@@ -46,8 +46,8 @@ import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.taxi.*;
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.optimizer.fifo.*;
+import playground.michalm.taxi.optimizer.TaxiOptimizer;
+import playground.michalm.taxi.optimizer.fifo.TaxiOptimizerConfiguration;
 import playground.michalm.taxi.scheduler.*;
 import playground.michalm.taxi.util.chart.TaxiScheduleChartUtils;
 import playground.michalm.taxi.util.stats.*;
@@ -79,9 +79,9 @@ import playground.michalm.util.RunningVehicleRegister;
     /*package*/final Scenario scenario;
 
     /*package*/AlgorithmConfig algorithmConfig;
-    /*package*/Boolean destinationKnown;
     /*package*/Boolean onlineVehicleTracker;
-    /*package*/Boolean minimizePickupTripTime;
+
+    /*package*/Boolean destinationKnown;
     /*package*/Double pickupDuration;
     /*package*/Double dropoffDuration;
 
@@ -113,16 +113,14 @@ import playground.michalm.util.RunningVehicleRegister;
 
         eventsFileName = dirName + "output\\ITERS\\it.20\\20.events.xml.gz";
 
-        algorithmConfig = AlgorithmConfig.NOS_FF;
+        //optimizer:
+        algorithmConfig = AlgorithmConfig.NOS_DSE_SL;
+        onlineVehicleTracker = true;
 
         //scheduler:
         destinationKnown = false;
         pickupDuration = 120.;
         dropoffDuration = 60.;
-
-        //optimizer:
-        onlineVehicleTracker = true;
-        minimizePickupTripTime = false;
 
         otfVis = !true;
 
@@ -173,10 +171,9 @@ import playground.michalm.util.RunningVehicleRegister;
         eventsFileName = dirName + params.get("eventsFileName");
 
         algorithmConfig = AlgorithmConfig.valueOf(params.get("algorithmConfig"));
+        onlineVehicleTracker = Boolean.valueOf(params.get("onlineVehicleTracker"));
 
         destinationKnown = Boolean.valueOf(params.get("destinationKnown"));
-        onlineVehicleTracker = Boolean.valueOf(params.get("onlineVehicleTracker"));
-        minimizePickupTripTime = Boolean.valueOf(params.get("minimizePickupTripTime"));
         pickupDuration = Double.valueOf(params.get("pickupDuration"));
         dropoffDuration = Double.valueOf(params.get("dropoffDuration"));
 
@@ -319,7 +316,7 @@ import playground.michalm.util.RunningVehicleRegister;
         VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(pathCalculator, scheduler);
 
         TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(context,
-                pathCalculator, scheduler, vrpFinder, minimizePickupTripTime);
+                pathCalculator, scheduler, vrpFinder, algorithmConfig.goal);
 
         return algorithmConfig.createTaxiOptimizer(optimConfig);
     }

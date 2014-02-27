@@ -1,13 +1,11 @@
 package playground.michalm.taxi.optimizer.fifo;
 
-import java.util.Collection;
-
 import playground.michalm.taxi.data.TaxiRequest;
 
 
-public class DemandSupplyEquilibriumUtils
+public class DemandSupplyBalanceUtils
 {
-    public static int countAwaitingUnplannedRequests(Collection<TaxiRequest> unplannedRequests,
+    public static int countUrgentUnplannedRequests(Iterable<TaxiRequest> unplannedRequests,
             double now)
     {
         //count unplannedRequests such that req.T0 < now

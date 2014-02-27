@@ -29,7 +29,7 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.TaxiOptimizer;
 import playground.michalm.taxi.optimizer.fifo.*;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
@@ -42,21 +42,16 @@ public class APSTaxiOptimizer
 {
     private final TaxiOptimizerConfiguration optimConfig;
 
-    private final boolean seekDemandSupplyEquilibrium;
-
     private final Map<Id, TaxiRequest> unplannedRequests;
 
     private boolean requiresReoptimization = false;
 
 
-    public APSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig,
-            boolean seekDemandSupplyEquilibrium)
+    public APSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
         this.optimConfig = optimConfig;
-        this.seekDemandSupplyEquilibrium = seekDemandSupplyEquilibrium;
 
         int vehCount = optimConfig.context.getVrpData().getVehicles().size();
-
         unplannedRequests = new HashMap<Id, TaxiRequest>(vehCount);
     }
 
@@ -64,8 +59,80 @@ public class APSTaxiOptimizer
     @Override
     public TaxiOptimizerConfiguration getConfiguration()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return optimConfig;
+    }
+
+
+    private static class VehicleData
+    {
+        private final List<Vehicle> vehicles = new ArrayList<Vehicle>();
+        private final List<LinkTimePair> departures = new ArrayList<LinkTimePair>();
+        private final int idleVehCount;
+        private final int dimension;
+
+
+        private VehicleData(TaxiOptimizerConfiguration optimConfig)
+        {
+            int idleVehs = 0;
+            double maxDepartureTime = -Double.MAX_VALUE;
+            for (Vehicle v : optimConfig.context.getVrpData().getVehicles()) {
+                LinkTimePair departure = optimConfig.scheduler.getEarliestIdleness(v);
+                //LinkTimePair departure = scheduler.getClosestDiversion(v);
+
+                if (departure != null) {
+                    vehicles.add(v);
+                    departures.add(departure);
+
+                    if (departure.time > maxDepartureTime) {
+                        maxDepartureTime = departure.time;
+                    }
+
+                    if (TaxiUtils.isIdle(v)) {
+                        idleVehs++;
+                    }
+                }
+            }
+
+            idleVehCount = idleVehs;
+            dimension = vehicles.size();
+        }
+    }
+
+
+    private static class RequestData
+    {
+        private final TaxiRequest[] requests;
+        private final int urgentReqCount;
+        private final int dimension;
+
+        public RequestData(TaxiOptimizerConfiguration optimConfig,
+                Map<Id, TaxiRequest> unplannedRequests)
+        {
+            dimension = unplannedRequests.size();//TODO - consider only awaiting and "soon-awaiting" reqs!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+            urgentReqCount = DemandSupplyBalanceUtils.countUrgentUnplannedRequests(
+                    unplannedRequests.values(), optimConfig.context.getTime());
+
+            requests = unplannedRequests.values().toArray(new TaxiRequest[dimension]);
+        }
+    }
+
+
+    private boolean doReduceTP(RequestData rData, VehicleData vData)
+    {
+        switch (optimConfig.goal) {
+            case MIN_PICKUP_TIME:
+                return true;
+
+            case MIN_WAIT_TIME:
+                return false;
+
+            case DEMAND_SUPPLY_EQUIL:
+                return rData.urgentReqCount > vData.idleVehCount;
+
+            default:
+                throw new IllegalStateException();
+        }
     }
 
 
@@ -76,61 +143,30 @@ public class APSTaxiOptimizer
                     unplannedRequests);
         }
 
-        int rDim = unplannedRequests.size();
-        if (rDim == 0) {
+        RequestData rData = new RequestData(optimConfig, unplannedRequests);
+        if (rData.dimension == 0) {
             return;
         }
 
-        List<Vehicle> vehicles = new ArrayList<Vehicle>();
-        List<LinkTimePair> departures = new ArrayList<LinkTimePair>();
-        int idleVehCount = 0;
-
-        double maxDepartureTime = -Double.MAX_VALUE;
-        for (Vehicle v : optimConfig.context.getVrpData().getVehicles()) {
-            LinkTimePair departure = optimConfig.scheduler.getEarliestIdleness(v);
-            //LinkTimePair departure = scheduler.getClosestDiversion(v);
-
-            if (departure != null) {
-                vehicles.add(v);
-                departures.add(departure);
-
-                if (departure.time > maxDepartureTime) {
-                    maxDepartureTime = departure.time;
-                }
-
-                if (TaxiUtils.isIdle(v)) {
-                    idleVehCount++;
-                }
-            }
-        }
-
-        int vDim = vehicles.size();
-        if (vDim == 0) {
+        VehicleData vData = new VehicleData(optimConfig);
+        if (vData.dimension == 0) {
             return;
         }
-
-        //        double now = context.getTime();
-        //
-        TaxiRequest[] requests = unplannedRequests.values().toArray(new TaxiRequest[rDim]);
-        int awaitingReqCount = DemandSupplyEquilibriumUtils.countAwaitingUnplannedRequests(
-                unplannedRequests.values(), optimConfig.context.getTime());
 
         VrpPathCalculator calculator = optimConfig.calculator;
 
-        boolean reduceTP = seekDemandSupplyEquilibrium ? //
-                awaitingReqCount > idleVehCount : //
-                optimConfig.minimizePickupTripTime;
+        boolean reduceTP = doReduceTP(rData, vData);
 
-        double[][] costMatrix = new double[vDim][rDim];
-        VrpPathWithTravelData[][] paths = new VrpPathWithTravelData[vDim][rDim];
+        double[][] costMatrix = new double[vData.dimension][rData.dimension];
+        VrpPathWithTravelData[][] paths = new VrpPathWithTravelData[vData.dimension][rData.dimension];
 
-        for (int r = 0; r < rDim; r++) {
-            TaxiRequest req = requests[r];
+        for (int r = 0; r < rData.dimension; r++) {
+            TaxiRequest req = rData.requests[r];
 
             //if ()
 
-            for (int v = 0; v < vDim; v++) {
-                LinkTimePair departure = departures.get(v);
+            for (int v = 0; v < vData.dimension; v++) {
+                LinkTimePair departure = vData.departures.get(v);
 
                 VrpPathWithTravelData path = calculator.calcPath(departure.link, req.getFromLink(),
                         departure.time);
@@ -147,7 +183,7 @@ public class APSTaxiOptimizer
 
         int[] assignment = new HungarianAlgorithm(costMatrix).execute();
 
-        for (int v = 0; v < vehicles.size(); v++) {
+        for (int v = 0; v < vData.vehicles.size(); v++) {
             int r = assignment[v];
             if (r == -1) {
                 continue;
@@ -156,8 +192,8 @@ public class APSTaxiOptimizer
             VrpPathWithTravelData path = paths[v][r];
 
             if (path != null) {
-                Vehicle veh = vehicles.get(v);
-                TaxiRequest req = requests[r];
+                Vehicle veh = vData.vehicles.get(v);
+                TaxiRequest req = rData.requests[r];
                 optimConfig.scheduler.scheduleRequest(new VehicleRequestPath(veh, req, path));
                 unplannedRequests.remove(req.getId());
             }

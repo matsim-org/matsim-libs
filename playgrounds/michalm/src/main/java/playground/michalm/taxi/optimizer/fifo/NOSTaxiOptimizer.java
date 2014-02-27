@@ -44,8 +44,6 @@ public class NOSTaxiOptimizer
     private final VehicleFilter vehicleFilter;
     private final RequestFilter requestFilter;
 
-    private final boolean seekDemandSupplyEquilibrium;
-
     private final Queue<TaxiRequest> unplannedRequests;
     private final Queue<Vehicle> idleVehicles;
 
@@ -53,42 +51,40 @@ public class NOSTaxiOptimizer
 
 
     public static NOSTaxiOptimizer createNOS(TaxiOptimizerConfiguration optimConfig,
-            boolean seekDemandSupplyEquilibrium, TravelDisutilitySource tdisSource)
+            TravelDisutilitySource tdisSource)
     {
         return tdisSource == STRAIGHT_LINE ? //
-                NOSTaxiOptimizer.createNOSWithStraightLineDistance(optimConfig, false) : //
-                NOSTaxiOptimizer.createNOSWithoutStraightLineDistance(optimConfig, false);
-
+                NOSTaxiOptimizer.createNOSWithStraightLineDistance(optimConfig) : //
+                NOSTaxiOptimizer.createNOSWithoutStraightLineDistance(optimConfig);
     }
 
 
     public static NOSTaxiOptimizer createNOSWithStraightLineDistance(
-            TaxiOptimizerConfiguration optimConfig, boolean seekDemandSupplyEquilibrium)
+            TaxiOptimizerConfiguration optimConfig)
     {
         VehicleFilter vehFilter = new StraightLineNearestVehicleFinder(optimConfig.scheduler);
         RequestFilter reqFilter = new StraightLineNearestRequestFinder(optimConfig.scheduler);
 
-        return new NOSTaxiOptimizer(optimConfig, vehFilter, reqFilter, seekDemandSupplyEquilibrium);
+        return new NOSTaxiOptimizer(optimConfig, vehFilter, reqFilter);
     }
 
 
     public static NOSTaxiOptimizer createNOSWithoutStraightLineDistance(
-            TaxiOptimizerConfiguration optimConfig, boolean seekDemandSupplyEquilibrium)
+            TaxiOptimizerConfiguration optimConfig)
     {
         VehicleFilter vehFilter = VehicleFilter.NO_FILTER;
         RequestFilter reqFilter = RequestFilter.NO_FILTER;
 
-        return new NOSTaxiOptimizer(optimConfig, vehFilter, reqFilter, seekDemandSupplyEquilibrium);
+        return new NOSTaxiOptimizer(optimConfig, vehFilter, reqFilter);
     }
 
 
     protected NOSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig, VehicleFilter vehicleFilter,
-            RequestFilter requestFilter, boolean seekDemandSupplyEquilibrium)
+            RequestFilter requestFilter)
     {
         this.optimConfig = optimConfig;
         this.vehicleFilter = vehicleFilter;
         this.requestFilter = requestFilter;
-        this.seekDemandSupplyEquilibrium = seekDemandSupplyEquilibrium;
 
         int vehCount = optimConfig.context.getVrpData().getVehicles().size();
         unplannedRequests = new PriorityQueue<TaxiRequest>(vehCount,//1 req per 1 veh
@@ -152,13 +148,20 @@ public class NOSTaxiOptimizer
 
     private boolean doReduceTP()
     {
-        if (!seekDemandSupplyEquilibrium) {
-            return optimConfig.minimizePickupTripTime;
-        }
-        else {
-            int awaitingReqCount = DemandSupplyEquilibriumUtils.countAwaitingUnplannedRequests(
-                    unplannedRequests, optimConfig.context.getTime());
-            return awaitingReqCount > idleVehicles.size();
+        switch (optimConfig.goal) {
+            case MIN_PICKUP_TIME:
+                return true;
+
+            case MIN_WAIT_TIME:
+                return false;
+
+            case DEMAND_SUPPLY_EQUIL:
+                int awaitingReqCount = DemandSupplyBalanceUtils.countUrgentUnplannedRequests(
+                        unplannedRequests, optimConfig.context.getTime());
+                return awaitingReqCount > idleVehicles.size();
+
+            default:
+                throw new IllegalStateException();
         }
     }
 

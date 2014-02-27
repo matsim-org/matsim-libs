@@ -31,7 +31,6 @@ import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.core.gbl.MatsimRandom;
 
 import pl.poznan.put.util.jfreechart.ChartUtils;
-import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.scheduler.TaxiDelaySpeedupStats;
 import playground.michalm.taxi.util.chart.TaxiScheduleChartUtils;
 import playground.michalm.taxi.util.stats.*;
@@ -91,7 +90,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
 
     /*package*/void run(AlgorithmConfig config, int runs, Boolean destinationKnown,
-            Boolean onlineVehicleTracker, Boolean minimizePickupTripTime)
+            Boolean onlineVehicleTracker)
     {
         if (runs < 0 || runs > RANDOM_SEEDS.length) {
             throw new RuntimeException();
@@ -100,7 +99,6 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
         launcher.algorithmConfig = config;
         launcher.destinationKnown = destinationKnown;
         launcher.onlineVehicleTracker = onlineVehicleTracker;
-        launcher.minimizePickupTripTime = minimizePickupTripTime;
 
         SummaryStatistics taxiPickupDriveTime = new SummaryStatistics();
         SummaryStatistics percentile95TaxiPickupDriveTime = new SummaryStatistics();
@@ -158,9 +156,6 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
         VrpData data = launcher.context.getVrpData();
         String cfg = launcher.algorithmConfig.name();
-        if (minimizePickupTripTime != null) {
-            cfg += minimizePickupTripTime ? "_TP" : "_TW";
-        }
 
         pw.printf(
                 "%20s\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
@@ -192,33 +187,41 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
     }
 
 
-    /*package*/void run(AlgorithmConfig config, int runs, Boolean minimizePickupTripTime)
+    /*package*/void run(AlgorithmConfig config, int runs)
     {
         Boolean destinationKnown = false;
         Boolean onlineVehicleTracker = false;
 
-        run(config, runs, destinationKnown, onlineVehicleTracker, minimizePickupTripTime);
+        run(config, runs, destinationKnown, onlineVehicleTracker);
 
     }
 
 
-    /*package*/void run(EnumSet<AlgorithmConfig> configs, int runs, Boolean minimizePickupTripTime)
+    /*package*/void run(EnumSet<AlgorithmConfig> configs, int runs)
     {
         for (AlgorithmConfig cfg : configs) {
-            run(cfg, runs, minimizePickupTripTime);
+            run(cfg, runs);
         }
     }
 
 
-    /*package*/static final EnumSet<AlgorithmConfig> selectedNos = EnumSet.of(//
-            //NOS_SL,
-            //NOS_TD,
-            NOS_FF
-            //NOS_24H,
-            //NOS_15M
+    /*package*/static final EnumSet<AlgorithmConfig> NOS_TW_xx = EnumSet.of(//
+            //NOS_TW_SL,
+            //NOS_TW_TD,
+            NOS_TW_FF
+            //NOS_TW_24H,
+            //NOS_TW_15M
             );
 
-    /*package*/static final EnumSet<AlgorithmConfig> selectedNosDse = EnumSet.of(//
+    /*package*/static final EnumSet<AlgorithmConfig> NOS_TP_xx = EnumSet.of(//
+            //NOS_TP_SL,
+            //NOS_TP_TD,
+            NOS_TP_FF
+            //NOS_TP_24H,
+            //NOS_TP_15M
+            );
+
+    /*package*/static final EnumSet<AlgorithmConfig> NOS_DSE_xx = EnumSet.of(//
             //NOS_DSE_SL,
             //NOS_DSE_TD,
             NOS_DSE_FF
@@ -226,21 +229,49 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
             //NOS_DSE_15M
             );
 
-    /*package*/static final EnumSet<AlgorithmConfig> selectedNonNos = EnumSet.of(//
-            //OTS_FF,
-            //OTS_24H,
-            //OTS_15M,
-            //========================================
-            //RES_FF,
-            //RES_24H,
-            //RES_15M,
-            //========================================
-            APS_FF
-            //APS_24H,
-            //APS_15M
+    /*package*/static final EnumSet<AlgorithmConfig> OTS_TW_xx = EnumSet.of(//
+            OTS_TW_FF
+            //OTS_TW_24H,
+            //OTS_TW_15M,
             );
 
-    /*package*/static final EnumSet<AlgorithmConfig> selectedNonNosDse = EnumSet.of(//
+    /*package*/static final EnumSet<AlgorithmConfig> OTS_TP_xx = EnumSet.of(//
+            OTS_TP_FF
+            //OTS_TP_24H,
+            //OTS_TP_15M,
+            );
+
+    /*package*/static final EnumSet<AlgorithmConfig> RES_TW_xx = EnumSet.of(//
+            RES_TW_FF
+            //RES_TW_24H,
+            //RES_TW_15M,
+            );
+
+    /*package*/static final EnumSet<AlgorithmConfig> RES_TP_xx = EnumSet.of(//
+            RES_TP_FF
+            //RES_TP_24H,
+            //RES_TP_15M,
+            );
+
+    /*package*/static final EnumSet<AlgorithmConfig> APS_TW_xx = EnumSet.of(//
+            //APS_TW_SL,
+            //APS_TW_TD,
+            APS_TW_FF
+            //APS_TW_24H,
+            //APS_TW_15M
+            );
+
+    /*package*/static final EnumSet<AlgorithmConfig> APS_TP_xx = EnumSet.of(//
+            //APS_TP_SL,
+            //APS_TP_TD,
+            APS_TP_FF
+            //APS_TP_24H,
+            //APS_TP_15M
+            );
+
+    /*package*/static final EnumSet<AlgorithmConfig> APS_DSE_xx = EnumSet.of(//
+            //APS_DSE_SL,
+            //APS_DSE_TD,
             APS_DSE_FF
             //APS_DSE_24H,
             //APS_DSE_15M
@@ -254,13 +285,9 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
         //multiLauncher.run(NOS_SL, runs, false);
 
-        //                multiLauncher.run(selectedNos, runs, false);
-        //                multiLauncher.run(selectedNos, runs, true);
-        //                multiLauncher.run(selectedNosDse, runs, null);
-
-        multiLauncher.run(selectedNonNos, runs, false);
-        multiLauncher.run(selectedNonNos, runs, true);
-        multiLauncher.run(selectedNonNosDse, runs, null);
+        multiLauncher.run(APS_TW_xx, runs);
+        multiLauncher.run(APS_TP_xx, runs);
+        multiLauncher.run(APS_DSE_xx, runs);
 
         multiLauncher.closeOutputFiles();
     }

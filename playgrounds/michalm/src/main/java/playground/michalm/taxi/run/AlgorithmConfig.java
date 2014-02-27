@@ -21,9 +21,8 @@ package playground.michalm.taxi.run;
 
 import static org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource.*;
 import static org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource.*;
+import static playground.michalm.taxi.optimizer.fifo.TaxiOptimizerConfiguration.Goal.*;
 import static playground.michalm.taxi.run.AlgorithmConfig.AlgorithmType.*;
-
-import java.util.EnumSet;
 
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
@@ -31,146 +30,103 @@ import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import playground.michalm.taxi.optimizer.TaxiOptimizer;
 import playground.michalm.taxi.optimizer.assignment.APSTaxiOptimizer;
 import playground.michalm.taxi.optimizer.fifo.*;
+import playground.michalm.taxi.optimizer.fifo.TaxiOptimizerConfiguration.Goal;
 
 
 /*package*/enum AlgorithmConfig
 {
-    NOS_SL(//
-            FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
-            STRAIGHT_LINE, // ????? Let's assume that taxi drivers choose the shortest-length path!!!
-            NO_SCHEDULING), //
+    NOS_TW_SL(NO_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, STRAIGHT_LINE),
 
-    NOS_TD(//
-            FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
-            DISTANCE, //
-            NO_SCHEDULING), //
+    NOS_TW_TD(NO_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, DISTANCE),
 
-    NOS_FF(//
-            FREE_FLOW_SPEED, //
-            TIME, //
-            NO_SCHEDULING), //
+    NOS_TW_FF(NO_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
 
-    NOS_24H(//
-            EVENTS_24_H, //
-            TIME, //
-            NO_SCHEDULING), //
+    NOS_TW_24H(NO_SCHEDULING, MIN_WAIT_TIME, EVENTS_24_H, TIME),
 
-    NOS_15M(//
-            EVENTS_15_MIN, //
-            TIME, //
-            NO_SCHEDULING), //
+    NOS_TW_15M(NO_SCHEDULING, MIN_WAIT_TIME, EVENTS_15_MIN, TIME),
 
-    NOS_DSE_SL(//
-            FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
-            STRAIGHT_LINE, // ????? Let's assume that taxi drivers choose the shortest-length path!!!
-            NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM), //
+    NOS_TP_SL(NO_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, STRAIGHT_LINE),
 
-    NOS_DSE_TD(//
-            FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
-            DISTANCE, //
-            NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM), //
+    NOS_TP_TD(NO_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, DISTANCE),
 
-    NOS_DSE_FF(//
-            FREE_FLOW_SPEED, //
-            TIME, //
-            NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM), //
+    NOS_TP_FF(NO_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, TIME),
 
-    NOS_DSE_24H(//
-            EVENTS_24_H, //
-            TIME, //
-            NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM), //
+    NOS_TP_24H(NO_SCHEDULING, MIN_PICKUP_TIME, EVENTS_24_H, TIME),
 
-    NOS_DSE_15M(//
-            EVENTS_15_MIN, //
-            TIME, //
-            NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM), //
+    NOS_TP_15M(NO_SCHEDULING, MIN_PICKUP_TIME, EVENTS_15_MIN, TIME),
 
-    OTS_FF(//
-            FREE_FLOW_SPEED, //
-            TIME, //
-            ONE_TIME_SCHEDULING), //
+    NOS_DSE_SL(NO_SCHEDULING, DEMAND_SUPPLY_EQUIL, FREE_FLOW_SPEED, STRAIGHT_LINE),
 
-    OTS_24H(//
-            EVENTS_24_H, //
-            TIME, //
-            ONE_TIME_SCHEDULING), //
+    NOS_DSE_TD(NO_SCHEDULING, DEMAND_SUPPLY_EQUIL, FREE_FLOW_SPEED, DISTANCE),
 
-    OTS_15M(//
-            EVENTS_15_MIN, //
-            TIME, //
-            ONE_TIME_SCHEDULING), //
+    NOS_DSE_FF(NO_SCHEDULING, DEMAND_SUPPLY_EQUIL, FREE_FLOW_SPEED, TIME),
 
-    RES_FF(//
-            FREE_FLOW_SPEED, //
-            TIME, //
-            RE_SCHEDULING), //
+    NOS_DSE_24H(NO_SCHEDULING, DEMAND_SUPPLY_EQUIL, EVENTS_24_H, TIME),
 
-    RES_24H(//
-            EVENTS_24_H, //
-            TIME, //
-            RE_SCHEDULING), //
+    NOS_DSE_15M(NO_SCHEDULING, DEMAND_SUPPLY_EQUIL, EVENTS_15_MIN, TIME),
 
-    RES_15M(//
-            EVENTS_15_MIN, //
-            TIME, //
-            RE_SCHEDULING), //
+    OTS_TW_FF(ONE_TIME_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
 
-    APS_FF(//
-            FREE_FLOW_SPEED, //
-            TIME, //
-            AP_SCHEDULING), //
+    OTS_TW_24H(ONE_TIME_SCHEDULING, MIN_WAIT_TIME, EVENTS_24_H, TIME),
 
-    APS_24H(//
-            EVENTS_24_H, //
-            TIME, //
-            AP_SCHEDULING), //
+    OTS_TW_15M(ONE_TIME_SCHEDULING, MIN_WAIT_TIME, EVENTS_15_MIN, TIME),
 
-    APS_15M(//
-            EVENTS_15_MIN, //
-            TIME, //
-            AP_SCHEDULING), //
+    OTS_TP_FF(ONE_TIME_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, TIME),
 
-    APS_DSE_FF(//
-            FREE_FLOW_SPEED, //
-            TIME, //
-            AP_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM), //
+    OTS_TP_24H(ONE_TIME_SCHEDULING, MIN_PICKUP_TIME, EVENTS_24_H, TIME),
 
-    APS_DSE_24H(//
-            EVENTS_24_H, //
-            TIME, //
-            AP_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM), //
+    OTS_TP_15M(ONE_TIME_SCHEDULING, MIN_PICKUP_TIME, EVENTS_15_MIN, TIME),
 
-    APS_DSE_15M(//
-            EVENTS_15_MIN, //
-            TIME, //
-            AP_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM);//
+    RES_TW_FF(RE_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
 
-    /*package*/static final EnumSet<AlgorithmConfig> NOS = EnumSet.of(NOS_SL, NOS_TD, NOS_FF,
-            NOS_24H, NOS_15M, NOS_DSE_SL, NOS_DSE_TD, NOS_DSE_FF, NOS_DSE_24H, NOS_DSE_15M);
+    RES_TW_24H(RE_SCHEDULING, MIN_WAIT_TIME, EVENTS_24_H, TIME),
 
-    /*package*/static final EnumSet<AlgorithmConfig> NON_NOS = EnumSet.complementOf(NOS);
+    RES_TW_15M(RE_SCHEDULING, MIN_WAIT_TIME, EVENTS_15_MIN, TIME),
 
+    RES_TP_FF(RE_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, TIME),
+
+    RES_TP_24H(RE_SCHEDULING, MIN_PICKUP_TIME, EVENTS_24_H, TIME),
+
+    RES_TP_15M(RE_SCHEDULING, MIN_PICKUP_TIME, EVENTS_15_MIN, TIME),
+
+    APS_TW_FF(AP_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
+
+    APS_TW_24H(AP_SCHEDULING, MIN_WAIT_TIME, EVENTS_24_H, TIME),
+
+    APS_TW_15M(AP_SCHEDULING, MIN_WAIT_TIME, EVENTS_15_MIN, TIME),
+
+    APS_TP_FF(AP_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, TIME),
+
+    APS_TP_24H(AP_SCHEDULING, MIN_PICKUP_TIME, EVENTS_24_H, TIME),
+
+    APS_TP_15M(AP_SCHEDULING, MIN_PICKUP_TIME, EVENTS_15_MIN, TIME),
+
+    APS_DSE_FF(AP_SCHEDULING, DEMAND_SUPPLY_EQUIL, FREE_FLOW_SPEED, TIME),
+
+    APS_DSE_24H(AP_SCHEDULING, DEMAND_SUPPLY_EQUIL, EVENTS_24_H, TIME),
+
+    APS_DSE_15M(AP_SCHEDULING, DEMAND_SUPPLY_EQUIL, EVENTS_15_MIN, TIME);
 
     /*package*/static enum AlgorithmType
     {
         NO_SCHEDULING, //
-        NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM, //
         ONE_TIME_SCHEDULING, //
         RE_SCHEDULING, //
         AP_SCHEDULING, //
-        AP_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM;
     }
 
 
     /*package*/final TravelTimeSource ttimeSource;
+    /*package*/final Goal goal;
     /*package*/final TravelDisutilitySource tdisSource;
     /*package*/final AlgorithmType algorithmType;
 
 
-    /*package*/AlgorithmConfig(TravelTimeSource ttimeSource, TravelDisutilitySource tdisSource,
-            AlgorithmType algorithmType)
+    /*package*/AlgorithmConfig(AlgorithmType algorithmType, Goal goal,
+            TravelTimeSource ttimeSource, TravelDisutilitySource tdisSource)
     {
         this.ttimeSource = ttimeSource;
+        this.goal = goal;
         this.tdisSource = tdisSource;
         this.algorithmType = algorithmType;
     }
@@ -180,10 +136,7 @@ import playground.michalm.taxi.optimizer.fifo.*;
     {
         switch (algorithmType) {
             case NO_SCHEDULING:
-                return NOSTaxiOptimizer.createNOS(optimConfig, false, tdisSource);
-
-            case NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM:
-                return NOSTaxiOptimizer.createNOS(optimConfig, true, tdisSource);
+                return NOSTaxiOptimizer.createNOS(optimConfig, tdisSource);
 
             case ONE_TIME_SCHEDULING:
                 return new OTSTaxiOptimizer(optimConfig);
@@ -192,10 +145,7 @@ import playground.michalm.taxi.optimizer.fifo.*;
                 return new RESTaxiOptimizer(optimConfig);
 
             case AP_SCHEDULING:
-                return new APSTaxiOptimizer(optimConfig, false);
-
-            case AP_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM:
-                return new APSTaxiOptimizer(optimConfig, true);
+                return new APSTaxiOptimizer(optimConfig);
 
             default:
                 throw new IllegalStateException();

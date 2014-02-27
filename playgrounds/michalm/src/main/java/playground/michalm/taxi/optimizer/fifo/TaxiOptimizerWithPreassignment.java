@@ -28,6 +28,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 
 import playground.michalm.taxi.data.TaxiRequest;
+import playground.michalm.taxi.optimizer.fifo.TaxiOptimizerConfiguration.Goal;
 import playground.michalm.taxi.scheduler.*;
 import playground.michalm.taxi.vehreqpath.*;
 
@@ -51,7 +52,7 @@ public class TaxiOptimizerWithPreassignment
         VehicleRequestPathFinder vrpFinder = createVrpFinder(calculator, scheduler, reqIdToVehMap);
 
         TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(context,
-                calculator, scheduler, vrpFinder, false);
+                calculator, scheduler, vrpFinder, Goal.NULL);
 
         return new OTSTaxiOptimizer(optimConfig);
     }

@@ -32,6 +32,7 @@ import org.matsim.contrib.dvrp.schedule.*;
 
 import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
 import playground.michalm.taxi.optimizer.fifo.*;
+import playground.michalm.taxi.optimizer.fifo.TaxiOptimizerConfiguration.Goal;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.scheduler.*;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
@@ -63,7 +64,7 @@ public class NOSRankTaxiOptimizer
         VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(calculator, scheduler);
 
         TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(context,
-                calculator, scheduler, vrpFinder, false);
+                calculator, scheduler, vrpFinder, Goal.MIN_WAIT_TIME);
 
         return new NOSRankTaxiOptimizer(optimConfig, new IdleRankVehicleFinder(context, scheduler));
     }
@@ -72,7 +73,7 @@ public class NOSRankTaxiOptimizer
     private NOSRankTaxiOptimizer(TaxiOptimizerConfiguration optimConfig,
             IdleRankVehicleFinder vehicleFinder)
     {
-        super(optimConfig, vehicleFinder, null, false);
+        super(optimConfig, vehicleFinder, null);
         this.optimConfig = optimConfig;
         this.idleVehicleFinder = vehicleFinder;
         this.shortTimeIdlers = new ArrayList<Id>();

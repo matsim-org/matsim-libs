@@ -29,7 +29,7 @@ import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiOptimizer;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
-import playground.michalm.taxi.vehreqpath.*;
+import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
 
 
 public class OTSTaxiOptimizer
@@ -51,9 +51,7 @@ public class OTSTaxiOptimizer
         int vehCount = optimConfig.context.getVrpData().getVehicles().size();//1 awaiting req/veh
         unplannedRequests = new PriorityQueue<TaxiRequest>(vehCount, Requests.T0_COMPARATOR);
 
-        vrpComparator = optimConfig.minimizePickupTripTime ? //
-                VehicleRequestPaths.TP_COMPARATOR : //
-                VehicleRequestPaths.TW_COMPARATOR;
+        vrpComparator = optimConfig.getVrpComparator();
     }
 
 
