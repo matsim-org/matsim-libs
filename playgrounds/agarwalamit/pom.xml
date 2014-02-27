@@ -8,4 +8,21 @@
   <groupId>playground</groupId>
   <artifactId>agarwalamit</artifactId>
   <name>agarwalamit</name>
+  <dependencies>
+  	<dependency>
+  		<groupId>playground</groupId>
+  		<artifactId>benjamin</artifactId>
+  		<version>0.6.0-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>playground</groupId>
+  		<artifactId>vsp</artifactId>
+  		<version>0.6.0-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>playground</groupId>
+  		<artifactId>ikaddoura</artifactId>
+  		<version>0.6.0-SNAPSHOT</version>
+  	</dependency>
+  </dependencies>
 </project>
