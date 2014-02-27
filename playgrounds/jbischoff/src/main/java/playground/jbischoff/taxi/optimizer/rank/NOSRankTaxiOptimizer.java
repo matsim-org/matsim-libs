@@ -31,8 +31,9 @@ import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.schedule.*;
 
 import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
+import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
 import playground.michalm.taxi.optimizer.fifo.*;
-import playground.michalm.taxi.optimizer.fifo.TaxiOptimizerConfiguration.Goal;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.scheduler.*;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;

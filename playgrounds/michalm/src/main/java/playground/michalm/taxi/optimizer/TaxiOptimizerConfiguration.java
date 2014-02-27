@@ -1,4 +1,4 @@
-package playground.michalm.taxi.optimizer.fifo;
+package playground.michalm.taxi.optimizer;
 
 import java.util.Comparator;
 

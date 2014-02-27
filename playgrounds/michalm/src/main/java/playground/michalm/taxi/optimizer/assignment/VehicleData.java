@@ -24,7 +24,7 @@ import java.util.*;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
-import playground.michalm.taxi.optimizer.fifo.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 import playground.michalm.taxi.util.TaxicabUtils;
 
 class VehicleData

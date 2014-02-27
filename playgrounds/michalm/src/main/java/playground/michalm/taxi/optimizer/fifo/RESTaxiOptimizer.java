@@ -21,6 +21,7 @@ package playground.michalm.taxi.optimizer.fifo;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 
+import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 import playground.michalm.taxi.schedule.TaxiSchedules;
 
 

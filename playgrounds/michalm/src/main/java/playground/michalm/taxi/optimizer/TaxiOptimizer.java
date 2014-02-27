@@ -22,8 +22,6 @@ package playground.michalm.taxi.optimizer;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
-import playground.michalm.taxi.optimizer.fifo.TaxiOptimizerConfiguration;
-
 
 /**
  * @author michalm

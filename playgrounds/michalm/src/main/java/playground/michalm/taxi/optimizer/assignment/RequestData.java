@@ -24,7 +24,7 @@ import java.util.Set;
 import org.matsim.contrib.dvrp.data.Requests;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.fifo.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 
 
 class RequestData

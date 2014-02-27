@@ -21,16 +21,16 @@ package playground.michalm.taxi.run;
 
 import static org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource.*;
 import static org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource.*;
-import static playground.michalm.taxi.optimizer.fifo.TaxiOptimizerConfiguration.Goal.*;
+import static playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal.*;
 import static playground.michalm.taxi.run.AlgorithmConfig.AlgorithmType.*;
 
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 
-import playground.michalm.taxi.optimizer.TaxiOptimizer;
+import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
 import playground.michalm.taxi.optimizer.assignment.APSTaxiOptimizer;
 import playground.michalm.taxi.optimizer.fifo.*;
-import playground.michalm.taxi.optimizer.fifo.TaxiOptimizerConfiguration.Goal;
 
 
 /*package*/enum AlgorithmConfig
