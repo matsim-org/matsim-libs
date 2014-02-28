@@ -354,5 +354,55 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 			return choice;
 		}
 	}
+
+	public static class MaxDistanceLogitLocationChooser implements LocationChooser {
+		private final Random random = MatsimRandom.getLocalInstance();
+		private final double beta;
+
+		public MaxDistanceLogitLocationChooser(final double beta) {
+			if ( beta > 0 ) throw new IllegalArgumentException( "beta must be negative to make sense. Got "+beta );
+			this.beta = beta;
+		}
+
+		@Override
+		public ActivityFacility choose(
+				final Collection<Subchain> subchains,
+				final List<ActivityFacility> choiceSet) {
+			final double[] vals = new double[ choiceSet.size() ];
+
+			double max = Double.NEGATIVE_INFINITY;
+			for ( int i=0; i < vals.length; i++ ) {
+				final ActivityFacility fac = choiceSet.get( i );
+				vals[ i ] = Double.NEGATIVE_INFINITY;
+
+				for ( Subchain subchain : subchains ) {
+					final double dist = CoordUtils.calcDistance(
+							subchain.start.getCoord(),
+							fac.getCoord() ) +
+						CoordUtils.calcDistance(
+							subchain.end.getCoord(),
+							fac.getCoord() );
+					if ( dist > vals[ i ] ) vals[ i ] = dist;
+				}
+
+				if ( vals[ i ] > max ) max = vals[ i ];
+			}
+
+			double sum = 0;
+			for ( int i=0; i < vals.length; i++ ) {
+				// substract max to avoid overflow (see comments in ExpBetaPlanSelector)
+				vals[ i ] = Math.exp( beta * (vals[ i ] - max) );
+				sum += vals[ i ];
+			}
+
+			double choice = random.nextDouble() * sum;
+			for ( int i=0; i < vals.length; i++ ) {
+				choice -= vals[ i ];
+				if ( choice <= 0 ) return choiceSet.get( i );
+			}
+
+			throw new RuntimeException( ""+sum );
+		}
+	}
 }
 

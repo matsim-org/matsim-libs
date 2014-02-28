@@ -44,8 +44,11 @@ public class PrismicLocationChoiceConfigGroup extends ReflectiveModule {
 	public static enum SamplingMethod {
 		random,
 		maximumDistanceMinimization,
-		maximumDistanceInverselyProportional;
+		maximumDistanceInverselyProportional,
+		maximumDistanceLogit;
 	}
+
+	private double maximumDistanceLogitBeta = -0.01;
 
 	public PrismicLocationChoiceConfigGroup() {
 		super( GROUP_NAME );
@@ -143,6 +146,16 @@ public class PrismicLocationChoiceConfigGroup extends ReflectiveModule {
 	@StringSetter( "samplingMethod" )
 	public void setSamplingMethod(SamplingMethod samplingMethod) {
 		this.samplingMethod = samplingMethod;
+	}
+
+	@StringGetter( "maximumDistanceLogitBeta" )
+	public double getMaximumDistanceLogitBeta() {
+		return this.maximumDistanceLogitBeta;
+	}
+
+	@StringSetter( "maximumDistanceLogitBeta" )
+	public void setMaximumDistanceLogitBeta(double maximumDistanceLogitBeta) {
+		this.maximumDistanceLogitBeta = maximumDistanceLogitBeta;
 	}
 
 	@StringGetter( "travelTimeBudget_s" )
