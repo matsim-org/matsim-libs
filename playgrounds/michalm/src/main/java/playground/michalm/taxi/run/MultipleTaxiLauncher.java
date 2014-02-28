@@ -25,14 +25,11 @@ import java.io.*;
 import java.util.EnumSet;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.jfree.chart.JFreeChart;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.core.gbl.MatsimRandom;
 
-import pl.poznan.put.util.jfreechart.ChartUtils;
 import playground.michalm.taxi.scheduler.TaxiDelaySpeedupStats;
-import playground.michalm.taxi.util.chart.TaxiScheduleChartUtils;
 import playground.michalm.taxi.util.stats.*;
 import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
@@ -90,7 +87,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
 
     /*package*/void run(AlgorithmConfig config, int runs, Boolean destinationKnown,
-            Boolean onlineVehicleTracker)
+            Boolean onlineVehicleTracker, Boolean advanceRequestSubmission)
     {
         if (runs < 0 || runs > RANDOM_SEEDS.length) {
             throw new RuntimeException();
@@ -99,6 +96,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
         launcher.algorithmConfig = config;
         launcher.destinationKnown = destinationKnown;
         launcher.onlineVehicleTracker = onlineVehicleTracker;
+        launcher.advanceRequestSubmission = advanceRequestSubmission;
 
         SummaryStatistics taxiPickupDriveTime = new SummaryStatistics();
         SummaryStatistics percentile95TaxiPickupDriveTime = new SummaryStatistics();
@@ -180,10 +178,10 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
         cacheStats.printStats(pw3, launcher.algorithmConfig.name());
         cacheStats.clearStats();
 
-        JFreeChart chart = TaxiScheduleChartUtils.chartSchedule(launcher.context.getVrpData()
-                .getVehicles());
-        chart.setTitle(cfg);
-        ChartUtils.showFrame(chart);
+//        JFreeChart chart = TaxiScheduleChartUtils.chartSchedule(launcher.context.getVrpData()
+//                .getVehicles());
+//        chart.setTitle(cfg);
+//        ChartUtils.showFrame(chart);
     }
 
 
@@ -191,9 +189,9 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
     {
         Boolean destinationKnown = false;
         Boolean onlineVehicleTracker = false;
+        Boolean advanceRequestSubmission = true;
 
-        run(config, runs, destinationKnown, onlineVehicleTracker);
-
+        run(config, runs, destinationKnown, onlineVehicleTracker, advanceRequestSubmission);
     }
 
 
@@ -283,8 +281,16 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
         MultipleTaxiLauncher multiLauncher = new MultipleTaxiLauncher(paramFile);
         multiLauncher.initOutputFiles("");
 
-        //multiLauncher.run(NOS_SL, runs, false);
+        multiLauncher.run(NOS_TW_xx, runs);
+        multiLauncher.run(NOS_TP_xx, runs);
+        multiLauncher.run(NOS_DSE_xx, runs);
 
+        multiLauncher.run(OTS_TW_xx, runs);
+        multiLauncher.run(OTS_TP_xx, runs);
+        
+        multiLauncher.run(RES_TW_xx, runs);
+        multiLauncher.run(RES_TP_xx, runs);
+        
         multiLauncher.run(APS_TW_xx, runs);
         multiLauncher.run(APS_TP_xx, runs);
         multiLauncher.run(APS_DSE_xx, runs);

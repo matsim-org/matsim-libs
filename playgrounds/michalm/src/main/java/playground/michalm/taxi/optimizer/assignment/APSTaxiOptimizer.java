@@ -51,7 +51,7 @@ public class APSTaxiOptimizer
     public APSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
         this.optimConfig = optimConfig;
-        unplannedRequests = new TreeSet<TaxiRequest>(Requests.T0_COMPARATOR);
+        unplannedRequests = new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR);
     }
 
 
@@ -90,7 +90,7 @@ public class APSTaxiOptimizer
         List<VrpPathWithTravelData[]> paths = new ArrayList<VrpPathWithTravelData[]>(
                 rData.urgentReqCount);
 
-        int rMin = Math.max(rData.urgentReqCount, vData.dimension);
+        int rMin = Math.max(rData.urgentReqCount, Math.min(rData.dimension, vData.dimension));
         Max maxArrivalTimeForRMinRequests = new Max();
 
         for (int r = 0; r < rMin; r++) {
@@ -184,12 +184,12 @@ public class APSTaxiOptimizer
     {
         removePlannedRequests();
 
-        RequestData rData = new RequestData(optimConfig, unplannedRequests);
+        rData = new RequestData(optimConfig, unplannedRequests);
         if (rData.dimension == 0) {
             return;
         }
 
-        VehicleData vData = new VehicleData(optimConfig);
+        vData = new VehicleData(optimConfig);
         if (vData.dimension == 0) {
             return;
         }

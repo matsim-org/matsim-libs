@@ -3,7 +3,7 @@ package org.matsim.contrib.dvrp.data;
 import java.util.Comparator;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.*;
 
 
 public class Requests
@@ -26,6 +26,18 @@ public class Requests
         public int compare(Request r1, Request r2)
         {
             return Double.compare(r1.getSubmissionTime(), r2.getSubmissionTime());
+        }
+    };
+
+    //necessary for instance when TreeSet is used to store requests
+    //(TreeSet uses comparisons instead of Object.equals(Object)) 
+    public static final Comparator<Request> ABSOLUTE_COMPARATOR = new Comparator<Request>() {
+        public int compare(Request r1, Request r2)
+        {
+            return ComparisonChain.start().compare(r1.getT0(), r2.getT0())
+                    .compare(r1.getT1(), r2.getT1())
+                    .compare(r1.getSubmissionTime(), r2.getSubmissionTime())
+                    .compare(r1.getId(), r2.getId()).result();
         }
     };
 

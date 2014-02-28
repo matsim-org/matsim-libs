@@ -23,7 +23,7 @@ import java.io.*;
 import java.util.*;
 
 import org.matsim.analysis.LegHistogram;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.router.*;
@@ -79,6 +79,7 @@ import playground.michalm.util.RunningVehicleRegister;
 
     /*package*/AlgorithmConfig algorithmConfig;
     /*package*/Boolean onlineVehicleTracker;
+    /*package*/Boolean advanceRequestSubmission;
 
     /*package*/Boolean destinationKnown;
     /*package*/Double pickupDuration;
@@ -115,6 +116,7 @@ import playground.michalm.util.RunningVehicleRegister;
         //optimizer:
         algorithmConfig = AlgorithmConfig.NOS_DSE_SL;
         onlineVehicleTracker = true;
+        advanceRequestSubmission = false;
 
         //scheduler:
         destinationKnown = false;
@@ -171,6 +173,7 @@ import playground.michalm.util.RunningVehicleRegister;
 
         algorithmConfig = AlgorithmConfig.valueOf(params.get("algorithmConfig"));
         onlineVehicleTracker = Boolean.valueOf(params.get("onlineVehicleTracker"));
+        advanceRequestSubmission = Boolean.valueOf(params.get("advanceRequestSubmission"));
 
         destinationKnown = Boolean.valueOf(params.get("destinationKnown"));
         pickupDuration = Double.valueOf(params.get("pickupDuration"));
@@ -243,7 +246,9 @@ import playground.michalm.util.RunningVehicleRegister;
         PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(
                 TaxiRequestCreator.MODE, new TaxiRequestCreator(), optimizer, context, qSim);
 
-        qSim.addQueueSimulationListeners(new BeforeSimulationTaxiCaller(passengerEngine));
+        if (advanceRequestSubmission) {
+            qSim.addQueueSimulationListeners(new BeforeSimulationTaxiCaller(passengerEngine));
+        }
 
         LegCreator legCreator = onlineVehicleTracker ? VrpDynLegs
                 .createLegWithOnlineTrackerCreator(optimizer, qSim.getSimTimer())

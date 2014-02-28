@@ -53,8 +53,13 @@ public class VehicleRequestPathFinder
     public VehicleRequestPath findBestVehicleForRequest(TaxiRequest req,
             Iterable<Vehicle> vehicles, Comparator<VehicleRequestPath> vrpComparator)
     {
+        if (Iterables.isEmpty(vehicles)) {
+            return null;
+        }
+        
         Function<Vehicle, VehicleRequestPath> transformation = vehToVRPathTransformation(req);
         Iterable<VehicleRequestPath> vrps = Iterables.transform(vehicles, transformation);
+        
         return Ordering.from(vrpComparator).nullsLast().min(vrps);
     }
 
@@ -62,8 +67,13 @@ public class VehicleRequestPathFinder
     public VehicleRequestPath findBestRequestForVehicle(Vehicle veh,
             Iterable<TaxiRequest> unplannedRequests, Comparator<VehicleRequestPath> vrpComparator)
     {
+        if (Iterables.isEmpty(unplannedRequests)) {
+            return null;
+        }
+        
         Function<TaxiRequest, VehicleRequestPath> transformation = reqToVRPathTransformation(veh);
         Iterable<VehicleRequestPath> vrps = Iterables.transform(unplannedRequests, transformation);
+
         return Ordering.from(vrpComparator).nullsLast().min(vrps);
     }
 
