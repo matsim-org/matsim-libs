@@ -87,7 +87,7 @@ public class GroupStrategyManager {
 			final GroupPlanStrategy strategy = registry.chooseStrategy( iteration , random.nextDouble() );
 			final List<ReplanningGroup> alloc = MapUtils.getList( strategy , strategyAllocations );
 
-			notifyAlloc( g , strategy );
+			notifyAlloc( iteration , g , strategy );
 			alloc.add( g );
 		}
 		if ( stopWatch != null ) stopWatch.endOperation( "remove plans alloc strategy" );
@@ -107,13 +107,15 @@ public class GroupStrategyManager {
 	}
 
 	private void notifyAlloc(
+			final int i,
 			final ReplanningGroup g,
 			final GroupPlanStrategy strategy) {
-		for ( Listener l : listeners ) l.notifyAlloc( g , strategy );
+		for ( Listener l : listeners ) l.notifyAlloc( i , g , strategy );
 	}
 
 	public static interface Listener {
 		public void notifyAlloc(
+				final int iteration,
 				final ReplanningGroup g,
 				final GroupPlanStrategy strategy );
 	}
