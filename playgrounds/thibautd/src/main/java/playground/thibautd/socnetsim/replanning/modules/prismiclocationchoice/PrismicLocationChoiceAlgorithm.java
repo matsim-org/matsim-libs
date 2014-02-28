@@ -140,6 +140,7 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 				potentialLocations = potentialLocations == null ?
 					new HashSet<ActivityFacility>( prism ) :
 					CollectionUtils.intersect( potentialLocations , prism );
+				if ( potentialLocations.isEmpty() ) break; // early abort: will loop anyway
 			}
 		}
 		while ( potentialLocations.isEmpty() && mult <= config.getMaximumExpansionFactor() );
