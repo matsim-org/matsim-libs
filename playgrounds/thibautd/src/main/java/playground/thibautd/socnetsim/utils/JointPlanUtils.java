@@ -37,6 +37,7 @@ import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.PassengerRoute;
+import playground.thibautd.utils.Couple;
 import playground.thibautd.utils.MapUtils;
 
 /**
@@ -434,30 +435,5 @@ class TripCharacteristics {
 	@Override
 	public int hashCode() {
 		return driver.hashCode() + passenger.hashCode() + origin.hashCode() + destination.hashCode();
-	}
-}
-
-class Couple {
-	private int hash;
-	private final Id id1, id2;
-
-	public Couple(
-			final Id id1,
-			final Id id2 ) {
-		this.id1 = id1;
-		this.id2 = id2;
-		this.hash = id1.hashCode() + id2.hashCode();
-	}
-
-	@Override
-	public int hashCode() {
-		return hash;
-	}
-
-	@Override
-	public boolean equals( final Object o ) {
-		final Couple other = (Couple) o;
-		return ( other.id1.equals( id1 ) && other.id2.equals( id2 ) ) ||
-			( other.id2.equals( id1 ) && other.id1.equals( id2 ) );
 	}
 }
