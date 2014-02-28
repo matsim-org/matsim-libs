@@ -345,6 +345,52 @@ public abstract class ReflectiveModule extends Module {
 		return map;
 	}
 
+	/**
+	 * Comments for parameters which setter get an enum type are automatically generated,
+	 * containing a list of possible values. They can be overriden by subclasses without
+	 * problems.
+	 *
+	 * <br>
+	 * it is recommended for subclasses to get this map using <tt>super.getComments()</tt>
+	 * and fill it with additional comments, rather than generate an empty map.
+	 */
+	@Override
+	public Map<String, String> getComments() {
+		// generate some default comments.
+		final Map<String, String> comments = super.getComments();
+
+		for ( Map.Entry<String, Method> entry : setters.entrySet() ) {
+			final String paramName = entry.getKey();
+			if ( comments.containsKey( paramName ) ) {
+				// at the time of implementation, this is not possible,
+				// but who knows? Do not override something already there.
+				continue;
+			}
+
+			final Method setter = entry.getValue();
+
+			final Class<?>[] params = setter.getParameterTypes();
+			assert params.length == 1; // already checked at constr.
+
+			final Class<?> type = params[ 0 ];
+
+			if ( type.isEnum() ) {
+				// generate an automatic comment containing the possible values for enum types
+				final StringBuilder comment = new StringBuilder( "Possible values: " );
+				final Object[] consts = type.getEnumConstants();
+
+				for ( int i = 0; i < consts.length; i++ ) {
+					comment.append( consts[ i ].toString() );
+					if ( i < consts.length - 1 ) comment.append( ", " );
+				}
+
+				comments.put( paramName , comment.toString() );
+			}
+		}
+
+		return comments;
+	}
+
 	// /////////////////////////////////////////////////////////////////////////
 	// annotations
 	// /////////////////////////////////////////////////////////////////////////
