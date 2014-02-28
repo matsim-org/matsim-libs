@@ -71,10 +71,22 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 			final StageActivityTypes stages) {
 		this(
 			config,
-			new RandomLocationChooser(),
+			getChooser( config ),
 			facilities,
 			socialNetwork,
 			stages );
+	}
+
+	private static LocationChooser getChooser(
+			final PrismicLocationChoiceConfigGroup config) {
+		switch ( config.getSamplingMethod() ) {
+			case random:
+				return new RandomLocationChooser();
+			case maximumDistanceProportional:
+				return new MaxDistanceProportionalLocationChooser();
+			default:
+				throw new IllegalArgumentException( ""+config.getSamplingMethod() );
+		}
 	}
 
 	public PrismicLocationChoiceAlgorithm(

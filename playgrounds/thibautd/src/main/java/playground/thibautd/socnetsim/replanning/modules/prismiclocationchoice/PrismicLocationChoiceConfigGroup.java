@@ -40,6 +40,11 @@ public class PrismicLocationChoiceConfigGroup extends ReflectiveModule {
 	private double minimalDistanceFactor = 1.2;
 	private int maximumExpansionFactor = 3;
 
+	private SamplingMethod samplingMethod = SamplingMethod.random;
+	public static enum SamplingMethod {
+		random, maximumDistanceProportional;
+	}
+
 	public PrismicLocationChoiceConfigGroup() {
 		super( GROUP_NAME );
 	}
@@ -126,6 +131,16 @@ public class PrismicLocationChoiceConfigGroup extends ReflectiveModule {
 	public void setMaximumExpansionFactor(final int maximumExpansionFactor) {
 		if ( maximumExpansionFactor <= 1 ) throw new IllegalArgumentException( maximumExpansionFactor+"too small" );
 		this.maximumExpansionFactor = maximumExpansionFactor;
+	}
+
+	@StringGetter( "samplingMethod" )
+	public SamplingMethod getSamplingMethod() {
+		return this.samplingMethod;
+	}
+
+	@StringSetter( "samplingMethod" )
+	public void setSamplingMethod(SamplingMethod samplingMethod) {
+		this.samplingMethod = samplingMethod;
 	}
 
 	@StringGetter( "travelTimeBudget_s" )
