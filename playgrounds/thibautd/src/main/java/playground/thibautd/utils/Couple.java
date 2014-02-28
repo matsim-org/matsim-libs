@@ -22,7 +22,7 @@ package playground.thibautd.utils;
 import org.matsim.api.core.v01.Id;
 
 public final class Couple {
-	private int hash;
+	private final int hash;
 	private final Id id1, id2;
 
 	public Couple(
