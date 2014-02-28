@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -53,6 +54,7 @@ import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
 import playground.thibautd.socnetsim.utils.JointPlanUtils;
 import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTravelStructure;
 import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTrip;
+import playground.thibautd.utils.MapUtils;
 
 /**
  * An algorithm which creates joint trips from nothing,
@@ -126,7 +128,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 				final String mode = mainModeIdentifier.identifyMainMode( trip.getTripElements() );
 
 				if ( mode.equals( TransportMode.car ) ) {
-					trips.carTrips.add(
+					trips.addCarTrip(
 							new Trip(
 								trip.getOriginActivity(),
 								trip.getDestinationActivity(),
@@ -136,7 +138,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 				else if (
 						!JointActingTypes.JOINT_MODES.contains( mode ) &&
 						!chainBasedModes.contains( mode ) ) {
-					trips.nonChainBasedModeTrips.add(
+					trips.addNonChainBasedTrip(
 							new Trip(
 								trip.getOriginActivity(),
 								trip.getDestinationActivity(),
@@ -155,11 +157,28 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 		final List<Match> matches = new ArrayList<Match>();
 		final JointTravelStructure structure = JointPlanUtils.analyseJointTravel( jointPlan );
 
-		for (Trip driverTrip : trips.carTrips) {
-			final Id driverId = driverTrip.agentId;
-			for (Trip passengerTrip : trips.nonChainBasedModeTrips) {
-				if ( acceptAgentMatch( driverId , passengerTrip.agentId ) &&
-						isInCorrectSequence( jointPlan , structure , driverTrip , passengerTrip ) ) {
+		for ( Map.Entry<Id, List<Trip>> eDriver : trips.carTrips.entrySet() ) {
+			final Id driverId = eDriver.getKey();
+			for ( Map.Entry<Id, List<Trip>> ePass : trips.nonChainBasedModeTrips.entrySet() ) {
+				final Id passengerId = ePass.getKey();
+				if ( acceptAgentMatch( driverId , passengerId ) ) {
+					addMatches( matches , jointPlan , structure , eDriver.getValue() , ePass.getValue() );
+				}
+			}
+		}
+
+		return matches;
+	}
+
+	private void addMatches(
+			final List<Match> matches,
+			final JointPlan jointPlan,
+			final JointTravelStructure structure,
+			final List<Trip> driverTrips,
+			final List<Trip> passengerTrips) {
+		for ( Trip driverTrip : driverTrips ) {
+			for (Trip passengerTrip : passengerTrips ) {
+				if ( isInCorrectSequence( jointPlan , structure , driverTrip , passengerTrip ) ) {
 					matches.add(
 							new Match(
 								driverTrip,
@@ -170,8 +189,6 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 				}
 			}
 		}
-
-		return matches;
 	}
 
 	private boolean acceptAgentMatch(
@@ -373,8 +390,16 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 	// helper classes
 	// /////////////////////////////////////////////////////////////////////////
 	private static class ClassifiedTrips {
-		public final List<Trip> carTrips = new ArrayList<Trip>();
-		public final List<Trip> nonChainBasedModeTrips = new ArrayList<Trip>();
+		public final Map<Id, List<Trip>> carTrips = new HashMap<Id, List<Trip>>();
+		public final Map<Id, List<Trip>> nonChainBasedModeTrips = new HashMap<Id, List<Trip>>();
+
+		public void addCarTrip( final Trip t ) {
+			MapUtils.getList( t.agentId , carTrips ).add( t );
+		}
+
+		public void addNonChainBasedTrip( final Trip t ) {
+			MapUtils.getList( t.agentId , nonChainBasedModeTrips ).add( t );
+		}
 	}
 
 	private static class Trip {
