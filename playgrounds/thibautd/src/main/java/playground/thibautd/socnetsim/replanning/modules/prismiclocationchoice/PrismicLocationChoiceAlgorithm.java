@@ -55,10 +55,12 @@ import playground.thibautd.utils.QuadTreeRebuilder;
 public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<GroupPlans> {
 	private final PrismicLocationChoiceConfigGroup config;
 	
-	private Random random;
+	private final Random random;
 	private final ActivityFacilities facilities;
 	private final Map<String, QuadTree<ActivityFacility>> facilitiesPerType;
 	private final SocialNetwork socialNetwork;
+
+	private final LocationChooser chooser;
 	
 	private final StageActivityTypes stages;
 
@@ -67,7 +69,22 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 			final ActivityFacilities facilities,
 			final SocialNetwork socialNetwork,
 			final StageActivityTypes stages) {
+		this(
+			config,
+			new RandomLocationChooser(),
+			facilities,
+			socialNetwork,
+			stages );
+	}
+
+	public PrismicLocationChoiceAlgorithm(
+			final PrismicLocationChoiceConfigGroup config,
+			final LocationChooser chooser,
+			final ActivityFacilities facilities,
+			final SocialNetwork socialNetwork,
+			final StageActivityTypes stages) {
 		this.random = MatsimRandom.getLocalInstance();
+		this.chooser = chooser;
 		this.config = config;
 		this.facilities = facilities;
 		this.socialNetwork = socialNetwork;
@@ -90,7 +107,7 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 		for ( Collection<Subchain> subchains : activityGroupsToHandle ) {
 			final List<ActivityFacility> potentialLocations = identifyPotentialLocations( subchains );
 			if ( potentialLocations.isEmpty() ) continue;
-			final ActivityFacility facility = potentialLocations.get( random.nextInt( potentialLocations.size() ) );
+			final ActivityFacility facility = chooser.choose( subchains , potentialLocations );
 			changeLocation( subchains , facility );
 		}
 	}
@@ -238,6 +255,58 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 			this.start = start;
 			this.toMove = toMove;
 			this.end = end;
+		}
+	}
+
+	public static interface LocationChooser {
+		public ActivityFacility choose(
+				Collection<Subchain> subchains,
+				List<ActivityFacility> choiceSet);
+	}
+
+	public static class RandomLocationChooser implements LocationChooser {
+		private final Random random = MatsimRandom.getLocalInstance();
+
+		@Override
+		public ActivityFacility choose(
+				final Collection<Subchain> subchains,
+				final List<ActivityFacility> choiceSet) {
+			 return choiceSet.get( random.nextInt( choiceSet.size() ) );
+		}
+	}
+
+	public static class MaxDistanceProportionalLocationChooser implements LocationChooser {
+		private final Random random = MatsimRandom.getLocalInstance();
+
+		@Override
+		public ActivityFacility choose(
+				final Collection<Subchain> subchains,
+				final List<ActivityFacility> choiceSet) {
+			final double[] maxDists = new double[ choiceSet.size() ];
+
+			double sum = 0;
+			for ( int i=0; i < maxDists.length; i++ ) {
+				final ActivityFacility fac = choiceSet.get( i );
+				maxDists[ i ] = Double.NEGATIVE_INFINITY;
+				for ( Subchain subchain : subchains ) {
+					final double dist = CoordUtils.calcDistance(
+							subchain.start.getCoord(),
+							fac.getCoord() ) +
+						CoordUtils.calcDistance(
+							subchain.end.getCoord(),
+							fac.getCoord() );
+					if ( dist > maxDists[ i ] ) maxDists[ i ] = dist;
+				}
+				sum += maxDists[ i ];
+			}
+
+			double choice = random.nextDouble() * sum;
+			for ( int i=0; i < maxDists.length; i++ ) {
+				choice -= maxDists[ i ];
+				if ( choice <= 0 ) return choiceSet.get( i );
+			}
+
+			throw new RuntimeException();
 		}
 	}
 }
