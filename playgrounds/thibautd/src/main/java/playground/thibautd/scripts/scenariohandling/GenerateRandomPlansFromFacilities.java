@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
@@ -38,6 +39,7 @@ import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 
 import playground.thibautd.utils.ArgParser;
@@ -56,12 +58,16 @@ public class GenerateRandomPlansFromFacilities {
 		parser.setDefaultValue( "--popsize" , "1000" );
 		parser.setDefaultValue( "--hometype" , "home" );
 
+		parser.setDefaultValue( "--betadistance" , "0" );
+
 		final String inputFacilities = parser.getValue( "--inputfacilities" );
 		final String outputPlans = parser.getValue( "--outputplans" );
 
 		final int plansSize = Integer.parseInt( parser.getValue( "--planssize" ) );
 		final int popSize = Integer.parseInt( parser.getValue( "--popsize" ) );
 		final String homeType = parser.getValue( "--hometype" );
+
+		final double betaDist = Double.parseDouble( parser.getValue( "--betadistance" ) );
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		new MatsimFacilitiesReader( sc ).readFile( inputFacilities );
@@ -91,7 +97,11 @@ public class GenerateRandomPlansFromFacilities {
 						random.nextDouble() * 12d * 3600d ) );
 
 			for ( int n = 0; n < plansSize; n++ ) {
-				final ActivityFacility fac = nonHomeLocations.get( random.nextInt( nonHomeLocations.size() ) );
+				final ActivityFacility fac = getRandomLocation(
+						random,
+						home.getCoord(),
+						betaDist,
+						nonHomeLocations );
 				final String type = getRandomOtherType( random , fac , homeType );
 
 				plan.addLeg( sc.getPopulation().getFactory().createLeg( "car" ) );
@@ -124,6 +134,36 @@ public class GenerateRandomPlansFromFacilities {
 		sc.getPopulation().setName( meta.toString() );
 
 		new PopulationWriter( sc.getPopulation() , sc.getNetwork() ).write( outputPlans );
+	}
+
+	private static ActivityFacility getRandomLocation(
+			final Random random,
+			final Coord home,
+			final double betaDist,
+			final List<ActivityFacility> nonHomeLocations) {
+		final double[] weights = new double[ nonHomeLocations.size() ];
+		double sum = 0;
+
+		for ( int i=0; i < weights.length; i++ ) {
+			weights[ i ] = Math.exp(
+					betaDist *
+					CoordUtils.calcDistance(
+						home,
+						nonHomeLocations.get( i ).getCoord() ) );
+			if ( weights[ i ] == Double.POSITIVE_INFINITY ) throw new RuntimeException();
+
+			sum += weights[ i ];
+			if ( sum == Double.POSITIVE_INFINITY ) throw new RuntimeException();
+		}
+
+		double choice = random.nextDouble() * sum;
+
+		for ( int i=0; i < weights.length; i++ ) {
+			choice -= weights[ i ];
+			if ( choice <= 0 ) return nonHomeLocations.get( i );
+		}
+
+		throw new IllegalStateException();
 	}
 
 	private static String getRandomOtherType(
