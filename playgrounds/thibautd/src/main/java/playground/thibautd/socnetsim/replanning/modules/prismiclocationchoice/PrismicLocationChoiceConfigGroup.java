@@ -42,7 +42,7 @@ public class PrismicLocationChoiceConfigGroup extends ReflectiveModule {
 
 	private SamplingMethod samplingMethod = SamplingMethod.random;
 	public static enum SamplingMethod {
-		random, maximumDistanceProportional;
+		random, maximumDistanceInverselyProportional;
 	}
 
 	public PrismicLocationChoiceConfigGroup() {

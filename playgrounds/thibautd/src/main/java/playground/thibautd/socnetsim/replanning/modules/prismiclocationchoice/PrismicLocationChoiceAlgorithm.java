@@ -82,7 +82,7 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 		switch ( config.getSamplingMethod() ) {
 			case random:
 				return new RandomLocationChooser();
-			case maximumDistanceProportional:
+			case maximumDistanceInverselyProportional:
 				return new MaxDistanceProportionalLocationChooser();
 			default:
 				throw new IllegalArgumentException( ""+config.getSamplingMethod() );
@@ -309,6 +309,7 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 							fac.getCoord() );
 					if ( dist > maxDists[ i ] ) maxDists[ i ] = dist;
 				}
+				maxDists[ i ] = 1 / (1 + maxDists[ i ] );
 				sum += maxDists[ i ];
 			}
 
@@ -318,7 +319,7 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 				if ( choice <= 0 ) return choiceSet.get( i );
 			}
 
-			throw new RuntimeException();
+			throw new RuntimeException( ""+sum );
 		}
 	}
 }
