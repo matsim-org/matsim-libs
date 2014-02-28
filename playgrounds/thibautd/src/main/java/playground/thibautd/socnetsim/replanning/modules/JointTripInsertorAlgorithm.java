@@ -194,18 +194,20 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			final JointTravelStructure structure,
 			final Trip driverTrip,
 			final Trip passengerTrip) {
-		final int positionInDriverPlan = getPosition( jointPlan , structure , driverTrip , passengerTrip.agentId );
-		final int positionInPassengerPlan = getPosition( jointPlan , structure , passengerTrip , driverTrip.agentId );
+		final List<JointTrip> jointTrips =
+				structure.getJointTripsForCotravelers(
+						driverTrip.agentId,
+						passengerTrip.agentId);
+		final int positionInDriverPlan = getPosition( jointPlan , jointTrips , driverTrip );
+		final int positionInPassengerPlan = getPosition( jointPlan , jointTrips , passengerTrip );
 		return positionInDriverPlan == positionInPassengerPlan;
 	}
 
 	private static int getPosition(
 			final JointPlan jointPlan,
-			final JointTravelStructure structure,
-			final Trip trip,
-			final Id cotraveler) {
+			final List<JointTrip> jointTrips,
+			final Trip trip) {
 		final Plan plan = jointPlan.getIndividualPlan( trip.agentId );
-		final List<JointTrip> jointTrips = structure.getJointTripsForCotravelers( trip.agentId , cotraveler );
 
 		final int indexOfTrip = plan.getPlanElements().indexOf( trip.departure );
 
