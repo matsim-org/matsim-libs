@@ -84,6 +84,8 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 				return new RandomLocationChooser();
 			case maximumDistanceInverselyProportional:
 				return new MaxDistanceProportionalLocationChooser();
+			case maximumDistanceMinimization:
+				return new MaxDistanceMinimizingLocationChooser();
 			default:
 				throw new IllegalArgumentException( ""+config.getSamplingMethod() );
 		}
@@ -320,6 +322,36 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 			}
 
 			throw new RuntimeException( ""+sum );
+		}
+	}
+
+	public static class MaxDistanceMinimizingLocationChooser implements LocationChooser {
+		@Override
+		public ActivityFacility choose(
+				final Collection<Subchain> subchains,
+				final List<ActivityFacility> choiceSet) {
+			double currentMin = Double.POSITIVE_INFINITY;
+			ActivityFacility choice = null;
+
+			for ( ActivityFacility fac : choiceSet ) {
+				double max = Double.NEGATIVE_INFINITY;
+				for ( Subchain subchain : subchains ) {
+					final double dist = CoordUtils.calcDistance(
+							subchain.start.getCoord(),
+							fac.getCoord() ) +
+						CoordUtils.calcDistance(
+							subchain.end.getCoord(),
+							fac.getCoord() );
+					if ( dist > max ) max = dist;
+				}
+
+				if ( max < currentMin ) {
+					currentMin = max;
+					choice = fac;
+				}
+			}
+
+			return choice;
 		}
 	}
 }
