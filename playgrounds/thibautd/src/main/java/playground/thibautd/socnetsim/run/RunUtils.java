@@ -662,6 +662,10 @@ public class RunUtils {
 
 		strategyManager.setStopWatch( controller.stopwatch );
 
+		final ReplanningStatsDumper replanningStats = new ReplanningStatsDumper( controller.getControlerIO().getOutputFilename( "replanningGroups.dat" ) );
+		strategyManager.addListener( replanningStats );
+		controller.addControlerListener( replanningStats );
+
 		return controller;
 	}
 
