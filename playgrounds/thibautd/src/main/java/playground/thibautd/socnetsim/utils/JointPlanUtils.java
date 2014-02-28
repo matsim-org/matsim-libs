@@ -37,6 +37,7 @@ import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.PassengerRoute;
+import playground.thibautd.utils.MapUtils;
 
 /**
  * @author thibautd
@@ -253,62 +254,37 @@ public class JointPlanUtils {
 	 */
 	public static final class JointTravelStructure {
 		private final List<JointTrip> jointTrips;
+		private final Map<Couple, List<JointTrip>> jointTripsPerCouple = new HashMap<Couple, List<JointTrip>>();
 
 		public JointTravelStructure(
 				final List<JointTrip> jointTrips) {
 			this.jointTrips = jointTrips;
+
+			for (JointTrip jt : jointTrips) {
+				final List<JointTrip> trips =
+					MapUtils.getList(
+							new Couple(
+								jt.getDriverId(),
+								jt.getPassengerId() ),
+							jointTripsPerCouple );
+				trips.add( jt );
+			}
 		}	
 
 		public List<JointTrip> getJointTrips() {
 			return jointTrips;
 		}
 
-		public List<JointTrip> getJointTripsForPassenger(final Id id) {
-			final List<JointTrip> trips = new ArrayList<JointTrip>();
-
-			for (JointTrip jt : jointTrips) {
-				if ( jt.getPassengerId().equals( id ) ) trips.add( jt );
-			}
-
-			return Collections.unmodifiableList( trips );
-		}
-
-		public List<JointTrip> getJointTripsForDriver(final Id id) {
-			final List<JointTrip> trips = new ArrayList<JointTrip>();
-
-			for (JointTrip jt : jointTrips) {
-				if ( jt.getDriverId().equals( id ) ) trips.add( jt );
-			}
-
-			return Collections.unmodifiableList( trips );
-		}
-
-		public List<JointTrip> getJointTripsForDriverAndPassenger(final Id driver, final Id passenger) {
-			final List<JointTrip> trips = new ArrayList<JointTrip>();
-
-			for (JointTrip jt : jointTrips) {
-				if ( jt.getDriverId().equals( driver ) &&
-						jt.getPassengerId().equals( passenger ) ) { 
-					trips.add( jt );
-				}
-			}
-
-			return Collections.unmodifiableList( trips );
-		}
-
 		public List<JointTrip> getJointTripsForCotravelers(final Id id1, final Id id2) {
-			final List<JointTrip> trips = new ArrayList<JointTrip>();
+			final List<JointTrip> trips =
+				jointTripsPerCouple.get(
+						new Couple(
+							id1,
+							id2 ) );
 
-			for (JointTrip jt : jointTrips) {
-				if ( (jt.getDriverId().equals( id1 ) &&
-						jt.getPassengerId().equals( id2 )) ||
-					 (jt.getDriverId().equals( id2 ) &&
-						jt.getPassengerId().equals( id1 )) ) { 
-					trips.add( jt );
-				}
-			}
-
-			return Collections.unmodifiableList( trips );
+			return trips == null ?
+				Collections.<JointTrip>emptyList() :
+				Collections.unmodifiableList( trips );
 		}
 
 		@Override
@@ -458,5 +434,30 @@ class TripCharacteristics {
 	@Override
 	public int hashCode() {
 		return driver.hashCode() + passenger.hashCode() + origin.hashCode() + destination.hashCode();
+	}
+}
+
+class Couple {
+	private int hash;
+	private final Id id1, id2;
+
+	public Couple(
+			final Id id1,
+			final Id id2 ) {
+		this.id1 = id1;
+		this.id2 = id2;
+		this.hash = id1.hashCode() + id2.hashCode();
+	}
+
+	@Override
+	public int hashCode() {
+		return hash;
+	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		final Couple other = (Couple) o;
+		return ( other.id1.equals( id1 ) && other.id2.equals( id2 ) ) ||
+			( other.id2.equals( id1 ) && other.id1.equals( id2 ) );
 	}
 }
