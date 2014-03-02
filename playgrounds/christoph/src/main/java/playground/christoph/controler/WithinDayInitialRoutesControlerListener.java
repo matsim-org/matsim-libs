@@ -20,14 +20,18 @@
 
 package playground.christoph.controler;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -39,9 +43,9 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContext;
@@ -60,6 +64,7 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.withinday.controller.ExperiencedPlansWriter;
 import org.matsim.withinday.controller.WithinDayControlerListener;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.LegStartedIdentifierFactory;
@@ -77,20 +82,20 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 	private DuringLegIdentifier legPerformingIdentifier;
 	private DuringLegIdentifier legStartedIdentifier;
 	
+//	private DuringActivityIdentifierFactory activityEndingFactory;
+//	private DuringActivityIdentifier activityEndingIdentifier;
+	
 	private TransportModeFilterFactory carLegAgentsFilterFactory;
 	private WithinDayControlerListener withinDayControlerListener;
-	
-	private Scenario scenario;
-		
+	private ExperiencedPlansWriter experiencedPlansWriter;
+
 	private boolean initialLegRerouting = true;
 	private boolean duringLegRerouting = true;
 	
 	private double duringLegReroutingShare = 0.10;
 		
-	public WithinDayInitialRoutesControlerListener(Controler controler) {
-		
-		this.scenario = controler.getScenario();
-		init(controler);
+	public WithinDayInitialRoutesControlerListener() {
+		init();
 	}
 
 	public void setDuringLegReroutingShare(double share) {
@@ -109,22 +114,14 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 		return this.withinDayControlerListener;
 	}
 	
-	private void init(Controler controler) {
-		/*
-		 * Change the persons' original plans. By doing so, the (hopefully) optimized
-		 * routes are written to the output plans file.
-		 */
-//		ExperimentalBasicWithindayAgent.copySelectedPlan = false;
-		Logger.getLogger(this.getClass()).fatal("copySelectedPlan no longer possible. kai, feb'14") ;
-		System.exit(-1); 
-
+	private void init() {
 		/*
 		 * Create a WithinDayControlerListener but do NOT register it as ControlerListener.
 		 * It implements the StartupListener interface as this class also does. The
 		 * StartupEvent is passed over to it when this class handles the event. 
 		 */
 		this.withinDayControlerListener = new WithinDayControlerListener();
-		
+
 		// workaround
 		this.withinDayControlerListener.setLeastCostPathCalculatorFactory(new MultiNodeDijkstraFactory());
 	}
@@ -133,16 +130,21 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
+		Controler controler = event.getControler();
+		
 		/*
 		 * The withinDayControlerListener is also a StartupListener. Its notifyStartup(...)
 		 * method has to be called first. There, the within-day module is initialized.
 		 */
 		this.withinDayControlerListener.notifyStartup(event);
 		
-		this.prepareForSim(event.getControler());
+		this.experiencedPlansWriter = new ExperiencedPlansWriter(this.withinDayControlerListener.getMobsimDataProvider());
+		controler.addControlerListener(this.experiencedPlansWriter);
+		
+		this.prepareForSim(controler);
 		
 		this.initIdentifiers();
-		this.initReplanners();
+		this.initReplanners(controler.getScenario());
 	}
 	
 	@Override
@@ -175,16 +177,16 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
 		Set<String> dummyModes = CollectionUtils.stringToSet(TransportMode.car);
 		TripRouterFactory tripRouterFactory = new WithinDayInitialRoutesTripRouterFactory(defaultTripRouterFactory, dummyModes,
-				populationFactory, routeFactory);
+				populationFactory, routeFactory, scenario.getNetwork());
 		
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = controler.getTravelDisutilityFactory().createTravelDisutility(travelTime, this.scenario.getConfig().planCalcScore());
+		TravelDisutility travelDisutility = controler.getTravelDisutilityFactory().createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, travelTime);
 
 		final PlanRouterProvider planRouterProvider = new PlanRouterProvider(tripRouterFactory, routingContext);
 		
 		// make sure all routes are calculated.
-		ParallelPersonAlgorithmRunner.run(this.scenario.getPopulation(), this.scenario.getConfig().global().getNumberOfThreads(),
+		ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), scenario.getConfig().global().getNumberOfThreads(),
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 			@Override
 			public AbstractPersonAlgorithm getPersonAlgorithm() {
@@ -215,36 +217,43 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 		}
 		
 		if (initialLegRerouting) {
-			startedLegFactory = new LegStartedIdentifierFactory(this.withinDayControlerListener.getLinkReplanningMap(),
+//			this.activityEndingFactory = new ActivityEndIdentifierFactory(this.withinDayControlerListener.getActivityReplanningMap());
+//			this.activityEndingIdentifier = this.activityEndingFactory.createIdentifier();
+			this.startedLegFactory = new LegStartedIdentifierFactory(this.withinDayControlerListener.getLinkReplanningMap(),
 					this.withinDayControlerListener.getMobsimDataProvider());
-			startedLegFactory.addAgentFilterFactory(carLegAgentsFilterFactory);
+			this.startedLegFactory.addAgentFilterFactory(carLegAgentsFilterFactory);
 			this.legStartedIdentifier = startedLegFactory.createIdentifier();			
 		}
 	}
 	
-	protected void initReplanners() {
+	protected void initReplanners(Scenario scenario) {
 		
 		TravelDisutility travelDisutility = this.withinDayControlerListener.getTravelDisutilityFactory().createTravelDisutility(
-				this.withinDayControlerListener.getTravelTimeCollector(), this.scenario.getConfig().planCalcScore()); 
+				this.withinDayControlerListener.getTravelTimeCollector(), scenario.getConfig().planCalcScore()); 
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.withinDayControlerListener.getTravelTimeCollector());
 		
 		/*
-		 * During Leg Replanner
+		 * Replanners
 		 */
 		WithinDayDuringLegReplannerFactory duringLegReplannerFactory;
+//		WithinDayDuringActivityReplannerFactory duringActivityReplannerFactory;
 		
 		if (duringLegRerouting) {
-			duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(),
+			duringLegReplannerFactory = new CurrentLegReplannerFactory(scenario, this.withinDayControlerListener.getWithinDayEngine(),
 					this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
 			duringLegReplannerFactory.addIdentifier(this.legPerformingIdentifier);
 			this.withinDayControlerListener.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);
 		}
 		
 		if (initialLegRerouting) {
-			duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(),
+			duringLegReplannerFactory = new CurrentLegReplannerFactory(scenario, this.withinDayControlerListener.getWithinDayEngine(),
 					this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
 			duringLegReplannerFactory.addIdentifier(this.legStartedIdentifier);
 			this.withinDayControlerListener.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);
+//			duringActivityReplannerFactory = new NextLegReplannerFactory(scenario, this.withinDayControlerListener.getWithinDayEngine(), 
+//					this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
+//			duringActivityReplannerFactory.addIdentifier(this.activityEndingIdentifier);
+//			this.withinDayControlerListener.getWithinDayEngine().addDuringActivityReplannerFactory(duringActivityReplannerFactory);
 		}
 	}
 	
@@ -254,13 +263,15 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 		private final Set<String> dummyModes;
 		private final PopulationFactory populationFactory;
 		private final ModeRouteFactory routeFactory;
+		private final Network network;
 		
 		public WithinDayInitialRoutesTripRouterFactory(TripRouterFactory tripRouterFactory, Set<String> dummyModes, 
-				PopulationFactory populationFactory, ModeRouteFactory routeFactory) {
+				PopulationFactory populationFactory, ModeRouteFactory routeFactory, Network network) {
 			this.tripRouterFactory = tripRouterFactory;
 			this.dummyModes = dummyModes;
 			this.populationFactory = populationFactory;
 			this.routeFactory = routeFactory;
+			this.network = network;
 		}
 		
 		@Override
@@ -269,9 +280,10 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 
 			// replace routing modules for dummy modes
 			for (String mode : dummyModes) {
-				RoutingModule routingModule = new WithinDayInitialRoutesRoutingModule(mode, populationFactory, routeFactory);
+				RoutingModule routingModule = new WithinDayInitialRoutesRoutingModule(mode, this.populationFactory, 
+						this.routeFactory, this.network);
 				tripRouter.setRoutingModule(mode, routingModule);
-			}				
+			}
 			
 			return tripRouter;
 		}
@@ -282,11 +294,14 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 		private final String mode;
 		private final PopulationFactory populationFactory;
 		private final ModeRouteFactory routeFactory;
+		private final Network network;
 		
-		public WithinDayInitialRoutesRoutingModule(String mode, PopulationFactory populationFactory, ModeRouteFactory routeFactory) {
+		public WithinDayInitialRoutesRoutingModule(String mode, PopulationFactory populationFactory, ModeRouteFactory routeFactory,
+				Network network) {
 			this.mode = mode;
 			this.populationFactory = populationFactory;
 			this.routeFactory = routeFactory;
+			this.network = network;
 		}
 		
 		@Override
@@ -297,6 +312,32 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 			newLeg.setTravelTime(0.0);	// we do not know the travel time
 			
 			Route route = this.routeFactory.createRoute(mode, fromFacility.getLinkId(), toFacility.getLinkId());
+			
+			/*
+			 * Workaround for network routes:
+			 * Due to a recent change in the code, the mobility simulation calls 
+			 * agent.chooseNextLinkId() when an agent starts a new leg. However, at this point,
+			 * the agent does not know its next link and therefore is removed from the simulation,
+			 * if the leg does not end on the same link again. To avoid this, we insert a dummy link
+			 * which is replaced when the agent actually updates its route.
+			 */
+			if (route instanceof NetworkRoute) {
+				if (!fromFacility.getLinkId().equals(toFacility.getLinkId())) {
+					
+					Link fromLink = this.network.getLinks().get(fromFacility.getLinkId());
+					Node toNode = fromLink.getToNode();
+					
+					List<Id> links = new ArrayList<Id>();
+					// add the first possible outlink to the list
+					for (Link link : toNode.getOutLinks().values()) {
+						links.add(link.getId());
+						break;
+					}
+					
+					((NetworkRoute) route).setLinkIds(fromFacility.getLinkId(), links, toFacility.getLinkId());
+				}				
+			}
+							
 			newLeg.setRoute(route);
 
 			return Arrays.asList(newLeg);

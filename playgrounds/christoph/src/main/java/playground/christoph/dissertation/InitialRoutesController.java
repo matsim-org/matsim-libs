@@ -103,7 +103,7 @@ public class InitialRoutesController {
 		controler.addControlerListener(new ActivitiesAnalyzer());
 		
 		if (useWithinDayReplanning) {
-			WithinDayInitialRoutesControlerListener controlerListener = new WithinDayInitialRoutesControlerListener(controler);
+			WithinDayInitialRoutesControlerListener controlerListener = new WithinDayInitialRoutesControlerListener();
 			controlerListener.setDuringLegReroutingEnabled(duringLegRerouting);
 			controlerListener.setDuringLegReroutingShare(duringLegReroutingShare);
 			controlerListener.setInitialLegReroutingEnabled(initialLegRerouting);

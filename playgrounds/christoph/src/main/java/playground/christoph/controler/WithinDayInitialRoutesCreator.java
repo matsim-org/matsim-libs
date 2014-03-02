@@ -48,7 +48,7 @@ public class WithinDayInitialRoutesCreator  {
 			controler.addControlerListener(new TripsAnalyzer());
 			controler.addControlerListener(new ActivitiesAnalyzer());
 			
-			WithinDayInitialRoutesControlerListener controlerListener = new WithinDayInitialRoutesControlerListener(controler);
+			WithinDayInitialRoutesControlerListener controlerListener = new WithinDayInitialRoutesControlerListener();
 			controlerListener.setDuringLegReroutingEnabled(duringLegRerouting);
 			controlerListener.setDuringLegReroutingShare(duringLegReroutingShare);
 			controlerListener.setInitialLegReroutingEnabled(initialLegRerouting);
