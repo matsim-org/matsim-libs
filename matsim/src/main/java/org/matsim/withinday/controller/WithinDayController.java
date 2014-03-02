@@ -54,8 +54,11 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
  * This controller contains the basic structure for
  * simulation runs using within-day replanning.
  *
+ * @Deprecated use a WithinDayControlerListener instead!
+ *
  * @author Christoph Dobler
  */
+@Deprecated
 public abstract class WithinDayController extends Controler implements StartupListener, MobsimInitializedListener {
 
 	private static final Logger log = Logger.getLogger(WithinDayController.class);
