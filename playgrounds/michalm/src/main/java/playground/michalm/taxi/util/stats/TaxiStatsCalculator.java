@@ -78,7 +78,7 @@ public class TaxiStatsCalculator
                     eval.taxiPickupTime += time;
 
                     Request req = ((TaxiPickupStayTask)t).getRequest();
-                    double waitTime = t.getBeginTime() - req.getT0();
+                    double waitTime = Math.max(t.getBeginTime() - req.getT0(), 0);
                     eval.passengerWaitTime += waitTime;
 
                     if (eval.maxPassengerWaitTime < waitTime) {

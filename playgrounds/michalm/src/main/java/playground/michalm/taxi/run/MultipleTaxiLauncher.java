@@ -189,7 +189,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
     {
         Boolean destinationKnown = false;
         Boolean onlineVehicleTracker = false;
-        Boolean advanceRequestSubmission = true;
+        Boolean advanceRequestSubmission = false;
 
         run(config, runs, destinationKnown, onlineVehicleTracker, advanceRequestSubmission);
     }
