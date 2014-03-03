@@ -446,15 +446,11 @@ implements ShutdownListener, StartupListener {
 	}
 
 	/**
-	 * Design thoughts:<ul>
-	 * <li> I wanted to plot something like (max(acc)-acc)*population.  For that, I needed "population" at the x/y coordinates.
+	 * I wanted to plot something like (max(acc)-acc)*population.  For that, I needed "population" at the x/y coordinates.
 	 * This is the mechanics via which I inserted that. (The computation is then done in postprocessing.)
-	 * <li> It is, however, far from optimal. Presumably, one would want to be able to add arbitrary columns.  Need to think about a 
-	 * mechanism (maybe just something like "addAdditionalInformationAsColumn(...)"??). [[I think this is what it needs: 
-	 * addAdditionalData( key, container ) .  Need to change the key mechanism away from the enum.]]
-	 * <li> What is clear: We should go away from these separate files and have as much as possible in one.  The urbansim output 
-	 * already does this, but maybe we should not touch that.
-	 * </ul> kai, feb'14
+	 * <p/>
+	 * You can add arbitrary ActivityFacilities containers here.  They will be aggregated to the grid points, and then written to
+	 * file as additional column.
 	 */
 	public void addAdditionalFacilityData(ActivityFacilities facilities ) {
 		if ( this.lockedForAdditionalFacilityData ) {

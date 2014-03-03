@@ -45,6 +45,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	private Map<Modes4Accessibility,Double> accessibilitiesHomeZone;
 	private Map<Modes4Accessibility,Double> accessibilitiesWorkZone;
 
+	@SuppressWarnings("static-method")
 	@Before
 	public void setUp() throws Exception {
 		OutputDirectoryLogging.catchLogEntries();		

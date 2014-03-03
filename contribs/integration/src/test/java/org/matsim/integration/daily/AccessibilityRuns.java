@@ -33,6 +33,7 @@ public class AccessibilityRuns {
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
+	@SuppressWarnings("static-method")
 	@Test
 	public void doTest() {
 		System.out.println("available ram: " + (Runtime.getRuntime().maxMemory() / 1024/1024));
@@ -115,10 +116,10 @@ public class AccessibilityRuns {
 		// the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
 
 		for ( String actType : activityTypes ) {
-			if ( !actType.equals("w") ) {
-				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
-				continue ;
-			}
+//			if ( !actType.equals("w") ) {
+//				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
+//				continue ;
+//			}
 			
 			config.controler().setOutputDirectory( utils.getOutputDirectory() + "/" + actType + "/" );
 			ActivityFacilities opportunities = FacilitiesUtils.createActivityFacilities() ;
@@ -152,7 +153,7 @@ public class AccessibilityRuns {
 				BufferedWriter writer = IOUtils.getBufferedWriter( config.controler().getOutputDirectory() + "/t.gpl" ) ;
 				// yy might be worthwhile to find out what all the following instructions actually do; I took them from an example.
 				// kai, feb'14
-				writer.write("set pm3d map\n") ;
+				writer.write("set pm3d map\n") ; 
 				writer.write("set pm3d flush begin\n") ;
 				writer.write("set palette defined ( 0. '#ffffff', 0.5 '#ffff00', 1. '#0000ff' )\n") ;
 				writer.write("set zrange [-0:10]\n") ;
