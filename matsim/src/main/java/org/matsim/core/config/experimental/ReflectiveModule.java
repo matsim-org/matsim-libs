@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Module;
 
 /**
@@ -47,21 +48,28 @@ import org.matsim.core.config.Module;
  * or {@link Integer}),</li>
  * <li> an enumeration type</li>
  * </ul>
- * and a getter returning an Object which String representation must be written to
- * the xml file, and annotate them with the {@link StringSetter} and
- * {@link StringGetter} annotation types.
+ * and a getter returning an Object or primitive type which String representation
+ * must be written to the xml file, and annotate them with the {@link StringSetter}
+ * and {@link StringGetter} annotation types.
  * <br>
  * Those annotations take a mandatory String argument, which is the parameter name
  * in the xml.
  * <br>
  * <br>
- * In most of the cases, annotating the actual setters is fine. Sometimes (for instance
- * when handling collections) it is not: just separate actual setters/getters and
- * "string" setters/getters.
+ * In most of the cases (for Strings, primitive types and enums),
+ * annotating the actual setters and getters is fine.
+ * Sometimes (When the {@link Object#toString()} method returns the right String representation,
+ * for instance for {@link Id}s), one needs to implement a specific
+ * "String" setter, but can annotate the normal getter.
+ * Sometimes (for instance when handling collections) one needs specific conversion bothways.
+ * In those cases, just separate actual setters/getters and "string" setters/getters.
  * <br>
  * Note that there is no restriction on access modifiers for those methods: they
  * can even be private, if for instance you do not want to confuse the users with dozens
- * of methods of the type "getStringRepresentationOfParameterX()".
+ * of methods of the type "<tt>getStringRepresentationOfParameterX()</tt>" or
+ * "<tt>setParameterXFromStringRepresentation( String v )</tt>".
+ * <br>
+ * A commented example can be found at {@link tutorial.programming.reflectiveModule.MyModule}.
  * <br>
  * <br>
  * If something is wrong (missing setter or getter, wrong parameter or return type),
