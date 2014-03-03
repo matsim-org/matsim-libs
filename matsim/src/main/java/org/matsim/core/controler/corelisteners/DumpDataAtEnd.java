@@ -40,6 +40,8 @@ import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.VehicleWriterV1;
 
 public class DumpDataAtEnd implements ShutdownListener {
@@ -57,6 +59,12 @@ public class DumpDataAtEnd implements ShutdownListener {
 	public void notifyShutdown(ShutdownEvent event) {
 		// dump plans
 		new PopulationWriter(scenarioData.getPopulation(), scenarioData.getNetwork()).write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
+		final ObjectAttributes personAttributes = scenarioData.getPopulation().getPersonAttributes();
+		if ( personAttributes!=null ) {
+			ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter(personAttributes) ;
+			writer.setPrettyPrint(true);
+			writer.writeFile( controlerIO.getOutputFilename( Controler.FILENAME_PERSON_ATTRIBUTES ) );
+		}
 		// dump network
 		new NetworkWriter(scenarioData.getNetwork()).write(controlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
 		// dump config

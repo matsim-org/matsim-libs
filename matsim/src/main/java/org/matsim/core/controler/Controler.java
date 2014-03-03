@@ -121,6 +121,7 @@ public class Controler extends AbstractController {
 	public static final String FILENAME_HOUSEHOLDS = "output_households.xml.gz";
 	public static final String FILENAME_LANES = "output_lanes.xml.gz";
 	public static final String FILENAME_CONFIG = "output_config.xml.gz";
+	public static final String FILENAME_PERSON_ATTRIBUTES = "output_personAttributes.xml.gz" ; 
 
 	protected static final Logger log = Logger.getLogger(Controler.class);
 
