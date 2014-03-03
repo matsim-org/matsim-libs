@@ -5,8 +5,6 @@ package josmMatsimPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 import javax.swing.JOptionPane;
@@ -29,15 +27,10 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.openstreetmap.josm.Main;
-import org.openstreetmap.josm.data.validation.OsmValidator;
-import org.openstreetmap.josm.data.validation.Severity;
-import org.openstreetmap.josm.data.validation.TestError;
 import org.openstreetmap.josm.gui.PleaseWaitRunnable;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
-import org.openstreetmap.josm.gui.progress.NullProgressMonitor;
 import org.openstreetmap.josm.io.OsmTransferException;
-import org.openstreetmap.josm.tools.ImageProvider;
 import org.xml.sax.SAXException;
 
 /**
@@ -50,14 +43,11 @@ import org.xml.sax.SAXException;
 public class ExportTask extends PleaseWaitRunnable {
 	static Properties matsimConvertProperties = new Properties();
 	protected int exportResult;
-	private String targetSystem;
 
 	private File file;
 
 	public ExportTask(File file) {
 		super("MATSim Export");
-		this.targetSystem = (String) ExportDialog.exportSystem
-				.getSelectedItem();
 		this.file = file;
 		if (!this.file.getAbsolutePath().endsWith(".xml")) {
 			this.file = new File(this.file.getAbsolutePath() + ".xml");
@@ -99,9 +89,7 @@ public class ExportTask extends PleaseWaitRunnable {
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
 		Network network = sc.getNetwork();
-		CoordinateTransformation osmCt = TransformationFactory
-				.getCoordinateTransformation(TransformationFactory.WGS84,
-						targetSystem);
+		
 
 		Layer layer = Main.main.getActiveLayer();
 		
@@ -115,12 +103,6 @@ public class ExportTask extends PleaseWaitRunnable {
 					Node newNode = network.getFactory().createNode(
 							new IdImpl(((NodeImpl) node).getOrigId()),
 							node.getCoord());
-					CoordinateTransformation customCt = TransformationFactory
-							.getCoordinateTransformation(
-									((NetworkLayer) layer).getCoordSystem(),
-									targetSystem);
-					Coord temp = customCt.transform(node.getCoord());
-					node.getCoord().setXY(temp.getX(), temp.getY());
 					network.addNode(newNode);
 				}
 				for (Link link : ((NetworkLayer) layer).getMatsimNetwork()
@@ -144,10 +126,15 @@ public class ExportTask extends PleaseWaitRunnable {
 				this.progressMonitor.setTicks(1);
 				this.progressMonitor.setCustomText("converting osm data..");
 
+				CoordinateTransformation osmCt = TransformationFactory
+						.getCoordinateTransformation(TransformationFactory.WGS84,
+								((String) ExportDialog.exportSystem
+										.getSelectedItem()));
 				Converter converter = new Converter(
 						((OsmDataLayer) layer).data, network);
 				converter.convert();
-				if (!(targetSystem.equals(TransformationFactory.WGS84))) {
+				if (!(((String) ExportDialog.exportSystem
+						.getSelectedItem()).equals(TransformationFactory.WGS84))) {
 					for (Node node : ((NetworkImpl) network).getNodes()
 							.values()) {
 						Coord temp = osmCt.transform(node.getCoord());
