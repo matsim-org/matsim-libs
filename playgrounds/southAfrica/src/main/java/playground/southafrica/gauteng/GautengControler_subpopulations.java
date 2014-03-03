@@ -119,6 +119,10 @@ public class GautengControler_subpopulations {
 		/* Config must be passed as an argument, everything else is optional. */
 		final String configFilename = args[0];
 		Config config = ConfigUtils.createConfig();
+		if ( configFilename != null ) {
+			ConfigUtils.loadConfig(config, configFilename);
+		}
+
 
 		// ### I moved loadConfig down quite a lot so that we can overwrite config options on the server without having to build a new jar every time. kai
 		
@@ -137,6 +141,7 @@ public class GautengControler_subpopulations {
 		 * [8] - user // should presumably be earlier in sequence?
 		 * [9] - Output directory
 		 * [10] - Counts file
+		 * [11] - optional second config file
 		 */
 
 		setOptionalArguments(args, config);
@@ -206,11 +211,13 @@ public class GautengControler_subpopulations {
 		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspExperimentalConfigGroup.ABORT ) ;
 		config.vspExperimental().setWritingOutputEvents(true);
-
-		// ### moved this down quite a lot so that we can overwrite config options on the server without having to build a new jar every time. kai
-		if ( configFilename != null ) {
-			ConfigUtils.loadConfig(config, configFilename);
+		
+		// This should (in theory) allow you to add a second config file, overwriting config entries.  Meant for work with jars on the server,
+		// where you don't want to re-create the jar if you just want to change a config option.   Currently untested. kai, feb'14
+		if(args.length > 10 && args[10] != null && args[10].length() > 0 && !args[10].equals("null") ) {
+			ConfigUtils.loadConfig(config, args[10]);
 		}
+
 
 		config.addConfigConsistencyChecker( new VspConfigConsistencyCheckerImpl() );
 		config.checkConsistency();
@@ -228,6 +235,8 @@ public class GautengControler_subpopulations {
 
 		/* CREATE VEHICLES. */
 		createVehiclePerPerson(sc);
+
+		// ===========================================
 
 		final Controler controler = new Controler(sc);
 		controler.setOverwriteFiles(true);
@@ -290,7 +299,7 @@ public class GautengControler_subpopulations {
 	 * </ul>
 	 * I think that only the last item is still meaningful.  kai, feb'14
 	 */
-//	@SuppressWarnings("unused")
+	@SuppressWarnings("unused")
 	private static void simplifyPopulation(final Scenario sc) {
 		
 //		simplifyNetwork(sc.getNetwork());

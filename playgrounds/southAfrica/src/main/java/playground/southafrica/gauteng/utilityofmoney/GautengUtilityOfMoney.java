@@ -57,8 +57,8 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 		log.info("-----  Using SanralTollVehicleType  -----");
 		for ( SanralTollVehicleType vehType : SanralTollVehicleType.values() ) {
 			log.info( String.format("%30s: mUTTS: %5.2f/hr; mVTTS: %5.0f ZAR/hr; mUoM: %5.3f/ZAR", 
-					vehType.toString(), (double)getUtilityOfTravelTime_hr(), (double)getValueOfTime_hr_OLD(vehType), 
-					(double)getUtilityOfMoneyFromValueOfTime( getValueOfTime_hr_OLD(vehType)) ) ) ;
+					vehType.toString(), getUtilityOfTravelTime_hr(), getValueOfTime_hr_OLD(vehType), 
+					getUtilityOfMoneyFromValueOfTime( getValueOfTime_hr_OLD(vehType)) ) ) ;
 		}
 		// (I found (the previous verison of) these logging statements _above_ setting this.baseValueOfTime etc.  In consequence, I would think that they
 		// were giving wrong information.  Originally, the values came from the config file only or were
@@ -75,8 +75,8 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 		log.info("-----  Using subpopulation  -----");
 		for(String sp : map.keySet()){
 			log.info( String.format("%30s: mUTTS: %5.2f/hr; mVTTS: %5.0f ZAR/hr; mUoM: %5.3f/ZAR", 
-					sp, (double)getUtilityOfTravelTime_hr(), (double)getValueOfTime_hr( map.get(sp) ), 
-					(double)getUtilityOfMoneyFromValueOfTime( getValueOfTime_hr( map.get(sp) )))
+					sp, getUtilityOfTravelTime_hr(), getValueOfTime_hr( map.get(sp) ), 
+					getUtilityOfMoneyFromValueOfTime( getValueOfTime_hr( map.get(sp) )))
 			);
 		}
 	}
