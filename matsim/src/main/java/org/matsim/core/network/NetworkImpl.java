@@ -85,6 +85,14 @@ public final class NetworkImpl implements Network {
 
 	private String name = null;
 
+	private int counter=0;
+
+	private int nextMsg=1;
+
+	private int counter2=0;
+
+	private int nextMsg2=1;
+
 	NetworkImpl() {
 		this.factory = new NetworkFactoryImpl(this);
 	}
@@ -106,8 +114,23 @@ public final class NetworkImpl implements Network {
 		Node toNode = link.getToNode();
 		toNode.addInLink(link);
 		links.put(link.getId(), link);
+		
+		// show counter
+		this.counter++;
+		if (this.counter % this.nextMsg == 0) {
+			this.nextMsg *= 2;
+			printLinksCount();
+		}
 	}
-
+	
+	private void printLinksCount() {
+		log.info(" link # " + this.counter);
+	}
+	
+	private void printNodesCount() {
+		log.info(" node # " + this.counter2);
+	}
+	
 	@Override
 	public void addNode(final Node nn) {
 		Id id = nn.getId() ;
@@ -126,6 +149,13 @@ public final class NetworkImpl implements Network {
 			// we changed the nodes, invalidate the quadTree
 			this.nodeQuadTree.clear();
 			this.nodeQuadTree = null;
+		}
+
+		// show counter
+		this.counter2++;
+		if (this.counter2 % this.nextMsg2 == 0) {
+			this.nextMsg2 *= 2;
+			printNodesCount();
 		}
 	}
 	// ////////////////////////////////////////////////////////////////////
