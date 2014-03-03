@@ -20,9 +20,9 @@
 
 package org.matsim.contrib.analysis.kai;
 
-import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 
 /**
@@ -31,30 +31,27 @@ import org.matsim.core.controler.listener.StartupListener;
  * @author nagel
  *
  */
-public class KaiAnalysisListener implements StartupListener, AfterMobsimListener {
+public class KaiAnalysisListener implements StartupListener, IterationEndsListener {
 	// NOTE: My excel opens tab-separated txt files directly (from the command line).  It does not do this with comma-separated or semicolon-separated.
 	// So tab-separated is the way to go. kai, sep'13
 	
-	MyCalcLegTimes calcLegTimes = null ;
+	KNAnalysisEventsHandler calcLegTimes = null ;
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		this.calcLegTimes = new MyCalcLegTimes( event.getControler().getScenario() ) ;
+		this.calcLegTimes = new KNAnalysisEventsHandler( event.getControler().getScenario() ) ;
 		event.getControler().getEvents().addHandler( this.calcLegTimes ) ;
 
 	}
 
 	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		// moved this to iteration end since I also want to analyze population scores. kai, mar'14
 
 		int iteration = event.getIteration() ;
 
-		this.calcLegTimes.writeStats(event.getControler().getControlerIO().getIterationFilename(iteration, "stats_"));
-
-//		Logger.getLogger(this.getClass()).info("[" + iteration + "] average trip leg duration is: " 
-//				+ (int) this.calcLegTimes.getAverageTripDuration()
-//				+ " seconds = " + Time.writeTime(this.calcLegTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
+		this.calcLegTimes.addPopulationStatsAndWrite(event.getControler().getControlerIO().getIterationFilename(iteration, "stats_"));
 
 		// trips are from "true" activity to "true" activity.  legs may also go
 		// from/to ptInteraction activity.  This, in my opinion "legs" is the correct (matsim) term

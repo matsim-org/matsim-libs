@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.analysis.kai.MyCalcLegTimes;
+import org.matsim.contrib.analysis.kai.KNAnalysisEventsHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -93,7 +93,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 
 	public void testNoEvents() {
 
-		MyCalcLegTimes testee = new MyCalcLegTimes(this.population);
+		KNAnalysisEventsHandler testee = new KNAnalysisEventsHandler(this.population);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(testee);
@@ -105,7 +105,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 
 	public void testAveraging() {
 
-		MyCalcLegTimes testee = new MyCalcLegTimes(this.population);
+		KNAnalysisEventsHandler testee = new KNAnalysisEventsHandler(this.population);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(testee);
@@ -137,9 +137,9 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		this.runTest(testee);
 	}
 
-	protected void runTest(MyCalcLegTimes calcLegTimes) {
+	protected void runTest(KNAnalysisEventsHandler calcLegTimes) {
 
-		calcLegTimes.writeStats(this.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME);
+		calcLegTimes.addPopulationStatsAndWrite(this.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME);
 
 		// actual test: compare checksums of the files
 		{

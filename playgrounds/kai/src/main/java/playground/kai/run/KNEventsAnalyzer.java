@@ -18,11 +18,12 @@
  * *********************************************************************** */
 package playground.kai.run;
 
+import java.util.Arrays;
 import java.util.Formatter;
 
 import org.joda.time.DateTime;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.analysis.kai.MyCalcLegTimes;
+import org.matsim.contrib.analysis.kai.KNAnalysisEventsHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -30,7 +31,11 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+
+import playground.southafrica.gauteng.GautengControler_subpopulations;
 
 /**
  * @author nagel
@@ -43,22 +48,42 @@ public class KNEventsAnalyzer {
 		DateTime date = new org.joda.time.DateTime() ;
 
 		Formatter formatter = new Formatter() ;
-		String minute = formatter.format( "%2d", date.getMinuteOfHour() ).toString() ;
+		String minute = formatter.format( "%02d", date.getMinuteOfHour() ).toString() ;
 		formatter.close();
 		
 		String eventsFilename = args[0] ;
 		String populationFilename = args[1] ;
 		String networkFilename = args[2] ;
 		
-		Config config = ConfigUtils.createConfig() ;
-		Scenario scenario = ScenarioUtils.createScenario(config) ;
+		String popAttrFilename = null ;
+		if ( args.length >= 3 && args[3]!=null ) {
+			popAttrFilename = args[3] ;
+		}
 		
-		new MatsimNetworkReader(scenario).parse(networkFilename);
-		new MatsimPopulationReader(scenario).parse(populationFilename) ;
+		// ===
+
+		Config config = ConfigUtils.createConfig() ;
+		
+		String[] modes ={"car","commercial"};
+		config.qsim().setMainModes( Arrays.asList(modes) );
+		config.plansCalcRoute().setNetworkModes(Arrays.asList(modes));
+		
+		config.network().setInputFile( networkFilename );
+		config.plans().setInputFile( populationFilename );
+		config.plans().setInputPersonAttributeFile( popAttrFilename );
+
+		// ===
+		
+		Scenario scenario = ScenarioUtils.loadScenario(config) ;
+
+//		((ScenarioImpl)scenario).createVehicleContainer() ;
+//		GautengControler_subpopulations.createVehiclePerPerson(scenario);
+		
+		// ===
 		
 		EventsManager events = new EventsManagerImpl() ;
 		
-		final MyCalcLegTimes calcLegTimes = new MyCalcLegTimes(scenario);
+		final KNAnalysisEventsHandler calcLegTimes = new KNAnalysisEventsHandler(scenario);
 		events.addHandler(calcLegTimes);
 		
 		new MatsimEventsReader(events).readFile(eventsFilename) ;
@@ -66,7 +91,7 @@ public class KNEventsAnalyzer {
 		String myDate = date.getYear() + "-" + date.getMonthOfYear() + "-" + date.getDayOfMonth() + "-" + 
 				date.getHourOfDay() + "h" + minute ;
 		
-		calcLegTimes.writeStats(myDate + "_stats_");
+		calcLegTimes.addPopulationStatsAndWrite(myDate + "_stats_");
 	}
 
 }
