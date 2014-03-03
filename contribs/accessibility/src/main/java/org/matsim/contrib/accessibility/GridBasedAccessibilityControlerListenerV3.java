@@ -30,7 +30,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.utils.LeastCostPathTree;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -177,8 +176,7 @@ implements ShutdownListener, StartupListener {
 
 		// writing accessibility measures continuously into a csv file, which is not 
 		// dedicated for as input for UrbanSim, but for analysis purposes
-		String matsimOutputDirectory = config.controler().getOutputDirectory();
-		urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(matsimOutputDirectory);
+		urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(config.controler().getOutputDirectory());
 
 	}
 
@@ -198,6 +196,8 @@ implements ShutdownListener, StartupListener {
 
 		// make sure that measuring points are set.
 		if(this.measuringPoints == null){
+			// yy this test is really a bit late AFTER all the iterations. kai, mar'14
+			
 			log.error("No measuring points found! For this reason no accessibilities can be calculated!");
 			log.info("Please use one of the following methods when initializing the accessibility listener to fix this problem:");
 			log.info("1) generateGridsAndMeasuringPointsByShapeFile(String shapeFile, double cellSize)");
@@ -209,12 +209,10 @@ implements ShutdownListener, StartupListener {
 		// prepare the weight:
 		for ( ActivityFacilities facilities : this.additionalFacilityData ) {
 			SpatialGrid spatialGrid = this.additionalSpatialGrids.get( facilities.getName() ) ;
-			// yyyyyy this needs to be initialized somehwere ... and that needs to be where we have the spatial extent!!
 			for ( ActivityFacility fac : facilities.getFacilities().values() ) {
 				Coord coord = fac.getCoord() ;
 //				double value = fac.getActivityOptions().get("h").getCapacity() ; // infinity if undefined!!!
 				double value = 1 ;
-				// yyyyyy this is not general at all!
 				spatialGrid.addToValue(value, coord) ;
 			}
 		}
@@ -227,12 +225,12 @@ implements ShutdownListener, StartupListener {
 		// get the free-speed car travel times (in seconds)
 		TravelTime ttf = new FreeSpeedTravelTime() ;
 		TravelDisutility tdFree = controler.getTravelDisutilityFactory().createTravelDisutility(ttf, controler.getConfig().planCalcScore() ) ;
-		LeastCostPathTreeExtended lcptExtFreeSpeedCarTrvelTime = new LeastCostPathTreeExtended( ttf, tdFree, (RoadPricingSchemeImpl) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME) ) ;
+		LeastCostPathTreeExtended lcptExtFreeSpeedCarTrvelTime = new LeastCostPathTreeExtended( ttf, tdFree, (RoadPricingScheme) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME) ) ;
 
 		// get the congested car travel time (in seconds)
 		TravelTime ttc = controler.getLinkTravelTimes(); // congested
 		TravelDisutility tdCongested = controler.getTravelDisutilityFactory().createTravelDisutility(ttc, controler.getConfig().planCalcScore() ) ;
-		LeastCostPathTreeExtended  lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended(ttc, tdCongested, (RoadPricingSchemeImpl) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME) ) ;
+		LeastCostPathTreeExtended  lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended(ttc, tdCongested, (RoadPricingScheme) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME) ) ;
 
 		// get travel distance (in meter)
 		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttf, new LinkLengthTravelDisutility());

@@ -58,14 +58,14 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 	protected static final Logger log = Logger.getLogger(LeastCostPathTreeExtended.class);
 	
 	private Map<Id, NodeDataExtended> nodeDataExt = null;
-	private RoadPricingSchemeImpl scheme = null;
+	private RoadPricingScheme scheme = null;
 	
 	/**
 	 * constructor
 	 * @param controler Controler, to get the RoadPricingScheme if available
 	 */
 	@Deprecated // use the original LeastCostPathTree with appropriate TravelDisutility objects. kai, feb'14
-	public LeastCostPathTreeExtended(final TravelTime tt, final TravelDisutility td, final RoadPricingSchemeImpl scheme) {
+	public LeastCostPathTreeExtended(final TravelTime tt, final TravelDisutility td, final RoadPricingScheme scheme) {
 		super(tt, td);
 		this.scheme = scheme;
 	}

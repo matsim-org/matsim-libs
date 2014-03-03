@@ -58,7 +58,7 @@ public class LeastCostPathTree {
 	// member variables
 	// ////////////////////////////////////////////////////////////////////
 
-	private Node origin = null;
+	private Node origin1 = null;
 	private double dTime = Time.UNDEFINED_TIME;
 	
 	private final TravelTime ttFunction;
@@ -78,7 +78,7 @@ public class LeastCostPathTree {
 	}
 
 	public void calculate(final Network network, final Node origin, final double time) {
-		this.origin = origin;
+		this.origin1 = origin;
 		this.dTime = time;
 		
 		this.nodeData = new HashMap<Id, NodeData>((int) (network.getNodes().size() * 1.1), 0.95f);
@@ -165,7 +165,7 @@ public class LeastCostPathTree {
 	 * @return Returns the root of the calculated tree, or <code>null</code> if no tree was calculated yet.
 	 */
 	public final Node getOrigin() {
-		return this.origin;
+		return this.origin1;
 	}
 
 	public final double getDepartureTime() {
