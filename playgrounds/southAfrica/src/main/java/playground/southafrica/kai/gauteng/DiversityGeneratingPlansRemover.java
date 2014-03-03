@@ -19,30 +19,25 @@
 package playground.southafrica.kai.gauteng;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.replanning.selectors.AbstractPlanSelector;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
-import org.apache.log4j.Logger ;
 
 /**
  * @author nagel
  *
  */
-final class MyPlanSelectorForRemoval extends AbstractPlanSelector {
-	static private final Logger log = Logger.getLogger(MyPlanSelectorForRemoval.class);
+public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector {
+	static private final Logger log = Logger.getLogger(DiversityGeneratingPlansRemover.class);
 	
 	private static final double sameActTypePenalty = 5;
 	private static final double sameLocationPenalty = 5;
@@ -50,7 +45,7 @@ final class MyPlanSelectorForRemoval extends AbstractPlanSelector {
 	private static final double samePenalty = 5;
 	private final Network network;
 	
-	public MyPlanSelectorForRemoval( Network network ) {
+	public DiversityGeneratingPlansRemover( Network network ) {
 		this.network = network ;
 	}
 

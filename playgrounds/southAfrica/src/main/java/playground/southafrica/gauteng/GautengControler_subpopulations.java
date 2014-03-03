@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -55,7 +54,6 @@ import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.controler.PlanStrategyRegistrar;
@@ -63,7 +61,6 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.PlanStrategy;
@@ -86,12 +83,12 @@ import playground.southafrica.gauteng.roadpricingscheme.GautengRoadPricingScheme
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor_Subpopulation;
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollVehicleType;
 import playground.southafrica.gauteng.roadpricingscheme.TollFactorI;
-import playground.southafrica.gauteng.routing.PersonSpecificTravelDisutilityInclTollFactory;
 import playground.southafrica.gauteng.scoring.GautengScoringFunctionFactory;
 import playground.southafrica.gauteng.scoring.GenerationOfMoneyEvents;
 import playground.southafrica.gauteng.utilityofmoney.GautengUtilityOfMoney;
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
 import playground.southafrica.kai.gauteng.ConfigurableTravelDisutilityFactory;
+import playground.southafrica.kai.gauteng.DiversityGeneratingPlansRemover;
 import playground.southafrica.utilities.Header;
 
 /**
@@ -103,7 +100,7 @@ public class GautengControler_subpopulations {
 			.getLogger(GautengControler_subpopulations.class);
 
 	private static final String RE_ROUTE_AND_SET_VEHICLE = "ReRouteAndSetVehicle";
-	private static String VEH_ID = "TransportModeToVehicleIdMap" ;
+	public static final String VEH_ID = "TransportModeToVehicleIdMap" ;
 
 	public static enum User { johan, kai } ;
 	private static User user = User.johan ;
@@ -123,10 +120,6 @@ public class GautengControler_subpopulations {
 			ConfigUtils.loadConfig(config, configFilename);
 		}
 
-
-		// ### I moved loadConfig down quite a lot so that we can overwrite config options on the server without having to build a new jar every time. kai
-		
-		
 		/* Required argument:
 		 * [0] - Config file;
 		 * 
@@ -214,13 +207,13 @@ public class GautengControler_subpopulations {
 		
 		// This should (in theory) allow you to add a second config file, overwriting config entries.  Meant for work with jars on the server,
 		// where you don't want to re-create the jar if you just want to change a config option.   Currently untested. kai, feb'14
-		if(args.length > 10 && args[10] != null && args[10].length() > 0 && !args[10].equals("null") ) {
-			ConfigUtils.loadConfig(config, args[10]);
+		if(args.length > 11 && args[11] != null && args[11].length() > 0 && !args[11].equals("null") ) {
+			ConfigUtils.loadConfig(config, args[11]);
 		}
-
 
 		config.addConfigConsistencyChecker( new VspConfigConsistencyCheckerImpl() );
 		config.checkConsistency();
+		
 
 		// ===========================================
 
@@ -228,6 +221,10 @@ public class GautengControler_subpopulations {
 		config.scenario().setUseVehicles(true); // _after_ scenario loading. :-(
 		// (there will eventually be something like sc.createVehiclesContainer or ((ScenarioImpl)sc).createVehiclesContainer which will
 		// address this problem. kai, feb'14)
+		
+		//yyyy should now be possible to replace by:
+//		((ScenarioImpl)sc).createVehicleContainer() ;
+		// but needs to be tested. kai, feb'14
 		
 //		if ( user==User.kai ) {
 //			simplifyPopulation(sc) ;
@@ -239,7 +236,7 @@ public class GautengControler_subpopulations {
 		// ===========================================
 
 		final Controler controler = new Controler(sc);
-		controler.setOverwriteFiles(true);
+//		controler.setOverwriteFiles(true);
 
 		// SET VEHICLES ...
 		// ... at beginning:
@@ -267,7 +264,17 @@ public class GautengControler_subpopulations {
 			}
 		});
 
+		// ROAD PRICING AND SCORING:
 		setUpRoadPricingAndScoring(baseValueOfTime, valueOfTimeMultiplier, sc, controler);
+		
+		// PLANS REMOVAL
+		controler.addControlerListener(new StartupListener(){
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				event.getControler().getStrategyManager().setPlanSelectorForRemoval(new DiversityGeneratingPlansRemover( sc.getNetwork() ));
+			}
+		});
+		// needs to be tested!
 
 		// ADDITIONAL ANALYSIS:
 		controler.addControlerListener(new KaiAnalysisListener());
@@ -461,7 +468,9 @@ public class GautengControler_subpopulations {
 	/**
 	 * @param sc
 	 */
-	private static void createVehiclePerPerson(final Scenario sc) {
+	public static void createVehiclePerPerson(final Scenario sc) {
+		// (public:  access for analysis. kai, feb'14)
+		
 		/* Create vehicle types. */
 		VehiclesFactory vf = VehicleUtils.getFactory();
 		LOG.info("Creating vehicle types.");
