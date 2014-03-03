@@ -100,9 +100,8 @@ public class PersonImpl implements Person {
 		}
 	}
 
+	@Deprecated 		// yyyy should use new RandomPlanSelector().selectPlan( person ) instead. kai, nov'13
 	public Plan getRandomPlan() {
-		// yyyy could (should?) use new RandomPlanSelector().selectPlan( person ) instead. kai, nov'13
-		
 		if (this.getPlans().size() == 0) {
 			return null;
 		}
@@ -110,9 +109,8 @@ public class PersonImpl implements Person {
 		return this.getPlans().get(index);
 	}
 
+	@Deprecated 		// yyyy should use new BestPlanSelector().selectPlan( person ) instead. kai, nov'13
 	public Plan getBestPlan() {
-		// yyyy could (should?) use new BestPlanSelector().selectPlan( person ) instead. kai, nov'13
-
 		if (this.getPlans().size() == 0) {
 			return null;
 		}
@@ -132,9 +130,8 @@ public class PersonImpl implements Person {
 		return currBestPlan;
 	}
 
+	@Deprecated 		// yyyy should use new RandomUnscoredPlanSelector().selectPlan( person ) instead. kai, nov'13
 	public Plan getRandomUnscoredPlan() {
-		// yyyy could (should?) use new RandomUnscoredPlanSelector().selectPlan( person ) instead. kai, nov'13
-		
 		int cntUnscored = 0;
 		for (Plan plan : this.getPlans()) {
 			if (plan.getScore() == null) {
