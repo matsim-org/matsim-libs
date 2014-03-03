@@ -71,12 +71,14 @@ public class ScenarioLoaderImpl {
 
 
 	static Scenario loadScenario(Config config) {
+		// deliberately non-public.  Use method in ScenarioUtils.
 		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(config);
 		Scenario scenario = scenarioLoader.loadScenario();
 		return scenario;
 	}
 
 	static void loadScenario(Scenario scenario) {
+		// deliberately non-public.  Use method in ScenarioUtils.
 		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(scenario);
 		scenarioLoader.loadScenario();
 	}
