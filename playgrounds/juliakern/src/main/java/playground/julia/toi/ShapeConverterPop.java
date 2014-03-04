@@ -193,9 +193,9 @@ public class ShapeConverterPop {
 //				Double id = (Double) sf.getAttribute("B0"); //B0
 //				String idstring = Double.toString(id);
 				
-				//Integer id = (Integer) sf.getAttribute("ID_NUM2"); //ID_2
-				Double idd = (Double) sf.getAttribute("ID_2");
-				Integer id = idd.intValue();
+				Integer id = (Integer) sf.getAttribute("ID_NUM2"); //ID_2 --> pop size = 59059
+//				Double idd = (Double) sf.getAttribute("ID_2");
+//				Integer id = idd.intValue();
 				String idstring = Integer.toString(id);
 				Id personId = new IdImpl(idstring);
 				

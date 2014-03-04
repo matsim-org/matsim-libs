@@ -40,6 +40,7 @@ public class FirstSimulation {
 	static String outputDir = "output/oslo/";
 	//static String plansFile = "input/oslo/plans_from_csv.xml";
 	static String plansFile = "input/oslo/plans_from_start_og.xml";
+	//static String plansFile = "input/oslo/smallpop.xml";
 	/**
 	 * @param args
 	 */
@@ -140,8 +141,8 @@ public class FirstSimulation {
 		ncg.setInputFile(networkFile);
 		controler.getConfig().plans().setInputFile(plansFile);
 				 
-		controler.getEvents().addHandler(new TollHandler(population, controler));
-		 
+		controler.getEvents().addHandler(new TollHandler(population, controler, scenario));
+		
 		controler.run();
 	}
 
