@@ -26,10 +26,10 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -41,7 +41,7 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.andreas.utils.stats.RecursiveStatsContainer;
 
 
-public class FilterStuckScores implements AgentStuckEventHandler{
+public class FilterStuckScores implements PersonStuckEventHandler{
 
 	private final static Logger log = Logger.getLogger(FilterStuckScores.class);
 
@@ -164,7 +164,7 @@ public class FilterStuckScores implements AgentStuckEventHandler{
 	}
 
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		this.tempIds.add(event.getPersonId().toString());
 	}
 	
