@@ -19,33 +19,23 @@
 
 package playground.julia.toi;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class FirstSimulation {
  
-	static String networkFile = "input/oslo/trondheim_network.xml";
+	static String networkFile = "input/oslo/trondheim_network_with_lanes.xml";
 	static String cvsSplitBy = ",";
 	static String outputDir = "output/oslo/";
 	//static String plansFile = "input/oslo/plans_from_csv.xml";
@@ -108,7 +98,9 @@ public class FirstSimulation {
 		StrategySettings timeAll = new StrategySettings(new IdImpl(4));
 		timeAll.setModuleName("TimeAllocationMutator");
 		timeAll.setProbability(0.1);
+		String mutationRange = Double.toString(60.*15);		
 		config.strategy().addStrategySettings(timeAll);
+		config.setParam("TimeAllocationMutator", "mutationRange", mutationRange);
 		
 		// timeallocation mutator
 		// keep last selected
@@ -148,6 +140,7 @@ public class FirstSimulation {
 		ncg.setInputFile(networkFile);
 		controler.getConfig().plans().setInputFile(plansFile);
 				 
+		controler.getEvents().addHandler(new TollHandler(population, controler));
 		 
 		controler.run();
 	}

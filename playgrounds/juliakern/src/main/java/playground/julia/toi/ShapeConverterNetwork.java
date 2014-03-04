@@ -19,7 +19,12 @@
 
 package playground.julia.toi;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
@@ -40,11 +45,12 @@ import org.opengis.feature.simple.SimpleFeature;
 public class ShapeConverterNetwork {
 
 	static String shapeFile = "input/oslo/Matsim_files_1/trondheim_med_omland_4.shp";
+	static String laneTypeFile = "input/oslo/lanetypes.csv";
+	private static String splitSymbol =",";
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		
 		Logger logger = Logger.getLogger(ShapeConverterNetwork.class);
 		
@@ -57,6 +63,28 @@ public class ShapeConverterNetwork {
 		Collection<SimpleFeature> features = sfr.readFileAndInitialize(shapeFile);
 		
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		
+		// read lane type file
+		
+		HashMap<String, Lane> laneTypes = new HashMap<String, Lane>();
+		BufferedReader br = null;
+		String line = "";
+		
+		try{
+			br = new BufferedReader(new FileReader(laneTypeFile));
+			br.readLine(); //skip first line
+			br.readLine();
+			while((line=br.readLine())!= null){
+				String [] lanetypeStr = line.split(splitSymbol);
+				laneTypes.put(lanetypeStr[1], new Lane(lanetypeStr));
+			}
+			
+		}catch(FileNotFoundException e){
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		//Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(0.0, 10000.0));
 		
@@ -118,25 +146,49 @@ public class ShapeConverterNetwork {
 				Double linkLength = (Double) sf.getAttribute("LENGTH");
 				Integer freeSpeedkmh = (Integer) sf.getAttribute("FARTSGRENS"); // tempo limit //TODO change to m/sec?
 				Double freeSpeed = freeSpeedkmh.doubleValue(); 
-				Double capacity = 3600.;
-				Double numLanes = 1.0;
-				if((Double)sf.getAttribute("LENGDE")>20.0)numLanes=2.0;
+				String lanetype = (String) sf.getAttribute("VKJORFLT");
+				
+				if (!laneTypes.containsKey(lanetype)) {
+					System.out.println("couldnt find lanetype " + lanetype);
+					System.out.println("using 1#2 values for the link from " + fromCoord + " to " + toCoord + " with length " + linkLength);
+					lanetype = "1#2";
+				}
+				
+				if(laneTypes.get(lanetype).toll==true){
+					logger.info("toll roads " + linkId1 + " " + linkId2 );
+				}
+					Double capacity = laneTypes.get(lanetype).getCapacity(); //standard 3600
+					Double numLanesForwards = laneTypes.get(lanetype)
+							.getNumberOfForwardLanes();
+					Double numLanesBackwards = laneTypes.get(lanetype)
+							.getNumberOfBackLanes();
+					if (!network.getLinks().containsKey(linkId1)) {
+						if(numLanesForwards>0.0){
+							network.createAndAddLink(linkId1, node1, node2,	linkLength, freeSpeed, capacity,numLanesForwards);
+						}
+					}
+					if (!network.getLinks().containsKey(linkId2)) {
+						if(numLanesBackwards>0.0){
+							network.createAndAddLink(linkId2, node2, node1,	linkLength, freeSpeed, capacity,numLanesBackwards);
+						}
+					}
 					
-				if (!network.getLinks().containsKey(linkId1)) {
-					network.createAndAddLink(linkId1, node1, node2, linkLength,freeSpeed, capacity, numLanes);
+					
+					
+					if(!(numLanesBackwards+numLanesForwards>=1.0)){
+						logger.warn("no lanes for link " + lanetype);
+					}
 				}
-				if(!network.getLinks().containsKey(linkId2)){
-					network.createAndAddLink(linkId2, node2, node1, linkLength,freeSpeed, capacity, numLanes);
-				}
-		}
+		
 		
 		}
 		
 		 new NetworkCleaner().run(network);
 		NetworkWriter nw = new NetworkWriter(network);
-		nw.write("input/oslo/trondheim_network.xml");
+		nw.write("input/oslo/trondheim_network_with_lanes.xml");
 		
 		
 	
 	}
 }
+
