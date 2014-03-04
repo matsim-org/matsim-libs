@@ -35,7 +35,7 @@
   	</dependency>
 	<dependency>
 		<groupId>processing</groupId>
-		<artifactId>processing</artifactId>
+		<artifactId>core</artifactId>
 		<version>2.0.b6</version>
 		<scope>system</scope>
 		<systemPath>${basedir}/lib/processing-2.0b6/core.jar</systemPath>
