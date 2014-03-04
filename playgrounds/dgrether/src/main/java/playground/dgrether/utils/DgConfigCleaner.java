@@ -1,15 +1,5 @@
-package playground.dgrether.utils;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
-import org.matsim.core.utils.io.IOUtils;
-
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgConfigCleaner
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -26,6 +16,16 @@ import org.matsim.core.utils.io.IOUtils;
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
+package playground.dgrether.utils;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import org.matsim.core.utils.io.IOUtils;
+
 
 /**
  * @author dgrether
