@@ -65,6 +65,7 @@ public class ShapeConverterPopRandom {
 	private static Double shift = 100.;
 	private static Scenario scenario;
 	private static List<Person> newPersons;
+	private static double timeShift = 15*60.;
 	/**
 	 * @param args
 	 */
@@ -234,6 +235,8 @@ public class ShapeConverterPopRandom {
 				Double xCoord = originalActivity.getCoord().getX() + Math.random()*shift - .5*shift;
 				Double yCoord = originalActivity.getCoord().getY() + Math.random()*shift - .5*shift;
 				Activity act = popfac.createActivityFromCoord(originalActivity.getType(), scenario.createCoord(xCoord, yCoord));
+				Double endtime = originalActivity.getEndTime() + Math.random()*timeShift  - .5*timeShift;
+				act.setEndTime(endtime);
 				newPlan.addActivity(act);
 			}
 		}

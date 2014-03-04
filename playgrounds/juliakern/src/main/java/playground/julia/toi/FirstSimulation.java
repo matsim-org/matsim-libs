@@ -39,7 +39,7 @@ public class FirstSimulation {
 	static String cvsSplitBy = ",";
 	static String outputDir = "output/oslo/";
 	//static String plansFile = "input/oslo/plans_from_csv.xml";
-	static String plansFile = "input/oslo/plans_from_start_og.xml";
+	static String plansFile = "input/oslo/plans_from_start_og_random.xml";
 	//static String plansFile = "input/oslo/smallpop.xml";
 	/**
 	 * @param args
