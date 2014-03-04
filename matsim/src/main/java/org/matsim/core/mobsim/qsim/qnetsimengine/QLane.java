@@ -19,11 +19,9 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -37,7 +35,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
-import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.vis.VisLane;
@@ -297,20 +294,6 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 			return lastDistanceFromFromNode;
 		}
 		
-	}
-
-	static class FromLinkEndComparator implements Comparator<QLane>, Serializable, MatsimComparator {
-		private static final long serialVersionUID = 1L;
-		@Override
-		public int compare(final QLane o1, final QLane o2) {
-			if (o1.getEndsAtMeterFromLinkEnd() < o2.getEndsAtMeterFromLinkEnd()) {
-				return -1;
-			} else if (o1.getEndsAtMeterFromLinkEnd() > o2.getEndsAtMeterFromLinkEnd()) {
-				return 1;
-			} else {
-				return 0;
-			}
-		}
 	}
 
 	double getInverseSimulatedFlowCapacity() {

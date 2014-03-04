@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OTFSignalSystem
+ * FromLinkEndComparator
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,44 +17,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signalsystems.vis;
+package org.matsim.lanes.utils;
 
-import java.awt.geom.Point2D;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.Serializable;
+import java.util.Comparator;
 
-/**
- * @author dgrether
- *
- */
-public class VisSignalSystem {
-	
-	private String id;
-	private Map<String, VisSignalGroup> signalGroups = new HashMap<String, VisSignalGroup>();
-	private Point2D.Float visCoordinate;
+import org.matsim.core.api.internal.MatsimComparator;
+import org.matsim.lanes.LaneImpl;
 
-	public VisSignalSystem(String id){
-		this.id = id;
+class LaneFromLinkEndComparator implements Comparator<LaneImpl>, Serializable, MatsimComparator {
+	private static final long serialVersionUID = 1L;
+	@Override
+	public int compare(final LaneImpl o1, final LaneImpl o2) {
+		if (o1.getEndsAtMeterFromLinkEnd() < o2.getEndsAtMeterFromLinkEnd()) {
+			return -1;
+		} else if (o1.getEndsAtMeterFromLinkEnd() > o2.getEndsAtMeterFromLinkEnd()) {
+			return 1;
+		} else {
+			return 0;
+		}
 	}
-
-	public String getId() {
-		return this.id;
-	}
-
-	public void addOTFSignalGroup(VisSignalGroup group){
-		this.signalGroups.put(group.getId(), group);
-	}
-	
-	public Map<String, VisSignalGroup> getOTFSignalGroups(){
-		return this.signalGroups;
-	}
-	
-	public void setVisCoordinate(Point2D.Float visCoordinate) {
-		this.visCoordinate = visCoordinate;
-	}
-	
-	public Point2D.Float getVisCoordinate(){
-		return this.visCoordinate;
-	}
-	
 }

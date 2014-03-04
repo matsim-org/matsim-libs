@@ -108,9 +108,9 @@ import org.matsim.vis.snapshotwriters.VisData;
  * of its QueueLanes is active.</li>
  * </ul>
  */
-public class QLinkLanesImpl extends AbstractQLink {
+public final class QLinkLanesImpl extends AbstractQLink {
 
-	final private static QLane.FromLinkEndComparator fromLinkEndComparator = new QLane.FromLinkEndComparator();
+	final private static QLaneFromLinkEndComparator fromLinkEndComparator = new QLaneFromLinkEndComparator();
 
 	/**
 	 * Reference to the QueueNode which is at the end of each QueueLink instance
@@ -213,7 +213,6 @@ public class QLinkLanesImpl extends AbstractQLink {
 		//fill toLinks
 		while (!laneStack.isEmpty()){
 			QLane qLane = laneStack.pop();
-//			qLane.calculateCapacities();
 			qLane.recalcTimeVariantAttributes(Time.UNDEFINED_TIME);
 			if (qLane.getToLanes() == null || (qLane.getToLanes().isEmpty())) {
 				for (Id toLinkId : qLane.getLaneData().getToLinkIds()){
@@ -240,7 +239,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 	@Override
 	void activateLink() {
 		if (!this.active) {
-			network.simEngine.activateLink(this);
+			netElementActivator.activateLink(this);
 			this.active = true;
 		}
 	}
@@ -446,7 +445,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 				 nodeOffset = nodeOffset +2.0; // +2.0: eventually we need a bit space for the signal
 			}
 			CoordinateTransformation transformation = new IdentityTransformation();
-			otfLink = laneModelBuilder.createOTFLinkWLanes(transformation, QLinkLanesImpl.this, nodeOffset, QLinkLanesImpl.this.lanesToLinkAssignment);
+			otfLink = laneModelBuilder.createVisLinkWLanes(transformation, QLinkLanesImpl.this, nodeOffset, QLinkLanesImpl.this.lanesToLinkAssignment);
 			SnapshotLinkWidthCalculator linkWidthCalculator = QLinkLanesImpl.this.network.getLinkWidthCalculator();
 			laneModelBuilder.recalculatePositions(otfLink, linkWidthCalculator);
 			for (QLane  ql : QLinkLanesImpl.this.queueLanes){

@@ -21,6 +21,7 @@ package org.matsim.lanes.vis;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
+import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
@@ -29,8 +30,10 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QLane;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkLanesImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.lanes.LaneImpl;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
+import org.matsim.lanes.utils.LanesUtils;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.vecmathutils.VectorUtils;
@@ -92,7 +95,21 @@ public class VisLaneModelBuilder {
 		return new Point2D.Double(x, y);
 	}
 	
-	
+	private VisLane createVisLane(LaneImpl qlane, double linkLength, double linkScale, double linkLengthCorrectionFactor) {
+		String id = qlane.getLaneData().getId().toString();
+		double startPosition = (linkLength -  qlane.getLaneData().getStartsAtMeterFromLinkEnd()) * linkScale * linkLengthCorrectionFactor;
+		double endPosition = startPosition + (qlane.getLength() *  linkScale * linkLengthCorrectionFactor);
+//		log.error("lane " + qlane.getId() + " starts at: " + startPosition + " and ends at : " +endPosition);
+		int alignment = qlane.getLaneData().getAlignment();
+		VisLane lane = new VisLane(id);
+		lane.setStartPosition(startPosition);
+		lane.setEndPosition(endPosition);
+		lane.setAlignment(alignment);
+		lane.setNumberOfLanes(qlane.getLaneData().getNumberOfRepresentedLanes());
+		return lane;
+	}
+
+	@Deprecated
 	private VisLane createOTFLane(LaneData20 laneData, QLane qlane, double linkLength, double linkScale, double linkLengthCorrectionFactor) {
 		String id = laneData.getId().toString();
 		double startPosition = (linkLength -  laneData.getStartsAtMeterFromLinkEnd()) * linkScale * linkLengthCorrectionFactor;
@@ -130,7 +147,11 @@ public class VisLaneModelBuilder {
 		}
 	}
 
-	public VisLinkWLanes createOTFLinkWLanes(CoordinateTransformation transform, VisLink link, double nodeOffsetMeter, LanesToLinkAssignment20 l2l) {
+	/**
+	 * @deprecated use createVisLinkLanes
+	 */
+	@Deprecated
+	public VisLinkWLanes createVisLinkWLanes(CoordinateTransformation transform, VisLink link, double nodeOffsetMeter, LanesToLinkAssignment20 l2l) {
 //		log.error("");
 //		log.error("link " + link.getLink().getId() + " ... ");
 //		log.debug("  fromNode: " + link.getLink().getFromNode().getId() + " coord: " + link.getLink().getFromNode().getCoord());
@@ -205,6 +226,83 @@ public class VisLaneModelBuilder {
 		return lanesLinkData;
 	}
 
+	public VisLinkWLanes createVisLinkLanes(CoordinateTransformation transform, VisLink link, double nodeOffsetMeter, LanesToLinkAssignment20 l2l) {
+//		log.error("");
+//		log.error("link " + link.getLink().getId() + " ... ");
+//		log.debug("  fromNode: " + link.getLink().getFromNode().getId() + " coord: " + link.getLink().getFromNode().getCoord());
+//		log.debug("  toNode: " + link.getLink().getToNode().getId() + " coord: " + link.getLink().getToNode().getCoord());
+		Coord linkStartCoord = transform.transform(link.getLink().getFromNode().getCoord());
+		Coord linkEndCoord = transform.transform(link.getLink().getToNode().getCoord());
+		Point2D.Double linkStart = new Point2D.Double(linkStartCoord.getX(), linkStartCoord.getY());
+		Point2D.Double linkEnd =  new Point2D.Double(linkEndCoord.getX(), linkEndCoord.getY());
+		
+		//calculate length and normal
+		Point2D.Double deltaLink = new Point2D.Double(linkEnd.x - linkStart.x, linkEnd.y - linkStart.y);
+		double euclideanLinkLength = this.calculateEuclideanLinkLength(deltaLink);
+		//calculate the correction factor if real link length is different than euclidean distance
+		double linkLengthCorrectionFactor = euclideanLinkLength / link.getLink().getLength();
+		Point2D.Double deltaLinkNorm = new Point2D.Double(deltaLink.x / euclideanLinkLength, deltaLink.y / euclideanLinkLength);
+		Point2D.Double normalizedOrthogonal = new Point2D.Double(deltaLinkNorm.y, - deltaLinkNorm.x);
+		
+		//first calculate the scale of the link based on the node offset, i.e. the link will be shortened at the beginning and the end 
+		double linkScale = 1.0;
+		if ((euclideanLinkLength * 0.2) > (2.0 * nodeOffsetMeter)){ // 2* nodeoffset is more than 20%
+			linkScale = (euclideanLinkLength - (2.0 * nodeOffsetMeter)) / euclideanLinkLength;
+		}
+		else { // use 80 % as euclidean length
+			linkScale = euclideanLinkLength * 0.8 / euclideanLinkLength;
+		}
+		
+		//scale the link 
+		Tuple<Double, Double> scaledLink = VectorUtils.scaleVector(linkStart, linkEnd, linkScale);
+		Point2D.Double scaledLinkEnd = scaledLink.getSecond();
+		Point2D.Double scaledLinkStart = scaledLink.getFirst();
+//		log.error("scaledLinkStart: " + scaledLinkStart + " end: " + scaledLinkEnd);
+		
+		VisLinkWLanes lanesLinkData = new VisLinkWLanes(link.getLink().getId().toString());
+		lanesLinkData.setLinkStartEndPoint(scaledLinkStart, scaledLinkEnd);
+		lanesLinkData.setNormalizedLinkVector(deltaLinkNorm);
+		lanesLinkData.setLinkOrthogonalVector(normalizedOrthogonal);
+		lanesLinkData.setNumberOfLanes(link.getLink().getNumberOfLanes());
+
+		if (l2l != null){
+			List<LaneImpl> lanes = LanesUtils.createLanes(link.getLink(), l2l);
+			int maxAlignment = 0;
+			for (LaneImpl lane : lanes){
+				VisLane visLane = this.createVisLane(lane, link.getLink().getLength(), linkScale, linkLengthCorrectionFactor);
+				lanesLinkData.addLaneData(visLane);
+				if (visLane.getAlignment() > maxAlignment) {
+					maxAlignment = visLane.getAlignment();
+				}
+			}
+			lanesLinkData.setMaximalAlignment(maxAlignment);
+			//connect the lanes TODO check with above
+			for (LaneData20 lane : l2l.getLanes().values()){
+				VisLane otfLane = lanesLinkData.getLaneData().get(lane.getId().toString());
+				if (lane.getToLaneIds() != null){
+					for (Id toLaneId : lane.getToLaneIds()){
+						VisLane otfToLane = lanesLinkData.getLaneData().get(toLaneId.toString());
+						otfLane.addToLane(otfToLane);
+					}
+				}
+				else if (lane.getToLinkIds() != null){
+					for (Id id : lane.getToLinkIds()){
+						otfLane.addToLinkId(id);
+					}
+				}
+			}
+		}
+		else {
+			for (Id id : link.getLink().getToNode().getOutLinks().keySet()){
+				lanesLinkData.addToLinkId(id);
+			}
+		}
+		
+		return lanesLinkData;
+	}
+
+	
+	
 	private QLane getQLane(Id laneId, QLinkLanesImpl link){
 		for (QLane lane : link.getQueueLanes()){
 			if (lane.getId().equals(laneId)){
