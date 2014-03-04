@@ -56,12 +56,12 @@ import org.opengis.feature.simple.SimpleFeatureType;
 public class ShapeConverterPopRandom {
 
 	static String shapeFile = "input/oslo/Start_og_stopp_i_TRD_fra_RVU2/testplott5_end.shp";
-	static String networkFile = "input/oslo/trondheim_network.xml";
+	static String networkFile = "input/oslo/trondheim_network_with_lanes.xml";
 	static String plansFile = "input/oslo/plans_from_start_og_random.xml";
 	static Collection<SimpleFeature> features;
 	static Logger logger = Logger.getLogger(ShapeConverterPopRandom.class);
 	private static int countKnownActTypes =0;
-	private static Double factor = 3.69;
+	private static Double factor = 3.0;
 	private static Double shift = 100.;
 	private static Scenario scenario;
 	private static List<Person> newPersons;
