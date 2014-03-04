@@ -79,7 +79,7 @@ public class MergeNetworks {
 		NetworkFactory factory = mergedNetwork.getFactory();
 		for (Node node : networkA.getNodes().values()) {
 			NodeImpl node2 = (NodeImpl) factory.createNode(new IdImpl(prefixA + node.getId().toString()), node.getCoord());
-			mergedNetwork.getNodes().put(node2.getId(), node2);
+			mergedNetwork.addNode(node2);
 		}
 		for (Link link : networkA.getLinks().values()) {
 			Id fromNodeId = new IdImpl(prefixA + link.getFromNode().getId().toString());
@@ -91,14 +91,14 @@ public class MergeNetworks {
 			link2.setFreespeed(link.getFreespeed());
 			link2.setLength(link.getLength());
 			link2.setNumberOfLanes(link.getNumberOfLanes());
-			mergedNetwork.getLinks().put(link2.getId(), link2);
+			mergedNetwork.addLink(link2);
 			mergedNetwork.getNodes().get(fromNodeId).addOutLink(link2);
 			mergedNetwork.getNodes().get(toNodeId).addInLink(link2);
 		}
 		capacityFactor = mergedNetwork.getCapacityPeriod() / networkB.getCapacityPeriod();
 		for (Node node : networkB.getNodes().values()) {
 			NodeImpl node2 = (NodeImpl) factory.createNode(new IdImpl(prefixB + node.getId().toString()), node.getCoord());
-			mergedNetwork.getNodes().put(node2.getId(), node2);
+			mergedNetwork.addNode(node2);
 		}
 		for (Link link : networkB.getLinks().values()) {
 			Id fromNodeId = new IdImpl(prefixB + link.getFromNode().getId().toString());
@@ -110,7 +110,7 @@ public class MergeNetworks {
 			link2.setFreespeed(link.getFreespeed());
 			link2.setLength(link.getLength());
 			link2.setNumberOfLanes(link.getNumberOfLanes());
-			mergedNetwork.getLinks().put(link2.getId(), link2);
+			mergedNetwork.addLink(link2);
 			mergedNetwork.getNodes().get(fromNodeId).addOutLink(link2);
 			mergedNetwork.getNodes().get(toNodeId).addInLink(link2);
 		}
