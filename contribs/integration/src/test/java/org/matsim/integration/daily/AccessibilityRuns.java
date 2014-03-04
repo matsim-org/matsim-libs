@@ -73,8 +73,10 @@ public class AccessibilityRuns {
 	public void doAccessibilityTest() {
 		Config config = ConfigUtils.createConfig() ;
 
-		config.network().setInputFile("../../../matsimExamples/countries/za/nmbm/network/network.xml.gz" );
-		config.facilities().setInputFile("../../../matsimExamples/countries/za/nmbm/facilities/facilities.xml.gz" );
+//		config.network().setInputFile("../../../matsimExamples/countries/za/nmbm/network/network.xml.gz" );
+//		config.facilities().setInputFile("../../../matsimExamples/countries/za/nmbm/facilities/facilities.xml.gz" );
+		config.network().setInputFile("../../matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz");
+		config.facilities().setInputFile("../../matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml.gz" );
 
 		config.controler().setLastIteration(0);
 
@@ -149,26 +151,80 @@ public class AccessibilityRuns {
 
 			controler.run() ;
 
+//			try {
+//				BufferedWriter writer = IOUtils.getBufferedWriter( config.controler().getOutputDirectory() + "/t.gpl" ) ;
+//				// yy might be worthwhile to find out what all the following instructions actually do; I took them from an example.
+//				// kai, feb'14
+//				writer.write("set pm3d map\n") ;
+//				writer.write("set pm3d flush begin\n") ;
+//				writer.write("set palette defined ( 0. '#ffffff', 0.5 '#ffff00', 1. '#0000ff' )\n") ;
+//				writer.write("set zrange [-0:10]\n") ;
+//				writer.write("set term pdf size 25cm,15cm \n") ;
+//				writer.write("set out 'accessibility.pdf'\n") ;
+//				writer.write("set title 'accessibility to " + actType + "'\n") ;
+//				//writer.write("splot \"<awk '!/access/{print $0}' accessibilities.csv\" u 1:2:3\n ") ;
+//				writer.write("splot \"accessibilities.csv\" u 1:2:3\n ") ;
+//				// (the awk command filters out the first line)
+//				writer.close();
+//			} catch (Exception ee ) {
+//				ee.printStackTrace(); 
+//				throw new RuntimeException( "writing t.gpl did not work") ;
+//			}
+			
+			
 			try {
 				BufferedWriter writer = IOUtils.getBufferedWriter( config.controler().getOutputDirectory() + "/t.gpl" ) ;
-				// yy might be worthwhile to find out what all the following instructions actually do; I took them from an example.
-				// kai, feb'14
-				writer.write("set pm3d map\n") ; 
+				writer.write("#set pm3d\n") ;
+				writer.write("set pm3d map\n") ;
 				writer.write("set pm3d flush begin\n") ;
-				writer.write("set palette defined ( 0. '#ffffff', 0.5 '#ffff00', 1. '#0000ff' )\n") ;
-				writer.write("set zrange [-0:10]\n") ;
-				writer.write("set term pdf size 25cm,15cm \n") ;
+				writer.write("set pm3d corners2color c1\n") ;
+				writer.write("set style data pm3d\n") ;
+				writer.write("set palette defined ( 0. '#ff0000', 0.82 '#ff0000', 0.86 '#00ff00', 0.9 '#0000ff', 1.0 '#0000ff' )\n") ;
+				writer.write("#set zrange [-40:10]\n") ;
+				writer.write("#set cbrange [-0:10]\n") ;
+				writer.write("set term pdf size 25cm,20cm\n") ;
 				writer.write("set out 'accessibility.pdf'\n") ;
-				writer.write("set title 'accessibility to " + actType + "'\n") ;
-				writer.write("splot \"<awk '!/access/{print $0}' accessibilities.csv\" u 1:2:3\n ") ;
-				// (the awk command filters out the first line)
+				writer.write("#set title 'accessibility to w'\n") ;
+				writer.write("\n") ;
+				writer.write("#set view 45,30;\n") ;
+				writer.write("\n") ;
+				writer.write("# set palette model HSV functions gray, 1, 1\n") ;
+				writer.write("\n") ;
+				writer.write("min(a,b) = (a < b) ? a : b\n") ;
+				writer.write("\n") ;
+				writer.write("max(a,b) = (a < b) ? b : a\n") ;
+				writer.write("accmin=3 ; # accessibilities below this are red\n") ;
+				writer.write("accmax=9 ; # accessibilities above this are blue.  max is around 12\n") ;
+				writer.write("gray(acc) = 2.*min( 1, max(0 , (acc-accmin)/(accmax-accmin) ) ) ;\n") ;
+				writer.write("# I have no idea why this needs to be multiplied by 2. kai, feb'14\n") ;
+				writer.write("\n") ;
+				writer.write("densmax=1000 ; # 2726 is the maximum value in NMB\n") ;
+				writer.write("maxwhite = 240 ; # 255 means that we go all the way to full white\n") ;
+				writer.write("val(dens) = max(0,maxwhite*(densmax-dens)/densmax) ;\n") ;
+				writer.write("#val(dens) = 0. ; # unset this comment to get the non-pop-weighted version (for paper)\n") ;
+				writer.write("\n") ;
+				writer.write("blue(acc,dens) = min(255,  val(dens)+255*max(0,1.-2.*gray(acc))  ) ;\n") ;
+				writer.write("green(acc,dens) = min(255,  val(dens)+255*max(0,min(2.*gray(acc),2.-2.*gray(acc)))  ) ;\n") ;
+				writer.write("red(acc,dens) = min(255,  val(dens)+255*max(0,2.*gray(acc)-1)  ) ;\n") ;
+				writer.write("\n") ;
+				writer.write("rgb(acc,dens) = 256*256*int(blue(acc,dens))+256*int(green(acc,dens))+int(red(acc,dens)) ;\n") ;
+				writer.write("\n") ;
+				writer.write("unset colorbox ; # useless with lc rgb variable\n") ;
+				writer.write("\n") ;
+				//writer.write("splot \"<awk '!/access/{print $0}' doAccessibilityTest/w/accessibilities.csv\" u 1:2:(rgb($3,$8)) lc rgb variable\n") ;
+				writer.write("splot \"accessibilities.csv\" u 1:2:(rgb($3,$8)) lc rgb variable\n") ;
+				writer.write("\n") ;
+				writer.write("#rgb(r,g,b) = 65536 * int(r) + 256 * int(g) + int(b)\n") ;
+				writer.write("#splot \"data\" using 1:2:3:(rgb($1,$2,$3)) with points lc rgb variable\n") ;
 				writer.close();
 			} catch (Exception ee ) {
 				ee.printStackTrace(); 
 				throw new RuntimeException( "writing t.gpl did not work") ;
 			}
-
-			String cmd = "/opt/local/bin/gnuplot t.gpl" ;
+			
+		
+			// String cmd = "/opt/local/bin/gnuplot t.gpl" ;
+			String cmd = "C:/Program Files (x86)/gnuplot/bin/gnuplot t.gpl";
 			String stdoutFileName = config.controler().getOutputDirectory() + "/gnuplot.log" ;
 			int timeout = 99999 ;
 			String workingDirectory = config.controler().getOutputDirectory() ;

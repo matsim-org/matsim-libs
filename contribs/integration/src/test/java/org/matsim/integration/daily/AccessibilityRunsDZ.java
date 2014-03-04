@@ -33,6 +33,7 @@ public class AccessibilityRunsDZ {
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
+	@SuppressWarnings("static-method")
 	@Test
 	public void doTest() {
 		System.out.println("available ram: " + (Runtime.getRuntime().maxMemory() / 1024/1024));
@@ -42,27 +43,27 @@ public class AccessibilityRunsDZ {
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario( config ) ;
 
-//		try {
-//			new MatsimNetworkReader(sc).readFile(FN);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		try {
-//			new MatsimNetworkReader(sc).readFile("../" + FN);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+		try {
+			new MatsimNetworkReader(sc).readFile(FN);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			new MatsimNetworkReader(sc).readFile("../" + FN);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		try {
 			new MatsimNetworkReader(sc).readFile("../../" + FN);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-//		try {
-//			new MatsimNetworkReader(sc).readFile("../../../" + FN);
-//			// this is the one that works locally
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+		try {
+			new MatsimNetworkReader(sc).readFile("../../../" + FN);
+			// this is the one that works locally
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 
 		Assert.assertTrue(true);
@@ -150,25 +151,25 @@ public class AccessibilityRunsDZ {
 
 			controler.run() ;
 
-//			try {
-//				BufferedWriter writer = IOUtils.getBufferedWriter( config.controler().getOutputDirectory() + "/t.gpl" ) ;
-//				// yy might be worthwhile to find out what all the following instructions actually do; I took them from an example.
-//				// kai, feb'14
-//				writer.write("set pm3d map\n") ;
-//				writer.write("set pm3d flush begin\n") ;
-//				writer.write("set palette defined ( 0. '#ffffff', 0.5 '#ffff00', 1. '#0000ff' )\n") ;
-//				writer.write("set zrange [-0:10]\n") ;
-//				writer.write("set term pdf size 25cm,15cm \n") ;
-//				writer.write("set out 'accessibility.pdf'\n") ;
-//				writer.write("set title 'accessibility to " + actType + "'\n") ;
-//				//writer.write("splot \"<awk '!/access/{print $0}' accessibilities.csv\" u 1:2:3\n ") ;
-//				writer.write("splot \"accessibilities.csv\" u 1:2:3\n ") ;
-//				// (the awk command filters out the first line)
-//				writer.close();
-//			} catch (Exception ee ) {
-//				ee.printStackTrace(); 
-//				throw new RuntimeException( "writing t.gpl did not work") ;
-//			}
+			try {
+				BufferedWriter writer = IOUtils.getBufferedWriter( config.controler().getOutputDirectory() + "/t.gpl" ) ;
+				// yy might be worthwhile to find out what all the following instructions actually do; I took them from an example.
+				// kai, feb'14
+				writer.write("set pm3d map\n") ;
+				writer.write("set pm3d flush begin\n") ;
+				writer.write("set palette defined ( 0. '#ffffff', 0.5 '#ffff00', 1. '#0000ff' )\n") ;
+				writer.write("set zrange [-0:10]\n") ;
+				writer.write("set term pdf size 25cm,15cm \n") ;
+				writer.write("set out 'accessibility.pdf'\n") ;
+				writer.write("set title 'accessibility to " + actType + "'\n") ;
+				//writer.write("splot \"<awk '!/access/{print $0}' accessibilities.csv\" u 1:2:3\n ") ;
+				writer.write("splot \"accessibilities.csv\" u 1:2:3\n ") ;
+				// (the awk command filters out the first line)
+				writer.close();
+			} catch (Exception ee ) {
+				ee.printStackTrace(); 
+				throw new RuntimeException( "writing t.gpl did not work") ;
+			}
 			
 			
 			try {
