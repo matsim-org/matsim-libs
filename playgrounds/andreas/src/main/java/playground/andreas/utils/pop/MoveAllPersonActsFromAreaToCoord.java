@@ -161,10 +161,16 @@ public class MoveAllPersonActsFromAreaToCoord extends NewPopulation {
 		
 		Gbl.startMeasurement();
 		
-		String outputDir = "f:/p_runs/txl/";
-		String networkFile = outputDir + "network.final.xml.gz";
-		String inPlansFile = "e:/berlin-bvg09_runs/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.plans.selected.xml.gz";
-		String outPlansFile = "bvg.run189.10pct.100.plans.selected_movedToTXL.xml.gz";
+//		String outputDir = "d:/Berlin/berlin_bvg3/berlin-bvg09_runs/bvg.run192.100pct/ITERS/it.100/";
+//		String networkFile = "e:/_shared-svn/andreas/paratransit/txl/run/input/network.final.xml.gz";
+//		String inPlansFile = "d:/Berlin/berlin_bvg3/berlin-bvg09_runs/bvg.run192.100pct/ITERS/it.100/bvg.run192.100pct.100.plans.selected.xml.gz";
+//		String outPlansFile = "bvg.run192.100pct.100.plans.selected.movedToTXL.xml.gz";
+		
+		String outputDir = "e:/_shared-svn/andreas/paratransit/txl/run/output_huge/";
+		String networkFile = "e:/_shared-svn/andreas/paratransit/txl/run/output_huge/network.final.xml.gz";
+		String inPlansFile = "e:/_shared-svn/andreas/paratransit/txl/run/output_huge/scenarioPopulation.xml.gz";
+		String outPlansFile = "scenarioPopulation_movedToTXL.xml.gz";
+		
 		
 		Coord targetCoord = new CoordImpl(4587780.0, 5825320.0); // TXL
 //		Coord targetCoord = new CoordImpl(4603511.0, 5807250.0); // SXF

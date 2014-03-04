@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -53,6 +52,7 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.BVGLines2PtModes;
+import playground.andreas.dh.TransitScheduleSimplifier;
 import playground.vsp.analysis.VspAnalyzer;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 import playground.vsp.analysis.modules.act2mode.ActivityToModeAnalysis;
@@ -171,6 +171,9 @@ public class AnalysisRunner {
 		// still beta
 		PtLines2PaxAnalysis ptLines2PaxAnalysis = new PtLines2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getVehicles(), 3600.0, 24);
 		analyzer.addAnalysisModule(ptLines2PaxAnalysis);
+		
+		// still beta
+		TransitScheduleSimplifier.simplifyTransitSchedule(sc, dir.getOutputPath() + "/_testout/simplifiedTransitSchedule.xml.gz");
 
 		TransitVehicleVolumeAnalyzer transitVehicleVolumeAnalyzer = new TransitVehicleVolumeAnalyzer(sc, 3600., targetCoordinateSystem);
 		analyzer.addAnalysisModule(transitVehicleVolumeAnalyzer);
