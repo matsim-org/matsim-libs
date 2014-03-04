@@ -392,7 +392,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 			// get the index of the currently performed activity in the selected plan
 			MobsimAgent mobsimAgent = this.mobsimDataProvider.getAgent(personId);
 			
-			Plan executedPlan = WithinDayAgentUtils.getSelectedPlan(mobsimAgent);
+			Plan executedPlan = WithinDayAgentUtils.getModifiablePlan(mobsimAgent);
 			
 			if(!mobsimAgent.getState().equals(State.ACTIVITY)) {
 				throw new RuntimeException("Expected agent to perform an activity but this is not true. Aborting!");

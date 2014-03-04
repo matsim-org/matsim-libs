@@ -72,7 +72,7 @@ public class ParkAgentPaperStrategy implements FullParkingSearchStrategy {
 		Id currentLinkId = agent.getCurrentLinkId();
 		int currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(agent);
 
-		Leg leg = this.withinDayAgentUtils.getCurrentLeg(agent);
+		Leg leg = this.withinDayAgentUtils.getModifiableCurrentLeg(agent);
 
 		Link currentLink = scenarioData.getNetwork().getLinks().get(currentLinkId);
 
@@ -94,7 +94,7 @@ public class ParkAgentPaperStrategy implements FullParkingSearchStrategy {
 
 			links.add(endLink);
 
-			ActivityImpl nextActivity = (ActivityImpl) this.withinDayAgentUtils.getSelectedPlan(agent).getPlanElements().get(currentPlanElementIndex + 3);
+			ActivityImpl nextActivity = (ActivityImpl) this.withinDayAgentUtils.getModifiablePlan(agent).getPlanElements().get(currentPlanElementIndex + 3);
 
 		//	endLink = getLinkWhichIsClosestToDestination(currentLink, nextActivity.getCoord()).getId();
 
@@ -171,13 +171,13 @@ public class ParkAgentPaperStrategy implements FullParkingSearchStrategy {
 
 		public double getDistanceToDestination() {
 			Link currentLink = scenarioData.getNetwork().getLinks().get(agent.getCurrentLinkId());
-			ActivityImpl destination = (ActivityImpl) this.withinDayAgentUtils.getSelectedPlan(agent).getPlanElements().get(this.withinDayAgentUtils.getCurrentPlanElementIndex(agent) + 3);
+			ActivityImpl destination = (ActivityImpl) this.withinDayAgentUtils.getModifiablePlan(agent).getPlanElements().get(this.withinDayAgentUtils.getCurrentPlanElementIndex(agent) + 3);
 			return GeneralLib.getDistance(currentLink.getCoord(), destination.getCoord());
 		}
 
 		private Link getNextLinkClosestToDestination() {
 			Link currentLink = scenarioData.getNetwork().getLinks().get(agent.getCurrentLinkId());
-			Coord destinationCoord = ((ActivityImpl) this.withinDayAgentUtils.getSelectedPlan(agent).getPlanElements().get(this.withinDayAgentUtils.getCurrentPlanElementIndex(agent) + 3)).getCoord();
+			Coord destinationCoord = ((ActivityImpl) this.withinDayAgentUtils.getModifiablePlan(agent).getPlanElements().get(this.withinDayAgentUtils.getCurrentPlanElementIndex(agent) + 3)).getCoord();
 			
 			Map<Id, ? extends Link> outLinks = currentLink.getToNode().getOutLinks();
 
@@ -224,7 +224,7 @@ public class ParkAgentPaperStrategy implements FullParkingSearchStrategy {
 		}
 
 		private boolean isCarAtEndOfCurrentRoute() {
-			Leg leg = this.withinDayAgentUtils.getCurrentLeg(agent);
+			Leg leg = this.withinDayAgentUtils.getModifiableCurrentLeg(agent);
 
 			int routeIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
 
@@ -265,7 +265,7 @@ public class ParkAgentPaperStrategy implements FullParkingSearchStrategy {
 			if (getDistanceToDestination()>maxDistanceToDestination){
 				Id currentLinkId = agent.getCurrentLinkId();
 				
-				Leg leg = this.withinDayAgentUtils.getCurrentLeg(agent);
+				Leg leg = this.withinDayAgentUtils.getModifiableCurrentLeg(agent);
 
 				//Link currentLink = this.network.getLinks().get(currentLinkId);
 

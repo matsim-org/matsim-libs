@@ -71,14 +71,14 @@ public class OptimalParkingStrategy implements FullParkingSearchStrategy {
 		
 		Id currentLinkId = agent.getCurrentLinkId();
 
-		Leg leg = this.withinDayAgentUtils.getCurrentLeg(agent);
+		Leg leg = this.withinDayAgentUtils.getModifiableCurrentLeg(agent);
 
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 
 		Id parkingFacilityId = parkingAgentsTracker.getSelectedParking(agent.getId());
 		Id parkingFacilityLinkId = parkInfrastructure_v2.getParkingFacilityLinkId(parkingFacilityId);
 
-		parkingRouter.adaptEndOfRoute(route, parkingFacilityLinkId, time, this.withinDayAgentUtils.getSelectedPlan(agent).getPerson(), null,
+		parkingRouter.adaptEndOfRoute(route, parkingFacilityLinkId, time, this.withinDayAgentUtils.getModifiablePlan(agent).getPerson(), null,
 				TransportMode.car);
 	}
 
@@ -97,7 +97,7 @@ public class OptimalParkingStrategy implements FullParkingSearchStrategy {
 		ParkingInfrastructure_v2 parkingInfrastructure = parkingAgentsTracker.getInfrastructure_v2();
 
 		Id personId = agent.getId();
-		Plan selectedPlan = this.withinDayAgentUtils.getSelectedPlan(agent);
+		Plan selectedPlan = this.withinDayAgentUtils.getModifiablePlan(agent);
 		List<PlanElement> planElements = selectedPlan.getPlanElements();
 		Integer currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(agent);
 
@@ -146,7 +146,7 @@ public class OptimalParkingStrategy implements FullParkingSearchStrategy {
 	}
 
 	private boolean isLastParkingOfDay(MobsimAgent agent) {
-		List<PlanElement> planElements = this.withinDayAgentUtils.getSelectedPlan(agent).getPlanElements();
+		List<PlanElement> planElements = this.withinDayAgentUtils.getModifiablePlan(agent).getPlanElements();
 		Integer currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(agent);
 
 		for (int i = planElements.size() - 1; i > 0; i--) {

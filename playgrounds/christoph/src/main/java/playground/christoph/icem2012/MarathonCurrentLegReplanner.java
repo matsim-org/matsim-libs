@@ -63,7 +63,7 @@ public class MarathonCurrentLegReplanner extends WithinDayDuringLegReplanner {
 		int currentLinkIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 
 		// for walk2d legs: switch mode to walk for routing
-		Leg currentLeg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
+		Leg currentLeg = this.withinDayAgentUtils.getModifiableCurrentLeg(withinDayAgent);
 		boolean isWalk2d = currentLeg.getMode().equals("walk2d");
 		
 		// switch to walk mode for routing

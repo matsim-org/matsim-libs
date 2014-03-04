@@ -45,7 +45,6 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 
@@ -61,7 +60,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	private static final Logger log = Logger.getLogger(PersonDriverAgentImpl.class);
 
 	private static int expectedLinkWarnCount = 0;
-	
+
 	final Person person;
 
 	private MobsimVehicle vehicle;
@@ -79,7 +78,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 
 	int currentPlanElementIndex = 0;
 
-	private final Plan plan;
+	private Plan plan;
 
 	private transient Id cachedDestinationLinkId;
 
@@ -123,7 +122,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	@Override
 	public final void endLegAndComputeNextState(final double now) {
 		this.simulation.getEventsManager().processEvent(new PersonArrivalEvent(
-						now, this.getPerson().getId(), this.getDestinationLinkId(), currentLeg.getMode()));
+				now, this.getPerson().getId(), this.getDestinationLinkId(), currentLeg.getMode()));
 		if( (!(this.currentLinkId == null && this.cachedDestinationLinkId == null)) 
 				&& !this.currentLinkId.equals(this.cachedDestinationLinkId)) {
 			log.error("The agent " + this.getPerson().getId() + " has destination link " + this.cachedDestinationLinkId
@@ -166,14 +165,14 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	 */
 	@Override
 	public Id chooseNextLinkId() {
-		
+
 		// Please, let's try, amidst all checking and caching, to have this method return the same thing
 		// if it is called several times in a row. Otherwise, you get Heisenbugs.
 		// I just fixed a situation where this method would give a warning about a bad route and return null
 		// the first time it is called, and happily return a link id when called the second time.
-		
+
 		// michaz 2013-08
-		
+
 		if (this.cachedNextLinkId != null) {
 			return this.cachedNextLinkId;
 		}
@@ -249,7 +248,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 			throw new RuntimeException("Unknown PlanElement of type: " + pe.getClass().getName());
 		}
 	}
-	
+
 	private void initializeLeg(Leg leg) {
 		this.state = MobsimAgent.State.LEG ;			
 		Route route = leg.getRoute();
@@ -273,7 +272,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 			return;
 		}
 	}
-	
+
 	private void initializeActivity(Activity act) {
 		this.state = MobsimAgent.State.ACTIVITY ;
 
@@ -286,6 +285,18 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 		calculateAndSetDepartureTime(act);
 	}
 
+	private boolean firstTimeToGetModifiablePlan = true;
+
+	final Plan getModifiablePlan() {
+		if (firstTimeToGetModifiablePlan) {
+			firstTimeToGetModifiablePlan = false ;
+			PlanImpl newPlan = new PlanImpl(this.plan.getPerson()) ;
+			newPlan.copyFrom(this.plan);
+			this.plan = newPlan;
+		}
+		return this.plan;
+	}
+
 	/**
 	 * Some data of the currently simulated Leg is cached to speed up
 	 * the simulation. If the Leg changes (for example the Route or
@@ -295,7 +306,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	 * on the Results of the Simulation!
 	 */
 	void resetCaches() {
-		
+
 		// moving this method not to WithinDay for the time being since it seems to make some sense to keep this where the internal are
 		// known best.  kai, oct'10
 		// Compromise: package-private here; making it public in the Withinday class.  kai, nov'10
@@ -454,29 +465,10 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 		return this.person.getId();
 	}
 
-	private boolean firstTimeToGetCurrentPlan = true ;
-	private Plan modifiablePlansCopy = null ;
 	@Override
 	public final Plan getCurrentPlan() {
-		if ( firstTimeToGetCurrentPlan ) {
-			firstTimeToGetCurrentPlan = false ;
-			PlanImpl newPlan = new PlanImpl(this.plan.getPerson()) ;
-			newPlan.copyFrom( this.plan );
-			this.modifiablePlansCopy = newPlan ;
-		}
-		return this.modifiablePlansCopy ;
+		return plan;
 	}
-	
-	private boolean firstTimeToGetOriginalPlan = true ;
-	private Plan unmodifiablePlan = null ;
-	public final Plan getUnmodifiableOriginalPlan() {
-		if ( firstTimeToGetOriginalPlan ) {
-			firstTimeToGetOriginalPlan = false ;
-			this.unmodifiablePlan = PopulationUtils.unmodifiablePlan( this.plan ) ;
-		}
-		return this.unmodifiablePlan ;
-	}
-	
 
 	@Override
 	public MobsimAgent.State getState() {

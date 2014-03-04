@@ -307,10 +307,10 @@ public class InsertParkingActivities implements PlanAlgorithm {
 		ActivityImpl nextParkingArrivalAct = null;
 		ActivityImpl nextParkingDepartureAct = null;
 
-		Plan executedPlan = withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = withinDayAgentUtils.getModifiablePlan(withinDayAgent);
 		int currentPlanElemIndex = withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 
-		List<PlanElement> planElements = withinDayAgentUtils.getSelectedPlan(withinDayAgent).getPlanElements();
+		List<PlanElement> planElements = withinDayAgentUtils.getModifiablePlan(withinDayAgent).getPlanElements();
 		for (int i = currentPlanElemIndex; i < planElements.size(); i++) {
 			if (planElements.get(i) instanceof Activity) {
 				Activity act = (Activity) planElements.get(i);

@@ -201,7 +201,7 @@ public class ParkingSearchIdentifier extends DuringLegIdentifier {
 	private String getAgentsNextNonParkingActivityType(MobsimAgent agent) {
 		
 		int currentPlanElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
-		List<PlanElement> planElements = WithinDayAgentUtils.getSelectedPlan(agent).getPlanElements();
+		List<PlanElement> planElements = WithinDayAgentUtils.getModifiablePlan(agent).getPlanElements();
 		for (int i = currentPlanElementIndex; i < planElements.size(); i++) {
 			PlanElement planElement = planElements.get(i);
 			if (planElement instanceof Activity) {
@@ -216,7 +216,7 @@ public class ParkingSearchIdentifier extends DuringLegIdentifier {
 	private double getAgentsParkingDuration(MobsimAgent agent, double now) {
 		
 		int currentPlanElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
-		List<PlanElement> planElements = WithinDayAgentUtils.getSelectedPlan(agent).getPlanElements();
+		List<PlanElement> planElements = WithinDayAgentUtils.getModifiablePlan(agent).getPlanElements();
 		for (int i = currentPlanElementIndex + 1; i < planElements.size(); i++) {
 			PlanElement planElement = planElements.get(i);
 			if (planElement instanceof Leg) {

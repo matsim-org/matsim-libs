@@ -92,7 +92,7 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 			MobsimAgent agent = this.agents.get(agentId);
 			
 			Id personId =agent.getId();
-			Plan selectedPlan = this.withinDayAgentUtils.getSelectedPlan(agent);
+			Plan selectedPlan = this.withinDayAgentUtils.getModifiablePlan(agent);
 			List<PlanElement> planElements = selectedPlan.getPlanElements();
 			Integer currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(agent);
 			
@@ -163,7 +163,7 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 	private boolean isLastParkingOfDay(Id personId) {
 		MobsimAgent agent = this.agents.get(personId);
 		
-		List<PlanElement> planElements = this.withinDayAgentUtils.getSelectedPlan(agent).getPlanElements();
+		List<PlanElement> planElements = this.withinDayAgentUtils.getModifiablePlan(agent).getPlanElements();
 		Integer currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(agent);
 		
 		for (int i=planElements.size()-1;i>0;i--){

@@ -66,7 +66,7 @@ public class CurrentLegInitialReplanner extends WithinDayDuringLegReplanner {
 		// If we don't have a valid WithinDayPersonAgent
 		if (withinDayAgent == null) return false;
 		
-		Plan executedPlan = WithinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = WithinDayAgentUtils.getModifiablePlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
@@ -95,7 +95,7 @@ public class CurrentLegInitialReplanner extends WithinDayDuringLegReplanner {
 			((ActivityImpl) nextActivity).setLinkId(scenario.createId(EvacuationConstants.RESCUE_LINK));
 			
 			// for walk2d legs: switch mode to walk for routing
-			Leg currentLeg = WithinDayAgentUtils.getCurrentLeg(withinDayAgent);
+			Leg currentLeg = WithinDayAgentUtils.getModifiableCurrentLeg(withinDayAgent);
 			boolean isWalk2d = currentLeg.getMode().equals("walk2d");
 			
 			// switch to walk mode for routing

@@ -33,8 +33,7 @@ import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.vehicles.VehicleUtils;
@@ -130,16 +129,7 @@ public class ParkingPopulationAgentSource implements AgentSource {
 				qsim.insertAgentIntoMobsim(agent);
 			}
 			
-			/*
-			 * If it is a within-day replanning agent, we use its plan instead
-			 * of the person's plan because the agent's plan may have already
-			 * been altered.
-			 */
-			Plan plan;
-			if (agent instanceof PersonDriverAgentImpl) {
-				plan = ((PersonDriverAgentImpl) agent).getCurrentPlan();
-			} else
-				plan = person.getSelectedPlan();
+			Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 
 			/*
 			 * Insert parking activities into the plan

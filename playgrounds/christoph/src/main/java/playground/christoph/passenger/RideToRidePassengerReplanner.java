@@ -103,7 +103,7 @@ public class RideToRidePassengerReplanner extends WithinDayInitialReplanner {
 
 	private void adaptPassenger(MobsimAgent agent, RideToRidePassengerContext context) {
 
-		Plan plan = WithinDayAgentUtils.getSelectedPlan(agent);
+		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 		Leg rideLeg = context.rideLeg;
 		Route route = rideLeg.getRoute();
 		
@@ -165,7 +165,7 @@ public class RideToRidePassengerReplanner extends WithinDayInitialReplanner {
 	
 	private void adaptDriver(RideToRidePassengerContext context) {
 		
-		Plan plan = WithinDayAgentUtils.getSelectedPlan(context.carLegAgent);
+		Plan plan = WithinDayAgentUtils.getModifiablePlan(context.carLegAgent);
 		Leg rideLeg = context.rideLeg;
 		Leg carLeg = context.carLeg;
 		NetworkRoute route = (NetworkRoute) carLeg.getRoute();
@@ -249,7 +249,7 @@ public class RideToRidePassengerReplanner extends WithinDayInitialReplanner {
 	
 	private void rideToNonCar(MobsimAgent agent, RideToRidePassengerContext context) {
 		
-		Plan plan = WithinDayAgentUtils.getSelectedPlan(agent);
+		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 		Leg rideLeg = context.rideLeg;
 		Route route = rideLeg.getRoute();
 		

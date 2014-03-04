@@ -93,7 +93,7 @@ public class ParkingSearchReplannerWithStrategySwitching extends ParkingSearchRe
 		 * and has been accepted. Now ensure that the agent's plan is still valid.
 		 */
 		else {
-			Leg leg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
+			Leg leg = this.withinDayAgentUtils.getModifiableCurrentLeg(withinDayAgent);
 
 			int routeIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 

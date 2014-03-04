@@ -64,7 +64,7 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		// If we don't have a valid PersonAgent
 		if (withinDayAgent == null) return false;
 	
-		Plan executedPlan = WithinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = WithinDayAgentUtils.getModifiablePlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;

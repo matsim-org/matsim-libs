@@ -36,7 +36,7 @@ public class ReplannerOldPeople extends WithinDayDuringActivityReplanner {
 		// If we don't have a valid personAgent (only extra security)
 		if (withinDayAgent == null) return false;
 			
-		PlanImpl executedPlan = (PlanImpl) WithinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		PlanImpl executedPlan = (PlanImpl) WithinDayAgentUtils.getModifiablePlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;

@@ -75,12 +75,12 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 		
 		//EditPartialRoute editPartialRoute=new EditPartialRoute(scenario, routeAlgo);
 		
-		Plan plan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan plan = this.withinDayAgentUtils.getModifiablePlan(withinDayAgent);
 
-		Leg leg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
+		Leg leg = this.withinDayAgentUtils.getModifiableCurrentLeg(withinDayAgent);
 
 		int currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
-		ActivityImpl activity = (ActivityImpl) this.withinDayAgentUtils.getSelectedPlan(withinDayAgent).getPlanElements().get(currentPlanElementIndex + 1);
+		ActivityImpl activity = (ActivityImpl) this.withinDayAgentUtils.getModifiablePlan(withinDayAgent).getPlanElements().get(currentPlanElementIndex + 1);
 		Id linkId = withinDayAgent.getCurrentLinkId();
 		Link link = scenario.getNetwork().getLinks().get(linkId);
 

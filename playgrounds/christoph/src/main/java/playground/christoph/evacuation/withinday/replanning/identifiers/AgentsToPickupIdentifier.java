@@ -306,7 +306,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 		
 		int currentPlanElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(driver);
 		
-		Activity nextActivity = (Activity) WithinDayAgentUtils.getSelectedPlan(driver).getPlanElements().get(currentPlanElementIndex + 1);
+		Activity nextActivity = (Activity) WithinDayAgentUtils.getModifiablePlan(driver).getPlanElements().get(currentPlanElementIndex + 1);
 		if (nextActivity.getType().equals(PassengerQNetsimEngine.PICKUP_ACTIVITY_TYPE) ||
 				nextActivity.getType().equals(PassengerQNetsimEngine.DROP_OFF_ACTIVITY_TYPE)) return true;
 		else return false;

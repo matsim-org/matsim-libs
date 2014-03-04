@@ -38,7 +38,7 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 
-		Leg currentLeg = WithinDayAgentUtils.getCurrentLeg(withinDayAgent);
+		Leg currentLeg = WithinDayAgentUtils.getModifiableCurrentLeg(withinDayAgent);
 		int currentLegIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 		Activity nextActivity = (Activity) executedPlan.getPlanElements().get(currentLegIndex + 1);
 		int currentLinkIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);

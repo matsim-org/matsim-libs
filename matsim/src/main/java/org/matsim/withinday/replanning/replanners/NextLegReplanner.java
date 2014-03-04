@@ -65,7 +65,7 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 	@Override
 	public boolean doReplanning(MobsimAgent withinDayAgent) {
 
-		Plan executedPlan = WithinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = WithinDayAgentUtils.getModifiablePlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;

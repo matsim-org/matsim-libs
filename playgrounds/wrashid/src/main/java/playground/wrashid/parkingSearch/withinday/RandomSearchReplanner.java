@@ -65,9 +65,9 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 	@Override
 	public boolean doReplanning(MobsimAgent withinDayAgent) {
 
-		Plan plan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan plan = this.withinDayAgentUtils.getModifiablePlan(withinDayAgent);
 
-		Leg leg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
+		Leg leg = this.withinDayAgentUtils.getModifiableCurrentLeg(withinDayAgent);
 
 		int currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 		ActivityImpl activity = (ActivityImpl) plan.getPlanElements().get(currentPlanElementIndex + 1);

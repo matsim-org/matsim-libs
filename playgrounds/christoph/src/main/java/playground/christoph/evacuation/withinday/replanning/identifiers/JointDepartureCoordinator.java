@@ -61,7 +61,7 @@ public class JointDepartureCoordinator {
 		
 		// check whether the agent has already been replanned and has scheduled joint departure
 		MobsimAgent driver = this.mobsimDataProvider.getAgent(agentId);
-		Leg currentLeg = WithinDayAgentUtils.getCurrentLeg(driver);
+		Leg currentLeg = WithinDayAgentUtils.getModifiableCurrentLeg(driver);
 		if (this.pickupIdentifier.getJointDepartureOrganizer().getJointDepartureForLeg(agentId, currentLeg) != null) return true;
 
 		return false;

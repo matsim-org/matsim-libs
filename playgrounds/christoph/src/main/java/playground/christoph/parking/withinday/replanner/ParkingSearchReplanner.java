@@ -109,7 +109,7 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 		 * and has been accepted. Now ensure that the agent's plan is still valid.
 		 */
 		else {
-			Leg leg = WithinDayAgentUtils.getCurrentLeg(withinDayAgent);
+			Leg leg = WithinDayAgentUtils.getModifiableCurrentLeg(withinDayAgent);
 
 			int routeIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 

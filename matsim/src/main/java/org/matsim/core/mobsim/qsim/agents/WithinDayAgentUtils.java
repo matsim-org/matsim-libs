@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
 
 /**
  * <p>
@@ -90,9 +89,9 @@ public class WithinDayAgentUtils {
 		}
 	}
 	
-	public static final Leg getCurrentLeg(MobsimAgent agent) {
-		if (agent instanceof PlanAgent) {
-			PlanElement currentPlanElement = ((PlanAgent) agent).getCurrentPlanElement();
+	public static final Leg getModifiableCurrentLeg(MobsimAgent agent) {
+		if (agent instanceof PersonDriverAgentImpl) {
+			PlanElement currentPlanElement = getCurrentPlanElement(agent);
 			if (!(currentPlanElement instanceof Leg)) {
 				return null;
 			}
@@ -103,9 +102,9 @@ public class WithinDayAgentUtils {
 		}
 	}
 	
-	public static final Plan getSelectedPlan(MobsimAgent agent) {
-		if (agent instanceof PlanAgent) {
-			return ((PlanAgent) agent).getCurrentPlan();
+	public static final Plan getModifiablePlan(MobsimAgent agent) {
+		if (agent instanceof PersonDriverAgentImpl) {
+			return ((PersonDriverAgentImpl) agent).getModifiablePlan();
 		} else {
 			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
 					" which does not support getSelectedPlan(...). Aborting!");
@@ -113,8 +112,8 @@ public class WithinDayAgentUtils {
 	}
 	
 	public static final PlanElement getCurrentPlanElement(MobsimAgent agent) {
-		if (agent instanceof PlanAgent) {
-			return ((PlanAgent) agent).getCurrentPlanElement();
+		if (agent instanceof PersonDriverAgentImpl) {
+			return getModifiablePlan(agent).getPlanElements().get(getCurrentPlanElementIndex(agent));
 		} else {
 			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
 					" which does not support getCurrentPlanElement(...). Aborting!");

@@ -134,7 +134,7 @@ public class RideToRidePassengerAgentIdentifier extends InitialIdentifier {
 	private Collection<Leg> getModeLegs(MobsimAgent agent, String mode) {
 		
 		List<Leg> modeLegs = new ArrayList<Leg>();
-		for (PlanElement planElement : this.withinDayAgentUtils.getSelectedPlan(agent).getPlanElements()) {
+		for (PlanElement planElement : this.withinDayAgentUtils.getModifiablePlan(agent).getPlanElements()) {
 			if (planElement instanceof Leg) {
 				Leg leg = (Leg) planElement;
 				if (leg.getMode().equals(mode)) modeLegs.add(leg);
@@ -152,7 +152,7 @@ public class RideToRidePassengerAgentIdentifier extends InitialIdentifier {
 			// skip agents with a ride trip
 			if (agentsToReplan.contains(mobsimAgent)) continue;
 			
-			Person person = this.withinDayAgentUtils.getSelectedPlan(mobsimAgent).getPerson();
+			Person person = this.withinDayAgentUtils.getModifiablePlan(mobsimAgent).getPerson();
 			
 			Collection<Leg> carLegs = getModeLegs(mobsimAgent, TransportMode.car);
 			for (Leg leg : carLegs) {
@@ -218,7 +218,7 @@ public class RideToRidePassengerAgentIdentifier extends InitialIdentifier {
 		
 		for (MobsimAgent agent : agents) {
 			
-			Person person = this.withinDayAgentUtils.getSelectedPlan(agent).getPerson();
+			Person person = this.withinDayAgentUtils.getModifiablePlan(agent).getPerson();
 			Collection<Leg> rideLegs = getModeLegs(agent, TransportMode.ride);
 			
 			for (Leg rideLeg : rideLegs) {

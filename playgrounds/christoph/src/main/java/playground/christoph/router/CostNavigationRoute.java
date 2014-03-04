@@ -99,7 +99,7 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 		Id currentLinkId = withinDayAgent.getCurrentLinkId();
 		Link currentLink = network.getLinks().get(currentLinkId);
 		Node nextNode = currentLink.getToNode();
-		Link endLink = network.getLinks().get(WithinDayAgentUtils.getCurrentLeg(withinDayAgent).getRoute().getEndLinkId());
+		Link endLink = network.getLinks().get(WithinDayAgentUtils.getModifiableCurrentLeg(withinDayAgent).getRoute().getEndLinkId());
 		Node endNode = endLink.getFromNode();
 		
 		Map<Id, ? extends Link> outLinksMap = nextNode.getOutLinks();
@@ -133,7 +133,7 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 			Link lookupLink = this.network.getLinks().get(outLink.getId());
 			double outLinkCosts = this.travelDisutility.getLinkTravelDisutility(lookupLink, this.time, null, null);
 			
-			Path path = leastCostPathCalculator.calcLeastCostPath(outLink.getToNode(), endNode, this.time, WithinDayAgentUtils.getSelectedPlan(withinDayAgent).getPerson(), null);
+			Path path = leastCostPathCalculator.calcLeastCostPath(outLink.getToNode(), endNode, this.time, WithinDayAgentUtils.getModifiablePlan(withinDayAgent).getPerson(), null);
 			paths.put(outLink.getId(), path);
 			double pathCosts = path.travelCost + outLinkCosts;
 			costs.put(outLink.getId(), pathCosts);
@@ -206,7 +206,7 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 			costNavigationTravelTimeLogger.setExpectedAlternativeTravelTime(personId, expectedAlternativeCosts);
 		}
 			
-		Leg leg = WithinDayAgentUtils.getCurrentLeg(withinDayAgent);
+		Leg leg = WithinDayAgentUtils.getModifiableCurrentLeg(withinDayAgent);
 		Route route = leg.getRoute();
 
 		// if the route type is not supported (e.g. because it is a walking agent)

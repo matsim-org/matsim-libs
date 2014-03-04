@@ -54,7 +54,7 @@ public class SwitchToWalk2DLegReplanner extends WithinDayDuringLegReplanner {
 		// If we don't have a valid PersonAgent
 		if (withinDayAgent == null) return false;
 
-		Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = this.withinDayAgentUtils.getModifiablePlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
@@ -62,7 +62,7 @@ public class SwitchToWalk2DLegReplanner extends WithinDayDuringLegReplanner {
 		int currentLegIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 
 		// for walk2d legs: switch mode to walk for routing
-		Leg currentLeg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
+		Leg currentLeg = this.withinDayAgentUtils.getModifiableCurrentLeg(withinDayAgent);
 		boolean isWalk = currentLeg.getMode().equals(TransportMode.walk);
 		
 		// if it is a walk leg and the current link is affected, switch to walk 2d
@@ -78,7 +78,7 @@ public class SwitchToWalk2DLegReplanner extends WithinDayDuringLegReplanner {
 			boolean isRescueLink = currentLinkId.toString().contains("rescue");
 			
 			if (!isRescueLink && isAffected) {
-				Plan plan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+				Plan plan = this.withinDayAgentUtils.getModifiablePlan(withinDayAgent);
 				NetworkRoute currentRoute = (NetworkRoute) currentLeg.getRoute();
 				
 				NetworkRoute subRoute = currentRoute.getSubRoute(currentRoute.getStartLinkId(), currentLinkId); 

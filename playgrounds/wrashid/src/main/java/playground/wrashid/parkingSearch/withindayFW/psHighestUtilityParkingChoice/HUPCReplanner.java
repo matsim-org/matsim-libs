@@ -74,7 +74,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 		
 		//EditPartialRoute editPartialRoute=new EditPartialRoute(scenario, routeAlgo);
 		
-		Plan plan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan plan = this.withinDayAgentUtils.getModifiablePlan(withinDayAgent);
 		
 		int currentLegIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 
@@ -125,7 +125,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 		
 		Route preRoute = ((LegImpl) plan.getPlanElements().get(currentLegIndex)).getRoute().clone();
 		
-		this.editRoutes.relocateCurrentLegRoute(this.withinDayAgentUtils.getCurrentLeg(withinDayAgent), plan.getPerson(), currentLinkIndex, 
+		this.editRoutes.relocateCurrentLegRoute(this.withinDayAgentUtils.getModifiableCurrentLeg(withinDayAgent), plan.getPerson(), currentLinkIndex, 
 				parkingFacility.getLinkId(), time, scenario.getNetwork(), tripRouter);
 		
 		Route postRoute = ((LegImpl) plan.getPlanElements().get(currentLegIndex)).getRoute();
@@ -139,7 +139,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 	}
 
 	private Integer getSecondParkingActIndex(MobsimAgent withinDayAgent) {
-		List<PlanElement> planElements = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent).getPlanElements();
+		List<PlanElement> planElements = this.withinDayAgentUtils.getModifiablePlan(withinDayAgent).getPlanElements();
 
 		for (int i = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent) + 2; i < planElements.size(); i++) {
 			if (planElements.get(i) instanceof Activity) {

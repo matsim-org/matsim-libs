@@ -45,7 +45,7 @@ public class InitialReplanner extends WithinDayInitialReplanner {
 	@Override
 	public boolean doReplanning(MobsimAgent withinDayAgent) {
 		
-		this.planRouter.run(WithinDayAgentUtils.getSelectedPlan(withinDayAgent));
+		this.planRouter.run(WithinDayAgentUtils.getModifiablePlan(withinDayAgent));
 		return true;
 	}
 }

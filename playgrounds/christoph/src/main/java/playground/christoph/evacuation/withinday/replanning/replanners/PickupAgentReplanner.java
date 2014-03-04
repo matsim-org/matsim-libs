@@ -83,7 +83,7 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 	
 	private boolean replanDriver(MobsimAgent withinDayAgent) {
 		
-		Plan executedPlan = WithinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = WithinDayAgentUtils.getModifiablePlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
@@ -91,7 +91,7 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 		int currentLegIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 		int currentLinkIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 		Id currentLinkId = withinDayAgent.getCurrentLinkId();
-		Leg currentLeg = WithinDayAgentUtils.getCurrentLeg(withinDayAgent);
+		Leg currentLeg = WithinDayAgentUtils.getModifiableCurrentLeg(withinDayAgent);
 		NetworkRoute currentRoute = (NetworkRoute) currentLeg.getRoute();
 		Id currentVehicleId = currentRoute.getVehicleId();
 		List<Id> subRoute;
@@ -178,7 +178,7 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 	
 	private boolean replanPassenger(MobsimAgent withinDayAgent) {
 		
-		Plan executedPlan = WithinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = WithinDayAgentUtils.getModifiablePlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
@@ -186,7 +186,7 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 		int currentLegIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 		int currentLinkIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 		Id currentLinkId = withinDayAgent.getCurrentLinkId();
-		Leg currentLeg = WithinDayAgentUtils.getCurrentLeg(withinDayAgent);
+		Leg currentLeg = WithinDayAgentUtils.getModifiableCurrentLeg(withinDayAgent);
 		
 		/*
 		 * Create new pickup activity.

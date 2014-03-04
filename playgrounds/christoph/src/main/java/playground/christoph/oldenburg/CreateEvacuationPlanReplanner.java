@@ -53,7 +53,7 @@ public class CreateEvacuationPlanReplanner extends WithinDayInitialReplanner {
 		// If we don't have a valid personAgent
 		if (withinDayAgent == null) return false;
 
-		Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = this.withinDayAgentUtils.getModifiablePlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;

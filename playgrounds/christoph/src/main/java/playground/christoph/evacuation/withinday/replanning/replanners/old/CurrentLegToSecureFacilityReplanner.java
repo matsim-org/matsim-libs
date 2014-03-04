@@ -76,12 +76,12 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 		// If we don't have a valid WithinDayPersonAgent
 		if (withinDayAgent == null) return false;
 
-		Plan executedPlan = WithinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = WithinDayAgentUtils.getModifiablePlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 
-		Leg currentLeg = WithinDayAgentUtils.getCurrentLeg(withinDayAgent);
+		Leg currentLeg = WithinDayAgentUtils.getModifiableCurrentLeg(withinDayAgent);
 		int currentPlanElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 		Activity nextActivity = (Activity) executedPlan.getPlanElements().get(currentPlanElementIndex + 1);
 		

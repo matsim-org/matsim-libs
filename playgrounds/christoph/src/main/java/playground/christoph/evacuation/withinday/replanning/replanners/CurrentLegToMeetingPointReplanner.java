@@ -64,7 +64,7 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 		// If we don't have a valid WithinDayPersonAgent
 		if (withinDayAgent == null) return false;
 		
-		Plan executedPlan = WithinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = WithinDayAgentUtils.getModifiablePlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
@@ -122,7 +122,7 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 			 */
 			if (currentLinkIndex == 0) currentLinkIndex++;
 
-			Leg currentLeg = WithinDayAgentUtils.getCurrentLeg(withinDayAgent);
+			Leg currentLeg = WithinDayAgentUtils.getModifiableCurrentLeg(withinDayAgent);
 			
 			// new Route for current Leg
 			this.editRoutes.relocateCurrentLegRoute(currentLeg, executedPlan.getPerson(), currentLinkIndex, 

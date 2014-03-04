@@ -56,7 +56,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		 */
 		Id currentLinkId = agent.getCurrentLinkId();
 		
-		Leg leg = WithinDayAgentUtils.getCurrentLeg(agent);
+		Leg leg = WithinDayAgentUtils.getModifiableCurrentLeg(agent);
 
 		Link currentLink = this.network.getLinks().get(currentLinkId);
 
