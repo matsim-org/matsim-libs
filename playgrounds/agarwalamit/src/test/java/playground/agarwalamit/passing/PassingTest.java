@@ -39,6 +39,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -46,12 +47,7 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.PassingVehicleQ;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetwork;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -126,18 +122,7 @@ public class PassingTest {
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
 
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1, new NetsimNetworkFactory<QNode, QLinkImpl>() {
-
-			@Override
-			public QLinkImpl createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
-				return new QLinkImpl(link, network, toQueueNode, new PassingVehicleQ());
-			}
-
-			@Override
-			public QNode createNetsimNode(final Node node, QNetwork network) {
-				return new QNode(node, network);
-			}
-		});
+		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1);
 		qSim1.addMobsimEngine(netsimEngine);
 		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
@@ -180,7 +165,7 @@ public class PassingTest {
 			config.qsim().setFlowCapFactor(1.0);
 			config.qsim().setStorageCapFactor(1.0);
 			config.qsim().setMainModes(Arrays.asList("car","bike"));
-
+			config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ.name());
 
 			network = (NetworkImpl) scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));

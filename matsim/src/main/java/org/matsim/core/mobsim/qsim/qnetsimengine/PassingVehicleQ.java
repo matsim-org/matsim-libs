@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-public final class PassingVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle> {
+final class PassingVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle> {
 
 	public PassingVehicleQ() {} // to find calls 
 	

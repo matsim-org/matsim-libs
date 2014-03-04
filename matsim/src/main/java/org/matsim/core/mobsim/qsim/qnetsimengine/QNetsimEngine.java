@@ -31,6 +31,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -55,15 +57,15 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 	private static final Logger log = Logger.getLogger(QNetsimEngine.class);
 
 	private static final int INFO_PERIOD = 3600;
-	
+
 	/*package*/   QNetwork network;
 
 	/** This is the collection of links that have to be moved in the simulation */
 	/*package*/  List<QLinkInternalI> simLinksList = new ArrayList<QLinkInternalI>();
-	
+
 	/** This is the collection of nodes that have to be moved in the simulation */
 	/*package*/  List<QNode> simNodesList = null;
-	
+
 	/** This is the collection of links that have to be activated in the current time step */
 	/*package*/  ArrayList<QLinkInternalI> simActivateLinks = new ArrayList<QLinkInternalI>();
 
@@ -80,9 +82,9 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 	private final DepartureHandler dpHandler;
 
 	private double infoTime = 0;
-	
+
 	private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator();
-	
+
 	/*package*/ InternalInterface internalInterface = null ;
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface) {
@@ -142,6 +144,17 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 											LaneDefinitions20.ELEMENT_NAME)));
 		} else if ( netsimNetworkFactory != null ){
 			network = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
+		} else if (QSimConfigGroup.LinkDynamics.valueOf(sim.getScenario().getConfig().qsim().getLinkDynamics()) == QSimConfigGroup.LinkDynamics.PassingQ) {
+			network = new QNetwork(sim.getScenario().getNetwork(), new NetsimNetworkFactory<QNode, QLinkImpl>() {
+				@Override
+				public QLinkImpl createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
+					return new QLinkImpl(link, network, toQueueNode, new PassingVehicleQ());
+				}
+				@Override
+				public QNode createNetsimNode(final Node node, QNetwork network) {
+					return new QNode(node, network);
+				}
+			});
 		} else {
 			network = new QNetwork(sim.getScenario().getNetwork(), new DefaultQNetworkFactory());
 		}
@@ -339,9 +352,9 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 	public void setLinkSpeedCalculator(LinkSpeedCalculator linkSpeedCalculator) {
 		this.linkSpeedCalculator = linkSpeedCalculator;
 	}
-	
+
 	public LinkSpeedCalculator getLinkSpeedCalculator() {
 		return this.linkSpeedCalculator;
 	}
-	
+
 }

@@ -37,7 +37,6 @@ import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.PassingQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 
@@ -54,7 +53,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 public class QSimFactory implements MobsimFactory {
 
 	private final static Logger log = Logger.getLogger(QSimFactory.class);
-	
+
 	@Override
 	public Netsim createMobsim(Scenario sc, EventsManager eventsManager) {
 
@@ -62,15 +61,8 @@ public class QSimFactory implements MobsimFactory {
 		if (conf == null) {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
-		QSimConfigGroup.LinkDynamics linkDynamics = QSimConfigGroup.LinkDynamics.valueOf( conf.getLinkDynamics() ) ;
 
-		// Get number of parallel Threads
-		int numOfThreads = conf.getNumberOfThreads();
-		QNetsimEngineFactory netsimEngFactory;
-		if (numOfThreads > 1) {
-			if ( linkDynamics != QSimConfigGroup.LinkDynamics.FIFO ) {
-				throw new RuntimeException("not implemented (albeit PassingQ probably not very hard)" ) ;
-			}
+		if (conf.getNumberOfThreads() > 1) {
 			/*
 			 * The SimStepParallelEventsManagerImpl can handle events from multiple threads.
 			 * The (Parallel)EventsMangerImpl cannot, therefore it has to be wrapped into a
@@ -79,24 +71,25 @@ public class QSimFactory implements MobsimFactory {
 			if (!(eventsManager instanceof SimStepParallelEventsManagerImpl)) {
 				eventsManager = new SynchronizedEventsManagerImpl(eventsManager);				
 			}
-			netsimEngFactory = new ParallelQNetsimEngineFactory();
-			log.info("Using parallel QSim with " + numOfThreads + " threads.");
-		} else {
-			if ( linkDynamics == QSimConfigGroup.LinkDynamics.FIFO ) {
-				netsimEngFactory = new DefaultQNetsimEngineFactory();
-			} else if ( linkDynamics == QSimConfigGroup.LinkDynamics.PassingQ ) {
-				netsimEngFactory = new PassingQNetsimEngineFactory() ;
-			} else {
-				throw new RuntimeException("not implemented") ;
-			}
 		}
+
 		QSim qSim = new QSim(sc, eventsManager);
+		
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
+
+		QNetsimEngineFactory netsimEngFactory;
+		if (conf.getNumberOfThreads() > 1) {
+			netsimEngFactory = new ParallelQNetsimEngineFactory();
+			log.info("Using parallel QSim with " + conf.getNumberOfThreads() + " threads.");
+		} else {
+			netsimEngFactory = new DefaultQNetsimEngineFactory();
+		}
 		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+		
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
 

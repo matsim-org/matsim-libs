@@ -5,8 +5,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -23,12 +21,7 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.PassingVehicleQ;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetwork;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -88,17 +81,8 @@ class KNPatnaControler {
 			qSim.addActivityHandler(activityEngine);
 
 			// add the netsim engine:
-			NetsimNetworkFactory<QNode, QLinkImpl> netsimNetworkFactory = new NetsimNetworkFactory<QNode, QLinkImpl>() {
-				@Override
-				public QLinkImpl createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
-					return new QLinkImpl(link, network, toQueueNode, new PassingVehicleQ());
-				}
-				@Override
-				public QNode createNetsimNode(final Node node, QNetwork network) {
-					return new QNode(node, network);
-				}
-			};
-			QNetsimEngine netsimEngine = new QNetsimEngine(qSim, netsimNetworkFactory) ;
+
+			QNetsimEngine netsimEngine = new QNetsimEngine(qSim) ;
 //			QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim, MatsimRandom.getRandom());
 			qSim.addMobsimEngine(netsimEngine);
 			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
