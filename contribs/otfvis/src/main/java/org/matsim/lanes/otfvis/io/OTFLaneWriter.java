@@ -63,7 +63,7 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 			if (this.lanes != null){
 				l2l = this.lanes.getLanesToLinkAssignments().get(visLink.getLink().getId());
 			}
-			VisLinkWLanes otfLink = this.laneModelBuilder.createOTFLinkWLanes(OTFServerQuadTree.getOTFTransformation(), visLink, config.qsim().getNodeOffset(), l2l);
+			VisLinkWLanes otfLink = this.laneModelBuilder.createVisLinkWLanes(OTFServerQuadTree.getOTFTransformation(), visLink, config.qsim().getNodeOffset(), l2l);
 			//write link data
 			ByteBufferUtils.putObject(out, otfLink);
 		}
