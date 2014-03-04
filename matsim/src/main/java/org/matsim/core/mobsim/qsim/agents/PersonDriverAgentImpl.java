@@ -78,6 +78,12 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 
 	int currentPlanElementIndex = 0;
 
+	/*
+	 * Holds the plan which is passed through the constructor,
+	 * (which is normally the original Plan from the Population, which must not be changed by this Agent)
+	 * until getModifiablePlan is called the first time,
+	 * when it is replaced by a deep copy.
+	 */
 	private Plan plan;
 
 	private transient Id cachedDestinationLinkId;
@@ -287,10 +293,14 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 
 	private boolean firstTimeToGetModifiablePlan = true;
 
+	/**
+	 * Returns a modifiable Plan for use by WithinDayAgentUtils in this package.
+	 * This agent retains the copied plan and forgets the original one.
+	 */
 	final Plan getModifiablePlan() {
 		if (firstTimeToGetModifiablePlan) {
 			firstTimeToGetModifiablePlan = false ;
-			PlanImpl newPlan = new PlanImpl(this.plan.getPerson()) ;
+			PlanImpl newPlan = new PlanImpl(this.plan.getPerson());
 			newPlan.copyFrom(this.plan);
 			this.plan = newPlan;
 		}
@@ -465,6 +475,12 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 		return this.person.getId();
 	}
 
+	/**
+	 * The Plan this agent is executing. Please assume this to be immutable. 
+	 * Modifying a Plan which comes out of this method is a programming error.
+	 * This will eventually be replaced by a read-only interface.
+	 * 
+	 */
 	@Override
 	public final Plan getCurrentPlan() {
 		return plan;

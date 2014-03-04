@@ -68,7 +68,7 @@ public class PlanToPlanStep {
 		// /////////////////////////////////////////////
 		String planType = plan.getType();
 		if (planType != null) {
-			if (PlanImpl.DeprecatedConstants.PT.equals(planType)) {
+			if (TransportMode.pt.equals(planType)) {
 				if (!foundPT) {
 					System.out.println("BSE: found a PT plan");
 					foundPT = true;

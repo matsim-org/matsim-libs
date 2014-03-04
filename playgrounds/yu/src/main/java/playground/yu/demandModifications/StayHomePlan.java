@@ -24,6 +24,7 @@
 package playground.yu.demandModifications;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -70,7 +71,7 @@ public class StayHomePlan {
 		if (type == null) {
 			return false;
 		}
-		return type.equals(PlanImpl.DeprecatedConstants.WALK);
+		return type.equals(TransportMode.walk);
 		/*
 		 * TODO: just a temporary solution, there could be a dummy PlanType in
 		 * PlanImpl .DeprecatedConstants , which should NOT be the existing

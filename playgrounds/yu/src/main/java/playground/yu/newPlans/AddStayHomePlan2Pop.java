@@ -118,7 +118,7 @@ public class AddStayHomePlan2Pop extends NewPopulation {
 		lastHomeAct.setStartTime(21600d);
 		homePlan.addActivity(lastHomeAct);
 
-		((PlanImpl) homePlan).setType(PlanImpl.DeprecatedConstants.WALK);
+		((PlanImpl) homePlan).setType(TransportMode.walk);
 
 		person.addPlan(homePlan);
 	}

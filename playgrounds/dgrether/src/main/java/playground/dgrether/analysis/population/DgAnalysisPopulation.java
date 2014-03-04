@@ -30,6 +30,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -88,7 +89,7 @@ public class DgAnalysisPopulation {
 	public int calculateNumberOfCarPlans(Id runId) {
 		int carplans = 0;
 		for (DgPersonData d : table.values()) {
-			if (((PlanImpl) d.getPlanData().get(runId).getPlan()).getType().equals(PlanImpl.DeprecatedConstants.CAR)){
+			if (((PlanImpl) d.getPlanData().get(runId).getPlan()).getType().equals(TransportMode.car)){
 				carplans++;
 			}
 		}

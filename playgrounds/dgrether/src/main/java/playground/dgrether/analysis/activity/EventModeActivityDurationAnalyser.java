@@ -25,6 +25,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
@@ -136,21 +137,21 @@ public class EventModeActivityDurationAnalyser {
 				this.durTemp = event.getTime() - startEvent.getTime();
 			}
 			if (event.getActType().equalsIgnoreCase("h")) {
-				if (((PlanImpl) p).getType().equals(PlanImpl.DeprecatedConstants.CAR)) {
+				if (((PlanImpl) p).getType().equals(TransportMode.car)) {
 					this.homeActivityDurationsCar += this.durTemp;
 					this.homeActivityCarCount++;
 				}
-				else if (((PlanImpl) p).getType().equals(PlanImpl.DeprecatedConstants.PT)){
+				else if (((PlanImpl) p).getType().equals(TransportMode.pt)){
 					this.homeActivityDurationsNonCar += this.durTemp;
 					this.homeActivityNonCarCount++;
 				}
 			}
 			else if (event.getActType().equalsIgnoreCase("w")) {
-				if (((PlanImpl) p).getType().equals(PlanImpl.DeprecatedConstants.CAR)) {
+				if (((PlanImpl) p).getType().equals(TransportMode.car)) {
 					this.workActivityDurationsCar += this.durTemp;
 					this.workActivityCarCount++;
 				}
-				else if (((PlanImpl) p).getType().equals(PlanImpl.DeprecatedConstants.PT)){
+				else if (((PlanImpl) p).getType().equals(TransportMode.pt)){
 					this.workActivityDurationsNonCar += this.durTemp;
 					this.workActivityNonCarCount++;
 				}
@@ -162,10 +163,10 @@ public class EventModeActivityDurationAnalyser {
 			this.eventMap.put(new IdImpl(event.getPersonId().toString()), event);
 			Plan p = this.plans.getPersons().get(new IdImpl(event.getPersonId().toString())).getSelectedPlan();
 			if (event.getActType().equalsIgnoreCase("w")) {
-				if (((PlanImpl) p).getType().equals(PlanImpl.DeprecatedConstants.PT)) {
+				if (((PlanImpl) p).getType().equals(TransportMode.pt)) {
 					this.ptStartTimeMap.incrementValue(event.getTime());
 				}
-				else if (((PlanImpl) p).getType().equals(PlanImpl.DeprecatedConstants.CAR)) {
+				else if (((PlanImpl) p).getType().equals(TransportMode.car)) {
 					this.carStartTimeMap.incrementValue(event.getTime());
 			  }
 			}

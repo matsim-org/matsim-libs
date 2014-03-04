@@ -32,7 +32,7 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.dgrether.analysis.charts.interfaces.DgXYChart;
@@ -80,10 +80,10 @@ public class DgAvgDeltaUtilsModeQuantilesChart implements DgXYChart {
 			xLoc = quantile /this.nQuantiles;
 			xLoc*=100.0;
 			DgModeSwitchPlanTypeAnalyzer modeSwitchAnalysis = new DgModeSwitchPlanTypeAnalyzer(p, runId1, runId2);
-			DgAnalysisPopulation car2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.DeprecatedConstants.CAR, PlanImpl.DeprecatedConstants.CAR));
-			DgAnalysisPopulation pt2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.DeprecatedConstants.PT, PlanImpl.DeprecatedConstants.PT));
-			DgAnalysisPopulation pt2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.DeprecatedConstants.PT, PlanImpl.DeprecatedConstants.CAR));
-			DgAnalysisPopulation car2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.DeprecatedConstants.CAR, PlanImpl.DeprecatedConstants.PT));
+			DgAnalysisPopulation car2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(TransportMode.car, TransportMode.car));
+			DgAnalysisPopulation pt2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(TransportMode.pt, TransportMode.pt));
+			DgAnalysisPopulation pt2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(TransportMode.pt, TransportMode.car));
+			DgAnalysisPopulation car2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(TransportMode.car, TransportMode.pt));
 			if ((car2carPop  != null) && (car2carPop.getPersonData().size() >= threshold)) {
 				avgUtil = car2carPop.calcAverageScoreDifference(runId1, runId2);
 				car2carSeries.add(xLoc, avgUtil);

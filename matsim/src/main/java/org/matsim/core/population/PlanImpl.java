@@ -38,25 +38,6 @@ import org.matsim.utils.customize.CustomizableImpl;
 
 public class PlanImpl implements Plan {
 
-	/**Plan(Impl).getType is still there, but now returns a String.  That String can be used in arbitrary, user-defined
-	 * ways; matsim will, however, make sure that the last plan of a given type is not removed.  The constants here are just
-	 * leftovers from the conversion from PlanImpl.Type to String.  They should not be used since they are not useful
-	 * for inter-modal plans; you should rely on Leg.getMode() instead.  kai, mar'11
-	 * <p/>
-	 * yyyy this class presumably should be removed eventually.  kai, mar'11
-	 *
-	 * @author nagel
-	 */
-	@Deprecated
-	public static class DeprecatedConstants {
-		public static final String CAR = "car" ;
-		public static final String PT = "pt" ;
-		public static final String RIDE = "ride" ;
-		public static final String BIKE = "bike" ;
-		public static final String WALK = "walk" ;
-		public static final String UNDEFINED = "undefined" ;
-	}
-
 	protected ArrayList<PlanElement> actsLegs = new ArrayList<PlanElement>();
 
 	private Double score = null;
@@ -68,13 +49,27 @@ public class PlanImpl implements Plan {
 
 	private Customizable customizableDelegate;
 
-	@Deprecated // use scenario.getPopulation().getFactory().createPlan(...) instead
+	/*
+	 * Creates a new Plan for the specified Person (without adding this Plan to the Person).
+	 * This is for special uses only, like if you need a Plan as a value object without adding it
+	 * to a scenario.
+	 * 
+	 * For initial demand generation, please use scenario.getPopulation().getFactory().createPlan(...) instead.
+	 * 
+	 */
 	public PlanImpl(final Person person) {
 		this.person = person;
 	}
 
-	@Deprecated // use scenario.getPopulation().getFactory().createPlan(...) instead
+	/*
+	 * Creates a new Plan without an associated Person.
+	 * This is for special uses only, like if you need a Plan as a value object without adding it
+	 * to a scenario.
+	 * 
+	 * For initial demand generation, please use scenario.getPopulation().getFactory().createPlan(...) instead.
+	 */
 	public PlanImpl() {
+	
 	}
 
 	@Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself

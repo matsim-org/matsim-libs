@@ -54,9 +54,9 @@ public class NewAgentPtPlan extends NewPopulation {
 			// copyPlans: the copy of the plans.
 			for (Plan pl : person.getPlans()) {
 				// set plan type for car, pt, walk
-				((PlanImpl) pl).setType(PlanImpl.DeprecatedConstants.CAR);
+				((PlanImpl) pl).setType(TransportMode.car);
 				PlanImpl ptPlan = new org.matsim.core.population.PlanImpl(person);
-				ptPlan.setType(PlanImpl.DeprecatedConstants.PT);
+				ptPlan.setType(TransportMode.pt);
 //				Plan walkPlan = new org.matsim.population.PlanImpl(person);
 //				walkPlan.setType(Type.WALK);
 

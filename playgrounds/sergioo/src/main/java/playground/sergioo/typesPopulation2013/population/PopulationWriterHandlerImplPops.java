@@ -153,7 +153,7 @@ import org.matsim.core.utils.misc.Time;
 			out.write(" selected=\"no\"");
 		if (plan instanceof PlanImpl){
 			PlanImpl p = (PlanImpl)plan;
-			if ((p.getType() != null) && (!p.getType().equals(PlanImpl.DeprecatedConstants.UNDEFINED))) {
+			if ((p.getType() != null)) {
 				out.write(" type=\"");
 				out.write(p.getType());
 				out.write("\"");

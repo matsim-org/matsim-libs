@@ -20,6 +20,7 @@ package playground.dgrether.analysis.activity;
 
 import java.io.File;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -95,21 +96,21 @@ public class ModeActivityDurationAnalyser {
 					try {
 						durTemp = DeprecatedStaticMethod.calculateSomeDuration(act);
 						if (act.getType().equalsIgnoreCase("h")) {
-							if (((PlanImpl) p).getType().equals(PlanImpl.DeprecatedConstants.CAR)) {
+							if (((PlanImpl) p).getType().equals(TransportMode.car)) {
 								homeActivityDurationsCar += durTemp;
 								homeActivityCarCount++;
 							}
-							else if (((PlanImpl) p).getType().equals(PlanImpl.DeprecatedConstants.PT)){
+							else if (((PlanImpl) p).getType().equals(TransportMode.pt)){
 								homeActivityDurationsNonCar += durTemp;
 								homeActivityNonCarCount++;
 							}
 						}
 						else if (act.getType().equalsIgnoreCase("w")) {
-							if (((PlanImpl) p).getType().equals(PlanImpl.DeprecatedConstants.CAR)) {
+							if (((PlanImpl) p).getType().equals(TransportMode.car)) {
 								workActivityDurationsCar += durTemp;
 								workActivityCarCount++;
 							}
-							else if (((PlanImpl) p).getType().equals(PlanImpl.DeprecatedConstants.PT)){
+							else if (((PlanImpl) p).getType().equals(TransportMode.pt)){
 								workActivityDurationsNonCar += durTemp;
 								workActivityNonCarCount++;
 							}

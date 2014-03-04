@@ -32,8 +32,8 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PlanImpl.DeprecatedConstants;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.dgrether.analysis.charts.interfaces.DgChart;
@@ -79,16 +79,16 @@ public class DgDeltaUtilsModeGroupChart implements DgChart {
 			Double scoreDiff = planDataRun2.getScore() - planDataRun1.getScore();
 			Tuple<Double, Double> t = new Tuple<Double, Double>(100.0*i/size, scoreDiff);
 			
-			if (((PlanImpl) planDataRun1.getPlan()).getType().equals(DeprecatedConstants.CAR) && ((PlanImpl) planDataRun2.getPlan()).getType().equals(DeprecatedConstants.CAR)) {
+			if (((PlanImpl) planDataRun1.getPlan()).getType().equals(TransportMode.car) && ((PlanImpl) planDataRun2.getPlan()).getType().equals(TransportMode.car)) {
 				valuesCarCar.add(t);
 			}
-			else if (((PlanImpl) planDataRun1.getPlan()).getType().equals(DeprecatedConstants.PT) && ((PlanImpl) planDataRun2.getPlan()).getType().equals(DeprecatedConstants.PT)) {
+			else if (((PlanImpl) planDataRun1.getPlan()).getType().equals(TransportMode.pt) && ((PlanImpl) planDataRun2.getPlan()).getType().equals(TransportMode.pt)) {
 				valuesPtPt.add(t);
 			}
-			else if (((PlanImpl) planDataRun1.getPlan()).getType().equals(DeprecatedConstants.PT) && ((PlanImpl) planDataRun2.getPlan()).getType().equals(DeprecatedConstants.CAR)) {
+			else if (((PlanImpl) planDataRun1.getPlan()).getType().equals(TransportMode.pt) && ((PlanImpl) planDataRun2.getPlan()).getType().equals(TransportMode.car)) {
 				valuesPtCar.add(t);
 			}
-			else if (((PlanImpl) planDataRun1.getPlan()).getType().equals(DeprecatedConstants.CAR) && ((PlanImpl) planDataRun2.getPlan()).getType().equals(DeprecatedConstants.PT)){
+			else if (((PlanImpl) planDataRun1.getPlan()).getType().equals(TransportMode.car) && ((PlanImpl) planDataRun2.getPlan()).getType().equals(TransportMode.pt)){
 				valuesCarPt.add(t);
 			}
 		}

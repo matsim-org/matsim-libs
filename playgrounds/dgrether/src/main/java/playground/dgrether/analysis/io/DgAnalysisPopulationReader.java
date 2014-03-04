@@ -38,7 +38,6 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.algorithms.PlanCalcType;
 
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
 import playground.dgrether.analysis.population.DgPersonData;
@@ -74,7 +73,7 @@ public class DgAnalysisPopulationReader {
 		}
 		// load first plans file
 		population = loadPopulationFile(firstPlanPath, sc);
-		new PlanCalcType().run(population);
+		// new PlanCalcType().run(population);
 		Plan plan;
 		Activity act;
 		for (Id id : population.getPersons().keySet()) {

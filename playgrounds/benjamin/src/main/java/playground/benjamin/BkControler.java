@@ -21,7 +21,6 @@ package playground.benjamin;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.population.algorithms.PlanCalcType;
 
 
 /**
@@ -45,6 +44,6 @@ public class BkControler extends Controler {
 	@Override
 	protected void loadData() {
 		super.loadData();
-		new PlanCalcType().run(this.population);
+		// new PlanCalcType().run(this.population);
 	}
 }

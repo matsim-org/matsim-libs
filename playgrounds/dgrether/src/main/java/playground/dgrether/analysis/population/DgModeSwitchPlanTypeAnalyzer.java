@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PlanImpl.DeprecatedConstants;
 import org.matsim.core.utils.collections.Tuple;
 
 
@@ -61,7 +60,7 @@ public class DgModeSwitchPlanTypeAnalyzer {
 		}
 	}
 	
-	public DgAnalysisPopulation getPersonsForModeSwitch(Tuple<PlanImpl.DeprecatedConstants, PlanImpl.DeprecatedConstants> modes) {
+	public DgAnalysisPopulation getPersonsForModeSwitch(Tuple<String, String> modes) {
 		return this.classifiedPops.get(modes);
 	}
 	
