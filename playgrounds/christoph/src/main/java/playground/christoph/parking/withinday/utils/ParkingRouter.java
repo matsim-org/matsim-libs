@@ -84,24 +84,6 @@ public class ParkingRouter {
 		this.walkDijkstra = (MultiNodeDijkstra) new FastMultiNodeDijkstraFactory().createPathCalculator(scenario.getNetwork(), 
 				this.walkTravelDisutility, this.walkTravelTime);
 	}
-
-	/**
-	 * 
-	 * @param route ... the initial route that has to be adapted
-	 * @param startLinkId ... the new start link (which does not equals the routes start link)
-	 * @param time
-	 * @param person
-	 * @param vehicle
-	 * @param mode
-	 */
-	@Deprecated
-	public void adaptStartOfRoute(NetworkRoute route, Id startLinkId, double time, Person person, Vehicle vehicle, String mode) {
-		if (TransportMode.car.equals(mode)) {
-			adaptStartOfRoute(route, startLinkId, time, person, vehicle, this.carDijkstra, this.carTravelDisutility);
-		} else if (TransportMode.walk.equals(mode)) {
-			adaptStartOfRoute(route, startLinkId, time, person, vehicle, this.walkDijkstra, this.walkTravelDisutility);
-		}
-	}
 	
 	/**
 	 * Adapts the start of a car route and reuses parts of the existing route.
@@ -213,21 +195,17 @@ public class ParkingRouter {
 	}
 	
 	/**
+	 * Adapts the end of a car route. If it is a NetworkRoute, parts of the existing route
+	 * are reused to speed up the routing process. 
 	 * 
-	 * @param route ... the initial route that has to be adapted
-	 * @param endLinkId ... the new end link (which does not equals the routes end link)
+	 * @param route
+	 * @param endLinkId
 	 * @param time
 	 * @param person
 	 * @param vehicle
-	 * @param mode
 	 */
-	@Deprecated
-	public void adaptEndOfRoute(NetworkRoute route, Id endLinkId, double time, Person person, Vehicle vehicle, String mode) {
-		if (TransportMode.car.equals(mode)) {
-			adaptEndOfRoute(route, endLinkId, time, person, vehicle, this.carDijkstra, this.carTravelDisutility);
-		} else if (TransportMode.walk.equals(mode)) {
-			adaptEndOfRoute(route, endLinkId, time, person, vehicle, this.walkDijkstra, this.walkTravelDisutility);
-		}
+	public void adaptEndOfCarRoute(NetworkRoute route, Id endLinkId, double time, Person person, Vehicle vehicle) {
+		adaptEndOfRoute(route, endLinkId, time, person, vehicle, this.carDijkstra, this.carTravelDisutility);
 	}
 	
 	/**

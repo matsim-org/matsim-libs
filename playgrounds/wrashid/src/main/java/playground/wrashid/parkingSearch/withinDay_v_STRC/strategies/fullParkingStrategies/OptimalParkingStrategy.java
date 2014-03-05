@@ -78,8 +78,7 @@ public class OptimalParkingStrategy implements FullParkingSearchStrategy {
 		Id parkingFacilityId = parkingAgentsTracker.getSelectedParking(agent.getId());
 		Id parkingFacilityLinkId = parkInfrastructure_v2.getParkingFacilityLinkId(parkingFacilityId);
 
-		parkingRouter.adaptEndOfRoute(route, parkingFacilityLinkId, time, this.withinDayAgentUtils.getModifiablePlan(agent).getPerson(), null,
-				TransportMode.car);
+		parkingRouter.adaptEndOfCarRoute(route, parkingFacilityLinkId, time, this.withinDayAgentUtils.getModifiablePlan(agent).getPerson(), null);
 	}
 
 	@Override
