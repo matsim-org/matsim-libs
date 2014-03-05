@@ -30,13 +30,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.io.AbstractMatsimWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
-public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, PersonAlgorithm {
+public class PopulationWriter extends AbstractMatsimWriter implements MatsimWriter, PersonAlgorithm {
 
 	private final double write_person_fraction;
 
