@@ -108,30 +108,6 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 		this.carriers = carriers;
 	}
 
-	/**
-	 * Reads a xml-file that contains carriers and their plans.
-	 * 
-	 * <p> Builds carriers and plans, and stores them in the carriers-object coming with this constructor.
-	 * 
-	 * @param filename
-	 */
-	/* This is somewhat problematic for me (JWJoubert, Nov '13). The MatsimXmlParser
-	 * has a parse method, yet when calling it, it results in an XML error. Maybe 
-	 * it would be better to 
-	 * a) use a dtd file, and
-	 * b) rather use the infrastructure provided by the MatsimXmlParser, and 
-	 *    override it if required.
-	 * 
-	 * I've posted a similar comment for the CarrierVehicleTypeReader.
-	 */
-	public void read(String filename) {
-		logger.info("read carrier plans");
-		this.setValidating(false);
-		parse(filename);
-		logger.info("done");
-
-	}
-	
 	private Id createId(String id) {
 		return new IdImpl(id);
 	}
