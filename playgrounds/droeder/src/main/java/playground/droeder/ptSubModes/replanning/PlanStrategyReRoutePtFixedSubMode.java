@@ -38,6 +38,7 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.replanning.selectors.RandomUnscoredPlanSelector;
 
 
 /**
@@ -82,7 +83,7 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 	@Override
 	public void run(HasPlansAndId<Plan> person) {
 		// try to score unscored plans anyway
-		Plan p = ((PersonImpl) person).getRandomUnscoredPlan();
+		Plan p = new RandomUnscoredPlanSelector<Plan>().selectPlan(((PersonImpl) person));
 		//otherwise get random plan
 		if(p == null){
 			p = this.selector.selectPlan(person);

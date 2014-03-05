@@ -157,4 +157,10 @@ public class CarrierImpl implements Carrier {
 	
 	}
 
+	@Override
+	public boolean removePlan(CarrierPlan p) {
+		return this.plans.remove(p);
+	}
+	
+
 }

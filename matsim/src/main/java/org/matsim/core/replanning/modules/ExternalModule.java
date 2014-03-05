@@ -20,43 +20,28 @@
 
 package org.matsim.core.replanning.modules;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.TreeMap;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.AbstractPopulationWriterHandler;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.PopulationWriterHandlerImplV4;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ExeRunner;
-import org.matsim.households.Households;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PersonCalcTimes;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.vehicles.Vehicles;
 
 /**
  * Basic wrapper for any call to external "plans-to-plans" modules. As basic handling of
@@ -65,10 +50,11 @@ import org.matsim.vehicles.Vehicles;
  * 2.) dump every person with the selected plan only
  * 3.) close plans file and write a config file based on a config template file
  * 4.) Execute the external program with this config file
- * 5.) Re-read plans and exchange selected plan by a new one or append new plan
+ * 5.) Mutate original plans according to re-read plans
  *
  * @author dstrippgen
  * @author mrieser
+ * @author michaz
  */
 public class ExternalModule implements PlanStrategyModule {
 
@@ -78,23 +64,22 @@ public class ExternalModule implements PlanStrategyModule {
 	private static final String SCENARIO_WORKING_EVENTS_TXT_FILENAME = "workingEventsTxtFilename";
 	private static final String SCENARIO_NETWORK_FILENAME = "networkFilename";
 
-	protected static final String ExternalInFileName = "plans.in.xml";
-	protected static final String ExternalOutFileName = "plans.out.xml";
-	protected static final String ExternalConfigFileName = "config.xml";
+	private static final String ExternalInFileName = "plans.in.xml";
+	private static final String ExternalOutFileName = "plans.out.xml";
+	private static final String ExternalConfigFileName = "config.xml";
 
-	/** holds a personId and the reference to the person for reloading the plans later */
-	private final TreeMap<Id, Person> persons = new TreeMap<Id, Person>();
-	protected PopulationWriter plansWriter = null;
-	private AbstractPopulationWriterHandler handler = null;
-	private BufferedWriter writer = null;
 	private final Scenario scenario;
-	protected Config extConfig;
-	protected String exePath = "";
-	protected String moduleId = "";
-	protected String outFileRoot = "";
+	private String exePath = "";
+	private String moduleId = "";
+	private String outFileRoot = "";
 
 	private final Controler controler;
+	
 	private int currentIteration = -1;
+	
+	private Population exportPopulation;
+	
+	private Map<Id, Plan> plansToMutate = new HashMap<Id, Plan>();
 
 
 	public ExternalModule(final String exePath, final String moduleId, final Controler controler, final Scenario scenario) {
@@ -108,216 +93,81 @@ public class ExternalModule implements PlanStrategyModule {
 	@Override
 	public void prepareReplanning(ReplanningContext replanningContext) {
 		this.currentIteration = replanningContext.getIteration();
-		String filename = this.outFileRoot + this.moduleId + ExternalInFileName;
-		PopulationImpl pop = (PopulationImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
-		pop.setIsStreaming(true);
-		this.plansWriter = new PopulationWriter(pop, scenario.getNetwork());
+		this.exportPopulation = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 
-		this.persons.clear();
-		this.plansWriter.writeStartPlans(filename);
-		this.handler = new PopulationWriterHandlerImplV4(this.scenario.getNetwork());
-		this.plansWriter.setWriterHandler(this.handler);
-		this.writer = this.plansWriter.getWriter();
 	}
 
 	@Override
 	public void handlePlan(final Plan plan) {
-		Person person = plan.getPerson();
-		this.persons.put(person.getId(), person);
-
-		try {
-			/* we have to re-implement a custom writer here, because we only want to
-			 * write a single plan (the selected one) and not all plans of the person.
-			 */
-			this.handler.startPerson(person, this.writer);
-			this.handler.startPlan(plan, this.writer);
-
-			// act/leg
-			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Activity) {
-					Activity act = (Activity) pe;
-					this.handler.startAct(act, this.writer);
-					this.handler.endAct(this.writer);
-				} else if (pe instanceof Leg) {
-					Leg leg = (Leg) pe;
-					this.handler.startLeg(leg, this.writer);
-					// route
-					if (leg.getRoute() != null) {
-						NetworkRoute r = (NetworkRoute) leg.getRoute();
-						this.handler.startRoute(r, this.writer);
-						this.handler.endRoute(this.writer);
-					}
-					this.handler.endLeg(this.writer);
-				}
-			}
-			this.handler.endPlan(this.writer);
-			this.handler.endPerson(this.writer);
-			this.handler.writeSeparator(this.writer);
-			this.writer.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// Creating a dummy population which only contains the plans which are passed here.
+		// I need to copy the plans because I am not supposed to add a plan to a different Person.
+		// I also need to memorize the plans which are passed here, because I am supposed to mutate them.
+		
+		final Person personWithOnlySelectedPlan = this.exportPopulation.getFactory().createPerson(plan.getPerson().getId());
+		final PlanImpl planForNewPerson = new PlanImpl(personWithOnlySelectedPlan);
+		planForNewPerson.copyFrom(plan);
+		personWithOnlySelectedPlan.addPlan(planForNewPerson);
+		this.exportPopulation.addPerson(personWithOnlySelectedPlan);
+		this.plansToMutate.put(plan.getPerson().getId(), plan);
 	}
 
 	@Override
 	public void finishReplanning() {
-		this.plansWriter.writeEndPlans();
-		if (this.persons.size() == 0) {
-			return;
-		}
+		exportPopulation();
 		if (callExe()) {
-			// the exe returned with error = 0, == no error
-			// Read back  plans file and change plans for persons in file
-			reReadPlans();
+			importPopulationAndMutatePlans();
 		} else {
-			throw new RuntimeException("External Replanning failed! ");
+			throw new RuntimeException("External Replanning exited with error.");
 		}
-
 	}
 
-	public void prepareExternalExeConfig() {
-		String configFileName = this.scenario.getConfig().strategy().getExternalExeConfigTemplate();
-		if (configFileName == null) {
-			this.extConfig = new Config();
-		} else {
-			this.extConfig = new Config();
-			MatsimConfigReader reader = new MatsimConfigReader(this.extConfig);
-			reader.readFile(configFileName);
-		}
-
-		// Change scenario config according to given output- and input-filenames: events, plans, network
-		this.extConfig.setParam(SCENARIO, SCENARIO_INPUT_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalInFileName);
-		this.extConfig.setParam(SCENARIO, SCENARIO_WORKING_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalOutFileName);
-		this.extConfig.setParam(SCENARIO, SCENARIO_WORKING_EVENTS_TXT_FILENAME, this.controler.getControlerIO().getIterationFilename(this.currentIteration - 1, "events.txt"));
-		String networkFilename = this.scenario.getConfig().findParam("network", "inputNetworkFile");
-		this.extConfig.setParam(SCENARIO, SCENARIO_NETWORK_FILENAME, networkFilename);
-	}
-
-	private void writeExternalExeConfig() {
-		new ConfigWriter(this.extConfig).write(this.outFileRoot + this.moduleId + ExternalConfigFileName);
+	private void exportPopulation() {
+		String filename = this.outFileRoot + this.moduleId + ExternalInFileName;
+		PopulationWriter plansWriter = new PopulationWriter(exportPopulation, scenario.getNetwork());
+		plansWriter.write(filename);
 	}
 
 	private boolean callExe() {
 		prepareExternalExeConfig();
-		writeExternalExeConfig();
-
 		String cmd = this.exePath + " " + this.outFileRoot + this.moduleId + ExternalConfigFileName;
 		String logfilename = this.controler.getControlerIO().getIterationFilename(this.currentIteration, this.moduleId + "stdout.log");
-
 		return (ExeRunner.run(cmd, logfilename, 3600) == 0);
 	}
 
-	private void reReadPlans() {
-		Population plans = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
-		PopulationReader plansReader = getPlansReader(plans);
+	private void prepareExternalExeConfig() {
+		Config extConfig;
+		String configFileName = this.scenario.getConfig().strategy().getExternalExeConfigTemplate();
+		if (configFileName == null) {
+			extConfig = new Config();
+		} else {
+			extConfig = new Config();
+			MatsimConfigReader reader = new MatsimConfigReader(extConfig);
+			reader.readFile(configFileName);
+		}
+		// Change scenario config according to given output- and input-filenames: events, plans, network
+		extConfig.setParam(SCENARIO, SCENARIO_INPUT_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalInFileName);
+		extConfig.setParam(SCENARIO, SCENARIO_WORKING_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalOutFileName);
+		extConfig.setParam(SCENARIO, SCENARIO_WORKING_EVENTS_TXT_FILENAME, this.controler.getControlerIO().getIterationFilename(this.currentIteration - 1, "events.txt"));
+		String networkFilename = this.scenario.getConfig().findParam("network", "inputNetworkFile");
+		extConfig.setParam(SCENARIO, SCENARIO_NETWORK_FILENAME, networkFilename);
+		new ConfigWriter(extConfig).write(this.outFileRoot + this.moduleId + ExternalConfigFileName);
+	}
+
+	private void importPopulationAndMutatePlans() {
+		Scenario dummyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		PopulationReader plansReader = new MatsimPopulationReader(dummyScenario);
+		Population plans = dummyScenario.getPopulation();
 		plansReader.readFile(this.outFileRoot + this.moduleId + ExternalOutFileName);
-		new PersonCalcTimes().run(plans);
-		new UpdatePlansAlgo(this.persons).run(plans);
+		new UpdatePlansAlgo().run(plans);
 	}
 
-	private PopulationReader getPlansReader(final Population plans) {
-		PopulationReader plansReader = new MatsimPopulationReader(new PseudoScenario(this.scenario, plans));
-		return plansReader;
-	}
-
-	private static class UpdatePlansAlgo extends AbstractPersonAlgorithm {
-
-		private final TreeMap<Id, Person> persons;
-
-		protected UpdatePlansAlgo(final TreeMap<Id, Person> persons) {
-			this.persons = persons;
-		}
-
+	private class UpdatePlansAlgo extends AbstractPersonAlgorithm {
 		@Override
-		public void run(final Person dummyperson) {
-			Plan newplan = dummyperson.getPlans().get(0);
-			// Find the original person
-			Id Id = dummyperson.getId();
-			Person person = this.persons.get(Id);
-
-			// replace / append the new plan
-			((PersonImpl) person).exchangeSelectedPlan(newplan, false);
+		public void run(final Person dummyPerson) {
+			Plan newPlan = dummyPerson.getPlans().get(0);
+			Plan planToMutate = plansToMutate.get(dummyPerson.getId());
+			((PlanImpl) planToMutate).copyFrom(newPlan);
 		}
-	}
-
-	/**
-	 * Provides a real scenario, but exchanges the population.
-	 * Still, network and facilities can be reused that way.
-	 *
-	 * @author mrieser
-	 */
-	private static class PseudoScenario implements Scenario {
-
-		private final Scenario scenario;
-		private Population myPopulation;
-
-		public PseudoScenario(final Scenario scenario, final Population population) {
-			this.scenario = scenario;
-			this.myPopulation = population;
-		}
-
-		@Override
-		public Population getPopulation() {
-			return this.myPopulation;
-		}
-		
-		@Override
-		public TransitSchedule getTransitSchedule() {
-			return null;
-		}
-
-		@Override
-		public ActivityFacilities getActivityFacilities() {
-			return null;
-		}
-		
-		@Override
-		public Coord createCoord(double x, double y) {
-			return this.scenario.createCoord(x, y);
-		}
-
-		@Override
-		public Id createId(String string) {
-			return this.scenario.createId(string);
-		}
-
-		@Override
-		public Config getConfig() {
-			return this.scenario.getConfig();
-		}
-
-		@Override
-		public Network getNetwork() {
-			return this.scenario.getNetwork();
-		}
-
-		@Override
-		public void addScenarioElement(String name, Object o) {
-			this.scenario.addScenarioElement(name , o);
-		}
-
-		@Override
-		public Object getScenarioElement(String name) {
-			return this.scenario.getScenarioElement(name);
-		}
-
-		@Override
-		public Object removeScenarioElement(String name) {
-			return this.scenario.removeScenarioElement( name );
-		}
-
-		@Override
-		public Vehicles getVehicles() {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
-		@Override
-		public Households getHouseholds() {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
 	}
 
 }

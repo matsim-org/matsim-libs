@@ -113,6 +113,12 @@ public class TtDgKoehlerStrehler2010Router {
 			throw new RuntimeException("not implemented") ;
 		}
 
+		@Override
+		public boolean removePlan(Plan p) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
 	};
 	
 	private Vehicle fakeVehicle = new Vehicle(){

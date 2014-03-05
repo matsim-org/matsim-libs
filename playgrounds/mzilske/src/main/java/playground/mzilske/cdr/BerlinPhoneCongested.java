@@ -43,7 +43,8 @@ public class BerlinPhoneCongested {
 //		for (int dailyRate : CALLRATES) {
 //			run(scenario, dailyRate, pw);
 //		}
-		runInfiniteRate(scenario);
+//		runInfiniteRate(scenario);
+		runInfiniteRate2(scenario);
 	//	pw.close();
 	}
 
@@ -74,6 +75,16 @@ public class BerlinPhoneCongested {
 
 		});
 		new MatsimEventsReader(events).readFile("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/car-congested/output-berlin/ITERS/it.200/2kW.15.200.events.xml.gz");
+		Config config = phoneConfig();
+
+		config.controler().setOutputDirectory("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/car-congested/output-" + Integer.toString((int) dailyRate));
+
+		compareMain.runOnceWithSimplePlans(config);
+		pw.printf("%d\t%f\t%f\t%f\n", dailyRate, compareMain.compareAllDay(), compareMain.compareTimebins(), compareMain.compareEMDMassPerLink());
+		pw.flush();
+	}
+
+	private static Config phoneConfig() {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams sightingParam = new ActivityParams("sighting");
 		sightingParam.setTypicalDuration(30.0 * 60);
@@ -103,47 +114,16 @@ public class BerlinPhoneCongested {
 			config.strategy().addStrategySettings(stratSets);
 		}
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
-
-		config.controler().setOutputDirectory("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/car-congested/output-" + Integer.toString((int) dailyRate));
-
-		compareMain.runOnceWithSimplePlans(config);
-		pw.printf("%d\t%f\t%f\t%f\n", dailyRate, compareMain.compareAllDay(), compareMain.compareTimebins(), compareMain.compareEMDMassPerLink());
-		pw.flush();
+		return config;
 	}
 
 	private void runInfiniteRate(Scenario baseScenario) {
-		Config config = ConfigUtils.createConfig();
+		Config config = phoneConfig();
 		for (ActivityParams params : baseScenario.getConfig().planCalcScore().getActivityParams()) {
 			ActivityParams zero = new ActivityParams(params.getType());
 			zero.setScoringThisActivityAtAll(false);
 			config.planCalcScore().addActivityParams(zero);
 		}
-		config.planCalcScore().setTraveling_utils_hr(-6);
-		config.planCalcScore().setPerforming_utils_hr(0);
-		config.planCalcScore().setTravelingOther_utils_hr(-6);
-		config.planCalcScore().setConstantCar(0);
-		config.planCalcScore().setMonetaryDistanceCostRateCar(0);
-		config.planCalcScore().setWriteExperiencedPlans(true);
-		config.controler().setLastIteration(20);
-		QSimConfigGroup tmp = config.qsim();
-		tmp.setFlowCapFactor(0.02);
-		tmp.setStorageCapFactor(0.06);
-		tmp.setRemoveStuckVehicles(false);
-		tmp.setStuckTime(10.0);
-		{
-			StrategySettings stratSets = new StrategySettings(new IdImpl(1));
-			stratSets.setModuleName("ChangeExpBeta");
-			stratSets.setProbability(0.7);
-			config.strategy().addStrategySettings(stratSets);
-		}
-		{
-			StrategySettings stratSets = new StrategySettings(new IdImpl(2));
-			stratSets.setModuleName("ReRoute");
-			stratSets.setProbability(0.3);
-			config.strategy().addStrategySettings(stratSets);
-		}
-		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
-
 		config.controler().setOutputDirectory("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/car-congested/output-infinite");
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -159,8 +139,39 @@ public class BerlinPhoneCongested {
 		controler.setCreateGraphs(false);
 		controler.run();
 
-		// pw.printf("%d\t%f\t%f\t%f\n", dailyRate, compareMain.compareAllDay(), compareMain.compareTimebins(), compareMain.compareEMDMassPerLink());
-
 	}
+	
+	private void runInfiniteRate2(Scenario scenario) {
+		EventsManager events = EventsUtils.createEventsManager();
+		CompareMain compareMain = new CompareMain(scenario, events, new CallBehavior() {
+
+			@Override
+			public boolean makeACall(ActivityEndEvent event) {
+				return true;
+			}
+
+			@Override
+			public boolean makeACall(ActivityStartEvent event) {
+				return true;
+			}
+
+			@Override
+			public boolean makeACall(Id id, double time) {
+				return false;
+			}
+
+			@Override
+			public boolean makeACallAtMorningAndNight() {
+				return true;
+			}
+
+		});
+		new MatsimEventsReader(events).readFile("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/car-congested/output-berlin/ITERS/it.200/2kW.15.200.events.xml.gz");
+		
+		Config config = phoneConfig();
+		config.controler().setOutputDirectory("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/car-congested/output-infinte");
+		compareMain.runOnceWithSimplePlans(config);
+	}
+	
 
 }

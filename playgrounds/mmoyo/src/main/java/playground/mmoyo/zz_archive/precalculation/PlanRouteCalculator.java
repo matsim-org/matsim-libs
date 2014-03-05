@@ -146,7 +146,7 @@ public class PlanRouteCalculator {
 			}
 
 
-			((PersonImpl) person).exchangeSelectedPlan(newPlan, true);
+		//	((PersonImpl) person).exchangeSelectedPlan(newPlan, true);
 			((PersonImpl) person).removeUnselectedPlans();
 			newPopulation.addPerson(person);
 

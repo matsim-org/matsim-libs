@@ -22,6 +22,9 @@ package org.matsim.core.utils.io;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.util.zip.GZIPOutputStream;
 
 
 /**
@@ -61,10 +64,34 @@ public abstract class AbstractMatsimWriter {
 	 * @throws UncheckedIOException
 	 */
 	protected void openFile(final String filename) throws UncheckedIOException {
+		assertNotAlreadyOpen();
 		if (this.useCompression == null) {
 			this.writer = IOUtils.getBufferedWriter(filename);
 		} else {
 			this.writer = IOUtils.getBufferedWriter(filename, this.useCompression.booleanValue());
+		}
+	}
+
+	/**
+	 * Uses the specified OutputStream for writing.
+	 * 
+	 */
+	protected void openOutputStream(OutputStream outputStream) {
+		assertNotAlreadyOpen();
+		try {
+			if (this.useCompression == null || this.useCompression.booleanValue()) {
+				this.writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+			} else {
+				this.writer = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(outputStream)));
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	private void assertNotAlreadyOpen() {
+		if (this.writer != null) {
+			throw new RuntimeException("File already open.");
 		}
 	}
 
@@ -85,4 +112,5 @@ public abstract class AbstractMatsimWriter {
 			}
 		}
 	}
+
 }

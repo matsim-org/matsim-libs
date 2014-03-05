@@ -96,8 +96,6 @@ import org.xml.sax.Attributes;
 
 	private final static Logger log = Logger.getLogger(PopulationReaderMatsimV4.class);
 
-	private int warnPlanTypeCount = 0;
-
 	public PopulationReaderMatsimV4(final Scenario scenario) {
 		this.scenario = scenario;
 		this.plans = scenario.getPopulation();
@@ -298,25 +296,7 @@ import org.xml.sax.Attributes;
 		}
 
 		String type = atts.getValue(ATTR_TYPE);
-		if (type == null) {
-			this.currplan.setType("undefined");
-		} else if ("car".equalsIgnoreCase(type)) {
-			this.currplan.setType("car");
-		} else if ("pt".equalsIgnoreCase(type)) {
-			this.currplan.setType("pt");
-		} else if ("ride".equalsIgnoreCase(type)) {
-			this.currplan.setType("ride");
-		} else if ("bike".equalsIgnoreCase(type)) {
-			this.currplan.setType("bike");
-		} else if ("walk".equalsIgnoreCase(type)) {
-			this.currplan.setType("walk");
-		} else {
-			if (this.warnPlanTypeCount < 10) {
-				log.warn("Type " + type + " of plan not known! Setting plan to type undefined!");
-				this.warnPlanTypeCount++;
-			}
-			this.currplan.setType("undefined");
-		}
+		this.currplan.setType(type);
 	}
 
 	private void startAct(final Attributes atts) {

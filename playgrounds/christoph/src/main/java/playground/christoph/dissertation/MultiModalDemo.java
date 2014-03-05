@@ -76,6 +76,8 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -523,7 +525,7 @@ public class MultiModalDemo {
 					person.addPlan(plan);
 					if (legMode.equals(initialLegMode)) ((PersonImpl) person).setSelectedPlan(plan);
 				}
-				if (initialLegMode.equals(randomMode)) ((PersonImpl) person).setSelectedPlan(((PersonImpl) person).getRandomPlan());				
+				if (initialLegMode.equals(randomMode)) ((PersonImpl) person).setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(((PersonImpl) person)));				
 			} else {
 				if (initialLegMode.equals(randomMode)) {
 					String[] modes = CollectionUtils.stringToArray(legModes);
@@ -586,7 +588,7 @@ public class MultiModalDemo {
 			if(((PersonImpl) person).getSex().equals("m")) males++;
 			else females++;
 			
-			Leg leg = (Leg) ((PersonImpl) person).getBestPlan().getPlanElements().get(1);
+			Leg leg = (Leg) new BestPlanSelector<Plan>().selectPlan(((PersonImpl) person)).getPlanElements().get(1);
 			if (leg.getMode().equals(TransportMode.car)) car++;
 			else nonCar++;
 			

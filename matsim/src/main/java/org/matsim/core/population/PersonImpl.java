@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.population.Desires;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
@@ -98,72 +98,6 @@ public class PersonImpl implements Person {
 				iter.remove();
 			}
 		}
-	}
-
-	@Deprecated 		// yyyy should use new RandomPlanSelector().selectPlan( person ) instead. kai, nov'13
-	public Plan getRandomPlan() {
-		if (this.getPlans().size() == 0) {
-			return null;
-		}
-		int index = (int)(MatsimRandom.getRandom().nextDouble()*this.getPlans().size());
-		return this.getPlans().get(index);
-	}
-
-	@Deprecated 		// yyyy should use new BestPlanSelector().selectPlan( person ) instead. kai, nov'13
-	public Plan getBestPlan() {
-		if (this.getPlans().size() == 0) {
-			return null;
-		}
-		double currMaxScore = Double.NEGATIVE_INFINITY;
-		Plan currBestPlan = null;
-		for ( Iterator<Plan> iter = this.getPlans().iterator(); iter.hasNext(); ) {
-			Plan plan = iter.next();
-			if (plan.getScore() == null) {
-				if (currBestPlan == null) {
-					currBestPlan = plan;
-				}
-			} else if (plan.getScore() > currMaxScore) {
-				currMaxScore = plan.getScore();
-				currBestPlan = plan;
-			}
-		}
-		return currBestPlan;
-	}
-
-	@Deprecated 		// yyyy should use new RandomUnscoredPlanSelector().selectPlan( person ) instead. kai, nov'13
-	public Plan getRandomUnscoredPlan() {
-		int cntUnscored = 0;
-		for (Plan plan : this.getPlans()) {
-			if (plan.getScore() == null) {
-				cntUnscored++;
-			}
-		}
-		if (cntUnscored > 0) {
-			// select one of the unscored plans
-			int idxUnscored = MatsimRandom.getRandom().nextInt(cntUnscored);
-			cntUnscored = 0;
-			for (Plan plan : this.getPlans()) {
-				if (plan.getScore() == null) {
-					if (cntUnscored == idxUnscored) {
-						return plan;
-					}
-					cntUnscored++;
-				}
-			}
-		}
-		return null;
-	}
-
-	public void exchangeSelectedPlan(final Plan newPlan, final boolean appendPlan) {
-		newPlan.setPerson(this);
-		Plan oldSelectedPlan = getSelectedPlan();
-		if (appendPlan || (oldSelectedPlan == null)) {
-			this.getPlans().add(newPlan);
-		} else {
-			int i = this.getPlans().indexOf(oldSelectedPlan);
-			this.getPlans().set(i, newPlan);
-		}
-		setSelectedPlan(newPlan);
 	}
 
 	@Override
@@ -285,7 +219,7 @@ public class PersonImpl implements Person {
 	public boolean removePlan(final Plan plan) {
 		boolean result = this.getPlans().remove(plan);
 		if ((this.getSelectedPlan() == plan) && result) {
-			this.setSelectedPlan(this.getRandomPlan());
+			this.setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(this));
 		}
 		return result;
 	}

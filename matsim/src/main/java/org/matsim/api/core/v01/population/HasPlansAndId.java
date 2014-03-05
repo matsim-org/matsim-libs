@@ -19,12 +19,13 @@ public interface HasPlansAndId<T extends BasicPlan> extends Identifiable {
 	 * sets the reference to this person in the Plan instance.
 	 */
 	public abstract boolean addPlan(T p);
+	
+	public abstract boolean removePlan(T p);
 
 	public abstract T getSelectedPlan();
 
 	public abstract void setSelectedPlan(T selectedPlan);
-	
-//	@Deprecated
+
 	public abstract T createCopyOfSelectedPlanAndMakeSelected() ;
 
 }

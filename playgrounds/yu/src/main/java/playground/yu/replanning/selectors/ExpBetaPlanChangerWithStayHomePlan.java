@@ -32,6 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 import playground.yu.demandModifications.StayHomePlan;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
@@ -154,7 +155,7 @@ public class ExpBetaPlanChangerWithStayHomePlan implements PlanSelector {
 
 		// current plan and random plan:
 		Plan currentPlan = person.getSelectedPlan();
-		Plan otherPlan = ((PersonImpl) person).getRandomPlan();
+		Plan otherPlan = new RandomPlanSelector<Plan>().selectPlan(((PersonImpl) person));
 
 		if (currentPlan == null) {
 			// this case should only happen when the agent has no plans at all

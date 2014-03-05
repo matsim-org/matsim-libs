@@ -25,6 +25,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.RandomUnscoredPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -63,19 +65,19 @@ public class PersonImplTest extends MatsimTestCase {
 		population.addPerson(person);
 
 		// now test if we all for plans without score are returned
-		Plan plan = person.getRandomUnscoredPlan();
+		Plan plan = new RandomUnscoredPlanSelector<Plan>().selectPlan(person);
 		assertNull(plan.getScore());
 		plan.setScore(1.0);
-		plan = person.getRandomUnscoredPlan();
+		plan = new RandomUnscoredPlanSelector<Plan>().selectPlan(person);
 		assertNull(plan.getScore());
 		plan.setScore(2.0);
-		plan = person.getRandomUnscoredPlan();
+		plan = new RandomUnscoredPlanSelector<Plan>().selectPlan(person);
 		assertNull(plan.getScore());
 		plan.setScore(3.0);
-		plan = person.getRandomUnscoredPlan();
+		plan = new RandomUnscoredPlanSelector<Plan>().selectPlan(person);
 		assertNull(plan.getScore());
 		plan.setScore(4.0);
-		plan = person.getRandomUnscoredPlan();
+		plan = new RandomUnscoredPlanSelector<Plan>().selectPlan(person);
 		assertNull(plan);
 		for (int i = 0; i < plans.length; i++) {
 			assertNotNull(plans[i].getScore());
@@ -155,7 +157,7 @@ public class PersonImplTest extends MatsimTestCase {
 		p2.setScore(89.0);
 		person.addPlan(p1);
 		person.addPlan(p2);
-		Plan p = person.getBestPlan();
+		Plan p = new BestPlanSelector<Plan>().selectPlan(person);
 		assertEquals(p1, p);
 	}
 
@@ -173,7 +175,7 @@ public class PersonImplTest extends MatsimTestCase {
 		person.addPlan(p1);
 		person.addPlan(p2);
 		person.addPlan(p3);
-		Plan p = person.getBestPlan();
+		Plan p = new BestPlanSelector<Plan>().selectPlan(person);
 		assertTrue(p == p1 || p == p3);
 	}
 
@@ -187,7 +189,7 @@ public class PersonImplTest extends MatsimTestCase {
 		p2.setScore(80.0);
 		person.addPlan(p1);
 		person.addPlan(p2);
-		Plan p = person.getBestPlan();
+		Plan p = new BestPlanSelector<Plan>().selectPlan(person);
 		assertEquals(p2, p);
 	}
 
@@ -200,7 +202,7 @@ public class PersonImplTest extends MatsimTestCase {
 		Plan p2 = new PlanImpl();
 		person.addPlan(p1);
 		person.addPlan(p2);
-		Plan p = person.getBestPlan();
+		Plan p = new BestPlanSelector<Plan>().selectPlan(person);
 		assertTrue(p == p1 || p == p2);
 	}
 }

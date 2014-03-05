@@ -37,7 +37,7 @@ public abstract class AbstractPlanSelector implements PlanSelector {
 	@Override
 	public final Plan selectPlan(HasPlansAndId<Plan> person) {
 		// First check if there are any unscored plans
-		Plan selectedPlan = ((PersonImpl) person).getRandomUnscoredPlan();
+		Plan selectedPlan = new RandomUnscoredPlanSelector<Plan>().selectPlan(((PersonImpl) person));
 		if (selectedPlan != null) return selectedPlan;
 		// Okay, no unscored plans...
 

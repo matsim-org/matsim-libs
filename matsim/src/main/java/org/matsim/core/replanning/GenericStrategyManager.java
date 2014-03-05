@@ -227,9 +227,8 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	private final void removePlans(final HasPlansAndId<T> person, final int maxNumberOfPlans) {
 		while (person.getPlans().size() > maxNumberOfPlans) {
 			T plan = this.removalPlanSelector.selectPlan(person);
-			person.getPlans().remove(plan);
+			person.removePlan(plan);
 			if (plan == person.getSelectedPlan()) {
-//				final T newPlanToSelect = person.getRandomPlan();
 				final T newPlanToSelect = new RandomPlanSelector<T>().selectPlan(person) ;
 				if ( newPlanToSelect == null ) {
 					throw new IllegalStateException( "could not find a plan to select for person "+person );

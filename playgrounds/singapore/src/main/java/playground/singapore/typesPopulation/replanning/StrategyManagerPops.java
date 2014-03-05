@@ -18,6 +18,7 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
 import playground.singapore.typesPopulation.population.PersonImplPops;
@@ -204,7 +205,7 @@ public class StrategyManagerPops extends StrategyManager implements BeforeMobsim
 			Plan plan = selector.selectPlan(person);
 			person.getPlans().remove(plan);
 			if (plan == person.getSelectedPlan()) {
-				final Plan newPlanToSelect = person.getRandomPlan();
+				final Plan newPlanToSelect = new RandomPlanSelector<Plan>().selectPlan(person);
 				if ( newPlanToSelect == null ) {
 					throw new IllegalStateException("could not find a plan to select for person "+person);
 				}

@@ -47,6 +47,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -184,7 +185,7 @@ public class CreateBackgroundPopulation {
 		 */
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			PersonImpl p = (PersonImpl) person;
-			p.setSelectedPlan(p.getRandomPlan());
+			p.setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(p));
 		}
 		
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(populationFile);

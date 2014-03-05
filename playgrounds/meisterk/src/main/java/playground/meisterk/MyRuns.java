@@ -223,7 +223,7 @@ public class MyRuns {
 		XY2Links xY2Links = new XY2Links();
 
 		// write out new initial demand
-		new PopulationWriter(population, network).write(null);//scenario.getConfig().plans().getOutputFile());
+		// new PopulationWriter(population, network).write(null);//scenario.getConfig().plans().getOutputFile());
 
 	}
 
@@ -454,7 +454,7 @@ public class MyRuns {
 		psfaet.run(population);
 
 		logger.info("Writing plans file...");
-		new PopulationWriter(population, scenario.getNetwork()).write(null);//scenario.getConfig().plans().getOutputFile());
+		// new PopulationWriter(population, scenario.getNetwork()).write(null);//scenario.getConfig().plans().getOutputFile());
 		logger.info("Writing plans file...DONE.");
 	}
 

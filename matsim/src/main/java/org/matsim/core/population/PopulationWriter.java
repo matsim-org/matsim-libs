@@ -22,6 +22,7 @@ package org.matsim.core.population;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
@@ -30,6 +31,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PersonAlgorithm;
@@ -37,7 +39,6 @@ import org.matsim.population.algorithms.PersonAlgorithm;
 public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, PersonAlgorithm {
 
 	private final double write_person_fraction;
-	private boolean fileOpened = false;
 
 	private PopulationWriterHandler handler = null;
 	private final Population population;
@@ -82,6 +83,52 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 		this.handler = new PopulationWriterHandlerImplV5();
 	}
 
+	/**
+	 * Writes all plans to the file.
+	 */
+	@Override
+	public void write(final String filename) {
+		try {
+			this.openFile(filename);
+			this.handler.writeHeaderAndStartElement(this.writer);
+			this.handler.startPlans(this.population, this.writer);
+			this.handler.writeSeparator(this.writer);
+			this.writePersons();
+			this.handler.endPlans(this.writer);
+			log.info("Population written to: " + filename);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		} finally {
+			this.close();
+			counter.printCounter();
+			counter.reset();
+		}
+	}
+
+	/**
+	 * Writes all plans to the output stream and closes it.
+	 * 
+	 */
+	public void write(OutputStream outputStream) {
+		try {
+			this.openOutputStream(outputStream);
+			this.handler.writeHeaderAndStartElement(this.writer);
+			this.handler.startPlans(this.population, this.writer);
+			this.handler.writeSeparator(this.writer);
+			this.writePersons();
+			this.handler.endPlans(this.writer);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		} finally {
+			this.close();
+			counter.printCounter();
+			counter.reset();
+		}
+	}
+
+
+	// implementation of PersonAlgorithm
+	// this is primarily to use the PlansWriter with filters and other algorithms.
 	public void startStreaming(final String filename) {
 		if ((this.population instanceof PopulationImpl) && (((PopulationImpl) this.population).isStreaming())) {
 			// write the file head if it is used with streaming.
@@ -91,9 +138,14 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 		}
 	}
 
+	@Override
+	public void run(final Person person) {
+		writePerson(person);
+	}
+
 	public void closeStreaming() {
 		if ((this.population instanceof PopulationImpl) && (((PopulationImpl) this.population).isStreaming())) {
-			if (this.fileOpened) {
+			if (this.writer != null) {
 				writeEndPlans();
 			} else {
 				log.error("Cannot close streaming. File is not open.");
@@ -103,24 +155,20 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 		}
 	}
 
-	public final void setWriterHandler(final PopulationWriterHandler handler) {
-		this.handler = handler;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// write methods
-	//////////////////////////////////////////////////////////////////////
-
 	public final void writeStartPlans(final String filename) {
 		try {
-			openFile(filename);
-			this.fileOpened = true;
+			this.openFile(filename);
 			this.handler.writeHeaderAndStartElement(this.writer);
 			this.handler.startPlans(this.population, this.writer);
 			this.handler.writeSeparator(this.writer);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
+	}
+
+	public final void writePersons() {
+		for (Person p : PopulationUtils.getSortedPersons(this.population).values()) {
+			writePerson(p);
 		}
 	}
 
@@ -131,44 +179,18 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 			}
 			this.handler.writePerson(person, this.writer);
 			counter.incCounter();
-		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public final void writePersons() {
-		for (Person p : PopulationUtils.getSortedPersons(this.population).values()) {
-			writePerson(p);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 	}
 
 	public final void writeEndPlans() {
-		if (this.fileOpened) {
-			try {
-				this.handler.endPlans(this.writer);
-				this.writer.flush();
-				this.writer.close();
-			}
-			catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+		try {
+			this.handler.endPlans(this.writer);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
-	}
-
-
-
-	/**
-	 * Writes all plans to the file.
-	 */
-	@Override
-	public void write(final String filename) {
-		this.writeStartPlans(filename);
-		this.writePersons();
-		this.writeEndPlans();
-		counter.printCounter();
-		counter.reset();
-		log.info("Population written to: " + filename);
+		this.close();
 	}
 
 	public void writeFileV0(final String filename) {
@@ -190,10 +212,8 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 		return this.writer;
 	}
 
-	// implementation of PersonAlgorithm
-	// this is primarily to use the PlansWriter with filters and other algorithms.
-	@Override
-	public void run(final Person person) {
-		writePerson(person);
+	public final void setWriterHandler(final PopulationWriterHandler handler) {
+		this.handler = handler;
 	}
+	
 }

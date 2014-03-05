@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 /**
  * @author nagel
@@ -56,7 +57,7 @@ public class CadytsPlanChanger<T> implements PlanSelector {
 		// random plan:
 		Plan otherPlan = null;
 		do {
-			otherPlan = ((PersonImpl) person).getRandomPlan();
+			otherPlan = new RandomPlanSelector<Plan>().selectPlan(((PersonImpl) person));
 		} while (otherPlan == currentPlan);
 
 		if (otherPlan.getScore() == null) {

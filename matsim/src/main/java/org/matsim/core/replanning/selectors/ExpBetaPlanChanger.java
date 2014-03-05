@@ -51,7 +51,7 @@ public class ExpBetaPlanChanger implements PlanSelector {
 	public Plan selectPlan(final HasPlansAndId<Plan> person) {
 		// current plan and random plan:
 		Plan currentPlan = person.getSelectedPlan();
-		Plan otherPlan = ((PersonImpl) person).getRandomPlan();
+		Plan otherPlan = new RandomPlanSelector<Plan>().selectPlan(((PersonImpl) person));
 
 		if (currentPlan == null) {
 			// this case should only happen when the agent has no plans at all

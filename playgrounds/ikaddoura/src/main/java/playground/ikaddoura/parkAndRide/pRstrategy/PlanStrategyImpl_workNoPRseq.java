@@ -32,6 +32,7 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.core.replanning.selectors.RandomUnscoredPlanSelector;
 
 /**
  * A strategy defines how an agent can be modified during re-planning.
@@ -79,7 +80,7 @@ public final class PlanStrategyImpl_workNoPRseq implements PlanStrategy {
 		this.counter++;
 		
 		// if there is at least one unscored plan, find that one:
-		Plan plan = ((PersonImpl) person).getRandomUnscoredPlan();
+		Plan plan = new RandomUnscoredPlanSelector<Plan>().selectPlan(((PersonImpl) person));
 		
 		// otherwise, find one according to selector (often defined in PlanStrategy ctor):
 		if (plan == null) {

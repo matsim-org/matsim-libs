@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 public class RandomPlanSelectorWithPlanType implements PlanSelector {
 
@@ -48,7 +49,7 @@ public class RandomPlanSelectorWithPlanType implements PlanSelector {
 		}
 		Plan toRemove;
 		do {
-			toRemove = ((PersonImpl) person).getRandomPlan();
+			toRemove = new RandomPlanSelector<Plan>().selectPlan(((PersonImpl) person));
 		} while (typeCounts.get(((PlanImpl) toRemove).getType()) <= 1);
 		return toRemove;
 	}
