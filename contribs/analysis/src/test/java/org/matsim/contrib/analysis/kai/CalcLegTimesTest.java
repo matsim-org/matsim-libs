@@ -20,7 +20,9 @@
 
 package org.matsim.contrib.analysis.kai;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -28,7 +30,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.analysis.kai.KNAnalysisEventsHandler;
+import org.matsim.contrib.analysis.kai.KNAnalysisEventsHandler.StatType;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -36,7 +38,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -44,21 +45,24 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
 public class CalcLegTimesTest extends MatsimTestCase {
+	// yy this test is probably not doing anything with respect to some of the newer statistics, such as money. kai, mar'14 
 
 	public static final String BASE_FILE_NAME = "stats_";
 	public static final Id DEFAULT_PERSON_ID = new IdImpl(123);
 	public static final Id DEFAULT_LINK_ID = new IdImpl(456);
 
-	private Population population = null;
-	private Network network = null;
+	private Scenario scenario = null ;
+	private Population population = null ;
+	private Network network = null ;
 
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		super.loadConfig(null);
 
-		ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		this.population = s.getPopulation();
+		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		this.population = scenario.getPopulation();
 		PersonImpl person = new PersonImpl(DEFAULT_PERSON_ID);
 		this.population.addPerson(person);
 		PlanImpl plan = person.createAndAddPlan(true);
@@ -71,7 +75,9 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		plan.createAndAddActivity("act4", new CoordImpl(200.0, 200.0));
 		plan.createAndAddLeg("undefined");
 		plan.createAndAddActivity("act5", new CoordImpl(200.0, 200.0));
-		this.network = s.getNetwork();
+		plan.setScore(12.);
+
+		this.network = scenario.getNetwork();
 		Node fromNode = this.network.getFactory().createNode(new IdImpl("123456"), new CoordImpl(100.0, 100.0));
 		this.network.addNode(fromNode);
 		Node toNode = this.network.getFactory().createNode(new IdImpl("789012"), new CoordImpl(200.0, 200.0));
@@ -93,7 +99,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 
 	public void testNoEvents() {
 
-		KNAnalysisEventsHandler testee = new KNAnalysisEventsHandler(this.population);
+		KNAnalysisEventsHandler testee = new KNAnalysisEventsHandler(this.scenario);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(testee);
@@ -104,8 +110,9 @@ public class CalcLegTimesTest extends MatsimTestCase {
 	}
 
 	public void testAveraging() {
+		// yy this test is probably not doing anything with respect to some of the newer statistics, such as money. kai, mar'14 
 
-		KNAnalysisEventsHandler testee = new KNAnalysisEventsHandler(this.population);
+		KNAnalysisEventsHandler testee = new KNAnalysisEventsHandler(this.scenario);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(testee);
@@ -142,20 +149,9 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		calcLegTimes.addPopulationStatsAndWrite(this.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME);
 
 		// actual test: compare checksums of the files
-		{
-			final String str = CalcLegTimesTest.BASE_FILE_NAME + "beelineDistance.txt" ;
-			final long expectedChecksum = CRCChecksum.getCRCFromFile(this.getInputDirectory() + str);
-			final long actualChecksum = CRCChecksum.getCRCFromFile(this.getOutputDirectory() + str);
-			assertEquals("Output files differ.", expectedChecksum, actualChecksum);
-		}
-		{
-			final String str = CalcLegTimesTest.BASE_FILE_NAME + "duration.txt" ;
-			final long expectedChecksum = CRCChecksum.getCRCFromFile(this.getInputDirectory() + str);
-			final long actualChecksum = CRCChecksum.getCRCFromFile(this.getOutputDirectory() + str);
-			assertEquals("Output files differ.", expectedChecksum, actualChecksum);
-		}
-		{
-			final String str = CalcLegTimesTest.BASE_FILE_NAME + "durationsOtherBins.txt" ;
+		for ( StatType type : StatType.values() ) {
+			final String str = CalcLegTimesTest.BASE_FILE_NAME + type.toString() + ".txt" ;
+			Logger.getLogger(this.getClass()).info( "comparing " + str );
 			final long expectedChecksum = CRCChecksum.getCRCFromFile(this.getInputDirectory() + str);
 			final long actualChecksum = CRCChecksum.getCRCFromFile(this.getOutputDirectory() + str);
 			assertEquals("Output files differ.", expectedChecksum, actualChecksum);

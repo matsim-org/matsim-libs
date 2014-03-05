@@ -59,27 +59,27 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
  */
 public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, 
 VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
-	
+
 	private final static Logger log = Logger.getLogger(KNAnalysisEventsHandler.class);
-	
+
 	public static final String MONEY = "money";
 	public static final String TRAV_TIME = "travTime" ;
-	
+
 	private Scenario scenario = null ;
 	private Population population = null;
 	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
 	private final TreeMap<Id, Integer> agentLegs = new TreeMap<Id, Integer>();
-	
+
 	// statistics types:
-	private enum StatType { durations, durationsOtherBins, beelineDistances, legDistances, scores, payments } ;
+	enum StatType { durations, durationsOtherBins, beelineDistances, legDistances, scores, payments } ;
 
 	// container that contains the statistics containers:
 	private final Map<StatType,Map<String,int[]>> legStatsContainer = new TreeMap<StatType,Map<String,int[]>>() ;
 	// yy should probably be "double" instead of "int" (not all data are integer counts; think of emissions).  kai, jul'11
-	
+
 	// container that contains the data bin boundaries (arrays):
 	private final Map<StatType,double[]> dataBoundaries = new TreeMap<StatType,double[]>() ;
-	
+
 	// container that contains the sum (to write averages):
 	private final Map<StatType,Map<String,Double>> sumsContainer = new TreeMap<StatType,Map<String,Double>>() ;
 
@@ -88,25 +88,25 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 
 	// general trip counter.  Would, in theory, not necessary to do this per StatType, but I find it too brittle 
 	// to avoid under- or over-counting with respect to loops.
-//	private final Map<StatType,Integer> legCount = new TreeMap<StatType,Integer>() ;
-	
+	//	private final Map<StatType,Integer> legCount = new TreeMap<StatType,Integer>() ;
+
 	public KNAnalysisEventsHandler(final Scenario scenario) {
 		this(scenario.getPopulation()) ;
 		this.scenario = scenario ;
 	}
 
-	KNAnalysisEventsHandler(final Population population) {
+	private KNAnalysisEventsHandler(final Population population) {
 		this.population = population ;
-		
+
 		for ( StatType type : StatType.values() ) {
 
 			// instantiate the statistics containers:
 			Map<String,int[]> legStats = new TreeMap<String,int[]>() ;
 			this.legStatsContainer.put( type, legStats ) ;
-			
+
 			Map<String,Double> sums = new TreeMap<String,Double>() ;
 			this.sumsContainer.put( type, sums ) ;
-						
+
 			// define the bin boundaries:
 			switch ( type ) {
 			case beelineDistances: {
@@ -138,11 +138,11 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 				throw new RuntimeException("statistics container for type "+type.toString()+" not initialized.") ;
 			}
 		}
-		
+
 		// initialize everything (in the same way it is done between iterations):
 		reset(-1) ;
 	}
-	
+
 	private int getIndex( StatType type, final double dblVal) {
 		double[] dataBoundariesTmp = dataBoundaries.get(type) ;
 		int ii = dataBoundariesTmp.length-1 ;
@@ -165,15 +165,15 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 			this.agentLegs.put(event.getPersonId(), Integer.valueOf(1 + cnt.intValue()));
 		}
 	}
-	
+
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 
 	}
-	
+
 	private static int noCoordCnt = 0 ;
 	private static int noDistanceCnt = 0 ;
-	
+
 	@Override
 	public void handleEvent(final PersonArrivalEvent event) {
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
@@ -182,45 +182,45 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 			double travTime = event.getTime() - depTime;
 			controlStatisticsSum += travTime ;
 			controlStatisticsCnt ++ ;
-			
+
 			add(person,travTime, TRAV_TIME) ;
-			
+
 			int legNr = this.agentLegs.get(event.getPersonId());
 			Plan plan = person.getSelectedPlan();
 			int index = (legNr - 1) * 2;
 			final Activity fromAct = (Activity)plan.getPlanElements().get(index);
 			final Leg leg = (Leg)plan.getPlanElements().get(index+1) ;
 			final Activity toAct = (Activity)plan.getPlanElements().get(index + 2);
-			
+
 			// this defines to which legTypes this leg should belong for the statistical averaging:
 			List<String> legTypes = new ArrayList<String>() ;
 
 			// register the leg by activity type pair:
 			legTypes.add(fromAct.getType() + "---" + toAct.getType()) ;
-			
+
 			// register the leg by mode:
 			legTypes.add("zz_mode_" + leg.getMode()) ;
-			
-//			// register the leg by vehicle type:
-//			// yy this, as maybe some other things, should really be anchored to the vehicle arrival.
-//			if ( this.scenario.getVehicles()!=null ) {
-//				Id vehId = (Id) this.population.getPersonAttributes().getAttribute( person.getId().toString(), "TransportModeToVehicleIdMap" ) ;
-//				if ( vehId != null ) {
-//					Vehicles vehs = this.scenario.getVehicles() ;
-//					VehicleType type = this.scenario.getVehicles().getVehicles().get(vehId).getType();
-//					legTypes.add("yy_vehType_"+type) ;
-//				}
-//			}
-			
+
+			//			// register the leg by vehicle type:
+			//			// yy this, as maybe some other things, should really be anchored to the vehicle arrival.
+			//			if ( this.scenario.getVehicles()!=null ) {
+			//				Id vehId = (Id) this.population.getPersonAttributes().getAttribute( person.getId().toString(), "TransportModeToVehicleIdMap" ) ;
+			//				if ( vehId != null ) {
+			//					Vehicles vehs = this.scenario.getVehicles() ;
+			//					VehicleType type = this.scenario.getVehicles().getVehicles().get(vehId).getType();
+			//					legTypes.add("yy_vehType_"+type) ;
+			//				}
+			//			}
+
 			// register the leg by subpop type:
 			legTypes.add( this.getLegtypeBySubpop(person) ) ;
-			
-			
+
+
 			// register the leg for the overall average:
 			legTypes.add("zzzzzzz_all") ;
 			// (reason for so many "zzz": make entry long enough for the following tab)
 			// (This works because now ALL legs will be of legType="zzzzzzz_all".)
-			
+
 			// go through all types of statistics that are generated ...
 			for ( StatType statType : StatType.values() ) {
 
@@ -247,7 +247,7 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 				case legDistances:
 					if ( leg.getRoute() instanceof NetworkRoute ) {
 						item = RouteUtils.calcDistance( ((NetworkRoute)leg.getRoute()), this.scenario.getNetwork() ) ;
-					} else if ( !Double.isNaN( leg.getRoute().getDistance() ) )  {
+					} else if ( leg.getRoute()!=null && !Double.isNaN( leg.getRoute().getDistance() ) )  {
 						item = leg.getRoute().getDistance() ;
 					} else {
 						if ( noDistanceCnt < 10 ) {
@@ -270,7 +270,7 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 
 				addItemToAllRegisteredTypes(legTypes, statType, item);
 			}
-			
+
 		}
 	}
 
@@ -299,7 +299,7 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 				// ... also initialize the sums container ...
 				this.sumsContainer.get(statType).put(legType, 0.) ;
 			}
-			
+
 			// ... finally add the "item" to the correct bin in the container:
 			stats[getIndex(statType,item)]++;
 
@@ -313,32 +313,32 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 	public void reset(final int iteration) {
 		this.agentDepartures.clear();
 		this.agentLegs.clear();
-		
+
 		for ( StatType type : StatType.values() ) {
 			this.legStatsContainer.get(type).clear() ;
 			this.sumsContainer.get(type).clear() ;
 		}
-		
+
 		controlStatisticsSum = 0. ;
 		controlStatisticsCnt = 0. ;
 
 	}
-	
+
 	@Override
 	public void handleEvent(PersonMoneyEvent event) {
 		List<String> legTypes = new ArrayList<String>() ;
-		
+
 		final Population pop = this.scenario.getPopulation();
 		Person person = pop.getPersons().get( event.getPersonId() ) ;
 		legTypes.add( this.getLegtypeBySubpop(person)) ;
-		
+
 		double item = event.getAmount() ;
-		
+
 		this.addItemToAllRegisteredTypes(legTypes, StatType.payments, item);
 		// (this is not additive by person, but it is additive by legType.  So if a person has multiple money events, they
 		// are added up in the legType category.  kai, feb'14)
-		
-		
+
+
 		add(person, item, MONEY);
 	}
 
@@ -354,7 +354,7 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 
 	public void addPopulationStatsAndWrite(final String filenameTmp) {
 		final Population pop = this.scenario.getPopulation();
-		
+
 		// analyze Population:
 		for ( Person person : pop.getPersons().values() ) {
 			// this defines to which legTypes this leg should belong for the statistical averaging:
@@ -362,26 +362,25 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 			// (yy "leg" is a misnomer here)
 
 			legTypes.add( this.getLegtypeBySubpop(person) ) ;
-			
+
 			// register the leg for the overall average:
 			legTypes.add("zzzzzzz_all") ;
-			
+
 			Double item = person.getSelectedPlan().getScore() ;
-			
+
 			this.addItemToAllRegisteredTypes(legTypes, StatType.scores, item);
 		}
-		
+
 		// write population attributes:
 		new ObjectAttributesXmlWriter(pop.getPersonAttributes()).writeFile("derivedPersonAttributes.xml.gz");
 
 		//write statistics:
 		for ( StatType type : StatType.values() ) {
 			String filename = filenameTmp + type.toString() + ".txt" ;
-//			if ( type!=StatType.duration ) {
-//				filename += type.toString() ;
-//			}
-			BufferedWriter legStatsFile = null;
-			legStatsFile = IOUtils.getBufferedWriter(filename);
+			//			if ( type!=StatType.duration ) {
+			//				filename += type.toString() ;
+			//			}
+			BufferedWriter legStatsFile = IOUtils.getBufferedWriter(filename);
 			writeStats(type, legStatsFile );
 			try {
 				if (legStatsFile != null) {
@@ -396,26 +395,26 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 
 	private void writeStats(StatType statType, final java.io.Writer out ) throws UncheckedIOException {
 		try {
-			
+
 			boolean first = true;
 			for (Map.Entry<String, int[]> entry : this.legStatsContainer.get(statType).entrySet()) {
 				String legType = entry.getKey();
 				int[] counts = entry.getValue();
-				
+
 				// header line etc:
 				if (first) {
 					first = false;
 					out.write(statType.toString());
-//					System.out.print( "counts.length: " + counts.length ) ;
+					//					System.out.print( "counts.length: " + counts.length ) ;
 					for (int i = 0; i < counts.length; i++) {
 						out.write("\t" + this.dataBoundaries.get(statType)[i] + "+" ) ;
 					}
 					out.write("\t|\t average \t|\t cnt \t | \t sum\n");
-//					Logger.getLogger(this.getClass()).warn("Writing a file that is often called `tripXXX.txt', " +
-//							"and which explicitly talks about `trips'.  It uses, however, _legs_ as unit of analysis. " +
-//					"This makes a difference with intermodal trips.  kai, jul'11");
+					//					Logger.getLogger(this.getClass()).warn("Writing a file that is often called `tripXXX.txt', " +
+					//							"and which explicitly talks about `trips'.  It uses, however, _legs_ as unit of analysis. " +
+					//					"This makes a difference with intermodal trips.  kai, jul'11");
 				}
-				
+
 				// data:
 				int cnt = 0 ;
 				out.write(legType);
@@ -426,16 +425,16 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 				out.write("\t|\t" + this.sumsContainer.get(statType).get(legType)/cnt ) ;
 				out.write("\t|\t" + cnt  ) ;
 				out.write("\t|\t" + this.sumsContainer.get(statType).get(legType) + "\n" ) ;
-				
+
 			}
 			out.write("\n");
-			
+
 			if ( first ) { // means there was no data
 				out.write("no legs, therefore no data") ;
 				out.write("\n");
 			}
-			
-			
+
+
 			switch( statType ) {
 			case durations:
 			case durationsOtherBins:
@@ -448,7 +447,7 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 			default:
 				break;
 			}
-			
+
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		} finally {
