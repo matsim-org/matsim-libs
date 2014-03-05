@@ -254,8 +254,7 @@ public class NetworkAnalyzer extends AbstractAnalyisModule{
 		checkLinkAttributes();
 		
 		//create a bounding box for accessibility computation
-		BoundingBox bbox = new BoundingBox();
-		bbox.setDefaultBoundaryBox(this.scenario.getNetwork());
+		BoundingBox bbox = BoundingBox.createBoundingBox(this.scenario.getNetwork());
 		
 		double resolution = 100;
 		

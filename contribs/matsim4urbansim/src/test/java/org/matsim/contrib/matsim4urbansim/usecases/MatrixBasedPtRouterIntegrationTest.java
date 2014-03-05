@@ -117,8 +117,7 @@ public class MatrixBasedPtRouterIntegrationTest {
 
 		PlansCalcRouteConfigGroup plansCalcRoute = controler.getScenario().getConfig().plansCalcRoute();
 		
-		BoundingBox nbb = new BoundingBox();
-		nbb.setDefaultBoundaryBox(network);
+		BoundingBox nbb = BoundingBox.createBoundingBox(network);
 		
 		//create new pt matrix
 		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, nbb, ConfigUtils.addOrGetModule(controler.getScenario().getConfig(), MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class));

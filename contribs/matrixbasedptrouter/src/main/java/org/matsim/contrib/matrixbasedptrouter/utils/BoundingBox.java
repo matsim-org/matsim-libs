@@ -1,13 +1,10 @@
 package org.matsim.contrib.matrixbasedptrouter.utils;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 
 public class BoundingBox {
 	
-	// Logger
-	private final Logger log = Logger.getLogger(BoundingBox.class);
 	private double boundingBox [] = null;
 	
 	/**
@@ -17,10 +14,16 @@ public class BoundingBox {
 	 * @param ymin
 	 * @param xmax
 	 * @param ymax
+	 * @return TODO
 	 */
-	public void setCustomBoundaryBox(double xmin, double ymin, double xmax, double ymax){
+	public static BoundingBox createBoundingBox(double xmin, double ymin, double xmax, double ymax){
+		// no real reasons why these are static factory methods instead of constructors; was just easier to refactor. kai, mar'14
 		
-		log.info("Setting custom bounding box ...");
+		return new BoundingBox( xmin, ymin, xmax, ymax ) ;
+	}
+	
+	private BoundingBox( double xmin, double ymin, double xmax, double ymax ) {
+		// no real reasons why these are static factory methods instead of constructors; was just easier to refactor. kai, mar'14
 		
 		boundingBox = new double[4];
 		boundingBox[0] = xmin;
@@ -28,28 +31,22 @@ public class BoundingBox {
 		boundingBox[2] = xmax;
 		boundingBox[3] = ymax;
 		
-		log.info("...done!");
 	}
 	
 	/**
 	 * This determines and set the bounding box based on the network extend
 	 * 
 	 * @param network
+	 * @return TODO
 	 */
-	public void setDefaultBoundaryBox(Network network){
-		
-		if(boundingBox != null) {
-			System.out.flush();
-			log.warn("Bounding box is already initialized and will not be overwritten!");
-			System.err.flush();
-		} else {
-			System.out.flush();
-			log.warn("Setting bounding box from network! For large networks this may lead to memory issues depending on available memory and/or grid resolution. In this case define a custom bounding box.");
-			System.err.flush();
-			// The bounding box of all the given nodes as double[] = {minX, minY, maxX, maxY}
-			boundingBox = NetworkUtils.getBoundingBox(network.getNodes().values());
-			log.info("... done!");
-		}
+	public static BoundingBox createBoundingBox(Network network){
+		// no real reasons why these are static factory methods instead of constructors; was just easier to refactor. kai, mar'14
+		return new BoundingBox( NetworkUtils.getBoundingBox( network.getNodes().values() ) ) ;
+	}
+	
+	private BoundingBox( double[] bounds ) {
+		// no real reasons why these are static factory methods instead of constructors; was just easier to refactor. kai, mar'14
+		this.boundingBox = bounds ;
 	}
 	
 	////////////////////////////////

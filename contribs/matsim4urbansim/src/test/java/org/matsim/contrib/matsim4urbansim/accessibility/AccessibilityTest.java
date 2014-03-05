@@ -100,15 +100,11 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 
 		{
 			//create a bounding box with 9 measuring points (one for each node)
-			BoundingBox bbox = new BoundingBox();
 			double[] boundary = NetworkUtils.getBoundingBox(net.getNodes().values());
-
 			double minX = boundary[0]-resolution/2;
 			double minY = boundary[1]-resolution/2;
 			double maxX = boundary[2]+resolution/2;
 			double maxY = boundary[3]+resolution/2;
-
-			bbox.setCustomBoundaryBox(minX,minY,maxX,maxY);
 
 			//initialize opportunities for accessibility computation
 			ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");
@@ -178,16 +174,13 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 		Controler ctrl = new Controler(scenario);
 		ctrl.setOverwriteFiles(true);
 
-		//create a bounding box with 9 measuring points (one for each node)
-		BoundingBox bbox = new BoundingBox();
+		//create a box with 9 measuring points (one for each node)
 		double[] boundary = NetworkUtils.getBoundingBox(net.getNodes().values());
 
 		double minX = boundary[0]-resolution/2;
 		double minY = boundary[1]-resolution/2;
 		double maxX = boundary[2]+resolution/2;
 		double maxY = boundary[3]+resolution/2;
-
-		bbox.setCustomBoundaryBox(minX,minY,maxX,maxY);
 
 		//initialize opportunities for accessibility computation
 		ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");

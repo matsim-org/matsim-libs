@@ -107,8 +107,7 @@ public class PtMatrixTest extends MatsimTestCase{
 		config.addModule(module) ;
 
 		// determining the bounds minX/minY -- maxX/maxY. For optimal performance of the QuadTree. All pt stops should be evenly distributed within this rectangle.
-		BoundingBox nbb = new BoundingBox();
-		nbb.setDefaultBoundaryBox(network);
+		BoundingBox nbb = BoundingBox.createBoundingBox(network);
 		// call and init the pt matrix
 		PtMatrix ptm = PtMatrix.createPtMatrix(config.plansCalcRoute(), nbb, module);
 
@@ -217,8 +216,7 @@ public class PtMatrixTest extends MatsimTestCase{
 		module.setPtTravelDistancesInputFile(distancesLocation);				
 
 		// determining the bounds minX/minY -- maxX/maxY. For optimal performance of the QuadTree. All pt stops should be evenly distributed within this rectangle.
-		BoundingBox nbb = new BoundingBox();
-		nbb.setDefaultBoundaryBox(network);
+		BoundingBox nbb = BoundingBox.createBoundingBox(network);
 		// call and init the pt matrix
 		PtMatrix ptm = PtMatrix.createPtMatrix(config.plansCalcRoute(), nbb, module);
 

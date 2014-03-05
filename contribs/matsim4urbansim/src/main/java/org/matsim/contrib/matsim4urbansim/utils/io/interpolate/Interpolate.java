@@ -64,8 +64,7 @@ public class Interpolate {
 		Interpolation interpol = new Interpolation(inputSG, Interpolation.BILINEAR);
 		
 		log.info("Creating spatial grid for interpolated values.");
-		BoundingBox boundary = new BoundingBox();
-		boundary.setCustomBoundaryBox(inputSG.getXmin(), inputSG.getYmin(), inputSG.getXmax(), inputSG.getYmax());
+		BoundingBox boundary = BoundingBox.createBoundingBox(inputSG.getXmin(), inputSG.getYmin(), inputSG.getXmax(), inputSG.getYmax());
 		SpatialGrid outputSG= new SpatialGrid(cellSizeInMeter, boundary.getBoundingBox());
 		
 		for(double x = outputSG.getXmin(); x < outputSG.getXmax(); x = x+cellSizeInMeter){

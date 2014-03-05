@@ -34,9 +34,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
-import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.utils.AggregateObject2NearestNode;
@@ -293,8 +293,7 @@ public class MATSim4UrbanSimParcel{
 		MatrixBasedPtRouterConfigGroup ippcm = ConfigUtils.addOrGetModule(scenario.getConfig(), MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class) ;
 		if(ippcm.getPtStopsInputFile() != null){
 			log.info("Initializing MATSim4UrbanSim pseudo pt router ...");
-			BoundingBox nbb = new BoundingBox();
-			nbb.setDefaultBoundaryBox(controler.getScenario().getNetwork());
+			BoundingBox nbb = BoundingBox.createBoundingBox(controler.getScenario().getNetwork());
 			ptMatrix = PtMatrix.createPtMatrix(controler.getScenario().getConfig().plansCalcRoute(), nbb, ConfigUtils.addOrGetModule(controler.getScenario().getConfig(), MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class));	
 			controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(scenario, ptMatrix) ); // the car and pt router
 			
@@ -454,17 +453,16 @@ public class MATSim4UrbanSimParcel{
 		
 		// the boundary box defines the study area for accessibility calculations if no shape file is provided or a zone based UrbanSim application is used
 		// the boundary is either defined by a user defined boundary box or if not applicable by the extend of the road network
-		this.nwBoundaryBox 				= new BoundingBox();
 		if(this.computeGridBasedAccessibilityUsingBoundingBox){	// check if a boundary box is defined
 			// log.info("Using custom bounding box for accessibility computation.");
-			nwBoundaryBox.setCustomBoundaryBox(moduleAccessibility.getBoundingBoxLeft(), 
+			nwBoundaryBox = BoundingBox.createBoundingBox(moduleAccessibility.getBoundingBoxLeft(), 
 													moduleAccessibility.getBoundingBoxBottom(), 
 													moduleAccessibility.getBoundingBoxRight(), 
 													moduleAccessibility.getBoundingBoxTop());
 		}
 		else{	// no boundary box defined using boundary of hole network for accessibility computation
 			// log.warn("Using the boundary of the network file for accessibility computation. This could lead to memory issues when the network is large and/or the cell size is too fine.");
-			nwBoundaryBox.setDefaultBoundaryBox(scenario.getNetwork());
+			nwBoundaryBox = BoundingBox.createBoundingBox(scenario.getNetwork());
 		}
 	}
 	

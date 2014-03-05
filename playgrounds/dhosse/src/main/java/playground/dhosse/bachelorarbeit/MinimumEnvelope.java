@@ -46,8 +46,7 @@ public class MinimumEnvelope {
 		
 		log.info("creating minimum envelope for given network...");
 		
-		BoundingBox bbox = new BoundingBox();
-		bbox.setDefaultBoundaryBox(this.net);
+		BoundingBox bbox = BoundingBox.createBoundingBox(this.net);
 		
 		List<Coord> coordinates = new ArrayList<Coord>();
 		List<Id> outerNodes = new ArrayList<Id>();

@@ -48,6 +48,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 public class NetworkInspector {//TODO pfade ändern
 	
+	@Deprecated // please do not public static variables in matsim. kai, mar'14
 	private static Scenario scenario = null;
 	
 	private Map<Id,Double> geometricLengths = new HashMap<Id,Double>();
@@ -313,8 +314,7 @@ public class NetworkInspector {//TODO pfade ändern
 		if(!(this.nodeTypes.size()<1))
 			exportNodesToShape();
 		
-		BoundingBox bbox = new BoundingBox();
-		bbox.setDefaultBoundaryBox(NetworkInspector.scenario.getNetwork());
+		BoundingBox bbox = BoundingBox.createBoundingBox(NetworkInspector.scenario.getNetwork());
 		
 		ZoneLayer<Id> measuringPoints = NetworkInspector.createGridLayerByGridSizeByNetwork(50, bbox.getBoundingBox());
 		// tnicolai: ich habe die GridUtils auskommentiert, da es sonst nicht mehr kompiliert.

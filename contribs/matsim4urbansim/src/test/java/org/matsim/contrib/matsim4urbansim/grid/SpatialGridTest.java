@@ -19,8 +19,7 @@ public class SpatialGridTest extends MatsimTestCase{
 		Network network = CreateTestNetwork.createTestNetwork();
 		
 		// get boundaries of network, i.e. x and y coordinates
-		BoundingBox nbb = new BoundingBox();
-		nbb.setDefaultBoundaryBox(network);		
+		BoundingBox nbb = BoundingBox.createBoundingBox(network);		
 		
 		// create spatial grid		
 		SpatialGrid testGrid = new SpatialGrid(cellSize, nbb.getBoundingBox());
