@@ -22,6 +22,8 @@ package org.matsim.contrib.grips.simulation;
 
 import java.awt.image.BufferedImage;
 
+import javax.swing.JOptionPane;
+
 import org.matsim.contrib.grips.control.Controller;
 import org.matsim.contrib.grips.model.AbstractModule;
 import org.matsim.contrib.grips.model.AbstractToolBox;
@@ -33,12 +35,15 @@ import org.matsim.contrib.grips.view.DefaultWindow;
 public class SimulationComputation extends AbstractModule {
 
 	private SimulationMask msgMask;
+
 	public static void main(String[] args) {
 		final Controller controller = new Controller();
 
 		// set up controller and image interface
-		BufferedImage image = new BufferedImage(width - border * 2, height - border * 2, BufferedImage.TYPE_INT_ARGB);
-		BufferedImageContainer imageContainer = new BufferedImageContainer(image, border);
+		BufferedImage image = new BufferedImage(width - border * 2, height
+				- border * 2, BufferedImage.TYPE_INT_ARGB);
+		BufferedImageContainer imageContainer = new BufferedImageContainer(
+				image, border);
 		controller.setImageContainer(imageContainer);
 
 		// inform controller that this module is running stand alone
@@ -59,7 +64,8 @@ public class SimulationComputation extends AbstractModule {
 	}
 
 	public SimulationComputation(Controller controller) {
-		super(controller.getLocale().moduleMatsimScenarioGenerator(), Constants.ModuleType.MATSIMSCENARIO, controller);
+		super(controller.getLocale().moduleMatsimScenarioGenerator(),
+				Constants.ModuleType.MATSIMSCENARIO, controller);
 
 		this.processList.add(new BasicProcess(this, this.controller) {
 			@Override
@@ -75,8 +81,13 @@ public class SimulationComputation extends AbstractModule {
 				// check if Matsim config (including the OSM network) has been
 				// loaded
 				if (!controller.isMatsimConfigOpened())
-					if (!controller.openMastimConfig())
-						exit(locale.msgOpenMatsimConfigFailed());
+					if (!controller.openMastimConfig()) {
+						JOptionPane.showConfirmDialog(msgMask,
+								"Not a matsim file. Maybe a grips file.",
+								"Fatal error. Exiting.",
+								JOptionPane.WARNING_MESSAGE);
+						exit("Not a matsim file. Maybe a grips file.");
+					}
 
 				msgMask.readConfig();
 
@@ -91,6 +102,5 @@ public class SimulationComputation extends AbstractModule {
 	public AbstractToolBox getToolBox() {
 		return null;
 	}
-
 
 }

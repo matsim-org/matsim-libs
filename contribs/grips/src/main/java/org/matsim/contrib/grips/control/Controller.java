@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.EventListener;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -112,9 +113,9 @@ public class Controller {
 	private GripsConfigModule gripsConfigModule;
 	private Config matsimConfig;
 
-	private String configCoordinateSystem = "EPSG:3395";
-	private String sourceCoordinateSystem = "EPSG:4326";
-	private String targetCoordinateSystem;
+	// private String configCoordinateSystem = Constants.getEPSG();
+	private String sourceCoordinateSystem = "EPSG:4326"; // WGS 84
+	private String targetCoordinateSystem = Constants.getEPSG();
 	private Scenario scenario;
 	private Point2D centerPosition;
 	private CoordinateTransformation ctTarget2Osm;
@@ -131,7 +132,6 @@ public class Controller {
 	private JPanel mainPanel;
 	private Rectangle mainPanelBounds;
 	private boolean inSelection;
-
 
 	private ShapeUtils shapeUtils;
 
@@ -159,6 +159,7 @@ public class Controller {
 	private EventData data;
 	private String wms;
 	private String layer;
+
 	private ModuleChain moduleChain;
 
 	public Controller() {
@@ -191,13 +192,12 @@ public class Controller {
 		}
 	}
 
-	private void printUsage()
-	{
+	private void printUsage() {
 		System.out.println(locale.getUsage());
-		//TODO:
-//		JOptionPane.showConfirmDialog(this, locale.infoMatsimTime(), "", JOptionPane.WARNING_MESSAGE);
-		
-		
+		// TODO:
+		// JOptionPane.showConfirmDialog(this, locale.infoMatsimTime(), "",
+		// JOptionPane.WARNING_MESSAGE);
+
 	}
 
 	public String getMatsimConfigFile() {
@@ -331,7 +331,8 @@ public class Controller {
 			this.parentComponent.repaint();
 	}
 
-	public void setSlippyMapEventListeners(ArrayList<EventListener> eventListeners) {
+	public void setSlippyMapEventListeners(
+			ArrayList<EventListener> eventListeners) {
 
 		// put each listener to the corresponding array list
 		initListeners();
@@ -378,7 +379,7 @@ public class Controller {
 	}
 
 	public boolean hasMapRenderer() {
-		if (this.visualizer!=null)
+		if (this.visualizer != null)
 			return this.visualizer.hasMapRenderer();
 		else
 			return false;
@@ -406,16 +407,72 @@ public class Controller {
 	}
 
 	public boolean openGripsConfig(File selectedFile) {
+		boolean rv = false;
 		try {
-			this.gripsConfigModule = new GripsConfigModule("grips");
-			GripsConfigDeserializer parser = new GripsConfigDeserializer(this.gripsConfigModule);
+			this.gripsConfigModule = new GripsConfigModule("grips",
+					selectedFile.getAbsolutePath());
+			GripsConfigDeserializer parser = new GripsConfigDeserializer(
+					this.gripsConfigModule);
 			parser.readFile(selectedFile.getAbsolutePath());
 
 			this.scenarioPath = selectedFile.getParent();
 			this.gripsFile = selectedFile.getAbsolutePath();
 
-			this.readOSMFile(this.gripsConfigModule.getNetworkFileName());
-			this.setCurrentOSMFile(this.gripsConfigModule.getNetworkFileName());
+			String osmf = this.gripsConfigModule.getNetworkFileNameAbsolute();
+			try {
+				rv = this.readOSMFile(osmf);
+				if (rv == false)
+					JOptionPane.showConfirmDialog(null, "OSM file " + osmf
+							+ " does not exists.", "Fatal error. Exiting.",
+							JOptionPane.WARNING_MESSAGE);
+
+			} catch (Exception e) {
+				return false;
+			}
+			this.setCurrentOSMFile(osmf);
+
+			String areafile = this.gripsConfigModule
+					.getEvacuationAreaFileNameAbsolute();
+			// String popDensFilename =
+			// this.gripsConfigModule.getPopDensFilename();
+
+			this.setWms(this.gripsConfigModule.getWms());
+			this.setLayer(this.gripsConfigModule.getLayer());
+
+			File file = new File(areafile);
+			String dir = file.getParent();
+			File dirfile = new File(dir);
+			if (!dirfile.exists()) {
+				JOptionPane
+						.showConfirmDialog(
+								null,
+								"Area file "
+										+ areafile
+										+ " is located in an invalid directory.\nPlease select another area file.",
+								"Warning", JOptionPane.WARNING_MESSAGE);
+			}
+			if (!file.getName().endsWith(".shp"))
+				areafile += ".shp";
+			GripsConfigModule gcm = this.getGripsConfigModule();
+			gcm.setEvacuationAreaFileName(areafile);
+
+			String popfile = this.gripsConfigModule
+					.getPopulationFileNameAbsolute();
+			file = new File(popfile);
+			dir = file.getParent();
+			dirfile = new File(dir);
+			if (!dirfile.exists()) {
+				JOptionPane
+						.showConfirmDialog(
+								null,
+								"Population file "
+										+ popfile
+										+ " is located in an invalid directory. \nPlease select another population file.",
+								"Warning", JOptionPane.WARNING_MESSAGE);
+			}
+			if (!file.getName().endsWith(".shp"))
+				popfile += ".shp";
+			this.getGripsConfigModule().setPopulationFileName(popfile);
 
 			if (!standAlone)
 				updateOtherModules();
@@ -423,8 +480,22 @@ public class Controller {
 			return true;
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			return false;
+			rv = false;
 		}
+		return rv;
+	}
+
+	private void setPopDensFilename(String popDensFilename) {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void setLayer(String layer) {
+		this.layer = layer;
+	}
+
+	private void setWms(String wms) {
+		this.wms = wms;
 	}
 
 	public String getGripsFile() {
@@ -432,7 +503,8 @@ public class Controller {
 	}
 
 	public boolean openGripsConfig() {
-		DefaultOpenDialog openDialog = new DefaultOpenDialog(this, "xml", locale.infoGripsFile(), false);
+		DefaultOpenDialog openDialog = new DefaultOpenDialog(this, "xml",
+				locale.infoGripsFile(), false);
 		int returnValue = openDialog.showOpenDialog(this.getParentComponent());
 
 		if (returnValue == JFileChooser.APPROVE_OPTION)
@@ -448,8 +520,8 @@ public class Controller {
 	}
 
 	private void updateOtherModules() {
-		
-		//TODO add listener
+
+		// TODO add listener
 
 	}
 
@@ -461,9 +533,11 @@ public class Controller {
 			// if (matsimConfig==null)
 			{
 				matsimConfig = ConfigUtils.createConfig();
-				matsimConfig.global().setCoordinateSystem(this.configCoordinateSystem);
+				matsimConfig.global().setCoordinateSystem(
+						this.targetCoordinateSystem);
 
-				this.targetCoordinateSystem = matsimConfig.global().getCoordinateSystem();
+				this.targetCoordinateSystem = matsimConfig.global()
+						.getCoordinateSystem();
 				this.scenario = ScenarioUtils.createScenario(matsimConfig);
 
 			}
@@ -472,7 +546,8 @@ public class Controller {
 			checkGeoTransformationTools();
 
 			// finally read network
-			OsmNetworkReader reader = new OsmNetworkReader(this.scenario.getNetwork(), ctOsm2Target, true);
+			OsmNetworkReader reader = new OsmNetworkReader(
+					this.scenario.getNetwork(), ctOsm2Target, true);
 			reader.setKeepPaths(true);
 			reader.parse(networkFileName);
 
@@ -489,8 +564,10 @@ public class Controller {
 	private void checkGeoTransformationTools() {
 		// are the transformation tools already at hand?
 		if ((ctOsm2Target == null) || (ctTarget2Osm == null)) {
-			this.ctOsm2Target = new GeotoolsTransformation(this.sourceCoordinateSystem, this.targetCoordinateSystem);
-			this.ctTarget2Osm = new GeotoolsTransformation(this.targetCoordinateSystem, this.sourceCoordinateSystem);
+			this.ctOsm2Target = new GeotoolsTransformation(
+					this.sourceCoordinateSystem, this.targetCoordinateSystem);
+			this.ctTarget2Osm = new GeotoolsTransformation(
+					this.targetCoordinateSystem, this.sourceCoordinateSystem);
 		}
 	}
 
@@ -506,13 +583,15 @@ public class Controller {
 		}
 
 		// calculate center and bounding box
-		Coord centerC = new CoordImpl((e.getMaxX() + e.getMinX()) / 2, (e.getMaxY() + e.getMinY()) / 2);
+		Coord centerC = new CoordImpl((e.getMaxX() + e.getMinX()) / 2,
+				(e.getMaxY() + e.getMinY()) / 2);
 		Coord min = new CoordImpl(e.getMinX(), e.getMinY());
 		Coord max = new CoordImpl(e.getMaxX(), e.getMaxY());
 
 		// also process links (to link quad tree)
 		if (processLinks) {
-			this.links = new LinkQuadTree(e.getMinX(), e.getMinY(), e.getMaxX(), e.getMaxY());
+			this.links = new LinkQuadTree(e.getMinX(), e.getMinY(),
+					e.getMaxX(), e.getMaxY());
 			this.linkList = new ArrayList<Link>();
 			NetworkImpl net = (NetworkImpl) this.scenario.getNetwork();
 			for (Link link : net.getLinks().values()) {
@@ -531,7 +610,8 @@ public class Controller {
 
 		// pass center position and bounding box to the controller
 		this.centerPosition = new Point2D.Double(centerC.getX(), centerC.getY());
-		this.boundingBox = new Rectangle2D.Double(min.getY(), min.getX(), max.getY() - min.getY(), max.getX() - min.getX());
+		this.boundingBox = new Rectangle2D.Double(min.getY(), min.getX(),
+				max.getY() - min.getY(), max.getX() - min.getX());
 	}
 
 	public CoordinateTransformation getCtOsm2Target() {
@@ -566,7 +646,8 @@ public class Controller {
 	public void removeAllPanelEventListeners() {
 		if (this.mainPanel != null) {
 			MouseListener[] ms = this.mainPanel.getMouseListeners();
-			MouseMotionListener[] mms = this.mainPanel.getMouseMotionListeners();
+			MouseMotionListener[] mms = this.mainPanel
+					.getMouseMotionListeners();
 			MouseWheelListener[] mws = this.mainPanel.getMouseWheelListeners();
 			KeyListener[] ks = this.mainPanel.getKeyListeners();
 
@@ -585,8 +666,8 @@ public class Controller {
 	/**
 	 * Add a shape. Since no specific layer is given:
 	 * 
-	 * - scans for shapes - creates a new shape, if no shape 
-	 * found or replaces the old shape with the same id
+	 * - scans for shapes - creates a new shape, if no shape found or replaces
+	 * the old shape with the same id
 	 * 
 	 * @param shape
 	 */
@@ -660,10 +741,14 @@ public class Controller {
 	public Rectangle geoToPixel(Rectangle2D rectangle) {
 
 		Point2D minGeo = new Point2D.Double(rectangle.getX(), rectangle.getY());
-		Point2D maxGeo = new Point2D.Double(rectangle.getX() + rectangle.getWidth(), rectangle.getY() + rectangle.getHeight());
+		Point2D maxGeo = new Point2D.Double(rectangle.getX()
+				+ rectangle.getWidth(), rectangle.getY()
+				+ rectangle.getHeight());
 
-		Point2D minPoint = this.visualizer.getActiveMapRenderLayer().geoToPixel(minGeo);
-		Point2D maxPoint = this.visualizer.getActiveMapRenderLayer().geoToPixel(maxGeo);
+		Point2D minPoint = this.visualizer.getActiveMapRenderLayer()
+				.geoToPixel(minGeo);
+		Point2D maxPoint = this.visualizer.getActiveMapRenderLayer()
+				.geoToPixel(maxGeo);
 
 		// preliminary assignment
 		int x = (int) minPoint.getX();
@@ -694,7 +779,6 @@ public class Controller {
 		return this.visualizer.getActiveMapRenderLayer().pixelToGeo(point);
 	}
 
-
 	public void setZoom(int zoom) {
 		if (this.visualizer.getActiveMapRenderLayer() != null)
 			this.visualizer.getActiveMapRenderLayer().setZoom(zoom);
@@ -715,7 +799,9 @@ public class Controller {
 	}
 
 	public void updatePanelBounds() {
-		mainPanelBounds = SwingUtilities.convertRectangle(mainPanel.getParent(), mainPanel.getBounds(), this.getParentComponent());
+		mainPanelBounds = SwingUtilities.convertRectangle(
+				mainPanel.getParent(), mainPanel.getBounds(),
+				this.getParentComponent());
 	}
 
 	public JPanel getMainPanel() {
@@ -739,15 +825,17 @@ public class Controller {
 	}
 
 	public String getConfigCoordinateSystem() {
-		return configCoordinateSystem;
+		return this.targetCoordinateSystem;
 	}
 
 	public boolean saveShape(Shape shape, String fileName) {
 		if (shape instanceof PolygonShape) {
-			boolean saved = ShapeIO.savePolygon(this, (PolygonShape) shape, this.gripsConfigModule.getEvacuationAreaFileName());
-//			if (saved)
-//				System.out.println("saved polygon to " + this.gripsConfigModule.getEvacuationAreaFileName());
-			//TODO confirmation dialog
+			boolean saved = ShapeIO.savePolygon(this, (PolygonShape) shape,
+					this.gripsConfigModule.getEvacuationAreaFileNameAbsolute());
+			// if (saved)
+			// System.out.println("saved polygon to " +
+			// this.gripsConfigModule.getEvacuationAreaFileName());
+			// TODO confirmation dialog
 		}
 
 		return true;
@@ -800,18 +888,20 @@ public class Controller {
 		// grips config is not opened, check for file destination in scenario
 		if (this.gripsConfigModule == null) {
 			if (this.scenario != null)
-				dest = this.scenario.getConfig().getModule("grips").getValue("evacuationAreaFile");
+				dest = this.scenario.getConfig().getModule("grips")
+						.getValue("evacuationAreaFile");
 			else
 				return false;
 		} else
-			dest = this.gripsConfigModule.getEvacuationAreaFileName();
+			dest = this.gripsConfigModule.getEvacuationAreaFileNameAbsolute();
 
 		return openShape(id, dest, evacShapeStyle);
 	}
 
 	public boolean openShape(String id, String fileName, ShapeStyle style) {
 		try {
-			PolygonShape evacShape = ShapeIO.getShapeFromFile(this, id, fileName);
+			PolygonShape evacShape = ShapeIO.getShapeFromFile(this, id,
+					fileName);
 			evacShape.setStyle(style);
 			addShape(evacShape);
 			return true;
@@ -833,11 +923,13 @@ public class Controller {
 		ArrayList<PolygonShape> polygonShapes = new ArrayList<PolygonShape>();
 
 		for (Shape shape : this.getActiveShapes())
-			if ((shape instanceof PolygonShape) && (shape.getMetaData(Constants.POPULATION) != null))
+			if ((shape instanceof PolygonShape)
+					&& (shape.getMetaData(Constants.POPULATION) != null))
 				polygonShapes.add((PolygonShape) shape);
 
 		if (polygonShapes.size() > 0)
-			return ShapeIO.savePopulationAreaPolygons(this, polygonShapes, populationFileName);
+			return ShapeIO.savePopulationAreaPolygons(this, polygonShapes,
+					populationFileName);
 
 		return false;
 
@@ -863,8 +955,9 @@ public class Controller {
 	}
 
 	public boolean openMastimConfig() {
-		
-		DefaultOpenDialog openDialog = new DefaultOpenDialog(this, "xml", locale.infoMatsimFile(), false);
+
+		DefaultOpenDialog openDialog = new DefaultOpenDialog(this, "xml",
+				locale.infoMatsimFile(), false);
 		int returnValue = openDialog.showOpenDialog(this.getParentComponent());
 
 		if (returnValue == JFileChooser.APPROVE_OPTION)
@@ -880,19 +973,18 @@ public class Controller {
 			this.scenarioPath = file.getParent();
 
 			this.matsimConfigFile = file.getAbsolutePath();
-			file.getParent();
 
-			try{
-				this.matsimConfig = ConfigUtils.loadConfig(this.matsimConfigFile);
-			}
-			catch(org.matsim.core.utils.io.UncheckedIOException e)
-			{
+			try {
+				this.matsimConfig = ConfigUtils
+						.loadConfig(this.matsimConfigFile);
+			} catch (org.matsim.core.utils.io.UncheckedIOException e) {
 				e.printStackTrace();
-				//TODO check if MATSim or GRIPS config!
+				// TODO check if MATSim or GRIPS config!
 			}
 			this.scenario = ScenarioUtils.loadScenario(this.matsimConfig);
 
-			this.targetCoordinateSystem = matsimConfig.global().getCoordinateSystem();
+			this.targetCoordinateSystem = matsimConfig.global()
+					.getCoordinateSystem();
 
 			// check if geo tranformation tools are available
 			checkGeoTransformationTools();
@@ -916,9 +1008,9 @@ public class Controller {
 		return scenarioPath;
 	}
 
-	public void setConfigCoordinateSystem(String configCoordinateSystem) {
-		this.configCoordinateSystem = configCoordinateSystem;
-	}
+	// public void setConfigCoordinateSystem(String configCoordinateSystem) {
+	// this.configCoordinateSystem = configCoordinateSystem;
+	// }
 
 	public void setScenarioPath(String scenarioPath) {
 		this.scenarioPath = scenarioPath;
@@ -951,13 +1043,15 @@ public class Controller {
 		// grips config is not opened, check for file destination in scenario
 		if (this.gripsConfigModule == null) {
 			if (this.scenario != null)
-				dest = this.scenario.getConfig().getModule("grips").getValue("populationFile");
+				dest = this.scenario.getConfig().getModule("grips")
+						.getValue("populationFile");
 			else
 				return false;
 		} else
 			dest = this.gripsConfigModule.getPopulationFileName();
 
-		ArrayList<PolygonShape> popShapes = ShapeIO.getShapesFromFile(this, dest, Constants.SHAPESTYLE_POPAREA);
+		ArrayList<PolygonShape> popShapes = ShapeIO.getShapesFromFile(this,
+				dest, Constants.SHAPESTYLE_POPAREA);
 		for (PolygonShape shape : popShapes)
 			addShape(shape);
 
@@ -968,17 +1062,21 @@ public class Controller {
 
 	public boolean openNetworkChangeEvents() {
 		if (this.scenario != null) {
-			Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl) this.scenario.getNetwork()).getNetworkChangeEvents();
+			Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl) this.scenario
+					.getNetwork()).getNetworkChangeEvents();
 			int id = visualizer.getPrimaryShapeRenderLayer().getId();
 
 			if (changeEvents != null) {
 				for (NetworkChangeEvent event : changeEvents) {
 					Collection<Link> changeEventLinks = event.getLinks();
 					for (Link link : changeEventLinks) {
-						Point2D from2D = this.coordToPoint(link.getFromNode().getCoord());
-						Point2D to2D = this.coordToPoint(link.getToNode().getCoord());
+						Point2D from2D = this.coordToPoint(link.getFromNode()
+								.getCoord());
+						Point2D to2D = this.coordToPoint(link.getToNode()
+								.getCoord());
 
-						LineShape linkShape = ShapeFactory.getRoadClosureShape(id, link.getId().toString(), from2D, to2D);
+						LineShape linkShape = ShapeFactory.getRoadClosureShape(
+								id, link.getId().toString(), from2D, to2D);
 						addShape(linkShape);
 					}
 				}
@@ -1023,8 +1121,7 @@ public class Controller {
 	public void setGoalAchieved(boolean goalAchieved) {
 		if (goalAchieved) {
 			AbstractModule module = getModuleByType(activeModuleType);
-			if (module != null)
-			{
+			if (module != null) {
 				module.enableNextModules();
 				module.disablePastModules();
 			}
@@ -1044,20 +1141,21 @@ public class Controller {
 
 	public void enableModule(ModuleType moduleType) {
 		AbstractModule module = getModuleByType(moduleType);
-		if (module != null) 
+		if (module != null)
 			module.setEnabled(true);
 
 	}
-	
+
 	public void disableModule(ModuleType moduleType) {
 		AbstractModule module = getModuleByType(moduleType);
-		if (module != null) 
+		if (module != null)
 			module.setEnabled(false);
-		
+
 	}
 
 	public void updateParentUI() {
-		if ((parentComponent != null) && (parentComponent instanceof DefaultWindow))
+		if ((parentComponent != null)
+				&& (parentComponent instanceof DefaultWindow))
 			((DefaultWindow) parentComponent).updateMask();
 
 	}
@@ -1067,8 +1165,10 @@ public class Controller {
 	}
 
 	public void setToolBoxVisible(boolean toggle) {
-		if ((this.getParentComponent() != null) && (this.getParentComponent() instanceof DefaultWindow))
-			((DefaultWindow) this.getParentComponent()).setToolBoxVisible(toggle);
+		if ((this.getParentComponent() != null)
+				&& (this.getParentComponent() instanceof DefaultWindow))
+			((DefaultWindow) this.getParentComponent())
+					.setToolBoxVisible(toggle);
 	}
 
 	public EventData getEventData() {
@@ -1096,7 +1196,8 @@ public class Controller {
 	}
 
 	public String getIterationsOutputDirectory() {
-		return this.scenario.getConfig().getModule("controler").getValue("outputDirectory");
+		return this.scenario.getConfig().getModule("controler")
+				.getValue("outputDirectory");
 	}
 
 	public void exit(String exitString) {
@@ -1120,7 +1221,7 @@ public class Controller {
 	}
 
 	public ArrayList<ModuleType> getNextModules(ModuleType moduleType) {
-		if (this.moduleChain==null)
+		if (this.moduleChain == null)
 			return null;
 		else
 			return this.moduleChain.getNextModules(moduleType);
@@ -1128,33 +1229,31 @@ public class Controller {
 	}
 
 	public ArrayList<ModuleType> getPastModules(ModuleType moduleType) {
-		if (this.moduleChain==null)
+		if (this.moduleChain == null)
 			return null;
 		else
-		return this.moduleChain.getPastModules(moduleType);
+			return this.moduleChain.getPastModules(moduleType);
 	}
-	
+
 	public boolean isInSelection() {
 		return inSelection;
 	}
-	
+
 	public void setInSelection(boolean inSelection) {
 		this.inSelection = inSelection;
 	}
 
 	public int getPopAreaCount() {
-		
-		for (AbstractModule module : modules)
-		{
+
+		for (AbstractModule module : modules) {
 			if (module instanceof PopAreaSelector)
-				return ((PopAreaSelector)module).getPopAreaCount();
+				return ((PopAreaSelector) module).getPopAreaCount();
 		}
 		return -1;
 	}
-	
-	public void deselectShapes()
-	{
-		for (Shape shape : getActiveShapes()) 
+
+	public void deselectShapes() {
+		for (Shape shape : getActiveShapes())
 			shape.setSelected(false);
 	}
 
@@ -1163,42 +1262,42 @@ public class Controller {
 			if (shape.getMetaData(string) != null)
 				shape.setSelected(false);
 		}
-		
-	}
-	
-	public boolean writeGripsConfig()
-	{
-		if ((this.gripsConfigModule!=null) && (this.gripsFile!=null))
-		{
-			return writeGripsConfig(this.gripsConfigModule, this.gripsFile);
-		}
-		else
-			return false;
-		
+
 	}
 
-	public boolean writeGripsConfig(GripsConfigModule gripsConfigModule, String fileLocation) {
-		
-		if (gripsConfigModule!=null)
-		{
+	public boolean writeGripsConfig() {
+		if ((this.gripsConfigModule != null) && (this.gripsFile != null)) {
+			return writeGripsConfig(this.gripsConfigModule, this.gripsFile);
+		} else
+			return false;
+
+	}
+
+	public boolean writeGripsConfig(GripsConfigModule gripsConfigModule,
+			String fileLocation) {
+
+		if (gripsConfigModule != null) {
 			try {
-				GripsConfigSerializer gcs = new GripsConfigSerializer(gripsConfigModule);
+				GripsConfigSerializer gcs = new GripsConfigSerializer(
+						gripsConfigModule);
 				gcs.write(fileLocation);
-				
+
 			} catch (Exception e) {
 				e.printStackTrace();
 				return false;
 			}
-			
+
 			return true;
-		}
-		else
+		} else
 			return false;
 	}
 
 	public void setUnsavedChanges(boolean b) {
 		getModuleByType(this.getActiveModuleType()).setUnsavedChanges(b);
 	}
-	
-	
+
+	public String getPopDensFilename() {
+		return this.getGripsConfigModule().getPopDensFilename();
+	}
+
 }

@@ -71,6 +71,7 @@ public class ScenarioManager extends DefaultWindow
 		ArrayList<AbstractModule> moduleChain = new ArrayList<AbstractModule>();
 		
 		//current work flow
+		moduleChain.add(new ScenarioXMLEditor(controller));
 		moduleChain.add(new EvacuationAreaSelector(controller));
 		moduleChain.add(new PopulationAreaSelector(controller));
 		moduleChain.add(new MatsimNetworkGenerator(controller));

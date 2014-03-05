@@ -86,6 +86,7 @@ public class GermanLocale implements Locale
 	public String btSet = "Setzen";
 	public String msgSameFiles = "Die angegebene Datei stimmt mit einer anderen ausgewählten Datei überein!";
 	public String msgUnsavedChanges = "Möchten Sie die aktuellen Änderungen speichern?";
+	private Object infoMatsimOverwrite = "Ausgabeverzeichnis existiert und wird umbenannt.";
 	public String labelExistingShapeFile = "Existierende Shape-Datei";
 
 
@@ -371,6 +372,10 @@ public class GermanLocale implements Locale
 	@Override
 	public String labelExistingShapeFile() {
 		return labelExistingShapeFile;
+	}
+	@Override
+	public Object infoMatsimOverwriteOutputDir() {
+		return infoMatsimOverwrite ;
 	}
 
 

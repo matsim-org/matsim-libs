@@ -24,34 +24,20 @@ import java.io.File;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.matsim.contrib.grips.control.Controller;
 
-public class DefaultSaveDialog extends JFileChooser
-{
+public class DefaultSaveDialog extends JFileChooser {
 	private static final long serialVersionUID = 1L;
 	protected Controller controller;
-	public DefaultSaveDialog(Controller controller, final String fileExtension, final String fileDescription, boolean mandatory)
-	{
+
+	public DefaultSaveDialog(Controller controller, final String fileExtension,
+			final String fileDescription, boolean mandatory) {
+
 		this.controller = controller;
-		this.setFileFilter(new FileFilter()
-		{
-			
-			@Override
-			public String getDescription()
-			{
-				return fileDescription;
-			}
-			
-			@Override
-			public boolean accept(File f)
-			{
-				if (f.toString().endsWith(fileExtension))
-					return true;
-				else
-					return false;
-			}
-		});
+		this.setFileFilter(new FileNameExtensionFilter(fileDescription,
+				fileExtension));
 		this.setCurrentDirectory(controller.getCurrentWorkingDirectory());
 	}
 

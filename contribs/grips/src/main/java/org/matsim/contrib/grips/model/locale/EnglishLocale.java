@@ -87,6 +87,7 @@ public class EnglishLocale implements Locale
 	public String labelCurrentFile = "current file";
 	public String msgSameFiles = "The selected file is equal to another selected file!";
 	public String msgUnsavedChanges = "Do you want to save the current changes?";
+	private Object infoMatsimOverwrite = "Output directory exists and will be renamed";
 	public String labelExistingShapeFile = "existing shape file";
 	
 	
@@ -366,6 +367,10 @@ public class EnglishLocale implements Locale
 		return msgUnsavedChanges;
 	}
 
+	@Override
+	public Object infoMatsimOverwriteOutputDir() {
+		return infoMatsimOverwrite;
+	}
 	@Override
 	public String labelExistingShapeFile() {
 		return labelExistingShapeFile;

@@ -70,8 +70,8 @@ class PopToolBox extends AbstractToolBox {
 	private static final long serialVersionUID = 1L;
 	private JButton openBtn;
 	public JButton loadPopBtn;
-	
-	
+	private JButton clearBtn;
+
 	private JButton saveButton;
 	private JButton popDeleteBt;
 
@@ -81,7 +81,7 @@ class PopToolBox extends AbstractToolBox {
 	private JTextField popInput;
 	private String selectedAreaID = "-1";
 	protected boolean editing = false;
-
+	private Object[] columnNames;
 
 	PopToolBox(AbstractModule module, final Controller controller) {
 		super(module, controller);
@@ -90,7 +90,7 @@ class PopToolBox extends AbstractToolBox {
 
 		JPanel tools = new JPanel(new BorderLayout());
 
-		Object[] columnNames = { locale.titleAreaID(), locale.titlePopulation() };
+		columnNames = new Object[] { locale.titleAreaID(), locale.titlePopulation() };
 
 		@SuppressWarnings("serial")
 		DefaultTableModel tableModel = new DefaultTableModel() {
@@ -104,13 +104,14 @@ class PopToolBox extends AbstractToolBox {
 		tableModel.setDataVector(areaTableData, columnNames);
 		areaTable = new JTable();
 		areaTable.setModel(tableModel);
-		areaTable.getSelectionModel().addListSelectionListener(new SelectionListener(this));
+		areaTable.getSelectionModel().addListSelectionListener(
+				new SelectionListener(this));
 		areaTable.setSelectionBackground(Color.blue);
 		areaTable.setSelectionForeground(Color.white);
 		areaTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//		areaTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-//		areaTable.getColumnModel().getColumn(0).setMinWidth(0);
-//		areaTable.getColumnModel().getColumn(0).setMaxWidth(0);
+		// areaTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		// areaTable.getColumnModel().getColumn(0).setMinWidth(0);
+		// areaTable.getColumnModel().getColumn(0).setMaxWidth(0);
 
 		JPanel editAreaPanel = new JPanel(new GridLayout(0, 3));
 
@@ -136,7 +137,8 @@ class PopToolBox extends AbstractToolBox {
 					if (id.equals(selectedAreaID))
 						break;
 				}
-				((DefaultTableModel) areaTable.getModel()).setValueAt(popInput.getText(), i, 1);
+				((DefaultTableModel) areaTable.getModel()).setValueAt(
+						popInput.getText(), i, 1);
 
 				if (id != "") {
 					Shape shape = PopToolBox.this.controller.getShapeById(id);
@@ -160,14 +162,17 @@ class PopToolBox extends AbstractToolBox {
 
 				if (sel > -1) {
 					editing = true;
-					DefaultTableModel defModel = (DefaultTableModel) areaTable.getModel();
+					DefaultTableModel defModel = (DefaultTableModel) areaTable
+							.getModel();
 
 					if (areaTable.getSelectedRow() <= defModel.getRowCount()) {
-						String id = (String) (areaTable.getModel()).getValueAt(sel, 0);
+						String id = (String) (areaTable.getModel()).getValueAt(
+								sel, 0);
 						controller.removeShape(id);
 
 						// delete action/weight (row) in table
-						((DefaultTableModel) areaTable.getModel()).removeRow(areaTable.getSelectedRow());
+						((DefaultTableModel) areaTable.getModel())
+								.removeRow(areaTable.getSelectedRow());
 
 						controller.paintLayers();
 
@@ -199,30 +204,35 @@ class PopToolBox extends AbstractToolBox {
 		tools.setBorder(BorderFactory.createTitledBorder(locale.titlePopAreas()));
 
 		this.openBtn = new JButton(locale.btOpen());
+		this.clearBtn = new JButton(locale.btClear());
 		this.loadPopBtn = new JButton(locale.btSet());
 		this.saveButton = new JButton(locale.btSave());
 		this.saveButton.setEnabled(false);
-		this.loadPopBtn.setEnabled(false);
+		// this.loadPopBtn.setEnabled(false);
 
 		this.openBtn.addActionListener(this);
+		this.clearBtn.addActionListener(this);
 		this.loadPopBtn.addActionListener(this);
 		this.saveButton.addActionListener(this);
 
 		this.add(tools, BorderLayout.CENTER);
-		JPanel openAndSave = new JPanel();
-		openAndSave.setPreferredSize(new Dimension(320,80));
+		JPanel openClearSave = new JPanel();
+		openClearSave.setPreferredSize(new Dimension(320, 80));
 
 		if (this.controller.isStandAlone())
-			openAndSave.add(this.openBtn);
-		
-		JPanel existingFilePanel = new JPanel();
-		existingFilePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.gray, 2), locale.labelExistingShapeFile()));
-		existingFilePanel.add(this.loadPopBtn);
-		existingFilePanel.setPreferredSize(new Dimension(150,60));
+			openClearSave.add(this.openBtn);
 
-		openAndSave.add(this.saveButton);
-		openAndSave.add(existingFilePanel);
-		this.add(openAndSave, BorderLayout.SOUTH);
+		JPanel existingFilePanel = new JPanel();
+		existingFilePanel.setBorder(BorderFactory.createTitledBorder(
+				BorderFactory.createLineBorder(Color.gray, 2),
+				locale.labelExistingShapeFile()));
+		existingFilePanel.add(this.loadPopBtn);
+		existingFilePanel.setPreferredSize(new Dimension(150, 60));
+
+		openClearSave.add(this.saveButton);
+		openClearSave.add(this.clearBtn);
+		openClearSave.add(existingFilePanel);
+		this.add(openClearSave, BorderLayout.SOUTH);
 
 	}
 
@@ -233,12 +243,14 @@ class PopToolBox extends AbstractToolBox {
 			if (shape instanceof PolygonShape) {
 				String popCount = shape.getMetaData("population");
 				if (popCount != null) {
-					DefaultTableModel defModel = (DefaultTableModel) areaTable.getModel();
+					DefaultTableModel defModel = (DefaultTableModel) areaTable
+							.getModel();
 					String id = shape.getId();
 
 					boolean foundShape = false;
 					for (int j = 0; j < defModel.getRowCount(); j++) {
-						if (((String) areaTable.getModel().getValueAt(j, 0)).equals(id)) {
+						if (((String) areaTable.getModel().getValueAt(j, 0))
+								.equals(id)) {
 							areaTable.getModel().setValueAt(popCount, j, 1);
 							foundShape = true;
 							break;
@@ -246,7 +258,8 @@ class PopToolBox extends AbstractToolBox {
 					}
 					if (!foundShape) {
 						editing = true;
-						((DefaultTableModel) areaTable.getModel()).addRow(new Object[] { id, "100" });
+						((DefaultTableModel) areaTable.getModel())
+								.addRow(new Object[] { id, "100" });
 						this.saveButton.setEnabled(false);
 
 						popInput.setEnabled(true);
@@ -285,51 +298,94 @@ class PopToolBox extends AbstractToolBox {
 	public void actionPerformed(ActionEvent e) {
 		String cmd = e.getActionCommand();
 
-		if (cmd.equals(locale.btOpen())) {
+		if (cmd.equals(locale.btOpen())) { // open
 			if (this.controller.openGripsConfig()) {
 				this.controller.disableAllRenderLayers();
-				
-				File popFile = new File(this.controller.getGripsConfigModule().getPopulationFileName());
+
+				File popFile = new File(this.controller.getGripsConfigModule()
+						.getPopulationFileName());
 				if (popFile.exists())
 					openPopFile();
 
 				// add network bounding box shape
-				int shapeRendererId = controller.getVisualizer().getPrimaryShapeRenderLayer().getId();
+				int shapeRendererId = controller.getVisualizer()
+						.getPrimaryShapeRenderLayer().getId();
 				Rectangle2D bbRect = controller.getBoundingBox();
-				controller.addShape(ShapeFactory.getNetBoxShape(shapeRendererId, bbRect, true));
+				controller.addShape(ShapeFactory.getNetBoxShape(
+						shapeRendererId, bbRect, true));
 
 				// deactivate circle shape
-				Shape shape = this.controller.getShapeById(Constants.ID_EVACAREACIRCLE);
+				Shape shape = this.controller
+						.getShapeById(Constants.ID_EVACAREACIRCLE);
 				if (shape != null)
 					shape.setVisible(false);
 
-				this.controller.getVisualizer().getActiveMapRenderLayer().setPosition(this.controller.getCenterPosition());
+				this.controller.getVisualizer().getActiveMapRenderLayer()
+						.setPosition(this.controller.getCenterPosition());
 				this.saveButton.setEnabled(false);
 				this.loadPopBtn.setEnabled(true);
 				this.controller.enableAllRenderLayers();
 			}
-		} else if (cmd.equals(locale.btSave())) {
+		} else if (cmd.equals(locale.btSave())) { // save
 
-			this.setGoalAchieved(controller.saveShapes(controller.getGripsConfigModule().getPopulationFileName()));
+			String shapefile = controller.getGripsConfigModule()
+					.getPopulationFileNameAbsolute();
+			this.setGoalAchieved(controller.saveShapes(shapefile));
 			this.controller.setGoalAchieved(this.goalAchieved);
 			if (this.isGoalAchieved())
 				this.controller.setPopulationFileOpened(true);
 
 			this.saveButton.setEnabled(false);
 
-		} else if (cmd.equals(locale.btSet())) {
-			DefaultOpenDialog openDialog = new DefaultOpenDialog(controller, "shp", "Shape", false);
-			int returnValue = openDialog.showOpenDialog(controller.getParentComponent());
-			
-			if (openDialog.getSelectedFile()!=null)
-			{
-				CreatePopulationShapeFileFromExistingData.main(new String[]{openDialog.getSelectedFile().getAbsolutePath(),controller.getGripsFile()});
-				
+		} else if (cmd.equals(locale.btSet())) { // set
+			DefaultOpenDialog openDialog = new DefaultOpenDialog(controller,
+					"shp", "Shape", false);
+			String populationDensityFilename = this.controller.getPopDensFilename();
+//			if(populationDensityFilename != null)
+//				openDialog.setCurrentDirectory(new File(populationDensityFilename).getParent());
+			openDialog.showOpenDialog(controller.getParentComponent());
+
+			if (openDialog.getSelectedFile() != null) {
+				populationDensityFilename = openDialog.getSelectedFile().getAbsolutePath();
+				CreatePopulationShapeFileFromExistingData.main(new String[] {
+						populationDensityFilename, controller.getGripsFile() });
 				openPopFile();
 			}
-			
 		}
-
+		else if (cmd.equals(locale.btClear())) {
+			
+			ArrayList<Shape> shapes = controller.getActiveShapes();
+			ArrayList<String> shapesToDelete = new ArrayList<String>();
+			editing = true;
+			for (Shape shape : shapes)
+			{
+				if (shape.getMetaData(Constants.POPULATION)!=null)
+					shapesToDelete.add(shape.getId());
+				
+			}
+			for (String shapeToDelete : shapesToDelete)
+					controller.removeShape(shapeToDelete);
+				
+			while (((DefaultTableModel) areaTable.getModel()).getRowCount()>0)
+				((DefaultTableModel) areaTable.getModel()).removeRow(0);
+			
+//			areaTableData = new Object[][] {};
+//			@SuppressWarnings("serial")
+//			DefaultTableModel tableModel = new DefaultTableModel() {
+//				@Override
+//				public boolean isCellEditable(int row, int column) {
+//					return false;
+//				}
+//			};
+//			tableModel.setDataVector(areaTableData, columnNames);
+//			areaTable = new JTable();
+//			areaTable.setModel(tableModel);
+			editing = false;
+			updateMask();
+			controller.paintLayers();
+			
+		
+		}
 	}
 
 	/**
@@ -339,33 +395,32 @@ class PopToolBox extends AbstractToolBox {
 	public void openPopFile() {
 		try {
 			this.editing = true;
-			
+
 			controller.openPopulationFile();
 			int i = 0;
-			this.controller.getVisualizer().getPrimaryShapeRenderLayer().updatePixelCoordinates(true);
+			this.controller.getVisualizer().getPrimaryShapeRenderLayer()
+					.updatePixelCoordinates(true);
 			boolean foundOne = false;
-			for (Shape shape : controller.getActiveShapes())
-			{
+			for (Shape shape : controller.getActiveShapes()) {
 				shape.setVisible(true);
-				if (shape.getMetaData(Constants.POPULATION)!=null)
-				{
-					((DefaultTableModel) areaTable.getModel()).addRow(new Object[] { shape.getId(), shape.getMetaData(Constants.POPULATION) });
+				if (shape.getMetaData(Constants.POPULATION) != null) {
+					((DefaultTableModel) areaTable.getModel())
+							.addRow(new Object[] { shape.getId(),
+									shape.getMetaData(Constants.POPULATION) });
 					shape.setSelected(false);
 					foundOne = true;
 				}
 			}
-			if (foundOne)
-			{
+			if (foundOne) {
 				this.popDeleteBt.setEnabled(true);
 				this.popInput.setEnabled(true);
 				this.popLabel.setEnabled(true);
 				this.saveButton.setEnabled(true);
 			}
-			
+
 			this.controller.paintLayers();
-			
-		} finally
-		{
+
+		} finally {
 			this.editing = false;
 		}
 	}
@@ -382,16 +437,20 @@ class PopToolBox extends AbstractToolBox {
 		public synchronized void valueChanged(ListSelectionEvent e) {
 
 			if (!populationAreaSelector.editing) {
-				int sel = populationAreaSelector.getAreaTable().getSelectedRow();
-				String id = (String) (populationAreaSelector.getAreaTable().getModel()).getValueAt(sel, 0);
-				String pop = String.valueOf((populationAreaSelector.getAreaTable().getModel()).getValueAt(sel, 1));
+				int sel = populationAreaSelector.getAreaTable()
+						.getSelectedRow();
+				String id = (String) (populationAreaSelector.getAreaTable()
+						.getModel()).getValueAt(sel, 0);
+				String pop = String.valueOf((populationAreaSelector
+						.getAreaTable().getModel()).getValueAt(sel, 1));
 
 				populationAreaSelector.setSelectedAreaID(id);
 				populationAreaSelector.setSelectedAreaPop(pop);
 
-				controller.deselectShapesByMetaData("population");
-				
-				populationAreaSelector.getController().getShapeById(id).setSelected(true);
+				controller.deselectShapesByMetaData(Constants.POPULATION);
+
+				populationAreaSelector.getController().getShapeById(id)
+						.setSelected(true);
 				controller.paintLayers();
 
 			}
@@ -399,9 +458,8 @@ class PopToolBox extends AbstractToolBox {
 		}
 	}
 
-
 	public int getPopAreaCount() {
-		
+
 		int popAreaCount = 0;
 		for (Shape shape : this.controller.getActiveShapes()) {
 			if (shape instanceof PolygonShape) {

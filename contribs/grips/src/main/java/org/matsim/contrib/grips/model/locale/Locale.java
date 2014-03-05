@@ -20,8 +20,6 @@
 
 package org.matsim.contrib.grips.model.locale;
 
-import javax.swing.Icon;
-
 
 public interface Locale
 {
@@ -46,11 +44,8 @@ public interface Locale
 	public String modulePTLEditor();
 	public String moduleMatsimScenarioGenerator();
 	public String moduleEvacuationAnalysis();
-	
-	
+
 	public String infoMatsimTime();
-	
-	
 	
 	public String titlePopAreas();
 	public String titlePopulation();
@@ -86,6 +81,7 @@ public interface Locale
 	public String btNew();
 	public String msgSameFiles();
 	public String msgUnsavedChanges();
+	public Object infoMatsimOverwriteOutputDir();
 	public String labelExistingShapeFile();
 	
 	

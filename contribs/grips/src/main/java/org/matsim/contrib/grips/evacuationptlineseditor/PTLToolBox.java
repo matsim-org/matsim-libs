@@ -59,8 +59,7 @@ import org.matsim.contrib.grips.model.Constants;
 import org.matsim.contrib.grips.model.shape.BoxShape;
 import org.matsim.contrib.grips.model.shape.Shape;
 
-public class PTLToolBox extends AbstractToolBox
-{
+public class PTLToolBox extends AbstractToolBox {
 
 	private static final long serialVersionUID = 1L;
 	private JTextField blockFieldLink1hh;
@@ -68,7 +67,6 @@ public class PTLToolBox extends AbstractToolBox
 	private JButton openBtn;
 	private JButton saveButton;
 	private JPanel compositePanel;
-
 
 	// STRING COMMANDS
 	public static final String RED = "LINK_SELECT_RED";
@@ -87,10 +85,8 @@ public class PTLToolBox extends AbstractToolBox
 	private JSpinner numVehSpinner;
 	private BusStop currentBusStop;
 
-	private void setBusStopEditorPanelEnabled(boolean toggle)
-	{
-		if (!toggle)
-		{
+	private void setBusStopEditorPanelEnabled(boolean toggle) {
+		if (!toggle) {
 			this.greenLinkSelct.setEnabled(toggle);
 			this.redLinkSelct.setEnabled(toggle);
 		}
@@ -105,8 +101,7 @@ public class PTLToolBox extends AbstractToolBox
 
 	private JButton blockButtonRemove;
 
-	public PTLToolBox(AbstractModule module, Controller controller)
-	{
+	public PTLToolBox(AbstractModule module, Controller controller) {
 		super(module, controller);
 
 		this.setLayout(new BorderLayout());
@@ -116,8 +111,8 @@ public class PTLToolBox extends AbstractToolBox
 
 		this.busStopConfigPanel = new JPanel(new GridLayout(18, 2));
 
-		this.blockFieldLink1hh = new JTextField("--");
-		this.blockFieldLink1mm = new JTextField("--");
+		this.blockFieldLink1hh = new JTextField("0");
+		this.blockFieldLink1mm = new JTextField("1");
 		this.blockButtonOK = new JButton(locale.btOK());
 		this.blockButtonRemove = new JButton(locale.btRemove());
 
@@ -135,33 +130,46 @@ public class PTLToolBox extends AbstractToolBox
 		ptButtons.add(this.blockButtonOK);
 		ptButtons.add(this.blockButtonRemove);
 
-		this.blockButtonOK.addActionListener(new ActionListener()
-		{
+		this.blockButtonOK.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e) {
 				PTLToolBox.this.setBusStopEditorPanelEnabled(false);
 				PTLToolBox.this.numVehSpinner.setEnabled(false);
-				PTLToolBox.this.currentBusStop.hh = PTLToolBox.this.blockFieldLink1hh.getText();
-				PTLToolBox.this.currentBusStop.mm = PTLToolBox.this.blockFieldLink1mm.getText();
-				PTLToolBox.this.currentBusStop.numDepSpinnerValue = PTLToolBox.this.numDepSpinner.getValue();
-				PTLToolBox.this.currentBusStop.capSpinnerValue = PTLToolBox.this.capSpinner.getValue();
-				PTLToolBox.this.currentBusStop.circCheckSelected = PTLToolBox.this.circCheck.isSelected();
-				PTLToolBox.this.currentBusStop.numVehSpinnerValue = PTLToolBox.this.numVehSpinner.getValue();
-				PTLToolBox.this.currentBusStop.id = PTLToolBox.this.redLinkSelct.isSelected() ? PTLToolBox.this.currentLinkIdRed : PTLToolBox.this.currentLinkIdGreen;
+				PTLToolBox.this.currentBusStop.hh = PTLToolBox.this.blockFieldLink1hh
+						.getText();
+				PTLToolBox.this.currentBusStop.mm = PTLToolBox.this.blockFieldLink1mm
+						.getText();
+				PTLToolBox.this.currentBusStop.numDepSpinnerValue = PTLToolBox.this.numDepSpinner
+						.getValue();
+				PTLToolBox.this.currentBusStop.capSpinnerValue = PTLToolBox.this.capSpinner
+						.getValue();
+				PTLToolBox.this.currentBusStop.circCheckSelected = PTLToolBox.this.circCheck
+						.isSelected();
+				PTLToolBox.this.currentBusStop.numVehSpinnerValue = PTLToolBox.this.numVehSpinner
+						.getValue();
+				PTLToolBox.this.currentBusStop.id = PTLToolBox.this.redLinkSelct
+						.isSelected() ? PTLToolBox.this.currentLinkIdRed
+						: PTLToolBox.this.currentLinkIdGreen;
 
-				PTLToolBox.this.busStops.put(PTLToolBox.this.currentBusStop.id, PTLToolBox.this.currentBusStop);
+				PTLToolBox.this.busStops.put(PTLToolBox.this.currentBusStop.id,
+						PTLToolBox.this.currentBusStop);
 
-				Link link = PTLToolBox.this.controller.getScenario().getNetwork().getLinks().get(currentBusStop.id);
-				Point2D linkPos = PTLToolBox.this.controller.coordToPoint(link.getCoord());
+				Link link = PTLToolBox.this.controller.getScenario()
+						.getNetwork().getLinks().get(currentBusStop.id);
+				Point2D linkPos = PTLToolBox.this.controller.coordToPoint(link
+						.getCoord());
 
-				int secondaryLayerID = PTLToolBox.this.controller.getVisualizer().getSecondaryShapeRenderLayer().getId();
+				int secondaryLayerID = PTLToolBox.this.controller
+						.getVisualizer().getSecondaryShapeRenderLayer().getId();
 
-				BoxShape shape = ShapeFactory.getBusStopShape(currentBusStop.id.toString(), secondaryLayerID, linkPos);
+				BoxShape shape = ShapeFactory.getBusStopShape(
+						currentBusStop.id.toString(), secondaryLayerID, linkPos);
 				shape.setVisible(true);
 				PTLToolBox.this.controller.addShape(shape);
-				PTLToolBox.this.controller.getVisualizer().getSecondaryShapeRenderLayer().updatePixelCoordinates(shape);
+				PTLToolBox.this.controller.getVisualizer()
+						.getSecondaryShapeRenderLayer()
+						.updatePixelCoordinates(shape);
 				PTLToolBox.this.controller.paintLayers();
 
 				PTLToolBox.this.saveButton.setEnabled(true);
@@ -172,31 +180,36 @@ public class PTLToolBox extends AbstractToolBox
 			}
 		});
 
-		this.blockButtonRemove.addActionListener(new ActionListener()
-		{
+		this.blockButtonRemove.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				if ((PTLToolBox.this.currentBusStop.id != null) && PTLToolBox.this.busStops.containsKey(PTLToolBox.this.currentBusStop.id))
-				{
-					PTLToolBox.this.busStops.remove(PTLToolBox.this.currentBusStop.id);
-					PTLToolBox.this.controller.removeShape(Constants.ID_BUSSTOP_PREFIX + PTLToolBox.this.currentBusStop.id.toString());
+			public void actionPerformed(ActionEvent e) {
+				if ((PTLToolBox.this.currentBusStop.id != null)
+						&& PTLToolBox.this.busStops
+								.containsKey(PTLToolBox.this.currentBusStop.id)) {
+					PTLToolBox.this.busStops
+							.remove(PTLToolBox.this.currentBusStop.id);
+					PTLToolBox.this.controller
+							.removeShape(Constants.ID_BUSSTOP_PREFIX
+									+ PTLToolBox.this.currentBusStop.id
+											.toString());
 					PTLToolBox.this.controller.paintLayers();
 
-					PTLToolBox.this.blockFieldLink1hh.setText("--");
-					PTLToolBox.this.blockFieldLink1mm.setText("--");
-					PTLToolBox.this.numDepSpinner.setValue(0);
-					PTLToolBox.this.capSpinner.setValue(0);
-					PTLToolBox.this.numVehSpinner.setValue(0);
+					PTLToolBox.this.blockFieldLink1hh.setText("0");
+					PTLToolBox.this.blockFieldLink1mm.setText("1");
+					PTLToolBox.this.numDepSpinner.setValue(1);
+					PTLToolBox.this.capSpinner.setValue(1);
+					PTLToolBox.this.numVehSpinner.setValue(1);
 					PTLToolBox.this.circCheck.setSelected(false);
 					PTLToolBox.this.setLink1Id(null);
 					PTLToolBox.this.setLink2Id(null);
 
-					Shape shape = PTLToolBox.this.controller.getShapeById(Constants.ID_LINK_PRIMARY);
+					Shape shape = PTLToolBox.this.controller
+							.getShapeById(Constants.ID_LINK_PRIMARY);
 					if (shape != null)
 						shape.setVisible(false);
-					shape = PTLToolBox.this.controller.getShapeById(Constants.ID_LINK_SECONDARY);
+					shape = PTLToolBox.this.controller
+							.getShapeById(Constants.ID_LINK_SECONDARY);
 					if (shape != null)
 						shape.setVisible(false);
 
@@ -257,6 +270,7 @@ public class PTLToolBox extends AbstractToolBox
 		this.numDepSpinner.setEnabled(false);
 		this.busStopConfigPanel.add(numDepPanel);
 		this.busStopConfigPanel.add(new JSeparator());
+		numDepSpinner.setValue(1);
 
 		JPanel capPanel = new JPanel(new GridLayout(1, 2));
 		capPanel.add(new JLabel("capacity/vehicle"));
@@ -266,6 +280,7 @@ public class PTLToolBox extends AbstractToolBox
 		this.capSpinner.setEnabled(false);
 		this.busStopConfigPanel.add(capPanel);
 		this.busStopConfigPanel.add(new JSeparator());
+		capSpinner.setValue(1);
 
 		JPanel circPanel = new JPanel(new GridLayout(1, 2));
 		circPanel.add(new JLabel("circling"));
@@ -274,17 +289,14 @@ public class PTLToolBox extends AbstractToolBox
 		this.circCheck.setEnabled(false);
 		this.busStopConfigPanel.add(circPanel);
 
-		this.circCheck.addActionListener(new ActionListener()
-		{
+		this.circCheck.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent arg0)
-			{
-				if (PTLToolBox.this.circCheck.isSelected())
-				{
+			public void actionPerformed(ActionEvent arg0) {
+				if (PTLToolBox.this.circCheck.isSelected()) {
 					PTLToolBox.this.numVehSpinner.setEnabled(true);
-				} else
-				{
+					numVehSpinner.setValue(1);
+				} else {
 					PTLToolBox.this.numVehSpinner.setEnabled(false);
 				}
 			}
@@ -308,7 +320,8 @@ public class PTLToolBox extends AbstractToolBox
 
 		this.busStopConfigPanel.setPreferredSize(new Dimension(300, 300));
 
-		this.busStopConfigPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+		this.busStopConfigPanel.setBorder(BorderFactory
+				.createLineBorder(Color.black));
 
 		this.blockFieldLink1hh.setEnabled(false);
 		this.blockFieldLink1mm.setEnabled(false);
@@ -318,7 +331,7 @@ public class PTLToolBox extends AbstractToolBox
 		this.add(this.busStopConfigPanel, BorderLayout.EAST);
 
 		this.openBtn = new JButton(locale.btOpen());
-		
+
 		if (this.controller.isStandAlone())
 			panel.add(this.openBtn);
 
@@ -337,19 +350,16 @@ public class PTLToolBox extends AbstractToolBox
 
 	}
 
-	class TypeHour implements KeyListener
-	{
+	class TypeHour implements KeyListener {
 
 		@Override
-		public void keyTyped(KeyEvent e)
-		{
+		public void keyTyped(KeyEvent e) {
 			if (!Character.toString(e.getKeyChar()).matches("[0-9]"))
 				e.consume();
 		}
 
 		@Override
-		public void keyReleased(KeyEvent e)
-		{
+		public void keyReleased(KeyEvent e) {
 
 			JTextField src = (JTextField) e.getSource();
 
@@ -361,18 +371,15 @@ public class PTLToolBox extends AbstractToolBox
 		}
 
 		@Override
-		public void keyPressed(KeyEvent e)
-		{
+		public void keyPressed(KeyEvent e) {
 
 		}
 	}
 
-	class CheckHour implements FocusListener
-	{
+	class CheckHour implements FocusListener {
 
 		@Override
-		public void focusGained(FocusEvent e)
-		{
+		public void focusGained(FocusEvent e) {
 			JTextField src = (JTextField) e.getSource();
 			src.setSelectionStart(0);
 			src.setSelectionEnd(src.getText().length());
@@ -380,8 +387,7 @@ public class PTLToolBox extends AbstractToolBox
 		}
 
 		@Override
-		public void focusLost(FocusEvent e)
-		{
+		public void focusLost(FocusEvent e) {
 			JTextField src = (JTextField) e.getSource();
 			String text = src.getText();
 
@@ -394,12 +400,10 @@ public class PTLToolBox extends AbstractToolBox
 
 	}
 
-	class CheckMinute implements FocusListener
-	{
+	class CheckMinute implements FocusListener {
 
 		@Override
-		public void focusGained(FocusEvent e)
-		{
+		public void focusGained(FocusEvent e) {
 			JTextField src = (JTextField) e.getSource();
 			src.setSelectionStart(0);
 			src.setSelectionEnd(src.getText().length());
@@ -407,8 +411,7 @@ public class PTLToolBox extends AbstractToolBox
 		}
 
 		@Override
-		public void focusLost(FocusEvent e)
-		{
+		public void focusLost(FocusEvent e) {
 			JTextField src = (JTextField) e.getSource();
 
 			String text = src.getText();
@@ -422,30 +425,25 @@ public class PTLToolBox extends AbstractToolBox
 
 	}
 
-	class TypeMinute implements KeyListener
-	{
+	class TypeMinute implements KeyListener {
 
 		@Override
-		public void keyTyped(KeyEvent e)
-		{
+		public void keyTyped(KeyEvent e) {
 			if (!Character.toString(e.getKeyChar()).matches("[0-9]"))
 				e.consume();
 		}
 
 		@Override
-		public void keyReleased(KeyEvent e)
-		{
+		public void keyReleased(KeyEvent e) {
 		}
 
 		@Override
-		public void keyPressed(KeyEvent e)
-		{
+		public void keyPressed(KeyEvent e) {
 		}
 	}
 
 	@Override
-	public void updateMask()
-	{
+	public void updateMask() {
 
 		Id linkId1 = this.controller.getTempLinkId(0);
 		Id linkId2 = this.controller.getTempLinkId(1);
@@ -462,47 +460,37 @@ public class PTLToolBox extends AbstractToolBox
 	 * 
 	 */
 	@Override
-	public void actionPerformed(ActionEvent e)
-	{
-		if (e.getActionCommand() == "LINK_SELECT_RED")
-		{
+	public void actionPerformed(ActionEvent e) {
+		if (e.getActionCommand() == "LINK_SELECT_RED") {
 			BusStop bs = this.busStops.get(this.currentLinkIdRed);
-			if (bs != null)
-			{
+			if (bs != null) {
 				this.currentBusStop = bs;
-			} else
-			{
+			} else {
 				bs = new BusStop();
 				this.busStops.put(this.currentLinkIdRed, bs);
 			}
 			updateControlPanel(bs);
 
-		} else if (e.getActionCommand() == "LINK_SELECT_GREEN")
-		{
+		} else if (e.getActionCommand() == "LINK_SELECT_GREEN") {
 			BusStop bs = this.busStops.get(this.currentLinkIdGreen);
-			if (bs != null)
-			{
+			if (bs != null) {
 				this.currentBusStop = bs;
-			} else
-			{
+			} else {
 				bs = new BusStop();
 				this.busStops.put(this.currentLinkIdGreen, bs);
 			}
 			updateControlPanel(bs);
-		} else if (e.getActionCommand() == locale.btSave())
-		{
+		} else if (e.getActionCommand() == locale.btSave()) {
 			createAndSavePTLines();
-		} else if (e.getActionCommand() == locale.btOpen())
-		{
-			//TODO default open 
+		} else if (e.getActionCommand() == locale.btOpen()) {
+			// TODO default open
 		}
 
 	}
 
-	private void createAndSavePTLines()
-	{
+	private void createAndSavePTLines() {
 		ConfigIO.savePTLines(this.controller, this.busStops);
-		//TODO confirmation dialog
+		// TODO confirmation dialog
 	}
 
 	/**
@@ -511,19 +499,14 @@ public class PTLToolBox extends AbstractToolBox
 	 * 
 	 * @param id
 	 */
-	public void setLink1Id(Id id)
-	{
+	public void setLink1Id(Id id) {
 		this.currentLinkIdRed = id;
-		if (id != null)
-		{
-			if (this.busStops.containsKey(id))
-			{
+		if (id != null) {
+			if (this.busStops.containsKey(id)) {
 				BusStop bs = this.busStops.get(id);
 				this.currentBusStop = bs;
 				updateControlPanel(bs);
-			}
-			else
-			{
+			} else {
 
 				this.currentBusStop = new BusStop();
 				this.currentBusStop.id = id;
@@ -537,10 +520,8 @@ public class PTLToolBox extends AbstractToolBox
 		this.redLinkSelct.setEnabled(id != null);
 	}
 
-	private void updateControlPanel(BusStop bs)
-	{
-		if (bs != null)
-		{
+	private void updateControlPanel(BusStop bs) {
+		if (bs != null) {
 			this.currentBusStop = bs;
 			this.blockFieldLink1hh.setText(bs.hh);
 			this.blockFieldLink1mm.setText(bs.mm);
@@ -558,8 +539,7 @@ public class PTLToolBox extends AbstractToolBox
 	 * 
 	 * @param id
 	 */
-	public void setLink2Id(Id id)
-	{
+	public void setLink2Id(Id id) {
 		this.currentLinkIdGreen = id;
 		this.greenLinkSelct.setEnabled(id != null);
 	}

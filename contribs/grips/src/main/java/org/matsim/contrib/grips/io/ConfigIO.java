@@ -48,7 +48,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.VehicleWriterV1;
 
 /**
- * all i/o functions involving the configuration files
+ * all i/origin functions involving the configuration files
  * 
  * @author wdoering
  *

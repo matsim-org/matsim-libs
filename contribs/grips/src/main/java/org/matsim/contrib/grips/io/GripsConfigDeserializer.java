@@ -52,13 +52,13 @@ public class GripsConfigDeserializer extends MatsimJaxbXmlParser{
 	}
 	
 	public GripsConfigDeserializer(GripsConfigModule gcm) {
-		this(GripsConfigSerializer.SCHEMA,gcm,true);
+		this(GripsConfigSerializer.SCHEMA,gcm, false);
 	}
 	
 	protected GripsConfigDeserializer(String schemaLocation, GripsConfigModule gcm, boolean validate) {
 		super(schemaLocation);
 		this.gcm = gcm;
-		this.validate = validate;
+		this.validate = validate; // validate causes trouble when offline
 	}
 
 	@Override
@@ -101,10 +101,16 @@ public class GripsConfigDeserializer extends MatsimJaxbXmlParser{
 		this.gcm.setNetworkFileName(gct.getNetworkFile().getInputFile());
 		this.gcm.setOutputDir(gct.getOutputDir().getInputFile());
 		this.gcm.setPopulationFileName(gct.getPopulationFile().getInputFile());
+		// this is not a mandatory element!
+		if(gct.getPopulationDensityFile() != null)
+			this.gcm.setPopDensFilename(gct.getPopulationDensityFile().getInputFile());
 		this.gcm.setSampleSize(gct.getSampleSize()+"");
 		this.gcm.setDepartureTimeDistribution(gct.getDepartureTimeDistribution());
 		this.gcm.setMainTrafficType(gct.getMainTrafficType().value());
-		
+		final String wms = gct.getWms();
+		this.gcm.setWms(wms);
+		this.gcm.setLayer(gct.getLayer());
+		this.gcm.setTargetCRS(gct.getTargetCRS());
 	}
 
 }

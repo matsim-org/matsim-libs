@@ -29,6 +29,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -45,14 +46,14 @@ import javax.swing.text.Element;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.grips.control.Controller;
 import org.matsim.contrib.grips.model.locale.Locale;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
 
-public class SimulationMask extends JPanel
-{
+public class SimulationMask extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private Controller controller;
 	private JButton btRun;
@@ -64,11 +65,10 @@ public class SimulationMask extends JPanel
 	private JLabel labelConfigName;
 	protected String configFile;
 
-	public SimulationMask(Controller controller)
-	{
+	public SimulationMask(Controller controller) {
 
 		this.labelConfigName = new JLabel("");
-		
+
 		this.controller = controller;
 		this.locale = this.controller.getLocale();
 		this.setLayout(new BorderLayout());
@@ -108,71 +108,93 @@ public class SimulationMask extends JPanel
 		JPanel infoPanel = new JPanel();
 		infoPanel.setSize(600, 200);
 
-//		infoPanel.add(new JLabel(this.controller.getLocale().moduleMatsimScenarioGenerator()));
+		// infoPanel.add(new
+		// JLabel(this.controller.getLocale().moduleMatsimScenarioGenerator()));
 		itPanel.add(btRun);
 		itPanel.add(infoPanel);
-		
+
 		this.add(new JScrollPane(textOutput), BorderLayout.NORTH);
 		this.add(centerPanel, BorderLayout.CENTER);
 		Logger root = Logger.getRootLogger();
 		root.addAppender(new LogAppender(this));
 
-		this.btRun.addActionListener(new ActionListener()
-		{
+		this.btRun.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				try
-				{
-					// System.setOut(SGMask.this.outputRedirect);
+			public void actionPerformed(ActionEvent e) {
+				try {
+					// System.setOut(Scenario2MatsimMask.this.outputRedirect);
 					SimulationMask.this.btRun.setEnabled(false);
+					// check if outputdir exists
+					Scenario scenario = SimulationMask.this.controller
+							.getScenario();
+					Config config = scenario.getConfig();
+					String outdir = config.getParam("grips", "outputDir")
+							+ "/output";
+					;
+					outdir = config.getParam("controler", "outputDirectory");
+					File file = new File(outdir);
+					int a = 0;
+					if (file.exists()) {
+						a = JOptionPane.showConfirmDialog(SimulationMask.this,
+								locale.infoMatsimOverwriteOutputDir(),
+								locale.infoMatsimTime(),
+								JOptionPane.WARNING_MESSAGE);
+						String newdir = outdir + "_old";
+						int i = 1;
+						while (new File(newdir + i).exists())
+							i++;
+						newdir += i;
+						file.renameTo(new File(newdir));
+					} else {
+						a = JOptionPane.showConfirmDialog(SimulationMask.this,
+								locale.infoMatsimTime(), "",
+								JOptionPane.WARNING_MESSAGE);
+					}
+					SimulationMask.this.setCursor(Cursor
+							.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-					
-					int a = JOptionPane.showConfirmDialog(SimulationMask.this, locale.infoMatsimTime(), "", JOptionPane.WARNING_MESSAGE);
+					if (a == JOptionPane.OK_OPTION) {
 
-					SimulationMask.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-					
-					if (a == JOptionPane.OK_OPTION)
-					{
-	
-						SwingWorker<String, Void> worker = new SwingWorker<String, Void>()
-						{
-	
+						SwingWorker<String, Void> worker = new SwingWorker<String, Void>() {
+
 							@Override
-							protected String doInBackground()
-							{
-								Config config = SimulationMask.this.controller.getScenario().getConfig();
-	
-								config.setParam("controler", "firstIteration", textFirstIteration.getText());
-								config.setParam("controler", "lastIteration", textLastIteration.getText());
-								new ConfigWriter(config).write(SimulationMask.this.configFile);
-	
-								Controler matsimController = new Controler(config);
+							protected String doInBackground() {
+								Config config = SimulationMask.this.controller
+										.getScenario().getConfig();
+
+								config.setParam("controler", "firstIteration",
+										textFirstIteration.getText());
+								config.setParam("controler", "lastIteration",
+										textLastIteration.getText());
+								new ConfigWriter(config)
+										.write(SimulationMask.this.configFile);
+
+								Controler matsimController = new Controler(
+										config);
 								matsimController.setOverwriteFiles(true);
 								matsimController.run();
-	
-								SimulationMask.this.controller.setGoalAchieved(true);
-								
+
+								SimulationMask.this.controller
+										.setGoalAchieved(true);
+
 								return "";
 							}
-	
+
 							@Override
-							protected void done()
-							{
-								SimulationMask.this.setCursor(Cursor.getDefaultCursor());
+							protected void done() {
+								SimulationMask.this.setCursor(Cursor
+										.getDefaultCursor());
 								SimulationMask.this.btRun.setEnabled(true);
-	
+
 							}
 						};
 						worker.execute();
 					}
 
-				} catch (Exception e2)
-				{
+				} catch (Exception e2) {
 					e2.printStackTrace();
-				} finally
-				{
+				} finally {
 					SimulationMask.this.btRun.setEnabled(true);
 					SimulationMask.this.setCursor(Cursor.getDefaultCursor());
 				}
@@ -187,34 +209,31 @@ public class SimulationMask extends JPanel
 
 	}
 
-
-	public void readConfig()
-	{
+	public void readConfig() {
 		Config config = this.controller.getScenario().getConfig();
-		this.labelConfigName.setText(this.controller.getScenarioPath());
+		String matsimSP = this.controller.getScenarioPath();
+		this.labelConfigName.setText(matsimSP);
 		this.configFile = this.controller.getMatsimConfigFile();
-		this.textFirstIteration.setText(config.getModule("controler").getValue("firstIteration"));
-		this.textLastIteration.setText(config.getModule("controler").getValue("lastIteration"));
+		this.textFirstIteration.setText(config.getModule("controler").getValue(
+				"firstIteration"));
+		this.textLastIteration.setText(config.getModule("controler").getValue(
+				"lastIteration"));
 		this.textFirstIteration.setEnabled(true);
 		this.textLastIteration.setEnabled(true);
 		this.btRun.setEnabled(true);
 	}
 
-	private class NumberKeyListener implements KeyListener
-	{
+	private class NumberKeyListener implements KeyListener {
 
 		@Override
-		public void keyTyped(KeyEvent e)
-		{
+		public void keyTyped(KeyEvent e) {
 			if (!Character.toString(e.getKeyChar()).matches("[0-9]"))
 				e.consume();
 		}
 
 		@Override
-		public void keyReleased(KeyEvent e)
-		{
-			if (e.getSource() instanceof JTextField)
-			{
+		public void keyReleased(KeyEvent e) {
+			if (e.getSource() instanceof JTextField) {
 				String val = ((JTextField) e.getSource()).getText();
 				if ((val != "") && (!isNumeric(val)))
 					((JTextField) e.getSource()).setText("0");
@@ -224,59 +243,52 @@ public class SimulationMask extends JPanel
 		}
 
 		@Override
-		public void keyPressed(KeyEvent e)
-		{
+		public void keyPressed(KeyEvent e) {
 		}
 
-		public boolean isNumeric(String str)
-		{
-			return str.matches("-?\\d+(\\.\\d+)?"); 
-													
+		public boolean isNumeric(String str) {
+			return str.matches("-?\\d+(\\.\\d+)?");
+			// this has been changed by Refactor|Rename from d to destination?
+			// reverted it (HK, 2014-02-19)
 		}
 
 	}
 
-	public class LogAppender extends AppenderSkeleton
-	{
+	public class LogAppender extends AppenderSkeleton {
 		private SimulationMask msgMask;
 		private long n = 0;
 
-		public LogAppender(SimulationMask msgMask)
-		{
+		public LogAppender(SimulationMask msgMask) {
 			super();
 			this.msgMask = msgMask;
 		}
 
 		@Override
-		protected void append(LoggingEvent loggingEvent)
-		{
-			
+		protected void append(LoggingEvent loggingEvent) {
+
 			this.msgMask.textOutput.append(loggingEvent.getMessage() + "\r\n");
 			this.msgMask.textOutput.selectAll();
-			
-			if (++n>20)
-			{
-				Element root = this.msgMask.textOutput.getDocument().getDefaultRootElement();
+
+			if (++n > 20) {
+				Element root = this.msgMask.textOutput.getDocument()
+						.getDefaultRootElement();
 				Element first = root.getElement(0);
-				try
-				{
-					this.msgMask.textOutput.getDocument().remove(first.getStartOffset(), first.getEndOffset());
-				} catch (BadLocationException e)
-				{
+				try {
+					this.msgMask.textOutput.getDocument().remove(
+							first.getStartOffset(), first.getEndOffset());
+				} catch (BadLocationException e) {
 					e.printStackTrace();
 				}
 			}
 		}
 
 		@Override
-		public void close()
-		{
+		public void close() {
 
 		}
 
 		@Override
-		public boolean requiresLayout()
-		{
+		public boolean requiresLayout() {
 			return false;
 		}
 

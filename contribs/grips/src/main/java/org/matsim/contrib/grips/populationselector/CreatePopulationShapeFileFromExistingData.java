@@ -53,15 +53,14 @@ public class CreatePopulationShapeFileFromExistingData {
 		String gripsConfig = args[1];
 		ShapeFileReader r1 = new ShapeFileReader();
 		r1.readFileAndInitialize(existingDataFile);
-		GripsConfigModule gcm = new GripsConfigModule("grips");
+		GripsConfigModule gcm = new GripsConfigModule("grips", gripsConfig);
 		GripsConfigDeserializer gcd = new GripsConfigDeserializer(gcm,false);
 		gcd.readFile(gripsConfig);
 		
 		ShapeFileReader r2 = new ShapeFileReader();
-		r2.readFileAndInitialize(gcm.getEvacuationAreaFileName());
+		r2.readFileAndInitialize(gcm.getEvacuationAreaFileNameAbsolute());
 		
 		transformCRS(r1,r2); //only needed if shape files have different coordinate systems; r2 usually is in WGS84 while r1 is projected. So, we transform r2 to r1
-		
 		
 		if (r2.getFeatureCollection().size() != 1) {
 			throw new RuntimeException("The evacuation area must comprise of exactly one feature!");
@@ -120,7 +119,7 @@ public class CreatePopulationShapeFileFromExistingData {
 				System.out.println("empty");
 			}
 		}
-		ShapeFileWriter.writeGeometries(fts, gcm.getPopulationFileName());
+		ShapeFileWriter.writeGeometries(fts, gcm.getPopulationFileNameAbsolute());
 	}
 	
     public static void transformCRS(ShapeFileReader r1) {

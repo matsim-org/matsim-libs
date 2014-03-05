@@ -19,48 +19,51 @@
  * *********************************************************************** */
 package org.matsim.contrib.grips.model.config;
 
+import java.io.File;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.DepartureTimeDistributionType;
+import org.matsim.contrib.grips.io.jaxb.gripsconfig.FileType;
 import org.matsim.core.config.Module;
 
 /**
  * Config module for grips project
+ * 
  * @author laemmel
- *
+ * 
  */
 public class GripsConfigModule extends Module {
 
 	public static final String GROUP_NAME = "grips";
-
 	public static final String NETWORK_FILE_NAME = "networkFile";
-
 	public static final String EVACUATION_AREA_FILE_NAME = "evacuationAreaFile";
-
 	public static final String POPULATION_FILE_NAME = "populationFile";
-
 	public static final String OUTPUT_DIR = "outputDir";
-
 	public static final String SAMPLE_SIZE = "sampleSize";
-
+	private String scenarioFileName;
 	private String networkFileName;
-
 	private String evacuationAreaFileName;
-
 	private String populationFileName;
-
 	private String outputDir;
-
+	private String wms;
+	private String layer;
 	private double sampleSize = 1;
+	private String mainTrafficType = "vehicular";
+	private String popDensFilename;
+	private String targetCRS;
 
 
-
+	public GripsConfigModule(String name, String scenariofile) {
+		super(name);
+		scenarioFileName = scenariofile;
+	}
+	
 	public GripsConfigModule(String name) {
 		super(name);
-	}
+	}	
 
 	public GripsConfigModule(Module grips) {
 		super(GROUP_NAME);
@@ -75,13 +78,13 @@ public class GripsConfigModule extends Module {
 			setNetworkFileName(value);
 		} else if (param_name.equals(EVACUATION_AREA_FILE_NAME)) {
 			setEvacuationAreaFileName(value);
-		} else if (param_name.equals(POPULATION_FILE_NAME)){
+		} else if (param_name.equals(POPULATION_FILE_NAME)) {
 			setPopulationFileName(value);
-		} else if (param_name.equals(OUTPUT_DIR)){
+		} else if (param_name.equals(OUTPUT_DIR)) {
 			setOutputDir(value);
-		} else if (param_name.equals(SAMPLE_SIZE)){
+		} else if (param_name.equals(SAMPLE_SIZE)) {
 			setSampleSize(value);
-		}else {
+		} else {
 			throw new IllegalArgumentException(param_name);
 		}
 	}
@@ -100,13 +103,13 @@ public class GripsConfigModule extends Module {
 			return getNetworkFileName();
 		} else if (param_name.equals(EVACUATION_AREA_FILE_NAME)) {
 			return getEvacuationAreaFileName();
-		} else if (param_name.equals(POPULATION_FILE_NAME)){
+		} else if (param_name.equals(POPULATION_FILE_NAME)) {
 			return getPopulationFileName();
-		} else if (param_name.equals(OUTPUT_DIR)){
+		} else if (param_name.equals(OUTPUT_DIR)) {
 			return getOutputDir();
-		}else if (param_name.equals(SAMPLE_SIZE)){
+		} else if (param_name.equals(SAMPLE_SIZE)) {
 			return Double.toString(getSampleSize());
-		}else {
+		} else {
 			throw new IllegalArgumentException(param_name);
 		}
 	}
@@ -126,12 +129,31 @@ public class GripsConfigModule extends Module {
 		return this.networkFileName;
 	}
 
+	public String getNetworkFileNameAbsolute() {
+		return getAbsolute(this.networkFileName);
+	}
+
+	private String getAbsolute(String filename) {
+		String rv = filename;
+		File file = new File(filename);
+		if (!file.isAbsolute()) {
+			File sf = new File(scenarioFileName);
+			rv = sf.getParent() + "/" + filename; // filename can be something
+													// like /osm/map.osm
+		}
+		return rv;
+	}
+
 	public void setNetworkFileName(String name) {
 		this.networkFileName = name;
 	}
 
 	public String getEvacuationAreaFileName() {
 		return this.evacuationAreaFileName;
+	}
+
+	public String getEvacuationAreaFileNameAbsolute() {
+		return getAbsolute(this.evacuationAreaFileName);
 	}
 
 	public void setEvacuationAreaFileName(String evacuationAreaFileName) {
@@ -154,21 +176,26 @@ public class GripsConfigModule extends Module {
 		this.sampleSize = Double.parseDouble(sampleSize);
 	}
 
-	//from here things only work for the xsd based config
+	// from here things only work for the xsd based config
 	private DepartureTimeDistributionType distribution;
 
-	public void setDepartureTimeDistribution(DepartureTimeDistributionType departureTimeDistributionType) {
+	public void setDepartureTimeDistribution(
+			DepartureTimeDistributionType departureTimeDistributionType) {
 		this.distribution = departureTimeDistributionType;
 	}
+
 	public DepartureTimeDistributionType getDepartureTimeDistribution() {
 		return this.distribution;
 	}
 
-	private String mainTrafficType = "vehicular";
+	public String getTargetCRS(){
+		return targetCRS;
+	}
+	
 	public String getMainTrafficType() {
 		return this.mainTrafficType;
 	}
-	
+
 	public void setMainTrafficType(String mainTrafficType) {
 		this.mainTrafficType = mainTrafficType;
 	}
@@ -244,6 +271,47 @@ public class GripsConfigModule extends Module {
 		return true;
 	}
 
-	
-	
+	public String getPopulationFileNameAbsolute() {
+		return getAbsolute(this.populationFileName);
+	}
+
+	public String getOutputDirAbsolute() {
+		return getAbsolute(this.outputDir);
+	}
+
+	public void setFileNamesAbsolute() {
+		networkFileName = getNetworkFileNameAbsolute();
+		evacuationAreaFileName = getEvacuationAreaFileNameAbsolute();
+		populationFileName = getPopulationFileNameAbsolute();
+		outputDir = getOutputDirAbsolute();
+	}
+
+	public String getWms() {
+		return this.wms;
+	}
+
+	public String getLayer() {
+		return this.layer;
+	}
+
+	public String getPopDensFilename() {
+		return popDensFilename;
+	}
+
+	public void setPopDensFilename(String populationDensityFile) {
+		this.popDensFilename = populationDensityFile;
+	}
+
+	public void setWms(String wms) {
+		this.wms = wms;
+	}
+
+	public void setLayer(String layer) {
+		this.layer = layer;
+	}
+
+	public void setTargetCRS(String targetCRS) {
+		this.targetCRS = targetCRS;
+	}
+
 }

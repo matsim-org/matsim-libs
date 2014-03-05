@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.awt.Image;
 
 import org.matsim.contrib.grips.model.locale.EnglishLocale;
+import org.matsim.contrib.grips.model.locale.GermanLocale;
 import org.matsim.contrib.grips.model.locale.Locale;
 import org.matsim.contrib.grips.model.shape.Shape.DrawMode;
 import org.matsim.contrib.grips.model.shape.ShapeStyle;
@@ -163,18 +164,15 @@ public class Constants
 	
 	public static int FRAME_MIN_WIDTH = 200;
 	public static int FRAME_MIN_HEIGHT = 200;
+	private static String CRS_EPSG = "EPSG:3395"; // WorldMercator: 3395
 
 	public static Locale getLocale()
 	{
 		return locale ;
 	}
-		
-	
-	
 
-	
-
-	
-
+	public static String getEPSG() {
+		return CRS_EPSG;
+	}
 
 }

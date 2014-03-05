@@ -24,6 +24,7 @@ import java.io.File;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.matsim.contrib.grips.control.Controller;
 
@@ -31,39 +32,26 @@ import org.matsim.contrib.grips.control.Controller;
  * default open dialog
  * 
  * @author wdoering
- *
+ * 
  */
-public class DefaultOpenDialog extends JFileChooser
-{
+public class DefaultOpenDialog extends JFileChooser {
 	private static final long serialVersionUID = 1L;
 	protected Controller controller;
-	public DefaultOpenDialog(Controller controller, final String fileExtension, final String fileDescription, boolean directory)
-	{
+
+	public DefaultOpenDialog(Controller controller, final String fileExtension,
+			final String fileDescription, boolean directory) {
 		this.controller = controller;
 		if (directory)
 			this.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		else
-		{
-			this.setFileFilter(new FileFilter()
-			{
-				
-				@Override
-				public String getDescription()
-				{
-					return fileDescription;
-				}
-				
-				@Override
-				public boolean accept(File f)
-				{
-					if ((f.toString().endsWith(fileExtension)) || (f.isDirectory()))
-						return true;
-					else
-						return false;
-				}
-			});
+		else {
+			this.setFileFilter(new FileNameExtensionFilter(fileDescription,
+					fileExtension));
 		}
 		this.setCurrentDirectory(controller.getCurrentWorkingDirectory());
+	}
+
+	public void setCurrentDirectory(String dir) {
+		this.setCurrentDirectory(dir);
 	}
 
 }

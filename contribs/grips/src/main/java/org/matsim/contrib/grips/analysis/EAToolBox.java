@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+c * project: org.matsim.*
  * RoadClosuresEditor.java
  *                                                                         *
  * *********************************************************************** *
@@ -71,6 +71,7 @@ import org.matsim.contrib.grips.control.Controller;
 import org.matsim.contrib.grips.model.AbstractToolBox;
 import org.matsim.contrib.grips.model.Constants.Mode;
 import org.matsim.contrib.grips.model.Constants.Unit;
+import org.matsim.contrib.grips.view.DefaultSaveDialog;
 import org.matsim.contrib.grips.view.renderer.GridRenderer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -81,13 +82,13 @@ import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 
 import com.vividsolutions.jts.geom.Polygon;
 
-public class EAToolBox extends AbstractToolBox
-{
+public class EAToolBox extends AbstractToolBox {
 	private static final long serialVersionUID = 1L;
 
 	private int exportSize;
 
-	private static final Logger log = Logger.getLogger(EvacuationAnalysis.class);
+	private static final Logger log = Logger
+			.getLogger(EvacuationAnalysis.class);
 	private JPanel compositePanel;
 	private JButton saveButton;
 	private JButton openBtn;
@@ -114,17 +115,15 @@ public class EAToolBox extends AbstractToolBox
 	private String cellSizeText = " number of cells: ";
 	private boolean useCalculateButton = false;
 	private GeotoolsTransformation ctInverse;
-	
-	private EvacuationAnalysis module; 
-	
+
+	private EvacuationAnalysis module;
+
 	private GridRenderer gridRenderer;
-	
-	public EAToolBox(EvacuationAnalysis module, Controller controller)
-	{
+
+	public EAToolBox(EvacuationAnalysis module, Controller controller) {
 		super(module, controller);
-		
+
 		this.module = module;
-		
 
 		this.firstLoad = true;
 		this.cellTransparency = .5f;
@@ -132,7 +131,8 @@ public class EAToolBox extends AbstractToolBox
 		// the panel on the right hand side, to display graphs etc.
 		JPanel panel = new JPanel();
 		this.blockPanel = new JPanel();
-		this.blockPanel.setLayout(new BoxLayout(this.blockPanel, BoxLayout.Y_AXIS));
+		this.blockPanel.setLayout(new BoxLayout(this.blockPanel,
+				BoxLayout.Y_AXIS));
 		this.blockPanel.setSize(new Dimension(400, 450));
 
 		// ////////////////////////////////////////////////////////////////////////////
@@ -158,7 +158,7 @@ public class EAToolBox extends AbstractToolBox
 		this.blockPanel.add(keyPanel);
 		this.blockPanel.add(controlPanel);
 		this.blockPanel.add(panel);
-		
+
 		this.blockPanel.setPreferredSize(new Dimension(360, 700));
 		this.blockPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 
@@ -175,7 +175,7 @@ public class EAToolBox extends AbstractToolBox
 
 		this.openBtn = new JButton("Open");
 		this.saveButton = new JButton("Save");
-		this.saveButton.setEnabled(false);
+		// this.saveButton.setEnabled(false);
 		this.saveButton.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		this.calcButton = new JButton("calculate");
@@ -183,73 +183,68 @@ public class EAToolBox extends AbstractToolBox
 		this.calcButton.addActionListener(this);
 		this.calcButton.setPreferredSize(new Dimension(100, 20));
 		this.calcButton.setSize(new Dimension(100, 24));
-		
+
 		this.openOTFVisBtn = new JButton("OTFVis");
 		this.openOTFVisBtn.setEnabled(false);
 		this.openOTFVisBtn.addActionListener(this);
 		this.openOTFVisBtn.setPreferredSize(new Dimension(100, 20));
 		this.openOTFVisBtn.setSize(new Dimension(100, 24));
-		
-		
 
-		JPanel iterationSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		iterationSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+		JPanel iterationSelectionPanel = new JPanel(new FlowLayout(
+				FlowLayout.RIGHT));
+		iterationSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2,
+				2, 2));
 		this.iterationsList = new JComboBox();
 		this.iterationsList.addActionListener(this);
 		this.iterationsList.setActionCommand("changeIteration");
 		this.iterationsList.setPreferredSize(new Dimension(220, 24));
-		iterationSelectionPanel.add(new JLabel(" event file: ", SwingConstants.RIGHT));
+		iterationSelectionPanel.add(new JLabel(" event file: ",
+				SwingConstants.RIGHT));
 		iterationSelectionPanel.add(this.iterationsList);
 
-		JPanel gridSizeSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		gridSizeSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-		this.gridSizeSlider = new JSlider(SwingConstants.HORIZONTAL, 10, 100, (int) this.cellSize);
-//		this.gridSizeSlider.setMinorTickSpacing(2);
+		JPanel gridSizeSelectionPanel = new JPanel(new FlowLayout(
+				FlowLayout.RIGHT));
+		gridSizeSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2,
+				2, 2));
+		this.gridSizeSlider = new JSlider(SwingConstants.HORIZONTAL, 10, 100,
+				(int) this.cellSize);
+		// this.gridSizeSlider.setMinorTickSpacing(2);
 		this.gridSizeSlider.setPaintTicks(true);
 		this.gridSizeSlider.setSnapToTicks(true);
-		this.gridSizeSlider.addChangeListener(new ChangeListener()
-		{
+		this.gridSizeSlider.addChangeListener(new ChangeListener() {
 			@Override
-			public void stateChanged(ChangeEvent e)
-			{
+			public void stateChanged(ChangeEvent e) {
 				int value = ((JSlider) (e.getSource())).getValue();
-//				value = value - (value % 10);
+				// value = value - (value % 10);
 				updateCellSize(value);
 			}
 		});
 
-		this.gridSizeSlider.addMouseListener(new MouseListener()
-		{
+		this.gridSizeSlider.addMouseListener(new MouseListener() {
 			@Override
-			public void mouseReleased(MouseEvent arg0)
-			{
-				if (!useCalculateButton)
-				{
+			public void mouseReleased(MouseEvent arg0) {
+				if (!useCalculateButton) {
 					int value = ((JSlider) (arg0.getSource())).getValue();
 					updateCellSize(value);
-//					
+					//
 					EAToolBox.this.module.runCalculation();
 				}
 			}
 
 			@Override
-			public void mousePressed(MouseEvent arg0)
-			{
+			public void mousePressed(MouseEvent arg0) {
 			}
 
 			@Override
-			public void mouseExited(MouseEvent arg0)
-			{
+			public void mouseExited(MouseEvent arg0) {
 			}
 
 			@Override
-			public void mouseEntered(MouseEvent arg0)
-			{
+			public void mouseEntered(MouseEvent arg0) {
 			}
 
 			@Override
-			public void mouseClicked(MouseEvent arg0)
-			{
+			public void mouseClicked(MouseEvent arg0) {
 			}
 		});
 
@@ -260,7 +255,8 @@ public class EAToolBox extends AbstractToolBox
 		gridSizeSelectionPanel.add(this.gridSizeSlider);
 
 		JPanel modeSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		modeSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+		modeSelectionPanel.setBorder(BorderFactory
+				.createEmptyBorder(2, 2, 2, 2));
 		this.modeList = new JComboBox();
 		this.modeList.addItem(Mode.EVACUATION);
 		this.modeList.addItem(Mode.CLEARING);
@@ -271,59 +267,57 @@ public class EAToolBox extends AbstractToolBox
 		modeSelectionPanel.add(new JLabel(" mode: ", SwingConstants.RIGHT));
 		modeSelectionPanel.add(this.modeList);
 
-		JPanel calculateButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		calculateButtonPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 7));
+		JPanel calculateButtonPanel = new JPanel(new FlowLayout(
+				FlowLayout.RIGHT));
+		calculateButtonPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2,
+				7));
 		calculateButtonPanel.add(new JLabel(""));
 		if (useCalculateButton)
 			calculateButtonPanel.add(calcButton);
 
 		calculateButtonPanel.setPreferredSize(new Dimension(220, 40));
 
-		JPanel transparencySliderPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		transparencySliderPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+		JPanel transparencySliderPanel = new JPanel(new FlowLayout(
+				FlowLayout.RIGHT));
+		transparencySliderPanel.setBorder(BorderFactory.createEmptyBorder(2, 2,
+				2, 2));
 		transparencySlider = new JSlider(SwingConstants.HORIZONTAL, 1, 100, 50);
-		transparencySlider.addChangeListener(new ChangeListener()
-		{
+		transparencySlider.addChangeListener(new ChangeListener() {
 			@Override
-			public void stateChanged(ChangeEvent e)
-			{
+			public void stateChanged(ChangeEvent e) {
 				updateTransparency((((JSlider) e.getSource()).getValue()) / 100f);
 			}
 		});
-		transparencySlider.addMouseListener(new MouseListener()
-		{
+		transparencySlider.addMouseListener(new MouseListener() {
 			@Override
-			public void mouseReleased(MouseEvent arg0)
-			{
-//				if (!useCalculateButton)
-//				{
-				EAToolBox.this.module.setCellTransparency((((JSlider) arg0.getSource()).getValue()) / 100f);
-					EAToolBox.this.module.runCalculation();
-//				}
+			public void mouseReleased(MouseEvent arg0) {
+				// if (!useCalculateButton)
+				// {
+				EAToolBox.this.module.setCellTransparency((((JSlider) arg0
+						.getSource()).getValue()) / 100f);
+				EAToolBox.this.module.runCalculation();
+				// }
 			}
 
 			@Override
-			public void mousePressed(MouseEvent arg0)
-			{
+			public void mousePressed(MouseEvent arg0) {
 			}
 
 			@Override
-			public void mouseExited(MouseEvent arg0)
-			{
+			public void mouseExited(MouseEvent arg0) {
 			}
 
 			@Override
-			public void mouseEntered(MouseEvent arg0)
-			{
+			public void mouseEntered(MouseEvent arg0) {
 			}
 
 			@Override
-			public void mouseClicked(MouseEvent arg0)
-			{
+			public void mouseClicked(MouseEvent arg0) {
 			}
 		});
 		transparencySlider.setPreferredSize(new Dimension(220, 24));
-		transparencySliderPanel.add(new JLabel(" cell transparency: ", SwingConstants.RIGHT));
+		transparencySliderPanel.add(new JLabel(" cell transparency: ",
+				SwingConstants.RIGHT));
 		transparencySliderPanel.add(transparencySlider);
 
 		this.controlPanel.add(new JLabel(""));
@@ -333,60 +327,52 @@ public class EAToolBox extends AbstractToolBox
 		this.controlPanel.add(calculateButtonPanel);
 		this.controlPanel.add(new JSeparator());
 		this.controlPanel.add(transparencySliderPanel);
-		
+
 		if (this.controller.isStandAlone())
 			panel.add(this.openBtn);
-		
+
 		panel.add(this.saveButton);
-//		panel.add(this.openOTFVisBtn); //TODO 
+		// panel.add(this.openOTFVisBtn); //TODO
 
 		this.openBtn.addActionListener(this);
 		this.saveButton.addActionListener(this);
 
-		this.addComponentListener(new ComponentListener()
-		{
+		this.addComponentListener(new ComponentListener() {
 			@Override
-			public void componentResized(ComponentEvent evt)
-			{
+			public void componentResized(ComponentEvent evt) {
 				Component src = (Component) evt.getSource();
 				Dimension newSize = src.getSize();
 				updateMapViewerSize(newSize.width - 200, newSize.height);
 			}
 
 			@Override
-			public void componentMoved(ComponentEvent e)
-			{
+			public void componentMoved(ComponentEvent e) {
 			}
 
 			@Override
-			public void componentShown(ComponentEvent e)
-			{
+			public void componentShown(ComponentEvent e) {
 			}
 
 			@Override
-			public void componentHidden(ComponentEvent e)
-			{
+			public void componentHidden(ComponentEvent e) {
 			}
 		});
-		
+
 	}
 
-	protected void updateCellSize(int value)
-	{
-		this.cellSize = (double)value;
+	protected void updateCellSize(int value) {
+		this.cellSize = (double) value;
 		this.gridSizeLabel.setText(cellSizeText + value + " ");
-//		this.gridSizeLabel.setText(cellSizeText + value + "m* ");
+		// this.gridSizeLabel.setText(cellSizeText + value + "m* ");
 		this.module.setGridSize(value);
 
 	}
-	
-	public void setGridRenderer(GridRenderer gridRenderer)
-	{
+
+	public void setGridRenderer(GridRenderer gridRenderer) {
 		this.gridRenderer = gridRenderer;
 	}
 
-	public void updateTransparency(float transparency)
-	{
+	public void updateTransparency(float transparency) {
 		this.cellTransparency = transparency;
 		this.gridRenderer.setTransparency(transparency);
 	}
@@ -396,89 +382,84 @@ public class EAToolBox extends AbstractToolBox
 	 * 
 	 */
 	@Override
-	public void actionPerformed(ActionEvent e)
-	{
+	public void actionPerformed(ActionEvent e) {
 		/**
 		 * Save heatmap shape and graphs
 		 * 
 		 */
-		if (e.getActionCommand() == "Save")
-		{
-			if (this.module.getEventHandler() != null)
-			{
+		if (e.getActionCommand() == "Save") {
+			if (this.module.getEventHandler() != null) {
 
 				this.gridRenderer.setEnabled(false);
 
-				final JFileChooser fc = new JFileChooser();
-				// fc.setCurrentDirectory(new File(currentDirectory));
+				DefaultSaveDialog saveDialog = new DefaultSaveDialog(
+						controller, "tiff", "tiff file (*.tiff)", false);
 
-				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				int returnVal = saveDialog.showSaveDialog(this.controller
+						.getParentComponent());
 
-				fc.setFileFilter(new FileFilter()
-				{
-
-					@Override
-					public String getDescription()
-					{
-						return "choose directory for the TIFF export";
-					}
-
-					@Override
-					public boolean accept(File f)
-					{
-						if (f.isDirectory())
-							return true;
-						else
-							return false;
-					}
-				});
-
-				int returnVal = fc.showSaveDialog(this.controller.getParentComponent());
-
-				if (returnVal == JFileChooser.APPROVE_OPTION)
-				{
-					// open file
-					File directory = fc.getSelectedFile();
-
-					// currentDirectory = directory.toString();
-
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+					// save file
+					File directory = saveDialog.getSelectedFile();
+					final String sourceCRS = this.controller.getSourceCoordinateSystem();
+					final String targetCRS = this.controller.getTargetCoordinateSystem();
+					this.ctInverse = new GeotoolsTransformation(targetCRS, sourceCRS);
+					
 					Rectangle2D bbox = controller.getBoundingBox();
-					Rect boundingBox = new Rect(bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY());
-					double gridSize = this.module.getEventHandler().getData().getCellSize();
+					Rect boundingBox = new Rect(bbox.getMinX(), bbox.getMinY(),
+							bbox.getMaxX(), bbox.getMaxY());
+					double gridSize = this.module.getEventHandler().getData()
+							.getCellSize();
 
-					Coord minValues = this.ctInverse.transform(new CoordImpl(boundingBox.minX - gridSize / 2, boundingBox.minY - gridSize / 2));
-					Coord maxValues = this.ctInverse.transform(new CoordImpl(boundingBox.maxX + gridSize / 2, boundingBox.maxY + gridSize / 2));
+					Coord minValues = this.ctInverse.transform(new CoordImpl(
+							boundingBox.minX - gridSize / 2, boundingBox.minY
+									- gridSize / 2));
+					Coord maxValues = this.ctInverse.transform(new CoordImpl(
+							boundingBox.maxX + gridSize / 2, boundingBox.maxY
+									+ gridSize / 2));
 
 					double westmost = minValues.getX();
 					double soutmost = minValues.getY();
 					double eastmost = maxValues.getX();
 					double northmost = maxValues.getY();
 
-					Envelope2D env = new Envelope2D(DefaultGeographicCRS.WGS84, westmost, soutmost, eastmost - westmost, northmost - soutmost);
+					Envelope2D env = new Envelope2D(DefaultGeographicCRS.WGS84,
+							westmost, soutmost, eastmost - westmost, northmost
+									- soutmost);
 
-					BufferedImage imgEvacuation = this.gridRenderer.getGridAsImage(Mode.EVACUATION, exportSize, exportSize);
-					BufferedImage imgClearing = this.gridRenderer.getGridAsImage(Mode.CLEARING, exportSize, exportSize);
-					BufferedImage imgUtilization = this.gridRenderer.getGridAsImage(Mode.UTILIZATION, exportSize, exportSize);
+					BufferedImage imgEvacuation = this.gridRenderer
+							.getGridAsImage(Mode.EVACUATION, exportSize,
+									exportSize);
+					BufferedImage imgClearing = this.gridRenderer
+							.getGridAsImage(Mode.CLEARING, exportSize,
+									exportSize);
+					BufferedImage imgUtilization = this.gridRenderer
+							.getGridAsImage(Mode.UTILIZATION, exportSize,
+									exportSize);
 
-					String filePrefix = directory.toString() + "/" + this.module.getCurrentEventFile().getName() + "_2_";
+					String filePrefix = directory.toString() + "/"
+							+ this.module.getCurrentEventFile().getName()
+							+ "_2_";
 
-					try
-					{
-						TiffExporter.writeGEOTiff(env, filePrefix + Mode.EVACUATION + ".tiff", imgEvacuation);
-						TiffExporter.writeGEOTiff(env, filePrefix + Mode.CLEARING + ".tiff", imgClearing);
-						TiffExporter.writeGEOTiff(env, filePrefix + Mode.UTILIZATION + ".tiff", imgUtilization);
-					} catch (IOException e1)
-					{
+					try {
+						TiffExporter.writeGEOTiff(env, filePrefix
+								+ Mode.EVACUATION + ".tiff", imgEvacuation);
+						TiffExporter.writeGEOTiff(env, filePrefix
+								+ Mode.CLEARING + ".tiff", imgClearing);
+						TiffExporter.writeGEOTiff(env, filePrefix
+								+ Mode.UTILIZATION + ".tiff", imgUtilization);
+					} catch (IOException e1) {
 						e1.printStackTrace();
-					} finally
-					{
+					} finally {
 						this.gridRenderer.setEnabled(true);
-						this.controller.getParentComponent().setCursor(Cursor.getDefaultCursor());
+						this.controller.getParentComponent().setCursor(
+								Cursor.getDefaultCursor());
 					}
 				}
 
 				this.gridRenderer.setEnabled(true);
-				this.controller.getParentComponent().setCursor(Cursor.getDefaultCursor());
+				this.controller.getParentComponent().setCursor(
+						Cursor.getDefaultCursor());
 
 			}
 
@@ -488,38 +469,32 @@ public class EAToolBox extends AbstractToolBox
 		 * Open MATSim config file.
 		 * 
 		 */
-		else if (e.getActionCommand() == "Open")
-		{
+		else if (e.getActionCommand() == "Open") {
 			final JFileChooser fc = new JFileChooser();
 
-			fc.setFileFilter(new FileFilter()
-			{
+			fc.setFileFilter(new FileFilter() {
 
 				@Override
-				public String getDescription()
-				{
+				public String getDescription() {
 					return "MATSim config file";
 				}
 
 				@Override
-				public boolean accept(File f)
-				{
-					if (f.isDirectory())
-					{
+				public boolean accept(File f) {
+					if (f.isDirectory()) {
 						return true;
 					}
-					if (f.getName().endsWith("xml"))
-					{
+					if (f.getName().endsWith("xml")) {
 						return true;
 					}
 					return false;
 				}
 			});
 
-			int returnVal = fc.showOpenDialog(this.controller.getParentComponent());
+			int returnVal = fc.showOpenDialog(this.controller
+					.getParentComponent());
 
-			if (returnVal == JFileChooser.APPROVE_OPTION)
-			{
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				// open file
 				File file = fc.getSelectedFile();
 				log.info("Opening: " + file.getAbsolutePath() + ".");
@@ -537,55 +512,48 @@ public class EAToolBox extends AbstractToolBox
 				this.openBtn.setEnabled(false);
 				this.saveButton.setEnabled(true);
 				this.calcButton.setEnabled(true);
-
-				this.ctInverse = new GeotoolsTransformation(this.getScenario().getConfig().global().getCoordinateSystem(), "EPSG:4326");
+				
+				final String sourceCRS = this.controller.getSourceCoordinateSystem();
+				
+				this.ctInverse = new GeotoolsTransformation(this.getScenario()
+						.getConfig().global().getCoordinateSystem(), sourceCRS);
 
 				this.firstLoad = false;
 
-			} else
-			{
+			} else {
 				log.info("Open command cancelled by user.");
 			}
 		}
 
-		else if (e.getActionCommand() == "calculate")
-		{
+		else if (e.getActionCommand() == "calculate") {
 			this.module.runCalculation();
 		}
 
-		else if ((e.getActionCommand() == "changeIteration") && (!firstLoad))
-		{
-			File newFile = this.module.getEventPathFromName("" + iterationsList.getSelectedItem());
+		else if ((e.getActionCommand() == "changeIteration") && (!firstLoad)) {
+			File newFile = this.module.getEventPathFromName(""
+					+ iterationsList.getSelectedItem());
 			int index = iterationsList.getSelectedIndex();
 
-			if (newFile != null)
-			{
+			if (newFile != null) {
 				this.module.setCurrentEventFile(newFile);
 			}
 
 			if (!useCalculateButton)
 				this.module.runCalculation();
-			
+
 			iterationsList.setSelectedIndex(index);
 		}
 
-		else if (e.getActionCommand() == "changeMode")
-		{
+		else if (e.getActionCommand() == "changeMode") {
 			this.module.setMode((Mode) modeList.getSelectedItem());
-			
 
-		}
-		else if (e.getActionCommand() == "OTFVis")
-		{
-			//TODO
+		} else if (e.getActionCommand() == "OTFVis") {
+			// TODO
 		}
 
 	}
 
-
-
-	public void setIterations()
-	{
+	public void setIterations() {
 		// get events file, check if there is at least the very first
 		// iteration
 		this.itersOutputDir = this.controller.getIterationsOutputDirectory();
@@ -595,45 +563,35 @@ public class EAToolBox extends AbstractToolBox
 
 		this.module.setCurrentEventFile(eventFiles.get(0));
 
-
-		
 	}
-	
-	public void setEventFileItems(ArrayList<File> items)
-	{
+
+	public void setEventFileItems(ArrayList<File> items) {
 		iterationsList.removeAllItems();
-		for (File eventFile : items)
-		{
+		for (File eventFile : items) {
 			String shortenedFileName = eventFile.getName();
 			iterationsList.addItem(shortenedFileName);
-		}		
+		}
 	}
 
-
-	public void updateMapViewerSize(int width, int height)
-	{
+	public void updateMapViewerSize(int width, int height) {
 		if (this.gridRenderer != null)
 			this.gridRenderer.setBounds(0, 0, width, height);
 	}
 
-	public void setSaveButtonEnabled(boolean enabled)
-	{
+	public void setSaveButtonEnabled(boolean enabled) {
 		this.saveButton.setEnabled(enabled);
 	}
 
-	class TypeHour implements KeyListener
-	{
+	class TypeHour implements KeyListener {
 
 		@Override
-		public void keyTyped(KeyEvent e)
-		{
+		public void keyTyped(KeyEvent e) {
 			if (!Character.toString(e.getKeyChar()).matches("[0-9]"))
 				e.consume();
 		}
 
 		@Override
-		public void keyReleased(KeyEvent e)
-		{
+		public void keyReleased(KeyEvent e) {
 
 			JTextField src = (JTextField) e.getSource();
 
@@ -645,18 +603,15 @@ public class EAToolBox extends AbstractToolBox
 		}
 
 		@Override
-		public void keyPressed(KeyEvent e)
-		{
+		public void keyPressed(KeyEvent e) {
 
 		}
 	}
 
-	class CheckHour implements FocusListener
-	{
+	class CheckHour implements FocusListener {
 
 		@Override
-		public void focusGained(FocusEvent e)
-		{
+		public void focusGained(FocusEvent e) {
 			JTextField src = (JTextField) e.getSource();
 			src.setSelectionStart(0);
 			src.setSelectionEnd(src.getText().length());
@@ -664,8 +619,7 @@ public class EAToolBox extends AbstractToolBox
 		}
 
 		@Override
-		public void focusLost(FocusEvent e)
-		{
+		public void focusLost(FocusEvent e) {
 			JTextField src = (JTextField) e.getSource();
 			String text = src.getText();
 
@@ -678,12 +632,10 @@ public class EAToolBox extends AbstractToolBox
 
 	}
 
-	class CheckMinute implements FocusListener
-	{
+	class CheckMinute implements FocusListener {
 
 		@Override
-		public void focusGained(FocusEvent e)
-		{
+		public void focusGained(FocusEvent e) {
 			JTextField src = (JTextField) e.getSource();
 			src.setSelectionStart(0);
 			src.setSelectionEnd(src.getText().length());
@@ -691,8 +643,7 @@ public class EAToolBox extends AbstractToolBox
 		}
 
 		@Override
-		public void focusLost(FocusEvent e)
-		{
+		public void focusLost(FocusEvent e) {
 			JTextField src = (JTextField) e.getSource();
 
 			String text = src.getText();
@@ -706,48 +657,38 @@ public class EAToolBox extends AbstractToolBox
 
 	}
 
-
-
-	class TypeMinute implements KeyListener
-	{
+	class TypeMinute implements KeyListener {
 
 		@Override
-		public void keyTyped(KeyEvent e)
-		{
+		public void keyTyped(KeyEvent e) {
 			if (!Character.toString(e.getKeyChar()).matches("[0-9]"))
 				e.consume();
 		}
 
 		@Override
-		public void keyReleased(KeyEvent e)
-		{
+		public void keyReleased(KeyEvent e) {
 
 		}
 
 		@Override
-		public void keyPressed(KeyEvent e)
-		{
+		public void keyPressed(KeyEvent e) {
 
 		}
 	}
 
-	class TypeNumber implements KeyListener
-	{
+	class TypeNumber implements KeyListener {
 		@Override
-		public void keyTyped(KeyEvent e)
-		{
+		public void keyTyped(KeyEvent e) {
 			if (!Character.toString(e.getKeyChar()).matches("[.0-9]"))
 				e.consume();
 		}
 
 		@Override
-		public void keyReleased(KeyEvent e)
-		{
+		public void keyReleased(KeyEvent e) {
 			JTextField textField = ((JTextField) e.getSource());
 			if (!(textField.getText().matches("^[0-9]{0,4}\\.?[0-9]{0,4}$")))
 				textField.setText("" + getGridSize());
-			else
-			{
+			else {
 				if (textField.getText().length() > 0)
 					setGridSize(Double.parseDouble(textField.getText()));
 			}
@@ -755,39 +696,31 @@ public class EAToolBox extends AbstractToolBox
 		}
 
 		@Override
-		public void keyPressed(KeyEvent e)
-		{
+		public void keyPressed(KeyEvent e) {
 		}
 	}
 
-	public Scenario getScenario()
-	{
+	public Scenario getScenario() {
 		return this.sc;
 	}
 
-	public Polygon getAreaPolygon()
-	{
+	public Polygon getAreaPolygon() {
 		return areaPolygon;
 	}
 
-
-	public void setGridSize(double gridSize)
-	{
+	public void setGridSize(double gridSize) {
 		this.cellSize = gridSize;
 	}
 
-	public double getGridSize()
-	{
+	public double getGridSize() {
 		return this.cellSize;
 	}
 
-	public float getCellTransparency()
-	{
+	public float getCellTransparency() {
 		return this.cellTransparency;
 	}
 
-	public static String getReadableTime(double value, Unit unit)
-	{
+	public static String getReadableTime(double value, Unit unit) {
 		if (unit.equals(Unit.PEOPLE))
 			return " " + (int) value + " people";
 
@@ -797,51 +730,45 @@ public class EAToolBox extends AbstractToolBox
 
 		if (value < 0d)
 			return "";
-		else
-		{
+		else {
 			if (value / 60 > 1d) // check if minutes need to be displayed
 			{
 				if (value / 3600 > 1d) // check if hours need to be displayed
 				{
 					hours = Math.floor(value / 3600);
 					minutes = Math.floor((value - hours * 3600) / 60);
-					seconds = Math.floor((value - (hours * 3600) - (minutes * 60)));
-					return " > " + (int) hours + "h, " + (int) minutes + "m, " + (int) seconds + "s";
-				} else
-				{
+					seconds = Math
+							.floor((value - (hours * 3600) - (minutes * 60)));
+					return " > " + (int) hours + "h, " + (int) minutes + "m, "
+							+ (int) seconds + "s";
+				} else {
 					minutes = Math.floor(value / 60);
 					seconds = Math.floor((value - (minutes * 60)));
 					return " > " + (int) minutes + "m, " + (int) seconds + "s";
 
 				}
 
-			} else
-			{
+			} else {
 				return " > " + (int) seconds + "s";
 			}
 		}
 	}
-	
-	public KeyPanel getKeyPanel()
-	{
+
+	public KeyPanel getKeyPanel() {
 		return keyPanel;
 	}
-	
-	public AbstractDataPanel getGraphPanel()
-	{
+
+	public AbstractDataPanel getGraphPanel() {
 		return graphPanel;
 	}
 
-	public void setFirstLoad(boolean b)
-	{
+	public void setFirstLoad(boolean b) {
 		this.firstLoad = b;
-		
+
 	}
-	
+
 	public JButton getOpenOTFVisBtn() {
 		return openOTFVisBtn;
 	}
-
-
 
 }

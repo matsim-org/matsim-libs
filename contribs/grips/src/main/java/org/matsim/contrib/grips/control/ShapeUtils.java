@@ -36,58 +36,55 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
- * geometric functions for shapes 
+ * geometric functions for shapes
  * 
  * @author wdoering
- *
+ * 
  */
-public class ShapeUtils
-{
+public class ShapeUtils {
 	private Controller controller;
-	public ShapeUtils(Controller controller)
-	{
+
+	public ShapeUtils(Controller controller) {
 		this.controller = controller;
 	}
 
-	public PolygonShape getPolygonFromCircle(CircleShape circle)
-	{
+	public PolygonShape getPolygonFromCircle(CircleShape circle) {
 		// copy circle data to polygon data
 		PolygonShape polygon = new PolygonShape(circle.getLayerID(), null);
 		polygon.setDescription(circle.getDescription());
 		polygon.setId(circle.getId());
 		polygon.setMetaData(circle.getAllMetaData());
-		
+
 		polygon.setStyle(circle.getStyle());
 
-		CoordinateReferenceSystem sourceCRS = MGC.getCRS(controller.getSourceCoordinateSystem());
-		CoordinateReferenceSystem targetCRS = MGC.getCRS(controller.getConfigCoordinateSystem());
+		CoordinateReferenceSystem sourceCRS = MGC.getCRS(controller
+				.getSourceCoordinateSystem());
+		CoordinateReferenceSystem targetCRS = MGC.getCRS(controller
+				.getTargetCoordinateSystem());
+		// getGripsConfigModule().getTargetCRS());
 
 		MathTransform transform = null;
-		try
-		{
+		try {
 			transform = CRS.findMathTransform(sourceCRS, targetCRS, true);
-		}
-		catch (FactoryException e)
-		{
+		} catch (FactoryException e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		Point2D c0 = circle.getOrigin();
 		Point2D c1 = circle.getDestination();
-		
+
 		Coordinate coord0 = new Coordinate(c0.getY(), c0.getX());
 		Coordinate coord1 = new Coordinate(c1.getY(), c1.getX());
 		PolygonalCircleApproximation.transform(coord0, transform);
 		PolygonalCircleApproximation.transform(coord1, transform);
 
-		Polygon poly = PolygonalCircleApproximation.getPolygonFromGeoCoords(coord0, coord1);
+		Polygon poly = PolygonalCircleApproximation.getPolygonFromGeoCoords(
+				coord0, coord1);
 
-		try
-		{
-			poly = (Polygon) PolygonalCircleApproximation.transform(poly, transform.inverse());
-		}
-		catch (NoninvertibleTransformException e)
-		{
+		try {
+			poly = (Polygon) PolygonalCircleApproximation.transform(poly,
+					transform.inverse());
+		} catch (NoninvertibleTransformException e) {
 			e.printStackTrace();
 		}
 

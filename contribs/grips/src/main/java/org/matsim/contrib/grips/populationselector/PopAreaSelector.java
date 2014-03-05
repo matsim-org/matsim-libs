@@ -49,7 +49,7 @@ public class PopAreaSelector extends AbstractModule
 	public static void main(String[] args)
 	{
 		// set up controller and image interface
-		final Controller controller = new Controller();
+		final Controller controller = new Controller(args);
 		BufferedImage image = new BufferedImage(width - border * 2, height - border * 2, BufferedImage.TYPE_INT_ARGB);
 		BufferedImageContainer imageContainer = new BufferedImageContainer(image, border);
 		controller.setImageContainer(imageContainer);

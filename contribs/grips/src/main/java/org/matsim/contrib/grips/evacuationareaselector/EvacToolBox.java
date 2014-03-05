@@ -53,9 +53,8 @@ class EvacToolBox extends AbstractToolBox {
 	private JButton openBtn;
 	private JButton saveButton;
 	private JButton clearButton;
-	
+
 	private SelectionModeSwitch modeSwitch;
-	
 
 	EvacToolBox(AbstractModule module, Controller controller) {
 		super(module, controller);
@@ -63,16 +62,15 @@ class EvacToolBox extends AbstractToolBox {
 		this.setLayout(new BorderLayout());
 
 		JPanel buttonPanel = new JPanel();
-		
+
 		JPanel tools = new JPanel(new GridLayout(2, 0));
-		
+
 		this.modeSwitch = new SelectionModeSwitch(controller);
-		
 
 		this.openBtn = new JButton(locale.btOpen());
 		this.saveButton = new JButton(locale.btSave());
 		this.saveButton.setEnabled(false);
-		
+
 		this.clearButton = new JButton(locale.btClear());
 		this.clearButton.setEnabled(false);
 
@@ -82,16 +80,14 @@ class EvacToolBox extends AbstractToolBox {
 
 		if (this.controller.isStandAlone())
 			buttonPanel.add(this.openBtn);
-		
+
 		buttonPanel.add(this.clearButton);
 		buttonPanel.add(this.saveButton);
-		
+
 		tools.add(this.modeSwitch);
 		tools.add(buttonPanel);
-		
-		this.add(tools, BorderLayout.SOUTH);
-		
 
+		this.add(tools, BorderLayout.SOUTH);
 
 	}
 
@@ -111,27 +107,31 @@ class EvacToolBox extends AbstractToolBox {
 				this.controller.disableAllRenderLayers();
 
 				// add network bounding box shape
-				int shapeRendererId = controller.getVisualizer().getPrimaryShapeRenderLayer().getId();
+				int shapeRendererId = controller.getVisualizer()
+						.getPrimaryShapeRenderLayer().getId();
 				Rectangle2D bbRect = controller.getBoundingBox();
-				controller.addShape(ShapeFactory.getNetBoxShape(shapeRendererId, bbRect, false));
+				controller.addShape(ShapeFactory.getNetBoxShape(
+						shapeRendererId, bbRect, false));
 
 				// deactivate evacuation shape
-				Shape evacuationShape = this.controller.getShapeById(Constants.ID_EVACAREAPOLY);
+				Shape evacuationShape = this.controller
+						.getShapeById(Constants.ID_EVACAREAPOLY);
 				if (evacuationShape != null)
 					evacuationShape.setVisible(false);
 
-				this.controller.getVisualizer().getActiveMapRenderLayer().setPosition(this.controller.getCenterPosition());
+				this.controller.getVisualizer().getActiveMapRenderLayer()
+						.setPosition(this.controller.getCenterPosition());
 				this.saveButton.setEnabled(false);
 				this.controller.enableAllRenderLayers();
 			}
-		} else if (cmd.equals(locale.btSave())) {
+		} else if (cmd.equals(locale.btSave())) { // Save
 			save();
 		} else if (cmd.equals(locale.btClear())) {
-			this.controller.removeShape(Constants.ID_EVACAREAPOLY); 
+			this.controller.removeShape(Constants.ID_EVACAREAPOLY);
 			this.controller.setInSelection(false);
 			this.setGoalAchieved(false);
 			this.controller.paintLayers();
-			
+
 		}
 
 	}
@@ -141,20 +141,18 @@ class EvacToolBox extends AbstractToolBox {
 		Shape shape = controller.getShapeById(Constants.ID_EVACAREAPOLY);
 
 		if (shape instanceof PolygonShape) {
-			this.goalAchieved = controller.saveShape(shape, controller.getGripsConfigModule().getEvacuationAreaFileName());
-				
-			
+			this.goalAchieved = controller.saveShape(shape, controller
+					.getGripsConfigModule().getEvacuationAreaFileName());
+
 			this.controller.setGoalAchieved(this.goalAchieved);
 
 			this.saveButton.setEnabled(false);
-			if (this.goalAchieved)
-			{
+			if (this.goalAchieved) {
 				this.controller.setUnsavedChanges(false);
 				return true;
 			}
 		}
 		return false;
 	}
-	
 
 }
