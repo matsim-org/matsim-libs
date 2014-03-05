@@ -77,7 +77,7 @@ class PtTutorialControler {
 						net);
 		accessibilityListener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true) ;
 		accessibilityListener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-		accessibilityListener.generateGridsAndMeasuringPointsByNetwork(net, 251);
+		accessibilityListener.generateGridsAndMeasuringPointsByNetwork(251);
 		controler.addControlerListener(accessibilityListener);
 		
 		controler.setOverwriteFiles(true);

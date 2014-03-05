@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -167,7 +168,7 @@ public class NetworkUtils {
 	 * 
 	 * @deprecated use the version which passes an {@link IdFactory}, otherwise you might end up wasting tons of memory
 	 */
-	@Deprecated
+	@Deprecated // use the version which passes an {@link IdFactory}, otherwise you might end up wasting tons of memory
 	public static List<Id> getLinkIds(final String links) {
 		if (links == null) {
 			return new ArrayList<Id>(0);
@@ -286,5 +287,104 @@ public class NetworkUtils {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Returns the orthogonal distance between a point and a network link (a straight line).
+	 * It assumes that a link has unlimited length.
+	 * So it gives just the distance between a point and a line.
+	 * 
+	 * tnicolai feb'13: not used any more for accessibility calculation
+	 * @param pointx
+	 * @param pointy
+	 * @param link
+	 * 
+	 * @return
+	 */
+	public static double getOrthogonalDistance(double pointx, double pointy, Link link){
+		// yyyy I don't think there is a test for this anywhere.  kai, mar'14
+		
+		double ax = link.getFromNode().getCoord().getX();
+		double ay = link.getFromNode().getCoord().getY();
+		double bx = link.getToNode().getCoord().getX();
+		double by = link.getToNode().getCoord().getY();
+	
+		double normalzation = Math.sqrt( Math.pow( bx - ax , 2) + Math.pow( by - ay, 2));
+		double distance = Math.abs( ((pointx - ax) * (by - ay)) - ((pointy -ay) * (bx - ax)) );
+		
+		return distance/normalzation;
+	}
+
+	/**
+	 * Returns the orthogonal distance between a point and a network link (a straight line).
+	 * It assumes that a link has unlimited length.
+	 * So it gives just the distance between a point and a line.
+	 * 
+	 * tnicolai feb'13: not used any more for accessibility calculation
+	 * @param link
+	 * @param coord
+	 * 
+	 * @return
+	 */
+	public static double getOrthogonalDistance(Coord point, Link link){
+		return getOrthogonalDistance(point.getX(), point.getY(), link);
+	}
+
+	/**
+	 * This method expects the nearest link to a given measure point. 
+	 * It calculates the euclidian distance for both nodes of the link, 
+	 * "fromNode" and "toNode" and returns the node with shorter distance
+	 * 
+	 * @param coord
+	 * @param link
+	 */
+	public static Node getCloserNodeOnLink(Coord coord, Link link) {
+		// yyyy I don't think there is a test for this anywhere.  kai, mar'14
+		
+		Node toNode = link.getToNode();
+		Node fromNode= link.getFromNode();
+		
+		double distanceToNode = getEuclidianDistance(coord, toNode.getCoord());
+		double distanceFromNode= getEuclidianDistance(coord, fromNode.getCoord());
+		
+		if(distanceToNode < distanceFromNode)
+			return toNode;
+		return fromNode;
+	}
+
+	/**
+		 * returns the euclidean distance between two coordinates
+		 * 
+		 * @param origin
+		 * @param destination
+		 * @return distance
+		 */
+		public static double getEuclidianDistance(Coord origin, Coord destination){
+			
+	//		assert(origin != null);
+	//		assert(destination != null);
+			
+			double xDiff = origin.getX() - destination.getX();
+			double yDiff = origin.getY() - destination.getY();
+			double distance = Math.sqrt( (xDiff*xDiff) + (yDiff*yDiff) );
+			
+			return distance;
+		}
+
+	/** returns the euclidean distance between two points (x1,y1) and (x2,y2)
+	 * 
+	 * @param x1
+	 * @param y1
+	 * @param x2
+	 * @param y2
+	 * @return Distances
+	 */
+	public static double getEuclidianDistance(double x1, double y1, double x2, double y2){
+		
+		double xDiff = x1 - x2;
+		double yDiff = y1 - y2;
+		double distance =  Math.sqrt( (xDiff*xDiff) + (yDiff*yDiff) );
+		
+		return distance ;
 	}
 }

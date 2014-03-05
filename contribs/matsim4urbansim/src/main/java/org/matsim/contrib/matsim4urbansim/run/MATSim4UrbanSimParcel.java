@@ -387,7 +387,7 @@ public class MATSim4UrbanSimParcel{
 			else if(computeGridBasedAccessibilityUsingBoundingBox)
 				gbacl.generateGridsAndMeasuringPointsByCustomBoundary(nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
 			else
-				gbacl.generateGridsAndMeasuringPointsByNetwork(controler.getNetwork(), cellSizeInMeter);
+				gbacl.generateGridsAndMeasuringPointsByNetwork(cellSizeInMeter);
 			
 			// accessibility calculations will be triggered when mobsim finished
 			controler.addControlerListener( gbacl );

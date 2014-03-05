@@ -30,6 +30,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
@@ -244,7 +245,7 @@ public abstract class AccessibilityControlerListenerImpl {
 			Node nearestNode = ((NetworkImpl)network).getNearestNode( opprotunity.getCoord() );
 
 			// get Euclidian distance to nearest node
-			double distance_meter 	= NetworkUtil.getEuclidianDistance(opprotunity.getCoord(), nearestNode.getCoord());
+			double distance_meter 	= NetworkUtils.getEuclidianDistance(opprotunity.getCoord(), nearestNode.getCoord());
 			double walkTravelTime_h = distance_meter / this.walkSpeedMeterPerHour;
 
 			double VjkWalkTravelTime	= this.betaWalkTT * walkTravelTime_h;
@@ -311,7 +312,7 @@ public abstract class AccessibilityControlerListenerImpl {
 		for ( ActivityFacility aFac : mp.getFacilities().values() ) {
 
 			// determine nearest network node (from- or toNode) based on the link 
-			Node fromNode = NetworkUtil.getNearestNode(aFac.getCoord(), network.getNearestLinkExactly(aFac.getCoord()));
+			Node fromNode = NetworkUtils.getCloserNodeOnLink(aFac.getCoord(), network.getNearestLinkExactly(aFac.getCoord()));
 
 			// this is used as a key for hash map lookups
 			Id nodeId = fromNode.getId();
@@ -357,7 +358,7 @@ public abstract class AccessibilityControlerListenerImpl {
 				Link nearestLink = network.getNearestLinkExactly(origin.getCoord());
 
 				// captures the distance (as walk time) between a zone centroid and its nearest node
-				Distances distance = NetworkUtil.getDistance2Node(nearestLink, origin.getCoord(), fromNode);
+				Distances distance = NetworkUtil.getDistances2Node(origin.getCoord(), nearestLink, fromNode);
 
 				// distance to road, and then to node:
 				double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Road() / this.walkSpeedMeterPerHour;

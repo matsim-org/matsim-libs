@@ -191,7 +191,7 @@ public class AccessibilityIntegrationTest {
 		gacl.addSpatialGridDataExchangeListener(etr);
 		
 		// generating measuring points and SpatialGrids by using the bounding box
-		gacl.generateGridsAndMeasuringPointsByNetwork(network, cellSize);
+		gacl.generateGridsAndMeasuringPointsByNetwork(cellSize);
 
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(false);

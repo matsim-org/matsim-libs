@@ -127,6 +127,7 @@ public class SpatialGrid{
 	 * @param point
 	 * @return the initial value at the given point
 	 */
+	@Deprecated // use method with Coord
 	public double getValue(Point point) {
 		if(isInBounds(point))
 			return getValue(point.getX(), point.getY());
@@ -135,6 +136,14 @@ public class SpatialGrid{
 		// log.warn("Boundary: xmin:"+this.minX+", ymin:"+ this.minY+", xmax:"+this.maxX+", maxy:"+this.maxY);
 		// log.warn("Point: x:"+point.getX()+ ", y:"+point.getY());
 		return Double.NaN;
+	}
+	
+	public double getValue( Coord coord ) {
+		if ( isInBounds( coord ) ) {
+			return getValue( coord.getX(), coord.getY() ) ;
+		} else {
+			return Double.NaN ;
+		}
 	}
 	
 	/**
