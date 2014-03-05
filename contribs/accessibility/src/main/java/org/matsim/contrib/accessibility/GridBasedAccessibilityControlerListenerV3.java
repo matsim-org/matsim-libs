@@ -28,6 +28,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.utils.LeastCostPathTree;
 
@@ -182,7 +183,8 @@ implements ShutdownListener, StartupListener {
 
 	private boolean alreadyActive = false ;
 	private List<ActivityFacilities> additionalFacilityData = new ArrayList<ActivityFacilities>() ; 
-	private Map<String,SpatialGrid> additionalSpatialGrids = new TreeMap<String,SpatialGrid>() ;
+	private Map<String,Tuple<SpatialGrid,SpatialGrid>> additionalSpatialGrids = new TreeMap<String,Tuple<SpatialGrid,SpatialGrid>>() ;
+	//(not sure if this is a bit odd ... but I always need TWO spatial grids. kai, mar'14)
 	private boolean lockedForAdditionalFacilityData = false;
 
 	@Override
@@ -207,8 +209,8 @@ implements ShutdownListener, StartupListener {
 
 		// prepare the additional columns:
 		for ( ActivityFacilities facilities : this.additionalFacilityData ) {
-			SpatialGrid spatialGrid = this.additionalSpatialGrids.get( facilities.getName() ) ;
-			GridUtils.aggregateFacilitiesIntoSpatialGrid(facilities, spatialGrid, spatialGridAv);
+			Tuple<SpatialGrid,SpatialGrid> spatialGrids = this.additionalSpatialGrids.get( facilities.getName() ) ;
+			GridUtils.aggregateFacilitiesIntoSpatialGrid(facilities, spatialGrids.getFirst(), spatialGrids.getSecond());
 		}
 
 		// get the controller and scenario
@@ -334,8 +336,9 @@ implements ShutdownListener, StartupListener {
 						writer.writeField( Double.NaN ) ;
 					}
 				}
-				for ( SpatialGrid additionalGrid : this.additionalSpatialGrids.values() ) {
-					writer.writeField( additionalGrid.getValue(x, y) ) ;
+				for ( Tuple<SpatialGrid,SpatialGrid> additionalGrids : this.additionalSpatialGrids.values() ) {
+					writer.writeField( additionalGrids.getFirst().getValue(x, y) ) ;
+					writer.writeField( additionalGrids.getSecond().getValue(x, y) ) ;
 				}
 				writer.writeNewLine(); 
 			}
@@ -426,7 +429,9 @@ implements ShutdownListener, StartupListener {
 			if ( this.additionalSpatialGrids.get( facilities.getName() ) != null ) {
 				throw new RuntimeException("this should not yet exist ...") ;
 			}
-			this.additionalSpatialGrids.put( facilities.getName(), new SpatialGrid( minX, minY, maxX, maxY, cellSize, 0. ) ) ;
+			Tuple<SpatialGrid,SpatialGrid> spatialGrids = new Tuple<SpatialGrid,SpatialGrid>(
+					new SpatialGrid( minX, minY, maxX, maxY, cellSize, 0. ) , new SpatialGrid( minX, minY, maxX, maxY, cellSize, 0. ) ) ;
+			this.additionalSpatialGrids.put( facilities.getName(), spatialGrids ) ;
 		}
 	}
 
@@ -438,6 +443,8 @@ implements ShutdownListener, StartupListener {
 	 * file as additional column.
 	 */
 	public void addAdditionalFacilityData(ActivityFacilities facilities ) {
+		log.warn("changed this data flow (by adding the _cnt_ column) but did not test.  If it works, please remove this warning. kai, mar'14") ;
+		
 		if ( this.lockedForAdditionalFacilityData ) {
 			throw new RuntimeException("too late for adding additional facility data; spatial grids have already been generated.  Needs"
 					+ " to be called before generating the spatial grids.  (This design should be improved ..)") ;
