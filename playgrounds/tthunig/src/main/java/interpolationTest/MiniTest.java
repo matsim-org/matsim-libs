@@ -50,7 +50,7 @@ public class MiniTest {
 		//initialize the SpatialGrid
 		double[] boundingBox = initBoundingBox(numberOfRows,numberOfColumns);
 		double gridSizeInMeter = 1.;
-		this.sg = new SpatialGrid(gridSizeInMeter, boundingBox);
+		this.sg = new SpatialGrid(boundingBox, gridSizeInMeter);
 		
 		//set values
 		for (double x = sg.getXmin(); x <= sg.getXmax(); x += sg.getResolution()){

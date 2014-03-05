@@ -6,10 +6,10 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
-class CellBasedAccessibilityCSVWriter {
-	private static final Logger log = Logger.getLogger(CellBasedAccessibilityCSVWriter.class);
+public final class CSVWriter {
+	private static final Logger log = Logger.getLogger(CSVWriter.class);
 
-	private static final String FILE_NAME= "accessibilities.csv";
+	public static final String FILE_NAME= "accessibilities.csv";
 	
 	private static final String SEPARATOR = "\t"; // comma is the correct choice for excel.  But gnuplot cannot deal with comma!
 
@@ -18,10 +18,10 @@ class CellBasedAccessibilityCSVWriter {
 	/**
 	 * writes the header of accessibility data csv file
 	 */
-	public CellBasedAccessibilityCSVWriter(String matsimOutputDirectory){
+	public CSVWriter(String path){
 		log.info("Initializing  ...");
 		try {
-		writer = IOUtils.getBufferedWriter( matsimOutputDirectory + "/" + FILE_NAME );
+		writer = IOUtils.getBufferedWriter( path );
 		} catch ( Exception ee ) {
 			ee.printStackTrace();
 			throw new RuntimeException("writer could not be instantiated") ;
@@ -34,7 +34,7 @@ class CellBasedAccessibilityCSVWriter {
 		log.info("... done!");
 	}
 
-	public void writeField( double val ) {
+	public final void writeField( double val ) {
 		try {
 			writer.write( val + SEPARATOR ) ;
 		} catch (IOException e) {
@@ -43,7 +43,7 @@ class CellBasedAccessibilityCSVWriter {
 		}
 	}
 
-	public void writeNewLine() {
+	public final void writeNewLine() {
 		try {
 			writer.newLine() ;
 		} catch (IOException e) {
@@ -55,7 +55,7 @@ class CellBasedAccessibilityCSVWriter {
 	/**
 	 * finalize and close csv file
 	 */
-	public void close(){
+	public final void close(){
 		try {
 			log.info("Closing ...");
 			assert(writer != null);

@@ -68,4 +68,9 @@ public class BoundingBox {
 	public double getYMax(){
 		return boundingBox[3];
 	}
+	
+	@Override
+	public String toString() {
+		return "[xmin=" + this.getXMin() + " ymin=" + this.getYMin() + " xmax=" + this.getXMax() + " ymax= " + this.getYMax() + "]" ;
+	}
 }

@@ -22,7 +22,7 @@ public class SpatialGridTest extends MatsimTestCase{
 		BoundingBox nbb = BoundingBox.createBoundingBox(network);		
 		
 		// create spatial grid		
-		SpatialGrid testGrid = new SpatialGrid(cellSize, nbb.getBoundingBox());
+		SpatialGrid testGrid = new SpatialGrid(nbb.getBoundingBox(), cellSize);
 		
 		// get number of rows
 		int rows = testGrid.getNumRows();

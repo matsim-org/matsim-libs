@@ -88,8 +88,9 @@ public class KNEventsAnalyzer {
 		
 		new MatsimEventsReader(events).readFile(eventsFilename) ;
 		
-		String myDate = date.getYear() + "-" + date.getMonthOfYear() + "-" + date.getDayOfMonth() + "-" + 
-				date.getHourOfDay() + "h" + minute ;
+//		String myDate = date.getYear() + "-" + date.getMonthOfYear() + "-" + date.getDayOfMonth() + "-" + 
+//				date.getHourOfDay() + "h" + minute ;
+		String myDate = "" ;
 		
 		calcLegTimes.addPopulationStatsAndWrite(myDate + "_stats_");
 	}

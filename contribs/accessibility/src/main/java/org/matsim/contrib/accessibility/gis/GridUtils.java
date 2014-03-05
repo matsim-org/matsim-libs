@@ -1,10 +1,14 @@
 package org.matsim.contrib.accessibility.gis;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.accessibility.CSVWriter;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -23,14 +27,18 @@ public class GridUtils {
 	
 	/**
 	 * 
-	 * @param shapeFile
+	 * @param shapeFileName
 	 * @return Geometry determines the scenario boundary for the accessibility measure
 	 */
-	public static Geometry getBoundary(String shapeFile){
+	public static Geometry getBoundary(String shapeFileName){
 		
 		try{
 			// get boundaries of study area
-			Set<SimpleFeature> featureSet = FeatureSHP.readFeatures(shapeFile);
+			Set<SimpleFeature> featureSet = FeatureSHP.readFeatures(shapeFileName);
+			// yyyy I find this quite terrible to have the reader hidden in here.  Now I cannot pass a shape file which
+			// I may have gotten in some way, but need to first write it to file. kai, mar'14
+			
+			
 			log.info("Extracting boundary of the shape file ...");
 			Geometry boundary = (Geometry) featureSet.iterator().next().getDefaultGeometry();
 			log.info("Done extracting boundary ...");
@@ -52,72 +60,6 @@ public class GridUtils {
 		return null;
 	}
 	
-//	/**
-//	 * creates measuring points for accessibility computation
-//	 * 
-//	 * @param <T>
-//	 * @param gridSize
-//	 * @param boundary
-//	 * @return
-//	 */
-//	@Deprecated
-//	public static ZoneLayer<Id> createGridLayerByGridSizeByShapeFile(double gridSize, Geometry boundary) {
-//		
-//		log.info("Setting statring points for accessibility measure ...");
-//
-//		int skippedPoints = 0;
-//		int setPoints = 0;
-//		
-//		GeometryFactory factory = new GeometryFactory();
-//		
-//		Set<Zone<Id>> zones = new HashSet<Zone<Id>>();
-//		Envelope env = boundary.getEnvelopeInternal();
-//		
-//		ProgressBar bar = new ProgressBar( (env.getMaxX()-env.getMinX())/gridSize );
-//		
-//		// goes step by step from the min x and y coordinate to max x and y coordinate
-//		for(double x = env.getMinX(); x < env.getMaxX(); x += gridSize) {
-//			
-//			bar.update();
-//						
-//			for(double y = env.getMinY(); y < env.getMaxY(); y += gridSize) {
-//				
-//				// check first if cell centroid is within study area
-//				double center_X = x + (gridSize/2);
-//				double center_Y = y + (gridSize/2);
-//				Point centroid = factory.createPoint(new Coordinate(center_X, center_Y));
-//				
-//				if(boundary.contains(centroid)) {
-//					Point point = factory.createPoint(new Coordinate(x, y));
-//					
-//					Coordinate[] coords = new Coordinate[5];
-//					coords[0] = point.getCoordinate();
-//					coords[1] = new Coordinate(x, y + gridSize);			// upper left
-//					coords[2] = new Coordinate(x + gridSize, y + gridSize);	// upper right
-//					coords[3] = new Coordinate(x + gridSize, y);			// lower right
-//					coords[4] = point.getCoordinate();						// lower left
-//					
-//					// Linear Ring defines an artificial zone
-//					LinearRing linearRing = factory.createLinearRing(coords);
-//					Polygon polygon = factory.createPolygon(linearRing, null);
-//					// polygon.setSRID( srid ); // tnicolai: this is not needed to match the grid layer with locations / facilities from UrbanSim
-//					
-//					Zone<Id> zone = new Zone<Id>(polygon);
-//					zone.setAttribute( new IdImpl( setPoints ) );
-//					zones.add(zone);
-//					
-//					setPoints++;
-//				}
-//				else skippedPoints++;
-//			}
-//		}
-//
-//		log.info("Having " + setPoints + " inside the shape file boundary (and " + skippedPoints + " outside).");
-//		log.info("Done with setting starting points!");
-//		
-//		ZoneLayer<Id> layer = new ZoneLayer<Id>(zones);
-//		return layer;
-//	}
 	
 	/**
 	 * creates measuring points for accessibility computation
@@ -162,79 +104,6 @@ public class GridUtils {
 		return measuringPoints;
 	}
 	
-//	/**
-//	 * creates measuring points for accessibility computation
-//	 * 
-//	 * @param <T>
-//	 * @param gridSize
-//	 * @param boundingBox defines an area within the network file, this area will later be processed when calculating accessibilities.
-//	 * @param boundary
-//	 * @return
-//	 */
-//	@Deprecated
-//	public static ZoneLayer<Id> createGridLayerByGridSizeByNetwork(double gridSize, double [] boundingBox) {
-//		
-//		log.info("Setting statring points for accessibility measure ...");
-//
-//		int skippedPoints = 0;
-//		int setPoints = 0;
-//		
-//		GeometryFactory factory = new GeometryFactory();
-//		
-//		Set<Zone<Id>> zones = new HashSet<Zone<Id>>();
-//
-//		double xmin = boundingBox[0];
-//		double ymin = boundingBox[1];
-//		double xmax = boundingBox[2];
-//		double ymax = boundingBox[3];
-//		
-//		
-//		ProgressBar bar = new ProgressBar( (xmax-xmin)/gridSize );
-//		
-//		// goes step by step from the min x and y coordinate to max x and y coordinate
-//		for(double x = xmin; x <xmax; x += gridSize) {
-//			
-//			bar.update();
-//						
-//			for(double y = ymin; y < ymax; y += gridSize) {
-//				
-//				// check first if cell centroid is within study area
-//				double center_X = x + (gridSize/2);
-//				double center_Y = y + (gridSize/2);
-//				
-//				// check if x, y is within network boundary
-//				if (center_X <= xmax && center_X >= xmin && 
-//					center_Y <= ymax && center_Y >= ymin) {
-//				
-//					Point point = factory.createPoint(new Coordinate(x, y));
-//					
-//					Coordinate[] coords = new Coordinate[5];
-//					coords[0] = point.getCoordinate();
-//					coords[1] = new Coordinate(x, y + gridSize);
-//					coords[2] = new Coordinate(x + gridSize, y + gridSize);
-//					coords[3] = new Coordinate(x + gridSize, y);
-//					coords[4] = point.getCoordinate();
-//					// Linear Ring defines an artificial zone
-//					LinearRing linearRing = factory.createLinearRing(coords);
-//					Polygon polygon = factory.createPolygon(linearRing, null);
-//					// polygon.setSRID( srid ); // tnicolai: this is not needed to match the grid layer with locations / facilities from UrbanSim
-//					
-//					Zone<Id> zone = new Zone<Id>(polygon);
-//					zone.setAttribute( new IdImpl( setPoints ) );
-//					zones.add(zone);
-//					
-//					setPoints++;
-//				}
-//				else skippedPoints++;
-//			}
-//		}
-//
-//		log.info("Having " + setPoints + " inside the shape file boundary (and " + skippedPoints + " outside).");
-//		log.info("Done with setting starting points!");
-//		
-//		ZoneLayer<Id> layer = new ZoneLayer<Id>(zones);
-//		return layer;
-//	}
 	
 	/**
 	 * creates measuring points for accessibility computation
@@ -281,48 +150,6 @@ public class GridUtils {
 		return measuringPoints;
 	}
 	
-//	/**
-//	 * Converting zones (or zone centroids) of type ActivityFacilitiesImpl into a ZoneLayer
-//	 * 
-//	 * @param facility ActivityFacilitiesImpl
-//	 * @return ZoneLayer<Id>
-//	 */
-//	public static ZoneLayer<Id> convertActivityFacilities2ZoneLayer(ActivityFacilitiesImpl facility){
-//		
-//		int setPoints = 0;
-//		
-//		GeometryFactory factory = new GeometryFactory();
-//		
-//		Set<Zone<Id>> zones = new HashSet<Zone<Id>>();
-//
-//		Iterator<ActivityFacility> facilityIterator =  facility.getFacilities().values().iterator();
-//		
-//		while(facilityIterator.hasNext()){
-//			
-//			ActivityFacility af = facilityIterator.next();
-//
-//			Coord coord = af.getCoord();
-//			// Point defines the artificial zone centroid
-//			Point point = factory.createPoint(new Coordinate(coord.getX(), coord.getY()));
-//			// point.setSRID(srid); // tnicolai: this is not needed to match the grid layer with locations / facilities from UrbanSim
-//			
-//			Zone<Id> zone = new Zone<Id>(point);
-//			zone.setAttribute( af.getId() );
-//			zones.add(zone);
-//			
-//			setPoints++;
-//		}
-//		
-//		log.info("Having " + setPoints + " 'ActivityFacilitiesImpl' items converted into 'ZoneLayer' format");
-//		log.info("Done with conversion!");
-//		
-//		ZoneLayer<Id> layer = new ZoneLayer<Id>(zones);
-//
-//		if(!checkConversion(facility, layer))
-//			log.error("Conversion error: Either not all items are converted or coordinates are wrong!");
-//		
-//		return layer;
-//	}
 	
 	/**
 	 * returns a spatial grid for a given geometry (e.g. shape file) with a given grid size
@@ -358,4 +185,43 @@ public class GridUtils {
 			e.printStackTrace();
 		}
 	}
+
+	public static final String WEIGHT = "weight";
+
+	public static final void writeSpatialGrids( List<SpatialGrid> spatialGrids, String path ) {
+		// seems that we cannot re-use the accessibility write method since it plays games with the modes. kai, mar'14
+		
+		final CSVWriter writer = new CSVWriter( path ) ;
+		final SpatialGrid spatialGrid = spatialGrids.get(0) ;
+		for ( double y = spatialGrid.getYmin() ; y <= spatialGrid.getYmax() ; y += spatialGrid.getResolution() ) {
+			for ( double x = spatialGrid.getXmin() ; x <= spatialGrid.getXmax(); x+= spatialGrid.getResolution() ) {
+				writer.writeField( x ) ;
+				writer.writeField( y ) ;
+				for ( SpatialGrid theSpatialGrid : spatialGrids ) {
+					writer.writeField( theSpatialGrid.getValue(x,y) ) ;
+				}
+				writer.writeNewLine();
+			}
+			writer.writeNewLine() ; // gnuplot pm3d scanlines
+		}
+		writer.close();
+		
+	}
+
+
+	public static void aggregateFacilitiesIntoSpatialGrid(ActivityFacilities facilities, SpatialGrid spatialGridSum, SpatialGrid spatialGridCnt) {
+			for ( ActivityFacility fac : facilities.getFacilities().values() ) {
+				Coord coord = fac.getCoord() ;
+				
+				final Object weight = fac.getCustomAttributes().get(WEIGHT);
+				double value = 1 ;
+				if ( weight != null ) {
+					value = (Double) weight ;
+				}
+	//				double value = fac.getActivityOptions().get("h").getCapacity() ; // infinity if undefined!!!
+	
+				spatialGridSum.addToValue(value, coord) ;
+				spatialGridCnt.addToValue(1., coord) ;
+			}
+		}
 }

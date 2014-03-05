@@ -50,6 +50,8 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 /**
  * @author knagel, originally based on
@@ -60,13 +62,16 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 	
 	private final static Logger log = Logger.getLogger(KNAnalysisEventsHandler.class);
 	
+	public static final String MONEY = "money";
+	public static final String TRAV_TIME = "travTime" ;
+	
 	private Scenario scenario = null ;
 	private Population population = null;
 	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
 	private final TreeMap<Id, Integer> agentLegs = new TreeMap<Id, Integer>();
 	
 	// statistics types:
-	private enum StatType { durations, durationsOtherBins, beelineDistances, legDistances, scores, money } ;
+	private enum StatType { durations, durationsOtherBins, beelineDistances, legDistances, scores, payments } ;
 
 	// container that contains the statistics containers:
 	private final Map<StatType,Map<String,int[]>> legStatsContainer = new TreeMap<StatType,Map<String,int[]>>() ;
@@ -125,7 +130,7 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 				double[] dataBoundariesTmp = {Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY } ; // yy ??
 				dataBoundaries.put( type, dataBoundariesTmp ) ;
 				break; }
-			case money:{
+			case payments:{
 				double[] dataBoundariesTmp = {Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY } ; // yy ??
 				dataBoundaries.put( type, dataBoundariesTmp ) ;
 				break; }
@@ -176,7 +181,9 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 		if (depTime != null && person != null) {
 			double travTime = event.getTime() - depTime;
 			controlStatisticsSum += travTime ;
-			controlStatisticsCnt ++ ; 
+			controlStatisticsCnt ++ ;
+			
+			add(person,travTime, TRAV_TIME) ;
 			
 			int legNr = this.agentLegs.get(event.getPersonId());
 			Plan plan = person.getSelectedPlan();
@@ -254,7 +261,7 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 						}
 					}
 					break;
-				case money:
+				case payments:
 				case scores:
 					break ;
 				default:
@@ -321,20 +328,35 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 	public void handleEvent(PersonMoneyEvent event) {
 		List<String> legTypes = new ArrayList<String>() ;
 		
-		Person person = this.scenario.getPopulation().getPersons().get( event.getPersonId() ) ;
+		final Population pop = this.scenario.getPopulation();
+		Person person = pop.getPersons().get( event.getPersonId() ) ;
 		legTypes.add( this.getLegtypeBySubpop(person)) ;
 		
 		double item = event.getAmount() ;
 		
-		this.addItemToAllRegisteredTypes(legTypes, StatType.money, item);
+		this.addItemToAllRegisteredTypes(legTypes, StatType.payments, item);
 		// (this is not additive by person, but it is additive by legType.  So if a person has multiple money events, they
 		// are added up in the legType category.  kai, feb'14)
 		
+		
+		add(person, item, MONEY);
+	}
+
+	private void add(Person person, double item, final String attributeName) {
+		final ObjectAttributes pAttribs = this.scenario.getPopulation().getPersonAttributes();
+		Double oldMoney = (Double) pAttribs.getAttribute( person.getId().toString(), attributeName) ;
+		if ( oldMoney==null ) {
+			pAttribs.putAttribute( person.getId().toString(), attributeName, item ) ; 
+		} else {
+			pAttribs.putAttribute( person.getId().toString(), attributeName, item + oldMoney ) ; 
+		}
 	}
 
 	public void addPopulationStatsAndWrite(final String filenameTmp) {
+		final Population pop = this.scenario.getPopulation();
+		
 		// analyze Population:
-		for ( Person person : this.scenario.getPopulation().getPersons().values() ) {
+		for ( Person person : pop.getPersons().values() ) {
 			// this defines to which legTypes this leg should belong for the statistical averaging:
 			List<String> legTypes = new ArrayList<String>() ;
 			// (yy "leg" is a misnomer here)
@@ -349,6 +371,10 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 			this.addItemToAllRegisteredTypes(legTypes, StatType.scores, item);
 		}
 		
+		// write population attributes:
+		new ObjectAttributesXmlWriter(pop.getPersonAttributes()).writeFile("derivedPersonAttributes.xml.gz");
+
+		//write statistics:
 		for ( StatType type : StatType.values() ) {
 			String filename = filenameTmp + type.toString() + ".txt" ;
 //			if ( type!=StatType.duration ) {

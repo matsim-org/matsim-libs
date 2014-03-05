@@ -89,7 +89,7 @@ public abstract class AccessibilityControlerListenerImpl {
 	AggregateObject2NearestNode[] aggregatedOpportunities;
 	
 	// storing the accessibility results
-	Map<Modes4Accessibility,SpatialGrid> spatialGrids = new HashMap<Modes4Accessibility,SpatialGrid>() ;
+	Map<Modes4Accessibility,SpatialGrid> accessibilityGrids = new HashMap<Modes4Accessibility,SpatialGrid>() ;
 
 	Map<Modes4Accessibility,Boolean> isComputingMode = new HashMap<Modes4Accessibility,Boolean>() ;
 
@@ -418,7 +418,7 @@ public abstract class AccessibilityControlerListenerImpl {
 						}
 						if(runMode == PARCEL_BASED){ // only for cell-based accessibility computation
 							// assign log sums to current starZone[[???]] object and spatial grid
-							this.spatialGrids.get(mode).setValue( accessibilities.get(mode), origin.getCoord().getX(), origin.getCoord().getY() ) ; 
+							this.accessibilityGrids.get(mode).setValue( accessibilities.get(mode), origin.getCoord().getX(), origin.getCoord().getY() ) ; 
 						}
 					}
 				}

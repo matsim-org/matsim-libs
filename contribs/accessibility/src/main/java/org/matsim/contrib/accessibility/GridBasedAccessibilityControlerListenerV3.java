@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.gis.GridUtils;
@@ -124,8 +123,8 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityControlerListenerImpl 
 implements ShutdownListener, StartupListener { 
-
 	private static final Logger log = Logger.getLogger(GridBasedAccessibilityControlerListenerV3.class);
+	
 	private UrbansimCellBasedAccessibilityCSVWriterV2 urbansimAccessibilityWriter;
 	private Network network;
 	private Config config;
@@ -206,21 +205,10 @@ implements ShutdownListener, StartupListener {
 			return;
 		}
 
-		// prepare the weight:
+		// prepare the additional columns:
 		for ( ActivityFacilities facilities : this.additionalFacilityData ) {
 			SpatialGrid spatialGrid = this.additionalSpatialGrids.get( facilities.getName() ) ;
-			for ( ActivityFacility fac : facilities.getFacilities().values() ) {
-				Coord coord = fac.getCoord() ;
-				
-				final Object weight = fac.getCustomAttributes().get("weight");
-				double value = 1 ;
-				if ( weight != null ) {
-					value = (Double) weight ;
-				}
-//				double value = fac.getActivityOptions().get("h").getCapacity() ; // infinity if undefined!!!
-
-				spatialGrid.addToValue(value, coord) ;
-			}
+			GridUtils.aggregateFacilitiesIntoSpatialGrid(facilities, spatialGrid, spatialGridAv);
 		}
 
 		// get the controller and scenario
@@ -277,7 +265,7 @@ implements ShutdownListener, StartupListener {
 		if(this.spatialGridDataExchangeListenerList != null){
 			log.info("Triggering " + this.spatialGridDataExchangeListenerList.size() + " SpatialGridDataExchangeListener(s) ...");
 			for(int i = 0; i < this.spatialGridDataExchangeListenerList.size(); i++)
-				this.spatialGridDataExchangeListenerList.get(i).getAndProcessSpatialGrids( spatialGrids );
+				this.spatialGridDataExchangeListenerList.get(i).getAndProcessSpatialGrids( accessibilityGrids );
 		}
 
 	}
@@ -308,12 +296,12 @@ implements ShutdownListener, StartupListener {
 	 * @param matsimOutputDirectory
 	 * @throws IOException
 	 */
-	private void writePlottingData(String matsimOutputDirectory) {
+	private final void writePlottingData(String matsimOutputDirectory) {
 
 		log.info("Writing plotting data for R analyis into " + matsimOutputDirectory + " ...");
 		for ( Modes4Accessibility mode : Modes4Accessibility.values()  ) {
 			if ( this.isComputingMode.get(mode) ) {
-				final SpatialGrid spatialGrid = this.spatialGrids.get(mode);
+				final SpatialGrid spatialGrid = this.accessibilityGrids.get(mode);
 
 				// output for R:
 				GridUtils.writeSpatialGridTable( spatialGrid, matsimOutputDirectory
@@ -325,9 +313,9 @@ implements ShutdownListener, StartupListener {
 
 		log.info("Writing plotting data for other analyis into " + matsimOutputDirectory + " ...");
 
-		final CellBasedAccessibilityCSVWriter writer = new CellBasedAccessibilityCSVWriter(matsimOutputDirectory) ;
+		final CSVWriter writer = new CSVWriter(matsimOutputDirectory + "/" + CSVWriter.FILE_NAME ) ;
 
-		final SpatialGrid spatialGrid = this.spatialGrids.get( Modes4Accessibility.freeSpeed ) ;
+		final SpatialGrid spatialGrid = this.accessibilityGrids.get( Modes4Accessibility.freeSpeed ) ;
 		// yy for time being, have to assume that this is always there
 		for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax() ; y += spatialGrid.getResolution()) {
 			for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
@@ -335,7 +323,7 @@ implements ShutdownListener, StartupListener {
 				writer.writeField( y ) ;
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()  ) {
 					if ( this.isComputingMode.get(mode) ) {
-						final SpatialGrid theSpatialGrid = this.spatialGrids.get(mode);
+						final SpatialGrid theSpatialGrid = this.accessibilityGrids.get(mode);
 						final double value = theSpatialGrid.getValue(x, y);
 						if ( !Double.isNaN(value ) ) { 
 							writer.writeField( value ) ;
@@ -358,6 +346,7 @@ implements ShutdownListener, StartupListener {
 		log.info("Writing plotting data for other analysis done!");
 	}
 
+	
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// GridBasedAccessibilityControlerListenerV3 specific methods that do not apply to zone-based accessibility measures
@@ -368,21 +357,21 @@ implements ShutdownListener, StartupListener {
 	 * Generates the activated SpatialGrids and measuring points for accessibility calculation.
 	 * The given ShapeFile determines the area for which to compute/measure accessibilities.
 	 * 
-	 * @param shapeFile String giving the path to the shape file
+	 * @param shapeFileName String giving the path to the shape file
 	 * @param cellSize double value giving the the side length of the cell in meter
 	 */
-	public void generateGridsAndMeasuringPointsByShapeFile(String shapeFile, double cellSize){
+	public void generateGridsAndMeasuringPointsByShapeFile(String shapeFileName, double cellSize){
 
-		if(TempDirectoryUtil.pathExists(shapeFile))
+		if(TempDirectoryUtil.pathExists(shapeFileName))
 			log.info("Using shape file to determine the area for accessibility computation.");
 		else
-			throw new RuntimeException("ShapeFile for accessibility computation not found: " + shapeFile);
+			throw new RuntimeException("ShapeFile for accessibility computation not found: " + shapeFileName);
 
-		Geometry boundary = GridUtils.getBoundary(shapeFile);
+		Geometry boundary = GridUtils.getBoundary(shapeFileName);
 		measuringPoints = GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSize);
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 			if ( this.isComputingMode.get(mode) ) {
-				this.spatialGrids.put( mode, GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize ) ) ;
+				this.accessibilityGrids.put( mode, GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize ) ) ;
 			}
 		}
 	}
@@ -429,7 +418,7 @@ implements ShutdownListener, StartupListener {
 		measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, cellSize);
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 			if ( this.isComputingMode.get(mode) ) {
-				this.spatialGrids.put( mode, new SpatialGrid(minX, minY, maxX, maxY, cellSize, Double.NaN) ) ;
+				this.accessibilityGrids.put( mode, new SpatialGrid(minX, minY, maxX, maxY, cellSize, Double.NaN) ) ;
 			}
 		}
 		lockedForAdditionalFacilityData  = true ;

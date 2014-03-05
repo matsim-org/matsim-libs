@@ -26,7 +26,9 @@ package org.matsim.contrib.accessibility.gis;
 import java.io.BufferedReader;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.utils.io.IOUtils;
 
 import com.vividsolutions.jts.geom.Point;
@@ -82,11 +84,15 @@ public class SpatialGrid{
 	}
 	
 	/**
-	 * @param resolution cell size. E.g. (xmax-xmin)/resolution = number of cells in x direction
 	 * @param boundingBox
+	 * @param resolution cell size. E.g. (xmax-xmin)/resolution = number of cells in x direction
 	 */
-	public SpatialGrid(double resolution, double [] boundingBox) {
+	public SpatialGrid(double [] boundingBox, double resolution) {
 		this(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3], resolution, Double.NaN);
+	}
+	
+	public SpatialGrid( BoundingBox bbox, double resolution, double initialValue ) {
+		this( bbox.getXMin(), bbox.getYMin(), bbox.getXMax(), bbox.getYMax(), resolution, initialValue ) ;
 	}
 	
 	public SpatialGrid(SpatialGrid grid) {

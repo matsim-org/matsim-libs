@@ -8,4 +8,11 @@
   <groupId>org.matsim.contrib</groupId>
   <artifactId>analysis</artifactId>
   <name>analysis</name>
+  <dependencies>
+  	<dependency>
+  		<groupId>org.matsim.contrib</groupId>
+  		<artifactId>accessibility</artifactId>
+  		<version>0.6.0-SNAPSHOT</version>
+  	</dependency>
+  </dependencies>
 </project>
