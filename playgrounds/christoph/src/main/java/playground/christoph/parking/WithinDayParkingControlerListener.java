@@ -22,7 +22,6 @@ package playground.christoph.parking;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -33,9 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.multimodal.MultiModalControlerListener;
 import org.matsim.contrib.multimodal.MultimodalQSimFactory;
-import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -48,9 +45,7 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.LegRouterWrapper;
-import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
@@ -60,13 +55,12 @@ import org.matsim.core.router.old.LegRouter;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
-import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.withinday.controller.ExperiencedPlansWriter;
 import org.matsim.withinday.controller.WithinDayControlerListener;
 
 import playground.christoph.parking.core.ParkingCostCalculatorImpl;
@@ -86,7 +80,7 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 	/*
 	 * How many parallel Threads shall do the Replanning.
 	 */
-	protected int numReplanningThreads = 8;
+	protected int numReplanningThreads = 4;
 
 	/*
 	 * How many nodes should be checked when adapting an existing route
@@ -121,6 +115,7 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 	private final double capacityFactor;
 	
 	private final WithinDayControlerListener withinDayControlerListener;
+	private ExperiencedPlansWriter experiencedPlansWriter;
 	
 	public WithinDayParkingControlerListener(Scenario scenario, MultiModalControlerListener multiModalControlerListener, 
 			Set<String> initialParkingTypes, Set<String> allParkingTypes, double capacityFactor) {
@@ -190,11 +185,18 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 		this.withinDayControlerListener.notifyStartup(event);
 		
 		/*
+		 * After the withinDayControlerListener has been initialized, also the experiencedPlansWriter can be created.
+		 */
+		this.experiencedPlansWriter = new ExperiencedPlansWriter(this.withinDayControlerListener.getMobsimDataProvider());
+		event.getControler().addControlerListener(this.experiencedPlansWriter);
+		
+		/*
 		 * The ParkingRouter is used to create on-the-fly routes, therefore use the TravelTimeCollector
 		 * for car trips. For walk trips use either the TravelTime object used by the multi-modal simulation
 		 * or a walk travel time object.
 		 */
 		TravelTime carTravelTime = this.withinDayControlerListener.getTravelTimeCollector();
+//		TravelTime carTravelTime = new FreeSpeedTravelTime();
 		TravelTime walkTravelTime;
 		if (this.multiModalControlerListener != null && this.multiModalControlerListener.getMultiModalTravelTimes().containsKey(TransportMode.walk)) {
 			walkTravelTime = this.multiModalControlerListener.getMultiModalTravelTimes().get(TransportMode.walk);

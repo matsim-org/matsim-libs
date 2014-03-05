@@ -30,9 +30,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -79,22 +79,22 @@ public class ParkingAgentSource implements AgentSource {
 			
 			// Create agent...
 			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
+			Plan modifiablePlan = WithinDayAgentUtils.getModifiablePlan(agent);
 			
 			// ... and then insert parking activities into its plan.
-			insertParkingActivities.run(((PlanAgent) agent).getCurrentPlan());
+			insertParkingActivities.run(modifiablePlan);
 			
 			// Insert the agent into the mobsim...
 			qsim.insertAgentIntoMobsim(agent);
 			
 			// ... and park its vehicle at the link where the first parking activity is performed.
-			Plan plan = ((PlanAgent) agent).getCurrentPlan();
-			this.parkVehicleAtFirstParking(plan);
+			this.parkVehicleAtFirstParking(modifiablePlan);
 
 			/*
 			 * Finally, Update agent's routes which is necessary since their plans have been 
 			 * altered by adding parking activities.
 			 */
-			routeUpdater.handlePlan(plan);
+			routeUpdater.handlePlan(modifiablePlan);
 		}
 		
 		// Finish replanning starts the replanning threads and waits until they a finished.

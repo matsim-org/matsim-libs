@@ -32,7 +32,6 @@ import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -112,13 +111,7 @@ public class ParkingQSimFactory implements MobsimFactory {
 		qSim.addMobsimEngine(this.withinDayEngine);
 		qSim.addMobsimEngine(this.parkingAgentsTracker);
 		
-//		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-//		ExperimentalBasicWithindayAgent.copySelectedPlan = true;
-		Logger.getLogger(this.getClass()).fatal("copySelectedPlan no longer possible. kai, feb'14") ;
-		System.exit(-1); 
-
-		
+		AgentFactory agentFactory = new DefaultAgentFactory(qSim);		
 		AgentSource agentSource = new ParkingAgentSource(sc, agentFactory, qSim, this.parkingInfrastructure, this.parkingRouterFactory);
 		qSim.addAgentSource(agentSource);
 
