@@ -183,7 +183,7 @@ implements ShutdownListener, StartupListener {
 
 	private boolean alreadyActive = false ;
 	private List<ActivityFacilities> additionalFacilityData = new ArrayList<ActivityFacilities>() ; 
-	/*package*/ Map<String,SpatialGrid> additionalSpatialGrids = new TreeMap<String,SpatialGrid>() ;
+	private Map<String,SpatialGrid> additionalSpatialGrids = new TreeMap<String,SpatialGrid>() ;
 	private boolean lockedForAdditionalFacilityData = false;
 
 	@Override
@@ -211,8 +211,14 @@ implements ShutdownListener, StartupListener {
 			SpatialGrid spatialGrid = this.additionalSpatialGrids.get( facilities.getName() ) ;
 			for ( ActivityFacility fac : facilities.getFacilities().values() ) {
 				Coord coord = fac.getCoord() ;
-//				double value = fac.getActivityOptions().get("h").getCapacity() ; // infinity if undefined!!!
+				
+				final Object weight = fac.getCustomAttributes().get("weight");
 				double value = 1 ;
+				if ( weight != null ) {
+					value = (Double) weight ;
+				}
+//				double value = fac.getActivityOptions().get("h").getCapacity() ; // infinity if undefined!!!
+
 				spatialGrid.addToValue(value, coord) ;
 			}
 		}
@@ -289,7 +295,7 @@ implements ShutdownListener, StartupListener {
 	 * @param accCsvWriter
 	 */
 	@Override
-	void writeCSVData4Urbansim( ActivityFacility measurePoint, Node fromNode, Map<Modes4Accessibility,Double> accessibilities ) {
+	final void writeCSVData4Urbansim( ActivityFacility measurePoint, Node fromNode, Map<Modes4Accessibility,Double> accessibilities ) {
 		// (this is what, I think, writes the urbansim data, and should thus better not be touched. kai, feb'14)
 
 		// writing accessibility measures of current measurePoint in csv format
@@ -379,10 +385,6 @@ implements ShutdownListener, StartupListener {
 				this.spatialGrids.put( mode, GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize ) ) ;
 			}
 		}
-//		for ( OtherItems item : OtherItems.values() ) {
-//			this.otherItems.put( item, GridUtils.createSpatialGridByShapeBoundary(boundary,cellSize)) ;
-//			throw new RuntimeException("this will not work since the spatial grid will be initialized by NaN --> fix") ;
-//		}
 	}
 
 	/**
@@ -403,11 +405,9 @@ implements ShutdownListener, StartupListener {
 	/**
 	 * Generates the activated SpatialGrids and measuring points for accessibility calculation.
 	 * The given road network determines the area for which to compute/measure accessibilities.
-	 * 
-	 * @param network MATSim road network
 	 * @param cellSize double value giving the the side length of the cell in meter
 	 */
-	public void generateGridsAndMeasuringPointsByNetwork(Network network, double cellSize){
+	public void generateGridsAndMeasuringPointsByNetwork(double cellSize){
 		log.info("Using the boundary of the network file to determine the area for accessibility computation.");
 		log.warn("This could lead to memory issues when the network is large and/or the cell size is too fine!");
 		BoundingBox bb = new BoundingBox();
@@ -426,8 +426,7 @@ implements ShutdownListener, StartupListener {
 	 * @param maxY double value giving the top y coordinate of the area
 	 * @param cellSize double value giving the the side length of the cell in meter
 	 */
-	private void generateGridsAndMeasuringPoints(double minX, double minY,
-			double maxX, double maxY, double cellSize) {
+	private void generateGridsAndMeasuringPoints(double minX, double minY, double maxX, double maxY, double cellSize) {
 		measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, cellSize);
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 			if ( this.isComputingMode.get(mode) ) {

@@ -145,7 +145,7 @@ public class AccessibilityRuns {
 					new GridBasedAccessibilityControlerListenerV3(opportunities, config, scenario.getNetwork( ));
 			listener.setComputingAccessibilityForMode( Modes4Accessibility.freeSpeed, true );
 			listener.addAdditionalFacilityData( homes ) ;
-			listener.generateGridsAndMeasuringPointsByNetwork(scenario.getNetwork(), 1000. );
+			listener.generateGridsAndMeasuringPointsByNetwork(1000. );
 
 			controler.addControlerListener(listener);
 
