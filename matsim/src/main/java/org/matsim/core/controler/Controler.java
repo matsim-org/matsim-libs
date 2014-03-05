@@ -532,14 +532,14 @@ public class Controler extends AbstractController {
 			Mobsim simulation = this.thisMobsimFactory.createMobsim(this.getScenario(), this.getEvents());
 			enrichSimulation(simulation);
 			return simulation;
-		} else if (this.config.getModule(SimulationConfigGroup.GROUP_NAME) != null && ((SimulationConfigGroup) this.config.getModule(SimulationConfigGroup.GROUP_NAME)).getExternalExe() != null ) {
+		} else if (this.config.getModule(SimulationConfigGroup.GROUP_NAME) != null && 
+				((SimulationConfigGroup) this.config.getModule(SimulationConfigGroup.GROUP_NAME)).getExternalExe() != null ) {
 			ExternalMobsim simulation = new ExternalMobsim(this.scenarioData, this.events);
 			simulation.setControlerIO(this.getControlerIO());
 			simulation.setIterationNumber(this.thisIteration);
 			return simulation;
 		} else {
-			String mobsim = this.config.controler().getMobsim();
-			MobsimFactory f = this.mobsimFactoryRegister.getInstance(mobsim);
+			MobsimFactory f = this.mobsimFactoryRegister.getInstance(this.config.controler().getMobsim());
 			Mobsim simulation = f.createMobsim(this.getScenario(), this.getEvents());
 			enrichSimulation(simulation);
 			return simulation;
