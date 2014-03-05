@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package playground.southafrica.kai.freight;
 
+import java.util.Collection;
+
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import jsprit.core.algorithm.box.SchrimpfFactory;
 import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
@@ -35,6 +37,8 @@ import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
+import org.matsim.contrib.freight.carrier.CarrierService;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
@@ -108,6 +112,8 @@ public class KNFreight4 {
 	private static final String ALGORITHM = QVH_FREIGHT + "myGridSim/initialPlanAlgorithm.xml" ;
 	//	private static final String ALGORITHM = QVANHEERDEN_FREIGHT + "myGridSim/algorithm.xml" ;
 	
+	private static final boolean generatingDemandFromModel = false ;
+	
 	private static final boolean generatingCarrierPlansFromScratch = true ;
 	
 	private static final boolean addingCongestion = false ;
@@ -131,8 +137,19 @@ public class KNFreight4 {
 		CarrierVehicleTypes vehicleTypes = createVehicleTypes();
 
 		Carriers carriers = createCarriers(vehicleTypes);
+		if ( generatingDemandFromModel ) {
+			// this will over-write the shipments in the "carrier" data structure
+			for ( Carrier carrier : carriers.getCarriers().values() ) {
+				Collection<CarrierService> services = carrier.getServices() ;
+				services.clear(); // clear away whatever may have been in there
+//				MethodsToGenerateServices.createServicesMethod1(services);
+				MethodsToGenerateServices.createServicesMethod2(services);
+			}
+		}
 		
-		if ( generatingCarrierPlansFromScratch ) {
+		if ( generatingCarrierPlansFromScratch || generatingDemandFromModel ) {
+			// (need to (re)generate carrier plans if demand has changed!)
+
 			generateCarrierPlans(scenario.getNetwork(), carriers, vehicleTypes);
 		}
 
