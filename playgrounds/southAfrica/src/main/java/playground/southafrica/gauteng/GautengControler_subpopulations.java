@@ -50,6 +50,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -61,6 +62,25 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.SimStepParallelEventsManagerImpl;
+import org.matsim.core.events.SynchronizedEventsManagerImpl;
+import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.TeleportationEngine;
+import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
+import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
+import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
+import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.PlanStrategy;
@@ -101,6 +121,7 @@ public class GautengControler_subpopulations {
 
 	private static final String RE_ROUTE_AND_SET_VEHICLE = "ReRouteAndSetVehicle";
 	public static final String VEH_ID = "TransportModeToVehicleIdMap" ;
+
 
 	public static enum User { johan, kai } ;
 	private static User user = User.johan ;
@@ -275,6 +296,9 @@ public class GautengControler_subpopulations {
 			}
 		});
 		// needs to be tested!
+		
+		// the following is how (in principle) mode-specific vehicle types are set:
+//		controler.setMobsimFactory(new MobsimWithModeDependentVehicleTypes());
 
 		// ADDITIONAL ANALYSIS:
 		controler.addControlerListener(new KaiAnalysisListener());
@@ -341,10 +365,6 @@ public class GautengControler_subpopulations {
 				sc, personSpecificUtilityOfMoney
 				));
 
-		// insert into routing:
-//		controler.setTravelDisutilityFactory(new PersonSpecificTravelDisutilityInclTollFactory(
-//				vehDepScheme, personSpecificUtilityOfMoney
-//				));
 		
 		final ConfigurableTravelDisutilityFactory travelDisutilityFactory = new ConfigurableTravelDisutilityFactory( sc );
 		// ---
@@ -630,6 +650,94 @@ public class GautengControler_subpopulations {
 		public void finishReplanning() {}
 	}
 
+	/**
+	 * This mobsim factory is a verbatim copy of the standard QSimFactory, plus vehicle type insertion near its end.
+	 * Currently (mar'14), there is no more elegant way of doing this, although we are working on this. kai, mar'14
+	 * 
+	 * @author nagel
+	 */
+	private static final class MobsimWithModeDependentVehicleTypes implements MobsimFactory {
+		@Override
+		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+			QSimConfigGroup conf = sc.getConfig().qsim();
+			if (conf == null) {
+				throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
+			}
+			if (conf.getNumberOfThreads() > 1) {
+				/*
+				 * The SimStepParallelEventsManagerImpl can handle events from multiple threads.
+				 * The (Parallel)EventsMangerImpl cannot, therefore it has to be wrapped into a
+				 * SynchronizedEventsManagerImpl.
+				 */
+				if (!(eventsManager instanceof SimStepParallelEventsManagerImpl)) {
+					eventsManager = new SynchronizedEventsManagerImpl(eventsManager);				
+				}
+			}
+
+			QSim qSim = new QSim(sc, eventsManager);
+
+			ActivityEngine activityEngine = new ActivityEngine();
+			qSim.addMobsimEngine(activityEngine);
+			qSim.addActivityHandler(activityEngine);
+
+			QNetsimEngineFactory netsimEngFactory;
+			if (conf.getNumberOfThreads() > 1) {
+				netsimEngFactory = new ParallelQNetsimEngineFactory();
+				LOG.info("Using parallel QSim with " + conf.getNumberOfThreads() + " threads.");
+			} else {
+				netsimEngFactory = new DefaultQNetsimEngineFactory();
+			}
+			QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
+			qSim.addMobsimEngine(netsimEngine);
+			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+			
+			TeleportationEngine teleportationEngine = new TeleportationEngine();
+			qSim.addMobsimEngine(teleportationEngine);
+
+			AgentFactory agentFactory;
+			if (sc.getConfig().scenario().isUseTransit()) {
+				agentFactory = new TransitAgentFactory(qSim);
+				TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
+				transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+				qSim.addDepartureHandler(transitEngine);
+				qSim.addAgentSource(transitEngine);
+				qSim.addMobsimEngine(transitEngine);
+			} else {
+				agentFactory = new DefaultAgentFactory(qSim);
+			}
+			if (sc.getConfig().network().isTimeVariantNetwork()) {
+				qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
+			}
+			PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+			// === code which sets mode vehicles begin
+			Map<String, VehicleType> modeVehicleTypes = new HashMap<String,VehicleType>() ;
+
+			/* Create vehicle types. */
+			LOG.info("Creating vehicle types.");
+			VehicleType vehicle_A2 = new VehicleTypeImpl(new IdImpl("A2"));
+			vehicle_A2.setDescription("Light vehicle with SANRAL toll class `A2'");
+			modeVehicleTypes.put("A2_private", vehicle_A2) ; // assumes that mode is "A2_private"!
+			modeVehicleTypes.put("A2_commercial", vehicle_A2) ; 
+
+			VehicleType vehicle_B = new VehicleTypeImpl(new IdImpl("B"));
+			vehicle_B.setDescription("Short commercial vehicle with SANRAL toll class `B'");
+			vehicle_B.setMaximumVelocity(100.0 / 3.6);
+			vehicle_B.setLength(10.0);
+			modeVehicleTypes.put("B", vehicle_B ) ;
+
+			VehicleType vehicle_C = new VehicleTypeImpl(new IdImpl("C"));
+			vehicle_C.setDescription("Medium/long commercial vehicle with SANRAL toll class `C'");
+			vehicle_C.setMaximumVelocity(80.0 / 3.6);
+			vehicle_C.setLength(15.0);
+			modeVehicleTypes.put("C", vehicle_C ) ;
+
+			agentSource.setModeVehicleTypes(modeVehicleTypes);
+
+			// === code which sets mode vehicles end
+			qSim.addAgentSource(agentSource);
+			return qSim;
+		}
+	}
 
 
 }
