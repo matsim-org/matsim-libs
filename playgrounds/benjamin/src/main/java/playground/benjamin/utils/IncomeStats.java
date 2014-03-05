@@ -34,7 +34,6 @@ import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
 
 import playground.benjamin.BkPaths;
-import playground.dgrether.analysis.charts.utils.DgChartWriter;
 
 
 /**
@@ -114,7 +113,7 @@ public class IncomeStats {
 		
 		XYLineChart chart = new XYLineChart("Lorenz", "number of hh percent", "percentage of income");
 		chart.addSeries("incomes", xValues, yValues);
-		DgChartWriter.writeChartDataToFile(outdir + "lorenz.txt", chart.getChart());
+//		DgChartWriter.writeChartDataToFile(outdir + "lorenz.txt", chart.getChart());
 		chart.saveAsPng(outdir + "lorenz.png", 800, 600);
 	}
 

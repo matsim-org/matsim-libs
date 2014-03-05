@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.munich.analysis.nectar;
 
-import playground.dgrether.analysis.CountsAnalyser;
 
 /**
  * @author benjamin
@@ -40,13 +39,14 @@ public class CountsDataAnalyzer {
 	static String outputFormat = "txt";
 
 	public static void main(String[] args) {
-		CountsAnalyser ca = new CountsAnalyser();
-		ca.setCoordinateSystem(coordinateSystem);
-		ca.setCountsFilename(countsFilename);
-		ca.setLinkStatsFilename(linkStatsFilename);
-		ca.setNetworkFilename(networkFilename);
-		ca.setScaleFactor(scaleFactor);
-		ca.loadData();
-		ca.writeCountsComparisonList(outputFile, outputFormat);
+//		CountsAnalyser ca = new CountsAnalyser();
+//		ca.setCoordinateSystem(coordinateSystem);
+//		ca.setCountsFilename(countsFilename);
+//		ca.setLinkStatsFilename(linkStatsFilename);
+//		ca.setNetworkFilename(networkFilename);
+//		ca.setScaleFactor(scaleFactor);
+//		ca.loadData();
+//		ca.writeCountsComparisonList(outputFile, outputFormat)
+		throw new RuntimeException("commented code because playground.dgrether is no longer available");
 	}
 }

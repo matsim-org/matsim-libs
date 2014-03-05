@@ -22,12 +22,10 @@ package playground.benjamin.scenarios.zurich.analysis;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -36,21 +34,6 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.benjamin.BkPaths;
-import playground.benjamin.scenarios.zurich.analysis.charts.BkAvgTollPaidQuantilesChart;
-import playground.dgrether.analysis.charts.DgAvgDeltaMoneyQuantilesChart;
-import playground.dgrether.analysis.charts.DgAvgDeltaUtilsModeQuantilesChart;
-import playground.dgrether.analysis.charts.DgAvgDeltaUtilsQuantilesChart;
-import playground.dgrether.analysis.charts.DgDeltaUtilsModeGroupChart;
-import playground.dgrether.analysis.charts.DgMixedDeltaUtilsModeGroupChart;
-import playground.dgrether.analysis.charts.DgMixedModeSwitcherOnlyDeltaScoreIncomeModeChoiceChart;
-import playground.dgrether.analysis.charts.DgModalSplitDiffQuantilesChart;
-import playground.dgrether.analysis.charts.DgModalSplitQuantilesChart;
-import playground.dgrether.analysis.charts.utils.DgChartWriter;
-import playground.dgrether.analysis.io.DgAnalysisPopulationReader;
-import playground.dgrether.analysis.io.DgHouseholdsAnalysisReader;
-import playground.dgrether.analysis.population.DgAnalysisPopulation;
-import playground.dgrether.analysis.population.DgPersonData;
-import playground.dgrether.analysis.population.ExcludeZurichTransitFilter;
 
 public class AnalysisTransportEconomics10 {
 
@@ -98,52 +81,52 @@ public class AnalysisTransportEconomics10 {
 		String avgTollPaidInQuantilesChartFile = BkPaths.RUNSSVN + runid2String + "/avgTollPaidInQuantilesChart"+runNumber2;
 //***************************************************************************************************************************************************
 		
-		DgAnalysisPopulationReader pc = new DgAnalysisPopulationReader();
-		DgAnalysisPopulation ana = new DgAnalysisPopulation();	
-		pc.readAnalysisPopulation(ana, runid1, netfile, plans1file);
-		pc.readAnalysisPopulation(ana, runid2, netfile, plans2file);
-		
-		DgHouseholdsAnalysisReader hhr = new DgHouseholdsAnalysisReader(ana);
-		hhr.readHousholds(housholdsfile);
-		ana.calculateIncomeData();
-		
+//		DgAnalysisPopulationReader pc = new DgAnalysisPopulationReader();
+//		DgAnalysisPopulation ana = new DgAnalysisPopulation();	
+//		pc.readAnalysisPopulation(ana, runid1, netfile, plans1file);
+//		pc.readAnalysisPopulation(ana, runid2, netfile, plans2file);
+//		
+//		DgHouseholdsAnalysisReader hhr = new DgHouseholdsAnalysisReader(ana);
+//		hhr.readHousholds(housholdsfile);
+//		ana.calculateIncomeData();
+//		
 		Config config = new Config();
-		config.addCoreModules();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
-		configReader.readFile(outputConfig2Path);
-		
-//***************************************************************************************************************************************************
-//any filter can be applied here or for toll area see below:
-		pc.addFilter(new ExcludeZurichTransitFilter());
-		
-//***************************************************************************************************************************************************
-//creating the charts:		
-	//group chart
-		DgDeltaUtilsModeGroupChart deltaUtilsModeGroupChart = new DgDeltaUtilsModeGroupChart(ana, runid1, runid2);
+//		config.addCoreModules();
+//		MatsimConfigReader configReader = new MatsimConfigReader(config);
+//		configReader.readFile(outputConfig2Path);
+//		
+////***************************************************************************************************************************************************
+////any filter can be applied here or for toll area see below:
+//		pc.addFilter(new ExcludeZurichTransitFilter());
+//		
+////***************************************************************************************************************************************************
+////creating the charts:		
+//	//group chart
+//		DgDeltaUtilsModeGroupChart deltaUtilsModeGroupChart = new DgDeltaUtilsModeGroupChart(ana, runid1, runid2);
+//
+//	//quantile charts
+//		//modal split
+//		DgModalSplitQuantilesChart modalSplitQuantilesChartRun1 = new DgModalSplitQuantilesChart(ana, runid1);
+//		DgChartWriter.writeChart(modalSplitQuantilesChartFileRun1, modalSplitQuantilesChartRun1.createChart());
+//		
+//		DgModalSplitQuantilesChart modalSplitQuantilesChartRun2 = new DgModalSplitQuantilesChart(ana, runid2);
+//		DgChartWriter.writeChart(modalSplitQuantilesChartFileRun2, modalSplitQuantilesChartRun2.createChart());
+//
+//		DgModalSplitDiffQuantilesChart modalSplitDiffQuantilesChartRun2 = new DgModalSplitDiffQuantilesChart(ana, runid1,  runid2);
+//		DgChartWriter.writeChart(modalSplitDiffQuantilesChartFileRun2, modalSplitDiffQuantilesChartRun2.createChart());
+//
+//		//utility differences
+//		DgAvgDeltaUtilsQuantilesChart avgDeltaUtilsQuantilesChart = new DgAvgDeltaUtilsQuantilesChart(ana, runid1, runid2);
+//		DgChartWriter.writeChart(avgDeltaUtilsQuantilesChartFile, avgDeltaUtilsQuantilesChart.createChart());
+//
+//		DgAvgDeltaUtilsModeQuantilesChart avgDeltaUtilesModeQuantilesChart = new DgAvgDeltaUtilsModeQuantilesChart(ana, threshold,  runid1, runid2);
+//		DgChartWriter.writeChart(avgDeltaUtilsModeQuantilesChartFile, avgDeltaUtilesModeQuantilesChart.createChart());
+//		
+//		//monetized utility differences
+//		DgAvgDeltaMoneyQuantilesChart avgDeltaMoneyQuantilesChart = new DgAvgDeltaMoneyQuantilesChart(ana, runid1, runid2);
+//		DgChartWriter.writeChart(avgDeltaMoneyQuantilesChartFile, avgDeltaMoneyQuantilesChart.createChart());
 
-	//quantile charts
-		//modal split
-		DgModalSplitQuantilesChart modalSplitQuantilesChartRun1 = new DgModalSplitQuantilesChart(ana, runid1);
-		DgChartWriter.writeChart(modalSplitQuantilesChartFileRun1, modalSplitQuantilesChartRun1.createChart());
-		
-		DgModalSplitQuantilesChart modalSplitQuantilesChartRun2 = new DgModalSplitQuantilesChart(ana, runid2);
-		DgChartWriter.writeChart(modalSplitQuantilesChartFileRun2, modalSplitQuantilesChartRun2.createChart());
-
-		DgModalSplitDiffQuantilesChart modalSplitDiffQuantilesChartRun2 = new DgModalSplitDiffQuantilesChart(ana, runid1,  runid2);
-		DgChartWriter.writeChart(modalSplitDiffQuantilesChartFileRun2, modalSplitDiffQuantilesChartRun2.createChart());
-
-		//utility differences
-		DgAvgDeltaUtilsQuantilesChart avgDeltaUtilsQuantilesChart = new DgAvgDeltaUtilsQuantilesChart(ana, runid1, runid2);
-		DgChartWriter.writeChart(avgDeltaUtilsQuantilesChartFile, avgDeltaUtilsQuantilesChart.createChart());
-
-		DgAvgDeltaUtilsModeQuantilesChart avgDeltaUtilesModeQuantilesChart = new DgAvgDeltaUtilsModeQuantilesChart(ana, threshold,  runid1, runid2);
-		DgChartWriter.writeChart(avgDeltaUtilsModeQuantilesChartFile, avgDeltaUtilesModeQuantilesChart.createChart());
-		
-		//monetized utility differences
-		DgAvgDeltaMoneyQuantilesChart avgDeltaMoneyQuantilesChart = new DgAvgDeltaMoneyQuantilesChart(ana, runid1, runid2);
-		DgChartWriter.writeChart(avgDeltaMoneyQuantilesChartFile, avgDeltaMoneyQuantilesChart.createChart());
-
-		writeMixedDeltaUtilsModeGroupChart(deltaUtilsModeGroupChart, avgDeltaUtilesModeQuantilesChart, mixedDeltaUtilsModeGroupChartFile, mixedMsoDeltaUtilsModeGroupChartFile,  runid1, runid2);
+//		writeMixedDeltaUtilsModeGroupChart(deltaUtilsModeGroupChart, avgDeltaUtilesModeQuantilesChart, mixedDeltaUtilsModeGroupChartFile, mixedMsoDeltaUtilsModeGroupChartFile,  runid1, runid2);
 		
 		log.debug("Plots and tables finished!");
 		
@@ -161,18 +144,20 @@ if(config.scenario().isUseRoadpricing()){
 		System.out.println("Events file read!");
 			
 	Map<Id, Double> id2Toll = tollCollectHandler.getPersonId2TollMap();
-	for (DgPersonData data : ana.getPersonData().values()){
-		if (id2Toll.containsKey(data.getPersonId())){
-			data.setToll(id2Toll.get(data.getPersonId()));
-		}
-		else {
-			data.setToll(0.0);
-		}
-	}
+//	for (DgPersonData data : ana.getPersonData().values()){
+//		if (id2Toll.containsKey(data.getPersonId())){
+//			data.setToll(id2Toll.get(data.getPersonId()));
+//		}
+//		else {
+//			data.setToll(0.0);
+//		}
+//	}
 	
 	//money difference chart (due to toll)
-	BkAvgTollPaidQuantilesChart avgTollPaidQuantilesChart = new BkAvgTollPaidQuantilesChart (ana, runid2);
-	DgChartWriter.writeChart(avgTollPaidInQuantilesChartFile, avgTollPaidQuantilesChart.createChart());
+//	BkAvgTollPaidQuantilesChart avgTollPaidQuantilesChart = new BkAvgTollPaidQuantilesChart (ana, runid2);
+//	DgChartWriter.writeChart(avgTollPaidInQuantilesChartFile, avgTollPaidQuantilesChart.createChart());
+	
+	
 	
 //***************************************************************************************************************************************************
 //another filter for a certain area
@@ -190,26 +175,26 @@ if(config.scenario().isUseRoadpricing()){
 		return scheme;
 	}
 
-public static void writeMixedDeltaUtilsModeGroupChart(DgDeltaUtilsModeGroupChart deltaUtilsModeGroupChart, DgAvgDeltaUtilsModeQuantilesChart avgDScoreModeIncomeChartData, String mixedDeltaScoreIncomeChartFile, String mixedMsoDeltaScoreIncomeChartFile,  Id runid1, Id runid2){
-		DgMixedDeltaUtilsModeGroupChart mixedDsIncomeChart = new DgMixedDeltaUtilsModeGroupChart();
-		XYSeriesCollection modeChoiceDataset = deltaUtilsModeGroupChart.createDeltaScoreIncomeModeChoiceDataset(runid1, runid2);
-		mixedDsIncomeChart.addIncomeModeChoiceDataSet(modeChoiceDataset);
-		XYSeriesCollection avgScoreDataset = avgDScoreModeIncomeChartData.getDataset();
-		mixedDsIncomeChart.addAvgDeltaScoreIncomeDs(avgScoreDataset);
-////		DgChartFrame frame = new DgChartFrame("test", mixedDsIncomeChart.createChart());
-		DgChartWriter.writeChart(mixedDeltaScoreIncomeChartFile, mixedDsIncomeChart.createChart());
-		
-		XYSeriesCollection ds2 = new XYSeriesCollection();
-		ds2.addSeries(modeChoiceDataset.getSeries(2));
-		ds2.addSeries(modeChoiceDataset.getSeries(3));
-		XYSeriesCollection ds3 = new XYSeriesCollection();
-		ds3.addSeries(avgScoreDataset.getSeries(2));
-		ds3.addSeries(avgScoreDataset.getSeries(3));
-		DgMixedModeSwitcherOnlyDeltaScoreIncomeModeChoiceChart mixedSwichterOnlyDsIncomeChart = new DgMixedModeSwitcherOnlyDeltaScoreIncomeModeChoiceChart();
-		mixedSwichterOnlyDsIncomeChart.addIncomeModeChoiceDataSet(ds2);
-		mixedSwichterOnlyDsIncomeChart.addAvgDeltaScoreIncomeDs(ds3);
-////		DgChartFrame frame = new DgChartFrame("test", mixedSwichterOnlyDsIncomeChart.createChart());
-		DgChartWriter.writeChart(mixedMsoDeltaScoreIncomeChartFile, mixedSwichterOnlyDsIncomeChart.createChart());
-  }
+//public static void writeMixedDeltaUtilsModeGroupChart(DgDeltaUtilsModeGroupChart deltaUtilsModeGroupChart, DgAvgDeltaUtilsModeQuantilesChart avgDScoreModeIncomeChartData, String mixedDeltaScoreIncomeChartFile, String mixedMsoDeltaScoreIncomeChartFile,  Id runid1, Id runid2){
+//		DgMixedDeltaUtilsModeGroupChart mixedDsIncomeChart = new DgMixedDeltaUtilsModeGroupChart();
+//		XYSeriesCollection modeChoiceDataset = deltaUtilsModeGroupChart.createDeltaScoreIncomeModeChoiceDataset(runid1, runid2);
+//		mixedDsIncomeChart.addIncomeModeChoiceDataSet(modeChoiceDataset);
+//		XYSeriesCollection avgScoreDataset = avgDScoreModeIncomeChartData.getDataset();
+//		mixedDsIncomeChart.addAvgDeltaScoreIncomeDs(avgScoreDataset);
+//////		DgChartFrame frame = new DgChartFrame("test", mixedDsIncomeChart.createChart());
+//		DgChartWriter.writeChart(mixedDeltaScoreIncomeChartFile, mixedDsIncomeChart.createChart());
+//		
+//		XYSeriesCollection ds2 = new XYSeriesCollection();
+//		ds2.addSeries(modeChoiceDataset.getSeries(2));
+//		ds2.addSeries(modeChoiceDataset.getSeries(3));
+//		XYSeriesCollection ds3 = new XYSeriesCollection();
+//		ds3.addSeries(avgScoreDataset.getSeries(2));
+//		ds3.addSeries(avgScoreDataset.getSeries(3));
+//		DgMixedModeSwitcherOnlyDeltaScoreIncomeModeChoiceChart mixedSwichterOnlyDsIncomeChart = new DgMixedModeSwitcherOnlyDeltaScoreIncomeModeChoiceChart();
+//		mixedSwichterOnlyDsIncomeChart.addIncomeModeChoiceDataSet(ds2);
+//		mixedSwichterOnlyDsIncomeChart.addAvgDeltaScoreIncomeDs(ds3);
+//////		DgChartFrame frame = new DgChartFrame("test", mixedSwichterOnlyDsIncomeChart.createChart());
+//		DgChartWriter.writeChart(mixedMsoDeltaScoreIncomeChartFile, mixedSwichterOnlyDsIncomeChart.createChart());
+//  }
 
 }

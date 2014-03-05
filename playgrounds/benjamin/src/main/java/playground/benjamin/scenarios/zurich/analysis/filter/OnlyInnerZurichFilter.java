@@ -19,36 +19,30 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.zurich.analysis.filter;
 
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.roadpricing.RoadPricingScheme;
-
-import playground.dgrether.analysis.io.DgAnalysisReaderFilter;
 
 /**
  * @author benjamin
  *
  */
-public class OnlyInnerZurichFilter implements DgAnalysisReaderFilter {
+public class OnlyInnerZurichFilter {} //implements DgAnalysisReaderFilter {
 
-	private final RoadPricingScheme tollLinks ;
-
-	public OnlyInnerZurichFilter(RoadPricingScheme tollLinks) {
-		this.tollLinks = tollLinks;
-	}
-
-	@Override
-	public boolean doAcceptPerson(Person person) {
-		for (PlanElement pe : person.getSelectedPlan().getPlanElements()){
-            if (pe instanceof Activity) {
-                Activity act = (Activity) pe;
-			if (this.tollLinks.getTolledLinkIds().contains(act.getLinkId())) {
-				return true;
-            }
-            }
-		}
-		return false;
-	}
-
-}
+//	private final RoadPricingScheme tollLinks ;
+//
+//	public OnlyInnerZurichFilter(RoadPricingScheme tollLinks) {
+//		this.tollLinks = tollLinks;
+//	}
+//
+//	@Override
+//	public boolean doAcceptPerson(Person person) {
+//		for (PlanElement pe : person.getSelectedPlan().getPlanElements()){
+//            if (pe instanceof Activity) {
+//                Activity act = (Activity) pe;
+//			if (this.tollLinks.getTolledLinkIds().contains(act.getLinkId())) {
+//				return true;
+//            }
+//            }
+//		}
+//		return false;
+//	}
+//
+//}
