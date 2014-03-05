@@ -81,31 +81,31 @@ public class ParkingRouterTest extends MatsimTestCase {
 		
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 1);
-		parkingRouter.adaptStartOfRoute(route, startLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptStartOfCarRoute(route, startLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(5, route.getLinkIds().size());
 		
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 2);
-		parkingRouter.adaptStartOfRoute(route, startLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptStartOfCarRoute(route, startLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(4, route.getLinkIds().size());
 		
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 3);
-		parkingRouter.adaptStartOfRoute(route, startLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptStartOfCarRoute(route, startLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(3, route.getLinkIds().size());
 		
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 4);
-		parkingRouter.adaptStartOfRoute(route, startLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptStartOfCarRoute(route, startLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(2, route.getLinkIds().size());
 		
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 10);
-		parkingRouter.adaptStartOfRoute(route, startLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptStartOfCarRoute(route, startLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(2, route.getLinkIds().size());
 
@@ -113,14 +113,14 @@ public class ParkingRouterTest extends MatsimTestCase {
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 10);
 		testTimeCost.setData(scenario.createId("l9"), 10.0, 5.0);
-		parkingRouter.adaptStartOfRoute(route, startLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptStartOfCarRoute(route, startLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(3, route.getLinkIds().size());
 		
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 4);
 		testTimeCost.setData(scenario.createId("l9"), 10.0, 5.0);
-		parkingRouter.adaptStartOfRoute(route, startLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptStartOfCarRoute(route, startLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(3, route.getLinkIds().size());
 		
@@ -128,7 +128,7 @@ public class ParkingRouterTest extends MatsimTestCase {
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 4);
 		testTimeCost.setData(scenario.createId("l8"), 10.0, 5.0);
 		testTimeCost.setData(scenario.createId("l9"), 10.0, 5.0);
-		parkingRouter.adaptStartOfRoute(route, startLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptStartOfCarRoute(route, startLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(4, route.getLinkIds().size());
 		
@@ -137,7 +137,7 @@ public class ParkingRouterTest extends MatsimTestCase {
 		testTimeCost.setData(scenario.createId("l7"), 10.0, 5.0);
 		testTimeCost.setData(scenario.createId("l8"), 10.0, 5.0);
 		testTimeCost.setData(scenario.createId("l9"), 10.0, 5.0);
-		parkingRouter.adaptStartOfRoute(route, startLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptStartOfCarRoute(route, startLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(5, route.getLinkIds().size());
 		
@@ -148,7 +148,7 @@ public class ParkingRouterTest extends MatsimTestCase {
 		testTimeCost.setData(scenario.createId("l7"), 10.0, 5.0);
 		testTimeCost.setData(scenario.createId("l8"), 10.0, 5.0);
 		testTimeCost.setData(scenario.createId("l9"), 10.0, 5.0);
-		parkingRouter.adaptStartOfRoute(route, startLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptStartOfCarRoute(route, startLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(2, route.getLinkIds().size());
 		
@@ -174,7 +174,7 @@ public class ParkingRouterTest extends MatsimTestCase {
 				
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 1);
-		parkingRouter.adaptEndOfRoute(route, endLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptEndOfCarRoute(route, endLinkId, time, person, vehicle);
 		log.info(route.getStartLinkId());
 		for(Id linkId : route.getLinkIds()) log.info(linkId);
 		log.info(route.getEndLinkId());
@@ -183,25 +183,25 @@ public class ParkingRouterTest extends MatsimTestCase {
 		
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 2);
-		parkingRouter.adaptEndOfRoute(route, endLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptEndOfCarRoute(route, endLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(4, route.getLinkIds().size());
 		
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 3);
-		parkingRouter.adaptEndOfRoute(route, endLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptEndOfCarRoute(route, endLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(3, route.getLinkIds().size());
 
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 4);
-		parkingRouter.adaptEndOfRoute(route, endLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptEndOfCarRoute(route, endLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(2, route.getLinkIds().size());
 		
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 10);
-		parkingRouter.adaptEndOfRoute(route, endLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptEndOfCarRoute(route, endLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(2, route.getLinkIds().size());
 
@@ -209,14 +209,14 @@ public class ParkingRouterTest extends MatsimTestCase {
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 10);
 		testTimeCost.setData(scenario.createId("l11"), 10.0, 5.0);
-		parkingRouter.adaptEndOfRoute(route, endLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptEndOfCarRoute(route, endLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(3, route.getLinkIds().size());
 
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 4);
 		testTimeCost.setData(scenario.createId("l11"), 10.0, 5.0);
-		parkingRouter.adaptEndOfRoute(route, endLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptEndOfCarRoute(route, endLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(3, route.getLinkIds().size());
 		
@@ -224,7 +224,7 @@ public class ParkingRouterTest extends MatsimTestCase {
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 4);
 		testTimeCost.setData(scenario.createId("l11"), 10.0, 5.0);
 		testTimeCost.setData(scenario.createId("l12"), 10.0, 5.0);
-		parkingRouter.adaptEndOfRoute(route, endLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptEndOfCarRoute(route, endLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(4, route.getLinkIds().size());
 		
@@ -233,7 +233,7 @@ public class ParkingRouterTest extends MatsimTestCase {
 		testTimeCost.setData(scenario.createId("l11"), 10.0, 5.0);
 		testTimeCost.setData(scenario.createId("l12"), 10.0, 5.0);
 		testTimeCost.setData(scenario.createId("l13"), 10.0, 5.0);
-		parkingRouter.adaptEndOfRoute(route, endLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptEndOfCarRoute(route, endLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(5, route.getLinkIds().size());
 		
@@ -244,7 +244,7 @@ public class ParkingRouterTest extends MatsimTestCase {
 		testTimeCost.setData(scenario.createId("l12"), 10.0, 5.0);
 		testTimeCost.setData(scenario.createId("l13"), 10.0, 5.0);
 		testTimeCost.setData(scenario.createId("l14"), 10.0, 5.0);
-		parkingRouter.adaptEndOfRoute(route, endLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptEndOfCarRoute(route, endLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(2, route.getLinkIds().size());
 	}
@@ -308,7 +308,7 @@ public class ParkingRouterTest extends MatsimTestCase {
 				
 		route = new LinkNetworkRouteImpl(scenario.createId("l2"), scenario.createId("l2"));
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 4);
-		parkingRouter.adaptStartOfRoute(route, startLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptStartOfCarRoute(route, startLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(1, route.getLinkIds().size());
 	}
@@ -329,7 +329,7 @@ public class ParkingRouterTest extends MatsimTestCase {
 
 		route = new LinkNetworkRouteImpl(scenario.createId("l2"), scenario.createId("l2"));
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 4);
-		parkingRouter.adaptEndOfRoute(route, endLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.adaptEndOfCarRoute(route, endLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(1, route.getLinkIds().size());
 	}
