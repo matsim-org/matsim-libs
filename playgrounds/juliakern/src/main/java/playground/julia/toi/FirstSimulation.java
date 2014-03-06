@@ -40,6 +40,7 @@ public class FirstSimulation {
 	static String outputDir = "output/oslo/";
 	//static String plansFile = "input/oslo/plans_from_csv.xml";
 	static String plansFile = "input/oslo/plans_from_start_og_random.xml";
+	private static int numberOfIterations = 20;
 	//static String plansFile = "input/oslo/smallpop.xml";
 	/**
 	 * @param args
@@ -54,11 +55,12 @@ public class FirstSimulation {
 
 		Config config = ConfigUtils.createConfig();	
 		config.addCoreModules();
-		config.controler().setLastIteration(20);
+		config.controler().setLastIteration(numberOfIterations );
 		config.controler().setOutputDirectory(outputDir);
 		config.controler().setWriteEventsInterval(1);
 		config.controler().setWritePlansInterval(1);
-		config.controler().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
+		//config.controler().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
+		
 	
 		ActivityParams home = new ActivityParams("home");
 		home.setTypicalDuration(13 * 3600);

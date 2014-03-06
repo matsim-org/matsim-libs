@@ -45,8 +45,8 @@ import org.opengis.feature.simple.SimpleFeature;
 public class ShapeConverterNetwork {
 
 	static String shapeFile = "input/oslo/Matsim_files_1/trondheim_med_omland_4.shp";
-	static String laneTypeFile = "input/oslo/lanetypes.csv";
-	private static String splitSymbol =",";
+	static String laneTypeFile = "input/oslo/lanetypes2.csv";
+	private static String splitSymbol =";";
 	/**
 	 * @param args
 	 */
@@ -73,10 +73,10 @@ public class ShapeConverterNetwork {
 		try{
 			br = new BufferedReader(new FileReader(laneTypeFile));
 			br.readLine(); //skip first line
-			br.readLine();
+			//br.readLine();
 			while((line=br.readLine())!= null){
 				String [] lanetypeStr = line.split(splitSymbol);
-				laneTypes.put(lanetypeStr[1], new Lane(lanetypeStr));
+				laneTypes.put(lanetypeStr[0], new Lane(lanetypeStr));
 			}
 			
 		}catch(FileNotFoundException e){
@@ -157,19 +157,21 @@ public class ShapeConverterNetwork {
 				if(laneTypes.get(lanetype).toll==true){
 					logger.info("toll roads " + linkId1 + " " + linkId2 );
 				}
-					Double capacity = laneTypes.get(lanetype).getCapacity(); //standard 3600
+				
 					Double numLanesForwards = laneTypes.get(lanetype)
 							.getNumberOfForwardLanes();
 					Double numLanesBackwards = laneTypes.get(lanetype)
 							.getNumberOfBackLanes();
+					Double capacityf = numLanesForwards * freeSpeed *72; // assume 3600 in 1 hour for freespeed 50 km/h
+					Double capacityb = numLanesBackwards * freeSpeed * 72;
 					if (!network.getLinks().containsKey(linkId1)) {
 						if(numLanesForwards>0.0){
-							network.createAndAddLink(linkId1, node1, node2,	linkLength, freeSpeed, capacity,numLanesForwards);
+							network.createAndAddLink(linkId1, node1, node2,	linkLength, freeSpeed, capacityf,numLanesForwards);
 						}
 					}
 					if (!network.getLinks().containsKey(linkId2)) {
 						if(numLanesBackwards>0.0){
-							network.createAndAddLink(linkId2, node2, node1,	linkLength, freeSpeed, capacity,numLanesBackwards);
+							network.createAndAddLink(linkId2, node2, node1,	linkLength, freeSpeed, capacityb,numLanesBackwards);
 						}
 					}
 					

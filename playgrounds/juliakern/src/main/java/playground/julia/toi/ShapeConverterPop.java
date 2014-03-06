@@ -53,9 +53,10 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 public class ShapeConverterPop {
 
-	static String shapeFile = "input/oslo/Start_og_stopp_i_TRD_fra_RVU2/testplott5_end.shp";
-	static String networkFile = "input/oslo/trondheim_network.xml";
-	static String plansFile = "input/oslo/plans_from_start_og.xml";
+	static String shapeFile = "input/oslo/Dataset/eksport_stort_datasett_test_2.shp";
+	//static String shapeFile = "input/oslo/Start_og_stopp_i_TRD_fra_RVU2/testplott5_end.shp";
+	static String networkFile = "input/oslo/trondheim_network_with_lanes.xml";
+	static String plansFile = "input/oslo/plans_from_eksport_stort_datasett.xml";
 	static Collection<SimpleFeature> features;
 	static Logger logger = Logger.getLogger(ShapeConverterPop.class);
 	private static int countKnownActTypes =0;
@@ -193,16 +194,17 @@ public class ShapeConverterPop {
 //				Double id = (Double) sf.getAttribute("B0"); //B0
 //				String idstring = Double.toString(id);
 				
-				Integer id = (Integer) sf.getAttribute("ID_NUM2"); //ID_2 --> pop size = 59059
-//				Double idd = (Double) sf.getAttribute("ID_2");
-//				Integer id = idd.intValue();
-				String idstring = Integer.toString(id);
-				Id personId = new IdImpl(idstring);
+				//Integer idd = (Integer) sf.getAttribute("ID_NUM2"); //ID_2 --> pop size = 59059
+				Double idd = (Double) sf.getAttribute("ID_NUM2");
+			//	Integer id = idd.intValue();
+				//String idstring = Integer.toString(id);
+				String ids = Double.toString(idd);
+				Id personId = new IdImpl(ids);
 				
-				Double startx = (Double) sf.getAttribute("start_x");
-				Double starty = (Double) sf.getAttribute("start_y");
-				Double endx = (Double) sf.getAttribute("ende_x");
-				Double endy = (Double) sf.getAttribute("ende_y");
+				Double startx = (Double) sf.getAttribute("start_x_ny");
+				Double starty = (Double) sf.getAttribute("start_y_ny");
+				Double endx = (Double) sf.getAttribute("ende_x_ny");
+				Double endy = (Double) sf.getAttribute("ende_y_ny");
 				
 				Coord startCoordinates = scenario.createCoord(startx, starty);
 				Coord endCoordinates = scenario.createCoord(endx, endy);

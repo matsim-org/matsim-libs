@@ -25,11 +25,10 @@ public class Lane {
 	int numberOfForwardLanes;
 	int numberOfBackwardLanes;
 	boolean toll; 
-	Double capacity;
 	
 
 	public Lane(String[] lanetypeStr) {
-		this.identifier = new String(lanetypeStr[1]);
+		this.identifier = new String(lanetypeStr[0]);
 		this.identifier = identifier.replace("1|#2", "1#2"); // typo in the input tabular?
 		
 		// toll
@@ -67,9 +66,6 @@ public class Lane {
 			} catch (NumberFormatException e) {
 			}
 		}
-				
-		// capacity
-		this.capacity = Double.parseDouble(lanetypeStr[2]);
 	}
 
 	public Double getNumberOfBackLanes() {
@@ -80,8 +76,5 @@ public class Lane {
 		return 1.0*numberOfForwardLanes;
 	}
 
-	public Double getCapacity() {
-		return capacity;
-	}
 
 }
