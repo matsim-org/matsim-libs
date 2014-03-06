@@ -26,7 +26,6 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QLane;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkLanesImpl;
 import org.matsim.signalsystems.model.Signal;
@@ -75,7 +74,7 @@ public class QSimSignalEngine implements SignalEngine {
 //					log.debug("  signal is on lanes: ");
 					for (Id laneId : signal.getLaneIds()){
 //						log.debug("    lane id: " + laneId);
-						QLane lane = getQLane(laneId, l);
+						SignalizeableItem lane = getQLane(laneId, l);
 						lane.setSignalized(true);
 						signal.addSignalizeableItem(lane);
 					}
@@ -85,11 +84,9 @@ public class QSimSignalEngine implements SignalEngine {
 		}
 	}
 
-	private QLane getQLane(Id laneId, QLinkLanesImpl link){
-		for (QLane lane : link.getQueueLanes()){
-			if (lane.getId().equals(laneId)){
-				return lane;
-			}
+	private SignalizeableItem getQLane(Id laneId, QLinkLanesImpl link){
+		if (link.getQueueLanes().containsKey(laneId)){
+			return link.getQueueLanes().get(laneId);
 		}
 		throw new IllegalArgumentException("QLane Id " + laneId + "on link Id" + link.getLink().getId() + "  not found. Check configuration!");
 	}

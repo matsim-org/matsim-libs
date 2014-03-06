@@ -240,7 +240,7 @@ public class QLaneTest extends MatsimTestCase {
 		assertNotNull(ql.getToNodeQueueLanes());
 		assertEquals(3, ql.getToNodeQueueLanes().size());
 		double totalFlowCapacity = 0.0;
-		for (QLane qll : ql.getToNodeQueueLanes()) {
+		for (QueueWithBuffer qll : ql.getToNodeQueueLanes()) {
 			if (qll.getId().equals(id2)) {
 				assertEquals(0.5, qll.getSimulatedFlowCapacity());
 				assertEquals(28.0, qll.getStorageCapacity());

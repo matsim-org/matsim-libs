@@ -180,17 +180,17 @@ public class QNode implements NetsimNode {
 			// This cannot be moved to QLinkLanesImpl since we want to be able to serve other lanes if one lane is blocked.
 			// kai, feb'12
 			// yyyy but somehow I think this should be solved "under the hood" in QLinkLanesImpl.  kai, sep'13
-			for (QLane lane : ((QLinkLanesImpl)link).getToNodeQueueLanes()) {
-				if (lane.isThisTimeStepGreen()){
-					while (!lane.isNotOfferingVehicle()) {
+			for (QueueWithBuffer lane : ((QLinkLanesImpl)link).getToNodeQueueLanes()) {
+					while (! lane.isNotOfferingVehicle()) {
 						QVehicle veh = lane.getFirstVehicle();
-						if (!moveVehicleOverNode(veh, lane, now)) {
+						Id nextLink = veh.getDriver().chooseNextLinkId();
+						if (! (lane.hasGreenForToLink(nextLink) && moveVehicleOverNode(veh, lane, now))) {
 							break;
 						}
 					}
 				}
 			}
-		} else {
+		else {
 			while (!link.isNotOfferingVehicle()) {
 				QVehicle veh = link.getFirstVehicle();
 				if (!moveVehicleOverNode(veh, link, now)) {

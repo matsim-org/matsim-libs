@@ -27,7 +27,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.LaneEnterEvent;
+import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
+import org.matsim.core.api.experimental.events.handler.LaneEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.api.experimental.events.handler.SignalGroupStateChangedEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -50,7 +54,7 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author dgrether
  */
 public class QSimTest implements
-		LinkEnterEventHandler, SignalGroupStateChangedEventHandler {
+		LinkEnterEventHandler, SignalGroupStateChangedEventHandler, LaneEnterEventHandler, LaneLeaveEventHandler {
 
 	private static final Logger log = Logger.getLogger(QSimTest.class);
 
@@ -71,7 +75,7 @@ public class QSimTest implements
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(this);
-		this.link2EnterTime = 38.0;
+		this.link2EnterTime = 37.0;
 		
 		FromDataBuilder builder = new FromDataBuilder(scenario, events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
@@ -175,6 +179,18 @@ public class QSimTest implements
 	@Override
 	public void handleEvent(SignalGroupStateChangedEvent event) {
 		log.info("State changed : "  + event.getTime() + " " + event.getSignalSystemId() + " " + event.getSignalGroupId() + " " + event.getNewState());
+	}
+
+
+	@Override
+	public void handleEvent(LaneLeaveEvent e) {
+		log.info("Leave Lane id: " + e.getLaneId().toString() + " enter time: " + e.getTime());
+	}
+
+
+	@Override
+	public void handleEvent(LaneEnterEvent e) {
+		log.info("Enter Lane id: " + e.getLaneId().toString() + " enter time: " + e.getTime());
 	}
 
 }

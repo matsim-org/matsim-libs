@@ -130,7 +130,7 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 	public boolean doSimStep(final double now) {
 		updateRemainingFlowCapacity();
 
-		moveLaneToBuffer(now);
+		moveQueueToBuffer(now);
 
 		// move vehicles from buffer to next lane if there is one.
 		boolean isOtherLaneActive = false;

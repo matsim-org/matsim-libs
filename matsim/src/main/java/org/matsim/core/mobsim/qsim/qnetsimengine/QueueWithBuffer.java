@@ -143,15 +143,22 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue ) {
 		this(qLinkImpl, vehicleQueue,  qLinkImpl.getLink().getId() ) ;
 	}
+	
 	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue, Id id ) {
+		this(qLinkImpl, vehicleQueue, id, qLinkImpl.getLink().getLength(), qLinkImpl.getLink().getNumberOfLanes(),
+				((LinkImpl)qLinkImpl.getLink()).getFlowCapacity());
+	}
+	
+	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue, Id id, 
+			double length, double effectiveNumberOfLanes, double flowCapacity_s) {
 		this.id = id ;
 		this.qLink = qLinkImpl;
 		this.network = qLinkImpl.network ;
 		this.vehQueue = vehicleQueue ;
 
-		this.length = qLinkImpl.getLink().getLength() ;
-		this.unscaledFlowCapacity_s = ((LinkImpl)qLinkImpl.getLink()).getFlowCapacity() ;
-		this.effectiveNumberOfLanes = qLinkImpl.getLink().getNumberOfLanes() ;
+		this.length = length;
+		this.unscaledFlowCapacity_s = flowCapacity_s ;
+		this.effectiveNumberOfLanes = effectiveNumberOfLanes;
 
 		freespeedTravelTime = this.length / qLinkImpl.getLink().getFreespeed();
 		if (Double.isNaN(freespeedTravelTime)) {
@@ -325,7 +332,7 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 
 	@Override
 	public boolean doSimStep(final double now ) {
-		this.moveLaneToBuffer(now);
+		this.moveQueueToBuffer(now);
 		return true ;
 	}
 
@@ -336,7 +343,7 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 	 * @param now
 	 *          The current time.
 	 */
-	final void moveLaneToBuffer(final double now) {
+	final void moveQueueToBuffer(final double now) {
 		QVehicle veh;
 
 		while ((veh = vehQueue.peek()) != null) {
@@ -486,6 +493,10 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 		return vehicles ;
 	}
 
+	public final QVehicle peekFirstVehicle(){
+		return this.buffer.peek();
+	}
+	
 	@Override
 	public final QVehicle popFirstVehicle() {
 		double now = qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
@@ -656,7 +667,7 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 	Id getId() {
 		// need this so we can generate lane events although we do not need them here. kai, sep'13
 		// yyyy would probably be better to have this as a final variable set during construction. kai, sep'13
-		return this.qLink.link.getId() ;
+		return this.id;
 	}
 
 	static class Hole extends QItem {
