@@ -47,6 +47,7 @@ import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * @author dgrether
+ * @author tthunig
  */
 public class NetLanesSignalsShrinker {
 	
@@ -59,8 +60,8 @@ public class NetLanesSignalsShrinker {
 	private Scenario fullScenario;
 	private CoordinateReferenceSystem crs;
 
-	private DgSignalsBoundingBox signalsBoundingBox;
-
+	private DgSignalsBoundingBox cuttingBoundingBox;
+	
 	private Map<Id, Id> originalToSimplifiedLinkIdMatching;
 
 	private Network shrinkedNetwork;
@@ -74,21 +75,21 @@ public class NetLanesSignalsShrinker {
 		this.crs = crs;
 	}
 	
-	public void shrinkScenario(String outputDirectory, String shapeFileDirectory, double boundingBoxOffset) throws IOException{
+	public void shrinkScenario(String outputDirectory, String shapeFileDirectory, double cuttingBoundingBoxOffset) throws IOException{
 		//Some initialization
 		Set<Id> signalizedNodes = this.getSignalizedNodeIds(((SignalsData) this.fullScenario.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData(), this.fullScenario.getNetwork());
 		DgNetworkUtils.writeNetwork2Shape(fullScenario.getNetwork(), crs, shapeFileDirectory + "network_full");
 		
-		//create the bounding box
-		this.signalsBoundingBox = new DgSignalsBoundingBox(crs);
-		Envelope boundingBox = signalsBoundingBox.calculateBoundingBoxForSignals(fullScenario.getNetwork(), 
-				((SignalsData) fullScenario.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData(), boundingBoxOffset);
-		signalsBoundingBox.writeBoundingBox(shapeFileDirectory);
+		//create the boundary envelope
+		this.cuttingBoundingBox = new DgSignalsBoundingBox(crs);
+		Envelope cuttingBoundingBoxEnvelope = cuttingBoundingBox.calculateBoundingBoxForSignals(fullScenario.getNetwork(), 
+				((SignalsData) fullScenario.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData(), cuttingBoundingBoxOffset);
+		cuttingBoundingBox.writeBoundingBox(shapeFileDirectory + "cutting_");		
 		
 		//Reduce the network size to the bounding box
 		DgNetworkShrinker netShrinker = new DgNetworkShrinker();
 		netShrinker.setSignalizedNodes(signalizedNodes);
-		Network smallNetwork = netShrinker.createSmallNetwork(fullScenario.getNetwork(), boundingBox, crs);
+		Network smallNetwork = netShrinker.createSmallNetwork(fullScenario.getNetwork(), cuttingBoundingBoxEnvelope, crs);
 		
 		DgNetworkUtils.writeNetwork(smallNetwork, outputDirectory +  smallNetworkFilename);
 		DgNetworkUtils.writeNetwork2Shape(smallNetwork, crs, shapeFileDirectory + "network_small");
@@ -134,8 +135,8 @@ public class NetLanesSignalsShrinker {
 		
 	}
 		
-	public DgSignalsBoundingBox getSignalsBoundingBox() {
-		return this.signalsBoundingBox;
+	public DgSignalsBoundingBox getCuttingBoundingBox() {
+		return this.cuttingBoundingBox;
 	}
 	
 	public Map<Id, Id> getOriginalToSimplifiedLinkIdMatching(){

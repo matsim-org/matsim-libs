@@ -513,12 +513,12 @@ public class DgAnalyseCottbusKS2010 {
 			sc2.getNetwork().removeLink(link.getId()); 
 		}
 		e.network = sc2.getNetwork();
-		l.add(e);
+//		l.add(e);
 		
 		e = new Extent();
 		e.name = "all";
 		e.createPersonDiff = false;
-		l.add(e);
+//		l.add(e);
 		return l;
 	}
 
@@ -567,8 +567,11 @@ public class DgAnalyseCottbusKS2010 {
 
 //		add1712BaseCaseRoutesOnlyRuns(l);
 //		CottbusRuns.add1712BaseCaseRoutesOnlyRandomRuns(l);
-		CottbusRuns.add1712BaseCaseRoutesOnlyHighStorageCapRuns(l);
-
+//		CottbusRuns.add1712BaseCaseRoutesOnlyHighStorageCapRuns(l);
+		
+//		CottbusRuns.add1712BaseCaseRoutesOnlyHighStorageCapRunsOnSimplifiedNetwork(l);
+		CottbusRuns.add1712BaseCaseRoutesTimesHighStorageCapRunsOnSimplifiedNetwork(l);
+		
 		//		add1930BaseCase(l);
 //		add1712BaseCaseRoutesOnlyRuns5Percent(l);
 
@@ -599,7 +602,7 @@ public class DgAnalyseCottbusKS2010 {
 		String timesString = createTimesString(times);
 		List<Extent> extents = createExtentList();
 		String extentString = createExtentString(extents);
-		String outputFilename = outputDirectory + "2014-01-16_analysis" + runIdsString + "_" +  timesString;
+		String outputFilename = outputDirectory + "2014-01-27_analysis" + runIdsString + "_" +  timesString;
 		System.out.println(outputFilename);
 		DgAnalyseCottbusKS2010 ana = new DgAnalyseCottbusKS2010();
 		ana.setUseInMemoryEvents(false);

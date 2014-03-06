@@ -33,7 +33,11 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
 
-
+/**
+ * 
+ * @author tthunig
+ *
+ */
 public class TtSignalizedNodeShortestPath {
 
 	private static final Logger log = Logger.getLogger(TtSignalizedNodeShortestPath.class);

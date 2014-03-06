@@ -131,6 +131,44 @@ public class CottbusRuns {
 		l.add(ri);
 	}
 
+	static void add1712BaseCaseRoutesOnlyHighStorageCapRunsOnSimplifiedNetwork(List<RunInfo> l){
+		RunInfo ri = null;
+
+		ri = new RunInfo();
+		ri.runId = "1933";
+		ri.iteration = 2000;
+		ri.baseCase = true;
+		ri.remark  = "base case 1712 it 2000, routes only, btu network and population";
+		ri.remark = "base case high storage cap, simplified network and population";
+		l.add(ri);
+		//
+		ri = new RunInfo();
+		ri.runId = "1934";
+		ri.iteration = 2000;
+		ri.remark = "continue 1712, com > 10, routes only, btu network and population";
+		ri.remark = "optimization, commodities > 10 high storage cap, simplified network and population";
+		l.add(ri);
+	}
+	
+	static void add1712BaseCaseRoutesTimesHighStorageCapRunsOnSimplifiedNetwork(List<RunInfo> l){
+		RunInfo ri = null;
+
+		ri = new RunInfo();
+		ri.runId = "1935";
+		ri.iteration = 2000;
+		ri.baseCase = true;
+		ri.remark  = "base case 1712 it 2000, route and time choice, btu network and population";
+		ri.remark = "base case high storage cap, routes and times, simplified network and population";
+		l.add(ri);
+		//
+		ri = new RunInfo();
+		ri.runId = "1936";
+		ri.iteration = 2000;
+		ri.remark = "continue 1712, com > 10, route and time choice, btu network and population";
+		ri.remark = "optimization, commodities > 10 high storage cap, routes and times, simplified network and population";
+		l.add(ri);
+	}
+	
 	static void add1712BaseCaseRoutesOnlyRuns(List<RunInfo> l){
 		RunInfo ri = null;
 //		ri = new RunInfo();

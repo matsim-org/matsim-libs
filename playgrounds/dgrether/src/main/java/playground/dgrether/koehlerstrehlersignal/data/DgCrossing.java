@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 
 /**
  * @author dgrether
+ * @author tthunig
  *
  */
 public class DgCrossing {
@@ -39,6 +40,7 @@ public class DgCrossing {
 	private Map<Id, DgCrossingNode> nodes = new HashMap<Id, DgCrossingNode>();
 	private Map<Id, DgStreet> lights = new HashMap<Id, DgStreet>();
 	private Map<Id, DgProgram> programs = new HashMap<Id, DgProgram>();
+	private String type;
 
 	public DgCrossing(Id id) {
 		this.id = id;
@@ -80,5 +82,13 @@ public class DgCrossing {
 	
 	public Map<Id, DgProgram> getPrograms(){
 		return this.programs;
+	}
+	
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 }

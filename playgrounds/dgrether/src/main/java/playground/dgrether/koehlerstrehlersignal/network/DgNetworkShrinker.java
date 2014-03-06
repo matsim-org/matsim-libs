@@ -26,11 +26,16 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.dgrether.analysis.eventsfilter.FeatureNetworkLinkStartOrEndCoordFilter;
+import playground.dgrether.EnvelopeLinkStartEndFilter;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-
+/**
+ * 
+ * @author dgrether
+ * @author tthunig
+ *
+ */
 public class DgNetworkShrinker {
 
 
@@ -41,7 +46,7 @@ public class DgNetworkShrinker {
 		NetworkFilterManager filterManager = new NetworkFilterManager(net);
 		
 		//bounding box filter - deletes all edges outside the bounding box
-		filterManager.addLinkFilter(new FeatureNetworkLinkStartOrEndCoordFilter(networkCrs, envelope, networkCrs));
+		filterManager.addLinkFilter(new EnvelopeLinkStartEndFilter(envelope));
 		
 		//interior link filter - deletes all edges that are not on a shortest path (according to travel time) between signalized nodes
 		Set<Id> shortestPathLinkIds = new TtSignalizedNodeShortestPath().calcShortestPathLinkIdsBetweenSignalizedNodes(net, signalizedNodes);

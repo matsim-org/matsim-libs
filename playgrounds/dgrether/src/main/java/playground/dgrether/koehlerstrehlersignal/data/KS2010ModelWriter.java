@@ -33,7 +33,14 @@ import org.matsim.core.utils.io.IOUtils;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
+import playground.dgrether.koehlerstrehlersignal.conversion.TtCrossingType;
 
+/**
+ * 
+ * @author dgrether
+ * @author tthunig
+ *
+ */
 public class KS2010ModelWriter {
 
 	private static final Logger log = Logger.getLogger(KS2010ModelWriter.class);
@@ -49,6 +56,7 @@ public class KS2010ModelWriter {
 	private static final String NAME = "name";
 	private static final String DESCRIPTION = "description";
 	// tags for the crossings element
+	private static final String TYPE = "type";
 	private static final String CROSSINGS = "crossings";
 	private static final String CROSSING = "crossing";
 	private static final String NODES = "nodes";
@@ -131,6 +139,7 @@ public class KS2010ModelWriter {
 		for (DgCrossing crossing : net.getCrossings().values()) {
 			atts.clear();
 			atts.addAttribute("", "", ID, CDATA, crossing.getId().toString());
+			atts.addAttribute("", "", TYPE, CDATA, crossing.getType());
 			hd.startElement("", "", CROSSING, atts);
 			// nodes
 			atts.clear();
@@ -158,27 +167,27 @@ public class KS2010ModelWriter {
 				hd.endElement("", "", LIGHT);
 			}
 			hd.endElement("", "", LIGHTS);
-			// programs
-			atts.clear();
-			hd.startElement("", "", PROGRAMS, atts);
-			for (DgProgram program : crossing.getPrograms().values()) {
+			// programs for crossings with type fixed
+			if (crossing.getType().equals(TtCrossingType.FIXED)){
 				atts.clear();
-				atts.addAttribute("", "", ID, CDATA, program.getId().toString());
-				atts.addAttribute("", "", CYCLE, CDATA, Integer.toString(program.getCycle()));
-				hd.startElement("", "", PROGRAM, atts);
-				for (DgGreen g : program.getGreensByLightId().values()) {
+				hd.startElement("", "", PROGRAMS, atts);
+				for (DgProgram program : crossing.getPrograms().values()) {
 					atts.clear();
-					atts.addAttribute("", "", LIGHT, CDATA, g.getLightId().toString());
-					atts.addAttribute("", "", OFFSET, CDATA, Integer.toString(g.getOffset()));
-					atts.addAttribute("", "", LENGTH, CDATA, Integer.toString(g.getLength()));
-					hd.startElement("", "", GREEN, atts);
-					hd.endElement("", "", GREEN);
+					atts.addAttribute("", "", ID, CDATA, program.getId().toString());
+					atts.addAttribute("", "", CYCLE, CDATA, Integer.toString(program.getCycle()));
+					hd.startElement("", "", PROGRAM, atts);
+					for (DgGreen g : program.getGreensByLightId().values()) {
+						atts.clear();
+						atts.addAttribute("", "", LIGHT, CDATA, g.getLightId().toString());
+						atts.addAttribute("", "", OFFSET, CDATA, Integer.toString(g.getOffset()));
+						atts.addAttribute("", "", LENGTH, CDATA, Integer.toString(g.getLength()));
+						hd.startElement("", "", GREEN, atts);
+						hd.endElement("", "", GREEN);
+					}
+					hd.endElement("", "", PROGRAM);
 				}
-				hd.endElement("", "", PROGRAM);
+				hd.endElement("", "", PROGRAMS);
 			}
-
-			hd.endElement("", "", PROGRAMS);
-
 			hd.endElement("", "", CROSSING);
 		}
 		hd.endElement("", "", CROSSINGS);

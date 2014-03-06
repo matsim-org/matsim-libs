@@ -49,6 +49,7 @@ import com.vividsolutions.jts.geom.Point;
  * Therefore, a small network is needed that should only contain links within the area covered by zones. 
  *  
  * @author dgrether
+ * @author tthunig
  * 
  */
 public class DgMatsimPopulation2Links {
@@ -141,7 +142,9 @@ public class DgMatsimPopulation2Links {
 			Envelope networkBoundingBox) {
 			NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
 			List<Link> route = this.createFullRoute(networkRoute);
-			while (! route.isEmpty()){
+			// create an od-pair between the first and the last link on the route which is in the small network
+			// no matter whether there are links between them which are not in the small network
+			if (! route.isEmpty()){
 				Tuple<Link, Link> nextFromTo = this.getNextFromToOnSmallNetworkOfRoute(route);
 				if (nextFromTo != null){
 					this.addFromLinkToLinkRelationshipToGrid(nextFromTo.getFirst(), nextFromTo.getSecond());
@@ -175,9 +178,8 @@ public class DgMatsimPopulation2Links {
 		Link routeStartLink = null;
 		Link routeEndLink = null;
 		Link currentLink = null;
-//		Coordinate currentCoordinate = null;
+		//search first link that is in the small network
 		while (! route.isEmpty()){
-//			log.error("route: " + route);
 			currentLink = route.remove(0);
 			Id linkId = currentLink.getId();
 			if (this.originalToSimplifiedLinkIdMatching.containsKey(linkId)) {
@@ -191,7 +193,7 @@ public class DgMatsimPopulation2Links {
 		}
 		//search last link that is in the small network
 		while (! route.isEmpty()){
-			currentLink = route.remove(0);
+			currentLink = route.remove(route.size()-1);
 			Id linkId = currentLink.getId();
 			if (this.originalToSimplifiedLinkIdMatching.containsKey(linkId)) {
 				linkId = this.originalToSimplifiedLinkIdMatching.get(linkId);
@@ -200,8 +202,6 @@ public class DgMatsimPopulation2Links {
 			}
 			if (this.smallNetwork.getLinks().containsKey(currentLink.getId())){
 				routeEndLink = currentLink;
-			}
-			else {
 				break;
 			}
 		}

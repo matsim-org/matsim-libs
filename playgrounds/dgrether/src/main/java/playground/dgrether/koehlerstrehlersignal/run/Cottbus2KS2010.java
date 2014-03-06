@@ -39,6 +39,7 @@ import playground.dgrether.utils.zones.DgZones;
 
 /**
  * @author dgrether
+ * @author tthunig
  * 
  */
 public class Cottbus2KS2010 {
@@ -73,7 +74,8 @@ public class Cottbus2KS2010 {
 		// parameters
 		int cellsX = 5;
 		int cellsY = 5;
-		double boundingBoxOffset = 50.0;
+		double signalsBoundingBoxOffset = 50.0;
+		double cuttingBoundingBoxOffset = 50.0;
 		double startTime = 5.5 * 3600.0;
 		double endTime = 9.5 * 3600.0;
 		// double startTime = 13.5 * 3600.0;
@@ -84,7 +86,7 @@ public class Cottbus2KS2010 {
 		String name = "run run1722 output plans between 05:30 and 09:30";
 		// String name = "run run1722 output plans between 13:30 and 18:30";
 		final String outputDirectory = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/cb2ks2010/2014-01-17_minflow_10_morning_peak/";
+				+ "shared-svn/projects/cottbus/cb2ks2010/2014-03-06_minflow_"+ minCommodityFlow +"_morning_peak_bb"+ cuttingBoundingBoxOffset + "/";
 		String ksModelOutputFilename = "ks2010_model_";
 		ksModelOutputFilename += Double.toString(minCommodityFlow) + "_"
 				+ Double.toString(startTime) + ".xml";
@@ -100,14 +102,14 @@ public class Cottbus2KS2010 {
 		NetLanesSignalsShrinker scenarioShrinker = new NetLanesSignalsShrinker(
 				fullScenario, CRS);
 		scenarioShrinker.shrinkScenario(outputDirectory, shapeFileDirectory,
-				boundingBoxOffset);
+				cuttingBoundingBoxOffset);
 
 		// create the geometry for zones. The geometry itsself is not used, but
 		// the object serves as container for the link -> link OD pairs
 		ZoneBuilder zoneBuilder = new ZoneBuilder(CRS);
 		DgZones zones = zoneBuilder.createAndWriteZones(
 				scenarioShrinker.getShrinkedNetwork(),
-				scenarioShrinker.getSignalsBoundingBox(), cellsX, cellsY,
+				scenarioShrinker.getCuttingBoundingBox(), cellsX, cellsY,
 				shapeFileDirectory);
 
 		// match population to the small network and convert to od, results are
@@ -119,16 +121,17 @@ public class Cottbus2KS2010 {
 		pop2od.convertPopulation2OdPairs(zones, fullScenario.getNetwork(),
 				fullScenario.getPopulation(), CRS,
 				scenarioShrinker.getShrinkedNetwork(),
-				scenarioShrinker.getSignalsBoundingBox(), startTime, endTime,
+				scenarioShrinker.getCuttingBoundingBox(), startTime, endTime,
 				shapeFileDirectory);
 
 		// convert to KoehlerStrehler2010 file format
 		M2KS2010Converter converter = new M2KS2010Converter(
 				scenarioShrinker.getShrinkedNetwork(),
 				scenarioShrinker.getShrinkedLanes(),
-				scenarioShrinker.getShrinkedSignals(), CRS);
+				scenarioShrinker.getShrinkedSignals(), 
+				signalsBoundingBoxOffset, CRS);
 		String description = createDescription(cellsX, cellsY, startTime,
-				endTime, boundingBoxOffset, matsimPopSampleSize,
+				endTime, cuttingBoundingBoxOffset, matsimPopSampleSize,
 				ksModelCommoditySampleSize, minCommodityFlow);
 		converter.setKsModelCommoditySampleSize(ksModelCommoditySampleSize);
 		converter.setMinCommodityFlow(minCommodityFlow);
@@ -136,7 +139,7 @@ public class Cottbus2KS2010 {
 				ksModelOutputFilename, name, description, zones, startTime,
 				endTime);
 
-		printStatistics(cellsX, cellsY, boundingBoxOffset, startTime, endTime);
+		printStatistics(cellsX, cellsY, cuttingBoundingBoxOffset, startTime, endTime);
 		log.info("output ist written to " + outputDirectory);
 		OutputDirectoryLogging.closeOutputDirLogging();
 	}

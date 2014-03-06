@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
@@ -49,6 +50,9 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.vis.vecmathutils.VectorUtils;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossingNode;
 import playground.dgrether.koehlerstrehlersignal.data.DgGreen;
@@ -60,6 +64,7 @@ import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 
 /**
  * @author dgrether
+ * @author tthunig
  *
  */
 public class M2KS2010NetworkConverter {
@@ -76,18 +81,26 @@ public class M2KS2010NetworkConverter {
 
 	private Set<Id> signalizedLinks;
 	
+	private Envelope signalsBoundingBox;
+	
 	public M2KS2010NetworkConverter(DgIdConverter idConverter){
 		this.idConverter = idConverter;
 	}
 	
-	public DgKSNetwork convertNetworkLanesAndSignals(Network network, LaneDefinitions20 lanes,
+	public DgKSNetwork convertNetworkLanesAndSignals(Network network, LaneDefinitions20 lanes, 
 			SignalsData signals, double startTime, double endTime) {
+		return this.convertNetworkLanesAndSignals(network, lanes, signals, null, startTime, endTime);
+	}
+	
+	public DgKSNetwork convertNetworkLanesAndSignals(Network network, LaneDefinitions20 lanes,
+			SignalsData signals, Envelope signalsBoundingBox, double startTime, double endTime) {
 		log.info("Checking cycle time...");
 		this.cycle = readCycle(signals);
 		log.info("cycle set to " + this.cycle);
 		signalizedLinks = this.getSignalizedLinkIds(signals.getSignalSystemsData());
 		log.info("Converting network ...");
 		this.timeInterval = endTime - startTime;
+		this.signalsBoundingBox = signalsBoundingBox;
 		this.dgNetwork = this.convertNetwork(network, lanes, signals);
 		log.info("Network converted.");
 		return this.dgNetwork ;
@@ -125,10 +138,10 @@ public class M2KS2010NetworkConverter {
 		 */
 		this.convertLinks2Streets(ksnet, net);
 
-		//loop over links and create layout of crossing
+		//loop over links and create layout of target crossing
 		for (Link link : net.getLinks().values()){
 			//prepare some objects/data
-			DgCrossing crossing = ksnet.getCrossings().get(this.idConverter.convertNodeId2CrossingId(link.getToNode().getId())); //The node id of the matsim network is the crossing id
+			DgCrossing crossing = ksnet.getCrossings().get(this.idConverter.convertNodeId2CrossingId(link.getToNode().getId())); //The node id of the matsim network gives the crossing id
 			Link backLink = this.getBackLink(link);
 			Id backLinkId = (backLink == null) ?  null : backLink.getId();
 			DgCrossingNode inLinkToNode = crossing.getNodes().get(this.idConverter.convertLinkId2ToCrossingNodeId(link.getId()));
@@ -151,10 +164,31 @@ public class M2KS2010NetworkConverter {
 	private void convertNodes2Crossings(DgKSNetwork ksNet, Network net){
 		for (Node node : net.getNodes().values()){
 			DgCrossing crossing = new DgCrossing(this.idConverter.convertNodeId2CrossingId(node.getId()));
-			ksNet.addCrossing(crossing);
-			DgProgram program = new DgProgram(this.DEFAULT_PROGRAM_ID);
-			program.setCycle(this.cycle);
-			crossing.addProgram(program);
+			
+			// create crossing type
+			Coordinate nodeCoordinate = MGC.coord2Coordinate(node.getCoord());
+			if (this.signalsBoundingBox == null || // there is no signals bounding box to stop expansion -> all nodes will be expanded
+					this.signalsBoundingBox.contains(nodeCoordinate)){ // node is within the signals bounding box
+				
+				// create crossing type "fixed" if node is signalized, "equalRank" else
+				for (Link link : node.getInLinks().values()){
+					if (signalizedLinks.contains(link.getId())){ // node is signalized
+						crossing.setType(TtCrossingType.FIXED);
+						// create default program for signalized crossing
+						DgProgram program = new DgProgram(this.DEFAULT_PROGRAM_ID);
+						program.setCycle(this.cycle);
+						crossing.addProgram(program);
+					} 
+				}
+				if (crossing.getType() == null){ // node isn't signalized, but within the signals bounding box
+					crossing.setType(TtCrossingType.EQUALRANK);
+				}
+			}
+			else{
+				crossing.setType(TtCrossingType.NOTEXPAND);
+			}
+			
+			ksNet.addCrossing(crossing);			
 		}
 	}
 	
@@ -164,12 +198,13 @@ public class M2KS2010NetworkConverter {
 			Node mToNode = link.getToNode();
 			Tuple<Coord, Coord> startEnd = this.scaleLinkCoordinates(link.getLength(), mFromNode.getCoord(), mToNode.getCoord());
 
+			// create from node
 			DgCrossing fromNodeCrossing = ksnet.getCrossings().get(this.idConverter.convertNodeId2CrossingId(mFromNode.getId()));
 			DgCrossingNode fromNode = new DgCrossingNode(this.idConverter.convertLinkId2FromCrossingNodeId(link.getId()));
-			
 			fromNode.setCoordinate(startEnd.getFirst());
 			fromNodeCrossing.addNode(fromNode);
 			
+			// create to node
 			DgCrossing toNodeCrossing = ksnet.getCrossings().get(this.idConverter.convertNodeId2CrossingId(mToNode.getId()));
 			DgCrossingNode toNode = new DgCrossingNode(this.idConverter.convertLinkId2ToCrossingNodeId(link.getId()));
 			toNode.setCoordinate(startEnd.getSecond());
@@ -200,21 +235,21 @@ public class M2KS2010NetworkConverter {
 		//calculate length and normal
 		Point2D.Double deltaLink = new Point2D.Double(linkEnd.x - linkStart.x, linkEnd.y - linkStart.y);
 		double euclideanLinkLength = this.calculateEuclideanLinkLength(deltaLink);
-		//calculate the correction factor if real link length is different than euclidean distance
-		double linkLengthCorrectionFactor = euclideanLinkLength / linkLength;
-		Point2D.Double deltaLinkNorm = new Point2D.Double(deltaLink.x / euclideanLinkLength, deltaLink.y / euclideanLinkLength);
-		Point2D.Double normalizedOrthogonal = new Point2D.Double(deltaLinkNorm.y, - deltaLinkNorm.x);
+//		//calculate the correction factor if real link length is different than euclidean distance
+//		double linkLengthCorrectionFactor = euclideanLinkLength / linkLength;
+//		Point2D.Double deltaLinkNorm = new Point2D.Double(deltaLink.x / euclideanLinkLength, deltaLink.y / euclideanLinkLength);
+//		Point2D.Double normalizedOrthogonal = new Point2D.Double(deltaLinkNorm.y, - deltaLinkNorm.x);
 		
 		//first calculate the scale of the link based on the node offset, i.e. the link will be shortened at the beginning and the end 
 		double linkScale = 1.0;
-		if ((euclideanLinkLength * 0.2) > (2.0 * nodeOffsetMeter)){ // 2* nodeoffset is more than 20%
+		if ((euclideanLinkLength * 0.2) > (2.0 * nodeOffsetMeter)){ // 2* nodeoffset is less than 20%
 			linkScale = (euclideanLinkLength - (2.0 * nodeOffsetMeter)) / euclideanLinkLength;
 		}
-		else { // use 80 % as euclidean length
+		else { // use 80 % as euclidean length (because nodeoffset is to big)
 			linkScale = euclideanLinkLength * 0.8 / euclideanLinkLength;
 		}
 		
-		//scale the link 
+		//scale link
 		Tuple<Double, Double> scaledLink = VectorUtils.scaleVector(linkStart, linkEnd, linkScale);
 		Point2D.Double scaledLinkEnd = scaledLink.getSecond();
 		Point2D.Double scaledLinkStart = scaledLink.getFirst();
@@ -255,6 +290,7 @@ public class M2KS2010NetworkConverter {
 //			return null;
 		}
 		DgStreet street = new DgStreet(lightId, inLinkToNode, outLinkFromNode);
+		street.setCost(0);
 		crossing.addLight(street);
 		return lightId;
 	}
@@ -352,31 +388,32 @@ public class M2KS2010NetworkConverter {
 	
 	private void createCrossing4NotSignalizedLink(DgCrossing crossing, Link link,
 			DgCrossingNode inLinkToNode, Id backLinkId, LanesToLinkAssignment20 l2l) {
-		DgProgram program = null;
-		if (crossing.getPrograms().containsKey(this.DEFAULT_PROGRAM_ID)){
-			program = crossing.getPrograms().get(this.DEFAULT_PROGRAM_ID);
-		}
-		else {
-			log.error("Link: " + link.getId() + " fromNode: " + link.getFromNode().getId() + " toNode: " + link.getToNode().getId());
-			throw new IllegalStateException("Default program must exist at not signalized crossing: " + crossing.getId());
-		}
+//		DgProgram program = null;
+//		if (crossing.getPrograms().containsKey(this.DEFAULT_PROGRAM_ID)){
+//			program = crossing.getPrograms().get(this.DEFAULT_PROGRAM_ID);
+//		}
+//		else {
+//			log.error("Link: " + link.getId() + " fromNode: " + link.getFromNode().getId() + " toNode: " + link.getToNode().getId());
+//			throw new IllegalStateException("Default program must exist at not signalized crossing: " + crossing.getId());
+//		}
 		if (l2l == null){
 			List<Id> toLinks = this.getTurningMoves4LinkWoLanes(link);
 			for (Id outLinkId : toLinks){
 				Id lightId = this.createLights(link.getId(), null, outLinkId, backLinkId, inLinkToNode, crossing);
-				if (lightId != null){
-					this.createAndAddAllTimeGreen(lightId, program);
-				}
+//				if (lightId != null){
+//					this.createAndAddAllTimeGreen(lightId, program);
+//				}
 			}
 		}
 		else {
 			for (LaneData20 lane : l2l.getLanes().values()){
-				if (lane.getToLaneIds() == null || lane.getToLaneIds().isEmpty()){ // check for outlanes
+				// check for outlanes (create only lights for lanes without outlanes)
+				if (lane.getToLaneIds() == null || lane.getToLaneIds().isEmpty()){
 					for (Id outLinkId : lane.getToLinkIds()){
 						Id lightId = this.createLights(link.getId(), lane.getId(), outLinkId, backLinkId, inLinkToNode, crossing);
-						if (lightId != null){
-							this.createAndAddAllTimeGreen(lightId, program);
-						}
+//						if (lightId != null){
+//							this.createAndAddAllTimeGreen(lightId, program);
+//						}
 					}
 				}
 			}

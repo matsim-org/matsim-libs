@@ -34,6 +34,8 @@ import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.signalsystems.data.SignalsData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodityUtils;
@@ -46,6 +48,7 @@ import playground.dgrether.koehlerstrehlersignal.gexf.DgKSNetwork2Gexf;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 import playground.dgrether.koehlerstrehlersignal.network.DgNetworkUtils;
+import playground.dgrether.signalsystems.utils.DgSignalsBoundingBox;
 import playground.dgrether.utils.zones.DgZones;
 
 /**
@@ -77,16 +80,25 @@ public class M2KS2010Converter {
 	private double minCommodityFlow;
 
 	private CoordinateReferenceSystem crs;
+	
+	private DgSignalsBoundingBox signalsBoundingBox;
 
 	
 	public M2KS2010Converter(Network network, LaneDefinitions20 lanes,
-			SignalsData signals, CoordinateReferenceSystem crs) {
+			SignalsData signals, double signalsBoundingBoxOffset, CoordinateReferenceSystem crs) {
 		this.network = network;
 		this.lanes = lanes;
 		this.signals = signals;
 		this.crs = crs;
+		this.createSignalsEnvelope(signalsBoundingBoxOffset);
 	}
 	
+	private void createSignalsEnvelope(double signalsBoundingBoxOffset) {
+		this.signalsBoundingBox = new DgSignalsBoundingBox(crs);
+		Envelope signalsBoundingBoxEnvelope = signalsBoundingBox.calculateBoundingBoxForSignals(this.network, 
+				this.signals.getSignalSystemsData(), signalsBoundingBoxOffset);
+	}
+
 	private void scaleCommodities(DgCommodities commodities){
 		if (ksModelCommoditySampleSize != 1.0){
 			for (DgCommodity com : commodities.getCommodities().values()) {
@@ -104,7 +116,8 @@ public class M2KS2010Converter {
 		DgIdConverter idConverter = new DgIdConverter(idPool);
 		
 		M2KS2010NetworkConverter netConverter = new M2KS2010NetworkConverter(idConverter);
-		DgKSNetwork ksNet = netConverter.convertNetworkLanesAndSignals(this.network, this.lanes, this.signals, startTimeSec, endTimeSec);
+		DgKSNetwork ksNet = netConverter.convertNetworkLanesAndSignals(this.network, this.lanes, this.signals, 
+				this.signalsBoundingBox.getBoundingBox(), startTimeSec, endTimeSec);
 		
 		//gexf output for visualization
 		DgKSNetwork2Gexf converter = new DgKSNetwork2Gexf();
@@ -156,10 +169,13 @@ public class M2KS2010Converter {
 		
 		DgCommodityUtils.write2Shapefile(commodities, newMatsimNetwork, crs,  shapeFileDirectory + "commodities.shp");
 
-		// write ks-model and the same commodities as matsim population
+		// write ks-model 
 		new KS2010ModelWriter().write(ksNet, commodities, name, description, outputDirectory + filename);
+		// write commodities from the ks-model as matsim population
 		new TtMorningCommodityAsMatsimPopWriter().writePlansFile(this.network, idConverter, commodities, outputDirectory, filename, startTimeSec, endTimeSec);
 		writeStats(ksNet, commodities, totalFlow, removedCommodities);
+		
+		signalsBoundingBox.writeBoundingBox(shapeFileDirectory + "signals_");
 		
 		idPool.writeToFile(outputDirectory + "id_conversions.txt");
 	}

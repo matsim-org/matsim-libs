@@ -36,6 +36,7 @@ import playground.dgrether.utils.zones.DgZones;
 
 /**
  * @author dgrether
+ * @author tthunig
  *
  */
 public class M2KS2010Zones2Commodities  {
