@@ -112,9 +112,6 @@ import org.matsim.vis.snapshotwriters.VisData;
 public final class QLinkLanesImpl extends AbstractQLink {
 
 	private static final Logger log = Logger.getLogger(QLinkLanesImpl.class);
-	
-	final private static QLaneFromLinkEndComparator fromLinkEndComparator = new QLaneFromLinkEndComparator();
-
 	/**
 	 * Reference to the QueueNode which is at the end of each QueueLink instance
 	 */
