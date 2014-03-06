@@ -21,6 +21,7 @@ package playground.vsp.analysis.modules.ptLines2PaxAnalysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -57,10 +58,14 @@ public class PtLines2PaxAnalysis extends AbstractAnalyisModule {
 	private static final Logger log = Logger.getLogger(PtLines2PaxAnalysis.class);
 	private final String SEP = "--";
 	private PtLines2PaxAnalysisHandler handler;
+	private double interval;
+	private int maxSlices;
 	
 	public PtLines2PaxAnalysis(Map<Id, TransitLine> lines, Vehicles vehicles, double interval, int maxSlices) {
 		super(PtLines2PaxAnalysis.class.getSimpleName());
 		this.handler = new PtLines2PaxAnalysisHandler(interval, maxSlices, lines, vehicles);
+		this.interval = interval;
+		this.maxSlices = maxSlices;
 	}
 
 	@Override
@@ -86,7 +91,7 @@ public class PtLines2PaxAnalysis extends AbstractAnalyisModule {
 		for(TransitLines2PaxCounts tl2c: this.handler.getLinesPaxCounts().values()){
 			writeLineFiles(dir, tl2c);
 		}
-		CreateRscript.createScriptFromTransitLines2PaxCounts(this.handler.getLinesPaxCounts(), dir);
+		CreateRscript.createScriptFromTransitLines2PaxCounts(this.handler.getLinesPaxCounts(), dir, interval, maxSlices);
 	}
 	
 	private void writeCounts2File(List<TransitRouteStop> transitRouteStops, int maxSlice, Counts counts, String outputFilename) {
@@ -94,9 +99,21 @@ public class PtLines2PaxAnalysis extends AbstractAnalyisModule {
 		try {
 			//create header
 			w.write("index;stopId;name");
-			for(int i = 0; i <= maxSlice; i++){
-				w.write(";" + String.valueOf(i));
+			DecimalFormat rFormat = new DecimalFormat("00");
+			for(int i = 0; i < maxSlices; i++){
+				int begin = (int) (i * interval);
+				//Interval begin, eg. "H08M30" : hour 8, minute 30
+				String beginString = "H" + rFormat.format(begin / (60 * 60)) + "M" + rFormat.format((begin / 60) % 60);
+				int end = (int) ((i + 1) * interval);
+				//Interval end
+				String endString = "H" + rFormat.format(end / (60 * 60)) + "M" + rFormat.format((end / 60) % 60);
+				w.write("; " + beginString + "_to_" + endString);
 			}
+			// measurements after the last slice
+			int begin = (int) (maxSlices * interval);
+			String beginString = "H" + rFormat.format(begin / (60 * 60)) + "M" + rFormat.format((begin / 60) % 60);
+			w.write("; " + beginString);
+			
 			w.write("\n");
 			
 			for (int noStops = 0; noStops < transitRouteStops.size(); noStops++) {	
