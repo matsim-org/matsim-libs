@@ -44,6 +44,10 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
 /**
  * 
+ * This analysis module calculates the beeline distances and the distances
+ * really travelled on the pt network. It differentiates pt trips including
+ * pt transit lines and trips which only include transit_walk.
+ * 
  * @author gleich
  *
  */
@@ -217,7 +221,7 @@ public class PtCircuityAnalyzer extends AbstractAnalyisModule {
 
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fileName)));
-			bw.write("# Agent Id" + separator + "ptBeeline" + separator + "ptDistance" + separator + "ptCircuity" 
+			bw.write("Agent Id" + separator + "ptBeeline" + separator + "ptDistance" + separator + "ptCircuity" 
 					+ separator + "transit_walkBeeline" + separator + "transit_walkDistance" + separator + "transit_walkCircuity");
 			bw.newLine();
 			bw.write("total" + separator);
