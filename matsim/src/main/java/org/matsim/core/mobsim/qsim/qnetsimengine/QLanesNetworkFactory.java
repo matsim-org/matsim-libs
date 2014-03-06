@@ -21,9 +21,14 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 
+import java.util.List;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.lanes.LaneImpl;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
+import org.matsim.lanes.utils.LanesUtils;
 
 
 public class QLanesNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
@@ -39,8 +44,10 @@ public class QLanesNetworkFactory implements NetsimNetworkFactory<QNode, QLinkIn
 	@Override
 	public QLinkInternalI createNetsimLink(Link link, QNetwork network, QNode queueNode) {
 		QLinkInternalI ql = null;
-		if (this.laneDefinitions.getLanesToLinkAssignments().containsKey(link.getId())){
-			ql = new QLinkLanesImpl(link, network, queueNode, this.laneDefinitions.getLanesToLinkAssignments().get(link.getId()));
+		LanesToLinkAssignment20 l2l = this.laneDefinitions.getLanesToLinkAssignments().get(link.getId());
+		if (l2l != null){
+			List<LaneImpl> lanes = LanesUtils.createLanes(link, l2l);
+			ql = new QLinkLanesImpl(link, network, queueNode, lanes);
 		}
 		else {
 			ql = this.delegate.createNetsimLink(link, network, queueNode);

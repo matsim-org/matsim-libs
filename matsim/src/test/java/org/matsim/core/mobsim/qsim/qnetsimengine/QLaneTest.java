@@ -163,7 +163,7 @@ public class QLaneTest extends MatsimTestCase {
 		//900 m link, 2 lanes = 240 storage + 105 m lane, 1 lane = 14 storage
 		assertEquals(254.0, ql.getSpaceCap());
 		//check original lane
-		QLane qlane = ql.getOriginalLane();
+		QueueWithBuffer qlane = ql.getOriginalLane();
 		assertNotNull(qlane);
 //		assertTrue(qlane.isFirstLaneOnLink());
 		assertEquals(0.5, qlane.getSimulatedFlowCapacity());
@@ -196,7 +196,7 @@ public class QLaneTest extends MatsimTestCase {
 		//900 m link, 2 lanes = 240 storage + 105 m lane, 2 lanes = 28 storage
 		assertEquals(268.0, ql.getSpaceCap());
 		//check original lane
-		QLane qlane = ql.getOriginalLane();
+		QueueWithBuffer qlane = ql.getOriginalLane();
 		assertNotNull(qlane);
 //		assertTrue(qlane.isFirstLaneOnLink());
 		assertEquals(0.5, qlane.getSimulatedFlowCapacity());
@@ -230,7 +230,7 @@ public class QLaneTest extends MatsimTestCase {
 		assertEquals(296.0, ql.getSpaceCap());
 		double totalStorageCapacity = 0.0;
 		//check original lane
-		QLane qlane = ql.getOriginalLane();
+		QueueWithBuffer qlane = ql.getOriginalLane();
 		assertNotNull(qlane);
 //		assertTrue(qlane.isFirstLaneOnLink());
 		assertEquals(0.5, qlane.getSimulatedFlowCapacity());

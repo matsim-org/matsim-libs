@@ -22,11 +22,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -35,10 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.lanes.data.v20.LaneData20;
-import org.matsim.lanes.data.v20.LaneData20MeterFromLinkEndComparator;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
+import org.matsim.lanes.LaneImpl;
 import org.matsim.lanes.vis.VisLane;
 import org.matsim.lanes.vis.VisLaneModelBuilder;
 import org.matsim.lanes.vis.VisLinkWLanes;
@@ -119,23 +112,25 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	/**
 	 * The QueueLane instance which always exists.
 	 */
-	private QLane firstLane;
+	private QueueWithBuffer firstLaneQueue;
 	/**
 	 * A List holding all QueueLane instances of the QueueLink
 	 */
 	private List<QLane> queueLanes;
-
+	private List<QueueWithBuffer> laneQueues;
+	
 	/**
 	 * If more than one QueueLane exists this list holds all QueueLanes connected to
 	 * the (To)QueueNode of the QueueLink
 	 */
 	private List<QLane> toNodeQueueLanes = null;
+	private List<QueueWithBuffer> toNodeLaneQueues = null;
 
 	private boolean active = false;
 
-	private VisData visdata = null; 
+	private VisData visdata = null;
 
-	private LanesToLinkAssignment20 lanesToLinkAssignment;
+	private List<LaneImpl> lanes; 
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -144,92 +139,27 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	 * @param toNode
 	 * @see NetsimLink#createLanes(List)
 	 */
-	QLinkLanesImpl(final Link link2, QNetwork network, final QNode toNode, LanesToLinkAssignment20 lanesToLinkAssignment) {
+	QLinkLanesImpl(final Link link2, QNetwork network, final QNode toNode, List<LaneImpl> lanes) {
 		super(link2, network) ;
 		this.toQueueNode = toNode;
 		this.queueLanes = new ArrayList<QLane>();
 		this.toNodeQueueLanes = new ArrayList<QLane>();
-		this.lanesToLinkAssignment = lanesToLinkAssignment;
-		this.createLanes(lanesToLinkAssignment.getLanes());
+		this.lanes = lanes;
+		this.initLaneQueues();
 		this.visdata = this.new VisDataImpl();
 	}
 
-
-	/**
-	 * Initialize the QueueLink with more than one QueueLane
-	 * @param map
-	 */
-	private void createLanes(Map<Id, LaneData20> map) {
-		List<LaneData20> sortedLanes =  new ArrayList<LaneData20>(map.values());
-		Collections.sort(sortedLanes, new LaneData20MeterFromLinkEndComparator());
-		Collections.reverse(sortedLanes);
-
-		List<QLane> laneList = new LinkedList<QLane>();
-		LaneData20 firstLane = sortedLanes.remove(0);
-		if (firstLane.getStartsAtMeterFromLinkEnd() != this.link.getLength()) {
-			throw new IllegalStateException("First Lane Id " + firstLane.getId() + " on Link Id " + this.link.getId() +
-			"isn't starting at the beginning of the link!");
+	private void initLaneQueues(){
+		for (LaneImpl lane : lanes) {
+			QueueWithBuffer queue = new QueueWithBuffer(this, new FIFOVehicleQ(), lane.getLaneData().getId());
+			if (firstLaneQueue == null) {
+				firstLaneQueue = queue;
+			}
+			if (lane.getToLanes() == null || lane.getToLanes().isEmpty()){
+				this.toNodeLaneQueues.add(queue);
+			}
+			this.laneQueues.add(queue);
 		}
-		this.firstLane = new QLane(this, firstLane, true);
-		laneList.add(this.firstLane);
-		Stack<QLane> laneStack = new Stack<QLane>();
-
-		while (!laneList.isEmpty()){
-			QLane lastQLane = laneList.remove(0);
-			laneStack.push(lastQLane);
-			lastQLane.setGeneratingEvents(true);
-			this.queueLanes.add(lastQLane);
-
-			//if existing create the subsequent lanes
-			List<Id> toLaneIds = lastQLane.getLaneData().getToLaneIds();
-			double nextMetersFromLinkEnd = 0.0;
-			double laneLength = 0.0;
-			if (toLaneIds != null 	&& (!toLaneIds.isEmpty())) {
-				for (Id toLaneId : toLaneIds){
-					LaneData20 currentLane = map.get(toLaneId);
-					nextMetersFromLinkEnd = currentLane.getStartsAtMeterFromLinkEnd();
-					QLane currentQLane = new QLane(this, currentLane, false);
-					laneList.add(currentQLane);
-					lastQLane.addAToLane(currentQLane);
-				}
-				laneLength = lastQLane.getLaneData().getStartsAtMeterFromLinkEnd() - nextMetersFromLinkEnd;
-				lastQLane.setEndsAtMetersFromLinkEnd(nextMetersFromLinkEnd);
-			}
-			//there are no subsequent lanes
-			else {
-				laneLength = lastQLane.getLaneData().getStartsAtMeterFromLinkEnd();
-				lastQLane.setEndsAtMetersFromLinkEnd(0.0);
-				this.toNodeQueueLanes.add(lastQLane);
-			}
-			lastQLane.changeLength(laneLength, Time.UNDEFINED_TIME );
-			double cap = lastQLane.getLaneData().getCapacityVehiclesPerHour() / 3600. ;
-			lastQLane.changeUnscaledFlowCapacityPerSecond(cap, Time.UNDEFINED_TIME );
-
-			double nLanes = lastQLane.getLaneData().getNumberOfRepresentedLanes() ;
-			lastQLane.changeEffectiveNumberOfLanes(nLanes, Time.UNDEFINED_TIME );
-			// (not covered by a test, I think.  kai, sep'13)
-		}
-
-		//fill toLinks
-		while (!laneStack.isEmpty()){
-			QLane qLane = laneStack.pop();
-			qLane.recalcTimeVariantAttributes(Time.UNDEFINED_TIME);
-			if (qLane.getToLanes() == null || (qLane.getToLanes().isEmpty())) {
-				for (Id toLinkId : qLane.getLaneData().getToLinkIds()){
-					qLane.addDestinationLink(toLinkId);
-				}
-			}
-			else {
-				for (QLane subsequentLane : qLane.getToLanes()){
-					for (Id toLinkId : subsequentLane.getDestinationLinkIds()){
-						qLane.addDestinationLink(toLinkId);
-					}
-				}
-			}
-			qLane.finishInitialization();
-		}
-
-		Collections.sort(this.queueLanes, QLinkLanesImpl.fromLinkEndComparator);
 	}
 
 	List<QLane> getToNodeQueueLanes() {
@@ -255,7 +185,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	void addFromUpstream(final QVehicle veh) {
 		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		activateLink();
-		this.firstLane.addFromUpstream(veh );
+		this.firstLaneQueue.addFromUpstream(veh );
 		veh.setCurrentLink(this.getLink());
 		this.network.simEngine.getMobsim().getEventsManager().processEvent(
 				new LinkEnterEvent(now, veh.getDriver().getId(),
@@ -308,7 +238,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	 */
 	private boolean moveWaitToBuffer(final double now) {
 		boolean movedAtLeastOne = false;
-		while (this.firstLane.isAcceptingFromWait()) {
+		while (this.firstLaneQueue.isAcceptingFromWait()) {
 			QVehicle veh = this.waitingList.poll();
 			if (veh == null) {
 				return movedAtLeastOne;
@@ -319,7 +249,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 //			boolean handled = this.firstLane.addTransitToStopQueue(now, veh);
 			boolean handled = false ;
 			if (!handled) {
-				this.firstLane.addFromWait(veh, now);
+				this.firstLaneQueue.addFromWait(veh, now);
 			}
 		}
 		return movedAtLeastOne;
@@ -329,7 +259,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	boolean isNotOfferingVehicle() {
 		//if there is only one lane...
 		if (this.toNodeQueueLanes == null){
-			return this.firstLane.isNotOfferingVehicle();
+			return this.firstLaneQueue.isNotOfferingVehicle();
 		}
 		//otherwise we have to do a bit more work
 		for (QLane lane : this.toNodeQueueLanes){
@@ -342,7 +272,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 
 	@Override
 	boolean isAcceptingFromUpstream() {
-		return this.firstLane.isAcceptingFromUpstream();
+		return this.firstLaneQueue.isAcceptingFromUpstream();
 	}
 
 	@Override
@@ -411,7 +341,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	 *         values and in relation to the SimulationTimer's simticktime.
 	 */
 	double getSimulatedFlowCapacity() {
-		return this.firstLane.getSimulatedFlowCapacity();
+		return this.firstLaneQueue.getSimulatedFlowCapacity();
 	}
 
 	/**
@@ -426,8 +356,8 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		return this.visdata;
 	}
 
-	QLane getOriginalLane(){
-		return this.firstLane;
+	QueueWithBuffer getOriginalLane(){
+		return this.firstLaneQueue;
 	}
 
 	/**
@@ -445,7 +375,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 				 nodeOffset = nodeOffset +2.0; // +2.0: eventually we need a bit space for the signal
 			}
 			CoordinateTransformation transformation = new IdentityTransformation();
-			otfLink = laneModelBuilder.createVisLinkWLanes(transformation, QLinkLanesImpl.this, nodeOffset, QLinkLanesImpl.this.lanesToLinkAssignment);
+			otfLink = laneModelBuilder.createVisLinkLanes(transformation, QLinkLanesImpl.this, nodeOffset, lanes);
 			SnapshotLinkWidthCalculator linkWidthCalculator = QLinkLanesImpl.this.network.getLinkWidthCalculator();
 			laneModelBuilder.recalculatePositions(otfLink, linkWidthCalculator);
 			for (QLane  ql : QLinkLanesImpl.this.queueLanes){

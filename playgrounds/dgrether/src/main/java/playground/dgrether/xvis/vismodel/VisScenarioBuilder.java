@@ -20,6 +20,7 @@
 package playground.dgrether.xvis.vismodel;
 
 import java.awt.geom.Point2D;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,8 +30,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.lanes.LaneImpl;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
+import org.matsim.lanes.utils.LanesUtils;
 import org.matsim.lanes.vis.VisLane;
 import org.matsim.lanes.vis.VisLaneModelBuilder;
 import org.matsim.lanes.vis.VisLinkWLanes;
@@ -111,7 +114,8 @@ public class VisScenarioBuilder {
 				l2l = lanes.getLanesToLinkAssignments().get(l.getId());
 			}
 			VisLink vl = new VisLinkImpl(l);
-			VisLinkWLanes link = visLaneModelBuilder.createVisLinkLanes(transform, vl, scenario.getConfig().qsim().getNodeOffset(),  l2l);
+			List<LaneImpl> la = LanesUtils.createLanes(l, l2l);
+			VisLinkWLanes link = visLaneModelBuilder.createVisLinkLanes(transform, vl, scenario.getConfig().qsim().getNodeOffset(),  la);
 			SnapshotLinkWidthCalculator lwc = new SnapshotLinkWidthCalculator();
 			visLaneModelBuilder.recalculatePositions(link, lwc);
 			visScenario.getLanesLinkData().put(link.getLinkId(), link);

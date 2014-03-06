@@ -402,7 +402,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 				nodeOffset = nodeOffset +2.0; // +2.0: eventually we need a bit space for the signal
 				laneModelBuilder = new VisLaneModelBuilder();
 				CoordinateTransformation transformation = new IdentityTransformation();
-				otfLink = laneModelBuilder.createVisLinkWLanes(transformation, QLinkImpl.this, nodeOffset, null);
+				otfLink = laneModelBuilder.createVisLinkLanes(transformation, QLinkImpl.this, nodeOffset, null);
 				SnapshotLinkWidthCalculator linkWidthCalculator = QLinkImpl.this.network.getLinkWidthCalculator();
 				laneModelBuilder.recalculatePositions(otfLink, linkWidthCalculator);
 			}

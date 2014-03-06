@@ -59,6 +59,12 @@ public final class LanesUtils {
 		l2l.addLane(lane);
 	}
 	
+	/**
+	 * Creates a sorted list of lanes for a link. 
+	 * @param link
+	 * @param lanesToLinkAssignment
+	 * @return sorted list with the most upstream lane at the first position. 
+	 */
 	public static List<LaneImpl> createLanes(Link link, LanesToLinkAssignment20 lanesToLinkAssignment) {
 		List<LaneImpl> queueLanes = new ArrayList<LaneImpl>();
 		List<LaneData20> sortedLanes =  new ArrayList<LaneData20>(lanesToLinkAssignment.getLanes().values());
