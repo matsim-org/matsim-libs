@@ -60,6 +60,24 @@ public class ScenarioGeneratorTest extends MatsimTestCase {
 		
 		String gripsFileString = inputDir + "/grips_config.xml";
 		String matsimConfigFileString = outputDir + "/config.xml";
+		
+		System.out.println("grips file:" + gripsFileString);
+		System.out.println("matsim config file:" + matsimConfigFileString);
+		
+//		File file = new File("oloberg.jpg");
+//		File file2 = new File("C:/HTW_Logo_rgb.jpg");
+//		File file3 = new File("/lol/HTW_Logo_rgb.jpg");
+//		File file4 = new File("./test/input/org/matsim/contrib/grips/scenariogenerator/ScenarioGeneratorTest/testScenarioGenerator/lenzen.osm");
+//		
+//		System.out.println("file1 absolute path:" + file.isAbsolute());
+//		System.out.println("file2 absolute path:" + file2.isAbsolute());
+//		System.out.println("file3 absolute path:" + file3.isAbsolute());
+//		
+//		System.out.println(":" + file4.isAbsolute());
+//		System.out.println("file4 absolute path:" + file4.exists());
+		
+//		System.exit(0);
+		
 		File gripsConfigFile = new File(gripsFileString);
 		File matsimConfigFile;
 		
@@ -88,6 +106,7 @@ public class ScenarioGeneratorTest extends MatsimTestCase {
 		assertTrue("scenario was not generated",generateScenario);
 		
 		//check and open matsim scenario config file
+		System.out.println("string:" + matsimConfigFileString);
 		matsimConfigFile = new File(matsimConfigFileString);
 		assertTrue("scenario config file is missing",matsimConfigFile.exists());
 		assertTrue("could not open matsim config",controller.openMastimConfig(matsimConfigFile));

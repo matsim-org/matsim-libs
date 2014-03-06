@@ -119,8 +119,7 @@ public class ShapeIO {
 				fts.add(f);
 			}
 
-			ShapeFileWriter.writeGeometries(fts, controller
-					.getGripsConfigModule().getPopulationFileNameAbsolute());
+			ShapeFileWriter.writeGeometries(fts, controller.getGripsConfigModule().getPopulationFileName());
 			return true;
 		} catch (FactoryRegistryException e) {
 			e.printStackTrace();
@@ -128,8 +127,7 @@ public class ShapeIO {
 		}
 	}
 
-	public static PolygonShape getShapeFromFile(Controller controller,
-			String id, String shapeFileString) {
+	public static PolygonShape getShapeFromFile(Controller controller,String id, String shapeFileString) {
 		int layerID = controller.getVisualizer().getPrimaryShapeRenderLayer()
 				.getId();
 		PolygonShape newPolygon = new PolygonShape(layerID, null);

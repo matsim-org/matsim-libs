@@ -58,7 +58,7 @@ public class CreatePopulationShapeFileFromExistingData {
 		gcd.readFile(gripsConfig);
 		
 		ShapeFileReader r2 = new ShapeFileReader();
-		r2.readFileAndInitialize(gcm.getEvacuationAreaFileNameAbsolute());
+		r2.readFileAndInitialize(gcm.getEvacuationAreaFileName());
 		
 		transformCRS(r1,r2); //only needed if shape files have different coordinate systems; r2 usually is in WGS84 while r1 is projected. So, we transform r2 to r1
 		
@@ -119,7 +119,7 @@ public class CreatePopulationShapeFileFromExistingData {
 				System.out.println("empty");
 			}
 		}
-		ShapeFileWriter.writeGeometries(fts, gcm.getPopulationFileNameAbsolute());
+		ShapeFileWriter.writeGeometries(fts, gcm.getPopulationFileName());
 	}
 	
     public static void transformCRS(ShapeFileReader r1) {

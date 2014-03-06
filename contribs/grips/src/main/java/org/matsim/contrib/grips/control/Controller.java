@@ -409,30 +409,26 @@ public class Controller {
 	public boolean openGripsConfig(File selectedFile) {
 		boolean rv = false;
 		try {
-			this.gripsConfigModule = new GripsConfigModule("grips",
-					selectedFile.getAbsolutePath());
-			GripsConfigDeserializer parser = new GripsConfigDeserializer(
-					this.gripsConfigModule);
+			this.gripsConfigModule = new GripsConfigModule("grips",selectedFile.getAbsolutePath());
+			System.out.println("grips config module:" + this.gripsConfigModule);
+			GripsConfigDeserializer parser = new GripsConfigDeserializer(this.gripsConfigModule);
 			parser.readFile(selectedFile.getAbsolutePath());
 
 			this.scenarioPath = selectedFile.getParent();
 			this.gripsFile = selectedFile.getAbsolutePath();
 
-			String osmf = this.gripsConfigModule.getNetworkFileNameAbsolute();
+			String osmf = this.gripsConfigModule.getNetworkFileName();
 			try {
 				rv = this.readOSMFile(osmf);
 				if (rv == false)
-					JOptionPane.showConfirmDialog(null, "OSM file " + osmf
-							+ " does not exists.", "Fatal error. Exiting.",
-							JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showConfirmDialog(null, "OSM file " + osmf+ " does not exists.", "Fatal error. Exiting.", JOptionPane.WARNING_MESSAGE);
 
 			} catch (Exception e) {
 				return false;
 			}
 			this.setCurrentOSMFile(osmf);
 
-			String areafile = this.gripsConfigModule
-					.getEvacuationAreaFileNameAbsolute();
+			String areafile = this.gripsConfigModule.getEvacuationAreaFileName();
 			// String popDensFilename =
 			// this.gripsConfigModule.getPopDensFilename();
 
@@ -456,8 +452,7 @@ public class Controller {
 			GripsConfigModule gcm = this.getGripsConfigModule();
 			gcm.setEvacuationAreaFileName(areafile);
 
-			String popfile = this.gripsConfigModule
-					.getPopulationFileNameAbsolute();
+			String popfile = this.gripsConfigModule.getPopulationFileName();
 			file = new File(popfile);
 			dir = file.getParent();
 			dirfile = new File(dir);
@@ -830,8 +825,7 @@ public class Controller {
 
 	public boolean saveShape(Shape shape, String fileName) {
 		if (shape instanceof PolygonShape) {
-			boolean saved = ShapeIO.savePolygon(this, (PolygonShape) shape,
-					this.gripsConfigModule.getEvacuationAreaFileNameAbsolute());
+			boolean saved = ShapeIO.savePolygon(this, (PolygonShape) shape, this.gripsConfigModule.getEvacuationAreaFileName());
 			// if (saved)
 			// System.out.println("saved polygon to " +
 			// this.gripsConfigModule.getEvacuationAreaFileName());
@@ -888,20 +882,18 @@ public class Controller {
 		// grips config is not opened, check for file destination in scenario
 		if (this.gripsConfigModule == null) {
 			if (this.scenario != null)
-				dest = this.scenario.getConfig().getModule("grips")
-						.getValue("evacuationAreaFile");
+				dest = this.scenario.getConfig().getModule("grips").getValue("evacuationAreaFile");
 			else
 				return false;
 		} else
-			dest = this.gripsConfigModule.getEvacuationAreaFileNameAbsolute();
+			dest = this.gripsConfigModule.getEvacuationAreaFileName();
 
 		return openShape(id, dest, evacShapeStyle);
 	}
 
 	public boolean openShape(String id, String fileName, ShapeStyle style) {
 		try {
-			PolygonShape evacShape = ShapeIO.getShapeFromFile(this, id,
-					fileName);
+			PolygonShape evacShape = ShapeIO.getShapeFromFile(this, id,fileName);
 			evacShape.setStyle(style);
 			addShape(evacShape);
 			return true;
@@ -983,8 +975,7 @@ public class Controller {
 			}
 			this.scenario = ScenarioUtils.loadScenario(this.matsimConfig);
 
-			this.targetCoordinateSystem = matsimConfig.global()
-					.getCoordinateSystem();
+			this.targetCoordinateSystem = matsimConfig.global().getCoordinateSystem();
 
 			// check if geo tranformation tools are available
 			checkGeoTransformationTools();

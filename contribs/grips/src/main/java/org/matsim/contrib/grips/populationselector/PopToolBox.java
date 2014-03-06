@@ -328,8 +328,7 @@ class PopToolBox extends AbstractToolBox {
 			}
 		} else if (cmd.equals(locale.btSave())) { // save
 
-			String shapefile = controller.getGripsConfigModule()
-					.getPopulationFileNameAbsolute();
+			String shapefile = controller.getGripsConfigModule().getPopulationFileName();
 			this.setGoalAchieved(controller.saveShapes(shapefile));
 			this.controller.setGoalAchieved(this.goalAchieved);
 			if (this.isGoalAchieved())

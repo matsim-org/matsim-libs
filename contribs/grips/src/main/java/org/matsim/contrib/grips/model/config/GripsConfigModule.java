@@ -129,18 +129,21 @@ public class GripsConfigModule extends Module {
 		return this.networkFileName;
 	}
 
-	public String getNetworkFileNameAbsolute() {
-		return getAbsolute(this.networkFileName);
-	}
 
 	private String getAbsolute(String filename) {
 		String rv = filename;
 		File file = new File(filename);
+		
 		if (!file.isAbsolute()) {
 			File sf = new File(scenarioFileName);
+			if (filename.startsWith("."))
+				filename = filename.substring(1);
 			rv = sf.getParent() + "/" + filename; // filename can be something
 													// like /osm/map.osm
 		}
+//		System.out.println("filename: " + filename);
+		System.out.println("rv: " + rv);
+		
 		return rv;
 	}
 
@@ -152,9 +155,6 @@ public class GripsConfigModule extends Module {
 		return this.evacuationAreaFileName;
 	}
 
-	public String getEvacuationAreaFileNameAbsolute() {
-		return getAbsolute(this.evacuationAreaFileName);
-	}
 
 	public void setEvacuationAreaFileName(String evacuationAreaFileName) {
 		this.evacuationAreaFileName = evacuationAreaFileName;
@@ -271,20 +271,6 @@ public class GripsConfigModule extends Module {
 		return true;
 	}
 
-	public String getPopulationFileNameAbsolute() {
-		return getAbsolute(this.populationFileName);
-	}
-
-	public String getOutputDirAbsolute() {
-		return getAbsolute(this.outputDir);
-	}
-
-	public void setFileNamesAbsolute() {
-		networkFileName = getNetworkFileNameAbsolute();
-		evacuationAreaFileName = getEvacuationAreaFileNameAbsolute();
-		populationFileName = getPopulationFileNameAbsolute();
-		outputDir = getOutputDirAbsolute();
-	}
 
 	public String getWms() {
 		return this.wms;
