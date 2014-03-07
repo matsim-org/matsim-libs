@@ -28,6 +28,16 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+/**
+ * Design thoughts:<ul>
+ * <li> I would argue that basing this on reflection is software design overkill.  In my understanding, reflection is useful to decouple
+ * pieces of software, i.e. be able to insert a class (a constructor) into compiled code (e.g. a jar file) if I do not have access to the source
+ * code of the jar file.  This is, however, not the situation here.  kai, mar'14
+ * <li> Practically, the current design is in my way.  I need additional information inside the width calculator, because I do not want to
+ * calculate width based on a network property, but on something else (speed differences).  So now I will have to abuse "capacity"
+ * for the quantity of interest. kai, mar'14
+ * </ul
+ */
 public class FeatureGeneratorBuilderImpl implements FeatureGeneratorBuilder {
 
 

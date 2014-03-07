@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -37,7 +37,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
- * Simple class to convert the links of MATSim network files to ESRI shape files. The network could be written either
+ * Simple class to convert the links of MATSim network files to ESRI shape files. The network can be written either
  * as line strings or as polygons. Furthermore the width of the links could be calculated according to
  * freespeed, lanes or capacity. For some basic examples please have a look at the <code>main</code> method.
  * Can also be called as Links2ESRIShape inputNetwork.xml outputAsLines.shp outputAsPolygons.shp .
@@ -109,7 +109,7 @@ public class Links2ESRIShape {
 			System.exit(-1) ;
 		}
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().global().setCoordinateSystem(defaultCRS);
 
 		log.info("loading network from " + netfile);

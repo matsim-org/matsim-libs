@@ -87,37 +87,58 @@ public class CalcLinkStats {
 	public void addData(final VolumesAnalyzer analyzer, final TravelTime ttimes) {
 		this.count++;
 		// TODO verify ttimes has hourly timeBin-Settings
+
+		// go through all links
 		for (Id linkId : this.linkData.keySet()) {
+			
+			// retrieve link from link ID
 			Link link = this.network.getLinks().get(linkId);
+			
+			// get the volumes for the link ID from the analyzier
 			double[] volumes = analyzer.getVolumesPerHourForLink(linkId);
+			
+			// get the destination container for the data from link data (could have gotten this through iterator right away)
 			LinkData data = this.linkData.get(linkId);
-			int sum = 0; // daily (0-24) sum
-			for (int i = 0; i < this.nofHours; i++) {
-				double ttime = ttimes.getLinkTravelTime(link, i*3600, null, null);
-				sum += volumes[i];
+			
+			// prepare the sum variables (for volumes);
+			long sumVolumes = 0; // daily (0-24) sum
+			
+			// go through all hours:
+			for (int hour = 0; hour < this.nofHours; hour++) {
+				
+				// get travel time for hour
+				double ttime = ttimes.getLinkTravelTime(link, hour*3600, null, null);
+				
+				// add for daily sum:
+				sumVolumes += volumes[hour];
+
+				// the following has something to do with the fact that we are doing this for multiple iterations.  So there are variations.
+				// this collects min and max.  There is, however, no good control over how many iterations this is collected.
 				if (this.count == 1) {
-					data.volumes[MIN][i] = volumes[i];
-					data.volumes[MAX][i] = volumes[i];
-					data.ttimes[MIN][i] = ttime;
-					data.ttimes[MAX][i] = ttime;
+					data.volumes[MIN][hour] = volumes[hour];
+					data.volumes[MAX][hour] = volumes[hour];
+					data.ttimes[MIN][hour] = ttime;
+					data.ttimes[MAX][hour] = ttime;
 				} else {
-					if (volumes[i] < data.volumes[MIN][i]) data.volumes[MIN][i] = volumes[i];
-					if (volumes[i] > data.volumes[MAX][i]) data.volumes[MAX][i] = volumes[i];
-					if (ttime < data.ttimes[MIN][i]) data.ttimes[MIN][i] = ttime;
-					if (ttime > data.ttimes[MAX][i]) data.ttimes[MAX][i] = ttime;
+					if (volumes[hour] < data.volumes[MIN][hour]) data.volumes[MIN][hour] = volumes[hour];
+					if (volumes[hour] > data.volumes[MAX][hour]) data.volumes[MAX][hour] = volumes[hour];
+					if (ttime < data.ttimes[MIN][hour]) data.ttimes[MIN][hour] = ttime;
+					if (ttime > data.ttimes[MAX][hour]) data.ttimes[MAX][hour] = ttime;
 				}
-				data.volumes[SUM][i] += volumes[i];
-				data.ttimes[SUM][i] += volumes[i] * ttime;
+				
+				// this is the regular summing up for each hour
+				data.volumes[SUM][hour] += volumes[hour];
+				data.ttimes[SUM][hour] += volumes[hour] * ttime;
 			}
 			// dataVolumes[.][nofHours] are daily (0-24) values
 			if (this.count == 1) {
-				data.volumes[MIN][this.nofHours] = sum;
-				data.volumes[SUM][this.nofHours] = sum;
-				data.volumes[MAX][this.nofHours] = sum;
+				data.volumes[MIN][this.nofHours] = sumVolumes;
+				data.volumes[SUM][this.nofHours] = sumVolumes;
+				data.volumes[MAX][this.nofHours] = sumVolumes;
 			} else {
-				if (sum < data.volumes[MIN][this.nofHours]) data.volumes[MIN][this.nofHours] = sum;
-				data.volumes[SUM][this.nofHours] += sum;
-				if (sum > data.volumes[MAX][this.nofHours]) data.volumes[MAX][this.nofHours] = sum;
+				if (sumVolumes < data.volumes[MIN][this.nofHours]) data.volumes[MIN][this.nofHours] = sumVolumes;
+				data.volumes[SUM][this.nofHours] += sumVolumes;
+				if (sumVolumes > data.volumes[MAX][this.nofHours]) data.volumes[MAX][this.nofHours] = sumVolumes;
 			}
 		}
 	}
