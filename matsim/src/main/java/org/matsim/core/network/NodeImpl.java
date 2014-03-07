@@ -109,7 +109,7 @@ public class NodeImpl implements Node {
 	public final boolean addOutLink(Link outlink) {
 		Id linkid = outlink.getId();
 		if (this.outlinks.containsKey(linkid)) {
-			throw new IllegalArgumentException(this + "[inlink_id=" + outlink.getId() + " already exists]");
+			throw new IllegalArgumentException(this + "[outlink_id=" + outlink.getId() + " already exists]");
 		}
 		if (this.inlinks.containsKey(linkid) && (cnt < 1)) {
 			cnt++ ;
