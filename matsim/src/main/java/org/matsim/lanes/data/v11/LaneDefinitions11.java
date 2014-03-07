@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,16 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vis.snapshotwriters;
+package org.matsim.lanes.data.v11;
 
-import java.util.Collection;
+import java.util.SortedMap;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.MatsimToplevelContainer;
 
 /**
- * Interface for methods to provide a visualizer with data.
+ * Top level container for lanes within MATSim. See package-info for documentation.
  * @author dgrether
+ *
  */
-public interface VisData {
+public interface LaneDefinitions11 extends MatsimToplevelContainer {
 
-	public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(final Collection<AgentSnapshotInfo> positions);
+	/**
+	 *
+	 * @return Map with Link Ids as keys and assignments as values
+	 */
+	public SortedMap<Id, LanesToLinkAssignment11> getLanesToLinkAssignments();
 
+	/**
+	 * Adds a LanesToLinkAssignment to the container.
+	 * @param assignment
+	 */
+	public void addLanesToLinkAssignment(LanesToLinkAssignment11 assignment);
+	/**
+	 * Get the factory to create container content.
+	 */
+	@Override
+	public LaneDefinitionsFactory11 getFactory();
+	
+	public void setFactory(LaneDefinitionsFactory11 factory);
 }

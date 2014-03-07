@@ -572,7 +572,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	class VisDataImpl implements VisData {
 
 		@Override
-		public Collection<AgentSnapshotInfo> getAgentSnapshotInfo(
+		public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(
 				final Collection<AgentSnapshotInfo> positions) {
 			String snapshotStyle = ((SimulationConfigGroup) queueNetwork.getMobsim().getScenario().getConfig().getModule("simulation"))
 					.getSnapshotStyle();

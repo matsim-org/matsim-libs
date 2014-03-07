@@ -43,11 +43,11 @@ import org.matsim.jaxb.signalsystems20.XMLSignalSystemType.XMLSignals;
 import org.matsim.jaxb.signalsystems20.XMLSignalType;
 import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLLane;
 import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
-import org.matsim.lanes.data.v11.Lane;
-import org.matsim.lanes.data.v11.LaneDefinitions;
+import org.matsim.lanes.data.v11.LaneData11;
+import org.matsim.lanes.data.v11.LaneDefinitions11;
+import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
 import org.matsim.lanes.data.v11.LaneDefinitionsReader11;
-import org.matsim.lanes.data.v11.LaneDefinitionsImpl;
-import org.matsim.lanes.data.v11.LanesToLinkAssignment;
+import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.SignalSystemsReader11;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsWriter20;
@@ -66,7 +66,7 @@ public class SignalSystems11To20Converter {
 	private static final Logger log = Logger.getLogger(SignalSystems11To20Converter.class);
 
 	public void convert(String laneDefinitions11, String signalSystems, String signalSystems20, String signalGroups20) {
-		LaneDefinitions laneDefs = this.readLaneDefinitions11(laneDefinitions11);
+		LaneDefinitions11 laneDefs = this.readLaneDefinitions11(laneDefinitions11);
 		XMLSignalSystems xmlSignals = this.readSignals11(signalSystems);
 		Tuple<org.matsim.jaxb.signalsystems20.XMLSignalSystems, XMLSignalGroups> signals20Groups20 = this.createSignalSystems20(laneDefs, xmlSignals);
 		this.writeSignals20(signals20Groups20.getFirst(), signalSystems20);
@@ -74,20 +74,10 @@ public class SignalSystems11To20Converter {
 		log.info("conversion done!");
 	}
 	
-	private LaneDefinitions readLaneDefinitions11(String laneDefinitions11) {
-		LaneDefinitions laneDefs = new LaneDefinitionsImpl();
+	private LaneDefinitions11 readLaneDefinitions11(String laneDefinitions11) {
+		LaneDefinitions11 laneDefs = new LaneDefinitions11Impl();
 		LaneDefinitionsReader11 reader = new LaneDefinitionsReader11(laneDefs, MatsimLaneDefinitionsReader.SCHEMALOCATIONV11);
-		try {
-			reader.readFile(laneDefinitions11);
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		reader.readFile(laneDefinitions11);
 		return laneDefs;
 	}
 
@@ -120,7 +110,7 @@ public class SignalSystems11To20Converter {
 	}
 	
 	
-	private Tuple<org.matsim.jaxb.signalsystems20.XMLSignalSystems, XMLSignalGroups> createSignalSystems20(LaneDefinitions laneDefs, XMLSignalSystems xmlSignals11){
+	private Tuple<org.matsim.jaxb.signalsystems20.XMLSignalSystems, XMLSignalGroups> createSignalSystems20(LaneDefinitions11 laneDefs, XMLSignalSystems xmlSignals11){
 		org.matsim.jaxb.signalsystems20.ObjectFactory signals20ObjectFactory = new org.matsim.jaxb.signalsystems20.ObjectFactory();
 		org.matsim.jaxb.signalsystems20.XMLSignalSystems signals20 = signals20ObjectFactory.createXMLSignalSystems();
 		org.matsim.jaxb.signalgroups20.ObjectFactory signalGroups20ObjectFactory = new org.matsim.jaxb.signalgroups20.ObjectFactory();
@@ -177,7 +167,7 @@ public class SignalSystems11To20Converter {
 			}
 			//set the turning move restrictions
 			if (signalgroupdef11.getToLink() != null){
-				LanesToLinkAssignment l2link = laneDefs.getLanesToLinkAssignments().get(new IdImpl(signal20.getLinkIdRef()));
+				LanesToLinkAssignment11 l2link = laneDefs.getLanesToLinkAssignments().get(new IdImpl(signal20.getLinkIdRef()));
 				if (!this.checkSignalGroupToLinkEqualLaneToLink(signalgroupdef11, l2link)){
 					signal20.setTurningMoveRestrictions(signals20ObjectFactory.createXMLSignalTypeXMLTurningMoveRestrictions());
 					for (XMLIdRefType toLinkId : signalgroupdef11.getToLink()){
@@ -202,7 +192,7 @@ public class SignalSystems11To20Converter {
 	}
 
 	private boolean checkSignalGroupToLinkEqualLaneToLink(
-			XMLSignalGroupDefinitionType signalGroup, LanesToLinkAssignment l2link) {
+			XMLSignalGroupDefinitionType signalGroup, LanesToLinkAssignment11 l2link) {
 		List<XMLIdRefType> sgToLinkIdRefTypes = signalGroup.getToLink();
 		Set<Id> sgToLinkIds = new HashSet<Id>();
 		for (XMLIdRefType idreftype : sgToLinkIdRefTypes){
@@ -211,7 +201,7 @@ public class SignalSystems11To20Converter {
 		
 		Set<Id> laneToLinksIds = new HashSet<Id>();
 		for (XMLIdRefType sgLaneId : signalGroup.getLane()){
-			Lane lane = l2link.getLanes().get(new IdImpl(sgLaneId.getRefId()));
+			LaneData11 lane = l2link.getLanes().get(new IdImpl(sgLaneId.getRefId()));
 			laneToLinksIds.addAll(lane.getToLinkIds());
 		}
 		

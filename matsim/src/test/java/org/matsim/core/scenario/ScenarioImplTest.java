@@ -21,13 +21,11 @@ package org.matsim.core.scenario;
 
 import org.junit.Assert;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.households.Households;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.lanes.data.v11.LaneDefinitions;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
@@ -89,22 +87,6 @@ public class ScenarioImplTest {
 		Assert.assertFalse( "knowledge said recreated" , recreated );
 	}
 
-	@Test
-	public void testCreateOnlyOneLanes() {
-		final ScenarioImpl sc = new ScenarioImpl( ConfigUtils.createConfig() );
-
-		final boolean created = sc.createLaneDefinitionsContainer();
-		final LaneDefinitions lanes = sc.getLaneDefinitions11();
-		final boolean recreated = sc.createKnowledges();
-
-		Assert.assertSame(
-				"lanes re-created!",
-				lanes,
-				sc.getLaneDefinitions11() );
-
-		Assert.assertTrue( "lanes said not created" , created );
-		Assert.assertFalse( "lanes said recreated" , recreated );
-	}
 
 	@Test
 	public void testCreateOnlyOneSchedule() {

@@ -48,7 +48,7 @@ public class SnapshotWriterQuadTree extends OTFServerQuadTree {
 					return new VisData() {
 
 						@Override
-						public Collection<AgentSnapshotInfo> getAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
+						public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
 							return Collections.emptyList();
 						}
 						

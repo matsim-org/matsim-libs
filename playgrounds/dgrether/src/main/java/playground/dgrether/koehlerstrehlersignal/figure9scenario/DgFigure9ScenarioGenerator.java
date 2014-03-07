@@ -37,10 +37,11 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
-import org.matsim.lanes.data.v11.Lane;
-import org.matsim.lanes.data.v11.LaneDefinitions;
-import org.matsim.lanes.data.v11.LaneDefinitionsFactory;
-import org.matsim.lanes.data.v11.LanesToLinkAssignment;
+import org.matsim.lanes.data.v11.LaneData11;
+import org.matsim.lanes.data.v11.LaneDefinitions11;
+import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
+import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
+import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.signalsystems.SignalUtils;
@@ -366,30 +367,30 @@ public class DgFigure9ScenarioGenerator {
 
 	private LaneDefinitions20 createLanes(ScenarioImpl scenario) {
 		double laneLenght = 50.0;
-		LaneDefinitions lanes = scenario.getLaneDefinitions11();
-		LaneDefinitionsFactory factory = lanes.getFactory();
+		LaneDefinitions11 lanes = new LaneDefinitions11Impl();
+		LaneDefinitionsFactory11 factory = lanes.getFactory();
 		//lanes for link 12
-		LanesToLinkAssignment lanesForLink12 = factory.createLanesToLinkAssignment(id12);
+		LanesToLinkAssignment11 lanesForLink12 = factory.createLanesToLinkAssignment(id12);
 		lanes.addLanesToLinkAssignment(lanesForLink12);
-		Lane link12lane1 = factory.createLane(id1);
+		LaneData11 link12lane1 = factory.createLane(id1);
 		lanesForLink12.addLane(link12lane1);
 		link12lane1.addToLinkId(id23);
 		link12lane1.setStartsAtMeterFromLinkEnd(laneLenght);
 
-		Lane link12lane2 = factory.createLane(id2);
+		LaneData11 link12lane2 = factory.createLane(id2);
 		lanesForLink12.addLane(link12lane2);
 		link12lane2.addToLinkId(id27);
 		link12lane2.setStartsAtMeterFromLinkEnd(laneLenght);
 		
 		//lanes for link 65
-		LanesToLinkAssignment lanesForLink65 = factory.createLanesToLinkAssignment(id65);
+		LanesToLinkAssignment11 lanesForLink65 = factory.createLanesToLinkAssignment(id65);
 		lanes.addLanesToLinkAssignment(lanesForLink65);
-		Lane link65lane1 = factory.createLane(id1);
+		LaneData11 link65lane1 = factory.createLane(id1);
 		lanesForLink65.addLane(link65lane1);
 		link65lane1.addToLinkId(id54);
 		link65lane1.setStartsAtMeterFromLinkEnd(laneLenght);
 
-		Lane link65lane2 = factory.createLane(id2);
+		LaneData11 link65lane2 = factory.createLane(id2);
 		lanesForLink65.addLane(link65lane2);
 		link65lane2.addToLinkId(id58);
 		link65lane2.setStartsAtMeterFromLinkEnd(laneLenght);

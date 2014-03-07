@@ -29,13 +29,14 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 
 
 public class FourWaysVisNoLanes {
 
-	public static final String TESTINPUTDIR = "../../matsim/test/input/org/matsim/signalsystems/TravelTimeFourWaysTest/";
+	public static final String TESTINPUTDIR = "../../../matsim/trunk/src/test/resources/test/input/org/matsim/signalsystems/TravelTimeFourWaysTest/";
 	
 	/**
 	 * @param args
@@ -53,6 +54,10 @@ public class FourWaysVisNoLanes {
     scenario.getConfig().qsim().setSnapshotStyle("queue");
 //    scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("equiDist");
     scenario.getConfig().qsim().setStuckTime(100.0);
+		
+    OTFVisConfigGroup otfconfig = ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
+		otfconfig.setAgentSize(130.0f);
+		scenario.getConfig().qsim().setNodeOffset(30.0);
     
     
     ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
@@ -61,7 +66,7 @@ public class FourWaysVisNoLanes {
     EventsManager events = EventsUtils.createEventsManager();
     QSim otfVisQSim = (QSim) new QSimFactory().createMobsim(scenario, events);
     OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
-	OTFClientLive.run(scenario.getConfig(), server);
+    OTFClientLive.run(scenario.getConfig(), server);
     otfVisQSim.run();
 	}
 

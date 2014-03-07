@@ -180,7 +180,11 @@ public class QNode implements NetsimNode {
 			// This cannot be moved to QLinkLanesImpl since we want to be able to serve other lanes if one lane is blocked.
 			// kai, feb'12
 			// yyyy but somehow I think this should be solved "under the hood" in QLinkLanesImpl.  kai, sep'13
-			for (QueueWithBuffer lane : ((QLinkLanesImpl)link).getToNodeQueueLanes()) {
+			// zzzz the above yyyy solution would get really ugly with the current interface and the code in the
+			// else {} branch: link.isNotOfferingVehicle():boolean would return sequentially the state of the single
+			//lanes. Each call would have side effects on a state machine within QLinkLanesImpl. Proposal: think
+			//about a better interface first, then solve under the hood. dg, mar'14
+			for (QLaneInternalI lane : ((QLinkLanesImpl)link).getToNodeQueueLanes()) {
 					while (! lane.isNotOfferingVehicle()) {
 						QVehicle veh = lane.getFirstVehicle();
 						Id nextLink = veh.getDriver().chooseNextLinkId();
@@ -226,10 +230,11 @@ public class QNode implements NetsimNode {
 		Id nextLinkId = veh.getDriver().chooseNextLinkId();
 		Link currentLink = veh.getCurrentLink();
 
-		if ((!fromLaneBuffer.hasGreenForToLink(nextLinkId))) {
-			if (!(vehicleIsStuck(fromLaneBuffer, now))){
+		if ((! fromLaneBuffer.hasGreenForToLink(nextLinkId))) {
+			//there is no longer a stuck check for red links. This means that
+			//in case of an infinite red time the simulation will not stop automatically because
+			//vehicles waiting in front of the red signal will never reach their destination. dg, mar'14
 				return false;
-			}
 		}
 
 		if (nextLinkId == null) {

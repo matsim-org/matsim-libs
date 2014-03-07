@@ -22,9 +22,6 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,13 +29,11 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.lanes.vis.VisLaneModelBuilder;
 import org.matsim.lanes.vis.VisLinkWLanes;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;
 import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
@@ -75,8 +70,6 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	 */
 	private final QNode toQueueNode;
 
-	private boolean active = false;
-
 	private final VisData visdata;
 
 	final double length;
@@ -103,6 +96,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		this.road = new QueueWithBuffer(this, vehicleQueue);
 		this.toQueueNode = toNode;
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
+	  super.transitQLink = new TransitQLink(this.road);
 	}
 	
 	/** 
@@ -118,20 +112,10 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		this.road = roadFactory.createRoad(this); 
 		this.toQueueNode = toNode;
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
+	  super.transitQLink = new TransitQLink(this.road);
 	}
 
-	/** 
-	 * Links are active while (see checkForActivity()): () vehicles move on it; () vehicles wait to enter; () vehicles wait at the transit stop.
-	 * Once all of those have left the link, the link is no longer active.  It then needs to be activated from the outside, which is done by
-	 * this method.
-	 */
-	@Override
-	void activateLink() {
-		if (!this.active) {
-			netElementActivator.activateLink(this);
-			this.active = true;
-		}
-	}
+
 
 	/**
 	 * Adds a vehicle to the link (i.e. the "queue"), called by
@@ -162,18 +146,13 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 		if ( this.insertingWaitingVehiclesBeforeDrivingVehicles ) {
 			this.moveWaitToRoad(now);
-			this.handleTransitVehiclesInStopQueue(now);
+			this.transitQLink.handleTransitVehiclesInStopQueue(now);
 			road.doSimStep(now);
 		} else {
-			this.handleTransitVehiclesInStopQueue(now);
+			this.transitQLink.handleTransitVehiclesInStopQueue(now);
 			road.doSimStep(now);
 			this.moveWaitToRoad(now);
 		}
-		// moveLaneToBuffer moves vehicles from lane to buffer.  Includes possible vehicle arrival.  Which, I think, would only be triggered
-		// if this is the original lane.
-
-		// moveWaitToBuffer moves waiting (i.e. just departed) vehicles into the buffer.
-
 		this.active = this.checkForActivity();
 		return active;
 	}
@@ -196,7 +175,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 					new Wait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId())
 					);
 
-			if ( this.addTransitToStopQueue(now, veh) ) {
+			if ( this.transitQLink.addTransitToStopQueue(now, veh, this.getLink().getId()) ) {
 				continue ;
 			}
 
@@ -212,57 +191,6 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 			}
 
 			road.addFromWait(veh, now);
-		}
-	}
-
-	private final boolean addTransitToStopQueue(final double now, final QVehicle veh) {
-		if (veh.getDriver() instanceof TransitDriverAgent) {
-			TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
-			while (true) {
-				TransitStopFacility stop = driver.getNextTransitStop();
-				if ((stop != null) && (stop.getLinkId().equals(getLink().getId()))) {
-					double delay = driver.handleTransitStop(stop, now);
-					if (delay > 0.0) {
-						// yy removing this condition makes at least one test fail.  I still think we could discuss doing this. kai, jun'13
-
-						veh.setEarliestLinkExitTime(now + delay);
-						// add it to the stop queue: vehicle that is not yet on the road will never block
-						transitVehicleStopQueue.add(veh);
-						return true;
-					}
-				} else {
-					return false;
-				}
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * This method moves transit vehicles from the stop queue directly to the front of the
-	 * "queue" of the QLink. An advantage is that this will observe flow
-	 * capacity restrictions. 
-	 */
-	private void handleTransitVehiclesInStopQueue(final double now) {
-		QVehicle veh;
-		// handle transit traffic in stop queue
-		List<QVehicle> departingTransitVehicles = null;
-		while ((veh = transitVehicleStopQueue.peek()) != null) {
-			// there is a transit vehicle.
-			if (veh.getEarliestLinkExitTime() > now) {
-				break;
-			}
-			if (departingTransitVehicles == null) {
-				departingTransitVehicles = new LinkedList<QVehicle>();
-			}
-			departingTransitVehicles.add(transitVehicleStopQueue.poll());
-		}
-		if (departingTransitVehicles != null) {
-			// add all departing transit vehicles at the front of the vehQueue
-			ListIterator<QVehicle> iter = departingTransitVehicles.listIterator(departingTransitVehicles.size());
-			while (iter.hasPrevious()) {
-				this.road.addTransitSlightlyUpstreamOfStop(iter.previous()) ;
-			}
 		}
 	}
 
@@ -301,7 +229,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	@Override
 	public Collection<MobsimVehicle> getAllNonParkedVehicles(){
 		Collection<MobsimVehicle> vehicles = new ArrayList<MobsimVehicle>();
-		vehicles.addAll(this.transitVehicleStopQueue);
+		vehicles.addAll(this.transitQLink.getTransitVehicleStopQueue());
 		vehicles.addAll(this.waitingList);
 		vehicles.addAll( road.getAllVehicles() ) ;
 		return vehicles;
@@ -348,7 +276,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		 * link active until buffercap has accumulated (so a newly arriving vehicle
 		 * is not delayed).
 		 */
-		return road.isActive()  || !this.waitingList.isEmpty() || !this.transitVehicleStopQueue.isEmpty() ;
+		return road.isActive()  || !this.waitingList.isEmpty() || !this.transitQLink.getTransitVehicleStopQueue().isEmpty() ;
 	}
 
 	@Override
@@ -393,37 +321,38 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	 */
 	class VisDataImpl implements VisData {
 
-		private VisLaneModelBuilder laneModelBuilder = null;
-		private VisLinkWLanes otfLink = null;
+		private VisLaneModelBuilder visModelBuilder = null;
+		private VisLinkWLanes visLink = null;
 
 		private VisDataImpl() {
 			double nodeOffset = QLinkImpl.this.network.simEngine.getMobsim().getScenario().getConfig().qsim().getNodeOffset(); 
 			if (nodeOffset != 0.0) {
 				nodeOffset = nodeOffset +2.0; // +2.0: eventually we need a bit space for the signal
-				laneModelBuilder = new VisLaneModelBuilder();
+				visModelBuilder = new VisLaneModelBuilder();
 				CoordinateTransformation transformation = new IdentityTransformation();
-				otfLink = laneModelBuilder.createVisLinkLanes(transformation, QLinkImpl.this, nodeOffset, null);
+				visLink = visModelBuilder.createVisLinkLanes(transformation, QLinkImpl.this, nodeOffset, null);
 				SnapshotLinkWidthCalculator linkWidthCalculator = QLinkImpl.this.network.getLinkWidthCalculator();
-				laneModelBuilder.recalculatePositions(otfLink, linkWidthCalculator);
+				visModelBuilder.recalculatePositions(visLink, linkWidthCalculator);
 			}
 		}
 
 		@Override
-		public Collection<AgentSnapshotInfo> getAgentSnapshotInfo( Collection<AgentSnapshotInfo> positions) {
+		public Collection<AgentSnapshotInfo> addAgentSnapshotInfo( Collection<AgentSnapshotInfo> positions) {
 			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.network.simEngine.getAgentSnapshotInfoBuilder();
 
 			VisData roadVisData = road.getVisData() ;
+			if (visLink != null) {
+				((QueueWithBuffer.VisDataImpl)roadVisData).setVisInfo(visLink.getLinkStartCoord(), visLink.getLinkEndCoord(), visLink.getEuklideanDistance()) ;
+				// yyyy not so great but an elegant solution needs more thinking about visualizer structure. kai, jun'13
+			}
 
-			((QueueWithBuffer.VisDataImpl)roadVisData).setOtfLink( otfLink ) ;
-			// yyyy not so great but an elegant solution needs more thinking about visualizer structure. kai, jun'13
-
-			positions = roadVisData.getAgentSnapshotInfo(positions) ;
+			positions = roadVisData.addAgentSnapshotInfo(positions) ;
 
 			int cnt2 = 10 ; // a counter according to which non-moving items can be "spread out" in the visualization
 			// initialize a bit away from the lane
 
 			// treat vehicles from transit stops
-			cnt2 = snapshotInfoBuilder.positionVehiclesFromTransitStop(positions, link, transitVehicleStopQueue, cnt2 );
+			cnt2 = snapshotInfoBuilder.positionVehiclesFromTransitStop(positions, link, transitQLink.getTransitVehicleStopQueue(), cnt2 );
 
 			// treat vehicles from waiting list:
 			cnt2 = snapshotInfoBuilder.positionVehiclesFromWaitingList(positions, QLinkImpl.this.link, cnt2,
@@ -432,7 +361,6 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 			cnt2 = snapshotInfoBuilder.positionAgentsInActivities(positions, QLinkImpl.this.link,
 					QLinkImpl.this.getAdditionalAgentsOnLink(), cnt2);
 
-			// return:
 			return positions;
 		}
 

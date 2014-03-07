@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicLaneDefinitionBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -16,17 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.lanes.data.v11;
 
-package org.matsim.vis.snapshotwriters;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.MatsimFactory;
 
-import java.util.Collection;
 
 /**
- * Interface for methods to provide a visualizer with data.
+ * Builder for the content of BasicLaneDefinitions
  * @author dgrether
  */
-public interface VisData {
+public interface LaneDefinitionsFactory11 extends MatsimFactory {
 
-	public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(final Collection<AgentSnapshotInfo> positions);
-
+	/**
+	 * 
+	 * @param linkIdReference id of the links the lanes of the created object belong to
+	 * @return An empty instance of LanesToLinkAssignment for the Link with the Id given as parameter
+	 */
+	public LanesToLinkAssignment11 createLanesToLinkAssignment(Id linkIdReference);
+	/**
+	 * Creates an instance of BasicLane with the id given as parameter.
+	 * @param laneId
+	 * @return
+	 */
+	public LaneData11 createLane(Id laneId);
 }

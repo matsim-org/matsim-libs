@@ -47,10 +47,11 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
-import org.matsim.lanes.data.v11.Lane;
-import org.matsim.lanes.data.v11.LaneDefinitions;
-import org.matsim.lanes.data.v11.LaneDefinitionsFactory;
-import org.matsim.lanes.data.v11.LanesToLinkAssignment;
+import org.matsim.lanes.data.v11.LaneData11;
+import org.matsim.lanes.data.v11.LaneDefinitions11;
+import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
+import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
+import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
@@ -449,19 +450,19 @@ public class DaganzoScenarioGenerator {
 
 
 	private LaneDefinitions20 createLanes(ScenarioImpl scenario) {
-		LaneDefinitions lanes = scenario.getLaneDefinitions11();
-		LaneDefinitionsFactory factory = lanes.getFactory();
+		LaneDefinitions11 lanes = new LaneDefinitions11Impl();
+		LaneDefinitionsFactory11 factory = lanes.getFactory();
 		//lanes for link 4
-		LanesToLinkAssignment lanesForLink4 = factory.createLanesToLinkAssignment(id4);
-		Lane link4lane1 = factory.createLane(id1);
+		LanesToLinkAssignment11 lanesForLink4 = factory.createLanesToLinkAssignment(id4);
+		LaneData11 link4lane1 = factory.createLane(id1);
 		link4lane1.addToLinkId(id6);
 		link4lane1.setNumberOfRepresentedLanes(numberOfLanes);
 		link4lane1.setStartsAtMeterFromLinkEnd(100.0);
 		lanesForLink4.addLane(link4lane1);
 		lanes.addLanesToLinkAssignment(lanesForLink4);
 		//lanes for link 5
-		LanesToLinkAssignment lanesForLink5 = factory.createLanesToLinkAssignment(id5);
-		Lane link5lane1 = factory.createLane(id1);
+		LanesToLinkAssignment11 lanesForLink5 = factory.createLanesToLinkAssignment(id5);
+		LaneData11 link5lane1 = factory.createLane(id1);
 		link5lane1.setNumberOfRepresentedLanes(numberOfLanes);
 		link5lane1.addToLinkId(id6);
 		link5lane1.setStartsAtMeterFromLinkEnd(7.5);

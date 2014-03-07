@@ -39,9 +39,9 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
-import org.matsim.lanes.data.v11.Lane;
-import org.matsim.lanes.data.v11.LaneDefinitions;
-import org.matsim.lanes.data.v11.LanesToLinkAssignment;
+import org.matsim.lanes.data.v20.LaneData20;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.openstreetmap.osmosis.core.domain.v0_6.Tag;
 import org.openstreetmap.osmosis.core.filter.v0_6.TagFilter;
 import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
@@ -71,19 +71,19 @@ public class DgOsmJunctionsPostprocessing {
 		
 		Map<Id, Set<Id>> removedLinkIdToLinkIdsMap = this.removeJunctions(network, signalSystemId2NodesMap);
 		
-		LaneDefinitions lanes = this.handleLanes(scenario.getLaneDefinitions11(), removedLinkIdToLinkIdsMap);
+		LaneDefinitions20 lanes = this.handleLanes((LaneDefinitions20)scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME), removedLinkIdToLinkIdsMap);
 		
 		new NetworkWriter(network).write(networkOutFile);
-		new MatsimLaneDefinitionsWriter().writeFile11(lanesOutFile, lanes);
+		new MatsimLaneDefinitionsWriter().writeFile20(lanesOutFile, lanes);
 		log.info("done!");
 	}
 	
-	private LaneDefinitions handleLanes(LaneDefinitions laneDefinitions, Map<Id, Set<Id>> removedLinkIdToLinkIdsMap) {
-		for (LanesToLinkAssignment l2l : laneDefinitions.getLanesToLinkAssignments().values()){
+	private LaneDefinitions20 handleLanes(LaneDefinitions20 laneDefinitions20, Map<Id, Set<Id>> removedLinkIdToLinkIdsMap) {
+		for (LanesToLinkAssignment20 l2l : laneDefinitions20.getLanesToLinkAssignments().values()){
 			if (removedLinkIdToLinkIdsMap.containsKey(l2l.getLinkId())){
 				throw new IllegalStateException("Link Id " + l2l.getLinkId() + " was removed but has lanes attached, can't handle this automatically!");
 			}
-			for (Lane lane : l2l.getLanes().values()){
+			for (LaneData20 lane : l2l.getLanes().values()){
 				Set<Id> toLinkIds2Remove = new HashSet<Id>();
 				if (lane.getToLinkIds() != null && !lane.getToLinkIds().isEmpty()){
 					for (Id toLinkId : lane.getToLinkIds()){
@@ -103,7 +103,7 @@ public class DgOsmJunctionsPostprocessing {
 				}
 			}
 		}
-		return laneDefinitions;
+		return laneDefinitions20;
 	}
 
 	private Map<Id, Set<Id>> removeJunctions(Network network, Map<String, Set<Node>> signalSystemId2NodesMap){

@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.lanes.LaneImpl;
+import org.matsim.lanes.ModelLane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.lanes.utils.LanesUtils;
@@ -114,7 +114,7 @@ public class VisScenarioBuilder {
 				l2l = lanes.getLanesToLinkAssignments().get(l.getId());
 			}
 			VisLink vl = new VisLinkImpl(l);
-			List<LaneImpl> la = LanesUtils.createLanes(l, l2l);
+			List<ModelLane> la = LanesUtils.createLanes(l, l2l);
 			VisLinkWLanes link = visLaneModelBuilder.createVisLinkLanes(transform, vl, scenario.getConfig().qsim().getNodeOffset(),  la);
 			SnapshotLinkWidthCalculator lwc = new SnapshotLinkWidthCalculator();
 			visLaneModelBuilder.recalculatePositions(link, lwc);

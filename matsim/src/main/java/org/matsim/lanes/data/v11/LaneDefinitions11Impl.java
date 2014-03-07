@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * LaneDefinitionsV1Impl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,17 +17,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.lanes.data.v11;
 
-package org.matsim.vis.snapshotwriters;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
-import java.util.Collection;
+import org.matsim.api.core.v01.Id;
+
 
 /**
- * Interface for methods to provide a visualizer with data.
  * @author dgrether
+ *
  */
-public interface VisData {
+public class LaneDefinitions11Impl implements LaneDefinitions11 {
 
-	public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(final Collection<AgentSnapshotInfo> positions);
+	private SortedMap<Id, LanesToLinkAssignment11> lanesToLinkAssignments  =  new TreeMap<Id, LanesToLinkAssignment11>();
 
+	private LaneDefinitionsFactory11 factory = new LaneDefinitionsFactory11Impl();
+	
+	@Override
+	public SortedMap<Id, LanesToLinkAssignment11> getLanesToLinkAssignments() {
+		return this.lanesToLinkAssignments;
+	}
+
+	@Override
+	public void addLanesToLinkAssignment(LanesToLinkAssignment11 assignment) {
+		this.lanesToLinkAssignments.put(assignment.getLinkId(), assignment);
+	}
+
+	@Override
+	public LaneDefinitionsFactory11 getFactory() {
+		return factory;
+	}
+
+	@Override
+	public void setFactory(LaneDefinitionsFactory11 factory) {
+		this.factory = factory;
+	}
 }

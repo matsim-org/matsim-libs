@@ -27,10 +27,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
-import org.matsim.lanes.data.v11.LaneDefinitions;
+import org.matsim.lanes.data.v11.LaneDefinitions11;
+import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
 import org.matsim.lanes.data.v11.LaneDefinitionsReader11;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitionsReader20;
@@ -50,11 +50,19 @@ public class MatsimLaneDefinitionsReader implements MatsimSomeReader {
 	
 	private LaneDefinitions20 laneDefinitions;
 
-	private LaneDefinitions laneDefinitionsV1;
+	private LaneDefinitions11 laneDefinitionsV1;
+
+	private Scenario scenario;
 	
 	public MatsimLaneDefinitionsReader(Scenario scenario) {
-		this.laneDefinitionsV1 = ((ScenarioImpl)scenario).getLaneDefinitions11();
+		this.laneDefinitionsV1 = new LaneDefinitions11Impl();
+		this.scenario = scenario;
 		this.laneDefinitions = (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
+	}
+
+	
+	public LaneDefinitions11 getLaneDefinitionsV1() {
+		return laneDefinitionsV1;
 	}
 
 	/**

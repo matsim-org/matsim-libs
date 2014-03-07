@@ -37,6 +37,7 @@ import org.matsim.jaxb.lanedefinitions11.XMLIdRefType;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneDefinitions;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneType;
 import org.matsim.jaxb.lanedefinitions11.XMLLanesToLinkAssignmentType;
+import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
 import org.xml.sax.SAXException;
 
 
@@ -51,33 +52,41 @@ public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser implements Mats
 	private static final Logger log = Logger
 			.getLogger(LaneDefinitionsReader11.class);
 
-	private LaneDefinitions laneDefinitions;
+	private LaneDefinitions11 laneDefinitions;
 
-	private LaneDefinitionsFactory builder;
+	private LaneDefinitionsFactory11 builder;
 	/**
-	 * @param schemaLocation
+	 * @deprecated use constructor without schema location
 	 */
-	public LaneDefinitionsReader11(LaneDefinitions laneDefs, String schemaLocation) {
+	@Deprecated
+	public LaneDefinitionsReader11(LaneDefinitions11 laneDefs, String schemaLocation) {
 		super(schemaLocation);
 		this.laneDefinitions = laneDefs;
 		builder = this.laneDefinitions.getFactory();
 	}
+	
+	public LaneDefinitionsReader11(LaneDefinitions11 laneDefs) {
+		super(MatsimLaneDefinitionsReader.SCHEMALOCATIONV11);
+		this.laneDefinitions = laneDefs;
+		builder = this.laneDefinitions.getFactory();
+	}
+	
 
 	/**
 	 * @see org.matsim.core.utils.io.MatsimJaxbXmlParser#readFile(java.lang.String)
 	 */
 	@Override
-	public void readFile(String filename) throws JAXBException, SAXException,
-			ParserConfigurationException, IOException {
+	public void readFile(String filename) throws RuntimeException {
 		//create jaxb infrastructure
 		JAXBContext jc;
 		XMLLaneDefinitions xmlLaneDefinitions;
-			jc = JAXBContext
-					.newInstance(org.matsim.jaxb.lanedefinitions11.ObjectFactory.class);
+			try {
+				jc = JAXBContext
+						.newInstance(org.matsim.jaxb.lanedefinitions11.ObjectFactory.class);
 			ObjectFactory fac = new ObjectFactory();
 			Unmarshaller u = jc.createUnmarshaller();
 			// validate XML file
-			super.validateFile(filename, u);
+				super.validateFile(filename, u);
 			log.info("starting unmarshalling " + filename);
 			InputStream stream = null;
 			try {
@@ -89,11 +98,14 @@ public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser implements Mats
 					if (stream != null) { stream.close();	}
 				} catch (IOException e) {
 					log.warn("Could not close stream.", e);
+					e.printStackTrace();
+					throw new RuntimeException(e.getMessage());
 				}
 			}
+			
 			//convert the parsed xml-instances to basic instances
-			LanesToLinkAssignment l2lAssignment;
-			Lane lane = null;
+			LanesToLinkAssignment11 l2lAssignment;
+			LaneData11 lane = null;
 			for (XMLLanesToLinkAssignmentType lldef : xmlLaneDefinitions
 					.getLanesToLinkAssignment()) {
 				l2lAssignment = builder.createLanesToLinkAssignment(new IdImpl(lldef
@@ -117,6 +129,21 @@ public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser implements Mats
 				}
 				this.laneDefinitions.addLanesToLinkAssignment(l2lAssignment);
 			}
+			} catch (JAXBException e1) {
+				e1.printStackTrace();
+				throw new RuntimeException(e1.getMessage());
+			} 	catch (SAXException e1) {
+				e1.printStackTrace();
+				throw new RuntimeException(e1.getMessage());
+			} catch (ParserConfigurationException e1) {
+				e1.printStackTrace();
+				throw new RuntimeException(e1.getMessage());
+			} catch (IOException e1) {
+				e1.printStackTrace();
+				throw new RuntimeException(e1.getMessage());
+			}
+
+		
 	}
 
 }

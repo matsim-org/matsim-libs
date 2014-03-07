@@ -74,7 +74,7 @@ public final class OTFFileWriter implements SnapshotWriter {
 		this.writer.setSrc(new VisData() {
 
 			@Override
-			public Collection<AgentSnapshotInfo> getAgentSnapshotInfo(Collection<AgentSnapshotInfo> inPositions) {
+			public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> inPositions) {
 				inPositions.addAll(positions);
 				return inPositions;
 			}

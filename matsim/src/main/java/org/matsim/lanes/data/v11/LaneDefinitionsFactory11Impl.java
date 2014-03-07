@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * LaneDefinitionsFactoryV1Impl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,17 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.lanes.data.v11;
 
-package org.matsim.vis.snapshotwriters;
+import org.matsim.api.core.v01.Id;
 
-import java.util.Collection;
 
 /**
- * Interface for methods to provide a visualizer with data.
  * @author dgrether
+ *
  */
-public interface VisData {
+public class LaneDefinitionsFactory11Impl implements LaneDefinitionsFactory11 {
 
-	public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(final Collection<AgentSnapshotInfo> positions);
+	@Override
+	public LanesToLinkAssignment11 createLanesToLinkAssignment(Id linkId) {
+		return new LanesToLinkAssignment11Impl(linkId);
+	}
+
+	@Override
+	public LaneData11 createLane(Id laneId) {
+		return new LaneData11Impl(laneId);
+	}
 
 }

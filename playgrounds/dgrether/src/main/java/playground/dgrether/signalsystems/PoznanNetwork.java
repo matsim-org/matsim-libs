@@ -41,13 +41,15 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
-import org.matsim.lanes.data.v11.Lane;
-import org.matsim.lanes.data.v11.LaneDefinitions;
-import org.matsim.lanes.data.v11.LaneDefinitionsFactory;
+import org.matsim.lanes.data.v11.LaneData11;
+import org.matsim.lanes.data.v11.LaneDefinitions11;
+import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
+import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
 import org.matsim.lanes.data.v11.LaneDefinitionsWriter11;
-import org.matsim.lanes.data.v11.LanesToLinkAssignment;
+import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.signalsystems.data.SignalsDataImpl;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
@@ -84,8 +86,8 @@ public class PoznanNetwork
     private static Network network;
     private static NetworkFactory netFactory;
     private static ScenarioImpl scenario;
-    private static LaneDefinitions lanes;
-    private static LaneDefinitionsFactory laneFactory;
+    private static LaneDefinitions11 lanes;
+    private static LaneDefinitionsFactory11 laneFactory;
     private static SignalGroupsDataFactory gf;
     private static SignalGroupsData groups;
 
@@ -193,10 +195,10 @@ public class PoznanNetwork
         // === 92<->90
         Link l90_92 = createAndAddLink(n90, n92, 2);
 
-        lanes = scenario.getLaneDefinitions11();
+        lanes = new LaneDefinitions11Impl();
         laneFactory = lanes.getFactory();
 
-        LanesToLinkAssignment l2l = laneFactory.createLanesToLinkAssignment(l12_10.getId());
+        LanesToLinkAssignment11 l2l = laneFactory.createLanesToLinkAssignment(l12_10.getId());
         createAndAddLanes(l2l, 1, 90, l10_13);
         createAndAddLanes(l2l, 2, 90, l10_20);
         createAndAddLanes(l2l, 3, 100, l10_20, l10_11);
@@ -209,7 +211,7 @@ public class PoznanNetwork
         createAndAddLanes(l2l, 3, 80, l10_20);
         lanes.addLanesToLinkAssignment(l2l);
 
-        Lane lane;
+        LaneData11 lane;
         // lanes for link 30_10
         l2l = laneFactory.createLanesToLinkAssignment(l30_10.getId());
         createAndAddLanes(l2l, 1, 90, 1.8, l10_11);
@@ -268,6 +270,7 @@ public class PoznanNetwork
         lanes.addLanesToLinkAssignment(l2l);
 
         // create the traffic signal infrastructure
+        scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataImpl(scenario.getConfig().signalSystems()));
         SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
         SignalSystemsData signals = signalsData.getSignalSystemsData();
 
@@ -436,17 +439,17 @@ public class PoznanNetwork
     }
 
 
-    private static void createAndAddLanes(LanesToLinkAssignment l2l, int id, double length,
+    private static void createAndAddLanes(LanesToLinkAssignment11 l2l, int id, double length,
             Link... toLinks)
     {
         createAndAddLanes(l2l, id, length, 1, toLinks);
     }
 
 
-    private static void createAndAddLanes(LanesToLinkAssignment l2l, int id, double length,
+    private static void createAndAddLanes(LanesToLinkAssignment11 l2l, int id, double length,
             double noLanes, Link... toLinks)
     {
-    	Lane lane = laneFactory.createLane(scenario.createId(l2l.getLinkId() + "_" + id));
+    	LaneData11 lane = laneFactory.createLane(scenario.createId(l2l.getLinkId() + "_" + id));
 
         for (Link toLink : toLinks) {
             lane.addToLinkId(toLink.getId());
@@ -581,7 +584,9 @@ public class PoznanNetwork
         config.qsim().setSnapshotStyle("queue");
         config.scenario().setUseLanes(true);
         config.scenario().setUseSignalSystems(true);
-        ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setAgentSize(70.0f);
+        OTFVisConfigGroup otfconfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
+        otfconfig.setAgentSize(70.0f);
+        otfconfig.setMapOverlayMode(false);
         config.qsim().setNodeOffset(30);
         config.signalSystems().setUseAmbertimes(true);
         scenario = (ScenarioImpl)ScenarioUtils.createScenario(config);
@@ -589,7 +594,7 @@ public class PoznanNetwork
         // create network lanes and signals
         createPhysics();
         LaneDefinitions20 lanes20 = new LaneDefinitionsV11ToV20Conversion().convertTo20(
-                scenario.getLaneDefinitions11(), scenario.getNetwork());
+                lanes, scenario.getNetwork());
         LanesConsistencyChecker lcc = new LanesConsistencyChecker(scenario.getNetwork(), lanes20);
         lcc.checkConsistency();
         SignalSystemsDataConsistencyChecker sscc = new SignalSystemsDataConsistencyChecker(scenario.getNetwork(), lanes20, (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME));
@@ -630,7 +635,7 @@ public class PoznanNetwork
 
         String lanesOutputFile = baseDir + "lanes.xml";
         // String lanesOutputFile = "d:\\PP-dyplomy\\2010_11-inz\\MATSim\\lanes.xml";
-        new LaneDefinitionsWriter11(scenario.getLaneDefinitions11()).write(lanesOutputFile);
+        new LaneDefinitionsWriter11(lanes).write(lanesOutputFile);
         // config.network().setLaneDefinitionsFile(lanesOutputFile);
 
         String lanes20OutputFile = baseDir + "lanes20.xml";

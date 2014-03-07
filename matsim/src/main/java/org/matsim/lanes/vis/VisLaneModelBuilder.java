@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.lanes.LaneImpl;
+import org.matsim.lanes.ModelLane;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.vecmathutils.VectorUtils;
@@ -90,7 +90,7 @@ public class VisLaneModelBuilder {
 		return new Point2D.Double(x, y);
 	}
 	
-	private VisLane createVisLane(LaneImpl qlane, double linkLength, double linkScale, double linkLengthCorrectionFactor) {
+	private VisLane createVisLane(ModelLane qlane, double linkLength, double linkScale, double linkLengthCorrectionFactor) {
 		String id = qlane.getLaneData().getId().toString();
 		double startPosition = (linkLength -  qlane.getLaneData().getStartsAtMeterFromLinkEnd()) * linkScale * linkLengthCorrectionFactor;
 		double endPosition = startPosition + (qlane.getLength() *  linkScale * linkLengthCorrectionFactor);
@@ -129,7 +129,7 @@ public class VisLaneModelBuilder {
 		}
 	}
 
-	public VisLinkWLanes createVisLinkLanes(CoordinateTransformation transform, VisLink link, double nodeOffsetMeter, List<LaneImpl> lanes) {
+	public VisLinkWLanes createVisLinkLanes(CoordinateTransformation transform, VisLink link, double nodeOffsetMeter, List<ModelLane> lanes) {
 //		log.error("");
 //		log.error("link " + link.getLink().getId() + " ... ");
 //		log.debug("  fromNode: " + link.getLink().getFromNode().getId() + " coord: " + link.getLink().getFromNode().getCoord());
@@ -170,7 +170,7 @@ public class VisLaneModelBuilder {
 
 		if (lanes != null){
 			int maxAlignment = 0;
-			for (LaneImpl lane : lanes){
+			for (ModelLane lane : lanes){
 				VisLane visLane = this.createVisLane(lane, link.getLink().getLength(), linkScale, linkLengthCorrectionFactor);
 				lanesLinkData.addLaneData(visLane);
 				if (visLane.getAlignment() > maxAlignment) {
@@ -180,7 +180,7 @@ public class VisLaneModelBuilder {
 			lanesLinkData.setMaximalAlignment(maxAlignment);
 
 			//connect the lanes 
-			for (LaneImpl lane : lanes){
+			for (ModelLane lane : lanes){
 				VisLane otfLane = lanesLinkData.getLaneData().get(lane.getLaneData().getId().toString());
 				if (lane.getToLanes() == null ||  lane.getToLanes().isEmpty()){
 					for (Id id : lane.getLaneData().getToLinkIds()){
@@ -188,7 +188,7 @@ public class VisLaneModelBuilder {
 					}
 				}
 				else {
-					for (LaneImpl toLane : lane.getToLanes()){
+					for (ModelLane toLane : lane.getToLanes()){
 						VisLane otfToLane = lanesLinkData.getLaneData().get(toLane.getLaneData().getId().toString());
 						otfLane.addToLane(otfToLane);
 					}

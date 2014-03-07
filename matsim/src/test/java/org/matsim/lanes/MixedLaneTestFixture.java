@@ -41,10 +41,11 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
-import org.matsim.lanes.data.v11.Lane;
-import org.matsim.lanes.data.v11.LaneDefinitions;
-import org.matsim.lanes.data.v11.LaneDefinitionsFactory;
-import org.matsim.lanes.data.v11.LanesToLinkAssignment;
+import org.matsim.lanes.data.v11.LaneData11;
+import org.matsim.lanes.data.v11.LaneDefinitions11;
+import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
+import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
+import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 
 
@@ -116,14 +117,14 @@ public class MixedLaneTestFixture {
 		link3.setNumberOfLanes(2.0);
 		n.addLink(link3);
 		//create lanes
-		LaneDefinitions lanes = this.sc.getLaneDefinitions11();
-		LaneDefinitionsFactory lb = lanes.getFactory();
-		Lane lane = lb.createLane(id1);
+		LaneDefinitions11 lanes = new LaneDefinitions11Impl();
+		LaneDefinitionsFactory11 lb = lanes.getFactory();
+		LaneData11 lane = lb.createLane(id1);
 		lane.setNumberOfRepresentedLanes(2.0);
 		lane.setStartsAtMeterFromLinkEnd(50.0);
 		lane.addToLinkId(id2);
 		lane.addToLinkId(id3);
-		LanesToLinkAssignment l2l = lb.createLanesToLinkAssignment(id1);
+		LanesToLinkAssignment11 l2l = lb.createLanesToLinkAssignment(id1);
 		l2l.addLane(lane);
 		lanes.addLanesToLinkAssignment(l2l);
 		LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();

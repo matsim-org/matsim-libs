@@ -60,7 +60,8 @@ public class SignalSystemsIntegrationTest {
 		new LaneDefinitonsV11ToV20Converter().convert(lanes11, lanes20, config.network().getInputFile());
 		
 //		config.network().setLaneDefinitionsFile(lanes20);
-		
+		config.controler().setWriteEventsInterval(10);
+		config.controler().setWritePlansInterval(10);
 		Controler c = new Controler(config);
 		c.getConfig().controler().setOutputDirectory(controlerOutputDir);
 		c.setCreateGraphs(false);

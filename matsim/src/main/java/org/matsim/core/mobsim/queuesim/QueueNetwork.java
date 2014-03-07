@@ -90,7 +90,7 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
 	/*package*/ Collection<AgentSnapshotInfo> getVehiclePositions() {
 		Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 		for (QueueLink link : this.queuelinks.values()) {
-			link.getVisData().getAgentSnapshotInfo(positions);
+			link.getVisData().addAgentSnapshotInfo(positions);
 		}
 		return positions;
 	}

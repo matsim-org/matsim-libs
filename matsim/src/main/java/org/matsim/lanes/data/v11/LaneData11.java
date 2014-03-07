@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * LaneDataV1
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,17 +17,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.lanes.data.v11;
 
-package org.matsim.vis.snapshotwriters;
+import java.util.List;
 
-import java.util.Collection;
+import org.matsim.api.core.v01.Id;
+
 
 /**
- * Interface for methods to provide a visualizer with data.
+ * Models a lane that ends at the downstream node of a link.
+ * 
+ * The position is specified via the distance the lane starts measured from the downstream node
+ * of the link. The 'starts at meter from link end' attribute corresponds to the 'length' attribute in
+ * the laneDefinitions_v1.1.xsd.
+ * 
+ * All downstream links that can be reached by vehicles leaving this lane must be completely given
+ * by their id.
+ * 
+ * If a lane shall model more than one lane existing in the reality to be modeled, increase the number of represented lanes attribute.
+ * 
  * @author dgrether
+ *
  */
-public interface VisData {
+public interface LaneData11 {
 
-	public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(final Collection<AgentSnapshotInfo> positions);
+	public Id getId();
 
+	public void setNumberOfRepresentedLanes(double number);
+
+	public double getNumberOfRepresentedLanes();
+
+	public void setStartsAtMeterFromLinkEnd(double meter);
+
+	public double getStartsAtMeterFromLinkEnd();
+
+	public void addToLinkId(Id id);
+
+	public List<Id> getToLinkIds();
+
+	
 }

@@ -93,7 +93,7 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 		if (!this.snapshotWriters.isEmpty()) {
 			Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 			for (VisLink link : visMobsim.getVisNetwork().getVisLinks().values()) {
-				link.getVisData().getAgentSnapshotInfo(positions);
+				link.getVisData().addAgentSnapshotInfo(positions);
 			}
 			
 			// We do not put non-network agents in movies.

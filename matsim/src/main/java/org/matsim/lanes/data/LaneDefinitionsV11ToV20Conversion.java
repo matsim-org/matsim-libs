@@ -30,9 +30,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.lanes.data.v11.Lane;
-import org.matsim.lanes.data.v11.LaneDefinitions;
-import org.matsim.lanes.data.v11.LanesToLinkAssignment;
+import org.matsim.lanes.data.v11.LaneData11;
+import org.matsim.lanes.data.v11.LaneDefinitions11;
+import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneData20MeterFromLinkEndComparator;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
@@ -67,20 +67,20 @@ public class LaneDefinitionsV11ToV20Conversion {
 	
 //	private static final Logger log = Logger.getLogger(LaneDefinitionsV11ToV20Conversion.class);
 	
-	public LaneDefinitions20 convertTo20(LaneDefinitions lanedefs11, Network network) {
+	public LaneDefinitions20 convertTo20(LaneDefinitions11 lanedefs11, Network network) {
 		LaneDefinitions20 lanedefs20 = new LaneDefinitions20Impl();
 		LaneDefinitionsFactory20 lanedefs20fac = lanedefs20.getFactory();
 		org.matsim.lanes.data.v20.LanesToLinkAssignment20 l2lnew;
 		LaneData20 lanev20;
 		Link link;
 		LanesCapacityCalculator capacityCalculator = new LanesCapacityCalculator();
-		for (LanesToLinkAssignment l2lv11 : lanedefs11.getLanesToLinkAssignments().values()){
+		for (LanesToLinkAssignment11 l2lv11 : lanedefs11.getLanesToLinkAssignments().values()){
 			//create the lane2linkassignment
 			l2lnew = lanedefs20fac.createLanesToLinkAssignment(l2lv11.getLinkId());
 			link = network.getLinks().get(l2lv11.getLinkId());
 			lanedefs20.addLanesToLinkAssignment(l2lnew);
 			//create the already in 1.1 defined lanes and add them to the 2.0 format objects
-			for (Lane lanev11 : l2lv11.getLanes().values()){
+			for (LaneData11 lanev11 : l2lv11.getLanes().values()){
 				lanev20 = lanedefs20fac.createLane(lanev11.getId());
 				l2lnew.addLane(lanev20);
 				//copy values
@@ -142,10 +142,10 @@ public class LaneDefinitionsV11ToV20Conversion {
 			int mostRight = l2lv11.getLanes().size() / 2;
 			SortedMap<Double, Link> outLinksByAngle = CalculateAngle.getOutLinksSortedByAngle(link);
 			LaneData20 newLane;
-			Set<Lane> assignedLanes = new HashSet<Lane>();
+			Set<LaneData11> assignedLanes = new HashSet<LaneData11>();
 			for (Link outlink : outLinksByAngle.values()){
 //				log.info("Outlink: " + outlink.getId());
-				for (Lane oldLane : l2lv11.getLanes().values()){
+				for (LaneData11 oldLane : l2lv11.getLanes().values()){
 //					log.info("lane: " + oldLane.getId());
 					if (assignedLanes.contains(oldLane)){
 						continue;

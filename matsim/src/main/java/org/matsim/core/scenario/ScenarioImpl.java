@@ -40,8 +40,6 @@ import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
-import org.matsim.lanes.data.v11.LaneDefinitions;
-import org.matsim.lanes.data.v11.LaneDefinitionsImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.VehicleUtils;
@@ -68,7 +66,6 @@ public class ScenarioImpl implements Scenario {
 	private final ConcurrentHashMap<String, Id> idMap = new ConcurrentHashMap<String, Id>();
 
 	//non-mandatory attributes
-	private LaneDefinitions laneDefinitions;
 	private TransitSchedule transitSchedule = null;
 
 	private Households households;
@@ -93,20 +90,12 @@ public class ScenarioImpl implements Scenario {
 		if (this.config.scenario().isUseVehicles()){
 			this.createVehicleContainer();
 		}
-		if (this.config.scenario().isUseLanes()){
-			this.createLaneDefinitionsContainer();
-		}
 		if (this.config.scenario().isUseKnowledges()){
 			this.createKnowledges();
 		}
 		if (this.config.scenario().isUseTransit()) {
 			this.createTransitSchedule();
 		}
-		// this did not do anything (there is no "typed getter" for signals,
-		// they are added as a custom scenario element) td, feb'14
-		//if (this.config.scenario().isUseSignalSystems()){
-		//	this.createSignals();
-		//}
 	}
 
 	/**
@@ -163,31 +152,6 @@ public class ScenarioImpl implements Scenario {
 
 		this.knowledges = new KnowledgesImpl();
 		return true;
-	}
-
-	/**
-	 * Creates a LaneDefinition container and stores it, if it does not exist.
-	 * This is necessary only in very special use cases, when one needs
-	 * to create such a container <b>without</b> setting the useLanes
-	 * config switch to true.
-	 *
-	 * @return true if a new container was initialized, false otherwise
-	 */
-	public boolean createLaneDefinitionsContainer() {
-		if ( this.laneDefinitions != null ) return false;
-
-		if ( !this.config.scenario().isUseLanes() ) {
-			log.info( "creating lanes definitions container while switch in config set to false. File will not be loaded automatically." );
-		}
-
-		this.laneDefinitions = new LaneDefinitionsImpl();
-		return true;
-		// thought: this is not the responsibility of the scenario to add 
-		// custom elements (the idea being that those elements are not known.
-		// td, oct 2013
-//		this.addScenarioElement(
-//				LaneDefinitions20.ELEMENT_NAME,
-//				new LaneDefinitions20Impl());
 	}
 
 	/**
@@ -252,25 +216,6 @@ public class ScenarioImpl implements Scenario {
 	@Deprecated
 	public void setPopulation(Population population) {
 		this.population = population;
-	}
-
-	public LaneDefinitions getLaneDefinitions11() {
-		if ( this.laneDefinitions == null ) {
-			if ( this.config.scenario().isUseLanes() ) {
-				this.createLaneDefinitionsContainer();
-			}
-			else {
-				// throwing an exception should be the right approach,
-				// but it requires some testing (there may be places in the code
-				// which are happy with getting a null pointer, and would then
-				// not work anymore)
-				// throw new IllegalStateException(
-				log.warn(
-						"no lane definitions, and lanes not activated from config. You must first call the create method of ScenarioImpl." );
-			}
-		}
-
-		return laneDefinitions;
 	}
 
 	@Override

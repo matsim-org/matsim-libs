@@ -86,7 +86,7 @@ public class QSimSignalEngine implements SignalEngine {
 
 	private SignalizeableItem getQLane(Id laneId, QLinkLanesImpl link){
 		if (link.getQueueLanes().containsKey(laneId)){
-			return link.getQueueLanes().get(laneId);
+			return (SignalizeableItem) link.getQueueLanes().get(laneId);
 		}
 		throw new IllegalArgumentException("QLane Id " + laneId + "on link Id" + link.getLink().getId() + "  not found. Check configuration!");
 	}

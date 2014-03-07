@@ -24,11 +24,11 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -40,7 +40,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.lanes.vis.VisLinkWLanes;
 import org.matsim.signalsystems.mobsim.DefaultSignalizeableItem;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;
 import org.matsim.signalsystems.model.SignalGroupState;
@@ -62,7 +61,7 @@ import org.matsim.vis.snapshotwriters.VisData;
  *
  * @author nagel
  */
-class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
+final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 
 	/**
 	 * The remaining integer part of the flow capacity available in one time step to move vehicles into the
@@ -119,7 +118,7 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 	/**
 	 * LaneEvents should only be fired if there is more than one QueueLane on a QueueLink
 	 * because the LaneEvents are identical with LinkEnter/LeaveEvents otherwise.
-	 * Possibly set to "true" in QLane .
+	 * Set to "true" in QLinkImpl.
 	 */
 	boolean generatingEvents = false;
 
@@ -133,12 +132,6 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 
 	// (still) private:
 	private VisData visData = new VisDataImpl() ;
-	/**
-	 * This flag indicates whether the QLane is the first lane on the link or one
-	 * of the subsequent lanes.
-	 */
-	boolean isFirstLane = true ;
-	double endsAtMetersFromLinkEnd = 0. ;
 
 	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue ) {
 		this(qLinkImpl, vehicleQueue,  qLinkImpl.getLink().getId() ) ;
@@ -348,19 +341,14 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 
 		while ((veh = vehQueue.peek()) != null) {
 			//we have an original QueueLink behaviour
-			if ((veh.getEarliestLinkExitTime() > now) && this.isFirstLane && (this.endsAtMetersFromLinkEnd == 0.0)){
-				return;
-			}
-			//this is the aneumann PseudoLink behaviour
-			// yyyy ????  If anything, this should be resolved at entry (addFromUpstream). kai, sep'13
-			else if (Math.floor(veh.getEarliestLinkExitTime()) > now){
+			if (veh.getEarliestLinkExitTime() > now){
 				return;
 			}
 
 			MobsimDriverAgent driver = veh.getDriver();
 
 			if (driver instanceof TransitDriverAgent) {
-				HandleTransitStopResult handleTransitStop = qLink.handleTransitStop(now, veh, (TransitDriverAgent) driver);
+				HandleTransitStopResult handleTransitStop = qLink.transitQLink.handleTransitStop(now, veh, (TransitDriverAgent) driver, this.qLink.link.getId());
 				if (handleTransitStop == HandleTransitStopResult.accepted) {
 					// vehicle has been accepted into the transit vehicle queue of the link.
 					removeVehicleFromQueue(now) ;
@@ -369,6 +357,7 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 					continue; // yy why "continue", and not "break" or "return"?  Seems to me that this
 					// is currently only working because qLink.handleTransitStop(...) also increases the
 					// earliestLinkExitTime for the present vehicle.  kai, oct'13
+					// zz From my point of view it is exactly like described above. dg, mar'14
 				} else if (handleTransitStop == HandleTransitStopResult.continue_driving) {
 					// Do nothing, but go on..
 				}
@@ -493,16 +482,10 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 		return vehicles ;
 	}
 
-	public final QVehicle peekFirstVehicle(){
-		return this.buffer.peek();
-	}
-	
 	@Override
 	public final QVehicle popFirstVehicle() {
+		QVehicle veh = removeFirstVehicle();
 		double now = qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
-		QVehicle veh = buffer.poll();
-		usedBufferStorageCapacity = usedBufferStorageCapacity - veh.getSizeInEquivalents();
-		bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		if (this.generatingEvents) {
 			this.qLink.network.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(
 					now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()
@@ -511,6 +494,14 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 		qLink.network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
 				now, veh.getDriver().getId(), this.id, veh.getId()
 		));
+		return veh;
+	}
+	
+	final QVehicle removeFirstVehicle(){
+		double now = qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+		QVehicle veh = buffer.poll();
+		usedBufferStorageCapacity = usedBufferStorageCapacity - veh.getSizeInEquivalents();
+		bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		return veh;
 	}
 
@@ -581,7 +572,7 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 		// (I now think that this is some fractional leftover from an earlier lane. kai, sep'13)
 		// (I also think it is never triggered for regular lanes since there the numbers are integerized (see below). kai, sep'13)
 
-		if ( this.endsAtMetersFromLinkEnd == 0.0 ) {
+//		if ( this.endsAtMetersFromLinkEnd == 0.0 ) {
 //			/* It's a QLane that is directly connected to a QNode,
 //			 * so we have to floor the freeLinkTravelTime in order the get the same
 //			 * results compared to the old mobSim */
@@ -590,7 +581,7 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 			// values, but I don't see why this has to be, and worse, it is wrong when the time step is
 			// not one second.  And obviously dangerous if someone tries sub-second time steps.
 			// kai, sep'13
-		}
+//		}
 
 		veh.setEarliestLinkExitTime(earliestExitTime);
 		veh.setCurrentLink(qLink.getLink());
@@ -606,10 +597,10 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 		if ( QueueWithBuffer.HOLES ) {
 			holes.poll();
 		}
-		if (this.generatingEvents) {
-			this.qLink.network.simEngine.getMobsim().getEventsManager()
-			.processEvent(new LaneEnterEvent(now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()));
-		}
+//		if (this.generatingEvents) {
+//			this.qLink.network.simEngine.getMobsim().getEventsManager()
+//			.processEvent(new LaneEnterEvent(now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()));
+//		}
 	}
 
 	@Override
@@ -685,12 +676,12 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 	}
 
 	class VisDataImpl implements VisData {
-
-
-		private VisLinkWLanes otfLink;
+		private Coord upstreamCoord;
+		private Coord downsteamCoord;
+		private double euklideanDistance;
 
 		@Override
-		public final Collection<AgentSnapshotInfo> getAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
+		public final Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
 			AgentSnapshotInfoBuilder snapshotInfoBuilder = QueueWithBuffer.this.network.simEngine.getAgentSnapshotInfoBuilder();
 
 			double numberOfVehiclesDriving = QueueWithBuffer.this.buffer.size() + QueueWithBuffer.this.vehQueue.size();
@@ -725,9 +716,9 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 			Integer lane = snapshotInfoBuilder.guessLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 			double speedValue = snapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh,
 					QueueWithBuffer.this.inverseFlowCapacityPerTimeStep, now, link.getFreespeed());
-			if (this.otfLink != null){
-				snapshotInfoBuilder.createAndAddVehiclePosition(positions, this.otfLink.getLinkStartCoord(), this.otfLink.getLinkEndCoord(),
-						QueueWithBuffer.this.length, this.otfLink.getEuklideanDistance(), veh,
+			if (this.upstreamCoord != null){
+				snapshotInfoBuilder.createAndAddVehiclePosition(positions, this.upstreamCoord, this.downsteamCoord,
+						QueueWithBuffer.this.length, this.euklideanDistance, veh,
 						lastDistanceFromFromNode, lane, speedValue);
 			}
 			else {
@@ -737,9 +728,11 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 			return lastDistanceFromFromNode;
 		}
 
-		public void setOtfLink(VisLinkWLanes otfLink) {
-			this.otfLink = otfLink;
-		}
+		 void setVisInfo(Coord upstreamCoord, Coord downstreamCoord, double euklideanDistance) {
+			 this.upstreamCoord = upstreamCoord;
+			 this.downsteamCoord = downstreamCoord;
+			 this.euklideanDistance = euklideanDistance;
+		 }
 	}
 
 }

@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.lanes.LaneImpl;
+import org.matsim.lanes.ModelLane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.lanes.utils.LanesUtils;
@@ -66,7 +66,10 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 			if (this.lanes != null){
 				l2l = this.lanes.getLanesToLinkAssignments().get(visLink.getLink().getId());
 			}
-			List<LaneImpl> la = LanesUtils.createLanes(visLink.getLink(), l2l);
+			List<ModelLane> la = null;
+			if (l2l != null) {
+				la = LanesUtils.createLanes(visLink.getLink(), l2l);
+			}
 			VisLinkWLanes otfLink = this.laneModelBuilder.createVisLinkLanes(OTFServerQuadTree.getOTFTransformation(), visLink, config.qsim().getNodeOffset(), la);
 			//write link data
 			ByteBufferUtils.putObject(out, otfLink);

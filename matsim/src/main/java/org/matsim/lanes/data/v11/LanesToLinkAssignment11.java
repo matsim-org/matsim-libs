@@ -1,9 +1,10 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- *                                                                         *
+/* **********************************import java.util.List;
+
+import org.matsim.interfaces.basic.v01.Id;
+                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,16 +18,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vis.snapshotwriters;
+package org.matsim.lanes.data.v11;
 
-import java.util.Collection;
+import java.util.SortedMap;
 
+import org.matsim.api.core.v01.Id;
 /**
- * Interface for methods to provide a visualizer with data.
+ *
  * @author dgrether
+ *
  */
-public interface VisData {
+public interface LanesToLinkAssignment11 {
 
-	public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(final Collection<AgentSnapshotInfo> positions);
+	public SortedMap<Id, LaneData11> getLanes();
+
+	public void addLane(LaneData11 lane);
+
+	public Id getLinkId();
 
 }

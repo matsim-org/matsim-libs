@@ -21,7 +21,7 @@ package org.matsim.lanes.data;
 
 import org.matsim.core.api.internal.MatsimSomeWriter;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
-import org.matsim.lanes.data.v11.LaneDefinitions;
+import org.matsim.lanes.data.v11.LaneDefinitions11;
 import org.matsim.lanes.data.v11.LaneDefinitionsWriter11;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
@@ -52,7 +52,7 @@ public class MatsimLaneDefinitionsWriter implements MatsimSomeWriter {
 		writerDelegate.write(filename);
 	}
 	
-	public void writeFile11(String filename, LaneDefinitions lanedefs){
+	public void writeFile11(String filename, LaneDefinitions11 lanedefs){
 		MatsimJaxbXmlWriter writerDelegate = new LaneDefinitionsWriter11(lanedefs);
 		writerDelegate.write(filename);
 	}

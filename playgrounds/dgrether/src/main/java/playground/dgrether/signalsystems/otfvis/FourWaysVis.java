@@ -19,18 +19,17 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.otfvis;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
 import org.matsim.signalsystems.builder.FromDataBuilder;
-import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
@@ -41,7 +40,7 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class FourWaysVis {
 
-	public static final String TESTINPUTDIR = "../../matsim/src/test/resources/test/input/org/matsim/signalsystems/TravelTimeFourWaysTest/";
+	public static final String TESTINPUTDIR = "../../../matsim/trunk/src/test/resources/test/input/org/matsim/signalsystems/TravelTimeFourWaysTest/";
 	
 	/**
 	 * @param args
@@ -50,36 +49,45 @@ public class FourWaysVis {
 
 		String netFile = TESTINPUTDIR + "network.xml.gz";
 		String lanesFile  = TESTINPUTDIR + "testLaneDefinitions_v1.1.xml";
+		String lanesFile20  = TESTINPUTDIR + "testLaneDefinitions_v2.0.xml";
 		String popFile = TESTINPUTDIR + "plans.xml.gz";
 		String signalFile = TESTINPUTDIR + "testSignalSystems_v2.0.xml";
 		String signalGroupsFile = TESTINPUTDIR + "testSignalGroups_v2.0.xml";
 		String signalControlFile = TESTINPUTDIR + "testSignalControl_v2.0.xml";
 		
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().network().setInputFile(netFile);
-		scenario.getConfig().plans().setInputFile(popFile);
-		scenario.getConfig().qsim().setSnapshotStyle("queue");
-		scenario.getConfig().qsim().setStuckTime(100.0);
+		Config config = ConfigUtils.createConfig();
+		config.network().setInputFile(netFile);
+		config.plans().setInputFile(popFile);
+		config.qsim().setSnapshotStyle("queue");
+		config.qsim().setStuckTime(100.0);
 		
-		scenario.getConfig().network().setLaneDefinitionsFile(lanesFile);
-		scenario.getConfig().scenario().setUseLanes(true);
 		
-		scenario.getConfig().signalSystems().setSignalSystemFile(signalFile);
-		scenario.getConfig().signalSystems().setSignalGroupsFile(signalGroupsFile);
-		scenario.getConfig().signalSystems().setSignalControlFile(signalControlFile);
-		scenario.getConfig().scenario().setUseSignalSystems(true);
+		config.signalSystems().setSignalSystemFile(signalFile);
+		config.signalSystems().setSignalGroupsFile(signalGroupsFile);
+		config.signalSystems().setSignalControlFile(signalControlFile);
+		config.scenario().setUseSignalSystems(true);
 		
-		ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setAgentSize(130.0f);
+		OTFVisConfigGroup otfconfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
+		otfconfig.setAgentSize(130.0f);
+
 		
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
-		loader.loadScenario();
+//		LaneDefinitions laneDefinitions = new LaneDefinitionsImpl();
+//		LaneDefinitionsReader11 reader = new LaneDefinitionsReader11(laneDefinitions, MatsimLaneDefinitionsReader.SCHEMALOCATIONV11);
+//		reader.readFile(lanesFile);
+		LaneDefinitonsV11ToV20Converter converter = new LaneDefinitonsV11ToV20Converter();
+		converter.convert(lanesFile, lanesFile20, netFile);
+
+		config.network().setLaneDefinitionsFile(lanesFile20);
+		config.scenario().setUseLanes(true);
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		
-		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(scenario.getConfig().signalSystems());
-		SignalsData signalsData = signalsLoader.loadSignalsData();
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME , signalsData);
+//		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(config.signalSystems());
+//		SignalsData signalsData = signalsLoader.loadSignalsData();
+//		scenario.addScenarioElement(SignalsData.ELEMENT_NAME , signalsData);
 		FromDataBuilder builder = new FromDataBuilder(scenario, events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
@@ -91,8 +99,8 @@ public class FourWaysVis {
 		//		client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
 //		client.setLaneDefinitions(scenario.getLaneDefinitions());
 //		client.setSignalSystems(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());
-		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
-		OTFClientLive.run(scenario.getConfig(), server);
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config, scenario, events, otfVisQSim);
+		OTFClientLive.run(config, server);
 		
 		otfVisQSim.run();
 		

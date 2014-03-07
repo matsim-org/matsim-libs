@@ -49,7 +49,7 @@ public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter implements Mats
 	private static final Logger log = Logger
 			.getLogger(LaneDefinitionsWriter11.class);
 
-	private LaneDefinitions laneDefinitions;
+	private LaneDefinitions11 laneDefinitions;
 
 	private XMLLaneDefinitions xmlLaneDefinitions;
 
@@ -59,7 +59,7 @@ public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter implements Mats
 	 * @param lanedefs
 	 *
 	 */
-	public LaneDefinitionsWriter11(LaneDefinitions lanedefs) {
+	public LaneDefinitionsWriter11(LaneDefinitions11 lanedefs) {
 		log.info("Using LaneDefinitionWriter11...");
 		this.laneDefinitions = lanedefs;
 		this.xmlLaneDefinitions = convertBasicToXml();
@@ -92,11 +92,11 @@ public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter implements Mats
 		ObjectFactory fac = new ObjectFactory();
 		XMLLaneDefinitions xmllaneDefs = fac.createXMLLaneDefinitions();
 
-		for (LanesToLinkAssignment ltla : this.laneDefinitions.getLanesToLinkAssignments().values()) {
+		for (LanesToLinkAssignment11 ltla : this.laneDefinitions.getLanesToLinkAssignments().values()) {
 			XMLLanesToLinkAssignmentType xmlltla = fac.createXMLLanesToLinkAssignmentType();
 			xmlltla.setLinkIdRef(ltla.getLinkId().toString());
 
-			for (Lane bl : ltla.getLanes().values()) {
+			for (LaneData11 bl : ltla.getLanes().values()) {
 				XMLLaneType xmllane = fac.createXMLLaneType();
 				xmllane.setId(bl.getId().toString());
 

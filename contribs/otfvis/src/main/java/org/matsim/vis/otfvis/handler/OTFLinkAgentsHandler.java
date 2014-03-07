@@ -97,7 +97,7 @@ public class OTFLinkAgentsHandler extends OTFDataReader {
 			out.putFloat((float)0.) ; 
 
 			positions.clear();
-			this.src.getVisData().getAgentSnapshotInfo( positions);
+			this.src.getVisData().addAgentSnapshotInfo( positions);
 
 			if (showParked) {
 				out.putInt(positions.size());

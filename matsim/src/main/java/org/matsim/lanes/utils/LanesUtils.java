@@ -27,10 +27,10 @@ import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.lanes.LaneImpl;
-import org.matsim.lanes.data.v11.Lane;
-import org.matsim.lanes.data.v11.LaneDefinitionsFactory;
-import org.matsim.lanes.data.v11.LanesToLinkAssignment;
+import org.matsim.lanes.ModelLane;
+import org.matsim.lanes.data.v11.LaneData11;
+import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
+import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneData20MeterFromLinkEndComparator;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
@@ -48,9 +48,9 @@ public final class LanesUtils {
 	 * lanes and the given Ids of the downstream links the lane leads to. The Lane is added to the LanesToLinkAssignment
 	 * given as parameter.
 	 */
-	public static void createAndAddLane(LanesToLinkAssignment l2l, LaneDefinitionsFactory factory, Id laneId, 
+	public static void createAndAddLane(LanesToLinkAssignment11 l2l, LaneDefinitionsFactory11 factory, Id laneId, 
 			double length, 	double noLanes, Id... toLinkIds) {
-		Lane lane = factory.createLane(laneId);
+		LaneData11 lane = factory.createLane(laneId);
 		for (Id toLinkId : toLinkIds) {
 			lane.addToLinkId(toLinkId);
 		}
@@ -65,24 +65,24 @@ public final class LanesUtils {
 	 * @param lanesToLinkAssignment
 	 * @return sorted list with the most upstream lane at the first position. 
 	 */
-	public static List<LaneImpl> createLanes(Link link, LanesToLinkAssignment20 lanesToLinkAssignment) {
-		List<LaneImpl> queueLanes = new ArrayList<LaneImpl>();
+	public static List<ModelLane> createLanes(Link link, LanesToLinkAssignment20 lanesToLinkAssignment) {
+		List<ModelLane> queueLanes = new ArrayList<ModelLane>();
 		List<LaneData20> sortedLanes =  new ArrayList<LaneData20>(lanesToLinkAssignment.getLanes().values());
 		Collections.sort(sortedLanes, new LaneData20MeterFromLinkEndComparator());
 		Collections.reverse(sortedLanes);
 
-		List<LaneImpl> laneList = new LinkedList<LaneImpl>();
+		List<ModelLane> laneList = new LinkedList<ModelLane>();
 		LaneData20 firstLane = sortedLanes.remove(0);
 		if (firstLane.getStartsAtMeterFromLinkEnd() != link.getLength()) {
 			throw new IllegalStateException("First Lane Id " + firstLane.getId() + " on Link Id " + link.getId() +
 			"isn't starting at the beginning of the link!");
 		}
-		LaneImpl firstQLane = new LaneImpl(firstLane);
+		ModelLane firstQLane = new ModelLane(firstLane);
 		laneList.add(firstQLane);
-		Stack<LaneImpl> laneStack = new Stack<LaneImpl>();
+		Stack<ModelLane> laneStack = new Stack<ModelLane>();
 
 		while (!laneList.isEmpty()){
-			LaneImpl lastQLane = laneList.remove(0);
+			ModelLane lastQLane = laneList.remove(0);
 			laneStack.push(lastQLane);
 			queueLanes.add(lastQLane);
 
@@ -94,7 +94,7 @@ public final class LanesUtils {
 				for (Id toLaneId : toLaneIds){
 					LaneData20 currentLane = lanesToLinkAssignment.getLanes().get(toLaneId);
 					nextMetersFromLinkEnd = currentLane.getStartsAtMeterFromLinkEnd();
-					LaneImpl currentQLane = new LaneImpl(currentLane);
+					ModelLane currentQLane = new ModelLane(currentLane);
 					laneList.add(currentQLane);
 					lastQLane.addAToLane(currentQLane);
 				}
@@ -111,14 +111,14 @@ public final class LanesUtils {
 
 		//fill toLinks
 		while (! laneStack.isEmpty()){
-			LaneImpl qLane = laneStack.pop();
+			ModelLane qLane = laneStack.pop();
 			if (qLane.getToLanes() == null || (qLane.getToLanes().isEmpty())) {
 				for (Id toLinkId : qLane.getLaneData().getToLinkIds()){
 					qLane.addDestinationLink(toLinkId);
 				}
 			}
 			else {
-				for (LaneImpl subsequentLane : qLane.getToLanes()){
+				for (ModelLane subsequentLane : qLane.getToLanes()){
 					for (Id toLinkId : subsequentLane.getDestinationLinkIds()){
 						qLane.addDestinationLink(toLinkId);
 					}

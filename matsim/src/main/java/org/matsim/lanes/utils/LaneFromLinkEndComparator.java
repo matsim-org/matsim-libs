@@ -23,12 +23,12 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 import org.matsim.core.api.internal.MatsimComparator;
-import org.matsim.lanes.LaneImpl;
+import org.matsim.lanes.ModelLane;
 
-class LaneFromLinkEndComparator implements Comparator<LaneImpl>, Serializable, MatsimComparator {
+class LaneFromLinkEndComparator implements Comparator<ModelLane>, Serializable, MatsimComparator {
 	private static final long serialVersionUID = 1L;
 	@Override
-	public int compare(final LaneImpl o1, final LaneImpl o2) {
+	public int compare(final ModelLane o1, final ModelLane o2) {
 		if (o1.getEndsAtMeterFromLinkEnd() < o2.getEndsAtMeterFromLinkEnd()) {
 			return -1;
 		} else if (o1.getEndsAtMeterFromLinkEnd() > o2.getEndsAtMeterFromLinkEnd()) {

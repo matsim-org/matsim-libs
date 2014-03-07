@@ -57,7 +57,7 @@ VisData {
 	}
 
 	@Override
-	public Collection<AgentSnapshotInfo> getAgentSnapshotInfo(Collection<AgentSnapshotInfo> snapshotList) {
+	public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> snapshotList) {
 		double time = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 		for (TeleportationVisData teleportationVisData : teleportationData.values()) {
 			teleportationVisData.calculatePosition(time);

@@ -22,7 +22,6 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -30,7 +29,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 
@@ -44,10 +42,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
-import org.matsim.core.mobsim.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * QLinkInternalI is the interface; this here is an abstract class that contains implementation
@@ -62,8 +57,6 @@ abstract class AbstractQLink extends QLinkInternalI {
 		continue_driving, rehandle, accepted
 
 	}
-
-	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
 
 	private static Logger log = Logger.getLogger(AbstractQLink.class);
 
@@ -103,8 +96,10 @@ abstract class AbstractQLink extends QLinkInternalI {
 	 * A list containing all transit vehicles that are at a stop but not
 	 * blocking other traffic on the lane.
 	 */
-	protected final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<QVehicle>(5, VEHICLE_EXIT_COMPARATOR);
 
+	boolean active = false;
+
+	TransitQLink transitQLink;
 
 	AbstractQLink(Link link, QNetwork network) {
 		this.link = link ;
@@ -114,8 +109,17 @@ abstract class AbstractQLink extends QLinkInternalI {
 				network.simEngine.getMobsim().getScenario().getConfig().qsim().isInsertingWaitingVehiclesBeforeDrivingVehicles() ;
 	}
 
-	abstract void activateLink();
-
+	/** 
+	 * Links are active while (see checkForActivity()): () vehicles move on it; () vehicles wait to enter; () vehicles wait at the transit stop.
+	 * Once all of those have left the link, the link is no longer active.  It then needs to be activated from the outside, which is done by
+	 * this method.
+	 */
+	void activateLink() {
+		if (!this.active) {
+			netElementActivator.activateLink(this);
+			this.active = true;
+		}
+	}
 	@Override
 	/*package*/ final void addParkedVehicle(MobsimVehicle vehicle) {
 		QVehicle qveh = (QVehicle) vehicle; // cast ok: when it gets here, it needs to be a qvehicle to work.
@@ -154,6 +158,8 @@ abstract class AbstractQLink extends QLinkInternalI {
 	/*package*/ Collection<MobsimAgent> getAdditionalAgentsOnLink() {
 		return Collections.unmodifiableCollection( this.additionalAgentsOnLink.values());
 	}
+	
+
 
 	@Override
 	void clearVehicles() {
@@ -398,28 +404,5 @@ abstract class AbstractQLink extends QLinkInternalI {
 		else return null;
 	}
 
-	protected HandleTransitStopResult handleTransitStop(final double now, final QVehicle veh, final TransitDriverAgent transitDriver) {
-		TransitStopFacility stop = transitDriver.getNextTransitStop();
-		if ((stop != null) && (stop.getLinkId().equals(getLink().getId()))) {
-			double delay = transitDriver.handleTransitStop(stop, now);
-			if (delay > 0.0) {
-				veh.setEarliestLinkExitTime(now + delay);
-				// (if the vehicle is not removed from the queue in the following lines, then this will effectively block the lane
-				if (!stop.getIsBlockingLane()) {
-					transitVehicleStopQueue.add(veh);
-					// transit vehicle which is removed to the transit stop space
-					return HandleTransitStopResult.accepted;
-				} else {
-					// transit vehicle which blocks its lane by getting its exit time increased
-					return HandleTransitStopResult.rehandle;
-				}
-			} else {
-				// transit vehicle which instantaneously delivered passangers
-				return HandleTransitStopResult.rehandle;
-			}
-		} else {
-			// transit vehicle which either arrives or continues driving
-			return HandleTransitStopResult.continue_driving;
-		}
-	}
+
 }

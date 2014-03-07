@@ -68,7 +68,8 @@ public class LanesIntegrationTest {
 		config.network().setLaneDefinitionsFile(lanes20);
 		config.plans().setInputFile(testUtils.getClassInputDirectory() + "population.xml");
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "output");
-		
+		config.controler().setWriteEventsInterval(100);
+		config.controler().setWritePlansInterval(100);
 		Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
 		TestListener listener = new TestListener();
