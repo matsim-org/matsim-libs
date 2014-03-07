@@ -36,11 +36,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class FirstSimulation {
  
 	static String networkFile = "input/oslo/trondheim_network_with_lanes.xml";
-	static String cvsSplitBy = ",";
+	//static String cvsSplitBy = ",";
 	static String outputDir = "output/oslo/";
 	//static String plansFile = "input/oslo/plans_from_csv.xml";
-	static String plansFile = "input/oslo/plans_from_start_og_random.xml";
-	private static int numberOfIterations = 20;
+	static String plansFile = "input/oslo/plans_from_eksport_stort_datasett.xml";
+	//static String plansFile = "input/oslo/plans_from_start_og_random.xml";
+	private static int numberOfIterations = 200;
 	//static String plansFile = "input/oslo/smallpop.xml";
 	/**
 	 * @param args
@@ -119,14 +120,10 @@ public class FirstSimulation {
 		 */
  
 		
-		//System.out.println(config.getParam("planscalcroute", "beelineDistanceFactor"));
-		
 		System.out.println(config.plansCalcRoute().getBeelineDistanceFactor());
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		
-		//new MatsimNetworkReader(scenario).readFile("input/oslo/trondheim.xml");
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		
 //		Network network = scenario.getNetwork();
@@ -144,6 +141,9 @@ public class FirstSimulation {
 		controler.getConfig().plans().setInputFile(plansFile);
 				 
 		controler.getEvents().addHandler(new TollHandler(population, controler, scenario));
+		
+		controler.getConfig().setParam("global", "numberOfThreads", "2");
+		controler.getConfig().setParam("controler", "routingAlgorithmType" , "AStarLandmarks");
 		
 		controler.run();
 	}
