@@ -65,7 +65,7 @@ public class PlansScoring implements ScoringListener, IterationStartsListener, I
 		this.events = events ;
 		this.scoringFunctionFactory = scoringFunctionFactory ;
 		this.controlerIO = controlerIO;
-		this.travelDistanceStats = new TravelDistanceStats(sc.getConfig(), sc.getNetwork(), controlerIO.getOutputFilename(Controler.FILENAME_TRAVELDISTANCESTATS), sc.getConfig().controler().isCreateGraphs());
+		this.travelDistanceStats = new TravelDistanceStats(sc.getConfig(), sc.getNetwork(), sc.getTransitSchedule(), controlerIO.getOutputFilename(Controler.FILENAME_TRAVELDISTANCESTATS), sc.getConfig().controler().isCreateGraphs());
 	}
 
 	@Override

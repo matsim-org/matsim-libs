@@ -41,6 +41,8 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
  *
@@ -70,6 +72,7 @@ public class TravelDistanceStats {
 	private StatsCalculator[] statsCalculators = null;
 	private final AtomicBoolean hadException = new AtomicBoolean(false);
 	private final ExceptionHandler exceptionHandler = new ExceptionHandler(this.hadException);
+	private TransitSchedule transitSchedule;
 
 	private final static Logger log = Logger.getLogger(TravelDistanceStats.class);
 
@@ -78,9 +81,10 @@ public class TravelDistanceStats {
 	 * @param createPNG true if in every iteration, the distance statistics should be visualized in a graph and written to disk.
 	 * @throws UncheckedIOException
 	 */
-	public TravelDistanceStats(final Config config, final Network network, final String filename, final boolean createPNG) throws UncheckedIOException {
+	public TravelDistanceStats(final Config config, final Network network, final TransitSchedule transitSchedule, final String filename, final boolean createPNG) throws UncheckedIOException {
 		this.config = config;
 		this.network = network;
+		this.transitSchedule = transitSchedule;
 		this.fileName = filename;
 		this.createPNG = createPNG;
 		if (this.createPNG) {
@@ -148,7 +152,8 @@ public class TravelDistanceStats {
 		this.threads = null;
 
 		log.info("-- average of the average leg distance per plan (executed plans only): " + (sumAvgPlanLegTravelDistanceExecuted / nofLegTravelDistanceExecuted));
-		log.info("(TravelDistanceStats takes an average over all legs that have a NetworkRoute.  These are usually all car legs.)") ;
+		log.info("(TravelDistanceStats takes an average over all legs where the simulation reports travelled distances. These are car legs, pt legs,");
+		log.info("(and teleported legs whose route contains a distance.)");
 
 		try {
 			this.out.write(iteration + "\t" + (sumAvgPlanLegTravelDistanceExecuted / nofLegTravelDistanceExecuted) + "\t" + "\n");
@@ -201,7 +206,7 @@ public class TravelDistanceStats {
 
 		// setup threads
 		for (int i = 0; i < numOfThreads; i++) {
-			StatsCalculator statsCalculatorThread = new StatsCalculator(this.network);
+			StatsCalculator statsCalculatorThread = new StatsCalculator();
 			Thread thread = new Thread(statsCalculatorThread, this.getClass().getSimpleName() + "." + StatsCalculator.class.getSimpleName() + "." + i);
 			thread.setUncaughtExceptionHandler(this.exceptionHandler);
 			this.threads[i] = thread;
@@ -209,19 +214,13 @@ public class TravelDistanceStats {
 		}
 	}
 
-	private static class StatsCalculator implements Runnable {
+	private class StatsCalculator implements Runnable {
 
 
 		double sumAvgPlanLegTravelDistanceExecuted = 0.0;
 		int nofLegTravelDistanceExecuted = 0;
 
-		private Collection<Plan> persons;
-		private Network network;
-
-		public StatsCalculator(Network network) {
-			this.network = network;
-			persons = new ArrayList<Plan>();
-		}
+		private Collection<Plan> persons = new ArrayList<Plan>();
 
 		public void addPerson(Plan plan) {
 			persons.add(plan);
@@ -245,7 +244,10 @@ public class TravelDistanceStats {
 				if (pe instanceof Leg) {
 					final Leg leg = (Leg) pe;
 					if (leg.getRoute() instanceof NetworkRoute) {
-						planTravelDistance += RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network);
+						planTravelDistance += RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), network);
+						numberOfLegs++;
+					} else if (leg.getRoute() instanceof ExperimentalTransitRoute) {
+						planTravelDistance += RouteUtils.calcDistance((ExperimentalTransitRoute) leg.getRoute(), transitSchedule, network);
 						numberOfLegs++;
 					} else {
 						double distance = leg.getRoute().getDistance();
