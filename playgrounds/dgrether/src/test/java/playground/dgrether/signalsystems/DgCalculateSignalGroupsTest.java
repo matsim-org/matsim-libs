@@ -42,10 +42,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
-import org.matsim.lanes.data.v11.Lane;
-import org.matsim.lanes.data.v11.LaneDefinitions;
-import org.matsim.lanes.data.v11.LaneDefinitionsFactory;
-import org.matsim.lanes.data.v11.LanesToLinkAssignment;
+import org.matsim.lanes.data.v11.LaneData11;
+import org.matsim.lanes.data.v11.LaneDefinitions11;
+import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
+import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
+import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
 import org.matsim.signalsystems.data.SignalsData;
@@ -352,13 +353,13 @@ public class DgCalculateSignalGroupsTest {
 	 * @param sc 
 	 */
 	private void createLanesFor3WayNetwork(ScenarioImpl sc) {
-		LaneDefinitions lanes = sc.getLaneDefinitions11();
+		LaneDefinitions11 lanes = new LaneDefinitions11Impl();
 		
-		LaneDefinitionsFactory fac = lanes.getFactory();
+		LaneDefinitionsFactory11 fac = lanes.getFactory();
 		//link 13
-		LanesToLinkAssignment l2l = fac.createLanesToLinkAssignment(this.getId(13));
+		LanesToLinkAssignment11 l2l = fac.createLanesToLinkAssignment(this.getId(13));
 		lanes.addLanesToLinkAssignment(l2l);
-		Lane lane = fac.createLane(this.getId(1));
+		LaneData11 lane = fac.createLane(this.getId(1));
 		l2l.addLane(lane);
 		lane.addToLinkId(this.getId(32));
 		lane = fac.createLane(this.getId(2));

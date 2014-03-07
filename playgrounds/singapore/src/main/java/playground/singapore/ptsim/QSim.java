@@ -502,11 +502,11 @@ public final class QSim implements VisMobsim, Netsim {
 		return new VisData() {
 
 			@Override
-			public Collection<AgentSnapshotInfo> getAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
+			public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
 				for (MobsimEngine mobsimEngine : mobsimEngines) {
 					if (mobsimEngine instanceof VisData) {
 						VisData visData = (VisData) mobsimEngine;
-						positions = visData.getAgentSnapshotInfo(positions);
+						positions = visData.addAgentSnapshotInfo(positions);
 					}
 				}
 				return positions;

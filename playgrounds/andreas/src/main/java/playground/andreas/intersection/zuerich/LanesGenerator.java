@@ -30,11 +30,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.lanes.data.v11.Lane;
-import org.matsim.lanes.data.v11.LaneImpl;
-import org.matsim.lanes.data.v11.LaneDefinitions;
-import org.matsim.lanes.data.v11.LaneDefinitionsImpl;
-import org.matsim.lanes.data.v11.LanesToLinkAssignment;
+import org.matsim.lanes.data.v11.LaneData11;
+import org.matsim.lanes.data.v11.LaneData11Impl;
+import org.matsim.lanes.data.v11.LaneDefinitions11;
+import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
+import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 
 
 /**
@@ -171,13 +171,13 @@ public class LanesGenerator {
 	 * @param knotenSpurLinkMapping knotennummer -> (spurnummer -> linkid)
 	 * @return
 	 */
-	public LaneDefinitions processLaneDefinitions(Map<Integer, Map<Integer, List<Integer>>> spurSpurMapping, 
+	public LaneDefinitions11 processLaneDefinitions(Map<Integer, Map<Integer, List<Integer>>> spurSpurMapping, 
 			Map<Integer, Map<Integer, String>> knotenSpurLinkMapping) {
 		
 		preprocessData(spurSpurMapping, knotenSpurLinkMapping);
 		
 		//create the lanes ...
-		LaneDefinitions laneDefs = new LaneDefinitionsImpl();
+		LaneDefinitions11 laneDefs = new LaneDefinitions11Impl();
 		for (Integer nodeId : spurSpurMapping.keySet()) {
 			System.out.println();
 			log.info("##########################################################");
@@ -199,13 +199,13 @@ public class LanesGenerator {
 				
 				Id linkId = new IdImpl(linkIdString);
 				//create the assignment
-				LanesToLinkAssignment assignment = laneDefs.getLanesToLinkAssignments().get(linkId);
+				LanesToLinkAssignment11 assignment = laneDefs.getLanesToLinkAssignments().get(linkId);
 				if (assignment == null){
 					assignment = laneDefs.getFactory().createLanesToLinkAssignment(linkId);
 					laneDefs.addLanesToLinkAssignment(assignment);
 				}
 				//and the lane
-				Lane lane = createLaneWithDefaults(fromLaneId);
+				LaneData11 lane = createLaneWithDefaults(fromLaneId);
 				
 				//reset the length if there is a network available
 				log.info("checking the length of the lane..." );
@@ -265,9 +265,9 @@ public class LanesGenerator {
 	
 
 
-	private Lane createLaneWithDefaults(Integer fromLaneId) {
+	private LaneData11 createLaneWithDefaults(Integer fromLaneId) {
 		Id laneId = new IdImpl(fromLaneId);
-		Lane lane = new LaneImpl(laneId);
+		LaneData11 lane = new LaneData11Impl(laneId);
 		lane.setStartsAtMeterFromLinkEnd(45.0);
 		lane.setNumberOfRepresentedLanes(1);
 		return lane;

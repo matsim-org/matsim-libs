@@ -13,7 +13,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
-import org.matsim.lanes.data.v11.LaneDefinitions;
+import org.matsim.lanes.data.v11.LaneDefinitions11;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
@@ -63,7 +63,7 @@ public class GenerateZuerrichOutput {
 		
 		Map<Integer, Map<Integer,  List<Integer>>> knotenVonSpurNachSpurMap = null;
 		Map<Integer, Map<Integer, String>> knotenSpurLinkMap = null;
-		LaneDefinitions laneDefs = null;
+		LaneDefinitions11 laneDefs = null;
 		SignalsScenarioWriter writer = new SignalsScenarioWriter();
 
 		

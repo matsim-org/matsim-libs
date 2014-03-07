@@ -145,7 +145,7 @@ class AssignmentEmulatingQLane extends QLaneInternalI {
 
 			if ( driver instanceof AbstractTransitDriverAgent ) {
 				AbstractTransitDriverAgent transitDriver = (AbstractTransitDriverAgent) driver ;
-			HandleTransitStopResult handleTransitStop = qLink.handleTransitStop(now, veh, transitDriver);
+			HandleTransitStopResult handleTransitStop = qLink.transitQLink.handleTransitStop(now, veh, transitDriver, qLink.link.getId());
 			if (handleTransitStop == HandleTransitStopResult.accepted) {
 				// vehicle has been accepted into the transit vehicle queue of the link.
 				removeVehicleFromQueue(now) ;
@@ -363,7 +363,7 @@ class AssignmentEmulatingQLane extends QLaneInternalI {
 		private VisLinkWLanes otfLink;
 
 		@Override
-		public final Collection<AgentSnapshotInfo> getAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
+		public final Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
 			AgentSnapshotInfoBuilder snapshotInfoBuilder = AssignmentEmulatingQLane.this.network.simEngine.getAgentSnapshotInfoBuilder();
 
 			double numberOfVehiclesDriving = AssignmentEmulatingQLane.this.buffer.size() + AssignmentEmulatingQLane.this.vehQueue.size();
