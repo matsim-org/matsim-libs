@@ -22,36 +22,30 @@
  */
 package playground.southafrica.gauteng;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
-import org.matsim.contrib.matsim4urbansim.utils.network.NetworkSimplifier;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -64,11 +58,12 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.SimStepParallelEventsManagerImpl;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
+import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
@@ -240,17 +235,10 @@ public class GautengControler_subpopulations {
 
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 		config.scenario().setUseVehicles(true); // _after_ scenario loading. :-(
-		// (there will eventually be something like sc.createVehiclesContainer or ((ScenarioImpl)sc).createVehiclesContainer which will
-		// address this problem. kai, feb'14)
-		
 		//yyyy should now be possible to replace by:
 //		((ScenarioImpl)sc).createVehicleContainer() ;
 		// but needs to be tested. kai, feb'14
 		
-//		if ( user==User.kai ) {
-//			simplifyPopulation(sc) ;
-//		}
-
 		/* CREATE VEHICLES. */
 		createVehiclePerPerson(sc);
 
@@ -295,10 +283,10 @@ public class GautengControler_subpopulations {
 				event.getControler().getStrategyManager().setPlanSelectorForRemoval(new DiversityGeneratingPlansRemover( sc.getNetwork() ));
 			}
 		});
-		// needs to be tested!
+		// needs to be tested.  But in current runs, all plans of an agent are exactly identical at end of 1000it.  kai, mar'13
 		
 		// the following is how (in principle) mode-specific vehicle types are set:
-//		controler.setMobsimFactory(new MobsimWithModeDependentVehicleTypes());
+//		controler.setMobsimFactory(new MobsimWithVehicleInsertion());
 
 		// ADDITIONAL ANALYSIS:
 		controler.addControlerListener(new KaiAnalysisListener());
@@ -656,9 +644,9 @@ public class GautengControler_subpopulations {
 	 * 
 	 * @author nagel
 	 */
-	private static final class MobsimWithModeDependentVehicleTypes implements MobsimFactory {
+	private static final class MobsimWithVehicleInsertion implements MobsimFactory {
 		@Override
-		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+		public Mobsim createMobsim(final Scenario sc, EventsManager eventsManager) {
 			QSimConfigGroup conf = sc.getConfig().qsim();
 			if (conf == null) {
 				throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
@@ -674,7 +662,7 @@ public class GautengControler_subpopulations {
 				}
 			}
 
-			QSim qSim = new QSim(sc, eventsManager);
+			final QSim qSim = new QSim(sc, eventsManager);
 
 			ActivityEngine activityEngine = new ActivityEngine();
 			qSim.addMobsimEngine(activityEngine);
@@ -694,46 +682,53 @@ public class GautengControler_subpopulations {
 			TeleportationEngine teleportationEngine = new TeleportationEngine();
 			qSim.addMobsimEngine(teleportationEngine);
 
-			AgentFactory agentFactory;
+			AgentFactory af;
 			if (sc.getConfig().scenario().isUseTransit()) {
-				agentFactory = new TransitAgentFactory(qSim);
+				af = new TransitAgentFactory(qSim);
 				TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
 				transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 				qSim.addDepartureHandler(transitEngine);
 				qSim.addAgentSource(transitEngine);
 				qSim.addMobsimEngine(transitEngine);
 			} else {
-				agentFactory = new DefaultAgentFactory(qSim);
+				af = new DefaultAgentFactory(qSim);
 			}
 			if (sc.getConfig().network().isTimeVariantNetwork()) {
 				qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
 			}
-			PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-			// === code which sets mode vehicles begin
-			Map<String, VehicleType> modeVehicleTypes = new HashMap<String,VehicleType>() ;
+			final AgentFactory agentFactory = af ; // make this final for inner class 
+			
+			AgentSource agentSource = new AgentSource(){
+				@Override
+				public void insertAgentsIntoMobsim() {
+					Population population = sc.getPopulation() ;
+					for (Person p : population.getPersons().values()) {
+						MobsimAgent agent = agentFactory.createMobsimAgentFromPerson(p);
+						Plan plan = p.getSelectedPlan();
+						Set<String> seenModes = new HashSet<String>();
+						for (PlanElement planElement : plan.getPlanElements()) {
+							if (planElement instanceof Leg) {
+								Leg leg = (Leg) planElement;
+								if (sc.getConfig().qsim().getMainModes().contains(leg.getMode())) { // only simulated modes get vehicles
+									if (!seenModes.contains(leg.getMode())) { // create one vehicle per simulated mode, put it at beginning of first leg where needed
+										Id vehId = (Id) population.getPersonAttributes().getAttribute( p.getId().toString(), VEH_ID ) ;
+										Vehicle vehicle = sc.getVehicles().getVehicles().get( vehId ) ;
+										qSim.createAndParkVehicleOnLink(vehicle, PopulationAgentSource.findVehicleLink(p));
+										seenModes.add(leg.getMode());
+									}
+								}
+							}
+						}
+						// When the agent is inserted, it immediately starts its first activity, and
+						// possibly ends it (if it is 0-duration or if the simulation start time is later than
+						// the activity end time), so the action really starts here!
+						// E.g. the vehicle must already be in place at this point.
+						qSim.insertAgentIntoMobsim(agent);
+					}
+				}
+			} ;
 
-			/* Create vehicle types. */
-			LOG.info("Creating vehicle types.");
-			VehicleType vehicle_A2 = new VehicleTypeImpl(new IdImpl("A2"));
-			vehicle_A2.setDescription("Light vehicle with SANRAL toll class `A2'");
-			modeVehicleTypes.put("A2_private", vehicle_A2) ; // assumes that mode is "A2_private"!
-			modeVehicleTypes.put("A2_commercial", vehicle_A2) ; 
-
-			VehicleType vehicle_B = new VehicleTypeImpl(new IdImpl("B"));
-			vehicle_B.setDescription("Short commercial vehicle with SANRAL toll class `B'");
-			vehicle_B.setMaximumVelocity(100.0 / 3.6);
-			vehicle_B.setLength(10.0);
-			modeVehicleTypes.put("B", vehicle_B ) ;
-
-			VehicleType vehicle_C = new VehicleTypeImpl(new IdImpl("C"));
-			vehicle_C.setDescription("Medium/long commercial vehicle with SANRAL toll class `C'");
-			vehicle_C.setMaximumVelocity(80.0 / 3.6);
-			vehicle_C.setLength(15.0);
-			modeVehicleTypes.put("C", vehicle_C ) ;
-
-			agentSource.setModeVehicleTypes(modeVehicleTypes);
-
-			// === code which sets mode vehicles end
+			
 			qSim.addAgentSource(agentSource);
 			return qSim;
 		}
