@@ -91,10 +91,10 @@ public class XVis {
 	private static void testResourceLoading() {
 		String filename = "jlfgr-1_0/toolbarButtonGraphics/general/ZoomIn24.gif";
 //		filename = "jlfgr-1_0/jlfgr-1_0.jar";
-		log.error(filename);
+		log.debug(filename);
 		URL url = XVis.class.getClassLoader().getResource(filename);
 //	URL r = ControlButtonPanel.class.getClassLoader().getResource(filename);
-		log.error("url to resource file: " + url);
+		log.debug("url to resource file: " + url);
 	}
 
 
