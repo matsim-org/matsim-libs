@@ -71,7 +71,7 @@ public class DrawingPreferences {
 
 	private void calcRealScale(){
 		this.realScale = (float) Math.exp(this.scale);
-		log.error("scale: " + this.scale + " real: " + this.realScale);
+//		log.debug("scale: " + this.scale + " real: " + this.realScale);
 	}
 	
 	private void calcScale(){
