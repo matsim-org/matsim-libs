@@ -61,7 +61,7 @@ public class ElectroCabLaunchUtils
         Scenario scenario = context.getScenario();
 
         optimizer.setRankMode(false);
-        optimizer.setIdleRankMode(false);
+        optimizer.setIdleRankMode(true);
         boolean ALLCARSELECTRIC = true;
 
         EventsManager events = qSim.getEventsManager();
@@ -88,7 +88,7 @@ public class ElectroCabLaunchUtils
         }
 
         energyConsumptionTracker = new EnergyConsumptionTracker(elvehicles, scenario.getNetwork());
-        rankArrivalDepartureCharger = new RankArrivalDepartureCharger(elvehicles);
+        rankArrivalDepartureCharger = new RankArrivalDepartureCharger(elvehicles, events);
         taxiCustomerWaitTimeAnalyser = new TaxiCustomerWaitTimeAnalyser(scenario);
 
         handlerGroup.addHandler(travelDistanceEvaluator);
@@ -105,6 +105,7 @@ public class ElectroCabLaunchUtils
         events.addHandler(handlerGroup);
 
         optimizer.setRankArrivalCharger(rankArrivalDepartureCharger);
+        optimizer.createNearestRankDb();
 
         // chargeUponRankArrival = new ChargeUponRankArrival(elvehicles);
         // chargeUponRankArrival.setRankLocations(this.rankReader.getRankLinks());

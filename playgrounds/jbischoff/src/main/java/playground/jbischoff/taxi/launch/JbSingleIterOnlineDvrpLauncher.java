@@ -42,6 +42,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 import pl.poznan.put.util.jfreechart.ChartUtils;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
@@ -105,11 +106,18 @@ import playground.michalm.util.RunningVehicleRegister;
 //        eventsFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.events.xml.gz";
     	
 //    	   dirName = "/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/2014_02_basic_scenario_v1/";
-    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v1\\";
-           plansFileName = dirName + "OD_20130417_SCALE_2.0_plans.xml.gz";
-           netFileName = dirName + "berlin_brb.xml.gz";
-           eventsFileName = null;
+//    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v1\\";
+//           plansFileName = dirName + "OD_20130417_SCALE_2.0_plans.xml.gz";
+//           taxisFileName = dirName + "taxis-3000.xml";
 
+
+    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v2\\";
+           plansFileName = dirName + "plans4to4.xml.gz";
+           taxisFileName = dirName + "taxis4to4.xml";
+
+           eventsFileName = null;
+           netFileName = dirName + "berlin_brb.xml.gz";
+           
         ////////////////////////////////////////////////////////         
 
         //        electricStatsDir = dirName +"electric_noranks\\";
@@ -128,7 +136,6 @@ import playground.michalm.util.RunningVehicleRegister;
         // taxiCustomersFileName = dirName + "taxiCustomers_10_pc.txt";
         taxiCustomersFileName = dirName + "taxiCustomers_15_pc.txt";
 
-        taxisFileName = dirName + "taxis-3000.xml";
         ranksFileName = dirName + "berlin_ranks.xml";
 
         // reqIdToVehIdFileName = dirName + "reqIdToVehId";
@@ -233,7 +240,7 @@ import playground.michalm.util.RunningVehicleRegister;
         events.addHandler(rvr);
 
         if (otfVis) { // OFTVis visualization
-            DynAgentLauncherUtils.runOTFVis(qSim, false);
+            DynAgentLauncherUtils.runOTFVis(qSim, false, ColoringScheme.taxicab);
         }
 
         if (outHistogram) {
