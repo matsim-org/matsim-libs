@@ -31,6 +31,9 @@ public class VehicleRequestPathFinder
         return new Function<Vehicle, VehicleRequestPath>() {
             public VehicleRequestPath apply(Vehicle veh)
             {
+            	if (veh == null) {
+            		return null;
+            	}
                 VrpPathWithTravelData path = calculateVrpPath(veh, req);
                 return path == null ? null : new VehicleRequestPath(veh, req, path);
             }
