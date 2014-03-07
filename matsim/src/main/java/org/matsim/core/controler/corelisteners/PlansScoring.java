@@ -59,7 +59,7 @@ public class PlansScoring implements ScoringListener, IterationStartsListener, I
 	private OutputDirectoryHierarchy controlerIO;
 
 	private TravelDistanceStats travelDistanceStats; 
-	
+
 	public PlansScoring( Scenario sc, EventsManager events, OutputDirectoryHierarchy controlerIO, ScoringFunctionFactory scoringFunctionFactory ) {
 		this.sc = sc ;
 		this.events = events ;
@@ -83,7 +83,10 @@ public class PlansScoring implements ScoringListener, IterationStartsListener, I
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		this.events.removeHandler(this.eventsToScore);
 		if(sc.getConfig().planCalcScore().isWriteExperiencedPlans()) {
-			this.eventsToScore.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans"));
+			final int writePlansInterval = sc.getConfig().controler().getWritePlansInterval();
+			if (writePlansInterval > 0 && event.getIteration() % writePlansInterval == 0) {
+				this.eventsToScore.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans"));
+			}
 		}
 		this.travelDistanceStats.addIteration(event.getIteration(), eventsToScore.getAgentRecords());
 		if ( sc.getConfig().planCalcScore().isMemorizingExperiencedPlans() ) {

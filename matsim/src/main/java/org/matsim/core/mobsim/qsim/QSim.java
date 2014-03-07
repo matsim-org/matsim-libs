@@ -183,6 +183,16 @@ public final class QSim implements VisMobsim, Netsim {
 		addDepartureHandler(this.teleportationEngine);
 		prepareSim();
 		this.listenerManager.fireQueueSimulationInitializedEvent();
+		
+		// Put agents into the handler for their first ("overnight") action,
+		// probably the ActivityEngine. This is done before the first
+		// beforeSimStepEvent, because the expectation seems to be
+		// (e.g. in OTFVis), that agents are doing something
+		// (can be located somewhere) before you execute a sim step.
+		for (MobsimAgent agent : this.agents) {
+			arrangeNextAgentAction(agent);
+		}
+		
 		// do iterations
 		boolean doContinue = true;
 		double time = this.simTimer.getTimeOfDay();
@@ -280,7 +290,6 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 		agents.add(agent);
 		this.agentCounter.incLiving();
-		arrangeNextAgentAction(agent);
 	}
 
 	private void arrangeNextAgentAction(MobsimAgent agent) {

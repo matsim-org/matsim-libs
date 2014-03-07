@@ -52,6 +52,8 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 		double activityEndTime;
 	}
 
+	private InternalInterface internalInterface;
+	
 	/**
 	 * This list needs to be a "blocking" queue since this is needed for
 	 * thread-safety in the parallel qsim. cdobler, oct'10
@@ -77,8 +79,9 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 		}
 
 	});
-
-	private InternalInterface internalInterface;
+	
+	// See handleActivity for the reason for this.
+	private boolean beforeFirstSimStep = true;
 
 	@Override
 	public void onPrepareSim() {
@@ -87,6 +90,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 
 	@Override
 	public void doSimStep(double time) {
+		beforeFirstSimStep = false;
 		while (activityEndsList.peek() != null) {
 			if (activityEndsList.peek().activityEndTime <= time) {
 				MobsimAgent agent = activityEndsList.poll().agent;
@@ -118,13 +122,24 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 		this.internalInterface = internalInterface;
 	}
 
+	
+	/**
+	 * 
+	 * This method is called by QSim to pass in agents which then "live" in the activity layer until they are handed out again
+	 * through the internalInterface.
+	 * 
+	 * It is called not before onPrepareSim() and not after afterSim(), but it may be called before, after, or from doSimStep(),
+	 * and even from itself (i.e. it must be reentrant), since internalInterface.arrangeNextAgentState() may trigger
+	 * the next Activity.
+	 * 
+	 */
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
-		if (agent.getActivityEndTime() == Double.POSITIVE_INFINITY) {
+		if (agent.getActivityEndTime() == Double.POSITIVE_INFINITY && !beforeFirstSimStep) {
 			// This is the last planned activity.
 			// So the agent goes to sleep.
 			internalInterface.getMobsim().getAgentCounter().decLiving();
-		} else if (agent.getActivityEndTime() <= internalInterface.getMobsim().getSimTimer().getTimeOfDay()) {
+		} else if (agent.getActivityEndTime() <= internalInterface.getMobsim().getSimTimer().getTimeOfDay() && !beforeFirstSimStep) {
 			// This activity is already over (planned for 0 duration)
 			// So we proceed immediately.
 			agent.endActivityAndComputeNextState(internalInterface.getMobsim().getSimTimer().getTimeOfDay());
@@ -134,6 +149,15 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 			activityEndsList.add(new AgentEntry(agent, agent.getActivityEndTime()));
 			internalInterface.registerAdditionalAgentOnLink(agent);
 		}
+		// Why beforeFirstSimStep matters:
+		// - If this class has never had a doSimStep() when this method is called, this means that this Agent is having its
+		// "overnight", i.e. first Activity.
+		// - This means that this ActivityEngine should not just pass this MobsimAgent along if its activityEndTime has already ended,
+		// but queue it in with other such Agents and let them all leave on doSimStep(), because we expect those Agents to leave
+		// in the order specified by the activityQueue (no matter if it is a good order or not, see comment there). The order in which new Agents enter
+		// the simulation and are passed into this method is a different one, so this matters.
+		// - This is safe (Agents will not miss a second), simply because doSimStep for this time step has not yet happened.
+		// - It also means that e.g. OTFVis will probably display all Agents while they are in their first Activity before you press play.
 		return true;
 	}
 
