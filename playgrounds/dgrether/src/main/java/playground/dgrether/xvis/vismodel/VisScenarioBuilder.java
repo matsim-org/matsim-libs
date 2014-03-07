@@ -114,7 +114,10 @@ public class VisScenarioBuilder {
 				l2l = lanes.getLanesToLinkAssignments().get(l.getId());
 			}
 			VisLink vl = new VisLinkImpl(l);
-			List<ModelLane> la = LanesUtils.createLanes(l, l2l);
+			List<ModelLane> la = null; 
+			if (l2l != null) {
+				la = LanesUtils.createLanes(l, l2l);
+			}
 			VisLinkWLanes link = visLaneModelBuilder.createVisLinkLanes(transform, vl, scenario.getConfig().qsim().getNodeOffset(),  la);
 			SnapshotLinkWidthCalculator lwc = new SnapshotLinkWidthCalculator();
 			visLaneModelBuilder.recalculatePositions(link, lwc);
