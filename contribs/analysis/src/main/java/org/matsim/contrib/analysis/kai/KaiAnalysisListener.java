@@ -51,7 +51,7 @@ public class KaiAnalysisListener implements StartupListener, IterationEndsListen
 
 		int iteration = event.getIteration() ;
 
-		this.calcLegTimes.addPopulationStatsAndWrite(event.getControler().getControlerIO().getIterationFilename(iteration, "stats_"));
+		this.calcLegTimes.writeStats(event.getControler().getControlerIO().getIterationFilename(iteration, "stats_"));
 
 		// trips are from "true" activity to "true" activity.  legs may also go
 		// from/to ptInteraction activity.  This, in my opinion "legs" is the correct (matsim) term

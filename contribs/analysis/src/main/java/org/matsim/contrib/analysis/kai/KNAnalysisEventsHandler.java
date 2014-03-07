@@ -23,18 +23,30 @@ package org.matsim.contrib.analysis.kai;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -42,14 +54,14 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.roadpricing.RoadPricingReaderXMLv1;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
@@ -57,8 +69,11 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
  * @author knagel, originally based on
  * @author mrieser
  */
-public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, 
-VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
+public class KNAnalysisEventsHandler implements 
+PersonDepartureEventHandler, PersonArrivalEventHandler, 
+PersonMoneyEventHandler, 
+LinkLeaveEventHandler, LinkEnterEventHandler, 
+PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 
 	private final static Logger log = Logger.getLogger(KNAnalysisEventsHandler.class);
 
@@ -86,17 +101,29 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 	private double controlStatisticsSum;
 	private double controlStatisticsCnt;
 
+	private  Set<Id> tolledLinkIds = new HashSet<Id>() ;
+	// (initializing with empty set, meaning output will say no vehicles at gantries).
+
 	// general trip counter.  Would, in theory, not necessary to do this per StatType, but I find it too brittle 
 	// to avoid under- or over-counting with respect to loops.
 	//	private final Map<StatType,Integer> legCount = new TreeMap<StatType,Integer>() ;
 
 	public KNAnalysisEventsHandler(final Scenario scenario) {
-		this(scenario.getPopulation()) ;
 		this.scenario = scenario ;
-	}
+		this.population = scenario.getPopulation() ;
 
-	private KNAnalysisEventsHandler(final Population population) {
-		this.population = population ;
+		final String tollLinksFileName = this.scenario.getConfig().roadpricing().getTollLinksFile();
+		if ( tollLinksFileName != null && !tollLinksFileName.equals("") ) {
+			RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
+			RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
+			try {
+				rpReader.parse( tollLinksFileName  );
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			this.tolledLinkIds = scheme.getTolledLinkIds() ;
+		}
+
 
 		for ( StatType type : StatType.values() ) {
 
@@ -164,11 +191,6 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 		} else {
 			this.agentLegs.put(event.getPersonId(), Integer.valueOf(1 + cnt.intValue()));
 		}
-	}
-
-	@Override
-	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-
 	}
 
 	private static int noCoordCnt = 0 ;
@@ -352,7 +374,7 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 		}
 	}
 
-	public void addPopulationStatsAndWrite(final String filenameTmp) {
+	public void writeStats(final String filenameTmp) {
 		final Population pop = this.scenario.getPopulation();
 
 		// analyze Population:
@@ -372,26 +394,49 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 		}
 
 		// write population attributes:
-		new ObjectAttributesXmlWriter(pop.getPersonAttributes()).writeFile("derivedPersonAttributes.xml.gz");
+		new ObjectAttributesXmlWriter(pop.getPersonAttributes()).writeFile("extendedPersonAttributes.xml.gz");
 
 		//write statistics:
 		for ( StatType type : StatType.values() ) {
 			String filename = filenameTmp + type.toString() + ".txt" ;
-			//			if ( type!=StatType.duration ) {
-			//				filename += type.toString() ;
-			//			}
 			BufferedWriter legStatsFile = IOUtils.getBufferedWriter(filename);
 			writeStats(type, legStatsFile );
 			try {
-				if (legStatsFile != null) {
-					legStatsFile.close();
-				}
+				legStatsFile.close();
 			} catch (IOException e) {
-				log.error(e);
+				e.printStackTrace();
 			}
 		}
-		
+
+		// write link statistics:
+		for ( Entry<Id, Double> entry : this.linkCnts.entrySet() ) {
+			final Id linkId = entry.getKey();
+			linkAttribs.putAttribute(linkId.toString(), CNT, entry.getValue().toString() ) ;
+			linkAttribs.putAttribute(linkId.toString(), TTIME_SUM, this.linkTtimesSums.get(linkId).toString() ) ;
+		}
+		new ObjectAttributesXmlWriter( this.linkAttribs ).writeFile("networkAttributes.xml.gz");
+
+		{
+			BufferedWriter writer = IOUtils.getBufferedWriter("gantries.txt") ;
+			for (  Entry<Id, Double> entry : this.vehicleGantryCounts.entrySet() ) {
+				try {
+					writer.write( entry.getKey() + "\t" + entry.getValue() + "\n") ;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			try {
+				writer.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
+
+	private ObjectAttributes linkAttribs = new ObjectAttributes() ;
+	public static final String CNT = "cnt" ;
+	public static final String TTIME_SUM = "ttimeSum" ;
 
 	private void writeStats(StatType statType, final java.io.Writer out ) throws UncheckedIOException {
 		try {
@@ -456,6 +501,56 @@ VehicleArrivesAtFacilityEventHandler, PersonMoneyEventHandler {
 			} catch (IOException e) {
 				log.error(e);
 			}
+		}
+	}
+
+	private Map<Id,Double> vehicleEnterTimes = new HashMap<Id,Double>() ;
+
+	private Map<Id,Double> vehicleGantryCounts = new HashMap<Id,Double>() ;
+
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		vehicleEnterTimes.put( event.getVehicleId(), event.getTime() ) ;
+
+		if ( this.tolledLinkIds.contains( event.getLinkId() ) ) {
+			final Double gantryCountSoFar = this.vehicleGantryCounts.get( event.getVehicleId() ) ;
+			if ( gantryCountSoFar==null ) {
+				this.vehicleGantryCounts.put( event.getVehicleId(), 1. ) ;
+			} else {
+				this.vehicleGantryCounts.put( event.getVehicleId(), 1. + gantryCountSoFar ) ;
+			}
+		}
+	}
+
+	private Map<Id,Double> linkTtimesSums = new HashMap<Id,Double>() ;
+	private Map<Id,Double> linkCnts = new HashMap<Id,Double>() ;
+
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
+		Double enterTime = vehicleEnterTimes.get( event.getVehicleId() ) ;
+		if ( enterTime != null && enterTime < 9.*3600. ) {
+			final Id linkId = event.getLinkId();
+			final Double sumSoFar = linkTtimesSums.get( linkId );
+			if ( sumSoFar == null ) {
+				linkTtimesSums.put( linkId, event.getTime() - enterTime ) ;
+				linkCnts.put( linkId, 1. ) ; 
+			} else {
+				linkTtimesSums.put( linkId, event.getTime() - enterTime + sumSoFar ) ;
+				linkCnts.put( linkId, 1. + linkCnts.get(linkId) ) ;
+			}
+		}
+	}
+
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		// do we need to do anything here?
+	}
+
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent event) {
+		Double result = vehicleEnterTimes.remove( event.getVehicleId() ) ;
+		if ( result == null ) {
+			throw new RuntimeException("vehicle arrival for vehicle that never entered link.  teleportation?") ;
 		}
 	}
 

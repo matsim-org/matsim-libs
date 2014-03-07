@@ -146,7 +146,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 
 	protected void runTest(KNAnalysisEventsHandler calcLegTimes) {
 
-		calcLegTimes.addPopulationStatsAndWrite(this.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME);
+		calcLegTimes.writeStats(this.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME);
 
 		// actual test: compare checksums of the files
 		for ( StatType type : StatType.values() ) {
