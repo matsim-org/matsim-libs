@@ -108,8 +108,14 @@ public class ChargerLog {
 			
 			Collections.sort(log);
 			Id last = log.get(0).getChargerId();
-			int l = last.toString().length()-10;
-			String fn = last.toString().substring(l);
+			int l = last.toString().length()-6;
+			String fn ;
+			try{
+			fn = last.toString().substring(l);
+			}
+			catch (StringIndexOutOfBoundsException e){
+			fn = "charger "+Math.random();	
+			}
 			String filename = (outputFileDir+"/charger_"+fn+".txt");
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(filename)));
 			
@@ -126,7 +132,7 @@ public class ChargerLog {
 					bw.flush();
 					bw.close();
 					last  = row.getChargerId();
-					l = last.toString().length()-10;
+					l = last.toString().length()-6;
 					 fn = last.toString().substring(l);
 
 					filename = (outputFileDir+"/charger_"+fn+".txt");

@@ -18,6 +18,7 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.jbischoff.energy.log.ChargeLogRow;
@@ -41,6 +42,7 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 //	private final double POWERINKW = 50.0; // max charge for Nissan Leaf
 	private final double POWERINKW = 22.0; // max charge at standard Berlin Charger
 	private final int RANKCHARGERAMOUNT = 50; //amount of chargers at each rank location
+	private EventsManager events;
 	
 	private final double MINIMUMSOCFORDEPARTURE = 5.;
 	private static final Logger log = Logger
@@ -48,7 +50,8 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 	private final double NEEDSTORETURNTORANKSOC = 6.;
 	private SoCLog soCLog;
 	private ChargerLog chargerLog;
-	public RankArrivalDepartureCharger(HashMap<Id, Vehicle> vehicles) {
+	public RankArrivalDepartureCharger(HashMap<Id, Vehicle> vehicles, EventsManager events) {
+		this.events = events;
 		this.vehicles = vehicles;
 		this.arrivalTimes = new LinkedHashMap<Id, Double>();
 		this.socUponArrival = new HashMap<Id, Double>();
@@ -141,8 +144,11 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 				continue;	
 				}
 			if (!isConnectedToCharger(e.getKey()) ){
-				if (chargerHasFreeSpaceForVehicle(e.getKey()) )
+				if (chargerHasFreeSpaceForVehicle(e.getKey()) ){
 					addVehicleToCharger(e.getKey());
+					this.events.processEvent(new StartChargingEvent(time, e.getKey(), this.arrivalLinks.get(e.getKey())));
+
+				}
 			}	
 			if (isConnectedToCharger(e.getKey())){
 				
@@ -296,5 +302,8 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 	public Map<Id, Integer> getRankLocations() {
 		return rankLocations;
 	}
+	
+	
 
 }
+

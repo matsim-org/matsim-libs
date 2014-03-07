@@ -125,7 +125,7 @@ public class BerlinVehicleGenerator {
 	}
 	
 	
-	private void read(String file, TabularFileHandler handler) {
+	public static void read(String file, TabularFileHandler handler) {
 		TabularFileParserConfig config = new TabularFileParserConfig();
 		log.info("parsing " + file);
 		config.setDelimiterTags(new String[]{"\t"});
@@ -139,7 +139,7 @@ public class BerlinVehicleGenerator {
 
 }
 
-class TaxiDemandPerLor{
+class TaxiDemandPerLor implements Comparable<TaxiDemandPerLor>{
 	private Id lorNo;
 	private int toLor;
 	private int fromLor;
@@ -160,6 +160,12 @@ class TaxiDemandPerLor{
 
 	public int getFromLor() {
 		return fromLor;
+	}
+
+	@Override
+	public int compareTo(TaxiDemandPerLor arg0) {
+		Integer i = fromLor;
+		return i.compareTo(arg0.getFromLor());
 	}
 
 	

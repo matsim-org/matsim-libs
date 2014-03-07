@@ -80,7 +80,8 @@ public class TaxiDemandWriter {
 					TransformationFactory.DHDN_GK4);
 
 	private Random rnd = new Random(17);
-	private final static String NETWORKFILE = "/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/network/berlin_brb.xml.gz";
+	private final static String DATADIR = "C:/local_jb/data/";
+	private final static String NETWORKFILE = DATADIR+"network/berlin_brb.xml.gz";
 	private final static Id TXLLORID = new IdImpl("12214125");
 	private final static double SCALEFACTOR = 1.0;
 	static int fromTXL = 0;
@@ -93,13 +94,13 @@ public class TaxiDemandWriter {
 
 	public static void main(String[] args) {
 		LorShapeReader lsr = new LorShapeReader();
-		lsr.readShapeFile("/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/OD/shp_merged/Planungsraum.shp", "SCHLUESSEL");
-		lsr.readShapeFile("/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/OD/shp_merged/gemeinden.shp", "NR");
-		for (int i = 15; i <22 ; i++){
+		lsr.readShapeFile(DATADIR+"OD/shp_merged/Planungsraum.shp", "SCHLUESSEL");
+		lsr.readShapeFile(DATADIR+"OD/shp_merged/gemeinden.shp", "NR");
+		for (int i = 16; i <17 ; i++){
 			TaxiDemandWriter tdw = new TaxiDemandWriter();
 			tdw.setMunicipalityMap(lsr.getShapeMap());
-			tdw.writeDemand("/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/OD/201304"+i+"/", "OD_201304"+i);
-			tdw.writeODbyZone("/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/OD/201304"+i+"/od.csv");
+			tdw.writeDemand(DATADIR+"/OD/201304"+i+"/", "OD_201304"+i);
+//			tdw.writeODbyZone(DATADIR+"OD/201304"+i+"/od.csv");
 		}
 		System.out.println("trips from TXL "+TaxiDemandWriter.fromTXL);
 		System.out.println("trips to TXL "+TaxiDemandWriter.toTXL);
@@ -155,11 +156,12 @@ public class TaxiDemandWriter {
 		
 		
 		population = scenario.getPopulation();
-		generatePopulation(dirname, fileNamePrefix);
+//		generatePopulation(dirname, fileNamePrefix);
+		generatePopulation4to4();
 		log.info("Population size: " +population.getPersons().size());
 		PopulationWriter populationWriter = new PopulationWriter(
 				scenario.getPopulation(), scenario.getNetwork());
-		populationWriter.write(dirname+fileNamePrefix+"_SCALE_"+SCALEFACTOR+"_"+"plans.xml.gz");
+		populationWriter.write(dirname+fileNamePrefix+"_SCALE_"+SCALEFACTOR+"_"+"plans4to4.xml.gz");
 	}
 
 	private void generatePopulation(String dirname, String fileNamePrefix) {
@@ -170,7 +172,34 @@ public class TaxiDemandWriter {
 			String currentFileName = dirname+fileNamePrefix+hrstring+"0000.dat";
 			read(currentFileName, dp);
 			generatePlansForZones(i, dp.getDemand());
+			writeODbyZone( dirname+fileNamePrefix+hrstring+"_OD.csv");
+			this.oMap.clear();
+			this.dMap.clear();
+			
+		}
 
+	}
+	private void generatePopulation4to4() {
+		
+		for (int i = 4; i<24; i++){
+			String hrstring = String.format("%02d", i);
+			DemandParser dp = new DemandParser();
+			String currentFileName = DATADIR +"/OD/20130416/OD_20130416"+hrstring+"0000.dat";
+			read(currentFileName, dp);
+			generatePlansForZones(i, dp.getDemand());
+			this.oMap.clear();
+			this.dMap.clear();
+			
+		}
+		for (int i = 0; i<4; i++){
+			String hrstring = String.format("%02d", i);
+			DemandParser dp = new DemandParser();
+			String currentFileName = DATADIR +"/OD/20130417/OD_20130417"+hrstring+"0000.dat";
+			read(currentFileName, dp);
+			generatePlansForZones(i+24, dp.getDemand());
+			this.oMap.clear();
+			this.dMap.clear();
+			
 		}
 
 	}

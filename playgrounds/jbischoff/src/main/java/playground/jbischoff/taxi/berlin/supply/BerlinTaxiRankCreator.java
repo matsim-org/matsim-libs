@@ -19,29 +19,28 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
-import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.michalm.taxi.data.TaxiRank;
 
 public class BerlinTaxiRankCreator {
 	private static final Logger log = Logger.getLogger(BerlinTaxiRankCreator.class);
 
-	private final static String NETWORKFILE = "/Users/jb/tucloud/taxi/berlin/2kW.15.output_network.xml";
-	private final static String RANKFILE = "/Users/jb/tucloud/taxi/taxiranks_greaterberlin-1.csv";
-	private final static String OUTPUTFILE = "/Users/jb/tucloud/taxi/berlin_ranks.xml";
-	private final static String OUTPUTSHP = "/Users/jb/tucloud/taxi/shp_berlin.shp";
+	private final static String NETWORKFILE = "C:/local_jb/data/network/berlin_brb.xml.gz";
+	private final static String RANKFILE = "C:/local_jb/data/network/taxiranks_greaterberlin-1.csv";
+	private final static String OUTPUTFILE = "C:/local_jb/data/network/berlin_ranks.xml";
+	private final static String OUTPUTFILETXT = "C:/local_jb/data/network/berlin_ranks.csv";
+
 	public static void main(String[] args) {
 		BerlinTaxiRankCreator btrc = new BerlinTaxiRankCreator();
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(sc).readFile(NETWORKFILE);	
 		List <TaxiRank> rankList = btrc.read(sc.getNetwork(), RANKFILE);
 		btrc.writeRanks(rankList, OUTPUTFILE);
+		btrc.WriteRanksText(rankList, OUTPUTFILETXT);
 //		new Links2ESRIShape(sc.getNetwork(), OUTPUTSHP, ,
 //				
 //					).write();;
@@ -78,6 +77,25 @@ public class BerlinTaxiRankCreator {
 		}
 	}
 	
+
+public void WriteRanksText(List<TaxiRank> rankList, String outputFile){
+	try {
+		FileWriter fw = new FileWriter(new File(outputFile));
+		fw.append("id\tname\tlink\tx\ty\n");
+
+		for (TaxiRank rank : rankList){
+			fw.append(rank.getId().toString() +"\t"+rank.getName()+"\t"+rank.getLink().getId().toString()+"\t"+rank.getLink().getCoord().getX()+"\t"+rank.getLink().getCoord().getY()+"\n"); 
+		
+
+		}
+		
+		fw.flush();
+		fw.close();
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+}
 }
 
 
@@ -101,6 +119,8 @@ class RankReader implements TabularFileHandler{
 		Link link = network.getNearestRightEntryLink(stringtoCoord(row[2], row[1]));
 		String name = row[4];
 		Id id = new IdImpl(row[5]);
+		if (id.equals("21")) link = network.getLinks().get(new IdImpl("-35954"));
+		//Exception for Tegel Airport
 		TaxiRank rank = new TaxiRank(id, name, link);
 		ranks.add(rank);
 	}
@@ -112,7 +132,7 @@ class RankReader implements TabularFileHandler{
 		double yc = 52. + Double.parseDouble("0."+ycoordString);
 		Coord coord = new CoordImpl(xc, yc);
 		Coord trans =ct.transform(coord); 
-		System.out.println("Read x"+ x + " Read y "+ y + " coord read "+ coord + " transformed "+trans );
+//		System.out.println("Read x"+ x + " Read y "+ y + " coord read "+ coord + " transformed "+trans );
 		return trans;
 	}
 

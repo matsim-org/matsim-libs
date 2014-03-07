@@ -180,7 +180,8 @@ public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, Perso
 	}
 
 	private void handleTaxiDriverLeavesEvent(PersonLeavesVehicleEvent event) {
-		double travelTime = event.getTime() - this.lastDeparture.get(event.getPersonId());
+		double travelTime = 0.;
+		if (this.lastDeparture.containsKey(event.getPersonId())) travelTime = event.getTime() - this.lastDeparture.get(event.getPersonId());
 		double totalTravelTime = 0.;
 		if (this.taxiTravelDuration.containsKey(event.getPersonId())) totalTravelTime = this.taxiTravelDuration.get(event.getPersonId());
 		totalTravelTime = totalTravelTime + travelTime;

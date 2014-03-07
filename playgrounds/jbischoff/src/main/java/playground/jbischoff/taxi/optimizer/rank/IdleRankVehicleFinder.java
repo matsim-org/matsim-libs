@@ -206,7 +206,6 @@ public class IdleRankVehicleFinder
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;
             double distance = calculateSquaredDistance(req, veh);
-
             if (distance < bestDistance) {
                 bestDistance = distance;
                 bestVeh = veh;
@@ -230,10 +229,17 @@ public class IdleRankVehicleFinder
 
     private double calculateSquaredDistance(TaxiRequest req, Vehicle veh)
     {
-        LinkTimePair departure = scheduler.getEarliestIdleness(veh);
-        Link fromLink = departure.link;
-        Link toLink = req.getFromLink();
-
+    	LinkTimePair   departure = scheduler.getEarliestIdleness(veh);
+    	
+    	Link fromLink = null;
+    	try{
+    	fromLink = departure.link;
+    	}
+    	catch (NullPointerException e ) {
+    		return Double.MAX_VALUE;
+    	}
+    	Link toLink = req.getFromLink();
+    	
         return DistanceUtils.calculateSquaredDistance(fromLink, toLink);
     }
 }

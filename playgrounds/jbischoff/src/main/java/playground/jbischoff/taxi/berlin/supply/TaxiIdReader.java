@@ -27,18 +27,18 @@ public class TaxiIdReader {
 	private List<TaxiIdData> taxiIdData;
 	
 	public static void main(String[] args) {
-		for (int i = 15; i<22; i++){
+//		for (int i = 15; i<22; i++){
 		TaxiIdReader tir = new TaxiIdReader();
-		tir.go(i);
-		}
+		tir.go(0);
+//		}
 	}
 	private void go(int i){
 		
 		TaxiIdParser tip = new TaxiIdParser();
-		this.read("/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/OD/vehicles/rawFCD_201304"+i+".csv", tip);
+		this.read("C:/local_jb/data/OD/tripids/rawFCD_20130415-20130422.dat", tip);
 		this.taxiIdData = tip.getTaxiIds();
 		this.analyse();
-		this.write("/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/OD/vehicles/201304"+i+"_taxisOverTime.csv");
+		this.write("C:/local_jb/data/OD/tripids/taxisOverTimeWeek.csv");
 		
 	}
 	
@@ -64,7 +64,7 @@ public class TaxiIdReader {
 			this.removeTaxi(td.getEndTime());
 		}
 	
-		for (int i=1; i<30*3600;i++ ){
+		for (int i=1; i<24*8*3600;i++ ){
 			this.incTaxi(i, this.inSystem.get(i-1));
 			int inc = this.addToSystem.get(i);
 			this.incTaxi(i,inc );
@@ -78,7 +78,7 @@ public class TaxiIdReader {
 		this.addToSystem = new HashMap<Integer, Integer>();
 		this.removeFromSystem = new HashMap<Integer, Integer>();
 		this.inSystem = new TreeMap<Integer, Integer>();
-		for (int d = 0 ; d<30*3600 ; d++){
+		for (int d = 0 ; d<24*8*3600 ; d++){
 			this.addToSystem.put(d, 0);
 			this.removeFromSystem.put(d, 0);
 			this.inSystem.put(d,0);
@@ -166,12 +166,20 @@ class TaxiIdParser implements TabularFileHandler{
 	public void startRow(String[] row) {
 		Id taxiId = new IdImpl(row[0]);
 		String startDate = row[1];
-		int startTime = parseTime(row[2]);
+		int dayOffsetStart = getDayOffset(startDate);
+		int startTime = parseTime(row[2]) + dayOffsetStart*24*3600;
 		String endDate = row[3];
-		int endTime = parseTime(row[4]);
-		
-		if (startTime>endTime) endTime += 24*3600;
-	taxiIds.add(new TaxiIdData(taxiId, startDate, endDate, startTime, endTime))	;
+		int dayOffsetEnd = getDayOffset(endDate);
+		int endTime = parseTime(row[4]) + dayOffsetEnd * 24 * 3600;
+		if (endTime<startTime) System.out.println(taxiId+startDate+startTime+endDate+endTime);
+		taxiIds.add(new TaxiIdData(taxiId, startDate, endDate, startTime, endTime))	;
+	}
+
+	private int getDayOffset(String startDate) {
+		int day = Integer.parseInt(startDate.split("-")[2]);
+		day = day-15;
+//		System.out.println(startDate + ":"+  day);
+		return day; //Offset: Start at 15.4.2013
 	}
 
 	private int parseTime(String timeString) {
