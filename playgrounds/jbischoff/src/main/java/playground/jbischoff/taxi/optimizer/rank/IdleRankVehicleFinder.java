@@ -147,7 +147,8 @@ public class IdleRankVehicleFinder
         double bestSoc = 0;
         Collections.shuffle(context.getVrpData().getVehicles(), rnd);
 
-        for (Vehicle veh : TaxicabUtils.filterIdleVehicles(context.getVrpData().getVehicles())) {
+        for (Vehicle veh : TaxicabUtils.filterVehicles(context.getVrpData().getVehicles(),
+                TaxicabUtils.IS_IDLE)) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;
@@ -169,7 +170,8 @@ public class IdleRankVehicleFinder
         double bestSoc = 0;
         Collections.shuffle(context.getVrpData().getVehicles(), rnd);
 
-        for (Vehicle veh : TaxicabUtils.filterIdleVehicles(context.getVrpData().getVehicles())) {
+        for (Vehicle veh : TaxicabUtils.filterVehicles(context.getVrpData().getVehicles(),
+                TaxicabUtils.IS_IDLE)) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;
@@ -201,7 +203,8 @@ public class IdleRankVehicleFinder
         Vehicle bestVeh = null;
         //          double bestDistance = Double.MAX_VALUE;
         double bestDistance = Double.MAX_VALUE / 2;
-        for (Vehicle veh : TaxicabUtils.filterIdleVehicles(context.getVrpData().getVehicles())) {
+        for (Vehicle veh : TaxicabUtils.filterVehicles(context.getVrpData().getVehicles(),
+                TaxicabUtils.IS_IDLE)) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;
@@ -229,17 +232,15 @@ public class IdleRankVehicleFinder
 
     private double calculateSquaredDistance(TaxiRequest req, Vehicle veh)
     {
-    	LinkTimePair   departure = scheduler.getEarliestIdleness(veh);
-    	
-    	Link fromLink = null;
-    	try{
-    	fromLink = departure.link;
-    	}
-    	catch (NullPointerException e ) {
-    		return Double.MAX_VALUE;
-    	}
-    	Link toLink = req.getFromLink();
-    	
+        LinkTimePair departure = scheduler.getEarliestIdleness(veh);
+        Link fromLink = departure.link;
+
+        if (fromLink == null) {
+            return Double.MAX_VALUE;
+        }
+
+        Link toLink = req.getFromLink();
+
         return DistanceUtils.calculateSquaredDistance(fromLink, toLink);
     }
 }

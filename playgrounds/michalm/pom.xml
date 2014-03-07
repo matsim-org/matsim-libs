@@ -88,6 +88,14 @@
 			<version>0.6.0-SNAPSHOT</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>pl.poznan.put.michalm</groupId>
+			<artifactId>gurobi</artifactId>
+			<version>5.6.2</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/gurobi-5.6.2.jar</systemPath>
+		</dependency>
+		
 		
   		<!-- ============== standard option ============== -->
 		<dependency>

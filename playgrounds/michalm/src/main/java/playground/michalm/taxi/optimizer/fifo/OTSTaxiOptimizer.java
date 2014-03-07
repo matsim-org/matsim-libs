@@ -55,14 +55,7 @@ public class OTSTaxiOptimizer
     }
 
 
-    @Override
-    public TaxiOptimizerConfiguration getConfiguration()
-    {
-        return optimConfig;
-    }
-
-
-    protected void scheduleUnplannedRequests()
+    /*package*/void scheduleUnplannedRequests()
     {
         while (!unplannedRequests.isEmpty()) {
             TaxiRequest req = unplannedRequests.peek();

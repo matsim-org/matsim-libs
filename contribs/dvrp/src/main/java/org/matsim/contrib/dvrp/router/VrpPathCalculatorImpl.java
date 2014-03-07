@@ -59,7 +59,7 @@ public class VrpPathCalculatorImpl
             //we start at the end of fromLink
             //actually, in QSim, it usually takes 1 second to move over the first node
             //(when INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES is ON;
-            //otherwise it may take even much longer)
+            //otherwise it can take much longer)
             double currentTime = departureTime;
             links[0] = fromLink;
             double tt = 1.;
@@ -76,7 +76,7 @@ public class VrpPathCalculatorImpl
 
             //there is no extra time spent on queuing at the end of the last link
             links[count + 1] = toLink;
-            tt = toLink.getLength() / toLink.getFreespeed();
+            tt = toLink.getLength() / toLink.getFreespeed();///???????????????
             linkTT[count + 1] = tt;
 
             double totalTT = 1 + path.travelTime + tt;

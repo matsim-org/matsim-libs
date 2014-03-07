@@ -27,15 +27,15 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 import playground.michalm.taxi.util.TaxicabUtils;
 
-class VehicleData
+/*package*/class VehicleData
 {
-    final List<Vehicle> vehicles = new ArrayList<Vehicle>();
-    final List<LinkTimePair> departures = new ArrayList<LinkTimePair>();
-    final int idleVehCount;
-    final int dimension;
+    /*package*/final List<Vehicle> vehicles = new ArrayList<Vehicle>();
+    /*package*/final List<LinkTimePair> departures = new ArrayList<LinkTimePair>();
+    /*package*/final int idleVehCount;
+    /*package*/final int dimension;
 
 
-    VehicleData(TaxiOptimizerConfiguration optimConfig)
+    /*package*/VehicleData(TaxiOptimizerConfiguration optimConfig)
     {
         int idleVehs = 0;
         double maxDepartureTime = -Double.MAX_VALUE;

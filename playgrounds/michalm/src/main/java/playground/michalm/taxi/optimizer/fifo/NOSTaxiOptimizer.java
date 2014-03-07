@@ -79,7 +79,7 @@ public class NOSTaxiOptimizer
     }
 
 
-    protected NOSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig, VehicleFilter vehicleFilter,
+    public NOSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig, VehicleFilter vehicleFilter,
             RequestFilter requestFilter)
     {
         this.optimConfig = optimConfig;
@@ -93,16 +93,46 @@ public class NOSTaxiOptimizer
     }
 
 
+    //==============================
+
     @Override
-    public TaxiOptimizerConfiguration getConfiguration()
+    public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
     {
-        return optimConfig;
+        if (!requiresReoptimization) {
+            return;
+        }
+
+        if (doReduceTP()) {
+            scheduleIdleVehicles();//reduce T_P to increase throughput (demand > supply)
+        }
+        else {
+            scheduleUnplannedRequests();//reduce T_W (regular NOS)
+        }
     }
 
 
-    //==============================
+    private boolean doReduceTP()
+    {
+        switch (optimConfig.goal) {
+            case MIN_PICKUP_TIME:
+                return true;
 
-    protected void scheduleUnplannedRequests()
+            case MIN_WAIT_TIME:
+                return false;
+
+            case DEMAND_SUPPLY_EQUIL:
+                int awaitingReqCount = Requests.countRequests(unplannedRequests,
+                        new Requests.IsUrgentPredicate(optimConfig.context.getTime()));
+
+                return awaitingReqCount > idleVehicles.size();
+
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
+
+    private void scheduleUnplannedRequests()
     {
         while (!unplannedRequests.isEmpty()) {
             TaxiRequest req = unplannedRequests.peek();
@@ -122,8 +152,6 @@ public class NOSTaxiOptimizer
         }
     }
 
-
-    //==============================
 
     private void scheduleIdleVehicles()
     {
@@ -146,43 +174,7 @@ public class NOSTaxiOptimizer
     }
 
 
-    private boolean doReduceTP()
-    {
-        switch (optimConfig.goal) {
-            case MIN_PICKUP_TIME:
-                return true;
-
-            case MIN_WAIT_TIME:
-                return false;
-
-            case DEMAND_SUPPLY_EQUIL:
-                int awaitingReqCount = Requests.countUrgentRequests(unplannedRequests,
-                        optimConfig.context.getTime());
-                return awaitingReqCount > idleVehicles.size();
-
-            default:
-                throw new IllegalStateException();
-        }
-    }
-
-
     //==============================
-
-    @Override
-    public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
-    {
-        if (!requiresReoptimization) {
-            return;
-        }
-
-        if (doReduceTP()) {
-            scheduleIdleVehicles();//reduce T_P to increase throughput (demand > supply)
-        }
-        else {
-            scheduleUnplannedRequests();//reduce T_W (regular NOS)
-        }
-    }
-
 
     @Override
     public void requestSubmitted(Request request)

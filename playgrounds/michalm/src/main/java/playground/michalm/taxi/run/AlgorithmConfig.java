@@ -31,6 +31,7 @@ import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
 import playground.michalm.taxi.optimizer.assignment.APSTaxiOptimizer;
 import playground.michalm.taxi.optimizer.fifo.*;
+import playground.michalm.taxi.optimizer.gurobi.MIPTaxiOptimizer;
 
 
 /*package*/enum AlgorithmConfig
@@ -105,7 +106,9 @@ import playground.michalm.taxi.optimizer.fifo.*;
 
     APS_DSE_24H(AP_SCHEDULING, DEMAND_SUPPLY_EQUIL, EVENTS_24_H, TIME),
 
-    APS_DSE_15M(AP_SCHEDULING, DEMAND_SUPPLY_EQUIL, EVENTS_15_MIN, TIME);
+    APS_DSE_15M(AP_SCHEDULING, DEMAND_SUPPLY_EQUIL, EVENTS_15_MIN, TIME),
+    
+    MIQCP_FF(MIQCP_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME);
 
     /*package*/static enum AlgorithmType
     {
@@ -113,6 +116,7 @@ import playground.michalm.taxi.optimizer.fifo.*;
         ONE_TIME_SCHEDULING, //
         RE_SCHEDULING, //
         AP_SCHEDULING, //
+        MIQCP_SCHEDULING;
     }
 
 
@@ -146,6 +150,9 @@ import playground.michalm.taxi.optimizer.fifo.*;
 
             case AP_SCHEDULING:
                 return new APSTaxiOptimizer(optimConfig);
+                
+            case MIQCP_SCHEDULING:
+                return new MIPTaxiOptimizer(optimConfig);
 
             default:
                 throw new IllegalStateException();

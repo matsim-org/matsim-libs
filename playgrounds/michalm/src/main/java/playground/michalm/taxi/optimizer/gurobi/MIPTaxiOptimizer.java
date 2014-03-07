@@ -17,11 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.assignment;
+package playground.michalm.taxi.optimizer.gurobi;
 
 import java.util.*;
 
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
@@ -31,26 +31,31 @@ import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
 
-public class APSTaxiOptimizer
+public class MIPTaxiOptimizer
     implements TaxiOptimizer
 {
     private final TaxiOptimizerConfiguration optimConfig;
-
-    private final SortedSet<TaxiRequest> unplannedRequests;
+    private final Set<TaxiRequest> unplannedRequests;
 
     private boolean requiresReoptimization = false;
 
+    private final LeastCostPathTreeStorage leastCostPathTrees;
 
-    public APSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
+
+    public MIPTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
         this.optimConfig = optimConfig;
-        unplannedRequests = new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR);
+        leastCostPathTrees = new LeastCostPathTreeStorage(optimConfig.context.getScenario()
+                .getNetwork());
+
+        unplannedRequests = new HashSet<TaxiRequest>();
     }
 
 
     private void scheduleUnplannedRequests()
     {
-        new AssignmentProblem(optimConfig).scheduleUnplannedRequests(unplannedRequests);
+        new MIPProblem(optimConfig, leastCostPathTrees)
+                .scheduleUnplannedRequests(unplannedRequests);
     }
 
 

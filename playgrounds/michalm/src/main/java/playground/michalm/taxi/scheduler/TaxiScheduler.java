@@ -401,6 +401,22 @@ public class TaxiScheduler
     };
 
 
+    public void removePlannedRequestsFromAllSchedules(Collection<TaxiRequest> unplannedRequests)
+    {
+        for (Vehicle veh : context.getVrpData().getVehicles()) {
+            removePlannedRequests(TaxiSchedules.getSchedule(veh), unplannedRequests);
+        }
+    }
+
+
+    public void removePlannedRequestsFromAllSchedules(Map<Id, TaxiRequest> unplannedReqsById)
+    {
+        for (Vehicle veh : context.getVrpData().getVehicles()) {
+            removePlannedRequests(TaxiSchedules.getSchedule(veh), unplannedReqsById);
+        }
+    }
+
+
     public void removePlannedRequests(Schedule<TaxiTask> schedule,
             final Collection<TaxiRequest> unplannedRequests)
     {

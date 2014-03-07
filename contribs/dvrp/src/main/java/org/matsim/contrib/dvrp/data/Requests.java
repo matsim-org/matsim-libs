@@ -67,15 +67,16 @@ public class Requests
     }
 
 
-    public static int countUrgentRequests(Iterable<? extends Request> requests, double now)
+    public static int countRequests(Iterable<? extends Request> requests,
+            Predicate<Request> predicate)
     {
-        return Iterables.size(Iterables.filter(requests, new IsUrgentPredicate(now)));
+        return Iterables.size(Iterables.filter(requests, predicate));
     }
 
 
-    public static <R extends Request> Iterable<R> filterIdleVehicles(Iterable<R> requests,
-            double now)
+    public static <R extends Request> Iterable<R> filterRequests(Iterable<R> requests,
+            Predicate<Request> predicate)
     {
-        return Iterables.filter(requests, new IsUrgentPredicate(now));
+        return Iterables.filter(requests, predicate);
     }
 }

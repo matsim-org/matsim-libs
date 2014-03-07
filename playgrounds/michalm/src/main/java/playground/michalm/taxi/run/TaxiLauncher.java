@@ -236,7 +236,8 @@ import playground.michalm.util.RunningVehicleRegister;
         TaxiData taxiData = TaxiLauncherUtils.initTaxiData(scenario, taxisFileName, ranksFileName);
         contextImpl.setVrpData(taxiData);
 
-        TaxiOptimizer optimizer = createOptimizer();
+        TaxiOptimizerConfiguration optimizerConfig = createOptimizerConfiguration(); 
+        TaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(optimizerConfig);
 
         QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
         contextImpl.setMobsimTimer(qSim.getSimTimer());
@@ -276,7 +277,7 @@ import playground.michalm.util.RunningVehicleRegister;
             events.addHandler(travelTimeCalculator);
         }
         else {
-            optimizer.getConfiguration().scheduler.setDelaySpeedupStats(delaySpeedupStats);
+            optimizerConfig.scheduler.setDelaySpeedupStats(delaySpeedupStats);
         }
 
         RunningVehicleRegister rvr = new RunningVehicleRegister();
@@ -311,7 +312,7 @@ import playground.michalm.util.RunningVehicleRegister;
     }
 
 
-    private TaxiOptimizer createOptimizer()
+    private TaxiOptimizerConfiguration createOptimizerConfiguration()
     {
         TaxiSchedulerParams params = new TaxiSchedulerParams(destinationKnown, pickupDuration,
                 dropoffDuration);
@@ -319,10 +320,8 @@ import playground.michalm.util.RunningVehicleRegister;
 
         VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(pathCalculator, scheduler);
 
-        TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(context,
+        return new TaxiOptimizerConfiguration(context,
                 pathCalculator, scheduler, vrpFinder, algorithmConfig.goal);
-
-        return algorithmConfig.createTaxiOptimizer(optimConfig);
     }
 
 

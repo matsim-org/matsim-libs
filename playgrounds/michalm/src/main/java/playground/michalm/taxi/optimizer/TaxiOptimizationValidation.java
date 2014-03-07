@@ -32,7 +32,7 @@ public class TaxiOptimizationValidation
     {
         TaxiData taxiData = (TaxiData)context.getVrpData();
 
-        if (TaxicabUtils.countIdleVehicles(taxiData.getVehicles()) == 0) {
+        if (TaxicabUtils.countVehicles(taxiData.getVehicles(), TaxicabUtils.IS_IDLE) == 0) {
             return;//OK
         }
 

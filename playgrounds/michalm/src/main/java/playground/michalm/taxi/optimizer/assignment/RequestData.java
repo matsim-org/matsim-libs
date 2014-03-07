@@ -27,19 +27,20 @@ import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 
 
-class RequestData
+/*package*/class RequestData
 {
-    final TaxiRequest[] requests;
-    final int urgentReqCount;
-    final int dimension;
+    /*package*/final TaxiRequest[] requests;
+    /*package*/final int urgentReqCount;
+    /*package*/final int dimension;
 
 
-    public RequestData(TaxiOptimizerConfiguration optimConfig, Set<TaxiRequest> unplannedRequests)
+    /*package*/RequestData(TaxiOptimizerConfiguration optimConfig,
+            Set<TaxiRequest> unplannedRequests)
     {
         dimension = unplannedRequests.size();//TODO - consider only awaiting and "soon-awaiting" reqs!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        urgentReqCount = Requests.countUrgentRequests(unplannedRequests,
-                optimConfig.context.getTime());
+        urgentReqCount = Requests.countRequests(unplannedRequests, new Requests.IsUrgentPredicate(
+                optimConfig.context.getTime()));
 
         requests = unplannedRequests.toArray(new TaxiRequest[dimension]);
     }

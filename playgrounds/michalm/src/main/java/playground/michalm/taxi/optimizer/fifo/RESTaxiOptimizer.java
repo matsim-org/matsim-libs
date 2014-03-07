@@ -19,10 +19,7 @@
 
 package playground.michalm.taxi.optimizer.fifo;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
-
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
-import playground.michalm.taxi.schedule.TaxiSchedules;
 
 
 public class RESTaxiOptimizer
@@ -35,13 +32,9 @@ public class RESTaxiOptimizer
 
 
     @Override
-    protected void scheduleUnplannedRequests()
+    /*package*/void scheduleUnplannedRequests()
     {
-        for (Vehicle veh : optimConfig.context.getVrpData().getVehicles()) {
-            optimConfig.scheduler.removePlannedRequests(TaxiSchedules.getSchedule(veh),
-                    unplannedRequests);
-        }
-
+        optimConfig.scheduler.removePlannedRequestsFromAllSchedules(unplannedRequests);
         super.scheduleUnplannedRequests();
     }
 }

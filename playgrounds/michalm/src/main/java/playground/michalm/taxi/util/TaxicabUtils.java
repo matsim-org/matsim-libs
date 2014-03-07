@@ -19,6 +19,8 @@
 
 package playground.michalm.taxi.util;
 
+import java.util.*;
+
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -32,18 +34,19 @@ import com.google.common.collect.Iterables;
 
 public class TaxicabUtils
 {
-    public static final Predicate<Vehicle> IS_IDLE_PREDICATE = new Predicate<Vehicle>() {
+    public static final Predicate<Vehicle> IS_IDLE = new Predicate<Vehicle>() {
         public boolean apply(Vehicle vehicle)
         {
             return isIdle(vehicle);
         }
     };
 
-
-    public static <V extends Vehicle> Iterable<V> filterIdleVehicles(Iterable<V> vehicles)
-    {
-        return Iterables.filter(vehicles, IS_IDLE_PREDICATE);
-    }
+    public static final Predicate<Vehicle> CAN_BE_SCHEDULED = new Predicate<Vehicle>() {
+        public boolean apply(Vehicle vehicle)
+        {
+            return canBeScheduled(vehicle);
+        }
+    };
 
 
     public static boolean isIdle(Vehicle vehicle)
@@ -65,6 +68,51 @@ public class TaxicabUtils
     }
 
 
+    public static boolean canBeScheduled(Vehicle vehicle)
+    {
+        Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(vehicle);
+
+        if (schedule.getStatus() != ScheduleStatus.STARTED) {
+            return false;
+        }
+
+        TaxiTask currentTask = schedule.getCurrentTask();
+
+        if (Schedules.isLastTask(currentTask)
+                && currentTask.getTaxiTaskType() == TaxiTaskType.WAIT_STAY) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    public static <V extends Vehicle> List<V> getVehiclesAsList(Iterable<V> input, Predicate<Vehicle> predicate)
+    {
+        List<V> output = new ArrayList<V>();
+
+        for (V v : input) {
+            if (predicate.apply(v)) {
+                output.add(v);
+            }
+        }
+
+        return output;
+    }
+
+
+    public static <V extends Vehicle> Iterable<V> filterVehicles(Iterable<V> vehicles, Predicate<Vehicle> predicate)
+    {
+        return Iterables.filter(vehicles, predicate);
+    }
+
+
+    public static int countVehicles(Iterable<? extends Vehicle> vehicles, Predicate<Vehicle> predicate)
+    {
+        return Iterables.size(Iterables.filter(vehicles, predicate));
+    }
+
+
     public static boolean isCurrentTaskDelayed(Schedule<TaxiTask> schedule, double now)
     {
         TaxiTask currentTask = schedule.getCurrentTask();
@@ -76,11 +124,5 @@ public class TaxicabUtils
         else {
             throw new IllegalStateException();
         }
-    }
-
-
-    public static int countIdleVehicles(Iterable<? extends Vehicle> vehicles)
-    {
-        return Iterables.size(Iterables.filter(vehicles, IS_IDLE_PREDICATE));
     }
 }
