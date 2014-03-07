@@ -37,6 +37,7 @@ import org.matsim.contrib.grips.model.config.GripsConfigModule;
 import org.matsim.contrib.grips.model.events.InfoEvent;
 import org.matsim.contrib.grips.scenariogenerator.ScenarioGenerator;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -82,6 +83,9 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 
 	private static final Logger log = Logger.getLogger(ScenarioGeneratorPT.class);
 	private List<TransitRouteStop> stops;
+	private String configFile;
+	private Config c;
+	private Scenario sc;
 	
 	public ScenarioGeneratorPT(String config) {
 		super(config);
