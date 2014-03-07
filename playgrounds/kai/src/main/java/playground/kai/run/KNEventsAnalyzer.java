@@ -29,13 +29,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-
-import playground.southafrica.gauteng.GautengControler_subpopulations;
 
 /**
  * @author nagel
@@ -60,6 +54,11 @@ public class KNEventsAnalyzer {
 			popAttrFilename = args[3] ;
 		}
 		
+		String tollFilename = null ;
+		if ( args.length >= 4 && args[4]!=null ) {
+			tollFilename = args[4] ;
+		}
+		
 		// ===
 
 		Config config = ConfigUtils.createConfig() ;
@@ -71,6 +70,7 @@ public class KNEventsAnalyzer {
 		config.network().setInputFile( networkFilename );
 		config.plans().setInputFile( populationFilename );
 		config.plans().setInputPersonAttributeFile( popAttrFilename );
+		config.roadpricing().setTollLinksFile(tollFilename);
 
 		// ===
 		
@@ -92,7 +92,7 @@ public class KNEventsAnalyzer {
 //				date.getHourOfDay() + "h" + minute ;
 		String myDate = "" ;
 		
-		calcLegTimes.addPopulationStatsAndWrite(myDate + "_stats_");
+		calcLegTimes.writeStats(myDate + "_stats_");
 	}
 
 }
