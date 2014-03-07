@@ -1,6 +1,7 @@
 package org.matsim.contrib.freight.carrier;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.internal.MatsimReader;
 
 /**
  * A reader that reads carriers and their plans.
@@ -8,7 +9,7 @@ import org.apache.log4j.Logger;
  * @author sschroeder
  *
  */
-public class CarrierPlanXmlReaderV2 {
+public class CarrierPlanXmlReaderV2 implements MatsimReader {
 
 	private static Logger logger = Logger.getLogger(CarrierPlanXmlReaderV2.class);
 	
@@ -30,15 +31,7 @@ public class CarrierPlanXmlReaderV2 {
 	 * 
 	 * @param filename
 	 */
-	/* This is somewhat problematic for me (JWJoubert, Nov '13). The MatsimXmlParser
-	 * has a parse method, yet when calling it, it results in an XML error. Maybe 
-	 * it would be better to 
-	 * a) use a dtd file, and
-	 * b) rather use the infrastructure provided by the MatsimXmlParser, and 
-	 *    override it if required.
-	 * 
-	 * I've posted a similar comment for the CarrierVehicleTypeReader.
-	 */
+	@Override
 	public void read(String filename) {
 		logger.info("read carrier plans");
 		this.delegate.setValidating(false);
