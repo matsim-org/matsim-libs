@@ -83,9 +83,13 @@ public class PopulationAgentSource implements AgentSource {
 		}
 	}
 
-	private Id findVehicleLink(Person p) {
-		// A more careful way to decide where this agent should have its vehicles created
-		// than to ask agent.getCurrentLinkId() after creation.
+	/**
+	 *	A more careful way to decide where this agent should have its vehicles created
+	 *  than to ask agent.getCurrentLinkId() after creation.
+	 */
+	public static final Id findVehicleLink(Person p) {
+		// hope it is ok to make this public as long as it is static final. kai, mar'14
+		
 		for (PlanElement planElement : p.getSelectedPlan().getPlanElements()) {
 			if (planElement instanceof Activity) {
 				Activity activity = (Activity) planElement;
