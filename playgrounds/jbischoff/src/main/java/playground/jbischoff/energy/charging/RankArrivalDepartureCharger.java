@@ -146,7 +146,7 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 			if (!isConnectedToCharger(e.getKey()) ){
 				if (chargerHasFreeSpaceForVehicle(e.getKey()) ){
 					addVehicleToCharger(e.getKey());
-					this.events.processEvent(new StartChargingEvent(time, e.getKey(), this.arrivalLinks.get(e.getKey())));
+//					this.events.processEvent(new StartChargingEvent(time, e.getKey(), this.arrivalLinks.get(e.getKey())));
 
 				}
 			}	
