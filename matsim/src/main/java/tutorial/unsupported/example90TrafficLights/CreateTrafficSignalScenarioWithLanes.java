@@ -30,9 +30,10 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
-import org.matsim.lanes.data.v11.LaneDefinitions;
-import org.matsim.lanes.data.v11.LaneDefinitionsFactory;
-import org.matsim.lanes.data.v11.LanesToLinkAssignment;
+import org.matsim.lanes.data.v11.LaneDefinitions11;
+import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
+import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
+import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.utils.LanesUtils;
 import org.matsim.signalsystems.SignalUtils;
@@ -208,10 +209,10 @@ public class CreateTrafficSignalScenarioWithLanes {
 
 	private LaneDefinitions20 createLanes(ScenarioImpl scenario) {
 		double laneLenght = 150.0;
-		LaneDefinitions lanes = scenario.getLaneDefinitions11();
-		LaneDefinitionsFactory factory = lanes.getFactory();
+		LaneDefinitions11 lanes = new LaneDefinitions11Impl();
+		LaneDefinitionsFactory11 factory = lanes.getFactory();
 		//lanes for link 12
-		LanesToLinkAssignment lanesForLink12 = factory.createLanesToLinkAssignment(scenario.createId("12"));
+		LanesToLinkAssignment11 lanesForLink12 = factory.createLanesToLinkAssignment(scenario.createId("12"));
 		lanes.addLanesToLinkAssignment(lanesForLink12);
 		LanesUtils.createAndAddLane(lanesForLink12, factory, scenario.createId("1"), 
 				laneLenght, 1, scenario.createId("23"));
@@ -220,7 +221,7 @@ public class CreateTrafficSignalScenarioWithLanes {
 				laneLenght, 1, scenario.createId("27"));
 
 		//lanes for link 65
-		LanesToLinkAssignment lanesForLink65 = factory.createLanesToLinkAssignment(scenario.createId("65"));
+		LanesToLinkAssignment11 lanesForLink65 = factory.createLanesToLinkAssignment(scenario.createId("65"));
 		lanes.addLanesToLinkAssignment(lanesForLink65);
 
 		LanesUtils.createAndAddLane(lanesForLink65, factory, scenario.createId("1"), 
