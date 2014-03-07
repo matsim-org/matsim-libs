@@ -71,6 +71,9 @@ public class AccessibilityRuns {
 
 	@Test
 	public void doAccessibilityTest() {
+		String gnuplotDirectory = "C:/cygwin64/bin/";
+		String integrationContribRoot = "D:/Workspace/contrib/integration/";
+		
 		Config config = ConfigUtils.createConfig() ;
 
 //		config.network().setInputFile("../../../matsimExamples/countries/za/nmbm/network/network.xml.gz" );
@@ -118,10 +121,10 @@ public class AccessibilityRuns {
 		// the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
 
 		for ( String actType : activityTypes ) {
-//			if ( !actType.equals("w") ) {
-//				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
-//				continue ;
-//			}
+			if ( !actType.equals("w") ) {
+				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
+				continue ;
+			}
 			
 			config.controler().setOutputDirectory( utils.getOutputDirectory() + "/" + actType + "/" );
 			ActivityFacilities opportunities = FacilitiesUtils.createActivityFacilities() ;
@@ -171,7 +174,6 @@ public class AccessibilityRuns {
 //				throw new RuntimeException( "writing t.gpl did not work") ;
 //			}
 			
-			
 			try {
 				BufferedWriter writer = IOUtils.getBufferedWriter( config.controler().getOutputDirectory() + "/t.gpl" ) ;
 				writer.write("#set pm3d\n") ;
@@ -183,7 +185,8 @@ public class AccessibilityRuns {
 				writer.write("#set zrange [-40:10]\n") ;
 				writer.write("#set cbrange [-0:10]\n") ;
 				writer.write("set term pdf size 25cm,20cm\n") ;
-				writer.write("set out 'accessibility.pdf'\n") ;
+				// writer.write("set out 'accessibility.pdf'\n") ;
+				writer.write("set out '" + integrationContribRoot + config.controler().getOutputDirectory() + "accessibility.pdf'\n") ;
 				writer.write("#set title 'accessibility to w'\n") ;
 				writer.write("\n") ;
 				writer.write("#set view 45,30;\n") ;
@@ -191,7 +194,6 @@ public class AccessibilityRuns {
 				writer.write("# set palette model HSV functions gray, 1, 1\n") ;
 				writer.write("\n") ;
 				writer.write("min(a,b) = (a < b) ? a : b\n") ;
-				writer.write("\n") ;
 				writer.write("max(a,b) = (a < b) ? b : a\n") ;
 				writer.write("accmin=3 ; # accessibilities below this are red\n") ;
 				writer.write("accmax=9 ; # accessibilities above this are blue.  max is around 12\n") ;
@@ -211,8 +213,9 @@ public class AccessibilityRuns {
 				writer.write("\n") ;
 				writer.write("unset colorbox ; # useless with lc rgb variable\n") ;
 				writer.write("\n") ;
-				//writer.write("splot \"<awk '!/access/{print $0}' doAccessibilityTest/w/accessibilities.csv\" u 1:2:(rgb($3,$8)) lc rgb variable\n") ;
-				writer.write("splot \"accessibilities.csv\" u 1:2:(rgb($3,$8)) lc rgb variable\n") ;
+				// writer.write("splot \"<awk '!/access/{print $0}' doAccessibilityTest/w/accessibilities.csv\" u 1:2:(rgb($3,$8)) lc rgb variable\n") ;
+				// writer.write("splot \"accessibilities.csv\" u 1:2:(rgb($3,$8)) lc rgb variable\n") ;
+				writer.write("splot \"<awk '!/access/{print $0}' " + integrationContribRoot + config.controler().getOutputDirectory() + "accessibilities.csv\" u 1:2:(rgb($3,$8)) lc rgb variable\n") ;
 				writer.write("\n") ;
 				writer.write("#rgb(r,g,b) = 65536 * int(r) + 256 * int(g) + int(b)\n") ;
 				writer.write("#splot \"data\" using 1:2:3:(rgb($1,$2,$3)) with points lc rgb variable\n") ;
@@ -222,16 +225,17 @@ public class AccessibilityRuns {
 				throw new RuntimeException( "writing t.gpl did not work") ;
 			}
 			
-		
 			// String cmd = "/opt/local/bin/gnuplot t.gpl" ;
-			String cmd = "C:/Program Files (x86)/gnuplot/bin/gnuplot t.gpl";
+			String cmd = gnuplotDirectory + "gnuplot " + integrationContribRoot + config.controler().getOutputDirectory() + "/t.gpl";
+			
+			// It seems to be required that workingDirectory = gnuplotDirectory to ensure that Unix commands (e.g. awk)
+			// are also operable in other system architectures (e.g. on Windows via Cygwin).
+			// String workingDirectory = config.controler().getOutputDirectory() ;
+			String workingDirectory = gnuplotDirectory;
+
 			String stdoutFileName = config.controler().getOutputDirectory() + "/gnuplot.log" ;
 			int timeout = 99999 ;
-			String workingDirectory = config.controler().getOutputDirectory() ;
 			ExeRunner.run(cmd, stdoutFileName, timeout, workingDirectory) ;
-
 		}
-
 	}
-
 }
