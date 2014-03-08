@@ -42,6 +42,8 @@
           type           CDATA #IMPLIED
           start_link	 CDATA #IMPLIED
           end_link       CDATA #IMPLIED
+          trav_time		 CDATA #IMPLIED
+          distance		 CDATA #IMPLIED
           vehicleRefId           CDATA #IMPLIED
           >
 
