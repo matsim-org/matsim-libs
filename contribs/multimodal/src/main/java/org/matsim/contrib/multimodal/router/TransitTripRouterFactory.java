@@ -86,7 +86,7 @@ public class TransitTripRouterFactory implements TripRouterFactory {
 			}
 			
         	TransitRouterWrapper routingModule = new TransitRouterWrapper(transitRouterFactory.createTransitRouter(), scenario.getTransitSchedule(),
-        			transitWalkRoutingModule);
+        			scenario.getNetwork(), transitWalkRoutingModule);
         	
             for (String mode : scenario.getConfig().transit().getTransitModes()) {
                 tripRouter.setRoutingModule(mode, routingModule);

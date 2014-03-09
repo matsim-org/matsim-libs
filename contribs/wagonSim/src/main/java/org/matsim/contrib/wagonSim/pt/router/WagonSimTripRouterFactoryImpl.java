@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -66,6 +67,7 @@ public final class WagonSimTripRouterFactoryImpl implements TripRouterFactory {
 	private TransitSchedule transitSchedule;
 	private TransitRouterFactory routerFactory;
 	private Map<Id,Double> minShuntingTimes;
+	private Network network;
 
 	public WagonSimTripRouterFactoryImpl(
 			final Scenario scenario,
@@ -77,6 +79,7 @@ public final class WagonSimTripRouterFactoryImpl implements TripRouterFactory {
 //		this.delegate = new TripRouterFactoryImpl(scenario, disutilityFactory, travelTime, leastCostAlgoFactory, transitRouterFactory);
 		this.routerFactory = transitRouterFactory;
 		this.transitSchedule = scenario.getTransitSchedule();
+		this.network = scenario.getNetwork();
 		this.walkRouter = createWalkRouter(scenario.getPopulation().getFactory(), scenario.getConfig().plansCalcRoute());
 		this.minShuntingTimes = minShuntingTimes;
 	}
@@ -96,7 +99,7 @@ public final class WagonSimTripRouterFactoryImpl implements TripRouterFactory {
 //		TripRouter tripRouter = this.delegate.instantiateAndConfigureTripRouter();
 		TripRouter tripRouter = new TripRouter();
 		tripRouter.setRoutingModule(TransportMode.pt, 
-				new WagonSimRouterWrapper(routerFactory.createTransitRouter(), transitSchedule, walkRouter, minShuntingTimes));
+				new WagonSimRouterWrapper(routerFactory.createTransitRouter(), transitSchedule, network, walkRouter, minShuntingTimes));
 		return tripRouter;
 	}
 	
@@ -108,9 +111,10 @@ public final class WagonSimTripRouterFactoryImpl implements TripRouterFactory {
 		public WagonSimRouterWrapper(
 				final TransitRouter router,
 				final TransitSchedule transitSchedule,
+				final Network network,
 				final RoutingModule walkRouter,
 				Map<Id,Double> minShuntingTimes) {
-			this.delegate = new TransitRouterWrapper(router, transitSchedule, walkRouter);
+			this.delegate = new TransitRouterWrapper(router, transitSchedule, network, walkRouter);
 			this.minShuntingTimes = minShuntingTimes;
 		}
 		

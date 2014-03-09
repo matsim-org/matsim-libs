@@ -197,7 +197,7 @@ public class PTripRouterFactoryImpl implements TripRouterFactory {
 						this.scenario.getTransitSchedule(),
 						// end of modification
 						
-						// use a walk router in case no PT path is found
+						scenario.getNetwork(), // use a walk router in case no PT path is found
 						new LegRouterWrapper(
 							TransportMode.transit_walk,
 							populationFactory,

@@ -57,7 +57,7 @@ public class ScheduleBasedTripRouterFactory implements TripRouterFactory {
 			 new TransitRouterWrapper(
 					transitRouterFactory.createTransitRouter(),
 					scenario.getTransitSchedule(),
-					// use a walk router in case no PT path is found
+					scenario.getNetwork(), // use a walk router in case no PT path is found
 					new LegRouterWrapper(
 							TransportMode.transit_walk,
 							scenario.getPopulation().getFactory(),
