@@ -252,16 +252,18 @@ import org.matsim.core.utils.misc.Time;
 		out.write("type=\"");
 		out.write(route.getRouteType());
 		out.write("\"");
-		if (route.getStartLinkId() != null) {
-			out.write(" start_link=\"");
-			out.write(route.getStartLinkId().toString());
-			out.write("\"");
-		}
-		if (route.getEndLinkId() != null) {
-			out.write(" end_link=\"");
-			out.write(route.getEndLinkId().toString());
-			out.write("\"");
-		}
+		out.write(" start_link=\"");
+		out.write(route.getStartLinkId().toString());
+		out.write("\"");
+		out.write(" end_link=\"");
+		out.write(route.getEndLinkId().toString());
+		out.write("\"");
+		out.write(" trav_time=\"");
+		out.write(Time.writeTime(route.getTravelTime()));
+		out.write("\"");
+		out.write(" distance=\"");
+		out.write(Double.toString(route.getDistance()).toString());
+		out.write("\"");
 		out.write(">");
 		String rd = route.getRouteDescription();
 		if (rd != null) {
@@ -269,23 +271,28 @@ import org.matsim.core.utils.misc.Time;
 		}
 	}
 
-	private void startNetworkRoute(final NetworkRoute nr, final BufferedWriter out) throws IOException {
+	private void startNetworkRoute(final NetworkRoute route, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route ");
-
-		if ( nr.getVehicleId()!=null ) {
-			out.write("vehicleRefId=\""+ nr.getVehicleId() +"\" ") ;
+		if ( route.getVehicleId()!=null ) {
+			out.write("vehicleRefId=\""+ route.getVehicleId() +"\" ") ;
 		}
-
-		out.write("type=\"links\">");
-		out.write(nr.getStartLinkId().toString());
-		for (Id linkId : nr.getLinkIds()) {
+		out.write("type=\"links\"");
+		out.write(" trav_time=\"");
+		out.write(Time.writeTime(route.getTravelTime()));
+		out.write("\"");
+		out.write(" distance=\"");
+		out.write(Double.toString(route.getDistance()));
+		out.write("\"");
+		out.write(">");
+		out.write(route.getStartLinkId().toString());
+		for (Id linkId : route.getLinkIds()) {
 			out.write(" ");
 			out.write(linkId.toString());
 		}
 		// If the start links equals the end link additionally check if its is a round trip. 
-		if (!nr.getEndLinkId().equals(nr.getStartLinkId()) || nr.getLinkIds().size() > 0) {
+		if (!route.getEndLinkId().equals(route.getStartLinkId()) || route.getLinkIds().size() > 0) {
 			out.write(" ");
-			out.write(nr.getEndLinkId().toString());
+			out.write(route.getEndLinkId().toString());
 		}
 	}
 

@@ -204,7 +204,7 @@ public class TripRouterFactoryImpl implements TripRouterFactoryInternal {
 			TransitRouterWrapper routingModule = new TransitRouterWrapper(
 					transitRouterFactory.createTransitRouter(),
 					transitSchedule,
-					// use a walk router in case no PT path is found
+					network, // use a walk router in case no PT path is found
 					new LegRouterWrapper(
 							TransportMode.transit_walk,
 							populationFactory,

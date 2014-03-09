@@ -23,15 +23,17 @@ package org.matsim.core.replanning;
 import java.util.EnumSet;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 
 public class ReRoutingTest extends MatsimTestCase {
@@ -100,15 +102,19 @@ public class ReRoutingTest extends MatsimTestCase {
 	}
 	
 	private void evaluate() {
-		final String revisedFileName = getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz";
-		log.warn( "output file name is: " + revisedFileName );
-		long revisedCheckSum = CRCChecksum.getCRCFromFile(revisedFileName);
-
+		Config config = loadConfig(getClassInputDirectory() + "config.xml");
 		final String originalFileName = getInputDirectory() + "1.plans.xml.gz";
-		log.warn( "input file name is: " + originalFileName );
-		long originalCheckSum = CRCChecksum.getCRCFromFile(originalFileName);
+		final String revisedFileName = getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz";
+		
+		Scenario expectedPopulation = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(expectedPopulation).readFile(config.network().getInputFile());
+		new MatsimPopulationReader(expectedPopulation).readFile(originalFileName);
+		Scenario actualPopulation = ScenarioUtils.createScenario(config);
+	
+		new MatsimPopulationReader(actualPopulation).readFile(revisedFileName);
 
-		assertEquals("different plans files", originalCheckSum, revisedCheckSum);
+		Assert.assertTrue("different plans files", 
+				PopulationUtils.equalPopulation(expectedPopulation.getPopulation(), actualPopulation.getPopulation()));		
 	}
 
 	static public class TestControler extends Controler {

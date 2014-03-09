@@ -156,15 +156,15 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 	    leg.setArrivalTime(event.getTime());
 	    double travelTime = leg.getArrivalTime() - leg.getDepartureTime();
 	    leg.setTravelTime(travelTime);
-	    List<Id> route = routes.get(event.getPersonId());
+	    List<Id> route = routes.remove(event.getPersonId());
 	    assert route.size() >= 1;
 	    PendingTransitTravel pendingTransitTravel;
 	    if (route.size() > 1) {
 	        NetworkRoute networkRoute = RouteUtils.createNetworkRoute(route, null);
 	        networkRoute.setTravelTime(travelTime);
+	        networkRoute.setDistance(RouteUtils.calcDistance(networkRoute, scenario.getNetwork()));
 	        leg.setRoute(networkRoute);
-	        routes.remove(event.getPersonId());
-	    } else if ((pendingTransitTravel = transitTravels.get(event.getPersonId())) != null) {
+	    } else if ((pendingTransitTravel = transitTravels.remove(event.getPersonId())) != null) {
 	    	LineAndRoute lineAndRoute = transitVehicle2currentRoute.get(pendingTransitTravel.vehicleId);
 			TransitLine line = scenario.getTransitSchedule().getTransitLines().get(lineAndRoute.transitLineId);
 			ExperimentalTransitRoute experimentalTransitRoute = new ExperimentalTransitRoute(
@@ -172,18 +172,19 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 					line, 
 					line.getRoutes().get(lineAndRoute.transitRouteId), 
 					scenario.getTransitSchedule().getFacilities().get(lineAndRoute.lastFacilityId));
+			experimentalTransitRoute.setTravelTime(travelTime);
+			experimentalTransitRoute.setDistance(RouteUtils.calcDistance(experimentalTransitRoute, scenario.getTransitSchedule(), scenario.getNetwork()));
 			leg.setRoute(experimentalTransitRoute);
-			transitTravels.remove(event.getPersonId());
 	    } else {
-	        GenericRoute genericRoute = new GenericRouteImpl(route.get(0), event.getLinkId());
-	        TeleportationArrivalEvent travelEvent = routelessTravels.get(event.getPersonId());
+	    	TeleportationArrivalEvent travelEvent = routelessTravels.remove(event.getPersonId());
+	    	GenericRoute genericRoute = new GenericRouteImpl(route.get(0), event.getLinkId());
+	    	genericRoute.setTravelTime(travelTime);
 	        if (travelEvent != null) {
 	            genericRoute.setDistance(travelEvent.getDistance());
 	        } else {
 	            genericRoute.setDistance(0.0);
 	        }
 	        leg.setRoute(genericRoute);
-	        routelessTravels.remove(event.getPersonId());
 	    }
 	    legHandler.handleLeg(event.getPersonId(), leg);
 	}

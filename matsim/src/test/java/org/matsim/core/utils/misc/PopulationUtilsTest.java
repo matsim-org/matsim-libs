@@ -20,19 +20,24 @@ package org.matsim.core.utils.misc;
 
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.Assert;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
@@ -136,6 +141,33 @@ public class PopulationUtilsTest {
 				plan3 = plan ;
 			}
 		}
+	}
+	
+	@Test
+	public void testEmptyPopulation() {
+		Scenario s1 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario s2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Assert.assertTrue(PopulationUtils.equalPopulation(s1.getPopulation(), s2.getPopulation()));
+	}
+	
+	@Test
+	public void testEmptyPopulationVsOnePerson() {
+		Scenario s1 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario s2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Person person = s2.getPopulation().getFactory().createPerson(new IdImpl("1"));
+		s2.getPopulation().addPerson(person);
+		Assert.assertFalse(PopulationUtils.equalPopulation(s1.getPopulation(), s2.getPopulation()));
+		Assert.assertFalse(PopulationUtils.equalPopulation(s2.getPopulation(), s1.getPopulation()));
+	}
+	
+	@Test
+	public void testCompareBigPopulationWithItself() {
+		Scenario s1 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		String netFileName = "test/scenarios/berlin/network.xml";
+		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
+		new MatsimNetworkReader(s1).readFile(netFileName);
+		new MatsimPopulationReader(s1).readFile(popFileName);
+		Assert.assertTrue(PopulationUtils.equalPopulation(s1.getPopulation(), s1.getPopulation()));
 	}
 
 }

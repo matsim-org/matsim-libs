@@ -27,16 +27,21 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToLegs.LegHandler;
 
 public class EventsToLegsTest {
 
 	@Test
 	public void testCreatesLeg() {
-		Scenario scenario = null;
+		Scenario scenario = createTriangularNetwork();
 		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
 		RememberingLegHandler lh = new RememberingLegHandler();
 		eventsToLegs.setLegHandler(lh);
@@ -51,7 +56,7 @@ public class EventsToLegsTest {
 
 	@Test
 	public void testCreatesLegWithRoute() {
-		Scenario scenario = null;
+		Scenario scenario = createTriangularNetwork();
 		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
 		RememberingLegHandler lh = new RememberingLegHandler();
 		eventsToLegs.setLegHandler(lh);
@@ -66,6 +71,30 @@ public class EventsToLegsTest {
 		Assert.assertEquals(10.0,lh.handledLeg.getDepartureTime(), 1e-9);
 		Assert.assertEquals(20.0,lh.handledLeg.getTravelTime(), 1e-9);
 		Assert.assertEquals(20.0,lh.handledLeg.getRoute().getTravelTime(), 1e-9);
+		
+		// Don't know if it makes sense, but according to specification,
+		// the length of a route still does not include first and last link.
+		Assert.assertEquals(500.0,lh.handledLeg.getRoute().getDistance(), 1e-9);
+	}
+	
+	private static Scenario createTriangularNetwork() {
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		
+		// add nodes
+		Node node1 = network.createAndAddNode(new IdImpl("n1"), scenario.createCoord(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl("n2"), scenario.createCoord(50, 100));
+		Node node3 = network.createAndAddNode(new IdImpl("n3"), scenario.createCoord(50, 0));
+		Node node4 = network.createAndAddNode(new IdImpl("n4"), scenario.createCoord(100, 0));
+
+		// add links
+		network.createAndAddLink(new IdImpl("l1"), node1, node2, 500.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl("l2"), node2, node3, 500.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl("l3"), node3, node4, 50.0, 0.1, 3600.0, 1);
+		network.createAndAddLink(new IdImpl("l4"), node4, node1, 50.0, 0.1, 3600.0, 1);
+		
+		return scenario;
 	}
 	
 	private static class RememberingLegHandler implements LegHandler {

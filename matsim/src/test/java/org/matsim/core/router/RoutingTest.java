@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.AStarEuclideanFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -247,25 +248,18 @@ public class RoutingTest extends MatsimTestCase {
 
 	private void doTest(final RouterProvider provider) {
 		final Config config = loadConfig("test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/config.xml");
-
 		final Scenario scenario = ScenarioUtils.createScenario(config);
-
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
-
 		final String inPlansName = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/plans.xml.gz";
 		new MatsimPopulationReader(scenario).readFile(inPlansName);
-
-		final long referenceChecksum = CRCChecksum.getCRCFromFile(inPlansName);
-		log.info("Reference checksum = " + referenceChecksum + " file: " + inPlansName);
-
-		final String outPlansName = getOutputDirectory() + provider.getName() + ".plans.xml.gz";
-
+		
 		calcRoute(provider, scenario);
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(outPlansName);
-		final long routerChecksum = CRCChecksum.getCRCFromFile(outPlansName);
 
-		log.info("routerChecksum = " + routerChecksum + " file: " + outPlansName);
-		assertEquals("different plans files.", referenceChecksum, routerChecksum);
+		final Scenario referenceScenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(referenceScenario).readFile(config.network().getInputFile());
+		new MatsimPopulationReader(referenceScenario).readFile(inPlansName);
+		
+		assertTrue("different plans files.", PopulationUtils.equalPopulation(referenceScenario.getPopulation(), scenario.getPopulation()));
 	}
 
 	private void calcRoute(

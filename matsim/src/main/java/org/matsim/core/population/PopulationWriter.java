@@ -47,7 +47,12 @@ public class PopulationWriter extends AbstractMatsimWriter implements MatsimWrit
 	private Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
 
 	private final static Logger log = Logger.getLogger(PopulationWriter.class);
-
+	
+	
+	public PopulationWriter(final Population population) {
+		this(population, null, 1.0);
+	}
+	
 	/**
 	 * Creates a new PlansWriter to write out the specified plans to the file and with version
 	 * as specified in the {@linkplain org.matsim.core.config.groups.PlansConfigGroup configuration}.

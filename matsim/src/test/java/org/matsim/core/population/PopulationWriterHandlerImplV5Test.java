@@ -131,6 +131,10 @@ public class PopulationWriterHandlerImplV5Test {
 		plan.addActivity(pb.createActivityFromLinkId("h", idFrom));
 		Leg leg = pb.createLeg(TransportMode.walk);
 		GenericRouteImpl route = new GenericRouteImpl(idFrom, idTo);
+		final double travTime = 60.0 * 60.0;
+		route.setTravelTime(travTime); 
+		final double dist = 100.0;
+		route.setDistance(dist); 
 		leg.setRoute(route);
 		plan.addLeg(leg);
 		plan.addActivity(pb.createActivityFromLinkId("h", scenario.createId("2")));
@@ -149,6 +153,8 @@ public class PopulationWriterHandlerImplV5Test {
 		Assert.assertTrue("read route is of class " + route2.getClass().getCanonicalName(), route2 instanceof GenericRouteImpl);
 		Assert.assertEquals("wrong start link", startLinkId, route2.getStartLinkId().toString());
 		Assert.assertEquals("wrong end link", endLinkId, route2.getEndLinkId().toString());
+		Assert.assertEquals("wrong travel time", travTime, route2.getTravelTime(), 1e-9);
+		Assert.assertEquals("wrong distance", dist, route2.getDistance(), 1e-9);
 	}
 
 	private static final class RouteInterceptingPopulationReader extends MatsimXmlParser implements PopulationReader {

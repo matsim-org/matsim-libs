@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
@@ -16,6 +18,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -46,7 +49,7 @@ public class PowerPlans {
 		.instantiateAndConfigureTripRouter();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
-			double distance = PowerPlans.distance(scenario, plan);
+			double distance = PowerPlans.distance(scenario.getNetwork(), plan);
 			List<Activity> activities = TripStructureUtils.getActivities(plan.getPlanElements(), new StageActivityTypesImpl());
 			for (List<Activity> someActivities : PowerList.powerList(activities)) {
 				List<Activity> otherActivities = new ArrayList<Activity>(activities);
@@ -99,14 +102,14 @@ public class PowerPlans {
 		return dist;
 	}
 
-	public static double distance(Scenario scenario, Plan plan) {
+	public static double distance(Network network, Plan plan) {
 		double personKm = 0.0;
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
 				Leg leg = (Leg) pe;
 				if (leg.getRoute() instanceof NetworkRoute) {
 					NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
-					personKm += calcDistance(networkRoute, scenario.getNetwork());
+					personKm += calcDistance(networkRoute, network);
 				}
 			}
 		}
@@ -178,7 +181,7 @@ public class PowerPlans {
 		.instantiateAndConfigureTripRouter();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
-			double distance = distance(scenario, plan);
+			double distance = distance(scenario.getNetwork(), plan);
 			for (int i=0; i < plan.getPlanElements().size(); i++) {
 				PlanElement pe = plan.getPlanElements().get(i);
 				if (pe instanceof Activity) {
@@ -194,7 +197,7 @@ public class PowerPlans {
 		pw.close();
 	}
 
-	static double drivenKilometersWholeDay(Scenario scenario,
+	public static double drivenKilometersWholeDay(Scenario scenario,
 			VolumesAnalyzer volumes) {
 		double sum = 0;
 		for (Link link : scenario.getNetwork().getLinks().values()) {
@@ -208,18 +211,15 @@ public class PowerPlans {
 		return sum;
 	}
 
-	static double sumDistancesAndPutInBasePopulation(Scenario scenario,
-			Scenario baseScenario, String suffix) {
-		double km = 0.0;
-		for (Person person : scenario.getPopulation().getPersons().values()) {
-	
+	public static Map<Id, Double> travelledDistancePerPerson(Population population,
+			Network network) {
+		Map<Id, Double> result = new HashMap<Id, Double>();
+		for (Person person : population.getPersons().values()) {	
 			Plan plan = person.getSelectedPlan();
-			double personKm = distance(baseScenario, plan);
-			Person basePerson = baseScenario.getPopulation().getPersons().get(person.getId());
-			basePerson.getCustomAttributes().put("kilometers-"+suffix, personKm);
-			km += personKm;
+			double personKm = distance(network, plan);
+			result.put(person.getId(), personKm);
 		}
-		return km;
+		return result;
 	}
 
 }

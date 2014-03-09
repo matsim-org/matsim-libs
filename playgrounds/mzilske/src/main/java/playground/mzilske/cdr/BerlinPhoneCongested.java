@@ -1,5 +1,6 @@
 package playground.mzilske.cdr;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
@@ -21,7 +22,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -39,13 +40,13 @@ public class BerlinPhoneCongested {
 		Scenario scenario = ScenarioUtils.createScenario(baseConfig);
 		new MatsimNetworkReader(scenario).readFile(BerlinRun.BERLIN_PATH + "network/bb_4.xml.gz");
 		new MatsimPopulationReader(scenario).readFile("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/car-congested/output-berlin/ITERS/it.200/2kW.15.200.plans.xml.gz");
-//		PrintWriter pw = new PrintWriter(new File("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/car-congested/quality-over-callrate.txt"));
+	//	PrintWriter pw = new PrintWriter(new File("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/car-congested/quality-over-callrate.txt"));
 //		for (int dailyRate : CALLRATES) {
 //			run(scenario, dailyRate, pw);
 //		}
-//		runInfiniteRate(scenario);
-		runInfiniteRate2(scenario);
-	//	pw.close();
+		runContinuedBasePlans(scenario);
+//		runPhoneOnActivityStartEnd(scenario);
+//		pw.close();
 	}
 
 	private static void run(Scenario scenario, final int dailyRate, PrintWriter pw) {
@@ -80,20 +81,16 @@ public class BerlinPhoneCongested {
 		config.controler().setOutputDirectory("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/car-congested/output-" + Integer.toString((int) dailyRate));
 
 		compareMain.runOnceWithSimplePlans(config);
-		pw.printf("%d\t%f\t%f\t%f\n", dailyRate, compareMain.compareAllDay(), compareMain.compareTimebins(), compareMain.compareEMDMassPerLink());
-		pw.flush();
+	//	pw.printf("%d\t%f\t%f\t%f\n", dailyRate, compareMain.compareAllDay(), compareMain.compareTimebins(), compareMain.compareEMDMassPerLink());
+	//	pw.flush();
 	}
 
 	private static Config phoneConfig() {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams sightingParam = new ActivityParams("sighting");
-		sightingParam.setTypicalDuration(30.0 * 60);
+		sightingParam.setScoringThisActivityAtAll(false);
 		config.planCalcScore().addActivityParams(sightingParam);
 		config.planCalcScore().setTraveling_utils_hr(-6);
-		config.planCalcScore().setPerforming_utils_hr(0);
-		config.planCalcScore().setTravelingOther_utils_hr(-6);
-		config.planCalcScore().setConstantCar(0);
-		config.planCalcScore().setMonetaryDistanceCostRateCar(0);
 		config.planCalcScore().setWriteExperiencedPlans(true);
 		config.controler().setLastIteration(20);
 		QSimConfigGroup tmp = config.qsim();
@@ -117,31 +114,33 @@ public class BerlinPhoneCongested {
 		return config;
 	}
 
-	private void runInfiniteRate(Scenario baseScenario) {
+	private void runContinuedBasePlans(Scenario baseScenario) {
 		Config config = phoneConfig();
 		for (ActivityParams params : baseScenario.getConfig().planCalcScore().getActivityParams()) {
 			ActivityParams zero = new ActivityParams(params.getType());
 			zero.setScoringThisActivityAtAll(false);
 			config.planCalcScore().addActivityParams(zero);
 		}
-		config.controler().setOutputDirectory("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/car-congested/output-infinite");
+		config.controler().setOutputDirectory("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/car-congested/output-contbaseplans");
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		((ScenarioImpl) scenario).setNetwork(baseScenario.getNetwork());
-		((ScenarioImpl) scenario).setPopulation(baseScenario.getPopulation());
 		
-		for (Person person : scenario.getPopulation().getPersons().values()) {
-			((PersonImpl) person).removeUnselectedPlans();
+		for (Person basePerson : baseScenario.getPopulation().getPersons().values()) {
+			Person person = scenario.getPopulation().getFactory().createPerson(basePerson.getId());
+			PlanImpl planImpl = (PlanImpl) scenario.getPopulation().getFactory().createPlan();
+			planImpl.copyFrom(basePerson.getSelectedPlan());
+			person.addPlan(planImpl);
+			scenario.getPopulation().addPerson(person);
 		}
 		
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(false);
 		controler.run();
-
 	}
 	
-	private void runInfiniteRate2(Scenario scenario) {
+	private void runPhoneOnActivityStartEnd(Scenario scenario) {
 		EventsManager events = EventsUtils.createEventsManager();
 		CompareMain compareMain = new CompareMain(scenario, events, new CallBehavior() {
 
@@ -169,7 +168,7 @@ public class BerlinPhoneCongested {
 		new MatsimEventsReader(events).readFile("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/car-congested/output-berlin/ITERS/it.200/2kW.15.200.events.xml.gz");
 		
 		Config config = phoneConfig();
-		config.controler().setOutputDirectory("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/car-congested/output-infinte");
+		config.controler().setOutputDirectory("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/car-congested/output-actevents");
 		compareMain.runOnceWithSimplePlans(config);
 	}
 	

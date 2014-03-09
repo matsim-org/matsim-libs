@@ -20,6 +20,10 @@
 
 package org.matsim.core.population;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -43,6 +47,8 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -396,4 +402,59 @@ public final class PopulationUtils {
 		}
 		return simil ;
 	}
+	
+	/**
+	 * Compares two Populations by serializing them to XML with the current writer
+	 * and comparing their XML form byte by byte.
+	 * A bit like comparing checksums of files,
+	 * but regression tests won't fail just because the serialization changes.
+	 * Limitation: If one of the PopulationWriters throws an Exception,
+	 * this will go unnoticed (this method will just return true or false).
+	 */
+	public static boolean equalPopulation(final Population s1, final Population s2) {
+		try {
+			InputStream inputStream1 = null;
+			InputStream inputStream2 = null;
+			try {
+				inputStream1 = openPopulationInputStream(s1);
+				inputStream2 = openPopulationInputStream(s2);
+				return IOUtils.isEqual(inputStream1, inputStream2);
+			} finally {
+				if (inputStream1 != null) inputStream1.close();
+				if (inputStream2 != null) inputStream2.close();
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * The InputStream which comes from this method must be properly
+	 * resource-managed, i.e. always be closed.
+	 * 
+	 * Otherwise, the Thread which is opened here may stay alive.
+	 */
+	private static InputStream openPopulationInputStream(final Population s1) {
+		try {
+			final PipedInputStream in = new PipedInputStream();
+			final PipedOutputStream out = new PipedOutputStream(in);
+			new Thread(new Runnable() {
+				public void run() {
+					final PopulationWriter writer = new PopulationWriter(s1);
+					try {
+						writer.write(out);
+					} catch (UncheckedIOException e) {
+						// Writer will throw an IOException when pipe is closed from the other side (like "broken pipe" in UNIX)
+						// This is expected. Don't even log anything.
+						// Other exceptions (from the Writer) are not caught
+						// but written to the console.
+					}
+				}
+			}).start();
+			return in;
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+	
 }

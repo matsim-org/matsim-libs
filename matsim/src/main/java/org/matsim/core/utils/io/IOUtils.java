@@ -33,6 +33,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.zip.GZIPInputStream;
@@ -571,4 +574,31 @@ public class IOUtils {
 			throw new UncheckedIOException(e);
 		}
 	}
+
+	// Compares two InputStreams.
+	// Interestingly, StackOverflow claims that this naive way would be slow,
+	// but for me, it is OK and the fast alternative which is proposed there is 
+	// much slower, so I'm just doing it like this for now.
+	
+	// http://stackoverflow.com/questions/4245863/fast-way-to-compare-inputstreams
+	public static boolean isEqual(InputStream i1, InputStream i2)
+			throws IOException {
+		try {
+			while (true) {
+				int fr = i1.read();
+	            int tr = i2.read();
+
+	            if (fr != tr) {
+	                return false;
+	            }
+	            if (fr == -1) {
+	                return true; // EOF on both sides
+	            }
+			}
+		} finally {
+			if (i1 != null) i1.close();
+			if (i2 != null) i2.close();
+		}
+	}
+	
 }
