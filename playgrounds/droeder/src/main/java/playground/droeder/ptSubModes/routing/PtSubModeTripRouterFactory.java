@@ -181,7 +181,7 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 					new TransitRouterWrapper(
 							((PtSubModeRouterSet) transitRouterFactory.createTransitRouter()).getModeRouter(mode),
 							transitSchedule,
-							// use a walk router in case no path is found
+							network, // use a walk router in case no path is found
 							new LegRouterWrapper(
 									TransportMode.transit_walk,
 									populationFactory,
@@ -196,7 +196,7 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 				new TransitRouterWrapper(
 						((PtSubModeRouterSet) transitRouterFactory.createTransitRouter()).getModeRouter(TransportMode.pt),
 						transitSchedule,
-						// use a walk router in case no PT path is found
+						network, // use a walk router in case no PT path is found
 						new LegRouterWrapper(
 								TransportMode.transit_walk,
 								populationFactory,
