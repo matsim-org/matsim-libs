@@ -409,7 +409,9 @@ public final class PopulationUtils {
 	 * A bit like comparing checksums of files,
 	 * but regression tests won't fail just because the serialization changes.
 	 * Limitation: If one of the PopulationWriters throws an Exception,
-	 * this will go unnoticed (this method will just return true or false).
+	 * this will go unnoticed (this method will just return true or false,
+	 * probably false, except if both Writers have written the exact same text
+	 * until the Exception happens).
 	 */
 	public static boolean equalPopulation(final Population s1, final Population s2) {
 		try {
