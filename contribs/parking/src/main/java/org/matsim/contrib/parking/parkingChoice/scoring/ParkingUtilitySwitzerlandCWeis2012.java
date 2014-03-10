@@ -28,6 +28,7 @@ public class ParkingUtilitySwitzerlandCWeis2012 implements ParkingUtilityFunctio
 	public double getScore(Id agentId, double parkingArrivalTime, double parkingDuration, double actDuration, Id actFacilityId,
 			String actType, Parking parking) {
 		// TODO Auto-generated method stub
+		 
 		return 0;
 	}
 
