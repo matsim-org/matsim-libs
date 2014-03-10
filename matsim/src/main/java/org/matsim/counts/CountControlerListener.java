@@ -83,7 +83,7 @@ public class CountControlerListener implements StartupListener, IterationEndsLis
 		}
 		Controler controler = event.getControler();
 		
-		if (useVolumesOfIteration(event.getIteration(), controler.getFirstIteration())) {
+		if (useVolumesOfIteration(event.getIteration(), controler.getConfig().controler().getFirstIteration())) {
 			addVolumes(controler.getVolumes());
 		}
 

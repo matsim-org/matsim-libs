@@ -120,7 +120,7 @@ public class Line2GexfPStat implements StartupListener, IterationEndsListener, S
 	public void notifyShutdown(ShutdownEvent event) {
 		// call shutdown for all remaining gexf
 		for (SimpleGexfPStat gexf : this.lineId2GexfPStat.values()) {
-			gexf.notifyShutdown(event.getControler().getLastIteration());
+			gexf.notifyShutdown(event.getControler().getConfig().controler().getLastIteration());
 		}
 		log.info("terminated the last " + this.lineId2GexfPStat.values().size() + " gexf handlers...");
 	}

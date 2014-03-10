@@ -28,6 +28,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.router.PlanRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 
@@ -52,7 +53,10 @@ public class CottbusFansControlerListener implements BeforeMobsimListener{
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent e) {
 		Controler c = e.getControler();
-		PlanAlgorithm pcr = c.createRoutingAlgorithm();
+		PlanAlgorithm pcr = new PlanRouter(
+		c.getTripRouterFactory().instantiateAndConfigureTripRouter(),
+		c.getScenario().getActivityFacilities()
+		);
 		for (Person p : pop.getPersons().values()){
 			if (random.nextDouble() < 0.1){
 //				log.debug(((LinkNetworkRoute)((Leg)p.getSelectedPlan().getPlanElements().get(1)).getRoute()).getLinkIds());

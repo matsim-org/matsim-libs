@@ -26,6 +26,7 @@ package playground.yu.counts;
 import java.util.List;
 
 import org.matsim.analysis.CalcLinkStats;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -36,6 +37,7 @@ import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
+import org.matsim.counts.algorithms.CountsComparisonAlgorithm.VolumesForId;
 
 import playground.yu.utils.io.SimpleWriter;
 
@@ -67,11 +69,18 @@ public class RebuildCountSimRealPerHourFromLinkStats2Txt {
 		Counts counts = new Counts();
 		new MatsimCountsReader(counts).readFile(countsFilename);
 
-		CalcLinkStats linkStats = new CalcLinkStats(network);
+		final CalcLinkStats linkStats = new CalcLinkStats(network);
 		linkStats.readFile(linkStatsFilename);
 
-		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(
-				linkStats, counts, network, countsScaleFactor);
+		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
+		
+			@Override
+			public double[] getVolumesForStop(Id stopId) {
+				return linkStats.getAvgLinkVolumes(stopId);
+			}
+		
+		}, counts, network,
+				countsScaleFactor);
 		// if (config.counts().getDistanceFilterCenterNode() != null) {
 		cca.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
 		// }

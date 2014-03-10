@@ -23,7 +23,13 @@ package org.matsim.pt.counts;
 import java.util.List;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.counts.CountSimComparison;
+import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
 
 
@@ -34,7 +40,7 @@ public class PtAlightCountsComparisonAlgorithmTest extends MatsimTestCase {
 		PtCountsFixture fixture = new PtAlightCountsFixture();
 		fixture.setUp();
 
-		PtCountsComparisonAlgorithm cca = fixture.getCCA();
+		CountsComparisonAlgorithm cca = fixture.getCCA();
 		cca.run();
 
 		List<CountSimComparison> csc_list = cca.getComparison();
@@ -54,11 +60,11 @@ public class PtAlightCountsComparisonAlgorithmTest extends MatsimTestCase {
 
 	@Test
 	public void testDistanceFilter() {
-		PtCountsFixture fixture = new PtAlightCountsFixture();
+		final PtCountsFixture fixture = new PtAlightCountsFixture();
 		fixture.setUp();
+		CountsComparisonAlgorithm cca = fixture.getCCA();
 
-		PtCountsComparisonAlgorithm cca = fixture.getCCA();
-		cca.setDistanceFilter(Double.valueOf(4000), "11");
+		cca.setCountCoordUsingDistanceFilter(4000.0, "11");
 		cca.run();
 
 		List<CountSimComparison> csc_list = cca.getComparison();

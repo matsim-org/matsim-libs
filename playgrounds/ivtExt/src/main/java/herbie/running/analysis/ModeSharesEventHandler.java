@@ -89,7 +89,7 @@ public class ModeSharesEventHandler
 	 */
 	public ModeSharesEventHandler(final Controler controler) {
 		this.network = controler.getNetwork();
-		this.modeShares = new ArrayList<Map<String, Double>>(controler.getLastIteration());
+		this.modeShares = new ArrayList<Map<String, Double>>(controler.getConfig().controler().getLastIteration());
 	}
 	
 	/*

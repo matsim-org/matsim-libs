@@ -66,7 +66,7 @@ public class PlansDumping implements BeforeMobsimListener {
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		if ( calledViaOldConstructor ) {
 			this.sc = event.getControler().getScenario() ;
-			this.firstIteration = event.getControler().getFirstIteration() ;
+			this.firstIteration = event.getControler().getConfig().controler().getFirstIteration() ;
 			this.writePlansInterval = sc.getConfig().controler().getWritePlansInterval() ;
 			this.stopwatch = event.getControler().stopwatch ;
 			this.controlerIO = event.getControler().getControlerIO() ;

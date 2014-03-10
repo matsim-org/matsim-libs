@@ -63,7 +63,7 @@ public class TravelTimeRoadPricingControler extends Controler {
 					e.printStackTrace();
 				}
 			}
-			if (idx == ctl.getLastIteration()) {
+			if (idx == ctl.getConfig().controler().getLastIteration()) {
 				if (ttms != null) {
 					ttms.write(event.getControler().getControlerIO().getOutputFilename("traveltimes.txt"));
 					// ttms.writeCharts(getOutputFilename("traveltimes.png"));
@@ -81,7 +81,7 @@ public class TravelTimeRoadPricingControler extends Controler {
 
 		public void notifyIterationStarts(IterationStartsEvent event) {
 			Controler c = event.getControler();
-			if (event.getIteration() == c.getLastIteration()) {
+			if (event.getIteration() == c.getConfig().controler().getLastIteration()) {
 				ttms = new LegTravelTimeModalSplit(3600, c.getPopulation());
 				c.getEvents().addHandler(ttms);
 			}

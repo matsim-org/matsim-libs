@@ -47,7 +47,7 @@ public class BseUCControler extends Controler {
 	@Override
 	protected StrategyManager loadStrategyManager() {
 		// StrategyManager Constructor
-		StrategyManager manager = new BseUCStrategyManager(network, getFirstIteration());
+		StrategyManager manager = new BseUCStrategyManager(network, getConfig().controler().getFirstIteration());
 		StrategyManagerConfigLoader.load(this, manager);
 		return manager;
 	}

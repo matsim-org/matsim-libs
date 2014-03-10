@@ -58,7 +58,7 @@ public class CarSharingListener implements IterationEndsListener {
   public void notifyIterationEnds(IterationEndsEvent event)
   {
     this.controler = event.getControler();
-    if (event.getIteration() != this.controler.getLastIteration())
+    if (event.getIteration() != this.controler.getConfig().controler().getLastIteration())
       return;
     Network network = this.controler.getNetwork();
     this.plansCalcRouteFtInfo.prepare(network);

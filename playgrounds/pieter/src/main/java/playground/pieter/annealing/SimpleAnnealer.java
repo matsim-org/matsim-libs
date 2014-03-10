@@ -101,8 +101,7 @@ public class SimpleAnnealer implements IterationStartsListener,
 					log.warn("No " + END_PROPORTION
 							+ " set, so using default of " + endProportion);
 				slope = (startProportion - endProportion)
-						/ (controler.getFirstIteration() - controler
-								.getLastIteration());
+						/ (controler.getConfig().controler().getFirstIteration() - controler.getConfig().controler().getLastIteration());
 			} else {
 				log.error("Incorrect anneal type \""
 						+ config.getParam(modName, ANNEAL_TYPE)
@@ -112,7 +111,7 @@ public class SimpleAnnealer implements IterationStartsListener,
 			}
 		}
 		// re-planning only starts in the first iteration
-		currentIter = event.getIteration() - controler.getFirstIteration();
+		currentIter = event.getIteration() - controler.getConfig().controler().getFirstIteration();
 		if (currentIter <= 1)
 			currentProportion = startProportion;
 		else {

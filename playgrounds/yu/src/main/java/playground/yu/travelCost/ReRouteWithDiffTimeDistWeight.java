@@ -58,7 +58,7 @@ public class ReRouteWithDiffTimeDistWeight implements IterationStartsListener,
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		Controler ctl = event.getControler();
 		int iter = event.getIteration();/* firstIter+1, +2, +3 */
-		int firstIter = ctl.getFirstIteration();
+		int firstIter = ctl.getConfig().controler().getFirstIteration();
 		ctl.setTravelDisutilityFactory(new ParameterizedTravelCostCalculatorFactoryImpl(
 				1d - (iter - firstIter - 1) / (nbOfCombi - 1d)/* A -> travelTime */));
 	}
@@ -71,7 +71,7 @@ public class ReRouteWithDiffTimeDistWeight implements IterationStartsListener,
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		Controler ctl = event.getControler();
 		int iter = event.getIteration();/* firstIter+1, +2, +3 */
-		if (iter == ctl.getFirstIteration()) {
+		if (iter == ctl.getConfig().controler().getFirstIteration()) {
 			PlanCalcScoreConfigGroup scoringCfg = ctl.getConfig()
 					.planCalcScore();
 			scoringCfg.setMonetaryDistanceCostRateCar(-0.000245);

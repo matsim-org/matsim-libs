@@ -42,7 +42,7 @@ public class TrCtl extends TransitControler {
 		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 			int iter = event.getIteration();
 			TrCtl ctl = (TrCtl) event.getControler();
-			if (iter % 10 == 0 && iter > ctl.getFirstIteration()) {
+			if (iter % 10 == 0 && iter > ctl.getConfig().controler().getFirstIteration()) {
 				ctl.oa.reset(iter);
 				ctl.getEvents().addHandler(ctl.oa);
 			}
@@ -51,7 +51,7 @@ public class TrCtl extends TransitControler {
 		public void notifyAfterMobsim(AfterMobsimEvent event) {
 			int it = event.getIteration();
 			TrCtl ctl = (TrCtl) event.getControler();
-			if (it % 10 == 0 && it > ctl.getFirstIteration()) {
+			if (it % 10 == 0 && it > ctl.getConfig().controler().getFirstIteration()) {
 				ctl.getEvents().removeHandler(ctl.oa);
 				ctl.oa.write(ctl.getControlerIO().getIterationFilename(it,
 						"occupancyAnalysis.txt"));

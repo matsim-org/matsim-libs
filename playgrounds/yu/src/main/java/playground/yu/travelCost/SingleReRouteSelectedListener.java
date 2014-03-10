@@ -49,7 +49,7 @@ public class SingleReRouteSelectedListener implements IterationStartsListener,
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		Controler ctl = event.getControler();
-		if (event.getIteration() > ctl.getFirstIteration()) {
+		if (event.getIteration() > ctl.getConfig().controler().getFirstIteration()) {
 			ctl
 					.setTravelDisutilityFactory(new ParameterizedTravelCostCalculatorFactoryImpl(
 							A/* travelTime */));
@@ -64,7 +64,7 @@ public class SingleReRouteSelectedListener implements IterationStartsListener,
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		Controler ctl = event.getControler();
 		int iter = event.getIteration();/* firstIter+1, +2, +3 */
-		if (iter == ctl.getFirstIteration()) {
+		if (iter == ctl.getConfig().controler().getFirstIteration()) {
 			PlanCalcScoreConfigGroup scoringCfg = ctl.getConfig()
 					.planCalcScore();
 			scoringCfg.setMonetaryDistanceCostRateCar(-0.00036);

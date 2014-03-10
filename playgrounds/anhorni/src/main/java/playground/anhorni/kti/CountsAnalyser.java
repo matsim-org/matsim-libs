@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.matsim.analysis.CalcLinkStats;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -38,6 +39,7 @@ import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
+import org.matsim.counts.algorithms.CountsComparisonAlgorithm.VolumesForId;
 import org.matsim.counts.algorithms.CountsHtmlAndGraphsWriter;
 import org.matsim.counts.algorithms.graphs.CountsErrorGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
@@ -133,8 +135,15 @@ public class CountsAnalyser {
 	private List<CountSimComparison> createCountsComparisonList(
 			final CalcLinkStats calcLinkStats) {
 		// processing counts
-		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(this.linkStats,
-				counts, this.network, this.scenario.getConfig().counts().getCountsScaleFactor());
+		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
+		
+			@Override
+			public double[] getVolumesForStop(Id stopId) {
+				return calcLinkStats.getAvgLinkVolumes(stopId);
+			}
+		
+		}, counts, this.network,
+				this.scenario.getConfig().counts().getCountsScaleFactor());
 		if ((this.distanceFilter != null) && (this.distanceFilterCenterNode != null))
 			cca.setDistanceFilter(this.distanceFilter, this.distanceFilterCenterNode);
 		cca.setCountsScaleFactor(this.scenario.getConfig().counts().getCountsScaleFactor());

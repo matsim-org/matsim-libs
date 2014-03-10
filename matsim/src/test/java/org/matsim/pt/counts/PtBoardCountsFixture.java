@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 
 public class PtBoardCountsFixture extends PtCountsFixture {
 
@@ -33,14 +34,30 @@ public class PtBoardCountsFixture extends PtCountsFixture {
 	}
 
 	@Override
-	public PtCountsComparisonAlgorithm getCCA() {
+	public CountsComparisonAlgorithm getCCA() {
 		Map<Id, int[]> boards = new HashMap<Id, int[]>();
 		int[] boardArray = new int[24];
 		boardArray[8] = 65;
 		boards.put(new IdImpl("stop1"), boardArray);
 		this.oa.setBoards(boards);
-		PtCountsComparisonAlgorithm cca = new PtBoardCountComparisonAlgorithm(oa, counts, network, Double.parseDouble(config.findParam(MODULE_NAME, "countsScaleFactor")));
+		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
+			
+			@Override
+			public double[] getVolumesForStop(Id stopId) {
+				return copyFromIntArray(oa.getBoardVolumesForStop(stopId));
+			}
+			
+		}, counts, network, Double.parseDouble(config.findParam(MODULE_NAME, "countsScaleFactor")));
 		cca.setDistanceFilter(Double.valueOf(config.findParam(MODULE_NAME,"distanceFilter")), config.findParam(MODULE_NAME,"distanceFilterCenterNode"));
 		return cca;
+	}
+	
+
+	private static double[] copyFromIntArray(int[] source) {
+	    double[] dest = new double[source.length];
+	    for(int i=0; i<source.length; i++) {
+	        dest[i] = source[i];
+	    }
+	    return dest;
 	}
 }

@@ -176,8 +176,9 @@ class CadytsPtCountsComparisonAlgorithm {
 		this.distanceFilterNode = this.network.getNodes().get(new IdImpl(nodeId));
 	}
 
-	@SuppressWarnings("resource")
 	void write(final String outputFilename) {
-		new SimpleWriter(outputFilename, this.content.toString());
+		final SimpleWriter simpleWriter = new SimpleWriter(outputFilename);
+		simpleWriter.write(this.content.toString());
+		simpleWriter.close();
 	}
 }

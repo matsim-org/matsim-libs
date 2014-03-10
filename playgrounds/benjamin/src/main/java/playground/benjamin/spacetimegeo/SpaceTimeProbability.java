@@ -138,9 +138,9 @@ public class SpaceTimeProbability {
 					}
 				}
 				
-				Double link3Fraction = handler.getLink3Counter() / (controler.getLastIteration() + 1);
-				Double link9Fraction = handler.getLink9Counter() / (controler.getLastIteration() + 1);
-				Double link11Fraction = handler.getLink11Counter() / (controler.getLastIteration() + 1);
+				Double link3Fraction = handler.getLink3Counter() / (controler.getConfig().controler().getLastIteration() + 1);
+				Double link9Fraction = handler.getLink9Counter() / (controler.getConfig().controler().getLastIteration() + 1);
+				Double link11Fraction = handler.getLink11Counter() / (controler.getConfig().controler().getLastIteration() + 1);
 				
 				bw.append(entry.getKey().toString());
 				bw.append("\t");

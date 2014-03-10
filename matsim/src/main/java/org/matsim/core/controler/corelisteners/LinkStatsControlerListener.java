@@ -44,7 +44,7 @@ public class LinkStatsControlerListener implements IterationEndsListener, Iterat
 		Controler controler = event.getControler();
 		int iteration = event.getIteration();
 		
-		if (useVolumesOfIteration(iteration, controler.getFirstIteration())) {
+		if (useVolumesOfIteration(iteration, controler.getConfig().controler().getFirstIteration())) {
 			this.iterationsUsed++;
 			controler.getLinkStats().addData(controler.getVolumes(), controler.getLinkTravelTimes());
 		}

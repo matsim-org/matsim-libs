@@ -124,7 +124,7 @@ public class LinkCapacitySqrtWeightedTimeListener implements
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		Controler ctl = event.getControler();
-		if (event.getIteration() > ctl.getFirstIteration()) {
+		if (event.getIteration() > ctl.getConfig().controler().getFirstIteration()) {
 			ctl
 					.setTravelDisutilityFactory(new LinkCapacitySqrtWeightedTravelCostCalculatorFactoryImpl());
 		}

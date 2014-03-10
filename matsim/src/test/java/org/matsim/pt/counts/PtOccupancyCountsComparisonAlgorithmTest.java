@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.matsim.counts.CountSimComparison;
+import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
 
 public class PtOccupancyCountsComparisonAlgorithmTest extends MatsimTestCase {
@@ -33,7 +34,7 @@ public class PtOccupancyCountsComparisonAlgorithmTest extends MatsimTestCase {
 		PtCountsFixture fixture = new PtOccupancyCountsFixture();
 		fixture.setUp();
 
-		PtCountsComparisonAlgorithm cca = fixture.getCCA();
+		CountsComparisonAlgorithm cca = fixture.getCCA();
 		cca.run();
 
 		List<CountSimComparison> csc_list = cca.getComparison();
@@ -56,8 +57,8 @@ public class PtOccupancyCountsComparisonAlgorithmTest extends MatsimTestCase {
 		PtCountsFixture fixture = new PtOccupancyCountsFixture();
 		fixture.setUp();
 
-		PtCountsComparisonAlgorithm cca = fixture.getCCA();
-		cca.setDistanceFilter(Double.valueOf(3000), "11");
+		CountsComparisonAlgorithm cca = fixture.getCCA();
+		cca.setCountCoordUsingDistanceFilter(3000.0, "11");
 		cca.run();
 
 		List<CountSimComparison> csc_list = cca.getComparison();

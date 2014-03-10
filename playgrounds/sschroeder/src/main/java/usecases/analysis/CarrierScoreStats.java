@@ -105,8 +105,8 @@ public class CarrierScoreStats implements StartupListener, IterationEndsListener
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 		Controler controler = event.getControler();
-		this.minIteration = controler.getFirstIteration();
-		int maxIter = controler.getLastIteration();
+		this.minIteration = controler.getConfig().controler().getFirstIteration();
+		int maxIter = controler.getConfig().controler().getLastIteration();
 		int iterations = maxIter - this.minIteration;
 		if (iterations > 5000) iterations = 5000; // limit the history size
 		this.history = new double[4][iterations+1];

@@ -27,6 +27,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -124,7 +125,7 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		final Controler controler = event.getControler();
-		if(event.getIteration() == controler.getFirstIteration()){
+		if(event.getIteration() == controler.getConfig().controler().getFirstIteration()){
 			log.info("This is the first iteration. All lines were added by notifyStartup event.");
 		} else {
 			this.pBox.notifyIterationStarts(event);
@@ -139,7 +140,10 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 				ParallelPersonAlgorithmRunner.run(controler.getPopulation(), controler.getConfig().global().getNumberOfThreads(), new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 					@Override
 					public AbstractPersonAlgorithm getPersonAlgorithm() {
-						return stuckFactory.getReRouteStuck(controler.createRoutingAlgorithm(), ((ScenarioImpl)controler.getScenario()), agentsStuckHandler.getAgentsStuck());
+						return stuckFactory.getReRouteStuck(new PlanRouter(
+						controler.getTripRouterFactory().instantiateAndConfigureTripRouter(),
+						controler.getScenario().getActivityFacilities()
+						), ((ScenarioImpl)controler.getScenario()), agentsStuckHandler.getAgentsStuck());
 					}
 				});
 			}

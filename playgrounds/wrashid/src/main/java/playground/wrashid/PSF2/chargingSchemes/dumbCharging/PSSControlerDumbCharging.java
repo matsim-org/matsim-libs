@@ -98,7 +98,7 @@ public class PSSControlerDumbCharging extends PSSControler {
 
 		controler.addControlerListener(new ShutdownListener() {
 			public void notifyShutdown(ShutdownEvent event) {
-				ParametersPSF2.getPSFGeneralLog().writeFileAndCloseStream(event.getControler().getLastIteration() + 1);
+				ParametersPSF2.getPSFGeneralLog().writeFileAndCloseStream(event.getControler().getConfig().controler().getLastIteration() + 1);
 			}
 		});
 	}

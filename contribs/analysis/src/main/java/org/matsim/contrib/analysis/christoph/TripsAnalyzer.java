@@ -159,8 +159,8 @@ public class TripsAnalyzer implements PersonDepartureEventHandler, PersonArrival
 	public void notifyStartup(final StartupEvent event) {
 
 		Controler controler = event.getControler();	
-		this.minIteration = controler.getFirstIteration();
-		int maxIter = controler.getLastIteration();
+		this.minIteration = controler.getConfig().controler().getFirstIteration();
+		int maxIter = controler.getConfig().controler().getLastIteration();
 		int iterations = maxIter - this.minIteration;
 		this.tripsHistory = new double[this.sortedModes.size() + 1][iterations + 1];
 		this.durationHistory = new double[this.sortedModes.size() + 1][iterations + 1];	

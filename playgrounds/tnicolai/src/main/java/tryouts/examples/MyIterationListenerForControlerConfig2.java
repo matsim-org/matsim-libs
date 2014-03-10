@@ -54,7 +54,7 @@ public class MyIterationListenerForControlerConfig2 implements IterationEndsList
 	 * At the end of the last iteration some results are presented...
 	 */
 	public void notifyIterationEnds(IterationEndsEvent event){
-		if(event.getIteration() == event.getControler().getLastIteration()){
+		if(event.getIteration() == event.getControler().getConfig().controler().getLastIteration()){
 			log.info("This will be the last iteration !!! Iteration = " + event.getIteration() );
 			
 			log.info("Showing some results for travel time (tt):");

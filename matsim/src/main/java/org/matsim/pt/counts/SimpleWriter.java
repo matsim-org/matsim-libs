@@ -25,6 +25,7 @@ import java.io.Flushable;
 import java.io.IOException;
 
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * a small and simple writer, in order to avoid copious "try" and "catch" for
@@ -34,16 +35,11 @@ import org.matsim.core.utils.io.IOUtils;
  * 
  */
 public class SimpleWriter implements Closeable, Flushable {
-	private BufferedWriter writer = null;
+
+	private final BufferedWriter writer;
 
 	public SimpleWriter(final String outputFilename) {
 		writer = IOUtils.getBufferedWriter(outputFilename);
-	}
-
-	public SimpleWriter(String outputFilename, String contents2write) {
-		writer = IOUtils.getBufferedWriter(outputFilename);
-		write(contents2write);
-		close();
 	}
 
 	public void write(char[] c) {
@@ -51,7 +47,7 @@ public class SimpleWriter implements Closeable, Flushable {
 			try {
 				writer.write(c);
 			} catch (IOException e) {
-				e.printStackTrace();
+				throw new UncheckedIOException(e);
 			}
 	}
 
@@ -60,7 +56,7 @@ public class SimpleWriter implements Closeable, Flushable {
 			try {
 				writer.write(c);
 			} catch (IOException e) {
-				e.printStackTrace();
+				throw new UncheckedIOException(e);
 			}
 	}
 
@@ -70,7 +66,7 @@ public class SimpleWriter implements Closeable, Flushable {
 				writer.write(s);
 			} catch (IOException e) {
 				System.err.println("writer was not initialized yet!");
-				e.printStackTrace();
+				throw new UncheckedIOException(e);
 			}
 		}
 	}
@@ -96,7 +92,7 @@ public class SimpleWriter implements Closeable, Flushable {
 		try {
 			writer.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -105,11 +101,12 @@ public class SimpleWriter implements Closeable, Flushable {
 		try {
 			writer.flush();
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new UncheckedIOException(e);
 		}
 	}
 
 	public void writeln(StringBuffer line) {
 		writeln(line.toString());
 	}
+
 }

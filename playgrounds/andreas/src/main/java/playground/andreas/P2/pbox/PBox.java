@@ -126,7 +126,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		this.cooperatives.addAll(coopsFromSchedule);
 		
 		// init initial set of cooperatives - reduced by the number of preset coops
-		LinkedList<Cooperative> initialCoops = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, event.getControler().getFirstIteration(), (this.pConfig.getNumberOfCooperatives() - coopsFromSchedule.size()));
+		LinkedList<Cooperative> initialCoops = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, event.getControler().getConfig().controler().getFirstIteration(), (this.pConfig.getNumberOfCooperatives() - coopsFromSchedule.size()));
 		this.cooperatives.addAll(initialCoops);
 		
 		// collect the transit schedules from all cooperatives

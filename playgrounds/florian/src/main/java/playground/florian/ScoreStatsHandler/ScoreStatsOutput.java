@@ -49,8 +49,8 @@ public class ScoreStatsOutput implements ShutdownListener{
 
 	public void notifyShutdown(ShutdownEvent event) {
 		history = event.getControler().getScoreStats().getHistory();
-		int firstIt = event.getControler().getFirstIteration();
-		int lastIt = event.getControler().getLastIteration();
+		int firstIt = event.getControler().getConfig().controler().getFirstIteration();
+		int lastIt = event.getControler().getConfig().controler().getLastIteration();
 		int maxHistory = lastIt - firstIt;
 		for (int i = 0; i<=maxHistory; i++){
 			int it = i + firstIt;

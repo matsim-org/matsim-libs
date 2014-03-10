@@ -122,8 +122,8 @@ public class PStatsOverview implements StartupListener, IterationEndsListener, S
 			this.pStatsWriter = null;
 		}		
 		
-		this.minIteration = controler.getFirstIteration();
-		int maxIter = controler.getLastIteration();
+		this.minIteration = controler.getConfig().controler().getFirstIteration();
+		int maxIter = controler.getConfig().controler().getLastIteration();
 		int iterations = maxIter - this.minIteration;
 		if (iterations > 10000) iterations = 10000; // limit the history size
 		this.history = new double[29][iterations+1];

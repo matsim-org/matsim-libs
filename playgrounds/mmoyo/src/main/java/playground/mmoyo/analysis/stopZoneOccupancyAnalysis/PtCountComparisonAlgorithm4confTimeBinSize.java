@@ -139,6 +139,8 @@ public class PtCountComparisonAlgorithm4confTimeBinSize {
 	}
 
 	void write(final String outputFilename) {
-		new SimpleWriter(outputFilename, this.content.toString());
+		final SimpleWriter simpleWriter = new SimpleWriter(outputFilename);
+		simpleWriter.write(this.content.toString());
+		simpleWriter.close();
 	}
 }

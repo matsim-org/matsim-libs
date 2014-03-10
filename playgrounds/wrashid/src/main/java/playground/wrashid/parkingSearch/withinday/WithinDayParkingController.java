@@ -29,6 +29,7 @@ import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
@@ -96,7 +97,10 @@ public class WithinDayParkingController extends WithinDayController implements R
 		super.createAndInitLinkReplanningMap();
 		
 // ensure that all agents' plans have valid mode chains
-		legModeChecker = new LegModeChecker(this.scenarioData, this.createRoutingAlgorithm());
+		legModeChecker = new LegModeChecker(this.scenarioData, new PlanRouter(
+		this.getTripRouterFactory().instantiateAndConfigureTripRouter(),
+		this.getScenario().getActivityFacilities()
+		));
 		legModeChecker.setValidNonCarModes(new String[]{TransportMode.walk});
 		legModeChecker.setToCarProbability(0.5);
 		legModeChecker.run(this.scenarioData.getPopulation());

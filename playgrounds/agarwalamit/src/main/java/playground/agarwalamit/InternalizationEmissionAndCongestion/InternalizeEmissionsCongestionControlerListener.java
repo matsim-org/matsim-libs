@@ -86,8 +86,8 @@ public class InternalizeEmissionsCongestionControlerListener implements StartupL
 		eventsManager.addHandler(new MarginalCostPricingCarHandler(eventsManager, scenario));
 		eventsManager.addHandler(tollHandler);
 
-		firstIt = controler.getFirstIteration();
-		lastIt = controler.getLastIteration();
+		firstIt = controler.getConfig().controler().getFirstIteration();
+		lastIt = controler.getConfig().controler().getLastIteration();
 	}
 
 	@Override

@@ -43,7 +43,7 @@ public class TimeTollTest extends MatsimTestCase {
 
 		@Override
 		public void notifyIterationEnds(final IterationEndsEvent event) {
-			if (event.getIteration() == event.getControler().getLastIteration()
+			if (event.getIteration() == event.getControler().getConfig().controler().getLastIteration()
 					&& clt != null) {
 				double traveling = event.getControler().getConfig().planCalcScore().getTraveling_utils_hr();
 				double criterion = 0;
@@ -62,7 +62,7 @@ public class TimeTollTest extends MatsimTestCase {
 
 		@Override
 		public void notifyIterationStarts(final IterationStartsEvent event) {
-			if (event.getIteration() == event.getControler().getLastIteration()) {
+			if (event.getIteration() == event.getControler().getConfig().controler().getLastIteration()) {
 				clt = new CalcLegTimes();
 				event.getControler().getEvents().addHandler(clt);
 			}

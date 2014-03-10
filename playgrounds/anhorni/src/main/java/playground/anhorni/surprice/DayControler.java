@@ -84,7 +84,7 @@ public class DayControler extends Controler {
 	
 	public int getFinalIteration() {
 		if (this.terminationCriterion == null) {
-			return this.getLastIteration();
+			return this.getConfig().controler().getLastIteration();
 		}
 		else {
 			return this.terminationCriterion.getFinalIteration();

@@ -34,6 +34,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -158,7 +159,10 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 		super.createAndInitLinkReplanningMap();
 
 		// ensure that all agents' plans have valid mode chains
-		legModeChecker = new LegModeChecker(this.scenarioData, this.createRoutingAlgorithm());
+		legModeChecker = new LegModeChecker(this.scenarioData, new PlanRouter(
+		this.getTripRouterFactory().instantiateAndConfigureTripRouter(),
+		this.getScenario().getActivityFacilities()
+		));
 		legModeChecker.setValidNonCarModes(new String[] { TransportMode.walk });
 		legModeChecker.setToCarProbability(0.5);
 		ParallelPersonAlgorithmRunner.run(this.scenarioData.getPopulation(), numReplanningThreads, legModeChecker);

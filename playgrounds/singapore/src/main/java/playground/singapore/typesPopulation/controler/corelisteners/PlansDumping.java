@@ -46,7 +46,7 @@ public class PlansDumping implements BeforeMobsimListener {
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		Scenario sc = event.getControler().getScenario() ;
-		int firstIteration = event.getControler().getFirstIteration() ;
+		int firstIteration = event.getControler().getConfig().controler().getFirstIteration() ;
 		int writePlansInterval = sc.getConfig().controler().getWritePlansInterval() ;
 		IterationStopWatch stopwatch = event.getControler().stopwatch ;
 		OutputDirectoryHierarchy controlerIO = event.getControler().getControlerIO() ;

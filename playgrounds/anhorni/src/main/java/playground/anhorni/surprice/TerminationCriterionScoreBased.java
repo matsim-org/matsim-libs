@@ -34,13 +34,13 @@ public class TerminationCriterionScoreBased implements TerminationCriterion {
 	public TerminationCriterionScoreBased(double stoppingCriterionVal, Controler controler) {
 		this.stoppingCriterionVal = stoppingCriterionVal;
 		this.controler = controler;
-		this.finalIteration = this.controler.getLastIteration();
+		this.finalIteration = this.controler.getConfig().controler().getLastIteration();
 	}
 
 	@Override
 	public boolean continueIterations(int iteration) {
 		
-		if (iteration > this.controler.getLastIteration()) {
+		if (iteration > this.controler.getConfig().controler().getLastIteration()) {
 			this.finalIteration = iteration - 1;
 			return false;
 		}

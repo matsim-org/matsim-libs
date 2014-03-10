@@ -104,7 +104,7 @@ public class RetailersLocationListener
     String modelIterParam = this.controler.getConfig().findParam("Retailers", "modelIteration");
     if (modelIterParam == null) {
       log.warn("The iteration in which the model should be run has not been set, the model run will be performed at the last iteration");
-      modelIter = this.controler.getLastIteration();
+      modelIter = this.controler.getConfig().controler().getLastIteration();
     }
     else {
       modelIter = Integer.parseInt(modelIterParam);
@@ -114,7 +114,7 @@ public class RetailersLocationListener
     String AnalysisFrequencyParam = this.controler.getConfig().findParam("Retailers", "analysisFrequency");
     if (AnalysisFrequencyParam == null) {
       log.warn("The frequency with which the analysis should be run has not been set, the analysis will be only performed when the model will run and at the last iteration");
-      analysisFrequency = this.controler.getLastIteration();
+      analysisFrequency = this.controler.getConfig().controler().getLastIteration();
     }
     else {
       analysisFrequency = Integer.parseInt(AnalysisFrequencyParam);
@@ -138,7 +138,7 @@ public class RetailersLocationListener
         		this.controler.getFacilities());
       }
     }
-    if ((event.getIteration() != 0) && (event.getIteration() % analysisFrequency == 0) && (event.getIteration() != modelIter) && (event.getIteration() != this.controler.getLastIteration()))
+    if ((event.getIteration() != 0) && (event.getIteration() % analysisFrequency == 0) && (event.getIteration() != modelIter) && (event.getIteration() != this.controler.getConfig().controler().getLastIteration()))
     {
     	log.info("Test1");
     	for (Iterator<Retailer> localIterator = this.retailers.getRetailers().values().iterator(); localIterator.hasNext(); ) { r = localIterator.next();
@@ -148,7 +148,7 @@ public class RetailersLocationListener
 
     }
 
-    if (event.getIteration() != this.controler.getLastIteration())
+    if (event.getIteration() != this.controler.getConfig().controler().getLastIteration())
       return;
     for (Iterator<Retailer> localIterator = this.retailers.getRetailers().values().iterator(); localIterator.hasNext(); ) { r = localIterator.next();
 

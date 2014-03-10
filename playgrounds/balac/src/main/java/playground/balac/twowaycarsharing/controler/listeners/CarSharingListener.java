@@ -64,7 +64,7 @@ public class CarSharingListener implements StartupListener, IterationEndsListene
   {
 	   // log.info("Number of rerouted legs is: " + tripCounter.getNumberOfReroutedLegs());
     this.controler = event.getControler();
-    if (event.getIteration() != this.controler.getLastIteration())
+    if (event.getIteration() != this.controler.getConfig().controler().getLastIteration())
       return;
     Network network = this.controler.getNetwork();
     this.plansCalcRouteFtInfo.prepare(network);

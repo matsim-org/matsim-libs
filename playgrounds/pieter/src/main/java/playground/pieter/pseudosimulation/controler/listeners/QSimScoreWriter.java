@@ -33,13 +33,13 @@ public class QSimScoreWriter implements IterationEndsListener,
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		if (!MobSimSwitcher.isQSimIteration || event.getIteration()==controler.getMATSimControler().getLastIteration()) {
+		if (!MobSimSwitcher.isQSimIteration || event.getIteration()==controler.getMATSimControler().getConfig().controler().getLastIteration()) {
 			return;
 		}
 		ArrayList<Integer> expensiveIters = MobSimSwitcher.getQSimIters();
 		int index = expensiveIters.size();
 		double[][] history = controler.getMATSimControler().getScoreStats().getHistory();
-		int idx = event.getIteration() - controler.getMATSimControler().getFirstIteration();
+		int idx = event.getIteration() - controler.getMATSimControler().getConfig().controler().getFirstIteration();
 		try {
 			out.write(event.getIteration() + "\t"
 					+ history[INDEX_EXECUTED][idx] + "\t"
@@ -59,11 +59,11 @@ public class QSimScoreWriter implements IterationEndsListener,
 				"iteration", "score");
 		double[] iterations = new double[index];
 		for (int i = 0; i < index; i++) {
-			iterations[i] = i + controler.getMATSimControler().getFirstIteration();
+			iterations[i] = i + controler.getMATSimControler().getConfig().controler().getFirstIteration();
 		}
 		double[] values = new double[index];
 		double[] fullhist = new double[event.getIteration()
-				- controler.getMATSimControler().getFirstIteration() + 1];
+				- controler.getMATSimControler().getConfig().controler().getFirstIteration() + 1];
 		int[] series = { INDEX_WORST, INDEX_BEST, INDEX_AVERAGE, INDEX_EXECUTED };
 		String[] seriesNames = { "avg. worst score", "avg. best score",
 				"avg. of plans' average score", "avg. executed score" };
@@ -73,7 +73,7 @@ public class QSimScoreWriter implements IterationEndsListener,
 			int valuecounter = 0;
 			for (int i : expensiveIters) {
 				values[valuecounter++] = fullhist[i
-						- controler.getMATSimControler().getFirstIteration()];
+						- controler.getMATSimControler().getConfig().controler().getFirstIteration()];
 			}
 			chart.addSeries(seriesNames[s], iterations, values);
 

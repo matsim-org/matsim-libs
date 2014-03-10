@@ -45,6 +45,7 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
+import org.matsim.counts.algorithms.CountsComparisonAlgorithm.VolumesForId;
 
 /**
  * This class is able to produce a crapy kml file to compare the link volumes
@@ -177,8 +178,15 @@ public class LinkStatsAnalyser {
 
 
 		// processing counts
-		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(this.linkStats1,
-				counts, this.network, this.scaleFactor);
+		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
+		
+			@Override
+			public double[] getVolumesForStop(Id stopId) {
+				return linkStats1.getAvgLinkVolumes(stopId);
+			}
+		
+		}, counts, this.network,
+				this.scaleFactor);
 
 		cca.setCountsScaleFactor(this.scaleFactor);
 		cca.run();

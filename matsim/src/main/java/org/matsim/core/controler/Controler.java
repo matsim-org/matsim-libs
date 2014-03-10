@@ -88,7 +88,6 @@ import org.matsim.population.VspPlansCleaner;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.counts.PtCountControlerListener;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -364,7 +363,7 @@ public class Controler extends AbstractController {
 
 		this.strategyManager = loadStrategyManager();
 		this.addCoreControlerListener(new PlansReplanning(this.strategyManager, population));
-		this.addCoreControlerListener(new PlansDumping(this.scenarioData, this.getFirstIteration(), this.config.controler().getWritePlansInterval(),
+		this.addCoreControlerListener(new PlansDumping(this.scenarioData, this.getConfig().controler().getFirstIteration(), this.config.controler().getWritePlansInterval(),
 				this.stopwatch, this.getControlerIO() ));
 
 
@@ -452,7 +451,10 @@ public class Controler extends AbstractController {
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 			@Override
 			public AbstractPersonAlgorithm getPersonAlgorithm() {
-				return new PersonPrepareForSim(createRoutingAlgorithm(), Controler.this.scenarioData);
+				return new PersonPrepareForSim(new PlanRouter(
+				getTripRouterFactory().instantiateAndConfigureTripRouter(),
+				getScenario().getActivityFacilities()
+				), Controler.this.scenarioData);
 			}
 		});
 	}
@@ -614,26 +616,6 @@ public class Controler extends AbstractController {
 		};
 	}
 	
-	/**Design comments:<ul>
-	 * @return a new instance of a {@link PlanAlgorithm} to calculate the routes
-	 *         of plans with the default (= the current from the last or current
-	 *         iteration) travel costs and travel times. Only to be used by a
-	 *         single thread, use multiple instances for multiple threads!
-	 *         
-	 *  @deprecated Overriding this method will affect prepareForSim(), but not the iterations.  In particular, without further measures it
-	 *  will not affect ReRoute in the iterations. Also conceptually, the building block really is the TripRouter, which routes from
-	 *  one location to another.  Wrapping this into a PlanAlgorithm is useful as a strategy, but nowhere else.  In summary, there
-	 *  is neither a good reason (any more) to override this method nor to call it.  kai, apr'13
-	 */
-	@Deprecated // use getTripRouterFactory() instead.  You probably want a trip router instead of a plan router anyway.  kai, may'13
-	public final PlanAlgorithm createRoutingAlgorithm() {
-		// yy public use at about 10 locations.  kai, may'13
-		return new PlanRouter(
-				getTripRouterFactory().instantiateAndConfigureTripRouter(),
-				getScenario().getActivityFacilities()
-				) ; 
-	}
-
 	public final TravelDisutility createTravelDisutilityCalculator() {
 		return this.travelCostCalculatorFactory.createTravelDisutility(
 				this.travelTimeCalculator.getLinkTravelTimes(), this.config.planCalcScore());
@@ -653,14 +635,6 @@ public class Controler extends AbstractController {
 	 */
 	public final ScoringFunctionFactory getScoringFunctionFactory() {
 		return this.scoringFunctionFactory;
-	}
-
-	public final int getFirstIteration() {
-		return this.config.controler().getFirstIteration();
-	}
-
-	public final int getLastIteration() {
-		return this.config.controler().getLastIteration();
 	}
 
 	public final Config getConfig() {

@@ -24,6 +24,7 @@ import java.io.File;
 
 import org.junit.Test;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -35,17 +36,17 @@ public class PtCountsKMLWriterTest extends MatsimTestCase {
 	public void testPtAlightKMLCreation() {
 		PtCountsFixture alightFixture = new PtAlightCountsFixture();
 		alightFixture.setUp();
-		PtCountsComparisonAlgorithm ccaAlight = alightFixture.getCCA();
+		CountsComparisonAlgorithm ccaAlight = alightFixture.getCCA();
 		ccaAlight.run();
 
 		PtCountsFixture boardFixture = new PtBoardCountsFixture();
 		boardFixture.setUp();
-		PtCountsComparisonAlgorithm ccaBoard = boardFixture.getCCA();
+		CountsComparisonAlgorithm ccaBoard = boardFixture.getCCA();
 		ccaBoard.run();
 
 		PtCountsFixture occupancyFixture = new PtOccupancyCountsFixture();
 		occupancyFixture.setUp();
-		PtCountsComparisonAlgorithm ccaOccupancy = occupancyFixture.getCCA();
+		CountsComparisonAlgorithm ccaOccupancy = occupancyFixture.getCCA();
 		ccaOccupancy.run();
 
 		String filename = this.getOutputDirectory() + "ptCountsCompare.kmz";

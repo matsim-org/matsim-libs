@@ -94,8 +94,8 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 	public void notifyStartup(final StartupEvent event) {
 		fileName =  event.getControler().getControlerIO().getOutputFilename(fileName);
 		Controler controler = event.getControler();
-		this.minIteration = controler.getFirstIteration();
-		int maxIter = controler.getLastIteration();
+		this.minIteration = controler.getConfig().controler().getFirstIteration();
+		int maxIter = controler.getConfig().controler().getLastIteration();
 		int iterations = maxIter - this.minIteration;
 		if (iterations > 5000) iterations = 5000; // limit the history size
 		for(Person person:population.getPersons().values()) {

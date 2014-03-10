@@ -33,6 +33,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLinkStats;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -112,8 +113,15 @@ public class CountsAnalyser {
 	private List<CountSimComparison> createCountsComparisonList(
 			final CalcLinkStats calcLinkStats) {
 		// processing counts
-		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(this.linkStats,
-				counts, this.network, this.scaleFactor);
+		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
+		
+			@Override
+			public double[] getVolumesForStop(Id stopId) {
+				return calcLinkStats.getAvgLinkVolumes(stopId);
+			}
+		
+		}, counts, this.network,
+				this.scaleFactor);
 		cca.run();
 		return cca.getComparison();
 	}

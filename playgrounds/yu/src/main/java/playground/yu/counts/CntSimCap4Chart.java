@@ -119,8 +119,7 @@ public class CntSimCap4Chart implements StartupListener, AfterMobsimListener,
 	public void notifyShutdown(ShutdownEvent event) {
 
 		Controler ctl = event.getControler();
-		int lastIter = ctl.getLastIteration(), firstIter = ctl
-				.getFirstIteration();
+		int lastIter = ctl.getConfig().controler().getLastIteration(), firstIter = ctl.getConfig().controler().getFirstIteration();
 		Map<Id, Count> countsMap = ctl.getCounts().getCounts();
 		double[] xs = Collection2Array.toDoubleArray(iters);
 		iters.clear();

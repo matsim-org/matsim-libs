@@ -71,8 +71,8 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
 		
-		firstIt = controler.getFirstIteration();
-		lastIt = controler.getLastIteration();
+		firstIt = controler.getConfig().controler().getFirstIteration();
+		lastIt = controler.getConfig().controler().getLastIteration();
 	}
 
 	@Override

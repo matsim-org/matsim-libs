@@ -34,6 +34,7 @@ import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.CountSimComparisonImpl;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
+import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -61,6 +62,10 @@ public abstract class PtCountsFixture {
 	public Network getNetwork() {
 		return this.network;
 	}
+	
+	public Scenario getScenario() {
+		return this.scenario;
+	}
 
 	public void setUp() {
 		String configFile = "test/input/org/matsim/pt/counts/config.xml";
@@ -74,7 +79,7 @@ public abstract class PtCountsFixture {
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 	}
 
-	public abstract PtCountsComparisonAlgorithm getCCA();
+	public abstract CountsComparisonAlgorithm getCCA();
 
 	public List<CountSimComparison> ceateCountSimCompList() {
 		List<CountSimComparison> csc_l = new Vector<CountSimComparison>(24);

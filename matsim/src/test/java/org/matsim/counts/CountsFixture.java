@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.matsim.analysis.CalcLinkStats;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
@@ -31,6 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
+import org.matsim.counts.algorithms.CountsComparisonAlgorithm.VolumesForId;
 
 public class CountsFixture {
 
@@ -56,9 +58,17 @@ public class CountsFixture {
 	}
 
 	public CountsComparisonAlgorithm getCCA() {
-		CalcLinkStats linkStats = new AttributeFactory().createLinkStats(this.network);
-		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(linkStats, this.counts, this.network, 1.0);
-		cca.setDistanceFilter(100.0, "0");
+		final CalcLinkStats linkStats = new AttributeFactory().createLinkStats(this.network);
+		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
+		
+			@Override
+			public double[] getVolumesForStop(Id stopId) {
+				return linkStats.getAvgLinkVolumes(stopId);
+			}
+		
+		}, this.counts, this.network,
+				1.0);
+	//	cca.setDistanceFilter(100.0, "0");
 		return cca;
 	}
 

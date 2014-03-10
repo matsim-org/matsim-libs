@@ -53,7 +53,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		controler = event.getControler();
-		lastIteration = controler.getLastIteration();
+		lastIteration = controler.getConfig().controler().getLastIteration();
 		logger.info("emissions will be calculated for iteration " + lastIteration);
 		
 		Scenario scenario = controler.getScenario() ;

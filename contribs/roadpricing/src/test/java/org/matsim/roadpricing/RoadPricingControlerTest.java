@@ -24,6 +24,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.RoadPricingConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
@@ -47,7 +48,10 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
-		PlanAlgorithm router = controler.createRoutingAlgorithm();
+		PlanAlgorithm router = new PlanRouter(
+		controler.getTripRouterFactory().instantiateAndConfigureTripRouter(),
+		controler.getScenario().getActivityFacilities()
+		);
 		assertFalse("BaseCase must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
 		TravelDisutility travelCosts = controler.createTravelDisutilityCalculator();
 		assertFalse("BaseCase must not use TollTravelCostCalculator.", travelCosts instanceof TravelDisutilityIncludingToll);
@@ -69,7 +73,10 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
-		PlanAlgorithm router = controler.createRoutingAlgorithm();
+		PlanAlgorithm router = new PlanRouter(
+		controler.getTripRouterFactory().instantiateAndConfigureTripRouter(),
+		controler.getScenario().getActivityFacilities()
+		);
 		assertFalse("Distance toll must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
 		TravelDisutility travelCosts = controler.createTravelDisutilityCalculator();
 		assertTrue("Distance toll must use TollTravelCostCalculator.", travelCosts instanceof TravelDisutilityIncludingToll);
@@ -87,7 +94,10 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
-		PlanAlgorithm router = controler.createRoutingAlgorithm();
+		PlanAlgorithm router = new PlanRouter(
+		controler.getTripRouterFactory().instantiateAndConfigureTripRouter(),
+		controler.getScenario().getActivityFacilities()
+		);
 		assertFalse("Cordon toll must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
 		TravelDisutility travelCosts = controler.createTravelDisutilityCalculator();
 		assertTrue("Cordon toll must use TollTravelCostCalculator.", travelCosts instanceof TravelDisutilityIncludingToll);

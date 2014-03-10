@@ -76,13 +76,13 @@ public class MobSimSwitcher implements ControlerListener,
 							END_RATE)));
 		currentRate = startRate;
 
-		startIter = matsimControler.getFirstIteration();
+		startIter = matsimControler.getConfig().controler().getFirstIteration();
 		if (matsimControler.getConfig().getParam("MobSimSwitcher", START_ITER) != null)
 			startIter = Math.max(
 					startIter,
 					Integer.parseInt(matsimControler.getConfig().getParam("MobSimSwitcher",
 							START_ITER)));
-		endIter = matsimControler.getLastIteration();
+		endIter = matsimControler.getConfig().controler().getLastIteration();
 		if (matsimControler.getConfig().getParam("MobSimSwitcher", END_ITER) != null)
 			endIter = Math.min(
 					endIter,
@@ -136,7 +136,7 @@ public class MobSimSwitcher implements ControlerListener,
 
 	private boolean checkExpensiveIter(int iteration) {
 
-		if (iteration == matsimControler.getLastIteration()) {
+		if (iteration == matsimControler.getConfig().controler().getLastIteration()) {
 			MobSimSwitcher.isQSimIteration = true;
 			return isQSimIteration;
 		}

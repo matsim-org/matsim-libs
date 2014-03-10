@@ -61,7 +61,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	@Override
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
 
-		if (event.getIteration() < event.getControler().getLastIteration()) {
+		if (event.getIteration() < event.getControler().getConfig().controler().getLastIteration()) {
 			return;
 		}
 		log.info("Number of ZH facilities " + this.facilities.getNumberOfFacilities());
