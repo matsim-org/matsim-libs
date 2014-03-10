@@ -37,7 +37,10 @@ class Main {
 		
 		final Controler controler = new Controler(config);
 		
-		TripRouterFactory factory = new MyTripRouterFactory( controler.getEvents() ) ; 
+		MySimulationObserver observer = new MySimulationObserver();
+		controler.getEvents().addHandler(observer) ; 
+		
+		TripRouterFactory factory = new MyTripRouterFactory(observer) ; 
 		controler.setTripRouterFactory(factory) ;
 
 		controler.run();
