@@ -4,6 +4,8 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -47,53 +49,44 @@ public class MapRenderer extends StyledMapRenderer {
 		Layer layer = Main.main.getActiveLayer();
 		Id id = new IdImpl(way.getUniqueId());
 		if (layer instanceof NetworkLayer) {
-			Network network = ((NetworkLayer) layer).getMatsimNetwork();
-			if (network.getLinks().containsKey(id)) {
-				Link link = network.getLinks().get(id);
-				if (!way.isSelected()) {
-					if (Properties.showIds) {
-						drawTextOnPath(
-								way,
-								new TextElement(Properties.getInstance(),
-										Properties.FONT, 0, textOffset(network,
-												link), Properties.MATSIMCOLOR,
-										0.f, null));
-					}
-					super.drawWay(way, Properties.MATSIMCOLOR, line, dashes,
-							dashedColor, wayOffset(network, link),
-							showOrientation, showHeadArrowOnly, showOneway,
-							onewayReversed);
-					return;
-				} else {
-					if (Properties.showIds) {
-						drawTextOnPath(
-								way,
-								new TextElement(Properties.getInstance(),
-										Properties.FONT, 0, textOffset(network,
-												link), selectedColor, 0.f, null));
+			Map<Way, List<Link>> way2Links = ((NetworkLayer) layer)
+					.getWay2Links();
+			if (way2Links.containsKey(way)) {
+				if (!way2Links.get(way).isEmpty()) {
+					if (!way.isSelected()) {
+						 if (Properties.showIds) {
+						 drawTextOnPath(
+						 way,
+						 new TextElement(Properties.getInstance(),
+						 Properties.FONT, 0, textOffset(way), Properties.MATSIMCOLOR,
+						 0.f, null));
+						 }
+						super.drawWay(way, Properties.MATSIMCOLOR, line,
+								dashes, dashedColor, Properties.wayOffset,
+								showOrientation, showHeadArrowOnly, showOneway,
+								onewayReversed);
+						return;
+					} else {
+						 if (Properties.showIds) {
+						 drawTextOnPath(
+						 way,
+						 new TextElement(Properties.getInstance(),
+						 Properties.FONT, 0, textOffset(way), selectedColor, 0.f, null));
+						 }
 					}
 				}
 			}
 		}
-		super.drawWay(way, color, line, dashes, dashedColor, offset,
-				showOrientation, showHeadArrowOnly, showOneway, onewayReversed);
+		super.drawWay(way, color, line, dashes, dashedColor,
+				Properties.wayOffset, showOrientation, showHeadArrowOnly,
+				showOneway, onewayReversed);
 	}
 
-	private float wayOffset(Network network, Link link) {
-		return Properties.wayOffset;
-	}
-
-	private int textOffset(Network network, Link link) {
+	private int textOffset(Way way) {
 		int offset = -10;
-		for (Link link2 : network.getLinks().values()) {
-			if (link2.getFromNode().equals(link.getToNode())
-					&& link2.getToNode().equals(link.getFromNode())) {
-				if (Long.parseLong(link.getToNode().getId().toString()) < Long
-						.parseLong(link.getFromNode().getId().toString())) {
-					offset *= -1;
-				}
-				break;
-			}
+		
+		if (way.firstNode().getUniqueId() < way.lastNode().getUniqueId()) {
+			offset *= -1;
 		}
 		return offset;
 	}

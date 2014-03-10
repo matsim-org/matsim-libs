@@ -2,6 +2,7 @@ package josmMatsimPlugin;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
@@ -24,6 +25,8 @@ import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.gui.layer.Layer;
+import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.tools.Shortcut;
 
 /**
@@ -40,6 +43,10 @@ public class MATSimAction {
 
 	public JosmAction getNewNetworkAction() {
 		return new NewNetworkAction();
+	}
+	
+	public JosmAction getConvertAction() {
+		return new ConvertAction();
 	}
 
 	
@@ -58,12 +65,12 @@ public class MATSimAction {
 
 			JFileChooser chooser = new JFileChooser(
 					System.getProperty("user.home"));
+			chooser.setApproveButtonText("Import");
 			chooser.setDialogTitle("MATSim-Import");
-			chooser.setApproveButtonText("Confirm");
 			FileFilter filter = new FileNameExtensionFilter("Network-XML",
 					"xml");
 			chooser.setFileFilter(filter);
-			int result = chooser.showOpenDialog(null);
+			int result = chooser.showOpenDialog(Main.parent);
 			if (result == JFileChooser.APPROVE_OPTION
 					&& chooser.getSelectedFile().getAbsolutePath() != null) {
 				String path = chooser.getSelectedFile().getAbsolutePath();
@@ -80,6 +87,7 @@ public class MATSimAction {
 				if (pane.getValue() != null) {
 					if (((Integer) pane.getValue()) == JOptionPane.OK_OPTION) {
 						ImportTask task = new ImportTask(path);
+//						ImportTask_v2 task = new ImportTask_v2(path);
 						Main.worker.execute(task);
 					}
 				}
@@ -106,6 +114,25 @@ public class MATSimAction {
 			NetworkLayer layer = new NetworkLayer(dataSet, "new Layer", null,
 					scenario.getNetwork(), TransformationFactory.WGS84, new HashMap<Way, List<Link>>());
 			Main.main.addLayer(layer);
+		}
+	}
+	
+	public class ConvertAction extends JosmAction {
+
+		public ConvertAction() {
+			super(tr("Convert to MATSim Network"), null, tr("Convert Osm layer to MATSim network layer"),
+					Shortcut.registerShortcut("menu:matsimConvert",
+							tr("Menu: {0}", tr("Convert to MATSim Network")),
+							KeyEvent.VK_G, Shortcut.ALT_CTRL), true);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Layer activeLayer = Main.main.getActiveLayer();
+			if (activeLayer instanceof OsmDataLayer && !(activeLayer instanceof NetworkLayer) ) {
+				ConvertTask task = new ConvertTask();
+				task.run();
+			}
 		}
 	}
 }

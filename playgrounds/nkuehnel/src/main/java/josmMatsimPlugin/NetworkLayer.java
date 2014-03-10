@@ -52,6 +52,7 @@ public class NetworkLayer extends OsmDataLayer {
 		this.coordSystem = coordSystem;
 		this.way2Links = way2Links;
 		data.addDataSetListener(new NetworkListener(this));
+//		data.addDataSetListener(new NetworkListener_v2(this));
 	}
 
 	public Map<Way, List<Link>> getWay2Links() {

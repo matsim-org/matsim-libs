@@ -24,7 +24,7 @@ final class MATSimNetworkFileExporter extends FileExporter {
 
 	@Override
 	public boolean acceptFile(File pathname, Layer layer) {
-		return layer instanceof OsmDataLayer;
+		return layer instanceof NetworkLayer;
 	}
 
 	@Override

@@ -65,7 +65,7 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		table.setDefaultRenderer(Object.class, new MATSimTableRenderer());
 		table.setEnabled(false);
 		table.setAutoCreateRowSorter(true);
-
+		
 		JScrollPane tableContainer = new JScrollPane(table);
 		createLayout(tableContainer, false, null);
 
@@ -114,14 +114,16 @@ public class MATSimToggleDialog extends ToggleDialog implements
 				ExtensionFileFilter.exporters.clear();
 				ExtensionFileFilter.exporters.add(0, new MATSimNetworkFileExporter());
 			}
-
+			networkAttributes.setEnabled(true);
 		} else {
 			if (oldLayer instanceof NetworkLayer) {
+				ExtensionFileFilter.exporters.clear();
 				ExtensionFileFilter.exporters.addAll(this.exporterCopy);
 			}
 			table.setModel(new DefaultTableModel());
 			setTitle(tr("Links/Nodes"));
 			layer = null;
+			networkAttributes.setEnabled(false);
 		}
 	}
 

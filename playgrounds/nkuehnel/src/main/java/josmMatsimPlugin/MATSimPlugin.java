@@ -48,6 +48,7 @@ public class MATSimPlugin extends Plugin implements PreferenceChangedListener {
 		MATSimAction = new MATSimAction();
 		Main.main.menu.toolsMenu.add(MATSimAction.getImportAction());
 		Main.main.menu.toolsMenu.add(MATSimAction.getNewNetworkAction());
+		Main.main.menu.toolsMenu.add(MATSimAction.getConvertAction());
 
 		Reader reader = new InputStreamReader(getClass().getResourceAsStream(
 				"matsimPreset.xml"));

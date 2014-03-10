@@ -41,7 +41,6 @@ import org.xml.sax.SAXException;
  */
 
 public class ExportTask extends PleaseWaitRunnable {
-	static Properties matsimConvertProperties = new Properties();
 	protected int exportResult;
 
 	private File file;
@@ -121,25 +120,6 @@ public class ExportTask extends PleaseWaitRunnable {
 					newLink.setNumberOfLanes(link.getNumberOfLanes());
 					newLink.setAllowedModes(link.getAllowedModes());
 					network.addLink(newLink);
-				}
-			} else {
-				this.progressMonitor.setTicks(1);
-				this.progressMonitor.setCustomText("converting osm data..");
-
-				CoordinateTransformation osmCt = TransformationFactory
-						.getCoordinateTransformation(TransformationFactory.WGS84,
-								((String) ExportDialog.exportSystem
-										.getSelectedItem()));
-				Converter converter = new Converter(
-						((OsmDataLayer) layer).data, network);
-				converter.convert();
-				if (!(((String) ExportDialog.exportSystem
-						.getSelectedItem()).equals(TransformationFactory.WGS84))) {
-					for (Node node : ((NetworkImpl) network).getNodes()
-							.values()) {
-						Coord temp = osmCt.transform(node.getCoord());
-						node.getCoord().setXY(temp.getX(), temp.getY());
-					}
 				}
 			}
 
