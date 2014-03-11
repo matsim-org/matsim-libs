@@ -281,19 +281,21 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
         MultipleTaxiLauncher multiLauncher = new MultipleTaxiLauncher(paramFile);
         multiLauncher.initOutputFiles("");
 
-        multiLauncher.run(NOS_TW_xx, runs);
-        multiLauncher.run(NOS_TP_xx, runs);
-        multiLauncher.run(NOS_DSE_xx, runs);
-
-        multiLauncher.run(OTS_TW_xx, runs);
-        multiLauncher.run(OTS_TP_xx, runs);
+//        multiLauncher.run(NOS_TW_xx, runs);
+//        multiLauncher.run(NOS_TP_xx, runs);
+//        multiLauncher.run(NOS_DSE_xx, runs);
+//
+//        multiLauncher.run(OTS_TW_xx, runs);
+//        multiLauncher.run(OTS_TP_xx, runs);
+//        
+//        multiLauncher.run(RES_TW_xx, runs);
+//        multiLauncher.run(RES_TP_xx, runs);
+//        
+//        multiLauncher.run(APS_TW_xx, runs);
+//        multiLauncher.run(APS_TP_xx, runs);
+//        multiLauncher.run(APS_DSE_xx, runs);
         
-        multiLauncher.run(RES_TW_xx, runs);
-        multiLauncher.run(RES_TP_xx, runs);
-        
-        multiLauncher.run(APS_TW_xx, runs);
-        multiLauncher.run(APS_TP_xx, runs);
-        multiLauncher.run(APS_DSE_xx, runs);
+        multiLauncher.run(MIQCP_FF, 1, true, true, false);
 
         multiLauncher.closeOutputFiles();
     }

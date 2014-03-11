@@ -31,7 +31,7 @@ import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
 import playground.michalm.taxi.optimizer.assignment.APSTaxiOptimizer;
 import playground.michalm.taxi.optimizer.fifo.*;
-import playground.michalm.taxi.optimizer.gurobi.MIPTaxiOptimizer;
+import playground.michalm.taxi.optimizer.mip.MIPTaxiOptimizer;
 
 
 /*package*/enum AlgorithmConfig

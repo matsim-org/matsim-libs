@@ -1,6 +1,5 @@
 package org.matsim.contrib.dvrp.data.file;
 
-import java.io.IOException;
 import java.util.*;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
@@ -20,20 +19,14 @@ public class VehicleWriter
     }
 
 
-    public void write(String fileName) 
+    public void write(String fileName)
     {
-        this.openFile(fileName);
-        this.writeDoctype("vehicles", "http://matsim.org/files/dtd/vehicles_v1.dtd");
-        this.writeStartTag("vehicles", Collections.<Tuple<String, String>>emptyList());
-        this.writeVehicles();
-        this.writeEndTag("vehicles");
-        try {
-			this.writer.flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        this.close();
+        openFile(fileName);
+        writeDoctype("vehicles", "http://matsim.org/files/dtd/vehicles_v1.dtd");
+        writeStartTag("vehicles", Collections.<Tuple<String, String>>emptyList());
+        writeVehicles();
+        writeEndTag("vehicles");
+        close();
     }
 
 
@@ -45,7 +38,7 @@ public class VehicleWriter
             atts.add(new Tuple<String, String>("start_link", veh.getStartLink().getId().toString()));
             atts.add(new Tuple<String, String>("t_0", veh.getT0() + ""));
             atts.add(new Tuple<String, String>("t_1", veh.getT1() + ""));
-            this.writeStartTag("vehicle", atts, true);
+            writeStartTag("vehicle", atts, true);
         }
     }
 }

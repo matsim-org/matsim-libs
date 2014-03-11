@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.gurobi;
+package playground.michalm.taxi.optimizer.mip;
 
 import gurobi.*;
 
