@@ -135,7 +135,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 	 */
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
-		if (agent.getActivityEndTime() == Double.POSITIVE_INFINITY && !beforeFirstSimStep) {
+		if (agent.getActivityEndTime() == Double.POSITIVE_INFINITY) {
 			// This is the last planned activity.
 			// So the agent goes to sleep.
 			internalInterface.getMobsim().getAgentCounter().decLiving();
@@ -158,6 +158,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 		// the simulation and are passed into this method is a different one, so this matters.
 		// - This is safe (Agents will not miss a second), simply because doSimStep for this time step has not yet happened.
 		// - It also means that e.g. OTFVis will probably display all Agents while they are in their first Activity before you press play.
+		// - On the other hand, agents whose first activity is also their last activity go right to sleep "inside" this engine.
 		return true;
 	}
 
