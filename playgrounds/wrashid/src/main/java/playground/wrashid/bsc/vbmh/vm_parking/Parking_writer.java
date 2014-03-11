@@ -1,9 +1,21 @@
 package playground.wrashid.bsc.vbmh.vm_parking;
 
+
+
 import java.io.File;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
+
+/**
+ * Does some jaxb magic to write parkings into a xml file
+ * 
+ * 
+ * 
+ * @author Valentin Bemetz & Moritz Hohenfellner
+ *
+ */
+
 
 public class Parking_writer {
 	public int write(Parking_Map parking_map, String filename){

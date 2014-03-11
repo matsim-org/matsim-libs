@@ -204,10 +204,10 @@ public class Park_Control {
 			if(selected_spot.parking.check_for_free_spot()==null){ //Sinde alle anderen Plaetze belegt? Dann von Besetzt >> Frei
 				phwriter.add_parking_availible(selected_spot.parking, Double.toString(event.getTime()));
 			}
-			selected_spot.occupied=false; //Platz freigeben
+			selected_spot.setOccupied(false); //Platz freigeben
 			
 			//kosten auf matsim util funktion
-			double duration=this.time-selected_spot.time_vehicle_parked; //Parkzeit berechnen
+			double duration=this.time-selected_spot.getTime_vehicle_parked(); //Parkzeit berechnen
 			double payed_parking = pricing.calculate_parking_price(duration/60, false, selected_spot.parking_pricem); // !! EV Boolean anpassen
 			// System.out.println(payed_parking);
 			
@@ -230,8 +230,8 @@ public class Park_Control {
 		Map<String, Object> person_attributes = person.getCustomAttributes();
 		person_attributes.put("selected_parkingspot", selected_spot);
 		Parkingspot selected_spot_to_set = (Parkingspot) person_attributes.get("selected_parkingspot");
-		selected_spot_to_set.occupied = true;
-		selected_spot_to_set.time_vehicle_parked=this.time;
+		selected_spot_to_set.setOccupied(true);
+		selected_spot_to_set.setTime_vehicle_parked(this.time);
 		
 		if(selected_spot.parking.check_for_free_spot()==null){
 			phwriter.add_parking_occupied(selected_spot.parking, Double.toString(this.time), person_id.toString());

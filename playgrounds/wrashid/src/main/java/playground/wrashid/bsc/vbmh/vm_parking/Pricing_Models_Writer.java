@@ -5,6 +5,15 @@ import java.io.File;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
+/**
+ * Writes Pricing Models using jaxb
+ * 
+ * 
+ * @author Valentin Bemetz & Moritz Hohenfellner
+ *
+ */
+
+
 public class Pricing_Models_Writer {
 	public int write(Pricing_Models models, String filename){
 		try{
