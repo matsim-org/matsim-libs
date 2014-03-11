@@ -21,7 +21,7 @@ public class Park_Control {
 	int max_distance = 2000; //Maximaler Umkreis in dem Parkplaetze gesucht werden
 	
 	//Zur berechnung des besten oeffentlichen Parkplatzes: (Negative Werte, hoechste Score gewinnt)
-	double beta_geld = -10; 
+	double beta_money = -10; 
 	double beta_distance = -1; // !! Zweiphasige Kurve einbauen?
 	
 	int count_private = 0;
@@ -126,7 +126,7 @@ public class Park_Control {
 			double distance = CoordUtils.calcDistance(this.cordinate, spot.parking.get_coordinate());
 			double pricem = spot.parking_pricem;
 			double cost = pricing.calculate_parking_price(1, false, (int) pricem);
-			score =  this.beta_geld*cost+this.beta_distance*distance;
+			score =  this.beta_money*cost+this.beta_distance*distance;
 			//___
 
 			if(score > best_score){
