@@ -126,7 +126,7 @@ public class Park_Control {
 			double distance = CoordUtils.calcDistance(this.cordinate, spot.parking.get_coordinate());
 			double pricem = spot.parking_pricem;
 			double cost = pricing.calculate_parking_price(1, false, (int) pricem);
-			score =  this.beta_geld*cost+this.beta_distanz*distance;
+			score =  this.beta_geld*cost+this.beta_distance*distance;
 			//___
 
 			if(score > best_score){
