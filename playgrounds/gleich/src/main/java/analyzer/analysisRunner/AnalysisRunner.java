@@ -1,5 +1,6 @@
 package analyzer.analysisRunner;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -29,6 +30,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleReaderV1;
@@ -45,9 +47,11 @@ import playground.vsp.analysis.modules.carDistance.CarDistanceAnalyzer;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MonetaryPaymentsAnalyzer;
+import playground.vsp.analysis.modules.networkAnalysis.NetworkAnalyzer;
 import playground.vsp.analysis.modules.plansSubset.GetPlansSubset;
 import playground.vsp.analysis.modules.ptAccessibility.PtAccessibility;
 import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
+import playground.vsp.analysis.modules.ptLines2PaxAnalysis.PtLines2PaxAnalysis;
 import playground.vsp.analysis.modules.ptOperator.PtOperatorAnalyzer;
 import playground.vsp.analysis.modules.ptPaxVolumes.PtPaxVolumesAnalyzer;
 import playground.vsp.analysis.modules.ptRoutes2paxAnalysis.PtRoutes2PaxAnalysis;
@@ -74,12 +78,16 @@ import playground.vsp.analysis.modules.welfareAnalyzer.WelfareAnalyzer;
  * <ul>
  * <li> addition of distance and activity clusters at rPtAccesibility()
  * <li> setting time intervals to be analysed at rAct2Mode(), 
- * rAct2ModeWithPlanCoord(), rBoardingAlightingCountAnalyzer(), rPtPaxVolumes(), 
- * rPtRoutes2PaxAnalysis(), rPtTravelStats(), rTransitVehicleVolume()
+ * rAct2ModeWithPlanCoord(), rBoardingAlightingCountAnalyzer(),
+ * rPtPaxVolumes(), rPtRoutes2PaxAnalysis(), 
+ * rPtTravelStats(), rTransitVehicleVolume()
  * </ul>
  * 
  * Make sure to have all necessary R packages installed and accessible (see
- * {@link ReportGenerator#runRScripts()})
+ * {@link ReportGenerator#runRScripts()}). PtRoutes2Pax and PtRoutes2Lines use
+ * packages requiring Perl, so R needs an valid path to an Perl interpreter.
+ * However, apart from an error message, there seems to be no obvious
+ * difference between running R with a Perl interpreter and without.
  *
  * @param <b>outputDirectory</b>: a path to a network drive may cause problems when
  * ReportGenerator invokes R and Latex
@@ -89,6 +97,7 @@ import playground.vsp.analysis.modules.welfareAnalyzer.WelfareAnalyzer;
  * @param pathToLatexFiles
  * @param pathToRScriptExe
  * @param pathToPdfLatexExe
+ * @param coordinateSystem (as String)
  * @param useConfigXml : Shall the config be loaded from an xml file to be found at
  * pathToScenarioData
  * 
@@ -99,12 +108,13 @@ public class AnalysisRunner {
 	private boolean useConfigXml;
 	private String pathToScenarioData = "Z:/WinHome/ArbeitWorkspace/Analyzer/";
 	private String eventFile = pathToScenarioData 
-			+ "output/test1/ITERS/it.1/1.events.xml.gz";
+			+ "output/test2ndDifferentStop2/ITERS/it.10/10.events.xml.gz";
 	private String outputDirectory;
 	private String pathToRScriptFiles = "Z:/WinHome/ArbeitWorkspace/Analyzer/output/Rscripts";
 	private String pathToLatexFiles = "Z:/WinHome/ArbeitWorkspace/Analyzer/output/Latex";
 	private String pathToRScriptExe = "C:/Program Files/R/R-2.14.2/bin/Rscript.exe";
 	private String pathToPdfLatexExe = "pdflatex";
+	private String coordinateSystem = "DHDN_GK4";//DHDN_GK4
 	
 	private Scenario scenario;
 	
@@ -128,15 +138,16 @@ public class AnalysisRunner {
 			outputDirectory = System.getProperty("user.home") + "/Desktop/MATSimAnalyzer";
 			(new File(System.getProperty("user.home") + "/desktop/MATSimAnalyzer")).mkdir();
 		}
-		outputDirectory = "Z:/WinHome/MATSimAnalyzer";
-		(new File("Z:/WinHome/MATSimAnalyzer")).mkdir();
+		outputDirectory = "Z:/WinHome/MATSimAnalyzer3";
+		(new File("Z:/WinHome/MATSimAnalyzer3")).mkdir();
 		this.initialize();
 	}
 	
 	public AnalysisRunner(String pathToExampleScenario, String eventFile,
 			String outputDirectory, String pathToRScriptFiles, 
 			String pathToLatexFiles, String pathToRScriptExe, 
-			String pathToPdfLatexExe, boolean useConfigXml){
+			String pathToPdfLatexExe, String coordinateSystem, 
+			boolean useConfigXml){
 		this.pathToScenarioData = pathToExampleScenario;
 		this.eventFile = eventFile;
 		this.outputDirectory = outputDirectory;
@@ -144,6 +155,7 @@ public class AnalysisRunner {
 		this.pathToLatexFiles = pathToLatexFiles;
 		this.pathToRScriptExe = pathToRScriptExe;
 		this.pathToPdfLatexExe = pathToPdfLatexExe;
+		this.coordinateSystem = coordinateSystem;
 		this.useConfigXml = useConfigXml;
 		this.initialize();
 	}
@@ -164,7 +176,7 @@ public class AnalysisRunner {
 			/* Some analyzers read the result plan files.
 			 * The Plan File should include the plans used for the iteration
 			 * whose eventfile is to be analysed. */
-			config.plans().setInputFile(pathToScenarioData + "output/ExampleScenario/1.plans.xml.gz");
+			config.plans().setInputFile(pathToScenarioData + "output/test2ndDifferentStop2/ITERS/it.10/10.plans.xml.gz");//pathToScenarioData + "output/ExampleScenario/1.plans.xml.gz"
 		}
 		scenario = ScenarioUtils.loadScenario(config);
 	}
@@ -178,10 +190,56 @@ public class AnalysisRunner {
 		/*rEmissionsAnalyzer(); */ //not included: needs an emission events file created with the package emissionsWriter which needs settings made with VspExperimentalConfigGroup which is not intended for public use
 		rLegModeDistanceDistribution(); // reads the plans in the scenario -> scenario should include the most recent plans (set in config)
 		rMonetaryPaymentsAnalyzer();
+
+		rNetworkAnalyzer();
+		/*
+		While retrieving the coordinate reference system, the inserted 
+		"DHDN_GK4" is looked up in map MGC.transformations where this key 
+		exists, however somewhere on the way to geotool's CRSUtils this 
+		information on the coordinate reference system gets lost or is
+		ignored or is invalid and CRSUtils adds "0" to the fixed String "EPSG:"
+		leading to the problem that the coordinate reference system looked for
+		is "EPSG:0" which apparently cannot be retrieved. 
+		
+		2014-02-18 11:17:03,639  INFO MatsimXmlParser:218 Trying to load http://matsim.org/files/dtd/network_v1.dtd. In some cases (e.g. network interface up but no connection), this may take a bit.
+2014-02-18 11:17:03,686  INFO NetworkImpl:488 building QuadTree for nodes: xrange(999.0,4001.0); yrange(999.0,4001.0)
+2014-02-18 11:17:03,780  INFO NetworkImpl:497 Building QuadTree took 0.094 seconds.
+2014-02-18 11:17:03,858  INFO NetworkAnalyzer:208   checking 19 nodes and 64 links for dead-ends...
+2014-02-18 11:17:03,951  INFO NetworkAnalyzer:220 size of biggest cluster equals network size... continuing with routable network...
+2014-02-18 11:17:03,951  INFO NetworkAnalyzer:279 analysing network nodes...
+2014-02-18 11:17:03,951  INFO NetworkAnalyzer:333 found 0 exit road nodes, 0 dead end nodes and 0 redundant nodes...
+2014-02-18 11:17:03,951  INFO NetworkAnalyzer:334 ...done
+2014-02-18 11:17:03,951  INFO NetworkAnalyzer:346 analyzing network links...
+2014-02-18 11:17:03,951  INFO NetworkAnalyzer:371 0 warnings about storage capacity written...
+2014-02-18 11:17:03,951  INFO NetworkAnalyzer:372 ...done
+2014-02-18 11:17:04,060  WARN MyBoundingBox:47 Setting bounding box from network! For large networks this may lead to memory issues depending on available memory and/or grid resolution. In this case define a custom bounding box.
+2014-02-18 11:17:04,060  INFO MyBoundingBox:51 ... done!
+|--------------------------------------------------------------------------------------------------|
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Feb 18, 2014 11:17:04 AM org.geotools.referencing.factory.epsg.ThreadedEpsgFactory <init>
+Information: Setting the EPSG factory org.geotools.referencing.factory.epsg.DefaultFactory to a 1800000ms timeout
+Feb 18, 2014 11:17:04 AM org.geotools.referencing.factory.epsg.ThreadedEpsgFactory <init>
+Information: Setting the EPSG factory org.geotools.referencing.factory.epsg.ThreadedHsqlEpsgFactory to a 1800000ms timeout
+Feb 18, 2014 11:17:04 AM org.geotools.referencing.factory.epsg.ThreadedHsqlEpsgFactory createDataSource
+Information: Building new data source for org.geotools.referencing.factory.epsg.ThreadedHsqlEpsgFactory
+Feb 18, 2014 11:17:18 AM org.geotools.referencing.factory.epsg.ThreadedHsqlEpsgFactory createBackingStore
+Information: Building backing store for org.geotools.referencing.factory.epsg.ThreadedHsqlEpsgFactory
+2014-02-18 11:25:31,715  WARN CRSUtils:73 No code "EPSG:0" from authority "European Petroleum Survey Group" found for object of type "CoordinateReferenceSystem".
+|--------------------------------------------------------------------------------------------------|
+2014-02-18 11:40:39,812  INFO NetworkImpl:519 building LinkQuadTree for nodes: xrange(999.0,4001.0); yrange(999.0,4001.0)
+2014-02-18 11:40:40,093  INFO NetworkImpl:525 Building LinkQuadTree took 0.281 seconds.
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+2014-02-18 11:40:55,787  INFO NetworkAnalyzer:151 total length of all network links: 68420.0 m
+2014-02-18 11:40:55,787  INFO NetworkAnalyzer:152 total geometric length of all network links: 58092.457716446464 m
+2014-02-18 11:41:12,184  INFO ShapeFileWriter:53 Writing shapefile to Z:/WinHome/MATSimAnalyzer/NetworkAnalyzer/envelope.shp
+	*/
 		rPlansSubset();
 		rPtAccesibility();
 		rPtCircuityAnalysis();
 		rPtDriverPrefix();
+		rPtLines2PaxAnalysis();
 		rPtOperator();
 		rPtPaxVolumes();
 		rPtRoutes2PaxAnalysis();
@@ -267,7 +325,7 @@ public class AnalysisRunner {
 		for(Id id: scenario.getPopulation().getPersons().keySet()){
 			personsOfInterest.add(id);
 		}
-		ActivityToModeAnalysis analysis = new ActivityToModeAnalysis(scenario, personsOfInterest, 30*60, "DHDN_GK4");
+		ActivityToModeAnalysis analysis = new ActivityToModeAnalysis(scenario, personsOfInterest, 30*60, coordinateSystem);
 		EventsManager events = EventsUtils.createEventsManager();
 		List<EventHandler> handler = analysis.getEventHandler();
 		for(EventHandler eh : handler){
@@ -288,7 +346,7 @@ public class AnalysisRunner {
 			personsOfInterest.add(id);
 		}
 		
-		Act2ModeWithPlanCoordAnalysis analysis = new Act2ModeWithPlanCoordAnalysis(scenario, personsOfInterest, 30*60, "DHDN_GK4");
+		Act2ModeWithPlanCoordAnalysis analysis = new Act2ModeWithPlanCoordAnalysis(scenario, personsOfInterest, 30*60, coordinateSystem);
 		EventsManager events = EventsUtils.createEventsManager();
 		List<EventHandler> handler = analysis.getEventHandler();
 		for(EventHandler eh : handler){
@@ -333,7 +391,7 @@ public class AnalysisRunner {
 
 	private void rBoardingAlightingCountAnalyzer(){
 		BoardingAlightingCountAnalyzer ba = new BoardingAlightingCountAnalyzer(
-				scenario, 30*60, "DHDN_GK4");
+				scenario, 30*60, coordinateSystem);
 		EventsManager events = EventsUtils.createEventsManager();
 		List<EventHandler> handler = ba.getEventHandler();
 		for(EventHandler eh : handler){
@@ -402,6 +460,14 @@ public class AnalysisRunner {
 		mpa.writeResults(outputDirectory + "/MonetaryPaymentsAnalyzer/");
 	}
 	
+	private void rNetworkAnalyzer(){//TODO: Change Analyzer to use the scenario as input instead of path to network file
+		NetworkAnalyzer nea = new NetworkAnalyzer(pathToScenarioData + "input/network.xml", coordinateSystem);
+		//no event handler
+		nea.postProcessData();
+		(new File(outputDirectory + "/NetworkAnalyzer")).mkdir(); 
+		nea.writeResults(outputDirectory + "/NetworkAnalyzer/");
+	}
+	
 	private void rPlansSubset(){
 		Set<Id> selection = new TreeSet<Id>();
 		selection.add(new IdImpl(2));
@@ -429,7 +495,7 @@ public class AnalysisRunner {
 		activityCluster.put("h", home);
 		activityCluster.put("w", work);
 		activityCluster.put("s", shop);
-		PtAccessibility pta = new PtAccessibility(scenario, distanceCluster, 16, activityCluster, "DHDN_GK4", 10);
+		PtAccessibility pta = new PtAccessibility(scenario, distanceCluster, 16, activityCluster, coordinateSystem, 10);
 		pta.preProcessData();
 		pta.postProcessData();
 		(new File(outputDirectory + "/PtAccessibility")).mkdir(); 
@@ -467,6 +533,50 @@ public class AnalysisRunner {
 		pda.writeResults(outputDirectory + "/PtDriverIdAnalyzer/");//no output file, only console
 	}
 	
+	private void rPtLines2PaxAnalysis(){
+		
+		Map<Id, TransitLine> lines = scenario.getTransitSchedule().getTransitLines();
+		//scenario.getScenarioElement(vehicles)
+		ScenarioImpl sc = (ScenarioImpl) scenario;
+
+		Vehicles vehicles = sc.getVehicles();
+		//(Map<Id, TransitLine> lines, Vehicles vehicles, double interval, int maxSlices)
+		PtLines2PaxAnalysis ppa = new PtLines2PaxAnalysis(lines, vehicles, 60*60, 24*(60/60));
+		
+		EventsManager events = EventsUtils.createEventsManager();
+		List<EventHandler> handler = ppa.getEventHandler();
+		for(EventHandler eh : handler){
+			events.addHandler(eh);
+		}
+		MatsimEventsReader reader = new MatsimEventsReader(events);
+		reader.readFile(eventFile);
+		(new File(outputDirectory + "/PtLines2PaxAnalysis")).mkdir(); 
+		ppa.writeResults(outputDirectory + "/PtLines2PaxAnalysis/");
+		
+		//Latex code to insert one example plot, implemented here because file names are known here
+		BufferedWriter w = IOUtils.getBufferedWriter(outputDirectory + "/PtLines2PaxAnalysis/includeExamplePlot.tex");
+		if(lines.size() > 0){
+			Id exampleLine = lines.values().iterator().next().getId();
+			Id exampleRoute = lines.get(exampleLine).getRoutes().values().iterator().next().getId();
+			try {
+				w.write("\\includegraphics[width=0.99\\textwidth, page=1]{" +
+						"PtLines2PaxAnalysis/" + exampleLine.toString() +
+						"--" + exampleRoute.toString() + ".pdf}\n" + 
+						exampleLine.toString() + "\n");
+				w.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			try{
+				w.write("No transit line found, therefore no plot to be shown.");
+				w.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	private void rPtOperator(){
 		PtOperatorAnalyzer poa = new PtOperatorAnalyzer();
 		poa.init((ScenarioImpl)scenario);
@@ -484,7 +594,7 @@ public class AnalysisRunner {
 	}
 	
 	private void rPtPaxVolumes(){
-		PtPaxVolumesAnalyzer ppv = new PtPaxVolumesAnalyzer(scenario, 30.0*60.0, "DHDN_GK4");
+		PtPaxVolumesAnalyzer ppv = new PtPaxVolumesAnalyzer(scenario, 30.0*60.0, coordinateSystem);
 		EventsManager events = EventsUtils.createEventsManager();
 		List<EventHandler> handler = ppv.getEventHandler();
 		for(EventHandler eh : handler){
@@ -504,7 +614,7 @@ public class AnalysisRunner {
 		ScenarioImpl sc = (ScenarioImpl) scenario;
 
 		Vehicles vehicles = sc.getVehicles();
-		//(Map<Id, TransitLine> lines, Vehicles vehicles, double interval, int maxSlices)
+		//(Map<Id, TransitLine> lines, Vehicles vehicles, double interval in seconds, int maxSlices)
 		PtRoutes2PaxAnalysis ppa = new PtRoutes2PaxAnalysis(lines, vehicles, 60*60, 24*(60/60));
 		
 		EventsManager events = EventsUtils.createEventsManager();
@@ -516,6 +626,30 @@ public class AnalysisRunner {
 		reader.readFile(eventFile);
 		(new File(outputDirectory + "/PtRoutes2PaxAnalysis")).mkdir(); 
 		ppa.writeResults(outputDirectory + "/PtRoutes2PaxAnalysis/");
+		
+		//Latex code to insert one example plot, implemented here because file names are known here
+		BufferedWriter w = IOUtils.getBufferedWriter(outputDirectory + "/PtRoutes2PaxAnalysis/includeExamplePlot.tex");
+		if(lines.size() > 0){
+			Id exampleLine = lines.values().iterator().next().getId();
+			Id exampleRoute = lines.get(exampleLine).getRoutes().values().iterator().next().getId();
+			try {
+				w.write("\\includegraphics[width=0.99\\textwidth, page=1]{" +
+						"PtRoutes2PaxAnalysis/" + exampleLine.toString() +
+						"--" + exampleRoute.toString() + ".pdf}\n" + 
+						exampleLine.toString() + " " + 
+						exampleRoute.toString() + "\n");
+				w.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			try{
+				w.write("No transit line found, therefore no plot to be shown.");
+				w.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	private void rPtTravelStats(){
@@ -564,7 +698,7 @@ public class AnalysisRunner {
 	}
 	
 	private void rTransitSchedule2Shp(){
-		TransitSchedule2Shp tshp = new TransitSchedule2Shp(scenario, "DHDN_GK4");
+		TransitSchedule2Shp tshp = new TransitSchedule2Shp(scenario, coordinateSystem);
 		(new File(outputDirectory + "/TransitSchedule2Shp")).mkdir(); 
 		tshp.writeResults(outputDirectory + "/TransitSchedule2Shp/");
 	}
@@ -576,7 +710,7 @@ public class AnalysisRunner {
 	}
 	
 	private void rTransitVehicleVolume(){
-		TransitVehicleVolumeAnalyzer tsa = new TransitVehicleVolumeAnalyzer(scenario, 30.0*60.0, "DHDN_GK4");
+		TransitVehicleVolumeAnalyzer tsa = new TransitVehicleVolumeAnalyzer(scenario, 30.0*60.0, coordinateSystem);
 		EventsManager events = EventsUtils.createEventsManager();
 		List<EventHandler> handler = tsa.getEventHandler();
 		for(EventHandler eh : handler){

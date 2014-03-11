@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Map;
 
 /**
  * 
@@ -32,7 +33,7 @@ import java.io.InputStreamReader;
  */
 public class ReportGenerator {
 	
-	String workingDirectory = "Z:/WinHome/ArbeitWorkspace/Analyzer/output/workingDirectory";
+	String workingDirectory = "Z:/WinHome/MATSimAnalyzer";//"Z:/WinHome/MATSimAnalyzer" "Z:/WinHome/ArbeitWorkspace/Analyzer/output/workingDirectory"
 	String pathToRScriptFiles = "Z:/WinHome/ArbeitWorkspace/Analyzer/output/Rscripts";
 	String pathToLatexFiles = "Z:/WinHome/ArbeitWorkspace/Analyzer/output/Latex";
 	String pathToRScriptExe = "C:/Program Files/R/R-2.14.2/bin/Rscript.exe";//linux Rscript 
@@ -117,6 +118,7 @@ public class ReportGenerator {
 		String s = null;
 	       try {
 	    	    ProcessBuilder pb = new ProcessBuilder(command);
+	    	    
 	    	    pb.directory(workSpace);
 	    	    Process p = pb.start();
 	            
@@ -127,13 +129,13 @@ public class ReportGenerator {
 	                 InputStreamReader(p.getErrorStream()));
 
 	            // read the output from the command
-	            System.out.println("Standard output of the command:\n");
+	            System.out.println("\nStandard output of the command:\n");
 	            while ((s = stdInput.readLine()) != null) {
 	                System.out.println(s);
 	            }
 	            
 	            // read any errors from the attempted command
-	            System.out.println("Standard error of the command (if any):\n");
+	            System.out.println("\nStandard error of the command (if any):\n");
 	            while ((s = stdError.readLine()) != null) {
 	                System.err.println(s);
 	            }
