@@ -16,6 +16,16 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+/**
+ * Manages the whole parking process of one Agent at a time. One instance of this class is kept by the Park_Handler 
+ * which starts the Park() / leave().
+ * Parking: First the availability of a private parking belonging to the destination facility is checked. If there
+ * is no private parking available all public parking in a specific area around the destination of the agent are checked 
+ * for free spots and then the best one is selected. 
+ * 
+ * @author Valentin Bemetz & Moritz Hohenfellner
+ *
+ */
 
 public class Park_Control {
 	int max_distance = 2000; //Maximaler Umkreis in dem Parkplaetze gesucht werden
@@ -181,8 +191,8 @@ public class Park_Control {
 	}
 	
 	
-	//--------------------------- U N P A R K  ---------------------------------------------
-	public void unpark(ActivityEndEvent event) {
+	//--------------------------- leave Parking  ---------------------------------------------
+	public void leave(ActivityEndEvent event) {
 		Id person_id = event.getPersonId();
 		Parkingspot selected_spot = null;
 		VM_Score_Keeper scorekeeper = null;

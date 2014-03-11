@@ -7,6 +7,14 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
+/**
+ * Adds the Park_Scoring function to the default scoring function
+ * 
+ * @author Valentin Bemetz & Moritz Hohenfellner
+ *
+ */
+
+
 public class Park_Scoring_Factory extends CharyparNagelScoringFunctionFactory {
 
 	public Park_Scoring_Factory(PlanCalcScoreConfigGroup config, Network network) {

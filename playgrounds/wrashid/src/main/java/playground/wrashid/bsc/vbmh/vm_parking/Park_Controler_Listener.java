@@ -11,8 +11,31 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 
+/**
+ * Sets up event handlers and does some restes after and before each.
+ * 
+ * 
+ * 
+ * @author Valentin Bemetz & Moritz Hohenfellner
+ *
+ */
+
+
 public class Park_Controler_Listener implements StartupListener, IterationEndsListener, IterationStartsListener{
-	public Park_handler park_handler = new Park_handler();
+	private Park_handler park_handler = new Park_handler();
+
+	public Park_handler getPark_handler() {
+		return park_handler;
+	}
+
+
+
+	public void setPark_handler(Park_handler park_handler) {
+		this.park_handler = park_handler;
+	}
+
+
+
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		// TODO Auto-generated method stub
@@ -22,8 +45,8 @@ public class Park_Controler_Listener implements StartupListener, IterationEndsLi
 		phwriter.end();
 		
 		//Park Statistik Drucken und zuruecksetzen:
-		this.park_handler.park_control.print_statistics();
-		this.park_handler.park_control.reset_statistics();
+		this.getPark_handler().park_control.print_statistics();
+		this.getPark_handler().park_control.reset_statistics();
 	}
 	
 		
@@ -32,7 +55,7 @@ public class Park_Controler_Listener implements StartupListener, IterationEndsLi
 	public void notifyStartup(StartupEvent event) {
 		// TODO Auto-generated method stub
 		
-		event.getControler().getEvents().addHandler(park_handler);
+		event.getControler().getEvents().addHandler(getPark_handler());
 	}
 
 	@Override
@@ -44,8 +67,8 @@ public class Park_Controler_Listener implements StartupListener, IterationEndsLi
 		phwriter.start("output/test_outputs/test_parkhistory.xml"); // !! Pro Iteration neues File
 		
 		//Parkplaetze zuruecksetzen 
-		park_handler.park_control.parking_map.clear_spots();
-		park_handler.park_control.parking_map.create_spots();
+		getPark_handler().park_control.parking_map.clear_spots();
+		getPark_handler().park_control.parking_map.create_spots();
 		
 		
 		//VM_Score_Keeper Zuruecksetzen:

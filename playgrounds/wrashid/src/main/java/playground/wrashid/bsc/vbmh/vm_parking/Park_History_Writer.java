@@ -4,6 +4,20 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/**
+ * Writes a file with parking related events. At the moments there are events for:
+ * -Parking lot is fully occupied
+ * -Parking lot is available again
+ * -Agent can not park
+ * 
+ * The start() should be called before each iteration, the end() should be called at the end of 
+ * each iteration to close the file stream.
+ * 
+ * @author Valentin Bemetz & Moritz Hohenfellner
+ *
+ */
+
+
 public class Park_History_Writer {
 	String filename;
 	static File file;
@@ -12,9 +26,9 @@ public class Park_History_Writer {
 
 	public void start(String filename) {
 		this.filename = filename;
-		this.file = new File(this.filename);
+		Park_History_Writer.file = new File(this.filename);
 		try {
-			this.fwriter=new FileWriter(file);
+			Park_History_Writer.fwriter=new FileWriter(file);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -24,7 +38,7 @@ public class Park_History_Writer {
 	
 	public void end(){
 		try {
-			this.fwriter.close();
+			Park_History_Writer.fwriter.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -32,7 +46,7 @@ public class Park_History_Writer {
 	}
 	void schreiben(String text){
 		try {
-			this.fwriter.write(text);
+			Park_History_Writer.fwriter.write(text);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

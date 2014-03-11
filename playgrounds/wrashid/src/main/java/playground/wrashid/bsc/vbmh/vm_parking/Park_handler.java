@@ -9,14 +9,26 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 
-
+/**
+ * Handles AktivityStartEvent and starts parking process. Same for ActivityEndEvent.
+ * @author Valentin Bemetz & Moritz Hohenfellner
+ *
+ */
 
 
 
 public class Park_handler implements ActivityEndEventHandler, ActivityStartEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler {
 
-	public Park_Control park_control = new Park_Control();
+	Park_Control park_control = new Park_Control();
 	
+	public Park_Control getPark_control() {
+		return park_control;
+	}
+
+	public void setPark_control(Park_Control park_control) {
+		this.park_control = park_control;
+	}
+
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
@@ -50,7 +62,7 @@ public class Park_handler implements ActivityEndEventHandler, ActivityStartEvent
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		// TODO Auto-generated method stub
-		park_control.unpark(event);
+		park_control.leave(event);
 	}
 
 }

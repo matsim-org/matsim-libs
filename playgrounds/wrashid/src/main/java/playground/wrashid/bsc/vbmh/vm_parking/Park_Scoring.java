@@ -3,6 +3,15 @@ package playground.wrashid.bsc.vbmh.vm_parking;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
 
+/**
+ * 
+ * 
+ * 
+ *
+ * @author Valentin Bemetz & Moritz Hohenfellner
+ *
+ */
+
 
 public class Park_Scoring implements BasicScoring  {
 	double score =0;
