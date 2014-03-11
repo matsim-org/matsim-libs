@@ -22,7 +22,7 @@ public class SFControler1 {
 		Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
 		Park_Controler_Listener parklistener = new Park_Controler_Listener();
-		parklistener.park_handler.park_control.startup(parking_filename, pricing_filename, controler);
+		parklistener.getPark_handler().getPark_control().startup(parking_filename, pricing_filename, controler);
 		controler.addControlerListener(parklistener);
 		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();
