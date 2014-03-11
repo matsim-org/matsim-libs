@@ -255,3 +255,5 @@ ActivityStartEvent write_event= new ActivityStartEvent(event.getTime(), person_p
 controller.getEvents().processEvent(write_event);
 //-----------
 */
+
+//Das Programm ist jetzt zu ende!!
