@@ -2,7 +2,6 @@ package josmMatsimPlugin;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -37,13 +36,6 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 			"Show internal Ids in table");
 
 	// Export tab
-	private JLabel defaultExportFolder = new JLabel("Default Export Folder");
-	protected final JButton fileChooser = new JButton("Choose..");
-	protected static String exportFolder = Main.pref.get("matsim_exportFolder",
-			System.getProperty("user.home"));
-	protected final static JLabel folderLabel = new JLabel(exportFolder);
-
-	private JLabel optionsLabel = new JLabel("Options");
 	protected final static JCheckBox cleanNetwork = new JCheckBox(
 			"Clean network");
 
@@ -65,12 +57,7 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 			TransformationFactory.NAD83_UTM17N, TransformationFactory.WGS84_TM };
 	private JButton convertingDefaults = new JButton("Set converting defaults");
 
-	protected final static JComboBox exportSystem = new JComboBox(coordSystems);
-
-	// Import Tab
-	protected final static JComboBox importSystem = new JComboBox(coordSystems);
-	private JLabel originCoordSystemLabel = new JLabel(
-			"Default Origin coord system: ");
+	protected final static JComboBox coordSystem = new JComboBox(coordSystems);
 
 	public static class Factory implements PreferenceSettingFactory {
 		@Override
@@ -135,27 +122,19 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 		return pnl;
 	}
 
-	private JPanel buildExportPanel() {
+	private JPanel buildConvertPanel() {
 		JPanel pnl = new JPanel(new GridBagLayout());
 		GridBagConstraints cOptions = new GridBagConstraints();
-
-		defaultExportFolder.setFont(defaultExportFolder.getFont().deriveFont(
-				Font.BOLD));
-
-		fileChooser.setActionCommand("fileChooser");
-		fileChooser.addActionListener(listener);
-
-		optionsLabel.setFont(optionsLabel.getFont().deriveFont(Font.BOLD));
 
 		cleanNetwork.setSelected(Main.pref.getBoolean("matsim_cleanNetwork",
 				true));
 		cleanNetwork.setActionCommand("cleanNetwork");
 		cleanNetwork.addActionListener(listener);
 
-		exportSystem.setSelectedItem(Main.pref.get("matsim_exportSystem",
+		coordSystem.setSelectedItem(Main.pref.get("matsim_convertSystem",
 				"WGS84"));
-		exportSystem.setActionCommand("exportSystem");
-		exportSystem.addActionListener(listener);
+		coordSystem.setActionCommand("convertSystem");
+		coordSystem.addActionListener(listener);
 
 		convertingDefaults.setActionCommand("convertDefaults");
 		convertingDefaults.addActionListener(listener);
@@ -166,70 +145,17 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 
 		cOptions.gridx = 0;
 		cOptions.gridy = 0;
-		pnl.add(defaultExportFolder, cOptions);
-
-		cOptions.gridy = 1;
-		pnl.add(fileChooser, cOptions);
-
-		cOptions.gridx = 1;
-		pnl.add(folderLabel, cOptions);
-
-		cOptions.gridy = 4;
-		cOptions.gridx = 0;
-		pnl.add(optionsLabel, cOptions);
-
-		cOptions.gridy = 5;
 		pnl.add(cleanNetwork, cOptions);
 
-		cOptions.gridy = 6;
-		pnl.add(targetCoordSystemLabel, cOptions);
-		cOptions.gridx = 1;
-		cOptions.weightx = 1.0;
-		pnl.add(exportSystem, cOptions);
-
-		cOptions.weightx = 0.0;
-		cOptions.weighty = 1.0;
-		cOptions.gridx = 0;
-		cOptions.gridy = 7;
-		pnl.add(convertingDefaults, cOptions);
-
-		return pnl;
-	}
-
-	private JPanel buildImportPanel() {
-		JPanel pnl = new JPanel(new GridBagLayout());
-		GridBagConstraints cOptions = new GridBagConstraints();
-
-		optionsLabel.setFont(optionsLabel.getFont().deriveFont(Font.BOLD));
-
-		importSystem.setSelectedItem(Main.pref.get("matsim_importSystem",
-				"WGS84"));
-		importSystem.setActionCommand("importSystem");
-		importSystem.addActionListener(listener);
-
-		cOptions.anchor = GridBagConstraints.NORTHWEST;
-
-		cOptions.insets = new Insets(4, 4, 4, 4);
-
-		cOptions.gridy = 0;
-		cOptions.gridx = 0;
-		pnl.add(optionsLabel, cOptions);
-
 		cOptions.gridy = 1;
-		pnl.add(originCoordSystemLabel, cOptions);
-		cOptions.gridx = 1;
-		cOptions.weightx = 1.0;
-		cOptions.weighty = 1.0;
-		pnl.add(importSystem, cOptions);
-
+		pnl.add(convertingDefaults, cOptions);
 		return pnl;
 	}
 
 	protected JTabbedPane buildContentPane() {
 		JTabbedPane pane = getTabPane();
 		pane.addTab(tr("Visualization"), buildVisualizationPanel());
-		pane.addTab(tr("Export"), buildExportPanel());
-		pane.addTab(tr("Import"), buildImportPanel());
+		pane.addTab(tr("Converter Options"), buildConvertPanel());
 		return pane;
 	}
 

@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JSlider;
 import javax.swing.WindowConstants;
@@ -40,18 +39,6 @@ public class PreferencesActionListener implements ActionListener,
 				Preferences.wayOffset.setEnabled(true);
 				Preferences.wayOffsetLabel.setEnabled(true);
 			}
-		} else if (e.getActionCommand().equals("fileChooser")) {
-			JFileChooser chooser = new JFileChooser(Preferences.exportFolder);
-			chooser.setDialogTitle("MATSim-Export");
-			chooser.setApproveButtonText("Confirm");
-			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			int result = chooser.showSaveDialog(null);
-			if (result == JFileChooser.APPROVE_OPTION) {
-				String newPath = chooser.getSelectedFile().getAbsolutePath();
-				Main.pref.put("matsim_exportFolder", newPath);
-				Preferences.folderLabel.setText(newPath);
-				Preferences.exportFolder = newPath;
-			}
 		} else if (e.getActionCommand().equals("cleanNetwork")) {
 			if (!Preferences.cleanNetwork.isSelected()) {
 				Main.pref.put("matsim_cleanNetwork", false);
@@ -74,12 +61,9 @@ public class PreferencesActionListener implements ActionListener,
 				}
 			}
 			dlg.dispose();
-		} else if (e.getActionCommand().equals("exportSystem")) {
-			Main.pref.put("matsim_exportSystem",
-					(String) Preferences.exportSystem.getSelectedItem());
-		} else if (e.getActionCommand().equals("importSystem")) {
-			Main.pref.put("matsim_importSystem",
-					(String) Preferences.importSystem.getSelectedItem());
+		} else if (e.getActionCommand().equals("convertSystem")) {
+			Main.pref.put("matsim_convertSystem",
+					(String) Preferences.coordSystem.getSelectedItem());
 		} else if (e.getActionCommand().equals("showInternalIds")) {
 			if (Preferences.showInternalIds.isSelected()) {
 				Main.pref.put("matsim_showInternalIds", true);
@@ -92,9 +76,7 @@ public class PreferencesActionListener implements ActionListener,
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-
 		JSlider source = (JSlider) e.getSource();
-		
 		if (!source.getValueIsAdjusting()) {
 			int temp = source.getValue();
 			double offset = ((double) temp) * 0.03; 

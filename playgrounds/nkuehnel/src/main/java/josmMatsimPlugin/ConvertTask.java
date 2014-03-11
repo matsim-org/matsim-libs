@@ -52,7 +52,7 @@ public class ConvertTask extends PleaseWaitRunnable {
 		Network tempNetwork = NetworkImpl.createNetwork();
 		Network network = NetworkImpl.createNetwork();
 		
-		String convertSystem = Main.pref.get("matsim_exportSystem", "WGS84");
+		String convertSystem = Main.pref.get("matsim_convertSystem", "WGS84");
 		CoordinateTransformation ctOut = TransformationFactory
 				.getCoordinateTransformation(TransformationFactory.WGS84,
 						convertSystem);

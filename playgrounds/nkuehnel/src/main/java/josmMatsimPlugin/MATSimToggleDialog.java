@@ -93,6 +93,7 @@ public class MATSimToggleDialog extends ToggleDialog implements
 			}
 		});
 		this.titleBar.add(networkAttributes);
+		
 
 	}
 
@@ -116,6 +117,7 @@ public class MATSimToggleDialog extends ToggleDialog implements
 				ExtensionFileFilter.exporters.add(0, new MATSimNetworkFileExporter());
 			}
 			networkAttributes.setEnabled(true);
+			checkInternalIdColumn();
 		} else {
 			if (oldLayer instanceof NetworkLayer) {
 				ExtensionFileFilter.exporters.clear();
@@ -126,6 +128,7 @@ public class MATSimToggleDialog extends ToggleDialog implements
 			layer = null;
 			networkAttributes.setEnabled(false);
 		}
+		
 	}
 
 	@Override
@@ -152,13 +155,17 @@ public class MATSimToggleDialog extends ToggleDialog implements
 	@Override
 	public void preferenceChanged(PreferenceChangeEvent e) {
 		if (e.getKey().equalsIgnoreCase("matsim_showInternalIds")) {
-			if (!Main.pref.getBoolean("matsim_showInternalIds", false)) {
-				table.getColumn("internal-id").setMinWidth(0);
-				table.getColumn("internal-id").setMaxWidth(0);
-			} else {
-				table.getColumn("internal-id").setMaxWidth(table.getColumn("id").getMaxWidth());
-				table.getColumn("internal-id").setWidth(table.getColumn("id").getWidth());
-			}
+			checkInternalIdColumn();
+		}
+	}
+	
+	private void checkInternalIdColumn() {
+		if (!Main.pref.getBoolean("matsim_showInternalIds", false)) {
+			table.getColumn("internal-id").setMinWidth(0);
+			table.getColumn("internal-id").setMaxWidth(0);
+		} else {
+			table.getColumn("internal-id").setMaxWidth(table.getColumn("id").getMaxWidth());
+			table.getColumn("internal-id").setWidth(table.getColumn("id").getWidth());
 		}
 	}
 
