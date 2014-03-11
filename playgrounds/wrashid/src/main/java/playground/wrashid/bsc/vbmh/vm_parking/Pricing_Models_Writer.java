@@ -16,7 +16,7 @@ public class Pricing_Models_Writer {
 		catch (Exception e){
 			System.out.println(e.toString());
 			System.out.println(e.getMessage());
-			System.out.println("fucked up");
+			System.out.println("Writing could not be finished");
 			return 0;
 			}
 		return 1;
