@@ -58,6 +58,7 @@ public class TransitScheduleAnalyserToCSVandTEX {
 		Date date = new Date();
 		String filenameTEX = outputDirectory + "\\transitScheduleAnalyser_" + date.getHours() + "_" + date.getMinutes() +  ".tex";
 		String filenameCSV = outputDirectory + "\\transitScheduleAnalyser_" + date.getHours() + "_" + date.getMinutes() +  ".csv";
+		String filenameTexForAutomaticAnalyzer = outputDirectory + "\\transitScheduleAnalyser.tex";
 		
 		List <TransitScheduleAnalyserElement> allInformations = new ArrayList<TransitScheduleAnalyserElement>();
 		
@@ -233,11 +234,65 @@ public class TransitScheduleAnalyserToCSVandTEX {
 					e.printStackTrace();
 				}
 				
+				/*
+				 * .tex for Automatic analyzer:
+				 * without begin{document} and usepackage declarations
+				 * added by gleich
+				 */
 				
+				try {
+					BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filenameTexForAutomaticAnalyzer),false));
+						writer.write("\\begin{longtable}{>{\\raggedleft}p{15mm} >{\\raggedleft}p{15mm} >{\\raggedleft}p{18mm} >{\\raggedleft}p{18mm} >{\\raggedleft}p{18mm} >{\\raggedleft}p{10mm} >{\\raggedleft}p{15mm} >{\\raggedleft}p{10mm}}" );
+						writer.newLine();
+						writer.write("\\caption{\\label{tab:LABEL}Results of Transitschedule Analyser} \\tabularnewline \\addlinespace[1.0em]" );
+						writer.newLine();
+						writer.write("\\toprule" );
+						writer.newLine();
+						writer.write("lineID & routeID & first Departure &  last Departure &  tourlength time & tourlength distance &  average headway &  number of vehicles \\tabularnewline" );
+						writer.newLine();
+						writer.write("\\midrule \\endhead" );
+						writer.newLine();
+						writer.newLine();
+						writer.write("\\caption{(continued)} \\tabularnewline \\addlinespace[1.0em]" );
+						writer.newLine();
+						writer.write("\\toprule" );
+						writer.newLine();
+						writer.write(" lineID & routeID & first Departure &  last Departure &  tourlength time & tourlength distance &  average headway &  number of vehicles \\tabularnewline" );
+						writer.newLine();
+						writer.write("\\midrule \\endhead" );
+						writer.newLine();
+						writer.newLine();
+						
+						for (int i = 0; i < allInformations.size(); i++) {
+							String line = allInformations.get(i).lineId;
+							line = line.replace("_", "\\_");
+							String route = allInformations.get(i).routeId;
+							route = route.replace("_", "\\_");
+							writer.write(line + " & " + route + " & " + allInformations.get(i).firstDeparture + " & " + allInformations.get(i).lastDeparture + " & " + allInformations.get(i).tourLengthTime + " & " + allInformations.get(i).tourLengthDistance +  " & " +  allInformations.get(i).averageHeadway + " & " + allInformations.get(i).numberOfVehicles + " \\tabularnewline "  );
+							writer.newLine();
+						}
+						writer.newLine();
+						writer.write("% \\tabularnewline");
+						writer.newLine();
+						writer.write("%\\bottomrule");
+						writer.newLine();
+						writer.write("\\end{longtable}");
+						writer.newLine();
+						writer.flush();
+						writer.close();
+					
+					
+					
+					
 
-
+				}catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 		log.info("Die Datei wurde nach " + filenameTEX + " geschrieben.");
 		log.info("Die Datei wurde nach " + filenameCSV + " geschrieben.");
+		log.info("Die Datei wurde nach " + filenameTexForAutomaticAnalyzer + " geschrieben.");
 		
 		}
 	
