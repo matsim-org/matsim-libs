@@ -80,7 +80,14 @@ public class PreferencesActionListener implements ActionListener,
 		} else if (e.getActionCommand().equals("importSystem")) {
 			Main.pref.put("matsim_importSystem",
 					(String) Preferences.importSystem.getSelectedItem());
+		} else if (e.getActionCommand().equals("showInternalIds")) {
+			if (Preferences.showInternalIds.isSelected()) {
+				Main.pref.put("matsim_showInternalIds", true);
+			} else {
+				Main.pref.put("matsim_showInternalIds", false);
+			}
 		}
+		
 	}
 
 	@Override

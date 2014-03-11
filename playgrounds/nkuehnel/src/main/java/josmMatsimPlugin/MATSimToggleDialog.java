@@ -2,9 +2,7 @@ package josmMatsimPlugin;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -34,19 +32,20 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.ExtensionFileFilter;
+import org.openstreetmap.josm.data.Preferences.PreferenceChangeEvent;
+import org.openstreetmap.josm.data.Preferences.PreferenceChangedListener;
 import org.openstreetmap.josm.data.SelectionChangedListener;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.MapView.LayerChangeListener;
 import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
-import org.openstreetmap.josm.gui.dialogs.DialogsPanel.Action;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.io.FileExporter;
 import org.openstreetmap.josm.tools.ImageProvider;
 
 public class MATSimToggleDialog extends ToggleDialog implements
-		LayerChangeListener, SelectionChangedListener {
+		LayerChangeListener, SelectionChangedListener, PreferenceChangedListener {
 	private JTable table;
 	private NetworkLayer layer;
 	private MATSimTableModel tableModel;
@@ -58,6 +57,7 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		super("Links/Nodes", "logo.png", "Links/Nodes", null, 150, true,
 				Preferences.class);
 		DataSet.addSelectionListener(this);
+		Main.pref.addPreferenceChangeListener(this);
 
 		exporterCopy.addAll(ExtensionFileFilter.exporters);
 
@@ -108,6 +108,7 @@ public class MATSimToggleDialog extends ToggleDialog implements
 			layer = (NetworkLayer) newLayer;
 			tableModel = new MATSimTableModel(layer.getMatsimNetwork());
 			table.setModel(tableModel);
+			
 			notifyDataChanged(layer);
 			this.networkAttributes.setEnabled(true);
 			if(!(oldLayer instanceof NetworkLayer)) {
@@ -144,6 +145,19 @@ public class MATSimToggleDialog extends ToggleDialog implements
 						table.addRowSelectionInterval(rowIndex, rowIndex);
 					}
 				}
+			}
+		}
+	}
+	
+	@Override
+	public void preferenceChanged(PreferenceChangeEvent e) {
+		if (e.getKey().equalsIgnoreCase("matsim_showInternalIds")) {
+			if (!Main.pref.getBoolean("matsim_showInternalIds", false)) {
+				table.getColumn("internal-id").setMinWidth(0);
+				table.getColumn("internal-id").setMaxWidth(0);
+			} else {
+				table.getColumn("internal-id").setMaxWidth(table.getColumn("id").getMaxWidth());
+				table.getColumn("internal-id").setWidth(table.getColumn("id").getWidth());
 			}
 		}
 	}

@@ -33,6 +33,8 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 	protected final static JCheckBox showIds = new JCheckBox("Show Ids");
 	protected final static JSlider wayOffset = new JSlider(0, 100);
 	protected final static JLabel wayOffsetLabel = new JLabel("link offset for overlapping links");
+	protected final static JCheckBox showInternalIds = new JCheckBox(
+			"Show internal Ids in table");
 
 	// Export tab
 	private JLabel defaultExportFolder = new JLabel("Default Export Folder");
@@ -94,6 +96,9 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 		
 		wayOffset.addChangeListener(listener);
 		wayOffset.setValue((int) ((Main.pref.getDouble("matsim_wayOffset", 0)) / 0.03));
+		
+		showInternalIds.setActionCommand("showInternalIds");
+		showInternalIds.addActionListener(listener);
 
 		showIds.setSelected(Main.pref.getBoolean("matsim_showIds")
 				&& Main.pref.getBoolean("matsim_renderer"));
@@ -101,8 +106,8 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 		wayOffset.setEnabled(Main.pref.getBoolean("matsim_renderer"));
 		showIds.setEnabled(Main.pref.getBoolean("matsim_renderer"));
 		wayOffsetLabel.setEnabled(Main.pref.getBoolean("matsim_renderer"));
+		showInternalIds.setSelected(Main.pref.getBoolean("matsim_showInternalIds", false));
 		
-
 		cOptions.anchor = GridBagConstraints.NORTHWEST;
 
 		cOptions.insets = new Insets(4, 4, 4, 4);
@@ -122,6 +127,10 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 		
 		cOptions.gridx = 1;
 		pnl.add(wayOffset, cOptions);
+		
+		cOptions.gridx = 0;
+		cOptions.gridy = 2;
+		pnl.add(showInternalIds, cOptions);
 		
 		return pnl;
 	}
