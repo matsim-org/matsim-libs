@@ -9,7 +9,7 @@ import playground.wrashid.bsc.vbmh.vm_parking.Park_Controler_Listener;
 import playground.wrashid.bsc.vbmh.vm_parking.Park_Scoring_Factory;
 
 
-public class DerControler {
+public class SFControler1 {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub

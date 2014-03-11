@@ -22,7 +22,7 @@ public class Park_Control {
 	
 	//Zur berechnung des besten oeffentlichen Parkplatzes: (Negative Werte, hoechste Score gewinnt)
 	double beta_geld = -10; 
-	double beta_distanz = -1; // !! Zweiphasige Kurve einbauen?
+	double beta_distance = -1; // !! Zweiphasige Kurve einbauen?
 	
 	int count_private = 0;
 	int count_public = 0;
