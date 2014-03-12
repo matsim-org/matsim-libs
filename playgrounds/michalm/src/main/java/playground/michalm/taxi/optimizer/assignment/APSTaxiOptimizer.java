@@ -21,86 +21,24 @@ package playground.michalm.taxi.optimizer.assignment;
 
 import java.util.*;
 
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.schedule.*;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.contrib.dvrp.data.Requests;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.schedule.*;
-import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
 
 public class APSTaxiOptimizer
-    implements TaxiOptimizer
+    extends AbstractTaxiOptimizer
 {
-    private final TaxiOptimizerConfiguration optimConfig;
-
-    private final SortedSet<TaxiRequest> unplannedRequests;
-
-    private boolean requiresReoptimization = false;
-
-
     public APSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
-        this.optimConfig = optimConfig;
-        unplannedRequests = new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR);
+        super(optimConfig, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR));
     }
 
 
-    private void scheduleUnplannedRequests()
+    protected void scheduleUnplannedRequests()
     {
-        new AssignmentProblem(optimConfig).scheduleUnplannedRequests(unplannedRequests);
-    }
-
-
-    @Override
-    public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
-    {
-        if (requiresReoptimization) {
-            scheduleUnplannedRequests();
-        }
-    }
-
-
-    @Override
-    public void requestSubmitted(Request request)
-    {
-        unplannedRequests.add((TaxiRequest)request);
-        requiresReoptimization = true;
-    }
-
-
-    @Override
-    public void nextTask(Schedule<? extends Task> schedule)
-    {
-        @SuppressWarnings("unchecked")
-        Schedule<TaxiTask> taxiSchedule = (Schedule<TaxiTask>)schedule;
-
-        optimConfig.scheduler.updateBeforeNextTask(taxiSchedule);
-        TaxiTask nextTask = taxiSchedule.nextTask();
-
-        if (!optimConfig.scheduler.getParams().destinationKnown) {
-            if (nextTask != null // schedule != COMPLETED
-                    && nextTask.getTaxiTaskType() == TaxiTaskType.DROPOFF_DRIVE) {
-                requiresReoptimization = true;
-            }
-        }
-    }
-
-
-    //TODO switch on/off
-    @Override
-    public void nextLinkEntered(DriveTask driveTask)
-    {
-        @SuppressWarnings("unchecked")
-        Schedule<TaxiTask> schedule = (Schedule<TaxiTask>)driveTask.getSchedule();
-
-        double predictedEndTime = driveTask.getTaskTracker().predictEndTime(
-                optimConfig.context.getTime());
-        optimConfig.scheduler.updateCurrentAndPlannedTasks(schedule, predictedEndTime);
-
-        //we may here possibly decide here whether or not to reoptimize
-        //if (delays/speedups encountered) {requiresReoptimization = true;}
+        new AssignmentProblem(optimConfig)
+                .scheduleUnplannedRequests((SortedSet<TaxiRequest>)unplannedRequests);
     }
 }

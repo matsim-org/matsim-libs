@@ -108,6 +108,8 @@ public class NOSTaxiOptimizer
         else {
             scheduleUnplannedRequests();//reduce T_W (regular NOS)
         }
+        
+        requiresReoptimization = false;
     }
 
 

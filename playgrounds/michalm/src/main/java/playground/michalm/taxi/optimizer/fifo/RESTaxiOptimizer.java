@@ -35,7 +35,7 @@ public class RESTaxiOptimizer
 
 
     @Override
-    /*package*/void scheduleUnplannedRequests()
+    protected void scheduleUnplannedRequests()
     {
         List<TaxiRequest> removedRequests = optimConfig.scheduler
                 .removePlannedRequestsFromAllSchedules();

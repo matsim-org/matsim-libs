@@ -21,88 +21,31 @@ package playground.michalm.taxi.optimizer.fifo;
 
 import java.util.*;
 
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.schedule.*;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.contrib.dvrp.data.Requests;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.schedule.*;
-import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
 
 public class OTSTaxiOptimizer
-    implements TaxiOptimizer
+    extends AbstractTaxiOptimizer
 {
-    /*package*/final TaxiOptimizerConfiguration optimConfig;
-
-    /*package*/final Queue<TaxiRequest> unplannedRequests;
-
-    private boolean requiresReoptimization = false;
-
-
     public OTSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
-        this.optimConfig = optimConfig;
-
-        int vehCount = optimConfig.context.getVrpData().getVehicles().size();//1 awaiting req/veh
-        unplannedRequests = new PriorityQueue<TaxiRequest>(vehCount, Requests.T0_COMPARATOR);
+        super(optimConfig, new PriorityQueue<TaxiRequest>(getVehicleCount(optimConfig),
+                Requests.T0_COMPARATOR));
     }
 
 
-    /*package*/void scheduleUnplannedRequests()
+    protected void scheduleUnplannedRequests()
     {
-        new FIFOSchedulingProblem(optimConfig).scheduleUnplannedRequests(unplannedRequests);
+        new FIFOSchedulingProblem(optimConfig)
+                .scheduleUnplannedRequests((Queue<TaxiRequest>)unplannedRequests);
     }
 
 
-    @Override
-    public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
+    private static int getVehicleCount(TaxiOptimizerConfiguration optimConfig)
     {
-        if (requiresReoptimization) {
-            scheduleUnplannedRequests();
-        }
-    }
-
-
-    @Override
-    public void requestSubmitted(Request request)
-    {
-        unplannedRequests.add((TaxiRequest)request);
-        requiresReoptimization = true;
-    }
-
-
-    @Override
-    public void nextTask(Schedule<? extends Task> schedule)
-    {
-        @SuppressWarnings("unchecked")
-        Schedule<TaxiTask> taxiSchedule = (Schedule<TaxiTask>)schedule;
-
-        optimConfig.scheduler.updateBeforeNextTask(taxiSchedule);
-        TaxiTask nextTask = taxiSchedule.nextTask();
-
-        if (!optimConfig.scheduler.getParams().destinationKnown) {
-            if (nextTask != null // schedule != COMPLETED
-                    && nextTask.getTaxiTaskType() == TaxiTaskType.DROPOFF_DRIVE) {
-                requiresReoptimization = true;
-            }
-        }
-    }
-
-
-    //TODO switch on/off
-    @Override
-    public void nextLinkEntered(DriveTask driveTask)
-    {
-        @SuppressWarnings("unchecked")
-        Schedule<TaxiTask> schedule = (Schedule<TaxiTask>)driveTask.getSchedule();
-
-        double predictedEndTime = driveTask.getTaskTracker().predictEndTime(
-                optimConfig.context.getTime());
-        optimConfig.scheduler.updateCurrentAndPlannedTasks(schedule, predictedEndTime);
-
-        //we may here possibly decide here whether or not to reoptimize
-        //if (delays/speedups encountered) {requiresReoptimization = true;}
+        return optimConfig.context.getVrpData().getVehicles().size();
     }
 }
