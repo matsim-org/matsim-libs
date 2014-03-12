@@ -25,13 +25,13 @@ public class RunScenario {
 		config.transit().setVehiclesFile(pathToExampleScenario 
 				+ "input/Vehicles.xml");
 		config.plans().setInputFile(pathToExampleScenario 
-				+ "output/ExampleScenario/1.plans.xml.gz");
+				+ "input/ijkl_plans.xml");
 		config.controler().setOutputDirectory(pathToExampleScenario 
-				+ "output/test2ndDifferentStop2");
+				+ "output/testOneBusManyIterations");
 		config.controler().setWriteEventsInterval(1); //soll eigentlich direkt im controler gehen, laut http://matsim.org/node/624 (8 lessons tutorial 7.1)
 		// included in config_ptturial
 		
-		config.controler().setLastIteration(10);
+		config.controler().setLastIteration(20);
 		
 		/*
 		ActivityParams work = new ActivityParams("w");

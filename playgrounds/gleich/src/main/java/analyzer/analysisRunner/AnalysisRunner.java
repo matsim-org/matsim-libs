@@ -67,7 +67,82 @@ import playground.vsp.analysis.modules.waitingTimes.WaitingTimesAnalyzer;
 import playground.vsp.analysis.modules.welfareAnalyzer.WelfareAnalyzer;
 
 /**
+ * Work Flow at version 12.02.2014:
  * 
+ * <ul>
+ * <li>1. AnalysisRunner.java loads scenario
+ * <li>2. AnalysisRunner.java runs methods r"AnalyzerName"() to run all working 
+ * analyzers, output is saved in outputDirectory/"AnalyzerName"
+ * <li>3. AnalysisRunner.java creates an instance of ReportGenerator.java and runs it
+ * <li>4. ReportGenerator.java copies RScripts and Latex files from a local 
+ * directory (to be replaced by an svn path shared-svn...studies/gleich/MATSimAnalyzer) 
+ * to a local working copy at outputDirectory/Latex and outputDirectory/RScripts
+ * <li>5. ReportGenerator.java launches the RScript executable which runs analysis_main.R 
+ * at outputDirectory/Rscripts
+ * <li>5.1. RScript follows relative paths stated in analysis_main.R to the R Scripts 
+ * for the VspAnalyzer output
+ * <li>5.2. RScript executable creates plots as .pdf
+ * <li>6. ReportGenerator.java launches pdflatex executable which runs 
+ * VspAnalyzerAutomaticReport.tex
+ * <li>6.1. pdflatex executable follows relative paths stated in 
+ * VspAnalyzerAutomaticReport.tex to VspAnalyzerAutomaticReport_main.tex and further 
+ * on to Latex files for the VspAnalyzer and Rscript output
+ * <li>6.2. pdflatex creates a single report file including the results of all analyzers
+ * outputDirectory/VspAnalyzerAutomaticReport.pdf
+ * </ul>
+ * 
+ * There is for each working VspAnalyzer one latex file outputDirectory/Latex/"analyzerName".tex.
+ * For some Analyzers there is one Rscript outputDirectory/RScripts/"analyzerName.R".
+ * 
+ * AnalysisRunner.java, ReportGenerator.java, all R and latex files and all paths 
+ * work for the example scenario at gleich's computer at version 12.03.2014. However,
+ * the current legModeDistanceDistribution.R needs LegModeDistanceDistribution to 
+ * write its output file with the "#" in the header replaced by 'distance' 
+ * (R interpretes '#' as comment line).<p>
+ * The example scenario can be found in shared-svn.../studies/gleich/MATSimExampleScenario
+ * 
+ * TODO:
+ * <ul> 
+ * <li>Separate Run of VspAnalyzers from Starting R and Latex
+ * <li>Separate methods to run the analyzers from this class into one class per analyzer
+ * (in the package of the analysis module)
+ * <li>Have the R scripts and latex files created by Java by one class per analyzer
+ * (in the package of the analysis module)
+ * <li>After the VspAnalyzers were run by one of the above mentioned classes or manually
+ * somehow else, Java should look in the output data which the VspAnalyzers created and
+ * check for output names which match with preconfigured standardized names for each
+ * analyzer output. In case the analyzer was run, Java finds its output names and writes
+ * R scripts and latex files corresponding to this analyzer. Otherwise this analyzer is 
+ * not included in the final VspAnalyzerAutomaticReport.pdf
+ * <li>Have the documentary comment of the analysis modules inserted automatically into
+ * the latex files in order to have them updated to the most recent version in the 
+ * resulting pdf report.
+ * </ul>
+ * Problems concerning analyzer modules:
+ * <ul>
+ * <li>Some analyzers crash during runtime (PtTravelStats, TransitVehicleVolume) due to
+ * a conflict between Matsim class "Counts" which does not allow counts starting at 0 and
+ * these analyzers which crash while trying to create Counts starting at 0.
+ * <li>NetworkAnalyzer seems to have problems to retrieve the coordinate reference system
+ * <li>PtTripAnalysis (commented out) and BvgAna are not included
+ * </ul>
+ * Problems concerning the exampleScenario
+ * <ul>
+ * <li>There are no transfers between different TransitLines, this might make the example
+ * scenario unsuitable for some analyzers.
+ * <li>Monetary Payments and Welfare analyzers deliver almost empty output
+ * <li>ptSimpleTripAnalyzer needs a scenario without transitLines
+ * </ul>
+ * 
+ * Some analysis modules only create .shp files which are not yet included in the report.
+ * Due to a bug in Qgis, it cannot be used from command line on windows to create
+ * graphics to be included in latex. According to ikaddoura and aneumann shp files 
+ * (respectively graphics produced from shp files ) do not need to be inserted in the report.
+ * 
+ * End of TODO list and description of version 12.03.2014
+ * -------
+ * Begin normal documentary comment
+ * -------
  * Runs most analyzers available in the vsp playground and invokes the
  * {@link ReportGenerator} to create a working copy of R and Latex scripts and
  * finally a <i>pdf-document which shows the results of some
@@ -92,7 +167,9 @@ import playground.vsp.analysis.modules.welfareAnalyzer.WelfareAnalyzer;
  * @param <b>outputDirectory</b>: a path to a network drive may cause problems when
  * ReportGenerator invokes R and Latex
  * @param pathToScenario data: plans, network, vehicles, transitSchedule
- * @param eventFile
+ * @param <b>eventFile</b>: it has to correspond to the plan file (plans from
+ *  iteration x and events from iteration x) otherwise some analyzers may produce
+ *  unreliable results
  * @param pathToRScriptFiles
  * @param pathToLatexFiles
  * @param pathToRScriptExe
@@ -108,7 +185,7 @@ public class AnalysisRunner {
 	private boolean useConfigXml;
 	private String pathToScenarioData = "Z:/WinHome/ArbeitWorkspace/Analyzer/";
 	private String eventFile = pathToScenarioData 
-			+ "output/test2ndDifferentStop2/ITERS/it.10/10.events.xml.gz";
+			+ "output/testOneBusManyIterations/ITERS/it.10/10.events.xml.gz";
 	private String outputDirectory;
 	private String pathToRScriptFiles = "Z:/WinHome/ArbeitWorkspace/Analyzer/output/Rscripts";
 	private String pathToLatexFiles = "Z:/WinHome/ArbeitWorkspace/Analyzer/output/Latex";
@@ -138,8 +215,8 @@ public class AnalysisRunner {
 			outputDirectory = System.getProperty("user.home") + "/Desktop/MATSimAnalyzer";
 			(new File(System.getProperty("user.home") + "/desktop/MATSimAnalyzer")).mkdir();
 		}
-		outputDirectory = "Z:/WinHome/MATSimAnalyzer3";
-		(new File("Z:/WinHome/MATSimAnalyzer3")).mkdir();
+		outputDirectory = "Z:/WinHome/MATSimAnalyzer4";
+		(new File("Z:/WinHome/MATSimAnalyzer4")).mkdir();
 		this.initialize();
 	}
 	
@@ -176,7 +253,7 @@ public class AnalysisRunner {
 			/* Some analyzers read the result plan files.
 			 * The Plan File should include the plans used for the iteration
 			 * whose eventfile is to be analysed. */
-			config.plans().setInputFile(pathToScenarioData + "output/test2ndDifferentStop2/ITERS/it.10/10.plans.xml.gz");//pathToScenarioData + "output/ExampleScenario/1.plans.xml.gz"
+			config.plans().setInputFile(pathToScenarioData + "output/testOneBusManyIterations/ITERS/it.10/10.plans.xml.gz");//pathToScenarioData + "output/ExampleScenario/1.plans.xml.gz"
 		}
 		scenario = ScenarioUtils.loadScenario(config);
 	}
@@ -346,7 +423,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 			personsOfInterest.add(id);
 		}
 		
-		Act2ModeWithPlanCoordAnalysis analysis = new Act2ModeWithPlanCoordAnalysis(scenario, personsOfInterest, 30*60, coordinateSystem);
+		ActivityToModeAnalysis analysis = new ActivityToModeAnalysis(scenario, personsOfInterest, 30*60, coordinateSystem);
 		EventsManager events = EventsUtils.createEventsManager();
 		List<EventHandler> handler = analysis.getEventHandler();
 		for(EventHandler eh : handler){
@@ -356,7 +433,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 		reader.readFile(eventFile);
 		analysis.postProcessData();
 		(new File(outputDirectory + "/Act2ModeWithPlanCoord")).mkdir(); 
-		analysis.writeResults(outputDirectory + "/Act2ModeWithPlanCoord/");
+		analysis.writeResultsPlanCoords(outputDirectory + "/Act2ModeWithPlanCoord/");
 	}
 
 	private void rBvgAna(){
