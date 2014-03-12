@@ -55,13 +55,14 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 public class ShapeConverterPopRandom {
 
-	static String shapeFile = "input/oslo/Start_og_stopp_i_TRD_fra_RVU2/testplott5_end.shp";
+	static String shapeFile = "input/oslo/Dataset/eksport_stort_datasett_test_2.shp";
+	//static String shapeFile = "input/oslo/Start_og_stopp_i_TRD_fra_RVU2/testplott5_end.shp";
 	static String networkFile = "input/oslo/trondheim_network_with_lanes.xml";
 	static String plansFile = "input/oslo/plans_from_start_og_random.xml";
 	static Collection<SimpleFeature> features;
 	static Logger logger = Logger.getLogger(ShapeConverterPopRandom.class);
 	private static int countKnownActTypes =0;
-	private static Double factor = 3.0;
+	private static Double factor = 0.08; // additional to 1 original
 	private static Double shift = 100.;
 	private static Scenario scenario;
 	private static List<Person> newPersons;
@@ -88,14 +89,15 @@ public class ShapeConverterPopRandom {
 		ActivityParams other = new ActivityParams("other");
 		other.setTypicalDuration(1*3600);
 		config.planCalcScore().addActivityParams(other);
+		ActivityParams comm = new ActivityParams("commute");
+		config.planCalcScore().addActivityParams(comm);
+		comm.setTypicalDuration(1*3600);
 		
 		scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		Population pop = fillScenario();
 		new PopulationWriter(pop, scenario.getNetwork()).write(plansFile);
 
-		
-		//Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(0.0, 10000.0));
 		logger.info("Population size "+ pop.getPersons().size());
 		logger.info("number of features" + features.size());
 		logger.info("features with know acttype " + countKnownActTypes);
@@ -120,15 +122,14 @@ public class ShapeConverterPopRandom {
 			
 			if (time>0.0) {
 				
+				Double idd = (Double) sf.getAttribute("ID_NUM2");
+				String ids = Double.toString(idd);
+				Id personId = new IdImpl(ids);
 				
-				Integer id = (Integer) sf.getAttribute("ID_NUM2"); //ID_2 --> pop size = 59059
-				String idstring = Integer.toString(id);
-				Id personId = new IdImpl(idstring);
-				
-				Double startx = (Double) sf.getAttribute("start_x");
-				Double starty = (Double) sf.getAttribute("start_y");
-				Double endx = (Double) sf.getAttribute("ende_x");
-				Double endy = (Double) sf.getAttribute("ende_y");
+				Double startx = (Double) sf.getAttribute("start_x_ny");
+				Double starty = (Double) sf.getAttribute("start_y_ny");
+				Double endx = (Double) sf.getAttribute("ende_x_ny");
+				Double endy = (Double) sf.getAttribute("ende_y_ny");
 				
 				Coord startCoordinates = scenario.createCoord(startx, starty);
 				Coord endCoordinates = scenario.createCoord(endx, endy);
@@ -167,28 +168,34 @@ public class ShapeConverterPopRandom {
 		}
 		
 		for(Id id: personid2trips.keySet()){
-			
-			Person person = populationFactory.createPerson(id);
-			population.addPerson(person);
-			Plan plan = populationFactory.createPlan();
-			person.addPlan(plan);
 			Trip sortedTrips[] = getSortedTrips(personid2trips.get(id));
-		
-			String firstActType = sortedTrips[sortedTrips.length-1].getActivityType();
-			Activity firstAct = populationFactory.createActivityFromCoord(firstActType, sortedTrips[0].getStartCoord());
-			firstAct.setEndTime(sortedTrips[0].getTime());
-			plan.addActivity(firstAct);
 			
 			
-			for(int i = 0; i<sortedTrips.length; i++){
-				// add leg
-				plan.addLeg(populationFactory.createLeg(sortedTrips[i].getLeg()));
-				// add end activity
-				Activity nextAct = populationFactory.createActivityFromCoord(sortedTrips[i].getActivityType(), sortedTrips[i].getEndCoord());
-				if(i<sortedTrips.length-1){
-					nextAct.setEndTime(sortedTrips[i+1].getTime());
+			if (sortedTrips.length>1) {
+				Person person = populationFactory.createPerson(id);
+				population.addPerson(person);
+				Plan plan = populationFactory.createPlan();
+				person.addPlan(plan);
+				String firstActType = sortedTrips[sortedTrips.length - 1]
+						.getActivityType();
+				Activity firstAct = populationFactory.createActivityFromCoord(
+						firstActType, sortedTrips[0].getStartCoord());
+				firstAct.setEndTime(sortedTrips[0].getTime());
+				plan.addActivity(firstAct);
+				for (int i = 0; i < sortedTrips.length; i++) {
+					// add leg
+					plan.addLeg(populationFactory.createLeg(sortedTrips[i]
+							.getLeg()));
+					// add end activity
+					Activity nextAct = populationFactory
+							.createActivityFromCoord(
+									sortedTrips[i].getActivityType(),
+									sortedTrips[i].getEndCoord());
+					if (i < sortedTrips.length - 1) {
+						nextAct.setEndTime(sortedTrips[i + 1].getTime());
+					}
+					plan.addActivity(nextAct);
 				}
-				plan.addActivity(nextAct);
 			}
 		}
 		
@@ -279,7 +286,6 @@ public class ShapeConverterPopRandom {
 		return sortedTrips;
 	}
 	private static Double getTimeInSeconds(String timeString) {
-//		logger.info(timeString);
 		try{
 		String[] split = timeString.split(" ");
 		String[] split2 = split[1].split(":");
@@ -288,7 +294,6 @@ public class ShapeConverterPopRandom {
 				+ Double.parseDouble(split2[2]);
 		return time;
 		}catch(ArrayIndexOutOfBoundsException e){
-		//	logger.warn("couldnt parse time from " + timeString);
 		}
 		return -1.;
 	}

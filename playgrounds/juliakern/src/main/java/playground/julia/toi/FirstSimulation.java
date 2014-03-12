@@ -82,29 +82,38 @@ public class FirstSimulation {
 		// find a shortest route
 		StrategySettings reRoute = new StrategySettings(new IdImpl(1));
 		reRoute.setModuleName("ReRoute");
-		reRoute.setProbability(0.3);
-		reRoute.setDisableAfter(17);
+		reRoute.setProbability(0.2);
+		reRoute.setDisableAfter(50);
 		config.strategy().addStrategySettings(reRoute);
 		
 		// choose one of existing plans
 		StrategySettings change = new StrategySettings(new IdImpl(2));
 		change.setModuleName("ChangeExpBeta");
-		change.setProbability(0.3);
+		change.setProbability(0.3); //TODO decrease later
 		config.strategy().addStrategySettings(change);
 		
 		// change leg mode of a plan
 		StrategySettings modechoice = new StrategySettings(new IdImpl(3));
 		modechoice.setModuleName("ChangeLegMode");
-		modechoice.setProbability(0.3);
+		modechoice.setProbability(0.05);
+		modechoice.setDisableAfter(50);
 		config.strategy().addStrategySettings(modechoice);
 		
 		// shift start times 
 		StrategySettings timeAll = new StrategySettings(new IdImpl(4));
 		timeAll.setModuleName("TimeAllocationMutator");
 		timeAll.setProbability(0.1);
+		timeAll.setDisableAfter(50);
 		String mutationRange = Double.toString(60.*15);		
 		config.strategy().addStrategySettings(timeAll);
 		config.setParam("TimeAllocationMutator", "mutationRange", mutationRange);
+		
+		// keep last plan = do nothing
+		StrategySettings keep = new StrategySettings(new IdImpl(5));
+		keep.setModuleName("KeepLastSelected");
+		keep.setProbability(0.3);
+		config.strategy().addStrategySettings(keep);
+		
 		
 		// timeallocation mutator
 		// keep last selected

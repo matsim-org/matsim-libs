@@ -257,12 +257,16 @@ public class ShapeConverterPop {
 		
 		for(Id id: personid2trips.keySet()){
 			
+			Trip sortedTrips[] = getSortedTrips(personid2trips.get(id));
+			
+			if(sortedTrips.length>1){ // only persons with more than one trip
 			Person person = populationFactory.createPerson(id);
 			population.addPerson(person);
 			Plan plan = populationFactory.createPlan();
 			person.addPlan(plan);
-			Trip sortedTrips[] = getSortedTrips(personid2trips.get(id));
+			
 		
+			
 			String firstActType = sortedTrips[sortedTrips.length-1].getActivityType();
 			Activity firstAct = populationFactory.createActivityFromCoord(firstActType, sortedTrips[0].getStartCoord());
 			firstAct.setEndTime(sortedTrips[0].getTime());
@@ -279,9 +283,12 @@ public class ShapeConverterPop {
 				}
 				plan.addActivity(nextAct);
 			}
+			
+			
+			
 		}
 		
-
+		}
 		
 		return population;
 	}

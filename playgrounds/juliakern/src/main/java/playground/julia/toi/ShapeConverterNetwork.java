@@ -162,8 +162,8 @@ public class ShapeConverterNetwork {
 							.getNumberOfForwardLanes();
 					Double numLanesBackwards = laneTypes.get(lanetype)
 							.getNumberOfBackLanes();
-					Double capacityf = numLanesForwards * freeSpeed *72; // assume 3600 in 1 hour for freespeed 50 km/h
-					Double capacityb = numLanesBackwards * freeSpeed * 72;
+					Double capacityf = numLanesForwards * freeSpeed *29; // assume 3600 in 1 hour for freespeed 50 km/h
+					Double capacityb = numLanesBackwards * freeSpeed * 29;
 					if (!network.getLinks().containsKey(linkId1)) {
 						if(numLanesForwards>0.0){
 							network.createAndAddLink(linkId1, node1, node2,	linkLength, freeSpeed, capacityf,numLanesForwards);
