@@ -29,7 +29,7 @@ import org.jfree.chart.labels.XYItemLabelGenerator;
 import org.jfree.chart.plot.*;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 
@@ -95,7 +95,7 @@ public class RouteChartUtils
 
         JFreeChart chart = ChartFactory.createXYLineChart("Routes", "X", "Y", nData,
                 PlotOrientation.VERTICAL, false, true, false);
-        
+
         XYPlot plot = (XYPlot)chart.getPlot();
         plot.setRangeGridlinesVisible(false);
         plot.setDomainGridlinesVisible(false);
@@ -149,7 +149,7 @@ public class RouteChartUtils
     private static Map<TaskStatus, CoordSource> createLinkSourceByStatus(
             Schedule<? extends Task> schedule)
     {
-        Iterator<DriveTask> taskIter = Schedules.createDriveTaskIter(schedule);
+        Iterable<DriveTask> tasks = Schedules.createDriveTaskIter(schedule);
 
         // creating lists of DriveTasks
         Map<TaskStatus, List<DriveTask>> taskListByStatus = new EnumMap<TaskStatus, List<DriveTask>>(
@@ -159,8 +159,7 @@ public class RouteChartUtils
             taskListByStatus.put(ts, new ArrayList<DriveTask>());
         }
 
-        while (taskIter.hasNext()) {
-            DriveTask t = taskIter.next();
+        for (DriveTask t : tasks) {
             taskListByStatus.get(t.getStatus()).add(t);
         }
 

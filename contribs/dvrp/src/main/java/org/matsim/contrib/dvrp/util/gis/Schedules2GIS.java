@@ -61,26 +61,21 @@ public class Schedules2GIS
         String filename = vrpOutDirName + "\\route_";
 
         for (Vehicle v : vehicles) {
-            Iterator<DriveTask> driveIter = Schedules.createDriveTaskIter(v.getSchedule());
-
-            if (!driveIter.hasNext()) {
-                continue;
-            }
-
+            Iterable<DriveTask> drives = Schedules.createDriveTaskIter(v.getSchedule());
             Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 
-            while (driveIter.hasNext()) {
-                DriveTask drive = driveIter.next();
+            for (DriveTask drive : drives) {
                 Coordinate[] coords = createLineString(drive);
 
                 if (coords != null) {
                     features.add(this.factory.createPolyline(coords,
-                            new Object[] { v.getId(), v.getId(), drive.getTaskIdx() },
-                            null));
+                            new Object[] { v.getId(), v.getId(), drive.getTaskIdx() }, null));
                 }
             }
 
-            ShapeFileWriter.writeGeometries(features, filename + v.getId() + ".shp");
+            if (!features.isEmpty()) {
+                ShapeFileWriter.writeGeometries(features, filename + v.getId() + ".shp");
+            }
         }
     }
 

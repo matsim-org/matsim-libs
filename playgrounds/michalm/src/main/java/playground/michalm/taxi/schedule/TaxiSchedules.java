@@ -22,12 +22,45 @@ package playground.michalm.taxi.schedule;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 
+import playground.michalm.taxi.data.TaxiRequest;
+import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
+
+import com.google.common.base.*;
+import com.google.common.collect.Iterables;
+
 
 public class TaxiSchedules
 {
+    public static final Predicate<TaxiTask> IS_PICKUP_STAY = new Predicate<TaxiTask>() {
+        public boolean apply(TaxiTask t)
+        {
+            return t.getTaxiTaskType() == TaxiTaskType.PICKUP_STAY;
+        };
+    };
+
+    public static final Function<TaxiTask, TaxiRequest> TAXI_TASK_TO_REQUEST = new Function<TaxiTask, TaxiRequest>() {
+        public TaxiRequest apply(TaxiTask t)
+        {
+            if (t instanceof TaxiTaskWithRequest) {
+                return ((TaxiTaskWithRequest)t).getRequest();
+            }
+            else {
+                return null;
+            }
+        }
+    };
+
+
     @SuppressWarnings("unchecked")
     public static Schedule<TaxiTask> getSchedule(Vehicle vehicle)
     {
         return (Schedule<TaxiTask>)vehicle.getSchedule();
+    }
+
+
+    public static Iterable<TaxiRequest> getTaxiRequests(Schedule<TaxiTask> schedule)
+    {
+        Iterable<TaxiTask> pickupTasks = Iterables.filter(schedule.getTasks(), IS_PICKUP_STAY);
+        return Iterables.transform(pickupTasks, TAXI_TASK_TO_REQUEST);
     }
 }

@@ -31,7 +31,7 @@ import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
 
 
-class AssignmentProblem
+public class AssignmentProblem
 {
     private final double NULL_PATH_COST = 24 * 60 * 60; //1 day
 
@@ -41,13 +41,13 @@ class AssignmentProblem
     private RequestData rData;
 
 
-    AssignmentProblem(TaxiOptimizerConfiguration optimConfig)
+    public AssignmentProblem(TaxiOptimizerConfiguration optimConfig)
     {
         this.optimConfig = optimConfig;
     }
 
 
-    void scheduleUnplannedRequests(SortedSet<TaxiRequest> unplannedRequests)
+    public void scheduleUnplannedRequests(SortedSet<TaxiRequest> unplannedRequests)
     {
         optimConfig.scheduler.removePlannedRequestsFromAllSchedules(unplannedRequests);
 

@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Task.TaskType;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Iterators;
+import com.google.common.collect.Iterables;
 
 
 public class Schedules
@@ -118,22 +118,22 @@ public class Schedules
 
 
     @SuppressWarnings("unchecked")
-    public static Iterator<StayTask> createStayTaskIter(Schedule<?> schedule)
+    public static Iterable<StayTask> createStayTaskIter(Schedule<?> schedule)
     {
-        return (Iterator<StayTask>)createTaskFilterIter(schedule, STAY_TASK_PREDICATE);
+        return (Iterable<StayTask>)createTaskFilterIter(schedule, STAY_TASK_PREDICATE);
     }
 
 
     @SuppressWarnings("unchecked")
-    public static Iterator<DriveTask> createDriveTaskIter(Schedule<?> schedule)
+    public static Iterable<DriveTask> createDriveTaskIter(Schedule<?> schedule)
     {
-        return (Iterator<DriveTask>)createTaskFilterIter(schedule, DRIVE_TASK_PREDICATE);
+        return (Iterable<DriveTask>)createTaskFilterIter(schedule, DRIVE_TASK_PREDICATE);
     }
 
 
-    public static Iterator<? extends Task> createTaskFilterIter(Schedule<?> schedule,
+    public static Iterable<? extends Task> createTaskFilterIter(Schedule<?> schedule,
             Predicate<Task> taskPredicate)
     {
-        return Iterators.filter(schedule.getTasks().iterator(), taskPredicate);
+        return Iterables.filter(schedule.getTasks(), taskPredicate);
     }
 }

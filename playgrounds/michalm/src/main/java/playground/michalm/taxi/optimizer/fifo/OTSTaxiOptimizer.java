@@ -29,7 +29,6 @@ import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
-import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
 
 
 public class OTSTaxiOptimizer
@@ -41,8 +40,6 @@ public class OTSTaxiOptimizer
 
     private boolean requiresReoptimization = false;
 
-    private final Comparator<VehicleRequestPath> vrpComparator;
-
 
     public OTSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
@@ -50,26 +47,12 @@ public class OTSTaxiOptimizer
 
         int vehCount = optimConfig.context.getVrpData().getVehicles().size();//1 awaiting req/veh
         unplannedRequests = new PriorityQueue<TaxiRequest>(vehCount, Requests.T0_COMPARATOR);
-
-        vrpComparator = optimConfig.getVrpComparator();
     }
 
 
     /*package*/void scheduleUnplannedRequests()
     {
-        while (!unplannedRequests.isEmpty()) {
-            TaxiRequest req = unplannedRequests.peek();
-
-            VehicleRequestPath best = optimConfig.vrpFinder.findBestVehicleForRequest(req,
-                    optimConfig.context.getVrpData().getVehicles(), vrpComparator);
-
-            if (best == null) {
-                return;
-            }
-
-            optimConfig.scheduler.scheduleRequest(best);
-            unplannedRequests.poll();
-        }
+        new FIFOSchedulingProblem(optimConfig).scheduleUnplannedRequests(unplannedRequests);
     }
 
 

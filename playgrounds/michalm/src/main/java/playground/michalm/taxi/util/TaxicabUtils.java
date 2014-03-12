@@ -19,8 +19,6 @@
 
 package playground.michalm.taxi.util;
 
-import java.util.*;
-
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -87,27 +85,8 @@ public class TaxicabUtils
     }
 
 
-    public static <V extends Vehicle> List<V> getVehiclesAsList(Iterable<V> input, Predicate<Vehicle> predicate)
-    {
-        List<V> output = new ArrayList<V>();
-
-        for (V v : input) {
-            if (predicate.apply(v)) {
-                output.add(v);
-            }
-        }
-
-        return output;
-    }
-
-
-    public static <V extends Vehicle> Iterable<V> filterVehicles(Iterable<V> vehicles, Predicate<Vehicle> predicate)
-    {
-        return Iterables.filter(vehicles, predicate);
-    }
-
-
-    public static int countVehicles(Iterable<? extends Vehicle> vehicles, Predicate<Vehicle> predicate)
+    public static int countVehicles(Iterable<? extends Vehicle> vehicles,
+            Predicate<Vehicle> predicate)
     {
         return Iterables.size(Iterables.filter(vehicles, predicate));
     }

@@ -25,16 +25,21 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.utils.LeastCostPathTree.NodeData;
 
-import playground.michalm.taxi.data.TaxiRequest;
+import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.optimizer.fifo.FIFOSchedulingProblem;
+import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
 import playground.michalm.taxi.util.TaxicabUtils;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
+
+import com.google.common.collect.*;
 
 
 public class MIPProblem
@@ -66,7 +71,7 @@ public class MIPProblem
     }
 
 
-    void scheduleUnplannedRequests(Set<TaxiRequest> unplannedRequests)
+    public void scheduleUnplannedRequests(Set<TaxiRequest> unplannedRequests)
     {
         this.unplannedRequests = unplannedRequests;
         optimConfig.scheduler.removePlannedRequestsFromAllSchedules(unplannedRequests);
@@ -77,8 +82,10 @@ public class MIPProblem
         }
 
         requests = unplannedRequests.toArray(new TaxiRequest[n]);
-        vehicles = TaxicabUtils.getVehiclesAsList(optimConfig.context.getVrpData().getVehicles(),
-                TaxicabUtils.CAN_BE_SCHEDULED);
+
+        List<Vehicle> allVehs = optimConfig.context.getVrpData().getVehicles();
+        Iterable<Vehicle> filteredVehs = Iterables.filter(allVehs, TaxicabUtils.CAN_BE_SCHEDULED);
+        vehicles = Lists.newArrayList(filteredVehs);
 
         m = vehicles.size();
         if (m == 0) {
@@ -107,6 +114,8 @@ public class MIPProblem
             addVehToReqLinConstraint();
             addReqToReqLinConstraint();
 
+            findInitialSolution();
+
             model.optimize();
 
             updateSchedules();
@@ -132,14 +141,20 @@ public class MIPProblem
     }
 
 
+    private Map<Id, Integer> reqIdToIdx = new HashMap<Id, Integer>();
+
+
     private void addWVariables()
         throws GRBException
     {
         wVar = new GRBVar[n];
 
         for (int i = 0; i < n; i++) {
-            double e_i = requests[i].getT0();
+            TaxiRequest req = requests[i];
+            double e_i = req.getT0();
             wVar[i] = model.addVar(e_i, GRB.INFINITY, 1, GRB.CONTINUOUS, "w_" + i);
+
+            reqIdToIdx.put(req.getId(), i);
         }
     }
 
@@ -236,6 +251,52 @@ public class MIPProblem
     }
 
 
+    private void findInitialSolution()
+        throws GRBException
+    {
+        int size = unplannedRequests.size();
+        Queue<TaxiRequest> queue = new PriorityQueue<TaxiRequest>(size, Requests.T0_COMPARATOR);
+
+        for (TaxiRequest r : unplannedRequests) {
+            queue.add(r);
+        }
+
+        new FIFOSchedulingProblem(optimConfig).scheduleUnplannedRequests(queue);
+
+        //schedules --> x[u][v] and w[i]
+
+        for (int u = 0; u < m + n; u++) {
+            for (int v = 0; v < m + n; v++) {
+                xVar[u][v].set(GRB.DoubleAttr.Start, 0);
+            }
+        }
+
+        double t_P = optimConfig.scheduler.getParams().pickupDuration;
+
+        for (int k = 0; k < m; k++) {
+            Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(vehicles.get(k));
+            Iterable<TaxiRequest> reqs = TaxiSchedules.getTaxiRequests(schedule);
+            Iterable<TaxiRequest> plannedReqs = Iterables.filter(reqs, TaxiRequests.IS_PLANNED);
+
+            int u = k;
+            for (TaxiRequest r : plannedReqs) {
+                int i = reqIdToIdx.get(r.getId());
+                int v = m + i;
+
+                xVar[u][v].set(GRB.DoubleAttr.Start, 1);
+
+                double w_i = r.getPickupStayTask().getEndTime() - t_P;
+                wVar[i].set(GRB.DoubleAttr.Start, w_i);
+
+                u = v;
+            }
+        }
+
+        optimConfig.scheduler
+                .removePlannedRequestsFromAllSchedules(new ArrayList<TaxiRequest>(size));
+    }
+
+
     private double getTravelTime(Map<Id, NodeData> tree, Link toLink)
     {
         double tt = 1;//getting over the first node
@@ -296,7 +357,7 @@ public class MIPProblem
 
         VrpPathWithTravelData path = optimConfig.calculator.calcPath(fromLink, req.getFromLink(),
                 departureTime);
-        
+
         VehicleRequestPath vrPath = new VehicleRequestPath(currentVeh, req, path);
         optimConfig.scheduler.scheduleRequest(vrPath);
         unplannedRequests.remove(req);
