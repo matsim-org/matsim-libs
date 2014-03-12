@@ -19,6 +19,9 @@
 
 package playground.michalm.taxi.optimizer.fifo;
 
+import java.util.List;
+
+import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 
 
@@ -34,7 +37,10 @@ public class RESTaxiOptimizer
     @Override
     /*package*/void scheduleUnplannedRequests()
     {
-        optimConfig.scheduler.removePlannedRequestsFromAllSchedules(unplannedRequests);
+        List<TaxiRequest> removedRequests = optimConfig.scheduler
+                .removePlannedRequestsFromAllSchedules();
+        unplannedRequests.addAll(removedRequests);
+
         super.scheduleUnplannedRequests();
     }
 }

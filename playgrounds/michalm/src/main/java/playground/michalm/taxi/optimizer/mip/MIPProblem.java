@@ -74,7 +74,10 @@ public class MIPProblem
     public void scheduleUnplannedRequests(Set<TaxiRequest> unplannedRequests)
     {
         this.unplannedRequests = unplannedRequests;
-        optimConfig.scheduler.removePlannedRequestsFromAllSchedules(unplannedRequests);
+
+        List<TaxiRequest> removedRequests = optimConfig.scheduler
+                .removePlannedRequestsFromAllSchedules();
+        unplannedRequests.addAll(removedRequests);
 
         n = unplannedRequests.size();
         if (n == 0) {
@@ -180,7 +183,7 @@ public class MIPProblem
         }
     }
 
-    
+
     private void addOneOutgoingConstraint()
         throws GRBException
     {
@@ -294,8 +297,7 @@ public class MIPProblem
             xVar[u][k].set(GRB.DoubleAttr.Start, 1);
         }
 
-        optimConfig.scheduler
-                .removePlannedRequestsFromAllSchedules(new ArrayList<TaxiRequest>(size));
+        optimConfig.scheduler.removePlannedRequestsFromAllSchedules();
     }
 
 

@@ -49,7 +49,9 @@ public class AssignmentProblem
 
     public void scheduleUnplannedRequests(SortedSet<TaxiRequest> unplannedRequests)
     {
-        optimConfig.scheduler.removePlannedRequestsFromAllSchedules(unplannedRequests);
+        List<TaxiRequest> removedRequests = optimConfig.scheduler
+                .removePlannedRequestsFromAllSchedules();
+        unplannedRequests.addAll(removedRequests);
 
         rData = new RequestData(optimConfig, unplannedRequests);
         if (rData.dimension == 0) {
