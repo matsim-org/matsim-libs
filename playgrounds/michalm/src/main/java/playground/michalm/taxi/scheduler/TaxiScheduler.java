@@ -331,7 +331,6 @@ public class TaxiScheduler
                     else {
                         // if this is not the last task then some other task must have been added
                         // at time submissionTime <= t
-                        // THEREFORE: waittask.endTime() == t0, and so it can be removed
 
                         TaxiTask nextTask = tasks.get(i + 1);
                         switch (nextTask.getTaxiTaskType()) {
@@ -479,12 +478,10 @@ public class TaxiScheduler
                         break;
 
                     case CRUISE_DRIVE:
-                        obligatoryTasks = 0;
-
                     case WAIT_STAY:
-                        // this WAIT is not the last task
-                        // but one cannot wait if there are more tasks scheduled 
-                        throw new IllegalStateException();
+                    case CHARGE_STAY:
+                        obligatoryTasks = 0;
+                        break;
                 }
 
                 if (obligatoryTasks == 0) {
