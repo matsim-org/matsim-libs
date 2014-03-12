@@ -484,10 +484,6 @@ public class TaxiScheduler
                         break;
                 }
 
-                if (obligatoryTasks == 0) {
-                    return;
-                }
-
                 int newLastTaskIdx = schedule.getCurrentTask().getTaskIdx() + obligatoryTasks;
 
                 removePlannedTasks(schedule, newLastTaskIdx, unplannedRequestAdder);

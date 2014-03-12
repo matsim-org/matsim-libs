@@ -180,7 +180,7 @@ public class MIPProblem
         }
     }
 
-
+    
     private void addOneOutgoingConstraint()
         throws GRBException
     {
@@ -290,6 +290,8 @@ public class MIPProblem
 
                 u = v;
             }
+
+            xVar[u][k].set(GRB.DoubleAttr.Start, 1);
         }
 
         optimConfig.scheduler
