@@ -57,12 +57,8 @@ public class TaxicabUtils
 
         TaxiTask currentTask = schedule.getCurrentTask();
 
-        if (Schedules.isLastTask(currentTask)
-                && currentTask.getTaxiTaskType() == TaxiTaskType.WAIT_STAY) {
-            return true;
-        }
-
-        return false;
+        return Schedules.isLastTask(currentTask)
+                && currentTask.getTaxiTaskType() == TaxiTaskType.WAIT_STAY;
     }
 
 
@@ -74,14 +70,7 @@ public class TaxicabUtils
             return false;
         }
 
-        TaxiTask currentTask = schedule.getCurrentTask();
-
-        if (Schedules.isLastTask(currentTask)
-                && currentTask.getTaxiTaskType() == TaxiTaskType.WAIT_STAY) {
-            return true;
-        }
-
-        return false;
+        return Schedules.getLastTask(schedule).getTaxiTaskType() == TaxiTaskType.WAIT_STAY;
     }
 
 
