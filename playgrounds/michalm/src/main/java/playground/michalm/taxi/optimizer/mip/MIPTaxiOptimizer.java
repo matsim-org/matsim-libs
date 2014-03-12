@@ -21,7 +21,7 @@ package playground.michalm.taxi.optimizer.mip;
 
 import java.util.*;
 
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
@@ -35,7 +35,7 @@ public class MIPTaxiOptimizer
     implements TaxiOptimizer
 {
     private final TaxiOptimizerConfiguration optimConfig;
-    private final Set<TaxiRequest> unplannedRequests;
+    private final SortedSet<TaxiRequest> unplannedRequests;
 
     private boolean requiresReoptimization = false;
 
@@ -48,7 +48,7 @@ public class MIPTaxiOptimizer
         leastCostPathTrees = new LeastCostPathTreeStorage(optimConfig.context.getScenario()
                 .getNetwork());
 
-        unplannedRequests = new HashSet<TaxiRequest>();
+        unplannedRequests = new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR);
     }
 
 

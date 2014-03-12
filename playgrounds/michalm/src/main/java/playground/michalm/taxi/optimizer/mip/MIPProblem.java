@@ -47,8 +47,8 @@ public class MIPProblem
     private final TaxiOptimizerConfiguration optimConfig;
     private final LeastCostPathTreeStorage leastCostPathTrees;
 
-    private Set<TaxiRequest> unplannedRequests;
-    private TaxiRequest[] requests;
+    private SortedSet<TaxiRequest> unplannedRequests;
+    private MIPRequestData rData;
     private List<Vehicle> vehicles;
 
     private GRBModel model;
@@ -71,20 +71,19 @@ public class MIPProblem
     }
 
 
-    public void scheduleUnplannedRequests(Set<TaxiRequest> unplannedRequests)
+    public void scheduleUnplannedRequests(SortedSet<TaxiRequest> unplannedRequests)
     {
-        this.unplannedRequests = unplannedRequests;
-
         List<TaxiRequest> removedRequests = optimConfig.scheduler
                 .removePlannedRequestsFromAllSchedules();
         unplannedRequests.addAll(removedRequests);
+        
+        this.unplannedRequests = unplannedRequests;
 
-        n = unplannedRequests.size();
+        this.rData = new MIPRequestData(optimConfig, unplannedRequests);
+        n = rData.dimension;
         if (n == 0) {
             return;
         }
-
-        requests = unplannedRequests.toArray(new TaxiRequest[n]);
 
         List<Vehicle> allVehs = optimConfig.context.getVrpData().getVehicles();
         Iterable<Vehicle> filteredVehs = Iterables.filter(allVehs, TaxicabUtils.CAN_BE_SCHEDULED);
@@ -144,20 +143,15 @@ public class MIPProblem
     }
 
 
-    private Map<Id, Integer> reqIdToIdx = new HashMap<Id, Integer>();
-
-
     private void addWVariables()
         throws GRBException
     {
         wVar = new GRBVar[n];
 
         for (int i = 0; i < n; i++) {
-            TaxiRequest req = requests[i];
+            TaxiRequest req = rData.requests[i];
             double e_i = req.getT0();
             wVar[i] = model.addVar(e_i, GRB.INFINITY, 1, GRB.CONTINUOUS, "w_" + i);
-
-            reqIdToIdx.put(req.getId(), i);
         }
     }
 
@@ -212,7 +206,7 @@ public class MIPProblem
                 Map<Id, NodeData> tree = leastCostPathTrees.getTree(departure.link);
 
                 double a_k = departure.time;
-                double t_O_ki = getTravelTime(tree, requests[i].getFromLink());
+                double t_O_ki = getTravelTime(tree, rData.requests[i].getFromLink());
                 expr.addTerm(-a_k - t_O_ki, xVar[k][m + i]);
             }
 
@@ -232,7 +226,7 @@ public class MIPProblem
         double t_D = schedParams.dropoffDuration;
 
         for (int i = 0; i < n; i++) {
-            TaxiRequest iReq = requests[i];
+            TaxiRequest iReq = rData.requests[i];
 
             Map<Id, NodeData> iTree = leastCostPathTrees.getTree(iReq.getFromLink());
             double t_i = getTravelTime(iTree, iReq.getToLink());
@@ -240,7 +234,7 @@ public class MIPProblem
 
             Map<Id, NodeData> ijTree = leastCostPathTrees.getTree(iReq.getToLink());
             for (int j = 0; j < n; j++) {
-                TaxiRequest jReq = requests[j];
+                TaxiRequest jReq = rData.requests[j];
                 double t_ij = getTravelTime(ijTree, jReq.getFromLink());
 
                 GRBLinExpr expr = new GRBLinExpr();
@@ -257,10 +251,10 @@ public class MIPProblem
     private void findInitialSolution()
         throws GRBException
     {
-        int size = unplannedRequests.size();
-        Queue<TaxiRequest> queue = new PriorityQueue<TaxiRequest>(size, Requests.T0_COMPARATOR);
+        Queue<TaxiRequest> queue = new PriorityQueue<TaxiRequest>(rData.dimension,
+                Requests.T0_COMPARATOR);
 
-        for (TaxiRequest r : unplannedRequests) {
+        for (TaxiRequest r : rData.requests) {
             queue.add(r);
         }
 
@@ -283,7 +277,7 @@ public class MIPProblem
 
             int u = k;
             for (TaxiRequest r : plannedReqs) {
-                int i = reqIdToIdx.get(r.getId());
+                int i = rData.reqIdToIdx.get(r.getId());
                 int v = m + i;
 
                 xVar[u][v].set(GRB.DoubleAttr.Start, 1);
@@ -332,7 +326,7 @@ public class MIPProblem
     {
         for (int i = 0; i < n; i++) {
             if (x_u[m + i] > 0.5) {
-                addRequestToCurrentVehicle(requests[i], w[i]);
+                addRequestToCurrentVehicle(rData.requests[i], w[i]);
                 addSubsequentRequestsToCurrentVehicle(x[m + i]);
                 return;
             }

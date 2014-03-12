@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi.optimizer.assignment;
 
-import java.util.Set;
+import java.util.SortedSet;
 
 import org.matsim.contrib.dvrp.data.Requests;
 
@@ -27,15 +27,15 @@ import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 
 
-/*package*/class RequestData
+/*package*/class APSRequestData
 {
     /*package*/final TaxiRequest[] requests;
     /*package*/final int urgentReqCount;
     /*package*/final int dimension;
 
 
-    /*package*/RequestData(TaxiOptimizerConfiguration optimConfig,
-            Set<TaxiRequest> unplannedRequests)
+    /*package*/APSRequestData(TaxiOptimizerConfiguration optimConfig,
+            SortedSet<TaxiRequest> unplannedRequests)
     {
         dimension = unplannedRequests.size();//TODO - consider only awaiting and "soon-awaiting" reqs!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

@@ -37,8 +37,8 @@ public class AssignmentProblem
 
     private final TaxiOptimizerConfiguration optimConfig;
 
-    private VehicleData vData;
-    private RequestData rData;
+    private APSVehicleData vData;
+    private APSRequestData rData;
 
 
     public AssignmentProblem(TaxiOptimizerConfiguration optimConfig)
@@ -53,12 +53,12 @@ public class AssignmentProblem
                 .removePlannedRequestsFromAllSchedules();
         unplannedRequests.addAll(removedRequests);
 
-        rData = new RequestData(optimConfig, unplannedRequests);
+        rData = new APSRequestData(optimConfig, unplannedRequests);
         if (rData.dimension == 0) {
             return;
         }
 
-        vData = new VehicleData(optimConfig);
+        vData = new APSVehicleData(optimConfig);
         if (vData.dimension == 0) {
             return;
         }

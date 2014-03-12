@@ -17,47 +17,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.assignment;
+package playground.michalm.taxi.optimizer.mip;
 
 import java.util.*;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.util.LinkTimePair;
+import org.matsim.api.core.v01.Id;
 
+import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
-import playground.michalm.taxi.util.TaxicabUtils;
 
-/*package*/class VehicleData
+
+/*package*/class MIPRequestData
 {
-    /*package*/final List<Vehicle> vehicles = new ArrayList<Vehicle>();
-    /*package*/final List<LinkTimePair> departures = new ArrayList<LinkTimePair>();
-    /*package*/final int idleVehCount;
+    public static final int REQS_PER_VEH = 5;
+
+    /*package*/final TaxiRequest[] requests;
+    /*package*/Map<Id, Integer> reqIdToIdx = new HashMap<Id, Integer>();
     /*package*/final int dimension;
 
 
-    /*package*/VehicleData(TaxiOptimizerConfiguration optimConfig)
+    /*package*/MIPRequestData(TaxiOptimizerConfiguration optimConfig,
+            SortedSet<TaxiRequest> unplannedRequests)
     {
-        int idleVehs = 0;
-        double maxDepartureTime = -Double.MAX_VALUE;
-        for (Vehicle v : optimConfig.context.getVrpData().getVehicles()) {
-            LinkTimePair departure = optimConfig.scheduler.getEarliestIdleness(v);
-            //LinkTimePair departure = scheduler.getClosestDiversion(v);
+        int reqLimit = REQS_PER_VEH * optimConfig.context.getVrpData().getVehicles().size();
+        dimension = Math.min(reqLimit, unplannedRequests.size());
 
-            if (departure != null) {
-                vehicles.add(v);
-                departures.add(departure);
+        Iterator<TaxiRequest> reqIter = unplannedRequests.iterator();
+        requests = new TaxiRequest[dimension];
 
-                if (departure.time > maxDepartureTime) {
-                    maxDepartureTime = departure.time;
-                }
-
-                if (TaxicabUtils.isIdle(v)) {
-                    idleVehs++;
-                }
-            }
+        for (int i = 0; i < dimension; i++) {
+            TaxiRequest req = reqIter.next();
+            requests[i] = req;
+            reqIdToIdx.put(req.getId(), i);
         }
-
-        idleVehCount = idleVehs;
-        dimension = vehicles.size();
     }
 }
