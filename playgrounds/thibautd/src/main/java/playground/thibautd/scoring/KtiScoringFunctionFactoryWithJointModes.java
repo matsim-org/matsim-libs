@@ -22,7 +22,7 @@ package playground.thibautd.scoring;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.StageActivityTypes;
@@ -71,9 +71,9 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(final Plan plan) {
+	public ScoringFunction createNewScoringFunction(final Person person) {
 		final ScoringFunctionAccumulator scoringFunctionAccumulator =
-			(ScoringFunctionAccumulator) delegate.createNewScoringFunction( plan );
+			(ScoringFunctionAccumulator) delegate.createNewScoringFunction( person );
 
 		// joint modes
 		// XXX: do better for shared cost
@@ -108,8 +108,8 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 
 					@Override
 					public double getScore() {
-						final int nNonPerfActs = TripStructureUtils.getActivities( plan , EmptyStageActivityTypes.INSTANCE ).size() - actCount;
-						assert nNonPerfActs >= 0 : nNonPerfActs+" < 0 for plan "+plan;
+						final int nNonPerfActs = TripStructureUtils.getActivities( person.getSelectedPlan() , EmptyStageActivityTypes.INSTANCE ).size() - actCount;
+						assert nNonPerfActs >= 0 : nNonPerfActs+" < 0 for plan "+person;
 						return nNonPerfActs * UTIL_OF_NOT_PERF;
 					}
 

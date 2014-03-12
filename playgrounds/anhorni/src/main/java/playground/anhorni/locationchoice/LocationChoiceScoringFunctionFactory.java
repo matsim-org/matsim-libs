@@ -24,7 +24,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -59,10 +59,10 @@ public class LocationChoiceScoringFunctionFactory implements ScoringFunctionFact
 	}
 	
 	@Override
-	public ScoringFunction createNewScoringFunction(final Plan plan) {
+	public ScoringFunction createNewScoringFunction(final Person person) {
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-		scoringFunctionAccumulator.addScoringFunction(new LocationChoiceScoringFunction(plan, params, facilityPenalties, this.facilities));
+		scoringFunctionAccumulator.addScoringFunction(new LocationChoiceScoringFunction(person.getSelectedPlan(), params, facilityPenalties, this.facilities));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(params));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));

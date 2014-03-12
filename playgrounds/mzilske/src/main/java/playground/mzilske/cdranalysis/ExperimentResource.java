@@ -6,10 +6,12 @@ import java.util.Set;
 
 public class ExperimentResource {
 	
-	private String wd;
+	private final String wd;
 	
-	final String BASE = "/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/";
-
+	public ExperimentResource(String wd) {
+		this.wd = wd;
+	}
+	
 	public Collection<String> getRegimes() {
 		final Set<String> REGIMES = new HashSet<String>();
 		REGIMES.add("uncongested");
@@ -18,7 +20,7 @@ public class ExperimentResource {
 	}
 	
 	public MultiRateRunResource getRegime(String regime) {
-		return new MultiRateRunResource(wd, regime);
+		return new MultiRateRunResource(wd + "regimes/" + regime, regime);
 	}
 	
 }

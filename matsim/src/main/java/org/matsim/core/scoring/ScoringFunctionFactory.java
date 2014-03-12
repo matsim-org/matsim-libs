@@ -20,7 +20,7 @@
 
 package org.matsim.core.scoring;
 
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.MatsimFactory;
 
 /**
@@ -46,10 +46,10 @@ public interface ScoringFunctionFactory extends MatsimFactory {
 	/**
 	 * Creates a new scoring function for the given plan.
 	 *
-	 * @param plan A reference plan when calculating the score. This plan may be
+	 * @param person A reference plan when calculating the score. This plan may be
 	 * used by the scoring function to look additional information. (But see comment above.  kai, mar'12)
 	 * @return A scoring function.
 	 */
-	public ScoringFunction createNewScoringFunction(final Plan plan);
+	public ScoringFunction createNewScoringFunction(final Person person);
 
 }

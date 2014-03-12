@@ -110,8 +110,8 @@ public class OwnScoringFunctionAndReplanning {
 		}
 
 		@Override
-		public ScoringFunction createNewScoringFunction(Plan plan) {
-			return new MyScoringFunction(plan, delegate.createNewScoringFunction(plan));
+		public ScoringFunction createNewScoringFunction(Person person) {
+			return new MyScoringFunction(person.getSelectedPlan(), delegate.createNewScoringFunction(person));
 		}
 
 	}

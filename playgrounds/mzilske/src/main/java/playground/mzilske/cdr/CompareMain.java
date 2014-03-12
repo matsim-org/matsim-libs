@@ -68,7 +68,7 @@ public class CompareMain {
 	private static final class ZeroScoringFunctionFactory implements
 			ScoringFunctionFactory {
 		@Override
-		public ScoringFunction createNewScoringFunction(Plan plan) {
+		public ScoringFunction createNewScoringFunction(Person person) {
 			return new ScoringFunction() {
 
 				@Override
@@ -187,14 +187,6 @@ public class CompareMain {
 		return result;
 	}
 	
-	public void runOnceWithSimplePlansUnCongested(Config config) {
-		ticker.finish();
-		callProcess.dump();
-		List<Sighting> sightings = callProcess.getSightings();
-
-		cdrVolumes = runOnceWithSimplePlansUncongested(config, scenario.getNetwork(), linkToZoneResolver, sightings);
-	}
-	
 	public void runOnceWithSimplePlans(Config config) {
 		ticker.finish();
 		callProcess.dump();
@@ -275,7 +267,7 @@ public class CompareMain {
 		return counts;
 	}
 
-	CompareMain(Scenario scenario, EventsManager events, CallBehavior callingBehavior) {
+	public CompareMain(Scenario scenario, EventsManager events, CallBehavior callingBehavior) {
 		super();
 		this.scenario = scenario;
 
@@ -552,9 +544,9 @@ public class CompareMain {
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 
 			@Override
-			public ScoringFunction createNewScoringFunction(Plan plan) {
+			public ScoringFunction createNewScoringFunction(Person person) {
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
-				CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(plan, config, context);
+				CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, context);
 		//		scoringFunction.setWeightOfCadytsCorrection(10.0);
 				sumScoringFunction.addScoringFunction(scoringFunction);
 				return sumScoringFunction;
@@ -586,66 +578,6 @@ public class CompareMain {
 		double currentPlanCadytsCorrection = context.getCalibrator().calcLinearPlanEffect(currentPlanSteps); // / this.beta;
 		// CadytsPlanUtils.printCadytsPlan(currentPlanSteps);
 		return currentPlanCadytsCorrection;
-	}
-	
-	public static VolumesAnalyzer runOnceWithSimplePlansUncongested(Config config, Network network, final LinkToZoneResolver linkToZoneResolver, List<Sighting> sightings) {
-
-
-		final ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		scenario2.setNetwork(network);
-
-		final Map<Id, List<Sighting>> allSightings = new HashMap<Id, List<Sighting>>();
-		for (Sighting sighting : sightings) {
-
-			List<Sighting> sightingsOfPerson = allSightings.get(sighting.getAgentId());
-			if (sightingsOfPerson == null) {
-				sightingsOfPerson = new ArrayList<Sighting>();
-				allSightings.put(sighting.getAgentId(), sightingsOfPerson);
-
-			}
-			System.out.println(sighting.getCellTowerId().toString());
-
-			sightingsOfPerson.add(sighting);
-		}
-
-
-		PopulationFromSightings.createPopulationWithEndTimesAtLastSightings(scenario2, linkToZoneResolver, allSightings);
-		PopulationFromSightings.preparePopulation(scenario2, linkToZoneResolver, allSightings);
-
-		Controler controler = new Controler(scenario2);
-		controler.setOverwriteFiles(true);
-
-		controler.setCreateGraphs(false);
-		controler.run();
-		return controler.getVolumes();
-	}
-	
-	public static VolumesAnalyzer runWithSimplePlans(Config config, Network network, final LinkToZoneResolver linkToZoneResolver, List<Sighting> sightings, String suffix) {
-		final ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		scenario2.setNetwork(network);
-
-		final Map<Id, List<Sighting>> allSightings = new HashMap<Id, List<Sighting>>();
-		for (Sighting sighting : sightings) {
-
-			List<Sighting> sightingsOfPerson = allSightings.get(sighting.getAgentId());
-			if (sightingsOfPerson == null) {
-				sightingsOfPerson = new ArrayList<Sighting>();
-				allSightings.put(sighting.getAgentId(), sightingsOfPerson);
-
-			}
-			System.out.println(sighting.getCellTowerId().toString());
-
-			sightingsOfPerson.add(sighting);
-		}
-
-		PopulationFromSightings.createPopulationWithEndTimesAtLastSightings(scenario2, linkToZoneResolver, allSightings);
-		PopulationFromSightings.preparePopulation(scenario2, linkToZoneResolver, allSightings);
-
-		Controler controler = new Controler(scenario2);
-		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
-		controler.run();
-		return controler.getVolumes();
 	}
 	
 	public static VolumesAnalyzer runOnceWithSimplePlans(Config config, Network network, final LinkToZoneResolver linkToZoneResolver, List<Sighting> sightings, String suffix) {

@@ -70,7 +70,7 @@ public class IndividualPreferencesValues4LegScore_CtrlLauncher {
 		
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override
-			public ScoringFunction createNewScoringFunction(Plan plan) {
+			public ScoringFunction createNewScoringFunction(Person person) {
 				
 				//create personalized PlanCalcScoreConfigGroup with personalized values for leg scoring
 				PlanCalcScoreConfigGroup persCalcScoreCnfigGroup = new PlanCalcScoreConfigGroup(); // a copy so that old/new values are safe 
@@ -91,7 +91,7 @@ public class IndividualPreferencesValues4LegScore_CtrlLauncher {
 //				persCalcScoreCnfigGroup.setTravelingBike_utils_hr(0.0);
 				
 				//set individualized preferences values to parameters
-				Id personId = plan.getPerson().getId();
+				Id personId = person.getId();
 				IndividualPreferences svdValues = svdMap.get(personId);
 				persCalcScoreCnfigGroup.setTravelingPt_utils_hr(svdValues.getWeight_trTime() * 3600.0);
 				persCalcScoreCnfigGroup.setUtilityOfLineSwitch(svdValues.getWeight_changes());

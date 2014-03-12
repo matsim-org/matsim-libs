@@ -36,12 +36,11 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
 import org.matsim.core.scoring.EventsToLegs.LegHandler;
 import org.matsim.core.utils.io.IOUtils;
@@ -71,7 +70,7 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.scenario = scenario;
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			ScoringFunction data = this.scoringFunctionFactory.createNewScoringFunction(person.getSelectedPlan());
+			ScoringFunction data = this.scoringFunctionFactory.createNewScoringFunction(person);
 			this.agentScorers.put(person.getId(), data);
 			this.agentRecords.put(person.getId(), new PlanImpl());
 			this.partialScores.put(person.getId(), new ArrayList<Double>());
@@ -128,7 +127,7 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 	}
 
 	public void writeExperiencedPlans(String iterationFilename) {
-		PopulationImpl population = new PopulationImpl((ScenarioImpl) scenario);
+		Population population = PopulationUtils.createPopulation(scenario.getConfig());
 		for (Entry<Id, Plan> entry : agentRecords.entrySet()) {
 			PersonImpl person = new PersonImpl(entry.getKey());
 			Plan plan = entry.getValue();
@@ -153,18 +152,6 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 			out.close();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
-		}
-	}
-
-	@Deprecated // this is not (yet?) for public use.  kai, dec'13
-	public void memorizeExperiencedPlans() {
-		for ( Person person : this.scenario.getPopulation().getPersons().values() ) {
-			Plan experiencedPlan = agentRecords.get( person.getId() ) ;
-			if ( experiencedPlan==null ) {
-				throw new RuntimeException("experienced plan is null; I don't think this should happen") ;
-			}
-			Plan selectedPlan = person.getSelectedPlan() ;
-			selectedPlan.getCustomAttributes().put(PlanCalcScoreConfigGroup.EXPERIENCED_PLAN_KEY, experiencedPlan ) ;
 		}
 	}
 

@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -85,7 +84,7 @@ public class Template implements MatsimModule {
 
 		ScoringFunctionFactory scoringFactory = new ScoringFunctionFactory() {
 			@Override
-			public ScoringFunction createNewScoringFunction(final Plan plan) {
+			public ScoringFunction createNewScoringFunction(final Person person) {
 				return null;
 			}
 		};

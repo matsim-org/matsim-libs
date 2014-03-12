@@ -25,8 +25,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -35,17 +34,14 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
-import playground.staheale.occupancy.FacilitiesOccupancyCalculator;
 import playground.staheale.occupancy.FacilityOccupancy;
 
 public class AgentInteractionScoringFunctionFactory extends CharyparNagelScoringFunctionFactory {
@@ -134,11 +130,11 @@ public class AgentInteractionScoringFunctionFactory extends CharyparNagelScoring
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(final Plan plan) {
+	public ScoringFunction createNewScoringFunction(final Person person) {
 
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 
-		AgentInteractionScoringFunction scoringFunction = new AgentInteractionScoringFunction(plan, params,
+		AgentInteractionScoringFunction scoringFunction = new AgentInteractionScoringFunction(person.getSelectedPlan(), params,
 				facilityOccupancies, this.facilities, this.attributes, this.scaleNumberOfPersons
 				,this.controler.getConfig(),this.facilitiesKValues, this.personsKValues, this.scaleEpsilon);
 

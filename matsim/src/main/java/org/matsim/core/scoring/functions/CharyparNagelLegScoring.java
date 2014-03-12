@@ -30,14 +30,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.ArbitraryEventScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.Mode;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
@@ -127,11 +124,12 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 		if (modeParams.marginalUtilityOfDistance_m != 0.0
 				|| modeParams.monetaryDistanceCostRate != 0.0) {
 			Route route = leg.getRoute();
-			double dist = getDistance(route); // distance in meters
+			double dist = route.getDistance(); // distance in meters
 			if ( Double.isNaN(dist) ) {
 				if ( ccc<10 ) {
 					ccc++ ;
-					Logger.getLogger(this.getClass()).warn("distance is NaN. Will make score of this plan NaN. Possible reason: router does not " +
+					Logger.getLogger(this.getClass()).warn("distance is NaN. Will make score of this plan NaN. Possible reason: Simulation does not report " +
+							"a distance for this trip. Possible reason for that: mode is teleported and router does not " +
 							"write distance into plan.  Needs to be fixed or these plans will die out.") ;
 					if ( ccc==10 ) {
 						Logger.getLogger(this.getClass()).warn(Gbl.FUTURE_SUPPRESSED) ;
@@ -145,18 +143,6 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 		// (yyyy once we have multiple legs without "real" activities in between, this will produce wrong results.  kai, dec'12)
 		// (yy NOTE: the constant is added for _every_ pt leg.  This is not how such models are estimated.  kai, nov'12)
 		return tmpScore;
-	}
-
-	protected double getDistance(Route route) {
-		double dist;
-		if (route instanceof NetworkRoute) {
-			dist = RouteUtils.calcDistance((NetworkRoute) route, network);
-		} else if (route instanceof ExperimentalTransitRoute) {
-			dist = RouteUtils.calcDistance((ExperimentalTransitRoute) route, transitSchedule, network);
-		} else {
-			dist = route.getDistance();
-		}
-		return dist;
 	}
 	
 	@Override

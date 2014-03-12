@@ -1,10 +1,12 @@
 package playground.mzilske.cdranalysis;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.EventsToScore;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
 public class IterationResource {
 	
@@ -12,16 +14,37 @@ public class IterationResource {
 	
 	private int iteration;
 
-	public IterationResource(String wd, int iteration) {
+	private String runId;
+
+	public IterationResource(String wd, String runId, int iteration) {
 		this.wd = wd;
+		this.runId = runId;
 		this.iteration = iteration;
 	}
 
+	private RunResource getRun() {
+		return new RunResource(wd + "../../", runId);
+	}
+
 	public Scenario getExperiencedPlansAndNetwork() {
-		Scenario baseScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(baseScenario).readFile(wd + "/" + iteration + ".experienced_plans.xml.gz");
-		new MatsimNetworkReader(baseScenario).readFile(wd + "../../output_network.xml.gz");
+		Scenario baseScenario = getRun().getConfigAndNetwork();
+		new MatsimPopulationReader(baseScenario).readFile(wd + "/" + runId + "." + iteration + ".experienced_plans.xml.gz");
 		return baseScenario;
+	}
+
+	public void postExperiencedPlans() {
+		Scenario scenario = getRun().getOutputScenario();
+		scenario.getConfig().planCalcScore().setWriteExperiencedPlans(true);
+		EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
+		EventsToScore events2Score = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getNetwork()));
+		eventsManager.addHandler(events2Score);
+		new MatsimEventsReader(eventsManager).readFile(getEventsFileName());
+		events2Score.finish();
+		events2Score.writeExperiencedPlans(wd + "/" + runId + "." + iteration + ".experienced_plans.xml.gz");
+	}
+
+	public String getEventsFileName() {
+		return wd + "/" + runId + "." + iteration + ".events.xml.gz";
 	}
 
 }

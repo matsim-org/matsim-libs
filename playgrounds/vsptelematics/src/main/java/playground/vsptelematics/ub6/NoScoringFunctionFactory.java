@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.vsptelematics.ub6;
 
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
@@ -31,11 +31,11 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 public class NoScoringFunctionFactory implements ScoringFunctionFactory {
 
 	/**
-	 * @see org.matsim.core.scoring.ScoringFunctionFactory#createNewScoringFunction(org.matsim.api.core.v01.population.Plan)
+	 * @see org.matsim.core.scoring.ScoringFunctionFactory#createNewScoringFunction(Person)
 	 */
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {
-		return new NoScoringFunction(plan);
+	public ScoringFunction createNewScoringFunction(Person person) {
+		return new NoScoringFunction(person.getSelectedPlan());
 	}
 
 }

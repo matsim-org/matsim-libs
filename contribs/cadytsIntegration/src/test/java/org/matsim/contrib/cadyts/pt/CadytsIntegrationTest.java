@@ -29,7 +29,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
@@ -51,8 +51,8 @@ import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
@@ -158,15 +158,15 @@ public class CadytsIntegrationTest {
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override
-			public ScoringFunction createNewScoringFunction(Plan plan) {
+			public ScoringFunction createNewScoringFunction(Person person) {
 				CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore()) ;
 
-				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-				final CadytsScoring<TransitStopFacility> scoringFunction = new CadytsScoring<TransitStopFacility>(plan,config, cContext);
+				final CadytsScoring<TransitStopFacility> scoringFunction = new CadytsScoring<TransitStopFacility>(person.getSelectedPlan() ,config, cContext);
 				scoringFunction.setWeightOfCadytsCorrection(beta*30.) ;
 				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
 

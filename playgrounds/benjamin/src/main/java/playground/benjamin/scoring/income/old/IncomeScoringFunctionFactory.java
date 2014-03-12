@@ -21,7 +21,6 @@ package playground.benjamin.scoring.income.old;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
@@ -55,9 +54,8 @@ public class IncomeScoringFunctionFactory implements ScoringFunctionFactory {
 		this.network = network;
 	}
 
-	public ScoringFunction createNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Person person) {
 
-		Person person = plan.getPerson();
 		double householdIncomePerDay = getHouseholdIncomePerDay(person, hhdb);
 		
 		//summing up all relevant ulitlites
@@ -70,7 +68,7 @@ public class IncomeScoringFunctionFactory implements ScoringFunctionFactory {
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params));
 
 		//utility spend for traveling (in this case: travel time and distance costs)
-		scoringFunctionAccumulator.addScoringFunction(new ScoringFromLeg(plan, params, this.network, householdIncomePerDay ));
+		scoringFunctionAccumulator.addScoringFunction(new ScoringFromLeg(person.getSelectedPlan(), params, this.network, householdIncomePerDay ));
 
 		//utility spend for traveling (toll costs) if there is a toll
 		if(config.scenario().isUseRoadpricing()){

@@ -22,7 +22,7 @@ package playground.southafrica.gauteng.scoring;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -57,16 +57,15 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction( Plan plan ) {
+	public ScoringFunction createNewScoringFunction( Person person ) {
 		SumScoringFunction sum = new SumScoringFunction() ;
 		
-		String subPopName = (String) personAttributes.getAttribute(plan.getPerson().getId().toString(), this.subPopulationAttributeName ) ;
+		String subPopName = (String) personAttributes.getAttribute(person.getId().toString(), this.subPopulationAttributeName ) ;
 		if ( subPopName != null && subPopName.equals("commercial") ) {
 			sum.addScoringFunction( new SumScoringFunction.ActivityScoring() {
 				private final double margUtlOfTime_s = scenario.getConfig().planCalcScore().getPerforming_utils_hr()/3600. ;
 				private double score = 0. ;
 				private double overnightActEndTime = Double.NaN ;
-				@Override public void reset() { score = 0. ; }
 				@Override public void handleActivity(Activity act) { }
 				@Override public void handleFirstActivity(Activity act) { 
 					overnightActEndTime = act.getEndTime() ;
@@ -101,7 +100,7 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 		sum.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
 		// person-dependent money scoring function (standard implementation contains person-indep scoring function):
-		double utilityOfMoney_normally_positive = this.utlOfMon.getMarginalUtilityOfMoney(plan.getPerson().getId());
+		double utilityOfMoney_normally_positive = this.utlOfMon.getMarginalUtilityOfMoney(person.getId());
 		sum.addScoringFunction( new MoneyScoringImpl(utilityOfMoney_normally_positive) ) ;
 		
 		return sum ;

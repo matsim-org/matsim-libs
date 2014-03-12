@@ -22,7 +22,6 @@ import java.util.Collection;
 
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import jsprit.core.algorithm.box.SchrimpfFactory;
-import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
 import jsprit.core.problem.VehicleRoutingProblem;
 import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import jsprit.core.util.Solutions;
@@ -38,7 +37,6 @@ import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
 import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
@@ -328,10 +326,6 @@ public class KNFreight4 {
 					@Override
 					public double getScore() {
 						return this.score ;
-					}
-					@Override
-					public void reset() {
-						score = 0. ;
 					}
 					@Override
 					public void handleFirstActivity(Activity act) {

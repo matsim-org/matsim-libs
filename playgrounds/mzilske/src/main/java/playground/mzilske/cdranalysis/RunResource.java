@@ -1,15 +1,54 @@
 package playground.mzilske.cdranalysis;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioUtils;
+
 public class RunResource {
 
 	private String wd;
+	private String runId;
 
-	public RunResource(String wd) {
+	public RunResource(String wd, String runId) {
 		this.wd = wd;
+		this.runId = runId;
 	}
 
 	public IterationResource getIteration(int iteration) {
-		return new IterationResource(wd + "/ITERS/it."+iteration, iteration);
+		return new IterationResource(wd + "/ITERS/it." + iteration + "/", runId, iteration);
+	}
+	
+	public IterationResource getLastIteration() {
+		Config config = getOutputConfig();
+		return getIteration(config.controler().getLastIteration());
+	}
+
+	public Config getOutputConfig() {
+		final Config config = ConfigUtils.loadConfig(wd + "/" + runPrefix() + "output_config.xml");
+		return config;
+	}
+	
+	public Scenario getConfigAndNetwork() {
+		Scenario baseScenario = ScenarioUtils.createScenario(getOutputConfig());
+		new MatsimNetworkReader(baseScenario).readFile(wd + "/" + runPrefix() + "output_network.xml.gz");
+		return baseScenario;
+	}
+	
+	public Scenario getOutputScenario() {
+		Scenario scenario = getConfigAndNetwork();
+		new MatsimPopulationReader(scenario).readFile(wd + "/" + runPrefix() + "output_plans.xml.gz");
+		return scenario;
+	}
+
+	private String runPrefix() {
+		if (runId == null) {
+			return "";
+		} else {
+			return runId + ".";
+		}
 	}
 
 }

@@ -24,8 +24,8 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.population.PersonImpl;
@@ -78,14 +78,14 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(final Plan plan) {
+	public ScoringFunction createNewScoringFunction(final Person person) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 
 		scoringFunctionAccumulator.addScoringFunction(
 				new BlackListedActivityScoringFunction(
 					blackList,
 					new KtiActivityScoring(
-						plan,
+						person.getSelectedPlan(),
 						params,
 						facilityPenalties,
 						((ScenarioImpl) scenario).getActivityFacilities() )) );
@@ -99,7 +99,7 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 					scenario.getNetwork()));
 		// KTI like consideration of influence of travel card
 		// (except that is was not expressed as a ratio)
-		final Collection<String> travelCards = ((PersonImpl) plan.getPerson()).getTravelcards();
+		final Collection<String> travelCards = ((PersonImpl) person).getTravelcards();
 		final double utilityOfDistancePt =
 			travelCards == null || travelCards.isEmpty() ?
 				params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m :

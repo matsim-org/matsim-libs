@@ -25,7 +25,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
@@ -65,14 +65,14 @@ public class HerbiePlanBasedScoringFunctionFactory implements ScoringFunctionFac
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(final Plan plan) {
+	public ScoringFunction createNewScoringFunction(final Person person) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
 		scoringFunctionAccumulator.addScoringFunction(
 				// if no pick-up or drop off, behaviour the one of the "base" herbie
 				// scoring.
 				new HerbieJointActivityScoringFunction(
-					plan, 
+					person.getSelectedPlan(), 
 					params,
 					this.facilityPenalties,
 					this.facilities,
@@ -80,12 +80,12 @@ public class HerbiePlanBasedScoringFunctionFactory implements ScoringFunctionFac
 
 		scoringFunctionAccumulator.addScoringFunction(
 				new PlanBasedLegScoringFunction(
-					plan,
+					person.getSelectedPlan(),
 					//new HerbieLegWithNetworkPtDistanceScoringFunction(
 					// this is the same as the classic herbie scoring function,
 					// with handling of "joint" modes.
 					new HerbieJointLegScoringFunction(
-						plan, 
+						person.getSelectedPlan(), 
 						params,
 						config,
 						this.network,

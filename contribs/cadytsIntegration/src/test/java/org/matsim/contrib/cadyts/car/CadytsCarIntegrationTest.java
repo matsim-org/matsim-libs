@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
@@ -53,6 +53,7 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
@@ -210,16 +211,16 @@ public class CadytsCarIntegrationTest {
 		// for car
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override
-			public ScoringFunction createNewScoringFunction(Plan plan) {
+			public ScoringFunction createNewScoringFunction(Person person) {
 				
 				final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());
 				
-				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-				final CadytsScoring scoringFunction = new CadytsScoring(plan, config, cContext);
+				final CadytsScoring scoringFunction = new CadytsScoring(person.getSelectedPlan(), config, cContext);
 				final double cadytsScoringWeight = beta*30.;
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
 				scoringFunctionAccumulator.addScoringFunction(scoringFunction );

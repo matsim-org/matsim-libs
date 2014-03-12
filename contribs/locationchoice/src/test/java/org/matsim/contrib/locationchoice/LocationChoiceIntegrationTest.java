@@ -110,9 +110,9 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		// set scoring function factory:
 		controler.setScoringFunctionFactory( new ScoringFunctionFactory(){
 			@Override
-			public ScoringFunction createNewScoringFunction(Plan plan) {
+			public ScoringFunction createNewScoringFunction(Person person) {
 				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-				scoringFunctionAccumulator.addScoringFunction(new DCActivityWOFacilitiesScoringFunction(plan, lcContext ) );
+				scoringFunctionAccumulator.addScoringFunction(new DCActivityWOFacilitiesScoringFunction(person.getSelectedPlan(), lcContext ) );
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(lcContext.getParams(), scenario.getNetwork()));
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(lcContext.getParams()));
 				return scoringFunctionAccumulator;

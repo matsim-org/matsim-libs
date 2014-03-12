@@ -21,7 +21,7 @@
 package playground.sergioo.singapore2012.scoringFunction;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunction;
@@ -45,7 +45,7 @@ public class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunc
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Person person) {
 		if (this.params == null) {
 			/* lazy initialization of params. not strictly thread safe, as different threads could
 			 * end up with different params-object, although all objects will have the same
@@ -55,7 +55,7 @@ public class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunc
 			this.params = new CharyparNagelScoringParameters(this.config);
 		}
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(plan, params, ((ScenarioImpl) scenario).getActivityFacilities()));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(person.getSelectedPlan(), params, ((ScenarioImpl) scenario).getActivityFacilities()));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(params));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));

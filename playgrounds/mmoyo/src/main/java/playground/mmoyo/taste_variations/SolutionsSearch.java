@@ -20,7 +20,7 @@
 package playground.mmoyo.taste_variations;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
@@ -139,9 +139,9 @@ public class SolutionsSearch {
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			
 			@Override
-			public ScoringFunction createNewScoringFunction(Plan plan) {
+			public ScoringFunction createNewScoringFunction(Person person) {
 				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-				final CadytsScoring scoringFunction = new CadytsScoring(plan,config, cContext);
+				final CadytsScoring scoringFunction = new CadytsScoring(person.getSelectedPlan(),config, cContext);
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
 				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
 				return scoringFunctionAccumulator;

@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -159,7 +159,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 			// empty public constructor for private inner class
 		}
 
-		public ScoringFunction createNewScoringFunction(final Plan plan) {
+		public ScoringFunction createNewScoringFunction(final Person person) {
 			this.counter++;
 			return this.sf;
 		}

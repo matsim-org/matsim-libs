@@ -1,7 +1,7 @@
 package playground.balac.freefloating.scoring;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
@@ -24,12 +24,12 @@ public class FreeFloatingScoringFunctionFactory extends org.matsim.core.scoring.
 	    this.config = config;
 	  }   
 
-	  public ScoringFunction createNewScoringFunction(Plan plan)
+	  public ScoringFunction createNewScoringFunction(Person person)
 	  {
 		  SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 	    
 	    scoringFunctionAccumulator.addScoringFunction(
-	      new FreeFloatingLegScoringFunction((PlanImpl)plan, 
+	      new FreeFloatingLegScoringFunction((PlanImpl)person, 
 	      new CharyparNagelScoringParameters(config.planCalcScore()), 
 	      this.config, 
 	      network));

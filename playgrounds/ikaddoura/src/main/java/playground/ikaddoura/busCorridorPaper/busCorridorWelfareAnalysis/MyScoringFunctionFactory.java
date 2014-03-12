@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -56,9 +56,9 @@ public class MyScoringFunctionFactory implements ScoringFunctionFactory {
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Person person) {
 		
-		Id personId = plan.getPerson().getId();
+		Id personId = person.getId();
 		Map <Id, Double> personId2InVehTime = this.ptLegHandler.getPersonId2InVehicleTime();
 		Map <Id, Double> personId2WaitingTime = this.ptLegHandler.getPersonId2WaitingTime();
 

@@ -24,12 +24,12 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
@@ -57,17 +57,17 @@ public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.func
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Person person) {
 		
-		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+		SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 		
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(
-				plan, 
+				person.getSelectedPlan(), 
 				new CharyparNagelScoringParameters(config.planCalcScore()),
 				this.facilityPenalties,
 				this.facilities));
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(
-				plan, 
+				person.getSelectedPlan(), 
 				new CharyparNagelScoringParameters(config.planCalcScore()),
 				scenario.getConfig(),
                 scenario.getNetwork(),

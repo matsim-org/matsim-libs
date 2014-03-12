@@ -20,7 +20,7 @@
 package playground.julia.distribution.withScoring;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -41,9 +41,9 @@ public class ResponsibilityScoringFunctionFactory implements
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Person person) {
 		// TODO Auto-generated method stub
-		return new ResponsibilityScoringFunction(plan, delegate.createNewScoringFunction(plan), ecl);
+		return new ResponsibilityScoringFunction(person.getSelectedPlan(), delegate.createNewScoringFunction(person), ecl);
 	}
 
 }

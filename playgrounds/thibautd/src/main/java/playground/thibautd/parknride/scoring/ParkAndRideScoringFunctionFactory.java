@@ -20,7 +20,7 @@
 package playground.thibautd.parknride.scoring;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
@@ -51,13 +51,13 @@ public class ParkAndRideScoringFunctionFactory implements ScoringFunctionFactory
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(final Plan plan) {
+	public ScoringFunction createNewScoringFunction(final Person person) {
 		return new ParkAndRideScoringFunction(
-				scoringFunctionFactory.createNewScoringFunction( plan ),
-				parkingPenaltyFactory.createPenalty( plan ),
+				scoringFunctionFactory.createNewScoringFunction( person ),
+				parkingPenaltyFactory.createPenalty( person.getSelectedPlan() ),
 				facilities,
 				network,
-				plan);
+				person.getSelectedPlan());
 	}
 
 	/**

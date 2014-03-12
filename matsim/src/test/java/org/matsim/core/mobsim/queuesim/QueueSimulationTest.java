@@ -28,6 +28,7 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -38,6 +39,8 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
@@ -570,20 +573,22 @@ public class QueueSimulationTest extends TestCase {
 
 		/* finish */
 		List<Event> allEvents = collector.getEvents();
-		assertEquals("wrong number of events.", 13, allEvents.size());
+		assertEquals("wrong number of events.", 15, allEvents.size());
 		assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
-		assertEquals("wrong type of event.", Wait2LinkEvent.class, allEvents.get(2).getClass());
-		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(3).getClass()); // link1
-		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(4).getClass()); // link2
-		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(5).getClass());
-		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(6).getClass()); // link3
-		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(7).getClass());
-		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(8).getClass()); // link4
-		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(9).getClass());
-		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(10).getClass()); // link1 again
-		assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(11).getClass());
-		assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(12).getClass());
+		assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(2).getClass());
+		assertEquals("wrong type of event.", Wait2LinkEvent.class, allEvents.get(3).getClass());
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(4).getClass()); // link1
+		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(5).getClass()); // link2
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(6).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(7).getClass()); // link3
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(8).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(9).getClass()); // link4
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(10).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(11).getClass()); // link1 again
+		assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(12).getClass());	
+		assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(13).getClass());
+		assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(14).getClass());
 	}
 
 	/**
@@ -628,24 +633,26 @@ public class QueueSimulationTest extends TestCase {
 
 		/* finish */
 		List<Event> allEvents = collector.getEvents();
-		assertEquals("wrong number of events.", 17, allEvents.size());
+		assertEquals("wrong number of events.", 19, allEvents.size());
 		assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
-		assertEquals("wrong type of event.", Wait2LinkEvent.class, allEvents.get(2).getClass());
-		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(3).getClass()); // link1
-		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(4).getClass()); // link2
-		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(5).getClass());
-		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(6).getClass()); // link3
-		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(7).getClass());
-		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(8).getClass()); // link4
-		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(9).getClass());
-		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(10).getClass()); // link1 again
-		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(11).getClass());
-		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(12).getClass()); // link2 again
-		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(13).getClass());
-		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(14).getClass()); // link3 again
-		assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(15).getClass());
-		assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(16).getClass());
+		assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(2).getClass());
+		assertEquals("wrong type of event.", Wait2LinkEvent.class, allEvents.get(3).getClass());
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(4).getClass()); // link1
+		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(5).getClass()); // link2
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(6).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(7).getClass()); // link3
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(8).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(9).getClass()); // link4
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(10).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(11).getClass()); // link1 again
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(12).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(13).getClass()); // link2 again
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(14).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(15).getClass()); // link3 again
+		assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(16).getClass());
+		assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(17).getClass());
+		assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(18).getClass());
 	}
 
 	/**

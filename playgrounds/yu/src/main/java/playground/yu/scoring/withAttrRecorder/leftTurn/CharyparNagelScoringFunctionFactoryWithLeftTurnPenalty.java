@@ -19,7 +19,7 @@
 package playground.yu.scoring.withAttrRecorder.leftTurn;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
@@ -46,7 +46,7 @@ public class CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty extends
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Person person) {
 		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());
 		ScoringFunctionAccumulatorWithLeftTurnPenalty scoringFunctionAccumulator = new ScoringFunctionAccumulatorWithLeftTurnPenalty(
 				params);

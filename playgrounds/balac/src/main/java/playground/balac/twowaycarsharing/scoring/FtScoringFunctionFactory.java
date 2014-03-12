@@ -2,7 +2,7 @@ package playground.balac.twowaycarsharing.scoring;
 
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
@@ -29,12 +29,12 @@ public class FtScoringFunctionFactory extends org.matsim.core.scoring.functions.
     this.ftConfigGroup = ftConfigGroup;
   }
 
-  public ScoringFunction createNewScoringFunction(Plan plan) {
+  public ScoringFunction createNewScoringFunction(Person person) {
 	  
 	  SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
     
 	  scoringFunctionAccumulator.addScoringFunction(
-      new LegScoringFunction((PlanImpl)plan, 
+      new LegScoringFunction((PlanImpl)person, 
       new CharyparNagelScoringParameters(config.planCalcScore()), 
       this.config, 
       this.ftConfigGroup, network));

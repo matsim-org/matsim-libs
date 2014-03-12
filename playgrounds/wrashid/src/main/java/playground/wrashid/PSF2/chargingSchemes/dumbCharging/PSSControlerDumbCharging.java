@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
@@ -230,7 +230,7 @@ public class PSSControlerDumbCharging extends PSSControler {
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			
 			@Override
-			public ScoringFunction createNewScoringFunction(Plan plan) {
+			public ScoringFunction createNewScoringFunction(Person person) {
 				// TODO Auto-generated method stub
 				return new ScoringFunction() {
 					

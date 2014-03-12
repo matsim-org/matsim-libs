@@ -40,7 +40,7 @@ import org.matsim.contrib.cadyts.general.PlansTranslator;
 
 import cadyts.demand.PlanBuilder;
 
-public class PlanToPlanStepBasedOnEvents implements PlansTranslator, LinkLeaveEventHandler, 
+public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler, 
 		PersonDepartureEventHandler, PersonArrivalEventHandler {
 	
 	private static final Logger log = Logger.getLogger(PlanToPlanStepBasedOnEvents.class);

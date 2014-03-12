@@ -21,7 +21,7 @@
 package org.matsim.core.scoring.functions;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -65,11 +65,11 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
 	 * solutions.  In order to do a better job, they may (or may not) use person-specific info.  kai, apr'11
 	 * </ul>
 	 * 
-	 * @param plan
+	 * @param person
 	 * @return new ScoringFunction
 	 */
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Person person) {
 		if (this.params == null) {
 			/* lazy initialization of params. not strictly thread safe, as different threads could
 			 * end up with different params-object, although all objects will have the same
@@ -84,15 +84,6 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
 		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(this.params, this.network));
 		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(this.params));
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(this.params));
-			
-		
-//		ScoringFunctionAccumulator sumScoringFunction = new ScoringFunctionAccumulator();
-//		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(this.params));
-//		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(this.params, this.network));
-//		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(this.params));
-//		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(this.params));
-		
-		
 		return sumScoringFunction;
 	}
 	

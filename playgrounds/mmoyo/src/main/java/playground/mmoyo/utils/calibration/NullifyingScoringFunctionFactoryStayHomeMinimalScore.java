@@ -22,7 +22,7 @@ package playground.mmoyo.utils.calibration;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -36,8 +36,8 @@ public class NullifyingScoringFunctionFactoryStayHomeMinimalScore implements Sco
 	}
 	
 	@Override
-	public ScoringFunction createNewScoringFunction(final Plan plan) {
-		return new NullifyingScoringFunctionStayHomeMinimalScore(((PlanImpl)plan).getType());
+	public ScoringFunction createNewScoringFunction(final Person person) {
+		return new NullifyingScoringFunctionStayHomeMinimalScore(((PlanImpl)person).getType());
 	}
 }
 

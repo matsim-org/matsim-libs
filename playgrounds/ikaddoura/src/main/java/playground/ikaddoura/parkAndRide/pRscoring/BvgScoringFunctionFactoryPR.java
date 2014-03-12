@@ -20,7 +20,7 @@
 package playground.ikaddoura.parkAndRide.pRscoring;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -54,10 +54,10 @@ public class BvgScoringFunctionFactoryPR implements ScoringFunctionFactory {
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Person person) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-		scoringFunctionAccumulator.addScoringFunction(new BvgActivityScoringFunctionPR(plan, this.charyparNagelConfigParameters, this.bvgParameters));
-		scoringFunctionAccumulator.addScoringFunction(new BvgLegScoringFunctionPR(plan, this.charyparNagelConfigParameters, this.bvgParameters, this.utilityOfLineSwitch, this.network));
+		scoringFunctionAccumulator.addScoringFunction(new BvgActivityScoringFunctionPR(person.getSelectedPlan(), this.charyparNagelConfigParameters, this.bvgParameters));
+		scoringFunctionAccumulator.addScoringFunction(new BvgLegScoringFunctionPR(person.getSelectedPlan(), this.charyparNagelConfigParameters, this.bvgParameters, this.utilityOfLineSwitch, this.network));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(this.charyparNagelConfigParameters));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(this.charyparNagelConfigParameters));
 		return scoringFunctionAccumulator;

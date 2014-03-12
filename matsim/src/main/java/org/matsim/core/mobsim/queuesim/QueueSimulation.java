@@ -31,6 +31,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -290,6 +292,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 			Collection<QueueVehicle> arrivingVehicles) {
 		for (QueueVehicle queueVehicle : arrivingVehicles) {
 			MobsimDriverAgent driver = queueVehicle.getDriver();
+			this.getEventsManager().processEvent(new PersonLeavesVehicleEvent(this.getSimTimer().getTimeOfDay(), driver.getId(), queueVehicle.getId()));
 			driver.endLegAndComputeNextState(time) ;
 			arrangeNextAgentAction(driver) ;
 		}
@@ -386,7 +389,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 		double now = this.getSimTimer().getTimeOfDay() ;
 		String mode = agent.getMode();
 		Id linkId = agent.getCurrentLinkId() ;
-		events.processEvent( new PersonDepartureEvent(now, agent.getId(), linkId, mode) ) ;
+		events.processEvent(new PersonDepartureEvent(now, agent.getId(), linkId, mode));
 		if (mode.equals(TransportMode.car)) {
 			if ( !(agent instanceof MobsimDriverAgent) ) {
 				throw new IllegalStateException("PersonAgent that is not a DriverAgent cannot have car as mode") ;
@@ -398,6 +401,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 				driverAgent.endLegAndComputeNextState(now) ;
 				this.arrangeNextAgentAction(agent) ;
 			} else {
+				events.processEvent(new PersonEntersVehicleEvent(now, agent.getId(), agent.getId()));
 				qlink.addDepartingVehicle(vehicle);
 			}
 		} else {

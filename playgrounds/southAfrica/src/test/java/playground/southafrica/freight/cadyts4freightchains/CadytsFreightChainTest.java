@@ -26,9 +26,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Test ;
+import org.junit.Ignore;
 import org.junit.Rule;
-import org.junit.Ignore ;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -45,8 +45,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
-import org.matsim.contrib.cadyts.general.ExpBetaPlanChangerWithCadytsPlanRegistration;
-import org.matsim.contrib.cadyts.general.ExpBetaPlanSelectorWithCadytsPlanRegistration;
 import org.matsim.contrib.cadyts.general.PlanSelectionByCadyts;
 import org.matsim.contrib.cadyts.utils.CalibrationStatReader;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -68,11 +66,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.utilities.io.tabularFileParser.TabularFileParser;
 import cadyts.utilities.misc.DynamicData;
-import playground.southafrica.freight.cadyts4freightchains.CadytsFreightChainsContext;
-import playground.southafrica.freight.cadyts4freightchains.Item;
 
 /**
  * @author nagel
@@ -138,9 +133,9 @@ public class CadytsFreightChainTest {
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override
-			public ScoringFunction createNewScoringFunction(Plan plan) {
+			public ScoringFunction createNewScoringFunction(Person person) {
 				SumScoringFunction sum = new SumScoringFunction() ;
-				final CadytsScoring<Item> cadytsScoring = new CadytsScoring<Item>(plan, config, cContext );
+				final CadytsScoring<Item> cadytsScoring = new CadytsScoring<Item>(person.getSelectedPlan(), config, cContext );
 				cadytsScoring.setWeightOfCadytsCorrection(100.);
 				sum.addScoringFunction( cadytsScoring ); 
 				return sum ; 

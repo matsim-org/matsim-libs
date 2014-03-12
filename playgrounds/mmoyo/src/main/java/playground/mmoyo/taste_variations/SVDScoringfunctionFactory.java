@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -42,9 +42,9 @@ public class SVDScoringfunctionFactory implements ScoringFunctionFactory {
 	}
 	
 	@Override
-	public ScoringFunction createNewScoringFunction(final Plan plan) {
-		final IndividualPreferences svdValues = svdValuesMap.get(plan.getPerson().getId());
-		ScoringFunction svdScoringFunction = new IndividualPreferencesLegScoring(plan, svdValues, net, schedule, scoreWeight);
+	public ScoringFunction createNewScoringFunction(final Person person) {
+		final IndividualPreferences svdValues = svdValuesMap.get(person.getId());
+		ScoringFunction svdScoringFunction = new IndividualPreferencesLegScoring(person.getSelectedPlan(), svdValues, net, schedule, scoreWeight);
 		return svdScoringFunction;
 	}
 }

@@ -38,6 +38,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.router.KtiPtRoute;
@@ -78,19 +79,19 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 	 */
 	private List<Leg> legs;
 	private int legIndex;
-	
+
 	private final static Logger log = Logger.getLogger(LegScoringFunction.class);
 
 	public LegScoringFunction(Plan plan,
 			CharyparNagelScoringParameters params,
 			Config config,
-            Network network,
+			Network network,
 			KtiConfigGroup ktiConfigGroup) {
 		super(params, network);
 		this.ktiConfigGroup = ktiConfigGroup;
 		this.plansCalcRouteConfigGroup = config.plansCalcRoute();
 		this.plan = plan;
-		
+
 		legs = new ArrayList<Leg>();
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if (planElement instanceof Leg) legs.add((Leg) planElement);
@@ -100,7 +101,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 
 	@Override
 	protected double calcLegScore(double departureTime, double arrivalTime, Leg leg) {
-		
+
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 
@@ -112,13 +113,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 
 			if (this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m != 0.0) {
 				Route route = leg.getRoute();
-				/*
-				 * route.getDistance() is deprecated and might return null.
-				 * Therefore, replacing it with call to calcDistance as in the
-				 * default MATSim LegScoringFunction.
-				 * cdobler, Jan'12
-				 */
-				dist = getDistance(route);
+				dist = RouteUtils.calcDistance((NetworkRoute) route, network);
 				tmpScore += this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m * ktiConfigGroup.getDistanceCostCar()/1000d * dist;
 			}
 			tmpScore += travelTime * this.params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s;
@@ -133,48 +128,48 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 			if (!(route instanceof KtiPtRoute)) {
 				if (route == null) log.error("Route in pt leg is not from type KtiPtRoute. It is null!");
 				else {
-				      log.error("Route in pt leg is not from type KtiPtRoute. It is from type : " + route.getClass().toString());
-				      log.error("Person Id: " + plan.getPerson().getId());
-				      log.error("LegIndex: " + legIndex);
-				      log.error("");
-				      int i = 0;
-				      for (Leg l : legs) {
-				    	  log.error("Leg #" + i + ", RouteType: " + l.getRoute().getClass().toString());
-				    	  i++;
-				      }
+					log.error("Route in pt leg is not from type KtiPtRoute. It is from type : " + route.getClass().toString());
+					log.error("Person Id: " + plan.getPerson().getId());
+					log.error("LegIndex: " + legIndex);
+					log.error("");
+					int i = 0;
+					for (Leg l : legs) {
+						log.error("Leg #" + i + ", RouteType: " + l.getRoute().getClass().toString());
+						i++;
+					}
 				}
 				throw new RuntimeException("Cannot calculate score for PT leg since it does not contain a KtiPtRoute!");
 			}
 			KtiPtRoute ktiPtRoute = (KtiPtRoute) route;
-			
+
 			if (ktiPtRoute.getFromStop() != null) {
 
-//				String nanoMsg = "Scoring kti pt:\t";
+				//				String nanoMsg = "Scoring kti pt:\t";
 
-//				long nanos = System.nanoTime();
+				//				long nanos = System.nanoTime();
 				dist = ktiPtRoute.calcAccessEgressDistance(((PlanImpl) this.plan).getPreviousActivity(leg), ((PlanImpl) this.plan).getNextActivity(leg));
-//				nanos = System.nanoTime() - nanos;
-//				nanoMsg += Long.toString(nanos) + "\t";
+				//				nanos = System.nanoTime() - nanos;
+				//				nanoMsg += Long.toString(nanos) + "\t";
 
-//				nanos = System.nanoTime();
+				//				nanos = System.nanoTime();
 				travelTime = PlansCalcRouteKti.getAccessEgressTime(dist, this.plansCalcRouteConfigGroup);
-//				nanos = System.nanoTime() - nanos;
-//				nanoMsg += Long.toString(nanos) + "\t";
+				//				nanos = System.nanoTime() - nanos;
+				//				nanoMsg += Long.toString(nanos) + "\t";
 
 				tmpScore += this.getWalkScore(dist, travelTime);
 
-//				nanos = System.nanoTime();
+				//				nanos = System.nanoTime();
 				dist = ktiPtRoute.calcInVehicleDistance();
-//				nanos = System.nanoTime() - nanos;
-//				nanoMsg += Long.toString(nanos) + "\t";
+				//				nanos = System.nanoTime() - nanos;
+				//				nanoMsg += Long.toString(nanos) + "\t";
 
-//				nanos = System.nanoTime();
+				//				nanos = System.nanoTime();
 				travelTime = ktiPtRoute.getInVehicleTime();
-//				nanos = System.nanoTime() - nanos;
-//				nanoMsg += Long.toString(nanos) + "\t";
+				//				nanos = System.nanoTime() - nanos;
+				//				nanoMsg += Long.toString(nanos) + "\t";
 
 				tmpScore += this.getPtScore(dist, travelTime);
-//				log.info(nanoMsg);
+				//				log.info(nanoMsg);
 
 			} else {
 
@@ -205,9 +200,9 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 			tmpScore += travelTime * this.params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s + this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m * dist;
 
 		}
-		
+
 		legIndex++;
-		
+
 		return tmpScore;
 	}
 
@@ -249,13 +244,13 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 	 * check whether the route is a NetworkRoute or not when
 	 * calculating its distance.
 	 */
-//	private double getDistance(Route route) {
-//		double dist;
-//		if (route instanceof NetworkRoute) {
-//			dist =  RouteUtils.calcDistance((NetworkRoute) route, network);
-//		} else {
-//			dist = route.getDistance();
-//		}
-//		return dist;
-//	}
+	//	private double getDistance(Route route) {
+	//		double dist;
+	//		if (route instanceof NetworkRoute) {
+	//			dist =  RouteUtils.calcDistance((NetworkRoute) route, network);
+	//		} else {
+	//			dist = route.getDistance();
+	//		}
+	//		return dist;
+	//	}
 }

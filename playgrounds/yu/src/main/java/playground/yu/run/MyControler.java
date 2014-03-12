@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
@@ -38,7 +39,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
@@ -66,12 +66,12 @@ public final class MyControler extends Controler {
 		}
 
 		@Override
-		public ScoringFunction createNewScoringFunction(Plan plan) {
+		public ScoringFunction createNewScoringFunction(Person person) {
 			ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 			scoringFunctionAccumulator
 					.addScoringFunction(new CharyparNagelActivityScoring(new CharyparNagelScoringParameters(config)));
 			scoringFunctionAccumulator
-					.addScoringFunction(new MyLegScoringFunction(plan,
+					.addScoringFunction(new MyLegScoringFunction(person.getSelectedPlan(),
 							new CharyparNagelScoringParameters(config), network));
 			scoringFunctionAccumulator
 					.addScoringFunction(new CharyparNagelMoneyScoring(new CharyparNagelScoringParameters(config)));

@@ -5,7 +5,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
@@ -23,9 +23,9 @@ public class AgentPropertiesScoringFunctionFactory implements ScoringFunctionFac
 	}
 	
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan)
+	public ScoringFunction createNewScoringFunction(Person person)
 	{
-		return createNewScoringFunction(plan.getPerson().getId().toString());
+		return createNewScoringFunction(person.getId().toString());
 	}
 
 	private ScoringFunction createNewScoringFunction(String id)

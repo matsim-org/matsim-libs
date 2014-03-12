@@ -2,7 +2,6 @@ package playground.vsp.parkAndRide.scoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.pt.PtConstants;
@@ -23,7 +22,7 @@ public class PRActivityScoringFunction extends CharyparNagelActivityScoring {
 	private CharyparNagelScoringParameters params;
 	private double intermodalTransferPenalty;
 
-	public PRActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, double intermodalTransferPenalty) {
+	public PRActivityScoringFunction(CharyparNagelScoringParameters params, double intermodalTransferPenalty) {
 		super(params);
 		this.params = params;
 		this.intermodalTransferPenalty = intermodalTransferPenalty;

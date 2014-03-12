@@ -21,7 +21,7 @@ package playground.ikaddoura.busCorridor.busCorridorWelfareAnalysis;
  * *********************************************************************** */
 
 
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -48,14 +48,14 @@ public class MyScoringFunctionFactory implements ScoringFunctionFactory {
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Person person) {
 
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
-		scoringFunctionAccumulator.addScoringFunction(new CarLegScoringFunction(plan, params, this.monetaryCostPerKm));
+		scoringFunctionAccumulator.addScoringFunction(new CarLegScoringFunction(person.getSelectedPlan(), params, this.monetaryCostPerKm));
 		scoringFunctionAccumulator.addScoringFunction(new MyMoneyScoringFunction(params));
 		scoringFunctionAccumulator.addScoringFunction(new MyAgentStuckScoringFunction(this.agentStuckScore));
-		scoringFunctionAccumulator.addScoringFunction(new PtLegScoringFunction(plan, inVehWaitHandler.getPersonId2InVehicleTime(), inVehWaitHandler.getPersonId2WaitingTime(), this.TRAVEL_PT_IN_VEHICLE, this.TRAVEL_PT_WAITING));
+		scoringFunctionAccumulator.addScoringFunction(new PtLegScoringFunction(person.getSelectedPlan(), inVehWaitHandler.getPersonId2InVehicleTime(), inVehWaitHandler.getPersonId2WaitingTime(), this.TRAVEL_PT_IN_VEHICLE, this.TRAVEL_PT_WAITING));
 		scoringFunctionAccumulator.addScoringFunction(new MyActivityScoringFunction(params));
 		return scoringFunctionAccumulator;
 	}

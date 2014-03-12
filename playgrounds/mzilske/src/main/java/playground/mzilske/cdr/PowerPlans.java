@@ -34,33 +34,41 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityF
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.mzilske.util.PowerList;
 
 public class PowerPlans {
 
-	public static void writePermutations(Scenario scenario, File file) throws FileNotFoundException {
-		PrintWriter pw = new PrintWriter(file);
-		TripRouter tripRouter = new TripRouterFactoryImpl(
-				ConfigUtils.createConfig(), 
-				scenario.getNetwork(), 
-				new OnlyTimeDependentTravelDisutilityFactory(), 
-				new FreeSpeedTravelTime(), new DijkstraFactory(), new PopulationFactoryImpl(ScenarioUtils.createScenario(ConfigUtils.createConfig())), new ModeRouteFactory(), null, null)
-		.instantiateAndConfigureTripRouter();
-		for (Person person : scenario.getPopulation().getPersons().values()) {
-			Plan plan = person.getSelectedPlan();
-			double distance = PowerPlans.distance(scenario.getNetwork(), plan);
-			List<Activity> activities = TripStructureUtils.getActivities(plan.getPlanElements(), new StageActivityTypesImpl());
-			for (List<Activity> someActivities : PowerList.powerList(activities)) {
-				List<Activity> otherActivities = new ArrayList<Activity>(activities);
-				otherActivities.removeAll(someActivities);
-				List<PlanElement> pes = PowerPlans.makePlan(someActivities);
-				double partialDistance = PowerPlans.distance(scenario.getNetwork(), tripRouter, pes);	
-				pw.printf("%.0f\t%s\t%s\n", distance - partialDistance, PowerPlans.formatDurations(someActivities), PowerPlans.formatDurations(otherActivities));
+	public static void writePermutations(Scenario scenario, File file) {
+		PrintWriter pw = null;
+		try {
+			pw = new PrintWriter(file);
+			TripRouter tripRouter = new TripRouterFactoryImpl(
+					ConfigUtils.createConfig(), 
+					scenario.getNetwork(), 
+					new OnlyTimeDependentTravelDisutilityFactory(), 
+					new FreeSpeedTravelTime(), new DijkstraFactory(), new PopulationFactoryImpl(ScenarioUtils.createScenario(ConfigUtils.createConfig())), new ModeRouteFactory(), null, null)
+			.instantiateAndConfigureTripRouter();
+			for (Person person : scenario.getPopulation().getPersons().values()) {
+				Plan plan = person.getSelectedPlan();
+				double distance = PowerPlans.distance(scenario.getNetwork(), plan);
+				List<Activity> activities = TripStructureUtils.getActivities(plan.getPlanElements(), new StageActivityTypesImpl());
+				for (List<Activity> someActivities : PowerList.powerList(activities)) {
+					List<Activity> otherActivities = new ArrayList<Activity>(activities);
+					otherActivities.removeAll(someActivities);
+					List<PlanElement> pes = PowerPlans.makePlan(someActivities);
+					double partialDistance = PowerPlans.distance(scenario.getNetwork(), tripRouter, pes);	
+					pw.printf("%.0f\t%s\t%s\n", distance - partialDistance, PowerPlans.formatDurations(someActivities), PowerPlans.formatDurations(otherActivities));
+				}
+		
 			}
-	
+		} catch (FileNotFoundException e) {
+			throw new UncheckedIOException(e);
+		} finally {
+			if (pw != null) pw.close();
 		}
-		pw.close();
+		
 	}
 
 	static List<PlanElement> makePlan(List<Activity> someActivities) {
@@ -170,31 +178,38 @@ public class PowerPlans {
 		return distance(network, tripRouter, pes);
 	}
 
-	public static void writeActivityDurations(Scenario scenario, File file)
-			throws FileNotFoundException {
-		PrintWriter pw = new PrintWriter(file);
-		TripRouter tripRouter = new TripRouterFactoryImpl(
-				ConfigUtils.createConfig(), 
-				scenario.getNetwork(), 
-				new OnlyTimeDependentTravelDisutilityFactory(), 
-				new FreeSpeedTravelTime(), new DijkstraFactory(), new PopulationFactoryImpl(ScenarioUtils.createScenario(ConfigUtils.createConfig())), new ModeRouteFactory(), null, null)
-		.instantiateAndConfigureTripRouter();
-		for (Person person : scenario.getPopulation().getPersons().values()) {
-			Plan plan = person.getSelectedPlan();
-			double distance = distance(scenario.getNetwork(), plan);
-			for (int i=0; i < plan.getPlanElements().size(); i++) {
-				PlanElement pe = plan.getPlanElements().get(i);
-				if (pe instanceof Activity) {
-					Activity act = (Activity) pe;
-					double duration = duration(act);
-					double without = calculatePlanDistanceWithout(i, plan, scenario.getNetwork(), tripRouter);
-					double withoutThisAndWithoutAllShorter = calculatePlanDistanceWithoutThisAndShorter(duration, plan, scenario.getNetwork(), tripRouter);
-					pw.printf("%f\t%f\t%f\n", duration, distance - without, distance - withoutThisAndWithoutAllShorter);
+	public static void writeActivityDurations(Scenario scenario, File file) {
+		PrintWriter pw = null;
+		try {
+			pw = new PrintWriter(file);
+			TripRouter tripRouter = new TripRouterFactoryImpl(
+					ConfigUtils.createConfig(), 
+					scenario.getNetwork(), 
+					new OnlyTimeDependentTravelDisutilityFactory(), 
+					new FreeSpeedTravelTime(), new DijkstraFactory(), new PopulationFactoryImpl(ScenarioUtils.createScenario(ConfigUtils.createConfig())), new ModeRouteFactory(), null, null)
+			.instantiateAndConfigureTripRouter();
+			for (Person person : scenario.getPopulation().getPersons().values()) {
+				Plan plan = person.getSelectedPlan();
+				double distance = distance(scenario.getNetwork(), plan);
+				for (int i=0; i < plan.getPlanElements().size(); i++) {
+					PlanElement pe = plan.getPlanElements().get(i);
+					if (pe instanceof Activity) {
+						Activity act = (Activity) pe;
+						double duration = duration(act);
+						double without = calculatePlanDistanceWithout(i, plan, scenario.getNetwork(), tripRouter);
+						double withoutThisAndWithoutAllShorter = calculatePlanDistanceWithoutThisAndShorter(duration, plan, scenario.getNetwork(), tripRouter);
+						pw.printf("%f\t%f\t%f\n", duration, distance - without, distance - withoutThisAndWithoutAllShorter);
+					}
+					i++;
 				}
-				i++;
 			}
+			
+		} catch (FileNotFoundException e) {
+			throw new UncheckedIOException(e);
+		} finally {
+			if (pw != null) pw.close();
 		}
-		pw.close();
+		
 	}
 
 	public static double drivenKilometersWholeDay(Scenario scenario,

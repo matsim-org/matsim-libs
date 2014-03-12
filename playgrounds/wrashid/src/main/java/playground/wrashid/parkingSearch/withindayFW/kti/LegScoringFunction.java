@@ -34,14 +34,11 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
-import playground.meisterk.kti.router.KtiPtRoute;
-import playground.meisterk.kti.router.PlansCalcRouteKti;
 
 
 /**
@@ -112,13 +109,11 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 
 			if (this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m != 0.0) {
 				Route route = leg.getRoute();
-				/*
-				 * route.getDistance() is deprecated and might return null.
-				 * Therefore, replacing it with call to calcDistance as in the
-				 * default MATSim LegScoringFunction.
-				 * cdobler, Jan'12
-				 */
-				dist = getDistance(route);
+				if (route instanceof NetworkRoute) {
+					dist = RouteUtils.calcDistance((NetworkRoute) route, network);
+				} else {
+					dist = route.getDistance();
+				}
 				tmpScore += this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m * ktiConfigGroup.getDistanceCostCar()/1000d * dist;
 			}
 			tmpScore += travelTime * this.params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s;
@@ -126,7 +121,11 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 		} else if (TransportMode.pt.equals(leg.getMode())) {
 			if (this.params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m != 0.0) {
 				Route route = leg.getRoute();
-				dist = getDistance(route);
+				if (route instanceof NetworkRoute) {
+					dist = RouteUtils.calcDistance((NetworkRoute) route, network);
+				} else {
+					dist = route.getDistance();
+				}
 			}
 			tmpScore += travelTime * this.params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s + this.params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m * dist;
 			tmpScore += this.params.modeParams.get(TransportMode.pt).constant ;

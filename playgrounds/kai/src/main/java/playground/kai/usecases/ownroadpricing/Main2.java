@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -99,10 +98,10 @@ public class Main2 {
 		// set the scoring function.  this is one scoring function per agent
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory(){
 			@Override
-			public ScoringFunction createNewScoringFunction(final Plan plan) {
+			public ScoringFunction createNewScoringFunction(final Person person) {
 				final ScoringFunctionFactory factory = ControlerDefaults.createDefaultScoringFunctionFactory(scenario);
 				//					factory.setMarginalUtilityOfMoney( muml ) ;
-				ScoringFunction sf = factory.createNewScoringFunction(plan) ;
+				ScoringFunction sf = factory.createNewScoringFunction(person) ;
 				return sf ;
 			}
 		});

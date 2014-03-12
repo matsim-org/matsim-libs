@@ -79,7 +79,7 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		final Config config = loadConfig(null);
 		Activity act = this.plan.getFirstActivity();
 
-		CharyparNagelOpenTimesActivityScoring testee = new CharyparNagelOpenTimesActivityScoring(this.plan, new CharyparNagelScoringParameters(config.planCalcScore()), this.facilities);
+		CharyparNagelOpenTimesActivityScoring testee = new CharyparNagelOpenTimesActivityScoring(new CharyparNagelScoringParameters(config.planCalcScore()), this.facilities);
 
 		double[] openInterval = null;
 

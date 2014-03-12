@@ -20,7 +20,7 @@
 package playground.mmoyo.randomizerPtRouter;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
@@ -135,7 +135,7 @@ public class CadytsScoringFunctionAndRndRouterLauncher {
 		
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override
-			public ScoringFunction createNewScoringFunction(Plan plan) {
+			public ScoringFunction createNewScoringFunction(Person person) {
 				//if (params == null) {																			//<- see comment about performance improvement in 
 				//	params = new CharyparNagelScoringParameters(config.planCalcScore()); //org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.createNewScoringFunction
 				//}
@@ -146,7 +146,7 @@ public class CadytsScoringFunctionAndRndRouterLauncher {
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 				//scoringFunctionAccumulator.setId(plan.getPerson().getId().toString());
 				
-				final CadytsScoring scoringFunction = new CadytsScoring(plan,config, cContext);
+				final CadytsScoring scoringFunction = new CadytsScoring(person.getSelectedPlan(),config, cContext);
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
 				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
  

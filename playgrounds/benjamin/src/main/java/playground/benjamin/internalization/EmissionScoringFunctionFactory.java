@@ -20,7 +20,7 @@
 package playground.benjamin.internalization;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.ScoringFunction;
@@ -53,7 +53,7 @@ public class EmissionScoringFunctionFactory implements ScoringFunctionFactory {
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Person person) {
 		
 		PlanCalcScoreConfigGroup configGroup = controler.getConfig().planCalcScore();
 		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(configGroup);

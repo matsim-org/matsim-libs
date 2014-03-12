@@ -60,8 +60,8 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -805,8 +805,8 @@ public class ControlerTest {
 	/** A helper class for testSetScoringFunctionFactory() */
 	/*package*/ static class DummyScoringFunctionFactory implements ScoringFunctionFactory {
 		@Override
-		public ScoringFunction createNewScoringFunction(final Plan plan) {
-			return new ScoringFunctionAccumulator();
+		public ScoringFunction createNewScoringFunction(final Person person) {
+			return new SumScoringFunction();
 		}
 	}
 

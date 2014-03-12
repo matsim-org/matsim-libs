@@ -45,7 +45,7 @@ public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesActivit
 	private CharyparNagelScoringParameters params;
 
 	public LocationChoiceScoringFunction(final Plan plan, final CharyparNagelScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties, final ActivityFacilities facilities) {
-		super(plan, params, facilities);
+		super(params, facilities);
 		this.params = params;
 		this.penalty = new Vector<ScoringPenalty>();
 		this.facilityPenalties = facilityPenalties;

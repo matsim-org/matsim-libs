@@ -371,8 +371,8 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 				network);
 
 		for (int until=1; until < plan.getPlanElements().size(); until++) {
-			ScoringFunction planBased = planBasedScoringFunctionFactory.createNewScoringFunction( plan );
-			ScoringFunction base = baseScoringFunctionFactory.createNewScoringFunction( plan );
+			ScoringFunction planBased = planBasedScoringFunctionFactory.createNewScoringFunction( plan.getPerson() );
+			ScoringFunction base = baseScoringFunctionFactory.createNewScoringFunction( plan.getPerson() );
 	
 			// test all "partial" scores, to track where it fails
 			int c = 0;

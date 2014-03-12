@@ -96,19 +96,20 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	public final void run(final Plan plan) {
 		// if person is not in the analysis population
 		// TODO: replace this now by subpopulation!
-		if (Integer.parseInt(plan.getPerson().getId().toString()) > 
+		final Person person = plan.getPerson();
+		if (Integer.parseInt(person.getId().toString()) > 
 		Integer.parseInt(super.scenario.getConfig().locationchoice().getIdExclusion())) return;
 
 		// why is all this plans copying necessary?  Could you please explain the design a bit?  Thanks.  kai, jan'13
 		// (this may be done by now. kai, jan'13)
 
-		Plan bestPlan = new PlanImpl(plan.getPerson());	
+		Plan bestPlan = new PlanImpl(person);	
 
 		// bestPlan is initialized as a copy from the old plan:
 		((PlanImpl)bestPlan).copyFrom(plan);
 
 		// this will probably generate an improved bestPlan (?):
-		int personIndex = this.lcContext.getPersonIndex(plan.getPerson().getId());
+		int personIndex = this.lcContext.getPersonIndex(person.getId());
 		this.handleActivities(plan, bestPlan, personIndex);
 
 		// copy the best plan into replanned plan
@@ -135,7 +136,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 
 		
 		ScoringFunctionAccumulator scoringFunction = 
-			(ScoringFunctionAccumulator) this.scoringFunctionFactory.createNewScoringFunction(plan); 
+			(ScoringFunctionAccumulator) this.scoringFunctionFactory.createNewScoringFunction(plan.getPerson()); 
 		// (scoringFunction inserted into getWeightedRandomChoice as well as into evaluateAndAdaptPlans.  Presumably, could as well
 		// insert factory (which is already in the replanning context), but this would need to be checked.  kai, jan'13
 		

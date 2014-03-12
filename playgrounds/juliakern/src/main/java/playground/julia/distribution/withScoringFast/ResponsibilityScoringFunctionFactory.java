@@ -20,14 +20,11 @@
 package playground.julia.distribution.withScoringFast;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
-
-import playground.julia.distribution.withScoringFast.EmissionControlerListener;
-import playground.julia.distribution.withScoringFast.ResponsiblityScoringFunction;
 
 public class ResponsibilityScoringFunctionFactory implements
 		ScoringFunctionFactory {
@@ -42,9 +39,9 @@ public class ResponsibilityScoringFunctionFactory implements
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Person person) {
 		// TODO Auto-generated method stub
-		return new ResponsiblityScoringFunction(plan, delegate.createNewScoringFunction(plan), ecl);
+		return new ResponsiblityScoringFunction(person.getSelectedPlan(), delegate.createNewScoringFunction(person), ecl);
 	}
 
 }

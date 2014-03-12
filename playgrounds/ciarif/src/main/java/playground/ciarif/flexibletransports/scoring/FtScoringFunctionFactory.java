@@ -1,9 +1,10 @@
 package playground.ciarif.flexibletransports.scoring;
 
 import java.util.TreeMap;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
@@ -11,8 +12,8 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
@@ -36,17 +37,17 @@ public class FtScoringFunctionFactory extends CharyparNagelScoringFunctionFactor
     this.facilities = facilities;
   }
 
-  public ScoringFunction createNewScoringFunction(Plan plan)
+  public ScoringFunction createNewScoringFunction(Person person)
   {
     ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 
     scoringFunctionAccumulator.addScoringFunction(
-      new ActivityScoringFunction(plan, 
+      new ActivityScoringFunction(person.getSelectedPlan(), 
       new CharyparNagelScoringParameters(config.planCalcScore()), 
       this.facilityPenalties, 
       this.facilities));
     scoringFunctionAccumulator.addScoringFunction(
-      new LegScoringFunction((PlanImpl)plan, 
+      new LegScoringFunction((PlanImpl)person, 
       new CharyparNagelScoringParameters(config.planCalcScore()), 
       this.config, 
       this.ftConfigGroup, network));

@@ -22,7 +22,7 @@ package playground.thibautd.scoring;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.router.StageActivityTypes;
@@ -97,7 +97,7 @@ public class CharyparNagelWithJointModesScoringFunctionFactory implements Scorin
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(final Plan plan) {
+	public ScoringFunction createNewScoringFunction(final Person person) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 
 		scoringFunctionAccumulator.addScoringFunction(

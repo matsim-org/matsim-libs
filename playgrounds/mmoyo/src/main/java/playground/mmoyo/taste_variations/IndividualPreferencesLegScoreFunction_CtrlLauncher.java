@@ -69,7 +69,7 @@ public class IndividualPreferencesLegScoreFunction_CtrlLauncher {
 		final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(scn.getConfig().planCalcScore()); //M
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override
-			public ScoringFunction createNewScoringFunction(Plan plan) {
+			public ScoringFunction createNewScoringFunction(Person person) {
 			
 				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 				//scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
@@ -77,8 +77,8 @@ public class IndividualPreferencesLegScoreFunction_CtrlLauncher {
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 				
 				//set individualized preferences-based leg scoring function
-				IndividualPreferences indValues = svdMap.get(plan.getPerson().getId());
-				IndividualPreferencesLegScoring indPrefLegScoring = new IndividualPreferencesLegScoring(plan, indValues, net, schedule, scoreWeight);
+				IndividualPreferences indValues = svdMap.get(person.getId());
+				IndividualPreferencesLegScoring indPrefLegScoring = new IndividualPreferencesLegScoring(person.getSelectedPlan(), indValues, net, schedule, scoreWeight);
 				scoringFunctionAccumulator.addScoringFunction(indPrefLegScoring);
  
 				return scoringFunctionAccumulator;

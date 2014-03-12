@@ -26,7 +26,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.population.PersonImpl;
@@ -75,9 +74,9 @@ public class CharyparNagelOpenTimesAndDesiresScoringFunctionFactory implements S
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Person person) {
 		
-		CharyparNagelScoringParameters params = this.paramsMap.get(plan.getPerson().getId());
+		CharyparNagelScoringParameters params = this.paramsMap.get(person.getId());
 		/*
 		 * We get the typical durations from the persons' desires. Instead, we
 		 * could also store them in the PersonAttributes and get them from there.
@@ -85,7 +84,6 @@ public class CharyparNagelOpenTimesAndDesiresScoringFunctionFactory implements S
 		if (params == null) {
 			// ensure that only one thread at a time can adapt the config parameters
 			synchronized (this) {
-				Person person = plan.getPerson();
 				Desires desires = ((PersonImpl) person).getDesires();
 				
 				// replace typical durations in config - quite an ugly hack...
@@ -106,7 +104,7 @@ public class CharyparNagelOpenTimesAndDesiresScoringFunctionFactory implements S
 		}
 		
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
-		sumScoringFunction.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(plan, params, scenario.getActivityFacilities()));
+		sumScoringFunction.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(params, scenario.getActivityFacilities()));
 		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
 		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));

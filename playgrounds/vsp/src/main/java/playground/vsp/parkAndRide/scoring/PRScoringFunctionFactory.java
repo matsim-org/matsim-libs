@@ -21,15 +21,15 @@ package playground.vsp.parkAndRide.scoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 /**
  * Park-and-ride specific scoring function accumulator which extends the CharyparNagelActivityScoring
@@ -53,11 +53,11 @@ public class PRScoringFunctionFactory implements ScoringFunctionFactory {
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {
-		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+	public ScoringFunction createNewScoringFunction(Person person) {
+		SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 		
 		// Park-and-ride specific activity scoring extension
-		scoringFunctionAccumulator.addScoringFunction(new PRActivityScoringFunction(plan, this.charyparNagelConfigParameters, this.interModalTransferPenalty));
+		scoringFunctionAccumulator.addScoringFunction(new PRActivityScoringFunction(this.charyparNagelConfigParameters, this.interModalTransferPenalty));
 		
 		// standard scoring functions
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(this.charyparNagelConfigParameters, this.network));

@@ -21,14 +21,14 @@
 package playground.yu.scoring.postProcessing;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 public class CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord
@@ -43,13 +43,13 @@ public class CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Person person) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator
 				.addScoringFunction(new CharyparNagelActivityScoring(new CharyparNagelScoringParameters(config)));
 
 		LegScoringFunctionWithDetailedRecord legScoring = new LegScoringFunctionWithDetailedRecord(
-				plan, new CharyparNagelScoringParameters(config), network);
+				person.getSelectedPlan(), new CharyparNagelScoringParameters(config), network);
 		scoringFunctionAccumulator.addScoringFunction(legScoring);
 
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(

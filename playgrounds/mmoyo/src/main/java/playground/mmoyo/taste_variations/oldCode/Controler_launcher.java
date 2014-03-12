@@ -21,7 +21,7 @@ package playground.mmoyo.taste_variations.oldCode;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
@@ -113,7 +113,7 @@ public class Controler_launcher {
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 
 			@Override
-			public ScoringFunction createNewScoringFunction(Plan plan) {
+			public ScoringFunction createNewScoringFunction(Person person) {
 				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 				
 				if (!useBruteForce){
@@ -122,7 +122,7 @@ public class Controler_launcher {
 					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));	
 				}
 				
-				final CadytsScoring scoringFunction = new CadytsScoring(plan,config, cContext);
+				final CadytsScoring scoringFunction = new CadytsScoring(person.getSelectedPlan(),config, cContext);
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
 				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
 	 

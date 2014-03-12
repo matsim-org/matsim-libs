@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -96,7 +96,7 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 	}
 		
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Person person) {
 		if (!this.initialized) {
 			this.initialize();
 			this.initialized = true;
@@ -104,7 +104,7 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();		
 		CharyparNagelActivityScoring activityScoringFunction = new DCActivityScoringFunction(
-					(PlanImpl) plan, 
+					(PlanImpl) person, 
 					this.dcContext.getFacilityPenalties(), 
 					dcContext,
 					this.linkToZoneMap,

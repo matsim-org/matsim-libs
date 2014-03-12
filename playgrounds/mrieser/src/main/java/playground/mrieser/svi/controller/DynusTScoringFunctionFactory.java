@@ -19,7 +19,7 @@
 
 package playground.mrieser.svi.controller;
 
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
@@ -47,8 +47,8 @@ public class DynusTScoringFunctionFactory implements ScoringFunctionFactory {
 	}
 	
 	@Override
-	public ScoringFunction createNewScoringFunction(final Plan plan) {
-		return new DynusTScoringFunction(plan, this.ttMatrix, this.act2zones,
+	public ScoringFunction createNewScoringFunction(final Person person) {
+		return new DynusTScoringFunction(person.getSelectedPlan(), this.ttMatrix, this.act2zones,
 				new CharyparNagelLegScoring(this.params, null),
 				new CharyparNagelActivityScoring(this.params));
 	}

@@ -23,7 +23,10 @@ package org.matsim.core.controler.corelisteners;
 import org.matsim.analysis.TravelDistanceStats;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -90,7 +93,14 @@ public class PlansScoring implements ScoringListener, IterationStartsListener, I
 		}
 		this.travelDistanceStats.addIteration(event.getIteration(), eventsToScore.getAgentRecords());
 		if ( sc.getConfig().planCalcScore().isMemorizingExperiencedPlans() ) {
-			this.eventsToScore.memorizeExperiencedPlans() ;
+			for ( Person person : this.sc.getPopulation().getPersons().values() ) {
+				Plan experiencedPlan = eventsToScore.getAgentRecords().get( person.getId() ) ;
+				if ( experiencedPlan==null ) {
+					throw new RuntimeException("experienced plan is null; I don't think this should happen") ;
+				}
+				Plan selectedPlan = person.getSelectedPlan() ;
+				selectedPlan.getCustomAttributes().put(PlanCalcScoreConfigGroup.EXPERIENCED_PLAN_KEY, experiencedPlan ) ;
+			}
 		}
 	}
 

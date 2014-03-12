@@ -26,7 +26,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
@@ -58,20 +58,20 @@ public class HerbieScoringFunctionFactory extends org.matsim.core.scoring.functi
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Person person) {
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
 //		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(plan, super.getParams()));
 		
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(
-				plan, 
+				person.getSelectedPlan(), 
 				new CharyparNagelScoringParameters(config.planCalcScore()), 
 				this.facilityPenalties,
 				this.facilities,
 				this.config));
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(
-				plan, 
+				person.getSelectedPlan(), 
 				new CharyparNagelScoringParameters(config.planCalcScore()),
 				config,
 				this.network,

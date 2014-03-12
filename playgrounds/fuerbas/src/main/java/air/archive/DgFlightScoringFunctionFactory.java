@@ -21,7 +21,7 @@ package air.archive;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -51,7 +51,7 @@ public class DgFlightScoringFunctionFactory extends CharyparNagelScoringFunction
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {
+	public ScoringFunction createNewScoringFunction(Person person) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator.addScoringFunction(new DgFlightCharyparNagelActivityScoringFunction(params, this.plansCalcScoreConfigGroup.getUtilityOfLineSwitch()));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network));

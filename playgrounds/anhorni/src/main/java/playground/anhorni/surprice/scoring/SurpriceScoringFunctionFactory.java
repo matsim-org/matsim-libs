@@ -20,7 +20,7 @@
 package playground.anhorni.surprice.scoring;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PersonImpl;
@@ -51,24 +51,24 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 		this.preferences = preferences;
 	}
 		
-	public ScoringFunction createNewScoringFunction(Plan plan) {			
+	public ScoringFunction createNewScoringFunction(Person person) {			
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 						
 		scoringFunctionAccumulator.addScoringFunction(new SurpriceActivityScoringFunction(
-				plan, new CharyparNagelScoringParameters(config), controler.getConfig(), this.controler.getFacilities(), 
+				person.getSelectedPlan(), new CharyparNagelScoringParameters(config), controler.getConfig(), this.controler.getFacilities(), 
 				this.day));
 		
 		scoringFunctionAccumulator.addScoringFunction(new SurpriceLegScoringFunction(
 				new CharyparNagelScoringParameters(config), 
 				this.controler.getNetwork(), 
-				this.memories.getMemory(plan.getPerson().getId()),
-				this.day, (PersonImpl)plan.getPerson(), 
-				(Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), "dudm")));
+				this.memories.getMemory(person.getId()),
+				this.day, (PersonImpl)person, 
+				(Double)this.preferences.getAttribute(person.getId().toString(), "dudm")));
 		
 		if (Boolean.parseBoolean(controler.getConfig().findParam(Surprice.SURPRICE_RUN, "useRoadPricing"))) {	
 			scoringFunctionAccumulator.addScoringFunction(new SupriceTollScoringFunction(
-					new CharyparNagelScoringParameters(config), (PersonImpl)plan.getPerson(), this.day,
-					(Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), "dudm")));
+					new CharyparNagelScoringParameters(config), (PersonImpl)person, this.day,
+					(Double)this.preferences.getAttribute(person.getId().toString(), "dudm")));
 		}				
 		//scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(super.getParams()));
 		return scoringFunctionAccumulator;

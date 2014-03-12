@@ -19,7 +19,7 @@
 
 package playground.pbouman.crowdedness;
 
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -74,9 +74,9 @@ public class CrowdedScoringFunctionFactory implements ScoringFunctionFactory
 	}
 	
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan)
+	public ScoringFunction createNewScoringFunction(Person person)
 	{
-		return new CrowdedScoringFunction(delegate.createNewScoringFunction(plan), events);
+		return new CrowdedScoringFunction(delegate.createNewScoringFunction(person), events);
 	}
 
 }

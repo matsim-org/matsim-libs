@@ -57,7 +57,7 @@ public class BasicFitness implements FitnessFunction<Plan> {
 
 		Plan plan = solution.getPhenotype();
 
-		ScoringFunction scoringFunction = factory.createNewScoringFunction( plan );
+		ScoringFunction scoringFunction = factory.createNewScoringFunction( plan.getPerson() );
 
 		if (DEBUG) log.debug( "start scoring" );
 

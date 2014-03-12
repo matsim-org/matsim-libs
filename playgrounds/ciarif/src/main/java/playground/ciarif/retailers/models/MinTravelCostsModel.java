@@ -96,12 +96,8 @@ public class MinTravelCostsModel extends RetailerModelImpl
         //log.info("toLink " + (Link)this.controler.getNetwork().getLinks().get(ppa.getActivityLinkId()));
         handleCarLeg(li, link, this.controler.getNetwork().getLinks().get(ppa.getActivityLinkId()), network, routeAlgo);
 
-        Plan plan = this.controler.getPopulation().getFactory().createPlan();
-        plan.addActivity(null);
-        plan.addLeg(li);
-        plan.addActivity(null);
-
-        ScoringFunction scoringFunction = this.controler.getScoringFunctionFactory().createNewScoringFunction(plan);
+      
+        ScoringFunction scoringFunction = this.controler.getScoringFunctionFactory().createNewScoringFunction(null);
         double score = getLegScore(li, scoringFunction);
 
         //log.info("Score: " + score);

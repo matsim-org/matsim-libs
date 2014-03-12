@@ -13,7 +13,6 @@ public class SumScoringFunction implements ScoringFunction {
 	public interface BasicScoring {
 		public void finish();
 		public double getScore();
-		public void reset();
 	}
 	
 	public interface ActivityScoring extends BasicScoring {
@@ -38,7 +37,7 @@ public class SumScoringFunction implements ScoringFunction {
 		void handleEvent( final Event event ) ;
 	}
 	
-	private static Logger log = Logger.getLogger(ScoringFunctionAccumulator.class);
+	private static Logger log = Logger.getLogger(SumScoringFunction.class);
 
 	private ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<BasicScoring>();
 	private ArrayList<ActivityScoring> activityScoringFunctions = new ArrayList<ActivityScoring>();
@@ -119,12 +118,6 @@ public class SumScoringFunction implements ScoringFunction {
 		return score;
 	}
 
-	/**
-	 * add the scoring function the list of functions, it implemented the
-	 * interfaces.
-	 * 
-	 * @param scoringFunction
-	 */
 	public void addScoringFunction(BasicScoring scoringFunction) {
 		basicScoringFunctions.add(scoringFunction);
 
