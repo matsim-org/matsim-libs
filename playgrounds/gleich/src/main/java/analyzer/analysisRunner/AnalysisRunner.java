@@ -67,7 +67,7 @@ import playground.vsp.analysis.modules.waitingTimes.WaitingTimesAnalyzer;
 import playground.vsp.analysis.modules.welfareAnalyzer.WelfareAnalyzer;
 
 /**
- * Work Flow at version 12.02.2014:
+ * Work Flow at version 12.03.2014:
  * 
  * <ul>
  * <li>1. AnalysisRunner.java loads scenario
@@ -100,8 +100,13 @@ import playground.vsp.analysis.modules.welfareAnalyzer.WelfareAnalyzer;
  * write its output file with the "#" in the header replaced by 'distance' 
  * (R interpretes '#' as comment line).<p>
  * The example scenario can be found in shared-svn.../studies/gleich/MATSimExampleScenario
+ * <p>
  * 
- * TODO:
+ * MATsim output of the ExampleScenario runs and corresponding output of AnalysisRunner can
+ * be found in shared-svn/studies/gleich/MATSimExampleScenario.
+ * 
+ * 
+ * TODO 12.03.2014:
  * <ul> 
  * <li>Separate Run of VspAnalyzers from Starting R and Latex
  * <li>Separate methods to run the analyzers from this class into one class per analyzer
@@ -138,6 +143,7 @@ import playground.vsp.analysis.modules.welfareAnalyzer.WelfareAnalyzer;
  * Due to a bug in Qgis, it cannot be used from command line on windows to create
  * graphics to be included in latex. According to ikaddoura and aneumann shp files 
  * (respectively graphics produced from shp files ) do not need to be inserted in the report.
+ * <p>
  * 
  * End of TODO list and description of version 12.03.2014
  * -------
