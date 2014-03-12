@@ -116,8 +116,6 @@ public class ShapeConverterPopRandom {
 		
 		for(SimpleFeature sf: features){
 			
-			
-			
 			Double time = getTimeInSeconds((String) sf.getAttribute("klokkeslet"));
 			
 			if (time>0.0) {
@@ -143,7 +141,7 @@ public class ShapeConverterPopRandom {
 					countKnownActTypes ++;
 				}
 				
-				String legmode = (String) sf.getAttribute("trmh_enkel"); //TODO
+				String legmode = (String) sf.getAttribute("trmh_enkel");
 				legmode = legmode.toLowerCase();
 				
 				Double tripnr = (Double) sf.getAttribute("reisenr");
@@ -160,11 +158,7 @@ public class ShapeConverterPopRandom {
 					personid2trips.put(personId, new ArrayList<Trip>());
 					personid2trips.get(personId).add(trip);
 				}
-				
-			}else{
-			//	logger.info(sf.getAttributes().toString());
 			}			
-			
 		}
 		
 		for(Id id: personid2trips.keySet()){
