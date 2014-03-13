@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureTypeImpl;
@@ -38,15 +40,19 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
+
+import playground.benjamin.utils.NetworkSimplifier;
 
 public class ShapeConverterNetwork {
 
 	static String shapeFile = "input/oslo/Matsim_files_1/trondheim_med_omland_4.shp";
 	static String laneTypeFile = "input/oslo/lanetypes2.csv";
 	private static String splitSymbol =";";
+	private static String networkfile = "input/oslo/trondheim_network_with_lanes_simple.xml";
 	/**
 	 * @param args
 	 */
@@ -185,9 +191,20 @@ public class ShapeConverterNetwork {
 		
 		}
 		
+		
+		// network cleaner - find biggest cluster, throw everything else away. removes unreachable nodes, links etc.
 		 new NetworkCleaner().run(network);
-		NetworkWriter nw = new NetworkWriter(network);
-		nw.write("input/oslo/trondheim_network_with_lanes.xml");
+		 // merges links with same parameters if they meet at a node (with no other node attached)
+		 NetworkSimplifier ns = new NetworkSimplifier();
+		 Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
+		 nodeTypesToMerge.add(4); // nodes of type "path 1 way"  -->node-->
+		 nodeTypesToMerge.add(5); // nodes of type "path 2 ways" <-->node<-->
+		 ns.setNodesToMerge(nodeTypesToMerge);
+		 ns.run(network);
+		 
+		 logger.info("The cleaned and simplified network has " + network.getNodes().size() + " nodes and " + network.getLinks().size() + " links.");
+		 NetworkWriter nw = new NetworkWriter(network); // write network into xml file
+		 nw.write(networkfile );
 		
 		
 	
