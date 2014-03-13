@@ -23,9 +23,9 @@ public class Park_Scoring_Factory extends CharyparNagelScoringFunctionFactory {
 		// TODO Auto-generated constructor stub
 	}
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {
-		SumScoringFunction scoringFunctionSum = (SumScoringFunction) super.createNewScoringFunction(plan);
-		scoringFunctionSum.addScoringFunction(new Park_Scoring(plan));
+	public ScoringFunction createNewScoringFunction(Person person) {
+		SumScoringFunction scoringFunctionSum = (SumScoringFunction) super.createNewScoringFunction(person);
+		scoringFunctionSum.addScoringFunction(new Park_Scoring(person.getSelectedPlan()));
 		//ScoringFunctionAccumulator scoringFunctionAccumulator = (ScoringFunctionAccumulator)super.createNewScoringFunction(plan);
 		//scoringFunctionAccumulator.addScoringFunction(new Park_Scoring());
 		return scoringFunctionSum;
