@@ -47,47 +47,46 @@ public class VrpPathCalculatorImpl
     @Override
     public VrpPathWithTravelData calcPath(Link fromLink, Link toLink, double departureTime)
     {
-        if (fromLink != toLink) {
-            //TODO run dijkstra with departureTime+1 (we need 1 second to move over the node)???
-            Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(),
-                    departureTime, null, null);
-
-            int count = path.links.size();
-            Link[] links = new Link[count + 2];
-            double[] linkTT = new double[count + 2];
-
-            //we start at the end of fromLink
-            //actually, in QSim, it usually takes 1 second to move over the first node
-            //(when INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES is ON;
-            //otherwise it can take much longer)
-            double currentTime = departureTime;
-            links[0] = fromLink;
-            double tt = 1.;
-            linkTT[0] = tt;
-            currentTime += tt;
-
-            for (int i = 1; i <= count; i++) {
-                Link link = path.links.get(i - 1);
-                links[i] = link;
-                tt = travelTime.getLinkTravelTime(link, currentTime, null, null);
-                linkTT[i] = tt;
-                currentTime += tt;
-            }
-
-            //there is no extra time spent on queuing at the end of the last link
-            links[count + 1] = toLink;
-            tt = toLink.getLength() / toLink.getFreespeed();///???????????????
-            linkTT[count + 1] = tt;
-
-            double totalTT = 1 + path.travelTime + tt;
-
-            double totalCost = path.travelCost
-                    + travelDisutility.getLinkMinimumTravelDisutility(toLink);
-
-            return new VrpPathImpl(departureTime, totalTT, totalCost, links, linkTT);
-        }
-        else {
+        if (fromLink == toLink) {
             return new VrpPathImpl(departureTime, 0, 0, new Link[] { fromLink }, new double[] { 0 });
         }
+
+        //calc path for departureTime+1 (we need 1 second to move over the node)
+        Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(),
+                departureTime + 1, null, null);
+
+        int count = path.links.size();
+        Link[] links = new Link[count + 2];
+        double[] linkTT = new double[count + 2];
+
+        //we start at the end of fromLink
+        //actually, in QSim, it usually takes 1 second to move over the first node
+        //(when INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES is ON;
+        //otherwise it can take much longer)
+        double currentTime = departureTime;
+        links[0] = fromLink;
+        double tt = 1.;
+        linkTT[0] = tt;
+        currentTime += tt;
+
+        for (int i = 1; i <= count; i++) {
+            Link link = path.links.get(i - 1);
+            links[i] = link;
+            tt = travelTime.getLinkTravelTime(link, currentTime, null, null);
+            linkTT[i] = tt;
+            currentTime += tt;
+        }
+
+        //there is no extra time spent on queuing at the end of the last link
+        links[count + 1] = toLink;
+        tt = toLink.getLength() / toLink.getFreespeed();///???????????????
+        linkTT[count + 1] = tt;
+
+        double totalTT = 1 + path.travelTime + tt;
+
+        double totalCost = path.travelCost
+                + travelDisutility.getLinkMinimumTravelDisutility(toLink);
+
+        return new VrpPathImpl(departureTime, totalTT, totalCost, links, linkTT);
     }
 }
