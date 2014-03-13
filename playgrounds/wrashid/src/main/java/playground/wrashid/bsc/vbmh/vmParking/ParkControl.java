@@ -165,7 +165,7 @@ public class ParkControl {
 		for (Parking parking : parkingMap.getParkings()) {
 			// System.out.println("Suche Parking mit passender facility ID");
 			if(parking.facilityId!=null){ //Es gibt datensaetze ohne Facility ID >> Sonst Nullpointer
-				if (parking.facilityId.equals(facilityId)) {
+				if (parking.facilityId.equals(facilityId)) { // !! Act Type muss auch uebereinstimmen ! >> Einbauen
 					//System.out.println("checke Parking");
 					ParkingSpot selectedSpot = parking.checkForFreeSpot(); //Gibt null oder einen freien Platz zurueck
 					if (selectedSpot != null) {
