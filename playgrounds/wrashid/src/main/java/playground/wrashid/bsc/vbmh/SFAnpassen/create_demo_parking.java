@@ -22,7 +22,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.bsc.vbmh.vm_parking.Parking;
-import playground.wrashid.bsc.vbmh.vm_parking.Parking_Map;
+import playground.wrashid.bsc.vbmh.vm_parking.ParkingMap;
 import playground.wrashid.bsc.vbmh.vm_parking.Parking_writer;
 public class create_demo_parking {
 	static HashMap <String,Double> Panteile = new HashMap<String,Double>();	//Anzahl Parkplaetze / what ever nach P typ
@@ -52,7 +52,7 @@ public class create_demo_parking {
 		
 		int i = 0;
 		double zufallsz;
-		Parking_Map parking_map = new Parking_Map();
+		ParkingMap parking_map = new ParkingMap();
 		Parking_writer writer = new Parking_writer();
 		Random zufall = new Random();
 	

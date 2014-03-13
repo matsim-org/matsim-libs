@@ -67,8 +67,8 @@ public class Park_Controler_Listener implements StartupListener, IterationEndsLi
 		phwriter.start("output/test_outputs/test_parkhistory.xml"); // !! Pro Iteration neues File
 		
 		//Parkplaetze zuruecksetzen 
-		getPark_handler().park_control.parking_map.clear_spots();
-		getPark_handler().park_control.parking_map.create_spots();
+		getPark_handler().park_control.parking_map.clearSpots();
+		getPark_handler().park_control.parking_map.createSpots();
 		
 		
 		//VM_Score_Keeper Zuruecksetzen:

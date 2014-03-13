@@ -18,10 +18,10 @@ import javax.xml.bind.Marshaller;
 
 
 public class Parking_writer {
-	public int write(Parking_Map parking_map, String filename){
+	public int write(ParkingMap parking_map, String filename){
 		try{
 		File file = new File( filename );
-		JAXBContext context = JAXBContext.newInstance( Parking_Map.class );
+		JAXBContext context = JAXBContext.newInstance( ParkingMap.class );
 		Marshaller m = context.createMarshaller();
 		m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
 		m.marshal( parking_map, file );}

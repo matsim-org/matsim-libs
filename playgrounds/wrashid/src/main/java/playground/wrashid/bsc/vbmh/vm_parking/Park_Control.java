@@ -39,7 +39,7 @@ public class Park_Control {
 	int count_not_parked = 0;
 	
 	Controler controller;
-	Parking_Map parking_map = new Parking_Map(); //Beinhaltet alle Parkplaetze
+	ParkingMap parking_map = new ParkingMap(); //Beinhaltet alle Parkplaetze
 	Pricing_Models pricing = new Pricing_Models(); //Behinhaltet dei Preismodelle
 	Park_History_Writer phwriter = new Park_History_Writer(); //Schreibt XML Datei mit Park events
 	double time; //Wird auf aktuelle Zeit gesetzt (Vom event)
@@ -53,7 +53,7 @@ public class Park_Control {
 		
 		//Parkplaetze Laden
 		File parkingfile = new File( parking_filename );
-		Parking_Map karte = JAXB.unmarshal( parkingfile, Parking_Map.class ); //Laedt Parkplaetze aus XML
+		ParkingMap karte = JAXB.unmarshal( parkingfile, ParkingMap.class ); //Laedt Parkplaetze aus XML
 		this.parking_map=karte;
 		
 		//Preise Laden

@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 
 @XmlRootElement
-public class Parking_Map {
+public class ParkingMap {
 	private static List<Parking> parkings = new LinkedList<Parking>();
 
 	@XmlElement(name = "Parking")
@@ -26,19 +26,19 @@ public class Parking_Map {
 
 	public void setParking(List<Parking> parkings) {
 
-		Parking_Map.parkings = parkings;
+		ParkingMap.parkings = parkings;
 	}
 	
 	public void addParking(Parking parking){
-		Parking_Map.parkings.add(parking);
+		ParkingMap.parkings.add(parking);
 	}
 	
-	public void create_spots(){
+	public void createSpots(){
 		for (Parking parking : parkings){
 			parking.create_spots();
 		}
 	}
-	public void clear_spots(){
+	public void clearSpots(){
 		for (Parking parking : parkings){
 			parking.create_spots();
 		}
