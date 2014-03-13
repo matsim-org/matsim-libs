@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * Keeps a list of all parking in the network.
  * 
- * 
+ * !! Quadtree und evntl umkreis Suche hier her?
  * @author Valentin Bemetz & Moritz Hohenfellner
  *
  */

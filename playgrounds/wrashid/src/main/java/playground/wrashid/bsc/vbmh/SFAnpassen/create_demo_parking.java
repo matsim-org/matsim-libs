@@ -1,4 +1,6 @@
 package playground.wrashid.bsc.vbmh.SFAnpassen;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -6,12 +8,16 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -19,19 +25,38 @@ import playground.wrashid.bsc.vbmh.vm_parking.Parking;
 import playground.wrashid.bsc.vbmh.vm_parking.Parking_Map;
 import playground.wrashid.bsc.vbmh.vm_parking.Parking_writer;
 public class create_demo_parking {
-
+	static HashMap <String,Double> Panteile = new HashMap<String,Double>();	//Anzahl Parkplaetze / what ever nach P typ
+	static HashMap <String,Double> EVanteile = new HashMap<String,Double>(); //Anteil EV Nach P Typ
+	static Scenario scenario;
+	static HashMap <String,Integer> anzahlArbeiter = new HashMap<String, Integer>();
 	public static void main(String[] args) {
-		double privat_anteil_p_gesammt=0.2;
-		double privat_anteil_EV=0.2;
-		double public_anteil_p_gesammt=0.05;
-		double public_anteil_EV=0.2;
+	
+		Panteile.put("home", 1.0);
+		EVanteile.put("home", 0.0);
+		
+		Panteile.put("work", 0.5);
+		EVanteile.put("work", 0.05);
+		
+		Panteile.put("secondary",0.5);
+		EVanteile.put("secondary", 0.2);
+		
+		Panteile.put("Street", 0.05);
+		EVanteile.put("Street", 0.0);
+		
+		Panteile.put("edu", 0.05);
+		EVanteile.put("edu", 0.0);
+		
+		
+		
+		
+		
 		int i = 0;
 		double zufallsz;
 		Parking_Map parking_map = new Parking_Map();
 		Parking_writer writer = new Parking_writer();
 		Random zufall = new Random();
 	
-		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("input/SF/config_SF_1.xml"));
+		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("input/SF/config_SF_1.xml"));
 		
 		
 		// P R I V A T E --------------------------------------------
@@ -44,8 +69,14 @@ public class create_demo_parking {
 				ActivityOption activity = actfacility.getActivityOptions().get(key);
 				
 				double location_capacity= activity.getCapacity();
-				CoordImpl location_coord = (CoordImpl) actfacility.getCoord();
+				String location_type = activity.getType();
 				IdImpl location_id=(IdImpl)facility.getId();
+				CoordImpl location_coord = (CoordImpl) actfacility.getCoord();
+				
+				System.out.println(location_type);
+				
+				
+				
 				
 				
 				if (location_capacity>1000){
@@ -55,8 +86,7 @@ public class create_demo_parking {
 				
 				
 				Parking parking = new Parking();
-				parking.capacity_ev=Math.round(location_capacity * privat_anteil_p_gesammt * privat_anteil_EV);
-				parking.capacity_nev=Math.round(location_capacity * privat_anteil_p_gesammt * (1-privat_anteil_EV));
+				setCapacity(parking, location_type, location_capacity);
 				
 				// Facilitys ohne capacity Angabe haben intern unendlich >> Bessere loesung suchen!
 				if (parking.capacity_ev>1000){
@@ -88,8 +118,9 @@ public class create_demo_parking {
 			Coord link_coord=link.getFromNode().getCoord();
 			double location_capacity = link_length/10;
 			Parking parking = new Parking();
-			parking.capacity_ev=Math.round(location_capacity * public_anteil_p_gesammt * public_anteil_EV);
-			parking.capacity_nev=Math.round(location_capacity * public_anteil_p_gesammt * (1-public_anteil_EV));
+			setCapacity(parking, "Street", location_capacity);
+			
+			
 			if (parking.capacity_ev>1000){
 				parking.capacity_ev=100;
 			}
@@ -124,5 +155,32 @@ public class create_demo_parking {
 		System.out.println("feddisch");
 
 	}
+	
+	static void setCapacity(Parking parking, String location_type, double location_capacity){
+		parking.capacity_ev=Math.round(location_capacity * Panteile.get(location_type) * EVanteile.get(location_type));
+		parking.capacity_nev=Math.round(location_capacity * Panteile.get(location_type) * (1-EVanteile.get(location_type)));
+		
+		
+	}
+	
+	static int countEmployees(){
+		int anzahl=0;
+		Collection<? extends Person> personen = scenario.getPopulation().getPersons().values();
+		
+		for (Person person : personen){
+			for(Plan plan : person.getPlans()){ 
+				PlanImpl planImpl = (PlanImpl) plan;
+				for(PlanElement element : planImpl.getPlanElements()){
+					System.out.println(element.getClass());
+					
+				}
+			}
+			
+			
+		}
+		
+		return anzahl;
+	}
+	
 
 }
