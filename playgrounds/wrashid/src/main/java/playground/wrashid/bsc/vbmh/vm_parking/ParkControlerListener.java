@@ -30,7 +30,7 @@ public class ParkControlerListener implements StartupListener, IterationEndsList
 
 
 
-	public void setPark_handler(ParkHandler parkHandler) {
+	public void setParkHandler(ParkHandler parkHandler) {
 		this.parkHandler = parkHandler;
 	}
 

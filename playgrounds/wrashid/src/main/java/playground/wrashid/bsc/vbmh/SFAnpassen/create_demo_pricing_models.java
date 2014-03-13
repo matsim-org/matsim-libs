@@ -1,8 +1,8 @@
 package playground.wrashid.bsc.vbmh.SFAnpassen;
 
-import playground.wrashid.bsc.vbmh.vm_parking.Parking_Pricing_Model;
+import playground.wrashid.bsc.vbmh.vm_parking.ParkingPricingModel;
 import playground.wrashid.bsc.vbmh.vm_parking.PricingModels;
-import playground.wrashid.bsc.vbmh.vm_parking.Pricing_Models_Writer;
+import playground.wrashid.bsc.vbmh.vm_parking.PricingModelsWriter;
 
 public class create_demo_pricing_models {
 	
@@ -11,29 +11,29 @@ public class create_demo_pricing_models {
 		// TODO Auto-generated method stub
 	
 		PricingModels pricing_models = new PricingModels();
-		Pricing_Models_Writer writer = new Pricing_Models_Writer();
+		PricingModelsWriter writer = new PricingModelsWriter();
 		
 		
-		Parking_Pricing_Model model1 = new Parking_Pricing_Model();
+		ParkingPricingModel model1 = new ParkingPricingModel();
 		pricing_models.add(model1);
 		model1.id=0;
-		model1.setMax_time_ev(24);
-		model1.setMax_time_nev(24);
-		model1.setPrice_of_first_minute_ev(0);
-		model1.setPrice_of_first_minute_nev(1);
-		model1.setPrice_per_minute_ev(1/60.0);
-		model1.setPrice_per_minute_nev(2/60.0);
+		model1.setMaxTimeEV(24);
+		model1.setMaxTimeNEV(24);
+		model1.setPriceOfFirstMinuteEV(0);
+		model1.setPriceOfFirstMinuteNEV(1);
+		model1.setPricePerMinuteEV(1/60.0);
+		model1.setPricePerMinuteNEV(2/60.0);
 		
 		
-		Parking_Pricing_Model model2 = new Parking_Pricing_Model();
+		ParkingPricingModel model2 = new ParkingPricingModel();
 		pricing_models.add(model2);
 		model2.id=3;
-		model2.setMax_time_ev(24);
-		model2.setMax_time_nev(24);
-		model2.setPrice_of_first_minute_ev(0);
-		model2.setPrice_of_first_minute_nev(0);
-		model2.setPrice_per_minute_ev(5/60.0);
-		model2.setPrice_per_minute_nev(5/60.0);
+		model2.setMaxTimeEV(24);
+		model2.setMaxTimeNEV(24);
+		model2.setPriceOfFirstMinuteEV(0);
+		model2.setPriceOfFirstMinuteNEV(0);
+		model2.setPricePerMinuteEV(5/60.0);
+		model2.setPricePerMinuteNEV(5/60.0);
 		
 		writer.write(pricing_models, "input/parking_pricing_models_demo.xml");
 		

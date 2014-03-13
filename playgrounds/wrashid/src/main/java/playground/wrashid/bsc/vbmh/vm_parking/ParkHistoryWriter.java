@@ -59,7 +59,7 @@ public class ParkHistoryWriter {
 	public void addParkingAvailible(Parking parking, String time){
 		schreiben("<parkevent time="+time+" Parkingid="+parking.id+" Parkingtype="+parking.type+" eventtype=availible>\n");
 	}
-	public void add_agent_not_parked(String time, String person){
+	public void addAgentNotParked(String time, String person){
 		schreiben("<parkevent time="+time+" eventtype=agent_not_parked person="+person+">\n");
 	}
 }

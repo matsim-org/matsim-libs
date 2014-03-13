@@ -14,7 +14,7 @@ import javax.xml.bind.Marshaller;
  */
 
 
-public class Pricing_Models_Writer {
+public class PricingModelsWriter {
 	public int write(PricingModels models, String filename){
 		try{
 		File file = new File( filename );

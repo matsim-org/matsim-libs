@@ -118,7 +118,7 @@ public class ParkControl {
 		}
 		scorekeeper.add(30);
 		
-		phwriter.add_agent_not_parked(Double.toString(this.time), personId.toString());
+		phwriter.addAgentNotParked(Double.toString(this.time), personId.toString());
 		
 		this.countNotParked++;
 		return -1;

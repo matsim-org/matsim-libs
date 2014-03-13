@@ -21,7 +21,7 @@ public class ParkHandler implements ActivityEndEventHandler, ActivityStartEventH
 
 	ParkControl parkControl = new ParkControl();
 	
-	public ParkControl getPark_control() {
+	public ParkControl getParkControl() {
 		return parkControl;
 	}
 

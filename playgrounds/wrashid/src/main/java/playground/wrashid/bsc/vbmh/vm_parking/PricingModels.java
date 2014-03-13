@@ -20,21 +20,21 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class PricingModels {
-	private static List<Parking_Pricing_Model> parkingprices = new LinkedList<Parking_Pricing_Model>();
+	private static List<ParkingPricingModel> parkingprices = new LinkedList<ParkingPricingModel>();
 	
 	@XmlElement(name = "Parking_Pricing_Model")
-	public List<Parking_Pricing_Model> getParking_Pricing_Models() {
+	public List<ParkingPricingModel> getParking_Pricing_Models() {
 		return parkingprices;
 	}
 	
-	public void add(Parking_Pricing_Model model){
+	public void add(ParkingPricingModel model){
 		parkingprices.add(model);
 
 	}
 
-	public Parking_Pricing_Model get_model(int model_id){
+	public ParkingPricingModel get_model(int model_id){
 		// Alle in Map schreiben zum beschleunigen?
-		for (Parking_Pricing_Model model : parkingprices){
+		for (ParkingPricingModel model : parkingprices){
 			if (model.id==model_id){
 				return model;	
 			}
@@ -47,11 +47,11 @@ public class PricingModels {
 	
 	public double calculateParkingPrice(double duration, boolean ev,int model_id){
 		double price = 0;
-		Parking_Pricing_Model model = get_model(model_id);
+		ParkingPricingModel model = get_model(model_id);
 		if (ev){
-			price = model.getPrice_of_first_minute_ev() + duration * model.getPrice_per_minute_ev();
+			price = model.getPriceOfFirstMinuteEV() + duration * model.getPricePerMinuteEV();
 		} else {
-			price = model.getPrice_of_first_minute_nev() + duration * model.getPrice_per_minute_nev();
+			price = model.getPriceOfFirstMinuteNEV() + duration * model.getPricePerMinuteNEV();
 		}
 			
 		

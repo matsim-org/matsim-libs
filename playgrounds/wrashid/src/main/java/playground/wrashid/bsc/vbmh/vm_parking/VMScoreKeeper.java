@@ -17,7 +17,7 @@ public class VMScoreKeeper {
 		score = score + add;
 	}
 	
-	public double get_score(){
+	public double getScore(){
 		return score;
 	}
 

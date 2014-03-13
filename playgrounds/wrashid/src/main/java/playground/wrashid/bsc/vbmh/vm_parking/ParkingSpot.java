@@ -1,17 +1,17 @@
 package playground.wrashid.bsc.vbmh.vm_parking;
 
 public class ParkingSpot {
-	boolean charge, ev_exclusive;
+	boolean charge, evExclusive;
 	private boolean occupied;
 	public int chargingRate, parkingPriceM, chargingPriceM;
 	public Parking parking;
-	private double time_vehicle_parked;
+	private double timeVehicleParked;
 	
 	public double getTimeVehicleParked() {
-		return time_vehicle_parked;
+		return timeVehicleParked;
 	}
 	public void setTimeVehicleParked(double time_vehicle_parked) {
-		this.time_vehicle_parked = time_vehicle_parked;
+		this.timeVehicleParked = time_vehicle_parked;
 	}
 	boolean isOccupied() {
 		return occupied;
