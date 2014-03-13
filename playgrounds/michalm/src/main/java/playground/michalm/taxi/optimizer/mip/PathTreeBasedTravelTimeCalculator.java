@@ -19,53 +19,37 @@
 
 package playground.michalm.taxi.optimizer.mip;
 
-import java.util.*;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.core.router.util.*;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.utils.*;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.utils.LeastCostPathTree.NodeData;
 
 
-public class LeastCostPathTreeStorage
+public class PathTreeBasedTravelTimeCalculator
 {
-    private final Network network;
-    private final LeastCostPathTree leastCostPathTree;
-    private final Map<Id, Map<Id, NodeData>> treesByRootNodeId;
+    private final LeastCostPathTreeStorage leastCostPathTrees;
 
 
-    public LeastCostPathTreeStorage(Network network)
+    public PathTreeBasedTravelTimeCalculator(LeastCostPathTreeStorage leastCostPathTrees)
     {
-        this.network = network;
-
-        TravelTime travelTime = new FreeSpeedTravelTime();
-        TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
-        leastCostPathTree = new LeastCostPathTree(travelTime, travelDisutility);
-
-        treesByRootNodeId = new HashMap<Id, Map<Id, NodeData>>();
+        this.leastCostPathTrees = leastCostPathTrees;
     }
 
 
-    public Map<Id, NodeData> getTree(Link fromLink)
+    public double calcTravelTime(Link fromLink, Link toLink)
     {
-        return getTree(fromLink.getToNode());
-    }
-
-
-    public Map<Id, NodeData> getTree(Node rootNode)
-    {
-        Map<Id, NodeData> tree = treesByRootNodeId.get(rootNode.getId());
-
-        if (tree != null) {
-            return tree;
+        if (fromLink == toLink) {
+            return 0;
         }
 
-        leastCostPathTree.calculate(network, rootNode, 0);
-        tree = leastCostPathTree.getTree();
-        treesByRootNodeId.put(rootNode.getId(), tree);
-        return tree;
+        Map<Id, NodeData> tree = leastCostPathTrees.getTree(fromLink);
+        NodeData nodeData = tree.get(toLink.getFromNode().getId());
+        
+        double tt = 1;//getting over the first node
+        tt += nodeData.getTime();//travelling along the path
+        tt += toLink.getLength() / toLink.getFreespeed();//travelling the last link (approx.)
+        
+        return tt;
     }
 }

@@ -30,21 +30,21 @@ import playground.michalm.taxi.optimizer.*;
 public class MIPTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
-    private final LeastCostPathTreeStorage leastCostPathTrees;
+    private final PathTreeBasedTravelTimeCalculator pathTravelTimeCalc;
 
 
     public MIPTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
         super(optimConfig, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR));
 
-        leastCostPathTrees = new LeastCostPathTreeStorage(optimConfig.context.getScenario()
-                .getNetwork());
+        pathTravelTimeCalc = new PathTreeBasedTravelTimeCalculator(new LeastCostPathTreeStorage(
+                optimConfig.context.getScenario().getNetwork()));
     }
 
 
     protected void scheduleUnplannedRequests()
     {
-        new MIPProblem(optimConfig, leastCostPathTrees)
+        new MIPProblem(optimConfig, pathTravelTimeCalc)
                 .scheduleUnplannedRequests((SortedSet<TaxiRequest>)unplannedRequests);
     }
 }
