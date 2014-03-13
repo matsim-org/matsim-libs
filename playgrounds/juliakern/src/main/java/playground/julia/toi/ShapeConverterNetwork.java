@@ -160,7 +160,7 @@ public class ShapeConverterNetwork {
 					lanetype = "1#2";
 				}
 				
-				if(laneTypes.get(lanetype).toll==true){
+				if(laneTypes.get(lanetype).isToll()==true){
 					logger.info("toll roads " + linkId1 + " " + linkId2 );
 				}
 				

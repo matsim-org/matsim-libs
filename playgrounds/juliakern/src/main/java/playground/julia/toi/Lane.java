@@ -24,7 +24,7 @@ public class Lane {
 	String identifier;
 	int numberOfForwardLanes;
 	int numberOfBackwardLanes;
-	boolean toll; 
+	private boolean toll; 
 	
 
 	public Lane(String[] lanetypeStr) {
@@ -32,9 +32,9 @@ public class Lane {
 		this.identifier = identifier.replace("1|#2", "1#2"); // typo in the input tabular?
 		
 		// toll
-		toll = false;
+		setToll(false);
 		if(identifier.contains("B")){
-			toll=true;
+			setToll(true);
 			System.out.println("toll on link");
 		}
 		
@@ -74,6 +74,14 @@ public class Lane {
 
 	public Double getNumberOfForwardLanes() {
 		return 1.0*numberOfForwardLanes;
+	}
+
+	public boolean isToll() {
+		return toll;
+	}
+
+	public void setToll(boolean toll) {
+		this.toll = toll;
 	}
 
 
