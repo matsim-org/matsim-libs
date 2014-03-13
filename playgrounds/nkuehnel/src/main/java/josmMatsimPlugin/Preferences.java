@@ -31,9 +31,11 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 			"Activate MATSim Renderer");
 	protected final static JCheckBox showIds = new JCheckBox("Show Ids");
 	protected final static JSlider wayOffset = new JSlider(0, 100);
-	protected final static JLabel wayOffsetLabel = new JLabel("link offset for overlapping links");
+	protected final static JLabel wayOffsetLabel = new JLabel("Link offset for overlapping links");
 	protected final static JCheckBox showInternalIds = new JCheckBox(
 			"Show internal Ids in table");
+	protected final static JCheckBox keepPaths = new JCheckBox(
+			"Keep paths");
 
 	// Export tab
 	protected final static JCheckBox cleanNetwork = new JCheckBox(
@@ -130,6 +132,10 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 				true));
 		cleanNetwork.setActionCommand("cleanNetwork");
 		cleanNetwork.addActionListener(listener);
+		
+		keepPaths.setSelected(Main.pref.getBoolean("matsim_convertDefaults_keepPaths", false));
+		keepPaths.setActionCommand("keepPaths");
+		keepPaths.addActionListener(listener);
 
 		coordSystem.setSelectedItem(Main.pref.get("matsim_convertSystem",
 				"WGS84"));
@@ -146,8 +152,11 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 		cOptions.gridx = 0;
 		cOptions.gridy = 0;
 		pnl.add(cleanNetwork, cOptions);
-
+		
 		cOptions.gridy = 1;
+		pnl.add(keepPaths, cOptions);
+
+		cOptions.gridy = 2;
 		pnl.add(convertingDefaults, cOptions);
 		return pnl;
 	}

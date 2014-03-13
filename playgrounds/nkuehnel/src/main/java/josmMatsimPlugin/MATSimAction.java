@@ -87,13 +87,11 @@ public class MATSimAction {
 				if (pane.getValue() != null) {
 					if (((Integer) pane.getValue()) == JOptionPane.OK_OPTION) {
 						ImportTask task = new ImportTask(path);
-//						ImportTask_v2 task = new ImportTask_v2(path);
 						Main.worker.execute(task);
 					}
 				}
 				dlg.dispose();
 			}
-
 		}
 	}
 

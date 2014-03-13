@@ -59,7 +59,7 @@ public class Converter implements PreferenceChangedListener {
 	Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
 	private final Network network;
 	private boolean scaleMaxSpeed = false;
-	private static boolean keepPaths = Main.pref.getBoolean(
+	private boolean keepPaths = Main.pref.getBoolean(
 			"matsim_convertDefaults_keepPaths", false);
 
 	final List<OsmFilter> hierarchyLayers = new ArrayList<OsmFilter>();

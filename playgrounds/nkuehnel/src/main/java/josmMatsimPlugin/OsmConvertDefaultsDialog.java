@@ -32,7 +32,6 @@ public class OsmConvertDefaultsDialog extends JPanel {
 	private JOptionPane optionPane;
 	private Map<String, JComponent> input = new HashMap<String, JComponent>();
 	private GridBagConstraints c = new GridBagConstraints();
-	static JCheckBox keepPaths = new JCheckBox("keep paths");
 	
 	public OsmConvertDefaultsDialog() {
 		setLayout(new GridBagLayout());
@@ -80,26 +79,7 @@ public class OsmConvertDefaultsDialog extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				OsmConvertDefaults.reset();
 				fillValues();
-				keepPaths.setSelected(false);
 				Main.pref.put("matsim_convertDefaults_keepPaths", false);
-			}
-		});
-
-		keepPaths.setSelected(Main.pref.getBoolean("matsim_convertDefaults_keepPaths", false));
-		c.gridwidth = 1;
-		c.gridx = 4;
-		c.gridy = (OsmConvertDefaults.types.length + 1);
-		c.weightx = 1.;
-		add(keepPaths, c);
-		
-		keepPaths.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (keepPaths.isSelected()) {
-					Main.pref.put("matsim_convertDefaults_keepPaths", true);
-				} else {
-					Main.pref.put("matsim_convertDefaults_keepPaths", false);
-				}
 			}
 		});
 	}

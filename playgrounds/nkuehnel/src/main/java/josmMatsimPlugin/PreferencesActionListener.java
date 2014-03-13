@@ -70,6 +70,12 @@ public class PreferencesActionListener implements ActionListener,
 			} else {
 				Main.pref.put("matsim_showInternalIds", false);
 			}
+		} else if (e.getActionCommand().equals("keepPaths")) {
+			if (Preferences.keepPaths.isSelected()) {
+				Main.pref.put("matsim_convertDefaults_keepPaths", true);
+			} else {
+				Main.pref.put("matsim_convertDefaults_keepPaths", false);
+			}
 		}
 		
 	}

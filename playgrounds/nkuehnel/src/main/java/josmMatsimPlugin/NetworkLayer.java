@@ -139,5 +139,4 @@ public class NetworkLayer extends OsmDataLayer {
 
         return p;
     }
-  
 }

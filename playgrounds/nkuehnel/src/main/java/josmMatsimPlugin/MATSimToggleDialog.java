@@ -93,8 +93,6 @@ public class MATSimToggleDialog extends ToggleDialog implements
 			}
 		});
 		this.titleBar.add(networkAttributes);
-		
-
 	}
 
 	public void notifyDataChanged(NetworkLayer layer) {
