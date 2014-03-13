@@ -83,7 +83,7 @@ public class create_demo_parking {
 				
 				
 				
-				if (location_capacity>1000){
+				if (location_capacity>1000){ 	// Facilitys ohne capacity Angabe haben intern unendlich >> Bessere loesung suchen!
 					location_capacity=getAnzahlArbeiter(location_id.toString());
 					System.out.println(location_capacity);
 				}
@@ -94,19 +94,14 @@ public class create_demo_parking {
 				setCapacity(parking, location_type, location_capacity);
 				
 				// Facilitys ohne capacity Angabe haben intern unendlich >> Bessere loesung suchen!
-				if (parking.capacityEV>1000){
-					System.out.println("Null gesetzt");
-					parking.capacityEV=0;
-				}
-				if (parking.capacityNEV>1000){
-					parking.capacityNEV=0;
-				}
+
 				
 				
 				parking.setCoordinate(location_coord);
 				parking.facilityId=location_id.toString();
 				parking.id=i;
 				parking.type="private";
+				parking.facilityActType=location_type;
 				
 				parking_map.addParking(parking);
 				i++;
@@ -124,15 +119,7 @@ public class create_demo_parking {
 			double location_capacity = link_length/10;
 			Parking parking = new Parking();
 			setCapacity(parking, "Street", location_capacity);
-			
-			
-			if (parking.capacityEV>1000){
-				parking.capacityEV=100;
-			}
-			if (parking.capacityNEV>1000){
-				parking.capacityNEV=100;
-			}
-			
+
 			
 			parking.setCoordinate(link_coord);
 			parking.id=i;
