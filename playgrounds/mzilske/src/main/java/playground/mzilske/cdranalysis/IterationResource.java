@@ -28,7 +28,7 @@ public class IterationResource {
 
 	public Scenario getExperiencedPlansAndNetwork() {
 		Scenario baseScenario = getRun().getConfigAndNetwork();
-		new MatsimPopulationReader(baseScenario).readFile(wd + "/" + runId + "." + iteration + ".experienced_plans.xml.gz");
+		new MatsimPopulationReader(baseScenario).readFile(wd + "/" + iterationPrefix() + "experienced_plans.xml.gz");
 		return baseScenario;
 	}
 
@@ -40,11 +40,19 @@ public class IterationResource {
 		eventsManager.addHandler(events2Score);
 		new MatsimEventsReader(eventsManager).readFile(getEventsFileName());
 		events2Score.finish();
-		events2Score.writeExperiencedPlans(wd + "/" + runId + "." + iteration + ".experienced_plans.xml.gz");
+		events2Score.writeExperiencedPlans(wd + "/" + iterationPrefix() + "experienced_plans.xml.gz");
 	}
 
 	public String getEventsFileName() {
-		return wd + "/" + runId + "." + iteration + ".events.xml.gz";
+		return wd + "/" + iterationPrefix() + "events.xml.gz";
+	}
+	
+	private String iterationPrefix() {
+		if (runId == null) {
+			return iteration + ".";
+		} else {
+			return runId + "." + iteration + ".";
+		}
 	}
 
 }

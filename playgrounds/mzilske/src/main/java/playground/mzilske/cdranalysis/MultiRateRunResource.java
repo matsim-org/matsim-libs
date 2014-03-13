@@ -1,7 +1,9 @@
 package playground.mzilske.cdranalysis;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,7 +26,6 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -76,7 +77,7 @@ public class MultiRateRunResource {
 			runRate(scenario, rate);
 		}
 	}
-	
+
 	public void allRates() {
 		for (String rate : getRates()) {
 			rate(rate);
@@ -300,19 +301,17 @@ public class MultiRateRunResource {
 		try {
 			pw = new PrintWriter(file);
 			final Map<Id, Double> distancePerPersonBase = PowerPlans.travelledDistancePerPerson(baseScenario.getPopulation(), baseScenario.getNetwork());
-			pw.printf("person\tkilometers-base\tvariable\tvalue\tregime\n");
+			pw.printf("regime\trate\tperson\tkilometers-base\tkilometers\n");
 			for (String rate : getRates()) {
-				Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-				new MatsimPopulationReader(scenario).readFile(WD + "/rates/" + rate + "/ITERS/it.20/20.experienced_plans.xml.gz");
-				final Map<Id, Double> distancePerPerson = PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), baseScenario.getNetwork());
+				Scenario scenario = getRateRun(rate).getLastIteration().getExperiencedPlansAndNetwork();
+				final Map<Id, Double> distancePerPerson = PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), scenario.getNetwork());
 				for (Person person : baseScenario.getPopulation().getPersons().values()) {
-					pw.printf("%s\t%f\t%s\t%f\t%s\n", 
-							person.getId().toString(), 
+					pw.printf("%s\t%s\t%s\t%f\t%f\n", 
+							regime, rate, person.getId().toString(), 
 							zeroForNull(distancePerPersonBase.get(person.getId())),
-							rate,
-							zeroForNull(distancePerPerson.get(person.getId())),
-							regime);
+							zeroForNull(distancePerPerson.get(person.getId())));
 				}
+				pw.flush();
 			}
 		} catch (FileNotFoundException e) {
 			throw new UncheckedIOException(e);
@@ -343,6 +342,43 @@ public class MultiRateRunResource {
 			return 0.0;
 		}
 		return maybeDouble;
+	}
+
+	public void putPersonKilometers(final BufferedReader personKilometers) {
+		final String filename = WD + "/person-kilometers.txt";
+		FileIO.writeToFile(filename, new StreamingOutput() {
+			@Override
+			public void write(final PrintWriter pw) throws IOException {
+				FileIO.readFromInput(personKilometers, new Reading() {
+					@Override
+					public void read(BufferedReader br) throws IOException {
+						String line = br.readLine();
+						while (br != null) {
+							pw.println(line);
+						}
+					}	
+				});
+			}	
+		});
+	}
+	
+	public StreamingOutput getPersonKilometers() {
+		final String filename = WD + "/person-kilometers.txt";
+		return new StreamingOutput() {
+			@Override
+			public void write(final PrintWriter pw) throws IOException {
+				FileIO.readFromFile(filename, new Reading() {
+					@Override
+					public void read(BufferedReader br) throws IOException {
+						String line = br.readLine();
+						while (line != null) {
+							pw.println(line);
+							line = br.readLine();
+						}
+					}
+				});
+			}
+		};
 	}
 
 }
