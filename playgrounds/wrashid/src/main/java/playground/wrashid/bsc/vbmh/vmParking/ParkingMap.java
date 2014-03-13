@@ -40,7 +40,7 @@ public class ParkingMap {
 	}
 	public void clearSpots(){
 		for (Parking parking : parkings){
-			parking.createSpots();
+			parking.clearSpots();
 		}
 	}
 	

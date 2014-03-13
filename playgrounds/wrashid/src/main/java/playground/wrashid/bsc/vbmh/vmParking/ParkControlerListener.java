@@ -74,7 +74,8 @@ public class ParkControlerListener implements StartupListener, IterationEndsList
 		//VM_Score_Keeper Zuruecksetzen:
 		Map<Id, ? extends Person> population = event.getControler().getPopulation().getPersons();
 		for (Person person : population.values()){
-			person.getCustomAttributes().put("VMScoreKeeper", null);
+			//person.getCustomAttributes().put("VMScoreKeeper", null);
+			person.getCustomAttributes().remove("VMScoreKeeper");
 		}
 		
 		

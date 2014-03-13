@@ -70,6 +70,22 @@ public class Parking {
 	}
 	
 	public void clearSpots(){
+		if(spots == null){ return; }
+		for(ParkingSpot spot : spots){
+			spot.setTimeVehicleParked(1); // !! 
+
+			/*!!
+			 * Die Spots wurden teilweise nicht richtig zurueck gesetzt 
+			 * dardurch war die Parkzeit noch von der vorherigern Iteration drinnen
+			 * dardurch negative Dauer >> Postive Util fuer Parkzeit.
+			 * 
+			 * Eigentlich sollte Scorekeeper Entfernen und spot = null reichen ...
+			 * 
+			 * Es muss aber ueberprueft werden ob der Fehler jetzt wirklich ausgeschlossen ist.
+			 * 
+			 */
+			spot = null;
+		}
 		spots=null;
 	}
 	

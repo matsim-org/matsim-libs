@@ -49,8 +49,10 @@ public class PricingModels {
 		double price = 0;
 		ParkingPricingModel model = get_model(model_id);
 		if (ev){
+			
 			price = model.getPriceOfFirstMinuteEV() + duration * model.getPricePerMinuteEV();
 		} else {
+			System.out.println(model.getPricePerMinuteNEV());
 			price = model.getPriceOfFirstMinuteNEV() + duration * model.getPricePerMinuteNEV();
 		}
 			

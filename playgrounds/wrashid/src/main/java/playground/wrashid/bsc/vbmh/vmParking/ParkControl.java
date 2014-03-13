@@ -31,8 +31,9 @@ public class ParkControl {
 	int maxDistance = 2000; //Maximaler Umkreis in dem Parkplaetze gesucht werden
 	
 	//Zur berechnung des besten oeffentlichen Parkplatzes: (Negative Werte, hoechste Score gewinnt)
-	double betaMoney = -10; 
-	double betaDistance = -1; // !! Zweiphasige Kurve einbauen?
+	//werden jetzt beim startup() aus der Config geladen
+	double betaMoney; //= -10; 
+	double betaWalk; //= -1; // !! Zweiphasige Kurve einbauen?
 	
 	int countPrivate = 0;
 	int countPublic = 0;
@@ -50,6 +51,15 @@ public class ParkControl {
 	//--------------------------- S T A R T  U P---------------------------------------------
 	public int startup(String parkingFilename, String pricingFilename, Controler controller){
 		this.controller=controller;
+		
+		//Get Betas from Config
+		Map<String, String> planCalcParams = this.controller.getConfig().getModule("planCalcScore").getParams();
+		betaMoney=-Double.parseDouble(planCalcParams.get("marginalUtilityOfMoney")); //!! in Config positiver Wert >> stimmt das dann so?
+		betaWalk=Double.parseDouble(planCalcParams.get("traveling_walk"));
+		
+		System.out.println(betaMoney);
+		
+		
 		
 		//Parkplaetze Laden
 		File parkingfile = new File( parkingFilename );
@@ -116,7 +126,7 @@ public class ParkControl {
 			scorekeeper = new VMScoreKeeper();
 			personAttributes.put("VMScoreKeeper", scorekeeper);
 		}
-		scorekeeper.add(30);
+		scorekeeper.add(-30);
 		
 		phwriter.addAgentNotParked(Double.toString(this.time), personId.toString());
 		
@@ -136,7 +146,7 @@ public class ParkControl {
 			double distance = CoordUtils.calcDistance(this.cordinate, spot.parking.getCoordinate());
 			double pricem = spot.parkingPriceM;
 			double cost = pricing.calculateParkingPrice(1, false, (int) pricem);
-			score =  this.betaMoney*cost+this.betaDistance*distance;
+			score =  this.betaMoney*cost+this.betaWalk*distance;
 			//___
 
 			if(score > bestScore){
@@ -208,8 +218,13 @@ public class ParkControl {
 			
 			//kosten auf matsim util funktion
 			double duration=this.time-selectedSpot.getTimeVehicleParked(); //Parkzeit berechnen
+			System.out.println(duration);
+			
 			double payedParking = pricing.calculateParkingPrice(duration/60, false, selectedSpot.parkingPriceM); // !! EV Boolean anpassen
 			// System.out.println(payed_parking);
+			
+			System.out.println("bezahltes Parken (Score): "+payedParking*this.betaMoney);
+
 			
 			if (personAttributes.get("VMScoreKeeper")!= null){
 				scorekeeper = (VMScoreKeeper) personAttributes.get("VMScoreKeeper");
@@ -217,7 +232,7 @@ public class ParkControl {
 				scorekeeper = new VMScoreKeeper();
 				personAttributes.put("VMScoreKeeper", scorekeeper);
 			}
-			scorekeeper.add(payedParking);
+			scorekeeper.add(payedParking*this.betaMoney);
 		}
 		
 		
@@ -237,6 +252,17 @@ public class ParkControl {
 			phwriter.addParkingOccupied(selectedSpot.parking, Double.toString(this.time), personId.toString());
 		}
 		
+		VMScoreKeeper scorekeeper;
+		if (personAttributes.get("VMScoreKeeper")!= null){
+			scorekeeper = (VMScoreKeeper) personAttributes.get("VMScoreKeeper");
+		} else{
+			scorekeeper = new VMScoreKeeper();
+			personAttributes.put("VMScoreKeeper", scorekeeper);
+		}
+		double distance = CoordUtils.calcDistance(this.cordinate, selectedSpot.parking.getCoordinate());
+		double walkingTime = distance/(1000*4); //4 Km/h !!Gibt es den Wert in der Config?
+		System.out.println("Walking Score :"+betaWalk*walkingTime);
+		scorekeeper.add(betaWalk*walkingTime);
 		
 		return 1;
 	}

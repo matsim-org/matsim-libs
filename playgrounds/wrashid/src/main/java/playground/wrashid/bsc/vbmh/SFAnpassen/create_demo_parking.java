@@ -102,6 +102,7 @@ public class create_demo_parking {
 				parking.id=i;
 				parking.type="private";
 				parking.facilityActType=location_type;
+				parking.parkingPriceM=3;
 				
 				parking_map.addParking(parking);
 				i++;
