@@ -1,7 +1,7 @@
 package playground.wrashid.bsc.vbmh.SFAnpassen;
 
 import playground.wrashid.bsc.vbmh.vm_parking.Parking_Pricing_Model;
-import playground.wrashid.bsc.vbmh.vm_parking.Pricing_Models;
+import playground.wrashid.bsc.vbmh.vm_parking.PricingModels;
 import playground.wrashid.bsc.vbmh.vm_parking.Pricing_Models_Writer;
 
 public class create_demo_pricing_models {
@@ -10,7 +10,7 @@ public class create_demo_pricing_models {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 	
-		Pricing_Models pricing_models = new Pricing_Models();
+		PricingModels pricing_models = new PricingModels();
 		Pricing_Models_Writer writer = new Pricing_Models_Writer();
 		
 		

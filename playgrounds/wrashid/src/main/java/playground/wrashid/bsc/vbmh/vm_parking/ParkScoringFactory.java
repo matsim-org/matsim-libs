@@ -15,18 +15,18 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
  */
 
 
-public class Park_Scoring_Factory extends CharyparNagelScoringFunctionFactory {
+public class ParkScoringFactory extends CharyparNagelScoringFunctionFactory {
 
-	public Park_Scoring_Factory(PlanCalcScoreConfigGroup config, Network network) {
+	public ParkScoringFactory(PlanCalcScoreConfigGroup config, Network network) {
 		super(config, network);
 		// TODO Auto-generated constructor stub
 	}
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
 		SumScoringFunction scoringFunctionSum = (SumScoringFunction) super.createNewScoringFunction(person);
-		scoringFunctionSum.addScoringFunction(new Park_Scoring(person.getSelectedPlan()));
+		scoringFunctionSum.addScoringFunction(new ParkScoring(person.getSelectedPlan()));
 		//ScoringFunctionAccumulator scoringFunctionAccumulator = (ScoringFunctionAccumulator)super.createNewScoringFunction(plan);
-		//scoringFunctionAccumulator.addScoringFunction(new Park_Scoring());
+		//scoringFunctionAccumulator.addScoringFunction(new ParkScoring());
 		return scoringFunctionSum;
 	}
 

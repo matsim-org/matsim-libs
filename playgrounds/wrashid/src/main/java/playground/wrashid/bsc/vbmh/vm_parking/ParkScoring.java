@@ -14,12 +14,12 @@ import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
  */
 
 
-public class Park_Scoring implements BasicScoring  {
+public class ParkScoring implements BasicScoring  {
 	double score =0;
 	Plan plan = null;
 	double beta_money=-0.1; //!! Kommt auch in ParkControl vor >> In config auslagern?
 	VMScoreKeeper scorekeeper = null;
-	public Park_Scoring(Plan plan) {
+	public ParkScoring(Plan plan) {
 		super();
 		this.plan = plan;
 		// TODO Auto-generated constructor stub
@@ -28,8 +28,8 @@ public class Park_Scoring implements BasicScoring  {
 	@Override
 	public void finish() {
 		// TODO Auto-generated method stub
-		if(this.plan.getPerson().getCustomAttributes().get("VM_Score_Keeper")!=null){
-			scorekeeper = (VMScoreKeeper) this.plan.getPerson().getCustomAttributes().get("VM_Score_Keeper");
+		if(this.plan.getPerson().getCustomAttributes().get("VMScoreKeeper")!=null){
+			scorekeeper = (VMScoreKeeper) this.plan.getPerson().getCustomAttributes().get("VMScoreKeeper");
 			this.score=beta_money*scorekeeper.get_score();
 			System.out.println("Score Keeper geladen");
 		}
