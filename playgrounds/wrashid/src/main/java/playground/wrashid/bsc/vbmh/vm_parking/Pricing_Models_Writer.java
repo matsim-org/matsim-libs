@@ -15,10 +15,10 @@ import javax.xml.bind.Marshaller;
 
 
 public class Pricing_Models_Writer {
-	public int write(Pricing_Models models, String filename){
+	public int write(PricingModels models, String filename){
 		try{
 		File file = new File( filename );
-		JAXBContext context = JAXBContext.newInstance( Pricing_Models.class );
+		JAXBContext context = JAXBContext.newInstance( PricingModels.class );
 		Marshaller m = context.createMarshaller();
 		m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
 		m.marshal( models, file );}

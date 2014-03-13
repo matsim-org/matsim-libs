@@ -18,7 +18,7 @@ import java.io.IOException;
  */
 
 
-public class Park_History_Writer {
+public class ParkHistoryWriter {
 	String filename;
 	static File file;
 	static FileWriter fwriter;
@@ -26,9 +26,9 @@ public class Park_History_Writer {
 
 	public void start(String filename) {
 		this.filename = filename;
-		Park_History_Writer.file = new File(this.filename);
+		ParkHistoryWriter.file = new File(this.filename);
 		try {
-			Park_History_Writer.fwriter=new FileWriter(file);
+			ParkHistoryWriter.fwriter=new FileWriter(file);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -38,7 +38,7 @@ public class Park_History_Writer {
 	
 	public void end(){
 		try {
-			Park_History_Writer.fwriter.close();
+			ParkHistoryWriter.fwriter.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -46,17 +46,17 @@ public class Park_History_Writer {
 	}
 	void schreiben(String text){
 		try {
-			Park_History_Writer.fwriter.write(text);
+			ParkHistoryWriter.fwriter.write(text);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	public void add_parking_occupied(Parking parking, String time, String person){
+	public void addParkingOccupied(Parking parking, String time, String person){
 		schreiben("<parkevent time="+time+" Parkingid="+parking.id+" Parkingtype="+parking.type+" eventtype=occupied last_person="+person+">\n");
 	}
-	public void add_parking_availible(Parking parking, String time){
+	public void addParkingAvailible(Parking parking, String time){
 		schreiben("<parkevent time="+time+" Parkingid="+parking.id+" Parkingtype="+parking.type+" eventtype=availible>\n");
 	}
 	public void add_agent_not_parked(String time, String person){

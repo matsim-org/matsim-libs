@@ -21,17 +21,17 @@ import org.matsim.core.controler.listener.StartupListener;
  */
 
 
-public class Park_Controler_Listener implements StartupListener, IterationEndsListener, IterationStartsListener{
-	private Park_handler park_handler = new Park_handler();
+public class ParkControlerListener implements StartupListener, IterationEndsListener, IterationStartsListener{
+	private ParkHandler parkHandler = new ParkHandler();
 
-	public Park_handler getPark_handler() {
-		return park_handler;
+	public ParkHandler getParkHandler() {
+		return parkHandler;
 	}
 
 
 
-	public void setPark_handler(Park_handler park_handler) {
-		this.park_handler = park_handler;
+	public void setPark_handler(ParkHandler parkHandler) {
+		this.parkHandler = parkHandler;
 	}
 
 
@@ -41,12 +41,12 @@ public class Park_Controler_Listener implements StartupListener, IterationEndsLi
 		// TODO Auto-generated method stub
 		
 		//PH Writer beenden damit File geschlossen und geschrieben wird
-		Park_History_Writer phwriter = new Park_History_Writer();
+		ParkHistoryWriter phwriter = new ParkHistoryWriter();
 		phwriter.end();
 		
 		//Park Statistik Drucken und zuruecksetzen:
-		this.getPark_handler().park_control.print_statistics();
-		this.getPark_handler().park_control.reset_statistics();
+		this.getParkHandler().parkControl.printStatistics();
+		this.getParkHandler().parkControl.resetStatistics();
 	}
 	
 		
@@ -55,7 +55,7 @@ public class Park_Controler_Listener implements StartupListener, IterationEndsLi
 	public void notifyStartup(StartupEvent event) {
 		// TODO Auto-generated method stub
 		
-		event.getControler().getEvents().addHandler(getPark_handler());
+		event.getControler().getEvents().addHandler(getParkHandler());
 	}
 
 	@Override
@@ -63,18 +63,18 @@ public class Park_Controler_Listener implements StartupListener, IterationEndsLi
 		// TODO Auto-generated method stub
 		
 		//Park History Writer Starten: 
-		Park_History_Writer phwriter = new Park_History_Writer();
+		ParkHistoryWriter phwriter = new ParkHistoryWriter();
 		phwriter.start("output/test_outputs/test_parkhistory.xml"); // !! Pro Iteration neues File
 		
 		//Parkplaetze zuruecksetzen 
-		getPark_handler().park_control.parking_map.clearSpots();
-		getPark_handler().park_control.parking_map.createSpots();
+		getParkHandler().parkControl.parkingMap.clearSpots();
+		getParkHandler().parkControl.parkingMap.createSpots();
 		
 		
 		//VM_Score_Keeper Zuruecksetzen:
 		Map<Id, ? extends Person> population = event.getControler().getPopulation().getPersons();
 		for (Person person : population.values()){
-			person.getCustomAttributes().put("VM_Score_Keeper", null);
+			person.getCustomAttributes().put("VMScoreKeeper", null);
 		}
 		
 		

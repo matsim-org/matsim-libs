@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 
 @XmlRootElement
-public class Pricing_Models {
+public class PricingModels {
 	private static List<Parking_Pricing_Model> parkingprices = new LinkedList<Parking_Pricing_Model>();
 	
 	@XmlElement(name = "Parking_Pricing_Model")
@@ -45,7 +45,7 @@ public class Pricing_Models {
 		
 	}
 	
-	public double calculate_parking_price(double duration, boolean ev,int model_id){
+	public double calculateParkingPrice(double duration, boolean ev,int model_id){
 		double price = 0;
 		Parking_Pricing_Model model = get_model(model_id);
 		if (ev){

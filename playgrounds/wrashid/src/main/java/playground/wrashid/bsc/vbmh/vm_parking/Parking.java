@@ -32,7 +32,7 @@ public class Parking {
 	public String type;
 	public boolean evExklusive;
 	public double coordinateX, coordinateY;
-	public LinkedList <Parkingspot> spots;
+	public LinkedList <ParkingSpot> spots;
 ///*
 	@XmlTransient
 	public Coord getCoordinate(){
@@ -47,10 +47,10 @@ public class Parking {
 	}
 	
 	public void createSpots(){
-		spots= new LinkedList<Parkingspot>();
+		spots= new LinkedList<ParkingSpot>();
 		for (int i=0; i<capacityEV; i++){
-			Parkingspot parkingspot = new Parkingspot();
-			spots.add(parkingspot);
+			ParkingSpot parkingSpot = new ParkingSpot();
+			spots.add(parkingSpot);
 			spots.getLast().charge=true;
 			spots.getLast().chargingPriceM=this.chargingPriceM;
 			spots.getLast().chargingRate=this.chargingRate;
@@ -59,8 +59,8 @@ public class Parking {
 			spots.getLast().parking=this;
 		}
 		for (int i=0; i<capacityNEV; i++){
-			Parkingspot parkingspot = new Parkingspot();
-			spots.add(parkingspot);
+			ParkingSpot parkingSpot = new ParkingSpot();
+			spots.add(parkingSpot);
 			spots.getLast().charge=false;
 			spots.getLast().parkingPriceM=this.parkingPriceM;
 			spots.getLast().setOccupied(false);
@@ -72,8 +72,8 @@ public class Parking {
 		spots=null;
 	}
 	
-	public Parkingspot checkForFreeSpot(){
-		for(Parkingspot spot : spots){
+	public ParkingSpot checkForFreeSpot(){
+		for(ParkingSpot spot : spots){
 			//System.out.println("checke spot");
 			if (spot.isOccupied() == false){
 				return spot;

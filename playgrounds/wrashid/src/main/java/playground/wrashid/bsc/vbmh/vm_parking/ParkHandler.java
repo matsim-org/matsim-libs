@@ -17,16 +17,16 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 
 
 
-public class Park_handler implements ActivityEndEventHandler, ActivityStartEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler {
+public class ParkHandler implements ActivityEndEventHandler, ActivityStartEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler {
 
-	Park_Control park_control = new Park_Control();
+	ParkControl parkControl = new ParkControl();
 	
-	public Park_Control getPark_control() {
-		return park_control;
+	public ParkControl getPark_control() {
+		return parkControl;
 	}
 
-	public void setPark_control(Park_Control park_control) {
-		this.park_control = park_control;
+	public void setPark_control(ParkControl park_control) {
+		this.parkControl = park_control;
 	}
 
 	@Override
@@ -40,7 +40,7 @@ public class Park_handler implements ActivityEndEventHandler, ActivityStartEvent
 		// TODO Auto-generated method stub
 	//	if(event.getLegMode()=="car"){
 			if(!event.getActType().equals("ParkO")&&!event.getActType().equals("ParkP")){
-				park_control.park(event);
+				parkControl.park(event);
 			}
 	//	}
 		
@@ -62,7 +62,7 @@ public class Park_handler implements ActivityEndEventHandler, ActivityStartEvent
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		// TODO Auto-generated method stub
-		park_control.leave(event);
+		parkControl.leave(event);
 	}
 
 }

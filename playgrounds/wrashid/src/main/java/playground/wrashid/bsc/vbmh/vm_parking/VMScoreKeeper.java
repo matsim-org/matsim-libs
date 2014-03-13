@@ -10,7 +10,7 @@ package playground.wrashid.bsc.vbmh.vm_parking;
  */
 
 
-public class VM_Score_Keeper {
+public class VMScoreKeeper {
 	double score = 0;
 	
 	public void add(double add){
