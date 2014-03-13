@@ -42,4 +42,10 @@ public class Park_Scoring implements BasicScoring  {
 		return this.score;
 	}
 
+	@Override
+	public void reset() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
