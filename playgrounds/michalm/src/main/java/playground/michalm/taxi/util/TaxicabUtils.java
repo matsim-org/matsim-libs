@@ -25,6 +25,7 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
+import playground.michalm.taxi.scheduler.TaxiScheduler;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -39,12 +40,16 @@ public class TaxicabUtils
         }
     };
 
-    public static final Predicate<Vehicle> CAN_BE_SCHEDULED = new Predicate<Vehicle>() {
-        public boolean apply(Vehicle vehicle)
-        {
-            return canBeScheduled(vehicle);
-        }
-    };
+
+    public static Predicate<Vehicle> createCanBeScheduled(final TaxiScheduler scheduler)
+    {
+        return new Predicate<Vehicle>() {
+            public boolean apply(Vehicle vehicle)
+            {
+                return canBeScheduled(vehicle, scheduler);
+            }
+        };
+    }
 
 
     public static boolean isIdle(Vehicle vehicle)
@@ -62,15 +67,9 @@ public class TaxicabUtils
     }
 
 
-    public static boolean canBeScheduled(Vehicle vehicle)
+    public static boolean canBeScheduled(Vehicle vehicle, TaxiScheduler scheduler)
     {
-        Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(vehicle);
-
-        if (schedule.getStatus() != ScheduleStatus.STARTED) {
-            return false;
-        }
-
-        return Schedules.getLastTask(schedule).getTaxiTaskType() == TaxiTaskType.WAIT_STAY;
+        return scheduler.getEarliestIdleness(vehicle) != null;
     }
 
 

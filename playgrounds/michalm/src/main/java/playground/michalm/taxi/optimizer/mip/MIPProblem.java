@@ -84,7 +84,8 @@ public class MIPProblem
         }
 
         List<Vehicle> allVehs = optimConfig.context.getVrpData().getVehicles();
-        Iterable<Vehicle> filteredVehs = Iterables.filter(allVehs, TaxicabUtils.CAN_BE_SCHEDULED);
+        Iterable<Vehicle> filteredVehs = Iterables.filter(allVehs,
+                TaxicabUtils.createCanBeScheduled(optimConfig.scheduler));
         vehicles = Lists.newArrayList(filteredVehs);
 
         m = vehicles.size();
@@ -113,6 +114,7 @@ public class MIPProblem
 
             addVehToReqLinConstraint();
             addReqToReqLinConstraint();
+            model.update();
 
             findInitialSolution();
 
