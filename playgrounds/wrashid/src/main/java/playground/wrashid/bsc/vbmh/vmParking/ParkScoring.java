@@ -1,4 +1,4 @@
-package playground.wrashid.bsc.vbmh.vm_parking;
+package playground.wrashid.bsc.vbmh.vmParking;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.scoring.SumScoringFunction.BasicScoring;

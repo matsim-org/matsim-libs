@@ -5,8 +5,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 
-import playground.wrashid.bsc.vbmh.vm_parking.ParkControlerListener;
-import playground.wrashid.bsc.vbmh.vm_parking.ParkScoringFactory;
+import playground.wrashid.bsc.vbmh.vmParking.ParkControlerListener;
+import playground.wrashid.bsc.vbmh.vmParking.ParkScoringFactory;
 
 
 public class SFControler1 {

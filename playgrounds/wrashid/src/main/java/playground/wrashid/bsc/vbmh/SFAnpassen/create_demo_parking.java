@@ -22,9 +22,9 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.wrashid.bsc.vbmh.vm_parking.Parking;
-import playground.wrashid.bsc.vbmh.vm_parking.ParkingMap;
-import playground.wrashid.bsc.vbmh.vm_parking.ParkingWriter;
+import playground.wrashid.bsc.vbmh.vmParking.Parking;
+import playground.wrashid.bsc.vbmh.vmParking.ParkingMap;
+import playground.wrashid.bsc.vbmh.vmParking.ParkingWriter;
 public class create_demo_parking {
 	static HashMap <String,Double> Panteile = new HashMap<String,Double>();	//Anzahl Parkplaetze / what ever nach P typ
 	static HashMap <String,Double> EVanteile = new HashMap<String,Double>(); //Anteil EV Nach P Typ

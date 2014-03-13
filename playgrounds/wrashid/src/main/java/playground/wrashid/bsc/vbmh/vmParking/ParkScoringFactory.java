@@ -1,4 +1,4 @@
-package playground.wrashid.bsc.vbmh.vm_parking;
+package playground.wrashid.bsc.vbmh.vmParking;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;

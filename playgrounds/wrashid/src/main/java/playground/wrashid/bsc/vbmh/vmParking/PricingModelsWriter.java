@@ -1,6 +1,4 @@
-package playground.wrashid.bsc.vbmh.vm_parking;
-
-
+package playground.wrashid.bsc.vbmh.vmParking;
 
 import java.io.File;
 
@@ -8,8 +6,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
 /**
- * Does some jaxb magic to write parkings into a xml file
- * 
+ * Writes Pricing Models using jaxb
  * 
  * 
  * @author Valentin Bemetz & Moritz Hohenfellner
@@ -17,14 +14,14 @@ import javax.xml.bind.Marshaller;
  */
 
 
-public class ParkingWriter {
-	public int write(ParkingMap parkingMap, String filename){
+public class PricingModelsWriter {
+	public int write(PricingModels models, String filename){
 		try{
 		File file = new File( filename );
-		JAXBContext context = JAXBContext.newInstance( ParkingMap.class );
+		JAXBContext context = JAXBContext.newInstance( PricingModels.class );
 		Marshaller m = context.createMarshaller();
 		m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
-		m.marshal( parkingMap, file );}
+		m.marshal( models, file );}
 		catch (Exception e){
 			System.out.println(e.toString());
 			System.out.println(e.getMessage());

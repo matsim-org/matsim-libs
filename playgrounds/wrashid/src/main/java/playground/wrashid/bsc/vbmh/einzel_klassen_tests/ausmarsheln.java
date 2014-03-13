@@ -4,7 +4,7 @@ import java.io.File;
 
 import javax.xml.bind.JAXB;
 
-import playground.wrashid.bsc.vbmh.vm_parking.ParkingMap;
+import playground.wrashid.bsc.vbmh.vmParking.ParkingMap;
 
 public class ausmarsheln {
 

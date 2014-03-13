@@ -1,6 +1,6 @@
 package playground.wrashid.bsc.vbmh.einzel_klassen_tests;
 
-import playground.wrashid.bsc.vbmh.vm_parking.ParkHistoryWriter;
+import playground.wrashid.bsc.vbmh.vmParking.ParkHistoryWriter;
 
 public class Park_hist_writer_test {
 	public static void main(String[] args){

@@ -1,4 +1,4 @@
-package playground.wrashid.bsc.vbmh.vm_parking;
+package playground.wrashid.bsc.vbmh.vmParking;
 
 public class ParkingSpot {
 	boolean charge, evExclusive;

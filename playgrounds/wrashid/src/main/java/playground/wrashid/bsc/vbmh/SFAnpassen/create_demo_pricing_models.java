@@ -1,8 +1,8 @@
 package playground.wrashid.bsc.vbmh.SFAnpassen;
 
-import playground.wrashid.bsc.vbmh.vm_parking.ParkingPricingModel;
-import playground.wrashid.bsc.vbmh.vm_parking.PricingModels;
-import playground.wrashid.bsc.vbmh.vm_parking.PricingModelsWriter;
+import playground.wrashid.bsc.vbmh.vmParking.ParkingPricingModel;
+import playground.wrashid.bsc.vbmh.vmParking.PricingModels;
+import playground.wrashid.bsc.vbmh.vmParking.PricingModelsWriter;
 
 public class create_demo_pricing_models {
 	

@@ -1,4 +1,4 @@
-package playground.wrashid.bsc.vbmh.vm_parking;
+package playground.wrashid.bsc.vbmh.vmParking;
 
 /**
  * Is added as an agents Attribute to keep for example the money which is paid for parking.
