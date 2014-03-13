@@ -17,6 +17,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -34,6 +35,8 @@ public class create_demo_parking {
 		Panteile.put("home", 1.0);
 		EVanteile.put("home", 0.0);
 		
+		
+		// Alle folgenden relativ zu Agents die in der Facility arbeiten
 		Panteile.put("work", 0.5);
 		EVanteile.put("work", 0.05);
 		
@@ -58,6 +61,7 @@ public class create_demo_parking {
 	
 		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("input/SF/config_SF_1.xml"));
 		
+		countEmployees();
 		
 		// P R I V A T E --------------------------------------------
 		
@@ -80,6 +84,7 @@ public class create_demo_parking {
 				
 				
 				if (location_capacity>1000){
+					location_capacity=getAnzahlArbeiter(location_id.toString());
 					System.out.println(location_capacity);
 				}
 				
@@ -163,23 +168,47 @@ public class create_demo_parking {
 		
 	}
 	
-	static int countEmployees(){
-		int anzahl=0;
+	
+	static int getAnzahlArbeiter(String facId){
+		if(anzahlArbeiter.containsKey(facId)){
+			return anzahlArbeiter.get(facId);
+		}else{
+			return 0;
+		}
+		
+	}
+	
+	
+	
+	static void countEmployees(){
+		
 		Collection<? extends Person> personen = scenario.getPopulation().getPersons().values();
 		
 		for (Person person : personen){
 			for(Plan plan : person.getPlans()){ 
 				PlanImpl planImpl = (PlanImpl) plan;
 				for(PlanElement element : planImpl.getPlanElements()){
-					System.out.println(element.getClass());
-					
+					if(element.getClass()==ActivityImpl.class){
+						ActivityImpl actImpl = (ActivityImpl) element;
+						if(actImpl.getType()=="work"){
+							String facId = actImpl.getFacilityId().toString();
+							if(anzahlArbeiter.containsKey(facId)){
+								int Anzahl = anzahlArbeiter.get(facId);
+								Anzahl++;
+								anzahlArbeiter.put(facId, Anzahl);
+								//System.out.print("Arbeiter plus eins");
+							}else{
+								anzahlArbeiter.put(facId, 1);
+							}
+						}
+					}
 				}
 			}
 			
 			
 		}
 		
-		return anzahl;
+		
 	}
 	
 
