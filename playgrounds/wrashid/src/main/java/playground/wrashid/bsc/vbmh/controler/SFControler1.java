@@ -5,8 +5,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 
-import playground.wrashid.bsc.vbmh.vm_parking.Park_Controler_Listener;
-import playground.wrashid.bsc.vbmh.vm_parking.Park_Scoring_Factory;
+import playground.wrashid.bsc.vbmh.vm_parking.ParkControlerListener;
+import playground.wrashid.bsc.vbmh.vm_parking.ParkScoringFactory;
 
 
 public class SFControler1 {
@@ -21,12 +21,12 @@ public class SFControler1 {
 		Config config = ConfigUtils.loadConfig(args[0]);
 		Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
-		Park_Controler_Listener parklistener = new Park_Controler_Listener();
-		parklistener.getPark_handler().getPark_control().startup(parking_filename, pricing_filename, controler);
+		ParkControlerListener parklistener = new ParkControlerListener();
+		parklistener.getParkHandler().getPark_control().startup(parking_filename, pricing_filename, controler);
 		controler.addControlerListener(parklistener);
 		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();
-		Park_Scoring_Factory factory = new Park_Scoring_Factory(planCalcScoreConfigGroup, controler.getNetwork());
+		ParkScoringFactory factory = new ParkScoringFactory(planCalcScoreConfigGroup, controler.getNetwork());
 		controler.setScoringFunctionFactory(factory);
 		
 		controler.run();
