@@ -29,6 +29,7 @@ public class Parking {
 	public long capacityNEV;
 	public int chargingRate, parkingPriceM, chargingPriceM;
 	public String facilityId;
+	public String facilityActType;
 	public String type;
 	public boolean evExklusive;
 	public double coordinateX, coordinateY;
