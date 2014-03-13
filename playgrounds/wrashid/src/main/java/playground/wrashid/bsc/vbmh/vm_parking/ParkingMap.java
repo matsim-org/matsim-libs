@@ -35,12 +35,12 @@ public class ParkingMap {
 	
 	public void createSpots(){
 		for (Parking parking : parkings){
-			parking.create_spots();
+			parking.createSpots();
 		}
 	}
 	public void clearSpots(){
 		for (Parking parking : parkings){
-			parking.create_spots();
+			parking.createSpots();
 		}
 	}
 	

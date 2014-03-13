@@ -23,7 +23,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.bsc.vbmh.vm_parking.Parking;
 import playground.wrashid.bsc.vbmh.vm_parking.ParkingMap;
-import playground.wrashid.bsc.vbmh.vm_parking.Parking_writer;
+import playground.wrashid.bsc.vbmh.vm_parking.ParkingWriter;
 public class create_demo_parking {
 	static HashMap <String,Double> Panteile = new HashMap<String,Double>();	//Anzahl Parkplaetze / what ever nach P typ
 	static HashMap <String,Double> EVanteile = new HashMap<String,Double>(); //Anteil EV Nach P Typ
@@ -53,7 +53,7 @@ public class create_demo_parking {
 		int i = 0;
 		double zufallsz;
 		ParkingMap parking_map = new ParkingMap();
-		Parking_writer writer = new Parking_writer();
+		ParkingWriter writer = new ParkingWriter();
 		Random zufall = new Random();
 	
 		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("input/SF/config_SF_1.xml"));
@@ -89,17 +89,17 @@ public class create_demo_parking {
 				setCapacity(parking, location_type, location_capacity);
 				
 				// Facilitys ohne capacity Angabe haben intern unendlich >> Bessere loesung suchen!
-				if (parking.capacity_ev>1000){
+				if (parking.capacityEV>1000){
 					System.out.println("Null gesetzt");
-					parking.capacity_ev=0;
+					parking.capacityEV=0;
 				}
-				if (parking.capacity_nev>1000){
-					parking.capacity_nev=0;
+				if (parking.capacityNEV>1000){
+					parking.capacityNEV=0;
 				}
 				
 				
-				parking.set_coordinate(location_coord);
-				parking.facility_id=location_id.toString();
+				parking.setCoordinate(location_coord);
+				parking.facilityId=location_id.toString();
 				parking.id=i;
 				parking.type="private";
 				
@@ -121,22 +121,22 @@ public class create_demo_parking {
 			setCapacity(parking, "Street", location_capacity);
 			
 			
-			if (parking.capacity_ev>1000){
-				parking.capacity_ev=100;
+			if (parking.capacityEV>1000){
+				parking.capacityEV=100;
 			}
-			if (parking.capacity_nev>1000){
-				parking.capacity_nev=100;
+			if (parking.capacityNEV>1000){
+				parking.capacityNEV=100;
 			}
 			
 			
-			parking.set_coordinate(link_coord);
+			parking.setCoordinate(link_coord);
 			parking.id=i;
 			parking.type="public";
 			zufallsz=zufall.nextDouble();
 			if (zufallsz<0.2){
-				parking.parking_pricem=0;
+				parking.parkingPriceM=0;
 			} else{
-				parking.parking_pricem=3;
+				parking.parkingPriceM=3;
 			}
 				
 			parking_map.addParking(parking);
@@ -157,8 +157,8 @@ public class create_demo_parking {
 	}
 	
 	static void setCapacity(Parking parking, String location_type, double location_capacity){
-		parking.capacity_ev=Math.round(location_capacity * Panteile.get(location_type) * EVanteile.get(location_type));
-		parking.capacity_nev=Math.round(location_capacity * Panteile.get(location_type) * (1-EVanteile.get(location_type)));
+		parking.capacityEV=Math.round(location_capacity * Panteile.get(location_type) * EVanteile.get(location_type));
+		parking.capacityNEV=Math.round(location_capacity * Panteile.get(location_type) * (1-EVanteile.get(location_type)));
 		
 		
 	}

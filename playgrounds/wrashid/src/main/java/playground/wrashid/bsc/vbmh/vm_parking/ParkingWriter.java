@@ -17,14 +17,14 @@ import javax.xml.bind.Marshaller;
  */
 
 
-public class Parking_writer {
-	public int write(ParkingMap parking_map, String filename){
+public class ParkingWriter {
+	public int write(ParkingMap parkingMap, String filename){
 		try{
 		File file = new File( filename );
 		JAXBContext context = JAXBContext.newInstance( ParkingMap.class );
 		Marshaller m = context.createMarshaller();
 		m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
-		m.marshal( parking_map, file );}
+		m.marshal( parkingMap, file );}
 		catch (Exception e){
 			System.out.println(e.toString());
 			System.out.println(e.getMessage());

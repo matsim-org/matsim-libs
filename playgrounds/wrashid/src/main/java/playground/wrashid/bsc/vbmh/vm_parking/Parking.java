@@ -25,54 +25,54 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 public class Parking {
 	public @XmlAttribute int id;
-	public long capacity_ev;
-	public long capacity_nev;
-	public int charging_rate, parking_pricem, charging_pricem;
-	public String facility_id;
+	public long capacityEV;
+	public long capacityNEV;
+	public int chargingRate, parkingPriceM, chargingPriceM;
+	public String facilityId;
 	public String type;
-	public boolean ev_exklusive;
-	public double coordinate_x, coordinate_y;
+	public boolean evExklusive;
+	public double coordinateX, coordinateY;
 	public LinkedList <Parkingspot> spots;
 ///*
 	@XmlTransient
-	public Coord get_coordinate(){
-		Coord coordinate = new CoordImpl(coordinate_x, coordinate_y);
+	public Coord getCoordinate(){
+		Coord coordinate = new CoordImpl(coordinateX, coordinateY);
 		return coordinate;
 	}//*/
 	
-	public void set_coordinate(Coord coordinate){
-		this.coordinate_x=coordinate.getX();
-		this.coordinate_y=coordinate.getY();
+	public void setCoordinate(Coord coordinate){
+		this.coordinateX=coordinate.getX();
+		this.coordinateY=coordinate.getY();
 		coordinate = null;
 	}
 	
-	public void create_spots(){
+	public void createSpots(){
 		spots= new LinkedList<Parkingspot>();
-		for (int i=0; i<capacity_ev; i++){
+		for (int i=0; i<capacityEV; i++){
 			Parkingspot parkingspot = new Parkingspot();
 			spots.add(parkingspot);
 			spots.getLast().charge=true;
-			spots.getLast().charging_pricem=this.charging_pricem;
-			spots.getLast().charging_rate=this.charging_rate;
-			spots.getLast().parking_pricem=this.parking_pricem;
+			spots.getLast().chargingPriceM=this.chargingPriceM;
+			spots.getLast().chargingRate=this.chargingRate;
+			spots.getLast().parkingPriceM=this.parkingPriceM;
 			spots.getLast().setOccupied(false);
 			spots.getLast().parking=this;
 		}
-		for (int i=0; i<capacity_nev; i++){
+		for (int i=0; i<capacityNEV; i++){
 			Parkingspot parkingspot = new Parkingspot();
 			spots.add(parkingspot);
 			spots.getLast().charge=false;
-			spots.getLast().parking_pricem=this.parking_pricem;
+			spots.getLast().parkingPriceM=this.parkingPriceM;
 			spots.getLast().setOccupied(false);
 			spots.getLast().parking=this;
 		}
 	}
 	
-	public void clear_spots(){
+	public void clearSpots(){
 		spots=null;
 	}
 	
-	public Parkingspot check_for_free_spot(){
+	public Parkingspot checkForFreeSpot(){
 		for(Parkingspot spot : spots){
 			//System.out.println("checke spot");
 			if (spot.isOccupied() == false){

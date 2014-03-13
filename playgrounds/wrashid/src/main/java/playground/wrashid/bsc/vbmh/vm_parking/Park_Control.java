@@ -133,8 +133,8 @@ public class Park_Control {
 		best_spot=null;
 		for (Parkingspot spot : spots_in_area){
 			// SCORE
-			double distance = CoordUtils.calcDistance(this.cordinate, spot.parking.get_coordinate());
-			double pricem = spot.parking_pricem;
+			double distance = CoordUtils.calcDistance(this.cordinate, spot.parking.getCoordinate());
+			double pricem = spot.parkingPriceM;
 			double cost = pricing.calculate_parking_price(1, false, (int) pricem);
 			score =  this.beta_money*cost+this.beta_distance*distance;
 			//___
@@ -154,10 +154,10 @@ public class Park_Control {
 		// !! Zur Beschleunigung Map erstellen ? <facility ID, Private Parking> ?
 		for (Parking parking : parking_map.getParkings()) {
 			// System.out.println("Suche Parking mit passender facility ID");
-			if(parking.facility_id!=null){ //Es gibt datensaetze ohne Facility ID >> Sonst Nullpointer
-				if (parking.facility_id.equals(facility_id)) {
+			if(parking.facilityId!=null){ //Es gibt datensaetze ohne Facility ID >> Sonst Nullpointer
+				if (parking.facilityId.equals(facility_id)) {
 					//System.out.println("checke Parking");
-					Parkingspot selected_spot = parking.check_for_free_spot(); //Gibt null oder einen freien Platz zurueck
+					Parkingspot selected_spot = parking.checkForFreeSpot(); //Gibt null oder einen freien Platz zurueck
 					if (selected_spot != null) {
 						return selected_spot;
 					}
@@ -174,9 +174,9 @@ public class Park_Control {
 		for (Parking parking : parking_map.getParkings()) {
 			if (parking.type.equals("public")) {
 				double distance = CoordUtils.calcDistance(coord,
-						parking.get_coordinate());
+						parking.getCoordinate());
 				if (distance < max_distance) {
-					Parkingspot spot = parking.check_for_free_spot();
+					Parkingspot spot = parking.checkForFreeSpot();
 					if (spot != null) {
 						list.add(spot);
 					}
@@ -201,14 +201,14 @@ public class Park_Control {
 		if(person_attributes.get("selected_parkingspot")!=null){
 			selected_spot = (Parkingspot) person_attributes.get("selected_parkingspot");
 			person_attributes.remove("selected_parkingspot");
-			if(selected_spot.parking.check_for_free_spot()==null){ //Sinde alle anderen Plaetze belegt? Dann von Besetzt >> Frei
+			if(selected_spot.parking.checkForFreeSpot()==null){ //Sinde alle anderen Plaetze belegt? Dann von Besetzt >> Frei
 				phwriter.add_parking_availible(selected_spot.parking, Double.toString(event.getTime()));
 			}
 			selected_spot.setOccupied(false); //Platz freigeben
 			
 			//kosten auf matsim util funktion
 			double duration=this.time-selected_spot.getTime_vehicle_parked(); //Parkzeit berechnen
-			double payed_parking = pricing.calculate_parking_price(duration/60, false, selected_spot.parking_pricem); // !! EV Boolean anpassen
+			double payed_parking = pricing.calculate_parking_price(duration/60, false, selected_spot.parkingPriceM); // !! EV Boolean anpassen
 			// System.out.println(payed_parking);
 			
 			if (person_attributes.get("VM_Score_Keeper")!= null){
@@ -233,7 +233,7 @@ public class Park_Control {
 		selected_spot_to_set.setOccupied(true);
 		selected_spot_to_set.setTime_vehicle_parked(this.time);
 		
-		if(selected_spot.parking.check_for_free_spot()==null){
+		if(selected_spot.parking.checkForFreeSpot()==null){
 			phwriter.add_parking_occupied(selected_spot.parking, Double.toString(this.time), person_id.toString());
 		}
 		
