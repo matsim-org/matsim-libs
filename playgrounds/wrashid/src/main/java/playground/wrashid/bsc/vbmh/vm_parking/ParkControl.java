@@ -229,7 +229,7 @@ public class ParkControl {
 		Person person = controller.getPopulation().getPersons().get(personId);
 		Map<String, Object> personAttributes = person.getCustomAttributes();
 		personAttributes.put("selectedParkingspot", selectedSpot);
-		ParkingSpot selectedSpotToSet = (ParkingSpot) personAttributes.get("selected_parkingspot");
+		ParkingSpot selectedSpotToSet = (ParkingSpot) personAttributes.get("selectedParkingspot");
 		selectedSpotToSet.setOccupied(true);
 		selectedSpotToSet.setTimeVehicleParked(this.time);
 		
