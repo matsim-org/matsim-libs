@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.WindowConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -37,7 +41,9 @@ import org.openstreetmap.josm.data.Preferences.PreferenceChangedListener;
 import org.openstreetmap.josm.data.SelectionChangedListener;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
+import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.data.osm.WaySegment;
 import org.openstreetmap.josm.gui.MapView.LayerChangeListener;
 import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
 import org.openstreetmap.josm.gui.layer.Layer;
@@ -45,7 +51,7 @@ import org.openstreetmap.josm.io.FileExporter;
 import org.openstreetmap.josm.tools.ImageProvider;
 
 public class MATSimToggleDialog extends ToggleDialog implements
-		LayerChangeListener, SelectionChangedListener, PreferenceChangedListener {
+		LayerChangeListener, PreferenceChangedListener {
 	private JTable table;
 	private NetworkLayer layer;
 	private MATSimTableModel tableModel;
@@ -56,16 +62,14 @@ public class MATSimToggleDialog extends ToggleDialog implements
 	public MATSimToggleDialog() {
 		super("Links/Nodes", "logo.png", "Links/Nodes", null, 150, true,
 				Preferences.class);
-		DataSet.addSelectionListener(this);
 		Main.pref.addPreferenceChangeListener(this);
 
 		exporterCopy.addAll(ExtensionFileFilter.exporters);
 
 		table = new JTable();
 		table.setDefaultRenderer(Object.class, new MATSimTableRenderer());
-		table.setEnabled(false);
 		table.setAutoCreateRowSorter(true);
-		
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		JScrollPane tableContainer = new JScrollPane(table);
 		createLayout(tableContainer, false, null);
 
@@ -130,27 +134,6 @@ public class MATSimToggleDialog extends ToggleDialog implements
 	}
 
 	@Override
-	public void selectionChanged(Collection<? extends OsmPrimitive> primitives) {
-		if (layer == null) {
-			// active layer has nothing to do with MATSim
-			return;
-		}
-		table.clearSelection();
-		for (OsmPrimitive prim : primitives) {
-			if (prim instanceof Way) {
-				if (layer.getWay2Links().get((Way) prim) != null) {
-					List<Link> links = layer.getWay2Links().get((Way) prim);
-					for (Link link : links) {
-						int rowIndex = ((MATSimTableModel) table.getModel())
-								.getRowIndexFor(link);
-						table.addRowSelectionInterval(rowIndex, rowIndex);
-					}
-				}
-			}
-		}
-	}
-	
-	@Override
 	public void preferenceChanged(PreferenceChangeEvent e) {
 		if (e.getKey().equalsIgnoreCase("matsim_showInternalIds")) {
 			checkInternalIdColumn();
@@ -179,8 +162,8 @@ public class MATSimToggleDialog extends ToggleDialog implements
 			return tableCellRendererComponent;
 		}
 	}
-
-	private class MATSimTableModel extends AbstractTableModel {
+	
+	private class MATSimTableModel extends AbstractTableModel implements SelectionChangedListener, ListSelectionListener {
 
 		private String[] columnNames = { "id", "internal-id", "length",
 				"freespeed", "capacity", "permlanes" };
@@ -188,16 +171,15 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		private Network network;
 
 		private Map<Id, Integer> link2rowIndex;
-
+		
 		private ArrayList<Id> links;
+		
 
 		MATSimTableModel(Network network) {
 			this.network = network;
-			this.links = new ArrayList<Id>(network.getLinks().keySet());
-			this.link2rowIndex = new HashMap<Id, Integer>();
-			for (int i = 0; i < links.size(); i++) {
-				link2rowIndex.put(links.get(i), i);
-			}
+			this.links = new ArrayList<Id>();
+			DataSet.addSelectionListener(this);
+			table.getSelectionModel().addListSelectionListener(this);
 		}
 
 		@Override
@@ -224,11 +206,6 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		}
 
 		public void networkChanged() {
-			this.links = new ArrayList<Id>(network.getLinks().keySet());
-			this.link2rowIndex = new HashMap<Id, Integer>();
-			for (int i = 0; i < links.size(); i++) {
-				link2rowIndex.put(links.get(i), i);
-			}
 			fireTableDataChanged();
 		}
 
@@ -239,7 +216,8 @@ public class MATSimToggleDialog extends ToggleDialog implements
 
 		@Override
 		public int getRowCount() {
-			return network.getLinks().size();
+//			return network.getLinks().size();
+			return links.size();
 		}
 
 		public int getRowIndexFor(Link link) {
@@ -264,6 +242,44 @@ public class MATSimToggleDialog extends ToggleDialog implements
 			}
 			throw new RuntimeException();
 		}
+
+		@Override
+		public void selectionChanged(
+				Collection<? extends OsmPrimitive> newSelection) {
+			layer.data.clearHighlightedWaySegments();
+			layer.data.clearHighlightedVirtualNodes();
+			this.links = new ArrayList<Id>();
+			for (OsmPrimitive primitive: newSelection) {
+				if (primitive instanceof Way) {
+					if (layer.getWay2Links().containsKey(primitive)) {
+						for (Link link: layer.getWay2Links().get(primitive)) {
+							links.add(link.getId());
+						}
+					}
+				}
+			}
+			this.link2rowIndex = new HashMap<Id, Integer>();
+			for (int i = 0; i < links.size(); i++) {
+				link2rowIndex.put(links.get(i), i);
+			}
+			fireTableDataChanged();
+			
+		}
+		
+		
+		@Override
+		public void valueChanged(ListSelectionEvent e) {
+			layer.data.clearHighlightedWaySegments();
+			layer.data.clearHighlightedVirtualNodes();
+			if(!e.getValueIsAdjusting()) {
+				int[] rows = table.getSelectedRows();
+				for (int i = 0; i < rows.length; i++) {
+					long id = Long.parseLong((String)this.getValueAt(rows[i], 1));
+					((Way)layer.data.getPrimitiveById(id, OsmPrimitiveType.WAY)).setHighlighted(true);
+				}
+			}
+		}
+		
 	}
 
 	private class NetworkAttributes extends JPanel {
