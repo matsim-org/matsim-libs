@@ -42,6 +42,8 @@ public class TripDistanceMean extends AbstractTrajectoryProperty {
 
 	private final String purpose;
 	
+	private String ignorePurpose = "pt interaction";
+	
 	private final DistanceCalculator calculator;
 	
 	private final ActivityFacilities facilities;
@@ -51,9 +53,14 @@ public class TripDistanceMean extends AbstractTrajectoryProperty {
 	}
 	
 	public TripDistanceMean(String purpose, ActivityFacilities facilities, DistanceCalculator calculator) {
+		this(purpose, facilities, calculator, null);
+	}
+	
+	public TripDistanceMean(String purpose, ActivityFacilities facilities, DistanceCalculator calculator, String ignore) {
 		this.purpose = purpose;
 		this.facilities = facilities;
 		this.calculator = calculator;
+//		this.ignorePurpose = ignore;
 	}
 	
 	@Override
@@ -66,11 +73,22 @@ public class TripDistanceMean extends AbstractTrajectoryProperty {
 			for(int i = 2; i < trajectory.getElements().size(); i += 2) {
 				Activity destination = (Activity) trajectory.getElements().get(i);
 				
+				if(!destination.getType().equals(ignorePurpose)) {
 				if(purpose == null || destination.getType().equals(purpose)) {
 					Id id = destination.getFacilityId();
 					Coord dest = facilities.getFacilities().get(id).getCoord();
 					
-					Activity origin = (Activity) trajectory.getElements().get(i - 2);
+					Activity origin = null;
+					boolean valid = false;
+					int k = i;
+					while(!valid) {
+						origin = (Activity) trajectory.getElements().get(k - 2);
+						if(!origin.getType().equals(ignorePurpose))
+							valid = true;
+						else
+							k -= 2;
+					}
+					
 					id = origin.getFacilityId();
 					ActivityFacility fac = facilities.getFacilities().get(id);
 					Coord source = fac.getCoord();
@@ -85,6 +103,7 @@ public class TripDistanceMean extends AbstractTrajectoryProperty {
 						e.printStackTrace();
 					}
 					}
+				}
 				}
 			}
 			if (cnt > 0) {
