@@ -10,7 +10,7 @@ public class EVList {
 	private HashMap <String, EV> ownerMap = new HashMap<String, EV>();
 	
 	public void addEV(EV ev){
-		ownerMap.put(ev.ownerPersonId, ev);	
+		ownerMap.put(ev.getOwnerPersonId(), ev);	
 	}
 
 	@XmlElement(name = "EV")

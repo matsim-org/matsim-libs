@@ -15,6 +15,7 @@ public class EVListWriter {
 			Marshaller m = context.createMarshaller();
 			m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
 			m.marshal( evList, file );
+			
 			}
 		catch (Exception e){
 			System.out.println(e.toString());

@@ -22,8 +22,8 @@ public class evsErzeugen {
 		for(Person person : scenario.getPopulation().getPersons().values()){
 			if(zufall.nextDouble()<probabilityOfEVOwnership(person)){
 				EV ev = new EV();
-				ev.id=Integer.toString(i);
-				ev.ownerPersonId=person.getId().toString();
+				ev.setId(Integer.toString(i));
+				ev.setOwnerPersonId(person.getId().toString());
 				ev.batteryCapacity=1000;
 				evList.addEV(ev);
 				System.out.println(i);
