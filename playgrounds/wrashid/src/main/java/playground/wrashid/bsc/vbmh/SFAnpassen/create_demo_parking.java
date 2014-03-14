@@ -59,7 +59,7 @@ public class create_demo_parking {
 		ParkingWriter writer = new ParkingWriter();
 		Random zufall = new Random();
 	
-		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("input/SF/config_SF_1.xml"));
+		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("input/SF/config_SF_3.xml"));
 		
 		countEmployees();
 		
