@@ -95,11 +95,7 @@ public abstract class MarginalCongestionHandler implements
 		if (this.scenario.getNetwork().getCapacityPeriod() != 3600.) {
 			throw new RuntimeException("Expecting a capacity period of 1h. Aborting...");
 		}
-		
-		if (this.scenario.getConfig().qsim().isInsertingWaitingVehiclesBeforeDrivingVehicles() != true) {
-			throw new RuntimeException("Expecting the qsim to insert waiting vehicles before driving vehicles. Aborting...");
-		}
-		
+			
 		if (this.scenario.getConfig().qsim().getFlowCapFactor() != 1.0) {
 			log.warn("Flow capacity factor unequal 1.0 is not tested.");
 		}
