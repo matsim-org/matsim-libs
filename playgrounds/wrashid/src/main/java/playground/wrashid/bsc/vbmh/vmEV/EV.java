@@ -1,6 +1,5 @@
 package playground.wrashid.bsc.vbmh.vmEV;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 public class EV {
 	
@@ -9,7 +8,11 @@ public class EV {
 	public double stateOfCharge; //Absolut in KWh 
 	public double batteryCapacity;
 	
-	@XmlAttribute
+	public EV(){
+		
+	}
+	
+
 	public String getId() {
 		return id;
 	}
