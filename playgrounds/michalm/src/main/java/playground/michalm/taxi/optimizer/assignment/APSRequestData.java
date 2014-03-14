@@ -27,14 +27,14 @@ import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 
 
-/*package*/class APSRequestData
+class APSRequestData
 {
-    /*package*/final TaxiRequest[] requests;
-    /*package*/final int urgentReqCount;
-    /*package*/final int dimension;
+    final TaxiRequest[] requests;
+    final int urgentReqCount;
+    final int dimension;
 
 
-    /*package*/APSRequestData(TaxiOptimizerConfiguration optimConfig,
+    APSRequestData(TaxiOptimizerConfiguration optimConfig,
             SortedSet<TaxiRequest> unplannedRequests)
     {
         dimension = unplannedRequests.size();//TODO - consider only awaiting and "soon-awaiting" reqs!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

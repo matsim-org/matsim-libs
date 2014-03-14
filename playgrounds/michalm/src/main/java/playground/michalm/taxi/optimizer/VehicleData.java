@@ -17,39 +17,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.assignment;
+package playground.michalm.taxi.optimizer;
 
 import java.util.*;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 import playground.michalm.taxi.util.TaxicabUtils;
 
-/*package*/class APSVehicleData
+
+public class VehicleData
 {
-    /*package*/final List<Vehicle> vehicles = new ArrayList<Vehicle>();
-    /*package*/final List<LinkTimePair> departures = new ArrayList<LinkTimePair>();
-    /*package*/final int idleVehCount;
-    /*package*/final int dimension;
+    public final List<Vehicle> vehicles = new ArrayList<Vehicle>();
+    public final List<LinkTimePair> departures = new ArrayList<LinkTimePair>();
+    public final int idleVehCount;
+    public final int dimension;
 
 
-    /*package*/APSVehicleData(TaxiOptimizerConfiguration optimConfig)
+    public VehicleData(TaxiOptimizerConfiguration optimConfig)
     {
         int idleVehs = 0;
-        double maxDepartureTime = -Double.MAX_VALUE;
         for (Vehicle v : optimConfig.context.getVrpData().getVehicles()) {
             LinkTimePair departure = optimConfig.scheduler.getEarliestIdleness(v);
-            //LinkTimePair departure = scheduler.getClosestDiversion(v);
+            //LinkTimePair diversion = scheduler.getClosestDiversion(v);
 
             if (departure != null) {
                 vehicles.add(v);
                 departures.add(departure);
-
-                if (departure.time > maxDepartureTime) {
-                    maxDepartureTime = departure.time;
-                }
 
                 if (TaxicabUtils.isIdle(v)) {
                     idleVehs++;

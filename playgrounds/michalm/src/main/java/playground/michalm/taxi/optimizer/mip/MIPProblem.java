@@ -30,14 +30,13 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.michalm.taxi.data.*;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.fifo.FIFOSchedulingProblem;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
-import playground.michalm.taxi.util.TaxicabUtils;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
 
-import com.google.common.collect.*;
+import com.google.common.collect.Iterables;
 
 
 public class MIPProblem
@@ -47,7 +46,7 @@ public class MIPProblem
 
     private SortedSet<TaxiRequest> unplannedRequests;
     private MIPRequestData rData;
-    private List<Vehicle> vehicles;
+    private VehicleData vData;
 
     private GRBModel model;
 
@@ -77,19 +76,15 @@ public class MIPProblem
 
         this.unplannedRequests = unplannedRequests;
 
-        this.rData = new MIPRequestData(optimConfig, unplannedRequests);
-        n = rData.dimension;
-        if (n == 0) {
+        vData = new VehicleData(optimConfig);
+        m = vData.dimension;
+        if (m == 0) {
             return;
         }
 
-        List<Vehicle> allVehs = optimConfig.context.getVrpData().getVehicles();
-        Iterable<Vehicle> filteredVehs = Iterables.filter(allVehs,
-                TaxicabUtils.createCanBeScheduled(optimConfig.scheduler));
-        vehicles = Lists.newArrayList(filteredVehs);
-
-        m = vehicles.size();
-        if (m == 0) {
+        rData = new MIPRequestData(optimConfig, unplannedRequests, vData);
+        n = rData.dimension;
+        if (n == 0) {
             return;
         }
 
@@ -203,7 +198,7 @@ public class MIPProblem
             Link toLink = rData.requests[i].getFromLink();
 
             for (int k = 0; k < m; k++) {
-                Vehicle veh = vehicles.get(k);
+                Vehicle veh = vData.vehicles.get(k);
                 LinkTimePair departure = optimConfig.scheduler.getEarliestIdleness(veh);
 
                 double a_k = departure.time;
@@ -253,10 +248,7 @@ public class MIPProblem
     {
         Queue<TaxiRequest> queue = new PriorityQueue<TaxiRequest>(rData.dimension,
                 Requests.T0_COMPARATOR);
-
-        for (TaxiRequest r : rData.requests) {
-            queue.add(r);
-        }
+        Collections.addAll(queue, rData.requests);
 
         new FIFOSchedulingProblem(optimConfig).scheduleUnplannedRequests(queue);
 
@@ -271,7 +263,7 @@ public class MIPProblem
         double t_P = optimConfig.scheduler.getParams().pickupDuration;
 
         for (int k = 0; k < m; k++) {
-            Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(vehicles.get(k));
+            Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(vData.vehicles.get(k));
             Iterable<TaxiRequest> reqs = TaxiSchedules.getTaxiRequests(schedule);
             Iterable<TaxiRequest> plannedReqs = Iterables.filter(reqs, TaxiRequests.IS_PLANNED);
 
@@ -307,7 +299,7 @@ public class MIPProblem
         w = model.get(GRB.DoubleAttr.X, wVar);
 
         for (int k = 0; k < m; k++) {
-            currentVeh = vehicles.get(k);
+            currentVeh = vData.vehicles.get(k);
             addSubsequentRequestsToCurrentVehicle(x[k]);
         }
     }

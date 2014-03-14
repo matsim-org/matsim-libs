@@ -24,31 +24,31 @@ import java.util.*;
 import org.matsim.api.core.v01.Id;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.optimizer.*;
+
+import com.google.common.collect.Iterables;
 
 
-/*package*/class MIPRequestData
+class MIPRequestData
 {
-    public static final int REQS_PER_VEH = 5;
+    static final int REQS_PER_VEH = 10;
 
-    /*package*/final TaxiRequest[] requests;
-    /*package*/Map<Id, Integer> reqIdToIdx = new HashMap<Id, Integer>();
-    /*package*/final int dimension;
+    final TaxiRequest[] requests;
+    final Map<Id, Integer> reqIdToIdx = new HashMap<Id, Integer>();
+    final int dimension;
 
 
-    /*package*/MIPRequestData(TaxiOptimizerConfiguration optimConfig,
-            SortedSet<TaxiRequest> unplannedRequests)
+    MIPRequestData(TaxiOptimizerConfiguration optimConfig,
+            SortedSet<TaxiRequest> unplannedRequests, VehicleData vData)
     {
-        int reqLimit = REQS_PER_VEH * optimConfig.context.getVrpData().getVehicles().size();
+        int reqLimit = REQS_PER_VEH * vData.dimension;
         dimension = Math.min(reqLimit, unplannedRequests.size());
 
-        Iterator<TaxiRequest> reqIter = unplannedRequests.iterator();
-        requests = new TaxiRequest[dimension];
+        requests = Iterables.toArray(Iterables.limit(unplannedRequests, dimension),
+                TaxiRequest.class);
 
         for (int i = 0; i < dimension; i++) {
-            TaxiRequest req = reqIter.next();
-            requests[i] = req;
-            reqIdToIdx.put(req.getId(), i);
+            reqIdToIdx.put(requests[i].getId(), i);
         }
     }
 }

@@ -27,7 +27,7 @@ import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
 
 
@@ -37,7 +37,7 @@ public class AssignmentProblem
 
     private final TaxiOptimizerConfiguration optimConfig;
 
-    private APSVehicleData vData;
+    private VehicleData vData;
     private APSRequestData rData;
 
 
@@ -58,7 +58,7 @@ public class AssignmentProblem
             return;
         }
 
-        vData = new APSVehicleData(optimConfig);
+        vData = new VehicleData(optimConfig);
         if (vData.dimension == 0) {
             return;
         }

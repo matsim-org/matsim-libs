@@ -75,13 +75,11 @@ public class TaxiScheduler
     public LinkTimePair getEarliestIdleness(Vehicle veh)
     {
         double currentTime = context.getTime();
-
         if (currentTime >= veh.getT1()) {// time window T1 exceeded
             return null;
         }
 
         Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
-
         Link link;
         double time;
 
@@ -94,7 +92,7 @@ public class TaxiScheduler
                     case WAIT_STAY:
                         link = ((StayTask)lastTask).getLink();
                         time = Math.max(lastTask.getBeginTime(), currentTime);//TODO very optimistic!!!
-                        return new LinkTimePair(link, time);
+                        return createValidLinkTimePair(link, time, veh);
 
                     case PICKUP_STAY:
                         if (!params.destinationKnown) {
@@ -121,13 +119,11 @@ public class TaxiScheduler
     public LinkTimePair getEarliestDiversion(Vehicle veh)
     {
         double currentTime = context.getTime();
-
         if (currentTime >= veh.getT1()) {// time window T1 exceeded
             return null;
         }
 
         Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
-
         Link link;
         double time;
         TaxiDropoffStayTask dropoffStayTask;
@@ -136,7 +132,7 @@ public class TaxiScheduler
             case PLANNED:
                 link = veh.getStartLink();
                 time = Math.max(veh.getT0(), currentTime);
-                return new LinkTimePair(link, time);
+                return createValidLinkTimePair(link, time, veh);
 
             case STARTED:
                 TaxiTask currentTask = schedule.getCurrentTask();
@@ -145,13 +141,15 @@ public class TaxiScheduler
                     case WAIT_STAY:
                         link = ((StayTask)currentTask).getLink();
                         time = currentTime;
-                        return new LinkTimePair(link, time);
+                        return createValidLinkTimePair(link, time, veh);
 
                     case PICKUP_DRIVE:
                         TaskTracker tracker = currentTask.getTaskTracker();
 
                         if (tracker instanceof OnlineDriveTaskTracker) {
-                            return ((OnlineDriveTaskTracker)tracker).getDiversionPoint(currentTime);
+                            OnlineDriveTaskTracker onlineTracker = (OnlineDriveTaskTracker)tracker;
+                            LinkTimePair lt = onlineTracker.getDiversionPoint(currentTime);
+                            return filterValidLinkTimePair(lt, veh);
                         }
 
                         //no "break" here!!!
@@ -178,7 +176,7 @@ public class TaxiScheduler
 
                 link = dropoffStayTask.getLink();
                 time = dropoffStayTask.getEndTime();
-                return new LinkTimePair(link, time);
+                return createValidLinkTimePair(link, time, veh);
 
             case COMPLETED:
                 return null;
@@ -187,6 +185,18 @@ public class TaxiScheduler
             default:
                 throw new IllegalStateException();
         }
+    }
+
+
+    private LinkTimePair filterValidLinkTimePair(LinkTimePair pair, Vehicle veh)
+    {
+        return pair.time >= veh.getT1() ? null : pair;
+    }
+
+
+    private LinkTimePair createValidLinkTimePair(Link link, double time, Vehicle veh)
+    {
+        return time >= veh.getT1() ? null : new LinkTimePair(link, time);
     }
 
 
