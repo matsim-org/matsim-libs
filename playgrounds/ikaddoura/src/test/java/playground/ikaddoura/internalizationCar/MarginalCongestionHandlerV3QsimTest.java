@@ -345,6 +345,52 @@ public class MarginalCongestionHandlerV3QsimTest {
 		
 	 }
 	
+	@Test
+	public final void testInsertingWaitingVehicles(){
+		
+		Scenario sc = loadScenario4();
+		setPopulation4(sc);
+		
+		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
+		
+		events.addHandler( new MarginalCongestionEventHandler() {
+
+			@Override
+			public void reset(int iteration) {				
+			}
+
+			@Override
+			public void handleEvent(MarginalCongestionEvent event) {
+				congestionEvents.add(event);
+			}	
+		});
+		
+		events.addHandler( new LinkLeaveEventHandler() {
+
+			@Override
+			public void reset(int iteration) {				
+			}
+
+			@Override
+			public void handleEvent(LinkLeaveEvent event) {
+				System.out.println(event.toString());
+			}	
+		});
+		
+		events.addHandler(new MarginalCongestionHandlerImplV3(events, (ScenarioImpl) sc));
+				
+		QSim sim = createQSim(sc, events);
+		sim.run();
+						
+		for (MarginalCongestionEvent event : congestionEvents) {
+		
+			System.out.println(event.toString());
+			
+		}
+		
+	}
+	
+	
 	// ################################################################################################################################
 
 	private void setPopulation1(Scenario scenario) {
@@ -533,6 +579,66 @@ private void setPopulation2(Scenario scenario) {
 	
 	}
 	
+	private void setPopulation4(Scenario scenario) {
+		
+		Population population = scenario.getPopulation();
+		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
+
+		Activity workActLink5 = popFactory.createActivityFromLinkId("work", linkId5);
+		
+		// leg: 1,2,3,4,5
+		Leg leg_1_5 = popFactory.createLeg("car");
+		List<Id> linkIds234 = new ArrayList<Id>();
+		linkIds234.add(linkId2);
+		linkIds234.add(linkId3);
+		linkIds234.add(linkId4);
+		NetworkRoute route1_5 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId5);
+		route1_5.setLinkIds(linkId1, linkIds234, linkId5);
+		leg_1_5.setRoute(route1_5);
+		
+		Person person1 = popFactory.createPerson(testAgent1);
+		Plan plan1 = popFactory.createPlan();
+		Activity homeActLink1_1 = popFactory.createActivityFromLinkId("home", linkId1);
+		homeActLink1_1.setEndTime(100);
+		plan1.addActivity(homeActLink1_1);
+		plan1.addLeg(leg_1_5);
+		plan1.addActivity(workActLink5);
+		person1.addPlan(plan1);
+		population.addPerson(person1);
+		
+		Person person2 = popFactory.createPerson(testAgent2);
+		Plan plan2 = popFactory.createPlan();
+		Activity homeActLink1_2 = popFactory.createActivityFromLinkId("home", linkId1);
+		homeActLink1_2.setEndTime(101);
+		plan2.addActivity(homeActLink1_2);
+		plan2.addLeg(leg_1_5);
+		plan2.addActivity(workActLink5);
+		person2.addPlan(plan2);
+		population.addPerson(person2);
+		
+		// leg: 1,2,3,4,5
+		Leg leg_2_5 = popFactory.createLeg("car");
+		List<Id> linkIds34 = new ArrayList<Id>();
+		linkIds34.add(linkId3);
+		linkIds34.add(linkId4);
+		NetworkRoute route2_5 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId5);
+		route2_5.setLinkIds(linkId2, linkIds34, linkId5);
+		leg_2_5.setRoute(route2_5);
+		
+		Person person3 = popFactory.createPerson(testAgent3);
+		Plan plan3 = popFactory.createPlan();
+		Activity homeActLink2_3 = popFactory.createActivityFromLinkId("home", linkId2);
+		homeActLink2_3.setEndTime(158);
+		plan3.addActivity(homeActLink2_3);
+		plan3.addLeg(leg_2_5);
+		plan3.addActivity(workActLink5);
+		person3.addPlan(plan3);
+		population.addPerson(person3);
+	
+
+	}
+	
 	private Scenario loadScenario1() {
 			
 		// (0)				(1)				(2)				(3)				(4)				(5)
@@ -651,12 +757,6 @@ private void setPopulation2(Scenario scenario) {
 
 		Set<String> modes = new HashSet<String>();
 		modes.add("car");
-		
-		link1.setAllowedModes(modes);
-		link1.setCapacity(999999);
-		link1.setFreespeed(1);
-		link1.setNumberOfLanes(1000);
-		link1.setLength(1);
 		
 		// link without capacity restrictions
 		link1.setAllowedModes(modes);
@@ -779,6 +879,91 @@ private void setPopulation2(Scenario scenario) {
 		network.addLink(link2);
 		network.addLink(link3);
 		network.addLink(link4);
+
+		this.events = EventsUtils.createEventsManager();
+		return scenario;
+	}
+	
+	private Scenario loadScenario4() {
+		
+		// (0)				(1)				(2)				(3)				(4)				(5)
+		//    -----link1----   ----link2----   ----link3----   ----link4----   ----link5----   
+		
+		Config config = testUtils.loadConfig(null);
+		QSimConfigGroup qSimConfigGroup = config.qsim();
+		qSimConfigGroup.setFlowCapFactor(1.0);
+		qSimConfigGroup.setStorageCapFactor(1.0);
+		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
+		qSimConfigGroup.setRemoveStuckVehicles(true);
+		qSimConfigGroup.setStuckTime(3600.0);
+		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+	
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		network.setEffectiveCellSize(7.5);
+		network.setCapacityPeriod(3600.);
+		
+		Node node0 = network.getFactory().createNode(new IdImpl("0"), scenario.createCoord(0., 0.));
+		Node node1 = network.getFactory().createNode(new IdImpl("1"), scenario.createCoord(100., 0.));
+		Node node2 = network.getFactory().createNode(new IdImpl("2"), scenario.createCoord(200., 0.));
+		Node node3 = network.getFactory().createNode(new IdImpl("3"), scenario.createCoord(300., 0.));
+		Node node4 = network.getFactory().createNode(new IdImpl("4"), scenario.createCoord(400., 0.));
+		Node node5 = network.getFactory().createNode(new IdImpl("5"), scenario.createCoord(500., 0.));
+		
+		Link link1 = network.getFactory().createLink(this.linkId1, node0, node1);
+		Link link2 = network.getFactory().createLink(this.linkId2, node1, node2);
+		Link link3 = network.getFactory().createLink(this.linkId3, node2, node3);
+		Link link4 = network.getFactory().createLink(this.linkId4, node3, node4);
+		Link link5 = network.getFactory().createLink(this.linkId5, node4, node5);
+
+		Set<String> modes = new HashSet<String>();
+		modes.add("car");
+		
+		// link without capacity restrictions
+		link1.setAllowedModes(modes);
+		link1.setCapacity(999999);
+		link1.setFreespeed(10);
+		link1.setNumberOfLanes(100);
+		link1.setLength(500);
+
+		// link with capacity restrictions
+		link2.setAllowedModes(modes);
+		link2.setCapacity(360);
+		link2.setFreespeed(10);
+		link2.setNumberOfLanes(100);
+		link2.setLength(500);
+
+		// link without capacity restrictions
+		link3.setAllowedModes(modes);
+		link3.setCapacity(999999);
+		link3.setFreespeed(10);
+		link3.setNumberOfLanes(100);
+		link3.setLength(500);
+
+		// link without capacity restrictions
+		link4.setAllowedModes(modes);
+		link4.setCapacity(999999);
+		link4.setFreespeed(10); 
+		link4.setNumberOfLanes(100);
+		link4.setLength(500);
+
+		// link without capacity restrictions
+		link5.setAllowedModes(modes);
+		link5.setCapacity(999999);
+		link5.setFreespeed(10);
+		link5.setNumberOfLanes(100);
+		link5.setLength(500);
+		
+		network.addNode(node0);
+		network.addNode(node1);
+		network.addNode(node2);
+		network.addNode(node3);
+		network.addNode(node4);
+
+		network.addLink(link1);
+		network.addLink(link2);
+		network.addLink(link3);
+		network.addLink(link4);
+		network.addLink(link5);
 
 		this.events = EventsUtils.createEventsManager();
 		return scenario;
