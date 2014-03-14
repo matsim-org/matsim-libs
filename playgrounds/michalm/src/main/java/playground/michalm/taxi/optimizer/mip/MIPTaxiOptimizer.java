@@ -22,9 +22,12 @@ package playground.michalm.taxi.optimizer.mip;
 import java.util.*;
 
 import org.matsim.contrib.dvrp.data.Requests;
+import org.matsim.contrib.dvrp.schedule.*;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.schedule.*;
+import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
 
 public class MIPTaxiOptimizer
@@ -46,5 +49,19 @@ public class MIPTaxiOptimizer
     {
         new MIPProblem(optimConfig, pathTravelTimeCalc)
                 .scheduleUnplannedRequests((SortedSet<TaxiRequest>)unplannedRequests);
+    }
+
+
+    @Override
+    public void nextTask(Schedule<? extends Task> schedule)
+    {
+        super.nextTask(schedule);
+
+        TaxiTask currentTask = (TaxiTask)schedule.getCurrentTask();
+        if (currentTask.getTaxiTaskType() == TaxiTaskType.PICKUP_DRIVE) {
+            if (unplannedRequests.size() > 0) {
+                requiresReoptimization = true;
+            }
+        }
     }
 }

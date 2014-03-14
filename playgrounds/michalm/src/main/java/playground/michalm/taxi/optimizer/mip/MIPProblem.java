@@ -41,6 +41,8 @@ import com.google.common.collect.Iterables;
 
 public class MIPProblem
 {
+    private static final int REQS_PER_VEH = 20;
+    
     private final TaxiOptimizerConfiguration optimConfig;
     private final PathTreeBasedTravelTimeCalculator pathTravelTimeCalc;
 
@@ -81,8 +83,9 @@ public class MIPProblem
         if (m == 0) {
             return;
         }
-
-        rData = new MIPRequestData(optimConfig, unplannedRequests, vData);
+        
+        int maxReqCount = REQS_PER_VEH * vData.dimension;
+        rData = new MIPRequestData(optimConfig, unplannedRequests, maxReqCount);
         n = rData.dimension;
         if (n == 0) {
             return;

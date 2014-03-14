@@ -37,7 +37,7 @@ public abstract class AbstractTaxiOptimizer
 
     protected final Collection<TaxiRequest> unplannedRequests;
 
-    private boolean requiresReoptimization = false;
+    protected boolean requiresReoptimization = false;
 
 
     public AbstractTaxiOptimizer(TaxiOptimizerConfiguration optimConfig,

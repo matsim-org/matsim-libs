@@ -31,18 +31,15 @@ import com.google.common.collect.Iterables;
 
 class MIPRequestData
 {
-    static final int REQS_PER_VEH = 10;
-
     final TaxiRequest[] requests;
     final Map<Id, Integer> reqIdToIdx = new HashMap<Id, Integer>();
     final int dimension;
 
 
     MIPRequestData(TaxiOptimizerConfiguration optimConfig,
-            SortedSet<TaxiRequest> unplannedRequests, VehicleData vData)
+            SortedSet<TaxiRequest> unplannedRequests, int maxReqCount)
     {
-        int reqLimit = REQS_PER_VEH * vData.dimension;
-        dimension = Math.min(reqLimit, unplannedRequests.size());
+        dimension = Math.min(maxReqCount, unplannedRequests.size());
 
         requests = Iterables.toArray(Iterables.limit(unplannedRequests, dimension),
                 TaxiRequest.class);
