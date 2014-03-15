@@ -23,6 +23,7 @@ import java.util.*;
 
 import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
@@ -34,6 +35,11 @@ public class MIPTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
     private final PathTreeBasedTravelTimeCalculator pathTravelTimeCalc;
+
+    private int plannedReqs;
+    private int schedulableVehs;
+
+    private int startedReqs;
 
 
     public MIPTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
@@ -47,8 +53,13 @@ public class MIPTaxiOptimizer
 
     protected void scheduleUnplannedRequests()
     {
-        new MIPProblem(optimConfig, pathTravelTimeCalc)
-                .scheduleUnplannedRequests((SortedSet<TaxiRequest>)unplannedRequests);
+        MIPProblem mipProblem = new MIPProblem(optimConfig, pathTravelTimeCalc);
+        mipProblem.scheduleUnplannedRequests((SortedSet<TaxiRequest>)unplannedRequests);
+
+        plannedReqs = mipProblem.getRequestData().dimension;
+        schedulableVehs = mipProblem.getVehicleData().dimension;
+
+        startedReqs = 0;
     }
 
 
@@ -57,11 +68,31 @@ public class MIPTaxiOptimizer
     {
         super.nextTask(schedule);
 
+        if (schedule.getStatus() != ScheduleStatus.STARTED) {
+            return;
+        }
+
         TaxiTask currentTask = (TaxiTask)schedule.getCurrentTask();
         if (currentTask.getTaxiTaskType() == TaxiTaskType.PICKUP_DRIVE) {
+            startedReqs++;
+
             if (unplannedRequests.size() > 0) {
-                requiresReoptimization = true;
+                requiresReoptimization = doReoptimize();
             }
+        }
+    }
+
+
+    private boolean doReoptimize()
+    {
+        int currentPlanned = plannedReqs - startedReqs;
+        double currentReqsPerVeh = (double)currentPlanned / schedulableVehs;
+
+        if (currentReqsPerVeh <= 2) {
+            return true;
+        }
+        else {
+            return startedReqs >= schedulableVehs;
         }
     }
 }

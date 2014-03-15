@@ -20,12 +20,12 @@
 package playground.michalm.taxi.optimizer.mip;
 
 import gurobi.*;
+import gurobi.GRB.DoubleParam;
 
 import java.util.*;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
@@ -34,15 +34,15 @@ import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.fifo.FIFOSchedulingProblem;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
-import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
 
 import com.google.common.collect.Iterables;
 
 
 public class MIPProblem
 {
-    private static final int REQS_PER_VEH = 20;
-    
+    private static final double W_MAX = 30 * 60 * 60;//30 hours
+    private static final int REQS_PER_VEH = 5;
+
     private final TaxiOptimizerConfiguration optimConfig;
     private final PathTreeBasedTravelTimeCalculator pathTravelTimeCalc;
 
@@ -51,7 +51,6 @@ public class MIPProblem
     private VehicleData vData;
 
     private GRBModel model;
-
     private int n;//request count
     private int m;//vehicle count
     private GRBVar[][] xVar;//for each request/vehicle pair, (i, j)
@@ -83,7 +82,7 @@ public class MIPProblem
         if (m == 0) {
             return;
         }
-        
+
         int maxReqCount = REQS_PER_VEH * vData.dimension;
         rData = new MIPRequestData(optimConfig, unplannedRequests, maxReqCount);
         n = rData.dimension;
@@ -98,8 +97,10 @@ public class MIPProblem
     private void solveWithGurobi()
     {
         try {
-            GRBEnv env = new GRBEnv();
-            model = new GRBModel(env);
+            model = new GRBModel(new GRBEnv());
+            GRBEnv env = model.getEnv();//this is the internal model (a copy of that passed to the constructor)
+
+            env.set(DoubleParam.TimeLimit, 30);
 
             addXVariables();
             addWVariables();
@@ -149,7 +150,7 @@ public class MIPProblem
         for (int i = 0; i < n; i++) {
             TaxiRequest req = rData.requests[i];
             double e_i = req.getT0();
-            wVar[i] = model.addVar(e_i, GRB.INFINITY, 1, GRB.CONTINUOUS, "w_" + i);
+            wVar[i] = model.addVar(e_i, W_MAX, 1, GRB.CONTINUOUS, "w_" + i);
         }
     }
 
@@ -214,9 +215,6 @@ public class MIPProblem
     }
 
 
-    private static final double T = 7 * 24 * 60 * 60;//one week
-
-
     private void addReqToReqLinConstraint()
         throws GRBException
     {
@@ -238,8 +236,8 @@ public class MIPProblem
                 GRBLinExpr expr = new GRBLinExpr();
                 expr.addTerm(1, wVar[j]);
                 expr.addTerm(-1, wVar[i]);
-                expr.addConstant(T);
-                expr.addTerm(-iTotalServeTime - t_ij - T, xVar[m + i][m + j]);
+                expr.addConstant(W_MAX);
+                expr.addTerm(-iTotalServeTime - t_ij - W_MAX, xVar[m + i][m + j]);
                 model.addConstr(expr, GRB.GREATER_EQUAL, 0, "w(r2r)_" + i + "," + j);
             }
         }
@@ -290,57 +288,24 @@ public class MIPProblem
     }
 
 
-    private Vehicle currentVeh;
-    private double[][] x;
-    private double[] w;
-
-
-    private void updateSchedules()
-        throws GRBException
+    private void updateSchedules() throws GRBException
     {
-        x = model.get(GRB.DoubleAttr.X, xVar);
-        w = model.get(GRB.DoubleAttr.X, wVar);
+        double[][] x = model.get(GRB.DoubleAttr.X, xVar);
 
-        for (int k = 0; k < m; k++) {
-            currentVeh = vData.vehicles.get(k);
-            addSubsequentRequestsToCurrentVehicle(x[k]);
-        }
+        new MIPScheduler(optimConfig, rData, vData).updateSchedules(x);
+        
+        unplannedRequests.removeAll(Arrays.asList(rData.requests));
     }
 
 
-    private void addSubsequentRequestsToCurrentVehicle(double[] x_u)
+    MIPRequestData getRequestData()
     {
-        for (int i = 0; i < n; i++) {
-            if (x_u[m + i] > 0.5) {
-                addRequestToCurrentVehicle(rData.requests[i], w[i]);
-                addSubsequentRequestsToCurrentVehicle(x[m + i]);
-                return;
-            }
-        }
+        return rData;
     }
 
 
-    private static final double EPSILON = 0.01;
-
-
-    private void addRequestToCurrentVehicle(TaxiRequest req, double w_i)
+    VehicleData getVehicleData()
     {
-        LinkTimePair earliestDeparture = optimConfig.scheduler.getEarliestIdleness(currentVeh);
-        Link fromLink = earliestDeparture.link;
-
-        double latestDepartureTime = w_i
-                - pathTravelTimeCalc.calcTravelTime(earliestDeparture.link, req.getFromLink());
-
-        double diff = latestDepartureTime - earliestDeparture.time;
-        if (diff < -EPSILON) {
-            throw new IllegalStateException();
-        }
-
-        VrpPathWithTravelData path = optimConfig.calculator.calcPath(fromLink, req.getFromLink(),
-                earliestDeparture.time);
-
-        VehicleRequestPath vrPath = new VehicleRequestPath(currentVeh, req, path);
-        optimConfig.scheduler.scheduleRequest(vrPath);
-        unplannedRequests.remove(req);
+        return vData;
     }
 }
