@@ -1,7 +1,5 @@
 package playground.michalm.taxi.optimizer.mip;
 
-import gurobi.GRBException;
-
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
@@ -34,7 +32,6 @@ class MIPScheduler
 
 
     void updateSchedules(double[][] x)
-        throws GRBException
     {
         this.x = x;
         for (int k = 0; k < m; k++) {
