@@ -157,7 +157,7 @@ public class ParallelPseudoSim {
 		@Override
 		public void run() {
 			eventQueue = new LinkedList<Event>();
-			railSimEngine = new RailSimEngine(eventQueue, schedule);
+			railSimEngine = new RailSimEngine(eventQueue, schedule, network);
 			
 			for (Plan plan : plans) {
 				List<PlanElement> elements = plan.getPlanElements();

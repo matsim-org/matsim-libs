@@ -51,7 +51,7 @@ public class LineRouteCountsHandler extends TableHandler {
 	
 	public static final String INDEX_KEY = "INDEX";
 	
-	private TObjectDoubleHashMap<Link> counts;
+	private final TObjectDoubleHashMap<Link> counts;
 	
 	private String lastLine;
 	
@@ -63,9 +63,17 @@ public class LineRouteCountsHandler extends TableHandler {
 	
 	private Node fromNode;
 	
-	private Network network;
+	double lastCountValue;
 	
-	private IdGenerator idGenerator;
+	private final Network network;
+	
+	private final IdGenerator idGenerator;
+	
+	public LineRouteCountsHandler(Network network) {
+		this.network = network;
+		counts = new TObjectDoubleHashMap<Link>(network.getLinks().size());
+		idGenerator = new PrefixIdGenerator("rail.");
+	}
 	
 	/* (non-Javadoc)
 	 * @see playground.johannes.gsv.visum.NetFileReader.TableHandler#handleRow(java.util.Map)
@@ -73,32 +81,40 @@ public class LineRouteCountsHandler extends TableHandler {
 	@Override
 	public void handleRow(Map<String, String> record) {
 		int index = Integer.parseInt(record.get(INDEX_KEY));
+		String line = record.get(LINE_KEY);
+		String route = record.get(ROUTE_KEY);
+		String dcode = record.get(DCODE_KEY);
+		Node toNode = network.getNodes().get(idGenerator.generateId(record.get(NODE_KEY)));
 		
 		if(index - 1 == lastIndex) {
-			lastIndex = index;
 			
-			String line = record.get(LINE_KEY);
 			if(!line.equals(lastLine))
 				throw new RuntimeException("Line name does not match.");
 			
-			String route = record.get(ROUTE_KEY);
 			if(!route.equals(lastRoute))
 				throw new RuntimeException("Route name does not match.");
 			
-			String dcode = record.get(DCODE_KEY);
 			if(!dcode.equals(lastDCode))
 				throw new RuntimeException("Direction does not match.");
 			
-			Node toNode = network.getNodes().get(idGenerator.generateId(record.get(NODE_KEY)));
 			Link link = NetworkUtils.getConnectingLink(fromNode, toNode);
 			
 			if(link == null) {
 				throw new RuntimeException("Link not found.");
 			}
 			
-		} else {
-			//new line
+			counts.put(link, lastCountValue);
+			
 		}
+		
+		lastIndex = index;
+		lastLine = line;
+		lastRoute = route;
+		lastDCode = dcode;
+		fromNode = toNode;
+		
+		lastCountValue = Double.parseDouble(record.get(COUNTS_KEY));
+		
 		
 
 	}

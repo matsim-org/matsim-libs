@@ -104,6 +104,9 @@ public class PKmCalculator implements TransitAlightEventHandler, TransitBoardEve
 		Link accessLink = network.getLinks().get(access.getLinkId());
 		Node accessNode = accessLink.getToNode();
 		
+		Link egressLink = network.getLinks().get(egress.getLinkId());
+		Node egressNode = egressLink.getFromNode();
+		
 		int startIdx = -1;
 		List<Id> ids = new ArrayList<Id>(netRoute.getLinkIds().size() + 2);
 		ids.add(netRoute.getStartLinkId());
@@ -126,7 +129,7 @@ public class PKmCalculator implements TransitAlightEventHandler, TransitBoardEve
 			Link link = network.getLinks().get(ids.get(i));
 			length += link.getLength();
 			
-			if(link.getToNode().equals(accessNode)) {
+			if(link.getToNode().equals(egressNode)) {
 				break;
 			}
 		}

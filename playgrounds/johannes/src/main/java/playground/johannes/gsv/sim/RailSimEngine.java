@@ -22,12 +22,20 @@
  */
 package playground.johannes.gsv.sim;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -46,13 +54,14 @@ public class RailSimEngine implements LegSimEngine {
 
 	private final TransitSchedule schedule;
 	
-//	private final Network network;
+	private final Network network;
 	
 	private final PreparedTransitSchedule preparedSchedule = new PreparedTransitSchedule(null);
 	
-	public RailSimEngine(Queue<Event> eventQueue, TransitSchedule schedule) {
+	public RailSimEngine(Queue<Event> eventQueue, TransitSchedule schedule, Network network) {
 		this.eventQueue = eventQueue;
 		this.schedule = schedule;
+		this.network = network;
 	}
 	
 	/* (non-Javadoc)
@@ -71,13 +80,63 @@ public class RailSimEngine implements LegSimEngine {
 		TransitRouteStop egressStop = troute.getStop(egressStopFac);
 		
 		double departure = preparedSchedule.getNextDepartureTime(troute, accessStop, departureTime);
-		// throw event
+
 		eventQueue.add(new TransitBoardEvent(departure, person, line, troute, accessStopFac));
 		double arrival = egressStop.getArrivalOffset() + departure;
+		double legTravelTime = arrival - departure;
+		
+		NetworkRoute netRoute = troute.getRoute();
+		Link accessLink = network.getLinks().get(accessStopFac.getLinkId());
+		Node accessNode = accessLink.getToNode();
+		
+		Link egressLink = network.getLinks().get(egressStopFac.getLinkId());
+		Node egressNode = egressLink.getFromNode();
+		
+		int startIdx = -1;
+		List<Id> ids = new ArrayList<Id>(netRoute.getLinkIds().size() + 2);
+		ids.add(netRoute.getStartLinkId());
+		ids.addAll(netRoute.getLinkIds());
+		ids.add(netRoute.getEndLinkId());
+		
+		for(int i = 0; i < ids.size(); i++) {
+			Link link = network.getLinks().get(ids.get(i));
+			if(link.getFromNode().equals(accessNode)) {
+				startIdx = i;
+				break;
+			}
+		}
+		
+		if(startIdx < 0)
+			throw new RuntimeException("Access stop not found in transit route.");
+		
+		boolean found = false;
+		List<Link> links = new ArrayList<Link>(ids.size());
+		for(int i = startIdx; i < ids.size(); i++) {
+			Link link = network.getLinks().get(ids.get(i));
+			links.add(link);
+			
+			if(link.getToNode().equals(egressNode)) {
+				found = true;
+				break;
+			}
+		}
+		
+		if(!found)
+			throw new RuntimeException("Egress node not found.");
+		
+		double time = departure;
+		
+		double linkTTime = Math.ceil(legTravelTime / (double)links.size());
+		for(Link link : links) {
+			eventQueue.add(new LinkEnterEvent(time, person.getId(), link.getId(), null));
+			time += linkTTime;
+			time = Math.min(time, arrival);
+			eventQueue.add(new LinkLeaveEvent(time, person.getId(), link.getId(), null));
+		}
+		
 		eventQueue.add(new TransitAlightEvent(arrival, person, line, troute, egressStopFac));
-//		NetworkRoute netRoute = troute.getRoute();
-//		Link accessStationLink = network.getLinks().get(accessStopFac.getLinkId());
-		return arrival - departure;
+		
+		return legTravelTime;
 	}
 
 }
