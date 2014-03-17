@@ -73,5 +73,38 @@ public class EV {
 		return 100*this.stateOfCharge/this.batteryCapacity;
 	}
 	
+	
+	
+	
+	public double calcNewStateOfCharge(double chargingRate, double time){
+		double stateOfCharge = this.stateOfCharge;
+		double effChargingRate = chargingRate * 0.93;
+		double timeNeededFor80p = (this.batteryCapacity*0.8-stateOfCharge)/effChargingRate;
+		
+		//Laden bis 80%
+		if(timeNeededFor80p>0){
+			if(time<timeNeededFor80p){
+				stateOfCharge+=time*effChargingRate;
+				time=0;
+			}else{
+				stateOfCharge+=timeNeededFor80p*effChargingRate;
+				time-=timeNeededFor80p;
+			}
+		}
+		//Laden ab 80%
+		effChargingRate = 0.81 * chargingRate;
+		stateOfCharge+=effChargingRate*time;
+		if(stateOfCharge>batteryCapacity){
+			stateOfCharge=batteryCapacity;
+		}
+		
+		return stateOfCharge;
+	}
+
+
+	public void setStateOfCharge(double stateOfCharge) {
+		this.stateOfCharge = stateOfCharge;
+	}
+	
 
 }

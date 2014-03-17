@@ -32,7 +32,7 @@ public class ParkScoring implements BasicScoring  {
 			scorekeeper = (VMScoreKeeper) this.plan.getPerson().getCustomAttributes().get("VMScoreKeeper");
 			this.score=scorekeeper.getScore();
 			//System.out.println("Score Keeper geladen");
-			System.out.println("Park Scoring "+Double.toString(this.score));
+			//System.out.println("Park Scoring "+Double.toString(this.score));
 		}
 		
 	}

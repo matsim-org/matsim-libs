@@ -41,8 +41,8 @@ public class EVControl {
 		EV ev = evList.getEV(personID);
 		double consumption = ev.calcEnergyConsumption(link, time);
 		evList.getEV(personID).discharge(consumption);
-		System.out.println(consumption);
-		System.out.println(ev.getStateOfChargePercentage());
+		//System.out.println(consumption);
+		//System.out.println(ev.getStateOfChargePercentage());
 		
 		
 		
@@ -67,7 +67,17 @@ public class EVControl {
 		
 	}
 	
+	public boolean hasEV(Id personId){
+		return evList.hasEV(personId);
+	}
 	
+	
+	public double charge(Id personId, double chargingRate, double duration){
+		EV ev = evList.getEV(personId);
+		double amountOfEnergy = ev.calcNewStateOfCharge(chargingRate, duration)-ev.stateOfCharge;
+		ev.setStateOfCharge(ev.calcNewStateOfCharge(chargingRate, duration));
+		return amountOfEnergy;
+	}
 	
 	
 

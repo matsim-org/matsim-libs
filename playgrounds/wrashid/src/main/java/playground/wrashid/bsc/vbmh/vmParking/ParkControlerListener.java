@@ -70,6 +70,39 @@ public class ParkControlerListener implements StartupListener, IterationEndsList
 		getParkHandler().parkControl.parkingMap.clearSpots();
 		getParkHandler().parkControl.parkingMap.createSpots();
 		
+		//Diagnose: 
+			//Spots Zaehlen
+
+		int nevs = 0;
+		int evs = 0;
+		for(Parking parking : getParkHandler().getParkControl().parkingMap.getParkings()){
+			int[] counts = parking.diagnose();
+			evs+=counts[0];
+			nevs+=counts[1];
+		}
+		
+		System.out.println("ParkControlerListener Zaehlt Spots: EVS :"+evs+" NEVS :"+nevs);
+		
+			//EVs Zaehlen
+		if(getParkHandler().getParkControl().evUsage){
+			int i = 0;
+			for(Person person : getParkHandler().getParkControl().controller.getPopulation().getPersons().values()){
+				if(getParkHandler().getParkControl().evControl.hasEV(person.getId())){
+					i++;
+				}
+			}
+			System.out.println("ParkControlerListener Zaehlt: EVS :"+i);
+			
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		//VM_Score_Keeper Zuruecksetzen:
 		Map<Id, ? extends Person> population = event.getControler().getPopulation().getPersons();

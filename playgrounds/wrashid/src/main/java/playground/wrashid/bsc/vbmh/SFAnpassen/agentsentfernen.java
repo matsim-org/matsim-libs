@@ -24,18 +24,23 @@ public class agentsentfernen {
 			if(pa.getCarAvail()!="never"){
 				population.addPerson(pa);
 				System.out.println("Autofahrer hinzugefuegt");
+				i+=1;
 			}
 			if(i==anzahl_agents-1){
 				break;
 			}
-			i+=1;
 		}
 		
+		int j=0;
 		for (Person pneu : population.getPersons().values()) {
 			System.out.println(pneu.toString());
+			j++;
+			System.out.println(j);
 		}
 		PopulationWriter writer = new PopulationWriter(population, schreib_scenario.getNetwork());
+		
 		writer.writeV5("input/SF/Siouxfalls_population_reduziert.xml");
+		System.out.println("Achtung: Ueberschreibt nicht richtig; Ausgabedatei sollte vorher geloescht werden.");
 		
 
 	}

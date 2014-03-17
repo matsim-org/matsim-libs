@@ -5,13 +5,16 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 
+import playground.wrashid.bsc.vbmh.vmEV.EVControl;
 import playground.wrashid.bsc.vbmh.vmEV.EVControlerListener;
+import playground.wrashid.bsc.vbmh.vmParking.ParkControl;
 import playground.wrashid.bsc.vbmh.vmParking.ParkControlerListener;
 import playground.wrashid.bsc.vbmh.vmParking.ParkScoringFactory;
 
 
 public class SFControler1 {
-
+	
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		System.out.println("Los gehts");
@@ -29,6 +32,7 @@ public class SFControler1 {
 		
 		EVControlerListener evControlerListener = new EVControlerListener();
 		evControlerListener.getEvHandler().getEvControl().startUp(evFilename, controler);
+		parklistener.getParkHandler().getParkControl().setEvControl(evControlerListener.getEvHandler().getEvControl());
 		controler.addControlerListener(evControlerListener);
 		
 		
@@ -36,6 +40,10 @@ public class SFControler1 {
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();
 		ParkScoringFactory factory = new ParkScoringFactory(planCalcScoreConfigGroup, controler.getNetwork());
 		controler.setScoringFunctionFactory(factory);
+	
+		
+		
+		
 		
 		controler.run();
 	

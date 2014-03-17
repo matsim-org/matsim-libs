@@ -10,11 +10,20 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+
+import playground.wrashid.bsc.vbmh.vmEV.EVControl;
 
 /**
  * Manages the whole parking process of one Agent at a time. One instance of this class is kept by the Park_Handler 
@@ -38,11 +47,15 @@ public class ParkControl {
 	int countPrivate = 0;
 	int countPublic = 0;
 	int countNotParked = 0;
+	int countEVParkedOnEVSpot = 0;
 	
 	Controler controller;
 	ParkingMap parkingMap = new ParkingMap(); //Beinhaltet alle Parkplaetze
 	PricingModels pricing = new PricingModels(); //Behinhaltet dei Preismodelle
 	ParkHistoryWriter phwriter = new ParkHistoryWriter(); //Schreibt XML Datei mit Park events
+	EVControl evControl;
+	boolean evUsage=false;
+	
 	double time; //Wird auf aktuelle Zeit gesetzt (Vom event)
 	Coord cordinate; //Koordinaten an denen die Zie Facility ist. Von hier aus wird gesucht.
 	
@@ -57,7 +70,7 @@ public class ParkControl {
 		betaMoney=-Double.parseDouble(planCalcParams.get("marginalUtilityOfMoney")); //!! in Config positiver Wert >> stimmt das dann so?
 		betaWalk=Double.parseDouble(planCalcParams.get("traveling_walk"));
 		
-		System.out.println(betaMoney);
+		//System.out.println(betaMoney);
 		
 		
 		
@@ -69,8 +82,9 @@ public class ParkControl {
 		//Preise Laden
 		File pricingfile = new File( pricingFilename ); 
 		this.pricing = JAXB.unmarshal( pricingfile, PricingModels.class ); //Laedt Preise aus XML
-		return 0;
 		
+		
+		return 0;
 	
 	}
 	
@@ -94,6 +108,10 @@ public class ParkControl {
 		Falls nicht werden freie Oeffentliche Parkplaetze im Umkreis um die Facility gesammellt und daraus 
 		der Beste ausgewaehlt.
 		*/
+		
+		//Geschaetzte Dauer laden
+		//sSystem.out.println(getEstimatedDuration(event)/3600);
+		
 		
 		
 		// PRIVATES PARKEN
@@ -218,12 +236,12 @@ public class ParkControl {
 			
 			//kosten auf matsim util funktion
 			double duration=this.time-selectedSpot.getTimeVehicleParked(); //Parkzeit berechnen
-			System.out.println(duration);
+			//System.out.println(duration);
 			
 			double payedParking = pricing.calculateParkingPrice(duration/60, false, selectedSpot.parkingPriceM); // !! EV Boolean anpassen
 			// System.out.println(payed_parking);
 			
-			System.out.println("bezahltes Parken (Score): "+payedParking*this.betaMoney);
+			//System.out.println("bezahltes Parken (Score): "+payedParking*this.betaMoney);
 
 			
 			if (personAttributes.get("VMScoreKeeper")!= null){
@@ -233,6 +251,16 @@ public class ParkControl {
 				personAttributes.put("VMScoreKeeper", scorekeeper);
 			}
 			scorekeeper.add(payedParking*this.betaMoney);
+		
+			//EVs:
+			if(!evUsage){return;}
+			if(evControl.hasEV(event.getPersonId())){
+				if(selectedSpot.charge){
+					evControl.charge(personId, selectedSpot.chargingRate, duration);
+					System.out.println("EV geladen Person: "+personId.toString()+" Spot: "+selectedSpot.parking.id);
+				}
+			}
+		
 		}
 		
 		
@@ -261,23 +289,97 @@ public class ParkControl {
 		}
 		double distance = CoordUtils.calcDistance(this.cordinate, selectedSpot.parking.getCoordinate());
 		double walkingTime = distance/(1000*4); //4 Km/h !!Gibt es den Wert in der Config?
-		System.out.println("Walking Score :"+betaWalk*walkingTime);
+		//System.out.println("Walking Score :"+betaWalk*walkingTime);
 		scorekeeper.add(betaWalk*walkingTime);
+		
+		
+		//EV
+		if(evControl.hasEV(personId)&&selectedSpot.charge){
+			this.countEVParkedOnEVSpot++;
+		}
+		
+		
 		
 		return 1;
 	}
 
+	//--------------------------- ---------------------------------------------
 	public void printStatistics(){
 		System.out.println("Privat geparkt:" + Double.toString(this.countPrivate));
 		System.out.println("Oeffentlich geparkt:" + Double.toString(this.countPublic));
 		System.out.println("Nicht geparkt:" + Double.toString(this.countNotParked));
+		System.out.println("EVs auf EV Spots geparkt:" + this.countEVParkedOnEVSpot);
 		
 	}
 	
+	//---------------------------  ---------------------------------------------
 	public void resetStatistics(){
 		this.countNotParked=0;
 		this.countPrivate=0;
 		this.countPublic=0;
+		this.countEVParkedOnEVSpot=0;
+	}
+	
+	//--------------------------- G E T     E S T I M A T E D     D U R A T I O N -----
+	
+	public double getEstimatedDuration(ActivityStartEvent event){
+		//System.out.println("Get estimated duration:");
+
+		PersonImpl person = (PersonImpl) controller.getPopulation().getPersons().get(event.getPersonId());
+		PlanImpl plan = (PlanImpl) person.getSelectedPlan();
+		double endTime=0;
+
+		//Aktuelle activity finden:
+		boolean getnext = true;
+		ActivityImpl activity = (ActivityImpl) plan.getFirstActivity();
+		while(getnext){
+			if(activity.equals(plan.getLastActivity())){
+				endTime = plan.getFirstActivity().getEndTime();
+				return 24*3600-event.getTime()+endTime; //Letzte activity >> Parkdauer laenger als Rest der Iteration
+			}
+			
+			if(activity.getFacilityId().equals(event.getFacilityId()) && Math.abs(activity.getStartTime()-event.getTime())<1800){
+				//gefunden
+				getnext=false;
+			} else{
+				Leg leg = plan.getNextLeg(activity);
+				if(leg==null){return -3;}
+				activity=(ActivityImpl) plan.getNextActivity(leg); // Naechste laden
+				if(activity==null){ return -2;} //Aktuelle activity nicht gefunden >> sollte nicht passieren
+				
+			}
+		}
+
+		
+		boolean foundNextCarLeg = false;
+		while (foundNextCarLeg == false){
+			Leg leg = plan.getNextLeg(activity);
+			if(leg.getMode().equalsIgnoreCase("car")){
+				endTime = leg.getDepartureTime();
+				foundNextCarLeg=true;
+			}else{
+				Activity act = plan.getNextActivity(leg);
+				if(act==null){return -1;}
+				leg=plan.getNextLeg(act);
+				if(leg==null){
+					return -1; //Scheint letzte Activity zu sein >> Parkdauer laenger als Rest der Iteration
+				}
+			}
+			
+		}
+		
+		if(endTime==0){return -4;}
+		
+		return endTime-event.getTime();
+		
+	}
+
+
+
+
+	public void setEvControl(EVControl evControl) {
+		this.evControl = evControl;
+		this.evUsage=true;
 	}
 
 	

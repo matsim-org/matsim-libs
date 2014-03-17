@@ -98,6 +98,17 @@ public class Parking {
 		}
 		return null;
 	}
+	
+	public int[] diagnose(){
+		int[] counts = new int[2];
+		counts[0]=0; //EVs
+		counts[1]=0; //NEVs
+		for (ParkingSpot spot : spots){
+			if(spot.charge){counts[0]++;}
+			else{counts[1]++;}
+		}
+		return counts;
+	}
 
 	
 	

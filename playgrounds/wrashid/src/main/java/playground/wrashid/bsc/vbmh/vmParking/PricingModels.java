@@ -52,7 +52,7 @@ public class PricingModels {
 			
 			price = model.getPriceOfFirstMinuteEV() + duration * model.getPricePerMinuteEV();
 		} else {
-			System.out.println(model.getPricePerMinuteNEV());
+			//System.out.println(model.getPricePerMinuteNEV());
 			price = model.getPriceOfFirstMinuteNEV() + duration * model.getPricePerMinuteNEV();
 		}
 			

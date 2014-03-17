@@ -30,6 +30,8 @@ public class create_demo_parking {
 	static HashMap <String,Double> EVanteile = new HashMap<String,Double>(); //Anteil EV Nach P Typ
 	static Scenario scenario;
 	static HashMap <String,Integer> anzahlArbeiter = new HashMap<String, Integer>();
+	static int diagZaehlEV=0;
+	static int diagZaehlNEV=0;
 	public static void main(String[] args) {
 	
 		Panteile.put("home", 1.0);
@@ -38,10 +40,10 @@ public class create_demo_parking {
 		
 		// Alle folgenden relativ zu Agents die in der Facility arbeiten
 		Panteile.put("work", 0.5);
-		EVanteile.put("work", 0.05);
+		EVanteile.put("work", 0.10);
 		
 		Panteile.put("secondary",0.5);
-		EVanteile.put("secondary", 0.2);
+		EVanteile.put("secondary", 0.0);
 		
 		Panteile.put("Street", 0.05);
 		EVanteile.put("Street", 0.0);
@@ -146,13 +148,15 @@ public class create_demo_parking {
 		
 		writer.write(parking_map, "input/parkings_demo.xml");
 		System.out.println("feddisch");
-
+		System.out.println("EV: "+create_demo_parking.diagZaehlEV);
+		System.out.println("NEV: "+create_demo_parking.diagZaehlNEV);
 	}
 	
 	static void setCapacity(Parking parking, String location_type, double location_capacity){
 		parking.capacityEV=Math.round(location_capacity * Panteile.get(location_type) * EVanteile.get(location_type));
 		parking.capacityNEV=Math.round(location_capacity * Panteile.get(location_type) * (1-EVanteile.get(location_type)));
-		
+		create_demo_parking.diagZaehlEV+=Math.round(location_capacity * Panteile.get(location_type) * EVanteile.get(location_type));
+		create_demo_parking.diagZaehlNEV+=Math.round(location_capacity * Panteile.get(location_type) * (1-EVanteile.get(location_type)));
 		
 	}
 	

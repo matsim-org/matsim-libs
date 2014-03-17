@@ -14,9 +14,9 @@ public class VMScoreKeeper {
 	double score = 0;
 	
 	public void add(double add){
-		System.out.println("Previous Score :"+score);
+		//System.out.println("Previous Score :"+score);
 		score = score + add;
-		System.out.println("Added value to ScoreKeeper :"+add);
+		//System.out.println("Added value to ScoreKeeper :"+add);
 		if(score>0){
 			System.out.println("Positve parkingScore !!");
 			try {
