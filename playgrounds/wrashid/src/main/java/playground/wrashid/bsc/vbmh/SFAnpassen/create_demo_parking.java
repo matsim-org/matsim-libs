@@ -40,13 +40,13 @@ public class create_demo_parking {
 		
 		// Alle folgenden relativ zu Agents die in der Facility arbeiten
 		Panteile.put("work", 0.5);
-		EVanteile.put("work", 0.10);
+		EVanteile.put("work", 0.20);
 		
 		Panteile.put("secondary",0.5);
-		EVanteile.put("secondary", 0.0);
+		EVanteile.put("secondary", 0.2);
 		
 		Panteile.put("Street", 0.05);
-		EVanteile.put("Street", 0.0);
+		EVanteile.put("Street", 0.30);
 		
 		Panteile.put("edu", 0.05);
 		EVanteile.put("edu", 0.0);

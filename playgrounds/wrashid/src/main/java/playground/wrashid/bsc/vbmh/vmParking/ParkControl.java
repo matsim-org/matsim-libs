@@ -58,7 +58,7 @@ public class ParkControl {
 	
 	double time; //Wird auf aktuelle Zeit gesetzt (Vom event)
 	Coord cordinate; //Koordinaten an denen die Zie Facility ist. Von hier aus wird gesucht.
-	
+	boolean ev;
 	
 	
 	//--------------------------- S T A R T  U P---------------------------------------------
@@ -112,10 +112,20 @@ public class ParkControl {
 		//Geschaetzte Dauer laden
 		//sSystem.out.println(getEstimatedDuration(event)/3600);
 		
+		//EV Checken:
+		ev=false;
+		if(evUsage){
+			if(evControl.hasEV(personId)){
+				ev=true;
+				//System.out.println("Suche Parking fuer EV");
+			}
+		}
+		
+		
 		
 		
 		// PRIVATES PARKEN
-		ParkingSpot privateParking = checkPrivateParking(facilityid.toString());
+		ParkingSpot privateParking = checkPrivateParking(facilityid.toString(), ev);
 		if (privateParking != null) {
 			//System.out.println("Privaten Parkplatz gefunden");
 			parkOnSpot(privateParking, personId);
@@ -125,7 +135,7 @@ public class ParkControl {
 		
 		
 		// OEFFENTLICHES PARKEN
-		LinkedList<ParkingSpot> spotsInArea = getPublicParkings(cordinate);
+		LinkedList<ParkingSpot> spotsInArea = getPublicParkings(cordinate, ev);
 		if (spotsInArea != null) {
 			parkPublic(spotsInArea, personId);
 			//System.out.println("Oeffentlich geparkt");
@@ -178,17 +188,22 @@ public class ParkControl {
 	}
 
 	//--------------------------- C H E C K   P R I V A T ---------------------------------------------
-	ParkingSpot checkPrivateParking(String facilityId) {
+	ParkingSpot checkPrivateParking(String facilityId, boolean ev) {
 		// !! Zur Beschleunigung Map erstellen ? <facility ID, Private Parking> ?
+		ParkingSpot selectedSpot = null;
 		for (Parking parking : parkingMap.getParkings()) {
 			// System.out.println("Suche Parking mit passender facility ID");
 			if(parking.facilityId!=null){ //Es gibt datensaetze ohne Facility ID >> Sonst Nullpointer
 				if (parking.facilityId.equals(facilityId)) { // !! Act Type muss auch uebereinstimmen ! >> Einbauen
 					//System.out.println("checke Parking");
-					ParkingSpot selectedSpot = parking.checkForFreeSpot(); //Gibt null oder einen freien Platz zurueck
+					selectedSpot = parking.checkForFreeSpot(); //Gibt null oder einen freien Platz zurueck
+					if(ev){
+						selectedSpot = parking.checkForFreeSpotEVPriority(); // !!Wenn ev Spot vorhanden wird er genommen.
+					}
 					if (selectedSpot != null) {
 						return selectedSpot;
 					}
+					
 				}
 			}
 		}
@@ -196,15 +211,20 @@ public class ParkControl {
 	}
 
 	//--------------------------- G E T  P U B L I C ---------------------------------------------
-	LinkedList<ParkingSpot> getPublicParkings(Coord coord) {
+	LinkedList<ParkingSpot> getPublicParkings(Coord coord, boolean ev) {
 		// !! Mit quadtree oder aehnlichem Beschleunigen??
 		LinkedList<ParkingSpot> list = new LinkedList<ParkingSpot>();
 		for (Parking parking : parkingMap.getParkings()) {
 			if (parking.type.equals("public")) {
+				ParkingSpot spot = null;
 				double distance = CoordUtils.calcDistance(coord,
 						parking.getCoordinate());
 				if (distance < maxDistance) {
-					ParkingSpot spot = parking.checkForFreeSpot();
+					spot = parking.checkForFreeSpot();
+					if(ev){
+						spot = parking.checkForFreeSpotEVPriority();
+					}
+					
 					if (spot != null) {
 						list.add(spot);
 					}

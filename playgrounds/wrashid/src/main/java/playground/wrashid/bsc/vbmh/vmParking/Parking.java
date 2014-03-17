@@ -34,6 +34,8 @@ public class Parking {
 	public boolean evExklusive;
 	public double coordinateX, coordinateY;
 	public LinkedList <ParkingSpot> spots;
+	public LinkedList <ParkingSpot> evSpots;
+	public LinkedList <ParkingSpot> nevSpots;
 ///*
 	@XmlTransient
 	public Coord getCoordinate(){
@@ -49,6 +51,19 @@ public class Parking {
 	
 	public void createSpots(){
 		spots= new LinkedList<ParkingSpot>();
+		evSpots = new LinkedList<ParkingSpot>();
+		nevSpots = new LinkedList<ParkingSpot>();
+		
+		for (int i=0; i<capacityNEV; i++){
+			ParkingSpot parkingSpot = new ParkingSpot();
+			spots.add(parkingSpot);
+			spots.getLast().charge=false;
+			spots.getLast().parkingPriceM=this.parkingPriceM;
+			spots.getLast().setOccupied(false);
+			spots.getLast().parking=this;
+			nevSpots.add(spots.getLast());
+		}
+	
 		for (int i=0; i<capacityEV; i++){
 			ParkingSpot parkingSpot = new ParkingSpot();
 			spots.add(parkingSpot);
@@ -58,15 +73,9 @@ public class Parking {
 			spots.getLast().parkingPriceM=this.parkingPriceM;
 			spots.getLast().setOccupied(false);
 			spots.getLast().parking=this;
+			evSpots.add(spots.getLast());
 		}
-		for (int i=0; i<capacityNEV; i++){
-			ParkingSpot parkingSpot = new ParkingSpot();
-			spots.add(parkingSpot);
-			spots.getLast().charge=false;
-			spots.getLast().parkingPriceM=this.parkingPriceM;
-			spots.getLast().setOccupied(false);
-			spots.getLast().parking=this;
-		}
+	
 	}
 	
 	public void clearSpots(){
@@ -87,9 +96,11 @@ public class Parking {
 			spot = null;
 		}
 		spots=null;
+		evSpots=null;
+		nevSpots=null;
 	}
 	
-	public ParkingSpot checkForFreeSpot(){
+	public ParkingSpot checkForFreeSpot(){ //Durchsucht zwar alle Spots, NEV Spots sind jedoch oben in der Liste, kommen daher morgens zuerst drann
 		for(ParkingSpot spot : spots){
 			//System.out.println("checke spot");
 			if (spot.isOccupied() == false){
@@ -98,6 +109,33 @@ public class Parking {
 		}
 		return null;
 	}
+	
+	
+	
+	public ParkingSpot checkForFreeSpotEVPriority(){  //Durchsucht erst EV Spots dann NEV Spots
+		for(ParkingSpot spot : evSpots){
+			//System.out.println("checke spot");
+			if (spot.isOccupied() == false){
+				return spot;
+			}
+		}
+		
+		return checkForFreeNEVSpot();
+	}
+	
+	
+	public ParkingSpot checkForFreeNEVSpot(){
+		for(ParkingSpot spot : nevSpots){
+			//System.out.println("checke spot");
+			if (spot.isOccupied() == false){
+				return spot;
+			}
+		}
+		return null;
+	}
+	
+	
+	
 	
 	public int[] diagnose(){
 		int[] counts = new int[2];
