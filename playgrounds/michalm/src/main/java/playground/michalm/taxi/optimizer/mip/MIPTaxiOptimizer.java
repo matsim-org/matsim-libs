@@ -77,7 +77,7 @@ public class MIPTaxiOptimizer
             startedReqs++;
 
             if (unplannedRequests.size() > 0) {
-                requiresReoptimization = doReoptimize();
+                requiresReoptimization |= doReoptimize();
             }
         }
     }

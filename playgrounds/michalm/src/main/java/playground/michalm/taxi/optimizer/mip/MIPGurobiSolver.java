@@ -40,10 +40,10 @@ public class MIPGurobiSolver
     private final PathTreeBasedTravelTimeCalculator pathTravelTimeCalc;
     private final MIPRequestData rData;
     private final VehicleData vData;
+    private final int n;//request count
+    private final int m;//vehicle count
 
     private GRBModel model;
-    private int n;//request count
-    private int m;//vehicle count
     private GRBVar[][] xVar;//for each request/vehicle pair, (i, j)
     private GRBVar[] wVar; //for each request, i
 
@@ -56,6 +56,9 @@ public class MIPGurobiSolver
         this.pathTravelTimeCalc = pathTravelTimeCalc;
         this.rData = rData;
         this.vData = vData;
+
+        n = rData.dimension;
+        m = vData.dimension;
     }
 
 
@@ -63,8 +66,11 @@ public class MIPGurobiSolver
     {
         try {
             model = new GRBModel(new GRBEnv());
-            GRBEnv env = model.getEnv();//this is the internal model (a copy of that passed to the constructor)
-            env.set(DoubleParam.TimeLimit, 30);
+            
+            // this is the internal model (a copy of that passed to the constructor)
+            GRBEnv env = model.getEnv();
+            env.set(DoubleParam.TimeLimit, 3600);// 1 hour
+            env.set(GRB.DoubleParam.MIPGap, 0.01);//1%
 
             addXVariables();
             addWVariables();
@@ -213,8 +219,19 @@ public class MIPGurobiSolver
     private void applyInitialSolution(MIPSolution initialSolution)
         throws GRBException
     {
-        model.set(GRB.DoubleAttr.X, xVar, initialSolution.x);
-        model.set(GRB.DoubleAttr.X, wVar, initialSolution.w);
+        for (int u = 0; u < m + n; u++) {
+            for (int v = 0; v < m + n; v++) {
+                xVar[u][v].set(GRB.DoubleAttr.Start, initialSolution.x[u][v]);
+            }
+        }
+
+        for (int i = 0; i < n; i++) {
+            wVar[i].set(GRB.DoubleAttr.Start, initialSolution.w[i]);
+        }
+
+        //the following shortcut does not work (why??):
+        //model.set(GRB.DoubleAttr.Start, wVar, initialSolution.w);
+        //model.set(GRB.DoubleAttr.Start, xVar, initialSolution.x);
     }
 
 

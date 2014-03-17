@@ -108,7 +108,7 @@ import playground.michalm.taxi.optimizer.mip.MIPTaxiOptimizer;
 
     APS_DSE_15M(AP_SCHEDULING, DEMAND_SUPPLY_EQUIL, EVENTS_15_MIN, TIME),
     
-    MIQCP_FF(MIQCP_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME);
+    MIP_FF(MIQCP_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME);
 
     /*package*/static enum AlgorithmType
     {

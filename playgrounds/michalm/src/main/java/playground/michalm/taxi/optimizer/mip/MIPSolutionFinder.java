@@ -53,8 +53,9 @@ class MIPSolutionFinder
     {
         final int m = vData.dimension;
         final int n = rData.dimension;
-        double[][] x = new double[m + n][m + n];
-        double[] w = new double[n];
+        
+        final double[][] x = new double[m + n][m + n];
+        final double[] w = new double[n];
 
         Queue<TaxiRequest> queue = new PriorityQueue<TaxiRequest>(n, Requests.T0_COMPARATOR);
         Collections.addAll(queue, rData.requests);

@@ -41,7 +41,7 @@ public class MIPProblem
     };
 
 
-    private static final int REQS_PER_VEH = 5;
+    private static final int REQS_PER_VEH = 99999;
 
     private final TaxiOptimizerConfiguration optimConfig;
     private final PathTreeBasedTravelTimeCalculator pathTravelTimeCalc;
@@ -49,6 +49,9 @@ public class MIPProblem
     private SortedSet<TaxiRequest> unplannedRequests;
     private MIPRequestData rData;
     private VehicleData vData;
+
+    private MIPSolution initialSolution;
+    private MIPSolution finalSolution;
 
 
     public MIPProblem(TaxiOptimizerConfiguration optimConfig,
@@ -72,9 +75,9 @@ public class MIPProblem
             return;
         }
 
-        MIPSolution initialSolution = findInitialSolution();
-        MIPSolution solution = solveProblem(initialSolution);
-        scheduleSolution(solution);
+        findInitialSolution();
+        solveProblem();
+        scheduleSolution();
     }
 
 
@@ -97,28 +100,23 @@ public class MIPProblem
     }
 
 
-    private MIPSolution findInitialSolution()
+    private void findInitialSolution()
     {
-        MIPSolution solution = new MIPSolutionFinder(optimConfig, rData, vData)
-                .findInitialSolution();
-
+        initialSolution = new MIPSolutionFinder(optimConfig, rData, vData).findInitialSolution();
         optimConfig.scheduler.removePlannedRequestsFromAllSchedules();
-
-        return solution;
     }
 
 
-    private MIPSolution solveProblem(MIPSolution initialSolution)
+    private void solveProblem()
     {
-        MIPGurobiSolver solver = new MIPGurobiSolver(optimConfig, pathTravelTimeCalc, rData, vData);
-        return solver.solve(initialSolution);
+        finalSolution = new MIPGurobiSolver(optimConfig, pathTravelTimeCalc, rData, vData)
+                .solve(initialSolution);
     }
 
 
-    private void scheduleSolution(MIPSolution solution)
+    private void scheduleSolution()
     {
-        new MIPSolutionScheduler(optimConfig, rData, vData).updateSchedules(solution);
-
+        new MIPSolutionScheduler(optimConfig, rData, vData).updateSchedules(finalSolution);
         unplannedRequests.removeAll(Arrays.asList(rData.requests));
     }
 
