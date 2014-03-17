@@ -295,7 +295,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 //        multiLauncher.run(APS_TP_xx, runs);
 //        multiLauncher.run(APS_DSE_xx, runs);
         
-        multiLauncher.run(MIQCP_FF, 1, true, true, false);
+        multiLauncher.run(MIP_FF, 1, true, true, false);
 
         multiLauncher.closeOutputFiles();
     }
