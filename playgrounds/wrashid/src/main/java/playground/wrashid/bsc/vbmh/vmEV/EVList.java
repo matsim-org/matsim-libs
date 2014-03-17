@@ -5,6 +5,8 @@ import java.util.HashMap;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.matsim.api.core.v01.Id;
+
 @XmlRootElement
 public class EVList {
 	private HashMap <String, EV> ownerMap = new HashMap<String, EV>();
@@ -27,9 +29,24 @@ public class EVList {
 		this.ownerMap = ownerMap;
 	}
 
-	@XmlElement(name = "test")
-	public String getTestvar() {
-		return testvar;
+
+	public boolean hasEV(Id personID){
+		return this.ownerMap.containsKey(personID.toString());
+	}
+	
+	
+	public EV getEV(Id personID){
+		EV ev = this.ownerMap.get(personID.toString()); 
+		
+		if (ev == null){ System.out.println("Something went wrong");}
+		
+		return ev;
+	}
+	
+	public void setAllStateOfChargePercentage(double percentage){
+		for(EV ev : ownerMap.values()){
+			ev.setStateOfChargePercentage(percentage);
+		}
 	}
 	
 	

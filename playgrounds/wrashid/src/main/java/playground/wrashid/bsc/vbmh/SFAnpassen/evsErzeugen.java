@@ -24,7 +24,9 @@ public class evsErzeugen {
 				EV ev = new EV();
 				ev.setId(Integer.toString(i));
 				ev.setOwnerPersonId(person.getId().toString());
-				ev.batteryCapacity=1000;
+				ev.batteryCapacity=18.7;
+				ev.consumptionPerHundredKlicks=11.7;
+				ev.evType="w-Zo"; 
 				evList.addEV(ev);
 				System.out.println(i);
 				System.out.println(evList.getOwnerMap().size());
