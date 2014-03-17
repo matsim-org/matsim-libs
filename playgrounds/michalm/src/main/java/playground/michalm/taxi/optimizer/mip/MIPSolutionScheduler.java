@@ -6,10 +6,11 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.mip.MIPProblem.MIPSolution;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
 
 
-class MIPScheduler
+class MIPSolutionScheduler
 {
     private final TaxiOptimizerConfiguration optimConfig;
     private final MIPRequestData rData;
@@ -17,11 +18,12 @@ class MIPScheduler
     private final int m;
     private final int n;
 
-    private double[][] x;
+    private MIPSolution solution;
     private Vehicle currentVeh;
 
 
-    MIPScheduler(TaxiOptimizerConfiguration optimConfig, MIPRequestData rData, VehicleData vData)
+    MIPSolutionScheduler(TaxiOptimizerConfiguration optimConfig, MIPRequestData rData,
+            VehicleData vData)
     {
         this.optimConfig = optimConfig;
         this.rData = rData;
@@ -31,9 +33,10 @@ class MIPScheduler
     }
 
 
-    void updateSchedules(double[][] x)
+    void updateSchedules(MIPSolution solution)
     {
-        this.x = x;
+        this.solution = solution;
+
         for (int k = 0; k < m; k++) {
             currentVeh = vData.vehicles.get(k);
             addSubsequentRequestsToCurrentVehicle(k);
@@ -43,9 +46,9 @@ class MIPScheduler
 
     private void addSubsequentRequestsToCurrentVehicle(int u)
     {
-        double[] x_u = x[u];
+        double[] x_u = solution.x[u];
         for (int i = 0; i < n; i++) {
-            if (x_u[m + i] > 0.5) {//either 0 +/-epsilon or 1 +/-epsilon
+            if (x_u[m + i] >= 0.5) {//either 0 +/-epsilon or 1 +/-epsilon
                 addRequestToCurrentVehicle(i);
                 addSubsequentRequestsToCurrentVehicle(m + i);
                 return;
