@@ -77,6 +77,7 @@ public class EV {
 	
 	
 	public double calcNewStateOfCharge(double chargingRate, double time){
+		time = time / 3600;
 		double stateOfCharge = this.stateOfCharge;
 		double effChargingRate = chargingRate * 0.93;
 		double timeNeededFor80p = (this.batteryCapacity*0.8-stateOfCharge)/effChargingRate;
@@ -98,12 +99,15 @@ public class EV {
 			stateOfCharge=batteryCapacity;
 		}
 		
+		
 		return stateOfCharge;
 	}
 
 
 	public void setStateOfCharge(double stateOfCharge) {
+		System.out.println("State of charge: "+this.stateOfCharge);
 		this.stateOfCharge = stateOfCharge;
+		System.out.println("New state of charge: "+this.stateOfCharge);
 	}
 	
 

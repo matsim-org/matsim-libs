@@ -277,7 +277,7 @@ public class ParkControl {
 			if(evControl.hasEV(event.getPersonId())){
 				if(selectedSpot.charge){
 					evControl.charge(personId, selectedSpot.chargingRate, duration);
-					System.out.println("EV geladen Person: "+personId.toString()+" Spot: "+selectedSpot.parking.id);
+					System.out.println("EV charged person: "+personId.toString()+" parking: "+selectedSpot.parking.id+" new state of charge [%]: "+evControl.stateOfChargePercentage(personId));
 				}
 			}
 		

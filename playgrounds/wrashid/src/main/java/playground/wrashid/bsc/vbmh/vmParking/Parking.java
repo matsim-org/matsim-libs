@@ -27,7 +27,8 @@ public class Parking {
 	public @XmlAttribute int id;
 	public long capacityEV;
 	public long capacityNEV;
-	public int chargingRate, parkingPriceM, chargingPriceM;
+	public double chargingRate;
+	public int parkingPriceM, chargingPriceM;
 	public String facilityId;
 	public String facilityActType;
 	public String type;

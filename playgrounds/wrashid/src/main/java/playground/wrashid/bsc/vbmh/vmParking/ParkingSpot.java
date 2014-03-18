@@ -3,7 +3,8 @@ package playground.wrashid.bsc.vbmh.vmParking;
 public class ParkingSpot {
 	boolean charge, evExclusive;
 	private boolean occupied;
-	public int chargingRate, parkingPriceM, chargingPriceM;
+	double chargingRate;
+	public int parkingPriceM, chargingPriceM;
 	public Parking parking;
 	private double timeVehicleParked;
 	

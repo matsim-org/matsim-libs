@@ -157,7 +157,7 @@ public class create_demo_parking {
 		parking.capacityNEV=Math.round(location_capacity * Panteile.get(location_type) * (1-EVanteile.get(location_type)));
 		create_demo_parking.diagZaehlEV+=Math.round(location_capacity * Panteile.get(location_type) * EVanteile.get(location_type));
 		create_demo_parking.diagZaehlNEV+=Math.round(location_capacity * Panteile.get(location_type) * (1-EVanteile.get(location_type)));
-		
+		parking.chargingRate=2.3;//!! Gehoert nicht hier her und muss dynamisch werden
 	}
 	
 	

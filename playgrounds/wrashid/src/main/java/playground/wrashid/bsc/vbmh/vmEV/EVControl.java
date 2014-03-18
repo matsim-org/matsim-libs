@@ -75,8 +75,13 @@ public class EVControl {
 	public double charge(Id personId, double chargingRate, double duration){
 		EV ev = evList.getEV(personId);
 		double amountOfEnergy = ev.calcNewStateOfCharge(chargingRate, duration)-ev.stateOfCharge;
+		System.out.println("amount of energy :" + amountOfEnergy);
 		ev.setStateOfCharge(ev.calcNewStateOfCharge(chargingRate, duration));
 		return amountOfEnergy;
+	}
+	
+	public double stateOfChargePercentage(Id personId){
+		return evList.getEV(personId).getStateOfChargePercentage();
 	}
 	
 	
