@@ -107,17 +107,6 @@ public class TaxiStatsCalculator
 
     public static class TaxiStats
     {
-        public static final String HEADER = "PickupDriveT\t" //
-                + "MaxPickupDriveT" //
-                + "DeliveryDriveT\t"//
-                + "PickupT\t" //
-                + "DropoffT\t" //
-                + "CruiseT\t" //
-                + "WaitT\t" //
-                + "OverT\t" //
-                + "PassengerWaitT\t" //
-                + "MaxPassengerWaitT";
-
         private double taxiPickupDriveTime;
         private double taxiDropoffDriveTime;
         private double taxiPickupTime;
@@ -204,6 +193,18 @@ public class TaxiStatsCalculator
         {
             return passengerWaitTimeStats;
         }
+
+
+        public static final String HEADER = "PickupDriveT\t" //
+                + "MaxPickupDriveT" //
+                + "DeliveryDriveT\t"//
+                + "PickupT\t" //
+                + "DropoffT\t" //
+                + "CruiseT\t" //
+                + "WaitT\t" //
+                + "OverT\t" //
+                + "PassengerWaitT\t" //
+                + "MaxPassengerWaitT";
 
 
         @Override

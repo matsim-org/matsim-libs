@@ -20,7 +20,6 @@
 package playground.michalm.taxi.optimizer.mip;
 
 import gurobi.*;
-import gurobi.GRB.DoubleParam;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
@@ -66,11 +65,16 @@ public class MIPGurobiSolver
     {
         try {
             model = new GRBModel(new GRBEnv());
-            
+
             // this is the internal model (a copy of that passed to the constructor)
             GRBEnv env = model.getEnv();
-            env.set(DoubleParam.TimeLimit, 3600);// 1 hour
-            env.set(GRB.DoubleParam.MIPGap, 0.01);//1%
+
+            //env.set(DoubleParam.TimeLimit, 3600);// 1 hour
+            //env.set(GRB.DoubleParam.MIPGap, 0.01);//1%
+            
+            env.set(GRB.IntParam.MIPFocus, 1);//the focus towards finding feasible solutions
+            //or alternatively: focus towards finding feasible solutions after 1 hour
+            //env.set(GRB.DoubleParam.ImproveStartTime, 3600);
 
             addXVariables();
             addWVariables();
@@ -84,6 +88,8 @@ public class MIPGurobiSolver
             addVehToReqLinConstraint();
             addReqToReqLinConstraint();
             model.update();
+
+            //model.write("D:\\model.lp");
 
             applyInitialSolution(initialSolution);
 
@@ -118,11 +124,9 @@ public class MIPGurobiSolver
         throws GRBException
     {
         wVar = new GRBVar[n];
-
         for (int i = 0; i < n; i++) {
-            TaxiRequest req = rData.requests[i];
-            double e_i = req.getT0();
-            wVar[i] = model.addVar(e_i, W_MAX, 1, GRB.CONTINUOUS, "w_" + i);
+            double e_i = rData.requests[i].getT0();
+            wVar[i] = model.addVar(e_i, W_MAX, 0, GRB.CONTINUOUS, "w_" + i);
         }
     }
 
@@ -130,6 +134,15 @@ public class MIPGurobiSolver
     private void setObjective()
         throws GRBException
     {
+        GRBLinExpr obj = new GRBLinExpr();
+        for (int i = 0; i < n; i++) {
+            obj.addTerm(1, wVar[i]);
+
+            double e_i = rData.requests[i].getT0();
+            obj.addConstant(-e_i);
+        }
+
+        model.setObjective(obj);
         model.set(GRB.IntAttr.ModelSense, 1);
     }
 

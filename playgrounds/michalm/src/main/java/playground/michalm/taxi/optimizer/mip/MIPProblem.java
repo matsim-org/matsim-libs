@@ -23,6 +23,8 @@ import java.util.*;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.util.stats.*;
+import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
 
 public class MIPProblem
@@ -78,6 +80,10 @@ public class MIPProblem
         findInitialSolution();
         solveProblem();
         scheduleSolution();
+        
+        TaxiStats stats = new TaxiStatsCalculator().calculateStats(optimConfig.context.getVrpData());
+        System.err.println(TaxiStats.HEADER);
+        System.err.println(stats.toString());
     }
 
 

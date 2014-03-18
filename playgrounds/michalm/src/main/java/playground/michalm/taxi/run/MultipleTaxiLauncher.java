@@ -25,11 +25,14 @@ import java.io.*;
 import java.util.EnumSet;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.jfree.chart.JFreeChart;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.core.gbl.MatsimRandom;
 
+import pl.poznan.put.util.jfreechart.ChartUtils;
 import playground.michalm.taxi.scheduler.TaxiDelaySpeedupStats;
+import playground.michalm.taxi.util.chart.TaxiScheduleChartUtils;
 import playground.michalm.taxi.util.stats.*;
 import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
@@ -178,10 +181,15 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
         cacheStats.printStats(pw3, launcher.algorithmConfig.name());
         cacheStats.clearStats();
 
-//        JFreeChart chart = TaxiScheduleChartUtils.chartSchedule(launcher.context.getVrpData()
-//                .getVehicles());
-//        chart.setTitle(cfg);
-//        ChartUtils.showFrame(chart);
+        //=========== stats & graphs for the last run
+        
+        TaxiStats stats = new TaxiStatsCalculator().calculateStats(data);
+        System.err.println(TaxiStats.HEADER);
+        System.err.println(stats.toString());
+        
+        JFreeChart chart = TaxiScheduleChartUtils.chartSchedule(data.getVehicles());
+        chart.setTitle(cfg);
+        ChartUtils.showFrame(chart);
     }
 
 
@@ -295,7 +303,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 //        multiLauncher.run(APS_TP_xx, runs);
 //        multiLauncher.run(APS_DSE_xx, runs);
         
-        multiLauncher.run(MIP_FF, 1, true, true, false);
+        multiLauncher.run(MIP_FF, 1, true, true, true);
 
         multiLauncher.closeOutputFiles();
     }
