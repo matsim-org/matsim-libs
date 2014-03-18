@@ -77,12 +77,14 @@ public class MIPTaxiOptimizer
             startedReqs++;
 
             if (unplannedRequests.size() > 0) {
-                requiresReoptimization |= doReoptimize();
+                //requiresReoptimization |= doReoptimize();
+                requiresReoptimization = true;
             }
         }
     }
 
 
+    @SuppressWarnings("unused")
     private boolean doReoptimize()
     {
         int currentPlanned = plannedReqs - startedReqs;

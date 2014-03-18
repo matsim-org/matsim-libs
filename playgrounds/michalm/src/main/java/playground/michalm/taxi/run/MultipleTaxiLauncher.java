@@ -31,6 +31,7 @@ import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.core.gbl.MatsimRandom;
 
 import pl.poznan.put.util.jfreechart.ChartUtils;
+import playground.michalm.taxi.optimizer.mip.MIPTaxiStats;
 import playground.michalm.taxi.scheduler.TaxiDelaySpeedupStats;
 import playground.michalm.taxi.util.chart.TaxiScheduleChartUtils;
 import playground.michalm.taxi.util.stats.*;
@@ -182,11 +183,10 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
         cacheStats.clearStats();
 
         //=========== stats & graphs for the last run
-        
-        TaxiStats stats = new TaxiStatsCalculator().calculateStats(data);
-        System.err.println(TaxiStats.HEADER);
-        System.err.println(stats.toString());
-        
+
+        MIPTaxiStats.currentStats.calcSimulated();
+        MIPTaxiStats.currentStats.print(pw);
+
         JFreeChart chart = TaxiScheduleChartUtils.chartSchedule(data.getVehicles());
         chart.setTitle(cfg);
         ChartUtils.showFrame(chart);
@@ -289,20 +289,20 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
         MultipleTaxiLauncher multiLauncher = new MultipleTaxiLauncher(paramFile);
         multiLauncher.initOutputFiles("");
 
-//        multiLauncher.run(NOS_TW_xx, runs);
-//        multiLauncher.run(NOS_TP_xx, runs);
-//        multiLauncher.run(NOS_DSE_xx, runs);
-//
-//        multiLauncher.run(OTS_TW_xx, runs);
-//        multiLauncher.run(OTS_TP_xx, runs);
-//        
-//        multiLauncher.run(RES_TW_xx, runs);
-//        multiLauncher.run(RES_TP_xx, runs);
-//        
-//        multiLauncher.run(APS_TW_xx, runs);
-//        multiLauncher.run(APS_TP_xx, runs);
-//        multiLauncher.run(APS_DSE_xx, runs);
-        
+        //        multiLauncher.run(NOS_TW_xx, runs);
+        //        multiLauncher.run(NOS_TP_xx, runs);
+        //        multiLauncher.run(NOS_DSE_xx, runs);
+        //
+        //        multiLauncher.run(OTS_TW_xx, runs);
+        //        multiLauncher.run(OTS_TP_xx, runs);
+        //        
+        //        multiLauncher.run(RES_TW_xx, runs);
+        //        multiLauncher.run(RES_TP_xx, runs);
+        //        
+        //        multiLauncher.run(APS_TW_xx, runs);
+        //        multiLauncher.run(APS_TP_xx, runs);
+        //        multiLauncher.run(APS_DSE_xx, runs);
+
         multiLauncher.run(MIP_FF, 1, true, true, true);
 
         multiLauncher.closeOutputFiles();

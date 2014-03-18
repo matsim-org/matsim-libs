@@ -23,8 +23,6 @@ import java.util.*;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.util.stats.*;
-import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
 
 public class MIPProblem
@@ -78,12 +76,13 @@ public class MIPProblem
         }
 
         findInitialSolution();
+        MIPTaxiStats.currentStats = new MIPTaxiStats(optimConfig.context.getVrpData());
+        MIPTaxiStats.currentStats.calcInitial();
+
         solveProblem();
+
         scheduleSolution();
-        
-        TaxiStats stats = new TaxiStatsCalculator().calculateStats(optimConfig.context.getVrpData());
-        System.err.println(TaxiStats.HEADER);
-        System.err.println(stats.toString());
+        MIPTaxiStats.currentStats.calcSolved();
     }
 
 
