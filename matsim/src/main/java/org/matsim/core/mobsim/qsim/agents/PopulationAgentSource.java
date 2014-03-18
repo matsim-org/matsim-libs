@@ -45,6 +45,7 @@ public class PopulationAgentSource implements AgentSource {
 	private QSim qsim;
 	private Map<String, VehicleType> modeVehicleTypes;
 	private Collection<String> mainModes;
+	private boolean insertVehicles = true;
 
 	public PopulationAgentSource(Population population, AgentFactory agentFactory, QSim qsim) {
 		this.population = population;
@@ -61,25 +62,29 @@ public class PopulationAgentSource implements AgentSource {
 	public void insertAgentsIntoMobsim() {
 		for (Person p : population.getPersons().values()) {
 			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
-			Plan plan = p.getSelectedPlan();
-			Set<String> seenModes = new HashSet<String>();
-			for (PlanElement planElement : plan.getPlanElements()) {
-				if (planElement instanceof Leg) {
-					Leg leg = (Leg) planElement;
-					if (this.mainModes.contains(leg.getMode())) { // only simulated modes get vehicles
-						if (!seenModes.contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
-							Id vehicleLink = findVehicleLink(p);
-							qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(p.getId(), modeVehicleTypes.get(leg.getMode())), vehicleLink);
-							seenModes.add(leg.getMode());
-						}
+			qsim.insertAgentIntoMobsim(agent);
+		}
+		if (insertVehicles) {
+			for (Person p : population.getPersons().values()) {
+				insertVehicles(p);
+			}
+		}
+	}
+
+	public void insertVehicles(Person p) {
+		Plan plan = p.getSelectedPlan();
+		Set<String> seenModes = new HashSet<String>();
+		for (PlanElement planElement : plan.getPlanElements()) {
+			if (planElement instanceof Leg) {
+				Leg leg = (Leg) planElement;
+				if (this.mainModes.contains(leg.getMode())) { // only simulated modes get vehicles
+					if (!seenModes.contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
+						Id vehicleLink = findVehicleLink(p);
+						qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(p.getId(), modeVehicleTypes.get(leg.getMode())), vehicleLink);
+						seenModes.add(leg.getMode());
 					}
 				}
 			}
-			// When the agent is inserted, it immediately starts its first activity, and
-			// possibly ends it (if it is 0-duration or if the simulation start time is later than
-			// the activity end time), so the action really starts here!
-			// E.g. the vehicle must already be in place at this point.
-			qsim.insertAgentIntoMobsim(agent);
 		}
 	}
 
@@ -108,6 +113,10 @@ public class PopulationAgentSource implements AgentSource {
 
 	public void setModeVehicleTypes(Map<String, VehicleType> modeVehicleTypes) {
 		this.modeVehicleTypes = modeVehicleTypes;
+	}
+	
+	public void setInsertVehicles(boolean insertVehicles) {
+		this.insertVehicles = insertVehicles;
 	}
 
 }

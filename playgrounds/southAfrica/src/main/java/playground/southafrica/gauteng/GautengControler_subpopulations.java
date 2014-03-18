@@ -60,7 +60,6 @@ import org.matsim.core.events.SimStepParallelEventsManagerImpl;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -696,14 +695,17 @@ public class GautengControler_subpopulations {
 			if (sc.getConfig().network().isTimeVariantNetwork()) {
 				qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
 			}
-			final AgentFactory agentFactory = af ; // make this final for inner class 
 			
-			AgentSource agentSource = new AgentSource(){
+			PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), af, qSim);
+			agentSource.setInsertVehicles(false); // We insert them ourselves!
+			
+			qSim.addAgentSource(agentSource);
+			
+			qSim.addAgentSource(new AgentSource() {
 				@Override
 				public void insertAgentsIntoMobsim() {
 					Population population = sc.getPopulation() ;
 					for (Person p : population.getPersons().values()) {
-						MobsimAgent agent = agentFactory.createMobsimAgentFromPerson(p);
 						Plan plan = p.getSelectedPlan();
 						Set<String> seenModes = new HashSet<String>();
 						for (PlanElement planElement : plan.getPlanElements()) {
@@ -719,17 +721,9 @@ public class GautengControler_subpopulations {
 								}
 							}
 						}
-						// When the agent is inserted, it immediately starts its first activity, and
-						// possibly ends it (if it is 0-duration or if the simulation start time is later than
-						// the activity end time), so the action really starts here!
-						// E.g. the vehicle must already be in place at this point.
-						qSim.insertAgentIntoMobsim(agent);
 					}
 				}
-			} ;
-
-			
-			qSim.addAgentSource(agentSource);
+			});
 			return qSim;
 		}
 	}
