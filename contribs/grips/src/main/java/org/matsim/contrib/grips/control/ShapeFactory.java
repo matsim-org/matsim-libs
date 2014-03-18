@@ -83,14 +83,14 @@ public class ShapeFactory
 		if (points.size()==0)
 			return null;
 		
-		if (points.size()==1)
-		{
-			Point2D p1 = new Point2D.Double(points.get(0).getX()+0.00002,points.get(0).getY()+0.00002);
-			Point2D p2 = new Point2D.Double(points.get(0).getX()+0.00002,points.get(0).getY()-0.00002);
-			points.add(p1);
-			points.add(p2);
-			points.add(p2);
-		}
+//		if (points.size()==1)
+//		{
+//			Point2D p1 = new Point2D.Double(points.get(0).getX()+0.00002,points.get(0).getY()+0.00002);
+//			Point2D p2 = new Point2D.Double(points.get(0).getX()+0.00002,points.get(0).getY()-0.00002);
+//			points.add(p1);
+//			points.add(p2);
+//			points.add(p2);
+//		}
 		
 		
 		PolygonShape polygonShape = new PolygonShape(points, id);

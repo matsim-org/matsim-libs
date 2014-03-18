@@ -79,7 +79,7 @@ public class ScenarioGenerator {
 
 	private static final Logger log = Logger.getLogger(ScenarioGenerator.class);
 	protected static final boolean DEBUG = false;
-	protected final String gripsConfig;
+	protected final String configFile;
 	protected String matsimConfigFile;
 	protected Id safeLinkId;
 	protected final EventsManager em;
@@ -88,13 +88,13 @@ public class ScenarioGenerator {
 
 	public ScenarioGenerator(String gripsconfig) {
 		this.em = EventsUtils.createEventsManager();
-		this.gripsConfig = gripsconfig;
+		this.configFile = gripsconfig;
 	}
 
 	public ScenarioGenerator(String gripsConfig, EventHandler handler) {
 		this.em = EventsUtils.createEventsManager();
 		this.em.addHandler(handler);
-		this.gripsConfig = gripsConfig;
+		this.configFile = gripsConfig;
 	}
 
 	public void run() {
@@ -106,10 +106,10 @@ public class ScenarioGenerator {
 
 		try {
 			this.matsimConfig = ConfigUtils.createConfig();
-			gcm = new GripsConfigModule("grips", gripsConfig);
+			gcm = new GripsConfigModule("grips", configFile);
 			this.matsimConfig.addModule(gcm);
 			GripsConfigDeserializer parser = new GripsConfigDeserializer(gcm);
-			parser.readFile(this.gripsConfig);
+			parser.readFile(this.configFile);
 //			gcm.setFileNamesAbsolute();
 			String crs = gcm.getTargetCRS();
 			if(crs == null)
@@ -120,7 +120,7 @@ public class ScenarioGenerator {
 		} catch (Exception ee) {
 			// TODO for backwards compatibility should be remove soon
 			log.warn("File is not a  grips config file. Guessing it is a common MATSim config file");
-			this.matsimConfig = ConfigUtils.loadConfig(this.gripsConfig);
+			this.matsimConfig = ConfigUtils.loadConfig(this.configFile);
 
 		}
 

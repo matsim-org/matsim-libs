@@ -94,13 +94,9 @@ class EvacEventListener extends AbstractListener {
 				this.controller.setInSelection(true);
 			}
 			points.add(point);
+			if (points.size()>3)
+				setEvacPoly(points);
 			
-			setEvacPoly(points);
-			
-//			for (int i = 0; i < this.polygon.npoints; i++)
-//			{
-//			}
-			// repaint
 			controller.paintLayers();
 		}
 		super.mousePressed(e);
