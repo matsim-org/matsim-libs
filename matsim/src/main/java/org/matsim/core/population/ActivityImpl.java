@@ -38,8 +38,9 @@ public class ActivityImpl implements Activity {
 
 	private double endTime = Time.UNDEFINED_TIME;
 
-	/** @deprecated I don't think this is used/interpreted anywhere. Kai, jun09 */
-	@Deprecated
+	/**
+	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.
+	 */
 	private double startTime = Time.UNDEFINED_TIME;
 
 	private double dur = Time.UNDEFINED_TIME;
@@ -90,15 +91,17 @@ public class ActivityImpl implements Activity {
 		this.endTime = endTime;
 	}
 
-	/** @deprecated I don't think this is used/interpreted anywhere. Kai, jun09 */
-	@Deprecated
+	/**
+	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.
+	 */
 	@Override
 	public final double getStartTime() {
 		return this.startTime;
 	}
 
-	/** @deprecated I don't think this is used/interpreted anywhere. Kai, jun09 */
-	@Deprecated
+	/**
+	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.
+	 */
 	@Override
 	public final void setStartTime(final double startTime) {
 		this.startTime = startTime;
