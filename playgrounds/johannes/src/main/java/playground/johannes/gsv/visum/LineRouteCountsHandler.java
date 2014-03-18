@@ -26,6 +26,7 @@ import gnu.trove.TObjectDoubleHashMap;
 
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -38,6 +39,8 @@ import playground.johannes.gsv.visum.NetFileReader.TableHandler;
  *
  */
 public class LineRouteCountsHandler extends TableHandler {
+	
+	private static final Logger logger = Logger.getLogger(LineRouteCountsHandler.class);
 
 	public static final String NODE_KEY = "KNOTNR";
 	
@@ -59,7 +62,7 @@ public class LineRouteCountsHandler extends TableHandler {
 	
 	private String lastDCode;
 	
-	private int lastIndex;
+	private int lastIndex = 1;
 	
 	private Node fromNode;
 	
@@ -97,13 +100,24 @@ public class LineRouteCountsHandler extends TableHandler {
 			if(!dcode.equals(lastDCode))
 				throw new RuntimeException("Direction does not match.");
 			
-			Link link = NetworkUtils.getConnectingLink(fromNode, toNode);
-			
-			if(link == null) {
-				throw new RuntimeException("Link not found.");
+			if (fromNode != null && toNode != null) {
+				Link link = NetworkUtils.getConnectingLink(fromNode, toNode);
+
+				if (link == null) {
+					link = NetworkUtils.getConnectingLink(toNode, fromNode);
+					if (link == null)
+						// throw new RuntimeException("Link not found.");
+						logger.warn("Link not found, ignoring count.");
+					else
+						logger.warn("Link not found, yet using return link.");
+				}
+
+				if (link != null)
+					counts.put(link, lastCountValue);
+
+			} else {
+				logger.warn("Node not found, ignoring count.");
 			}
-			
-			counts.put(link, lastCountValue);
 			
 		}
 		
@@ -113,10 +127,14 @@ public class LineRouteCountsHandler extends TableHandler {
 		lastDCode = dcode;
 		fromNode = toNode;
 		
-		lastCountValue = Double.parseDouble(record.get(COUNTS_KEY));
-		
-		
-
+		String str = record.get(COUNTS_KEY);
+		if(str != null && !str.isEmpty())
+			lastCountValue = Double.parseDouble(str);	
+		else
+			lastCountValue = 0;
 	}
 
+	public TObjectDoubleHashMap<Link> getCounts() {
+		return counts;
+	}
 }

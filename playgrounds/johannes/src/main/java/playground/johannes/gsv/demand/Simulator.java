@@ -22,11 +22,17 @@
  */
 package playground.johannes.gsv.demand;
 
+import gnu.trove.TObjectDoubleHashMap;
+
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -49,7 +55,11 @@ import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.analysis.TripDistanceTask;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
+import playground.johannes.gsv.analysis.KMLCountsDiffPlot;
 import playground.johannes.gsv.analysis.PKmCalculator;
+import playground.johannes.gsv.visum.LineRouteCountsHandler;
+import playground.johannes.gsv.visum.NetFileReader;
+import playground.johannes.gsv.visum.NetFileReader.TableHandler;
 
 /**
  * @author johannes
@@ -64,6 +74,7 @@ public class Simulator {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		Controler controler = new Controler(args);
+		controler.setOverwriteFiles(true);
 //		generateFacilities(controler);
 		controler.setMobsimFactory(new MobsimConnectorFactory());
 		
@@ -112,6 +123,10 @@ public class Simulator {
 		
 		private TrajectoryEventsBuilder builder;
 		
+		private VolumesAnalyzer volAnalyzer;
+		
+		private TObjectDoubleHashMap<Link> counts;
+		
 		/* (non-Javadoc)
 		 * @see org.matsim.core.controler.listener.IterationEndsListener#notifyIterationEnds(org.matsim.core.controler.events.IterationEndsEvent)
 		 */
@@ -119,6 +134,10 @@ public class Simulator {
 		public void notifyIterationEnds(IterationEndsEvent event) {
 			try {
 				TrajectoryAnalyzer.analyze(builder.trajectories(), task, controler.getControlerIO().getIterationPath(event.getIteration()));
+				
+				KMLCountsDiffPlot kmlplot = new KMLCountsDiffPlot();
+				String file = controler.getControlerIO().getIterationPath(event.getIteration()) + "/counts.kmz";
+				kmlplot.write(volAnalyzer, counts, 1.0, file, controler.getNetwork());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -145,6 +164,24 @@ public class Simulator {
 			builder = new TrajectoryEventsBuilder(person);
 			controler.getEvents().addHandler(builder);
 			
+			volAnalyzer = new VolumesAnalyzer(Integer.MAX_VALUE, Integer.MAX_VALUE, controler.getNetwork());
+			controler.getEvents().addHandler(volAnalyzer);
+			
+			Map<String, TableHandler> tableHandlers = new HashMap<String, NetFileReader.TableHandler>();
+			LineRouteCountsHandler countsHandler = new LineRouteCountsHandler(controler.getNetwork());
+			tableHandlers.put("LINIENROUTENELEMENT", countsHandler);
+			NetFileReader netReader = new NetFileReader(tableHandlers);
+			NetFileReader.FIELD_SEPARATOR = "\t";
+			
+			try {
+				netReader.read("/home/johannes/gsv/matsim/studies/netz2030/data/raw/counts.att");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			counts = countsHandler.getCounts();
+			
+			NetFileReader.FIELD_SEPARATOR = ";";
 		}
 		
 	}

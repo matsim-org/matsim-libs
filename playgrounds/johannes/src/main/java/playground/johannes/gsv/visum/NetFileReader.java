@@ -47,7 +47,7 @@ public class NetFileReader {
 	
 	private final static String TABLE_SUFFIX = ":";
 	
-	private final static String FIELD_SEPARATOR = ";";
+	public static String FIELD_SEPARATOR = ";";//FIXME
 	
 	private Map<String, TableHandler> tableHandlers;
 	
