@@ -83,6 +83,9 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 
 	private static final Logger log = Logger.getLogger(ScenarioGeneratorPT.class);
 	private List<TransitRouteStop> stops;
+	private String configFile;
+	private Config c;
+	private Scenario sc;
 	
 	public ScenarioGeneratorPT(String config) {
 		super(config);
@@ -93,30 +96,30 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		log.info("loading config file");
 		InfoEvent e = new InfoEvent(System.currentTimeMillis(), "loading config file");
 		this.em.processEvent(e);
-		this.matsimConfig = ConfigUtils.loadConfig(this.configFile);
+		this.c = ConfigUtils.loadConfig(this.configFile);
 		
-		this.matsimConfig.scenario().setUseTransit(true);
-		this.matsimConfig.scenario().setUseVehicles(true);
+		this.c.scenario().setUseTransit(true);
+		this.c.scenario().setUseVehicles(true);
 		
-		this.matsimConfig.addModule( new SimulationConfigGroup() );
-		this.matsimConfig.global().setCoordinateSystem("EPSG:3395");
-		this.matsimConfig.controler().setOutputDirectory(getGripsConfig(this.matsimConfig).getOutputDir()+"/output");
-		this.matsimScenario = ScenarioUtils.createScenario(this.matsimConfig);
-		this.safeLinkId = this.matsimScenario.createId("el1");
+		this.c.addModule( new SimulationConfigGroup() );
+		this.c.global().setCoordinateSystem("EPSG:3395");
+		this.c.controler().setOutputDirectory(getGripsConfig(this.c).getOutputDir()+"/output");
+		this.sc = ScenarioUtils.createScenario(this.c);
+		this.safeLinkId = this.sc.createId("el1");
 
 		log.info("generating network file");
 		e = new InfoEvent(System.currentTimeMillis(), "generating network file");
 		this.em.processEvent(e);
-		generateAndSaveNetwork(this.matsimScenario);
+		generateAndSaveNetwork(this.sc);
 		if (DEBUG) {
-			dumpNetworkAsShapeFile(this.matsimScenario);
+			dumpNetworkAsShapeFile(this.sc);
 		}
 
 		log.info("generating population file");
 		e = new InfoEvent(System.currentTimeMillis(), "generating population file");
 		this.em.processEvent(e);
 		createPTSchedule();
-		generateAndSavePopulation(this.matsimScenario);
+		generateAndSavePopulation(this.sc);
 
 		log.info("saving simulation config file");
 		e = new InfoEvent(System.currentTimeMillis(), "simulation config file");
@@ -124,12 +127,12 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 
 		
 
-		this.matsimConfig.controler().setLastIteration(10);
-		this.matsimConfig.controler().setOutputDirectory(getGripsConfig(this.matsimConfig).getOutputDir()+"/output");
+		this.c.controler().setLastIteration(10);
+		this.c.controler().setOutputDirectory(getGripsConfig(this.c).getOutputDir()+"/output");
 
 		
 		
-		QSimConfigGroup qsim = this.matsimConfig.qsim();
+		QSimConfigGroup qsim = this.c.qsim();
 		qsim.setEndTime(4*3600);
 		
 //		Sim2DConfigGroup s2d = new Sim2DConfigGroup();
@@ -151,29 +154,29 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 
 //		s2d.setTimeStepSize("1");
 		
-//		this.matsimConfig.addModule("sim2d", s2d);
+//		this.c.addModule("sim2d", s2d);
 
 
 
-//		this.matsimConfig.controler().setMobsim("hybridQ2D");
-
-		
-		
-		this.matsimConfig.strategy().setMaxAgentPlanMemorySize(3);
-
-		this.matsimConfig.strategy().addParam("maxAgentPlanMemorySize", "3");
-		this.matsimConfig.strategy().addParam("Module_1", "ReRoute");
-		this.matsimConfig.strategy().addParam("ModuleProbability_1", "0.1");
-		this.matsimConfig.strategy().addParam("Module_2", "ChangeExpBeta");
-		this.matsimConfig.strategy().addParam("ModuleProbability_2", "0.9");
-//		this.matsimConfig.strategy().addParam("Module_3", "TransitChangeLegMode");
-//		this.matsimConfig.strategy().addParam("ModuleProbability_3", "0.1");
-		
-
-		this.matsimConfigFile = getGripsConfig(this.matsimConfig).getOutputDir() + "/config.xml";
+//		this.c.controler().setMobsim("hybridQ2D");
 
 		
-		new ConfigWriter(this.matsimConfig).write(this.matsimConfigFile);
+		
+		this.c.strategy().setMaxAgentPlanMemorySize(3);
+
+		this.c.strategy().addParam("maxAgentPlanMemorySize", "3");
+		this.c.strategy().addParam("Module_1", "ReRoute");
+		this.c.strategy().addParam("ModuleProbability_1", "0.1");
+		this.c.strategy().addParam("Module_2", "ChangeExpBeta");
+		this.c.strategy().addParam("ModuleProbability_2", "0.9");
+//		this.c.strategy().addParam("Module_3", "TransitChangeLegMode");
+//		this.c.strategy().addParam("ModuleProbability_3", "0.1");
+		
+
+		this.matsimConfigFile = getGripsConfig(this.c).getOutputDir() + "/config.xml";
+
+		
+		new ConfigWriter(this.c).write(this.matsimConfigFile);
 		e = new InfoEvent(System.currentTimeMillis(), "scenario generation finished.");
 		this.em.processEvent(e);
 		
@@ -182,9 +185,9 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 	}
 
 	private void createPTSchedule() {
-		Network network = this.matsimScenario.getNetwork();
+		Network network = this.sc.getNetwork();
 		FreeSpeedTravelTime fs = new FreeSpeedTravelTime();
-		TravelDisutility cost = new TravelTimeAndDistanceBasedTravelDisutilityFactory().createTravelDisutility(fs,this.matsimScenario.getConfig().planCalcScore() );
+		TravelDisutility cost = new TravelTimeAndDistanceBasedTravelDisutilityFactory().createTravelDisutility(fs,this.sc.getConfig().planCalcScore() );
 		LeastCostPathCalculator dijkstra = new Dijkstra(network, cost, fs);
 		
 		
@@ -271,7 +274,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		
 		
 		//Vehicles
-		Vehicles vehicles = ((ScenarioImpl)this.matsimScenario).getVehicles();
+		Vehicles vehicles = ((ScenarioImpl)this.sc).getVehicles();
 		VehiclesFactory vf = vehicles.getFactory();
 		VehicleType vt = vf.createVehicleType(new IdImpl("bus"));
 		VehicleCapacity vc = vf.createVehicleCapacity();
@@ -298,7 +301,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		new TransitScheduleWriterV1(schedule).write(out+"/transitSchedule.xml");
 		new VehicleWriterV1(vehicles).writeFile(out+"/transitVehicles.xml");
 		
-		TransitConfigGroup tc = this.matsimConfig.transit();
+		TransitConfigGroup tc = this.c.transit();
 		Set<String> tms = new HashSet<String>();
 		tms.add("pt");
 		tc.setTransitModes(tms);
@@ -307,7 +310,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		
 //		Module clm = new Module("changeLegMode");
 //		clm.addParam("modes", "pt,walk2d");
-//		this.matsimConfig.addModule("changeLegMode", clm);
+//		this.c.addModule("changeLegMode", clm);
 		this.safeLinkId = stops.get(stops.size()-1).getStopFacility().getLinkId();
 		this.stops = stops;
 		
