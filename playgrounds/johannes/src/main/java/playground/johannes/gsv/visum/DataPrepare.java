@@ -19,23 +19,19 @@
 
 package playground.johannes.gsv.visum;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
@@ -47,14 +43,10 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.config.TransitConfigGroup;
-import org.matsim.pt.config.TransitRouterConfigGroup;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.utils.CreatePseudoNetwork;
-import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetworkReader;
@@ -64,7 +56,7 @@ public class DataPrepare {
 	private static final Logger log = Logger.getLogger(DataPrepare.class);
 
 	// INPUT FILES
-	private final static String VISUM_FILE = "/home/johannes/gsv/citytunnel/data/visum-export/network.net";
+	private final static String VISUM_FILE = "/home/johannes/gsv/matsim/studies/netz2030/data/raw/network.net";
 	private final static String NETWORK_FILE = "/home/johannes/gsv/matsim/studies/netz2030/data/roadnetwork.gk3.xml";
 	private final static String INPUT_PLANS_FILE = "/home/johannes/gsv/matsim/studies/netz2030/data/population.linked.gk3.xml";
 
@@ -125,6 +117,35 @@ V;Dritte FV;OV;1.000
 W;Dritte NV;OV;1.000
 X;Dritte GV;OV;1.000
 		 */
+		Map<String, String> systems = new HashMap<String, String>();
+		systems.put("1", "temp");
+		systems.put("2", "Railion EW Fern");
+		systems.put("3", "Railion EW Nah");
+		systems.put("4", "Railion GZ");
+		systems.put("5", "Railion KV/RoLa");
+		systems.put("9", "Leer/Schad");
+		systems.put("A", "Bus Fernverkehr");
+		systems.put("B", "RB");
+		systems.put("C", "IC/EC/D-Tag");
+		systems.put("D", "NZ/CNL/D-Nacht/UEx/AZ");
+		systems.put("E", "ICE/ICE-T");
+		systems.put("F", "Fuss");
+		systems.put("H", "Ausland FV A");
+		systems.put("I", "Ausland FV B");
+		systems.put("J", "Ausland NV");
+		systems.put("K", "Ausland GV");
+		systems.put("N", "Netz");
+		systems.put("O", "Sonstiger OEV");
+		systems.put("R", "RE/IRE");
+		systems.put("S", "S-Bahn");
+		systems.put("T", "Thalys");
+		systems.put("V", "Dritte FV");
+		systems.put("W", "Dritte NV");
+		systems.put("X", "Dritte GV");
+		
+		converter.setTransportSystems(systems);
+		
+		
 		// configure how transport modes must be converted
 		// the ones for Berlin
 		converter.registerTransportMode("1", TransportMode.other);
@@ -163,10 +184,10 @@ X;Dritte GV;OV;1.000
 //			converter.registerTransportMode("Z", TransportMode.train); // FERNVERKEHR
 
 		converter.convert();
-		log.info("writing TransitSchedule to file.");
-		new TransitScheduleWriterV1(this.scenario.getTransitSchedule()).write(TRANSIT_SCHEDULE_WITHOUT_NETWORK_FILE);
-		log.info("writing vehicles to file.");
-		new VehicleWriterV1(this.scenario.getVehicles()).writeFile(VEHICLE_FILE);
+//		log.info("writing TransitSchedule to file.");
+//		new TransitScheduleWriterV1(this.scenario.getTransitSchedule()).write(TRANSIT_SCHEDULE_WITHOUT_NETWORK_FILE);
+//		log.info("writing vehicles to file.");
+//		new VehicleWriterV1(this.scenario.getVehicles()).writeFile(VEHICLE_FILE);
 	}
 
 	protected void createNetworkFromSchedule() {
@@ -261,21 +282,21 @@ X;Dritte GV;OV;1.000
 //		NetworkConfigGroup netConfig = (NetworkConfigGroup) app.config.getModule(NetworkConfigGroup.GROUP_NAME);
 //		netConfig.setInputFile("/home/johannes/gsv/netz2030/data/network.multimodal.xml");
 		
-		MatsimNetworkReader netreader = new MatsimNetworkReader(app.scenario);
-		netreader.readFile("/home/johannes/gsv/matsim/studies/netz2030/data/network.gk3.xml");
+//		MatsimNetworkReader netreader = new MatsimNetworkReader(app.scenario);
+//		netreader.readFile("/home/johannes/gsv/matsim/studies/netz2030/data/network.gk3.xml");
 		
 //		VehicleReaderV1 vehReader = new VehicleReaderV1(app.scenario.getVehicles());
 //		vehReader.readFile("/home/johannes/gsv/matsim/studies/netz2030/data/vehicles.xml");
 		
-		TransitScheduleReader schedReader = new TransitScheduleReader(app.scenario);
-		schedReader.readFile("/home/johannes/gsv/matsim/studies/netz2030/data/transitSchedule.longdist.xml");
+//		TransitScheduleReader schedReader = new TransitScheduleReader(app.scenario);
+//		schedReader.readFile("/home/johannes/gsv/matsim/studies/netz2030/data/transitSchedule.longdist.xml");
 //		
 //		TransitRouterConfigGroup trConfig = (TransitRouterConfigGroup) app.config.getModule(TransitRouterConfigGroup.GROUP_NAME);
 //		trConfig.setMaxBeelineWalkConnectionDistance(1);
-//		app.convertSchedule();
+		app.convertSchedule();
 //		app.createNetworkFromSchedule();
 //		app.mergeNetworks();
-		app.routePopulation();
+//		app.routePopulation();
 //		app.visualizeRouterNetwork();
 
 		log.info("done.");

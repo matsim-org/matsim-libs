@@ -174,6 +174,7 @@ public class KMLCountsDiffPlot {
 			Link link = (Link) obj;
 			double diff = values.get(link);
 			double val = discretizer.discretize(diff);
+			double bin = discretizer.index(diff);
 
 			StyleType kmlStyle = tmpStyles.get(val);
 			if (kmlStyle == null) {
@@ -183,7 +184,7 @@ public class KMLCountsDiffPlot {
 				kmlLineStyle.setColor(new byte[] { (byte) c.getAlpha(),
 						(byte) c.getBlue(), (byte) c.getGreen(),
 						(byte) c.getRed() });
-				kmlLineStyle.setWidth(val);
+				kmlLineStyle.setWidth(bin);
 
 				kmlStyle = kmlFactory.createStyleType();
 				kmlStyle.setId("link." + val);
@@ -215,8 +216,10 @@ public class KMLCountsDiffPlot {
 		/*
 		 * Add vertices and edges.
 		 */
+		int i = 0;
 		for (Object obj : values.keys()) {
 			Link link = (Link) obj;
+			if(link.getLength() > 1000) {
 			LineStringType kmlLineString = kmlFactory.createLineStringType();
 
 			Node fromNode = link.getFromNode();
@@ -244,6 +247,8 @@ public class KMLCountsDiffPlot {
 
 			kmlFolder.getAbstractFeatureGroup().add(
 					kmlFactory.createPlacemark(kmlPlacemark));
+			
+			}
 
 		}
 

@@ -56,7 +56,8 @@ import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.analysis.TripDistanceTask;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
 import playground.johannes.gsv.analysis.KMLCountsDiffPlot;
-import playground.johannes.gsv.analysis.PKmCalculator;
+import playground.johannes.gsv.analysis.PKmAnalyzer;
+import playground.johannes.gsv.analysis.TransitLineAttributes;
 import playground.johannes.gsv.visum.LineRouteCountsHandler;
 import playground.johannes.gsv.visum.NetFileReader;
 import playground.johannes.gsv.visum.NetFileReader.TableHandler;
@@ -89,8 +90,8 @@ public class Simulator {
 		listener.controler = controler;
 		
 		controler.addControlerListener(listener);
-		PKmCalculator pkm = new PKmCalculator(controler.getNetwork());
-		controler.getEvents().addHandler(pkm);
+		
+		PKmAnalyzer pkm = new PKmAnalyzer(TransitLineAttributes.createFromFile("/home/johannes/gsv/matsim/studies/netz2030/data/transitLineAttributes.xml"));
 		controler.addControlerListener(pkm);
 		controler.run();
 		

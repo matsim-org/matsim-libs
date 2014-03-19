@@ -22,23 +22,19 @@
  */
 package playground.johannes.gsv.demand;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.api.core.v01.population.Population;
 
 /**
  * @author johannes
  *
  */
-public class MobsimConnectorFactory implements MobsimFactory {
+public class AbstractTaskWrapper implements PopulationTask {
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.mobsim.framework.MobsimFactory#createMobsim(org.matsim.api.core.v01.Scenario, org.matsim.core.api.experimental.events.EventsManager)
-	 */
+	protected PopulationTask delegate;
+	
 	@Override
-	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-		return new MobsimConnector(sc, eventsManager);
+	public void apply(Population pop) {
+		delegate.apply(pop);
 	}
 
 }

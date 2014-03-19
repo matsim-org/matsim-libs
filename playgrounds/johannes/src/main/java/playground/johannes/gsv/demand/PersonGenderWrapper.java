@@ -22,23 +22,60 @@
  */
 package playground.johannes.gsv.demand;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+
+import playground.johannes.sna.gis.Zone;
+import playground.johannes.sna.gis.ZoneLayer;
+
 
 /**
  * @author johannes
  *
  */
-public class MobsimConnectorFactory implements MobsimFactory {
+public class PersonGenderWrapper extends AbstractTaskWrapper {
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.mobsim.framework.MobsimFactory#createMobsim(org.matsim.api.core.v01.Scenario, org.matsim.core.api.experimental.events.EventsManager)
-	 */
-	@Override
-	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-		return new MobsimConnector(sc, eventsManager);
+	public PersonGenderWrapper(String file, String maleKey, String femaleKey, Random random) throws IOException {
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		/*
+		 * read headers
+		 */
+		String line = reader.readLine();
+		
+		String[] tokens = line.split("\t");
+		int maleIdx = 0;
+		int femaleIdx = 0;
+		for(int i = 0; i < tokens.length; i++) {
+			if(tokens[i].equals(maleKey)) {
+				maleIdx = i;
+			} else if(tokens[i].equals(femaleKey)) {
+				femaleIdx = i;
+			}
+		}
+		/*
+		 * read lines
+		 */
+		Set<Zone<Double>> zones = new HashSet<Zone<Double>>();
+		while((line = reader.readLine()) != null) {
+			tokens = line.split("\t");
+			String id = tokens[0];
+			int males = Integer.parseInt(tokens[maleIdx]);
+			int females = Integer.parseInt(tokens[femaleIdx]);
+			
+			
+			Zone<Double> zone = new Zone<Double>(NutsLevel3Zones.getZone(id).getGeometry());
+			zone.setAttribute(females/(double)(males + females));
+			zones.add(zone);
+			
+		}
+		reader.close();
+		
+		ZoneLayer<Double> zoneLayer = new ZoneLayer<Double>(zones);
+		
+		this.delegate = new PersonGender(zoneLayer, random);
 	}
-
 }

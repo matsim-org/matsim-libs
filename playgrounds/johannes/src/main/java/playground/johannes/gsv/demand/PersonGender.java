@@ -22,23 +22,52 @@
  */
 package playground.johannes.gsv.demand;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
+import java.util.Random;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.population.PersonImpl;
+
+import playground.johannes.coopsim.util.MatsimCoordUtils;
+import playground.johannes.sna.gis.Zone;
+import playground.johannes.sna.gis.ZoneLayer;
+import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 /**
  * @author johannes
  *
  */
-public class MobsimConnectorFactory implements MobsimFactory {
+public class PersonGender implements PopulationTask {
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.mobsim.framework.MobsimFactory#createMobsim(org.matsim.api.core.v01.Scenario, org.matsim.core.api.experimental.events.EventsManager)
-	 */
+	private final ZoneLayer<Double> zones;
+	
+	private final Random random;
+	
+	public PersonGender(ZoneLayer<Double> zones) {
+		this(zones, new XORShiftRandom());
+	}
+	
+	public PersonGender(ZoneLayer<Double> zones, Random random) {
+		this.zones = zones;
+		this.random = random;
+	}
+	
 	@Override
-	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-		return new MobsimConnector(sc, eventsManager);
+	public void apply(Population pop) {
+		for(Person person : pop.getPersons().values()) {
+			Coord c = ((Activity)person.getPlans().get(0).getPlanElements().get(0)).getCoord();
+			Zone<Double> zone = zones.getZone(MatsimCoordUtils.coordToPoint(c));
+			
+			double p = zone.getAttribute();
+			if(random.nextDouble() < p) {
+				((PersonImpl)person).setSex(PersonAttributes.FEMALE);
+			} else {
+				((PersonImpl)person).setSex(PersonAttributes.MALE);
+			}
+		}
+
 	}
 
 }

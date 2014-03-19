@@ -48,6 +48,8 @@ import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetwork.VehicleCombination;
 import org.matsim.visum.VisumNetwork.VehicleUnit;
 
+import playground.johannes.gsv.analysis.TransitLineAttributes;
+
 public class Visum2TransitSchedule {
 
 	private static final Logger log = Logger.getLogger(Visum2TransitSchedule.class);
@@ -59,6 +61,8 @@ public class Visum2TransitSchedule {
 	private final CoordinateTransformation coordinateTransformation = new IdentityTransformation();
 	private final Map<String, String> transportModes = new HashMap<String, String>();
 
+	private Map<String, String> transportSystems;
+	
 	public Visum2TransitSchedule(final VisumNetwork visum, final TransitSchedule schedule, final Vehicles vehicles) {
 		this.visum = visum;
 		this.schedule = schedule;
@@ -69,8 +73,12 @@ public class Visum2TransitSchedule {
 		this.transportModes.put(visumTransportMode, transportMode);
 	}
 
+	public void setTransportSystems(Map<String, String> map) {
+		transportSystems = map;
+	}
+	
 	public void convert() {
-
+		TransitLineAttributes attrs = new TransitLineAttributes();
 		long vehId = 0;
 
 		TransitScheduleFactory builder = this.schedule.getFactory();
@@ -117,6 +125,7 @@ public class Visum2TransitSchedule {
 				log.info(String.format("Converting %s of %s lines...", i, this.visum.lines.size()));
 			}
 			TransitLine tLine = builder.createTransitLine(line.id);
+			attrs.setTransportSystem(tLine.getId().toString(), transportSystems.get(line.tCode));
 
 			for (VisumNetwork.TimeProfile timeProfile : this.visum.timeProfiles.values()){
 				VisumNetwork.VehicleCombination defaultVehCombination = this.visum.vehicleCombinations.get(timeProfile.vehCombNr);
@@ -177,6 +186,8 @@ public class Visum2TransitSchedule {
 				log.warn("The line " + tLine.getId() + " was not added to the transit schedule because it does not contain any routes.");
 			}
 		}
+		
+		TransitLineAttributes.writeToFile(attrs, "/home/johannes/gsv/matsim/studies/netz2030/data/transitLineAttributes.net");
 	}
 }
 

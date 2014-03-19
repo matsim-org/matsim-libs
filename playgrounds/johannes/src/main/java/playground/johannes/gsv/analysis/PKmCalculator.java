@@ -22,6 +22,9 @@
  */
 package playground.johannes.gsv.analysis;
 
+import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.TObjectIntHashMap;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,8 +34,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -46,34 +47,32 @@ import playground.johannes.gsv.sim.TransitBoardEventHandler;
  * @author johannes
  *
  */
-public class PKmCalculator implements TransitAlightEventHandler, TransitBoardEventHandler, IterationEndsListener {
+public class PKmCalculator implements TransitAlightEventHandler, TransitBoardEventHandler {
+	
+	private static final String SYSTEM_ALL = "all";
 
 	private final Network network;
 	
 	private Map<Id, TransitBoardEvent> boardingEvents;
 	
-	private double length;
+	private TObjectDoubleHashMap<String> distances;
 	
-	private int persons;
+	private TObjectIntHashMap<String> persons;
 	
-	public PKmCalculator(Network network) {
+	private TransitLineAttributes attributes;
+	
+	public PKmCalculator(Network network, TransitLineAttributes attributes) {
 		this.network = network;
+		this.attributes = attributes;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.matsim.core.events.handler.EventHandler#reset(int)
-	 */
 	@Override
 	public void reset(int iteration) {
-		System.out.println("################# PKM = " + (length * persons / 1000) + " ####################");
 		boardingEvents = new HashMap<Id, TransitBoardEvent>();
-		length = 0;
-		persons = 0;
+		distances = new TObjectDoubleHashMap<String>();
+		persons = new TObjectIntHashMap<String>();
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.sim.TransitAlightEventHandler#handleEvent(playground.johannes.gsv.sim.TransitAlightEvent)
-	 */
 	@Override
 	public void handleEvent(TransitAlightEvent event) {
 		TransitBoardEvent boarding = boardingEvents.get(event.getPersonId());
@@ -87,8 +86,13 @@ public class PKmCalculator implements TransitAlightEventHandler, TransitBoardEve
 		if(boarding.getRoute() != event.getRoute())
 			throw new RuntimeException("Events refer to differen transit routes.");
 		
-		length += calculateDistance(event.getRoute(), boarding.getStop(), event.getStop());
-		persons++;
+		double d = calculateDistance(event.getRoute(), boarding.getStop(), event.getStop());
+		String system = attributes.getTransportSystem(event.getLine().getId().toString());
+		distances.adjustOrPutValue(system, d, d);
+		persons.adjustOrPutValue(system, 1, 1);
+		
+		distances.adjustOrPutValue(SYSTEM_ALL, d, d);
+		persons.adjustOrPutValue(SYSTEM_ALL, 1, 1);
 	}
 
 	/* (non-Javadoc)
@@ -99,6 +103,18 @@ public class PKmCalculator implements TransitAlightEventHandler, TransitBoardEve
 		boardingEvents.put(event.getPersonId(), event);
 	}
 
+	public Map<String, Double> statistics() {
+		Map<String, Double> stats = new HashMap<String, Double>();
+		
+		Object[] keys = distances.keys();
+		for(Object key : keys) {
+			double val = distances.get((String) key) * persons.get((String) key);
+			stats.put((String) key, val);
+		}
+		
+		return stats;
+	}
+	
 	private double calculateDistance(TransitRoute troute, TransitStopFacility access, TransitStopFacility egress) {
 		NetworkRoute netRoute = troute.getRoute();
 		Link accessLink = network.getLinks().get(access.getLinkId());
@@ -135,18 +151,5 @@ public class PKmCalculator implements TransitAlightEventHandler, TransitBoardEve
 		}
 		
 		return length;
-	}
-	
-	public double getPKm() {
-		return length * persons;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.matsim.core.controler.listener.IterationEndsListener#notifyIterationEnds(org.matsim.core.controler.events.IterationEndsEvent)
-	 */
-	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		System.out.println("################# PKM = " + (length * persons / 1000) + " ####################");
-		
 	}
 }
