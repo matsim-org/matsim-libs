@@ -31,13 +31,13 @@ import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner.PersonAlgo
 import org.matsim.population.algorithms.PersonAlgorithm;
 
 import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
+import playground.mzilske.d4d.NetworkRoutingModule;
+import playground.mzilske.d4d.Sighting;
+import playground.mzilske.d4d.Sightings;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
-import d4d.NetworkRoutingModule;
-import d4d.Sighting;
-import d4d.Sightings;
 
 public class PopulationFromSightings {
 	

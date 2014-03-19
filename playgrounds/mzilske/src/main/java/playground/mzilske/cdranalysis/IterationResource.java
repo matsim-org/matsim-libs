@@ -1,10 +1,15 @@
 package playground.mzilske.cdranalysis;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReaderMatsimV5;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
@@ -53,6 +58,13 @@ public class IterationResource {
 		} else {
 			return runId + "." + iteration + ".";
 		}
+	}
+
+	public Population getExperiencedPlans() {
+		final Config config = ConfigUtils.createConfig();
+		final Scenario scenario = ScenarioUtils.createScenario(config);
+		new PopulationReaderMatsimV5(scenario).readFile(wd + "/" + iterationPrefix() + "experienced_plans.xml.gz");
+		return scenario.getPopulation();
 	}
 
 }

@@ -44,12 +44,12 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 
 import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
+import playground.mzilske.d4d.Sighting;
 
 import com.telmomenezes.jfastemd.Feature;
 import com.telmomenezes.jfastemd.JFastEMD;
 import com.telmomenezes.jfastemd.Signature;
 
-import d4d.Sighting;
 
 
 //		double varianceScale = 0.1;
@@ -157,8 +157,7 @@ public class CompareMain {
 	private VolumesAnalyzer cdrVolumes;
 
 	public void runWithTwoPlansAndCadyts() {
-		ticker.finish();
-		callProcess.dump();
+		close();
 		List<Sighting> sightings = callProcess.getSightings();
 
 		Counts counts = volumesToCounts(groundTruthVolumes);
@@ -166,8 +165,7 @@ public class CompareMain {
 	}
 	
 	public Result runWithOnePlanAndCadyts() {
-		ticker.finish();
-		callProcess.dump();
+		close();
 		List<Sighting> sightings = callProcess.getSightings();
 
 		Counts counts = volumesToCounts(groundTruthVolumes);
@@ -177,8 +175,7 @@ public class CompareMain {
 	}
 	
 	public Result runWithOnePlanAndCadytsAndInflation() {
-		ticker.finish();
-		callProcess.dump();
+		close();
 		List<Sighting> sightings = callProcess.getSightings();
 
 		Counts counts = volumesToCounts(groundTruthVolumes);
@@ -187,11 +184,32 @@ public class CompareMain {
 		return result;
 	}
 	
-	public void runOnceWithSimplePlans(Config config) {
+	public ScenarioImpl createScenarioFromSightings(Config config) {
+		final ScenarioImpl scenario21 = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		scenario21.setNetwork(scenario.getNetwork());
+		
+		final Map<Id, List<Sighting>> allSightings = new HashMap<Id, List<Sighting>>();
+		for (Sighting sighting : callProcess.getSightings()) {
+		
+			List<Sighting> sightingsOfPerson = allSightings.get(sighting.getAgentId());
+			if (sightingsOfPerson == null) {
+				sightingsOfPerson = new ArrayList<Sighting>();
+				allSightings.put(sighting.getAgentId(), sightingsOfPerson);
+		
+			}
+			sightingsOfPerson.add(sighting);
+		}
+		
+		
+		PopulationFromSightings.createPopulationWithEndTimesAtLastSightings(scenario21, linkToZoneResolver, allSightings);
+		PopulationFromSightings.preparePopulation(scenario21, linkToZoneResolver, allSightings);
+		final ScenarioImpl scenario2 = scenario21;
+		return scenario2;
+	}
+
+	public void close() {
 		ticker.finish();
 		callProcess.dump();
-		List<Sighting> sightings = callProcess.getSightings();
-		cdrVolumes = runOnceWithSimplePlans(config, scenario.getNetwork(), linkToZoneResolver, sightings, suffix);
 	}
 
 	double compareEMD() {
@@ -580,38 +598,6 @@ public class CompareMain {
 		return currentPlanCadytsCorrection;
 	}
 	
-	public static VolumesAnalyzer runOnceWithSimplePlans(Config config, Network network, final LinkToZoneResolver linkToZoneResolver, List<Sighting> sightings, String suffix) {
-		
-
-		final ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		scenario2.setNetwork(network);
-
-		final Map<Id, List<Sighting>> allSightings = new HashMap<Id, List<Sighting>>();
-		for (Sighting sighting : sightings) {
-
-			List<Sighting> sightingsOfPerson = allSightings.get(sighting.getAgentId());
-			if (sightingsOfPerson == null) {
-				sightingsOfPerson = new ArrayList<Sighting>();
-				allSightings.put(sighting.getAgentId(), sightingsOfPerson);
-
-			}
-			System.out.println(sighting.getCellTowerId().toString());
-
-			sightingsOfPerson.add(sighting);
-		}
-
-
-		PopulationFromSightings.createPopulationWithEndTimesAtLastSightings(scenario2, linkToZoneResolver, allSightings);
-		PopulationFromSightings.preparePopulation(scenario2, linkToZoneResolver, allSightings);
-
-		Controler controler = new Controler(scenario2);
-		controler.setOverwriteFiles(true);
-
-		controler.setCreateGraphs(false);
-		controler.run();
-		return controler.getVolumes();
-	}
-
 	public static int[] getVolumesForLink(VolumesAnalyzer volumesAnalyzer1, Link link) {
 		int maxSlotIndex = (MAX_TIME / TIME_BIN_SIZE) + 1;
 		int[] maybeVolumes = volumesAnalyzer1.getVolumesForLink(link.getId());

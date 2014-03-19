@@ -23,8 +23,8 @@ public class ExperimentResource {
 		return REGIMES;
 	}
 
-	public MultiRateRunResource getRegime(String regime) {
-		return new MultiRateRunResource(wd + "regimes/" + regime, regime);
+	public RegimeResource getRegime(String regime) {
+		return new RegimeResource(wd + "regimes/" + regime, regime);
 	}
 
 	public void personKilometers() {	
@@ -34,7 +34,7 @@ public class ExperimentResource {
 				boolean first = true;
 				for (final String regime : getRegimes()) {
 					final boolean first2 = first;
-					FileIO.readFromResponse(getRegime(regime).getPersonKilometers(), new Reading() {
+					FileIO.readFromResponse(getRegime(regime).getMultiRateRun("regular").getPersonKilometers(), new Reading() {
 						@Override
 						public void read(BufferedReader br) throws IOException {
 							String header = br.readLine();

@@ -84,7 +84,7 @@ public class PowerPlans {
 		return pes;
 	}
 
-	static double distance(Network network, TripRouter tripRouter,
+	public static double distance(Network network, TripRouter tripRouter,
 			List<PlanElement> pes) {
 		List<Trip> trips = TripStructureUtils.getTrips(pes, new StageActivityTypesImpl());
 		List<Leg> legs = new ArrayList<Leg>();

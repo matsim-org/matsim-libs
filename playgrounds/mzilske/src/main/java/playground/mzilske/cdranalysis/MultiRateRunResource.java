@@ -2,7 +2,6 @@ package playground.mzilske.cdranalysis;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -16,20 +15,29 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactoryImpl;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
+import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import playground.mzilske.cdr.CallBehavior;
 import playground.mzilske.cdr.CompareMain;
@@ -41,9 +49,12 @@ public class MultiRateRunResource {
 
 	private String regime;
 
-	public MultiRateRunResource(String wd, String regime) {
+	private String alternative;
+
+	public MultiRateRunResource(String wd, String regime, String alternative) {
 		this.WD = wd;
 		this.regime = regime;
+		this.alternative = alternative;
 	}
 
 	final static int TIME_BIN_SIZE = 60*60;
@@ -64,6 +75,10 @@ public class MultiRateRunResource {
 		RATES.add("actevents");
 		RATES.add("contbaseplans");
 		return RATES;
+	}
+	
+	private RunResource getBaseRun() {
+		return new RegimeResource(WD + "/../..", regime).getBaseRun();
 	}
 
 	public void rate(String string) {
@@ -91,6 +106,7 @@ public class MultiRateRunResource {
 		config.planCalcScore().addActivityParams(sightingParam);
 		config.planCalcScore().setTraveling_utils_hr(-6);
 		config.planCalcScore().setWriteExperiencedPlans(true);
+		config.controler().setWritePlansInterval(1);
 		config.controler().setLastIteration(20);
 		QSimConfigGroup tmp = config.qsim();
 		tmp.setFlowCapFactor(0.02);
@@ -117,6 +133,7 @@ public class MultiRateRunResource {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams sightingParam = new ActivityParams("sighting");
 		sightingParam.setTypicalDuration(30.0 * 60);
+		config.controler().setWritePlansInterval(1);
 		config.planCalcScore().addActivityParams(sightingParam);
 		config.planCalcScore().setTraveling_utils_hr(-6);
 		config.planCalcScore().setPerforming_utils_hr(0);
@@ -175,10 +192,18 @@ public class MultiRateRunResource {
 
 		Config config = phoneConfig();
 		config.controler().setOutputDirectory(WD + "/rates/actevents");
-		compareMain.runOnceWithSimplePlans(config);
+		compareMain.close();
+		final ScenarioImpl scenario2 = compareMain.createScenarioFromSightings(config);
+		
+		Controler controler = new Controler(scenario2);
+		controler.setOverwriteFiles(true);
+		
+		controler.setCreateGraphs(false);
+		controler.run();
 	}
 
-	private void runRate(Scenario baseScenario, final int dailyRate) {
+	private void runRate(final Scenario baseScenario, final int dailyRate) {
+		final RunResource run = getRateRun(Integer.toString(dailyRate)); // The run we are producing
 		EventsManager events = EventsUtils.createEventsManager();
 		CompareMain compareMain = new CompareMain(baseScenario, events, new CallBehavior() {
 
@@ -205,9 +230,34 @@ public class MultiRateRunResource {
 
 		});
 		new MatsimEventsReader(events).readFile(getBaseRun().getLastIteration().getEventsFileName());
-		Config config = phoneConfig();
+		final Config config = phoneConfig();
 		config.controler().setOutputDirectory(WD + "/rates/" + dailyRate);
-		compareMain.runOnceWithSimplePlans(config);
+		compareMain.close();
+		final Scenario scenario = compareMain.createScenarioFromSightings(config);
+		final double flowCapacityFactor = config.qsim().getFlowCapFactor();
+		final double storageCapacityFactor = config.qsim().getStorageCapFactor();	
+		Controler controler = new Controler(scenario);
+		controler.setOverwriteFiles(true);
+		if (alternative.equals("sense")) {
+			final double travelledKilometersBase = sum(PowerPlans.travelledDistancePerPerson(baseScenario.getPopulation(), baseScenario.getNetwork()).values());
+			controler.addControlerListener(new BeforeMobsimListener() {
+				@Override
+				public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+					if (event.getIteration() > config.controler().getFirstIteration()) {
+						Population previous = run.getIteration(event.getIteration()-1).getExperiencedPlans();
+						double distanceSum = sum(PowerPlans.travelledDistancePerPerson(previous, baseScenario.getNetwork()).values());
+						double sensedSampleSize = distanceSum / travelledKilometersBase;
+						config.qsim().setFlowCapFactor(flowCapacityFactor * sensedSampleSize);
+						config.qsim().setStorageCapFactor(storageCapacityFactor * sensedSampleSize);
+					}
+					final String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "config.xml.gz");
+					new ConfigWriter(config).write(filename);
+				}
+			});
+		}
+
+		controler.setCreateGraphs(false);
+		controler.run();
 	}
 
 	private Config phoneConfig() {
@@ -246,84 +296,109 @@ public class MultiRateRunResource {
 	}
 
 	public void distances() {
-		File file = new File(WD + "/distances.txt");
-		Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
-
+		final String filename = WD + "/distances.txt";
+		final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
 		EventsManager events = EventsUtils.createEventsManager();
 		VolumesAnalyzer baseVolumes = new VolumesAnalyzer(TIME_BIN_SIZE, MAX_TIME, baseScenario.getNetwork());
 		events.addHandler(baseVolumes);
 		new MatsimEventsReader(events).readFile(getBaseRun().getLastIteration().getEventsFileName());
-
-		PrintWriter pw = null;
-		try {
-			pw = new PrintWriter(file);
-			pw.printf("callrate\troutesum\tvolumesum\tvolumesumdiff\n");
-			for (String rate : getRates()) {
-				final IterationResource lastIteration = getRateRun(rate).getLastIteration();
-				Scenario scenario = lastIteration.getExperiencedPlansAndNetwork();
-
-
-				final Map<Id, Double> distancePerPerson1 = PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), baseScenario.getNetwork());
-				final Map<Id, Double> distancePerPerson = distancePerPerson1;
-				double km = 0.0;
-				for (double distance : distancePerPerson.values()) {
-					km += distance;
+		final double baseSum = PowerPlans.drivenKilometersWholeDay(baseScenario, baseVolumes);
+		FileIO.writeToFile(filename, new StreamingOutput() {
+			@Override
+			public void write(PrintWriter pw) throws IOException {
+				pw.printf("callrate\troutesum\tvolumesum\tvolumesumdiff\n");
+				for (String rate : getRates()) {
+					final IterationResource lastIteration = getRateRun(rate).getLastIteration();
+					Scenario scenario = lastIteration.getExperiencedPlansAndNetwork();
+					final Map<Id, Double> distancePerPerson = PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), baseScenario.getNetwork());
+					double km = 0.0;
+					for (double distance : distancePerPerson.values()) {
+						km += distance;
+					}
+					EventsManager events1 = EventsUtils.createEventsManager();
+					VolumesAnalyzer volumes = new VolumesAnalyzer(TIME_BIN_SIZE, MAX_TIME, baseScenario.getNetwork());
+					events1.addHandler(volumes);
+					new MatsimEventsReader(events1).readFile(lastIteration.getEventsFileName());
+					double sum = PowerPlans.drivenKilometersWholeDay(baseScenario, volumes);
+					pw.printf("%s\t%f\t%f\t%f\n", rate, km, sum, baseSum - sum);
+					pw.flush();
 				}
-
-				EventsManager events1 = EventsUtils.createEventsManager();
-				VolumesAnalyzer volumes = new VolumesAnalyzer(TIME_BIN_SIZE, MAX_TIME, baseScenario.getNetwork());
-				events1.addHandler(volumes);
-				new MatsimEventsReader(events1).readFile(lastIteration.getEventsFileName());
-
-				double baseSum = PowerPlans.drivenKilometersWholeDay(baseScenario, baseVolumes);
-				double sum = PowerPlans.drivenKilometersWholeDay(baseScenario, volumes);
-
-				pw.printf("%s\t%f\t%f\t%f\n", rate, km, sum, baseSum - sum);
-				pw.flush();
 			}
-		} catch (FileNotFoundException e) {
-			throw new UncheckedIOException(e);
-		} finally {
-			if (pw != null) pw.close();
-		}
-
+		});
 	}
 
-	private RunResource getRateRun(String rate) {
+	public RunResource getRateRun(String rate) {
 		return new RunResource(WD + "/rates/" + rate, null); 
 	}
 
 	public void personKilometers() {
-		final File file = new File(WD + "/person-kilometers.txt");
-		Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
-
-		PrintWriter pw = null;
-		try {
-			pw = new PrintWriter(file);
-			final Map<Id, Double> distancePerPersonBase = PowerPlans.travelledDistancePerPerson(baseScenario.getPopulation(), baseScenario.getNetwork());
-			pw.printf("regime\trate\tperson\tkilometers-base\tkilometers\n");
-			for (String rate : getRates()) {
-				Scenario scenario = getRateRun(rate).getLastIteration().getExperiencedPlansAndNetwork();
-				final Map<Id, Double> distancePerPerson = PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), scenario.getNetwork());
-				for (Person person : baseScenario.getPopulation().getPersons().values()) {
-					pw.printf("%s\t%s\t%s\t%f\t%f\n", 
-							regime, rate, person.getId().toString(), 
-							zeroForNull(distancePerPersonBase.get(person.getId())),
-							zeroForNull(distancePerPerson.get(person.getId())));
+		final String filename = WD + "/person-kilometers.txt";
+		final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
+		FileIO.writeToFile(filename, new StreamingOutput() {
+			@Override
+			public void write(PrintWriter pw) throws IOException {
+				final Map<Id, Double> distancePerPersonBase = PowerPlans.travelledDistancePerPerson(baseScenario.getPopulation(), baseScenario.getNetwork());
+				pw.printf("regime\trate\tperson\tkilometers-base\tkilometers\n");
+				for (String rate : getRates()) {
+					Scenario scenario = getRateRun(rate).getLastIteration().getExperiencedPlansAndNetwork();
+					final Map<Id, Double> distancePerPerson = PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), scenario.getNetwork());
+					for (Person person : baseScenario.getPopulation().getPersons().values()) {
+						pw.printf("%s\t%s\t%s\t%f\t%f\n", 
+								regime, rate, person.getId().toString(), 
+								zeroForNull(distancePerPersonBase.get(person.getId())),
+								zeroForNull(distancePerPerson.get(person.getId())));
+					}
+					pw.flush();
 				}
-				pw.flush();
+			} 
+		});
+	}
+
+	public void detourFactor() {
+		final String filename = WD + "/detour-factor.txt";	
+		final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
+		final double travelledBase = sum(PowerPlans.travelledDistancePerPerson(baseScenario.getPopulation(), baseScenario.getNetwork()).values());
+		FileIO.writeToFile(filename, new StreamingOutput() {
+			@Override
+			public void write(PrintWriter pw) throws IOException {	
+				for (String rate : getRates()) {
+					Scenario scenario = getRateRun(rate).getLastIteration().getExperiencedPlansAndNetwork();
+					TripRouter tripRouter = new TripRouterFactoryImpl(
+							scenario.getConfig(), 
+							scenario.getNetwork(), 
+							new OnlyTimeDependentTravelDisutilityFactory(), 
+							new FreeSpeedTravelTime(), 
+							new DijkstraFactory(), 
+							scenario.getPopulation().getFactory(), 
+							new ModeRouteFactory(), 
+							null, null)
+					.instantiateAndConfigureTripRouter();
+					double travelled = sum(PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), scenario.getNetwork()).values());
+					double freespeedDistances = 0.0;
+					for (Person person : scenario.getPopulation().getPersons().values()) {
+						double freespeedDistance = PowerPlans.distance(scenario.getNetwork(), tripRouter, person.getSelectedPlan().getPlanElements());
+						freespeedDistances += freespeedDistance;
+					}		
+					double detourFactor = travelled / freespeedDistances;
+					double reconstructionWithoutDetours = freespeedDistances / travelledBase;
+					pw.printf("%s\t%s\t%f\t%f\t%f\t%f\n",
+							regime, rate, travelled, freespeedDistances, detourFactor, reconstructionWithoutDetours);
+					pw.flush();
+				}	
 			}
-		} catch (FileNotFoundException e) {
-			throw new UncheckedIOException(e);
-		} finally {
-			if (pw != null) pw.close();
+		});
+	}
+
+
+	private double sum(Collection<Double> values) {
+		double result = 0.0;
+		for (double summand : values) {
+			result += summand;
 		}
-
+		return result;
 	}
 
-	private RunResource getBaseRun() {
-		return new RunResource(WD + "/output-berlin", "2kW.15");
-	}
+
 
 	public void permutations() {
 		File file = new File(WD + "/permutations.txt");
@@ -361,7 +436,7 @@ public class MultiRateRunResource {
 			}	
 		});
 	}
-	
+
 	public StreamingOutput getPersonKilometers() {
 		final String filename = WD + "/person-kilometers.txt";
 		return new StreamingOutput() {

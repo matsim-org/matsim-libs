@@ -34,6 +34,8 @@ import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
 
+import playground.mzilske.otp.OTPTripRouterFactory;
+
 public class GenerateAndRoutePopulation {
 
 

@@ -15,7 +15,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Steppable;
 
-import d4d.Sighting;
+import playground.mzilske.d4d.Sighting;
+
 
 public class CallProcess implements ActivityStartEventHandler, ActivityEndEventHandler, Steppable {
 

@@ -14,6 +14,8 @@ import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
+import playground.mzilske.gtfs.GtfsConverter;
+
 public class Convert {
 	
 

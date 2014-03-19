@@ -17,7 +17,9 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
-import d4d.AltPopulationReaderMatsimV5;
+import playground.mzilske.d4d.AltPopulationReaderMatsimV5;
+import playground.mzilske.otp.OTPTripRouterFactory;
+
 
 public class Run {
 	
