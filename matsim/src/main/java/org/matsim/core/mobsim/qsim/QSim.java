@@ -20,13 +20,6 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,12 +33,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimListenerManager;
-import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
-import org.matsim.core.mobsim.qsim.interfaces.AgentCounterI;
-import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
@@ -57,6 +45,8 @@ import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 import org.matsim.withinday.mobsim.WithinDayEngine;
+
+import java.util.*;
 
 /**
  * This has developed over the last couple of months/years towards an increasingly pluggable module.  The current (dec'2011)
@@ -140,12 +130,17 @@ public final class QSim implements VisMobsim, Netsim {
 
 		@Override
 		public synchronized void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
-			QSim.this.netEngine.registerAdditionalAgentOnLink(planAgent);
+            if (QSim.this.netEngine != null) {
+                QSim.this.netEngine.registerAdditionalAgentOnLink(planAgent);
+            }
 		}
 
 		@Override
 		public synchronized MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
-			return QSim.this.netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
+            if (QSim.this.netEngine != null) {
+                return QSim.this.netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
+            }
+            return null;
 		}
 
 		@Override
@@ -242,11 +237,15 @@ public final class QSim implements VisMobsim, Netsim {
 
 	public void createAndParkVehicleOnLink(Vehicle vehicle, Id linkId) {
 		QVehicle veh = new QVehicle(vehicle);
-		netEngine.addParkedVehicle(veh, linkId);
+        if (netEngine != null) {
+            netEngine.addParkedVehicle(veh, linkId);
+        }
 	}
 
 	public void addParkedVehicle(MobsimVehicle veh, Id startLinkId) {
-		netEngine.addParkedVehicle(veh, startLinkId);
+		if (netEngine != null) {
+            netEngine.addParkedVehicle(veh, startLinkId);
+        }
 	}
 
 	private void cleanupSim() {
@@ -357,7 +356,7 @@ public final class QSim implements VisMobsim, Netsim {
 			this.stopTime = Double.MAX_VALUE;
 		}
 
-		double simStartTime = 0;
+		double simStartTime;
 		if (QSimConfigGroup.MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END.equals(qSimConfigGroup.getSimStarttimeInterpretation())) {
 			double firstAgentStartTime = calculateFirstAgentStartTime();
 			simStartTime = Math.floor(Math.max(configuredStartTime, firstAgentStartTime));
@@ -478,7 +477,7 @@ public final class QSim implements VisMobsim, Netsim {
 	 * Adds the QueueSimulationListener instance given as parameters as listener
 	 * to this QueueSimulation instance.
 	 *
-	 * @param listeners
+	 * @param listener
 	 */
 	@Override
 	public void addQueueSimulationListeners(MobsimListener listener) {
