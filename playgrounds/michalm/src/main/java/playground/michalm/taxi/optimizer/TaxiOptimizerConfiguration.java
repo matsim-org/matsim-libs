@@ -19,6 +19,8 @@ public class TaxiOptimizerConfiguration
 
     public final Goal goal;
 
+    public final String workingDirectory;
+
 
     public static enum Goal
     {
@@ -27,7 +29,8 @@ public class TaxiOptimizerConfiguration
 
 
     public TaxiOptimizerConfiguration(MatsimVrpContext context, VrpPathCalculator calculator,
-            TaxiScheduler scheduler, VehicleRequestPathFinder vrpFinder, Goal goal)
+            TaxiScheduler scheduler, VehicleRequestPathFinder vrpFinder, Goal goal,
+            String workingDirectory)
     {
         this.context = context;
 
@@ -36,6 +39,8 @@ public class TaxiOptimizerConfiguration
         this.vrpFinder = vrpFinder;
 
         this.goal = goal;
+
+        this.workingDirectory = workingDirectory;
     }
 
 

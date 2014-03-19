@@ -54,7 +54,7 @@ class MIPSolutionFinder
         final int m = vData.dimension;
         final int n = rData.dimension;
         
-        final double[][] x = new double[m + n][m + n];
+        final boolean[][] x = new boolean[m + n][m + n];
         final double[] w = new double[n];
 
         Queue<TaxiRequest> queue = new PriorityQueue<TaxiRequest>(n, Requests.T0_COMPARATOR);
@@ -74,7 +74,7 @@ class MIPSolutionFinder
                 int i = rData.reqIdToIdx.get(r.getId());
                 int v = m + i;
 
-                x[u][v] = 1;
+                x[u][v] = true;
 
                 double w_i = r.getPickupStayTask().getEndTime() - t_P;
                 w[i] = w_i;
@@ -82,7 +82,7 @@ class MIPSolutionFinder
                 u = v;
             }
 
-            x[u][k] = 1;
+            x[u][k] = true;
         }
 
         return new MIPSolution(x, w);

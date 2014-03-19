@@ -212,7 +212,7 @@ import playground.michalm.util.RunningVehicleRegister;
         TaxiSchedulerParams params = new TaxiSchedulerParams(false, pickupDuration, dropoffDuration);
 
         NOSRankTaxiOptimizer optimizer = NOSRankTaxiOptimizer.createNOSRankTaxiOptimizer(context,
-                calculator, params, tdisSource);
+                calculator, params, tdisSource, dirName);
 
         QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
         contextImpl.setMobsimTimer(qSim.getSimTimer());

@@ -29,7 +29,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
 public class MIPTaxiStats
 {
-    //temporarily... not the cleanest solution...
+    //temporarily... not the cleanest design...
     public static MIPTaxiStats currentStats;
 
     private final VrpData data;

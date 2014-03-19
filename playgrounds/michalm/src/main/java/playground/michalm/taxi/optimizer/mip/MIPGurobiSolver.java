@@ -69,12 +69,14 @@ public class MIPGurobiSolver
             // this is the internal model (a copy of that passed to the constructor)
             GRBEnv env = model.getEnv();
 
-            //env.set(DoubleParam.TimeLimit, 3600);// 1 hour
-            //env.set(GRB.DoubleParam.MIPGap, 0.01);//1%
-            
+            env.set(GRB.DoubleParam.TimeLimit, 7200);// 2 hours
+            //env.set(GRB.DoubleParam.MIPGap, 0.001);//0.1%
+
             env.set(GRB.IntParam.MIPFocus, 1);//the focus towards finding feasible solutions
             //or alternatively: focus towards finding feasible solutions after 1 hour
             //env.set(GRB.DoubleParam.ImproveStartTime, 3600);
+
+            //env.set(GRB.IntParam.Threads, 1);//number of threads 
 
             addXVariables();
             addWVariables();
@@ -94,6 +96,8 @@ public class MIPGurobiSolver
             applyInitialSolution(initialSolution);
 
             model.optimize();
+            
+            model.write(optimConfig.workingDirectory + "gurobi_solution.sol");
 
             MIPSolution solution = extractSolution();
 
@@ -234,25 +238,33 @@ public class MIPGurobiSolver
     {
         for (int u = 0; u < m + n; u++) {
             for (int v = 0; v < m + n; v++) {
-                xVar[u][v].set(GRB.DoubleAttr.Start, initialSolution.x[u][v]);
+                double x_uv = initialSolution.x[u][v] ? 1 : 0;
+                xVar[u][v].set(GRB.DoubleAttr.Start, x_uv);
             }
         }
 
         for (int i = 0; i < n; i++) {
             wVar[i].set(GRB.DoubleAttr.Start, initialSolution.w[i]);
         }
-
-        //the following shortcut does not work (why??):
-        //model.set(GRB.DoubleAttr.Start, wVar, initialSolution.w);
-        //model.set(GRB.DoubleAttr.Start, xVar, initialSolution.x);
     }
 
 
     private MIPSolution extractSolution()
         throws GRBException
     {
-        return new MIPSolution(//
-                model.get(GRB.DoubleAttr.X, xVar),//
-                model.get(GRB.DoubleAttr.X, wVar));
+        boolean[][] x = new boolean[m + n][m + n];
+        for (int u = 0; u < m + n; u++) {
+            for (int v = 0; v < m + n; v++) {
+                double x_uv = xVar[u][v].get(GRB.DoubleAttr.X);
+                x[u][v] = x_uv >= 0.5;
+            }
+        }
+
+        double[] w = new double[n];
+        for (int i = 0; i < n; i++) {
+            w[i] = wVar[i].get(GRB.DoubleAttr.X);
+        }
+
+        return new MIPSolution(x, w);
     }
 }

@@ -51,6 +51,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
     private PrintWriter pw;
     private PrintWriter pw2;
     private PrintWriter pw3;
+    private PrintWriter pw4;
 
 
     /*package*/MultipleTaxiLauncher(String paramFile)
@@ -75,6 +76,8 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
             pw3 = new PrintWriter(launcher.dirName + "cacheStats" + outputFileSuffix);
             pw3.print("cfg\tHits\tMisses\n");
+
+            pw4 = new PrintWriter(launcher.dirName + "MIP_stats" + outputFileSuffix);
         }
         catch (IOException e) {
             throw new RuntimeException(e);
@@ -87,6 +90,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
         pw.close();
         pw2.close();
         pw3.close();
+        pw4.close();
     }
 
 
@@ -185,11 +189,11 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
         //=========== stats & graphs for the last run
 
         MIPTaxiStats.currentStats.calcSimulated();
-        MIPTaxiStats.currentStats.print(pw);
+        MIPTaxiStats.currentStats.print(pw4);
 
-        JFreeChart chart = TaxiScheduleChartUtils.chartSchedule(data.getVehicles());
-        chart.setTitle(cfg);
-        ChartUtils.showFrame(chart);
+//        JFreeChart chart = TaxiScheduleChartUtils.chartSchedule(data.getVehicles());
+//        chart.setTitle(cfg);
+//        ChartUtils.showFrame(chart);
     }
 
 
@@ -303,6 +307,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
         //        multiLauncher.run(APS_TP_xx, runs);
         //        multiLauncher.run(APS_DSE_xx, runs);
 
+        //multiLauncher.run(NOS_DSE_FF, 1, true, true, true);
         multiLauncher.run(MIP_FF, 1, true, true, true);
 
         multiLauncher.closeOutputFiles();

@@ -23,7 +23,7 @@ import java.io.*;
 import java.util.*;
 
 import org.matsim.analysis.LegHistogram;
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.router.*;
@@ -236,7 +236,7 @@ import playground.michalm.util.RunningVehicleRegister;
         TaxiData taxiData = TaxiLauncherUtils.initTaxiData(scenario, taxisFileName, ranksFileName);
         contextImpl.setVrpData(taxiData);
 
-        TaxiOptimizerConfiguration optimizerConfig = createOptimizerConfiguration(); 
+        TaxiOptimizerConfiguration optimizerConfig = createOptimizerConfiguration();
         TaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(optimizerConfig);
 
         QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
@@ -320,8 +320,8 @@ import playground.michalm.util.RunningVehicleRegister;
 
         VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(pathCalculator, scheduler);
 
-        return new TaxiOptimizerConfiguration(context,
-                pathCalculator, scheduler, vrpFinder, algorithmConfig.goal);
+        return new TaxiOptimizerConfiguration(context, pathCalculator, scheduler, vrpFinder,
+                algorithmConfig.goal, dirName);
     }
 
 

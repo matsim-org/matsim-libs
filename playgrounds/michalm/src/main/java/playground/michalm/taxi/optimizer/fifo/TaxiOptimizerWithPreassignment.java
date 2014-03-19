@@ -43,7 +43,7 @@ public class TaxiOptimizerWithPreassignment
 {
     public static OTSTaxiOptimizer createOptimizer(MatsimVrpContext context,
             VrpPathCalculator calculator, double pickupDuration, double dropoffDuration,
-            String reqIdToVehIdFile)
+            String reqIdToVehIdFile, String workingDir)
     {
         final Map<Id, Vehicle> reqIdToVehMap = readReqIdToVehMap(context, reqIdToVehIdFile);
 
@@ -53,7 +53,7 @@ public class TaxiOptimizerWithPreassignment
         VehicleRequestPathFinder vrpFinder = createVrpFinder(calculator, scheduler, reqIdToVehMap);
 
         TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(context,
-                calculator, scheduler, vrpFinder, Goal.NULL);
+                calculator, scheduler, vrpFinder, Goal.NULL, workingDir);
 
         return new OTSTaxiOptimizer(optimConfig);
     }

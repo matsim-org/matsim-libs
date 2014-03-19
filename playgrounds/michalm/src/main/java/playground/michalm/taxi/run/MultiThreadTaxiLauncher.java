@@ -26,14 +26,14 @@ import java.util.concurrent.*;
 {
     //20 d:\michalm\2014_02\mielec-2-peaks-new-10-25\params.in
     //d:\PP-rad\taxi\mielec-2-peaks\2014_02\
-    private static final String PATH = "d:\\PP-rad\\taxi\\mielec-2-peaks\\2014_02\\mielec-2-peaks-new-";
+    private static final String PATH = "d:\\michalm\\2014_02\\mielec-2-peaks-new-";
     private static final String FILE = "\\params.in";
 
     //reverse order of iteration (--> start with bigger tasks)
-//    private static final int[] DEMANDS = { 40, 35, 30, 25, 20, 15, 10 };
-//    private static final int[] SUPPLIES = { 50, 25 };
-    private static final int[] DEMANDS = { 10 };
-    private static final int[] SUPPLIES = { 25 };
+    private static final int[] DEMANDS = { 40, 35, 30, 25, 20, 15, 10 };
+    private static final int[] SUPPLIES = { 50, 25 };
+//    private static final int[] DEMANDS = { 10 };
+//    private static final int[] SUPPLIES = { 25 };
 
     private static final int RUNS = 1;
 

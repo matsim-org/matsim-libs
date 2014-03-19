@@ -19,6 +19,7 @@
 
 package playground.michalm.taxi.optimizer.mip;
 
+import java.io.*;
 import java.util.*;
 
 import playground.michalm.taxi.data.TaxiRequest;
@@ -29,11 +30,11 @@ public class MIPProblem
 {
     static class MIPSolution
     {
-        final double[][] x;
+        final boolean[][] x;
         final double[] w;
 
 
-        MIPSolution(double[][] x, double[] w)
+        MIPSolution(boolean[][] x, double[] w)
         {
             this.x = x;
             this.w = w;
@@ -76,13 +77,8 @@ public class MIPProblem
         }
 
         findInitialSolution();
-        MIPTaxiStats.currentStats = new MIPTaxiStats(optimConfig.context.getVrpData());
-        MIPTaxiStats.currentStats.calcInitial();
-
         solveProblem();
-
         scheduleSolution();
-        MIPTaxiStats.currentStats.calcSolved();
     }
 
 
@@ -108,6 +104,11 @@ public class MIPProblem
     private void findInitialSolution()
     {
         initialSolution = new MIPSolutionFinder(optimConfig, rData, vData).findInitialSolution();
+
+        //only for OFFLINE
+        MIPTaxiStats.currentStats = new MIPTaxiStats(optimConfig.context.getVrpData());
+        MIPTaxiStats.currentStats.calcInitial();
+
         optimConfig.scheduler.removePlannedRequestsFromAllSchedules();
     }
 
@@ -123,6 +124,60 @@ public class MIPProblem
     {
         new MIPSolutionScheduler(optimConfig, rData, vData).updateSchedules(finalSolution);
         unplannedRequests.removeAll(Arrays.asList(rData.requests));
+
+        //only for OFFLINE
+        MIPTaxiStats.currentStats.calcSolved();
+    }
+
+
+    @SuppressWarnings("unused")
+    private MIPSolution readFromFile(String filename)
+    {
+        Scanner s;
+        try {
+            s = new Scanner(new File(filename));
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        //header
+        if (!s.nextLine().startsWith("# Objective value = ")) {
+            s.close();
+            throw new RuntimeException();
+        }
+
+        int n = rData.dimension;
+        int m = vData.dimension;
+
+        boolean[][] x = new boolean[m + n][m + n];
+        for (int u = 0; u < m + n; u++) {
+            for (int v = 0; v < m + n; v++) {
+
+                //line format: x_430,430 0
+                if (!s.next().equals("x_" + u + "," + v)) {
+                    s.close();
+                    throw new RuntimeException();
+                }
+
+                x[u][v] = s.nextDouble() >= 0.5;
+            }
+        }
+
+        double[] w = new double[n];
+        for (int i = 0; i < n; i++) {
+
+            //line format: w_0 22096
+            if (!s.next().equals("w_" + i)) {
+                s.close();
+                throw new RuntimeException();
+            }
+
+            w[i] = s.nextDouble();
+        }
+
+        s.close();
+        return new MIPSolution(x, w);
     }
 
 

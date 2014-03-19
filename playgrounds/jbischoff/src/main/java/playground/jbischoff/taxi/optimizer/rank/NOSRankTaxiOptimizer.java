@@ -65,14 +65,14 @@ public class NOSRankTaxiOptimizer
 
     public static NOSRankTaxiOptimizer createNOSRankTaxiOptimizer(MatsimVrpContext context,
             VrpPathCalculator calculator, TaxiSchedulerParams params,
-            TravelDisutilitySource tdisSource)
+            TravelDisutilitySource tdisSource, String workingDir)
     {
         TaxiScheduler scheduler = new RankModeTaxiScheduler(context, calculator, params);
 
         VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(calculator, scheduler);
 
         TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(context,
-                calculator, scheduler, vrpFinder, Goal.MIN_WAIT_TIME);
+                calculator, scheduler, vrpFinder, Goal.MIN_WAIT_TIME, workingDir);
 
         return new NOSRankTaxiOptimizer(optimConfig, new IdleRankVehicleFinder(context, scheduler));
     }

@@ -46,9 +46,9 @@ class MIPSolutionScheduler
 
     private void addSubsequentRequestsToCurrentVehicle(int u)
     {
-        double[] x_u = solution.x[u];
+        boolean[] x_u = solution.x[u];
         for (int i = 0; i < n; i++) {
-            if (x_u[m + i] >= 0.5) {//either 0 +/-epsilon or 1 +/-epsilon
+            if (x_u[m + i]) {
                 addRequestToCurrentVehicle(i);
                 addSubsequentRequestsToCurrentVehicle(m + i);
                 return;
