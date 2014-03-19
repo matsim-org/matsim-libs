@@ -200,9 +200,7 @@ public class TaxiStatsCalculator
                 + "DeliveryDriveT\t"//
                 + "PickupT\t" //
                 + "DropoffT\t" //
-                + "CruiseT\t" //
                 + "WaitT\t" //
-                + "OverT\t" //
                 + "PassengerWaitT\t" //
                 + "MaxPassengerWaitT";
 
@@ -215,9 +213,7 @@ public class TaxiStatsCalculator
                     .append(taxiDropoffDriveTime).append('\t') //
                     .append(taxiPickupTime).append('\t') //
                     .append(taxiDropoffTime).append('\t') //
-                    .append(taxiCruiseTime).append('\t') //
                     .append(taxiWaitTime).append('\t') //
-                    .append(taxiOverTime).append('\t') //
                     .append(passengerWaitTime).append('\t') //
                     .append(maxPassengerWaitTime).toString();
         }
