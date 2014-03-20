@@ -19,27 +19,6 @@
  * *********************************************************************** */
 package org.matsim.vis.otfvis;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowEvent;
-import java.util.Locale;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.OverlayLayout;
-import javax.swing.RepaintManager;
-import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
@@ -53,6 +32,13 @@ import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.utils.WGS84ToMercator;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
 
 
 /**
@@ -104,15 +90,13 @@ public final class OTFClient extends JFrame {
 		super("MATSim OTFVis");
 		this.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 		JFrame.setDefaultLookAndFeelDecorated(true);
-		boolean isMac = System.getProperty("os.name").toLowerCase(Locale.ROOT).startsWith("mac os x");
+		boolean isMac = System.getProperty("os.name").equals("Mac OS X");
 		if (isMac){
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
 			this.getRootPane().putClientProperty("apple.awt.brushMetalLook", Boolean.TRUE);
 		}
 		//Make sure menus appear above JOGL Layer
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		setSize(screenSize.width/2,screenSize.height/2);
 		log.info("created MainFrame");
 	}
 
@@ -188,11 +172,13 @@ public final class OTFClient extends JFrame {
 		OTFClientControl.getInstance().setMainOTFDrawer(mainDrawer);
 		log.info("created drawer");
 		compositePanel = new JPanel();
+        compositePanel.setBackground(Color.white);
+        compositePanel.setOpaque(true);
 		compositePanel.setLayout(new OverlayLayout(compositePanel));
-		compositePanel.add(mainDrawer.getComponent());	
-		JPanel panel = new JPanel(new BorderLayout());
-		panel.add(compositePanel, BorderLayout.CENTER);
-		getContentPane().add(panel);
+        compositePanel.add(mainDrawer.getComponent());
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        compositePanel.setPreferredSize(new Dimension(screenSize.width/2,screenSize.height/2));
+		getContentPane().add(compositePanel, BorderLayout.CENTER);
 		hostControlBar.setDrawer(mainDrawer);
 	}
 	
@@ -220,12 +206,6 @@ public final class OTFClient extends JFrame {
 			}
 
 		});
-	}
-
-	@Override
-	public void show() {
-		mainDrawer.redraw();
-		super.show();
 	}
 
 	public OTFHostControlBar getHostControlBar() {

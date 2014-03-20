@@ -20,10 +20,6 @@
 
 package org.matsim.vis.otfvis;
 
-import java.awt.BorderLayout;
-
-import javax.swing.SwingUtilities;
-
 import org.jdesktop.swingx.mapviewer.DefaultTileFactory;
 import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
@@ -50,6 +46,9 @@ import org.matsim.vis.otfvis.interfaces.OTFServer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class OTFClientLive {
 
@@ -109,7 +108,8 @@ public class OTFClientLive {
 					}
 					otfClient.addMapViewer(tf);
 				}
-				otfClient.show();
+                otfClient.pack();
+				otfClient.setVisible(true);
 			}
 		});
 	}

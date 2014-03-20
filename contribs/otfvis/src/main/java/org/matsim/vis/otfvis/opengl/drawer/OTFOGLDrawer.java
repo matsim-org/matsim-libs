@@ -20,53 +20,12 @@
 
 package org.matsim.vis.otfvis.opengl.drawer;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLCapabilities;
-import javax.media.opengl.GLEventListener;
-import javax.media.opengl.GLException;
-import javax.media.opengl.GLProfile;
-import javax.media.opengl.awt.GLCanvas;
-import javax.media.opengl.awt.GLJPanel;
-import javax.media.opengl.glu.GLU;
-import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.MouseInputAdapter;
-
+import com.jogamp.opengl.util.awt.ImageUtil;
+import com.jogamp.opengl.util.awt.Screenshot;
+import com.jogamp.opengl.util.awt.TextRenderer;
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.TextureCoords;
+import com.jogamp.opengl.util.texture.TextureIO;
 import org.apache.log4j.Logger;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.interpolation.PropertySetter;
@@ -87,12 +46,28 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.Point3f;
 
-import com.jogamp.opengl.util.awt.ImageUtil;
-import com.jogamp.opengl.util.awt.Screenshot;
-import com.jogamp.opengl.util.awt.TextRenderer;
-import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.TextureCoords;
-import com.jogamp.opengl.util.texture.TextureIO;
+import javax.media.opengl.*;
+import javax.media.opengl.awt.GLCanvas;
+import javax.media.opengl.awt.GLJPanel;
+import javax.media.opengl.glu.GLU;
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.MouseInputAdapter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.List;
+import java.util.Map.Entry;
 
 public class OTFOGLDrawer implements GLEventListener {
 
@@ -199,7 +174,6 @@ public class OTFOGLDrawer implements GLEventListener {
 		public void mouseReleased(MouseEvent e) {
 			// update screen one last time
 			mouseDragged(e);
-
 			Rectangle screenRect = new Rectangle(start);
 			screenRect.add(e.getPoint());
 			if ((screenRect.getHeight() > 10)&& (screenRect.getWidth() > 10)) {
@@ -212,7 +186,6 @@ public class OTFOGLDrawer implements GLEventListener {
 						Rectangle2D scaledAndTranslatedNewViewBounds = new Rectangle2D.Double(scaledNewViewBounds.getX() + (currentRect.getCenterX() - viewBounds.centerX), scaledNewViewBounds.getY() + (currentRect.getCenterY() - viewBounds.centerY), scaledNewViewBounds.getWidth(), scaledNewViewBounds.getHeight());
 						Animator viewBoundsAnimator = PropertySetter.createAnimator(2020, OTFOGLDrawer.this, "viewBounds", quadTreeRectToRectangle2D(viewBounds), scaledAndTranslatedNewViewBounds);
 						viewBoundsAnimator.start();
-						// TODO: Scale property
 						Animator rectFader = PropertySetter.createAnimator(2020, OTFOGLDrawer.this, "alpha", 1.0f, 0.f);
 						rectFader.setStartDelay(200);
 						rectFader.setAcceleration(0.4f);
@@ -298,9 +271,7 @@ public class OTFOGLDrawer implements GLEventListener {
 
 	private int nRedrawn = 0;
 
-	private final VisGUIMouseHandler mouseMan;
-
-	private final OTFClientQuadTree clientQ;
+    private final OTFClientQuadTree clientQ;
 
 	private String lastTime = "";
 
@@ -334,9 +305,7 @@ public class OTFOGLDrawer implements GLEventListener {
 
 	private TextRenderer textRenderer;
 
-	private String status;
-
-	private int statusWidth;
+    private int statusWidth;
 
 	private OTFVisConfigGroup otfVisConfig;
 
@@ -348,10 +317,10 @@ public class OTFOGLDrawer implements GLEventListener {
 		this.otfVisConfig = otfVisConfig;
 		GLCapabilities caps = new GLCapabilities(GLProfile.get(GLProfile.GL2));
 		this.canvas = createGLCanvas(this, caps);
-		this.mouseMan = new VisGUIMouseHandler();
-		this.canvas.addMouseListener(this.mouseMan);
-		this.canvas.addMouseMotionListener(this.mouseMan);
-		this.canvas.addMouseWheelListener(this.mouseMan);
+        VisGUIMouseHandler mouseMan = new VisGUIMouseHandler();
+		this.canvas.addMouseListener(mouseMan);
+		this.canvas.addMouseMotionListener(mouseMan);
+		this.canvas.addMouseWheelListener(mouseMan);
 		this.scaleBar = new OTFScaleBarDrawer();
 		OTFGLOverlay matsimLogo = new OTFGLOverlay("matsim_logo_blue.png", -0.03f, 0.05f, 1.5f, false);
 		this.overlayItems.add(matsimLogo);
@@ -371,13 +340,19 @@ public class OTFOGLDrawer implements GLEventListener {
 
 	private Component createGLCanvas(final OTFOGLDrawer drawer, final GLCapabilities caps) {
 		Component canvas;
-		if (otfVisConfig.isMapOverlayMode()) {
-			// A GLJPanel is an OpenGL component which is "more Swing compatible" than a GLCanvas.
-			// The JOGL doc says the tradeoff is that it is slower than a GLCanvas.
-			// We use it if we want to put map tiles behind the agent drawer, because it can be made translucent!
-			GLJPanel glJPanel = new GLJPanel(caps);
-			glJPanel.addGLEventListener(drawer);
-			glJPanel.setOpaque(false); // So that the map shines through
+        boolean isMac = System.getProperty("os.name").equals("Mac OS X");
+        boolean isJava7 = System.getProperty("java.version").startsWith("1.7");
+		if (otfVisConfig.isMapOverlayMode() || (isMac && isJava7)) {
+            // A GLJPanel is an OpenGL component which is "more Swing compatible" than a GLCanvas.
+            // The JOGL doc says the tradeoff is that it is slower than a GLCanvas.
+            // We use it if we want to put map tiles behind the agent drawer, because it can be made translucent!
+            // On Java 7 on Mac, I get strange behavior (wrong layout on startup with no obvious fix), so I
+            // also use the "more compatible" version, which works.
+            GLJPanel glJPanel = new GLJPanel(caps);
+            glJPanel.addGLEventListener(drawer);
+            if (otfVisConfig.isMapOverlayMode()) {
+                glJPanel.setOpaque(false); // So that the map shines through
+            }
 			canvas = glJPanel;
 		} else {
 			// This is the default JOGL component. JOGL doc recommends using it if you do not need a GLJPanel.
@@ -491,7 +466,7 @@ public class OTFOGLDrawer implements GLEventListener {
 	}
 
 	private void drawFrameRate(GLAutoDrawable drawable) {
-		this.status  = this.lastTime;
+        String status = this.lastTime;
 
 		if (this.statusWidth == 0) {
 			// Place it at a fixed offset wrt the upper right corner
@@ -505,7 +480,7 @@ public class OTFOGLDrawer implements GLEventListener {
 		// Render the text
 		this.textRenderer.setColor(Color.DARK_GRAY);
 		this.textRenderer.beginRendering(drawable.getWidth(), drawable.getHeight());
-		this.textRenderer.draw(this.status, x, y);
+		this.textRenderer.draw(status, x, y);
 		this.textRenderer.endRendering();
 	}
 
@@ -514,8 +489,7 @@ public class OTFOGLDrawer implements GLEventListener {
 		Rectangle2D.Double dest = new Rectangle2D.Double(rect.minX , rect.minY , rect.maxX - rect.minX, rect.maxY - rect.minY);
 		CollectDrawLinkId linkIdQuery = new CollectDrawLinkId(dest);
 		linkIdQuery.prepare(this.clientQ);
-		Map<Coord, String> linkIds = linkIdQuery.getLinkIds();
-		return linkIds;
+        return linkIdQuery.getLinkIds();
 	}
 
 	private void fireChangeListeners() {
@@ -537,18 +511,12 @@ public class OTFOGLDrawer implements GLEventListener {
 		float winX, winY;//, winZ = cameraStart.getZ();
 		float posX, posY;//, posZ;
 		double[] w_pos = new double[3];
-		double[] z_pos = new double[1];
-
-
-		winX = x;
+        winX = x;
 		winY = viewport[3] - y;
-		z_pos[0]=1;
-
 		GLU glu = new GLU();
 		obj_pos[2]=0; // Check view relative z-koord of layer zero == visnet layer
 		glu.gluProject( obj_pos[0], obj_pos[1],obj_pos[2], modelview,0, projection,0, viewport,0, w_pos,0);
 		glu.gluUnProject( winX, winY, w_pos[2], modelview,0, projection,0, viewport,0, obj_pos,0);
-
 		posX = (float)obj_pos[0];
 		posY = (float)obj_pos[1];
 		return new Point3f(posX, posY, 0);
@@ -865,9 +833,6 @@ public class OTFOGLDrawer implements GLEventListener {
 	}
 
 	@Override
-	public void dispose(GLAutoDrawable arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void dispose(GLAutoDrawable arg0) {}
 
 }

@@ -20,29 +20,18 @@
 
 package org.matsim.vis.otfvis.gui;
 
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
-import java.text.MessageFormat;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
-import javax.swing.border.Border;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
+
+import javax.swing.*;
+import javax.swing.border.Border;
+import java.awt.*;
+import java.awt.event.*;
+import java.text.MessageFormat;
 
 public final class OTFHostControlBar extends JToolBar implements ActionListener, ItemListener {
 
@@ -68,9 +57,7 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 
 	private final OTFHostControl hostControl;
 
-	private int gotoIter = 0;
-
-	private boolean synchronizedPlay = true;
+    private boolean synchronizedPlay = true;
 
 	private ImageIcon playIcon = null;
 
@@ -78,9 +65,9 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 
 	private OTFAbortGoto progressBar = null;
 
-	private static enum PlayOrPause {PLAY, PAUSE};
-	
-	private OTFOGLDrawer drawer;
+	private static enum PlayOrPause {PLAY, PAUSE}
+
+    private OTFOGLDrawer drawer;
 
 	/*
 	 * The symbol which the play/pause button currently shows.
@@ -140,8 +127,7 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 	}
 
 	private boolean requestTimeStep(int newTime, OTFServer.TimePreference prefTime) {
-		boolean result = hostControl.requestTimeStep(newTime, prefTime);
-		return result;
+        return hostControl.requestTimeStep(newTime, prefTime);
 	}
 
 	public void clearCaches() {
@@ -165,12 +151,7 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 		timeField.setText(text);
 	}
 
-	public void stopMovie() {
-		hostControl.stopMovie();
-		playPauseButton.setIcon(playIcon);
-	}
-
-	public void updateScaleLabel() {
+    public void updateScaleLabel() {
 		double scale = drawer.getScale();
 		scale = (float)(Math.round(scale*100))/100;
 		this.scaleField.setText(String.valueOf(scale));
@@ -210,7 +191,8 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 
 	private void forwardToTime(String newTime) {
 		final int newTime_s = (int) Time.parseTime(newTime);
-		progressBar = new OTFAbortGoto(server, newTime_s, gotoIter);
+        int gotoIter = 0;
+        progressBar = new OTFAbortGoto(server, newTime_s, gotoIter);
 		progressBar.start();
 		new Thread() {
 			@Override

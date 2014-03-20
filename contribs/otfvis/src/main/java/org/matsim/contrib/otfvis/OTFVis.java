@@ -20,14 +20,6 @@
 
 package org.matsim.contrib.otfvis;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Locale;
-
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -35,7 +27,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -59,13 +50,15 @@ import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
 import org.matsim.signalsystems.otfvis.io.SignalGroupStateChangeTracker;
-import org.matsim.vis.otfvis.OTFClientFile;
-import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OTFEvent2MVI;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
-import org.matsim.vis.otfvis.OTFVisMobsimListener;
-import org.matsim.vis.otfvis.OnTheFlyServer;
+import org.matsim.vis.otfvis.*;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Locale;
 
 /**
  * A generic starter for the OnTheFly Visualizer that supports
@@ -204,11 +197,11 @@ public class OTFVis {
 		OTFVisMobsimListener queueSimulationFeature = new OTFVisMobsimListener(server);
 		qSim.addQueueSimulationListeners(queueSimulationFeature);
 		server.setSimulation(qSim);
-		
+
 		if (config.scenario().isUseTransit()) {
-			
+
 			Network network = scenario.getNetwork();
-			TransitSchedule transitSchedule = ((ScenarioImpl) scenario).getTransitSchedule();
+			TransitSchedule transitSchedule = scenario.getTransitSchedule();
 			TransitQSimEngine transitEngine = qSim.getTransitEngine();
 			TransitStopAgentTracker agentTracker = transitEngine.getAgentTracker();
 			AgentSnapshotInfoFactory snapshotInfoFactory = qSim.getVisNetwork().getAgentSnapshotInfoFactory();
