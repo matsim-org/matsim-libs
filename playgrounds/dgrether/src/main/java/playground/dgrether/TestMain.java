@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.dgrether;
 
-import java.text.DecimalFormat;
-import java.util.regex.Matcher;
 
 
 
@@ -31,63 +29,7 @@ import java.util.regex.Matcher;
  */
 public class TestMain {
 
-	public static void testVarArgs(String...strings) {
-		for (String s : strings)
-			System.out.println(s);
-	}
-	
-	public static void testVarArgsMain(String[] args) {
-		testVarArgs("hallo", "ihr", "penner");
-		testVarArgs("hallo");
-	}
-	
-	public static void testNumberFormat(){
-		double d = 312380980328479.5;
-		System.out.println(Double.toString(d));
-		DecimalFormat f = new DecimalFormat("#.#");
-		System.out.println(f.format(d));
-		f = new DecimalFormat("#0.00");
-		System.out.println(f.format(d));
-		d = 0.34;
-		System.out.println(f.format(d));
-		f = new DecimalFormat("#");
-		System.out.println(f.format(d));
-	
-	}
-	
-	private static void testReplaceAll() {
-		String test = "aasdf_asdf";
-		String test2 = test.replaceAll("_", Matcher.quoteReplacement(" "));
-		System.out.println(test2);
-		test = "asladfj % afddasjal";
-		test2 = test.replaceAll("%", Matcher.quoteReplacement("\\%"));
-		System.out.println(test2);
-	}
-	
-	private static void testRound(){
-		double d = 0.5;
-		System.out.println(Math.round(d));
-		d = -0.5;
-		System.out.println(Math.round(d));
-	}
-	
-	private static void testSplit(){
-		String modes = "car, pt";
-		System.out.println(modes.split(","));
-		System.out.println(modes.split(";")[0]);
-		modes = "car";
-		System.out.println(modes.split(",")[0]);
-	}
-
 	public static void main(String[] args){
-		String config = "/media/data/work/matsim/examples/stephan_rath/testcase3/config.xml";
-//		Controler c = new Controler(config);
-//		c.run();
-//		OTFVis.playConfig(config);
-		testNumberFormat();
-//		testReplaceAll();
-//		testRound();
-//		testSplit();
 	}
 
 

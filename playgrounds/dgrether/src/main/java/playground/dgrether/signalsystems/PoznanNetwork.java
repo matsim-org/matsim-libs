@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems;
 
+import java.io.IOException;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -72,6 +74,7 @@ import playground.dgrether.lanes.LanesConsistencyChecker;
 import playground.dgrether.signalsystems.data.consistency.SignalControlDataConsistencyChecker;
 import playground.dgrether.signalsystems.data.consistency.SignalGroupsDataConsistencyChecker;
 import playground.dgrether.signalsystems.data.consistency.SignalSystemsDataConsistencyChecker;
+import playground.dgrether.xvis.XVis;
 
 
 /**
@@ -590,6 +593,7 @@ public class PoznanNetwork
         config.qsim().setNodeOffset(30);
         config.signalSystems().setUseAmbertimes(true);
         scenario = (ScenarioImpl)ScenarioUtils.createScenario(config);
+        scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataImpl(config.signalSystems()));
 
         // create network lanes and signals
         createPhysics();
@@ -655,8 +659,14 @@ public class PoznanNetwork
         new ConfigWriter(config).write(configFilename);
         // String configFilename = "d:\\PP-dyplomy\\2010_11-inz\\MATSim\\config.xml";
 
-        // visualization
+				// visualization
         new DgOTFVis().playAndRouteConfig(configFilename);
+//        String[] c = {configFilename};
+//        try {
+//					XVis.main(c);
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
     }
 
 }

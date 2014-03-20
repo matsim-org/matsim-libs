@@ -61,6 +61,7 @@ public class Daganzo2012Run {
 	
 	public static void main(String[] args) {
 		String config = args[0];
+//		String config = "/media/data/work/repos/shared-svn/studies/dgrether/jobfiles/daganzo/1574_config_local.xml";
 		new Daganzo2012Run().run(config);
 	}
 
