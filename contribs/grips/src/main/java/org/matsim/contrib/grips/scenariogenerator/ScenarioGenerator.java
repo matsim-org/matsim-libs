@@ -106,7 +106,7 @@ public class ScenarioGenerator {
 
 		try {
 			this.matsimConfig = ConfigUtils.createConfig();
-			gcm = new GripsConfigModule("grips", configFile);
+			gcm = new GripsConfigModule("grips", this.configFile);
 			this.matsimConfig.addModule(gcm);
 			GripsConfigDeserializer parser = new GripsConfigDeserializer(gcm);
 			parser.readFile(this.configFile);
@@ -308,7 +308,8 @@ public class ScenarioGenerator {
 			reader.setHighwayDefaults(6, "path", 2, 1.34, 1.0, laneCap);
 			reader.setHighwayDefaults(6, "cycleway", 2, 1.34, 1.0, laneCap);
 			reader.setHighwayDefaults(6, "footway", 2, 1.34, 1.0, laneCap);
-
+			reader.setHighwayDefaults(6, "steps", 2, 1.34, 1.0, laneCap);
+			reader.setHighwayDefaults(6, "pedestrian", 2, 1.34, 1.0, laneCap);
 			// max density is set to 5.4 p/m^2
 			((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(.6);
 			((NetworkImpl) sc.getNetwork()).setEffectiveCellSize(.31);

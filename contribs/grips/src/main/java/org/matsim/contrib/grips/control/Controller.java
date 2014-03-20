@@ -89,7 +89,7 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public class Controller {
 
-	private ArrayList<Shape> shapes;
+	private final ArrayList<Shape> shapes;
 	private Visualizer visualizer;
 	private Point mousePosition;
 	private SelectionMode selectionMode;
@@ -114,7 +114,7 @@ public class Controller {
 	private Config matsimConfig;
 
 	// private String configCoordinateSystem = Constants.getEPSG();
-	private String sourceCoordinateSystem = "EPSG:4326"; // WGS 84
+	private final String sourceCoordinateSystem = "EPSG:4326"; // WGS 84
 	private String targetCoordinateSystem = Constants.getEPSG();
 	private Scenario scenario;
 	private Point2D centerPosition;
@@ -133,7 +133,7 @@ public class Controller {
 	private Rectangle mainPanelBounds;
 	private boolean inSelection;
 
-	private ShapeUtils shapeUtils;
+	private final ShapeUtils shapeUtils;
 
 	private AbstractToolBox activeToolBox;
 	private ArrayList<AbstractModule> modules;
@@ -193,7 +193,7 @@ public class Controller {
 	}
 
 	private void printUsage() {
-		System.out.println(locale.getUsage());
+		System.out.println(this.locale.getUsage());
 		// TODO:
 		// JOptionPane.showConfirmDialog(this, locale.infoMatsimTime(), "",
 		// JOptionPane.WARNING_MESSAGE);
@@ -201,7 +201,7 @@ public class Controller {
 	}
 
 	public String getMatsimConfigFile() {
-		return matsimConfigFile;
+		return this.matsimConfigFile;
 	}
 
 	private void initListeners() {
@@ -215,7 +215,7 @@ public class Controller {
 	}
 
 	private static final class Runner implements Runnable {
-		private Controller controller;
+		private final Controller controller;
 
 		public Runner(Controller controller) {
 			this.controller = controller;
@@ -224,7 +224,7 @@ public class Controller {
 		@Override
 		public void run() {
 			try {
-				controller.setVisualizer(new Visualizer(controller));
+				this.controller.setVisualizer(new Visualizer(this.controller));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -232,7 +232,7 @@ public class Controller {
 	}
 
 	public ArrayList<Shape> getActiveShapes() {
-		return shapes;
+		return this.shapes;
 	}
 
 	public void setVisualizer(Visualizer visualizer) {
@@ -241,11 +241,11 @@ public class Controller {
 	}
 
 	public void addRenderLayer(AbstractRenderLayer layer) {
-		visualizer.addRenderLayer(layer);
+		this.visualizer.addRenderLayer(layer);
 	}
 
 	public Visualizer getVisualizer() {
-		return visualizer;
+		return this.visualizer;
 	}
 
 	public void resetRenderer(boolean leaveMapRenderer) {
@@ -253,7 +253,7 @@ public class Controller {
 	}
 
 	public Point getMousePosition() {
-		return mousePosition;
+		return this.mousePosition;
 	}
 
 	public void setMousePosition(Point mousePosition) {
@@ -267,11 +267,11 @@ public class Controller {
 	}
 
 	public Rectangle getViewportBounds() {
-		return visualizer.getActiveMapRenderLayer().getViewportBounds();
+		return this.visualizer.getActiveMapRenderLayer().getViewportBounds();
 	}
 
 	public SelectionMode getSelectionMode() {
-		return selectionMode;
+		return this.selectionMode;
 	}
 
 	public void setSelectionMode(SelectionMode selectionMode) {
@@ -279,7 +279,7 @@ public class Controller {
 	}
 
 	public boolean isHoveringOverPoint() {
-		return hoveringOverPoint;
+		return this.hoveringOverPoint;
 	}
 
 	public void setHoveringOverPoint(boolean hoveringOverPoint) {
@@ -287,7 +287,7 @@ public class Controller {
 	}
 
 	public boolean isEditMode() {
-		return editMode;
+		return this.editMode;
 	}
 
 	public void setEditMode(boolean editMode) {
@@ -295,7 +295,7 @@ public class Controller {
 	}
 
 	public ImageContainerInterface getImageContainer() {
-		return imageContainer;
+		return this.imageContainer;
 	}
 
 	public void setImageContainer(ImageContainerInterface imageContainer) {
@@ -323,7 +323,7 @@ public class Controller {
 	}
 
 	public Component getParentComponent() {
-		return parentComponent;
+		return this.parentComponent;
 	}
 
 	public void repaintParent() {
@@ -337,36 +337,36 @@ public class Controller {
 		initListeners();
 		for (EventListener listener : eventListeners) {
 			if (listener instanceof MouseListener) {
-				mouseListener.add((MouseListener) listener);
-				mouseMotionListener.add((MouseMotionListener) listener);
+				this.mouseListener.add((MouseListener) listener);
+				this.mouseMotionListener.add((MouseMotionListener) listener);
 			} else if (listener instanceof MouseWheelListener)
-				mouseWheelListener.add((MouseWheelListener) listener);
+				this.mouseWheelListener.add((MouseWheelListener) listener);
 			else if (listener instanceof KeyListener)
-				keyListener.add((KeyListener) listener);
+				this.keyListener.add((KeyListener) listener);
 		}
 
 		if (eventListeners.size() > 0)
-			slippyListenersAdded = true;
+			this.slippyListenersAdded = true;
 	}
 
 	public ArrayList<MouseListener> getMouseListener() {
-		return mouseListener;
+		return this.mouseListener;
 	}
 
 	public ArrayList<MouseMotionListener> getMouseMotionListener() {
-		return mouseMotionListener;
+		return this.mouseMotionListener;
 	}
 
 	public ArrayList<MouseWheelListener> getMouseWheelListener() {
-		return mouseWheelListener;
+		return this.mouseWheelListener;
 	}
 
 	public ArrayList<KeyListener> getKeyListener() {
-		return keyListener;
+		return this.keyListener;
 	}
 
 	public boolean slippyEventListenersAvailable() {
-		return slippyListenersAdded;
+		return this.slippyListenersAdded;
 	}
 
 	public void setListener(AbstractListener listener) {
@@ -374,7 +374,7 @@ public class Controller {
 	}
 
 	public AbstractListener getListener() {
-		return listener;
+		return this.listener;
 	}
 
 	public boolean hasMapRenderer() {
@@ -385,7 +385,7 @@ public class Controller {
 	}
 
 	public String getCurrentOSMFile() {
-		return currentOSMFile;
+		return this.currentOSMFile;
 	}
 
 	public void setCurrentOSMFile(String currentOSMFile) {
@@ -398,7 +398,7 @@ public class Controller {
 	}
 
 	public GripsConfigModule getGripsConfigModule() {
-		return gripsConfigModule;
+		return this.gripsConfigModule;
 	}
 
 	public void setGripsConfigModule(GripsConfigModule gripsConfigModule) {
@@ -456,7 +456,7 @@ public class Controller {
 				popfile += ".shp";
 			this.getGripsConfigModule().setPopulationFileName(popfile);
 
-			if (!standAlone)
+			if (!this.standAlone)
 				updateOtherModules();
 
 			return true;
@@ -481,11 +481,11 @@ public class Controller {
 	}
 
 	public String getGripsFile() {
-		return gripsFile;
+		return this.gripsFile;
 	}
 
 	public boolean openGripsConfig() {
-		DefaultOpenDialog openDialog = new DefaultOpenDialog(this, "xml", locale.infoGripsFile(), false);
+		DefaultOpenDialog openDialog = new DefaultOpenDialog(this, "xml", this.locale.infoGripsFile(), false);
 		int returnValue = openDialog.showOpenDialog(this.getParentComponent());
 
 		if (returnValue == JFileChooser.APPROVE_OPTION)
@@ -513,11 +513,11 @@ public class Controller {
 			// has a config already been loaded?
 			// if (matsimConfig==null)
 			{
-				matsimConfig = ConfigUtils.createConfig();
-				matsimConfig.global().setCoordinateSystem(this.targetCoordinateSystem);
+				this.matsimConfig = ConfigUtils.createConfig();
+				this.matsimConfig.global().setCoordinateSystem(this.targetCoordinateSystem);
 
-				this.targetCoordinateSystem = matsimConfig.global().getCoordinateSystem();
-				this.scenario = ScenarioUtils.createScenario(matsimConfig);
+				this.targetCoordinateSystem = this.matsimConfig.global().getCoordinateSystem();
+				this.scenario = ScenarioUtils.createScenario(this.matsimConfig);
 
 			}
 
@@ -525,9 +525,41 @@ public class Controller {
 			checkGeoTransformationTools();
 
 			// finally read network
-			OsmNetworkReader reader = new OsmNetworkReader(this.scenario.getNetwork(), ctOsm2Target, true);
-			reader.setKeepPaths(true);
-			reader.parse(networkFileName);
+			//TODO c 'n p from ScenarioGenerator needs to be cleaned up [GL March '14]
+			GripsConfigModule gcm = this.gripsConfigModule;
+			if (gcm.getMainTrafficType().equals("vehicular")) {
+				OsmNetworkReader reader = new OsmNetworkReader(this.scenario.getNetwork(), this.ctOsm2Target, true);
+				reader.setKeepPaths(true);
+				reader.parse(networkFileName);
+			} else if (gcm.getMainTrafficType().equals("pedestrian")) {
+				OsmNetworkReader reader = new OsmNetworkReader(this.scenario.getNetwork(), this.ctOsm2Target, false);
+				reader.setKeepPaths(true);
+				
+				double laneCap = 2808 * 2; // 2 lanes
+
+				reader.setHighwayDefaults(2, "trunk", 2, 1.34, 1., laneCap);
+				reader.setHighwayDefaults(2, "trunk_link", 2, 1.34, 1.0, laneCap);
+				reader.setHighwayDefaults(3, "primary", 2, 1.34, 1.0, laneCap);
+				reader.setHighwayDefaults(3, "primary_link", 2, 1.34, 1.0, laneCap);
+				reader.setHighwayDefaults(4, "secondary", 2, 1.34, 1.0, laneCap);
+				reader.setHighwayDefaults(5, "tertiary", 2, 1.34, 1.0, laneCap);
+				reader.setHighwayDefaults(6, "minor", 2, 1.34, 1.0, laneCap);
+				reader.setHighwayDefaults(6, "unclassified", 2, 1.34, 1.0, laneCap);
+				reader.setHighwayDefaults(6, "residential", 2, 1.34, 1.0, laneCap);
+				reader.setHighwayDefaults(6, "living_street", 2, 1.34, 1.0, laneCap);
+				reader.setHighwayDefaults(6, "path", 2, 1.34, 1.0, laneCap);
+				reader.setHighwayDefaults(6, "cycleway", 2, 1.34, 1.0, laneCap);
+				reader.setHighwayDefaults(6, "footway", 2, 1.34, 1.0, laneCap);
+				reader.setHighwayDefaults(6, "steps", 2, 1.34, 1.0, laneCap);
+				reader.setHighwayDefaults(6, "pedestrian", 2, 1.34, 1.0, laneCap);
+
+				// max density is set to 5.4 p/m^2
+				((NetworkImpl) this.scenario.getNetwork()).setEffectiveLaneWidth(.6);
+				((NetworkImpl) this.scenario.getNetwork()).setEffectiveCellSize(.31);
+				reader.parse(networkFileName);
+			} else if (gcm.getMainTrafficType().equals("mixed")) {
+				throw new RuntimeException("not implemented yet!");
+			}
 
 			processNetwork(false);
 
@@ -541,7 +573,7 @@ public class Controller {
 
 	private void checkGeoTransformationTools() {
 		// are the transformation tools already at hand?
-		if ((ctOsm2Target == null) || (ctTarget2Osm == null)) {
+		if ((this.ctOsm2Target == null) || (this.ctTarget2Osm == null)) {
 			this.ctOsm2Target = new GeotoolsTransformation(this.sourceCoordinateSystem, this.targetCoordinateSystem);
 			this.ctTarget2Osm = new GeotoolsTransformation(this.targetCoordinateSystem, this.sourceCoordinateSystem);
 		}
@@ -578,9 +610,9 @@ public class Controller {
 		}
 
 		// transform coordinates
-		centerC = ctTarget2Osm.transform(centerC);
-		min = ctTarget2Osm.transform(min);
-		max = ctTarget2Osm.transform(max);
+		centerC = this.ctTarget2Osm.transform(centerC);
+		min = this.ctTarget2Osm.transform(min);
+		max = this.ctTarget2Osm.transform(max);
 
 		// pass center position and bounding box to the controller
 		this.centerPosition = new Point2D.Double(centerC.getX(), centerC.getY());
@@ -588,19 +620,19 @@ public class Controller {
 	}
 
 	public CoordinateTransformation getCtOsm2Target() {
-		return ctOsm2Target;
+		return this.ctOsm2Target;
 	}
 
 	public CoordinateTransformation getCtTarget2Osm() {
-		return ctTarget2Osm;
+		return this.ctTarget2Osm;
 	}
 
 	public Point2D getCenterPosition() {
-		return centerPosition;
+		return this.centerPosition;
 	}
 
 	public Rectangle2D getBoundingBox() {
-		return boundingBox;
+		return this.boundingBox;
 	}
 
 	public void setMainPanelListeners(boolean removeAllExistingListeners) {
@@ -674,13 +706,13 @@ public class Controller {
 
 	public int getZoom() {
 		if (this.visualizer.getActiveMapRenderLayer() != null)
-			return visualizer.getActiveMapRenderLayer().getZoom();
+			return this.visualizer.getActiveMapRenderLayer().getZoom();
 
 		return 0;
 	}
 
 	public Scenario getScenario() {
-		return scenario;
+		return this.scenario;
 	}
 
 	public void enableAllRenderLayers() {
@@ -767,27 +799,27 @@ public class Controller {
 	}
 
 	public void updatePanelBounds() {
-		mainPanelBounds = SwingUtilities.convertRectangle(mainPanel.getParent(), mainPanel.getBounds(), this.getParentComponent());
+		this.mainPanelBounds = SwingUtilities.convertRectangle(this.mainPanel.getParent(), this.mainPanel.getBounds(), this.getParentComponent());
 	}
 
 	public JPanel getMainPanel() {
-		return mainPanel;
+		return this.mainPanel;
 	}
 
 	public Rectangle getMainPanelBounds() {
-		return mainPanelBounds;
+		return this.mainPanelBounds;
 	}
 
 	public ShapeUtils getShapeUtils() {
-		return shapeUtils;
+		return this.shapeUtils;
 	}
 
 	public String getTargetCoordinateSystem() {
-		return targetCoordinateSystem;
+		return this.targetCoordinateSystem;
 	}
 
 	public String getSourceCoordinateSystem() {
-		return sourceCoordinateSystem;
+		return this.sourceCoordinateSystem;
 	}
 
 	public String getConfigCoordinateSystem() {
@@ -803,7 +835,7 @@ public class Controller {
 	}
 
 	public Locale getLocale() {
-		return locale;
+		return this.locale;
 	}
 
 	public void setLocale(Locale locale) {
@@ -811,7 +843,7 @@ public class Controller {
 	}
 
 	public boolean isStandAlone() {
-		return standAlone;
+		return this.standAlone;
 	}
 
 	public void setStandAlone(boolean standAlone) {
@@ -826,14 +858,14 @@ public class Controller {
 	}
 
 	public AbstractToolBox getActiveToolBox() {
-		return activeToolBox;
+		return this.activeToolBox;
 	}
 
 	public void setActiveToolBox(AbstractToolBox activeToolBox) {
 		this.activeToolBox = activeToolBox;
-		if ((parentComponent != null)) {
-			if (parentComponent instanceof DefaultWindow) {
-				((DefaultWindow) parentComponent).setToolBox(activeToolBox);
+		if ((this.parentComponent != null)) {
+			if (this.parentComponent instanceof DefaultWindow) {
+				((DefaultWindow) this.parentComponent).setToolBox(activeToolBox);
 			}
 		}
 
@@ -901,9 +933,9 @@ public class Controller {
 
 	public Id getTempLinkId(int n) {
 		if (n == 0)
-			return linkID1;
+			return this.linkID1;
 		else
-			return linkID2;
+			return this.linkID2;
 
 	}
 
@@ -913,7 +945,7 @@ public class Controller {
 
 	public boolean openMastimConfig() {
 
-		DefaultOpenDialog openDialog = new DefaultOpenDialog(this, "xml", locale.infoMatsimFile(), false);
+		DefaultOpenDialog openDialog = new DefaultOpenDialog(this, "xml", this.locale.infoMatsimFile(), false);
 		int returnValue = openDialog.showOpenDialog(this.getParentComponent());
 
 		if (returnValue == JFileChooser.APPROVE_OPTION)
@@ -938,7 +970,7 @@ public class Controller {
 			}
 			this.scenario = ScenarioUtils.loadScenario(this.matsimConfig);
 
-			this.targetCoordinateSystem = matsimConfig.global().getCoordinateSystem();
+			this.targetCoordinateSystem = this.matsimConfig.global().getCoordinateSystem();
 
 			// check if geo tranformation tools are available
 			checkGeoTransformationTools();
@@ -955,11 +987,11 @@ public class Controller {
 	}
 
 	public String getConfigFilePath() {
-		return configFilePath;
+		return this.configFilePath;
 	}
 
 	public String getScenarioPath() {
-		return scenarioPath;
+		return this.scenarioPath;
 	}
 
 	// public void setConfigCoordinateSystem(String configCoordinateSystem) {
@@ -975,16 +1007,16 @@ public class Controller {
 	}
 
 	public LinkQuadTree getLinks() {
-		return links;
+		return this.links;
 	}
 
 	public Point2D coordToPoint(Coord coord) {
-		coord = ctTarget2Osm.transform(coord);
+		coord = this.ctTarget2Osm.transform(coord);
 		return new Point2D.Double(coord.getY(), coord.getX());
 	}
 
 	public boolean isPopulationFileOpened() {
-		return populationFileOpened;
+		return this.populationFileOpened;
 	}
 
 	public void setPopulationFileOpened(boolean populationFileOpened) {
@@ -1015,7 +1047,7 @@ public class Controller {
 	public boolean openNetworkChangeEvents() {
 		if (this.scenario != null) {
 			Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl) this.scenario.getNetwork()).getNetworkChangeEvents();
-			int id = visualizer.getPrimaryShapeRenderLayer().getId();
+			int id = this.visualizer.getPrimaryShapeRenderLayer().getId();
 
 			if (changeEvents != null) {
 				for (NetworkChangeEvent event : changeEvents) {
@@ -1035,7 +1067,7 @@ public class Controller {
 	}
 
 	public boolean isMainWindowUndecorated() {
-		return mainWindowUndecorated;
+		return this.mainWindowUndecorated;
 	}
 
 	public void setMainFrameUndecorated(boolean mainWindowUndecorated) {
@@ -1047,11 +1079,11 @@ public class Controller {
 	}
 
 	public ArrayList<AbstractModule> getModules() {
-		return modules;
+		return this.modules;
 	}
 
 	public ArrayList<Link> getLinkList() {
-		return linkList;
+		return this.linkList;
 	}
 
 	public void readOSM(boolean b) {
@@ -1059,7 +1091,7 @@ public class Controller {
 	}
 
 	public ModuleType getActiveModuleType() {
-		return activeModuleType;
+		return this.activeModuleType;
 	}
 
 	public void setActiveModuleType(ModuleType activeModuleType) {
@@ -1068,7 +1100,7 @@ public class Controller {
 
 	public void setGoalAchieved(boolean goalAchieved) {
 		if (goalAchieved) {
-			AbstractModule module = getModuleByType(activeModuleType);
+			AbstractModule module = getModuleByType(this.activeModuleType);
 			if (module != null) {
 				module.enableNextModules();
 				module.disablePastModules();
@@ -1080,7 +1112,7 @@ public class Controller {
 	public AbstractModule getModuleByType(ModuleType moduleType) {
 		if (this.modules == null)
 			return null;
-		for (AbstractModule module : modules) {
+		for (AbstractModule module : this.modules) {
 			if (module.getModuleType().equals(moduleType))
 				return module;
 		}
@@ -1102,8 +1134,8 @@ public class Controller {
 	}
 
 	public void updateParentUI() {
-		if ((parentComponent != null) && (parentComponent instanceof DefaultWindow))
-			((DefaultWindow) parentComponent).updateMask();
+		if ((this.parentComponent != null) && (this.parentComponent instanceof DefaultWindow))
+			((DefaultWindow) this.parentComponent).updateMask();
 
 	}
 
@@ -1117,7 +1149,7 @@ public class Controller {
 	}
 
 	public EventData getEventData() {
-		return data;
+		return this.data;
 	}
 
 	public void setEventData(EventData data) {
@@ -1161,7 +1193,7 @@ public class Controller {
 	}
 
 	public ModuleChain getModuleChain() {
-		return moduleChain;
+		return this.moduleChain;
 	}
 
 	public ArrayList<ModuleType> getNextModules(ModuleType moduleType) {
@@ -1180,7 +1212,7 @@ public class Controller {
 	}
 
 	public boolean isInSelection() {
-		return inSelection;
+		return this.inSelection;
 	}
 
 	public void setInSelection(boolean inSelection) {
@@ -1189,7 +1221,7 @@ public class Controller {
 
 	public int getPopAreaCount() {
 
-		for (AbstractModule module : modules) {
+		for (AbstractModule module : this.modules) {
 			if (module instanceof PopAreaSelector)
 				return ((PopAreaSelector) module).getPopAreaCount();
 		}
