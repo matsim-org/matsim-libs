@@ -33,6 +33,25 @@ import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
 
 public class MIPGurobiSolver
 {
+    private static enum Mode
+    {
+        OFFLINE(7200, 1, 1), //
+        ONLINE(30, 1, 0);//
+
+        private Mode(double timeLimit, int mipFocus, int output)
+        {
+            this.timeLimit = timeLimit;
+            this.mipFocus = mipFocus;
+            this.output = output;
+        }
+
+
+        private final double timeLimit;
+        private final int mipFocus;
+        private final int output;
+    }
+
+
     private static final double W_MAX = 30 * 60 * 60;//30 hours
 
     private final TaxiOptimizerConfiguration optimConfig;
@@ -45,6 +64,8 @@ public class MIPGurobiSolver
     private GRBModel model;
     private GRBVar[][] xVar;//for each request/vehicle pair, (i, j)
     private GRBVar[] wVar; //for each request, i
+
+    private final Mode mode = Mode.ONLINE;
 
 
     MIPGurobiSolver(TaxiOptimizerConfiguration optimConfig,
@@ -69,14 +90,16 @@ public class MIPGurobiSolver
             // this is the internal model (a copy of that passed to the constructor)
             GRBEnv env = model.getEnv();
 
-            env.set(GRB.DoubleParam.TimeLimit, 7200);// 2 hours
+            env.set(GRB.DoubleParam.TimeLimit, mode.timeLimit);// 2 hours
             //env.set(GRB.DoubleParam.MIPGap, 0.001);//0.1%
 
-            env.set(GRB.IntParam.MIPFocus, 1);//the focus towards finding feasible solutions
+            env.set(GRB.IntParam.MIPFocus, mode.mipFocus);//the focus towards finding feasible solutions
             //or alternatively: focus towards finding feasible solutions after 1 hour
             //env.set(GRB.DoubleParam.ImproveStartTime, 3600);
 
-            //env.set(GRB.IntParam.Threads, 1);//number of threads 
+            //env.set(GRB.IntParam.Threads, 1);//number of threads
+
+            env.set(GRB.IntParam.OutputFlag, mode.output);//no output
 
             addXVariables();
             addWVariables();
@@ -96,7 +119,7 @@ public class MIPGurobiSolver
             applyInitialSolution(initialSolution);
 
             model.optimize();
-            
+
             model.write(optimConfig.workingDirectory + "gurobi_solution.sol");
 
             MIPSolution solution = extractSolution();

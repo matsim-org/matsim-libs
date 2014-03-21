@@ -42,7 +42,34 @@ public class MIPProblem
     };
 
 
-    private static final int REQS_PER_VEH = 99999;
+    enum Mode
+    {
+        OFFLINE_INIT_OPTIM(true, true, false, 99999), //
+        OFFLINE_INIT(true, false, false, 99999), //
+        OFFLINE_OPTIM(false, true, false, 99999), //
+        OFFLINE_LOAD(false, false, true, 99999), //
+        //
+        ONLINE_1(true, true, false, 1), //
+        ONLINE_2(true, true, false, 2), //
+        ONLINE_3(true, true, false, 3), //
+        ONLINE_4(true, true, false, 4), //
+        ONLINE_5(true, true, false, 5);
+
+        private final boolean init;
+        private final boolean optim;
+        private final boolean load;
+        private final int reqsPerVeh;//planning horizon
+
+
+        private Mode(boolean init, boolean optim, boolean load, int reqsPerVeh)
+        {
+            this.init = init;
+            this.optim = optim;
+            this.load = load;
+            this.reqsPerVeh = reqsPerVeh;
+        }
+    };
+
 
     private final TaxiOptimizerConfiguration optimConfig;
     private final PathTreeBasedTravelTimeCalculator pathTravelTimeCalc;
@@ -54,14 +81,12 @@ public class MIPProblem
     private MIPSolution initialSolution;
     private MIPSolution finalSolution;
 
+    static final Mode mode = Mode.ONLINE_5;
+
 
     public MIPProblem(TaxiOptimizerConfiguration optimConfig,
             PathTreeBasedTravelTimeCalculator pathTravelTimeCalc)
     {
-        if (!optimConfig.scheduler.getParams().destinationKnown) {
-            throw new IllegalArgumentException("Destinations must be known ahead");
-        }
-
         this.optimConfig = optimConfig;
         this.pathTravelTimeCalc = pathTravelTimeCalc;
     }
@@ -76,8 +101,23 @@ public class MIPProblem
             return;
         }
 
-        findInitialSolution();
-        solveProblem();
+        if (mode.init) {
+            findInitialSolution();
+        }
+
+        if (mode.optim) {
+            solveProblem();
+        }
+        else if (mode.load) {
+            loadSolution(optimConfig.workingDirectory + "gurobi_solution.sol");
+        }
+        else if (mode.init) {
+            finalSolution = initialSolution;
+        }
+        else {
+            throw new RuntimeException();
+        }
+
         scheduleSolution();
     }
 
@@ -93,7 +133,7 @@ public class MIPProblem
             return;
         }
 
-        int maxReqCount = REQS_PER_VEH * vData.dimension;
+        int maxReqCount = mode.reqsPerVeh * vData.dimension;
         rData = new MIPRequestData(optimConfig, unplannedRequests, maxReqCount);
         if (rData.dimension == 0) {
             return;
@@ -104,11 +144,6 @@ public class MIPProblem
     private void findInitialSolution()
     {
         initialSolution = new MIPSolutionFinder(optimConfig, rData, vData).findInitialSolution();
-
-        //only for OFFLINE
-        MIPTaxiStats.currentStats = new MIPTaxiStats(optimConfig.context.getVrpData());
-        MIPTaxiStats.currentStats.calcInitial();
-
         optimConfig.scheduler.removePlannedRequestsFromAllSchedules();
     }
 
@@ -124,14 +159,10 @@ public class MIPProblem
     {
         new MIPSolutionScheduler(optimConfig, rData, vData).updateSchedules(finalSolution);
         unplannedRequests.removeAll(Arrays.asList(rData.requests));
-
-        //only for OFFLINE
-        MIPTaxiStats.currentStats.calcSolved();
     }
 
 
-    @SuppressWarnings("unused")
-    private MIPSolution readFromFile(String filename)
+    private void loadSolution(String filename)
     {
         Scanner s;
         try {
@@ -177,18 +208,18 @@ public class MIPProblem
         }
 
         s.close();
-        return new MIPSolution(x, w);
+        finalSolution = new MIPSolution(x, w);
     }
-
-
-    MIPRequestData getRequestData()
+    
+    
+    int getPlanningHorizon()
     {
-        return rData;
+        return vData.dimension * mode.reqsPerVeh;
     }
-
-
-    VehicleData getVehicleData()
+    
+    
+    int getPlannedRequestCount()
     {
-        return vData;
+        return rData.dimension;
     }
 }

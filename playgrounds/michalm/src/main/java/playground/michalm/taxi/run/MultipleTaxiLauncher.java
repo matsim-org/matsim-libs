@@ -25,15 +25,11 @@ import java.io.*;
 import java.util.EnumSet;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.jfree.chart.JFreeChart;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.core.gbl.MatsimRandom;
 
-import pl.poznan.put.util.jfreechart.ChartUtils;
-import playground.michalm.taxi.optimizer.mip.MIPTaxiStats;
 import playground.michalm.taxi.scheduler.TaxiDelaySpeedupStats;
-import playground.michalm.taxi.util.chart.TaxiScheduleChartUtils;
 import playground.michalm.taxi.util.stats.*;
 import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
@@ -51,7 +47,6 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
     private PrintWriter pw;
     private PrintWriter pw2;
     private PrintWriter pw3;
-    private PrintWriter pw4;
 
 
     /*package*/MultipleTaxiLauncher(String paramFile)
@@ -76,8 +71,6 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
             pw3 = new PrintWriter(launcher.dirName + "cacheStats" + outputFileSuffix);
             pw3.print("cfg\tHits\tMisses\n");
-
-            pw4 = new PrintWriter(launcher.dirName + "MIP_stats" + outputFileSuffix);
         }
         catch (IOException e) {
             throw new RuntimeException(e);
@@ -90,7 +83,6 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
         pw.close();
         pw2.close();
         pw3.close();
-        pw4.close();
     }
 
 
@@ -188,12 +180,9 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
         //=========== stats & graphs for the last run
 
-        MIPTaxiStats.currentStats.calcSimulated();
-        MIPTaxiStats.currentStats.print(pw4);
-
-//        JFreeChart chart = TaxiScheduleChartUtils.chartSchedule(data.getVehicles());
-//        chart.setTitle(cfg);
-//        ChartUtils.showFrame(chart);
+        //        JFreeChart chart = TaxiScheduleChartUtils.chartSchedule(data.getVehicles());
+        //        chart.setTitle(cfg);
+        //        ChartUtils.showFrame(chart);
     }
 
 
@@ -307,8 +296,8 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
         //        multiLauncher.run(APS_TP_xx, runs);
         //        multiLauncher.run(APS_DSE_xx, runs);
 
-        //multiLauncher.run(NOS_DSE_FF, 1, true, true, true);
-        multiLauncher.run(MIP_FF, 1, true, true, true);
+        //multiLauncher.run(NOS_DSE_FF, runs, true, true, true);
+        multiLauncher.run(MIP_FF, runs, true, true, false);
 
         multiLauncher.closeOutputFiles();
     }

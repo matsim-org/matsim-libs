@@ -36,15 +36,20 @@ public class MIPTaxiOptimizer
 {
     private final PathTreeBasedTravelTimeCalculator pathTravelTimeCalc;
 
-    private int plannedReqs;
-    private int schedulableVehs;
+    private int lastPlanningHorizon = -1;//cannot be 0 in order to run optimization for the first request
+    private int lastPlannedReqs = 0;
+    private int recentlyStartedReqs = 0;
 
-    private int startedReqs;
+    private int optimCounter = 0;
 
 
     public MIPTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
         super(optimConfig, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR));
+
+        if (!optimConfig.scheduler.getParams().destinationKnown) {
+            throw new IllegalArgumentException("Destinations must be known ahead");
+        }
 
         pathTravelTimeCalc = new PathTreeBasedTravelTimeCalculator(new LeastCostPathTreeStorage(
                 optimConfig.context.getScenario().getNetwork()));
@@ -53,13 +58,28 @@ public class MIPTaxiOptimizer
 
     protected void scheduleUnplannedRequests()
     {
+        if (unplannedRequests.size() == 0) {
+            //nothing new to be planned and we want to avoid extra re-planning of what has been
+            //already planned (high computational cost while only marginal improvement) 
+            return;
+        }
+
+        if (lastPlanningHorizon == lastPlannedReqs && //last time we planned as many requests as possible, and...
+                recentlyStartedReqs == 0) {//...since then no empty space has appeared in the planning horizon 
+            return;
+        }
+
         MIPProblem mipProblem = new MIPProblem(optimConfig, pathTravelTimeCalc);
         mipProblem.scheduleUnplannedRequests((SortedSet<TaxiRequest>)unplannedRequests);
 
-        plannedReqs = mipProblem.getRequestData().dimension;
-        schedulableVehs = mipProblem.getVehicleData().dimension;
+        optimCounter++;
+        if (optimCounter % 100 == 0) {
+            System.err.println(optimCounter);
+        }
 
-        startedReqs = 0;
+        lastPlanningHorizon = mipProblem.getPlanningHorizon();
+        lastPlannedReqs = mipProblem.getPlannedRequestCount();
+        recentlyStartedReqs = 0;
     }
 
 
@@ -67,34 +87,20 @@ public class MIPTaxiOptimizer
     public void nextTask(Schedule<? extends Task> schedule)
     {
         super.nextTask(schedule);
+        checkIfRequiresReoptimization(schedule);
+    }
 
-        if (schedule.getStatus() != ScheduleStatus.STARTED) {
+
+    private void checkIfRequiresReoptimization(Schedule<? extends Task> schedule)
+    {
+        if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
             return;
         }
 
         TaxiTask currentTask = (TaxiTask)schedule.getCurrentTask();
         if (currentTask.getTaxiTaskType() == TaxiTaskType.PICKUP_DRIVE) {
-            startedReqs++;
-
-            if (unplannedRequests.size() > 0) {
-                //requiresReoptimization |= doReoptimize();
-                requiresReoptimization = true;
-            }
-        }
-    }
-
-
-    @SuppressWarnings("unused")
-    private boolean doReoptimize()
-    {
-        int currentPlanned = plannedReqs - startedReqs;
-        double currentReqsPerVeh = (double)currentPlanned / schedulableVehs;
-
-        if (currentReqsPerVeh <= 2) {
-            return true;
-        }
-        else {
-            return startedReqs >= schedulableVehs;
+            recentlyStartedReqs++;
+            requiresReoptimization = true;
         }
     }
 }

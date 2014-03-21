@@ -30,7 +30,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 public class MIPTaxiStats
 {
     //temporarily... not the cleanest design...
-    public static MIPTaxiStats currentStats;
+//    public static MIPTaxiStats currentStats;
 
     private final VrpData data;
 
@@ -47,21 +47,18 @@ public class MIPTaxiStats
 
     void calcInitial()
     {
-        assertNull(initial);
         initial = calcTaxiStats();
     }
 
 
     void calcSolved()
     {
-        assertNull(solved);
         solved = calcTaxiStats();
     }
 
 
     public void calcSimulated()
     {
-        assertNull(simulated);
         simulated = calcTaxiStats();
     }
 
@@ -87,17 +84,15 @@ public class MIPTaxiStats
     public void print(PrintWriter pw)
     {
         pw.println("state\t" + TaxiStats.HEADER);
-        pw.println("initial\t" + initial.toString());
-        pw.println("solved\t" + solved.toString());
-        pw.println("simulated\t" + simulated.toString());
+        pw.println("initial\t" + statsToString(initial));
+        pw.println("solved\t" + statsToString(solved));
+        pw.println("simulated\t" + statsToString(simulated));
     }
 
 
-    private void assertNull(TaxiStats stats)
+    private String statsToString(TaxiStats stats)
     {
-        if (stats != null) {
-            throw new IllegalStateException("Already set..");
-        }
+        return stats == null ? "---" : stats.toString();
     }
 
 

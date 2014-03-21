@@ -35,8 +35,9 @@ import java.util.concurrent.*;
 //    private static final int[] DEMANDS = { 10 };
 //    private static final int[] SUPPLIES = { 25 };
 
-    private static final int RUNS = 1;
+    private static final int RUNS = 10;
 
+    //Do not use multithreading for MIP 
     private static final int THREADS = 11;
 
 
