@@ -61,7 +61,7 @@ public class create_demo_parking {
 		ParkingWriter writer = new ParkingWriter();
 		Random zufall = new Random();
 	
-		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("input/SF/config_SF_3.xml"));
+		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("input/SF_PLUS/config_SF_PLUS_1.xml"));
 		
 		countEmployees();
 		
@@ -146,7 +146,7 @@ public class create_demo_parking {
 		
 		
 		
-		writer.write(parking_map, "input/parkings_demo.xml");
+		writer.write(parking_map, "input/SF_PLUS/VM/parkings_demo.xml");
 		System.out.println("feddisch");
 		System.out.println("EV: "+create_demo_parking.diagZaehlEV);
 		System.out.println("NEV: "+create_demo_parking.diagZaehlNEV);
