@@ -22,15 +22,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.RowSorter;
 import javax.swing.WindowConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.RowSorterEvent;
-import javax.swing.event.RowSorterListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -47,7 +45,6 @@ import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Way;
-import org.openstreetmap.josm.data.osm.WaySegment;
 import org.openstreetmap.josm.gui.MapView.LayerChangeListener;
 import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
 import org.openstreetmap.josm.gui.layer.Layer;
@@ -73,9 +70,9 @@ public class MATSimToggleDialog extends ToggleDialog implements
 
 		table = new JTable();
 		table.setDefaultRenderer(Object.class, new MATSimTableRenderer());
-//		table.setAutoCreateRowSorter(true);
-		table.setAutoCreateRowSorter(false);
+		table.setAutoCreateRowSorter(true);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
 		JScrollPane tableContainer = new JScrollPane(table);
 		createLayout(tableContainer, false, null);
 
@@ -173,7 +170,7 @@ public class MATSimToggleDialog extends ToggleDialog implements
 	}
 
 	private class MATSimTableModel extends AbstractTableModel implements
-			SelectionChangedListener, ListSelectionListener /*,RowSorterListener*/ {
+			SelectionChangedListener, ListSelectionListener {
 
 		private String[] columnNames = { "id", "internal-id", "length",
 				"freespeed", "capacity", "permlanes" };
@@ -181,7 +178,7 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		private Network network;
 
 		private Map<Integer, Id> links;
-		
+
 		final HighlightHelper helper = new HighlightHelper();
 
 		MATSimTableModel(Network network) {
@@ -189,7 +186,6 @@ public class MATSimToggleDialog extends ToggleDialog implements
 			this.links = new HashMap<Integer, Id>();
 			DataSet.addSelectionListener(this);
 			table.getSelectionModel().addListSelectionListener(this);
-//			table.getRowSorter().addRowSorterListener(this);
 		}
 
 		@Override
@@ -226,7 +222,6 @@ public class MATSimToggleDialog extends ToggleDialog implements
 
 		@Override
 		public int getRowCount() {
-			// return network.getLinks().size();
 			return links.size();
 		}
 
@@ -254,7 +249,7 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		public void selectionChanged(
 				Collection<? extends OsmPrimitive> newSelection) {
 			this.links = new HashMap<Integer, Id>();
-			int i=0;
+			int i = 0;
 			for (OsmPrimitive primitive : newSelection) {
 				if (primitive instanceof Way) {
 					if (layer.getWay2Links().containsKey(primitive)) {
@@ -271,30 +266,21 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
 			helper.clear();
-			if(!layer.data.selectionEmpty() && !e.getValueIsAdjusting() && !((ListSelectionModel)e.getSource()).isSelectionEmpty()) {
-				int row = table.getSelectedRow();
-				System.out.println("selected row: "+table.getSelectedRow());
+			if (!layer.data.selectionEmpty() && !e.getValueIsAdjusting()
+					&& !((ListSelectionModel) e.getSource()).isSelectionEmpty()) {
+				int row = table.getRowSorter().convertRowIndexToModel(
+						table.getSelectedRow());
+				System.out.println("selected row: " + row);
 				System.out.println("_______________\n");
 				long id = Long.parseLong((String) this.getValueAt(row, 1));
 				Way way = (Way) layer.data.getPrimitiveById(id,
 						OsmPrimitiveType.WAY);
 				helper.highlightOnly(way);
-				AutoScaleAction.zoomTo(Collections.singleton(((OsmPrimitive)(way))));
+				AutoScaleAction.zoomTo(Collections
+						.singleton(((OsmPrimitive) (way))));
 				Main.map.mapView.repaint();
 			}
 		}
-
-//		@Override
-//		public void sorterChanged(RowSorterEvent e) {
-//			System.out.println("rowsorterevent thrown");
-//			Map<Integer, Id> temp = new HashMap<Integer, Id>();
-//			for(int i=0; i<e.getPreviousRowCount(); i++) {
-//				int prev = e.convertPreviousRowIndexToModel(i);
-//				System.out.println(prev+"->"+i);
-//				temp.put(i, links.get(prev));
-//			}
-//			links=temp;
-//		}
 	}
 
 	private class NetworkAttributes extends JPanel {
