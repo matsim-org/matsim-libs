@@ -125,7 +125,8 @@ public class ParkControl {
 		
 		
 		// PRIVATES PARKEN
-		ParkingSpot privateParking = checkPrivateParking(facilityid.toString(), ev);
+		
+		ParkingSpot privateParking = checkPrivateParking(facilityid.toString(), event.getActType(), ev);
 		if (privateParking != null) {
 			//System.out.println("Privaten Parkplatz gefunden");
 			parkOnSpot(privateParking, personId);
@@ -188,13 +189,13 @@ public class ParkControl {
 	}
 
 	//--------------------------- C H E C K   P R I V A T ---------------------------------------------
-	ParkingSpot checkPrivateParking(String facilityId, boolean ev) {
+	ParkingSpot checkPrivateParking(String facilityId, String facilityActType, boolean ev) {
 		// !! Zur Beschleunigung Map erstellen ? <facility ID, Private Parking> ?
 		ParkingSpot selectedSpot = null;
 		for (Parking parking : parkingMap.getParkings()) {
 			// System.out.println("Suche Parking mit passender facility ID");
 			if(parking.facilityId!=null){ //Es gibt datensaetze ohne Facility ID >> Sonst Nullpointer
-				if (parking.facilityId.equals(facilityId)) { // !! Act Type muss auch uebereinstimmen ! >> Einbauen
+				if (parking.facilityId.equals(facilityId) && parking.facilityActType.equals(facilityActType)) { // !! Act Type muss auch uebereinstimmen ! >> Einbauen
 					//System.out.println("checke Parking");
 					selectedSpot = parking.checkForFreeSpot(); //Gibt null oder einen freien Platz zurueck
 					if(ev){

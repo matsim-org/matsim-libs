@@ -2,6 +2,7 @@ package playground.wrashid.bsc.vbmh.SFAnpassen;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -9,11 +10,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -68,12 +72,18 @@ public class agentsInAgglo {
 			
 		}
 		
-		
+		Random zufall = new Random();
 		
 		for(ActivityFacility homeFacility : scenario.getActivityFacilities().getFacilitiesForActivityType("home").values()){
 			
 			countAgents+=homes.get(homeFacility.getId()).size();
 			System.out.println(homes.get(homeFacility.getId()).size());
+			
+			if(zufall.nextDouble()<0.3){
+				move(homeFacility.getId());
+			}
+			
+			
 			
 			
 		}
@@ -85,23 +95,31 @@ public class agentsInAgglo {
 		
 		
 		
+		PopulationWriter pwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
+		FacilitiesWriter fwriter = new FacilitiesWriter(scenario.getActivityFacilities());
 		
+		pwriter.writeV5(outputFileP);
+		fwriter.write(outputFileF);
+		
+		System.out.println("Achtung: Ueberschreibt nicht richtig; Ausgabedatei sollte vorher geloescht werden.");
 		
 		
 
 	}
 	
-	void move(Id facId){
+	static void move(Id facId){
 		IdImpl newFacId = new IdImpl(facId.toString()+"_B");
 		for (Person person : homes.get(facId)){
 			PersonImpl personImpl = (PersonImpl) person;
 			for(PlanElement planElement : personImpl.getSelectedPlan().getPlanElements()){
-				if(planElement.getClass().equals(Activity.class)){
+				if(planElement.getClass().equals(ActivityImpl.class)){
+					System.out.println("Activity gefunden");
 					ActivityImpl activity = (ActivityImpl) planElement;
 					if (activity.getType().equals("home")){
 						activity.getCoord().setXY(xCoord, yCoord);
 						
 						activity.setFacilityId(newFacId);
+						System.out.println("moved agent");
 					}
 				}
 				
@@ -110,10 +128,16 @@ public class agentsInAgglo {
 		}
 		
 	
-		scenario.getActivityFacilities().getFactory().createActivityFacility(newFacId, brookings);
+		ActivityFacility newCreatedFac = scenario.getActivityFacilities().getFactory().createActivityFacility(newFacId, brookings);
+		scenario.getActivityFacilities().addActivityFacility(newCreatedFac);
 		for (ActivityOption option : scenario.getActivityFacilities().getFacilities().get(facId).getActivityOptions().values()){
 			if (option.getType().equals("home")){
-				scenario.getActivityFacilities().getFacilities().get(newFacId).addActivityOption(option);
+				ActivityOptionImpl newOption = new ActivityOptionImpl("home");
+				newOption.setOpeningTimes(option.getOpeningTimes());
+				newOption.setCapacity(option.getCapacity());
+				
+				
+				scenario.getActivityFacilities().getFacilities().get(newFacId).addActivityOption(newOption);
 			}
 		}
 		
