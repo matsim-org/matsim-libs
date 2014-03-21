@@ -84,7 +84,7 @@ public class PersonEqualZoneDistribution implements PopulationTask {
 				/*
 				 * check if all persons already processed
 				 */
-				if(processed > N) {
+				if(processed >= N) {
 					break;
 				}
 				/*

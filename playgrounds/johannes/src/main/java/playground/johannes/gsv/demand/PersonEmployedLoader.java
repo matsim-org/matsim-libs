@@ -22,62 +22,37 @@
  */
 package playground.johannes.gsv.demand;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.TObjectDoubleIterator;
+
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
-import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
-
 
 /**
  * @author johannes
  *
  */
-public class PersonGenderWrapper extends AbstractTaskWrapper {
+public class PersonEmployedLoader extends AbstractTaskWrapper {
 
-	public PersonGenderWrapper(String file, String maleKey, String femaleKey, Random random) throws IOException {
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		/*
-		 * read headers
-		 */
-		String line = reader.readLine();
+	public PersonEmployedLoader(String file1, String key1, String file2, String key2, Random random) throws IOException {
+		TObjectDoubleHashMap<String> employees = LoaderUtils.loadSingleColumn(file1, key1);
+		TObjectDoubleHashMap<String> inhabitants = LoaderUtils.loadSingleColumn(file2, key2);
 		
-		String[] tokens = line.split("\t");
-		int maleIdx = 0;
-		int femaleIdx = 0;
-		for(int i = 0; i < tokens.length; i++) {
-			if(tokens[i].equals(maleKey)) {
-				maleIdx = i;
-			} else if(tokens[i].equals(femaleKey)) {
-				femaleIdx = i;
-			}
+		TObjectDoubleHashMap<String> fractions = new TObjectDoubleHashMap<String>();
+		TObjectDoubleIterator<String> it = employees.iterator();
+		while(it.hasNext()) {
+			it.advance();
+			String zoneId = it.key();
+			double employ = it.value();
+			double inhab = inhabitants.get(zoneId);
+			double frac = employ/inhab;
+			fractions.put(zoneId, frac);
 		}
-		/*
-		 * read lines
-		 */
-		Set<Zone<Double>> zones = new HashSet<Zone<Double>>();
-		while((line = reader.readLine()) != null) {
-			tokens = line.split("\t");
-			String id = tokens[0];
-			Zone<?> zone = NutsLevel3Zones.getZone(id);
-			if (zone != null) {
-				int males = Integer.parseInt(tokens[maleIdx]);
-				int females = Integer.parseInt(tokens[femaleIdx]);
-
-				Zone<Double> newzone = new Zone<Double>(zone.getGeometry());
-				newzone.setAttribute(females / (double) (males + females));
-				zones.add(newzone);
-			}
-			
-		}
-		reader.close();
 		
-		ZoneLayer<Double> zoneLayer = new ZoneLayer<Double>(zones);
+		ZoneLayer<Double> zoneLayer = LoaderUtils.mapValuesToZones(fractions);
 		
-		this.delegate = new PersonGender(zoneLayer, random);
+		this.delegate = new PersonEmployed(zoneLayer, random);
 	}
 }

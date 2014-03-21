@@ -22,21 +22,21 @@
  */
 package playground.johannes.gsv.demand;
 
-import java.io.IOException;
-import java.util.Random;
+import org.matsim.api.core.v01.population.Population;
 
-import playground.johannes.sna.gis.ZoneLayer;
-
+import playground.johannes.sna.util.Composite;
 
 /**
  * @author johannes
  *
  */
-public class PersonEqualZoneDistributionWrapper extends AbstractTaskWrapper {
+public class PopulationTaskComposite extends Composite<PopulationTask> implements PopulationTask {
 
-	public PersonEqualZoneDistributionWrapper(String file, String key, Random random) throws IOException {
-		ZoneLayer<Double> zoneLayer = LoaderUtils.loadSingleColumnRelative(file, key);
-		this.delegate = new PersonEqualZoneDistribution(zoneLayer, random);
+	@Override
+	public void apply(Population pop) {
+		for(PopulationTask task : components) {
+			task.apply(pop);
+		}
 	}
 
 }

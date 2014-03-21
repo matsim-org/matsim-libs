@@ -75,10 +75,16 @@ public class NutsLevel3Zones {
 		BufferedReader reader = new BufferedReader(new FileReader(idMappingsFile));
 		String line = reader.readLine();
 		while((line = reader.readLine()) != null) {
-			String tokens[] = line.split(";");
+			String tokens[] = line.split("\t");
 			String gsvId = tokens[0];
 			String nutsId = tokens[1];
-			zones.put(gsvId, new Zone<Object>(((Geometry)featureMap.get(nutsId).getDefaultGeometry()).getGeometryN(0)));
+			SimpleFeature feature = featureMap.get(nutsId);
+			if(feature != null) {
+				Zone<?> zone = new Zone<Object>(((Geometry)feature.getDefaultGeometry()).getGeometryN(0));
+//				zone.getGeometry().setSRID(4326);
+				zones.put(gsvId, zone);
+			}
+			
 		}
 		
 		reader.close();

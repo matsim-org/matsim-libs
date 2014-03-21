@@ -22,62 +22,37 @@
  */
 package playground.johannes.gsv.demand;
 
+import gnu.trove.TIntDoubleHashMap;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
-
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
-
 
 /**
  * @author johannes
  *
  */
-public class PersonGenderWrapper extends AbstractTaskWrapper {
+public class PersonCarAvailabilityLoader extends AbstractTaskWrapper {
 
-	public PersonGenderWrapper(String file, String maleKey, String femaleKey, Random random) throws IOException {
+	public PersonCarAvailabilityLoader(String file, Random random) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(file));
-		/*
-		 * read headers
-		 */
-		String line = reader.readLine();
 		
-		String[] tokens = line.split("\t");
-		int maleIdx = 0;
-		int femaleIdx = 0;
-		for(int i = 0; i < tokens.length; i++) {
-			if(tokens[i].equals(maleKey)) {
-				maleIdx = i;
-			} else if(tokens[i].equals(femaleKey)) {
-				femaleIdx = i;
-			}
-		}
-		/*
-		 * read lines
-		 */
-		Set<Zone<Double>> zones = new HashSet<Zone<Double>>();
+		TIntDoubleHashMap map = new TIntDoubleHashMap();
+		
+		String line = reader.readLine();
 		while((line = reader.readLine()) != null) {
-			tokens = line.split("\t");
-			String id = tokens[0];
-			Zone<?> zone = NutsLevel3Zones.getZone(id);
-			if (zone != null) {
-				int males = Integer.parseInt(tokens[maleIdx]);
-				int females = Integer.parseInt(tokens[femaleIdx]);
-
-				Zone<Double> newzone = new Zone<Double>(zone.getGeometry());
-				newzone.setAttribute(females / (double) (males + females));
-				zones.add(newzone);
+			String[] tokens = line.split(LoaderUtils.FIELD_SEPARATOR);
+			int lower = Integer.parseInt(tokens[0]);
+			int upper = Integer.parseInt(tokens[1]);
+			double frac = Double.parseDouble(tokens[2]);
+			for(int i = lower; i < upper+1; i++) {
+				map.put(i, frac);
 			}
-			
 		}
+		
 		reader.close();
 		
-		ZoneLayer<Double> zoneLayer = new ZoneLayer<Double>(zones);
-		
-		this.delegate = new PersonGender(zoneLayer, random);
+		delegate = new PersonCarAvailability(map, random);
 	}
 }

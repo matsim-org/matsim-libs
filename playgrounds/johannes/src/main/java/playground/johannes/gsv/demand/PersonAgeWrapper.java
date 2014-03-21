@@ -26,6 +26,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -45,65 +46,81 @@ import playground.johannes.sna.gis.ZoneLayer;
  *
  */
 public class PersonAgeWrapper extends AbstractTaskWrapper {
+	
+	private static final String PREFIX = "age.";
 
 	public PersonAgeWrapper(String baseDir, String key, Random random) throws IOException {
-		File file = new File(baseDir);
+		File dirFile = new File(baseDir);
 		Map<String, List<Category>> categories = new HashMap<String, List<Category>>();
-		for(String fil2 : file.list()) {
-			if(fil2.startsWith("age.")) {
-				String[] tokens = fil2.split("\\.");
-				String[] tokens2 = tokens[1].split("-");
-				int lower = Integer.parseInt(tokens2[0]);
-				int upper = Integer.parseInt(tokens2[1]);
-				
-				
-				BufferedReader reader = new BufferedReader(new FileReader(file));
-				/*
-				 * read headers
-				 */
-				String line = reader.readLine();
-				
-				String[] tokens3 = line.split("\t");
-				int idx = 0;
-				for(int i = 0; i < tokens.length; i++) {
-					if(tokens3[i].equals(key)) {
-						idx = i;
-						break;
-					}
-				}
-				/*
-				 * 
-				 */
-				while((line = reader.readLine()) != null) {
-					String tokens4[] = line.split("\t");
-					int val = Integer.parseInt(tokens4[idx]);
-					String id = tokens4[0];
-					
-					Category cat = new Category();
-					cat.lower = lower;
-					cat.upper = upper;
-					cat.value = val;
-					List<Category> list = categories.get(id);
-					list.add(cat);
-				}
-				reader.close();
+		for(String file : dirFile.list()) {
+			if(file.startsWith(PREFIX)) {
+				readFile(baseDir + file, key, categories);
 			}
 		}
 		
 		Set<Zone<ChoiceSet<Tuple<Integer, Integer>>>> zones = new HashSet<Zone<ChoiceSet<Tuple<Integer, Integer>>>>();
 		for(Entry<String, List<Category>> entry : categories.entrySet()) {
-			Zone<ChoiceSet<Tuple<Integer, Integer>>> zone = new Zone<ChoiceSet<Tuple<Integer, Integer>>>(NutsLevel3Zones.getZone(entry.getKey()).getGeometry());
-			ChoiceSet<Tuple<Integer, Integer>> choiceSet = new ChoiceSet<Tuple<Integer,Integer>>(random);
-			
-			for(Category cat : entry.getValue()) {
-				Tuple<Integer, Integer> bounds = new Tuple<Integer, Integer>(cat.lower, cat.upper);
-				choiceSet.addChoice(bounds, cat.value);
+			Zone<?> zone = NutsLevel3Zones.getZone(entry.getKey());
+			if (zone != null) {
+				Zone<ChoiceSet<Tuple<Integer, Integer>>> newzone = new Zone<ChoiceSet<Tuple<Integer, Integer>>>(
+						zone.getGeometry());
+				ChoiceSet<Tuple<Integer, Integer>> choiceSet = new ChoiceSet<Tuple<Integer, Integer>>(
+						random);
+
+				for (Category cat : entry.getValue()) {
+					Tuple<Integer, Integer> bounds = new Tuple<Integer, Integer>(
+							cat.lower, cat.upper);
+					choiceSet.addChoice(bounds, cat.inhabitants);
+				}
+				newzone.setAttribute(choiceSet);
+				zones.add(newzone);
 			}
-			zone.setAttribute(choiceSet);
-			zones.add(zone);
 		}
 		ZoneLayer<ChoiceSet<Tuple<Integer, Integer>>> zoneLayer = new ZoneLayer<ChoiceSet<Tuple<Integer, Integer>>>(zones);
 		this.delegate = new PersonAge(zoneLayer, random);
+	}
+	
+	private void readFile(String file, String key, Map<String, List<Category>> categories) throws IOException {
+		String[] fileNameElements = file.split("\\.");
+		String[] bounds = fileNameElements[1].split("-");
+		int lower = Integer.parseInt(bounds[0]);
+		int upper = Integer.parseInt(bounds[1]);
+		
+		
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		/*
+		 * read headers
+		 */
+		String line = reader.readLine();
+		
+		String[] tokens = line.split("\t");
+		int idx = 0;
+		for(int i = 0; i < tokens.length; i++) {
+			if(tokens[i].equals(key)) {
+				idx = i;
+				break;
+			}
+		}
+		/*
+		 * 
+		 */
+		while((line = reader.readLine()) != null) {
+			tokens = line.split("\t");
+			int val = Integer.parseInt(tokens[idx]);
+			String id = tokens[0];
+			
+			Category cat = new Category();
+			cat.lower = lower;
+			cat.upper = upper;
+			cat.inhabitants = val;
+			List<Category> list = categories.get(id);
+			if(list == null) {
+				list = new ArrayList<PersonAgeWrapper.Category>(50);
+				categories.put(id, list);
+			}
+			list.add(cat);
+		}
+		reader.close();
 	}
 	
 	private static class Category {
@@ -112,6 +129,6 @@ public class PersonAgeWrapper extends AbstractTaskWrapper {
 		
 		private int upper;
 		
-		private int value;
+		private int inhabitants;
 	}
 }
