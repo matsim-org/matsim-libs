@@ -19,13 +19,7 @@
 
 package playground.julia.toi;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -40,7 +34,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -50,9 +43,7 @@ import playground.benjamin.utils.NetworkSimplifier;
 public class ShapeConverterNetwork {
 
 	static String shapeFile = "input/oslo/Matsim_files_1/trondheim_med_omland_4.shp";
-	static String laneTypeFile = "input/oslo/lanetypes2.csv";
-	private static String splitSymbol =";";
-	private static String networkfile = "input/oslo/trondheim_network_with_lanes_simple.xml";
+	private static String networkfile = "input/oslo/trondheim_network_with_lanes_simple_V2.xml";
 	/**
 	 * @param args
 	 */
@@ -70,28 +61,6 @@ public class ShapeConverterNetwork {
 		
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		
-		// read lane type file
-		
-		HashMap<String, Lane> laneTypes = new HashMap<String, Lane>();
-		BufferedReader br = null;
-		String line = "";
-		
-		try{
-			br = new BufferedReader(new FileReader(laneTypeFile));
-			br.readLine(); //skip first line
-			//br.readLine();
-			while((line=br.readLine())!= null){
-				String [] lanetypeStr = line.split(splitSymbol);
-				laneTypes.put(lanetypeStr[0], new Lane(lanetypeStr));
-			}
-			
-		}catch(FileNotFoundException e){
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 		//Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(0.0, 10000.0));
 		
 		for(SimpleFeature sf: features){
@@ -154,21 +123,11 @@ public class ShapeConverterNetwork {
 				Double freeSpeed = freeSpeedkmh.doubleValue(); 
 				String lanetype = (String) sf.getAttribute("VKJORFLT");
 				
-				if (!laneTypes.containsKey(lanetype)) {
-					System.out.println("couldnt find lanetype " + lanetype);
-					System.out.println("using 1#2 values for the link from " + fromCoord + " to " + toCoord + " with length " + linkLength);
-					lanetype = "1#2";
-				}
+				LaneType laneType = new LaneType(lanetype);
 				
-				if(laneTypes.get(lanetype).isToll()==true){
-					logger.info("toll roads " + linkId1 + " " + linkId2 );
-				}
-				
-					Double numLanesForwards = laneTypes.get(lanetype)
-							.getNumberOfForwardLanes();
-					Double numLanesBackwards = laneTypes.get(lanetype)
-							.getNumberOfBackLanes();
-					Double capacityf = numLanesForwards * freeSpeed *29; // assume 3600 in 1 hour for freespeed 50 km/h
+					Double numLanesForwards = laneType.getNumberOfForwardLanes();
+					Double numLanesBackwards = laneType.getNumberOfBackLanes();
+					Double capacityf = numLanesForwards * freeSpeed *29; // assume 2000 in 1 hour for freespeed 50 km/h
 					Double capacityb = numLanesBackwards * freeSpeed * 29;
 					if (!network.getLinks().containsKey(linkId1)) {
 						if(numLanesForwards>0.0){
