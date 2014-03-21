@@ -17,7 +17,6 @@ import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
 public class ParkScoring implements BasicScoring  {
 	double score =0;
 	Plan plan = null;
-	//double betaMoney=-0.1; //!! Kommt auch in ParkControl vor >> In config auslagern?
 	VMScoreKeeper scorekeeper = null;
 	public ParkScoring(Plan plan) {
 		super();

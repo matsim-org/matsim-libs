@@ -4,7 +4,18 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.matsim.api.core.v01.network.Link;
+/**
+ * Simulates one EV
+ * 
+ * 
+ * 
+ * @author Valentin Bemetz & Moritz Hohenfellner
+ *
+ */
+
+
 public class EV {
+
 	
 	private String id;
 	private String ownerPersonId;
@@ -48,6 +59,21 @@ public class EV {
 		return consumption;
 		
 	}
+	
+	
+	public double calcEnergyConsumptionForDistance(double distance){
+		double consumption = distance*(this.consumptionPerHundredKlicks/100000);
+		return consumption;
+	}
+	
+	
+	public double calcEnergyConsumptionForDistancePerc(double distance){
+		//Batterieverbrauch fuer gegebene Distanz in Prozent der Kapazitaet		
+		return calcEnergyConsumptionForDistance(distance)/this.batteryCapacity;
+	
+	}
+	
+	
 	
 	
 	public int discharge(double value){
@@ -109,6 +135,8 @@ public class EV {
 		this.stateOfCharge = stateOfCharge;
 		System.out.println("New state of charge: "+this.stateOfCharge);
 	}
+	
+	
 	
 
 }

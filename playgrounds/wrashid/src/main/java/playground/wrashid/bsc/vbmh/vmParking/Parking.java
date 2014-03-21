@@ -58,6 +58,7 @@ public class Parking {
 		for (int i=0; i<capacityNEV; i++){
 			ParkingSpot parkingSpot = new ParkingSpot();
 			spots.add(parkingSpot);
+			spots.getLast().evExclusive=false;
 			spots.getLast().charge=false;
 			spots.getLast().parkingPriceM=this.parkingPriceM;
 			spots.getLast().setOccupied(false);
@@ -69,6 +70,7 @@ public class Parking {
 			ParkingSpot parkingSpot = new ParkingSpot();
 			spots.add(parkingSpot);
 			spots.getLast().charge=true;
+			spots.getLast().evExclusive=this.evExklusive;
 			spots.getLast().chargingPriceM=this.chargingPriceM;
 			spots.getLast().chargingRate=this.chargingRate;
 			spots.getLast().parkingPriceM=this.parkingPriceM;
@@ -104,7 +106,7 @@ public class Parking {
 	public ParkingSpot checkForFreeSpot(){ //Durchsucht zwar alle Spots, NEV Spots sind jedoch oben in der Liste, kommen daher morgens zuerst drann
 		for(ParkingSpot spot : spots){
 			//System.out.println("checke spot");
-			if (spot.isOccupied() == false){
+			if (spot.isOccupied() == false && spot.evExclusive == false){  //EV exclusive Spots werden nicht ausgegeben
 				return spot;
 			}
 		}

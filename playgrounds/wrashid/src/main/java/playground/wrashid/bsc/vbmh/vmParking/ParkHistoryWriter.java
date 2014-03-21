@@ -9,6 +9,9 @@ import java.io.IOException;
  * -Parking lot is fully occupied
  * -Parking lot is available again
  * -Agent can not park
+ * -EV / NEV parks (containins information on state of charge)
+ * -EV / NEV leaves parking (containins information on state of charge)
+ * -EV runs out of Battery 
  * 
  * The start() should be called before each iteration, the end() should be called at the end of 
  * each iteration to close the file stream.
@@ -62,4 +65,27 @@ public class ParkHistoryWriter {
 	public void addAgentNotParked(String time, String person){
 		schreiben("<parkevent time="+time+" eventtype=agent_not_parked person="+person+">\n");
 	}
+
+	public void addNEVParked(String time, String person, String parking, String parkingType, String spotType){
+		schreiben("<parkevent time="+time+" eventtype=NEV_parked person="+person+" parking="+parking+" parkingType="+parkingType+" spotType="+spotType+">\n");
+	}
+	
+	public void addEVParked(String time, String person, String parking, String parkingType, String spotType, String stateOfChargePercent){
+		schreiben("<parkevent time="+time+" eventtype=EV_parked person="+person+" parking="+parking+" parkingType="+parkingType+" spotType="+spotType+" stateOfChargePercent="+stateOfChargePercent+">\n");
+	}
+	
+	public void addNEVLeft(String time, String person, String parking, String parkingType, String spotType){
+		schreiben("<parkevent time="+time+" eventtype=NEV_left person="+person+" parking="+parking+" parkingType="+parkingType+" spotType="+spotType+">\n");
+	}
+
+	
+	public void addEVLeft(String time, String person, String parking, String parkingType, String spotType, String stateOfChargePercent){
+		schreiben("<parkevent time="+time+" eventtype=EV_left person="+person+" parking="+parking+" parkingType="+parkingType+" spotType="+spotType+" stateOfChargePercent="+stateOfChargePercent+">\n");
+	}
+	
+	public void addEVOutOfBattery(String time, String person){
+		schreiben("<parkevent time="+time+" eventtype=ev_out_of_battery person="+person+">\n");
+	}
+	
+	
 }

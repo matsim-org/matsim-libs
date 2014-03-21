@@ -28,16 +28,16 @@ import playground.wrashid.bsc.vbmh.vmEV.EVControl;
 /**
  * Manages the whole parking process of one Agent at a time. One instance of this class is kept by the Park_Handler 
  * which starts the Park() / leave().
- * Parking: First the availability of a private parking belonging to the destination facility is checked. If there
- * is no private parking available all public parking in a specific area around the destination of the agent are checked 
- * for free spots and then the best one is selected. 
+ * Parking: First the availability of a private parking belonging to the destination facility is checked. Then all public 
+ * parking in a specific area around the destination of the agent are checked for free spots
+ * and then the best one is selected. 
  * 
  * @author Valentin Bemetz & Moritz Hohenfellner
  *
  */
 
 public class ParkControl {
-	int maxDistance = 2000; //Maximaler Umkreis in dem Parkplaetze gesucht werden
+	int maxDistance = 2500; //Maximaler Umkreis in dem Parkplaetze gesucht werden
 	
 	//Zur berechnung des besten oeffentlichen Parkplatzes: (Negative Werte, hoechste Score gewinnt)
 	//werden jetzt beim startup() aus der Config geladen
@@ -51,7 +51,7 @@ public class ParkControl {
 	
 	Controler controller;
 	ParkingMap parkingMap = new ParkingMap(); //Beinhaltet alle Parkplaetze
-	PricingModels pricing = new PricingModels(); //Behinhaltet dei Preismodelle
+	PricingModels pricing = new PricingModels(); //Behinhaltet die Preismodelle
 	ParkHistoryWriter phwriter = new ParkHistoryWriter(); //Schreibt XML Datei mit Park events
 	EVControl evControl;
 	boolean evUsage=false;
@@ -104,9 +104,9 @@ public class ParkControl {
 		this.cordinate = facility.getCoord();
 		
 		/*
-		Parkplatz finden: Est wird ueberprueft ob es an der Zielfacility einen Freien Privatparkplatz gibt.
-		Falls nicht werden freie Oeffentliche Parkplaetze im Umkreis um die Facility gesammellt und daraus 
-		der Beste ausgewaehlt.
+		Parkplatz finden: Es werden zur Facility gehoerende Privatparkplaetze und oeffentliche in der Umgebung
+		in einer Liste gesammelt. Anschliessend wird jeder bewertet und der beste ausgewaehlt. Bewertet wird fuer 
+		NEVs nach Distanz und Kosten. Bei EVs wird das moegliche Laden beruecksichtigt
 		*/
 		
 		//Geschaetzte Dauer laden
@@ -114,33 +114,40 @@ public class ParkControl {
 		
 		//EV Checken:
 		ev=false;
-		if(evUsage){
+		if(evUsage){ //Ueberpruefen ob EV Control verwendet wird (Damit Parking weiterhin als standalone funktioniert)
 			if(evControl.hasEV(personId)){
 				ev=true;
 				//System.out.println("Suche Parking fuer EV");
 			}
 		}
 		
-		
-		
+		// Geschatzte Dauer und noch Zurueckzulegende Strecke berechnen
+		double [] futureInfo = getFutureInfo(event);
+		double estimatedDuration = 0;
+		double restOfDayDistance = 0;
+		if(futureInfo != null ){	
+			estimatedDuration = futureInfo[0];
+			restOfDayDistance = futureInfo[1];
+		} else {
+			System.out.println("Fehler in der Future Info");
+		}
 		
 		// PRIVATES PARKEN
 		
 		ParkingSpot privateParking = checkPrivateParking(facilityid.toString(), event.getActType(), ev);
-		if (privateParking != null) {
-			//System.out.println("Privaten Parkplatz gefunden");
-			parkOnSpot(privateParking, personId);
-			this.countPrivate ++;
-			return 1;
-		} 
+
+		//!! EVs muessten fuer jedes Parking wenn vorhanden einen EV und einen NEV Platz zur Auswahl bekommen
+		// Falls mit Preisen aufs Laden gearbeitet wird und EVs nicht laden muessen
 		
 		
 		// OEFFENTLICHES PARKEN
 		LinkedList<ParkingSpot> spotsInArea = getPublicParkings(cordinate, ev);
-		if (spotsInArea != null) {
-			parkPublic(spotsInArea, personId);
-			//System.out.println("Oeffentlich geparkt");
-			this.countPublic ++;
+
+		if (privateParking != null) {
+			spotsInArea.add(privateParking); // Privates Parking anfuegen
+		} 
+		if(spotsInArea.size()>0){ 
+			selectParking(spotsInArea, personId, estimatedDuration, restOfDayDistance, ev);
 			return 1;
 		}
 		
@@ -163,8 +170,8 @@ public class ParkControl {
 		return -1;
 	}
 
-	//--------------------------- P A R K   P U B L I C ---------------------------------------------	
-	private void parkPublic(LinkedList<ParkingSpot> spotsInArea, Id personId) {
+	//--------------------------- SELECT PARKING ---------------------------------------------	
+	private void selectParking(LinkedList<ParkingSpot> spotsInArea, Id personId, double duration, double restOfDayDistance, boolean ev) {
 		// TODO Auto-generated method stub
 		double score = 0;
 		double bestScore=-10000; //Nicht elegant, aber Startwert muss kleiner sein als alle moeglichen Scores
@@ -172,10 +179,31 @@ public class ParkControl {
 		bestSpot=null;
 		for (ParkingSpot spot : spotsInArea){
 			// SCORE
+			double evRelatedScore = 0;
 			double distance = CoordUtils.calcDistance(this.cordinate, spot.parking.getCoordinate());
 			double pricem = spot.parkingPriceM;
 			double cost = pricing.calculateParkingPrice(1, false, (int) pricem);
-			score =  this.betaMoney*cost+this.betaWalk*distance;
+			
+			//EV Score:
+			if(ev && spot.charge){
+				double stateOfCharge = evControl.stateOfChargePercentage(personId);
+				double newStateOfChargePerc = evControl.calcNewStateOfChargePercentage(personId, spot.chargingRate, duration);
+				double neededBatteryPercentage = evControl.calcEnergyConsumptionForDistancePerc(personId, restOfDayDistance);
+				double stateOfChargeGainPerc = newStateOfChargePerc-stateOfCharge;
+				
+				if(stateOfCharge<neededBatteryPercentage && newStateOfChargePerc>neededBatteryPercentage){
+					//Rest des Tages kann ohne Laden nicht gefahren werden mit jedoch schon.
+					evRelatedScore+=10; //!! Wert anpassen
+				}
+				
+				double betaBatteryPerc = 0.1; //!! Gerhoert nicht hier her und sollte nicht als konstant angenommen werden
+				
+				//evRelatedScore += betaBatteryPerc  * stateOfChargeGainPerc; //!! Nur provisorisch !
+	
+			}
+			
+			
+			score =  this.betaMoney*cost+this.betaWalk*distance+evRelatedScore;
 			//___
 
 			if(score > bestScore){
@@ -190,12 +218,14 @@ public class ParkControl {
 
 	//--------------------------- C H E C K   P R I V A T ---------------------------------------------
 	ParkingSpot checkPrivateParking(String facilityId, String facilityActType, boolean ev) {
+		//Gibt falls verfuegbar Spot auf Privatparkplatz passend zur Aktivitaet in der Facility zurueck
+		//Bei EVS werden priorisiert EV Plaetze zurueck gegeben
 		// !! Zur Beschleunigung Map erstellen ? <facility ID, Private Parking> ?
 		ParkingSpot selectedSpot = null;
 		for (Parking parking : parkingMap.getParkings()) {
 			// System.out.println("Suche Parking mit passender facility ID");
 			if(parking.facilityId!=null){ //Es gibt datensaetze ohne Facility ID >> Sonst Nullpointer
-				if (parking.facilityId.equals(facilityId) && parking.facilityActType.equals(facilityActType)) { // !! Act Type muss auch uebereinstimmen ! >> Einbauen
+				if (parking.facilityId.equals(facilityId) && parking.facilityActType.equals(facilityActType)) { 
 					//System.out.println("checke Parking");
 					selectedSpot = parking.checkForFreeSpot(); //Gibt null oder einen freien Platz zurueck
 					if(ev){
@@ -233,7 +263,7 @@ public class ParkControl {
 			}
 		}
 		if (list.isEmpty()) {
-			list = null; // !! Oder Radius vergroessern?
+			//list = null; // !! Oder Radius vergroessern?
 		}
 
 		return list;
@@ -242,6 +272,7 @@ public class ParkControl {
 	
 	//--------------------------- leave Parking  ---------------------------------------------
 	public void leave(ActivityEndEvent event) {
+		double time = event.getTime();
 		Id personId = event.getPersonId();
 		ParkingSpot selectedSpot = null;
 		VMScoreKeeper scorekeeper = null;
@@ -250,8 +281,10 @@ public class ParkControl {
 		if(personAttributes.get("selectedParkingspot")!=null){
 			selectedSpot = (ParkingSpot) personAttributes.get("selectedParkingspot");
 			personAttributes.remove("selectedParkingspot");
+			
+			boolean wasOccupied = false;
 			if(selectedSpot.parking.checkForFreeSpot()==null){ //Sinde alle anderen Plaetze belegt? Dann von Besetzt >> Frei
-				phwriter.addParkingAvailible(selectedSpot.parking, Double.toString(event.getTime()));
+				wasOccupied = true;
 			}
 			selectedSpot.setOccupied(false); //Platz freigeben
 			
@@ -278,9 +311,32 @@ public class ParkControl {
 			if(evControl.hasEV(event.getPersonId())){
 				if(selectedSpot.charge){
 					evControl.charge(personId, selectedSpot.chargingRate, duration);
-					System.out.println("EV charged person: "+personId.toString()+" parking: "+selectedSpot.parking.id+" new state of charge [%]: "+evControl.stateOfChargePercentage(personId));
+					//System.out.println("EV charged person: "+personId.toString()+" parking: "+selectedSpot.parking.id+" new state of charge [%]: "+evControl.stateOfChargePercentage(personId));
 				}
 			}
+		
+			//Events
+			String spotType;
+			if(selectedSpot.charge){
+				spotType="ev";
+			}else{
+				spotType="nev";
+			}
+
+			if(evControl.hasEV(personId)){
+				phwriter.addEVLeft(Double.toString(time), person.getId().toString(), Integer.toString(selectedSpot.parking.id), selectedSpot.parking.type, spotType, Double.toString(evControl.stateOfChargePercentage(personId)));
+			} else {
+				phwriter.addNEVLeft(Double.toString(time), person.getId().toString(), Integer.toString(selectedSpot.parking.id), selectedSpot.parking.type, spotType);
+			}
+			
+			if(selectedSpot.parking.checkForFreeSpot()==null){
+				phwriter.addParkingOccupied(selectedSpot.parking, Double.toString(this.time), personId.toString());
+			}
+			
+			if(wasOccupied){
+				phwriter.addParkingAvailible(selectedSpot.parking, Double.toString(event.getTime()));
+			}	
+		
 		
 		}
 		
@@ -297,9 +353,8 @@ public class ParkControl {
 		selectedSpotToSet.setOccupied(true);
 		selectedSpotToSet.setTimeVehicleParked(this.time);
 		
-		if(selectedSpot.parking.checkForFreeSpot()==null){
-			phwriter.addParkingOccupied(selectedSpot.parking, Double.toString(this.time), personId.toString());
-		}
+		
+		
 		
 		VMScoreKeeper scorekeeper;
 		if (personAttributes.get("VMScoreKeeper")!= null){
@@ -313,13 +368,26 @@ public class ParkControl {
 		//System.out.println("Walking Score :"+betaWalk*walkingTime);
 		scorekeeper.add(betaWalk*walkingTime);
 		
+
+		//Events
 		
-		//EV
-		if(evControl.hasEV(personId)&&selectedSpot.charge){
-			this.countEVParkedOnEVSpot++;
+		String spotType;
+		if(selectedSpot.charge){
+			spotType="ev";
+		}else{
+			spotType="nev";
+		}
+
+		if(evControl.hasEV(personId)){
+			phwriter.addEVParked(Double.toString(time), person.getId().toString(), Integer.toString(selectedSpot.parking.id), selectedSpot.parking.type, spotType, Double.toString(evControl.stateOfChargePercentage(personId)));
+		} else {
+			phwriter.addNEVParked(Double.toString(time), person.getId().toString(), Integer.toString(selectedSpot.parking.id), selectedSpot.parking.type, spotType);
 		}
 		
-		
+		if(selectedSpot.parking.checkForFreeSpot()==null){
+			phwriter.addParkingOccupied(selectedSpot.parking, Double.toString(this.time), personId.toString());
+		}
+		//--
 		
 		return 1;
 	}
@@ -341,11 +409,14 @@ public class ParkControl {
 		this.countEVParkedOnEVSpot=0;
 	}
 	
-	//--------------------------- G E T     E S T I M A T E D     D U R A T I O N -----
+	//--------------------------- G E T     F U T U R E     I N F O  -----
 	
-	public double getEstimatedDuration(ActivityStartEvent event){
+	public double[] getFutureInfo(ActivityStartEvent event){
 		//System.out.println("Get estimated duration:");
-
+		//[0]: Estimated duration of parking
+		//[1]: Estimated distance to travel during rest of day
+		
+		
 		PersonImpl person = (PersonImpl) controller.getPopulation().getPersons().get(event.getPersonId());
 		PlanImpl plan = (PlanImpl) person.getSelectedPlan();
 		double endTime=0;
@@ -356,7 +427,8 @@ public class ParkControl {
 		while(getnext){
 			if(activity.equals(plan.getLastActivity())){
 				endTime = plan.getFirstActivity().getEndTime();
-				return 24*3600-event.getTime()+endTime; //Letzte activity >> Parkdauer laenger als Rest der Iteration
+				double [] returnValue = {24*3600-event.getTime()+endTime, 0}; //Letzte activity >> Parkdauer laenger als Rest der Iteration
+				return returnValue;
 			}
 			
 			if(activity.getFacilityId().equals(event.getFacilityId()) && Math.abs(activity.getStartTime()-event.getTime())<1800){
@@ -364,34 +436,60 @@ public class ParkControl {
 				getnext=false;
 			} else{
 				Leg leg = plan.getNextLeg(activity);
-				if(leg==null){return -3;}
+				if(leg==null){return null;}
 				activity=(ActivityImpl) plan.getNextActivity(leg); // Naechste laden
-				if(activity==null){ return -2;} //Aktuelle activity nicht gefunden >> sollte nicht passieren
+				if(activity==null){ return null;} //Aktuelle activity nicht gefunden >> sollte nicht passieren
 				
 			}
 		}
 
-		
+		// Naechste Car leg nach aktueller activity finden:
 		boolean foundNextCarLeg = false;
+		Leg nextCarLeg=null;
 		while (foundNextCarLeg == false){
 			Leg leg = plan.getNextLeg(activity);
 			if(leg.getMode().equalsIgnoreCase("car")){
 				endTime = leg.getDepartureTime();
+				nextCarLeg=leg;
 				foundNextCarLeg=true;
 			}else{
 				Activity act = plan.getNextActivity(leg);
-				if(act==null){return -1;}
+				if(act==null){return null;}
 				leg=plan.getNextLeg(act);
 				if(leg==null){
-					return -1; //Scheint letzte Activity zu sein >> Parkdauer laenger als Rest der Iteration
+					return null; //Scheint letzte Activity zu sein >> Parkdauer laenger als Rest der Iteration
 				}
 			}
 			
 		}
 		
-		if(endTime==0){return -4;}
 		
-		return endTime-event.getTime();
+		//Calculate the distance to drive during the rest of the day
+		double restOfDayDistance = 0;
+		restOfDayDistance+=nextCarLeg.getRoute().getDistance();
+		boolean goOn = true;
+		while(goOn){
+			Activity act = plan.getNextActivity(nextCarLeg);
+			if(act==null){
+				goOn=false;
+				break;
+			}
+			nextCarLeg=plan.getNextLeg(act);
+			if(nextCarLeg==null){
+				break;
+			}
+			if(nextCarLeg.getMode().equalsIgnoreCase("car")){
+				restOfDayDistance+=nextCarLeg.getRoute().getDistance();
+			}
+			
+		}
+		
+		//System.out.println("Rest of day distance: "+restOfDayDistance);
+		
+		if(endTime==0){return null;}
+		double parkDuration = endTime-event.getTime();
+		double [] returnValue = {parkDuration, restOfDayDistance};
+		return returnValue;
 		
 	}
 
@@ -403,6 +501,14 @@ public class ParkControl {
 		this.evUsage=true;
 	}
 
+	
+	
+	public void clearAgents(){
+		for (Person person : controller.getPopulation().getPersons().values()){
+			person.getCustomAttributes().remove("selectedParkingspot");
+		}
+	}
+	
 	
 	
 }

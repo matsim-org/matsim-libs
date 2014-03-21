@@ -33,7 +33,9 @@ public class create_demo_parking {
 	static int diagZaehlEV=0;
 	static int diagZaehlNEV=0;
 	public static void main(String[] args) {
-	
+		String inputFile = "input/SF_PLUS/config_SF_PLUS_3.xml";
+		String outputFile = "input/SF_PLUS/VM/parkings_demo.xml";
+		
 		Panteile.put("home", 1.0);
 		EVanteile.put("home", 0.0);
 		
@@ -61,7 +63,7 @@ public class create_demo_parking {
 		ParkingWriter writer = new ParkingWriter();
 		Random zufall = new Random();
 	
-		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("input/SF_PLUS/config_SF_PLUS_1.xml"));
+		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(inputFile));
 		
 		countEmployees();
 		
@@ -146,7 +148,7 @@ public class create_demo_parking {
 		
 		
 		
-		writer.write(parking_map, "input/SF_PLUS/VM/parkings_demo.xml");
+		writer.write(parking_map, outputFile);
 		System.out.println("feddisch");
 		System.out.println("EV: "+create_demo_parking.diagZaehlEV);
 		System.out.println("NEV: "+create_demo_parking.diagZaehlNEV);

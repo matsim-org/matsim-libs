@@ -23,7 +23,8 @@ import org.matsim.core.controler.listener.StartupListener;
 
 public class ParkControlerListener implements StartupListener, IterationEndsListener, IterationStartsListener{
 	private ParkHandler parkHandler = new ParkHandler();
-
+	private String parkHistoryOutputFileName=null;
+	
 	public ParkHandler getParkHandler() {
 		return parkHandler;
 	}
@@ -64,11 +65,13 @@ public class ParkControlerListener implements StartupListener, IterationEndsList
 		
 		//Park History Writer Starten: 
 		ParkHistoryWriter phwriter = new ParkHistoryWriter();
-		phwriter.start("output/test_outputs/test_parkhistory.xml"); // !! Pro Iteration neues File
+
+		phwriter.start(parkHistoryOutputFileName+"_"+event.getIteration()+".xml"); 
 		
 		//Parkplaetze zuruecksetzen 
 		getParkHandler().parkControl.parkingMap.clearSpots();
 		getParkHandler().parkControl.parkingMap.createSpots();
+		getParkHandler().parkControl.clearAgents();
 		
 		//Diagnose: 
 			//Spots Zaehlen
@@ -113,6 +116,18 @@ public class ParkControlerListener implements StartupListener, IterationEndsList
 		
 		
 		
+	}
+
+
+
+	public String getParkHistoryOutputFileName() {
+		return parkHistoryOutputFileName;
+	}
+
+
+
+	public void setParkHistoryOutputFileName(String parkHistoryOutputFileName) {
+		this.parkHistoryOutputFileName = parkHistoryOutputFileName;
 	}
 
 }
