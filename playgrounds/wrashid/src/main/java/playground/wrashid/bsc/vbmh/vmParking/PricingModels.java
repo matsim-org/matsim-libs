@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Keeps all pricing model objects.
- * !! Berechnet Parkpreise >> Evntl. besser ins einzelne Model auslagern.
+ * 
  * 
  * 
  * 
@@ -46,19 +46,8 @@ public class PricingModels {
 	}
 	
 	public double calculateParkingPrice(double duration, boolean ev,int model_id){
-		double price = 0;
 		ParkingPricingModel model = get_model(model_id);
-		if (ev){
-			
-			price = model.getPriceOfFirstMinuteEV() + duration * model.getPricePerMinuteEV();
-		} else {
-			//System.out.println(model.getPricePerMinuteNEV());
-			price = model.getPriceOfFirstMinuteNEV() + duration * model.getPricePerMinuteNEV();
-		}
-			
-		
-		
-		return price;
+		return model.calculateParkingPrice(duration, ev);
 	}
 	
 	

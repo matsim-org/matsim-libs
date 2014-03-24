@@ -28,7 +28,7 @@ public class Parking {
 	public long capacityEV;
 	public long capacityNEV;
 	public double chargingRate;
-	public int parkingPriceM, chargingPriceM;
+	public int parkingPriceMEVSpot, parkingPriceMNEVSpot, chargingPriceM;
 	public String facilityId;
 	public String facilityActType;
 	public String type;
@@ -60,7 +60,7 @@ public class Parking {
 			spots.add(parkingSpot);
 			spots.getLast().evExclusive=false;
 			spots.getLast().charge=false;
-			spots.getLast().parkingPriceM=this.parkingPriceM;
+			spots.getLast().parkingPriceM=this.parkingPriceMNEVSpot;
 			spots.getLast().setOccupied(false);
 			spots.getLast().parking=this;
 			nevSpots.add(spots.getLast());
@@ -73,7 +73,7 @@ public class Parking {
 			spots.getLast().evExclusive=this.evExklusive;
 			spots.getLast().chargingPriceM=this.chargingPriceM;
 			spots.getLast().chargingRate=this.chargingRate;
-			spots.getLast().parkingPriceM=this.parkingPriceM;
+			spots.getLast().parkingPriceM=this.parkingPriceMEVSpot;
 			spots.getLast().setOccupied(false);
 			spots.getLast().parking=this;
 			evSpots.add(spots.getLast());

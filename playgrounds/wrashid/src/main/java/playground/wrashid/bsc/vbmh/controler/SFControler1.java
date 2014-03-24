@@ -20,7 +20,7 @@ public class SFControler1 {
 		System.out.println("Los gehts");
 		
 		String parking_filename="input/SF_PLUS/VM/parkings_demo.xml";
-		String pricing_filename="input/parking_pricing_models_demo.xml";
+		String pricing_filename="input/SF_PLUS/VM/parking_pricing_models_demo.xml";
 		String evFilename = "input/SF_PLUS/VM/evs.xml";
 		String parkHistoryFileName = "output/SF_PLUS/parkhistory/parkhistory"; 
 		

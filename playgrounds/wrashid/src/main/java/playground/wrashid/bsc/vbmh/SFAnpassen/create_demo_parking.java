@@ -106,7 +106,9 @@ public class create_demo_parking {
 				parking.id=i;
 				parking.type="private";
 				parking.facilityActType=location_type;
-				parking.parkingPriceM=3;
+				
+				parking.parkingPriceMEVSpot=4; //!! Nach typ + Zone unterscheiden; Zu hause aufs Laden den Stromtarif verechnen >> vorausgesetzt der Anschluss gehoert dem Agent..
+				parking.parkingPriceMNEVSpot=3;
 				
 				parking_map.addParking(parking);
 				i++;
@@ -131,9 +133,11 @@ public class create_demo_parking {
 			parking.type="public";
 			zufallsz=zufall.nextDouble();
 			if (zufallsz<0.2){
-				parking.parkingPriceM=0;
+				parking.parkingPriceMEVSpot=0;
+				parking.parkingPriceMNEVSpot=0;
 			} else{
-				parking.parkingPriceM=3;
+				parking.parkingPriceMEVSpot=4;
+				parking.parkingPriceMNEVSpot=3;
 			}
 				
 			parking_map.addParking(parking);

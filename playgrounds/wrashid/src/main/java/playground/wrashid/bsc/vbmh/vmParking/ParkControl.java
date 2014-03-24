@@ -43,6 +43,8 @@ public class ParkControl {
 	//werden jetzt beim startup() aus der Config geladen
 	double betaMoney; //= -10; 
 	double betaWalk; //= -1; // !! Zweiphasige Kurve einbauen?
+	double pricePerKWH = 0.12; //$/KWH !!Gehoert nicht hier her (Quelle http://shrinkthatfootprint.com/average-electricity-prices-kwh)
+	
 	
 	int countPrivate = 0;
 	int countPublic = 0;
@@ -173,37 +175,57 @@ public class ParkControl {
 	//--------------------------- SELECT PARKING ---------------------------------------------	
 	private void selectParking(LinkedList<ParkingSpot> spotsInArea, Id personId, double duration, double restOfDayDistance, boolean ev) {
 		// TODO Auto-generated method stub
+		boolean sufficientEVSpotFound = false; //Marks if there is a spot with anough possible charging to get the agent back home
 		double score = 0;
 		double bestScore=-10000; //Nicht elegant, aber Startwert muss kleiner sein als alle moeglichen Scores
+		double stateOfCharge=0;
+		double neededBatteryPercentage=0;
 		ParkingSpot bestSpot;
 		bestSpot=null;
+		
+		if(ev){
+			stateOfCharge = evControl.stateOfChargePercentage(personId);
+			neededBatteryPercentage = evControl.calcEnergyConsumptionForDistancePerc(personId, restOfDayDistance);
+			if(neededBatteryPercentage>stateOfCharge){
+				phwriter.addAgentHasToCharge(Double.toString(time), personId.toString());
+			}
+		}
+		
+		
+		
 		for (ParkingSpot spot : spotsInArea){
 			// SCORE
 			double evRelatedScore = 0;
 			double distance = CoordUtils.calcDistance(this.cordinate, spot.parking.getCoordinate());
 			double pricem = spot.parkingPriceM;
-			double cost = pricing.calculateParkingPrice(1, false, (int) pricem);
+			double cost = pricing.calculateParkingPrice(duration, false, (int) pricem);
+			//System.out.println("Cost :"+ Double.toString(cost));
 			
 			//EV Score:
 			if(ev && spot.charge){
-				double stateOfCharge = evControl.stateOfChargePercentage(personId);
+				
 				double newStateOfChargePerc = evControl.calcNewStateOfChargePercentage(personId, spot.chargingRate, duration);
-				double neededBatteryPercentage = evControl.calcEnergyConsumptionForDistancePerc(personId, restOfDayDistance);
 				double stateOfChargeGainPerc = newStateOfChargePerc-stateOfCharge;
+				double chargableAmountOfEnergy =evControl.clalcChargedAmountOfEnergy(personId, spot.chargingRate, duration);
 				
 				if(stateOfCharge<neededBatteryPercentage && newStateOfChargePerc>neededBatteryPercentage){
 					//Rest des Tages kann ohne Laden nicht gefahren werden mit jedoch schon.
-					evRelatedScore+=10; //!! Wert anpassen
+					evRelatedScore+=30; //!! Wert anpassen
+					sufficientEVSpotFound = true;
 				}
 				
-				double betaBatteryPerc = 0.1; //!! Gerhoert nicht hier her und sollte nicht als konstant angenommen werden
+				evRelatedScore += pricePerKWH*chargableAmountOfEnergy*betaMoney*-1; //Ersparnis gegenueber zu hause Laden
+				//!! Vorzeichen?
 				
+				double betaBatteryPerc = 0.1; //!! Gerhoert nicht hier her und sollte nicht als konstant angenommen werden
 				//evRelatedScore += betaBatteryPerc  * stateOfChargeGainPerc; //!! Nur provisorisch !
-	
+				
+				//System.out.println("Ev related Score :" + Double.toString(evRelatedScore));
 			}
 			
-			
-			score =  this.betaMoney*cost+this.betaWalk*distance+evRelatedScore;
+			double walkingTime = distance/4000.0; //in h //!! Wert aus der Config oder anders zentral... gibts 2 mal
+			//System.out.println("Walking Time: "+Double.toString(walkingTime));
+			score =  this.betaMoney*1*cost+this.betaWalk*walkingTime+evRelatedScore; //!! Vorzeichen
 			//___
 
 			if(score > bestScore){
@@ -212,7 +234,12 @@ public class ParkControl {
 			}
 			
 		}
-		parkOnSpot(bestSpot,personId);
+		
+		if(sufficientEVSpotFound && !bestSpot.charge){
+			phwriter.addEVChoseWrongSpot(Double.toString(time), personId.toString(), bestScore);
+		}
+		
+		parkOnSpot(bestSpot, bestScore, personId);
 		
 	}
 
@@ -345,7 +372,7 @@ public class ParkControl {
 
 	
 	//--------------------------- P A R K   O N   S P O T ---------------------------------------------
-	int parkOnSpot(ParkingSpot selectedSpot, Id personId) {
+	int parkOnSpot(ParkingSpot selectedSpot, double score, Id personId) {
 		Person person = controller.getPopulation().getPersons().get(personId);
 		Map<String, Object> personAttributes = person.getCustomAttributes();
 		personAttributes.put("selectedParkingspot", selectedSpot);
@@ -379,9 +406,9 @@ public class ParkControl {
 		}
 
 		if(evControl.hasEV(personId)){
-			phwriter.addEVParked(Double.toString(time), person.getId().toString(), Integer.toString(selectedSpot.parking.id), selectedSpot.parking.type, spotType, Double.toString(evControl.stateOfChargePercentage(personId)));
+			phwriter.addEVParked(Double.toString(time), person.getId().toString(), Integer.toString(selectedSpot.parking.id), score, selectedSpot.parking.type, spotType, Double.toString(evControl.stateOfChargePercentage(personId)));
 		} else {
-			phwriter.addNEVParked(Double.toString(time), person.getId().toString(), Integer.toString(selectedSpot.parking.id), selectedSpot.parking.type, spotType);
+			phwriter.addNEVParked(Double.toString(time), person.getId().toString(), Integer.toString(selectedSpot.parking.id), score, selectedSpot.parking.type, spotType);
 		}
 		
 		if(selectedSpot.parking.checkForFreeSpot()==null){

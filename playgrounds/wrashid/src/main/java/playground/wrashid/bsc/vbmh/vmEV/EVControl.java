@@ -103,7 +103,8 @@ public class EVControl {
 	
 	public double charge(Id personId, double chargingRate, double duration){
 		EV ev = evList.getEV(personId);
-		double amountOfEnergy = ev.calcNewStateOfCharge(chargingRate, duration)-ev.stateOfCharge;
+		//double amountOfEnergy = ev.calcNewStateOfCharge(chargingRate, duration)-ev.stateOfCharge;
+		double amountOfEnergy=clalcChargedAmountOfEnergy(personId, chargingRate, duration);
 		//System.out.println("amount of energy :" + amountOfEnergy);
 		ev.setStateOfCharge(ev.calcNewStateOfCharge(chargingRate, duration));
 		return amountOfEnergy;
@@ -118,6 +119,17 @@ public class EVControl {
 		EV ev = evList.getEV(personId);
 		return ev.calcNewStateOfCharge(chargingRate, duration)/ev.batteryCapacity;
 	}
+	
+	
+	public double clalcChargedAmountOfEnergy(Id personId, double chargingRate, double duration){
+		//Returns the amount of Energy which can be charged for the given EV at the given charging Rate
+		//during the given time in kwh
+		EV ev = evList.getEV(personId);
+		
+		return ev.calcNewStateOfCharge(chargingRate, duration)-ev.stateOfCharge;
+		
+	}
+	
 	
 	
 	public double calcEnergyConsumptionForDistancePerc(Id personId, double distance){

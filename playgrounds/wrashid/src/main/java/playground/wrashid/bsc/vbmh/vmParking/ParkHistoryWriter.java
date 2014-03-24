@@ -66,12 +66,12 @@ public class ParkHistoryWriter {
 		schreiben("<parkevent time="+time+" eventtype=agent_not_parked person="+person+">\n");
 	}
 
-	public void addNEVParked(String time, String person, String parking, String parkingType, String spotType){
-		schreiben("<parkevent time="+time+" eventtype=NEV_parked person="+person+" parking="+parking+" parkingType="+parkingType+" spotType="+spotType+">\n");
+	public void addNEVParked(String time, String person, String parking, double score, String parkingType, String spotType){
+		schreiben("<parkevent time="+time+" eventtype=NEV_parked person="+person+" parking="+parking+" spot_score="+score+" parkingType="+parkingType+" spotType="+spotType+">\n");
 	}
 	
-	public void addEVParked(String time, String person, String parking, String parkingType, String spotType, String stateOfChargePercent){
-		schreiben("<parkevent time="+time+" eventtype=EV_parked person="+person+" parking="+parking+" parkingType="+parkingType+" spotType="+spotType+" stateOfChargePercent="+stateOfChargePercent+">\n");
+	public void addEVParked(String time, String person, String parking, double score, String parkingType, String spotType, String stateOfChargePercent){
+		schreiben("<parkevent time="+time+" eventtype=EV_parked person="+person+" parking="+parking+" spot_score="+score+" parkingType="+parkingType+" spotType="+spotType+" stateOfChargePercent="+stateOfChargePercent+">\n");
 	}
 	
 	public void addNEVLeft(String time, String person, String parking, String parkingType, String spotType){
@@ -87,5 +87,13 @@ public class ParkHistoryWriter {
 		schreiben("<parkevent time="+time+" eventtype=ev_out_of_battery person="+person+">\n");
 	}
 	
+	public void addEVChoseWrongSpot(String time, String person, double bestScore){
+		schreiben("<parkevent time="+time+" eventtype=ev_chose_nonEV_spot_instead_of_sufficient_charge person="+person+" best_spot_score="+bestScore+">\n");
+	}
 	
+	public void addAgentHasToCharge(String time, String person){
+		schreiben("<parkevent time="+time+" eventtype=Agent_looking_for_parking_has_to_charge person="+person+">\n");
+	}
+
+
 }

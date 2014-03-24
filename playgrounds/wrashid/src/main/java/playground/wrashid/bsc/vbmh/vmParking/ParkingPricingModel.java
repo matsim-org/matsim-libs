@@ -19,6 +19,24 @@ public class ParkingPricingModel {
 	private double maxTimeNEV;
 	
 	
+	public double calculateParkingPrice(double duration, boolean ev){
+		duration = duration/60; //von Sekunden auf Minuten
+		double price = 0;
+		
+		if (ev){
+			
+			price = this.getPriceOfFirstMinuteEV() + duration * this.getPricePerMinuteEV();
+		} else {
+			//System.out.println(model.getPricePerMinuteNEV());
+			price = this.getPriceOfFirstMinuteNEV() + duration * this.getPricePerMinuteNEV();
+		}
+		
+		return price;
+	}
+	
+	
+	
+	
 	
 	public double getPricePerMinuteEV() {
 		return pricePerMinuteEV;
