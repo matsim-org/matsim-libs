@@ -19,12 +19,17 @@ public class SFControler1 {
 		// TODO Auto-generated method stub
 		System.out.println("Los gehts");
 		
-		String parking_filename="input/SF_PLUS/VM/parkings_demo.xml";
-		String pricing_filename="input/SF_PLUS/VM/parking_pricing_models_demo.xml";
-		String evFilename = "input/SF_PLUS/VM/evs.xml";
-		String parkHistoryFileName = "output/SF_PLUS/parkhistory/parkhistory"; 
+		String parking_filename;
+		String pricing_filename;
+		String evFilename;
+		String parkHistoryFileName; 
 		
 		Config config = ConfigUtils.loadConfig(args[0]);
+		parking_filename=config.getModule("VM_park").getValue("inputParkingFile");
+		pricing_filename=config.getModule("VM_park").getValue("inputPricingFile");
+		evFilename=config.getModule("VM_park").getValue("inputEVFile");
+		parkHistoryFileName = config.getModule("controler").getValue("outputDirectory")+"/parkhistory"; 
+		
 		Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
 		ParkControlerListener parklistener = new ParkControlerListener();

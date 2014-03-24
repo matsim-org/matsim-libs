@@ -23,6 +23,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import playground.wrashid.bsc.vbmh.controler.VMConfig;
 import playground.wrashid.bsc.vbmh.vmEV.EVControl;
 
 /**
@@ -37,13 +38,12 @@ import playground.wrashid.bsc.vbmh.vmEV.EVControl;
  */
 
 public class ParkControl {
-	int maxDistance = 2500; //Maximaler Umkreis in dem Parkplaetze gesucht werden
+	
 	
 	//Zur berechnung des besten oeffentlichen Parkplatzes: (Negative Werte, hoechste Score gewinnt)
 	//werden jetzt beim startup() aus der Config geladen
 	double betaMoney; //= -10; 
 	double betaWalk; //= -1; // !! Zweiphasige Kurve einbauen?
-	double pricePerKWH = 0.12; //$/KWH !!Gehoert nicht hier her (Quelle http://shrinkthatfootprint.com/average-electricity-prices-kwh)
 	
 	
 	int countPrivate = 0;
@@ -217,7 +217,7 @@ public class ParkControl {
 					sufficientEVSpotFound = true;
 				}
 				
-				evRelatedScore += pricePerKWH*chargableAmountOfEnergy*betaMoney*-1; //Ersparnis gegenueber zu hause Laden
+				evRelatedScore += VMConfig.pricePerKWH*chargableAmountOfEnergy*betaMoney*-1; //Ersparnis gegenueber zu hause Laden
 				//!! Vorzeichen?
 				
 				double betaBatteryPerc = 0.1; //!! Gerhoert nicht hier her und sollte nicht als konstant angenommen werden
@@ -226,7 +226,7 @@ public class ParkControl {
 				//System.out.println("Ev related Score :" + Double.toString(evRelatedScore));
 			}
 			
-			double walkingTime = distance/4000.0; //in h //!! Wert aus der Config oder anders zentral... gibts 2 mal
+			double walkingTime = distance/VMConfig.walkingSpeed; //in h 
 			//System.out.println("Walking Time: "+Double.toString(walkingTime));
 			score =  this.betaMoney*1*cost+this.betaWalk*walkingTime+evRelatedScore; //!! Vorzeichen
 			//___
@@ -280,7 +280,7 @@ public class ParkControl {
 				ParkingSpot spot = null;
 				double distance = CoordUtils.calcDistance(coord,
 						parking.getCoordinate());
-				if (distance < maxDistance) {
+				if (distance < VMConfig.maxDistance) {
 					spot = parking.checkForFreeSpot();
 					if(ev){
 						spot = parking.checkForFreeSpotEVPriority();
@@ -322,7 +322,7 @@ public class ParkControl {
 			double duration=this.time-selectedSpot.getTimeVehicleParked(); //Parkzeit berechnen
 			//System.out.println(duration);
 			
-			double payedParking = pricing.calculateParkingPrice(duration/60, false, selectedSpot.parkingPriceM); // !! EV Boolean anpassen
+			double payedParking = pricing.calculateParkingPrice(duration, false, selectedSpot.parkingPriceM); // !! EV Boolean anpassen
 			// System.out.println(payed_parking);
 			
 			//System.out.println("bezahltes Parken (Score): "+payedParking*this.betaMoney);
@@ -394,7 +394,7 @@ public class ParkControl {
 			personAttributes.put("VMScoreKeeper", scorekeeper);
 		}
 		double distance = CoordUtils.calcDistance(this.cordinate, selectedSpot.parking.getCoordinate());
-		double walkingTime = distance/(1000*4); //4 Km/h !!Gibt es den Wert in der Config?
+		double walkingTime = distance/VMConfig.walkingSpeed; 
 		//System.out.println("Walking Score :"+betaWalk*walkingTime);
 		scorekeeper.add(betaWalk*walkingTime);
 		

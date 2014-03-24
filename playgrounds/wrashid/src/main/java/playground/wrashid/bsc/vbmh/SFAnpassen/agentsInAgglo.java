@@ -117,7 +117,7 @@ public class agentsInAgglo {
 					ActivityImpl activity = (ActivityImpl) planElement;
 					if (activity.getType().equals("home")){
 						activity.getCoord().setXY(xCoord, yCoord);
-						
+						activity.setEndTime(activity.getEndTime()-2400); //!! 40 minuten frueher wegfahren - gute idee??
 						activity.setFacilityId(newFacId);
 						System.out.println("moved agent");
 					}
