@@ -20,10 +20,6 @@
 			<name>Opengeo repository</name>
 			<url>dav:http://repo.opengeo.org</url>
 		</repository>
-		<repository>
-			<id>google-api-services</id>
-			<url>http://mavenrepo.google-api-java-client.googlecode.com/hg</url>
-		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
@@ -75,12 +71,6 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>otfvis</artifactId>
-			<version>0.6.0-SNAPSHOT</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>playground</groupId>
-			<artifactId>mrieser</artifactId>
 			<version>0.6.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
@@ -139,7 +129,6 @@
 			<artifactId>cadytsIntegration</artifactId>
 			<version>0.6.0-SNAPSHOT</version>
 		</dependency>
-
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
