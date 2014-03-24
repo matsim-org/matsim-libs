@@ -39,12 +39,13 @@
         <javac srcdir="src" debug="true" destdir="${plugin.build.dir}" includeantruntime="false" encoding="UTF-8">
             <compilerarg value="-Xlint:deprecation"/>
             <compilerarg value="-Xlint:unchecked"/>
-            <classpath>
-                <pathelement location="${josm}"/>
-                <fileset dir="${plugin.lib.dir}" erroronmissingdir="no">
-                    <include name="**/*.jar"/>
-                </fileset>
-            </classpath>
+            <!--<classpath>-->
+                <!--<pathelement location="${josm}"/>-->
+                <!--<fileset dir="${plugin.lib.dir}" erroronmissingdir="no">-->
+                    <!--<include name="**/*.jar"/>-->
+                <!--</fileset>-->
+            <!--</classpath>-->
+            <classpath refid="maven.compile.classpath"/>
         </javac>
     </target>
     <!--
@@ -119,8 +120,28 @@
             <param name="propery.value" value="${plugin.stage}"/>
         </antcall>
         <antcall target="additional-manifest" />
+        <resourcecount refid="maven.runtime.classpath" property="nresources"/>
+        <scriptdef name="subtract" language="javascript">
+            <attribute name="leftside"/>
+            <attribute name="rightside"/>
+            <attribute name="diff"/>
+            <![CDATA[
+   var leftSide = attributes.get("leftside");
+   var rightSide = attributes.get("rightside");
+
+   project.setProperty(attributes.get("diff"), leftSide-rightSide);
+ ]]>
+
+        </scriptdef>
+        <subtract leftside="${nresources}" rightside="1" diff="njars"/>
         <jar destfile="${plugin.jar}" basedir="${plugin.build.dir}" manifest="MANIFEST">
-            <zipgroupfileset dir="${plugin.lib.dir}" includes="*.jar" erroronmissingdir="no"/>
+            <archives>
+                <zips>
+                    <last count="${njars}">
+                        <path refid="maven.runtime.classpath"/>
+                    </last>
+                </zips>
+            </archives>
         </jar>
         <delete file="MANIFEST" failonerror="no"/>
         <antcall target="post-dist" />

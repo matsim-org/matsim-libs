@@ -9,6 +9,12 @@
 	<groupId>playground</groupId>
 	<artifactId>nkuehnel</artifactId>
 	<name>nkuehnel</name>
+    <scm>
+        <connection>scm:svn:https://svn.code.sf.net/p/matsim/source/playgrounds/trunk/nkuehnel</connection>
+        <developerConnection>scm:svn:https://svn.code.sf.net/p/matsim/source/playgrounds/trunk/nkuehnel</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://svn.code.sf.net/p/matsim/source/playgrounds/trunk/nkuehnel</url>
+    </scm>
 	<dependencies>
 		<dependency>
 			<groupId>org.openstreetmap</groupId>
@@ -18,4 +24,83 @@
 			<systemPath>${basedir}/josm/josm-custom.jar</systemPath>
 		</dependency>
 	</dependencies>
+    <build>
+        <resources>
+            <resource>
+            <directory>${basedir}</directory>
+                <includes>
+                    <include>images/**</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <doCheck>false</doCheck>
+                    <doUpdate>true</doUpdate>
+                </configuration>
+            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-assembly-plugin</artifactId>-->
+                <!--<configuration>-->
+                    <!--<archive>-->
+                        <!--<manifestEntries>-->
+                            <!--<Plugin-Mainversion>4394</Plugin-Mainversion>-->
+                            <!--<Plugin-Version>${buildNumber}</Plugin-Version>-->
+                            <!--<Plugin-Class>josmMatsimPlugin.MATSimPlugin</Plugin-Class>-->
+                            <!--<Plugin-Description>Allows to edit and extract network information for the traffic simulation MATSim</Plugin-Description>-->
+                            <!--<Plugin-Date>${maven.build.timestamp}</Plugin-Date>-->
+                            <!--<Author>Nico Kuehnel</Author>-->
+                            <!--<Plugin-Icon>images/dialogs/logo.png</Plugin-Icon>-->
+                        <!--</manifestEntries>-->
+                    <!--</archive>-->
+                    <!--<descriptorRefs>-->
+                        <!--<descriptorRef>jar-with-dependencies</descriptorRef>-->
+                    <!--</descriptorRefs>-->
+                <!--</configuration>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<phase>package</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>single</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <phase>install</phase>
+                        <configuration>
+                            <target>
+                                <property name="mavenruntime" refid="maven.runtime.classpath"/>
+
+                                <echo message="runtime classpath: ${mavenruntime}"/>
+                                <ant target="install">
+                                    <reference torefid="maven.compile.classpath" refid="maven.compile.classpath"/>
+                                    <reference torefid="maven.runtime.classpath" refid="maven.runtime.classpath"/>
+                                </ant>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
