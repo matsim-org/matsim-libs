@@ -93,7 +93,8 @@ public class FileUtils {
 	 * @param number the number of files that must be sampled. 
 	 * @param filter the {@link FilenameFilter} filter that will be	used to 
 	 *        filter the files from the source folder. 
-	 * @return a {@link List} of {@link File}s sampled.
+	 * @return a {@link List} of {@link File}s sampled, or null if there are no
+	 * 		  files with the given extension.
 	 * @author jwjoubert
 	 */
 	public static List<File> sampleFiles(File folder, int number, FileFilter filter){
@@ -110,13 +111,16 @@ public class FileUtils {
 				LOG.warn("Although " + number + " files were requested, only " + fileList.length + " are available");
 			}
 			
-			for(File f : fileList){
-				result.add(f);
+			/* Generate a random permutation of integers. */
+			List<Integer> permutation = RandomPermutation.getPermutation(fileList.length);
+			while(result.size() < number && !permutation.isEmpty()){
+				result.add(fileList[permutation.get(0)]);
+				permutation.remove(0);
 			}
 		} else{
 			LOG.warn("The folder contains no relevant files. A null list is returned!");
 		}
-		LOG.info("File sampling complete.");
+		LOG.info("File sampling complete, " + result.size() + " returned.");
 		return result;
 	}
 	
