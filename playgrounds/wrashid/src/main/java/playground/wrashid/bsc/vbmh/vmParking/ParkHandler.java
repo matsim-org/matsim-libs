@@ -1,5 +1,7 @@
 package playground.wrashid.bsc.vbmh.vmParking;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -8,6 +10,9 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.LegImpl;
 
 /**
  * Handles AktivityStartEvent and starts parking process. Same for ActivityEndEvent.
@@ -38,11 +43,32 @@ public class ParkHandler implements ActivityEndEventHandler, ActivityStartEventH
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		// TODO Auto-generated method stub
-	//	if(event.getLegMode()=="car"){
+	
+		//Activitys zaehlen:
+		
+		Person person = parkControl.controller.getPopulation().getPersons().get(event.getPersonId());
+		Map<String, Object> personAttributes = person.getCustomAttributes();
+		
+		String legMode = null;
+		
+		if (personAttributes.get("ActCounter")!= null){
+			Integer counter = (Integer) personAttributes.get("ActCounter");
+			LegImpl leg = (LegImpl) person.getSelectedPlan().getPlanElements().get(counter);
+			legMode = leg.getMode();
+			counter ++;
+			personAttributes.put("ActCounter", counter);
+		} else{
+			personAttributes.put("ActCounter", 0);
+		}
+		
+		
+		
+		
+		if(legMode=="car"){
 			if(!event.getActType().equals("ParkO")&&!event.getActType().equals("ParkP")){
 				parkControl.park(event);
 			}
-	//	}
+		}
 			
 	}
 
@@ -50,6 +76,17 @@ public class ParkHandler implements ActivityEndEventHandler, ActivityStartEventH
 	public void handleEvent(PersonDepartureEvent event) {
 		// TODO Auto-generated method stub
 		
+		Person person = parkControl.controller.getPopulation().getPersons().get(event.getPersonId());
+		Map<String, Object> personAttributes = person.getCustomAttributes();
+		
+		
+		if (personAttributes.get("ActCounter")!= null){
+			Integer counter = (Integer) personAttributes.get("ActCounter");
+			counter ++;
+			personAttributes.put("ActCounter", counter);
+		} else{
+			System.out.println("F E H L E R agent ohne ActCounter unterwegs"); //should not happen
+		}
 		
 	}
 

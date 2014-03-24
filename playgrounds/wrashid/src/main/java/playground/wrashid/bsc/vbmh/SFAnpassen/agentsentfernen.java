@@ -1,5 +1,7 @@
 package playground.wrashid.bsc.vbmh.SFAnpassen;
 
+import java.util.Random;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
@@ -13,7 +15,9 @@ public class agentsentfernen {
 
 	@SuppressWarnings("deprecation")
 	public static void main(String[] args) {
+		String outputFileName = "input/SF/Siouxfalls_population_reduziert_random.xml";
 		int anzahl_agents = 1500;
+		Random zufall = new Random();
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("input/SF/config_SF_1.xml"));
 		Scenario schreib_scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("input/SF/config_SF_2.xml"));
 		PopulationImpl population = new PopulationImpl((ScenarioImpl)schreib_scenario);
@@ -21,7 +25,7 @@ public class agentsentfernen {
 		for (Person p : scenario.getPopulation().getPersons().values()) {
 			PersonImpl pa = (PersonImpl) p;
 			System.out.println(pa.getCarAvail());
-			if(pa.getCarAvail()!="never"){
+			if(pa.getCarAvail()!="never" && zufall.nextDouble()<0.02){
 				population.addPerson(pa);
 				System.out.println("Autofahrer hinzugefuegt");
 				i+=1;
@@ -39,7 +43,8 @@ public class agentsentfernen {
 		}
 		PopulationWriter writer = new PopulationWriter(population, schreib_scenario.getNetwork());
 		
-		writer.writeV5("input/SF/Siouxfalls_population_reduziert.xml");
+		
+		writer.writeV5(outputFileName);
 		System.out.println("Achtung: Ueberschreibt nicht richtig; Ausgabedatei sollte vorher geloescht werden.");
 		
 

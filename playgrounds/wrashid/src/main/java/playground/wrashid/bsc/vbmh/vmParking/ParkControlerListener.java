@@ -112,6 +112,7 @@ public class ParkControlerListener implements StartupListener, IterationEndsList
 		for (Person person : population.values()){
 			//person.getCustomAttributes().put("VMScoreKeeper", null);
 			person.getCustomAttributes().remove("VMScoreKeeper");
+			person.getCustomAttributes().put("ActCounter", 0);
 		}
 		
 		

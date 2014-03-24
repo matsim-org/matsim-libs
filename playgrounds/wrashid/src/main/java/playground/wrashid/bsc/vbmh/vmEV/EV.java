@@ -69,7 +69,7 @@ public class EV {
 	
 	public double calcEnergyConsumptionForDistancePerc(double distance){
 		//Batterieverbrauch fuer gegebene Distanz in Prozent der Kapazitaet		
-		return calcEnergyConsumptionForDistance(distance)/this.batteryCapacity;
+		return 100*calcEnergyConsumptionForDistance(distance)/this.batteryCapacity;
 	
 	}
 	
@@ -131,9 +131,9 @@ public class EV {
 
 
 	public void setStateOfCharge(double stateOfCharge) {
-		System.out.println("State of charge: "+this.stateOfCharge);
+		//System.out.println("State of charge: "+this.stateOfCharge);
 		this.stateOfCharge = stateOfCharge;
-		System.out.println("New state of charge: "+this.stateOfCharge);
+		//System.out.println("New state of charge: "+this.stateOfCharge);
 	}
 	
 	

@@ -130,8 +130,9 @@ public class ParkControl {
 		if(futureInfo != null ){	
 			estimatedDuration = futureInfo[0];
 			restOfDayDistance = futureInfo[1];
+			//System.out.println("rest of day distance: "+restOfDayDistance);
 		} else {
-			System.out.println("Fehler in der Future Info");
+			System.out.println("F E H L E R in der Future Info");
 		}
 		
 		// PRIVATES PARKEN
@@ -186,6 +187,8 @@ public class ParkControl {
 		if(ev){
 			stateOfCharge = evControl.stateOfChargePercentage(personId);
 			neededBatteryPercentage = evControl.calcEnergyConsumptionForDistancePerc(personId, restOfDayDistance);
+			//System.out.println("Needed battery perc :"+neededBatteryPercentage);
+			//System.out.println("State of charge: "+stateOfCharge);
 			if(neededBatteryPercentage>stateOfCharge){
 				phwriter.addAgentHasToCharge(Double.toString(time), personId.toString());
 			}
@@ -447,18 +450,29 @@ public class ParkControl {
 		PersonImpl person = (PersonImpl) controller.getPopulation().getPersons().get(event.getPersonId());
 		PlanImpl plan = (PlanImpl) person.getSelectedPlan();
 		double endTime=0;
-
+		int actCount = (Integer) person.getCustomAttributes().get("ActCounter");
+		ActivityImpl actFromCounter = (ActivityImpl) person.getSelectedPlan().getPlanElements().get((Integer) person.getCustomAttributes().get("ActCounter"));
+		ActivityImpl activity = actFromCounter;
+		
 		//Aktuelle activity finden:
+		/*
 		boolean getnext = true;
 		ActivityImpl activity = (ActivityImpl) plan.getFirstActivity();
 		while(getnext){
 			if(activity.equals(plan.getLastActivity())){
 				endTime = plan.getFirstActivity().getEndTime();
 				double [] returnValue = {24*3600-event.getTime()+endTime, 0}; //Letzte activity >> Parkdauer laenger als Rest der Iteration
+				
+				if(actFromCounter.equals(activity)){
+					System.out.println("Aktivitaeten stimmen ueberein");
+				}else{
+					System.out.println("F E H L E R: Aktivitaeten stimmen N I C H T ueberein");
+				}
+				
 				return returnValue;
 			}
 			
-			if(activity.getFacilityId().equals(event.getFacilityId()) && Math.abs(activity.getStartTime()-event.getTime())<1800){
+			if(activity.getFacilityId().equals(event.getFacilityId()) && Math.abs(activity.getStartTime()-event.getTime())<3600){ //!! Nicht zwei activitys am gleichen Ort innerhalb einer Stunde?
 				//gefunden
 				getnext=false;
 			} else{
@@ -470,6 +484,24 @@ public class ParkControl {
 			}
 		}
 
+		
+		if(actFromCounter.equals(activity)){
+			System.out.println("Aktivitaeten stimmen ueberein");
+		}else{
+			System.out.println("F E H L E R: Aktivitaeten stimmen N I C H T ueberein");
+		}
+		*/
+		
+		
+		//Pruefen ob letzte am Tag:
+		if(activity.equals(plan.getLastActivity())){
+			endTime = plan.getFirstActivity().getEndTime();
+			double [] returnValue = {24*3600-event.getTime()+endTime, 0}; //Letzte activity >> Parkdauer laenger als Rest der Iteration
+			return returnValue;
+		}
+		
+
+		
 		// Naechste Car leg nach aktueller activity finden:
 		boolean foundNextCarLeg = false;
 		Leg nextCarLeg=null;
@@ -484,6 +516,8 @@ public class ParkControl {
 				if(act==null){return null;}
 				leg=plan.getNextLeg(act);
 				if(leg==null){
+					System.out.println("F E H L E R letzte activity nicht identifiziert");
+					System.out.println("Person: "+person.getId().toString()+" count: "+actCount);
 					return null; //Scheint letzte Activity zu sein >> Parkdauer laenger als Rest der Iteration
 				}
 			}

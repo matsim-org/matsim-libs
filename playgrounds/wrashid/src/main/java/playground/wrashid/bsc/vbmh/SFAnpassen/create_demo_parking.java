@@ -47,7 +47,7 @@ public class create_demo_parking {
 		Panteile.put("secondary",0.5);
 		EVanteile.put("secondary", 0.2);
 		
-		Panteile.put("Street", 0.05);
+		Panteile.put("Street", 0.2);
 		EVanteile.put("Street", 0.30);
 		
 		Panteile.put("edu", 0.05);
