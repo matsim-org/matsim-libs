@@ -64,8 +64,11 @@ public class TaxiActionCreator
                 final TaxiDropoffStayTask dst = (TaxiDropoffStayTask)task;
                 return new SinglePassengerDropoffActivity(passengerEngine, dst, dst.getRequest());
 
+            case CHARGE_STAY:
+                return new VrpActivity("Charging", (StayTask)task);
+
             case WAIT_STAY:
-                return new VrpActivity("Waiting", (TaxiWaitStayTask)task);
+                return new VrpActivity("Waiting", (StayTask)task);
 
             default:
                 throw new IllegalStateException();

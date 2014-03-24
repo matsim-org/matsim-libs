@@ -135,16 +135,16 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
                     .calculateStats(launcher.context.getVrpData());
             long t1 = System.currentTimeMillis();
 
-            taxiPickupDriveTime.addValue(evaluation.getTaxiPickupDriveTime());
-            percentile95TaxiPickupDriveTime.addValue(evaluation.getTaxiPickupDriveTimeStats()
+            taxiPickupDriveTime.addValue(evaluation.getPickupDriveTime());
+            percentile95TaxiPickupDriveTime.addValue(evaluation.getPickupDriveTimeStats()
                     .getPercentile(95));
-            maxTaxiPickupDriveTime.addValue(evaluation.getMaxTaxiPickupDriveTime());
-            taxiDropoffDriveTime.addValue(evaluation.getTaxiDropoffDriveTime());
-            taxiPickupTime.addValue(evaluation.getTaxiPickupTime());
-            taxiDropoffTime.addValue(evaluation.getTaxiDropoffTime());
-            taxiCruiseTime.addValue(evaluation.getTaxiCruiseTime());
-            taxiWaitTime.addValue(evaluation.getTaxiWaitTime());
-            taxiOverTime.addValue(evaluation.getTaxiOverTime());
+            maxTaxiPickupDriveTime.addValue(evaluation.getMaxPickupDriveTime());
+            taxiDropoffDriveTime.addValue(evaluation.getDropoffDriveTime());
+            taxiPickupTime.addValue(evaluation.getPickupTime());
+            taxiDropoffTime.addValue(evaluation.getDropoffTime());
+            taxiCruiseTime.addValue(evaluation.getCruiseTime());
+            taxiWaitTime.addValue(evaluation.getWaitTime());
+            taxiOverTime.addValue(evaluation.getOverTime());
             passengerWaitTime.addValue(evaluation.getPassengerWaitTime());
             percentile95PassengerWaitTime.addValue(evaluation.getPassengerWaitTimeStats()
                     .getPercentile(95));

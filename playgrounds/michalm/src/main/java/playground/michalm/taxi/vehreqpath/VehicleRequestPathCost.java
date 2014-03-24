@@ -17,42 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer;
+package playground.michalm.taxi.vehreqpath;
 
-import java.util.*;
-
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.util.LinkTimePair;
-
-import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
-
-
-public class VehicleData
+public interface VehicleRequestPathCost
 {
-    public final List<Vehicle> vehicles = new ArrayList<Vehicle>();
-    public final List<LinkTimePair> departures = new ArrayList<LinkTimePair>();
-    public final int idleVehCount;
-    public final int dimension;
-
-
-    public VehicleData(TaxiOptimizerConfiguration optimConfig)
-    {
-        int idleVehs = 0;
-        for (Vehicle v : optimConfig.context.getVrpData().getVehicles()) {
-            LinkTimePair departure = optimConfig.scheduler.getEarliestIdleness(v);
-            //LinkTimePair diversion = scheduler.getClosestDiversion(v);
-
-            if (departure != null) {
-                vehicles.add(v);
-                departures.add(departure);
-
-                if (TaxiSchedulerUtils.isIdle(v)) {
-                    idleVehs++;
-                }
-            }
-        }
-
-        idleVehCount = idleVehs;
-        dimension = vehicles.size();
-    }
+    double getCost(VehicleRequestPath vrp);
 }

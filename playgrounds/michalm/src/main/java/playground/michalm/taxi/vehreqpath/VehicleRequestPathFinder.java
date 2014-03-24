@@ -1,16 +1,11 @@
 package playground.michalm.taxi.vehreqpath;
 
-import java.util.Comparator;
-
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.scheduler.TaxiScheduler;
-
-import com.google.common.base.Function;
-import com.google.common.collect.*;
 
 
 public class VehicleRequestPathFinder
@@ -26,63 +21,65 @@ public class VehicleRequestPathFinder
     }
 
 
-    public Function<Vehicle, VehicleRequestPath> vehToVRPathTransformation(final TaxiRequest req)
+    interface VRPCostCalculator
     {
-        return new Function<Vehicle, VehicleRequestPath>() {
-            public VehicleRequestPath apply(Vehicle veh)
-            {
-            	if (veh == null) {
-            		return null;
-            	}
-            	
-                VrpPathWithTravelData path = calculateVrpPath(veh, req);
-                return path == null ? null : new VehicleRequestPath(veh, req, path);
-            }
-        };
-    }
-
-
-    public Function<TaxiRequest, VehicleRequestPath> reqToVRPathTransformation(final Vehicle veh)
-    {
-        return new Function<TaxiRequest, VehicleRequestPath>() {
-            public VehicleRequestPath apply(TaxiRequest req)
-            {
-                VrpPathWithTravelData path = calculateVrpPath(veh, req);
-                return path == null ? null : new VehicleRequestPath(veh, req, path);
-            }
-        };
+        double calcCost(VehicleRequestPath vrp);
     }
 
 
     public VehicleRequestPath findBestVehicleForRequest(TaxiRequest req,
-            Iterable<Vehicle> vehicles, Comparator<VehicleRequestPath> vrpComparator)
+            Iterable<Vehicle> vehicles, VehicleRequestPathCost vrpCost)
     {
-        if (Iterables.isEmpty(vehicles)) {
-            return null;
+        VehicleRequestPath bestVrp = null;
+        double bestCost = Double.MAX_VALUE;
+
+        for (Vehicle veh : vehicles) {
+            VrpPathWithTravelData path = calculateVrpPath(veh, req);
+
+            if (path == null) {
+                continue;
+            }
+
+            VehicleRequestPath vrp = new VehicleRequestPath(veh, req, path);
+            double cost = vrpCost.getCost(vrp);
+
+            if (cost < bestCost) {
+                bestVrp = vrp;
+                bestCost = cost;
+            }
         }
-        
-        Function<Vehicle, VehicleRequestPath> transformation = vehToVRPathTransformation(req);
-        Iterable<VehicleRequestPath> vrps = Iterables.transform(vehicles, transformation);
-        
-        return Ordering.from(vrpComparator).nullsLast().min(vrps);
+
+        return bestVrp;
     }
 
 
     public VehicleRequestPath findBestRequestForVehicle(Vehicle veh,
-            Iterable<TaxiRequest> unplannedRequests, Comparator<VehicleRequestPath> vrpComparator)
+            Iterable<TaxiRequest> unplannedRequests, VehicleRequestPathCost vrpCost)
     {
-        if (Iterables.isEmpty(unplannedRequests)) {
-            return null;
-        }
-        
-        Function<TaxiRequest, VehicleRequestPath> transformation = reqToVRPathTransformation(veh);
-        Iterable<VehicleRequestPath> vrps = Iterables.transform(unplannedRequests, transformation);
+        VehicleRequestPath bestVrp = null;
+        double bestCost = Double.MAX_VALUE;
 
-        return Ordering.from(vrpComparator).nullsLast().min(vrps);
+        for (TaxiRequest req : unplannedRequests) {
+            VrpPathWithTravelData path = calculateVrpPath(veh, req);
+
+            if (path == null) {
+                continue;
+            }
+
+            VehicleRequestPath vrp = new VehicleRequestPath(veh, req, path);
+            double cost = vrpCost.getCost(vrp);
+
+            if (cost < bestCost) {
+                bestVrp = vrp;
+                bestCost = cost;
+            }
+        }
+
+        return bestVrp;
     }
 
 
-    public VrpPathWithTravelData calculateVrpPath(Vehicle veh, TaxiRequest req)
+    private VrpPathWithTravelData calculateVrpPath(Vehicle veh, TaxiRequest req)
     {
         LinkTimePair departure = scheduler.getEarliestIdleness(veh);
         return departure == null ? null : calculator.calcPath(departure.link, req.getFromLink(),

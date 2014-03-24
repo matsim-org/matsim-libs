@@ -71,6 +71,8 @@ public class TaxiScheduler
         this.delaySpeedupStats = delaySpeedupStats;
     }
 
+    
+    
 
     public LinkTimePair getEarliestIdleness(Vehicle veh)
     {
@@ -89,6 +91,7 @@ public class TaxiScheduler
                 TaxiTask lastTask = Schedules.getLastTask(schedule);
 
                 switch (lastTask.getTaxiTaskType()) {
+                    case CHARGE_STAY:
                     case WAIT_STAY:
                         link = ((StayTask)lastTask).getLink();
                         time = Math.max(lastTask.getBeginTime(), currentTime);//TODO very optimistic!!!
@@ -138,6 +141,7 @@ public class TaxiScheduler
                 TaxiTask currentTask = schedule.getCurrentTask();
 
                 switch (currentTask.getTaxiTaskType()) {
+                    case CHARGE_STAY:
                     case WAIT_STAY:
                         link = ((StayTask)currentTask).getLink();
                         time = currentTime;
@@ -344,6 +348,8 @@ public class TaxiScheduler
                         TaxiTask nextTask = tasks.get(i + 1);
                         switch (nextTask.getTaxiTaskType()) {
                             case PICKUP_DRIVE:
+                            case CHARGE_STAY:
+                            case CRUISE_DRIVE:
                                 double endTime = task.getEndTime();
 
                                 if (endTime <= t) {// may happen if the previous task is delayed
@@ -358,10 +364,45 @@ public class TaxiScheduler
                                 break;
 
                             default:
-                                //maybe in the future: WAIT+CHARGE or WAIT+CRUISE would make sense
-                                //but currently it is not supported
                                 throw new RuntimeException();
                         }
+                    }
+
+                    break;
+                }
+
+                case CHARGE_STAY: {
+                    //THE CURRENT ASSUMPTION IS THAT WE MAY (ACCIDENTALLY) RUN UNDERCHARGED
+                    //MAYBE THIS SHOULD BE CHANGED IN THE FUTURE(???)
+
+                    //but for the moment, we do not bother about cutting down the charging time
+                    //or maybe there should be something like "minimumChargeTime"??
+                    TaxiTask nextTask = tasks.get(i + 1);
+                    switch (nextTask.getTaxiTaskType()) {
+                        case PICKUP_DRIVE:
+                        case CRUISE_DRIVE:
+                            double endTime = task.getEndTime();
+
+                            if (endTime <= t) {// may happen if the previous task is delayed
+                                schedule.removeTask(task);
+                                i--;
+                            }
+                            else {
+                                task.setBeginTime(t);
+                                t = endTime;
+                            }
+
+                            break;
+
+                        case WAIT_STAY:
+                            double duration = task.getEndTime() - task.getBeginTime();
+                            task.setBeginTime(t);
+                            task.setEndTime(Math.min(t + duration, nextTask.getEndTime()));
+
+                        default:
+                            //maybe in the future: WAIT+CHARGE or WAIT+CRUISE would make sense
+                            //but currently it is not supported
+                            throw new RuntimeException();
                     }
 
                     break;
@@ -476,7 +517,10 @@ public class TaxiScheduler
                 double tBegin = schedule.getEndTime();
                 double tEnd = Math.max(tBegin, schedule.getVehicle().getT1());
 
-                if (task.getTaxiTaskType() == TaxiTaskType.WAIT_STAY) {
+                //TODO how to handle CHARGE_TASK???
+
+                if (task.getTaxiTaskType() == TaxiTaskType.WAIT_STAY
+                        || task.getTaxiTaskType() == TaxiTaskType.CHARGE_STAY) {
                     task.setEndTime(tEnd);//extend WaitTask
                 }
                 else {

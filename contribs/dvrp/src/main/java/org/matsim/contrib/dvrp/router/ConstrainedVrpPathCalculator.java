@@ -27,25 +27,25 @@ import com.google.common.base.Predicate;
 public class ConstrainedVrpPathCalculator
     implements VrpPathCalculator
 {
-    VrpPathCalculator createVrpPathCalculatorWithMaxTravelCost(VrpPathCalculator calculator,
-            final double maxTravelCost)
+    VrpPathCalculator createVrpPathCalculatorWithTravelCostLimit(VrpPathCalculator calculator,
+            final double travelCostLimit)
     {
         return new ConstrainedVrpPathCalculator(calculator, new Predicate<VrpPathWithTravelData>() {
             public boolean apply(VrpPathWithTravelData path)
             {
-                return path.getTravelCost() <= maxTravelCost;
+                return path.getTravelCost() <= travelCostLimit;
             }
         });
     }
 
 
-    VrpPathCalculator createVrpPathCalculatorWithMaxTravelTime(VrpPathCalculator calculator,
-            final double maxTravelTime)
+    VrpPathCalculator createVrpPathCalculatorWithTravelTimeLimit(VrpPathCalculator calculator,
+            final double travelTimeLimit)
     {
         return new ConstrainedVrpPathCalculator(calculator, new Predicate<VrpPathWithTravelData>() {
             public boolean apply(VrpPathWithTravelData path)
             {
-                return path.getTravelTime() <= maxTravelTime;
+                return path.getTravelTime() <= travelTimeLimit;
             }
         });
     }

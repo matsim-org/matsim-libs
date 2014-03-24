@@ -17,42 +17,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer;
+package playground.michalm.taxi.optimizer.query;
 
-import java.util.*;
-
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.util.LinkTimePair;
-
-import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
+import java.util.Collections;
 
 
-public class VehicleData
+public class QueryUtils
 {
-    public final List<Vehicle> vehicles = new ArrayList<Vehicle>();
-    public final List<LinkTimePair> departures = new ArrayList<LinkTimePair>();
-    public final int idleVehCount;
-    public final int dimension;
-
-
-    public VehicleData(TaxiOptimizerConfiguration optimConfig)
+    public static <V> Iterable<V> toIterableExcludingNull(V elem)
     {
-        int idleVehs = 0;
-        for (Vehicle v : optimConfig.context.getVrpData().getVehicles()) {
-            LinkTimePair departure = optimConfig.scheduler.getEarliestIdleness(v);
-            //LinkTimePair diversion = scheduler.getClosestDiversion(v);
-
-            if (departure != null) {
-                vehicles.add(v);
-                departures.add(departure);
-
-                if (TaxiSchedulerUtils.isIdle(v)) {
-                    idleVehs++;
-                }
-            }
+        if (elem == null) {
+            return Collections.emptySet();
         }
-
-        idleVehCount = idleVehs;
-        dimension = vehicles.size();
+        else {
+            return Collections.singleton(elem);
+        }
     }
 }

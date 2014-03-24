@@ -19,8 +19,6 @@
 
 package playground.michalm.taxi.optimizer.query;
 
-import java.util.Collections;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.DistanceUtils;
@@ -67,6 +65,6 @@ public class StraightLineNearestVehicleFinder
     public Iterable<Vehicle> filterVehiclesForRequest(Iterable<Vehicle> vehicles,
             TaxiRequest request)
     {
-        return Collections.singletonList(findVehicleForRequest(vehicles, request));
+        return QueryUtils.toIterableExcludingNull(findVehicleForRequest(vehicles, request));
     }
 }

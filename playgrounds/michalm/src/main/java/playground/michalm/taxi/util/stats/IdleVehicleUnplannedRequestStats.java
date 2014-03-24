@@ -29,7 +29,7 @@ import org.matsim.core.mobsim.framework.listeners.*;
 
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.util.TaxicabUtils;
+import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
 
 
 public class IdleVehicleUnplannedRequestStats
@@ -60,7 +60,7 @@ public class IdleVehicleUnplannedRequestStats
 
             int idleVehCount = 0;
             for (Vehicle v : context.getVrpData().getVehicles()) {
-                if (TaxicabUtils.isIdle(v)) {
+                if (TaxiSchedulerUtils.isIdle(v)) {
                     idleVehCount++;
                 }
             }

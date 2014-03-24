@@ -54,7 +54,7 @@ public class OneTaxiLauncher
         plansFileName = dirName + "one_taxi/one_taxi_population.xml";
         vehiclesFileName = dirName + "one_taxi/one_taxi_vehicles.xml";
 
-        otfVis = true;//or false -- turning ON/OFF visualization
+        otfVis = !true;//or false -- turning ON/OFF visualization
 
         scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName);
     }

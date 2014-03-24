@@ -76,6 +76,18 @@ public class Schedules
     }
 
 
+    public static boolean isSecondTask(Task task)
+    {
+        return task.getTaskIdx() == 1;
+    }
+
+
+    public static boolean isNextToLastTask(Task task)
+    {
+        return task.getTaskIdx() + 2 == task.getSchedule().getTaskCount();
+    }
+
+
     public static boolean isLastTask(Task task)
     {
         return task.getTaskIdx() + 1 == task.getSchedule().getTaskCount();

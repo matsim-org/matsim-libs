@@ -20,12 +20,6 @@
 package playground.michalm.taxi.util;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.*;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-
-import playground.michalm.taxi.schedule.*;
-import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
-import playground.michalm.taxi.scheduler.TaxiScheduler;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -33,63 +27,9 @@ import com.google.common.collect.Iterables;
 
 public class TaxicabUtils
 {
-    public static final Predicate<Vehicle> IS_IDLE = new Predicate<Vehicle>() {
-        public boolean apply(Vehicle vehicle)
-        {
-            return isIdle(vehicle);
-        }
-    };
-
-
-    public static Predicate<Vehicle> createCanBeScheduled(final TaxiScheduler scheduler)
-    {
-        return new Predicate<Vehicle>() {
-            public boolean apply(Vehicle vehicle)
-            {
-                return canBeScheduled(vehicle, scheduler);
-            }
-        };
-    }
-
-
-    public static boolean isIdle(Vehicle vehicle)
-    {
-        Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(vehicle);
-
-        if (schedule.getStatus() != ScheduleStatus.STARTED) {
-            return false;
-        }
-
-        TaxiTask currentTask = schedule.getCurrentTask();
-
-        return Schedules.isLastTask(currentTask)
-                && currentTask.getTaxiTaskType() == TaxiTaskType.WAIT_STAY;
-    }
-
-
-    public static boolean canBeScheduled(Vehicle vehicle, TaxiScheduler scheduler)
-    {
-        return scheduler.getEarliestIdleness(vehicle) != null;
-    }
-
-
     public static int countVehicles(Iterable<? extends Vehicle> vehicles,
             Predicate<Vehicle> predicate)
     {
         return Iterables.size(Iterables.filter(vehicles, predicate));
-    }
-
-
-    public static boolean isCurrentTaskDelayed(Schedule<TaxiTask> schedule, double now)
-    {
-        TaxiTask currentTask = schedule.getCurrentTask();
-        double delay = now - currentTask.getEndTime();
-
-        if (delay < 0) {
-            return false;
-        }
-        else {
-            throw new IllegalStateException();
-        }
     }
 }

@@ -29,8 +29,7 @@ import org.matsim.contrib.dvrp.util.*;
 import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.query.*;
-import playground.michalm.taxi.scheduler.TaxiScheduler;
-import playground.michalm.taxi.util.TaxicabUtils;
+import playground.michalm.taxi.scheduler.*;
 
 import com.google.common.collect.Iterables;
 
@@ -40,7 +39,7 @@ import com.google.common.collect.Iterables;
  */
 
 public class IdleRankVehicleFinder
-    implements VehicleFinder, VehicleFilter
+    implements VehicleFilter
 {
     private final MatsimVrpContext context;
     private final TaxiScheduler scheduler;
@@ -86,7 +85,6 @@ public class IdleRankVehicleFinder
     }
 
 
-    @Override
     public Vehicle findVehicleForRequest(Iterable<Vehicle> vehicles, TaxiRequest request)
     {
         if (this.useChargeOverTime) {
@@ -105,7 +103,7 @@ public class IdleRankVehicleFinder
     public Iterable<Vehicle> filterVehiclesForRequest(Iterable<Vehicle> vehicles,
             TaxiRequest request)
     {
-        return Collections.singleton(findVehicleForRequest(vehicles, request));
+        return QueryUtils.toIterableExcludingNull(findVehicleForRequest(vehicles, request));
     }
 
 
@@ -150,7 +148,7 @@ public class IdleRankVehicleFinder
         Collections.shuffle(context.getVrpData().getVehicles(), rnd);
 
         for (Vehicle veh : Iterables.filter(context.getVrpData().getVehicles(),
-                TaxicabUtils.IS_IDLE)) {
+                TaxiSchedulerUtils.IS_IDLE)) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;
@@ -173,7 +171,7 @@ public class IdleRankVehicleFinder
         Collections.shuffle(context.getVrpData().getVehicles(), rnd);
 
         for (Vehicle veh : Iterables.filter(context.getVrpData().getVehicles(),
-                TaxicabUtils.IS_IDLE)) {
+                TaxiSchedulerUtils.IS_IDLE)) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;
@@ -206,7 +204,7 @@ public class IdleRankVehicleFinder
         //          double bestDistance = Double.MAX_VALUE;
         double bestDistance = Double.MAX_VALUE / 2;
         for (Vehicle veh : Iterables.filter(context.getVrpData().getVehicles(),
-                TaxicabUtils.IS_IDLE)) {
+                TaxiSchedulerUtils.IS_IDLE)) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;

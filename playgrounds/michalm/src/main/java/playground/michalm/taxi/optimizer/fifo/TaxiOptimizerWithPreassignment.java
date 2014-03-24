@@ -28,7 +28,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
 import playground.michalm.taxi.scheduler.*;
 import playground.michalm.taxi.vehreqpath.*;
@@ -65,10 +65,10 @@ public class TaxiOptimizerWithPreassignment
         return new VehicleRequestPathFinder(calculator, scheduler) {
             @Override
             public VehicleRequestPath findBestVehicleForRequest(TaxiRequest req,
-                    Iterable<Vehicle> vehicles, Comparator<VehicleRequestPath> vrpComparator)
+                    Iterable<Vehicle> vehicles, VehicleRequestPathCost vrpCost)
             {
                 Vehicle veh = reqIdToVehMap.get(req.getId());
-                return new VehicleRequestPath(veh, req, calculateVrpPath(veh, req));
+                return super.findBestVehicleForRequest(req, Collections.singleton(veh), vrpCost);
             }
         };
     }

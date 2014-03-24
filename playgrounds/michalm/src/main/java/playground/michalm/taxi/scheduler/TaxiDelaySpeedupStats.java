@@ -36,6 +36,8 @@ public class TaxiDelaySpeedupStats
     private final SummaryStatistics dropoffDriveSpeedupStats = new SummaryStatistics();
     private final SummaryStatistics cruiseDelayStats = new SummaryStatistics();
     private final SummaryStatistics cruiseSpeedupStats = new SummaryStatistics();
+    private final SummaryStatistics chargeDelayStats = new SummaryStatistics();
+    private final SummaryStatistics chargeSpeedupStats = new SummaryStatistics();
     private final SummaryStatistics waitDelayStats = new SummaryStatistics();
     private final SummaryStatistics waitSpeedupStats = new SummaryStatistics();
     private final SummaryStatistics pickupDelayStats = new SummaryStatistics();
@@ -72,6 +74,10 @@ public class TaxiDelaySpeedupStats
 
             case CRUISE_DRIVE:
                 updateStats(delay, cruiseDelayStats, cruiseSpeedupStats);
+                break;
+
+            case CHARGE_STAY:
+                updateStats(delay, chargeDelayStats, chargeSpeedupStats);
                 break;
 
             case WAIT_STAY:
@@ -118,6 +124,8 @@ public class TaxiDelaySpeedupStats
         printSingleStats(pw, dropoffDriveSpeedupStats, "delivery drive speedup");
         printSingleStats(pw, cruiseDelayStats, "cruise delay");
         printSingleStats(pw, cruiseSpeedupStats, "cruise speedup");
+        printSingleStats(pw, chargeDelayStats, "charge delay");
+        printSingleStats(pw, chargeSpeedupStats, "charge speedup");
         printSingleStats(pw, waitDelayStats, "wait delay");
         printSingleStats(pw, waitSpeedupStats, "wait speedup");
         printSingleStats(pw, pickupDelayStats, "pickup delay");
@@ -137,6 +145,8 @@ public class TaxiDelaySpeedupStats
         dropoffDriveSpeedupStats.clear();
         cruiseDelayStats.clear();
         cruiseSpeedupStats.clear();
+        chargeDelayStats.clear();
+        chargeSpeedupStats.clear();
         waitDelayStats.clear();
         waitSpeedupStats.clear();
         pickupDelayStats.clear();

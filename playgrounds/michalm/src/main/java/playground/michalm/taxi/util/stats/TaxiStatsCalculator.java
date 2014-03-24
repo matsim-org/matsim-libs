@@ -56,26 +56,26 @@ public class TaxiStatsCalculator
 
             switch (t.getTaxiTaskType()) {
                 case PICKUP_DRIVE:
-                    eval.taxiPickupDriveTime += time;
+                    eval.pickupDriveTime += time;
 
-                    if (eval.maxTaxiPickupDriveTime < time) {
-                        eval.maxTaxiPickupDriveTime = time;
+                    if (eval.maxPickupDriveTime < time) {
+                        eval.maxPickupDriveTime = time;
                     }
 
-                    eval.taxiPickupDriveTimeStats.addValue(time);
+                    eval.pickupDriveTimeStats.addValue(time);
 
                     break;
 
                 case DROPOFF_DRIVE:
-                    eval.taxiDropoffDriveTime += time;
+                    eval.dropoffDriveTime += time;
                     break;
 
                 case CRUISE_DRIVE:
-                    eval.taxiCruiseTime += time;
+                    eval.cruiseTime += time;
                     break;
 
                 case PICKUP_STAY:
-                    eval.taxiPickupTime += time;
+                    eval.pickupTime += time;
 
                     Request req = ((TaxiPickupStayTask)t).getRequest();
                     double waitTime = Math.max(t.getBeginTime() - req.getT0(), 0);
@@ -90,78 +90,88 @@ public class TaxiStatsCalculator
                     break;
 
                 case DROPOFF_STAY:
-                    eval.taxiDropoffTime += time;
+                    eval.dropoffTime += time;
                     break;
 
+                case CHARGE_STAY:
+                    eval.chargeTime += time;
+                    
                 case WAIT_STAY:
-                    eval.taxiWaitTime += time;
+                    eval.waitTime += time;
             }
         }
 
         double latestValidEndTime = schedule.getVehicle().getT1();
         double actualEndTime = schedule.getEndTime();
 
-        eval.taxiOverTime += Math.max(actualEndTime - latestValidEndTime, 0);
+        eval.overTime += Math.max(actualEndTime - latestValidEndTime, 0);
     }
 
 
     public static class TaxiStats
     {
-        private double taxiPickupDriveTime;
-        private double taxiDropoffDriveTime;
-        private double taxiPickupTime;
-        private double taxiDropoffTime;
-        private double taxiCruiseTime;
-        private double taxiWaitTime;
-        private double taxiOverTime;
+        private double pickupDriveTime;
+        private double dropoffDriveTime;
+        private double pickupTime;
+        private double dropoffTime;
+        private double cruiseTime;
+        private double chargeTime;
+        private double waitTime;
+        private double overTime;
         private double passengerWaitTime;
 
-        private double maxTaxiPickupDriveTime;
+        private double maxPickupDriveTime;
         private double maxPassengerWaitTime;
 
-        private final DescriptiveStatistics taxiPickupDriveTimeStats = new DescriptiveStatistics();
+        private final DescriptiveStatistics pickupDriveTimeStats = new DescriptiveStatistics();
         private final DescriptiveStatistics passengerWaitTimeStats = new DescriptiveStatistics();
 
 
-        public double getTaxiPickupDriveTime()
+        public double getPickupDriveTime()
         {
-            return taxiPickupDriveTime;
+            return pickupDriveTime;
         }
 
 
-        public double getTaxiDropoffDriveTime()
+        public double getDropoffDriveTime()
         {
-            return taxiDropoffDriveTime;
+            return dropoffDriveTime;
         }
 
 
-        public double getTaxiPickupTime()
+        public double getPickupTime()
         {
-            return taxiPickupTime;
+            return pickupTime;
         }
 
 
-        public double getTaxiDropoffTime()
+        public double getDropoffTime()
         {
-            return taxiDropoffTime;
+            return dropoffTime;
         }
 
 
-        public double getTaxiCruiseTime()
+        public double getCruiseTime()
         {
-            return taxiCruiseTime;
+            return cruiseTime;
+        }
+        
+        
+        public double getChargeTime()
+        {
+            return chargeTime;
         }
 
 
-        public double getTaxiWaitTime()
+        public double getWaitTime()
         {
-            return taxiWaitTime;
+            return waitTime;
         }
 
 
-        public double getTaxiOverTime()
+        public double getOverTime()
         {
-            return taxiOverTime;
+            return overTime;
         }
 
 
@@ -171,9 +181,9 @@ public class TaxiStatsCalculator
         }
 
 
-        public double getMaxTaxiPickupDriveTime()
+        public double getMaxPickupDriveTime()
         {
-            return maxTaxiPickupDriveTime;
+            return maxPickupDriveTime;
         }
 
 
@@ -183,9 +193,9 @@ public class TaxiStatsCalculator
         }
 
 
-        public DescriptiveStatistics getTaxiPickupDriveTimeStats()
+        public DescriptiveStatistics getPickupDriveTimeStats()
         {
-            return taxiPickupDriveTimeStats;
+            return pickupDriveTimeStats;
         }
 
 
@@ -208,12 +218,12 @@ public class TaxiStatsCalculator
         @Override
         public String toString()
         {
-            return new StringBuilder().append(taxiPickupDriveTime).append('\t') //
-                    .append(maxTaxiPickupDriveTime).append('\t') //
-                    .append(taxiDropoffDriveTime).append('\t') //
-                    .append(taxiPickupTime).append('\t') //
-                    .append(taxiDropoffTime).append('\t') //
-                    .append(taxiWaitTime).append('\t') //
+            return new StringBuilder().append(pickupDriveTime).append('\t') //
+                    .append(maxPickupDriveTime).append('\t') //
+                    .append(dropoffDriveTime).append('\t') //
+                    .append(pickupTime).append('\t') //
+                    .append(dropoffTime).append('\t') //
+                    .append(waitTime).append('\t') //
                     .append(passengerWaitTime).append('\t') //
                     .append(maxPassengerWaitTime).toString();
         }

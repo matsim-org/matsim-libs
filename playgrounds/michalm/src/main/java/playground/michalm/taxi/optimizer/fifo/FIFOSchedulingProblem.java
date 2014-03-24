@@ -23,19 +23,19 @@ import java.util.*;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
-import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
+import playground.michalm.taxi.vehreqpath.*;
 
 
 public class FIFOSchedulingProblem
 {
     private final TaxiOptimizerConfiguration optimConfig;
-    private final Comparator<VehicleRequestPath> vrpComparator;
+    private final VehicleRequestPathCost vrpComparator;
 
 
     public FIFOSchedulingProblem(TaxiOptimizerConfiguration optimConfig)
     {
         this.optimConfig = optimConfig;
-        this.vrpComparator = optimConfig.getVrpComparator();
+        this.vrpComparator = optimConfig.getVrpCost();
     }
 
 

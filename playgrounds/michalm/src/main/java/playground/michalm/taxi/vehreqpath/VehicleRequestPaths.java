@@ -5,13 +5,35 @@ import java.util.Comparator;
 
 public class VehicleRequestPaths
 {
+    //    public static final Predicate<VehicleRequestPath> BELOW_TRIP_TIME_LIMIT = new Predicate<VehicleRequestPath>() {
+    //        @Override
+    //        public boolean apply(VehicleRequestPath vrp)
+    //        {
+    //            return vrp.path.getTravelCost();
+    //        }
+    //    };
+
+    public static final VehicleRequestPathCost TW_COST = new VehicleRequestPathCost() {
+        @Override
+        public double getCost(VehicleRequestPath vrp)
+        {
+            return VehicleRequestPaths.calculatePickupBeginTime(vrp) - vrp.request.getT0();
+        }
+    };
+
+    public static final VehicleRequestPathCost TP_COST = new VehicleRequestPathCost() {
+        @Override
+        public double getCost(VehicleRequestPath vrp)
+        {
+            return VehicleRequestPaths.calculatePickupBeginTime(vrp) - vrp.path.getDepartureTime();
+        }
+    };
+
     public static final Comparator<VehicleRequestPath> TW_COMPARATOR = new Comparator<VehicleRequestPath>() {
         @Override
         public int compare(VehicleRequestPath vrp1, VehicleRequestPath vrp2)
         {
-            double tw1 = calculatePickupBeginTime(vrp1) - vrp1.request.getT0();
-            double tw2 = calculatePickupBeginTime(vrp2) - vrp2.request.getT0();
-            return Double.compare(tw1, tw2);
+            return Double.compare(TW_COST.getCost(vrp1), TW_COST.getCost(vrp2));
         }
     };
 
@@ -19,9 +41,7 @@ public class VehicleRequestPaths
         @Override
         public int compare(VehicleRequestPath vrp1, VehicleRequestPath vrp2)
         {
-            double tw1 = calculatePickupBeginTime(vrp1) - vrp1.path.getDepartureTime();
-            double tw2 = calculatePickupBeginTime(vrp2) - vrp2.path.getDepartureTime();
-            return Double.compare(tw1, tw2);
+            return Double.compare(TP_COST.getCost(vrp1), TP_COST.getCost(vrp2));
         }
     };
 

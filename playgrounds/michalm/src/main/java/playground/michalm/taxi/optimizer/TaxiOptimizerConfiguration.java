@@ -1,7 +1,5 @@
 package playground.michalm.taxi.optimizer;
 
-import java.util.Comparator;
-
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 
@@ -44,14 +42,14 @@ public class TaxiOptimizerConfiguration
     }
 
 
-    public Comparator<VehicleRequestPath> getVrpComparator()
+    public VehicleRequestPathCost getVrpCost()
     {
         switch (goal) {
             case MIN_WAIT_TIME:
-                return VehicleRequestPaths.TW_COMPARATOR;
+                return VehicleRequestPaths.TW_COST;
 
             case MIN_PICKUP_TIME:
-                return VehicleRequestPaths.TP_COMPARATOR;
+                return VehicleRequestPaths.TP_COST;
 
             case NULL:
                 return null;

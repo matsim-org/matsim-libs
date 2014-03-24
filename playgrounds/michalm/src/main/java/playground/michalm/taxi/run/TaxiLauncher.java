@@ -80,6 +80,7 @@ import playground.michalm.util.RunningVehicleRegister;
     /*package*/AlgorithmConfig algorithmConfig;
     /*package*/Boolean onlineVehicleTracker;
     /*package*/Boolean advanceRequestSubmission;
+    /*package*/Double pickupTripTimeLimit;
 
     /*package*/Boolean destinationKnown;
     /*package*/Double pickupDuration;
@@ -117,6 +118,7 @@ import playground.michalm.util.RunningVehicleRegister;
         algorithmConfig = AlgorithmConfig.NOS_DSE_SL;
         onlineVehicleTracker = true;
         advanceRequestSubmission = false;
+        pickupTripTimeLimit = 10 * 60.;//10 minutes
 
         //scheduler:
         destinationKnown = false;

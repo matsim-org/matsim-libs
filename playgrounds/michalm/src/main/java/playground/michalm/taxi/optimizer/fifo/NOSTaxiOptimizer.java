@@ -142,7 +142,7 @@ public class NOSTaxiOptimizer
                     req);
 
             VehicleRequestPath best = optimConfig.vrpFinder.findBestVehicleForRequest(req,
-                    filteredVehs, VehicleRequestPaths.TW_COMPARATOR);
+                    filteredVehs, VehicleRequestPaths.TW_COST);
 
             if (best == null) {
                 return;//no idle vehicles
@@ -163,7 +163,7 @@ public class NOSTaxiOptimizer
                     unplannedRequests, veh);
 
             VehicleRequestPath best = optimConfig.vrpFinder.findBestRequestForVehicle(veh,
-                    filteredReqs, VehicleRequestPaths.TP_COMPARATOR);
+                    filteredReqs, VehicleRequestPaths.TP_COST);
 
             if (best == null) {
                 return;//no unplanned requests
@@ -202,6 +202,7 @@ public class NOSTaxiOptimizer
 
         switch (taxiSchedule.getCurrentTask().getTaxiTaskType()) {
             case WAIT_STAY:
+            case CHARGE_STAY:
                 idleVehicles.add(schedule.getVehicle());
                 requiresReoptimization = true;
                 break;

@@ -23,6 +23,7 @@ import org.matsim.contrib.dvrp.MatsimVrpContext;
 
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
+import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
 import playground.michalm.taxi.util.*;
 
 
@@ -32,7 +33,7 @@ public class TaxiOptimizationValidation
     {
         TaxiData taxiData = (TaxiData)context.getVrpData();
 
-        if (TaxicabUtils.countVehicles(taxiData.getVehicles(), TaxicabUtils.IS_IDLE) == 0) {
+        if (TaxicabUtils.countVehicles(taxiData.getVehicles(), TaxiSchedulerUtils.IS_IDLE) == 0) {
             return;//OK
         }
 
