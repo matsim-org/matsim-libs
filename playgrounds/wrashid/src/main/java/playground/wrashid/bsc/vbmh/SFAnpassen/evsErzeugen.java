@@ -18,30 +18,29 @@ public class evsErzeugen {
 		// TODO Auto-generated method stub
 		EVList evList = new EVList();
 		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("input/SF_PLUS/config_SF_PLUS_3.xml"));
-		String outputFile="input/SF_PLUS/VM/evs.xml";
-		int i=0;
-		int j=0;
+		String evOutputFile="input/SF_PLUS/VM/evs.xml";
+		int ev_i=0;
+		int ev_j=0;
 		for(Person person : scenario.getPopulation().getPersons().values()){
 			if(zufall.nextDouble()<probabilityOfEVOwnership(person)){
 				EV ev = new EV();
-				ev.setId(Integer.toString(i));
+				ev.setId(Integer.toString(ev_i));
 				ev.setOwnerPersonId(person.getId().toString());
 				ev.batteryCapacity=18.7;
 				ev.consumptionPerHundredKlicks=11.7;
 				ev.evType="w-Zo"; 
 				evList.addEV(ev);
-				System.out.println(i);
+				System.out.println(ev_i);
 				System.out.println(evList.getOwnerMap().size());
-				i++;
+				ev_i++;
 				
 			}
-			j++;
+			ev_j++;
 			
 		}
-		evList.getOwnerMap().get(3);
 		System.out.println(evList.getOwnerMap().values().size());
-		System.out.println("Anzahl Agents insgesammt :"+j);
-		writer.write(evList, outputFile);
+		System.out.println("Anzahl Agents insgesammt :"+ev_j);
+		writer.write(evList, evOutputFile);
 	
 			
 	}

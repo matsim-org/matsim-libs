@@ -27,6 +27,7 @@ public class agentsentfernen {
 			System.out.println(pa.getCarAvail());
 			if(pa.getCarAvail()!="never" && zufall.nextDouble()<0.02){
 				population.addPerson(pa);
+				
 				System.out.println("Autofahrer hinzugefuegt");
 				i+=1;
 			}

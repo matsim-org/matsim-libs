@@ -2,6 +2,7 @@ package playground.wrashid.bsc.vbmh.SFAnpassen;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
@@ -13,7 +14,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
@@ -25,6 +28,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.households.Household;
 
 import playground.wrashid.PHEV.parking.data.Facility;
+import playground.wrashid.bsc.vbmh.vmEV.EV;
+import playground.wrashid.bsc.vbmh.vmEV.EVList;
+import playground.wrashid.bsc.vbmh.vmEV.EVListWriter;
 
 public class agentsInAgglo {
 
@@ -36,21 +42,79 @@ public class agentsInAgglo {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
+
+		// E I N S T E L L U N G EN
+		String scenarioName = "140324_1";
 		
+		int anzahl_agents = 1500;
+		String networkFile = "input/SF_PLUS/network/siouxFalls_network_OSM_brookings.xml";
+		String inputPricingFile = "input/SF_PLUS/pricing/parking_pricing_models_demo.xml";
+		String outputFileF = "input/SF_PLUS/Scenario/"+scenarioName+"/facilities.xml";
+		String outputFileP = "input/SF_PLUS/Scenario/"+scenarioName+"/population.xml";
+		String evOutputFile = "input/SF_PLUS/Scenario/"+scenarioName+"/evs.xml";
+		String newConfigFileName = "input/SF_PLUS/Scenario/"+scenarioName+"/config.xml";
+		String parkingOutput = "input/SF_PLUS/Scenario/"+scenarioName+"/parking.xml";
+		//--
+		String inputFileConf = "input/Original/config_SF_default.xml";
+		String inputFileLeereConf = "input/Schreiben/defaultconfig.xml";
+		//--------------------------------
+		
+		
+		// A G G L O 
 		double xCoord = 678773;
 		double yCoord = 4908813;
 		CoordImpl brookings = new CoordImpl(xCoord, yCoord);
+		//------------------
+				
 		
 		
-		String outputFileF = "input/SF_PLUS/VM/facilities_brookings.xml";
-		String outputFileP = "input/SF_PLUS/VM/population_brookings.xml";
-		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("input/SF_PLUS/config_SF_PLUS_2.xml"));
+		
+		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(inputFileConf));
+		
+		//neue config anpassen
+		Config newConfig = ConfigUtils.loadConfig(inputFileLeereConf);
+		newConfig.getModule("controler").addParam("outputDirectory", "output/"+scenarioName);
+		newConfig.getModule("network").addParam("inputNetworkFile", networkFile);
+		newConfig.getModule("plans").addParam("inputPlansFile", outputFileP);
+		newConfig.getModule("facilities").addParam("inputFacilitiesFile", outputFileF);
+		newConfig.getModule("VM_park").addParam("inputParkingFile", parkingOutput);
+		newConfig.getModule("VM_park").addParam("inputPricingFile", inputPricingFile);
+		newConfig.getModule("VM_park").addParam("inputEVFile", evOutputFile);
+		ConfigWriter configWriter = new ConfigWriter(newConfig);
+		configWriter.write(newConfigFileName);
+		//--
 		
 		
+		
+		//Reduzieren
+		Random zufall = new Random();
+		int i = 0;
+		Map<Id, ? extends Person> personMap = scenario.getPopulation().getPersons();
+		LinkedList <Id> personsNotUsed = new LinkedList <Id>();
+		for (Person p : scenario.getPopulation().getPersons().values()) {
+			PersonImpl pa = (PersonImpl) p;
+			System.out.println(pa.getCarAvail());
+			if(pa.getCarAvail()!="never" && zufall.nextDouble()<0.02 && i<anzahl_agents){
+				//population.addPerson(pa);
+				
+				System.out.println("Autofahrer hinzugefuegt");
+				i+=1;
+			}else{
+				personsNotUsed.add(pa.getId());
+			}
+		}
+		
+		for (Id personId : personsNotUsed){
+			personMap.remove(personId);
+		}
+		
+		
+		
+
+		//zuegeln:
 		
 		int countAgents = 0;
-		
-	
+			
 		for(ActivityFacility homeFacility : scenario.getActivityFacilities().getFacilitiesForActivityType("home").values()){
 			
 			homes.put(homeFacility.getId(), new LinkedList<Person>());
@@ -72,7 +136,6 @@ public class agentsInAgglo {
 			
 		}
 		
-		Random zufall = new Random();
 		
 		for(ActivityFacility homeFacility : scenario.getActivityFacilities().getFacilitiesForActivityType("home").values()){
 			
@@ -102,6 +165,44 @@ public class agentsInAgglo {
 		fwriter.write(outputFileF);
 		
 		System.out.println("Achtung: Ueberschreibt nicht richtig; Ausgabedatei sollte vorher geloescht werden.");
+		
+		
+		
+		// EVs
+		EVListWriter evWriter = new EVListWriter();
+		EVList evList = new EVList();
+		int ev_i=0;
+		int ev_j=0;
+		for(Person person : scenario.getPopulation().getPersons().values()){
+			if(zufall.nextDouble()<probabilityOfEVOwnership(person)){
+				EV ev = new EV();
+				ev.setId(Integer.toString(ev_i));
+				ev.setOwnerPersonId(person.getId().toString());
+				ev.batteryCapacity=18.7;
+				ev.consumptionPerHundredKlicks=11.7;
+				ev.evType="w-Zo"; 
+				evList.addEV(ev);
+				System.out.println(ev_i);
+				System.out.println(evList.getOwnerMap().size());
+				ev_i++;
+				
+			}
+			ev_j++;
+			
+		}
+		System.out.println(evList.getOwnerMap().values().size());
+		System.out.println("Anzahl Agents insgesammt :"+ev_j);
+		evWriter.write(evList, evOutputFile);
+		
+		
+		
+		
+		
+		//Parkplaetze bauen:
+		
+		String [] parameter = {newConfigFileName, parkingOutput};
+		create_demo_parking.main(parameter);
+		
 		
 		
 
@@ -143,6 +244,11 @@ public class agentsInAgglo {
 		
 	}
 	
+	
+	static double probabilityOfEVOwnership(Person person){
+		
+		return 0.2; //!! BESSER MACHEN
+	}
 	
 	
 	

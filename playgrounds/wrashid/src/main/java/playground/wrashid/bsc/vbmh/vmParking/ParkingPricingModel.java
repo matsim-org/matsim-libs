@@ -20,7 +20,7 @@ public class ParkingPricingModel {
 	
 	
 	public double calculateParkingPrice(double duration, boolean ev){
-		duration = duration/60; //von Sekunden auf Minuten
+		duration = duration/3600; //von Sekunden auf Minuten
 		double price = 0;
 		
 		if (ev){

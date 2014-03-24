@@ -26,34 +26,60 @@ import playground.wrashid.bsc.vbmh.vmParking.Parking;
 import playground.wrashid.bsc.vbmh.vmParking.ParkingMap;
 import playground.wrashid.bsc.vbmh.vmParking.ParkingWriter;
 public class create_demo_parking {
-	static HashMap <String,Double> Panteile = new HashMap<String,Double>();	//Anzahl Parkplaetze / what ever nach P typ
-	static HashMap <String,Double> EVanteile = new HashMap<String,Double>(); //Anteil EV Nach P Typ
+	
+	static HashMap <String,Double> pAnteile = new HashMap<String,Double>();	//Anzahl Parkplaetze / what ever nach P typ
+	static HashMap <String,Double> evAnteile = new HashMap<String,Double>(); //Anteil EV Nach P Typ
+	
+	static HashMap <String,Integer> preiseEVSpots = new HashMap<String,Integer>();	//Preismodell EV nach P typ
+	static HashMap <String,Integer> preiseNEVSpots = new HashMap<String,Integer>(); //Preismodell NEV Nach P Typ
+	
+	static HashMap <String,Double> chargingRates = new HashMap<String,Double>(); //Preismodell NEV Nach P Typ
+
+	
 	static Scenario scenario;
 	static HashMap <String,Integer> anzahlArbeiter = new HashMap<String, Integer>();
 	static int diagZaehlEV=0;
 	static int diagZaehlNEV=0;
 	public static void main(String[] args) {
-		String inputFile = "input/SF_PLUS/config_SF_PLUS_3.xml";
-		String outputFile = "input/SF_PLUS/VM/parkings_demo.xml";
 		
-		Panteile.put("home", 1.0);
-		EVanteile.put("home", 0.0);
 		
+		String inputFile; // = "input/SF_PLUS/config_SF_PLUS_3.xml";
+		String outputFile; // = "input/SF_PLUS/VM/parkings_demo.xml";
+		
+		inputFile=args[0];
+		outputFile=args[1];
+		
+		
+		pAnteile.put("home", 1.0);
+		evAnteile.put("home", 0.0);
+		preiseEVSpots.put("home", 0);
+		preiseNEVSpots.put("home", 0);
+		chargingRates.put("home", 2.3);
 		
 		// Alle folgenden relativ zu Agents die in der Facility arbeiten
-		Panteile.put("work", 0.5);
-		EVanteile.put("work", 0.20);
+		pAnteile.put("work", 0.5);
+		evAnteile.put("work", 0.20);
+		preiseEVSpots.put("work", 3);
+		preiseNEVSpots.put("work", 4);
+		chargingRates.put("work", 3.6);
 		
-		Panteile.put("secondary",0.5);
-		EVanteile.put("secondary", 0.2);
+		pAnteile.put("secondary",0.5);
+		evAnteile.put("secondary", 0.2);
+		preiseEVSpots.put("secondary", 5);
+		preiseNEVSpots.put("secondary", 6);
+		chargingRates.put("secondary", 8.04);
 		
-		Panteile.put("Street", 0.2);
-		EVanteile.put("Street", 0.30);
+		pAnteile.put("Street", 0.2);
+		evAnteile.put("Street", 0.30);
+		preiseEVSpots.put("Street", 1);
+		preiseNEVSpots.put("Street", 2);
+		chargingRates.put("Street", 3.6);
 		
-		Panteile.put("edu", 0.05);
-		EVanteile.put("edu", 0.0);
-		
-		
+		pAnteile.put("edu", 0.05);
+		evAnteile.put("edu", 0.0);
+		preiseEVSpots.put("edu", 7);
+		preiseNEVSpots.put("edu", 7);
+		chargingRates.put("edu", 0.0);
 		
 		
 		
@@ -107,8 +133,7 @@ public class create_demo_parking {
 				parking.type="private";
 				parking.facilityActType=location_type;
 				
-				parking.parkingPriceMEVSpot=4; //!! Nach typ + Zone unterscheiden; Zu hause aufs Laden den Stromtarif verechnen >> vorausgesetzt der Anschluss gehoert dem Agent..
-				parking.parkingPriceMNEVSpot=3;
+				
 				
 				parking_map.addParking(parking);
 				i++;
@@ -159,11 +184,15 @@ public class create_demo_parking {
 	}
 	
 	static void setCapacity(Parking parking, String location_type, double location_capacity){
-		parking.capacityEV=Math.round(location_capacity * Panteile.get(location_type) * EVanteile.get(location_type));
-		parking.capacityNEV=Math.round(location_capacity * Panteile.get(location_type) * (1-EVanteile.get(location_type)));
-		create_demo_parking.diagZaehlEV+=Math.round(location_capacity * Panteile.get(location_type) * EVanteile.get(location_type));
-		create_demo_parking.diagZaehlNEV+=Math.round(location_capacity * Panteile.get(location_type) * (1-EVanteile.get(location_type)));
-		parking.chargingRate=2.3;//!! Gehoert nicht hier her und muss dynamisch werden
+		parking.capacityEV=Math.round(location_capacity * pAnteile.get(location_type) * evAnteile.get(location_type));
+		parking.capacityNEV=Math.round(location_capacity * pAnteile.get(location_type) * (1-evAnteile.get(location_type)));
+		create_demo_parking.diagZaehlEV+=Math.round(location_capacity * pAnteile.get(location_type) * evAnteile.get(location_type));
+		create_demo_parking.diagZaehlNEV+=Math.round(location_capacity * pAnteile.get(location_type) * (1-evAnteile.get(location_type)));
+		
+		parking.chargingRate=chargingRates.get(location_type);//!! Gehoert nicht hier her und muss dynamisch werden
+		parking.parkingPriceMEVSpot=preiseEVSpots.get(location_type); //!! Nach typ + Zone unterscheiden; Zu hause aufs Laden den Stromtarif verechnen >> vorausgesetzt der Anschluss gehoert dem Agent..
+		parking.parkingPriceMNEVSpot=preiseNEVSpots.get(location_type);
+
 	}
 	
 	

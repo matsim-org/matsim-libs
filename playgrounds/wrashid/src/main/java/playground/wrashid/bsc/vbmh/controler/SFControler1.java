@@ -28,7 +28,7 @@ public class SFControler1 {
 		parking_filename=config.getModule("VM_park").getValue("inputParkingFile");
 		pricing_filename=config.getModule("VM_park").getValue("inputPricingFile");
 		evFilename=config.getModule("VM_park").getValue("inputEVFile");
-		parkHistoryFileName = config.getModule("controler").getValue("outputDirectory")+"/parkhistory"; 
+		parkHistoryFileName = config.getModule("controler").getValue("outputDirectory")+"/parkhistory/parkhistory"; 
 		
 		Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
