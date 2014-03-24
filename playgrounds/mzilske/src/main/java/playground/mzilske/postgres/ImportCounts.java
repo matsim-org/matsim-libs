@@ -19,18 +19,6 @@
 
 package playground.mzilske.postgres;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.Date;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.counts.Count;
@@ -39,7 +27,12 @@ import org.matsim.counts.CountsReaderMatsimV1;
 import org.matsim.counts.CountsWriter;
 import org.xml.sax.SAXException;
 
-public class ImportCounts {
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.sql.*;
+
+public class
+        ImportCounts {
 
 	private static final String COUNTS_FILE_PREFIX = "../detailedEval/counts/counts";
 
