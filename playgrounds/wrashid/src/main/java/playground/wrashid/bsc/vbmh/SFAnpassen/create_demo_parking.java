@@ -51,7 +51,7 @@ public class create_demo_parking {
 		
 		
 		pAnteile.put("home", 1.0);
-		evAnteile.put("home", 0.0);
+		evAnteile.put("home", 1.0);
 		preiseEVSpots.put("home", 0);
 		preiseNEVSpots.put("home", 0);
 		chargingRates.put("home", 2.3);
