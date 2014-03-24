@@ -25,6 +25,7 @@ import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 
 
 /**
@@ -40,6 +41,7 @@ public class OneTaxiOptimizer
     private final Schedule<AbstractTask> schedule;// the vehicle's schedule
 
     public static final double PICKUP_DURATION = 120;
+
 
     @SuppressWarnings("unchecked")
     public OneTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator)
@@ -76,7 +78,10 @@ public class OneTaxiOptimizer
         OneTaxiRequest req = (OneTaxiRequest)request;
         Link fromLink = req.getFromLink();
         Link toLink = req.getToLink();
-        double t0 = Schedules.getLastTask(schedule).getEndTime();
+
+        double t0 = schedule.getStatus() == ScheduleStatus.UNPLANNED ? //
+                Math.max(vehicle.getT0(), currentTime) : //
+                Schedules.getLastTask(schedule).getEndTime();
 
         VrpPathWithTravelData p1 = pathCalculator.calcPath(lastTask.getLink(), fromLink, t0);
         schedule.addTask(new DriveTaskImpl(p1));
