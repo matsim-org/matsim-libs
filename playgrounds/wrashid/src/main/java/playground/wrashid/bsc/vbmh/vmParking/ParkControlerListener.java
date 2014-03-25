@@ -11,6 +11,8 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 
+import playground.wrashid.bsc.vbmh.util.VMCharts;
+
 /**
  * Sets up event handlers and does some restes after and before each.
  * 
@@ -48,6 +50,8 @@ public class ParkControlerListener implements StartupListener, IterationEndsList
 		//Park Statistik Drucken und zuruecksetzen:
 		this.getParkHandler().parkControl.printStatistics();
 		this.getParkHandler().parkControl.resetStatistics();
+		VMCharts.printCharts(getParkHandler().getParkControl().controller.getConfig().getModule("controler").getValue("outputDirectory")+"/Charts", getParkHandler().getParkControl().controller.getIterationNumber());
+		VMCharts.clear();
 	}
 	
 		
@@ -101,7 +105,8 @@ public class ParkControlerListener implements StartupListener, IterationEndsList
 		
 		
 		
-		
+		//Par control Statistik starten
+		getParkHandler().getParkControl().iterStart();
 		
 		
 		

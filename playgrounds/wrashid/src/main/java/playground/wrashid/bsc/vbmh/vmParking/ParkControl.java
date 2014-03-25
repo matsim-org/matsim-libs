@@ -25,6 +25,8 @@ import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.wrashid.bsc.vbmh.controler.VMConfig;
+import playground.wrashid.bsc.vbmh.util.RemoveDuplicate;
+import playground.wrashid.bsc.vbmh.util.VMCharts;
 import playground.wrashid.bsc.vbmh.vmEV.EVControl;
 
 
@@ -54,6 +56,9 @@ public class ParkControl {
 	int countEVParkedOnEVSpot = 0;
 	
 	LinkedList<double[]> availableParkingStat = new LinkedList<double[]>();  //zaehlt für jeden Parkvorgang die Parkplaetze, die zur verfuegung stehen
+	VMCharts vmCharts = new VMCharts(); 
+	
+	
 	
 	Controler controller;
 	ParkingMap parkingMap = new ParkingMap(); //Beinhaltet alle Parkplaetze
@@ -78,6 +83,7 @@ public class ParkControl {
 		
 		//System.out.println(betaMoney);
 		
+		//Charts starten:
 		
 		
 		//Parkplaetze Laden
@@ -92,6 +98,13 @@ public class ParkControl {
 		
 		return 0;
 	
+	}
+	
+	public void iterStart(){
+		vmCharts.addChart("Available parkings");
+		vmCharts.setAxis("Available parkings", "time", "available parkings in area");
+		vmCharts.addSeries("Available parkings", "for ev");
+		vmCharts.addSeries("Available parkings", "for nev");
 	}
 	
 	
@@ -139,26 +152,43 @@ public class ParkControl {
 			System.out.println("F E H L E R in der Future Info");
 		}
 		
-		// PRIVATES PARKEN
 		
-		ParkingSpot privateParking = checkPrivateParking(facilityid.toString(), event.getActType(), ev);
-
-		//!! EVs muessten fuer jedes Parking wenn vorhanden einen EV und einen NEV Platz zur Auswahl bekommen
-		// Falls mit Preisen aufs Laden gearbeitet wird und EVs nicht laden muessen
-		
-		
-		// OEFFENTLICHES PARKEN
-		LinkedList<ParkingSpot> spotsInArea = getPublicParkings(cordinate, ev);
-
+		// NICHT EV Plaetze
+		ParkingSpot privateParking = checkPrivateParking(facilityid.toString(), event.getActType(), false);
+		LinkedList<ParkingSpot> spotsInArea = getPublicParkings(cordinate, false);
 		if (privateParking != null) {
 			spotsInArea.add(privateParking); // Privates Parking anfuegen
 		} 
-		availableParkingStat.add(new double[]{time, spotsInArea.size()});
+		// ------------
 		
+		//EV Plaetze dazu	//!! Spots koennten doppelt sein !
+		if (ev){
+			ParkingSpot privateParkingEV = checkPrivateParking(facilityid.toString(), event.getActType(), true);
+			LinkedList<ParkingSpot> spotsInAreaEV = getPublicParkings(cordinate, true);
+			if (privateParking != null) {
+				spotsInAreaEV.add(privateParkingEV); // Privates Parking anfuegen
+			} 
+			
+			spotsInArea.addAll(spotsInAreaEV);
+		}
+		//-----------
+		RemoveDuplicate.RemoveDuplicate(spotsInArea);
+		
+		//Statistik
+		if(ev){
+			VMCharts.addValues("Available parkings", "for ev", time, spotsInArea.size());
+		}else{
+			VMCharts.addValues("Available parkings", "for nev", time, spotsInArea.size());
+		}	
+		availableParkingStat.add(new double[]{time, spotsInArea.size()});
+		//--
+		
+		//Select 
 		if(spotsInArea.size()>0){ 
 			selectParking(spotsInArea, personId, estimatedDuration, restOfDayDistance, ev);
 			return 1;
 		}
+		//-----
 		
 		//System.err.println("Nicht geparkt"); // !! Was passiert wenn Kein Parkplatz im Umkreis gefunden?
 		
