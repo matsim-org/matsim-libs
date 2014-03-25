@@ -364,6 +364,7 @@ import playground.michalm.util.RunningVehicleRegister;
             throw new RuntimeException();
         }
 
+        launcher.initVrpPathCalculator();
         launcher.go(false);
         launcher.generateOutput();
     }
