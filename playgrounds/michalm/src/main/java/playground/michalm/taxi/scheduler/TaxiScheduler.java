@@ -398,10 +398,12 @@ public class TaxiScheduler
                             double duration = task.getEndTime() - task.getBeginTime();
                             task.setBeginTime(t);
                             task.setEndTime(Math.min(t + duration, nextTask.getEndTime()));
+                            break;
 
                         default:
                             //maybe in the future: WAIT+CHARGE or WAIT+CRUISE would make sense
                             //but currently it is not supported
+                        	System.err.println("next task is"+ nextTask.getTaxiTaskType());
                             throw new RuntimeException();
                     }
 

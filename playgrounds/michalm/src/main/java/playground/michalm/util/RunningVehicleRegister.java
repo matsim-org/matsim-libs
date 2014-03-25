@@ -66,6 +66,6 @@ public class RunningVehicleRegister
     @Override
     public void reset(int iteration)
     {
-        runningAgentsMap.clear();
+//        runningAgentsMap.clear();
     }
 }

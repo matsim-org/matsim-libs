@@ -125,6 +125,7 @@ public class ScheduleImpl<T extends AbstractTask>
             Task previousTask = tasks.get(taskIdx - 1);
 
             if (previousTask.getEndTime() != beginTime) {
+            	
                 throw new IllegalArgumentException();
             }
 
