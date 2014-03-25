@@ -71,8 +71,6 @@ public class TaxiScheduler
         this.delaySpeedupStats = delaySpeedupStats;
     }
 
-    
-    
 
     public LinkTimePair getEarliestIdleness(Vehicle veh)
     {
@@ -403,7 +401,8 @@ public class TaxiScheduler
                         default:
                             //maybe in the future: WAIT+CHARGE or WAIT+CRUISE would make sense
                             //but currently it is not supported
-                        	System.err.println("next task is"+ nextTask.getTaxiTaskType());
+                            System.err.println("Next task is of type: "
+                                    + nextTask.getTaxiTaskType());
                             throw new RuntimeException();
                     }
 

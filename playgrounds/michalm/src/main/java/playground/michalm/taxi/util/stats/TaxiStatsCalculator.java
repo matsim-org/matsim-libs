@@ -29,20 +29,33 @@ import playground.michalm.taxi.schedule.*;
 
 public class TaxiStatsCalculator
 {
-    public TaxiStats calculateStats(VrpData data)
-    {
-        TaxiStats evaluation = new TaxiStats();
+    private TaxiStats stats;
 
-        for (Vehicle v : data.getVehicles()) {
-            evaluateSchedule(data, TaxiSchedules.getSchedule(v), evaluation);
+
+    public TaxiStats calculateStats(Iterable<Vehicle> vehicles)
+    {
+        stats = new TaxiStats();
+
+        for (Vehicle v : vehicles) {
+            calculateStatsImpl(v);
         }
 
-        return evaluation;
+        return stats;
     }
 
 
-    private void evaluateSchedule(VrpData data, Schedule<TaxiTask> schedule, TaxiStats eval)
+    public TaxiStats calculateStats(Vehicle vehicle)
     {
+        stats = new TaxiStats();
+        calculateStatsImpl(vehicle);
+        return stats;
+    }
+
+
+    private void calculateStatsImpl(Vehicle vehicle)
+    {
+        Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(vehicle);
+
         if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
             return;// do not evaluate - the vehicle is unused
         }
@@ -56,55 +69,55 @@ public class TaxiStatsCalculator
 
             switch (t.getTaxiTaskType()) {
                 case PICKUP_DRIVE:
-                    eval.pickupDriveTime += time;
+                    stats.pickupDriveTime += time;
 
-                    if (eval.maxPickupDriveTime < time) {
-                        eval.maxPickupDriveTime = time;
+                    if (stats.maxPickupDriveTime < time) {
+                        stats.maxPickupDriveTime = time;
                     }
 
-                    eval.pickupDriveTimeStats.addValue(time);
+                    stats.pickupDriveTimeStats.addValue(time);
 
                     break;
 
                 case DROPOFF_DRIVE:
-                    eval.dropoffDriveTime += time;
+                    stats.dropoffDriveTime += time;
                     break;
 
                 case CRUISE_DRIVE:
-                    eval.cruiseTime += time;
+                    stats.cruiseTime += time;
                     break;
 
                 case PICKUP_STAY:
-                    eval.pickupTime += time;
+                    stats.pickupTime += time;
 
                     Request req = ((TaxiPickupStayTask)t).getRequest();
                     double waitTime = Math.max(t.getBeginTime() - req.getT0(), 0);
-                    eval.passengerWaitTime += waitTime;
+                    stats.passengerWaitTime += waitTime;
 
-                    if (eval.maxPassengerWaitTime < waitTime) {
-                        eval.maxPassengerWaitTime = waitTime;
+                    if (stats.maxPassengerWaitTime < waitTime) {
+                        stats.maxPassengerWaitTime = waitTime;
                     }
 
-                    eval.passengerWaitTimeStats.addValue(waitTime);
+                    stats.passengerWaitTimeStats.addValue(waitTime);
 
                     break;
 
                 case DROPOFF_STAY:
-                    eval.dropoffTime += time;
+                    stats.dropoffTime += time;
                     break;
 
                 case CHARGE_STAY:
-                    eval.chargeTime += time;
-                    
+                    stats.chargeTime += time;
+
                 case WAIT_STAY:
-                    eval.waitTime += time;
+                    stats.waitTime += time;
             }
         }
 
         double latestValidEndTime = schedule.getVehicle().getT1();
         double actualEndTime = schedule.getEndTime();
 
-        eval.overTime += Math.max(actualEndTime - latestValidEndTime, 0);
+        stats.overTime += Math.max(actualEndTime - latestValidEndTime, 0);
     }
 
 
@@ -155,8 +168,8 @@ public class TaxiStatsCalculator
         {
             return cruiseTime;
         }
-        
-        
+
+
         public double getChargeTime()
         {
             return chargeTime;
