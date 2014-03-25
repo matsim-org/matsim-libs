@@ -44,7 +44,7 @@ public class agentsInAgglo {
 		
 
 		// E I N S T E L L U N G EN
-		String scenarioName = "140324_1";
+		String scenarioName = "140325_1";
 		
 		int anzahl_agents = 1500;
 		String networkFile = "input/SF_PLUS/network/siouxFalls_network_OSM_brookings.xml";

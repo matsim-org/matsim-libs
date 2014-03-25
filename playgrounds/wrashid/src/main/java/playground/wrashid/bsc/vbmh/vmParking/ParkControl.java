@@ -21,10 +21,12 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.wrashid.bsc.vbmh.controler.VMConfig;
 import playground.wrashid.bsc.vbmh.vmEV.EVControl;
+
 
 /**
  * Manages the whole parking process of one Agent at a time. One instance of this class is kept by the Park_Handler 
@@ -50,6 +52,8 @@ public class ParkControl {
 	int countPublic = 0;
 	int countNotParked = 0;
 	int countEVParkedOnEVSpot = 0;
+	
+	LinkedList<double[]> availableParkingStat = new LinkedList<double[]>();  //zaehlt für jeden Parkvorgang die Parkplaetze, die zur verfuegung stehen
 	
 	Controler controller;
 	ParkingMap parkingMap = new ParkingMap(); //Beinhaltet alle Parkplaetze
@@ -149,6 +153,8 @@ public class ParkControl {
 		if (privateParking != null) {
 			spotsInArea.add(privateParking); // Privates Parking anfuegen
 		} 
+		availableParkingStat.add(new double[]{time, spotsInArea.size()});
+		
 		if(spotsInArea.size()>0){ 
 			selectParking(spotsInArea, personId, estimatedDuration, restOfDayDistance, ev);
 			return 1;
@@ -429,6 +435,21 @@ public class ParkControl {
 		System.out.println("Nicht geparkt:" + Double.toString(this.countNotParked));
 		System.out.println("EVs auf EV Spots geparkt:" + this.countEVParkedOnEVSpot);
 		
+		String filename = controller.getConfig().getModule("controler").getValue("outputDirectory")+"/Charts/Parkplatzauswahl_"+controller.getIterationNumber()+".png";
+		XYScatterChart chart = new XYScatterChart("Parkplatzauswahl", "Time", "available Spots");
+		double[] time = new double[availableParkingStat.size()];
+		double[] availableParkings = new double[availableParkingStat.size()];
+		int i=0;
+		for(double[] element : availableParkingStat){
+			time[i]=element[0];
+			availableParkings[i]=element[1];
+			i++;
+		}
+		chart.addSeries("anzahl", time, availableParkings);
+		chart.saveAsPng(filename, 800, 600);
+		
+		
+		
 	}
 	
 	//---------------------------  ---------------------------------------------
@@ -437,6 +458,7 @@ public class ParkControl {
 		this.countPrivate=0;
 		this.countPublic=0;
 		this.countEVParkedOnEVSpot=0;
+		availableParkingStat.clear();
 	}
 	
 	//--------------------------- G E T     F U T U R E     I N F O  -----
