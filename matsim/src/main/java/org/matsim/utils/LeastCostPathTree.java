@@ -20,11 +20,6 @@
 
 package org.matsim.utils;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.PriorityQueue;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -44,11 +39,15 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.PriorityQueue;
+
 /**
  * Calculates a least-cost-path tree using Dijkstra's algorithm  for calculating a shortest-path
  * tree, given a node as root of the tree.
- * 
- * (The overall algorithm is sometimes called Kruskal's algorithm, the least-cost-path tree in graph theory is a spanning tree. dg 2013)
+ *
  * 
  * @author balmermi, mrieser
  */
