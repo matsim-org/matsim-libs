@@ -104,13 +104,7 @@ public class LeastCostPathTree {
 		private double cost = Double.MAX_VALUE;
 		private double time = 0;
 
-		/*package*/ void reset() {
-			this.prevId = null;
-			this.cost = Double.MAX_VALUE;
-			this.time = 0;
-		}
-
-		/*package*/ void visit(final Id comingFromNodeId, final double cost, final double time) {
+        /*package*/ void visit(final Id comingFromNodeId, final double cost, final double time) {
 			this.prevId = comingFromNodeId;
 			this.cost = cost;
 			this.time = time;
@@ -198,11 +192,7 @@ public class LeastCostPathTree {
 			}
 		}
 	}
-	
-	/**
-	 * @param link  
-	 * @param currTime 
-	 */
+
 	protected void additionalComputationsHook( Link link, double currTime ) {
 		// left empty for inheritance
 	}
