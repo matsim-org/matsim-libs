@@ -37,11 +37,14 @@ public static void main(String[] args) {
 	EventsManager manager = EventsUtils.createEventsManager();
 	Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	
-	new MatsimNetworkReader(sc).readFile("C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\network.xml");
-	TaxiCustomerWaitTimeAnalyser tcwa = new TaxiCustomerWaitTimeAnalyser(sc);
+	new MatsimNetworkReader(sc).readFile("C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v1\\berlin_brb.xml.gz");
+TaxiCustomerDebugger tdb 	= new TaxiCustomerDebugger();
+	manager.addHandler(tdb);
+	new MatsimEventsReader(manager).readFile("C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v1\\1slow_nolog\\events.xml.gz");
 	
-	manager.addHandler(tcwa);
-	new MatsimEventsReader(manager).readFile("C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\Modified Dispatch\\modifiedDispatch\\events.xml.gz");
-	tcwa.writeCustomerWaitStats("C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\Modified Dispatch\\modifiedDispatch\\pp_WaitTimes");
+	System.out.println("Arrivals " +tdb.arrivals);
+	System.out.println("Departures " +tdb.departures);
+	System.out.println("Vehicle Enter " +tdb.vehicleEnts);
+
 }
 }

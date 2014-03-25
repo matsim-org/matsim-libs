@@ -38,6 +38,9 @@ import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.*;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkChangeEventsParser;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -74,11 +77,30 @@ public class VrpLauncherUtils
         TIME; // travel time
     }
 
-
+//TODO: Make Scenario Loading Matsim Standard (e.g. use a config file)
     public static Scenario initScenario(String netFileName, String plansFileName)
     {
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         new MatsimNetworkReader(scenario).readFile(netFileName);
+        new MatsimPopulationReader(scenario).readFile(plansFileName);
+        return scenario;
+    }
+    
+    public static Scenario initTimeVariantScenario(String netFileName, String plansFileName, String changeEventsFilename)
+    {
+        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+        scenario.getConfig().network().setTimeVariantNetwork(true);
+        NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+        network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
+        new MatsimNetworkReader(scenario).readFile(netFileName);
+        System.out.println("use TimeVariantLinks in NetworkFactory.");
+		scenario.getConfig().network().setChangeEventInputFile(changeEventsFilename);
+		System.out.println("loading network change events from " + scenario.getConfig().network().getChangeEventsInputFile());
+		NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
+		parser.parse(scenario.getConfig().network().getChangeEventsInputFile());
+		
+		network.setNetworkChangeEvents(parser.getEvents());
+        
         new MatsimPopulationReader(scenario).readFile(plansFileName);
         return scenario;
     }

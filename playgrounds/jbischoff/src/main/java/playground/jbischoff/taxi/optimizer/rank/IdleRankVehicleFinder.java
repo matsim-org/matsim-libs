@@ -233,12 +233,13 @@ public class IdleRankVehicleFinder
     private double calculateSquaredDistance(TaxiRequest req, Vehicle veh)
     {
         LinkTimePair departure = scheduler.getEarliestIdleness(veh);
-        Link fromLink = departure.link;
-
-        if (fromLink == null) {
-            return Double.MAX_VALUE;
+        Link fromLink;
+        if (departure == null) {
+        	return Double.MAX_VALUE;
         }
+         fromLink = departure.link;
 
+         // from means here the request's from, to is therefore the taxis destination to pick up customer (just a reminder for myself)
         Link toLink = req.getFromLink();
 
         return DistanceUtils.calculateSquaredDistance(fromLink, toLink);

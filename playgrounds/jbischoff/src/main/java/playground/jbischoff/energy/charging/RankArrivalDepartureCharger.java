@@ -25,10 +25,13 @@ import playground.jbischoff.energy.log.ChargeLogRow;
 import playground.jbischoff.energy.log.ChargerLog;
 import playground.jbischoff.energy.log.SoCLog;
 import playground.jbischoff.energy.log.SocLogRow;
+import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 
 public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 		PersonDepartureEventHandler {
 
+	private NOSRankTaxiOptimizer optimizer;
+	
 	private Map<Id,Integer> rankLocations;
 	private Map<Id,Integer> currentChargerOccupation;
 	private Map<Id, Vehicle> vehicles;
@@ -39,26 +42,30 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 	private Map<Id,Id> chargingVehicles;
 	
 	private final double MINIMUMCHARGETIME = 120.;
-//	private final double POWERINKW = 50.0; // max charge for Nissan Leaf
-	private final double POWERINKW = 22.0; // max charge at standard Berlin Charger
-	private final int RANKCHARGERAMOUNT = 50; //amount of chargers at each rank location
+	private final double POWERINKW = 50.0; // max charge for Nissan Leaf
+//	private final double POWERINKW = 22.0; // max charge at standard Berlin Charger
+	private final int RANKCHARGERAMOUNT = 1000; //amount of chargers at each rank location
 	private EventsManager events;
 	
-	private final double MINIMUMSOCFORDEPARTURE = 5.;
+	private final double MINIMUMSOCFORDEPARTURE = 6.;
 	private static final Logger log = Logger
 			.getLogger(RankArrivalDepartureCharger.class);
-	private final double NEEDSTORETURNTORANKSOC = 6.;
+	private final double NEEDSTORETURNTORANKSOC = 4.;
 	private SoCLog soCLog;
 	private ChargerLog chargerLog;
-	public RankArrivalDepartureCharger(HashMap<Id, Vehicle> vehicles, EventsManager events) {
+	private long underChargeMinutes = 0;
+
+	public RankArrivalDepartureCharger(HashMap<Id, Vehicle> vehicles, EventsManager events, NOSRankTaxiOptimizer optimizer) {
 		this.events = events;
 		this.vehicles = vehicles;
+		this.optimizer = optimizer;
 		this.arrivalTimes = new LinkedHashMap<Id, Double>();
 		this.socUponArrival = new HashMap<Id, Double>();
 		this.soCLog = new SoCLog();
 		this.arrivalLinks = new HashMap<Id, Id>();
 		this.chargingVehicles=new HashMap<Id, Id>();
 		this.chargerLog = new ChargerLog();
+		
 	}
 
 	@Override
@@ -147,7 +154,11 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 				if (chargerHasFreeSpaceForVehicle(e.getKey()) ){
 					addVehicleToCharger(e.getKey());
 					this.events.processEvent(new StartChargingEvent(time, e.getKey(), this.arrivalLinks.get(e.getKey())));
-
+					double approxChargeAmount = ((BatteryElectricVehicle) this.vehicles.get(e.getKey())).getUsableBatteryCapacityInJoules() * 0.8 - ((BatteryElectricVehicle) this.vehicles.get(e.getKey()))
+							.getSocInJoules();
+					double expectedChargeTime = approxChargeAmount / (POWERINKW*1000);
+					double expectedEndTime = time + expectedChargeTime;
+					optimizer.scheduleCharging(e.getKey(),time, expectedEndTime);
 				}
 			}	
 			if (isConnectedToCharger(e.getKey())){
@@ -216,6 +227,7 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 					/ ((BatteryElectricVehicle) e.getValue())
 							.getUsableBatteryCapacityInJoules();
 			this.soCLog.add(new SocLogRow(e.getKey(), time, soc, rsoc));
+			if (rsoc < 0.1) this.underChargeMinutes++;
 			currentSoc.add(soc);
 		}
 		if (currentSoc.size() > 0) {
@@ -229,6 +241,10 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 			}
 			double average = socs / currentSoc.size();
 			this.soCLog.add(new SocLogRow(new IdImpl("ave"), time, average, 0));
+			Collections.sort(currentSoc);
+			int p05 = (int) Math.floor(currentSoc.size() * 0.05);
+			double p05v = currentSoc.get(p05);
+			this.soCLog.add(new SocLogRow(new IdImpl("p05"), time, p05v, 0));
 		}
 		for (Entry<Id,Integer> e : this.currentChargerOccupation.entrySet()){
 			double rocc = (double) e.getValue() / (double) this.rankLocations.get(e.getKey());
@@ -260,6 +276,7 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 	}
 
 	public SoCLog getSoCLog() {
+		log.info("Undercharge minutes in total: "+this.underChargeMinutes);
 		return soCLog;
 	}
 	public ChargerLog getChargeLog(){

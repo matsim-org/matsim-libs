@@ -34,11 +34,14 @@ import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.contrib.dvrp.util.chart.ScheduleChartUtils;
 import org.matsim.contrib.dvrp.util.gis.Schedules2GIS;
+import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpDynLegs;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.network.NetworkChangeEventsParser;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -65,6 +68,8 @@ import playground.michalm.util.RunningVehicleRegister;
 {
     /*package*/final String dirName;
     /*package*/final String netFileName;
+    /*package*/final String changeEventsFilename;
+
     /*package*/final String plansFileName;
     /*package*/final String taxiCustomersFileName;
     /*package*/final String taxisFileName;
@@ -113,8 +118,17 @@ import playground.michalm.util.RunningVehicleRegister;
 
     	   dirName = "C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v2\\";
            plansFileName = dirName + "plans4to4.xml.gz";
-           taxisFileName = dirName + "taxis4to4.xml";
+//           taxisFileName = dirName + "taxis4to4_EV0.5.xml";
+//           taxisFileName = dirName + "taxis4to4_EV0.6.xml";
+//           taxisFileName = dirName + "taxis4to4_EV0.7.xml";
+//           taxisFileName = dirName + "taxis4to4_EV0.8.xml";
+//           taxisFileName = dirName + "taxis4to4_EV0.9.xml";
+//           taxisFileName = dirName + "taxis4to4_EV1.0.xml";
+           taxisFileName = dirName + "taxis4to4.xml"; //all conventional
 
+
+           
+           changeEventsFilename = dirName + "changeevents.xml.gz";
            eventsFileName = null;
            netFileName = dirName + "berlin_brb.xml.gz";
            
@@ -153,7 +167,9 @@ import playground.michalm.util.RunningVehicleRegister;
         writeSimEvents = true;
         waitList = new ArrayList<String>();
 
-        scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName);
+        scenario = VrpLauncherUtils.initTimeVariantScenario(netFileName, plansFileName, changeEventsFilename);
+      
+        
 
         //        List<String> taxiCustomerIds;
         //        taxiCustomerIds = ODDemandGenerator.readTaxiCustomerIds(taxiCustomersFileName);
@@ -199,7 +215,7 @@ import playground.michalm.util.RunningVehicleRegister;
                 travelTime);
 
         LeastCostPathCalculatorWithCache routerWithCache = new LeastCostPathCalculatorWithCache(
-                router, ttimeSource.timeDiscretizer);
+                router, new TimeDiscretizer(31*4, 15 *60));
 
         VrpPathCalculator calculator = new VrpPathCalculatorImpl(routerWithCache, travelTime,
                 travelDisutility);

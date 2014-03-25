@@ -83,7 +83,7 @@ public class TaxiDemandWriter {
 	private final static String DATADIR = "C:/local_jb/data/";
 	private final static String NETWORKFILE = DATADIR+"network/berlin_brb.xml.gz";
 	private final static Id TXLLORID = new IdImpl("12214125");
-	private final static double SCALEFACTOR = 1.0;
+	private final static double SCALEFACTOR = 2.0;
 	static int fromTXL = 0;
 	static int toTXL = 0;
 	
@@ -217,9 +217,13 @@ public class TaxiDemandWriter {
 	
 	private void generatePlansForZones(int hr, List<TaxiDemandElement> hourlyTaxiDemand) {
 
+		double actualAmount = 0.;
+		double desiredAmount =0.;
 		for (TaxiDemandElement tde : hourlyTaxiDemand){
-			double amount = tde.getAmount() * SCALEFACTOR;
-		for (int i = 0; i< amount; i++){
+			double amount =  tde.getAmount() * SCALEFACTOR;
+			desiredAmount += amount;
+			amount = Math.floor(amount);
+			for (int i = 0; i<amount; i++){
 			Person p;
 			Id pId = scenario.createId("p"+tde.fromId+"_"+tde.toId+"_hr_"+hr+"_nr_"+i);
 			p = generatePerson(tde.fromId, tde.toId,pId, hr);
@@ -227,7 +231,21 @@ public class TaxiDemandWriter {
 			population.addPerson(p);
 			incMap(oMap,tde.fromId);
 			incMap(dMap,tde.toId);
+			actualAmount++;
 		}
+			
+		}
+		long extraAmount = Math.round(desiredAmount-actualAmount);
+		Collections.sort(hourlyTaxiDemand);
+		for (int i = 0; i<= extraAmount; i++){
+			TaxiDemandElement tde = hourlyTaxiDemand.get(i%3);
+			Person p;
+			Id pId = scenario.createId("p"+tde.fromId+"_"+tde.toId+"_hr_"+hr+"_nr_x"+i);
+			p = generatePerson(tde.fromId, tde.toId,pId, hr);
+			if (p == null ) continue;
+			population.addPerson(p);
+			incMap(oMap,tde.fromId);
+			incMap(dMap,tde.toId);
 		}
 	}
 
@@ -256,15 +274,23 @@ public class TaxiDemandWriter {
 		Coord fromCoord;
 		Coord toCoord; 
 		if (from.equals(TXLLORID)){
-			fromCoord = new CoordImpl(4588171.603474933,5825260.734177444);
+			
+			fromCoord = new CoordImpl(4588010.58447,5825269.27936);
 			TaxiDemandWriter.fromTXL++;
 		} else {
 		 fromCoord = this.shoot(from);
 		}
 		if (to.equals(TXLLORID)){
-			toCoord = new CoordImpl(4588171.603474933,5825260.734177444);
+			
+			toCoord = new CoordImpl(4588009.07923,5825207.56463);
 			TaxiDemandWriter.toTXL++;
-		} else {
+			if (from.equals(TXLLORID))
+				{
+				fromCoord = this.shoot(from);
+				toCoord = this.shoot(to);
+				//quite a lot of trips are TXL to TXL
+				}
+				} else {
 			toCoord = this.shoot(to);
 		}
 		
@@ -279,7 +305,7 @@ public class TaxiDemandWriter {
 
 		
 		double activityStart = Math.round(hr * 3600. + rnd.nextDouble() * 3600.);
-
+		if (hr == 27 )  activityStart = Math.round(hr * 3600. + rnd.nextDouble() * 1800.);
 		plan.addActivity(this.addActivity("home", 0.0, activityStart, fromLink));
 		plan.addLeg(this.addLeg(activityStart , "taxi", fromLink, toLink));
 		plan.addActivity(this.addActivity("work", toLink));
@@ -344,7 +370,7 @@ public class TaxiDemandWriter {
 
 }
 
-class TaxiDemandElement {
+class TaxiDemandElement implements Comparable<TaxiDemandElement> {
 	Id fromId;
 	Id toId;
 	int amount;
@@ -367,6 +393,12 @@ class TaxiDemandElement {
 		return amount;
 	}
 
+	@Override
+	public int compareTo(TaxiDemandElement arg0) {
+		Integer amo = amount;
+		return amo.compareTo(arg0.getAmount());
+	}
+	
 }
 class DemandParser implements TabularFileHandler{
 

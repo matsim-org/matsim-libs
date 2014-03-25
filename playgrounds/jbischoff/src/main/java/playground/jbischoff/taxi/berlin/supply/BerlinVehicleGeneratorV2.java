@@ -48,6 +48,9 @@ public class BerlinVehicleGeneratorV2 {
 	private static final String DATADIR = "C:/local_jb/data/";
 	private final static String NETWORKFILE = DATADIR+"network/berlin_brb.xml.gz";
 	private final static int  PAXPERCAR = 4;
+	private final static Id TXLLORID = new IdImpl("12214125");
+	private final static double EVSHARE = 1.0;
+
 
 	private NetworkImpl network;
 	private CoordinateTransformation ct = TransformationFactory
@@ -62,7 +65,7 @@ public class BerlinVehicleGeneratorV2 {
 		bvr.readInputData();
 		bvr.createTaxis(28, 52);
 		List<Vehicle> taxiList = bvr.createVehicles();
-		new VehicleWriter(taxiList).write(DATADIR+"/OD/demandperLorHr/taxis4to4.xml");
+		new VehicleWriter(taxiList).write(DATADIR+"/OD/demandperLorHr/taxis4to4_EV"+EVSHARE+".xml");
 
 
 	}
@@ -70,8 +73,11 @@ public class BerlinVehicleGeneratorV2 {
 
 	private List<Vehicle> createVehicles() {
 		List<Vehicle> vehicles = new ArrayList<Vehicle>();
+		
 		for (VData v : vdata){
-			vehicles.add(createTaxiFromLor(v.lor, v.vid, v.t0, v.t1));
+			String vid = v.vid.toString();
+			if (rnd.nextDouble() < EVSHARE) vid = "e"+vid;
+			vehicles.add(createTaxiFromLor(v.lor, new IdImpl(vid), v.t0, v.t1));
 		}
 		return vehicles;
 	}
@@ -149,13 +155,15 @@ public class BerlinVehicleGeneratorV2 {
 				count++;
 			}
 		}
-		TaxiDemandPerLor dpl = Collections.max(demandPerLor);
+		Collections.sort(demandPerLor);
+		
+		TaxiDemandPerLor dpl [] = {Collections.max(demandPerLor),demandPerLor.get(1)};
 		int i = 0;
 		int rest = amount-count;
 		while (rest>0){
-			Id vid = new IdImpl("t_"+dpl.getFromId()+"_"+(hr%24)+"_x"+i);
+			Id vid = new IdImpl("t_"+dpl[i%2].getFromId()+"_"+(hr%24)+"_x"+i);
 			VData v = new VData();
-			v.lor = dpl.getFromId();
+			v.lor = dpl[i%2].getFromId();
 			v.vid = vid;
 			v.t0 =  ( hr % 24 ) * 3600 +  rnd.nextInt(3600);
 			i++;
@@ -181,22 +189,22 @@ public class BerlinVehicleGeneratorV2 {
 				Id vid = new IdImpl("t_"+dpl.getFromId()+"_"+hr+"_"+i);
 				VData v = new VData(vid,dpl.getFromId());
 				int start = ( hr % 24 ) * 3600 - 1800;
-				int end = start + 3600 + rnd.nextInt(8*3600);
+				int end = start + 7200 + rnd.nextInt(16*3600);
 				v.t0 = start;
 				v.t1 = end;
 				vdata.add(v);
 				count++;
 			}
 		}
-		
-		TaxiDemandPerLor dpl = Collections.max(demandPerLor);
+		Collections.sort(demandPerLor);
+		TaxiDemandPerLor dpl [] = {Collections.max(demandPerLor),demandPerLor.get(1)};
 		int i = 0;
 		int rest = currentVeh-count;
 		while (rest>0){
-			Id vid = new IdImpl("t_"+dpl.getFromId()+"_"+(hr%24)+"_x"+i);
+			Id vid = new IdImpl("t_"+dpl[i%2].getFromId()+"_"+(hr%24)+"_x"+i);
 			VData v = new VData();
 			i++;
-			v.lor = dpl.getFromId();
+			v.lor = dpl[i%2].getFromId();
 			v.vid = vid;
 			int start = ( hr % 24 ) * 3600 +  rnd.nextInt(3600);
 			int end = start + rnd.nextInt(8*3600);
@@ -212,7 +220,16 @@ public class BerlinVehicleGeneratorV2 {
 
 
 	private Vehicle createTaxiFromLor(Id lorId, Id vid, int t0, int t1) {
-		Link link = getRandomLinkInLor(lorId);
+		Link link ;
+		if (lorId.equals(TXLLORID) ){ 
+			
+			link = network.getLinks().get(new IdImpl("-35956"));
+		
+		}
+		else{
+			link = getRandomLinkInLor(lorId);
+		}
+		
 		Vehicle v = new VehicleImpl(vid, link, PAXPERCAR, t0, t1);
 		
 		return v;

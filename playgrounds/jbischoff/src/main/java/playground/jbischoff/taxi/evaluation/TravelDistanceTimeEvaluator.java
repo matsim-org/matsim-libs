@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.network.Network;
  * @author jbischoff
  *
  */
-public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
+public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler , ActivityStartEventHandler, ActivityEndEventHandler {
 
 	private Map<Id,Double> taxiTravelDistance;
 	private Map<Id,Double> taxiTravelDistancesWithPassenger;
@@ -45,6 +45,8 @@ public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, Perso
 	private List<Id> isOccupied;
 	private Map<Id,Double> lastDeparture;
 	private Map<Id,Double> taxiTravelDuration;
+	private Map<Id,Double> startTimes;
+	private Map<Id,Double> endTimes;
 
 	
 	
@@ -57,6 +59,10 @@ public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, Perso
 		this.taxiTravelDuration = new HashMap<Id,Double>();
 		this.isOccupied = new ArrayList<Id>();
 		this.network = network;
+		this.startTimes= new HashMap<Id,Double>();
+		this.endTimes= new HashMap<Id,Double>();
+
+		
 	}
 
 	public void addAgent(Id agentId){
@@ -71,15 +77,15 @@ public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, Perso
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (!isMonitoredVehicle(event.getPersonId())) return;
-		double distance = this.taxiTravelDistance.get(event.getPersonId());
+		if (!isMonitoredVehicle(event.getVehicleId())) return;
+		double distance = this.taxiTravelDistance.get(event.getVehicleId());
 		distance = distance + this.network.getLinks().get(event.getLinkId()).getLength();
-		this.taxiTravelDistance.put(event.getPersonId(), distance);
-		if (this.isOccupied.contains(event.getPersonId())) {
+		this.taxiTravelDistance.put(event.getVehicleId(), distance);
+		if (this.isOccupied.contains(event.getVehicleId())) {
 			double distanceWithPax = 0.;
-			if (this.taxiTravelDistancesWithPassenger.containsKey(event.getPersonId())) distanceWithPax = this.taxiTravelDistancesWithPassenger.get(event.getPersonId());
+			if (this.taxiTravelDistancesWithPassenger.containsKey(event.getVehicleId())) distanceWithPax = this.taxiTravelDistancesWithPassenger.get(event.getVehicleId());
 			distanceWithPax = distanceWithPax + this.network.getLinks().get(event.getLinkId()).getLength();
-			this.taxiTravelDistancesWithPassenger.put(event.getPersonId(), distanceWithPax);
+			this.taxiTravelDistancesWithPassenger.put(event.getVehicleId(), distanceWithPax);
 			
 		}
 	}
@@ -97,7 +103,7 @@ public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, Perso
 			tpkm += tryToGetOrReturnZero(this.taxiTravelDistancesWithPassenger,e.getKey());
 			double relativeOccpanceTime = tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey()) / (tryToGetOrReturnZero( this.taxiTravelDuration, e.getKey()) + 0.01);
 			tkm += e.getValue();
-			System.out.println(e.getKey()+"\t"+(e.getValue()/1000)+"\t"+(tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey())/1000)+"\t"+relativeOccupanceDist+"\t"+tryToGetOrReturnZero( this.taxiTravelDuration, e.getKey())+"\t"+tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey())+"\t"+relativeOccpanceTime);
+			System.out.println(e.getKey()+"\t"+(e.getValue()/1000)+"\t"+(tryToGetOrReturnZero(this.taxiTravelDistancesWithPassenger, e.getKey())/1000)+"\t"+relativeOccupanceDist+"\t"+tryToGetOrReturnZero( this.taxiTravelDuration, e.getKey())+"\t"+tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey())+"\t"+relativeOccpanceTime);
 		}
 		tkm = tkm / 1000;
 		tpkm = tpkm /1000;
@@ -114,6 +120,7 @@ public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, Perso
 			double tpkm = 0.;
 			double s = 0.;
 			double ps = 0.;
+			double onlineTimes = 0.;
 			bw.write("Agent ID\tdistanceTravelled\tdistanceTravelledWithPax\tOccupanceOverDistance\tTravelTime\tTravelTimeWithPax\tOccupanceOverTime");
 			for (Entry<Id,Double> e: this.taxiTravelDistance.entrySet()){
 				tpkm += tryToGetOrReturnZero(taxiTravelDistancesWithPassenger, e.getKey());
@@ -124,7 +131,11 @@ public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, Perso
 				bw.newLine();
 				double relativeOccupanceDist = tryToGetOrReturnZero(taxiTravelDistancesWithPassenger, e.getKey()) /e.getValue();
 				double relativeOccpanceTime = tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey()) /tryToGetOrReturnZero( this.taxiTravelDuration, e.getKey());
-				bw.write(e.getKey()+"\t"+(e.getValue()/1000)+"\t"+(tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey())/1000)+"\t"+relativeOccupanceDist+"\t"+tryToGetOrReturnZero( this.taxiTravelDuration, e.getKey())+"\t"+tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey())+"\t"+relativeOccpanceTime);
+				double startTime = this.startTimes.get(e.getKey());
+				double endTime = this.endTimes.get(e.getKey());
+				double onlineTime = endTime-startTime;
+				onlineTimes += onlineTime;
+				bw.write(e.getKey()+"\t"+(e.getValue()/1000)+"\t"+(tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey())/1000)+"\t"+relativeOccupanceDist+"\t"+tryToGetOrReturnZero( this.taxiTravelDuration, e.getKey())+"\t"+tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey())+"\t"+relativeOccpanceTime+"\t"+startTime+"\t"+endTime+"\t"+onlineTime);
 				
 			}
 			tkm = tkm / 1000;
@@ -135,7 +146,7 @@ public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, Perso
 			ps /=this.taxiTravelDistance.size();
 			
 			bw.newLine();
-			String avs = "average\t"+Math.round(tkm)+"\t"+Math.round(tpkm)+"\t"+(tpkm/tkm)+"\t"+s+"\t"+ps+"\t"+(ps/s);
+			String avs = "average\t"+Math.round(tkm)+"\t"+Math.round(tpkm)+"\t"+(tpkm/tkm)+"\t"+s+"\t"+ps+"\t"+(ps/s)+"\t-"+"\t-"+onlineTimes/this.endTimes.size();
 			bw.write(avs);
 			
 			bw.flush();
@@ -192,5 +203,26 @@ public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, Perso
 	
 	private void handleTaxiDriverEntersEvent(PersonEntersVehicleEvent event) {
 		this.lastDeparture.put(event.getPersonId(), event.getTime());		
+	}
+
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		if (event.getActType().startsWith("Before schedule:") ) handleBeforeSchedule(event);
+
+	}
+
+	private void handleBeforeSchedule(ActivityEndEvent event) {
+		this.startTimes.put(event.getPersonId(), event.getTime());
+	}
+
+	@Override
+	public void handleEvent(ActivityStartEvent event) {
+		if (event.getActType().startsWith("After schedule:") ) handleAfterSchedule(event);
+
+		
+	}
+
+	private void handleAfterSchedule(ActivityStartEvent event) {
+		this.endTimes.put(event.getPersonId(),event.getTime());		
 	}
 }

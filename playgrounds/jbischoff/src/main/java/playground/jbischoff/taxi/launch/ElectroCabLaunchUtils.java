@@ -21,6 +21,7 @@ package playground.jbischoff.taxi.launch;
 
 import java.util.*;
 
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
@@ -29,6 +30,7 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.*;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 
 import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
 import playground.jbischoff.energy.vehicles.BatteryElectricVehicleImpl;
@@ -59,10 +61,9 @@ public class ElectroCabLaunchUtils
             NOSRankTaxiOptimizer optimizer)
     {
         Scenario scenario = context.getScenario();
-
         optimizer.setRankMode(false);
         optimizer.setIdleRankMode(true);
-        boolean ALLCARSELECTRIC = true;
+        boolean ALLCARSELECTRIC = false;
 
         EventsManager events = qSim.getEventsManager();
 
@@ -73,22 +74,33 @@ public class ElectroCabLaunchUtils
         HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle> elvehicles = new HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle>();
 
         travelDistanceEvaluator = new TravelDistanceTimeEvaluator(scenario.getNetwork());
-
+        
         if (ALLCARSELECTRIC) {
-
+   
             for (Vehicle v : context.getVrpData().getVehicles()) {
-                Id aid = v.getId();
-                elvehicles.put(aid, new BatteryElectricVehicleImpl(ecm, 20 * 1000 * 3600));
-                travelDistanceEvaluator.addAgent(aid);
+            	Id aid = v.getId();
+            	elvehicles.put(aid, new BatteryElectricVehicleImpl(ecm, 20 * 1000 * 3600));
+            	
             }
         }
-
+        
+        else {
+        	 for (Vehicle v : context.getVrpData().getVehicles()) {
+             	Id aid = v.getId();
+             	if (aid.toString().startsWith("et"))
+             		{elvehicles.put(aid, new BatteryElectricVehicleImpl(ecm, 20 * 1000 * 3600));
+             		}
+             	
+             }
+        	 System.out.println( context.getVrpData().getVehicles().size() + " taxis in total, of which " + elvehicles.size() + " are electric.");
+        }
+        
         for (Vehicle v : context.getVrpData().getVehicles()) {
             travelDistanceEvaluator.addAgent(v.getId());
         }
 
         energyConsumptionTracker = new EnergyConsumptionTracker(elvehicles, scenario.getNetwork());
-        rankArrivalDepartureCharger = new RankArrivalDepartureCharger(elvehicles, events);
+        rankArrivalDepartureCharger = new RankArrivalDepartureCharger(elvehicles, events, optimizer);
         taxiCustomerWaitTimeAnalyser = new TaxiCustomerWaitTimeAnalyser(scenario);
 
         handlerGroup.addHandler(travelDistanceEvaluator);
@@ -102,19 +114,21 @@ public class ElectroCabLaunchUtils
         }
 
         rankArrivalDepartureCharger.setRankLocations(rankLinkIds);
+        
         events.addHandler(handlerGroup);
 
         optimizer.setRankArrivalCharger(rankArrivalDepartureCharger);
         optimizer.createNearestRankDb();
 
-        // chargeUponRankArrival = new ChargeUponRankArrival(elvehicles);
-        // chargeUponRankArrival.setRankLocations(this.rankReader.getRankLinks());
-
-        // handlerGroup.addHandler(chargeUponRankArrival);
+        
 
         ElectricTaxiSimEngine taxiSimEngine = new ElectricTaxiSimEngine(optimizer,
                 rankArrivalDepartureCharger);
+        qSim.getScenario().getConfig().qsim().setEndTime(30*3600);
         qSim.addMobsimEngine(taxiSimEngine);
+		if (qSim.getScenario().getConfig().network().isTimeVariantNetwork()) {
+        qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
+		}
 
         return taxiSimEngine;
     }

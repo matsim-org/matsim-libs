@@ -19,6 +19,8 @@
 
 package playground.jbischoff.energy.log;
 
+import java.util.Comparator;
+
 import org.matsim.api.core.v01.Id;
 /**
  * 
@@ -66,3 +68,5 @@ public class SocLogRow implements Comparable<SocLogRow> {
 	}
  
 }
+
+
