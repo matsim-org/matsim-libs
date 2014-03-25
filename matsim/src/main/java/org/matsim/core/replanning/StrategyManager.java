@@ -36,10 +36,19 @@ import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
  * Manages and applies strategies to agents for re-planning.
  *
  * @author mrieser
+ * @author kai
  */
 public class StrategyManager implements MatsimManager {
-	
-	GenericStrategyManager<Plan> delegate = new GenericStrategyManager<Plan>() ;
+
+	protected final GenericStrategyManager<Plan> delegate;
+
+	public StrategyManager() {
+		this.delegate = new GenericStrategyManager<Plan>();
+	}
+
+	public StrategyManager(GenericStrategyManager<Plan> delegate) {
+		this.delegate = delegate;
+	}
 
 	/**
 	 * @param name the name of the subpopulation attribute
@@ -121,11 +130,11 @@ public class StrategyManager implements MatsimManager {
 	 *
 	 * @param population
 	 * @param iteration the current iteration we're handling
-	 * @param replanningContext 
+	 * @param replanningContext
 	 */
 	public final void run(final Population population, final int iteration, final ReplanningContext replanningContext) {
 		// (this is not directly delegated since the run method of this StrategyManager includes two "hooks").
-		delegate.handleChangeRequests(iteration);	
+		delegate.handleChangeRequests(iteration);
 		run(population, replanningContext);
 	}
 
@@ -138,18 +147,15 @@ public class StrategyManager implements MatsimManager {
 	 * strategy on the person.
 	 *
 	 * @param population
-	 * @param replanningContext 
+	 * @param replanningContext
 	 */
 	public final void run( final Population population, final ReplanningContext replanningContext) {
 		beforePopulationRunHook( population, replanningContext ) ;
-		
-		// if anybody has a better idea of how to do the following, please go ahead, kai, nov'13
+
 		Collection<HasPlansAndId<Plan>> members = new ArrayList<HasPlansAndId<Plan>>() ;
-		for ( Person person : population.getPersons().values() ) {
-			members.add(person) ;
-		}
+		members.addAll(population.getPersons().values());
 		delegate.run( members, population.getPersonAttributes(), replanningContext ) ;
-		
+
 //		delegate.run( (Collection<HasPlansAndId<Plan>>)population.getPersons().values(), population.getPersonAttributes(), replanningContext);
 		// not sure why I need to cast this but I think in this case the <? extends Person> backfires. kai, nov'13
 		// compiles under eclipse, but not on the build server. kai, nov'13
@@ -228,16 +234,16 @@ public class StrategyManager implements MatsimManager {
 	 * Thoughts about using the logit-type selectors with negative logit model scale parameter:<ul>
 	 * <li> Look at one agent.
 	 * <li> Assume she has the choice between <i>n</i> different plans.
-	 * <li> (Continuous) fraction <i>f(i)</i> of plan <i>i</i> develops as (master equation) 
+	 * <li> (Continuous) fraction <i>f(i)</i> of plan <i>i</i> develops as (master equation)
 	 * <blockquote><i>
 	 * df(i)/dt = - p(i) * f(i) + 1/n
 	 * </i></blockquote>
-	 * where <i>p(i)</i> is from the choice model. 
+	 * where <i>p(i)</i> is from the choice model.
 	 * <li> Steady state solution (<i>df/dt=0</i>) <i> f(i) = 1/n * 1/p(i) </i>.
 	 * <li> If <i> p(i) = e<sup>-b*U(i)</sup></i>, then <i> f(i) = e<sup>b*U(i)</sup> / n </i>.  Or in words:
 	 * <i><b> If you use a logit model with a minus in front of the beta for plans removal, the resulting steady state distribution is
-	 * the same logit model with normal beta.</b></i> 
-	 * 
+	 * the same logit model with normal beta.</b></i>
+	 *
 	 * </ul>
 	 * The implication seems to be: divide the user-configured beta by two, use one half for choice and the other for plans removal.
 	 * <p/>
