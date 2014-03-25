@@ -105,6 +105,10 @@ public class ParkControl {
 		vmCharts.setAxis("Available parkings", "time", "available parkings in area");
 		vmCharts.addSeries("Available parkings", "for ev");
 		vmCharts.addSeries("Available parkings", "for nev");
+		vmCharts.addChart("Available EVparkings");
+		vmCharts.addSeries("Available EVparkings", "slow charge");
+		vmCharts.addSeries("Available EVparkings", "fast charge");
+		vmCharts.addSeries("Available EVparkings", "turbo charge[x100]");
 	}
 	
 	
@@ -213,10 +217,14 @@ public class ParkControl {
 	private void selectParking(LinkedList<ParkingSpot> spotsInArea, Id personId, double duration, double restOfDayDistance, boolean ev) {
 		// TODO Auto-generated method stub
 		boolean sufficientEVSpotFound = false; //Marks if there is a spot with anough possible charging to get the agent back home
+		boolean hasToCharge=false;
 		double score = 0;
 		double bestScore=-10000; //Nicht elegant, aber Startwert muss kleiner sein als alle moeglichen Scores
 		double stateOfCharge=0;
 		double neededBatteryPercentage=0;
+		int countSlowCharge=0;
+		int countFastCharge=0;
+		int countTurboCharge=0;
 		ParkingSpot bestSpot;
 		bestSpot=null;
 		
@@ -227,6 +235,7 @@ public class ParkControl {
 			//System.out.println("State of charge: "+stateOfCharge);
 			if(neededBatteryPercentage>stateOfCharge){
 				phwriter.addAgentHasToCharge(Double.toString(time), personId.toString());
+				hasToCharge=true;
 			}
 		}
 		
@@ -260,6 +269,20 @@ public class ParkControl {
 				//evRelatedScore += betaBatteryPerc  * stateOfChargeGainPerc; //!! Nur provisorisch !
 				
 				//System.out.println("Ev related Score :" + Double.toString(evRelatedScore));
+			
+				//Stats
+				if(spot.chargingRate<3){
+					countSlowCharge++;
+				}else if(spot.chargingRate<5){
+					countFastCharge++;
+				}else{
+					countTurboCharge++;
+				}
+				//---------
+			
+			
+			
+			
 			}
 			
 			double walkingTime = distance/VMConfig.walkingSpeed; //in h 
@@ -277,6 +300,13 @@ public class ParkControl {
 		if(sufficientEVSpotFound && !bestSpot.charge){
 			phwriter.addEVChoseWrongSpot(Double.toString(time), personId.toString(), bestScore);
 		}
+		//Stat
+		if(hasToCharge){
+			//vmCharts.addValues("Available EVparkings", "slow charge", time, countSlowCharge);
+			vmCharts.addValues("Available EVparkings", "fast charge", time, countFastCharge);
+			vmCharts.addValues("Available EVparkings", "turbo charge[x100]", time, countTurboCharge*100);
+		}
+		//-----
 		
 		parkOnSpot(bestSpot, bestScore, personId);
 		

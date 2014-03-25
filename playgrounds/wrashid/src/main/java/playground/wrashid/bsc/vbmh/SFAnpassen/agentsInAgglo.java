@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
+import java.util.Scanner;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -46,7 +47,11 @@ public class agentsInAgglo {
 		// E I N S T E L L U N G EN
 		String scenarioName = "140325_1";
 		
-		int anzahl_agents = 1500;
+		System.out.println("scenario name?");
+		Scanner s = new Scanner(System.in);
+		scenarioName=s.next();
+		
+		int anzahl_agents = 84110;
 		String networkFile = "input/SF_PLUS/network/siouxFalls_network_OSM_brookings.xml";
 		String inputPricingFile = "input/SF_PLUS/pricing/parking_pricing_models_demo.xml";
 		String outputFileF = "input/SF_PLUS/Scenario/"+scenarioName+"/facilities.xml";
@@ -89,12 +94,13 @@ public class agentsInAgglo {
 		//Reduzieren
 		Random zufall = new Random();
 		int i = 0;
+		double wkeit = anzahl_agents/84110;
 		Map<Id, ? extends Person> personMap = scenario.getPopulation().getPersons();
 		LinkedList <Id> personsNotUsed = new LinkedList <Id>();
 		for (Person p : scenario.getPopulation().getPersons().values()) {
 			PersonImpl pa = (PersonImpl) p;
 			System.out.println(pa.getCarAvail());
-			if(pa.getCarAvail()!="never" && zufall.nextDouble()<0.02 && i<anzahl_agents){
+			if(pa.getCarAvail()!="never" && zufall.nextDouble()<wkeit && i<anzahl_agents){
 				//population.addPerson(pa);
 				
 				System.out.println("Autofahrer hinzugefuegt");

@@ -107,7 +107,7 @@ public class create_demo_parking {
 				IdImpl location_id=(IdImpl)facility.getId();
 				CoordImpl location_coord = (CoordImpl) actfacility.getCoord();
 				
-				System.out.println(location_type);
+				//System.out.println(location_type);
 				
 				
 				
@@ -115,7 +115,12 @@ public class create_demo_parking {
 				
 				if (location_capacity>1000){ 	// Facilitys ohne capacity Angabe haben intern unendlich >> Bessere loesung suchen!
 					location_capacity=getAnzahlArbeiter(location_id.toString());
-					System.out.println(location_capacity);
+					
+					if(location_capacity==0){ //!! In testlaeufen reduzierte pop > oft kein Arbeiter
+						location_capacity=10;
+					}
+					
+					//System.out.println(location_capacity);
 				}
 				
 				
