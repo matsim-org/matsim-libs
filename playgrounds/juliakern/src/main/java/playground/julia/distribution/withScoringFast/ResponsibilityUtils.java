@@ -52,6 +52,18 @@ public class ResponsibilityUtils {
 		
 		//go through all time intervals (those without emissions are not relevant)
 		for(Double endOfTimeInterval: emissionsPerCell.keySet()){
+			
+			//calculate average aggregated durations for this time interval
+			Double avgDurations = 0.0;
+			for(int x=0; x<noOfXCells; x++){
+				for(int y=0; y<noOfYCells; y++){
+					if(duration.get(endOfTimeInterval)[x][y]!=null){
+						avgDurations+=duration.get(endOfTimeInterval)[x][y];
+					}
+				}
+			}
+			avgDurations = avgDurations/noOfXCells/noOfYCells;
+			
 			ArrayList<EmPerCell> emissionsOfCurrentInterval = emissionsPerCell.get(endOfTimeInterval);
 			// em per cell has already price as value and therefore no pollutant type
 			// causing person -> add emission price of curent emission per cell X numberOfPeople exposed X timeOfPeople exposed
@@ -66,10 +78,10 @@ public class ResponsibilityUtils {
 						Double durationForCurrentCell = duration.get(endOfTimeInterval)[cell.getX()][cell.getY()];
 						if(durationForCurrentCell!=null){
 							switch(distance){
-							case 0: exposureDuration += dist0factor * durationForCurrentCell; break;
-							case 1: exposureDuration += dist1factor * durationForCurrentCell; break;
-							case 2: exposureDuration += dist2factor * durationForCurrentCell; break;
-							case 3: exposureDuration += dist3factor * durationForCurrentCell; break;
+							case 0: exposureDuration += dist0factor * durationForCurrentCell/avgDurations; break;
+							case 1: exposureDuration += dist1factor * durationForCurrentCell/avgDurations; break;
+							case 2: exposureDuration += dist2factor * durationForCurrentCell/avgDurations; break;
+							case 3: exposureDuration += dist3factor * durationForCurrentCell/avgDurations; break;
 							}
 						}
 						}

@@ -73,19 +73,38 @@ public class ResponsibilityScoringFunction implements ScoringFunction {
 				for(ResponsibilityEvent re: ecl.getResp()){
 		
 					if(re.getResponsiblePersonId().equals(personId)){
+						
 		
 						amount += re.getExposureValue();
 					}
 				}
 			}
 		}
-		delegate.addMoney(-amount);
+		delegate.addMoney(-amount/ecl.noOfTimeBins);
 		delegate.finish();
 
 	}
 
 	@Override
 	public double getScore() {
+//		Id personId = plan.getPerson().getId();
+//
+//		System.out.println("score before " + plan.getScore());
+//		if(!plan.isSelected())System.out.println("++++++++++++++++shouldnt happen");
+//		Double amount = new Double(.0);
+//		if(ecl!=null){
+//			if(ecl.getResp()!=null){
+//				for(ResponsibilityEvent re: ecl.getResp()){
+//		
+//					if(re.getResponsiblePersonId().equals(personId)){
+//						
+//		
+//						amount += re.getExposureValue();
+//					}
+//				}
+//			}
+//		}
+	
 //		Id personId = plan.getPerson().getId();
 //
 //		Double amount = new Double(.0);
@@ -104,6 +123,7 @@ public class ResponsibilityScoringFunction implements ScoringFunction {
 //		if(amount>0.0) delegate.addMoney(-amount); //TODO ueberpruefen, hier muesste immer >=0 sein
 //		System.out.println("Person id: " + personId.toString() + " exposure amount " + amount + " resulting score " + delegate.getScore());
 		return delegate.getScore();
+//		System.out.println("delegatescore " + delegate.getScore() + " amount " + amount);
 //		return delegate.getScore() - amount;
 	}
 

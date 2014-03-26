@@ -19,11 +19,14 @@
  * *********************************************************************** */
 package playground.julia.distribution.withScoringFast;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -34,10 +37,18 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
+import playground.julia.distribution.EmActivity;
+import playground.julia.distribution.EmPerCell;
 import playground.julia.distribution.EmissionModule;
 import playground.julia.distribution.GridTools;
+import playground.julia.responsibilityOffline.EmCarTrip;
+import playground.julia.responsibilityOffline.IntervalHandler;
+import playground.julia.spatialAveraging.SimpleWarmEmissionEventHandler;
+import playground.vsp.emissions.events.EmissionEventsReader;
 
 /**
  * @author benjamin
@@ -51,7 +62,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	Integer lastIteration;
 	EmissionModule emissionModule;
 	EventWriterXML emissionEventWriter;
-	IntervalHandler intervalHandler = new IntervalHandler();
+	IntervalHandler intervalHandler;
 	GeneratedEmissionsHandler geh;
 	GridTools gt;
 
@@ -72,11 +83,21 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 
 	private Map<Id, Double> person2causedEmCosts;
 
-	public EmissionControlerListener() {
-	}
+	private String eventsFile;
+
+	private ArrayList<EmActivity> activities;
+
+	private ArrayList<EmCarTrip> carTrips;
+	Network network;
+
+	private String emissionFile1;
+
+	private Map<Double, ArrayList<EmPerCell>> emissionsPerCell;
+
 
 	public EmissionControlerListener(Controler controler) {
 		this.controler = controler;
+		setMinMax(controler.getNetwork());
 		this.gt = new GridTools(controler.getNetwork().getLinks(), xMin, xMax, yMin, yMax);
 		
 		Scenario scenario = controler.getScenario() ;
@@ -85,6 +106,33 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		emissionModule.createEmissionHandler();
 	}
 	
+	public EmissionControlerListener(Controler controler, Network network, String eventsFile, String emissionFile){
+		this.controler = controler;
+		setMinMax(network);
+		this.gt = new GridTools(network.getLinks(), xMin, xMax, yMin, yMax);
+		this.eventsFile = eventsFile;
+		this.network=network;
+		this.emissionFile1=emissionFile;
+		
+		Scenario scenario = controler.getScenario() ;
+		emissionModule = new EmissionModule(scenario);
+		emissionModule.createLookupTables();
+		emissionModule.createEmissionHandler();
+	}
+	
+	private void setMinMax(Network network2) {
+		for(Link link: network2.getLinks().values()){
+			Double xCoord = link.getCoord().getX();
+			Double yCoord = link.getCoord().getY();
+			if(xMin>xCoord)xMin=xCoord;
+			if(xMax<xCoord)xMax=xCoord;
+			if(yMin>yCoord)yMin=yCoord;
+			if(yMax<yCoord)yMax=yCoord;
+		}
+		// TODO Auto-generated method stub
+		
+	}
+
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		controler = event.getControler();
@@ -105,16 +153,57 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 //		emissionModule.createEmissionHandler();
 		
 		EventsManager eventsManager = controler.getEvents();
-		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
-		
-		eventsManager.addHandler(intervalHandler);
-		
 		Double simulationEndTime = controler.getConfig().qsim().getEndTime();
+		simulationEndTime = 60*60*30.0; // TODO
 		timeBinSize = simulationEndTime/noOfTimeBins;
 		
+		logger.info("timebinsize----------------" + timeBinSize);
+		intervalHandler = new IntervalHandler(timeBinSize, simulationEndTime, noOfXCells, noOfYCells, links2xcells, links2ycells, gt, network );
+		
+		eventsManager.addHandler(intervalHandler);
+		intervalHandler.reset(0);
+		logger.info("size durations" + intervalHandler.getDuration().size());
+		
+		if(eventsFile!=null){
+			logger.info("start parsing");
+		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
+		matsimEventsReader.readFile(eventsFile);
+		
+		logger.warn(intervalHandler.uncountedEvents());
+		//intervalHandler.addActivitiesToTimetables(activities, links2xcells, links2ycells, simulationEndTime);
+		//intervalHandler.addCarTripsToTimetables(carTrips, simulationEndTime);
+		
+		}
+		logger.info("done parsing");
+		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
+		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
 		geh = new GeneratedEmissionsHandler(0.0, timeBinSize, links2xcells, links2ycells);
 		emissionModule.emissionEventsManager.addHandler(geh);
+		
+	
+		EmissionEventsReader emissionReader = new EmissionEventsReader(emissionModule.emissionEventsManager);
+		
+//		SimpleWarmEmissionEventHandler weeh = new SimpleWarmEmissionEventHandler();
+//		eventsManager.addHandler(weeh);
+//		SimpleColdEmissionEventHandler ceeh = new SimpleColdEmissionEventHandler();
+//	eventsManager.addHandler(ceeh);
+		emissionReader.parse(emissionFile1);
+		
+		logger.info("done parsing emission file");
+//		emissionsPerCell = geh.emissionPerCell;
+		
+		/*
+		 * 		IntervalHandler intervalHandler = new IntervalHandler();
+		eventsManager.addHandler(intervalHandler);
+		
+		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
+		matsimEventsReader.readFile(eventsFile);
+				
+		intervalHandler.addActivitiesToTimetables(activities, link2xbin, link2ybin, simulationEndTime);
+		intervalHandler.addCarTripsToTimetables(carTrips, simulationEndTime);
+		
+		eventsManager.removeHandler(intervalHandler);
+		 */
 	}
 
 	@Override
@@ -149,10 +238,10 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	public void notifyScoring(ScoringEvent event) {
 		logger.info("before scoring. starting resp calc.");
 		
-		Double simulationEndTime = controler.getConfig().qsim().getEndTime();
+		Double simulationEndTime = 60*60*30.0;
 		timeBinSize = simulationEndTime/noOfTimeBins;
 
-		intervalHandler.calculateDuration(links2xcells, links2ycells, simulationEndTime, timeBinSize, noOfXCells, noOfYCells);
+		//intervalHandler.calculateDuration(links2xcells, links2ycells, simulationEndTime, timeBinSize, noOfXCells, noOfYCells);
 		
 		if(intervalHandler.getDuration().size()==0)logger.warn("No activities recorded.");
 		

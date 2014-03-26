@@ -27,10 +27,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -47,7 +49,8 @@ import playground.vsp.emissions.types.WarmPollutant;
  * @author benjamin
  *
  */
-public class EmissionControlerListener implements StartupListener, IterationStartsListener, ShutdownListener, ScoringListener{
+public class EmissionControlerListener implements StartupListener, IterationStartsListener, 
+ShutdownListener, ScoringListener, AfterMobsimListener{
 	private static final Logger logger = Logger.getLogger(EmissionControlerListener.class);
 	
 	Controler controler;
@@ -55,16 +58,21 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	Integer lastIteration;
 	EmissionModule emissionModule;
 	EventWriterXML emissionEventWriter;
-	IntervalHandler intervalHandler = new IntervalHandler();
+	IntervalHandler intervalHandler;
 	GeneratedEmissionsHandler geh;
 	GridTools gt;
 
 	private ArrayList<ResponsibilityEvent> resp;
-
-	Double xMin = 4452550.25;
-	Double xMax = 4479483.33;
-	Double yMin = 5324955.00;
-	Double yMax = 5345696.81;
+//
+//	Double xMin = 4452550.25;
+//	Double xMax = 4479483.33;
+//	Double yMin = 5324955.00;
+//	Double yMax = 5345696.81;
+//	
+	Double xMin = 0.0;
+	Double xMax = 20000.0;
+	Double yMin = 0.0;
+	Double yMax = 10000.0;
 	
 	Integer noOfXCells = 16;
 	Integer noOfYCells = 12;
@@ -74,12 +82,12 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	Map<Id, Integer> links2xcells;
 	Map<Id, Integer> links2ycells;
 
-	public EmissionControlerListener() {
-	}
-
 	public EmissionControlerListener(Controler controler) {
 		this.controler = controler;
 		this.gt = new GridTools(controler.getNetwork().getLinks(), xMin, xMax, yMin, yMax);
+		this.intervalHandler = new IntervalHandler();
+		
+		logger.warn(controler.getNetwork().getLinks().size() + " number of links");
 		
 		Scenario scenario = controler.getScenario() ;
 		emissionModule = new EmissionModule(scenario);
@@ -95,8 +103,8 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		
 		logger.info("mapping links to cells");
 
-		links2xcells = gt.mapLinks2Xcells(noOfXCells);
-		links2ycells = gt.mapLinks2Ycells(noOfYCells);
+		this.links2xcells = gt.mapLinks2Xcells(noOfXCells);
+		this.links2ycells = gt.mapLinks2Ycells(noOfYCells);
 		if(links2xcells.isEmpty() || links2ycells.isEmpty()){
 			logger.warn("Something went wrong while mapping links to cells.");
 		}
@@ -152,22 +160,44 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 
 	@Override
 	public void notifyScoring(ScoringEvent event) {
+//		logger.info("before scoring. starting resp calc.");
+//		
+//		Double simulationEndTime = controler.getConfig().qsim().getEndTime();
+//		timeBinSize = simulationEndTime/noOfTimeBins;
+//
+//		this.intervalHandler.addActivitiesToTimetables(links2xcells, links2ycells, simulationEndTime);
+//
+//		ResponsibilityUtils reut = new ResponsibilityUtils();
+//		resp = new ArrayList<ResponsibilityEvent>();
+//		
+//		if(this.intervalHandler.getActivities().size()==0)logger.warn("No activities recorded.");
+//		
+//		if(this.geh.getEmissionsPerCell().isEmpty()) logger.warn("No emissions per cell calculated.");
+//		
+//		reut.addExposureAndResponsibilityBinwise(intervalHandler.getActivities(), geh.getEmissionsPerCell(), resp, timeBinSize, controler.getConfig().qsim().getEndTime());
+//		
+	}
+
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		// TODO Auto-generated method stub
 		logger.info("before scoring. starting resp calc.");
 		
 		Double simulationEndTime = controler.getConfig().qsim().getEndTime();
 		timeBinSize = simulationEndTime/noOfTimeBins;
 
-		intervalHandler.addActivitiesToTimetables(links2xcells, links2ycells, simulationEndTime);
+		this.intervalHandler.addActivitiesToTimetables(links2xcells, links2ycells, simulationEndTime);
 
 		ResponsibilityUtils reut = new ResponsibilityUtils();
 		resp = new ArrayList<ResponsibilityEvent>();
 		
-		if(intervalHandler.getActivities().size()==0)logger.warn("No activities recorded.");
+		if(this.intervalHandler.getActivities().size()==0)logger.warn("No activities recorded.");
 		
-		if(geh.getEmissionsPerCell().isEmpty()) logger.warn("No emissions per cell calculated.");
+		if(this.geh.getEmissionsPerCell().isEmpty()) logger.warn("No emissions per cell calculated.");
 		
 		reut.addExposureAndResponsibilityBinwise(intervalHandler.getActivities(), geh.getEmissionsPerCell(), resp, timeBinSize, controler.getConfig().qsim().getEndTime());
 		
+		logger.info("done with resp calc");
 	}
 	
 }

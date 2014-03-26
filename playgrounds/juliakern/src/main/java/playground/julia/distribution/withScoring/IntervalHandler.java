@@ -60,11 +60,11 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 		// combine act start events with act leave events to em activities
 		// without emission values - store person id, time and x,y-cell
 		
+		
 		for(Id personId: person2asevent.keySet()){
 			//TODO? sort by time?
 			for(ActivityStartEvent ase: person2asevent.get(personId)){
 				Double startOfActivity = ase.getTime();				
-				
 				if (link2xbins.get(ase.getLinkId())!=null && link2ybins.get(ase.getLinkId())!=null) {
 					int xBin = link2xbins.get(ase.getLinkId());
 					int yBin = link2ybins.get(ase.getLinkId());
@@ -87,8 +87,7 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 					// TODO sinnvoll? beschleunigt das entsprechend?
 					// hinterher auch act start loeschen?
 					//person2aeevent.get(personId).remove(aee);
-				}
-				
+				}				
 			}
 			if (person2aeevent.get(personId)!=null) {
 				// TODO rethink this!

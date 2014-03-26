@@ -80,6 +80,7 @@ public class TestEmissionPricing {
 		
 		Config config = new Config();
 		config.addCoreModules();
+		config.setParam("strategy", "maxAgentPlanMemorySize", "11");
 		Controler controler = new Controler(config);
 		
 	// controler settings	
@@ -90,7 +91,7 @@ public class TestEmissionPricing {
 		ControlerConfigGroup ccg = controler.getConfig().controler();
 		ccg.setOutputDirectory(outputPath);
 		ccg.setFirstIteration(0);
-		ccg.setLastIteration(11);
+		ccg.setLastIteration(21);
 		ccg.setMobsim("qsim");
 		Set set = new HashSet();
 		set.add(EventsFileFormat.xml);
@@ -139,12 +140,12 @@ public class TestEmissionPricing {
 		StrategyConfigGroup scg = controler.getConfig().strategy();
 		StrategySettings strategySettings = new StrategySettings(new IdImpl("1"));
 		strategySettings.setModuleName("ChangeExpBeta");
-		strategySettings.setProbability(1.0);
+		strategySettings.setProbability(0.01);
 		scg.addStrategySettings(strategySettings);
 		StrategySettings strategySettingsR = new StrategySettings(new IdImpl("2"));
 		strategySettingsR.setModuleName("ReRoute");
 		strategySettingsR.setProbability(1.0);
-		strategySettingsR.setDisableAfter(5);
+		strategySettingsR.setDisableAfter(10);
 		scg.addStrategySettings(strategySettingsR);
 		
 	// network
@@ -170,7 +171,7 @@ public class TestEmissionPricing {
 	// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
 		vcg.setWritingOutputEvents(false) ;
 		
-		EmissionControlerListener ecl = new EmissionControlerListener();
+		EmissionControlerListener ecl = new EmissionControlerListener(controler);
 		controler.addControlerListener(ecl);
 		controler.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(config, controler.getNetwork(), ecl));
 		
@@ -190,7 +191,8 @@ public class TestEmissionPricing {
 						logger.info("Selected route should not use link 39."); //System.out.println("39 contained");
 					}else{
 						if(lnri.getLinkIds().contains(new IdImpl("38"))){
-							logger.info("Selected route avoids node 9 as it is supposed to.");
+							logger.info("Selected route avoids node 9 as it is supposed to. " +
+									"It's score is " + selectedPlan.getScore());
 						}
 					}
 				}
@@ -200,6 +202,7 @@ public class TestEmissionPricing {
 		boolean plan9ex=false;
 		for(Plan p: activeAgent.getPlans()){			
 			if(p.isSelected()==false){
+				logger.info("This plan is not selected. It's score is " + p.getScore());
 				for(PlanElement pe: p.getPlanElements()){
 					if(pe instanceof Leg){
 						Leg leg = (Leg)pe;

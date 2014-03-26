@@ -120,10 +120,12 @@ public class ResponsibilityUtils {
 		ArrayList<ResponsibilityEvent> rEvents= new ArrayList<ResponsibilityEvent>();
 		
 		if (emissionPerBinOfCurrentTimeBin!=null) {
+			
 			for (EmPerCell epb : emissionPerBinOfCurrentTimeBin) {
 				if (epb.getXbin().equals(xBin) && epb.getYbin().equals(yBin)) {					
 					String location = "x = " + epb.getXbin().toString()	+ ", y = " + epb.getYbin();
 					ResponsibilityEvent ree = new ResponsibilityEventImpl(epb.getPersonId(), exposedPersonId, startTime, endTime, epb.getConcentration(), location);
+					System.out.println("epb conc" + epb.getConcentration());
 					rEvents.add(ree);
 				}
 			}
