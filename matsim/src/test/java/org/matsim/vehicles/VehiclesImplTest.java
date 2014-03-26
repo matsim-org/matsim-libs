@@ -21,18 +21,50 @@ package org.matsim.vehicles;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 
+/**
+ * 
+ * @author dgrether
+ * @author jwjoubert
+ */
 public class VehiclesImplTest {
 
+	@Test
+	public void testAddVehicle() {
+		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
+		
+		VehicleType testType = vehicles.getFactory().createVehicleType(new IdImpl("test"));
+		Vehicle v1 = vehicles.getFactory().createVehicle(new IdImpl("v1"), testType);
+
+		/* Must add vehicle type before adding vehicle. */
+		try{
+			vehicles.addVehicle(v1);
+			Assert.fail("Should not allow adding a vehicle if vehicle type has not been added to container first.");
+		} catch(IllegalArgumentException e){
+			/* Pass. */
+		}
+		
+		vehicles.addVehicleType(testType);
+		vehicles.addVehicle(v1);
+		
+		Vehicle v2 = vehicles.getFactory().createVehicle(new IdImpl("v1"), testType);
+		try{
+			vehicles.addVehicle(v2);
+			Assert.fail("Cannot add another vehicle with the same Id.");
+		} catch (IllegalArgumentException e){
+			/* Pass. */
+		}
+	}
+
+	
 	@Test
 	public void testGetVehicles(){
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 
-		Vehicle v1 = vehicles.getFactory().createVehicle(new IdImpl("v1"), new VehicleTypeImpl(new IdImpl("test")));
+		VehicleType testType = vehicles.getFactory().createVehicleType(new IdImpl("test"));
+		vehicles.addVehicleType(testType);
+		Vehicle v1 = vehicles.getFactory().createVehicle(new IdImpl("v1"), testType);
 
 		/* Should get an unmodifiable Map of the Vehicles container. */
 		try{
@@ -44,25 +76,7 @@ public class VehiclesImplTest {
 		}
 	}
 
-
-	@Test
-	public void testAddVehicle() {
-		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
-		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-
-		Vehicle v1 = vehicles.getFactory().createVehicle(new IdImpl("v1"), new VehicleTypeImpl(new IdImpl("test")));
-		Vehicle v2 = vehicles.getFactory().createVehicle(new IdImpl("v1"), new VehicleTypeImpl(new IdImpl("test")));
-
-		vehicles.addVehicle(v1);
-		try{
-			vehicles.addVehicle(v2);
-			Assert.fail("Cannot add another vehicle with the same Id.");
-		} catch (IllegalArgumentException e){
-			/* Pass. */
-		}
-	}
-
+	
 	@Test
 	public void testGetVehicleTypes(){
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
@@ -97,6 +111,7 @@ public class VehiclesImplTest {
 	public void testRemoveVehicle() {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		VehicleType t1 = vehicles.getFactory().createVehicleType(new IdImpl("type1"));
+		vehicles.addVehicleType(t1);
 
 		Vehicle v1 = vehicles.getFactory().createVehicle(new IdImpl("v1"), t1);
 

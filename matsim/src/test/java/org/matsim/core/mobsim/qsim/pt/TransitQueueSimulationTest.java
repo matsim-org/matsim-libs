@@ -147,6 +147,8 @@ public class TransitQueueSimulationTest {
         capacity.setStandingRoom(Integer.valueOf(0));
         vehicleType.setCapacity(capacity);
         
+        vehicles.addVehicleType(vehicleType);
+        
         vehicles.addVehicle(vb.createVehicle(new IdImpl("veh1"), vehicleType));
         vehicles.addVehicle(vb.createVehicle(new IdImpl("veh2"), vehicleType));
         vehicles.addVehicle(vb.createVehicle(new IdImpl("veh3"), vehicleType));

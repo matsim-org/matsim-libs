@@ -31,6 +31,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * @author dgrether
+ * @author jwjoubert
  */
 public class VehicleWriterV1 extends MatsimXmlWriter {
   

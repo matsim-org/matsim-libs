@@ -134,6 +134,8 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		vehicleCapacity.setSeats(30);
 		vehicleCapacity.setStandingRoom(70);
 		vehicleType.setCapacity(vehicleCapacity);
+		vehicles.addVehicleType(vehicleType);
+		
 		Vehicle vehicle = vehicles.getFactory().createVehicle(new IdImpl("V1"), vehicleType);
 		vehicles.addVehicle(vehicle);
 

@@ -46,9 +46,7 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 		
 		checkContent(vehicles);
-	}
-	
-	
+	}		
 
 	public void testWriter() throws FileNotFoundException, IOException {
 		
