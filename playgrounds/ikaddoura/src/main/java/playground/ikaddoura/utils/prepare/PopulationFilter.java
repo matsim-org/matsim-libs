@@ -22,9 +22,9 @@
  */
 package playground.ikaddoura.utils.prepare;
 
-import java.io.File;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
@@ -42,12 +42,36 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class PopulationFilter {
 	
-	private String outputPath = "/Users/ihab/Desktop/";
-	private String inputPlansFile = "/Users/ihab/Desktop/output_plans.xml.gz";
-	Scenario scenario_input;
-	Scenario scenario_output;
+	static String inputPlansFile;
+	static String outputPlansFile;
+	static String networkFile;
 
+	private Scenario scenario_input;
+	private Scenario scenario_output;
+	private int counter_car = 0;
+	private int counter_total = 0;
+	private static final Logger log = Logger.getLogger(PopulationFilter.class);
+	
 	public static void main(String[] args) {
+		
+		if (args.length > 0) {
+			
+			inputPlansFile = args[0];		
+			log.info("first argument (input plans file): " + inputPlansFile);
+			
+			outputPlansFile = args[1];
+			log.info("second argument (output plans file): " + outputPlansFile);
+			
+			networkFile = args[2];
+			log.info("third argument (network file): " + networkFile);
+			
+		} else {
+			
+			inputPlansFile = "/Users/ihab/Desktop/selectedPlans_10pct.xml.gz";
+			outputPlansFile = "/Users/ihab/Desktop/selectedPlans_10pct_car.xml.gz";
+			networkFile = "/Users/ihab/Desktop/network.xml";
+			
+		}
 		
 		PopulationFilter filter = new PopulationFilter();
 		filter.run();		
@@ -55,11 +79,9 @@ public class PopulationFilter {
 
 	private void run() {
 		
-		File directory = new File(this.outputPath);
-		directory.mkdirs();
-		
 		Config config1 = ConfigUtils.createConfig();
 		config1.plans().setInputFile(inputPlansFile);
+		config1.network().setInputFile(networkFile);
 		scenario_input = ScenarioUtils.loadScenario(config1);
 		
 		Config config2 = ConfigUtils.createConfig();
@@ -67,14 +89,18 @@ public class PopulationFilter {
 		
 		filterSelectedCarPlans();
 		
-		PopulationWriter popWriter = new PopulationWriter(scenario_output.getPopulation(), null);
-		popWriter.write("/Users/ihab/Desktop/selectedCarPlans.xml"); 
+		PopulationWriter popWriter = new PopulationWriter(scenario_output.getPopulation(), scenario_input.getNetwork());
+		popWriter.write(outputPlansFile);
+		
+		log.info("Number of selected plans in input population: " + scenario_input.getPopulation().getPersons().size());
+		log.info("Number of selected plans in output population: " + scenario_output.getPopulation().getPersons().size());
 		
 	}
 
 	private void filterSelectedCarPlans() {
 			
 		for (Person person : scenario_input.getPopulation().getPersons().values()){
+			counter_total++;
 			Plan selectedPlan = person.getSelectedPlan();
 			boolean planContainsCarLeg = false;
 			
@@ -87,12 +113,13 @@ public class PopulationFilter {
 						// leg has car mode
 						planContainsCarLeg = true;
 					} else {
-							// no car mode
+						// no car mode
 					}
 				}
 			}
 			
 			if (planContainsCarLeg){
+				counter_car++;
 				Person personCopy = scenario_output.getPopulation().getFactory().createPerson(person.getId());
 				personCopy.addPlan(selectedPlan);
 				scenario_output.getPopulation().addPerson(personCopy);
