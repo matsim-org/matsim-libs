@@ -152,6 +152,22 @@ public class Parking {
 	}
 
 	
+	public LinkedList<String> getLinkedList(){
+		String facilityId = this.facilityId;
+		String facilityActType = this.facilityActType;
+		if(this.type.equals("public")){
+			facilityActType="Street";
+			facilityId="Street";
+		}
+		
+		LinkedList<String> list = new LinkedList<String>();
+		list.add(facilityId);
+		list.add(facilityActType);
+		list.add(type);
+		list.add(Double.toString(coordinateX));
+		list.add(Double.toString(coordinateY));
+		return list;
+	}
 	
 	
 }

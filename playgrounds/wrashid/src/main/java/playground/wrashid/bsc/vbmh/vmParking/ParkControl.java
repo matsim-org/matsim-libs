@@ -1,6 +1,7 @@
 package playground.wrashid.bsc.vbmh.vmParking;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -25,6 +26,7 @@ import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.wrashid.bsc.vbmh.controler.VMConfig;
+import playground.wrashid.bsc.vbmh.util.CSVWriter;
 import playground.wrashid.bsc.vbmh.util.RemoveDuplicate;
 import playground.wrashid.bsc.vbmh.util.VMCharts;
 import playground.wrashid.bsc.vbmh.vmEV.EVControl;
@@ -57,7 +59,8 @@ public class ParkControl {
 	
 	LinkedList<double[]> availableParkingStat = new LinkedList<double[]>();  //zaehlt für jeden Parkvorgang die Parkplaetze, die zur verfuegung stehen
 	VMCharts vmCharts = new VMCharts(); 
-	
+	HashMap<Integer, Integer> peekLoad;
+	HashMap<Integer, Integer> load;
 	
 	
 	Controler controller;
@@ -109,6 +112,14 @@ public class ParkControl {
 		vmCharts.addSeries("Available EVparkings", "slow charge");
 		vmCharts.addSeries("Available EVparkings", "fast charge");
 		vmCharts.addSeries("Available EVparkings", "turbo charge[x100]");
+		peekLoad = new HashMap<Integer, Integer>();
+		load = new HashMap<Integer, Integer>();
+		for(Parking parking : parkingMap.getParkings()){
+			peekLoad.put(parking.id, 0);
+			load.put(parking.id, 0);
+		}
+		
+		
 	}
 	
 	
@@ -384,6 +395,9 @@ public class ParkControl {
 			}
 			selectedSpot.setOccupied(false); //Platz freigeben
 			
+			load.put(selectedSpot.parking.id, load.get(selectedSpot.parking.id)-1);
+			
+			
 			//kosten auf matsim util funktion
 			double duration=this.time-selectedSpot.getTimeVehicleParked(); //Parkzeit berechnen
 			//System.out.println(duration);
@@ -448,7 +462,11 @@ public class ParkControl {
 		ParkingSpot selectedSpotToSet = (ParkingSpot) personAttributes.get("selectedParkingspot");
 		selectedSpotToSet.setOccupied(true);
 		selectedSpotToSet.setTimeVehicleParked(this.time);
-		
+		int currentLoad = load.get(selectedSpotToSet.parking.id);
+		load.put(selectedSpotToSet.parking.id, currentLoad+1);
+		if(peekLoad.get(selectedSpotToSet.parking.id)<currentLoad+1){
+			peekLoad.put(selectedSpotToSet.parking.id, currentLoad+1);
+		}
 		
 		
 		
@@ -508,6 +526,15 @@ public class ParkControl {
 		chart.addSeries("anzahl", time, availableParkings);
 		chart.saveAsPng(filename, 800, 600);
 		
+		CSVWriter csvWriter = new CSVWriter(controller.getConfig().getModule("controler").getValue("outputDirectory")+"/parkhistory/peekload_"+controller.getIterationNumber());
+		LinkedList<LinkedList<String>> peekLoadOutput = new LinkedList<LinkedList<String>>();
+		for(Parking parking : parkingMap.getParkings()){
+			peekLoadOutput.add(parking.getLinkedList());
+			peekLoadOutput.getLast().add(Integer.toString(peekLoad.get(parking.id)));
+			System.out.println(peekLoadOutput.getLast().toString());
+		}
+		csvWriter.writeAll(peekLoadOutput);
+		csvWriter.close();
 		
 		
 	}

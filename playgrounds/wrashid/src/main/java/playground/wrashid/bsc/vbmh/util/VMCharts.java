@@ -50,7 +50,7 @@ public class VMCharts {
 		String yName = "Y";
 		
 		void print(String filename){
-			XYScatterChart chart = new XYScatterChart(name, xName, yName);
+			XYScatterChart chart = new XYScatterChart(name, xName, yName,true); //True aktiviert log scale
 			
 			Iterator<String> names = series.keySet().iterator();
 			for (LinkedList<double[]> serie : series.values()){
@@ -59,7 +59,7 @@ public class VMCharts {
 				int i=0;
 				for(double[] element : serie){
 					x[i]=element[0];
-					y[i]=element[1];
+					y[i]=element[1]+0.1; // +0.1 nicht schoen aber sonst log scale nicht moeglich wegen 0 werten
 					i++;
 				}
 				chart.addSeries(names.next(), x,y);
