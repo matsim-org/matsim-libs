@@ -106,9 +106,6 @@ public class TaxiStatsCalculator
                     stats.dropoffTime += time;
                     break;
 
-                case CHARGE_STAY:
-                    stats.chargeTime += time;
-
                 case WAIT_STAY:
                     stats.waitTime += time;
             }
@@ -128,7 +125,6 @@ public class TaxiStatsCalculator
         private double pickupTime;
         private double dropoffTime;
         private double cruiseTime;
-        private double chargeTime;
         private double waitTime;
         private double overTime;
         private double passengerWaitTime;
@@ -167,12 +163,6 @@ public class TaxiStatsCalculator
         public double getCruiseTime()
         {
             return cruiseTime;
-        }
-
-
-        public double getChargeTime()
-        {
-            return chargeTime;
         }
 
 

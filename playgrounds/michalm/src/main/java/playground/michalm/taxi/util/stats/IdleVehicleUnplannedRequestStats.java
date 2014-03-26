@@ -22,14 +22,14 @@ package playground.michalm.taxi.util.stats;
 import java.io.*;
 
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
-import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.data.*;
 import org.matsim.core.mobsim.framework.events.*;
 import org.matsim.core.mobsim.framework.listeners.*;
 
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
+import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
+import playground.michalm.taxi.util.TaxicabUtils;
 
 
 public class IdleVehicleUnplannedRequestStats
@@ -38,16 +38,16 @@ public class IdleVehicleUnplannedRequestStats
     private static final int MAX_TIME = 30 * 60 * 60;
     private static final int STEP = 60;
 
-    private final double[] idleVehs = new double[MAX_TIME];
-    private final double[] unplannedReqs = new double[MAX_TIME];
+    private final double[] idleVehs = new double[MAX_TIME / STEP];
+    private final double[] unplannedReqs = new double[MAX_TIME / STEP];
 
-    private final MatsimVrpContext context;
+    private final TaxiOptimizerConfiguration optimConfig;
     private final String filename;
 
 
-    public IdleVehicleUnplannedRequestStats(MatsimVrpContext context, String filename)
+    public IdleVehicleUnplannedRequestStats(TaxiOptimizerConfiguration optimConfig, String filename)
     {
-        this.context = context;
+        this.optimConfig = optimConfig;
         this.filename = filename;
     }
 
@@ -57,22 +57,13 @@ public class IdleVehicleUnplannedRequestStats
     {
         int idx = (int)e.getSimulationTime();
         if (idx < MAX_TIME) {
+            TaxiData taxiData = (TaxiData)optimConfig.context.getVrpData();
 
-            int idleVehCount = 0;
-            for (Vehicle v : context.getVrpData().getVehicles()) {
-                if (TaxiSchedulerUtils.isIdle(v)) {
-                    idleVehCount++;
-                }
-            }
-            idleVehs[idx] = idleVehCount;
+            idleVehs[idx / STEP] += TaxicabUtils.countVehicles(taxiData.getVehicles(),
+                    TaxiSchedulerUtils.createIsIdle(optimConfig.scheduler));
 
-            int unplannedReqCount = 0;
-            for (Request r : context.getVrpData().getRequests()) {
-                if ( ((TaxiRequest)r).getStatus() == TaxiRequestStatus.UNPLANNED) {
-                    unplannedReqCount++;
-                }
-            }
-            unplannedReqs[idx] = unplannedReqCount;
+            unplannedReqs[idx / STEP] += TaxiRequests.countRequestsWithStatus(
+                    taxiData.getTaxiRequests(), TaxiRequestStatus.UNPLANNED);
         }
     }
 
@@ -85,10 +76,8 @@ public class IdleVehicleUnplannedRequestStats
 
             pw.println("time\tidleVehs\tunplReqs");
 
-            for (int i = STEP; i < idleVehs.length; i += STEP) {
-                double avgIV = new Mean().evaluate(idleVehs, i - STEP, STEP);
-                double avgUR = new Mean().evaluate(unplannedReqs, i - STEP, STEP);
-                pw.println(i + "\t" + avgIV + "\t" + avgUR);
+            for (int i = 0; i < idleVehs.length; i++) {
+                pw.println(i + "\t" + idleVehs[i] / STEP + "\t" + unplannedReqs[i] / STEP);
             }
 
             pw.close();

@@ -19,25 +19,25 @@
 
 package playground.michalm.taxi.optimizer;
 
-import org.matsim.contrib.dvrp.MatsimVrpContext;
-
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
-import playground.michalm.taxi.util.*;
+import playground.michalm.taxi.util.TaxicabUtils;
 
 
 public class TaxiOptimizationValidation
 {
-    public static void assertNoUnplannedRequestsWhenIdleVehicles(MatsimVrpContext context)
+    public static void assertNoUnplannedRequestsWhenIdleVehicles(
+            TaxiOptimizerConfiguration optimConfig)
     {
-        TaxiData taxiData = (TaxiData)context.getVrpData();
+        TaxiData taxiData = (TaxiData)optimConfig.context.getVrpData();
 
-        if (TaxicabUtils.countVehicles(taxiData.getVehicles(), TaxiSchedulerUtils.IS_IDLE) == 0) {
+        if (TaxicabUtils.countVehicles(taxiData.getVehicles(),
+                TaxiSchedulerUtils.createIsIdle(optimConfig.scheduler)) == 0) {
             return;//OK
         }
 
-        if (TaxiRequestUtils.countRequestsWithStatus(taxiData.getTaxiRequests(),
+        if (TaxiRequests.countRequestsWithStatus(taxiData.getTaxiRequests(),
                 TaxiRequestStatus.UNPLANNED) == 0) {
             return; //OK
         }

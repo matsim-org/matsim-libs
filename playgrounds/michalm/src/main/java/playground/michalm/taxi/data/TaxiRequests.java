@@ -22,14 +22,56 @@ package playground.michalm.taxi.data;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 
 
 public class TaxiRequests
 {
-    public static final Predicate<TaxiRequest> IS_PLANNED = new Predicate<TaxiRequest>() {
+    public static final Predicate<TaxiRequest> IS_UNPLANNED = new TaxiRequestStatusPredicate(
+            TaxiRequestStatus.UNPLANNED);
+
+    public static final Predicate<TaxiRequest> IS_PLANNED = new TaxiRequestStatusPredicate(
+            TaxiRequestStatus.PLANNED);
+
+    public static final Predicate<TaxiRequest> IS_PICKUP_DRIVE = new TaxiRequestStatusPredicate(
+            TaxiRequestStatus.PICKUP_DRIVE);
+
+    public static final Predicate<TaxiRequest> IS_PICKUP_STAY = new TaxiRequestStatusPredicate(
+            TaxiRequestStatus.PICKUP_STAY);
+
+    public static final Predicate<TaxiRequest> IS_DROPOFF_DRIVE = new TaxiRequestStatusPredicate(
+            TaxiRequestStatus.DROPOFF_DRIVE);
+
+    public static final Predicate<TaxiRequest> IS_DROPOFF_STAY = new TaxiRequestStatusPredicate(
+            TaxiRequestStatus.DROPOFF_STAY);
+
+    public static final Predicate<TaxiRequest> IS_PERFORMED = new TaxiRequestStatusPredicate(
+            TaxiRequestStatus.PERFORMED);
+
+
+    public static class TaxiRequestStatusPredicate
+        implements Predicate<TaxiRequest>
+    {
+        private final TaxiRequestStatus status;
+
+
+        public TaxiRequestStatusPredicate(TaxiRequestStatus status)
+        {
+            this.status = status;
+        }
+
+
+        @Override
         public boolean apply(TaxiRequest r)
         {
-            return r.getStatus() == TaxiRequestStatus.PLANNED;
-        };
-    };
+            return r.getStatus() == status;
+        }
+    }
+
+
+    public static int countRequestsWithStatus(Iterable<TaxiRequest> requests,
+            TaxiRequestStatus status)
+    {
+        return Iterables.size(Iterables.filter(requests, new TaxiRequestStatusPredicate(status)));
+    }
 }

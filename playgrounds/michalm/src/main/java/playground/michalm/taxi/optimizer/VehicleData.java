@@ -21,38 +21,57 @@ package playground.michalm.taxi.optimizer;
 
 import java.util.*;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
-import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
+import playground.michalm.taxi.scheduler.TaxiScheduler;
 
 
 public class VehicleData
 {
-    public final List<Vehicle> vehicles = new ArrayList<Vehicle>();
-    public final List<LinkTimePair> departures = new ArrayList<LinkTimePair>();
-    public final int idleVehCount;
+    public static class Entry
+    {
+        public final Vehicle vehicle;
+        public final Link link;
+        public final double time;
+        public final boolean idle;
+
+
+        public Entry(Vehicle vehicle, LinkTimePair linkTimePair, boolean idle)
+        {
+            this.vehicle = vehicle;
+            this.link = linkTimePair.link;
+            this.time = linkTimePair.time;
+            this.idle = idle;
+        }
+    }
+
+
+    public final List<Entry> entries = new ArrayList<Entry>();
+
+    public final int idleCount;
     public final int dimension;
 
 
     public VehicleData(TaxiOptimizerConfiguration optimConfig)
     {
-        int idleVehs = 0;
+        TaxiScheduler scheduler = optimConfig.scheduler;
+        int idleCounter = 0;
         for (Vehicle v : optimConfig.context.getVrpData().getVehicles()) {
-            LinkTimePair departure = optimConfig.scheduler.getEarliestIdleness(v);
-            //LinkTimePair diversion = scheduler.getClosestDiversion(v);
+            LinkTimePair departure = scheduler.getEarliestIdleness(v);
 
             if (departure != null) {
-                vehicles.add(v);
-                departures.add(departure);
+                boolean idle = scheduler.isIdle(v);
+                entries.add(new Entry(v, departure, idle));
 
-                if (TaxiSchedulerUtils.isIdle(v)) {
-                    idleVehs++;
+                if (idle) {
+                    idleCounter++;
                 }
             }
         }
 
-        idleVehCount = idleVehs;
-        dimension = vehicles.size();
+        idleCount = idleCounter;
+        dimension = entries.size();
     }
 }

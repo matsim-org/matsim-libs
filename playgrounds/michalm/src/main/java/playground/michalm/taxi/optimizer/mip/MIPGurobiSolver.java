@@ -214,8 +214,7 @@ public class MIPGurobiSolver
             Link toLink = rData.requests[i].getFromLink();
 
             for (int k = 0; k < m; k++) {
-                Vehicle veh = vData.vehicles.get(k);
-                LinkTimePair departure = optimConfig.scheduler.getEarliestIdleness(veh);
+                VehicleData.Entry departure = vData.entries.get(k); 
 
                 double a_k = departure.time;
                 double t_O_ki = pathTravelTimeCalc.calcTravelTime(departure.link, toLink);

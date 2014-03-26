@@ -49,8 +49,6 @@ public class TaxiScheduleChartUtils
     private static final Color CRUISE_COLOR = new Color(100, 0, 0);
     private static final Color WAIT_COLOR = new Color(0, 0, 100);
 
-    private static final Color CHARGE_COLOR = new Color(0, 200, 0);
-
     public static final PaintSelector<TaxiTask> TAXI_PAINT_SELECTOR = new PaintSelector<TaxiTask>() {
         public Paint select(TaxiTask task)
         {
@@ -68,9 +66,6 @@ public class TaxiScheduleChartUtils
 
                 case WAIT_STAY:
                     return WAIT_COLOR;
-
-                case CHARGE_STAY:
-                    return CHARGE_COLOR;
 
                 default:
                     throw new IllegalStateException();

@@ -63,6 +63,19 @@ public class Schedules
     }
 
 
+    public static <T extends Task> T getSecondTask(Schedule<T> schedule)
+    {
+        return schedule.getTasks().get(1);
+    }
+
+
+    public static <T extends Task> T getNextToLastTask(Schedule<T> schedule)
+    {
+        List<T> tasks = schedule.getTasks();
+        return tasks.get(tasks.size() - 2);
+    }
+
+
     public static <T extends Task> T getLastTask(Schedule<T> schedule)
     {
         List<T> tasks = schedule.getTasks();
@@ -84,13 +97,13 @@ public class Schedules
 
     public static boolean isNextToLastTask(Task task)
     {
-        return task.getTaskIdx() + 2 == task.getSchedule().getTaskCount();
+        return task.getTaskIdx() == task.getSchedule().getTaskCount() - 2;
     }
 
 
     public static boolean isLastTask(Task task)
     {
-        return task.getTaskIdx() + 1 == task.getSchedule().getTaskCount();
+        return task.getTaskIdx() == task.getSchedule().getTaskCount() - 1;
     }
 
 

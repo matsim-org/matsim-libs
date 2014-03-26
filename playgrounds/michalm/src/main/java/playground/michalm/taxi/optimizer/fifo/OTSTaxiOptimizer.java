@@ -32,8 +32,7 @@ public class OTSTaxiOptimizer
 {
     public OTSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
-        super(optimConfig, new PriorityQueue<TaxiRequest>(getVehicleCount(optimConfig),
-                Requests.T0_COMPARATOR));
+        super(optimConfig, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR));
     }
 
 
@@ -41,11 +40,5 @@ public class OTSTaxiOptimizer
     {
         new FIFOSchedulingProblem(optimConfig)
                 .scheduleUnplannedRequests((Queue<TaxiRequest>)unplannedRequests);
-    }
-
-
-    private static int getVehicleCount(TaxiOptimizerConfiguration optimConfig)
-    {
-        return optimConfig.context.getVrpData().getVehicles().size();
     }
 }

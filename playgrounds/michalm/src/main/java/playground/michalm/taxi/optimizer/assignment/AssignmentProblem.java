@@ -24,7 +24,6 @@ import java.util.*;
 import org.apache.commons.math3.stat.descriptive.rank.Max;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
@@ -113,7 +112,7 @@ public class AssignmentProblem
         VrpPathWithTravelData[] reqPaths = new VrpPathWithTravelData[vData.dimension];
 
         for (int v = 0; v < vData.dimension; v++) {
-            LinkTimePair departure = vData.departures.get(v);
+            VehicleData.Entry departure = getVehicleDataEntry(v);
             reqPaths[v] = optimConfig.calculator.calcPath(departure.link, req.getFromLink(),
                     departure.time);
         }
@@ -141,7 +140,7 @@ public class AssignmentProblem
                     double pickupBeginTime = Math.max(req.getT0(), path.getArrivalTime());
 
                     reqToVehCostMatrix[r][v] = reduceTP ? //
-                            pickupBeginTime - vData.departures.get(v).time : //T_P
+                            pickupBeginTime - getVehicleDataEntry(v).time : //T_P
                             pickupBeginTime;//T_W
                 }
             }
@@ -161,7 +160,7 @@ public class AssignmentProblem
                 return false;
 
             case DEMAND_SUPPLY_EQUIL:
-                return rData.urgentReqCount > vData.idleVehCount;
+                return rData.urgentReqCount > vData.idleCount;
 
             default:
                 throw new IllegalStateException();
@@ -182,10 +181,16 @@ public class AssignmentProblem
 
             VrpPathWithTravelData path = pathsByReq.get(r)[v];
 
-            Vehicle veh = vData.vehicles.get(v);
+            Vehicle veh = getVehicleDataEntry(v).vehicle;
             TaxiRequest req = rData.requests[r];
             optimConfig.scheduler.scheduleRequest(new VehicleRequestPath(veh, req, path));
             unplannedRequests.remove(req);
         }
+    }
+
+
+    private VehicleData.Entry getVehicleDataEntry(int idx)
+    {
+        return vData.entries.get(idx);
     }
 }

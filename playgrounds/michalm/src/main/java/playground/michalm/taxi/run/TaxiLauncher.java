@@ -330,6 +330,8 @@ import playground.michalm.util.RunningVehicleRegister;
     /*package*/void generateOutput()
     {
         PrintWriter pw = new PrintWriter(System.out);
+        pw.println("m\t" + context.getVrpData().getVehicles().size());
+        pw.println("n\t" + context.getVrpData().getRequests().size());
         pw.println(TaxiStats.HEADER);
         TaxiStats stats = new TaxiStatsCalculator().calculateStats(context.getVrpData().getVehicles());
         pw.println(stats);

@@ -26,8 +26,6 @@ import java.util.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.schedule.*;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
@@ -37,17 +35,10 @@ import playground.michalm.taxi.vehreqpath.*;
 
 
 public class NOSTaxiOptimizer
-    implements TaxiOptimizer
+    extends AbstractTaxiOptimizer
 {
-    private final TaxiOptimizerConfiguration optimConfig;
-
     private final VehicleFilter vehicleFilter;
     private final RequestFilter requestFilter;
-
-    private final Queue<TaxiRequest> unplannedRequests;
-    private final Queue<Vehicle> idleVehicles;
-
-    private boolean requiresReoptimization = false;
 
 
     public static NOSTaxiOptimizer createNOS(TaxiOptimizerConfiguration optimConfig,
@@ -82,34 +73,40 @@ public class NOSTaxiOptimizer
     public NOSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig, VehicleFilter vehicleFilter,
             RequestFilter requestFilter)
     {
-        this.optimConfig = optimConfig;
+        super(optimConfig, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR));
         this.vehicleFilter = vehicleFilter;
         this.requestFilter = requestFilter;
-
-        int vehCount = optimConfig.context.getVrpData().getVehicles().size();
-        unplannedRequests = new PriorityQueue<TaxiRequest>(vehCount,//1 req per 1 veh
-                Requests.T0_COMPARATOR);
-        idleVehicles = new ArrayDeque<Vehicle>(vehCount);
     }
 
 
     //==============================
 
+    private Set<Vehicle> idleVehicles;
+
+
     @Override
-    public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
+    protected void scheduleUnplannedRequests()
     {
-        if (!requiresReoptimization) {
-            return;
-        }
+        initIdleVehicles();
 
         if (doReduceTP()) {
-            scheduleIdleVehicles();//reduce T_P to increase throughput (demand > supply)
+            scheduleIdleVehiclesImpl();//reduce T_P to increase throughput (demand > supply)
         }
         else {
-            scheduleUnplannedRequests();//reduce T_W (regular NOS)
+            scheduleUnplannedRequestsImpl();//reduce T_W (regular NOS)
         }
+    }
 
-        requiresReoptimization = false;
+
+    private void initIdleVehicles()
+    {
+        idleVehicles = new HashSet<Vehicle>();
+
+        for (Vehicle veh : optimConfig.context.getVrpData().getVehicles()) {
+            if (optimConfig.scheduler.isIdle(veh)) {
+                idleVehicles.add(veh);
+            }
+        }
     }
 
 
@@ -134,10 +131,17 @@ public class NOSTaxiOptimizer
     }
 
 
-    private void scheduleUnplannedRequests()
+    private void scheduleUnplannedRequestsImpl()
     {
-        while (!unplannedRequests.isEmpty()) {
-            TaxiRequest req = unplannedRequests.peek();
+        Queue<TaxiRequest> queue = (Queue<TaxiRequest>)unplannedRequests;
+
+        while (!queue.isEmpty()) {
+            if (idleVehicles.size() == 0) {
+                return;
+            }
+
+            TaxiRequest req = queue.peek();
+
             Iterable<Vehicle> filteredVehs = vehicleFilter.filterVehiclesForRequest(idleVehicles,
                     req);
 
@@ -145,20 +149,23 @@ public class NOSTaxiOptimizer
                     filteredVehs, VehicleRequestPaths.TW_COST);
 
             if (best == null) {
-                return;//no idle vehicles
+                continue;//either no idle vehicles or no "acceptable" path found
             }
 
             optimConfig.scheduler.scheduleRequest(best);
-            unplannedRequests.poll();
+            queue.poll();
             idleVehicles.remove(best.vehicle);
         }
     }
 
 
-    private void scheduleIdleVehicles()
+    private void scheduleIdleVehiclesImpl()
     {
-        while (!idleVehicles.isEmpty()) {
-            Vehicle veh = idleVehicles.peek();
+        for (Vehicle veh : idleVehicles) {
+            if (unplannedRequests.size() == 0) {
+                return;
+            }
+
             Iterable<TaxiRequest> filteredReqs = requestFilter.filterRequestsForVehicle(
                     unplannedRequests, veh);
 
@@ -166,25 +173,16 @@ public class NOSTaxiOptimizer
                     filteredReqs, VehicleRequestPaths.TP_COST);
 
             if (best == null) {
-                return;//no unplanned requests
+                continue;//either no unplanned requests or no "acceptable" path found
             }
 
             optimConfig.scheduler.scheduleRequest(best);
-            idleVehicles.poll();
             unplannedRequests.remove(best.request);
         }
     }
 
 
     //==============================
-
-    @Override
-    public void requestSubmitted(Request request)
-    {
-        unplannedRequests.add((TaxiRequest)request);
-        requiresReoptimization = true;
-    }
-
 
     @Override
     public void nextTask(Schedule<? extends Task> schedule)
@@ -194,26 +192,6 @@ public class NOSTaxiOptimizer
 
         optimConfig.scheduler.updateBeforeNextTask(taxiSchedule);
         taxiSchedule.nextTask();
-
-        if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
-            idleVehicles.remove(schedule.getVehicle());
-            return;
-        }
-
-        switch (taxiSchedule.getCurrentTask().getTaxiTaskType()) {
-            case WAIT_STAY:
-            case CHARGE_STAY:
-                idleVehicles.add(schedule.getVehicle());
-                requiresReoptimization = true;
-                break;
-
-            case PICKUP_DRIVE:
-                idleVehicles.remove(schedule.getVehicle());
-                break;
-
-            default:
-                //do nothing
-        }
     };
 
 

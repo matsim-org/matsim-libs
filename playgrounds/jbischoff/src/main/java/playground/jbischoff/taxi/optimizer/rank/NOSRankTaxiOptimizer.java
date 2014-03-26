@@ -270,30 +270,27 @@ public class NOSRankTaxiOptimizer
 
     }
 
-    public void scheduleCharging(Id vehid, double startTime, double endTime){
-    	double end = endTime;
-    	Vehicle vehicle = null;
-        for (Vehicle veh : optimConfig.context.getVrpData().getVehicles()) {
-        	if (veh.getId().equals(vehid)) vehicle = veh;
-        }
-        if (vehicle == null) throw new IllegalStateException();
-        if (vehicle.getSchedule().getStatus() != ScheduleStatus.STARTED)
-            return;
-        if (! (Schedules.getLastTask(vehicle.getSchedule()).getTaskIdx() == vehicle.getSchedule()
-                .getCurrentTask().getTaskIdx())) throw new IllegalStateException();
-        
-        @SuppressWarnings("unchecked")
-		Schedule<Task> sched = (Schedule<Task>)vehicle.getSchedule();
-
-        TaxiWaitStayTask twst = (TaxiWaitStayTask)vehicle.getSchedule().getCurrentTask();
-        double oldEndTime = twst.getEndTime();
-        if (end > oldEndTime) end = oldEndTime - 1.;
-        twst.setEndTime(startTime);
-        sched.addTask(new TaxiChargeStayTask(startTime, end, twst.getLink()));
-        sched.addTask(new TaxiWaitStayTask(end, oldEndTime, twst.getLink()));
-
-        
-        
-        }
+//    public void scheduleCharging(Id vehid, double startTime, double endTime){
+//    	double end = endTime;
+//    	Vehicle vehicle = null;
+//        for (Vehicle veh : optimConfig.context.getVrpData().getVehicles()) {
+//        	if (veh.getId().equals(vehid)) vehicle = veh;
+//        }
+//        if (vehicle == null) throw new IllegalStateException();
+//        if (vehicle.getSchedule().getStatus() != ScheduleStatus.STARTED)
+//            return;
+//        if (! (Schedules.getLastTask(vehicle.getSchedule()).getTaskIdx() == vehicle.getSchedule()
+//                .getCurrentTask().getTaskIdx())) throw new IllegalStateException();
+//        
+//        @SuppressWarnings("unchecked")
+//		Schedule<Task> sched = (Schedule<Task>)vehicle.getSchedule();
+//
+//        TaxiWaitStayTask twst = (TaxiWaitStayTask)vehicle.getSchedule().getCurrentTask();
+//        double oldEndTime = twst.getEndTime();
+//        if (end > oldEndTime) end = oldEndTime - 1.;
+//        twst.setEndTime(startTime);
+//        sched.addTask(new TaxiChargeStayTask(startTime, end, twst.getLink()));
+//        sched.addTask(new TaxiWaitStayTask(end, oldEndTime, twst.getLink()));
+//        }
     
 }

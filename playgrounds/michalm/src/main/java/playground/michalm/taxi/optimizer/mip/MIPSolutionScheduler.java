@@ -38,7 +38,7 @@ class MIPSolutionScheduler
         this.solution = solution;
 
         for (int k = 0; k < m; k++) {
-            currentVeh = vData.vehicles.get(k);
+            currentVeh = vData.entries.get(k).vehicle;
             addSubsequentRequestsToCurrentVehicle(k);
         }
     }

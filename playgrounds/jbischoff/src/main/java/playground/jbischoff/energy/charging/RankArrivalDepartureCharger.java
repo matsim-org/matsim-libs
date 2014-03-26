@@ -154,11 +154,11 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 				if (chargerHasFreeSpaceForVehicle(e.getKey()) ){
 					addVehicleToCharger(e.getKey());
 					this.events.processEvent(new StartChargingEvent(time, e.getKey(), this.arrivalLinks.get(e.getKey())));
-					double approxChargeAmount = ((BatteryElectricVehicle) this.vehicles.get(e.getKey())).getUsableBatteryCapacityInJoules() * 0.8 - ((BatteryElectricVehicle) this.vehicles.get(e.getKey()))
-							.getSocInJoules();
-					double expectedChargeTime = approxChargeAmount / (POWERINKW*1000);
-					double expectedEndTime = time + expectedChargeTime;
-					optimizer.scheduleCharging(e.getKey(),time, expectedEndTime);
+					//double approxChargeAmount = ((BatteryElectricVehicle) this.vehicles.get(e.getKey())).getUsableBatteryCapacityInJoules() * 0.8 - ((BatteryElectricVehicle) this.vehicles.get(e.getKey()))
+					//		.getSocInJoules();
+					//double expectedChargeTime = approxChargeAmount / (POWERINKW*1000);
+					//double expectedEndTime = time + expectedChargeTime;
+					//optimizer.scheduleCharging(e.getKey(),time, expectedEndTime);
 				}
 			}	
 			if (isConnectedToCharger(e.getKey())){

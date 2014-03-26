@@ -148,7 +148,7 @@ public class IdleRankVehicleFinder
         Collections.shuffle(context.getVrpData().getVehicles(), rnd);
 
         for (Vehicle veh : Iterables.filter(context.getVrpData().getVehicles(),
-                TaxiSchedulerUtils.IS_IDLE)) {
+                TaxiSchedulerUtils.createIsIdle(scheduler))) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;
@@ -171,7 +171,7 @@ public class IdleRankVehicleFinder
         Collections.shuffle(context.getVrpData().getVehicles(), rnd);
 
         for (Vehicle veh : Iterables.filter(context.getVrpData().getVehicles(),
-                TaxiSchedulerUtils.IS_IDLE)) {
+                TaxiSchedulerUtils.createIsIdle(scheduler))) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;
@@ -204,7 +204,7 @@ public class IdleRankVehicleFinder
         //          double bestDistance = Double.MAX_VALUE;
         double bestDistance = Double.MAX_VALUE / 2;
         for (Vehicle veh : Iterables.filter(context.getVrpData().getVehicles(),
-                TaxiSchedulerUtils.IS_IDLE)) {
+                TaxiSchedulerUtils.createIsIdle(scheduler))) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;

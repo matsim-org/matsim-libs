@@ -48,7 +48,6 @@ public class StraightLineNearestVehicleFinder
 
         for (Vehicle veh : vehicles) {
             Link fromLink = scheduler.getEarliestIdleness(veh).link;
-
             double squaredDistance = DistanceUtils.calculateSquaredDistance(fromLink, toLink);
 
             if (squaredDistance < bestSquaredDistance) {
