@@ -1,5 +1,6 @@
 package playground.wrashid.bsc.vbmh.SFAnpassen;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -71,7 +72,14 @@ public class VMScenarioTool {
 		CoordImpl brookings = new CoordImpl(xCoord, yCoord);
 		//------------------
 				
-		
+		//Verzeichnisse erstellen
+		try{
+		File dir = new File("input/SF_PLUS/Scenario/"+scenarioName);
+			dir.mkdir();
+		}catch(Exception e){
+			System.out.println("Verzeichniss wurde nicht angelegt");
+		}
+		//-----
 		
 		
 		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(inputFileConf));
