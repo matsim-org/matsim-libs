@@ -48,8 +48,6 @@ public class PopulationFilter {
 
 	private Scenario scenario_input;
 	private Scenario scenario_output;
-	private int counter_car = 0;
-	private int counter_total = 0;
 	private static final Logger log = Logger.getLogger(PopulationFilter.class);
 	
 	public static void main(String[] args) {
@@ -100,7 +98,6 @@ public class PopulationFilter {
 	private void filterSelectedCarPlans() {
 			
 		for (Person person : scenario_input.getPopulation().getPersons().values()){
-			counter_total++;
 			Plan selectedPlan = person.getSelectedPlan();
 			boolean planContainsCarLeg = false;
 			
@@ -119,7 +116,6 @@ public class PopulationFilter {
 			}
 			
 			if (planContainsCarLeg){
-				counter_car++;
 				Person personCopy = scenario_output.getPopulation().getFactory().createPerson(person.getId());
 				personCopy.addPlan(selectedPlan);
 				scenario_output.getPopulation().addPerson(personCopy);
