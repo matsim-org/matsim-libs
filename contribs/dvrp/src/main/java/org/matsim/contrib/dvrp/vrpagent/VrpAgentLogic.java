@@ -82,7 +82,7 @@ public class VrpAgentLogic
         }
         // else: PLANNED or STARTED
 
-        optimizer.nextTask(vehicle.getSchedule());
+        optimizer.nextTask(schedule);
         // remember to REFRESH status (after nextTask -> now it can be COMPLETED)!!!
 
         if (schedule.getStatus() == ScheduleStatus.COMPLETED) {// no more tasks
