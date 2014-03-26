@@ -33,7 +33,7 @@ import playground.wrashid.bsc.vbmh.vmEV.EV;
 import playground.wrashid.bsc.vbmh.vmEV.EVList;
 import playground.wrashid.bsc.vbmh.vmEV.EVListWriter;
 
-public class agentsInAgglo {
+public class VMScenarioTool {
 
 	static HashMap <Id, LinkedList <Person>> homes = new HashMap <Id, LinkedList <Person>>();
 	static Scenario scenario;
