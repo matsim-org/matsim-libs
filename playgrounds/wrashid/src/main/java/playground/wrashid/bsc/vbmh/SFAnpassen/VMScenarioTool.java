@@ -94,7 +94,7 @@ public class VMScenarioTool {
 		//Reduzieren
 		Random zufall = new Random();
 		int i = 0;
-		double wkeit = anzahl_agents/84110;
+		double wkeit = anzahl_agents/scenario.getPopulation().getPersons().size();
 		Map<Id, ? extends Person> personMap = scenario.getPopulation().getPersons();
 		LinkedList <Id> personsNotUsed = new LinkedList <Id>();
 		for (Person p : scenario.getPopulation().getPersons().values()) {

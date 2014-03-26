@@ -94,6 +94,7 @@ public class ParkControl {
 		ParkingMap karte = JAXB.unmarshal( parkingfile, ParkingMap.class ); //Laedt Parkplaetze aus XML
 		this.parkingMap=karte;
 		
+		
 		//Preise Laden
 		File pricingfile = new File( pricingFilename ); 
 		this.pricing = JAXB.unmarshal( pricingfile, PricingModels.class ); //Laedt Preise aus XML
@@ -104,6 +105,7 @@ public class ParkControl {
 	}
 	
 	public void iterStart(){
+		this.parkingMap.initHashMap(); //Im startup reicht eigentlich aber es muss sicher sein, dass parkings nicht neu erzeugt werden
 		vmCharts.addChart("Available parkings");
 		vmCharts.setAxis("Available parkings", "time", "available parkings in area");
 		vmCharts.addSeries("Available parkings", "for ev");
@@ -329,6 +331,21 @@ public class ParkControl {
 		//Bei EVS werden priorisiert EV Plaetze zurueck gegeben
 		// !! Zur Beschleunigung Map erstellen ? <facility ID, Private Parking> ?
 		ParkingSpot selectedSpot = null;
+		
+		Parking parking = parkingMap.getPrivateParking(facilityId, facilityActType);
+		if(parking==null){
+			return null;
+		}
+		
+		selectedSpot = parking.checkForFreeSpot(); //Gibt null oder einen freien Platz zurueck
+		if(ev){
+			selectedSpot = parking.checkForFreeSpotEVPriority(); // !!Wenn ev Spot vorhanden wird er genommen.
+		}
+		if (selectedSpot != null) {
+			return selectedSpot;
+		}
+		
+		/*
 		for (Parking parking : parkingMap.getParkings()) {
 			// System.out.println("Suche Parking mit passender facility ID");
 			if(parking.facilityId!=null){ //Es gibt datensaetze ohne Facility ID >> Sonst Nullpointer
@@ -345,6 +362,8 @@ public class ParkControl {
 				}
 			}
 		}
+		
+		*/
 		return null;
 	}
 
@@ -352,6 +371,20 @@ public class ParkControl {
 	LinkedList<ParkingSpot> getPublicParkings(Coord coord, boolean ev) {
 		// !! Mit quadtree oder aehnlichem Beschleunigen??
 		LinkedList<ParkingSpot> list = new LinkedList<ParkingSpot>();
+		
+		for(Parking parking :this.parkingMap.getPublicParkings(coord.getX(), coord.getY(), VMConfig.maxDistance)){
+			ParkingSpot spot = null;
+			spot = parking.checkForFreeSpot();
+			if(ev){
+				spot = parking.checkForFreeSpotEVPriority();
+			}
+			
+			if (spot != null) {
+				list.add(spot);
+			}
+		}
+		
+		/*
 		for (Parking parking : parkingMap.getParkings()) {
 			if (parking.type.equals("public")) {
 				ParkingSpot spot = null;
@@ -368,7 +401,9 @@ public class ParkControl {
 					}
 				}
 			}
-		}
+		}*/
+		
+		
 		if (list.isEmpty()) {
 			//list = null; // !! Oder Radius vergroessern?
 		}
@@ -531,7 +566,7 @@ public class ParkControl {
 		for(Parking parking : parkingMap.getParkings()){
 			peekLoadOutput.add(parking.getLinkedList());
 			peekLoadOutput.getLast().add(Integer.toString(peekLoad.get(parking.id)));
-			System.out.println(peekLoadOutput.getLast().toString());
+			//System.out.println(peekLoadOutput.getLast().toString());
 		}
 		csvWriter.writeAll(peekLoadOutput);
 		csvWriter.close();

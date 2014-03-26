@@ -3,6 +3,7 @@ package playground.wrashid.bsc.vbmh.vmParking;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedList;
 
 /**
  * Writes a file with parking related events. At the moments there are events for:
@@ -22,13 +23,20 @@ import java.io.IOException;
 
 
 public class ParkHistoryWriter {
-	String filename;
+	static String filename;
 	static File file;
 	static FileWriter fwriter;
-	
+	static LinkedList<String> output;
 
 	public void start(String filename) {
+		output = new LinkedList<String>();
 		this.filename = filename;
+		
+		
+	}
+	
+	public void end(){
+		
 		ParkHistoryWriter.file = new File(this.filename);
 		try {
 			ParkHistoryWriter.fwriter=new FileWriter(file);
@@ -37,9 +45,16 @@ public class ParkHistoryWriter {
 			e.printStackTrace();
 		}
 		
-	}
-	
-	public void end(){
+		for(String text : output){
+			try {
+				ParkHistoryWriter.fwriter.write(text);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		
 		try {
 			ParkHistoryWriter.fwriter.close();
 		} catch (IOException e) {
@@ -48,12 +63,8 @@ public class ParkHistoryWriter {
 		}
 	}
 	void schreiben(String text){
-		try {
-			ParkHistoryWriter.fwriter.write(text);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		output.add(text);
+		
 	}
 	
 	public void addParkingOccupied(Parking parking, String time, String person){

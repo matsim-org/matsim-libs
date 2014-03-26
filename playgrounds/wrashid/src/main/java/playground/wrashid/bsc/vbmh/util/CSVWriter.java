@@ -15,7 +15,7 @@ public class CSVWriter {
 		fileWriter = null;
 		try {
 			fileWriter = new FileWriter(file);
-			System.out.println("File offen");
+			//System.out.println("File offen");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -29,7 +29,7 @@ public class CSVWriter {
 				if(zeilenText!=null){
 					zeilenText=zeilenText+",";
 				}else{
-					System.out.println("neuer zeilentext");
+					//System.out.println("neuer zeilentext");
 					zeilenText="";
 				}
 				if(spalte==null){
