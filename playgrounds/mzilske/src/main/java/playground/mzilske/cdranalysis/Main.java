@@ -6,10 +6,10 @@ public class Main {
 		final ExperimentResource experiment = new ExperimentResource("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/");
 		final RegimeResource uncongested = experiment.getRegime("uncongested");
 		final RegimeResource congested = experiment.getRegime("congested");
-		congested.getMultiRateRun("sense").rate("2");
+		//congested.getMultiRateRun("sense").rate("2");
 	
-//		uncongested.getMultiRateRun("regular").detourFactor();
-		
+		uncongested.getMultiRateRun("regular").distances2();
+		congested.getMultiRateRun("regular").distances2();
 //		uncongested.allRates();
 //		congested.allRates();
 //		uncongested.distances();

@@ -20,14 +20,9 @@
 
 package org.matsim.core.network;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -35,15 +30,19 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl.HashSetCache;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
+
+/**
+ * @author mrieser
+ */
 public class LinkImplTest {
 
 	private final static Logger log = Logger.getLogger(LinkImplTest.class);
 	private static final double EPSILON = 1e-7;
 
-	/** Tests the method {@link LinkImpl#calcDistance(Coord)}.
-	 *
-	 * @author mrieser
-	 **/
+
 	@Test
 	public void testCalcDistance() {
 		/* create a sample network:
@@ -61,7 +60,7 @@ public class LinkImplTest {
 		 * The network contains an exactly horizontal, an exactly vertical, an exactly diagonal
 		 * and another link with no special slope to also test possible special cases.
 		 */
-		final NetworkImpl network = NetworkImpl.createNetwork();
+		final NetworkImpl network = new NetworkImpl();
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(0, 1000));
 		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(1000, 2000));
@@ -156,7 +155,7 @@ public class LinkImplTest {
 
 	@Test
 	public void testSetAttributes() {
-		NetworkImpl network = NetworkImpl.createNetwork();
+		NetworkImpl network = new NetworkImpl();
 		network.setCapacityPeriod(3600.0);
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(50, 50));
@@ -171,11 +170,10 @@ public class LinkImplTest {
 	/**
 	 * Tests setting and getting allowed modes for links.
 	 *
-	 * @author mrieser
 	 */
 	@Test
 	public void testAllowedModes() {
-		NetworkImpl network = NetworkImpl.createNetwork();
+		NetworkImpl network = new NetworkImpl();
 		Node n1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node n2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
 		Link l = network.createAndAddLink(new IdImpl(1), n1, n2, 1000, 10, 3600, 1);
@@ -203,9 +201,7 @@ public class LinkImplTest {
 		Assert.assertTrue(modes.contains(TransportMode.bike));
 	}
 
-	/**
-	 * @author mrieser
-	 */
+
 	@Test
 	public void testHashSetCache_get_unmodifiable() {
 		Set<String> s1 = new TreeSet<String>();
@@ -230,18 +226,14 @@ public class LinkImplTest {
 		Assert.assertEquals("the returned set must be independent of the given, original set.", 2, s.size());
 	}
 
-	/**
-	 * @author mrieser
-	 */
+
 	@Test
 	public void testHashSetCache_get_null() {
 		Set<String> s = HashSetCache.get((Set<String>) null);
 		Assert.assertNull(s);
 	}
 
-	/**
-	 * @author mrieser
-	 */
+
 	@Test
 	public void testHashSetCache_get_emptySet() {
 		Set<String> s = HashSetCache.get(new TreeSet<String>());
@@ -249,9 +241,7 @@ public class LinkImplTest {
 		Assert.assertEquals(0, s.size());
 	}
 
-	/**
-	 * @author mrieser
-	 */
+
 	@Test
 	public void testHashSetCache_get() {
 		Set<String> s1 = new TreeSet<String>();
@@ -290,9 +280,7 @@ public class LinkImplTest {
 		Assert.assertEquals(1, s_4.size());
 	}
 
-	/**
-	 * @author mrieser
-	 */
+
 	@Test
 	public void testHashSetCache_get_identicalObjects() {
 		Set<String> s1 = new TreeSet<String>();

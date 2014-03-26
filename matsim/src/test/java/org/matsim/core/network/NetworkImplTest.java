@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.AbstractNetworkTest;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -37,8 +38,8 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	private static final Logger log = Logger.getLogger(NetworkImplTest.class);
 
 	@Override
-	public NetworkImpl getEmptyTestNetwork() {
-		return NetworkImpl.createNetwork();  // TODO should be NetworkImpl, but that doesn't work
+	public Network getEmptyTestNetwork() {
+		return new NetworkImpl();
 	}
 	
 	/**
@@ -46,7 +47,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	 */
 	@Test
 	public void testDefaultValues(){
-		NetworkImpl net = this.getEmptyTestNetwork();
+		NetworkImpl net = new NetworkImpl();
 		Assert.assertEquals(7.5, net.getEffectiveCellSize(), 0.0);
 		Assert.assertEquals(3.75, net.getEffectiveLaneWidth(), 0.0);
 		Assert.assertEquals(3600.0, net.getCapacityPeriod(), 0.0);
@@ -69,7 +70,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	 */
 	@Test
 	public void testAddLink_existingId() {
-		NetworkImpl network = NetworkImpl.createNetwork();
+		NetworkImpl network = new NetworkImpl();
 		Id id1 = new IdImpl(1);
 		Id id2 = new IdImpl(2);
 		Id id3 = new IdImpl(3);

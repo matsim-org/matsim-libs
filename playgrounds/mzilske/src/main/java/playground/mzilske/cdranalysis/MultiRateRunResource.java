@@ -1,14 +1,5 @@
 package playground.mzilske.cdranalysis;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,10 +29,18 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-
 import playground.mzilske.cdr.CallBehavior;
 import playground.mzilske.cdr.CompareMain;
 import playground.mzilske.cdr.PowerPlans;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public class MultiRateRunResource {
 
@@ -295,6 +294,7 @@ public class MultiRateRunResource {
 		controler.run();
 	}
 
+    // TODO: Why does the volumeanalyzer measure something different from the routesums?
 	public void distances() {
 		final String filename = WD + "/distances.txt";
 		final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
@@ -310,11 +310,7 @@ public class MultiRateRunResource {
 				for (String rate : getRates()) {
 					final IterationResource lastIteration = getRateRun(rate).getLastIteration();
 					Scenario scenario = lastIteration.getExperiencedPlansAndNetwork();
-					final Map<Id, Double> distancePerPerson = PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), baseScenario.getNetwork());
-					double km = 0.0;
-					for (double distance : distancePerPerson.values()) {
-						km += distance;
-					}
+				    double km = sum(PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), baseScenario.getNetwork()).values());
 					EventsManager events1 = EventsUtils.createEventsManager();
 					VolumesAnalyzer volumes = new VolumesAnalyzer(TIME_BIN_SIZE, MAX_TIME, baseScenario.getNetwork());
 					events1.addHandler(volumes);
@@ -326,6 +322,28 @@ public class MultiRateRunResource {
 			}
 		});
 	}
+
+    public void distances2() {
+        final String filename = WD + "/distances2.txt";
+        final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
+        final double baseKm = sum(PowerPlans.travelledDistancePerPerson(baseScenario.getPopulation(), baseScenario.getNetwork()).values());
+        FileIO.writeToFile(filename, new StreamingOutput() {
+            @Override
+            public void write(PrintWriter pw) throws IOException {
+                pw.printf("regime\tcallrate\troutesum\trouterate\n");
+                pw.printf("%s\t%s\t%f\t%f\n",
+                        regime, "base", baseKm, baseKm/baseKm);
+                for (String rate : getRates()) {
+                    final IterationResource lastIteration = getRateRun(rate).getLastIteration();
+                    Scenario scenario = lastIteration.getExperiencedPlansAndNetwork();
+                    double km = sum(PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), baseScenario.getNetwork()).values());
+                    pw.printf("%s\t%s\t%f\t%f\n",
+                            regime, rate, km, km/baseKm);
+                    pw.flush();
+                }
+            }
+        });
+    }
 
 	public RunResource getRateRun(String rate) {
 		return new RunResource(WD + "/rates/" + rate, null); 
