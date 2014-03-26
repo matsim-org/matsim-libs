@@ -14,7 +14,7 @@ import playground.michalm.taxi.schedule.*;
 
 public class TaxiScheduleChartUtils
 {
-    public static JFreeChart chartSchedule(List<Vehicle> vehicles)
+    public static JFreeChart chartSchedule(List<? extends Vehicle> vehicles)
     {
         return ScheduleChartUtils.chartSchedule(vehicles, TAXI_DESCRIPTION_CREATOR,
                 TAXI_PAINT_SELECTOR);

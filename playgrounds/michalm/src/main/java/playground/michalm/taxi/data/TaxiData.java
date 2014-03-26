@@ -32,16 +32,19 @@ public class TaxiData
     private final List<TaxiRank> taxiRanks = new ArrayList<TaxiRank>();
     private final List<Charger> chargers = new ArrayList<Charger>();
 
+    private final List<TaxiRank> unmodifiableTaxiRanks = Collections.unmodifiableList(taxiRanks);
+    private final List<Charger> unmodifiableChargers = Collections.unmodifiableList(chargers);
+
 
     public List<TaxiRank> getTaxiRanks()
     {
-        return taxiRanks;
+        return unmodifiableTaxiRanks;
     }
 
 
     public List<Charger> getChargers()
     {
-        return chargers;
+        return unmodifiableChargers;
     }
 
 
@@ -54,6 +57,19 @@ public class TaxiData
     public List<TaxiRequest> getTaxiRequests()
     {
         return convertList(getRequests());
+    }
+
+
+    public void addTaxiRank(TaxiRank taxiRank)
+    {
+        taxiRanks.add(taxiRank);
+    }
+
+
+    @Override
+    public void addCharger(Charger charger)
+    {
+        chargers.add(charger);
     }
 
 

@@ -31,17 +31,34 @@ public class VrpDataImpl
     private final List<Vehicle> vehicles = new ArrayList<Vehicle>();
     private final List<Request> requests = new ArrayList<Request>();
 
+    private final List<Vehicle> unmodifiableVehicles = Collections.unmodifiableList(vehicles);
+    private final List<Request> unmodifiableRequests = Collections.unmodifiableList(requests);
+
 
     @Override
     public List<Vehicle> getVehicles()
     {
-        return vehicles;
+        return unmodifiableVehicles;
     }
 
 
     @Override
     public List<Request> getRequests()
     {
-        return requests;
+        return unmodifiableRequests;
+    }
+
+
+    @Override
+    public void addVehicle(Vehicle vehicle)
+    {
+        vehicles.add(vehicle);
+    }
+
+
+    @Override
+    public void addRequest(Request request)
+    {
+        requests.add(request);
     }
 }

@@ -28,7 +28,7 @@ public class VehicleRequestPathFinder
 
 
     public VehicleRequestPath findBestVehicleForRequest(TaxiRequest req,
-            Iterable<Vehicle> vehicles, VehicleRequestPathCost vrpCost)
+            Iterable<? extends Vehicle> vehicles, VehicleRequestPathCost vrpCost)
     {
         VehicleRequestPath bestVrp = null;
         double bestCost = Double.MAX_VALUE;

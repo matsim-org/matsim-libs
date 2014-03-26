@@ -85,7 +85,7 @@ public class TaxiRankReader
         Link link = links.get(linkId);
 
         currentRank = new TaxiRank(id, name, link);
-        data.getTaxiRanks().add(currentRank);
+        data.addTaxiRank(currentRank);
     }
 
 
@@ -94,6 +94,6 @@ public class TaxiRankReader
         Id id = scenario.createId(atts.getValue("id"));
         double powerInWatts = ReaderUtils.getDouble(atts, "power", 20) * 1000;
 
-        data.getChargers().add(new ChargerImpl(id, powerInWatts, currentRank.getLink()));
+        data.addCharger(new ChargerImpl(id, powerInWatts, currentRank.getLink()));
     }
 }

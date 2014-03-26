@@ -39,13 +39,13 @@ import org.matsim.contrib.dvrp.schedule.Task;
 
 public class ScheduleChartUtils
 {
-    public static JFreeChart chartSchedule(List<Vehicle> vehicles)
+    public static JFreeChart chartSchedule(List<? extends Vehicle> vehicles)
     {
         return chartSchedule(vehicles, BASIC_DESCRIPTION_CREATOR, BASIC_PAINT_SELECTOR);
     }
 
 
-    public static <T extends Task> JFreeChart chartSchedule(List<Vehicle> vehicles,
+    public static <T extends Task> JFreeChart chartSchedule(List<? extends Vehicle> vehicles,
             DescriptionCreator<T> descriptionCreator, PaintSelector<T> paintSelector)
     {
         // data
@@ -178,7 +178,7 @@ public class ScheduleChartUtils
 
 
     private static <T extends Task> TaskSeriesCollection createScheduleDataset(
-            List<Vehicle> vehicles, DescriptionCreator<T> descriptionCreator)
+            List<? extends Vehicle> vehicles, DescriptionCreator<T> descriptionCreator)
     {
         TaskSeriesCollection collection = new TaskSeriesCollection();
 

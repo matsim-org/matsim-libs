@@ -79,6 +79,6 @@ public class VehicleReader
         double t0 = ReaderUtils.getDouble(atts, "t_0", 0);
         double t1 = ReaderUtils.getDouble(atts, "t_1", 24 * 60 * 60);
 
-        data.getVehicles().add(new VehicleImpl(id, startLink, capacity, t0, t1));
+        data.addVehicle(new VehicleImpl(id, startLink, capacity, t0, t1));
     }
 }

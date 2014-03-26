@@ -154,7 +154,7 @@ public class PassengerEngine
         PassengerRequest request = requestCreator.createRequest(id, passenger, fromLink, toLink,
                 departureTime, departureTime, now);
 
-        requests.add(request);
+        context.getVrpData().addRequest(request);
 
         return request;
     }

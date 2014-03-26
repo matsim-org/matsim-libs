@@ -112,8 +112,10 @@ public class IdleRankVehicleFinder
         Vehicle bestVeh = null;
         double bestDistance = 1e9;
 
-        Collections.shuffle(context.getVrpData().getVehicles(), rnd);
-        for (Vehicle veh : context.getVrpData().getVehicles()) {
+        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles());
+        Collections.shuffle(vehicles, rnd);
+        
+        for (Vehicle veh : vehicles) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;
@@ -145,9 +147,11 @@ public class IdleRankVehicleFinder
     {
         Vehicle bestVeh = null;
         double bestSoc = 0;
-        Collections.shuffle(context.getVrpData().getVehicles(), rnd);
 
-        for (Vehicle veh : Iterables.filter(context.getVrpData().getVehicles(),
+        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles());
+        Collections.shuffle(vehicles, rnd);
+
+        for (Vehicle veh : Iterables.filter(vehicles,
                 TaxiSchedulerUtils.createIsIdle(scheduler))) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
@@ -168,9 +172,11 @@ public class IdleRankVehicleFinder
     {
         Vehicle bestVeh = null;
         double bestSoc = 0;
-        Collections.shuffle(context.getVrpData().getVehicles(), rnd);
 
-        for (Vehicle veh : Iterables.filter(context.getVrpData().getVehicles(),
+        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles());
+        Collections.shuffle(vehicles, rnd);
+
+        for (Vehicle veh : Iterables.filter(vehicles,
                 TaxiSchedulerUtils.createIsIdle(scheduler))) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
@@ -199,11 +205,13 @@ public class IdleRankVehicleFinder
 
     private Vehicle findClosestFIFOVehicle(TaxiRequest req)
     {
-        Collections.shuffle(context.getVrpData().getVehicles(), rnd);
+        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles());
+        Collections.shuffle(vehicles, rnd);
+
         Vehicle bestVeh = null;
         //          double bestDistance = Double.MAX_VALUE;
         double bestDistance = Double.MAX_VALUE / 2;
-        for (Vehicle veh : Iterables.filter(context.getVrpData().getVehicles(),
+        for (Vehicle veh : Iterables.filter(vehicles,
                 TaxiSchedulerUtils.createIsIdle(scheduler))) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))

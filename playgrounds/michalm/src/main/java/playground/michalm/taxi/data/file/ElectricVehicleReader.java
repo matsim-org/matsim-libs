@@ -89,6 +89,6 @@ public class ElectricVehicleReader
         Battery battery = new BatteryImpl(batteryCharge, batteryCapacity);
         ev.setBattery(battery);
 
-        data.getVehicles().add(ev);
+        data.addVehicle(ev);
     }
 }

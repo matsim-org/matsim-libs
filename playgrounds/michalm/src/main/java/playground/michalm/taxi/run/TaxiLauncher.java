@@ -192,6 +192,9 @@ import playground.michalm.util.RunningVehicleRegister;
         writeSimEvents = Boolean.valueOf(params.get("writeSimEvents"));
 
         scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName);
+//        scenario = VrpLauncherUtils.initTimeVariantScenario(netFileName, plansFileName,
+//                dirName + "changeevents.xml.gz");
+
         List<String> passengerIds = ODDemandGenerator.readTaxiCustomerIds(taxiCustomersFileName);
         VrpLauncherUtils.convertLegModes(passengerIds, TaxiRequestCreator.MODE, scenario);
     }

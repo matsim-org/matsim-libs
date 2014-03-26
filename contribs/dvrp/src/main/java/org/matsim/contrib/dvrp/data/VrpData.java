@@ -28,4 +28,10 @@ public interface VrpData
 
 
     List<Request> getRequests();
+
+
+    void addVehicle(Vehicle vehicle);
+
+
+    void addRequest(Request request);
 }

@@ -65,7 +65,7 @@ public class TaxiOptimizerWithPreassignment
         return new VehicleRequestPathFinder(calculator, scheduler) {
             @Override
             public VehicleRequestPath findBestVehicleForRequest(TaxiRequest req,
-                    Iterable<Vehicle> vehicles, VehicleRequestPathCost vrpCost)
+                    Iterable<? extends Vehicle> vehicles, VehicleRequestPathCost vrpCost)
             {
                 Vehicle veh = reqIdToVehMap.get(req.getId());
                 return super.findBestVehicleForRequest(req, Collections.singleton(veh), vrpCost);

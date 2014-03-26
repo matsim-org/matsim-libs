@@ -39,7 +39,7 @@ import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
  */
 public class RouteChartUtils
 {
-    public static JFreeChart chartRoutes(List<Vehicle> vehicles)
+    public static JFreeChart chartRoutes(List<? extends Vehicle> vehicles)
     {
         CoordDataset lData = new CoordDataset();
 
@@ -81,7 +81,7 @@ public class RouteChartUtils
     }
 
 
-    public static JFreeChart chartRoutesByStatus(List<Vehicle> vehicles)
+    public static JFreeChart chartRoutesByStatus(List<? extends Vehicle> vehicles)
     {
         CoordDataset nData = new CoordDataset();
 

@@ -32,7 +32,7 @@ public class TaxiStatsCalculator
     private TaxiStats stats;
 
 
-    public TaxiStats calculateStats(Iterable<Vehicle> vehicles)
+    public TaxiStats calculateStats(Iterable<? extends Vehicle> vehicles)
     {
         stats = new TaxiStats();
 
