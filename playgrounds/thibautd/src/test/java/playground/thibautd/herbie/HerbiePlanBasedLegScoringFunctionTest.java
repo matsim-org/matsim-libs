@@ -246,6 +246,9 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 
 	public HerbiePlanBasedLegScoringFunctionTest(final Plan plan) {
 		this.plan = plan;
+		// the factory now requires that we score the selected plan (mar. 2014)
+		plan.getPerson().addPlan( plan );
+		plan.getPerson().setSelectedPlan( plan );
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
