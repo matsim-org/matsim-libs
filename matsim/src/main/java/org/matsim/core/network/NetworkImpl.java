@@ -111,13 +111,13 @@ public final class NetworkImpl implements Network {
 		}
 		
 		/* Check if the link's nodes are in the network. */
-		Node fromNode = link.getFromNode();
-		if(nodes.get(fromNode.getId()) == null){
-			throw new IllegalArgumentException("Trying to add link = " + link.getId() + ", but its fromNode = " + fromNode.getId() + " has not been added to the network.");
+		Node fromNode = nodes.get( link.getFromNode().getId() );
+		if(fromNode == null){
+			throw new IllegalArgumentException("Trying to add link = " + link.getId() + ", but its fromNode = " + link.getFromNode().getId() + " has not been added to the network.");
 		}
-		Node toNode = link.getToNode();
-		if(nodes.get(toNode.getId()) == null){
-			throw new IllegalArgumentException("Trying to add link = " + link.getId() + ", but its toNode = " + toNode.getId() + " has not been added to the network.");
+		Node toNode = nodes.get( link.getToNode().getId() );
+		if(toNode == null){
+			throw new IllegalArgumentException("Trying to add link = " + link.getId() + ", but its toNode = " + link.getToNode().getId() + " has not been added to the network.");
 		}
 
 		fromNode.addOutLink(link);
