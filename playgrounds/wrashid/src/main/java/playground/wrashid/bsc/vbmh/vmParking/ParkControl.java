@@ -59,7 +59,7 @@ public class ParkControl {
 	
 	LinkedList<double[]> availableParkingStat = new LinkedList<double[]>();  //zaehlt für jeden Parkvorgang die Parkplaetze, die zur verfuegung stehen
 	VMCharts vmCharts = new VMCharts(); 
-	HashMap<Integer, Integer> peekLoad;
+	HashMap<Integer, Integer> peakLoad;
 	HashMap<Integer, Integer> load;
 	
 	
@@ -114,10 +114,10 @@ public class ParkControl {
 		vmCharts.addSeries("Available EVparkings", "slow charge");
 		vmCharts.addSeries("Available EVparkings", "fast charge");
 		vmCharts.addSeries("Available EVparkings", "turbo charge[x100]");
-		peekLoad = new HashMap<Integer, Integer>();
+		peakLoad = new HashMap<Integer, Integer>();
 		load = new HashMap<Integer, Integer>();
 		for(Parking parking : parkingMap.getParkings()){
-			peekLoad.put(parking.id, 0);
+			peakLoad.put(parking.id, 0);
 			load.put(parking.id, 0);
 		}
 		
@@ -499,8 +499,8 @@ public class ParkControl {
 		selectedSpotToSet.setTimeVehicleParked(this.time);
 		int currentLoad = load.get(selectedSpotToSet.parking.id);
 		load.put(selectedSpotToSet.parking.id, currentLoad+1);
-		if(peekLoad.get(selectedSpotToSet.parking.id)<currentLoad+1){
-			peekLoad.put(selectedSpotToSet.parking.id, currentLoad+1);
+		if(peakLoad.get(selectedSpotToSet.parking.id)<currentLoad+1){
+			peakLoad.put(selectedSpotToSet.parking.id, currentLoad+1);
 		}
 		
 		
@@ -561,14 +561,28 @@ public class ParkControl {
 		chart.addSeries("anzahl", time, availableParkings);
 		chart.saveAsPng(filename, 800, 600);
 		
-		CSVWriter csvWriter = new CSVWriter(controller.getConfig().getModule("controler").getValue("outputDirectory")+"/parkhistory/peekload_"+controller.getIterationNumber());
-		LinkedList<LinkedList<String>> peekLoadOutput = new LinkedList<LinkedList<String>>();
+		CSVWriter csvWriter = new CSVWriter(controller.getConfig().getModule("controler").getValue("outputDirectory")+"/parkhistory/peakload_"+controller.getIterationNumber());
+		LinkedList<LinkedList<String>> peakLoadOutput = new LinkedList<LinkedList<String>>();
+		LinkedList<String> headLine = new LinkedList<String>();
+		headLine.add("ID");
+		headLine.add("FacID");
+		headLine.add("FacActType");
+		headLine.add("type");
+		headLine.add("X");
+		headLine.add("Y");
+		headLine.add("EV Exclusive");
+		headLine.add("EV Capacity");
+		headLine.add("NEV Capacitiy");
+		headLine.add("Sum");
+		headLine.add("Rate of charge");
+		headLine.add("PeakLoad");
+		
 		for(Parking parking : parkingMap.getParkings()){
-			peekLoadOutput.add(parking.getLinkedList());
-			peekLoadOutput.getLast().add(Integer.toString(peekLoad.get(parking.id)));
+			peakLoadOutput.add(parking.getLinkedList());
+			peakLoadOutput.getLast().add(Integer.toString(peakLoad.get(parking.id)));
 			//System.out.println(peekLoadOutput.getLast().toString());
 		}
-		csvWriter.writeAll(peekLoadOutput);
+		csvWriter.writeAll(peakLoadOutput);
 		csvWriter.close();
 		
 		

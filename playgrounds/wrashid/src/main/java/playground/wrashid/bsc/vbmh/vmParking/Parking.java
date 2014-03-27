@@ -29,6 +29,7 @@ public class Parking {
 	public long capacityNEV;
 	public double chargingRate;
 	public int parkingPriceMEVSpot, parkingPriceMNEVSpot, chargingPriceM;
+	public int peekLoadEV, peekLoadNEV;
 	public String facilityId;
 	public String facilityActType;
 	public String type;
@@ -161,11 +162,17 @@ public class Parking {
 		}
 		
 		LinkedList<String> list = new LinkedList<String>();
+		list.add(Integer.toString(this.id));
 		list.add(facilityId);
 		list.add(facilityActType);
 		list.add(type);
 		list.add(Double.toString(coordinateX));
 		list.add(Double.toString(coordinateY));
+		list.add(Boolean.toString(this.evExklusive));
+		list.add(Long.toString(this.capacityEV));
+		list.add(Long.toString(this.capacityNEV));
+		list.add(Long.toString(this.capacityEV+this.capacityNEV));
+		list.add(Double.toString(this.chargingRate));
 		return list;
 	}
 	

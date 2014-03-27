@@ -1,5 +1,8 @@
 package playground.wrashid.bsc.vbmh.controler;
 
+import java.io.File;
+import java.util.Scanner;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -25,6 +28,31 @@ public class SFControler1 {
 		String parkHistoryFileName; 
 		
 		Config config = ConfigUtils.loadConfig(args[0]);
+		
+		//System.out.println("OutputDir Extension?");
+		//Scanner s = new Scanner(System.in);
+		//String extension=s.next();
+		
+		String extension = args[1];
+		System.out.println(extension);
+		
+		config.getModule("controler").addParam("outputDirectory", config.getModule("controler").getValue("outputDirectory")+extension);
+		System.out.println(config.getModule("controler").getValue("outputDirectory"));
+
+		//Verzeichnisse erstellen
+		try{
+			File dir = new File(config.getModule("controler").getValue("outputDirectory"));
+			dir.mkdir();
+			dir = new File(config.getModule("controler").getValue("outputDirectory")+"/parkhistory");
+			dir.mkdir();
+			dir = new File(config.getModule("controler").getValue("outputDirectory")+"/Charts");
+			dir.mkdir();
+		}catch(Exception e){
+			System.out.println("Verzeichniss wurde nicht angelegt");
+		}
+		//-----
+				
+		
 		parking_filename=config.getModule("VM_park").getValue("inputParkingFile");
 		pricing_filename=config.getModule("VM_park").getValue("inputPricingFile");
 		evFilename=config.getModule("VM_park").getValue("inputEVFile");

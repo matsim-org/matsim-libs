@@ -65,7 +65,7 @@ public class VMCharts {
 				chart.addSeries(names.next(), x,y);
 			}
 			
-			
+			//chart.getChart().getXYPlot().getRenderer().setBaseShape(new Ellipse2D.Double(0,0,5,5));
 			chart.saveAsPng(filename, 800, 600);
 			
 		}
