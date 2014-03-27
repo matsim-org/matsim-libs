@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransportMode.java
+ * CASimAgentConstructEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,20 +18,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.scenario;
+package playground.gregor.casim.events;
 
+import org.matsim.api.core.v01.events.Event;
 
-public abstract class TransportMode {
+import playground.gregor.casim.simulation.physics.CAAgent;
 
-//	public static String walk = org.matsim.api.core.v01.TransportMode.walk;
-	public static String walk2d = "walk2d";
-	public static String walkca = "walkca";
-//	public static Set<String> transportModes;
-//	static {
-//		transportModes = new HashSet<String>();
-//		transportModes.add(walk);
-//		transportModes.add(walk2d);
-//		
-//	}
+public class CASimAgentConstructEvent extends Event{
+
+	private final CAAgent agent;
+
+	public CASimAgentConstructEvent(double time, CAAgent a) {
+		super(time);
+		this.agent = a;
+	}
+
+	public static final String EVENT_TYP = "CASIM_AGENT_CONSTR";
 	
+	@Override
+	public String getEventType() {
+		return EVENT_TYP;
+	}
+	
+	public CAAgent getCAAgent() {
+		return this.agent;
+	}
+
 }

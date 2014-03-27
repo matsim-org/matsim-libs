@@ -32,7 +32,7 @@ public class NearestPointAtTargetLine implements DesiredDirectionCalculator {
 	private final Sim2DAgent agent;
 	private final LinkSwitcher ls;
 
-	
+
 	public NearestPointAtTargetLine(Sim2DAgent agent, LinkSwitcher ls) {
 		this.agent = agent;
 		this.ls = ls;
@@ -45,21 +45,23 @@ public class NearestPointAtTargetLine implements DesiredDirectionCalculator {
 		LinkInfo li = this.ls.getLinkInfo(id);
 		LineSegment fl = li.targetLine;
 		double r = CGAL.vectorCoefOfPerpendicularProjection(pos[0], pos[1], fl.x0, fl.y0, fl.x1, fl.y1);
-//if (this.agent.getId().toString().equals("b1")) {
-//	System.out.println("got you");
-//}
-		
+		//if (this.agent.getId().toString().equals("b1")) {
+		//	System.out.println("got you");
+		//}
+
 		//TODO intersection line/line segment!
 		double dx, dy;
 
 
 
-		if (r >= 0 && r <= 1) {
-			//			tx = fl.x0 + r * (fl.x1-fl.x0);
-			//			ty = fl.y0 + r * (fl.y1-fl.y0);
-			dx = li.dx;
-			dy = li.dy;
-		} else if (r <= 0) {
+		//		if (r >= 0 && r <= 1) {
+		//			//			tx = fl.x0 + r * (fl.x1-fl.x0);
+		//			//			ty = fl.y0 + r * (fl.y1-fl.y0);
+		//			dx = li.dx;
+		//			dy = li.dy;
+		//		} else 
+
+		if (r <= 0) {
 			final double tx = fl.x0;
 			final double ty = fl.y0;
 			dx = tx - pos[0];
@@ -78,19 +80,19 @@ public class NearestPointAtTargetLine implements DesiredDirectionCalculator {
 		}
 
 
-//		//for testing only [GL August '13]
-//		Cell c = this.agent.getVoronoiCell();
-//		if (c != null) {
-//			double dcx = c.cx - pos[0];
-//			double dcy = c.cy - pos[1];
-//			if (Double.isNaN(dcx) || Double.isNaN(dcy) || Math.abs(dcx) > 2 || Math.abs(dcy) > 2) {
-//				
-//			} else {
-//				dx += .5*dcx;
-//				dy += .5*dcy;
-////				System.out.println("corrected");
-//			}
-//		}
+		//		//for testing only [GL August '13]
+		//		Cell c = this.agent.getVoronoiCell();
+		//		if (c != null) {
+		//			double dcx = c.cx - pos[0];
+		//			double dcy = c.cy - pos[1];
+		//			if (Double.isNaN(dcx) || Double.isNaN(dcy) || Math.abs(dcx) > 2 || Math.abs(dcy) > 2) {
+		//				
+		//			} else {
+		//				dx += .5*dcx;
+		//				dy += .5*dcy;
+		////				System.out.println("corrected");
+		//			}
+		//		}
 
 
 		return new double []{dx,dy};

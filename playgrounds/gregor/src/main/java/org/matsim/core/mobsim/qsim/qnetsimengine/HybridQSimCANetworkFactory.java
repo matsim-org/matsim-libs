@@ -23,11 +23,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
-import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
-import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
+import playground.gregor.casim.simulation.CAAgentFactory;
+import playground.gregor.casim.simulation.CAEngine;
 import playground.gregor.sim2d_v4.scenario.TransportMode;
-import playground.gregor.sim2d_v4.simulation.Sim2DAgentFactory;
-import playground.gregor.sim2d_v4.simulation.Sim2DEngine;
+
 
 
 
@@ -36,33 +35,38 @@ import playground.gregor.sim2d_v4.simulation.Sim2DEngine;
  * <li> It would probably be much better to have this in a separate package.  But this means to move a lot of scopes from
  * "package" to protected.  Worse, the interfaces are not sorted out.  So I remain here for the time being.  kai, jan'11
  */
-public final class HybridQSim2DNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
+public final class HybridQSimCANetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
 
 
-	private final Sim2DEngine hybridEngine;
-	private final Sim2DScenario s2dsc;
-	private final Sim2DAgentFactory agentBuilder;
+	private final CAEngine hybridEngine;
+	private final CAAgentFactory agentBuilder;
 
-
-	public HybridQSim2DNetworkFactory( Sim2DEngine e, Scenario sc, Sim2DAgentFactory builder) {
+	public HybridQSimCANetworkFactory(CAEngine e, Scenario sc, CAAgentFactory aBuilder) {
 		this.hybridEngine = e;
-		this.agentBuilder = builder;
-		this.s2dsc = (Sim2DScenario) sc.getScenarioElement(Sim2DScenario.ELEMENT_NAME);
-
+		this.agentBuilder = aBuilder;
 	}
 
 	@Override
 	public QLinkInternalI createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
 		boolean sim2DQTransitionLink = false;
-		boolean qSim2DTransitionLink = link.getAllowedModes().contains(TransportMode.walk2d);
+		boolean qSim2DTransitionLink = link.getAllowedModes().contains(TransportMode.walkca);
 
+		
+		
 		QLinkInternalI qLink = null;
-		qLink = new QLinkImpl(link, network, toQueueNode);
+		if (qSim2DTransitionLink) {
+			qLink = new CALink(link,1);
+		} else {
+			qLink = new QLinkImpl(link, network, toQueueNode);
+			throw new RuntimeException("Not yet implemented!");
+		}
+
 
 		if (qSim2DTransitionLink){
+			//			if (link.getFromNode().getOutLinks().size() > 1) {
 			qSim2DTransitionLink = false;
 			for (Link l : link.getFromNode().getInLinks().values()) {
-				if (!l.getAllowedModes().contains(TransportMode.walk2d)) {
+				if (!l.getAllowedModes().contains(TransportMode.walkca)) {
 					qSim2DTransitionLink = true;
 					break;
 				}
@@ -70,7 +74,7 @@ public final class HybridQSim2DNetworkFactory implements NetsimNetworkFactory<QN
 			//			}
 		} else {
 			for (Link l : link.getFromNode().getInLinks().values()) {
-				if (l.getAllowedModes().contains(TransportMode.walk2d)) {
+				if (l.getAllowedModes().contains(TransportMode.walkca)) {
 					sim2DQTransitionLink = true;
 					break;
 				}
@@ -78,21 +82,27 @@ public final class HybridQSim2DNetworkFactory implements NetsimNetworkFactory<QN
 		}
 
 		if (qSim2DTransitionLink) {
-			Sim2DEnvironment env = this.s2dsc.getSim2DEnvironment(link);
-			QSim2DTransitionLink hiResLink = new QSim2DTransitionLink(link, network, toQueueNode, this.hybridEngine, qLink, env, this.agentBuilder) ;
-			this.hybridEngine.registerHiResLink(hiResLink);
-			return hiResLink ;
+//			Sim2DEnvironment env = this.s2dsc.getSim2DEnvironment(link);
+//			QSimCATransitionLink hiResLink = new QSimCATransitionLink(link, network, toQueueNode, this.hybridEngine, qLink, env, this.agentBuilder) ;
+//			this.hybridEngine.registerHiResLink(hiResLink);
+//			return hiResLink ;
+			throw new RuntimeException("Not yet implemented!");
 		} 
+		//		QLinkImpl ql = 
 		if (sim2DQTransitionLink) {
-			Sim2DQTransitionLink lowResLink = new Sim2DQTransitionLink(qLink);
-			this.hybridEngine.registerLowResLink(lowResLink);
-			return lowResLink;
+//			Sim2DQTransitionLink lowResLink = new Sim2DQTransitionLink(qLink);
+//			this.hybridEngine.registerLowResLink(lowResLink);
+//			return lowResLink;
+			throw new RuntimeException("Not yet implemented!");
 		}
+
+		//		return new QLinkImpl(link, network, toQueueNode);
 		return qLink;
 	}
 
 	@Override
 	public QNode createNetsimNode(final Node node, QNetwork network) {
+		//TODO CA Node;
 		return new QNode(node, network);
 	}
 

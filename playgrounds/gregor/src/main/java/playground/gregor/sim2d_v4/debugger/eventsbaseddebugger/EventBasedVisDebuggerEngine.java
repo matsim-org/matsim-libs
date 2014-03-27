@@ -35,6 +35,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.MatsimRandom;
 
+import playground.gregor.casim.events.CASimAgentConstructEvent;
+import playground.gregor.casim.events.CASimAgentConstructEventHandler;
+import playground.gregor.casim.simulation.physics.CAAgent;
 import playground.gregor.sim2d_v4.events.Sim2DAgentConstructEvent;
 import playground.gregor.sim2d_v4.events.Sim2DAgentConstructEventHandler;
 import playground.gregor.sim2d_v4.events.Sim2DAgentDestructEvent;
@@ -59,7 +62,7 @@ import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAgentConstructEventHandler, Sim2DAgentDestructEventHandler, NeighborsEventHandler, LineEventHandler, ForceReDrawEventHandler, RectEventHandler, CircleEventHandler{
+public class EventBasedVisDebuggerEngine implements CASimAgentConstructEventHandler, XYVxVyEventsHandler, Sim2DAgentConstructEventHandler, Sim2DAgentDestructEventHandler, NeighborsEventHandler, LineEventHandler, ForceReDrawEventHandler, RectEventHandler, CircleEventHandler{
 
 	double time;
 	private final EventsBasedVisDebugger vis;
@@ -172,8 +175,8 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 				Coord c0 = l.getFromNode().getCoord();
 				Coord c1 = l.getToNode().getCoord();
 //				this.vis.addDashedLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), lp.r,lp.g,lp.b,lp.a, lp.minScale,.1,.9);
-//				this.vis.addLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), lp.r,lp.g,lp.b,lp.a, 0);
-//				this.vis.addCircleStatic(c0.getX(), c0.getY(), .04f, 0, 0, 0, 255, 0);
+				this.vis.addLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), lp.r,lp.g,lp.b,lp.a, 0);
+				this.vis.addCircleStatic(c0.getX(), c0.getY(), .04f, 0, 0, 0, 255, 0);
 //				this.vis.addCircleStatic(c1.getX(), c1.getY(), .04f, 0, 0, 0, 255, 0);
 //				double dx = c1.getX()-c0.getX();
 //				double dy = c1.getY()-c0.getY();
@@ -234,7 +237,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 		//		if (event.getAgent() != null) {
 		//			this.vis.addText(event.getX(),event.getY(), event.getAgent().toString(), 200);
 		//		} else {
-		this.vis.addText(event.getX(),event.getY(), event.getPersonId().toString(), 60);
+		this.vis.addText(event.getX(),event.getY(), event.getPersonId().toString(), 150);
 //		this.vis.addText(event.getX(),event.getY(), event.getAgent().toString(), 50);
 		//		}
 
@@ -288,6 +291,46 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 		int r,g,b,a, minScale = 0;
 	}
 
+	@Override
+	public void handleEvent(CASimAgentConstructEvent e) {
+		CAAgent a = e.getCAAgent();
+		CircleProperty cp = new CircleProperty();
+		cp.rr = (float) (0.5/5.091);
+		int nr = a.getId().toString().hashCode()%100;
+		int color = (nr/10)%3;
+		if (Integer.parseInt(a.getId().toString()) < 0) {
+			color = 1;
+		} else {
+			color = 2;
+		}
+		if (color == 1){
+			cp.r = 255;
+			cp.g = 255-nr;
+			cp.b = 0;
+			cp.a = 255;
+		} else if (color == 2) { 
+			cp.r = nr-nr;
+			cp.g = 0;
+			cp.b = 255;
+			cp.a = 255;
+		}else {
+			cp.r = 0;
+			cp.g = 255;
+			cp.b = 255-nr;
+			cp.a = 255;
+		}
+		
+		if (a.getId().toString().equals("0") || a.getId().toString().equals("1000")) {
+			cp.r=255;
+			cp.g=0;
+			cp.b=0;
+		}
+		
+		this.circleProperties.put(a.getId(), cp);
+		
+	}
+	
+	
 	@Override
 	public void handleEvent(Sim2DAgentConstructEvent event) {
 		Sim2DAgent a = event.getSim2DAgent();
@@ -478,6 +521,8 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 	public int getNrAgents() {
 		return this.nrAgents;
 	}
+
+
 
 
 

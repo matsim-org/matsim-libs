@@ -73,7 +73,7 @@ public class Sim2DAgent implements VoronoiCenter, TwoDObject {
 
 	private VelocityUpdater vu;
 
-	private boolean emitPosEvents = true;
+	private boolean emitPosEvents = false;
 
 	/*package*/ int ttl; //workaround - think about this [gl August '13]
 

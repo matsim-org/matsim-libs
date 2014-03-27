@@ -22,25 +22,23 @@ package playground.gregor.sim2d_v4.run;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
+import playground.gregor.sim2d_v4.events.EventsReaderXMLv1ExtendedSim2DVersion;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
-import playground.gregor.sim2d_v4.simulation.HybridQ2DMobsimFactory;
 
-public class Sim2DRunner implements IterationStartsListener{
+public class Vis {
 
-	private Controler controller;
 	private QSimDensityDrawer qSimDrawer;
 
 	public static void main(String [] args) {
@@ -63,6 +61,8 @@ public class Sim2DRunner implements IterationStartsListener{
 		c.qsim().setEndTime(23*3600);
 //		c.qsim().setEndTime(41*60);//+30*60);
 
+		
+		EventsManager e = new EventsManagerImpl();
 
 		//offsets needed to convert to doubles later in program
 		double minX = Double.POSITIVE_INFINITY;
@@ -77,14 +77,9 @@ public class Sim2DRunner implements IterationStartsListener{
 		}
 //		sim2dc.setOffsets(minX, minY);
 		
-		Controler controller = new Controler(sc);
-
-		controller.setOverwriteFiles(true);
 		
 //		controller.getEvents().addHandler(new SimSpeedObserver());
 
-		HybridQ2DMobsimFactory factory = new HybridQ2DMobsimFactory();
-		controller.addMobsimFactory("hybridQ2D", factory);
 
 		
 //		ShapeFileReader sr = new ShapeFileReader();
@@ -157,8 +152,8 @@ public class Sim2DRunner implements IterationStartsListener{
 //			dbg.addAdditionalDrawer(iCasion);
 //			dbg.addAdditionalDrawer(new GregorsOffice());
 //			dbg.addAdditionalDrawer(v);
-			controller.getEvents().addHandler(dbg);
-			controller.getEvents().addHandler(qDbg);
+			e.addHandler(dbg);
+			e.addHandler(qDbg);
 //			controller.getEvents().addHandler(qDbg2);
 //			VDTester vdt = new VDTester(new Envelope(-2.5,2.5,-50,-40),controller.getEvents());
 //			controller.getEvents().addHandler(vdt);
@@ -176,10 +171,11 @@ public class Sim2DRunner implements IterationStartsListener{
 //		controller.getEvents().addHandler(vdt);
 //		controller.addControlerListener(vdt);
 
+		EventsReaderXMLv1ExtendedSim2DVersion reader = new EventsReaderXMLv1ExtendedSim2DVersion(e);
+		reader.parse("/Users/laemmel/devel/hhw3/vis/0.events.xml");
 		
 //		controller.setCreateGraphs(false);
 //		controller.setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
-		controller.run();
 	}
 
 	protected static void printUsage() {
@@ -198,17 +194,4 @@ public class Sim2DRunner implements IterationStartsListener{
 		System.out.println();
 	}
 
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		if ((event.getIteration()) % 1 == 0 || event.getIteration() > 50) {
-//			this.factory.debug(this.visDebugger);
-			this.controller.getEvents().addHandler(this.qSimDrawer);
-			this.controller.setCreateGraphs(true);
-		} else {
-//			this.factory.debug(null);
-			this.controller.getEvents().removeHandler(this.qSimDrawer);
-			this.controller.setCreateGraphs(false);
-		}
-//		this.visDebugger.setIteration(event.getIteration());
-	}
 }

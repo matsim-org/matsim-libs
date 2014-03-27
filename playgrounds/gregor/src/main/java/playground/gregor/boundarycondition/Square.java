@@ -295,35 +295,35 @@ public class Square {
 //			t+=1;
 		}
 
-//		for (int i = 2*nrAgents; i < 3*nrAgents; i++) {
-//			Person pers = fac.createPerson(new IdImpl("e"+i));
-//			Plan plan = fac.createPlan();
-//			pers.addPlan(plan);
-//			Activity act0;
-//			act0 = fac.createActivityFromLinkId("origin", new IdImpl("k3_rev"));
-//			act0.setEndTime(t);
-//			plan.addActivity(act0);
-//			Leg leg = fac.createLeg("car");
-//			plan.addLeg(leg);
-//			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("k0_rev"));
-//			plan.addActivity(act1);
-//			pop.addPerson(pers);
-//		}
+		for (int i = 2*nrAgents; i < 3*nrAgents; i++) {
+			Person pers = fac.createPerson(new IdImpl("e"+i));
+			Plan plan = fac.createPlan();
+			pers.addPlan(plan);
+			Activity act0;
+			act0 = fac.createActivityFromLinkId("origin", new IdImpl("k3_rev"));
+			act0.setEndTime(t);
+			plan.addActivity(act0);
+			Leg leg = fac.createLeg("car");
+			plan.addLeg(leg);
+			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("k0_rev"));
+			plan.addActivity(act1);
+			pop.addPerson(pers);
+		}
 
-//		for (int i = 3*nrAgents; i < 4*nrAgents; i++) {
-//			Person pers = fac.createPerson(new IdImpl("e"+i));
-//			Plan plan = fac.createPlan();
-//			pers.addPlan(plan);
-//			Activity act0;
-//			act0 = fac.createActivityFromLinkId("origin", new IdImpl("k6"));
-//			act0.setEndTime(t);
-//			plan.addActivity(act0);
-//			Leg leg = fac.createLeg("car");
-//			plan.addLeg(leg);
-//			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("k3"));
-//			plan.addActivity(act1);
-//			pop.addPerson(pers);
-//		}
+		for (int i = 3*nrAgents; i < 4*nrAgents; i++) {
+			Person pers = fac.createPerson(new IdImpl("e"+i));
+			Plan plan = fac.createPlan();
+			pers.addPlan(plan);
+			Activity act0;
+			act0 = fac.createActivityFromLinkId("origin", new IdImpl("k6"));
+			act0.setEndTime(t);
+			plan.addActivity(act0);
+			Leg leg = fac.createLeg("car");
+			plan.addLeg(leg);
+			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("k3"));
+			plan.addActivity(act1);
+			pop.addPerson(pers);
+		}
 
 		//		for (int i = 3*nrAgents; i < 4*nrAgents; i++) {
 		//			Person pers = fac.createPerson(new IdImpl("e"+i));

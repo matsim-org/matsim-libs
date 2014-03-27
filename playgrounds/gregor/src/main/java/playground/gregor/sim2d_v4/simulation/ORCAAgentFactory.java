@@ -62,6 +62,7 @@ public class ORCAAgentFactory implements Sim2DAgentFactory {
 			KDTreeNeighbors nn = new KDTreeNeighbors(agent, this.config);
 			nn.setRangeAndMaxNrOfNeighbors(8, 5);			
 			DesiredDirectionCalculator dd = new PathAndDrivingDirection(agent, ls);
+			dd = new NearestPointAtTargetLine(agent, ls);
 ////			VelocityUpdater vu = new ORCAVelocityUpdater(new FNDDependentSpeed(),new NearestPointAtTargetLine(agent, ls), nn, this.config, agent);
 //			if (agent.getId().toString().startsWith("d")) {
 //				double rx =2* MatsimRandom.getRandom().nextDouble()-1;

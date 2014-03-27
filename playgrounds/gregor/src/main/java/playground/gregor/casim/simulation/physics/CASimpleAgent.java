@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransportMode.java
+ * CASimpleAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,20 +18,53 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.scenario;
+package playground.gregor.casim.simulation.physics;
 
+import java.util.List;
 
-public abstract class TransportMode {
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
-//	public static String walk = org.matsim.api.core.v01.TransportMode.walk;
-	public static String walk2d = "walk2d";
-	public static String walkca = "walkca";
-//	public static Set<String> transportModes;
-//	static {
-//		transportModes = new HashSet<String>();
-//		transportModes.add(walk);
-//		transportModes.add(walk2d);
-//		
-//	}
-	
+public class CASimpleAgent extends CAAgent {
+
+	private final List<Link> links;
+	private int next;
+	private final Id id;
+	private CALink link;
+
+	public CASimpleAgent(List<Link> links, int i, Id id, CALink caLink) {
+		super(id);
+		this.links = links;
+		this.next = i;
+		this.id = id;
+		this.link = caLink;
+	}
+
+	@Override
+	Id getNextLinkId() {
+		return this.links.get(this.next).getId();
+	}
+
+	@Override
+	void moveOverNode(CALink link, double time) {
+//		System.out.println("DEBUG");
+//		if (this.id.toString().equals("46") && link.getLink().getId().toString().equals("7") && time > 300){
+//			System.out.println("DEBUG");
+//		}
+		this.link = link;
+		this.next++;
+		if (this.next == this.links.size()) {
+			this.next = 2;
+		}
+//		System.out.println(this.next);
+	}
+
+	@Override
+	public String toString() {
+		return "a:"+this.id;
+	}
+		
+	public CALink getCurrentLink() {
+		return this.link;
+	}
 }

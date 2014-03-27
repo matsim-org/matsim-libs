@@ -127,8 +127,13 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 			
 			double fdx = fl.dx;
 			double fdy = fl.dy;
-			fdx *= .4;
-			fdy *= .4;
+			
+			double dxx = fl.x0 - fl.x1;
+			double dyy = fl.y0 - fl.y1;
+			double ll = Math.sqrt(dxx*dxx+dyy*dyy);
+			
+			fdx *= .4 * ll;
+			fdy *= .4 * ll;
 			
 			targetLine = new LineSegment();
 			targetLine.x0 = fl.x1 - fdx;

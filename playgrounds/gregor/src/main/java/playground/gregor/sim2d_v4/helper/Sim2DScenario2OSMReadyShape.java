@@ -199,12 +199,12 @@ public class Sim2DScenario2OSMReadyShape {
 
 	public static void main(String [] args) {
 		String baseName = "nextgen_floorplan";
-		String confPath = "/Users/laemmel/devel/gct/floorpl/s2d_config_v0.3.xml";
+		String confPath = "/Users/laemmel/devel/hhw3/raw/sim2dConfigenv.xml";
 		Sim2DConfig conf = Sim2DConfigUtils.loadConfig(confPath);
 		Sim2DScenario sc = Sim2DScenarioUtils.loadSim2DScenario(conf);
 		Sim2DScenario2OSMReadyShape osm = new Sim2DScenario2OSMReadyShape(sc);
-		osm.writeOSMReadyEnvironmentShape("/Users/laemmel/devel/gct/env_gen_stage2/osmEnv" + baseName +".shp");
-		osm.writeOSMReadyNetworkShape("/Users/laemmel/devel/gct/env_gen_stage2/osmNet"+ baseName + ".shp");
+		osm.writeOSMReadyEnvironmentShape("/Users/laemmel/devel/hhw3/env_gen_stage2/osmEnv" + baseName +".shp");
+		osm.writeOSMReadyNetworkShape("/Users/laemmel/devel/hhw3/env_gen_stage2/osmNet"+ baseName + ".shp");
 	}
 
 }

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransportMode.java
+ * CAEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,20 +18,56 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.scenario;
+package playground.gregor.casim.simulation.physics;
 
+public class CAEvent implements Comparable<CAEvent>{
 
-public abstract class TransportMode {
-
-//	public static String walk = org.matsim.api.core.v01.TransportMode.walk;
-	public static String walk2d = "walk2d";
-	public static String walkca = "walkca";
-//	public static Set<String> transportModes;
-//	static {
-//		transportModes = new HashSet<String>();
-//		transportModes.add(walk);
-//		transportModes.add(walk2d);
-//		
-//	}
+	public enum CAEventType {SWAP,TTA};
 	
+	
+	private final double time;
+	private final CAAgent agent;
+	private final CANetworkEntity entity;
+	private final CAEventType type;
+	public long cnt;
+
+	public CAEvent(double time, CAAgent agent, CANetworkEntity entity, CAEventType type){
+		this.time = time;
+		this.agent = agent;
+		this.entity = entity;
+		this.type = type;
+	}
+	
+	
+	public CAEventType getCAEventType() {
+		return this.type;
+	}
+	
+	
+	@Override
+	public int compareTo(CAEvent o) {
+		if (this.getEventExcexutionTime() < o.getEventExcexutionTime()) {
+			return -1;
+		} else if (this.getEventExcexutionTime() > o.getEventExcexutionTime()) {
+			return 1;
+		}
+		return 0;
+	}
+
+	public double getEventExcexutionTime() {
+		return this.time;
+	}
+
+	public CAAgent getCAAgent() {
+		return this.agent;
+	}
+
+	public CANetworkEntity getCANetworkEntity() {
+		return this.entity;
+	}
+	
+	@Override
+	public String toString() {
+		return "time:" + this.time + " a:" + this.agent + " " + this.type;
+	}
 }

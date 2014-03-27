@@ -20,7 +20,6 @@
 
 package playground.gregor.sim2d_v4.simulation.physics;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,10 +29,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
-import playground.gregor.sim2d_v4.cgal.DefaultTwoDObject;
 import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.cgal.LinearQuadTreeLD;
-import playground.gregor.sim2d_v4.cgal.TwoDObject;
 import playground.gregor.sim2d_v4.cgal.TwoDTree;
 import playground.gregor.sim2d_v4.events.Sim2DAgentDestructEvent;
 import playground.gregor.sim2d_v4.scenario.Section;
@@ -100,18 +97,18 @@ public class PhysicalSim2DSection {
 		this.agents.addAll(this.inBuffer);
 		this.inBuffer.clear();
 		
-		List<TwoDObject> el = new ArrayList<TwoDObject>(this.agents);
-		for (LineSegment o : this.sec.getOpeningSegments()) {
-			el.add(new DefaultTwoDObject((o.x0+o.x1)/2,(o.y0+o.y1)/2));
-			el.add(new DefaultTwoDObject(o.x1,o.y1));
-			el.add(new DefaultTwoDObject(o.x0,o.y0));
-		}
-		for (int x = 1; x <= 20; x+=2) {
-			for (int y =1; y <= 20; y+=2){
-				el.add(new DefaultTwoDObject(x,y));
-			}
-		}
-		this.quadTree = new LinearQuadTreeLD(el, this.penv.getSim2DEnvironment().getEnvelope(), this.penv.getEventsManager());
+//		List<TwoDObject> el = new ArrayList<TwoDObject>(this.agents);
+//		for (LineSegment o : this.sec.getOpeningSegments()) {
+//			el.add(new DefaultTwoDObject((o.x0+o.x1)/2,(o.y0+o.y1)/2));
+//			el.add(new DefaultTwoDObject(o.x1,o.y1));
+//			el.add(new DefaultTwoDObject(o.x0,o.y0));
+//		}
+//		for (int x = 1; x <= 20; x+=2) {
+//			for (int y =1; y <= 20; y+=2){
+//				el.add(new DefaultTwoDObject(x,y));
+//			}
+//		}
+//		this.quadTree = new LinearQuadTreeLD(el, this.penv.getSim2DEnvironment().getEnvelope(), this.penv.getEventsManager());
 		if (!Sim2DConfig.EXPERIMENTAL_VD_APPROACH) {
 			this.agentTwoDTree.buildTwoDTree(this.agents);
 		}		

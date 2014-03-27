@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.simulation;
+package playground.gregor.casim.simulation;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -33,7 +33,7 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.HybridQSim2DNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.HybridQSimCANetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
@@ -42,7 +42,7 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 
 	private final static Logger log = Logger.getLogger(HybridQ2DMobsimFactory.class);
 	
-	Sim2DEngine sim2DEngine = null;
+	CAEngine sim2DEngine = null;
 
 
 	@Override
@@ -75,7 +75,7 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
 		
-		Sim2DEngine e = new Sim2DEngine(qSim);
+		CAEngine e = new CAEngine(qSim);
 		
 		
 		this.sim2DEngine = e;
@@ -86,11 +86,11 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 		qSim.addActivityHandler(activityEngine);
 		
 		Sim2DScenario sc2d = (Sim2DScenario) sc.getScenarioElement(Sim2DScenario.ELEMENT_NAME);
-		Sim2DAgentFactory aBuilder = new SocialForceSim2DAgentFactory(sc2d.getSim2DConfig(),sc);
+		CAAgentFactory aBuilder = new CAAgentFactory(sc2d.getSim2DConfig(),sc);
 //		Sim2DAgentFactory aBuilder = new ORCAAgentFactory(sc2d.getSim2DConfig(),sc);
 		
-		HybridQSim2DNetworkFactory networkFactory = new HybridQSim2DNetworkFactory(e,sc, aBuilder);
-		
+		HybridQSimCANetworkFactory networkFactory = new HybridQSimCANetworkFactory(e,sc, aBuilder);
+	
 		QNetsimEngine netsimEngine = new QNetsimEngine( qSim, networkFactory ) ;
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
@@ -106,7 +106,7 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 		return qSim;
 	}
 
-	public Sim2DEngine getSim2DEngine() {
+	public CAEngine getSim2DEngine() {
 		return this.sim2DEngine;
 	}
 

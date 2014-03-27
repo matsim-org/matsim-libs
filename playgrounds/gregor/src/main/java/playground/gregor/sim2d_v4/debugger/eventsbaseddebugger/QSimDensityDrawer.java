@@ -30,16 +30,16 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkImpl;
 
@@ -134,7 +134,7 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, PersonDep
 		p.strokeCap(PConstants.SQUARE);
 		for (LinkInfo li : this.links) {
 			p.strokeWeight(li.width);
-			p.stroke(li.r,li.g,li.b,li.a * fade);
+			p.stroke(li.r,li.g,li.b,255);//li.a * fade);
 			p.line((float)(li.x0+p.offsetX),(float)-(li.y0+p.offsetY),(float)(li.x1+p.offsetX),(float)-(li.y1+p.offsetY));
 		}
 //		p.strokeCap(PConstants.SQUARE);
@@ -175,7 +175,7 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, PersonDep
 			l.r = 0;
 			l.g = 0;
 			l.b = 0;
-			l.a = 0;
+			l.a =255;
 		} else if (density < 0.25) {
 			l.a = (int) (128 + 128 * (density/0.25));
 			l.r = 0;
@@ -207,9 +207,9 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, PersonDep
 		public String text;
 		public double tx;
 		public double ty;
-		public int r = 255;
-		public int b = 255;
-		public int g = 255;
+		public int r = 0;
+		public int b = 0;
+		public int g = 0;
 		public int a = 0;
 		double cap;
 		float width;

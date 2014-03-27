@@ -248,7 +248,7 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 			//				System.out.println("full");
 			return;
 		}
-		debug(vd);
+//		debug(vd);
 		
 	}
 

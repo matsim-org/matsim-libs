@@ -22,8 +22,6 @@ package playground.gregor.sim2d_v4.simulation.physics;
 
 import java.util.List;
 
-import org.matsim.core.gbl.MatsimRandom;
-
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
@@ -40,7 +38,7 @@ import playground.gregor.sim2d_v4.simulation.physics.algorithms.Obstacles;
 public class SocialForce2005VelocityUpdater implements VelocityUpdater {
 
 	//Helbing constants
-	private final double v0 = 1.3 * MatsimRandom.getRandom().nextGaussian()*0.3; //desired velocity
+//	private final double v0 = 1.3 * MatsimRandom.getRandom().nextGaussian()*0.3; //desired velocity
 	private final double m = 1;//70 + (MatsimRandom.getRandom().nextDouble()*20); //mass
 	private final double tau = 1; //acceleration time
 	private final double Aw = 5; //repulsion of walls
