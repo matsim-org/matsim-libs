@@ -104,6 +104,10 @@ public class Parking {
 		nevSpots=null;
 	}
 	
+	//!! Vllt beschleunigen >> Liste mit freien EV / NEV spots fuehren und einfach ersten 
+	//zurueck geben; dafuer dann neue funktion zum parken statt parkin in parkcontrol
+	//auf occupied zu setzen 
+	
 	public ParkingSpot checkForFreeSpot(){ //Durchsucht zwar alle Spots, NEV Spots sind jedoch oben in der Liste, kommen daher morgens zuerst drann
 		for(ParkingSpot spot : spots){
 			//System.out.println("checke spot");

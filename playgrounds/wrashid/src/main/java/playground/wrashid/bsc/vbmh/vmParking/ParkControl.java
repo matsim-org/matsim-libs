@@ -576,7 +576,7 @@ public class ParkControl {
 		headLine.add("Sum");
 		headLine.add("Rate of charge");
 		headLine.add("PeakLoad");
-		
+		peakLoadOutput.add(headLine);
 		for(Parking parking : parkingMap.getParkings()){
 			peakLoadOutput.add(parking.getLinkedList());
 			peakLoadOutput.getLast().add(Integer.toString(peakLoad.get(parking.id)));

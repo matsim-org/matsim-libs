@@ -50,33 +50,33 @@ public class create_demo_parking {
 		outputFile=args[1];
 		
 		
-		pAnteile.put("home", 1.0);
-		evAnteile.put("home", 1.0);
+		pAnteile.put("home", 50.0);
+		evAnteile.put("home", 0.5);
 		preiseEVSpots.put("home", 0);
 		preiseNEVSpots.put("home", 0);
 		chargingRates.put("home", 2.3);
 		
 		// Alle folgenden relativ zu Agents die in der Facility arbeiten
-		pAnteile.put("work", 0.5);
-		evAnteile.put("work", 0.20);
+		pAnteile.put("work", 100.0);
+		evAnteile.put("work", 0.50);
 		preiseEVSpots.put("work", 3);
 		preiseNEVSpots.put("work", 4);
 		chargingRates.put("work", 3.6);
 		
-		pAnteile.put("secondary",0.5);
-		evAnteile.put("secondary", 0.2);
+		pAnteile.put("secondary",100.0);
+		evAnteile.put("secondary", 0.5);
 		preiseEVSpots.put("secondary", 5);
 		preiseNEVSpots.put("secondary", 6);
 		chargingRates.put("secondary", 8.04);
 		
-		pAnteile.put("Street", 0.2);
+		pAnteile.put("Street", 0.0);
 		evAnteile.put("Street", 0.30);
 		preiseEVSpots.put("Street", 1);
 		preiseNEVSpots.put("Street", 2);
 		chargingRates.put("Street", 3.6);
 		
-		pAnteile.put("edu", 0.05);
-		evAnteile.put("edu", 0.0);
+		pAnteile.put("edu", 100.00);
+		evAnteile.put("edu", 0.5);
 		preiseEVSpots.put("edu", 7);
 		preiseNEVSpots.put("edu", 7);
 		chargingRates.put("edu", 0.0);
