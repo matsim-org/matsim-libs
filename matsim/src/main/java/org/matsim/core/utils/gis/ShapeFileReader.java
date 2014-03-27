@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.geotools.data.DataStore;
 import org.geotools.data.FileDataStore;
 import org.geotools.data.FileDataStoreFinder;
@@ -35,6 +36,7 @@ import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.core.utils.misc.Counter;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -46,6 +48,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author mrieser // switch to GeoTools 2.7.3
  */
 public class ShapeFileReader implements MatsimSomeReader {
+    	private static final Logger log = Logger.getLogger(ShapeFileReader.class);
 
 	private SimpleFeatureSource featureSource = null;
 
@@ -118,10 +121,14 @@ public class ShapeFileReader implements MatsimSomeReader {
 			SimpleFeature ft = null;
 			SimpleFeatureIterator it = this.featureSource.getFeatures().features();
 			this.featureSet = new ArrayList<SimpleFeature>();
+			log.info("features to read #" + this.featureSource.getFeatures().size());
+			Counter cnt = new Counter("features read #");
 			while (it.hasNext()) {
 				ft = it.next();
 				this.featureSet.add(ft);
+				cnt.incCounter();
 			}
+			cnt.printCounter();
 			it.close();
 			return this.featureSet;
 		} catch (IOException e) {
