@@ -103,8 +103,8 @@ public class DigicoreCluster implements Identifiable{
 		return this.clusterId;
 	}
 	
-	public void setConcaveHull(Geometry geomtery){
-		this.concaveHull = geomtery;
+	public void setConcaveHull(Geometry geometry){
+		this.concaveHull = geometry;
 	}
 	
 	public Geometry getConcaveHull(Geometry geometry){

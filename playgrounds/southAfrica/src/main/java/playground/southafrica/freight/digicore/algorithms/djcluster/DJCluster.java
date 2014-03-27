@@ -27,11 +27,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.southafrica.freight.digicore.algorithms.djcluster.containers.ClusterActivity;
@@ -58,6 +62,7 @@ import playground.southafrica.freight.digicore.algorithms.djcluster.containers.D
  */
 public class DJCluster {
 	private List<Coord> inputPoints;
+	private Map<Id, ClusterActivity> lostPoints = new TreeMap<Id, ClusterActivity>();
 	private QuadTree<ClusterActivity> quadTree;
 	private List<DigicoreCluster> clusterList;
 	private final static Logger log = Logger.getLogger(DJCluster.class);
@@ -169,14 +174,18 @@ public class DJCluster {
 						}
 					}
 					if(neighbourhood.size() < minimumPoints){
-						// Point is considered to be noise.
+						/* Point is considered to be noise.
+						 * FIXME Not quite true... it may be incorporated into
+						 * another cluster later! (JWJ - Mar '14)
+						 */
+						
+						lostPoints.put(p.getId(), p);
 						uPointCounter++;
 					}else if(cN.size() > 0){
 						/* 
 						 * Merge all the clusters. Use the DigicoreCluster with the smallest clusterId
 						 * value as the remaining DigicoreCluster.
 						 */
-						
 						List<DigicoreCluster> localClusters = new ArrayList<DigicoreCluster>();
 						DigicoreCluster smallestCluster = cN.get(0).getCluster();
 						for(int i = 1; i < cN.size(); i++){
@@ -211,8 +220,11 @@ public class DJCluster {
 							smallestCluster.getPoints().add(cp);
 							cp.setCluster(smallestCluster);
 							cPointCounter++;
+							if(lostPoints.containsKey(cp.getId())){
+								lostPoints.remove(cp.getId());
+								uPointCounter--;
+							}
 						}
-						
 					} else{
 						// Create new DigicoreCluster and add all the points.
 						DigicoreCluster newCluster = new DigicoreCluster(new IdImpl(clusterIndex));
@@ -222,6 +234,10 @@ public class DJCluster {
 							cp.setCluster(newCluster);
 							newCluster.getPoints().add(cp);
 							cPointCounter++;
+							if(lostPoints.containsKey(cp.getId())){
+								lostPoints.remove(cp.getId());
+								uPointCounter--;
+							}
 						}					
 					}
 				}
@@ -234,12 +250,25 @@ public class DJCluster {
 					}
 				}
 			}
+			
+			
 			if(!silent){
 				log.info("   Points clustered: " + pointCounter + " (Done)");	
 				int sum = cPointCounter + uPointCounter;
 				log.info("Sum should add up: " + cPointCounter + " (clustered) + " 
 						+ uPointCounter + " (unclustered) = " + sum);
+				
+				/* Code added for Joubert & Meintjes paper (2014). */
+				log.info("Unclustered points: ");
+				for(ClusterActivity ca : lostPoints.values()){
+					log.info(String.format("   %.6f,%.6f", ca.getCoord().getX(), ca.getCoord().getY()));
+				}
+				log.info("New way of unclustered points:");
+				log.info("   Number: " + lostPoints.size());
 			}
+			
+			
+			
 			
 			/* 
 			 * Build the DigicoreCluster list. Once built, I rename the clusterId field so as to
@@ -312,6 +341,8 @@ public class DJCluster {
 				log.info("DigicoreCluster list built.");
 			}
 		}
+		
+		// lost list must be made up of clusters without Id. 
 	}
 	
 	
@@ -390,6 +421,10 @@ public class DJCluster {
 	
 	public void setDelimiter(String delimiter) {
 		this.delimiter = delimiter;
+	}
+	
+	public Map<Id,ClusterActivity> getLostPoints(){
+		return this.lostPoints;
 	}
 
 	
