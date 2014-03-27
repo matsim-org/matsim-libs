@@ -125,6 +125,8 @@ public class JointScenarioUtilsTest {
 		final Leg driverLeg = population.getFactory().createLeg( JointActingTypes.DRIVER );
 		final DriverRoute dRoute = new DriverRoute( new IdImpl( 1 ) , new IdImpl( 1 ) );
 		dRoute.addPassenger( new IdImpl( "random_hitch_hiker" ) );
+		dRoute.setDistance( 234 );
+		dRoute.setTravelTime( 234 );
 		driverLeg.setRoute( dRoute );
 		driverPlan.addLeg( driverLeg );
 		driverPlan.addActivity( population.getFactory().createActivityFromLinkId( "h" , new IdImpl( 1 ) ) );
@@ -139,6 +141,8 @@ public class JointScenarioUtilsTest {
 		final Leg passengerLeg = population.getFactory().createLeg( JointActingTypes.PASSENGER );
 		final PassengerRoute pRoute = new PassengerRoute( new IdImpl( 1 ) , new IdImpl( 1 ) );
 		pRoute.setDriverId( new IdImpl( "lorrie driver" ) );
+		pRoute.setDistance( 234 );
+		pRoute.setTravelTime( 234 );
 		passengerLeg.setRoute( pRoute );
 		passengerPlan.addLeg( passengerLeg );
 		passengerPlan.addActivity( population.getFactory().createActivityFromLinkId( "h" , new IdImpl( 1 ) ) );
