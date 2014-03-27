@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.AbstractNetworkTest;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -102,7 +103,61 @@ public class NetworkImplTest extends AbstractNetworkTest {
 		network.addLink(link2); // adding the same link again should just be ignored
 		Assert.assertEquals(2, network.getLinks().size());
 	}
+	
+	/**
+	 * Tests that if a link is added when its associated nodes are not in the network,
+	 * an exception is thrown. If the node is already in the network, no exception 
+	 * should be thrown. 
+	 */
+	@Test
+	public void testAddLink_noNodes(){
+		Network n = NetworkUtils.createNetwork();
+		Node a = n.getFactory().createNode(new IdImpl("a"), new CoordImpl(0.0, 0.0));
+		Node b = n.getFactory().createNode(new IdImpl("b"), new CoordImpl(1000.0, 0.0));
+		Node c = n.getFactory().createNode(new IdImpl("c"), new CoordImpl(0.0, 1000.0));
+		
+		Link ab = n.getFactory().createLink(new IdImpl("ab"), a, b);
+		try{
+			n.addLink(ab);
+			Assert.fail("Should have thrown exception as fromNode was not in network.");
+		} catch (IllegalArgumentException e){
+			log.info("Caught expected exception: fromNode not in network.", e);
+		}
 
+		n.addNode(a);
+		try{
+			n.addLink(ab);
+			Assert.fail("Should have thrown exception as toNode was not in network.");
+		} catch (IllegalArgumentException e){
+			log.info("Caught expected exception: toNode not in network.", e);
+		}
+		
+		n.addNode(b);
+		try{
+			n.addLink(ab);
+			log.info("Link added correctly. Both nodes in the network.");
+		} catch (IllegalArgumentException e){
+			Assert.fail("Should not have thrown exception as both nodes are in network.");
+		}
+		
+		Link ac = n.getFactory().createLink(new IdImpl("ac"), a, c);
+		try{
+			n.addLink(ac);
+			Assert.fail("Should have thrown exception as toNode was not in network.");
+		} catch (IllegalArgumentException e){
+			log.info("Caught expected exception: toNode not in network.", e);
+		}
+		
+		n.addNode(c);
+		try{
+			n.addLink(ac);
+			log.info("Link added correctly. Both nodes in the network.");
+		} catch (IllegalArgumentException e){
+			Assert.fail("Should not have thrown exception as both nodes are in network.");
+		}
+	}
+
+	
 	@Test
 	public void testAddNode_existingId() {
 		NetworkImpl network = new NetworkImpl();
