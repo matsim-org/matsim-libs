@@ -1133,6 +1133,7 @@ private void setPopulation6(Scenario scenario) {
 		network.addNode(node2);
 		network.addNode(node3);
 		network.addNode(node4);
+		network.addNode(node5);
 
 		network.addLink(link1);
 		network.addLink(link2);
@@ -1218,6 +1219,7 @@ private void setPopulation6(Scenario scenario) {
 		network.addNode(node2);
 		network.addNode(node3);
 		network.addNode(node4);
+		network.addNode(node5);
 
 		network.addLink(link1);
 		network.addLink(link2);
@@ -1378,6 +1380,7 @@ private void setPopulation6(Scenario scenario) {
 		network.addNode(node2);
 		network.addNode(node3);
 		network.addNode(node4);
+		network.addNode(node5);
 
 		network.addLink(link1);
 		network.addLink(link2);
@@ -1463,6 +1466,7 @@ private void setPopulation6(Scenario scenario) {
 		network.addNode(node2);
 		network.addNode(node3);
 		network.addNode(node4);
+		network.addNode(node5);
 	
 		network.addLink(link1);
 		network.addLink(link2);
@@ -1548,6 +1552,7 @@ private Scenario loadScenario7() {
 		network.addNode(node2);
 		network.addNode(node3);
 		network.addNode(node4);
+		network.addNode(node5);
 
 		network.addLink(link1);
 		network.addLink(link2);
