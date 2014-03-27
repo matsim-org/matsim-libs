@@ -270,7 +270,7 @@ public class TransportModeNetworkFilterTest {
 	 * 
 	 * <code>Issue #178</code> - http://sourceforge.net/apps/trac/matsim/ticket/178
 	 * 
-	 * The problem seems only to happen when the loop link is (acidentially / randomly) 
+	 * The problem seems only to happen when the loop link is (accidentally / randomly) 
 	 * chosen as start link for the algorithm, as otherwise the node already exists.
 	 * Thus cannot extend existing Fixture to test this, but have to create test 
 	 * scenario from scratch.
