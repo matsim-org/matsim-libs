@@ -1,5 +1,25 @@
 package playground.mzilske.cdr;
 
+import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.*;
+import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
+import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.utils.io.UncheckedIOException;
+import playground.mzilske.util.PowerList;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -7,36 +27,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.matsim.analysis.VolumesAnalyzer;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.ActivityWrapperFacility;
-import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryImpl;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.core.utils.io.UncheckedIOException;
-
-import playground.mzilske.util.PowerList;
 
 public class PowerPlans {
 
@@ -106,7 +96,9 @@ public class PowerPlans {
 		for (Id linkId : route.getLinkIds()) {
 			dist += network.getLinks().get(linkId).getLength();
 		}
-		dist += network.getLinks().get(route.getEndLinkId()).getLength();
+        if (route.getLinkIds().size() > 0) {
+            dist += network.getLinks().get(route.getEndLinkId()).getLength();
+        }
 		return dist;
 	}
 
@@ -135,7 +127,7 @@ public class PowerPlans {
 		return builder.toString();
 	}
 
-	static double duration(Activity act) {
+	public static double duration(Activity act) {
 		double startTime = act.getStartTime();
 		if (Double.isInfinite(startTime)) {
 			startTime = 0.0;
@@ -178,41 +170,7 @@ public class PowerPlans {
 		return distance(network, tripRouter, pes);
 	}
 
-	public static void writeActivityDurations(Scenario scenario, File file) {
-		PrintWriter pw = null;
-		try {
-			pw = new PrintWriter(file);
-			TripRouter tripRouter = new TripRouterFactoryImpl(
-					ConfigUtils.createConfig(), 
-					scenario.getNetwork(), 
-					new OnlyTimeDependentTravelDisutilityFactory(), 
-					new FreeSpeedTravelTime(), new DijkstraFactory(), new PopulationFactoryImpl(ScenarioUtils.createScenario(ConfigUtils.createConfig())), new ModeRouteFactory(), null, null)
-			.instantiateAndConfigureTripRouter();
-			for (Person person : scenario.getPopulation().getPersons().values()) {
-				Plan plan = person.getSelectedPlan();
-				double distance = distance(scenario.getNetwork(), plan);
-				for (int i=0; i < plan.getPlanElements().size(); i++) {
-					PlanElement pe = plan.getPlanElements().get(i);
-					if (pe instanceof Activity) {
-						Activity act = (Activity) pe;
-						double duration = duration(act);
-						double without = calculatePlanDistanceWithout(i, plan, scenario.getNetwork(), tripRouter);
-						double withoutThisAndWithoutAllShorter = calculatePlanDistanceWithoutThisAndShorter(duration, plan, scenario.getNetwork(), tripRouter);
-						pw.printf("%f\t%f\t%f\n", duration, distance - without, distance - withoutThisAndWithoutAllShorter);
-					}
-					i++;
-				}
-			}
-			
-		} catch (FileNotFoundException e) {
-			throw new UncheckedIOException(e);
-		} finally {
-			if (pw != null) pw.close();
-		}
-		
-	}
-
-	public static double drivenKilometersWholeDay(Scenario scenario,
+    public static double drivenKilometersWholeDay(Scenario scenario,
 			VolumesAnalyzer volumes) {
 		double sum = 0;
 		for (Link link : scenario.getNetwork().getLinks().values()) {

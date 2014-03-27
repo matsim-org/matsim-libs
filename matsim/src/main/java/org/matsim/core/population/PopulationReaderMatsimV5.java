@@ -19,14 +19,10 @@
 
 package org.matsim.core.population;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Stack;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkUtils;
@@ -38,6 +34,11 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Stack;
 
 /**
  * A reader for plans files of MATSim according to <code>population_v5.dtd</code>.
@@ -234,10 +235,14 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 			}
 			if (this.currRoute instanceof GenericRoute) {
 				((GenericRoute) this.currRoute).setRouteDescription(startLinkId, this.routeDescription.trim(), endLinkId);
-				if (Double.isNaN(this.currRoute.getDistance())) {		
-					double dist = CoordUtils.calcDistance(this.prevAct.getCoord(), this.curract.getCoord());
-					double estimatedNetworkDistance = dist * this.scenario.getConfig().plansCalcRoute().getBeelineDistanceFactor();
-					this.currRoute.setDistance(estimatedNetworkDistance);
+				if (Double.isNaN(this.currRoute.getDistance())) {
+                    Coord fromCoord = getCoord(this.prevAct);
+                    Coord toCoord = getCoord(this.curract);
+                    if (fromCoord != null && toCoord != null) {
+                        double dist = CoordUtils.calcDistance(fromCoord, toCoord);
+                        double estimatedNetworkDistance = dist * this.scenario.getConfig().plansCalcRoute().getBeelineDistanceFactor();
+                        this.currRoute.setDistance(estimatedNetworkDistance);
+                    }
 				}
 				if (this.currRoute.getTravelTime() == Time.UNDEFINED_TIME) {
 					this.currRoute.setTravelTime(this.currleg.getTravelTime());
@@ -267,7 +272,21 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 		}
 	}
 
-	private void startLeg(final Attributes atts) {
+    private Coord getCoord(Activity fromActivity) {
+        Coord fromCoord;
+        if (fromActivity.getCoord() != null) {
+            fromCoord = fromActivity.getCoord();
+        } else {
+            if (!this.scenario.getNetwork().getLinks().isEmpty()) {
+                fromCoord = this.scenario.getNetwork().getLinks().get(fromActivity.getLinkId()).getCoord();
+            } else {
+                fromCoord = null;
+            }
+        }
+        return fromCoord;
+    }
+
+    private void startLeg(final Attributes atts) {
 		String mode = atts.getValue(ATTR_LEG_MODE).toLowerCase(Locale.ROOT);
 		if (VALUE_UNDEF.equals(mode)) {
 			mode = "undefined";

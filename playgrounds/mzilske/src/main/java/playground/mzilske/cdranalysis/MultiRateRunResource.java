@@ -71,7 +71,7 @@ public class MultiRateRunResource {
 		RATES.add(Integer.toString(50));
 		RATES.add(Integer.toString(100));
 		RATES.add(Integer.toString(150));
-		RATES.add("actevents");
+		RATES.add("activity");
 		RATES.add("contbaseplans");
 		return RATES;
 	}
@@ -422,12 +422,6 @@ public class MultiRateRunResource {
 		File file = new File(WD + "/permutations.txt");
 		Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
 		PowerPlans.writePermutations(baseScenario, file);
-	}
-
-	public void durationsSimulated() {
-		File file = new File(WD + "/durations-simulated.txt");
-		Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
-		PowerPlans.writeActivityDurations(baseScenario, file);
 	}
 
 	private static Double zeroForNull(Double maybeDouble) {
