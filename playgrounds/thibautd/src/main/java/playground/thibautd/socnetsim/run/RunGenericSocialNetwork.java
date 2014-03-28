@@ -86,11 +86,14 @@ public class RunGenericSocialNetwork {
 		}
 		RunUtils.addDistanceFillerListener( controller );
 
-		// run it
-		controller.run();
-
-		// dump non flat config
-		new NonFlatConfigWriter( config ).write( controller.getControlerIO().getOutputFilename( "output_config.xml.gz" ) );
+		try { 
+			// run it
+			controller.run();
+		}
+		finally {
+			// dump non flat config
+			new NonFlatConfigWriter( config ).write( controller.getControlerIO().getOutputFilename( "output_config.xml.gz" ) );
+		}
 	}
 
 	public static void main(final String[] args) {

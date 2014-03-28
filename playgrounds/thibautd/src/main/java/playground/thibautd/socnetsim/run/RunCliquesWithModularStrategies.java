@@ -86,11 +86,14 @@ public class RunCliquesWithModularStrategies {
 		}
 		RunUtils.addDistanceFillerListener( controller );
 
-		// run it
-		controller.run();
-
-		// dump non flat config
-		new NonFlatConfigWriter( config ).write( controller.getControlerIO().getOutputFilename( "output_config.xml.gz" ) );
+		try { 
+			// run it
+			controller.run();
+		}
+		finally {
+			// dump non flat config
+			new NonFlatConfigWriter( config ).write( controller.getControlerIO().getOutputFilename( "output_config.xml.gz" ) );
+		}
 	}
 
 	private static SocialNetwork toSocialNetwork(
