@@ -135,13 +135,15 @@ public class NOSTaxiOptimizer
 
     private void scheduleUnplannedRequestsImpl()
     {
-        SortedSet<TaxiRequest> unplannedReqs = (SortedSet<TaxiRequest>)unplannedRequests;
+        Iterator<TaxiRequest> reqIter = unplannedRequests.iterator();
 
-        for (TaxiRequest req : unplannedReqs) {
+        while (reqIter.hasNext()) {
             if (idleVehicles.isEmpty()) {
                 return;
             }
 
+            TaxiRequest req = reqIter.next();
+            
             Iterable<Vehicle> filteredVehs = vehicleFilter.filterVehiclesForRequest(idleVehicles,
                     req);
 
@@ -150,7 +152,7 @@ public class NOSTaxiOptimizer
 
             if (best != null) {
                 optimConfig.scheduler.scheduleRequest(best);
-                unplannedReqs.remove(req);
+                reqIter.remove();
                 idleVehicles.remove(best.vehicle);
             }
         }
