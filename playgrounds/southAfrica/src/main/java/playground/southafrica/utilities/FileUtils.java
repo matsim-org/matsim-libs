@@ -114,7 +114,7 @@ public class FileUtils {
 			/* Generate a random permutation of integers. */
 			List<Integer> permutation = RandomPermutation.getPermutation(fileList.length);
 			while(result.size() < number && !permutation.isEmpty()){
-				result.add(fileList[permutation.get(0)]);
+				result.add(fileList[permutation.get(0)-1]); /* Permutation is from 1... while index is from 0... */
 				permutation.remove(0);
 			}
 		} else{

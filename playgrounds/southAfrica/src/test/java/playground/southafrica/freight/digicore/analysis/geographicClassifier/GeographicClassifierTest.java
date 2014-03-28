@@ -6,75 +6,80 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-import playground.southafrica.freight.digicore.analysis.geographicClassifier.GeographicClassifier;
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 import playground.southafrica.freight.digicore.io.DigicoreVehicleWriter;
 
 
-public class GeographicClassifierTest extends MatsimTestCase {
-	
+public class GeographicClassifierTest{
+
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+
+	@Test
 	public void testConstructor() throws IOException{
-		GeographicClassifier gc = new GeographicClassifier(getOutputDirectory(), getPackageInputDirectory() + "shapefile/testShapefile.shp", 1);
+		GeographicClassifier gc = new GeographicClassifier(utils.getOutputDirectory(), utils.getPackageInputDirectory() + "shapefile/testShapefile.shp", 1);
 		
-		assertEquals("Basic maps not created.", 3, gc.getLists().size());
+		Assert.assertEquals("Basic maps not created.", 3, gc.getLists().size());
 		
-		assertTrue("Should have an intra list", gc.getLists().containsKey("intra"));
-		assertTrue("Intra list should be empty.", gc.getLists().get("intra").isEmpty());
-		assertTrue("Should have an intra list", gc.getLists().containsKey("inter"));
-		assertTrue("Inter list should be empty.", gc.getLists().get("inter").isEmpty());
-		assertTrue("Should have an intra list", gc.getLists().containsKey("extra"));
-		assertTrue("Extra list should be empty.", gc.getLists().get("extra").isEmpty());
+		Assert.assertTrue("Should have an intra list", gc.getLists().containsKey("intra"));
+		Assert.assertTrue("Intra list should be empty.", gc.getLists().get("intra").isEmpty());
+		Assert.assertTrue("Should have an intra list", gc.getLists().containsKey("inter"));
+		Assert.assertTrue("Inter list should be empty.", gc.getLists().get("inter").isEmpty());
+		Assert.assertTrue("Should have an intra list", gc.getLists().containsKey("extra"));
+		Assert.assertTrue("Extra list should be empty.", gc.getLists().get("extra").isEmpty());
 	}
 	
-	
+	@Test
 	public void testSplitInterIntraExtra(){
 		setUpIntraVehicle();
 		setUpInterVehicle();
 		setUpExtraVehicle();
 		
-		GeographicClassifier gc = new GeographicClassifier(getOutputDirectory(), getPackageInputDirectory() + "shapefile/testShapefile.shp", 1);
+		GeographicClassifier gc = new GeographicClassifier(utils.getOutputDirectory(), utils.getPackageInputDirectory() + "shapefile/testShapefile.shp", 1);
 		gc.splitIntraInterExtra(0.6, 1);
 		
 		/* Check that there are one of each type. */
-		assertEquals("There should only be one intra vehicle.", 1, gc.getLists().get("intra").size());
-		assertEquals("There should only be one inter vehicle.", 1, gc.getLists().get("inter").size());
-		assertEquals("There should only be one extra vehicle.", 1, gc.getLists().get("extra").size());
+		Assert.assertEquals("There should only be one intra vehicle.", 1, gc.getLists().get("intra").size());
+		Assert.assertEquals("There should only be one inter vehicle.", 1, gc.getLists().get("inter").size());
+		Assert.assertEquals("There should only be one extra vehicle.", 1, gc.getLists().get("extra").size());
 		
 		/* Check that the right vehicles are in the right lists. */
-		assertTrue("Wrong intra vehicle.", gc.getLists().get("intra").contains(new IdImpl(1)));
-		assertTrue("Wrong inter vehicle.", gc.getLists().get("inter").contains(new IdImpl(2)));
-		assertTrue("Wrong extra vehicle.", gc.getLists().get("extra").contains(new IdImpl(3)));
+		Assert.assertTrue("Wrong intra vehicle.", gc.getLists().get("intra").contains(new IdImpl(1)));
+		Assert.assertTrue("Wrong inter vehicle.", gc.getLists().get("inter").contains(new IdImpl(2)));
+		Assert.assertTrue("Wrong extra vehicle.", gc.getLists().get("extra").contains(new IdImpl(3)));
 	}
 	
-	
+	@Test
 	public void testWriteLists(){
 		setUpIntraVehicle();
 		setUpInterVehicle();
 		setUpExtraVehicle();
 		
-		GeographicClassifier gc = new GeographicClassifier(getOutputDirectory(), getPackageInputDirectory() + "shapefile/testShapefile.shp", 1);
+		GeographicClassifier gc = new GeographicClassifier(utils.getOutputDirectory(), utils.getPackageInputDirectory() + "shapefile/testShapefile.shp", 1);
 		gc.splitIntraInterExtra(0.6, 1);
-		gc.writeLists(getOutputDirectory(), "test");
+		gc.writeLists(utils.getOutputDirectory(), "test");
 		
 		/* Check that the output files were written. */
-		assertTrue("Intra file doesn't exist.", new File(getOutputDirectory() + "intra_test.txt").exists());
-		assertTrue("Inter file doesn't exist.", new File(getOutputDirectory() + "inter_test.txt").exists());
-		assertTrue("Extra file doesn't exist.", new File(getOutputDirectory() + "extra_test.txt").exists());
+		Assert.assertTrue("Intra file doesn't exist.", new File(utils.getOutputDirectory() + "intra_test.txt").exists());
+		Assert.assertTrue("Inter file doesn't exist.", new File(utils.getOutputDirectory() + "inter_test.txt").exists());
+		Assert.assertTrue("Extra file doesn't exist.", new File(utils.getOutputDirectory() + "extra_test.txt").exists());
 		
 		/* Check each file contains the right vehicle Id. */
 		String[] sa = {"intra", "inter", "extra"};
 		for(int i = 0; i < sa.length; i++){
-			BufferedReader br = IOUtils.getBufferedReader(getOutputDirectory() + sa[i] + "_test.txt");
+			BufferedReader br = IOUtils.getBufferedReader(utils.getOutputDirectory() + sa[i] + "_test.txt");
 			try{
 				String line = br.readLine();
-				assertTrue("Wrong Id in " + sa[i], line.equalsIgnoreCase(String.valueOf(i+1)));
+				Assert.assertTrue("Wrong Id in " + sa[i], line.equalsIgnoreCase(String.valueOf(i+1)));
 			} catch (IOException e) {
 				e.printStackTrace();
 				throw new RuntimeException("Cannot read from test file.");
@@ -149,7 +154,7 @@ public class GeographicClassifierTest extends MatsimTestCase {
 			
 		/* Write vehicle to output folder */
 		DigicoreVehicleWriter dvw = new DigicoreVehicleWriter();
-		dvw.write(getOutputDirectory() + "/" + vehicle.getId().toString() + ".xml.gz", vehicle);
+		dvw.write(utils.getOutputDirectory() + "/" + vehicle.getId().toString() + ".xml.gz", vehicle);
 	}
 	
 	
@@ -192,7 +197,7 @@ public class GeographicClassifierTest extends MatsimTestCase {
 			
 		/* Write vehicle to output folder */
 		DigicoreVehicleWriter dvw = new DigicoreVehicleWriter();
-		dvw.write(getOutputDirectory() + "/" + vehicle.getId().toString() + ".xml.gz", vehicle);
+		dvw.write(utils.getOutputDirectory() + "/" + vehicle.getId().toString() + ".xml.gz", vehicle);
 	}
 	
 	
@@ -230,6 +235,6 @@ public class GeographicClassifierTest extends MatsimTestCase {
 			
 		/* Write vehicle to output folder */
 		DigicoreVehicleWriter dvw = new DigicoreVehicleWriter();
-		dvw.write(getOutputDirectory() + "/" + vehicle.getId().toString() + ".xml.gz", vehicle);
+		dvw.write(utils.getOutputDirectory() + "/" + vehicle.getId().toString() + ".xml.gz", vehicle);
 	}
 }
