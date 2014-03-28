@@ -78,8 +78,8 @@ public class TripAnalysisHandler implements PersonDepartureEventHandler, PersonA
 		} else if (event.getLegMode().toString().equals(TransportMode.walk)) {
 			this.walkLegs++;
 		
-		} else {
-			log.warn("Unknown mode. This analysis only allows for 'car', 'pt' and 'walk'. For the simulated public transport, e.g. 'transit_walk' this analysis has to be revised.");
+		} else if (event.getLegMode().toString().equals(TransportMode.transit_walk)) {
+			log.warn("For the simulated public transport, e.g. 'transit_walk' this analysis has to be revised.");
 		}
 	
 	}
