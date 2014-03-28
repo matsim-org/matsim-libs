@@ -33,9 +33,9 @@ public class ExtCostMain {
 	
 	private static final Logger log = Logger.getLogger(ExtCostMain.class);
 	
-	private String eventsFile = "/Users/ihab/Desktop/test_events.xml";
-	private static String netFile = "/Users/ihab/Desktop/test_network.xml";
-	private String outputFolder = "/Users/Ihab/Desktop/analysis_output";
+	private String eventsFile = "/Users/ihab/Documents/workspace/runs-svn/agentBasedFlowBasedInternalization/output/int_flows_8_250_flow0.75/ITERS/it.250/250.events.xml.gz";
+	private static String netFile = "/Users/ihab/Documents/workspace/runs-svn/agentBasedFlowBasedInternalization/output/int_flows_8_250_flow0.75/output_network.xml.gz";
+	private String outputFolder = "/Users/ihab/Documents/workspace/runs-svn/agentBasedFlowBasedInternalization/output/int_flows_8_250_flow0.75/ITERS/it.250/analysis";
 	
 	public static void main(String[] args) {
 		ExtCostMain anaMain = new ExtCostMain();

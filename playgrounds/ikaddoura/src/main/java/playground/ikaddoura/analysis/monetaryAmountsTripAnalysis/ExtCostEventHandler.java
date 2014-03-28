@@ -39,10 +39,9 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.utils.misc.Time;
 
 /**
- * WARNING: This analysis assumes each agent to have exactly two trips.
+ * WARNING: This analysis assumes each agent to have exactly two trips. TODO: Adjust for more than 2 trips.
  * 
  * @author Ihab
  *
@@ -112,12 +111,12 @@ public class ExtCostEventHandler implements PersonDepartureEventHandler, LinkEnt
 		} else if (event.getActType().equalsIgnoreCase("secondary")){
 			this.personIDsSecondTrip.add(event.getPersonId());
 			this.personId2secondTripDepartureTime.put(event.getPersonId(), event.getTime());
-			System.out.println(Time.writeTime(event.getTime(), Time.TIMEFORMAT_HHMMSS));
+//			System.out.println(Time.writeTime(event.getTime(), Time.TIMEFORMAT_HHMMSS));
 		
 		} else if (event.getActType().equalsIgnoreCase("work")){
 			this.personIDsSecondTrip.add(event.getPersonId());
 			this.personId2secondTripDepartureTime.put(event.getPersonId(), event.getTime());
-			System.out.println(Time.writeTime(event.getTime(), Time.TIMEFORMAT_HHMMSS));
+//			System.out.println(Time.writeTime(event.getTime(), Time.TIMEFORMAT_HHMMSS));
 		}
 	}
 	
