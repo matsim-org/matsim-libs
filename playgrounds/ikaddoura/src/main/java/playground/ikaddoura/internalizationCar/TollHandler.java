@@ -31,19 +31,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.management.RuntimeErrorException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * @author ikaddoura
@@ -120,7 +115,7 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 			// calculate average toll for each link and time bin
 			
 			for (Id linkId : this.linkId2timeBin2tollSum.keySet()) {
-				log.info("Calculating average toll for link " + linkId);
+//				log.info("Calculating average toll for link " + linkId);
 				Map<Double, Double> timeBin2tollSum = this.linkId2timeBin2tollSum.get(linkId);
 				Map<Double, Double> timeBin2avgToll = new HashMap<Double, Double>();
 
@@ -135,7 +130,7 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 							throw new RuntimeException("Toll sum on link " + linkId + " in time bin " + timeBin + " is " + tollSum + ", but there is no agent departing / entering that link in that time bin. Aborting...");
 						} else {
 							avgToll = tollSum / enteringAndDepartingAgents;
-							log.info("linkId: " + linkId + " // timeBin: " + Time.writeTime(timeBin, Time.TIMEFORMAT_HHMMSS) + " // toll sum: " + tollSum + " // leaving agents: " + enteringAndDepartingAgents + " // avg toll: " + avgToll);
+//							log.info("linkId: " + linkId + " // timeBin: " + Time.writeTime(timeBin, Time.TIMEFORMAT_HHMMSS) + " // toll sum: " + tollSum + " // leaving agents: " + enteringAndDepartingAgents + " // avg toll: " + avgToll);
 						}
 					}
 					timeBin2avgToll.put(timeBin, avgToll);
