@@ -36,9 +36,9 @@ public class CompareScoresSingleIteration {
 	 */
 	public static void main(String[] args) {
 		TwoHashMapsConcatenated<String, Integer, ArrayList<String>> parkingEventsA = StrategyScoresAnalysis.getParkingEvents(
-				"H:/data/experiments/parkingSearchOct2013/runs/run100/output/", 99);
+				"H:/data/experiments/parkingSearchOct2013/runs/run104/output/", 399);
 		TwoHashMapsConcatenated<String, Integer, ArrayList<String>> parkingEventsB = StrategyScoresAnalysis.getParkingEvents(
-				"H:/data/experiments/parkingSearchOct2013/runs/run101/output/", 99);
+				"H:/data/experiments/parkingSearchOct2013/runs/run105/output/", 399);
 
 		int columnIndex = 9;
 		ArrayList<Double> values=new ArrayList<Double>();
@@ -58,7 +58,7 @@ public class CompareScoresSingleIteration {
 					}
 				}
 
-				if (relDiffernce>100 && !(parkingEventsA.get(personId, legIndex).get(6).contains("private") || parkingEventsB.get(personId, legIndex)
+				if (!(parkingEventsA.get(personId, legIndex).get(6).contains("private") || parkingEventsB.get(personId, legIndex)
 						.get(6).contains("private"))) {
 					System.out.println(relDiffernce*100);
 					values.add(relDiffernce*100);

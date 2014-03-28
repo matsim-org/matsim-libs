@@ -19,9 +19,9 @@
 
 package playground.wrashid.parkingSearch.planLevel.scenario;
 
+import org.matsim.contrib.parking.lib.EventHandlerAtStartupAdder;
 import org.matsim.core.controler.Controler;
 
-import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.parkingSearch.planLevel.init.InitializeParkings;
 import playground.wrashid.parkingSearch.planLevel.occupancy.FinishParkingOccupancyMaintainer;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingBookKeeper;

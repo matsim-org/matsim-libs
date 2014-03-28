@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.lib;
+package org.matsim.contrib.parking.lib;
 
 import java.util.LinkedList;
 

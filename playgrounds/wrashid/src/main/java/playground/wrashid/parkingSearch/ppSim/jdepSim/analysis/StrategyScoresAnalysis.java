@@ -36,25 +36,37 @@ public class StrategyScoresAnalysis {
 	 */
 	
 	//static String outputFolder="C:/data/parkingSearch/psim/zurich/output/run19/output/";
-	static String outputFolder="H:/data/experiments/parkingSearchOct2013/runs/run100/output/";
+	static String outputFolder="H:/data/experiments/parkingSearchOct2013/runs/run104/output/";
 	public static void main(String[] args) {
 		
 		
 		int startIteration=0;
-		int endIteration=99;
+		int endIteration=399;
 		int iterationStep=1;
 		
 		int referenceIteration=endIteration;
 		
-		TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> refernceScores = getScores(referenceIteration);
+		TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> refernceScores = getScores(referenceIteration,false);
 		
 		System.out.println("==========");
 		for (int i=startIteration;i<endIteration;i+=iterationStep){
-			TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> curScores = getScores(i);
+			TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> curScores = getScores(i,false);
+			
 			System.out.println(i + "\t" + getPercentageOfRelaxedStrategiesUnique(curScores,refernceScores) + "\t" + getPercentageOfRelaxedStrategiesAll(curScores,refernceScores) + "\t" + getPercentageOfMultipleBestStrategies(curScores));
 			
 		}
 		System.out.println("==========");
+		
+		/*
+		TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> curScoresWithPrivateParking = getScores(startIteration,true);
+		TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> nexterIterScoresWithPrivateParking = getScores(startIteration+1,true);
+		
+		for (int i=startIteration+1;i<endIteration-1;i+=iterationStep){
+			System.out.println(i + "\t" + getPercentageOfBestScoreChangePerIteration(curScoresWithPrivateParking,nexterIterScoresWithPrivateParking));
+			curScoresWithPrivateParking = nexterIterScoresWithPrivateParking;
+			nexterIterScoresWithPrivateParking = getScores(i+1,true);
+		}
+		*/
 		
 		
 		// % is best score strategy same as in final?
@@ -63,6 +75,37 @@ public class StrategyScoresAnalysis {
 		
 		
 	}
+
+
+
+	
+	private static double getPercentageOfBestScoreChangePerIteration(
+			TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> curScoresWithPrivateParking,
+			TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> nexterIterScoresWithPrivateParking) {
+		double numberOfParkingOperations=0;
+		double numberOfParkingOperationsWhereStrategyRelaxed=0;
+		for (String personId:nexterIterScoresWithPrivateParking.getKeySet1()){
+			for (Integer legIndex:nexterIterScoresWithPrivateParking.getKeySet2(personId)){
+				
+				if (curScoresWithPrivateParking.get(personId, legIndex)==null){
+					continue;
+				}
+				
+				double bestCurScore = getBestScore(curScoresWithPrivateParking.get(personId, legIndex));
+				double bestNextScore = getBestScore(nexterIterScoresWithPrivateParking.get(personId, legIndex));
+				
+				numberOfParkingOperations++;
+				
+				if (bestCurScore!= bestNextScore){
+					numberOfParkingOperationsWhereStrategyRelaxed++;
+				}
+			}
+		}
+		
+		return numberOfParkingOperationsWhereStrategyRelaxed/numberOfParkingOperations;
+	}
+
+
 
 
 	private static double getPercentageOfRelaxedStrategiesUnique(
@@ -247,7 +290,7 @@ public class StrategyScoresAnalysis {
 		return result;
 	}
 
-	public static TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> getScores(StringMatrix scoresMatrix,StringMatrix eventsMatrix) {
+	public static TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> getScores(StringMatrix scoresMatrix,StringMatrix eventsMatrix,boolean removePrivateParking) {
 TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> scores=new TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>>();
 		
 		TwoHashMapsConcatenated<String, Integer, Boolean> usesPrivateParking = usesPrivateParking(eventsMatrix);
@@ -263,7 +306,7 @@ TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> scores=ne
 			double score= scoresMatrix.getDouble(i, 3);
 			
 			if (!prevPersonId.equalsIgnoreCase(currentPersonId) || prevLegIndexId!=curLegIndexId){
-				if (usesPrivateParking.get(currentPersonId, curLegIndexId)==null){
+				if (!removePrivateParking || usesPrivateParking.get(currentPersonId, curLegIndexId)==null){
 					scores.put(prevPersonId, prevLegIndexId, tmpList);
 				}
 				
@@ -282,16 +325,16 @@ TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> scores=ne
 		return scores;
 	}
 	
-	public static TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> getScores(String outputPath,int iterationNumber) {
+	public static TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> getScores(String outputPath,int iterationNumber, boolean removePrivateParking) {
 		StringMatrix scoresMatrix = GeneralLib.readStringMatrix(outputPath + "/ITERS/" + iterationNumber +".strategyScores.txt.gz");
 		StringMatrix eventsMatrix = GeneralLib.readStringMatrix(outputPath + "/ITERS/" + iterationNumber +".parkingEvents.txt.gz");		
-		return getScores(scoresMatrix,eventsMatrix);
+		return getScores(scoresMatrix,eventsMatrix,removePrivateParking);
 	}
 	
-	public static TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> getScores(int iterationNumber) {
+	public static TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> getScores(int iterationNumber, boolean removePrivateParking) {
 		StringMatrix scoresMatrix = GeneralLib.readStringMatrix(getScoresFileName(iterationNumber));
 		StringMatrix eventsMatrix = GeneralLib.readStringMatrix(getEventsFileName(iterationNumber));		
-		return getScores(scoresMatrix,eventsMatrix);
+		return getScores(scoresMatrix,eventsMatrix,removePrivateParking);
 	}
 	
 	public static class StrategyScoreLog{
