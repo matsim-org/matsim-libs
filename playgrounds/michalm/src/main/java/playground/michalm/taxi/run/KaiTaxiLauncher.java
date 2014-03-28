@@ -27,8 +27,9 @@ import java.io.IOException;
     public static void main(String... args)
         throws IOException
     {
-        String file = "./shared-svn/projects/maciejewski/input/mielec-2-peaks/params.in";
+        String file = "./shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new-40-50/params.in.in";
         TaxiLauncher launcher = new TaxiLauncher(file);
+        launcher.initVrpPathCalculator();
         launcher.go(false);
         launcher.generateOutput();
     }
