@@ -41,136 +41,165 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Network;
 
 /**
- * WARNING: This analysis assumes each agent to have exactly two trips. TODO: Adjust for more than 2 trips.
+ * This analysis doesn't assume each agent to have exactly two trips.
  * 
- * @author Ihab
+ * @author ikaddoura , lkroeger
  *
  */
 public class ExtCostEventHandler implements PersonDepartureEventHandler, LinkEnterEventHandler, PersonMoneyEventHandler, ActivityEndEventHandler {
-				
-	private List<Id> personIDsSecondTrip = new ArrayList<Id>();
-		
-	// departure time
-	private Map<Id, Double> personId2firstTripDepartureTime = new HashMap<Id, Double>();
-	private Map<Id, Double> personId2secondTripDepartureTime = new HashMap<Id, Double>();
+	// necessary for calculating the trip distance during the iteration
+	private Map<Id,Integer> personId2actualTripNumber = new HashMap<Id, Integer>();
 	
-	// fare
-	private Map<Id, Double> personId2amountFirstTrip = new HashMap<Id, Double>();
-	private Map<Id, Double> personId2amountSecondTrip = new HashMap<Id, Double>();
-		
-	// distance
-	private Map<Id, Double> personId2distanceFirstTrip = new HashMap<Id, Double>();
-	private Map<Id, Double> personId2distanceSecondTrip = new HashMap<Id, Double>();
-		
+	// departure times
+	private Map<Id,Map<Integer,Double>> personId2tripNumber2departureTime = new HashMap<Id, Map<Integer,Double>>();
+	
+	// trip distances
+	private Map<Id,Map<Integer,Double>> personId2tripNumber2tripDistance = new HashMap<Id, Map<Integer,Double>>();
+	
+	// fares
+	private Map<Id,Map<Integer,Double>> personId2tripNumber2amount = new HashMap<Id, Map<Integer,Double>>();
+	
 	private Network network;
-	
+
 	public ExtCostEventHandler(Network network) {
 		this.network = network;
 	}
 
 	@Override
 	public void reset(int iteration) {
-		this.personIDsSecondTrip.clear();
-		this.personId2amountFirstTrip.clear();
-		this.personId2amountSecondTrip.clear();
-		this.personId2firstTripDepartureTime.clear();
-		this.personId2secondTripDepartureTime.clear();
-		this.personId2distanceFirstTrip.clear();
-		this.personId2distanceSecondTrip.clear();
+		personId2actualTripNumber.clear();
+		personId2tripNumber2departureTime.clear();
+		personId2tripNumber2tripDistance.clear();
+		personId2tripNumber2amount.clear();
 	}
 
 	@Override
 	public void handleEvent(PersonMoneyEvent event) {
 		
-		if (this.personIDsSecondTrip.contains(event.getPersonId())){
-			// second trip
-			if (personId2amountSecondTrip.containsKey(event.getPersonId())){
-				double amountSum = this.personId2amountSecondTrip.get(event.getPersonId()) + event.getAmount();
-				this.personId2amountSecondTrip.put(event.getPersonId(), amountSum);
-			} else {
-				this.personId2amountSecondTrip.put(event.getPersonId(), event.getAmount());
+		if(personId2tripNumber2amount.containsKey(event.getPersonId())){
+			// already at least one personMoneyEvent handled for this person
+			double amount = event.getAmount();
+			double eventTime = event.getTime();
+			int x = 0;
+			for(int i : personId2tripNumber2departureTime.get(event.getPersonId()).keySet()){
+				if(eventTime > (personId2tripNumber2departureTime.get(event.getPersonId()).get(i))){
+					x = i;
+				}else{
+				}
 			}
+			int tripNumber = x;
 			
-		} else {
-			// first trip
-			if (personId2amountFirstTrip.containsKey(event.getPersonId())){
-				double amountSum = this.personId2amountFirstTrip.get(event.getPersonId()) + event.getAmount();
-				this.personId2amountFirstTrip.put(event.getPersonId(), amountSum);
-			} else {
-				this.personId2amountFirstTrip.put(event.getPersonId(), event.getAmount());
+			if(personId2tripNumber2amount.get(event.getPersonId()).containsKey(tripNumber)){
+				// already at least one personMoneyEvent handled for this trip of this person
+				double amountBefore = personId2tripNumber2amount.get(event.getPersonId()).get(tripNumber);
+				double updatedAmount = amountBefore + amount;
+				Map<Integer,Double> tripNumber2amount = personId2tripNumber2amount.get(event.getPersonId());
+				tripNumber2amount.put(tripNumber, updatedAmount);
+				personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
+			}else{
+				// handling the first PersonMoneyEvent of this trip of this person
+				Map<Integer,Double> tripNumber2amount = personId2tripNumber2amount.get(event.getPersonId());
+				tripNumber2amount.put(tripNumber, amount);
+				personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
 			}
+		}else{
+			// handling the first personMoneyEvent for this person
+			double amount = event.getAmount();
+			double eventTime = event.getTime();
+			int x = 0;
+			for(int i : personId2tripNumber2departureTime.get(event.getPersonId()).keySet()){
+				if(eventTime > (personId2tripNumber2departureTime.get(event.getPersonId()).get(i))){
+					x = i;
+				}else{
+				}
+			}
+			int tripNumber = x;
+			
+			Map<Integer,Double> tripNumber2amount = new HashMap<Integer, Double>();
+			tripNumber2amount.put(tripNumber, amount);
+			personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
 		}
 	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		
-		if (event.getActType().equalsIgnoreCase("home")){
-			this.personId2firstTripDepartureTime.put(event.getPersonId(), event.getTime());
-		
-		} else if (event.getActType().equalsIgnoreCase("secondary")){
-			this.personIDsSecondTrip.add(event.getPersonId());
-			this.personId2secondTripDepartureTime.put(event.getPersonId(), event.getTime());
-//			System.out.println(Time.writeTime(event.getTime(), Time.TIMEFORMAT_HHMMSS));
-		
-		} else if (event.getActType().equalsIgnoreCase("work")){
-			this.personIDsSecondTrip.add(event.getPersonId());
-			this.personId2secondTripDepartureTime.put(event.getPersonId(), event.getTime());
-//			System.out.println(Time.writeTime(event.getTime(), Time.TIMEFORMAT_HHMMSS));
-		}
+//		
+//		if (event.getActType().equalsIgnoreCase("home")){
+//			this.personId2firstTripDepartureTime.put(event.getPersonId(), event.getTime());
+//		
+//		} else if (event.getActType().equalsIgnoreCase("secondary")){
+//			this.personIDsSecondTrip.add(event.getPersonId());
+//			this.personId2secondTripDepartureTime.put(event.getPersonId(), event.getTime());
+////			System.out.println(Time.writeTime(event.getTime(), Time.TIMEFORMAT_HHMMSS));
+//		
+//		} else if (event.getActType().equalsIgnoreCase("work")){
+//			this.personIDsSecondTrip.add(event.getPersonId());
+//			this.personId2secondTripDepartureTime.put(event.getPersonId(), event.getTime());
+////			System.out.println(Time.writeTime(event.getTime(), Time.TIMEFORMAT_HHMMSS));
+//		}
 	}
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-			
+			// updating the trip Length
 			double linkLength = this.network.getLinks().get(event.getLinkId()).getLength();
-
-				if (this.personIDsSecondTrip.contains(event.getVehicleId())){
-					// second trip
-					
-					if (this.personId2distanceSecondTrip.containsKey(event.getVehicleId())) {
-						double updatedDistance = this.personId2distanceSecondTrip.get(event.getVehicleId()) + linkLength;
-						this.personId2distanceSecondTrip.put(event.getVehicleId(), updatedDistance);
-					} else {
-						this.personId2distanceSecondTrip.put(event.getVehicleId(), linkLength);
-					}
-				} else {
-					// first trip
-
-					if (this.personId2distanceFirstTrip.containsKey(event.getVehicleId())) {
-						double updatedDistance = this.personId2distanceFirstTrip.get(event.getVehicleId()) + linkLength;
-						this.personId2distanceFirstTrip.put(event.getVehicleId(), updatedDistance);
-					} else {
-						this.personId2distanceFirstTrip.put(event.getVehicleId(), linkLength);
-					}
-				}
+			int tripNumber = personId2actualTripNumber.get(event.getVehicleId());
+			double distanceBefore = personId2tripNumber2tripDistance.get(event.getVehicleId()).get(tripNumber);
+			double updatedDistance = distanceBefore + linkLength;
+			Map<Integer,Double> tripNumber2tripDistance = personId2tripNumber2tripDistance.get(event.getVehicleId());
+			tripNumber2tripDistance.put(tripNumber, updatedDistance);
+			personId2tripNumber2tripDistance.put(event.getVehicleId(), tripNumber2tripDistance);
 	}
 	
-
-	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	
-	public Map<Id, Double> getPersonId2firstTripDepartureTime() {
-		return personId2firstTripDepartureTime;
+	public Map<Id, Integer> getPersonId2NumberOfTrips() {
+		Map<Id,Integer> personId2numberOfTrips = new HashMap<Id, Integer>();
+		for(Id personId : personId2actualTripNumber.keySet()){
+			int numberOfTrips = personId2actualTripNumber.get(personId);
+			personId2numberOfTrips.put(personId,numberOfTrips);
+		}
+		return personId2numberOfTrips;
+		// should be called only after the start of the last activity (= at the end of the iteration) 
+	}
+	
+	public Map<Id,List<Double>> getPersonId2listOfDepartureTimes() {
+		Map<Id,List<Double>> personId2listOfDepartureTimes = new HashMap<Id, List<Double>>();
+		for(Id personId: personId2tripNumber2departureTime.keySet()){
+			List<Double> times = new ArrayList<Double>();
+			for(int i : personId2tripNumber2departureTime.get(personId).keySet()){
+				double time = personId2tripNumber2departureTime.get(personId).get(i);
+				times.add(time);
+			}
+			personId2listOfDepartureTimes.put(personId, times);
+		}
+		return personId2listOfDepartureTimes;
 	}
 
-	public Map<Id, Double> getPersonId2secondTripDepartureTime() {
-		return personId2secondTripDepartureTime;
+	public Map<Id,List<Double>> getPersonId2listOfDistances() {
+		Map<Id,List<Double>> personId2listOfDistances = new HashMap<Id, List<Double>>();
+		for(Id personId: personId2tripNumber2tripDistance.keySet()){
+			List<Double> distances = new ArrayList<Double>();
+			for(int i : personId2tripNumber2tripDistance.get(personId).keySet()){
+				double distance = personId2tripNumber2tripDistance.get(personId).get(i);
+				distances.add(distance);
+			}
+			personId2listOfDistances.put(personId, distances);
+		}
+		return personId2listOfDistances;
 	}
 
-	public Map<Id, Double> getPersonId2amountFirstTrip() {
-		return personId2amountFirstTrip;
-	}
-
-	public Map<Id, Double> getPersonId2amountSecondTrip() {
-		return personId2amountSecondTrip;
-	}
-
-	public Map<Id, Double> getPersonId2distanceFirstTrip() {
-		return personId2distanceFirstTrip;
-	}
-
-	public Map<Id, Double> getPersonId2distanceSecondTrip() {
-		return personId2distanceSecondTrip;
+	public Map<Id,List<Double>> getPersonId2listOfAmounts() {
+		Map<Id,List<Double>> personId2listOfAmounts = new HashMap<Id, List<Double>>();
+		for(Id personId: personId2tripNumber2amount.keySet()){
+			List<Double> amounts = new ArrayList<Double>();
+			for(int i : personId2tripNumber2amount.get(personId).keySet()){
+				double amount = personId2tripNumber2amount.get(personId).get(i);
+				amounts.add(amount);
+			}
+			personId2listOfAmounts.put(personId, amounts);
+		}
+		return personId2listOfAmounts;
 	}
 
 	public Map<Double, Double> getAvgAmountPerTripDepartureTime() {
@@ -185,20 +214,27 @@ public class ExtCostEventHandler implements PersonDepartureEventHandler, LinkEnt
 			List<Double> fares = new ArrayList<Double>();
 			tripDepTime2fares.put(time, fares);
 		}
-			
-		for (Double time : tripDepTime2fares.keySet()){
-			for (Id personId : this.personId2firstTripDepartureTime.keySet()){
-				if (this.personId2firstTripDepartureTime.get(personId) < time && this.personId2firstTripDepartureTime.get(personId) >= (time - periodLength)) {
-					if (tripDepTime2fares.containsKey(time)){
-						tripDepTime2fares.get(time).add(this.personId2amountFirstTrip.get(personId));
-					}
-				}
+		
+		Map<Integer, double[]> counter2allDepartureTimesAndAmounts = new HashMap<Integer, double[]>();
+		int i = 0;
+		
+		for(Id personId : personId2tripNumber2departureTime.keySet()){
+			for(int tripNumber : personId2tripNumber2departureTime.get(personId).keySet()){
+				double departureTime = personId2tripNumber2departureTime.get(personId).get(tripNumber);
+				double belongingAmount = personId2tripNumber2amount.get(personId).get(tripNumber);
+				double[] departureTimeAndAmount = new double[2];
+				departureTimeAndAmount[0] = departureTime;
+				departureTimeAndAmount[1] = belongingAmount;				
+				counter2allDepartureTimesAndAmounts.put(i, departureTimeAndAmount);
+				i++;
 			}
-			
-			for (Id personId : this.personId2secondTripDepartureTime.keySet()){
-				if (this.personId2secondTripDepartureTime.get(personId) < time && this.personId2secondTripDepartureTime.get(personId) >= (time - periodLength)) {
+		}
+		
+		for (Double time : tripDepTime2fares.keySet()){
+			for (int counter : counter2allDepartureTimesAndAmounts.keySet()){
+				if (counter2allDepartureTimesAndAmounts.get(counter)[0] < time && counter2allDepartureTimesAndAmounts.get(counter)[0] >= (time - periodLength)) {
 					if (tripDepTime2fares.containsKey(time)){
-						tripDepTime2fares.get(time).add(this.personId2amountSecondTrip.get(personId));
+						tripDepTime2fares.get(time).add(counter2allDepartureTimesAndAmounts.get(counter)[1]);
 					}
 				}
 			}
@@ -224,7 +260,7 @@ public class ExtCostEventHandler implements PersonDepartureEventHandler, LinkEnt
 		}
 		return tripDepTime2avgFare;
 	}
-	
+
 	public Map<Double, Double> getAvgAmountPerTripDistance() {
 		Map<Double, Double> tripDistance2avgAmount = new HashMap<Double, Double>();
 
@@ -237,20 +273,27 @@ public class ExtCostEventHandler implements PersonDepartureEventHandler, LinkEnt
 			List<Double> amounts = new ArrayList<Double>();
 			tripDistance2amount.put(distance, amounts);
 		}
-			
-		for (Double dist : tripDistance2amount.keySet()){
-			for (Id personId : this.personId2distanceFirstTrip.keySet()){
-				if (this.personId2distanceFirstTrip.get(personId) <= dist && this.personId2distanceFirstTrip.get(personId) > (dist - groupsize)) {
-					if (tripDistance2amount.containsKey(dist)){
-						tripDistance2amount.get(dist).add(this.personId2amountFirstTrip.get(personId));
-					}
-				}
+		
+		Map<Integer, double[]> counter2allDistancesAndAmounts = new HashMap<Integer, double[]>();
+		int i = 0;
+		
+		for(Id personId : personId2tripNumber2tripDistance.keySet()){
+			for(int tripNumber : personId2tripNumber2tripDistance.get(personId).keySet()){
+				double tripDistance = personId2tripNumber2tripDistance.get(personId).get(tripNumber);
+				double belongingAmount = personId2tripNumber2amount.get(personId).get(tripNumber);
+				double[] tripDistanceAndAmount = new double[2];
+				tripDistanceAndAmount[0] = tripDistance;
+				tripDistanceAndAmount[1] = belongingAmount;				
+				counter2allDistancesAndAmounts.put(i, tripDistanceAndAmount);
+				i++;
 			}
-			
-			for (Id personId : this.personId2distanceSecondTrip.keySet()){
-				if (this.personId2distanceSecondTrip.get(personId) <= dist && this.personId2distanceSecondTrip.get(personId) > (dist - groupsize)) {
+		}
+		
+		for (Double dist : tripDistance2amount.keySet()){
+			for (int counter : counter2allDistancesAndAmounts.keySet()){
+				if (counter2allDistancesAndAmounts.get(counter)[0] < dist && counter2allDistancesAndAmounts.get(counter)[0] >= (dist - groupsize)) {
 					if (tripDistance2amount.containsKey(dist)){
-						tripDistance2amount.get(dist).add(this.personId2amountSecondTrip.get(personId));
+						tripDistance2amount.get(dist).add(counter2allDistancesAndAmounts.get(counter)[1]);
 					}
 				}
 			}
@@ -279,20 +322,28 @@ public class ExtCostEventHandler implements PersonDepartureEventHandler, LinkEnt
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		// set 0 amounts - otherwise these agents appear nowhere
-		
 		if (event.getLegMode().equals(TransportMode.car)){
-			if (this.personIDsSecondTrip.contains(event.getPersonId())){
-				// second trip
-				this.personId2amountSecondTrip.put(event.getPersonId(), 0.0);
-				this.personId2distanceSecondTrip.put(event.getPersonId(), 0.0);
-				
-			} else {
-				// first trip
-				this.personId2amountFirstTrip.put(event.getPersonId(), 0.0);
-				this.personId2distanceFirstTrip.put(event.getPersonId(), 0.0);
+			if(personId2actualTripNumber.containsKey(event.getPersonId())){
+				// This is at least the second trip of the person
+				personId2actualTripNumber.put(event.getPersonId(), personId2actualTripNumber.get(event.getPersonId())+1);
+				Map<Integer,Double> tripNumber2departureTime = personId2tripNumber2departureTime.get(event.getPersonId());
+				tripNumber2departureTime.put(personId2actualTripNumber.get(event.getPersonId()), event.getTime());
+				personId2tripNumber2departureTime.put(event.getPersonId(), tripNumber2departureTime);
+				Map<Integer,Double> tripNumber2tripDistance = personId2tripNumber2tripDistance.get(event.getPersonId());
+				tripNumber2tripDistance.put(personId2actualTripNumber.get(event.getPersonId()), 0.0);
+				personId2tripNumber2tripDistance.put(event.getPersonId(), tripNumber2tripDistance);
+			}else{
+				// This is the first trip of the person
+				personId2actualTripNumber.put(event.getPersonId(), 1);
+				Map<Integer,Double> tripNumber2departureTime = new HashMap<Integer, Double>();
+				tripNumber2departureTime.put(1, event.getTime());
+				personId2tripNumber2departureTime.put(event.getPersonId(), tripNumber2departureTime);
+				Map<Integer,Double> tripNumber2tripDistance = new HashMap<Integer, Double>();
+				tripNumber2tripDistance.put(1, 0.0);
+				personId2tripNumber2tripDistance.put(event.getPersonId(), tripNumber2tripDistance);
 			}
 		}
 	}
+
 	
 }

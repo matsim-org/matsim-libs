@@ -20,22 +20,19 @@
 /**
  * 
  */
-package playground.ikaddoura.analysis.monetaryAmountsTripAnalysis;
+package playground.ikaddoura.analysis.monetaryAmountsTripAnalysis_old;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 /**
- * @author ikaddoura , lkroeger
+ * @author ikaddoura
  *
  */
 public class CarTripInfoWriter {
@@ -68,19 +65,25 @@ public class CarTripInfoWriter {
 			bw.write("amount per trip;departure time [sec];person Id;distance [m]");
 			bw.newLine();
 			
-			// all trips (different number of trips possible
-			for (Id id : this.handler.getPersonId2listOfAmounts().keySet()) {
-				List<Double> fares = this.handler.getPersonId2listOfAmounts().get(id);
-				List<Double> departureTimes = this.handler.getPersonId2listOfDepartureTimes().get(id);
-				List<Double> distances = this.handler.getPersonId2listOfDistances().get(id);
-				int numberOfTrips = this.handler.getPersonId2NumberOfTrips().get(id);
-				for(int i = 0 ; i < numberOfTrips ; i++){
-					double fare = fares.get(i);
-					double departureTime = departureTimes.get(i);
-					double distance = distances.get(i);
-					bw.write(fare + ";" + departureTime + ";" + id + ";" + distance);
-					bw.newLine();
-				}
+			// first trip
+			for (Id id : this.handler.getPersonId2amountFirstTrip().keySet()) {
+				double fare = this.handler.getPersonId2amountFirstTrip().get(id);
+				double departureTime = this.handler.getPersonId2firstTripDepartureTime().get(id);
+				double distance = this.handler.getPersonId2distanceFirstTrip().get(id);
+				
+				bw.write(fare + ";" + departureTime + ";" + id + ";" + distance);
+				bw.newLine();
+			}
+			
+			// second trip
+			for (Id id : this.handler.getPersonId2amountSecondTrip().keySet()) {
+				
+				double amount = this.handler.getPersonId2amountSecondTrip().get(id);
+				double departureTime = this.handler.getPersonId2secondTripDepartureTime().get(id);
+				double distance = this.handler.getPersonId2distanceSecondTrip().get(id);
+				
+				bw.write(amount + ";" + departureTime + ";" + id + ";" + distance);
+				bw.newLine();
 			}
 			
 			log.info("Output written to " + fileName);
