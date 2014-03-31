@@ -78,7 +78,7 @@ public class GroupReplanningConfigGroup extends ReflectiveNonFlatModule {
 	private boolean checkConsistency = false;
 	private int graphWriteInterval = 25;
 	private int disableInnovationAfterIter = -1;
-	private boolean considerVehicleIncompatibilities = true;
+	private boolean considerVehicleIncompatibilities = false;
 	private double initialTimeMutationTemperature = 24;
 	private boolean useLimitedVehicles = true;
 	private String locationChoiceActivityType = "leisure";

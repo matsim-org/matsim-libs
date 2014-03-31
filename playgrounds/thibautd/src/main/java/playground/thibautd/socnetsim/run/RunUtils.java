@@ -487,14 +487,12 @@ public class RunUtils {
 		builder.withPlanRoutingAlgorithmFactory(
 				RunUtils.createPlanRouterFactory( scenario ) );
 
-		if ( false ) { // not sure it helps, and not used in coalition selection anyway
-			builder.withIncompatiblePlansIdentifierFactory(
-					weights.getConsiderVehicleIncompatibilities() &&
-					scenario.getScenarioElement( VehicleRessources.ELEMENT_NAME ) != null ?
-						new VehicleBasedIncompatiblePlansIdentifierFactory(
-								SharedVehicleUtils.DEFAULT_VEHICULAR_MODES ) :
-						new EmptyIncompatiblePlansIdentifierFactory() );
-		}
+		builder.withIncompatiblePlansIdentifierFactory(
+				weights.getConsiderVehicleIncompatibilities() &&
+				scenario.getScenarioElement( VehicleRessources.ELEMENT_NAME ) != null ?
+					new VehicleBasedIncompatiblePlansIdentifierFactory(
+							SharedVehicleUtils.DEFAULT_VEHICULAR_MODES ) :
+					new EmptyIncompatiblePlansIdentifierFactory() );
 
 
 		final ScoringFunctionConfigGroup scoringFunctionConf = (ScoringFunctionConfigGroup)
