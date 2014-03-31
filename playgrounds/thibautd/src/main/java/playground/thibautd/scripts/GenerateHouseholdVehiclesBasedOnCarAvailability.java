@@ -21,7 +21,9 @@ package playground.thibautd.scripts;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -113,18 +115,36 @@ public class GenerateHouseholdVehiclesBasedOnCarAvailability {
 		final PopulationImpl pop = (PopulationImpl) sc.getPopulation();
 
 		log.info( "parse persons" );
+		final Set<Id> hhsWithSometimes = new HashSet<Id>();
+		final Set<Id> hhsWithOther = new HashSet<Id>();
 		pop.setIsStreaming( true );
 		pop.addAlgorithm( new PersonAlgorithm() {
 			@Override
 			public void run(final Person person) {
+				final Household hh = person2hh.get( person.getId() );
 				if ( "always".equals( ((PersonImpl) person).getCarAvail() ) ) {
-					final Household hh = person2hh.get( person.getId() );
 					((HouseholdImpl) hh).getVehicleIds().add( person.getId() );
+				}
+
+				if ( "sometimes".equals( ((PersonImpl) person).getCarAvail() ) ) {
+					hhsWithSometimes.add( hh.getId() );
+				}
+				else {
+					hhsWithOther.add( hh.getId() );
 				}
 			}
 		});
 
 		new MatsimPopulationReader( sc ).readFile( inpop );
+
+		log.info( "correction: do not let households with only \"sometimes\" without a car" );
+		for ( Household hh : households.getHouseholds().values() ) {
+			if ( hhsWithSometimes.contains( hh.getId() ) && !hhsWithOther.contains( hh.getId() ) ) {
+				log.warn( "correct empty vehicle list for household "+hh.getId() );
+				assert hh.getVehicleIds().isEmpty();
+				hh.getVehicleIds().add( new IdImpl( "corr-"+hh.getId() ) );
+			}
+		}
 
 		log.info( "dump households to "+outhh );
 		new HouseholdsWriterV10( households ).writeFile( outhh );
