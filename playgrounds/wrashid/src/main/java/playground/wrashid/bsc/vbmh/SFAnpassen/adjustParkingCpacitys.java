@@ -29,36 +29,37 @@ public class adjustParkingCpacitys {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		String parkFileName="";
-		String peakLoadFileName="";
-		String outputFile = "";
+		String parkFileName="input/SF_PLUS/base/parking.xml";
+		String peakLoadFileName="input/SF_PLUS/base/peakLoad.csv";
+		String streetFileName="input/SF_PLUS/base/street100p.csv";
+		String outputFile = "input/SF_PLUS/Scenario/140331_W08PeakS/parking2.xml";
 		//----
-		pAnteile.put("home", 50.0);
-		evAnteile.put("home", 0.5);
+		pAnteile.put("home", 1.0);
+		evAnteile.put("home", 1.0);
 //		preiseEVSpots.put("home", 0);
 //		preiseNEVSpots.put("home", 0);
 //		chargingRates.put("home", 2.3);
 		
-		pAnteile.put("work", 100.0);
-		evAnteile.put("work", 0.50);
-		preiseEVSpots.put("work", 3);
+		pAnteile.put("work", 0.8);
+		evAnteile.put("work", 0.2);
+//		preiseEVSpots.put("work", 3);
 //		preiseNEVSpots.put("work", 4);
 //		chargingRates.put("work", 3.6);
 		
-		pAnteile.put("secondary",100.0);
-		evAnteile.put("secondary", 0.5);
+		pAnteile.put("secondary",0.8);
+		evAnteile.put("secondary", 0.2);
 //		preiseEVSpots.put("secondary", 5);
 //		preiseNEVSpots.put("secondary", 6);
 //		chargingRates.put("secondary", 8.04);
 		
-		pAnteile.put("Street", 0.0);
-		evAnteile.put("Street", 0.30);
+		pAnteile.put("Street", 0.05);
+		evAnteile.put("Street", 0.2);
 //		preiseEVSpots.put("Street", 1);
 //		preiseNEVSpots.put("Street", 2);
 //		chargingRates.put("Street", 3.6);
 		
-		pAnteile.put("edu", 100.00);
-		evAnteile.put("edu", 0.5);
+		pAnteile.put("edu", 0.8);
+		evAnteile.put("edu", 0.2);
 //		preiseEVSpots.put("edu", 7);
 //		preiseNEVSpots.put("edu", 7);
 //		chargingRates.put("edu", 0.0);
@@ -67,21 +68,33 @@ public class adjustParkingCpacitys {
 		ParkingWriter writer = new ParkingWriter();
 		ParkingMap karte = JAXB.unmarshal( file, ParkingMap.class );
 		
+		karte.initHashMap();
+		System.out.println(karte.getPrivateParking("9261_11", "work").toString());
+		
 		readCSV(peakLoadFileName);
+		readStreetCSV(streetFileName);
 		
 		for (Parking parking : karte.getParkings()){
 			int peakLoad = peakLoads.get(parking.id);
-			double newCapacity = pAnteile.get(parking.facilityActType)*peakLoad;
-			int newEVCapacity = (int) Math.round(newCapacity*evAnteile.get(parking.facilityActType));
-			int newNEVCapacity = (int) Math.round(newCapacity*(1-evAnteile.get(parking.facilityActType)));
+			String actType;
+			if(parking.facilityActType==null){
+				actType="Street";
+				System.out.println("Street :"+peakLoad);
+			}else{
+				actType = parking.facilityActType;
+			}
+			double newCapacity = pAnteile.get(actType)*peakLoad;
+			int newEVCapacity = (int) Math.round(newCapacity*evAnteile.get(actType));
+			int newNEVCapacity = (int) Math.round(newCapacity*(1-evAnteile.get(actType)));
 			parking.capacityEV=newEVCapacity;
 			parking.capacityNEV=newNEVCapacity;
 		}
-		
-		
+
+
 		
 		
 		writer.write(karte, outputFile);
+		System.out.println("Fertig");
 	}
 
 	public static void readCSV(String peakLoadFileName){
@@ -109,7 +122,32 @@ public class adjustParkingCpacitys {
 		} //header
 		
 	}
-	
+
+	public static void readStreetCSV(String streetFileName){
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader(streetFileName));
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		String zeile = "";
+		
+		try {
+			zeile = reader.readLine();
+			while ((zeile = reader.readLine()) != null) {
+				String[] felder = zeile.split(","); //0 11
+				
+				peakLoads.put(Integer.parseInt(felder[0]), Integer.parseInt(felder[6]));
+				
+				
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} //header
+		
+	}
 	
 	
 }

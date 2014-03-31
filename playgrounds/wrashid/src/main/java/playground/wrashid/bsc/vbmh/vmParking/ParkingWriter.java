@@ -44,9 +44,9 @@ public class ParkingWriter {
 			return 0;
 		}
 		
-		gisSchreiben(gisFileWriter, "X, Y, Type, FacActType, CapacityEV, CapacityNEV \n");
+		gisSchreiben(gisFileWriter, "ParkingID, X, Y, Type, FacActType, CapacityEV, CapacityNEV \n");
 		for (Parking parking : parkingMap.getParkings()){
-			gisSchreiben(gisFileWriter, parking.getCoordinate().getX() + "," + parking.getCoordinate().getY()+ "," + parking.type + "," + parking.facilityActType + "," + parking.capacityEV + "," + parking.capacityNEV+"\n");
+			gisSchreiben(gisFileWriter, parking.id+","+parking.getCoordinate().getX() + "," + parking.getCoordinate().getY()+ "," + parking.type + "," + parking.facilityActType + "," + parking.capacityEV + "," + parking.capacityNEV+"\n");
 
 
 		}
