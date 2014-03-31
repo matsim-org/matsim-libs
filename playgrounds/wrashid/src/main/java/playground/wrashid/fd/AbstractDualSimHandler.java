@@ -12,8 +12,8 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.contrib.parking.lib.obj.TwoKeyHashMapWithDouble;
 
-import playground.wrashid.lib.obj.TwoKeyHashMapsWithDouble;
 
 public abstract class AbstractDualSimHandler implements LinkLeaveEventHandler,
 		LinkEnterEventHandler, PersonArrivalEventHandler,
@@ -29,7 +29,7 @@ public abstract class AbstractDualSimHandler implements LinkLeaveEventHandler,
 	private HashSet<Id> agentsTravellingOnLinks = new HashSet<Id>();
 
 	// linkId, personId
-	private TwoKeyHashMapsWithDouble<Id, Id> linkEnterTime = new TwoKeyHashMapsWithDouble<Id, Id>();
+	private TwoKeyHashMapWithDouble<Id, Id> linkEnterTime = new TwoKeyHashMapWithDouble<Id, Id>();
 
 	@Override
 	public void reset(int iteration) {

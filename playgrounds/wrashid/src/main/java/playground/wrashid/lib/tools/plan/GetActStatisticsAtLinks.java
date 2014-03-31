@@ -28,12 +28,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.TwoKeyHashMapWithDouble;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 
 import playground.wrashid.lib.obj.IntegerValueHashMap;
-import playground.wrashid.lib.obj.TwoKeyHashMapsWithDouble;
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
 import playground.wrashid.lib.tools.kml.Color;
 
@@ -47,7 +47,7 @@ public class GetActStatisticsAtLinks {
 		String facilititiesPath = basePath + "facilities/facilities.zrhCutC.xml.gz";
 		Scenario scenario = GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
 		
-		TwoKeyHashMapsWithDouble<Id,String> numberOfActivitiesAtLinks=new TwoKeyHashMapsWithDouble<Id,String>();
+		TwoKeyHashMapWithDouble<Id,String> numberOfActivitiesAtLinks=new TwoKeyHashMapWithDouble<Id,String>();
 		//IntegerValueHashMap<Id> numberOfAcitivitesAtLink=new IntegerValueHashMap<Id>();
 		
 		for (Id personId:scenario.getPopulation().getPersons().keySet()){

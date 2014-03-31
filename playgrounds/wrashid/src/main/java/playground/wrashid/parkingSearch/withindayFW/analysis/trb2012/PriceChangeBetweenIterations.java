@@ -24,10 +24,10 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.TwoKeyHashMapWithDouble;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
-import playground.wrashid.lib.obj.TwoKeyHashMapsWithDouble;
 
 public class PriceChangeBetweenIterations {
 

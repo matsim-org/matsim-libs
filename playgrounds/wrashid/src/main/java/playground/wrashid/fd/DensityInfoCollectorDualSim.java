@@ -36,8 +36,8 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.TwoKeyHashMapWithDouble;
 
-import playground.wrashid.lib.obj.TwoKeyHashMapsWithDouble;
 
 // TODO: accumulate
 public class DensityInfoCollectorDualSim extends AbstractDualSimHandler {

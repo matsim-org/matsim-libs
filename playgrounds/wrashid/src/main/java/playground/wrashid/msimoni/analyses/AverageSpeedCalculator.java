@@ -11,15 +11,15 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.TwoKeyHashMapWithDouble;
 
-import playground.wrashid.lib.obj.TwoKeyHashMapsWithDouble;
 
 public class AverageSpeedCalculator implements LinkEnterEventHandler,
 		LinkLeaveEventHandler {
 
 	private Map<Id, ? extends Link> filteredLinks;
 	private int binSizeInSeconds;
-	private TwoKeyHashMapsWithDouble<Id, Id> linkEnterTime=new TwoKeyHashMapsWithDouble<Id, Id>();
+	private TwoKeyHashMapWithDouble<Id, Id> linkEnterTime=new TwoKeyHashMapWithDouble<Id, Id>();
 	// linkId, agentId
 
 	public HashMap<Id, SpeedAccumulator[]> speedAccumulator=new HashMap<Id, SpeedAccumulator[]>();
