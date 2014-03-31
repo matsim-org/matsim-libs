@@ -81,8 +81,16 @@ public class IndividualBasedGroupStrategyModule implements GenericStrategyModule
 		}
 	}
 
+	private String name = null;
 	@Override
 	public String toString() {
+		if ( name == null ) {
+			name = name();
+		}
+		return name;
+	}
+
+	public String name() {
 		String delegateName = delegate.getClass().getSimpleName();
 		if (delegateName.length() == 0 && delegate instanceof AbstractMultithreadedModule) {
 			// anonymous class
