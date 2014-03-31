@@ -19,11 +19,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Queue;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -46,6 +41,11 @@ import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Queue;
+
 /**
  * Separating out the "lane" functionality from the "link" functionality also for QLinkImpl.  Ultimate goal is to unite this class here
  * with QLane.
@@ -66,7 +66,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 	/**
 	 * The remaining integer part of the flow capacity available in one time step to move vehicles into the
 	 * buffer. This value is updated each time step by a call to
-	 * {@link #updateBufferCapacity(double)}.
+	 * {@link #updateRemainingFlowCapacity()} (double)}.
 	 */
 	private double remainingflowCap = 0.0 ;
 	/**
@@ -106,9 +106,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 	 * null if the link is not signalized
 	 */
 	private DefaultSignalizeableItem qSignalizedItem = null ;
-	private double congestedDensity_veh_m;
-	private int nHolesMax;
-	final AbstractQLink qLink;
+    final AbstractQLink qLink;
 	private final QNetwork network ;
 	private final Id id;
 	private static int congDensWarnCnt2 = 0;
@@ -157,8 +155,8 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 		if (Double.isNaN(freespeedTravelTime)) {
 			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");
 		}
-		this.calculateFlowCapacity(Time.UNDEFINED_TIME);
-		this.calculateStorageCapacity(Time.UNDEFINED_TIME);
+		this.calculateFlowCapacity();
+		this.calculateStorageCapacity();
 		flowcap_accumulate = (flowCapacityPerTimeStepFractionalPart == 0.0 ? 0.0 : 1.0);
 
 		if ( QueueWithBuffer.HOLES ) {
@@ -181,7 +179,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 		addToBuffer(veh, now);
 	}
 
-	private final void addToBuffer(final QVehicle veh, final double now) {
+	private void addToBuffer(final QVehicle veh, final double now) {
 		// yy might make sense to just accumulate to "zero" and go into negative when something is used up.
 		// kai/mz/amit, mar'12
 
@@ -212,7 +210,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 		return this.hasFlowCapacityLeftAndBufferSpace() ;
 	}
 
-	private final boolean hasFlowCapacityLeftAndBufferSpace() {
+	private boolean hasFlowCapacityLeftAndBufferSpace() {
 		return (
 				usedBufferStorageCapacity < bufferStorageCapacity
 				&&
@@ -228,7 +226,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 		}
 	}
 
-	private final void calculateFlowCapacity(final double time) {
+	private void calculateFlowCapacity() {
 //		flowCapacityPerTimeStep = ((LinkImpl)qLink.getLink()).getFlowCapacity(time);
 		flowCapacityPerTimeStep = this.unscaledFlowCapacity_s ;
 		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
@@ -239,7 +237,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 		flowCapacityPerTimeStepFractionalPart = flowCapacityPerTimeStep - (int) flowCapacityPerTimeStep;
 	}
 
-	private final void calculateStorageCapacity(final double time) {
+	private void calculateStorageCapacity() {
 		double storageCapFactor = network.simEngine.getMobsim().getScenario().getConfig().qsim().getStorageCapFactor();
 		bufferStorageCapacity = (int) Math.ceil(flowCapacityPerTimeStep);
 
@@ -282,7 +280,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 			double bnFlowCap_s = this.unscaledFlowCapacity_s ;
 
 			// ( c * n_cells - cap * L ) / (L * c) = (n_cells/L - cap/c) ;
-			congestedDensity_veh_m = storageCapacity/this.length - (bnFlowCap_s*3600.)/(15.*1000) ;
+            double congestedDensity_veh_m = storageCapacity / this.length - (bnFlowCap_s * 3600.) / (15. * 1000);
 
 			if ( congestedDensity_veh_m > 10. ) {
 				if ( QueueWithBuffer.congDensWarnCnt2 < 1 ) {
@@ -306,7 +304,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 				congestedDensity_veh_m = storageCapacity/this.length - (bnFlowCap_s*3600.)/(15.*1000) ;
 			}
 
-			nHolesMax = (int) Math.ceil( congestedDensity_veh_m * this.length ) ;
+            int nHolesMax = (int) Math.ceil(congestedDensity_veh_m * this.length);
 			QLinkImpl.log.warn(
 					" nHoles: " + nHolesMax
 					+ " storCap: " + storageCapacity
@@ -314,12 +312,11 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 					+ " bnFlowCap: " + bnFlowCap_s
 					+ " congDens: " + congestedDensity_veh_m
 					) ;
-			for ( int ii=0 ; ii<nHolesMax ; ii++ ) {
+			for ( int ii=0 ; ii< nHolesMax; ii++ ) {
 				QueueWithBuffer.Hole hole = new QueueWithBuffer.Hole() ;
 				hole.setEarliestLinkExitTime( 0. ) ;
 				holes.add( hole ) ;
 			}
-			//			System.exit(-1);
 		}
 	}
 
@@ -379,7 +376,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 		} // end while
 	}
 
-	private final QVehicle removeVehicleFromQueue(final double now) {
+	private QVehicle removeVehicleFromQueue(final double now) {
 		QVehicle veh = vehQueue.poll();
 		usedStorageCapacity -= veh.getSizeInEquivalents();
 		if ( QueueWithBuffer.HOLES ) {
@@ -391,7 +388,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 		return veh ;
 	}
 
-	private final void letVehicleArrive(final double now, QVehicle veh) {
+	private void letVehicleArrive(final double now, QVehicle veh) {
 		qLink.addParkedVehicle(veh);
 		network.simEngine.letVehicleArrive(veh);
 		qLink.makeVehicleAvailableToNextDriver(veh, now);
@@ -457,8 +454,8 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 		if (Double.isNaN(freespeedTravelTime)) {
 			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");
 		}
-		calculateFlowCapacity(now);
-		calculateStorageCapacity(now);
+		calculateFlowCapacity();
+		calculateStorageCapacity();
 	}
 
 	@Override
@@ -631,17 +628,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 		qSignalizedItem  = new DefaultSignalizeableItem(qLink.getLink().getToNode().getOutLinks().keySet());
 	}
 
-	final void changeLength(final double laneLengthMeters, double now) {
-		this.length = laneLengthMeters;
-		this.freespeedTravelTime = this.length / this.qLink.getLink().getFreespeed();
-		if (Double.isNaN(this.freespeedTravelTime)) {
-			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a lane. Please check the attributes lane length and freespeed of link!");
-		}
-		// be defensive (might now be called twice):
-		this.recalcTimeVariantAttributes(now);
-	}
-
-	@Override
+    @Override
 	public final void changeUnscaledFlowCapacityPerSecond( final double val, final double now ) {
 		this.unscaledFlowCapacity_s = val ;
 		// be defensive (might now be called twice):
