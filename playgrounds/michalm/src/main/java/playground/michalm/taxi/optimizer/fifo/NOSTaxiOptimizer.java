@@ -136,12 +136,7 @@ public class NOSTaxiOptimizer
     private void scheduleUnplannedRequestsImpl()
     {
         Iterator<TaxiRequest> reqIter = unplannedRequests.iterator();
-
-        while (reqIter.hasNext()) {
-            if (idleVehicles.isEmpty()) {
-                return;
-            }
-
+        while (reqIter.hasNext() && !idleVehicles.isEmpty()) {
             TaxiRequest req = reqIter.next();
             
             Iterable<Vehicle> filteredVehs = vehicleFilter.filterVehiclesForRequest(idleVehicles,
@@ -161,10 +156,9 @@ public class NOSTaxiOptimizer
 
     private void scheduleIdleVehiclesImpl()
     {
-        for (Vehicle veh : idleVehicles) {
-            if (unplannedRequests.isEmpty()) {
-                return;
-            }
+        Iterator<Vehicle> vehIter = idleVehicles.iterator();
+        while (vehIter.hasNext() && !unplannedRequests.isEmpty()) {
+            Vehicle veh = vehIter.next();
 
             Iterable<TaxiRequest> filteredReqs = requestFilter.filterRequestsForVehicle(
                     unplannedRequests, veh);

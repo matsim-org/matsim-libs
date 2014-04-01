@@ -209,7 +209,7 @@ public class TaxiStatsCalculator
 
 
         public static final String HEADER = "PickupDriveT\t" //
-                + "MaxPickupDriveT" //
+                + "MaxPickupDriveT\t" //
                 + "DeliveryDriveT\t"//
                 + "PickupT\t" //
                 + "DropoffT\t" //

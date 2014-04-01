@@ -21,12 +21,6 @@ public class VehicleRequestPathFinder
     }
 
 
-    interface VRPCostCalculator
-    {
-        double calcCost(VehicleRequestPath vrp);
-    }
-
-
     public VehicleRequestPath findBestVehicleForRequest(TaxiRequest req,
             Iterable<? extends Vehicle> vehicles, VehicleRequestPathCost vrpCost)
     {
