@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Random;
 
 import org.matsim.analysis.CalcLegTimes;
-import org.matsim.analysis.ScoreStats;
+import org.matsim.analysis.ScoreStatsControlerListener;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -82,14 +82,14 @@ public class MyController extends AbstractController {
 	private TravelTimeCalculator travelTime;
 	private Map<Id, List<Sighting>> sightings;
 	private CreatePopulation scenarioReader;
-	private ScoreStats scoreStats;
+	private ScoreStatsControlerListener scoreStats;
 	private AgentLocator agentLocator;
 
 	@Override
 	protected void loadCoreListeners() {
 		
 		// optional: score stats
-				this.scoreStats = new ScoreStats(this.scenario.getPopulation(),
+				this.scoreStats = new ScoreStatsControlerListener(this.scenario.getPopulation(),
 						this.getControlerIO().getOutputFilename("scorestats"), true);
 				this.addControlerListener(this.scoreStats);
 		

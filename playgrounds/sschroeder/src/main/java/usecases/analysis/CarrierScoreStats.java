@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
-import org.matsim.analysis.ScoreStats;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.Carriers;
@@ -42,7 +40,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
- * As you can see, it is basically a copy of {@link ScoreStats}. However, it is modified to score {@link Carrier}s 
+ * As you can see, it is basically a copy of {@link org.matsim.analysis.ScoreStatsControlerListener}. However, it is modified to score {@link Carrier}s
  * rather than Persons. (Oct'13, schroeder)
  * 
  * 
@@ -66,7 +64,6 @@ public class CarrierScoreStats implements StartupListener, IterationEndsListener
 	final private static int INDEX_AVERAGE = 2;
 	final private static int INDEX_EXECUTED = 3;
 
-//	final private Population population;
 	final private BufferedWriter out;
 	final private String fileName;
 	
@@ -81,7 +78,6 @@ public class CarrierScoreStats implements StartupListener, IterationEndsListener
 	/**
 	 * Creates a new ScoreStats instance.
 	 *
-	 * @param population
 	 * @param filename including the path, excluding the file type extension
 	 * @param createPNG true if in every iteration, the scorestats should be visualized in a graph and written to disk.
 	 * @throws UncheckedIOException

@@ -23,10 +23,7 @@ package org.matsim.core.controler;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-import org.matsim.analysis.CalcLegTimes;
-import org.matsim.analysis.CalcLinkStats;
-import org.matsim.analysis.ScoreStats;
-import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.analysis.*;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -143,7 +140,7 @@ public class Controler extends AbstractController {
 
 	protected boolean scenarioLoaded = false;
 	private PlansScoring plansScoring = null;
-	private ScoreStats scoreStats = null;
+	private ScoreStatsControlerListener scoreStats = null;
 
 	private final List<MobsimListener> simulationListeners = new ArrayList<MobsimListener>();
 
@@ -322,9 +319,7 @@ public class Controler extends AbstractController {
 		/*
 		 * The order how the listeners are added is very important! As
 		 * dependencies between different listeners exist or listeners may read
-		 * and write to common variables, the order is important. Example: The
-		 * RoadPricing-Listener modifies the scoringFunctionFactory, which in
-		 * turn is used by the PlansScoring-Listener.
+		 * and write to common variables, the order is important.
 		 *
 		 * IMPORTANT: The execution order is reverse to the order the listeners
 		 * are added to the list.
@@ -389,7 +384,7 @@ public class Controler extends AbstractController {
 		this.addControlerListener(new LegHistogramListener(this.events, this.config.controler().isCreateGraphs()));
 
 		// optional: score stats
-		this.scoreStats = new ScoreStats(this.population,
+		this.scoreStats = new ScoreStatsControlerListener(this.population,
 				this.getControlerIO().getOutputFilename(FILENAME_SCORESTATS), this.config.controler().isCreateGraphs());
 		this.addControlerListener(this.scoreStats);
 
@@ -660,9 +655,6 @@ public class Controler extends AbstractController {
 		return this.volumes;
 	}
 
-	/**
-	 * @return Returns the scoreStats.
-	 */
 	public final ScoreStats getScoreStats() {
 		return this.scoreStats;
 	}

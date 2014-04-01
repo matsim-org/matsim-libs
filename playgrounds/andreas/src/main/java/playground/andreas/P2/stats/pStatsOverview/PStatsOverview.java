@@ -54,7 +54,7 @@ import playground.andreas.P2.replanning.PPlan;
  * </ul>
  * The calculated values are written to a file, each iteration on a separate line, and as png.
  *
- * @author aneumann based on {@link org.matsim.analysis.ScoreStats} by mrieser
+ * @author aneumann based on {@link org.matsim.analysis.ScoreStatsControlerListener} by mrieser
  */
 public class PStatsOverview implements StartupListener, IterationEndsListener, ShutdownListener {
 

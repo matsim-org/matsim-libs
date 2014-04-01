@@ -21,7 +21,7 @@
 package playground.christoph.energyflows.controller;
 
 import org.apache.log4j.Logger;
-import org.matsim.analysis.ScoreStats;
+import org.matsim.analysis.ScoreStatsControlerListener;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -73,9 +73,9 @@ public class EnergyFlowsController extends Controler {
 		}
 		
 		// add subpopulation score stats
-		ScoreStats nonTransitScoreStats = new ScoreStats(nonTransitPopulation, super.getControlerIO().getOutputFilename("nontransit" + FILENAME_SCORESTATS), config.controler().isCreateGraphs());
+		ScoreStatsControlerListener nonTransitScoreStats = new ScoreStatsControlerListener(nonTransitPopulation, super.getControlerIO().getOutputFilename("nontransit" + FILENAME_SCORESTATS), config.controler().isCreateGraphs());
 		this.addControlerListener(nonTransitScoreStats);
-		ScoreStats transitScoreStats = new ScoreStats(transitPopulation, super.getControlerIO().getOutputFilename("transit" + FILENAME_SCORESTATS), config.controler().isCreateGraphs());
+		ScoreStatsControlerListener transitScoreStats = new ScoreStatsControlerListener(transitPopulation, super.getControlerIO().getOutputFilename("transit" + FILENAME_SCORESTATS), config.controler().isCreateGraphs());
 		this.addControlerListener(transitScoreStats);
 
 		// add subpopulation travel distance stats

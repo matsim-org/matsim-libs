@@ -53,7 +53,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
  *
  * @author mrieser
  */
-public class ScoreStats implements StartupListener, IterationEndsListener, ShutdownListener {
+public class ScoreStatsControlerListener implements StartupListener, IterationEndsListener, ShutdownListener, ScoreStats {
 
 	final private static int INDEX_WORST = 0;
 	final private static int INDEX_BEST = 1;
@@ -68,7 +68,7 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 	private double[][] history = null;
 	private int minIteration = 0;
 
-	private final static Logger log = Logger.getLogger(ScoreStats.class);
+	private final static Logger log = Logger.getLogger(ScoreStatsControlerListener.class);
 
 	/**
 	 * Creates a new ScoreStats instance.
@@ -78,7 +78,7 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 	 * @param createPNG true if in every iteration, the scorestats should be visualized in a graph and written to disk.
 	 * @throws UncheckedIOException
 	 */
-	public ScoreStats(final Population population, final String filename, final boolean createPNG) throws UncheckedIOException {
+	public ScoreStatsControlerListener(final Population population, final String filename, final boolean createPNG) throws UncheckedIOException {
 		this.population = population;
 		this.fileName = filename;
 		this.createPNG = createPNG;
@@ -240,13 +240,12 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 
 	}
 
-	/**
-	 * @return the history of scores in last iterations
-	 */
-	public double[][] getHistory() {
+	@Override
+    public double[][] getHistory() {
 		if (this.history == null) {
 			return null;
 		}
 		return this.history.clone();
 	}
+
 }

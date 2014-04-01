@@ -19,7 +19,7 @@ public class Main {
 //        System.out.println(baseDistance);
 
 
-		uncongested.getMultiRateRun("regular").distances2();
+		congested.getMultiRateRun("regular").distances2();
 //		uncongested.allRates();
 //		congested.allRates();
 //		uncongested.distances();

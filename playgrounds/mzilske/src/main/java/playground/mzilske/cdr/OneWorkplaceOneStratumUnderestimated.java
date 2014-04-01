@@ -20,6 +20,8 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.PlanStrategyRegistrar;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
@@ -148,9 +150,6 @@ public class OneWorkplaceOneStratumUnderestimated {
         config1.qsim().setFlowCapFactor(100);
         config1.qsim().setStorageCapFactor(100);
         config1.qsim().setRemoveStuckVehicles(false);
-        config1.counts().setOutputFormat("html");
-        config1.counts().setWriteCountsInterval(1);
-        config1.counts().setAverageCountsOverIterations(1);
 
         StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(new IdImpl(1));
         stratSets.setModuleName("ccc") ;
@@ -179,7 +178,12 @@ public class OneWorkplaceOneStratumUnderestimated {
 
         Controler controler1 = new Controler(scenario2);
         controler1.setOverwriteFiles(true);
-        controler1.addControlerListener(new CountControlerListener(config1.counts()));
+        controler1.addControlerListener(new IterationEndsListener() {
+            @Override
+            public void notifyIterationEnds(IterationEndsEvent event) {
+
+            }
+        });
         controler1.addControlerListener(context);
 
         controler1.setScoringFunctionFactory(new ScoringFunctionFactory() {
