@@ -41,6 +41,9 @@ import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanModule;
 import playground.thibautd.socnetsim.replanning.modules.SynchronizeCoTravelerPlansModule;
+import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToPlansInGroupPlanModule;
+import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
+import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 
 /**
  * @author thibautd
@@ -133,6 +136,17 @@ public class GroupPlanStrategyFactoryUtils {
 				config.global().getNumberOfThreads(),
 				jpFactory,
 				linkIdentifier );
+	}
+
+	public static GenericStrategyModule<GroupPlans> createVehicleAllocationModule(
+			final Config config,
+			final VehicleRessources vehicles) {
+		return new AllocateVehicleToPlansInGroupPlanModule(
+				config.global().getNumberOfThreads(),
+				vehicles,
+				SharedVehicleUtils.DEFAULT_VEHICULAR_MODES,
+				true,
+				true);
 	}
 }
 

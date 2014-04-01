@@ -24,6 +24,7 @@ import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.replanning.modules.randomlocationchoice.RandomJointLocationChoiceModule;
+import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 
 /**
  * @author thibautd
@@ -47,6 +48,17 @@ public class RandomJointLocationChoiceStrategyFactory extends AbstractConfigurab
 				GroupPlanStrategyFactoryUtils.createJointTripAwareTourModeUnifierModule(
 					registry.getScenario().getConfig(),
 					registry.getTripRouterFactory() ) );
+
+		// TODO: add an option to enable or disable this part?
+		final VehicleRessources vehicles =
+				(VehicleRessources) registry.getScenario().getScenarioElement(
+					VehicleRessources.ELEMENT_NAME );
+		if ( vehicles != null ) {
+			strategy.addStrategyModule(
+					GroupPlanStrategyFactoryUtils.createVehicleAllocationModule(
+						registry.getScenario().getConfig(),
+						vehicles ) );
+		}
 
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createReRouteModule(

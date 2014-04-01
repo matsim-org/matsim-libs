@@ -26,9 +26,7 @@ import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.replanning.IndividualBasedGroupStrategyModule;
-import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
-import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToPlansInGroupPlanModule;
 
 /**
  * @author thibautd
@@ -60,16 +58,12 @@ public class GroupSubtourModeChoiceFactory extends AbstractConfigurableSelection
 		// TODO: add an option to enable or disable this part?
 		final VehicleRessources vehicles =
 				(VehicleRessources) registry.getScenario().getScenarioElement(
-			VehicleRessources.ELEMENT_NAME );
+					VehicleRessources.ELEMENT_NAME );
 		if ( vehicles != null ) {
 			strategy.addStrategyModule(
-				new AllocateVehicleToPlansInGroupPlanModule(
-						registry.getScenario().getConfig().global().getNumberOfThreads(),
-						(VehicleRessources) registry.getScenario().getScenarioElement(
-							VehicleRessources.ELEMENT_NAME ),
-						SharedVehicleUtils.DEFAULT_VEHICULAR_MODES,
-						true,
-						true));
+					GroupPlanStrategyFactoryUtils.createVehicleAllocationModule(
+						registry.getScenario().getConfig(),
+						vehicles ) );
 		}
 
 		strategy.addStrategyModule(
