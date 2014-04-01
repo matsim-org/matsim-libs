@@ -5,11 +5,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -21,7 +17,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class OneWorkplace {
 
-	private Scenario scenario;
+	Scenario scenario;
 	private CompareMain compareMain;
 
 	public static void main(String[] args) {
@@ -85,10 +81,21 @@ public class OneWorkplace {
 				return true;
 			}
 
+		}, new ZoneTracker.LinkToZoneResolver() {
+
+			@Override
+			public Id resolveLinkToZone(Id linkId) {
+				return linkId;
+			}
+
+			public IdImpl chooseLinkInZone(String zoneId) {
+				return new IdImpl(zoneId);
+			}
+
 		});
 		controler.run();
 		compareMain.runWithTwoPlansAndCadyts();
-		System.out.printf("%f\t%f\t%f\n",compareMain.compareAllDay(), compareMain.compareTimebins(), compareMain.compareEMDMassPerLink());
+		System.out.printf("%f\t%f\t%f\n", CompareMain.compareAllDay(scenario, compareMain.getCdrVolumes(), compareMain.getGroundTruthVolumes()), CompareMain.compareTimebins(scenario, compareMain.getCdrVolumes(), compareMain.getGroundTruthVolumes()), CompareMain.compareEMDMassPerLink(scenario, compareMain.getCdrVolumes(), compareMain.getGroundTruthVolumes()));
 	}
 
 	private Activity createHomeMorning(IdImpl idImpl) {

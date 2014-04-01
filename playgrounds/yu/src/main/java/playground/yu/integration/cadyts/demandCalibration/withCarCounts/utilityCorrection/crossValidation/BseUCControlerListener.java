@@ -20,13 +20,10 @@
 
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.utilityCorrection.crossValidation;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import cadyts.calibrators.Calibrator;
+import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
+import cadyts.measurements.SingleLinkMeasurement.TYPE;
+import cadyts.supply.SimResults;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -46,15 +43,13 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.Volume;
-
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseControlerListener;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.utils.qgis.LinkCostOffsets2QGIS;
-import cadyts.calibrators.Calibrator;
-import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
-import cadyts.measurements.SingleLinkMeasurement.TYPE;
-import cadyts.supply.SimResults;
 import utilities.misc.DynamicData;
+
+import java.io.IOException;
+import java.util.*;
 
 public class BseUCControlerListener implements StartupListener,
 		AfterMobsimListener, BseControlerListener {
@@ -290,7 +285,7 @@ public class BseUCControlerListener implements StartupListener,
 			}
 		}
 		// reads countsdata
-		final Counts counts = controler.getCounts();
+        final Counts counts = (Counts) controler.getScenario().getScenarioElement(Counts.ELEMENT_NAME);
 		if (counts == null) {
 			throw new RuntimeException("BSE requires counts-data.");
 		}

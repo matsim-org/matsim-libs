@@ -32,6 +32,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import playground.mzilske.cdr.CallBehavior;
 import playground.mzilske.cdr.CompareMain;
 import playground.mzilske.cdr.PowerPlans;
+import playground.mzilske.cdr.ZoneTracker;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -186,6 +187,17 @@ public class MultiRateRunResource {
 				return true;
 			}
 
+		}, new ZoneTracker.LinkToZoneResolver() {
+
+			@Override
+			public Id resolveLinkToZone(Id linkId) {
+				return linkId;
+			}
+
+			public IdImpl chooseLinkInZone(String zoneId) {
+				return new IdImpl(zoneId);
+			}
+
 		});
 		new MatsimEventsReader(events).readFile(getBaseRun().getLastIteration().getEventsFileName());
 
@@ -225,6 +237,17 @@ public class MultiRateRunResource {
 			@Override
 			public boolean makeACallAtMorningAndNight() {
 				return false;
+			}
+
+		}, new ZoneTracker.LinkToZoneResolver() {
+
+			@Override
+			public Id resolveLinkToZone(Id linkId) {
+				return linkId;
+			}
+
+			public IdImpl chooseLinkInZone(String zoneId) {
+				return new IdImpl(zoneId);
 			}
 
 		});

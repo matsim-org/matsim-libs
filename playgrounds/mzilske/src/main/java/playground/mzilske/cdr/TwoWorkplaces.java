@@ -5,23 +5,19 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class TwoWorkplaces {
 	
-	private Scenario scenario;
+	Scenario scenario;
 	private CompareMain compareMain;
 
 	public static void main(String[] args) {
@@ -91,7 +87,18 @@ public class TwoWorkplaces {
 			public boolean makeACallAtMorningAndNight() {
 				return true;
 			}
-			
+
+		}, new ZoneTracker.LinkToZoneResolver() {
+
+			@Override
+			public Id resolveLinkToZone(Id linkId) {
+				return linkId;
+			}
+
+			public IdImpl chooseLinkInZone(String zoneId) {
+				return new IdImpl(zoneId);
+			}
+
 		});
 		controler.run();
 		compareMain.runWithTwoPlansAndCadyts();

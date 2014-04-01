@@ -184,7 +184,9 @@ public final class QSim implements VisMobsim, Netsim {
 		// beforeSimStepEvent, because the expectation seems to be
 		// (e.g. in OTFVis), that agents are doing something
 		// (can be located somewhere) before you execute a sim step.
-		for (MobsimAgent agent : this.agents) {
+        // Agents can abort in this loop already, so we iterate over
+        // a defensive copy of the agent collection.
+		for (MobsimAgent agent : new ArrayList<MobsimAgent>(this.agents)) {
 			arrangeNextAgentAction(agent);
 		}
 		

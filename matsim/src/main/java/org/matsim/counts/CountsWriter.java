@@ -20,16 +20,15 @@
 
 package org.matsim.counts;
 
+import org.matsim.core.api.internal.MatsimWriter;
+import org.matsim.core.utils.io.MatsimXmlWriter;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-
-import org.matsim.core.api.internal.MatsimWriter;
-import org.matsim.core.utils.io.MatsimXmlWriter;
 
 public class CountsWriter extends MatsimXmlWriter implements MatsimWriter {
 
@@ -57,29 +56,20 @@ public class CountsWriter extends MatsimXmlWriter implements MatsimWriter {
 			List<Count> countsTemp = new Vector<Count>();
 			countsTemp.addAll(this.counts.getCounts().values());
 			Collections.sort(countsTemp, new CountComparator());
-			
-			//counts iterator
-			Iterator<Count> c_it = countsTemp.iterator();
-			while (c_it.hasNext()) {
-				Count c = c_it.next();
-				
-				List<Volume> volumesTemp = new Vector<Volume>();
-				volumesTemp.addAll(c.getVolumes().values());
-				Collections.sort(volumesTemp, new VolumeComparator());
-				
-				this.handler.startCount(c,this.writer);
 
-				// volume iterator
-				Iterator<Volume> vol_it = volumesTemp.iterator();
-				while (vol_it.hasNext()) {
-					Volume v = vol_it.next();
-					this.handler.startVolume(v, this.writer);
-					this.handler.endVolume(this.writer);
-				}
-				this.handler.endCount(this.writer);
-				this.handler.writeSeparator(this.writer);
-				this.writer.flush();
-			}
+            for (Count c : countsTemp) {
+                List<Volume> volumesTemp = new Vector<Volume>();
+                volumesTemp.addAll(c.getVolumes().values());
+                Collections.sort(volumesTemp, new VolumeComparator());
+                this.handler.startCount(c, this.writer);
+                for (Volume v : volumesTemp) {
+                    this.handler.startVolume(v, this.writer);
+                    this.handler.endVolume(this.writer);
+                }
+                this.handler.endCount(this.writer);
+                this.handler.writeSeparator(this.writer);
+                this.writer.flush();
+            }
 			this.handler.endCounts(this.writer);
 			close();
 		}

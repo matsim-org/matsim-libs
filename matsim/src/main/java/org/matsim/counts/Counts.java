@@ -20,11 +20,13 @@
 
 package org.matsim.counts;
 
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
 
+import java.util.TreeMap;
+
 public class Counts {
+
+    public static final String ELEMENT_NAME = "counts";
 
 	private String name = null;
 	private String desc = null;

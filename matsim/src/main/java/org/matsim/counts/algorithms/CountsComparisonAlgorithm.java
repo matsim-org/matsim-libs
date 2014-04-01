@@ -20,10 +20,6 @@
 
 package org.matsim.counts.algorithms;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
@@ -32,11 +28,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.counts.Count;
-import org.matsim.counts.CountSimComparison;
-import org.matsim.counts.CountSimComparisonImpl;
-import org.matsim.counts.Counts;
-import org.matsim.counts.Volume;
+import org.matsim.counts.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This algorithm can be used to obtain a List of CountSimComparison objects from the
@@ -119,28 +115,22 @@ public class CountsComparisonAlgorithm {
 	 * countAttribute Attribute of this class.
 	 */
 	private void compare() {
-		double countValue;
-
 		for (Count count : this.counts.getCounts().values()) {
 			if (!distanceFilter.isInRange(count)) {
 				continue;
 			}
 			double[] volumes = this.volumesPerLinkPerHour.getVolumesForStop(count.getLocId());
-
 			if (volumes == null || volumes.length == 0) {
 				log.warn("No volumes for count location: " + count.getLocId().toString());
 				continue;
 			}
 			for (int hour = 1; hour <= 24; hour++) {
-				// real volumes:
 				Volume volume = count.getVolume(hour);
 				if (volume != null) {
-					countValue = volume.getValue();
+					double countValue = volume.getValue();
 					double simValue=volumes[hour-1];
 					simValue *= this.countsScaleFactor;
 					this.result.add(new CountSimComparisonImpl(count.getLocId(), hour, countValue, simValue));
-				} else {
-					countValue = 0.0;
 				}
 			}
 		}

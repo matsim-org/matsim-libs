@@ -20,19 +20,6 @@
 
 package org.matsim.counts.algorithms.graphs.helper;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.List;
-
 import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -40,6 +27,9 @@ import org.jfree.chart.entity.StandardEntityCollection;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.algorithms.graphs.CountsGraph;
+
+import java.io.*;
+import java.util.*;
 
 public class OutputDelegate {
 
@@ -67,13 +57,9 @@ public class OutputDelegate {
 
 	public void outputHtml(){
 		new File(this.iterPath_+"/png").mkdir();
-
-		Iterator<CountsGraph> cg_it = this.cg_list_.iterator();
-		while (cg_it.hasNext()) {
-			CountsGraph cg=cg_it.next();
-
-			writeHtml(cg, this.iterPath_, false);
-		}
+        for (CountsGraph cg : this.cg_list_) {
+            writeHtml(cg, this.iterPath_, false);
+        }
 		writeHtml(null, this.iterPath_, true);
 		try {
 			new File(this.iterPath_+"/div").mkdir();
@@ -81,11 +67,10 @@ public class OutputDelegate {
 			copyResourceToFile("logo.png", this.iterPath_ + "/div/logo.png");
 			copyResourceToFile("overlib.js", this.iterPath_ + "/div/overlib.js");
 			copyResourceToFile("title.png", this.iterPath_ + "/div/title.png");
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			System.out.println(e.toString());
 			e.printStackTrace();
-		}//catch
+		}
 	}
 
 	private void copyResourceToFile(final String resourceFilename, final String destinationFilename) throws IOException {
@@ -95,21 +80,12 @@ public class OutputDelegate {
 			inStream = MatsimResource.getAsInputStream(resourceFilename);
 			outStream = new FileOutputStream(destinationFilename);
 			IOUtils.copyStream(inStream, outStream);
-		}
-		finally {
+		} finally {
 			if (inStream != null) {
-				try {
-					inStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				inStream.close();
 			}
 			if (outStream != null) {
-				try {
-					outStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				outStream.close();
 			}
 		}
 	}
@@ -179,20 +155,17 @@ public class OutputDelegate {
 			writer.println("</div>");
 			writer.println("<div id=\"links\">");
 
-			Iterator<Section> sec_it = this.sections_.iterator();
-			while (sec_it.hasNext()) {
-				Section sec= sec_it.next();
+            for (Section sec : this.sections_) {
+                writer.print("<h3>");
+                writer.print(sec.getTitle() + ":<br />");
+                writer.print("</h3>");
 
-				writer.print("<h3>");
-				writer.print(sec.getTitle()+":<br />");
-				writer.print("</h3>");
-
-				Iterator<MyURL> url_it = sec.getURLs().iterator();
-				while (url_it.hasNext()) {
-					MyURL url=url_it.next();
-					writer.println("<a href=\""+url.address+"\">"+url.displayText+"</a><br />");
-				}//while
-			}
+                Iterator<MyURL> url_it = sec.getURLs().iterator();
+                while (url_it.hasNext()) {
+                    MyURL url = url_it.next();
+                    writer.println("<a href=\"" + url.address + "\">" + url.displayText + "</a><br />");
+                }
+            }
 			writer.println("</div>");
 
 			writer.println("<div id=\"contents\">");
@@ -225,15 +198,13 @@ public class OutputDelegate {
 			writer.println("</body>");
 			writer.println("</html>");
 
-		}//try
-		catch (IOException e) {
+		} catch (IOException e) {
 			System.out.println(e.toString());
-		}//catch
-		finally {
+		} finally {
 			if (writer != null) {
 				writer.close();
 			}
-		}//finally
-	}//writeHtml
+		}
+	}
 
 }

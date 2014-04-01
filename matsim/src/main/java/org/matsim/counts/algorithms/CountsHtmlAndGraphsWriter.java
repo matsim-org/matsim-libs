@@ -19,10 +19,6 @@
  * *********************************************************************** */
 
 package org.matsim.counts.algorithms;
-import java.io.File;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.counts.CountSimComparison;
@@ -30,30 +26,31 @@ import org.matsim.counts.algorithms.graphs.CountsGraph;
 import org.matsim.counts.algorithms.graphs.CountsGraphsCreator;
 import org.matsim.counts.algorithms.graphs.helper.OutputDelegate;
 
+import java.io.File;
+import java.util.List;
+import java.util.Vector;
+
 public class CountsHtmlAndGraphsWriter {
 
-	private String iter_path_;
-	private List<CountSimComparison> ccl_;
-	private int iteration_;
-	private OutputDelegate outputDelegate_;
+	private String iterationPath;
+	private List<CountSimComparison> countSimComparisons;
+	private int iteration;
+	private OutputDelegate outputDelegate;
 	private List<CountsGraphsCreator> graphsCreators;
 
 	private static final Logger log = Logger.getLogger(CountsHtmlAndGraphsWriter.class);
 
-	public CountsHtmlAndGraphsWriter(final String iter_path, final List<CountSimComparison> ccl, final int iteration) {
-		this.iter_path_=iter_path+"/graphs/";
-		this.ccl_=ccl;
-		this.iteration_=iteration;
-
-		// delegate pattern without callback
-		this.outputDelegate_=new OutputDelegate(this.iter_path_);
-
-		new File(this.iter_path_).mkdir();
+	public CountsHtmlAndGraphsWriter(final String iterationPath, final List<CountSimComparison> countSimComparisons, final int iteration) {
+		this.iterationPath = iterationPath + "/graphs/";
+		this.countSimComparisons = countSimComparisons;
+		this.iteration = iteration;
+		this.outputDelegate = new OutputDelegate(this.iterationPath);
+		new File(this.iterationPath).mkdir();
 		this.graphsCreators=new Vector<CountsGraphsCreator>();
 	}
 
 	public OutputDelegate getOutput() {
-		return this.outputDelegate_;
+		return this.outputDelegate;
 	}
 
 	public void addGraphsCreator(final CountsGraphsCreator graphsCreator) {
@@ -62,21 +59,13 @@ public class CountsHtmlAndGraphsWriter {
 
 	public void createHtmlAndGraphs() {
 		log.info("Creating graphs");
-
-		Iterator<CountsGraphsCreator> cgc_it = this.graphsCreators.iterator();
-		while (cgc_it.hasNext()) {
-			CountsGraphsCreator cgc= cgc_it.next();
-			List<CountsGraph> graphs=cgc.createGraphs(this.ccl_, this.iteration_);
-
-			this.outputDelegate_.addSection(cgc.getSection());
-
-			Iterator<CountsGraph> cg_it = graphs.iterator();
-			while (cg_it.hasNext()) {
-				CountsGraph cg=cg_it.next();
-				this.outputDelegate_.addCountsGraph(cg);
-			}
-		}
-
-		this.outputDelegate_.outputHtml();
+        for (CountsGraphsCreator cgc : this.graphsCreators) {
+            List<CountsGraph> graphs = cgc.createGraphs(this.countSimComparisons, this.iteration);
+            this.outputDelegate.addSection(cgc.getSection());
+            for (CountsGraph cg : graphs) {
+                this.outputDelegate.addCountsGraph(cg);
+            }
+        }
+		this.outputDelegate.outputHtml();
 	}
 }

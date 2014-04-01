@@ -18,9 +18,6 @@
  * *********************************************************************** */
 package playground.yu.integration.cadyts.utils;
 
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.Controler;
@@ -31,9 +28,12 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.counts.Count;
-
+import org.matsim.counts.Counts;
 import playground.yu.utils.io.SimpleWriter;
 import utilities.math.BasicStatistics;
+
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * calculates the sample variance of simulated traffic volumes on some places,
@@ -85,7 +85,7 @@ public class SampleVariance4simVolumes implements StartupListener,
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		Controler ctl = event.getControler();
-		Map<Id, Count> countsMap = ctl.getCounts().getCounts();
+        Map<Id, Count> countsMap = ((Counts) ctl.getScenario().getScenarioElement(Counts.ELEMENT_NAME)).getCounts();
 
 		for (Id countId : countsMap.keySet()) {
 			Map<Integer, BasicStatistics> localStatistics = new TreeMap<Integer, BasicStatistics>();

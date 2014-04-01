@@ -20,11 +20,6 @@
 
 package org.matsim.core.controler;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -45,14 +40,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
-import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
-import org.matsim.core.controler.corelisteners.EventsHandling;
-import org.matsim.core.controler.corelisteners.LegHistogramListener;
-import org.matsim.core.controler.corelisteners.LegTimesListener;
-import org.matsim.core.controler.corelisteners.LinkStatsControlerListener;
-import org.matsim.core.controler.corelisteners.PlansDumping;
-import org.matsim.core.controler.corelisteners.PlansReplanning;
-import org.matsim.core.controler.corelisteners.PlansScoring;
+import org.matsim.core.controler.corelisteners.*;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.external.ExternalMobsim;
@@ -63,14 +51,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
-import org.matsim.core.router.DefaultTripRouterFactoryImpl;
-import org.matsim.core.router.LinkToLinkTripRouterFactory;
-import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -96,6 +77,11 @@ import org.matsim.signalsystems.controler.SignalsControllerListenerFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
+
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -132,13 +118,10 @@ public class Controler extends AbstractController {
 
 	protected final EventsManager events;
 
-	private final String configFileName;
-
-	protected Network network = null;
+    protected Network network = null;
 	protected Population population = null;
-	private Counts counts = null;
 
-	public static interface TerminationCriterion {
+    public static interface TerminationCriterion {
 		boolean continueIterations( int iteration ) ;
 	}
 
@@ -224,8 +207,7 @@ public class Controler extends AbstractController {
 	}
 
 	private Controler(final String configFileName, final Config config, final Scenario scenario) {
-		this.configFileName = configFileName;
-		if (scenario != null) {
+        if (scenario != null) {
 			this.scenarioLoaded = true;
 			this.scenarioData = (ScenarioImpl) scenario;
 			this.config = scenario.getConfig();
@@ -233,13 +215,13 @@ public class Controler extends AbstractController {
 			checkConfigConsistencyAndWriteToLog(this.config,"Complete config dump directly after reading/getting the config file.  " +
 					"See later for config dump after setup.");
 		} else {
-			if (this.configFileName == null) {
+			if (configFileName == null) {
 				if (config == null) {
 					throw new IllegalArgumentException("Either the config or the filename of a configfile must be set to initialize the Controler.");
 				}
 				this.config = config;
 			} else {
-				this.config = ConfigUtils.loadConfig(this.configFileName);
+				this.config = ConfigUtils.loadConfig(configFileName);
 			}
 			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 			checkConfigConsistencyAndWriteToLog(this.config,"Complete config dump directly after reading/getting the config file.  " +
@@ -288,7 +270,7 @@ public class Controler extends AbstractController {
 
 	}
 
-	private final void setupTransitSimulation() {
+	private void setupTransitSimulation() {
 		log.info("setting up transit simulation");
 		if (!this.config.scenario().isUseVehicles()) {
 			log.warn("Your are using Transit but not Vehicles. This most likely won't work.");
@@ -379,7 +361,7 @@ public class Controler extends AbstractController {
 
 		this.legTimes = new CalcLegTimes();
 		this.events.addHandler(this.legTimes);
-		this.addCoreControlerListener(new LegTimesListener(legTimes, getControlerIO()));
+		this.addCoreControlerListener(new LegTimesListener(this.legTimes, getControlerIO()));
 
 		this.addCoreControlerListener(new EventsHandling(this.events, this.getConfig().controler().getWriteEventsInterval(),
 				this.getConfig().controler().getEventsFileFormats(), this.getControlerIO() ));
@@ -411,11 +393,10 @@ public class Controler extends AbstractController {
 				this.getControlerIO().getOutputFilename(FILENAME_SCORESTATS), this.config.controler().isCreateGraphs());
 		this.addControlerListener(this.scoreStats);
 
-		// load counts, if requested
-		if (this.config.counts().getCountsFileName() != null) {
+		// optional: use counts
+		if (this.config.counts().getCountsFileName() != null || this.scenarioData.getScenarioElement(Counts.ELEMENT_NAME) != null) {
 			CountControlerListener ccl = new CountControlerListener(this.config.counts());
 			this.addControlerListener(ccl);
-			this.counts = ccl.getCounts();
 		}
 
 		if (this.config.linkStats().getWriteLinkStatsInterval() > 0) {
@@ -659,14 +640,6 @@ public class Controler extends AbstractController {
 
 	public final Scenario getScenario() {
 		return this.scenarioData;
-	}
-
-	/**
-	 * @return real-world traffic counts if available, <code>null</code> if no
-	 *         data is available.
-	 */
-	public final Counts getCounts() {
-		return this.counts;
 	}
 
 	/**

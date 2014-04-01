@@ -1,11 +1,8 @@
 package playground.mzilske.cdr;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.telmomenezes.jfastemd.Feature;
+import com.telmomenezes.jfastemd.JFastEMD;
+import com.telmomenezes.jfastemd.Signature;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -18,8 +15,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
-import org.matsim.contrib.cadyts.general.CadytsScoring;
-import org.matsim.contrib.cadyts.general.ExpBetaPlanSelectorWithCadytsPlanRegistration;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -28,7 +23,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.replanning.PlanStrategy;
@@ -38,17 +32,13 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
-
 import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
 import playground.mzilske.d4d.Sighting;
 
-import com.telmomenezes.jfastemd.Feature;
-import com.telmomenezes.jfastemd.JFastEMD;
-import com.telmomenezes.jfastemd.Signature;
+import java.util.*;
 
 
 
@@ -60,12 +50,16 @@ import com.telmomenezes.jfastemd.Signature;
 public class CompareMain {
 	
 	private String suffix = "";
-	
+
 	public void setSuffix(String suffix) {
 		this.suffix = suffix;
 	}
 
-	private static final class ZeroScoringFunctionFactory implements
+    public List<Sighting> getSightings() {
+        return callProcess.getSightings();
+    }
+
+    private static final class ZeroScoringFunctionFactory implements
 			ScoringFunctionFactory {
 		@Override
 		public ScoringFunction createNewScoringFunction(Person person) {
@@ -151,7 +145,12 @@ public class CompareMain {
 	private static final int dailyRate = 0;
 	private CallProcessTicker ticker;
 	private CallProcess callProcess;
-	private VolumesAnalyzer groundTruthVolumes;
+
+    public VolumesAnalyzer getGroundTruthVolumes() {
+        return groundTruthVolumes;
+    }
+
+    private VolumesAnalyzer groundTruthVolumes;
 	private LinkToZoneResolver linkToZoneResolver;
 	private Scenario scenario;
 	private VolumesAnalyzer cdrVolumes;
@@ -160,45 +159,15 @@ public class CompareMain {
 		close();
 		List<Sighting> sightings = callProcess.getSightings();
 
-		Counts counts = volumesToCounts(groundTruthVolumes);
+		Counts counts = volumesToCounts(scenario.getNetwork(), groundTruthVolumes);
 		cdrVolumes = runWithTwoPlansAndCadyts(scenario.getNetwork(), linkToZoneResolver, sightings, counts);
 	}
-	
-	public Result runWithOnePlanAndCadyts() {
-		close();
-		List<Sighting> sightings = callProcess.getSightings();
 
-		Counts counts = volumesToCounts(groundTruthVolumes);
-		Result result = runWithOnePlanAndCadyts(scenario.getNetwork(), linkToZoneResolver, sightings, counts);
-		cdrVolumes = result.volumes;
-		return result;
-	}
-	
-	public Result runWithOnePlanAndCadytsAndInflation() {
-		close();
-		List<Sighting> sightings = callProcess.getSightings();
-
-		Counts counts = volumesToCounts(groundTruthVolumes);
-		Result result = runWithOnePlanAndCadytsAndInflation(scenario.getNetwork(), linkToZoneResolver, sightings, counts);
-		cdrVolumes = result.volumes;
-		return result;
-	}
-	
-	public ScenarioImpl createScenarioFromSightings(Config config) {
+    public ScenarioImpl createScenarioFromSightings(Config config) {
 		final ScenarioImpl scenario21 = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		scenario21.setNetwork(scenario.getNetwork());
-		
-		final Map<Id, List<Sighting>> allSightings = new HashMap<Id, List<Sighting>>();
-		for (Sighting sighting : callProcess.getSightings()) {
-		
-			List<Sighting> sightingsOfPerson = allSightings.get(sighting.getAgentId());
-			if (sightingsOfPerson == null) {
-				sightingsOfPerson = new ArrayList<Sighting>();
-				allSightings.put(sighting.getAgentId(), sightingsOfPerson);
-		
-			}
-			sightingsOfPerson.add(sighting);
-		}
+
+        final Map<Id, List<Sighting>> allSightings = getSightingsPerPerson();
 		
 		
 		PopulationFromSightings.createPopulationWithEndTimesAtLastSightings(scenario21, linkToZoneResolver, allSightings);
@@ -207,7 +176,23 @@ public class CompareMain {
 		return scenario2;
 	}
 
-	public void close() {
+    Map<Id, List<Sighting>> getSightingsPerPerson() {
+        final Map<Id, List<Sighting>> allSightings = new HashMap<Id, List<Sighting>>();
+        for (Sighting sighting : callProcess.getSightings()) {
+
+            List<Sighting> sightingsOfPerson = allSightings.get(sighting.getAgentId());
+            if (sightingsOfPerson == null) {
+                sightingsOfPerson = new ArrayList<Sighting>();
+                allSightings.put(sighting.getAgentId(), sightingsOfPerson);
+
+            }
+            sightingsOfPerson.add(sighting);
+        }
+        return allSightings;
+    }
+
+
+    public void close() {
 		ticker.finish();
 		callProcess.dump();
 	}
@@ -220,7 +205,7 @@ public class CompareMain {
 		return emd;
 	}
 
-	double compareTimebins() {
+	static double compareTimebins(Scenario scenario, VolumesAnalyzer cdrVolumes, VolumesAnalyzer groundTruthVolumes) {
 		double sum = 0;
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			int[] volumesForLink1 = getVolumesForLink(groundTruthVolumes, link);
@@ -238,11 +223,15 @@ public class CompareMain {
 		return sum;
 	}
 
-	double compareAllDay() {
+    public VolumesAnalyzer getCdrVolumes() {
+        return cdrVolumes;
+    }
+
+    static double compareAllDay(Scenario scenario, VolumesAnalyzer cdrVolumes, VolumesAnalyzer groundTruthVolumes) {
 		double sum = 0;
 		for (Link link : scenario.getNetwork().getLinks().values()) {
-			int[] volumesForLink1 = getVolumesForLink(groundTruthVolumes, link);
-			int[] volumesForLink2 = getVolumesForLink(cdrVolumes, link);
+            int[] volumesForLink1 = getVolumesForLink(groundTruthVolumes, link);
+            int[] volumesForLink2 = getVolumesForLink(cdrVolumes, link);
 			int sum1 = 0;
 			int sum2 = 0;
 			for (int i = 0; i < volumesForLink1.length; ++i) {
@@ -255,12 +244,12 @@ public class CompareMain {
 		return sum;
 	}
 
-	double compareEMDMassPerLink() {
+	static double compareEMDMassPerLink(Scenario scenario, VolumesAnalyzer cdrVolumes, VolumesAnalyzer groundTruthVolumes) {
 		double sum = 0;
 		double lengthsum = 0;
 		for (Link link : scenario.getNetwork().getLinks().values()) {
-			int[] volumesForLink1 = getVolumesForLink(groundTruthVolumes, link);
-			int[] volumesForLink2 = getVolumesForLink(cdrVolumes, link);
+            int[] volumesForLink1 = getVolumesForLink(groundTruthVolumes, link);
+            int[] volumesForLink2 = getVolumesForLink(cdrVolumes, link);
 			double emd =  MatchDistance.emd(MatchDistance.int2double(volumesForLink1), MatchDistance.int2double(volumesForLink2));
 			if (! Double.isNaN(emd)) {
 				lengthsum += link.getLength();
@@ -270,9 +259,8 @@ public class CompareMain {
 		return sum / lengthsum;
 	}
 
-	private Counts volumesToCounts(VolumesAnalyzer volumesAnalyzer) {
+	static Counts volumesToCounts(Network network, VolumesAnalyzer volumesAnalyzer) {
 		Counts counts = new Counts();
-		Network network = scenario.getNetwork();
 		for (Link link : network.getLinks().values()) {
 			Count count = counts.createAndAddCount(link.getId(), link.getId().toString());
 			int[] volumesForLink = getVolumesForLink(volumesAnalyzer, link);
@@ -285,7 +273,7 @@ public class CompareMain {
 		return counts;
 	}
 
-	public CompareMain(Scenario scenario, EventsManager events, CallBehavior callingBehavior) {
+	public CompareMain(Scenario scenario, EventsManager events, CallBehavior callingBehavior, LinkToZoneResolver linkToZoneResolver) {
 		super();
 		this.scenario = scenario;
 
@@ -294,34 +282,21 @@ public class CompareMain {
 
 		// final Zones cellularCoverage = SyntheticCellTowerDistribution.naive(scenario.getNetwork());
 
-		LinkToZoneResolver trivialLinkToZoneResolver = new LinkToZoneResolver() {
-
-			@Override
-			public Id resolveLinkToZone(Id linkId) {
-				return linkId;	
-			}
-
-			public IdImpl chooseLinkInZone(String zoneId) {
-				return new IdImpl(zoneId);
-			}
-
-		};
-
-		linkToZoneResolver = trivialLinkToZoneResolver;
+        this.linkToZoneResolver = linkToZoneResolver;
 
 		// linkToZoneResolver = new CellularCoverageLinkToZoneResolver(cellularCoverage, scenario.getNetwork());
 
 		for (Person p : scenario.getPopulation().getPersons().values()) {
 			Id linkId = ((Activity) p.getSelectedPlan().getPlanElements().get(0)).getLinkId();
 			System.out.println(linkId);
-			initialPersonInZone.put(p.getId(), linkToZoneResolver.resolveLinkToZone(linkId));
+			initialPersonInZone.put(p.getId(), this.linkToZoneResolver.resolveLinkToZone(linkId));
 		}
 
 		ticker = new CallProcessTicker();
 		events.addHandler(ticker);
 
 
-		ZoneTracker zoneTracker = new ZoneTracker(events, linkToZoneResolver, initialPersonInZone);
+		ZoneTracker zoneTracker = new ZoneTracker(events, this.linkToZoneResolver, initialPersonInZone);
 		callProcess = new CallProcess(null, scenario.getPopulation(), zoneTracker, callingBehavior);
 		ticker.addHandler(zoneTracker);
 
@@ -502,94 +477,8 @@ public class CompareMain {
 		result.context = context;
 		return result;
 	}
-	
-	public static Result runWithOnePlanAndCadytsAndInflation(Network network, final LinkToZoneResolver linkToZoneResolver, List<Sighting> sightings, Counts counts) {
-		final Config config = ConfigUtils.createConfig();
-		ActivityParams sightingParam = new ActivityParams("sighting");
-		sightingParam.setTypicalDuration(30.0 * 60);
-		config.planCalcScore().addActivityParams(sightingParam);
-		config.planCalcScore().setTraveling_utils_hr(-6);
-		config.planCalcScore().setPerforming_utils_hr(0);
-		config.planCalcScore().setTravelingOther_utils_hr(-6);
-		config.planCalcScore().setConstantCar(0);
-		config.planCalcScore().setMonetaryDistanceCostRateCar(0);
-		config.planCalcScore().setWriteExperiencedPlans(true);
-		config.controler().setLastIteration(300);
-		QSimConfigGroup tmp = config.qsim();
-		tmp.setFlowCapFactor(100);
-		tmp.setStorageCapFactor(100);
-		tmp.setRemoveStuckVehicles(false);
-		
-		StrategySettings stratSets = new StrategySettings(new IdImpl(1));
-		stratSets.setModuleName("ccc") ;
-		stratSets.setProbability(1.) ;
-		config.strategy().addStrategySettings(stratSets) ;
-		StrategySettings random = new StrategySettings(new IdImpl(2));
-		random.setModuleName(Selector.SelectRandom.toString()) ;
-		random.setProbability(0.1) ;
-		config.strategy().addStrategySettings(random) ;
-
-		final ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		scenario2.setNetwork(network);
-
- 
-
-		final Map<Id, List<Sighting>> allSightings = new HashMap<Id, List<Sighting>>();
-		for (Sighting sighting : sightings) {
-
-			List<Sighting> sightingsOfPerson = allSightings.get(sighting.getAgentId());
-			if (sightingsOfPerson == null) {
-				sightingsOfPerson = new ArrayList<Sighting>();
-				allSightings.put(sighting.getAgentId(), sightingsOfPerson);
-
-			}
-			System.out.println(sighting.getCellTowerId().toString());
-
-			sightingsOfPerson.add(sighting);
-		}
 
 
-		PopulationFromSightings.createPopulationWithEndTimesAtLastSightingsAndAdditionalInflationPopulation(scenario2, linkToZoneResolver, allSightings);
-		PopulationFromSightings.preparePopulation(scenario2, linkToZoneResolver, allSightings);
-
-		final CadytsContext context = new CadytsContext(config, counts) ;
-	
-		Controler controler = new Controler(scenario2);
-		controler.setOverwriteFiles(true);
-		controler.addControlerListener(context);
-		// controler.setScoringFunctionFactory(new ZeroScoringFunctionFactory());
-		
-		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-
-			@Override
-			public ScoringFunction createNewScoringFunction(Person person) {
-				SumScoringFunction sumScoringFunction = new SumScoringFunction();
-				CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, context);
-		//		scoringFunction.setWeightOfCadytsCorrection(10.0);
-				sumScoringFunction.addScoringFunction(scoringFunction);
-				return sumScoringFunction;
-			}
-			
-		});
-		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
-			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				// KeepSelected planSelector = new KeepSelected();
-				// CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario2,context);
-				// planSelector.setCadytsWeight(100000);
-				// PlanSelectionByCadyts<Link> planSelector = new PlanSelectionByCadyts<Link>(1.0, context);
-				ExpBetaPlanSelectorWithCadytsPlanRegistration planSelector = new ExpBetaPlanSelectorWithCadytsPlanRegistration(1.0, context);
-				return new PlanStrategyImpl(planSelector);
-			}} ) ;
-		controler.setCreateGraphs(false);
-		controler.run();
-		
-		Result result = new Result();
-		result.volumes = controler.getVolumes();
-		result.scenario = scenario2;
-		result.context = context;
-		return result;
-	}
 
 	public static double calcCadytsScore(final CadytsContext context, Plan plan) {
 		cadyts.demand.Plan<Link> currentPlanSteps = context.getPlansTranslator().getPlanSteps(plan);
