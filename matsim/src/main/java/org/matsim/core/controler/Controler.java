@@ -139,8 +139,7 @@ public class Controler extends AbstractController {
 	private VolumesAnalyzer volumes = null;
 
 	protected boolean scenarioLoaded = false;
-	private PlansScoring plansScoring = null;
-	private ScoreStatsControlerListener scoreStats = null;
+    private ScoreStatsControlerListener scoreStats = null;
 
 	private final List<MobsimListener> simulationListeners = new ArrayList<MobsimListener>();
 
@@ -334,9 +333,8 @@ public class Controler extends AbstractController {
 			this.scoringFunctionFactory = ControlerDefaults.createDefaultScoringFunctionFactory(this.scenarioData) ;
 		}
 
-		// the default handling of plans
-		this.plansScoring = new PlansScoring( this.scenarioData, this.events, getControlerIO(), this.scoringFunctionFactory );
-		this.addCoreControlerListener(this.plansScoring);
+        PlansScoring plansScoring = new PlansScoring(this.scenarioData, this.events, getControlerIO(), this.scoringFunctionFactory);
+		this.addCoreControlerListener(plansScoring);
 
 		this.strategyManager = loadStrategyManager();
 		this.addCoreControlerListener(new PlansReplanning(this.strategyManager, population));
@@ -660,13 +658,11 @@ public class Controler extends AbstractController {
 	}
 
 	@Deprecated
-	/**
-	 * This method exposes something which is definitely private to the Controler,
-	 * bypassing all the interfaces.
-	 */
 	public final PlansScoring getPlansScoring() {
-		// yy public use at about 6 places.  kai, may'13
-		return this.plansScoring;
+		throw new RuntimeException("To modify scoring for your Agents, please either:" +
+                "(1) throw a PersonMoneyEvent for an appropriate amount or" +
+                "(2) set a custom ScoringFunctionFactory which calculates what you need or" +
+                "(3) talk to developers list.");
 	}
 
 	// Not sure if necessary. Perhaps try to unwind, directly calling
