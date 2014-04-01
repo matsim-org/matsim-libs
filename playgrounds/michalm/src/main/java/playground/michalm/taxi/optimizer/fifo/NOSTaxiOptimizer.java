@@ -138,10 +138,9 @@ public class NOSTaxiOptimizer
         Iterator<TaxiRequest> reqIter = unplannedRequests.iterator();
         while (reqIter.hasNext() && !idleVehicles.isEmpty()) {
             TaxiRequest req = reqIter.next();
-            
+
             Iterable<Vehicle> filteredVehs = vehicleFilter.filterVehiclesForRequest(idleVehicles,
                     req);
-
             VehicleRequestPath best = optimConfig.vrpFinder.findBestVehicleForRequest(req,
                     filteredVehs, VehicleRequestPaths.TW_COST);
 
@@ -162,7 +161,6 @@ public class NOSTaxiOptimizer
 
             Iterable<TaxiRequest> filteredReqs = requestFilter.filterRequestsForVehicle(
                     unplannedRequests, veh);
-
             VehicleRequestPath best = optimConfig.vrpFinder.findBestRequestForVehicle(veh,
                     filteredReqs, VehicleRequestPaths.TP_COST);
 
