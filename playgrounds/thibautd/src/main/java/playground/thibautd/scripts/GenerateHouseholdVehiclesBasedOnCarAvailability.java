@@ -116,7 +116,6 @@ public class GenerateHouseholdVehiclesBasedOnCarAvailability {
 
 		log.info( "parse persons" );
 		final Set<Id> hhsWithSometimes = new HashSet<Id>();
-		final Set<Id> hhsWithOther = new HashSet<Id>();
 		pop.setIsStreaming( true );
 		pop.addAlgorithm( new PersonAlgorithm() {
 			@Override
@@ -129,22 +128,20 @@ public class GenerateHouseholdVehiclesBasedOnCarAvailability {
 				if ( "sometimes".equals( ((PersonImpl) person).getCarAvail() ) ) {
 					hhsWithSometimes.add( hh.getId() );
 				}
-				else {
-					hhsWithOther.add( hh.getId() );
-				}
 			}
 		});
 
 		new MatsimPopulationReader( sc ).readFile( inpop );
 
 		log.info( "correction: do not let households with only \"sometimes\" without a car" );
+		int c=0;
 		for ( Household hh : households.getHouseholds().values() ) {
-			if ( hhsWithSometimes.contains( hh.getId() ) && !hhsWithOther.contains( hh.getId() ) ) {
-				log.warn( "correct empty vehicle list for household "+hh.getId() );
-				assert hh.getVehicleIds().isEmpty();
+			if ( hhsWithSometimes.contains( hh.getId() ) && hh.getVehicleIds().isEmpty() ) {
+				c++;
 				hh.getVehicleIds().add( new IdImpl( "corr-"+hh.getId() ) );
 			}
 		}
+		log.info( "created "+c+" correction vehicles" );
 
 		log.info( "dump households to "+outhh );
 		new HouseholdsWriterV10( households ).writeFile( outhh );
