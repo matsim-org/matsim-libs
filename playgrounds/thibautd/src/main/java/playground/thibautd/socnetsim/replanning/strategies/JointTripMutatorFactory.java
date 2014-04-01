@@ -92,7 +92,7 @@ public class JointTripMutatorFactory extends AbstractConfigurableSelectionStrate
 
 		final VehicleRessources vehicles = 
 					(VehicleRessources) registry.getScenario().getScenarioElement(
-			VehicleRessources.ELEMENT_NAME );
+							VehicleRessources.ELEMENT_NAME );
 
 		if ( vehicles != null ) {
 			strategy.addStrategyModule(

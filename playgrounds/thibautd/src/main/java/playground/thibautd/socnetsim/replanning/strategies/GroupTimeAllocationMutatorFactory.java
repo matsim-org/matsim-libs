@@ -83,7 +83,11 @@ public class GroupTimeAllocationMutatorFactory extends AbstractConfigurableSelec
 						}
 					}));
 
-		strategy.addStrategyModule( GroupPlanStrategyFactoryUtils.createReRouteModule( config , planRouterFactory , tripRouterFactory ) );
+		strategy.addStrategyModule(
+				GroupPlanStrategyFactoryUtils.createReRouteModule(
+						config,
+						planRouterFactory,
+						tripRouterFactory ) );
 
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createSynchronizerModule(
