@@ -59,6 +59,7 @@ public class ParkControl {
 	
 	LinkedList<double[]> availableParkingStat = new LinkedList<double[]>();  //zaehlt für jeden Parkvorgang die Parkplaetze, die zur verfuegung stehen
 	VMCharts vmCharts = new VMCharts(); 
+	LinkedList<LinkedList<String>> notParked;
 	HashMap<Integer, Integer> peakLoad;
 	HashMap<Integer, Integer> load;
 	
@@ -120,7 +121,7 @@ public class ParkControl {
 			peakLoad.put(parking.id, 0);
 			load.put(parking.id, 0);
 		}
-		
+		notParked = new LinkedList<LinkedList<String>>();
 		
 	}
 	
@@ -221,6 +222,18 @@ public class ParkControl {
 		scorekeeper.add(-30);
 		
 		phwriter.addAgentNotParked(Double.toString(this.time), personId.toString());
+		
+		LinkedList<String> notParkedLine = new LinkedList<String>();
+		notParkedLine.add(personId.toString());
+		notParkedLine.add(Double.toString(cordinate.getX()));
+		notParkedLine.add(Double.toString(cordinate.getY()));
+		notParkedLine.add(Double.toString(time));
+		notParkedLine.add(Boolean.toString(ev));
+		notParkedLine.add(facilityid.toString());
+		notParkedLine.add(event.getActType());
+		
+		notParked.add(notParkedLine);
+		
 		
 		this.countNotParked++;
 		return -1;
@@ -585,6 +598,20 @@ public class ParkControl {
 		csvWriter.writeAll(peakLoadOutput);
 		csvWriter.close();
 		
+		csvWriter = new CSVWriter(controller.getConfig().getModule("controler").getValue("outputDirectory")+"/parkhistory/notParked_"+controller.getIterationNumber());
+		headLine = new LinkedList<String>();
+		headLine.add("PersonID");
+		headLine.add("X");
+		headLine.add("Y");
+		headLine.add("time");
+		headLine.add("EV");
+		headLine.add("FacID");
+		headLine.add("FacActType");
+		
+		
+		notParked.add(0, headLine);
+		csvWriter.writeAll(notParked);
+		csvWriter.close();
 		
 	}
 	
