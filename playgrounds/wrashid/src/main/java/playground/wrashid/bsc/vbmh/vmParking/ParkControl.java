@@ -205,6 +205,13 @@ public class ParkControl {
 		if(spotsInArea.size()>0){ 
 			selectParking(spotsInArea, personId, estimatedDuration, restOfDayDistance, ev);
 			return 1;
+		}else { //!! Groesserer Suchradius
+			int maxDist = VMConfig.maxDistance;
+			while (spotsInArea.size()==0){
+				maxDist = maxDist * 2;
+				//!!get publics
+				break;
+			}
 		}
 		//-----
 		

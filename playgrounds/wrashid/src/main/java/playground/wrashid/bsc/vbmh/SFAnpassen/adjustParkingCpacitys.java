@@ -29,10 +29,10 @@ public class adjustParkingCpacitys {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		String parkFileName="input/SF_PLUS/base/parking.xml";
+		String parkFileName="input/SF_PLUS/base/parkingLotsIncl.xml";
 		String peakLoadFileName="input/SF_PLUS/base/peakLoad.csv";
 		String streetFileName="input/SF_PLUS/base/street100p.csv";
-		String outputFile = "input/SF_PLUS/Scenario/140331_W08PeakS/parking2.xml";
+		String outputFile = "input/SF_PLUS/Scenario/140401_W08PmSL/parking2.xml";
 		//----
 		pAnteile.put("home", 1.0);
 		evAnteile.put("home", 1.0);
@@ -52,7 +52,7 @@ public class adjustParkingCpacitys {
 //		preiseNEVSpots.put("secondary", 6);
 //		chargingRates.put("secondary", 8.04);
 		
-		pAnteile.put("Street", 0.05);
+		pAnteile.put("Street", 0.10);
 		evAnteile.put("Street", 0.2);
 //		preiseEVSpots.put("Street", 1);
 //		preiseNEVSpots.put("Street", 2);
@@ -75,19 +75,20 @@ public class adjustParkingCpacitys {
 		readStreetCSV(streetFileName);
 		
 		for (Parking parking : karte.getParkings()){
-			int peakLoad = peakLoads.get(parking.id);
 			String actType;
 			if(parking.facilityActType==null){
 				actType="Street";
-				System.out.println("Street :"+peakLoad);
 			}else{
 				actType = parking.facilityActType;
 			}
-			double newCapacity = pAnteile.get(actType)*peakLoad;
-			int newEVCapacity = (int) Math.round(newCapacity*evAnteile.get(actType));
-			int newNEVCapacity = (int) Math.round(newCapacity*(1-evAnteile.get(actType)));
-			parking.capacityEV=newEVCapacity;
-			parking.capacityNEV=newNEVCapacity;
+			if(!actType.equalsIgnoreCase("parkingLot")){
+				int peakLoad = peakLoads.get(parking.id);
+				double newCapacity = pAnteile.get(actType)*peakLoad;
+				int newEVCapacity = (int) Math.round(newCapacity*evAnteile.get(actType));
+				int newNEVCapacity = (int) Math.round(newCapacity*(1-evAnteile.get(actType)));
+				parking.capacityEV=newEVCapacity;
+				parking.capacityNEV=newNEVCapacity;
+			}
 		}
 
 
