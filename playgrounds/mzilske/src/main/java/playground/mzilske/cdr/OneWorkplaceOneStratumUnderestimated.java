@@ -174,6 +174,7 @@ public class OneWorkplaceOneStratumUnderestimated {
 
 
         Counts counts = CompareMain.volumesToCounts(scenario.getNetwork(), compareMain.getGroundTruthVolumes());
+        scenario2.addScenarioElement(Counts.ELEMENT_NAME, counts);
         final CadytsContext context = new CadytsContext(config1, counts) ;
 
         Controler controler1 = new Controler(scenario2);

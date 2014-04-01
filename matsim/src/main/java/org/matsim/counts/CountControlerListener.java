@@ -55,23 +55,25 @@ public class CountControlerListener implements StartupListener, IterationEndsLis
 	public static final String OPERATION_COMPARECOUNTS = "compare with counts";
 	
 	private final CountsConfigGroup config;
-	private final Counts counts;
 	private final Map<Id, double[]> linkStats = new HashMap<Id, double[]>();
 	private final Set<String> analyzedModes;
 	private int iterationsUsed = 0;
 
 	public CountControlerListener(final CountsConfigGroup config) {
 		this.config = config;
-		this.counts = new Counts();
 		this.analyzedModes = CollectionUtils.stringToSet(config.getAnalyzedModes());
 	}
 
 	@Override
 	public void notifyStartup(final StartupEvent controlerStartupEvent) {
-		MatsimCountsReader counts_parser = new MatsimCountsReader(this.counts);
-		counts_parser.readFile(this.config.getCountsFileName());
-		
-		for (Id linkId : this.counts.getCounts().keySet()) {
+        Counts counts = (Counts) controlerStartupEvent.getControler().getScenario().getScenarioElement(Counts.ELEMENT_NAME);
+        if (counts == null) {
+            counts = new Counts();
+            MatsimCountsReader counts_parser = new MatsimCountsReader(counts);
+            counts_parser.readFile(this.config.getCountsFileName());
+            controlerStartupEvent.getControler().getScenario().addScenarioElement(Counts.ELEMENT_NAME, counts);
+        }
+		for (Id linkId : counts.getCounts().keySet()) {
 			this.linkStats.put(linkId, new double[24]);
 		}
 	}
@@ -81,16 +83,14 @@ public class CountControlerListener implements StartupListener, IterationEndsLis
 		if (this.config.getWriteCountsInterval() <= 0) {
 			return;
 		}
-		Controler controler = event.getControler();
-		
-		if (useVolumesOfIteration(event.getIteration(), controler.getConfig().controler().getFirstIteration())) {
-			addVolumes(controler.getVolumes());
+
+        if (useVolumesOfIteration(event.getIteration(), event.getControler().getConfig().controler().getFirstIteration())) {
+			addVolumes(event.getControler().getVolumes());
 		}
 
 		if (createCountsInIteration(event.getIteration())) {
-			controler.stopwatch.beginOperation(OPERATION_COMPARECOUNTS);
-			
-			Map<Id, double[]> averages = null;
+			event.getControler().stopwatch.beginOperation(OPERATION_COMPARECOUNTS);
+			Map<Id, double[]> averages;
 			if (this.iterationsUsed > 1) {
 				averages = new HashMap<Id, double[]>();
 				for (Map.Entry<Id, double[]> e : this.linkStats.entrySet()) {
@@ -105,8 +105,8 @@ public class CountControlerListener implements StartupListener, IterationEndsLis
 			} else {
 				averages = this.linkStats;
 			}
-//			CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(controler.getLinkStats(), this.counts, controler.getNetwork(), controler.getConfig().counts().getCountsScaleFactor());
-			CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(averages, this.counts, controler.getNetwork(), controler.getConfig().counts().getCountsScaleFactor());
+            Counts counts = (Counts) event.getControler().getScenario().getScenarioElement(Counts.ELEMENT_NAME);
+			CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(averages, counts, event.getControler().getNetwork(), event.getControler().getConfig().counts().getCountsScaleFactor());
 			if ((this.config.getDistanceFilter() != null) && (this.config.getDistanceFilterCenterNode() != null)) {
 				cca.setDistanceFilter(this.config.getDistanceFilter(), this.config.getDistanceFilterCenterNode());
 			}
@@ -126,7 +126,7 @@ public class CountControlerListener implements StartupListener, IterationEndsLis
 					this.config.getOutputFormat().contains("all")) {
 				String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "countscompare.kmz");
 				CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
-						cca.getComparison(), controler.getNetwork(), TransformationFactory.getCoordinateTransformation(controler.getConfig().global().getCoordinateSystem(), TransformationFactory.WGS84 ));
+						cca.getComparison(), event.getControler().getNetwork(), TransformationFactory.getCoordinateTransformation(event.getControler().getConfig().global().getCoordinateSystem(), TransformationFactory.WGS84 ));
 				kmlWriter.setIterationNumber(event.getIteration());
 				kmlWriter.writeFile(filename);
 			}
@@ -137,7 +137,7 @@ public class CountControlerListener implements StartupListener, IterationEndsLis
 				ctw.writeFile(filename);
 			}
 			reset();
-			controler.stopwatch.endOperation(OPERATION_COMPARECOUNTS);
+			event.getControler().stopwatch.endOperation(OPERATION_COMPARECOUNTS);
 		}
 	}
 
@@ -194,7 +194,4 @@ public class CountControlerListener implements StartupListener, IterationEndsLis
 		}
 	}
 
-	public Counts getCounts() {
-		return this.counts;
-	}
 }
