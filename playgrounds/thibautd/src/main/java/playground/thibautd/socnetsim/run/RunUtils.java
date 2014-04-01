@@ -680,6 +680,12 @@ public class RunUtils {
 			controller.addControlerListener( replanningStats );
 		}
 
+		if ( analysis.isDumpAllocation() ) {
+			final ReplanningAllocationDumper replanningStats = new ReplanningAllocationDumper( controller.getControlerIO().getOutputFilename( "replanningAllocations.dat" ) );
+			strategyManager.addListener( replanningStats );
+			controller.addControlerListener( replanningStats );
+		}
+
 		return controller;
 	}
 

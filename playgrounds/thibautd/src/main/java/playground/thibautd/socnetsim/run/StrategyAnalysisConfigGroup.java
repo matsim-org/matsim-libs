@@ -29,6 +29,7 @@ public class StrategyAnalysisConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME = "strategyanalysis";
 
 	private boolean dumpGroupSizes = false;
+	private boolean dumpAllocation = false;
 
 	public StrategyAnalysisConfigGroup() {
 		super( GROUP_NAME );
@@ -42,6 +43,16 @@ public class StrategyAnalysisConfigGroup extends ReflectiveModule {
 	@StringSetter( "dumpGroupSizes" )
 	public void setDumpGroupSizes( final boolean dumpGroupSizes ) {
 		this.dumpGroupSizes = dumpGroupSizes;
+	}
+
+	@StringGetter( "dumpAllocation" )
+	public boolean isDumpAllocation() {
+		return this.dumpAllocation;
+	}
+
+	@StringSetter( "dumpAllocation" )
+	public void setDumpAllocation(boolean dumpAllocation) {
+		this.dumpAllocation = dumpAllocation;
 	}
 }
 
