@@ -49,8 +49,8 @@ public class PtAlightCountsFixture extends PtCountsFixture {
 		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
 			
 			@Override
-			public double[] getVolumesForStop(Id stopId) {
-				return copyFromIntArray(oa.getAlightVolumesForStop(stopId));
+			public double[] getVolumesForStop(Id locationId) {
+				return copyFromIntArray(oa.getAlightVolumesForStop(locationId));
 			}
 			
 		}, counts, network, Double.parseDouble(config.findParam(MODULE_NAME, "countsScaleFactor")));

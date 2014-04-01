@@ -75,8 +75,8 @@ public class RebuildCountSimRealPerHourFromLinkStats2Txt {
 		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
 		
 			@Override
-			public double[] getVolumesForStop(Id stopId) {
-				return linkStats.getAvgLinkVolumes(stopId);
+			public double[] getVolumesForStop(Id locationId) {
+				return linkStats.getAvgLinkVolumes(locationId);
 			}
 		
 		}, counts, network,

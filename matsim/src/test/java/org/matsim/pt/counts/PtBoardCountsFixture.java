@@ -43,8 +43,8 @@ public class PtBoardCountsFixture extends PtCountsFixture {
 		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
 			
 			@Override
-			public double[] getVolumesForStop(Id stopId) {
-				return copyFromIntArray(oa.getBoardVolumesForStop(stopId));
+			public double[] getVolumesForStop(Id locationId) {
+				return copyFromIntArray(oa.getBoardVolumesForStop(locationId));
 			}
 			
 		}, counts, network, Double.parseDouble(config.findParam(MODULE_NAME, "countsScaleFactor")));

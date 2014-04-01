@@ -44,7 +44,7 @@ import java.util.Map;
 public class CountsComparisonAlgorithm {
 
 	public static interface VolumesForId {
-		double[] getVolumesForStop(Id stopId);
+		double[] getVolumesForStop(Id locationId);
 	}
 	
 	public static interface DistanceFilter {
@@ -80,8 +80,8 @@ public class CountsComparisonAlgorithm {
 		this.volumesPerLinkPerHour = new VolumesForId() {
 
 			@Override
-			public double[] getVolumesForStop(Id stopId) {
-				return volumes.getVolumesPerHourForLink(stopId);
+			public double[] getVolumesForStop(Id locationId) {
+				return volumes.getVolumesPerHourForLink(locationId);
 			}
 
 		};
@@ -91,8 +91,8 @@ public class CountsComparisonAlgorithm {
 		this.volumesPerLinkPerHour = new VolumesForId() {
 
 			@Override
-			public double[] getVolumesForStop(Id stopId) {
-				return volumesPerLinkPerHour.get(stopId);
+			public double[] getVolumesForStop(Id locationId) {
+				return volumesPerLinkPerHour.get(locationId);
 			}
 
 		};

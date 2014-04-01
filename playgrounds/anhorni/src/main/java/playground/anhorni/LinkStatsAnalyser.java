@@ -181,8 +181,8 @@ public class LinkStatsAnalyser {
 		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
 		
 			@Override
-			public double[] getVolumesForStop(Id stopId) {
-				return linkStats1.getAvgLinkVolumes(stopId);
+			public double[] getVolumesForStop(Id locationId) {
+				return linkStats1.getAvgLinkVolumes(locationId);
 			}
 		
 		}, counts, this.network,

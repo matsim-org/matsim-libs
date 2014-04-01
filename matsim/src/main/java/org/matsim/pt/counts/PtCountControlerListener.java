@@ -20,16 +20,9 @@
 
 package org.matsim.pt.counts;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PtCountsConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -42,14 +35,16 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.counts.Count;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class PtCountControlerListener implements StartupListener, IterationEndsListener,
 BeforeMobsimListener, AfterMobsimListener  {
@@ -131,22 +126,22 @@ BeforeMobsimListener, AfterMobsimListener  {
 			cca.put( CountType.Boarding, new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
 
 				@Override
-				public double[] getVolumesForStop(Id stopId) {
-					return copyFromIntArray(occupancyAnalyzer.getBoardVolumesForStop(stopId));
+				public double[] getVolumesForStop(Id locationId) {
+					return copyFromIntArray(occupancyAnalyzer.getBoardVolumesForStop(locationId));
 				}
 			}, this.boardCounts, network, countsScaleFactor)) ;
 			cca.put( CountType.Alighting, new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
 
 				@Override
-				public double[] getVolumesForStop(Id stopId) {
-					return copyFromIntArray(occupancyAnalyzer.getAlightVolumesForStop(stopId));
+				public double[] getVolumesForStop(Id locationId) {
+					return copyFromIntArray(occupancyAnalyzer.getAlightVolumesForStop(locationId));
 				}
 			}, this.alightCounts, network, countsScaleFactor) ) ;
 			cca.put( CountType.Occupancy, new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
 
 				@Override
-				public double[] getVolumesForStop(Id stopId) {
-					return copyFromIntArray(occupancyAnalyzer.getOccupancyVolumesForStop(stopId));
+				public double[] getVolumesForStop(Id locationId) {
+					return copyFromIntArray(occupancyAnalyzer.getOccupancyVolumesForStop(locationId));
 				}
 			}, this.occupancyCounts, network, countsScaleFactor) ) ;
 
