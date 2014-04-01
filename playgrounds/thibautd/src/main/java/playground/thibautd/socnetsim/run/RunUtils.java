@@ -667,9 +667,18 @@ public class RunUtils {
 
 		strategyManager.setStopWatch( controller.stopwatch );
 
-		final ReplanningStatsDumper replanningStats = new ReplanningStatsDumper( controller.getControlerIO().getOutputFilename( "replanningGroups.dat" ) );
-		strategyManager.addListener( replanningStats );
-		controller.addControlerListener( replanningStats );
+		if ( !(config.getModule( StrategyAnalysisConfigGroup.GROUP_NAME ) instanceof StrategyAnalysisConfigGroup) ) {
+			config.addModule( new StrategyAnalysisConfigGroup() );
+		}
+
+		final StrategyAnalysisConfigGroup analysis = (StrategyAnalysisConfigGroup)
+			config.getModule( StrategyAnalysisConfigGroup.GROUP_NAME );
+
+		if ( analysis.isDumpGroupSizes() ) {
+			final ReplanningStatsDumper replanningStats = new ReplanningStatsDumper( controller.getControlerIO().getOutputFilename( "replanningGroups.dat" ) );
+			strategyManager.addListener( replanningStats );
+			controller.addControlerListener( replanningStats );
+		}
 
 		return controller;
 	}
