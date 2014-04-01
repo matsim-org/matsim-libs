@@ -187,6 +187,11 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithm implements GenericPlanAl
 			new ArrayList<Id>(
 					vehicleRessources.identifyVehiclesUsableForAgent(
 						currentPersonId ) );
+
+		if ( possibleVehicles.isEmpty() ) {
+			throw new RuntimeException( "no vehicle found for person "+currentPersonId );
+		}
+
 		// make sure order is deterministic
 		Collections.sort( possibleVehicles );
 		Collections.shuffle( possibleVehicles , random );

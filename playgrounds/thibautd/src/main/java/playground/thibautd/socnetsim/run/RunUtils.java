@@ -455,6 +455,11 @@ public class RunUtils {
 					scenario.getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME );
 
 		if ( scenario.getScenarioElement( VehicleRessources.ELEMENT_NAME ) != null ) {
+			if ( !scenario.getConfig().qsim().getVehicleBehavior().equals( "wait" ) ) {
+				throw new RuntimeException( "agents should wait for vehicles when vehicle ressources are used! Setting is "+
+						scenario.getConfig().qsim().getVehicleBehavior() );
+			}
+
 			log.warn( "Adding the vehicle preparation algorithm with the *default* plan link identifier" );
 			log.warn( "this should be modified, or it will cause inconsistencies" );
 
