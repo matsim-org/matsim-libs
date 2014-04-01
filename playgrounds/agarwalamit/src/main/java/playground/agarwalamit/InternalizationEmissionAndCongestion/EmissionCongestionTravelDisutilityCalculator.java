@@ -33,7 +33,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import playground.benjamin.internalization.EmissionCostModule;
-import playground.benjamin.internalization.EmissionTravelDisutilityCalculator;
 import playground.ikaddoura.internalizationCar.TollHandler;
 import playground.vsp.emissions.EmissionModule;
 import playground.vsp.emissions.WarmEmissionAnalysisModule;
