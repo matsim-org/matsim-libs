@@ -27,6 +27,9 @@ import java.io.IOException;
     public static void main(String... args)
         throws IOException
     {
+        //demands: 10, 15, 20, 25, 30, 35, 40
+        //supplies: 25, 50
+        //path pattern: mielec-2-peaks-new-$supply$-$demand$
         String file = "./shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new-40-50/params.in.in";
         TaxiLauncher launcher = new TaxiLauncher(file);
         launcher.initVrpPathCalculator();
