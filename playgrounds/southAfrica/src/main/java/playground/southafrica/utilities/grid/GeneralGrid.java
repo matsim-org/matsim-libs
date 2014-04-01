@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.Utilities.KernelDensityEstimation;
+package playground.southafrica.utilities.grid;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -37,12 +37,16 @@ import playground.southafrica.utilities.Header;
 import playground.southafrica.utilities.gis.MyMultiFeatureReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
+/**
+ * Class to generate either a square or hexagonal grid from a given shapefile.
+ *
+ * @author jwjoubert
+ */
 public class GeneralGrid {
 	private final static Logger LOG = Logger.getLogger(GeneralGrid.class);
 	
@@ -53,6 +57,20 @@ public class GeneralGrid {
 	private final GridType type;
 	private final double width;
 
+	
+	/**
+	 * Instantiates a grid.
+	 * @param width the horizontal distance at the widest portion of the cell.
+	 * 		  For a square that is obviously the width; for a (flat-topped) 
+	 * 		  hexagonal cell it is the distance from the left-most point to the
+	 * 	      right-most point. 
+	 * @param type an indicator specifying the type of grid. Currently supported
+	 * 		  grid-type values are:
+	 * 		  <ol>
+	 * 			<li> square;
+	 * 			<li> hexagonal.
+	 * 		  </ol>
+	 */
 	public GeneralGrid(double width, int type) {
 		this.width = width;
 		switch (type) {
@@ -67,7 +85,15 @@ public class GeneralGrid {
 		};
 	}
 	
-	private void generateGrid(Geometry g){
+	/**
+	 * Converts a given (single) shapefile into a grid, each cell having a 
+	 * centroid within the shapefile.
+	 * @param g the (preferably single) shapefile to convert into a grid. If the
+	 * 		  given {@link Geometry} has multiple geometries... I don't know 
+	 * 		  what happens.
+	 */
+	public void generateGrid(Geometry g){
+		LOG.warn("Did you check that the width given is in the same unit-of-measure as the shapefile?");
 		LOG.info("Generating " + this.type.toString() + " grid. This may take some time...");
 
 		grid = new Matrix("grid", null);
@@ -78,9 +104,6 @@ public class GeneralGrid {
 				envelope.getCoordinates()[2].x+width, 
 				envelope.getCoordinates()[2].y+width);				
 
-		double xDim = qt.getMaxEasting() - qt.getMinEasting();
-		double yDim = qt.getMaxNorthing() - qt.getMinNorthing();
-		
 		Counter counter = new Counter("   cells # ");
 		
 		double startX = envelope.getCoordinates()[0].x + 0.5*width;
@@ -138,7 +161,26 @@ public class GeneralGrid {
 		counter.printCounter();
 	}
 	
-	private void writeGrid(String folder){
+	
+	/**
+	 * Writes the grid to a file that can be visualised using R. The format of
+	 * the file, irrespective of the {@link GridType}, contains the following
+	 * columns:<br>
+	 * <blockquote><code> From,To,Long,Lat,Width </code></blockquote>
+	 * where
+	 * <ul>
+	 * 	<b>From</b> is the row index of the grid cell;<br>
+	 * 	<b>To</b> is the column index of the grid cell;<br>
+	 * 	<b>Long</b> is the longitude of the centroid of the grid cell;<br>
+	 * 	<b>Lat</b> is the latitude of the grid cell; and<br>
+	 * 	<b>Width</b> is the width of the grid cell.
+	 * </ul>
+	 * 
+	 * @param folder where the output will be written. The final output filename
+	 * 		  will be dependent of the {@link GridType}, followed by the 
+	 * 		  <code>.csv</code> extension. 
+	 */
+	public void writeGrid(String folder){
 		String filename = folder + (folder.endsWith("/") ? "" : "/") + this.type + ".csv";
 		LOG.info("Writing grid to file: " + filename);
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
@@ -156,7 +198,6 @@ public class GeneralGrid {
 				Coordinate c = tuple.getSecond().getCoordinate();
 				bw.write(String.format("%.4f,%.4f,%.4f\n", c.x, c.y, width));
 			}
-			
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Cannot write to " + filename);
@@ -169,6 +210,18 @@ public class GeneralGrid {
 			}
 		}
 		LOG.info("Done writing file.");
+	}
+	
+	
+	/**
+	 * @return the {@link GridType} of the grid.
+	 */
+	public GridType getGridType(){
+		return this.type;
+	}
+	
+	public QuadTree<Tuple<String,Point>> getGrid(){
+		return this.qt;
 	}
 	
 	
@@ -189,34 +242,48 @@ public class GeneralGrid {
 		}
 		
 		LOG.info("Read " + mmfr.getAllZones().size() + " zone(s).");
-		Geometry zone = mmfr.getAllZones().get(0);
-		
 		GeneralGrid grid = new GeneralGrid(width, type);
-//		grid.generateGrid(grid.buildDummyPolygon());
-		grid.generateGrid(zone);
+
+		Geometry zone = mmfr.getAllZones().get(0);
+		Geometry dummy = grid.buildDummyPolygon();
+		
+		grid.generateGrid(dummy);
 		grid.writeGrid(outputFolder);
 		
 		Header.printFooter();
 	}
 	
-	private enum GridType{
-		SQUARE("Square"), 
-		HEX("Hex"),
-		UNKNOWN("Unknown");
-		
-		private final String type;
-		
-		private GridType(final String type){this.type = type;}
+	
+	/**
+	 * Currently supported grid types are:
+	 * <ul>
+	 * 	<b>SQUARE</b> where each cell is a square;<br>
+	 * 	<b>HEX</b> where each cell is a hexagon, resulting in a honeycomb grid;
+	 * 	<b>UNKNOWN</b> if no (proper) grid type is passed. This will ultimately 
+	 * 	lead to a {@link RuntimeException} being thrown.
+	 *
+	 * @author jwjoubert
+	 */
+	public static enum GridType{
+		SQUARE, 
+		HEX,
+		UNKNOWN;		
 	}
 	
+	/**
+	 * Builds a geometry that is 20 x 20 grids cells in size.
+	 * @return a geometry of type {@link Polygon} 
+	 */
 	private Polygon buildDummyPolygon(){
 		Coordinate c1 = new Coordinate(0.0, 0.0);
-		Coordinate c2 = new Coordinate(0.0, 20*width);
-		Coordinate c3 = new Coordinate(20*width, 20*width);
-		Coordinate c4 = new Coordinate(20*width, 0.0);
+		Coordinate c2 = new Coordinate(0.0, 10*width);
+		Coordinate c3 = new Coordinate(10*width, 10*width);
+		Coordinate c4 = new Coordinate(10*width, 0.0);
 		Coordinate[] ca = {c1,c2,c3,c4,c1};
 		return gf.createPolygon(ca);
 	}
+	
+	
 
 }
 

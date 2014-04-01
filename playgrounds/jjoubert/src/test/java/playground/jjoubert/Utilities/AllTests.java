@@ -35,7 +35,6 @@ public class AllTests {
 		suite.addTestSuite(MyVehicleIdentifierTest.class);
 		suite.addTestSuite(MyXmlConverterTest.class);
 		
-		suite.addTest(playground.jjoubert.Utilities.KernelDensityEstimation.AllTests.suite());
 		suite.addTest(playground.jjoubert.Utilities.matsim2urbansim.AllTests.suite());
 		suite.addTest(playground.jjoubert.Utilities.roadpricing.AllTests.suite());
 		
