@@ -79,39 +79,6 @@ class VehicularDepartureHandler implements DepartureHandler {
 					// consistently implemented.  One could also decide to not have these departure/arrival events here
 					// (we would still have actEnd/actStart events).  kai, nov'11
 
-				    // we need the following 4 lines, for example, in taxicabs:
-				    // when the first request is located at the same link as the taxi then for
-				    // the pickup trip we have: fromLink==toLink. Without these 4 lines,
-				    // that would lead to not setting the bi-directional vehicle-driver assignment.
-				    // However, this assignment must exist before taxi departs with the customer --
-				    // i.e. the customer must know which vehicle to enter.
-				    // (previously, the assignment used to be set during the departure
-				    // ("delivery trip"), which was too late. 
-				    // michalm, kai, jul'13
-					//
-					// This is wrong, for several reasons:
-					//  - this does not check whether the vehicle is parked at the
-					//  right link or not. In my runs a vehicle can be used by several agents,
-					//  and thus I can get an agant added as a driver in a vehicle
-					//  being driven by another agent at the other end of the network.
-					//  - the agent is not removed from the vehicle afterwards
-					//  (this is done in the arrival logic in the link), and thus
-					//  is both in the vehicle and at its activity. I also had problems
-					//  with that.
-					//  I have no problem with agents performing 0-length car trips
-					//  entering and leaving their vehicle, as long as:
-					//  1 - it respects the VehicleBehavior setting (see normal
-					//  departure logic below)
-					//  2 - the agent enters *and leaves* the vehicle (ie there
-					//  needs to be a test)
-					//  Thus I comment out the code for the time being. No test fails,
-					//  so I assume it is OK.
-					//  td, apr'14
-                    //Id vehicleId = agent.getPlannedVehicleId();
-                    //QVehicle vehicle = qNetsimEngine.getVehicles().get(vehicleId);
-                    //vehicle.setDriver(agent);
-                    //agent.setVehicle(vehicle);
-
 					agent.endLegAndComputeNextState(now) ;
 					this.qNetsimEngine.internalInterface.arrangeNextAgentState(agent) ;
 					return;

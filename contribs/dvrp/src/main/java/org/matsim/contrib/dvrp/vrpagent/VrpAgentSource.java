@@ -31,6 +31,7 @@ import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.dynagent.util.DynAgentWithPlan;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.vehicles.*;
 
 
@@ -63,22 +64,22 @@ public class VrpAgentSource
         VehiclesFactory qSimVehicleFactory = VehicleUtils.getFactory();
 
         for (Vehicle vrpVeh : vehicles) {
-            VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator, vrpVeh);
-
             Id id = vrpVeh.getId();
             Id startLinkId = vrpVeh.getStartLink().getId();
 
-            DynAgent taxiAgent = new DynAgent(id, startLinkId, qSim, vrpAgentLogic);
+            VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator, vrpVeh);
+            DynAgent vrpAgent = new DynAgent(id, startLinkId, qSim, vrpAgentLogic);
+            QVehicle mobsimVehicle = new QVehicle(qSimVehicleFactory.createVehicle(id,
+                    VehicleUtils.getDefaultVehicleType()));
+            vrpAgent.setVehicle(mobsimVehicle);
+            mobsimVehicle.setDriver(vrpAgent);
 
-            qSim.createAndParkVehicleOnLink(
-                    qSimVehicleFactory.createVehicle(id, VehicleUtils.getDefaultVehicleType()),
-                    startLinkId);
-
+            qSim.addParkedVehicle(mobsimVehicle, startLinkId);
             if (planFactory != null) {
-                qSim.insertAgentIntoMobsim(new DynAgentWithPlan(taxiAgent, planFactory));
+                qSim.insertAgentIntoMobsim(new DynAgentWithPlan(vrpAgent, planFactory));
             }
             else {
-                qSim.insertAgentIntoMobsim(taxiAgent);
+                qSim.insertAgentIntoMobsim(vrpAgent);
             }
         }
     }
