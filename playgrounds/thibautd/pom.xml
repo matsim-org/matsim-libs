@@ -19,11 +19,6 @@
   		<artifactId>meisterk</artifactId>
   		<version>0.6.0-SNAPSHOT</version>
   	</dependency>
-  	<dependency>
-  		<groupId>playground</groupId>
-  		<artifactId>acmarmol</artifactId>
-  		<version>0.6.0-SNAPSHOT</version>
-  	</dependency>
   </dependencies>
   	<build>
   		<plugins>
