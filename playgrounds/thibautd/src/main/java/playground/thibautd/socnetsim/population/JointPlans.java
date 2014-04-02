@@ -49,7 +49,16 @@ public class JointPlans implements MatsimToplevelContainer {
 	
 	public JointPlan getJointPlan(final Plan indivPlan) {
 		if ( indivPlan instanceof PlanWithCachedJointPlan ) {
-			return ((PlanWithCachedJointPlan) indivPlan).getJointPlan( instanceId );
+			final PlanWithCachedJointPlan withCache = (PlanWithCachedJointPlan) indivPlan;
+
+			if ( withCache.hasCached( instanceId ) ) {
+				return withCache.getJointPlan( instanceId );
+			}
+			else {
+				final JointPlan jp = planToJointPlan.get( indivPlan );
+				withCache.setJointPlan( instanceId , jp );
+				return jp;
+			}
 		}
 		return planToJointPlan.get( indivPlan );
 	}
@@ -62,12 +71,13 @@ public class JointPlans implements MatsimToplevelContainer {
 
 					if (withCache.getJointPlan( instanceId ) != jointPlan) throw new PlanLinkException( withCache.getJointPlan( instanceId )+" differs from "+indivPlan );
 
-					withCache.resetJointPlan();
+					withCache.resetJointPlan( instanceId );
 				}
-				else {
-					final Object removed = planToJointPlan.remove( indivPlan );
-					if (removed != jointPlan) throw new PlanLinkException( removed+" differs from "+indivPlan );
-				}
+
+				// keep in Map no matter what, as the joint plan may be uncached in the plan.
+				// This results in slower removes... Only get is optimized by the cache
+				final Object removed = planToJointPlan.remove( indivPlan );
+				if (removed != jointPlan) throw new PlanLinkException( removed+" differs from "+indivPlan );
 			}
 		}
 	}
@@ -85,12 +95,13 @@ public class JointPlans implements MatsimToplevelContainer {
 
 					withCache.setJointPlan( instanceId , jointPlan );
 				}
-				else {
-					final Object removed = planToJointPlan.put( indivPlan , jointPlan );
-					if (removed != null && removed != jointPlan) {
-						throw new PlanLinkException( removed+" was associated to "+indivPlan+
-								" while trying to associate "+jointPlan );
-					}
+
+				// keep in Map no matter what, as the joint plan may be uncached in the plan
+				// This results in slower additions... Only get is optimized by the cache
+				final Object removed = planToJointPlan.put( indivPlan , jointPlan );
+				if (removed != null && removed != jointPlan) {
+					throw new PlanLinkException( removed+" was associated to "+indivPlan+
+							" while trying to associate "+jointPlan );
 				}
 			}
 		}
