@@ -19,12 +19,12 @@
 
 package playground.wrashid.parkingChoice.util;
 
+import org.matsim.contrib.parking.lib.EventHandlerAtStartupAdder;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.wrashid.lib.EventHandlerAtStartupAdder;
 
 public class ActivityDurationEstimatorTest extends MatsimTestCase {
 
