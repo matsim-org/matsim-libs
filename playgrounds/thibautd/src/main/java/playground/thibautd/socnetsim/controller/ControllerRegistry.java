@@ -61,6 +61,7 @@ public final class ControllerRegistry {
 	private final GroupIdentifier groupIdentifier;
 	private final Iterable<GenericStrategyModule<ReplanningGroup>> prepareForSimModules;
 	private final PlanLinkIdentifier planLinkIdentifier;
+	private final PlanLinkIdentifier weakPlanLinkIdentifier;
 	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
 
 	ControllerRegistry(
@@ -77,6 +78,7 @@ public final class ControllerRegistry {
 			final GroupIdentifier groupIdentifier,
 			final Iterable<GenericStrategyModule<ReplanningGroup>> prepareForSimModules,
 			final PlanLinkIdentifier planLinkIdentifier,
+			final PlanLinkIdentifier weakPlanLinkIdentifier,
 			final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory) {
 		log.debug( "constructing "+getClass().getSimpleName() );
 		log.debug( "scenario = "+scenario );
@@ -105,6 +107,8 @@ public final class ControllerRegistry {
 		this.prepareForSimModules = prepareForSimModules;
 		log.debug( "planLinkIdentifier = "+ planLinkIdentifier );
 		this.planLinkIdentifier = planLinkIdentifier;
+		log.debug( "weakPlanLinkIdentifier = "+ weakPlanLinkIdentifier );
+		this.weakPlanLinkIdentifier = weakPlanLinkIdentifier;
 		log.debug( "incompatiblePlansIdentifierFactory = "+ incompatiblePlansIdentifierFactory );
 		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
 		log.debug( "constructing "+getClass().getSimpleName()+"... done" );
@@ -204,6 +208,10 @@ public final class ControllerRegistry {
 
 	public IncompatiblePlansIdentifierFactory getIncompatiblePlansIdentifierFactory() {
 		return this.incompatiblePlansIdentifierFactory;
+	}
+
+	public PlanLinkIdentifier getWeakPlanLinkIdentifier() {
+		return weakPlanLinkIdentifier;
 	}
 }
 

@@ -96,6 +96,7 @@ public class ControllerRegistryBuilder {
 	private PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory = null;
 	private GroupIdentifier groupIdentifier = null;
 	private PlanLinkIdentifier planLinkIdentifier = null;
+	private PlanLinkIdentifier weakPlanLinkIdentifier = null;
 	private IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory = null;
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -190,6 +191,13 @@ public class ControllerRegistryBuilder {
 		return this;
 	}
 
+	public ControllerRegistryBuilder withWeakPlanLinkIdentifier(
+			final PlanLinkIdentifier identifier) {
+		if ( this.weakPlanLinkIdentifier != null ) throw new IllegalStateException( "object already set" );
+		this.weakPlanLinkIdentifier = identifier;
+		return this;
+	}
+
 	public ControllerRegistryBuilder withIncompatiblePlansIdentifierFactory(
 			final IncompatiblePlansIdentifierFactory factory) {
 		if ( this.incompatiblePlansIdentifierFactory != null ) throw new IllegalStateException( "object already set" );
@@ -222,6 +230,7 @@ public class ControllerRegistryBuilder {
 			getGroupIdentifier(),
 			prepareForSimModules,
 			getPlanLinkIdentifier(),
+			getWeakPlanLinkIdentifier(),
 			getIncompatiblePlansIdentifierFactory());
 	}
 
@@ -281,6 +290,15 @@ public class ControllerRegistryBuilder {
 
 		}
 		return planLinkIdentifier;
+	}
+
+	public PlanLinkIdentifier getWeakPlanLinkIdentifier() {
+		if ( weakPlanLinkIdentifier == null ) {
+			this.weakPlanLinkIdentifier =
+				PlanLinkIdentifierUtils.createPlanLinkIdentifier(
+						scenario );
+		}
+		return weakPlanLinkIdentifier;
 	}
 
 	public TravelTimeCalculator getTravelTime() {
