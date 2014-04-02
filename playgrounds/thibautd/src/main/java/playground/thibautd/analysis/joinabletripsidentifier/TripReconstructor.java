@@ -25,8 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -57,8 +56,8 @@ public class TripReconstructor implements
 		PersonArrivalEventHandler,
 		ActivityEndEventHandler,
 		ActivityStartEventHandler {
-	private static final Log log =
-		LogFactory.getLog(TripReconstructor.class);
+	private static final Logger log =
+		Logger.getLogger(TripReconstructor.class);
 
 	private final Network network;
 

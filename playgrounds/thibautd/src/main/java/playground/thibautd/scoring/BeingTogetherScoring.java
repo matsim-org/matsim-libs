@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -429,10 +428,17 @@ public class BeingTogetherScoring {
 		@Override
 		public boolean equals( final Object o ) {
 			return o instanceof Location &&
-				ObjectUtils.equals( ((Location) o).vehId , vehId ) &&
-				ObjectUtils.equals( ((Location) o).linkId , linkId ) &&
-				ObjectUtils.equals( ((Location) o).facilityId , facilityId ) &&
-				ObjectUtils.equals( ((Location) o).activityType , activityType );
+				areEquals( ((Location) o).vehId , vehId ) &&
+				areEquals( ((Location) o).linkId , linkId ) &&
+				areEquals( ((Location) o).facilityId , facilityId ) &&
+				areEquals( ((Location) o).activityType , activityType );
+		}
+		
+		private final boolean areEquals(
+				final Object o1,
+				final Object o2 ) {
+			if ( o1 == null ) return o2 == null;
+			return o1.equals( o2 );
 		}
 
 		@Override

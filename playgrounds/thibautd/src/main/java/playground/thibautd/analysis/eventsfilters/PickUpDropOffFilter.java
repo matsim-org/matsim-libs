@@ -22,8 +22,7 @@ package playground.thibautd.analysis.eventsfilters;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -43,8 +42,8 @@ import playground.thibautd.socnetsim.population.JointActingTypes;
  * @author thibautd
  */
 public class PickUpDropOffFilter {
-	private static final Log log =
-		LogFactory.getLog(PickUpDropOffFilter.class);
+	private static final Logger log =
+		Logger.getLogger(PickUpDropOffFilter.class);
 
 	private static final double MINIMAL_DURATION = 60 * 5;
 	private static final double MAX_END_TIME = 30 * 3600;

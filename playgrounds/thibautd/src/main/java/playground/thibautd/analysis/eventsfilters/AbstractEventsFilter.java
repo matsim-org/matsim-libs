@@ -19,8 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.eventsfilters;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -33,8 +32,8 @@ import org.matsim.core.events.handler.BasicEventHandler;
  * @author thibautd
  */
 public abstract class AbstractEventsFilter {
-	private static final Log log =
-		LogFactory.getLog(AbstractEventsFilter.class);
+	private static final Logger log =
+		Logger.getLogger(AbstractEventsFilter.class);
 
 	private EventWriterXML writer = null;
 

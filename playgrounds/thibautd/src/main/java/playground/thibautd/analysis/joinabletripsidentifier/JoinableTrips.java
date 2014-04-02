@@ -26,8 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
@@ -45,8 +44,8 @@ import org.matsim.core.utils.geometry.CoordUtils;
  * @author thibautd
  */
 public class JoinableTrips {
-	private static final Log log =
-		LogFactory.getLog(JoinableTrips.class);
+	private static final Logger log =
+		Logger.getLogger(JoinableTrips.class);
 
 	private final double distanceRadius;
 	private final double timeRadius;
