@@ -95,7 +95,7 @@ public class M2KS2010Converter {
 	
 	private void createSignalsEnvelope(double signalsBoundingBoxOffset) {
 		this.signalsBoundingBox = new DgSignalsBoundingBox(crs);
-		Envelope signalsBoundingBoxEnvelope = signalsBoundingBox.calculateBoundingBoxForSignals(this.network, 
+		signalsBoundingBox.calculateBoundingBoxForSignals(this.network, 
 				this.signals.getSignalSystemsData(), signalsBoundingBoxOffset);
 	}
 
@@ -103,7 +103,7 @@ public class M2KS2010Converter {
 		if (ksModelCommoditySampleSize != 1.0){
 			for (DgCommodity com : commodities.getCommodities().values()) {
 				double flow = com.getFlow() * ksModelCommoditySampleSize;
-				com.setSourceNode(com.getSourceNodeId(), flow);
+				com.setFlow(flow);
 			}
 		}
 	}

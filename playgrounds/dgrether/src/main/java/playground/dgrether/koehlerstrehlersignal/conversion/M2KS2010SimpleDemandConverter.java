@@ -53,18 +53,22 @@ public class M2KS2010SimpleDemandConverter {
 	private DgCommodities createCommodities(DgKSNetwork net, Population population){
 		DgCommodities coms = new DgCommodities();
 
-		Map<Tuple<Id, Id>, Double> fromNodeToNodeCountMap = new HashMap<Tuple<Id, Id>, Double>();
+		// the array contains the from node id, the to node id, the from link id and the to link id in this order
+		// the Double contains the flow value of this origin destination pair
+		Map<Id[], Double> fromNodeToNodeCountMap = new HashMap<Id[], Double>();
 		
 		for (Person p : population.getPersons().values()){
 			Plan plan = p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()){
 				if (pe instanceof Leg){
 					Leg leg = (Leg)pe;
-					DgStreet startStreet = net.getStreets().get(leg.getRoute().getStartLinkId());
+					Id fromLinkId = leg.getRoute().getStartLinkId();
+					DgStreet startStreet = net.getStreets().get(fromLinkId);
 					Id fromNodeId = startStreet.getToNode().getId();
-					DgStreet endStreet = net.getStreets().get(leg.getRoute().getEndLinkId());
+					Id toLinkId = leg.getRoute().getEndLinkId();
+					DgStreet endStreet = net.getStreets().get(toLinkId);
 					Id toNodeId = endStreet.getFromNode().getId();
-					Tuple<Id, Id> index = new Tuple<Id, Id>(fromNodeId, toNodeId);
+					Id[] index = new Id[]{fromNodeId, toNodeId, fromLinkId, toLinkId};
 					if (!fromNodeToNodeCountMap.containsKey(index)){
 						fromNodeToNodeCountMap.put(index, 0.0);
 					}
@@ -76,13 +80,13 @@ public class M2KS2010SimpleDemandConverter {
 		}
 		
 		int comId = 0;
-		for (Tuple<Id, Id> index : fromNodeToNodeCountMap.keySet()){
+		for (Id[] index : fromNodeToNodeCountMap.keySet()){
 			comId++;
 			Id coId = new IdImpl(comId);
 			DgCommodity co = new DgCommodity(coId);
 			coms.addCommodity(co);
-			co.setSourceNode(index.getFirst(), fromNodeToNodeCountMap.get(index));
-			co.setDrainNode(index.getSecond());
+			co.setSourceNode(index[0], index[2], fromNodeToNodeCountMap.get(index));
+			co.setDrainNode(index[1], index[3]);
 		}
 		
 		return coms;

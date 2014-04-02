@@ -49,9 +49,17 @@ public class TtSignalizedNodeShortestPath {
 			for (Id toSignalId : signalizedNodes){
 				if (!fromSignalId.equals(toSignalId)){
 					DgCommodity signalCom = new DgCommodity(new IdImpl("signalCommodity_" + fromSignalId + "-" + toSignalId));
-					signalCom.setSourceNode(fromSignalId, 1.0);
-					signalCom.setDrainNode(toSignalId);
-					signalCommodities.addCommodity(signalCom);	
+					signalCom.setSourceNode(fromSignalId, null, 1.0);
+					signalCom.setDrainNode(toSignalId, null);
+					signalCommodities.addCommodity(signalCom);
+					/*
+					 * remark: a DgCommodity needs node to node representation together with link to link representation 
+					 * as converter between matsim and ks-model format. 
+					 * but in this special case of determine the links of the shortest paths between signalized nodes 
+					 * a link to link representation would be misleading and moreover is not used in the router 
+					 * TtDgKoehlerStrehler2010Router which calculates the shortest paths in this case.
+					 * so we leave the link to link representation empty.
+					 */
 				}
 			}
 		}

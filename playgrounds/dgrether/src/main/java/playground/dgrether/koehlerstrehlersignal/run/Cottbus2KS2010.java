@@ -75,7 +75,7 @@ public class Cottbus2KS2010 {
 		int cellsX = 5;
 		int cellsY = 5;
 		double signalsBoundingBoxOffset = 50.0;
-		double cuttingBoundingBoxOffset = 50.0;
+		double cuttingBoundingBoxOffset = 9000.0;
 		double startTime = 5.5 * 3600.0;
 		double endTime = 9.5 * 3600.0;
 		// double startTime = 13.5 * 3600.0;
@@ -86,7 +86,7 @@ public class Cottbus2KS2010 {
 		String name = "run run1722 output plans between 05:30 and 09:30";
 		// String name = "run run1722 output plans between 13:30 and 18:30";
 		final String outputDirectory = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/cb2ks2010/2014-03-06_minflow_"+ minCommodityFlow +"_morning_peak_bb"+ cuttingBoundingBoxOffset + "/";
+				+ "shared-svn/projects/cottbus/cb2ks2010/2014-04-02_minflow_"+ minCommodityFlow +"_morning_peak_bb"+ cuttingBoundingBoxOffset + "/";
 		String ksModelOutputFilename = "ks2010_model_";
 		ksModelOutputFilename += Double.toString(minCommodityFlow) + "_"
 				+ Double.toString(startTime) + ".xml";

@@ -138,29 +138,43 @@ public class M2KS2010NetworkConverter {
 		 */
 		this.convertLinks2Streets(ksnet, net);
 
-		//loop over links and create layout of target crossing
+		//loop over links and create layout (i.e. lights and programs) of target crossing (if it is expanded)
 		for (Link link : net.getLinks().values()){
-			//prepare some objects/data
 			DgCrossing crossing = ksnet.getCrossings().get(this.idConverter.convertNodeId2CrossingId(link.getToNode().getId())); //The node id of the matsim network gives the crossing id
-			Link backLink = this.getBackLink(link);
-			Id backLinkId = (backLink == null) ?  null : backLink.getId();
-			DgCrossingNode inLinkToNode = crossing.getNodes().get(this.idConverter.convertLinkId2ToCrossingNodeId(link.getId()));
-			LanesToLinkAssignment20 l2l = lanes.getLanesToLinkAssignments().get(link.getId());
-			//create crossing layout
-			if (signalizedLinks.contains(link.getId())){
-				log.debug("link: " + link.getId() + " is signalized...");
-				SignalSystemData system = this.getSignalSystem4SignalizedLinkId(signalsData.getSignalSystemsData(), link.getId());
-				this.createCrossing4SignalizedLink(crossing, link, inLinkToNode, backLinkId, l2l, system, signalsData);
-			}
-			else {
-				log.debug("link: " + link.getId() + " not signalized...");
-				this.createCrossing4NotSignalizedLink(crossing, link, inLinkToNode, backLinkId, l2l);
+			// lights and programs are only necessary for expanded crossings
+			if (!crossing.getType().equals(TtCrossingType.NOTEXPAND)){
+				//prepare some objects/data
+				Link backLink = this.getBackLink(link);
+				Id backLinkId = (backLink == null) ?  null : backLink.getId();
+				DgCrossingNode inLinkToNode = crossing.getNodes().get(this.idConverter.convertLinkId2ToCrossingNodeId(link.getId()));
+				LanesToLinkAssignment20 l2l = lanes.getLanesToLinkAssignments().get(link.getId());
+				//create crossing layout
+				if (signalizedLinks.contains(link.getId())){
+					log.debug("link: " + link.getId() + " is signalized...");
+					SignalSystemData system = this.getSignalSystem4SignalizedLinkId(signalsData.getSignalSystemsData(), link.getId());
+					this.createCrossing4SignalizedLink(crossing, link, inLinkToNode, backLinkId, l2l, system, signalsData);
+				}
+				else {
+					log.debug("link: " + link.getId() + " not signalized...");
+					this.createCrossing4NotSignalizedLink(crossing, link, inLinkToNode, backLinkId, l2l);
+				}
 			}
 		}
 		return ksnet;
 	}
 
 	
+	/**
+	 * creates crossings in ksNet for all nodes in the matsim network net.
+	 * if a node lies within the signals bounding box (i.e. should be expanded)
+	 * this method creates a corresponding crossing with the type "fixed" (if the node is signalized)
+	 * or "equalRank" (else) respectively. this crossing has no crossing nodes so far.
+	 * if a node lies outside the signals bounding box this method creates the complete crossing, 
+	 * which gets the type "notExpand" and a single crossing node.
+	 * 
+	 * @param ksNet
+	 * @param net
+	 */
 	private void convertNodes2Crossings(DgKSNetwork ksNet, Network net){
 		for (Node node : net.getNodes().values()){
 			DgCrossing crossing = new DgCrossing(this.idConverter.convertNodeId2CrossingId(node.getId()));
@@ -184,31 +198,60 @@ public class M2KS2010NetworkConverter {
 					crossing.setType(TtCrossingType.EQUALRANK);
 				}
 			}
-			else{
+			else{ // node is outside the signals bounding box
 				crossing.setType(TtCrossingType.NOTEXPAND);
+				// create and add the single crossing node of the not expanded crossing
+				DgCrossingNode crossingNode = new DgCrossingNode(this.idConverter.convertNodeId2NotExpandedCrossingNodeId(node.getId()));
+				crossingNode.setCoordinate(node.getCoord());
+				crossing.addNode(crossingNode);
 			}
 			
 			ksNet.addCrossing(crossing);			
 		}
 	}
 	
+	/**
+	 * creates streets in ksnet for all links in the matsim network net.
+	 * if a from or to node of a link lies within the signals bounding box (i.e. should be expanded) 
+	 * this method creates a new crossing node for this street in the expanded network ksnet.
+	 * if a node lies outside the signals bounding box the single crossing node for the not expanded crossing 
+	 * already exists (see convertNodes2Crossings(...)) and is used by this method to create the street.
+	 * 
+	 * @param ksnet
+	 * @param net
+	 */
 	private void convertLinks2Streets(DgKSNetwork ksnet, Network net){
+		
 		for (Link link : net.getLinks().values()){
 			Node mFromNode = link.getFromNode();
 			Node mToNode = link.getToNode();
 			Tuple<Coord, Coord> startEnd = this.scaleLinkCoordinates(link.getLength(), mFromNode.getCoord(), mToNode.getCoord());
 
-			// create from node
+			// get from node
 			DgCrossing fromNodeCrossing = ksnet.getCrossings().get(this.idConverter.convertNodeId2CrossingId(mFromNode.getId()));
-			DgCrossingNode fromNode = new DgCrossingNode(this.idConverter.convertLinkId2FromCrossingNodeId(link.getId()));
-			fromNode.setCoordinate(startEnd.getFirst());
-			fromNodeCrossing.addNode(fromNode);
+			DgCrossingNode fromNode;
+			// create from node for expanded crossings
+			if (!fromNodeCrossing.getType().equals(TtCrossingType.NOTEXPAND)){
+				fromNode = new DgCrossingNode(this.idConverter.convertLinkId2FromCrossingNodeId(link.getId()));
+				fromNode.setCoordinate(startEnd.getFirst());
+				fromNodeCrossing.addNode(fromNode);
+			}
+			else{ // node for not expanded crossing already exists
+				fromNode = fromNodeCrossing.getNodes().get(this.idConverter.convertNodeId2NotExpandedCrossingNodeId(mFromNode.getId()));
+			}
 			
-			// create to node
+			// get to node
 			DgCrossing toNodeCrossing = ksnet.getCrossings().get(this.idConverter.convertNodeId2CrossingId(mToNode.getId()));
-			DgCrossingNode toNode = new DgCrossingNode(this.idConverter.convertLinkId2ToCrossingNodeId(link.getId()));
-			toNode.setCoordinate(startEnd.getSecond());
-			toNodeCrossing.addNode(toNode);
+			DgCrossingNode toNode;
+			// create to node for expanded crossings
+			if (!toNodeCrossing.getType().equals(TtCrossingType.NOTEXPAND)){
+				toNode = new DgCrossingNode(this.idConverter.convertLinkId2ToCrossingNodeId(link.getId()));
+				toNode.setCoordinate(startEnd.getSecond());
+				toNodeCrossing.addNode(toNode);
+			}
+			else{ // node for not expanded crossing already exists
+				toNode = toNodeCrossing.getNodes().get(this.idConverter.convertNodeId2NotExpandedCrossingNodeId(mToNode.getId()));
+			}
 			
 			DgStreet street = new DgStreet(this.idConverter.convertLinkId2StreetId(link.getId()), fromNode, toNode);
 			double fsd = link.getLength() / link.getFreespeed();

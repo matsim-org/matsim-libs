@@ -72,13 +72,13 @@ public class TtMorningCommodityAsMatsimPopWriter {
 	}
 
 	private Activity createDrainAct(DgCommodity com) {
-		Activity drain = population.getFactory().createActivityFromLinkId("work", convertToCrossingId2LinkId(com.getDrainNodeId()));
+		Activity drain = population.getFactory().createActivityFromLinkId("work", com.getDrainLinkId());
 		drain.setEndTime(createEndTime(startTimeSecEveningPeak, endTimeSecEveningPeak));
 		return drain;
 	}
 
 	private Activity createSourceAct(DgCommodity com, boolean endActivity) {
-		Activity source = population.getFactory().createActivityFromLinkId("home", convertFromCrossingId2LinkId(com.getSourceNodeId()));
+		Activity source = population.getFactory().createActivityFromLinkId("home", com.getSourceLinkId());
 		if (!endActivity){
 			source.setEndTime(createEndTime(startTimeSecMorningPeak, endTimeSecMorningPeak));
 		}
@@ -90,19 +90,4 @@ public class TtMorningCommodityAsMatsimPopWriter {
 		double r = Math.random();
 		return minTime + r*(maxTime-minTime);
 	}
-
-	private Id convertFromCrossingId2LinkId(Id crossingId) {
-		Integer integerId = Integer.parseInt(crossingId.toString());
-		Id symbolicId = idConverter.getSymbolicId(integerId);
-		Id linkId = idConverter.convertFromCrossingNodeId2LinkId(symbolicId);
-		return linkId;
-	}
-	
-	private Id convertToCrossingId2LinkId(Id crossingId) {
-		Integer integerId = Integer.parseInt(crossingId.toString());
-		Id symbolicId = idConverter.getSymbolicId(integerId);
-		Id linkId = idConverter.convertToCrossingNodeId2LinkId(symbolicId);
-		return linkId;
-	}
-
 }
