@@ -26,6 +26,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +52,7 @@ public class CarTripInfoWriter {
 		file.mkdirs();
 	}
 
-	public void writeResults1() {
+	public void writeDetailedResults() {
 		
 		String fileName = this.outputFolder + "/monetary_amounts_trip_infos.csv";
 		File file = new File(fileName);
@@ -66,12 +67,16 @@ public class CarTripInfoWriter {
 			bw.write("amount per trip;departure time [sec];person Id;distance [m]");
 			bw.newLine();
 			
-			// all trips (different number of trips possible
-			for (Id id : this.handler.getPersonId2listOfAmounts().keySet()) {
-				List<Double> fares = this.handler.getPersonId2listOfAmounts().get(id);
-				List<Double> departureTimes = this.handler.getPersonId2listOfDepartureTimes().get(id);
-				List<Double> distances = this.handler.getPersonId2listOfDistances().get(id);
-				int numberOfTrips = this.handler.getPersonId2NumberOfTrips().get(id);
+			Map<Id,List<Double>> personId2listOfAmounts = this.handler.getPersonId2listOfAmounts();
+			Map<Id,List<Double>> personId2listOfDepartureTimes = this.handler.getPersonId2listOfDepartureTimes();
+			Map<Id,List<Double>> personId2listOfDistances = this.handler.getPersonId2listOfDistances();
+			Map<Id,Integer> personId2numberOfTrips = this.handler.getPersonId2NumberOfTrips();
+			
+			for (Id id : personId2listOfAmounts.keySet()) {
+				List<Double> fares = personId2listOfAmounts.get(id);
+				List<Double> departureTimes = personId2listOfDepartureTimes.get(id);
+				List<Double> distances = personId2listOfDistances.get(id);
+				int numberOfTrips = personId2numberOfTrips.get(id);
 				for(int i = 0 ; i < numberOfTrips ; i++){
 					double fare = fares.get(i);
 					double departureTime = departureTimes.get(i);
@@ -89,7 +94,7 @@ public class CarTripInfoWriter {
 		}
 	}
 	
-	public void writeAvgAmounts() {
+	public void writeResultsTime() {
 		String fileName = this.outputFolder + "/avg_amount_per_trip_departure_time.csv";
 		File file = new File(fileName);
 		Map<Double, Double> x2avgAmount = this.handler.getAvgAmountPerTripDepartureTime();
@@ -118,7 +123,7 @@ public class CarTripInfoWriter {
 		}	
 	}
 	
-	public void writeAvgFares3() {
+	public void writeResultsDistance() {
 		String fileName = this.outputFolder + "/avg_amount_per_trip_distance.csv";
 		File file = new File(fileName);
 		Map<Double, Double> x2avgAmount = this.handler.getAvgAmountPerTripDistance();

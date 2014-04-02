@@ -63,9 +63,9 @@ public class ExtCostMain {
 		log.info("Writing output files...");
 
 		CarTripInfoWriter writer = new CarTripInfoWriter(handler, outputFolder);
-		writer.writeResults1();
-		writer.writeAvgAmounts();
-		writer.writeAvgFares3();
+		writer.writeDetailedResults();
+		writer.writeResultsTime();
+		writer.writeResultsDistance();
 		
 		log.info("Writing output files... Done.");
 
