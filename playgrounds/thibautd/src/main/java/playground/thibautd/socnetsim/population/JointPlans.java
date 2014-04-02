@@ -32,8 +32,8 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
  * Using the {@link JointPlanFactory} to create instances of individual
  * plans will allow to cache the JointPlan in the Plan instance,
  * avoiding expensive Map lookups.
- * Howerver, <b>this makes the behavior when using several JointPlan containers
- * ill-defined!</b>
+ * <br>
+ * The caching procedure is able to cope with various instances of jointPlan.
  *
  * @author thibautd
  */
@@ -43,10 +43,13 @@ public class JointPlans implements MatsimToplevelContainer {
 	private final Map<Plan, JointPlan> planToJointPlan = new ConcurrentHashMap<Plan, JointPlan>();
 
 	private final JointPlanFactory factory = new JointPlanFactory();
+
+	private static int globalInstanceCount = 0;
+	private final int instanceId = globalInstanceCount++;
 	
 	public JointPlan getJointPlan(final Plan indivPlan) {
 		if ( indivPlan instanceof PlanWithCachedJointPlan ) {
-			return ((PlanWithCachedJointPlan) indivPlan).getJointPlan();
+			return ((PlanWithCachedJointPlan) indivPlan).getJointPlan( instanceId );
 		}
 		return planToJointPlan.get( indivPlan );
 	}
@@ -57,7 +60,7 @@ public class JointPlans implements MatsimToplevelContainer {
 				if ( indivPlan instanceof PlanWithCachedJointPlan ) {
 					final PlanWithCachedJointPlan withCache = (PlanWithCachedJointPlan) indivPlan;
 
-					if (withCache.getJointPlan() != jointPlan) throw new PlanLinkException( withCache.getJointPlan()+" differs from "+indivPlan );
+					if (withCache.getJointPlan( instanceId ) != jointPlan) throw new PlanLinkException( withCache.getJointPlan( instanceId )+" differs from "+indivPlan );
 
 					withCache.resetJointPlan();
 				}
@@ -75,12 +78,12 @@ public class JointPlans implements MatsimToplevelContainer {
 				if ( indivPlan instanceof PlanWithCachedJointPlan ) {
 					final PlanWithCachedJointPlan withCache = (PlanWithCachedJointPlan) indivPlan;
 
-					if ( withCache.getJointPlan() != null && withCache.getJointPlan() != jointPlan) {
-						throw new PlanLinkException( withCache.getJointPlan()+" was associated to "+indivPlan+
+					if ( withCache.getJointPlan( instanceId ) != null && withCache.getJointPlan( instanceId ) != jointPlan) {
+						throw new PlanLinkException( withCache.getJointPlan( instanceId )+" was associated to "+indivPlan+
 								" while trying to associate "+jointPlan );
 					}
 
-					withCache.setJointPlan( jointPlan );
+					withCache.setJointPlan( instanceId , jointPlan );
 				}
 				else {
 					final Object removed = planToJointPlan.put( indivPlan , jointPlan );
@@ -97,7 +100,7 @@ public class JointPlans implements MatsimToplevelContainer {
 		synchronized (jointPlan) {
 			for (Plan indivPlan : jointPlan.getIndividualPlans().values()) {
 				if ( indivPlan instanceof PlanWithCachedJointPlan ) {
-					if ( ((PlanWithCachedJointPlan) indivPlan).getJointPlan() == jointPlan ) {
+					if ( ((PlanWithCachedJointPlan) indivPlan).getJointPlan( instanceId ) == jointPlan ) {
 						return true;
 					}
 				}
@@ -128,7 +131,5 @@ public class JointPlans implements MatsimToplevelContainer {
 			super( msg );
 		}
 	}
-
-
 }
 

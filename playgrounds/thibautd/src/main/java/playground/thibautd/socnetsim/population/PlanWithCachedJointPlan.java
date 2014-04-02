@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.population;
 
+import java.util.Arrays;
+
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PlanImpl;
 
@@ -30,28 +32,40 @@ import org.matsim.core.population.PlanImpl;
  */
 final class PlanWithCachedJointPlan extends PlanImpl {
 	private boolean jointPlanSet = false;
-	private JointPlan jointPlan = null;
+
+	private JointPlan[] jointPlans = null;
 
 	public PlanWithCachedJointPlan( final Person person ) {
 		super( person );
 	}
 
-	public JointPlan getJointPlan() {
-		return jointPlan;
+	public JointPlan getJointPlan(final int containerId ) {
+		if ( jointPlans == null ) return null;
+		if ( jointPlans.length - 1 < containerId ) return null;
+		return jointPlans[ containerId ];
 	}
 
-	public void setJointPlan(final JointPlan jp) {
+	public void setJointPlan(
+			final int containerId,
+			final JointPlan jp) {
+		if ( jointPlans == null ) {
+			jointPlans = new JointPlan[ containerId  + 1 ];
+		}
+		else if ( jointPlans.length - 1 < containerId ) {
+			jointPlans = Arrays.copyOf( jointPlans , containerId + 1 );
+		}
+
 		// check if this was already called
-		if ( this.jointPlanSet && jp != this.jointPlan ) throw new IllegalStateException();
-		this.jointPlan = jp;
-		this.jointPlanSet = true;
+		if ( this.jointPlans[ containerId ] != null &&
+				jp != this.jointPlans[ containerId ] ) throw new IllegalStateException();
+
+		this.jointPlans[ containerId ] = jp;
 	}
 
 	// should not be useful, but necessary for the remove method of JointPlans
 	// to be well behaved
 	public void resetJointPlan() {
-		this.jointPlan = null;
-		this.jointPlanSet = false;
+		this.jointPlans = null;
 	}
 }
 
