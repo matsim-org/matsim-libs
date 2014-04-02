@@ -74,51 +74,23 @@ public class ExtCostEventHandler implements PersonDepartureEventHandler, LinkEnt
 	}
 
 	@Override
-	public void handleEvent(PersonMoneyEvent event) {
-		
-		if(personId2tripNumber2amount.containsKey(event.getPersonId())){
-			// already at least one personMoneyEvent handled for this person
-			double amount = event.getAmount();
-			double eventTime = event.getTime();
-			int x = 0;
-			for(int i : personId2tripNumber2departureTime.get(event.getPersonId()).keySet()){
-				if(eventTime > (personId2tripNumber2departureTime.get(event.getPersonId()).get(i))){
-					x = i;
-				}else{
-				}
-			}
-			int tripNumber = x;
-			
-			if(personId2tripNumber2amount.get(event.getPersonId()).containsKey(tripNumber)){
-				// already at least one personMoneyEvent handled for this trip of this person
-				double amountBefore = personId2tripNumber2amount.get(event.getPersonId()).get(tripNumber);
-				double updatedAmount = amountBefore + amount;
-				Map<Integer,Double> tripNumber2amount = personId2tripNumber2amount.get(event.getPersonId());
-				tripNumber2amount.put(tripNumber, updatedAmount);
-				personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
+	public void handleEvent(PersonMoneyEvent event) {	
+		double amount = event.getAmount();
+		double eventTime = event.getTime();
+		int x = 1;
+		for(int i : personId2tripNumber2departureTime.get(event.getPersonId()).keySet()){
+			if(eventTime > (personId2tripNumber2departureTime.get(event.getPersonId()).get(i))){
+				x = i;
 			}else{
-				// handling the first PersonMoneyEvent of this trip of this person
-				Map<Integer,Double> tripNumber2amount = personId2tripNumber2amount.get(event.getPersonId());
-				tripNumber2amount.put(tripNumber, amount);
-				personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
 			}
-		}else{
-			// handling the first personMoneyEvent for this person
-			double amount = event.getAmount();
-			double eventTime = event.getTime();
-			int x = 0;
-			for(int i : personId2tripNumber2departureTime.get(event.getPersonId()).keySet()){
-				if(eventTime > (personId2tripNumber2departureTime.get(event.getPersonId()).get(i))){
-					x = i;
-				}else{
-				}
-			}
-			int tripNumber = x;
-			
-			Map<Integer,Double> tripNumber2amount = new HashMap<Integer, Double>();
-			tripNumber2amount.put(tripNumber, amount);
-			personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
 		}
+		int tripNumber = x;
+			
+		double amountBefore = personId2tripNumber2amount.get(event.getPersonId()).get(tripNumber);
+		double updatedAmount = amountBefore + amount;
+		Map<Integer,Double> tripNumber2amount = personId2tripNumber2amount.get(event.getPersonId());
+		tripNumber2amount.put(tripNumber, updatedAmount);
+		personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
 	}
 
 	@Override
@@ -332,6 +304,10 @@ public class ExtCostEventHandler implements PersonDepartureEventHandler, LinkEnt
 				Map<Integer,Double> tripNumber2tripDistance = personId2tripNumber2tripDistance.get(event.getPersonId());
 				tripNumber2tripDistance.put(personId2actualTripNumber.get(event.getPersonId()), 0.0);
 				personId2tripNumber2tripDistance.put(event.getPersonId(), tripNumber2tripDistance);
+				
+				Map<Integer,Double> tripNumber2amount = personId2tripNumber2amount.get(event.getPersonId());
+				tripNumber2amount.put(personId2actualTripNumber.get(event.getPersonId()), 0.0);
+				personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
 			}else{
 				// This is the first trip of the person
 				personId2actualTripNumber.put(event.getPersonId(), 1);
@@ -341,6 +317,10 @@ public class ExtCostEventHandler implements PersonDepartureEventHandler, LinkEnt
 				Map<Integer,Double> tripNumber2tripDistance = new HashMap<Integer, Double>();
 				tripNumber2tripDistance.put(1, 0.0);
 				personId2tripNumber2tripDistance.put(event.getPersonId(), tripNumber2tripDistance);
+				
+				Map<Integer,Double> tripNumber2amount = new HashMap<Integer, Double>();
+				tripNumber2amount.put(1, 0.0);
+				personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
 			}
 		}
 	}
