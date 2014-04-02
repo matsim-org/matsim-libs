@@ -295,7 +295,7 @@ public class ControllerRegistryBuilder {
 	public PlanLinkIdentifier getWeakPlanLinkIdentifier() {
 		if ( weakPlanLinkIdentifier == null ) {
 			this.weakPlanLinkIdentifier =
-				PlanLinkIdentifierUtils.createPlanLinkIdentifier(
+				PlanLinkIdentifierUtils.createWeakPlanLinkIdentifier(
 						scenario );
 		}
 		return weakPlanLinkIdentifier;

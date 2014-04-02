@@ -49,15 +49,57 @@ public class PlanLinkIdentifierUtils {
 
 		id.addAndComponent( new SocialNetworkPlanLinkIdentifier( socialNetwork ) );
 
-		if ( conf.getLinkJointTrips() ) {
+		if ( conf.getLinkJointTrips().isWeak() ) {
 			id.addOrComponent( new JointTripsPlanLinkIdentifier() );
 		}
 
-		if ( conf.getLinkVehicles() ) {
+		if ( conf.getLinkVehicles().isWeak() ) {
 			id.addOrComponent( new VehicularPlanBasedIdentifier() );
 		}
 
-		if ( conf.getLinkJoinableActivities() ) {
+		if ( conf.getLinkJoinableActivities().isWeak() ) {
+			for ( String activityType : conf.getJoinableTypes() ) {
+				id.addOrComponent( new JoinableActivitiesPlanLinkIdentifier( activityType ) );
+			}
+		}
+
+		return id;
+	}
+	
+	public static PlanLinkIdentifier createWeakPlanLinkIdentifier(
+			final Scenario scenario ) {
+		final PlanLinkConfigGroup configGroup = (PlanLinkConfigGroup)
+			scenario.getConfig().getModule( PlanLinkConfigGroup.GROUP_NAME );
+		return PlanLinkIdentifierUtils.createWeakPlanLinkIdentifier(
+					configGroup,
+					(SocialNetwork) scenario.getScenarioElement(
+						SocialNetwork.ELEMENT_NAME ) );
+	}
+	
+	/**
+	 * The "weak" identifier only considers strong links!
+	 * (The name should be changed)
+	 * @param conf
+	 * @param socialNetwork
+	 * @return
+	 */
+	public static PlanLinkIdentifier createWeakPlanLinkIdentifier(
+			final PlanLinkConfigGroup conf,
+			final SocialNetwork socialNetwork) {
+		final CompositePlanLinkIdentifier id =
+			new CompositePlanLinkIdentifier();
+
+		id.addAndComponent( new SocialNetworkPlanLinkIdentifier( socialNetwork ) );
+
+		if ( conf.getLinkJointTrips().isStrong() ) {
+			id.addOrComponent( new JointTripsPlanLinkIdentifier() );
+		}
+
+		if ( conf.getLinkVehicles().isStrong() ) {
+			id.addOrComponent( new VehicularPlanBasedIdentifier() );
+		}
+
+		if ( conf.getLinkJoinableActivities().isStrong() ) {
 			for ( String activityType : conf.getJoinableTypes() ) {
 				id.addOrComponent( new JoinableActivitiesPlanLinkIdentifier( activityType ) );
 			}

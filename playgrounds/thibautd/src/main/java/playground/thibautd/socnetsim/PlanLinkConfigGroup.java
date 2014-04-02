@@ -33,9 +33,30 @@ import org.matsim.core.utils.collections.CollectionUtils;
 public class PlanLinkConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME = "planLinkIdentifier";
 
-	private boolean linkJointTrips = true;
-	private boolean linkVehicles = true;
-	private boolean linkJoinableActivities = true;
+	public static enum LinkStrength {
+		strong( true , true ), // a strong link is also weak
+		weak( false , true ),
+		none( false , false );
+
+		private final boolean isStrong, isWeak;
+
+		private LinkStrength( final boolean strong , final boolean weak ) {
+			this.isStrong = strong;
+			this.isWeak = weak;
+		}
+
+		public boolean isStrong() {
+			return this.isStrong;
+		}
+
+		public boolean isWeak() {
+			return this.isWeak;
+		}
+	}
+
+	private LinkStrength linkJointTrips = LinkStrength.strong;
+	private LinkStrength linkVehicles = LinkStrength.weak;
+	private LinkStrength linkJoinableActivities = LinkStrength.weak;
 	private final Set<String> joinableTypes = new TreeSet<String>( Collections.singleton( "leisure" ) );
 
 	public PlanLinkConfigGroup() {
@@ -43,32 +64,32 @@ public class PlanLinkConfigGroup extends ReflectiveModule {
 	}
 
 	@StringGetter( "linkJointTrips" )
-	public boolean getLinkJointTrips() {
+	public LinkStrength getLinkJointTrips() {
 		return this.linkJointTrips;
 	}
 
 	@StringSetter( "linkJointTrips" )
-	public void setLinkJointTrips(boolean linkJointTrips) {
+	public void setLinkJointTrips(LinkStrength linkJointTrips) {
 		this.linkJointTrips = linkJointTrips;
 	}
 
 	@StringGetter( "linkVehicles" )
-	public boolean getLinkVehicles() {
+	public LinkStrength getLinkVehicles() {
 		return this.linkVehicles;
 	}
 
 	@StringSetter( "linkVehicles" )
-	public void setLinkVehicles(boolean linkVehicles) {
+	public void setLinkVehicles(LinkStrength linkVehicles) {
 		this.linkVehicles = linkVehicles;
 	}
 
 	@StringGetter( "linkJoinableActivities" )
-	public boolean getLinkJoinableActivities() {
+	public LinkStrength getLinkJoinableActivities() {
 		return this.linkJoinableActivities;
 	}
 
 	@StringSetter( "linkJoinableActivities" )
-	public void setLinkJoinableActivities(boolean linkJoinableActivities) {
+	public void setLinkJoinableActivities(LinkStrength linkJoinableActivities) {
 		this.linkJoinableActivities = linkJoinableActivities;
 	}
 
