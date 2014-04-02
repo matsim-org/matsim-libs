@@ -116,6 +116,90 @@ public class JointPlansTest {
 				gotException);
 	}
 
+	@Test
+	public void testAddAndGetSeveralInstancesWithCache( ) {
+		testAddAndGetSeveralInstances( true );
+	}
+
+	@Test
+	public void testAddAndGetSeveralInstancesWithoutCache( ) {
+		testAddAndGetSeveralInstances( false );
+	}
+
+	private static void testAddAndGetSeveralInstances( final boolean withCache ) {
+		final Plan p1 = createPlan( new PersonImpl( new IdImpl( 1 ) ) , withCache );
+		final Plan p2 = createPlan( new PersonImpl( new IdImpl( 2 ) ) , withCache );
+
+		final Map<Id, Plan> jp = new HashMap<Id, Plan>();
+		jp.put( p1.getPerson().getId() , p1 );
+		jp.put( p2.getPerson().getId() , p2 );
+
+		final JointPlans jointPlans1 = new JointPlans();
+		final JointPlan jointPlan1 = jointPlans1.getFactory().createJointPlan( jp );
+		jointPlans1.addJointPlan( jointPlan1 );
+			
+		final JointPlans jointPlans2 = new JointPlans();
+		final JointPlan jointPlan2 = jointPlans2.getFactory().createJointPlan( jp );
+		jointPlans2.addJointPlan( jointPlan2 );
+
+		final JointPlans jointPlans3 = new JointPlans();
+		final JointPlan jointPlan3 = jointPlans3.getFactory().createJointPlan( jp );
+		jointPlans3.addJointPlan( jointPlan3 );
+
+		final JointPlans jointPlans4 = new JointPlans();
+		final JointPlan jointPlan4 = jointPlans4.getFactory().createJointPlan( jp );
+		jointPlans4.addJointPlan( jointPlan4 );
+
+		final JointPlans jointPlans5 = new JointPlans();
+		final JointPlan jointPlan5 = jointPlans5.getFactory().createJointPlan( jp );
+		jointPlans5.addJointPlan( jointPlan5 );
+
+		Assert.assertSame(
+				"wrong joint plan 1 for person 1",
+				jointPlan1,
+				jointPlans1.getJointPlan( p1 ) );
+		Assert.assertSame(
+				"wrong joint plan 1 for person 2",
+				jointPlan1,
+				jointPlans1.getJointPlan( p2 ) );
+
+		Assert.assertSame(
+				"wrong joint plan 2 for person 1",
+				jointPlan2,
+				jointPlans2.getJointPlan( p1 ) );
+		Assert.assertSame(
+				"wrong joint plan 2 for person 2",
+				jointPlan2,
+				jointPlans2.getJointPlan( p2 ) );
+
+		Assert.assertSame(
+				"wrong joint plan 3 for person 1",
+				jointPlan3,
+				jointPlans3.getJointPlan( p1 ) );
+		Assert.assertSame(
+				"wrong joint plan 3 for person 2",
+				jointPlan3,
+				jointPlans3.getJointPlan( p2 ) );
+
+		Assert.assertSame(
+				"wrong joint plan 4 for person 1",
+				jointPlan4,
+				jointPlans4.getJointPlan( p1 ) );
+		Assert.assertSame(
+				"wrong joint plan 4 for person 2",
+				jointPlan4,
+				jointPlans4.getJointPlan( p2 ) );
+
+		Assert.assertSame(
+				"wrong joint plan 5 for person 1",
+				jointPlan5,
+				jointPlans5.getJointPlan( p1 ) );
+		Assert.assertSame(
+				"wrong joint plan 5 for person 2",
+				jointPlan5,
+				jointPlans5.getJointPlan( p2 ) );
+	}
+
 	private static Plan createPlan( final Person person , final boolean withCache ) {
 		if ( withCache ) return new PlanWithCachedJointPlan( person );
 		else return new PlanImpl( person );
