@@ -56,6 +56,7 @@ import playground.thibautd.socnetsim.replanning.strategies.ParetoExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.RandomGroupPlanSelectorStrategyFactory;
 import playground.thibautd.socnetsim.replanning.strategies.RandomJointLocationChoiceStrategyFactory;
 import playground.thibautd.socnetsim.replanning.strategies.RandomSumGroupPlanSelectorStrategyFactory;
+import playground.thibautd.socnetsim.replanning.strategies.WeakSelectorFactory;
 
 /**
  * @author thibautd
@@ -147,6 +148,13 @@ public class GroupPlanStrategyFactoryRegistry {
 		addSelectorAndStrategyFactory(
 				"RandomSumSelection",
 				new RandomSumGroupPlanSelectorStrategyFactory() );
+
+		// "Weak" versions of selectors (for configurable selection strategies)
+		// ---------------------------------------------------------------------
+		addSelectorFactory(
+				"WeakRandomSelection",
+				new WeakSelectorFactory(
+					new RandomGroupPlanSelectorStrategyFactory() ) );
 
 		// default removers
 		// ---------------------------------------------------------------------
