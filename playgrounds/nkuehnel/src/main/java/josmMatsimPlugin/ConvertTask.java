@@ -1,9 +1,15 @@
 package josmMatsimPlugin;
 
+import static org.openstreetmap.josm.tools.I18n.tr;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.WindowConstants;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -28,7 +34,7 @@ import org.openstreetmap.josm.io.OsmTransferException;
 import org.xml.sax.SAXException;
 
 public class ConvertTask extends PleaseWaitRunnable {
-	
+
 	private NetworkLayer newLayer;
 
 	public ConvertTask() {
@@ -38,7 +44,7 @@ public class ConvertTask extends PleaseWaitRunnable {
 	@Override
 	protected void cancel() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -46,24 +52,30 @@ public class ConvertTask extends PleaseWaitRunnable {
 			OsmTransferException {
 		this.progressMonitor.setTicksCount(6);
 		this.progressMonitor.setTicks(0);
-		
+
 		Layer layer = Main.main.getActiveLayer();
-		
+
 		Network tempNetwork = NetworkImpl.createNetwork();
 		Network network = NetworkImpl.createNetwork();
-		
+
 		String convertSystem = Main.pref.get("matsim_convertSystem", "WGS84");
 		CoordinateTransformation ctOut = TransformationFactory
 				.getCoordinateTransformation(TransformationFactory.WGS84,
 						convertSystem);
-		Converter converter = new Converter(
-				((OsmDataLayer) layer).data, tempNetwork);
+		Converter converter;
+		if (Main.pref.getBoolean("matsim_filterActive", false)) {
+			OsmFilter filter = new OsmFilter(null, null, Main.pref.getInteger(
+					"matsim_filter_hierarchy", 6));
+			converter = new Converter(((OsmDataLayer) layer).data, tempNetwork,
+					filter);
+		} else {
+			converter = new Converter(((OsmDataLayer) layer).data, tempNetwork);
+		}
 		this.progressMonitor.setTicks(1);
 		this.progressMonitor.setCustomText("converting osm data..");
 		converter.convert();
 		if (!(convertSystem.equals(TransformationFactory.WGS84))) {
-			for (Node node : ((NetworkImpl) tempNetwork).getNodes()
-					.values()) {
+			for (Node node : ((NetworkImpl) tempNetwork).getNodes().values()) {
 				Coord temp = ctOut.transform(node.getCoord());
 				node.getCoord().setXY(temp.getX(), temp.getY());
 			}
@@ -73,7 +85,7 @@ public class ConvertTask extends PleaseWaitRunnable {
 			this.progressMonitor.setCustomText("cleaning network..");
 			new NetworkCleaner().run(tempNetwork);
 		}
-		
+
 		this.progressMonitor.setTicks(3);
 		this.progressMonitor.setCustomText("preparing new layer..");
 		DataSet dataSet = new DataSet();
@@ -81,7 +93,6 @@ public class ConvertTask extends PleaseWaitRunnable {
 				.getCoordinateTransformation(convertSystem,
 						TransformationFactory.WGS84);
 
-		
 		HashMap<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
 		HashMap<Node, org.openstreetmap.josm.data.osm.Node> node2OsmNode = new HashMap<Node, org.openstreetmap.josm.data.osm.Node>();
 		this.progressMonitor.setTicks(4);
@@ -154,10 +165,9 @@ public class ConvertTask extends PleaseWaitRunnable {
 		this.progressMonitor.setTicks(6);
 		this.progressMonitor.setCustomText("creating layer..");
 
-		newLayer = new NetworkLayer(dataSet, null,
-				null, network, convertSystem, way2Links);
-		
-		
+		newLayer = new NetworkLayer(dataSet, null, null, network,
+				convertSystem, way2Links);
+
 	}
 
 	@Override

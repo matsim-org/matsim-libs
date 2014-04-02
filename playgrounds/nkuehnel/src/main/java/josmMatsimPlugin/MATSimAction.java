@@ -3,14 +3,22 @@ package josmMatsimPlugin;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -23,8 +31,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.JosmAction;
+import org.openstreetmap.josm.data.coor.EastNorth;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.gui.SelectionManager;
+import org.openstreetmap.josm.gui.SelectionManager.SelectionEnded;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.tools.Shortcut;
@@ -115,7 +126,9 @@ public class MATSimAction {
 		}
 	}
 	
-	public class ConvertAction extends JosmAction {
+	public static class ConvertAction extends JosmAction implements SelectionEnded {
+		
+		public static JDialog dlg;
 
 		public ConvertAction() {
 			super(tr("Convert to MATSim Network"), null, tr("Convert Osm layer to MATSim network layer"),
@@ -128,9 +141,27 @@ public class MATSimAction {
 		public void actionPerformed(ActionEvent e) {
 			Layer activeLayer = Main.main.getActiveLayer();
 			if (activeLayer instanceof OsmDataLayer && !(activeLayer instanceof NetworkLayer) ) {
-				ConvertTask task = new ConvertTask();
+				ConvertTask task;
+				
+				SelectionManager manager = new SelectionManager(this, false, Main.map.mapView);
+				manager.register(Main.map.mapView, false);
+				task = new ConvertTask();
 				task.run();
 			}
 		}
+
+		@Override
+		public void selectionEnded(Rectangle rec, MouseEvent arg1) {
+			System.out.println("Punkt 1: "+ Main.map.mapView.getLatLon(rec.getMinX(), rec.getMinY()));
+			System.out.println("Punkt 2: "+ Main.map.mapView.getLatLon(rec.getMaxX(), rec.getMaxY()));
+		}
 	}
+	
+		
+		
+		
+		
+		
+		
+		
 }

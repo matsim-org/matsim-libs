@@ -27,9 +27,9 @@ public class OsmFilter
 		{
 			return false;
 		}
-
-		return ((this.coordNW.getX() < coord.getX() && coord.getX() < this.coordSE
-				.getX()) && (this.coordNW.getY() > coord.getY() && coord
-				.getY() > this.coordSE.getY()));
+		return true;
+//		return ((this.coordNW.getX() < coord.getX() && coord.getX() < this.coordSE
+//				.getX()) && (this.coordNW.getY() > coord.getY() && coord
+//				.getY() > this.coordSE.getY()));
 	}
 }

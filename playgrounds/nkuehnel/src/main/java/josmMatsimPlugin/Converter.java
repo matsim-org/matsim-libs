@@ -66,6 +66,13 @@ public class Converter implements PreferenceChangedListener {
 
 	private DataSet dataSet;
 
+	public Converter(DataSet dataSet, Network network, OsmFilter filter) {
+		this.dataSet = dataSet;
+		this.network = network;
+		this.highwayDefaults = OsmConvertDefaults.getDefaults();
+		this.hierarchyLayers.add(filter);
+	}
+	
 	public Converter(DataSet dataSet, Network network) {
 		this.dataSet = dataSet;
 		this.network = network;

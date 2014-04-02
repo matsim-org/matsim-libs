@@ -5,14 +5,20 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.openstreetmap.josm.Main;
@@ -22,27 +28,22 @@ import org.openstreetmap.josm.gui.preferences.PreferenceSettingFactory;
 import org.openstreetmap.josm.gui.preferences.PreferenceTabbedPane;
 import org.openstreetmap.josm.gui.preferences.PreferenceTabbedPane.PreferencePanel;
 
+import com.kitfox.svg.Filter;
+
 public final class Preferences extends DefaultTabPreferenceSetting {
 
-	private static PreferencesActionListener listener = new PreferencesActionListener();
-
 	// Visualization tab
-	protected final static JCheckBox renderMatsim = new JCheckBox(
+	private final static JCheckBox renderMatsim = new JCheckBox(
 			"Activate MATSim Renderer");
-	protected final static JCheckBox showIds = new JCheckBox("Show Ids");
-	protected final static JSlider wayOffset = new JSlider(0, 100);
-	protected final static JLabel wayOffsetLabel = new JLabel("Link offset for overlapping links");
-	protected final static JCheckBox showInternalIds = new JCheckBox(
+	private final static JCheckBox showIds = new JCheckBox("Show Ids");
+	private final static JSlider wayOffset = new JSlider(0, 100);
+	private final static JLabel wayOffsetLabel = new JLabel(
+			"Link offset for overlapping links");
+	private final static JCheckBox showInternalIds = new JCheckBox(
 			"Show internal Ids in table");
-	protected final static JCheckBox keepPaths = new JCheckBox(
-			"Keep paths");
 
-	// Export tab
-	protected final static JCheckBox cleanNetwork = new JCheckBox(
-			"Clean network");
-
-	private JLabel targetCoordSystemLabel = new JLabel(
-			"Default Target coord system: ");
+	private final static JCheckBox keepPaths = new JCheckBox("Keep paths");
+	private final static JCheckBox cleanNetwork = new JCheckBox("Clean network");
 
 	protected static String[] coordSystems = { TransformationFactory.WGS84,
 			TransformationFactory.ATLANTIS, TransformationFactory.CH1903_LV03,
@@ -57,9 +58,14 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 			TransformationFactory.CH1903_LV03_GT,
 			TransformationFactory.WGS84_SVY21,
 			TransformationFactory.NAD83_UTM17N, TransformationFactory.WGS84_TM };
+
 	private JButton convertingDefaults = new JButton("Set converting defaults");
 
-	protected final static JComboBox coordSystem = new JComboBox(coordSystems);
+	protected final static JCheckBox filterActive = new JCheckBox(
+			"Activate Filter");
+	private final static JLabel hierarchyLabel = new JLabel(
+			"Only convert hierarchies up to: ");
+	final static JTextField hierarchyLayer = new JTextField();
 
 	public static class Factory implements PreferenceSettingFactory {
 		@Override
@@ -77,17 +83,8 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 		JPanel pnl = new JPanel(new GridBagLayout());
 		GridBagConstraints cOptions = new GridBagConstraints();
 
-		showIds.setActionCommand("showIds");
-		showIds.addActionListener(listener);
-
-		renderMatsim.setActionCommand("renderMatsim");
-		renderMatsim.addActionListener(listener);
-		
-		wayOffset.addChangeListener(listener);
-		wayOffset.setValue((int) ((Main.pref.getDouble("matsim_wayOffset", 0)) / 0.03));
-		
-		showInternalIds.setActionCommand("showInternalIds");
-		showInternalIds.addActionListener(listener);
+		wayOffset
+				.setValue((int) ((Main.pref.getDouble("matsim_wayOffset", 0)) / 0.03));
 
 		showIds.setSelected(Main.pref.getBoolean("matsim_showIds")
 				&& Main.pref.getBoolean("matsim_renderer"));
@@ -95,8 +92,9 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 		wayOffset.setEnabled(Main.pref.getBoolean("matsim_renderer"));
 		showIds.setEnabled(Main.pref.getBoolean("matsim_renderer"));
 		wayOffsetLabel.setEnabled(Main.pref.getBoolean("matsim_renderer"));
-		showInternalIds.setSelected(Main.pref.getBoolean("matsim_showInternalIds", false));
-		
+		showInternalIds.setSelected(Main.pref.getBoolean(
+				"matsim_showInternalIds", false));
+
 		cOptions.anchor = GridBagConstraints.NORTHWEST;
 
 		cOptions.insets = new Insets(4, 4, 4, 4);
@@ -109,18 +107,18 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 		cOptions.weightx = 1.0;
 		cOptions.weighty = 1.0;
 		pnl.add(showIds, cOptions);
-		
+
 		cOptions.gridx = 0;
 		cOptions.gridy = 1;
 		pnl.add(wayOffsetLabel, cOptions);
-		
+
 		cOptions.gridx = 1;
 		pnl.add(wayOffset, cOptions);
-		
+
 		cOptions.gridx = 0;
 		cOptions.gridy = 2;
 		pnl.add(showInternalIds, cOptions);
-		
+
 		return pnl;
 	}
 
@@ -130,20 +128,36 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 
 		cleanNetwork.setSelected(Main.pref.getBoolean("matsim_cleanNetwork",
 				true));
-		cleanNetwork.setActionCommand("cleanNetwork");
-		cleanNetwork.addActionListener(listener);
-		
-		keepPaths.setSelected(Main.pref.getBoolean("matsim_convertDefaults_keepPaths", false));
-		keepPaths.setActionCommand("keepPaths");
-		keepPaths.addActionListener(listener);
+		keepPaths.setSelected(Main.pref.getBoolean(
+				"matsim_convertDefaults_keepPaths", false));
+		convertingDefaults.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (e.getActionCommand().equals("convertDefaults")) {
+					OsmConvertDefaultsDialog dialog = new OsmConvertDefaultsDialog();
+					JOptionPane pane = new JOptionPane(dialog,
+							JOptionPane.PLAIN_MESSAGE,
+							JOptionPane.OK_CANCEL_OPTION);
+					dialog.setOptionPane(pane);
+					JDialog dlg = pane
+							.createDialog(Main.parent, tr("Defaults"));
+					dlg.setAlwaysOnTop(true);
+					dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+					dlg.setVisible(true);
+					if (pane.getValue() != null) {
+						if (((Integer) pane.getValue()) == JOptionPane.OK_OPTION) {
+							dialog.handleInput();
+						}
+					}
+					dlg.dispose();
+				}
+			}
+		});
 
-		coordSystem.setSelectedItem(Main.pref.get("matsim_convertSystem",
-				"WGS84"));
-		coordSystem.setActionCommand("convertSystem");
-		coordSystem.addActionListener(listener);
-
-		convertingDefaults.setActionCommand("convertDefaults");
-		convertingDefaults.addActionListener(listener);
+		filterActive.setSelected(Main.pref.getBoolean("matsim_filterActive",
+				false));
+		hierarchyLayer.setText(String.valueOf(Main.pref.getInteger(
+				"matsim_filter_hierarchy", 6)));
 
 		cOptions.anchor = GridBagConstraints.NORTHWEST;
 
@@ -152,12 +166,21 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 		cOptions.gridx = 0;
 		cOptions.gridy = 0;
 		pnl.add(cleanNetwork, cOptions);
-		
+
 		cOptions.gridy = 1;
 		pnl.add(keepPaths, cOptions);
 
 		cOptions.gridy = 2;
 		pnl.add(convertingDefaults, cOptions);
+
+		cOptions.gridy = 3;
+		pnl.add(filterActive, cOptions);
+
+		cOptions.gridy = 4;
+		pnl.add(hierarchyLabel, cOptions);
+		cOptions.gridx = 1;
+		pnl.add(hierarchyLayer, cOptions);
+
 		return pnl;
 	}
 
@@ -181,8 +204,43 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 
 	@Override
 	public boolean ok() {
-		// TODO Auto-generated method stub
+		if (!showIds.isSelected()) {
+			Main.pref.put("matsim_showIds", false);
+		} else {
+			Main.pref.put("matsim_showIds", true);
+		}
+		if (!renderMatsim.isSelected()) {
+			Main.pref.put("matsim_renderer", false);
+		} else {
+			Main.pref.put("matsim_renderer", true);
+		}
+		if (!cleanNetwork.isSelected()) {
+			Main.pref.put("matsim_cleanNetwork", false);
+		} else {
+			Main.pref.put("matsim_cleanNetwork", true);
+		}
+		if (showInternalIds.isSelected()) {
+			Main.pref.put("matsim_showInternalIds", true);
+		} else {
+			Main.pref.put("matsim_showInternalIds", false);
+		}
+		if (Preferences.keepPaths.isSelected()) {
+			Main.pref.put("matsim_convertDefaults_keepPaths", true);
+		} else {
+			Main.pref.put("matsim_convertDefaults_keepPaths", false);
+		}
+		if (filterActive.isSelected()) {
+			Main.pref.put("matsim_filterActive", true);
+		} else {
+			Main.pref.put("matsim_filterActive", false);
+		}
+		Main.pref.putInteger("matsim_filter_hierarchy",
+				Integer.parseInt(hierarchyLayer.getText()));
+		int temp = wayOffset.getValue();
+		double offset = ((double) temp) * 0.03;
+		Main.pref.putDouble("matsim_wayOffset", offset);
 		return false;
+
 	}
 
 }
