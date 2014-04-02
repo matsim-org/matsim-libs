@@ -84,7 +84,7 @@ public class GroupReplanningConfigGroup extends ReflectiveNonFlatModule {
 	private String locationChoiceActivityType = "leisure";
 	private String weightAttribute = null;
 	private String selectorForRemoval = "MinimumSum";
-	private String selectorForModification = "RandomSelection";
+	private String selectorForModification = "WeakRandomSelection";
 	private double internalizationRatio = 0;
 
 	private int maxPlansPerComposition = 5;
