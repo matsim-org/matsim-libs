@@ -88,7 +88,9 @@ public class PrepareVehicleAllocationForSimAlgorithm implements GenericPlanAlgor
 
 		final GroupPlans groupPlans = new GroupPlans( jps , ps );
 		allocateVehiclesAlgo.run( groupPlans );
-		recomposeJointPlansAlgo.run( groupPlans );
+		if ( recomposeJointPlansAlgo != null ) {
+			recomposeJointPlansAlgo.run( groupPlans );
+		}
 
 		for ( JointPlan jp : jps ) jointPlans.removeJointPlan( jp );
 		jointPlans.addJointPlans( groupPlans.getJointPlans() );
