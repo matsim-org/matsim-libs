@@ -60,6 +60,7 @@ public class PrepareVehicleAllocationForSimAlgorithm implements GenericPlanAlgor
 					true);
 
 		this.recomposeJointPlansAlgo =
+			planLinkIdentifier == null ? null :
 			new RecomposeJointPlanAlgorithm(
 					jointPlans.getFactory(),
 					planLinkIdentifier);

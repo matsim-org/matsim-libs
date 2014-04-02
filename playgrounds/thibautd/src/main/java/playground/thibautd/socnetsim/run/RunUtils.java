@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * 
  * RunUtils.java
  *                                                                         *
  * *********************************************************************** *
@@ -97,7 +97,6 @@ import playground.thibautd.socnetsim.replanning.GroupReplanningListenner;
 import playground.thibautd.socnetsim.replanning.GroupReplanningListennerWithPSimLoop;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
-import playground.thibautd.socnetsim.replanning.PlanLinkIdentifierUtils;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
@@ -473,9 +472,9 @@ public class RunUtils {
 									MatsimRandom.getLocalInstance(),
 									(JointPlans) scenario.getScenarioElement( JointPlans.ELEMENT_NAME ),
 									(VehicleRessources) scenario.getScenarioElement( VehicleRessources.ELEMENT_NAME ),
-									// not nice, but we cannot access the link identifier here...
-									PlanLinkIdentifierUtils.createPlanLinkIdentifier(
-											scenario ) );
+									// do not bother with plan links: it can cause problems,
+									// as it can let no individual plans...
+									null );
 					}
 
 					@Override
