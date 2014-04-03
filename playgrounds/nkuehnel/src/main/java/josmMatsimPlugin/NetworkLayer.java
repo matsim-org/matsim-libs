@@ -13,6 +13,7 @@ import java.util.Map;
 
 import javax.swing.Action;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.matsim.api.core.v01.network.Link;
@@ -52,7 +53,20 @@ public class NetworkLayer extends OsmDataLayer {
 		this.matsimNetwork = network;
 		this.coordSystem = coordSystem;
 		this.way2Links = way2Links;
-		data.addDataSetListener(new NetworkListener(this));
+		NetworkListener listener;
+		try {
+			listener = new NetworkListener(this);
+		} catch (IllegalArgumentException e) {
+			 JOptionPane.showMessageDialog(
+		                Main.parent,
+		                "Could not initialize network listener with the given coordinate system.\nChanges on layer data will NOT affect the network.",
+		                tr("Error"),
+		                JOptionPane.ERROR_MESSAGE);
+			 listener=null;
+		}
+		if (listener!=null) {
+			data.addDataSetListener(listener);
+		} 
 	}
 
 	public Map<Way, List<Link>> getWay2Links() {

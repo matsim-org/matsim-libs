@@ -43,6 +43,10 @@ public class ImportTask extends PleaseWaitRunnable {
 	public static final String WAY_TAG_ID = "id";
 	private NetworkLayer layer;
 	private String path;
+	private DataSet dataSet;
+	private Network network;
+	private String importSystem;
+	private HashMap<Way, List<Link>> way2Links;
 
 	public ImportTask(String path) {
 		super("MATSim Import");
@@ -68,6 +72,8 @@ public class ImportTask extends PleaseWaitRunnable {
 	protected void finish() {
 		// layer = null happens if Exception happens during import,
 		// as Exceptions are handled only after this method is called.
+		layer = new NetworkLayer(dataSet, ImportDialog.path.getText(),
+				new File(path), network, importSystem, way2Links);
 		if (layer != null) {
 			Main.main.addLayer(layer);
 			Main.map.mapView.setActiveLayer(layer);
@@ -85,8 +91,8 @@ public class ImportTask extends PleaseWaitRunnable {
 		this.progressMonitor.setTicksCount(4);
 		this.progressMonitor.setTicks(0);
 
-		DataSet dataSet = new DataSet();
-		String importSystem = (String) ImportDialog.importSystem
+		dataSet = new DataSet();
+		importSystem = (String) ImportDialog.importSystem
 				.getSelectedItem();
 		CoordinateTransformation ct = TransformationFactory
 				.getCoordinateTransformation(importSystem,
@@ -99,9 +105,9 @@ public class ImportTask extends PleaseWaitRunnable {
 		this.progressMonitor.setTicks(2);
 		this.progressMonitor.setCustomText("reading network xml..");
 		new MatsimNetworkReader(scenario).readFile(path);
-		Network network = NetworkImpl.createNetwork();
+		network = NetworkImpl.createNetwork();
 
-		HashMap<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
+		way2Links = new HashMap<Way, List<Link>>();
 		HashMap<Node, org.openstreetmap.josm.data.osm.Node> node2OsmNode = new HashMap<Node, org.openstreetmap.josm.data.osm.Node>();
 		this.progressMonitor.setTicks(3);
 		this.progressMonitor.setCustomText("creating nodes..");
@@ -172,8 +178,5 @@ public class ImportTask extends PleaseWaitRunnable {
 
 		this.progressMonitor.setTicks(5);
 		this.progressMonitor.setCustomText("creating layer..");
-
-		layer = new NetworkLayer(dataSet, ImportDialog.path.getText(),
-				new File(path), network, importSystem, way2Links);
 	}
 }
