@@ -28,7 +28,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableRowSorter;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -52,6 +51,11 @@ import org.openstreetmap.josm.gui.util.HighlightHelper;
 import org.openstreetmap.josm.io.FileExporter;
 import org.openstreetmap.josm.tools.ImageProvider;
 
+/**
+ * The ToggleDialog that shows link information of selected ways
+ * 
+ * 
+ */
 public class MATSimToggleDialog extends ToggleDialog implements
 		LayerChangeListener, PreferenceChangedListener {
 	private JTable table;
@@ -248,19 +252,22 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		@Override
 		public void selectionChanged(
 				Collection<? extends OsmPrimitive> newSelection) {
-			this.links = new HashMap<Integer, Id>();
-			int i = 0;
-			for (OsmPrimitive primitive : newSelection) {
-				if (primitive instanceof Way) {
-					if (layer.getWay2Links().containsKey(primitive)) {
-						for (Link link : layer.getWay2Links().get(primitive)) {
-							links.put(i, link.getId());
-							i++;
+			if (Main.main.getActiveLayer() instanceof NetworkLayer) {
+				this.links = new HashMap<Integer, Id>();
+				int i = 0;
+				for (OsmPrimitive primitive : newSelection) {
+					if (primitive instanceof Way) {
+						if (layer.getWay2Links().containsKey(primitive)) {
+							for (Link link : layer.getWay2Links()
+									.get(primitive)) {
+								links.put(i, link.getId());
+								i++;
+							}
 						}
 					}
 				}
+				fireTableDataChanged();
 			}
-			fireTableDataChanged();
 		}
 
 		@Override
@@ -270,8 +277,6 @@ public class MATSimToggleDialog extends ToggleDialog implements
 					&& !((ListSelectionModel) e.getSource()).isSelectionEmpty()) {
 				int row = table.getRowSorter().convertRowIndexToModel(
 						table.getSelectedRow());
-				System.out.println("selected row: " + row);
-				System.out.println("_______________\n");
 				long id = Long.parseLong((String) this.getValueAt(row, 1));
 				Way way = (Way) layer.data.getPrimitiveById(id,
 						OsmPrimitiveType.WAY);

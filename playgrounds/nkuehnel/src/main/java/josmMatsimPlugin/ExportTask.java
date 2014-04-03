@@ -5,11 +5,9 @@ package josmMatsimPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Properties;
 
 import javax.swing.JOptionPane;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -18,13 +16,10 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.gui.PleaseWaitRunnable;
@@ -34,7 +29,7 @@ import org.openstreetmap.josm.io.OsmTransferException;
 import org.xml.sax.SAXException;
 
 /**
- * The task which is executed after confirming the MATSimExportDialog
+ * The task which which writes out the network xml file
  * 
  * @author nkuehnel
  * 
@@ -88,10 +83,9 @@ public class ExportTask extends PleaseWaitRunnable {
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
 		Network network = sc.getNetwork();
-		
 
 		Layer layer = Main.main.getActiveLayer();
-		
+
 		if (layer instanceof OsmDataLayer) {
 			if (layer instanceof NetworkLayer) {
 				this.progressMonitor.setTicks(1);

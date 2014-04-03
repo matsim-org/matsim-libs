@@ -2,7 +2,6 @@ package josmMatsimPlugin;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +33,11 @@ import org.openstreetmap.josm.data.osm.event.RelationMembersChangedEvent;
 import org.openstreetmap.josm.data.osm.event.TagsChangedEvent;
 import org.openstreetmap.josm.data.osm.event.WayNodesChangedEvent;
 
+/**
+ * Listens to changes in the dataset and their effects on the Network
+ * 
+ * 
+ */
 public class NetworkListener implements DataSetListener {
 	private Network network;
 	private CoordinateTransformation ct;
@@ -239,7 +243,8 @@ public class NetworkListener implements DataSetListener {
 				System.out.println("node removed!");
 				network.removeNode(node.getId());
 			} else if (primitive instanceof Way) {
-				List<Link> links = layer.getWay2Links().remove(((Way) primitive));
+				List<Link> links = layer.getWay2Links().remove(
+						((Way) primitive));
 				for (Link link : links) {
 					network.removeLink(link.getId());
 					System.out.println("link removed!");

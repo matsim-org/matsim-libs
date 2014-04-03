@@ -32,8 +32,8 @@ import org.openstreetmap.josm.io.OsmTransferException;
 import org.xml.sax.SAXException;
 
 /**
- * The task which is executed after confirming the MATSimImportDialog. Creates a
- * new layer showing the network data.
+ * The task which is executed after confirming the ImportDialog. Creates a new
+ * layer showing the network data.
  * 
  * @author nkuehnel
  * 
@@ -91,7 +91,7 @@ public class ImportTask extends PleaseWaitRunnable {
 		CoordinateTransformation ct = TransformationFactory
 				.getCoordinateTransformation(importSystem,
 						TransformationFactory.WGS84);
-		
+
 		this.progressMonitor.setTicks(1);
 		this.progressMonitor.setCustomText("creating scenario..");
 		Config config = ConfigUtils.createConfig();

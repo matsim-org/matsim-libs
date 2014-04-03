@@ -1,15 +1,9 @@
 package josmMatsimPlugin;
 
-import static org.openstreetmap.josm.tools.I18n.tr;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.WindowConstants;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -33,6 +27,11 @@ import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.xml.sax.SAXException;
 
+/**
+ * The Task that handles the convert action
+ * 
+ * 
+ */
 public class ConvertTask extends PleaseWaitRunnable {
 
 	private NetworkLayer newLayer;
@@ -97,6 +96,7 @@ public class ConvertTask extends PleaseWaitRunnable {
 		HashMap<Node, org.openstreetmap.josm.data.osm.Node> node2OsmNode = new HashMap<Node, org.openstreetmap.josm.data.osm.Node>();
 		this.progressMonitor.setTicks(4);
 		this.progressMonitor.setCustomText("loading nodes..");
+
 		for (Node node : tempNetwork.getNodes().values()) {
 			Coord tmpCoor = node.getCoord();
 			LatLon coor;
@@ -167,7 +167,6 @@ public class ConvertTask extends PleaseWaitRunnable {
 
 		newLayer = new NetworkLayer(dataSet, null, null, network,
 				convertSystem, way2Links);
-
 	}
 
 	@Override

@@ -6,6 +6,11 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.openstreetmap.josm.Main;
 
+/**
+ * Holds the default converting values
+ * 
+ * 
+ */
 public class OsmConvertDefaults {
 	private static Map<String, OsmHighwayDefaults> defaults = new HashMap<String, OsmHighwayDefaults>();
 
@@ -96,12 +101,12 @@ public class OsmConvertDefaults {
 				"2;1;" + Double.toString(50. / 3.6) + ";1.0;1500;false");
 		Main.pref.put("matsim_convertDefaults_primary",
 				"3;1;" + Double.toString(80. / 3.6) + ";1.0;1500;false");
-		Main.pref.put("matsim_convertDefaults_primary_link", "3;1;" + Double.toString(600. / 3.6)
-				+ ";1.0;1500;false");
-		Main.pref.put("matsim_convertDefaults_secondary", "4;1;" + Double.toString(60. / 3.6)
-				+ ";1.0;1000;false");
-		Main.pref.put("matsim_convertDefaults_tertiary", "5;1;" + Double.toString(45. / 3.6)
-				+ ";1.0;600;false");
+		Main.pref.put("matsim_convertDefaults_primary_link",
+				"3;1;" + Double.toString(600. / 3.6) + ";1.0;1500;false");
+		Main.pref.put("matsim_convertDefaults_secondary",
+				"4;1;" + Double.toString(60. / 3.6) + ";1.0;1000;false");
+		Main.pref.put("matsim_convertDefaults_tertiary",
+				"5;1;" + Double.toString(45. / 3.6) + ";1.0;600;false");
 		Main.pref.put("matsim_convertDefaults_minor",
 				"6;1;" + Double.toString(45. / 3.6) + ";1.0;600;false");
 		Main.pref.put("matsim_convertDefaults_unclassified",
@@ -132,7 +137,7 @@ public class OsmConvertDefaults {
 			this.oneway = oneway;
 		}
 	}
-	
+
 	protected static double calculateWGS84Length(Coord coord, Coord coord2) {
 		double lon1 = coord.getX();
 		double lat1 = coord.getY();

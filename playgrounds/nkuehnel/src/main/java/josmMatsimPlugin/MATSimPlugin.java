@@ -44,7 +44,7 @@ public class MATSimPlugin extends Plugin implements PreferenceChangedListener {
 			SAXException {
 		super(info);
 		ExtensionFileFilter.exporters.add(0, new MATSimNetworkFileExporter());
-		
+
 		MATSimAction = new MATSimAction();
 		Main.main.menu.toolsMenu.add(MATSimAction.getImportAction());
 		Main.main.menu.toolsMenu.add(MATSimAction.getNewNetworkAction());

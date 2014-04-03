@@ -46,13 +46,13 @@ public class NetworkLayer extends OsmDataLayer {
 	}
 
 	public NetworkLayer(DataSet data, String name, File associatedFile,
-			Network network, String coordSystem, HashMap<Way, List<Link>> way2Links) {
+			Network network, String coordSystem,
+			HashMap<Way, List<Link>> way2Links) {
 		super(data, name, associatedFile);
 		this.matsimNetwork = network;
 		this.coordSystem = coordSystem;
 		this.way2Links = way2Links;
 		data.addDataSetListener(new NetworkListener(this));
-//		data.addDataSetListener(new NetworkListener_v2(this));
 	}
 
 	public Map<Way, List<Link>> getWay2Links() {
@@ -89,54 +89,71 @@ public class NetworkLayer extends OsmDataLayer {
 				new LayerListPopup.InfoAction(this) }));
 		return actions.toArray(new Action[actions.size()]);
 	}
-	
-	@Override public boolean isMergable(final Layer other) {
-        return false;
-    }
 
-	 /**
-     * Replies true if the data managed by this layer needs to be uploaded to
-     * the server because it contains at least one modified primitive.
-     *
-     * @return true if the data managed by this layer needs to be uploaded to
-     * the server because it contains at least one modified primitive; false,
-     * otherwise
-     */
-    public boolean requiresUploadToServer() {
-        return false;
-    }
-    
-    @Override public Object getInfoComponent() {
-        final DataCountVisitor counter = new DataCountVisitor();
-        for (final OsmPrimitive osm : data.allPrimitives()) {
-            osm.accept(counter);
-        }
-        final JPanel p = new JPanel(new GridBagLayout());
+	@Override
+	public boolean isMergable(final Layer other) {
+		return false;
+	}
 
-        String nodeText = trn("{0} node", "{0} nodes", counter.nodes, counter.nodes);
-        if (counter.deletedNodes > 0) {
-            nodeText += " ("+trn("{0} deleted", "{0} deleted", counter.deletedNodes, counter.deletedNodes)+")";
-        }
+	/**
+	 * Replies true if the data managed by this layer needs to be uploaded to
+	 * the server because it contains at least one modified primitive.
+	 * 
+	 * @return true if the data managed by this layer needs to be uploaded to
+	 *         the server because it contains at least one modified primitive;
+	 *         false, otherwise
+	 */
+	public boolean requiresUploadToServer() {
+		return false;
+	}
 
-        String wayText = trn("{0} way", "{0} ways", counter.ways, counter.ways);
-        if (counter.deletedWays > 0) {
-            wayText += " ("+trn("{0} deleted", "{0} deleted", counter.deletedWays, counter.deletedWays)+")";
-        }
+	@Override
+	public Object getInfoComponent() {
+		final DataCountVisitor counter = new DataCountVisitor();
+		for (final OsmPrimitive osm : data.allPrimitives()) {
+			osm.accept(counter);
+		}
+		final JPanel p = new JPanel(new GridBagLayout());
 
-        String relationText = trn("{0} relation", "{0} relations", counter.relations, counter.relations);
-        if (counter.deletedRelations > 0) {
-            relationText += " ("+trn("{0} deleted", "{0} deleted", counter.deletedRelations, counter.deletedRelations)+")";
-        }
-        
-        p.add(new JLabel(tr("{0} consists of:", getName())), GBC.eol());
-        p.add(new JLabel(nodeText, ImageProvider.get("data", "node"), JLabel.HORIZONTAL), GBC.eop().insets(15,0,0,0));
-        p.add(new JLabel(wayText, ImageProvider.get("data", "way"), JLabel.HORIZONTAL), GBC.eop().insets(15,0,0,0));
-        p.add(new JLabel(relationText, ImageProvider.get("data", "relation"), JLabel.HORIZONTAL), GBC.eop().insets(15,0,0,0));
-        p.add(new JLabel(tr("API version: {0}", (data.getVersion() != null) ? data.getVersion() : tr("unset"))), GBC.eop().insets(15,0,0,0));
-        p.add(new JLabel(this.matsimNetwork.getLinks().size()+" MATSim links" ), GBC.eop().insets(15,0,0,0));
-        p.add(new JLabel(this.matsimNetwork.getNodes().size()+" MATSim nodes" ), GBC.eop().insets(15,0,0,0));
-       
+		String nodeText = trn("{0} node", "{0} nodes", counter.nodes,
+				counter.nodes);
+		if (counter.deletedNodes > 0) {
+			nodeText += " ("
+					+ trn("{0} deleted", "{0} deleted", counter.deletedNodes,
+							counter.deletedNodes) + ")";
+		}
 
-        return p;
-    }
+		String wayText = trn("{0} way", "{0} ways", counter.ways, counter.ways);
+		if (counter.deletedWays > 0) {
+			wayText += " ("
+					+ trn("{0} deleted", "{0} deleted", counter.deletedWays,
+							counter.deletedWays) + ")";
+		}
+
+		String relationText = trn("{0} relation", "{0} relations",
+				counter.relations, counter.relations);
+		if (counter.deletedRelations > 0) {
+			relationText += " ("
+					+ trn("{0} deleted", "{0} deleted",
+							counter.deletedRelations, counter.deletedRelations)
+					+ ")";
+		}
+
+		p.add(new JLabel(tr("{0} consists of:", getName())), GBC.eol());
+		p.add(new JLabel(nodeText, ImageProvider.get("data", "node"),
+				JLabel.HORIZONTAL), GBC.eop().insets(15, 0, 0, 0));
+		p.add(new JLabel(wayText, ImageProvider.get("data", "way"),
+				JLabel.HORIZONTAL), GBC.eop().insets(15, 0, 0, 0));
+		p.add(new JLabel(relationText, ImageProvider.get("data", "relation"),
+				JLabel.HORIZONTAL), GBC.eop().insets(15, 0, 0, 0));
+		p.add(new JLabel(tr("API version: {0}",
+				(data.getVersion() != null) ? data.getVersion() : tr("unset"))),
+				GBC.eop().insets(15, 0, 0, 0));
+		p.add(new JLabel(this.matsimNetwork.getLinks().size() + " MATSim links"),
+				GBC.eop().insets(15, 0, 0, 0));
+		p.add(new JLabel(this.matsimNetwork.getNodes().size() + " MATSim nodes"),
+				GBC.eop().insets(15, 0, 0, 0));
+
+		return p;
+	}
 }

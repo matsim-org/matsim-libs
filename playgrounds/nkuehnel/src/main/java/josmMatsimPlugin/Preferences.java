@@ -10,7 +10,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -28,8 +27,11 @@ import org.openstreetmap.josm.gui.preferences.PreferenceSettingFactory;
 import org.openstreetmap.josm.gui.preferences.PreferenceTabbedPane;
 import org.openstreetmap.josm.gui.preferences.PreferenceTabbedPane.PreferencePanel;
 
-import com.kitfox.svg.Filter;
-
+/**
+ * Preferences for the MATSim Plugin
+ * 
+ * 
+ */
 public final class Preferences extends DefaultTabPreferenceSetting {
 
 	// Visualization tab
@@ -62,7 +64,7 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 	private JButton convertingDefaults = new JButton("Set converting defaults");
 
 	protected final static JCheckBox filterActive = new JCheckBox(
-			"Activate Filter");
+			"Activate hierarchy filter");
 	private final static JLabel hierarchyLabel = new JLabel(
 			"Only convert hierarchies up to: ");
 	final static JTextField hierarchyLayer = new JTextField();
@@ -133,25 +135,23 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 		convertingDefaults.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (e.getActionCommand().equals("convertDefaults")) {
-					OsmConvertDefaultsDialog dialog = new OsmConvertDefaultsDialog();
-					JOptionPane pane = new JOptionPane(dialog,
-							JOptionPane.PLAIN_MESSAGE,
-							JOptionPane.OK_CANCEL_OPTION);
-					dialog.setOptionPane(pane);
-					JDialog dlg = pane
-							.createDialog(Main.parent, tr("Defaults"));
-					dlg.setAlwaysOnTop(true);
-					dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-					dlg.setVisible(true);
-					if (pane.getValue() != null) {
-						if (((Integer) pane.getValue()) == JOptionPane.OK_OPTION) {
-							dialog.handleInput();
-						}
+
+				OsmConvertDefaultsDialog dialog = new OsmConvertDefaultsDialog();
+				JOptionPane pane = new JOptionPane(dialog,
+						JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
+				dialog.setOptionPane(pane);
+				JDialog dlg = pane.createDialog(Main.parent, tr("Defaults"));
+				dlg.setAlwaysOnTop(true);
+				dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+				dlg.setVisible(true);
+				if (pane.getValue() != null) {
+					if (((Integer) pane.getValue()) == JOptionPane.OK_OPTION) {
+						dialog.handleInput();
 					}
-					dlg.dispose();
 				}
+				dlg.dispose();
 			}
+
 		});
 
 		filterActive.setSelected(Main.pref.getBoolean("matsim_filterActive",

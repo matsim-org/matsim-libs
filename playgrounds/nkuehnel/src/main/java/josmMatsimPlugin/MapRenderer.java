@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.openstreetmap.josm.Main;
@@ -22,7 +21,13 @@ import org.openstreetmap.josm.gui.NavigatableComponent;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.mappaint.LabelCompositionStrategy;
 import org.openstreetmap.josm.gui.mappaint.TextElement;
-
+/**
+ * the MATSim MapRenderer. Draws ways that correspond 
+ * to an existing MATSim link in a MATSim blue color.
+ * Also offers offset for overlapping links as well 
+ * as the option to show MATSim ids on ways
+ * 
+ */
 public class MapRenderer extends StyledMapRenderer {
 
 	public MapRenderer(Graphics2D arg0, NavigatableComponent arg1, boolean arg2) {
@@ -47,32 +52,32 @@ public class MapRenderer extends StyledMapRenderer {
 			boolean showOneway, boolean onewayReversed) {
 
 		Layer layer = Main.main.getActiveLayer();
-		Id id = new IdImpl(way.getUniqueId());
 		if (layer instanceof NetworkLayer) {
 			Map<Way, List<Link>> way2Links = ((NetworkLayer) layer)
 					.getWay2Links();
 			if (way2Links.containsKey(way)) {
 				if (!way2Links.get(way).isEmpty()) {
 					if (!way.isSelected()) {
-						 if (Properties.showIds) {
-						 drawTextOnPath(
-						 way,
-						 new TextElement(Properties.getInstance(),
-						 Properties.FONT, 0, textOffset(way), Properties.MATSIMCOLOR,
-						 0.f, null));
-						 }
+						if (Properties.showIds) {
+							drawTextOnPath(way,
+									new TextElement(Properties.getInstance(),
+											Properties.FONT, 0,
+											textOffset(way),
+											Properties.MATSIMCOLOR, 0.f, null));
+						}
 						super.drawWay(way, Properties.MATSIMCOLOR, line,
 								dashes, dashedColor, Properties.wayOffset,
 								showOrientation, showHeadArrowOnly, showOneway,
 								onewayReversed);
 						return;
 					} else {
-						 if (Properties.showIds) {
-						 drawTextOnPath(
-						 way,
-						 new TextElement(Properties.getInstance(),
-						 Properties.FONT, 0, textOffset(way), selectedColor, 0.f, null));
-						 }
+						if (Properties.showIds) {
+							drawTextOnPath(way,
+									new TextElement(Properties.getInstance(),
+											Properties.FONT, 0,
+											textOffset(way), selectedColor,
+											0.f, null));
+						}
 					}
 				}
 			}
@@ -84,7 +89,7 @@ public class MapRenderer extends StyledMapRenderer {
 
 	private int textOffset(Way way) {
 		int offset = -10;
-		
+
 		if (way.firstNode().getUniqueId() < way.lastNode().getUniqueId()) {
 			offset *= -1;
 		}

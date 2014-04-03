@@ -23,7 +23,8 @@ import josmMatsimPlugin.OsmConvertDefaults.OsmHighwayDefaults;
 import org.openstreetmap.josm.Main;
 
 /**
- * This dialog is used to show and edit the values which are used when converting osm data 
+ * This dialog is used to show and edit the values which are used when
+ * converting osm data
  * 
  * @author nkuehnel
  * 
@@ -32,7 +33,7 @@ public class OsmConvertDefaultsDialog extends JPanel {
 	private JOptionPane optionPane;
 	private Map<String, JComponent> input = new HashMap<String, JComponent>();
 	private GridBagConstraints c = new GridBagConstraints();
-	
+
 	public OsmConvertDefaultsDialog() {
 		setLayout(new GridBagLayout());
 		c.insets = new Insets(4, 4, 4, 4);
@@ -53,8 +54,8 @@ public class OsmConvertDefaultsDialog extends JPanel {
 				}
 				c.gridy = (i + 1);
 				c.gridx = (j + 1);
-				
-				if (j < OsmConvertDefaults.attributes.length-1) {
+
+				if (j < OsmConvertDefaults.attributes.length - 1) {
 					JTextField tF_hierarchy = new JTextField();
 					add(tF_hierarchy, c);
 					input.put(i + "_" + j, tF_hierarchy);
@@ -73,7 +74,7 @@ public class OsmConvertDefaultsDialog extends JPanel {
 		add(reset, c);
 
 		fillValues();
-		
+
 		reset.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -84,11 +85,11 @@ public class OsmConvertDefaultsDialog extends JPanel {
 		});
 	}
 
-
 	private void fillValues() {
 
 		for (int i = 0; i < OsmConvertDefaults.types.length; i++) {
-			OsmHighwayDefaults highwayDefault = OsmConvertDefaults.getDefaults().get(OsmConvertDefaults.types[i]);
+			OsmHighwayDefaults highwayDefault = OsmConvertDefaults
+					.getDefaults().get(OsmConvertDefaults.types[i]);
 			for (int j = 0; j < OsmConvertDefaults.attributes.length; j++) {
 				String value;
 				switch (j) {
@@ -114,7 +115,7 @@ public class OsmConvertDefaultsDialog extends JPanel {
 					break;
 				case 5:
 					((JCheckBox) input.get(i + "_" + j))
-					.setSelected(highwayDefault.oneway);
+							.setSelected(highwayDefault.oneway);
 					break;
 				}
 			}
@@ -128,17 +129,25 @@ public class OsmConvertDefaultsDialog extends JPanel {
 	protected void handleInput() {
 		for (int i = 0; i < OsmConvertDefaults.types.length; i++) {
 
-			int hierarchy = Integer.parseInt(((JTextField) input.get(i + "_0")).getText());
-			double lanes = Double.parseDouble(((JTextField) input.get(i + "_1")).getText());
-			double freespeed = Double.parseDouble(((JTextField) input.get(i + "_2")).getText());
-			double freespeedFactor = Double.parseDouble(((JTextField) input.get(i + "_3")).getText());
-			double laneCapacity = Double.parseDouble(((JTextField) input.get(i + "_4")).getText());
+			int hierarchy = Integer.parseInt(((JTextField) input.get(i + "_0"))
+					.getText());
+			double lanes = Double
+					.parseDouble(((JTextField) input.get(i + "_1")).getText());
+			double freespeed = Double.parseDouble(((JTextField) input.get(i
+					+ "_2")).getText());
+			double freespeedFactor = Double.parseDouble(((JTextField) input
+					.get(i + "_3")).getText());
+			double laneCapacity = Double.parseDouble(((JTextField) input.get(i
+					+ "_4")).getText());
 			boolean oneway = (((JCheckBox) input.get(i + "_5")).isSelected());
 
-			OsmConvertDefaults.getDefaults().put(OsmConvertDefaults.types[i], new OsmHighwayDefaults(hierarchy, lanes,
-					freespeed, freespeedFactor, laneCapacity, oneway));
-			Main.pref.put("matsim_convertDefaults_" + OsmConvertDefaults.types[i], hierarchy + ";"
-					+ lanes + ";" + freespeed + ";" + freespeedFactor + ";"
+			OsmConvertDefaults.getDefaults().put(
+					OsmConvertDefaults.types[i],
+					new OsmHighwayDefaults(hierarchy, lanes, freespeed,
+							freespeedFactor, laneCapacity, oneway));
+			Main.pref.put("matsim_convertDefaults_"
+					+ OsmConvertDefaults.types[i], hierarchy + ";" + lanes
+					+ ";" + freespeed + ";" + freespeedFactor + ";"
 					+ laneCapacity + ";" + oneway);
 		}
 	}

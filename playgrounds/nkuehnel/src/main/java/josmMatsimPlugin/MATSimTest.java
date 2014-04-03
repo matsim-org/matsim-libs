@@ -25,6 +25,11 @@ import org.openstreetmap.josm.data.validation.TestError;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.progress.ProgressMonitor;
 
+/**
+ * The Test which is used for the validation of MATSim content.
+ * 
+ * 
+ */
 public class MATSimTest extends Test {
 
 	Map<String, ArrayList<Way>> linkIds;

@@ -34,9 +34,9 @@ import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Way;
 
 /**
+ * The Converter
  * 
  * 
- * @author nkuehnel
  */
 public class Converter implements PreferenceChangedListener {
 	private final static Logger log = Logger.getLogger(Converter.class);
@@ -72,7 +72,7 @@ public class Converter implements PreferenceChangedListener {
 		this.highwayDefaults = OsmConvertDefaults.getDefaults();
 		this.hierarchyLayers.add(filter);
 	}
-	
+
 	public Converter(DataSet dataSet, Network network) {
 		this.dataSet = dataSet;
 		this.network = network;
@@ -216,8 +216,8 @@ public class Converter implements PreferenceChangedListener {
 					for (int i = 1, n = way.nodes.size(); i < n; i++) {
 						OsmNode toNode = this.nodes.get(way.nodes.get(i));
 						if (toNode != lastToNode) {
-							length += OsmConvertDefaults.calculateWGS84Length(lastToNode.coord,
-									toNode.coord);
+							length += OsmConvertDefaults.calculateWGS84Length(
+									lastToNode.coord, toNode.coord);
 							if (toNode.used) {
 
 								if (this.hierarchyLayers.isEmpty()) {
@@ -494,10 +494,8 @@ public class Converter implements PreferenceChangedListener {
 	public void preferenceChanged(PreferenceChangeEvent e) {
 		if (e.getKey().equalsIgnoreCase("matsim_convertDefaults_keepPaths")) {
 			this.keepPaths = (Boolean) e.getNewValue().getValue();
-			System.out.println(keepPaths);
 		}
-		
+
 	}
 
-	
 }

@@ -2,23 +2,14 @@ package josmMatsimPlugin;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
-import java.awt.Color;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -31,17 +22,14 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.JosmAction;
-import org.openstreetmap.josm.data.coor.EastNorth;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Way;
-import org.openstreetmap.josm.gui.SelectionManager;
-import org.openstreetmap.josm.gui.SelectionManager.SelectionEnded;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.tools.Shortcut;
 
 /**
- * Adds the MATSim button to the tools bar.
+ * Adds the MATSim buttons and their functionality to the tools bar.
  * 
  * @author nkuehnel
  * 
@@ -55,12 +43,11 @@ public class MATSimAction {
 	public JosmAction getNewNetworkAction() {
 		return new NewNetworkAction();
 	}
-	
+
 	public JosmAction getConvertAction() {
 		return new ConvertAction();
 	}
 
-	
 	public class ImportAction extends JosmAction {
 
 		public ImportAction() {
@@ -109,8 +96,9 @@ public class MATSimAction {
 	public class NewNetworkAction extends JosmAction {
 
 		public NewNetworkAction() {
-			super(tr("New MATSim network"), "new.png", tr("Create new Network"),
-					Shortcut.registerShortcut("menu:matsimNetwork",
+			super(tr("New MATSim network"), "new.png",
+					tr("Create new Network"), Shortcut.registerShortcut(
+							"menu:matsimNetwork",
 							tr("Menu: {0}", tr("New MATSim Network")),
 							KeyEvent.VK_G, Shortcut.ALT_CTRL), true);
 		}
@@ -121,47 +109,34 @@ public class MATSimAction {
 			Config config = ConfigUtils.createConfig();
 			Scenario scenario = ScenarioUtils.createScenario(config);
 			NetworkLayer layer = new NetworkLayer(dataSet, "new Layer", null,
-					scenario.getNetwork(), TransformationFactory.WGS84, new HashMap<Way, List<Link>>());
+					scenario.getNetwork(), TransformationFactory.WGS84,
+					new HashMap<Way, List<Link>>());
 			Main.main.addLayer(layer);
 		}
 	}
-	
-	public static class ConvertAction extends JosmAction implements SelectionEnded {
-		
+
+	public static class ConvertAction extends JosmAction {
+
 		public static JDialog dlg;
 
 		public ConvertAction() {
-			super(tr("Convert to MATSim Network"), null, tr("Convert Osm layer to MATSim network layer"),
-					Shortcut.registerShortcut("menu:matsimConvert",
-							tr("Menu: {0}", tr("Convert to MATSim Network")),
-							KeyEvent.VK_G, Shortcut.ALT_CTRL), true);
+			super(tr("Convert to MATSim Network"), null,
+					tr("Convert Osm layer to MATSim network layer"), Shortcut
+							.registerShortcut(
+									"menu:matsimConvert",
+									tr("Menu: {0}",
+											tr("Convert to MATSim Network")),
+									KeyEvent.VK_G, Shortcut.ALT_CTRL), true);
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Layer activeLayer = Main.main.getActiveLayer();
-			if (activeLayer instanceof OsmDataLayer && !(activeLayer instanceof NetworkLayer) ) {
-				ConvertTask task;
-				
-				SelectionManager manager = new SelectionManager(this, false, Main.map.mapView);
-				manager.register(Main.map.mapView, false);
-				task = new ConvertTask();
+			if (activeLayer instanceof OsmDataLayer
+					&& !(activeLayer instanceof NetworkLayer)) {
+				ConvertTask task = new ConvertTask();
 				task.run();
 			}
 		}
-
-		@Override
-		public void selectionEnded(Rectangle rec, MouseEvent arg1) {
-			System.out.println("Punkt 1: "+ Main.map.mapView.getLatLon(rec.getMinX(), rec.getMinY()));
-			System.out.println("Punkt 2: "+ Main.map.mapView.getLatLon(rec.getMaxX(), rec.getMaxY()));
-		}
 	}
-	
-		
-		
-		
-		
-		
-		
-		
 }
