@@ -91,9 +91,12 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private boolean ignoreExitLink = true;
 	
 	private boolean useCellCount = true;
+	private double sampleSize = 0.1;
 
 	public EventHandler(boolean useCellCount, String eventFilename, Scenario sc, double cellSize, Thread readerThread) {
 		this.useCellCount = useCellCount;
+		
+		this.sampleSize = Double.valueOf(sc.getConfig().getModule("grips").getValue("sampleSize"));
 		
 		if (useCellCount)
 			this.cellCount = (int)cellSize;
@@ -345,6 +348,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		eventData.setLinkLeaveTimes(linkLeaveTimes);
 		eventData.setMaxUtilization(maxUtilization);
 		eventData.setMaxClearingTime(maxClearingTime);
+		eventData.setSampleSize(sampleSize);
 
 		// set visualization attributes
 		setVisualData(eventData);

@@ -23,11 +23,13 @@ package org.matsim.contrib.grips.model;
 import java.awt.Color;
 import java.awt.Image;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.grips.model.locale.EnglishLocale;
 import org.matsim.contrib.grips.model.locale.GermanLocale;
 import org.matsim.contrib.grips.model.locale.Locale;
 import org.matsim.contrib.grips.model.shape.Shape.DrawMode;
 import org.matsim.contrib.grips.model.shape.ShapeStyle;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimResource;
 
 /**
@@ -49,6 +51,8 @@ public class Constants
 	public static enum Mode { EVACUATION, UTILIZATION, CLEARING };
 	public static enum SelectionMode { POLYGONAL, CIRCLE };
 	public enum Unit { TIME, PEOPLE }
+	
+	public static Id safeLinkId = new IdImpl("el1");
 
 	public static String DEFAULT_MATSIM_CONFIG_DESTINATION = "/output/config.xml";
 	public static final String DEFAULT_MATSIM_CONFIG_FILE = "config.xml";

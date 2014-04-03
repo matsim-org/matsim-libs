@@ -89,6 +89,9 @@ public class EnglishLocale implements Locale
 	public String msgUnsavedChanges = "Do you want to save the current changes?";
 	private Object infoMatsimOverwrite = "Output directory exists and will be renamed";
 	public String labelExistingShapeFile = "existing shape file";
+	public String labelWMS = "WMS";
+	public String labelLayer = "layer";
+
 	
 	
 	
@@ -374,6 +377,16 @@ public class EnglishLocale implements Locale
 	@Override
 	public String labelExistingShapeFile() {
 		return labelExistingShapeFile;
+	}
+
+	@Override
+	public String labelWMS() {
+		return labelWMS;
+	}
+
+	@Override
+	public String labelLayer() {
+		return labelLayer;
 	}
 
 	

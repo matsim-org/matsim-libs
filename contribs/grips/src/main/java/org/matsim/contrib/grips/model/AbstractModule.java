@@ -39,7 +39,7 @@ import org.matsim.contrib.grips.model.process.ProcessInterface;
 public abstract class AbstractModule
 {
 	protected static int width = 800;
-	protected static int height = 600;
+	protected static int height = 680;
 	protected static int border = 30;
 	
 	

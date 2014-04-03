@@ -41,7 +41,7 @@ public class SetModuleListenerProcess extends BasicProcess
 	public void start()
 	{
 		//set module listeners
-		if ((controller.getListener()==null) || (!(controller.getListener().getClass().isInstance(listener))))
+//		if ((controller.getListener()==null) || (!(controller.getListener().getClass().isInstance(listener))))
 			setListeners(listener);
 		
 		module.setListener(listener);

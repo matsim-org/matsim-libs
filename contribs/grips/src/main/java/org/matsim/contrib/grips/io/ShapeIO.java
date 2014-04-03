@@ -49,21 +49,44 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
- * all i/origin functions concerning shapes
+ * all i/o functions concerning shapes
  * 
  * @author wdoering
  * 
  */
 public class ShapeIO {
-	public static boolean savePolygon(Controller controller,
-			PolygonShape polygonShape, String destinationFile) {
+	public static boolean savePolygon(Controller controller, PolygonShape polygonShape, String destinationFile) {
 		String description = polygonShape.getDescription();
 
 		if (!destinationFile.endsWith("shp"))
 			destinationFile = destinationFile + ".shp";
 
-		CoordinateReferenceSystem targetCRS = MGC.getCRS(controller
-				.getSourceCoordinateSystem());
+		CoordinateReferenceSystem targetCRS = MGC.getCRS(controller.getSourceCoordinateSystem());
+
+		Polygon polygon = polygonShape.getPolygon();
+		Coordinate[] coordinates = polygon.getCoordinates();
+		ArrayList<Coordinate> newCoordinatesList = new ArrayList<Coordinate>();
+
+		for (int i = 0; i < coordinates.length; i++) {
+			if ((i == coordinates.length - 1) || (!newCoordinatesList.contains(coordinates[i]))) {
+				newCoordinatesList.add(coordinates[i]);
+				System.out.println("coord:" + coordinates[i].x + "\t " + coordinates[i].y);
+			}
+		}
+		if (coordinates.length > newCoordinatesList.size()) {
+			Coordinate[] newCoordinates = new Coordinate[newCoordinatesList.size()];
+
+			newCoordinatesList.toArray(newCoordinates);
+
+			System.out.println("finally:");
+			for (int i = 0; i < newCoordinates.length; i++) {
+				System.out.println("coord:" + newCoordinates[i].x + "\t " + newCoordinates[i].y);
+			}
+
+			GeometryFactory geofac = new GeometryFactory();
+			LinearRing shell = geofac.createLinearRing(coordinates);
+			polygon = geofac.createPolygon(shell, null);
+		}
 
 		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 		b.setName("EvacuationArea");
@@ -73,14 +96,12 @@ public class ShapeIO {
 		SimpleFeatureType ft = b.buildFeatureType();
 
 		try {
-			MultiPolygon mp = new GeometryFactory(new PrecisionModel(2))
-					.createMultiPolygon(new Polygon[] { polygonShape
-							.getPolygon() });
-			SimpleFeature f = new SimpleFeatureBuilder(ft).buildFeature(
-					description, new Object[] { mp, description });
+			MultiPolygon mp = new GeometryFactory(new PrecisionModel(2)).createMultiPolygon(new Polygon[] { polygon });
+			SimpleFeature f = new SimpleFeatureBuilder(ft).buildFeature(description, new Object[] { mp, description });
 			Collection<SimpleFeature> fts = new ArrayList<SimpleFeature>();
 			fts.add(f);
 			ShapeFileWriter.writeGeometries(fts, destinationFile);
+			polygonShape.setFromFile(true);
 			return true;
 		} catch (FactoryRegistryException e) {
 			e.printStackTrace();
@@ -88,11 +109,9 @@ public class ShapeIO {
 		}
 	}
 
-	public static boolean savePopulationAreaPolygons(Controller controller,
-			ArrayList<PolygonShape> shapes, String destinationFile) {
+	public static boolean savePopulationAreaPolygons(Controller controller, ArrayList<PolygonShape> shapes, String destinationFile) {
 
-		CoordinateReferenceSystem targetCRS = MGC.getCRS(controller
-				.getSourceCoordinateSystem());
+		CoordinateReferenceSystem targetCRS = MGC.getCRS(controller.getSourceCoordinateSystem());
 
 		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 		b.setName("EvacuationArea");
@@ -105,21 +124,21 @@ public class ShapeIO {
 		try {
 			Collection<SimpleFeature> fts = new ArrayList<SimpleFeature>();
 
-			for (PolygonShape polygonShape : shapes)
-			{
+			for (PolygonShape polygonShape : shapes) {
 				Polygon currentPolygon = polygonShape.getPolygon();
 
-				int pop = Integer.valueOf(polygonShape
-						.getMetaData(Constants.POPULATION));
+				int pop = Integer.valueOf(polygonShape.getMetaData(Constants.POPULATION));
 
-				MultiPolygon mp = new GeometryFactory(new PrecisionModel(2))
-						.createMultiPolygon(new Polygon[] { currentPolygon });
-				SimpleFeature f = builder.buildFeature(null, new Object[] { mp,
-						pop });
+				MultiPolygon mp = new GeometryFactory(new PrecisionModel(2)).createMultiPolygon(new Polygon[] { currentPolygon });
+				SimpleFeature f = builder.buildFeature(null, new Object[] { mp, pop });
 				fts.add(f);
 			}
 
 			ShapeFileWriter.writeGeometries(fts, controller.getGripsConfigModule().getPopulationFileName());
+			
+			for (PolygonShape polygonShape : shapes)
+				polygonShape.setFromFile(true);
+			
 			return true;
 		} catch (FactoryRegistryException e) {
 			e.printStackTrace();
@@ -127,15 +146,14 @@ public class ShapeIO {
 		}
 	}
 
-	public static PolygonShape getShapeFromFile(Controller controller,String id, String shapeFileString) {
-		int layerID = controller.getVisualizer().getPrimaryShapeRenderLayer()
-				.getId();
+	public static PolygonShape getShapeFromFile(Controller controller, String id, String shapeFileString) {
+		int layerID = controller.getVisualizer().getPrimaryShapeRenderLayer().getId();
 		PolygonShape newPolygon = new PolygonShape(layerID, null);
 		newPolygon.setId(id);
 
 		ShapeFileReader shapeFileReader = new ShapeFileReader();
 		shapeFileReader.readFileAndInitialize(shapeFileString);
-		
+
 		CreatePopulationShapeFileFromExistingData.transformCRS(shapeFileReader);
 
 		ArrayList<Geometry> geometries = new ArrayList<Geometry>();
@@ -156,42 +174,36 @@ public class ShapeIO {
 
 	}
 
-	public static ArrayList<PolygonShape> getShapesFromFile(
-			Controller controller, String shapeFileString, ShapeStyle style) {
+	public static ArrayList<PolygonShape> getShapesFromFile(Controller controller, String shapeFileString, ShapeStyle style) {
 
 		ArrayList<PolygonShape> shapes = new ArrayList<PolygonShape>();
 
-		int layerID = controller.getVisualizer().getPrimaryShapeRenderLayer()
-				.getId();
+		int layerID = controller.getVisualizer().getPrimaryShapeRenderLayer().getId();
 
 		ShapeFileReader shapeFileReader = new ShapeFileReader();
 		shapeFileReader.readFileAndInitialize(shapeFileString);
-		
+
 		CreatePopulationShapeFileFromExistingData.transformCRS(shapeFileReader);
 
-
-		for (SimpleFeature ft : shapeFileReader.getFeatureSet())
-		{
+		for (SimpleFeature ft : shapeFileReader.getFeatureSet()) {
 			Geometry geo = (Geometry) ft.getDefaultGeometry();
 			Coordinate[] coords = geo.getCoordinates();
 			coords[coords.length - 1] = coords[0];
 			GeometryFactory geofac = new GeometryFactory();
 			LinearRing shell = geofac.createLinearRing(coords);
-			
 
-			
 			PolygonShape newPolygon = new PolygonShape(layerID, null);
 			Polygon polygon = geofac.createPolygon(shell, null);
-			
+
 			String persons = ft.getAttribute("persons").toString();
-			if (persons != null)
-			{
+			if (persons != null) {
 				newPolygon.putMetaData(Constants.POPULATION, persons);
 				ShapeFactory.setPopAreaStyle(newPolygon);
 			}
-				
+
 			newPolygon.setPolygon(polygon);
 			newPolygon.setStyle(style);
+			newPolygon.setFromFile(true);
 
 			shapes.add(newPolygon);
 		}

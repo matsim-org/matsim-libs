@@ -409,7 +409,7 @@ public class Controller {
 		boolean rv = false;
 		try {
 			this.gripsConfigModule = new GripsConfigModule("grips", selectedFile.getAbsolutePath());
-			System.out.println("grips config module:" + this.gripsConfigModule);
+//			System.out.println("grips config module:" + this.gripsConfigModule);
 			GripsConfigDeserializer parser = new GripsConfigDeserializer(this.gripsConfigModule);
 			parser.readFile(selectedFile.getAbsolutePath());
 
@@ -872,8 +872,15 @@ public class Controller {
 	}
 
 	public boolean openEvacuationShape(String id) {
-		if (this.getShapeById(id) != null)
-			return true;
+		
+		//check if evac area is from file (if not: reopen!)
+		if (this.getShapeById(id) != null) {
+			if (this.getShapeById(id).isFromFile())
+				return true;
+			else
+				this.removeShape(id);
+		}
+		
 
 		ShapeStyle evacShapeStyle = Constants.SHAPESTYLE_EVACAREA;
 		String dest;
@@ -1036,6 +1043,17 @@ public class Controller {
 			dest = this.gripsConfigModule.getPopulationFileName();
 
 		ArrayList<PolygonShape> popShapes = ShapeIO.getShapesFromFile(this, dest, Constants.SHAPESTYLE_POPAREA);
+		
+		//remove existing shapes that were loaded from a file
+		ArrayList<Shape> shapesToRemove = new ArrayList<Shape>();
+		for (Shape shape : this.shapes)
+		{
+			if ((shape.getMetaData(Constants.POPULATION)!=null) && (shape.isFromFile()))
+				shapesToRemove.add(shape);
+		}	
+		for (Shape shape : shapesToRemove)
+			this.shapes.remove(shape);
+		
 		for (PolygonShape shape : popShapes)
 			addShape(shape);
 

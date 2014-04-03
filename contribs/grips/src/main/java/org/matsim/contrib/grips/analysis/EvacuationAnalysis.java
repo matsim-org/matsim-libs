@@ -43,6 +43,7 @@ import org.matsim.contrib.grips.model.imagecontainer.BufferedImageContainer;
 import org.matsim.contrib.grips.model.process.BasicProcess;
 import org.matsim.contrib.grips.model.process.DisableLayersProcess;
 import org.matsim.contrib.grips.model.process.EnableLayersProcess;
+import org.matsim.contrib.grips.model.process.InitEvacShapeProcess;
 import org.matsim.contrib.grips.model.process.InitMainPanelProcess;
 import org.matsim.contrib.grips.model.process.InitMapLayerProcess;
 import org.matsim.contrib.grips.model.process.InitMatsimConfigProcess;
@@ -118,9 +119,6 @@ public class EvacuationAnalysis extends AbstractModule {
 
 		// set module listeners
 		this.processList.add(new SetModuleListenerProcess(controller, this, new EAEventListener(controller)));
-
-//		// load evacuation area shape
-//		this.processList.add(new InitEvacShapeProcess(controller));
 
 		// add grid renderer
 		this.processList.add(new BasicProcess(controller) {
@@ -217,7 +215,7 @@ public class EvacuationAnalysis extends AbstractModule {
 
 			// get data
 			EventData data = eventHandler.getData();
-
+			
 			// update data in both the map viewer and the graphs
 
 			this.controller.setEventData(data);

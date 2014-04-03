@@ -45,6 +45,7 @@ public class EventData {
 	private HashMap<Id, List<Tuple<Id, Double>>> linkEnterTimes;
 	private int maxUtilization;
 	private double maxClearingTime;
+	private double sampleSize;
 
 	private AttributeData<Color> evacuationTimeVisData;
 	private AttributeData<Color> clearingTimeVisData;
@@ -211,6 +212,14 @@ public class EventData {
 
 	public HashMap<Mode, LinkedList<Tuple<Id, Double>>> getClusters() {
 		return this.clusters;
+	}
+	
+	public double getSampleSize() {
+		return sampleSize;
+	}
+	
+	public void setSampleSize(double sampleSize) {
+		this.sampleSize = sampleSize;
 	}
 
 }

@@ -65,13 +65,13 @@ public class EvacuationTimeGraphPanel extends AbstractDataPanel {
 
 		for (int i = 0; i < arrivalTimeCount; i++) {
 			xs[i] = 1000 * 60 * 60 * 23 + arrivalTimes.get(i).getFirst() * 1000;
-			ys[i] = arrivalTimes.get(i).getSecond();
+			ys[i] = arrivalTimes.get(i).getSecond()/data.getSampleSize();
 			timeSeries.add(new Second(new Date((long) xs[i])), ys[i]);
 		}
 
 		dataset.addSeries(timeSeries);
 
-		JFreeChart freeChart = ChartFactory.createTimeSeriesChart("evacuation time", "time (hh:mm:ss)", "persons", dataset, false, false, false);
+		JFreeChart freeChart = ChartFactory.createTimeSeriesChart("evacuation time", "time (hh:mm:ss)", "agents", dataset, false, false, false);
 
 		XYPlot plot = (XYPlot) freeChart.getPlot();
 		((DateAxis) (plot.getDomainAxis())).setDateFormatOverride(new SimpleDateFormat("HH:mm:ss"));

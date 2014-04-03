@@ -38,15 +38,14 @@ public class DefaultOpenDialog extends JFileChooser {
 	private static final long serialVersionUID = 1L;
 	protected Controller controller;
 
-	public DefaultOpenDialog(Controller controller, final String fileExtension,
-			final String fileDescription, boolean directory) {
+	public DefaultOpenDialog(Controller controller, final String fileExtension, final String fileDescription, boolean directory) {
 		this.controller = controller;
 		if (directory)
 			this.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		else {
-			this.setFileFilter(new FileNameExtensionFilter(fileDescription,
-					fileExtension));
+			this.setFileFilter(new FileNameExtensionFilter(fileDescription, fileExtension));
 		}
+
 		this.setCurrentDirectory(controller.getCurrentWorkingDirectory());
 	}
 

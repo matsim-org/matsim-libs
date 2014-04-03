@@ -77,6 +77,8 @@ public interface Locale
 	public String labelMu();
 	public String labelEarliest();
 	public String labelLatest();
+	public String labelWMS();
+	public String labelLayer();
 	public String labelCurrentFile();
 	public String btNew();
 	public String msgSameFiles();

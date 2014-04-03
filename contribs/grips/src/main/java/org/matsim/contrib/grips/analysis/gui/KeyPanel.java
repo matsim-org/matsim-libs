@@ -88,7 +88,7 @@ public class KeyPanel extends AbstractDataPanel
 			else
 			{
 				classColor[i] = this.data.getLinkUtilizationVisData().getAttribute((IdImpl) clusters.get(i).getFirst()).getSecond();
-				classVal[i] = getReadableTime(clusters.get(i).getSecond(), Unit.PEOPLE);
+				classVal[i] = getReadableTime(clusters.get(i).getSecond()/data.getSampleSize(), Unit.PEOPLE);
 			}
 
 		}
@@ -134,7 +134,7 @@ public class KeyPanel extends AbstractDataPanel
 	
 	public static String getReadableTime(double value, Unit unit) {
 		if (unit.equals(Unit.PEOPLE))
-			return " " + (int) value + " agents";
+			return " " + (int) (value) + " agents";
 
 		double minutes = 0;
 		double hours = 0;

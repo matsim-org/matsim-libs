@@ -38,6 +38,7 @@ import org.matsim.contrib.grips.model.imagecontainer.BufferedImageContainer;
 import org.matsim.contrib.grips.model.process.BasicProcess;
 import org.matsim.contrib.grips.model.process.DisableLayersProcess;
 import org.matsim.contrib.grips.model.process.EnableLayersProcess;
+import org.matsim.contrib.grips.model.process.InitEvacShapeProcess;
 import org.matsim.contrib.grips.model.process.InitGripsConfigProcess;
 import org.matsim.contrib.grips.model.process.InitMainPanelProcess;
 import org.matsim.contrib.grips.model.process.InitMapLayerProcess;
@@ -57,11 +58,9 @@ import org.matsim.contrib.grips.view.DefaultWindow;
 public class EvacuationAreaSelector extends AbstractModule {
 
 	public static void main(String[] args) {
-		setLaF();
 		// set up controller and image interface
 		final Controller controller = new Controller(args);
-		controller.setImageContainer(BufferedImageContainer.getImageContainer(
-				width, height, border));
+		controller.setImageContainer(BufferedImageContainer.getImageContainer(width, height, border));
 
 		// inform controller that this module is running stand alone
 		controller.setStandAlone(true);
@@ -82,28 +81,8 @@ public class EvacuationAreaSelector extends AbstractModule {
 
 	}
 
-	private static void setLaF() {
-		try {
-			UIManager
-					.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedLookAndFeelException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
 	public EvacuationAreaSelector(Controller controller) {
-		super(controller.getLocale().moduleEvacAreaSelector(),
-				Constants.ModuleType.EVACUATION, controller);
+		super(controller.getLocale().moduleEvacAreaSelector(), Constants.ModuleType.EVACUATION, controller);
 
 		// disable all layers
 		this.processList.add(new DisableLayersProcess(controller));
@@ -119,8 +98,7 @@ public class EvacuationAreaSelector extends AbstractModule {
 		this.processList.add(new InitMapLayerProcess(controller));
 
 		// set module listeners
-		this.processList.add(new SetModuleListenerProcess(controller, this,
-				new EvacEventListener(controller)));
+		this.processList.add(new SetModuleListenerProcess(controller, this, new EvacEventListener(controller)));
 
 		// check if there is already a primary shape layer
 		this.processList.add(new InitShapeLayerProcess(controller));
@@ -129,14 +107,15 @@ public class EvacuationAreaSelector extends AbstractModule {
 		this.processList.add(new BasicProcess(controller) {
 			@Override
 			public void start() {
-				int shapeRendererId = controller.getVisualizer()
-						.getPrimaryShapeRenderLayer().getId();
+				int shapeRendererId = controller.getVisualizer().getPrimaryShapeRenderLayer().getId();
 				Rectangle2D bbRect = controller.getBoundingBox();
-				controller.addShape(ShapeFactory.getNetBoxShape(
-						shapeRendererId, bbRect, false));
+				controller.addShape(ShapeFactory.getNetBoxShape(shapeRendererId, bbRect, false));
 			}
 
 		});
+		
+		// load evacuation area shape (if available)
+		this.processList.add(new InitEvacShapeProcess(controller));
 
 		// add toolbox
 		this.processList.add(new SetToolBoxProcess(controller, getToolBox()));
@@ -156,16 +135,13 @@ public class EvacuationAreaSelector extends AbstractModule {
 
 	public Point getGeoPoint(Point mousePoint) {
 		Rectangle viewPortBounds = this.controller.getViewportBounds();
-		return new Point(mousePoint.x + viewPortBounds.x - offsetX,
-				mousePoint.y + viewPortBounds.y - offsetY);
+		return new Point(mousePoint.x + viewPortBounds.x - offsetX, mousePoint.y + viewPortBounds.y - offsetY);
 	}
 
 	public void setEvacCircle(Point2D c0, Point2D c1) {
-		CircleShape evacCircle = ShapeFactory.getEvacCircle(controller
-				.getVisualizer().getPrimaryShapeRenderLayer().getId(), c0, c1);
+		CircleShape evacCircle = ShapeFactory.getEvacCircle(controller.getVisualizer().getPrimaryShapeRenderLayer().getId(), c0, c1);
 		controller.addShape(evacCircle);
-		this.controller.getVisualizer().getPrimaryShapeRenderLayer()
-				.updatePixelCoordinates(evacCircle);
+		this.controller.getVisualizer().getPrimaryShapeRenderLayer().updatePixelCoordinates(evacCircle);
 
 	}
 

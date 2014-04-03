@@ -25,10 +25,12 @@ public class ScenarioManagerModuleChain extends ModuleChain {
 		nextModules.put(ModuleType.GRIPSSCENARIO, new ArrayList<ModuleType>(){{ add(ModuleType.ROADCLOSURE); add(ModuleType.BUSSTOPS); add(ModuleType.MATSIMSCENARIO); }});
 		nextModules.put(ModuleType.MATSIMSCENARIO, new ArrayList<ModuleType>(){{ add(ModuleType.ANALYSIS); }});
 		
-		pastModules.put(ModuleType.GRIPSSCENARIO, new ArrayList<ModuleType>(){{ add(ModuleType.EVACUATION); add(ModuleType.POPULATION); }});
+		pastModules.put(ModuleType.EVACUATION, new ArrayList<ModuleType>(){{ add(ModuleType.SCENARIOXML);  }});
+		pastModules.put(ModuleType.POPULATION, new ArrayList<ModuleType>(){{ add(ModuleType.SCENARIOXML); add(ModuleType.EVACUATION);}});
+		pastModules.put(ModuleType.GRIPSSCENARIO, new ArrayList<ModuleType>(){{ add(ModuleType.EVACUATION); add(ModuleType.POPULATION); add(ModuleType.SCENARIOXML);}});
 		pastModules.put(ModuleType.MATSIMSCENARIO, new ArrayList<ModuleType>(){{ add(ModuleType.ROADCLOSURE); add(ModuleType.BUSSTOPS); add(ModuleType.GRIPSSCENARIO);}});
-		
-//		pastModules.put(ModuleType.SCENARIOXML, new ArrayList<ModuleType>(){{ add(ModuleType.GRIPSSCENARIO); add(ModuleType.ROADCLOSURE); add(ModuleType.BUSSTOPS); add(ModuleType.ANALYSIS); add(ModuleType.MATSIMSCENARIO); }});
+		pastModules.put(ModuleType.ROADCLOSURE, new ArrayList<ModuleType>(){{ add(ModuleType.GRIPSSCENARIO);}});
+		pastModules.put(ModuleType.BUSSTOPS, new ArrayList<ModuleType>(){{ add(ModuleType.GRIPSSCENARIO);}});
 		
 	}
 	

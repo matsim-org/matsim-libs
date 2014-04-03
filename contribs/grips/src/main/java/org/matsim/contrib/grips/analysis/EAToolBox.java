@@ -87,8 +87,7 @@ public class EAToolBox extends AbstractToolBox {
 
 	private int exportSize;
 
-	private static final Logger log = Logger
-			.getLogger(EvacuationAnalysis.class);
+	private static final Logger log = Logger.getLogger(EvacuationAnalysis.class);
 	private JPanel compositePanel;
 	private JButton saveButton;
 	private JButton openBtn;
@@ -131,8 +130,7 @@ public class EAToolBox extends AbstractToolBox {
 		// the panel on the right hand side, to display graphs etc.
 		JPanel panel = new JPanel();
 		this.blockPanel = new JPanel();
-		this.blockPanel.setLayout(new BoxLayout(this.blockPanel,
-				BoxLayout.Y_AXIS));
+		this.blockPanel.setLayout(new BoxLayout(this.blockPanel, BoxLayout.Y_AXIS));
 		this.blockPanel.setSize(new Dimension(400, 450));
 
 		// ////////////////////////////////////////////////////////////////////////////
@@ -190,24 +188,18 @@ public class EAToolBox extends AbstractToolBox {
 		this.openOTFVisBtn.setPreferredSize(new Dimension(100, 20));
 		this.openOTFVisBtn.setSize(new Dimension(100, 24));
 
-		JPanel iterationSelectionPanel = new JPanel(new FlowLayout(
-				FlowLayout.RIGHT));
-		iterationSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2,
-				2, 2));
+		JPanel iterationSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		iterationSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		this.iterationsList = new JComboBox();
 		this.iterationsList.addActionListener(this);
 		this.iterationsList.setActionCommand("changeIteration");
 		this.iterationsList.setPreferredSize(new Dimension(220, 24));
-		iterationSelectionPanel.add(new JLabel(" event file: ",
-				SwingConstants.RIGHT));
+		iterationSelectionPanel.add(new JLabel(" event file: ", SwingConstants.RIGHT));
 		iterationSelectionPanel.add(this.iterationsList);
 
-		JPanel gridSizeSelectionPanel = new JPanel(new FlowLayout(
-				FlowLayout.RIGHT));
-		gridSizeSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2,
-				2, 2));
-		this.gridSizeSlider = new JSlider(SwingConstants.HORIZONTAL, 10, 100,
-				(int) this.cellSize);
+		JPanel gridSizeSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		gridSizeSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+		this.gridSizeSlider = new JSlider(SwingConstants.HORIZONTAL, 10, 100, (int) this.cellSize);
 		// this.gridSizeSlider.setMinorTickSpacing(2);
 		this.gridSizeSlider.setPaintTicks(true);
 		this.gridSizeSlider.setSnapToTicks(true);
@@ -255,8 +247,7 @@ public class EAToolBox extends AbstractToolBox {
 		gridSizeSelectionPanel.add(this.gridSizeSlider);
 
 		JPanel modeSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		modeSelectionPanel.setBorder(BorderFactory
-				.createEmptyBorder(2, 2, 2, 2));
+		modeSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		this.modeList = new JComboBox();
 		this.modeList.addItem(Mode.EVACUATION);
 		this.modeList.addItem(Mode.CLEARING);
@@ -267,20 +258,16 @@ public class EAToolBox extends AbstractToolBox {
 		modeSelectionPanel.add(new JLabel(" mode: ", SwingConstants.RIGHT));
 		modeSelectionPanel.add(this.modeList);
 
-		JPanel calculateButtonPanel = new JPanel(new FlowLayout(
-				FlowLayout.RIGHT));
-		calculateButtonPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2,
-				7));
+		JPanel calculateButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		calculateButtonPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 7));
 		calculateButtonPanel.add(new JLabel(""));
 		if (useCalculateButton)
 			calculateButtonPanel.add(calcButton);
 
 		calculateButtonPanel.setPreferredSize(new Dimension(220, 40));
 
-		JPanel transparencySliderPanel = new JPanel(new FlowLayout(
-				FlowLayout.RIGHT));
-		transparencySliderPanel.setBorder(BorderFactory.createEmptyBorder(2, 2,
-				2, 2));
+		JPanel transparencySliderPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		transparencySliderPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		transparencySlider = new JSlider(SwingConstants.HORIZONTAL, 1, 100, 50);
 		transparencySlider.addChangeListener(new ChangeListener() {
 			@Override
@@ -293,8 +280,7 @@ public class EAToolBox extends AbstractToolBox {
 			public void mouseReleased(MouseEvent arg0) {
 				// if (!useCalculateButton)
 				// {
-				EAToolBox.this.module.setCellTransparency((((JSlider) arg0
-						.getSource()).getValue()) / 100f);
+				EAToolBox.this.module.setCellTransparency((((JSlider) arg0.getSource()).getValue()) / 100f);
 				EAToolBox.this.module.runCalculation();
 				// }
 			}
@@ -316,8 +302,7 @@ public class EAToolBox extends AbstractToolBox {
 			}
 		});
 		transparencySlider.setPreferredSize(new Dimension(220, 24));
-		transparencySliderPanel.add(new JLabel(" cell transparency: ",
-				SwingConstants.RIGHT));
+		transparencySliderPanel.add(new JLabel(" cell transparency: ", SwingConstants.RIGHT));
 		transparencySliderPanel.add(transparencySlider);
 
 		this.controlPanel.add(new JLabel(""));
@@ -392,11 +377,9 @@ public class EAToolBox extends AbstractToolBox {
 
 				this.gridRenderer.setEnabled(false);
 
-				DefaultSaveDialog saveDialog = new DefaultSaveDialog(
-						controller, "tiff", "tiff file (*.tiff)", false);
+				DefaultSaveDialog saveDialog = new DefaultSaveDialog(controller, "tiff", "tiff file (*.tiff)", false);
 
-				int returnVal = saveDialog.showSaveDialog(this.controller
-						.getParentComponent());
+				int returnVal = saveDialog.showSaveDialog(this.controller.getParentComponent());
 
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					// save file
@@ -404,62 +387,41 @@ public class EAToolBox extends AbstractToolBox {
 					final String sourceCRS = this.controller.getSourceCoordinateSystem();
 					final String targetCRS = this.controller.getTargetCoordinateSystem();
 					this.ctInverse = new GeotoolsTransformation(targetCRS, sourceCRS);
-					
-					Rectangle2D bbox = controller.getBoundingBox();
-					Rect boundingBox = new Rect(bbox.getMinX(), bbox.getMinY(),
-							bbox.getMaxX(), bbox.getMaxY());
-					double gridSize = this.module.getEventHandler().getData()
-							.getCellSize();
 
-					Coord minValues = this.ctInverse.transform(new CoordImpl(
-							boundingBox.minX - gridSize / 2, boundingBox.minY
-									- gridSize / 2));
-					Coord maxValues = this.ctInverse.transform(new CoordImpl(
-							boundingBox.maxX + gridSize / 2, boundingBox.maxY
-									+ gridSize / 2));
+					Rectangle2D bbox = controller.getBoundingBox();
+					Rect boundingBox = new Rect(bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY());
+					double gridSize = this.module.getEventHandler().getData().getCellSize();
+
+					Coord minValues = this.ctInverse.transform(new CoordImpl(boundingBox.minX - gridSize / 2, boundingBox.minY - gridSize / 2));
+					Coord maxValues = this.ctInverse.transform(new CoordImpl(boundingBox.maxX + gridSize / 2, boundingBox.maxY + gridSize / 2));
 
 					double westmost = minValues.getX();
 					double soutmost = minValues.getY();
 					double eastmost = maxValues.getX();
 					double northmost = maxValues.getY();
 
-					Envelope2D env = new Envelope2D(DefaultGeographicCRS.WGS84,
-							westmost, soutmost, eastmost - westmost, northmost
-									- soutmost);
+					Envelope2D env = new Envelope2D(DefaultGeographicCRS.WGS84, westmost, soutmost, eastmost - westmost, northmost - soutmost);
 
-					BufferedImage imgEvacuation = this.gridRenderer
-							.getGridAsImage(Mode.EVACUATION, exportSize,
-									exportSize);
-					BufferedImage imgClearing = this.gridRenderer
-							.getGridAsImage(Mode.CLEARING, exportSize,
-									exportSize);
-					BufferedImage imgUtilization = this.gridRenderer
-							.getGridAsImage(Mode.UTILIZATION, exportSize,
-									exportSize);
+					BufferedImage imgEvacuation = this.gridRenderer.getGridAsImage(Mode.EVACUATION, exportSize, exportSize);
+					BufferedImage imgClearing = this.gridRenderer.getGridAsImage(Mode.CLEARING, exportSize, exportSize);
+					BufferedImage imgUtilization = this.gridRenderer.getGridAsImage(Mode.UTILIZATION, exportSize, exportSize);
 
-					String filePrefix = directory.toString() + "/"
-							+ this.module.getCurrentEventFile().getName()
-							+ "_2_";
+					String filePrefix = directory.toString() + "/" + this.module.getCurrentEventFile().getName() + "_2_";
 
 					try {
-						TiffExporter.writeGEOTiff(env, filePrefix
-								+ Mode.EVACUATION + ".tiff", imgEvacuation);
-						TiffExporter.writeGEOTiff(env, filePrefix
-								+ Mode.CLEARING + ".tiff", imgClearing);
-						TiffExporter.writeGEOTiff(env, filePrefix
-								+ Mode.UTILIZATION + ".tiff", imgUtilization);
+						TiffExporter.writeGEOTiff(env, filePrefix + Mode.EVACUATION + ".tiff", imgEvacuation);
+						TiffExporter.writeGEOTiff(env, filePrefix + Mode.CLEARING + ".tiff", imgClearing);
+						TiffExporter.writeGEOTiff(env, filePrefix + Mode.UTILIZATION + ".tiff", imgUtilization);
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					} finally {
 						this.gridRenderer.setEnabled(true);
-						this.controller.getParentComponent().setCursor(
-								Cursor.getDefaultCursor());
+						this.controller.getParentComponent().setCursor(Cursor.getDefaultCursor());
 					}
 				}
 
 				this.gridRenderer.setEnabled(true);
-				this.controller.getParentComponent().setCursor(
-						Cursor.getDefaultCursor());
+				this.controller.getParentComponent().setCursor(Cursor.getDefaultCursor());
 
 			}
 
@@ -491,8 +453,7 @@ public class EAToolBox extends AbstractToolBox {
 				}
 			});
 
-			int returnVal = fc.showOpenDialog(this.controller
-					.getParentComponent());
+			int returnVal = fc.showOpenDialog(this.controller.getParentComponent());
 
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				// open file
@@ -512,11 +473,10 @@ public class EAToolBox extends AbstractToolBox {
 				this.openBtn.setEnabled(false);
 				this.saveButton.setEnabled(true);
 				this.calcButton.setEnabled(true);
-				
+
 				final String sourceCRS = this.controller.getSourceCoordinateSystem();
-				
-				this.ctInverse = new GeotoolsTransformation(this.getScenario()
-						.getConfig().global().getCoordinateSystem(), sourceCRS);
+
+				this.ctInverse = new GeotoolsTransformation(this.getScenario().getConfig().global().getCoordinateSystem(), sourceCRS);
 
 				this.firstLoad = false;
 
@@ -530,8 +490,7 @@ public class EAToolBox extends AbstractToolBox {
 		}
 
 		else if ((e.getActionCommand() == "changeIteration") && (!firstLoad)) {
-			File newFile = this.module.getEventPathFromName(""
-					+ iterationsList.getSelectedItem());
+			File newFile = this.module.getEventPathFromName("" + iterationsList.getSelectedItem());
 			int index = iterationsList.getSelectedIndex();
 
 			if (newFile != null) {
@@ -737,10 +696,8 @@ public class EAToolBox extends AbstractToolBox {
 				{
 					hours = Math.floor(value / 3600);
 					minutes = Math.floor((value - hours * 3600) / 60);
-					seconds = Math
-							.floor((value - (hours * 3600) - (minutes * 60)));
-					return " > " + (int) hours + "h, " + (int) minutes + "m, "
-							+ (int) seconds + "s";
+					seconds = Math.floor((value - (hours * 3600) - (minutes * 60)));
+					return " > " + (int) hours + "h, " + (int) minutes + "m, " + (int) seconds + "s";
 				} else {
 					minutes = Math.floor(value / 60);
 					seconds = Math.floor((value - (minutes * 60)));

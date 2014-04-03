@@ -64,8 +64,7 @@ public class SGMask extends JPanel {
 
 		this.setLayout(new BorderLayout());
 		this.textOutput = new JTextArea();
-		this.textOutput.setPreferredSize(new Dimension(width - 20,
-				(int) (height / 1.5)));
+		this.textOutput.setPreferredSize(new Dimension(width - 20, (int) (height / 1.5)));
 		this.btRun = new JButton(this.controller.getLocale().btRun());
 		this.btRun.setEnabled(false);
 
@@ -90,15 +89,13 @@ public class SGMask extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					SGMask.this.btRun.setEnabled(false);
-					SGMask.this.setCursor(Cursor
-							.getPredefinedCursor(Cursor.WAIT_CURSOR));
+					SGMask.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
 					SwingWorker<String, Void> worker = new SwingWorker<String, Void>() {
 
 						@Override
 						protected String doInBackground() {
-							ScenarioGenerator scengen = new org.matsim.contrib.grips.scenariogenerator.ScenarioGenerator(
-									SGMask.this.controller.getGripsFile());
+							ScenarioGenerator scengen = new org.matsim.contrib.grips.scenariogenerator.ScenarioGenerator(SGMask.this.controller.getGripsFile());
 							scengen.run();
 							return "";
 						}
@@ -107,22 +104,13 @@ public class SGMask extends JPanel {
 						protected void done() {
 							SGMask.this.setCursor(Cursor.getDefaultCursor());
 							SGMask.this.btRun.setEnabled(true);
-							SGMask.this.scenarioGeneratorMask
-									.setMainGoalAchieved(true);
-							SGMask.this.controller
-									.setGoalAchieved(SGMask.this.scenarioGeneratorMask
-											.isMainGoalAchieved());
+							SGMask.this.scenarioGeneratorMask.setMainGoalAchieved(true);
+							SGMask.this.controller.setGoalAchieved(SGMask.this.scenarioGeneratorMask.isMainGoalAchieved());
 
-							SGMask.this.root
-									.removeAppender(SGMask.this.logAppender);
+							SGMask.this.root.removeAppender(SGMask.this.logAppender);
 
 							if (!SGMask.this.controller.isStandAlone())
-								SGMask.this.controller
-										.openMastimConfig(new File(
-												SGMask.this.controller
-														.getGripsConfigModule()
-														.getOutputDir()
-														+ Constants.DEFAULT_MATSIM_CONFIG_FILE));
+								SGMask.this.controller.openMastimConfig(new File(SGMask.this.controller.getGripsConfigModule().getOutputDir() + Constants.DEFAULT_MATSIM_CONFIG_FILE));
 
 						}
 					};
@@ -175,12 +163,10 @@ public class SGMask extends JPanel {
 			this.sgMask.textOutput.selectAll();
 
 			if (++n > 20) {
-				Element root = this.sgMask.textOutput.getDocument()
-						.getDefaultRootElement();
+				Element root = this.sgMask.textOutput.getDocument().getDefaultRootElement();
 				Element first = root.getElement(0);
 				try {
-					this.sgMask.textOutput.getDocument().remove(
-							first.getStartOffset(), first.getEndOffset());
+					this.sgMask.textOutput.getDocument().remove(first.getStartOffset(), first.getEndOffset());
 				} catch (BadLocationException e) {
 					e.printStackTrace();
 				}

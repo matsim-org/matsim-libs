@@ -40,6 +40,7 @@ public abstract class Shape
 	protected String description;
 	protected HashMap<String, String> metaData;
 	protected boolean visible = true;
+	protected boolean fromFile = false;
 	
 	
 	protected ShapeStyle style;
@@ -188,6 +189,14 @@ public abstract class Shape
 	
 	public static int getCurrentNumberId() {
 		return currentNumberId;
+	}
+	
+	public boolean isFromFile() {
+		return fromFile;
+	}
+	
+	public void setFromFile(boolean fromFile) {
+		this.fromFile = fromFile;
 	}
 	
 	

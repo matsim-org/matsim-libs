@@ -40,6 +40,9 @@ public class SetToolBoxProcess extends BasicProcess
 		//set tool box
 		if ((controller.getActiveToolBox()==null) || (!(controller.getActiveToolBox().getClass().isInstance(toolBox))))
 			this.controller.setActiveToolBox(toolBox);
+		
+		if (!controller.getActiveToolBox().isVisible())
+			controller.getActiveToolBox().setVisible(true);
 	}	
 
 }
