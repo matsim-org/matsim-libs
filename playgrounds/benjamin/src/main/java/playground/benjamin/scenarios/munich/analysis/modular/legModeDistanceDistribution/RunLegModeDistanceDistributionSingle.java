@@ -31,12 +31,16 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 public class RunLegModeDistanceDistributionSingle {
 	private final static Logger logger = Logger.getLogger(RunLegModeDistanceDistributionSingle.class);
 	
-	static String baseFolder = "../../runs-svn/detEval/mobilTUM/run20/";
-	static String configFile = baseFolder + "output_config.xml.gz";
-	static String iteration = "0";
+//	static String baseFolder = "../../runs-svn/detEval/mobilTUM/run20/";
+//	static String configFile = baseFolder + "output_config.xml.gz";
+//	static String iteration = "0";
 	
-//	static UserGroup userGroup = null;
-	static UserGroup userGroup = UserGroup.URBAN;
+	static String baseFolder = "../../runs-svn/internalizationCar/output/baseCase2a/";
+	static String configFile = baseFolder + "output_config.xml.gz";
+	static String iteration = "500";
+	
+	static UserGroup userGroup = null;
+//	static UserGroup userGroup = UserGroup.URBAN;
 
 	public static void main(String[] args) {
 		Gbl.startMeasurement();

@@ -50,7 +50,7 @@ import playground.benjamin.utils.BkNumberUtils;
 public class ModalSplitAnalysis {
 	private static final Logger logger = Logger.getLogger(ModalSplitAnalysis.class);
 
-	private final static String runNumber = "983";
+	private final static String runNumber = "981";
 	private final static String runDirectory = "../../runs-svn/run" + runNumber + "/";
 	private final String netFile = runDirectory + runNumber + ".output_network.xml.gz";
 	private final String plansFile = runDirectory + runNumber + ".output_plans.xml.gz";

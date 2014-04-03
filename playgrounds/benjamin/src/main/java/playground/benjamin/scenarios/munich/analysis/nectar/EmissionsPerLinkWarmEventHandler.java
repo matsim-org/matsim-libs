@@ -21,7 +21,6 @@ package playground.benjamin.scenarios.munich.analysis.nectar;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -103,6 +102,7 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 						double countsSoFar = countTotal.get(linkId);
 						double newValue = countsSoFar + 1.;
 						countTotal.put(linkId, newValue);
+						warmEmissionsTotal.put(linkId, warmEmissionsSoFar);
 					} else {
 						warmEmissionsTotal.put(linkId, warmEmissionsOfEvent);
 						countTotal.put(linkId, 1.);

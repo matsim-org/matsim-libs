@@ -28,9 +28,9 @@ import playground.benjamin.BkPaths;
 public class BkVisConvertReplay {
 	private final static Logger logger = Logger.getLogger(BkVisConvertReplay.class);
 
-	static boolean convert = false;
-	static String runNumber = "981";
-	static String eventsNumber = "1000";
+	static boolean convert = true;
+	static String runNumber = "";
+	static String eventsNumber = "500";
 	
 	static String runPath = BkPaths.RUNSSVN + "run" + runNumber + "/";
 	static String eventsPath = runPath + "ITERS/it." + eventsNumber + "/";
