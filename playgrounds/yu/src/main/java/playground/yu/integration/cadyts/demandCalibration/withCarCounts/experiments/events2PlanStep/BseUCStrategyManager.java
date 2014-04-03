@@ -62,16 +62,13 @@ public class BseUCStrategyManager extends StrategyManager implements
 		throw new RuntimeException("this won't work any more since afterRemovePlansHook is no longer there.  kai, nov'13") ;
 	}
 
-	public void init(final Calibrator<Link> calibrator,
-			final TravelTime travelTimes, double brainExpBeta) {
+	public void init(final Calibrator<Link> calibrator, double brainExpBeta) {
 		this.calibrator = (MATSimUtilityModificationCalibrator<Link>) calibrator;
-		planConverter = new PlanToPlanStep(travelTimes, net);
 		beta = brainExpBeta;
 	}
 
-	public void init(final Calibrator<Link> calibrator,
-			final TravelTime travelTimes, EventsToPlanSteps events2PlanStep) {
-		this.init(calibrator, travelTimes, beta);
+	public void init(final Calibrator<Link> calibrator, EventsToPlanSteps events2PlanStep) {
+		this.init(calibrator,  beta);
 		this.events2PlanSteps = events2PlanStep;
 	}
 

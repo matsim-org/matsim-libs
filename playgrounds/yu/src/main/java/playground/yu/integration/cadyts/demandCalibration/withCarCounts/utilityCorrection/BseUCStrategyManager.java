@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.ReplanningContext;
@@ -63,6 +64,7 @@ public class BseUCStrategyManager extends StrategyManager implements
 	private SimpleWriter writer = null;
 	private String line = null;
 	protected int iter;
+	private Config config;
 
 	// ////////////////////////////////////////
 	// public void setScoreModificationFilename(String
@@ -74,15 +76,18 @@ public class BseUCStrategyManager extends StrategyManager implements
 		return personUtilityOffsets;
 	}
 
-	public BseUCStrategyManager(Network net, int iteration) {
+	public BseUCStrategyManager(Network net, Config config) {
 		this.net = net;
-		iter = iteration;
+		this.config = config;
+		iter = config.controler().getFirstIteration();
+		;
 	}
 
 	public void init(final Calibrator<Link> calibrator,
-			final TravelTime travelTimes, final double brainExpBeta) {
+	// final TravelTime travelTimes,
+			final double brainExpBeta) {
 		this.calibrator = (MATSimUtilityModificationCalibrator<Link>) calibrator;
-		planConverter = new PlanToPlanStep(travelTimes, net);
+
 		beta = brainExpBeta;
 	}
 
@@ -112,7 +117,7 @@ public class BseUCStrategyManager extends StrategyManager implements
 	// if (plan == person.getSelectedPlan())
 	// person.setSelectedPlan(person.getRandomPlan());
 	// // remove oldCorrection of the removed plan
-	//			
+	//
 	// }
 	// }
 
@@ -122,15 +127,15 @@ public class BseUCStrategyManager extends StrategyManager implements
 	// }
 
 	@Override
-	protected void beforePopulationRunHook(Population population, ReplanningContext replanningContext) {
+	protected void beforePopulationRunHook(Population population,
+			ReplanningContext replanningContext) {
 		iter++;
-
+		planConverter = new PlanToPlanStep(replanningContext.getTravelTime(),
+				net);
 		// ////////////////////////////////
-		writer = new SimpleWriter(
-				"../integration-parameterCalibration/test/cali3/C3Step0TestLocal_DC2/corrections.it"
-						+ iter + ".log");
-		writer
-				.writeln("personId\tplanIndex\toldPlanScore\tnewPlanScore\tcurrentCorrection\tplanStep");
+		writer = new SimpleWriter(config.controler().getOutputDirectory()
+				+ "/corrections.it" + iter + ".log");
+		writer.writeln("personId\tplanIndex\toldPlanScore\tnewPlanScore\tcurrentCorrection\tplanStep");
 		// /////////////////////////////////
 		// #####################DEPRECATED################################
 		// this.samplers = new HashMap<Id, ChoiceSampler<Link>>();
@@ -269,8 +274,7 @@ public class BseUCStrategyManager extends StrategyManager implements
 	private void correctPlanScore(Plan plan) {
 		planConverter.convert((PlanImpl) plan);
 		cadyts.demand.Plan<Link> planSteps = planConverter.getPlanSteps();
-		double scoreCorrection = calibrator
-				.getUtilityCorrection(planSteps)
+		double scoreCorrection = calibrator.getUtilityCorrection(planSteps)
 				/ beta;
 
 		// ################only for Dummy Tests################

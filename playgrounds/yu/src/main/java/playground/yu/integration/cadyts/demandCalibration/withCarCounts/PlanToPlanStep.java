@@ -21,6 +21,7 @@ w * project: org.matsim.*
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.ActivityImpl;
@@ -80,6 +81,14 @@ public class PlanToPlanStep {
 			planStepFactory.addEntry(net.getLinks().get(fromAct.getLinkId()),
 					(int) time/* endTime of first activity */);
 			// turns for all links
+			if (leg.getMode().equals(TransportMode.pt)) {
+				if (!foundPT) {
+					System.out.println("BSE: found a PT plan");
+					foundPT = true;
+				}
+				planStepFactory.reset();
+				return;
+			}
 			for (Id linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 				Link link = net.getLinks().get(linkId);
 				planStepFactory.addTurn(link, (int) time);
@@ -92,8 +101,8 @@ public class PlanToPlanStep {
 			// last turn to destination link
 			planStepFactory.addTurn(net.getLinks().get(toAct.getLinkId()),
 					(int) time);
-			time += ttime.getLinkTravelTime(net.getLinks().get(
-					toAct.getLinkId()), time, null, null);
+			time += ttime.getLinkTravelTime(
+					net.getLinks().get(toAct.getLinkId()), time, null, null);
 			if (time > maxTime) {
 				planStepFactory.addExit(maxTime);
 				return;
@@ -103,8 +112,10 @@ public class PlanToPlanStep {
 			// advance time
 			if (toAct.getMaximumDuration() != Time.UNDEFINED_TIME
 					&& toAct.getEndTime() != Time.UNDEFINED_TIME) {
-				time = Math.max(time, Math.min(time + toAct.getMaximumDuration(),
-						toAct.getEndTime()));
+				time = Math.max(
+						time,
+						Math.min(time + toAct.getMaximumDuration(),
+								toAct.getEndTime()));
 			} else if (toAct.getMaximumDuration() != Time.UNDEFINED_TIME) {
 				time += toAct.getMaximumDuration();
 			} else {

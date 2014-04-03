@@ -23,6 +23,7 @@
  */
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.run;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.matsim.core.controler.Controler;
@@ -67,8 +68,28 @@ public class Run {
 		ctl.run();
 	}
 
+	public static void runTest(String[] args) throws IOException {
+		final Controler ctl;
+		if (args.length == 0) {
+//			File dirFile = new File("../..");
+//			String[] files = dirFile.list();
+//			for (int i = 0; i < files.length; i++) {
+//				System.out.println(files[i]);
+//			}
+			ctl = new playground.yu.integration.cadyts.demandCalibration.withCarCounts.utilityCorrection.BseUCControler(
+					new String[] { "../../trials/2car1ptRoutes/cfg.xml" });
+		} else {
+			ctl = new BseUCControler(args);
+		}
+
+		ctl.setOverwriteFiles(true);
+		ctl.setCreateGraphs(false);
+		ctl.run();
+	}
+
 	public static void main(String[] args) throws IOException {
-		runOld(args);
+		// runOld(args);
 		// runNew(args);
+		runTest(args);
 	}
 }

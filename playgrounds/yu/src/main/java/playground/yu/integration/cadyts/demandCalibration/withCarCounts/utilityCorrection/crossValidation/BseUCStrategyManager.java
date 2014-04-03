@@ -62,10 +62,8 @@ public class BseUCStrategyManager extends StrategyManager implements
 		throw new RuntimeException("this won't work any more since afterRemovePlansHook is no longer there.  kai, nov'13") ;
 	}
 
-	public void init(final Calibrator<Link> calibrator,
-			final TravelTime travelTimes, double brainExpBeta) {
+	public void init(final Calibrator<Link> calibrator,double brainExpBeta) {
 		this.calibrator = (MATSimUtilityModificationCalibrator<Link>) calibrator;
-		planConverter = new PlanToPlanStep(travelTimes, net);
 		beta = brainExpBeta;
 	}
 
@@ -108,6 +106,7 @@ public class BseUCStrategyManager extends StrategyManager implements
 
 	@Override
 	protected void beforePopulationRunHook(Population population, ReplanningContext replanningContext) {
+		planConverter = new PlanToPlanStep(replanningContext.getTravelTime(), net);
 		// ###########################DEPRECATED###########################
 		// this.samplers = new HashMap<Id, ChoiceSampler<Link>>();
 		// ###########################DEPRECATED###########################

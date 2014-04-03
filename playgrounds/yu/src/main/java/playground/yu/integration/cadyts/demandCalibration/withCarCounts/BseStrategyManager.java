@@ -32,7 +32,8 @@ import cadyts.calibrators.Calibrator;
  * @author yu
  * 
  */
-@Deprecated // use contrib.cadytsintegration instead
+@Deprecated
+// use contrib.cadytsintegration instead
 public interface BseStrategyManager {
 
 	/*
@@ -52,6 +53,6 @@ public interface BseStrategyManager {
 	 * @param brainExpBeta
 	 */
 	public void init(final Calibrator<Link> calibrator,
-			final TravelTime travelTimes, final double brainExpBeta);
+			final double brainExpBeta);
 
 }

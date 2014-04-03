@@ -56,7 +56,7 @@ public class BseUCControlerListener implements StartupListener,
 	private SimResults<Link> resultsContainer = null;
 	/* default */VolumesAnalyzer volumes = null;
 	/* default */double countsScaleFactor = 1.0;
-	private Coord distanceFilterCenterNodeCoord;
+	private Coord distanceFilterCenterNodeCoord=null;
 	private double distanceFilter;
 	private int arStartTime, arEndTime;
 	private boolean writeQGISFile = false;
@@ -65,6 +65,8 @@ public class BseUCControlerListener implements StartupListener,
 	private static Set<Id> linkIds = new HashSet<Id>();
 
 	private boolean isInRange(final Id linkid, final Network net) {
+		if(this.distanceFilterCenterNodeCoord==null)
+			return true;
 		Link l = net.getLinks().get(linkid);
 		if (l == null) {
 			System.out.println("Cannot find requested link: "
@@ -117,10 +119,10 @@ public class BseUCControlerListener implements StartupListener,
 		Config config = controler.getConfig();
 
 		// set up center and radius of counts stations locations
-		distanceFilterCenterNodeCoord = net.getNodes().get(
-				new IdImpl(config.counts().getDistanceFilterCenterNode()))
-				.getCoord();
-		distanceFilter = config.counts().getDistanceFilter();
+//		distanceFilterCenterNodeCoord = net.getNodes().get(
+//				new IdImpl(config.counts().getDistanceFilterCenterNode()))
+//				.getCoord();
+//		distanceFilter = config.counts().getDistanceFilter();
 		arStartTime = Integer.parseInt(config.findParam("bse", "startTime"));
 		arEndTime = Integer.parseInt(config.findParam("bse", "endTime"));
 
@@ -310,9 +312,11 @@ public class BseUCControlerListener implements StartupListener,
 
 		// set up a/r-strategy
 		((BseUCStrategyManager) controler.getStrategyManager()).init(
-				calibrator, controler.getLinkTravelTimes(), config
-						.planCalcScore().getBrainExpBeta());
+				calibrator//, controler.getLinkTravelTimes()
+				, config.planCalcScore().getBrainExpBeta());
 
+		//TODO moves " controler.getLinkTravelTimes()" to notifyIterationStart() ...
+		
 		// prepare resultsContainer
 		resultsContainer = new SimResultsContainerImpl();
 	}
