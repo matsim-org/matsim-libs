@@ -176,7 +176,7 @@ public class PassingTest {
 
 			Set<String> allowedModes = new HashSet<String>(); allowedModes.addAll(Arrays.asList("car","bike"));
 
-			link1 = network.createAndAddLink(scenario.createId("1"), node1, node2, 100, 25, 60, 1, null, "22"); //capacity is 1 PCU per second.
+			link1 = network.createAndAddLink(scenario.createId("1"), node1, node2, 100, 25, 60, 1, null, "22"); //capacity is 1 PCU per min.
 			link2 = network.createAndAddLink(scenario.createId("2"), node2, node3, 1000, 25, 60, 1, null, "22");	
 			link3 = network.createAndAddLink(scenario.createId("3"), node3, node4, 100, 25, 60, 1, null, "22");
 
