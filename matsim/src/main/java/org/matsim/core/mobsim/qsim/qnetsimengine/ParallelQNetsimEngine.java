@@ -56,7 +56,6 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 	private CyclicBarrier endBarrier;
 	
 	private final Set<QLinkInternalI> linksToActivateInitially = new HashSet<QLinkInternalI>();
-	private boolean isPrepared = false;
 
 	ParallelQNetsimEngine(final QSim sim) {
 		super(sim);
@@ -69,7 +68,6 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 	public void onPrepareSim() {
 		super.onPrepareSim();
 		initQSimEngineThreads();
-		this.isPrepared = true;
 	}
 
 	/**
@@ -149,16 +147,7 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 	 */
 	@Override
 	protected synchronized void activateLink(final QLinkInternalI link) {
-		/*
-		 * The ActivityEngine might activate links when inserting Agents into the mobsim.
-		 * This only occurs before the onPrepareSim method of this class is called. Links
-		 * containing such agents are activated when assigned to a QSimEngineRunner.
-		 */
-		if (isPrepared) {
-			throw new RuntimeException("Links should be activated by a QSimEngineRunner and not by the ParallelQNetsimEngine!");
-		} else { 
-			linksToActivateInitially.add(link);
-		}
+		throw new RuntimeException("Links should be activated by a QSimEngineRunner and not by the ParallelQNetsimEngine!");
 	}
 
 	@Override
