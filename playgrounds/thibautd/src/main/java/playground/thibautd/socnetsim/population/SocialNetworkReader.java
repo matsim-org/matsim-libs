@@ -24,11 +24,8 @@ import java.util.Stack;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.IdFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-
-import playground.thibautd.utils.ObjectPool;
 
 /**
  * @author thibautd
@@ -42,20 +39,7 @@ public class SocialNetworkReader extends MatsimXmlParser {
 
 	public SocialNetworkReader(final Scenario scenario) {
 		this.scenario = scenario;
-
-		if ( scenario instanceof IdFactory ) {
-			this.idFactory = (IdFactory) scenario;
-		}
-		else {
-			this.idFactory = new IdFactory() {
-				private final ObjectPool<Id> idPool = new ObjectPool<Id>();
-	
-				@Override
-				public Id createId(final String id) {
-					return idPool.getPooledInstance( new IdImpl( id ) );
-				}
-			};
-		}
+		this.idFactory = scenario;
 	}
 
 	@Override
