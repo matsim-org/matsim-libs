@@ -77,6 +77,10 @@ public class ParkHistoryWriter {
 		schreiben("<parkevent time="+time+" eventtype=agent_not_parked person="+person+">\n");
 	}
 
+	public void addAgentNotParkedWithinDefaultDistance(String time, String person){
+		schreiben("<parkevent time="+time+" eventtype=agent_not_parked_within_default_distance person="+person+">\n");
+	}
+	
 	public void addNEVParked(String time, String person, String parking, double score, String parkingType, String spotType){
 		schreiben("<parkevent time="+time+" eventtype=NEV_parked person="+person+" parking="+parking+" spot_score="+score+" parkingType="+parkingType+" spotType="+spotType+">\n");
 	}

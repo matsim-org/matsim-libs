@@ -192,7 +192,7 @@ public class ParkControl {
 		//-----------
 		RemoveDuplicate.RemoveDuplicate(spotsInArea);
 		
-		//Statistik
+		//Statistik (Bezieht sich auf Spots im Unkreis vom Suchradius aus der VMConfig)
 		if(ev){
 			VMCharts.addValues("Available parkings", "for ev", time, spotsInArea.size());
 		}else{
@@ -201,23 +201,39 @@ public class ParkControl {
 		availableParkingStat.add(new double[]{time, spotsInArea.size()});
 		//--
 		
+		//-- If there is no Spot with in the given distance: -----------
+		if(spotsInArea.size()==0){ //mit 5km Radius
+			System.out.println("Agent is looking for parking in maximum range of 5 km");
+			phwriter.addAgentNotParkedWithinDefaultDistance(Double.toString(time), personId.toString());
+			spotsInArea = getPublicParkings(cordinate, false);
+			if (ev){
+				LinkedList<ParkingSpot> spotsInAreaEV = getPublicParkings(cordinate, true);
+				spotsInArea.addAll(spotsInAreaEV);
+			}
+			RemoveDuplicate.RemoveDuplicate(spotsInArea);	
+		}
+		//--------------				--------------------------------
+		
+
+		
 		//Select 
 		if(spotsInArea.size()>0){ 
 			selectParking(spotsInArea, personId, estimatedDuration, restOfDayDistance, ev);
 			return 1;
-		}else { //!! Groesserer Suchradius
+		}
+		/*else { //!! Groesserer Suchradius				//weiter oben ersetzt
 			int maxDist = VMConfig.maxDistance;
 			while (spotsInArea.size()==0){
 				maxDist = maxDist * 2;
 				//!!get publics
 				break;
 			}
-		}
+		}*/
 		//-----
 		
-		//System.err.println("Nicht geparkt"); // !! Was passiert wenn Kein Parkplatz im Umkreis gefunden?
+		//System.err.println("Nicht geparkt");
 		
-		// !! Provisorisch: Agents bestrafen die nicht Parken:
+		// Wer nicht umkreis von 5km parken kann bekommt massiv disutil
 		Map<String, Object> personAttributes = controller.getPopulation().getPersons().get(personId).getCustomAttributes();
 		VMScoreKeeper scorekeeper;
 		if (personAttributes.get("VMScoreKeeper")!= null){
@@ -389,10 +405,15 @@ public class ParkControl {
 
 	//--------------------------- G E T  P U B L I C ---------------------------------------------
 	LinkedList<ParkingSpot> getPublicParkings(Coord coord, boolean ev) {
+		return getPublicParkings(coord, ev, VMConfig.maxDistance);
+	}
+	
+	
+	LinkedList<ParkingSpot> getPublicParkings(Coord coord, boolean ev, int maxDistance) {
 		// !! Mit quadtree oder aehnlichem Beschleunigen??
 		LinkedList<ParkingSpot> list = new LinkedList<ParkingSpot>();
 		
-		for(Parking parking :this.parkingMap.getPublicParkings(coord.getX(), coord.getY(), VMConfig.maxDistance)){
+		for(Parking parking :this.parkingMap.getPublicParkings(coord.getX(), coord.getY(), maxDistance)){
 			ParkingSpot spot = null;
 			spot = parking.checkForFreeSpot();
 			if(ev){
