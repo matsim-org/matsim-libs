@@ -82,6 +82,17 @@ public class JointPlans implements MatsimToplevelContainer {
 		}
 	}
 
+	public synchronized void clear() {
+		// first clear caches
+		for ( Plan indivPlan : planToJointPlan.keySet() ) {
+			if ( indivPlan instanceof PlanWithCachedJointPlan ) {
+				final PlanWithCachedJointPlan withCache = (PlanWithCachedJointPlan) indivPlan;
+				withCache.resetJointPlan( instanceId );
+			}
+		}
+		planToJointPlan.clear();
+	}
+
 	public void addJointPlan(final JointPlan jointPlan) {
 		synchronized (jointPlan) {
 			for (Plan indivPlan : jointPlan.getIndividualPlans().values()) {

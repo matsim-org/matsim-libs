@@ -200,6 +200,39 @@ public class JointPlansTest {
 				jointPlans5.getJointPlan( p2 ) );
 	}
 
+
+	@Test
+	public void testClearWithoutCache( ) {
+		testClear( false );
+	}
+
+	@Test
+	public void testClearWithCache( ) {
+		testClear( true );
+	}
+
+	private static void testClear( final boolean withCache ) {
+		Plan p1 = createPlan( new PersonImpl( new IdImpl( 1 ) ) , withCache );
+		Plan p2 = createPlan( new PersonImpl( new IdImpl( 2 ) ) , withCache );
+
+		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
+		jp1.put( p1.getPerson().getId() , p1 );
+		jp1.put( p2.getPerson().getId() , p2 );
+
+		JointPlans jointPlans = new JointPlans();
+		jointPlans.addJointPlan(
+			jointPlans.getFactory().createJointPlan( jp1 ) );
+
+		Assert.assertNotNull(
+				"joint plan was not added???",
+				jointPlans.getJointPlan( p1 ) );
+		jointPlans.clear();
+
+		Assert.assertNull(
+				"still a joint plan after clear...",
+				jointPlans.getJointPlan( p1 ) );
+	}
+
 	private static Plan createPlan( final Person person , final boolean withCache ) {
 		if ( withCache ) return new PlanWithCachedJointPlan( person );
 		else return new PlanImpl( person );
