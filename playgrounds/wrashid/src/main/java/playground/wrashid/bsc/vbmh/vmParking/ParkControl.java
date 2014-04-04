@@ -114,7 +114,7 @@ public class ParkControl {
 		vmCharts.addChart("Available EVparkings");
 		vmCharts.addSeries("Available EVparkings", "slow charge");
 		vmCharts.addSeries("Available EVparkings", "fast charge");
-		vmCharts.addSeries("Available EVparkings", "turbo charge[x100]");
+		vmCharts.addSeries("Available EVparkings", "turbo charge");
 		peakLoad = new HashMap<Integer, Integer>();
 		load = new HashMap<Integer, Integer>();
 		for(Parking parking : parkingMap.getParkings()){
@@ -353,7 +353,7 @@ public class ParkControl {
 		if(hasToCharge){
 			//vmCharts.addValues("Available EVparkings", "slow charge", time, countSlowCharge);
 			vmCharts.addValues("Available EVparkings", "fast charge", time, countFastCharge);
-			vmCharts.addValues("Available EVparkings", "turbo charge[x100]", time, countTurboCharge*100);
+			vmCharts.addValues("Available EVparkings", "turbo charge", time, countTurboCharge*100);
 		}
 		//-----
 		

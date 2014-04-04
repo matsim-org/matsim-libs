@@ -15,6 +15,10 @@ public class VMCharts {
 		charts.get(name).name=name;
 	}
 	
+	public void setAx(String chartName, Boolean logAx){
+		charts.get(chartName).logAx=logAx;
+	}
+	
 	public void addSeries(String chartName, String seriesName){
 		charts.get(chartName).series.put(seriesName, new LinkedList<double[]>());
 	}
@@ -48,9 +52,10 @@ public class VMCharts {
 		String name;
 		String xName = "X";
 		String yName = "Y";
+		Boolean logAx = true;
 		
 		void print(String filename){
-			XYScatterChart chart = new XYScatterChart(name, xName, yName,true); //True aktiviert log scale
+			XYScatterChart chart = new XYScatterChart(name, xName, yName,logAx); //True aktiviert log scale
 			
 			Iterator<String> names = series.keySet().iterator();
 			for (LinkedList<double[]> serie : series.values()){
@@ -66,7 +71,7 @@ public class VMCharts {
 			}
 			
 			//chart.getChart().getXYPlot().getRenderer().setBaseShape(new Ellipse2D.Double(0,0,5,5));
-			chart.saveAsPng(filename, 800, 600);
+			chart.saveAsPng(filename, 2400, 1500);
 			
 		}
 		

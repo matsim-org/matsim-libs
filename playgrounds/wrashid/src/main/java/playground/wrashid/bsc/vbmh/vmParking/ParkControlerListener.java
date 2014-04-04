@@ -51,10 +51,11 @@ public class ParkControlerListener implements StartupListener, IterationEndsList
 		//Park Statistik Drucken und zuruecksetzen:
 		this.getParkHandler().parkControl.printStatistics();
 		this.getParkHandler().parkControl.resetStatistics();
+		IterEndStats iterEndStats=new IterEndStats();
+		iterEndStats.run(getParkHandler().getParkControl());
+		
 		VMCharts.printCharts(getParkHandler().getParkControl().controller.getConfig().getModule("controler").getValue("outputDirectory")+"/Charts", getParkHandler().getParkControl().controller.getIterationNumber());
 		VMCharts.clear();
-		 
-		
 		
 		
 	}
