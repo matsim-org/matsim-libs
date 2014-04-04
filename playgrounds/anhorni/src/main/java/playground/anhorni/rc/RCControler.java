@@ -37,9 +37,7 @@ public class RCControler extends Controler {
     }
 	
 	protected void setUp() {
-		if (this.scoringFunctionFactory == null) {
-			this.scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory(this.config.planCalcScore(), this.getScenario());
-		}
+		this.scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory(this.config.planCalcScore(), this.getScenario());
 		super.setUp();
 	}
 }
