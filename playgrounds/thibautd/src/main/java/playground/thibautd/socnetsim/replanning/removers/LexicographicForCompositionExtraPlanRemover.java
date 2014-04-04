@@ -93,6 +93,7 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 					for ( Plan p : toRemove.getIndividualPlans().values() ) {
 						((PersonImpl) p.getPerson()).removePlan( p );
 					}
+					jointPlans.removeJointPlan( toRemove );
 					somethingDone = true;
 				}
 			}
@@ -117,6 +118,7 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 					for ( Plan p : jpToRemove.getIndividualPlans().values() ) {
 						((PersonImpl) p.getPerson()).removePlan( p );
 					}
+					jointPlans.removeJointPlan( jpToRemove );
 				}
 				else {
 					((PersonImpl) person).removePlan( toRemove );

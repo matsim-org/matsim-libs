@@ -179,6 +179,10 @@ public class LexicographicRemoverTest {
 			Assert.assertFalse(
 					expectedRemoved+" not removed for person "+p,
 					p.getPlans().contains( expectedRemoved ) );
+
+			Assert.assertNull(
+					"MEMORY LEAK: There is still a joint plan associated to removed plan "+expectedRemoved,
+					f.jointPlans.getJointPlan( expectedRemoved ) );
 		}
 	}
 
