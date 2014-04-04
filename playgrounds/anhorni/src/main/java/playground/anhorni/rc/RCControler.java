@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,25 +19,29 @@
 
 package playground.anhorni.rc;
 
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
-import playground.anhorni.surprice.analysis.AgentAnalysisShutdownListener;
-import playground.anhorni.surprice.analysis.ModeSharesControlerListener;
-import playground.anhorni.surprice.scoring.SurpriceScoringFunctionFactory;
-import playground.anhorni.surprice.warmstart.AdaptNextDay;
 
 public class RCControler extends Controler {
-			
-	public RCControler(final Config config) {
-		super(config);	
-		
-		
+				
+	
+	public RCControler(final String[] args) {
+		super(args);	
+	}
+
+	public static void main (final String[] args) { 
+		RCControler controler = new RCControler(args);
+		controler.setOverwriteFiles(true);
+		controler.init();
+    	controler.run();
+    } 
+	
+	
+	private void init() {
 		this.setScoringFunctionFactory(
 				new CharyparNagelOpenTimesScoringFunctionFactory(
 			  			config.planCalcScore(), super.getScenario()));
-	} 
+				
+	}
 }
