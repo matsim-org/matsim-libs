@@ -98,7 +98,7 @@ public class RunTRBModel {
 					}
 				});
 		//runner.setThresholds( new ThresholdFunction( 1.735 , 1.835 ) );
-		runner.setThresholds( new ThresholdFunction( -10.9 , 50 ) );
+		runner.setThresholds( new ThresholdFunction( -8.8 , 230 ) );
 
 		final ModelIterator modelIterator = new ModelIterator();
 		final ModelIteratorFileListener listener = new ModelIteratorFileListener( outputDirectory+"/thresholdEvolution.dat" );
