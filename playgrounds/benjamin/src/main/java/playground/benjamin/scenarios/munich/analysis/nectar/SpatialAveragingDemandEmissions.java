@@ -223,7 +223,7 @@ public class SpatialAveragingDemandEmissions {
 					for (int yIndex=0; yIndex<noOfYbins; yIndex++){
 						Coord cellCentroid = this.sau.findCellCentroid(xIndex, yIndex);
 //						double weightOfLinkForCell = this.sau.calculateWeightOfPointForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
-						double weightOfLinkForCell = this.saue.calculateWeightOfLineForCellImpl2(fromNodeCoord, toNodeCoord, cellCentroid.getX(), cellCentroid.getY());
+						double weightOfLinkForCell = this.saue.calculateWeightOfLineForCellV2(fromNodeCoord, toNodeCoord, cellCentroid.getX(), cellCentroid.getY());
 						weightedEmissions[xIndex][yIndex] += weightOfLinkForCell * scaledValue;					
 					}
 				}
@@ -256,7 +256,7 @@ public class SpatialAveragingDemandEmissions {
 					for (int yIndex=0; yIndex<noOfYbins; yIndex++){
 						Coord cellCentroid = this.sau.findCellCentroid(xIndex, yIndex);
 //						double weightOfLinkForCell = this.sau.calculateWeightOfPointForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
-						double weightOfLinkForCell = this.saue.calculateWeightOfLineForCellImpl2(fromNodeCoord, toNodeCoord, cellCentroid.getX(), cellCentroid.getY());
+						double weightOfLinkForCell = this.saue.calculateWeightOfLineForCellV2(fromNodeCoord, toNodeCoord, cellCentroid.getX(), cellCentroid.getY());
 						weightedDemand[xIndex][yIndex] += weightOfLinkForCell * scaledVkm;					
 					}
 				}

@@ -29,33 +29,35 @@ import playground.benjamin.scenarios.munich.analysis.nectar.SpatialAveragingUtil
  * @author amit
  */
 public class SpatialAveragingUtilsExtended {
-	
+
 	private final Logger logger = Logger.getLogger(SpatialAveragingUtils.class);
 	double smoothinRadiusSquared_m;
-	
+
 	public SpatialAveragingUtilsExtended(double smoothingRadius_m) {
 		this.smoothinRadiusSquared_m = smoothingRadius_m * smoothingRadius_m;
 	}
 
-	public double calculateWeightOfLineForCellImpl1(Coord fromNodeCoord, Coord toNodeCoord, double cellCentroidX, double cellCentroidY) throws MathException {
+	//V1 results in negative weights. Will remove it later. Amit
+	public double calculateWeightOfLineForCellV1(Coord fromNodeCoord, Coord toNodeCoord, double cellCentroidX, double cellCentroidY) throws MathException {
 		double constantA = getConstantA(fromNodeCoord, cellCentroidX, cellCentroidY);
 		double constantB = getConstantB(fromNodeCoord, toNodeCoord, cellCentroidX, cellCentroidY);
 		double constantC =0.;
 		double linkLengthFromCoord = getLinkLengthUsingFromAndToNode(fromNodeCoord, toNodeCoord);
 		double constantR = Math.sqrt(smoothinRadiusSquared_m);
-	
+
 		constantC= Math.exp(-(constantA-(constantB*constantB/(linkLengthFromCoord*linkLengthFromCoord)))/smoothinRadiusSquared_m);
 		double upperLimit = (linkLengthFromCoord+(constantB/linkLengthFromCoord));
 		double lowerLimit = constantB/(linkLengthFromCoord);
 		double integrationUpperLimit = (-smoothinRadiusSquared_m/(2*linkLengthFromCoord))*Math.exp(-upperLimit*upperLimit/smoothinRadiusSquared_m) - (constantR*constantB*Math.sqrt(Math.PI))/(linkLengthFromCoord*linkLengthFromCoord*2)*Erf.erf(upperLimit/constantR);
 		double integrationLowerLimit = (-smoothinRadiusSquared_m/(2*linkLengthFromCoord))*Math.exp(-lowerLimit*lowerLimit/smoothinRadiusSquared_m) - (constantR*constantB*Math.sqrt(Math.PI))/(linkLengthFromCoord*linkLengthFromCoord*2)*Erf.erf(lowerLimit/constantR);
 		double  weight = constantC *(integrationUpperLimit-integrationLowerLimit);
+		
 		if(weight<0.0) {
-		logger.warn("weight is negative, please check. Weight = "+weight);
+			logger.warn("weight is negative, please check. Weight = "+weight);
 		}
 		return weight;
 	}
-	public double calculateWeightOfLineForCellImpl2(Coord fromNodeCoord, Coord toNodeCoord, double cellCentroidX, double cellCentroidY) {
+	public double calculateWeightOfLineForCellV2(Coord fromNodeCoord, Coord toNodeCoord, double cellCentroidX, double cellCentroidY) {
 		double constantA = getConstantA(fromNodeCoord, cellCentroidX, cellCentroidY);
 		double constantB = getConstantB(fromNodeCoord, toNodeCoord, cellCentroidX, cellCentroidY);
 		double constantC =0.;
@@ -74,8 +76,9 @@ public class SpatialAveragingUtilsExtended {
 			throw new RuntimeException("Error function is not defined for " + upperLimit + " or " + lowerLimit + "; Exception: " + e);
 		}
 		double  weight = constantC *(integrationUpperLimit-integrationLowerLimit);
+		
 		if(weight<0.0) {
-		logger.warn("weight is negative, please check. Weight = "+weight);
+			logger.warn("Weight is negative, please check. Weight = "+weight);
 		}
 		return weight;
 	}
@@ -86,7 +89,7 @@ public class SpatialAveragingUtilsExtended {
 		double y0 = cellCentroidY;
 		return (x1-x0)*(x1-x0)+(y1-y0)*(y1-y0);
 	}
-	
+
 	double getLinkLengthUsingFromAndToNode(Coord fromNodeCoord, Coord toNodeCoord){
 		double x1 = fromNodeCoord.getX();
 		double y1 = fromNodeCoord.getY();
@@ -94,7 +97,7 @@ public class SpatialAveragingUtilsExtended {
 		double y2 = toNodeCoord.getY();
 		return Math.sqrt((y2-y1)*(y2-y1)+(x2-x1)*(x2-x1));
 	}
-	
+
 	double getConstantB(Coord fromNodeCoord, Coord toNodeCoord, double cellCentroidX, double cellCentroidY){
 		double x1 = fromNodeCoord.getX();
 		double y1 = fromNodeCoord.getY();
