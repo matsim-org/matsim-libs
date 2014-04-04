@@ -66,9 +66,18 @@ public class WeakSelector implements GroupLevelPlanSelector {
 			final JointPlans jointPlans,
 			final ReplanningGroup group) {
 		final Collection<JointPlan> jpCollection = getJointPlans( group , jointPlans );
-		final JointPlans weakJointPlans = getWeakJointPlans( jpCollection );
+		final JointPlans jointPlansInstance = new JointPlans();
+		fillWithWeakJointPlans( jointPlansInstance , jpCollection );
 
-		return delegate.selectPlans( weakJointPlans , group );
+		final GroupPlans selected = delegate.selectPlans( jointPlansInstance , group );
+
+		// this is necessary in order to avoid ridiculous memory consumption, with
+		// joint plan caches being full of unused joint plans.
+		// As we clean it, we could as well re-use it, to avoid having thousands of
+		// loose objects lying around (not done, as the actual effect on performance
+		// is probably minimal)
+		jointPlansInstance.clear();
+		return selected;
 	}
 
 	private Collection<JointPlan> getJointPlans(
@@ -85,9 +94,9 @@ public class WeakSelector implements GroupLevelPlanSelector {
 		return set;
 	}
 
-	public JointPlans getWeakJointPlans(final Collection<JointPlan> jointPlans) {
-		final JointPlans weakPlans = new JointPlans();
-
+	public void fillWithWeakJointPlans(
+			final JointPlans weakPlans,
+			final Collection<JointPlan> jointPlans) {
 		for ( JointPlan fullJointPlan : jointPlans ) {
 			final Map<Id, Plan> plansMap = new HashMap<Id, Plan>( fullJointPlan.getIndividualPlans() );
 
@@ -104,8 +113,6 @@ public class WeakSelector implements GroupLevelPlanSelector {
 				}
 			}
 		}
-
-		return weakPlans;
 	}
 
 	// DFS
