@@ -1,0 +1,363 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * ExperiencedPlansWriterTest.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package org.matsim.withinday.controller;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteFactory;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteFactory;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.withinday.mobsim.WithinDayEngine;
+import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
+import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
+import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
+
+/**
+ * @author cdobler
+ */
+public class ExperiencedPlansWriterTest {
+
+private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.class);
+	
+	@Rule 
+	public MatsimTestUtils utils = new MatsimTestUtils();
+	
+	@Test
+	public void testWriteFile() {
+		
+		Config config = ConfigUtils.createConfig();
+
+		config.controler().setOutputDirectory(this.utils.getOutputDirectory());
+		
+		config.qsim().setEndTime(24*3600);
+		
+		config.controler().setLastIteration(0);
+
+		ActivityParams homeParams = new ActivityParams("home");
+		homeParams.setTypicalDuration(16*3600);
+		config.planCalcScore().addActivityParams(homeParams);
+			
+		Scenario scenario = ScenarioUtils.createScenario(config);
+
+		createNetwork(scenario);
+		
+		Population population = scenario.getPopulation();
+		population.addPerson(createPerson(scenario, "p01"));
+		population.addPerson(createPerson(scenario, "p02"));
+		
+		Controler controler = new Controler(scenario);
+		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setWriteEventsInterval(0);
+		controler.setOverwriteFiles(true);
+		
+		WithinDayControlerListener withinDayControlerListener = new WithinDayControlerListener();
+
+		/*
+		 * ExperiencedPlansWriter cannot be initialized before the WithinDayControlerListener
+		 * has processed the StartupEvent. Note that added listeners are processed in reverse order!
+		 */
+		controler.addControlerListener(new WriterInitializer(withinDayControlerListener));
+		controler.addControlerListener(withinDayControlerListener);
+		
+		// only for debugging
+		controler.getEvents().addHandler(new EventsPrinter());
+		
+		controler.run();
+
+		/*
+		 * After running the scenario, load experienced plans file and check whether the
+		 * routes match what we expect (route 01 unchanged, route 02 adapted).
+		 */
+		File file = new File(this.utils.getOutputDirectory() + "/ITERS/it.0/0." + 
+				ExperiencedPlansWriter.EXPERIENCEDPLANSFILE);
+		Assert.assertTrue(file.exists());
+		
+		Config experiencedConfig = ConfigUtils.createConfig();
+		experiencedConfig.plans().setInputFile(this.utils.getOutputDirectory() + "/ITERS/it.0/0." + 
+				ExperiencedPlansWriter.EXPERIENCEDPLANSFILE);
+		
+		Scenario experiencedScenario = ScenarioUtils.loadScenario(experiencedConfig);
+		
+		Person p01 = experiencedScenario.getPopulation().getPersons().get(scenario.createId("p01"));
+		Person p02 = experiencedScenario.getPopulation().getPersons().get(scenario.createId("p02"));
+		
+		Leg leg01 = (Leg) p01.getSelectedPlan().getPlanElements().get(1);
+		Leg leg02 = (Leg) p02.getSelectedPlan().getPlanElements().get(1);
+		
+		// expect leg from p01 to be unchanged
+		Assert.assertEquals(1, ((NetworkRoute) leg01.getRoute()).getLinkIds().size());
+		
+		// expect leg from p02 to be adapted
+		Assert.assertEquals(3, ((NetworkRoute) leg02.getRoute()).getLinkIds().size());
+	}
+	
+	private static class WriterInitializer implements StartupListener {
+
+		private final WithinDayControlerListener withinDayControlerListener;
+		
+		public WriterInitializer(WithinDayControlerListener withinDayControlerListener) {
+			this.withinDayControlerListener = withinDayControlerListener;
+		}
+		
+		@Override
+		public void notifyStartup(StartupEvent event) {
+			ExperiencedPlansWriter experiencedPlansWriter = new ExperiencedPlansWriter(
+					this.withinDayControlerListener.getMobsimDataProvider());
+			event.getControler().addControlerListener(experiencedPlansWriter);
+
+			/*
+			 * Initialize within-day stuff to adapt the second person's route.
+			 */
+			ActivityEndIdentifierFactory identifierFactory = new ActivityEndIdentifierFactory(
+					this.withinDayControlerListener.getActivityReplanningMap());
+			identifierFactory.addAgentFilterFactory(new FilterFactory());
+			
+			ReplannerFactory replannerFactory = new ReplannerFactory(event.getControler().getScenario(),
+					this.withinDayControlerListener.getWithinDayEngine());
+			replannerFactory.addIdentifier(identifierFactory.createIdentifier());
+			
+			this.withinDayControlerListener.getWithinDayEngine().addDuringActivityReplannerFactory(replannerFactory);
+		}
+		
+	}
+
+	private static class Filter implements AgentFilter {
+
+		private final Id id = new IdImpl("p02");
+		
+		// Agents that do not match the filter criteria are removed from the set.
+		public void applyAgentFilter(Set<Id> set, double time) {
+			Iterator<Id> iter = set.iterator();
+			while (iter.hasNext()) {
+				Id id = iter.next();
+				if (!this.applyAgentFilter(id, time)) iter.remove();
+			}
+		}
+
+		// Returns true if the agent matches the filter criteria, otherwise returns false.
+		public boolean applyAgentFilter(Id id, double time) {
+			if (id.equals(this.id)) return true;
+			return false;
+		}
+	}
+	
+	private static class FilterFactory implements AgentFilterFactory {
+		
+		@Override
+		public AgentFilter createAgentFilter() {
+			return new Filter();
+		}
+	}
+	
+	/*
+	 * Replace agent's route "l0 - l1 - l2" with "l0 - l3 - l4 - l5 - l2".
+	 */
+	private static class Replanner extends WithinDayDuringActivityReplanner {
+
+		public Replanner(Id id, Scenario scenario, InternalInterface internalInterface) {
+			super(id, scenario, internalInterface);
+		}
+		
+		@Override
+		public boolean doReplanning(MobsimAgent withinDayAgent) {
+			
+			log.info("Replanning agent " + withinDayAgent.getId());
+			
+ 			Plan plan = WithinDayAgentUtils.getModifiablePlan(withinDayAgent);
+			
+			Leg leg = (Leg) plan.getPlanElements().get(1);
+			NetworkRoute route = (NetworkRoute) leg.getRoute();
+			
+			Id startLinkId = scenario.createId("l0");
+			Id endLinkId = scenario.createId("l2");
+			List<Id> linkIds = new ArrayList<Id>();
+			linkIds.add(scenario.createId("l3"));
+			linkIds.add(scenario.createId("l4"));
+			linkIds.add(scenario.createId("l5"));
+			route.setLinkIds(startLinkId, linkIds, endLinkId);
+			
+			return true;
+		}
+	}
+
+	private static class ReplannerFactory extends WithinDayDuringActivityReplannerFactory {
+
+		private final Scenario scenario;
+		
+		public ReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine) {
+			super(withinDayEngine);
+			this.scenario = scenario;
+		}
+
+		@Override
+		public WithinDayDuringActivityReplanner createReplanner() {
+			WithinDayDuringActivityReplanner replanner = new Replanner(super.getId(), scenario, 
+					this.getWithinDayEngine().getInternalInterface());
+			return replanner;
+		}
+	}
+	
+	/*
+	 * Network looks like:
+	 *          l4 
+	 *       n4----n5
+	 *     l3|     |l5
+	 * n0----n1----n2----n3
+	 *    l0    l1    l2
+	 */
+	private void createNetwork(Scenario scenario) {
+		
+		Network network = scenario.getNetwork();
+		NetworkFactory networkFactory = network.getFactory();
+		
+		Node node0 = networkFactory.createNode(scenario.createId("n0"), scenario.createCoord(0.0, 0.0));
+		Node node1 = networkFactory.createNode(scenario.createId("n1"), scenario.createCoord(1.0, 0.0));
+		Node node2 = networkFactory.createNode(scenario.createId("n2"), scenario.createCoord(2.0, 0.0));
+		Node node3 = networkFactory.createNode(scenario.createId("n3"), scenario.createCoord(3.0, 0.0));
+		Node node4 = networkFactory.createNode(scenario.createId("n4"), scenario.createCoord(1.0, 1.0));
+		Node node5 = networkFactory.createNode(scenario.createId("n5"), scenario.createCoord(2.0, 1.0));
+		
+		Link link0 = networkFactory.createLink(scenario.createId("l0"), node0, node1);
+		Link link1 = networkFactory.createLink(scenario.createId("l1"), node1, node2);
+		Link link2 = networkFactory.createLink(scenario.createId("l2"), node2, node3);
+		Link link3 = networkFactory.createLink(scenario.createId("l3"), node1, node4);
+		Link link4 = networkFactory.createLink(scenario.createId("l4"), node4, node5);
+		Link link5 = networkFactory.createLink(scenario.createId("l5"), node5, node2);
+		
+		link0.setLength(1000.0);
+		link1.setLength(1000.0);
+		link2.setLength(1000.0);
+		link3.setLength(1000.0);
+		link4.setLength(1000.0);
+		link5.setLength(1000.0);
+
+		network.addNode(node0);
+		network.addNode(node1);
+		network.addNode(node2);
+		network.addNode(node3);
+		network.addNode(node4);
+		network.addNode(node5);
+		network.addLink(link0);
+		network.addLink(link1);
+		network.addLink(link2);
+		network.addLink(link3);
+		network.addLink(link4);
+		network.addLink(link5);
+	}
+	
+	/*
+	 * Create a person with default route l0 - l1 - l2
+	 */
+	private Person createPerson(Scenario scenario, String id) {
+		
+		PersonImpl person = (PersonImpl) scenario.getPopulation().getFactory().createPerson(scenario.createId(id));
+		
+		person.setAge(20);
+		person.setSex("m");
+
+		Activity from = scenario.getPopulation().getFactory().createActivityFromLinkId("home", scenario.createId("l0"));
+		Leg leg = scenario.getPopulation().getFactory().createLeg(TransportMode.car);
+		Activity to = scenario.getPopulation().getFactory().createActivityFromLinkId("home", scenario.createId("l2"));
+
+		from.setEndTime(8*3600);
+		leg.setDepartureTime(8*3600);
+		
+		RouteFactory routeFactory = new LinkNetworkRouteFactory();
+		Id startLinkId = scenario.createId("l0");
+		Id endLinkId = scenario.createId("l2");
+		NetworkRoute route = (NetworkRoute) routeFactory.createRoute(startLinkId, endLinkId);
+		List<Id> linkIds = new ArrayList<Id>();
+		linkIds.add(scenario.createId("l1"));
+		route.setLinkIds(startLinkId, linkIds, endLinkId);
+		
+		Plan plan = scenario.getPopulation().getFactory().createPlan();
+		plan.addActivity(from);
+		plan.addLeg(leg);
+		plan.addActivity(to);
+		
+		person.addPlan(plan);
+		
+		return person;
+	}
+	
+	// for debugging
+	private static class EventsPrinter implements BasicEventHandler {
+
+		@Override
+		public void reset(final int iter) {
+		}
+
+		@Override
+		public void handleEvent(final Event event) {
+			StringBuilder eventXML = new StringBuilder(180);
+			eventXML.append("\t<event ");
+			Map<String, String> attr = event.getAttributes();
+			for (Map.Entry<String, String> entry : attr.entrySet()) {
+				eventXML.append(entry.getKey());
+				eventXML.append("=\"");
+				eventXML.append(entry.getValue());
+				eventXML.append("\" ");
+			}
+			eventXML.append("/>");
+			
+			log.info(eventXML.toString());
+		}
+	}
+}
