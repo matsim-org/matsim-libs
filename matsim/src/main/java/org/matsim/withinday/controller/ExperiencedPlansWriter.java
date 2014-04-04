@@ -28,6 +28,7 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -62,7 +63,7 @@ public class ExperiencedPlansWriter implements AfterMobsimListener {
 				Person experiencedPerson = experiencedPopulation.getFactory().createPerson(person.getId());
 				
 				// add experienced plan
-				experiencedPerson.addPlan(((PersonDriverAgentImpl) agent).getCurrentPlan());
+				experiencedPerson.addPlan(WithinDayAgentUtils.getModifiablePlan(agent));
 				
 				// copy attributes if possible
 				if (person instanceof PersonImpl && experiencedPerson instanceof PersonImpl) {
