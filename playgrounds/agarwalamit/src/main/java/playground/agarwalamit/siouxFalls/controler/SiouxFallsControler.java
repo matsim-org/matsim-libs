@@ -106,7 +106,7 @@ public class SiouxFallsControler {
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(true);
 		controler.setDumpDataAtEnd(true);
-//		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		
 		if(Boolean.valueOf(args[0])==false && Boolean.valueOf(args[2])==false){
 			controler.addControlerListener(new EmissionControlerListener());
