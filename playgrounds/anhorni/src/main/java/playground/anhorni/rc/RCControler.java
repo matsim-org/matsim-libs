@@ -33,11 +33,8 @@ public class RCControler extends Controler {
 	public static void main (final String[] args) { 
 		RCControler controler = new RCControler(args);
 		controler.setOverwriteFiles(true);
+		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(
+				controler.getConfig().planCalcScore(), controler.getScenario()));
     	controler.run();
     }
-	
-	protected void setUp() {
-		this.scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory(this.config.planCalcScore(), this.getScenario());
-		super.setUp();
-	}
 }
