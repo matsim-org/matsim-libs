@@ -63,6 +63,9 @@ import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 
 /**
+ * Class to convert a MATSim network into a KS-model network with crossings and streets.
+ * BTU Cottbus needs this network format to optimize signal plans with CPLEX.
+ * 
  * @author dgrether
  * @author tthunig
  *
@@ -92,6 +95,17 @@ public class M2KS2010NetworkConverter {
 		return this.convertNetworkLanesAndSignals(network, lanes, signals, null, startTime, endTime);
 	}
 	
+	/**
+	 * converts the given matsim network into a ks-model network with crossings and streets and returns it
+	 * 
+	 * @param network the matsim network to convert
+	 * @param lanes
+	 * @param signals
+	 * @param signalsBoundingBox nodes within this envelop will be extended spatially
+	 * @param startTime of the simulation
+	 * @param endTime of the simulation
+	 * @return the corresponding ks-model network
+	 */
 	public DgKSNetwork convertNetworkLanesAndSignals(Network network, LaneDefinitions20 lanes,
 			SignalsData signals, Envelope signalsBoundingBox, double startTime, double endTime) {
 		log.info("Checking cycle time...");
@@ -123,24 +137,26 @@ public class M2KS2010NetworkConverter {
 	}
 	
 	/*
-	 * codierung:
-	 *   fromLink -> toLink zwei nodes + 1 light
+	 * conversion of extended nodes:
+	 *   fromLink -> toLink : 2 crossing nodes + 1 light
 	 */
 	private DgKSNetwork convertNetwork(Network net, LaneDefinitions20 lanes, SignalsData signalsData) {
 		DgKSNetwork ksnet = new DgKSNetwork();
-		/* create a crossing for each node, same id
+		/* create a crossing for each node (crossing id generated from node id).
+		 * add the single crossing node for each not extended crossing (crossing node id generated from node id).
 		 */
 		this.convertNodes2Crossings(ksnet, net);
 		/*
-		 * convert all links to streets (same id) and create the from and to 
-		 * nodes (ids generated from link id) for the already created corresponding 
-		 * crossing 
+		 * convert all links to streets (street id generated from link id).
+		 * add extended crossing nodes for the already created corresponding extended crossings
+		 * (extended crossing node id generated from adjacent link id).
 		 */
 		this.convertLinks2Streets(ksnet, net);
 
 		//loop over links and create layout (i.e. lights and programs) of target crossing (if it is expanded)
 		for (Link link : net.getLinks().values()){
-			DgCrossing crossing = ksnet.getCrossings().get(this.idConverter.convertNodeId2CrossingId(link.getToNode().getId())); //The node id of the matsim network gives the crossing id
+			// the node id of the matsim network gives the crossing id
+			DgCrossing crossing = ksnet.getCrossings().get(this.idConverter.convertNodeId2CrossingId(link.getToNode().getId())); 
 			// lights and programs are only necessary for expanded crossings
 			if (!crossing.getType().equals(TtCrossingType.NOTEXPAND)){
 				//prepare some objects/data
@@ -270,6 +286,17 @@ public class M2KS2010NetworkConverter {
 	}
 	
 	
+	/**
+	 * scales the link start and end coordinates based on a node offset to create extended crossing nodes, 
+	 * i.e. the link will be shortened at the beginning and the end.
+	 * the scaled start coordinate gives the coordinate for the extended crossing node corresponding to the from crossing of the link.
+	 * the scaled end coordinate gives this information for the to crossing of the link.
+	 * 
+	 * @param linkLength currently not used. we use the euclidean distance between start and end coordinate as link length.
+	 * @param linkStartCoord the start coordinate of the link
+	 * @param linkEndCoord the end coordinate of the link
+	 * @return a tuple of the scaled start and end coordinates, so the coordinates for the extended crossing nodes 
+	 */
 	private Tuple<Coord,Coord> scaleLinkCoordinates(double linkLength, Coord linkStartCoord, Coord linkEndCoord){
 		double nodeOffsetMeter = 20.0;
 		Point2D.Double linkStart = new Point2D.Double(linkStartCoord.getX(), linkStartCoord.getY());
@@ -302,8 +329,8 @@ public class M2KS2010NetworkConverter {
 	}
 	
 	private double calculateEuclideanLinkLength(Point2D.Double deltaLink) {
-  	return Math.sqrt(Math.pow(deltaLink.x, 2) + Math.pow(deltaLink.y, 2));
-  }
+		return Math.sqrt(Math.pow(deltaLink.x, 2) + Math.pow(deltaLink.y, 2));
+	}
 	
 	private Tuple<SignalPlanData, SignalGroupSettingsData> getPlanAndSignalGroupSettings4Signal(Id signalSystemId, Id signalId, SignalsData signalsData){
 		SignalSystemControllerData controllData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(signalSystemId);
@@ -313,10 +340,18 @@ public class M2KS2010NetworkConverter {
 	}
 
 	
-
-	
 	/**
+	 * creates a light (i.e. a street representing the connection of crossing nodes of one crossing)
+	 * between the inLink crossing node and the outLink crossing node. 
+	 * lights are only used for extended crossings. so the outLink gives the outLink crossing node.
 	 * 
+	 * @param fromLinkId the matsim id of the inLink
+	 * @param fromLaneId 
+	 * @param outLinkId the matsim id of the outLink
+	 * @param backLinkId the back link id of the fromLink
+	 * @param inLinkToNode the corresponding target crossing node of the fromLink
+	 * @param crossing the target crossing of the fromLink
+	 * @return the id of the created light
 	 */
 	private Id createLights(Id fromLinkId, Id fromLaneId, Id outLinkId, Id backLinkId, DgCrossingNode inLinkToNode, DgCrossing crossing){
 		if (backLinkId != null && backLinkId.equals(outLinkId)){
@@ -340,6 +375,7 @@ public class M2KS2010NetworkConverter {
 	
 	
 	/**
+	 * creates the crossing layout (lights and programs) for the target crossing of signalized links.
 	 * Maps a signalized MATSim Link's turning moves and signalization to lights and greens, i.e. 1 allowed turning move  => 1 light + 1 green
 	 * Turning moves are given by:
 	 *   a) the outLinks of the toNode of the Link, if no lanes are given and there are no turning move restrictions set for the Signal
@@ -349,6 +385,13 @@ public class M2KS2010NetworkConverter {
 	 * If there are several signals without turning move restrictions on a link or a lane nothing can be created because this is an inconsistent state of 
 	 * the input data:  thus the programs/plans for the signal might be ambiguous, an exception is thrown.
 	 * 
+	 * @param crossing the target crossing of the link
+	 * @param link
+	 * @param inLinkToNode the corresponding target crossing node of the link
+	 * @param backLinkId
+	 * @param l2l
+	 * @param system
+	 * @param signalsData
 	 */
 	private void createCrossing4SignalizedLink(DgCrossing crossing, Link link, DgCrossingNode inLinkToNode, Id backLinkId, 
 			LanesToLinkAssignment20 l2l, SignalSystemData system, SignalsData signalsData) {
@@ -429,6 +472,15 @@ public class M2KS2010NetworkConverter {
 		} 
 	}
 	
+	/**
+	 * creates the crossing layout (lights without programs) for the target crossing of non signalized links.
+	 * 
+	 * @param crossing the target crossing of the link
+	 * @param link
+	 * @param inLinkToNode the corresponding target crossing node of the link
+	 * @param backLinkId
+	 * @param l2l
+	 */
 	private void createCrossing4NotSignalizedLink(DgCrossing crossing, Link link,
 			DgCrossingNode inLinkToNode, Id backLinkId, LanesToLinkAssignment20 l2l) {
 //		DgProgram program = null;
@@ -439,7 +491,7 @@ public class M2KS2010NetworkConverter {
 //			log.error("Link: " + link.getId() + " fromNode: " + link.getFromNode().getId() + " toNode: " + link.getToNode().getId());
 //			throw new IllegalStateException("Default program must exist at not signalized crossing: " + crossing.getId());
 //		}
-		if (l2l == null){
+		if (l2l == null){ // create lights for link without lanes
 			List<Id> toLinks = this.getTurningMoves4LinkWoLanes(link);
 			for (Id outLinkId : toLinks){
 				Id lightId = this.createLights(link.getId(), null, outLinkId, backLinkId, inLinkToNode, crossing);
@@ -450,7 +502,7 @@ public class M2KS2010NetworkConverter {
 		}
 		else {
 			for (LaneData20 lane : l2l.getLanes().values()){
-				// check for outlanes (create only lights for lanes without outlanes)
+				// check for outlanes (create only lights for lanes without outlanes, i.e. "last lanes" of a link)
 				if (lane.getToLaneIds() == null || lane.getToLaneIds().isEmpty()){
 					for (Id outLinkId : lane.getToLinkIds()){
 						Id lightId = this.createLights(link.getId(), lane.getId(), outLinkId, backLinkId, inLinkToNode, crossing);
