@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
+import org.apache.commons.math.MathException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -53,37 +54,37 @@ import playground.vsp.emissions.utils.EmissionUtils;
 public class SpatialAveragingDemandEmissions {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingDemandEmissions.class);
 
-//	final double scalingFactor = 100.;
-//	private final static String runNumber1 = "baseCase";
-//	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
-//	private final static String runNumber2 = "zone30";
-//	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
-////	private final static String runNumber2 = "pricing";
-////	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
-//	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
-//	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-//
-//	private static String configFile1 = runDirectory1 + "output_config.xml.gz";
-//	private final static Integer lastIteration1 = getLastIteration(configFile1);
-//	private static String configFile2 = runDirectory1 + "output_config.xml.gz";
-//	private final static Integer lastIteration2 = getLastIteration(configFile2);
-//	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
-//	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + lastIteration2 + ".emission.events.xml.gz";
-	
-	final double scalingFactor = 10.;
-	private final static String runNumber1 = "981";
-	private final static String runNumber2 = "983";
-	private final static String runDirectory1 = "../../runs-svn/run" + runNumber1 + "/";
-	private final static String runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
-	private final String netFile1 = runDirectory1 + runNumber1 + ".output_network.xml.gz";
+	final double scalingFactor = 100.;
+	private final static String runNumber1 = "baseCase";
+	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
+	private final static String runNumber2 = "zone30";
+	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
+//	private final static String runNumber2 = "pricing";
+//	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
+	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
 	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 
-	private static String configFile1 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
+	private static String configFile1 = runDirectory1 + "output_config.xml.gz";
 	private final static Integer lastIteration1 = getLastIteration(configFile1);
-	private static String configFile2 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
+	private static String configFile2 = runDirectory1 + "output_config.xml.gz";
 	private final static Integer lastIteration2 = getLastIteration(configFile2);
-	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + runNumber1 + "." + lastIteration1 + ".emission.events.xml.gz";
-	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + runNumber2 + "." + lastIteration2 + ".emission.events.xml.gz";
+	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
+	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + lastIteration2 + ".emission.events.xml.gz";
+	
+//	final double scalingFactor = 10.;
+//	private final static String runNumber1 = "981";
+//	private final static String runNumber2 = "983";
+//	private final static String runDirectory1 = "../../runs-svn/run" + runNumber1 + "/";
+//	private final static String runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
+//	private final String netFile1 = runDirectory1 + runNumber1 + ".output_network.xml.gz";
+//	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+//
+//	private static String configFile1 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
+//	private final static Integer lastIteration1 = getLastIteration(configFile1);
+//	private static String configFile2 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
+//	private final static Integer lastIteration2 = getLastIteration(configFile2);
+//	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + runNumber1 + "." + lastIteration1 + ".emission.events.xml.gz";
+//	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + runNumber2 + "." + lastIteration2 + ".emission.events.xml.gz";
 
 	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
 	final double xMin = 4452550.25;
@@ -98,9 +99,11 @@ public class SpatialAveragingDemandEmissions {
 	final double smoothingRadius_m = 500.;
 	
 	final String pollutant2analyze = WarmPollutant.NO2.toString();
-	final boolean compareToBaseCase = true;
+//	final boolean compareToBaseCase = true;
+	final boolean compareToBaseCase = false;
 	
 	SpatialAveragingUtils sau;
+	SpatialAveragingUtilsExtended saue;
 	LocationFilter lf;
 	double simulationEndTime;
 	SortedSet<String> listOfPollutants;
@@ -113,6 +116,7 @@ public class SpatialAveragingDemandEmissions {
 	
 	private void run() throws IOException{
 		this.sau = new SpatialAveragingUtils(xMin, xMax, yMin, yMax, noOfXbins, noOfYbins, smoothingRadius_m, munichShapeFile, targetCRS);
+		this.saue = new SpatialAveragingUtilsExtended(smoothingRadius_m);
 		this.lf = new LocationFilter();
 		
 		this.simulationEndTime = getEndTime(configFile1);
@@ -198,16 +202,18 @@ public class SpatialAveragingDemandEmissions {
 		}
 	}
 	
-	private Map<Double, double[][]> fillWeightedEmissionValues(Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered) {
+	private Map<Double, double[][]> fillWeightedEmissionValues(Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered){
 		Map<Double, double[][]> time2weightedEmissions = new HashMap<Double, double[][]>();
 		
 		for(Double endOfTimeInterval : time2EmissionsTotalFilledAndFiltered.keySet()){
 			double[][]weightedEmissions = new double[noOfXbins][noOfYbins];
 			
 			for(Id linkId : time2EmissionsTotalFilledAndFiltered.get(endOfTimeInterval).keySet()){
-				Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
-				double xLink = linkCoord.getX();
-				double yLink = linkCoord.getY();
+//				Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
+//				double xLink = linkCoord.getX();
+//				double yLink = linkCoord.getY();
+				Coord fromNodeCoord = this.network.getLinks().get(linkId).getFromNode().getCoord();
+				Coord toNodeCoord = this.network.getLinks().get(linkId).getToNode().getCoord();
 				
 				double value = time2EmissionsTotalFilledAndFiltered.get(endOfTimeInterval).get(linkId).get(this.pollutant2analyze);
 				double scaledValue = this.scalingFactor * value;
@@ -216,7 +222,8 @@ public class SpatialAveragingDemandEmissions {
 				for(int xIndex=0; xIndex<noOfXbins; xIndex++){
 					for (int yIndex=0; yIndex<noOfYbins; yIndex++){
 						Coord cellCentroid = this.sau.findCellCentroid(xIndex, yIndex);
-						double weightOfLinkForCell = this.sau.calculateWeightOfPointForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
+//						double weightOfLinkForCell = this.sau.calculateWeightOfPointForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
+						double weightOfLinkForCell = this.saue.calculateWeightOfLineForCellImpl2(fromNodeCoord, toNodeCoord, cellCentroid.getX(), cellCentroid.getY());
 						weightedEmissions[xIndex][yIndex] += weightOfLinkForCell * scaledValue;					
 					}
 				}
@@ -233,9 +240,11 @@ public class SpatialAveragingDemandEmissions {
 			double[][]weightedDemand = new double[noOfXbins][noOfYbins];
 			
 			for(Id linkId : time2CountsPerLinkFilledAndFiltered.get(endOfTimeInterval).keySet()){
-				Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
-				double xLink = linkCoord.getX();
-				double yLink = linkCoord.getY();
+//				Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
+//				double xLink = linkCoord.getX();
+//				double yLink = linkCoord.getY();
+				Coord fromNodeCoord = this.network.getLinks().get(linkId).getFromNode().getCoord();
+				Coord toNodeCoord = this.network.getLinks().get(linkId).getToNode().getCoord();
 				double linkLength_km = this.network.getLinks().get(linkId).getLength() / 1000.;
 				
 				double count = time2CountsPerLinkFilledAndFiltered.get(endOfTimeInterval).get(linkId);
@@ -246,7 +255,8 @@ public class SpatialAveragingDemandEmissions {
 				for(int xIndex=0; xIndex<noOfXbins; xIndex++){
 					for (int yIndex=0; yIndex<noOfYbins; yIndex++){
 						Coord cellCentroid = this.sau.findCellCentroid(xIndex, yIndex);
-						double weightOfLinkForCell = this.sau.calculateWeightOfPointForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
+//						double weightOfLinkForCell = this.sau.calculateWeightOfPointForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
+						double weightOfLinkForCell = this.saue.calculateWeightOfLineForCellImpl2(fromNodeCoord, toNodeCoord, cellCentroid.getX(), cellCentroid.getY());
 						weightedDemand[xIndex][yIndex] += weightOfLinkForCell * scaledVkm;					
 					}
 				}

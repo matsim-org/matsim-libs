@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.spatial;
+package playground.benjamin.scenarios.munich.analysis.nectar;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.special.Erf;
@@ -55,7 +55,7 @@ public class SpatialAveragingUtilsExtended {
 		}
 		return weight;
 	}
-	public double calculateWeightOfLineForCellImpl2(Coord fromNodeCoord, Coord toNodeCoord, double cellCentroidX, double cellCentroidY) throws MathException {
+	public double calculateWeightOfLineForCellImpl2(Coord fromNodeCoord, Coord toNodeCoord, double cellCentroidX, double cellCentroidY) {
 		double constantA = getConstantA(fromNodeCoord, cellCentroidX, cellCentroidY);
 		double constantB = getConstantB(fromNodeCoord, toNodeCoord, cellCentroidX, cellCentroidY);
 		double constantC =0.;
@@ -65,8 +65,14 @@ public class SpatialAveragingUtilsExtended {
 
 		double upperLimit = (linkLengthFromCoord+(constantB/linkLengthFromCoord));
 		double lowerLimit = constantB/(linkLengthFromCoord);
-		double integrationUpperLimit = Erf.erf(upperLimit/constantR);
-		double integrationLowerLimit = Erf.erf(lowerLimit/constantR);
+		double integrationUpperLimit;
+		double integrationLowerLimit;
+		try {
+			integrationUpperLimit = Erf.erf(upperLimit/constantR);
+			integrationLowerLimit = Erf.erf(lowerLimit/constantR);
+		} catch (MathException e) {
+			throw new RuntimeException("Error function is not defined for " + upperLimit + " or " + lowerLimit + "; Exception: " + e);
+		}
 		double  weight = constantC *(integrationUpperLimit-integrationLowerLimit);
 		if(weight<0.0) {
 		logger.warn("weight is negative, please check. Weight = "+weight);
