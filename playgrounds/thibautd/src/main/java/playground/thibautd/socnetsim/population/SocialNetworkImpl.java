@@ -187,5 +187,16 @@ public class SocialNetworkImpl implements SocialNetwork {
 		if ( old != null ) log.warn( "replacing metadata \""+attribute+"\" from \""+old+"\" to \""+value+"\"" );
 	}
 
+	public void removeEgo(final Id ego) {
+		if ( !isReflective() ) throw new IllegalStateException( "Cannot remove an ego in a non reflective network." );
+
+		final Set<Id> alters = map.remove( ego );
+
+		// this requires the network to be reflective to be correct.
+		for ( Id alter : alters ) {
+			final Set<Id> altersOfAlter = map.get( alter );
+			altersOfAlter.remove( ego );
+		}
+	}
 }
 
