@@ -43,16 +43,38 @@ public class DgIdConverter {
 		this.idPool = idpool;
 	}
 	
+	/**
+	 * creates an id for the crossing node of the extended crossing corresponding to
+	 * the from node of the link. in the extended ks-model network the street 
+	 * corresponding to the matsim link will start at this crossing node.
+	 * 
+	 * @param linkId the id of the link in the matsim network
+	 * @return the id for the crossing node of the links from crossing
+	 */
 	public  Id convertLinkId2FromCrossingNodeId(Id linkId){
 		String idString = linkId.toString() + "11";
 		return idPool.createId(idString);
 	}
 	
+	/**
+	 * creates an id for the crossing node of the extended crossing corresponding to
+	 * the to node of the link. in the extended ks-model network the street 
+	 * corresponding to the matsim link will end at this crossing node.
+	 * 
+	 * @param linkId the id of the link in the matsim network
+	 * @return the id for the crossing node of the links to crossing
+	 */
 	public  Id convertLinkId2ToCrossingNodeId(Id linkId){
 		String idString = linkId.toString() + "99";
 		return idPool.createId(idString);
 	}
 	
+	/**
+	 * converts back. see convertLinkId2ToCrossingNodeId(...)
+	 * 
+	 * @param toCrossingNodeId the id of the crossing node in the ks-model network
+	 * @return the id of the matsim link corresponding to the street ending in this crossing node
+	 */
 	public Id convertToCrossingNodeId2LinkId(Id toCrossingNodeId){
 		String sid = toCrossingNodeId.toString();
 		if (sid.endsWith("99")){
@@ -62,6 +84,12 @@ public class DgIdConverter {
 		throw new IllegalStateException("Can not convert " + sid + " to link id");
 	}
 	
+	/**
+	 * converts back. see convertLinkId2FromCrossingNodeId(...)
+	 * 
+	 * @param fromCrossingNodeId the id of the crossing node in the ks-model network
+	 * @return the id of the matsim link corresponding to the street starting in this crossing node
+	 */
 	public Id convertFromCrossingNodeId2LinkId(Id fromCrossingNodeId){
 		String sid = fromCrossingNodeId.toString();
 		if (sid.endsWith("11")){
@@ -71,6 +99,14 @@ public class DgIdConverter {
 		throw new IllegalStateException("Can not convert " + sid + " to link id");
 	}
 	
+	/**
+	 * creates a light id for a link to link relationship
+	 * 
+	 * @param fromLinkId
+	 * @param fromLaneId
+	 * @param toLinkId
+	 * @return the light id
+	 */
 	public  Id convertFromLinkIdToLinkId2LightId(Id fromLinkId, Id fromLaneId, Id toLinkId){
 		Id id =  null;
 		if (fromLaneId == null){
@@ -83,11 +119,23 @@ public class DgIdConverter {
 		return idPool.createId(idString);
 	}
 	
+	/**
+	 * creates an id for the crossing representing the matsim node in the ks-model
+	 * 
+	 * @param nodeId the matsim node id
+	 * @return the corresponding crossing id in the ks-model
+	 */
 	public  Id convertNodeId2CrossingId(Id nodeId){
 		String idString = nodeId.toString() + "77";
 		return idPool.createId(idString);
 	}
 	
+	/**
+	 * converts back. see convertNodeId2CrossingId(...)
+	 * 
+	 * @param crossingId the crossing id in the ks-model
+	 * @return the corresponding node id in the matsim network
+	 */
 	public Id convertCrossingId2NodeId(Id crossingId){
 		String sid = crossingId.toString();
 		if (sid.endsWith("77")){
@@ -102,25 +150,44 @@ public class DgIdConverter {
 	 * to the single crossing node ID existing for the not expanded crossing in the ks-model.
 	 * (the signals bounding box determines the region of spatial expansion: all nodes within this area will be expanded.)
 	 * 
-	 * @param nodeId
-	 * @return the nodeId as String
+	 * @param nodeId the id of the matsim node
+	 * @return the crossing node id in the ks-model representing the single crossing node 
+	 * of the not expanded crossing corresponding to the matsim node
 	 */
 	public Id convertNodeId2NotExpandedCrossingNodeId(Id nodeId){
 		String idString = nodeId.toString();
 		return idPool.createId(idString);
 	}
 	
-	public Id convertNotExpandedCrossingNodeId2NodeId(Id crossingId){
-		String sid = crossingId.toString();
-		Id  id = new IdImpl(sid);
-		return id;
+	/**
+	 * converts back. see convertNodeId2NotExpandedCrossingNodeId(...)
+	 * 
+	 * @param crossingId the crossing node id in the ks-model
+	 * @return the id of the matsim node corresponding to the not expanded crossing 
+	 * in the ks-model containing this crossing node
+	 */
+	public Id convertNotExpandedCrossingNodeId2NodeId(Id crossingNodeId){
+		String sid = crossingNodeId.toString();
+		return new IdImpl(sid);
 	}
 	
+	/**
+	 * creates a street id for the ks-model corresponding to the link id of the matsim network
+	 * 
+	 * @param linkId the link id in the matsim network
+	 * @return the street id for the ks-model
+	 */
 	public Id convertLinkId2StreetId(Id linkId){
 		String idString = linkId.toString() + "88";
 		return idPool.createId(idString);
 	}
 
+	/**
+	 * converts back. see convertLinkId2StreetId(...)
+	 * 
+	 * @param streetId the street id in the ks-model
+	 * @return the corresponding link id in the matsim network
+	 */
 	public Id convertStreetId2LinkId(Id streetId){
 		String sid = streetId.toString();
 		if (sid.endsWith("88")){
