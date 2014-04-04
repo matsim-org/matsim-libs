@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -52,7 +51,7 @@ public class DiluteSocialNetworkedPopulation {
 
 		args.setDefaultValue( "--radius" , "30000" );
 
-		args.setDefaultValue( "--netfile" , null );
+		args.setDefaultValue( "--netfile" , null ); // unused.
 		args.setDefaultValue( "--inpopfile" , null );
 		args.setDefaultValue( "--insocnet" , null );
 		args.setDefaultValue( "--outdir" , null );
@@ -69,7 +68,6 @@ public class DiluteSocialNetworkedPopulation {
 					args.getValue(
 						"--radius" ) );
 
-		final String netfile = args.getValue( "--netfile" );
 		final String inpopfile = args.getValue( "--inpopfile" );
 		final String insocnet = args.getValue( "--insocnet" );
 		final String outdir = args.getValue( "--outdir" );
@@ -79,7 +77,6 @@ public class DiluteSocialNetworkedPopulation {
 		try {
 			final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 
-			new MatsimNetworkReader( scenario ).readFile( netfile );
 			new MatsimPopulationReader( scenario ).readFile( inpopfile );
 			new SocialNetworkReader( scenario ).parse( insocnet );
 
