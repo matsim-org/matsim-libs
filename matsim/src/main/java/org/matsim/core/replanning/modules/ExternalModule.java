@@ -20,9 +20,6 @@
 
 package org.matsim.core.replanning.modules;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -33,7 +30,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReader;
@@ -42,6 +39,9 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ExeRunner;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Basic wrapper for any call to external "plans-to-plans" modules. As basic handling of
@@ -73,7 +73,7 @@ public class ExternalModule implements PlanStrategyModule {
 	private String moduleId = "";
 	private String outFileRoot = "";
 
-	private final Controler controler;
+	private final OutputDirectoryHierarchy controler;
 	
 	private int currentIteration = -1;
 	
@@ -82,11 +82,11 @@ public class ExternalModule implements PlanStrategyModule {
 	private Map<Id, Plan> plansToMutate = new HashMap<Id, Plan>();
 
 
-	public ExternalModule(final String exePath, final String moduleId, final Controler controler, final Scenario scenario) {
+	public ExternalModule(final String exePath, final String moduleId, final OutputDirectoryHierarchy controler, final Scenario scenario) {
 		this.exePath = exePath;
 		this.moduleId = moduleId + "_";
 		this.controler = controler;
-		this.outFileRoot = controler.getControlerIO().getTempPath() + "/";
+		this.outFileRoot = controler.getTempPath() + "/";
 		this.scenario = scenario;
 	}
 
@@ -130,7 +130,7 @@ public class ExternalModule implements PlanStrategyModule {
 	private boolean callExe() {
 		prepareExternalExeConfig();
 		String cmd = this.exePath + " " + this.outFileRoot + this.moduleId + ExternalConfigFileName;
-		String logfilename = this.controler.getControlerIO().getIterationFilename(this.currentIteration, this.moduleId + "stdout.log");
+		String logfilename = this.controler.getIterationFilename(this.currentIteration, this.moduleId + "stdout.log");
 		return (ExeRunner.run(cmd, logfilename, 3600) == 0);
 	}
 
@@ -147,7 +147,7 @@ public class ExternalModule implements PlanStrategyModule {
 		// Change scenario config according to given output- and input-filenames: events, plans, network
 		extConfig.setParam(SCENARIO, SCENARIO_INPUT_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalInFileName);
 		extConfig.setParam(SCENARIO, SCENARIO_WORKING_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalOutFileName);
-		extConfig.setParam(SCENARIO, SCENARIO_WORKING_EVENTS_TXT_FILENAME, this.controler.getControlerIO().getIterationFilename(this.currentIteration - 1, "events.txt"));
+		extConfig.setParam(SCENARIO, SCENARIO_WORKING_EVENTS_TXT_FILENAME, this.controler.getIterationFilename(this.currentIteration - 1, "events.txt"));
 		String networkFilename = this.scenario.getConfig().findParam("network", "inputNetworkFile");
 		extConfig.setParam(SCENARIO, SCENARIO_NETWORK_FILENAME, networkFilename);
 		new ConfigWriter(extConfig).write(this.outFileRoot + this.moduleId + ExternalConfigFileName);

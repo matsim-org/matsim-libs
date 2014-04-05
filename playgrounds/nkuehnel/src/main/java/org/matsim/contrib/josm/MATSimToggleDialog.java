@@ -1,4 +1,4 @@
-package josmMatsimPlugin;
+package org.matsim.contrib.josm;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 

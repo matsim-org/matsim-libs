@@ -1,4 +1,4 @@
-package josmMatsimPlugin;
+package org.matsim.contrib.josm;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -19,38 +19,69 @@
 
 package org.matsim.core.controler.corelisteners;
 
+import org.matsim.analysis.CalcLinkStats;
+import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.LinkStatsConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 /**
  * @author mrieser
  */
 public class LinkStatsControlerListener implements IterationEndsListener, IterationStartsListener {
 
-	private final LinkStatsConfigGroup config;
-	private int iterationsUsed = 0;
+	private final LinkStatsConfigGroup linkStatsConfigGroup;
+    private final Config config;
+    private final CalcLinkStats linkStats;
+    private final VolumesAnalyzer volumes;
+    private final OutputDirectoryHierarchy controlerIO;
+    private TravelTimeCalculator travelTimeCalculator;
+    private Controler controler;
+    private int iterationsUsed = 0;
 	private boolean doReset = false;
 	
-	public LinkStatsControlerListener(final LinkStatsConfigGroup config) {
-		this.config = config;
+	public LinkStatsControlerListener(final Config config, OutputDirectoryHierarchy controlerIO, CalcLinkStats linkStats, VolumesAnalyzer volumes, Controler controler) {
+        this.config = config;
+        this.controlerIO = controlerIO;
+        this.linkStats = linkStats;
+        this.volumes = volumes;
+        this.controler = controler;
+        this.linkStatsConfigGroup = config.linkStats();
 	}
-	
-	@Override
+
+    public LinkStatsControlerListener(Config config, OutputDirectoryHierarchy controlerIO, CalcLinkStats linkStats, VolumesAnalyzer volumes, TravelTimeCalculator travelTimeCalculator) {
+        this.config = config;
+        this.controlerIO = controlerIO;
+        this.linkStats = linkStats;
+        this.volumes = volumes;
+        this.travelTimeCalculator = travelTimeCalculator;
+        this.linkStatsConfigGroup = config.linkStats();
+    }
+
+    @Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		Controler controler = event.getControler();
 		int iteration = event.getIteration();
 		
-		if (useVolumesOfIteration(iteration, controler.getConfig().controler().getFirstIteration())) {
+		if (useVolumesOfIteration(iteration, config.controler().getFirstIteration())) {
 			this.iterationsUsed++;
-			controler.getLinkStats().addData(controler.getVolumes(), controler.getLinkTravelTimes());
+            TravelTime travelTimes;
+            if (travelTimeCalculator != null) {
+                travelTimes = travelTimeCalculator.getLinkTravelTimes();
+            } else {
+                travelTimes = controler.getLinkTravelTimes();
+            }
+            linkStats.addData(volumes, travelTimes);
 		}
 
 		if (createLinkStatsInIteration(iteration)) {
-			controler.getLinkStats().writeFile(event.getControler().getControlerIO().getIterationFilename(iteration, Controler.FILENAME_LINKSTATS));
+			linkStats.writeFile(this.controlerIO.getIterationFilename(iteration, Controler.FILENAME_LINKSTATS));
 			this.doReset = true;
 		}
 	}
@@ -65,22 +96,22 @@ public class LinkStatsControlerListener implements IterationEndsListener, Iterat
 	}
 	
 	/*package*/ boolean useVolumesOfIteration(final int iteration, final int firstIteration) {
-		if (this.config.getWriteLinkStatsInterval() < 1) {
+		if (this.linkStatsConfigGroup.getWriteLinkStatsInterval() < 1) {
 			return false;
 		}
-		int iterationMod = iteration % this.config.getWriteLinkStatsInterval();
+		int iterationMod = iteration % this.linkStatsConfigGroup.getWriteLinkStatsInterval();
 		int effectiveIteration = iteration - firstIteration;
-		int averaging = Math.min(this.config.getAverageLinkStatsOverIterations(), this.config.getWriteLinkStatsInterval());
+		int averaging = Math.min(this.linkStatsConfigGroup.getAverageLinkStatsOverIterations(), this.linkStatsConfigGroup.getWriteLinkStatsInterval());
 		if (iterationMod == 0) {
-			return ((this.config.getAverageLinkStatsOverIterations() <= 1) ||
+			return ((this.linkStatsConfigGroup.getAverageLinkStatsOverIterations() <= 1) ||
 					(effectiveIteration >= averaging));
 		}
-		return (iterationMod > (this.config.getWriteLinkStatsInterval() - this.config.getAverageLinkStatsOverIterations())
-				&& (effectiveIteration + (this.config.getWriteLinkStatsInterval() - iterationMod) >= averaging));
+		return (iterationMod > (this.linkStatsConfigGroup.getWriteLinkStatsInterval() - this.linkStatsConfigGroup.getAverageLinkStatsOverIterations())
+				&& (effectiveIteration + (this.linkStatsConfigGroup.getWriteLinkStatsInterval() - iterationMod) >= averaging));
 	}
 	
 	/*package*/ boolean createLinkStatsInIteration(final int iteration) {
-		return ((iteration % this.config.getWriteLinkStatsInterval() == 0) && (this.iterationsUsed >= this.config.getAverageLinkStatsOverIterations()));		
+		return ((iteration % this.linkStatsConfigGroup.getWriteLinkStatsInterval() == 0) && (this.iterationsUsed >= this.linkStatsConfigGroup.getAverageLinkStatsOverIterations()));
 	}
 
 }

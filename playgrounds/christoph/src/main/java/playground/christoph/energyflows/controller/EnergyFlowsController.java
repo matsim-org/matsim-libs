@@ -73,9 +73,9 @@ public class EnergyFlowsController extends Controler {
 		}
 		
 		// add subpopulation score stats
-		ScoreStatsControlerListener nonTransitScoreStats = new ScoreStatsControlerListener(nonTransitPopulation, super.getControlerIO().getOutputFilename("nontransit" + FILENAME_SCORESTATS), config.controler().isCreateGraphs());
+		ScoreStatsControlerListener nonTransitScoreStats = new ScoreStatsControlerListener(config, nonTransitPopulation, super.getControlerIO().getOutputFilename("nontransit" + FILENAME_SCORESTATS), config.controler().isCreateGraphs());
 		this.addControlerListener(nonTransitScoreStats);
-		ScoreStatsControlerListener transitScoreStats = new ScoreStatsControlerListener(transitPopulation, super.getControlerIO().getOutputFilename("transit" + FILENAME_SCORESTATS), config.controler().isCreateGraphs());
+		ScoreStatsControlerListener transitScoreStats = new ScoreStatsControlerListener(config, transitPopulation, super.getControlerIO().getOutputFilename("transit" + FILENAME_SCORESTATS), config.controler().isCreateGraphs());
 		this.addControlerListener(transitScoreStats);
 
 		// add subpopulation travel distance stats

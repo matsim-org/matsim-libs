@@ -1,4 +1,4 @@
-package josmMatsimPlugin;
+package org.matsim.contrib.josm;
 
 import java.io.IOException;
 import java.util.Collections;

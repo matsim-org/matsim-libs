@@ -1,6 +1,7 @@
 package playground.pieter.pseudosimulation.controler.listeners;
 
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.corelisteners.LegHistogramListener;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -12,8 +13,8 @@ import org.matsim.core.controler.events.IterationStartsEvent;
  */
 public class PSimLegHistogramListener extends LegHistogramListener {
 
-	public PSimLegHistogramListener(EventsManager events, boolean outputGraph) {
-		super(events, outputGraph);
+	public PSimLegHistogramListener(EventsManager events, OutputDirectoryHierarchy controlerIO, boolean outputGraph) {
+		super(events, controlerIO, outputGraph);
 		
 	}
 

@@ -1,4 +1,4 @@
-package josmMatsimPlugin;
+package org.matsim.contrib.josm;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import josmMatsimPlugin.OsmConvertDefaults.OsmHighwayDefaults;
+import org.matsim.contrib.josm.OsmConvertDefaults.OsmHighwayDefaults;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;

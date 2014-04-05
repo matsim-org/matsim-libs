@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -43,9 +44,11 @@ public class LegHistogramListener implements IterationEndsListener, IterationSta
 	private final boolean outputGraph;
 
 	static private final Logger log = Logger.getLogger(LegHistogramListener.class);
+    private final OutputDirectoryHierarchy controlerIO;
 
-	public LegHistogramListener(final EventsManager events, final boolean outputGraph) {
+    public LegHistogramListener(final EventsManager events, OutputDirectoryHierarchy controlerIO, final boolean outputGraph) {
 		this.events = events;
+        this.controlerIO = controlerIO;
 		this.histogram = new LegHistogram(300);
 		this.outputGraph = outputGraph;
 		this.events.addHandler(this.histogram);
@@ -58,12 +61,12 @@ public class LegHistogramListener implements IterationEndsListener, IterationSta
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		this.histogram.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "legHistogram.txt"));
+		this.histogram.write(controlerIO.getIterationFilename(event.getIteration(), "legHistogram.txt"));
 		this.printStats();
 		if (this.outputGraph) {
-			this.histogram.writeGraphic(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "legHistogram_all.png"));
+			this.histogram.writeGraphic(controlerIO.getIterationFilename(event.getIteration(), "legHistogram_all.png"));
 			for (String legMode : this.histogram.getLegModes()) {
-				this.histogram.writeGraphic(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "legHistogram_" + legMode + ".png"), legMode);
+				this.histogram.writeGraphic(controlerIO.getIterationFilename(event.getIteration(), "legHistogram_" + legMode + ".png"), legMode);
 			}
 		}
 

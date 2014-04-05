@@ -89,7 +89,7 @@ public class MyController extends AbstractController {
 	protected void loadCoreListeners() {
 		
 		// optional: score stats
-				this.scoreStats = new ScoreStatsControlerListener(this.scenario.getPopulation(),
+				this.scoreStats = new ScoreStatsControlerListener(config, this.scenario.getPopulation(),
 						this.getControlerIO().getOutputFilename("scorestats"), true);
 				this.addControlerListener(this.scoreStats);
 		

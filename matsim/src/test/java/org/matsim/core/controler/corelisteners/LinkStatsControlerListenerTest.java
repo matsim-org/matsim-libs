@@ -34,11 +34,13 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.LinkStatsConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -51,12 +53,12 @@ public class LinkStatsControlerListenerTest {
 	
 	@Test
 	public void testUseVolumesOfIteration() {
-		LinkStatsConfigGroup config = new LinkStatsConfigGroup();
-		LinkStatsControlerListener lscl = new LinkStatsControlerListener(config);
+		Config config = ConfigUtils.createConfig();
+		LinkStatsControlerListener lscl = new LinkStatsControlerListener(config, null, null, null, new Controler(ConfigUtils.createConfig()));
 		
 		// test defaults
-		Assert.assertEquals(10, config.getWriteLinkStatsInterval());
-		Assert.assertEquals(5, config.getAverageLinkStatsOverIterations());
+		Assert.assertEquals(10, config.linkStats().getWriteLinkStatsInterval());
+		Assert.assertEquals(5, config.linkStats().getAverageLinkStatsOverIterations());
 		
 		// now the real tests
 		Assert.assertFalse(lscl.useVolumesOfIteration(0, 0));
@@ -83,8 +85,8 @@ public class LinkStatsControlerListenerTest {
 		Assert.assertFalse(lscl.useVolumesOfIteration(21, 0));
 		
 		// change some values
-		config.setWriteLinkStatsInterval(8);
-		config.setAverageLinkStatsOverIterations(2);
+        config.linkStats().setWriteLinkStatsInterval(8);
+        config.linkStats().setAverageLinkStatsOverIterations(2);
 		Assert.assertFalse(lscl.useVolumesOfIteration(0, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(1, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(2, 0));
@@ -109,8 +111,8 @@ public class LinkStatsControlerListenerTest {
 		Assert.assertFalse(lscl.useVolumesOfIteration(21, 0));
 		
 		// change some values: averaging = 1
-		config.setWriteLinkStatsInterval(5);
-		config.setAverageLinkStatsOverIterations(1);
+        config.linkStats().setWriteLinkStatsInterval(5);
+        config.linkStats().setAverageLinkStatsOverIterations(1);
 		Assert.assertTrue(lscl.useVolumesOfIteration(0, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(1, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(2, 0));
@@ -135,8 +137,8 @@ public class LinkStatsControlerListenerTest {
 		Assert.assertFalse(lscl.useVolumesOfIteration(21, 0));
 
 		// change some values: averaging = 0
-		config.setWriteLinkStatsInterval(5);
-		config.setAverageLinkStatsOverIterations(0);
+        config.linkStats().setWriteLinkStatsInterval(5);
+        config.linkStats().setAverageLinkStatsOverIterations(0);
 		Assert.assertTrue(lscl.useVolumesOfIteration(0, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(1, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(2, 0));
@@ -161,8 +163,8 @@ public class LinkStatsControlerListenerTest {
 		Assert.assertFalse(lscl.useVolumesOfIteration(21, 0));
 
 		// change some values: interval = 0
-		config.setWriteLinkStatsInterval(0);
-		config.setAverageLinkStatsOverIterations(2);
+        config.linkStats().setWriteLinkStatsInterval(0);
+        config.linkStats().setAverageLinkStatsOverIterations(2);
 		Assert.assertFalse(lscl.useVolumesOfIteration(0, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(1, 0));
 		Assert.assertFalse(lscl.useVolumesOfIteration(2, 0));
@@ -187,8 +189,8 @@ public class LinkStatsControlerListenerTest {
 		Assert.assertFalse(lscl.useVolumesOfIteration(21, 0));
 		
 		// change some values: interval equal averaging
-		config.setWriteLinkStatsInterval(5);
-		config.setAverageLinkStatsOverIterations(5);
+        config.linkStats().setWriteLinkStatsInterval(5);
+        config.linkStats().setAverageLinkStatsOverIterations(5);
 		Assert.assertFalse(lscl.useVolumesOfIteration(0, 0));
 		Assert.assertTrue(lscl.useVolumesOfIteration(1, 0));
 		Assert.assertTrue(lscl.useVolumesOfIteration(2, 0));
@@ -213,8 +215,8 @@ public class LinkStatsControlerListenerTest {
 		Assert.assertTrue(lscl.useVolumesOfIteration(21, 0));
 
 		// change some values: averaging > interval
-		config.setWriteLinkStatsInterval(5);
-		config.setAverageLinkStatsOverIterations(6);
+        config.linkStats().setWriteLinkStatsInterval(5);
+        config.linkStats().setAverageLinkStatsOverIterations(6);
 		Assert.assertFalse(lscl.useVolumesOfIteration(0, 0));
 		Assert.assertTrue(lscl.useVolumesOfIteration(1, 0));
 		Assert.assertTrue(lscl.useVolumesOfIteration(2, 0));
@@ -239,8 +241,8 @@ public class LinkStatsControlerListenerTest {
 		Assert.assertTrue(lscl.useVolumesOfIteration(21, 0));
 		
 		// change some values: different firstIteration
-		config.setWriteLinkStatsInterval(5);
-		config.setAverageLinkStatsOverIterations(3);
+        config.linkStats().setWriteLinkStatsInterval(5);
+        config.linkStats().setAverageLinkStatsOverIterations(3);
 		Assert.assertFalse(lscl.useVolumesOfIteration(4, 4));
 		Assert.assertFalse(lscl.useVolumesOfIteration(5, 4));
 		Assert.assertFalse(lscl.useVolumesOfIteration(6, 4));

@@ -1,4 +1,4 @@
-package josmMatsimPlugin;
+package org.matsim.contrib.josm;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

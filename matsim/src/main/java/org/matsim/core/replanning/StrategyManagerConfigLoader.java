@@ -26,9 +26,11 @@ import java.lang.reflect.InvocationTargetException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.PlanStrategyFactoryRegister;
 import org.matsim.core.controler.PlanStrategyRegistrar;
 import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
@@ -58,11 +60,11 @@ public final class StrategyManagerConfigLoader {
 	public static void load(final Controler controler, final StrategyManager manager) {
 		PlanStrategyRegistrar planStrategyFactoryRegistrar = new PlanStrategyRegistrar();
 		PlanStrategyFactoryRegister planStrategyFactoryRegister = planStrategyFactoryRegistrar.getFactoryRegister();
-		load(controler, manager, planStrategyFactoryRegister);
+		load(controler.getScenario(), controler.getControlerIO(), controler.getEvents(), manager, planStrategyFactoryRegister);
 	}
 
-	public static void load(final Controler controler, final StrategyManager manager, PlanStrategyFactoryRegister planStrategyFactoryRegister) {
-		Config config = controler.getConfig();
+	public static void load(Scenario scenario, OutputDirectoryHierarchy controlerIO, EventsManager events, final StrategyManager manager, PlanStrategyFactoryRegister planStrategyFactoryRegister) {
+		Config config = scenario.getConfig();
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 		
 		int globalInnovationDisableAfter = (int) ((config.controler().getLastIteration() - config.controler().getFirstIteration()) 
@@ -85,7 +87,7 @@ public final class StrategyManagerConfigLoader {
 				moduleName = moduleName.replace("org.matsim.demandmodeling.plans.strategies.", "");
 			}
 
-			PlanStrategy strategy = loadStrategy(controler, moduleName, settings, planStrategyFactoryRegister);
+			PlanStrategy strategy = loadStrategy(scenario, controlerIO, events, moduleName, settings, planStrategyFactoryRegister);
 
 			if (strategy == null) {
 				throw new RuntimeException("Could not initialize strategy named " + moduleName);
@@ -138,7 +140,7 @@ public final class StrategyManagerConfigLoader {
 				// does not make sense, thus commented out. kai, oct'13
 			} else if ( name.equals("PathSizeLogitSelector") ) {
 				planSelector = new PathSizeLogitSelector(config.planCalcScore().getPathSizeLogitBeta(), -config.planCalcScore().getBrainExpBeta(), 
-						controler.getScenario().getNetwork());
+						scenario.getNetwork());
 			} else {
 				throw new RuntimeException("Unknown 'plan selector for removal'.");
 			}
@@ -146,30 +148,30 @@ public final class StrategyManagerConfigLoader {
 		}
 	}
 
-	private static PlanStrategy loadStrategy(final Controler controler, final String name, final StrategyConfigGroup.StrategySettings settings, PlanStrategyFactoryRegister planStrategyFactoryRegister) {
+	private static PlanStrategy loadStrategy(Scenario scenario, OutputDirectoryHierarchy controlerIO, EventsManager events, final String name, final StrategyConfigGroup.StrategySettings settings, PlanStrategyFactoryRegister planStrategyFactoryRegister) {
 		// Special cases, scheduled to go away.
 		if (name.equals(LOCATION_CHOICE)) {
-			PlanStrategy strategy = tryToLoadPlanStrategyByName(controler, "org.matsim.contrib.locationchoice.LocationChoicePlanStrategy");
+			PlanStrategy strategy = tryToLoadPlanStrategyByName(scenario, "org.matsim.contrib.locationchoice.LocationChoicePlanStrategy");
 			return strategy;
 		} else if (name.equals("ExternalModule")) {
 			externalCounter++;
 			PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			String exePath = settings.getExePath();
-			ExternalModule em = new ExternalModule(exePath, "ext" + externalCounter, controler, controler.getScenario());
+			ExternalModule em = new ExternalModule(exePath, "ext" + externalCounter, controlerIO, scenario);
 			strategy.addStrategyModule(em);
 			return strategy;
 		} else if (name.contains(".")) {
-			PlanStrategy strategy = tryToLoadPlanStrategyByName(controler, name);
+			PlanStrategy strategy = tryToLoadPlanStrategyByName(scenario, name);
 			return strategy;
 		} else {
 			PlanStrategyFactory planStrategyFactory = planStrategyFactoryRegister.getInstance(name);
-			PlanStrategy strategy = planStrategyFactory.createPlanStrategy(controler.getScenario(), controler.getEvents());
+			PlanStrategy strategy = planStrategyFactory.createPlanStrategy(scenario, events);
 			return strategy;
 		} 
 	} 
 
 
-	private static PlanStrategy tryToLoadPlanStrategyByName(final Controler controler, final String name) {
+	private static PlanStrategy tryToLoadPlanStrategyByName(final Scenario scenario, final String name) {
 		PlanStrategy strategy;
 		//classes loaded by name must not be part of the matsim core
 		if (name.startsWith("org.matsim.") && !name.startsWith("org.matsim.contrib.")) {
@@ -181,7 +183,7 @@ public final class StrategyManagerConfigLoader {
 				args[0] = Scenario.class;
 				Constructor<? extends PlanStrategy> c = null;
 				c = klas.getConstructor(args);
-				strategy = c.newInstance(controler.getScenario());
+				strategy = c.newInstance(scenario);
 			} catch (ClassNotFoundException e) {
 				throw new RuntimeException(e);
 			} catch (InstantiationException e) {

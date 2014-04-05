@@ -379,10 +379,10 @@ public class Controler extends AbstractController {
 		// zz vote for clearControlerListeners(). dg, may'13
 
 		// optional: LegHistogram
-		this.addControlerListener(new LegHistogramListener(this.events, this.config.controler().isCreateGraphs()));
+		this.addControlerListener(new LegHistogramListener(this.events, this.getControlerIO(), this.config.controler().isCreateGraphs()));
 
 		// optional: score stats
-		this.scoreStats = new ScoreStatsControlerListener(this.population,
+		this.scoreStats = new ScoreStatsControlerListener(config, this.population,
 				this.getControlerIO().getOutputFilename(FILENAME_SCORESTATS), this.config.controler().isCreateGraphs());
 		this.addControlerListener(this.scoreStats);
 
@@ -393,7 +393,8 @@ public class Controler extends AbstractController {
 		}
 
 		if (this.config.linkStats().getWriteLinkStatsInterval() > 0) {
-			this.addControlerListener(new LinkStatsControlerListener(this.config.linkStats()));
+            // Have to pass this here because TravelTimeCalculator isn't created yet.
+			this.addControlerListener(new LinkStatsControlerListener(this.config, this.getControlerIO(), this.linkStats, this.volumes, this));
 		}
 
 		if (this.config.scenario().isUseTransit()) {
@@ -410,7 +411,7 @@ public class Controler extends AbstractController {
 		ActivityDurationInterpretation actDurInterpr = this.config.plans().getActivityDurationInterpretation() ;
 		if ( actDurInterpr != ActivityDurationInterpretation.minOfDurationAndEndTime 
 				|| this.config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
-			addControlerListener(new VspPlansCleaner());
+			addControlerListener(new VspPlansCleaner(this.scenarioData));
 		}
 
 	}
@@ -481,7 +482,7 @@ public class Controler extends AbstractController {
 		// yyyy cannot make this final: overridden at about 40 locations.  kai, jan'2013
 		// now about 20 locations.  kai, may'2013
 		StrategyManager manager = new StrategyManager();
-		StrategyManagerConfigLoader.load(this, manager, this.planStrategyFactoryRegister);
+		StrategyManagerConfigLoader.load(getScenario(), getControlerIO(), getEvents(), manager, this.planStrategyFactoryRegister);
 		return manager;
 	}
 

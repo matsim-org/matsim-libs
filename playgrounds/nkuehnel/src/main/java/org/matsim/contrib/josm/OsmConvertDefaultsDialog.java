@@ -1,4 +1,4 @@
-package josmMatsimPlugin;
+package org.matsim.contrib.josm;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
@@ -18,7 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import josmMatsimPlugin.OsmConvertDefaults.OsmHighwayDefaults;
+import org.matsim.contrib.josm.OsmConvertDefaults.OsmHighwayDefaults;
 
 import org.openstreetmap.josm.Main;
 

@@ -20,15 +20,11 @@
 
 package org.matsim.analysis;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Locale;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -38,6 +34,10 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Locale;
 
 /**
  * Calculates at the end of each iteration the following statistics:
@@ -65,7 +65,8 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 	final private String fileName;
 	
 	private final boolean createPNG;
-	private double[][] history = null;
+    private final Config config;
+    private double[][] history = null;
 	private int minIteration = 0;
 
 	private final static Logger log = Logger.getLogger(ScoreStatsControlerListener.class);
@@ -73,13 +74,16 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 	/**
 	 * Creates a new ScoreStats instance.
 	 *
-	 * @param population
-	 * @param filename including the path, excluding the file type extension
-	 * @param createPNG true if in every iteration, the scorestats should be visualized in a graph and written to disk.
-	 * @throws UncheckedIOException
+	 *
+     * @param config
+     * @param population
+     * @param filename including the path, excluding the file type extension
+     * @param createPNG true if in every iteration, the scorestats should be visualized in a graph and written to disk.
+     * @throws UncheckedIOException
 	 */
-	public ScoreStatsControlerListener(final Population population, final String filename, final boolean createPNG) throws UncheckedIOException {
-		this.population = population;
+	public ScoreStatsControlerListener(Config config, final Population population, final String filename, final boolean createPNG) throws UncheckedIOException {
+		this.config = config;
+        this.population = population;
 		this.fileName = filename;
 		this.createPNG = createPNG;
 		if (filename.toLowerCase(Locale.ROOT).endsWith(".txt")) {
@@ -96,9 +100,8 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		Controler controler = event.getControler();
-		this.minIteration = controler.getConfig().controler().getFirstIteration();
-		int maxIter = controler.getConfig().controler().getLastIteration();
+		this.minIteration = config.controler().getFirstIteration();
+		int maxIter = config.controler().getLastIteration();
 		int iterations = maxIter - this.minIteration;
 		if (iterations > 5000) iterations = 5000; // limit the history size
 		this.history = new double[4][iterations+1];

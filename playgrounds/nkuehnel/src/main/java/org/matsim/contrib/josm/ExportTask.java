@@ -1,7 +1,7 @@
 /**
  * 
  */
-package josmMatsimPlugin;
+package org.matsim.contrib.josm;
 
 import java.io.File;
 import java.io.IOException;

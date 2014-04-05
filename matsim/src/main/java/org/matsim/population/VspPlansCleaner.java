@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.population;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -37,13 +38,17 @@ import org.matsim.core.utils.misc.Time;
  *
  */
 public class VspPlansCleaner implements BeforeMobsimListener {
-	
-	public VspPlansCleaner() {} 
+
+    private final Scenario scenario;
+
+    public VspPlansCleaner(Scenario scenarioData) {
+        this.scenario = scenarioData;
+    }
 	
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		Population pop = event.getControler().getScenario().getPopulation();
-		Config config = event.getControler().getScenario().getConfig() ;
+		Population pop = scenario.getPopulation();
+		Config config = scenario.getConfig() ;
 		ActivityDurationInterpretation actDurInterp = ( config.plans().getActivityDurationInterpretation() ) ;
 		for ( Person person : pop.getPersons().values() ) {
 

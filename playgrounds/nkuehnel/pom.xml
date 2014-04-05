@@ -101,7 +101,7 @@
 					<!--<manifestEntries> -->
 					<!--<Plugin-Mainversion>4394</Plugin-Mainversion> -->
 					<!--<Plugin-Version>${buildNumber}</Plugin-Version> -->
-					<!--<Plugin-Class>josmMatsimPlugin.MATSimPlugin</Plugin-Class> -->
+					<!--<Plugin-Class>josm.MATSimPlugin</Plugin-Class> -->
 					<!--<Plugin-Description>Allows to edit and extract network information 
 						for the traffic simulation MATSim</Plugin-Description> -->
 					<!--<Plugin-Date>${maven.build.timestamp}</Plugin-Date> -->
