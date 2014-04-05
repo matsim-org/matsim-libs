@@ -40,17 +40,19 @@ import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityE
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 
-public class ElectricPtSimModule implements VehicleArrivesAtFacilityEventHandler,VehicleDepartsAtFacilityEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler {
+public class ElectricPtSimModule implements VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler,
+		LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler {
 
 	private HashMap<Id, EnergyConsumptionModel> vehicleEnergyConsumption;
 	private DoubleValueHashMap<Id> chargingPowerAtStops;
 	private HashMap<Id, PtVehicleEnergyState> ptEnergyMangementModels;
 	private PtVehicleEnergyControl ptVehicleEnergyControl;
-	private DoubleValueHashMap<Id> stopArrivalTime=new DoubleValueHashMap<Id>();
+	private DoubleValueHashMap<Id> stopArrivalTime = new DoubleValueHashMap<Id>();
 	// vehicleId, linkId
-	private TwoKeyHashMapWithDouble<Id, Id> linkEnterTime=new TwoKeyHashMapWithDouble<Id, Id>();
+	private TwoKeyHashMapWithDouble<Id, Id> linkEnterTime = new TwoKeyHashMapWithDouble<Id, Id>();
 
-	public ElectricPtSimModule(Controler controler, HashMap<Id, PtVehicleEnergyState> ptEnergyMangementModels, PtVehicleEnergyControl ptVehicleEnergyControl){
+	public ElectricPtSimModule(Controler controler, HashMap<Id, PtVehicleEnergyState> ptEnergyMangementModels,
+			PtVehicleEnergyControl ptVehicleEnergyControl) {
 		this.ptEnergyMangementModels = ptEnergyMangementModels;
 		this.chargingPowerAtStops = chargingPowerAtStops;
 		this.ptVehicleEnergyControl = ptVehicleEnergyControl;
@@ -62,13 +64,15 @@ public class ElectricPtSimModule implements VehicleArrivesAtFacilityEventHandler
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
-		double durationOfStayAtStationInSeconds = GeneralLib.getIntervalDuration(stopArrivalTime.get(event.getFacilityId()), event.getTime());
-		ptVehicleEnergyControl.handleChargingOpportunityAtStation(ptEnergyMangementModels.get(event.getVehicleId()), durationOfStayAtStationInSeconds, event.getFacilityId());
+		double durationOfStayAtStationInSeconds = GeneralLib.getIntervalDuration(stopArrivalTime.get(event.getFacilityId()),
+				event.getTime());
+		ptVehicleEnergyControl.handleChargingOpportunityAtStation(ptEnergyMangementModels.get(event.getVehicleId()),
+				durationOfStayAtStationInSeconds, event.getFacilityId());
 	}
 
 	@Override
@@ -85,7 +89,11 @@ public class ElectricPtSimModule implements VehicleArrivesAtFacilityEventHandler
 	public void handleEvent(LinkLeaveEvent event) {
 		double enterTime = linkEnterTime.get(event.getVehicleId(), event.getLinkId());
 		double travelTime = GeneralLib.getIntervalDuration(enterTime, event.getTime());
-		ptVehicleEnergyControl.handleLinkTravelled(ptEnergyMangementModels.get(event.getVehicleId()), event.getLinkId(), travelTime);
+		
+		if(ptEnergyMangementModels.containsKey(event.getVehicleId()))
+		{
+			ptVehicleEnergyControl.handleLinkTravelled(ptEnergyMangementModels.get(event.getVehicleId()), event.getLinkId(), travelTime);
+		}
 	}
 
 	@Override
@@ -94,4 +102,3 @@ public class ElectricPtSimModule implements VehicleArrivesAtFacilityEventHandler
 	}
 
 }
-
