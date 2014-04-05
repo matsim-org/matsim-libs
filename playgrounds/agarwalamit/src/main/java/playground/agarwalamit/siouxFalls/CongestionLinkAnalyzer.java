@@ -31,7 +31,9 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.scenario.ScenarioImpl;
 
+import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
 /**
@@ -45,6 +47,7 @@ public class CongestionLinkAnalyzer extends AbstractAnalyisModule {
 	private final String configFile;
 	private Map<Double, Map<Id, Double>> congestionPerLinkTimeInterval;
 	private EventsManager eventsManager;
+	private Scenario scenario;
 
 	public CongestionLinkAnalyzer(String configFile, String eventFile, int noOfTimeBins) {
 		super(CongestionLinkAnalyzer.class.getSimpleName());
@@ -53,7 +56,8 @@ public class CongestionLinkAnalyzer extends AbstractAnalyisModule {
 		this.noOfTimeBins = noOfTimeBins;
 	}
 	public void init(Scenario scenario){
-		this.congestionPerLinkHandler = new CongestionPerLinkHandler(this.noOfTimeBins, getEndTime(this.configFile), scenario);
+		this.scenario = scenario;
+		this.congestionPerLinkHandler = new CongestionPerLinkHandler(this.noOfTimeBins, getEndTime(this.configFile), this.scenario);
 	}
 	@Override
 	public List<EventHandler> getEventHandler() {
@@ -91,5 +95,15 @@ public class CongestionLinkAnalyzer extends AbstractAnalyisModule {
 
 	public Map<Double, Map<Id, Double>> getCongestionPerLinkTimeInterval() {
 		return this.congestionPerLinkTimeInterval;
+	}
+	
+	public void checkTotalDelayUsingAlternativeMethod(){
+		EventsManager em = EventsUtils.createEventsManager();
+		MarginalCongestionHandlerImplV3 implV3 = new MarginalCongestionHandlerImplV3(em, (ScenarioImpl) scenario);
+		MatsimEventsReader eventsReader = new MatsimEventsReader(em);
+		em.addHandler(implV3);
+		eventsReader.readFile(this.eventsFile);
+		if(implV3.getTotalDelay()/3600!=this.congestionPerLinkHandler.getTotalDelayInHours())
+			throw new RuntimeException("Total Delays are not equal using two methods; values are "+implV3.getTotalDelay()/3600+","+this.congestionPerLinkHandler.getTotalDelayInHours());
 	}
 }

@@ -40,45 +40,60 @@ import org.matsim.api.core.v01.network.Link;
 public class CongestionPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler {
 	private final Logger logger = Logger.getLogger(CongestionPerLinkHandler.class);
 
-	private Map<Double, Map<Id, Double>> delaysPerLink = new HashMap<Double, Map<Id, Double>>();
+	private Map<Double, Map<Id, Double>> linkId2DelaysPerLink = new HashMap<Double, Map<Id, Double>>();
 	private Map<Id, Map<Id, Double>> linkId2PersonIdLinkEnterTime = new HashMap<Id, Map<Id,Double>>();
 	private Map<Id, Double> linkId2FreeSpeedLinkTravelTime = new HashMap<Id, Double>();
-	private double totalDelay = 0;
+	private Map<Double, Map<Id, Double>> time2linkIdLeaveCount = new HashMap<Double, Map<Id,Double>>();
+	private double totalDelay;
 
-	final int noOfTimeBins;
-	final double timeBinSize;
-	final Scenario scenario;
+	private final double timeBinSize;
+	
 	public CongestionPerLinkHandler(int noOfTimeBins, double simulationEndTime, Scenario scenario){
-		this.noOfTimeBins = noOfTimeBins;
+
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
-		this.scenario = scenario;
+
 		for (Link link : scenario.getNetwork().getLinks().values()) {
-			linkId2PersonIdLinkEnterTime.put(link.getId(), new HashMap<Id, Double>());
+			this.linkId2PersonIdLinkEnterTime.put(link.getId(), new HashMap<Id, Double>());
 			Double freeSpeedLinkTravelTime = Double.valueOf(Math.floor(link.getLength()/link.getFreespeed())+1);
-			linkId2FreeSpeedLinkTravelTime.put(link.getId(), freeSpeedLinkTravelTime);
+			this.linkId2FreeSpeedLinkTravelTime.put(link.getId(), freeSpeedLinkTravelTime);
+		}
+
+		for(int i =0;i<noOfTimeBins;i++){
+			this.linkId2DelaysPerLink.put(this.timeBinSize*(i+1), new HashMap<Id, Double>());
+			this.time2linkIdLeaveCount.put(this.timeBinSize*(i+1), new HashMap<Id, Double>());
+
+			for(Link link : scenario.getNetwork().getLinks().values()) {
+				Map<Id, Double>	delayOnLink = this.linkId2DelaysPerLink.get(this.timeBinSize*(i+1));
+				delayOnLink.put(link.getId(), Double.valueOf(0.));
+				Map<Id, Double> countOnLink = this.time2linkIdLeaveCount.get(this.timeBinSize*(i+1));
+				countOnLink.put(link.getId(), Double.valueOf(0.));
+			}
 		}
 	}
 
 	@Override
 	public void reset(int iteration) {
-		this.delaysPerLink.clear();
+		this.linkId2DelaysPerLink.clear();
+		logger.info("Resetting link delays to   " + this.linkId2DelaysPerLink);
 		this.linkId2PersonIdLinkEnterTime.clear();
 		this.linkId2FreeSpeedLinkTravelTime.clear();
+		this.time2linkIdLeaveCount.clear();
+		logger.info("Resetting linkLeave counter to " + this.time2linkIdLeaveCount);
 	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		Id linkId = event.getLinkId();
 		Id personId = event.getPersonId();
-		if(linkId2PersonIdLinkEnterTime.get(linkId).containsKey(personId)){
+		if(this.linkId2PersonIdLinkEnterTime.get(linkId).containsKey(personId)){
 			// Person is already on the link. Cannot happen.
 			throw new RuntimeException();
 		} 
-		
-		Map<Id, Double> personId2LinkEnterTime = linkId2PersonIdLinkEnterTime.get(linkId);
-		double derivedLinkEnterTime = event.getTime()+1-linkId2FreeSpeedLinkTravelTime.get(linkId);
+
+		Map<Id, Double> personId2LinkEnterTime = this.linkId2PersonIdLinkEnterTime.get(linkId);
+		double derivedLinkEnterTime = event.getTime()+1-this.linkId2FreeSpeedLinkTravelTime.get(linkId);
 		personId2LinkEnterTime.put(personId, Double.valueOf(derivedLinkEnterTime));
-		linkId2PersonIdLinkEnterTime.put(linkId, personId2LinkEnterTime);
+		this.linkId2PersonIdLinkEnterTime.put(linkId, personId2LinkEnterTime);
 	}
 
 	@Override
@@ -86,38 +101,33 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler, LinkLeav
 		Double time = event.getTime(); 
 		if(time ==0.0) time = this.timeBinSize;
 		double endOfTimeInterval = 0.0;
-		endOfTimeInterval = Math.ceil(time/timeBinSize)*timeBinSize;
-		if(endOfTimeInterval<=0.0)endOfTimeInterval=timeBinSize;
-		Map<Id, Double> delayOnLink;
+		endOfTimeInterval = Math.ceil(time/this.timeBinSize)*this.timeBinSize;
+		if(endOfTimeInterval<=0.0)endOfTimeInterval=this.timeBinSize;
+
 
 		Id linkId = event.getLinkId();
 		Id personId = event.getPersonId();
 
-		double actualTravelTime = event.getTime()-linkId2PersonIdLinkEnterTime.get(linkId).get(personId);
-		linkId2PersonIdLinkEnterTime.get(linkId).remove(personId);
-		double freeSpeedTime = linkId2FreeSpeedLinkTravelTime.get(linkId);
+		double actualTravelTime = event.getTime()-this.linkId2PersonIdLinkEnterTime.get(linkId).get(personId);
+		this.linkId2PersonIdLinkEnterTime.get(linkId).remove(personId);
+		double freeSpeedTime = this.linkId2FreeSpeedLinkTravelTime.get(linkId);
 		double currentDelay =	actualTravelTime-freeSpeedTime;
-		
-		if(currentDelay>=1.){
-			totalDelay=totalDelay+currentDelay;
-			if(delaysPerLink.get(endOfTimeInterval)!= null){
-				delayOnLink = delaysPerLink.get(endOfTimeInterval);
 
-				if(delayOnLink.get(linkId)!=null){
-					double delaySoFar = delayOnLink.get(linkId);
-					double delayNewValue = currentDelay+delaySoFar;
-					delayOnLink.put(linkId, Double.valueOf(delayNewValue));
-				} else {
-					delayOnLink.put(linkId, Double.valueOf(currentDelay));
-				}
-			} else {
-				delayOnLink = new HashMap<Id, Double>();
-				delayOnLink.put(linkId, Double.valueOf(currentDelay));
-				delaysPerLink.put(endOfTimeInterval, delayOnLink);
-			}
-		} else {
-			// ignore delays less than 1 sec(delay=1sec are included) because of rounding errors.
-		}
+		Map<Id, Double> delayOnLink = this.linkId2DelaysPerLink.get(endOfTimeInterval);
+		Map<Id, Double> countTotal = this.time2linkIdLeaveCount.get(endOfTimeInterval);
+
+		double delaySoFar = delayOnLink.get(linkId);
+
+		if(currentDelay<1.)  currentDelay=0.;
+
+		double delayNewValue = currentDelay+delaySoFar;
+		this.totalDelay+=currentDelay;	
+
+		delayOnLink.put(linkId, Double.valueOf(delayNewValue));
+
+		double countsSoFar = countTotal.get(linkId);
+		double newValue = countsSoFar + 1.;
+		countTotal.put(linkId, Double.valueOf(newValue));
 	}
 
 	@Override
@@ -125,26 +135,29 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler, LinkLeav
 		Double time = Double.valueOf(event.getTime());
 		Id linkId = event.getLinkId();
 		Id personId = event.getPersonId();
-		if(linkId2PersonIdLinkEnterTime.get(linkId).containsKey(personId)){
+		if(this.linkId2PersonIdLinkEnterTime.get(linkId).containsKey(personId)){
 			// Person is already on the link. Cannot happen.
 			throw new RuntimeException();
 		} 
-		
-		Map<Id, Double> personId2LinkEnterTime = linkId2PersonIdLinkEnterTime.get(linkId);
+
+		Map<Id, Double> personId2LinkEnterTime = this.linkId2PersonIdLinkEnterTime.get(linkId);
 		personId2LinkEnterTime.put(personId, time);
-		linkId2PersonIdLinkEnterTime.put(linkId, personId2LinkEnterTime);
+		this.linkId2PersonIdLinkEnterTime.put(linkId, personId2LinkEnterTime);
 	}
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		linkId2PersonIdLinkEnterTime.get(event.getLinkId()).remove(event.getPersonId());
+		this.linkId2PersonIdLinkEnterTime.get(event.getLinkId()).remove(event.getPersonId());
 	}
-	
+
 	public Map<Double, Map<Id, Double>> getDelayPerLinkAndTimeInterval(){
-		return this.delaysPerLink;
+		return this.linkId2DelaysPerLink;
 	}
-	
+
 	public double getTotalDelayInHours(){
 		return totalDelay/3600;
+	}
+	public Map<Double, Map<Id, Double>> getTime2linkIdLeaveCount() {
+		return this.time2linkIdLeaveCount;
 	}
 }
