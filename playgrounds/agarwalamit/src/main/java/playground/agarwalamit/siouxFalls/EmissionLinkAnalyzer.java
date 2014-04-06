@@ -1,0 +1,146 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+package playground.agarwalamit.siouxFalls;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.scenario.ScenarioImpl;
+
+import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkColdEventHandler;
+import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
+import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.emissions.events.EmissionEventsReader;
+import playground.vsp.emissions.types.ColdPollutant;
+import playground.vsp.emissions.types.WarmPollutant;
+import playground.vsp.emissions.utils.EmissionUtils;
+
+/**
+ * @author amit
+ *
+ */
+public class EmissionLinkAnalyzer extends AbstractAnalyisModule {
+	private final static Logger logger = Logger.getLogger(EmissionLinkAnalyzer.class);
+	private final String emissionEventsFile;
+	private EmissionUtils emissionUtils;
+	private EmissionsPerLinkWarmEventHandler warmHandler;
+	private EmissionsPerLinkColdEventHandler coldHandler;
+	private Map<Double, Map<Id, Map<WarmPollutant, Double>>> link2WarmEmissions;
+	private Map<Double, Map<Id, Map<ColdPollutant, Double>>> link2ColdEmissions;
+	private Map<Double, Map<Id, SortedMap<String, Double>>> link2TotalEmissions;
+	double simulationEndTime ;
+	 final int noOfTimeBins = 1;
+	 String configFile;
+	
+	public EmissionLinkAnalyzer(String configFile, String emissionEventFile) {
+		super(EmissionLinkAnalyzer.class.getSimpleName());
+		this.emissionEventsFile = emissionEventFile;
+		this.configFile = configFile;
+		
+	}
+	
+	public void init(ScenarioImpl scenario) {
+		this.emissionUtils = new EmissionUtils();
+		this.warmHandler = new EmissionsPerLinkWarmEventHandler(getEndTime(this.configFile), noOfTimeBins);
+		this.coldHandler = new EmissionsPerLinkColdEventHandler(getEndTime(this.configFile), noOfTimeBins);
+	}
+	@Override
+	public List<EventHandler> getEventHandler() {
+		List<EventHandler> handler = new LinkedList<EventHandler>();
+		return handler;
+	}
+
+	@Override
+	public void preProcessData() {
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
+		
+		eventsManager.addHandler(this.warmHandler);
+		eventsManager.addHandler(this.coldHandler);
+		
+		emissionReader.parse(this.emissionEventsFile);
+	}
+
+	@Override
+	public void postProcessData() {
+		this.link2WarmEmissions = this.warmHandler.getWarmEmissionsPerLinkAndTimeInterval();
+		this.link2ColdEmissions = this.coldHandler.getColdEmissionsPerLinkAndTimeInterval();
+		this.link2TotalEmissions = sumUpEmissionsPerTimeInterval(link2WarmEmissions, link2ColdEmissions);
+	}
+
+	@Override
+	public void writeResults(String outputFolder) {
+		
+	}
+	private Double getEndTime(String configfile) {
+		Config config = new Config();
+		config.addCoreModules();
+		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		configReader.readFile(configfile);
+		Double endTime = config.qsim().getEndTime();
+		logger.info("Simulation end time is: " + endTime / 3600 + " hours.");
+		logger.info("Aggregating emissions for " + (int) (endTime / 3600 / noOfTimeBins) + " hour time bins.");
+		return endTime;
+	}
+	private Map<Double, Map<Id, SortedMap<String, Double>>> sumUpEmissionsPerTimeInterval(
+			Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2warmEmissionsTotal,
+			Map<Double, Map<Id, Map<ColdPollutant, Double>>> time2coldEmissionsTotal) {
+	
+		Map<Double, Map<Id, SortedMap<String, Double>>> time2totalEmissions = new HashMap<Double, Map<Id, SortedMap<String, Double>>>();
+	
+		for(double endOfTimeInterval: time2warmEmissionsTotal.keySet()){
+			Map<Id, Map<WarmPollutant, Double>> warmEmissions = time2warmEmissionsTotal.get(endOfTimeInterval);
+			
+			Map<Id, SortedMap<String, Double>> totalEmissions = new HashMap<Id, SortedMap<String, Double>>();
+			if(time2coldEmissionsTotal.get(endOfTimeInterval) == null){
+				for(Id id : warmEmissions.keySet()){
+					SortedMap<String, Double> warmEmissionsOfLink = this.emissionUtils.convertWarmPollutantMap2String(warmEmissions.get(id));
+					totalEmissions.put(id, warmEmissionsOfLink);
+				}
+			} else {
+				Map<Id, Map<ColdPollutant, Double>> coldEmissions = time2coldEmissionsTotal.get(endOfTimeInterval);
+				totalEmissions = this.emissionUtils.sumUpEmissionsPerId(warmEmissions, coldEmissions);
+			}
+			time2totalEmissions.put(endOfTimeInterval, totalEmissions);
+		}
+		return time2totalEmissions;
+	}
+	
+	public Map<Double, Map<Id, SortedMap<String, Double>>> getLink2TotalEmissions() {
+		return this.link2TotalEmissions;
+	}
+
+	public Map<Double, Map<Id, Map<WarmPollutant, Double>>> getLink2WarmEmissions() {
+		return link2WarmEmissions;
+	}
+
+	public Map<Double, Map<Id, Map<ColdPollutant, Double>>> getLink2ColdEmissions() {
+		return link2ColdEmissions;
+	}
+}
