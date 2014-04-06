@@ -201,7 +201,7 @@ public class ParkControl {
 		availableParkingStat.add(new double[]{time, spotsInArea.size()});
 		//--
 		
-		//-- If there is no Spot with in the given distance: -----------
+		//-- If there is no Spot within the given distance: -----------
 		if(spotsInArea.size()==0){ //mit 5km Radius
 			System.out.println("Agent is looking for parking in maximum range of 5 km");
 			phwriter.addAgentNotParkedWithinDefaultDistance(Double.toString(time), personId.toString());
