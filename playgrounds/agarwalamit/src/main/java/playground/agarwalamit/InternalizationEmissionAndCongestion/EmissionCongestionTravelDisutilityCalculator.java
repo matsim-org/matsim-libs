@@ -39,7 +39,7 @@ import playground.vsp.emissions.WarmEmissionAnalysisModule;
 import playground.vsp.emissions.types.WarmPollutant;
 
 /**
- * @author amit
+ * @author amit after Banjamin and Ihab
  */
 public class EmissionCongestionTravelDisutilityCalculator implements TravelDisutility{
 
