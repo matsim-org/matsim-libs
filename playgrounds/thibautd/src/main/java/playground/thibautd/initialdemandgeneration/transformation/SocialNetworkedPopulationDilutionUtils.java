@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.EmptyStageActivityTypes;
@@ -65,6 +66,34 @@ public class SocialNetworkedPopulationDilutionUtils {
 				center,
 				radius );
 		fillSetWithAltersOfSet(
+				personsToKeep,
+				scenario );
+		final Collection<Id> pruned =
+			prunePopulation(
+				scenario,
+				personsToKeep );
+		pruneSocialNetwork( pruned , scenario );
+		log.info( "Finished dilution." );
+	}
+
+	/**
+	 * Dilutes the population of the scenario, by retaining only agents passing
+	 * by the area defined by center and radius, as well as their social contacts.
+	 * For social contacts not part of the "dilution", they are only kept if they,
+	 * as well as the ego, have a leisure activity.
+	 */
+	public static void diluteLeisureOnly(
+			final Scenario scenario,
+			final Coord center,
+			final double radius ) {
+		log.info( "Start dilution with center "+center+" and radius "+radius );
+		final Set<Id> personsToKeep = new HashSet<Id>();
+		fillSetWithIntersectingPersons(
+				personsToKeep,
+				scenario,
+				center,
+				radius );
+		fillSetWithLeisureAltersOfSet(
 				personsToKeep,
 				scenario );
 		final Collection<Id> pruned =
@@ -133,6 +162,51 @@ public class SocialNetworkedPopulationDilutionUtils {
 
 		log.info( "Finished search for alters of identified persons" ); 
 		log.info( personsToKeep.size()+" agents identified in total over "+scenario.getPopulation().getPersons().size() );
+	}
+
+	private static void fillSetWithLeisureAltersOfSet(
+			final Set<Id> personsToKeep,
+			final Scenario scenario) {
+		log.info( "Search for LEISURE alters of identified persons" ); 
+
+		final SocialNetwork sn = (SocialNetwork)
+			scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME );
+		if ( !sn.isReflective() ) throw new IllegalArgumentException( "results undefined with unreflexive network." );
+
+		final Set<Id> withLeisure = identifyAgentsWithLeisure( scenario );
+
+		final Collection<Id> alters = new ArrayList<Id>();
+		for ( Id ego : personsToKeep ) {
+			if ( !withLeisure.contains( ego ) ) continue; // only consider ties potentially activated
+
+			for ( Id alter : sn.getAlters( ego ) ) {
+				if ( !withLeisure.contains( alter ) ) continue; // only consider ties potentially activated
+				alters.add( alter );
+			}
+		}
+
+		personsToKeep.addAll( alters );
+
+		log.info( "Finished search for alters of identified persons" ); 
+		log.info( personsToKeep.size()+" agents identified in total over "+scenario.getPopulation().getPersons().size() );
+	}
+
+	private static Set<Id> identifyAgentsWithLeisure(final Scenario scenario) {
+		final Set<Id> agents = new HashSet<Id>();
+		for ( Person person : scenario.getPopulation().getPersons().values() ) {
+			final Plan plan = person.getSelectedPlan();
+			assert plan != null : person.getId();
+
+			for ( Activity act : TripStructureUtils.getActivities( plan , EmptyStageActivityTypes.INSTANCE ) ) {
+				// TODO: less hardcoded
+				if ( act.getType().equals( "leisure" ) ) {
+					agents.add( person.getId() );
+					break;
+				}
+			}
+		}
+
+		return agents;
 	}
 
 	private static void fillSetWithIntersectingPersons(

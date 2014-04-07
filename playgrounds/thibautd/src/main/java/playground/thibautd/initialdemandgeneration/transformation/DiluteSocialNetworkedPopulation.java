@@ -51,6 +51,8 @@ public class DiluteSocialNetworkedPopulation {
 
 		args.setDefaultValue( "--radius" , "30000" );
 
+		args.setDefaultValue( "--leisure-contacts-only" , "true" );
+
 		args.setDefaultValue( "--netfile" , null ); // unused.
 		args.setDefaultValue( "--inpopfile" , null );
 		args.setDefaultValue( "--insocnet" , null );
@@ -68,6 +70,8 @@ public class DiluteSocialNetworkedPopulation {
 					args.getValue(
 						"--radius" ) );
 
+		final boolean leisureOnly = args.getBooleanValue( "--leisure-contacts-only" );
+
 		final String inpopfile = args.getValue( "--inpopfile" );
 		final String insocnet = args.getValue( "--insocnet" );
 		final String outdir = args.getValue( "--outdir" );
@@ -80,10 +84,18 @@ public class DiluteSocialNetworkedPopulation {
 			new MatsimPopulationReader( scenario ).readFile( inpopfile );
 			new SocialNetworkReader( scenario ).parse( insocnet );
 
-			SocialNetworkedPopulationDilutionUtils.dilute(
-					scenario,
-					center,
-					radius );
+			if ( leisureOnly ) {
+				SocialNetworkedPopulationDilutionUtils.diluteLeisureOnly(
+						scenario,
+						center,
+						radius );
+			}
+			else {
+				SocialNetworkedPopulationDilutionUtils.dilute(
+						scenario,
+						center,
+						radius );
+			}
 
 			final String outpopfile = outdir+"/diluted-population.xml.gz";
 			final String outsocnet = outdir+"/diluted-socialnetwork.xml.gz";
