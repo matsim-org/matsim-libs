@@ -104,6 +104,29 @@ public class SocialNetworkedPopulationDilutionUtils {
 		log.info( "Finished dilution." );
 	}
 
+	/**
+	 * The "normal" dilution (only intersecting agents are kept), also taking care
+	 * of pruning the social network.
+	 */
+	public static void diluteAreaOnly(
+			final Scenario scenario,
+			final Coord center,
+			final double radius ) {
+		log.info( "Start dilution with center "+center+" and radius "+radius );
+		final Set<Id> personsToKeep = new HashSet<Id>();
+		fillSetWithIntersectingPersons(
+				personsToKeep,
+				scenario,
+				center,
+				radius );
+		final Collection<Id> pruned =
+			prunePopulation(
+				scenario,
+				personsToKeep );
+		pruneSocialNetwork( pruned , scenario );
+		log.info( "Finished dilution." );
+	}
+
 	private static void pruneSocialNetwork(
 			final Collection<Id> toPrune,
 			final Scenario scenario) {

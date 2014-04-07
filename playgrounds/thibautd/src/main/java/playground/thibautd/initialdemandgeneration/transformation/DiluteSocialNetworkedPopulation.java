@@ -44,6 +44,11 @@ import playground.thibautd.utils.MoreIOUtils;
  * @author thibautd
  */
 public class DiluteSocialNetworkedPopulation {
+	private static enum DilutionType {
+		area_only,
+		area_leisure_alters,
+		area_all_alters;
+	}
 
 	private static void main(final ArgParser args) throws IOException {
 		args.setDefaultValue( "--xcenter" , "683518.0" );
@@ -51,7 +56,7 @@ public class DiluteSocialNetworkedPopulation {
 
 		args.setDefaultValue( "--radius" , "30000" );
 
-		args.setDefaultValue( "--leisure-contacts-only" , "true" );
+		args.setDefaultValue( "--dilution-type" , "area_only" );
 
 		args.setDefaultValue( "--netfile" , null ); // unused.
 		args.setDefaultValue( "--inpopfile" , null );
@@ -70,7 +75,7 @@ public class DiluteSocialNetworkedPopulation {
 					args.getValue(
 						"--radius" ) );
 
-		final boolean leisureOnly = args.getBooleanValue( "--leisure-contacts-only" );
+		final DilutionType dilutionType = args.getEnumValue( "--dilution-type" , DilutionType.class );
 
 		final String inpopfile = args.getValue( "--inpopfile" );
 		final String insocnet = args.getValue( "--insocnet" );
@@ -84,17 +89,27 @@ public class DiluteSocialNetworkedPopulation {
 			new MatsimPopulationReader( scenario ).readFile( inpopfile );
 			new SocialNetworkReader( scenario ).parse( insocnet );
 
-			if ( leisureOnly ) {
-				SocialNetworkedPopulationDilutionUtils.diluteLeisureOnly(
-						scenario,
-						center,
-						radius );
-			}
-			else {
-				SocialNetworkedPopulationDilutionUtils.dilute(
-						scenario,
-						center,
-						radius );
+			switch ( dilutionType ) {
+				case area_all_alters:
+					SocialNetworkedPopulationDilutionUtils.dilute(
+							scenario,
+							center,
+							radius );
+					break;
+				case area_leisure_alters:
+					SocialNetworkedPopulationDilutionUtils.diluteLeisureOnly(
+							scenario,
+							center,
+							radius );
+					break;
+				case area_only:
+					SocialNetworkedPopulationDilutionUtils.diluteAreaOnly(
+							scenario,
+							center,
+							radius );
+					break;
+				default:
+					throw new RuntimeException( ""+dilutionType );
 			}
 
 			final String outpopfile = outdir+"/diluted-population.xml.gz";
