@@ -60,6 +60,18 @@ public class ArgParser {
 		return defaultValues.get( name );
 	}
 
+	public double getDoubleValue(final String name) {
+		return Double.parseDouble( getValue( name ) );
+	}
+
+	public int getIntegerValue(final String name) {
+		return Integer.parseInt( getValue( name ) );
+	}
+
+	public boolean getBooleanValue(final String name) {
+		return Boolean.parseBoolean( getValue( name ) );
+	}
+
 	public List<String> getValues(final String name) {
 		if ( !defaultMultipleValues.containsKey( name ) ) throw new IllegalArgumentException( name+" not in "+defaultMultipleValues.keySet() );
 
