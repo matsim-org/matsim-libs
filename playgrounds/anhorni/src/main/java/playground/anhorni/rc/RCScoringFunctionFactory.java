@@ -68,7 +68,8 @@ public class RCScoringFunctionFactory implements ScoringFunctionFactory {
 	}
 	
 	private void readPrefs() {
-		for (ActivityParams activityParams : this.scenario.getConfig().planCalcScore().getActivityParams()) {	
+		for (ActivityParams activityParams : this.scenario.getConfig().planCalcScore().getActivityParams()) {
+			log.info("activity param:" + activityParams.getType());
 			int counter = 0;
 			int nextMsg = 1;
 			for (Person p : this.scenario.getPopulation().getPersons().values()) {
