@@ -67,24 +67,11 @@ class VehicularDepartureHandler implements DepartureHandler {
 	}
 
 	private void handleCarDeparture(double now, MobsimDriverAgent agent, Id linkId) {
-		// Treat the situation where startLink == endLink.
-		// Transit vehicles do this differently than others, because there could be a stop on it.
-		// Other vehicles _do not_ traverse their only link but arrive right away.
-		if ( ! (agent instanceof AbstractTransitDriverAgent) ) { 	
-			if (linkId.equals(agent.getDestinationLinkId())) {
-				if ( agent.chooseNextLinkId() == null ) {
-
-					// no physical travel is necessary.  We still treat this as a departure and an arrival, since there is a 
-					// "leg".  Some of the design allows to have successive activities without invervening legs, but this is not 
-					// consistently implemented.  One could also decide to not have these departure/arrival events here
-					// (we would still have actEnd/actStart events).  kai, nov'11
-
-					agent.endLegAndComputeNextState(now) ;
-					this.qNetsimEngine.internalInterface.arrangeNextAgentState(agent) ;
-					return;
-				}
-			}
-		}		
+		// The situation where a leg starts and ends at the same link used to be
+		// handled specially, for all agents except AbstractTransitDriverAgents.
+		// This however caused some problems in some cases, as apparently for taxicabs.
+		// Thus, such trips are now simulated normally.
+		// See MATSIM-233 for details. td apr'14
 		Id vehicleId = agent.getPlannedVehicleId() ;
 		QLinkInternalI qlink = (QLinkInternalI) qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
 		QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);

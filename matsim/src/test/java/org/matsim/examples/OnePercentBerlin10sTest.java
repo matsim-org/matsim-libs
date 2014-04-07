@@ -52,7 +52,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		Config config = loadConfig(null);
 		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
-		String eventsFileName = getOutputDirectory() + "events.txt";
+		String eventsFileName = getOutputDirectory() + "events.txt.gz";
 		String referenceEventsFileName = getInputDirectory() + "events.txt.gz";
 
 		MatsimRandom.reset(7411L);

@@ -62,7 +62,8 @@ public class TravelTimeTest {
 		Map<Id, Double> travelTimes = agentTravelTimes.get(new IdImpl("1"));
 		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(6)).intValue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(180.0, travelTimes.get(new IdImpl(15)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(13560.0, travelTimes.get(new IdImpl(20)).intValue(), MatsimTestUtils.EPSILON);
+		// this one is NOT a travel time (it includes two activities and a zero-length trip)
+		Assert.assertEquals(13561.0, travelTimes.get(new IdImpl(20)).intValue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(21)).intValue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1260.0, travelTimes.get(new IdImpl(22)).intValue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(23)).intValue(), MatsimTestUtils.EPSILON);
@@ -88,7 +89,8 @@ public class TravelTimeTest {
 		Map<Id, Double> travelTimes = agentTravelTimes.get(new IdImpl("1"));
 		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(6)).intValue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(180.0, travelTimes.get(new IdImpl(15)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(13560.0, travelTimes.get(new IdImpl(20)).intValue(), MatsimTestUtils.EPSILON);
+		// this one is NOT a travel time (it includes two activities and a zero-length trip)
+		Assert.assertEquals(13561.0, travelTimes.get(new IdImpl(20)).intValue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(21)).intValue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1260.0, travelTimes.get(new IdImpl(22)).intValue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(23)).intValue(), MatsimTestUtils.EPSILON);
@@ -97,7 +99,8 @@ public class TravelTimeTest {
 		travelTimes = agentTravelTimes.get(new IdImpl("2"));
 		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(5)).intValue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(180.0, travelTimes.get(new IdImpl(14)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(13560.0, travelTimes.get(new IdImpl(20)).intValue(), MatsimTestUtils.EPSILON);
+		// this one is NOT a travel time (it includes two activities and a zero-length trip)
+		Assert.assertEquals(13561.0, travelTimes.get(new IdImpl(20)).intValue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(21)).intValue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1260.0, travelTimes.get(new IdImpl(22)).intValue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(23)).intValue(), MatsimTestUtils.EPSILON);

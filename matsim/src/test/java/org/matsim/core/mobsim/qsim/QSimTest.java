@@ -315,8 +315,14 @@ public class QSimTest {
 	}
 	
 	/**
-	 * Simulates a single agent that has two activities on the same link. Tests if the simulation
-	 * correctly recognizes such cases.
+	 * Simulates a single agent that has two activities on the same link.
+	 * Tests if the simulation correctly handles such cases.
+	 *
+	 * <br>
+	 * The primary reason for the existence of this test was that such trips were
+	 * handled especially (not being actually simulated).
+	 * Now, it is the opposite: it checks that such trips are really simulated
+	 * properly. td apr'14
 	 *
 	 * @author mrieser
 	 */
@@ -350,19 +356,33 @@ public class QSimTest {
 		for (Event event : allEvents) {
 			System.out.println(event);
 		}
-		Assert.assertEquals("wrong number of events.", 4, allEvents.size());
+		Assert.assertEquals("wrong number of events.", 7, allEvents.size());
+
+
 		Assert.assertEquals("wrong type of 1st event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		Assert.assertEquals("wrong type of 2nd event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
-		Assert.assertEquals("wrong type of 3rd event.", PersonArrivalEvent.class, allEvents.get(2).getClass());
-		Assert.assertEquals("wrong type of 4th event.", ActivityStartEvent.class, allEvents.get(3).getClass());
+		Assert.assertEquals("wrong type of 3rd event.", PersonEntersVehicleEvent.class, allEvents.get(2).getClass());
+		Assert.assertEquals("wrong type of 4th event.", Wait2LinkEvent.class, allEvents.get(3).getClass());
+		Assert.assertEquals("wrong type of 5th event.", PersonLeavesVehicleEvent.class, allEvents.get(4).getClass());
+		Assert.assertEquals("wrong type of 6th event.", PersonArrivalEvent.class, allEvents.get(5).getClass());
+		Assert.assertEquals("wrong type of 7th event.", ActivityStartEvent.class, allEvents.get(6).getClass());
+
+
 		Assert.assertEquals("wrong time in 1st event.", 6.0*3600 + 0, allEvents.get(0).getTime(), MatsimTestCase.EPSILON);
 		Assert.assertEquals("wrong time in 2nd event.", 6.0*3600 + 0, allEvents.get(1).getTime(), MatsimTestCase.EPSILON);
 		Assert.assertEquals("wrong time in 3rd event.", 6.0*3600 + 0, allEvents.get(2).getTime(), MatsimTestCase.EPSILON);
 		Assert.assertEquals("wrong time in 4th event.", 6.0*3600 + 0, allEvents.get(3).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong link in 1st event.", f.link1.getId(), ((ActivityEndEvent) allEvents.get(0)).getLinkId());
-		Assert.assertEquals("wrong link in 2nd event.", f.link1.getId(), ((PersonDepartureEvent) allEvents.get(1)).getLinkId());
-		Assert.assertEquals("wrong link in 3rd event.", f.link1.getId(), ((PersonArrivalEvent) allEvents.get(2)).getLinkId());
-		Assert.assertEquals("wrong link in 4th event.", f.link1.getId(), ((ActivityStartEvent) allEvents.get(3)).getLinkId());
+
+		Assert.assertEquals("wrong time in 5th event.", 6.0*3600 + 1, allEvents.get(4).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in 6th event.", 6.0*3600 + 1, allEvents.get(5).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in 7th event.", 6.0*3600 + 1, allEvents.get(6).getTime(), MatsimTestCase.EPSILON);
+
+
+		Assert.assertEquals("wrong link in 1st event.", f.link1.getId(), ((ActivityEndEvent) allEvents.get(0)).getLinkId() );
+		Assert.assertEquals("wrong link in 2nd event.", f.link1.getId(), ((PersonDepartureEvent) allEvents.get(1)).getLinkId() );
+		Assert.assertEquals("wrong link in 4th event.", f.link1.getId(), ((Wait2LinkEvent) allEvents.get(3)).getLinkId() );
+		Assert.assertEquals("wrong link in 6th event.", f.link1.getId(), ((PersonArrivalEvent) allEvents.get(5)).getLinkId() );
+		Assert.assertEquals("wrong link in 7th event.", f.link1.getId(), ((ActivityStartEvent) allEvents.get(6)).getLinkId() );
 	}
 
 	/**
