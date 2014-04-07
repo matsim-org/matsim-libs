@@ -184,9 +184,9 @@ public class TaxiCustomerWaitTimeAnalyser implements
 	}
 	
 	public void printTaxiCustomerWaitStatistics() {
-		System.out.println("Number of Taxi Trips "+ this.totalWaitTime.size());
-		System.out.println("Average Waiting Time "+ this.calculateAverageWaitTime());
-		System.out.println("Maximum Waiting Time "+ this.returnMaxWaitTime());
+		System.out.println("Number of Taxi Trips\t"+ this.totalWaitTime.size());
+		System.out.println("Average Waiting Time\t"+ this.calculateAverageWaitTime());
+		System.out.println("Maximum Waiting Time\t"+ this.returnMaxWaitTime());
 
 
 	}

@@ -83,7 +83,7 @@ public class TaxiDemandWriter {
 	private final static String DATADIR = "C:/local_jb/data/";
 	private final static String NETWORKFILE = DATADIR+"network/berlin_brb.xml.gz";
 	private final static Id TXLLORID = new IdImpl("12214125");
-	private final static double SCALEFACTOR = 2.0;
+	private final static double SCALEFACTOR = 1.5;
 	static int fromTXL = 0;
 	static int toTXL = 0;
 	
@@ -161,7 +161,7 @@ public class TaxiDemandWriter {
 		log.info("Population size: " +population.getPersons().size());
 		PopulationWriter populationWriter = new PopulationWriter(
 				scenario.getPopulation(), scenario.getNetwork());
-		populationWriter.write(dirname+fileNamePrefix+"_SCALE_"+SCALEFACTOR+"_"+"plans4to4.xml.gz");
+		populationWriter.write(dirname+fileNamePrefix+"_SCALE_"+SCALEFACTOR+"_"+"plans4to3.xml.gz");
 	}
 
 	private void generatePopulation(String dirname, String fileNamePrefix) {
@@ -191,7 +191,7 @@ public class TaxiDemandWriter {
 			this.dMap.clear();
 			
 		}
-		for (int i = 0; i<4; i++){
+		for (int i = 0; i<3; i++){
 			String hrstring = String.format("%02d", i);
 			DemandParser dp = new DemandParser();
 			String currentFileName = DATADIR +"/OD/20130417/OD_20130417"+hrstring+"0000.dat";
@@ -305,7 +305,7 @@ public class TaxiDemandWriter {
 
 		
 		double activityStart = Math.round(hr * 3600. + rnd.nextDouble() * 3600.);
-		if (hr == 27 )  activityStart = Math.round(hr * 3600. + rnd.nextDouble() * 1800.);
+//		if (hr == 27 )  activityStart = Math.round(hr * 3600. + rnd.nextDouble() * 1200.);
 		plan.addActivity(this.addActivity("home", 0.0, activityStart, fromLink));
 		plan.addLeg(this.addLeg(activityStart , "taxi", fromLink, toLink));
 		plan.addActivity(this.addActivity("work", toLink));

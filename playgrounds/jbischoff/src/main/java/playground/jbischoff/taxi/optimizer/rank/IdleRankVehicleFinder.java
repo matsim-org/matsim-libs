@@ -132,8 +132,10 @@ public class IdleRankVehicleFinder
                     bestVeh = veh;
                     continue;
                 }
+                if (this.IsElectric){
                 if (this.getVehicleSoc(veh) > this.getVehicleSoc(bestVeh)) {
                     bestVeh = veh;
+                	}
                 }
                 //higher charge, if distance is equal	
             }

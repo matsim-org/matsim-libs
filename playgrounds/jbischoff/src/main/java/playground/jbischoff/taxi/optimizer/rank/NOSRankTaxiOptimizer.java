@@ -32,6 +32,7 @@ import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
+import org.matsim.contrib.dvrp.schedule.Task.TaskType;
 import org.matsim.contrib.dvrp.util.DistanceUtils;
 
 import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
@@ -162,10 +163,13 @@ public class NOSRankTaxiOptimizer
             //                updateIdlers();
             //            	sendIdlingTaxisBackToRank(time);
         }
-        if (this.idleRankMode)
-            if (time % 60. == 5.) {
+        if (this.idleRankMode){
+            if (time % 60. == 5.)
+            {
+            	
                 sendIdlingTaxisBackToRank(time);
-            }
+                
+            }}
     }
 
 
@@ -206,8 +210,10 @@ public class NOSRankTaxiOptimizer
 
         VrpPathWithTravelData path = optimConfig.calculator
                 .calcPath(currentLink, nearestRank, time);
+        if (path.getArrivalTime()>veh.getT1()) return; // no rank return if vehicle is going out of service anyway
         sched.addTask(new TaxiCruiseDriveTask(path));
         sched.addTask(new TaxiWaitStayTask(path.getArrivalTime(), veh.getT1(), nearestRank));
+
     }
 
 
@@ -232,16 +238,20 @@ public class NOSRankTaxiOptimizer
     public void sendIdlingTaxisBackToRank(double time)
     {
         for (Vehicle veh : optimConfig.context.getVrpData().getVehicles()) {
+        	if (!optimConfig.scheduler.isIdle(veh)) continue;
             if (veh.getSchedule().getStatus() != ScheduleStatus.STARTED)
                 continue;
             if (! (Schedules.getLastTask(veh.getSchedule()).getTaskIdx() == veh.getSchedule()
                     .getCurrentTask().getTaskIdx()))
                 continue;
-            if (veh.getSchedule().getCurrentTask().getType().equals(TaxiTaskType.WAIT_STAY)) {
+            
+            if (veh.getSchedule().getCurrentTask().getType().equals(TaskType.STAY)) {
+            	
                 TaxiWaitStayTask twst = (TaxiWaitStayTask)veh.getSchedule().getCurrentTask();
                 if (!this.rankArrivalDepartureCharger.isAtRankLocation(twst.getLink().getId())) {
                     if (time - twst.getBeginTime() > 60.) {
-                        scheduleRankReturn(veh, time);
+                    	scheduleRankReturn(veh, time);
+                        
                     }
 
                 }
@@ -257,13 +267,10 @@ public class NOSRankTaxiOptimizer
         this.nearestRanks = new HashMap<Id, Link>();
         log.info("Beginning to create nearest rank db for"
                 + optimConfig.context.getScenario().getNetwork().getLinks().size() + " links...");
-        int i = 0;
         for (Link l : optimConfig.context.getScenario().getNetwork().getLinks().values()) {
             Link rankLink = findNearestRank(l);
             this.nearestRanks.put(l.getId(), rankLink);
-            i++;
-            if (i % 100 == 0)
-                log.info("handled link no " + i);
+
         }
 
         log.info("...done");

@@ -12,8 +12,12 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
@@ -28,13 +32,15 @@ import playground.jbischoff.energy.log.SocLogRow;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 
 public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
-		PersonDepartureEventHandler {
+		PersonDepartureEventHandler, ActivityStartEventHandler, ActivityEndEventHandler {
 
 	private NOSRankTaxiOptimizer optimizer;
 	
 	private Map<Id,Integer> rankLocations;
 	private Map<Id,Integer> currentChargerOccupation;
 	private Map<Id, Vehicle> vehicles;
+	private List<Id> activeVehicles;
+
 	
 	private Map<Id, Double> arrivalTimes;
 	private Map<Id, Double> socUponArrival;
@@ -54,9 +60,11 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 	private SoCLog soCLog;
 	private ChargerLog chargerLog;
 	private long underChargeMinutes = 0;
+	double totalChargeTime;
 
 	public RankArrivalDepartureCharger(HashMap<Id, Vehicle> vehicles, EventsManager events, NOSRankTaxiOptimizer optimizer) {
 		this.events = events;
+		this.activeVehicles = new ArrayList<Id>();
 		this.vehicles = vehicles;
 		this.optimizer = optimizer;
 		this.arrivalTimes = new LinkedHashMap<Id, Double>();
@@ -65,6 +73,7 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 		this.arrivalLinks = new HashMap<Id, Id>();
 		this.chargingVehicles=new HashMap<Id, Id>();
 		this.chargerLog = new ChargerLog();
+		this.totalChargeTime = 0;
 		
 	}
 
@@ -148,29 +157,31 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 			
 				{
 				removeVehicleFromCharger(e.getKey());
+				this.events.processEvent(new ActivityEndEvent(time, e.getKey(), this.arrivalLinks.get(e.getKey()), null, "Charging"));
+
 				continue;	
 				}
 			if (!isConnectedToCharger(e.getKey()) ){
 				if (chargerHasFreeSpaceForVehicle(e.getKey()) ){
 					addVehicleToCharger(e.getKey());
-					this.events.processEvent(new StartChargingEvent(time, e.getKey(), this.arrivalLinks.get(e.getKey())));
+					this.events.processEvent(new ActivityStartEvent(time, e.getKey(), this.arrivalLinks.get(e.getKey()), null, "Charging"));
 					//double approxChargeAmount = ((BatteryElectricVehicle) this.vehicles.get(e.getKey())).getUsableBatteryCapacityInJoules() * 0.8 - ((BatteryElectricVehicle) this.vehicles.get(e.getKey()))
 					//		.getSocInJoules();
 					//double expectedChargeTime = approxChargeAmount / (POWERINKW*1000);
 					//double expectedEndTime = time + expectedChargeTime;
 					//optimizer.scheduleCharging(e.getKey(),time, expectedEndTime);
+					
 				}
 			}	
 			if (isConnectedToCharger(e.getKey())){
 				
-			if (((BatteryElectricVehicle) this.vehicles.get(e.getKey()))
-					.getSocInJoules() + chargeWatt >= ((BatteryElectricVehicle) this.vehicles
-					.get(e.getKey())).getUsableBatteryCapacityInJoules() * 0.8) {
-				chargeWatt = ((BatteryElectricVehicle) this.vehicles.get(e.getKey())).getUsableBatteryCapacityInJoules()* .8- ((BatteryElectricVehicle) this.vehicles.get(e.getKey())).getSocInJoules();
-			}
+//			if ((((BatteryElectricVehicle) this.vehicles.get(e.getKey())).getSocInJoules() + chargeWatt) >= (((BatteryElectricVehicle) this.vehicles
+//					.get(e.getKey())).getUsableBatteryCapacityInJoules() * 0.8 )) {
+//				chargeWatt = ((BatteryElectricVehicle) this.vehicles.get(e.getKey())).getUsableBatteryCapacityInJoules()* .8- ((BatteryElectricVehicle) this.vehicles.get(e.getKey())).getSocInJoules();
+//			}
 			((BatteryElectricVehicle) this.vehicles.get(e.getKey())).chargeBattery(chargeWatt);
-			// log.info("Charged v"+e.getKey()+" with" + (chargeWatt/1000.)+" kW");
-
+//			 log.info("Charged v"+e.getKey()+" with" + (chargeWatt/1000.)+" kW");
+			this.totalChargeTime = +this.totalChargeTime+duration;
 			}
 		}
 
@@ -183,6 +194,7 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 		int occ = this.currentChargerOccupation.get(linkId);
 		occ++;
 		this.currentChargerOccupation.put(linkId, occ);
+		this.totalChargeTime = this.totalChargeTime + 120.;
 //		log.info("Added vehicle "+vehicleId+ "to Charger "+linkId+" load: "+occ);
 		
 	}
@@ -221,6 +233,7 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 		for (Entry<Id, Vehicle> e : this.vehicles.entrySet()) {
 			if (!isBatteryElectricVehicle(e.getKey()))
 				continue;
+			if (!this.activeVehicles.contains(e.getKey())) continue;
 			double soc = ((BatteryElectricVehicle) e.getValue())
 					.getSocInJoules();
 			double rsoc = soc
@@ -244,7 +257,17 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 			Collections.sort(currentSoc);
 			int p05 = (int) Math.floor(currentSoc.size() * 0.05);
 			double p05v = currentSoc.get(p05);
+			
+			double worst5pc = 0.;
+			for (int i = 0; i <= p05 ; i++){
+				worst5pc+=currentSoc.get(i);
+				
+			}
+			worst5pc  = worst5pc / p05;
+			
 			this.soCLog.add(new SocLogRow(new IdImpl("p05"), time, p05v, 0));
+			this.soCLog.add(new SocLogRow(new IdImpl("w05av"), time, worst5pc, 0));
+
 		}
 		for (Entry<Id,Integer> e : this.currentChargerOccupation.entrySet()){
 			double rocc = (double) e.getValue() / (double) this.rankLocations.get(e.getKey());
@@ -277,6 +300,7 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 
 	public SoCLog getSoCLog() {
 		log.info("Undercharge minutes in total: "+this.underChargeMinutes);
+		log.info("total charge time "+this.totalChargeTime);
 		return soCLog;
 	}
 	public ChargerLog getChargeLog(){
@@ -318,6 +342,22 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 	
 	public Map<Id, Integer> getRankLocations() {
 		return rankLocations;
+	}
+
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		if (!this.vehicles.containsKey(event.getPersonId())) return;
+		if (event.getActType().startsWith("Before schedule:")){
+			this.activeVehicles.add(event.getPersonId());
+			}
+		
+	}
+
+	@Override
+	public void handleEvent(ActivityStartEvent event) {
+		if (!this.vehicles.containsKey(event.getPersonId())) return;
+		if (event.getActType().startsWith("After schedule:")) this.activeVehicles.remove(event.getPersonId());	
+		
 	}
 	
 	

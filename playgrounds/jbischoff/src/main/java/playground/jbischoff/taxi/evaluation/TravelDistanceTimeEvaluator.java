@@ -97,13 +97,13 @@ public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, Perso
 	public void printTravelDistanceStatistics(){
 		double tkm = 0.;
 		double tpkm = 0.;
-		System.out.println("Agent ID\tdistanceTravelled\tdistanceTravelledWithPax\tOccupanceOverDistance\tTravelTime\tTravelTimeWithPax\tOccupanceOverTime");
+//		System.out.println("Agent ID\tdistanceTravelled\tdistanceTravelledWithPax\tOccupanceOverDistance\tTravelTime\tTravelTimeWithPax\tOccupanceOverTime");
 		for (Entry<Id,Double> e: this.taxiTravelDistance.entrySet()){
 			double relativeOccupanceDist = tryToGetOrReturnZero(this.taxiTravelDistancesWithPassenger,e.getKey()) /e.getValue();
 			tpkm += tryToGetOrReturnZero(this.taxiTravelDistancesWithPassenger,e.getKey());
 			double relativeOccpanceTime = tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey()) / (tryToGetOrReturnZero( this.taxiTravelDuration, e.getKey()) + 0.01);
 			tkm += e.getValue();
-			System.out.println(e.getKey()+"\t"+(e.getValue()/1000)+"\t"+(tryToGetOrReturnZero(this.taxiTravelDistancesWithPassenger, e.getKey())/1000)+"\t"+relativeOccupanceDist+"\t"+tryToGetOrReturnZero( this.taxiTravelDuration, e.getKey())+"\t"+tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey())+"\t"+relativeOccpanceTime);
+//			System.out.println(e.getKey()+"\t"+(e.getValue()/1000)+"\t"+(tryToGetOrReturnZero(this.taxiTravelDistancesWithPassenger, e.getKey())/1000)+"\t"+relativeOccupanceDist+"\t"+tryToGetOrReturnZero( this.taxiTravelDuration, e.getKey())+"\t"+tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey())+"\t"+relativeOccpanceTime);
 		}
 		tkm = tkm / 1000;
 		tpkm = tpkm /1000;
@@ -138,7 +138,7 @@ public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, Perso
 				if (this.endTimes.containsKey(e.getKey())) endTime = this.endTimes.get(e.getKey());
 				double onlineTime = endTime-startTime;
 				onlineTimes += onlineTime;
-				bw.write(e.getKey()+"\t"+(e.getValue()/1000)+"\t"+(tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey())/1000)+"\t"+relativeOccupanceDist+"\t"+tryToGetOrReturnZero( this.taxiTravelDuration, e.getKey())+"\t"+tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey())+"\t"+relativeOccpanceTime+"\t"+startTime+"\t"+endTime+"\t"+onlineTime);
+				bw.write(e.getKey()+"\t"+(e.getValue()/1000)+"\t"+(tryToGetOrReturnZero(this.taxiTravelDistancesWithPassenger, e.getKey())/1000)+"\t"+relativeOccupanceDist+"\t"+tryToGetOrReturnZero( this.taxiTravelDuration, e.getKey())+"\t"+tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey())+"\t"+relativeOccpanceTime+"\t"+startTime+"\t"+endTime+"\t"+onlineTime);
 				
 			}
 			tkm = tkm / 1000;

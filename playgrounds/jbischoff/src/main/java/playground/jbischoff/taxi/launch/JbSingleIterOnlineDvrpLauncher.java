@@ -47,7 +47,6 @@ import org.matsim.core.router.util.*;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
-import pl.poznan.put.util.jfreechart.ChartUtils;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 import playground.michalm.taxi.*;
 import playground.michalm.taxi.data.*;
@@ -118,31 +117,30 @@ import playground.michalm.util.RunningVehicleRegister;
 
     	   dirName = "C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v2\\";
            plansFileName = dirName + "plans4to4.xml.gz";
+//           plansFileName = dirName + "1.5plans4to4.xml.gz";
+//    	   	plansFileName = dirName + "1.5plans4to3.xml.gz";
+
+//           plansFileName = dirName + "2.0plans4to4.xml.gz";
+
+           
 //           taxisFileName = dirName + "taxis4to4_EV0.5.xml";
 //           taxisFileName = dirName + "taxis4to4_EV0.6.xml";
 //           taxisFileName = dirName + "taxis4to4_EV0.7.xml";
 //           taxisFileName = dirName + "taxis4to4_EV0.8.xml";
 //           taxisFileName = dirName + "taxis4to4_EV0.9.xml";
-//           taxisFileName = dirName + "taxis4to4_EV1.0.xml";
-           taxisFileName = dirName + "taxis4to4.xml"; //all conventional
-
+           taxisFileName = dirName + "taxis4to4_EV1.0.xml";
+//           taxisFileName = dirName + "taxis4to4.xml"; //all conventional
+           
 
            
            changeEventsFilename = dirName + "changeevents.xml.gz";
-           eventsFileName = null;
-           netFileName = dirName + "berlin_brb.xml.gz";
+           eventsFileName = dirName +"2kW.15.1000.events.xml.gz" ;
+           netFileName = dirName + "berlin_brb05.xml.gz";
            
         ////////////////////////////////////////////////////////         
 
-        //        electricStatsDir = dirName +"electric_noranks\\";
-        //        electricStatsDir = dirName +"electric_idleranks\\";
-        //        electricStatsDir = dirName +"electric_ranks\\";
-        //        electricStatsDir = dirName +"gas_noranks\\";
-        //      electricStatsDir = dirName +"gas_idleranks\\";
-        //      electricStatsDir = dirName +"gas_ranks\\";
-        //        electricStatsDir = dirName +"modifiedDispatch_SL\\";
-        //        electricStatsDir = dirName +"1charger\\";
-        electricStatsDir = dirName + "1slow_nolog/";
+   
+        electricStatsDir = dirName + "ev10fs05/";
 
         //        plansFileName = dirName + "20.plans.xml.gz";
         //
@@ -167,8 +165,8 @@ import playground.michalm.util.RunningVehicleRegister;
         writeSimEvents = true;
         waitList = new ArrayList<String>();
 
-        scenario = VrpLauncherUtils.initTimeVariantScenario(netFileName, plansFileName, changeEventsFilename);
-      
+//        scenario = VrpLauncherUtils.initTimeVariantScenario(netFileName, plansFileName, changeEventsFilename);
+        scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName);
         
 
         //        List<String> taxiCustomerIds;
@@ -192,6 +190,8 @@ import playground.michalm.util.RunningVehicleRegister;
         f.mkdirs();
 
         TravelTimeSource ttimeSource = TravelTimeSource.FREE_FLOW_SPEED;
+//        TravelTimeSource ttimeSource = TravelTimeSource.EVENTS_15_MIN;
+
         TravelDisutilitySource tdisSource = TravelDisutilitySource.STRAIGHT_LINE;
 
         if (scenario == null)
@@ -302,15 +302,15 @@ import playground.michalm.util.RunningVehicleRegister;
         // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
         //        ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
 
-        try {
-            ChartUtils.saveAsPDF(
-                    ScheduleChartUtils.chartSchedule(context.getVrpData().getVehicles()),
-                    electricStatsDir + "taxiSchedules", 2048, 1546);
-        }
-        catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+//        try {
+////            ChartUtils.saveAsPDF(
+////                    ScheduleChartUtils.chartSchedule(context.getVrpData().getVehicles()),
+////                    electricStatsDir + "taxiSchedules", 2048, 1546);
+//        }
+//        catch (IOException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
         if (outHistogram) {
             VrpLauncherUtils.writeHistograms(legHistogram, histogramOutDirName);
         }
