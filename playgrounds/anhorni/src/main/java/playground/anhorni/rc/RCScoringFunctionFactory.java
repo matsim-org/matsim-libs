@@ -44,12 +44,11 @@ public class RCScoringFunctionFactory implements ScoringFunctionFactory {
 	public RCScoringFunctionFactory(final PlanCalcScoreConfigGroup config, final Scenario scenario) {		
     	this.config = config;
 		this.scenario = scenario;
+		this.readPrefs();
 	}
 		
 	@Override
-	public ScoringFunction createNewScoringFunction(Person person) {
-		this.readPrefs();
-		
+	public ScoringFunction createNewScoringFunction(Person person) {	
 		if (this.params == null) {
 			/* lazy initialization of params. not strictly thread safe, as different threads could
 			 * end up with different params-object, although all objects will have the same
