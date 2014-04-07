@@ -63,11 +63,11 @@ public abstract class AbstractTaxiOptimizer
         double now = e.getSimulationTime();
 
         if (requiresReoptimization && now > reoptimizationEndTime) {
-            Stopwatch sw = new Stopwatch().start();
+            Stopwatch sw = Stopwatch.createStarted();
             scheduleUnplannedRequests();
             sw.stop();
 
-            reoptimizationEndTime = now + sw.elapsedTime(TimeUnit.SECONDS);
+            reoptimizationEndTime = now + sw.elapsed(TimeUnit.SECONDS);
             requiresReoptimization = false;
         }
     }
