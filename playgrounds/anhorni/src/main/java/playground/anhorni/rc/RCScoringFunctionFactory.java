@@ -69,8 +69,15 @@ public class RCScoringFunctionFactory implements ScoringFunctionFactory {
 	}
 	
 	private void readPrefs() {
-		for (ActivityParams activityParams : this.scenario.getConfig().planCalcScore().getActivityParams()) {				
+		for (ActivityParams activityParams : this.scenario.getConfig().planCalcScore().getActivityParams()) {	
+			int counter = 0;
+			int nextMsg = 1;
 			for (Person p : this.scenario.getPopulation().getPersons().values()) {
+				counter++;
+				if (counter % nextMsg == 0) {
+					nextMsg *= 2;
+					log.info(" person # " + counter);
+				}
 				PersonImpl person = (PersonImpl)p;
 				Desires desires = person.getDesires();					
 				if (desires != null) {
@@ -79,12 +86,12 @@ public class RCScoringFunctionFactory implements ScoringFunctionFactory {
 				} else {				
 					prefs.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getType(), activityParams.getTypicalDuration());
 					log.error("there should be desires!");
-					System.exit(0);
 				}
 				prefs.putAttribute(p.getId().toString(), "latestStartTime_" + activityParams.getType(), activityParams.getLatestStartTime());
 				prefs.putAttribute(p.getId().toString(), "earliestEndTime_" + activityParams.getType(), activityParams.getEarliestEndTime());
 				prefs.putAttribute(p.getId().toString(), "minimalDuration_" + activityParams.getType(), activityParams.getMinimalDuration());
 			}
 		}
-	}
+		log.info("Reading prefs finished");
+	}	
 }
