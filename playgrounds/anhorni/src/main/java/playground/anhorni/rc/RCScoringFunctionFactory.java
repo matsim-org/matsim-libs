@@ -69,7 +69,6 @@ public class RCScoringFunctionFactory implements ScoringFunctionFactory {
 	}
 	
 	private void readPrefs() {
-		log.warn("prefs are taken from the config and if available from the desires as there is no preferences file specified \n");
 		for (ActivityParams activityParams : this.scenario.getConfig().planCalcScore().getActivityParams()) {				
 			for (Person p : this.scenario.getPopulation().getPersons().values()) {
 				PersonImpl person = (PersonImpl)p;
