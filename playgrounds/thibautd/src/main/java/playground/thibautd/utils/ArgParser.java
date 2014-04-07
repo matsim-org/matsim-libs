@@ -72,6 +72,15 @@ public class ArgParser {
 		return Boolean.parseBoolean( getValue( name ) );
 	}
 
+	// "<T extends Enum<T>>" does read odd, but this is the correct phrasing.
+	// This stackoverflow answer just explains why nicely:
+	// http://stackoverflow.com/a/3061776
+	public <T extends Enum<T>> T getEnumValue(
+			final String name,
+			final Class<T> type) {
+		return Enum.valueOf( type , getValue( name ) );
+	}
+
 	public List<String> getValues(final String name) {
 		if ( !defaultMultipleValues.containsKey( name ) ) throw new IllegalArgumentException( name+" not in "+defaultMultipleValues.keySet() );
 
