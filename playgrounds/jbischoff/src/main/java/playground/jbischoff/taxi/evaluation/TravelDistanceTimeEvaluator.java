@@ -131,8 +131,11 @@ public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, Perso
 				bw.newLine();
 				double relativeOccupanceDist = tryToGetOrReturnZero(taxiTravelDistancesWithPassenger, e.getKey()) /e.getValue();
 				double relativeOccpanceTime = tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey()) /tryToGetOrReturnZero( this.taxiTravelDuration, e.getKey());
-				double startTime = this.startTimes.get(e.getKey());
-				double endTime = this.endTimes.get(e.getKey());
+				double startTime = 0.;
+				double endTime = 0.;
+				
+				if (this.startTimes.containsKey(e.getKey())) startTime = this.startTimes.get(e.getKey());
+				if (this.endTimes.containsKey(e.getKey())) endTime = this.endTimes.get(e.getKey());
 				double onlineTime = endTime-startTime;
 				onlineTimes += onlineTime;
 				bw.write(e.getKey()+"\t"+(e.getValue()/1000)+"\t"+(tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey())/1000)+"\t"+relativeOccupanceDist+"\t"+tryToGetOrReturnZero( this.taxiTravelDuration, e.getKey())+"\t"+tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey())+"\t"+relativeOccpanceTime+"\t"+startTime+"\t"+endTime+"\t"+onlineTime);
