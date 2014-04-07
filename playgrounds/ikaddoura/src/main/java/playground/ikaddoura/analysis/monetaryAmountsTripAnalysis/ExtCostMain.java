@@ -62,10 +62,15 @@ public class ExtCostMain {
 		
 		log.info("Writing output files...");
 
-		CarTripInfoWriter writer = new CarTripInfoWriter(handler, outputFolder);
-		writer.writeDetailedResults();
-		writer.writeResultsTime();
-		writer.writeResultsDistance();
+		CarTripInfoWriter writerCar = new CarTripInfoWriter(handler, outputFolder);
+		writerCar.writeDetailedResultsCar();
+		writerCar.writeResultsDistanceCar();
+		writerCar.writeResultsTimeCar();
+		
+//		PtTripInfoWriter writerPt = new PtTripInfoWriter(handler, outputFolder);
+//		writerPt.writeDetailedResultsPt();
+//		writerPt.writeResultsDistancePt();
+//		writerPt.writeResultsTimePt();
 		
 		log.info("Writing output files... Done.");
 
