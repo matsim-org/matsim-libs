@@ -20,8 +20,6 @@
 package playground.anhorni.rc;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
-
 
 public class RCControler extends Controler {
 				
@@ -33,7 +31,7 @@ public class RCControler extends Controler {
 	public static void main (final String[] args) { 
 		RCControler controler = new RCControler(args);
 		controler.setOverwriteFiles(true);
-		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(
+		controler.setScoringFunctionFactory(new RCScoringFunctionFactory(
 				controler.getConfig().planCalcScore(), controler.getScenario()));
     	controler.run();
     }
