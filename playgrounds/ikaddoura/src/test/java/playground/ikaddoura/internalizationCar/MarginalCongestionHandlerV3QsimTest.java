@@ -33,6 +33,7 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.contrib.multimodal.simengine.StuckAgentTest;
 import org.matsim.core.config.Config;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -170,6 +171,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			} else if ((event.getCausingAgentId().toString().equals(this.testAgent1.toString())) && (event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) && (event.getTime() == 126.0)) {
 				Assert.assertEquals("wrong delay.", 9.0, event.getDelay(), MatsimTestUtils.EPSILON);
 			}
+			
 		}
 		
 	}
@@ -600,7 +602,70 @@ public class MarginalCongestionHandlerV3QsimTest {
 		for (MarginalCongestionEvent event : congestionEvents) {
 		
 			System.out.println(event.toString());
+		}
+		
+	}
+	
+	@Test
+	public final void testStuckTimePeriod(){
+		
+		Scenario sc = loadScenario1b();
+		setPopulation1(sc);
+		
+		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
+		
+		events.addHandler( new MarginalCongestionEventHandler() {
+
+			@Override
+			public void reset(int iteration) {				
+			}
+
+			@Override
+			public void handleEvent(MarginalCongestionEvent event) {
+				congestionEvents.add(event);
+			}	
+		});
+		
+		events.addHandler( new LinkLeaveEventHandler() {
+
+			@Override
+			public void reset(int iteration) {				
+			}
+
+			@Override
+			public void handleEvent(LinkLeaveEvent event) {
+				System.out.println(event.toString());
+			}	
+		});
+		
+		events.addHandler( new LinkEnterEventHandler() {
+
+			@Override
+			public void reset(int iteration) {				
+			}
+
+			@Override
+			public void handleEvent(LinkEnterEvent event) {
+				System.out.println(event.toString());
+			}	
+		});
+		
+		events.addHandler(new MarginalCongestionHandlerImplV3(events, (ScenarioImpl) sc));
+		
+		QSim sim = createQSim(sc, events);
+		sim.run();
+						
+		for (MarginalCongestionEvent event : congestionEvents) {
+		
+			System.out.println(event.toString());
 			
+			if (event.getCausingAgentId().toString().equals(this.testAgent1.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent2.toString())) {				
+				Assert.assertEquals("wrong delay.", 10.0, event.getDelay(), MatsimTestUtils.EPSILON);
+			} else if ((event.getCausingAgentId().toString().equals(this.testAgent2.toString())) && (event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) && (event.getTime() == 116.0)) {
+				Assert.assertEquals("wrong delay.", 10.0, event.getDelay(), MatsimTestUtils.EPSILON);
+			} else if ((event.getCausingAgentId().toString().equals(this.testAgent1.toString())) && (event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) && (event.getTime() == 126.0)) {
+				Assert.assertEquals("wrong delay.", 9.0, event.getDelay(), MatsimTestUtils.EPSILON);
+			}
 		}
 		
 	}
@@ -1071,6 +1136,93 @@ private void setPopulation6(Scenario scenario) {
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(3600.0);
+		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+	
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		network.setEffectiveCellSize(7.5);
+		network.setCapacityPeriod(3600.);
+		
+		Node node0 = network.getFactory().createNode(new IdImpl("0"), scenario.createCoord(0., 0.));
+		Node node1 = network.getFactory().createNode(new IdImpl("1"), scenario.createCoord(100., 0.));
+		Node node2 = network.getFactory().createNode(new IdImpl("2"), scenario.createCoord(200., 0.));
+		Node node3 = network.getFactory().createNode(new IdImpl("3"), scenario.createCoord(300., 0.));
+		Node node4 = network.getFactory().createNode(new IdImpl("4"), scenario.createCoord(400., 0.));
+		Node node5 = network.getFactory().createNode(new IdImpl("5"), scenario.createCoord(500., 0.));
+		
+		Link link1 = network.getFactory().createLink(this.linkId1, node0, node1);
+		Link link2 = network.getFactory().createLink(this.linkId2, node1, node2);
+		Link link3 = network.getFactory().createLink(this.linkId3, node2, node3);
+		Link link4 = network.getFactory().createLink(this.linkId4, node3, node4);
+		Link link5 = network.getFactory().createLink(this.linkId5, node4, node5);
+
+		Set<String> modes = new HashSet<String>();
+		modes.add("car");
+		
+		// link without capacity restrictions
+		link1.setAllowedModes(modes);
+		link1.setCapacity(999999);
+		link1.setFreespeed(250); // one time step
+		link1.setNumberOfLanes(100);
+		link1.setLength(500);
+		
+		// link without capacity restrictions
+		link2.setAllowedModes(modes);
+		link2.setCapacity(999999);
+		link2.setFreespeed(166.66666667); // two time steps
+		link2.setNumberOfLanes(100);
+		link2.setLength(500);
+		
+		// link meant to reach storage capacity: space for one car, flow capacity: one car every 10 sec
+		link3.setAllowedModes(modes);
+		link3.setCapacity(360);
+		link3.setFreespeed(250); // one time step
+		link3.setNumberOfLanes(1);
+		link3.setLength(7.5);
+		
+		// link without capacity restrictions
+		link4.setAllowedModes(modes);
+		link4.setCapacity(999999);
+		link4.setFreespeed(166.66666667); // two time steps
+		link4.setNumberOfLanes(100);
+		link4.setLength(500);
+		
+		// link without capacity restrictions
+		link5.setAllowedModes(modes);
+		link5.setCapacity(999999);
+		link5.setFreespeed(250); // one time step
+		link5.setNumberOfLanes(100);
+		link5.setLength(500);
+		
+		network.addNode(node0);
+		network.addNode(node1);
+		network.addNode(node2);
+		network.addNode(node3);
+		network.addNode(node4);
+		network.addNode(node5);
+
+		network.addLink(link1);
+		network.addLink(link2);
+		network.addLink(link3);
+		network.addLink(link4);
+		network.addLink(link5);
+
+		this.events = EventsUtils.createEventsManager();
+		return scenario;
+	}
+	
+	private Scenario loadScenario1b() {
+		
+		// only the stuckTimePeriod has be changed to a small value
+		// (0)				(1)				(2)				(3)				(4)				(5)
+		//    -----link1----   ----link2----   ----link3----   ----link4----   ----link5----   
+		
+		Config config = testUtils.loadConfig(null);
+		QSimConfigGroup qSimConfigGroup = config.qsim();
+		qSimConfigGroup.setFlowCapFactor(1.0);
+		qSimConfigGroup.setStorageCapFactor(1.0);
+		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
+		qSimConfigGroup.setRemoveStuckVehicles(false);
+		qSimConfigGroup.setStuckTime(6.0);
 		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
