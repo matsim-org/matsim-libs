@@ -326,6 +326,7 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 		List<Id> linkIds = new ArrayList<Id>();
 		linkIds.add(scenario.createId("l1"));
 		route.setLinkIds(startLinkId, linkIds, endLinkId);
+		leg.setRoute(route);
 		
 		Plan plan = scenario.getPopulation().getFactory().createPlan();
 		plan.addActivity(from);
