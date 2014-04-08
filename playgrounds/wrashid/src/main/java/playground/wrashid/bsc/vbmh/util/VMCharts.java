@@ -57,17 +57,27 @@ public class VMCharts {
 		void print(String filename){
 			XYScatterChart chart = new XYScatterChart(name, xName, yName,logAx); //True aktiviert log scale
 			
+			
 			Iterator<String> names = series.keySet().iterator();
 			for (LinkedList<double[]> serie : series.values()){
+				String name = names.next();
+				CSVWriter writer = new CSVWriter(filename+name);
+				writer.writeLine(xName+", "+yName);
 				double[] x = new double[serie.size()];
 				double[] y = new double[serie.size()];
 				int i=0;
+				String xWert;
+				String yWert;
 				for(double[] element : serie){
 					x[i]=element[0];
 					y[i]=element[1]+0.1; // +0.1 nicht schoen aber sonst log scale nicht moeglich wegen 0 werten
+					xWert=Double.toString(element[0]);
+					yWert=Double.toString(element[1]);
+					writer.writeLine(xWert+", "+yWert);
 					i++;
 				}
-				chart.addSeries(names.next(), x,y);
+				chart.addSeries(name, x,y);
+				writer.close();
 			}
 			
 			//chart.getChart().getXYPlot().getRenderer().setBaseShape(new Ellipse2D.Double(0,0,5,5));
