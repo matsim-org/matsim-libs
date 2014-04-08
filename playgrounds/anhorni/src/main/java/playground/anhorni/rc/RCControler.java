@@ -19,20 +19,8 @@
 
 package playground.anhorni.rc;
 
-import java.util.HashSet;
-import java.util.Set;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.withinday.controller.WithinDayControlerListener;
-import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
-import org.matsim.withinday.replanning.identifiers.filter.LinkFilterFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
-import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 
 public class RCControler extends Controler {
 					
@@ -46,37 +34,9 @@ public class RCControler extends Controler {
 		controler.setScoringFunctionFactory(new RCScoringFunctionFactory(
 				controler.getConfig().planCalcScore(), controler.getScenario()));
 		
-		WithinDayControlerListener withinDayControlerListener = controler.initWithinDayReplanning(controler.getScenario());
-		controler.addControlerListener(withinDayControlerListener);
+		controler.addControlerListener(new WithindayListener(controler));
 		
     	controler.run();
     }
-	
-	
-	public WithinDayControlerListener initWithinDayReplanning(Scenario scenario) {
-		WithinDayControlerListener withinDayControlerListener = new WithinDayControlerListener();
-		
-		TravelDisutility travelDisutility = withinDayControlerListener.getTravelDisutilityFactory()
-				.createTravelDisutility(withinDayControlerListener.getTravelTimeCollector(), scenario.getConfig().planCalcScore());
-		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, withinDayControlerListener.getTravelTimeCollector());
-		
-		LeaveLinkIdentifierFactory duringLegIdentifierFactory = new LeaveLinkIdentifierFactory(withinDayControlerListener.getLinkReplanningMap(),
-				withinDayControlerListener.getMobsimDataProvider());
-		
-		Set<Id> links = new HashSet<Id>();
-		
-		LinkFilterFactory linkFilter = new LinkFilterFactory(links, withinDayControlerListener.getMobsimDataProvider());
-		duringLegIdentifierFactory.addAgentFilterFactory(linkFilter);
-		
-		DuringLegIdentifier duringLegIdentifier = duringLegIdentifierFactory.createIdentifier();
-		
-		CurrentLegReplannerFactory duringLegReplannerFactory = new CurrentLegReplannerFactory(scenario, withinDayControlerListener.getWithinDayEngine(),
-				withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
-		duringLegReplannerFactory.addIdentifier(duringLegIdentifier);
-		
-		withinDayControlerListener.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);
-		
-		return withinDayControlerListener;
-	}
 	
 }
