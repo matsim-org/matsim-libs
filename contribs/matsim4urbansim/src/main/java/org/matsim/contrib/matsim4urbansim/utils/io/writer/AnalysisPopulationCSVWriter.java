@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.accessibility.utils.AggregateObject2NearestNode;
+import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.SpatialReferenceObject;
@@ -67,7 +67,7 @@ public class AnalysisPopulationCSVWriter {
 	 * @param personClusterMap
 	 * @param module2 TODO
 	 */
-	public static void writeAggregatedPopulationData2CSV(final Map<Id, AggregateObject2NearestNode> personClusterMap, UrbanSimParameterConfigModuleV3 module){
+	public static void writeAggregatedPopulationData2CSV(final Map<Id, AggregationObject> personClusterMap, UrbanSimParameterConfigModuleV3 module){
 		try{
 			log.info("Initializing AnalysisPopulationCSVWriter ...");
 			BufferedWriter bwAggregatedPopulation = IOUtils.getBufferedWriter( module.getMATSim4OpusOutput() + FILE_NAME_AGGREGATED );
@@ -81,16 +81,16 @@ public class AnalysisPopulationCSVWriter {
 					 		   PERSONS_COUNT);
 			bwAggregatedPopulation.newLine();
 			
-			Iterator<AggregateObject2NearestNode> personIterator = personClusterMap.values().iterator();
+			Iterator<AggregationObject> personIterator = personClusterMap.values().iterator();
 
 			while(personIterator.hasNext()){
 				
-				AggregateObject2NearestNode person = personIterator.next();
+				AggregationObject person = personIterator.next();
 				
 				bwAggregatedPopulation.write(person.getParcelID() + "," +
 								   person.getNearestNode().getId() + "," +
-								   person.getCoordinate().getX() + "," +
-								   person.getCoordinate().getY() + "," +
+								   person.getNearestNode().getCoord().getX() + "," +
+								   person.getNearestNode().getCoord().getY() + "," +
 								   person.getNumberOfObjects());
 				bwAggregatedPopulation.newLine();
 			}

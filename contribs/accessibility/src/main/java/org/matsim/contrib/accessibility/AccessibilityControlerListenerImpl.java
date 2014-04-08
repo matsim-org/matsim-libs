@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import junit.framework.Assert;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -15,7 +17,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
-import org.matsim.contrib.accessibility.utils.AggregateObject2NearestNode;
+import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.Benchmark;
 import org.matsim.contrib.accessibility.utils.Distances;
 import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
@@ -28,6 +30,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -86,7 +89,7 @@ public abstract class AccessibilityControlerListenerImpl {
 	// containing parcel coordinates for accessibility feedback
 	ActivityFacilitiesImpl parcels; 
 	// destinations, opportunities like jobs etc ...
-	AggregateObject2NearestNode[] aggregatedOpportunities;
+	AggregationObject[] aggregatedOpportunities;
 	
 	// storing the accessibility results
 	Map<Modes4Accessibility,SpatialGrid> accessibilityGrids = new HashMap<Modes4Accessibility,SpatialGrid>() ;
@@ -229,23 +232,20 @@ public abstract class AccessibilityControlerListenerImpl {
 	 * @param network giving the road network
 	 * @return the sum of disutilities Vjk, i.e. the disutilities to reach all opportunities k that are assigned to j from node j 
 	 */
-	final AggregateObject2NearestNode[] aggregatedOpportunities(final ActivityFacilities opportunities, Network network){
+	final AggregationObject[] aggregatedOpportunities(final ActivityFacilities opportunities, Network network){
+		// yyyy this method ignores the "capacities" of the facilities.  kai, mar'14
 
 		log.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with identical nearest node ...");
-		Map<Id, AggregateObject2NearestNode> opportunityClusterMap = new ConcurrentHashMap<Id, AggregateObject2NearestNode>();
+		Map<Id, AggregationObject> opportunityClusterMap = new ConcurrentHashMap<Id, AggregationObject>();
 		ProgressBar bar = new ProgressBar( opportunities.getFacilities().size() );
 
-		Iterator<? extends ActivityFacility> oppIterator = opportunities.getFacilities().values().iterator();
-
-		while(oppIterator.hasNext()){
-
+		for ( ActivityFacility opportunity : opportunities.getFacilities().values() ) {
 			bar.update();
 
-			ActivityFacility opprotunity = oppIterator.next();
-			Node nearestNode = ((NetworkImpl)network).getNearestNode( opprotunity.getCoord() );
+			Node nearestNode = ((NetworkImpl)network).getNearestNode( opportunity.getCoord() );
 
 			// get Euclidian distance to nearest node
-			double distance_meter 	= NetworkUtils.getEuclidianDistance(opprotunity.getCoord(), nearestNode.getCoord());
+			double distance_meter 	= NetworkUtils.getEuclidianDistance(opportunity.getCoord(), nearestNode.getCoord());
 			double walkTravelTime_h = distance_meter / this.walkSpeedMeterPerHour;
 
 			double VjkWalkTravelTime	= this.betaWalkTT * walkTravelTime_h;
@@ -260,30 +260,47 @@ public abstract class AccessibilityControlerListenerImpl {
 			double VjkWalkPowerMoney	= 0.; //this.betaWalkTDPower * 0.; 	// no monetary costs for walking
 			double VjkWalkLnMoney		= 0.; //this.betaWalkLnTMC *0.; 	// no monetary costs for walking
 
-			double Vjk					= Math.exp(this.logitScaleParameter * (VjkWalkTravelTime + VjkWalkPowerTravelTime + VjkWalkLnTravelTime +
+			double expVjk					= Math.exp(this.logitScaleParameter * (VjkWalkTravelTime + VjkWalkPowerTravelTime + VjkWalkLnTravelTime +
 					VjkWalkDistance   + VjkWalkPowerDistnace   + VjkWalkLnDistance +
 					VjkWalkMoney      + VjkWalkPowerMoney      + VjkWalkLnMoney) );
 			// add Vjk to sum
-			if( opportunityClusterMap.containsKey( nearestNode.getId() ) ){
-				AggregateObject2NearestNode jco = opportunityClusterMap.get( nearestNode.getId() );
-				jco.addObject( opprotunity.getId(), Vjk);
+//			if( opportunityClusterMap.containsKey( nearestNode.getId() ) ){
+//				AggregationObject jco = opportunityClusterMap.get( nearestNode.getId() );
+//				jco.addObject( opportunity.getId(), expVjk);
+//			} else {
+//				// assign Vjk to given network node
+//				opportunityClusterMap.put(
+//						nearestNode.getId(),
+//						new AggregationObject(opportunity.getId(), null, null, nearestNode, expVjk) 
+//						);
+//			}
+			AggregationObject jco = opportunityClusterMap.get( nearestNode.getId() ) ;
+			if ( jco == null ) {
+				jco = new AggregationObject(opportunity.getId(), null, null, nearestNode, 0. ); // initialize with zero!
+				opportunityClusterMap.put( nearestNode.getId(), jco ) ; 
 			}
-			else // assign Vjk to given network node
-				opportunityClusterMap.put(
-						nearestNode.getId(),
-						new AggregateObject2NearestNode(opprotunity.getId(), 
-								null,
-								null,
-								nearestNode.getCoord(), 
-								nearestNode, 
-								Vjk));
+			jco.addObject( opportunity.getId(), expVjk ) ;
+			// yyyy if we would know the activity type, we could to do capacities as follows:
+			ActivityOption opt = opportunity.getActivityOptions().get("type") ;
+			Assert.assertNotNull(opt);
+			final double capacity = opt.getCapacity();
+			Assert.assertNotNull(capacity) ; // we do not know what that would mean
+			if ( capacity < Double.POSITIVE_INFINITY ) { // this is sometimes the value of "undefined" 
+				jco.addObject( opportunity.getId(), capacity * expVjk ) ;
+			} else {
+				jco.addObject( opportunity.getId(), expVjk ) ; // fix if capacity is "unknown".
+			}
+			
 		}
 		// convert map to array
-		AggregateObject2NearestNode jobClusterArray []  = new AggregateObject2NearestNode[ opportunityClusterMap.size() ];
-		Iterator<AggregateObject2NearestNode> jobClusterIterator = opportunityClusterMap.values().iterator();
-
-		for(int i = 0; jobClusterIterator.hasNext(); i++)
+		AggregationObject jobClusterArray []  = new AggregationObject[ opportunityClusterMap.size() ];
+		Iterator<AggregationObject> jobClusterIterator = opportunityClusterMap.values().iterator();
+		for(int i = 0; jobClusterIterator.hasNext(); i++) {
 			jobClusterArray[i] = jobClusterIterator.next();
+		}
+
+		// yy maybe replace by following?? Needs to be tested.  kai, mar'14
+//		AggregateObject2NearestNode[] jobClusterArray = (AggregateObject2NearestNode[]) opportunityClusterMap.values().toArray() ;
 
 		log.info("Aggregated " + opportunities.getFacilities().size() + " number of opportunities to " + jobClusterArray.length + " nodes.");
 
@@ -392,7 +409,7 @@ public abstract class AccessibilityControlerListenerImpl {
 				// --------------------------------------------------------------------------------------------------------------
 				// goes through all opportunities, e.g. jobs, (nearest network node) and calculate/add their exp(U) contributions:
 				for ( int i = 0; i < this.aggregatedOpportunities.length; i++ ) {
-					final AggregateObject2NearestNode aggregatedFacility = this.aggregatedOpportunities[i];
+					final AggregationObject aggregatedFacility = this.aggregatedOpportunities[i];
 
 					computeAndAddExpUtilContributions(lcptExtFreeSpeedCarTravelTime, lcptExtCongestedCarTravelTime,
 							lcptTravelDistance, gcs, fromNode, distance.getDistancePoint2Road(), distance.getDistanceRoad2Node(),
@@ -444,7 +461,7 @@ public abstract class AccessibilityControlerListenerImpl {
 			Node fromNode, double distanceMeasuringPoint2Road_meter, double distanceRoad2Node_meter,
 			double walkTravelTimeMeasuringPoint2Road_h, double road2NodeFreeSpeedTime_h, double road2NodeCongestedCarTime_h,
 			double road2NodeBikeTime_h, double road2NodeWalkTime_h, double toll_money,
-			final AggregateObject2NearestNode aggregatedFacility) {
+			final AggregationObject aggregatedFacility) {
 		// get stored network node (this is the nearest node next to an aggregated work place)
 		Node destinationNode = aggregatedFacility.getNearestNode();
 		Id nodeID = destinationNode.getId();
@@ -466,7 +483,7 @@ public abstract class AccessibilityControlerListenerImpl {
 		// disutilities to get on or off the network
 		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distanceMeasuringPoint2Road_meter * betaWalkTD);
 		double expVhiWalk = Math.exp(this.logitScaleParameter * walkDisutilityMeasuringPoint2Road);
-		double sumExpVjkWalk = aggregatedFacility.getSumVjk();
+		double sumExpVjkWalk = aggregatedFacility.getSum();
 
 		// travel times and distances for pseudo pt
 		if(this.isComputingMode.get(Modes4Accessibility.pt) ){

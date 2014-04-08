@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.gis.Zone;
 import org.matsim.contrib.accessibility.gis.ZoneLayer;
-import org.matsim.contrib.accessibility.utils.AggregateObject2NearestNode;
+import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.Distances;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.contrib.accessibility.utils.ProgressBar;
@@ -26,7 +26,7 @@ private SpatialGrid freeSpeedGrid;
 	
 	private ZoneLayer<Id> measuringPoints;
 	
-	protected AggregateObject2NearestNode[] aggregatedOpportunities;
+	protected AggregationObject[] aggregatedOpportunities;
 	
 	protected double walkSpeedMeterPerHour = 3000.;
 	

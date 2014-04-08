@@ -160,8 +160,12 @@ implements ShutdownListener, StartupListener {
 		this.benchmark = new Benchmark();
 
 		initAccessibilityParameters(config);
+
 		// aggregating facilities to their nearest node on the road network
 		this.aggregatedOpportunities = aggregatedOpportunities(opportunities, network);
+		// yyyy ignores the "capacities" of the facilities.  kai, mar'14
+		
+		
 		// use network as global variable, otherwise another network might be used during 
 		// notifyShutDown(...) (network may be preprocessed, e.g. only car-links.)
 		this.network = network;

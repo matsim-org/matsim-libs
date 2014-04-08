@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.accessibility.utils.AggregateObject2NearestNode;
+import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.SpatialReferenceObject;
@@ -27,7 +27,7 @@ public class AnalysisWorkplaceCSVWriter {
 	 * @param config TODO
 	 * @param file
 	 */
-	public static void writeAggregatedWorkplaceData2CSV(final AggregateObject2NearestNode[] jobClusterArray, Config config){
+	public static void writeAggregatedWorkplaceData2CSV(final AggregationObject[] jobClusterArray, Config config){
 		UrbanSimParameterConfigModuleV3 module = (UrbanSimParameterConfigModuleV3) config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
 		try{
 			log.info("Initializing AnalysisWorkplaceCSVWriter ...");
@@ -47,8 +47,8 @@ public class AnalysisWorkplaceCSVWriter {
 				bwAggregatedWP.write(jobClusterArray[i].getZoneID() + "," + 
 									 jobClusterArray[i].getParcelID() + "," +
 									 jobClusterArray[i].getNearestNode().getId()  + "," +
-									 jobClusterArray[i].getCoordinate().getX() + "," +
-									 jobClusterArray[i].getCoordinate().getY() + "," +
+									 jobClusterArray[i].getNearestNode().getCoord().getX() + "," +
+									 jobClusterArray[i].getNearestNode().getCoord().getY() + "," +
 									 jobClusterArray[i].getNumberOfObjects());
 				bwAggregatedWP.newLine();
 			}

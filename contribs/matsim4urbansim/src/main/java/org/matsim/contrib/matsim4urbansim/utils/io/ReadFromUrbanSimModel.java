@@ -21,7 +21,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.accessibility.utils.AggregateObject2NearestNode;
+import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
@@ -969,7 +969,7 @@ public class ReadFromUrbanSimModel {
 		log.info( "Starting to read persons table from " + filename );
 		
 		Map<Id, SpatialReferenceObject> personLocations = new ConcurrentHashMap<Id, SpatialReferenceObject>();
-		Map<Id, AggregateObject2NearestNode> personClusterMap = new ConcurrentHashMap<Id, AggregateObject2NearestNode>();
+		Map<Id, AggregationObject> personClusterMap = new ConcurrentHashMap<Id, AggregationObject>();
 		
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader( filename );
@@ -1002,16 +1002,12 @@ public class ReadFromUrbanSimModel {
 							assert( nearestNode != null );
 	
 							if( personClusterMap.containsKey( nearestNode.getId() ) ){
-								AggregateObject2NearestNode co = personClusterMap.get( nearestNode.getId() );
-								co.addObjectOld( personId, 0.);
+								AggregationObject co = personClusterMap.get( nearestNode.getId() );
+								co.addObject( personId, 0. );
+							} else {
+								personClusterMap.put( nearestNode.getId(), 
+										new AggregationObject( personId, homeParcelId, null, nearestNode, 0.) );
 							}
-							else
-								personClusterMap.put( nearestNode.getId(), new AggregateObject2NearestNode(0.,
-																							 personId,
-																						  	 homeParcelId,
-																						  	 null,
-																						  	 nearestNode.getCoord(),
-																						  	nearestNode) );
 						}
 					}
 				}

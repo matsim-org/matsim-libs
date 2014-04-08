@@ -94,8 +94,11 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		// data set table. THIS PRODUCES URBANSIM INPUT
 		urbanSimZoneCSVWriterV2 = new UrbanSimZoneCSVWriterV2(matsim4opusTempDirectory);
 		initAccessibilityParameters(scenario.getConfig());
+
 		// aggregating facilities to their nearest node on the road network
 		this.aggregatedOpportunities = aggregatedOpportunities(opportunities, scenario.getNetwork());
+		// yyyy ignores the "capacities" of the facilities. kai, mar'14
+		
 		
 		log.info(".. done initializing ZoneBasedAccessibilityControlerListenerV3");
 	}

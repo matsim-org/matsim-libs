@@ -39,7 +39,7 @@ import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssib
 import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
-import org.matsim.contrib.accessibility.utils.AggregateObject2NearestNode;
+import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterFactoryImpl;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
@@ -109,7 +109,7 @@ public class MATSim4UrbanSimParcel{
 	// indicates if MATSim run was successful
 	static boolean isSuccessfulMATSimRun 			 = false;
 	// needed for controler listeners
-	AggregateObject2NearestNode[] aggregatedOpportunities = null;
+	AggregationObject[] aggregatedOpportunities = null;
 	
 	boolean isParcelMode = true;
 
