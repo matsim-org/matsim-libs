@@ -73,6 +73,7 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 		int rr=0 ;
 		for ( Plan plan1 : plans ) {
 			for ( Plan plan2 : plans ) {
+				// yyyy there is really no need to compare the plan with itself.  kai/johan, mar'14
 				utils[rr] -= similarity( plan1, plan2, null, network ) ; 
 				if ( Double.isNaN(utils[rr]) ) {
 					log.warn( "utils is NaN; id: " + plan1.getPerson().getId() ) ;

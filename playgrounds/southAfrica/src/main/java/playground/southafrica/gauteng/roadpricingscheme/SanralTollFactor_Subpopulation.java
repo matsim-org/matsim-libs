@@ -37,7 +37,7 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 	private Scenario sc;
 	
 	public static enum TollVehicleType { A1, A2, B, C} ;
-	public static enum SubPopType{ PRIVATE, COMMERCIAL, EXT } ; 
+	public static enum SubPopType{ PRIVATE, COMMERCIAL, TAXI, BUS, EXT } ; 
 	
 	
 	public SanralTollFactor_Subpopulation(Scenario scenario) {
@@ -166,72 +166,70 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 	 * accordingly.
 	 */
 	@Override
-	public SanralTollVehicleType typeOf(Id idObj) {
-		if ( tollVehicleTypes.get(idObj) != null ) {
-			return tollVehicleTypes.get(idObj) ;
+	public SanralTollVehicleType typeOf(Id personId) {
+		if ( tollVehicleTypes.get(personId) != null ) {
+			return tollVehicleTypes.get(personId) ;
 		}
 		
 		Assert.assertNotNull(this.sc);
 		Assert.assertNotNull(this.sc.getPopulation());
 		Assert.assertNotNull(this.sc.getPopulation().getPersonAttributes());
-		Assert.assertNotNull( idObj ) ;
+		Assert.assertNotNull( personId ) ;
 		Assert.assertNotNull( sc.getConfig() );
 		Assert.assertNotNull( sc.getConfig().plans() );
 
 		/* Check subpopulation. */
-		String subpopulation = getSubPopTypeFromPersonID(idObj);
+		SubPopType popType = getSubPopTypeFromPersonID(personId);
 		
 		/* Check vehicle type. */
-		TollVehicleType vehicleType = getTollVehicleTypeFromPersonID(idObj);
+		TollVehicleType vehicleType = getTollVehicleTypeFromPersonID(personId);
 		
 		/* Check availability of eTag. */
-		Boolean tag = hasETag(idObj);
+		Boolean tag = hasETag(personId);
 	
 		/* Identify correct vehicle type. */
-		if(subpopulation.equalsIgnoreCase("car")){
+		switch( popType) {
+		case PRIVATE: {
 			final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.privateClassAWithTag : SanralTollVehicleType.privateClassAWithoutTag;
-			tollVehicleTypes.put( idObj, tvType ) ;
-			return tvType;
-
-		} else if(subpopulation.equalsIgnoreCase("commercial")){
-			if(vehicleType==TollVehicleType.A2){
+			tollVehicleTypes.put( personId, tvType ) ;
+			return tvType; }
+		case COMMERCIAL: 
+			switch (vehicleType ) {
+			case A2: {
 				final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.commercialClassAWithTag : SanralTollVehicleType.commercialClassAWithoutTag;
-				tollVehicleTypes.put( idObj, tvType ) ;
-				return tvType;
-			} else if(vehicleType==TollVehicleType.B){
+				tollVehicleTypes.put( personId, tvType ) ;
+				return tvType; } 
+			case B: {
 				final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.commercialClassBWithTag : SanralTollVehicleType.commercialClassBWithoutTag;
-				tollVehicleTypes.put( idObj, tvType ) ;
-				return tvType;
-			} else if(vehicleType==TollVehicleType.C ){
+				tollVehicleTypes.put( personId, tvType ) ;
+				return tvType; }
+			case C: {
 				final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.commercialClassCWithTag : SanralTollVehicleType.commercialClassCWithoutTag;
-				tollVehicleTypes.put( idObj, tvType ) ;
-				return tvType;
-			} else{
+				tollVehicleTypes.put( personId, tvType ) ;
+				return tvType; }
+			case A1:
+			default:
 				throw new RuntimeException("Unknown vehicle type " + vehicleType);
 			}
-			
-		} else if(subpopulation.equalsIgnoreCase("bus")){
+		case BUS: {
 			final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.busWithTag : SanralTollVehicleType.busWithoutTag;
-			tollVehicleTypes.put( idObj, tvType ) ;
-			return tvType;
-			
-		} else if(subpopulation.equalsIgnoreCase("taxi")){
+			tollVehicleTypes.put( personId, tvType ) ;
+			return tvType; }
+		case TAXI: {
 			final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.taxiWithTag : SanralTollVehicleType.taxiWithoutTag;
-			tollVehicleTypes.put( idObj, tvType ) ;
-			return tvType;
-			
-		} else if(subpopulation.equalsIgnoreCase("ext")){
+			tollVehicleTypes.put( personId, tvType ) ;
+			return tvType; }
+		case EXT: {
 			final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.extWithTag : SanralTollVehicleType.extWithoutTag;
-			tollVehicleTypes.put( idObj, tvType ) ;
-			return tvType;
-			
-		} else{
-			throw new RuntimeException("Unknown subpopulation type " + subpopulation);
+			tollVehicleTypes.put( personId, tvType ) ;
+			return tvType; }
+		default:
+			throw new RuntimeException("Unknown subpopulation type " + popType);
 		}
 	}
 
 
-	private String getSubPopTypeFromPersonID(Id personId) {
+	public SubPopType getSubPopTypeFromPersonID(Id personId) {
 		Object o1 = this.sc.getPopulation().getPersonAttributes().getAttribute(personId.toString(), sc.getConfig().plans().getSubpopulationAttributeName());
 		String subpopulation;
 		if(o1 instanceof String){
@@ -239,11 +237,11 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 		} else{
 			throw new RuntimeException("Expected a subppulation description of type `String', but it was `" + o1.getClass().toString() + "'. Returning NULL");
 		}
-		return subpopulation;
+		return SubPopType.valueOf( subpopulation ) ;
 	}
 
 
-	private Boolean hasETag(Id personId) {
+	public Boolean hasETag(Id personId) {
 		Object o3 = this.sc.getPopulation().getPersonAttributes().getAttribute(personId.toString(), E_TAG_ATTRIBUTE_NAME);
 		Boolean tag = false;
 		if(o3 instanceof Boolean){
