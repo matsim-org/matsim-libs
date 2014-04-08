@@ -25,6 +25,7 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -44,6 +45,9 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.households.Households;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.Vehicles;
 
 /**
  * Creates a table
@@ -326,13 +330,12 @@ public class CreateSelectedPlansTables {
 	 *
 	 * @author mrieser
 	 */
-	private static class PseudoScenario extends ScenarioImpl {
+	private static class PseudoScenario implements Scenario {
 
-		private final ScenarioImpl scenario;
+		private final Scenario scenario;
 		private final Population myPopulation;
 
-		public PseudoScenario(final ScenarioImpl scenario, final Population population) {
-			super(ConfigUtils.createConfig());
+		public PseudoScenario(final Scenario scenario, final Population population) {
 			this.scenario = scenario;
 			this.myPopulation = population;
 		}
@@ -365,6 +368,36 @@ public class CreateSelectedPlansTables {
 		@Override
 		public ActivityFacilities getActivityFacilities() {
 			return this.scenario.getActivityFacilities();
+		}
+
+		@Override
+		public TransitSchedule getTransitSchedule() {
+			return scenario.getTransitSchedule();
+		}
+
+		@Override
+		public void addScenarioElement(String name, Object o) {
+			scenario.addScenarioElement(name, o);
+		}
+
+		@Override
+		public Object removeScenarioElement(String name) {
+			return scenario.removeScenarioElement(name);
+		}
+
+		@Override
+		public Object getScenarioElement(String name) {
+			return scenario.getScenarioElement(name);
+		}
+
+		@Override
+		public Vehicles getVehicles() {
+			return scenario.getVehicles();
+		}
+
+		@Override
+		public Households getHouseholds() {
+			return scenario.getHouseholds();
 		}
 
 	}
