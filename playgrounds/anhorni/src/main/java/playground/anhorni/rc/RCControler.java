@@ -53,33 +53,9 @@ public class RCControler extends Controler {
 			((NetworkFactoryImpl)controler.getNetwork().getFactory()).setLinkFactory(new TimeVariantLinkFactory());
 			Set<Id> links = controler.createTunnelLinks();
 			controler.addControlerListener(new WithindayListener(controler, links));
-			controler.addNetworkChange(controler, links);
 		}		
     	controler.run();
     }
-	
-	public void addNetworkChange(Controler controler, Set<Id> links) {
-		NetworkImpl network = (NetworkImpl) controler.getNetwork();
-		NetworkChangeEvent networkChangeEvent0;
-		NetworkChangeEvent networkChangeEvent1;
-		
-		// reduce capacity
-		networkChangeEvent0 = network.getFactory().createNetworkChangeEvent(15.5 * 3600.0);
-		networkChangeEvent1 = network.getFactory().createNetworkChangeEvent(15.5 * 3600.0);
-		
-		networkChangeEvent1.setFreespeedChange(new ChangeValue(ChangeType.FACTOR, 0.0));
-		
-		for (Id id : links) {
-			Link link = network.getLinks().get(id);
-			networkChangeEvent0.addLink(link);
-			networkChangeEvent1.addLink(link);
-		}		
-		networkChangeEvent0.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 0.0));
-		networkChangeEvent1.setFreespeedChange(new ChangeValue(ChangeType.FACTOR, 0.0));
-		network.addNetworkChangeEvent(networkChangeEvent0);
-		network.addNetworkChangeEvent(networkChangeEvent1);
-	}
-	
 	
 	public Set<Id> createTunnelLinks() {
 		Set<Id> links = new HashSet<Id>();

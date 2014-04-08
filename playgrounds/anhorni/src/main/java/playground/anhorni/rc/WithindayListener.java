@@ -24,9 +24,14 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkChangeEvent.ChangeType;
+import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
@@ -66,6 +71,7 @@ public class WithindayListener implements StartupListener {
 		// initialze within-day module
 		this.withinDayControlerListener.notifyStartup(event);		
 		this.initWithinDayReplanning(this.scenario);
+		this.addNetworkChange(event.getControler(), links);
 	}
 	
 	private void initWithinDayReplanning(Scenario scenario) {		
@@ -86,6 +92,28 @@ public class WithindayListener implements StartupListener {
 		duringLegReplannerFactory.addIdentifier(duringLegIdentifier);
 		
 		withinDayControlerListener.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);
+	}
+	
+	public void addNetworkChange(Controler controler, Set<Id> links) {
+		NetworkImpl network = (NetworkImpl) controler.getNetwork();
+		NetworkChangeEvent networkChangeEvent0;
+		NetworkChangeEvent networkChangeEvent1;
+		
+		// reduce capacity
+		networkChangeEvent0 = network.getFactory().createNetworkChangeEvent(15.5 * 3600.0);
+		networkChangeEvent1 = network.getFactory().createNetworkChangeEvent(15.5 * 3600.0);
+		
+		networkChangeEvent1.setFreespeedChange(new ChangeValue(ChangeType.FACTOR, 0.0));
+		
+		for (Id id : links) {
+			Link link = network.getLinks().get(id);
+			networkChangeEvent0.addLink(link);
+			networkChangeEvent1.addLink(link);
+		}		
+		networkChangeEvent0.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 0.0));
+		networkChangeEvent1.setFreespeedChange(new ChangeValue(ChangeType.FACTOR, 0.0));
+		network.addNetworkChangeEvent(networkChangeEvent0);
+		network.addNetworkChangeEvent(networkChangeEvent1);
 	}
 
 }
