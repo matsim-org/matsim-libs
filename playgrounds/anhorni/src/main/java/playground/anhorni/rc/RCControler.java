@@ -57,19 +57,24 @@ public class RCControler extends Controler {
 	
 	public void addNetworkChange(Controler controler, Set<Id> links) {
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
-		ChangeValue changeValue;
-		NetworkChangeEvent networkChangeEvent;
+		NetworkChangeEvent networkChangeEvent0;
+		NetworkChangeEvent networkChangeEvent1;
 		
 		// reduce capacity
-		networkChangeEvent = network.getFactory().createNetworkChangeEvent(15.5 * 3600.0);
+		networkChangeEvent0 = network.getFactory().createNetworkChangeEvent(15.5 * 3600.0);
+		networkChangeEvent1 = network.getFactory().createNetworkChangeEvent(15.5 * 3600.0);
+		
+		networkChangeEvent1.setFreespeedChange(new ChangeValue(ChangeType.FACTOR, 0.0));
 		
 		for (Id id : links) {
 			Link link = network.getLinks().get(id);
-			networkChangeEvent.addLink(link);
+			networkChangeEvent0.addLink(link);
+			networkChangeEvent1.addLink(link);
 		}		
-		changeValue = new ChangeValue(ChangeType.FACTOR, 0.0);
-		networkChangeEvent.setFlowCapacityChange(changeValue);
-		network.addNetworkChangeEvent(networkChangeEvent);
+		networkChangeEvent0.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 0.0));
+		networkChangeEvent1.setFreespeedChange(new ChangeValue(ChangeType.FACTOR, 0.0));
+		network.addNetworkChangeEvent(networkChangeEvent0);
+		network.addNetworkChangeEvent(networkChangeEvent1);
 	}
 	
 	
