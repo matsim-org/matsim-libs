@@ -46,17 +46,17 @@ import org.matsim.core.basic.v01.IdImpl;
 public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, LinkEnterEventHandler, PersonDepartureEventHandler, PersonStuckEventHandler {
 
 	private final Logger logger = Logger.getLogger(QueuePositionCalculationHandler.class);
-	Map<Id, Map<Id, PersonOnLinkInformation>> linkId2PersonId2LinkInfo = new TreeMap<Id, Map<Id,PersonOnLinkInformation>>();
-	SortedMap<Id, Queue<Id>> linkId2PersonId2VehicleOnLink= new TreeMap<Id, Queue<Id>>();
-	Map<Id, Queue<Id>> linkId2PersonId2VehicleInQueue= new TreeMap<Id, Queue<Id>>();
-	Map<Id, Double> linkId2LinkAvailableSpace = new TreeMap<Id, Double>();
+	private Map<Id, Map<Id, PersonOnLinkInformation>> linkId2PersonId2LinkInfo = new TreeMap<Id, Map<Id,PersonOnLinkInformation>>();
+	private SortedMap<Id, Queue<Id>> linkId2PersonId2VehicleOnLink= new TreeMap<Id, Queue<Id>>();
+	private Map<Id, Queue<Id>> linkId2PersonId2VehicleInQueue= new TreeMap<Id, Queue<Id>>();
+	private Map<Id, Double> linkId2LinkAvailableSpace = new TreeMap<Id, Double>();
 
-	List<String> personIdLinkIdLinkEnterTimeLinkLeaveTimeData = new ArrayList<String>();
-	List<String> personIdLinkIdLinkEnterTimeLinkLeaveTimeQueuePositionData = new ArrayList<String>();
+	private List<String> personIdLinkIdLinkEnterTimeLinkLeaveTimeData = new ArrayList<String>();
+	private List<String> personIdLinkIdLinkEnterTimeLinkLeaveTimeQueuePositionData = new ArrayList<String>();
 
-	Map<Id, String> personId2LegMode = new TreeMap<Id, String>();
+	private Map<Id, String> personId2LegMode = new TreeMap<Id, String>();
 	private Scenario scenario;
-	private double time2=0;
+	private double lastEventTimeStep=0;
 
 	public QueuePositionCalculationHandler(Scenario scenario) {
 		this.scenario = scenario;
@@ -81,7 +81,6 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 	@Override
 	public void handleEvent(PersonDepartureEvent event){
 		personId2LegMode.put(event.getPersonId(), event.getLegMode());
-		//		updateVehicleOnLinkAndAddToQueue(event.getTime());
 		updateVehicleOnLinkAndFillToQueue(event.getTime());
 	}
 
@@ -100,20 +99,15 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		if(linkId2PersonId2VehicleOnLink.get(event.getLinkId()).contains(personId)){
 			throw new RuntimeException("Same person can not come on the link again until it leaves the link.");
 		}
-
 		Queue<Id> personId2Position = linkId2PersonId2VehicleOnLink.get(event.getLinkId());
 		personId2Position.offer(personId);
-
-		//		updateVehicleOnLinkAndAddToQueue(event.getTime());
 		updateVehicleOnLinkAndFillToQueue(event.getTime());
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if(event.getLinkId().equals(new IdImpl("-1"))) {
-
 		} else {
-
 			Id linkId = event.getLinkId();
 			Id personId = event.getPersonId();
 			Map<Id, PersonOnLinkInformation> personId2LinkInfo = linkId2PersonId2LinkInfo.get(linkId);
@@ -121,7 +115,6 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 			if (personId2LinkInfo == null) {
 				throw new RuntimeException("Cannot happen.");
 			}
-
 			PersonOnLinkInformation personOnLinkInfo = personId2LinkInfo.get(personId);
 			personOnLinkInfo.setLinkLeaveTime( event.getTime());
 
@@ -131,20 +124,17 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 					+personOnLinkInfo.getLinkLength()+"\t"
 					+personOnLinkInfo.getLegMode(); 
 			personIdLinkIdLinkEnterTimeLinkLeaveTimeData.add(dataToWriteInList);
-			
 
 			updateVehicleOnLinkAndFillToQueue(event.getTime());
 			linkId2PersonId2VehicleOnLink.get(linkId).remove(personId);
-			
+
 			if(linkId2PersonId2VehicleInQueue.get(linkId).contains(personId)) {
 				if(!((LinkedList<Id>)linkId2PersonId2VehicleInQueue.get(linkId)).get(0).equals(personId)) {
 					// perhaps check if this is at the front of the queue (only for no passing case).
 					//logger.warn("Leaving vehicle should be first in queue if it was entered on link first.");
 				}
-
 				String qDataToWriteInList = personId+"\t"+linkId+"\t"
 						+personOnLinkInfo.getLinkEnterTime()+"\t"
-						//						+personOnLinkInfo.getPositionInQ()+"\t"
 						+personOnLinkInfo.getQueuingTime()+"\t"
 						+personOnLinkInfo.getLinkLength()+"\t"
 						+personOnLinkInfo.getLegMode()+"\t"
@@ -152,13 +142,10 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 				personIdLinkIdLinkEnterTimeLinkLeaveTimeQueuePositionData.add(qDataToWriteInList);
 
 				linkId2PersonId2VehicleInQueue.get(linkId).remove(personId);
-
 				double availableSpaceSoFar=Double.valueOf(linkId2LinkAvailableSpace.get(linkId));
 				double newAvailableSpace = availableSpaceSoFar+getCellSize(personOnLinkInfo.getLegMode());
 				linkId2LinkAvailableSpace.put(linkId, Double.valueOf(newAvailableSpace));
 			}
-			//			updateVehicleOnLinkAndAddToQueue(event.getTime());
-
 			linkId2PersonId2LinkInfo.get(linkId).remove(personId);
 		}
 	}
@@ -166,8 +153,8 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
 		//		updateVehicleOnLinkAndFillToQueue(event.getTime());
-
 	}
+
 	private PersonOnLinkInformation insertLinkEnterInfo(LinkEnterEvent event, Link link){
 		PersonOnLinkInformation personOnLinkInfo = new PersonOnLinkInformation();
 		personOnLinkInfo.setLink(link);
@@ -176,37 +163,6 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		return personOnLinkInfo;
 	}
 
-//	private PersonOnLinkInformation insertPersonDepartureInfo(PersonDepartureEvent event, Link link){
-//		//		double derivedLinkEnterTime = event.getTime()+1-this.linkId2FreeSpeedLinkTravelTime.get(linkId);
-//		PersonOnLinkInformation personOnLinkInfo = new PersonOnLinkInformation();
-//		personOnLinkInfo.setLink(link);
-//		personOnLinkInfo.setLegMode(event.getLegMode());
-//		personOnLinkInfo.setAvailableLinkSpace(link.getLength());
-//		double derivedLinkEnterTime= event.getTime()+1-personOnLinkInfo.getFreeSpeedLinkTravelTime();
-//		personOnLinkInfo.setLinkEnterTime(derivedLinkEnterTime);
-//		return personOnLinkInfo;
-//	}
-
-//	private void updateVehicleOnLinkAndAddToQueue(double currentTimeStep) {
-//		for (Link link : scenario.getNetwork().getLinks().values()) {
-//			Id linkId = link.getId();
-//			for(Id personId : linkId2PersonId2VehicleOnLink.get(linkId)){
-//				PersonOnLinkInformation personOnLinkInfo = linkId2PersonId2LinkInfo.get(linkId).get(personId);
-//				personOnLinkInfo.checkIfVehicleWillGoInQ(currentTimeStep);
-//				if (personOnLinkInfo.addVehicleInQ()){
-//					Queue<Id> queue = linkId2PersonId2VehicleInQueue.get(linkId);
-//					if(queue.contains(personId)) { 
-//						// already in queue
-//					} else {
-//						queue.offer(personId);
-//						int positionOfVehicleInQueue  = ((LinkedList<Id>) queue).indexOf(personId)+1;
-//						personOnLinkInfo.setPositionInQ(positionOfVehicleInQueue);
-//					}
-//				} 
-//			}
-//		}
-//	}
-
 	public List<String> getPersonLinkEnterTimeVehiclePositionDataToWrite(){
 		return personIdLinkIdLinkEnterTimeLinkLeaveTimeQueuePositionData;
 	}
@@ -214,12 +170,12 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 	public List<String> getPersonLinkEnterLeaveTimeDataToWrite(){
 		return personIdLinkIdLinkEnterTimeLinkLeaveTimeData;
 	}
+	
 	private void updateVehicleOnLinkAndFillToQueue(double currentTimeStep) {
-
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			Id linkId = link.getId();
 			for(Id personId : linkId2PersonId2VehicleOnLink.get(linkId)){
-				for(double time = time2;time<=currentTimeStep;time++){
+				for(double time = lastEventTimeStep;time<=currentTimeStep;time++){
 					PersonOnLinkInformation personOnLinkInfo = linkId2PersonId2LinkInfo.get(linkId).get(personId);
 					personOnLinkInfo.setAvailableLinkSpace(Double.valueOf(linkId2LinkAvailableSpace.get(linkId)));
 					personOnLinkInfo.checkIfVehicleWillGoInQ(time);
@@ -237,27 +193,23 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 							double availableSpaceSoFar=Double.valueOf(linkId2LinkAvailableSpace.get(linkId));
 							double newAvailableSpace = availableSpaceSoFar-getCellSize(personOnLinkInfo.getLegMode());
 							linkId2LinkAvailableSpace.put(linkId, Double.valueOf(newAvailableSpace));
-							int positionOfVehicleInQueue  = ((LinkedList<Id>) queue).indexOf(personId)+1;
-							personOnLinkInfo.setPositionInQ(positionOfVehicleInQueue);
 						}
 					} 
 				}
 			}
 		}
-		time2=currentTimeStep;
+		lastEventTimeStep=currentTimeStep;
 	}
 
-	private static double getCellSize(String travelMode){
-		double vehicleSpeed =7.5;
+	private double getCellSize(String travelMode){
+		double effCellSize =7.5;
 		if(travelMode.equals("cars") || travelMode.equals("fast")) {
-			vehicleSpeed= 7.5;
+			effCellSize= 7.5;
 		} else if(travelMode.equals("motorbikes") || travelMode.equals("med")) {
-			vehicleSpeed = 7.5/4;
+			effCellSize = 7.5/4;
 		} else if(travelMode.equals("bicycles") || travelMode.equals("truck") ){
-			vehicleSpeed= 7.5/4;
+			effCellSize= 7.5/4;
 		}
-		return vehicleSpeed;
+		return effCellSize;
 	}
-
-
 }
