@@ -23,12 +23,20 @@ package playground.anhorni.rc;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkChangeEvent.ChangeType;
+import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+
+import playground.christoph.burgdorf.BurgdorfRoutes;
 
 
 public class RCControler extends Controler {
@@ -46,9 +54,27 @@ public class RCControler extends Controler {
 		if (Boolean.parseBoolean(controler.getConfig().findParam("rc", "withinday"))) {
 			Set<Id> links = controler.createTunnelLinks();
 			controler.addControlerListener(new WithindayListener(controler, links));
+			controler.addNetworkChange(controler, links);
 		}		
     	controler.run();
     }
+	
+	public void addNetworkChange(Controler controler, Set<Id> links) {
+		NetworkImpl network = (NetworkImpl) controler.getNetwork();
+		ChangeValue changeValue;
+		NetworkChangeEvent networkChangeEvent;
+		
+		// reduce capacity
+		networkChangeEvent = network.getFactory().createNetworkChangeEvent(15.5 * 3600.0);
+		
+		for (Id id : links) {
+			Link link = network.getLinks().get(id);
+			networkChangeEvent.addLink(link);
+		}		
+		changeValue = new ChangeValue(ChangeType.FACTOR, 0.0);
+		networkChangeEvent.setFlowCapacityChange(changeValue);
+		network.addNetworkChangeEvent(networkChangeEvent);
+	}
 	
 	
 	public Set<Id> createTunnelLinks() {
