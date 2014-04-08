@@ -220,7 +220,7 @@ public class MultiModalControlerListenerTest {
 		Controler controler = new Controler(scenario);
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(1);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 		
 		// controler listener that initializes the multi-modal simulation
