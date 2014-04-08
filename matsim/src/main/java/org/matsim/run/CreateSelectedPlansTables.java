@@ -183,8 +183,9 @@ public class CreateSelectedPlansTables {
 				out.write(person.getAge()+"\t");
 				out.write(person.getLicense()+"\t");
 				out.write(person.getCarAvail()+"\t");
-				out.write((person.isEmployed() ? "yes" : "no")+"\t");
-
+				if (person.isEmployed() != null)
+					out.write((person.isEmployed() ? "yes" : "no"));
+				out.write("\t");
 
 				Plan selectedPlan = person.getSelectedPlan();
 				PlanImpl selectedPlanImpl = (PlanImpl) selectedPlan;
