@@ -353,7 +353,7 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 		this.removalPlanSelector = planSelector;
 	}
 
-	int getMaxPlansPerAgent() {
+	final int getMaxPlansPerAgent() {
 		return this.maxPlansPerAgent ;
 	}
 

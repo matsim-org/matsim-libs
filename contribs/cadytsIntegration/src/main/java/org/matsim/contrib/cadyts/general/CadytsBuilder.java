@@ -77,6 +77,10 @@ public final class CadytsBuilder {
 		matsimCalibrator.setBruteForce(cadytsConfig.useBruteForce());
 		// I don't think this has an influence on any of the variants we are using. (Has an influence only when plan choice is left
 		// completely to cadyts, rather than just taking the score offsets.) kai, dec'13
+		// More formally, one would need to use the selectPlan() method of AnalyticalCalibrator which we are, however, not using. kai, mar'14
+		if ( matsimCalibrator.getBruteForce() ) {
+			log.warn("setting bruteForce==true for calibrator, but this won't do anything in the way the cadyts matsim integration is set up. kai, mar'14") ;
+		}
 		
 		matsimCalibrator.setStatisticsFile(config.controler().getOutputDirectory() + "/calibration-stats.txt");
 		
@@ -97,12 +101,18 @@ public final class CadytsBuilder {
 		//add counts data into calibrator
 		int numberOfAddedMeasurements = 0 ;
 		for (Map.Entry<Id, Count> entry : occupCounts.getCounts().entrySet()) {
+			// (loop over all counting "items" (usually locations/stations)
+			
 			T item = lookUp.lookUp(entry.getKey()) ;
 			int timeBinIndex = 0 ; // starting with zero which is different from the counts file!!!
 			int startTimeOfBin_s = -1 ;
 			double count = -1 ;
 			for (Volume volume : entry.getValue().getVolumes().values()){
+				// (loop over the different time slots)
+				
 				if ( timeBinIndex%multiple == 0 ) {
+					// (i.e. first timeBinIndex belonging to given bin)
+
 					startTimeOfBin_s = (volume.getHourOfDayStartingWithOne()-1)*3600 ;
 					count = 0 ;
 				}
@@ -110,6 +120,8 @@ public final class CadytsBuilder {
 				if ( ! ( (timeBinIndex%multiple) == (multiple-1) ) ) {
 					log.warn( " NOT adding measurement: timeBinIndex: " + timeBinIndex + "; multiple: " + multiple ) ;
 				} else {
+					// (i.e. last timeBinIndex belonging to given bin)
+					
 					int endTimeOfBin_s   = volume.getHourOfDayStartingWithOne()*3600 - 1 ;
 					if ( !( cadytsConfig.getStartTime() <= startTimeOfBin_s && endTimeOfBin_s <= cadytsConfig.getEndTime()) ) {
 						log.warn( " NOT adding measurement: cadytsConfigStartTime: " + cadytsConfig.getStartTime() + "; startTimeOfBin_s: " + startTimeOfBin_s +

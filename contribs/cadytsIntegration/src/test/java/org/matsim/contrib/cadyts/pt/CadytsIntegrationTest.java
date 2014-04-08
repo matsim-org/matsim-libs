@@ -146,7 +146,7 @@ public class CadytsIntegrationTest {
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-				 final CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario, cContext);
+				 final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(scenario, cContext);
 				 planSelector.setCadytsWeight(0.) ;
 				 // weight 0 is correct: this is only in order to use getCalibrator().addToDemand.
 				 // would certainly be cleaner (and less confusing) to write a separate method for this.  (But how?)
@@ -424,7 +424,7 @@ public class CadytsIntegrationTest {
 	public final void testCalibrationTwo() throws IOException {
 		// yyyy I cannot fully certify that this test is doing something reasonable, since simCountComparisonOccupancy.txt and 
 		// cadytsSimCountComparisonOccupancy.txt are returning different results.  kai, feb'13
-		// There is a comment in CadytsContext that the "cadyts" version may be wrong for time bins different from one your. kai, dec'13
+		// There is a comment in CadytsContext that the "cadyts" version may be wrong for time bins different from one hour. kai, dec'13
 		
 		final double beta = 30. ;
 		final int lastIteration = 20 ;
@@ -452,24 +452,12 @@ public class CadytsIntegrationTest {
 		
 		final Controler controler = new Controler(config);
 		final CadytsPtContext context = new CadytsPtContext( config, controler.getEvents()  ) ;
-//		final CadytsContextI<TransitStopFacility> context = new CadytsContextI<TransitStopFacility>() {
-//			@Override
-//			public AnalyticalCalibrator<TransitStopFacility> getCalibrator() {
-//				// TODO Auto-generated method stub
-//				throw new RuntimeException("not implemented") ;
-//			}
-//			@Override
-//			public PlansTranslator<TransitStopFacility> getPlansTranslator() {
-//				// TODO Auto-generated method stub
-//				throw new RuntimeException("not implemented") ;
-//			} 
-//		} ;
 		controler.addControlerListener(context) ;
 		controler.setOverwriteFiles(true);
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				final CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario2, context);
+				final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(scenario2, context);
 				planSelector.setCadytsWeight(beta*30.) ;
 				return new PlanStrategyImpl(planSelector);
 			}} ) ;

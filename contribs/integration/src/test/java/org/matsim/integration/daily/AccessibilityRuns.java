@@ -73,6 +73,8 @@ public class AccessibilityRuns {
 	public void doAccessibilityTest() {
 		String gnuplotDirectory = "C:/cygwin64/bin/";
 		String integrationContribRoot = "D:/Workspace/contrib/integration/";
+		// yyyy absolute pathnames in core or contrib are not an option.  You need to
+		// find an alternative solution. kai, apr'14
 		
 		Config config = ConfigUtils.createConfig() ;
 

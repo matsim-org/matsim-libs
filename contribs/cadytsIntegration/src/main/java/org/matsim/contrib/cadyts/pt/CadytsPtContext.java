@@ -256,12 +256,14 @@ CadytsContextI<TransitStopFacility> {
 		controler.stopwatch.endOperation("compare with pt counts");
 	}
 
+	@Override
 	public AnalyticalCalibrator<TransitStopFacility> getCalibrator() {
-		return (AnalyticalCalibrator<TransitStopFacility>) calibrator;
+		return calibrator;
 	}
 
+	@Override
 	public PlansTranslator<TransitStopFacility> getPlansTranslator() {
-		return (PlansTranslator<TransitStopFacility>) ptStep;
+		return ptStep;
 	}
 
 }
