@@ -41,10 +41,10 @@ import playground.ikaddoura.internalizationCar.MarginalCostPricingCarHandler;
  */
 public class MarginalCongestionEventsWriter {
 
-	static String configFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/internalization_4/output_config.xml.gz";
-	static String networkFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/internalization_4/output_network.xml.gz";
-	static String inputEventsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/internalization_4/ITERS/it.100/100.events.xml.gz";
-	static String outputEventsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/internalization_4/ITERS/it.100/100.eventsCongestionPrices.xml.gz";
+	static String configFile = "../../runs-svn/berlin_internalizationCar/output/internalization_4/output_config.xml.gz";
+	static String networkFile = "../../runs-svn/berlin_internalizationCar/output/internalization_4/output_network.xml.gz";
+	static String inputEventsFile = "../../runs-svn/berlin_internalizationCar/output/internalization_4/ITERS/it.100/100.events.xml.gz";
+	static String outputEventsFile = "../../runs-svn/berlin_internalizationCar/output/internalization_4/ITERS/it.100/100.eventsCongestionPrices.xml.gz";
 	
 	public static void main(String[] args) {
 		MarginalCongestionEventsWriter anaMain = new MarginalCongestionEventsWriter();
