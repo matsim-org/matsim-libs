@@ -69,9 +69,10 @@ public class WithindayListener implements StartupListener {
 	public void notifyStartup(StartupEvent event) {
 		log.info("doing within day replanning ...");
 		// initialze within-day module
-		this.withinDayControlerListener.notifyStartup(event);		
-		this.initWithinDayReplanning(this.scenario);
+		this.withinDayControlerListener.notifyStartup(event);	
 		this.addNetworkChange(event.getControler(), links);
+		this.initWithinDayReplanning(this.scenario);
+		
 	}
 	
 	private void initWithinDayReplanning(Scenario scenario) {		
