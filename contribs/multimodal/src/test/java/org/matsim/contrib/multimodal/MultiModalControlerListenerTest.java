@@ -238,18 +238,18 @@ public class MultiModalControlerListenerTest {
 		int walkCount = linkModeChecker.leftCountPerMode.get(TransportMode.walk);
 		Assert.assertEquals(
 				"unexpected number of link leave events for mode car with number of threads "+numberOfThreads,
-				511937, carCount);
+				513445, carCount);
 		Assert.assertEquals(
 				"unexpected number of link leave events for mode bike with number of threads "+numberOfThreads,
 				4577, bikeCount);
 		Assert.assertEquals(
 				"unexpected number of link leave events for mode walk with number of threads "+numberOfThreads,
-				5407, walkCount);
+				5834, walkCount);
 		
 		// check the total number of link left events
 		Assert.assertEquals(
 				"unexpected total number of link leave events with number of threads "+numberOfThreads,
-				521921, linkModeChecker.linkLeftCount);
+				523856, linkModeChecker.linkLeftCount);
 		
 		// check the total mode travel times
 		double carTravelTime = linkModeChecker.travelTimesPerMode.get(TransportMode.car);
@@ -257,13 +257,13 @@ public class MultiModalControlerListenerTest {
 		double walkTravelTime = linkModeChecker.travelTimesPerMode.get(TransportMode.walk);
 		Assert.assertEquals(
 				"unexpected total travel time for car mode with number of threads "+numberOfThreads,
-				5.6674539E7, carTravelTime, MatsimTestUtils.EPSILON);
+				5.7263255E7, carTravelTime, MatsimTestUtils.EPSILON);
 		Assert.assertEquals(
 				"unexpected total travel time for bike mode with number of threads "+numberOfThreads,
 				480275.0, bikeTravelTime, MatsimTestUtils.EPSILON);
 		Assert.assertEquals(
 				"unexpected total travel time for walk mode with number of threads "+numberOfThreads,
-				3150472.0, walkTravelTime, MatsimTestUtils.EPSILON);
+				3259757.0, walkTravelTime, MatsimTestUtils.EPSILON);
 	}
 	
 	private Person createPerson(Scenario scenario, String id, String mode) {
