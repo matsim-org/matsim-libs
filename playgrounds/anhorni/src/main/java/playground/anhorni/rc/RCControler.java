@@ -31,7 +31,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
@@ -46,8 +48,9 @@ public class RCControler extends Controler {
 		controler.setOverwriteFiles(true);
 		controler.setScoringFunctionFactory(new RCScoringFunctionFactory(
 				controler.getConfig().planCalcScore(), controler.getScenario()));
-		
+			
 		if (Boolean.parseBoolean(controler.getConfig().findParam("rc", "withinday"))) {
+			((NetworkFactoryImpl)controler.getNetwork().getFactory()).setLinkFactory(new TimeVariantLinkFactory());
 			Set<Id> links = controler.createTunnelLinks();
 			controler.addControlerListener(new WithindayListener(controler, links));
 			controler.addNetworkChange(controler, links);
