@@ -46,7 +46,6 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriverAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.router.util.TravelTime;
@@ -171,35 +170,6 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 		// (NetsimEngine like).
 		// The problem is that currently only the NetsimEngine can do that.
 		final QVehicle vehicle = getVehicle( vehicleId );
-
-		// Treat the situation where startLink == endLink.
-		// Transit vehicles do this differently than others, because there could be a stop on it.
-		// Other vehicles _do not_ traverse their only link but arrive right away.
-		if ( ! (agent instanceof AbstractTransitDriverAgent) ) { 	
-			if (linkId.equals(agent.getDestinationLinkId())) {
-				if ( agent.chooseNextLinkId() == null ) {
-					if ( log.isTraceEnabled() ) {
-						log.info( "handling case startLink == endLink for agent "+agent );
-					}
-					assert vehicle.getDriver() == null;
-					// do NOT do that! the agent is NOT removed from the vehicle after it!
-                    //vehicle.setDriver(agent);
-                    //agent.setVehicle(vehicle);
-
-					// the QNetsimEngine does not bother to generate an event...
-					//final EventsManager eventsManager = internalInterface.getMobsim().getEventsManager();
-					//eventsManager.processEvent(
-					//		new PersonEntersVehicleEvent(
-					//			now,
-					//			agent.getId(),
-					//			vehicleId) );
-
-					magent.endLegAndComputeNextState(now) ;
-					this.internalInterface.arrangeNextAgentState(magent) ;
-					return true;
-				}
-			}
-		}		
 
 		if (vehicle == null) {
 			throw new RuntimeException( "TODO" );
