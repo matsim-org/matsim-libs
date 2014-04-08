@@ -19,9 +19,9 @@
 
 package playground.anhorni.rc;
 
-import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
@@ -43,9 +43,11 @@ public class WithindayListener implements StartupListener {
 	
 	protected Scenario scenario;
 	protected WithinDayControlerListener withinDayControlerListener;
-	
+	private Set<Id> links;
+	private static final Logger log = Logger.getLogger(WithindayListener.class);
 
-	public WithindayListener(Controler controler) {
+	public WithindayListener(Controler controler, Set<Id> links) {
+		this.links = links;
 		
 		this.scenario = controler.getScenario();
 		this.withinDayControlerListener = new WithinDayControlerListener();
@@ -60,7 +62,7 @@ public class WithindayListener implements StartupListener {
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		
+		log.info("doing within day replanning ...");
 		// initialze within-day module
 		this.withinDayControlerListener.notifyStartup(event);		
 		this.initWithinDayReplanning(this.scenario);
@@ -73,9 +75,7 @@ public class WithindayListener implements StartupListener {
 		
 		LeaveLinkIdentifierFactory duringLegIdentifierFactory = new LeaveLinkIdentifierFactory(withinDayControlerListener.getLinkReplanningMap(),
 				withinDayControlerListener.getMobsimDataProvider());
-		
-		Set<Id> links = new HashSet<Id>();
-		
+				
 		LinkFilterFactory linkFilter = new LinkFilterFactory(links, withinDayControlerListener.getMobsimDataProvider());
 		duringLegIdentifierFactory.addAgentFilterFactory(linkFilter);
 		

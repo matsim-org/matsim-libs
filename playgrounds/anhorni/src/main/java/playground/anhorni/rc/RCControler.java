@@ -20,7 +20,16 @@
 package playground.anhorni.rc;
 
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
+
 
 public class RCControler extends Controler {
 					
@@ -34,9 +43,35 @@ public class RCControler extends Controler {
 		controler.setScoringFunctionFactory(new RCScoringFunctionFactory(
 				controler.getConfig().planCalcScore(), controler.getScenario()));
 		
-		controler.addControlerListener(new WithindayListener(controler));
-		
+		if (Boolean.parseBoolean(controler.getConfig().findParam("rc", "withinday"))) {
+			Set<Id> links = controler.createTunnelLinks();
+			controler.addControlerListener(new WithindayListener(controler, links));
+		}		
     	controler.run();
     }
+	
+	
+	public Set<Id> createTunnelLinks() {
+		Set<Id> links = new HashSet<Id>();
+		String tunnellinksfile = this.config.findParam("rc", "tunnellinksfile");
+		
+		 try {
+	          final BufferedReader in = new BufferedReader(new FileReader(tunnellinksfile));
+	          
+	          int cnt = 0;
+	          String curr_line = in.readLine(); // Skip header
+	          while ((curr_line = in.readLine()) != null) {
+	        	  links.add(new IdImpl(curr_line));
+		          cnt++;
+	          }
+	          in.close();
+	          log.info("added " + cnt + " links");
+	          
+	        } // end try
+	        catch (IOException e) {
+	        	e.printStackTrace();
+	        }			
+		return links;
+	}
 	
 }
