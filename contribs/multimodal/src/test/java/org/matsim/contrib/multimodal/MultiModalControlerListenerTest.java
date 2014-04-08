@@ -220,7 +220,7 @@ public class MultiModalControlerListenerTest {
 		Controler controler = new Controler(scenario);
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(1);
 		controler.setOverwriteFiles(true);
 		
 		// controler listener that initializes the multi-modal simulation
@@ -236,20 +236,34 @@ public class MultiModalControlerListenerTest {
 		int carCount = linkModeChecker.leftCountPerMode.get(TransportMode.car);
 		int bikeCount = linkModeChecker.leftCountPerMode.get(TransportMode.bike);
 		int walkCount = linkModeChecker.leftCountPerMode.get(TransportMode.walk);
-		Assert.assertEquals(511937, carCount);
-		Assert.assertEquals(4577, bikeCount);
-		Assert.assertEquals(5407, walkCount);
+		Assert.assertEquals(
+				"unexpected number of link leave events for mode car with number of threads "+numberOfThreads,
+				511937, carCount);
+		Assert.assertEquals(
+				"unexpected number of link leave events for mode bike with number of threads "+numberOfThreads,
+				4577, bikeCount);
+		Assert.assertEquals(
+				"unexpected number of link leave events for mode walk with number of threads "+numberOfThreads,
+				5407, walkCount);
 		
 		// check the total number of link left events
-		Assert.assertEquals(521921, linkModeChecker.linkLeftCount);
+		Assert.assertEquals(
+				"unexpected total number of link leave events with number of threads "+numberOfThreads,
+				521921, linkModeChecker.linkLeftCount);
 		
 		// check the total mode travel times
 		double carTravelTime = linkModeChecker.travelTimesPerMode.get(TransportMode.car);
 		double bikeTravelTime = linkModeChecker.travelTimesPerMode.get(TransportMode.bike);
 		double walkTravelTime = linkModeChecker.travelTimesPerMode.get(TransportMode.walk);
-		Assert.assertEquals(5.6674539E7, carTravelTime, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(480275.0, bikeTravelTime, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(3150472.0, walkTravelTime, MatsimTestUtils.EPSILON);
+		Assert.assertEquals(
+				"unexpected total travel time for car mode with number of threads "+numberOfThreads,
+				5.6674539E7, carTravelTime, MatsimTestUtils.EPSILON);
+		Assert.assertEquals(
+				"unexpected total travel time for bike mode with number of threads "+numberOfThreads,
+				480275.0, bikeTravelTime, MatsimTestUtils.EPSILON);
+		Assert.assertEquals(
+				"unexpected total travel time for walk mode with number of threads "+numberOfThreads,
+				3150472.0, walkTravelTime, MatsimTestUtils.EPSILON);
 	}
 	
 	private Person createPerson(Scenario scenario, String id, String mode) {
