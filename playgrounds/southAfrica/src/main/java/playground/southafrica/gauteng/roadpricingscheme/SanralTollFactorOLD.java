@@ -41,10 +41,10 @@ public  class SanralTollFactorOLD implements TollFactorI {
 
 		if (id < carStartId + (carEndId - carStartId)*TagPenetration.CAR) { 
 			/* It is a private vehicle with a tag. */
-			return SanralTollVehicleType.carWithTag ;
+			return SanralTollVehicleType.privateClassAWithTag ;
 		} else if (id <= carEndId) {
 			/* It is a private car without a tag. */
-			return SanralTollVehicleType.carWithoutTag ;
+			return SanralTollVehicleType.privateClassAWithoutTag ;
 		} else if (id < comStartId + fractionClassB*((comEndId - comStartId)*TagPenetration.COMMERCIAL)){
 			/* It is a Class B commercial vehicle with a tag. */
 			return SanralTollVehicleType.commercialClassBWithTag ;
@@ -104,10 +104,10 @@ public  class SanralTollFactorOLD implements TollFactorI {
 		}
 		
 		switch( typeOf( vehicleId) ) {
-		case carWithTag:
+		case privateClassAWithTag:
 			tagDiscount = 0.25;
 			break ;
-		case carWithoutTag:
+		case privateClassAWithoutTag:
 			// nothing
 			break ;
 		case commercialClassBWithTag:

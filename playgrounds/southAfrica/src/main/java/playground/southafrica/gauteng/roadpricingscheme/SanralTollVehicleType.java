@@ -1,6 +1,6 @@
 package playground.southafrica.gauteng.roadpricingscheme;
 
-public enum SanralTollVehicleType { carWithTag, carWithoutTag,  
+public enum SanralTollVehicleType { privateClassAWithTag, privateClassAWithoutTag,  
 commercialClassAWithTag, commercialClassAWithoutTag,
 commercialClassBWithTag, commercialClassBWithoutTag,
 commercialClassCWithTag, commercialClassCWithoutTag,

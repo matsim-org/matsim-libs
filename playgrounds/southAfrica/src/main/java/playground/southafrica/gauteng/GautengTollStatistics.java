@@ -162,8 +162,8 @@ public class GautengTollStatistics implements EventHandler, PersonMoneyEventHand
 	public static SimplifiedType simplifiedTypeOf(SanralTollVehicleType agentType) {
 		SimplifiedType sType = null ;
 		switch ( agentType ) {
-		case carWithoutTag:
-		case carWithTag:
+		case privateClassAWithoutTag:
+		case privateClassAWithTag:
 		case commercialClassAWithTag:
 		case commercialClassAWithoutTag:
 			sType = SimplifiedType.privateCar ; break ;

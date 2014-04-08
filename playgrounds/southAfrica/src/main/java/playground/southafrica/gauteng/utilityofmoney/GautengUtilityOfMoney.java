@@ -146,8 +146,8 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 	private double getValueOfTime_hr_OLD(SanralTollVehicleType vehicleType) {
 		double valueOfTime_hr = baseValueOfTime_h ;
 		switch( vehicleType ) {
-		case carWithTag:
-		case carWithoutTag:
+		case privateClassAWithTag:
+		case privateClassAWithoutTag:
 			break ;
 		case commercialClassBWithTag:
 		case commercialClassBWithoutTag:

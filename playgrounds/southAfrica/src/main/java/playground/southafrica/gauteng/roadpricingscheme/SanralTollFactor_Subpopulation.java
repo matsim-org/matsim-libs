@@ -36,6 +36,9 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 
 	private Scenario sc;
 	
+	public static enum TollVehicleType { A1, A2, B, C} ;
+	public static enum SubPopType{ PRIVATE, COMMERCIAL, EXT } ; 
+	
 	
 	public SanralTollFactor_Subpopulation(Scenario scenario) {
 		this.sc = scenario;
@@ -50,10 +53,9 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 		double sizeFactor = 1.00;
 		
 		/* Determine the presence of an eTag from vehicle attributes. */  
-		Object o1 = sc.getVehicles().getVehicleAttributes().getAttribute(vehicleId.toString(), E_TAG_ATTRIBUTE_NAME);
-		if (o1 instanceof Boolean) {
-			tagDiscount = ((Boolean)o1) ? 0.483 : 0.00;
-		}
+		if ( hasETag(vehicleId) ) {
+			tagDiscount = 0.483 ;
+		} 
 		
 		/* Determine toll class from vehicle type. */
 		VehicleType type = sc.getVehicles().getVehicles().get(vehicleId).getType();
@@ -70,14 +72,21 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 		/* Determine public transit status from vehicle Id. Currently (Jan '14)
 		 * the subpopulations, including bus and taxi, has a prefix in its
 		 * vehicle Id. */
-		if(vehicleId.toString().startsWith("bus") || 
-		   vehicleId.toString().startsWith("taxi")){
+		if(isPt(vehicleId)){
 			ptDiscount = 1.0;
 		}
 		
 		return getDiscountEligibility(linkId) ? sizeFactor*(1 - Math.min(1.0, timeDiscount + tagDiscount + ptDiscount)) : sizeFactor;		
 	}
-	
+
+
+	@SuppressWarnings("static-method") // may become truly non-static later. kai, mar'14
+	public boolean isPt(final Id vehicleId) {
+		return vehicleId.toString().startsWith("bus") || 
+		   vehicleId.toString().startsWith("taxi");
+	}
+
+
 	
 	/**
 	 * Updated 2014/02/07 (jwjoubert).
@@ -162,55 +171,38 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 			return tollVehicleTypes.get(idObj) ;
 		}
 		
-		/* Check subpopulation. */
 		Assert.assertNotNull(this.sc);
 		Assert.assertNotNull(this.sc.getPopulation());
 		Assert.assertNotNull(this.sc.getPopulation().getPersonAttributes());
 		Assert.assertNotNull( idObj ) ;
 		Assert.assertNotNull( sc.getConfig() );
 		Assert.assertNotNull( sc.getConfig().plans() );
-		Object o1 = this.sc.getPopulation().getPersonAttributes().getAttribute(idObj.toString(), sc.getConfig().plans().getSubpopulationAttributeName());
-		String subpopulation;
-		if(o1 instanceof String){
-			subpopulation = (String)o1;
-		} else{
-			throw new RuntimeException("Expected a subppulation description of type `String', but it was `" + o1.getClass().toString() + "'. Returning NULL");
-		}
+
+		/* Check subpopulation. */
+		String subpopulation = getSubPopTypeFromPersonID(idObj);
 		
 		/* Check vehicle type. */
-		Object o2 = this.sc.getPopulation().getPersonAttributes().getAttribute(idObj.toString(), VEH_TOLL_CLASS_ATTRIB_NAME);
-		String vehicleType;
-		if(o2 instanceof String){
-			vehicleType = (String)o2;
-		} else{
-			throw new RuntimeException("Expected a vehicle type description of type `String', but it was `" + o2.getClass().toString() + "'. Returning NULL");
-		}
+		TollVehicleType vehicleType = getTollVehicleTypeFromPersonID(idObj);
 		
 		/* Check availability of eTag. */
-		Object o3 = this.sc.getPopulation().getPersonAttributes().getAttribute(idObj.toString(), E_TAG_ATTRIBUTE_NAME);
-		Boolean tag = false;
-		if(o3 instanceof Boolean){
-			tag = (Boolean)o3;
-		} else{
-			throw new RuntimeException("Expected an eTag availability of type `Boolean', but it was `" + o3.getClass().toString() + "'. Returning NULL");
-		}
+		Boolean tag = hasETag(idObj);
 	
 		/* Identify correct vehicle type. */
 		if(subpopulation.equalsIgnoreCase("car")){
-			final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.carWithTag : SanralTollVehicleType.carWithoutTag;
+			final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.privateClassAWithTag : SanralTollVehicleType.privateClassAWithoutTag;
 			tollVehicleTypes.put( idObj, tvType ) ;
 			return tvType;
 
 		} else if(subpopulation.equalsIgnoreCase("commercial")){
-			if(vehicleType.equalsIgnoreCase("A2")){
+			if(vehicleType==TollVehicleType.A2){
 				final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.commercialClassAWithTag : SanralTollVehicleType.commercialClassAWithoutTag;
 				tollVehicleTypes.put( idObj, tvType ) ;
 				return tvType;
-			} else if(vehicleType.equalsIgnoreCase("B")){
+			} else if(vehicleType==TollVehicleType.B){
 				final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.commercialClassBWithTag : SanralTollVehicleType.commercialClassBWithoutTag;
 				tollVehicleTypes.put( idObj, tvType ) ;
 				return tvType;
-			} else if(vehicleType.equalsIgnoreCase("C")){
+			} else if(vehicleType==TollVehicleType.C ){
 				final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.commercialClassCWithTag : SanralTollVehicleType.commercialClassCWithoutTag;
 				tollVehicleTypes.put( idObj, tvType ) ;
 				return tvType;
@@ -236,6 +228,44 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 		} else{
 			throw new RuntimeException("Unknown subpopulation type " + subpopulation);
 		}
+	}
+
+
+	private String getSubPopTypeFromPersonID(Id personId) {
+		Object o1 = this.sc.getPopulation().getPersonAttributes().getAttribute(personId.toString(), sc.getConfig().plans().getSubpopulationAttributeName());
+		String subpopulation;
+		if(o1 instanceof String){
+			subpopulation = (String)o1;
+		} else{
+			throw new RuntimeException("Expected a subppulation description of type `String', but it was `" + o1.getClass().toString() + "'. Returning NULL");
+		}
+		return subpopulation;
+	}
+
+
+	private Boolean hasETag(Id personId) {
+		Object o3 = this.sc.getPopulation().getPersonAttributes().getAttribute(personId.toString(), E_TAG_ATTRIBUTE_NAME);
+		Boolean tag = false;
+		if(o3 instanceof Boolean){
+			tag = (Boolean)o3;
+		} else{
+			throw new RuntimeException("Expected an eTag availability of type `Boolean', but it was `" + o3.getClass().toString() + "'. Returning NULL");
+		}
+		return tag;
+	}
+
+
+	private TollVehicleType getTollVehicleTypeFromPersonID(Id personId) {
+		// yyyyyy based on personId, not good!
+		
+		Object o2 = this.sc.getPopulation().getPersonAttributes().getAttribute(personId.toString(), VEH_TOLL_CLASS_ATTRIB_NAME);
+		String vehicleType;
+		if(o2 instanceof String){
+			vehicleType = (String)o2;
+		} else{
+			throw new RuntimeException("Expected a vehicle type description of type `String', but it was `" + o2.getClass().toString() + "'. Returning NULL");
+		}
+		return TollVehicleType.valueOf(vehicleType);
 	}
 
 }
