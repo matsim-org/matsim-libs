@@ -50,9 +50,9 @@ public class RCControler extends Controler {
 				controler.getConfig().planCalcScore(), controler.getScenario()));
 			
 		if (Boolean.parseBoolean(controler.getConfig().findParam("rc", "withinday"))) {
-			((NetworkFactoryImpl)controler.getNetwork().getFactory()).setLinkFactory(new TimeVariantLinkFactory());
+			//((NetworkFactoryImpl)controler.getNetwork().getFactory()).setLinkFactory(new TimeVariantLinkFactory());
 			Set<Id> links = controler.createTunnelLinks();
-			//controler.addControlerListener(new WithindayListener(controler, links));
+			controler.addControlerListener(new WithindayListener(controler, links));
 		}		
     	controler.run();
     }
