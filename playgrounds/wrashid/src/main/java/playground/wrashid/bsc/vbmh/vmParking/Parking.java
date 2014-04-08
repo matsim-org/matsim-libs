@@ -40,6 +40,8 @@ public class Parking {
 	public LinkedList <ParkingSpot> spots;
 	public LinkedList <ParkingSpot> evSpots;
 	public LinkedList <ParkingSpot> nevSpots;
+	public boolean ocupancyStats = false;
+	private LinkedList<Double[]> occupancyList;
 ///*
 	@XmlTransient
 	public Coord getCoordinate(){
@@ -158,15 +160,17 @@ public class Parking {
 		} else{
 			this.occupancyNEVSpots++;
 		}
+		this.addStatValue(time);
 	}
 	
-	public void leaveSpot(ParkingSpot parkingSpot){
+	public void leaveSpot(ParkingSpot parkingSpot, double time){
 		parkingSpot.setOccupied(false);
 		if(parkingSpot.charge){
 			this.occupancyEVSpots--;
 		} else{
 			this.occupancyNEVSpots--;
 		}
+		this.addStatValue(time);
 	}
 	
 	
@@ -187,7 +191,9 @@ public class Parking {
 		String facilityId = this.facilityId;
 		String facilityActType = this.facilityActType;
 		if(this.type.equals("public")){
-			facilityActType="Street";
+			if(!this.facilityActType.equals("parkingLot")){
+				facilityActType="Street";
+			}
 			facilityId="Street";
 		}
 		
@@ -205,6 +211,16 @@ public class Parking {
 		list.add(Double.toString(this.chargingRate));
 		return list;
 	}
+
+	public void setOcupancyStats(boolean ocupancyStats) {
+		this.ocupancyStats = ocupancyStats;
+		this.occupancyList = new LinkedList<Double[]>();
+	}
 	
+	private void addStatValue(double time){
+		if(this.ocupancyStats){
+			this.occupancyList.add(new Double[]{time, this.occupancyEVSpots*1.0/this.capacityEV, this.occupancyNEVSpots*1.0/this.capacityNEV});
+		}
+	}
 	
 }

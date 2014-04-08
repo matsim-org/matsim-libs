@@ -478,7 +478,7 @@ public class ParkControl {
 				wasOccupied = true;
 			}
 			//selectedSpot.setOccupied(false); //Platz freigeben
-			selectedSpot.parking.leaveSpot(selectedSpot);
+			selectedSpot.parking.leaveSpot(selectedSpot, time);
 			load.put(selectedSpot.parking.id, load.get(selectedSpot.parking.id)-1);
 			
 			
@@ -588,6 +588,12 @@ public class ParkControl {
 		}
 		//--
 		
+		
+		//statistik
+		
+		
+		//---
+		
 		return 1;
 	}
 
@@ -598,6 +604,7 @@ public class ParkControl {
 		System.out.println("Nicht geparkt:" + Double.toString(this.countNotParked));
 		System.out.println("EVs auf EV Spots geparkt:" + this.countEVParkedOnEVSpot);
 		
+		/*
 		String filename = controller.getConfig().getModule("controler").getValue("outputDirectory")+"/Charts/Parkplatzauswahl_"+controller.getIterationNumber()+".png";
 		XYScatterChart chart = new XYScatterChart("Parkplatzauswahl", "Time", "available Spots");
 		double[] time = new double[availableParkingStat.size()];
@@ -610,6 +617,7 @@ public class ParkControl {
 		}
 		chart.addSeries("anzahl", time, availableParkings);
 		chart.saveAsPng(filename, 800, 600);
+		*/
 		
 		CSVWriter csvWriter = new CSVWriter(controller.getConfig().getModule("controler").getValue("outputDirectory")+"/parkhistory/peakload_"+controller.getIterationNumber());
 		LinkedList<LinkedList<String>> peakLoadOutput = new LinkedList<LinkedList<String>>();
