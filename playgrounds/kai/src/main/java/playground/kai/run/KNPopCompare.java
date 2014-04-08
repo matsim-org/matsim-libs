@@ -18,8 +18,12 @@
  * *********************************************************************** */
 package playground.kai.run;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -29,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
+import org.matsim.contrib.analysis.kai.DataMap;
 import org.matsim.contrib.analysis.kai.KNAnalysisEventsHandler;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -37,9 +42,9 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.FacilitiesUtils;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author nagel
@@ -47,16 +52,34 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class KNPopCompare {
 
+	// statistics types:
+	private static enum StatType { ttime1, ttime2, ttimeDiff, money1, money2, moneyDiff } ;
+	// container that contains the statistics containers:
+	final Map<StatType,DataMap<String>> sumsContainer = new TreeMap<StatType,DataMap<String>>() ;
+	final Map<StatType,DataMap<String>> cntsContainer = new TreeMap<StatType,DataMap<String>>() ;
+
 	public static void main(String[] args) {
+		if ( args.length != 4 ) {
+			System.out.println( "arg[0]: plans_base");
+			System.out.println( "arg[1]: plans_policy");
+			System.out.println( "arg[2]: extendedPersonAttribs_base");
+			System.out.println( "arg[3]: extendedPersonAttribs_policy");
+			System.exit(-1) ;
+		}
+		
+		new KNPopCompare().run( args ) ;
+	}
+		
+	private void run( String[] args ) {
 
 		Config config = ConfigUtils.createConfig();
 		Population pop1 ;
 		ActivityFacilitiesFactory ff ;
 		{
 			config.plans().setInputFile(args[0]);
-//			if ( args.length>2 && args[2]!=null && args[2]!="" ) {
-//				config.network().setInputFile(args[2]);
-//			}
+			//			if ( args.length>2 && args[2]!=null && args[2]!="" ) {
+			//				config.network().setInputFile(args[2]);
+			//			}
 			if ( args.length>2 && args[2]!=null && args[2]!="" ) {
 				Logger.getLogger(KNPopCompare.class).info("setting person attributes file to: " + args[3] ); 
 				config.plans().setInputPersonAttributeFile(args[2]);
@@ -66,10 +89,10 @@ public class KNPopCompare {
 
 			Scenario scenario1 = ScenarioUtils.loadScenario( config ) ;
 			pop1 = scenario1.getPopulation() ;
-//			network = scenario1.getNetwork() ;
+			//			network = scenario1.getNetwork() ;
 			ff = ((ScenarioImpl)scenario1).getActivityFacilities().getFactory() ;
 		}
-		
+
 		Population pop2 ;
 		{
 			Config config2 = ConfigUtils.createConfig();
@@ -83,16 +106,17 @@ public class KNPopCompare {
 			Scenario scenario1 = ScenarioUtils.loadScenario( config2 ) ;
 			pop2 = scenario1.getPopulation() ;
 		}
-
+		
 		List<SpatialGrid> spatialGrids = new ArrayList<SpatialGrid>() ;
 		ActivityFacilities homesWithScoreDifferences = FacilitiesUtils.createActivityFacilities("scoreDifferencesAtHome") ;
 		ActivityFacilities homesWithMoneyDifferences = FacilitiesUtils.createActivityFacilities("moneyDifferencesAtHome") ;
 		ActivityFacilities homesWithTtimeDifferences = FacilitiesUtils.createActivityFacilities("ttimeDifferencesAtHome") ;
 
+
 		// yy could try to first sort the person files and then align them
 		for ( Person person1 : pop1.getPersons().values() ) {
 			String subPop = (String) pop1.getPersonAttributes().getAttribute(person1.getId().toString(), config.plans().getSubpopulationAttributeName() ) ;
-			if ( subPop.equals("car") ) {
+//			if ( subPop.equals("car") ) {
 				Person person2 = pop2.getPersons().get( person1.getId() ) ;
 				if ( person2==null ) {
 					throw new RuntimeException( "did not find person in other population") ;
@@ -105,6 +129,7 @@ public class KNPopCompare {
 					fac.getCustomAttributes().put(GridUtils.WEIGHT, person2.getSelectedPlan().getScore() - person1.getSelectedPlan().getScore() ) ;
 					homesWithScoreDifferences.addActivityFacility(fac);
 				}
+				List<String> popTypes = new ArrayList<String>() ;
 				{
 					ActivityFacility fac = ff.createActivityFacility(person1.getId(), coord) ;
 					Double money1 = (Double) pop1.getPersonAttributes().getAttribute(person1.getId().toString(), KNAnalysisEventsHandler.MONEY ) ;
@@ -117,6 +142,24 @@ public class KNPopCompare {
 					}
 					fac.getCustomAttributes().put(GridUtils.WEIGHT, money2 - money1 ) ; 
 					homesWithMoneyDifferences.addActivityFacility(fac);
+
+					// to which subPopType does the agent belong?
+					popTypes.add( "zz_all" ) ; 
+					
+					final String subpopAttrName = config.plans().getSubpopulationAttributeName() ;
+					final String subpopName = KNAnalysisEventsHandler.getSubpopName( person1.getId(), pop1.getPersonAttributes(), subpopAttrName);
+					popTypes.add( "yy_" + subpopName ) ;
+
+					if ( money2!=0.) { // is a toll payer
+						popTypes.add( subpopName + "_tollPayer" ) ;
+					} else {
+						popTypes.add( subpopName + "_nonPayer") ;
+					}
+					
+					addItemToStatsContainer( StatType.money1, popTypes, money1 );
+					addItemToStatsContainer( StatType.money2, popTypes, money2 );
+					addItemToStatsContainer( StatType.moneyDiff, popTypes, money2 - money1 );
+
 				}
 				{
 					ActivityFacility fac = ff.createActivityFacility(person1.getId(), coord) ;
@@ -130,8 +173,13 @@ public class KNPopCompare {
 					}
 					fac.getCustomAttributes().put(GridUtils.WEIGHT, item2 - item1 ) ;
 					homesWithTtimeDifferences.addActivityFacility(fac);
+					
+					addItemToStatsContainer( StatType.ttime1, popTypes, item1 ) ;
+					addItemToStatsContainer( StatType.ttime2, popTypes, item2 ) ;
+					addItemToStatsContainer( StatType.ttimeDiff, popTypes, item2 - item1 ) ;
+
 				}
-			}
+//			}
 		}
 
 		final BoundingBox bbox = BoundingBox.createBoundingBox( 300000., -2.95e6, 500000., -2.7e6 );
@@ -161,8 +209,51 @@ public class KNPopCompare {
 
 		GridUtils.writeSpatialGrids(spatialGrids, "popcompare_grid.csv");
 
-
+		try {
+			BufferedWriter writer = IOUtils.getBufferedWriter("popcompare.txt") ; // the "open" trick works only with txt (and tab, I think)
+			writer.write( "#subpoptype") ;
+			for ( StatType statType : StatType.values() ) {
+				writer.write( "\t" + statType.toString() + "_sum \t" + statType.toString() + "_cnt \t" + statType.toString() + "_av" ) ;
+			}
+			writer.newLine() ;
+			for ( String popType : sumsContainer.get( StatType.ttime1).keySet() ) { // abusing ttime1 container to get the poptypes
+				writer.write( popType.toString() + ":" ) ;
+				for ( StatType statType : StatType.values() ) {
+					final DataMap<String> sumsContainer_statType = sumsContainer.get(statType);
+					Double sum ;
+					if ( sumsContainer_statType != null ) {
+						sum = sumsContainer_statType.get(popType);
+					} else {
+						throw new RuntimeException( "null: " + statType.toString() ) ;
+					}
+					final Double cnt = cntsContainer.get(statType).get(popType);
+					writer.write( "\t" + sum + "\t" + cnt + "\t" + sum/cnt ) ;
+				}
+				writer.newLine();
+			}
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
+
+	private void addItemToStatsContainer(StatType statType, List<String> popTypes, Double item) {
+		DataMap<String> sums = sumsContainer.get( statType ) ;
+		if ( sums == null ) {
+			sums = new DataMap<String>() ;
+			sumsContainer.put( statType, sums ) ;
+		}
+		DataMap<String> cnts = cntsContainer.get( statType ) ;
+		if ( cnts == null ) {
+			cnts = new DataMap<String>() ;
+			cntsContainer.put( statType, cnts ) ;
+		}
+		for ( String popType : popTypes ) {
+			sums.addValue( popType, item ) ;
+			cnts.inc( popType ) ;
+		}
+	}
+
 
 
 }

@@ -74,13 +74,14 @@ public class KNLinksCompare {
 			Link link = it.next() ;
 			String ttimeSum1 = (String) net1Attribs.getAttribute( link.getId().toString(), KNAnalysisEventsHandler.TTIME_SUM ) ;
 			String ttimeSum2 = (String) net2Attribs.getAttribute( link.getId().toString(), KNAnalysisEventsHandler.TTIME_SUM ) ;
-			double ttimeGainPerM = 0. ;
+			double ttimeDiffPerM = 0. ;
 			if ( ttimeSum1 != null && ttimeSum2 != null ) {
 				Double cnt1 = Double.valueOf( (String) net1Attribs.getAttribute( link.getId().toString(), KNAnalysisEventsHandler.CNT ) ) ;
 				Double cnt2 = Double.valueOf( (String) net2Attribs.getAttribute( link.getId().toString(), KNAnalysisEventsHandler.CNT ) ) ;
 				double ttime1 = Double.valueOf(ttimeSum1) / cnt1 ;
 				double ttime2 = Double.valueOf(ttimeSum2) / cnt2 ;
-				ttimeGainPerM = cnt2 * (ttime1 - ttime2) / link.getLength() ;
+//				ttimeDiffPerM = cnt2 * (ttime2 - ttime1) / link.getLength() ; // negative is an improvement
+				ttimeDiffPerM = (ttime2 - ttime1) / link.getLength() ; // negative is an improvement
 			} 
 			
 //			Link newLink = newNetwork.getFactory().createLink( link.getId(), link.getFromNode(), link.getToNode() ) ;
@@ -88,7 +89,7 @@ public class KNLinksCompare {
 //			newLink.setCapacity( link.getCapacity() ) ;
 //			newLink.setNumberOfLanes( link.getNumberOfLanes() );
 
-			link.setFreespeed(ttimeGainPerM);
+			link.setFreespeed(ttimeDiffPerM);
 
 //			newNetwork.addLink(newLink) ;
 
@@ -99,12 +100,12 @@ public class KNLinksCompare {
 					if ( link.getCapacity() >= 4000 ) {
 						writer = writerHi ;
 					} 
-					writer.write( link.getFromNode().getCoord().getX() + "\t" + link.getFromNode().getCoord().getY() + "\t" + Double.toString(ttimeGainPerM) + "\n" );
-					writer.write( link.getToNode().getCoord().getX() + "\t" + link.getToNode().getCoord().getY() + "\t" + Double.toString(ttimeGainPerM) + "\n\n\n" );
+					writer.write( link.getFromNode().getCoord().getX() + "\t" + link.getFromNode().getCoord().getY() + "\t" + Double.toString(ttimeDiffPerM) + "\n" );
+					writer.write( link.getToNode().getCoord().getX() + "\t" + link.getToNode().getCoord().getY() + "\t" + Double.toString(ttimeDiffPerM) + "\n\n\n" );
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			} else {
+			} else if ( link.getCapacity() < 1000. ){
 				linkIds4removal.add(link.getId()) ;
 			}
 		}
