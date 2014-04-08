@@ -34,7 +34,9 @@ public class ParkingPricingModel {
 		return price;
 	}
 	
-	
+	public double calculateParkingPrice(double duration, boolean ev, ParkingSpot spot){
+		return this.calculateParkingPrice(duration, ev);
+	}
 	
 	
 	

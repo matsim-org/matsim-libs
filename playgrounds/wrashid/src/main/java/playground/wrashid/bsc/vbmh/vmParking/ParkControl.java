@@ -295,7 +295,7 @@ public class ParkControl {
 			double evRelatedScore = 0;
 			double distance = CoordUtils.calcDistance(this.cordinate, spot.parking.getCoordinate());
 			double pricem = spot.parkingPriceM;
-			double cost = pricing.calculateParkingPrice(duration, false, (int) pricem);
+			double cost = pricing.calculateParkingPrice(duration, ev, spot);
 			//System.out.println("Cost :"+ Double.toString(cost));
 			
 			//EV Score:
@@ -460,6 +460,14 @@ public class ParkControl {
 		ParkingSpot selectedSpot = null;
 		VMScoreKeeper scorekeeper = null;
 		Person person = controller.getPopulation().getPersons().get(personId);
+		
+		ev=false;
+		if(evUsage){
+			if(evControl.hasEV(event.getPersonId())){
+				ev=true;
+			}
+		}
+		
 		Map<String, Object> personAttributes = person.getCustomAttributes();
 		if(personAttributes.get("selectedParkingspot")!=null){
 			selectedSpot = (ParkingSpot) personAttributes.get("selectedParkingspot");
@@ -478,7 +486,7 @@ public class ParkControl {
 			double duration=this.time-selectedSpot.getTimeVehicleParked(); //Parkzeit berechnen
 			//System.out.println(duration);
 			
-			double payedParking = pricing.calculateParkingPrice(duration, false, selectedSpot.parkingPriceM); // !! EV Boolean anpassen
+			double payedParking = pricing.calculateParkingPrice(duration, ev, selectedSpot); // !! EV Boolean anpassen
 			// System.out.println(payed_parking);
 			
 			//System.out.println("bezahltes Parken (Score): "+payedParking*this.betaMoney);
@@ -782,6 +790,10 @@ public class ParkControl {
 		for (Person person : controller.getPopulation().getPersons().values()){
 			person.getCustomAttributes().remove("selectedParkingspot");
 		}
+	}
+
+	public PricingModels getPricing() {
+		return pricing;
 	}
 	
 	

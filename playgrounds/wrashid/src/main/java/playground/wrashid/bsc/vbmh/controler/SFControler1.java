@@ -8,11 +8,13 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 
+import playground.wrashid.bsc.vbmh.extendedPricingModels.specialTestModel;
 import playground.wrashid.bsc.vbmh.vmEV.EVControl;
 import playground.wrashid.bsc.vbmh.vmEV.EVControlerListener;
 import playground.wrashid.bsc.vbmh.vmParking.ParkControl;
 import playground.wrashid.bsc.vbmh.vmParking.ParkControlerListener;
 import playground.wrashid.bsc.vbmh.vmParking.ParkScoringFactory;
+import playground.wrashid.bsc.vbmh.vmParking.PricingModels;
 
 
 public class SFControler1 {
@@ -76,7 +78,11 @@ public class SFControler1 {
 		ParkScoringFactory factory = new ParkScoringFactory(planCalcScoreConfigGroup, controler.getNetwork());
 		controler.setScoringFunctionFactory(factory);
 	
-		
+		//Spezialpreis Test:
+//		PricingModels pricing = parklistener.getParkHandler().getParkControl().getPricing();
+//		pricing.removeModel(0);
+//		specialTestModel testModel = new specialTestModel();
+//		pricing.add(testModel);
 		
 		
 		

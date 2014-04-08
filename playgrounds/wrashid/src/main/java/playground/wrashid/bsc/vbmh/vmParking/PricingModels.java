@@ -45,10 +45,25 @@ public class PricingModels {
 		
 	}
 	
+	public void removeModel(int modelID){
+		parkingprices.remove(get_model(modelID));
+	}
+	
+	/*
 	public double calculateParkingPrice(double duration, boolean ev,int model_id){
 		ParkingPricingModel model = get_model(model_id);
 		return model.calculateParkingPrice(duration, ev);
 	}
+	*/
+	
+	
+	public double calculateParkingPrice(double duration, boolean ev, ParkingSpot spot){
+		ParkingPricingModel model = get_model(spot.parkingPriceM);
+		return model.calculateParkingPrice(duration, ev, spot);
+	}
+	
+	
+	
 	
 	
 }
