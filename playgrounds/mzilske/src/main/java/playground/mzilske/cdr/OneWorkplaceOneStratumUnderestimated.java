@@ -1,6 +1,8 @@
 package playground.mzilske.cdr;
 
 import com.google.common.collect.ImmutableMap;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -10,8 +12,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.cadyts.car.CadytsContext;
-import org.matsim.contrib.cadyts.general.CadytsScoring;
-import org.matsim.contrib.cadyts.general.ExpBetaPlanSelectorWithCadytsPlanRegistration;
+import org.matsim.contrib.cadyts.general.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -28,15 +29,16 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.counts.CountControlerListener;
-import org.matsim.counts.CountSimComparison;
-import org.matsim.counts.Counts;
+import org.matsim.counts.*;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.mzilske.cdranalysis.StreamingOutput;
 import playground.mzilske.d4d.Sighting;
 import playground.mzilske.util.IterationSummaryFileControlerListener;
@@ -52,6 +54,7 @@ public class OneWorkplaceOneStratumUnderestimated {
     private CompareMain compareMain;
 
     public static void main(String[] args) {
+        LogManager.getRootLogger().setLevel(Level.ERROR);
         new OneWorkplaceOneStratumUnderestimated().run();
     }
 
@@ -153,8 +156,9 @@ public class OneWorkplaceOneStratumUnderestimated {
 
 
         final Config config1 = ConfigUtils.createConfig();
+        config1.strategy().setMaxAgentPlanMemorySize(100);
         config1.planCalcScore().setWriteExperiencedPlans(true);
-        config1.controler().setLastIteration(300);
+        config1.controler().setLastIteration(1000);
         config1.qsim().setFlowCapFactor(100);
         config1.qsim().setStorageCapFactor(100);
         config1.qsim().setRemoveStuckVehicles(false);
@@ -163,13 +167,6 @@ public class OneWorkplaceOneStratumUnderestimated {
         stratSets.setModuleName("ccc") ;
         stratSets.setProbability(1.) ;
         config1.strategy().addStrategySettings(stratSets) ;
-        StrategyConfigGroup.StrategySettings random = new StrategyConfigGroup.StrategySettings(new IdImpl(2));
-        random.setModuleName(PlanStrategyRegistrar.Selector.SelectRandom.toString()) ;
-        random.setProbability(0.1) ;
-        config1.strategy().addStrategySettings(random) ;
-
-
-
 
         final Map<Id, List<Sighting>> allSightings = compareMain.getSightingsPerPerson();
 
@@ -182,9 +179,19 @@ public class OneWorkplaceOneStratumUnderestimated {
 
         final Counts counts = CompareMain.volumesToCounts(scenario.getNetwork(), compareMain.getGroundTruthVolumes());
         scenario2.addScenarioElement(Counts.ELEMENT_NAME, counts);
+        final ObjectAttributes personAttributes = scenario2.getPopulation().getPersonAttributes();
 
-        Controler controler1 = new Controler(scenario2);
-        final CadytsContext cadyts = new CadytsContext(config1, counts);
+        final String CLONE_FACTOR = "cloneScore";
+        for (Person person : scenario2.getPopulation().getPersons().values()) {
+            personAttributes.putAttribute(person.getId().toString(), CLONE_FACTOR, 0.0);
+        }
+
+        final Controler controler1 = new Controler(scenario2);
+
+        final CadytsContext cadyts = new CadytsContext(config1, filterCounts(counts));
+        CadytsConfigGroup cadytsConfig = ConfigUtils.addOrGetModule(config1, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
+        cadytsConfig.setVarianceScale(0.01);
+
         controler1.addControlerListener(cadyts);
         controler1.setOverwriteFiles(true);
         controler1.addControlerListener(new IterationSummaryFileControlerListener(ImmutableMap.<String, IterationSummaryFileControlerListener.Writer>of(
@@ -226,51 +233,86 @@ public class OneWorkplaceOneStratumUnderestimated {
                 })));
         controler1.setScoringFunctionFactory(new ScoringFunctionFactory() {
             @Override
-            public ScoringFunction createNewScoringFunction(Person person) {
+            public ScoringFunction createNewScoringFunction(final Person person) {
                 SumScoringFunction sumScoringFunction = new SumScoringFunction();
                 CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config1, cadyts);
-               // scoringFunction.setWeightOfCadytsCorrection(100000000000.0);
-
-                scoringFunction.setWeightOfCadytsCorrection(10.0);
                 sumScoringFunction.addScoringFunction(scoringFunction);
+                sumScoringFunction.addScoringFunction(new SumScoringFunction.LegScoring() {
+                    boolean hasLeg = false;
+                    @Override
+                    public void finish() {}
+                    @Override
+                    public double getScore() {
+                        if (hasLeg) {
+                            final ObjectAttributes personAttributes = scenario2.getPopulation().getPersonAttributes();
+                            double cloneFactor = (Double) personAttributes.getAttribute(person.getId().toString(), CLONE_FACTOR);
+                            cadyts.demand.Plan currentPlanSteps = cadyts.getPlansTranslator().getPlanSteps(person.getSelectedPlan());
+                            double currentPlanCadytsCorrection = cadyts.getCalibrator().calcLinearPlanEffect(currentPlanSteps);
+                            cloneFactor = cloneFactor + 0.01 * currentPlanCadytsCorrection;
+                            personAttributes.putAttribute(person.getId().toString(), CLONE_FACTOR, cloneFactor);
+                            return cloneFactor;
+                        } else {
+                            return 0.0;
+                        }
+                    }
+                    @Override
+                    public void handleLeg(Leg leg) {
+                        hasLeg=true;
+                    }
+                });
                 return sumScoringFunction;
             }
         });
         controler1.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
             @Override
             public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-                ExpBetaPlanSelectorWithCadytsPlanRegistration<Link> planSelector = new ExpBetaPlanSelectorWithCadytsPlanRegistration<Link>(1.0, cadyts);
+                ExpBetaPlanChangerWithCadytsPlanRegistration<Link> planSelector = new ExpBetaPlanChangerWithCadytsPlanRegistration<Link>(1.0, cadyts);
                 return new PlanStrategyImpl(planSelector);
             }});
         controler1.setCreateGraphs(false);
+        for (Person person : scenario2.getPopulation().getPersons().values()) {
+            person.setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(person));
+        }
         controler1.run();
 
-        VolumesAnalyzer cdrVolumes = controler1.getVolumes();
+//        VolumesAnalyzer cdrVolumes = controler1.getVolumes();
+//
+//        int nSelectedClones[] = new int[3];
+//        for (Person person : scenario2.getPopulation().getPersons().values()) {
+//            Id id = person.getId();
+//            if (id.toString().startsWith("I_")) {
+//                id = new IdImpl(id.toString().substring(2));
+//                if (person.getPlans().get(0) == person.getSelectedPlan()) {
+//                    nSelectedClones[(Integer) scenario.getPopulation().getPersons().get(id).getPlans().get(0).getCustomAttributes().get("prop")]++;
+//                }
+//            }
+//            if (person.getPlans().size() == 2) {
+//                double score0 = CompareMain.calcCadytsScore(cadyts, person.getPlans().get(0));
+//                double score1 = CompareMain.calcCadytsScore(cadyts, person.getPlans().get(1));
+//                System.out.printf("%f\t%f\t%d\n", score0, score1, scenario.getPopulation().getPersons().get(id).getPlans().get(0).getCustomAttributes().get("prop"));
+//            } else {
+//                double score0 = CompareMain.calcCadytsScore(cadyts, person.getPlans().get(0));
+//                System.out.printf("%f\t\t%d\n", score0, scenario.getPopulation().getPersons().get(id).getPlans().get(0).getCustomAttributes().get("prop"));
+//            }
+//        }
+//        System.out.printf("%f\t%f\t%f\n",
+//                CompareMain.compareAllDay(scenario, cdrVolumes, compareMain.getGroundTruthVolumes()),
+//                CompareMain.compareTimebins(scenario, cdrVolumes, compareMain.getGroundTruthVolumes()),
+//                CompareMain.compareEMDMassPerLink(scenario, cdrVolumes, compareMain.getGroundTruthVolumes()));
+//        System.out.println(nSelectedClones[0] + " " + nSelectedClones[1] + " "+ nSelectedClones[2]);
 
-        int nSelectedClones[] = new int[3];
-        for (Person person : scenario2.getPopulation().getPersons().values()) {
-            Id id = person.getId();
-            if (id.toString().startsWith("I_")) {
-                id = new IdImpl(id.toString().substring(2));
-                if (person.getPlans().get(0) == person.getSelectedPlan()) {
-                    nSelectedClones[(Integer) scenario.getPopulation().getPersons().get(id).getPlans().get(0).getCustomAttributes().get("prop")]++;
-                }
+    }
+
+    private Counts filterCounts(Counts counts) {
+        Counts result = new Counts();
+        for (Count count : counts.getCounts().values()) {
+            Count newCount = result.createAndAddCount(count.getLocId(), count.getCsId());
+            for (Volume volume : count.getVolumes().values()) {
+                newCount.createVolume(volume.getHourOfDayStartingWithOne(), volume.getValue());
             }
-            if (person.getPlans().size() == 2) {
-                double score0 = CompareMain.calcCadytsScore(cadyts, person.getPlans().get(0));
-                double score1 = CompareMain.calcCadytsScore(cadyts, person.getPlans().get(1));
-                System.out.printf("%f\t%f\t%d\n", score0, score1, scenario.getPopulation().getPersons().get(id).getPlans().get(0).getCustomAttributes().get("prop"));
-            } else {
-                double score0 = CompareMain.calcCadytsScore(cadyts, person.getPlans().get(0));
-                System.out.printf("%f\t\t%d\n", score0, scenario.getPopulation().getPersons().get(id).getPlans().get(0).getCustomAttributes().get("prop"));
-            }
+
         }
-        System.out.printf("%f\t%f\t%f\n",
-                CompareMain.compareAllDay(scenario, cdrVolumes, compareMain.getGroundTruthVolumes()),
-                CompareMain.compareTimebins(scenario, cdrVolumes, compareMain.getGroundTruthVolumes()),
-                CompareMain.compareEMDMassPerLink(scenario, cdrVolumes, compareMain.getGroundTruthVolumes()));
-        System.out.println(nSelectedClones[0] + " " + nSelectedClones[1] + " "+ nSelectedClones[2]);
-
+        return result;
     }
 
     private Activity createHomeMorning(IdImpl idImpl, double time) {
