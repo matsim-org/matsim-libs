@@ -320,15 +320,15 @@ public abstract class MarginalCongestionHandler implements
 		
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("total delay [hours]: " + this.totalDelay / 3600.);
+			bw.write("total delay [hours];" + this.totalDelay / 3600.);
 			bw.newLine();
-			bw.write("total internalized delay [hours]: " + this.totalInternalizedDelay / 3600.);
+			bw.write("total internalized delay [hours];" + this.totalInternalizedDelay / 3600.);
 			bw.newLine();
-			bw.write("not internalized delay (rounding errors) [hours]: " + this.delayNotInternalized_roundingErrors / 3600.);
+			bw.write("not internalized delay (rounding errors) [hours];" + this.delayNotInternalized_roundingErrors / 3600.);
 			bw.newLine();
-			bw.write("not internalized delay (spill-back related delays without identifiying the causing agent) [hours]: " + this.delayNotInternalized_spillbackNoCausingAgent / 3600.);
+			bw.write("not internalized delay (spill-back related delays without identifiying the causing agent) [hours];" + this.delayNotInternalized_spillbackNoCausingAgent / 3600.);
 			bw.newLine();
-			bw.write("not internalized delay (in case delays resulting from the storage capacity are ignored) [hours]: " + this.delayNotInternalized_storageCapacity / 3600.);
+			bw.write("not internalized delay (in case delays resulting from the storage capacity are ignored) [hours];" + this.delayNotInternalized_storageCapacity / 3600.);
 			bw.newLine();
 			
 			bw.close();

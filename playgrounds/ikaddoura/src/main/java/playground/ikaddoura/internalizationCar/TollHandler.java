@@ -35,6 +35,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
@@ -90,7 +91,11 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 	
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		this.personDepartureEvents.add(event);
+		if (event.getLegMode().equals(TransportMode.car.toString())) {
+			this.personDepartureEvents.add(event);
+		} else {
+			// other simulated modes are not accounted for
+		}
 	}
 
 	public void setLinkId2timeBin2avgToll() {
