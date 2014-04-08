@@ -23,7 +23,6 @@ package playground.anhorni.rc;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,9 +34,6 @@ import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-
-import playground.christoph.burgdorf.BurgdorfRoutes;
-
 
 public class RCControler extends Controler {
 					
