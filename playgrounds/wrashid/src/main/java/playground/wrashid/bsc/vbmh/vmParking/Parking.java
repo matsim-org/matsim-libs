@@ -27,6 +27,8 @@ public class Parking {
 	public @XmlAttribute int id;
 	public long capacityEV;
 	public long capacityNEV;
+	private int occupancyEVSpots; //Anzahl belegte Plaetze
+	private int occupancyNEVSpots;
 	public double chargingRate;
 	public int parkingPriceMEVSpot, parkingPriceMNEVSpot, chargingPriceM;
 	public int peekLoadEV, peekLoadNEV;
@@ -52,6 +54,8 @@ public class Parking {
 	}
 	
 	public void createSpots(){
+		this.occupancyEVSpots=0;
+		this.occupancyNEVSpots=0;
 		spots= new LinkedList<ParkingSpot>();
 		evSpots = new LinkedList<ParkingSpot>();
 		nevSpots = new LinkedList<ParkingSpot>();
@@ -121,18 +125,22 @@ public class Parking {
 	
 	
 	public ParkingSpot checkForFreeSpotEVPriority(){  //Durchsucht erst EV Spots dann NEV Spots
-		for(ParkingSpot spot : evSpots){
-			//System.out.println("checke spot");
-			if (spot.isOccupied() == false){
-				return spot;
+		if(this.occupancyEVSpots<this.capacityEV){
+			for(ParkingSpot spot : evSpots){
+				//System.out.println("checke spot");
+				if (spot.isOccupied() == false){
+					return spot;
+				}
 			}
 		}
-		
 		return checkForFreeNEVSpot();
 	}
 	
 	
 	public ParkingSpot checkForFreeNEVSpot(){
+		if(this.occupancyNEVSpots==this.capacityNEV){
+			return null;
+		}
 		for(ParkingSpot spot : nevSpots){
 			//System.out.println("checke spot");
 			if (spot.isOccupied() == false){
@@ -142,6 +150,24 @@ public class Parking {
 		return null;
 	}
 	
+	public void parkOnSpot(ParkingSpot parkingSpot, double time){
+		parkingSpot.setOccupied(true);
+		parkingSpot.setTimeVehicleParked(time);
+		if(parkingSpot.charge){
+			this.occupancyEVSpots++;
+		} else{
+			this.occupancyNEVSpots++;
+		}
+	}
+	
+	public void leaveSpot(ParkingSpot parkingSpot){
+		parkingSpot.setOccupied(false);
+		if(parkingSpot.charge){
+			this.occupancyEVSpots--;
+		} else{
+			this.occupancyNEVSpots--;
+		}
+	}
 	
 	
 	

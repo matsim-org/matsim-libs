@@ -469,8 +469,8 @@ public class ParkControl {
 			if(selectedSpot.parking.checkForFreeSpot()==null){ //Sinde alle anderen Plaetze belegt? Dann von Besetzt >> Frei
 				wasOccupied = true;
 			}
-			selectedSpot.setOccupied(false); //Platz freigeben
-			
+			//selectedSpot.setOccupied(false); //Platz freigeben
+			selectedSpot.parking.leaveSpot(selectedSpot);
 			load.put(selectedSpot.parking.id, load.get(selectedSpot.parking.id)-1);
 			
 			
@@ -536,8 +536,9 @@ public class ParkControl {
 		Map<String, Object> personAttributes = person.getCustomAttributes();
 		personAttributes.put("selectedParkingspot", selectedSpot);
 		ParkingSpot selectedSpotToSet = (ParkingSpot) personAttributes.get("selectedParkingspot");
-		selectedSpotToSet.setOccupied(true);
-		selectedSpotToSet.setTimeVehicleParked(this.time);
+		selectedSpot.parking.parkOnSpot(selectedSpotToSet, time);
+		//selectedSpotToSet.setOccupied(true);
+		//selectedSpotToSet.setTimeVehicleParked(this.time);
 		int currentLoad = load.get(selectedSpotToSet.parking.id);
 		load.put(selectedSpotToSet.parking.id, currentLoad+1);
 		if(peakLoad.get(selectedSpotToSet.parking.id)<currentLoad+1){
