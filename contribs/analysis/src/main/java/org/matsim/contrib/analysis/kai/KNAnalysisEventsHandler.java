@@ -89,7 +89,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 	enum StatType { durations, durationsOtherBins, beelineDistances, legDistances, scores, payments } ;
 
 	// container that contains the statistics containers:
-	private final Map<StatType,Map<String,int[]>> legStatsContainer = new TreeMap<StatType,Map<String,int[]>>() ;
+	private final Map<StatType,Map<String,int[]>> statsContainer = new TreeMap<StatType,Map<String,int[]>>() ;
 	// yy should probably be "double" instead of "int" (not all data are integer counts; think of emissions).  kai, jul'11
 
 	// container that contains the data bin boundaries (arrays):
@@ -129,7 +129,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 
 			// instantiate the statistics containers:
 			Map<String,int[]> legStats = new TreeMap<String,int[]>() ;
-			this.legStatsContainer.put( type, legStats ) ;
+			this.statsContainer.put( type, legStats ) ;
 
 			Map<String,Double> sums = new TreeMap<String,Double>() ;
 			this.sumsContainer.put( type, sums ) ;
@@ -235,7 +235,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 			//			}
 
 			// register the leg by subpop type:
-			legTypes.add( this.getLegtypeBySubpop(person) ) ;
+			legTypes.add( this.getSubpopName(person) ) ;
 
 
 			// register the leg for the overall average:
@@ -296,10 +296,12 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		}
 	}
 
-	private String getLegtypeBySubpop(Person person) {
-		String subpopAttrName = this.scenario.getConfig().plans().getSubpopulationAttributeName() ;
-		String subpop = (String) this.population.getPersonAttributes().getAttribute( person.getId().toString(), subpopAttrName ) ;
-		return "yy_subpop_" + subpop;
+	private String getSubpopName(Person person) {
+		return "yy_" + getSubpopName( person.getId(), this.population.getPersonAttributes(), this.scenario.getConfig().plans().getSubpopulationAttributeName() ) ;
+	}
+	public static final String getSubpopName( Id personId, ObjectAttributes personAttributes, String subpopAttrName ) {
+		String subpop = (String) personAttributes.getAttribute( personId.toString(), subpopAttrName ) ;
+		return "subpop_" + subpop;
 	}
 
 	private void addItemToAllRegisteredTypes(List<String> legTypes, StatType statType, double item) {
@@ -307,7 +309,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		for ( String legType : legTypes ) {
 
 			// ... get correct statistics array by statType and legType ...
-			int[] stats = this.legStatsContainer.get(statType).get(legType);
+			int[] stats = this.statsContainer.get(statType).get(legType);
 
 			// ... if that statistics array does not exist yet, initialize it ...
 			if (stats == null) {
@@ -316,7 +318,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 				for (int i = 0; i < len; i++) {
 					stats[i] = 0;
 				}
-				this.legStatsContainer.get(statType).put(legType, stats);
+				this.statsContainer.get(statType).put(legType, stats);
 
 				// ... also initialize the sums container ...
 				this.sumsContainer.get(statType).put(legType, 0.) ;
@@ -337,7 +339,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		this.agentLegs.clear();
 
 		for ( StatType type : StatType.values() ) {
-			this.legStatsContainer.get(type).clear() ;
+			this.statsContainer.get(type).clear() ;
 			this.sumsContainer.get(type).clear() ;
 		}
 
@@ -352,7 +354,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 
 		final Population pop = this.scenario.getPopulation();
 		Person person = pop.getPersons().get( event.getPersonId() ) ;
-		legTypes.add( this.getLegtypeBySubpop(person)) ;
+		legTypes.add( this.getSubpopName(person)) ;
 
 		double item = event.getAmount() ;
 
@@ -383,7 +385,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 			List<String> legTypes = new ArrayList<String>() ;
 			// (yy "leg" is a misnomer here)
 
-			legTypes.add( this.getLegtypeBySubpop(person) ) ;
+			legTypes.add( this.getSubpopName(person) ) ;
 
 			// register the leg for the overall average:
 			legTypes.add("zzzzzzz_all") ;
@@ -420,7 +422,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 			BufferedWriter writer = IOUtils.getBufferedWriter("gantries.txt") ;
 			for (  Entry<Id, Double> entry : this.vehicleGantryCounts.entrySet() ) {
 				try {
-					writer.write( entry.getKey() + "\t" + entry.getValue() + "\n") ;
+					writer.write( entry.getKey() + "\t" + entry.getValue() + "\t 1 \n") ; // the "1" makes automatic processing a bit easier. kai, mar'14
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -442,7 +444,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		try {
 
 			boolean first = true;
-			for (Map.Entry<String, int[]> entry : this.legStatsContainer.get(statType).entrySet()) {
+			for (Map.Entry<String, int[]> entry : this.statsContainer.get(statType).entrySet()) {
 				String legType = entry.getKey();
 				int[] counts = entry.getValue();
 
