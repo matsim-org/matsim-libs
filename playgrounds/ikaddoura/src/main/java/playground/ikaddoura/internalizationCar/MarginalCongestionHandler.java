@@ -272,15 +272,16 @@ public abstract class MarginalCongestionHandler implements
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		// Start tracking delays caused by that agent leaving the link.
 		
-		if (linkInfo.getPersonId2linkLeaveTime().containsKey(event.getVehicleId())){
-			log.warn(event.getVehicleId() + " is already being tracked for link " + event.getLinkId() + ". Map 'personId2linkLeaveTime' at time step " + event.getTime() + ":");
-			for (Id id : linkInfo.getPersonId2linkLeaveTime().keySet()) {
-				log.warn(id + " // " + linkInfo.getPersonId2linkLeaveTime().get(id));
-			}
-		}
-		if (linkInfo.getLeavingAgents().contains(event.getVehicleId())){
-			log.warn(event.getVehicleId() + " is already being tracked for link " + event.getLinkId() + " (in List 'leavingAgents').");
-		}
+//		if (linkInfo.getPersonId2linkLeaveTime().containsKey(event.getVehicleId())){
+//			log.warn(event.getVehicleId() + " is already being tracked for link " + event.getLinkId() + ". Map 'personId2linkLeaveTime' at time step " + event.getTime() + ":");
+//			for (Id id : linkInfo.getPersonId2linkLeaveTime().keySet()) {
+//				log.warn(id + " // " + linkInfo.getPersonId2linkLeaveTime().get(id));
+//			}
+//		}
+//		if (linkInfo.getLeavingAgents().contains(event.getVehicleId())){
+//			log.warn(event.getVehicleId() + " is already being tracked for link " + event.getLinkId() + " (in List 'leavingAgents').");
+//		}
+		
 		linkInfo.getLeavingAgents().add(event.getVehicleId());
 		linkInfo.getPersonId2linkLeaveTime().put(event.getVehicleId(), event.getTime());
 	}
