@@ -73,7 +73,9 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 	 * @param plan
 	 * @return new ScoringFunction
 	 */
-	public ScoringFunction createNewScoringFunction(Plan plan) {
+
+	@Override
+	public ScoringFunction createNewScoringFunction(Person person) {
 		if (this.params == null) {
 			/* lazy initialization of params. not strictly thread safe, as different threads could
 			 * end up with different params-object, although all objects will have the same
@@ -106,12 +108,6 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 		
 		
 		return sumScoringFunction;
-	}
-
-	@Override
-	public ScoringFunction createNewScoringFunction(Person person) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 }
