@@ -24,7 +24,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
 
 /**
  * Standardizing plans selection when weights are given.
@@ -37,7 +36,7 @@ public abstract class AbstractPlanSelector implements PlanSelector {
 	@Override
 	public final Plan selectPlan(HasPlansAndId<Plan> person) {
 		// First check if there are any unscored plans
-		Plan selectedPlan = new RandomUnscoredPlanSelector<Plan>().selectPlan(((PersonImpl) person));
+		Plan selectedPlan = new RandomUnscoredPlanSelector<Plan>().selectPlan(person);
 		if (selectedPlan != null) return selectedPlan;
 		// Okay, no unscored plans...
 
