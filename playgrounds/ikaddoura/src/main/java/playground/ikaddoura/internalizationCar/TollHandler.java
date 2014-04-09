@@ -86,7 +86,7 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		this.linkEnterEvents.add(event);		
+		this.linkEnterEvents.add(event);	
 	}
 	
 	@Override
@@ -150,8 +150,8 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 		// first go through all link enter events
 		for (LinkEnterEvent event : this.linkEnterEvents){
 			
-			if (this.linkId2timeBin2tollSum.containsKey(event.getLinkId())){
-				// Tolls paid on this link.
+//			if (this.linkId2timeBin2tollSum.containsKey(event.getLinkId())){
+//				// Tolls paid on this link.
 				
 				Map<Double, Integer> timeBin2enteringAgents = new HashMap<Double, Integer>();
 
@@ -195,10 +195,10 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 				
 				this.linkId2timeBin2enteringAndDepartingAgents.put(event.getLinkId(), timeBin2enteringAgents);	
 			
-			} else {
-				// No tolls paid on that link. Skip that link.
-		
-			}
+//			} else {
+//				// No tolls paid on that link. Skip that link.
+//		
+//			}
 		}
 		
 		
@@ -206,8 +206,8 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 		// a person departure event means an agent also 'enters' the link
 		for (PersonDepartureEvent event : this.personDepartureEvents) {
 
-			if (this.linkId2timeBin2tollSum.containsKey(event.getLinkId())) {
-				// Tolls paid on this link.
+//			if (this.linkId2timeBin2tollSum.containsKey(event.getLinkId())) {
+//				// Tolls paid on this link.
 
 				Map<Double, Integer> timeBin2departingAgents = new HashMap<Double, Integer>();
 
@@ -251,10 +251,10 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 
 				this.linkId2timeBin2enteringAndDepartingAgents.put(event.getLinkId(), timeBin2departingAgents);
 
-			} else {
-				// No tolls paid on that link. Skip that link.
-
-			}
+//			} else {
+//				// No tolls paid on that link. Skip that link.
+//
+//			}
 		}
 
 	}
@@ -353,12 +353,17 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 			bw.write("link;total toll (per day);entering (and departing) agents (per day)");
 			bw.newLine();
 			
-			for (Id linkId : this.linkId2timeBin2tollSum.keySet()){
+			for (Id linkId : this.linkId2timeBin2enteringAndDepartingAgents.keySet()){
 				double totalToll = 0.;
 				int enteringAgents = 0;
 				
-				for (Double tollSum_timeBin : this.linkId2timeBin2tollSum.get(linkId).values()){
-					totalToll = totalToll + tollSum_timeBin;
+				if (this.linkId2timeBin2tollSum.get(linkId) == null) {
+					// There is no toll payment in any time bin.
+					
+				} else {
+					for (Double tollSum_timeBin : this.linkId2timeBin2tollSum.get(linkId).values()){
+						totalToll = totalToll + tollSum_timeBin;
+					}
 				}
 				
 				for (Integer enteringDepartingAgents_timeBin : this.linkId2timeBin2enteringAndDepartingAgents.get(linkId).values()){
