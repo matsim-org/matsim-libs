@@ -25,7 +25,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-public class GridTools {
+public class CopyOfGridTools {
 
 	private Map<Id, ? extends Link> links;
 	private Double xMin;
@@ -33,7 +33,7 @@ public class GridTools {
 	private Double yMin;
 	private Double yMax;
 
-	public GridTools(Map<Id, ? extends Link> links, Double xMin, Double xMax,
+	public CopyOfGridTools(Map<Id, ? extends Link> links, Double xMin, Double xMax,
 			Double yMin, Double yMax) {
 		this.links=links;
 		this.xMin=xMin;
@@ -47,12 +47,6 @@ public class GridTools {
 		Map<Id, Integer> link2xbin = new HashMap<Id, Integer>();
 		for(Id linkId: this.links.keySet()){
 			link2xbin.put(linkId, mapXCoordToBin(this.links.get(linkId).getCoord().getX(), noOfXCells));
-			System.out.println(linkId + " x bin " + link2xbin.get(linkId));
-			if(link2xbin.get(linkId)==null){
-				System.out.println("link id " + linkId.toString() 
-						+ " mapped Coord" + mapXCoordToBin(this.links.get(linkId).getCoord().getX(), noOfXCells)
-						+ " link x coord " + this.links.get(linkId).getCoord().getX());
-			}
 		}
 		return link2xbin;
 	}
@@ -65,14 +59,14 @@ public class GridTools {
 		return link2ybin;
 	}
 	
-	private Integer mapXCoordToBin(double xCoord, Integer noOfXCells) {
+	public Integer mapXCoordToBin(double xCoord, Integer noOfXCells) {
 
 		if (xCoord <= xMin  || xCoord >= xMax) return null; // xCorrd is not in area of interest
 		double relativePositionX = ((xCoord - xMin) / (xMax - xMin) * noOfXCells); // gives the relative position along the x-range
 		return (int) relativePositionX; // returns the number of the bin [0..n-1]
 	}
 	
-	private Integer mapYCoordToBin(double yCoord, Integer noOfYCells) {
+	public Integer mapYCoordToBin(double yCoord, Integer noOfYCells) {
 
 		if (yCoord <= yMin  || yCoord >= yMax) return null; // xCorrd is not in area of interest
 		double relativePositionY = ((yCoord - yMin) / (yMax - yMin) * noOfYCells); // gives the relative position along the x-range

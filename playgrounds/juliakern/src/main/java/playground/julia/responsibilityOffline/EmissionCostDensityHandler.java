@@ -49,8 +49,8 @@ public class EmissionCostDensityHandler implements WarmEmissionEventHandler {
 	private Map<Id, Integer> link2xbins;
 	private Map<Id, Integer> link2ybins;
 	private double timeBinSize = 60*60.;
-	private int noOfXCells;
-	private int noOfYCells;
+	private int noOfXCells = 160;
+	private int noOfYCells = 120;
 	private HashMap<Double, Double[][]> durations;
 
 	public EmissionCostDensityHandler(HashMap<Double, Double[][]> durations,
@@ -67,9 +67,11 @@ public class EmissionCostDensityHandler implements WarmEmissionEventHandler {
 				for(int i=0; i< durations.get(timeBin).length; i++){
 					for(int j=0; j< durations.get(timeBin)[i].length; j++){
 						avgDen+= durations.get(timeBin)[i][j];
+//						System.out.println(durations.get(timeBin)[i][j]);
 					}
 				}
-				timeBinsToAvgDensity.put(timeBin, avgDen/durations.get(timeBin).length/durations.get(timeBin).length);
+				System.out.println("avg den" + avgDen);
+				timeBinsToAvgDensity.put(timeBin, avgDen/noOfXCells/noOfYCells);
 			}
 	}
 
@@ -96,6 +98,9 @@ public class EmissionCostDensityHandler implements WarmEmissionEventHandler {
 			Double timeBin = Math.ceil(event.getTime()/timeBinSize )*timeBinSize;
 			
 			Double pmCosts = relativeFactor(timeBin, xCell, yCell) * pmCostsValue;
+//			System.out.println("pm costs" + pmCosts);
+//			System.out.println("pmCostsValue" + pmCostsValue);
+			
 			
 			// calc other costs
 			Double noxCosts = warmEmissions.get(WarmPollutant.NOX) * EURO_PER_GRAMM_NOX;
@@ -103,6 +108,9 @@ public class EmissionCostDensityHandler implements WarmEmissionEventHandler {
 			Double soCosts = warmEmissions.get(WarmPollutant.SO2) * EURO_PER_GRAMM_SO2;
 			
 			Double totalCosts = pmCosts + noxCosts + nmCosts + soCosts;
+//			System.out.println("NOX " + warmEmissions.get(WarmPollutant.NOX));
+//			System.out.println("NMHC " + warmEmissions.get(WarmPollutant.NMHC));
+//			System.out.println("SO2 " + warmEmissions.get(WarmPollutant.SO2));
 			
 			if(!person2causedEmCosts.containsKey(personId)){
 				person2causedEmCosts.put(personId, totalCosts);
@@ -126,26 +134,31 @@ public class EmissionCostDensityHandler implements WarmEmissionEventHandler {
 			List<Cell> distancedCells = cellOfLink .getCellsWithExactDistance(noOfXCells, noOfYCells, distance);
 			for(Cell dc: distancedCells){
 				// TODO better initialise with 0.0?
+				try {
 				if (durations.get(timeBin)[dc.getX()]!=null) {
 					Double[][] durationsOfCurrentInterval = durations.get(timeBin);
-					if (durationsOfCurrentInterval [dc.getX()][dc.getY()]!=null) {
-						Double valueOfdc = durationsOfCurrentInterval[dc
-								.getX()][dc.getY()];
-						switch (distance) {
-						case 0:
-							relevantDuration += dist0factor * valueOfdc; 
-							break;
-						case 1:
-							relevantDuration += dist1factor * valueOfdc;
-							break;
-						case 2:
-							relevantDuration += dist2factor * valueOfdc;
-							break;
-						case 3:
-							relevantDuration += dist3factor * valueOfdc;
-							break;
+					
+						if (durationsOfCurrentInterval [dc.getX()][dc.getY()]!=null) {
+							Double valueOfdc = durationsOfCurrentInterval[dc
+									.getX()][dc.getY()];
+							switch (distance) {
+							case 0:
+								relevantDuration += dist0factor * valueOfdc; 
+								break;
+							case 1:
+								relevantDuration += dist1factor * valueOfdc;
+								break;
+							case 2:
+								relevantDuration += dist2factor * valueOfdc;
+								break;
+							case 3:
+								relevantDuration += dist3factor * valueOfdc;
+								break;
+							}
 						}
 					}
+				} catch (ArrayIndexOutOfBoundsException e) {
+					// nothing to do not in research area
 				}
 			}
 		}

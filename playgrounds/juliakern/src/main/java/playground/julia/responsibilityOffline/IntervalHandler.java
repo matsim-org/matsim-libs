@@ -80,13 +80,20 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 			
 			// time interval of activity
 			double prevDuration = duration.get(currentTimeBin)[xCell][yCell];
-			prevDuration = prevDuration - timeWithinCurrentInterval;
+			
+			if (prevDuration>timeBinSize) {
+				prevDuration = prevDuration - timeWithinCurrentInterval;
+				duration.get(currentTimeBin)[xCell][yCell] = prevDuration;
+			}
 			currentTimeBin += timeBinSize;
 			
 			// later time intervals
 			while(currentTimeBin <= simulationEndTime){
 				double prevDurationL = duration.get(currentTimeBin)[xCell][yCell];
-				prevDurationL = prevDurationL - timeBinSize;
+				if (prevDurationL>timeBinSize) {
+					prevDurationL = prevDurationL - timeBinSize;
+					duration.get(currentTimeBin)[xCell][yCell] = prevDurationL;
+				}
 				currentTimeBin += timeBinSize;
 			}
 		} catch (NullPointerException e) {
@@ -117,12 +124,14 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 			// time interval of activity
 			double prevDuration = duration.get(currentTimeBin)[xCell][yCell];
 			prevDuration = prevDuration + timeWithinCurrentInterval;
+			duration.get(currentTimeBin)[xCell][yCell] = prevDuration;
 			currentTimeBin += timeBinSize;
 			
 			// later time intervals
 			while(currentTimeBin <= simulationEndTime){
 				double prevDurationL = duration.get(currentTimeBin)[xCell][yCell];
 				prevDurationL = prevDurationL + timeBinSize;
+				duration.get(currentTimeBin)[xCell][yCell]=prevDurationL;
 				currentTimeBin += timeBinSize;
 			}
 			} catch (NullPointerException e) {

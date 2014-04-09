@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
@@ -48,6 +49,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+
+import playground.benjamin.internalization.EmissionCostModule;
 
 
 /**
@@ -82,6 +85,7 @@ public class TestEmissionPricing {
 		config.addCoreModules();
 		config.setParam("strategy", "maxAgentPlanMemorySize", "11");
 		Controler controler = new Controler(config);
+		
 		
 	// controler settings	
 		controler.setOverwriteFiles(true);
@@ -132,9 +136,15 @@ public class TestEmissionPricing {
 		
 		for(String activity : activities){
 			ActivityParams params = new ActivityParams(activity);
-			params.setTypicalDuration(30 * 3600);
+			if(activity.equals("home")){
+				params.setTypicalDuration(12*3600);
+			}else{
+				params.setTypicalDuration(8 * 3600);
+			}
 			pcs.addActivityParams(params);
 		}
+		
+		
 
 	// strategy
 		StrategyConfigGroup scg = controler.getConfig().strategy();
@@ -174,6 +184,7 @@ public class TestEmissionPricing {
 		EmissionControlerListener ecl = new EmissionControlerListener(controler);
 		controler.addControlerListener(ecl);
 		controler.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(config, controler.getNetwork(), ecl));
+		//controler.setTravelDisutilityFactory(new ResDisFactory(ecl, ecl.emissionModule, new EmissionCostModule(1.0)));
 		
 		controler.run();
 		
@@ -218,19 +229,26 @@ public class TestEmissionPricing {
 			}
 		}
 		if(!plan9ex)logger.info("Something with rerouting went wrong. There is no alternative route via node 9.");
+		
+		
+		for(Id linkId: ecl.links2xcells.keySet()){
+			logger.info("link" + linkId.toString() + " is in cell " + ecl.links2xcells.get(linkId).toString() + " " + ecl.links2ycells.get(linkId));
+		}
+		
+		
 	}
 	
 	private static void createNetwork(Scenario scenario) {
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
-		Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(0.0, 10000.0));
+		Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(1.0, 10000.0));
 		Node node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(2500.0, 10000.0));
 		Node node3 = network.createAndAddNode(scenario.createId("3"), scenario.createCoord(4500.0, 10000.0));
 		Node node4 = network.createAndAddNode(scenario.createId("4"), scenario.createCoord(17500.0, 10000.0));
-		Node node5 = network.createAndAddNode(scenario.createId("5"), scenario.createCoord(20000.0, 10000.0));
-		Node node6 = network.createAndAddNode(scenario.createId("6"), scenario.createCoord(20000.0, 1500.0));
-		Node node7 = network.createAndAddNode(scenario.createId("7"), scenario.createCoord(0.0, 1500.0));
-		Node node8 = network.createAndAddNode(scenario.createId("8"), scenario.createCoord(12500.0,  12500.0));
+		Node node5 = network.createAndAddNode(scenario.createId("5"), scenario.createCoord(19999.0, 10000.0));
+		Node node6 = network.createAndAddNode(scenario.createId("6"), scenario.createCoord(19999.0, 1500.0));
+		Node node7 = network.createAndAddNode(scenario.createId("7"), scenario.createCoord(1.0, 1500.0));
+		Node node8 = network.createAndAddNode(scenario.createId("8"), scenario.createCoord(12500.0,  12499.0));
 		Node node9 = network.createAndAddNode(scenario.createId("9"), scenario.createCoord(12500.0, 7500.0));
 
 

@@ -34,6 +34,8 @@ public class ResponsibilityScoringFunction implements ScoringFunction {
 	private Plan plan;
 	//double rScore = 0.0;
 	EmissionControlerListener ecl;
+	// total time in all bins / number of bins
+	private Double averageDurationOfTimeBin = 36*60*60/16/12.;
 	
 	public ResponsibilityScoringFunction(Plan plan, ScoringFunction scoringFunction, EmissionControlerListener ecl){
 		this.plan=plan;
@@ -64,6 +66,7 @@ public class ResponsibilityScoringFunction implements ScoringFunction {
 
 	@Override
 	public void finish() {
+		
 		Id personId = plan.getPerson().getId();
 
 		if(!plan.isSelected())System.out.println("++++++++++++++++shouldnt happen");
@@ -74,14 +77,17 @@ public class ResponsibilityScoringFunction implements ScoringFunction {
 		
 					if(re.getResponsiblePersonId().equals(personId)){
 						
-		
-						amount += re.getExposureValue();
+						// concentration * duration / average duration
+						amount += re.getExposureValue()/averageDurationOfTimeBin;
 					}
 				}
 			}
 		}
-		delegate.addMoney(-amount/ecl.noOfTimeBins);
+		System.out.println("score without emissions" +delegate.getScore());
+		delegate.addMoney(-amount);System.out.println("score with emission costs" + delegate.getScore());
 		delegate.finish();
+		
+		
 
 	}
 

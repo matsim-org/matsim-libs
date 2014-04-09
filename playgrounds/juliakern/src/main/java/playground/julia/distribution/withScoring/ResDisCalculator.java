@@ -115,7 +115,7 @@ public class ResDisCalculator implements TravelDisutility{
 			sumOfEmissionValues += emissionValue;
 			sumOfDelegateValues += delegateValue;
 		}
-		
+		 logger.info("expected emission costs for person " + person.getId() + " on link " + link.getId() + " at time " + time + " are calculated to " + emissionValue);
 		return delegateValue + emissionValue;
 	}
 
@@ -150,7 +150,7 @@ public class ResDisCalculator implements TravelDisutility{
 					);
 		double expectedEmissionCosts = this.emissionCostModule.calculateWarmEmissionCosts(expectedWarmEmissions);
 		linkExpectedEmissionDisutility = this.marginalUtilityOfMoney * expectedEmissionCosts ;
-		// logger.info("expected emission costs for person " + person.getId() + " on link " + link.getId() + " at time " + time + " are calculated to " + expectedEmissionCosts);
+	//	 logger.info("expected emission costs for person " + person.getId() + " on link " + link.getId() + " at time " + time + " are calculated to " + expectedEmissionCosts);
 
 		return linkExpectedEmissionDisutility;
 	}

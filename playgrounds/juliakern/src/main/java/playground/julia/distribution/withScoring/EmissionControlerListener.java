@@ -39,11 +39,10 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
+
 import playground.julia.distribution.EmissionModule;
 import playground.julia.distribution.GridTools;
 import playground.julia.distribution.ResponsibilityEvent;
-import playground.vsp.emissions.types.ColdPollutant;
-import playground.vsp.emissions.types.WarmPollutant;
 
 /**
  * @author benjamin
@@ -72,7 +71,7 @@ ShutdownListener, ScoringListener, AfterMobsimListener{
 	Double xMin = 0.0;
 	Double xMax = 20000.0;
 	Double yMin = 0.0;
-	Double yMax = 10000.0;
+	Double yMax = 12500.0;
 	
 	Integer noOfXCells = 16;
 	Integer noOfYCells = 12;

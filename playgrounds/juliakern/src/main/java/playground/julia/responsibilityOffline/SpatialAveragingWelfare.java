@@ -66,10 +66,10 @@ public class SpatialAveragingWelfare {
 	final double scalingFactor = 100.;
 	private final static String runNumber1 = "baseCase";
 	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
-	private final static String runNumber2 = "zone30";
-	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
-//	private final static String runNumber2 = "pricing";
-//	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
+//	private final static String runNumber2 = "zone30";
+//	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
+	private final static String runNumber2 = "pricing";
+	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
 //	private final String netFile1 = runDirectory2 + "output_network.xml.gz";
 	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
 	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
@@ -162,6 +162,7 @@ public class SpatialAveragingWelfare {
 		//eventsManager.removeHandler(intervalHandler);
 		
 		System.out.println(durations.size() + "!!!!!!!!!!!!!!!!");
+		System.out.println(durations.get(timeBinSize*5)[50][50]);
 		
 		// calc emission costs
 		EmissionCostDensityHandler ecdh = new EmissionCostDensityHandler(durations, link2xbins, link2ybins);
@@ -175,7 +176,9 @@ public class SpatialAveragingWelfare {
 		// recalc score
 		for(Id person: person2causedEmCosts.keySet()){
 			Plan plan = pop.getPersons().get(person).getSelectedPlan();
+//			System.out.println(plan.getScore());
 			plan.setScore(plan.getScore()-person2causedEmCosts.get(person)*marUtilOfMoney);
+//			System.out.println(plan.getScore());
 		}
 //		
 //		// calculate paid toll per person
@@ -207,9 +210,9 @@ public class SpatialAveragingWelfare {
 		ubc.calculateUtility_money(pop);
 		Map<Id, Double> personId2Utility = ubc.getPersonId2MonetizedUtility();
 		
-		for(Id personId : personId2Utility.keySet()){
-			logger.info(personId.toString() + " has utility " + personId2Utility.get(personId) +" and caused em costs" + person2causedEmCosts.get(personId));
-		}
+//		for(Id personId : personId2Utility.keySet()){
+//			logger.info(personId.toString() + " has utility " + personId2Utility.get(personId) +" and caused em costs" + person2causedEmCosts.get(personId));
+//		}
 		
 		// subtract average/personal toll value from monetized utility
 		if(substractAverageValue ){
