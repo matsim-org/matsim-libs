@@ -42,8 +42,6 @@ import org.matsim.withinday.controller.WithinDayControlerListener;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 
-import playground.christoph.evacuation.config.EvacuationConfig;
-
 public class WithindayListener implements StartupListener {
 	
 	protected Scenario scenario;
