@@ -68,9 +68,12 @@ public class WithindayListener implements StartupListener {
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		log.info("doing within day replanning ...");
+		
 		this.addNetworkChange(event.getControler(), links);
-		this.withinDayControlerListener.notifyStartup(event);	
-		this.initWithinDayReplanning(this.scenario);	
+		
+		this.initWithinDayReplanning(this.scenario);
+		
+		this.withinDayControlerListener.notifyStartup(event);			
 	}
 	
 	private void initWithinDayReplanning(Scenario scenario) {		
