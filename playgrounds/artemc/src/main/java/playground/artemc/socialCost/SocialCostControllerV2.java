@@ -19,7 +19,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 
-public class SocialCostController {
+public class SocialCostControllerV2 {
 
 
 	public static void main(String[] args) {
@@ -36,7 +36,7 @@ public class SocialCostController {
 		 */
 		//controler.setScoringFunctionFactory(new TimeAndMoneyDependentScoringFunctionFactory());
 
-		Initializer initializer = new Initializer();
+		InitializerV2 initializer = new InitializerV2();
 		controler.addControlerListener(initializer);
 		controler.setOverwriteFiles(true);
 		controler.run();
@@ -45,11 +45,11 @@ public class SocialCostController {
 
 	private static Scenario initSampleScenario() {
 
-		Config config = ConfigUtils.loadConfig("H:/Work_Extern/SiouxFalls_Simulations/runInputs/config_PT_flowTollV2_local.xml");
-		config.controler().setOutputDirectory("H:/Work_Extern/SiouxFalls_Simulations/PT_flowTollV2/");
-		config.controler().setLastIteration(1);
-		config.controler().setWritePlansInterval(1);
-		config.controler().setWriteEventsInterval(1);
+		Config config = ConfigUtils.loadConfig("C:/Workspace/roadpricingSingapore/scenarios/siouxFalls/config.xml");
+		//config.controler().setOutputDirectory("./outpout_SiouxFalls/pt_UE_7200_calibration_PT_6min_600m");
+		//config.controler().setOutputDirectory("./outpout_SiouxFalls/SiouxFalls_5PT_Lines");
+		config.controler().setOutputDirectory("C:/Workspace/roadpricingSingapore/output_SiouxFalls/sf_10it_withPT");
+		config.controler().setLastIteration(10);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		return scenario;
@@ -58,7 +58,7 @@ public class SocialCostController {
 	/*
 	 * Initialize the necessary components for the social cost calculation.
 	 */
-	public static class Initializer implements IterationStartsListener {
+	public static class InitializerV2 implements IterationStartsListener {
 
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
@@ -66,7 +66,7 @@ public class SocialCostController {
 				Controler controler = event.getControler();
 
 				// initialize the social costs calculator
-				SocialCostCalculator scc = new SocialCostCalculator(controler.getNetwork(), controler.getEvents(), controler.getLinkTravelTimes(), controler);
+				SocialCostCalculatorV2 scc = new SocialCostCalculatorV2(controler.getNetwork(), controler.getEvents(), controler.getLinkTravelTimes(), controler);
 				
 				controler.addControlerListener(scc);
 				controler.getEvents().addHandler(scc);
@@ -78,6 +78,8 @@ public class SocialCostController {
 				// create a plot containing the mean travel times
 				Set<String> transportModes = new HashSet<String>();
 				transportModes.add(TransportMode.car);
+				transportModes.add(TransportMode.pt);
+				transportModes.add(TransportMode.walk);
 				MeanTravelTimeCalculator mttc = new MeanTravelTimeCalculator(controler.getScenario(), transportModes);
 				controler.addControlerListener(mttc);
 				controler.getEvents().addHandler(mttc);
@@ -88,12 +90,12 @@ public class SocialCostController {
 	private static class SocialCostTravelDisutility implements TravelDisutility {
 
 		private final TravelTime travelTime;
-		private final SocialCostCalculator scc;
+		private final SocialCostCalculatorV2 scc;
 		private final double marginalCostOfDistance;
 		private final double marginalCostOfTime;
 
 
-		public SocialCostTravelDisutility(TravelTime travelTime, SocialCostCalculator scc, PlanCalcScoreConfigGroup cnScoringGroup) {
+		public SocialCostTravelDisutility(TravelTime travelTime, SocialCostCalculatorV2 scc, PlanCalcScoreConfigGroup cnScoringGroup) {
 			this.travelTime = travelTime;
 			this.scc = scc;
 			this.marginalCostOfTime = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
@@ -118,10 +120,10 @@ public class SocialCostController {
 
 	private static class SocialCostTravelDisutilityFactory implements TravelDisutilityFactory {
 
-		private final SocialCostCalculator scc;
+		private final SocialCostCalculatorV2 scc;
 
-		public SocialCostTravelDisutilityFactory(SocialCostCalculator scc) {
-			this.scc = scc;
+		public SocialCostTravelDisutilityFactory(SocialCostCalculatorV2 scc2) {
+			this.scc = scc2;
 		}
 
 		@Override
