@@ -81,7 +81,7 @@ public class WithindayListener implements StartupListener {
 		LeaveLinkIdentifierFactory duringLegIdentifierFactory = new LeaveLinkIdentifierFactory(withinDayControlerListener.getLinkReplanningMap(),
 				withinDayControlerListener.getMobsimDataProvider());
 				
-		LinkFilterFactory linkFilter = new LinkFilterFactory(links, withinDayControlerListener.getMobsimDataProvider());
+		TunnelLinksFilterFactory linkFilter = new TunnelLinksFilterFactory(links, withinDayControlerListener.getMobsimDataProvider());
 		duringLegIdentifierFactory.addAgentFilterFactory(linkFilter);
 		
 		DuringLegIdentifier duringLegIdentifier = duringLegIdentifierFactory.createIdentifier();
