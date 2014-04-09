@@ -87,7 +87,7 @@ public abstract class AbstractController {
 			@SuppressWarnings("synthetic-access")
 			@Override
 			public void uncaughtException(Thread t, Throwable e) {
-				log.warn("Getting uncaught Exception in Thread " + t.getName(), e);
+				log.error("Getting uncaught Exception in Thread " + t.getName(), e);
 				uncaughtException = e;
 			}
 		});
