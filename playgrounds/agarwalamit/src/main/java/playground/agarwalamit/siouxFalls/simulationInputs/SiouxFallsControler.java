@@ -33,6 +33,7 @@ import playground.benjamin.internalization.InternalizeEmissionsControlerListener
 import playground.ikaddoura.internalizationCar.MarginalCostPricing;
 import playground.ikaddoura.internalizationCar.TollDisutilityCalculatorFactory;
 import playground.ikaddoura.internalizationCar.TollHandler;
+import playground.ikaddoura.internalizationCar.WelfareAnalysisControlerListener;
 import playground.vsp.emissions.EmissionModule;
 import playground.vsp.emissions.example.EmissionControlerListener;
 
@@ -107,6 +108,7 @@ public class SiouxFallsControler {
 		controler.setCreateGraphs(true);
 		controler.setDumpDataAtEnd(true);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
 		
 		if(Boolean.valueOf(args[0])==false && Boolean.valueOf(args[2])==false){
 			controler.addControlerListener(new EmissionControlerListener());
