@@ -25,10 +25,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.matrices.Matrix;
@@ -183,10 +188,16 @@ public class GeneralGrid {
 	public void writeGrid(String folder){
 		String filename = folder + (folder.endsWith("/") ? "" : "/") + this.type + ".csv";
 		LOG.info("Writing grid to file: " + filename);
+		
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "WGS84");
+		
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
 		
+		double sum = 0.0;
+		int count = 0;
+		
 		try{
-			bw.write("From,To,Long,Lat,Width");
+			bw.write("From,To,Long,Lat,X,Y,Width");
 			bw.newLine();
 			Collection<Tuple<String, Point>> list = qt.get(qt.getMinEasting(), qt.getMinNorthing(), qt.getMaxEasting(), qt.getMaxNorthing(), new ArrayList<Tuple<String,Point>>());
 			for(Tuple<String,Point> tuple : list){
@@ -196,7 +207,27 @@ public class GeneralGrid {
 				bw.write(sa[1]);
 				bw.write(",");
 				Coordinate c = tuple.getSecond().getCoordinate();
-				bw.write(String.format("%.4f,%.4f,%.4f\n", c.x, c.y, width));
+				
+				Coord saAlbers = new CoordImpl(new Double(c.x), new Double(c.y));
+				Coord wgs84 = ct.transform(saAlbers);
+				
+				bw.write(String.format("%.6f,%.6f,%.4f,%.4f,%.4f\n", wgs84.getX(), wgs84.getY(), c.x, c.y, width));
+//				bw.write(String.format("%.4f,%.4f,%.4f\n", c.x, c.y, width));
+				
+				/* Remove after calculation */
+				Coordinate c1 = c;
+				Coordinate c2 = new Coordinate(c1.x, c1.y+1000);
+				c1.distance(c2);
+				
+				Coord saa1 = new CoordImpl(c1.x, c1.y);
+				Coord saa2 = new CoordImpl(c2.x, c2.y);
+				Coord wgs1 = ct.transform(saa1);
+				Coord wgs2 = ct.transform(saa2);
+				double d = CoordUtils.calcDistance(wgs1, wgs2);
+//				LOG.info(String.format("    ==> 1000m = %.6f", d));
+				
+				sum += d;
+				count++;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -210,6 +241,7 @@ public class GeneralGrid {
 			}
 		}
 		LOG.info("Done writing file.");
+		LOG.info(String.format("Avg length (in decimal degrees) of 1000m: %.8f (%d observations)", sum / ((int)count), count));
 	}
 	
 	
@@ -245,9 +277,9 @@ public class GeneralGrid {
 		GeneralGrid grid = new GeneralGrid(width, type);
 
 		Geometry zone = mmfr.getAllZones().get(0);
-		Geometry dummy = grid.buildDummyPolygon();
+//		Geometry dummy = grid.buildDummyPolygon();
 		
-		grid.generateGrid(dummy);
+		grid.generateGrid(zone);
 		grid.writeGrid(outputFolder);
 		
 		Header.printFooter();
