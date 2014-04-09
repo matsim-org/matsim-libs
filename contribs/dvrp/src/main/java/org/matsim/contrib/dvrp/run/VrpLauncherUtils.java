@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.*;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
@@ -121,6 +122,31 @@ public class VrpLauncherUtils
             }
         }
     }
+    
+	public static void convertLegModesAndRemoveOtherModes(List<String> passengerIds, String mode, Scenario scenario) {
+		Population pop = scenario.getPopulation() ;
+		
+		List<Id> removals = new ArrayList<Id>() ;
+		int cnt = 0 ;
+		for ( Entry<Id, ? extends Person> entry : pop.getPersons().entrySet() ) {
+			if ( passengerIds.contains( entry.getKey().toString() ) ) {
+				cnt ++ ;
+	            for (PlanElement pe : entry.getValue().getSelectedPlan().getPlanElements()) {
+	                if (pe instanceof Leg) {
+	                    ((Leg)pe).setMode(mode);
+	                }
+	            }
+			} else {
+				removals.add( entry.getKey() ) ;
+			}
+		}
+		for ( Id id : removals ) {
+			pop.getPersons().remove( id ) ;
+		}
+		Logger.getLogger("generated " + cnt + " taxi passengers") ;
+
+	}
+
 
 
     public static void removeNonPassengers(String mode, Scenario scenario)
@@ -227,4 +253,6 @@ public class VrpLauncherUtils
                     legMode);
         }
     }
+
+
 }
