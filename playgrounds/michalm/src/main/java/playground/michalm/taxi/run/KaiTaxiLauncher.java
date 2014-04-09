@@ -21,6 +21,10 @@ package playground.michalm.taxi.run;
 
 import java.io.IOException;
 
+import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
+
+import playground.michalm.taxi.TaxiRequestCreator;
+
 
 /*package*/class KaiTaxiLauncher
 {
@@ -30,8 +34,16 @@ import java.io.IOException;
         //demands: 10, 15, 20, 25, 30, 35, 40
         //supplies: 25, 50
         //path pattern: mielec-2-peaks-new-$supply$-$demand$
+//        String file = "d:/eclipse-vsp/maciejewski/input/2014_02/mielec-2-peaks-new-40-50/params.in";
         String file = "/Users/nagel/shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new-40-50/params.in";
+        boolean removeNonPassengers = true;
+        
         TaxiLauncher launcher = new TaxiLauncher(file);
+
+        if (removeNonPassengers) {
+            VrpLauncherUtils.removeNonPassengers(TaxiRequestCreator.MODE, launcher.scenario);
+        }
+        
         launcher.initVrpPathCalculator();
         launcher.go(false);
         launcher.generateOutput();
