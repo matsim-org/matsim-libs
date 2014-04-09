@@ -55,7 +55,8 @@ public class TunnelLinksFilter implements AgentFilter {
 	public boolean applyAgentFilter(Id id, double time) {
 		MobsimAgent agent = this.agents.get(id);
 		
-		if (!links.contains(agent.getCurrentLinkId()) || time <= 15.5 * 3600.0) return false;
+		//if (!links.contains(agent.getCurrentLinkId()) || time <= 15.5 * 3600.0) return false;
+		if (!links.contains(agent.getCurrentLinkId())) return false;
 		else return true;
 	}
 }
