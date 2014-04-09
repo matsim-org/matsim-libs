@@ -19,77 +19,59 @@
 
 package playground.kai.run;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * @author kn after mrieser
+ * @author kn
  */
-public class MyPlansToPlans {
+class MyPlansToPlans {
 
-	private Config config;
-
-	public void run(final String[] args) {
-//		this.config = Gbl.createConfig(new String[]{"../padang/dlr-network/pconfig.xml"});
-//		new ConfigWriter(this.config).writeStream(new PrintWriter(System.out));
-
-//		ScenarioImpl scenario = new ScenarioImpl(this.config);
-//
-////		final World world = Gbl.getWorld();
-////
-////		if (this.config.world().getInputFile() != null) {
-////			final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-////			worldReader.readFile(this.config.world().getInputFile());
-////		}
-//
-//		NetworkLayer network = scenario.getNetwork();
-//		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
-//
-//		final PopulationImpl plans = scenario.getPopulation();
-//		plans.setIsStreaming(true);
-//		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
-//		final PopulationWriter plansWriter = new PopulationWriter(plans);
-//		plansWriter.startStreaming(this.config.plans().getOutputFile());
-////		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network));
-//		plans.addAlgorithm(new org.matsim.population.algorithms.PlansFilterByLegMode(TransportMode.pt,false));
-//		plans.addAlgorithm(plansWriter); // planswriter must be the last algorithm added
-//		plansReader.readFile(this.config.plans().getInputFile());
-//		plans.printPlansCount();
-//		plansWriter.closeStreaming();
-
-//		String configFileName = "/Users/nagel/ie-calvin/MATSim-SA/trunk/data/sanral2010/config/kaiconfig.xml" ;
-		String configFileName = args[0] ;
-		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFileName) ;
-		Scenario sc = sl.loadScenario() ;
-		Population pop = sc.getPopulation();
-
+	static void run(final String[] args) {
 		
+		Config config = ConfigUtils.createConfig() ;
+		config.plans().setInputFile( "/Users/nagel/shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new/output/ITERS/it.20/20.plans.xml.gz");
+		config.network().setInputFile("/Users/nagel/shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new/network.xml");
+
+		Scenario sc = ScenarioUtils.loadScenario(config) ;
+		
+		Population pop = sc.getPopulation() ;
+
+
 //		PlansFilterByLegMode pf = new PlansFilterByLegMode( TransportMode.pt, FilterType.keepAllPlansWithMode ) ;
 //		pf.run(pop) ;
 
-		
-		
-		
 //		PlanMutateTimeAllocation pm = new PlanMutateTimeAllocation( 60, new Random() ) ;
 //		for (Person person : pop.getPersons().values()) {
 //			Plan plan = person.getPlans().iterator().next();
 //			pm.run(plan);
 //		}
 
-		
-		
-		Scenario newScen = ScenarioUtils.createScenario(ConfigUtils.createConfig()) ;
-		Population newPop = newScen.getPopulation() ;
+		Population newPop = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation() ;
 		for ( Person person : pop.getPersons().values() ) {
-			if ( Math.random() < 0.1 ) 
-				newPop.addPerson( person ); 
+			Plan plan = person.getSelectedPlan() ;
+			List<Leg> legs = PopulationUtils.getLegs(plan) ;
+			boolean accept = true ;
+			for ( Leg leg : legs ) {
+				if ( leg.getMode().equals( TransportMode.car ) ) {
+					accept = false ;
+				}
+			}
+			if ( accept ) {
+				System.out.println("adding person...");
+				newPop.addPerson(person);
+			}
 		}
 		
 
