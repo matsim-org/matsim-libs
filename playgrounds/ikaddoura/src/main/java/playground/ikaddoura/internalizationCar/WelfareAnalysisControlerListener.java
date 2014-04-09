@@ -36,29 +36,34 @@ import org.apache.log4j.Logger;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 
+import playground.ikaddoura.analysis.monetaryAmountsTripAnalysis.CarTripInfoWriter;
+import playground.ikaddoura.analysis.monetaryAmountsTripAnalysis.ExtCostEventHandler;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 
 
 /**
- * @author Ihab
+ * @author ikaddoura
  *
  */
 
-public class WelfareAnalysisControlerListener implements StartupListener, IterationEndsListener {
+public class WelfareAnalysisControlerListener implements StartupListener, IterationEndsListener, IterationStartsListener {
 	private static final Logger log = Logger.getLogger(WelfareAnalysisControlerListener.class);
 
 	private final ScenarioImpl scenario;
 	private MoneyEventHandler moneyHandler = new MoneyEventHandler();
 	private TripAnalysisHandler tripAnalysisHandler = new TripAnalysisHandler();
+	private ExtCostEventHandler extCostHandler;
 	
 	private Map<Integer, Double> it2userBenefits_logsum = new TreeMap<Integer, Double>();
 	private Map<Integer, Integer> it2invalidPersons_logsum = new TreeMap<Integer, Integer>();
@@ -80,6 +85,7 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 	
 	public WelfareAnalysisControlerListener(ScenarioImpl scenario){
 		this.scenario = scenario;
+		extCostHandler = new ExtCostEventHandler(this.scenario.getNetwork());
 	}
 	
 	@Override
@@ -87,10 +93,30 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 		event.getControler().getEvents().addHandler(moneyHandler);
 		event.getControler().getEvents().addHandler(tripAnalysisHandler);
 	}
+	
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		if (event.getIteration() == this.scenario.getConfig().controler().getLastIteration()) {
+			log.info("Analyzing monetary events in the final iteration.");
+			
+			event.getControler().getEvents().addHandler(extCostHandler);
+			
+		}
+	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		writeAnalysis(event);
+		if (event.getIteration() == this.scenario.getConfig().controler().getLastIteration()) {
+			writeExtCostAnalysis(event.getControler().getControlerIO().getIterationPath(event.getIteration()));
+		}
+	}
+
+	private void writeExtCostAnalysis(String outputPath) {
+		CarTripInfoWriter writerCar = new CarTripInfoWriter(extCostHandler, outputPath);
+		writerCar.writeDetailedResults();
+		writerCar.writeAvgTollPerDistance();
+		writerCar.writeAvgTollPerTimeBin();		
 	}
 
 	private void writeAnalysis(IterationEndsEvent event) {

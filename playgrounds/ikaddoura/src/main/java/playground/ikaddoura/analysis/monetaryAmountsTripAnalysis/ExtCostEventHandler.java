@@ -55,14 +55,18 @@ public class ExtCostEventHandler implements TransitDriverStartsEventHandler , Pe
 	private Map<Id,Map<Integer,Double>> personId2tripNumber2departureTime = new HashMap<Id, Map<Integer,Double>>();
 	private Map<Id,Map<Integer,Double>> personId2tripNumber2tripDistance = new HashMap<Id, Map<Integer,Double>>();
 	private Map<Id,Map<Integer,Double>> personId2tripNumber2amount = new HashMap<Id, Map<Integer,Double>>();
-	private Map<Id,Double> drivers2totalDistance = new HashMap<Id,Double>();
+	private Map<Id,Double> driverId2totalDistance = new HashMap<Id,Double>();
 	
 	// for pt-distance calculation
 //	private Map<Id,Double> personId2enterValue = new HashMap<Id,Double>();
 	
 	private List<Id> ptDrivers = new ArrayList<Id>();
 	private Network network;
-
+	
+	private double distance = 500.;
+	private double maxDistance = 40 * distance;
+	private double timeBinSize = 900.0;
+	
 	public ExtCostEventHandler(Network network) {
 		this.network = network;
 	}
@@ -74,6 +78,7 @@ public class ExtCostEventHandler implements TransitDriverStartsEventHandler , Pe
 		personId2tripNumber2tripDistance.clear();
 		personId2tripNumber2amount.clear();
 		personId2tripNumber2legMode.clear();
+		driverId2totalDistance.clear();
 	}
 
 	@Override
@@ -84,7 +89,7 @@ public class ExtCostEventHandler implements TransitDriverStartsEventHandler , Pe
 		for(int i : personId2tripNumber2departureTime.get(event.getPersonId()).keySet()){
 			if(eventTime > (personId2tripNumber2departureTime.get(event.getPersonId()).get(i))){
 				x = i;
-			}else{
+			} else {
 			}
 		}
 		int tripNumber = x;
@@ -100,10 +105,10 @@ public class ExtCostEventHandler implements TransitDriverStartsEventHandler , Pe
 	public void handleEvent(LinkEnterEvent event) {
 		double linkLength = this.network.getLinks().get(event.getLinkId()).getLength();
 		if(ptDrivers.contains(event.getVehicleId())){
-			if(drivers2totalDistance.containsKey(event.getVehicleId())){
-				drivers2totalDistance.put(event.getVehicleId(),drivers2totalDistance.get(event.getVehicleId()) + linkLength);
+			if(driverId2totalDistance.containsKey(event.getVehicleId())){
+				driverId2totalDistance.put(event.getVehicleId(),driverId2totalDistance.get(event.getVehicleId()) + linkLength);
 			}else{
-				drivers2totalDistance.put(event.getVehicleId(),linkLength);
+				driverId2totalDistance.put(event.getVehicleId(),linkLength);
 			}
 		}else{
 			// updating the trip Length
@@ -250,9 +255,9 @@ public class ExtCostEventHandler implements TransitDriverStartsEventHandler , Pe
 		Map<Double, Double> tripDepTime2avgFareCar = new HashMap<Double, Double>();
 
 		Map<Double, List<Double>> tripDepTime2fares = new HashMap<Double, List<Double>>();
-		double startTime = 4. * 3600;
-		double periodLength = 900;
-		double endTime = 24. * 3600;
+		double startTime = this.timeBinSize;
+		double periodLength = this.timeBinSize;
+		double endTime = 30. * 3600;
 		
 		for (double time = startTime; time <= endTime; time = time + periodLength){
 			List<Double> fares = new ArrayList<Double>();
@@ -312,9 +317,9 @@ public class ExtCostEventHandler implements TransitDriverStartsEventHandler , Pe
 		Map<Double, Double> tripDepTime2avgFarePt = new HashMap<Double, Double>();
 
 		Map<Double, List<Double>> tripDepTime2fares = new HashMap<Double, List<Double>>();
-		double startTime = 4. * 3600;
-		double periodLength = 7200;
-		double endTime = 24. * 3600;
+		double startTime = this.timeBinSize;
+		double periodLength = this.timeBinSize;
+		double endTime = 30. * 3600;
 		
 		for (double time = startTime; time <= endTime; time = time + periodLength){
 			List<Double> fares = new ArrayList<Double>();
@@ -374,9 +379,9 @@ public class ExtCostEventHandler implements TransitDriverStartsEventHandler , Pe
 		Map<Double, Double> tripDistance2avgAmountCar = new HashMap<Double, Double>();
 
 		Map<Double, List<Double>> tripDistance2amount = new HashMap<Double, List<Double>>();
-		double startDistance = 500.;
-		double groupsize = 500.;
-		double endDistance = 40 * 500.;
+		double startDistance = this.distance;
+		double groupsize = this.distance;
+		double endDistance = this.maxDistance;
 		
 		for (double distance = startDistance; distance <= endDistance; distance = distance + groupsize){
 			List<Double> amounts = new ArrayList<Double>();
@@ -436,9 +441,9 @@ public class ExtCostEventHandler implements TransitDriverStartsEventHandler , Pe
 		Map<Double, Double> tripDistance2avgAmountPt = new HashMap<Double, Double>();
 
 		Map<Double, List<Double>> tripDistance2amount = new HashMap<Double, List<Double>>();
-		double startDistance = 500.;
-		double groupsize = 500.;
-		double endDistance = 40 * 500.;
+		double startDistance = this.distance;
+		double groupsize = this.distance;
+		double endDistance = this.maxDistance;
 		
 		for (double distance = startDistance; distance <= endDistance; distance = distance + groupsize){
 			List<Double> amounts = new ArrayList<Double>();

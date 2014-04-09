@@ -51,7 +51,7 @@ public class CarTripInfoWriter {
 		file.mkdirs();
 	}
 
-	public void writeDetailedResultsCar() {
+	public void writeDetailedResults() {
 		
 		String fileName = this.outputFolder + "/monetary_amounts_trip_infos_car.csv";
 		File file = new File(fileName);
@@ -93,7 +93,7 @@ public class CarTripInfoWriter {
 		}
 	}
 	
-	public void writeResultsTimeCar() {
+	public void writeAvgTollPerTimeBin() {
 		String fileName = this.outputFolder + "/avg_amount_per_trip_departure_time_car.csv";
 		File file = new File(fileName);
 		Map<Double, Double> x2avgAmount = this.handler.getAvgAmountPerTripDepartureTimeCar();
@@ -122,7 +122,7 @@ public class CarTripInfoWriter {
 		}	
 	}
 	
-	public void writeResultsDistanceCar() {
+	public void writeAvgTollPerDistance() {
 		String fileName = this.outputFolder + "/avg_amount_per_trip_distance_car.csv";
 		File file = new File(fileName);
 		Map<Double, Double> x2avgAmount = this.handler.getAvgAmountPerTripDistanceCar();

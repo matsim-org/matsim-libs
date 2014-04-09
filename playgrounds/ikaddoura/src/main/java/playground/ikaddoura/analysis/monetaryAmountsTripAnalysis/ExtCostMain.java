@@ -33,7 +33,7 @@ public class ExtCostMain {
 	
 	private static final Logger log = Logger.getLogger(ExtCostMain.class);
 	
-	private String eventsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/internalization_4/ITERS/it.100/100.events.xml.gz";
+	private String eventsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/internalization_4/ITERS/it.100/100.eventsCongestionPrices.xml.gz";
 	private static String netFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/internalization_4/output_network.xml.gz";
 	private String outputFolder = "/Users/ihab/Desktop/analysis4";
 	
@@ -63,9 +63,9 @@ public class ExtCostMain {
 		log.info("Writing output files...");
 
 		CarTripInfoWriter writerCar = new CarTripInfoWriter(handler, outputFolder);
-		writerCar.writeDetailedResultsCar();
-		writerCar.writeResultsDistanceCar();
-		writerCar.writeResultsTimeCar();
+		writerCar.writeDetailedResults();
+		writerCar.writeAvgTollPerDistance();
+		writerCar.writeAvgTollPerTimeBin();
 		
 //		PtTripInfoWriter writerPt = new PtTripInfoWriter(handler, outputFolder);
 //		writerPt.writeDetailedResultsPt();
