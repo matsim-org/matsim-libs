@@ -20,7 +20,6 @@
 
 package playground.anhorni.rc;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,22 +48,14 @@ public class TunnelLinksFilter implements AgentFilter {
 	
 	@Override
 	public void applyAgentFilter(Set<Id> set, double time) {
-		log.info("applying tunnel links filter ...");
-		Iterator<Id> iter = set.iterator();
-		
-		while (iter.hasNext()) {
-			Id id = iter.next();
-			if (this.applyAgentFilter(id, time)) iter.remove();
-		}
-		log.info("Replanning " + set.size() + " agents at time " + time);	
+		log.info("this one is not used anymore ...");	
 	}
 
 	@Override
 	public boolean applyAgentFilter(Id id, double time) {
-		log.info("checkaaa");
 		MobsimAgent agent = this.agents.get(id);
 		
-		if (!links.contains(agent.getCurrentLinkId()) || time > 15.5 * 3600.0) return false;
+		if (!links.contains(agent.getCurrentLinkId()) || time <= 15.5 * 3600.0) return false;
 		else return true;
 	}
 }
