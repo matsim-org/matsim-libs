@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
@@ -38,6 +39,7 @@ public class TunnelLinksFilter implements AgentFilter {
 
 	private final Map<Id, MobsimAgent> agents;
 	private final Set<Id> links;
+	private static final Logger log = Logger.getLogger(TunnelLinksFilter.class);
 	
 	// use the factory
 	/*package*/ TunnelLinksFilter(Map<Id, MobsimAgent> agents, Set<Id> links) {
@@ -53,6 +55,7 @@ public class TunnelLinksFilter implements AgentFilter {
 			Id id = iter.next();
 			if (this.applyAgentFilter(id, time)) iter.remove();
 		}
+		log.info("Replanning " + set.size() + " agents at time " + time);	
 	}
 
 	@Override
