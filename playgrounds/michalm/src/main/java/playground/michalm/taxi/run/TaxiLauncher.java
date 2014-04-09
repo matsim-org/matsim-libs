@@ -61,7 +61,7 @@ import playground.michalm.util.RunningVehicleRegister;
     /*package*/final String netFileName;
     /*package*/final String plansFileName;
     /*package*/final String taxiCustomersFileName;
-    /*package*/final String taxisFileName;
+    /*package*/String taxisFileName;
     /*package*/final String ranksFileName;
 
     /*package*/final boolean vrpOutFiles;
