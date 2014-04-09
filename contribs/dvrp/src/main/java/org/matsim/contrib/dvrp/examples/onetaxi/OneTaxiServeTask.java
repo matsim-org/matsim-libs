@@ -26,7 +26,8 @@ import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 public class OneTaxiServeTask
     extends StayTaskImpl
 {
-    private OneTaxiRequest request;
+    private final OneTaxiRequest request;
+    private final boolean isPickup;
 
 
     public OneTaxiServeTask(double beginTime, double endTime, Link link, String name,
@@ -34,6 +35,14 @@ public class OneTaxiServeTask
     {
         super(beginTime, endTime, link, name);
         this.request = request;
+        this.isPickup = link == request.getFromLink();
+
+        if (isPickup) {
+            request.setPickupTask(this);
+        }
+        else {
+            request.setDropoffTask(this);
+        }
     }
 
 
@@ -46,6 +55,6 @@ public class OneTaxiServeTask
     //pickup or dropoff
     public boolean isPickup()
     {
-        return getLink() == request.getFromLink();
+        return isPickup;
     }
 }

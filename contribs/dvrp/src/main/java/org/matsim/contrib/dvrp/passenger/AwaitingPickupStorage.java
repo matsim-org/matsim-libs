@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,23 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.run;
+package org.matsim.contrib.dvrp.passenger;
 
-import java.io.IOException;
+import java.util.*;
+
+import org.matsim.api.core.v01.Id;
 
 
-/*package*/class KaiTaxiLauncher
+public class AwaitingPickupStorage
 {
-    public static void main(String... args)
-        throws IOException
+    //passenger's request id -> driver's stay task
+    private final Map<Id, PassengerPickupActivity> awaitingPickups = new HashMap<Id, PassengerPickupActivity>();
+
+
+    public void storeAwaitingPickup(PassengerRequest request, PassengerPickupActivity pickupActivity)
     {
-        //demands: 10, 15, 20, 25, 30, 35, 40
-        //supplies: 25, 50
-        //path pattern: mielec-2-peaks-new-$supply$-$demand$
-        String file = "./shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new-40-50/params.in";
-        TaxiLauncher launcher = new TaxiLauncher(file);
-        launcher.initVrpPathCalculator();
-        launcher.go(false);
-        launcher.generateOutput();
+        awaitingPickups.put(request.getId(), pickupActivity);
+    }
+
+
+    public PassengerPickupActivity retrieveAwaitingPickup(PassengerRequest request)
+    {
+        return awaitingPickups.remove(request.getId());
     }
 }

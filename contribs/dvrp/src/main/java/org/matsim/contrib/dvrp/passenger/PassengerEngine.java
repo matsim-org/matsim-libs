@@ -19,14 +19,13 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.*;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.*;
@@ -45,6 +44,9 @@ public class PassengerEngine
     private final PassengerRequestCreator requestCreator;
     private final VrpOptimizer optimizer;
 
+    private final AdvancedRequestStorage advancedRequestStorage;
+    private final AwaitingPickupStorage awaitingPickupStorage;
+
 
     public PassengerEngine(String mode, PassengerRequestCreator requestCreator,
             VrpOptimizer optimizer, MatsimVrpContext context)
@@ -53,6 +55,9 @@ public class PassengerEngine
         this.requestCreator = requestCreator;
         this.optimizer = optimizer;
         this.context = context;
+
+        advancedRequestStorage = new AdvancedRequestStorage(context);
+        awaitingPickupStorage = new AwaitingPickupStorage();
     }
 
 
@@ -100,10 +105,10 @@ public class PassengerEngine
 
         PassengerRequest request = createRequest(passenger, fromLinkId, toLinkId, departureTime,
                 now);
-        storeAdvancedRequest(request);
+        advancedRequestStorage.storeAdvancedRequest(request);
 
         optimizer.requestSubmitted(request);
-        return true;
+        return !request.isRejected();
     }
 
 
@@ -121,25 +126,30 @@ public class PassengerEngine
 
         internalInterface.registerAdditionalAgentOnLink(passenger);
 
-        PassengerRequest request = retrieveAdvancedRequest(passenger, fromLinkId, toLinkId);
+        PassengerRequest request = advancedRequestStorage.retrieveAdvancedRequest(passenger,
+                fromLinkId, toLinkId);
 
         if (request == null) {//this is an immediate request
             request = createRequest(passenger, fromLinkId, toLinkId, departureTime, now);
             optimizer.requestSubmitted(request);
         }
         else {
-            PassengerPickupActivity awaitingPickup = retrieveAwaitingPickup(request);
+            PassengerPickupActivity awaitingPickup = awaitingPickupStorage
+                    .retrieveAwaitingPickup(request);
 
             if (awaitingPickup != null) {
                 awaitingPickup.notifyPassengerIsReadyForDeparture(passenger, now);
             }
         }
 
-        return true;
+        return !request.isRejected();
     }
 
 
     //================ REQUESTS CREATION
+
+    private int nextId = 0;
+
 
     private PassengerRequest createRequest(MobsimPassengerAgent passenger, Id fromLinkId,
             Id toLinkId, double departureTime, double now)
@@ -147,90 +157,12 @@ public class PassengerEngine
         Map<Id, ? extends Link> links = context.getScenario().getNetwork().getLinks();
         Link fromLink = links.get(fromLinkId);
         Link toLink = links.get(toLinkId);
-
-        List<Request> requests = context.getVrpData().getRequests();
-        Id id = context.getScenario().createId(requests.size() + "");
+        Id id = context.getScenario().createId(mode + "_" + nextId++);
 
         PassengerRequest request = requestCreator.createRequest(id, passenger, fromLink, toLink,
                 departureTime, departureTime, now);
-
         context.getVrpData().addRequest(request);
-
         return request;
-    }
-
-
-    //================ ADVANCED REQUESTS STORAGE
-
-    private final Map<Id, Queue<PassengerRequest>> advanceRequests = new HashMap<Id, Queue<PassengerRequest>>();
-
-
-    private void storeAdvancedRequest(PassengerRequest request)
-    {
-        MobsimAgent passenger = request.getPassenger();
-        Queue<PassengerRequest> passengerAdvReqs = advanceRequests.get(passenger.getId());
-
-        if (passengerAdvReqs == null) {
-            passengerAdvReqs = new PriorityQueue<PassengerRequest>(3,
-                    new Comparator<PassengerRequest>() {
-                        @Override
-                        public int compare(PassengerRequest r1, PassengerRequest r2)
-                        {
-                            return Double.compare(r1.getT0(), r2.getT0());
-                        }
-                    });
-
-            advanceRequests.put(passenger.getId(), passengerAdvReqs);
-        }
-
-        passengerAdvReqs.add(request);
-    }
-
-
-    private PassengerRequest retrieveAdvancedRequest(MobsimAgent passenger, Id fromLinkId,
-            Id toLinkId)
-    {
-        Queue<PassengerRequest> passengerAdvReqs = advanceRequests.get(passenger.getId());
-
-        if (passengerAdvReqs != null) {
-            PassengerRequest req = passengerAdvReqs.peek();
-
-            if (req != null) {
-                if (req.getFromLink().getId() == fromLinkId //
-                        && req.getToLink().getId() == toLinkId) {
-                    passengerAdvReqs.poll();
-                    return req;// this is the advance request for the current leg
-                }
-                else {
-                    if (context.getTime() > req.getT0()) {
-                        //TODO we have to somehow handle it (in the future)
-                        //Currently this is not a problem since we do not have such cases...
-                        throw new IllegalStateException(
-                                "Seems that the agent is not going to take the previously submitted request");
-                    }
-                }
-            }
-        }
-
-        return null;//this is an immediate request
-    }
-
-
-    //================ WAITING FOR PASSENGERS
-
-    //passenger's request id -> driver's stay task
-    private final Map<Id, PassengerPickupActivity> awaitingPickups = new HashMap<Id, PassengerPickupActivity>();
-
-
-    public void storeAwaitingPickup(PassengerRequest request, PassengerPickupActivity pickupActivity)
-    {
-        awaitingPickups.put(request.getId(), pickupActivity);
-    }
-
-
-    private PassengerPickupActivity retrieveAwaitingPickup(PassengerRequest request)
-    {
-        return awaitingPickups.remove(request.getId());
     }
 
 
@@ -244,7 +176,7 @@ public class PassengerEngine
 
         if (passenger.getCurrentLinkId() != linkId || passenger.getState() != State.LEG
                 || !passenger.getMode().equals(mode)) {
-            storeAwaitingPickup(request, pickupActivity);
+            awaitingPickupStorage.storeAwaitingPickup(request, pickupActivity);
             return false;//wait for the passenger
         }
 
@@ -252,7 +184,7 @@ public class PassengerEngine
                 driver.getCurrentLinkId()) == null) {
             //the passenger has already been picked up and is on another taxi trip
             //seems there have been at least 2 requests made by this passenger for this location
-            storeAwaitingPickup(request, pickupActivity);
+            awaitingPickupStorage.storeAwaitingPickup(request, pickupActivity);
             return false;//wait for the passenger (optimistically, he/she should appear soon)
         }
 

@@ -29,13 +29,12 @@ public class RequestImpl
     implements Request
 {
     private final Id id;
-
     private final double quantity;
-
     private final double t0;// earliest start time
     private final double t1;// latest start time
-
     private final double submissionTime;
+
+    private boolean rejected = false;
 
 
     public RequestImpl(Id id, double quantity, double t0, double t1, double submissionTime)
@@ -80,6 +79,19 @@ public class RequestImpl
     public double getSubmissionTime()
     {
         return submissionTime;
+    }
+
+
+    @Override
+    public boolean isRejected()
+    {
+        return rejected;
+    }
+
+
+    public void setRejected(boolean rejected)
+    {
+        this.rejected = rejected;
     }
 
 

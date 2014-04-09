@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.*;
@@ -106,6 +108,36 @@ public class OneTaxiOptimizer
     @Override
     public void nextTask(Schedule<? extends Task> schedule)
     {
+        shiftTimings();
         schedule.nextTask();
+    }
+
+
+    //Simplified version. For something more advanced, see:
+    //playground.michalm.taxi.scheduler.TaxiScheduler.updateCurrentAndPlannedTasks(...)
+    private void shiftTimings()
+    {
+        if (schedule.getStatus() != ScheduleStatus.STARTED) {
+            return;
+        }
+
+        double now = context.getTime();
+        Task currentTask = schedule.getCurrentTask();
+        double diff = now - currentTask.getEndTime();
+
+        if (diff == 0) {
+            return;
+        }
+
+        currentTask.setEndTime(now);
+
+        List<AbstractTask> tasks = schedule.getTasks();
+        int nextTaskIdx = currentTask.getTaskIdx() + 1;
+
+        for (int i = nextTaskIdx; i < tasks.size(); i++) {
+            Task task = tasks.get(i);
+            task.setBeginTime(task.getBeginTime() + diff);
+            task.setEndTime(task.getEndTime() + diff);
+        }
     }
 }

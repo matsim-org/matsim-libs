@@ -38,4 +38,7 @@ public interface Request
 
 
     double getSubmissionTime();
+    
+    
+    boolean isRejected();
 }
