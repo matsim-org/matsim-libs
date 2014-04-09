@@ -42,6 +42,8 @@ import org.matsim.withinday.controller.WithinDayControlerListener;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 
+import playground.christoph.evacuation.config.EvacuationConfig;
+
 public class WithindayListener implements StartupListener {
 	
 	protected Scenario scenario;
@@ -89,7 +91,8 @@ public class WithindayListener implements StartupListener {
 				withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
 		duringLegReplannerFactory.addIdentifier(duringLegIdentifierFactory.createIdentifier());
 		
-		withinDayControlerListener.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);
+		//withinDayControlerListener.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);
+		withinDayControlerListener.getWithinDayEngine().addTimedDuringLegReplannerFactory(duringLegReplannerFactory, 15.5*3600.0, Double.MAX_VALUE);
 	}
 	
 	public void addNetworkChange(Controler controler, Set<Id> links) {

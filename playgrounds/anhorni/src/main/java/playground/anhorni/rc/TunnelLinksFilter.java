@@ -49,6 +49,7 @@ public class TunnelLinksFilter implements AgentFilter {
 	
 	@Override
 	public void applyAgentFilter(Set<Id> set, double time) {
+		log.info("applying tunnel links filter ...");
 		Iterator<Id> iter = set.iterator();
 		
 		while (iter.hasNext()) {
