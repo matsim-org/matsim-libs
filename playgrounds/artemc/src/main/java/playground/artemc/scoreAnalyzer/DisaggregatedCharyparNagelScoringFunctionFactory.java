@@ -21,6 +21,7 @@
 package playground.artemc.scoreAnalyzer;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
@@ -72,7 +73,6 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 	 * @param plan
 	 * @return new ScoringFunction
 	 */
-	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {
 		if (this.params == null) {
 			/* lazy initialization of params. not strictly thread safe, as different threads could
@@ -106,6 +106,12 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 		
 		
 		return sumScoringFunction;
+	}
+
+	@Override
+	public ScoringFunction createNewScoringFunction(Person person) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }
