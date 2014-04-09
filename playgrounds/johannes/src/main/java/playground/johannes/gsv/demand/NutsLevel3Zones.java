@@ -26,6 +26,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -71,7 +72,7 @@ public class NutsLevel3Zones {
 			featureMap.put(code, fearure);
 		}
 		
-		zones = new HashMap<String, Zone<?>>();
+		zones = new LinkedHashMap<String, Zone<?>>();
 		BufferedReader reader = new BufferedReader(new FileReader(idMappingsFile));
 		String line = reader.readLine();
 		while((line = reader.readLine()) != null) {

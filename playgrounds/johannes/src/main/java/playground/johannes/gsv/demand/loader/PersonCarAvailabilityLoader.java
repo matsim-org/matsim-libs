@@ -20,54 +20,43 @@
 /**
  * 
  */
-package playground.johannes.gsv.demand;
+package playground.johannes.gsv.demand.loader;
 
+import gnu.trove.TIntDoubleHashMap;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Random;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PersonImpl;
-
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.gsv.demand.AbstractTaskWrapper;
+import playground.johannes.gsv.demand.LoaderUtils;
+import playground.johannes.gsv.demand.tasks.PersonCarAvailability;
 
 /**
  * @author johannes
  *
  */
-public class PersonGender implements PopulationTask {
+public class PersonCarAvailabilityLoader extends AbstractTaskWrapper {
 
-	private final ZoneLayer<Double> zones;
-	
-	private final Random random;
-	
-	public PersonGender(ZoneLayer<Double> zones) {
-		this(zones, new XORShiftRandom());
-	}
-	
-	public PersonGender(ZoneLayer<Double> zones, Random random) {
-		this.zones = zones;
-		this.random = random;
-	}
-	
-	@Override
-	public void apply(Population pop) {
-		for(Person person : pop.getPersons().values()) {
-			Coord c = ((Activity)person.getPlans().get(0).getPlanElements().get(0)).getCoord();
-			Zone<Double> zone = zones.getZone(MatsimCoordUtils.coordToPoint(c));
-			
-			double p = zone.getAttribute();
-			if(random.nextDouble() < p) {
-				((PersonImpl)person).setSex(PersonAttributes.FEMALE);
-			} else {
-				((PersonImpl)person).setSex(PersonAttributes.MALE);
+	public PersonCarAvailabilityLoader(String file, Random random) throws IOException {
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		
+		TIntDoubleHashMap map = new TIntDoubleHashMap();
+		
+		String line = reader.readLine();
+		while((line = reader.readLine()) != null) {
+			String[] tokens = line.split(LoaderUtils.FIELD_SEPARATOR);
+			int lower = Integer.parseInt(tokens[0]);
+			int upper = Integer.parseInt(tokens[1]);
+			double frac = Double.parseDouble(tokens[2]);
+			for(int i = lower; i < upper+1; i++) {
+				map.put(i, frac);
 			}
 		}
-
+		
+		reader.close();
+		
+		delegate = new PersonCarAvailability(map, random);
 	}
-
 }

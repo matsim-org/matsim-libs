@@ -29,6 +29,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
@@ -128,8 +129,22 @@ public class ZoneLayer<T> {
 		List<Zone<T>> zones = getZones(point);
 		if(zones.isEmpty())
 			return null;
-		else
+		else if(zones.size() == 1) {
 			return zones.get(0);
+		} else {
+			/*
+			 * FIXME
+			 * Apparently this makes huge problems. Need to find a more elegant solution.
+			 */
+			System.err.println("Overlapping zones!");
+			Geometry geo0 = zones.get(0).getGeometry();
+			Geometry geo1 = zones.get(1).getGeometry();
+			if(geo0.contains(geo1)) {
+				return zones.get(1);
+			} else {
+				return zones.get(0);
+			}
+		}
 	}
 	
 	/**

@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.johannes.gsv.demand;
+package playground.johannes.gsv.demand.loader;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -28,7 +28,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -38,6 +38,9 @@ import java.util.Set;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
+import playground.johannes.gsv.demand.AbstractTaskWrapper;
+import playground.johannes.gsv.demand.NutsLevel3Zones;
+import playground.johannes.gsv.demand.tasks.PersonAge;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 
@@ -58,7 +61,7 @@ public class PersonAgeWrapper extends AbstractTaskWrapper {
 			}
 		}
 		
-		Set<Zone<ChoiceSet<Tuple<Integer, Integer>>>> zones = new HashSet<Zone<ChoiceSet<Tuple<Integer, Integer>>>>();
+		Set<Zone<ChoiceSet<Tuple<Integer, Integer>>>> zones = new LinkedHashSet<Zone<ChoiceSet<Tuple<Integer, Integer>>>>();
 		for(Entry<String, List<Category>> entry : categories.entrySet()) {
 			Zone<?> zone = NutsLevel3Zones.getZone(entry.getKey());
 			if (zone != null) {
@@ -82,7 +85,7 @@ public class PersonAgeWrapper extends AbstractTaskWrapper {
 	
 	private void readFile(String file, String key, Map<String, List<Category>> categories) throws IOException {
 		String[] fileNameElements = file.split("\\.");
-		String[] bounds = fileNameElements[1].split("-");
+		String[] bounds = fileNameElements[fileNameElements.length-2].split("-");
 		int lower = Integer.parseInt(bounds[0]);
 		int upper = Integer.parseInt(bounds[1]);
 		

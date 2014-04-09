@@ -63,7 +63,7 @@ public class LinkStopFacilities {
 		Network network = scenario.getNetwork();
 		
 		TransitScheduleReader tReader = new TransitScheduleReader(scenario);
-		tReader.readFile("/home/johannes/gsv/matsim/studies/netz2030/data/transitSchedule.longdist.xml");
+		tReader.readFile("/home/johannes/gsv/matsim/studies/netz2030/data/transitSchedule.routed.gk3.xml");
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		
 		IdGenerator idGenerator = new PrefixIdGenerator("rail.");
@@ -96,10 +96,10 @@ public class LinkStopFacilities {
 		}
 
 		NetworkWriter writer = new NetworkWriter(network);
-		writer.write("/home/johannes/gsv/matsim/studies/netz2030/data/network.longdist.gk3.xml");
+		writer.write("/home/johannes/gsv/matsim/studies/netz2030/data/network.gk3.xml");
 		
 		TransitScheduleWriter tWriter = new TransitScheduleWriter(schedule);
-		tWriter.writeFile("/home/johannes/gsv/matsim/studies/netz2030/data/transitSchedule.longdist.linked.xml");
+		tWriter.writeFile("/home/johannes/gsv/matsim/studies/netz2030/data/transitSchedule.routed.gk3.xml");
 	}
 
 }

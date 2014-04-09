@@ -20,26 +20,29 @@
 /**
  * 
  */
-package playground.johannes.gsv.demand;
+package playground.johannes.gsv.demand.loader;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Population;
+import java.io.IOException;
+import java.util.Random;
 
-import playground.johannes.sna.util.Composite;
+import org.matsim.api.core.v01.Scenario;
+
+import playground.johannes.gsv.demand.AbstractTaskWrapper;
+import playground.johannes.gsv.demand.LoaderUtils;
+import playground.johannes.gsv.demand.tasks.PersonStopDistribution;
+import playground.johannes.sna.gis.CRSUtils;
+import playground.johannes.sna.gis.ZoneLayer;
 
 /**
  * @author johannes
  *
  */
-public class PopulationTaskComposite extends Composite<PopulationTask> implements PopulationTask {
+public class PersonStopDistributionLoader extends AbstractTaskWrapper {
 
-	private static final Logger logger = Logger.getLogger(PopulationTaskComposite.class);
-	@Override
-	public void apply(Population pop) {
-		for(PopulationTask task : components) {
-			logger.debug(String.format("Executing task %s", task.getClass().getName()));
-			task.apply(pop);
-		}
+	public PersonStopDistributionLoader(String inhabitants, String key, Scenario scenario, Random random) throws IOException {
+		ZoneLayer<Double> zoneLayer = LoaderUtils.loadSingleColumnRelative(inhabitants, key);
+		zoneLayer.overwriteCRS(CRSUtils.getCRS(4326));
+		
+		delegate = new PersonStopDistribution(scenario.getTransitSchedule(), zoneLayer, random);
 	}
-
 }

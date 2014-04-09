@@ -30,6 +30,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -64,8 +66,8 @@ public class LoaderUtils {
 		/*
 		 * read lines
 		 */
-		Set<Zone<Double>> zones = new HashSet<Zone<Double>>();
-		Map<Zone<?>, Integer> values = new HashMap<Zone<?>, Integer>();
+		Set<Zone<Double>> zones = new LinkedHashSet<Zone<Double>>();
+		Map<Zone<?>, Integer> values = new LinkedHashMap<Zone<?>, Integer>();
 		int total = 0;
 		while((line = reader.readLine()) != null) {
 			tokens = line.split(FIELD_SEPARATOR);
@@ -169,14 +171,18 @@ public class LoaderUtils {
 	}
 	
 	public static ZoneLayer<Double> mapValuesToZones(TObjectDoubleHashMap<String> values) {
-		Set<Zone<Double>> zones = new HashSet<Zone<Double>>();
+		Set<Zone<Double>> zones = new LinkedHashSet<Zone<Double>>();
 		TObjectDoubleIterator<String> it = values.iterator();
 		while(it.hasNext()) {
 			it.advance();
-			Geometry geometry = NutsLevel3Zones.getZone(it.key()).getGeometry();
-			Zone<Double> zone = new Zone<Double>(geometry);
-			zone.setAttribute(it.value());
-			zones.add(zone);
+			String key = it.key();
+			Zone<?> nutsZone = NutsLevel3Zones.getZone(key);
+			if (nutsZone != null) {
+				Geometry geometry = nutsZone.getGeometry();
+				Zone<Double> zone = new Zone<Double>(geometry);
+				zone.setAttribute(it.value());
+				zones.add(zone);
+			}
 		}
 		
 		return new ZoneLayer<Double>(zones);

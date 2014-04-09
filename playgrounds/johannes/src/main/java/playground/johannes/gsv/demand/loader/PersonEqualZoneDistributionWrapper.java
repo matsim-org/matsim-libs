@@ -20,45 +20,26 @@
 /**
  * 
  */
-package playground.johannes.gsv.demand;
+package playground.johannes.gsv.demand.loader;
 
+import java.io.IOException;
 import java.util.Random;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PersonImpl;
-
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.sna.gis.Zone;
+import playground.johannes.gsv.demand.AbstractTaskWrapper;
+import playground.johannes.gsv.demand.LoaderUtils;
+import playground.johannes.gsv.demand.tasks.PersonEqualZoneDistribution;
 import playground.johannes.sna.gis.ZoneLayer;
+
 
 /**
  * @author johannes
  *
  */
-public class PersonEmployed implements PopulationTask {
+public class PersonEqualZoneDistributionWrapper extends AbstractTaskWrapper {
 
-	private final ZoneLayer<Double> zoneLayer;
-	
-	private final Random random;
-	
-	public PersonEmployed(ZoneLayer<Double> zoneLayer, Random random) {
-		this.zoneLayer = zoneLayer;
-		this.random = random;
-	}
-	
-	@Override
-	public void apply(Population pop) {
-		for(Person person : pop.getPersons().values()) {
-			Coord c = ((Activity)person.getPlans().get(0).getPlanElements().get(0)).getCoord();
-			Zone<Double> zone = zoneLayer.getZone(MatsimCoordUtils.coordToPoint(c));
-			double p = zone.getAttribute();
-			
-			if(random.nextDouble() < p)
-				((PersonImpl)person).setEmployed(true);
-		}
+	public PersonEqualZoneDistributionWrapper(String file, String key, Random random) throws IOException {
+		ZoneLayer<Double> zoneLayer = LoaderUtils.loadSingleColumnRelative(file, key);
+		this.delegate = new PersonEqualZoneDistribution(zoneLayer, random);
 	}
 
 }

@@ -58,7 +58,7 @@ public class DataPrepare {
 	// INPUT FILES
 	private final static String VISUM_FILE = "/home/johannes/gsv/matsim/studies/netz2030/data/raw/network.net";
 	private final static String NETWORK_FILE = "/home/johannes/gsv/matsim/studies/netz2030/data/roadnetwork.gk3.xml";
-	private final static String INPUT_PLANS_FILE = "/home/johannes/gsv/matsim/studies/netz2030/data/population.linked.gk3.xml";
+	private final static String INPUT_PLANS_FILE = "/home/johannes/gsv/matsim/studies/netz2030/data/raw/population.tmp.xml";
 
 	// INTERMEDIARY FILES
 	private final static String TRANSIT_NETWORK_FILE = "/home/johannes/gsv/matsim/studies/netz2030/data/transitNetwork.tmp.xml";
@@ -68,7 +68,7 @@ public class DataPrepare {
 	private final static String TRANSIT_SCHEDULE_WITH_NETWORK_FILE = "/home/johannes/gsv/citytunnel/data/transitSchedule.gk3.50.xml";
 	private final static String VEHICLE_FILE = "/home/johannes/gsv/citytunnel/data/vehicles.xml";
 	private final static String MULTIMODAL_NETWORK_FILE = "/home/johannes/gsv/matsim/studies/netz2030/data/network.multimodal.gk3.xml";
-	private final static String ROUTED_PLANS_FILE = "/home/johannes/gsv/matsim/studies/netz2030/data/population.routed.xml";
+	private final static String ROUTED_PLANS_FILE = "/home/johannes/gsv/matsim/studies/netz2030/data/raw/population.xml";
 
 
 	private final ScenarioImpl scenario;
@@ -282,21 +282,21 @@ X;Dritte GV;OV;1.000
 //		NetworkConfigGroup netConfig = (NetworkConfigGroup) app.config.getModule(NetworkConfigGroup.GROUP_NAME);
 //		netConfig.setInputFile("/home/johannes/gsv/netz2030/data/network.multimodal.xml");
 		
-//		MatsimNetworkReader netreader = new MatsimNetworkReader(app.scenario);
-//		netreader.readFile("/home/johannes/gsv/matsim/studies/netz2030/data/network.gk3.xml");
+		MatsimNetworkReader netreader = new MatsimNetworkReader(app.scenario);
+		netreader.readFile("/home/johannes/gsv/matsim/studies/netz2030/data/network.gk3.xml");
 		
 //		VehicleReaderV1 vehReader = new VehicleReaderV1(app.scenario.getVehicles());
 //		vehReader.readFile("/home/johannes/gsv/matsim/studies/netz2030/data/vehicles.xml");
 		
-//		TransitScheduleReader schedReader = new TransitScheduleReader(app.scenario);
-//		schedReader.readFile("/home/johannes/gsv/matsim/studies/netz2030/data/transitSchedule.longdist.xml");
+		TransitScheduleReader schedReader = new TransitScheduleReader(app.scenario);
+		schedReader.readFile("/home/johannes/gsv/matsim/studies/netz2030/data/transitSchedule.longdist.linked.xml");
 //		
 //		TransitRouterConfigGroup trConfig = (TransitRouterConfigGroup) app.config.getModule(TransitRouterConfigGroup.GROUP_NAME);
 //		trConfig.setMaxBeelineWalkConnectionDistance(1);
-		app.convertSchedule();
+//		app.convertSchedule();
 //		app.createNetworkFromSchedule();
 //		app.mergeNetworks();
-//		app.routePopulation();
+		app.routePopulation();
 //		app.visualizeRouterNetwork();
 
 		log.info("done.");

@@ -20,39 +20,32 @@
 /**
  * 
  */
-package playground.johannes.gsv.demand;
+package playground.johannes.misc;
 
-import gnu.trove.TIntDoubleHashMap;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 
-import java.util.Random;
-
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PersonImpl;
+import playground.johannes.sna.gis.CRSUtils;
 
 /**
  * @author johannes
  *
  */
-public class PersonCarAvailability implements PopulationTask {
+public class GeoToolsTest {
 
-	private final TIntDoubleHashMap fractions;
-	
-	private final Random random;
-	
-	public PersonCarAvailability(TIntDoubleHashMap fractions, Random random) {
-		this.fractions = fractions;
-		this.random = random;
-	}
-	
-	@Override
-	public void apply(Population pop) {
-		for(Person person : pop.getPersons().values()) {
-			double p = fractions.get(((PersonImpl)person).getAge());
-			
-			if(random.nextDouble() < p)
-				((PersonImpl)person).setCarAvail("yes");
-		}
+	/**
+	 * @param args
+	 * @throws FactoryException 
+	 */
+	public static void main(String[] args) throws FactoryException {
+		CoordinateReferenceSystem crs1 = CRSUtils.getCRS(31467);
+		CoordinateReferenceSystem crs2 = CRSUtils.getCRS(4326);
+		
+		MathTransform transform = CRS.findMathTransform(crs1, crs2);
+		
+		System.out.println(transform.toString());
 
 	}
 

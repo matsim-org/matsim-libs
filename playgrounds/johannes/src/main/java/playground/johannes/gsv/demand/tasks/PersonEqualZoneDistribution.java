@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.johannes.gsv.demand;
+package playground.johannes.gsv.demand.tasks;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +32,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.johannes.gsv.demand.ActivityTypes;
+import playground.johannes.gsv.demand.PopulationTask;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;

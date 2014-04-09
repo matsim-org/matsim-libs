@@ -40,6 +40,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
+import playground.johannes.gsv.demand.tasks.PlanPrimaryActivity;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
@@ -101,8 +102,8 @@ public class PopulationGenerator {
 		zoneLayer = readAttribut(features, attracts);
 //		zoneLayer.overwriteCRS(DefaultGeographicCRS.WGS84);
 		zoneLayer.overwriteCRS(CRSUtils.getCRS(4326));
-		CreatePrimaryActivity task2 = new CreatePrimaryActivity(zoneLayer);
-		task2.apply(pop);
+//		PlanPrimaryActivity task2 = new PlanPrimaryActivity(zoneLayer);
+//		task2.apply(pop);
 		
 		/*
 		 * Write population.

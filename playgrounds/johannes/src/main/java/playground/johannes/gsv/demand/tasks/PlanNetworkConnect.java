@@ -20,39 +20,41 @@
 /**
  * 
  */
-package playground.johannes.gsv.demand;
+package playground.johannes.gsv.demand.tasks;
 
-import gnu.trove.TIntDoubleHashMap;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.population.algorithms.XY2Links;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Random;
+import playground.johannes.gsv.demand.PopulationTask;
 
 /**
  * @author johannes
  *
  */
-public class PersonCarAvailabilityLoader extends AbstractTaskWrapper {
+public class PlanNetworkConnect implements PopulationTask {
 
-	public PersonCarAvailabilityLoader(String file, Random random) throws IOException {
-		BufferedReader reader = new BufferedReader(new FileReader(file));
+	private final Scenario scenario;
+	
+	public PlanNetworkConnect(String roadNetFile) {
+		Config config = ConfigUtils.createConfig();
+		scenario = ScenarioUtils.createScenario(config);
 		
-		TIntDoubleHashMap map = new TIntDoubleHashMap();
-		
-		String line = reader.readLine();
-		while((line = reader.readLine()) != null) {
-			String[] tokens = line.split(LoaderUtils.FIELD_SEPARATOR);
-			int lower = Integer.parseInt(tokens[0]);
-			int upper = Integer.parseInt(tokens[1]);
-			double frac = Double.parseDouble(tokens[2]);
-			for(int i = lower; i < upper+1; i++) {
-				map.put(i, frac);
-			}
-		}
-		
-		reader.close();
-		
-		delegate = new PersonCarAvailability(map, random);
+		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);
+		reader.readFile(roadNetFile);
 	}
+	/* (non-Javadoc)
+	 * @see playground.johannes.gsv.demand.PopulationTask#apply(org.matsim.api.core.v01.population.Population)
+	 */
+	@Override
+	public void apply(Population pop) {
+		XY2Links delegate = new XY2Links(scenario);
+
+		delegate.run(pop);
+	}
+
 }

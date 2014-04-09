@@ -20,15 +20,18 @@
 /**
  * 
  */
-package playground.johannes.gsv.demand;
+package playground.johannes.gsv.demand.loader;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
 
+import playground.johannes.gsv.demand.AbstractTaskWrapper;
+import playground.johannes.gsv.demand.NutsLevel3Zones;
+import playground.johannes.gsv.demand.tasks.PersonGender;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 
@@ -59,7 +62,7 @@ public class PersonGenderWrapper extends AbstractTaskWrapper {
 		/*
 		 * read lines
 		 */
-		Set<Zone<Double>> zones = new HashSet<Zone<Double>>();
+		Set<Zone<Double>> zones = new LinkedHashSet<Zone<Double>>();
 		while((line = reader.readLine()) != null) {
 			tokens = line.split("\t");
 			String id = tokens[0];

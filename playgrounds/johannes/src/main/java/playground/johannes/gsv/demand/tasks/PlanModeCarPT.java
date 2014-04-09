@@ -20,23 +20,56 @@
 /**
  * 
  */
-package playground.johannes.gsv.demand;
+package playground.johannes.gsv.demand.tasks;
 
-import java.io.IOException;
 import java.util.Random;
 
-import playground.johannes.sna.gis.ZoneLayer;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 
+import playground.johannes.gsv.demand.PopulationTask;
 
 /**
  * @author johannes
  *
  */
-public class PersonEqualZoneDistributionWrapper extends AbstractTaskWrapper {
+public class PlanModeCarPT implements PopulationTask {
 
-	public PersonEqualZoneDistributionWrapper(String file, String key, Random random) throws IOException {
-		ZoneLayer<Double> zoneLayer = LoaderUtils.loadSingleColumnRelative(file, key);
-		this.delegate = new PersonEqualZoneDistribution(zoneLayer, random);
+	private final Random random;
+	
+	private final double pcar;
+	
+	public PlanModeCarPT(double pcar, Random random) {
+		this.pcar = pcar;
+		this.random = random;
+	}
+	
+	@Override
+	public void apply(Population pop) {
+		for(Person p : pop.getPersons().values()) {
+			Plan plan = p.getPlans().get(0);
+			Leg leg = (Leg) plan.getPlanElements().get(1);
+			if(random.nextDouble() < pcar) {
+				leg.setMode("car");
+			} else {
+				leg.setMode("pt");
+			}
+		}
+
+	}
+	
+	public final static void main(String[] args) {
+//		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//		PopulationReader reader = new MatsimPopulationReader(scenario);
+//		reader.readFile("/home/johannes/gsv/matsim/studies/netz2030/data/population.linked.gk3.xml");
+//		
+//		PlanModeCarPT selector = new PlanModeCarPT();
+//		selector.apply(scenario.getPopulation());
+//		
+//		PopulationWriter writer = new PopulationWriter(scenario.getPopulation(), null);
+//		writer.write("/home/johannes/gsv/matsim/studies/netz2030/data/population.linked.gk3.xml");
 	}
 
 }

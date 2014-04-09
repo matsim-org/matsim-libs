@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.johannes.gsv.demand;
+package playground.johannes.gsv.demand.tasks;
 
 import java.util.Random;
 
@@ -29,10 +29,12 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.utils.collections.Tuple;
 
-import playground.johannes.coopsim.mental.choice.ChoiceSet;
+import com.vividsolutions.jts.geom.Point;
+
 import playground.johannes.coopsim.util.MatsimCoordUtils;
+import playground.johannes.gsv.demand.PersonAttributes;
+import playground.johannes.gsv.demand.PopulationTask;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
@@ -41,17 +43,17 @@ import playground.johannes.socialnetworks.utils.XORShiftRandom;
  * @author johannes
  *
  */
-public class PersonAge implements PopulationTask {
+public class PersonGender implements PopulationTask {
 
-	private final ZoneLayer<ChoiceSet<Tuple<Integer, Integer>>> zones;
+	private final ZoneLayer<Double> zones;
 	
 	private final Random random;
 	
-	public PersonAge(ZoneLayer<ChoiceSet<Tuple<Integer, Integer>>> zones) {
+	public PersonGender(ZoneLayer<Double> zones) {
 		this(zones, new XORShiftRandom());
 	}
 	
-	public PersonAge(ZoneLayer<ChoiceSet<Tuple<Integer, Integer>>> zones, Random random) {
+	public PersonGender(ZoneLayer<Double> zones, Random random) {
 		this.zones = zones;
 		this.random = random;
 	}
@@ -60,23 +62,19 @@ public class PersonAge implements PopulationTask {
 	public void apply(Population pop) {
 		for(Person person : pop.getPersons().values()) {
 			Coord c = ((Activity)person.getPlans().get(0).getPlanElements().get(0)).getCoord();
-			Zone<ChoiceSet<Tuple<Integer, Integer>>> zone = zones.getZone(MatsimCoordUtils.coordToPoint(c));
-			ChoiceSet<Tuple<Integer, Integer>> choiceSet = zone.getAttribute();
+			Point point = MatsimCoordUtils.coordToPoint(c);
+			point.setSRID(4326);
+			Zone<Double> zone = zones.getZone(point);
 			
-			Tuple<Integer, Integer> category = choiceSet.randomWeightedChoice();
-			int lower = category.getFirst();
-			int upper = category.getSecond();
-			int diff = upper - lower;
+			double p = zone.getAttribute();
 			
-			int offset = random.nextInt(diff + 1); //+1 because upper bound is inclusive
-			
-			int age = lower + offset;
-			
-			((PersonImpl)person).setAge(age);
+			if(random.nextDouble() < p) {
+				((PersonImpl)person).setSex(PersonAttributes.FEMALE);
+			} else {
+				((PersonImpl)person).setSex(PersonAttributes.MALE);
+			}
 		}
 
 	}
-	
-	
 
 }

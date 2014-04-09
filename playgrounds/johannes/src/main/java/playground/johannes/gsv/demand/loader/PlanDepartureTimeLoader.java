@@ -20,26 +20,39 @@
 /**
  * 
  */
-package playground.johannes.gsv.demand;
+package playground.johannes.gsv.demand.loader;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Population;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Random;
 
-import playground.johannes.sna.util.Composite;
+import playground.johannes.coopsim.mental.choice.ChoiceSet;
+import playground.johannes.gsv.demand.AbstractTaskWrapper;
+import playground.johannes.gsv.demand.tasks.PlanDepartureTime;
 
 /**
  * @author johannes
  *
  */
-public class PopulationTaskComposite extends Composite<PopulationTask> implements PopulationTask {
+public class PlanDepartureTimeLoader extends AbstractTaskWrapper {
 
-	private static final Logger logger = Logger.getLogger(PopulationTaskComposite.class);
-	@Override
-	public void apply(Population pop) {
-		for(PopulationTask task : components) {
-			logger.debug(String.format("Executing task %s", task.getClass().getName()));
-			task.apply(pop);
+	public PlanDepartureTimeLoader(String file, Random random) throws IOException {
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		ChoiceSet<Integer> choiceSet = new ChoiceSet<Integer>(random);
+		String line = reader.readLine();
+		while((line = reader.readLine()) != null) {
+			/*
+			 * read only the first record
+			 */
+			String tokens[] = line.split(";");
+			for(int i = 2; i < 26; i++) {
+				choiceSet.addChoice(i-2, Double.parseDouble(tokens[i].replace(",", ".")));
+			}
+			break;
 		}
+		reader.close();
+		
+		delegate = new PlanDepartureTime(choiceSet, random);
 	}
-
 }
