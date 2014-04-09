@@ -96,7 +96,7 @@ public class WithindayListener implements StartupListener {
 	public void addNetworkChange(Controler controler, Set<Id> links) {
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		NetworkChangeEvent networkChangeEvent0;
-		networkChangeEvent0 = network.getFactory().createNetworkChangeEvent(15.5 * 3600.0);		
+		networkChangeEvent0 = network.getFactory().createNetworkChangeEvent(15.49 * 3600.0);		
 		
 		for (Id id : links) {
 			Link link = network.getLinks().get(id);
