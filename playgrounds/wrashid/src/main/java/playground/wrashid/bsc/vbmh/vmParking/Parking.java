@@ -41,7 +41,7 @@ public class Parking {
 	public LinkedList <ParkingSpot> evSpots;
 	public LinkedList <ParkingSpot> nevSpots;
 	public boolean ocupancyStats = false;
-	private LinkedList<Double[]> occupancyList;
+	public LinkedList<Double[]> occupancyList;
 ///*
 	@XmlTransient
 	public Coord getCoordinate(){
@@ -191,7 +191,7 @@ public class Parking {
 		String facilityId = this.facilityId;
 		String facilityActType = this.facilityActType;
 		if(this.type.equals("public")){
-			if(!this.facilityActType.equals("parkingLot")){
+			if(this.facilityActType==null /* !this.facilityActType.equals("parkingLot") */){
 				facilityActType="Street";
 			}
 			facilityId="Street";

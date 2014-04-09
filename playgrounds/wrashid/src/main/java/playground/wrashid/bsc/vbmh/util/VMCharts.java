@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.charts.XYScatterChart;
 
 public class VMCharts {
@@ -17,6 +18,10 @@ public class VMCharts {
 	
 	public void setAx(String chartName, Boolean logAx){
 		charts.get(chartName).logAx=logAx;
+	}
+	
+	public void setLine(String chartName, Boolean line){
+		charts.get(chartName).line=line;
 	}
 	
 	public void addSeries(String chartName, String seriesName){
@@ -53,10 +58,11 @@ public class VMCharts {
 		String xName = "X";
 		String yName = "Y";
 		Boolean logAx = true;
+		Boolean line = false;
 		
 		void print(String filename){
 			XYScatterChart chart = new XYScatterChart(name, xName, yName,logAx); //True aktiviert log scale
-			
+			XYLineChart lineChart = new XYLineChart(name, xName, yName,logAx);
 			
 			Iterator<String> names = series.keySet().iterator();
 			for (LinkedList<double[]> serie : series.values()){
@@ -70,18 +76,28 @@ public class VMCharts {
 				String yWert;
 				for(double[] element : serie){
 					x[i]=element[0];
-					y[i]=element[1]+0.1; // +0.1 nicht schoen aber sonst log scale nicht moeglich wegen 0 werten
+					if(logAx){
+						y[i]=element[1]+0.1; // +0.1 nicht schoen aber sonst log scale nicht moeglich wegen 0 werten
+					}else{
+						y[i]=element[1];
+					}
+						
 					xWert=Double.toString(element[0]);
 					yWert=Double.toString(element[1]);
 					writer.writeLine(xWert+", "+yWert);
 					i++;
 				}
 				chart.addSeries(name, x,y);
+				lineChart.addSeries(name, x,y);
 				writer.close();
 			}
 			
 			//chart.getChart().getXYPlot().getRenderer().setBaseShape(new Ellipse2D.Double(0,0,5,5));
-			chart.saveAsPng(filename, 2400, 1500);
+			if(line){
+				lineChart.saveAsPng(filename, 2400, 1500);
+			}else{
+				chart.saveAsPng(filename, 2400, 1500);
+			}
 			
 		}
 		

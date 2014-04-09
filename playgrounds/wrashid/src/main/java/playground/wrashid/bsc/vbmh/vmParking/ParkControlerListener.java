@@ -1,5 +1,6 @@
 package playground.wrashid.bsc.vbmh.vmParking;
 
+import java.io.File;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -54,7 +55,18 @@ public class ParkControlerListener implements StartupListener, IterationEndsList
 		IterEndStats iterEndStats=new IterEndStats();
 		iterEndStats.run(getParkHandler().getParkControl());
 		
-		VMCharts.printCharts(getParkHandler().getParkControl().controller.getConfig().getModule("controler").getValue("outputDirectory")+"/Charts", getParkHandler().getParkControl().controller.getIterationNumber());
+		
+		//Verzeichnisse erstellen
+		try{
+			File dir = new File(getParkHandler().getParkControl().controller.getConfig().getModule("controler").getValue("outputDirectory")+"/Charts/"+getParkHandler().getParkControl().controller.getIterationNumber());
+			dir.mkdir();
+		}catch(Exception e){
+			System.out.println("Verzeichniss wurde nicht angelegt");
+		}
+		//-----
+		
+		
+		VMCharts.printCharts(getParkHandler().getParkControl().controller.getConfig().getModule("controler").getValue("outputDirectory")+"/Charts/"+getParkHandler().getParkControl().controller.getIterationNumber(), getParkHandler().getParkControl().controller.getIterationNumber());
 		VMCharts.clear();
 		
 		

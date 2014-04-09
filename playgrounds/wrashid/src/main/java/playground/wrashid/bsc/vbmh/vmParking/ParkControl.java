@@ -120,6 +120,11 @@ public class ParkControl {
 		for(Parking parking : parkingMap.getParkings()){
 			peakLoad.put(parking.id, 0);
 			load.put(parking.id, 0);
+			if(parking.facilityActType!=null){
+				if(parking.facilityActType.equals("parkingLot")){
+					parking.setOcupancyStats(true);
+				}
+			}
 		}
 		notParked = new LinkedList<LinkedList<String>>();
 		
@@ -353,7 +358,7 @@ public class ParkControl {
 		if(hasToCharge){
 			//vmCharts.addValues("Available EVparkings", "slow charge", time, countSlowCharge);
 			vmCharts.addValues("Available EVparkings", "fast charge", time, countFastCharge);
-			vmCharts.addValues("Available EVparkings", "turbo charge", time, countTurboCharge*100);
+			vmCharts.addValues("Available EVparkings", "turbo charge", time, countTurboCharge);
 		}
 		//-----
 		

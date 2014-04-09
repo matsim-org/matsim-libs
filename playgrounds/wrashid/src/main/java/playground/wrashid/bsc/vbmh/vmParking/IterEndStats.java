@@ -46,6 +46,27 @@ public class IterEndStats {
 				VMCharts.addValues("Util vs Traveldistance", "NEV", distance, score);
 				}
 		}
+	
+		chart.addChart("Parkinglot occupancy");
+		chart.setAx("Parkinglot occupancy", false);
+		chart.setAxis("Parkinglot occupancy", "time", "occupancy [0..1]");
+		chart.setLine("Parkinglot occupancy", true);
+		for(Parking parking : parkControl.parkingMap.getParkings()){
+			if(parking.ocupancyStats == true){
+				chart.addSeries("Parkinglot occupancy", Integer.toString(parking.id)+"EV");
+				chart.addSeries("Parkinglot occupancy", Integer.toString(parking.id)+"NEV");
+				for(Double[] values : parking.occupancyList){
+					VMCharts.addValues("Parkinglot occupancy", Integer.toString(parking.id)+"EV", values[0], values[2]);
+					VMCharts.addValues("Parkinglot occupancy", Integer.toString(parking.id)+"NEV", values[0], values[2]);
+				}
+				
+			}
+		}
+		
+		
+		
+		
+		
 		
 	}
 	
