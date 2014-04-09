@@ -40,8 +40,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scoring.functions.OnlyTravelTimeDependentScoringFunctionFactory;
 import org.matsim.withinday.controller.WithinDayControlerListener;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
-import org.matsim.withinday.replanning.identifiers.filter.LinkFilterFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 
 public class WithindayListener implements StartupListener {
@@ -71,9 +69,9 @@ public class WithindayListener implements StartupListener {
 		
 		this.addNetworkChange(event.getControler(), links);
 		
-		this.initWithinDayReplanning(this.scenario);
+		this.withinDayControlerListener.notifyStartup(event);
 		
-		this.withinDayControlerListener.notifyStartup(event);			
+		this.initWithinDayReplanning(this.scenario);				
 	}
 	
 	private void initWithinDayReplanning(Scenario scenario) {		
@@ -84,14 +82,12 @@ public class WithindayListener implements StartupListener {
 		LeaveLinkIdentifierFactory duringLegIdentifierFactory = new LeaveLinkIdentifierFactory(withinDayControlerListener.getLinkReplanningMap(),
 				withinDayControlerListener.getMobsimDataProvider());
 				
-		TunnelLinksFilterFactory linkFilter = new TunnelLinksFilterFactory(links, withinDayControlerListener.getMobsimDataProvider());
-		duringLegIdentifierFactory.addAgentFilterFactory(linkFilter);
-		
-		DuringLegIdentifier duringLegIdentifier = duringLegIdentifierFactory.createIdentifier();
-		
+		TunnelLinksFilterFactory linkFilterFactory = new TunnelLinksFilterFactory(links, withinDayControlerListener.getMobsimDataProvider());
+		duringLegIdentifierFactory.addAgentFilterFactory(linkFilterFactory);
+				
 		CurrentLegReplannerFactory duringLegReplannerFactory = new CurrentLegReplannerFactory(scenario, withinDayControlerListener.getWithinDayEngine(),
 				withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
-		duringLegReplannerFactory.addIdentifier(duringLegIdentifier);
+		duringLegReplannerFactory.addIdentifier(duringLegIdentifierFactory.createIdentifier());
 		
 		withinDayControlerListener.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);
 	}
