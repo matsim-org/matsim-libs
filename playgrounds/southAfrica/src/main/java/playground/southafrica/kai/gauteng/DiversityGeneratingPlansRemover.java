@@ -33,8 +33,22 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 
 /**
+ * The idea, as the name says, is to not remove the worst plan, but remove plans such that diversity is maintained.
+ * The design idea stems from path size logit, which reduces the probability to select alternatives which are similar
+ * to other alternatives by adding a penalty to their utility.  
+ * <p/>
+ * So if you have, for example, 4 similar plans with high scores and one other plan with a lower score, then the scores of 
+ * the similar plans are artificially reduced, and one of them will in consequence be removed. 
+ * In the present incarnation, we make sure that not the best of those 4 will be removed.
+ * <p/>
+ * Note that once all similar plans are removed, the remaining best plan will not be similar to any other plan any more, and
+ * thus no longer incurr a similarity penalty.  So it will never be removed.
+ * <p/>
+ * This class has <i>not</i> yet been extensively tested and so it is not clear if it contains bugs, how well it works, or if parameters
+ * should be set differently.  If someone wants to experiment, the class presumably should be made configurable (or copied before 
+ * modification). 
+ * 
  * @author nagel
- *
  */
 public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector {
 	static private final Logger log = Logger.getLogger(DiversityGeneratingPlansRemover.class);
@@ -42,7 +56,7 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 	private static final double sameActTypePenalty = 5;
 	private static final double sameLocationPenalty = 5;
 	private static final double sameRoutePenalty = 5;
-	private static final double samePenalty = 5;
+	private static final double sameModePenalty = 5;
 	private final Network network;
 	
 	public DiversityGeneratingPlansRemover( Network network ) {
@@ -125,7 +139,7 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 		return map ;
 	}
 
-	static double similarity( Plan plan1, Plan plan2, StageActivityTypes stageActivities, Network network ) {
+	private static double similarity( Plan plan1, Plan plan2, StageActivityTypes stageActivities, Network network ) {
 		double simil = 0. ;
 		{
 			List<Activity> activities1 = TripStructureUtils.getActivities(plan1, stageActivities) ;
@@ -138,7 +152,7 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 		{
 			List<Leg> legs1 = TripStructureUtils.getLegs(plan1 ) ;
 			List<Leg> legs2 = TripStructureUtils.getLegs(plan2 ) ;
-			simil += PopulationUtils.calculateSimilarity(legs1, legs2, network, samePenalty, sameRoutePenalty ) ;
+			simil += PopulationUtils.calculateSimilarity(legs1, legs2, network, sameModePenalty, sameRoutePenalty ) ;
 			if ( Double.isNaN(simil) ) {
 				log.warn("simil is NaN; id: " + plan1.getPerson().getId() ) ;
 			}
