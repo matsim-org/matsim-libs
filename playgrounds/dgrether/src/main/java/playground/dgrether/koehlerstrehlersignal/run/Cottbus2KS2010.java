@@ -49,17 +49,17 @@ public class Cottbus2KS2010 {
 	private static final String shapeFileDirectoryName = "shapes/";
 
 	public static final String SIGNAL_SYSTEMS_FILENAME = DgPaths.REPOS
-			+ "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_systems_no_13.xml";
+			+ "shared-svn/projects/cottbus/cottbus_scenario/signal_systems_no_13.xml";
 	public static final String SIGNAL_GROUPS_FILENAME = DgPaths.REPOS
-			+ "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_groups_no_13.xml";
+			+ "shared-svn/projects/cottbus/cottbus_scenario/signal_groups_no_13.xml";
 	public static final String SIGNAL_CONTROL_FILENAME = DgPaths.REPOS
-			+ "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control_no_13.xml";
+			+ "shared-svn/projects/cottbus/cottbus_scenario/signal_control_no_13.xml";
 
 	public static final String NETWORK_FILENAME = DgPaths.REPOS
-			+ "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
+			+ "shared-svn/projects/cottbus/cottbus_scenario/network_wgs84_utm33n.xml.gz";
 
 	public static final String LANES_FILENAME = DgPaths.REPOS
-			+ "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/lanes.xml";
+			+ "shared-svn/projects/cottbus/cottbus_scenario/lanes.xml";
 
 	public static final String POPULTATION_FILENAME = DgPaths.REPOS
 			+ "runs-svn/run1712/1712.output_plans.xml.gz";
@@ -75,18 +75,18 @@ public class Cottbus2KS2010 {
 		int cellsX = 5;
 		int cellsY = 5;
 		double signalsBoundingBoxOffset = 50.0;
-		double cuttingBoundingBoxOffset = 9000.0;
+		double cuttingBoundingBoxOffset = 50.0;
 		double startTime = 5.5 * 3600.0;
 		double endTime = 9.5 * 3600.0;
 		// double startTime = 13.5 * 3600.0;
 		// double endTime = 18.5 * 3600.0;
 		double matsimPopSampleSize = 1.0;
 		double ksModelCommoditySampleSize = 1.0;
-		double minCommodityFlow = 10.0;
+		double minCommodityFlow = 20.0;
 		String name = "run run1722 output plans between 05:30 and 09:30";
 		// String name = "run run1722 output plans between 13:30 and 18:30";
 		final String outputDirectory = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/cb2ks2010/2014-04-02_minflow_"+ minCommodityFlow +"_morning_peak_bb"+ cuttingBoundingBoxOffset + "/";
+				+ "shared-svn/projects/cottbus/cb2ks2010/2014-04-10_minflow_"+ minCommodityFlow +"_morning_peak_bb"+ cuttingBoundingBoxOffset + "/";
 		String ksModelOutputFilename = "ks2010_model_";
 		ksModelOutputFilename += Double.toString(minCommodityFlow) + "_"
 				+ Double.toString(startTime) + ".xml";
