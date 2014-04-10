@@ -48,8 +48,8 @@ public class RunEmissionPricing {
 	
 	static String inputPath = "../../detailedEval/emissions/testScenario/input/";
 	static String networkFile = inputPath + "network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
-//	static String plansFile = inputPath + "mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
-	static String plansFile = inputPath + "smallPopulation.xml";
+	static String plansFile = inputPath + "mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
+//	static String plansFile = inputPath + "smallPopulation.xml";
 //	static String plansFile = inputPath + "mergedPopulation_All_10pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
 	
 	static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";

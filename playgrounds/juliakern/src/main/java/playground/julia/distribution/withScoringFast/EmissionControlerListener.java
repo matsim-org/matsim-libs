@@ -104,6 +104,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		emissionModule = new EmissionModule(scenario);
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
+		this.emissionFile1="./output/emissionFile.txt";
 	}
 	
 	public EmissionControlerListener(Controler controler, Network network, String eventsFile, String emissionFile){

@@ -74,6 +74,8 @@ public class ResDisCalculator implements TravelDisutility{
 	public double getLinkTravelDisutility(Link link, double time,
 			Person person, Vehicle vehicle) {
 		
+		System.out.println("travel dis for link " + link.getId().toString());
+		
 		double delegateValue = delegate.getLinkTravelDisutility(link, time, person, vehicle);
 		
 		double emissionValue = 0.0;

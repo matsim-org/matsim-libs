@@ -53,8 +53,9 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 public class ShapeConverterPop {
 
-	static String shapeFile = "input/oslo/Dataset/eksport_stort_datasett_test_2.shp";
+//	static String shapeFile = "input/oslo/Dataset/eksport_stort_datasett_test_2.shp";
 	//static String shapeFile = "input/oslo/Start_og_stopp_i_TRD_fra_RVU2/testplott5_end.shp";
+	static String shapeFile = "input/oslo/Data201404/datasett_reiser_3_shape.shp";
 	static String networkFile = "input/oslo/trondheim_network_with_lanes.xml";
 	static String plansFile = "input/oslo/plans_from_eksport_stort_datasett.xml";
 	static Collection<SimpleFeature> features;
@@ -169,8 +170,10 @@ public class ShapeConverterPop {
 			
 			
 			
-			Double time = getTimeInSeconds((String) sf.getAttribute("klokkeslet"));
+//			Double time = getTimeInSeconds((String) sf.getAttribute("klokkeslet"));
 			
+			Double time = (Integer)sf.getAttribute("HH24")*3600.
+					+ (Integer)sf.getAttribute("MIN")*60.;
 			/* 2014-02-11 12:25:26,120  INFO ShapeConverterPop:66 SimpleFeatureImpl:testplott5_end=[SimpleFeatureImpl.Attribute: 
 			the_geom<Point id=testplott5_end.1>=POINT (270060 7036918), 
 			SimpleFeatureImpl.Attribute: ID_2<ID_2 id=testplott5_end.1>=1.0, 
@@ -189,7 +192,7 @@ public class ShapeConverterPop {
 					SimpleFeatureImpl.Attribute: trmh_enk_1<trmh_enk_1 id=testplott5_end.1>=Bil, 
 					SimpleFeatureImpl.Attribute: ID_NUM2<ID_NUM2 id=testplott5_end.1>=6092701]
 			*/
-			if (time>0.0) {
+			if (time>=0.0) {
 				
 //				Double id = (Double) sf.getAttribute("B0"); //B0
 //				String idstring = Double.toString(id);
@@ -320,7 +323,7 @@ public class ShapeConverterPop {
 		return sortedTrips;
 	}
 	private static Double getTimeInSeconds(String timeString) {
-//		logger.info(timeString);
+		logger.info(timeString);
 		try{
 		String[] split = timeString.split(" ");
 		String[] split2 = split[1].split(":");
