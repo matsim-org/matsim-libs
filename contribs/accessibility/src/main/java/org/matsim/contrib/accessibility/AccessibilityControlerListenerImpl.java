@@ -281,15 +281,15 @@ public abstract class AccessibilityControlerListenerImpl {
 			}
 			jco.addObject( opportunity.getId(), expVjk ) ;
 			// yyyy if we would know the activity type, we could to do capacities as follows:
-			ActivityOption opt = opportunity.getActivityOptions().get("type") ;
-			Assert.assertNotNull(opt);
-			final double capacity = opt.getCapacity();
-			Assert.assertNotNull(capacity) ; // we do not know what that would mean
-			if ( capacity < Double.POSITIVE_INFINITY ) { // this is sometimes the value of "undefined" 
-				jco.addObject( opportunity.getId(), capacity * expVjk ) ;
-			} else {
-				jco.addObject( opportunity.getId(), expVjk ) ; // fix if capacity is "unknown".
-			}
+//			ActivityOption opt = opportunity.getActivityOptions().get("type") ;
+//			Assert.assertNotNull(opt);
+//			final double capacity = opt.getCapacity();
+//			Assert.assertNotNull(capacity) ; // we do not know what that would mean
+//			if ( capacity < Double.POSITIVE_INFINITY ) { // this is sometimes the value of "undefined" 
+//				jco.addObject( opportunity.getId(), capacity * expVjk ) ;
+//			} else {
+//				jco.addObject( opportunity.getId(), expVjk ) ; // fix if capacity is "unknown".
+//			}
 			
 		}
 		// convert map to array
