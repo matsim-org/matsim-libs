@@ -31,6 +31,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -134,6 +135,9 @@ public abstract class AccessibilityControlerListenerImpl {
 	private double bikeSpeedMeterPerHour = -1;
 	private double walkSpeedMeterPerHour = -1;
 	Benchmark benchmark;
+	
+	// counter for warning that capacities are not used so far ... in order not to give the same warning multiple times; dz, apr'14
+	private static int cnt = 0 ;
 
 	RoadPricingScheme scheme;
 
@@ -278,6 +282,11 @@ public abstract class AccessibilityControlerListenerImpl {
 			if ( jco == null ) {
 				jco = new AggregationObject(opportunity.getId(), null, null, nearestNode, 0. ); // initialize with zero!
 				opportunityClusterMap.put( nearestNode.getId(), jco ) ; 
+			}
+			if ( cnt == 0 ) {
+				cnt++;
+				log.warn("ignoring the capacities of the facilities");
+				log.warn(Gbl.ONLYONCE);
 			}
 			jco.addObject( opportunity.getId(), expVjk ) ;
 			// yyyy if we would know the activity type, we could to do capacities as follows:
