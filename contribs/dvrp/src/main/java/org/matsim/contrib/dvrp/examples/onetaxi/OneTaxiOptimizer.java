@@ -100,7 +100,7 @@ public class OneTaxiOptimizer
         schedule.addTask(new OneTaxiServeTask(t3, t4, toLink, "dropoff", req));
 
         //just wait (and be ready) till the end of the vehicle's time window (T1)
-        double tEnd = vehicle.getT1();
+        double tEnd = Math.max(t4, vehicle.getT1());
         schedule.addTask(new StayTaskImpl(t4, tEnd, toLink, "wait"));
     }
 
@@ -130,14 +130,24 @@ public class OneTaxiOptimizer
         }
 
         currentTask.setEndTime(now);
-
+        
         List<AbstractTask> tasks = schedule.getTasks();
         int nextTaskIdx = currentTask.getTaskIdx() + 1;
 
-        for (int i = nextTaskIdx; i < tasks.size(); i++) {
+        //all except the last task (waiting)
+        for (int i = nextTaskIdx; i < tasks.size() - 1; i++) {
             Task task = tasks.get(i);
             task.setBeginTime(task.getBeginTime() + diff);
             task.setEndTime(task.getEndTime() + diff);
+        }
+        
+        //wait task
+        if (nextTaskIdx != tasks.size()) {
+            Task waitTask = tasks.get(tasks.size() - 1);
+            waitTask.setBeginTime(waitTask.getBeginTime() + diff);
+            
+            double tEnd = Math.max(waitTask.getBeginTime(), vehicle.getT1());
+            waitTask.setEndTime(tEnd);
         }
     }
 }

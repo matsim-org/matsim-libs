@@ -40,6 +40,10 @@ public abstract class AbstractTask
 
     public AbstractTask(double beginTime, double endTime)
     {
+        if (beginTime > endTime) {
+            throw new IllegalArgumentException();
+        }
+
         this.beginTime = beginTime;
         this.endTime = endTime;
     }
