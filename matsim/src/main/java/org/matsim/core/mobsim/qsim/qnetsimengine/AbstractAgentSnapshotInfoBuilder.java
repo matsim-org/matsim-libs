@@ -153,7 +153,7 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 		}
 
 		this.createAndAddSnapshotInfoForPassengers(positions, veh.getPassengers(), distanceFromFromNode, startCoord, 
-				endCoord, lengthOfCurve, euclideanLength, lane, speedValueBetweenZeroAndOne);
+				endCoord, lengthOfCurve, euclideanLength, lane+5, speedValueBetweenZeroAndOne);
 		// (this is deliberately first memorizing "pos" but then filling in the passengers first)
 
 		positions.add(pos);
