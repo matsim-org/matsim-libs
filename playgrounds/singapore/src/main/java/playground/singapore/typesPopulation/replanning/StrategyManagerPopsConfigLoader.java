@@ -168,7 +168,7 @@ public final class StrategyManagerPopsConfigLoader {
 			externalCounter++;
 			PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			String exePath = settings.getExePath();
-			ExternalModule em = new ExternalModule(exePath, "ext" + externalCounter, controler, controler.getScenario());
+			ExternalModule em = new ExternalModule(exePath, "ext" + externalCounter, controler.getControlerIO(), controler.getScenario());
 			strategy.addStrategyModule(em);
 			return strategy;
 		} else if (name.contains(".")) {
