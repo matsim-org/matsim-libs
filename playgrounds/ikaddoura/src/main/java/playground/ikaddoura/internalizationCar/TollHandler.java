@@ -59,6 +59,8 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 	private Map<Id, Map<Double, Double>> linkId2timeBin2avgToll = new HashMap<Id, Map<Double, Double>>();
 	private Map<Id, Map<Double, Double>> linkId2timeBin2avgTollOldValue = new HashMap<Id, Map<Double, Double>>();
 	
+	private boolean setMethodsExecuted = false;
+	
 	private double vtts_car;
 	
 	public TollHandler(Scenario scenario) {
@@ -68,8 +70,8 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 
 	@Override
 	public void reset(int iteration) {
-		linkId2timeBin2tollSum.clear();
-		linkId2timeBin2enteringAndDepartingAgents.clear();
+		this.linkId2timeBin2tollSum.clear();
+		this.linkId2timeBin2enteringAndDepartingAgents.clear();
 		this.congestionEvents.clear();
 		this.linkEnterEvents.clear();
 		this.personDepartureEvents.clear();
@@ -77,6 +79,8 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 		this.linkId2timeBin2avgTollOldValue.clear();
 		this.linkId2timeBin2avgTollOldValue.putAll(linkId2timeBin2avgToll);
 		this.linkId2timeBin2avgToll.clear();
+		
+		this.setMethodsExecuted = false;
 	}
 
 	@Override
@@ -99,7 +103,7 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 	}
 
 	public void setLinkId2timeBin2avgToll() {
-		
+				
 		if (!this.linkId2timeBin2tollSum.isEmpty()) {
 			throw new RuntimeException("Map linkId2timeBin2tollSum should be empty!");
 		} else {
@@ -113,6 +117,8 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 			// calculate leaving agents for each link and time bin
 			setlinkId2timeBin2enteringAndDepartingAgents();
 		}
+		
+		this.setMethodsExecuted = true;
 		
 		if (!this.linkId2timeBin2avgToll.isEmpty()) {
 			throw new RuntimeException("Map linkId2timeBin2avgToll should be empty!");
@@ -346,6 +352,12 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 	}
 
 	public void writeTollStats(String fileName) {
+		
+		if (this.setMethodsExecuted == false) {
+			log.info("Average tolls per link Id and time bin have to be set. Running required method...");
+			this.setLinkId2timeBin2avgToll();
+		}
+		
 		File file = new File(fileName);
 		
 		try {
@@ -356,7 +368,7 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 			for (Id linkId : this.linkId2timeBin2enteringAndDepartingAgents.keySet()){
 				double totalToll = 0.;
 				int enteringAgents = 0;
-				
+								
 				if (this.linkId2timeBin2tollSum.get(linkId) == null) {
 					// There is no toll payment in any time bin.
 					

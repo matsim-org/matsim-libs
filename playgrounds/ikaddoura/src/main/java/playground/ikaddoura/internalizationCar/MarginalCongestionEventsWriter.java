@@ -29,22 +29,24 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
-import playground.ikaddoura.internalizationCar.MarginalCostPricingCarHandler;
+import playground.ikaddoura.analysis.monetaryAmountsTripAnalysis.CarTripInfoWriter;
+import playground.ikaddoura.analysis.monetaryAmountsTripAnalysis.ExtCostEventHandler;
 
 /**
  * (1) Writes marginal congestion events based on a standard events file.
  * (2) Writes agent money events based on these marginal congestion events.
+ * (3) Does some analysis
  * 
  * @author ikaddoura
  *
  */
 public class MarginalCongestionEventsWriter {
 
-	static String configFile = "../../runs-svn/berlin_internalizationCar/output/internalization_4/output_config.xml.gz";
-	static String networkFile = "../../runs-svn/berlin_internalizationCar/output/internalization_4/output_network.xml.gz";
-	static String inputEventsFile = "../../runs-svn/berlin_internalizationCar/output/internalization_4/ITERS/it.100/100.events.xml.gz";
-	static String outputEventsFile = "../../runs-svn/berlin_internalizationCar/output/internalization_4/ITERS/it.100/100.eventsCongestionPrices.xml.gz";
+	static String configFile = "../../runs-svn/berlin_internalizationCar/output/baseCase_4/output_config.xml.gz";
+	static String networkFile = "../../runs-svn/berlin_internalizationCar/output/baseCase_4/output_network.xml.gz";
+	
+	static String outputPath = "../../runs-svn/berlin_internalizationCar/output/baseCase_4/ITERS/it.0";
+	static String inputEventsFile = outputPath + "/0.events.xml.gz";
 	
 	public static void main(String[] args) {
 		MarginalCongestionEventsWriter anaMain = new MarginalCongestionEventsWriter();
@@ -60,19 +62,35 @@ public class MarginalCongestionEventsWriter {
 		
 		EventsManager events = EventsUtils.createEventsManager();		
 		
-		EventWriterXML eventWriter = new EventWriterXML(outputEventsFile);
+		EventWriterXML eventWriter = new EventWriterXML(outputPath + "/eventsCongestionPrices_Offline.xml.gz");
 		MarginalCongestionHandlerImplV3 congestionHandler = new MarginalCongestionHandlerImplV3(events, scenario);
 		MarginalCostPricingCarHandler marginalCostTollHandler = new MarginalCostPricingCarHandler(events, scenario);
 
+		TollHandler tollHandler = new TollHandler(scenario);
+		ExtCostEventHandler extCostHandler = new ExtCostEventHandler(scenario.getNetwork());
+		
 		events.addHandler(eventWriter);
 		events.addHandler(congestionHandler);
 		events.addHandler(marginalCostTollHandler);
+		
+		events.addHandler(tollHandler);
+		events.addHandler(extCostHandler);
 		
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(inputEventsFile);
 		
 		eventWriter.closeFile();
 		
+		// analyze the marginal congestion costs
+		System.out.println("Total amounts in AgentMoneyEvents: " + marginalCostTollHandler.getAmountSum());
+		congestionHandler.writeCongestionStats(outputPath + "/congestionStats_Offline.csv");
+		
+		tollHandler.writeTollStats(outputPath + "/tollStats_Offline.csv");
+
+		CarTripInfoWriter writer = new CarTripInfoWriter(extCostHandler, outputPath);
+		writer.writeDetailedResults();
+		writer.writeAvgTollPerTimeBin();
+		writer.writeAvgTollPerDistance();
 	}
 			 
 }

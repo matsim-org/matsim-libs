@@ -336,7 +336,7 @@ public abstract class MarginalCongestionHandler implements
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+		log.info("Output written to " + fileName);		
 	}
 
 	public double getTotalInternalizedDelay() {
