@@ -96,64 +96,6 @@ public class ShapeConverterPop {
 		logger.info("features with know acttype " + countKnownActTypes);
 		
 
-		//	if(sf.getFeatureType() instanceof SimpleFeatureTypeImpl){
-//				//SimpleFeatureTypeImpl http://www.opengis.net/gml:trondheim_med_omland_4 identified extends lineFeature(the_geom:MultiLineString,FNODE_:FNODE_,TNODE_:TNODE_,LPOLY_:LPOLY_,RPOLY_:RPOLY_,LENGTH:LENGTH,VEGNETT_:VEGNETT_,VEGNETT_ID:VEGNETT_ID,OPPR:OPPR,KOORDH:KOORDH,LTEMA:LTEMA,ADRS1:ADRS1,ADRS1F:ADRS1F,ADRS1T:ADRS1T,ADRS2:ADRS2,ADRS2F:ADRS2F,ADRS2T:ADRS2T,MEDIUM:MEDIUM,KOMM:KOMM,TRANSID:TRANSID,GATE:GATE,MAALEMETOD:MAALEMETOD,NOEYAKTIGH:NOEYAKTIGH,GATENAVN:GATENAVN,VEGTYPE:VEGTYPE,VEGSTATUS:VEGSTATUS,VEGNUMMER:VEGNUMMER,HOVEDPARSE:HOVEDPARSE,METER_FRA:METER_FRA,METER_TIL:METER_TIL,VKJORFLT:VKJORFLT,VFRADATO:VFRADATO,DATO:DATO,AKSEL_SO:AKSEL_SO,AKSEL_VI:AKSEL_VI,AKSEL_TEL:AKSEL_TEL,LENGDE:LENGDE,TOTVEKT:TOTVEKT,FARTSGRENS:FARTSGRENS,HOYDE:HOYDE,ONEWAY:ONEWAY,SPERRING:SPERRING,DRIVETIME:DRIVETIME,KOMMTRANSI:KOMMTRANSI,FYLKE:FYLKE,KOMMUNE:KOMMUNE,X_fra:X_fra,Y_fra:Y_fra,X_til:X_til,Y_til:Y_til)
-////				System.out.println(sf.getAttribute("FNODE_"));
-////				System.out.println(sf.getAttribute("KOORDH"));
-//				
-//				// create from node (if it doesnt exist yet)
-//				Double fromNodeX = (Double) sf.getAttribute("X_fra");
-//				Double fromNodeY = (Double) sf.getAttribute("Y_fra");
-//				Coord fromCoord = scenario.createCoord(fromNodeX, fromNodeY);
-//				Long fromNodeLong = (Long) sf.getAttribute("FNODE_");
-//				String fromNode = Long.toString(fromNodeLong);
-//				Node node1;
-//				
-//				if(!network.getNodes().containsKey(new IdImpl(fromNode))){
-//					node1 = network.createAndAddNode(scenario.createId(fromNode), fromCoord);
-//				}else{
-//					node1=network.getNodes().get(new IdImpl(fromNode));
-//					
-//				}
-//				
-//				// create to node (if it does not exist yet)
-//				Double toNodeX = (Double) sf.getAttribute("X_til");
-//				Double toNodeY = (Double) sf.getAttribute("Y_til");
-//				Coord toCoord = scenario.createCoord(toNodeX, toNodeY);
-//				Long toNodeLong = (Long) sf.getAttribute("TNODE_");
-//				String toNode = Long.toString(toNodeLong);
-//				Node node2;
-//				
-//				if(!network.getNodes().containsKey(new IdImpl(toNode))){
-//					node2 = network.createAndAddNode(scenario.createId(toNode), toCoord);
-//				}else{
-//					node2 = network.getNodes().get(new IdImpl(toNode));
-//					
-//				}
-//				
-//				// create link
-//				//network.createAndAddLink(scenario.createId("12"), node1, node2, 1000, 30.00, 3600, 1, null, "22");
-//				//network.createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, numLanes);
-//				//network.createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, numLanes, origId, type);
-//				Id linkId1 = new IdImpl(fromCoord+"_"+toCoord);
-//				Id linkId2 = new IdImpl(toCoord+"_"+fromCoord);
-//				if(node1.equals(node2)){
-//					logger.warn("nodes equal");
-//				}
-//				
-//				Double linkLength = (Double) sf.getAttribute("LENGDE");
-//				Integer freeSpeedkmh = (Integer) sf.getAttribute("FARTSGRENS"); // tempo limit //TODO change to m/sec?
-//				Double freeSpeed = freeSpeedkmh.doubleValue(); 
-//				Double capacity = 3600.;
-//				Double numLanes = 2.0;
-//					
-//				if (!network.getLinks().containsKey(linkId1)) {
-//					network.createAndAddLink(linkId1, node1, node2, linkLength,freeSpeed, capacity, numLanes);
-//				}
-//				if(!network.getLinks().containsKey(linkId2)){
-//					network.createAndAddLink(linkId2, node2, node1, linkLength,freeSpeed, capacity, numLanes);
-//				}
-	//	}
 		
 		}
 //		NetworkWriter nw = new NetworkWriter(network);
@@ -194,25 +136,18 @@ public class ShapeConverterPop {
 			*/
 			if (time>=0.0) {
 				
-//				Double id = (Double) sf.getAttribute("B0"); //B0
-//				String idstring = Double.toString(id);
-				
-				//Integer idd = (Integer) sf.getAttribute("ID_NUM2"); //ID_2 --> pop size = 59059
-				Double idd = (Double) sf.getAttribute("ID_NUM2");
-			//	Integer id = idd.intValue();
-				//String idstring = Integer.toString(id);
-				String ids = Double.toString(idd);
+																																																																																																																																																																																																									String ids = Long.toString((Long)sf.getAttribute("ID2"));
 				Id personId = new IdImpl(ids);
 				
-				Double startx = (Double) sf.getAttribute("start_x_ny");
-				Double starty = (Double) sf.getAttribute("start_y_ny");
-				Double endx = (Double) sf.getAttribute("ende_x_ny");
-				Double endy = (Double) sf.getAttribute("ende_y_ny");
+				Double startx = new Double((Integer) sf.getAttribute("START_X"));
+				Double starty = new Double((Integer) sf.getAttribute("START_Y"));
+				Double endx = new Double((Integer) sf.getAttribute("ENDE_X"));
+				Double endy = new Double((Integer) sf.getAttribute("ENDE_Y"));
 				
 				Coord startCoordinates = scenario.createCoord(startx, starty);
 				Coord endCoordinates = scenario.createCoord(endx, endy);
 				
-				String actType = (String) sf.getAttribute("Formal_enk"); // activity type
+				String actType = (String) sf.getAttribute("SKOM1"); // activity type
 				actType = actType.toLowerCase();
 				
 				if(!(actType.equals("home")||actType.equals("work")||actType.equals("commute")||actType.equals("other"))){
@@ -221,11 +156,10 @@ public class ShapeConverterPop {
 					countKnownActTypes ++;
 				}
 				
-				String legmode = (String) sf.getAttribute("trmh_enkel"); //TODO
+				String legmode = (String) sf.getAttribute("TRMH1"); //TODO
 				legmode = legmode.toLowerCase();
 				
-				Double tripnr = (Double) sf.getAttribute("reisenr");
-				int tripnumber = tripnr.intValue();
+				int tripnumber = (Integer) sf.getAttribute("REISENR");
 				
 				// map: person id 2 list of trips
 				Trip trip = new Trip(startCoordinates, endCoordinates, time, legmode, actType, tripnumber);
