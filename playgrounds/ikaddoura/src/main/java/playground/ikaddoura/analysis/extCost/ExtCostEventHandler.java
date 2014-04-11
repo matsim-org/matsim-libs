@@ -31,6 +31,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -403,19 +404,37 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 	
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		
-		double distanceTravelled = (driverId2totalDistance.get(event.getVehicleId()) - personId2distanceEnterValue.get(event.getVehicleId())); 
-		
-		int tripNumber = personId2actualTripNumber.get(event.getPersonId());
-		Map<Integer,Double> tripNumber2distance = personId2tripNumber2tripDistance.get(event.getPersonId());
-		tripNumber2distance.put(tripNumber, tripNumber2distance.get(tripNumber) + distanceTravelled);
-		
-		personId2distanceEnterValue.remove(event.getPersonId());
+		if(ptDrivers.contains(event.getPersonId())){
+			// ptDrivers are not considered
+		} else {
+			int tripNumber = personId2actualTripNumber.get(event.getPersonId());
+			Map<Integer,String> tripNumber2legMode = personId2tripNumber2legMode.get(event.getPersonId());
+			if((tripNumber2legMode.get(tripNumber)).equals(TransportMode.car)){
+			// car drivers not considered here
+			} else {
+				double distanceTravelled = (driverId2totalDistance.get(event.getVehicleId()) - personId2distanceEnterValue.get(event.getVehicleId())); 
+				
+				Map<Integer,Double> tripNumber2distance = personId2tripNumber2tripDistance.get(event.getPersonId());
+				tripNumber2distance.put(tripNumber, tripNumber2distance.get(tripNumber) + distanceTravelled);
+				
+				personId2distanceEnterValue.remove(event.getPersonId());
+			}
+		}
 	}
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		personId2distanceEnterValue.put(event.getPersonId(), driverId2totalDistance.get(event.getVehicleId()));
+		if(ptDrivers.contains(event.getPersonId())){
+			// ptDrivers are not considered
+		} else {
+			int tripNumber = personId2actualTripNumber.get(event.getPersonId());
+			Map<Integer,String> tripNumber2legMode = personId2tripNumber2legMode.get(event.getPersonId());
+			if((tripNumber2legMode.get(tripNumber)).equals(TransportMode.car)){
+			// car drivers not considered here
+			} else {
+				personId2distanceEnterValue.put(event.getPersonId(), driverId2totalDistance.get(event.getVehicleId()));
+			}
+		}
 	}
 
 }
