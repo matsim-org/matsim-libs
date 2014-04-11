@@ -196,8 +196,7 @@ import playground.michalm.util.RunningVehicleRegister;
 //                dirName + "changeevents.xml.gz");
 
         List<String> passengerIds = ODDemandGenerator.readTaxiCustomerIds(taxiCustomersFileName);
-//        VrpLauncherUtils.convertLegModes(passengerIds, TaxiRequestCreator.MODE, scenario);
-        VrpLauncherUtils.convertLegModesAndRemoveOtherModes(passengerIds, TaxiRequestCreator.MODE, scenario);
+        VrpLauncherUtils.convertLegModes(passengerIds, TaxiRequestCreator.MODE, scenario);
     }
 
 
