@@ -68,26 +68,32 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 
 	private int noOfYCells = 120;
 
-	private Map<Id, Integer> links2xCells;
-
-	private Map<Id, Integer> links2YCells;
 
 	static double xMin = 4452550.25;
 	static double xMax = 4479483.33;
 	static double yMin = 5324955.00;
 	static double yMax = 5345696.81;
 	
+	private int noOfTimeBins = 30;
+	
+	private Map<Id, Integer> links2xCells;
+	private Map<Id, Integer> links2yCells;
+	
 	private IntervalHandler intervalHandler;
 
 	private ResponsibilityGridTools responsibilityGridTools;
 
-	private int noOfTimeBins = 30;
+	
 
 
-	public InternalizeEmissionResponsibilityControlerListener(EmissionModule emissionModule, EmissionResponsibilityCostModule emissionCostModule, ResponsibilityGridTools rgt) {
+	public InternalizeEmissionResponsibilityControlerListener(EmissionModule emissionModule, EmissionResponsibilityCostModule emissionCostModule, ResponsibilityGridTools rgt, Map<Id, Integer> links2xCells, Map<Id, Integer> links2yCells) {
 		this.emissionModule = emissionModule;
 		this.emissionCostModule = emissionCostModule;
+		rgt = new ResponsibilityGridTools();
 		this.responsibilityGridTools=rgt;
+		rgt.init(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
+		this.links2xCells = links2xCells;
+		this.links2yCells = links2yCells;
 	}
 
 	@Override
@@ -98,14 +104,15 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionHandler());	
 		
-		GridTools gt = new GridTools(controler.getNetwork().getLinks(), xMin, xMax, yMin, yMax);
-		gt.mapLinks2Xcells(noOfXCells);
-		gt.mapLinks2Ycells(noOfYCells);
+//		GridTools gt = new GridTools(controler.getNetwork().getLinks(), xMin, xMax, yMin, yMax);
+//		links2xCells = gt.mapLinks2Xcells(noOfXCells);
+//		links2yCells = gt.mapLinks2Ycells(noOfYCells);
 		
-		responsibilityGridTools.init(timeBinSize, noOfTimeBins, links2xCells, links2YCells, noOfXCells, noOfYCells);
+		
+		responsibilityGridTools.init(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
 		
 		Double simulationEndtime = controler.getConfig().qsim().getEndTime();
-		intervalHandler = new IntervalHandler(timeBinSize, simulationEndtime, noOfXCells, noOfYCells, links2xCells, links2YCells);
+		intervalHandler = new IntervalHandler(timeBinSize, simulationEndtime, noOfXCells, noOfYCells, links2xCells, links2yCells);
 		eventsManager.addHandler(intervalHandler);
 		
 		firstIt = controler.getConfig().controler().getFirstIteration();

@@ -26,13 +26,19 @@ public class ResponsibilityGridTools {
 	private int noOfXCells;
 	private int noOfYCells;
 	
+	public ResponsibilityGridTools(){
+		
+	}
+	
 	public Double getFactorForLink(Id linkId, double time) {
 		Double currentTimeBin = getTimeBin(time);
 		
 		// TODO evtl schneller, wenn vor der ersten iteration initialisiert?
 		if(timebin2link2factor!=null){
-			if(timebin2link2factor.get(currentTimeBin).containsKey(linkId)){
+			if(timebin2link2factor.get(currentTimeBin)!=null){
+			if(timebin2link2factor.get(currentTimeBin).get(linkId)!=null){
 				return timebin2link2factor.get(currentTimeBin).get(linkId);
+			}
 			}
 		}
 		return 0.0;
@@ -125,6 +131,7 @@ public class ResponsibilityGridTools {
 		this.timeBinSize = timeBinSize;
 		this.noOfTimeBins = noOfTimeBins;
 		// neue time2link map anlegen
+		this.timebin2link2factor = new HashMap<Double, Map<Id,Double>>();
 		for(int i=1; i<noOfTimeBins+1; i++){
 			timebin2link2factor.put((i*this.timeBinSize), new HashMap<Id, Double>());
 		}
@@ -134,7 +141,4 @@ public class ResponsibilityGridTools {
 		this.noOfYCells=noOfYCells;
 		
 	}
-
-
-
 }

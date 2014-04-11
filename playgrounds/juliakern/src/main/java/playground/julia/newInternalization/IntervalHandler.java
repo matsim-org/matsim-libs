@@ -2,6 +2,7 @@ package playground.julia.newInternalization;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -9,9 +10,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 
-
-// TODO + homelocation at start of day
-// TODO den grid tools alte durations uebergeben
+// TODO den grid tools alte durations uebergeben - ueberpruefen
 
 public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEventHandler{
 
@@ -22,6 +21,7 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 	private Double simulationEndTime;
 	private int noOfxCells;
 	private int noOfyCells;
+	private Set<Id> recognisedPersons;
 
 	
 	public IntervalHandler(Double timeBinSize, Double simulationEndTime, int noOfxCells, int noOfyCells, 
@@ -30,7 +30,7 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 		this.simulationEndTime = simulationEndTime;
 		this.noOfxCells = noOfxCells;
 		this.noOfyCells = noOfyCells;
-		this.link2xbins = link2xbins;
+		this.link2xbins = link2xbins; //TODO probably not initialized
 		this.link2ybins = link2ybins;
 		if(link2xbins.isEmpty())System.out.println("---- emptyx");
 		if(link2ybins.isEmpty())System.out.println("---- emptyy");
@@ -52,13 +52,17 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 			
-		int xCell = link2xbins.get(event.getLinkId());
+		int xCell = link2xbins.get(event.getLinkId()); //TODO nullpointer here
 		int	yCell = link2ybins.get(event.getLinkId());
 
 		Double currentTimeBin = Math.ceil(event.getTime()/timeBinSize)*timeBinSize;
+		
+		
 		if(currentTimeBin<timeBinSize) currentTimeBin=timeBinSize;
-		Double timeWithinCurrentInterval = event.getTime()-currentTimeBin+timeBinSize;
-			
+		
+		
+		Double timeWithinCurrentInterval = new Double(event.getTime()-currentTimeBin+timeBinSize);
+		if(recognisedPersons.contains(event.getPersonId())){	
 		// time interval of activity
 		double prevDuration = duration.get(currentTimeBin)[xCell][yCell];
 			
@@ -77,7 +81,17 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 			}
 			currentTimeBin += timeBinSize;
 		}
-		
+		}else{ // person not yet recognised
+			recognisedPersons.add(event.getPersonId());
+			Double tb = new Double(timeBinSize);
+			// time bins prior to events time bin
+			while(tb < currentTimeBin){
+				duration.get(tb)[xCell][yCell] += timeBinSize;
+				tb += timeBinSize;
+			}
+			// time bin of event
+			duration.get(currentTimeBin)[xCell][yCell]+=timeWithinCurrentInterval;
+		}
 //			System.out.println(network.getLinks().size());
 //			System.out.println(event.getLinkId());
 //			System.out.println(network.getLinks().get(event.getLinkId()));
@@ -92,6 +106,8 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 	
+		if(!recognisedPersons.contains(event.getPersonId()))recognisedPersons.add(event.getPersonId());
+		
 		int	xCell = link2xbins.get(event.getLinkId());
 		int	yCell = link2ybins.get(event.getLinkId());
 		

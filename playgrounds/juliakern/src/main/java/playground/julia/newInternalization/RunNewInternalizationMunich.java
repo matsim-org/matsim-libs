@@ -19,13 +19,18 @@
  * *********************************************************************** */
 package playground.julia.newInternalization;
 
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
+import playground.julia.distribution.GridTools;
 import playground.vsp.emissions.EmissionModule;
 
 /**
@@ -39,19 +44,33 @@ public class RunNewInternalizationMunich {
 	static String emissionEfficiencyFactor;
 	static String considerCO2Costs;
 	private static ResponsibilityGridTools rgt;
+	private static Map<Id, Integer> links2xCells;
+	private static Map<Id, Integer> links2yCells;
+	private static Integer noOfXCells = 160;
+	private static Integer noOfYCells = 120;
+	
+	static double xMin = 4452550.25;
+	static double xMax = 4479483.33;
+	static double yMin = 5324955.00;
+	static double yMax = 5345696.81;
 
 
 	public static void main(String[] args) {
-		//		configFile = "../../detailedEval/internalization/munich1pct/input/config_munich_1pct.xml";
-		//		emissionCostFactor = "1.0";
-		//		emissionEfficiencyFactor = "1.0";
-		//		considerCO2Costs = "true";
+//				configFile = "../../detailedEval/internalization/munich1pct/input/config_munich_1pct.xml";
+//				emissionCostFactor = "1.0";
+//				emissionEfficiencyFactor = "1.0";
+//				considerCO2Costs = "true";
 
-		configFile = args[0];
-		emissionCostFactor = args[1];
-		emissionEfficiencyFactor = args[2];
-		considerCO2Costs = args[3];
+//		configFile = args[0];
+//		emissionCostFactor = args[1];
+//		emissionEfficiencyFactor = args[2];
+//		considerCO2Costs = args[3];
 
+		configFile = "../../detailedEval/internalization/test/testConfig.xml";
+		emissionCostFactor = "1.0";
+		emissionEfficiencyFactor = "1.0";
+		considerCO2Costs = "true";
+		
 		Config config = ConfigUtils.createConfig();
 		config.addCoreModules();
 		MatsimConfigReader confReader = new MatsimConfigReader(config);
@@ -59,24 +78,37 @@ public class RunNewInternalizationMunich {
 
 		Controler controler = new Controler(config);
 		Scenario scenario = controler.getScenario();
+		scenario = ScenarioUtils.loadScenario(config); // TODO remove?
 
 		EmissionModule emissionModule = new EmissionModule(scenario);
 		emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
 
-		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs), rgt );
-
-//		EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
-//		controler.setTravelDisutilityFactory(emissionTducf);
-		EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
-		controler.setTravelDisutilityFactory(emfac);
-
-//		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
-		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt));
-
-		controler.setOverwriteFiles(true);
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		controler.run();
+		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax);
+		links2xCells = gt.mapLinks2Xcells(noOfXCells);
+		links2yCells = gt.mapLinks2Ycells(noOfYCells);
+		
+		
+		if (!links2xCells.isEmpty()) {
+			EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(
+					Double.parseDouble(emissionCostFactor),
+					Boolean.parseBoolean(considerCO2Costs), rgt, links2xCells,
+					links2yCells);
+			//		EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
+			//		controler.setTravelDisutilityFactory(emissionTducf);
+			EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(
+					emissionModule, emissionCostModule);
+			controler.setTravelDisutilityFactory(emfac);
+			//		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
+			controler
+					.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(
+							emissionModule, emissionCostModule, rgt,
+							links2xCells, links2yCells));
+			controler.setOverwriteFiles(true);
+			controler.addSnapshotWriterFactory("otfvis",
+					new OTFFileWriterFactory());
+			controler.run();
+		}
 	}
 }
