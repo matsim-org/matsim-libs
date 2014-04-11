@@ -152,8 +152,6 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		System.out.println(event.toString());
-		System.out.println(this.scenario.getNetwork().getLinks().toString());
 		double linkLength = this.scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
 		if(ptDrivers.contains(event.getVehicleId())){
 			if(driverId2totalDistance.containsKey(event.getVehicleId())){
