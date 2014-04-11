@@ -104,12 +104,12 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 			double amount = event.getDelay() / 3600 * this.vtts_car;
 			double eventTime = event.getTime();
 			int tripNumber = 0;
-			double maxDepTime = Double.MIN_VALUE;
+			double maxDepTime = 0.;
 			Map<Integer,Double> tripNumber2departureTime = personId2tripNumber2departureTime.get(event.getCausingAgentId());
 			
 			for(int tripNr : tripNumber2departureTime.keySet()) {
-				if(eventTime > tripNumber2departureTime.get(tripNr)) {
-					if (tripNumber2departureTime.get(tripNr) > maxDepTime) {
+				if(eventTime >= tripNumber2departureTime.get(tripNr)) {
+					if (tripNumber2departureTime.get(tripNr) >= maxDepTime) {
 						tripNumber = tripNr;
 					}
 				}
@@ -130,12 +130,12 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 			double amount = event.getAmount();
 			double eventTime = event.getTime();
 			int tripNumber = 0;
-			double maxDepTime = Double.MIN_VALUE;
+			double maxDepTime = 0.;
 			Map<Integer,Double> tripNumber2departureTime = personId2tripNumber2departureTime.get(event.getPersonId());
 			
 			for(int tripNr : tripNumber2departureTime.keySet()) {
-				if(eventTime > tripNumber2departureTime.get(tripNr)) {
-					if (tripNumber2departureTime.get(tripNr) > maxDepTime) {
+				if(eventTime >= tripNumber2departureTime.get(tripNr)) {
+					if (tripNumber2departureTime.get(tripNr) >= maxDepTime) {
 						tripNumber = tripNr;
 					}
 				}
