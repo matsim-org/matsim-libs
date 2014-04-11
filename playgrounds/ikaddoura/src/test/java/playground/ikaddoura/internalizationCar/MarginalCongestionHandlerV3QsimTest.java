@@ -28,10 +28,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
@@ -80,11 +78,6 @@ public class MarginalCongestionHandlerV3QsimTest {
 	private Id testAgent3 = new IdImpl("testAgent3");
 	private Id testAgent4 = new IdImpl("testAgent4");
 	private Id testAgent5 = new IdImpl("testAgent5");
-	private Id testAgent6 = new IdImpl("testAgent6");
-	private Id testAgent7 = new IdImpl("testAgent7");
-	private Id testAgent8 = new IdImpl("testAgent8");
-	private Id testAgent9 = new IdImpl("testAgent9");
-	private Id testAgent10 = new IdImpl("testAgent10");
 	private Id testAgent11 = new IdImpl("testAgent11");
 	private Id testAgent12 = new IdImpl("testAgent12");
 	private Id testAgent13 = new IdImpl("testAgent13");
@@ -98,10 +91,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 	private Id linkId4 = new IdImpl("link4");
 	private Id linkId5 = new IdImpl("link5");
 	
-	private Id linkId1_ = new IdImpl("linkId1_");
 	private Id linkId2_ = new IdImpl("linkId2_");
-	private Id linkId3_ = new IdImpl("linkId3_");
-	private Id linkId4_ = new IdImpl("linkId4_");
 
 	double avgValue1 = 0.0;
 	double avgValue2 = 0.0;
@@ -508,82 +498,6 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}else if((mce.getCausingAgentId().equals(testAgent1))&&(mce.getAffectedAgentId().equals(testAgent3))){
 				Assert.assertEquals("delay", 8., mce.getDelay(), MatsimTestUtils.EPSILON);
 			}
-		}
-		
-	}
-	
-	// setInsertingWaitingVehiclesBeforeDrivingVehicles = false
-	//
-	//TODO: Warum verlässt Agent 5 bei diesem Test vor Agent 11 den Link2?!
-	//Agent 11 beendet dort bei t=140 eine Aktivität und reiht sich dann ein
-	//Agent 5 kommt erst bei t=181 auf den Link drauf, beendet sogar erst bei t=180 auf dem davorliegenden Link seine Aktivität
-	//und ist dennoch in der "Schlange" auf Link2 vor Agent11, warum?!
-	//Es gibt hier auch keine rückläufige Schlange auf vorhergehende Links wegen einer niedrigen Storage-Kapazität
-	@Ignore
-	@Test
-	public final void testInsertingWaitingVehicles_04(){
-		
-		Scenario sc = loadScenario7();
-		setPopulation7(sc);
-		
-		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
-		
-		events.addHandler( new MarginalCongestionEventHandler() {
-
-			@Override
-			public void reset(int iteration) {				
-			}
-
-			@Override
-			public void handleEvent(MarginalCongestionEvent event) {
-				congestionEvents.add(event);
-			}	
-		});
-		
-		events.addHandler( new LinkEnterEventHandler() {
-
-			@Override
-			public void reset(int iteration) {				
-			}
-
-			@Override
-			public void handleEvent(LinkEnterEvent event) {
-				System.out.println(event.toString());
-			}	
-		});
-		
-		events.addHandler( new LinkLeaveEventHandler() {
-
-			@Override
-			public void reset(int iteration) {				
-			}
-
-			@Override
-			public void handleEvent(LinkLeaveEvent event) {
-				System.out.println(event.toString());
-			}	
-		});
-		
-		events.addHandler( new ActivityEndEventHandler() {
-
-			@Override
-			public void reset(int iteration) {				
-			}
-
-			@Override
-			public void handleEvent(ActivityEndEvent event) {
-				System.out.println(event.toString());
-			}	
-		});
-		
-		events.addHandler(new MarginalCongestionHandlerImplV3(events, (ScenarioImpl) sc));
-				
-		QSim sim = createQSim(sc, events);
-		sim.run();
-						
-		for (MarginalCongestionEvent event : congestionEvents) {
-		
-			System.out.println(event.toString());
 		}
 		
 	}
