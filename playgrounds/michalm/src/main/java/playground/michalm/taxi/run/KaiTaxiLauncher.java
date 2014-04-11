@@ -41,7 +41,7 @@ import playground.michalm.taxi.TaxiRequestCreator;
         //String file = "/Users/nagel/shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new-40-50/params.in";
         String file = "/Users/nagel/shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new-40-25/params.in";
         boolean removeNonPassengers = true;
-        boolean endActivitiesAtTimeZero = true;
+        boolean endActivitiesAtTimeZero = false;
         TaxiLauncher launcher = new TaxiLauncher(file);
 
         if (removeNonPassengers) {
