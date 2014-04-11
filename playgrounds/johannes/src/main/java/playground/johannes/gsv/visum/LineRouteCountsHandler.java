@@ -24,7 +24,9 @@ package playground.johannes.gsv.visum;
 
 import gnu.trove.TObjectDoubleHashMap;
 
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -56,6 +58,8 @@ public class LineRouteCountsHandler extends TableHandler {
 	
 	private final TObjectDoubleHashMap<Link> counts;
 	
+	private final Set<CountsContainer> counts2;
+	
 	private String lastLine;
 	
 	private String lastRoute;
@@ -72,9 +76,13 @@ public class LineRouteCountsHandler extends TableHandler {
 	
 	private final IdGenerator idGenerator;
 	
+	int unmatchedLinks = 0;
+	int total = 0;
+	
 	public LineRouteCountsHandler(Network network) {
 		this.network = network;
 		counts = new TObjectDoubleHashMap<Link>(network.getLinks().size());
+		counts2 = new LinkedHashSet<LineRouteCountsHandler.CountsContainer>(network.getLinks().size());
 		idGenerator = new PrefixIdGenerator("rail.");
 	}
 	
@@ -89,6 +97,7 @@ public class LineRouteCountsHandler extends TableHandler {
 		String dcode = record.get(DCODE_KEY);
 		Node toNode = network.getNodes().get(idGenerator.generateId(record.get(NODE_KEY)));
 		
+		
 		if(index - 1 == lastIndex) {
 			
 			if(!line.equals(lastLine))
@@ -101,19 +110,30 @@ public class LineRouteCountsHandler extends TableHandler {
 				throw new RuntimeException("Direction does not match.");
 			
 			if (fromNode != null && toNode != null) {
+				total++;
 				Link link = NetworkUtils.getConnectingLink(fromNode, toNode);
 
 				if (link == null) {
 					link = NetworkUtils.getConnectingLink(toNode, fromNode);
-					if (link == null)
+					if (link == null) {
 						// throw new RuntimeException("Link not found.");
-						logger.warn("Link not found, ignoring count.");
-					else
+//						logger.warn("Link not found, ignoring count.");
+						unmatchedLinks++;
+					}
+					else {
 						logger.warn("Link not found, yet using return link.");
+						
+					}
 				}
 
-				if (link != null)
+				if (link != null) {
 					counts.put(link, lastCountValue);
+					CountsContainer container = new CountsContainer();
+					container.trainId = line;
+					container.linkeId = link.getId().toString();
+					container.count = lastCountValue;
+					counts2.add(container);
+				}
 
 			} else {
 				logger.warn("Node not found, ignoring count.");
@@ -136,5 +156,19 @@ public class LineRouteCountsHandler extends TableHandler {
 
 	public TObjectDoubleHashMap<Link> getCounts() {
 		return counts;
+	}
+	
+	public Set<CountsContainer> getCounts2() {
+		logger.warn(String.format("%s of %s unmatched.", unmatchedLinks, total));
+		return counts2;
+	}
+	
+	public static class CountsContainer {
+		
+		public String trainId;
+		
+		public String linkeId;
+		
+		public double count;
 	}
 }

@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.johannes.gsv.demand;
+package playground.johannes.gsv.sim;
 
 import gnu.trove.TObjectDoubleHashMap;
 
@@ -91,7 +91,8 @@ public class Simulator {
 		
 		controler.addControlerListener(listener);
 		
-		PKmAnalyzer pkm = new PKmAnalyzer(TransitLineAttributes.createFromFile("/home/johannes/gsv/matsim/studies/netz2030/data/transitLineAttributes.xml"));
+//		PKmAnalyzer pkm = new PKmAnalyzer(TransitLineAttributes.createFromFile("/home/johannes/gsv/matsim/studies/netz2030/data/transitLineAttributes.xml"));
+		PKmAnalyzer pkm = new PKmAnalyzer(TransitLineAttributes.createFromFile(controler.getConfig().getParam("gsv", "transitLineAttributes")));
 		controler.addControlerListener(pkm);
 		controler.run();
 		
@@ -175,7 +176,7 @@ public class Simulator {
 			NetFileReader.FIELD_SEPARATOR = "\t";
 			
 			try {
-				netReader.read("/home/johannes/gsv/matsim/studies/netz2030/data/raw/counts.att");
+				netReader.read(event.getControler().getConfig().getParam("gsv", "counts"));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

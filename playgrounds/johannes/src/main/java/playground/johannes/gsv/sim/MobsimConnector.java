@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.johannes.gsv.demand;
+package playground.johannes.gsv.sim;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -35,8 +35,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
-
-import playground.johannes.gsv.sim.ParallelPseudoSim;
 
 /**
  * @author johannes
