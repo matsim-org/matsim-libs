@@ -44,8 +44,8 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 
-import playground.ikaddoura.analysis.monetaryAmountsTripAnalysis.TripInfoWriter;
-import playground.ikaddoura.analysis.monetaryAmountsTripAnalysis.ExtCostEventHandler;
+import playground.ikaddoura.analysis.extCost.ExtCostEventHandler;
+import playground.ikaddoura.analysis.extCost.TripInfoWriter;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;

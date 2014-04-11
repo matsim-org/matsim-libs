@@ -30,8 +30,8 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.ikaddoura.analysis.monetaryAmountsTripAnalysis.TripInfoWriter;
-import playground.ikaddoura.analysis.monetaryAmountsTripAnalysis.ExtCostEventHandler;
+import playground.ikaddoura.analysis.extCost.ExtCostEventHandler;
+import playground.ikaddoura.analysis.extCost.TripInfoWriter;
 
 /**
  * (1) Writes marginal congestion events based on a standard events file.
