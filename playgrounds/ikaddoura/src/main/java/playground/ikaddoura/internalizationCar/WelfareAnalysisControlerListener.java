@@ -98,9 +98,7 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		if (event.getIteration() == this.scenario.getConfig().controler().getLastIteration()) {
 			log.info("Analyzing monetary events in the final iteration.");
-			
 			event.getControler().getEvents().addHandler(extCostHandler);
-			
 		}
 	}
 

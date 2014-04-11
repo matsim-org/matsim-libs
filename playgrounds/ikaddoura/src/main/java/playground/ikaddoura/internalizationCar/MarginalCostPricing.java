@@ -69,8 +69,9 @@ public class MarginalCostPricing implements StartupListener, IterationEndsListen
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		
-		log.info("Set average tolls for each link Id and time bin.");
+		log.info("Set average tolls for each link Id and time bin...");
 		tollHandler.setLinkId2timeBin2avgToll();
+		log.info("Set average tolls for each link Id and time bin... Done.");
 		
 		// write out toll statistics every iteration
 		tollHandler.writeTollStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollStats.csv");
@@ -78,19 +79,6 @@ public class MarginalCostPricing implements StartupListener, IterationEndsListen
 		// write out congestion statistics every iteration
 		congestionHandler.writeCongestionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
 		
-		// write out congestion events in a separate text file
-		congestionHandler.writeCongestionEvents(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionEvents.txt");
-
-		// TODO: Compare the number of thrown/caught congestion events
-		if (congestionHandler.getTotalNumberOfCongestionEvents() == tollHandler.getTotalNumberOfCongestionEvents() && congestionHandler.getTotalNumberOfCongestionEvents() == pricingHandler.getTotalNumberOfCongestionEvents()) {
-			// identical number of congestion events that are thrown and caught by different event handlers
-		} else {
-			log.warn("Different number of congestion events that are thrown and caught by different event handlers.");
-		}
-		
-		log.info("Total number of congestion events (" + congestionHandler.getClass().getName() + "): " + congestionHandler.getTotalNumberOfCongestionEvents());
-		log.info("Total number of congestion events (" + tollHandler.getClass().getName() + "): " + tollHandler.getTotalNumberOfCongestionEvents());
-		log.info("Total number of congestion events (" + pricingHandler.getClass().getName() + "): " + pricingHandler.getTotalNumberOfCongestionEvents());
 	}
 
 }

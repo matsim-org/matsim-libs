@@ -400,9 +400,5 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 	public List<LinkEnterEvent> getLinkEnterEvents() {
 		return linkEnterEvents;
 	}
-	
-	public int getTotalNumberOfCongestionEvents() {
-		return this.congestionEvents.size();
-	}
 
 }

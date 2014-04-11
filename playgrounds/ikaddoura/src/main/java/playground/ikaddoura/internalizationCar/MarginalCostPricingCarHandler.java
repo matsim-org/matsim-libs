@@ -44,7 +44,6 @@ public class MarginalCostPricingCarHandler implements MarginalCongestionEventHan
 	private final ScenarioImpl scenario;
 	private final double vtts_car;
 	private double amountSum = 0.;
-	private int congestionEventCounter = 0;
 
 	public MarginalCostPricingCarHandler(EventsManager eventsManager, ScenarioImpl scenario) {
 		this.events = eventsManager;
@@ -57,7 +56,6 @@ public class MarginalCostPricingCarHandler implements MarginalCongestionEventHan
 	@Override
 	public void reset(int iteration) {
 		this.amountSum = 0.;
-		this.congestionEventCounter = 0;
 	}
 
 	@Override
@@ -65,7 +63,6 @@ public class MarginalCostPricingCarHandler implements MarginalCongestionEventHan
 		
 		double amount = event.getDelay() / 3600 * this.vtts_car;
 		this.amountSum = this.amountSum + amount;
-		this.congestionEventCounter++;
 		
 		PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), event.getCausingAgentId(), amount);
 		this.events.processEvent(moneyEvent);
@@ -73,10 +70,6 @@ public class MarginalCostPricingCarHandler implements MarginalCongestionEventHan
 
 	public double getAmountSum() {
 		return amountSum;
-	}
-
-	public int getTotalNumberOfCongestionEvents() {
-		return congestionEventCounter;
 	}
 	
 }
