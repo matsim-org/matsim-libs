@@ -199,6 +199,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 	//
 	// 3 iterations are necessary to check the equality of the "toll" and the "tollOldValue"
 	@Test
+	@Ignore
 	public final void testRouting(){
 		
 		String configFile = testUtils.getPackageInputDirectory()+"MarginalCongestionHandlerV3QsimTest/configTestRouting.xml";
