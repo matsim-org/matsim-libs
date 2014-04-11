@@ -96,9 +96,9 @@ public abstract class MarginalCongestionHandler implements
 			throw new RuntimeException("Expecting a capacity period of 3600. Aborting...");
 		}
 		
-//		if (this.scenario.getConfig().parallelEventHandling().getNumberOfThreads() != 0 || this.scenario.getConfig().parallelEventHandling().getNumberOfThreads() != null) {
-//			throw new RuntimeException("Parallel events handling has to be disabled. Aborting...");
-//		}
+		if (this.scenario.getConfig().parallelEventHandling().getNumberOfThreads() != 0 || this.scenario.getConfig().parallelEventHandling().getNumberOfThreads() != null) {
+			log.warn("Parallel events handling has to be disabled.");
+		}
 			
 		if (this.scenario.getConfig().qsim().getFlowCapFactor() != 1.0) {
 			log.warn("Flow capacity factor unequal 1.0 is not tested.");
@@ -106,10 +106,6 @@ public abstract class MarginalCongestionHandler implements
 		
 		if (this.scenario.getConfig().qsim().getStorageCapFactor() != 1.0) {
 			log.warn("Storage capacity factor unequal 1.0 is not tested.");
-		}
-		
-		if (this.scenario.getConfig().qsim().getStuckTime() < 3600.){
-			log.warn("The stuck time is very short. If an agent is moved to the next link even though the next link is full, the calculation of delay effects may be wrong.");
 		}
 			
 		if (this.scenario.getConfig().scenario().isUseTransit()) {
