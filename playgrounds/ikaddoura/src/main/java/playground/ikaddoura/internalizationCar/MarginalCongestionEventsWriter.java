@@ -68,7 +68,7 @@ public class MarginalCongestionEventsWriter {
 		MarginalCostPricingCarHandler marginalCostTollHandler = new MarginalCostPricingCarHandler(events, scenario);
 
 		TollHandler tollHandler = new TollHandler(scenario);
-		ExtCostEventHandler extCostHandler = new ExtCostEventHandler(scenario);
+		ExtCostEventHandler extCostHandler = new ExtCostEventHandler(scenario, false);
 		
 		events.addHandler(eventWriter);
 		events.addHandler(congestionHandler);

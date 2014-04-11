@@ -84,7 +84,7 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 	
 	public WelfareAnalysisControlerListener(ScenarioImpl scenario){
 		this.scenario = scenario;
-		extCostHandler = new ExtCostEventHandler(this.scenario);
+		extCostHandler = new ExtCostEventHandler(this.scenario, false);
 	}
 	
 	@Override

@@ -52,7 +52,7 @@ public class ExtCostMain {
 
 		EventsManager events = EventsUtils.createEventsManager();
 		
-		ExtCostEventHandler handler = new ExtCostEventHandler(scenario);
+		ExtCostEventHandler handler = new ExtCostEventHandler(scenario, true);
 		events.addHandler(handler);
 
 		log.info("Reading events file...");

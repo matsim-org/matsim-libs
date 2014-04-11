@@ -35,11 +35,13 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Network;
 
@@ -51,9 +53,12 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionEventHandler;
  * @author ikaddoura , lkroeger
  *
  */
-public class ExtCostEventHandler implements TransitDriverStartsEventHandler , PersonDepartureEventHandler , LinkEnterEventHandler, PersonEntersVehicleEventHandler , PersonLeavesVehicleEventHandler , MarginalCongestionEventHandler {
+public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriverStartsEventHandler , PersonDepartureEventHandler , LinkEnterEventHandler, PersonEntersVehicleEventHandler , PersonLeavesVehicleEventHandler , MarginalCongestionEventHandler {
 	private final static Logger log = Logger.getLogger(ExtCostEventHandler.class);
 	private final double vtts_car;
+	
+	// this analysis uses either money events or congestion events
+	private final boolean useMoneyEvents;
 	
 	private Map<Id,Integer> personId2actualTripNumber = new HashMap<Id, Integer>();
 	private Map<Id,Map<Integer,String>> personId2tripNumber2legMode = new HashMap<Id,Map<Integer,String>>();
@@ -74,10 +79,11 @@ public class ExtCostEventHandler implements TransitDriverStartsEventHandler , Pe
 	private double maxDistance = 40 * distance;
 	private double timeBinSize = 900.0;
 	
-	public ExtCostEventHandler(Scenario scenario) {
+	public ExtCostEventHandler(Scenario scenario, boolean useMoneyEvents) {
 		this.scenario = scenario;
+		this.useMoneyEvents = useMoneyEvents;
+		log.info("UseMoneyEvents : " + useMoneyEvents);
 		this.vtts_car = (this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
-		
 		log.info("VTTS_car: " + vtts_car);
 	}
 
@@ -94,25 +100,55 @@ public class ExtCostEventHandler implements TransitDriverStartsEventHandler , Pe
 
 	@Override
 	public void handleEvent(MarginalCongestionEvent event) {
-		double amount = event.getDelay() / 3600 * this.vtts_car;
-		double eventTime = event.getTime();
-		int tripNumber = 0;
-		double maxDepTime = Double.MIN_VALUE;
-		Map<Integer,Double> tripNumber2departureTime = personId2tripNumber2departureTime.get(event.getCausingAgentId());
 		
-		for(int tripNr : tripNumber2departureTime.keySet()) {
-			if(eventTime > tripNumber2departureTime.get(tripNr)) {
-				if (tripNumber2departureTime.get(tripNr) > maxDepTime) {
-					tripNumber = tripNr;
+		if (useMoneyEvents == false){
+			double amount = event.getDelay() / 3600 * this.vtts_car;
+			double eventTime = event.getTime();
+			int tripNumber = 0;
+			double maxDepTime = Double.MIN_VALUE;
+			Map<Integer,Double> tripNumber2departureTime = personId2tripNumber2departureTime.get(event.getCausingAgentId());
+			
+			for(int tripNr : tripNumber2departureTime.keySet()) {
+				if(eventTime > tripNumber2departureTime.get(tripNr)) {
+					if (tripNumber2departureTime.get(tripNr) > maxDepTime) {
+						tripNumber = tripNr;
+					}
 				}
 			}
+				
+			double amountBefore = personId2tripNumber2amount.get(event.getCausingAgentId()).get(tripNumber);
+			double updatedAmount = amountBefore + amount;
+			Map<Integer,Double> tripNumber2amount = personId2tripNumber2amount.get(event.getCausingAgentId());
+			tripNumber2amount.put(tripNumber, updatedAmount);
+			personId2tripNumber2amount.put(event.getCausingAgentId(), tripNumber2amount);
 		}
+	}
+	
+	@Override
+	public void handleEvent(PersonMoneyEvent event) {
+		
+		if (useMoneyEvents == true) {
+			double amount = event.getAmount();
+			double eventTime = event.getTime();
+			int tripNumber = 0;
+			double maxDepTime = Double.MIN_VALUE;
+			Map<Integer,Double> tripNumber2departureTime = personId2tripNumber2departureTime.get(event.getPersonId());
 			
-		double amountBefore = personId2tripNumber2amount.get(event.getCausingAgentId()).get(tripNumber);
-		double updatedAmount = amountBefore + amount;
-		Map<Integer,Double> tripNumber2amount = personId2tripNumber2amount.get(event.getCausingAgentId());
-		tripNumber2amount.put(tripNumber, updatedAmount);
-		personId2tripNumber2amount.put(event.getCausingAgentId(), tripNumber2amount);
+			for(int tripNr : tripNumber2departureTime.keySet()) {
+				if(eventTime > tripNumber2departureTime.get(tripNr)) {
+					if (tripNumber2departureTime.get(tripNr) > maxDepTime) {
+						tripNumber = tripNr;
+					}
+				}
+			}
+				
+			double amountBefore = personId2tripNumber2amount.get(event.getPersonId()).get(tripNumber);
+			double updatedAmount = amountBefore + amount;
+			Map<Integer,Double> tripNumber2amount = personId2tripNumber2amount.get(event.getPersonId());
+			tripNumber2amount.put(tripNumber, updatedAmount);
+			personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
+		}
+		
 	}
 	
 	@Override
@@ -381,4 +417,5 @@ public class ExtCostEventHandler implements TransitDriverStartsEventHandler , Pe
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		personId2distanceEnterValue.put(event.getPersonId(), driverId2totalDistance.get(event.getVehicleId()));
 	}
+
 }
