@@ -37,7 +37,7 @@ public class Pwvm_GeoColumnCreator {
 						" FROM kid_fahrzeug" +
 						" WHERE fahrzeugid="+current_id+"" +
 						// keine Koordinate erzeugen, wenn diese als fehlend (-1 oder -9) kodiert
-						// oder ungültig ist (wenige Faelle haben negative, ungueltige Koordinaten
+						// oder ungueltig ist (wenige Faelle haben negative, ungueltige Koordinaten
 						" AND k24d::double precision >= 0" +
 						" AND k24e::double precision >= 0), 4326), " +						
 //								" AND k24d::double precision != -1" +

@@ -473,7 +473,7 @@ public class Pwvm_Simulator {
 		// DEBUG: storeSearchRadiusToDatabase(fromGeometry, radius, width, typeOfDestination, homeBusinessId);
 
 
-		// wenn ein Haushalt gesucht wird erst pruefen, ob Haushalte in dieser Entfernung in der synthetischen Bevölkerung definiert sind.
+		// wenn ein Haushalt gesucht wird erst pruefen, ob Haushalte in dieser Entfernung in der synthetischen Bevoelkerung definiert sind.
 		//		if (typeOfDestination == 6) { // private households
 		//			if (isWithinSyntheticPopulation(fromGeometry, radius, width) == false) {
 		//				
@@ -609,7 +609,7 @@ public class Pwvm_Simulator {
 			if (rs.isBeforeFirst() == false) {
 			
 				/* Es wurden keine Locations gefunden. Dies kann zwei Gruende haben:
-				 * 1. Die Entfernung der Strecke führt aus der Modellregion heraus
+				 * 1. Die Entfernung der Strecke faehrt aus der Modellregion heraus
 				 *    -> in diesem Fall soll eine Koordinate synthetisch erzeugt werden
 				 * 2. Die Entfernung der Strecke passt in das Modell, jedoch
 				 *    wurden keine geeigneten Locations gefunden.
@@ -686,7 +686,7 @@ public class Pwvm_Simulator {
 				System.out.println("Successfully assigned.");
 			} else {
 				/* Es wurden keine Locations gefunden. Dies kann zwei Gruende haben:
-				 * 1. Die Entfernung der Strecke führt aus der Modellregion heraus
+				 * 1. Die Entfernung der Strecke fuehrt aus der Modellregion heraus
 				 *    -> in diesem Fall soll eine beliebige Koordinate generiert werden
 				 * 2. Die Entfernung der Strecke passt in das Modell, jedoch
 				 *    wurden keine geeigneten Locations gefunden.

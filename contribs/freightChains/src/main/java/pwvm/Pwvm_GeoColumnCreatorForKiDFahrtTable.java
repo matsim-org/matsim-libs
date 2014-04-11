@@ -46,7 +46,7 @@ public class Pwvm_GeoColumnCreatorForKiDFahrtTable {
 //								" AND f08d::double precision != -9" +
 //								" AND f08e::double precision != -9), 4326), " +
 								// keine Koordinate erzeugen, wenn diese als fehlend (-1 oder -9) kodiert
-								// oder ungültig ist (wenige Faelle haben negative, ungueltige Koordinaten
+								// oder ungueltig ist (wenige Faelle haben negative, ungueltige Koordinaten
 								" AND f08d::double precision >= 0" +
 								" AND f08e::double precision >= 0), 4326), " +
 						"31467) " +

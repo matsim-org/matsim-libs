@@ -222,7 +222,7 @@ public class Pwvm_Logbook {
 	 * visited if a trip's purpose is 1, 2, 3, or 4.
 	 * 
 	 * -1: "not set"
-	 *  1: "Holen, Bringen, Transportieren von Gütern, Waren, Material, Maschinen, Geraeten, etc."
+	 *  1: "Holen, Bringen, Transportieren von Guetern, Waren, Material, Maschinen, Geraeten, etc."
 	 *  2: "Fahrt zur Erbringung beruflicher Leistungen (Montage, Reparatur, Beratung, Besuch, Betreuung, etc.)"
 	 *  3: "Holen, Bringen, Befoerdern von Personen (dienstlich/geschaeftlich)"
 	 *  4: "sonstige dienstlich/geschaeftliche Erledigung"
