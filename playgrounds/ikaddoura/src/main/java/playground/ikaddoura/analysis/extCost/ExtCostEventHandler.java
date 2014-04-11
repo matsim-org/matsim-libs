@@ -125,7 +125,7 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 	
 	@Override
 	public void handleEvent(PersonMoneyEvent event) {
-		
+				
 		if (useMoneyEvents == true) {
 			double amount = event.getAmount();
 			double eventTime = event.getTime();

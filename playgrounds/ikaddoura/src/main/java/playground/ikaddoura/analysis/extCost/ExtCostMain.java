@@ -30,12 +30,14 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.ikaddoura.internalizationCar.MarginalCongestionEventsReader;
+
 public class ExtCostMain {
 	
 	private static final Logger log = Logger.getLogger(ExtCostMain.class);
 	
-	private String eventsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/internalization_4/ITERS/it.100/100.eventsCongestionPrices.xml.gz";
-	private String configFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/internalization_4/output_config.xml.gz";
+	private String eventsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/internalization_4/ITERS/it.100/100.events.xml.gz";
+	private String configFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/input/config_baseCase_4.xml";
 	private String netFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/internalization_4/output_network.xml.gz";
 	private String outputFolder = "/Users/ihab/Desktop/analysis4";
 	
@@ -48,10 +50,11 @@ public class ExtCostMain {
 		
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.network().setInputFile(netFile);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
-
-		EventsManager events = EventsUtils.createEventsManager();
+		config.plans().setInputFile(null);
 		
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		EventsManager events = EventsUtils.createEventsManager();
+
 		ExtCostEventHandler handler = new ExtCostEventHandler(scenario, true);
 		events.addHandler(handler);
 
@@ -59,6 +62,9 @@ public class ExtCostMain {
 
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
+		
+		MarginalCongestionEventsReader congestionEventsReader = new MarginalCongestionEventsReader(events);		
+		congestionEventsReader.parse(eventsFile);
 		
 		log.info("Reading events file... Done.");
 		
