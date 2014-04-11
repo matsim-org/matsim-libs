@@ -105,32 +105,6 @@ public class MarginalCongestionHandlerV1QsimTest {
 			
 		});
 		
-//		events.addHandler( new LinkLeaveEventHandler() {
-//
-//			@Override
-//			public void reset(int iteration) {				
-//			}
-//
-//			@Override
-//			public void handleEvent(LinkLeaveEvent event) {
-//				System.out.println(event.toString());
-//			}
-//			
-//		});
-//		
-//		events.addHandler( new LinkEnterEventHandler() {
-//
-//			@Override
-//			public void reset(int iteration) {				
-//			}
-//
-//			@Override
-//			public void handleEvent(LinkEnterEvent event) {
-//				System.out.println(event.toString());
-//			}
-//			
-//		});
-		
 		events.addHandler(new MarginalCongestionHandlerV1(events, (ScenarioImpl) sc));
 				
 		QSim sim = createQSim(sc, events);

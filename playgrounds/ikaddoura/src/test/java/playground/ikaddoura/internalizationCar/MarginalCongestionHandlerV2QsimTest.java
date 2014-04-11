@@ -34,8 +34,6 @@ import org.junit.Test;
 import org.junit.runners.model.FrameworkMethod;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -92,8 +90,6 @@ public class MarginalCongestionHandlerV2QsimTest {
 	private Id linkId6 = new IdImpl("link6");
 	private Id linkId7 = new IdImpl("link7");
 	private Id linkId8 = new IdImpl("link8");
-	private Id linkId9 = new IdImpl("link9");
-	private Id linkId10 = new IdImpl("link10");
 	
 	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	
@@ -124,21 +120,19 @@ public class MarginalCongestionHandlerV2QsimTest {
 		QSim sim = createQSim(sc, events);
 		sim.run();
 			
-//		Assert.assertEquals("wrong number of congestion events" , 3, congestionEvents.size());
+		Assert.assertEquals("wrong number of congestion events" , 3, congestionEvents.size());
 			
 		for (MarginalCongestionEvent event : congestionEvents) {
-			
-			System.out.println(event.toString());
+							
+			if (event.getCausingAgentId().toString().equals(this.testAgent3.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent2.toString())) {
+				Assert.assertEquals("wrong delay.", 10.0, event.getDelay(), MatsimTestUtils.EPSILON);
 				
-//			if (event.getCausingAgentId().toString().equals(this.testAgent3.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent2.toString())) {
-//				Assert.assertEquals("wrong delay.", 10.0, event.getDelay(), MatsimTestUtils.EPSILON);
-//				
-//			} else if (event.getCausingAgentId().toString().equals(this.testAgent2.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent1.toString())) {
-//				Assert.assertEquals("wrong delay.", 10.0, event.getDelay(), MatsimTestUtils.EPSILON);
-//				
-//			} else if (event.getCausingAgentId().toString().equals(this.testAgent3.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent1.toString())) {
-//				Assert.assertEquals("wrong delay.", 10.0, event.getDelay(), MatsimTestUtils.EPSILON);
-//			}
+			} else if (event.getCausingAgentId().toString().equals(this.testAgent2.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent1.toString())) {
+				Assert.assertEquals("wrong delay.", 10.0, event.getDelay(), MatsimTestUtils.EPSILON);
+				
+			} else if (event.getCausingAgentId().toString().equals(this.testAgent3.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent1.toString())) {
+				Assert.assertEquals("wrong delay.", 10.0, event.getDelay(), MatsimTestUtils.EPSILON);
+			}
 		}
 			
 	}
@@ -530,46 +524,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 			}
 				
 		}
-		
-//		// the storage capacity is reached and agent 3 starts an activity on the relevant link
-//		@Test
-//		public final void testClearing3(){
-//				
-//			testUtils.starting(new FrameworkMethod(MarginalCongestionHandlerV2QsimTest.class.getMethods()[0]));
-//			Scenario sc = loadScenario4();
-//			setPopulation16(sc);
-//				
-//			final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
-//			
-//			events.addHandler( new MarginalCongestionEventHandler() {
-//
-//				@Override
-//				public void reset(int iteration) {				
-//				}
-//
-//				@Override
-//				public void handleEvent(MarginalCongestionEvent event) {
-//					congestionEvents.add(event);
-//				}
-//					
-//			});
-//				
-//			events.addHandler(new MarginalCongestionHandlerImplV2(events, (ScenarioImpl) sc));
-//						
-//			QSim sim = createQSim(sc, events);
-//			sim.run();
-//			
-//			System.out.println("test_Clearing3: "+events.toString());
-//						
-//			for (MarginalCongestionEvent event : congestionEvents) {
-//				
-//				System.out.println("test_Clearing3: "+event.toString());
-//				
-//			}
-//			Assert.assertEquals("wrong number of congestion events" , 6, congestionEvents.size());
-//				
-//		}
-		
+	
 		// the storage capacity on link 3 (3 cars) is reached, 3 agents end an activity on the link while another agent (agent 5) is already in the buffer (flow capacity 1 car / 80 seconds!)
 		// agent 5 should leave the link as the last, he is delayed by all other agents
 		@Test
@@ -1781,153 +1736,6 @@ public class MarginalCongestionHandlerV2QsimTest {
 		this.events = EventsUtils.createEventsManager();
 		return scenario;
 	}
-
-//	private Scenario loadScenario5() {
-//		
-//		//
-//		//								  (2)			(5)
-//		//								 /	 \		   /   \
-//		//								/	  \		  /     \
-//		//							link2    link4 link6    link8
-//		//							 /			\  /           \
-//		//		(0)-----link1-----(1)			(4)				(7)-----link10-----(8)
-//		//							 \			/  \		   /
-//		//							link3    link5 link7    link9
-//		//								\	  /		  \		/
-//		//								 \	 /		   \   /
-//		//								  (3)			(6)
-//		//
-//		
-//		Config config = testUtils.loadConfig(null);
-//		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
-//		qSimConfigGroup.setFlowCapFactor(1.0);
-//		qSimConfigGroup.setStorageCapFactor(1.0);
-//		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
-//		config.addQSimConfigGroup(qSimConfigGroup);
-//		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
-//	
-//		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-//		network.setEffectiveCellSize(7.5);
-//		network.setCapacityPeriod(3600.);
-//		
-//		Node node0 = network.getFactory().createNode(new IdImpl("0"), scenario.createCoord(0., 0.));
-//		Node node1 = network.getFactory().createNode(new IdImpl("1"), scenario.createCoord(100., 0.));
-//		Node node2 = network.getFactory().createNode(new IdImpl("2"), scenario.createCoord(200., 100.));
-//		Node node3 = network.getFactory().createNode(new IdImpl("3"), scenario.createCoord(200., -100.));
-//		Node node4 = network.getFactory().createNode(new IdImpl("4"), scenario.createCoord(300., 0.));
-//		Node node5 = network.getFactory().createNode(new IdImpl("5"), scenario.createCoord(400., 100.));
-//		Node node6 = network.getFactory().createNode(new IdImpl("6"), scenario.createCoord(400., -100.));
-//		Node node7 = network.getFactory().createNode(new IdImpl("7"), scenario.createCoord(500., 0.));
-//		Node node8 = network.getFactory().createNode(new IdImpl("8"), scenario.createCoord(600., 0.));
-//		
-//		Link link1 = network.getFactory().createLink(this.linkId1, node0, node1);
-//		Link link2 = network.getFactory().createLink(this.linkId2, node1, node2);
-//		Link link3 = network.getFactory().createLink(this.linkId3, node1, node3);
-//		Link link4 = network.getFactory().createLink(this.linkId4, node2, node4);
-//		Link link5 = network.getFactory().createLink(this.linkId5, node3, node4);
-//		Link link6 = network.getFactory().createLink(this.linkId6, node4, node5);
-//		Link link7 = network.getFactory().createLink(this.linkId7, node4, node6);
-//		Link link8 = network.getFactory().createLink(this.linkId8, node5, node7);
-//		Link link9 = network.getFactory().createLink(this.linkId9, node6, node7);
-//		Link link10 = network.getFactory().createLink(this.linkId10, node7, node8);
-//	
-//		Set<String> modes = new HashSet<String>();
-//		modes.add("car");
-//		
-//		// link1
-//		link1.setAllowedModes(modes);
-//		link1.setCapacity(10800);
-//		link1.setFreespeed(500);
-//		link1.setNumberOfLanes(100);
-//		link1.setLength(500);
-//		
-//		// link2
-//		link2.setAllowedModes(modes);
-//		link2.setCapacity(360);
-//		link2.setFreespeed(10);
-//		link2.setNumberOfLanes(100);
-//		link2.setLength(500);
-//		
-//		// link3
-//		link3.setAllowedModes(modes);
-//		link3.setCapacity(45);
-//		link3.setFreespeed(500);
-//		link3.setNumberOfLanes(1);
-//		link3.setLength(22.5);
-//		
-//		// link4
-//		link4.setAllowedModes(modes);
-//		link4.setCapacity(10800);
-//		link4.setFreespeed(500);
-//		link4.setNumberOfLanes(100);
-//		link4.setLength(500);
-//		
-//		// link5
-//		link5.setAllowedModes(modes);
-//		link5.setCapacity(10800);
-//		link5.setFreespeed(500);
-//		link5.setNumberOfLanes(100);
-//		link5.setLength(500);
-//		
-//		// link6
-//		link6.setAllowedModes(modes);
-//		link6.setCapacity(10800);
-//		link6.setFreespeed(500);
-//		link6.setNumberOfLanes(100);
-//		link6.setLength(500);
-//		
-//		// link7
-//		link7.setAllowedModes(modes);
-//		link7.setCapacity(10800);
-//		link7.setFreespeed(500);
-//		link7.setNumberOfLanes(100);
-//		link7.setLength(500);
-//		
-//		// link8
-//		link8.setAllowedModes(modes);
-//		link8.setCapacity(10800);
-//		link8.setFreespeed(500);
-//		link8.setNumberOfLanes(100);
-//		link8.setLength(500);
-//		
-//		// link9
-//		link9.setAllowedModes(modes);
-//		link9.setCapacity(10800);
-//		link9.setFreespeed(500);
-//		link9.setNumberOfLanes(100);
-//		link9.setLength(500);
-//		
-//		// link10
-//		link10.setAllowedModes(modes);
-//		link10.setCapacity(10800);
-//		link10.setFreespeed(500);
-//		link10.setNumberOfLanes(100);
-//		link10.setLength(500);
-//		
-//		network.addNode(node0);
-//		network.addNode(node1);
-//		network.addNode(node2);
-//		network.addNode(node3);
-//		network.addNode(node4);
-//		network.addNode(node5);
-//		network.addNode(node6);
-//		network.addNode(node7);
-//		network.addNode(node8);
-//	
-//		network.addLink(link1);
-//		network.addLink(link2);
-//		network.addLink(link3);
-//		network.addLink(link4);
-//		network.addLink(link5);
-//		network.addLink(link6);
-//		network.addLink(link7);
-//		network.addLink(link8);
-//		network.addLink(link9);
-//		network.addLink(link10);
-//	
-//		this.events = EventsUtils.createEventsManager();
-//		return scenario;
-//	}
 	
 	private QSim createQSim(Scenario sc, EventsManager events) {
 		QSim qSim1 = new QSim(sc, events);

@@ -174,66 +174,6 @@ public class MarginalCongestionHandlerV2Test {
 		Assert.assertEquals("number of congestion events", 0, congestionEvents.size());
 	}
 	
-//	// 2 agenten mit 5 sec Verzögerung, active Storage Capacity
-//	@Test
-//	public final void testFlowStorageCongestion(){
-//		
-//		loadScenario();
-//		setLinks_noStorageCapacityConstraints();
-//		setPopulation();
-//		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
-//							
-//		events.addHandler( new MarginalCongestionEventHandler() {
-//
-//			@Override
-//			public void reset(int iteration) {				
-//			}
-//
-//			@Override
-//			public void handleEvent(MarginalCongestionEvent event) {
-//				congestionEvents.add(event);
-//			}
-//			
-//		});
-//						
-//		MarginalCongestionHandler congestionHandler = new MarginalCongestionHandler(this.events, this.scenario);
-//
-//		// start agent 1...
-//		congestionHandler.handleEvent(ef.createAgentDepartureEvent(0, testAgent1, linkId1, "car"));
-//		congestionHandler.handleEvent(ef.createLinkLeaveEvent(1, testAgent1, linkId1, testAgent1));
-//		congestionHandler.handleEvent(ef.createLinkEnterEvent(1, testAgent1, linkId2, testAgent1));
-//		// start agent 2...
-//		congestionHandler.handleEvent(ef.createAgentDepartureEvent(5, testAgent2, linkId1, "car"));
-//		congestionHandler.handleEvent(ef.createLinkLeaveEvent(6, testAgent2, linkId1, testAgent2));
-//		congestionHandler.handleEvent(ef.createLinkEnterEvent(6, testAgent2, linkId2, testAgent2));
-//		
-//		// agent 1 kann ohne Probleme link 2 verlassen...
-//		congestionHandler.handleEvent(ef.createLinkLeaveEvent(52, testAgent1, linkId2, testAgent1));
-//		congestionHandler.handleEvent(ef.createLinkEnterEvent(52, testAgent1, linkId3, testAgent1));
-//		
-//		// agent 2 muss allerdings durch die flow capacity warten (52 + 10) plus durch die storage capacity (35)
-//		congestionHandler.handleEvent(ef.createLinkLeaveEvent(52 + 10 + 35, testAgent2, linkId2, testAgent2));
-//		congestionHandler.handleEvent(ef.createLinkEnterEvent(52 + 10 + 35, testAgent2, linkId3, testAgent2));
-//		
-//		// *****************
-//		
-//		Assert.assertEquals("number of congestion events", 2, congestionEvents.size());
-//
-//		MarginalCongestionEvent congEvent1 = congestionEvents.get(0);
-//		MarginalCongestionEvent congEvent2 = congestionEvents.get(1);
-//		
-//		double totalDelay = congEvent1.getDelay() + congEvent2.getDelay();
-//		Assert.assertEquals("wrong delay.", 40., totalDelay, MatsimTestUtils.EPSILON);
-//
-//		Assert.assertEquals("congested link", linkId2.toString(), congEvent1.getLinkId().toString());
-//		Assert.assertEquals("causing Agent", testAgent1.toString(), congEvent1.getCausingAgentId().toString());
-//		Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent1.getAffectedAgentId().toString());
-//		
-//		Assert.assertEquals("congested link", linkId2.toString(), congEvent2.getLinkId().toString());
-//		Assert.assertEquals("causing Agent", testAgent1.toString(), congEvent2.getCausingAgentId().toString());
-//		Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent2.getAffectedAgentId().toString());
-//	}
-	
 	// 2 agenten mit 5 sec Verzögerung, active Storage Capacity durch 2
 	@Test
 	public final void testFlowStorageCongestion2(){
