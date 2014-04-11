@@ -1,0 +1,140 @@
+package playground.julia.newInternalization;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+
+import playground.julia.distribution.Cell;
+
+
+public class ResponsibilityGridTools {
+	
+	private Double dist0factor = 0.216;
+	private Double dist1factor = 0.132;
+	private Double dist2factor = 0.029;
+	private Double dist3factor = 0.002;
+	
+	Double timeBinSize;
+	int noOfTimeBins;
+	Map<Double, Map<Id, Double>> timebin2link2factor;
+ 
+	// map erzeugen: timebin to link 2 relative factor (null abfangen)
+	private Map<Id, Integer> links2xCells;
+	private Map<Id, Integer> links2yCells;
+	private int noOfXCells;
+	private int noOfYCells;
+	
+	public Double getFactorForLink(Id linkId, double time) {
+		Double currentTimeBin = getTimeBin(time);
+		
+		// TODO evtl schneller, wenn vor der ersten iteration initialisiert?
+		if(timebin2link2factor!=null){
+			if(timebin2link2factor.get(currentTimeBin).containsKey(linkId)){
+				return timebin2link2factor.get(currentTimeBin).get(linkId);
+			}
+		}
+		return 0.0;
+	}
+
+
+	// keine zeiger! neue initial. jeweils! 
+	public void resetAndcaluculateRelativeDurationFactors(
+			HashMap<Double, Double[][]> duration) {
+		timebin2link2factor = new HashMap<Double, Map<Id, Double>>();
+		
+		// each time bin - generate new map
+		for(int i=1; i<noOfTimeBins+1; i++){
+			timebin2link2factor.put((i*this.timeBinSize), new HashMap<Id, Double>());
+		}
+		// calculate total durations for each time bin
+		for(Double timeBin: duration.keySet()){
+			Double sumOfCurrentTimeBin = 0.0;
+			Double [][] currentDurations = duration.get(timeBin);
+			for(int x=0; x< currentDurations.length; x++){
+				for(int y=0; y<currentDurations[x].length;y++){
+					sumOfCurrentTimeBin += currentDurations[x][y];
+				}
+			}
+			// calculate average for each time bin
+			Double averageOfCurrentTimeBin = sumOfCurrentTimeBin/currentDurations.length/currentDurations[0].length;
+			// calculate factor for each link for current time bin
+			for(Id linkId: links2xCells.keySet()){
+				if (links2yCells.containsKey(linkId)) { // only if in research are
+					Double relativeFactorForCurrentLink = getRelativeFactorForCurrentLink(
+							averageOfCurrentTimeBin, currentDurations, linkId);
+					timebin2link2factor.get(timeBin).put(linkId,
+							relativeFactorForCurrentLink);
+				}
+			}
+		}
+		
+
+		
+		
+	}
+
+	private Double getRelativeFactorForCurrentLink(
+			Double averageOfCurrentTimeBin, Double[][] currentDurations, Id linkId) {
+		
+		Double relevantDuration = 0.0;
+		
+		for(int distance =0; distance <= 3; distance++){
+			Cell cellOfLink = new Cell(links2xCells.get(linkId), links2yCells.get(linkId));
+			List<Cell> distancedCells = cellOfLink .getCellsWithExactDistance(noOfXCells, noOfYCells, distance);
+			for(Cell dc: distancedCells){
+				// TODO better initialise with 0.0?
+				try {
+						if (currentDurations[dc.getX()][dc.getY()]!=null) {
+							Double valueOfdc = currentDurations[dc.getX()][dc.getY()];
+							switch (distance) {
+							case 0:
+								relevantDuration += dist0factor * valueOfdc; 
+								break;
+							case 1:
+								relevantDuration += dist1factor * valueOfdc;
+								break;
+							case 2:
+								relevantDuration += dist2factor * valueOfdc;
+								break;
+							case 3:
+								relevantDuration += dist3factor * valueOfdc;
+								break;
+							}
+						}
+					
+				} catch (ArrayIndexOutOfBoundsException e) {
+					// nothing to do not in research area
+				}
+			}
+		}
+		return relevantDuration / averageOfCurrentTimeBin;	
+	}
+
+
+	private Double getTimeBin(double time) {
+		Double timeBin = Math.ceil(time/timeBinSize)*timeBinSize;
+		if(timeBin<=1)timeBin=timeBinSize;
+		return timeBin;
+	}
+
+
+	public void init(Double timeBinSize, int noOfTimeBins,
+			Map<Id, Integer> links2xCells, Map<Id, Integer> links2yCells, int noOfXCells, int noOfYCells) {
+		this.timeBinSize = timeBinSize;
+		this.noOfTimeBins = noOfTimeBins;
+		// neue time2link map anlegen
+		for(int i=1; i<noOfTimeBins+1; i++){
+			timebin2link2factor.put((i*this.timeBinSize), new HashMap<Id, Double>());
+		}
+		this.links2xCells = links2xCells;
+		this.links2yCells = links2yCells;
+		this.noOfXCells=noOfXCells;
+		this.noOfYCells=noOfYCells;
+		
+	}
+
+
+
+}
