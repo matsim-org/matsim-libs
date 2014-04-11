@@ -56,13 +56,12 @@ import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
  *
  */
 
-public class WelfareAnalysisControlerListener implements StartupListener, IterationEndsListener, IterationStartsListener {
+public class WelfareAnalysisControlerListener implements StartupListener, IterationEndsListener {
 	private static final Logger log = Logger.getLogger(WelfareAnalysisControlerListener.class);
 
 	private final ScenarioImpl scenario;
 	private MoneyEventHandler moneyHandler = new MoneyEventHandler();
 	private TripAnalysisHandler tripAnalysisHandler = new TripAnalysisHandler();
-	private ExtCostEventHandler extCostHandler;
 	
 	private Map<Integer, Double> it2userBenefits_logsum = new TreeMap<Integer, Double>();
 	private Map<Integer, Integer> it2invalidPersons_logsum = new TreeMap<Integer, Integer>();
@@ -84,7 +83,6 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 	
 	public WelfareAnalysisControlerListener(ScenarioImpl scenario){
 		this.scenario = scenario;
-		extCostHandler = new ExtCostEventHandler(this.scenario, false);
 	}
 	
 	@Override
@@ -92,28 +90,10 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 		event.getControler().getEvents().addHandler(moneyHandler);
 		event.getControler().getEvents().addHandler(tripAnalysisHandler);
 	}
-	
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		if (event.getIteration() == this.scenario.getConfig().controler().getLastIteration()) {
-			log.info("Analyzing monetary events in the final iteration.");
-			event.getControler().getEvents().addHandler(extCostHandler);
-		}
-	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		writeAnalysis(event);
-		if (event.getIteration() == this.scenario.getConfig().controler().getLastIteration()) {
-			writeExtCostAnalysis(event.getControler().getControlerIO().getIterationPath(event.getIteration()));
-		}
-	}
-
-	private void writeExtCostAnalysis(String outputPath) {
-		TripInfoWriter writerCar = new TripInfoWriter(extCostHandler, outputPath);
-		writerCar.writeDetailedResults(TransportMode.car);
-		writerCar.writeAvgTollPerDistance(TransportMode.car);
-		writerCar.writeAvgTollPerTimeBin(TransportMode.car);		
 	}
 
 	private void writeAnalysis(IterationEndsEvent event) {

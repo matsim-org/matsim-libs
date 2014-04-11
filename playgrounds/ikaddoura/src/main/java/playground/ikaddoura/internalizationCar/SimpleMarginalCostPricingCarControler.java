@@ -73,7 +73,8 @@ public class SimpleMarginalCostPricingCarControler {
 			controler.addControlerListener(new MarginalCostPricing( (ScenarioImpl) controler.getScenario(), tollHandler ));
 		
 		} else {
-			log.info("Internalization of congestion effects is disabled.");
+			log.info("Internalization of congestion effects is disabled. Calculating and analyzing congestion effects in the final iteration.");
+			controler.addControlerListener(new MarginalCostCalculation( (ScenarioImpl) controler.getScenario()));
 		}
 		
 		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));

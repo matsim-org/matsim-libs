@@ -96,9 +96,9 @@ public abstract class MarginalCongestionHandler implements
 			throw new RuntimeException("Expecting a capacity period of 3600. Aborting...");
 		}
 		
-		if (this.scenario.getConfig().parallelEventHandling().getNumberOfThreads() != 0 || this.scenario.getConfig().parallelEventHandling().getNumberOfThreads() != null) {
-			log.warn("Parallel events handling has to be disabled.");
-		}
+//		if (this.scenario.getConfig().parallelEventHandling().getNumberOfThreads() != 0 || this.scenario.getConfig().parallelEventHandling().getNumberOfThreads() != null) {
+//			log.warn("Parallel events handling has to be disabled.");
+//		}
 			
 		if (this.scenario.getConfig().qsim().getFlowCapFactor() != 1.0) {
 			log.warn("Flow capacity factor unequal 1.0 is not tested.");

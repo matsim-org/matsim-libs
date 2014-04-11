@@ -25,14 +25,13 @@
 package playground.ikaddoura.internalizationCar;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.EventsManager;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
 
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.ikaddoura.analysis.extCost.ExtCostEventHandler;
@@ -43,49 +42,48 @@ import playground.ikaddoura.analysis.extCost.TripInfoWriter;
  *
  */
 
-public class MarginalCostPricing implements StartupListener, IterationEndsListener {
-	private static final Logger log = Logger.getLogger(MarginalCostPricing.class);
+public class MarginalCostCalculation implements IterationEndsListener, IterationStartsListener {
+	private static final Logger log = Logger.getLogger(MarginalCostCalculation.class);
 
 	private final ScenarioImpl scenario;
-	private TollHandler tollHandler;
 	private MarginalCongestionHandlerImplV3 congestionHandler;
-	private MarginalCostPricingCarHandler pricingHandler;
 	private ExtCostEventHandler extCostHandler;
+	private TollHandler tollHandler;
 	
-	public MarginalCostPricing(ScenarioImpl scenario, TollHandler tollHandler){
+	public MarginalCostCalculation(ScenarioImpl scenario){
 		this.scenario = scenario;
-		this.tollHandler = tollHandler;
-	}
-	
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		
-		EventsManager eventsManager = event.getControler().getEvents();
-		
-		congestionHandler = new MarginalCongestionHandlerImplV3(eventsManager, scenario);
-		pricingHandler = new MarginalCostPricingCarHandler(eventsManager, scenario);
-		extCostHandler = new ExtCostEventHandler(this.scenario, false);
-		
-		eventsManager.addHandler(congestionHandler);
-		eventsManager.addHandler(pricingHandler);
-		eventsManager.addHandler(tollHandler);
-		eventsManager.addHandler(extCostHandler);
 	}
 
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		
+		if (event.getIteration() == this.scenario.getConfig().controler().getLastIteration()) {
+			
+			log.info("Computing congestion effects in the final iteration.");
+			congestionHandler = new MarginalCongestionHandlerImplV3(event.getControler().getEvents(), scenario);
+			event.getControler().getEvents().addHandler(congestionHandler);
+			
+			log.info("Analyzing congestion effects in the final iteration.");
+			extCostHandler = new ExtCostEventHandler(this.scenario, false);
+			event.getControler().getEvents().addHandler(extCostHandler);
+			tollHandler = new TollHandler(scenario);
+			event.getControler().getEvents().addHandler(tollHandler);			
+		}
+	}
+	
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		
-		log.info("Set average tolls for each link Id and time bin...");
-		tollHandler.setLinkId2timeBin2avgToll();
-		log.info("Set average tolls for each link Id and time bin... Done.");
-		
-		// write out analysis every iteration
-		tollHandler.writeTollStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollStats.csv");
-		congestionHandler.writeCongestionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
-		TripInfoWriter writerCar = new TripInfoWriter(extCostHandler, event.getControler().getControlerIO().getIterationPath(event.getIteration()));
-		writerCar.writeDetailedResults(TransportMode.car);
-		writerCar.writeAvgTollPerDistance(TransportMode.car);
-		writerCar.writeAvgTollPerTimeBin(TransportMode.car);
+		if (event.getIteration() == this.scenario.getConfig().controler().getLastIteration()) {
+			
+			congestionHandler.writeCongestionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
+			tollHandler.writeTollStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollStats.csv");
+			
+			TripInfoWriter writerCar = new TripInfoWriter(extCostHandler, event.getControler().getControlerIO().getIterationPath(event.getIteration()));
+			writerCar.writeDetailedResults(TransportMode.car);
+			writerCar.writeAvgTollPerDistance(TransportMode.car);
+			writerCar.writeAvgTollPerTimeBin(TransportMode.car);
+		}
 	}
 
 }
