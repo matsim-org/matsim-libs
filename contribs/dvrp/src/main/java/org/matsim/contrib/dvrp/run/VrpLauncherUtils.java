@@ -21,9 +21,7 @@ package org.matsim.contrib.dvrp.run;
 
 import java.io.File;
 import java.util.*;
-import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
@@ -122,59 +120,34 @@ public class VrpLauncherUtils
             }
         }
     }
-    
-	public static void convertLegModesAndRemoveOtherModes(List<String> passengerIds, String mode, Scenario scenario) {
-		Population pop = scenario.getPopulation() ;
-		
-		List<Id> removals = new ArrayList<Id>() ;
-		int cnt = 0 ;
-		for ( Entry<Id, ? extends Person> entry : pop.getPersons().entrySet() ) {
-			if ( passengerIds.contains( entry.getKey().toString() ) ) {
-				cnt ++ ;
-	            for (PlanElement pe : entry.getValue().getSelectedPlan().getPlanElements()) {
-	                if (pe instanceof Leg) {
-	                    ((Leg)pe).setMode(mode);
-	                }
-	            }
-			} else {
-				removals.add( entry.getKey() ) ;
-			}
-		}
-		for ( Id id : removals ) {
-			pop.getPersons().remove( id ) ;
-		}
-		Logger.getLogger("generated " + cnt + " taxi passengers") ;
-
-	}
-
 
 
     public static void removeNonPassengers(String mode, Scenario scenario)
     {
-        Set<Id> nonPassengerIds = new HashSet<Id>();
         Map<Id, ? extends Person> persons = scenario.getPopulation().getPersons();
+        Iterator<? extends Person> personIter = persons.values().iterator();
 
-        for (Entry<Id, ? extends Person> e : persons.entrySet()) {
-            Person person = e.getValue();
+        while (personIter.hasNext()) {
+            Plan selectedPlan = personIter.next().getSelectedPlan();
 
-            boolean isPassenger = false;
-            for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-                if (pe instanceof Leg) {
-                    if ( ((Leg)pe).getMode().equals(mode)) {
-                        isPassenger = true;
-                        break;
-                    }
+            if (!hasLegOfMode(selectedPlan, mode)) {
+                personIter.remove();
+            }
+        }
+    }
+
+
+    private static boolean hasLegOfMode(Plan plan, String mode)
+    {
+        for (PlanElement pe : plan.getPlanElements()) {
+            if (pe instanceof Leg) {
+                if ( ((Leg)pe).getMode().equals(mode)) {
+                    return true;
                 }
             }
-
-            if (!isPassenger) {
-                nonPassengerIds.add(e.getKey());
-            }
         }
 
-        for (Id id : nonPassengerIds) {
-            persons.remove(id);
-        }
+        return false;
     }
 
 
@@ -253,6 +226,5 @@ public class VrpLauncherUtils
                     legMode);
         }
     }
-
 
 }
