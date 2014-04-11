@@ -36,13 +36,13 @@ import org.matsim.api.core.v01.Id;
  * @author ikaddoura , lkroeger
  *
  */
-public class PtTripInfoWriter {
-	private static final Logger log = Logger.getLogger(PtTripInfoWriter.class);
+public class TripInfoWriter {
+	private static final Logger log = Logger.getLogger(TripInfoWriter.class);
 
 	ExtCostEventHandler handler;
 	String outputFolder;
 	
-	public PtTripInfoWriter(ExtCostEventHandler handler, String outputFolder) {
+	public TripInfoWriter(ExtCostEventHandler handler, String outputFolder) {
 		this.handler = handler;
 		this.outputFolder = outputFolder;
 		
@@ -50,10 +50,10 @@ public class PtTripInfoWriter {
 		File file = new File(fileName);
 		file.mkdirs();
 	}
-	
-	public void writeDetailedResultsPt() {
+
+	public void writeDetailedResults(String mode) {
 		
-		String fileName = this.outputFolder + "/monetary_amounts_trip_infos_pt.csv";
+		String fileName = this.outputFolder + "/monetary_amounts_trip_infos_" + mode + ".csv";
 		File file = new File(fileName);
 			
 		try {
@@ -66,17 +66,15 @@ public class PtTripInfoWriter {
 			bw.write("amount per trip;departure time [sec];person Id;distance [m]");
 			bw.newLine();
 			
-			Map<Id,List<Double>> personId2listOfAmountsPt = this.handler.getPersonId2listOfAmountsPt();
-			Map<Id,List<Double>> personId2listOfDepartureTimesPt = this.handler.getPersonId2listOfDepartureTimesPt();
-			Map<Id,List<Double>> personId2listOfDistancesPt = this.handler.getPersonId2listOfDistancesPt();
-			Map<Id,Integer> personId2numberOfTripsPt = this.handler.getPersonId2NumberOfTripsPt();
+			Map<Id,List<Double>> personId2listOfAmounts = this.handler.getPersonId2listOfAmounts(mode);
+			Map<Id,List<Double>> personId2listOfDepartureTimes = this.handler.getPersonId2listOfDepartureTimes(mode);
+			Map<Id,List<Double>> personId2listOfDistances = this.handler.getPersonId2listOfDistances(mode);
 			
-			for (Id id : personId2listOfAmountsPt.keySet()) {
-				List<Double> fares = personId2listOfAmountsPt.get(id);
-				List<Double> departureTimes = personId2listOfDepartureTimesPt.get(id);
-				List<Double> distances = personId2listOfDistancesPt.get(id);
-				int numberOfTrips = personId2numberOfTripsPt.get(id);
-				for(int i = 0 ; i < numberOfTrips ; i++){
+			for (Id id : personId2listOfAmounts.keySet()) {
+				List<Double> fares = personId2listOfAmounts.get(id);
+				List<Double> departureTimes = personId2listOfDepartureTimes.get(id);
+				List<Double> distances = personId2listOfDistances.get(id);
+				for(int i = 0 ; i < fares.size() ; i++){
 					double fare = fares.get(i);
 					double departureTime = departureTimes.get(i);
 					double distance = distances.get(i);
@@ -93,10 +91,10 @@ public class PtTripInfoWriter {
 		}
 	}
 	
-	public void writeResultsTimePt() {
-		String fileName = this.outputFolder + "/avg_amount_per_trip_departure_time_pt.csv";
+	public void writeAvgTollPerTimeBin(String mode) {
+		String fileName = this.outputFolder + "/avg_amount_per_trip_departure_time_" + mode + ".csv";
 		File file = new File(fileName);
-		Map<Double, Double> x2avgAmount = this.handler.getAvgAmountPerTripDepartureTimePt();
+		Map<Double, Double> departureTime2avgAmount = this.handler.getAvgAmountPerTripDepartureTime(mode);
 
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
@@ -108,9 +106,9 @@ public class PtTripInfoWriter {
 			bw.write("trip departure time;average amount");
 			bw.newLine();
 
-			for (Double x : x2avgAmount.keySet()) {
+			for (Double x : departureTime2avgAmount.keySet()) {
 				
-				bw.write(x + ";" + x2avgAmount.get(x));
+				bw.write(x + ";" + departureTime2avgAmount.get(x));
 				bw.newLine();
 			}
 			
@@ -122,10 +120,10 @@ public class PtTripInfoWriter {
 		}	
 	}
 	
-	public void writeResultsDistancePt() {
-		String fileName = this.outputFolder + "/avg_amount_per_trip_distance_pt.csv";
+	public void writeAvgTollPerDistance(String mode) {
+		String fileName = this.outputFolder + "/avg_amount_per_trip_distance_" + mode + ".csv";
 		File file = new File(fileName);
-		Map<Double, Double> x2avgAmount = this.handler.getAvgAmountPerTripDistancePt();
+		Map<Double, Double> tripDistance2avgAmount = this.handler.getAvgAmountPerTripDistance(mode);
 
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
@@ -137,9 +135,9 @@ public class PtTripInfoWriter {
 			bw.write("trip distance;average amount");
 			bw.newLine();
 
-			for (Double x : x2avgAmount.keySet()) {
+			for (Double x : tripDistance2avgAmount.keySet()) {
 				
-				bw.write(x + ";" + x2avgAmount.get(x));
+				bw.write(x + ";" + tripDistance2avgAmount.get(x));
 				bw.newLine();
 			}
 			
@@ -150,5 +148,5 @@ public class PtTripInfoWriter {
 			e.printStackTrace();
 		}	
 	}
-	
+
 }

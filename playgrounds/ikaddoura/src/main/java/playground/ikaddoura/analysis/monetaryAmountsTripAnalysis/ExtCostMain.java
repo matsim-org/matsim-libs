@@ -21,6 +21,7 @@
 package playground.ikaddoura.analysis.monetaryAmountsTripAnalysis;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -34,7 +35,8 @@ public class ExtCostMain {
 	private static final Logger log = Logger.getLogger(ExtCostMain.class);
 	
 	private String eventsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/internalization_4/ITERS/it.100/100.eventsCongestionPrices.xml.gz";
-	private static String netFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/internalization_4/output_network.xml.gz";
+	private String configFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/internalization_4/output_config.xml.gz";
+	private String netFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/internalization_4/output_network.xml.gz";
 	private String outputFolder = "/Users/ihab/Desktop/analysis4";
 	
 	public static void main(String[] args) {
@@ -44,13 +46,13 @@ public class ExtCostMain {
 
 	private void run() {
 		
-		Config config = ConfigUtils.createConfig();
+		Config config = ConfigUtils.loadConfig(configFile);
 		config.network().setInputFile(netFile);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		
-		ExtCostEventHandler handler = new ExtCostEventHandler(scenario.getNetwork());
+		ExtCostEventHandler handler = new ExtCostEventHandler(scenario);
 		events.addHandler(handler);
 
 		log.info("Reading events file...");
@@ -62,15 +64,13 @@ public class ExtCostMain {
 		
 		log.info("Writing output files...");
 
-		CarTripInfoWriter writerCar = new CarTripInfoWriter(handler, outputFolder);
-		writerCar.writeDetailedResults();
-		writerCar.writeAvgTollPerDistance();
-		writerCar.writeAvgTollPerTimeBin();
-		
-//		PtTripInfoWriter writerPt = new PtTripInfoWriter(handler, outputFolder);
-//		writerPt.writeDetailedResultsPt();
-//		writerPt.writeResultsDistancePt();
-//		writerPt.writeResultsTimePt();
+		TripInfoWriter writer = new TripInfoWriter(handler, outputFolder);
+		writer.writeDetailedResults(TransportMode.car);
+		writer.writeAvgTollPerDistance(TransportMode.car);
+		writer.writeAvgTollPerTimeBin(TransportMode.car);
+		writer.writeDetailedResults(TransportMode.pt);
+		writer.writeAvgTollPerDistance(TransportMode.pt);
+		writer.writeAvgTollPerTimeBin(TransportMode.pt);
 		
 		log.info("Writing output files... Done.");
 

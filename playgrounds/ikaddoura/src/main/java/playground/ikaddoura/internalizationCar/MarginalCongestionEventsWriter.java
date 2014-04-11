@@ -20,6 +20,7 @@
 
 package playground.ikaddoura.internalizationCar;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -29,7 +30,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.ikaddoura.analysis.monetaryAmountsTripAnalysis.CarTripInfoWriter;
+import playground.ikaddoura.analysis.monetaryAmountsTripAnalysis.TripInfoWriter;
 import playground.ikaddoura.analysis.monetaryAmountsTripAnalysis.ExtCostEventHandler;
 
 /**
@@ -67,7 +68,7 @@ public class MarginalCongestionEventsWriter {
 		MarginalCostPricingCarHandler marginalCostTollHandler = new MarginalCostPricingCarHandler(events, scenario);
 
 		TollHandler tollHandler = new TollHandler(scenario);
-		ExtCostEventHandler extCostHandler = new ExtCostEventHandler(scenario.getNetwork());
+		ExtCostEventHandler extCostHandler = new ExtCostEventHandler(scenario);
 		
 		events.addHandler(eventWriter);
 		events.addHandler(congestionHandler);
@@ -87,10 +88,10 @@ public class MarginalCongestionEventsWriter {
 		
 		tollHandler.writeTollStats(outputPath + "/tollStats_Offline.csv");
 
-		CarTripInfoWriter writer = new CarTripInfoWriter(extCostHandler, outputPath);
-		writer.writeDetailedResults();
-		writer.writeAvgTollPerTimeBin();
-		writer.writeAvgTollPerDistance();
+		TripInfoWriter writer = new TripInfoWriter(extCostHandler, outputPath);
+		writer.writeDetailedResults(TransportMode.car);
+		writer.writeAvgTollPerTimeBin(TransportMode.car);
+		writer.writeAvgTollPerDistance(TransportMode.car);
 	}
 			 
 }

@@ -32,20 +32,19 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
-
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 
-import playground.ikaddoura.analysis.monetaryAmountsTripAnalysis.CarTripInfoWriter;
+import playground.ikaddoura.analysis.monetaryAmountsTripAnalysis.TripInfoWriter;
 import playground.ikaddoura.analysis.monetaryAmountsTripAnalysis.ExtCostEventHandler;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
@@ -85,7 +84,7 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 	
 	public WelfareAnalysisControlerListener(ScenarioImpl scenario){
 		this.scenario = scenario;
-		extCostHandler = new ExtCostEventHandler(this.scenario.getNetwork());
+		extCostHandler = new ExtCostEventHandler(this.scenario);
 	}
 	
 	@Override
@@ -111,10 +110,10 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 	}
 
 	private void writeExtCostAnalysis(String outputPath) {
-		CarTripInfoWriter writerCar = new CarTripInfoWriter(extCostHandler, outputPath);
-		writerCar.writeDetailedResults();
-		writerCar.writeAvgTollPerDistance();
-		writerCar.writeAvgTollPerTimeBin();		
+		TripInfoWriter writerCar = new TripInfoWriter(extCostHandler, outputPath);
+		writerCar.writeDetailedResults(TransportMode.car);
+		writerCar.writeAvgTollPerDistance(TransportMode.car);
+		writerCar.writeAvgTollPerTimeBin(TransportMode.car);		
 	}
 
 	private void writeAnalysis(IterationEndsEvent event) {
