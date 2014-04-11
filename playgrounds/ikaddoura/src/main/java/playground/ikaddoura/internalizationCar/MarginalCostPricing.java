@@ -64,7 +64,7 @@ public class MarginalCostPricing implements StartupListener, IterationEndsListen
 		
 		congestionHandler = new MarginalCongestionHandlerImplV3(eventsManager, scenario);
 		pricingHandler = new MarginalCostPricingCarHandler(eventsManager, scenario);
-		extCostHandler = new ExtCostEventHandler(this.scenario, false);
+		extCostHandler = new ExtCostEventHandler(this.scenario, true);
 		
 		eventsManager.addHandler(congestionHandler);
 		eventsManager.addHandler(pricingHandler);
