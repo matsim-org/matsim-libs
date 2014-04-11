@@ -44,7 +44,6 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.api.core.v01.network.Network;
 
 import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
 import playground.ikaddoura.internalizationCar.MarginalCongestionEventHandler;
@@ -73,7 +72,6 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 	private Map<Id,Double> personId2distanceEnterValue = new HashMap<Id,Double>();
 	
 	private List<Id> ptDrivers = new ArrayList<Id>();
-	private Network network;
 	private Scenario scenario;
 	
 	private double distance = 500.;
@@ -154,7 +152,9 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		double linkLength = this.network.getLinks().get(event.getLinkId()).getLength();
+		System.out.println(event.toString());
+		System.out.println(this.scenario.getNetwork().getLinks().toString());
+		double linkLength = this.scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
 		if(ptDrivers.contains(event.getVehicleId())){
 			if(driverId2totalDistance.containsKey(event.getVehicleId())){
 				driverId2totalDistance.put(event.getVehicleId(),driverId2totalDistance.get(event.getVehicleId()) + linkLength);
