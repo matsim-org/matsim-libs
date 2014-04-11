@@ -41,11 +41,21 @@ public class DgNetworkShrinker {
 
 	private Set<Id> signalizedNodes;
 
+	/**
+	 * reduce the network size: delete all edges
+	 * 1. outside the envelope
+	 * 2. with freespeed <= 10 m/s, that are not on a shortest path (according to travel time) between signalized nodes.
+	 * 
+	 * @param net the original network
+	 * @param envelope
+	 * @param networkCrs
+	 * @return the small network
+	 */
 	public Network createSmallNetwork(Network net, Envelope envelope, CoordinateReferenceSystem networkCrs) {
 		
 		NetworkFilterManager filterManager = new NetworkFilterManager(net);
 		
-		//bounding box filter - deletes all edges outside the bounding box
+		//bounding box filter - deletes all edges outside the envelope
 		filterManager.addLinkFilter(new EnvelopeLinkStartEndFilter(envelope));
 		
 		//interior link filter - deletes all edges that are not on a shortest path (according to travel time) between signalized nodes

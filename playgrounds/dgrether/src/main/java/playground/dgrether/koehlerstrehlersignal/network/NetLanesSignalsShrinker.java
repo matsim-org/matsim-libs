@@ -75,16 +75,26 @@ public class NetLanesSignalsShrinker {
 		this.crs = crs;
 	}
 	
+	/**
+	 * shrink the scenario: reduce the network size to the bounding box around the signalized nodes given by the cuttingBoundingBoxOffset,
+	 * delete all small interior edges (freespeed <= 10 m/s) that are not on a shortest path (according to travel time) between signalized nodes,
+	 * clean and simplify the resulting small network.
+	 * 
+	 * @param outputDirectory
+	 * @param shapeFileDirectory
+	 * @param cuttingBoundingBoxOffset
+	 * @throws IOException
+	 */
 	public void shrinkScenario(String outputDirectory, String shapeFileDirectory, double cuttingBoundingBoxOffset) throws IOException{
 		//Some initialization
 		Set<Id> signalizedNodes = this.getSignalizedNodeIds(((SignalsData) this.fullScenario.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData(), this.fullScenario.getNetwork());
 		DgNetworkUtils.writeNetwork2Shape(fullScenario.getNetwork(), crs, shapeFileDirectory + "network_full");
 		
-		//create the boundary envelope
+		// create the boundary envelope
 		this.cuttingBoundingBox = new DgSignalsBoundingBox(crs);
 		Envelope cuttingBoundingBoxEnvelope = cuttingBoundingBox.calculateBoundingBoxForSignals(fullScenario.getNetwork(), 
 				((SignalsData) fullScenario.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData(), cuttingBoundingBoxOffset);
-		cuttingBoundingBox.writeBoundingBox(shapeFileDirectory + "cutting_");		
+		cuttingBoundingBox.writeBoundingBox(shapeFileDirectory + "cutting_");
 		
 		//Reduce the network size to the bounding box
 		DgNetworkShrinker netShrinker = new DgNetworkShrinker();
