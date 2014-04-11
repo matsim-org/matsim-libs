@@ -45,6 +45,7 @@ public class MarginalCostPricing implements StartupListener, IterationEndsListen
 	private final ScenarioImpl scenario;
 	private TollHandler tollHandler;
 	private MarginalCongestionHandlerImplV3 congestionHandler;
+	private MarginalCostPricingCarHandler pricingHandler;
 	
 	public MarginalCostPricing(ScenarioImpl scenario, TollHandler tollHandler){
 		this.scenario = scenario;
@@ -56,9 +57,10 @@ public class MarginalCostPricing implements StartupListener, IterationEndsListen
 		
 		EventsManager eventsManager = event.getControler().getEvents();
 		congestionHandler = new MarginalCongestionHandlerImplV3(eventsManager, scenario);
+		pricingHandler = new MarginalCostPricingCarHandler(eventsManager, scenario);
 		
 		event.getControler().getEvents().addHandler(congestionHandler);
-		event.getControler().getEvents().addHandler(new MarginalCostPricingCarHandler(eventsManager, scenario));
+		event.getControler().getEvents().addHandler(pricingHandler);
 		
 		event.getControler().getEvents().addHandler(tollHandler);
 
@@ -75,6 +77,20 @@ public class MarginalCostPricing implements StartupListener, IterationEndsListen
 		
 		// write out congestion statistics every iteration
 		congestionHandler.writeCongestionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
+		
+		// write out congestion events in a separate text file
+		congestionHandler.writeCongestionEvents(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionEvents.txt");
+
+		// TODO: Compare the number of thrown/caught congestion events
+		if (congestionHandler.getTotalNumberOfCongestionEvents() == tollHandler.getTotalNumberOfCongestionEvents() && congestionHandler.getTotalNumberOfCongestionEvents() == pricingHandler.getTotalNumberOfCongestionEvents()) {
+			// identical number of congestion events that are thrown and caught by different event handlers
+		} else {
+			log.warn("Different number of congestion events that are thrown and caught by different event handlers.");
+		}
+		
+		log.info("Total number of congestion events (" + congestionHandler.getClass().getName() + "): " + congestionHandler.getTotalNumberOfCongestionEvents());
+		log.info("Total number of congestion events (" + tollHandler.getClass().getName() + "): " + tollHandler.getTotalNumberOfCongestionEvents());
+		log.info("Total number of congestion events (" + pricingHandler.getClass().getName() + "): " + pricingHandler.getTotalNumberOfCongestionEvents());
 	}
 
 }

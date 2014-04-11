@@ -87,6 +87,10 @@ public abstract class MarginalCongestionHandler implements
 	double totalStorageDelay = 0.0;
 	double delayNotInternalized_roundingErrors = 0.0;
 	double delayNotInternalized_spillbackNoCausingAgent = 0.0;
+	
+	// for debugging
+	private List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
+	private int congestionEventsCounter = 0;
 		
 	public MarginalCongestionHandler(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
@@ -122,6 +126,10 @@ public abstract class MarginalCongestionHandler implements
 		this.totalInternalizedDelay = 0.0;
 		this.delayNotInternalized_roundingErrors = 0.0;
 		this.delayNotInternalized_spillbackNoCausingAgent = 0.0;
+		
+		// for debugging
+		congestionEvents.clear();
+		congestionEventsCounter = 0;
 	}
 
 	@Override
@@ -238,6 +246,11 @@ public abstract class MarginalCongestionHandler implements
 					MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(linkInfo.getPersonId2linkEnterTime().get(id), "flowStorageCapacity", id, event.getVehicleId(), linkInfo.getMarginalDelayPerLeavingVehicle_sec(), event.getLinkId());
 					this.events.processEvent(congestionEvent);
 					this.totalInternalizedDelay = this.totalInternalizedDelay + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
+
+					// for debugging
+					congestionEventsCounter++;
+					congestionEvents.add(congestionEvent);
+
 				}
 				delayToPayFor = delayToPayFor - linkInfo.getMarginalDelayPerLeavingVehicle_sec();
 				
@@ -251,6 +264,10 @@ public abstract class MarginalCongestionHandler implements
 						MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(linkInfo.getPersonId2linkEnterTime().get(id), "flowStorageCapacity", id, event.getVehicleId(), delayToPayFor, event.getLinkId());
 						this.events.processEvent(congestionEvent);	
 						this.totalInternalizedDelay = this.totalInternalizedDelay + delayToPayFor;
+						
+						// for debugging
+						congestionEventsCounter++;
+						congestionEvents.add(congestionEvent);
 
 					}
 					delayToPayFor = 0.;
@@ -330,13 +347,38 @@ public abstract class MarginalCongestionHandler implements
 			bw.newLine();
 			bw.write("not internalized delay (in case delays resulting from the storage capacity are ignored) [hours];" + this.delayNotInternalized_storageCapacity / 3600.);
 			bw.newLine();
+			bw.write("number of congestion events (from List);" + this.congestionEvents.size());
+			bw.newLine();
+			bw.write("number of congestion events (from Counter);" + this.congestionEventsCounter);
+			bw.newLine();
 			
 			bw.close();
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		log.info("Output written to " + fileName);		
+		log.info("Congestion statistics written to " + fileName);		
+	}
+	
+	public void writeCongestionEvents(String fileName) {
+		File file = new File(fileName);
+		
+		log.info("Total number of congestion events (from List): " + this.congestionEvents.size());
+		log.info("Total number of congestion events (from Counter): " + this.congestionEventsCounter);
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			for (MarginalCongestionEvent event : this.congestionEvents) {
+				bw.write(event.toString());
+				bw.newLine();
+			}
+			
+			bw.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		log.info("Congestion events written to " + fileName);		
 	}
 
 	public double getTotalInternalizedDelay() {
@@ -353,6 +395,10 @@ public abstract class MarginalCongestionHandler implements
 	
 	public double getDelayNotInternalizedSpillbackNoCausingAgent() {
 		return delayNotInternalized_spillbackNoCausingAgent;
+	}
+	
+	public int getTotalNumberOfCongestionEvents() {
+		return congestionEventsCounter;
 	}
 
 	abstract void calculateCongestion(LinkLeaveEvent event);

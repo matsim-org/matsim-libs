@@ -52,7 +52,7 @@ public class SimpleMarginalCostPricingCarControler {
 			log.info("second argument (enabling internalization: true/false): "+ internalization);
 
 		} else {
-			configFile = "../../runs-svn/test_internalizationCar/input/config.xml";
+			configFile = "../../runs-svn/berlin_internalizationCar/input/config_internalization_11.xml";
 			internalization = true;
 		}
 		

@@ -62,7 +62,7 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 	private boolean setMethodsExecuted = false;
 	
 	private double vtts_car;
-	
+		
 	public TollHandler(Scenario scenario) {
 		this.vtts_car = (scenario.getConfig().planCalcScore().getTraveling_utils_hr() - scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 		log.info("VTTS_car: " + vtts_car);
@@ -80,7 +80,7 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 		this.linkId2timeBin2avgTollOldValue.putAll(linkId2timeBin2avgToll);
 		this.linkId2timeBin2avgToll.clear();
 		
-		this.setMethodsExecuted = false;
+		this.setMethodsExecuted = false;		
 	}
 
 	@Override
@@ -103,7 +103,9 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 	}
 
 	public void setLinkId2timeBin2avgToll() {
-				
+		
+		log.info("Total number of congestion events: " + this.congestionEvents.size());
+		
 		if (!this.linkId2timeBin2tollSum.isEmpty()) {
 			throw new RuntimeException("Map linkId2timeBin2tollSum should be empty!");
 		} else {
@@ -397,6 +399,10 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 
 	public List<LinkEnterEvent> getLinkEnterEvents() {
 		return linkEnterEvents;
+	}
+	
+	public int getTotalNumberOfCongestionEvents() {
+		return this.congestionEvents.size();
 	}
 
 }
