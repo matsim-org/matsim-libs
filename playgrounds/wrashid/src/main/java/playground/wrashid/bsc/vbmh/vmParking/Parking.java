@@ -35,7 +35,7 @@ public class Parking {
 	public String facilityId;
 	public String facilityActType;
 	public String type;
-	public boolean evExklusive;
+	public boolean evExklusive; //Is now defined in the Pricing Model
 	public double coordinateX, coordinateY;
 	public LinkedList <ParkingSpot> spots;
 	public LinkedList <ParkingSpot> evSpots;
@@ -55,7 +55,7 @@ public class Parking {
 		coordinate = null;
 	}
 	
-	public void createSpots(){
+	public void createSpots(PricingModels pricingModels){
 		this.occupancyEVSpots=0;
 		this.occupancyNEVSpots=0;
 		spots= new LinkedList<ParkingSpot>();
@@ -65,7 +65,7 @@ public class Parking {
 		for (int i=0; i<capacityNEV; i++){
 			ParkingSpot parkingSpot = new ParkingSpot();
 			spots.add(parkingSpot);
-			spots.getLast().evExclusive=false;
+			spots.getLast().evExclusive=pricingModels.get_model(parkingPriceMNEVSpot).checkEvExc(); //Falls Preismodell fuer EV und NEV Platz das gleiche
 			spots.getLast().charge=false;
 			spots.getLast().parkingPriceM=this.parkingPriceMNEVSpot;
 			spots.getLast().setOccupied(false);
@@ -77,7 +77,7 @@ public class Parking {
 			ParkingSpot parkingSpot = new ParkingSpot();
 			spots.add(parkingSpot);
 			spots.getLast().charge=true;
-			spots.getLast().evExclusive=this.evExklusive;
+			spots.getLast().evExclusive=pricingModels.get_model(parkingPriceMEVSpot).checkEvExc();
 			spots.getLast().chargingPriceM=this.chargingPriceM;
 			spots.getLast().chargingRate=this.chargingRate;
 			spots.getLast().parkingPriceM=this.parkingPriceMEVSpot;
@@ -117,6 +117,7 @@ public class Parking {
 	public ParkingSpot checkForFreeSpot(){ //Durchsucht zwar alle Spots, NEV Spots sind jedoch oben in der Liste, kommen daher morgens zuerst drann
 		for(ParkingSpot spot : spots){
 			//System.out.println("checke spot");
+			//System.out.println(spot.evExclusive);
 			if (spot.isOccupied() == false && spot.evExclusive == false){  //EV exclusive Spots werden nicht ausgegeben
 				return spot;
 			}

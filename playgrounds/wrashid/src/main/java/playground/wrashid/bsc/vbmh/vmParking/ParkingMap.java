@@ -39,9 +39,9 @@ public class ParkingMap {
 		ParkingMap.parkings.add(parking);
 	}
 
-	public void createSpots(){
+	public void createSpots(PricingModels pricing){
 		for (Parking parking : parkings){
-			parking.createSpots();
+			parking.createSpots(pricing);
 		}
 	}
 	public void clearSpots(){

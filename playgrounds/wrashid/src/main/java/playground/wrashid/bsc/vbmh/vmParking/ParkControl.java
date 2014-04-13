@@ -296,7 +296,14 @@ public class ParkControl {
 		
 		
 		for (ParkingSpot spot : spotsInArea){
-			// SCORE
+			
+			//Diagnose
+			if(pricing.get_model(spot.parkingPriceM).checkEvExc() && !ev){
+				System.out.println("NEV hat evExclusive Platz in Auswahl - should not happen!");
+			}
+			
+			//----
+			
 			double evRelatedScore = 0;
 			double distance = CoordUtils.calcDistance(this.cordinate, spot.parking.getCoordinate());
 			double pricem = spot.parkingPriceM;
@@ -344,7 +351,7 @@ public class ParkControl {
 			score =  this.betaMoney*1*cost+this.betaWalk*walkingTime+evRelatedScore; //!! Vorzeichen
 			//___
 
-			if(score > bestScore){
+			if(score > bestScore && cost != -1){ //cost = -1 >> vehicle is not allowed to park here
 				bestScore=score;
 				bestSpot=spot;
 			}
@@ -386,25 +393,6 @@ public class ParkControl {
 			return selectedSpot;
 		}
 		
-		/*
-		for (Parking parking : parkingMap.getParkings()) {
-			// System.out.println("Suche Parking mit passender facility ID");
-			if(parking.facilityId!=null){ //Es gibt datensaetze ohne Facility ID >> Sonst Nullpointer
-				if (parking.facilityId.equals(facilityId) && parking.facilityActType.equals(facilityActType)) { 
-					//System.out.println("checke Parking");
-					selectedSpot = parking.checkForFreeSpot(); //Gibt null oder einen freien Platz zurueck
-					if(ev){
-						selectedSpot = parking.checkForFreeSpotEVPriority(); // !!Wenn ev Spot vorhanden wird er genommen.
-					}
-					if (selectedSpot != null) {
-						return selectedSpot;
-					}
-					
-				}
-			}
-		}
-		
-		*/
 		return null;
 	}
 
@@ -549,7 +537,10 @@ public class ParkControl {
 		Map<String, Object> personAttributes = person.getCustomAttributes();
 		personAttributes.put("selectedParkingspot", selectedSpot);
 		ParkingSpot selectedSpotToSet = (ParkingSpot) personAttributes.get("selectedParkingspot");
-		selectedSpot.parking.parkOnSpot(selectedSpotToSet, time);
+		if(selectedSpotToSet==null){
+			System.out.println("Selecting a spot went wrong!");
+		}
+		selectedSpotToSet.parking.parkOnSpot(selectedSpotToSet, time);
 		//selectedSpotToSet.setOccupied(true);
 		//selectedSpotToSet.setTimeVehicleParked(this.time);
 		int currentLoad = load.get(selectedSpotToSet.parking.id);

@@ -92,7 +92,7 @@ public class ParkControlerListener implements StartupListener, IterationEndsList
 		
 		//Parkplaetze zuruecksetzen 
 		getParkHandler().parkControl.parkingMap.clearSpots();
-		getParkHandler().parkControl.parkingMap.createSpots();
+		getParkHandler().parkControl.parkingMap.createSpots(getParkHandler().getParkControl().getPricing());
 		getParkHandler().parkControl.clearAgents();
 		
 		//Diagnose: 

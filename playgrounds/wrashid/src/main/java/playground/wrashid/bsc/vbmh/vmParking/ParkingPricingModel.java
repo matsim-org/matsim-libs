@@ -17,16 +17,23 @@ public class ParkingPricingModel {
 	private double priceOfFirstMinuteNEV;
 	private double maxTimeEV;
 	private double maxTimeNEV;
+	private Boolean evExclusive; //=false; 
 	
 	
 	public double calculateParkingPrice(double duration, boolean ev){
 		duration = duration/3600; //von Sekunden auf Minuten
 		double price = 0;
-		
+		//System.out.println(evExclusive);
 		if (ev){
 			
 			price = this.getPriceOfFirstMinuteEV() + duration * this.getPricePerMinuteEV();
 		} else {
+			if(evExclusive != null){
+				if(evExclusive){
+					System.out.println("EV exclusive! ");
+					return -1; // NEV is not allowed to park on this spot
+				}
+			}
 			//System.out.println(model.getPricePerMinuteNEV());
 			price = this.getPriceOfFirstMinuteNEV() + duration * this.getPricePerMinuteNEV();
 		}
@@ -37,7 +44,17 @@ public class ParkingPricingModel {
 	public double calculateParkingPrice(double duration, boolean ev, ParkingSpot spot){
 		return this.calculateParkingPrice(duration, ev);
 	}
-	
+	public Boolean checkEvExc(){
+		if (evExclusive!= null){
+			if(evExclusive){
+				return true;
+			}else{
+				return false;
+			}
+		}else{
+			return false;
+		}
+	}
 	
 	
 	public double getPricePerMinuteEV() {
@@ -75,5 +92,13 @@ public class ParkingPricingModel {
 	}
 	public void setMaxTimeEV(double max_time_ev) {
 		this.maxTimeEV = max_time_ev;
+	}
+
+	public Boolean getEvExclusive() {
+		return evExclusive;
+	}
+
+	public void setEvExclusive(Boolean evExclusive) {
+		this.evExclusive = evExclusive;
 	}
 }
