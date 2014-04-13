@@ -32,37 +32,37 @@ public class adjustParkingCpacitys {
 		String parkFileName="input/SF_PLUS/base/parkingLotsIncl.xml";
 		String peakLoadFileName="input/SF_PLUS/base/peakLoad.csv";
 		String streetFileName="input/SF_PLUS/base/street100p.csv";
-		String outputFile = "input/SF_PLUS/Scenario/140401_W08PmSL/parking2.xml";
+		String outputFile = "input/SF_PLUS/base/parking_08pmsl_korrigiert.xml";
 		//----
 		pAnteile.put("home", 1.0);
 		evAnteile.put("home", 1.0);
-//		preiseEVSpots.put("home", 0);
-//		preiseNEVSpots.put("home", 0);
-//		chargingRates.put("home", 2.3);
+		preiseEVSpots.put("home", 0);
+		preiseNEVSpots.put("home", 0);
+		chargingRates.put("home", 2.3);
 		
 		pAnteile.put("work", 0.8);
 		evAnteile.put("work", 0.2);
-//		preiseEVSpots.put("work", 3);
-//		preiseNEVSpots.put("work", 4);
-//		chargingRates.put("work", 3.6);
+		preiseEVSpots.put("work", 3);
+		preiseNEVSpots.put("work", 4);
+		chargingRates.put("work", 3.6);
 		
 		pAnteile.put("secondary",0.8);
 		evAnteile.put("secondary", 0.2);
-//		preiseEVSpots.put("secondary", 5);
-//		preiseNEVSpots.put("secondary", 6);
-//		chargingRates.put("secondary", 8.04);
+		preiseEVSpots.put("secondary", 5);
+		preiseNEVSpots.put("secondary", 6);
+		chargingRates.put("secondary", 8.04);
 		
 		pAnteile.put("Street", 0.10);
 		evAnteile.put("Street", 0.2);
-//		preiseEVSpots.put("Street", 1);
-//		preiseNEVSpots.put("Street", 2);
-//		chargingRates.put("Street", 3.6);
+		preiseEVSpots.put("Street", 1);
+		preiseNEVSpots.put("Street", 2);
+		chargingRates.put("Street", 3.6);
 		
 		pAnteile.put("edu", 0.8);
 		evAnteile.put("edu", 0.2);
-//		preiseEVSpots.put("edu", 7);
-//		preiseNEVSpots.put("edu", 7);
-//		chargingRates.put("edu", 0.0);
+		preiseEVSpots.put("edu", 7);
+		preiseNEVSpots.put("edu", 7);
+		chargingRates.put("edu", 0.0);
 		//----
 		File file = new File( parkFileName );
 		ParkingWriter writer = new ParkingWriter();
@@ -88,6 +88,9 @@ public class adjustParkingCpacitys {
 				int newNEVCapacity = (int) Math.round(newCapacity*(1-evAnteile.get(actType)));
 				parking.capacityEV=newEVCapacity;
 				parking.capacityNEV=newNEVCapacity;
+				parking.parkingPriceMEVSpot=preiseEVSpots.get(actType);
+				parking.parkingPriceMNEVSpot=preiseNEVSpots.get(actType);
+				parking.chargingRate=chargingRates.get(actType);
 			}
 		}
 

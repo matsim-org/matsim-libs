@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 
+import playground.wrashid.bsc.vbmh.controler.VMConfig;
 import playground.wrashid.bsc.vbmh.vmParking.ParkHistoryWriter;
 import playground.wrashid.bsc.vbmh.vmParking.ParkingMap;
 import playground.wrashid.bsc.vbmh.vmParking.VMScoreKeeper;
@@ -52,20 +53,26 @@ public class EVControl {
 		
 		Link link = controler.getNetwork().getLinks().get(event.getLinkId());
 		double time = event.getTime();
+		Map<String, Object> personAttributes = controler.getPopulation().getPersons().get(personID).getCustomAttributes();
+		VMScoreKeeper scorekeeper;
+		if (personAttributes.get("VMScoreKeeper")!= null){
+			scorekeeper = (VMScoreKeeper) personAttributes.get("VMScoreKeeper");
+		} else{
+			scorekeeper = new VMScoreKeeper();
+			personAttributes.put("VMScoreKeeper", scorekeeper);
+		}
 		
 		EV ev = evList.getEV(personID);
 		double consumption = ev.calcEnergyConsumption(link, time);
 		evList.getEV(personID).discharge(consumption);
+		
+		double distance = link.getLength();
+		double safedFuelCostUtil = VMConfig.evSavingsPerKM * distance;
+		scorekeeper.add(safedFuelCostUtil);
+		
 		if(ev.stateOfCharge<0){
 			phwriter.addEVOutOfBattery(Double.toString(time), personID.toString());
-			Map<String, Object> personAttributes = controler.getPopulation().getPersons().get(personID).getCustomAttributes();
-			VMScoreKeeper scorekeeper;
-			if (personAttributes.get("VMScoreKeeper")!= null){
-				scorekeeper = (VMScoreKeeper) personAttributes.get("VMScoreKeeper");
-			} else{
-				scorekeeper = new VMScoreKeeper();
-				personAttributes.put("VMScoreKeeper", scorekeeper);
-			}
+			
 			scorekeeper.add(-30);
 		}
 		

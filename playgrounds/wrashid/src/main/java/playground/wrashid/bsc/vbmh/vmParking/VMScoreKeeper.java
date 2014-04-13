@@ -18,13 +18,14 @@ public class VMScoreKeeper {
 		score = score + add;
 		//System.out.println("Added value to ScoreKeeper :"+add);
 		if(score>0){
-			System.out.println("Positve parkingScore !!");
+			//System.out.println("Positve parkingScore !!"); //EVs bekommen jetzt pos Score an jedem Link als Benzin ausgleich
+			/*
 			try {
 				wait(1000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			}*/
 		}
 	}
 	
