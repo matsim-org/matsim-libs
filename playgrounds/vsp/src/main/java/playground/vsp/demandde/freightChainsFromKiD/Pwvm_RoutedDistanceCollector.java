@@ -1,7 +1,7 @@
 /**
  * 
  */
-package pwvm;
+package playground.vsp.demandde.freightChainsFromKiD;
 
 import java.net.URL;
 import java.sql.Connection;

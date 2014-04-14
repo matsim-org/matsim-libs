@@ -1,7 +1,7 @@
 /**
  * 
  */
-package pwvm;
+package playground.vsp.demandde.freightChainsFromKiD;
 
 /**
  * @author schn_se

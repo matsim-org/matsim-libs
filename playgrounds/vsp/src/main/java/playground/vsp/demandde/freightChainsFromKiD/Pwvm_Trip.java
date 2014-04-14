@@ -1,4 +1,4 @@
-package pwvm;
+package playground.vsp.demandde.freightChainsFromKiD;
 
 public class Pwvm_Trip {
 	int logbookId;
