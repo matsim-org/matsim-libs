@@ -40,8 +40,8 @@ public class AbsoluteDelays {
 
 	
 //	static String configFile = "./output/run0/output_config.xml.gz";
-	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils/agarwal/siouxFalls/";
-	private static String [] runNumber = new String [] {"run1","run2","run3","run4"};
+	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/";
+	private static String [] runNumber =  {"run5","run6","run7","run8"};
 	public static void main(String[] args) {
 		
 		BufferedWriter writer =IOUtils.getBufferedWriter(clusterPathDesktop+"/output/analysis/r/rAbsoluteDelays.txt");

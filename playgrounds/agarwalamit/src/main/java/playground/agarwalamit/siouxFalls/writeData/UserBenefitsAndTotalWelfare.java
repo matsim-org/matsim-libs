@@ -48,7 +48,7 @@ public class UserBenefitsAndTotalWelfare {
 	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils/agarwal/siouxFalls/";
 	private static String [] runNumbers = new String [] {"run1","run2", "run3", "run4"};
 	private static String [] runCases = new String [] {"baseCase","onlyEmission", "onlyCongestion", "both"};
-	private final static WelfareMeasure welfareMeasure = WelfareMeasure.LOGSUM;
+	private final static WelfareMeasure welfareMeasure = WelfareMeasure.SELECTED;
 	public static void main(String[] args) {
 		
 		List<String> absoluteDataToWrite = new ArrayList<String>();
@@ -78,7 +78,7 @@ public class UserBenefitsAndTotalWelfare {
 			sumOfTwo[j] = relativeUserLogSum [j]+Math.abs(relativeTollPayments[j]);//toll payments are already negative thus they will be positive for the system
 			relativeDataToWrite.add(runCases[j+1]+"\t"+relativeUserLogSum[j]+"\t"+String.valueOf(-1*relativeTollPayments[j])+"\t"+sumOfTwo[j]); 
 		}
-		writeStrings(clusterPathDesktop+"/output/analysis/r/rChangeInTotalWelfare"+welfareMeasure+".txt", relativeDataToWrite);
+		writeStrings(clusterPathDesktop+"/output/analysis/r/rChangeInSystemWelfare"+welfareMeasure+".txt", relativeDataToWrite);
 		
 	}
 

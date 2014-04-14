@@ -50,12 +50,12 @@ public class VerifyResults {
 	
 	private static final double marginal_Utl_money=0.062;
 	private static final double marginal_Utl_performing_sec=0.96/3600;
-	private static final double marginal_Utl_traveling_car_sec=0.0/3600;
-	private static final double marginalUtlOfTravelTime = -marginal_Utl_traveling_car_sec+marginal_Utl_performing_sec;
+	private static final double marginal_Utl_traveling_car_sec=-0.0/3600;
+	private static final double marginalUtlOfTravelTime = marginal_Utl_traveling_car_sec+marginal_Utl_performing_sec;
 	private static final double vtts_car = marginalUtlOfTravelTime/marginal_Utl_money;
 
-	private final  static String runDir = "/Users/aagarwal/Desktop/ils/agarwal/siouxFalls/output/run";
-	private  final static String [] runNr = {"1","2","3","4"};
+	private final  static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/output/run";
+	private  final static String [] runNr = {"5","6","7","8"};//{"1","2","3","4"};
 
 	private  static Scenario scenario ;
 
@@ -72,6 +72,7 @@ public class VerifyResults {
 			scenario =  loadScenario(networkFile, plansFile);
 			calculateEmissionCosts(emissionsEventsFile, scenario,runNr[i]);
 			calculateDelaysCosts(eventsFile,scenario,runNr[i]);
+			calculateUserBenefits(scenario, runNr[i]);
 		}
 		Logger.getLogger(VerifyResults.class).info("Writing files is finsished.");
 	}
@@ -110,6 +111,7 @@ public class VerifyResults {
 					} else ; //do nothing
 				}
 				else ; //do nothing
+			writer.newLine();
 			}
 			writer.write("Emission cost factor is "+"\t"+emissionCostFacotr+"\t"+"and total cost of emissions is "+"\t"+emissionCostFacotr*totalEmissionCost);
 			writer.close();

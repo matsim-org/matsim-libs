@@ -34,7 +34,7 @@ import playground.vsp.emissions.types.WarmPollutant;
  */
 	public class AbsoluteAndChangeInEmissions {
 
-	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils/agarwal/siouxFalls/output/";
+	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/output/";
 	
 	public static void main(String[] args) {
 
@@ -43,10 +43,10 @@ import playground.vsp.emissions.types.WarmPollutant;
 		
 		
 		
-		SortedMap<String, Double> emissions1 = calculateTotalEmissions(clusterPathDesktop+"/run1/"+eventFileLocation);
-		SortedMap<String, Double> emissions2 = calculateTotalEmissions(clusterPathDesktop+"/run2/"+eventFileLocation);
-		SortedMap<String, Double> emissions3 = calculateTotalEmissions(clusterPathDesktop+"/run3/"+eventFileLocation);
-		SortedMap<String, Double> emissions4 = calculateTotalEmissions(clusterPathDesktop+"/run4/"+eventFileLocation);
+		SortedMap<String, Double> emissions1 = calculateTotalEmissions(clusterPathDesktop+"/run5/"+eventFileLocation);
+		SortedMap<String, Double> emissions2 = calculateTotalEmissions(clusterPathDesktop+"/run6/"+eventFileLocation);
+		SortedMap<String, Double> emissions3 = calculateTotalEmissions(clusterPathDesktop+"/run7/"+eventFileLocation);
+		SortedMap<String, Double> emissions4 = calculateTotalEmissions(clusterPathDesktop+"/run8/"+eventFileLocation);
 
 		String [] pollutants =  emissions1.keySet().toArray(new String [0]);
 
