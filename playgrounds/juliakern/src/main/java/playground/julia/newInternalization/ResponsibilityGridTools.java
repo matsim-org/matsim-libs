@@ -50,12 +50,12 @@ public class ResponsibilityGridTools {
 			HashMap<Double, Double[][]> duration) {
 		timebin2link2factor = new HashMap<Double, Map<Id, Double>>();
 		
+		System.out.println("!!!!!!!!!!! timebins " + duration.size());
+		
 		// each time bin - generate new map
-		for(int i=1; i<noOfTimeBins+1; i++){
-			timebin2link2factor.put((i*this.timeBinSize), new HashMap<Id, Double>());
-		}
+		for(Double timeBin : duration.keySet()){
+			timebin2link2factor.put(timeBin, new HashMap<Id, Double>());
 		// calculate total durations for each time bin
-		for(Double timeBin: duration.keySet()){
 			Double sumOfCurrentTimeBin = 0.0;
 			Double [][] currentDurations = duration.get(timeBin);
 			for(int x=0; x< currentDurations.length; x++){
@@ -70,8 +70,9 @@ public class ResponsibilityGridTools {
 				if (links2yCells.containsKey(linkId)) { // only if in research are
 					Double relativeFactorForCurrentLink = getRelativeFactorForCurrentLink(
 							averageOfCurrentTimeBin, currentDurations, linkId);
-					timebin2link2factor.get(timeBin).put(linkId,
-							relativeFactorForCurrentLink);
+					System.out.println("4. factor " + relativeFactorForCurrentLink);
+					System.out.println(" average of current time bin " + averageOfCurrentTimeBin);
+					timebin2link2factor.get(timeBin).put(linkId,relativeFactorForCurrentLink); //!!!
 				}
 			}
 		}
@@ -84,11 +85,15 @@ public class ResponsibilityGridTools {
 	private Double getRelativeFactorForCurrentLink(
 			Double averageOfCurrentTimeBin, Double[][] currentDurations, Id linkId) {
 		
-		Double relevantDuration = 0.0;
+		Double relevantDuration = new Double(0.0);
+		if(links2xCells.get(linkId)!=null && links2yCells.get(linkId)!=null){
+		Cell cellOfLink = new Cell(links2xCells.get(linkId), links2yCells.get(linkId));
+		System.out.println(cellOfLink.toString() + " --- cell");
 		
 		for(int distance =0; distance <= 3; distance++){
-			Cell cellOfLink = new Cell(links2xCells.get(linkId), links2yCells.get(linkId));
+			
 			List<Cell> distancedCells = cellOfLink .getCellsWithExactDistance(noOfXCells, noOfYCells, distance);
+			System.out.println("distanced Cells - number: " +distancedCells.size());
 			for(Cell dc: distancedCells){
 				// TODO better initialise with 0.0?
 				try {
@@ -116,6 +121,8 @@ public class ResponsibilityGridTools {
 			}
 		}
 		return relevantDuration / averageOfCurrentTimeBin;	
+		}
+		return 0.0;
 	}
 
 

@@ -76,10 +76,10 @@ public class Cell {
 		}
 		List<Cell> cells = new ArrayList<Cell>();
 		
-		for(int i = this.x-distance; i<= this.x+ distance; i++){
+		for(int i = this.x-distance; i< this.x+ distance+1; i++){
 			if(i>=0 && i<= noOfXCells){
 				int xDistance = Math.abs(this.x-i);
-				int y1 = -distance + xDistance - this.y;
+				int y1 = -distance + xDistance + this.y;
 				int y2 = distance - xDistance + this.y;
 				if(y1>=0 && y1<= noOfYCells){
 					cells.add(new Cell(i, y1));
@@ -91,5 +91,9 @@ public class Cell {
 		}
 		
 		return cells;
+	}
+	
+	public String toString(){
+		return "x = " + this.x + " y = " + this.y;
 	}
 }

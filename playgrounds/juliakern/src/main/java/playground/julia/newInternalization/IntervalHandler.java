@@ -1,6 +1,7 @@
 package playground.julia.newInternalization;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,10 +35,12 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 		this.link2ybins = link2ybins;
 		if(link2xbins.isEmpty())System.out.println("---- emptyx");
 		if(link2ybins.isEmpty())System.out.println("---- emptyy");
+		recognisedPersons = new HashSet<Id>();
 	}
 	
 	@Override
 	public void reset(int iteration) {
+		recognisedPersons = new HashSet<Id>();
 		for(int i=0; i<simulationEndTime/timeBinSize+1; i++){
 			duration.put(i*timeBinSize, new Double[noOfxCells][noOfyCells]);
 			for(int j=0; j< noOfxCells; j++){
@@ -52,8 +55,10 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 			
-		int xCell = link2xbins.get(event.getLinkId()); //TODO nullpointer here
-		int	yCell = link2ybins.get(event.getLinkId());
+		Id linkId = event.getLinkId();
+		if(link2xbins.get(linkId)!=null && link2ybins.get(linkId)!=null){
+		int xCell = link2xbins.get(linkId); 
+		int	yCell = link2ybins.get(linkId);
 
 		Double currentTimeBin = Math.ceil(event.getTime()/timeBinSize)*timeBinSize;
 		
@@ -102,14 +107,18 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 		
 
 	}
+	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-	
+		
+		Id linkId = event.getLinkId();
+		
+		if(link2xbins.get(linkId)!=null && link2ybins.get(linkId)!=null){
 		if(!recognisedPersons.contains(event.getPersonId()))recognisedPersons.add(event.getPersonId());
 		
-		int	xCell = link2xbins.get(event.getLinkId());
-		int	yCell = link2ybins.get(event.getLinkId());
+		int	xCell = link2xbins.get(linkId);
+		int	yCell = link2ybins.get(linkId);
 		
 		Double currentTimeBin = Math.ceil(event.getTime()/timeBinSize)*timeBinSize;
 		if(currentTimeBin<timeBinSize) currentTimeBin=timeBinSize;
@@ -128,6 +137,7 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 			duration.get(currentTimeBin)[xCell][yCell]=prevDurationL;
 			currentTimeBin += timeBinSize;
 		}
+	}
 	}
 
 	public HashMap<Double, Double[][]> getDuration() {

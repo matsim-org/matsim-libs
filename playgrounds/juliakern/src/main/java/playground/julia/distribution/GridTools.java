@@ -47,12 +47,6 @@ public class GridTools {
 		Map<Id, Integer> link2xbin = new HashMap<Id, Integer>();
 		for(Id linkId: this.links.keySet()){
 			link2xbin.put(linkId, mapXCoordToBin(this.links.get(linkId).getCoord().getX(), noOfXCells));
-			System.out.println(linkId + " x bin " + link2xbin.get(linkId));
-			if(link2xbin.get(linkId)==null){
-				System.out.println("link id " + linkId.toString() 
-						+ " mapped Coord" + mapXCoordToBin(this.links.get(linkId).getCoord().getX(), noOfXCells)
-						+ " link x coord " + this.links.get(linkId).getCoord().getX());
-			}
 		}
 		return link2xbin;
 	}

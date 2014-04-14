@@ -19,13 +19,17 @@
  * *********************************************************************** */
 package playground.julia.newInternalization;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
@@ -79,6 +83,33 @@ public class RunNewInternalizationMunich {
 		Controler controler = new Controler(config);
 		Scenario scenario = controler.getScenario();
 		scenario = ScenarioUtils.loadScenario(config); // TODO remove?
+		
+		// planCalcScoreConfigGroup
+		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
+		Set<String> activities = new HashSet<String>();
+		activities.add("unknown");
+		activities.add("work");
+		activities.add("pickup");
+		activities.add("with adult");
+		activities.add("other");
+		activities.add("pvWork");
+		activities.add("pvHome");
+		activities.add("gvHome");
+		activities.add("education");
+		activities.add("business");
+		activities.add("shopping");
+		activities.add("private");
+		activities.add("leisure");
+		activities.add("sports");
+		activities.add("home");
+		activities.add("friends");
+		
+		for(String activity : activities){
+			ActivityParams params = new ActivityParams(activity);
+			params.setTypicalDuration(30 * 3600);
+			pcs.addActivityParams(params);
+		}
+		
 
 		EmissionModule emissionModule = new EmissionModule(scenario);
 		emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
