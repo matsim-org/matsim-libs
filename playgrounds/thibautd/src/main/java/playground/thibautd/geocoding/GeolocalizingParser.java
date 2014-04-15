@@ -72,7 +72,7 @@ public class GeolocalizingParser {
 			counter.incCounter();
 			final Address address = addressProvider.next();
 
-			final GoogleAPIResult result = utils.getLocation( address );
+			final GoogleAPIResult result = utils.getLocationFromGoogle( address );
 
 			switch ( result.getStatus() ) {
 				case OVER_QUERY_LIMIT:
