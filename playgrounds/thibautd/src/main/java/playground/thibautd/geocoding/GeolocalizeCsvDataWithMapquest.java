@@ -25,19 +25,24 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.thibautd.geocoding.GeolocalizingParser;
+import playground.thibautd.geocoding.MapquestResult.Result;
 import playground.thibautd.utils.ArgParser;
 import playground.thibautd.utils.CsvUtils;
+import playground.thibautd.utils.MapUtils;
 
 /**
  * @author thibautd
@@ -230,14 +235,82 @@ public class GeolocalizeCsvDataWithMapquest {
 			final Address address,
 			final MapquestResult results ) {
 		final List<MapquestResult.Result> filtered = new ArrayList<MapquestResult.Result>();
+		for ( int i=0; i < results.getNumberResults(); i++ ) {
+			final MapquestResult.Result result = results.getResults( i );
+			filtered.add( result );
+		}
 
+		filterBadAddresses( address , filtered );
+		onlyKeepCenterOfStreets( filtered );
+
+		return filtered;
+	}
+
+	private static void onlyKeepCenterOfStreets(
+			final List<Result> filtered) {
+		final Map<String, List<Result>> resultsPerStreet = new HashMap<String, List<Result>>();
+		for ( Result result : filtered ) {
+			if ( result.getGeocodeQuality().equals( MapquestResult.GeocodeQuality.STREET ) ) {
+				final String street = result.getFormattedAddress(); // street can be in various municipalities
+				final List<Result> inStreet =
+					MapUtils.getList(
+							street,
+							resultsPerStreet );
+				inStreet.add( result );
+			}
+		}
+
+		for ( List<Result> inStreet : resultsPerStreet.values() ) {
+			final Coord coord = getCenter( inStreet );
+			final Result toKeep = getClosest( coord , inStreet );
+			inStreet.remove( toKeep );
+			filtered.removeAll( inStreet );
+		}
+	}
+
+	private static Result getClosest(
+			final Coord center,
+			final List<Result> inStreet) {
+		double min = Double.POSITIVE_INFINITY;
+		Result closest = null;
+
+		for ( Result r : inStreet ) {
+			final Coord c = r.getCH03Coord();
+			final double dist = CoordUtils.calcDistance( c , center );
+			if ( dist < min ) {
+				min = dist;
+				closest = r;
+			}
+		}
+
+		return closest;
+	}
+
+	private static Coord getCenter(final List<Result> inStreet) {
+		double minX = Double.POSITIVE_INFINITY;
+		double minY = Double.POSITIVE_INFINITY;
+		double maxX = Double.NEGATIVE_INFINITY;
+		double maxY = Double.NEGATIVE_INFINITY;
+
+		for ( Result r : inStreet ) {
+			final Coord c = r.getCH03Coord();
+			minX = Math.min( minX , c.getX() );
+			minY = Math.min( minY , c.getY() );
+			maxX = Math.max( maxX , c.getX() );
+			maxY = Math.max( maxY , c.getY() );
+		}
+
+		return new CoordImpl( (minX + maxX) / 2 , (minY + maxY) / 2 );
+	}
+
+	private static void filterBadAddresses(
+			final Address address,
+			final List<MapquestResult.Result> filtered) {
 		boolean wasZipMatch = false;
 		boolean wasCityMatch = false;
 		boolean wasStreetMatch = false;
 
-		for ( int i=0; i < results.getNumberResults(); i++ ) {
-			final MapquestResult.Result result = results.getResults( i );
-			filtered.add( result );
+		for ( MapquestResult.Result result : filtered ) {
 
 			if ( address.getZipcode() != null && address.getZipcode().equals( result.getZip() ) ) {
 				wasZipMatch = true;
@@ -260,8 +333,6 @@ public class GeolocalizeCsvDataWithMapquest {
 
 			if ( zip || city || street ) it.remove();
 		}
-
-		return filtered;
 	}
 
 	private static class CsvParser implements Iterator<Address> {
