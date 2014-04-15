@@ -90,7 +90,7 @@ public class GeolocalizingAPIsUtils {
 			builder.append( "&" );
 		}
 		if ( address.getZipcode() != null ) {
-			builder.append( "postalcode=" );
+			builder.append( "postalCode=" );
 			builder.append( address.getZipcode() );
 			builder.append( "&" );
 		}

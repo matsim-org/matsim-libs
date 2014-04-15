@@ -48,7 +48,8 @@ public class MapquestResult implements GeolocalizationResult {
 		COUNTY,
 		CITY,
 		ZIP,
-		ZIP_EXTENDED;
+		ZIP_EXTENDED,
+		UNKNOWN;
 	}
 
 	public MapquestResult( final JSONObject jsonResult ) {
