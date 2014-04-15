@@ -73,7 +73,7 @@ public class EmissionResponsibilityTravelDisutilityCalculator implements TravelD
 		double linkExpectedEmissionDisutility = calculateExpectedEmissionDisutility(person, link, distance, linkTravelTime, time);
 		linkTravelDisutility = linkTravelTimeDisutility + linkDistanceDisutility + linkExpectedEmissionDisutility;
 
-		logger.info("expected emission disutility " + linkExpectedEmissionDisutility);
+//		logger.info("expected emission disutility " + linkExpectedEmissionDisutility);
 		return linkTravelDisutility;
 	}
 

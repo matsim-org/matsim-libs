@@ -120,7 +120,7 @@ public class TestEmissionPricing {
 		ControlerConfigGroup ccg = controler.getConfig().controler();
 		ccg.setOutputDirectory(outputPath);
 		ccg.setFirstIteration(0);
-		ccg.setLastIteration(21);
+		ccg.setLastIteration(11);
 		ccg.setMobsim("qsim");
 		Set set = new HashSet();
 		set.add(EventsFileFormat.xml);
