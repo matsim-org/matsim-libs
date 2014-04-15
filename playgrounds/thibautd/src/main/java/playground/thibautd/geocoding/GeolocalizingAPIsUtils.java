@@ -36,17 +36,17 @@ import org.matsim.core.utils.io.UncheckedIOException;
 /**
  * @author thibautd
  */
-public class GoogleAPIUtils {
+public class GeolocalizingAPIsUtils {
 	private static final Logger log =
-		Logger.getLogger(GoogleAPIUtils.class);
+		Logger.getLogger(GeolocalizingAPIsUtils.class);
 
 	private final String key;
 
-	public GoogleAPIUtils() {
+	public GeolocalizingAPIsUtils() {
 		this( null );
 	}
 
-	public GoogleAPIUtils(final String key ) {
+	public GeolocalizingAPIsUtils(final String key ) {
 		this.key = key;
 	}
 

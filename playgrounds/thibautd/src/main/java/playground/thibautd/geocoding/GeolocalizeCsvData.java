@@ -76,7 +76,7 @@ public class GeolocalizeCsvData {
 
 		final GeolocalizingParser parser =
 			new GeolocalizingParser(
-					new GoogleAPIUtils( key ) );
+					new GeolocalizingAPIsUtils( key ) );
 
 		parser.parse(
 				addressProvider,

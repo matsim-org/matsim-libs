@@ -42,9 +42,9 @@ public class GeolocalizingParser {
 		public void handleNonlocalizedAddress( Address address , RejectCause cause );
 	}
 
-	private final GoogleAPIUtils utils;
+	private final GeolocalizingAPIsUtils utils;
 
-	public GeolocalizingParser( final GoogleAPIUtils utils ) {
+	public GeolocalizingParser( final GeolocalizingAPIsUtils utils ) {
 		this.utils = utils;
 	}
 
