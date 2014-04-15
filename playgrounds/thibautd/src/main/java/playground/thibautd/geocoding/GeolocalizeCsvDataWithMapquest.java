@@ -310,10 +310,11 @@ public class GeolocalizeCsvDataWithMapquest {
 					readField(
 						fields,
 						municipalityIndex ) );
-			address.setCountry(
-					readField(
-						fields,
-						countryIndex ) );
+			final String country =
+				readField(
+					fields,
+					countryIndex );
+			address.setCountry( country != null ? country : "CH" );
 
 			return address;
 		}
