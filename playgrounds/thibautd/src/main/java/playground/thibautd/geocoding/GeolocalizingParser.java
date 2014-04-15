@@ -28,29 +28,27 @@ import org.matsim.core.utils.misc.Counter;
 /**
  * @author thibautd
  */
-public class GeolocalizingParser {
+public class GeolocalizingParser<T extends GeolocalizationResult> {
 	private static final Logger log =
 		Logger.getLogger(GeolocalizingParser.class);
 
-	public static enum RejectCause { error, noresult, abort; }
-
-	public static interface GeolocalizationListenner {
-		public void handleResult( Address address , GoogleAPIResult result );
+	public static interface GeolocalizationListenner<TT extends GeolocalizationResult> {
+		public void handleResult( Address address , TT result );
 	}
 
 	public static interface NonlocalizedAddressListenner {
-		public void handleNonlocalizedAddress( Address address , RejectCause cause );
+		public void handleNonlocalizedAddress( Address address , Status cause );
 	}
 
-	private final GeolocalizingAPIsUtils utils;
+	private final Geolocalizer<T> utils;
 
-	public GeolocalizingParser( final GeolocalizingAPIsUtils utils ) {
+	public GeolocalizingParser( final Geolocalizer<T> utils ) {
 		this.utils = utils;
 	}
 
 	public void parse(
 			final Iterator<? extends Address> addressProvider,
-			final GeolocalizationListenner geolocalisationListenner,
+			final GeolocalizationListenner<T> geolocalisationListenner,
 			final NonlocalizedAddressListenner nonlocalizedAddressListenner) {
 		parseUntilLimit( addressProvider , geolocalisationListenner , nonlocalizedAddressListenner );
 
@@ -58,43 +56,34 @@ public class GeolocalizingParser {
 		while ( addressProvider.hasNext() ) {
 			counter.incCounter();
 			final Address address = addressProvider.next();
-			nonlocalizedAddressListenner.handleNonlocalizedAddress( address , RejectCause.abort );
+			nonlocalizedAddressListenner.handleNonlocalizedAddress( address , Status.ABORT );
 		}
 		counter.printCounter();
 	}
 
 	public void parseUntilLimit(
 			final Iterator<? extends Address> addressProvider,
-			final GeolocalizationListenner geolocalisationListenner,
+			final GeolocalizationListenner<T> geolocalisationListenner,
 			final NonlocalizedAddressListenner nonlocalizedAddressListenner) {
 		final Counter counter = new Counter( "Parse adress # " );
 		while ( addressProvider.hasNext() ) {
 			counter.incCounter();
 			final Address address = addressProvider.next();
 
-			final GoogleAPIResult result = utils.getLocationFromGoogle( address );
+			final T result = utils.getLocation( address );
 
 			switch ( result.getStatus() ) {
-				case OVER_QUERY_LIMIT:
+				case ABORT:
 					counter.printCounter();
 					log.error( "reached limit. Try processing the rest latter." );
-					nonlocalizedAddressListenner.handleNonlocalizedAddress( address , RejectCause.abort );
+					nonlocalizedAddressListenner.handleNonlocalizedAddress( address , result.getStatus() );
 					return;
-				case INVALID_REQUEST:
-					log.error( "invalid request for Address "+address );
-					nonlocalizedAddressListenner.handleNonlocalizedAddress( address , RejectCause.error );
-					break;
-				case REQUEST_DENIED:
-					log.error( "denied request for Address "+address );
-					nonlocalizedAddressListenner.handleNonlocalizedAddress( address , RejectCause.error );
-					break;
-				case UNKNOWN_ERROR:
-					log.error ( "unknown error for Address "+address );
-					nonlocalizedAddressListenner.handleNonlocalizedAddress( address , RejectCause.error );
-					break;
-				case ZERO_RESULTS:
+				case ERROR:
+					log.error( "error for Address "+address );
+					nonlocalizedAddressListenner.handleNonlocalizedAddress( address , result.getStatus() );
+				case NO_RESULT:
 					log.warn( "Address "+address+" gave no result!" );
-					nonlocalizedAddressListenner.handleNonlocalizedAddress( address , RejectCause.noresult );
+					nonlocalizedAddressListenner.handleNonlocalizedAddress( address , result.getStatus() );
 					break;
 				case OK:
 					geolocalisationListenner.handleResult( address , result );

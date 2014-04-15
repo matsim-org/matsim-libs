@@ -21,11 +21,8 @@ package playground.thibautd.geocoding;
 
 import java.io.IOException;
 
-import java.lang.InterruptedException;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import org.apache.log4j.Logger;
 
 import org.json.JSONException;
 import org.json.JSONTokener;
@@ -37,50 +34,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
  * @author thibautd
  */
 public class GeolocalizingAPIsUtils {
-	private static final Logger log =
-		Logger.getLogger(GeolocalizingAPIsUtils.class);
-
-	private final String key;
-
-	public GeolocalizingAPIsUtils() {
-		this( null );
-	}
-
-	public GeolocalizingAPIsUtils(final String key ) {
-		this.key = key;
-	}
-
-	public GoogleAPIResult getLocationFromGoogle( final Address address ) {
-		final GoogleAPIResult result = new GoogleAPIResult( getJSONGoogleLocation( address ) );
-
-		switch ( result.getStatus() ) {
-			case OVER_QUERY_LIMIT:
-				log.trace( "reached limit: try pausing 2secs." );
-				try {
-					Thread.sleep( 2000 );
-				}
-				catch (InterruptedException e) {
-					throw new RuntimeException( e );
-				}
-				return new GoogleAPIResult( getJSONGoogleLocation( address ) );
-			default:
-				return result;
-		}
-	}
-
-	private JSONObject getJSONGoogleLocation( final Address address ) {
-		final URL request = pasteAsURL(
-				"http://maps.googleapis.com/maps/api/geocode/",
-				"json?",
-				"address=",
-				pasteAddressString( address ),
-				"&sensor=false",  // absolutely no idea why this is needed...
-				key == null ? "" : "&key="+key );
-		if ( log.isTraceEnabled() ) log.trace( "send request "+request.toString() );
-		return toJSON( request );
-	}
-
-	private static JSONObject toJSON(final URL request) {
+	public static JSONObject toJSON(final URL request) {
 		try {
 			final JSONTokener tokener = new JSONTokener( request.openStream() );
 			return new JSONObject( tokener );
@@ -120,49 +74,6 @@ public class GeolocalizingAPIsUtils {
 		return builder.toString();
 	}
 
-	//public NominatimResult getLocationFromOSM( final Address address ) {
-	//	return null;
-	//}
-
-	//private JSONObject getJSONNominatimLocation( final Address address ) {
-	//	final URL request = pasteAsURL(
-	//			// mapquest is supposed to be less limited,
-	//			// but this is still the nominatim format and not the Mapquest one
-	//			//"http://nominatim.openstreetmap.org/search?",
-	//			"http://open.mapquestapi.com/nominatim/v1/search.php?",
-	//			pasteNominatimAddressString( address ),
-	//			"outFormat=json" );
-
-	//	if ( log.isTraceEnabled() ) log.trace( "send request "+request.toString() );
-	//	return toJSON( request );
-	//}
-
-	public MapquestResult getLocationFromMapquest( final Address address ) {
-		final MapquestResult result = new MapquestResult( getJSONMapquestLocation( address ) );
-
-		switch ( result.getStatus() ) {
-			case OK:
-				return result;
-			default:
-				log.error( "problem with request: "+result.getStatus() );
-				for ( String m : result.getMessages() ) {
-					log.error( m );
-				}
-				throw new RuntimeException();
-		}
-	}
-
-	private JSONObject getJSONMapquestLocation( final Address address ) {
-		final URL request = pasteAsURL(
-				"http://www.mapquestapi.com/geocoding/v1/address?",
-				"key=", key , "&" ,
-				pasteNominatimAddressString( address ),
-				"format=json" );
-
-		if ( log.isTraceEnabled() ) log.trace( "send request "+request.toString() );
-		return toJSON( request );
-	}
-
 	public static String pasteNominatimAddressString(final Address address) {
 		final StringBuilder builder = new StringBuilder();
 		
@@ -197,7 +108,7 @@ public class GeolocalizingAPIsUtils {
 		return builder.toString();
 	}
 
-	private static URL pasteAsURL(final String... pieces) {
+	public static URL pasteAsURL(final String... pieces) {
 		final StringBuilder builder = new StringBuilder();
 		for ( String p : pieces ) builder.append( p );
 		try {

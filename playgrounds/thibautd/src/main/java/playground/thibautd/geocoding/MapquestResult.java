@@ -28,10 +28,10 @@ import org.json.JSONObject;
 /**
  * @author thibautd
  */
-public class MapquestResult {
+public class MapquestResult implements GeolocalizationResult {
 	private final JSONObject jsonResult;
 
-	public static enum Status {
+	public static enum MapquestStatus {
 		OK,
 		INPUT_ERROR,
 		KEY_ERROR,
@@ -64,15 +64,28 @@ public class MapquestResult {
 		return new Result( i );
 	}
 
+	@Override
 	public Status getStatus() {
+		switch ( getMapquestStatus() ) {
+		case OK:
+			return getNumberResults() > 0  ? Status.OK : Status.NO_RESULT;
+		case INPUT_ERROR:
+		case KEY_ERROR:
+		case UNKNOWN_ERROR:
+		default:
+			return Status.ABORT;
+		}
+	}
+	
+	public MapquestStatus getMapquestStatus() {
 		final Integer status = (Integer) jsonResult.getJSONObject( "info" )
 			.get( "statuscode" );
 
 		switch ( status.intValue() ) {
-			case 0: return Status.OK;
-			case 400: return Status.INPUT_ERROR;
-			case 403: return Status.KEY_ERROR;
-			case 500: return Status.UNKNOWN_ERROR;
+			case 0: return MapquestStatus.OK;
+			case 400: return MapquestStatus.INPUT_ERROR;
+			case 403: return MapquestStatus.KEY_ERROR;
+			case 500: return MapquestStatus.UNKNOWN_ERROR;
 			default: throw new IllegalArgumentException( "unknown return code "+status );
 		}
 	}

@@ -30,14 +30,13 @@ import java.util.NoSuchElementException;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import playground.thibautd.geocoding.GeolocalizingParser.RejectCause;
 import playground.thibautd.utils.ArgParser;
 import playground.thibautd.utils.CsvUtils;
 
 /**
  * @author thibautd
  */
-public class GeolocalizeCsvData {
+public class GeolocalizeCsvDataWithGoogle {
 	public static final String STREET = "street";
 	public static final String NUMBER = "number";
 	public static final String ZIP_CODE = "zip";
@@ -74,13 +73,13 @@ public class GeolocalizeCsvData {
 		final CsvWriter successWriter = new CsvWriter( outFile );
 		final CsvWriter rejectWriter = new CsvWriter( rejectFile );
 
-		final GeolocalizingParser parser =
-			new GeolocalizingParser(
-					new GeolocalizingAPIsUtils( key ) );
+		final GeolocalizingParser<GoogleAPIResult> parser =
+			new GeolocalizingParser<GoogleAPIResult>(
+					new GoogleGeolocalizer( key ) );
 
 		parser.parse(
 				addressProvider,
-				new GeolocalizingParser.GeolocalizationListenner() {
+				new GeolocalizingParser.GeolocalizationListenner<GoogleAPIResult>() {
 					@Override
 					public void handleResult(
 							final Address address,
@@ -92,7 +91,7 @@ public class GeolocalizeCsvData {
 					@Override
 					public void handleNonlocalizedAddress(
 							final Address address,
-							final RejectCause cause) {
+							final Status cause) {
 						rejectWriter.write( address , null , cause );
 					}
 				} );
@@ -133,22 +132,22 @@ public class GeolocalizeCsvData {
 		public void write(
 				final Address address,
 				final GoogleAPIResult result,
-				final GeolocalizingParser.RejectCause rejectCause ) {
+				final Status rejectCause ) {
 			if ( result == null ) {
 				write( address , null , null , rejectCause );
 			}
 			else {
 				for ( int i=0; i < result.getNumberResults(); i++ ) {
-					write( address , result.getStatus() , result.getResults( i ) , rejectCause );
+					write( address , result.getGoogleStatus() , result.getResults( i ) , rejectCause );
 				}
 			}
 		}
 
 		private void write(
 				final Address address,
-				final GoogleAPIResult.Status status,
+				final GoogleAPIResult.GoogleStatus status,
 				final GoogleAPIResult.Result result,
-				final GeolocalizingParser.RejectCause rejectCause ) {
+				final Status rejectCause ) {
 			// Why do I always have to go so dirty when writing files?
 			final String[] fields = new String[ 12 ];
 

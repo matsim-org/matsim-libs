@@ -25,10 +25,10 @@ import org.json.JSONObject;
 /**
  * @author thibautd
  */
-public class GoogleAPIResult {
+public class GoogleAPIResult implements GeolocalizationResult {
 	private final JSONObject jsonResult;
 
-	public static enum Status {
+	public static enum GoogleStatus {
 		/**
 		 * indicates that no errors occurred; the address was successfully parsed and at least one geocode was returned.
 		 */
@@ -97,9 +97,26 @@ public class GoogleAPIResult {
 		return new Result( i );
 	}
 
+	@Override
 	public Status getStatus() {
+		switch ( getGoogleStatus() ) {
+		case OK:
+			return Status.OK;
+		case OVER_QUERY_LIMIT:
+			return Status.ABORT;
+		case ZERO_RESULTS:
+			return Status.NO_RESULT;
+		case INVALID_REQUEST:
+		case REQUEST_DENIED:
+		case UNKNOWN_ERROR:
+		default:
+			return Status.ERROR;
+		}
+	}
+	
+	public GoogleStatus getGoogleStatus() {
 		final String status = (String) jsonResult.get( "status" );
-		return Status.valueOf( status );
+		return GoogleStatus.valueOf( status );
 	}
 
 	public class Result {
