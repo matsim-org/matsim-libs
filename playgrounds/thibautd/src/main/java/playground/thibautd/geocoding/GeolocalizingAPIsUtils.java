@@ -119,37 +119,5 @@ public class GeolocalizingAPIsUtils {
 		}
 	}
 
-	public static Quality getMatchQuality(
-			final Address address,
-			final MapquestResult.Result result ) {
-		final Quality q = new Quality();
-
-		if ( result.getCountry().equals( toCountryCode( address.getCountry() ) ) ) {
-			q.setCountryMatch( true );
-		}
-
-		if ( result.getZip().equals( address.getZipcode() ) ) {
-			q.setZipMatch( true );
-		}
-
-		if ( result.getCity().equals( address.getMunicipality() ) ) {
-			q.setMunicipalityMatch( true );
-		}
-
-		if ( result.getStreet().matches( address.getStreet()+".*" ) ) {
-			q.setStreetMatch( true );
-		}
-
-		if ( result.getStreet().equals( address.getStreet()+" "+address.getNumber() ) ) {
-			q.setNumberMatch( true );
-		}
-
-		return q;
-	}
-
-	public static String toCountryCode(final String name) {
-		if ( "Schweiz".equals( name ) ) return "CH";
-		return name;
-	}
 }
 

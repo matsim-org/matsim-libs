@@ -23,10 +23,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -146,21 +143,11 @@ public class GeolocalizeCsvDataWithMapquest {
 				final MapquestResult result,
 				final Status rejectCause ) {
 			if ( result == null ) {
-				write( address , null , null , rejectCause.toString() );
+				write( address , null , null , rejectCause );
 			}
 			else {
-				assert rejectCause == null;
-				final ArrayList<MapquestResult.Result> orderedResults = new ArrayList<MapquestResult.Result>( result.getNumberResults() );
-
 				for ( int i=0; i < result.getNumberResults(); i++ ) {
-					orderedResults.add( result.getResults( i ) );
-				}
-
-				Collections.sort( orderedResults , new ResultQualityComparator( address ) );
-				Collections.reverse( orderedResults );
-
-				for ( int i=0; i < result.getNumberResults(); i++ ) {
-					write( address , result.getMapquestStatus() , orderedResults.get( i ) , "rank-"+i );
+					write( address , result.getMapquestStatus() , result.getResults( i ) , rejectCause );
 				}
 			}
 		}
@@ -169,7 +156,7 @@ public class GeolocalizeCsvDataWithMapquest {
 				final Address address,
 				final MapquestResult.MapquestStatus status,
 				final MapquestResult.Result result,
-				final String internalStatus ) {
+				final Status rejectCause ) {
 			// Why do I always have to go so dirty when writing files?
 			final String[] fields = new String[ 16 ];
 
@@ -184,8 +171,8 @@ public class GeolocalizeCsvDataWithMapquest {
 				fields[ 5 ] = address.getCountry() != null ? address.getCountry() : "";
 			}
 
-			if ( internalStatus != null ) {
-				fields[ 6 ] = internalStatus;
+			if ( rejectCause != null ) {
+				fields[ 6 ] = rejectCause.toString();
 			}
 
 			if ( result != null ) {
@@ -348,23 +335,6 @@ public class GeolocalizeCsvDataWithMapquest {
 		@Override
 		public void remove() {
 			throw new UnsupportedOperationException();
-		}
-	}
-
-	private static class ResultQualityComparator implements Comparator<MapquestResult.Result> {
-		private final Address address;
-
-		public ResultQualityComparator(final Address a) {
-			this.address = a;
-		}
-
-		@Override
-		public int compare(
-				final MapquestResult.Result o1,
-				final MapquestResult.Result o2) {
-			final Quality q1 = GeolocalizingAPIsUtils.getMatchQuality( address , o1 );
-			final Quality q2 = GeolocalizingAPIsUtils.getMatchQuality( address , o2 );
-			return q1.compareTo( q2 );
 		}
 	}
 }
