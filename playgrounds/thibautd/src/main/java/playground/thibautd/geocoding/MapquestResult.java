@@ -56,7 +56,7 @@ public class MapquestResult implements GeolocalizationResult {
 	}
 
 	public int getNumberResults() {
-		final JSONArray arr = jsonResult.getJSONArray( "results" );
+		final JSONArray arr = getLocationsArray();
 		return arr.length();
 	}
 
@@ -144,11 +144,15 @@ public class MapquestResult implements GeolocalizationResult {
 		}
 
 		private JSONObject getJSONResults() {
-			final JSONArray arr = jsonResult.getJSONArray( "results" );
-			if ( arr.length() != 1 ) throw new RuntimeException( "cannot handle multiple result lists. got "+arr.length() );
-			final JSONObject resultList = arr.getJSONObject( 0 );
-			return resultList.getJSONArray( "locations" ).getJSONObject( i );
+			return getLocationsArray().getJSONObject( i );
 		}
+	}
+
+	private JSONArray getLocationsArray() {
+		final JSONArray arr = jsonResult.getJSONArray( "results" );
+		if ( arr.length() != 1 ) throw new RuntimeException( "cannot handle multiple result lists. got "+arr.length() );
+		final JSONObject resultList = arr.getJSONObject( 0 );
+		return resultList.getJSONArray( "locations" );
 	}
 }
 
