@@ -20,6 +20,8 @@
 package playground.thibautd.geocoding;
 
 import java.io.IOException;
+
+import java.lang.InterruptedException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -49,7 +51,21 @@ public class GoogleAPIUtils {
 	}
 
 	public GoogleAPIResult getLocation( final Address address ) {
-		return new GoogleAPIResult( getJSONLocation( address ) );
+		final GoogleAPIResult result = new GoogleAPIResult( getJSONLocation( address ) );
+
+		switch ( result.getStatus() ) {
+			case OVER_QUERY_LIMIT:
+				log.trace( "reached limit: try pausing 2secs." );
+				try {
+					Thread.sleep( 2000 );
+				}
+				catch (InterruptedException e) {
+					throw new RuntimeException( e );
+				}
+				return new GoogleAPIResult( getJSONLocation( address ) );
+			default:
+				return result;
+		}
 	}
 
 	public JSONObject getJSONLocation( final Address address ) {
@@ -81,11 +97,12 @@ public class GoogleAPIUtils {
 		final StringBuilder builder = new StringBuilder();
 		
 		if ( address.getNumber() != null ) {
-			builder.append( address.getNumber() );
+			// number with spaces are possible (for instance igendeinestrasse 60 F)
+			builder.append( address.getNumber().replace( ' ' , '+' ) );
 			builder.append( "+" );
 		}
 		if ( address.getStreet() != null ) {
-			builder.append( address.getStreet() );
+			builder.append( address.getStreet().replace( ' ' , '+' ) );
 			builder.append( "+" );
 		}
 		if ( address.getZipcode() != null ) {
@@ -93,11 +110,11 @@ public class GoogleAPIUtils {
 			builder.append( "+" );
 		}
 		if ( address.getMunicipality() != null ) {
-			builder.append( address.getMunicipality() );
+			builder.append( address.getMunicipality().replace( ' ' , '+' ) );
 			builder.append( "+" );
 		}
 		if ( address.getCountry() != null ) {
-			builder.append( address.getCountry() );
+			builder.append( address.getCountry().replace( ' ' , '+' ) );
 		}
 
 		return builder.toString();
