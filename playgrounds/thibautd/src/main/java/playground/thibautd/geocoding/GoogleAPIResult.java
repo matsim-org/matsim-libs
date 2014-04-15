@@ -83,28 +83,18 @@ public class GoogleAPIResult {
 
 	}
 
-	private final JSONObject getResults() {
+	private JSONObject getJSONResults(final int i) {
 		final JSONArray arr = jsonResult.getJSONArray( "results" );
-		if ( arr.length() != 1 ) throw new IllegalStateException( "only designed to handle unique results, got "+arr.length() );
-		return arr.getJSONObject( 0 );
+		return arr.getJSONObject( i );
 	}
 
-	public String getFormattedAddress() {
-		return (String) getResults().get( "formatted_address" );
+	public int getNumberResults() {
+		final JSONArray arr = jsonResult.getJSONArray( "results" );
+		return arr.length();
 	}
 
-	public Double getLatitude() {
-		return (Double) getResults()
-				.getJSONObject( "geometry" )
-				.getJSONObject( "location" )
-				.get( "lat" );
-	}
-
-	public Double getLongitude() {
-		return (Double) getResults()
-				.getJSONObject( "geometry" )
-				.getJSONObject( "location" )
-				.get( "lng" );
+	public Result getResults( final int i ) {
+		return new Result( i );
 	}
 
 	public Status getStatus() {
@@ -112,14 +102,39 @@ public class GoogleAPIResult {
 		return Status.valueOf( status );
 	}
 
-	public LocationType getLocationType() {
-		final String type = (String) getResults().getJSONObject( "geometry" ).get( "location_type" );
-		return LocationType.valueOf( type );
-	}
+	public class Result {
+		private final int i;
 
-	@Override
-	public String toString() {
-		return "{Status="+getStatus()+"; LocationType="+getLocationType()+"; lat="+getLatitude()+"; lng="+getLongitude()+"; formattedAddress="+getFormattedAddress()+"}";
+		private Result( final int i ) {
+			this.i = i;
+		}
+
+		public int getIndex() {
+			return i;
+		}
+
+		public String getFormattedAddress() {
+			return (String) getJSONResults( i ).get( "formatted_address" );
+		}
+
+		public Double getLatitude() {
+			return (Double) getJSONResults( i )
+					.getJSONObject( "geometry" )
+					.getJSONObject( "location" )
+					.get( "lat" );
+		}
+
+		public Double getLongitude() {
+			return (Double) getJSONResults( i )
+					.getJSONObject( "geometry" )
+					.getJSONObject( "location" )
+					.get( "lng" );
+		}
+
+		public LocationType getLocationType() {
+			final String type = (String) getJSONResults( i ).getJSONObject( "geometry" ).get( "location_type" );
+			return LocationType.valueOf( type );
+		}
 	}
 }
 

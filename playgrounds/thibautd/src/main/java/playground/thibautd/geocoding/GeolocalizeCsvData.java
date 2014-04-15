@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -131,6 +132,20 @@ public class GeolocalizeCsvData {
 				final Address address,
 				final GoogleAPIResult result,
 				final GeolocalizingParser.RejectCause rejectCause ) {
+			if ( result == null ) {
+				writeUnique( address , null , rejectCause );
+			}
+			else {
+				for ( int i=0; i < result.getNumberResults(); i++ ) {
+					writeUnique( address , result.getResults( i ) , rejectCause );
+				}
+			}
+		}
+
+		private void writeUnique(
+				final Address address,
+				final GoogleAPIResult.Result result,
+				final GeolocalizingParser.RejectCause rejectCause ) {
 			// Why do I always have to go so dirty when writing files?
 			final String[] fields = new String[ 11 ];
 
@@ -153,7 +168,7 @@ public class GeolocalizeCsvData {
 				fields[ 7 ] = result.getLongitude().toString();
 				fields[ 8 ] = result.getLatitude().toString();
 				fields[ 9 ] = result.getLocationType().toString();
-				fields[ 10 ] = result.getStatus().toString();
+				fields[ 10 ] = "";//result.getStatus().toString();
 			}
 
 			final String line =
@@ -290,10 +305,15 @@ public class GeolocalizeCsvData {
 		private static String readField(
 				final String[] fields,
 				final int index ) {
-			return
-				fields[ index ].isEmpty() || fields[ index ].equals( "NULL" ) ?
-					null :
-					fields[ index ];
+			try {
+				return
+					fields[ index ].isEmpty() || fields[ index ].equals( "NULL" ) ?
+						null :
+						fields[ index ];
+			}
+			catch (ArrayIndexOutOfBoundsException e) {
+				throw new RuntimeException( fields.length+" fields in "+Arrays.toString( fields ) , e );
+			}
 		}
 
 		@Override
