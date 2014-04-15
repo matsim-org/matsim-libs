@@ -47,6 +47,7 @@ public class GeolocalizeCsvData {
 	public static final String LONG = "longitude";
 	public static final String LAT = "latitude";
 	public static final String LOCTYPE = "google_loctype";
+	public static final String GOOGLE_ADDRESS = "google_address";
 	public static final String GOOGLE_STATUS = "google_status";
 
 	public static final String LOC_ID = "locationID";
@@ -119,6 +120,7 @@ public class GeolocalizeCsvData {
 					LONG,
 					LAT,
 					LOCTYPE,
+					GOOGLE_ADDRESS,
 					GOOGLE_STATUS );
 			try {
 				this.writer.write( firstLine );
@@ -148,7 +150,7 @@ public class GeolocalizeCsvData {
 				final GoogleAPIResult.Result result,
 				final GeolocalizingParser.RejectCause rejectCause ) {
 			// Why do I always have to go so dirty when writing files?
-			final String[] fields = new String[ 11 ];
+			final String[] fields = new String[ 12 ];
 
 			for ( int i = 0; i < fields.length; i++ ) fields[ i ] = "";
 
@@ -169,7 +171,8 @@ public class GeolocalizeCsvData {
 				fields[ 7 ] = result.getLongitude().toString();
 				fields[ 8 ] = result.getLatitude().toString();
 				fields[ 9 ] = result.getLocationType().toString();
-				fields[ 10 ] = status.toString();
+				fields[ 10 ] = result.getFormattedAddress();
+				fields[ 11 ] = status.toString();
 			}
 
 			final String line =
