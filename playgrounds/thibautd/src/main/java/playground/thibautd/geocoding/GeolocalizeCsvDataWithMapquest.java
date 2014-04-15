@@ -241,22 +241,38 @@ public class GeolocalizeCsvDataWithMapquest {
 		}
 
 		filterBadAddresses( address , filtered );
-		onlyKeepCenterOfStreets( filtered );
+		onlyKeepCenterOfStreetsOrAddresses( filtered );
 
 		return filtered;
 	}
 
-	private static void onlyKeepCenterOfStreets(
+	private static void onlyKeepCenterOfStreetsOrAddresses(
 			final List<Result> filtered) {
 		final Map<String, List<Result>> resultsPerStreet = new HashMap<String, List<Result>>();
 		for ( Result result : filtered ) {
-			if ( result.getGeocodeQuality().equals( MapquestResult.GeocodeQuality.STREET ) ) {
-				final String street = result.getFormattedAddress(); // street can be in various municipalities
-				final List<Result> inStreet =
-					MapUtils.getList(
-							street,
-							resultsPerStreet );
-				inStreet.add( result );
+			switch ( result.getGeocodeQuality() ) {
+				// sometimes several results for one given address... Just keep one.
+				case ADDRESS:
+				case CITY:
+				case COUNTRY:
+				case STATE:
+				// when no street number is available, one gets matches all along the street.
+				case STREET:
+					final String street = result.getFormattedAddress();
+					final List<Result> inStreet =
+						MapUtils.getList(
+								street,
+								resultsPerStreet );
+					inStreet.add( result );
+					break;
+				case UNKNOWN:
+				case INTERSECTION:
+				case COUNTY:
+				case POINT:
+				case ZIP:
+				case ZIP_EXTENDED:
+				default:
+					break;
 			}
 		}
 
