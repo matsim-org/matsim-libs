@@ -20,41 +20,35 @@ public class ResponsibilityGridTools {
 	int noOfTimeBins;
 	Map<Double, Map<Id, Double>> timebin2link2factor;
  
-	// map erzeugen: timebin to link 2 relative factor (null abfangen)
 	private Map<Id, Integer> links2xCells;
 	private Map<Id, Integer> links2yCells;
 	private int noOfXCells;
 	private int noOfYCells;
 	
-	public ResponsibilityGridTools(){
-		
+	public ResponsibilityGridTools(Double timeBinSize, int noOfTimeBins,
+			Map<Id, Integer> links2xCells, Map<Id, Integer> links2yCells, int noOfXCells, int noOfYCells) {
+		this.init(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);		
 	}
 	
 	public Double getFactorForLink(Id linkId, double time) {
 		Double currentTimeBin = getTimeBin(time);
 		
-		// TODO evtl schneller, wenn vor der ersten iteration initialisiert?
 		if(timebin2link2factor!=null){
 			if(timebin2link2factor.get(currentTimeBin)!=null){
-			if(timebin2link2factor.get(currentTimeBin).get(linkId)!=null){
-				return timebin2link2factor.get(currentTimeBin).get(linkId);
-			}
+				if(timebin2link2factor.get(currentTimeBin).get(linkId)!=null){
+					return timebin2link2factor.get(currentTimeBin).get(linkId);
+				}
 			}
 		}
 		return 0.0;
 	}
-
-
-	// keine zeiger! neue initial. jeweils! 
-	public void resetAndcaluculateRelativeDurationFactors(
-			HashMap<Double, Double[][]> duration) {
+ 
+	public void resetAndcaluculateRelativeDurationFactors(HashMap<Double, Double[][]> duration) {
+		
 		timebin2link2factor = new HashMap<Double, Map<Id, Double>>();
 		
-		System.out.println("!!!!!!!!!!! timebins " + duration.size());
-		
 		// each time bin - generate new map
-		for(Double timeBin : duration.keySet()){
-			timebin2link2factor.put(timeBin, new HashMap<Id, Double>());
+		for(Double timeBin : duration.keySet()){timebin2link2factor.put(timeBin, new HashMap<Id, Double>());
 		// calculate total durations for each time bin
 			Double sumOfCurrentTimeBin = 0.0;
 			Double [][] currentDurations = duration.get(timeBin);
@@ -70,32 +64,21 @@ public class ResponsibilityGridTools {
 				if (links2yCells.containsKey(linkId)) { // only if in research are
 					Double relativeFactorForCurrentLink = getRelativeFactorForCurrentLink(
 							averageOfCurrentTimeBin, currentDurations, linkId);
-					System.out.println("4. factor " + relativeFactorForCurrentLink);
-					System.out.println(" average of current time bin " + averageOfCurrentTimeBin);
-					timebin2link2factor.get(timeBin).put(linkId,relativeFactorForCurrentLink); //!!!
+					timebin2link2factor.get(timeBin).put(linkId,relativeFactorForCurrentLink); 
 				}
 			}
-		}
-		
-
-		
-		
+		}		
 	}
 
-	private Double getRelativeFactorForCurrentLink(
-			Double averageOfCurrentTimeBin, Double[][] currentDurations, Id linkId) {
+	private Double getRelativeFactorForCurrentLink(Double averageOfCurrentTimeBin, Double[][] currentDurations, Id linkId) {
 		
 		Double relevantDuration = new Double(0.0);
 		if(links2xCells.get(linkId)!=null && links2yCells.get(linkId)!=null){
 		Cell cellOfLink = new Cell(links2xCells.get(linkId), links2yCells.get(linkId));
-		System.out.println(cellOfLink.toString() + " --- cell");
 		
 		for(int distance =0; distance <= 3; distance++){
-			
 			List<Cell> distancedCells = cellOfLink .getCellsWithExactDistance(noOfXCells, noOfYCells, distance);
-			System.out.println("distanced Cells - number: " +distancedCells.size());
 			for(Cell dc: distancedCells){
-				// TODO better initialise with 0.0?
 				try {
 						if (currentDurations[dc.getX()][dc.getY()]!=null) {
 							Double valueOfdc = currentDurations[dc.getX()][dc.getY()];
@@ -137,7 +120,6 @@ public class ResponsibilityGridTools {
 			Map<Id, Integer> links2xCells, Map<Id, Integer> links2yCells, int noOfXCells, int noOfYCells) {
 		this.timeBinSize = timeBinSize;
 		this.noOfTimeBins = noOfTimeBins;
-		// neue time2link map anlegen
 		this.timebin2link2factor = new HashMap<Double, Map<Id,Double>>();
 		for(int i=1; i<noOfTimeBins+1; i++){
 			timebin2link2factor.put((i*this.timeBinSize), new HashMap<Id, Double>());
@@ -147,5 +129,21 @@ public class ResponsibilityGridTools {
 		this.noOfXCells=noOfXCells;
 		this.noOfYCells=noOfYCells;
 		
+	}
+
+	public int getNoOfTimeBins() {
+		return this.noOfTimeBins;
+	}
+
+	public Double getTimeBinSize() {
+		return this.timeBinSize;
+	}
+
+	public int getNoOfXCells() {
+		return this.noOfXCells;
+	}
+
+	public int getNoOfYCells() {
+		return this.noOfYCells;
 	}
 }

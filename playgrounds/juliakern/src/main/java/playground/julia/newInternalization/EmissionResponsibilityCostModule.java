@@ -44,19 +44,14 @@ public class EmissionResponsibilityCostModule {
 	private final double EURO_PER_GRAMM_PM2_5_EXHAUST = 384500. / (1000. * 1000.);
 	private final double EURO_PER_GRAMM_CO2 = 70. / (1000. * 1000.);
 
-	private Double timeBinSize = 60.*60.;
-
-	private int noOfXCells = 160;
-
-	private int noOfYCells = 120;
-
-
-//	static double xMin = 4452550.25;
-//	static double xMax = 4479483.33;
-//	static double yMin = 5324955.00;
-//	static double yMax = 5345696.81;
-	
-	private int noOfTimeBins = 30;
+	// TODO move parameter to controler/ set in constructor
+//	private Double timeBinSize = 60.*60.;
+//
+//	private int noOfXCells = 160;
+//
+//	private int noOfYCells = 120;
+//	
+//	private int noOfTimeBins = 30;
 	
 	private ResponsibilityGridTools responsibilityGridTools;
 
@@ -71,9 +66,9 @@ public class EmissionResponsibilityCostModule {
 		} else {
 			logger.info("CO2 emission costs will NOT be calculated... ");
 		}
-		rgt = new ResponsibilityGridTools();
-		rgt.init(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
-		this.responsibilityGridTools = rgt;
+		// TODO should now be initialized before... delete this
+//		rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
+//		this.responsibilityGridTools = rgt;
 		
 	}
 	
@@ -81,9 +76,9 @@ public class EmissionResponsibilityCostModule {
 		this.emissionCostFactor = emissionCostFactor;
 		logger.info("Emission costs from Maibach et al. (2008) are multiplied by a factor of " + this.emissionCostFactor);
 		logger.info("CO2 emission costs will NOT be calculated... ");
-		rgt = new ResponsibilityGridTools();
-		rgt.init(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
-		this.responsibilityGridTools = rgt;
+		// TODO should now be initialized before... delete this
+//		rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
+//		this.responsibilityGridTools = rgt;
 	}
 
 	public double calculateWarmEmissionCosts(Map<WarmPollutant, Double> warmEmissions, Id linkId, double time) {
@@ -116,6 +111,7 @@ public class EmissionResponsibilityCostModule {
 			else ; //do nothing
 		}
 		
+		// relative density = person minutes of resp. cell and time bin / average person minutes of all cells from this time bin
 		Double relativeDensity = responsibilityGridTools.getFactorForLink(linkId, time);
 		
 		return this.emissionCostFactor * warmEmissionCosts * relativeDensity;
@@ -130,6 +126,7 @@ public class EmissionResponsibilityCostModule {
 			else if(cp.equals(ColdPollutant.PM)) coldEmissionCosts += coldEmissions.get(cp) * EURO_PER_GRAMM_PM2_5_EXHAUST;
 			else ; //do nothing
 		}
+		// relative density = person minutes of resp. cell and time bin / average person minutes of all cells from this time bin
 		Double relativeDensity = responsibilityGridTools.getFactorForLink(linkId, time);
 		
 		return this.emissionCostFactor * coldEmissionCosts * relativeDensity;

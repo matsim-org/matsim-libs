@@ -50,13 +50,15 @@ public class RunNewInternalizationMunich {
 	private static ResponsibilityGridTools rgt;
 	private static Map<Id, Integer> links2xCells;
 	private static Map<Id, Integer> links2yCells;
+	
 	private static Integer noOfXCells = 160;
 	private static Integer noOfYCells = 120;
-	
 	static double xMin = 4452550.25;
 	static double xMax = 4479483.33;
 	static double yMin = 5324955.00;
 	static double yMax = 5345696.81;
+	private static Double timeBinSize = 3600.;
+	private static int noOfTimeBins = 30;
 
 
 	public static void main(String[] args) {
@@ -120,26 +122,14 @@ public class RunNewInternalizationMunich {
 		links2xCells = gt.mapLinks2Xcells(noOfXCells);
 		links2yCells = gt.mapLinks2Ycells(noOfYCells);
 		
+		rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
+		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(Double.parseDouble(emissionCostFactor),	Boolean.parseBoolean(considerCO2Costs), rgt, links2xCells, links2yCells);
+		EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
+		controler.setTravelDisutilityFactory(emfac);
+		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, links2xCells, links2yCells));
+		controler.setOverwriteFiles(true);
+		controler.addSnapshotWriterFactory("otfvis",new OTFFileWriterFactory());
+		controler.run();
 		
-		if (!links2xCells.isEmpty()) {
-			EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(
-					Double.parseDouble(emissionCostFactor),
-					Boolean.parseBoolean(considerCO2Costs), rgt, links2xCells,
-					links2yCells);
-			//		EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
-			//		controler.setTravelDisutilityFactory(emissionTducf);
-			EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(
-					emissionModule, emissionCostModule);
-			controler.setTravelDisutilityFactory(emfac);
-			//		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
-			controler
-					.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(
-							emissionModule, emissionCostModule, rgt,
-							links2xCells, links2yCells));
-			controler.setOverwriteFiles(true);
-			controler.addSnapshotWriterFactory("otfvis",
-					new OTFFileWriterFactory());
-			controler.run();
-		}
 	}
 }

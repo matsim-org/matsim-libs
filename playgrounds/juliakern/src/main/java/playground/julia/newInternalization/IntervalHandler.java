@@ -11,8 +11,6 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 
-// TODO den grid tools alte durations uebergeben - ueberpruefen
-
 public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEventHandler{
 
 	HashMap<Double, Double[][]> duration = new HashMap<Double, Double[][]>();
@@ -31,10 +29,8 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 		this.simulationEndTime = simulationEndTime;
 		this.noOfxCells = noOfxCells;
 		this.noOfyCells = noOfyCells;
-		this.link2xbins = link2xbins; //TODO probably not initialized
+		this.link2xbins = link2xbins;
 		this.link2ybins = link2ybins;
-		if(link2xbins.isEmpty())System.out.println("---- emptyx");
-		if(link2ybins.isEmpty())System.out.println("---- emptyy");
 		recognisedPersons = new HashSet<Id>();
 	}
 	
@@ -62,9 +58,7 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 
 		Double currentTimeBin = Math.ceil(event.getTime()/timeBinSize)*timeBinSize;
 		
-		
 		if(currentTimeBin<timeBinSize) currentTimeBin=timeBinSize;
-		
 		
 		Double timeWithinCurrentInterval = new Double(event.getTime()-currentTimeBin+timeBinSize);
 		if(recognisedPersons.contains(event.getPersonId())){	
@@ -97,15 +91,6 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 			// time bin of event
 			duration.get(currentTimeBin)[xCell][yCell]+=timeWithinCurrentInterval;
 		}
-//			System.out.println(network.getLinks().size());
-//			System.out.println(event.getLinkId());
-//			System.out.println(network.getLinks().get(event.getLinkId()));
-//			System.out.println(network.getLinks().get(event.getLinkId()).getCoord());
-//			System.out.println(network.getLinks().get(event.getLinkId()).getCoord().getX());
-//			xCell = gt.mapXCoordToBin(network.getLinks().get(event.getLinkId()).getCoord().getX(), noOfxCells);
-//			yCell = gt.mapYCoordToBin(network.getLinks().get(event.getLinkId()).getCoord().getY(), noOfyCells);
-		
-
 	}
 	}
 

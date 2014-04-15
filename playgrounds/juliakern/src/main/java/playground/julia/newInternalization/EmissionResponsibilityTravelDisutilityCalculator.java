@@ -20,10 +20,8 @@
 package playground.julia.newInternalization;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -49,16 +47,16 @@ public class EmissionResponsibilityTravelDisutilityCalculator implements TravelD
 	double distanceCostRateCar;
 	double marginalUtlOfTravelTime;
 	EmissionModule emissionModule;
-	EmissionResponsibilityCostModule emissionCostModule;
+	EmissionResponsibilityCostModule emissionResponsibilityCostModule;
 
 
-	public EmissionResponsibilityTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionResponsibilityCostModule emissionCostModule) {
+	public EmissionResponsibilityTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionResponsibilityCostModule emissionResponsibilityCostModule) {
 		this.timeCalculator = timeCalculator;
 		this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
 		this.distanceCostRateCar = cnScoringGroup.getMonetaryDistanceCostRateCar();
 		this.marginalUtlOfTravelTime = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
 		this.emissionModule = emissionModule;
-		this.emissionCostModule = emissionCostModule;
+		this.emissionResponsibilityCostModule = emissionResponsibilityCostModule;
 	}
 
 	@Override
@@ -75,6 +73,7 @@ public class EmissionResponsibilityTravelDisutilityCalculator implements TravelD
 		double linkExpectedEmissionDisutility = calculateExpectedEmissionDisutility(person, link, distance, linkTravelTime, time);
 		linkTravelDisutility = linkTravelTimeDisutility + linkDistanceDisutility + linkExpectedEmissionDisutility;
 
+		logger.info("expected emission disutility " + linkExpectedEmissionDisutility);
 		return linkTravelDisutility;
 	}
 
@@ -98,7 +97,7 @@ public class EmissionResponsibilityTravelDisutilityCalculator implements TravelD
 				linkTravelTime,
 				vehicleInformation
 				);
-		double expectedEmissionCosts = this.emissionCostModule.calculateWarmEmissionCosts(expectedWarmEmissions, link.getId(), time);
+		double expectedEmissionCosts = this.emissionResponsibilityCostModule.calculateWarmEmissionCosts(expectedWarmEmissions, link.getId(), time);
 		linkExpectedEmissionDisutility = this.marginalUtlOfMoney * expectedEmissionCosts ;
 		// logger.info("expected emission costs for person " + person.getId() + " on link " + link.getId() + " at time " + time + " are calculated to " + expectedEmissionCosts);
 

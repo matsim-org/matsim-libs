@@ -21,8 +21,6 @@
 
 package playground.julia.newInternalization;
 
-import java.util.Set;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -40,16 +38,16 @@ import playground.vsp.emissions.EmissionModule;
 	public class EmissionResponsibilityTravelDisutilityCalculatorFactory implements TravelDisutilityFactory {
 
 		private final EmissionModule emissionModule;
-		private final EmissionResponsibilityCostModule emissionCostModule;
+		private final EmissionResponsibilityCostModule emissionResponsibilityCostModule;
 
-		public EmissionResponsibilityTravelDisutilityCalculatorFactory(EmissionModule emissionModule, EmissionResponsibilityCostModule emissionCostModule) {
+		public EmissionResponsibilityTravelDisutilityCalculatorFactory(EmissionModule emissionModule, EmissionResponsibilityCostModule emissionResponsibilityCostModule) {
 			this.emissionModule = emissionModule;
-			this.emissionCostModule = emissionCostModule;
+			this.emissionResponsibilityCostModule = emissionResponsibilityCostModule;
 		}
 
 		@Override
 		public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup){
-			final EmissionResponsibilityTravelDisutilityCalculator ertdc = new EmissionResponsibilityTravelDisutilityCalculator(timeCalculator, cnScoringGroup, emissionModule, emissionCostModule);
+			final EmissionResponsibilityTravelDisutilityCalculator ertdc = new EmissionResponsibilityTravelDisutilityCalculator(timeCalculator, cnScoringGroup, emissionModule, emissionResponsibilityCostModule);
 
 			return new TravelDisutility(){
 

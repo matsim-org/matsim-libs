@@ -21,26 +21,21 @@
 package playground.julia.newInternalization;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.events.handler.EventHandler;
 
-import playground.julia.distribution.GridTools;
 import playground.vsp.emissions.EmissionModule;
 
 /**
@@ -62,19 +57,19 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 	int lastIt;
 
 
-	private Double timeBinSize = 60.*60.;
+	private Double timeBinSize; // = 60.*60.;
 
-	private int noOfXCells = 160;
+	private int noOfXCells; // = 160;
 
-	private int noOfYCells = 120;
+	private int noOfYCells; // = 120;
 
-
-	static double xMin = 4452550.25;
-	static double xMax = 4479483.33;
-	static double yMin = 5324955.00;
-	static double yMax = 5345696.81;
+// TODO remove parameter
+//	static double xMin = 4452550.25;
+//	static double xMax = 4479483.33;
+//	static double yMin = 5324955.00;
+//	static double yMax = 5345696.81;
 	
-	private int noOfTimeBins = 30;
+	private int noOfTimeBins; // = 30;
 	
 	private Map<Id, Integer> links2xCells;
 	private Map<Id, Integer> links2yCells;
@@ -87,11 +82,15 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 
 
 	public InternalizeEmissionResponsibilityControlerListener(EmissionModule emissionModule, EmissionResponsibilityCostModule emissionCostModule, ResponsibilityGridTools rgt, Map<Id, Integer> links2xCells, Map<Id, Integer> links2yCells) {
+		this.noOfTimeBins = rgt.getNoOfTimeBins();
+		this.timeBinSize = rgt.getTimeBinSize();
+		this.noOfXCells = rgt.getNoOfXCells();
+		this.noOfYCells = rgt.getNoOfYCells();
 		this.emissionModule = emissionModule;
 		this.emissionCostModule = emissionCostModule;
-		rgt = new ResponsibilityGridTools();
-		this.responsibilityGridTools=rgt;
-		rgt.init(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
+		//TODO check: should already be initialized -> remove
+//		rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
+		this.responsibilityGridTools = rgt;
 		this.links2xCells = links2xCells;
 		this.links2yCells = links2yCells;
 	}
@@ -102,12 +101,7 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 
 		EventsManager eventsManager = controler.getEvents();
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionHandler());	
-		
-//		GridTools gt = new GridTools(controler.getNetwork().getLinks(), xMin, xMax, yMin, yMax);
-//		links2xCells = gt.mapLinks2Xcells(noOfXCells);
-//		links2yCells = gt.mapLinks2Ycells(noOfYCells);
-		
+		eventsManager.addHandler(emissionModule.getColdEmissionHandler());			
 		
 		responsibilityGridTools.init(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
 		
