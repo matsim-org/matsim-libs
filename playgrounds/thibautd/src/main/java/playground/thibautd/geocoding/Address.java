@@ -76,5 +76,15 @@ public class Address {
 		if ( this.country != null ) throw new IllegalStateException();
 		this.country = country;
 	}
+
+	@Override
+	public String toString() {
+ 		return "{Adress id: "+id+"; "+
+ 			"street="+street+"; "+
+			"number="+number+"; "+
+			"zipcode="+zipcode+"; "+
+			"municipality="+municipality+"; "+
+			"country="+country+"}";
+	}
 }
 
