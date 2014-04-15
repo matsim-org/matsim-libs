@@ -66,9 +66,10 @@ public class EmissionResponsibilityCostModule {
 		} else {
 			logger.info("CO2 emission costs will NOT be calculated... ");
 		}
+		
 		// TODO should now be initialized before... delete this
 //		rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
-//		this.responsibilityGridTools = rgt;
+		this.responsibilityGridTools = rgt;
 		
 	}
 	
@@ -78,7 +79,7 @@ public class EmissionResponsibilityCostModule {
 		logger.info("CO2 emission costs will NOT be calculated... ");
 		// TODO should now be initialized before... delete this
 //		rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
-//		this.responsibilityGridTools = rgt;
+		this.responsibilityGridTools = rgt;
 	}
 
 	public double calculateWarmEmissionCosts(Map<WarmPollutant, Double> warmEmissions, Id linkId, double time) {
