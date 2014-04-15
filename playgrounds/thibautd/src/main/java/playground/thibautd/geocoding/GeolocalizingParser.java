@@ -32,7 +32,7 @@ public class GeolocalizingParser {
 	private static final Logger log =
 		Logger.getLogger(GeolocalizingParser.class);
 
-	public static enum RejectCause { error, abort; }
+	public static enum RejectCause { error, noresult, abort; }
 
 	public static interface GeolocalizationListenner {
 		public void handleResult( Address address , GoogleAPIResult result );
@@ -94,6 +94,7 @@ public class GeolocalizingParser {
 					break;
 				case ZERO_RESULTS:
 					log.warn( "Address "+address+" gave no result!" );
+					nonlocalizedAddressListenner.handleNonlocalizedAddress( address , RejectCause.noresult );
 					break;
 				case OK:
 					geolocalisationListenner.handleResult( address , result );
