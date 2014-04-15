@@ -133,17 +133,18 @@ public class GeolocalizeCsvData {
 				final GoogleAPIResult result,
 				final GeolocalizingParser.RejectCause rejectCause ) {
 			if ( result == null ) {
-				writeUnique( address , null , rejectCause );
+				write( address , null , null , rejectCause );
 			}
 			else {
 				for ( int i=0; i < result.getNumberResults(); i++ ) {
-					writeUnique( address , result.getResults( i ) , rejectCause );
+					write( address , result.getStatus() , result.getResults( i ) , rejectCause );
 				}
 			}
 		}
 
-		private void writeUnique(
+		private void write(
 				final Address address,
+				final GoogleAPIResult.Status status,
 				final GoogleAPIResult.Result result,
 				final GeolocalizingParser.RejectCause rejectCause ) {
 			// Why do I always have to go so dirty when writing files?
@@ -168,7 +169,7 @@ public class GeolocalizeCsvData {
 				fields[ 7 ] = result.getLongitude().toString();
 				fields[ 8 ] = result.getLatitude().toString();
 				fields[ 9 ] = result.getLocationType().toString();
-				fields[ 10 ] = "";//result.getStatus().toString();
+				fields[ 10 ] = status.toString();
 			}
 
 			final String line =
