@@ -60,7 +60,7 @@ public class GoogleAPIUtils {
 				pasteAddressString( address ),
 				"&sensor=false",  // absolutely no idea why this is needed...
 				key == null ? "" : "&key="+key );
-		log.info( "send request "+request.toString() );
+		if ( log.isTraceEnabled() ) log.trace( "send request "+request.toString() );
 		return toJSON( request );
 	}
 
