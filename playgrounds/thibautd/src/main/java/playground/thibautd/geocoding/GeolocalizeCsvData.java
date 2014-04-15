@@ -48,6 +48,8 @@ public class GeolocalizeCsvData {
 	public static final String LOCTYPE = "google_loctype";
 	public static final String GOOGLE_STATUS = "google_status";
 
+	public static final String LOC_ID = "locationID";
+
 	private static final char SEP = ',';
 	private static final char QUOTE = '"';
 
@@ -106,6 +108,7 @@ public class GeolocalizeCsvData {
 				CsvUtils.buildCsvLine(
 					SEP,
 					QUOTE, 
+					LOC_ID,
 					STREET,
 					NUMBER,
 					ZIP_CODE,
@@ -129,12 +132,13 @@ public class GeolocalizeCsvData {
 				final GoogleAPIResult result,
 				final GeolocalizingParser.RejectCause rejectCause ) {
 			// Why do I always have to go so dirty when writing files?
-			final String[] fields = new String[ 10 ];
+			final String[] fields = new String[ 11 ];
 
 			for ( int i = 0; i < fields.length; i++ ) fields[ i ] = "";
 
 			int idx=0;
 			if ( address != null ) {
+				fields[ idx++ ] = address.getId() != null ? address.getId() : "";
 				fields[ idx++ ] = address.getStreet() != null ? address.getStreet() : "";
 				fields[ idx++ ] = address.getNumber() != null ? address.getNumber() : "";
 				fields[ idx++ ] = address.getZipcode() != null ? address.getZipcode() : "";
@@ -190,6 +194,7 @@ public class GeolocalizeCsvData {
 		private int zipIndex = -1;
 		private int municipalityIndex = -1;
 		private int countryIndex = -1;
+		private int idIndex = -1;
 		
 		public CsvParser(final String file) {
 			this.reader = IOUtils.getBufferedReader( file );
@@ -217,6 +222,10 @@ public class GeolocalizeCsvData {
 					if ( COUNTRY.equals( firstLine[ i ] ) ) {
 						if ( countryIndex >= 0 ) throw new RuntimeException();
 						countryIndex = i;
+					}
+					if ( LOC_ID.equals( firstLine[ i ] ) ) {
+						if ( idIndex >= 0 ) throw new RuntimeException();
+						idIndex = i;
 					}
 				}
 			}
@@ -251,6 +260,10 @@ public class GeolocalizeCsvData {
 			final String[] fields = CsvUtils.parseCsvLine( SEP , QUOTE , line );
 
 			final Address address = new Address();
+			address.setId(
+					readField(
+						fields,
+						idIndex ) );
 			address.setStreet(
 					readField(
 						fields,
