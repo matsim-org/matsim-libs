@@ -48,7 +48,10 @@ public class GeolocalizeCsvDataWithMapquest {
 	public static final String LAT = "latitude";
 	public static final String QUALITY = "geocode_quality";
 	public static final String QUALITY_CODE = "geocode_quality_code";
-	public static final String MAPQUEST_ADDRESS = "mapquest_address";
+	public static final String MAPQUEST_STREET = "mapquest_street";
+	public static final String MAPQUEST_ZIP_CODE = "mapquest_zip";
+	public static final String MAPQUEST_CITY = "mapquest_municipality";
+	public static final String MAPQUEST_COUNTRY = "mapquest_country";
 	public static final String MAPQUEST_STATUS = "mapquest_status";
 
 	public static final String LOC_ID = "locationID";
@@ -122,7 +125,10 @@ public class GeolocalizeCsvDataWithMapquest {
 					LAT,
 					QUALITY,
 					QUALITY_CODE,
-					MAPQUEST_ADDRESS,
+					MAPQUEST_STREET,
+					MAPQUEST_ZIP_CODE,
+					MAPQUEST_CITY,
+					MAPQUEST_COUNTRY,
 					MAPQUEST_STATUS );
 			try {
 				this.writer.write( firstLine );
@@ -152,7 +158,7 @@ public class GeolocalizeCsvDataWithMapquest {
 				final MapquestResult.Result result,
 				final Status rejectCause ) {
 			// Why do I always have to go so dirty when writing files?
-			final String[] fields = new String[ 13 ];
+			final String[] fields = new String[ 16 ];
 
 			for ( int i = 0; i < fields.length; i++ ) fields[ i ] = "";
 
@@ -174,8 +180,11 @@ public class GeolocalizeCsvDataWithMapquest {
 				fields[ 8 ] = result.getLatitude().toString();
 				fields[ 9 ] = result.getGeocodeQuality().toString();
 				fields[ 10 ] = result.getGeocodeQualityCode();
-				fields[ 11 ] = result.getFormattedAddress();
-				fields[ 12 ] = status.toString();
+				fields[ 11 ] = result.getStreet();
+				fields[ 12 ] = result.getZip();
+				fields[ 13 ] = result.getCity();
+				fields[ 14 ] = result.getCountry();
+				fields[ 15 ] = status.toString();
 			}
 
 			final String line =

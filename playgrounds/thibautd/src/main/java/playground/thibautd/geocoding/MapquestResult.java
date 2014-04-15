@@ -113,12 +113,23 @@ public class MapquestResult implements GeolocalizationResult {
 		}
 
 		public String getFormattedAddress() {
-			final String street = (String) getJSONResults().get( "street" );
-			final String city = (String) getJSONResults().get( "adminArea5" );
-			final String country = (String) getJSONResults().get( "adminArea1" );
-			final String zip = (String) getJSONResults().get( "postalCode" );
+			return getStreet()+", "+getZip()+" "+getCity()+", "+getCountry();
+		}
 
-			return street+", "+zip+" "+city+", "+country;
+		public String getStreet() {
+			return (String) getJSONResults().get( "street" );
+		}
+
+		public String getCity() {
+			return (String) getJSONResults().get( "adminArea5" );
+		}
+
+		public String getCountry() {
+			return (String) getJSONResults().get( "adminArea1" );
+		}
+
+		public String getZip() {
+			return (String) getJSONResults().get( "postalCode" );
 		}
 
 		public Double getLatitude() {
