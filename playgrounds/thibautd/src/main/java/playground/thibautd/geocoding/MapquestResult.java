@@ -67,13 +67,13 @@ public class MapquestResult implements GeolocalizationResult {
 	@Override
 	public Status getStatus() {
 		switch ( getMapquestStatus() ) {
-		case OK:
-			return getNumberResults() > 0  ? Status.OK : Status.NO_RESULT;
-		case INPUT_ERROR:
-		case KEY_ERROR:
-		case UNKNOWN_ERROR:
-		default:
-			return Status.ABORT;
+			case OK:
+				return getNumberResults() > 0  ? Status.OK : Status.NO_RESULT;
+			case INPUT_ERROR:
+			case KEY_ERROR:
+			case UNKNOWN_ERROR:
+			default:
+				return Status.ERROR;
 		}
 	}
 	

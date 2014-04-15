@@ -46,15 +46,15 @@ public class MapquestGeolocalizer implements Geolocalizer<MapquestResult> {
 	public MapquestResult getLocation( final Address address ) {
 		final MapquestResult result = new MapquestResult( getJSONMapquestLocation( address ) );
 
-		switch ( result.getStatus() ) {
+		switch ( result.getMapquestStatus() ) {
 			case OK:
 				return result;
 			default:
-				log.error( "problem with request: "+result.getStatus() );
+				log.error( "problem with request "+address+": "+result.getMapquestStatus() );
 				for ( String m : result.getMessages() ) {
 					log.error( m );
 				}
-				throw new RuntimeException();
+				return result;
 		}
 	}
 

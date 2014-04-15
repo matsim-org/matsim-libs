@@ -152,7 +152,7 @@ public class GeolocalizeCsvDataWithMapquest {
 				final MapquestResult.Result result,
 				final Status rejectCause ) {
 			// Why do I always have to go so dirty when writing files?
-			final String[] fields = new String[ 12 ];
+			final String[] fields = new String[ 13 ];
 
 			for ( int i = 0; i < fields.length; i++ ) fields[ i ] = "";
 
