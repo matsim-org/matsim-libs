@@ -26,6 +26,10 @@ import java.util.List;
  * @author thibautd
  */
 public class CsvUtils {
+	public static String[] parseCsvLine( final String line ) {
+		return parseCsvLine( ',' , '"' , line );
+	}
+
 	public static String[] parseCsvLine(
 			final char sep,
 			final char quote,
@@ -49,6 +53,36 @@ public class CsvUtils {
 		fields.add( currentField.toString() );
 
 		return fields.toArray( new String[ fields.size() ] );
+	}
+
+	public static String buildCsvLine(
+			final String... fields) {
+		return buildCsvLine( ',' , '"' , fields );
+	}
+
+	public static String buildCsvLine(
+			final char sep,
+			final char quote,
+			final String... fields) {
+		final StringBuilder line = new StringBuilder();
+
+		int c = 0;
+		for ( String f : fields ) {
+			if ( c++ > 0 ) line.append( sep );
+			line.append( escapeField( sep , quote , f ) ); 
+		}
+
+		return line.toString();
+	}
+
+	private static String escapeField(
+			final char sep,
+			final char quote,
+			final String string) {
+		if  ( sep == quote ) {} // just to get rid of warning...
+		// TODO: quote only if contains sep or white space.
+		// TODO: escape quotes!
+		return quote+string+quote;
 	}
 }
 

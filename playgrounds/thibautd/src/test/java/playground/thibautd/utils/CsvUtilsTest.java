@@ -29,7 +29,7 @@ import org.junit.Test;
  */
 public class CsvUtilsTest {
 	@Test
-	public void test() {
+	public void testSplit() {
 		final String[] fields = CsvUtils.parseCsvLine( ',' , '"' , "stuff1,\"some spaced stuff\",\"some quoted, with commas!\",," );
 
 		Assert.assertEquals(
@@ -56,6 +56,21 @@ public class CsvUtilsTest {
 				"wrong value in field",
 				fields[ 4 ],
 				"" );
+	}
+
+	@Test
+	public void testMerge() {
+		final String line =
+			CsvUtils.buildCsvLine( ',' , '"' ,
+				"stuff1",
+				"some spaced stuff",
+				"some quoted, with commas!",
+				"",
+				"" );
+		Assert.assertEquals(
+				"unexpected line",
+				"\"stuff1\",\"some spaced stuff\",\"some quoted, with commas!\",\"\",\"\"",
+				line );
 	}
 }
 
