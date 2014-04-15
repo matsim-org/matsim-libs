@@ -29,6 +29,17 @@ public class Address {
 	private String zipcode;
 	private String municipality;
 	private String country;
+
+	private String id;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(final String id) {
+		if ( this.id != null ) throw new IllegalStateException();
+		this.id = id;
+	}
 	
 	public String getStreet() {
 		return street;
@@ -46,18 +57,23 @@ public class Address {
 		return country;
 	}
 	public void setStreet(String street) {
+		if ( this.street != null ) throw new IllegalStateException();
 		this.street = street;
 	}
 	public void setNumber(String number) {
+		if ( this.number != null ) throw new IllegalStateException();
 		this.number = number;
 	}
 	public void setZipcode(String zipcode) {
+		if ( this.zipcode != null ) throw new IllegalStateException();
 		this.zipcode = zipcode;
 	}
 	public void setMunicipality(String municipality) {
+		if ( this.municipality != null ) throw new IllegalStateException();
 		this.municipality = municipality;
 	}
 	public void setCountry(String country) {
+		if ( this.country != null ) throw new IllegalStateException();
 		this.country = country;
 	}
 }
