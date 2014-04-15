@@ -136,28 +136,25 @@ public class GeolocalizeCsvData {
 
 			for ( int i = 0; i < fields.length; i++ ) fields[ i ] = "";
 
-			int idx=0;
 			if ( address != null ) {
-				fields[ idx++ ] = address.getId() != null ? address.getId() : "";
-				fields[ idx++ ] = address.getStreet() != null ? address.getStreet() : "";
-				fields[ idx++ ] = address.getNumber() != null ? address.getNumber() : "";
-				fields[ idx++ ] = address.getZipcode() != null ? address.getZipcode() : "";
-				fields[ idx++ ] = address.getMunicipality() != null ? address.getMunicipality() : "";
-				fields[ idx++ ] = address.getCountry() != null ? address.getCountry() : "";
+				fields[ 0 ] = address.getId() != null ? address.getId() : "";
+				fields[ 1 ] = address.getStreet() != null ? address.getStreet() : "";
+				fields[ 2 ] = address.getNumber() != null ? address.getNumber() : "";
+				fields[ 3 ] = address.getZipcode() != null ? address.getZipcode() : "";
+				fields[ 4 ] = address.getMunicipality() != null ? address.getMunicipality() : "";
+				fields[ 5 ] = address.getCountry() != null ? address.getCountry() : "";
 			}
 
 			if ( rejectCause != null ) {
-				fields[ idx++ ] = rejectCause.toString();
+				fields[ 6 ] = rejectCause.toString();
 			}
 
 			if ( result != null ) {
-				fields[ idx++ ] = result.getLongitude().toString();
-				fields[ idx++ ] = result.getLatitude().toString();
-				fields[ idx++ ] = result.getLocationType().toString();
-				fields[ idx++ ] = result.getStatus().toString();
+				fields[ 7 ] = result.getLongitude().toString();
+				fields[ 8 ] = result.getLatitude().toString();
+				fields[ 9 ] = result.getLocationType().toString();
+				fields[ 10 ] = result.getStatus().toString();
 			}
-
-			assert idx == fields.length;
 
 			final String line =
 				CsvUtils.buildCsvLine(
@@ -212,8 +209,8 @@ public class GeolocalizeCsvData {
 						numberIndex = i;
 					}
 					if ( ZIP_CODE.equals( firstLine[ i ] ) ) {
-						if ( numberIndex >= 0 ) throw new RuntimeException();
-						numberIndex = i;
+						if ( zipIndex >= 0 ) throw new RuntimeException();
+						zipIndex = i;
 					}
 					if ( CITY.equals( firstLine[ i ] ) ) {
 						if ( municipalityIndex >= 0 ) throw new RuntimeException();
@@ -258,6 +255,8 @@ public class GeolocalizeCsvData {
 			if ( line == null ) throw new NoSuchElementException();
 
 			final String[] fields = CsvUtils.parseCsvLine( SEP , QUOTE , line );
+
+			line = null;
 
 			final Address address = new Address();
 			address.setId(

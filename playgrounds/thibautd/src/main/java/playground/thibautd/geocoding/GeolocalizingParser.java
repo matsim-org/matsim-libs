@@ -23,6 +23,8 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
+import org.matsim.core.utils.misc.Counter;
+
 /**
  * @author thibautd
  */
@@ -52,23 +54,29 @@ public class GeolocalizingParser {
 			final NonlocalizedAddressListenner nonlocalizedAddressListenner) {
 		parseUntilLimit( addressProvider , geolocalisationListenner , nonlocalizedAddressListenner );
 
+		final Counter counter = new Counter( "Process aborted address # " );
 		while ( addressProvider.hasNext() ) {
+			counter.incCounter();
 			final Address address = addressProvider.next();
 			nonlocalizedAddressListenner.handleNonlocalizedAddress( address , RejectCause.abort );
 		}
+		counter.printCounter();
 	}
 
 	public void parseUntilLimit(
 			final Iterator<? extends Address> addressProvider,
 			final GeolocalizationListenner geolocalisationListenner,
 			final NonlocalizedAddressListenner nonlocalizedAddressListenner) {
+		final Counter counter = new Counter( "Parse adress # " );
 		while ( addressProvider.hasNext() ) {
+			counter.incCounter();
 			final Address address = addressProvider.next();
 
 			final GoogleAPIResult result = utils.getLocation( address );
 
 			switch ( result.getStatus() ) {
 				case OVER_QUERY_LIMIT:
+					counter.printCounter();
 					log.error( "reached limit. Try processing the rest latter." );
 					nonlocalizedAddressListenner.handleNonlocalizedAddress( address , RejectCause.abort );
 					return;
@@ -94,6 +102,7 @@ public class GeolocalizingParser {
 					throw new RuntimeException();
 			}
 		}
+		counter.printCounter();
 	}
 
 }
