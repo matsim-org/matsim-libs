@@ -23,8 +23,10 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.matsim.api.core.v01.Coord;
@@ -153,8 +155,8 @@ public class GeolocalizeCsvDataWithMapquest {
 				write( address , null , null , rejectCause );
 			}
 			else {
-				for ( int i=0; i < result.getNumberResults(); i++ ) {
-					write( address , result.getMapquestStatus() , result.getResults( i ) , rejectCause );
+				for ( MapquestResult.Result r : filterResults( address , result ) ) {
+					write( address , result.getMapquestStatus() , r , rejectCause );
 				}
 			}
 		}
@@ -222,6 +224,44 @@ public class GeolocalizeCsvDataWithMapquest {
 				throw new UncheckedIOException( e );
 			}
 		}
+	}
+
+	private static List<MapquestResult.Result> filterResults(
+			final Address address,
+			final MapquestResult results ) {
+		final List<MapquestResult.Result> filtered = new ArrayList<MapquestResult.Result>();
+
+		boolean wasZipMatch = false;
+		boolean wasCityMatch = false;
+		boolean wasStreetMatch = false;
+
+		for ( int i=0; i < results.getNumberResults(); i++ ) {
+			final MapquestResult.Result result = results.getResults( i );
+			filtered.add( result );
+
+			if ( address.getZipcode() != null && address.getZipcode().equals( result.getZip() ) ) {
+				wasZipMatch = true;
+			}
+			if ( address.getMunicipality() != null && address.getMunicipality().equals( result.getCity() ) ) {
+				wasCityMatch = true;
+			}
+			if ( address.getStreet() != null && result.getStreet().matches( ".*"+address.getStreet() ) ) {
+				wasStreetMatch = true;
+			}
+		}
+
+		final Iterator<MapquestResult.Result> it = filtered.iterator();
+		while ( it.hasNext() ) {
+			final MapquestResult.Result result = it.next();
+
+			final boolean zip = wasZipMatch && !address.getZipcode().equals( result.getZip() );
+			final boolean city = wasCityMatch && !address.getMunicipality().equals( result.getCity() );
+			final boolean street = wasStreetMatch && !result.getStreet().matches( ".*"+address.getStreet() );
+
+			if ( zip || city || street ) it.remove();
+		}
+
+		return filtered;
 	}
 
 	private static class CsvParser implements Iterator<Address> {
