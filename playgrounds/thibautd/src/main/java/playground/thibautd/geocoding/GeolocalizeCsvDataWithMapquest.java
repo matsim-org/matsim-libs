@@ -27,6 +27,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
@@ -44,8 +47,10 @@ public class GeolocalizeCsvDataWithMapquest {
 	public static final String CITY = "municipality";
 	public static final String COUNTRY = "country";
 	public static final String STATUS = "geoloc_status";
-	public static final String LONG = "longitude";
-	public static final String LAT = "latitude";
+	public static final String LONG = "longitude_wgs84";
+	public static final String LAT = "latitude_wgs84";
+	public static final String X = "easting_CH03";
+	public static final String Y = "northing_CH03";
 	public static final String QUALITY = "geocode_quality";
 	public static final String QUALITY_CODE = "geocode_quality_code";
 	public static final String MAPQUEST_STREET = "mapquest_street";
@@ -123,6 +128,8 @@ public class GeolocalizeCsvDataWithMapquest {
 					STATUS,
 					LONG,
 					LAT,
+					X,
+					Y,
 					QUALITY,
 					QUALITY_CODE,
 					MAPQUEST_STREET,
@@ -158,7 +165,7 @@ public class GeolocalizeCsvDataWithMapquest {
 				final MapquestResult.Result result,
 				final Status rejectCause ) {
 			// Why do I always have to go so dirty when writing files?
-			final String[] fields = new String[ 16 ];
+			final String[] fields = new String[ 18 ];
 
 			for ( int i = 0; i < fields.length; i++ ) fields[ i ] = "";
 
@@ -178,13 +185,18 @@ public class GeolocalizeCsvDataWithMapquest {
 			if ( result != null ) {
 				fields[ 7 ] = result.getLongitude().toString();
 				fields[ 8 ] = result.getLatitude().toString();
-				fields[ 9 ] = result.getGeocodeQuality().toString();
-				fields[ 10 ] = result.getGeocodeQualityCode();
-				fields[ 11 ] = result.getStreet();
-				fields[ 12 ] = result.getZip();
-				fields[ 13 ] = result.getCity();
-				fields[ 14 ] = result.getCountry();
-				fields[ 15 ] = status.toString();
+
+				final Coord wgsCoord = new CoordImpl( result.getLongitude() , result.getLatitude() );
+				final Coord chCoord = new WGS84toCH1903LV03().transform( wgsCoord );
+				fields[ 9 ] = ""+chCoord.getX();
+				fields[ 10 ] = ""+chCoord.getY();
+				fields[ 11 ] = result.getGeocodeQuality().toString();
+				fields[ 12 ] = result.getGeocodeQualityCode();
+				fields[ 13 ] = result.getStreet();
+				fields[ 14 ] = result.getZip();
+				fields[ 15 ] = result.getCity();
+				fields[ 16 ] = result.getCountry();
+				fields[ 17 ] = status.toString();
 			}
 
 			final String line =
