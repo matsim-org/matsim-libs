@@ -62,56 +62,24 @@ public class RunNewInternalizationMunich {
 
 
 	public static void main(String[] args) {
-//				configFile = "../../detailedEval/internalization/munich1pct/input/config_munich_1pct.xml";
-//				emissionCostFactor = "1.0";
-//				emissionEfficiencyFactor = "1.0";
-//				considerCO2Costs = "true";
+		configFile = args[0];
+		emissionCostFactor = args[1];
+		emissionEfficiencyFactor = args[2];
+		considerCO2Costs = args[3];
 
-//		configFile = args[0];
-//		emissionCostFactor = args[1];
-//		emissionEfficiencyFactor = args[2];
-//		considerCO2Costs = args[3];
-
-		configFile = "../../detailedEval/internalization/test/testConfig.xml";
-		emissionCostFactor = "1.0";
-		emissionEfficiencyFactor = "1.0";
-		considerCO2Costs = "true";
+//		configFile = "../../detailedEval/internalization/test/testConfig.xml";
+//		emissionCostFactor = "1.0";
+//		emissionEfficiencyFactor = "1.0";
+//		considerCO2Costs = "true";
 		
 		Config config = ConfigUtils.createConfig();
-		config.addCoreModules();
+		config.addCoreModules(); // TODO remove?
 		MatsimConfigReader confReader = new MatsimConfigReader(config);
 		confReader.readFile(configFile);
 
 		Controler controler = new Controler(config);
 		Scenario scenario = controler.getScenario();
 		scenario = ScenarioUtils.loadScenario(config); // TODO remove?
-		
-		// planCalcScoreConfigGroup
-		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
-		Set<String> activities = new HashSet<String>();
-		activities.add("unknown");
-		activities.add("work");
-		activities.add("pickup");
-		activities.add("with adult");
-		activities.add("other");
-		activities.add("pvWork");
-		activities.add("pvHome");
-		activities.add("gvHome");
-		activities.add("education");
-		activities.add("business");
-		activities.add("shopping");
-		activities.add("private");
-		activities.add("leisure");
-		activities.add("sports");
-		activities.add("home");
-		activities.add("friends");
-		
-		for(String activity : activities){
-			ActivityParams params = new ActivityParams(activity);
-			params.setTypicalDuration(30 * 3600);
-			pcs.addActivityParams(params);
-		}
-		
 
 		EmissionModule emissionModule = new EmissionModule(scenario);
 		emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
