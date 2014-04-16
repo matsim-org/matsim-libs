@@ -34,15 +34,20 @@ import org.opengis.feature.simple.SimpleFeature;
  */
 public class RunMunich {
 	
-	static String configFile = "../../runs-svn/detEval/test/input/config.xml";
+	static String configFile;
 	static String zone30Path = "../../detailedEval/policies/mobilTUM/";
 	static String zone30Shape = zone30Path + "zone30.shp";
 	static String zone30Links = zone30Path + "zone30Links.shp";
-	static boolean considerZone30 = true;
+	static boolean considerZone30;
 	static Collection<SimpleFeature> featuresInZone30;
 	
 
 	public static void main(String[] args) {
+//		configFile = "../../runs-svn/detEval/test/input/config.xml";
+//		considerZone30 = "true";
+		configFile = args[0];
+		considerZone30 = Boolean.parseBoolean(args[1]);
+		
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
 		Controler controler = new Controler(scenario);
 
