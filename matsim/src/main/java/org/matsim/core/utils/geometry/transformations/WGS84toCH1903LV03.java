@@ -25,7 +25,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 /**
- * Transforms coordinates from the Swiss-Grid coordinate system to WGS84.
+ * Transforms coordinates from WGS84 to the Swiss-Grid coordinate system.
  * 
  * @author meisterk
  * @author mrieser
