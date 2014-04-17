@@ -81,7 +81,7 @@ public class ExtractActivityDensitiesForCapeTown {
 		MultiPolygon area = msr.readMultiPolygon();
 		
 		/* Convert shapefile to hexagonal grid shapes. */
-		GeneralGrid gg = new GeneralGrid(500, 2);
+		GeneralGrid gg = new GeneralGrid(zoneWidth, 2);
 		gg.generateGrid(area);
 		gg.writeGrid(outputFolder);
 		QuadTree<Tuple<String, Point>> grid = gg.getGrid();
