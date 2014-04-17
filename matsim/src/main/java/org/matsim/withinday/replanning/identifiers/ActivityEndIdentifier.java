@@ -20,7 +20,6 @@
 
 package org.matsim.withinday.replanning.identifiers;
 
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -46,9 +45,9 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier {
 	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
 
-		for (Entry<Id, MobsimAgent> entry : this.activityReplanningMap.getActivityEndingAgents(time).entrySet()) {
-			Id agentId = entry.getKey();
-			if (this.applyFilters(agentId, time)) agentsToReplan.add(entry.getValue());
+		for (MobsimAgent mobsimAgent : this.activityReplanningMap.getActivityEndingAgents(time)) {
+			Id agentId = mobsimAgent.getId();
+			if (this.applyFilters(agentId, time)) agentsToReplan.add(mobsimAgent);
 		}
 			
 		/*

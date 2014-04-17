@@ -50,6 +50,45 @@ import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 
 public class ActivityReplanningMapTest extends MatsimTestCase {
 
+	public void testGetTimeBin() {
+		ActivityReplanningMap arp = new ActivityReplanningMap(null);
+		
+		// test default setting with start time = 0.0 and time step size = 1.0
+		arp.simStartTime = 0.0;
+		arp.timeStepSize = 1.0;
+		assertEquals(0, arp.getTimeBin(0.0));
+		assertEquals(1, arp.getTimeBin(0.9));
+		assertEquals(1, arp.getTimeBin(1.0));
+		
+		// test default setting with start time = 0.5 and time step size = 1.0
+		arp.simStartTime = 0.5;
+		arp.timeStepSize = 1.0;
+		assertEquals(0, arp.getTimeBin(0.0));
+		assertEquals(0, arp.getTimeBin(0.4));
+		assertEquals(0, arp.getTimeBin(0.5));
+		assertEquals(1, arp.getTimeBin(0.9));
+		assertEquals(1, arp.getTimeBin(1.0));
+		assertEquals(1, arp.getTimeBin(1.5));
+		assertEquals(2, arp.getTimeBin(1.6));
+		
+		// test setting with start time = 10.0 and time step size = 1.0
+		arp.simStartTime = 10.0;
+		arp.timeStepSize =  1.0;
+		assertEquals(0, arp.getTimeBin(0.0));
+		assertEquals(0, arp.getTimeBin(10.0));
+		assertEquals(1, arp.getTimeBin(10.9));
+		assertEquals(1, arp.getTimeBin(11.0));
+		
+		// test setting with start time = 10.0 and time step size = 2.0
+		arp.simStartTime = 10.0;
+		arp.timeStepSize =  2.0;
+		assertEquals(0, arp.getTimeBin(0.0));
+		assertEquals(1, arp.getTimeBin(11.0));
+		assertEquals(1, arp.getTimeBin(11.9));
+		assertEquals(1, arp.getTimeBin(12.0));
+		assertEquals(2, arp.getTimeBin(12.1));
+	}
+	
 	/**
 	 * @author cdobler
 	 */
@@ -61,6 +100,8 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		qSimConfig.setNumberOfThreads(2);
 		config.controler().setMobsim("qsim");
 		config.controler().setLastIteration(0);
+		config.qsim().setStartTime(0.0);
+		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
 
 		Controler controler = new Controler(config);
 		WithinDayEngine withinDayEngine = new WithinDayEngine(controler.getEvents());
