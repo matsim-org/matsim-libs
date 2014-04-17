@@ -62,6 +62,7 @@ public class ResponsibilityGridTools {
 			// calculate factor for each link for current time bin
 			for(Id linkId: links2xCells.keySet()){
 				if (links2yCells.containsKey(linkId)) { // only if in research are
+					
 					Double relativeFactorForCurrentLink = getRelativeFactorForCurrentLink(
 							averageOfCurrentTimeBin, currentDurations, linkId);
 					timebin2link2factor.get(timeBin).put(linkId,relativeFactorForCurrentLink); 
@@ -74,14 +75,15 @@ public class ResponsibilityGridTools {
 		
 		Double relevantDuration = new Double(0.0);
 		if(links2xCells.get(linkId)!=null && links2yCells.get(linkId)!=null){
-		Cell cellOfLink = new Cell(links2xCells.get(linkId), links2yCells.get(linkId));
-		
+		Cell cellOfLink = new Cell(links2xCells.get(linkId), links2yCells.get(linkId));		
 		for(int distance =0; distance <= 3; distance++){
 			List<Cell> distancedCells = cellOfLink .getCellsWithExactDistance(noOfXCells, noOfYCells, distance);
 			for(Cell dc: distancedCells){
+				
 				try {
 						if (currentDurations[dc.getX()][dc.getY()]!=null) {
 							Double valueOfdc = currentDurations[dc.getX()][dc.getY()];
+							//System.out.println("distanced cell: " + dc.toString() + "with duration amount " + valueOfdc);
 							switch (distance) {
 							case 0:
 								relevantDuration += dist0factor * valueOfdc; 
@@ -101,6 +103,14 @@ public class ResponsibilityGridTools {
 				} catch (ArrayIndexOutOfBoundsException e) {
 					// nothing to do not in research area
 				}
+			}
+		}
+		if(!linkId.toString().contains("_p")){
+			if(relevantDuration>1.){
+			System.out.println("average of time bin is " + averageOfCurrentTimeBin);
+			System.out.println("calculating relative factor for link " + linkId.toString() + " in cell " + cellOfLink.toString());
+			System.out.println("relevant duration for this link " + relevantDuration 
+					+ " resulting factor " + (relevantDuration/averageOfCurrentTimeBin));
 			}
 		}
 		return relevantDuration / averageOfCurrentTimeBin;	

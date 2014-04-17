@@ -50,6 +50,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.julia.distribution.GridTools;
@@ -102,6 +103,10 @@ public class TestEmissionPricing {
 
 	private static int noOfTimeBins = 24;
 	
+	private static int numberOfIterations = 30;
+
+	private static double epsilon = MatsimTestUtils.EPSILON * MatsimTestUtils.EPSILON;
+	
 	public static void main(String[] args) {
 		
 		logger = Logger.getLogger(TestEmissionPricing.class);
@@ -120,7 +125,7 @@ public class TestEmissionPricing {
 		ControlerConfigGroup ccg = controler.getConfig().controler();
 		ccg.setOutputDirectory(outputPath);
 		ccg.setFirstIteration(0);
-		ccg.setLastIteration(11);
+		ccg.setLastIteration(numberOfIterations);
 		ccg.setMobsim("qsim");
 		Set set = new HashSet();
 		set.add(EventsFileFormat.xml);
@@ -174,7 +179,7 @@ public class TestEmissionPricing {
 	// strategy
 		StrategyConfigGroup scg = controler.getConfig().strategy();
 		StrategySettings strategySettings = new StrategySettings(new IdImpl("1"));
-		strategySettings.setModuleName("ChangeExpBeta");
+		strategySettings.setModuleName("BestScore");
 		strategySettings.setProbability(0.01);
 		scg.addStrategySettings(strategySettings);
 		StrategySettings strategySettingsR = new StrategySettings(new IdImpl("2"));
@@ -252,26 +257,29 @@ public class TestEmissionPricing {
 		}
 		
 		// check not selected plans - score should be worse if link 39 is used
-		boolean plan9ex=false;
+		
 		for(Plan p: activeAgent.getPlans()){			
-			if(p.isSelected()==false){
-				logger.info("This plan is not selected. It's score is " + p.getScore());
 				for(PlanElement pe: p.getPlanElements()){
 					if(pe instanceof Leg){
 						Leg leg = (Leg)pe;
 						LinkNetworkRouteImpl lnri = (LinkNetworkRouteImpl) leg.getRoute();
 						if(lnri.getLinkIds().contains(new IdImpl("39"))){
-							plan9ex = true;
-							if(scoreOfSelectedPlan<p.getScore()){
-								logger.info("A plan with a route via node 9 should have a worse score.");
-							}
+							logger.info("This plan uses node 9 and has score " + p.getScore()+ ". Selected = " + p.isSelected());
+						}
+						if(lnri.getLinkIds().contains(new IdImpl("38"))){
+							logger.info("This plan uses node 8 and has score " + p.getScore() + ". Selected = " + p.isSelected());
 						}
 					}
 				}
-			}
+			
 		}
-		if(!plan9ex)logger.info("Something with rerouting went wrong. There is no alternative route via node 9.");
 		
+		
+//		// check links
+//		for(Id linkId: scenario.getNetwork().getLinks().keySet()){
+//			logger.info("link id " + linkId.toString() + " cell " + links2xCells.get(linkId) + " , " + links2yCells.get(linkId));
+//		}
+//		logger.info("epsilon"+epsilon);
 	}
 	
 	private static void createNetwork(Scenario scenario) {
@@ -282,10 +290,12 @@ public class TestEmissionPricing {
 		Node node3 = network.createAndAddNode(scenario.createId("3"), scenario.createCoord(4500.0, 10000.0));
 		Node node4 = network.createAndAddNode(scenario.createId("4"), scenario.createCoord(17500.0, 10000.0));
 		Node node5 = network.createAndAddNode(scenario.createId("5"), scenario.createCoord(19999.0, 10000.0));
-		Node node6 = network.createAndAddNode(scenario.createId("6"), scenario.createCoord(19999.0, 1500.0));
-		Node node7 = network.createAndAddNode(scenario.createId("7"), scenario.createCoord(1.0, 1500.0));
+		Node node6 = network.createAndAddNode(scenario.createId("6"), scenario.createCoord(19999.0, 1.0));
+		Node node7 = network.createAndAddNode(scenario.createId("7"), scenario.createCoord(1.0, 1.0));
 		Node node8 = network.createAndAddNode(scenario.createId("8"), scenario.createCoord(12500.0,  12499.0));
 		Node node9 = network.createAndAddNode(scenario.createId("9"), scenario.createCoord(12500.0, 7500.0));
+		Node homeNode = network.createAndAddNode(scenario.createId("homeNode"), scenario.createCoord(1.0, 2.0));
+		Node workNode = network.createAndAddNode(scenario.createId("workNode"), scenario.createCoord(19999.0, 2.0));
 
 
 		network.createAndAddLink(scenario.createId("12"), node1, node2, 1000, 30.00, 3600, 1, null, "22");
@@ -296,18 +306,23 @@ public class TestEmissionPricing {
 		network.createAndAddLink(scenario.createId("71"), node7, node1, 1000, 30.00, 3600, 1, null, "22");
 		
 		// two similar path from node 3 to node 4 - north: route via node 8, south: route via node 9
-		network.createAndAddLink(scenario.createId("38"), node3, node8, 5000, 30.00, 3600, 1, null, "22");
-		network.createAndAddLink(scenario.createId("39"), node3, node9, 5000, 30.00, 3600, 1, null, "22");
+		network.createAndAddLink(scenario.createId("38"), node3, node8, 5150, 30.00, 3600, 1, null, "22");
+		network.createAndAddLink(scenario.createId("39"), node3, node9, 5000, 30.00, 3600, 1, null, "22"); // 34.50km/h => nearly same score
 		network.createAndAddLink(scenario.createId("84"), node8, node4, 5000, 30.00, 3600, 1, null, "22");
 		network.createAndAddLink(scenario.createId("94"), node9, node4, 5000, 30.00, 3600, 1, null, "22");
 		
+		// two small links for work and home
+		network.createAndAddLink(scenario.createId("home7"), homeNode, node7, epsilon , 30.00, 3600, 1, null, "22");
+		network.createAndAddLink(scenario.createId("7home"), node7, homeNode, epsilon, 30.00, 3600, 1, null, "22");
+		network.createAndAddLink(scenario.createId("work6"), workNode, node6, epsilon, 30.00, 3600, 1, null, "22");
+		network.createAndAddLink(scenario.createId("6work"), node6, workNode, epsilon, 30.00, 3600, 1, null, "22");
 		
-		for(Integer i=0; i<9; i++){ // x
+		for(Integer i=0; i<5; i++){ // x
 			for(Integer j=0; j<4; j++){
 				String idpart = i.toString()+j.toString();
 
-				double xCoord = 8500. + i*1000;
-				double yCoord = 6000. + j*1000;
+				double xCoord = 9250. + i*1250;
+				double yCoord = 5200. + j*1041;
 				
 				// add a link for each person
 				Node nodeA = network.createAndAddNode(scenario.createId("node_"+idpart+"A"), scenario.createCoord(xCoord, yCoord));
@@ -321,15 +336,15 @@ public class TestEmissionPricing {
 	private static void createPassiveAgents(Scenario scenario) {
 		PopulationFactoryImpl pFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		// passive agents' home coordinates are around node 9 (12500, 7500)
-		for(Integer i=0; i<9; i++){ // x
+		for(Integer i=0; i<5; i++){ // x
 			for(Integer j=0; j<4; j++){
 				
 				String idpart = i.toString()+j.toString();
 				
 				Person person = pFactory.createPerson(scenario.createId("passive_"+idpart)); //new PersonImpl (new IdImpl(i));
 
-				double xCoord = 8500. + i*1000;
-				double yCoord = 6000. + j*1000;
+				double xCoord = 9250. + i*1250;
+				double yCoord = 5200. + j*1041;
 				Plan plan = pFactory.createPlan(); //person.createAndAddPlan(true);
 				
 				Coord coord = new CoordImpl(xCoord, yCoord);
@@ -353,15 +368,15 @@ public class TestEmissionPricing {
 		Person person = pFactory.createPerson(scenario.createId("567417.1#12424"));
 		Plan plan = pFactory.createPlan();
 
-		Activity home = pFactory.createActivityFromLinkId("home", scenario.createId("12"));
-		home.setEndTime(6 * 3600);
+	Activity home = pFactory.createActivityFromLinkId("home", scenario.createId("home7"));
+		home.setEndTime(6 * 3600 + 10);
 		plan.addActivity(home);
 
 		Leg leg1 = pFactory.createLeg(TransportMode.car);
 		plan.addLeg(leg1);
 
-		Activity work = pFactory.createActivityFromLinkId("work", scenario.createId("45"));
-		work.setEndTime(home.getEndTime() + 600 + 8 * 3600);
+		Activity work = pFactory.createActivityFromLinkId("work", scenario.createId("6work"));
+		work.setEndTime(16 * 3600 + 10);
 		plan.addActivity(work);
 
 		Leg leg2 = pFactory.createLeg(TransportMode.car);
