@@ -49,6 +49,7 @@ import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 import playground.southafrica.freight.digicore.io.DigicoreVehicleReader;
+import playground.southafrica.freight.digicore.io.DigicoreVehicleReader_v1;
 import playground.southafrica.freight.digicore.utils.DigicoreUtils;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
@@ -89,9 +90,9 @@ public class ExtractActivityDensitiesForCapeTown {
 		for(File f : vehicleFiles){
 			Id id = new IdImpl(f.getName().substring(0, f.getName().indexOf(".")));
 			/* Read the vehicle file. */
-			DigicoreVehicle vehicle = new DigicoreVehicle(id);
-			DigicoreVehicleReader dvr = new DigicoreVehicleReader(vehicle);
+			DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
 			dvr.parse(f.getAbsolutePath());
+			DigicoreVehicle vehicle = dvr.getVehicle();
 
 			/* Process the activities. */
 			for(DigicoreChain chain : vehicle.getChains()){
@@ -159,11 +160,12 @@ public class ExtractActivityDensitiesForCapeTown {
 	private static void writeCountsToFile(String filename, Map<String, Integer> map){
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
 		try{
-			bw.write("Id,Count");
+			bw.write("From,To,Count");
 			bw.newLine();
 			
 			for(String s : map.keySet()){
-				bw.write(String.format("%s,%d\n", s, map.get(s) ));
+				String[] sa = s.split("_");
+				bw.write(String.format("%s,%s,%d\n", sa[0], sa[1], map.get(s) ));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
