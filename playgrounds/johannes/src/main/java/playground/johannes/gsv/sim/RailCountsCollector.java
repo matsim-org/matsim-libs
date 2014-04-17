@@ -22,6 +22,7 @@
  */
 package playground.johannes.gsv.sim;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -31,6 +32,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 
 import playground.johannes.gsv.analysis.RailCounts;
+import playground.johannes.gsv.analysis.TransitLineAttributes;
 
 /**
  * @author johannes
@@ -44,13 +46,19 @@ public class RailCountsCollector implements TransitBoardEventHandler,
 	private Map<Id, TransitLine> currentLines;
 	
 	private RailCounts railCounts;
+
+	private TransitLineAttributes lineAttribues;
 	
+	public RailCountsCollector(TransitLineAttributes lineAttribs) {
+		this.lineAttribues = lineAttribs;
+	}
 	/* (non-Javadoc)
 	 * @see org.matsim.core.events.handler.EventHandler#reset(int)
 	 */
 	@Override
 	public void reset(int iteration) {
-		railCounts = new RailCounts(null);
+		railCounts = new RailCounts(lineAttribues);
+		currentLines = new HashMap<Id, TransitLine>();
 	}
 
 	/* (non-Javadoc)
@@ -58,7 +66,7 @@ public class RailCountsCollector implements TransitBoardEventHandler,
 	 */
 	@Override
 	public void handleEvent(TransitAlightEvent event) {
-		if(currentLines.remove(event.getPersonId()) != null) {
+		if(currentLines.remove(event.getPersonId()) == null) {
 			logger.warn(String.format("Person %s alights line %s without ever boarding it.", event.getPersonId(), event.getLine()));
 		}
 
@@ -88,6 +96,10 @@ public class RailCountsCollector implements TransitBoardEventHandler,
 			logger.warn(String.format("Person %s boards line %s without ever alighting previous line.", personId, event.getLine().getId().toString()));
 		}
 
+	}
+	
+	public RailCounts getRailCounts() {
+		return railCounts;
 	}
 
 }

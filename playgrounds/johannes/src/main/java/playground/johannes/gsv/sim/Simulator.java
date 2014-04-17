@@ -22,17 +22,11 @@
  */
 package playground.johannes.gsv.sim;
 
-import gnu.trove.TObjectDoubleHashMap;
-
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
-import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -55,12 +49,11 @@ import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.analysis.TripDistanceTask;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
-import playground.johannes.gsv.analysis.KMLCountsDiffPlot;
+import playground.johannes.gsv.analysis.KMLRailCountsWriter;
+import playground.johannes.gsv.analysis.ModeShareTask;
 import playground.johannes.gsv.analysis.PKmAnalyzer;
+import playground.johannes.gsv.analysis.RailCounts;
 import playground.johannes.gsv.analysis.TransitLineAttributes;
-import playground.johannes.gsv.visum.LineRouteCountsHandler;
-import playground.johannes.gsv.visum.NetFileReader;
-import playground.johannes.gsv.visum.NetFileReader.TableHandler;
 
 /**
  * @author johannes
@@ -81,10 +74,12 @@ public class Simulator {
 		
 		TrajectoryAnalyzerTaskComposite task = new TrajectoryAnalyzerTaskComposite();
 		task.addTask(new TripDistanceTask(controler.getFacilities()));
+		task.addTask(new ModeShareTask());
 		
-		
+		TransitLineAttributes attribs = TransitLineAttributes.createFromFile(controler.getConfig().getParam("gsv", "transitLineAttributes"));
 		
 		AnalyzerListiner listener = new AnalyzerListiner();
+		listener.lineAttribs = attribs;
 //		listener.builder = builder;
 		listener.task = task;
 		listener.controler = controler;
@@ -92,7 +87,7 @@ public class Simulator {
 		controler.addControlerListener(listener);
 		
 //		PKmAnalyzer pkm = new PKmAnalyzer(TransitLineAttributes.createFromFile("/home/johannes/gsv/matsim/studies/netz2030/data/transitLineAttributes.xml"));
-		PKmAnalyzer pkm = new PKmAnalyzer(TransitLineAttributes.createFromFile(controler.getConfig().getParam("gsv", "transitLineAttributes")));
+		PKmAnalyzer pkm = new PKmAnalyzer(attribs);
 		controler.addControlerListener(pkm);
 		controler.run();
 		
@@ -125,9 +120,17 @@ public class Simulator {
 		
 		private TrajectoryEventsBuilder builder;
 		
-		private VolumesAnalyzer volAnalyzer;
+//		private RailCounts simCounts;
 		
-		private TObjectDoubleHashMap<Link> counts;
+		private RailCountsCollector countsCollector;
+		
+		private TransitLineAttributes lineAttribs;
+		
+		private RailCounts obsCounts;
+		
+//		private VolumesAnalyzer volAnalyzer;
+		
+//		private TObjectDoubleHashMap<Link> counts;
 		
 		/* (non-Javadoc)
 		 * @see org.matsim.core.controler.listener.IterationEndsListener#notifyIterationEnds(org.matsim.core.controler.events.IterationEndsEvent)
@@ -137,9 +140,13 @@ public class Simulator {
 			try {
 				TrajectoryAnalyzer.analyze(builder.trajectories(), task, controler.getControlerIO().getIterationPath(event.getIteration()));
 				
-				KMLCountsDiffPlot kmlplot = new KMLCountsDiffPlot();
+//				KMLCountsDiffPlot kmlplot = new KMLCountsDiffPlot();
+				KMLRailCountsWriter railCountsWriter = new KMLRailCountsWriter();
 				String file = controler.getControlerIO().getIterationPath(event.getIteration()) + "/counts.kmz";
-				kmlplot.write(volAnalyzer, counts, 1.0, file, controler.getNetwork());
+//				kmlplot.write(volAnalyzer, counts, 1.0, file, controler.getNetwork());
+				RailCounts simCounts = countsCollector.getRailCounts();
+				
+				railCountsWriter.write(simCounts, obsCounts, event.getControler().getNetwork(), event.getControler().getScenario().getTransitSchedule(), lineAttribs, file, 5);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -166,24 +173,29 @@ public class Simulator {
 			builder = new TrajectoryEventsBuilder(person);
 			controler.getEvents().addHandler(builder);
 			
-			volAnalyzer = new VolumesAnalyzer(Integer.MAX_VALUE, Integer.MAX_VALUE, controler.getNetwork());
-			controler.getEvents().addHandler(volAnalyzer);
+			countsCollector = new RailCountsCollector(lineAttribs);
+			controler.getEvents().addHandler(countsCollector);
+//			volAnalyzer = new VolumesAnalyzer(Integer.MAX_VALUE, Integer.MAX_VALUE, controler.getNetwork());
+//			controler.getEvents().addHandler(volAnalyzer);
 			
-			Map<String, TableHandler> tableHandlers = new HashMap<String, NetFileReader.TableHandler>();
-			LineRouteCountsHandler countsHandler = new LineRouteCountsHandler(controler.getNetwork());
-			tableHandlers.put("LINIENROUTENELEMENT", countsHandler);
-			NetFileReader netReader = new NetFileReader(tableHandlers);
-			NetFileReader.FIELD_SEPARATOR = "\t";
+			String file = event.getControler().getConfig().getParam("gsv", "counts");
+			obsCounts = RailCounts.createFromFile(file, lineAttribs, event.getControler().getNetwork(), event.getControler().getScenario().getTransitSchedule());
 			
-			try {
-				netReader.read(event.getControler().getConfig().getParam("gsv", "counts"));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			counts = countsHandler.getCounts();
-			
-			NetFileReader.FIELD_SEPARATOR = ";";
+//			Map<String, TableHandler> tableHandlers = new HashMap<String, NetFileReader.TableHandler>();
+//			LineRouteCountsHandler countsHandler = new LineRouteCountsHandler(controler.getNetwork());
+//			tableHandlers.put("LINIENROUTENELEMENT", countsHandler);
+//			NetFileReader netReader = new NetFileReader(tableHandlers);
+//			NetFileReader.FIELD_SEPARATOR = "\t";
+//			
+//			try {
+//				netReader.read(event.getControler().getConfig().getParam("gsv", "counts"));
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+////			counts = countsHandler.getCounts();
+//			
+//			NetFileReader.FIELD_SEPARATOR = ";";
 		}
 		
 	}

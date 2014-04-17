@@ -108,7 +108,7 @@ public class PKmCalculator implements TransitAlightEventHandler, TransitBoardEve
 		
 		Object[] keys = distances.keys();
 		for(Object key : keys) {
-			double val = distances.get((String) key) * persons.get((String) key);
+			double val = distances.get((String) key);// * persons.get((String) key);
 			stats.put((String) key, val);
 		}
 		
@@ -141,13 +141,19 @@ public class PKmCalculator implements TransitAlightEventHandler, TransitBoardEve
 			throw new RuntimeException("Access stop not found in transit route.");
 		
 		double length = 0;
+		boolean found = false;
 		for(int i = startIdx; i < ids.size(); i++) {
 			Link link = network.getLinks().get(ids.get(i));
 			length += link.getLength();
 			
 			if(link.getToNode().equals(egressNode)) {
+				found = true;
 				break;
 			}
+		}
+		
+		if(!found) {
+			throw new RuntimeException("Ergress node not found in transit route.");
 		}
 		
 		return length;

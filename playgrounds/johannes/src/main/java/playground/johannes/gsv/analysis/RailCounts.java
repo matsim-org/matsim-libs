@@ -27,9 +27,11 @@ import gnu.trove.TObjectDoubleHashMap;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -114,13 +116,23 @@ public class RailCounts {
 		}
 	}
 	
+	public Id[] lines(Id linkId) {
+		RailCountsContainer container = countsMap.get(linkId);
+		if(container == null) {
+			return null;
+		} else {
+			return container.lines();
+		}
+	}
+	
 	public void writeToFile(String file) throws IOException {
 		new RailCountsXMLWriter().write(this, file);
 	}
 	
-	public RailCounts createFromFile(String file, TransitLineAttributes attribs, Network network, TransitSchedule schedule) {
+	public static RailCounts createFromFile(String file, TransitLineAttributes attribs, Network network, TransitSchedule schedule) {
 		RailCounts counts = new RailCounts(attribs);
 		RailCountsXMLParser parser = new RailCountsXMLParser(counts, network, schedule);
+		parser.setValidating(false);
 		parser.parse(file);
 		
 		return counts;
@@ -200,7 +212,9 @@ public class RailCounts {
 				currentLink = network.getLinks().get(new IdImpl(atts.getValue("id")));
 			} else if(name.equalsIgnoreCase("line")) {
 				TransitLine line = schedule.getTransitLines().get(new IdImpl(atts.getValue("id")));
-				railCounts.addCounts(currentLink.getId(), line.getId(), Double.parseDouble(atts.getValue("count")));
+				if(line != null && currentLink != null) {
+					railCounts.addCounts(currentLink.getId(), line.getId(), Double.parseDouble(atts.getValue("count")));
+				}
 			}
 			
 		}

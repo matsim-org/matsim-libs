@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
@@ -45,7 +46,7 @@ import playground.johannes.gsv.demand.loader.PersonEmployedLoader;
 import playground.johannes.gsv.demand.loader.PersonGenderWrapper;
 import playground.johannes.gsv.demand.loader.PersonStopDistributionLoader;
 import playground.johannes.gsv.demand.loader.PlanDepartureTimeLoader;
-import playground.johannes.gsv.demand.loader.PlanPrimaryActivityLoader;
+import playground.johannes.gsv.demand.loader.PlanPrimaryActivityLoader2;
 import playground.johannes.gsv.demand.tasks.PlanModeCarPT;
 import playground.johannes.gsv.demand.tasks.PlanNetworkConnect;
 import playground.johannes.gsv.demand.tasks.PlanRouteLegs;
@@ -64,34 +65,35 @@ public class Generator {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-//		System.getProperties().put("http.proxyHost", "localhost");
-//		System.getProperties().put("http.proxyHost", "wwwproxy.bahn-net.db.de");
-//		System.getProperties().put("http.proxyPort", "3128");
-//		System.getProperties().put("http.proxyPort", "8080");
-//		System.getProperties().put("http.proxySet", "true");
-		
-//		System.setProperty("org.geotools.referencing.forceXY", "true");
+		Config config = ConfigUtils.createConfig();
+		new MatsimConfigReader(config).readFile(args[0]);
 		
 		Random random = new XORShiftRandom(4711);
 		String year = "2009";
-		String baseDir = args[0]; //"/home/johannes/gsv/matsim/studies/netz2030/data/raw/";
-		NutsLevel3Zones.zonesFile = baseDir + "Zonierung_Kreise_WGS84_Stand2008Attr_WGS84_region.shp";
-		NutsLevel3Zones.idMappingsFile = baseDir + "innoz/inhabitants.csv";
+
+		String baseDir = config.getParam("gsv", "rawDataDir");//[0]; //"/home/johannes/gsv/matsim/studies/netz2030/data/raw/";
+		
+		NutsLevel3Zones.zonesFile = config.getParam("gsv", "zonesFile");//baseDir + "Zonierung_Kreise_WGS84_Stand2008Attr_WGS84_region.shp";
+		NutsLevel3Zones.idMappingsFile = config.getParam("gsv", "idMappingsFile");//baseDir + "innoz/inhabitants.csv";
 		/*
 		 * create N persons
 		 */
-		int N = Integer.parseInt(args[1]); //1000;
-		Population pop = create(N);
-		
-//		Population pop = loadFromFile(args[1]);
+		Population pop = null;
+		String popFile = config.findParam("plans", "inputPlansFile");
+		if(popFile == null || popFile.equalsIgnoreCase("null")) { // returns "null"???
+			int N = Integer.parseInt(config.getParam("gsv", "numPersons"));
+			pop = create(N);
+		} else { 
+			pop = loadFromFile(popFile);
+		}
 		/*
 		 * 
 		 */
-		String netFile = baseDir + "network.gk3.xml";
-		String roadNetFile = baseDir + "network.road.gk3.xml";
-		String scheduleFile =  baseDir + "transitSchedule.routed.gk3.xml";
+		String netFile = config.getParam("network", "inputNetworkFile");//baseDir + "network.gk3.xml";
+		String roadNetFile = config.getParam("gsv", "roadNetworkFile");//baseDir + "network.road.gk3.xml";
+		String scheduleFile =  config.getParam("transit", "transitScheduleFile");//baseDir + "transitSchedule.routed.gk3.xml";
 //		String scheduleFile =  baseDir + "transitSchedule.longdist.linked.xml";
-		Config config = ConfigUtils.createConfig();
+		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		config.scenario().setUseTransit(true);
 		
@@ -105,21 +107,24 @@ public class Generator {
 		 */
 		PopulationTaskComposite tasks = new PopulationTaskComposite();
 //		tasks.addComponent(new PersonEqualZoneDistribuionWrapper(baseDir + "innoz/inhabitants.csv" , "Einw_g_" + year, random));
-		tasks.addComponent(new PersonStopDistributionLoader(baseDir + "innoz/inhabitants.csv" , "Einw_g_" + year, scenario, random));
-		tasks.addComponent(new PersonGenderWrapper(baseDir + "innoz/inhabitants.csv", "Einw_m_" + year, "Einw_w_" + year, random));
-		tasks.addComponent(new PersonAgeWrapper(baseDir+"innoz/", "Einw_g_" + year, random));
-		tasks.addComponent(new PersonEmployedLoader(baseDir + "innoz/employees.csv", "EWTAO_" + year, baseDir + "innoz/inhabitants.csv" , "Einw_g_" + year, random));
-		tasks.addComponent(new PersonCarAvailabilityLoader(baseDir + "mid/caravailability.age.txt", random));
-		tasks.addComponent(new PlanPrimaryActivityLoader(baseDir + "StrukturAttraktivitaet2010.csv", "A2010", scenario, random));
-		tasks.addComponent(new PlanDepartureTimeLoader(baseDir + "Ganglinien_Standardtag.csv", random));
-		tasks.addComponent(new PlanModeCarPT(0.0, random));
-		tasks.addComponent(new PlanTransformCoord(CRSUtils.getCRS(4326), CRSUtils.getCRS(31467)));
-		tasks.addComponent(new PlanNetworkConnect(roadNetFile));
+//		tasks.addComponent(new PersonStopDistributionLoader(baseDir + "innoz/inhabitants.csv" , "Einw_g_" + year, scenario, random));
+//		tasks.addComponent(new PersonGenderWrapper(baseDir + "innoz/inhabitants.csv", "Einw_m_" + year, "Einw_w_" + year, random));
+//		tasks.addComponent(new PersonAgeWrapper(baseDir+"innoz/", "Einw_g_" + year, random));
+//		tasks.addComponent(new PersonEmployedLoader(baseDir + "innoz/employees.csv", "EWTAO_" + year, baseDir + "innoz/inhabitants.csv" , "Einw_g_" + year, random));
+//		tasks.addComponent(new PersonCarAvailabilityLoader(baseDir + "mid/caravailability.age.txt", random));
+//		
+////		tasks.addComponent(new PlanPrimaryActivityLoader(baseDir + "StrukturAttraktivitaet2010.csv", "A2010", scenario, random));
+//		tasks.addComponent(new PlanTransformCoord(CRSUtils.getCRS(4326), CRSUtils.getCRS(31467)));
+//		tasks.addComponent(new PlanPrimaryActivityLoader2(scenario, random));
+//		tasks.addComponent(new PlanDepartureTimeLoader(baseDir + "Ganglinien_Standardtag.csv", random));
+//		tasks.addComponent(new PlanModeCarPT(0.0, random));
+//		
+//		tasks.addComponent(new PlanNetworkConnect(roadNetFile));
 		tasks.addComponent(new PlanRouteLegs(scenario));
 		tasks.apply(pop);
 		
 		PopulationWriter writer = new PopulationWriter(pop, null);
-		writer.write(baseDir + "population.xml");
+		writer.write(config.getParam("gsv", "popOutFile"));
 	}
 
 	private static Population create(int N) {
