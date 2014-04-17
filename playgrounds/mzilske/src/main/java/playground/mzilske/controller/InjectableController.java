@@ -43,6 +43,7 @@ class InjectableController extends AbstractController implements Controller {
     private Config config;
     @Inject @Named("coreControlerListeners") List<ControlerListener> coreControlerListeners;
     @Inject @Named("defaultControlerListeners") List<ControlerListener> controlerListeners;
+    @Inject Set<ControlerListener> pluginControlerListeners;
     @Inject MobsimProvider mobsimProvider;
     @Inject Controler.TerminationCriterion terminationCriterion;
     @Inject @Named("prepareForSim") Provider<Runnable> prepareForSim;
@@ -80,6 +81,9 @@ class InjectableController extends AbstractController implements Controller {
             addCoreControlerListener(controlerListener);
         }
         for (ControlerListener controlerListener : controlerListeners) {
+            addControlerListener(controlerListener);
+        }
+        for (ControlerListener controlerListener : pluginControlerListeners) {
             addControlerListener(controlerListener);
         }
     }

@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * Main.java
+ *  * CharyparNagelModule.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -22,15 +22,13 @@
 
 package playground.mzilske.controller;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import com.google.inject.AbstractModule;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
-public class Main {
-
-    public static void main(String[] args) {
-        Injector injector = Guice.createInjector(new ControllerModuleWithConfigFilename("examples/equil/config.xml"));
-        Controller controller = injector.getInstance(Controller.class);
-        controller.run();
+public class CharyparNagelModule extends AbstractModule {
+    @Override
+    protected void configure() {
+        bind(ScoringFunctionFactory.class).to(CharyparNagelScoringFunctionFactory.class);
     }
-
 }

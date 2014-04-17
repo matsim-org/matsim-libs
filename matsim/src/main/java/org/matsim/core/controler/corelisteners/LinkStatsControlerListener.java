@@ -90,7 +90,7 @@ public class LinkStatsControlerListener implements IterationEndsListener, Iterat
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		if (this.doReset) {
 			// resetting at the beginning of an iteration, to allow others to use the data until the very end of the previous iteration
-			event.getControler().getLinkStats().reset();
+			this.linkStats.reset();
 			this.doReset = false;
 		}
 	}

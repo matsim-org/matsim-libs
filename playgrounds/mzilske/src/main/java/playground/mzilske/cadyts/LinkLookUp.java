@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * Main.java
+ *  * LinkLookUp.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -19,18 +19,33 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
+package playground.mzilske.cadyts;
 
-package playground.mzilske.controller;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.cadyts.general.LookUp;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+/**
+ * @author nagel
+ *
+ */
+class LinkLookUp implements LookUp<Link>{
+	
+	private Network network;
 
-public class Main {
-
-    public static void main(String[] args) {
-        Injector injector = Guice.createInjector(new ControllerModuleWithConfigFilename("examples/equil/config.xml"));
-        Controller controller = injector.getInstance(Controller.class);
-        controller.run();
-    }
+	LinkLookUp( Scenario sc ) {
+		this.network = sc.getNetwork();
+	}
+	
+	LinkLookUp( Network net ) {
+		this.network = net ;
+	}
+	
+	@Override
+	public Link lookUp( Id id ) {
+		return this.network.getLinks().get( id ) ;
+	}
 
 }

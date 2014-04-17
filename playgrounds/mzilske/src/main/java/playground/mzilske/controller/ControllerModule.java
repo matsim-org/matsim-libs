@@ -25,6 +25,7 @@ package playground.mzilske.controller;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 import org.matsim.analysis.*;
 import org.matsim.api.core.v01.Scenario;
@@ -43,6 +44,7 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
@@ -71,25 +73,16 @@ import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class ControllerModule extends AbstractModule {
 
-    private String configFileName;
-
-    public ControllerModule(String configFileName) {
-        this.configFileName = configFileName;
-    }
-
     @Override
     protected void configure() {
-        bindConstant().annotatedWith(Names.named("configFileName")).to(configFileName);
-        bind(Config.class).toProvider(ConfigLoader.class).in(Singleton.class);
-        bind(Scenario.class).toProvider(ScenarioLoader.class).in(Singleton.class);
         bind(Controller.class).to(InjectableController.class).in(Singleton.class);
         bind(ScoreStats.class).to(ScoreStatsControlerListener.class).in(Singleton.class);
         bind(Controler.TerminationCriterion.class).to(IsLastIteration.class);
         bind(Runnable.class).annotatedWith(Names.named("prepareForSim")).to(PrepareForSim.class);
-        bind(ScoringFunctionFactory.class).to(CharyparNagelScoringFunctionFactory.class);
         bind(TripRouter.class).toProvider(TripRouterProvider.class);
         bind(TripRouterFactory.class).toProvider(TripRouterFactoryProvider.class).in(Singleton.class);
         bind(SignalsControllerListenerFactory.class).to(DefaultSignalsControllerListenerFactory.class);
@@ -97,6 +90,7 @@ public class ControllerModule extends AbstractModule {
         bind(TravelDisutilityFactory.class).to(TravelTimeAndDistanceBasedTravelDisutilityFactory.class);
         bind(StrategyManager.class).toProvider(StrategyManagerProvider.class).in(Singleton.class);
         bind(ReplanningContextFactory.class).to(ReplanningContextFactoryImpl.class);
+        MapBinder.newMapBinder(binder(), String.class, PlanStrategyFactory.class);
     }
 
     @Provides Population providePopulation(Scenario scenario) {
@@ -132,7 +126,6 @@ public class ControllerModule extends AbstractModule {
             OutputDirectoryHierarchy controlerIO,
             ScoringFunctionFactory scoringFunctionFactory,
             EventsManager events,
-            StrategyManager strategyManager,
             IterationStopWatch stopwatch,
             CalcLegTimes calcLegTimes,
             ReplanningControlerListener replanningControlerListener) {

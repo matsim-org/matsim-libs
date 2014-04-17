@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * Main.java
+ *  * ControllerModuleWithScenario.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -22,15 +22,21 @@
 
 package playground.mzilske.controller;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import com.google.inject.AbstractModule;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.scenario.ScenarioImpl;
 
-public class Main {
+public class ControllerModuleWithScenario extends AbstractModule {
+    private final Scenario scenario;
 
-    public static void main(String[] args) {
-        Injector injector = Guice.createInjector(new ControllerModuleWithConfigFilename("examples/equil/config.xml"));
-        Controller controller = injector.getInstance(Controller.class);
-        controller.run();
+    public ControllerModuleWithScenario(Scenario scenario) {
+        this.scenario = scenario;
+    }
+
+    @Override
+    protected void configure() {
+        install(new ControllerModule());
+        bind(Scenario.class).toInstance(scenario);
     }
 
 }

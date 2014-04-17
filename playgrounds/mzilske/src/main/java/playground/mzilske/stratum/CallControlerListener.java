@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * StrategyManagerProvider.java
+ *  * CallControlerListener.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,42 +20,52 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.controller;
+package playground.mzilske.stratum;
 
-import org.apache.log4j.Logger;
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.PlanStrategyFactoryRegister;
-import org.matsim.core.controler.PlanStrategyRegistrar;
-import org.matsim.core.replanning.PlanStrategyFactory;
-import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.controler.listener.StartupListener;
+import playground.mzilske.cdr.CallBehavior;
+import playground.mzilske.cdr.CompareMain;
+import playground.mzilske.cdr.ZoneTracker;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.Map;
+
+class CallControlerListener implements Provider<ControlerListener> {
+
+    static interface BeginEndListener extends StartupListener, ShutdownListener {}
 
 
-public class StrategyManagerProvider implements Provider<StrategyManager> {
-
-    private static Logger log = Logger.getLogger(StrategyManagerProvider.class);
-
-    @Inject Scenario scenario;
-    @Inject EventsManager events;
-    @Inject OutputDirectoryHierarchy controlerIO;
-    @Inject Map<String, PlanStrategyFactory> planStrategyFactories;
+    @Inject
+    Scenario scenario;
+    @javax.inject.Inject
+    EventsManager eventsManager;
+    @javax.inject.Inject
+    CallBehavior callingBehavior;
+    @javax.inject.Inject
+    ZoneTracker.LinkToZoneResolver linkToZoneResolver;
+    @Inject
+    CompareMain compareMain;
 
     @Override
-    public StrategyManager get() {
-        PlanStrategyRegistrar planStrategyFactoryRegistrar = new PlanStrategyRegistrar();
-        PlanStrategyFactoryRegister planStrategyFactoryRegister = planStrategyFactoryRegistrar.getFactoryRegister();
-        for (Map.Entry<String, PlanStrategyFactory> entry : planStrategyFactories.entrySet()) {
-            planStrategyFactoryRegister.register(entry.getKey(), entry.getValue());
-        }
-        StrategyManager manager = new StrategyManager();
-        StrategyManagerConfigLoader.load(scenario, controlerIO, events, manager, planStrategyFactoryRegister);
-        return manager;
-    }
+    public ControlerListener get() {
 
+        return new BeginEndListener() {
+
+            @Override
+            public void notifyStartup(StartupEvent event) {
+                System.out.println("Comparemain is there: "+ compareMain);
+            }
+
+            @Override
+            public void notifyShutdown(ShutdownEvent event) {
+                compareMain.close();
+            }
+        };
+    }
 }

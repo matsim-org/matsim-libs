@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * Main.java
+ *  * ExpBetaPlanChangerWithCadytsPlanRegistration.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,17 +20,42 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.controller;
+/**
+ * 
+ */
+package playground.mzilske.cadyts;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.cadyts.general.CadytsContextI;
+import org.matsim.contrib.cadyts.general.PlansTranslator;
+import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
+import org.matsim.core.replanning.selectors.PlanSelector;
 
-public class Main {
+/**
+ * @author nagel
+ *
+ */
+public final class ExpBetaPlanChangerWithCadytsPlanRegistration<T> implements PlanSelector {
 
-    public static void main(String[] args) {
-        Injector injector = Guice.createInjector(new ControllerModuleWithConfigFilename("examples/equil/config.xml"));
-        Controller controller = injector.getInstance(Controller.class);
-        controller.run();
-    }
+	private final PlanSelector delegate ;
+    private PlansTranslator<T> plansTranslator;
+    private AnalyticalCalibrator<T> calibrator;
 
+    public ExpBetaPlanChangerWithCadytsPlanRegistration(double beta, PlansTranslator<T> plansTranslator, AnalyticalCalibrator<T> calibrator) {
+        this.plansTranslator = plansTranslator;
+        this.calibrator = calibrator;
+        delegate = new ExpBetaPlanChanger(beta);
+	}
+	
+
+	@Override
+	public Plan selectPlan(HasPlansAndId<Plan> person) {
+		Plan selectedPlan = delegate.selectPlan(person) ;
+		cadyts.demand.Plan<T> cadytsPlan = plansTranslator.getPlanSteps(selectedPlan);
+		calibrator.addToDemand(cadytsPlan);
+		return selectedPlan;
+	}
+	
 }

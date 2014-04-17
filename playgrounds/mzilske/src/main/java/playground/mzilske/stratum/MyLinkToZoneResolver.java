@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * Main.java
+ *  * MyLinkToZoneResolver.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,17 +20,19 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.controller;
+package playground.mzilske.stratum;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+import playground.mzilske.cdr.ZoneTracker;
 
-public class Main {
-
-    public static void main(String[] args) {
-        Injector injector = Guice.createInjector(new ControllerModuleWithConfigFilename("examples/equil/config.xml"));
-        Controller controller = injector.getInstance(Controller.class);
-        controller.run();
+class MyLinkToZoneResolver implements ZoneTracker.LinkToZoneResolver {
+    @Override
+    public Id resolveLinkToZone(Id linkId) {
+        return linkId;
     }
 
+    public IdImpl chooseLinkInZone(String zoneId) {
+        return new IdImpl(zoneId);
+    }
 }

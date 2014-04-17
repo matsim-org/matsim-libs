@@ -56,6 +56,11 @@
             <version>3.0</version>
         </dependency>
         <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-multibindings</artifactId>
+            <version>3.0</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
             <version>1.3.7</version>
@@ -69,12 +74,6 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>roadpricing</artifactId>
-			<version>0.6.0-SNAPSHOT</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>playground</groupId>
-			<artifactId>vsp</artifactId>
 			<version>0.6.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>

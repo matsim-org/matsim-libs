@@ -22,6 +22,7 @@
 
 package playground.mzilske.util;
 
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -44,10 +45,12 @@ public class IterationSummaryFileControlerListener implements StartupListener, I
         public StreamingOutput notifyIterationEnds(IterationEndsEvent event);
     }
 
+    private OutputDirectoryHierarchy controlerIO;
     private final Map<String, Writer> writers;
     private Map<String, PrintWriter> printWriters;
 
-    public IterationSummaryFileControlerListener(Map<String, Writer> writers) {
+    public IterationSummaryFileControlerListener(OutputDirectoryHierarchy controlerIO, Map<String, Writer> writers) {
+        this.controlerIO = controlerIO;
         this.writers = writers;
     }
 
@@ -55,7 +58,7 @@ public class IterationSummaryFileControlerListener implements StartupListener, I
     public void notifyStartup(StartupEvent event) {
         this.printWriters = new HashMap<String, PrintWriter>();
         for (Map.Entry<String, Writer> entry : writers.entrySet()) {
-            PrintWriter printWriter = new PrintWriter(IOUtils.getBufferedWriter(event.getControler().getControlerIO().getOutputFilename(entry.getKey())));
+            PrintWriter printWriter = new PrintWriter(IOUtils.getBufferedWriter(controlerIO.getOutputFilename(entry.getKey())));
             printWriters.put(entry.getKey(), printWriter);
             try {
                 entry.getValue().notifyStartup(event).write(printWriter);

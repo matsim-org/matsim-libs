@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * Main.java
+ *  * ControllerModuleWithConfigFilename.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -22,15 +22,27 @@
 
 package playground.mzilske.controller;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
 
-public class Main {
+import javax.inject.Singleton;
 
-    public static void main(String[] args) {
-        Injector injector = Guice.createInjector(new ControllerModuleWithConfigFilename("examples/equil/config.xml"));
-        Controller controller = injector.getInstance(Controller.class);
-        controller.run();
+public class ControllerModuleWithConfigFilename  extends AbstractModule {
+
+    private String configFileName;
+
+    public ControllerModuleWithConfigFilename(String configFileName) {
+        this.configFileName = configFileName;
+    }
+
+    @Override
+    protected void configure() {
+        install(new ControllerModule());
+        bindConstant().annotatedWith(Names.named("configFileName")).to(configFileName);
+        bind(Config.class).toProvider(ConfigLoader.class).in(Singleton.class);
+        bind(Scenario.class).toProvider(ScenarioLoader.class).in(Singleton.class);
     }
 
 }
