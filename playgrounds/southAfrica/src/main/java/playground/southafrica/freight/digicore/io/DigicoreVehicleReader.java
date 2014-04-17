@@ -32,16 +32,21 @@ public class DigicoreVehicleReader extends MatsimXmlParser {
 	private final static String DIGICORE_VEHICLE_V1 = "digicoreVehicle_v1.dtd";
 	private final static Logger LOG = Logger.getLogger(DigicoreVehicleReader.class);
 	private MatsimXmlParser delegate = null;
-	private DigicoreVehicle vehicle;
+	private DigicoreVehicle vehicle = null;
 
 	
 	/**
 	 * Creates a new reader for Digicore vehicle files.
 	 */
-	public DigicoreVehicleReader(DigicoreVehicle digicoreVehicle) {
-		this.vehicle = digicoreVehicle;
+	public DigicoreVehicleReader() {
 	}
 	
+	/**
+	 * Rather use the delegated {@link #getVehicle()} method.
+	 * @param filename
+	 * @return
+	 */
+	@Deprecated
 	public DigicoreVehicle parseDigicoreVehicle(String filename){
 		delegate.parse(filename);
 		return this.vehicle;
@@ -72,6 +77,13 @@ public class DigicoreVehicleReader extends MatsimXmlParser {
 		}
 	}
 	
+	
+	/**
+	 * @return the parsed {@link DigicoreVehicle} from the reader.
+	 */
+	public DigicoreVehicle getVehicle(){
+		return ((DigicoreVehicleReader_v1)this.delegate).getVehicle();
+	}
 
 }
 
