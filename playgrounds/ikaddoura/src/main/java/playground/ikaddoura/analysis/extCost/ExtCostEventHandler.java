@@ -32,12 +32,16 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
@@ -53,7 +57,7 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionEventHandler;
  * @author ikaddoura , lkroeger
  *
  */
-public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriverStartsEventHandler , PersonDepartureEventHandler , LinkEnterEventHandler, PersonEntersVehicleEventHandler , PersonLeavesVehicleEventHandler , MarginalCongestionEventHandler {
+public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriverStartsEventHandler , ActivityEndEventHandler , PersonDepartureEventHandler , PersonArrivalEventHandler , LinkEnterEventHandler, PersonEntersVehicleEventHandler , PersonLeavesVehicleEventHandler , MarginalCongestionEventHandler {
 	private final static Logger log = Logger.getLogger(ExtCostEventHandler.class);
 	private final double vtts_car;
 	
@@ -95,6 +99,7 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 		personId2tripNumber2legMode.clear();
 		driverId2totalDistance.clear();
 		personId2distanceEnterValue.clear();
+		ptDrivers.clear(); // not really necessary
 	}
 
 	@Override
@@ -344,51 +349,95 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 	}
 
 	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		// A transit driver should not practice any activity,
+		// otherwise the code has to be adapted here.
+		if(ptDrivers.contains(event.getPersonId())){
+			throw new RuntimeException("ActivityEndEvent by a transit-driver! The code has to be adapted.");
+		}
+		if(event.getActType().toString().equals("pt interaction")){
+			// pt_interactions are not considered
+		} else {
+			if(personId2actualTripNumber.containsKey(event.getPersonId())){
+				// The trip which starts immediately is at least the second trip of the person
+				personId2actualTripNumber.put(event.getPersonId(), personId2actualTripNumber.get(event.getPersonId())+1);
+				Map<Integer,Double> tripNumber2departureTime = personId2tripNumber2departureTime.get(event.getPersonId());
+				tripNumber2departureTime.put(personId2actualTripNumber.get(event.getPersonId()), event.getTime());
+				personId2tripNumber2departureTime.put(event.getPersonId(), tripNumber2departureTime);
+				Map<Integer,Double> tripNumber2tripDistance = personId2tripNumber2tripDistance.get(event.getPersonId());
+				tripNumber2tripDistance.put(personId2actualTripNumber.get(event.getPersonId()), 0.0);
+				personId2tripNumber2tripDistance.put(event.getPersonId(), tripNumber2tripDistance);
+					
+				Map<Integer,Double> tripNumber2amount = personId2tripNumber2amount.get(event.getPersonId());
+				tripNumber2amount.put(personId2actualTripNumber.get(event.getPersonId()), 0.0);
+				personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
+		
+			} else {
+				// The trip which starts immediately is the first trip of the person
+				personId2actualTripNumber.put(event.getPersonId(), 1);
+				Map<Integer,Double> tripNumber2departureTime = new HashMap<Integer, Double>();
+				tripNumber2departureTime.put(1, event.getTime());
+				personId2tripNumber2departureTime.put(event.getPersonId(), tripNumber2departureTime);
+				Map<Integer,Double> tripNumber2tripDistance = new HashMap<Integer, Double>();
+				tripNumber2tripDistance.put(1, 0.0);
+				personId2tripNumber2tripDistance.put(event.getPersonId(), tripNumber2tripDistance);
+				
+				Map<Integer,Double> tripNumber2amount = new HashMap<Integer, Double>();
+				tripNumber2amount.put(1, 0.0);
+				personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
+			}
+		}	
+	}
+	
+	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		if(ptDrivers.contains(event.getPersonId())){
 			// ptDrivers are not considered
 		}else{
-			if(event.getLegMode().toString().equals("transit_walk")){
-				// pt_interactions are not considered
-			} else {
-				if(personId2actualTripNumber.containsKey(event.getPersonId())){
-					// This is at least the second trip of the person
-					personId2actualTripNumber.put(event.getPersonId(), personId2actualTripNumber.get(event.getPersonId())+1);
-					Map<Integer,Double> tripNumber2departureTime = personId2tripNumber2departureTime.get(event.getPersonId());
-					tripNumber2departureTime.put(personId2actualTripNumber.get(event.getPersonId()), event.getTime());
-					personId2tripNumber2departureTime.put(event.getPersonId(), tripNumber2departureTime);
-					Map<Integer,Double> tripNumber2tripDistance = personId2tripNumber2tripDistance.get(event.getPersonId());
-					tripNumber2tripDistance.put(personId2actualTripNumber.get(event.getPersonId()), 0.0);
-					personId2tripNumber2tripDistance.put(event.getPersonId(), tripNumber2tripDistance);
-						
-					Map<Integer,Double> tripNumber2amount = personId2tripNumber2amount.get(event.getPersonId());
-					tripNumber2amount.put(personId2actualTripNumber.get(event.getPersonId()), 0.0);
-					personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
-						
-					Map<Integer,String> tripNumber2legMode = personId2tripNumber2legMode.get(event.getPersonId());
-					tripNumber2legMode.put(personId2actualTripNumber.get(event.getPersonId()), event.getLegMode());
-					personId2tripNumber2legMode.put(event.getPersonId(), tripNumber2legMode);
-				
+			// The leg mode has to be saved here.
+			// The actual trip number has just been adapted before
+			if(personId2tripNumber2legMode.containsKey(event.getPersonId())){
+				// This is at least the second trip.
+				int tripNumber = personId2actualTripNumber.get(event.getPersonId());
+				Map<Integer,String> tripNumber2legMode = personId2tripNumber2legMode.get(event.getPersonId());
+				if(tripNumber2legMode.containsKey(tripNumber)){
+					// legMode already listed, possible for pt trips
+					if(tripNumber2legMode.get(tripNumber).toString().equals("pt")){	
+					} else{
+						throw new RuntimeException("A leg mode has already been listed.");
+					}
 				} else {
-					// This is the first trip of the person
-					personId2actualTripNumber.put(event.getPersonId(), 1);
-					Map<Integer,Double> tripNumber2departureTime = new HashMap<Integer, Double>();
-					tripNumber2departureTime.put(1, event.getTime());
-					personId2tripNumber2departureTime.put(event.getPersonId(), tripNumber2departureTime);
-					Map<Integer,Double> tripNumber2tripDistance = new HashMap<Integer, Double>();
-					tripNumber2tripDistance.put(1, 0.0);
-					personId2tripNumber2tripDistance.put(event.getPersonId(), tripNumber2tripDistance);
-					
-					Map<Integer,Double> tripNumber2amount = new HashMap<Integer, Double>();
-					tripNumber2amount.put(1, 0.0);
-					personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
-						
-					Map<Integer,String> tripNumber2legMode = new HashMap<Integer,String>();
-					tripNumber2legMode.put(1, event.getLegMode());
+					// the leg mode has to be saved.
+					String legMode = event.getLegMode();
+					if((event.getLegMode().toString().equals("transit_walk"))){
+						legMode = "pt";
+					} else {
+					}
+					tripNumber2legMode.put(personId2actualTripNumber.get(event.getPersonId()), legMode);
 					personId2tripNumber2legMode.put(event.getPersonId(), tripNumber2legMode);
 				}
+			} else {
+				// This is the first trip of the person
+				Map<Integer,String> tripNumber2legMode = new HashMap<Integer,String>();
+				String legMode = event.getLegMode();
+				if((event.getLegMode().toString().equals("transit_walk"))){
+					legMode = "pt";
+				} else {
+				}
+				tripNumber2legMode.put(1, legMode);
+				personId2tripNumber2legMode.put(event.getPersonId(), tripNumber2legMode);
 			}
 		}
+	}
+	
+	@Override
+	public void handleEvent(PersonArrivalEvent event) {
+//		if(event.getLegMode().toString().equals("transit_walk")){
+//			// TODO:
+//			// If the measuring of the walking distance
+//			// for the mode transit_walk is desired,
+//			// it should be done here.
+//		} 
 	}
 	
 	@Override
@@ -410,7 +459,7 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 			if((tripNumber2legMode.get(tripNumber)).equals(TransportMode.car)){
 			// car drivers not considered here
 			} else {
-				double distanceTravelled = (driverId2totalDistance.get(event.getVehicleId()) - personId2distanceEnterValue.get(event.getVehicleId())); 
+				double distanceTravelled = (driverId2totalDistance.get(event.getVehicleId()) - personId2distanceEnterValue.get(event.getPersonId())); 
 				
 				Map<Integer,Double> tripNumber2distance = personId2tripNumber2tripDistance.get(event.getPersonId());
 				tripNumber2distance.put(tripNumber, tripNumber2distance.get(tripNumber) + distanceTravelled);
