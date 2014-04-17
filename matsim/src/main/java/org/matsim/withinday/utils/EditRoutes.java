@@ -29,13 +29,17 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
 
 public class EditRoutes {
 
@@ -46,7 +50,7 @@ public class EditRoutes {
 	 * 
 	 * @return true when replacing the route worked, false when something went wrong
 	 */
-	public boolean relocateFutureLegRoute(Leg leg, Id fromLinkId, Id toLinkId, Person person, Network network, TripRouter tripRouter) {
+	public static boolean relocateFutureLegRoute(Leg leg, Id fromLinkId, Id toLinkId, Person person, Network network, TripRouter tripRouter) {
 				
 		Link fromLink = network.getLinks().get(fromLinkId);
 		Link toLink = network.getLinks().get(toLinkId);
@@ -77,7 +81,7 @@ public class EditRoutes {
 	 * 
 	 * @return true when replacing the route worked, false when something went wrong
 	 */
-	public boolean replanFutureLegRoute(Leg leg, Person person, Network network, TripRouter tripRouter) {
+	public static boolean replanFutureLegRoute(Leg leg, Person person, Network network, TripRouter tripRouter) {
 		
 		Route route = leg.getRoute();
 		
@@ -103,11 +107,41 @@ public class EditRoutes {
 	}
 
 	/**
+	 * In contrast to the other replanFutureLegRoute(...) method, the leg at the given index is replaced
+	 * by a new one. This is e.g. necessary when replacing a pt trip which might consists of multiple legs
+	 * and pt_interaction activities.  
+	 * This might become the future default approach.
+	 * 
+	 * @return
+	 */
+	public static boolean replanFutureTrip(Trip trip, Plan plan, String mainMode, double departureTime, 
+			Network network, TripRouter tripRouter) {
+		
+		Person person = plan.getPerson();
+		
+		Activity fromActivity = trip.getOriginActivity();
+		Activity toActivity = trip.getDestinationActivity();
+		
+		Link fromLink = network.getLinks().get(fromActivity.getLinkId());
+		Link toLink = network.getLinks().get(toActivity.getLinkId());
+		
+		Facility fromFacility = new LinkWrapperFacility(fromLink);
+		Facility toFacility = new LinkWrapperFacility(toLink);
+				
+		final List<? extends PlanElement> newTrip =
+				tripRouter.calcRoute(mainMode, fromFacility, toFacility, departureTime, person);
+				
+		TripRouter.insertTrip(plan, trip.getOriginActivity(), newTrip, trip.getDestinationActivity());
+		
+		return true;
+	}
+
+	/**
 	 * Re-locates a future route. The route is given by its leg.
 	 * 
 	 * @return true when replacing the route worked, false when something went wrong
 	 */
-	public boolean relocateCurrentLegRoute(Leg leg, Person person, int currentLinkIndex, Id toLinkId, double time, Network network, TripRouter tripRouter) {
+	public static boolean relocateCurrentLegRoute(Leg leg, Person person, int currentLinkIndex, Id toLinkId, double time, Network network, TripRouter tripRouter) {
 		
 		Route route = leg.getRoute();
 
@@ -188,7 +222,7 @@ public class EditRoutes {
 	 * The currentNodeIndex has to Point to the next Node
 	 * (which is the endNode of the current Link)
 	 */
-	public boolean replanCurrentLegRoute(Leg leg, Person person, int currentLinkIndex, double time, Network network, TripRouter tripRouter) {
+	public static boolean replanCurrentLegRoute(Leg leg, Person person, int currentLinkIndex, double time, Network network, TripRouter tripRouter) {
 
 		Route route = leg.getRoute();
 
@@ -199,7 +233,34 @@ public class EditRoutes {
 		return relocateCurrentLegRoute(leg, person, currentLinkIndex, route.getEndLinkId(), time, network, tripRouter);
 	}
 
-	private List<Id> getRouteLinkIds(Route route) {
+	/**
+	 * @param plan
+	 * @param fromActivity
+	 * @param tripRouter
+	 * @return the Trip that starts at the given activity or null, if no trip was found
+	 */
+	public static Trip getTrip(Plan plan, Activity fromActivity, TripRouter tripRouter) {
+		List<Trip> trips = TripStructureUtils.getTrips(plan, tripRouter.getStageActivityTypes());
+		
+		for (Trip trip : trips) {
+			if (trip.getOriginActivity() == fromActivity) return trip;
+		}
+		
+		// no matching trip was found
+		return null;
+	}
+	
+	/**
+	 * @param trip
+	 * @return the depature time of the first leg of the trip
+	 */
+	public static double getDepatureTime(Trip trip) {
+		// does this always make sense?
+		Leg leg = (Leg) trip.getTripElements().get(0);
+		return leg.getDepartureTime();
+	}
+	
+	private static List<Id> getRouteLinkIds(Route route) {
 		List<Id> linkIds = new ArrayList<Id>();
 
 		if (route instanceof NetworkRoute) {
@@ -215,9 +276,9 @@ public class EditRoutes {
 	}
 	
 	/*
-	 * Wrapps a Link into a Facility.
+	 * Wraps a Link into a Facility.
 	 */
-	public class LinkWrapperFacility implements Facility {
+	private static class LinkWrapperFacility implements Facility {
 		
 		private final Link wrapped;
 

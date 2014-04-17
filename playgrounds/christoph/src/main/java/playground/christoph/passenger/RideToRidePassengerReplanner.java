@@ -23,10 +23,13 @@ package playground.christoph.passenger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -57,7 +60,6 @@ public class RideToRidePassengerReplanner extends WithinDayInitialReplanner {
 	private final JointDepartureOrganizer jointDepartureOrganizer;
 	private final RideToRidePassengerContextProvider rideToRidePassengerContextProvider;
 	
-	private final EditRoutes editRoutes = new EditRoutes();
 	private final RouteFactory carRouteFactory = new LinkNetworkRouteFactory();
 	private final RouteFactory rideRouteFactory = new GenericRouteFactory();
 	
@@ -156,8 +158,8 @@ public class RideToRidePassengerReplanner extends WithinDayInitialReplanner {
 		plan.getPlanElements().add(index, toPickupLeg);
 		
 		// update routes of the created walk legs
-		this.editRoutes.replanFutureLegRoute(toPickupLeg, plan.getPerson(), scenario.getNetwork(), this.tripRouter);
-		this.editRoutes.replanFutureLegRoute(fromDropOffLeg, plan.getPerson(), scenario.getNetwork(), this.tripRouter);
+		EditRoutes.replanFutureLegRoute(toPickupLeg, plan.getPerson(), scenario.getNetwork(), this.tripRouter);
+		EditRoutes.replanFutureLegRoute(fromDropOffLeg, plan.getPerson(), scenario.getNetwork(), this.tripRouter);
 		
 		// assign joint departure to agent's ride leg
 		this.jointDepartureOrganizer.assignAgentToJointDeparture(agent.getId(), ridePassengerLeg, context.pickupDeparture);
@@ -253,8 +255,8 @@ public class RideToRidePassengerReplanner extends WithinDayInitialReplanner {
 		Leg rideLeg = context.rideLeg;
 		Route route = rideLeg.getRoute();
 		
-		Facility fromFacility = this.editRoutes.new LinkWrapperFacility(scenario.getNetwork().getLinks().get(route.getStartLinkId()));
-		Facility toFacility = this.editRoutes.new LinkWrapperFacility(scenario.getNetwork().getLinks().get(route.getEndLinkId()));
+		Facility fromFacility = new LinkWrapperFacility(scenario.getNetwork().getLinks().get(route.getStartLinkId()));
+		Facility toFacility = new LinkWrapperFacility(scenario.getNetwork().getLinks().get(route.getEndLinkId()));
 		
 		List<? extends PlanElement> pt = this.tripRouter.calcRoute(TransportMode.pt, fromFacility, toFacility, rideLeg.getDepartureTime(), plan.getPerson());
 		
@@ -284,4 +286,40 @@ public class RideToRidePassengerReplanner extends WithinDayInitialReplanner {
 		return travelTime;
 	}
 
+	/*
+	 * Wraps a Link into a Facility.
+	 */
+	private static class LinkWrapperFacility implements Facility {
+		
+		private final Link wrapped;
+
+		public LinkWrapperFacility(final Link toWrap) {
+			wrapped = toWrap;
+		}
+
+		@Override
+		public Coord getCoord() {
+			return wrapped.getCoord();
+		}
+
+		@Override
+		public Id getId() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Map<String, Object> getCustomAttributes() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Id getLinkId() {
+			return wrapped.getId();
+		}
+
+		@Override
+		public String toString() {
+			return "[LinkWrapperFacility: wrapped="+wrapped+"]";
+		}
+	}
 }

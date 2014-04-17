@@ -30,6 +30,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
+import org.matsim.withinday.utils.EditRoutes;
 
 /*
  * The CurrentLegReplanner can be used while an Agent travels from
@@ -77,7 +78,7 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 		int currentLinkIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 
 		// new Route for current Leg
-		this.editRoutes.replanCurrentLegRoute(currentLeg, executedPlan.getPerson(), currentLinkIndex, this.time, 
+		EditRoutes.replanCurrentLegRoute(currentLeg, executedPlan.getPerson(), currentLinkIndex, this.time, 
 				scenario.getNetwork(), tripRouter); 
 
 		// Finally reset the cached Values of the PersonAgent - they may have changed!

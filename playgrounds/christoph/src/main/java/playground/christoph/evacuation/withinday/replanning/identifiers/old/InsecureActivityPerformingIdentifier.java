@@ -60,7 +60,7 @@ public class InsecureActivityPerformingIdentifier extends DuringActivityIdentifi
 	
 	public Set<MobsimAgent> getAgentsToReplan(double time) {
 
-		Set<Id> activityPerformingAgents = this.activityReplanningMap.getActivityPerformingAgents(time);
+		Set<Id> activityPerformingAgents = this.activityReplanningMap.getActivityPerformingAgents();
 		Map<Id, MobsimAgent> mapping = this.mobsimDataProvider.getAgents();
 		
 		// apply filter to remove agents that should not be replanned

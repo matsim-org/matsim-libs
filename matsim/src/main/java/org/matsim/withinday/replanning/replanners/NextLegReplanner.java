@@ -22,19 +22,22 @@ package org.matsim.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
+import org.matsim.withinday.utils.EditRoutes;
 
-/*
- * The NextLegReplanner can be used while an Agent is performing an Activity. The
- * Replanner creates a new Route from the current Activity to the next one in
- * the Agent's Plan.
+/**
+ * The NextLegReplanner can be used while an agent is performing an activity. The
+ * replanner creates a new trip from the current activity to the next main activity 
+ * in the agent's plan.
+ * 
+ * In fact this should be renamed to NextTripReplanner. cdobler, apr'14
  */
 public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 
@@ -45,54 +48,56 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 		this.tripRouter = tripRouter;
 	}
 
-	/*
-	 * Idea:
-	 * MATSim Routers create Routes for complete plans.
-	 * We just want to replan the Route from one Activity to another one, so we create
-	 * a new Plan that contains only this Route. This Plan is replanned by sending it
-	 * to the Router.
-	 *
-	 * Attention! The Replanner is started when the Activity of a Person ends and the Vehicle
-	 * is added to the Waiting List of its QueueLink. That means that a Person replans
-	 * his Route at time A but enters the QueueLink at time B.
-	 * A short example: If all Persons of a network end their Activities at the same time
-	 * and have the same Start- and Endpoints of their Routes they will all use the same
-	 * route (if they use the same router). If they would replan their routes when they really
-	 * Enter the QueueLink this would not happen because the enter times would be different
-	 * due to the limited number of possible vehicles on a link at a time. An implementation
-	 * of such a functionality would be a problem due to the structure of MATSim...
-	 */
 	@Override
 	public boolean doReplanning(MobsimAgent withinDayAgent) {
-
+		
 		Plan executedPlan = WithinDayAgentUtils.getModifiablePlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 
-		/*
-		 *  Get the index of the current PlanElement
-		 */
-		int currentPlanElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
+		// Get the activity currently performed by the agent as well as the subsequent trip.
+		Activity currentActivity = (Activity) WithinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
+		Trip trip = EditRoutes.getTrip(executedPlan, currentActivity, this.tripRouter);
 
+		// If there is no trip after the activity.
+		if (trip == null) return false;
+		
+		String mainMode = this.tripRouter.getMainModeIdentifier().identifyMainMode(trip.getTripElements());
+		double departureTime = EditRoutes.getDepatureTime(trip);
+		EditRoutes.replanFutureTrip(trip, executedPlan, mainMode, departureTime, scenario.getNetwork(), this.tripRouter);
+		
 		/*
-		 * Search next leg in the agent's plan
+		 * Updated code to use the TripRouter approach. This might result in problems at a few
+		 * places where people assumed that only routes are updated but the leg objects remain
+		 * in an agent's plan. 
 		 */
-		Leg nextLeg = null;
-		for (int i = currentPlanElementIndex + 1; i < executedPlan.getPlanElements().size(); i++) {
-			PlanElement planElement = executedPlan.getPlanElements().get(i);
-			if (planElement instanceof Leg) {
-				nextLeg = (Leg) planElement;
-				break;
-			}
-		}
+//		// if it is a more complex trip than just a single leg use modern approach
+//		if (trip.getTripElements().size() > 1) {
+//			String mainMode = this.tripRouter.getMainModeIdentifier().identifyMainMode(trip.getTripElements());
+//			double departureTime = EditRoutes.getDepatureTime(trip);
+//			EditRoutes.replanFutureTrip(trip, executedPlan, mainMode, departureTime, scenario.getNetwork(), this.tripRouter);
+//		} else {		
+//			// Get the index of the current PlanElement.
+//			int currentPlanElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
+//			
+//			// Search next leg in the agent's plan.
+//			Leg nextLeg = null;
+//			for (int i = currentPlanElementIndex + 1; i < executedPlan.getPlanElements().size(); i++) {
+//				PlanElement planElement = executedPlan.getPlanElements().get(i);
+//				if (planElement instanceof Leg) {
+//					nextLeg = (Leg) planElement;
+//					break;
+//				}
+//			}
+//			
+//			// check whether a next leg was found
+//			if (nextLeg == null) return false;
+//			
+//			// new Route for next Leg
+//			EditRoutes.replanFutureLegRoute(nextLeg, executedPlan.getPerson(), scenario.getNetwork(), tripRouter);
+//		}
 		
-		// check whether a next leg was found
-		if (nextLeg == null) return false;
-		
-		// new Route for next Leg
-		this.editRoutes.replanFutureLegRoute(nextLeg, executedPlan.getPerson(), scenario.getNetwork(), tripRouter);
-
 		return true;
 	}
 

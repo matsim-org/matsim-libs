@@ -51,7 +51,7 @@ public class ActivityPerformingIdentifier extends DuringActivityIdentifier {
 		 * Identify those activity performing agents that should be replanned.
 		 * Add them to a set of MobsimAgents.
 		 */
-		for (Id agentId : this.activityReplanningMap.getActivityPerformingAgents(time)) {
+		for (Id agentId : this.activityReplanningMap.getActivityPerformingAgents()) {
 			if (this.applyFilters(agentId, time)) agentsToReplan.add(mapping.get(agentId));
 		}
 				
