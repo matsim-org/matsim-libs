@@ -63,7 +63,7 @@
 		-->
 		<dependency>
 			<groupId>playground</groupId>
-			<artifactId>mzilske</artifactId>
+			<artifactId>vsp</artifactId>
 			<version>0.6.0-SNAPSHOT</version>
 		</dependency>
 				<dependency>
