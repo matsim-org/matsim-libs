@@ -79,6 +79,7 @@ public class ControllerModule extends AbstractModule {
 
     @Override
     protected void configure() {
+        requireBinding(ScoringFunctionFactory.class);
         bind(Controller.class).to(InjectableController.class).in(Singleton.class);
         bind(ScoreStats.class).to(ScoreStatsControlerListener.class).in(Singleton.class);
         bind(Controler.TerminationCriterion.class).to(IsLastIteration.class);
