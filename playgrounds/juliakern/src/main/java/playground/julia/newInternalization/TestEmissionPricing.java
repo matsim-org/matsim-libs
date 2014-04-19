@@ -50,7 +50,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.julia.distribution.GridTools;
@@ -105,7 +104,7 @@ public class TestEmissionPricing {
 	
 	private static int numberOfIterations = 30;
 
-	private static double epsilon = MatsimTestUtils.EPSILON * MatsimTestUtils.EPSILON;
+	private static double epsilon = Double.MIN_NORMAL;
 	
 	public static void main(String[] args) {
 		
