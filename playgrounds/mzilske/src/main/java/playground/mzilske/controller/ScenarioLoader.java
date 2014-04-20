@@ -29,7 +29,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class ScenarioLoader implements Provider<Scenario> {
+class ScenarioLoader implements Provider<Scenario> {
 
     @Inject
     Config config;

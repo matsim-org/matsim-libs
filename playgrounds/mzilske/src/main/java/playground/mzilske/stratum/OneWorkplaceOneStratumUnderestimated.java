@@ -19,7 +19,7 @@ import org.matsim.counts.Volume;
 
 import javax.inject.Inject;
 
-public class OneWorkplaceOneStratumUnderestimated implements Provider<Scenario> {
+class OneWorkplaceOneStratumUnderestimated implements Provider<Scenario> {
 
 
     private Scenario scenario;

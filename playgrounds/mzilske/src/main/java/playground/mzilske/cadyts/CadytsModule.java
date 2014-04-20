@@ -41,8 +41,6 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
@@ -67,7 +65,6 @@ public class CadytsModule extends AbstractModule {
         MapBinder<String, PlanStrategyFactory> planStrategyFactoryBinder
                 = MapBinder.newMapBinder(binder(), String.class, PlanStrategyFactory.class);
         planStrategyFactoryBinder.addBinding("ccc").toProvider(MyPlanStrategyFactoryProvider.class);
-        bind(ScoringFunctionFactory.class).to(MyScoringFunctionFactory.class);
         bind(new TypeLiteral<AnalyticalCalibrator<Link>>(){}).toProvider(CalibratorProvider.class).in(Singleton.class);
         bind(new TypeLiteral<PlansTranslator<Link>>(){}).to(PlanToPlanStepBasedOnEvents.class).in(Singleton.class);
     }

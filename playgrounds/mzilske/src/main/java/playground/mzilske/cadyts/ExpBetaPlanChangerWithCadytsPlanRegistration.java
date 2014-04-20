@@ -37,9 +37,9 @@ import org.matsim.core.replanning.selectors.PlanSelector;
  * @author nagel
  *
  */
-public final class ExpBetaPlanChangerWithCadytsPlanRegistration<T> implements PlanSelector {
+class ExpBetaPlanChangerWithCadytsPlanRegistration<T> implements PlanSelector {
 
-	private final PlanSelector delegate ;
+	private final PlanSelector delegate;
     private PlansTranslator<T> plansTranslator;
     private AnalyticalCalibrator<T> calibrator;
 

@@ -31,7 +31,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class ReplanningContextFactoryImpl implements ReplanningContextFactory {
+class ReplanningContextFactoryImpl implements ReplanningContextFactory {
 
     @Inject Provider<TravelDisutility> travelDisutility;
     @Inject Provider<TravelTime> travelTime;

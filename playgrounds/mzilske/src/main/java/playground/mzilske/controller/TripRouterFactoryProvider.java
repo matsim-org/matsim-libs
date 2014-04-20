@@ -36,7 +36,7 @@ import org.matsim.pt.router.TransitRouterFactory;
 import javax.annotation.Nullable;
 import javax.inject.Provider;
 
-public class TripRouterFactoryProvider implements Provider<TripRouterFactory> {
+class TripRouterFactoryProvider implements Provider<TripRouterFactory> {
 
     @Inject Config config;
     @Inject Scenario scenario;

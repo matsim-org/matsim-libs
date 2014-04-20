@@ -26,6 +26,7 @@ package playground.mzilske.controller;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import org.matsim.analysis.*;
 import org.matsim.api.core.v01.Scenario;
@@ -79,7 +80,12 @@ public class ControllerModule extends AbstractModule {
 
     @Override
     protected void configure() {
+        requireBinding(Config.class);
+        requireBinding(Scenario.class);
         requireBinding(ScoringFunctionFactory.class);
+        Multibinder.newSetBinder(binder(), ControlerListener.class);
+        MapBinder.newMapBinder(binder(), String.class, PlanStrategyFactory.class);
+
         bind(Controller.class).to(InjectableController.class).in(Singleton.class);
         bind(ScoreStats.class).to(ScoreStatsControlerListener.class).in(Singleton.class);
         bind(Controler.TerminationCriterion.class).to(IsLastIteration.class);
@@ -91,7 +97,6 @@ public class ControllerModule extends AbstractModule {
         bind(TravelDisutilityFactory.class).to(TravelTimeAndDistanceBasedTravelDisutilityFactory.class);
         bind(StrategyManager.class).toProvider(StrategyManagerProvider.class).in(Singleton.class);
         bind(ReplanningContextFactory.class).to(ReplanningContextFactoryImpl.class);
-        MapBinder.newMapBinder(binder(), String.class, PlanStrategyFactory.class);
     }
 
     @Provides Population providePopulation(Scenario scenario) {

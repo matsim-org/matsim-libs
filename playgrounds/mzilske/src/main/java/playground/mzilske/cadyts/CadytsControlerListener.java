@@ -53,7 +53,7 @@ import java.util.TreeSet;
  * select plans that better match to given occupancy counts.
  */
 @Singleton
-public class CadytsControlerListener implements StartupListener, IterationEndsListener {
+class CadytsControlerListener implements StartupListener, IterationEndsListener {
 
 	private final static Logger log = Logger.getLogger(CadytsControlerListener.class);
 

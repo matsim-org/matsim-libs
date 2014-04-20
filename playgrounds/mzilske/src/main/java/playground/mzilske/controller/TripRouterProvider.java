@@ -31,7 +31,7 @@ import org.matsim.core.router.util.TravelTime;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class TripRouterProvider implements Provider<TripRouter> {
+class TripRouterProvider implements Provider<TripRouter> {
 
     @Inject TravelTime linkTravelTimes;
     @Inject TravelDisutility travelDisutility;

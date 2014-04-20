@@ -37,7 +37,7 @@ import javax.inject.Provider;
 import java.util.Map;
 
 
-public class StrategyManagerProvider implements Provider<StrategyManager> {
+class StrategyManagerProvider implements Provider<StrategyManager> {
 
     private static Logger log = Logger.getLogger(StrategyManagerProvider.class);
 

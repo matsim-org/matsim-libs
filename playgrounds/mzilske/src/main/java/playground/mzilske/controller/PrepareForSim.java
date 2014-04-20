@@ -33,7 +33,7 @@ import org.matsim.population.algorithms.PersonPrepareForSim;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class PrepareForSim implements Runnable {
+class PrepareForSim implements Runnable {
 
     @Inject Scenario scenario;
     @Inject Config config;

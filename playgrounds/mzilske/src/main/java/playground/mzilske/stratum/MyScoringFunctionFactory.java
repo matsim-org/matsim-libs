@@ -20,22 +20,24 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.cadyts;
+package playground.mzilske.stratum;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import playground.mzilske.cadyts.CadytsScoring;
 
 import javax.inject.Inject;
 
-public class MyScoringFunctionFactory implements ScoringFunctionFactory {
+class MyScoringFunctionFactory implements ScoringFunctionFactory {
 
     @Inject
     Config config;
@@ -44,7 +46,8 @@ public class MyScoringFunctionFactory implements ScoringFunctionFactory {
     @Inject
     AnalyticalCalibrator<Link> cadyts;
 
-    @Inject PlanToPlanStepBasedOnEvents ptStep;
+    @Inject
+    PlansTranslator<Link> ptStep;
 
     private final String CLONE_FACTOR = "cloneScore";
 
@@ -62,7 +65,7 @@ public class MyScoringFunctionFactory implements ScoringFunctionFactory {
                 if (hasLeg) {
                     final ObjectAttributes personAttributes = scenario.getPopulation().getPersonAttributes();
                     double cloneFactor = (Double) personAttributes.getAttribute(person.getId().toString(), CLONE_FACTOR);
-                    cadyts.demand.Plan currentPlanSteps = ptStep.getPlanSteps(person.getSelectedPlan());
+                    cadyts.demand.Plan<Link> currentPlanSteps = ptStep.getPlanSteps(person.getSelectedPlan());
                     double currentPlanCadytsCorrection = cadyts.calcLinearPlanEffect(currentPlanSteps);
                     cloneFactor = cloneFactor + 0.01 * currentPlanCadytsCorrection;
                     personAttributes.putAttribute(person.getId().toString(), CLONE_FACTOR, cloneFactor);

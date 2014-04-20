@@ -46,7 +46,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Singleton
-public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler, 
+class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler,
 		PersonDepartureEventHandler, PersonArrivalEventHandler {
 	
 	private static final Logger log = Logger.getLogger(PlanToPlanStepBasedOnEvents.class);

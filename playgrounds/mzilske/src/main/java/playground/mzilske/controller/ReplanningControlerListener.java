@@ -31,7 +31,7 @@ import org.matsim.core.replanning.StrategyManager;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class ReplanningControlerListener implements ReplanningListener {
+class ReplanningControlerListener implements ReplanningListener {
 
     @Inject StrategyManager strategyManager;
     @Inject Population population;

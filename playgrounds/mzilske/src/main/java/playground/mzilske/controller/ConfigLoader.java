@@ -29,7 +29,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
-public class ConfigLoader implements Provider<Config> {
+class ConfigLoader implements Provider<Config> {
 
     private String configFileName;
 

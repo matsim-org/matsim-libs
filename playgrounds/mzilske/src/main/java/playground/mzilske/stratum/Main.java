@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.counts.Counts;
 import playground.mzilske.cadyts.CadytsModule;
 import playground.mzilske.cdr.CallBehavior;
@@ -97,6 +98,8 @@ public class Main {
                         bind(Scenario.class).toProvider(ScenarioReconstructor.class).in(Singleton.class);
                         bind(Counts.class).annotatedWith(Names.named("allCounts")).toInstance(allCounts);
                         bind(Counts.class).annotatedWith(Names.named("calibrationCounts")).toInstance(allCounts);
+
+                        bind(ScoringFunctionFactory.class).to(MyScoringFunctionFactory.class);
                     }
                 },
                 phoneModule

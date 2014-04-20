@@ -40,10 +40,9 @@ import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import java.util.List;
 
-public class MobsimProvider {
+class MobsimProvider {
 
     @Inject Config config;
     @Inject Scenario scenario;
