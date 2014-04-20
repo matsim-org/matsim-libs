@@ -106,34 +106,17 @@ public class ZoneMapping {
 	private Map<Integer, SimpleFeature> zonesMap;	// TAZ, Feature
 	private Map<Integer, Emme2Zone> parsedZones;	// TAZ, Emme2Zone
 		
-	/**
-	 * @param args
-	 * @throws IOException
-	 * @throws FactoryException
-	 * @throws TransformException
-	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		new ZoneMapping();
 	}
 	
-	public ZoneMapping() {
-		
-		try {
-			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			new MatsimNetworkReader(scenario).readFile(networkFile);
-			CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84");
+	public ZoneMapping() throws Exception {
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(scenario).readFile(networkFile);
+		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84");
 			
-//			new MatsimNetworkReader(scenario).readFile("../../matsim/mysimulations/telaviv/network/network.xml");
-//			CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84");	
-			
-			this.createMapping(coordinateTransformation);
-		} catch (IOException e) { 
-			e.printStackTrace();
-		} catch (FactoryException e) {
-			e.printStackTrace();
-		} catch (TransformException e) {
-			e.printStackTrace();
-		}
+//		new MatsimNetworkReader(scenario).readFile("../../matsim/mysimulations/telaviv/network/network.xml");
+//		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84");
 	}
 	
 	/*
@@ -141,16 +124,11 @@ public class ZoneMapping {
 	 * Therefore we have to transform the Coordinates.
 	 */
 	public ZoneMapping(Scenario scenario, CoordinateTransformation coordinateTransformation) {
-		this.scenario = scenario;
-		
-		try {		
+		try {
+			this.scenario = scenario;
 			this.createMapping(coordinateTransformation);
-		} catch (IOException e) { 
-			e.printStackTrace();
-		} catch (FactoryException e) {
-			e.printStackTrace();
-		} catch (TransformException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -312,8 +290,7 @@ public class ZoneMapping {
 				infoString = infoString + ", Students: " + emme2Zone.STUDENTS;
 				infoString = infoString + ", Total Employment: " + emme2Zone.EMPL_TOT;
 				infoString = infoString + ", Workers: " + emme2Zone.WORKERS;
-				log.info(infoString);
-				
+				log.info(infoString);				
 			}
 		}
 		Set<SimpleFeature> zonesWithLinks = new HashSet<SimpleFeature>();

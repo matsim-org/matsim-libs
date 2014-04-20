@@ -25,6 +25,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
 import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.KmlType;
@@ -36,15 +38,16 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -55,11 +58,12 @@ import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.vis.kml.KMZWriter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.telaviv.config.TelAvivConfig;
+import playground.telaviv.config.XMLParameterParser;
 import playground.toronto.maneuvers.NetworkAddEmmeManeuverRestrictions;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -67,52 +71,75 @@ import com.vividsolutions.jts.geom.Coordinate;
 /**
  * Translates emme2 networks into matsim networks.
  * <p/>
- * The network data is preprocessed by Shlomo Bekhor in an Excel file. The tables
+ * The network data is pre-processed by Shlomo Bekhor in an Excel file. The tables
  * are exported to csv/txt files and parsed.
  * <p/>
- * The provided Shape Files use WGS84 Coordinates but MATSim need an euclidian System.
- * Therefore two Network files are created:
- * - network_WGS84.xml with WGS84 coordinates
- * - network.xml with ITM coordinates (Israeli Transverse Mercator)
+ * The provided shp files use WGS84 Coordinates but MATSim need an euclidian System.<br>
+ * Therefore two Network files are created:<br>
+ * - network_WGS84.xml with WGS84 coordinates<br>
+ * - network.xml with ITM coordinates (Israeli Transverse Mercator)<br>
  * <p/>
- * Nodes:
- * index / column / data example: 
- * 0	/	NODE_ID	/	100
- * 1	/	COORD_X	/	138.0940	// Israeli Coordinates (ITM)
- * 2	/	COORD_Y	/	192.4970	// // Israeli Coordinates (ITM)
- * 4	/	longitude	/	34.8706600
- * 5	/	latitude	/	32.3254460
+ * Nodes:<br>
+ * index / column / data example: <br>
+ * 0	/	NODE_ID	/	100<br>
+ * 1	/	COORD_X	/	138.0940	// Israeli Coordinates (ITM)<br>
+ * 2	/	COORD_Y	/	192.4970	// // Israeli Coordinates (ITM)<br>
+ * 4	/	longitude	/	34.8706600<br>
+ * 5	/	latitude	/	32.3254460<br>
  * <p/>
- * Links:
- * index / column / data example:  
- * 0	/	From_node	/	103
- * 1	/	To_node	/	220500
- * 2	/	Connector	/	1
- * 3	/	Length (km)	/	0.20
- * 4	/	modes	/	cu
- * 5	/	type	/	9
- * 6	/	lanes	/	9
- * 7	/	vdf	/	2
- * 8	/	FT (facility type)	/	0
- * 9	/	AT (area type)	/	0
- * 10	/	IT (intersection type)	/	0
- * 11	/	NLI (additional lanes at intersection)	/	0
- * 12	/	tzero_link	/	0
- * 13	/	tzero_int	/	0
- * 14	/	cap_link	/	0
- * 15	/	cap_int	/	0
- * 16	/	tzero_mod	/	0.8
- * 17	/	cap_mod	/	999000
- * 18	/	speed(m/s)	/	4.17
- * 19	/	speed(km/h)	/	15
- * 20	/	auto_vol_AM	/	0
- * 21	/	comm_vol_AM	/	0
- * 22	/	truck_vol_AM	/	0
- * 23	/	bus_vol_AM	/	0
- * 24	/	Tot_vol_AM	/	0
+ * Links:<br>
+ * index / column / data example:<br>
+ * 0	/	From_node	/	103<br>
+ * 1	/	To_node	/	220500<br>
+ * 2	/	Connector	/	1<br>
+ * 3	/	Length (km)	/	0.20<br>
+ * 4	/	modes	/	cu<br>
+ * 5	/	type	/	9<br>
+ * 6	/	lanes	/	9<br>
+ * 7	/	vdf	/	2<br>
+ * 8	/	FT (facility type)	/	0<br>
+ * 9	/	AT (area type)	/	0<br>
+ * 10	/	IT (intersection type)	/	0<br>
+ * 11	/	NLI (additional lanes at intersection)	/	0<br>
+ * 12	/	tzero_link	/	0<br>
+ * 13	/	tzero_int	/	0<br>
+ * 14	/	cap_link	/	0<br>
+ * 15	/	cap_int	/	0<br>
+ * 16	/	tzero_mod	/	0.8<br>
+ * 17	/	cap_mod	/	999000<br>
+ * 18	/	speed(m/s)	/	4.17<br>
+ * 19	/	speed(km/h)	/	15<br>
+ * 20	/	auto_vol_AM	/	0<br>
+ * 21	/	comm_vol_AM	/	0<br>
+ * 22	/	truck_vol_AM	/	0<br>
+ * 23	/	bus_vol_AM	/	0<br>
+ * 24	/	Tot_vol_AM	/	0<br>
  * <p/>
  * 
- * Keyword(s): emme/2
+ * <p>
+ * Link types are like:<br>
+ * 1 ... freeway<br>
+ * 2 ... main road<br>
+ * 3 ... arterial road<br>
+ * 4 ... regional road<br>
+ * 5 ... collector street<br>
+ * 6 ... local street<br>
+ * 7 ... multilane highway<br>
+ * 9 ... centroid connector<br>
+ * 
+ * By default, centroid connectors are NOT included in the MATSim network. They do not need to be present
+ * there since we can add traffic to any link.
+ * </p>
+ * 
+ * <p>
+ * Several output files are created - some of them are optional:<br>
+ * - network file in MATSim xml format using ITM coordinates<br>
+ * - network file in MATSim xml format using WGS84 coordinates<br>
+ * - network file in MATSim xml format without post-processing (for counts and road pricing)<br>
+ * - network file in google kml format using WGS84 coordinates (optional)<br>
+ * - links file in shp format using WGS84 coordinates (optional)<br>
+ * - nodes file in shp format using WGS84 coordinates (optional)<br>
+ * </p>
  * 
  * @author cdobler
  */
@@ -128,48 +155,166 @@ public class NetworkEmme2MATSim2012 {
 	 *  - pedestrian
 	 *  - rail
 	 */
-	private static enum modes {c, u, b, p, r};
+//	private static enum modes {c, u, b, p, r};
 	
 //	private static double capacityScaleFator = 1.1;	// increase capacity by 10%
 	private static double capacityScaleFator = 1.0;
 	
 	private static String ITM = "EPSG:2039";	// network coding String
 	
-	private static String nodesFile = TelAvivConfig.basePath + "/network/nodes.csv";
-	private static String linksFile = TelAvivConfig.basePath + "/network/links_updated-revised_2013-09.csv";
-	private static String maneuversFile = TelAvivConfig.basePath + "/network/turns.csv";
-	private static String outFileWGS84 = TelAvivConfig.basePath + "/network/network_WGS84.xml";
-	private static String outFileITM = TelAvivConfig.basePath + "/network/network.xml";
-	private static String kmzFile = TelAvivConfig.basePath + "/network/network.kml";
-	private static String shpLinksFile = TelAvivConfig.basePath + "/network/links.shp";
-	private static String shpNodesFile = TelAvivConfig.basePath + "/network/nodes.shp";
+	private static String basePath = "";
+	private static String nodesFile = "";
+	private static String linksFile = "";
+	private static String maneuversFile = "";
+	private static String outFileWGS84 = "";
+	private static String outFileITM = "";
+	private static String outFileOriginal = "";
+	private static String kmlFile = "";
+	private static String shpLinksFile = "";
+	private static String shpNodesFile = "";
 	
 	private static String separator = ";";
 	
-	public static void readNetwork(NetworkImpl network, boolean useWGS84) {
-		network.setCapacityPeriod(3600.) ;
-		network.setEffectiveLaneWidth(3.75) ;
-//		network.setEffectiveCellSize(7.5) ;
+	private static Set<String> includedLinkTypes = CollectionUtils.stringToSet("1,2,3,4,5,6,7");
+	
+	private static boolean writeKMLFile = true;
+	private static boolean writeSHPFiles = true;
+	
+	public static void main(String[] args) {		
+		try {
+			if (args.length > 0) {
+				String file = args[0];
+				Map<String, String> parameterMap = new XMLParameterParser().parseFile(file);
+				String value;
+				
+				value = parameterMap.remove("basePath");
+				if (value != null) basePath = value;
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+				value = parameterMap.remove("nodesFile");
+				if (value != null) nodesFile = value;
+				
+				value = parameterMap.remove("linksFile");
+				if (value != null) linksFile = value;
+				
+				value = parameterMap.remove("maneuversFile");
+				if (value != null) maneuversFile = value;
+				
+				value = parameterMap.remove("outFileWGS84");
+				if (value != null) outFileWGS84 = value;
+				
+				value = parameterMap.remove("outFileITM");
+				if (value != null) outFileITM = value;
+				
+				value = parameterMap.remove("outFileOriginal");
+				if (value != null) outFileOriginal = value;
+				
+				value = parameterMap.remove("kmlFile");
+				if (value != null) kmlFile = value;
+				
+				value = parameterMap.remove("shpLinksFile");
+				if (value != null) shpLinksFile = value;
+				
+				value = parameterMap.remove("shpNodesFile");
+				if (value != null) shpNodesFile = value;
+				
+				value = parameterMap.remove("separator");
+				if (value != null) separator = value;
+				
+				value = parameterMap.remove("capacityScaleFator");
+				if (value != null) capacityScaleFator = Double.parseDouble(value);
+
+				value = parameterMap.remove("includedLinkTypes");
+				if (value != null) includedLinkTypes = CollectionUtils.stringToSet(value);
+				
+				value = parameterMap.remove("writeKMLFile");
+				if (value != null) writeKMLFile = Boolean.parseBoolean(value);
+				
+				value = parameterMap.remove("writeSHPFiles");
+				if (value != null) writeSHPFiles = Boolean.parseBoolean(value);
+				
+				for (String key : parameterMap.keySet()) log.warn("Found parameter " + key + " which is not handled!");
+			} else {
+				log.error("No input config file was given. Therefore cannont proceed. Aborting!");
+				return;
+			}
+			
+			log.info("reading network ...");
+			Network networkITM = readNetwork(false);
+			Network networkWGS84 = readNetwork(true);
+			Network networkOriginal = readNetwork(false);
+			log.info("done.\n");
+			
+			log.info("reading and processing maneuvers ...");
+			NetworkAddEmmeManeuverRestrictions mr = new NetworkAddEmmeManeuverRestrictions(basePath + maneuversFile);
+			mr.run(networkITM);
+			mr.run(networkWGS84);
+			log.info("done.\n");
+		
+			log.info("cleaning network ...");
+			NetworkCleaner nwCleaner = new NetworkCleaner();
+			nwCleaner.run(networkITM);
+			nwCleaner.run(networkWGS84);
+			log.info("done.\n");
+			
+			log.info("writing network ...");
+			new NetworkWriter(networkITM).write(basePath + outFileITM);
+			new NetworkWriter(networkWGS84).write(basePath + outFileWGS84);
+			new NetworkWriter(networkOriginal).write(basePath + outFileOriginal);
+			log.info("done.\n");
+			
+			if (writeKMLFile) {
+				log.info("writing KML file ...");
+				ObjectFactory kmlObjectFactory = new ObjectFactory();
+				DocumentType mainDoc = kmlObjectFactory.createDocumentType();
+				KMZWriter kmzWriter = new KMZWriter(basePath + kmlFile);
+				KmlType mainKml = kmlObjectFactory.createKmlType();
+				mainKml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(mainDoc));			
+
+				KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(networkITM, new GeotoolsTransformation(ITM, "WGS84"), kmzWriter, mainDoc);
+				mainDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(kmlNetworkWriter.getNetworkFolder()));
+				kmzWriter.writeMainKml(mainKml);
+				kmzWriter.close();
+				log.info("done.\n");
+			}
+
+			if (writeSHPFiles) {
+				log.info("writing SHP files ...");
+				Collection<SimpleFeature> ft;
+				ft = generateNodesFromNet(networkWGS84);
+				ShapeFileWriter.writeGeometries(ft, basePath + shpNodesFile);
+				
+				ft = generateLinksFromNet(networkWGS84);
+				ShapeFileWriter.writeGeometries(ft, basePath + shpLinksFile);
+				log.info("done.\n");
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	private static Network readNetwork(boolean useWGS84) throws Exception {
+//		network.setCapacityPeriod(3600.0);
+//		network.setEffectiveLaneWidth(3.75);
+//		network.setEffectiveCellSize(7.5);
+
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		// read emme2 network
-		try {
-			
-			readNodes(network, scenario, useWGS84);
-			
-			readLinks(network, scenario);
+		readNodes(scenario, useWGS84);
+		readLinks(scenario);
 		
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
+		return scenario.getNetwork();
 	}
 
-	public static void readNodes(NetworkImpl network, Scenario scenario, boolean useWGS84) throws FileNotFoundException, IOException {
+	// TODO: make this private and use "network_original" in place that access this method
+	public static void readNodes(Scenario scenario, boolean useWGS84) throws FileNotFoundException, IOException {
 		
-		BufferedReader reader = IOUtils.getBufferedReader(nodesFile);
+		Network network = scenario.getNetwork();
+		NetworkFactory networkFactory = network.getFactory();
+		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84");
+		
+		BufferedReader reader = IOUtils.getBufferedReader(basePath + nodesFile);
 		String line;
 
 		// skip header line
@@ -188,9 +333,7 @@ public class NetworkEmme2MATSim2012 {
 				 * For some connector links the WGS84 coordinate seem to be wrong. Therefore, we
 				 * create ITM coordinates and convert them to WGS84.
 				 */
-//				network.createAndAddNode(scenario.createId(idStr), new CoordImpl(xxStrWGS84, yyStrWGS84));
-				
-				CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84");
+//				network.createAndAddNode(scenario.createId(idStr), new CoordImpl(xxStrWGS84, yyStrWGS84));	
 				
 				double xx = Double.valueOf(xxStr);
 				double yy = Double.valueOf(yyStr);
@@ -203,9 +346,9 @@ public class NetworkEmme2MATSim2012 {
 				xx = (xx + 50) * 1000;
 				yy = (yy + 500) * 1000;
 				
-				network.createAndAddNode(scenario.createId(idStr), transformation.transform(new CoordImpl(xx, yy)));
-			}
-			else {
+				Node node = networkFactory.createNode(scenario.createId(idStr), transformation.transform(new CoordImpl(xx, yy)));
+				network.addNode(node);
+			} else {
 				double xx = Double.valueOf(xxStr);
 				double yy = Double.valueOf(yyStr);
 				
@@ -217,14 +360,18 @@ public class NetworkEmme2MATSim2012 {
 				xx = (xx + 50) * 1000;
 				yy = (yy + 500) * 1000;
 				
-				network.createAndAddNode(scenario.createId(idStr), new CoordImpl(xx, yy));
+				Node node = networkFactory.createNode(scenario.createId(idStr), new CoordImpl(xx, yy));
+				network.addNode(node);
 			}
 		}
 	}
 	
-	public static void readLinks(NetworkImpl network, Scenario scenario) throws FileNotFoundException, IOException {
+	private static void readLinks(Scenario scenario) throws FileNotFoundException, IOException {
 		
-		BufferedReader reader = IOUtils.getBufferedReader(linksFile);
+		Network network = scenario.getNetwork();
+		NetworkFactory networkFactory = network.getFactory();
+		
+		BufferedReader reader = IOUtils.getBufferedReader(basePath + linksFile);
 		String line;
 
 		// skip header line
@@ -232,6 +379,7 @@ public class NetworkEmme2MATSim2012 {
 
 		long linkCnt = 0;
 		
+		Counter counter = new Counter("\t# links that are ignored due to their type: ");
 		while ((line = reader.readLine()) != null) {
 			String[] parts = line.split(separator);
 
@@ -262,8 +410,13 @@ public class NetworkEmme2MATSim2012 {
 			double permlanes = Double.parseDouble(parts[6]);
 			if ( permlanes <= 0 ) { permlanes = 0.5; }
 
-			String oridId = parts[0] + "#" + parts[1];
+			String origId = parts[0] + "#" + parts[1];
 			String type = parts[5];
+			
+			if (!includedLinkTypes.contains(type)) {
+				counter.incCounter();
+				continue;
+			}
 			
 			double capacity = Double.valueOf(parts[17]) * capacityScaleFator;
 			
@@ -275,7 +428,14 @@ public class NetworkEmme2MATSim2012 {
 			Id id = scenario.createId(String.valueOf(linkCnt));
 			linkCnt++;
 
-			network.createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, permlanes, oridId, type);
+			Link link = networkFactory.createLink(id, fromNode, toNode);
+			link.setLength(length);
+			link.setFreespeed(freespeed);
+			link.setCapacity(capacity);
+			link.setNumberOfLanes(permlanes);
+			((LinkImpl) link).setType(type);
+			((LinkImpl) link).setOrigId(origId);
+			network.addLink(link);
 			
 			/* 
 			 * TODO:
@@ -290,73 +450,10 @@ public class NetworkEmme2MATSim2012 {
 			 *	200960	200970	200550	5
 			 */
 		}
-	}
-
-	public static void main(String[] args) {
-		NetworkImpl networkITM = NetworkImpl.createNetwork();
-		NetworkImpl networkWGS84 = NetworkImpl.createNetwork();
-
-		log.info("reading network ...");
-		readNetwork(networkITM, false);
-		readNetwork(networkWGS84, true);
-		log.info("... finished reading network.\n");
-		
-		log.info("reading and processing maneuvers ...");
-		try {
-			NetworkAddEmmeManeuverRestrictions mr = new NetworkAddEmmeManeuverRestrictions(maneuversFile);
-			mr.run(networkITM);
-			mr.run(networkWGS84);
-		}
-		catch (Exception e1) {
-			e1.printStackTrace();
-		}
-		
-		log.info("cleaning network ...");
-		NetworkCleaner nwCleaner = new NetworkCleaner();
-		nwCleaner.run(networkITM);
-		nwCleaner.run(networkWGS84);
-		log.info("... finished reading and processing maneuvers.\n");
-		
-		log.info("writing network ...");
-		new NetworkWriter(networkITM).write(outFileITM);
-		new NetworkWriter(networkWGS84).write(outFileWGS84);
-		log.info("... finished writing network.\n");
-		
-		
-		try {
-			ObjectFactory kmlObjectFactory = new ObjectFactory();
-			KMZWriter kmzWriter = new KMZWriter(kmzFile);
-		
-			KmlType mainKml = kmlObjectFactory.createKmlType();
-			DocumentType mainDoc = kmlObjectFactory.createDocumentType();
-			mainKml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(mainDoc));
-			
-			KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(networkITM, new GeotoolsTransformation(ITM, "WGS84"), kmzWriter, mainDoc);
-		
-			mainDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(kmlNetworkWriter.getNetworkFolder()));
-			kmzWriter.writeMainKml(mainKml);
-			kmzWriter.close();
-		} 
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		try {
-			Collection<SimpleFeature> ft;
-			ft = generateNodesFromNet(networkWGS84);
-			ShapeFileWriter.writeGeometries(ft, shpNodesFile);
-			
-			ft = generateLinksFromNet(networkWGS84);
-			ShapeFileWriter.writeGeometries(ft, shpLinksFile);
-			
-		} 
-		catch (NumberFormatException e) {
-			e.printStackTrace();
-		}
+		counter.printCounter();
 	}
 	
-	
-	public static Collection<SimpleFeature> generateLinksFromNet(Network network) {
+	private static Collection<SimpleFeature> generateLinksFromNet(Network network) {
 
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
@@ -383,7 +480,7 @@ public class NetworkEmme2MATSim2012 {
 		return features;
 	}
 
-	public static Collection<SimpleFeature> generateNodesFromNet(Network network) {
+	private static Collection<SimpleFeature> generateNodesFromNet(Network network) {
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
 
@@ -400,4 +497,4 @@ public class NetworkEmme2MATSim2012 {
 				
 		return features;
 	}
-	}
+}

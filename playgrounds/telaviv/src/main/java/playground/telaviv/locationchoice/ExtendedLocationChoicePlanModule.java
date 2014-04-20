@@ -35,7 +35,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.telaviv.facilities.Emme2FacilitiesCreator;
 import playground.telaviv.population.Emme2Person;
 import playground.telaviv.population.Emme2PersonFileParser;
 import playground.telaviv.zones.ZoneMapping;
@@ -52,7 +51,6 @@ public class ExtendedLocationChoicePlanModule extends AbstractMultithreadedModul
 	
 	private Scenario scenario;
 	
-	private Emme2FacilitiesCreator facilitiesCreator = null;
 	private ExtendedLocationChoiceProbabilityCreator extendedLocationChoiceProbabilityCreator = null;
 	private ZoneMapping zoneMapping = null;
 	private Map<Id, List<Integer>> shoppingActivities = null;	// <PersonId, List<Index in the Plan's PlanElementsList>
@@ -68,16 +66,17 @@ public class ExtendedLocationChoicePlanModule extends AbstractMultithreadedModul
 		zoneMapping = new ZoneMapping(scenario, TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84"));
 		log.info("done.");
 		
-		log.info("Creating FacilitiesCreator...");
-		facilitiesCreator = new Emme2FacilitiesCreator(scenario, zoneMapping);
-		log.info("done.");
-		
 		log.info("Creating ExtendedLocationChoiceProbabilityCreator...");
 		extendedLocationChoiceProbabilityCreator = new ExtendedLocationChoiceProbabilityCreator(scenario, travelTimeCalc);
 		log.info("done.");
 		
 		log.info("Parsing population file...");
-		Map<Integer, Emme2Person> personMap = new Emme2PersonFileParser(populationFile, ",", true).readFile();
+		Map<Integer, Emme2Person> personMap;
+		try {
+			personMap = new Emme2PersonFileParser(populationFile, ",", true).readFile();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		log.info("done.");
 		
 		log.info("Filter persons with activities...");
@@ -87,7 +86,7 @@ public class ExtendedLocationChoicePlanModule extends AbstractMultithreadedModul
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new ExtendedLocationChoicePlanAlgorithm(scenario, facilitiesCreator, extendedLocationChoiceProbabilityCreator, zoneMapping,
+		return new ExtendedLocationChoicePlanAlgorithm(scenario, extendedLocationChoiceProbabilityCreator, zoneMapping,
 				shoppingActivities, otherActivities, workActivities, educationActivities);
 	}
 

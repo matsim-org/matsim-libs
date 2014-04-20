@@ -33,7 +33,7 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.telaviv.facilities.Emme2FacilitiesCreator;
+import playground.telaviv.facilities.FacilitiesCreator;
 import playground.telaviv.population.Emme2Person;
 import playground.telaviv.population.Emme2PersonFileParser;
 import playground.telaviv.zones.ZoneMapping;
@@ -49,7 +49,6 @@ public class LocationChoicePlanModule extends AbstractMultithreadedModule {
 	
 	private Scenario scenario;
 	
-	private Emme2FacilitiesCreator facilitiesCreator = null;
 	private LocationChoiceProbabilityCreator locationChoiceProbabilityCreator = null;
 	private ZoneMapping zoneMapping = null;
 	private Map<Id, List<Integer>> shoppingActivities = null;	// <PersonId, List<Index in the Plan's PlanElementsList>
@@ -62,16 +61,17 @@ public class LocationChoicePlanModule extends AbstractMultithreadedModule {
 		zoneMapping = new ZoneMapping(scenario, TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84"));
 		log.info("done.");
 		
-		log.info("Creating FacilitiesCreator...");
-		facilitiesCreator = new Emme2FacilitiesCreator(scenario, zoneMapping);
-		log.info("done.");
-		
 		log.info("Creating LocationChoiceProbabilityCreator...");
 		locationChoiceProbabilityCreator = new LocationChoiceProbabilityCreator(scenario);
 		log.info("done.");
 		
 		log.info("Parsing population file...");
-		Map<Integer, Emme2Person> personMap = new Emme2PersonFileParser(populationFile, ",", true).readFile();
+		Map<Integer, Emme2Person> personMap;
+		try {
+			personMap = new Emme2PersonFileParser(populationFile, ",", true).readFile();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		log.info("done.");
 		
 		log.info("Filter persons with shopping activities...");
@@ -81,7 +81,7 @@ public class LocationChoicePlanModule extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new LocationChoicePlanAlgorithm(scenario, facilitiesCreator, locationChoiceProbabilityCreator, zoneMapping, 
+		return new LocationChoicePlanAlgorithm(scenario, locationChoiceProbabilityCreator, zoneMapping, 
 				shoppingActivities);
 	}
 

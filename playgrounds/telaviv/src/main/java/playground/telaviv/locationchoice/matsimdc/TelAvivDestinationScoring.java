@@ -35,20 +35,21 @@ import playground.telaviv.locationchoice.Coefficients;
 public class TelAvivDestinationScoring extends org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring {
 	
 	private final CalculateDestinationChoice dcCalculator;
-	private final Map<Id, Integer> linkToZoneMap;
+	private final Map<Id, Integer> facilityToZoneIndexMap;
 	
 	private static final Logger log = Logger.getLogger(TelAvivDestinationScoring.class);
 		
-	public TelAvivDestinationScoring(DestinationChoiceBestResponseContext dcContext, Map<Id, Integer> linkToZoneMap, CalculateDestinationChoice dcCalculator) {
+	public TelAvivDestinationScoring(DestinationChoiceBestResponseContext dcContext, 
+			Map<Id, Integer> facilityToZoneIndexMap, CalculateDestinationChoice dcCalculator) {
 		super(dcContext);	
 		this.dcCalculator = dcCalculator;
-		this.linkToZoneMap = linkToZoneMap;
+		this.facilityToZoneIndexMap = facilityToZoneIndexMap;
 	}
 	
 	public double getZonalScore(PlanImpl plan, ActivityImpl act) {
 		Activity previousActivity = plan.getPreviousActivity(plan.getPreviousLeg(act));
-		int fromZoneIndex = this.getZoneIndex(previousActivity.getLinkId());
-		int toZoneIndex = this.getZoneIndex(act.getLinkId());
+		int fromZoneIndex = this.getZoneIndex(previousActivity.getFacilityId());
+		int toZoneIndex = this.getZoneIndex(act.getFacilityId());
 		
 		int timeSlotIndex = 0;
 		// not required as constant factors are not given per time slot
@@ -72,8 +73,8 @@ public class TelAvivDestinationScoring extends org.matsim.contrib.locationchoice
 	}
 	
 	// could be speed up: search for fromZone and toZone at the same time
-	private int getZoneIndex(Id linkId) {
-		Integer index = this.linkToZoneMap.get(linkId);
+	private int getZoneIndex(Id facilityId) {
+		Integer index = this.facilityToZoneIndexMap.get(facilityId);
 		if (index != null) return index;
 		else return -1;
 //		int index = 0;
@@ -83,4 +84,5 @@ public class TelAvivDestinationScoring extends org.matsim.contrib.locationchoice
 //		}
 //		return -1;
 	}
+	
 }

@@ -41,9 +41,9 @@ public class DCActivityScoringFunction extends org.matsim.contrib.locationchoice
 	private DestinationChoiceBestResponseContext dcContext;
 		
 	public DCActivityScoringFunction(Plan plan, final TreeMap<Id, FacilityPenalty> facilityPenalties, 
-			DestinationChoiceBestResponseContext dcContext, Map<Id, Integer> linkToZoneMap, CalculateDestinationChoice dcCalculator) {
+			DestinationChoiceBestResponseContext dcContext, Map<Id, Integer> facilityToZoneIndexMap, CalculateDestinationChoice dcCalculator) {
 		super(plan, facilityPenalties, dcContext);
-		this.destinationChoiceScoring = new TelAvivDestinationScoring(dcContext, linkToZoneMap, dcCalculator);
+		this.destinationChoiceScoring = new TelAvivDestinationScoring(dcContext, facilityToZoneIndexMap, dcCalculator);
 		this.plan = plan;
 		this.dcContext = dcContext;
 	}

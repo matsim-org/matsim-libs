@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 
 public class Emme2ZonesFileParser {

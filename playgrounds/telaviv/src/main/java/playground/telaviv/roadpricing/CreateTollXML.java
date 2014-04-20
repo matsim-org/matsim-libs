@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
@@ -194,7 +193,7 @@ public class CreateTollXML {
 		
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		NetworkEmme2MATSim2012.readNodes((NetworkImpl) scenario.getNetwork(), scenario, false);
+		NetworkEmme2MATSim2012.readNodes(scenario, false);
 		
 		return scenario.getNetwork();
 	}

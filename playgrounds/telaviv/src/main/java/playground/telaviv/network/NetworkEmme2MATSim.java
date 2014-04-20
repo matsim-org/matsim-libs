@@ -61,6 +61,8 @@ import playground.toronto.maneuvers.NetworkAddEmmeManeuverRestrictions;
 import com.vividsolutions.jts.geom.Coordinate;
 
 /**
+ * This class has been used for the 2010 model and is therefore outdated! To be removed in the future.
+ * 
  * Translates emme2 networks into matsim networks.
  * <p/>
  * The network data is preprocessed by Shlomo Bekhor in an Excel file. The tables

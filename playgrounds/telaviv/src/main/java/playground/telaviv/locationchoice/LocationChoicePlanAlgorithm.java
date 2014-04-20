@@ -20,15 +20,16 @@
 
 package playground.telaviv.locationchoice;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -37,8 +38,9 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
-import playground.telaviv.facilities.Emme2FacilitiesCreator;
+import playground.telaviv.facilities.FacilitiesCreator;
 import playground.telaviv.zones.ZoneMapping;
 
 /*
@@ -49,26 +51,41 @@ public class LocationChoicePlanAlgorithm implements PlanAlgorithm {
 	private static final Logger log = Logger.getLogger(LocationChoicePlanAlgorithm.class);
 	
 	private Scenario scenario;
-	private Emme2FacilitiesCreator facilitiesCreator = null;
 	private LocationChoiceProbabilityCreator locationChoiceProbabilityCreator = null;
 	private ZoneMapping zoneMapping = null;
 	private Map<Id, List<Integer>> shoppingActivities = null;	// <PersonId, List<Index in the Plan's PlanElementsList>
-		
+	private Map<Integer, List<ActivityFacility>> facilityLocationMap;
+	
 	private Random random = MatsimRandom.getLocalInstance();
 	
-	LocationChoicePlanAlgorithm(Scenario scenario, Emme2FacilitiesCreator facilitiesCreator, 
+	LocationChoicePlanAlgorithm(Scenario scenario,
 			LocationChoiceProbabilityCreator locationChoiceProbabilityCreator,
 			ZoneMapping zoneMapping, Map<Id, List<Integer>> shoppingActivities) {
 		this.scenario = scenario;
-		this.facilitiesCreator = facilitiesCreator;
 		this.locationChoiceProbabilityCreator = locationChoiceProbabilityCreator;
 		this.zoneMapping = zoneMapping;
 		this.shoppingActivities = shoppingActivities;
+		
+		ObjectAttributes objectAttributes = scenario.getActivityFacilities().getFacilityAttributes();
+		
+		facilityLocationMap = new HashMap<Integer, List<ActivityFacility>>();
+		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
+			Object tazObject = objectAttributes.getAttribute(facility.getId().toString(), FacilitiesCreator.TAZObjectAttributesName);
+			if (tazObject != null) {
+				int taz = (Integer) tazObject;
+				List<ActivityFacility> list = facilityLocationMap.get(taz);
+				if (list == null) {
+					list = new ArrayList<ActivityFacility>();
+					facilityLocationMap.put(taz, list);
+				}
+				list.add(facility);
+			}
+		}
 	}
 	
 	/*
-	 * Searches for Shopping Activities that can be replaced.
-	 * If no ones are found no replanning is neccessary and therefore
+	 * Searches for shopping activities that can be replaced.
+	 * If no ones are found no replanning is necessary and therefore
 	 * false is returned.
 	 */
 	@Override
@@ -134,37 +151,14 @@ public class LocationChoicePlanAlgorithm implements PlanAlgorithm {
 		return -1;
 	}
 	
-	/*
-	 * The link is selected randomly but the length of the links 
-	 * is used to weight the probability.
-	 */
-	private Id selectLinkByZone(int TAZ) {		
-		List<Id> linkIds = facilitiesCreator.getLinkIdsInZoneForFacilites(TAZ);
+	private Id selectLinkByZone(int TAZ) {
+		List<ActivityFacility> list = facilityLocationMap.get(TAZ);
 		
-		if (linkIds == null) {
+		if (list == null) {
 			log.warn("Zone " + TAZ + " has no mapped Links!");
 			return null;
 		}
 		
-		double totalLength = 0;
-		for (Id id : linkIds) {
-			Link link = zoneMapping.getNetwork().getLinks().get(id);
-			totalLength = totalLength + link.getLength();
-		}
-		
-		double[] probabilities = new double[linkIds.size()];
-		double sumProbability = 0.0;
-		for (int i = 0; i < linkIds.size(); i++) {
-			Link link = zoneMapping.getNetwork().getLinks().get(linkIds.get(i));
-			double probability = link.getLength() / totalLength;
-			probabilities[i] = sumProbability + probability;
-			sumProbability = probabilities[i];
-		}
-		
-		double randomProbability = random.nextDouble();
-		for (int i = 0; i < linkIds.size() - 1; i++) {
-			if (randomProbability <= probabilities[i + 1]) return linkIds.get(i);
-		}
-		return null;
+		return list.get(this.random.nextInt(list.size())).getLinkId();
 	}
 }

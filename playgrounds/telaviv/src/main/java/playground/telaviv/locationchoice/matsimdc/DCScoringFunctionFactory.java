@@ -25,25 +25,24 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelOpenTimesActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import playground.telaviv.facilities.FacilitiesCreator;
 import playground.telaviv.locationchoice.CalculateDestinationChoice;
-import playground.telaviv.zones.Emme2Zone;
-import playground.telaviv.zones.ZoneMapping;
 //import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 
 public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory {
@@ -51,7 +50,7 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 	private DestinationChoiceBestResponseContext dcContext;
 	private Config config;	
 //	private int iteration = -1;
-	private Map<Id, Integer> linkToZoneMap;
+	private Map<Id, Integer> facilityToZoneIndexMap;
 	private CalculateDestinationChoice dcCalculator;
 	private final static Logger log = Logger.getLogger(DCScoringFunctionFactory.class);
 	private boolean initialized = false;
@@ -72,13 +71,18 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 //		not necessary anymore as the constant factors do not change over the iterations:
 //		if (this.iteration != this.controler.getIterationNumber()) {
 //			this.iteration = this.controler.getIterationNumber();
-			ZoneMapping zoneMapping = new ZoneMapping(this.dcContext.getScenario(), TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84"));
-			
-			this.linkToZoneMap = new HashMap<Id, Integer>();
-			int index = 0;
-			for (Emme2Zone zone : zoneMapping.getParsedZones().values()) {
-				for (Id linkId : zone.linkIds) linkToZoneMap.put(linkId, index);
-				index++;
+		
+			// it is actually a map Id -> Zone Index (and NOT taz!)
+			// the indices have the same order as the taz values but are enumerated from 0 upwards
+			this.facilityToZoneIndexMap = new HashMap<Id, Integer>();
+		
+			Scenario scenario = this.dcContext.getScenario();
+			ObjectAttributes facilitiesAttributes = scenario.getActivityFacilities().getFacilityAttributes();
+			for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
+				Object value = facilitiesAttributes.getAttribute(facility.getId().toString(), FacilitiesCreator.indexObjectAttributesName);
+				if (value != null) {
+					this.facilityToZoneIndexMap.put(facility.getId(),(Integer) value);
+				}
 			}
 			
 			this.dcCalculator = new CalculateDestinationChoice(this.dcContext.getScenario());
@@ -107,7 +111,7 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 					(PlanImpl) person, 
 					this.dcContext.getFacilityPenalties(), 
 					dcContext,
-					this.linkToZoneMap,
+					this.facilityToZoneIndexMap,
 					this.dcCalculator);
 		scoringFunctionAccumulator.addScoringFunction(activityScoringFunction);		
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(new CharyparNagelScoringParameters(config.planCalcScore()), controler.getNetwork()));

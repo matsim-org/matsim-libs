@@ -20,6 +20,8 @@
 
 package playground.telaviv.population;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,16 +31,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -52,7 +51,6 @@ import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDi
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
@@ -60,9 +58,10 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.Desires;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.telaviv.config.TelAvivConfig;
-import playground.telaviv.facilities.Emme2FacilitiesCreator;
+import playground.telaviv.facilities.FacilitiesCreator;
 import playground.telaviv.zones.ZoneMapping;
 
 public class Emme2PopulationCreator {
@@ -71,14 +70,14 @@ public class Emme2PopulationCreator {
 
 //	private String populationFile = TelAvivConfig.basePath + "/population/PB1000_10.txt";
 	private String populationFile = TelAvivConfig.basePath + "/population/Pop_2010_Msim_a.CSV";
-	private String networkFile = TelAvivConfig.basePath + "/network/network.xml";
-	private String facilitiesFile = TelAvivConfig.basePath + "/facilities/facilities.xml";
+	private static String networkFile = TelAvivConfig.basePath + "/network/network.xml";
+	private static String facilitiesFile = TelAvivConfig.basePath + "/facilities/facilities.xml";
+	private static String facilitiesAttributesFile = TelAvivConfig.basePath + "/facilities/facilitiesAttributes.xml";
 	private String outFile = TelAvivConfig.basePath + "/population/internal_plans_10.xml.gz";
 
 	private Scenario scenario;
-	private ActivityFacilities activityFacilities;
+	private Map<Integer, List<ActivityFacility>> facilitiesToZoneMap;
 	private ZoneMapping zoneMapping;
-	private Emme2FacilitiesCreator facilitiesCreator;
 	private Random random = new Random(123456);
 
 	/*
@@ -97,30 +96,30 @@ public class Emme2PopulationCreator {
 	 */
 
 	public static void main(String[] args) {
-		new Emme2PopulationCreator(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
+		try {
+			Config config = ConfigUtils.createConfig();
+			config.network().setInputFile(networkFile);
+			config.facilities().setInputFile(facilitiesFile);
+			config.facilities().setInputFacilitiesAttributesFile(facilitiesAttributesFile);
+			Scenario scenario = ScenarioUtils.loadScenario(config);
+			new Emme2PopulationCreator(scenario);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public Emme2PopulationCreator(Scenario scenario) {
+	public Emme2PopulationCreator(Scenario scenario) throws Exception {
 		this.scenario = scenario;
-		log.info("Read Network File...");
-		new MatsimNetworkReader(scenario).readFile(networkFile);
-		log.info("done.");
-		
+
 		log.info("Creating zone mapping...");
 		zoneMapping = new ZoneMapping(scenario, TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84")); 
 		log.info("done.");
 
-		log.info("Creating FacilitiesCreator...");
-		facilitiesCreator = new Emme2FacilitiesCreator(scenario, zoneMapping);
-		log.info("done.");
-
-		log.info("Reading facilities file...");
-		new MatsimFacilitiesReader((ScenarioImpl)scenario).readFile(facilitiesFile);
-		activityFacilities = ((ScenarioImpl)scenario).getActivityFacilities();
-		log.info("done.");
-
+		createFacilityToZoneMapping(scenario);
+		
 		log.info("Parsing population file...");
 		Map<Integer, Emme2Person> personMap = new Emme2PersonFileParser(populationFile, "," , true).readFile();
+		log.info(personMap.size());
 		log.info("done.");
 
 		log.info("Creating MATSim population...");
@@ -131,8 +130,8 @@ public class Emme2PopulationCreator {
 			Id id = scenario.createId(String.valueOf(entry.getKey()));
 			Emme2Person emme2Person = entry.getValue();
 
-			PersonImpl person = (PersonImpl)populationFactory.createPerson(id);
-
+			PersonImpl person = (PersonImpl) populationFactory.createPerson(id);
+			
 			setBasicParameters(person, emme2Person);
 
 			/*
@@ -190,6 +189,24 @@ public class Emme2PopulationCreator {
 		log.info("done.");
 	}
 
+	private void createFacilityToZoneMapping(Scenario scenario) {
+		
+		ObjectAttributes objectAttributes = scenario.getActivityFacilities().getFacilityAttributes();
+		this.facilitiesToZoneMap = new HashMap<Integer, List<ActivityFacility>>();
+		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
+			Object tazObject = objectAttributes.getAttribute(facility.getId().toString(), FacilitiesCreator.TAZObjectAttributesName);
+			if (tazObject != null) {
+				int taz = (Integer) tazObject;
+				List<ActivityFacility> list = this.facilitiesToZoneMap.get(taz);
+				if (list == null) {
+					list = new ArrayList<ActivityFacility>();
+					this.facilitiesToZoneMap.put(taz, list);
+				}
+				list.add(facility);
+			}
+		}
+	}
+	
 	/*
 	 * Set some basic person parameters like age, sex, license and car availability.
 	 */
@@ -284,8 +301,8 @@ public class Emme2PopulationCreator {
 		boolean hasPrimaryActivity = zoneMapping.zoneExists(primaryMainActivityZone);
 		boolean hasSecondaryActivity = zoneMapping.zoneExists(secondaryMainActivityZone);
 
-		Id homeLinkId;
-		Id previousActivityLinkId;
+		ActivityFacility homeFacility;
+		ActivityFacility previousFacility;
 		double time = 0.0;
 
 		/*
@@ -294,8 +311,10 @@ public class Emme2PopulationCreator {
 		 * If the zone of the primary and secondary activity is
 		 * not valid the persons stays at home the whole day.
 		 */
-		homeLinkId = selectLinkByZone(homeZone);
-		activity = (ActivityImpl) populationFactory.createActivityFromLinkId("home", homeLinkId);
+		homeFacility = selectFacilityByZone(homeZone);
+		activity = (ActivityImpl) populationFactory.createActivityFromCoord("home", homeFacility.getCoord());
+		activity.setFacilityId(homeFacility.getId());
+		activity.setLinkId(homeFacility.getLinkId());
 		activity.setStartTime(0.0);
 
 		if (hasPrimaryActivity) {
@@ -312,9 +331,6 @@ public class Emme2PopulationCreator {
 			// It is the only Activity in the plan so we don't set an endtime.
 		}
 		
-		activityFacility = activityFacilities.getFacilities().get(homeLinkId);
-		activity.setFacilityId(activityFacility.getId());
-		activity.setCoord(activityFacility.getCoord());
 //		desires.accumulateActivityDuration(activity.getType(), activity.getMaximumDuration());
 		plan.addActivity(activity);
 
@@ -324,7 +340,7 @@ public class Emme2PopulationCreator {
 			return true;
 		}
 
-		previousActivityLinkId = homeLinkId;
+		previousFacility = homeFacility;
 		transportMode = getPrimaryTransportMode(primaryMainModePreActivity);
 
 		/*
@@ -335,9 +351,9 @@ public class Emme2PopulationCreator {
 			 * If we have an Activity before the primary Activity
 			 */
 			if (primaryPreStop) {
-				Id primaryPreLinkId = selectLinkByZone(primaryPreStopActivityZone);
+				ActivityFacility primaryPreFacility = selectFacilityByZone(primaryPreStopActivityZone);
 
-				leg = (LegImpl)populationFactory.createLeg(transportMode);
+				leg = (LegImpl) populationFactory.createLeg(transportMode);
 				leg.setDepartureTime(time);
 				leg.setTravelTime(0.0);
 				leg.setArrivalTime(time);
@@ -349,16 +365,15 @@ public class Emme2PopulationCreator {
 				 * If null is returned, the found activity type cannot be performed in the found
 				 * facility. Skip those persons.
 				 */
-				activityType = getActivityTypeString(primaryPreStopActivityType, getActivityFacilityByLinkId(primaryPreLinkId));
+				activityType = getActivityTypeString(primaryPreStopActivityType, primaryPreFacility);
 				if (activityType == null) return false;
 				
-				activity = (ActivityImpl) populationFactory.createActivityFromLinkId(activityType, primaryPreLinkId);
+				activity = (ActivityImpl) populationFactory.createActivityFromCoord(activityType, primaryPreFacility.getCoord());
+				activity.setFacilityId(primaryPreFacility.getId());
+				activity.setLinkId(primaryPreFacility.getLinkId());
 				activity.setStartTime(time);
 				activity.setMaximumDuration(emme2Person.DUR_1_BEF);
 				activity.setEndTime(time + emme2Person.DUR_1_BEF);
-				activityFacility = activityFacilities.getFacilities().get(primaryPreLinkId);
-				activity.setFacilityId(activityFacility.getId());
-				activity.setCoord(activityFacility.getCoord());
 				/*
 				 * Ensure that typical duration is at least one hour. Very few agents have a duration of
 				 * 0.0 seconds, which results in crashes in the scoring function (typical duration is 0.0
@@ -367,16 +382,16 @@ public class Emme2PopulationCreator {
 				desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 				plan.addActivity(activity);
 
-				previousActivityLinkId = primaryPreLinkId;
+				previousFacility = primaryPreFacility;
 				time = time + emme2Person.DUR_1_BEF;
 			}
 
 			/*
 			 * Primary Activity
 			 */
-			Id primaryLinkId = selectLinkByZone(primaryMainActivityZone);
+			ActivityFacility primaryFacility = selectFacilityByZone(primaryMainActivityZone);
 
-			leg = (LegImpl)populationFactory.createLeg(transportMode);
+			leg = (LegImpl) populationFactory.createLeg(transportMode);
 			leg.setDepartureTime(time);
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(time);
@@ -388,20 +403,19 @@ public class Emme2PopulationCreator {
 			 * If null is returned, the found activity type cannot be performed in the found
 			 * facility. Skip those persons.
 			 */
-			activityType = getActivityTypeString(primaryMainActivityType, getActivityFacilityByLinkId(primaryLinkId));
+			activityType = getActivityTypeString(primaryMainActivityType, primaryFacility);
 			if (activityType == null) return false;
 			
-			activity = (ActivityImpl) populationFactory.createActivityFromLinkId(activityType, primaryLinkId);
+			activity = (ActivityImpl) populationFactory.createActivityFromCoord(activityType, primaryFacility.getCoord());
+			activity.setFacilityId(primaryFacility.getId());
+			activity.setLinkId(primaryFacility.getLinkId());
 			activity.setStartTime(time);
 			activity.setMaximumDuration(emme2Person.DUR_1_MAIN);
 			activity.setEndTime(time + emme2Person.DUR_1_MAIN);
-			activityFacility = activityFacilities.getFacilities().get(primaryLinkId);
-			activity.setFacilityId(activityFacility.getId());
-			activity.setCoord(activityFacility.getCoord());
 			desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 			plan.addActivity(activity);
 
-			previousActivityLinkId = primaryLinkId;
+			previousFacility = primaryFacility;
 			transportMode = getSwitchedTransportMode(primaryMainModeSwitch, transportMode);
 			time = time + emme2Person.DUR_1_MAIN;
 
@@ -409,9 +423,9 @@ public class Emme2PopulationCreator {
 			 * If we have an Activity after the primary Activity
 			 */
 			if (primaryPostStop) {
-				Id primaryPostLinkId = selectLinkByZone(primaryPostStopActivityZone);
+				ActivityFacility primaryPostFacility = selectFacilityByZone(primaryPostStopActivityZone);
 
-				leg = (LegImpl)populationFactory.createLeg(transportMode);
+				leg = (LegImpl) populationFactory.createLeg(transportMode);
 				leg.setDepartureTime(time);
 				leg.setTravelTime(0.0);
 				leg.setArrivalTime(time);
@@ -423,24 +437,23 @@ public class Emme2PopulationCreator {
 				 * If null is returned, the found activity type cannot be performed in the found
 				 * facility. Skip those persons.
 				 */
-				activityType = getActivityTypeString(primaryPostStopActivityType, getActivityFacilityByLinkId(primaryPostLinkId));
+				activityType = getActivityTypeString(primaryPostStopActivityType, primaryPostFacility);
 				if (activityType == null) return false;
 
-				activity = (ActivityImpl) populationFactory.createActivityFromLinkId(activityType, primaryPostLinkId);
+				activity = (ActivityImpl) populationFactory.createActivityFromCoord(activityType, primaryPostFacility.getCoord());
+				activity.setFacilityId(primaryPostFacility.getId());
+				activity.setLinkId(primaryPostFacility.getLinkId());
 				activity.setStartTime(time);
 				activity.setMaximumDuration(emme2Person.DUR_1_AFT);
 				activity.setEndTime(time + emme2Person.DUR_1_AFT);
-				activityFacility = activityFacilities.getFacilities().get(primaryPostLinkId);
-				activity.setFacilityId(activityFacility.getId());
-				activity.setCoord(activityFacility.getCoord());
 				desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 				plan.addActivity(activity);
 
-				previousActivityLinkId = primaryPostLinkId;
+				previousFacility = primaryPostFacility;
 				time = time + emme2Person.DUR_1_AFT;
 			}
 
-			leg = (LegImpl)populationFactory.createLeg(transportMode);
+			leg = (LegImpl) populationFactory.createLeg(transportMode);
 			leg.setDepartureTime(time);
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(time);
@@ -448,7 +461,9 @@ public class Emme2PopulationCreator {
 //			leg.setRoute(route);
 			plan.addLeg(leg);
 
-			activity = (ActivityImpl) populationFactory.createActivityFromLinkId("home", homeLinkId);
+			activity = (ActivityImpl) populationFactory.createActivityFromCoord("home", homeFacility.getCoord());
+			activity.setFacilityId(homeFacility.getId());
+			activity.setLinkId(homeFacility.getLinkId());
 			activity.setStartTime(time);
 
 			/*
@@ -460,9 +475,6 @@ public class Emme2PopulationCreator {
 				activity.setMaximumDuration(emme2Person.START_2 - time);
 				activity.setEndTime(emme2Person.START_2);
 			}
-			activityFacility = activityFacilities.getFacilities().get(homeLinkId);
-			activity.setFacilityId(activityFacility.getId());
-			activity.setCoord(activityFacility.getCoord());
 //			desires.accumulateActivityDuration(activity.getType(), activity.getDuration());
 			plan.addActivity(activity);
 		}
@@ -473,18 +485,17 @@ public class Emme2PopulationCreator {
 		 */
 		if (hasSecondaryActivity) {
 			time = emme2Person.START_2;
-			homeLinkId = selectLinkByZone(homeZone);
 
-			previousActivityLinkId = homeLinkId;
+			previousFacility = homeFacility;
 			transportMode = getSecondaryTransportMode(secondaryMainMode);
 
 			/*
 			 * If we have an Activity before the secondary Activity
 			 */
 			if (secondaryPreStop) {
-				Id secondaryPreLinkId = selectLinkByZone(secondaryPreStopActivityZone);
+				ActivityFacility secondaryPreFacility = selectFacilityByZone(secondaryPreStopActivityZone);
 
-				leg = (LegImpl)populationFactory.createLeg(transportMode);
+				leg = (LegImpl) populationFactory.createLeg(transportMode);
 				leg.setDepartureTime(time);
 				leg.setTravelTime(0.0);
 				leg.setArrivalTime(time);
@@ -496,29 +507,28 @@ public class Emme2PopulationCreator {
 				 * If null is returned, the found activity type cannot be performed in the found
 				 * facility. Skip those persons.
 				 */
-				activityType = getActivityTypeString(secondaryPreStopActivityType, getActivityFacilityByLinkId(secondaryPreLinkId));
+				activityType = getActivityTypeString(secondaryPreStopActivityType, secondaryPreFacility);
 				if (activityType == null) return false;
 				
-				activity = (ActivityImpl) populationFactory.createActivityFromLinkId(activityType, secondaryPreLinkId);
+				activity = (ActivityImpl) populationFactory.createActivityFromCoord(activityType, secondaryPreFacility.getCoord());
+				activity.setFacilityId(secondaryPreFacility.getId());
+				activity.setLinkId(secondaryPreFacility.getLinkId());
 				activity.setStartTime(time);
 				activity.setMaximumDuration(emme2Person.DUR_2_BEF);
 				activity.setEndTime(time + emme2Person.DUR_2_BEF);
-				activityFacility = activityFacilities.getFacilities().get(secondaryPreLinkId);
-				activity.setFacilityId(activityFacility.getId());
-				activity.setCoord(activityFacility.getCoord());
 				desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 				plan.addActivity(activity);
 
-				previousActivityLinkId = secondaryPreLinkId;
+				previousFacility = secondaryPreFacility;
 				time = time + emme2Person.DUR_2_BEF;
 			}
 
 			/*
 			 * Secondary Activity
 			 */
-			Id secondaryLinkId = selectLinkByZone(secondaryMainActivityZone);
+			ActivityFacility secondaryFacility = selectFacilityByZone(secondaryMainActivityZone);
 
-			leg = (LegImpl)populationFactory.createLeg(transportMode);
+			leg = (LegImpl) populationFactory.createLeg(transportMode);
 			leg.setDepartureTime(time);
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(time);
@@ -530,29 +540,28 @@ public class Emme2PopulationCreator {
 			 * If null is returned, the found activity type cannot be performed in the found
 			 * facility. Skip those persons.
 			 */
-			activityType = getActivityTypeString(secondaryMainActivityType, getActivityFacilityByLinkId(secondaryLinkId));
+			activityType = getActivityTypeString(secondaryMainActivityType, secondaryFacility);
 			if (activityType == null) return false;
 			
-			activity = (ActivityImpl) populationFactory.createActivityFromLinkId(activityType, secondaryLinkId);
+			activity = (ActivityImpl) populationFactory.createActivityFromCoord(activityType, secondaryFacility.getCoord());
+			activity.setFacilityId(secondaryFacility.getId());
+			activity.setLinkId(secondaryFacility.getLinkId());
 			activity.setStartTime(time);
 			activity.setMaximumDuration(emme2Person.DUR_2_MAIN);
 			activity.setEndTime(time + emme2Person.DUR_2_MAIN);
-			activityFacility = activityFacilities.getFacilities().get(secondaryLinkId);
-			activity.setFacilityId(activityFacility.getId());
-			activity.setCoord(activityFacility.getCoord());
 			desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 			plan.addActivity(activity);
 
-			previousActivityLinkId = secondaryLinkId;
+			previousFacility = secondaryFacility;
 			time = time + emme2Person.DUR_2_MAIN;
 
 			/*
 			 * If we have an Activity after the secondary Activity
 			 */
 			if (secondaryPostStop) {
-				Id secondaryPostLinkId = selectLinkByZone(secondaryPostStopActivityZone);
+				ActivityFacility secondaryPostFacility = selectFacilityByZone(secondaryPostStopActivityZone);
 
-				leg = (LegImpl)populationFactory.createLeg(transportMode);
+				leg = (LegImpl) populationFactory.createLeg(transportMode);
 				leg.setDepartureTime(time);
 				leg.setTravelTime(0.0);
 				leg.setArrivalTime(time);
@@ -564,24 +573,23 @@ public class Emme2PopulationCreator {
 				 * If null is returned, the found activity type cannot be performed in the found
 				 * facility. Skip those persons.
 				 */
-				activityType = getActivityTypeString(secondaryPostStopActivityType, getActivityFacilityByLinkId(secondaryPostLinkId));
+				activityType = getActivityTypeString(secondaryPostStopActivityType, secondaryPostFacility);
 				if (activityType == null) return false;
 				
-				activity = (ActivityImpl) populationFactory.createActivityFromLinkId(activityType, secondaryPostLinkId);
+				activity = (ActivityImpl) populationFactory.createActivityFromCoord(activityType, secondaryPostFacility.getCoord());
+				activity.setFacilityId(secondaryPostFacility.getId());
+				activity.setLinkId(secondaryPostFacility.getLinkId());
 				activity.setStartTime(time);
 				activity.setMaximumDuration(emme2Person.DUR_2_AFT);
 				activity.setEndTime(time + emme2Person.DUR_2_AFT);
-				activityFacility = activityFacilities.getFacilities().get(secondaryPostLinkId);
-				activity.setFacilityId(activityFacility.getId());
-				activity.setCoord(activityFacility.getCoord());
 				desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 				plan.addActivity(activity);
 
-				previousActivityLinkId = secondaryPostLinkId;
+				previousFacility = secondaryPostFacility;
 				time = time + emme2Person.DUR_2_AFT;
 			}
 
-			leg = (LegImpl)populationFactory.createLeg(transportMode);
+			leg = (LegImpl) populationFactory.createLeg(transportMode);
 			leg.setDepartureTime(time);
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(time);
@@ -592,11 +600,10 @@ public class Emme2PopulationCreator {
 			/*
 			 * It is the last Activity of the plan so we don't set an end time.
 			 */
-			activity = (ActivityImpl) populationFactory.createActivityFromLinkId("home", homeLinkId);
+			activity = (ActivityImpl) populationFactory.createActivityFromCoord("home", homeFacility.getCoord());
+			activity.setFacilityId(homeFacility.getId());
+			activity.setLinkId(homeFacility.getLinkId());
 			activity.setStartTime(time);
-			activityFacility = activityFacilities.getFacilities().get(homeLinkId);
-			activity.setFacilityId(activityFacility.getId());
-			activity.setCoord(activityFacility.getCoord());
 //			desires.accumulateActivityDuration(activity.getType(), activity.getDuration());
 			plan.addActivity(activity);
 		}
@@ -618,46 +625,14 @@ public class Emme2PopulationCreator {
 		return true;
 	}
 
-	/*
-	 * The link is selected randomly but the length of the links
-	 * is used to weight the probability.
-	 */
-	private Id selectLinkByZone(int TAZ) {
-		List<Id> linkIds = facilitiesCreator.getLinkIdsInZoneForFacilites(TAZ);
-
-		if (linkIds == null) {
-			log.warn("Zone " + TAZ + " has no mapped Links!");
-			return null;
+	private ActivityFacility selectFacilityByZone(int TAZ) {
+		List<ActivityFacility> list = this.facilitiesToZoneMap.get(TAZ);
+		
+		if (list == null || list.size() == 0) {
+			throw new RuntimeException("No facilities have been mapped to zone " + TAZ + ". Aborting!");
 		}
-
-		double totalLength = 0;
-		for (Id id : linkIds) {
-			Link link = zoneMapping.getNetwork().getLinks().get(id);
-			totalLength = totalLength + link.getLength();
-		}
-
-		double[] probabilities = new double[linkIds.size()];
-		double sumProbability = 0.0;
-		for (int i = 0; i < linkIds.size(); i++) {
-			Link link = zoneMapping.getNetwork().getLinks().get(linkIds.get(i));
-			double probability = link.getLength() / totalLength;
-			probabilities[i] = sumProbability + probability;
-			sumProbability = probabilities[i];
-		}
-
-		double randomProbability = random.nextDouble();
-		for (int i = 0; i < linkIds.size() - 1; i++) {
-			if (randomProbability <= probabilities[i + 1]) return linkIds.get(i);
-		}
-		return null;
-	}
-
-	/*
-	 * We have one ActivityFacility per Links that has the same
-	 * Id as the Link itself.
-	 */
-	private ActivityFacility getActivityFacilityByLinkId(Id id) {
-		return activityFacilities.getFacilities().get(id);
+		
+		return list.get(this.random.nextInt(list.size()));
 	}
 
 	private String getPrimaryTransportMode(int code) {
