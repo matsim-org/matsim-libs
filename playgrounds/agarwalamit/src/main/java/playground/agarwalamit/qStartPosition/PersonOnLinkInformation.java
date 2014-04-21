@@ -94,7 +94,9 @@ public class PersonOnLinkInformation {
 
 	public void checkIfVehicleWillGoInQ(double currentTimeStep){
 		double travelTimeSincePersonHasEntered = currentTimeStep - getLinkEnterTime();
-		this.addVehicleInQ= travelTimeSincePersonHasEntered >= Math.floor(getFreeSpeedLinkTravelTime())+1;
+		if(currentTimeStep!=getLinkLeaveTime()){
+			this.addVehicleInQ= travelTimeSincePersonHasEntered >= Math.floor(getFreeSpeedLinkTravelTime())+1;
+		} else this.addVehicleInQ=false;
 	}
 
 	public boolean addVehicleInQ() {
@@ -102,12 +104,14 @@ public class PersonOnLinkInformation {
 	}
 
 	public void setAvailableLinkSpace(double availableLinkSpace) {
-		this.availableLinkSpace = availableLinkSpace;
+		if(availableLinkSpace<0) this.availableLinkSpace=0;
+		else this.availableLinkSpace = availableLinkSpace;
 	}
 	public double getQueuingTime(){
 		return this.queuingTime;
 	}
-	public void setQueuingTime(double queueStartTime){
-		this.queuingTime=queueStartTime;
+	public void setQueuingTime(double availableSpaceSoFar){
+		// to set actual queuing time (45.56) not like earlier (45.0).
+		this.queuingTime = linkEnterTime + availableSpaceSoFar / Math.min(link.getFreespeed(), getVehicleSpeed(this.legMode));
 	}
 }
