@@ -81,7 +81,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 	@Override
 	public void handleEvent(PersonDepartureEvent event){
 		personId2LegMode.put(event.getPersonId(), event.getLegMode());
-		updateVehicleOnLinkAndFillToQueue(event.getTime());
+//		updateVehicleOnLinkAndFillToQueue(event.getTime());
 	}
 
 	@Override
@@ -115,6 +115,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 			if (personId2LinkInfo == null) {
 				throw new RuntimeException("Cannot happen.");
 			}
+			
 			PersonOnLinkInformation personOnLinkInfo = personId2LinkInfo.get(personId);
 			personOnLinkInfo.setLinkLeaveTime( event.getTime());
 
@@ -129,10 +130,10 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 			linkId2PersonId2VehicleOnLink.get(linkId).remove(personId);
 
 			if(linkId2PersonId2VehicleInQueue.get(linkId).contains(personId)) {
-				if(!((LinkedList<Id>)linkId2PersonId2VehicleInQueue.get(linkId)).get(0).equals(personId)) {
-					// perhaps check if this is at the front of the queue (only for no passing case).
-					//logger.warn("Leaving vehicle should be first in queue if it was entered on link first.");
-				}
+//				if(!((LinkedList<Id>)linkId2PersonId2VehicleInQueue.get(linkId)).get(0).equals(personId)) {
+//					// perhaps check if this is at the front of the queue (only for no passing case).
+//					//logger.warn("Leaving vehicle should be first in queue if it was entered on link first.");
+//				}
 				String qDataToWriteInList = personId+"\t"+linkId+"\t"
 						+personOnLinkInfo.getLinkEnterTime()+"\t"
 						+personOnLinkInfo.getQueuingTime()+"\t"
@@ -189,8 +190,9 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 							 * If a person (20mps)  starts on link(1000m) at t=0, then will add to queue if time t=51 sec
 							 * time-1 is actually physically correct time at which it will add to Q.
 							 */
-							personOnLinkInfo.setQueuingTime(time-1);
 							double availableSpaceSoFar=Double.valueOf(linkId2LinkAvailableSpace.get(linkId));
+							personOnLinkInfo.setQueuingTime(availableSpaceSoFar);
+//							personOnLinkInfo.setQueuingTime(time-1);
 							double newAvailableSpace = availableSpaceSoFar-getCellSize(personOnLinkInfo.getLegMode());
 							linkId2LinkAvailableSpace.put(linkId, Double.valueOf(newAvailableSpace));
 						}
