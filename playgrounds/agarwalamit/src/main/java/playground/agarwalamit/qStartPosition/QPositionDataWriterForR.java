@@ -95,7 +95,7 @@ public class QPositionDataWriterForR {
 				vehicleSpeed=getVehicleSpeed(travelMode);
 
 				double initialPos = Double.valueOf(linkId)*Double.valueOf(linkLength);
-				double qStartTime = Double.valueOf(queuingTime);
+				double qStartTime =Double.valueOf(queuingTime);
 				double qStartDistFromFNode = initialPos+(qStartTime-Double.valueOf(linkEnterTime))*vehicleSpeed;
 				double timeStepTillFreeSpeed = qStartTime;
 				double endOfLink = (1+Double.valueOf(linkId))*Double.valueOf(linkLength);
