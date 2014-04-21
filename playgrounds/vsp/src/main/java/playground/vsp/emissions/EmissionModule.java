@@ -433,6 +433,11 @@ public class EmissionModule {
 		WarmEmissionAnalysisModule wam = warmEmissionHandler.getWarmEmissionAnalysisModule();
 //		ColdEmissionAnalysisModule cam = coldEmissionHandler.getColdEmissionAnalysisModule();
 		
+//		logger.info("Average speed was calculated to 0.0 or a negative value for " + wam.getAverageSpeedNegativeCnt() + " of " + 
+//				wam.getWarmEmissionEventCounter() + " warm emission events.");
+		logger.info("Average speed was calculated greater than free flow speed for " + wam.getAverageSpeedTooHighCnt() + " of " +
+				wam.getWarmEmissionEventCounter() + " warm emission events.");
+		
 		logger.info("Emission calculation based on `Free flow only' occured for " + wam.getFreeFlowOccurences() + " of " +
 				wam.getWarmEmissionEventCounter() + " warm emission events.");
 		logger.info("Emission calculation based on `Stop&Go only' occured for " + wam.getStopGoOccurences() + " of " +
