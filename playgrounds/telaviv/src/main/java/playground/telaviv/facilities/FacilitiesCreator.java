@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Emme2FacilitiesCreator.java
+ * FacilitiesCreator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -105,7 +105,7 @@ public class FacilitiesCreator {
 
 	private static String ITM = "EPSG:2039";	// network coding String
 	
-	private static String basePath = "";	
+	private static String basePath = "";
 	private static String networkFile = "";
 	private static String zonalAttributesFile = "";
 	private static String zonalSHPFile = "";
@@ -118,12 +118,14 @@ public class FacilitiesCreator {
 	
 	private static Set<String> validLinkTypes = CollectionUtils.stringToSet("4,5,6");
 	
+	private static String separator = ",";
+	
 	private static Random random = MatsimRandom.getLocalInstance();
 	private static GeometryFactory geometryFactory = new GeometryFactory();
 	private static CoordinateTransformation fromWGS84CoordinateTransformation = new GeotoolsTransformation("WGS84", ITM);
 	private static CoordinateTransformation toWGS84CoordinateTransformation = new GeotoolsTransformation(ITM, "WGS84");
 	
-	public static void main(String[] args) throws Exception {	
+	public static void main(String[] args) {	
 		try {
 			if (args.length > 0) {
 				String file = args[0];
@@ -138,6 +140,9 @@ public class FacilitiesCreator {
 
 				value = parameterMap.remove("zonalAttributesFile");
 				if (value != null) zonalAttributesFile = value;
+				
+				value = parameterMap.remove("separator");
+				if (value != null) separator = value;
 				
 				value = parameterMap.remove("zonalSHPFile");
 				if (value != null) zonalSHPFile = value;
@@ -171,7 +176,8 @@ public class FacilitiesCreator {
 			
 			log.info("loading zonal attributes ...");
 			boolean skipHeader = true;
-			Map<Integer, Emme2Zone> zonalAttributes = new Emme2ZonesFileParser(basePath + zonalAttributesFile).readFile(skipHeader);
+			Map<Integer, Emme2Zone> zonalAttributes = new Emme2ZonesFileParser(basePath + zonalAttributesFile, 
+					separator).readFile(skipHeader);
 			log.info("done.\n");
 			
 			log.info("loading zonal shp file ...");
@@ -442,7 +448,7 @@ public class FacilitiesCreator {
 	}
 	
 	// create f2l mapping file
-	public static void createAndWriteF2LMapping(Scenario scenario) {
+	private static void createAndWriteF2LMapping(Scenario scenario) {
 		log.info("creating f2l mapping and write it to a file ...");
 		try {
 			BufferedWriter bw = IOUtils.getBufferedWriter(basePath + f2lFile);
@@ -486,25 +492,6 @@ public class FacilitiesCreator {
 		
 		return externalNodes;
 	}
-	
-//	public List<Id> getLinkIdsInZoneForFacilites(int TAZ) {
-//		Emme2Zone zone = zoneMapping.getParsedZone(TAZ);
-//		if (zone == null) return null;
-//		
-//		List<Id> validLinks = new ArrayList<Id>(zone.linkIds);
-//
-//		List<Integer> validTypes = new ArrayList<Integer>();
-//		for (int type : validLinkTypes) validTypes.add(type);
-//
-//		Iterator<Id> iter = validLinks.iterator();
-//		while (iter.hasNext()) {
-//			LinkImpl link = (LinkImpl) zoneMapping.getNetwork().getLinks().get(iter.next());
-//			int type = Integer.valueOf(link.getType());
-//			if (!validTypes.contains(type)) iter.remove();
-//		}
-//		
-//		return validLinks;
-//	}
 	
 	private static final List<Coord> getRandomCoordinatesInZone(int numCoordinates, Geometry zoneGeometry, Random random) {
 		

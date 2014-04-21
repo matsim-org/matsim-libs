@@ -32,8 +32,12 @@ import org.matsim.core.utils.io.IOUtils;
 
 public class TolledLinksFileParser {
 
-	private final String separator = ",";
+	private final String separator;
 
+	public TolledLinksFileParser(String separator) {
+		this.separator = separator;
+	}
+	
 	public List<Tuple<Id, Id>> readFile(String fileName) throws IOException {
 		
 		List<Tuple<Id, Id>> tuples = new ArrayList<Tuple<Id, Id>>();

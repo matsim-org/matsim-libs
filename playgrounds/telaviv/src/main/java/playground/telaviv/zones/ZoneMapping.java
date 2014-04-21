@@ -20,7 +20,6 @@
 
 package playground.telaviv.zones;
 
-import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -46,8 +45,6 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.TransformException;
 
 import playground.telaviv.config.TelAvivConfig;
 
@@ -132,7 +129,7 @@ public class ZoneMapping {
 		}
 	}
 	
-	public void createMapping(CoordinateTransformation coordinateTransformation) throws IOException, FactoryException, TransformException {
+	public void createMapping(CoordinateTransformation coordinateTransformation) throws Exception {
 		factory = new GeometryFactory();
 
 		network = scenario.getNetwork();
@@ -264,7 +261,7 @@ public class ZoneMapping {
 		 * Parse Zones file
 		 */
 		log.info("Parsing zones file...");
-		parsedZones = new Emme2ZonesFileParser(zonesFile).readFile(skipHeader);
+		parsedZones = new Emme2ZonesFileParser(zonesFile, ",").readFile(skipHeader);
 		log.info("done.");
 		
 		/*
