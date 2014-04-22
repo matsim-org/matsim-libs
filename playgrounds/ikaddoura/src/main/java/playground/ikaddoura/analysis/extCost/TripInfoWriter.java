@@ -31,6 +31,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 
 /**
  * @author ikaddoura , lkroeger
@@ -147,6 +148,50 @@ public class TripInfoWriter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}	
+	}
+	
+	public void writePersonId2totalAmount() {
+		
+		String fileName = this.outputFolder + "/personId2totalAmount.csv";
+		File file = new File(fileName);
+			
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			bw.write(fileName);
+			bw.newLine();
+			bw.write("____________________________________________________________________________");
+			bw.newLine();
+
+			bw.write("person Id;total amount [monetary units]");
+			bw.newLine();
+			
+			Map<Id,List<Double>> personId2listOfAmounts = this.handler.getPersonId2listOfAmounts(TransportMode.car);
+			Map<Id,Double> personId2totalAmount = this.handler.getPersonId2amountSumAllAgents();
+
+			for (Id id : personId2totalAmount.keySet()) {
+				double totalAmount = personId2totalAmount.get(id);
+				
+				// to check if person-based analysis is consistent with trip-based analysis
+				List<Double> fares = personId2listOfAmounts.get(id);
+				double amountSumFromList = 0.;
+				for(Double amount : fares){
+					amountSumFromList = amountSumFromList + amount;
+				}
+				
+				if (Math.abs(amountSumFromList - totalAmount) >= 0.001) {
+					log.warn("Inconsistent data: Total amount from trip-based analysis: " + amountSumFromList + " // total amount from person-based analysis: " + totalAmount);
+				}
+				
+				bw.write(id + ";" + totalAmount);
+				bw.newLine();
+			}
+			
+			log.info("Output written to " + fileName);
+			bw.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

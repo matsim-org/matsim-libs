@@ -48,6 +48,7 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
 import playground.ikaddoura.internalizationCar.MarginalCongestionEventHandler;
@@ -61,7 +62,7 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 	private final static Logger log = Logger.getLogger(ExtCostEventHandler.class);
 	private final double vtts_car;
 	
-	// this analysis uses either money events or congestion events
+	// This analysis uses either money events or congestion events.
 	private final boolean useMoneyEvents;
 	
 	private Map<Id,Integer> personId2actualTripNumber = new HashMap<Id, Integer>();
@@ -71,6 +72,9 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 	private Map<Id,Map<Integer,Double>> personId2tripNumber2tripDistance = new HashMap<Id, Map<Integer,Double>>();
 	private Map<Id,Map<Integer,Double>> personId2tripNumber2amount = new HashMap<Id, Map<Integer,Double>>();
 	private Map<Id,Double> driverId2totalDistance = new HashMap<Id,Double>();
+	
+	private Map<Id, Double> personId2amountSum = new HashMap <Id, Double>();
+	private List<Id> persons = new ArrayList<Id>();
 	
 	// for pt-distance calculation
 	private Map<Id,Double> personId2distanceEnterValue = new HashMap<Id,Double>();
@@ -100,12 +104,15 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 		driverId2totalDistance.clear();
 		personId2distanceEnterValue.clear();
 		ptDrivers.clear(); // not really necessary
+		personId2amountSum.clear();
 	}
 
 	@Override
 	public void handleEvent(MarginalCongestionEvent event) {
 		
 		if (useMoneyEvents == false){
+			
+			// trip-based analysis
 			double amount = event.getDelay() / 3600 * this.vtts_car;
 			double eventTime = event.getTime();
 			int tripNumber = 0;
@@ -125,6 +132,15 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 			Map<Integer,Double> tripNumber2amount = personId2tripNumber2amount.get(event.getCausingAgentId());
 			tripNumber2amount.put(tripNumber, updatedAmount);
 			personId2tripNumber2amount.put(event.getCausingAgentId(), tripNumber2amount);
+			
+			// person-based analysis
+			if (this.personId2amountSum.get(event.getCausingAgentId()) == null) {
+				this.personId2amountSum.put(event.getCausingAgentId(), amount);
+			} else {
+				double amountSoFar = this.personId2amountSum.get(event.getCausingAgentId());
+				double amountNew = amountSoFar + amount;
+				this.personId2amountSum.put(event.getCausingAgentId(), amountNew);
+			}
 		}
 	}
 	
@@ -132,6 +148,8 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 	public void handleEvent(PersonMoneyEvent event) {
 				
 		if (useMoneyEvents == true) {
+			
+			// trip-based analysis
 			double amount = event.getAmount();
 			double eventTime = event.getTime();
 			int tripNumber = 0;
@@ -151,8 +169,16 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 			Map<Integer,Double> tripNumber2amount = personId2tripNumber2amount.get(event.getPersonId());
 			tripNumber2amount.put(tripNumber, updatedAmount);
 			personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
+			
+			// person-based analysis
+			if (this.personId2amountSum.get(event.getPersonId()) == null) {
+				this.personId2amountSum.put(event.getPersonId(), amount);
+			} else {
+				double amountSoFar = this.personId2amountSum.get(event.getPersonId());
+				double amountNew = amountSoFar + amount;
+				this.personId2amountSum.put(event.getPersonId(), amountNew);
+			}
 		}
-		
 	}
 	
 	@Override
@@ -350,6 +376,13 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
+		
+		if (this.persons.contains(event.getPersonId())){
+			// do nothing
+		} else {
+			this.persons.add(event.getPersonId());
+		}
+		
 		// A transit driver should not practice any activity,
 		// otherwise the code has to be adapted here.
 		if(ptDrivers.contains(event.getPersonId())){
@@ -482,6 +515,26 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 				personId2distanceEnterValue.put(event.getPersonId(), driverId2totalDistance.get(event.getVehicleId()));
 			}
 		}
+	}
+
+	public Map<Id, Double> getPersonId2amountSum() {
+		return personId2amountSum;
+	}
+	
+	public Map<Id, Double> getPersonId2amountSumAllAgents() {
+		Map<Id, Double> personId2amountSumAllAgents = new HashMap<Id, Double>();
+
+//		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+		for (Id id : this.persons) {
+			double amountSum = 0.;
+			if (this.personId2amountSum.get(id) == null) {
+				// no monetary payments
+			} else {
+				amountSum = -1.0 * this.personId2amountSum.get(id);
+			}
+			personId2amountSumAllAgents.put(id, amountSum);
+		}
+		return personId2amountSumAllAgents;
 	}
 
 }
