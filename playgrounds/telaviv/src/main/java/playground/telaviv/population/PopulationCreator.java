@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Emme2PopulationCreator.java
+ * PopulationCreator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -38,6 +38,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -55,35 +56,45 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-import playground.telaviv.config.TelAvivConfig;
+import playground.telaviv.config.XMLParameterParser;
 import playground.telaviv.facilities.FacilitiesCreator;
-import playground.telaviv.zones.ZoneMapping;
+import playground.telaviv.zones.Emme2Zone;
+import playground.telaviv.zones.Emme2ZonesFileParser;
 
-public class Emme2PopulationCreator {
+/**
+ * <p>
+ * Creates the internal population of the Tel Aviv model. Input data is taken
+ * from the activity-based model. For a description of the data fields look at the
+ * "final report" pdf, pages 2-4 and 2-8. In addition, information about the activity
+ * timings (start time and duration) is included in the file. 
+ * </p>
+ * 
+ * @author cdobler
+ */
+public class PopulationCreator {
 
-	private static final Logger log = Logger.getLogger(Emme2PopulationCreator.class);
+	private static final Logger log = Logger.getLogger(PopulationCreator.class);
 
-//	private String populationFile = TelAvivConfig.basePath + "/population/PB1000_10.txt";
-	private String populationFile = TelAvivConfig.basePath + "/population/Pop_2010_Msim_a.CSV";
-	private static String networkFile = TelAvivConfig.basePath + "/network/network.xml";
-	private static String facilitiesFile = TelAvivConfig.basePath + "/facilities/facilities.xml";
-	private static String facilitiesAttributesFile = TelAvivConfig.basePath + "/facilities/facilitiesAttributes.xml";
-	private String outFile = TelAvivConfig.basePath + "/population/internal_plans_10.xml.gz";
+	private String basePath = "";
+	private String populationFile = "";
+	private String networkFile = "";
+	private String facilitiesFile = "";
+	private String facilitiesAttributesFile = "";
+	private String zonalAttributesFile = "";
+	private String outputFile = "";
 
-	private Scenario scenario;
-	private Map<Integer, List<ActivityFacility>> facilitiesToZoneMap;
-	private ZoneMapping zoneMapping;
-	private Random random = new Random(123456);
+	private String separatorZonalFile = ",";
+	private String separatorPopulationFile = ",";
+	private Random random = MatsimRandom.getLocalInstance();
 
 	/*
 	 * The +/- range within an activity's departure time is randomly shifted.
 	 */
-	private double timeMutationRange = 1800.0;
+	private double timeMutationRange = 0.0;
 	
 	/*
 	 * Opening Times:
@@ -94,31 +105,77 @@ public class Emme2PopulationCreator {
 	 * work 8..18
 	 * shop 9..19
 	 */
-
 	public static void main(String[] args) {
 		try {
-			Config config = ConfigUtils.createConfig();
-			config.network().setInputFile(networkFile);
-			config.facilities().setInputFile(facilitiesFile);
-			config.facilities().setInputFacilitiesAttributesFile(facilitiesAttributesFile);
-			Scenario scenario = ScenarioUtils.loadScenario(config);
-			new Emme2PopulationCreator(scenario);
+			if (args.length > 0) {
+				String file = args[0];
+				new PopulationCreator(file);
+			} else {
+				log.error("No input config file was given. Therefore cannont proceed. Aborting!");
+				return;
+			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public Emme2PopulationCreator(Scenario scenario) throws Exception {
-		this.scenario = scenario;
+	// NOT a MATSim config file!
+	public PopulationCreator(String configurationFile) throws Exception {
+		
+		Map<String, String> parameterMap = new XMLParameterParser().parseFile(configurationFile);
+		String value;
+		
+		value = parameterMap.remove("basePath");
+		if (value != null) basePath = value;
+		
+		value = parameterMap.remove("populationFile");
+		if (value != null) populationFile = value;
 
-		log.info("Creating zone mapping...");
-		zoneMapping = new ZoneMapping(scenario, TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84")); 
+		value = parameterMap.remove("networkFile");
+		if (value != null) networkFile = value;
+		
+		value = parameterMap.remove("separatorZonalFile");
+		if (value != null) separatorZonalFile = value;
+		
+		value = parameterMap.remove("separatorPopulationFile");
+		if (value != null) separatorPopulationFile = value;
+		
+		value = parameterMap.remove("facilitiesFile");
+		if (value != null) facilitiesFile = value;
+		
+		value = parameterMap.remove("facilitiesAttributesFile");
+		if (value != null) facilitiesAttributesFile = value;
+		
+		value = parameterMap.remove("zonalAttributesFile");
+		if (value != null) zonalAttributesFile = value;
+
+		value = parameterMap.remove("timeMutationRange");
+		if (value != null) timeMutationRange = Double.parseDouble(value);
+		
+		value = parameterMap.remove("outputFile");
+		if (value != null) outputFile = value;
+
+		for (String key : parameterMap.keySet()) log.warn("Found parameter " + key + " which is not handled!");
+				
+		Config config = ConfigUtils.createConfig();
+		config.network().setInputFile(basePath + networkFile);
+		config.facilities().setInputFile(basePath + facilitiesFile);
+		config.facilities().setInputFacilitiesAttributesFile(basePath + facilitiesAttributesFile);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		
+		log.info("loading zonal attributes ...");
+		boolean skipHeader = true;
+		Map<Integer, Emme2Zone> zonalAttributes = new Emme2ZonesFileParser(basePath + zonalAttributesFile, 
+				separatorZonalFile).readFile(skipHeader);
+		log.info("done.\n");
+
+		log.info("Creating mapping from facilities to zones...");
+		Map<Integer, List<ActivityFacility>> facilitiesToZoneMap = createFacilityToZoneMapping(scenario);
 		log.info("done.");
-
-		createFacilityToZoneMapping(scenario);
 		
 		log.info("Parsing population file...");
-		Map<Integer, Emme2Person> personMap = new Emme2PersonFileParser(populationFile, "," , true).readFile();
+		Map<Integer, ParsedPerson> personMap = new PersonFileParser(basePath + populationFile, 
+				separatorPopulationFile, true).readFile();
 		log.info(personMap.size());
 		log.info("done.");
 
@@ -126,9 +183,9 @@ public class Emme2PopulationCreator {
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 
 		Counter counter = new Counter ("People skipped because invalid plan information was found: #");
-		for (Entry<Integer, Emme2Person> entry : personMap.entrySet()) {
+		for (Entry<Integer, ParsedPerson> entry : personMap.entrySet()) {
 			Id id = scenario.createId(String.valueOf(entry.getKey()));
-			Emme2Person emme2Person = entry.getValue();
+			ParsedPerson emme2Person = entry.getValue();
 
 			PersonImpl person = (PersonImpl) populationFactory.createPerson(id);
 			
@@ -138,7 +195,7 @@ public class Emme2PopulationCreator {
 			 * Some entries in the input file might be wrong (e.g. persons which want to perform
 			 * an activity from type a in a zone which does not offer that type of activity).
 			 */
-			boolean vaildPerson = createAndAddInitialPlan(person, emme2Person);
+			boolean vaildPerson = createAndAddInitialPlan(person, emme2Person, scenario, facilitiesToZoneMap, zonalAttributes);
 
 			if (vaildPerson) scenario.getPopulation().addPerson(person);
 			else counter.incCounter();
@@ -146,9 +203,21 @@ public class Emme2PopulationCreator {
 		counter.printCounter();
 		log.info("done.");
 
-		log.info("mutating populations activity times");
-		scenario.getConfig().global().setNumberOfThreads(8);
-		TimeAllocationMutator timeAllocationMutator = new TimeAllocationMutator(scenario.getConfig(), timeMutationRange, true);
+		log.info("Mutating populations activity times...");
+		this.mutateActivityTimings(scenario);
+		log.info("done.");
+		
+		log.info("Writing MATSim population to file...");
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(basePath + outputFile);
+		log.info("done.");
+	}
+	
+	private void mutateActivityTimings(Scenario scenario) {
+		
+		Config config = scenario.getConfig();
+		
+		config.global().setNumberOfThreads(8);
+		TimeAllocationMutator timeAllocationMutator = new TimeAllocationMutator(config, timeMutationRange, true);
 		
 		final TravelTime travelTime = new FreeSpeedTravelTime();
 		TravelDisutilityFactory travelDisutilityFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
@@ -182,35 +251,31 @@ public class Emme2PopulationCreator {
 			for (Plan plan : person.getPlans()) timeAllocationMutator.handlePlan(plan);
 		}
 		timeAllocationMutator.finishReplanning();
-		log.info("done.");
-		
-		log.info("Writing MATSim population to file...");
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(outFile);
-		log.info("done.");
 	}
 
-	private void createFacilityToZoneMapping(Scenario scenario) {
+	private Map<Integer, List<ActivityFacility>> createFacilityToZoneMapping(Scenario scenario) {
 		
+		Map<Integer, List<ActivityFacility>> facilitiesToZoneMap = new HashMap<Integer, List<ActivityFacility>>();
 		ObjectAttributes objectAttributes = scenario.getActivityFacilities().getFacilityAttributes();
-		this.facilitiesToZoneMap = new HashMap<Integer, List<ActivityFacility>>();
 		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
 			Object tazObject = objectAttributes.getAttribute(facility.getId().toString(), FacilitiesCreator.TAZObjectAttributesName);
 			if (tazObject != null) {
 				int taz = (Integer) tazObject;
-				List<ActivityFacility> list = this.facilitiesToZoneMap.get(taz);
+				List<ActivityFacility> list = facilitiesToZoneMap.get(taz);
 				if (list == null) {
 					list = new ArrayList<ActivityFacility>();
-					this.facilitiesToZoneMap.put(taz, list);
+					facilitiesToZoneMap.put(taz, list);
 				}
 				list.add(facility);
 			}
 		}
+		return facilitiesToZoneMap;
 	}
 	
 	/*
 	 * Set some basic person parameters like age, sex, license and car availability.
 	 */
-	private void setBasicParameters(PersonImpl person, Emme2Person emme2Person) {
+	private void setBasicParameters(PersonImpl person, ParsedPerson emme2Person) {
 		person.setAge(emme2Person.AGE);
 
 		if (emme2Person.GENDER == 1) person.setSex("m");
@@ -238,9 +303,9 @@ public class Emme2PopulationCreator {
 	 * 3 - shopping
 	 * 4 - other (leisure)
 	 */
-	public boolean createAndAddInitialPlan(PersonImpl person, Emme2Person emme2Person) {
+	private boolean createAndAddInitialPlan(PersonImpl person, ParsedPerson emme2Person, Scenario scenario,
+			Map<Integer, List<ActivityFacility>> facilitiesToZoneMap, Map<Integer, Emme2Zone> zonalAttributes) {
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
-//		RouteFactory routeFactory = new GenericRouteFactory();
 
 		Plan plan = populationFactory.createPlan();
 		person.addPlan(plan);
@@ -298,8 +363,8 @@ public class Emme2PopulationCreator {
 		int secondaryPostStopActivityZone = emme2Person.TAZASEC;
 
 
-		boolean hasPrimaryActivity = zoneMapping.zoneExists(primaryMainActivityZone);
-		boolean hasSecondaryActivity = zoneMapping.zoneExists(secondaryMainActivityZone);
+		boolean hasPrimaryActivity = zonalAttributes.containsKey(primaryMainActivityZone);
+		boolean hasSecondaryActivity = zonalAttributes.containsKey(secondaryMainActivityZone);
 
 		ActivityFacility homeFacility;
 		ActivityFacility previousFacility;
@@ -311,7 +376,7 @@ public class Emme2PopulationCreator {
 		 * If the zone of the primary and secondary activity is
 		 * not valid the persons stays at home the whole day.
 		 */
-		homeFacility = selectFacilityByZone(homeZone);
+		homeFacility = selectFacilityByZone(homeZone, facilitiesToZoneMap);
 		activity = (ActivityImpl) populationFactory.createActivityFromCoord("home", homeFacility.getCoord());
 		activity.setFacilityId(homeFacility.getId());
 		activity.setLinkId(homeFacility.getLinkId());
@@ -351,7 +416,7 @@ public class Emme2PopulationCreator {
 			 * If we have an Activity before the primary Activity
 			 */
 			if (primaryPreStop) {
-				ActivityFacility primaryPreFacility = selectFacilityByZone(primaryPreStopActivityZone);
+				ActivityFacility primaryPreFacility = selectFacilityByZone(primaryPreStopActivityZone, facilitiesToZoneMap);
 
 				leg = (LegImpl) populationFactory.createLeg(transportMode);
 				leg.setDepartureTime(time);
@@ -389,7 +454,7 @@ public class Emme2PopulationCreator {
 			/*
 			 * Primary Activity
 			 */
-			ActivityFacility primaryFacility = selectFacilityByZone(primaryMainActivityZone);
+			ActivityFacility primaryFacility = selectFacilityByZone(primaryMainActivityZone, facilitiesToZoneMap);
 
 			leg = (LegImpl) populationFactory.createLeg(transportMode);
 			leg.setDepartureTime(time);
@@ -423,7 +488,7 @@ public class Emme2PopulationCreator {
 			 * If we have an Activity after the primary Activity
 			 */
 			if (primaryPostStop) {
-				ActivityFacility primaryPostFacility = selectFacilityByZone(primaryPostStopActivityZone);
+				ActivityFacility primaryPostFacility = selectFacilityByZone(primaryPostStopActivityZone, facilitiesToZoneMap);
 
 				leg = (LegImpl) populationFactory.createLeg(transportMode);
 				leg.setDepartureTime(time);
@@ -493,7 +558,7 @@ public class Emme2PopulationCreator {
 			 * If we have an Activity before the secondary Activity
 			 */
 			if (secondaryPreStop) {
-				ActivityFacility secondaryPreFacility = selectFacilityByZone(secondaryPreStopActivityZone);
+				ActivityFacility secondaryPreFacility = selectFacilityByZone(secondaryPreStopActivityZone, facilitiesToZoneMap);
 
 				leg = (LegImpl) populationFactory.createLeg(transportMode);
 				leg.setDepartureTime(time);
@@ -526,7 +591,7 @@ public class Emme2PopulationCreator {
 			/*
 			 * Secondary Activity
 			 */
-			ActivityFacility secondaryFacility = selectFacilityByZone(secondaryMainActivityZone);
+			ActivityFacility secondaryFacility = selectFacilityByZone(secondaryMainActivityZone, facilitiesToZoneMap);
 
 			leg = (LegImpl) populationFactory.createLeg(transportMode);
 			leg.setDepartureTime(time);
@@ -559,7 +624,7 @@ public class Emme2PopulationCreator {
 			 * If we have an Activity after the secondary Activity
 			 */
 			if (secondaryPostStop) {
-				ActivityFacility secondaryPostFacility = selectFacilityByZone(secondaryPostStopActivityZone);
+				ActivityFacility secondaryPostFacility = selectFacilityByZone(secondaryPostStopActivityZone, facilitiesToZoneMap);
 
 				leg = (LegImpl) populationFactory.createLeg(transportMode);
 				leg.setDepartureTime(time);
@@ -625,8 +690,8 @@ public class Emme2PopulationCreator {
 		return true;
 	}
 
-	private ActivityFacility selectFacilityByZone(int TAZ) {
-		List<ActivityFacility> list = this.facilitiesToZoneMap.get(TAZ);
+	private ActivityFacility selectFacilityByZone(int TAZ, Map<Integer, List<ActivityFacility>> facilitiesToZoneMap) {
+		List<ActivityFacility> list = facilitiesToZoneMap.get(TAZ);
 		
 		if (list == null || list.size() == 0) {
 			throw new RuntimeException("No facilities have been mapped to zone " + TAZ + ". Aborting!");

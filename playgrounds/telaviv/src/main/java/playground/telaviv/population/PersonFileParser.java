@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Emme2personFileParser.java
+ * PersonFileParser.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -27,20 +27,20 @@ import java.util.TreeMap;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
-public class Emme2PersonFileParser {
+public class PersonFileParser {
 
 	private String inFile;
 	private String separator;
 	private boolean skipHeader;
 	
-	public Emme2PersonFileParser(String inFile, String separator, boolean skipHeader) {
+	public PersonFileParser(String inFile, String separator, boolean skipHeader) {
 		this.inFile = inFile;
 		this.separator = separator;
 		this.skipHeader = skipHeader;
 	}
 	
-	public Map<Integer, Emme2Person> readFile() throws Exception {
-		Map<Integer, Emme2Person> persons = new TreeMap<Integer, Emme2Person>();
+	public Map<Integer, ParsedPerson> readFile() throws Exception {
+		Map<Integer, ParsedPerson> persons = new TreeMap<Integer, ParsedPerson>();
 		
 	    BufferedReader br = null;
 
@@ -52,7 +52,7 @@ public class Emme2PersonFileParser {
 	    Counter counter = new Counter("# lines parsed from the population input file: ");
 	    String line;
 	    while((line = br.readLine()) != null) {
-	    	Emme2Person emme2Person = new Emme2Person();
+	    	ParsedPerson emme2Person = new ParsedPerson();
 	    	
 	    	String[] cols = line.split(separator);
 	    	

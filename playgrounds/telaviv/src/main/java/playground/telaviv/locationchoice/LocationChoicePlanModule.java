@@ -34,8 +34,8 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.telaviv.facilities.FacilitiesCreator;
-import playground.telaviv.population.Emme2Person;
-import playground.telaviv.population.Emme2PersonFileParser;
+import playground.telaviv.population.ParsedPerson;
+import playground.telaviv.population.PersonFileParser;
 import playground.telaviv.zones.ZoneMapping;
 
 /*
@@ -66,9 +66,9 @@ public class LocationChoicePlanModule extends AbstractMultithreadedModule {
 		log.info("done.");
 		
 		log.info("Parsing population file...");
-		Map<Integer, Emme2Person> personMap;
+		Map<Integer, ParsedPerson> personMap;
 		try {
-			personMap = new Emme2PersonFileParser(populationFile, ",", true).readFile();
+			personMap = new PersonFileParser(populationFile, ",", true).readFile();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -89,12 +89,12 @@ public class LocationChoicePlanModule extends AbstractMultithreadedModule {
 		return this.shoppingActivities;
 	}
 	
-	private void filterPersons(Map<Integer, Emme2Person> personMap) {
+	private void filterPersons(Map<Integer, ParsedPerson> personMap) {
 		shoppingActivities = new HashMap<Id, List<Integer>>();
 		
-		Iterator<Emme2Person> iter = personMap.values().iterator();
+		Iterator<ParsedPerson> iter = personMap.values().iterator();
 		while (iter.hasNext()) {
-			Emme2Person emme2Person = iter.next();
+			ParsedPerson emme2Person = iter.next();
 			
 			int primaryMainActivityType = emme2Person.MAINACTPRI;
 			int secondaryMainActivityType = emme2Person.MAINACTSEC;

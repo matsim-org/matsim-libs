@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Emme2person.java
+ * ParsedPerson.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -24,7 +24,7 @@ package playground.telaviv.population;
  * For a description of the data fields look at the
  * "final report" pdf, pages 2-4 and 2-8.
  */
-public class Emme2Person {
+public class ParsedPerson {
 
 	int NEWID;
 	public int PERSONID;

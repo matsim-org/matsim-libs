@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Emme2ExternalTripFileParser.java
+ * ExternalTripFileParser.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -29,18 +29,18 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Emme2ExternalTripFileParser {
+public class ExternalTripFileParser {
 
 	private String inFile;
 	private String separator = ",";
 	private Charset charset = Charset.forName("UTF-8");
 	
-	public Emme2ExternalTripFileParser(String inFile) {
+	public ExternalTripFileParser(String inFile) {
 		this.inFile = inFile;
 	}
 	
-	public List<Emme2ExternalTrip> readFile() {
-		List<Emme2ExternalTrip> externalTrips = new ArrayList<Emme2ExternalTrip>();
+	public List<ExternalTrip> readFile() {
+		List<ExternalTrip> externalTrips = new ArrayList<ExternalTrip>();
 		
 		FileInputStream fis = null;
 		InputStreamReader isr = null;
@@ -56,7 +56,7 @@ public class Emme2ExternalTripFileParser {
 			 
 			String line;
 			while((line = br.readLine()) != null) {
-				Emme2ExternalTrip externalTrip = new Emme2ExternalTrip();
+				ExternalTrip externalTrip = new ExternalTrip();
 				
 				String[] cols = line.split(separator);
 				

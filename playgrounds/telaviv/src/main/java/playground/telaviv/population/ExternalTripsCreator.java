@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Emme2ExternalTripsCreator.java
+ * ExternalTripsCreator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -46,9 +46,9 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.telaviv.config.TelAvivConfig;
 
-public class Emme2ExternalTripsCreator {
+public class ExternalTripsCreator {
 
-	private static final Logger log = Logger.getLogger(Emme2ExternalTripsCreator.class);
+	private static final Logger log = Logger.getLogger(ExternalTripsCreator.class);
 	
 	private String networkFile = TelAvivConfig.basePath + "/network/network.xml";
 	private String facilitiesFile = TelAvivConfig.basePath + "/facilities/facilities.xml";
@@ -98,10 +98,10 @@ public class Emme2ExternalTripsCreator {
 	private double scaleFactor = 0.1; 
 	
 	public static void main(String[] args) {
-		new Emme2ExternalTripsCreator();
+		new ExternalTripsCreator();
 	}
 	
-	public Emme2ExternalTripsCreator() {
+	public ExternalTripsCreator() {
 		
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(networkFile);
@@ -142,13 +142,13 @@ public class Emme2ExternalTripsCreator {
 	private void createExternalTrips(String externalTripsFile, double periodDuration, Counter counter,
 			DepartureTimeCalculator departureTimeCalculator) {
 		log.info("\tParsing external trips file...");
-		List<Emme2ExternalTrip> externalTrips = new Emme2ExternalTripFileParser(externalTripsFile).readFile();
+		List<ExternalTrip> externalTrips = new ExternalTripFileParser(externalTripsFile).readFile();
 		log.info("done.");
 		
 		log.info("\tCreating MATSim external Trips...");
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 				
-		for (Emme2ExternalTrip externalTrip : externalTrips) {
+		for (ExternalTrip externalTrip : externalTrips) {
 			
 //			int numOfTrips = (int)(periodDuration * Double.valueOf(externalTrip.numOfTrips));
 			
@@ -198,7 +198,7 @@ public class Emme2ExternalTripsCreator {
 	 * 3 - shopping
 	 * 4 - other (leisure)
 	 */
-	public void createAndAddInitialPlan(PersonImpl person, Emme2ExternalTrip externalTrip, 
+	public void createAndAddInitialPlan(PersonImpl person, ExternalTrip externalTrip, 
 			DepartureTimeCalculator departureTimeCalculator) {
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 		

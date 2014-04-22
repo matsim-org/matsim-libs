@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Emme2ExternalTrip.java
+ * ExternalTrip.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,7 +23,7 @@ package playground.telaviv.population;
 /*
  * External Trips for the Model
  */
-public class Emme2ExternalTrip {
+public class ExternalTrip {
 	
 	int originNodeId;
 	int destinationNodeId;
