@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<events version="1.0">
+
+	<event time="36010.0" type="actend" person="testAgent1" link="link1" actType="home"  />
+	<event time="36010.0" type="departure" person="testAgent1" link="link1" legMode="car"  />
+	<event time="36010.0" type="PersonEntersVehicle" person="testAgent1" vehicle="testAgent1"  />
+	<event time="36010.0" type="wait2link" person="testAgent1" link="link1" vehicle="testAgent1"  />
+	<event time="36011.0" type="left link" person="testAgent1" link="link1" vehicle="testAgent1"  />
+	<event time="36011.0" type="entered link" person="testAgent1" link="link2" vehicle="testAgent1"  />
+	<event time="36061.0" type="left link" person="testAgent1" link="link2" vehicle="testAgent1"  />
+	<event time="36061.0" type="entered link" person="testAgent1" link="link3" vehicle="testAgent1"  />
+	<event time="36111.0" type="PersonLeavesVehicle" person="testAgent1" vehicle="testAgent1"  />
+	<event time="36111.0" type="arrival" person="testAgent1" link="link3" legMode="car"  />
+	<event time="36111.0" type="actstart" person="testAgent1" link="link3" actType="work"  />
+	
+	<event time="36101.0" type="personMoney" amount="-1" person="testAgent1"  />
+	<event time="36102.0" type="personMoney" amount="-2" person="testAgent1"  />
+	<event time="36103.0" type="personMoney" amount="-1" person="testAgent1"  />
+	
+	<event time="36010.0" type="actend" person="testAgent2" link="link1" actType="home"  />
+	<event time="36010.0" type="departure" person="testAgent2" link="link1" legMode="car"  />
+	<event time="36010.0" type="PersonEntersVehicle" person="testAgent2" vehicle="testAgent2"  />
+	<event time="36010.0" type="wait2link" person="testAgent2" link="link1" vehicle="testAgent2"  />
+	<event time="36011.0" type="left link" person="testAgent2" link="link1" vehicle="testAgent2"  />
+	<event time="36011.0" type="entered link" person="testAgent2" link="link2" vehicle="testAgent2"  />
+	<event time="36061.0" type="left link" person="testAgent2" link="link2" vehicle="testAgent2"  />
+	<event time="36061.0" type="entered link" person="testAgent2" link="link3" vehicle="testAgent2"  />
+	<event time="36111.0" type="PersonLeavesVehicle" person="testAgent2" vehicle="testAgent2"  />
+	<event time="36111.0" type="arrival" person="testAgent2" link="link3" legMode="car"  />
+	<event time="36111.0" type="actstart" person="testAgent2" link="link3" actType="work"  />
+	
+	<event time="36101.0" type="personMoney" amount="-1" person="testAgent2"  />
+	<event time="36102.0" type="personMoney" amount="-2" person="testAgent2"  />
+	<event time="36103.0" type="personMoney" amount="-1" person="testAgent2"  />
+	
+	<event time="47010.0" type="actend" person="testAgent2" link="link3" actType="work"  />
+	<event time="47010.0" type="departure" person="testAgent2" link="link3" legMode="car"  />
+	<event time="47010.0" type="PersonEntersVehicle" person="testAgent2" vehicle="testAgent2"  />
+	<event time="47010.0" type="wait2link" person="testAgent2" link="link3" vehicle="testAgent2"  />
+	<event time="47011.0" type="left link" person="testAgent2" link="link3" vehicle="testAgent2"  />
+	<event time="47011.0" type="entered link" person="testAgent2" link="link4" vehicle="testAgent2"  />
+	<event time="47061.0" type="left link" person="testAgent2" link="link4" vehicle="testAgent2"  />
+	<event time="47061.0" type="entered link" person="testAgent2" link="link1" vehicle="testAgent2"  />
+	<event time="48061.0" type="left link" person="testAgent2" link="link1" vehicle="testAgent2"  />
+	<event time="48061.0" type="entered link" person="testAgent2" link="link2" vehicle="testAgent2"  />
+	<event time="49061.0" type="left link" person="testAgent2" link="link2" vehicle="testAgent2"  />
+	<event time="49061.0" type="entered link" person="testAgent2" link="link3" vehicle="testAgent2"  />
+	<event time="50061.0" type="left link" person="testAgent2" link="link3" vehicle="testAgent2"  />
+	<event time="50061.0" type="entered link" person="testAgent2" link="link4" vehicle="testAgent2"  />
+	<event time="51111.0" type="PersonLeavesVehicle" person="testAgent2" vehicle="testAgent2"  />
+	<event time="51111.0" type="arrival" person="testAgent2" link="link4" legMode="car"  />
+	<event time="51111.0" type="actstart" person="testAgent2" link="link4" actType="work"  />
+	
+	<event time="47101.0" type="personMoney" amount="0" person="testAgent2"  />
+	<event time="47102.0" type="personMoney" amount="-2" person="testAgent2"  />
+	<event time="47200.0" type="personMoney" amount="-3" person="testAgent2"  />
+	
+	<event time="53800.0" type="actend" person="testAgent2" link="link4" actType="work"  />
+	<event time="53800.0" type="departure" person="testAgent2" link="link4" legMode="car"  />
+	<event time="53800.0" type="PersonEntersVehicle" person="testAgent2" vehicle="testAgent2"  />
+	<event time="53800.0" type="wait2link" person="testAgent2" link="link4" vehicle="testAgent2"  />
+	<event time="53801.0" type="left link" person="testAgent2" link="link4" vehicle="testAgent2"  />
+	<event time="53802.0" type="entered link" person="testAgent2" link="link1" vehicle="testAgent2"  />
+	<event time="53900.0" type="PersonLeavesVehicle" person="testAgent2" vehicle="testAgent2"  />
+	<event time="53900.0" type="arrival" person="testAgent2" link="link1" legMode="car"  />
+	<event time="53900.0" type="actstart" person="testAgent2" link="link1" actType="home"  />
+	
+	<event time="53850.0" type="personMoney" amount="0" person="testAgent2"  />
+	<event time="53851.0" type="personMoney" amount="-200" person="testAgent2"  />
+	<event time="53852.0" type="personMoney" amount="-3" person="testAgent2"  />
+	
+	<event time="36010.0" type="actend" person="testAgent3" link="link1" actType="home"  />
+	<event time="36010.0" type="departure" person="testAgent3" link="link1" legMode="car"  />
+	<event time="36010.0" type="PersonEntersVehicle" person="testAgent3" vehicle="testAgent3"  />
+	<event time="36010.0" type="wait2link" person="testAgent3" link="link1" vehicle="testAgent3"  />
+	<event time="36011.0" type="left link" person="testAgent3" link="link1" vehicle="testAgent3"  />
+	<event time="36011.0" type="entered link" person="testAgent3" link="link2" vehicle="testAgent3"  />
+	<event time="36061.0" type="left link" person="testAgent3" link="link2" vehicle="testAgent3"  />
+	<event time="36061.0" type="entered link" person="testAgent3" link="link3" vehicle="testAgent3"  />
+	<event time="36111.0" type="PersonLeavesVehicle" person="testAgent3" vehicle="testAgent3"  />
+	<event time="36111.0" type="arrival" person="testAgent3" link="link3" legMode="car"  />
+	<event time="36111.0" type="actstart" person="testAgent3" link="link3" actType="work"  />
+	
+	<event time="47010.0" type="actend" person="testAgent3" link="link3" actType="work"  />
+	<event time="47010.0" type="departure" person="testAgent3" link="link3" legMode="car"  />
+	<event time="47010.0" type="PersonEntersVehicle" person="testAgent3" vehicle="testAgent3"  />
+	<event time="47010.0" type="wait2link" person="testAgent3" link="link3" vehicle="testAgent3"  />
+	<event time="47011.0" type="left link" person="testAgent3" link="link3" vehicle="testAgent3"  />
+	<event time="47011.0" type="entered link" person="testAgent3" link="link4" vehicle="testAgent3"  />
+	<event time="47061.0" type="left link" person="testAgent3" link="link4" vehicle="testAgent3"  />
+	<event time="47061.0" type="entered link" person="testAgent3" link="link1" vehicle="testAgent3"  />
+	<event time="48061.0" type="left link" person="testAgent3" link="link1" vehicle="testAgent3"  />
+	<event time="48061.0" type="entered link" person="testAgent3" link="link2" vehicle="testAgent3"  />
+	<event time="49061.0" type="left link" person="testAgent3" link="link2" vehicle="testAgent3"  />
+	<event time="49061.0" type="entered link" person="testAgent3" link="link3" vehicle="testAgent3"  />
+	<event time="50061.0" type="left link" person="testAgent3" link="link3" vehicle="testAgent3"  />
+	<event time="50061.0" type="entered link" person="testAgent3" link="link4" vehicle="testAgent3"  />
+	<event time="51111.0" type="PersonLeavesVehicle" person="testAgent3" vehicle="testAgent3"  />
+	<event time="51111.0" type="arrival" person="testAgent3" link="link4" legMode="car"  />
+	<event time="51111.0" type="actstart" person="testAgent3" link="link4" actType="work"  />
+	
+	<event time="47101.0" type="personMoney" amount="0" person="testAgent3"  />
+	<event time="47102.0" type="personMoney" amount="-8" person="testAgent3"  />
+	<event time="47200.0" type="personMoney" amount="-3" person="testAgent3"  />
+	
+	<event time="53800.0" type="actend" person="testAgent3" link="link4" actType="work"  />
+	<event time="53800.0" type="departure" person="testAgent3" link="link4" legMode="car"  />
+	<event time="53800.0" type="PersonEntersVehicle" person="testAgent3" vehicle="testAgent3"  />
+	<event time="53800.0" type="wait2link" person="testAgent3" link="link4" vehicle="testAgent3"  />
+	<event time="53801.0" type="left link" person="testAgent3" link="link4" vehicle="testAgent3"  />
+	<event time="53802.0" type="entered link" person="testAgent3" link="link1" vehicle="testAgent3"  />
+	<event time="53900.0" type="PersonLeavesVehicle" person="testAgent3" vehicle="testAgent3"  />
+	<event time="53900.0" type="arrival" person="testAgent3" link="link1" legMode="car"  />
+	<event time="53900.0" type="actstart" person="testAgent3" link="link1" actType="home"  />
+	
+</events>
