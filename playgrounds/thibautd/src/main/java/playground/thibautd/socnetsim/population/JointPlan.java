@@ -19,15 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.population;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 
 /**
  * class for handling synchronized plans.
@@ -40,53 +36,12 @@ public class JointPlan {
 		this.individualPlans.putAll( plans );
 	}
 
-	/*
-	 * =========================================================================
-	 * Plan interface methods
-	 * =========================================================================
-	 */
-
-	public boolean isSelected() {
-		int nsel = 0;
-		int tot = 0;
-		for (Plan plan : individualPlans.values()) {
-			if (plan.isSelected()) nsel++;
-			tot++;
-		}
-
-		if (nsel == 0) return false;
-		if (nsel == tot) return true;
-
-		throw new IllegalStateException( "various selection status in "+individualPlans );
-	}
-
-	/*
-	 * =========================================================================
-	 * JointPlan specific methods
-	 * =========================================================================
-	 */
 	public Plan getIndividualPlan(final Id id) {
 		return this.individualPlans.get(id);
 	}
 
 	public Map<Id,Plan> getIndividualPlans() {
 		return this.individualPlans;
-	}
-
-	public List<Activity> getLastActivities() {
-		List<Activity> output = new ArrayList<Activity>();
-		List<PlanElement> currentPlanElements;
-
-		for (Plan currentPlan : this.individualPlans.values()) {
-			currentPlanElements = currentPlan.getPlanElements();
-			try {
-				output.add((Activity) currentPlanElements.get(currentPlanElements.size() - 1));
-			} catch (ClassCastException e) {
-				throw new RuntimeException("plan "+currentPlan+" does not finish by an activity.");
-			}
-		}
-
-		return output;
 	}
 
 	@Override
