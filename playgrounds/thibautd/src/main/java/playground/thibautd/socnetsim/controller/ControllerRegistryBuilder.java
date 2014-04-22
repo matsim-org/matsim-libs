@@ -36,7 +36,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
@@ -254,8 +253,7 @@ public class ControllerRegistryBuilder {
 		if ( scoringFunctionFactory == null ) {
 			this.scoringFunctionFactory =
 					new CharyparNagelWithJointModesScoringFunctionFactory(
-							new StageActivityTypesImpl(
-								JointActingTypes.INTERACTION ),
+							JointActingTypes.JOINT_STAGE_ACTS ,
 							scenario);
 		}
 		return scoringFunctionFactory;
