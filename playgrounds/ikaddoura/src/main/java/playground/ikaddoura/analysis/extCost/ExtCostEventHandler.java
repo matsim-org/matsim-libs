@@ -479,6 +479,7 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 			// already listed
 		} else {
 			ptDrivers.add(event.getDriverId());
+			driverId2totalDistance.put(event.getVehicleId(),0.0);
 		}
 	}
 	
