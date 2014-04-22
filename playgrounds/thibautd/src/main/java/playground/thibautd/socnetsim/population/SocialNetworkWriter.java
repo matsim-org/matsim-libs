@@ -27,14 +27,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * @author thibautd
  */
 public class SocialNetworkWriter extends MatsimXmlWriter {
+	private static final Logger log =
+		Logger.getLogger(SocialNetworkWriter.class);
+
 	public static final String ROOT_TAG = "socialnet";
 	public static final String EGO_TAG = "ego";
 	public static final String TIE_TAG = "tie";
@@ -56,6 +62,7 @@ public class SocialNetworkWriter extends MatsimXmlWriter {
 
 	public void write( final String file ) {
 		this.openFile( file );
+		log.info( "Start writing social network in file "+file );
 		this.writeXmlHead();
 		this.writeDoctype( ROOT_TAG , "socialnetwork_v1.dtd" );
 		this.writeStartTag(
@@ -69,6 +76,7 @@ public class SocialNetworkWriter extends MatsimXmlWriter {
 		writeNetwork( );
 		this.writeEndTag( ROOT_TAG );
 		this.close();
+		log.info( "Finished writing social network in file "+file );
 	}
 
 	private void writeMetadata() {
@@ -93,20 +101,28 @@ public class SocialNetworkWriter extends MatsimXmlWriter {
 	}
 
 	private void writeEgos() {
+		log.info( "start writing egos..." );
+		final Counter counter = new Counter( "[SocialNetworkWriter] writing ego # " );
 		for ( Id ego : network.getEgos() ) {
+			counter.incCounter();
 			final List<Tuple<String,String>> atts = new ArrayList<Tuple<String, String>>();
 			atts.add( createTuple( EGO_ATT , ego.toString() ) );
 			writeStartTag( EGO_TAG , atts , true );
 		}
+		counter.printCounter();
+		log.info( "finished writing egos." );
 	}
 
 	private void writeNetwork() {
+		log.info( "start writing ties..." );
+		final Counter counter = new Counter( "[SocialNetworkWriter] writing tie # " );
 		final Set<Id> dumpedEgos = new HashSet<Id>();
 		final boolean reflective = network.isReflective();
 		for ( Id ego : network.getEgos() ) {
 			for ( Id alter : network.getAlters( ego ) ) {
 				if ( reflective && dumpedEgos.contains( alter ) ) continue;
 
+				counter.incCounter();
 				final List<Tuple<String,String>> atts = new ArrayList<Tuple<String, String>>();
 				atts.add( createTuple( EGO_ATT , ego.toString() ) );
 				atts.add( createTuple( ALTER_ATT , alter.toString() ) );
@@ -114,6 +130,8 @@ public class SocialNetworkWriter extends MatsimXmlWriter {
 			}
 			dumpedEgos.add( ego );
 		}
+		counter.printCounter();
+		log.info( "finished writing ties." );
 	}
 }
 
