@@ -280,16 +280,16 @@ public class WarmEmissionAnalysisModule {
 //				}
 //				averageSpeed_kmh = freeFlowSpeed_kmh;
 			}
-			if ((averageSpeed_kmh - freeFlowSpeed_kmh) > 0.0){
-//				throw new RuntimeException("Average speed is higher than free flow speed; this might produce negative warm emissions. Aborting...");
-				averageSpeedTooHighCnt++;
-				if(averageSpeedTooHighCnt <= maxWarnCnt){
-					logger.warn("Average speed (" + averageSpeed_kmh + " kmh) has been calculated to be greater than free flow speed (" + freeFlowSpeed_kmh + " kmh)...");
-					logger.warn("Please check consistency of your scenario!");
-					logger.info("Setting average speed for emission calculation to free flow speed...");
-					if(averageSpeedTooHighCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-				}
-				averageSpeed_kmh = freeFlowSpeed_kmh;
+			if ((averageSpeed_kmh - freeFlowSpeed_kmh) > 1.0){
+				throw new RuntimeException("Average speed has been calculated to be greater than free flow speed; this might produce negative warm emissions. Aborting...");
+//				averageSpeedTooHighCnt++;
+//				if(averageSpeedTooHighCnt <= maxWarnCnt){
+//					logger.warn("Average speed (" + averageSpeed_kmh + " kmh) has been calculated to be greater than free flow speed (" + freeFlowSpeed_kmh + " kmh)...");
+//					logger.warn("Please check consistency of your scenario!");
+//					logger.info("Setting average speed for emission calculation to free flow speed...");
+//					if(averageSpeedTooHighCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+//				}
+//				averageSpeed_kmh = freeFlowSpeed_kmh;
 			}
 			/* NOTE: the following comparision does not make sense since HBEFA assumes free flow speeds to be different from speed limits.
 			 * For instance, for RUR/MW/80/Freeflow HBEFA assumes a free flow speed of 82.80 kmh.
@@ -350,13 +350,13 @@ public class WarmEmissionAnalysisModule {
 		return vehicleInformationTuple;
 	}
 
-public int getAverageSpeedTooHighCnt() {
-		return averageSpeedTooHighCnt;
-	}
-
-public int getAverageSpeedNegativeCnt() {
-		return averageSpeedNegativeCnt;
-	}
+//public int getAverageSpeedTooHighCnt() {
+//		return averageSpeedTooHighCnt;
+//	}
+//
+//public int getAverageSpeedNegativeCnt() {
+//		return averageSpeedNegativeCnt;
+//	}
 
 //	public Set<Id> getVehAttributesNotSpecified() {
 //		return vehAttributesNotSpecified;
