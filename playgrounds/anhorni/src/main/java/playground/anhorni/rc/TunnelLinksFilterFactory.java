@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
 
@@ -32,16 +33,18 @@ public class TunnelLinksFilterFactory implements AgentFilterFactory {
 	private final Set<Id> links;
 	private final MobsimDataProvider mobsimDataProvider;
 	private static final Logger log = Logger.getLogger(TunnelLinksFilterFactory.class);
+	private Network network;
 	
-	public TunnelLinksFilterFactory(Set<Id> links, MobsimDataProvider mobsimDataProvider) {
+	public TunnelLinksFilterFactory(Set<Id> links, MobsimDataProvider mobsimDataProvider, Network network) {
 		this.links = links;
 		this.mobsimDataProvider = mobsimDataProvider;
+		this.network = network;
 	}
 	
 	@Override
 	public TunnelLinksFilter createAgentFilter() {
 		log.info("creating a tunnel links filter ...");
-		return new TunnelLinksFilter(this.mobsimDataProvider.getAgents(), this.links);
+		return new TunnelLinksFilter(this.mobsimDataProvider.getAgents(), this.links, this.network);
 	}
 
 }
