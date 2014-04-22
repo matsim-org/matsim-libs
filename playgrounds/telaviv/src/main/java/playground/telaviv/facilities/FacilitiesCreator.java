@@ -164,7 +164,7 @@ public class FacilitiesCreator {
 
 				for (String key : parameterMap.keySet()) log.warn("Found parameter " + key + " which is not handled!");
 			} else {
-				log.error("No input config file was given. Therefore cannont proceed. Aborting!");
+				log.error("No input config file was given. Therefore cannot proceed. Aborting!");
 				return;
 			}
 			

@@ -20,11 +20,12 @@
 
 package playground.telaviv.counts;
 
-/*
- * This class was called Emme2CountV2 previously. However, in fact it was not related
- * to the Tel Aviv Emme2 model. The input data was taken from real world traffic counts.
+/**
+ * Container for data from real world traffic counts.
+ * 
+ * @author cdobler
  */
-public class CountV2 {
+public class RealWorldCount {
 
 	public int inode;
 	public int jnode;

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CountsCreator.java
+ * Emme2CountsCreator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,21 +21,17 @@
 package playground.telaviv.counts;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.misc.Counter;
@@ -44,80 +40,129 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
 import org.matsim.counts.CountsWriter;
 
-import playground.telaviv.config.TelAvivConfig;
-import playground.telaviv.network.NetworkEmme2MATSim2012;
+import playground.telaviv.config.XMLParameterParser;
+import playground.telaviv.network.LinkMappingTool;
 
-/*
- * Assigning the counts from Count Stations to a MATSim Network.
- *
- * When creating the MATSim Network some Links of the Emme2Network have to be
+/**
+ * <p>
+ * This class creates a MATSim counts file based on output from the EMME/2
+ * model of Tel Aviv.
+ * </p>
+ * <p>
+ * When creating the MATSim Network some links of the EMME/2 network have to be
  * converted due to the fact that they contain turning conditions that cannot
- * be directly converted to the MATSim Links. Therefore not for all Links a
+ * be directly converted to the MATSim links. Therefore not for all links a
  * 1:1 mapping is possible. In those cases the link with the best fit is
  * searched. (Alternatively the mapping could be done via the origId Tag of the
- * link. This Attribute could contain the Ids of the original nodes).
- * 
- * Two output files are created:
+ * link. This attribute could contain the Ids of the original nodes).
+ * </p>
+ * <p>
+ * The periods are converted like:<br>
+ * AM ... 0630 - 0830 -> hours 07 .. 09<br>
+ * OP ... 0830 - 1500 -> hours 10 .. 15<br>
+ * PM ... 1500 - 2000 -> hours 16 .. 20<br>
+ * </p>
+ * <p>
+ * Two output files are created:<br>
  * One containing data from all links and another one containing only data from
  * those links where real world count data is available.
+ * </p>
+ * 
+ *  @author cdobler
  */
-public class CountsCreatorV3 {
+public class Emme2CountsCreator {
 
-	private static final Logger log = Logger.getLogger(CountsCreatorV3.class);
+	private static final Logger log = Logger.getLogger(Emme2CountsCreator.class);
 	
-	private String nodesFile = TelAvivConfig.basePath + "/network/nodes.csv";
-	private String networkFile = TelAvivConfig.basePath + "/network/network.xml";
-	private String countsFile = TelAvivConfig.basePath + "/counts/TLV_model_volumes.csv";
-	private String outFileAll = TelAvivConfig.basePath + "/counts/counts_tlv_model_all.xml";
-	
-	private String inFileCounted = TelAvivConfig.basePath + "/counts/counts.xml";
-	private String outFileCounted = TelAvivConfig.basePath + "/counts/counts_tlv_model_counted.xml";
+	private String basePath = "";
+	private String networkFile = "";
+	private String originalNetworkFile = "";
+	private String realWorldCountsFile = "";
+	private String inputFile = "";
+	private String outputOnlyRealWorldFile = "";
+	private String outputAllFile = "";
 
-	private Scenario scenario;
+	private String separator = ",";
 	
-	private Map<Id, ? extends Node> originalNodes = new HashMap<Id, Node>();
-	private QuadTree<Node> nodeQuadTree;
-	
-	public static void main(String[] args) {
-		new CountsCreatorV3(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()))).createCounts();
+	public static void main(String[] args) throws Exception {
+		try {
+			if (args.length > 0) {
+				String file = args[0];
+				new Emme2CountsCreator(file);
+			} else {
+				log.error("No input config file was given. Therefore cannot proceed. Aborting!");
+				return;
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
+	
+	// NOT a MATSim config file!
+	public Emme2CountsCreator(String configurationFile) throws Exception {
 
-	public CountsCreatorV3(Scenario scenario) {
-		this.scenario = scenario;
-		new MatsimNetworkReader(scenario).readFile(networkFile);
-	}
-
-	public void createCounts() {
+		Map<String, String> parameterMap = new XMLParameterParser().parseFile(configurationFile);
+		String value;
+		
+		value = parameterMap.remove("basePath");
+		if (value != null) basePath = value;
+		
+		value = parameterMap.remove("networkFile");
+		if (value != null) networkFile = value;
+		
+		value = parameterMap.remove("originalNetworkFile");
+		if (value != null) originalNetworkFile = value;
+		
+		value = parameterMap.remove("realWorldCountsFile");
+		if (value != null) realWorldCountsFile = value;
+		
+		value = parameterMap.remove("inputFile");
+		if (value != null) inputFile = value;
+		
+		value = parameterMap.remove("separator");
+		if (value != null) separator = value;
+		
+		value = parameterMap.remove("outputAllFile");
+		if (value != null) outputAllFile = value;
+		
+		value = parameterMap.remove("outputOnlyRealWorldFile");
+		if (value != null) outputOnlyRealWorldFile = value;
+		
+		for (String key : parameterMap.keySet()) log.warn("Found parameter " + key + " which is not handled!");
+		
+		Config config = ConfigUtils.createConfig(); 
+		config.network().setInputFile(basePath + networkFile);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Network network = scenario.getNetwork();
+		
+		Config originalConfig = ConfigUtils.createConfig(); 
+		originalConfig.network().setInputFile(basePath + originalNetworkFile);
+		Scenario originalScenario = ScenarioUtils.loadScenario(originalConfig);
+		Network originalNetwork = originalScenario.getNetwork();
+		
 		Counts countsAll = new Counts();
-		countsAll.setName("Tel Aviv Model");
-		countsAll.setDescription("Tel Aviv Model");
+		countsAll.setName("EMME/2 Counts for Tel Aviv Model");
+		countsAll.setDescription("EMME/2 Counts for Tel Aviv Model");
 		countsAll.setYear(2012);
 
 		// count data based on real world data
 		Counts countsReference = new Counts();
-		new CountsReaderMatsimV1(countsReference).parse(this.inFileCounted);
+		new CountsReaderMatsimV1(countsReference).parse(basePath + realWorldCountsFile);
 		
 		Counts countsCounted = new Counts();
 		countsCounted.setName("Tel Aviv Model");
 		countsCounted.setDescription("Tel Aviv Model");
 		countsCounted.setYear(2012);
 		
-		if (this.nodesFile != null) {
-			try {
-			Config config = ConfigUtils.createConfig();
-			Scenario scenario = ScenarioUtils.createScenario(config);
-				NetworkEmme2MATSim2012.readNodes(scenario, false);
-				originalNodes = scenario.getNetwork().getNodes();
-				buildNodesQuadTree();
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-
-		List<Emme2CountV3> emme2Counts = new CountsFileParserV3(countsFile).readFile();
+		QuadTree<Node> quadTree = LinkMappingTool.buildNodesQuadTree(scenario.getNetwork());
 		
+		List<Emme2Count> emme2Counts = new Emme2CountsFileParser(separator).readFile(basePath + inputFile);
+		
+		int linkExists = 0;
+		int searchByOriginalNodes = 0;
+		int searchTransformedLink = 0;
 		Counter counter = new Counter("Count stations mapped to MATSim network: #");
-		for (Emme2CountV3 emme2Count : emme2Counts) {
+		for (Emme2Count emme2Count : emme2Counts) {
 			Id fromNodeId = scenario.createId(String.valueOf(emme2Count.inode));
 			Id toNodeId = scenario.createId(String.valueOf(emme2Count.jnode));
 
@@ -127,12 +172,20 @@ public class CountsCreatorV3 {
 			Link link = null;
 			if (fromNode == null || toNode == null) {
 				// try searching using original nodes
-				if (this.nodesFile != null) link = searchUsingOriginalNodes(fromNodeId, toNodeId);
-				
+				link = LinkMappingTool.searchUsingOriginalNodes(fromNodeId, toNodeId, network, originalNetwork, quadTree);
+								
 				// if link is still null try searching in transformed links
-				if (link == null) link = searchTransformedLink(emme2Count, fromNode, toNode);
+				if (link == null) {
+					searchTransformedLink++;
+					link = searchTransformedLink(emme2Count, fromNode, toNode, scenario);
+				} else {
+					searchByOriginalNodes++;
+				}
 			}
-			else link = searchLink(emme2Count, fromNode, toNode);
+			else {
+				linkExists++;
+				link = searchLink(emme2Count, fromNode, toNode);
+			}
 
 			if (link != null) {
 				Count count = countsAll.createAndAddCount(link.getId(), emme2Count.inode + "_" + emme2Count.jnode);
@@ -170,97 +223,22 @@ public class CountsCreatorV3 {
 			else log.warn("Link from Node " + fromNodeId + " to Node " + toNodeId + " could not be found!");
 		}
 		counter.printCounter();
-		log.info("Input file contained count information for " + countsAll.getCounts().size() + " links.");
-		new CountsWriter(countsAll).write(this.outFileAll);
 		
-		new CountsWriter(countsCounted).write(this.outFileCounted);
+		log.info("Found " + linkExists + " count stations directly in the new network.");
+		log.info("Found " + searchByOriginalNodes + " count stations by using the original network.");
+		log.info("Found " + searchTransformedLink + " count stations by looking at the transformed links.");
+		log.info("Input file contained count information for " + countsAll.getCounts().size() + " links.");
+		new CountsWriter(countsAll).write(basePath + outputAllFile);
+		
+		new CountsWriter(countsCounted).write(basePath + outputOnlyRealWorldFile);
 	}
 
-	private Link searchLink(Emme2CountV3 emme2Count, Node fromNode, Node toNode) {
+	private Link searchLink(Emme2Count emme2Count, Node fromNode, Node toNode) {
 		for (Link link : fromNode.getOutLinks().values()) {
 			if (link.getToNode().getId().equals(toNode.getId())) {
 				return link;
 			}
 		}
-		return null;
-	}
-
-	private void buildNodesQuadTree() {
-
-		double startTime = System.currentTimeMillis();
-		double minx = Double.POSITIVE_INFINITY;
-		double miny = Double.POSITIVE_INFINITY;
-		double maxx = Double.NEGATIVE_INFINITY;
-		double maxy = Double.NEGATIVE_INFINITY;
-		for (Node n : this.scenario.getNetwork().getNodes().values()) {
-			if (n.getCoord().getX() < minx) { minx = n.getCoord().getX(); }
-			if (n.getCoord().getY() < miny) { miny = n.getCoord().getY(); }
-			if (n.getCoord().getX() > maxx) { maxx = n.getCoord().getX(); }
-			if (n.getCoord().getY() > maxy) { maxy = n.getCoord().getY(); }
-		}
-		minx -= 1.0;
-		miny -= 1.0;
-		maxx += 1.0;
-		maxy += 1.0;
-		log.info("building QuadTree for nodes: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		QuadTree<Node> quadTree = new QuadTree<Node>(minx, miny, maxx, maxy);
-		for (Node n : this.scenario.getNetwork().getNodes().values()) {
-			quadTree.put(n.getCoord().getX(), n.getCoord().getY(), n);
-		}
-		/* assign the quadTree at the very end, when it is complete.
-		 * otherwise, other threads may already start working on an incomplete quadtree
-		 */
-		this.nodeQuadTree = quadTree;
-		log.info("Building QuadTree took " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds.");
-	}
-	
-	private Link searchUsingOriginalNodes(Id fromNodeId, Id toNodeId) {
-				
-		Collection<Node> potentialFromNodes = new ArrayList<Node>();
-		Collection<Node> potentialToNodes = new ArrayList<Node>();
-		
-		Node fromNode = scenario.getNetwork().getNodes().get(fromNodeId);
-		Node toNode = scenario.getNetwork().getNodes().get(toNodeId);
-		
-		if (fromNode == null) {
-			fromNode = this.originalNodes.get(fromNodeId);
-			if (fromNode == null) {
-				log.warn("fromNode is not contained in the original network!");
-				return null;
-			}
-			Coord fromCoord = fromNode.getCoord();
-			
-			potentialFromNodes = this.nodeQuadTree.get(fromCoord.getX(), fromCoord.getY(), 10.0);			
-			
-		} else potentialFromNodes.add(fromNode);
-		
-		if (toNode == null) {
-			toNode = this.originalNodes.get(toNodeId);
-			if (toNode == null) {
-				log.warn("toNode is not contained in the original network!");
-				return null;
-			}
-			Coord toCoord = toNode.getCoord();
-			
-			potentialToNodes = this.nodeQuadTree.get(toCoord.getX(), toCoord.getY(), 10.0);
-			
-		} else potentialToNodes.add(toNode);
-		
-		for (Node potentialFromNode : potentialFromNodes) {
-			if (!potentialFromNode.getId().toString().contains(fromNodeId.toString())) continue;
-				
-			for (Node potentialToNode : potentialToNodes) {
-				if (!potentialToNode.getId().toString().contains(toNodeId.toString())) continue;
-				
-				for (Link potentialLink : potentialFromNode.getOutLinks().values()) {
-					if (potentialLink.getToNode().equals(potentialToNode)) {
-						return potentialLink;
-					}
-				}
-			}
-		}
-		
-		log.warn("Link from Node " + fromNodeId + " to Node " + toNodeId + " could not be found using original node data!");
 		return null;
 	}
 	
@@ -269,7 +247,7 @@ public class CountsCreatorV3 {
 	 * represent turning conditions. In that case we try to find
 	 * the new created link that fits best to the original one.
 	 */
-	private Link searchTransformedLink(Emme2CountV3 emme2Count, Node fromNode, Node toNode) {
+	private Link searchTransformedLink(Emme2Count emme2Count, Node fromNode, Node toNode, Scenario scenario) {
 		List<Node> possibleFromNodes = new ArrayList<Node>();
 		List<Node> possibleToNodes = new ArrayList<Node>();
 		List<Link> possibleLinks = new ArrayList<Link>();

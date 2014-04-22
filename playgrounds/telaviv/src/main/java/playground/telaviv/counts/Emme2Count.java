@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,10 +20,16 @@
 
 package playground.telaviv.counts;
 
+/**
+ * Container for count data from EMME/2 Tel Aviv Model.
+ * 
+ * @author cdobler
+ */
 public class Emme2Count {
 
 	public int inode;
 	public int jnode;
-	public double volau;
-	public double result;
+	public int amVolume;
+	public int opVolume;
+	public int pmVolume;
 }

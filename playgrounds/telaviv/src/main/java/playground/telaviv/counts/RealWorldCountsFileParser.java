@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Emme2CountV2.java
+ * RealWorldCountsFileParser.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,11 +20,50 @@
 
 package playground.telaviv.counts;
 
-public class Emme2CountV3 {
+import java.io.BufferedReader;
+import java.util.ArrayList;
+import java.util.List;
 
-	public int inode;
-	public int jnode;
-	public int amVolume;
-	public int opVolume;
-	public int pmVolume;
+import org.matsim.core.utils.io.IOUtils;
+
+public class RealWorldCountsFileParser {
+	
+	private final String separator;
+	
+	public RealWorldCountsFileParser(String separator) {
+		this.separator = separator;
+	}
+	
+	public List<RealWorldCount> readFile(String inFile) throws Exception {
+		List<RealWorldCount> counts = new ArrayList<RealWorldCount>();
+		
+		BufferedReader br = IOUtils.getBufferedReader(inFile);
+			
+		// skip first Line
+		br.readLine();
+		
+		String line;
+		while((line = br.readLine()) != null) {
+			RealWorldCount realWorldCount = new RealWorldCount();
+			
+			String[] cols = line.split(separator);
+			
+			realWorldCount.inode = parseInteger(cols[0]);
+			realWorldCount.jnode = parseInteger(cols[1]);
+			realWorldCount.hour = parseInteger(cols[2]);
+			realWorldCount.value = parseInteger(cols[3]);
+			
+			counts.add(realWorldCount);
+		}
+		
+		br.close();
+		
+		return counts;
+	}
+	
+	private int parseInteger(String string) {
+		if (string == null) return 0;
+		else if (string.trim().equals("")) return 0;
+		else return Integer.valueOf(string);
+	}
 }

@@ -111,7 +111,7 @@ public class PopulationCreator {
 				String file = args[0];
 				new PopulationCreator(file);
 			} else {
-				log.error("No input config file was given. Therefore cannont proceed. Aborting!");
+				log.error("No input config file was given. Therefore cannot proceed. Aborting!");
 				return;
 			}
 		} catch (Exception e) {

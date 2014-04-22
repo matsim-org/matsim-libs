@@ -21,12 +21,10 @@
 package playground.telaviv.roadpricing;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -42,6 +40,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingWriterXMLv1;
 
 import playground.telaviv.config.XMLParameterParser;
+import playground.telaviv.network.LinkMappingTool;
 
 /**
  * <p>
@@ -112,7 +111,7 @@ public class TollXMLCreator {
 
 				for (String key : parameterMap.keySet()) log.warn("Found parameter " + key + " which is not handled!");
 			} else {
-				log.error("No input config file was given. Therefore cannont proceed. Aborting!");
+				log.error("No input config file was given. Therefore cannot proceed. Aborting!");
 				return;
 			}
 			
@@ -128,7 +127,7 @@ public class TollXMLCreator {
 			
 			List<Tuple<Id, Id>> tuples = new TolledLinksFileParser(separator).readFile(basePath + tolledLinksFile);
 			
-			QuadTree<Node> quadTree = buildNodesQuadTree(scenario.getNetwork());
+			QuadTree<Node> quadTree = LinkMappingTool.buildNodesQuadTree(scenario.getNetwork());
 			
 			List<Link> tolledLinks = new ArrayList<Link>();
 			Counter counter = new Counter("Tolled links mapped to MATSim network: #");
@@ -142,7 +141,7 @@ public class TollXMLCreator {
 				Link link = null;
 				if (fromNode == null || toNode == null) {
 					// try searching using original nodes
-					link = searchUsingOriginalNodes(fromNodeId, toNodeId, network, originalNetwork, quadTree);
+					link = LinkMappingTool.searchUsingOriginalNodes(fromNodeId, toNodeId, network, originalNetwork, quadTree);
 				} else link = searchLink(fromNode, toNode);
 
 				if (link != null) {
@@ -190,56 +189,6 @@ public class TollXMLCreator {
 		}
 	}
 	
-	private static Link searchUsingOriginalNodes(Id fromNodeId, Id toNodeId, Network network, Network originalNetwork, QuadTree<Node> quadTree) {
-		
-		Collection<Node> potentialFromNodes = new ArrayList<Node>();
-		Collection<Node> potentialToNodes = new ArrayList<Node>();
-		
-		Node fromNode = network.getNodes().get(fromNodeId);
-		Node toNode = network.getNodes().get(toNodeId);
-		
-		if (fromNode == null) {
-			fromNode = originalNetwork.getNodes().get(fromNodeId);
-			if (fromNode == null) {
-				log.warn("fromNode is not contained in the original network!");
-				return null;
-			}
-			Coord fromCoord = fromNode.getCoord();
-			
-			potentialFromNodes = quadTree.get(fromCoord.getX(), fromCoord.getY(), 10.0);			
-			
-		} else potentialFromNodes.add(fromNode);
-		
-		if (toNode == null) {
-			toNode = originalNetwork.getNodes().get(toNodeId);
-			if (toNode == null) {
-				log.warn("toNode is not contained in the original network!");
-				return null;
-			}
-			Coord toCoord = toNode.getCoord();
-			
-			potentialToNodes = quadTree.get(toCoord.getX(), toCoord.getY(), 10.0);
-			
-		} else potentialToNodes.add(toNode);
-		
-		for (Node potentialFromNode : potentialFromNodes) {
-			if (!potentialFromNode.getId().toString().contains(fromNodeId.toString())) continue;
-				
-			for (Node potentialToNode : potentialToNodes) {
-				if (!potentialToNode.getId().toString().contains(toNodeId.toString())) continue;
-				
-				for (Link potentialLink : potentialFromNode.getOutLinks().values()) {
-					if (potentialLink.getToNode().equals(potentialToNode)) {
-						return potentialLink;
-					}
-				}
-			}
-		}
-		
-		log.warn("Link from Node " + fromNodeId + " to Node " + toNodeId + " could not be found using original node data!");
-		return null;
-	}
-	
 	private static Link searchLink(Node fromNode, Node toNode) {
 		for (Link link : fromNode.getOutLinks().values()) {
 			if (link.getToNode().getId().equals(toNode.getId())) {
@@ -247,38 +196,5 @@ public class TollXMLCreator {
 			}
 		}
 		return null;
-	}
-	
-	private static QuadTree<Node> buildNodesQuadTree(Network network) {
-
-		double startTime = System.currentTimeMillis();
-		
-		double minx = Double.POSITIVE_INFINITY;
-		double miny = Double.POSITIVE_INFINITY;
-		double maxx = Double.NEGATIVE_INFINITY;
-		double maxy = Double.NEGATIVE_INFINITY;
-		
-		for (Node n : network.getNodes().values()) {
-			if (n.getCoord().getX() < minx) { minx = n.getCoord().getX(); }
-			if (n.getCoord().getY() < miny) { miny = n.getCoord().getY(); }
-			if (n.getCoord().getX() > maxx) { maxx = n.getCoord().getX(); }
-			if (n.getCoord().getY() > maxy) { maxy = n.getCoord().getY(); }
-		}
-		minx -= 1.0;
-		miny -= 1.0;
-		maxx += 1.0;
-		maxy += 1.0;
-		
-		log.info("building QuadTree for nodes: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		QuadTree<Node> quadTree = new QuadTree<Node>(minx, miny, maxx, maxy);
-		for (Node n : network.getNodes().values()) {
-			quadTree.put(n.getCoord().getX(), n.getCoord().getY(), n);
-		}
-		/* assign the quadTree at the very end, when it is complete.
-		 * otherwise, other threads may already start working on an incomplete quadtree
-		 */
-		log.info("Building QuadTree took " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds.");
-		
-		return quadTree;
 	}
 }

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CountsFileParser.java
+ * Emme2CountsFileParser.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,62 +21,63 @@
 package playground.telaviv.counts;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CountsFileParser {
+import org.matsim.core.utils.io.IOUtils;
 
-	private String inFile;
-	private String separator = ",";
-	private Charset charset = Charset.forName("UTF-8");
+/**
+ * <p>
+ * Class to parse results from the EMME/2 model containing data for AM, OP and PM time periods.
+ * </p>
+ * <p>
+ * The following columns are expected in the file:<br>
+ * 0 ... i-node<br>
+ * 1 ... j-node<br>
+ * 2 ... length<br>
+ * 3 ... modes<br>
+ * 4 ... type<br>
+ * 5 ... lanes<br>
+ * 6 ... VDF<br>
+ * 7 ... AM_volume<br>
+ * 8 ... OP_volume<br>
+ * 9 ... PM_volume<br>
+ * </p>
+ * 
+ * @author cdobler
+ */
+public class Emme2CountsFileParser {
+
+	private final String separator;
 	
-	public CountsFileParser(String inFile) {
-		this.inFile = inFile;
+	public Emme2CountsFileParser(String separator) {
+		this.separator = separator;
 	}
 	
-	public List<Emme2Count> readFile() {
+	public List<Emme2Count> readFile(String inFile) throws Exception {
 		List<Emme2Count> counts = new ArrayList<Emme2Count>();
+	    
+		BufferedReader br = IOUtils.getBufferedReader(inFile);
 		
-		FileInputStream fis = null;
-		InputStreamReader isr = null;
-	    BufferedReader br = null;
-	       
-    	try {
-    		fis = new FileInputStream(inFile);
-    		isr = new InputStreamReader(fis, charset);
-			br = new BufferedReader(isr);
-			
-			// skip first Line
-			br.readLine();
-			 
-			String line;
-			while((line = br.readLine()) != null) {
-				Emme2Count emme2Count = new Emme2Count();
-				
-				String[] cols = line.split(separator);
-				
-				emme2Count.inode = parseInteger(cols[0]);
-				emme2Count.jnode = parseInteger(cols[1]);
-				emme2Count.volau = parseDouble(cols[2]);
-//				emme2Count.result = parseDouble(cols[3]);
-				
-								
-				counts.add(emme2Count);
-			}
-			
-			br.close();
-			isr.close();
-			fis.close();
-    	} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	    // skip first Line
+	    br.readLine();
+	    
+	    String line;
+	    while((line = br.readLine()) != null) {
+	    	Emme2Count emme2Count = new Emme2Count();
+	    	
+	    	String[] cols = line.split(separator);
+	    	
+	    	emme2Count.inode = parseInteger(cols[0]);
+	    	emme2Count.jnode = parseInteger(cols[1]);
+	    	emme2Count.amVolume = parseInteger(cols[7]);
+	    	emme2Count.opVolume = parseInteger(cols[8]);
+	    	emme2Count.pmVolume = parseInteger(cols[9]);
+	    	
+	    	counts.add(emme2Count);
+	    }
+	    
+	    br.close();
 		
 		return counts;
 	}
@@ -85,11 +86,5 @@ public class CountsFileParser {
 		if (string == null) return 0;
 		else if (string.trim().equals("")) return 0;
 		else return Integer.valueOf(string);
-	}
-	
-	private double parseDouble(String string) {
-		if (string == null) return 0.0;
-		else if (string.trim().equals("")) return 0.0;
-		else return Double.valueOf(string);
 	}
 }
