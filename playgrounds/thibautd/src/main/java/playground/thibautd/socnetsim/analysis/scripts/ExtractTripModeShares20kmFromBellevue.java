@@ -56,6 +56,7 @@ import org.matsim.pt.PtConstants;
 
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
+import playground.thibautd.utils.ArgParser;
 
 /**
  * @author thibautd
@@ -90,12 +91,21 @@ public class ExtractTripModeShares20kmFromBellevue {
 	private static final Filter FILTER = true ? new ODFilter() : new HomeCoordFilter();
 
 	public static void main(final String[] args) throws IOException {
-		final String plansFile = args[ 0 ];
-		final String outputFile = args[ 1 ];
-		// for V4 or distance computation
-		final String networkFile = args.length > 2 ? args[ 2 ] : null;
-		// useful for V4 only
-		final String facilitiesFile = args.length > 3 ? args[ 3 ] : null;
+		main( new ArgParser( args ) );
+	}
+
+	private static void main(final ArgParser args) throws IOException {
+		args.setDefaultValue( "-p" , null );
+		args.setDefaultValue( "-o" , null );
+		args.setDefaultValue( "-f" , null );
+		args.setDefaultValue( "-n" , null );
+
+		final String plansFile = args.getValue( "-p" );
+		final String outputFile = args.getValue( "-o" );
+		// for V4 or distance computation: optional
+		final String networkFile = args.getValue( "-n" );
+		// useful for V4 only: optional
+		final String facilitiesFile = args.getValue( "-f" );
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		if ( facilitiesFile != null ) new MatsimFacilitiesReader( scenario ).parse( facilitiesFile );
