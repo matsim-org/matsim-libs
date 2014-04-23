@@ -20,8 +20,11 @@
 
 package playground.anhorni.rc;
 
+
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -43,6 +46,7 @@ public class TunnelLinksFilter implements AgentFilter {
 
 	private final Map<Id, MobsimAgent> agents;
 	private final Set<Id> links;
+	private final Set<Link> entryLinks = new HashSet<Link>();
 	private static final Logger log = Logger.getLogger(TunnelLinksFilter.class);
 	private Network network;
 	
@@ -61,8 +65,21 @@ public class TunnelLinksFilter implements AgentFilter {
 		portalNodeSouth = this.network.getNodes().get(new IdImpl("17560200470368"));
 		portalNodeNorth = this.network.getNodes().get(new IdImpl("17560200134734"));
 		
+		this.createEntryLinks();		
 	}
-		
+	
+	private void createEntryLinks() {
+		for (Id id : links) {
+			Node fromNode = this.network.getLinks().get(id).getFromNode();
+			this.entryLinks.addAll(fromNode.getInLinks().values());
+		}
+	}
+	
+	private boolean isOnEntryLink(MobsimAgent agent) {
+		if (entryLinks.contains(this.network.getLinks().get(agent.getCurrentLinkId()))) return true;
+		else return false;
+	}
+	
 	@Override
 	public void applyAgentFilter(Set<Id> set, double time) {
 		log.info("this one is not used anymore ...");	
@@ -72,18 +89,29 @@ public class TunnelLinksFilter implements AgentFilter {
 	public boolean applyAgentFilter(Id id, double time) {
 		MobsimAgent agent = this.agents.get(id);
 		Link currentLinkAgent = this.network.getLinks().get(agent.getCurrentLinkId());
+		
 //		if (!links.contains(agent.getCurrentLinkId())) return false;
 //		else return true;
-			
-		if (time < 17.0 * 3600.0) {
+		
+		if (time < 16.0 * 3600.0) {
+			if (this.isOnEntryLink(agent)) return true; //replan the agent
+			else return false;
+		}			
+		else if (time >= 16.0 * 3600.0 && time < 17.0 * 3600.0) {
 			double dist0 = CoordUtils.calcDistance(currentLinkAgent.getCoord(), portalNodeSouth.getCoord());
 			double dist1 = CoordUtils.calcDistance(currentLinkAgent.getCoord(), portalNodeNorth.getCoord());
-			if (Math.min(dist0, dist1) < 1000.0) return true; // replan the agent
+			if (Math.min(dist0, dist1) < 500.0 || this.isOnEntryLink(agent)) return true; // replan the agent
+			else return false;	
+		}
+		else if (time >= 17.0 * 3600.0 && time < 18.0 * 3600.0) {
+			double dist0 = CoordUtils.calcDistance(currentLinkAgent.getCoord(), portalNodeSouth.getCoord());
+			double dist1 = CoordUtils.calcDistance(currentLinkAgent.getCoord(), portalNodeNorth.getCoord());
+			if (Math.min(dist0, dist1) < 1000.0 || this.isOnEntryLink(agent)) return true; // replan the agent
 			else return false;	
 		}
 		else {
-			double dist2 = CoordUtils.calcDistance(currentLinkAgent.getCoord(), middleNode.getCoord());
-			if (dist2 < 5000) return true; // replan the agent
+			double dist = CoordUtils.calcDistance(currentLinkAgent.getCoord(), middleNode.getCoord());
+			if (dist < 4000 || this.isOnEntryLink(agent)) return true; // replan the agent
 			else return false;
 		}
 	}
