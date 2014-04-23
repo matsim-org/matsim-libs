@@ -524,9 +524,17 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 	
 	public Map<Id, Double> getPersonId2amountSumAllAgents() {
 		Map<Id, Double> personId2amountSumAllAgents = new HashMap<Id, Double>();
-
-//		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-		for (Id id : this.persons) {
+		
+		List<Id> personIds = new ArrayList<Id>();
+		if (this.scenario.getPopulation().getPersons().isEmpty()) {
+			log.warn("Scenario does not contain a Population. Using the person IDs from the events file for the person-based analysis.");
+			personIds.addAll(this.persons);
+		} else {
+			log.info("Scenario contains a Population. Using the person IDs from the population for the person-based analysis.");
+			personIds.addAll(this.scenario.getPopulation().getPersons().keySet());
+		}
+		
+		for (Id id : personIds) {
 			double amountSum = 0.;
 			if (this.personId2amountSum.get(id) == null) {
 				// no monetary payments
