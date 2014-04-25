@@ -20,13 +20,12 @@
 
 package org.matsim.core.replanning.selectors;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PlanImpl;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <p>Selects the worst plan of a person (most likely for removal), but respects
@@ -39,18 +38,18 @@ import org.matsim.core.population.PlanImpl;
  *
  * @author mrieser
  */
-public class WorstPlanForRemovalSelector<T extends BasicPlan> implements GenericPlanSelector<T> {
+public class WorstPlanForRemovalSelector implements GenericPlanSelector<Plan> {
 
 	private static final String UNDEFINED_TYPE = "undefined";
 
 	@Override
-	public T selectPlan(HasPlansAndId<T> person) {
+	public Plan selectPlan(HasPlansAndId<Plan> person) {
 
 		// hashmap that returns "Integer" count for given plans type:
 		Map<String, Integer> typeCounts = new ConcurrentHashMap<String, Integer>();
 
 		// count how many plans per type an agent has:
-		for (T plan : person.getPlans()) {
+		for (Plan plan : person.getPlans()) {
 			String type = ((PlanImpl) plan).getType();
 			if ( type==null ) {
 				type = UNDEFINED_TYPE ;
@@ -63,9 +62,9 @@ public class WorstPlanForRemovalSelector<T extends BasicPlan> implements Generic
 			}
 		}
 
-		T worst = null;
+		Plan worst = null;
 		double worstScore = Double.POSITIVE_INFINITY;
-		for (T plan : person.getPlans()) {
+		for (Plan plan : person.getPlans()) {
 
 			String type = ((PlanImpl) plan).getType();
 			if ( type==null ) {
@@ -95,7 +94,7 @@ public class WorstPlanForRemovalSelector<T extends BasicPlan> implements Generic
 		if (worst == null) {
 			// there is exactly one plan, or we have of each plan-type exactly one.
 			// select the one with worst score globally, or the first one with score=null
-			for (T plan : person.getPlans()) {
+			for (Plan plan : person.getPlans()) {
 				if (plan.getScore() == null || plan.getScore().isNaN() ) {
 					return plan;
 				}

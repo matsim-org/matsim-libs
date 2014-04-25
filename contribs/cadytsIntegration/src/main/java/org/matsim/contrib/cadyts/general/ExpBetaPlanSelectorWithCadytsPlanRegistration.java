@@ -14,11 +14,11 @@ import org.matsim.core.replanning.selectors.PlanSelector;
  */
 public final class ExpBetaPlanSelectorWithCadytsPlanRegistration<T> implements PlanSelector {
 
-	private final PlanSelector delegate ;
+	private final ExpBetaPlanSelector<Plan> delegate ;
 	private final CadytsContextI<T> cContext;
 	
 	public ExpBetaPlanSelectorWithCadytsPlanRegistration(double beta, CadytsContextI<T> cContext ) {
-		delegate = new ExpBetaPlanSelector( beta ) ;
+		delegate = new ExpBetaPlanSelector<Plan>( beta ) ;
 		this.cContext = cContext ;
 	}
 	

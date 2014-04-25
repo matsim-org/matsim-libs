@@ -22,14 +22,13 @@ package playground.pieter.pseudosimulation.replanning.selectors;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
-
 import playground.pieter.pseudosimulation.controler.listeners.MobSimSwitcher;
 import playground.pieter.pseudosimulation.replanning.PSimPlanStrategyTranslationAndRegistration;
 /**
  * @author fouriep
  * Plan selector for PSim. See {@link PSimPlanStrategyTranslationAndRegistration}.
  */
-public class PSimExpBetaPlanChanger extends ExpBetaPlanChanger {
+public class PSimExpBetaPlanChanger extends ExpBetaPlanChanger<Plan> {
 
 	public PSimExpBetaPlanChanger(double beta) {
 		super(beta);

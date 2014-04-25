@@ -29,7 +29,7 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 
 	@Override
 	protected GenericPlanSelector<Plan> getPlanSelector() {
-		return new WorstPlanForRemovalSelector<Plan>();
+		return new WorstPlanForRemovalSelector();
 	}
 
 	/**

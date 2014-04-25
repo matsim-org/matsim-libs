@@ -28,7 +28,6 @@ package playground.mzilske.cadyts;
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.cadyts.general.CadytsContextI;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -39,14 +38,14 @@ import org.matsim.core.replanning.selectors.PlanSelector;
  */
 class ExpBetaPlanChangerWithCadytsPlanRegistration<T> implements PlanSelector {
 
-	private final PlanSelector delegate;
+	private final ExpBetaPlanChanger<Plan> delegate;
     private PlansTranslator<T> plansTranslator;
     private AnalyticalCalibrator<T> calibrator;
 
     public ExpBetaPlanChangerWithCadytsPlanRegistration(double beta, PlansTranslator<T> plansTranslator, AnalyticalCalibrator<T> calibrator) {
         this.plansTranslator = plansTranslator;
         this.calibrator = calibrator;
-        delegate = new ExpBetaPlanChanger(beta);
+        delegate = new ExpBetaPlanChanger<Plan>(beta);
 	}
 	
 

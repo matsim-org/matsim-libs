@@ -4,7 +4,6 @@
 package org.matsim.contrib.cadyts.general;
 
 import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -15,11 +14,11 @@ import org.matsim.core.replanning.selectors.PlanSelector;
  */
 public final class ExpBetaPlanChangerWithCadytsPlanRegistration<T> implements PlanSelector {
 
-	private final PlanSelector delegate ;
+	private final ExpBetaPlanChanger<Plan> delegate ;
 	private final CadytsContextI<T> cContext;
 	
 	public ExpBetaPlanChangerWithCadytsPlanRegistration(double beta, CadytsContextI<T> cContext ) {
-		delegate = new ExpBetaPlanChanger( beta ) ;
+		delegate = new ExpBetaPlanChanger<Plan>( beta ) ;
 		this.cContext = cContext ;
 	}
 	

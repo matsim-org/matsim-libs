@@ -19,12 +19,6 @@
 
 package playground.mmoyo.taste_variations;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-//import java.util.Map.Entry;
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -36,13 +30,17 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
 import playground.mmoyo.analysis.tools.PtPlanAnalyzer;
 import playground.mmoyo.analysis.tools.PtPlanAnalyzer.PtPlanAnalysisValues;
 import playground.mmoyo.io.TextFileWriter;
 import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.calibration.StopNumberPerPassenger;
-import playground.mmoyo.utils.calibration.StopNumberPerPassenger.StopNumRecord;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.TreeMap;
+
+//import java.util.Map.Entry;
 
 /**
  * Reads two versions of same plans file: 
@@ -164,7 +162,7 @@ public class ChoiceProba {
 	protected Map<Plan, Double> getPlansSelectionProbabilities(final Person person) {
 		Map<Plan, Double> plan_proba_Map = new LinkedHashMap<Plan, Double>(person.getPlans().size());
 		for(Plan plan : person.getPlans()  ){
-			double probability = delegExpBetaPlanSelector.getSelectionProbability(plan); /////// using a deleg ExpBetaPlanSelector
+			double probability = ExpBetaPlanSelector.getSelectionProbability(delegExpBetaPlanSelector, plan.getPerson(), plan); /////// using a deleg ExpBetaPlanSelector
 			plan_proba_Map.put(plan, probability);
 		}
 		return plan_proba_Map;

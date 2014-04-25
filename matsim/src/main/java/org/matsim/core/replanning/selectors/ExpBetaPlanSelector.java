@@ -20,15 +20,16 @@
 
 package org.matsim.core.replanning.selectors;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Selects one of the existing plans of the person based on the
@@ -36,7 +37,7 @@ import org.matsim.core.gbl.MatsimRandom;
  *
  * @author mrieser
  */
-public class ExpBetaPlanSelector implements PlanSelector {
+public class ExpBetaPlanSelector<T extends BasicPlan> implements GenericPlanSelector<T>{
 
 	protected static final double MIN_WEIGHT = Double.MIN_VALUE;
 	protected final double beta;
@@ -50,22 +51,22 @@ public class ExpBetaPlanSelector implements PlanSelector {
 	}
 
 	/**
-	 * @return Returns a random plan from the person, random but according to its weight.
+	 * @return a random plan from the person, random but according to its weight.
 	 */
 	@Override
-	public Plan selectPlan(final HasPlansAndId<Plan> person) {
+	public T selectPlan(final HasPlansAndId<T> person) {
 
 		// get the weights of all plans
-		Map<Plan, Double> weights = this.calcWeights(person);
+		Map<T, Double> weights = this.calcWeights(person);
 
 		double sumWeights = 0.0;
 		for (Double weight : weights.values()) {
-			sumWeights += weight.doubleValue();
+			sumWeights += weight;
 		}
 
 		// choose a random number over interval [0, sumWeights[
 		double selnum = sumWeights * MatsimRandom.getRandom().nextDouble();
-		for (Plan plan : person.getPlans()) {
+		for (T plan : person.getPlans()) {
 			selnum -= weights.get(plan);
 			if (selnum <= 0.0) {
 				return plan;
@@ -84,11 +85,9 @@ public class ExpBetaPlanSelector implements PlanSelector {
 	/**
 	 * Calculates the weight of a single plan.
 	 *
-	 * @param plan
-	 * @param maxScore
 	 * @return the weight of the plan
 	 */
-	protected double calcPlanWeight(final Plan plan, final double maxScore) {
+	protected double calcPlanWeight(final T plan, final double maxScore) {
 		// NOTE: The deduction of "maxScore" from all scores is a numerical trick.  It ensures that the values of exp(...)
 		// are in some normal range, instead of close to numerical infinity.  The latter leads to numerically instable
 		// results (this is not fiction; we had that some time ago). kai, aug'12
@@ -104,25 +103,24 @@ public class ExpBetaPlanSelector implements PlanSelector {
 	/**
 	 * Builds the weights of all plans.
 	 *
-	 * @param person
 	 * @return a map containing the weights of all plans
 	 */
-	Map<Plan, Double> calcWeights(final HasPlansAndId<Plan> person) {
+	Map<T, Double> calcWeights(final HasPlansAndId<T> person) {
 
 		// - first find the max. score of all plans of this person
 		double maxScore = Double.NEGATIVE_INFINITY;
-		for (Plan plan1 : person.getPlans()) {
+		for (T plan1 : person.getPlans()) {
 			if ( (plan1.getScore() != null) && plan1.getScore().isNaN() ) {
 				Logger.getLogger(this.getClass()).error("encountering getScore().isNaN().  This class is not well behaved in this situation.  Continuing anyway ...") ;
 			}
-			if ((plan1.getScore() != null) && (plan1.getScore().doubleValue() > maxScore)) {
-				maxScore = plan1.getScore().doubleValue();
+			if ((plan1.getScore() != null) && (plan1.getScore() > maxScore)) {
+				maxScore = plan1.getScore();
 			}
 		}
 
-		Map<Plan, Double> weights = new LinkedHashMap<Plan, Double>(person.getPlans().size());
+		Map<T, Double> weights = new LinkedHashMap<T, Double>(person.getPlans().size());
 
-		for (Plan plan : person.getPlans()) {
+		for (T plan : person.getPlans()) {
 			weights.put(plan, this.calcPlanWeight(plan, maxScore));
 			// see note in calcPlanWeight!
 		}
@@ -130,16 +128,19 @@ public class ExpBetaPlanSelector implements PlanSelector {
 		return weights;
 	}
 
-	public double getSelectionProbability(final Plan plan) {
-
-		Map<Plan, Double> weights = this.calcWeights(plan.getPerson());
+    /**
+     * @return the probability that this expBetaPlanSelector will select this plan for this person.
+     */
+	public static double getSelectionProbability(ExpBetaPlanSelector<Plan> expBetaPlanSelector, Person person, final Plan plan) {
+		Map<Plan, Double> weights = expBetaPlanSelector.calcWeights(person);
 		double thisWeight = weights.get(plan);
 
 		double sumWeights = 0.0;
 		for (Double weight : weights.values()) {
-			sumWeights += weight.doubleValue();
+			sumWeights += weight;
 		}
 
 		return (thisWeight / sumWeights);
 	}
+
 }

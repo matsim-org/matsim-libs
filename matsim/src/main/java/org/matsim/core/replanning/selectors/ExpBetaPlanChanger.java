@@ -21,18 +21,16 @@
 package org.matsim.core.replanning.selectors;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
 
 /**
  * Changes to another plan if that plan is better.  Probability to change depends on score difference.
  *
  * @author kn based on mrieser
  */
-public class ExpBetaPlanChanger implements PlanSelector {
+public class ExpBetaPlanChanger<T extends BasicPlan> implements GenericPlanSelector<T> {
 	private static final Logger log = Logger.getLogger(ExpBetaPlanChanger.class);
 
 	private final double beta;
@@ -48,10 +46,10 @@ public class ExpBetaPlanChanger implements PlanSelector {
 	 * Need to think through if this goes to Nash Equilibrium or to SUE !!!
 	 */
 	@Override
-	public Plan selectPlan(final HasPlansAndId<Plan> person) {
+	public T selectPlan(final HasPlansAndId<T> person) {
 		// current plan and random plan:
-		Plan currentPlan = person.getSelectedPlan();
-		Plan otherPlan = new RandomPlanSelector<Plan>().selectPlan(((PersonImpl) person));
+		T currentPlan = person.getSelectedPlan();
+		T otherPlan = new RandomPlanSelector<T>().selectPlan(person);
 
 		if (currentPlan == null) {
 			// this case should only happen when the agent has no plans at all

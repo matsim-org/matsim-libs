@@ -63,7 +63,7 @@ class ScenarioReconstructor implements Provider<Scenario> {
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
         scenario.setNetwork(network);
 
-        PopulationFromSightings.createPopulationWithEndTimesAtLastSightingsAndAdditionalInflationPopulation(scenario, linkToZoneResolver, compareMain.getSightingsPerPerson());
+        PopulationFromSightings.createPopulationWithEndTimesAtLastSightings(scenario, linkToZoneResolver, compareMain.getSightingsPerPerson());
         PopulationFromSightings.preparePopulation(scenario, linkToZoneResolver, compareMain.getSightingsPerPerson());
 
 

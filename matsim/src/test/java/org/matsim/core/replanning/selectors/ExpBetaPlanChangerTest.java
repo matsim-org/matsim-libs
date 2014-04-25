@@ -29,7 +29,7 @@ package org.matsim.core.replanning.selectors;
 public class ExpBetaPlanChangerTest extends AbstractPlanSelectorTest {
 
 	@Override
-	protected PlanSelector getPlanSelector() {
+	protected ExpBetaPlanChanger getPlanSelector() {
 		return new ExpBetaPlanChanger(2.0);
 	}
 

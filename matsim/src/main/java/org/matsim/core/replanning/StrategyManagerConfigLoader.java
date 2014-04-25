@@ -20,9 +20,6 @@
 
 package org.matsim.core.replanning;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
@@ -35,12 +32,10 @@ import org.matsim.core.controler.PlanStrategyFactoryRegister;
 import org.matsim.core.controler.PlanStrategyRegistrar;
 import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
 import org.matsim.core.replanning.modules.ExternalModule;
-import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
-import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-import org.matsim.core.replanning.selectors.GenericPlanSelector;
-import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
+import org.matsim.core.replanning.selectors.*;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Loads the strategy modules specified in the config-file. This class offers
@@ -128,16 +123,13 @@ public final class StrategyManagerConfigLoader {
 			// Presumably, this is not the desired approach and the default should be in the config file?  kai, feb'12
 			GenericPlanSelector<Plan> planSelector = null ;
 			if ( name.equals("WorstPlanSelector") ) { 
-				planSelector = new WorstPlanForRemovalSelector<Plan>(); 
+				planSelector = new WorstPlanForRemovalSelector();
 			} else if ( name.equals("SelectRandom") ) {
 				planSelector = new RandomPlanSelector();
 			} else if ( name.equals("SelectExpBeta") ) {
 				planSelector = new ExpBetaPlanSelector( - config.planCalcScore().getBrainExpBeta());
 			} else if ( name.equals("ChangeExpBeta") ) {
 				planSelector = new ExpBetaPlanChanger( - config.planCalcScore().getBrainExpBeta());
-//			} else if ( name.equals("BestPlanSelector") ) {
-//				planSelector = new BestPlanSelector();
-				// does not make sense, thus commented out. kai, oct'13
 			} else if ( name.equals("PathSizeLogitSelector") ) {
 				planSelector = new PathSizeLogitSelector(config.planCalcScore().getPathSizeLogitBeta(), -config.planCalcScore().getBrainExpBeta(), 
 						scenario.getNetwork());

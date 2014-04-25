@@ -27,7 +27,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.selectors.AbstractPlanSelectorTest;
-import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.core.replanning.selectors.GenericPlanSelector;
 
 /**
  * Tests for {@link ExpBetaPlanForRemovalSelector}.
@@ -52,7 +52,7 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 	}
 
 	@Override
-	protected PlanSelector getPlanSelector() {
+	protected GenericPlanSelector<Plan> getPlanSelector() {
 		return new ExpBetaPlanForRemovalSelector(this.config.planCalcScore());
 	}
 
@@ -75,7 +75,7 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 		PlanImpl plan5 = person.createAndAddPlan(false);// weight: 22026.465
 		plan5.setScore(100.0);
 
-		PlanSelector selector = new ExpBetaPlanForRemovalSelector(this.config.planCalcScore());
+		ExpBetaPlanForRemovalSelector selector = new ExpBetaPlanForRemovalSelector(this.config.planCalcScore());
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;
@@ -133,7 +133,7 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 		PlanImpl plan5 = person.createAndAddPlan(false);
 		plan5.setScore(100.0);
 
-		PlanSelector selector = new ExpBetaPlanForRemovalSelector(this.config.planCalcScore());
+		ExpBetaPlanForRemovalSelector selector = new ExpBetaPlanForRemovalSelector(this.config.planCalcScore());
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;

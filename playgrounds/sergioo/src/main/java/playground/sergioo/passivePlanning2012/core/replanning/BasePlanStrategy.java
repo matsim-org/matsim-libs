@@ -1,10 +1,5 @@
 package playground.sergioo.passivePlanning2012.core.replanning;
 
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
@@ -12,11 +7,13 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.replanning.selectors.KeepSelected;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.utils.misc.Counter;
-
 import playground.sergioo.passivePlanning2012.api.population.BasePerson;
+
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BasePlanStrategy implements PlanStrategy {
 
@@ -113,10 +110,6 @@ public class BasePlanStrategy implements PlanStrategy {
 		if (hadException.get()) {
 			throw new RuntimeException("Some threads crashed, thus not all plans may have been handled.");
 		}
-	}
-	
-	public PlanSelector getPlanSelector() {
-		return new KeepSelected();
 	}
 
 }

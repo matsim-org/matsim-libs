@@ -18,23 +18,18 @@
  * *********************************************************************** */
 package org.matsim.core.replanning;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
+import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import java.util.*;
 
 /**
  * Notes:<ul>
@@ -66,7 +61,7 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 
 	private int maxPlansPerAgent = 0;
 
-	private GenericPlanSelector<T> removalPlanSelector = new WorstPlanForRemovalSelector<T>();
+	private GenericPlanSelector<T> removalPlanSelector = new GenericWorstPlanForRemovalSelector<T>();
 
 	private String subpopulationAttributeName = null;
 
@@ -83,8 +78,6 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	 * compared to the sum of weights of all strategies in this manager defines
 	 * the probability this strategy will be used for an agent.
 	 *
-	 * @param strategy
-	 * @param weight
 	 */
 	public final void addStrategy(
 			final GenericPlanStrategy<T> strategy,
@@ -92,7 +85,7 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 			final double weight) {
 		final StrategyWeights<T> weights = getStrategyWeights( subpopulation );
 		weights.strategies.add(strategy);
-		weights.weights.add(Double.valueOf(weight));
+		weights.weights.add(weight);
 		weights.totalWeights += weight;
 	}
 
@@ -112,7 +105,7 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 		int idx = weights.strategies.indexOf(strategy);
 		if (idx != -1) {
 			weights.strategies.remove(idx);
-			double weight = weights.weights.remove(idx).doubleValue();
+			double weight = weights.weights.remove(idx);
 			weights.totalWeights -= weight;
 			return true;
 		}
@@ -121,7 +114,7 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 
 
 
-	private final StrategyWeights<T> getStrategyWeights(final String subpop) {
+	private StrategyWeights<T> getStrategyWeights(final String subpop) {
 		StrategyWeights<T> weights = weightsPerSubpopulation.get( subpop );
 
 		if ( weights == null ) {
@@ -135,8 +128,6 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	/**
 	 * changes the weight of the specified strategy
 	 *
-	 * @param strategy
-	 * @param newWeight
 	 * @return true if the strategy is part of this manager and the weight could
 	 * 		be changed successfully, false otherwise.
 	 */
@@ -147,7 +138,7 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 		final StrategyWeights<T> weights = getStrategyWeights( subpopulation );
 		int idx = weights.strategies.indexOf(strategy);
 		if (idx != -1) {
-			double oldWeight = weights.weights.set(idx, Double.valueOf(newWeight)).doubleValue();
+			double oldWeight = weights.weights.set(idx, newWeight);
 			weights.totalWeights += (newWeight - oldWeight);
 			Logger.getLogger(this.getClass()).info( strategy.toString() + ": oldWeight=" + oldWeight + " newWeight=" + newWeight );
 			return true;
@@ -160,12 +151,10 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	 * strategy on the person, after adapting the strategies to any pending change
 	 * requests for the specified iteration.
 	 *
-	 * @param population
 	 * @param iteration the current iteration we're handling
-	 * @param replanningContext
 	 */
 	public final void run(
-			final Collection<HasPlansAndId<T>> persons,
+			final Iterable<? extends HasPlansAndId<T>> persons,
 			ObjectAttributes subpopLookup,
 			final int iteration,
 			final ReplanningContext replanningContext ) {
@@ -177,11 +166,9 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	 * Randomly chooses for each person of the population a strategy and uses that
 	 * strategy on the person.
 	 *
-	 * @param population
-	 * @param replanningContext
 	 */
 	final void run(
-			final Collection<HasPlansAndId<T>> persons,
+			final Iterable<? extends HasPlansAndId<T>> persons,
 			ObjectAttributes subPopLookup,
 			final ReplanningContext replanningContext) {
 
@@ -205,7 +192,7 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 			if (this.subpopulationAttributeName != null) {
 				subpopName = (String) subPopLookup.getAttribute(person.getId().toString(), this.subpopulationAttributeName);
 			}
-			GenericPlanStrategy<T> strategy = this.chooseStrategy(person, subpopName);
+			GenericPlanStrategy<T> strategy = this.chooseStrategy(subpopName);
 
 			if (strategy==null) {
 				throw new RuntimeException("No strategy found!");
@@ -224,7 +211,7 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 
 	}
 
-	private final void removePlans(final HasPlansAndId<T> person, final int maxNumberOfPlans) {
+	private void removePlans(final HasPlansAndId<T> person, final int maxNumberOfPlans) {
 		while (person.getPlans().size() > maxNumberOfPlans) {
 			T plan = this.removalPlanSelector.selectPlan(person);
 			person.removePlan(plan);
@@ -241,7 +228,6 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	/**
 	 * modifies the loaded strategies according to pending change requests for this iteration.
 	 *
-	 * @param iteration
 	 */
 	final void handleChangeRequests(final int iteration) {
 		for ( int ii = 0 ; ii <= iteration ; ii++ ) {
@@ -249,10 +235,10 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 			for ( Map.Entry<String, StrategyWeights<T>> wentry : weightsPerSubpopulation.entrySet() ) {
 				final String subpop = wentry.getKey();
 				final StrategyWeights<T> weights = wentry.getValue();
-				Map<GenericPlanStrategy<T>, Double> changes = weights.changeRequests.remove(Integer.valueOf(ii));
+				Map<GenericPlanStrategy<T>, Double> changes = weights.changeRequests.remove(ii);
 				if (changes != null) {
 					for (Map.Entry<GenericPlanStrategy<T>, Double> entry : changes.entrySet()) {
-						changeWeightOfStrategy( entry.getKey(), subpop, entry.getValue().doubleValue() );
+						changeWeightOfStrategy( entry.getKey(), subpop, entry.getValue());
 					}
 				}
 			}
@@ -262,10 +248,9 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	/**
 	 * chooses a (weight-influenced) random strategy
 	 *
-	 * @param person The person for which the strategy should be chosen
 	 * @return the chosen strategy
 	 */
-	protected GenericPlanStrategy<T> chooseStrategy(final HasPlansAndId<T> person, final String subpopulation) {
+	protected GenericPlanStrategy<T> chooseStrategy(final String subpopulation) {
 		final StrategyWeights<T> weights = weightsPerSubpopulation.get( subpopulation );
 		if(weights == null){
 			throw new RuntimeException("no weights container for subpopulation = " + subpopulation);
@@ -275,7 +260,7 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 
 		double sum = 0.0;
 		for (int i = 0, max = weights.weights.size(); i < max; i++) {
-			sum += weights.weights.get(i).doubleValue();
+			sum += weights.weights.get(i);
 			if (rnd <= sum) {
 				return weights.strategies.get(i);
 			}
@@ -289,19 +274,15 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	 * Agents can have up to maxPlansPerAgent plans plus one additional one with the
 	 * currently modified plan they're trying out.
 	 *
-	 * @param maxPlansPerAgent
 	 */
 	public final void setMaxPlansPerAgent(final int maxPlansPerAgent) {
 		this.maxPlansPerAgent = maxPlansPerAgent;
 	}
 
 	/**
-	 * Schedules a {@link #changeStrategy changeStrategy(Strategy, subpopulation, double)} command for a later iteration. The
+	 * Schedules a {@link #changeWeightOfStrategy(GenericPlanStrategy, String, double)} command for a later iteration. The
 	 * change will take place before the strategies are applied.
 	 *
-	 * @param iteration
-	 * @param strategy
-	 * @param newWeight
 	 */
 	public final void addChangeRequest(
 			final int iteration,
@@ -309,13 +290,13 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 			final String subpopulation,
 			final double newWeight) {
 		final StrategyWeights<T> weights = getStrategyWeights( subpopulation );
-		Integer iter = Integer.valueOf(iteration);
+		Integer iter = iteration;
 		Map<GenericPlanStrategy<T>, Double> iterationRequests = weights.changeRequests.get(iter);
 		if (iterationRequests == null) {
 			iterationRequests = new HashMap<GenericPlanStrategy<T>, Double>(3);
 			weights.changeRequests.put(iter, iterationRequests);
 		}
-		iterationRequests.put(strategy, Double.valueOf(newWeight));
+		iterationRequests.put(strategy, newWeight);
 		Logger.getLogger(this.getClass()).info( "added change request: "
 				+ " iteration=" + iter + " newWeight=" + newWeight + " strategy=" + strategy.toString() );
 	}
@@ -344,7 +325,6 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	 * <p/>
 	 * The path size version still needs to be tested (both for choice and for plans removal).
 	 *
-	 * @param planSelector
 	 *
 	 * @see #setMaxPlansPerAgent(int)
 	 */

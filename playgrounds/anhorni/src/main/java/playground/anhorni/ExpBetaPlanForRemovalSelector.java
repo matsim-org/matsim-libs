@@ -37,7 +37,7 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
  *
  * @author anhorni
  */
-public class ExpBetaPlanForRemovalSelector extends ExpBetaPlanSelector {
+public class ExpBetaPlanForRemovalSelector extends ExpBetaPlanSelector<Plan> {
 
 	public ExpBetaPlanForRemovalSelector(
 			PlanCalcScoreConfigGroup charyparNagelScoringConfigGroup) {

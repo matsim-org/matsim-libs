@@ -20,17 +20,14 @@
 
 package org.matsim.core.replanning;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
+
+import java.util.List;
 
 /**
  * Manages and applies strategies to agents for re-planning.
@@ -138,7 +135,7 @@ public class StrategyManager implements MatsimManager {
 		run(population, replanningContext);
 	}
 
-	protected void beforePopulationRunHook( Population population, ReplanningContext replanningContext ) {
+	protected void beforePopulationRunHook(Population population, ReplanningContext replanningContext) {
 		// left empty for inheritance
 	}
 
@@ -149,21 +146,13 @@ public class StrategyManager implements MatsimManager {
 	 * @param population
 	 * @param replanningContext
 	 */
-	public final void run( final Population population, final ReplanningContext replanningContext) {
-		beforePopulationRunHook( population, replanningContext ) ;
-
-		Collection<HasPlansAndId<Plan>> members = new ArrayList<HasPlansAndId<Plan>>() ;
-		members.addAll(population.getPersons().values());
-		delegate.run( members, population.getPersonAttributes(), replanningContext ) ;
-
-//		delegate.run( (Collection<HasPlansAndId<Plan>>)population.getPersons().values(), population.getPersonAttributes(), replanningContext);
-		// not sure why I need to cast this but I think in this case the <? extends Person> backfires. kai, nov'13
-		// compiles under eclipse, but not on the build server. kai, nov'13
-
-		afterRunHook( population ) ;
+	public final void run(final Population population, final ReplanningContext replanningContext) {
+		beforePopulationRunHook(population, replanningContext);
+		delegate.run(population.getPersons().values(), population.getPersonAttributes(), replanningContext);
+		afterRunHook(population);
 	}
 
-	protected void afterRunHook( Population population ) {
+	protected void afterRunHook(Population population) {
 		// left empty for inheritance
 	}
 
@@ -175,7 +164,7 @@ public class StrategyManager implements MatsimManager {
 	 * @return the chosen strategy
 	 */
 	public GenericPlanStrategy<Plan> chooseStrategy(final Person person, final String subpopulation) {
-		return delegate.chooseStrategy(person,subpopulation) ;
+		return delegate.chooseStrategy(subpopulation) ;
 	}
 
 	/**
@@ -203,7 +192,7 @@ public class StrategyManager implements MatsimManager {
 	}
 
 	/**
-	 * Schedules a {@link #changeStrategy changeStrategy(Strategy, subpopulation, double)} command for a later iteration. The
+	 * Schedules a command for a later iteration. The
 	 * change will take place before the strategies are applied.
 	 *
 	 * @param iteration
@@ -215,14 +204,6 @@ public class StrategyManager implements MatsimManager {
 			final PlanStrategy strategy,
 			final String subpopulation,
 			final double newWeight) {
-//		final StrategyWeights weights = getStrategyWeights( subpopulation );
-//		Integer iter = Integer.valueOf(iteration);
-//		Map<PlanStrategy, Double> iterationRequests = weights.changeRequests.get(iter);
-//		if (iterationRequests == null) {
-//			iterationRequests = new HashMap<PlanStrategy, Double>(3);
-//			weights.changeRequests.put(iter, iterationRequests);
-//		}
-//		iterationRequests.put(strategy, Double.valueOf(newWeight));
 		delegate.addChangeRequest(iteration, strategy, subpopulation, newWeight);
 	}
 
@@ -254,8 +235,6 @@ public class StrategyManager implements MatsimManager {
 	 * @see #setMaxPlansPerAgent(int)
 	 */
 	public final void setPlanSelectorForRemoval(final GenericPlanSelector<Plan> planSelector) {
-//		Logger.getLogger(this.getClass()).info("setting PlanSelectorForRemoval to " + planSelector.getClass() ) ;
-//		this.removalPlanSelector = planSelector;
 		delegate.setPlanSelectorForRemoval(planSelector);
 	}
 
@@ -265,7 +244,6 @@ public class StrategyManager implements MatsimManager {
 	}
 
 	public final List<GenericPlanStrategy<Plan>> getStrategies( final String subpopulation ) {
-//		return getStrategyWeights( subpopulation ).unmodifiableStrategies;
 		return delegate.getStrategies(subpopulation) ;
 	}
 
@@ -278,10 +256,9 @@ public class StrategyManager implements MatsimManager {
 	}
 
 	/**
-	 * @return the weights of the strategies for the given subpopulation, in the same order as the strategies returned by {@link #getStrategies()}
+	 * @return the weights of the strategies for the given subpopulation, in the same order as the strategies returned by {@link #getStrategies(java.lang.String)}
 	 */
 	public final List<Double> getWeights( final String subpopulation ) {
-//		return getStrategyWeights( subpopulation ).unmodifiableWeights;
 		return delegate.getWeights( subpopulation ) ;
 	}
 }

@@ -3,15 +3,14 @@
  */
 package org.matsim.contrib.cadyts.general;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import cadyts.utilities.math.Vector;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
-import cadyts.utilities.math.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author nagel
@@ -37,7 +36,7 @@ public final class PlanSelectionByCadyts<T> implements PlanSelector {
 		for ( Plan plan : person.getPlans() ) {
 			plans.add( cContext.getPlansTranslator().getPlanSteps(plan) ) ;
 
-			choiceProbs.add(pos, new ExpBetaPlanSelector(beta).getSelectionProbability(plan) ); 
+			choiceProbs.add(pos, ExpBetaPlanSelector.getSelectionProbability(new ExpBetaPlanSelector(beta), plan.getPerson(), plan) );
 			// I guess these are supposed to be the prior probabilities. If so, than the above shoudl be correct (albeit a bit expensive).
 			// I would have expected that these are internally ignored when brute force is switched on, but they are not.
 			// I think that what it does is to use them when plans are equal according to cadyts. kai, dec'13

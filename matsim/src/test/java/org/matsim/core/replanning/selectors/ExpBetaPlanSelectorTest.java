@@ -50,8 +50,8 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 	}
 
 	@Override
-	protected PlanSelector getPlanSelector() {
-		return new ExpBetaPlanSelector(this.config.planCalcScore());
+	protected ExpBetaPlanSelector<Plan> getPlanSelector() {
+		return new ExpBetaPlanSelector<Plan>(this.config.planCalcScore());
 	}
 
 	/**
@@ -72,7 +72,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 		PlanImpl plan5 = person.createAndAddPlan(false);// weight: 1
 		plan5.setScore(100.0);
 		
-		ExpBetaPlanSelector selector = new ExpBetaPlanSelector(this.config.planCalcScore());
+		ExpBetaPlanSelector<Plan> selector = new ExpBetaPlanSelector<Plan>(this.config.planCalcScore());
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;
@@ -131,7 +131,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 
 		
 		
-		ExpBetaPlanSelector selector = new ExpBetaPlanSelector(this.config.planCalcScore());
+		ExpBetaPlanSelector<Plan> selector = new ExpBetaPlanSelector<Plan>(this.config.planCalcScore());
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;
@@ -185,10 +185,10 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 
 		ExpBetaPlanSelector testee = new ExpBetaPlanSelector(this.config.planCalcScore());
 		
-		assertEquals(0.2024421, testee.getSelectionProbability(plan1), EPSILON_R);
-		assertEquals(0.2472634, testee.getSelectionProbability(plan2), EPSILON_R);
-		assertEquals(0.5502947, testee.getSelectionProbability(plan3), EPSILON_R);
-		assertEquals(6.208075e-10, testee.getSelectionProbability(plan4), EPSILON_R);
+		assertEquals(0.2024421, ExpBetaPlanSelector.getSelectionProbability(testee, person, plan1), EPSILON_R);
+		assertEquals(0.2472634, ExpBetaPlanSelector.getSelectionProbability(testee, person, plan2), EPSILON_R);
+		assertEquals(0.5502947, ExpBetaPlanSelector.getSelectionProbability(testee, person, plan3), EPSILON_R);
+		assertEquals(6.208075e-10, ExpBetaPlanSelector.getSelectionProbability(testee, person, plan4), EPSILON_R);
 	}
 	
 }

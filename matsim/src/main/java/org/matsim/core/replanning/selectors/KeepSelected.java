@@ -20,21 +20,21 @@
 
 package org.matsim.core.replanning.selectors;
 
+import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.api.core.v01.population.Plan;
 
 /**
  * Keeps the currently selected plan selected and returns it.
  * 
  * @author mrieser
  */
-public class KeepSelected implements PlanSelector {
+public class KeepSelected<T extends BasicPlan> implements GenericPlanSelector<T> {
 
 	/**
 	 * returns the already selected plan for this person
 	 */
 	@Override
-	public Plan selectPlan(HasPlansAndId<Plan> person) {
+	public T selectPlan(HasPlansAndId<T> person) {
 		return person.getSelectedPlan();
 	}
 
