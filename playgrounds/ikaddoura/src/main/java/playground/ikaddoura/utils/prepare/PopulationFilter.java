@@ -37,6 +37,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
+ * Filters a population by mode.
+ * 
  * @author ikaddoura
  *
  */

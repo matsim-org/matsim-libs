@@ -40,6 +40,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 
 /**
+ * Replaces all simulated pt legs by teleported pt leg.
+ * Replaces all transit_walk legs by the normal walk mode.
+ * 
  * @author ikaddoura
  *
  */
@@ -47,6 +50,7 @@ public class PopulationTransitCleaner {
 	
 	static String inputPlansFile;
 	static String outputPlansFile;
+	static String networkFile;
 
 	private Scenario scenario;
 	private static final Logger log = Logger.getLogger(PopulationTransitCleaner.class);
@@ -61,12 +65,14 @@ public class PopulationTransitCleaner {
 			outputPlansFile = args[1];
 			log.info("second argument (output plans file): " + outputPlansFile);
 			
+			networkFile = args[2];
+			log.info("third argument (network file): " + networkFile);
 			
 		} else {
 			
-			inputPlansFile = "/Users/ihab/Documents/workspace/runs-svn/berlin-bvg09/ik/input/bvg.run189.10pct.100.plans.selected.onlyWithCar.xml.gz";
-			outputPlansFile = "/Users/ihab/Documents/workspace/runs-svn/berlin-bvg09/ik/input/bvg.run189.10pct.100.plans.selected.onlyWithCar.genericPt.xml.gz";
-			
+			inputPlansFile = "/Users/ihab/Documents/workspace/runs-svn/berlin-bvg09/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.plans.selected.xml.gz";
+			outputPlansFile = "/Users/ihab/Desktop/bvg.run189.10pct.100.plans.selected.genericPt.xml.gz";
+			networkFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/input/network.xml";
 		}
 		
 		PopulationTransitCleaner filter = new PopulationTransitCleaner();
@@ -77,6 +83,7 @@ public class PopulationTransitCleaner {
 		
 		Config config1 = ConfigUtils.createConfig();
 		config1.plans().setInputFile(inputPlansFile);
+		config1.network().setInputFile(networkFile);
 		scenario = ScenarioUtils.loadScenario(config1);
 				
 		removePtInteractionsAndBelongingTransitWalkLegs();
