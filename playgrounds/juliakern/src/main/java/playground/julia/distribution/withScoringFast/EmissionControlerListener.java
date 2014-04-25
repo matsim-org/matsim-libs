@@ -45,8 +45,8 @@ import playground.julia.distribution.EmActivity;
 import playground.julia.distribution.EmPerCell;
 import playground.julia.distribution.EmissionModule;
 import playground.julia.distribution.GridTools;
+import playground.julia.newInternalization.IntervalHandler;
 import playground.julia.responsibilityOffline.EmCarTrip;
-import playground.julia.responsibilityOffline.IntervalHandler;
 import playground.julia.spatialAveraging.SimpleWarmEmissionEventHandler;
 import playground.vsp.emissions.events.EmissionEventsReader;
 
@@ -159,7 +159,8 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		timeBinSize = simulationEndTime/noOfTimeBins;
 		
 		logger.info("timebinsize----------------" + timeBinSize);
-		intervalHandler = new IntervalHandler(timeBinSize, simulationEndTime, noOfXCells, noOfYCells, links2xcells, links2ycells, gt, network );
+		intervalHandler = new IntervalHandler(timeBinSize, simulationEndTime, noOfXCells, noOfYCells, links2xcells, links2ycells);
+				//new IntervalHandler(timeBinSize, simulationEndTime, noOfXCells, noOfYCells, links2xcells, links2ycells, gt, network );
 		
 		eventsManager.addHandler(intervalHandler);
 		intervalHandler.reset(0);
@@ -169,10 +170,6 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 			logger.info("start parsing");
 		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
 		matsimEventsReader.readFile(eventsFile);
-		
-		logger.warn(intervalHandler.uncountedEvents());
-		//intervalHandler.addActivitiesToTimetables(activities, links2xcells, links2ycells, simulationEndTime);
-		//intervalHandler.addCarTripsToTimetables(carTrips, simulationEndTime);
 		
 		}
 		logger.info("done parsing");
