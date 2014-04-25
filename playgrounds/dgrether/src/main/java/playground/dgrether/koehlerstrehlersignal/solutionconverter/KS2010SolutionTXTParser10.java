@@ -33,20 +33,23 @@ import org.matsim.core.utils.io.IOUtils;
 
 
 /**
+ * Deprecated since BTU changed their solution format in spring 2014. The new parser is KS2014SolutionXMLParser.java
+ * 
  * @author dgrether
  * @author tthunig
  *
  */
+@Deprecated
 public class KS2010SolutionTXTParser10 {
 	
 	private static final Logger log = Logger.getLogger(KS2010SolutionTXTParser10.class);
 	
 	private List<KS2010CrossingSolution> solutions;
-	private Map<Integer, Double> streetFlow;
+	private Map<Id, Double> streetFlow;
 	
 	public void readFile(String filename) {
 		solutions = new ArrayList<KS2010CrossingSolution>();
-		streetFlow = new HashMap<Integer, Double>();
+		streetFlow = new HashMap<Id, Double>();
 		BufferedReader br = IOUtils.getBufferedReader(filename);
 		String line;
 		try {
@@ -73,7 +76,7 @@ public class KS2010SolutionTXTParser10 {
 
 	private void parseStrasseLine(String line) {
 		String[] s = line.split(" ");
-		Integer streetId = Integer.valueOf(s[1]);
+		Id streetId = new IdImpl(s[1]);
 		double commodityFlow = Double.valueOf(s[4]);
 		log.debug("Street " + streetId + " flow of one commodity " + commodityFlow);
 		if (!this.streetFlow.containsKey(streetId))
@@ -101,7 +104,7 @@ public class KS2010SolutionTXTParser10 {
 		return solutions;
 	}
 
-	public Map<Integer, Double> getStreetFlow() {
+	public Map<Id, Double> getStreetFlow() {
 		return streetFlow;
 	}
 	

@@ -61,6 +61,7 @@ import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010CrossingSolution;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010Solution2Matsim;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010SolutionTXTParser10;
+import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2014SolutionXMLParser;
 import playground.dgrether.signalsystems.cottbus.CottbusUtils;
 
 /**
@@ -72,14 +73,15 @@ public class KS2010VsMatimVolumes {
 
 	private static Map<Id, Double> loadKS2010Volumes(String directory,
 			String inputFile) {
-		KS2010SolutionTXTParser10 solutionParser = new KS2010SolutionTXTParser10();
+//		KS2010SolutionTXTParser10 solutionParser = new KS2010SolutionTXTParser10();
+		KS2014SolutionXMLParser solutionParser = new KS2014SolutionXMLParser();
 		solutionParser.readFile(directory + inputFile);
 
 		DgIdPool idPool = DgIdPool.readFromFile(directory
 				+ "id_conversions.txt");
 		DgIdConverter dgIdConverter = new DgIdConverter(idPool);
 
-		Map<Integer, Double> ks2010StreetIdFlow = solutionParser
+		Map<Id, Double> ks2010StreetIdFlow = solutionParser
 				.getStreetFlow();
 
 		Map<Id, Double> ks2010volumes = convertKS2010Volumes(idPool,
@@ -88,18 +90,19 @@ public class KS2010VsMatimVolumes {
 	}
 
 	private static Map<Id, Double> convertKS2010Volumes(DgIdPool idPool,
-			DgIdConverter dgIdConverter, Map<Integer, Double> ks2010StreetIdFlow) {
+			DgIdConverter dgIdConverter, Map<Id, Double> ks2010StreetIdFlow) {
 		// convert ks2010_id to matsim_id in the unsimplified network
 		Map<Id, Double> matsimLinkIdFlow = new HashMap<Id, Double>();
-		for (Integer intStreetId : ks2010StreetIdFlow.keySet()) {
-			String stringStreetId = idPool.getStringId(intStreetId);
+		for (Id streetId : ks2010StreetIdFlow.keySet()) {
+			Integer ksIntStreetId = Integer.parseInt(streetId.toString());
+			String matsimStringStreetId = idPool.getStringId(ksIntStreetId);
 			Id linkId = dgIdConverter.convertStreetId2LinkId(new IdImpl(
-					stringStreetId));
+					matsimStringStreetId));
 			// assign the flow to all links that belongs to the simplified link
 			String[] unsimplifiedLinks = linkId.toString().split("-");
 			for (int i = 0; i < unsimplifiedLinks.length; i++)
 				matsimLinkIdFlow.put(new IdImpl(unsimplifiedLinks[i]),
-						ks2010StreetIdFlow.get(intStreetId));
+						ks2010StreetIdFlow.get(streetId));
 		}
 		return matsimLinkIdFlow;
 	}

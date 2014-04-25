@@ -36,6 +36,7 @@ import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010CrossingSolution;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010Solution2Matsim;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010SolutionTXTParser10;
+import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2014SolutionXMLParser;
 
 
 /**
@@ -46,16 +47,17 @@ import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010Solutio
 public class ConvertCottbusSolution2Matsim {
 
 	private void convert(String directory, String inputFile){
-		KS2010SolutionTXTParser10  solutionParser = new KS2010SolutionTXTParser10();
+//		KS2010SolutionTXTParser10  solutionParser = new KS2010SolutionTXTParser10();
+		KS2014SolutionXMLParser  solutionParser = new KS2014SolutionXMLParser();
 		solutionParser.readFile(directory + inputFile);
 		
 		DgIdPool idPool = DgIdPool.readFromFile(directory + "id_conversions.txt");
 		
 		SignalsData signalsData = loadSignalsData(directory);
 
-		List<KS2010CrossingSolution> solutionCrossings = solutionParser.getSolutionCrossings();
+		List<KS2010CrossingSolution> crossingSolutions = solutionParser.getCrossingSolutions();
 
-		convertSignals(solutionCrossings, idPool, signalsData);
+		convertSignals(crossingSolutions, idPool, signalsData);
 		writeSignalControl(directory, inputFile, signalsData);		
 	}
 
