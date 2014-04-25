@@ -146,11 +146,11 @@ public class TravelTimePerModeEventHandler implements PersonArrivalEventHandler,
 		}
 	}
 
-	protected Map<String, Map<Id, Double>> getMode2personId2TravelTime() {
+	public Map<String, Map<Id, Double>> getMode2personId2TravelTime() {
 		return this.mode2personId2TravelTime;
 	}
 
-	protected Map<UserGroup, Map<String, Double>> getUserGroup2mode2noOfTrips() {
+	public Map<UserGroup, Map<String, Double>> getUserGroup2mode2noOfTrips() {
 		return userGroup2mode2noOfTrips;
 	}
 }

@@ -23,6 +23,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.SortedMap;
 
@@ -254,7 +255,52 @@ public class MultiAnalyzerWriter {
 		return runName;
 	}
 
-	protected void setRunName(String runName) {
+	public void setRunName(String runName) {
 		this.runName = runName;
+	}
+
+	public void writeEmissionCostInformation(
+			SortedMap<UserGroup, SortedMap<String, Double>> group2totalEmissionCosts) {
+		String fileName = this.outputDir + "/emissionCostInformation_" + runName + ".txt";
+		File file = new File(fileName);
+
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+
+			bw.write("user group");
+			
+			ArrayList<String> listOfPollutants = new ArrayList<String>();
+			// list of pollutants
+			for(UserGroup ug: group2totalEmissionCosts.keySet()){
+				for(String pollutant: group2totalEmissionCosts.get(ug).keySet()){
+					if(!listOfPollutants.contains(pollutant) && group2totalEmissionCosts.get(ug).get(pollutant)>0.0){
+						listOfPollutants.add(pollutant);
+					}
+				}
+			}
+			
+			for(int i=0; i<listOfPollutants.size(); i++){
+				bw.write("\t" + listOfPollutants.get(i));
+			}
+	
+			bw.newLine();
+
+			for(UserGroup userGroup : group2totalEmissionCosts.keySet()){
+				Map<String, Double> pollutant2TotalEmissions = group2totalEmissionCosts.get(userGroup);
+
+				bw.write(userGroup.toString());
+				for(int i=0; i<listOfPollutants.size(); i++){
+					Double pollutantValue = pollutant2TotalEmissions.get(listOfPollutants.get(i));
+					System.out.println(pollutantValue + " " + listOfPollutants.get(i));
+					bw.write("\t" + pollutantValue.toString());
+				}
+				bw.newLine();
+			}
+			bw.close();
+			logger.info("Finished writing output to " + fileName);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 }
