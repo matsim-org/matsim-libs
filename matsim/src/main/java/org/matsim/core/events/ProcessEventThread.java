@@ -20,7 +20,12 @@
 
 package org.matsim.core.events;
 
+import java.lang.InterruptedException;
+
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -32,44 +37,52 @@ import org.matsim.core.gbl.Gbl;
  * @author rashid_waraich
  */
 /*package*/ class ProcessEventThread implements Runnable {
-	private ArrayList<Event> preInputBuffer = null;
-	private ConcurrentListSPSC<Event> eventQueue = null;
-	private EventsManager events;
-	private int preInputBufferMaxLength;
+	private final List<Event> preInputBuffer;
+	private final BlockingQueue<Event> eventQueue;
+	private final EventsManager events;
+	private final int preInputBufferMaxLength;
 
-	public ProcessEventThread(EventsManager events, int preInputBufferMaxLength) {
+
+	public ProcessEventThread(
+			final EventsManager events,
+			final int preInputBufferMaxLength) {
 		this.events = events;
 		this.preInputBufferMaxLength = preInputBufferMaxLength;
-		eventQueue = new ConcurrentListSPSC<Event>();
-		preInputBuffer = new ArrayList<Event>();
+		eventQueue = new LinkedBlockingQueue<Event>();
+		preInputBuffer = new ArrayList<Event>( preInputBufferMaxLength + 1);
 	}
 
-	public synchronized void processEvent(Event event) {
+	public synchronized void processEvent(final Event event) {
 		// first approach (quick on office computer, but not on satawal)
 		// eventQueue.add(event);
 
 		// second approach, lesser locking => faster on Satawal
 		preInputBuffer.add(event);
 		if (preInputBuffer.size() > preInputBufferMaxLength) {
-			eventQueue.add(preInputBuffer);
+			eventQueue.addAll( preInputBuffer );
 			preInputBuffer.clear();
 		}
 	}
 
 	@Override
 	public void run() {
-		// process events, until LastEventOfIteration arrives
-		Event nextEvent = null;
-		while (true) {
-			nextEvent = eventQueue.remove();
-			if (nextEvent != null) {
+		try {
+			// process events, until LastEventOfIteration arrives
+			while (true) {
+				// take waits for an element to exist before returning:
+				//  - thread sleeps until there is an event to process
+				//  - we do not have to bother checking if the element exists
+				final Event nextEvent = eventQueue.take();
 				if (nextEvent instanceof LastEventOfIteration) {
-					break;
+					Gbl.printCurrentThreadCpuTime();
+					return;
 				}
 				getEvents().processEvent(nextEvent);
 			}
 		}
-		Gbl.printCurrentThreadCpuTime();
+		catch ( InterruptedException e ) {
+			throw new RuntimeException( e );
+		}
 	}
 
 	// schedule LastEventOfIteration and flush buffered events
@@ -78,7 +91,7 @@ import org.matsim.core.gbl.Gbl;
 	// they are allowed to go to sleep
 	public void close() {
 		processEvent(new LastEventOfIteration(0.0));
-		eventQueue.add(preInputBuffer);
+		eventQueue.addAll( preInputBuffer );
 		preInputBuffer.clear();
 	}
 
