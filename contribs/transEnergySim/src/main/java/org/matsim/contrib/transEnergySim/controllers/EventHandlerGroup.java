@@ -41,7 +41,10 @@ import org.matsim.core.events.handler.EventHandler;
 
 public class EventHandlerGroup implements ActivityStartEventHandler, PersonArrivalEventHandler,
 PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, Wait2LinkEventHandler {
-
+	/**
+	 * All event handlers needed for electric vehicle simulation. Convenience class.
+	 * 
+	 */
 	protected LinkedList<EventHandler> handler = new LinkedList<EventHandler>();
 
 	public void addHandler(EventHandler handler) {

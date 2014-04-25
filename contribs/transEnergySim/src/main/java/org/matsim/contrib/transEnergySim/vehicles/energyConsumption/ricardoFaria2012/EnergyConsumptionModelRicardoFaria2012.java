@@ -35,7 +35,7 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsum
  * A sustainability assessment of electric vehicles as a personal mobility
  * system R Faria, P Moura, J Delgado, AT de Almeida - Energy Conversion and …,
  * 2012 - Elsevier
- * 
+ * This model is used in several studies for VSP (Mielec, Berlin)
  * 
  * @author Zain Ul Abedin
  * 

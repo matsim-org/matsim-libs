@@ -23,7 +23,14 @@ import java.util.Iterator;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.DebugLib;
-
+/**
+ * An energy consumption modell is needed to track energy consumption based on different delimiters. 
+ * Usually driven distance and speed are of most importance, but time dependency (e.g. for heating) is also possible 
+ * 
+ * @author rashid_waraich
+ * 			jbischoff
+ * 
+ */
 public interface EnergyConsumptionModel {
 
 	public abstract double getEnergyConsumptionForLinkInJoule(Link link, double averageSpeedDriven);
