@@ -48,6 +48,7 @@ import playground.benjamin.internalization.EmissionCostModule;
 import playground.benjamin.scenarios.munich.analysis.filter.LocationFilter;
 import playground.julia.distribution.GridTools;
 import playground.julia.distribution.withScoringFast.EmissionControlerListener;
+import playground.julia.newInternalization.IntervalHandler;
 import playground.julia.spatialAveraging.SimpleWarmEmissionEventHandler;
 import playground.julia.spatialAveraging.SpatialAveragingUtils;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
@@ -65,11 +66,11 @@ public class SpatialAveragingWelfare {
 
 	final double scalingFactor = 100.;
 	private final static String runNumber1 = "baseCase";
-	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
+	private final static String runDirectory1 = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_baseCase_ctd/";
 //	private final static String runNumber2 = "zone30";
 //	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
-	private final static String runNumber2 = "pricing";
-	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
+	private final static String runNumber2 = "exposurePricing";
+	private final static String runDirectory2 = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_policyCase_pricing_exposurePricing/";
 //	private final String netFile1 = runDirectory2 + "output_network.xml.gz";
 	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
 	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
@@ -120,8 +121,8 @@ public class SpatialAveragingWelfare {
 	LocationFilter lf;
 	Network network;
 
-	//String outPathStub = runDirectory1 + "analysis/spatialAveraging/welfare/";
-	String outPathStub = "./output/analysis/";
+	String outPathStub = runDirectory1 + "analysis/spatialAveraging/welfare/";
+//	String outPathStub = "./output/analysis/";
 
 	private double emissionCostFactor = 1.0;
 
@@ -152,7 +153,9 @@ public class SpatialAveragingWelfare {
 		Map<Id, Integer> link2ybins = gt.mapLinks2Ycells(noOfYbins);
 		
 		// calc durations
-		IntervalHandler intervalHandler = new IntervalHandler(timeBinSize, simulationEndTime, noOfXbins, noOfYbins, link2xbins, link2ybins, gt, network);
+		IntervalHandler intervalHandler = new IntervalHandler(timeBinSize, simulationEndTime, noOfXbins, noOfYbins, link2xbins, link2ybins); 
+				//new IntervalHandler(timeBinSize, simulationEndTime, noOfXbins, noOfYbins, link2xbins, link2ybins, gt, network);
+		intervalHandler.reset(0);
 		intervalHandler.reset(0);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(intervalHandler);
@@ -161,8 +164,6 @@ public class SpatialAveragingWelfare {
 		HashMap<Double, Double[][]> durations = intervalHandler.getDuration();
 		//eventsManager.removeHandler(intervalHandler);
 		
-		System.out.println(durations.size() + "!!!!!!!!!!!!!!!!");
-		System.out.println(durations.get(timeBinSize*5)[50][50]);
 		
 		// calc emission costs
 		EmissionCostDensityHandler ecdh = new EmissionCostDensityHandler(durations, link2xbins, link2ybins);
@@ -275,7 +276,8 @@ public class SpatialAveragingWelfare {
 			Map<Id, Integer> link2ybins2 = gt.mapLinks2Ycells(noOfYbins);
 		
 		// calc durations
-			IntervalHandler intervalHandler2 = new IntervalHandler(timeBinSize, simulationEndTime, noOfXbins, noOfYbins, link2xbins2, link2ybins2, gt2, network);
+			IntervalHandler intervalHandler2 = new IntervalHandler(timeBinSize, simulationEndTime, noOfXbins, noOfYbins, link2xbins2, link2ybins2); 
+					//new IntervalHandler(timeBinSize, simulationEndTime, noOfXbins, noOfYbins, link2xbins2, link2ybins2, gt2, network);
 			intervalHandler2.reset(0);
 			EventsManager eventsManager2 = EventsUtils.createEventsManager();
 			eventsManager2.addHandler(intervalHandler2);
@@ -284,7 +286,7 @@ public class SpatialAveragingWelfare {
 			HashMap<Double, Double[][]> durations2 = intervalHandler2.getDuration();
 		//	eventsManager.removeHandler(intervalHandler);
 		
-			System.out.println(durations2.size() + "!!!!!!!!!!!!!!!!");
+
 		
 		// calc emission costs
 		EmissionCostDensityHandler ecdh2 = new EmissionCostDensityHandler(durations2, link2xbins2, link2ybins2);
@@ -297,7 +299,7 @@ public class SpatialAveragingWelfare {
 		
 		// recalc score
 		for(Id person: person2causedEmCosts2.keySet()){
-			Plan plan = pop2.getPersons().get(person).getSelectedPlan();
+			Plan plan = pop2.getPersons().get(person).getSelectedPlan(); //TODO test wheter positive/negative
 			plan.setScore(plan.getScore()-person2causedEmCosts2.get(person)*marUtilOfMoney);
 		}
 //		

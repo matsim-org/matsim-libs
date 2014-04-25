@@ -61,11 +61,11 @@ import playground.vsp.emissions.utils.EmissionUtils;
  */
 public class EmissionsAnalyzerRelativeDurations extends AbstractAnalyisModule{
 	private final static Logger log = Logger.getLogger(EmissionsAnalyzerRelativeDurations.class);
-	private ScenarioImpl scenario;
+//	private ScenarioImpl scenario;
 	private final String emissionEventsFile;
 	private EmissionUtils emissionUtils;
-	private EmissionsPerPersonWarmEventHandlerRelativeDurations warmHandler;
-	private EmissionsPerPersonColdEventHandlerRelativeDurations coldHandler;
+	private EmissionCostPerPersonWarmEventHandlerRelativeDurations warmHandler;
+	private EmissionCostPerPersonColdEventHandlerRelativeDurations coldHandler;
 	private Map<Id, Map<WarmPollutant, Double>> person2warmEmissions;
 	private Map<Id, Map<ColdPollutant, Double>> person2coldEmissions;
 	private Map<Id, SortedMap<String, Double>> person2totalEmissions;
@@ -83,16 +83,24 @@ public class EmissionsAnalyzerRelativeDurations extends AbstractAnalyisModule{
 		this.emissionEventsFile = emissionsEventsFile;
 		this.links2xbins = link2xbins;
 		this.links2ybins = link2ybins;
-	}
-	
-	public void init(ScenarioImpl scenario) {
 		// calc relative factor
 		this.relativeDurationFactor = calcRelativeDurations();
 		
-		this.scenario = scenario;
+//		this.scenario = scenario;
 		this.emissionUtils = new EmissionUtils();
-		this.warmHandler = new EmissionsPerPersonWarmEventHandlerRelativeDurations(relativeDurationFactor, links2xbins, links2ybins);
-		this.coldHandler = new EmissionsPerPersonColdEventHandlerRelativeDurations(relativeDurationFactor, links2xbins, links2ybins);
+		this.warmHandler = new EmissionCostPerPersonWarmEventHandlerRelativeDurations(relativeDurationFactor, links2xbins, links2ybins);
+		this.coldHandler = new EmissionCostPerPersonColdEventHandlerRelativeDurations(relativeDurationFactor, links2xbins, links2ybins);
+	
+	}
+	
+	public void init(ScenarioImpl scenario) {
+//		// calc relative factor
+//		this.relativeDurationFactor = calcRelativeDurations();
+//		
+////		this.scenario = scenario;
+//		this.emissionUtils = new EmissionUtils();
+//		this.warmHandler = new EmissionCostPerPersonWarmEventHandlerRelativeDurations(relativeDurationFactor, links2xbins, links2ybins);
+//		this.coldHandler = new EmissionCostPerPersonColdEventHandlerRelativeDurations(relativeDurationFactor, links2xbins, links2ybins);
 	}
 	
 
@@ -117,8 +125,8 @@ public class EmissionsAnalyzerRelativeDurations extends AbstractAnalyisModule{
 
 	@Override
 	public void postProcessData() {
-		this.person2warmEmissions = this.warmHandler.getWarmEmissionsPerPerson();
-		this.person2coldEmissions = this.coldHandler.getColdEmissionsPerPerson();
+		this.person2warmEmissions = this.warmHandler.getWarmEmissionCostsPerPerson();
+		this.person2coldEmissions = this.coldHandler.getColdEmissionCostsPerPerson();
 		this.person2totalEmissions = this.emissionUtils.sumUpEmissionsPerId(person2warmEmissions, person2coldEmissions);
 		this.totalEmissions = this.emissionUtils.getTotalEmissions(this.person2totalEmissions);
 	}
@@ -155,15 +163,15 @@ public class EmissionsAnalyzerRelativeDurations extends AbstractAnalyisModule{
 		return totalEmissions;
 	}
 
-	public Map<Id, Map<WarmPollutant, Double>> getPerson2warmEmissions() {
+	public Map<Id, Map<WarmPollutant, Double>> getPerson2warmEmissionCosts() {
 		return person2warmEmissions;
 	}
 
-	public Map<Id, Map<ColdPollutant, Double>> getPerson2coldEmissions() {
+	public Map<Id, Map<ColdPollutant, Double>> getPerson2coldEmissionCosts() {
 		return person2coldEmissions;
 	}
 
-	public Map<Id, SortedMap<String, Double>> getPerson2totalEmissions() {
+	public Map<Id, SortedMap<String, Double>> getPerson2totalEmissionCosts() {
 		return person2totalEmissions;
 	}
 	

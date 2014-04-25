@@ -32,6 +32,7 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 		this.link2xbins = link2xbins;
 		this.link2ybins = link2ybins;
 		recognisedPersons = new HashSet<Id>();
+		this.reset(0);
 	}
 	
 	@Override
