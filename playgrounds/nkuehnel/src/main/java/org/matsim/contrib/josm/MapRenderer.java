@@ -52,9 +52,9 @@ public class MapRenderer extends StyledMapRenderer {
 			boolean showOneway, boolean onewayReversed) {
 
 		Layer layer = Main.main.getActiveLayer();
-		if (layer instanceof NetworkLayer) {
-			Map<Way, List<Link>> way2Links = ((NetworkLayer) layer)
-					.getWay2Links();
+		if (Layer2Network.containsLayer(layer)) {
+			Map<Way, List<Link>> way2Links = Layer2Network
+					.getWay2Links(layer);
 			if (way2Links.containsKey(way)) {
 				if (!way2Links.get(way).isEmpty()) {
 					if (!way.isSelected()) {
@@ -128,9 +128,11 @@ public class MapRenderer extends StyledMapRenderer {
 		@Override
 		public String compose(OsmPrimitive prim) {
 			Layer layer = Main.main.getActiveLayer();
-			Id id = new IdImpl(prim.getUniqueId());
-			return ((LinkImpl) ((NetworkLayer) layer).getMatsimNetwork()
-					.getLinks().get(id)).getOrigId();
+			for(Link link: Layer2Network.getWay2Links(layer).get(prim)) {
+				String id = link.getId().toString();
+				return id.substring(0, id.indexOf("_"));
+			}
+			return null;
 		}
 	}
 }

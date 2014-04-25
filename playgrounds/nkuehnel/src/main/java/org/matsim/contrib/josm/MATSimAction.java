@@ -134,7 +134,7 @@ public class MATSimAction {
 			Layer activeLayer = Main.main.getActiveLayer();
 			if (activeLayer instanceof OsmDataLayer
 					&& !(activeLayer instanceof NetworkLayer)) {
-				ConvertTask task = new ConvertTask();
+				ConvertTask_2 task = new ConvertTask_2();
 				task.run();
 			}
 		}

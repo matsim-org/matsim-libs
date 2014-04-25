@@ -26,6 +26,7 @@ public class Converter_2 {
 	private final static Logger log = Logger.getLogger(Converter.class);
 	
 	private Map<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
+	private Map<Link, WaySegment> link2Segment = new HashMap<Link, WaySegment>();
 	private boolean scaleMaxSpeed = false;
 	
 	private final static String TAG_LANES = "lanes";
@@ -92,8 +93,7 @@ public class Converter_2 {
 			}
 			this.id++;
 		}
-//		LayerNetworkInfo info = new LayerNetworkInfo(network, way2Links);
-//		MATSimToggleDialog_2.addConvertedLayer(layer, info);
+		Layer2Network converted = new Layer2Network(layer, network, way2Links, link2Segment);
 	}
 	
 	
@@ -211,6 +211,7 @@ public class Converter_2 {
 				}
 				network.addLink(l);
 				links.add(l);
+				link2Segment.put(l, segment);
 				System.out.println(l.toString());
 			}
 			if (!oneway) {
@@ -222,13 +223,18 @@ public class Converter_2 {
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
 				if (l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(origId);
+					((LinkImpl) l).setOrigId(origId+"_r");
 				}
 				network.addLink(l);
 				links.add(l);
+				link2Segment.put(l, segment);
 				System.out.println(l.toString());
 			}
-			way2Links.put(segment.way, links);
+			if(way2Links.containsKey(segment.way)) {
+				way2Links.get(segment.way).addAll(links);
+			} else {
+				way2Links.put(segment.way, links);
+			}
 		}
 	}
 }
