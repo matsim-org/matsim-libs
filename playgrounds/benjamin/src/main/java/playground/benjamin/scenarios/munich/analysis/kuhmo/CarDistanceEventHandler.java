@@ -148,11 +148,11 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, PersonDep
 		return depArrOnSameLinkCnt;
 	}
 
-	protected Map<Id, Double> getPersonId2CarDistance() {
+	public Map<Id, Double> getPersonId2CarDistance() {
 		return this.personId2CarDistance;
 	}
 	
-	protected Map<UserGroup, Double> getUserGroup2carTrips() {
+	public Map<UserGroup, Double> getUserGroup2carTrips() {
 		return this.userGroup2carTrips;
 	}
 }
