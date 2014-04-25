@@ -40,7 +40,7 @@ public class IKShapeFileWriterMain {
 	
 	private static final Logger log = Logger.getLogger(IKShapeFileWriterMain.class);
 
-	static String netFile = "/Users/ihab/Desktop/output_network.xml.gz";
+	static String netFile = "/Users/ihab/Desktop/berlin_network.xml";
 	static String outputPath = "/Users/ihab/Desktop/analysis/";
 	private Scenario scenario;
 	private IKShapeFileWriter shapeFileWriter = new IKShapeFileWriter();
@@ -59,6 +59,7 @@ public class IKShapeFileWriterMain {
 		directory.mkdirs();
 		
 		shapeFileWriter.writeShapeFileLines(this.scenario, outputPath + "network/", "network.shp");
+
 		log.info("Done.");
 	}
 
