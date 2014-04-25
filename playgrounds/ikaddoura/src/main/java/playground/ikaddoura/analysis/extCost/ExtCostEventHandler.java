@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -41,14 +40,12 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.api.core.v01.population.Person;
 
 import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
 import playground.ikaddoura.internalizationCar.MarginalCongestionEventHandler;
@@ -58,7 +55,7 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionEventHandler;
  * @author ikaddoura , lkroeger
  *
  */
-public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriverStartsEventHandler , ActivityEndEventHandler , PersonDepartureEventHandler , PersonArrivalEventHandler , LinkEnterEventHandler, PersonEntersVehicleEventHandler , PersonLeavesVehicleEventHandler , MarginalCongestionEventHandler {
+public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriverStartsEventHandler , ActivityEndEventHandler , PersonDepartureEventHandler , LinkEnterEventHandler, PersonEntersVehicleEventHandler , PersonLeavesVehicleEventHandler , MarginalCongestionEventHandler {
 	private final static Logger log = Logger.getLogger(ExtCostEventHandler.class);
 	private final double vtts_car;
 	
@@ -442,7 +439,7 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 				} else {
 					// the leg mode has to be saved.
 					String legMode = event.getLegMode();
-					if((event.getLegMode().toString().equals("transit_walk"))){
+					if((event.getLegMode().toString().equals(TransportMode.transit_walk))){
 						legMode = "pt";
 					} else {
 					}
@@ -453,7 +450,7 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 				// This is the first trip of the person
 				Map<Integer,String> tripNumber2legMode = new HashMap<Integer,String>();
 				String legMode = event.getLegMode();
-				if((event.getLegMode().toString().equals("transit_walk"))){
+				if((event.getLegMode().toString().equals(TransportMode.transit_walk))){
 					legMode = "pt";
 				} else {
 				}
@@ -461,16 +458,6 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 				personId2tripNumber2legMode.put(event.getPersonId(), tripNumber2legMode);
 			}
 		}
-	}
-	
-	@Override
-	public void handleEvent(PersonArrivalEvent event) {
-//		if(event.getLegMode().toString().equals("transit_walk")){
-//			// TODO:
-//			// If the measuring of the walking distance
-//			// for the mode transit_walk is desired,
-//			// it should be done here.
-//		} 
 	}
 	
 	@Override
