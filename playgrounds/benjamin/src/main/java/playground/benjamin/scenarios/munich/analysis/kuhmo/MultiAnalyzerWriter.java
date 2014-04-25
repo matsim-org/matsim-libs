@@ -291,7 +291,6 @@ public class MultiAnalyzerWriter {
 				bw.write(userGroup.toString());
 				for(int i=0; i<listOfPollutants.size(); i++){
 					Double pollutantValue = pollutant2TotalEmissions.get(listOfPollutants.get(i));
-					System.out.println(pollutantValue + " " + listOfPollutants.get(i));
 					bw.write("\t" + pollutantValue.toString());
 				}
 				bw.newLine();
