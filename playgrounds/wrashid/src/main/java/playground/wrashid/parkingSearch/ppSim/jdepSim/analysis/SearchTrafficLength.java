@@ -22,47 +22,33 @@ import java.util.HashSet;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonMoneyEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 
-public class SearchTraffic {
+public class SearchTrafficLength {
 
-	
-	
 	public static void main(String[] args) {
-		String eventsFile="C:/data/parkingSearch/psim/zurich/output/run21/output/";
+		String eventsFile="C:/data/parkingSearch/psim/zurich/output/run21/output/ITERS/it.2.events.xml-gz";
 		Coord center = ParkingHerbieControler.getCoordinatesLindenhofZH();
 		double radius=2500;
 		Network network = GeneralLib.readNetwork("c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/output_network.xml.gz");
 		
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
-		TrafficOnRoadsCount trafficOnRoadsCount = new TrafficOnRoadsCount();
+		TrafficOnRoadsCount trafficOnRoadsCount = new TrafficOnRoadsCount(center,network,radius);
 		
 		events.addHandler(trafficOnRoadsCount);
 		
@@ -70,71 +56,51 @@ public class SearchTraffic {
 		reader.parse(eventsFile);
 	}
 	
-	private static class TrafficOnRoad{
-		
-		int binSize=60*24;
-		int numberOfBins=binSize;
-		HashSet<Id>[] bins=new HashSet[numberOfBins];
-		
-		TrafficOnRoad(){
-			for (int i=0;i<numberOfBins;i++){
-				bins[i]=new HashSet<Id>();
-			}
-		}
-		
-		public void registerAgentOnRoad(Id personId, double startTime, double endTime){
-			int startIndex=(int) Math.round(GeneralLib.projectTimeWithin24Hours(startTime)) /binSize;
-			int endIndex=(int) Math.round(GeneralLib.projectTimeWithin24Hours(endTime))/binSize;
-			
-			if (startIndex==endIndex){
-				bins[startIndex].add(personId);
-			} else if (startIndex<endIndex){
-				for (int i=startIndex;i<=endIndex;i++){
-					bins[i].add(personId);
-				}
-			}else if (startIndex>endIndex){
-				for (int i=startIndex;i<numberOfBins;i++){
-					bins[i].add(personId);
-				}
-				for (int i=0;i<=endIndex;i++){
-					bins[i].add(personId);
-				}
-			}
-			
-		}
-		
-	}
-	
 	private static class TrafficOnRoadsCount implements 
 	Wait2LinkEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
 
-		DoubleValueHashMap<Id> linkEnterTime=new DoubleValueHashMap<Id>();
+		int binSize=60*24;
+		private Coord center;
+		private Network network;
+		private double radius;
+		double[] travelledDistance=new double[binSize];
 
-		public TrafficOnRoadsCount(){
+		public TrafficOnRoadsCount(Coord center, Network network, double radius){
+			this.center = center;
+			this.network = network;
+			this.radius = radius;
+		}
+		
+		public void printTravelDistances(){
+			for (int i=0;i<binSize;i++){
+				System.out.println(i + "\t" + travelledDistance[i]);
+			}
 		}
 		
 		@Override
 		public void reset(int iteration) {
-			// TODO Auto-generated method stub
 			
 		}
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-//			if (event.getPersonId().equals(filterEventsForAgentId)){
-//				System.out.println(event.toString());
-//			}
+			Link link = network.getLinks().get(event.getLinkId());
+			if (GeneralLib.getDistance(center, link) <radius){
+				int index=(int) Math.round(GeneralLib.projectTimeWithin24Hours(event.getTime())) /binSize;
+				travelledDistance[index]+=link.getLength();
+			}
 		}
-
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			linkEnterTime.put(event.getPersonId(), event.getTime());
+			// TODO Auto-generated method stub
+			
 		}
 
 		@Override
 		public void handleEvent(Wait2LinkEvent event) {
-			linkEnterTime.put(event.getPersonId(), event.getTime());
+			// TODO Auto-generated method stub
+			
 		}
 
 	}
