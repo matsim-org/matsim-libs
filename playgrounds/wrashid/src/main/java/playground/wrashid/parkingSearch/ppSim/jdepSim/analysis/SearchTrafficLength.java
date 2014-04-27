@@ -41,7 +41,7 @@ import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 public class SearchTrafficLength {
 
 	public static void main(String[] args) {
-		String eventsFile="C:/data/parkingSearch/psim/zurich/output/run21/output/ITERS/it.2.events.xml-gz";
+		String eventsFile="C:/data/parkingSearch/psim/zurich/output/run20/output/ITERS/it.2.events.xml.gz";
 		Coord center = ParkingHerbieControler.getCoordinatesLindenhofZH();
 		double radius=2500;
 		Network network = GeneralLib.readNetwork("c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/output_network.xml.gz");
@@ -54,16 +54,19 @@ public class SearchTrafficLength {
 		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 		reader.parse(eventsFile);
+		
+		trafficOnRoadsCount.printTravelDistances();
 	}
 	
 	private static class TrafficOnRoadsCount implements 
 	Wait2LinkEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
 
-		int binSize=60*24;
+		int numberOfBins=24*4;
+		int binSize=24*3600/numberOfBins;
 		private Coord center;
 		private Network network;
 		private double radius;
-		double[] travelledDistance=new double[binSize];
+		double[] travelledDistance=new double[numberOfBins];
 
 		public TrafficOnRoadsCount(Coord center, Network network, double radius){
 			this.center = center;
@@ -72,7 +75,8 @@ public class SearchTrafficLength {
 		}
 		
 		public void printTravelDistances(){
-			for (int i=0;i<binSize;i++){
+			System.out.println("binNumber\ttravelDistance[m]");
+			for (int i=0;i<numberOfBins;i++){
 				System.out.println(i + "\t" + travelledDistance[i]);
 			}
 		}
@@ -86,7 +90,7 @@ public class SearchTrafficLength {
 		public void handleEvent(LinkLeaveEvent event) {
 			Link link = network.getLinks().get(event.getLinkId());
 			if (GeneralLib.getDistance(center, link) <radius){
-				int index=(int) Math.round(GeneralLib.projectTimeWithin24Hours(event.getTime())) /binSize;
+				int index=(int) Math.floor(GeneralLib.projectTimeWithin24Hours(event.getTime())) /binSize;
 				travelledDistance[index]+=link.getLength();
 			}
 		}
