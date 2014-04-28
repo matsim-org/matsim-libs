@@ -206,6 +206,13 @@ public class ParkControl {
 		availableParkingStat.add(new double[]{time, spotsInArea.size()});
 		//--
 		
+		//Diagnose
+		if(spotsInArea.size()==8){
+		System.out.println("8, "+facilityid.toString()+", "+facility.getCoord().toString()+", "+personId.toString());
+		}
+		
+		//-----
+		
 		//-- If there is no Spot within the given distance: -----------
 		if(spotsInArea.size()==0){ //mit 5km Radius
 			System.out.println("Agent is looking for parking in maximum range of 5 km");
@@ -316,11 +323,16 @@ public class ParkControl {
 				double newStateOfChargePerc = evControl.calcNewStateOfChargePercentage(personId, spot.chargingRate, duration);
 				double stateOfChargeGainPerc = newStateOfChargePerc-stateOfCharge;
 				double chargableAmountOfEnergy =evControl.clalcChargedAmountOfEnergy(personId, spot.chargingRate, duration);
-				
+//				if(hasToCharge){
+//					System.out.println("new state of charge % "+newStateOfChargePerc);
+//				}
+				//System.out.println("needed Battery Percentage "+neededBatteryPercentage);
 				if(stateOfCharge<neededBatteryPercentage && newStateOfChargePerc>neededBatteryPercentage){
 					//Rest des Tages kann ohne Laden nicht gefahren werden mit jedoch schon.
 					evRelatedScore+=30; //!! Wert anpassen
 					sufficientEVSpotFound = true;
+//					System.out.println(stateOfCharge);
+//					System.out.println("30 Punkte ev related");
 				}
 				
 				evRelatedScore += VMConfig.pricePerKWH*chargableAmountOfEnergy*betaMoney*-1; //Ersparnis gegenueber zu hause Laden

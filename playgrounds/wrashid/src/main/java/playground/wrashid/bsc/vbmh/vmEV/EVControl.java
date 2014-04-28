@@ -124,7 +124,7 @@ public class EVControl {
 	
 	public double calcNewStateOfChargePercentage(Id personId, double chargingRate, double duration){
 		EV ev = evList.getEV(personId);
-		return ev.calcNewStateOfCharge(chargingRate, duration)/ev.batteryCapacity;
+		return 100*ev.calcNewStateOfCharge(chargingRate, duration)/ev.batteryCapacity;
 	}
 	
 	

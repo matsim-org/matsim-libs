@@ -21,16 +21,16 @@ public class ParkingPricingModel {
 	
 	
 	public double calculateParkingPrice(double duration, boolean ev){
-		duration = duration/3600; //von Sekunden auf Minuten
+		duration = duration/3600; //von Sekunden auf Stunden
 		double price = 0;
 		//System.out.println(evExclusive);
 		if (ev){
 			
 			price = this.getPriceOfFirstMinuteEV() + duration * this.getPricePerMinuteEV();
 		} else {
-			if(evExclusive != null){
+			if(evExclusive != null){ //Sollte nicht mehr passieren >> EVExclusives sollten bei NEV garnicht merh in die Liste kommen
 				if(evExclusive){
-					System.out.println("EV exclusive! ");
+					System.out.println("EV exclusive! (should not happen!)");
 					return -1; // NEV is not allowed to park on this spot
 				}
 			}
@@ -42,6 +42,8 @@ public class ParkingPricingModel {
 	}
 	
 	public double calculateParkingPrice(double duration, boolean ev, ParkingSpot spot){
+		// Nur zum ueberschreiben falls man Informationen vom Spot mit in den Preis 
+		// einbeziehen moechte
 		return this.calculateParkingPrice(duration, ev);
 	}
 	public Boolean checkEvExc(){
