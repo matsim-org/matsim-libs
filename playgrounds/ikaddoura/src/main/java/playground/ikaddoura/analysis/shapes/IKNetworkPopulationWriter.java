@@ -20,9 +20,11 @@
 
 package playground.ikaddoura.analysis.shapes;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Scenario;
@@ -39,6 +41,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
@@ -49,23 +52,32 @@ import com.vividsolutions.jts.geom.Point;
  *
  */
 public class IKNetworkPopulationWriter {
+	
+	private final static Logger log = Logger.getLogger(IKNetworkPopulationWriter.class);
 
 	private Scenario scenario;
 	private SimpleFeatureBuilder builder;
 	
-	private String networkFile = "/../network.xml";
-	private String populationFile = "/../population.xml";
+	private String networkFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/input/network.xml";
+	private String populationFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/input/bvg.run189.10pct.100.plans.selected.genericPt.xml.gz";
 	
-	private String networkShapeFile = "/../network.shp";
-	private String activitiesShapeFile = "/../activities.shp";
+	private String outputPath = "/Users/ihab/Desktop/outputShapeFiles/";
 
 	public static void main(String[] args) {
 		
 		IKNetworkPopulationWriter main = new IKNetworkPopulationWriter();	
-		main.loadScenario();
+		main.run();		
+	}
+	
+	private void run() {
 		
-		main.exportNetwork2Shp();
-		main.exportActivities2Shp();
+		loadScenario();
+		
+		File file = new File(outputPath);
+		file.mkdirs();
+		
+		exportNetwork2Shp();
+		exportActivities2Shp();
 		
 	}
 	
@@ -110,15 +122,13 @@ public class IKNetworkPopulationWriter {
 			}
 			
 		}
-	
-		System.out.println(features.size());
 		
-		ShapeFileWriter.writeGeometries(features, activitiesShapeFile);
-		
+		log.info("Writing out activity points shapefile... ");
+		ShapeFileWriter.writeGeometries(features, outputPath + "activities.shp");
+		log.info("Writing out activity points shapefile... Done.");		
 	}
 	
 	private void exportNetwork2Shp(){
-
 
 		if (this.scenario.getNetwork().getLinks().size() == 0) {
 			new NetworkReaderMatsimV1(scenario).parse(this.networkFile);
@@ -126,7 +136,7 @@ public class IKNetworkPopulationWriter {
 				
 		SimpleFeatureTypeBuilder tbuilder = new SimpleFeatureTypeBuilder();
 		tbuilder.setName("shape");
-		tbuilder.add("geometry",LineString.class);
+		tbuilder.add("geometry", LineString.class);
 		tbuilder.add("id", String.class);
 		tbuilder.add("length", Double.class);
 		tbuilder.add("capacity", Double.class);
@@ -154,8 +164,9 @@ public class IKNetworkPopulationWriter {
 			features.add(feature);
 		}
 		
-		ShapeFileWriter.writeGeometries(features, networkShapeFile);
-		
+		log.info("Writing out network lines shapefile... ");
+		ShapeFileWriter.writeGeometries(features, outputPath + "network.shp");
+		log.info("Writing out network lines shapefile... Done.");
 	}
 
 }
