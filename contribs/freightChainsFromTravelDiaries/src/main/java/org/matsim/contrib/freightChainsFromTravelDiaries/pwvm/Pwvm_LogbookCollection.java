@@ -1,4 +1,4 @@
-package playground.vsp.demandde.freightChainsFromKiD;
+package org.matsim.contrib.freightChainsFromTravelDiaries.pwvm;
 
 import java.util.Iterator;
 import java.util.Vector;

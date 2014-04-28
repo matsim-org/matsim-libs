@@ -31,4 +31,4 @@
  * @author (of code) Sebastian Schneider
  *
  */
-package playground.vsp.demandde.freightChainsFromKiD;
+package org.matsim.contrib.freightChainsFromTravelDiaries.pwvm;

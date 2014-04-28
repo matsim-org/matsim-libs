@@ -1,4 +1,4 @@
-package playground.vsp.demandde.freightChainsFromKiD;
+package org.matsim.contrib.freightChainsFromTravelDiaries.pwvm;
 
 import java.io.BufferedWriter;
 import java.io.File;

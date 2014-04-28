@@ -86,6 +86,7 @@
 		<module>cadytsIntegration</module>
 		<module>dvrp</module>
 		<module>freight</module>
+		<module>freightChainsFromTravelDiaries</module>
 		<module>gtfs2matsimtransitschedule</module>
 		<module>grips</module>
 		<module>lanesandsignals</module>

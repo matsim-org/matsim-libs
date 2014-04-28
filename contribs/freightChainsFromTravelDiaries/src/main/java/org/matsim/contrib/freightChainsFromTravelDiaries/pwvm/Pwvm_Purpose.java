@@ -1,4 +1,4 @@
-package playground.vsp.demandde.freightChainsFromKiD;
+package org.matsim.contrib.freightChainsFromTravelDiaries.pwvm;
 
 public enum Pwvm_Purpose {
 	RUECKFAHRT_ZUM_BETRIEB,

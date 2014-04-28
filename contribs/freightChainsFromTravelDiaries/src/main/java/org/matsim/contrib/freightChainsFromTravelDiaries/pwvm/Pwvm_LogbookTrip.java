@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.vsp.demandde.freightChainsFromKiD;
+package org.matsim.contrib.freightChainsFromTravelDiaries.pwvm;
 
 /**
  * @author schn_se

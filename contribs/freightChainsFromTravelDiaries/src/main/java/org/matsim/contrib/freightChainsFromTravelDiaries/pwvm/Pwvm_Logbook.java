@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.vsp.demandde.freightChainsFromKiD;
+package org.matsim.contrib.freightChainsFromTravelDiaries.pwvm;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
