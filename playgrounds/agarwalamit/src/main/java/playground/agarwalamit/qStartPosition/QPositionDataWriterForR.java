@@ -41,15 +41,15 @@ public class QPositionDataWriterForR {
 	//	private static String configFile = "../../patnaIndiaSim/input/configTestCase.xml";//"./input/configTest.xml";
 	//	private static String outputDir = "../../patnaIndiaSim/outputTestCase/3modesPassing/";//"./outputTest/";//
 	//	private static String eventFile = outputDir+"ITERS/data_Patna_3modes_alternativeSpeed_events_Passing.xml";//outputDir+"/ITERS/it.10/10.events.xml.gz";//
-	private static String configFile ="../../patnaIndiaSim/outputSS/3links40PtP/config.xml";
-	private static String outputDir ="../../patnaIndiaSim/outputSS/3links40PtP/";
-	private static String eventFile = outputDir+"/event.xml";
-	private static String networkFile="../../patnaIndiaSim/outputSS/3links40PtP/dreieck_network.xml";
-
-	//	private static String configFile ="./output/config.xml";
-	//	private static String outputDir = "./output/";
-	//	private static String eventFile = outputDir+"events.xml";
-	//	private static String networkFile = outputDir+"network.xml";
+//	private static String configFile ="../../patnaIndiaSim/outputSS/3links1Km/config.xml";
+//	private static String outputDir ="../../patnaIndiaSim/outputSS/3links1Km/";
+//	private static String eventFile = outputDir+"/events.xml";
+//	private static String networkFile="../../patnaIndiaSim/outputSS/3links1Km/dreieck_network.xml";
+	
+		private static String configFile ="./output/config.xml";
+		private static String outputDir = "./output/";
+		private static String eventFile = outputDir+"events.xml";
+		private static String networkFile = outputDir+"network.xml";
 
 	private static Scenario scenario;
 	private static QueuePositionCalculationHandler calculationHandler;
@@ -97,13 +97,16 @@ public class QPositionDataWriterForR {
 				double initialPos = Double.valueOf(linkId)*Double.valueOf(linkLength);
 				double qStartTime =Double.valueOf(queuingTime);
 				double qStartDistFromFNode = initialPos+(qStartTime-Double.valueOf(linkEnterTime))*vehicleSpeed;
+				if((qStartDistFromFNode-initialPos) > Double.valueOf(linkLength)){
+					qStartDistFromFNode=initialPos + Double.valueOf(linkLength);
+				}
 				double timeStepTillFreeSpeed = qStartTime;
 				double endOfLink = (1+Double.valueOf(linkId))*Double.valueOf(linkLength);
 
 				// first line will write the distance and time for which speed was free flow speed.
 				// next line will write the queue distance and link leave time.
 				writer.write(personId+"\t"+linkId+"\t"+linkEnterTime+"\t"+initialPos+"\t"+timeStepTillFreeSpeed+"\t"+qStartDistFromFNode+"\t"+travelMode+"\n");
-				writer.write(personId+"\t"+linkId+"\t"+timeStepTillFreeSpeed+"\t"+qStartDistFromFNode+"\t"+linkLeaveTime+"\t"+endOfLink+"\t"+travelMode+"\n");
+				writer.write(personId+"\t"+linkId+"\t"+timeStepTillFreeSpeed+"\t"+qStartDistFromFNode+"\t"+(Double.valueOf(linkLeaveTime))+"\t"+endOfLink+"\t"+travelMode+"\n");
 				String timeDataLine=personId+"\t"+linkId+"\t"+linkEnterTime+"\t"+linkLeaveTime+"\t"+linkLength+"\t"+travelMode;
 				copyLinkEnterLeaveTimeData.remove(timeDataLine);
 			}
@@ -134,7 +137,7 @@ public class QPositionDataWriterForR {
 		} else if(travelMode.equals("motorbikes") || travelMode.equals("med")) {
 			vehicleSpeed = 16.67;
 		} else if(travelMode.equals("bicycles") || travelMode.equals("truck") ){
-			vehicleSpeed= 4.167;
+			vehicleSpeed= 4.17;
 		}
 		return vehicleSpeed;
 	}

@@ -95,7 +95,7 @@ public class PersonOnLinkInformation {
 	public void checkIfVehicleWillGoInQ(double currentTimeStep){
 		double travelTimeSincePersonHasEntered = currentTimeStep - getLinkEnterTime();
 		if(currentTimeStep!=getLinkLeaveTime()){
-			this.addVehicleInQ= travelTimeSincePersonHasEntered >= Math.floor(getFreeSpeedLinkTravelTime())+1;
+			this.addVehicleInQ= travelTimeSincePersonHasEntered > Math.floor(getFreeSpeedLinkTravelTime()) + 1;
 		} else this.addVehicleInQ=false;
 	}
 
