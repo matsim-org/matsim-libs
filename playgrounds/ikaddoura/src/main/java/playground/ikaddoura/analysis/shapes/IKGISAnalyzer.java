@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -53,6 +53,18 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
+/**
+ * 
+ * Reads in a shapeFile and performs a zone-based analysis:
+ * Calculates the number of home activities, work activities, all activities per zone.
+ * Calculates the tolls paid during the day mapped back to the agents' home zones (toll payments).
+ * Calculates the tolls paid during the day mapped back to the agents's home zones in relation to the number of home activities (avg. toll payments)
+ * 
+ * The shape file has to contain a grid (e.g. squares, hexagons) which can be created using a QGIS plugin called MMQGIS.
+ * 
+ * @author ikaddoura
+ *
+ */
 public class IKGISAnalyzer {
 	
 	private static final Logger log = Logger.getLogger(IKGISAnalyzer.class);
@@ -69,10 +81,13 @@ public class IKGISAnalyzer {
 
 //	final double scalingFactor = 10.;
 	
-	private String outputPath1 = runDirectory1 + "analysis/gridBasedAnalysis/moneyAmounts/";
+	private final String outputPath1 = runDirectory1 + "analysis/gridBasedAnalysis/moneyAmounts/";
 //	private String outputPath2 = runDirectory2 + "analysis/gridBasedAnalysis/moneyAmounts/";
 	
-	private Map<Integer, Geometry> zoneNr2zoneGeometry = new HashMap<Integer, Geometry>();
+	private final String homeActivity = "home";
+	private final String workActivity = "work";
+	
+	private Map<Integer, Geometry> zoneId2geometry = new HashMap<Integer, Geometry>();
 	
 	private IKShapeFileWriter shapeFileWriter = new IKShapeFileWriter();
 			
@@ -96,7 +111,7 @@ public class IKGISAnalyzer {
 		features = ShapeFileReader.getAllFeatures(shapeFileZones);
 		int featureCounter = 0;
 		for (SimpleFeature feature : features) {
-			this.zoneNr2zoneGeometry.put(featureCounter, (Geometry) feature.getDefaultGeometry());
+			this.zoneId2geometry.put(featureCounter, (Geometry) feature.getDefaultGeometry());
 			featureCounter++;
 		}
 		
@@ -139,10 +154,61 @@ public class IKGISAnalyzer {
 	}
 
 	private void analyzeZones(Map<Id, Double> personId2amountSum, Population population, String outputFile) {
-		Map<Integer,Integer> zoneNr2homeActivities = getZoneNr2activityLocations("home", population, this.zoneNr2zoneGeometry);
-		shapeFileWriter.writeShapeFileGeometry(this.zoneNr2zoneGeometry, zoneNr2homeActivities, outputFile);
+		// home activities
+		Map<Integer,Integer> zoneNr2homeActivities = getZoneNr2activityLocations(homeActivity, population, this.zoneId2geometry);
+		
+		// work activities
+		Map<Integer,Integer> zoneNr2workActivities = getZoneNr2activityLocations(workActivity, population, this.zoneId2geometry);
+
+		// all activities
+		Map<Integer,Integer> zoneNr2activities = getZoneNr2activityLocations(null, population, this.zoneId2geometry);
+		
+		// toll payments mapped back to home location
+		Map<Integer,Double> zoneNr2tollPayments = getZoneNr2tollPayments(population, personId2amountSum, this.zoneId2geometry);
+		
+		// toll payments mapped back to home location in relation to home activities
+		Map<Integer,Double> zoneNr2AvgTollPayments = getZoneId2avgToll(zoneNr2tollPayments, zoneNr2homeActivities);
+		
+		shapeFileWriter.writeShapeFileGeometry(this.zoneId2geometry, zoneNr2homeActivities, zoneNr2workActivities, zoneNr2activities, zoneNr2tollPayments, zoneNr2AvgTollPayments, outputFile);
 	}
 	
+	private Map<Integer, Double> getZoneId2avgToll(Map<Integer, Double> zoneNr2tollPayments, Map<Integer, Integer> zoneNr2homeActivities) {
+		Map<Integer, Double> zoneId2avgToll = new HashMap<Integer, Double>();
+		for (Integer zoneId : zoneNr2tollPayments.keySet()) {
+			zoneId2avgToll.put(zoneId, zoneNr2tollPayments.get(zoneId) / zoneNr2homeActivities.get(zoneId));
+		}
+
+		return zoneId2avgToll;
+	}
+
+	private Map<Integer, Double> getZoneNr2tollPayments(Population population, Map<Id, Double> personId2amountSum, Map<Integer, Geometry> zoneId2geometry) {
+		Map<Integer, Double> zoneNr2tollPayments = new HashMap<Integer, Double>();	
+		
+		SortedMap<Id,Coord> personId2homeCoord = getPersonId2Coordinates(population, homeActivity);
+		
+		for (Id personId : personId2amountSum.keySet()) {
+			if (personId2homeCoord.containsKey(personId)){
+				for (Integer zoneId : zoneId2geometry.keySet()) {
+					Geometry geometry = zoneId2geometry.get(zoneId);
+					Point p = MGC.coord2Point(personId2homeCoord.get(personId)); 
+					
+					if (p.within(geometry)){
+						if (zoneNr2tollPayments.get(zoneId) == null){
+							zoneNr2tollPayments.put(zoneId, personId2amountSum.get(personId));
+						} else {
+							double tollPayments = zoneNr2tollPayments.get(zoneId);
+							zoneNr2tollPayments.put(zoneId, tollPayments + personId2amountSum.get(personId));
+						}
+					}
+				}
+			} else {
+				// person doesn't have a home activity
+			}
+		}
+		
+		return zoneNr2tollPayments;
+	}
+
 	private Map<Integer, Integer> getZoneNr2activityLocations(String activity, Population population, Map<Integer, Geometry> zoneNr2zoneGeometry) {
 		Map<Integer, Integer> zoneNr2activity = new HashMap<Integer, Integer>();	
 
@@ -176,7 +242,7 @@ public class IKGISAnalyzer {
 				if (pE instanceof Activity){
 					Activity act = (Activity) pE;
 					
-					if (act.getType().equals(activity)){
+					if (act.getType().equals(activity) || act.getType().equals(null)) {
 						
 						Coord coord = act.getCoord();
 						personId2coord.put(person.getId(), coord);
