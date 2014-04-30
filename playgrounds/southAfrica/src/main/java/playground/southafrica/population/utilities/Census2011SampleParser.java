@@ -43,10 +43,12 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsFactory;
+import org.matsim.households.HouseholdsFactoryImpl;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.households.Income;
 import org.matsim.households.Income.IncomePeriod;
+import org.matsim.households.IncomeImpl;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -381,21 +383,35 @@ public class Census2011SampleParser {
 		}
 	}
 
-	private static class IncomeConverter implements AttributeConverter<Income>{
+	private static class IncomeConverter implements AttributeConverter<IncomeImpl>{
 		@Override
-		public Income convert(String value) {
-			// TODO Auto-generated method stub
-			return null;
+		public IncomeImpl convert(String value) {
+			String[] sa = value.split("_");
+			String currency = sa[0];
+			double incomeValue = Double.parseDouble(sa[1].substring(0, sa[1].indexOf("(")));
+			String incomePeriodString = sa[1].substring(sa[1].indexOf("(")+1, sa[1].indexOf(")"));
+			IncomePeriod incomePeriod = null;
+			if(incomePeriodString.equalsIgnoreCase("year")){
+				incomePeriod = IncomePeriod.year;
+			} else if(incomePeriodString.equalsIgnoreCase("month")){
+				incomePeriod = IncomePeriod.month;
+			}
+			
+			Income income = new IncomeImpl(incomeValue, incomePeriod);
+			income.setCurrency(currency);
+			
+			return (IncomeImpl)income;
 		}
 		
 		@Override
 		public String convertToString(Object o) {
-			if(o instanceof Income){
+			if(o instanceof IncomeImpl){
 				Income income = (Income)o;
 				String s = String.format("%s_%.2f(%s)", income.getCurrency(), income.getIncome(), income.getIncomePeriod().toString());
 				return s;
 			}
-			return null;
+			LOG.warn("Couldn't convert Income: " + o.toString() + "; returning empty string.");
+			return "";
 		}
 		
 	}
