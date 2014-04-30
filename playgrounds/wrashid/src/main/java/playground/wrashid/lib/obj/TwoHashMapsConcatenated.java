@@ -1,11 +1,23 @@
 package playground.wrashid.lib.obj;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Set;
 //TODO: write tests.
 public class TwoHashMapsConcatenated<ClassKey1,ClassKey2,ClassValue> {
 
 	private HashMap<ClassKey1, HashMap<ClassKey2, ClassValue>> hashMap=new HashMap<ClassKey1, HashMap<ClassKey2,ClassValue>>(); 
+	
+	public Collection<ClassValue> getValues(){
+		LinkedList<ClassValue> list=new LinkedList<ClassValue>();
+		for (ClassKey1 key1:getKeySet1()){
+			for (ClassKey2 key2:getKeySet2(key1)){
+				list.add(get(key1, key2));
+			}
+		}
+		return list;
+	}
 	
 	public void put(ClassKey1 key1, ClassKey2 key2, ClassValue value){
 		checkHashMapAndInitializeIfNeeded(key1);
