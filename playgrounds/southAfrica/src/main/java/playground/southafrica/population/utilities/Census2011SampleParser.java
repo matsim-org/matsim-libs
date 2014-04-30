@@ -47,6 +47,7 @@ import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.households.Income;
 import org.matsim.households.Income.IncomePeriod;
+import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
@@ -373,11 +374,32 @@ public class Census2011SampleParser {
 
 			LOG.info("Writing person attributes to file...");
 			ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(this.personAttributes);
+			oaw.putAttributeConverter(Income.class, new IncomeConverter());
+			
 			oaw.setPrettyPrint(true);
 			oaw.writeFile(outputfolder + "PersonAttributes.xml");
 		}
 	}
 
+	private static class IncomeConverter implements AttributeConverter<Income>{
+		@Override
+		public Income convert(String value) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+		@Override
+		public String convertToString(Object o) {
+			if(o instanceof Income){
+				Income income = (Income)o;
+				String s = String.format("%s_%.2f(%s)", income.getCurrency(), income.getIncome(), income.getIncomePeriod().toString());
+				return s;
+			}
+			return null;
+		}
+		
+	}
+	
 	
 	class SAHouseholdsFactory implements HouseholdsFactory{
 
