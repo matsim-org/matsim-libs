@@ -35,7 +35,6 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
@@ -48,7 +47,7 @@ import playground.southafrica.utilities.Header;
  * of Kirill Mueller) with the population synthesis (R script adapted from
  * Pieter Fourie).
  * 
- * @author johanwjoubert
+ * @author jwjoubert
  */
 public class PythonRIntegrator {
 	private final static Logger LOG = Logger.getLogger(PythonRIntegrator.class);

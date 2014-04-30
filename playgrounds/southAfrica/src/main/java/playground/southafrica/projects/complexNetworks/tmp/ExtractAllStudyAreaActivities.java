@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -48,6 +47,13 @@ import playground.southafrica.freight.digicore.io.DigicoreVehicleReader_v1;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
+/**
+ * Class to extract all the observed activities from the Digicore activity
+ * chains, and checking if they fall within the ten validation areas for which
+ * we will do clustering parameter validation.
+ *
+ * @author jwjoubert
+ */
 public class ExtractAllStudyAreaActivities {
 	private final static Logger LOG = Logger.getLogger(ExtractAllStudyAreaActivities.class);
 
@@ -123,11 +129,12 @@ public class ExtractAllStudyAreaActivities {
 		Header.printFooter();
 	}
 
-	
 	/**
-	 * Builds a (artificial) QuadTree for the 10 study areas in Nelson Mandela
-	 * Bay Metropole.
+	 * Building a basic QuadTree containing just the centroid coordinates of the
+	 * ten validation areas. This is done for the Nelson Mandela Bay Metropole.
 	 * 
+	 * @param qt
+	 * @param coord
 	 * @return
 	 */
 	private static QuadTree<Coord> buildQuadTree(){
@@ -147,7 +154,13 @@ public class ExtractAllStudyAreaActivities {
 		return qt;
 	}
 	
-	
+	/**
+	 * Implementing a multi-threaded analysis for extracting the activities from
+	 * activity chains. Each thread is passed a vehicle file, which is parsed,
+	 * and then analysed.
+	 * 
+	 * @author jwjoubert
+	 */
 	private static class ExtractorCallable implements Callable<List<Coord>>{
 		private final QuadTree<Coord> qt;
 		private final File file;
@@ -186,7 +199,6 @@ public class ExtractAllStudyAreaActivities {
 			counter.incCounter();
 			return list;
 		}
-		
 	}
 
 }
