@@ -22,8 +22,16 @@ package playground.southafrica.projects.complexNetworks.tmp;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -41,6 +49,7 @@ import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
 public class ExtractAllStudyAreaActivities {
+	private final static Logger LOG = Logger.getLogger(ExtractAllStudyAreaActivities.class);
 
 	public static void main(String[] args) {
 		Header.printHeader(ExtractAllStudyAreaActivities.class.toString(), args);
@@ -48,13 +57,36 @@ public class ExtractAllStudyAreaActivities {
 		String inputFolder = args[0];
 		String outputFile = args[1];
 		Double HEX_WIDTH = Double.parseDouble(args[2]); 
+		Integer numberOfThreads = Integer.parseInt(args[3]);
 		
+		/* Build the QuadTree covering the ten study areas for validation. */
 		QuadTree<Coord> qt = buildQuadTree();
 		
 		/* Get all the files */
 		List<File> listOfFiles = FileUtils.sampleFiles(new File(inputFolder), Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
 		
 		Counter counter = new Counter("   vehicles # ");
+		
+		/* Set up the multi-threaded infrastructure. */
+		LOG.info("Setting up multi-threaded infrastructure");
+		ExecutorService threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
+		List<Future<List<Coord>>> jobs = new ArrayList<Future<List<Coord>>>();
+		
+		LOG.info("Processing the vehicle files...");
+		for(File file : listOfFiles){
+			Callable<List<Coord>> job = new ExtractorCallable(qt, file, counter, HEX_WIDTH);
+			Future<List<Coord>> result = threadExecutor.submit(job);
+			jobs.add(result);
+		}
+		counter.printCounter();
+		LOG.info("Done processing vehicle files...");
+		
+		threadExecutor.shutdown();
+		while(!threadExecutor.isTerminated()){
+		}
+
+		/* Consolidate the output */
+		LOG.info("Consolidating output...");
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "WGS84");
 		
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
@@ -62,30 +94,22 @@ public class ExtractAllStudyAreaActivities {
 			bw.write("Long,Lat,X,Y");
 			bw.newLine();
 			
-			for(File file : listOfFiles){
-				/* Parse the vehicle from file. */
-				DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
-				dvr.parse(file.getAbsolutePath());
-				DigicoreVehicle vehicle = dvr.getVehicle();
-				
-				/* Check how far EACH activity is. If it is within the threshold,
-				 * then write it to file. */
-				for(DigicoreChain chain : vehicle.getChains()){
-					for(DigicoreActivity act : chain.getAllActivities()){
-						Coord actCoord = act.getCoord();
-						Coord closest = qt.get(actCoord.getX(), actCoord.getY());
-						double dist = CoordUtils.calcDistance(actCoord, closest);
-						if(dist <= HEX_WIDTH){
-							Coord actCoordWgs84 = ct.transform(actCoord);
-							bw.write(String.format("%.6f,%.6f,%.2f,%.2f\n", actCoordWgs84.getX(), actCoordWgs84.getY(), actCoord.getX(), actCoord.getY()));
-						}
-					}
+			for(Future<List<Coord>> job : jobs){
+				List<Coord> result = job.get();
+				for(Coord coord : result){
+					Coord actCoordWgs84 = ct.transform(coord);
+					bw.write(String.format("%.6f,%.6f,%.2f,%.2f\n", actCoordWgs84.getX(), actCoordWgs84.getY(), coord.getX(), coord.getY()));
 				}
-				counter.incCounter();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Cannot write to " + outputFile);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Couldn't get thread job result.");
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Couldn't get thread job result.");
 		} finally{
 			try {
 				bw.close();
@@ -99,7 +123,7 @@ public class ExtractAllStudyAreaActivities {
 		Header.printFooter();
 	}
 
-
+	
 	/**
 	 * Builds a (artificial) QuadTree for the 10 study areas in Nelson Mandela
 	 * Bay Metropole.
@@ -121,6 +145,48 @@ public class ExtractAllStudyAreaActivities {
 		qt.put(130048.2549,-3684152.8228, new CoordImpl(130048.2549,-3684152.8228));
 
 		return qt;
+	}
+	
+	
+	private static class ExtractorCallable implements Callable<List<Coord>>{
+		private final QuadTree<Coord> qt;
+		private final File file;
+		public Counter counter;
+		private final double width;
+		
+		public ExtractorCallable(QuadTree<Coord> qt, File file, Counter counter, double width) {
+			this.qt = qt;
+			this.file = file;
+			this.counter = counter;
+			this.width = width;
+		}
+
+		@Override
+		public List<Coord> call() throws Exception {
+			List<Coord> list = new ArrayList<Coord>();
+
+			/* Parse the vehicle from file. */
+			DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
+			dvr.parse(file.getAbsolutePath());
+			DigicoreVehicle vehicle = dvr.getVehicle();
+
+			/* Check how far EACH activity is. If it is within the threshold,
+			 * then write it to file. */
+			for(DigicoreChain chain : vehicle.getChains()){
+				for(DigicoreActivity act : chain.getAllActivities()){
+					Coord actCoord = act.getCoord();
+					Coord closest = qt.get(actCoord.getX(), actCoord.getY());
+					double dist = CoordUtils.calcDistance(actCoord, closest);
+					if(dist <= this.width){
+						list.add(actCoord);
+					}
+				}
+			}
+
+			counter.incCounter();
+			return list;
+		}
+		
 	}
 
 }
