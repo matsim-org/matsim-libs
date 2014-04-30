@@ -28,6 +28,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
@@ -53,10 +55,11 @@ public class ExtractAllStudyAreaActivities {
 		List<File> listOfFiles = FileUtils.sampleFiles(new File(inputFolder), Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
 		
 		Counter counter = new Counter("   vehicles # ");
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "WGS84");
 		
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
 		try{
-			bw.write("Long,Lat");
+			bw.write("Long,Lat,X,Y");
 			bw.newLine();
 			
 			for(File file : listOfFiles){
@@ -73,7 +76,8 @@ public class ExtractAllStudyAreaActivities {
 						Coord closest = qt.get(actCoord.getX(), actCoord.getY());
 						double dist = CoordUtils.calcDistance(actCoord, closest);
 						if(dist <= HEX_WIDTH){
-							bw.write(String.format("%.2f, %.2f\n", actCoord.getX(), actCoord.getY()));
+							Coord actCoordWgs84 = ct.transform(actCoord);
+							bw.write(String.format("%.6f,%.6f,%.2f,%.2f\n", actCoordWgs84.getX(), actCoordWgs84.getY(), actCoord.getX(), actCoord.getY()));
 						}
 					}
 				}
