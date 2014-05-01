@@ -32,25 +32,29 @@ public class doIt {
 		
 		
 		for(double constant = -5; constant<5.0; constant+=0.25){
-			for(double betaMatsim = 0; betaMatsim<5.0; betaMatsim+=0.25){
-				for(double betaReserve = 0; betaReserve<5.0; betaReserve+=0.25){
+			for(double betaMatsim = 0; betaMatsim<7.0; betaMatsim+=0.25){
+				for(double betaReserve = 0; betaReserve<7.0; betaReserve+=0.25){
 					for(double betaSOC = 0; betaSOC<5.0; betaSOC+=0.25){
 						params.add(new Parameterset(betaMatsim, betaReserve, betaSOC, constant));
 					}
 				}
 			}
 		}
+		System.out.println("Parameter Sets vorbereitet");
 		for(Parameterset param : params){
+			param.score=0.0;
 			for(ChoiceSet set : sets){
-				param.score+=set.check(param);
+				param.score=param.score+set.check(param);
 			}
+			//System.out.println("param score : "+param.score);
+			System.out.println("pruefe naechstes Set");
 		}
 		
 		double bestScore=-3000;
 		Parameterset bestParam = null;
 		for (Parameterset param : params){
 			if(param.score>=bestScore){
-				System.out.println("besseres");
+				//System.out.println("besseres");
 				bestScore=param.score;
 				bestParam = param;
 			}
