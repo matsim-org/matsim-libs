@@ -345,6 +345,10 @@ TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> scores=ne
 		}
 		String strategyName;
 		double score;
+		
+		public void print(){
+			System.out.println(strategyName + ":" + score);
+		}
 	}
 
 }
