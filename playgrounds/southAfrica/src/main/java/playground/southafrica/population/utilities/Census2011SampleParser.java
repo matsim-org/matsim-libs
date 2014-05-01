@@ -200,7 +200,15 @@ public class Census2011SampleParser {
 						getEmployment(employment) + "," + 
 						getIncome(income);
 				personMap.put(new IdImpl(serial + "_" + String.valueOf(Integer.parseInt(person.replaceAll(" ", "")))), s);
+				
 				counter.incCounter();
+
+				/* FIXME Remove after debugging */
+				Id idTmp = new IdImpl("11472276569_5");
+				Id thisId = new IdImpl((serial + "_" + String.valueOf(Integer.parseInt(person.replaceAll(" ", "")))));
+				if(idTmp.toString().equalsIgnoreCase(thisId.toString())){
+					LOG.warn("Found the null-income problem child.");
+				}
 			}
 		} catch (IOException e) {
 			throw new RuntimeException("Could not read from BufferedReader "
@@ -272,7 +280,9 @@ public class Census2011SampleParser {
 			personAttributes.putAttribute(pid.toString(), "relationship", relationship);
 			personAttributes.putAttribute(pid.toString(), "race", race);
 			personAttributes.putAttribute(pid.toString(), "school", school);
-			personAttributes.putAttribute(pid.toString(), "income", pIncome);
+			if(pIncome != null){
+				personAttributes.putAttribute(pid.toString(), "income", pIncome);
+			}
 			population.addPerson(person);
 			
 			/* Add to household */
@@ -376,7 +386,7 @@ public class Census2011SampleParser {
 
 			LOG.info("Writing person attributes to file...");
 			ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(this.personAttributes);
-			oaw.putAttributeConverter(Income.class, new IncomeConverter());
+			oaw.putAttributeConverter(IncomeImpl.class, new IncomeConverter());
 			
 			oaw.setPrettyPrint(true);
 			oaw.writeFile(outputfolder + "PersonAttributes.xml");
@@ -386,9 +396,15 @@ public class Census2011SampleParser {
 	private static class IncomeConverter implements AttributeConverter<IncomeImpl>{
 		@Override
 		public IncomeImpl convert(String value) {
+			if(value.equalsIgnoreCase("")){
+				/* Unknown income. */
+				return null;
+			}
+			
 			String[] sa = value.split("_");
 			String currency = sa[0];
-			double incomeValue = Double.parseDouble(sa[1].substring(0, sa[1].indexOf("(")));
+			String incomeString = sa[1].substring(0, sa[1].indexOf("("));
+			double incomeValue = Double.parseDouble(incomeString);
 			String incomePeriodString = sa[1].substring(sa[1].indexOf("(")+1, sa[1].indexOf(")"));
 			IncomePeriod incomePeriod = null;
 			if(incomePeriodString.equalsIgnoreCase("year")){
@@ -405,7 +421,9 @@ public class Census2011SampleParser {
 		
 		@Override
 		public String convertToString(Object o) {
-			if(o instanceof IncomeImpl){
+			if(o == null){
+				return "";
+			} else if(o instanceof IncomeImpl){
 				Income income = (Income)o;
 				String s = String.format("%s_%.2f(%s)", income.getCurrency(), income.getIncome(), income.getIncomePeriod().toString());
 				return s;
