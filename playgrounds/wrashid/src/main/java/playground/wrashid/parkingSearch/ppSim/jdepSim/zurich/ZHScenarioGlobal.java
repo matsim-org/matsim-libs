@@ -29,11 +29,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
+import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingChoice.scoring.ParkingInfo;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteThread;
@@ -66,6 +68,7 @@ public class ZHScenarioGlobal {
 	public static boolean turnParallelRoutingOnDuringSim = true;
 	public static Config config;
 	public static int parkingStrategyScenarioId = -1;
+	public static IntegerValueHashMap<Id> privateParkingCalibrationOriginalCapacities;
 
 	// personId, legIndex, route
 	public static TwoHashMapsConcatenated<Id, Integer, LinkNetworkRouteImpl> initialRoutes;

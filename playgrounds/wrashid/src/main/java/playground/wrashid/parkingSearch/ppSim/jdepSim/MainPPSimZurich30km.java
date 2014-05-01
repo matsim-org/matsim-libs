@@ -61,6 +61,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.Desires;
 
+import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
@@ -235,7 +236,7 @@ public class MainPPSimZurich30km {
 	private static void addPrivateParkingAtEachActivityLocationWithCapacityZero(ParkingManagerZH parkingManager) {
 		// add only, if not only exists such a parking
 
-		System.out.println(parkingManager.getParkings().size());
+		int initialNumberOfParkings=parkingManager.getParkings().size();
 		// activity facility Id, activityType, parking facility id
 		TwoHashMapsConcatenated<Id, String, Id> privateParkingFacilityIdMapping = new TwoHashMapsConcatenated<Id, String, Id>();
 
@@ -276,12 +277,35 @@ public class MainPPSimZurich30km {
 
 		parkingManager.reset();
 
-		System.out.println(parkingManager.getParkings().size());
+		System.out.println("numberOfPrivateParking facilities added (with capacity zero) :" + parkingManager.getParkings().size());
 		System.out.println();
 	}
 
 	private static void performAutoCalibration() {
-		Random rand = RandomNumbers.getGlobalbRandom();
+		LinkedList<Parking> parkings = AgentWithParking.parkingManager.getParkings();
+		
+		if (ZHScenarioGlobal.privateParkingCalibrationOriginalCapacities==null){
+			ZHScenarioGlobal.privateParkingCalibrationOriginalCapacities=new IntegerValueHashMap<Id>();
+			
+			for (Parking parking : parkings) {
+				if (parking.getId().toString().contains("private")) {
+					ZHScenarioGlobal.privateParkingCalibrationOriginalCapacities.set(parking.getId(), parking.getIntCapacity());
+				}
+			}
+		}
+		
+		
+		double newScalingFactor= ZHScenarioGlobal.loadDoubleParam("performCalibration.startValue") + ZHScenarioGlobal.iteration* ZHScenarioGlobal.loadDoubleParam("performCalibration.stepValue");
+		log.info("newScalingFactor: " + newScalingFactor);
+		
+		for (Parking parking : parkings) {
+			if (parking.getId().toString().contains("private")) {
+				int newCapacity = (int) Math.round(ZHScenarioGlobal.privateParkingCalibrationOriginalCapacities.get(parking.getId())*newScalingFactor);
+				parking.setCapacity(newCapacity);
+			}
+		}
+		
+		//Random rand = RandomNumbers.getGlobalbRandom();
 		// double
 		// countsScalingFactor=ZHScenarioGlobal.loadDoubleParam("ComparisonGarageCounts.countsScalingFactor")*rand.nextDouble()*0.2;
 
@@ -293,6 +317,15 @@ public class MainPPSimZurich30km {
 
 		// TODO: print private parking assignment later here
 
+		
+		
+		
+		
+		
+		
+		
+		/*
+		
 		double distance = 100;
 		LinkedList<Parking> parkings = AgentWithParking.parkingManager.getParkings();
 
@@ -357,6 +390,7 @@ public class MainPPSimZurich30km {
 				}
 			}
 		}
+		*/
 	}
 
 	public static void initGlobalReroute(Scenario scenario) {
