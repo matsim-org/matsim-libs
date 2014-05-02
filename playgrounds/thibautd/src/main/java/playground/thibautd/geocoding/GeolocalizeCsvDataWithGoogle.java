@@ -310,9 +310,11 @@ public class GeolocalizeCsvDataWithGoogle {
 				final int index ) {
 			try {
 				return
-					fields[ index ].isEmpty() || fields[ index ].equals( "NULL" ) ?
+					fields[ index ].isEmpty() ||
+					fields[ index ].equals( "NULL" ) ||
+					fields[ index ].equals( "NA" ) ?
 						null :
-						fields[ index ];
+						fields[ index ].trim();
 			}
 			catch (ArrayIndexOutOfBoundsException e) {
 				throw new RuntimeException( fields.length+" fields in "+Arrays.toString( fields ) , e );
