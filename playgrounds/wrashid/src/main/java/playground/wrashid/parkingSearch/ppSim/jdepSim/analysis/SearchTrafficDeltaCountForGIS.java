@@ -36,49 +36,62 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 
+import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 
-public class SearchTrafficLength {
+public class SearchTrafficDeltaCountForGIS {
 
 	public static void main(String[] args) {
-		String eventsFile="C:/data/parkingSearch/psim/zurich/output/run20/output/ITERS/it.2.events.xml.gz";
+		String eventsFileBaseCase="C:/data/parkingSearch/psim/zurich/output/run21/output/ITERS/it.2.events.xml.gz";
+		String eventsFileWithSearch="C:/data/parkingSearch/psim/zurich/output/run20/output/ITERS/it.2.events.xml.gz";
 		Coord center = ParkingHerbieControler.getCoordinatesLindenhofZH();
 		double radius=2500;
 		Network network = GeneralLib.readNetwork("c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/output_network.xml.gz");
 		
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		TrafficCount trafficCountBaseCase = getTraffiCounts(eventsFileBaseCase, center, radius, network);
+		TrafficCount trafficCountWithSearchTraffic = getTraffiCounts(eventsFileWithSearch, center, radius, network);
+		
+		printLinkCounts(trafficCountBaseCase, trafficCountWithSearchTraffic,network);
+	}
 
-		TravelDistanceLength trafficOnRoadsCount = new TravelDistanceLength(center,network,radius);
+	private static void printLinkCounts(TrafficCount trafficCountBaseCase,
+			TrafficCount trafficCountWithSearchTraffic, Network network) {
+		HashSet<Id> jointLinkSet=new HashSet<Id>();
+		jointLinkSet.addAll(trafficCountBaseCase.getLinkCounts().getKeySet());
+		jointLinkSet.addAll(trafficCountWithSearchTraffic.getLinkCounts().getKeySet());
 		
+		System.out.println("linkId\tx\ty\tcountsA\tcountsB\tdeltaCountsBMinusA");
+		for (Id linkId:jointLinkSet){
+			Coord coord = network.getLinks().get(linkId).getCoord();
+			int delta=trafficCountWithSearchTraffic.getLinkCounts().get(linkId)-trafficCountBaseCase.getLinkCounts().get(linkId);
+			System.out.println(linkId + "\t" + coord.getX()+ "\t" + coord.getY() + "\t" + trafficCountBaseCase.getLinkCounts().get(linkId)+ "\t" + trafficCountWithSearchTraffic.getLinkCounts().get(linkId) + "\t" + delta);
+		}
+	}
+
+	private static TrafficCount getTraffiCounts(
+			String eventsFileBaseCase, Coord center, double radius,
+			Network network) {
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		TrafficCount trafficOnRoadsCount = new TrafficCount(center,network,radius);
 		events.addHandler(trafficOnRoadsCount);
-		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(eventsFile);
-		
-		trafficOnRoadsCount.printTravelDistances();
+		reader.parse(eventsFileBaseCase);
+		return trafficOnRoadsCount;
 	}
 	
-	private static class TravelDistanceLength implements 
+	private static class TrafficCount implements 
 	Wait2LinkEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
 
-		int numberOfBins=24*4;
-		int binSize=24*3600/numberOfBins;
 		private Coord center;
 		private Network network;
 		private double radius;
-		double[] travelledDistance=new double[numberOfBins];
+		private IntegerValueHashMap<Id> linkCounts;
 
-		public TravelDistanceLength(Coord center, Network network, double radius){
+		public TrafficCount(Coord center, Network network, double radius){
 			this.center = center;
 			this.network = network;
 			this.radius = radius;
-		}
-		
-		public void printTravelDistances(){
-			System.out.println("binNumber\ttravelDistance[m]");
-			for (int i=0;i<numberOfBins;i++){
-				System.out.println(i + "\t" + travelledDistance[i]);
-			}
+			setLinkCounts(new IntegerValueHashMap<Id>());
 		}
 		
 		@Override
@@ -90,8 +103,7 @@ public class SearchTrafficLength {
 		public void handleEvent(LinkLeaveEvent event) {
 			Link link = network.getLinks().get(event.getLinkId());
 			if (GeneralLib.getDistance(center, link) <radius){
-				int index=(int) Math.floor(GeneralLib.projectTimeWithin24Hours(event.getTime())) /binSize;
-				travelledDistance[index]+=link.getLength();
+				getLinkCounts().increment(link.getId());
 			}
 		}
 
@@ -105,6 +117,14 @@ public class SearchTrafficLength {
 		public void handleEvent(Wait2LinkEvent event) {
 			// TODO Auto-generated method stub
 			
+		}
+
+		public IntegerValueHashMap<Id> getLinkCounts() {
+			return linkCounts;
+		}
+
+		private void setLinkCounts(IntegerValueHashMap<Id> counts) {
+			this.linkCounts = counts;
 		}
 
 	}
