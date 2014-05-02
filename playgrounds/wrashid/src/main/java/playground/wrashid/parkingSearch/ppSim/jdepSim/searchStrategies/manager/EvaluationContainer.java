@@ -200,8 +200,8 @@ public class EvaluationContainer {
 					StrategyEvaluation worstStrategy = getWorstStrategy(multipleStrategies);
 					getEvaluations().remove(worstStrategy);
 				} else {
-					DebugLib.stopSystemAndReportInconsistency("probably memory size smaller than number of groups");
-					//dropWostStrategy();
+					//DebugLib.stopSystemAndReportInconsistency("probably memory size smaller than number of groups");
+					dropWostStrategy();
 				}
 			}
 		} else {
