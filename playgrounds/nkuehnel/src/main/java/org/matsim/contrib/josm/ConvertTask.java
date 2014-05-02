@@ -61,17 +61,14 @@ public class ConvertTask extends PleaseWaitRunnable {
 		CoordinateTransformation ctOut = TransformationFactory
 				.getCoordinateTransformation(TransformationFactory.WGS84,
 						convertSystem);
-//		Converter converter;
-		Converter_2 converter;
+		Converter converter;
 		if (Main.pref.getBoolean("matsim_filterActive", false)) {
 			OsmFilter filter = new OsmFilter(null, null, Main.pref.getInteger(
 					"matsim_filter_hierarchy", 6));
-//			converter = new Converter(((OsmDataLayer) layer).data, tempNetwork,
-//					filter);
-			converter = new Converter_2((OsmDataLayer) layer, tempNetwork);
+			converter = new Converter(((OsmDataLayer) layer).data, tempNetwork,
+					filter);
 		} else {
-//			converter = new Converter(((OsmDataLayer) layer).data, tempNetwork);
-			converter = new Converter_2((OsmDataLayer) layer, tempNetwork);
+			converter = new Converter(((OsmDataLayer) layer).data, tempNetwork);
 		}
 		this.progressMonitor.setTicks(1);
 		this.progressMonitor.setCustomText("converting osm data..");

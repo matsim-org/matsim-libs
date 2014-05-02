@@ -47,6 +47,7 @@ import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.MapView.LayerChangeListener;
 import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
 import org.openstreetmap.josm.gui.layer.Layer;
+import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.gui.util.HighlightHelper;
 import org.openstreetmap.josm.io.FileExporter;
 import org.openstreetmap.josm.tools.ImageProvider;
@@ -59,11 +60,13 @@ import org.openstreetmap.josm.tools.ImageProvider;
 public class MATSimToggleDialog extends ToggleDialog implements
 		LayerChangeListener, PreferenceChangedListener {
 	private JTable table;
-	private NetworkLayer layer;
+	private OsmDataLayer layer;
 	private MATSimTableModel tableModel;
 	private JButton networkAttributes = new JButton(new ImageProvider(
 			"dialogs", "edit").setWidth(16).get());
 	private List<FileExporter> exporterCopy = new ArrayList<FileExporter>();
+	private Network currentNetwork;
+	private Map<Way, List<Link>> way2Links;
 
 	public MATSimToggleDialog() {
 		super("Links/Nodes", "logo.png", "Links/Nodes", null, 150, true,
@@ -100,45 +103,55 @@ public class MATSimToggleDialog extends ToggleDialog implements
 					}
 				}
 				dlg.dispose();
-
 			}
 		});
 		this.titleBar.add(networkAttributes);
 	}
 
-	public void notifyDataChanged(NetworkLayer layer) {
-		setTitle(tr("Links: {0} / Nodes: {1}", layer.getMatsimNetwork()
-				.getLinks().size(), layer.getMatsimNetwork().getNodes().size()));
+	public void notifyDataChanged(Network network) {
+		setTitle(tr("Links: {0} / Nodes: {1}", network.getLinks().size(),
+				network.getNodes().size()));
 		tableModel.networkChanged();
 	}
 
 	@Override
 	public void activeLayerChange(Layer oldLayer, Layer newLayer) {
-		if (newLayer instanceof NetworkLayer) {
-			layer = (NetworkLayer) newLayer;
-			tableModel = new MATSimTableModel(layer.getMatsimNetwork());
-			table.setModel(tableModel);
-
-			notifyDataChanged(layer);
-			this.networkAttributes.setEnabled(true);
-			if (!(oldLayer instanceof NetworkLayer)) {
+		if (newLayer instanceof OsmDataLayer) {
+			if (newLayer instanceof NetworkLayer) {
+				currentNetwork = ((NetworkLayer) newLayer).getMatsimNetwork();
+				way2Links = ((NetworkLayer) newLayer).getWay2Links();
 				ExtensionFileFilter.exporters.clear();
 				ExtensionFileFilter.exporters.add(0,
 						new MATSimNetworkFileExporter());
+			} else {
+				way2Links = new HashMap<Way, List<Link>>();
+				currentNetwork = NetworkImpl.createNetwork();
+				new Converter(((OsmDataLayer) newLayer).data, currentNetwork,
+						way2Links).convert();
+				if (oldLayer instanceof NetworkLayer) {
+					ExtensionFileFilter.exporters.clear();
+					ExtensionFileFilter.exporters.addAll(this.exporterCopy);
+				}
 			}
-			networkAttributes.setEnabled(true);
-			checkInternalIdColumn();
+			if (currentNetwork != null) {
+				tableModel = new MATSimTableModel(currentNetwork);
+				table.setModel(tableModel);
+				notifyDataChanged(currentNetwork);
+				this.networkAttributes.setEnabled(true);
+				this.layer = (OsmDataLayer) newLayer;
+				checkInternalIdColumn();
+			} else {
+				table.setModel(new DefaultTableModel());
+				setTitle(tr("Links/Nodes"));
+				networkAttributes.setEnabled(false);
+				this.layer = null;
+			}
+
 		} else {
-			if (oldLayer instanceof NetworkLayer) {
-				ExtensionFileFilter.exporters.clear();
-				ExtensionFileFilter.exporters.addAll(this.exporterCopy);
-			}
 			table.setModel(new DefaultTableModel());
 			setTitle(tr("Links/Nodes"));
-			layer = null;
 			networkAttributes.setEnabled(false);
 		}
-
 	}
 
 	@Override
@@ -252,22 +265,20 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		@Override
 		public void selectionChanged(
 				Collection<? extends OsmPrimitive> newSelection) {
-			if (Main.main.getActiveLayer() instanceof NetworkLayer) {
-				this.links = new HashMap<Integer, Id>();
-				int i = 0;
-				for (OsmPrimitive primitive : newSelection) {
-					if (primitive instanceof Way) {
-						if (layer.getWay2Links().containsKey(primitive)) {
-							for (Link link : layer.getWay2Links()
-									.get(primitive)) {
-								links.put(i, link.getId());
-								i++;
-							}
+			this.links = new HashMap<Integer, Id>();
+			int i = 0;
+			for (OsmPrimitive primitive : newSelection) {
+				if (primitive instanceof Way) {
+					if (way2Links.containsKey(primitive)) {
+						for (Link link : way2Links.get(primitive)) {
+							links.put(i, link.getId());
+							i++;
 						}
 					}
 				}
-				fireTableDataChanged();
 			}
+			fireTableDataChanged();
+
 		}
 
 		@Override
@@ -334,7 +345,6 @@ public class MATSimToggleDialog extends ToggleDialog implements
 
 	@Override
 	public void layerAdded(Layer newLayer) {
-
 	}
 
 	@Override

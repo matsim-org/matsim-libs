@@ -36,7 +36,7 @@ import org.xml.sax.SAXException;
  */
 public class MATSimPlugin extends Plugin implements PreferenceChangedListener {
 	private MATSimAction MATSimAction;
-	protected static MATSimToggleDialog_2 toggleDialog;
+	protected static MATSimToggleDialog toggleDialog;
 	private static boolean matsimRenderer = Main.pref.getBoolean(
 			"matsim_renderer", false);
 
@@ -107,7 +107,7 @@ public class MATSimPlugin extends Plugin implements PreferenceChangedListener {
 	@Override
 	public void mapFrameInitialized(MapFrame oldFrame, MapFrame newFrame) {
 		if (oldFrame == null && newFrame != null) { // map frame added
-			toggleDialog = new MATSimToggleDialog_2();
+			toggleDialog = new MATSimToggleDialog();
 			Main.map.addToggleDialog(toggleDialog);
 			MapView.addLayerChangeListener(toggleDialog);
 		}

@@ -13,7 +13,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.matsim.contrib.josm.OsmConvertDefaults.OsmHighwayDefaults;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -31,6 +30,7 @@ import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.INode;
 import org.openstreetmap.josm.data.osm.IWay;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
+import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Way;
 
 /**
@@ -66,17 +66,28 @@ public class Converter implements PreferenceChangedListener {
 
 	private DataSet dataSet;
 
+	private Map<Way, List<Link>> way2Links;
+
 	public Converter(DataSet dataSet, Network network, OsmFilter filter) {
 		this.dataSet = dataSet;
 		this.network = network;
 		this.highwayDefaults = OsmConvertDefaults.getDefaults();
 		this.hierarchyLayers.add(filter);
+		this.way2Links = new HashMap<Way, List<Link>>();
 	}
 
+	public Converter(DataSet dataSet, Network network, Map<Way, List<Link>> way2Links) {
+		this.dataSet = dataSet;
+		this.network = network;
+		this.highwayDefaults = OsmConvertDefaults.getDefaults();
+		this.way2Links = way2Links;
+	}
+	
 	public Converter(DataSet dataSet, Network network) {
 		this.dataSet = dataSet;
 		this.network = network;
 		this.highwayDefaults = OsmConvertDefaults.getDefaults();
+		this.way2Links = new HashMap<Way, List<Link>>();
 	}
 
 	/**
@@ -357,6 +368,8 @@ public class Converter implements PreferenceChangedListener {
 		if (this.scaleMaxSpeed) {
 			freespeed = freespeed * freespeedFactor;
 		}
+		
+		List<Link> links = new ArrayList<Link>();
 
 		// only create link, if both nodes were found, node could be null, since
 		// nodes outside a layer were dropped
@@ -378,6 +391,7 @@ public class Converter implements PreferenceChangedListener {
 					((LinkImpl) l).setOrigId(origId);
 				}
 				network.addLink(l);
+				links.add(l);
 				this.id++;
 			}
 			if (!oneway) {
@@ -392,8 +406,15 @@ public class Converter implements PreferenceChangedListener {
 					((LinkImpl) l).setOrigId(origId);
 				}
 				network.addLink(l);
+				links.add(l);
 				this.id++;
 			}
+		}
+		Way osmWay = (Way) dataSet.getPrimitiveById(way.id, OsmPrimitiveType.WAY);
+		if(!way2Links.containsKey(osmWay)){
+			way2Links.put(osmWay, links);
+		} else {
+			way2Links.get(osmWay).addAll(links);
 		}
 	}
 
