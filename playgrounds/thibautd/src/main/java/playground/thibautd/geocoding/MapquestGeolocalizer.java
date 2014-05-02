@@ -44,7 +44,21 @@ public class MapquestGeolocalizer implements Geolocalizer<MapquestResult> {
 
 	@Override
 	public MapquestResult getLocation( final Address address ) {
-		final MapquestResult result = new MapquestResult( getJSONMapquestLocation( address ) );
+		MapquestResult result = null;
+		try {
+			result = new MapquestResult( getJSONMapquestLocation( address ) );
+		}
+		catch (Exception e) {
+			log.warn( "got exception for address "+address , e );
+			log.warn( "trying again in 2 seconds." );
+			try {
+				Thread.sleep( 2000 );
+			}
+			catch (InterruptedException ie) {
+				throw new RuntimeException( ie );
+			}
+			result = new MapquestResult( getJSONMapquestLocation( address ) );
+		}
 
 		switch ( result.getMapquestStatus() ) {
 			case OK:
@@ -66,7 +80,12 @@ public class MapquestGeolocalizer implements Geolocalizer<MapquestResult> {
 				"format=json" );
 
 		if ( log.isTraceEnabled() ) log.trace( "send request "+request.toString() );
-		return GeolocalizingAPIsUtils.toJSON( request );
+		try {
+			return GeolocalizingAPIsUtils.toJSON( request );
+		}
+		catch (Exception e) {
+			throw new RuntimeException( "problem with request "+request , e);
+		}
 	}
 }
 
