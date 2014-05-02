@@ -80,12 +80,17 @@ public class FilterDoublonsFromCsv {
 		while ( true ) {
 			final String answer = s.next();
 			if ( answer.equals( "r" ) ) return "";
-			final int i = Integer.valueOf( answer );
 			try {
-				return linesOfId.get( i );
+				final int i = Integer.valueOf( answer );
+				try {
+					return linesOfId.get( i );
+				}
+				catch (IndexOutOfBoundsException e) {
+					System.err.println( "wrong index "+i );
+				}
 			}
-			catch (IndexOutOfBoundsException e) {
-				System.err.println( "wrong index "+i );
+			catch (Exception e) {
+				System.err.println( "error while reading input. try again" );
 			}
 		}
 	}
