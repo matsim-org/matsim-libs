@@ -29,6 +29,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
@@ -73,7 +74,10 @@ public class JointQSimFactory implements MobsimFactory {
 		qSim.addMobsimEngine( activityEngine );
 		qSim.addActivityHandler( activityEngine );
 
-		final QNetsimEngineFactory netsimEngFactory = new DefaultQNetsimEngineFactory();
+		final QNetsimEngineFactory netsimEngFactory =
+				conf.getNumberOfThreads() > 1 ?
+					new ParallelQNetsimEngineFactory() :
+					new DefaultQNetsimEngineFactory();
 		final QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine( qSim );
 		qSim.addMobsimEngine( netsimEngine );
 		// DO NOT ADD DEPARTURE HANDLER: it is done by the joint departure handler
