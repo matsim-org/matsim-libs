@@ -42,15 +42,37 @@ public class EvaluationContainer {
 	private Random random;
 
 	private LinkedList<ParkingSearchStrategy> allStrategies;
+	private LinkedListValueHashMap<String, ParkingSearchStrategy> strategiesSortedByGroupName;
+	private String[] groupNames;
+	private int currentGroupIndex=0;
 
 	public EvaluationContainer(LinkedList<ParkingSearchStrategy> allStrategies) {
 		this.allStrategies = allStrategies;
 		random = RandomNumbers.getGlobalbRandom();
 		setEvaluations(new LinkedList<StrategyEvaluation>());
-		createAndStorePermutation(allStrategies);
+		//createAndStorePermutation(allStrategies);
+		initStrategyGroups();
+		addRandomPlanFromCurrentGroupAndSelectForExecution();
 	}
 
-	public void createAndStorePermutation(LinkedList<ParkingSearchStrategy> allStrategies) {
+	private void initStrategyGroups() {
+		strategiesSortedByGroupName=new LinkedListValueHashMap<String, ParkingSearchStrategy>();
+		for (ParkingSearchStrategy se:allStrategies){
+			strategiesSortedByGroupName.put(se.getGroupName(), se);
+		}
+		groupNames=new String[strategiesSortedByGroupName.getKeySet().size()];
+		
+		// group names are permutated
+		ArrayList<String> allGroupNames = new ArrayList<String>(strategiesSortedByGroupName.getKeySet());
+		int i=0;
+		while (allGroupNames.size() != 0) {
+			int randomIndex = random.nextInt(allGroupNames.size());
+			groupNames[i]=allGroupNames.remove(randomIndex);
+			i++;
+		}
+	}
+
+	public void createAndStorePermutation_depracated(LinkedList<ParkingSearchStrategy> allStrategies) {
 		ArrayList<ParkingSearchStrategy> strategies = new ArrayList<ParkingSearchStrategy>(allStrategies);
 
 		while (strategies.size() != 0) {
@@ -141,9 +163,51 @@ public class EvaluationContainer {
 		}
 	}
 
-	public void trimStrategySet(int maxNumberOfStrategies) {
-		while (getEvaluations().size() > maxNumberOfStrategies) {
-			dropWostStrategy();
+	
+	
+	public void trimStrategySet(int maxNumberOfStrategies, boolean keepAllGroups) {
+		if (keepAllGroups){
+			//1.) identify multiple strategies in same group
+			// if there is none, break loop
+			
+			
+			//2.) worst score strategy should be dropped, where multiple groups exist
+			while (getEvaluations().size() > maxNumberOfStrategies){
+				LinkedListValueHashMap<String, StrategyEvaluation> evaluationHashMap=new LinkedListValueHashMap<String, StrategyEvaluation>();
+				
+				for (StrategyEvaluation se: getEvaluations()){
+					evaluationHashMap.put(se.strategy.getGroupName(), se);
+				}
+				
+				boolean groupWithMultipleElementsExists=false;
+				
+				
+				for (String groupName:evaluationHashMap.getKeySet()){
+					if (evaluationHashMap.get(groupName).size()>1){
+						groupWithMultipleElementsExists=true;
+						break;
+					}
+				}
+				
+				if (groupWithMultipleElementsExists){
+					LinkedList<StrategyEvaluation> multipleStrategies=new LinkedList<StrategyEvaluation>();
+					for (String groupName:evaluationHashMap.getKeySet()){
+						if (evaluationHashMap.get(groupName).size()>1){
+							multipleStrategies.addAll(evaluationHashMap.get(groupName));
+						}
+					}
+					
+					StrategyEvaluation worstStrategy = getWorstStrategy(multipleStrategies);
+					getEvaluations().remove(worstStrategy);
+				} else {
+					DebugLib.stopSystemAndReportInconsistency("probably memory size smaller than number of groups");
+					//dropWostStrategy();
+				}
+			}
+		} else {
+			while (getEvaluations().size() > maxNumberOfStrategies) {
+				dropWostStrategy();
+			}
 		}
 	}
 
@@ -280,7 +344,7 @@ public class EvaluationContainer {
 		return allStrategies.size()>evaluations.size();
 	}
 
-	public void addRandomPlanAndSelectForExecution() {
+	public void addRandomPlanAndSelectForExecution_deprecated() {
 		int randomIndex = random.nextInt(allStrategies.size());
 		ParkingSearchStrategy newParkingStrategy = allStrategies.get(randomIndex);
 		
@@ -291,6 +355,22 @@ public class EvaluationContainer {
 		
 		evaluations.addFirst(new StrategyEvaluation(newParkingStrategy));
 	}
+	
+	public void addRandomPlanFromCurrentGroupAndSelectForExecution() {
+		LinkedList<ParkingSearchStrategy> currentGroupStrategies = strategiesSortedByGroupName.get(groupNames[currentGroupIndex++ % groupNames.length]);
+		int randomIndex = random.nextInt(currentGroupStrategies.size());
+		ParkingSearchStrategy newParkingStrategy = currentGroupStrategies.get(randomIndex);
+		
+		while (strategyEvaluationExistsAlready(newParkingStrategy)){
+			randomIndex = random.nextInt(currentGroupStrategies.size());
+			newParkingStrategy = currentGroupStrategies.get(randomIndex);
+		}
+		
+		evaluations.addFirst(new StrategyEvaluation(newParkingStrategy));
+	}
+	
+	
+	
 
 	private boolean strategyEvaluationExistsAlready(ParkingSearchStrategy newParkingStrategy) {
 		for (StrategyEvaluation se : getEvaluations()) {

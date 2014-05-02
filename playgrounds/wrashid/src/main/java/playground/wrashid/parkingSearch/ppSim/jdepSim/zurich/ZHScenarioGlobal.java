@@ -21,6 +21,7 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim.zurich;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -105,8 +106,8 @@ public class ZHScenarioGlobal {
 		printFilteredParkingStatsParkingType("publicPOutsideCityZH");
 		printFilteredParkingStatsParkingType("backupParking");
 
-		for (ParkingSearchStrategy strategy : ParkingStrategyManager.allStrategies) {
-			printParkingStraregyStats(strategy.getName());
+		for (String groupNames : getUniqueGroupNames()) {
+			printParkingStraregyStats(groupNames);
 		}
 
 		if (writeOutputInCurrentIteration()) {
@@ -114,6 +115,14 @@ public class ZHScenarioGlobal {
 			ComparisonGarageCounts.logOutput(parkingEventDetails, getItersFolderPath() + iteration + ".parkingCountsComparison");
 		}
 		ComparisonGarageCounts.logRelativeError(parkingEventDetails, outputFolder  + "parkingCountsComparison-relativeError.png");
+	}
+	
+	private static HashSet<String> getUniqueGroupNames(){
+		HashSet<String> groupNames=new HashSet<String>();
+		for (ParkingSearchStrategy strategy : ParkingStrategyManager.allStrategies) {
+			groupNames.add(strategy.getGroupName());
+		}
+		return groupNames;
 	}
 
 	private static void writeAllParkingEventsToFile() {
@@ -128,17 +137,17 @@ public class ZHScenarioGlobal {
 		GeneralLib.writeList(list, getItersFolderPath() + iteration + ".parkingEvents.txt.gz");
 	}
 
-	private static void printParkingStraregyStats(String parkingStrategyName) {
+	private static void printParkingStraregyStats(String groupName) {
 		double averageParkingDuration = 0;
 		double averageSearchDuration = 0;
 		double averageWalkDuration = 0;
 		double averageWalkDistance = 0;
 
-		System.out.println("stats for parking strategy: " + parkingStrategyName);
+		System.out.println("stats for parking strategy group: " + groupName);
 
 		int numberOfParkingOperations = 0;
 		for (ParkingEventDetails ped : parkingEventDetails) {
-			if (ped.parkingStrategy.getName().equalsIgnoreCase(parkingStrategyName)) {
+			if (ped.parkingStrategy.getGroupName().equalsIgnoreCase(groupName)) {
 				averageParkingDuration += ped.parkingActivityAttributes.getParkingDuration();
 				averageSearchDuration += ped.parkingActivityAttributes.getParkingSearchDuration();
 				averageWalkDuration += ped.parkingActivityAttributes.getToActWalkDuration();

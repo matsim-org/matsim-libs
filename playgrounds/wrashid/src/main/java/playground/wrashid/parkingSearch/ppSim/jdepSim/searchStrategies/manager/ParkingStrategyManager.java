@@ -96,8 +96,16 @@ public class ParkingStrategyManager {
 	}
 
 	private void handleMATSimApproach(EvaluationContainer evaluationContainer) {
+		boolean preserveAllGroups;
+		if (ZHScenarioGlobal
+				.loadBooleanParam("convergance.useMATSimLikeConvergence.preserveAllGroups")){
+			preserveAllGroups=true;
+		} else {
+			preserveAllGroups=false;
+		}
+		
 		evaluationContainer.trimStrategySet(ZHScenarioGlobal
-				.loadIntParam("convergance.useMATSimLikeConvergence.maxNumberOfPlansInMemory"));
+				.loadIntParam("convergance.useMATSimLikeConvergence.maxNumberOfPlansInMemory"),preserveAllGroups);
 
 		
 		DebugLib.emptyFunctionForSettingBreakPoint();
@@ -139,10 +147,10 @@ public class ParkingStrategyManager {
 				if (evaluationContainer.allStrategiesHaveBeenExecutedOnce()) {
 					evaluationContainer.selectNextStrategyAccordingToMNLExp();
 				} else {
-					evaluationContainer.selectStrategyNotExecutedTillNow();
+					evaluationContainer.addRandomPlanFromCurrentGroupAndSelectForExecution();
 				}
 			} else {
-				evaluationContainer.addRandomPlanAndSelectForExecution();
+				evaluationContainer.addRandomPlanFromCurrentGroupAndSelectForExecution();
 			}
 		}
 		
@@ -177,7 +185,7 @@ public class ParkingStrategyManager {
 		if (ZHScenarioGlobal.loadStringParam("convergance.dropStrategy").equalsIgnoreCase("dropAllOnce")) {
 			if (ZHScenarioGlobal.loadIntParam("convergance.dropAllOnce.atIteration") == ZHScenarioGlobal.iteration) {
 				evaluationContainer
-						.trimStrategySet(ZHScenarioGlobal.loadIntParam("convergance.dropStrategy.minNumberOfStrategies"));
+						.trimStrategySet(ZHScenarioGlobal.loadIntParam("convergance.dropStrategy.minNumberOfStrategies"), false);
 			}
 		} else if (ZHScenarioGlobal.loadStringParam("convergance.dropStrategy").equalsIgnoreCase("dropOneByOne")) {
 			if (evaluationContainer.getNumberOfStrategies() > ZHScenarioGlobal
