@@ -163,7 +163,7 @@ public class MapquestResult implements GeolocalizationResult {
 
 		public String getGeocodeQualityCode() {
 			// see http://open.mapquestapi.com/geocoding/geocodequality.html
-			return (String) getJSONResults().get( "geocodeQualityCode" );
+			return ""+getJSONResults().get( "geocodeQualityCode" );
 		}
 
 		private JSONObject getJSONResults() {
