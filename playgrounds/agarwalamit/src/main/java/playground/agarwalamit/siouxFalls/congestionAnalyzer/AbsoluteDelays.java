@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.siouxFalls.writeData;
+package playground.agarwalamit.siouxFalls.congestionAnalyzer;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

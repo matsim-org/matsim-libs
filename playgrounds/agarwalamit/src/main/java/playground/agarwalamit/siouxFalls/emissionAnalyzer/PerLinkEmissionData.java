@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.siouxFalls.writeData;
+package playground.agarwalamit.siouxFalls.emissionAnalyzer;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -36,8 +36,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.siouxFalls.EmissionLinkAnalyzer;
-import playground.agarwalamit.siouxFalls.EmissionUtilsExtended;
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;
 import playground.vsp.emissions.utils.EmissionUtils;

@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.siouxFalls.writeData;
+package playground.agarwalamit.siouxFalls.congestionAnalyzer;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -31,8 +31,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-
-import playground.agarwalamit.siouxFalls.CongestionLinkAnalyzer;
 
 /**
  * @author amit
