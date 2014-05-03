@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 
-import org.jfree.data.category.CategoryDataset;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
@@ -34,7 +33,7 @@ import playground.vsp.emissions.types.WarmPollutant;
  */
 	public class AbsoluteAndChangeInEmissions {
 
-	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/output/";
+	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/";
 	
 	public static void main(String[] args) {
 
@@ -43,10 +42,10 @@ import playground.vsp.emissions.types.WarmPollutant;
 		
 		
 		
-		SortedMap<String, Double> emissions1 = calculateTotalEmissions(clusterPathDesktop+"/run5/"+eventFileLocation);
-		SortedMap<String, Double> emissions2 = calculateTotalEmissions(clusterPathDesktop+"/run6/"+eventFileLocation);
-		SortedMap<String, Double> emissions3 = calculateTotalEmissions(clusterPathDesktop+"/run7/"+eventFileLocation);
-		SortedMap<String, Double> emissions4 = calculateTotalEmissions(clusterPathDesktop+"/run8/"+eventFileLocation);
+		SortedMap<String, Double> emissions1 = calculateTotalEmissions(clusterPathDesktop+"/run105/"+eventFileLocation);
+		SortedMap<String, Double> emissions2 = calculateTotalEmissions(clusterPathDesktop+"/run106/"+eventFileLocation);
+		SortedMap<String, Double> emissions3 = calculateTotalEmissions(clusterPathDesktop+"/run107/"+eventFileLocation);
+		SortedMap<String, Double> emissions4 = calculateTotalEmissions(clusterPathDesktop+"/run108/"+eventFileLocation);
 
 		String [] pollutants =  emissions1.keySet().toArray(new String [0]);
 

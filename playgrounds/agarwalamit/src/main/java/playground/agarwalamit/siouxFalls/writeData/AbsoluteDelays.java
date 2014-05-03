@@ -38,13 +38,11 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
  */
 public class AbsoluteDelays {
 
-	
-//	static String configFile = "./output/run0/output_config.xml.gz";
 	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/";
-	private static String [] runNumber =  {"run5","run6","run7","run8"};
+	private static String [] runNumber =  {"run101","run102","run103","run104"};
 	public static void main(String[] args) {
 		
-		BufferedWriter writer =IOUtils.getBufferedWriter(clusterPathDesktop+"/output/analysis/r/rAbsoluteDelays.txt");
+		BufferedWriter writer =IOUtils.getBufferedWriter(clusterPathDesktop+"/outputMC/analysis/r/rAbsoluteDelays.txt");
 		
 		double [] delays = new double [runNumber.length];
 		
@@ -52,26 +50,9 @@ public class AbsoluteDelays {
 			delays[i] = totalDelayInHoursFromEventsFile(runNumber[i]);
 		}
 		
-//		ConstructBarChart barChart = new ConstructBarChart();
-//		String  legendKey = "% reduction in Delay w.r.t. base case";
-//		String [] xLabel = {"only Emissions", "only Congestion", "Both"};
-		double [] yValue = {getRelativeChange(delays[0], delays[1]),
-				getRelativeChange(delays[0], delays[2]), 
-				getRelativeChange(delays[0], delays[3])};
-//		CategoryDataset dataset = barChart.createSingleBarDataSet(yValue, legendKey, xLabel);
-//		barChart.createBarChart("% reduction in total Delay", "Internalization", "% reduction in total Delay", dataset);
-//		barChart.saveAsPng(clusterPathDesktop+"/output/analysis/r/javaChangeInDelay.png", 600, 400);
-		
 		try {
-//			writer.write("Total Delays in hours \n");
-			writer.write("baseCase \t onlyEmissions \t onlyCongestion \t both \n");
+			writer.write("BAU \t EI \t CI \t ECI \n");
 			writer.write(delays[0]+"\t"+delays[1]+"\t"+delays[2]+"\t"+delays[3]+"\n");
-//			writer.write("% reduction in total Delay w.r.t. base case");
-//			writer.write("only emissions \t only congestion \t both \n");
-			for(int i=0;i<yValue.length;i++){
-//				writer.write(yValue[i]+"\t");
-			}
-//			writer.write("\n");
 			writer.close();
 		} catch (IOException e) {
 			throw new RuntimeException("Data is not written into File. Reason : "+e);
@@ -87,22 +68,16 @@ public class AbsoluteDelays {
 		eventManager.addHandler(congestionHandlerImplV3);
 
 		MatsimEventsReader eventsReader = new MatsimEventsReader(eventManager);
-		String inputEventsFile = clusterPathDesktop+"/output/"+runNumber+"/ITERS/it.100/100.events.xml.gz";
+		String inputEventsFile = clusterPathDesktop+"/outputMC/"+runNumber+"/ITERS/it.100/100.events.xml.gz";
 		eventsReader.readFile(inputEventsFile);
 
 		return congestionHandlerImplV3.getTotalDelay()/3600;
 	}
 	
 	private static ScenarioImpl loadScenario(String runNumber) {
-//		String configFile = clusterPathDesktop+"/output/"+runNumber+"/output_config.xml.gz";
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(clusterPathDesktop+"/input/SiouxFalls_networkWithRoadType.xml.gz");
-//		config.plans().setInputFile(clusterPathDesktop+"/input/SiouxFalls_population_probably_v3.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		return (ScenarioImpl) scenario;
-	}
-	
-	private static double getRelativeChange (double baseValue, double value) {
-		return ((baseValue - value)*100)/baseValue;
 	}
 }

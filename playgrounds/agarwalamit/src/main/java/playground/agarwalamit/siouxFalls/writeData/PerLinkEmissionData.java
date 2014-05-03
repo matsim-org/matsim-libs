@@ -48,7 +48,7 @@ import playground.vsp.emissions.utils.EmissionUtils;
  */
 public class PerLinkEmissionData {
 	private Logger logger = Logger.getLogger(PerLinkEmissionData.class);
-	private static String outputDir = "/Users/aagarwal/Desktop/ils/agarwal/siouxFalls/output/run4/";
+	private static String outputDir = "/Users/aagarwal/Desktop/ils/agarwal/siouxFalls/output/run1/";
 	private static String networkFile =outputDir+ "/output_network.xml.gz";
 	private static String configFile = outputDir+"/output_config.xml";
 	private static String emissionEventFile = outputDir+"/ITERS/it.100/100.emission.events.xml";
