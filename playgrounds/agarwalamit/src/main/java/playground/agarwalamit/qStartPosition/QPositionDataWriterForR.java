@@ -48,7 +48,7 @@ public class QPositionDataWriterForR {
 	
 		private static String configFile ="./output/config.xml";
 		private static String outputDir = "./output/";
-		private static String eventFile = outputDir+"events.xml";
+		private static String eventFile = outputDir+"events2000.xml";
 		private static String networkFile = outputDir+"network.xml";
 
 	private static Scenario scenario;

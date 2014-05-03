@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.siouxFalls.simulationInputs;
+package playground.agarwalamit.siouxFalls.writeData;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
