@@ -97,7 +97,7 @@ public class StrategyStats {
 		int sampleSize = 0;
 
 		for (ParkingEventDetails ped : ZHScenarioGlobal.parkingEventDetails) {
-			if (ped.parkingActivityAttributes.getFacilityId().toString().contains("gp") || ped.parkingActivityAttributes.getFacilityId().toString().contains("stp")) {
+			if (isNonPrivateParkingInCity(ped)) {
 				strategyCount.increment(ped.parkingStrategy);
 				sampleSize++;
 			}
@@ -255,7 +255,7 @@ public class StrategyStats {
 		int sampleSize = 0;
 
 		for (ParkingEventDetails ped : ZHScenarioGlobal.parkingEventDetails) {
-			if (ped.parkingActivityAttributes.getFacilityId().toString().contains("gp") || ped.parkingActivityAttributes.getFacilityId().toString().contains("stp")) {
+			if (isNonPrivateParkingInCity(ped)) {
 				groupCount.increment(ped.parkingStrategy.getGroupName());
 				sampleSize++;
 			}
@@ -269,10 +269,16 @@ public class StrategyStats {
 			if (!groupCount.containsKey(pss.getGroupName())) {
 				groupCount.set(pss.getGroupName(), 0);
 			}
-
-			strategySharesGroupsWithoutPrivateParking.get(pss.getGroupName()).add(100.0 * groupCount.get(pss.getGroupName()) / sampleSize);
 		}
 		
+		for (String groupName:groupCount.getKeySet()){
+			double share = 100.0 * groupCount.get(groupName) / sampleSize;
+			strategySharesGroupsWithoutPrivateParking.get(groupName).add(share);
+		}
+	}
+
+	private boolean isNonPrivateParkingInCity(ParkingEventDetails ped) {
+		return ped.parkingActivityAttributes.getFacilityId().toString().contains("gp") || ped.parkingActivityAttributes.getFacilityId().toString().contains("stp") || ped.parkingActivityAttributes.getFacilityId().toString().contains("illegal");
 	}
 
 	public void writeNonPPGroupSharesToFile() {
