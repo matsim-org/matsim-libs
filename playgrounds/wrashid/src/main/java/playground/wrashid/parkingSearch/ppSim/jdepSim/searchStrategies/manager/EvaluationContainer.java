@@ -361,9 +361,13 @@ public class EvaluationContainer {
 		int randomIndex = random.nextInt(currentGroupStrategies.size());
 		ParkingSearchStrategy newParkingStrategy = currentGroupStrategies.get(randomIndex);
 		
-		while (strategyEvaluationExistsAlready(newParkingStrategy)){
+		// this variable is needed, in order to avoid a potential endless loop
+		int maxAttemptsToGetFreshStrategyForEvaluation=currentGroupStrategies.size()/2;
+		
+		while (strategyEvaluationExistsAlready(newParkingStrategy) && maxAttemptsToGetFreshStrategyForEvaluation>0){
 			randomIndex = random.nextInt(currentGroupStrategies.size());
 			newParkingStrategy = currentGroupStrategies.get(randomIndex);
+			maxAttemptsToGetFreshStrategyForEvaluation--;
 		}
 		
 		evaluations.addFirst(new StrategyEvaluation(newParkingStrategy));
