@@ -44,7 +44,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  * As a sample scenario, one can replace the empty config with a 
  * multi-modal config for the berlin scenario:
  * 
- * Config config = ConfigUtils.loadConfig("../../matsim/src/test/resources/test/scenarios/berlin/config_multimodal.xml", MultiModalConfigGroup.class);
+ * Config config = ConfigUtils.loadConfig("../../matsim/src/test/resources/test/scenarios/berlin/config_multimodal.xml", new MultiModalConfigGroup()));
  * 
  * @author cdobler
  */
@@ -53,7 +53,7 @@ public class Main {
 	public static void main(String[] args) {
 
 		Config config = ConfigUtils.createConfig();
-//		Config config = ConfigUtils.loadConfig("../../matsim/src/test/resources/test/scenarios/berlin/config_multimodal.xml", MultiModalConfigGroup.class);
+//		Config config = ConfigUtils.loadConfig("../../matsim/src/test/resources/test/scenarios/berlin/config_multimodal.xml", new MultiModalConfigGroup());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		PrepareMultiModalScenario.run(scenario);
 		Controler controler = new Controler(scenario);
