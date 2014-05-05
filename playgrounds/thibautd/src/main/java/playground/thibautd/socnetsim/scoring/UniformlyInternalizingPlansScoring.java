@@ -57,10 +57,25 @@ public class UniformlyInternalizingPlansScoring implements ScoringListener, Iter
 	private final EventsManager events;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 
+	private final InternalizationRatioCalculator ratioCalculator;
+
 	public UniformlyInternalizingPlansScoring(
 			final Scenario sc,
 			final EventsManager events,
 			final ScoringFunctionFactory scoringFunctionFactory) {
+		this( new ConfigBasedInternalizationRatio(
+					sc.getConfig() ),
+				sc,
+				events,
+				scoringFunctionFactory );
+	}
+
+	public UniformlyInternalizingPlansScoring(
+			final InternalizationRatioCalculator ratio,
+			final Scenario sc,
+			final EventsManager events,
+			final ScoringFunctionFactory scoringFunctionFactory) {
+		this.ratioCalculator = ratio;
 		this.sc = sc ;
 		this.events = events ;
 		this.scoringFunctionFactory = scoringFunctionFactory ;
@@ -86,7 +101,6 @@ public class UniformlyInternalizingPlansScoring implements ScoringListener, Iter
 		// first need to let the scores unmodified, to "internalize" "raw" scores
 		final Map<Id, Double> internalizedScores = new HashMap<Id, Double>();
 
-		final double ratio = getInternalizationRatio( sc.getConfig() );
 		for ( Person ego : sc.getPopulation().getPersons().values() ) {
 			final Collection<? extends Person> alters =
 				MapUtils.get(
@@ -102,6 +116,7 @@ public class UniformlyInternalizingPlansScoring implements ScoringListener, Iter
 			}
 
 			for ( Person alter : alters ) {
+				final double ratio = ratioCalculator.getInternalizationRatio( ego.getId() , alter.getId() );
 				internalizedScore += ratio * getScore( alter );
 			}
 
@@ -126,43 +141,6 @@ public class UniformlyInternalizingPlansScoring implements ScoringListener, Iter
 		if ( log.isTraceEnabled() ) log.trace( "internalizing alter's scores: DONE" );
 	}
 
-	private static double getInternalizationRatio(final Config config) {
-		final GroupReplanningConfigGroup group = (GroupReplanningConfigGroup)
-			config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
-
-		if ( group == null ) {
-			log.warn( "no "+GroupReplanningConfigGroup.GROUP_NAME+" module found in config" );
-			log.warn( "using null internalization ratio as a consequence" );
-			return 0;
-		}
-
-		assert group != null;
-		final double ratio = group.getInternalizationRatio();
-
-		final double epsilon = 1E-9;
-
-		if ( ratio < -epsilon ) {
-			log.warn( "internalization ratio "+ratio+" is negative!" );
-			log.warn( "agents will try to DECREASE the score of their alters!" );
-		}
-
-		if ( Math.abs( ratio ) < epsilon ) {
-			log.info( "null internalisation ratio: egoistic agents" );
-		}
-
-		if ( Math.abs( ratio - 1 ) < epsilon ) {
-			log.info( "unit internalisation ratio: agents try to maximize group average utility" );
-		}
-
-		if ( ratio > 1 + epsilon ) {
-			log.warn( "internalization ratio "+ratio+" is greater than one!" );
-			log.warn( "agents will value the utility of alters higher than their own!" );
-		}
-
-		log.info( "setting internalization ratio to "+ratio );
-		return ratio;
-	}
-
 	private static void setScore(
 			final Person p,
 			final Double score) {
@@ -184,6 +162,60 @@ public class UniformlyInternalizingPlansScoring implements ScoringListener, Iter
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		this.events.removeHandler(this.eventsToScore);
+	}
+
+	public static interface InternalizationRatioCalculator {
+		public double getInternalizationRatio( Id ego , Id alter );
+	}
+
+	public static class ConfigBasedInternalizationRatio implements  InternalizationRatioCalculator {
+		private final double ratio;
+
+		public ConfigBasedInternalizationRatio(final Config config) {
+			this.ratio = calc( config );
+		}
+
+		private static double calc( final Config config ) {
+			final GroupReplanningConfigGroup group = (GroupReplanningConfigGroup)
+				config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
+
+			if ( group == null ) {
+				log.warn( "no "+GroupReplanningConfigGroup.GROUP_NAME+" module found in config" );
+				log.warn( "using null internalization ratio as a consequence" );
+				return 0;
+			}
+
+			assert group != null;
+			final double ratio = group.getInternalizationRatio();
+
+			final double epsilon = 1E-9;
+
+			if ( ratio < -epsilon ) {
+				log.warn( "internalization ratio "+ratio+" is negative!" );
+				log.warn( "agents will try to DECREASE the score of their alters!" );
+			}
+
+			if ( Math.abs( ratio ) < epsilon ) {
+				log.info( "null internalisation ratio: egoistic agents" );
+			}
+
+			if ( Math.abs( ratio - 1 ) < epsilon ) {
+				log.info( "unit internalisation ratio: agents try to maximize group average utility" );
+			}
+
+			if ( ratio > 1 + epsilon ) {
+				log.warn( "internalization ratio "+ratio+" is greater than one!" );
+				log.warn( "agents will value the utility of alters higher than their own!" );
+			}
+
+			log.info( "setting internalization ratio to "+ratio );
+			return ratio;
+		}
+
+		@Override
+		public double getInternalizationRatio(final Id ego, final Id alter) {
+			return ratio;
+		}
 	}
 }
 
