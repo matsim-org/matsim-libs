@@ -37,9 +37,20 @@ public class SocialNetworkReader extends MatsimXmlParser {
 	private boolean isReflective = false;
 	private final IdFactory idFactory;
 
+	private final String elementName;
+
 	public SocialNetworkReader(final Scenario scenario) {
 		this.scenario = scenario;
 		this.idFactory = scenario;
+		this.elementName = SocialNetwork.ELEMENT_NAME;
+	}
+
+	public SocialNetworkReader(
+			final String elementName,
+			final Scenario scenario) {
+		this.scenario = scenario;
+		this.idFactory = scenario;
+		this.elementName = elementName;
 	}
 
 	@Override
@@ -50,7 +61,7 @@ public class SocialNetworkReader extends MatsimXmlParser {
 		if ( name.equals( SocialNetworkWriter.ROOT_TAG ) ) {
 			this.isReflective = Boolean.parseBoolean( atts.getValue( SocialNetworkWriter.REFLECTIVE_ATT ) );
 			this.socialNetwork = new SocialNetworkImpl( this.isReflective );
-			this.scenario.addScenarioElement( SocialNetwork.ELEMENT_NAME , this.socialNetwork );
+			this.scenario.addScenarioElement( elementName , this.socialNetwork );
 		}
 		else if ( name.equals( SocialNetworkWriter.EGO_TAG ) ) {
 			final Id ego = idFactory.createId(
