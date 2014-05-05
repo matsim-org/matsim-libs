@@ -35,7 +35,6 @@ import playground.thibautd.socnetsim.controller.listeners.DumpJointDataAtEnd;
 import playground.thibautd.socnetsim.controller.listeners.JointPlansDumping;
 import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.scoring.UniformlyInternalizingPlansScoring;
 
 /**
  * A simple controler for the process with joint plans.
@@ -91,10 +90,7 @@ public final class ImmutableJointController extends AbstractController {
 		this.addControlerListener(dumpDataAtEnd);
 		
 		this.addControlerListener(
-				new UniformlyInternalizingPlansScoring(
-					registry.getScenario(),
-					registry.getEvents(),
-					registry.getScoringFunctionFactory()) );
+					registry.getScoringListener() );
 
 		if (replanner == null) throw new NullPointerException();
 		this.addCoreControlerListener( replanner );

@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouter;
@@ -63,6 +64,7 @@ public final class ControllerRegistry {
 	private final PlanLinkIdentifier planLinkIdentifier;
 	private final PlanLinkIdentifier weakPlanLinkIdentifier;
 	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+	private final ControlerListener scoringListener;
 
 	ControllerRegistry(
 			final Scenario scenario,
@@ -79,7 +81,8 @@ public final class ControllerRegistry {
 			final Iterable<GenericStrategyModule<ReplanningGroup>> prepareForSimModules,
 			final PlanLinkIdentifier planLinkIdentifier,
 			final PlanLinkIdentifier weakPlanLinkIdentifier,
-			final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory) {
+			final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory,
+			final ControlerListener scoringListener) {
 		log.debug( "constructing "+getClass().getSimpleName() );
 		log.debug( "scenario = "+scenario );
 		this.scenario = scenario;
@@ -111,6 +114,8 @@ public final class ControllerRegistry {
 		this.weakPlanLinkIdentifier = weakPlanLinkIdentifier;
 		log.debug( "incompatiblePlansIdentifierFactory = "+ incompatiblePlansIdentifierFactory );
 		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+		log.debug( "scoringListener = "+scoringListener  );
+		this.scoringListener = scoringListener;
 		log.debug( "constructing "+getClass().getSimpleName()+"... done" );
 	}
 
@@ -208,6 +213,10 @@ public final class ControllerRegistry {
 
 	public IncompatiblePlansIdentifierFactory getIncompatiblePlansIdentifierFactory() {
 		return this.incompatiblePlansIdentifierFactory;
+	}
+
+	public ControlerListener getScoringListener() {
+		return this.scoringListener;
 	}
 
 	public PlanLinkIdentifier getWeakPlanLinkIdentifier() {

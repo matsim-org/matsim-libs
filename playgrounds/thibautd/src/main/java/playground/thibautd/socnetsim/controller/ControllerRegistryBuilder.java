@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.ReplanningContext;
@@ -70,6 +71,7 @@ import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
+import playground.thibautd.socnetsim.scoring.UniformlyInternalizingPlansScoring;
 import playground.thibautd.socnetsim.utils.ImportedJointRoutesChecker;
 
 /**
@@ -97,6 +99,7 @@ public class ControllerRegistryBuilder {
 	private PlanLinkIdentifier planLinkIdentifier = null;
 	private PlanLinkIdentifier weakPlanLinkIdentifier = null;
 	private IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory = null;
+	private ControlerListener scoringListener;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// contrs
@@ -204,6 +207,13 @@ public class ControllerRegistryBuilder {
 		return this;
 	}
 
+	public ControllerRegistryBuilder withScoringListener(
+			final ControlerListener l) {
+		if ( this.scoringListener != null ) throw new IllegalStateException( "object already set" );
+		this.scoringListener = l;
+		return this;
+	}
+
 	// /////////////////////////////////////////////////////////////////////////
 	// build
 	private boolean wasBuild = false;
@@ -230,7 +240,8 @@ public class ControllerRegistryBuilder {
 			prepareForSimModules,
 			getPlanLinkIdentifier(),
 			getWeakPlanLinkIdentifier(),
-			getIncompatiblePlansIdentifierFactory());
+			getIncompatiblePlansIdentifierFactory(),
+			getScoringListener());
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -379,6 +390,17 @@ public class ControllerRegistryBuilder {
 			incompatiblePlansIdentifierFactory = new EmptyIncompatiblePlansIdentifierFactory();
 		}
 		return incompatiblePlansIdentifierFactory;
+	}
+
+	public ControlerListener getScoringListener() {
+		if ( this.scoringListener == null ) {
+			this.scoringListener =
+				new UniformlyInternalizingPlansScoring(
+					scenario,
+					events,
+					getScoringFunctionFactory() );
+		}
+		return this.scoringListener;
 	}
 
 	private void setDefaults() {
