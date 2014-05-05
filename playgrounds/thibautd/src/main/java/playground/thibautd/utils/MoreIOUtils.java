@@ -46,26 +46,39 @@ public class MoreIOUtils {
 		//no instanciation 
 	}
 
+	public static File checkDirectory(final String outputDir) {
+		final File f = new File( outputDir +"/" );
+
+		if ( f.exists() && f.list().length != 0 ) {
+			throw new IllegalStateException( "directory "+outputDir+" exists and is not empty!" );
+		}
+
+		return f;
+	}
+
+	public static File createDirectory(final String outputDir) {
+		final File f = checkDirectory( outputDir );
+
+		if (!f.exists() && !f.mkdirs()) {
+			throw new UncheckedIOException( "could not create directory "+outputDir );
+		}
+
+		return f;
+	}
+
 	/**
 	 * creates an output directory if it does not exists, and creates a logfile.
 	 */
-	public static void initOut( String outputDir ) {
+	public static void initOut( final String outputDir ) {
 		try {
-			// create directory if does not exist
-			if (!outputDir.endsWith("/")) {
-				outputDir += "/";
-			}
-			File outputDirFile = new File(outputDir);
-			if (!outputDirFile.exists() && !outputDirFile.mkdirs()) {
-				throw new UncheckedIOException( "could not create directory "+outputDir );
-			}
+			createDirectory( outputDir );
 
 			// init logFile
 			CollectLogMessagesAppender appender = new CollectLogMessagesAppender();
 			Logger.getRootLogger().addAppender(appender);
 
 			initOutputDirLogging(
-				outputDir,
+				outputDir+"/",
 				appender.getLogEvents());
 		} catch (IOException e) {
 			// do NOT continue without proper logging!
