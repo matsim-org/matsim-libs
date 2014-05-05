@@ -76,10 +76,11 @@ public class IKGISAnalyzer {
 	// Run2
 //	private final static String runNumber2 = "internalization";
 //	private final static String runDirectory2 = "../../runs-svn/berlin_internalizationCar/output/internalization_2/";
+	
+	// the number of persons a single agent represents
+	final int scalingFactor = 10;
 		
-	private final String shapeFileZones = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/berlin/shapeFiles/Berlin/berlin_grid_2500.shp";
-
-//	final double scalingFactor = 10.;
+	private final String shapeFileZones = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/berlin/shapeFiles/berlin_grid_1000/berlin_grid_1000.shp";
 	
 	private final String outputPath1 = runDirectory1 + "analysis/gridBasedAnalysis/moneyAmounts/";
 //	private String outputPath2 = runDirectory2 + "analysis/gridBasedAnalysis/moneyAmounts/";
@@ -155,16 +156,16 @@ public class IKGISAnalyzer {
 
 	private void analyzeZones(Map<Id, Double> personId2amountSum, Population population, String outputFile) {
 		// home activities
-		Map<Integer,Integer> zoneNr2homeActivities = getZoneNr2activityLocations(homeActivity, population, this.zoneId2geometry);
+		Map<Integer,Integer> zoneNr2homeActivities = getZoneNr2activityLocations(homeActivity, population, this.zoneId2geometry, this.scalingFactor);
 		
 		// work activities
-		Map<Integer,Integer> zoneNr2workActivities = getZoneNr2activityLocations(workActivity, population, this.zoneId2geometry);
+		Map<Integer,Integer> zoneNr2workActivities = getZoneNr2activityLocations(workActivity, population, this.zoneId2geometry, this.scalingFactor);
 
 		// all activities
-		Map<Integer,Integer> zoneNr2activities = getZoneNr2activityLocations(null, population, this.zoneId2geometry);
+		Map<Integer,Integer> zoneNr2activities = getZoneNr2activityLocations(null, population, this.zoneId2geometry, this.scalingFactor);
 		
 		// toll payments mapped back to home location
-		Map<Integer,Double> zoneNr2tollPayments = getZoneNr2tollPayments(population, personId2amountSum, this.zoneId2geometry);
+		Map<Integer,Double> zoneNr2tollPayments = getZoneNr2tollPayments(population, personId2amountSum, this.zoneId2geometry, this.scalingFactor);
 		
 		// toll payments mapped back to home location in relation to home activities
 		Map<Integer,Double> zoneNr2AvgTollPayments = getZoneId2avgToll(zoneNr2tollPayments, zoneNr2homeActivities);
@@ -181,7 +182,7 @@ public class IKGISAnalyzer {
 		return zoneId2avgToll;
 	}
 
-	private Map<Integer, Double> getZoneNr2tollPayments(Population population, Map<Id, Double> personId2amountSum, Map<Integer, Geometry> zoneId2geometry) {
+	private Map<Integer, Double> getZoneNr2tollPayments(Population population, Map<Id, Double> personId2amountSum, Map<Integer, Geometry> zoneId2geometry, int scalingFactor) {
 		Map<Integer, Double> zoneNr2tollPayments = new HashMap<Integer, Double>();	
 		
 		SortedMap<Id,Coord> personId2homeCoord = getPersonId2Coordinates(population, homeActivity);
@@ -194,10 +195,10 @@ public class IKGISAnalyzer {
 					
 					if (p.within(geometry)){
 						if (zoneNr2tollPayments.get(zoneId) == null){
-							zoneNr2tollPayments.put(zoneId, personId2amountSum.get(personId));
+							zoneNr2tollPayments.put(zoneId, personId2amountSum.get(personId) * scalingFactor);
 						} else {
 							double tollPayments = zoneNr2tollPayments.get(zoneId);
-							zoneNr2tollPayments.put(zoneId, tollPayments + personId2amountSum.get(personId));
+							zoneNr2tollPayments.put(zoneId, tollPayments + (personId2amountSum.get(personId) * scalingFactor) );
 						}
 					}
 				}
@@ -209,7 +210,7 @@ public class IKGISAnalyzer {
 		return zoneNr2tollPayments;
 	}
 
-	private Map<Integer, Integer> getZoneNr2activityLocations(String activity, Population population, Map<Integer, Geometry> zoneNr2zoneGeometry) {
+	private Map<Integer, Integer> getZoneNr2activityLocations(String activity, Population population, Map<Integer, Geometry> zoneNr2zoneGeometry, int scalingFactor) {
 		Map<Integer, Integer> zoneNr2activity = new HashMap<Integer, Integer>();	
 
 		SortedMap<Id,Coord> personId2activityCoord = getPersonId2Coordinates(population, activity);
@@ -221,10 +222,10 @@ public class IKGISAnalyzer {
 				
 				if (p.within(geometry)){
 					if (zoneNr2activity.get(nr) == null){
-						zoneNr2activity.put(nr, 1);
+						zoneNr2activity.put(nr, scalingFactor);
 					} else {
 						int activityCounter = zoneNr2activity.get(nr);
-						zoneNr2activity.put(nr, activityCounter + 1);
+						zoneNr2activity.put(nr, activityCounter + scalingFactor);
 					}
 				}
 			}
