@@ -701,12 +701,20 @@ public class RunUtils {
 		return controller;
 	}
 
-	public static Scenario createScenario(final String configFile) {
+	public static Config loadConfig(final String configFile) {
 		final Config config = JointScenarioUtils.createConfig();
 		config.addModule( new ScoringFunctionConfigGroup() );
 		config.addModule( new KtiInputFilesConfigGroup() );
 		new NonFlatConfigReader( config ).parse( configFile );
+		return config;
+	}
 
+	public static Scenario createScenario(final String configFile) {
+		final Config config = loadConfig( configFile );
+		return loadScenario( config );
+	}
+
+	public static Scenario loadScenario(final Config config) {
 		final GroupReplanningConfigGroup weights =  (GroupReplanningConfigGroup)
 			config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );
