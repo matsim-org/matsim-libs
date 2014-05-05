@@ -24,6 +24,7 @@ import org.matsim.core.config.Config;
 
 import playground.thibautd.socnetsim.population.JointPlansConfigGroup;
 import playground.thibautd.utils.ArgParser;
+import playground.thibautd.utils.MoreIOUtils;
 
 /**
  * To just execute a plans file, in case you are so stupid you delete
@@ -47,6 +48,8 @@ public class ExecutePlans {
 		final String folder = argParser.getValue( "-f" );
 		final String output = argParser.getValue( "-o" );
 		final SimulationType simType = argParser.getEnumValue( "-t" , SimulationType.class );
+
+		MoreIOUtils.checkDirectory( output );
 
 		final Config config = RunUtils.loadConfig( folder+"/output_config.xml.gz" );
 
