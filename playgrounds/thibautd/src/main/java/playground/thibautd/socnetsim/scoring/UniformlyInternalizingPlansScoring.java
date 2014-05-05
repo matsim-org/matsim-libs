@@ -53,6 +53,8 @@ public class UniformlyInternalizingPlansScoring implements ScoringListener, Iter
 
 	private EventsToScore eventsToScore;
 
+	private final String socialNetworkName;
+
 	private final Scenario sc;
 	private final EventsManager events;
 	private final ScoringFunctionFactory scoringFunctionFactory;
@@ -75,10 +77,38 @@ public class UniformlyInternalizingPlansScoring implements ScoringListener, Iter
 			final Scenario sc,
 			final EventsManager events,
 			final ScoringFunctionFactory scoringFunctionFactory) {
+		this.socialNetworkName = SocialNetwork.ELEMENT_NAME;
 		this.ratioCalculator = ratio;
 		this.sc = sc ;
 		this.events = events ;
 		this.scoringFunctionFactory = scoringFunctionFactory ;
+	}
+
+	public UniformlyInternalizingPlansScoring(
+			final String socialNetworkName,
+			final Scenario sc,
+			final EventsManager events,
+			final ScoringFunctionFactory scoringFunctionFactory) {
+		this.socialNetworkName = socialNetworkName;
+		this.ratioCalculator = 
+			new ConfigBasedInternalizationRatio(
+					sc.getConfig() );
+		this.sc = sc;
+		this.events = events;
+		this.scoringFunctionFactory = scoringFunctionFactory;
+	}
+
+	public UniformlyInternalizingPlansScoring(
+			final String socialNetworkName,
+			final InternalizationRatioCalculator ratio,
+			final Scenario sc,
+			final EventsManager events,
+			final ScoringFunctionFactory scoringFunctionFactory) {
+		this.socialNetworkName = socialNetworkName;
+		this.ratioCalculator = ratio;
+		this.sc = sc;
+		this.events = events;
+		this.scoringFunctionFactory = scoringFunctionFactory;
 	}
 
 	@Override
@@ -96,7 +126,7 @@ public class UniformlyInternalizingPlansScoring implements ScoringListener, Iter
 	private void internalizeAltersScores() {
 		if ( log.isTraceEnabled() ) log.trace( "internalizing alter's scores" );
 		final SocialNetwork socialNet = (SocialNetwork)
-			sc.getScenarioElement( SocialNetwork.ELEMENT_NAME );
+			sc.getScenarioElement( socialNetworkName );
 
 		// first need to let the scores unmodified, to "internalize" "raw" scores
 		final Map<Id, Double> internalizedScores = new HashMap<Id, Double>();
