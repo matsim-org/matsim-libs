@@ -89,6 +89,7 @@ import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.population.SocialNetwork;
+import playground.thibautd.socnetsim.population.SocialNetworkReader;
 import playground.thibautd.socnetsim.qsim.JointPseudoSimFactory;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
@@ -105,6 +106,7 @@ import playground.thibautd.socnetsim.replanning.selectors.AnnealingCoalitionExpB
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
+import playground.thibautd.socnetsim.scoring.UniformlyInternalizingPlansScoring;
 import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
 import playground.thibautd.socnetsim.sharedvehicles.PlanRouterWithVehicleRessourcesFactory;
 import playground.thibautd.socnetsim.sharedvehicles.PrepareVehicleAllocationForSimAlgorithm;
@@ -513,6 +515,17 @@ public class RunUtils {
 						(KtiLikeScoringConfigGroup) scenario.getConfig().getModule( KtiLikeScoringConfigGroup.GROUP_NAME ),
 						scenario.getConfig().planCalcScore(),
 						scenario) );
+		}
+
+		if ( scoringFunctionConf.getInternalizationNetworkFile() != null ) {
+			final String elementName = "another social network, to use for internalization";
+			new SocialNetworkReader( elementName , scenario ).parse( scoringFunctionConf.getInternalizationNetworkFile() );
+			builder.withScoringListener(
+					new UniformlyInternalizingPlansScoring(
+						elementName,
+						scenario,
+						builder.getEvents(),
+						builder.getScoringFunctionFactory() ) );
 		}
 
 		if ( false && scoringFunctionConf.isUseKtiScoring() && !scenario.getConfig().scenario().isUseTransit() ) {

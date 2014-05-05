@@ -36,6 +36,7 @@ class ScoringFunctionConfigGroup extends ReflectiveModule {
 	private double marginalUtilityOfBeingDriver_h = -3;
 	private double marginalUtilityOfBeingPassenger_h = -3;
 	private String activityTypeForContactInDesires = "leisure";
+	private String internalizationNetworkFile = null;
 
 	static enum TogetherScoringForm {
 		linear,
@@ -181,6 +182,17 @@ class ScoringFunctionConfigGroup extends ReflectiveModule {
 		this.activityTypeForContactInDesires = activityTypeForContactInDesires;
 	}
 	
+	@StringGetter( "internalizationNetworkFile" )
+	public String getInternalizationNetworkFile() {
+		return this.internalizationNetworkFile;
+	}
+
+	@StringSetter( "internalizationNetworkFile" )
+	public void setInternalizationNetworkFile(
+			final String internalizationNetworkFile) {
+		this.internalizationNetworkFile = internalizationNetworkFile;
+	}
+
 	@Override
 	public Map<String, String> getComments() {
 		final Map<String, String> map = super.getComments();

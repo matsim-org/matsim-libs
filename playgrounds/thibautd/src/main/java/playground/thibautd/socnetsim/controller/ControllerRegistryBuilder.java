@@ -403,6 +403,10 @@ public class ControllerRegistryBuilder {
 		return this.scoringListener;
 	}
 
+	public EventsManager getEvents() {
+		return events;
+	}
+
 	private void setDefaults() {
 		// we do this here, as we need configurable objects
 		// but we want it to be executed at the start!
