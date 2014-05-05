@@ -20,19 +20,24 @@
 package playground.thibautd.utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+
 /**
  * @author thibautd
  */
 public class ArgParser {
-	private final Map<String, String> defaultValues = new LinkedHashMap<String, String>();
-	private final Map<String, List<String>> defaultMultipleValues = new LinkedHashMap<String, List<String>>();
-	private final Set<String> switches = new HashSet<String>();
+	private final Switches switchFactory = new Switches();
+	private final Map<Id, String> defaultValues = new LinkedHashMap<Id, String>();
+	private final Map<Id, List<String>> defaultMultipleValues = new LinkedHashMap<Id, List<String>>();
+	private final Set<Id> switches = new HashSet<Id>();
 
 	private final String[] args;
 
@@ -40,24 +45,36 @@ public class ArgParser {
 		this.args = args;
 	}
 
+	public void setDefaultValue( final String longName, final String shortName, final String v ) {
+		final Id id = switchFactory.addSwitch( longName , shortName );
+		final String old = defaultValues.put( id , v );
+		if ( old != null ) throw new IllegalStateException( longName+" "+shortName );
+	}
+
 	public void setDefaultValue( final String name, final String v ) {
-		defaultValues.put( name , v );
+		final Id id = switchFactory.addSwitch( name );
+		final String old = defaultValues.put( id , v );
+		if ( old != null ) throw new IllegalStateException( name );
 	}
 
 	public void setDefaultMultipleValue( final String name, final List<String> v ) {
-		defaultMultipleValues.put( name , v );
+		final Id id = switchFactory.addSwitch( name );
+		final List<String> old = defaultMultipleValues.put( id , v );
+		if ( old != null ) throw new IllegalStateException( name );
 	}
 
-	public void addSwitch( final String name ) {
-		switches.add( name );
+	public void addSwitch( final String... names ) {
+		switches.add( switchFactory.addSwitch( names ) );
 	}
 
 	public String getValue(final String name) {
-		if ( !defaultValues.containsKey( name ) ) throw new IllegalArgumentException( name+" not in "+defaultValues.keySet() );
+		final Id id = switchFactory.getSwitch( name );
+		if ( id.equals( Switches.unknown ) ) throw new IllegalArgumentException( name+" not in "+switchFactory.getNames() );
+
 		for ( int i=0; i < args.length; i++ ) {
-			if ( args[ i ].equals( name ) ) return args[ i + 1 ];
+			if ( switchFactory.getSwitch( args[ i ] ).equals( id ) ) return args[ i + 1 ];
 		}
-		return defaultValues.get( name );
+		return defaultValues.get( id );
 	}
 
 	public double getDoubleValue(final String name) {
@@ -82,24 +99,28 @@ public class ArgParser {
 	}
 
 	public List<String> getValues(final String name) {
-		if ( !defaultMultipleValues.containsKey( name ) ) throw new IllegalArgumentException( name+" not in "+defaultMultipleValues.keySet() );
-
 		final List<String> values = new ArrayList<String>();
 
+		final Id id = switchFactory.getSwitch( name );
+		if ( id.equals( Switches.unknown ) ) throw new IllegalArgumentException( name+" not in "+switchFactory.getNames() );
+
 		for ( int i=0; i < args.length; i++ ) {
-			if ( args[ i ].equals( name ) ) {
+			if ( switchFactory.getSwitch( args[ i ] ).equals( id ) ) {
 				values.add( args[ ++i ] );
 			}
 		}
 
-		return values.isEmpty() ? defaultMultipleValues.get( name ) : values;
+		return values.isEmpty() ? defaultMultipleValues.get( id ) : values;
 	}
 
 	public boolean isSwitched(final String name) {
-		if ( !switches.contains( name ) ) throw new IllegalArgumentException( name+" not in "+switches );
+		final Id id = switchFactory.getSwitch( name );
+		if ( id.equals( Switches.unknown ) ) throw new IllegalArgumentException( name+" not in "+switchFactory.getNames() );
+
 		for ( String a : args ) {
-			if ( a.equals( name ) ) return true;
+			if ( switchFactory.getSwitch( a ).equals( id ) ) return true;
 		}
+
 		return false;
 	}
 
@@ -107,10 +128,13 @@ public class ArgParser {
 		final List<String> list = new ArrayList<String>();
 
 		for ( int i=0; i < args.length; i++ ) {
-			if ( defaultValues.containsKey( args[ i ] ) ) {
+			if ( defaultValues.containsKey( switchFactory.getSwitch( args[ i ] ) ) ) {
 				i++;
 			}
-			else if ( !switches.contains( args[ i ] ) ) {
+			else if ( defaultMultipleValues.containsKey( switchFactory.getSwitch( args[ i ] ) ) ) {
+				i++;
+			}
+			else if ( !switches.contains( switchFactory.getSwitch( args[ i ] ) ) ) {
 				list.add( args[ i ] );
 			}
 		}
@@ -119,3 +143,26 @@ public class ArgParser {
 	}
 }
 
+class Switches {
+	private final Map<String, Id> name2id = new HashMap<String, Id>();
+	public static final Id unknown = new IdImpl( "unknown" );
+	private int c = 0;
+
+	public Id addSwitch( final String... names ) {
+		final Id id = new IdImpl( c++ );
+		for ( String n : names ) {
+			final Id old = name2id.put( n , id );
+			if ( old != null ) throw new IllegalStateException( old.toString() );
+		}
+		return id;
+	}
+
+	public Id getSwitch( final String name ) {
+		final Id id = name2id.get( name );
+		return id != null ? id : unknown;
+	}
+
+	public Set<String> getNames() {
+		return name2id.keySet();
+	}
+}
