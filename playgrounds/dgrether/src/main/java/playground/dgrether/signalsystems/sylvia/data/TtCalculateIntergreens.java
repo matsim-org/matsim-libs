@@ -50,22 +50,11 @@ import playground.dgrether.signalsystems.utils.DgSignalGroupSettingsDataOnsetCom
  * @author tthunig
  * 
  */
+@Deprecated
 public class TtCalculateIntergreens {
 
 	private static final Logger log = Logger
 			.getLogger(TtCalculateIntergreens.class);
-
-	// private Set<Id> signalSystemIds = new HashSet<Id>();
-	//
-	// public DgPreprocessIntergreens(){
-	// // this.signalSystemIds.add(new IdImpl(1));
-	// // this.signalSystemIds.add(new IdImpl(17));
-	// // this.signalSystemIds.add(new IdImpl(18));
-	// // this.signalSystemIds.add(new IdImpl(28));
-	// // this.signalSystemIds.add(new IdImpl(12));
-	// // this.signalSystemIds.add(new IdImpl(14));
-	// this.signalSystemIds.add(new IdImpl(8));
-	// }
 
 	int signalSystemCycleTime = 0;
 	List<SignalGroupSettingsData> groupSettingsList = new ArrayList<SignalGroupSettingsData>();
@@ -312,12 +301,9 @@ public class TtCalculateIntergreens {
 	
 	public static void main(String[] args){
 		 String signalControlFile = DgPaths.REPOS +
-		 "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control.xml";
+		 "shared-svn/studies/projects/cottbus/cottbus_scenario/signal_control.xml";
 		 String intergreensOutFile = DgPaths.REPOS +
-		 "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control_intergreens.xml";
-
-//		String signalControlFile = "C:/Users/Atany/Desktop/SHK/SVN/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control.xml";
-//		String intergreensOutFile = "C:/Users/Atany/Desktop/SHK/SVN/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control_intergreens.xml";
+		 "shared-svn/studies/projects/cottbus/cottbus_scenario/signal_control_intergreens.xml";
 
 		new TtCalculateIntergreens().calculateIntergreens(signalControlFile,
 				intergreensOutFile);
