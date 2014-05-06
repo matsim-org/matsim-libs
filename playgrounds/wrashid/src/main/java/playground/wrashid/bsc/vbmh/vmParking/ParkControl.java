@@ -312,7 +312,7 @@ public class ParkControl {
 		choice.setRequiredRestOfDayBatPerc(neededBatteryPercentage);
 		
 		for(ParkingSpot spot : spotsInArea){
-			double distance = CoordUtils.calcDistance(this.cordinate, spot.parking.getCoordinate());
+			double distance = 2*CoordUtils.calcDistance(this.cordinate, spot.parking.getCoordinate()); //2 times >> return
 			double cost = pricing.calculateParkingPrice(duration, ev, spot);
 			double newStateOfChargePerc = 0.0;
 			if(cost==-1){ //this vehicle seems to be not allowed to park here
@@ -394,7 +394,7 @@ public class ParkControl {
 			//----
 			
 			double evRelatedScore = 0;
-			double distance = CoordUtils.calcDistance(this.cordinate, spot.parking.getCoordinate());
+			double distance = 2 * CoordUtils.calcDistance(this.cordinate, spot.parking.getCoordinate());
 			double pricem = spot.parkingPriceM;
 			double cost = pricing.calculateParkingPrice(duration, ev, spot);
 			//System.out.println("Cost :"+ Double.toString(cost));
@@ -652,7 +652,7 @@ public class ParkControl {
 			scorekeeper = new VMScoreKeeper();
 			personAttributes.put("VMScoreKeeper", scorekeeper);
 		}
-		double distance = CoordUtils.calcDistance(this.cordinate, selectedSpot.parking.getCoordinate());
+		double distance = 2 * CoordUtils.calcDistance(this.cordinate, selectedSpot.parking.getCoordinate());
 		double walkingTime = distance/VMConfig.walkingSpeed; 
 		//System.out.println("Walking Score :"+betaWalk*walkingTime);
 		scorekeeper.add(betaWalk*walkingTime);
@@ -681,9 +681,9 @@ public class ParkControl {
 		
 		
 		if(evUsage&&spotType.equals("ev")&&evControl.hasEV(personId)){
-			vmCharts.addValues("Walking Distance", "Walking distance charge", time, distance);
+			vmCharts.addValues("Walking Distance", "Walking distance charge", time, distance/2);
 		}else{
-			vmCharts.addValues("Walking Distance", "Walking distance no charge", time, distance);
+			vmCharts.addValues("Walking Distance", "Walking distance no charge", time, distance/2);
 		}
 		
 		
