@@ -117,8 +117,8 @@ public class ParkControl {
 		vmCharts.addSeries("Available EVparkings", "turbo charge");
 		vmCharts.addChart("Walking Distance");
 		vmCharts.setAxis("Walking Distance", "time", "distance");
-		vmCharts.addSeries("Walking Distance", "Distance EV charge");
-		vmCharts.addSeries("Walking Distance", "Distance");
+		vmCharts.addSeries("Walking Distance", "Walking distance charge");
+		vmCharts.addSeries("Walking Distance", "Walking distance no charge");
 		vmCharts.setAx("Walking Distance", false);
 		peakLoad = new HashMap<Integer, Integer>();
 		load = new HashMap<Integer, Integer>();
@@ -604,9 +604,9 @@ public class ParkControl {
 		
 		
 		if(spotType.equals("ev")&&evControl.hasEV(personId)){
-			vmCharts.addValues("Walking Distance", "Distance EV charge", time, distance);
+			vmCharts.addValues("Walking Distance", "Walking distance charge", time, distance);
 		}else{
-			vmCharts.addValues("Walking Distance", "Distance", time, distance);
+			vmCharts.addValues("Walking Distance", "Walking distance no charge", time, distance);
 		}
 		
 		
