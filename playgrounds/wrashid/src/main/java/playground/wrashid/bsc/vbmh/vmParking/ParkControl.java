@@ -127,7 +127,7 @@ public class ParkControl {
 			load.put(parking.id, 0);
 			if(parking.facilityActType!=null){
 				if(parking.facilityActType.equals("parkingLot")){
-					parking.setOcupancyStats(true);
+					parking.setOcupancyStats(true); //!! gehoert nicht hier rein
 				}
 			}
 		}
@@ -211,7 +211,7 @@ public class ParkControl {
 		availableParkingStat.add(new double[]{time, spotsInArea.size()});
 		//--
 		
-		//Diagnose
+		//Diagnose //!! kann raus
 		if(spotsInArea.size()==8){
 		System.out.println("8, "+facilityid.toString()+", "+facility.getCoord().toString()+", "+personId.toString());
 		}
