@@ -376,16 +376,16 @@ public final class PopulationUtils {
 	/**
 	 * Notes:<ul>
 	 * <li> not normalized (for the time being?)
-	 * <li> does not look at times (for the time being?) 
 	 * </ul>
 	 * @param activities1
 	 * @param activities2
 	 * @param sameActivityTypeReward
 	 * @param sameActivityLocationReward
+	 * @param differentTimePenalty_s TODO
 	 * @return
 	 */
 	public static double calculateSimilarity(List<Activity> activities1, List<Activity> activities2, double sameActivityTypeReward, 
-			double sameActivityLocationReward ) {
+			double sameActivityLocationReward, double differentTimePenalty_s ) {
 		double simil = 0. ;
 		Iterator<Activity> it1 = activities1.iterator() ;
 		Iterator<Activity> it2 = activities2.iterator() ;
@@ -398,7 +398,10 @@ public final class PopulationUtils {
 			if ( act1.getCoord().equals( act2.getCoord() ) ){ 
 				simil += sameActivityLocationReward ;
 			}
-			// I don't look at times for the time being.
+			double delta = act1.getEndTime() - act2.getEndTime() ;
+			double penalty = Math.abs(delta) * differentTimePenalty_s ;
+			simil -= penalty ;
+			
 		}
 		return simil ;
 	}

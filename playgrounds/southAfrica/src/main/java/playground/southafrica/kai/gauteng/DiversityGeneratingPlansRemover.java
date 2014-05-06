@@ -53,8 +53,10 @@ import org.matsim.core.router.TripStructureUtils;
 public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector {
 	static private final Logger log = Logger.getLogger(DiversityGeneratingPlansRemover.class);
 	
-	private static final double sameActTypePenalty = 5;
-	private static final double sameLocationPenalty = 5;
+	private static final double actTypeWeight = 5;
+	private static final double locationWeight = 5;
+	private static final double endTimeWeight_s = 1./3600. ; // per sec, i.e. 1./3600. means that one hour difference results in 1 penalty point.
+	
 	private static final double sameRoutePenalty = 5;
 	private static final double sameModePenalty = 5;
 	private final Network network;
@@ -144,7 +146,7 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 		{
 			List<Activity> activities1 = TripStructureUtils.getActivities(plan1, stageActivities) ;
 			List<Activity> activities2 = TripStructureUtils.getActivities(plan2, stageActivities) ;
-			simil += PopulationUtils.calculateSimilarity(activities1, activities2, sameActTypePenalty, sameLocationPenalty) ;
+			simil += PopulationUtils.calculateSimilarity(activities1, activities2, actTypeWeight, locationWeight, endTimeWeight_s ) ;
 			if ( Double.isNaN(simil) ) {
 				log.warn("simil is NaN; id: " + plan1.getPerson().getId() ) ;
 			}
