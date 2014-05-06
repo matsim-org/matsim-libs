@@ -1,0 +1,182 @@
+\chapter{Tutorial}
+
+This tutorial is tested with MATSim 0.4.0 or higher.
+
+\section{Introduction}
+
+The MATSim contrib for traffic lights is able to simulate traffic signals microscopically. 
+For fixed-time control a default implementation is provided.  
+No programming is required to simulate fixed-time traffic signal control. 
+Traffic-responsive signal control need custom implementation but may use the provided infrastructure. 
+
+
+
+\subsection{Terminology}
+
+To help you to understand xml formats, configuration, and code better, here some translations...
+\begin{tabular}{ll}
+\textbf{Real world terms} & \textbf{MATSim term} \\ 
+Traffic light, traffic signal, i.e. a physical box standing somewhere on the transport network indicating driving allowed/permited & Signal \\ 
+Logical group of traffic lights, all lights display same color at the same time & Signal Group \\ 
+Algorithm or control scheme that determines which colors are displayed by the different Signal Groups, e.g. fixed-time control & Signal Control \\ 
+Collection of Signal Groups that is controlled by the same Signal Control & Signal System
+\end{tabular}
+
+\subsection{Overview}
+
+\subsubsection{Intergreens}
+
+MATSim's queue model implementation does not contain any collision detection. 
+That is, a signal control can switch several conflicting approaches to green at the same time. 
+The simulation does not report any error. 
+
+To prevent such faulty behavior, the intergreens component can be switched on. 
+An xml file defines for each signal system the intergreen times of the signal groups, i.e. the minimal time period between the ending of the one and the beginning of the other signal groups green phase. 
+This information is then used to validate the signal control while the simulation is executed and may result in a warning or an exception. 
+
+This is especially important if you implement a custom, traffic-responsive signal control strategy.  
+
+
+\section{Configuration}
+\label{sec:signals_configuration}
+
+If input files for signal systems are already available, simulation of traffic lights can be enabled via MATSim config options:
+
+\begin{itemize}
+	\item Set the parameter \lstinline$useSignalsystems$ to \lstinline$true$ in the config module \lstinline$scenario$
+	\item Set at least three input file names in the config module signalsystems:
+		\begin{itemize}
+			\item parameter name: \lstinline$signalsystems$ value: path to a file in the \lstinline$signalSystems_v2.0.xsd$ file format
+  		\item parameter name: \lstinline$signalgroups$ value: path to a file in the \lstinline$signalGroups_v2.0.xsd$ file format
+ 			\item parameter name: \lstinline$signalcontrol$ value: path to a file in the \lstinline$signalControl_v2.0.xsd$ file format
+ 			\item parameter name: \lstinline$ambertimes$ (optional) value: path to a file in the \lstinline$amberTimes_v1.0.xsd$ file format
+			\item parameter name: \lstinline$useIntergreenTimes$ (optional) value: \lstinline$true$ or \lstinline$false$
+			\item parameter name: \lstinline$intergreentimes$ (optional) value: path to a file in the \lstinline$intergreenTimes_v1.0.xsd$ file format
+			\item parameter name: \lstinline$actionOnIntergreenViolation$ (optional) value: \lstinline$warn$ or \lstinline$exception$
+		\end{itemize}
+\end{itemize}
+
+\section{Input Files -- Examples}
+
+\subsection{Intergreens}
+\lstset{breaklines=true,language=XML}
+\lstinputlisting{../../../../matsim/src/test/resources/test/input/org/matsim/signalsystems/data/intergreens/v10/testIntergreenTimes_v1.0.xml}
+
+
+\section{Generating Input Data -- Example}
+
+There is a small example in order to help you getting started, the class is CreateSimpleTrafficSignalScenario.
+
+The example creates the network attached to this page as pdf (http://matsim.org/uploads/2012\_ks\_2010\_network.pdf). The numbers show the link ids. Traffic lights to be created are shown as small icons.
+
+The following highlights important lines of code method by method
+
+\subsubsection{Code}
+
+Input files for the examples can be found in the folder examples/tutorial/unsupported/example90TrafficLights of the current MATSim release / head.
+
+Example code can be found in the folder src/main/java in the package tutorial.unsupported.example90TrafficLig
+
+\subsubsection{CreateSimpleTrafficSignalScenario.run()}
+
+This method sets up the config and writes the signals that are created in submethods to file.
+
+As optional module, the signal systems module has to be switched on in the scenario first:
+
+
+\texttt{\nolinebreak config.scenario().setUseSignalSystems(true);}
+
+Then, qsim as mobility simulation should be used:
+
+
+\texttt{\nolinebreak config.controler().setMobsim("qsim"); \nolinebreak }
+
+
+\texttt{\nolinebreak config.addQSimConfigGroup(new QSimConfigGroup());}
+
+After the scenario is loaded, the top-level container for all signal related data is retrieved by:
+
+
+\texttt{\nolinebreak SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);}
+
+\subsubsection{CreateSimpleTrafficSignalScenario.createSignalSystemsAndGroups(..)}
+
+This method creates the physics, i.e. locations of signals. Furthermore SignalGroups for the Signals are created.
+
+First a SignalSystem has to be created and explicitly added to the container:
+
+
+\texttt{\nolinebreak SignalSystemData sys = systems.getFactory().createSignalSystemData(scenario.createId("3"));
+\\  \nolinebreak systems.addSignalSystemData(sys);}
+
+Then on link 23 a Signal with Id 1 can be created:
+
+
+\texttt{\nolinebreak SignalData signal = systems.getFactory().createSignalData(scenario.createId("1"));
+\\\nolinebreak sys.addSignalData(signal);
+\\\nolinebreak signal.setLinkId(scenario.createId("23"));}
+
+The Signal must be added to the SignalSystem after creation.
+
+This is continued until all Signals of the SignalSystem are created.
+
+We then need some SignalGroup for the Signals. In this example each Signal has its\nolinebreak own group. That is done by calling:
+
+
+\texttt{\nolinebreak SignalUtils.createAndAddSignalGroups4Signals(groups, sys);}
+
+\subsubsection{CreateSimpleTrafficSignalScenario.createSignalControl(..)}
+
+This method adds a fixed-time traffic signal control on top of the SignalGroups created by the last method. The SignalGroups control the hardware, i.e. the Signals. MATSim Events are created for SignalGroups.
+
+Each SignalSystem is equiped with a fixed-time control. Each SignalSystem is setup the same way: A cycle time of 120 sec is used. Each direction gets green for second 0 to 55 within the cycle. Offsets for green waves are set to 0 seconds.
+
+The Code can be read as follows:
+
+Create a fixed-time control and add it to the container:
+
+
+\texttt{\nolinebreak  SignalSystemControllerData controller = control.getFactory().createSignalSystemControllerData(id);\nolinebreak control.addSignalSystemControllerData(controller);\nolinebreak controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);\nolinebreak }
+
+Then, create a fixed-time control plan (a plan can be disabled or changed at a certain time of day) and add it to the container:
+
+
+\texttt{\nolinebreak    SignalPlanData plan = control.getFactory().createSignalPlanData(scenario.createId("1"));\nolinebreak    controller.addSignalPlanData(plan);\nolinebreak  }
+
+Each fixed-time control plan has specific attributes for cycle and synchronization offset:
+
+
+\texttt{\nolinebreak    plan.setCycleTime(cycle);\nolinebreak   plan.setOffset(0);\nolinebreak }
+
+Create specific green times (onset = switch to green, offset = switch to amber/red) for all SignalGroups and add them to the signal control plan via
+
+
+\texttt{\nolinebreak    SignalGroupSettingsData settings1 = control.getFactory().createSignalGroupSettingsData(scenario.createId("1"));\nolinebreak   plan.addSignalGroupSettings(settings1);\nolinebreak   settings1.setOnset(0);\nolinebreak   settings1.setDropping(55);\nolinebreak }
+
+\subsubsection{Visualization}
+
+If you want to visualize the created scenario try to get and run the OTFVis contribution to MATSim (use MATSim head or nightly build instead of 0.4.1), see \href{http://matsim.org/docs/extensions/otfvis}{OTFVis}(this contribution is unsupported, please submit patches instead of mails).
+
+If OTFVis runs successfully, you may be able to run
+
+
+\texttt{\nolinebreak  tutorial.unsupported.example90TrafficLights.VisSimpleTrafficSignalScenario }
+
+within an up to date (> 04.12.2012) checkout within eclipse.
+
+Another option is to write the scenario to file via the example code and then start OTFVis with the created config file.
+
+\subsection{Links}
+\begin{itemize}
+	\item \href{http://ci.matsim.org:8080/job/MATSim_M2/javadoc/org/matsim/signalsystems/package-summary.html}{Technical Documentation (JavaDoc)}
+	\item \href{http://matsim.org/node/384}{Module Documentation and Publications}
+	\item \href{http://matsim.org/node/693}{OTFVis}
+\end{itemize}
+
+
+\texttt{\nolinebreak  }
+
+
+
+
+\texttt{\nolinebreak  }
