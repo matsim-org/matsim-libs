@@ -100,8 +100,8 @@ import playground.southafrica.gauteng.scoring.GenerationOfMoneyEvents;
 import playground.southafrica.gauteng.utilityofmoney.GautengUtilityOfMoney;
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
 import playground.southafrica.kai.gauteng.ConfigurableTravelDisutilityFactory;
-import playground.southafrica.kai.gauteng.DiversityGeneratingPlansRemover;
 import playground.southafrica.utilities.Header;
+import playground.vsp.planselectors.DiversityGeneratingPlansRemover;
 
 /**
  * 

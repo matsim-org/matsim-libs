@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.southafrica.kai.gauteng;
+package playground.vsp.planselectors;
 
 import java.util.HashMap;
 import java.util.List;
