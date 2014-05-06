@@ -30,6 +30,7 @@ import playground.wrashid.bsc.vbmh.util.CSVWriter;
 import playground.wrashid.bsc.vbmh.util.RemoveDuplicate;
 import playground.wrashid.bsc.vbmh.util.VMCharts;
 import playground.wrashid.bsc.vbmh.vmEV.EVControl;
+import playground.wrashid.bsc.vbmh.vmParking.AdvancedParkingChoice.Option;
 
 
 /**
@@ -84,6 +85,12 @@ public class ParkControl {
 		Map<String, String> planCalcParams = this.controller.getConfig().getModule("planCalcScore").getParams();
 		betaMoney=-Double.parseDouble(planCalcParams.get("marginalUtilityOfMoney")); //!! in Config positiver Wert >> stimmt das dann so?
 		betaWalk=Double.parseDouble(planCalcParams.get("traveling_walk"));
+		VMConfig.betaPayMoney=betaMoney;
+		VMConfig.betaWalkPMetre=betaWalk/VMConfig.walkingSpeed;
+		if(VMConfig.betaPayMoney>0){
+			System.out.println("E R R O R  positive betaPayMoney");
+		}
+		
 		
 		//System.out.println(betaMoney);
 		
@@ -213,7 +220,7 @@ public class ParkControl {
 		
 		//Diagnose //!! kann raus
 		if(spotsInArea.size()==8){
-		System.out.println("8, "+facilityid.toString()+", "+facility.getCoord().toString()+", "+personId.toString());
+		//System.out.println("8, "+facilityid.toString()+", "+facility.getCoord().toString()+", "+personId.toString());
 		}
 		
 		//-----
@@ -235,7 +242,7 @@ public class ParkControl {
 		
 		//Select 
 		if(spotsInArea.size()>0){ 
-			selectParking(spotsInArea, personId, estimatedDuration, restOfDayDistance, ev);
+			selectParkingAdvanced(spotsInArea, personId, estimatedDuration, restOfDayDistance, ev);
 			return 1;
 		}
 		/*else { //!! Groesserer Suchradius				//weiter oben ersetzt
@@ -279,6 +286,74 @@ public class ParkControl {
 		return -1;
 	}
 
+	
+	//--------------------------- SELECT PARKING --------Using Advanced Parking Choice Model-------------------------------------	
+	private void selectParkingAdvanced(LinkedList<ParkingSpot> spotsInArea, Id personId, double duration, double restOfDayDistance, boolean ev){
+		double stateOfCharge;
+		double neededBatteryPercentage=-1.0; //Stays -1 for NEVs which tells the Advanced Parking Choice that it is an NEV
+		boolean hasToCharge = false;
+		int countSlowCharge=0;
+		int countFastCharge=0;
+		int countTurboCharge=0;
+		AdvancedParkingChoice choice = new AdvancedParkingChoice();
+		
+		//calculate needed Battery Percenatge and check if ev has to charge
+		if(ev){
+			stateOfCharge = evControl.stateOfChargePercentage(personId);
+			neededBatteryPercentage = evControl.calcEnergyConsumptionForDistancePerc(personId, restOfDayDistance);
+			//System.out.println("Needed battery perc :"+neededBatteryPercentage);
+			//System.out.println("State of charge: "+stateOfCharge);
+			if(neededBatteryPercentage>stateOfCharge){
+				phwriter.addAgentHasToCharge(Double.toString(time), personId.toString());
+				hasToCharge=true;
+			}
+		}
+		//----------------
+		choice.setRequiredRestOfDayBatPerc(neededBatteryPercentage);
+		
+		for(ParkingSpot spot : spotsInArea){
+			double distance = CoordUtils.calcDistance(this.cordinate, spot.parking.getCoordinate());
+			double cost = pricing.calculateParkingPrice(duration, ev, spot);
+			double newStateOfChargePerc = 0.0;
+			if(cost==-1){ //this vehicle seems to be not allowed to park here
+				continue;
+			}
+			if (ev && spot.charge) {
+				newStateOfChargePerc = evControl.calcNewStateOfChargePercentage(personId,spot.chargingRate, duration);
+			}
+			choice.addOption(choice.new Option(spot, cost, distance, newStateOfChargePerc));
+			
+			//STATS
+			if(spot.chargingRate<3){
+				countSlowCharge++;
+			}else if(spot.chargingRate<5){
+				countFastCharge++;
+			}else{
+				countTurboCharge++;
+			}
+			//----------
+		}
+		
+		Option bestOption = choice.selectBestOption();
+		
+		//Stat
+		if(hasToCharge){
+			//vmCharts.addValues("Available EVparkings", "slow charge", time, countSlowCharge);
+			vmCharts.addValues("Available EVparkings", "fast charge", time, countFastCharge);
+			vmCharts.addValues("Available EVparkings", "turbo charge", time, countTurboCharge);
+		}
+		//-----
+		
+		parkOnSpot(bestOption.spot, bestOption.score, personId);
+		
+		
+		
+		
+		
+		
+	}
+	
+	
 	//--------------------------- SELECT PARKING ---------------------------------------------	
 	private void selectParking(LinkedList<ParkingSpot> spotsInArea, Id personId, double duration, double restOfDayDistance, boolean ev) {
 		// TODO Auto-generated method stub
@@ -293,6 +368,8 @@ public class ParkControl {
 		int countTurboCharge=0;
 		ParkingSpot bestSpot;
 		bestSpot=null;
+		
+		
 		
 		if(ev){
 			stateOfCharge = evControl.stateOfChargePercentage(personId);
