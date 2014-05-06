@@ -33,7 +33,7 @@ public class PricingModels {
 	}
 
 	public ParkingPricingModel get_model(int model_id){
-		// Alle in Map schreiben zum beschleunigen?
+		//!! Alle in Map schreiben zum beschleunigen?
 		for (ParkingPricingModel model : parkingprices){
 			if (model.id==model_id){
 				return model;	
