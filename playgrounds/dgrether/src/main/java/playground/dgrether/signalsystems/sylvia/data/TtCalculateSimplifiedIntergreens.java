@@ -371,11 +371,9 @@ public class TtCalculateSimplifiedIntergreens {
 		boolean simplifyPhases = true;
 				
 		String signalControlFile = DgPaths.REPOS +
-		 "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control.xml";
+		 "shared-svn/studies/projects/cottbus/cottbus_scenario/signal_control.xml";
 		String intergreensOutFile = DgPaths.REPOS +
-		 "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/";
-//		String signalControlFile = "C:/Users/Atany/Desktop/SHK/SVN/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control.xml";
-//		String intergreensOutFile = "C:/Users/Atany/Desktop/SHK/SVN/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/";
+		 "shared-svn/studies/projects/cottbus/cottbus_scenario/";
 		if (simplifyPhases)
 			intergreensOutFile += "signal_control_simplifiedIntergreens.xml";
 		else
