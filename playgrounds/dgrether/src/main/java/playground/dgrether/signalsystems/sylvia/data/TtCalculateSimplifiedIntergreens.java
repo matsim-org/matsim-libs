@@ -47,9 +47,11 @@ import playground.dgrether.signalsystems.utils.DgSignalGroupSettingsDataOnsetCom
 
 /**
  * 
- * class to calculate the intergreens from a (fixed) signal control plan
+ * class to calculate the intergreen times from a (fixed) signal control plan
  * and write them into a xml-file
- * (intergreens are necessary e.g. for adaptive signal control or to create other signal plans)
+ * 
+ * intergreens are necessary e.g. for adaptive signal control 
+ * or to create or check other signal plans.
  * 
  * @author tthunig
  * 
