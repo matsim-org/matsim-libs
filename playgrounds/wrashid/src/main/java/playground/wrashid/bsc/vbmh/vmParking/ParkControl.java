@@ -222,7 +222,7 @@ public class ParkControl {
 		if(spotsInArea.size()==0){ //mit 5km Radius
 			//System.out.println("Agent is looking for parking in maximum range of 5 km");
 			phwriter.addAgentNotParkedWithinDefaultDistance(Double.toString(time), personId.toString());
-			spotsInArea = getPublicParkings(cordinate, false, 5000);
+			spotsInArea = getPublicParkings(cordinate, false, 5000); //!! 5000 in die config
 			if (ev){
 				LinkedList<ParkingSpot> spotsInAreaEV = getPublicParkings(cordinate, true, 5000);
 				spotsInArea.addAll(spotsInAreaEV);
@@ -592,7 +592,7 @@ public class ParkControl {
 			spotType="nev";
 		}
 
-		if(evControl.hasEV(personId)){
+		if(evUsage && evControl.hasEV(personId)){
 			phwriter.addEVParked(Double.toString(time), person.getId().toString(), Integer.toString(selectedSpot.parking.id), score, selectedSpot.parking.type, spotType, Double.toString(evControl.stateOfChargePercentage(personId)));
 		} else {
 			phwriter.addNEVParked(Double.toString(time), person.getId().toString(), Integer.toString(selectedSpot.parking.id), score, selectedSpot.parking.type, spotType);
@@ -603,7 +603,7 @@ public class ParkControl {
 		}
 		
 		
-		if(spotType.equals("ev")&&evControl.hasEV(personId)){
+		if(evUsage&&spotType.equals("ev")&&evControl.hasEV(personId)){
 			vmCharts.addValues("Walking Distance", "Walking distance charge", time, distance);
 		}else{
 			vmCharts.addValues("Walking Distance", "Walking distance no charge", time, distance);
