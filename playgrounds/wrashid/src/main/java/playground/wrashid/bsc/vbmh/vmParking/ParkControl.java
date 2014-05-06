@@ -115,6 +115,11 @@ public class ParkControl {
 		vmCharts.addSeries("Available EVparkings", "slow charge");
 		vmCharts.addSeries("Available EVparkings", "fast charge");
 		vmCharts.addSeries("Available EVparkings", "turbo charge");
+		vmCharts.addChart("Walking Distance");
+		vmCharts.setAxis("Walking Distance", "time", "distance");
+		vmCharts.addSeries("Walking Distance", "Distance EV charge");
+		vmCharts.addSeries("Walking Distance", "Distance");
+		vmCharts.setAx("Walking Distance", false);
 		peakLoad = new HashMap<Integer, Integer>();
 		load = new HashMap<Integer, Integer>();
 		for(Parking parking : parkingMap.getParkings()){
@@ -215,11 +220,11 @@ public class ParkControl {
 		
 		//-- If there is no Spot within the given distance: -----------
 		if(spotsInArea.size()==0){ //mit 5km Radius
-			System.out.println("Agent is looking for parking in maximum range of 5 km");
+			//System.out.println("Agent is looking for parking in maximum range of 5 km");
 			phwriter.addAgentNotParkedWithinDefaultDistance(Double.toString(time), personId.toString());
-			spotsInArea = getPublicParkings(cordinate, false);
+			spotsInArea = getPublicParkings(cordinate, false, 5000);
 			if (ev){
-				LinkedList<ParkingSpot> spotsInAreaEV = getPublicParkings(cordinate, true);
+				LinkedList<ParkingSpot> spotsInAreaEV = getPublicParkings(cordinate, true, 5000);
 				spotsInArea.addAll(spotsInAreaEV);
 			}
 			RemoveDuplicate.RemoveDuplicate(spotsInArea);	
@@ -575,6 +580,8 @@ public class ParkControl {
 		//System.out.println("Walking Score :"+betaWalk*walkingTime);
 		scorekeeper.add(betaWalk*walkingTime);
 		
+		
+		
 
 		//Events
 		
@@ -594,6 +601,17 @@ public class ParkControl {
 		if(selectedSpot.parking.checkForFreeSpot()==null){
 			phwriter.addParkingOccupied(selectedSpot.parking, Double.toString(this.time), personId.toString());
 		}
+		
+		
+		if(spotType.equals("ev")&&evControl.hasEV(personId)){
+			vmCharts.addValues("Walking Distance", "Distance EV charge", time, distance);
+		}else{
+			vmCharts.addValues("Walking Distance", "Distance", time, distance);
+		}
+		
+		
+		
+		
 		//--
 		
 		
