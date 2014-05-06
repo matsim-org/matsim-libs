@@ -165,6 +165,10 @@ public class MainPPSimZurich30km {
 			if (ZHScenarioGlobal.loadBooleanParam("performCalibration")) {
 				performAutoCalibration();
 			}
+			
+			if (ZHScenarioGlobal.paramterExists("special.scenario.changeSupply") && ZHScenarioGlobal.loadBooleanParam("special.scenario.changeSupply")) {
+				scenario_changeSupply();
+			}
 
 			EventsManager eventsManager = EventsUtils.createEventsManager();
 			EventWriterXML eventsWriter = new EventWriterXML(ZHScenarioGlobal.outputFolder + "events.xml.gz");
@@ -279,6 +283,18 @@ public class MainPPSimZurich30km {
 
 		System.out.println("numberOfPrivateParking facilities added (with capacity zero) :" + parkingManager.getParkings().size());
 		System.out.println();
+	}
+	
+	
+	private static void scenario_changeSupply(){
+		if (ZHScenarioGlobal.iteration==ZHScenarioGlobal.loadIntParam("special.scenario.changeSupply.atIteration")){
+			double scaling = ZHScenarioGlobal.loadDoubleParam("special.scenario.changeSupply.newScaling");
+			LinkedList<Parking> parkings = AgentWithParking.parkingManager.getParkings();
+			for (Parking parking : parkings) {
+				int newCapacity = (int) Math.round(ZHScenarioGlobal.privateParkingCalibrationOriginalCapacities.get(parking.getId())*scaling);
+				parking.setCapacity(newCapacity);
+			}
+		}
 	}
 
 	private static void performAutoCalibration() {
