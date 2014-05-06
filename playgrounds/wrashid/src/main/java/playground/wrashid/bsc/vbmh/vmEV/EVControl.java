@@ -99,7 +99,7 @@ public class EVControl {
 	}
 	
 	public void iterStart(){
-		this.evList.setAllStateOfChargePercentage(80.0);
+		this.evList.setAllStateOfChargePercentage(80.0); //!! aus der config nehmen
 		
 	}
 	
