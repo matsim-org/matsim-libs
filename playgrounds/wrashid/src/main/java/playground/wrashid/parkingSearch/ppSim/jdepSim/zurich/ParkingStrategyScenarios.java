@@ -374,7 +374,7 @@ public class ParkingStrategyScenarios {
 			for (int i = 0; i < numberOfStrategiesInEachGroup; i++) {
 				ParkingSearchStrategy strategy = new AxPo1989_Strategy7(-1, scenario.getNetwork(), "ARD-illegal-S-" + i);
 				strategy.setGroupName("ARD-illegal-S");
-				addStrategyAndSetLayerValues(allStrategies, strategy, i);
+				allStrategies.add(strategy);
 				
 				double startStrategyAtDistanceFromDestination = 250;
 				double startParkingDecision = 100;
@@ -388,7 +388,7 @@ public class ParkingStrategyScenarios {
 						startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration,
 						increaseAcceptableDistanceInMetersPerMinute);
 				strategy.setGroupName("Parkagent");
-				addStrategyAndSetLayerValues(allStrategies, strategy, i);
+				allStrategies.add(strategy);
 			}
 		}else if (ZHScenarioGlobal.parkingStrategyScenarioId == 20){
 			int numberOfStrategiesInEachGroup = ZHScenarioGlobal
