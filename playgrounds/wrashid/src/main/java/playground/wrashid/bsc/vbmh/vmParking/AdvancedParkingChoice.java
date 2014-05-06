@@ -47,14 +47,16 @@ public class AdvancedParkingChoice {
 		double b = 10.97; // x term
 		double c = -2.159; // constant
 		double d = 2.425; // constant outside of exp
+		double e = 0.0454411; //shift down
+		double f = 1.067; //scale up
 		
 		double LMSOC = 0.0;
-		LMSOC = (Math.exp(a*soc*soc+b*soc+c))/(d+Math.exp(a*soc*soc+b*soc+c));
+		LMSOC = (((Math.exp(a*soc*soc+b*soc+c))/(d+Math.exp(a*soc*soc+b*soc+c))-e)*f);
 		//System.out.println("SOC : "+soc+" LMSOC : "+LMSOC);
 		return LMSOC;
 	}
 	
-	public double clalcLMReserve(double requiredBatPercRestOfDay, double newSOC){
+	public double calcLMReserve(double requiredBatPercRestOfDay, double newSOC){
 		double reserve = newSOC - requiredBatPercRestOfDay;
 		double LMReserve=(Math.exp(1/0.8)-Math.exp(1/(1000*reserve+0.8))-2.4825)/2.5;
 		if(reserve<0){
@@ -90,7 +92,7 @@ public class AdvancedParkingChoice {
 			double LMSOC = this.calcLMSOC(option.newSOC);
 			double price = option.price;
 			double walkingDistance = option.walkingDistance;
-			double LMReserve = this.clalcLMReserve(this.requiredRestOfDayBatPerc, option.newSOC);
+			double LMReserve = this.calcLMReserve(this.requiredRestOfDayBatPerc, option.newSOC);
 			if(requiredRestOfDayBatPerc==-1){ //Special value for NEVs
 				LMSOC=0.0;
 				LMReserve=0.0;
