@@ -15,7 +15,7 @@ public class IterEndStats {
 	public void run(ParkControl parkControl){
 		Controler controler = parkControl.controller;
 		if(!parkControl.evUsage){
-			System.out.println("Iteration end stats do not work without EV usage");
+			System.out.println("Iteration end stats does not work without EV usage");
 			return;
 		}
 		
