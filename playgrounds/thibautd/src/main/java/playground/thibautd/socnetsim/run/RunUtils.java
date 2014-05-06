@@ -506,15 +506,14 @@ public class RunUtils {
 		if ( scoringFunctionConf.isUseKtiScoring() ) {
 			builder.withScoringFunctionFactory(
 				new KtiScoringFunctionFactoryWithJointModes(
-					scoringFunctionConf.getMarginalUtilityOfBeingDriver_s(),
-					scoringFunctionConf.getMarginalUtilityOfBeingPassenger_s(),
 					new StageActivityTypesImpl(
 								Arrays.asList(
 										PtConstants.TRANSIT_ACTIVITY_TYPE,
 										JointActingTypes.INTERACTION) ),
-						(KtiLikeScoringConfigGroup) scenario.getConfig().getModule( KtiLikeScoringConfigGroup.GROUP_NAME ),
-						scenario.getConfig().planCalcScore(),
-						scenario) );
+					(KtiLikeScoringConfigGroup) scenario.getConfig().getModule( KtiLikeScoringConfigGroup.GROUP_NAME ),
+					scenario.getConfig().planCalcScore(),
+					scoringFunctionConf,
+					scenario) );
 		}
 
 		if ( scoringFunctionConf.getInternalizationNetworkFile() != null ) {

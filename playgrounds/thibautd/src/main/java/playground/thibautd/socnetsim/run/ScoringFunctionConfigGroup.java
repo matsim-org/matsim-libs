@@ -29,12 +29,14 @@ import org.matsim.core.utils.collections.CollectionUtils;
 
 import playground.thibautd.scoring.BeingTogetherScoring;
 
-class ScoringFunctionConfigGroup extends ReflectiveModule {
+public class ScoringFunctionConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME = "scoringFunction";
 	private boolean useKtiScoring = false;
 	private double marginalUtilityOfBeingTogether_h = 0;
 	private double marginalUtilityOfBeingDriver_h = -3;
 	private double marginalUtilityOfBeingPassenger_h = -3;
+	private double constantDriver = 0;
+	private double constantPassenger = 0;
 	private String activityTypeForContactInDesires = "leisure";
 	private String internalizationNetworkFile = null;
 
@@ -169,6 +171,26 @@ class ScoringFunctionConfigGroup extends ReflectiveModule {
 	
 	public void setJoinableActivityTypes(final Set<String> joinableActivityTypes) {
 		this.joinableActivityTypes = joinableActivityTypes;
+	}
+
+	@StringGetter( "constantDriver" )
+	public double getConstantDriver() {
+		return this.constantDriver;
+	}
+
+	@StringSetter( "constantDriver" )
+	public void setConstantDriver(double constantDriver) {
+		this.constantDriver = constantDriver;
+	}
+
+	@StringGetter( "constantPassenger" )
+	public double getConstantPassenger() {
+		return this.constantPassenger;
+	}
+
+	@StringSetter( "constantPassenger" )
+	public void setConstantPassenger(double constantPassenger) {
+		this.constantPassenger = constantPassenger;
 	}
 
 	@StringGetter( "activityTypeForContactInDesires" )

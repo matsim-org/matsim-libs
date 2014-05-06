@@ -22,6 +22,8 @@ package playground.thibautd.scoring;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -44,6 +46,9 @@ import playground.thibautd.socnetsim.population.JointActingTypes;
  * @author thibautd
  */
 public class CharyparNagelWithJointModesScoringFunctionFactory implements ScoringFunctionFactory {
+	private static final Logger log =
+		Logger.getLogger(CharyparNagelWithJointModesScoringFunctionFactory.class);
+
 
 	private final StageActivityTypes blackList;
 	private final CharyparNagelScoringParameters params;
@@ -56,6 +61,7 @@ public class CharyparNagelWithJointModesScoringFunctionFactory implements Scorin
     public CharyparNagelWithJointModesScoringFunctionFactory(
 			final StageActivityTypes typesNotToScore,
 			final Scenario scenario) {
+		log.warn( "initializing the \"CharyparNagel\" scoring function: this has no special parameters for joint modes!" );
 		this.params = new CharyparNagelScoringParameters( scenario.getConfig().planCalcScore() );
 		this.scenario = scenario;
 		this.blackList = typesNotToScore;

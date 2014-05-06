@@ -38,31 +38,30 @@ import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction;
 import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
 import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.run.ScoringFunctionConfigGroup;
 
 /**
  * @author thibautd
  */
 public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionFactory {
     private final ScoringFunctionFactory delegate;
+
 	private final CharyparNagelScoringParameters params;
 	private final Scenario scenario;
 
-	private final double marginalUtilOfBeingDriver_s;
-	private final double marginalUtilOfBeingPassenger_s;
+	private final ScoringFunctionConfigGroup group;
 
 	private static final double UTIL_OF_NOT_PERF = -1000;
 
 	public KtiScoringFunctionFactoryWithJointModes(
-			final double marginalUtilityOfBeingDriver_s,
-			final double marginalUtilityOfBeingPassenger_s,
 			final StageActivityTypes typesNotToScore,
 			final KtiLikeScoringConfigGroup ktiConfig,
 			final PlanCalcScoreConfigGroup config,
+			final ScoringFunctionConfigGroup group,
 			final Scenario scenario) {
-		this.marginalUtilOfBeingDriver_s = marginalUtilityOfBeingDriver_s;
-		this.marginalUtilOfBeingPassenger_s = marginalUtilityOfBeingPassenger_s;
 		this.scenario = scenario;
 		this.params = new CharyparNagelScoringParameters(config);
+		this.group = group;
 		this.delegate = new KtiLikeActivitiesScoringFunctionFactory(
 			typesNotToScore,
 			ktiConfig,
@@ -81,16 +80,16 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 				new ElementalCharyparNagelLegScoringFunction(
 					JointActingTypes.DRIVER,
 					new LegScoringParameters(
-						params.modeParams.get(TransportMode.car).constant,
-						marginalUtilOfBeingDriver_s,
+						group.getConstantDriver(),
+						group.getMarginalUtilityOfBeingDriver_s(),
 						params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m ),
 					scenario.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(
 				new ElementalCharyparNagelLegScoringFunction(
 					JointActingTypes.PASSENGER,
 					new LegScoringParameters(
-						params.modeParams.get(TransportMode.car).constant,
-						marginalUtilOfBeingPassenger_s,
+						group.getConstantPassenger(),
+						group.getMarginalUtilityOfBeingPassenger_s(),
 						// passenger doesn't pay gasoline
 						0 ),
 					scenario.getNetwork()));
