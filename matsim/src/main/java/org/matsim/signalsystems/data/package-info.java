@@ -32,6 +32,8 @@
  *  @see org.matsim.signalsystems.data.signalgroups.v20
  *  @see org.matsim.signalsystems.data.signalcontrol.v20
  *  @see org.matsim.signalsystems.data.ambertimes.v10
+ *  @see org.matsim.signalsystems.data.intergreens.v10
+ *  
  * <h2>Package Maintainer(s):</h2>
  * <ul>
  *   <li>Dominik Grether</li>
@@ -40,5 +42,6 @@
  * Changes by non-maintainers are prohibited. Patches very welcome!
  * 
  * @author dgrether
+ * @author tthunig
  */
 package org.matsim.signalsystems.data;
