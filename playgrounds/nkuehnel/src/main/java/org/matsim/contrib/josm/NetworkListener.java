@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.josm.Converter.OsmWay;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
@@ -32,6 +33,7 @@ import org.openstreetmap.josm.data.osm.event.PrimitivesRemovedEvent;
 import org.openstreetmap.josm.data.osm.event.RelationMembersChangedEvent;
 import org.openstreetmap.josm.data.osm.event.TagsChangedEvent;
 import org.openstreetmap.josm.data.osm.event.WayNodesChangedEvent;
+import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 
 /**
  * Listens to changes in the dataset and their effects on the Network
@@ -41,17 +43,25 @@ import org.openstreetmap.josm.data.osm.event.WayNodesChangedEvent;
 public class NetworkListener implements DataSetListener {
 	private Network network;
 	private CoordinateTransformation ct;
-	private NetworkLayer layer;
+	private OsmDataLayer layer;
 	private static final List<String> TRANSPORT_MODES = Arrays.asList(
 			TransportMode.bike, TransportMode.car, TransportMode.other,
 			TransportMode.pt, TransportMode.ride, TransportMode.transit_walk,
 			TransportMode.walk);
+	private Map<Way, List<Link>> way2Links;
+	private String coordSystem;
 
-	public NetworkListener(NetworkLayer layer) throws IllegalArgumentException{
+	public NetworkListener(OsmDataLayer layer, Network network,  Map<Way, List<Link>> way2Links) throws IllegalArgumentException{
 		this.layer = layer;
-		this.network = layer.getMatsimNetwork();
+		this.network = network;
+		if(layer instanceof NetworkLayer) {
+			this.coordSystem = ((NetworkLayer) layer).getCoordSystem();
+		} else {
+			this.coordSystem = TransformationFactory.WGS84;
+		}
 		this.ct = TransformationFactory.getCoordinateTransformation(
-				TransformationFactory.WGS84, layer.getCoordSystem());
+				TransformationFactory.WGS84, coordSystem);
+		this.way2Links = way2Links;
 	}
 
 	@Override
@@ -72,20 +82,29 @@ public class NetworkListener implements DataSetListener {
 		node.getCoord().setXY(temp.getX(), temp.getY());
 
 		for (Link link : node.getInLinks().values()) {
-			if (!((Way) layer.data.getPrimitiveById(
-					Long.parseLong(link.getId().toString()),
-					OsmPrimitiveType.WAY)).hasKey("length")) {
+			long wayId;
+			String tempId = link.getId().toString();
+			if(tempId.contains("_")){
+				wayId = Long.parseLong(tempId.substring(0, tempId.indexOf("_")));
+			} else {
+				wayId = Long.parseLong(tempId);
+			}
+			if (!((Way) layer.data.getPrimitiveById(wayId, OsmPrimitiveType.WAY)).hasKey("length")) {
 				link.setLength(linkLength(link));
 			}
 		}
 		for (Link link : node.getOutLinks().values()) {
-			if (!((Way) layer.data.getPrimitiveById(
-					Long.parseLong(link.getId().toString()),
-					OsmPrimitiveType.WAY)).hasKey("length")) {
+			long wayId;
+			String tempId = link.getId().toString();
+			if(tempId.contains("_")){
+				wayId = Long.parseLong(tempId.substring(0, tempId.indexOf("_")));
+			} else {
+				wayId = Long.parseLong(tempId);
+			}
+			if (!((Way) layer.data.getPrimitiveById(wayId, OsmPrimitiveType.WAY)).hasKey("length")) {
 				link.setLength(linkLength(link));
 			}
 		}
-
 		MATSimPlugin.toggleDialog.notifyDataChanged(network);
 	}
 
@@ -122,7 +141,7 @@ public class NetworkListener implements DataSetListener {
 			} else if (primitive instanceof Way) {
 				Way way = (Way) primitive;
 
-				if (!layer.getWay2Links().containsKey(way)) {
+				if (!way2Links.containsKey(way)) {
 					List<Link> links = enterWay2Links(way);
 					for (Link link : links) {
 						network.addLink(link);
@@ -135,7 +154,7 @@ public class NetworkListener implements DataSetListener {
 
 	private List<Link> enterWay2Links(Way way) {
 		List<Link> links = computeWay2Links(way);
-		List<Link> previous = layer.getWay2Links().put(way, links);
+		List<Link> previous = way2Links.put(way, links);
 		if (previous != null) {
 			throw new RuntimeException("Shouldn't happen.");
 		}
@@ -143,6 +162,7 @@ public class NetworkListener implements DataSetListener {
 	}
 
 	private List<Link> computeWay2Links(Way way) {
+		
 		Map<String, String> keys = way.getKeys();
 		if (way.getNodesCount() != 2)
 			return Collections.emptyList();
@@ -168,23 +188,23 @@ public class NetworkListener implements DataSetListener {
 		} else {
 			((LinkImpl) link).setOrigId(id.toString());
 		}
-		Double capacity = parseDoubleIfPossible(keys.get("capacity"));
+		
+		Double capacity;
+		Double freespeed;
+		Double permlanes;
+		
+		capacity = parseDoubleIfPossible(keys.get("capacity"));
 		if (capacity == null) {
 			return Collections.emptyList();
 		}
-		Double freespeed = parseDoubleIfPossible(keys.get("freespeed"));
+		freespeed = parseDoubleIfPossible(keys.get("freespeed"));
 		if (freespeed == null) {
 			return Collections.emptyList();
 		}
-		Double permlanes = parseDoubleIfPossible(keys.get("permlanes"));
+		permlanes = parseDoubleIfPossible(keys.get("permlanes"));
 		if (permlanes == null) {
 			return Collections.emptyList();
 		}
-
-		link.setCapacity(capacity);
-		link.setFreespeed(freespeed);
-		link.setNumberOfLanes(permlanes);
-
 		Set<String> modes = new HashSet<String>();
 		String tempArray[] = keys.get("modes").split(";");
 		for (int i = 0; i < tempArray.length; i++) {
@@ -196,6 +216,10 @@ public class NetworkListener implements DataSetListener {
 		if (modes.size() == 0) {
 			return Collections.emptyList();
 		}
+
+		link.setCapacity(capacity);
+		link.setFreespeed(freespeed);
+		link.setNumberOfLanes(permlanes);
 		link.setAllowedModes(modes);
 
 		if (keys.containsKey("length")) {
@@ -217,7 +241,7 @@ public class NetworkListener implements DataSetListener {
 
 	private Double linkLength(Link link) {
 		Double length;
-		if (layer.getCoordSystem().equals(TransformationFactory.WGS84)) {
+		if (coordSystem.equals(TransformationFactory.WGS84)) {
 			length = OsmConvertDefaults.calculateWGS84Length(link.getFromNode()
 					.getCoord(), link.getToNode().getCoord());
 		} else {
@@ -243,7 +267,7 @@ public class NetworkListener implements DataSetListener {
 				System.out.println("node removed!");
 				network.removeNode(node.getId());
 			} else if (primitive instanceof Way) {
-				List<Link> links = layer.getWay2Links().remove(
+				List<Link> links = way2Links.remove(
 						((Way) primitive));
 				for (Link link : links) {
 					network.removeLink(link.getId());
@@ -266,7 +290,7 @@ public class NetworkListener implements DataSetListener {
 		for (OsmPrimitive primitive : changed.getPrimitives()) {
 			if (primitive instanceof Way) {
 				Way way = (Way) primitive;
-				List<Link> oldLinks = layer.getWay2Links().remove(way);
+				List<Link> oldLinks = way2Links.remove(way);
 				List<Link> newLinks = enterWay2Links(way);
 				for (Link link : oldLinks) {
 					System.out.println("remove because tag changed.");

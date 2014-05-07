@@ -67,6 +67,7 @@ public class MATSimToggleDialog extends ToggleDialog implements
 	private List<FileExporter> exporterCopy = new ArrayList<FileExporter>();
 	private Network currentNetwork;
 	private Map<Way, List<Link>> way2Links;
+	private NetworkListener osmNetworkListener;
 
 	public MATSimToggleDialog() {
 		super("Links/Nodes", "logo.png", "Links/Nodes", null, 150, true,
@@ -116,6 +117,8 @@ public class MATSimToggleDialog extends ToggleDialog implements
 
 	@Override
 	public void activeLayerChange(Layer oldLayer, Layer newLayer) {
+		DataSet.removeSelectionListener(tableModel);
+		table.getSelectionModel().removeListSelectionListener(tableModel);
 		if (newLayer instanceof OsmDataLayer) {
 			if (newLayer instanceof NetworkLayer) {
 				currentNetwork = ((NetworkLayer) newLayer).getMatsimNetwork();
@@ -128,6 +131,11 @@ public class MATSimToggleDialog extends ToggleDialog implements
 				currentNetwork = NetworkImpl.createNetwork();
 				new Converter(((OsmDataLayer) newLayer).data, currentNetwork,
 						way2Links).convert();
+				if(this.osmNetworkListener!=null) {
+					((OsmDataLayer) newLayer).data.removeDataSetListener(this.osmNetworkListener);
+				}
+				this.osmNetworkListener = new NetworkListener((OsmDataLayer) newLayer, currentNetwork, way2Links);
+				((OsmDataLayer) newLayer).data.addDataSetListener(this.osmNetworkListener);
 				if (oldLayer instanceof NetworkLayer) {
 					ExtensionFileFilter.exporters.clear();
 					ExtensionFileFilter.exporters.addAll(this.exporterCopy);
@@ -278,7 +286,6 @@ public class MATSimToggleDialog extends ToggleDialog implements
 				}
 			}
 			fireTableDataChanged();
-
 		}
 
 		@Override
@@ -288,7 +295,13 @@ public class MATSimToggleDialog extends ToggleDialog implements
 					&& !((ListSelectionModel) e.getSource()).isSelectionEmpty()) {
 				int row = table.getRowSorter().convertRowIndexToModel(
 						table.getSelectedRow());
-				long id = Long.parseLong((String) this.getValueAt(row, 1));
+				String tempId = (String) this.getValueAt(row, 1);
+				long id;
+				if(tempId.contains("_")){
+					id = Long.parseLong(tempId.substring(0, tempId.indexOf("_")));
+				} else {
+					id = Long.parseLong(tempId);
+				}
 				Way way = (Way) layer.data.getPrimitiveById(id,
 						OsmPrimitiveType.WAY);
 				helper.highlightOnly(way);

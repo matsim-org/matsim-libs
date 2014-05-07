@@ -130,7 +130,7 @@ public class ConvertTask extends PleaseWaitRunnable {
 			org.openstreetmap.josm.data.osm.Node toNode = node2OsmNode.get(link
 					.getToNode());
 			way.addNode(toNode);
-			way.put(ImportTask.WAY_TAG_ID, link.getId().toString());
+			way.put(ImportTask.WAY_TAG_ID, ((LinkImpl)link).getOrigId());
 			way.put("freespeed", String.valueOf(link.getFreespeed()));
 			way.put("capacity", String.valueOf(link.getCapacity()));
 			way.put("length", String.valueOf(link.getLength()));
@@ -157,7 +157,7 @@ public class ConvertTask extends PleaseWaitRunnable {
 			newLink.setLength(link.getLength());
 			newLink.setNumberOfLanes(link.getNumberOfLanes());
 			newLink.setAllowedModes(link.getAllowedModes());
-			((LinkImpl) newLink).setOrigId(link.getId().toString());
+			((LinkImpl) newLink).setOrigId(((LinkImpl)link).getOrigId());
 			network.addLink(newLink);
 			way2Links.put(way, Collections.singletonList(newLink));
 		}

@@ -55,7 +55,7 @@ public class NetworkLayer extends OsmDataLayer {
 		this.way2Links = way2Links;
 		NetworkListener listener;
 		try {
-			listener = new NetworkListener(this);
+			listener = new NetworkListener(this, network, way2Links);
 		} catch (IllegalArgumentException e) {
 			 JOptionPane.showMessageDialog(
 		                Main.parent,

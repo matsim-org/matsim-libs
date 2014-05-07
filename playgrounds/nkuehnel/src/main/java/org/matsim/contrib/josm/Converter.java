@@ -47,7 +47,7 @@ public class Converter implements PreferenceChangedListener {
 	private final static String TAG_JUNCTION = "junction";
 	private final static String TAG_ONEWAY = "oneway";
 
-	private final static String[] ALL_TAGS = new String[] { TAG_LANES,
+	public final static String[] ALL_TAGS = new String[] { TAG_LANES,
 			TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY };
 
 	private final Map<Long, OsmNode> nodes = new HashMap<Long, OsmNode>();
@@ -233,19 +233,19 @@ public class Converter implements PreferenceChangedListener {
 
 								if (this.hierarchyLayers.isEmpty()) {
 									createLink(this.network, way, fromNode,
-											toNode, length);
+											toNode, length, i);
 								} else {
 									for (OsmFilter osmFilter : this.hierarchyLayers) {
 										if (osmFilter.coordInFilter(
 												fromNode.coord, way.hierarchy)) {
 											createLink(this.network, way,
-													fromNode, toNode, length);
+													fromNode, toNode, length,i);
 											break;
 										}
 										if (osmFilter.coordInFilter(
 												toNode.coord, way.hierarchy)) {
 											createLink(this.network, way,
-													fromNode, toNode, length);
+													fromNode, toNode, length,i);
 											break;
 										}
 									}
@@ -277,8 +277,8 @@ public class Converter implements PreferenceChangedListener {
 		log.info("= end of conversion statistics ====================");
 	}
 
-	private void createLink(final Network network, final OsmWay way,
-			final OsmNode fromNode, final OsmNode toNode, final double length) {
+	public void createLink(final Network network, final OsmWay way,
+			final OsmNode fromNode, final OsmNode toNode, final double length, final int i) {
 		String highway = way.tags.get(TAG_HIGHWAY);
 
 		// load defaults
@@ -377,10 +377,10 @@ public class Converter implements PreferenceChangedListener {
 		Id toId = new IdImpl(toNode.id);
 		if (network.getNodes().get(fromId) != null
 				&& network.getNodes().get(toId) != null) {
-			String origId = Long.toString(way.id);
+			String origId = Long.toString(way.id)+"_"+i;
 
 			if (!onewayReverse) {
-				Link l = network.getFactory().createLink(new IdImpl(this.id),
+				Link l = network.getFactory().createLink(new IdImpl(origId),
 						network.getNodes().get(fromId),
 						network.getNodes().get(toId));
 				l.setLength(length);
@@ -388,14 +388,14 @@ public class Converter implements PreferenceChangedListener {
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
 				if (l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(origId);
+					((LinkImpl) l).setOrigId(String.valueOf(this.id));
 				}
 				network.addLink(l);
 				links.add(l);
 				this.id++;
 			}
 			if (!oneway) {
-				Link l = network.getFactory().createLink(new IdImpl(this.id),
+				Link l = network.getFactory().createLink(new IdImpl(origId+"_r"),
 						network.getNodes().get(toId),
 						network.getNodes().get(fromId));
 				l.setLength(length);
@@ -403,7 +403,7 @@ public class Converter implements PreferenceChangedListener {
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
 				if (l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(origId);
+					((LinkImpl) l).setOrigId(String.valueOf(this.id));
 				}
 				network.addLink(l);
 				links.add(l);
@@ -418,7 +418,7 @@ public class Converter implements PreferenceChangedListener {
 		}
 	}
 
-	private static class OsmNode {
+	public static class OsmNode {
 		public final long id;
 		public boolean used = false;
 		public int ways = 0;
@@ -430,7 +430,7 @@ public class Converter implements PreferenceChangedListener {
 		}
 	}
 
-	private static class OsmWay {
+	public static class OsmWay {
 		public final long id;
 		public final List<Long> nodes = new ArrayList<Long>();
 		public final Map<String, String> tags = new HashMap<String, String>();
