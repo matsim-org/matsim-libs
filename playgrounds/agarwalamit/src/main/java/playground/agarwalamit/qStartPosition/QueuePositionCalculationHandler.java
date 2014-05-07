@@ -43,7 +43,7 @@ import org.matsim.core.basic.v01.IdImpl;
 /**
  * @author amit
  */
-public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, LinkEnterEventHandler, PersonDepartureEventHandler, PersonStuckEventHandler {
+public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, LinkEnterEventHandler, PersonDepartureEventHandler {
 
 	private final Logger logger = Logger.getLogger(QueuePositionCalculationHandler.class);
 	private Map<Id, Map<Id, PersonOnLinkInformation>> linkId2PersonId2LinkInfo = new TreeMap<Id, Map<Id,PersonOnLinkInformation>>();
@@ -149,11 +149,6 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 			}
 			linkId2PersonId2LinkInfo.get(linkId).remove(personId);
 		}
-	}
-
-	@Override
-	public void handleEvent(PersonStuckEvent event) {
-		//		updateVehicleOnLinkAndFillToQueue(event.getTime());
 	}
 
 	private PersonOnLinkInformation insertLinkEnterInfo(LinkEnterEvent event, Link link){
