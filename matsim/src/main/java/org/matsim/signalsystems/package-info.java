@@ -14,12 +14,18 @@
  *    	<li> parameter name: <code>signalgroups</code> value: path to a file in the <code>signalGroups_v2.0.xsd</code> file format </li>
  *    	<li> parameter name: <code>signalcontrol</code> value: path to a file in the <code>signalControl_v2.0.xsd</code> file format </li>
  *    	<li> parameter name: <code>ambertimes</code> (optional) value: path to a file in the <code>amberTimes_v1.0.xsd</code> file format </li>
+ *    	<li> parameter name: <code>useIntergreenTimes</code> (optional) value: <code>true</code> or <code>false</code> </li>
+ *    	<li> parameter name: <code>intergreentimes</code> (optional) value: path to a file in the <code>intergreenTimes_v1.0.xsd</code> file format </li>
+ *     	<li> parameter name: <code>actionOnIntergreenViolation</code> (optional) value: <code>warn</code> or <code>exception</code> </li>
  *    </ol>
  *    </li>
  *  </ol>
  *  
  *  An example of such a configuration can be found in the input folder of the SignalSystemsIntegrationTest. If your data is in an older file format have a look at the
  *  package playground.dgrether.signalsystems.data.conversion for converters to the required file formats.
+ *  <p>
+ *  For more information see the documentation in <code>contrib/signals/docs/user-guide</code>.
+ *  </p>
  *  
  *  <h2>Data Model description</h2>
  *  
@@ -84,6 +90,7 @@
  * Changes by non-maintainers are prohibited. Patches very welcome!
  * 
  * @author dgrether
+ * @author tthunig
  */
 package org.matsim.signalsystems;
 
