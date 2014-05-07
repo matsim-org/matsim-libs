@@ -16,11 +16,12 @@ public class AverageNumberOfStrategyGroups {
 		int startIteration = 0;
 		int endIteration = 28;
 		int iterationStep = 1;
+		boolean removePrivateParking = false;
 		String runOutputFolder = "C:/data/parkingSearch/psim/zurich/output/run20/output/";
 
 		for (int i = startIteration; i < endIteration; i += iterationStep) {
 			TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> parkingScores = StrategyScoresAnalysis
-					.getScores(runOutputFolder, i, true);
+					.getScores(runOutputFolder, i, removePrivateParking);
 
 			int sampleSize = 0;
 			int sumNumberOfStrategies = 0;
@@ -33,21 +34,18 @@ public class AverageNumberOfStrategyGroups {
 			System.out.println(i + ":" + sumNumberOfStrategies / 1.0
 					/ sampleSize);
 		}
-
+		
 	}
 
-	private static int getNumberOfStrategies(
+	protected static int getNumberOfStrategies(
 			LinkedList<StrategyScoreLog> strategyScores) {
-		boolean multipleStrategiesPerGroup = true;
+		
 
 		HashSet<String> strategies = new HashSet<String>();
 
 		for (StrategyScoreLog logElement : strategyScores) {
 
 			if (logElement.score>Double.NEGATIVE_INFINITY) {
-				if (!multipleStrategiesPerGroup) {
-					strategies.add(logElement.strategyName);
-				} else {
 					String[] split = logElement.strategyName.split("-");
 					String groupName = "";
 
@@ -59,21 +57,8 @@ public class AverageNumberOfStrategyGroups {
 						}
 					}
 					strategies.add(groupName);
-				}
 			}
 
-		}
-
-		if (strategies.size() > 5) {
-			for (StrategyScoreLog logElement : strategyScores) {
-				// logElement.print();
-			}
-		}
-
-		if (strategies.size() < strategyScores.size()) {
-			for (StrategyScoreLog logElement : strategyScores) {
-				// logElement.print();
-			}
 		}
 
 		return strategies.size();
