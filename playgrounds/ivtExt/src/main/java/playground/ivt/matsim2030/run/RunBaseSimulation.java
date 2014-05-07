@@ -45,6 +45,11 @@ public class RunBaseSimulation {
 				Matsim2030Utils.createTripRouterFactory(
 					scenario ) );
 		
+		// Code from Alex called (i) Controler.setOverrideFiles( true ) and
+		// (ii) Controler.setCreateGraphs( true ), but
+		// - (i) is wrong. Whatever you expect it to do, it does something different.
+		// - (ii) sets a config option, and config options should be set from config, not code.
+		// So I do not call them here.
 		controler.run();
 	}
 }
