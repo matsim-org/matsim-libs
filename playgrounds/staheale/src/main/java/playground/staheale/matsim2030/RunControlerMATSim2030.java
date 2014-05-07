@@ -24,7 +24,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouterConfig;
-import playground.thibautd.analysis.listeners.TripModeShares;
+
+import playground.ivt.utils.TripModeShares;
 
 
 public class RunControlerMATSim2030 extends Controler {

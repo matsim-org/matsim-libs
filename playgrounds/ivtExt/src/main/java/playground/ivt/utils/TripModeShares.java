@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.analysis.listeners;
+package playground.ivt.utils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -48,8 +48,6 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
-
-import playground.thibautd.utils.charts.WrapperChartUtil;
 
 /**
  * @author thibautd

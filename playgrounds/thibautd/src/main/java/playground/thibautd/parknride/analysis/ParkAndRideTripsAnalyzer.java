@@ -38,8 +38,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.pt.PtConstants;
 
+import playground.ivt.utils.WrapperChartUtil;
 import playground.thibautd.parknride.ParkAndRideConstants;
-import playground.thibautd.utils.charts.WrapperChartUtil;
 
 /**
  * Provides methods to create plots relative to various caracteristics of
