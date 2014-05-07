@@ -5,10 +5,10 @@
  * amber time a signal group is amber between the onset and dropping or vice versa.
  * <p>
  * This can be done globally by setting the defaults in the <code>AmberTimesData</code> instance
- * or by a <code>AmberTimeData</object> per signal system.
+ * or by a <code>AmberTimeData</code> object per signal system.
  * </p>
  * <p>
- * The classes correspond to the data format defined in amberTimes_v1.0.xsd for that a reader
+ * The classes correspond to the data format defined in <code>amberTimes_v1.0.xsd</code> for that a reader
  * and a writer can be found in this package. 
  * </p>
  * <p>
