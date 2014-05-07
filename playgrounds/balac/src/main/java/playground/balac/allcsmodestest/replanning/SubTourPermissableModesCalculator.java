@@ -32,7 +32,7 @@ public class SubTourPermissableModesCalculator implements PermissibleModesCalcul
 		
 		 if (p.getTravelcards() != null && Boolean.parseBoolean(config.getModule("TwoWayCarsharing").getParams().get("useTwoWayCarsharing"))
 		
-		&& (p.getLicense() == "yes")  && p.getTravelcards().contains("ch-HT-mobility"))
+		&& (p.getLicense().equals( "yes"))  && p.getTravelcards().contains("ch-HT-mobility"))
 		
 				modes.add("twowaycarsharing");
 		
