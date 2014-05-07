@@ -56,7 +56,10 @@ public final class WagonSimConstants {
 	public static final String LINK_VFACTOR = "vFactor";
 	public static final String LINK_OWNERID = "ownerId";
 	public static final String LINK_OWNERNAME = "ownerName";
-	public static final double DEFAULT_CAPACITY = 999999.0;
+	public static final double DEFAULT_CAPACITY = 99999.0;
+	public static final double DEFAULT_FREESPEED = 99999.0;
+	public static final double DEFAULT_NUMLANES = 1.0;
+	public static final double DEFAULT_LENGTH_LOOPLINK = 50.0;
 	
 	public static final String NODE_PRODUCTIONNODE_TYPE = "productionNodeType";
 	public static final String NODE_INFRANODE_ID = "infraNodeId";

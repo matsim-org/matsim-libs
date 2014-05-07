@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.wagonSim.WagonSimConstants;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -117,10 +118,10 @@ public class ShuntingTableToMATSimScheduleEnricher {
 						if (dwellLink == null) {
 							Node node = scenario.getNetwork().getLinks().get(stop.getStopFacility().getLinkId()).getToNode();
 							dwellLink = factory.createLink(stop.getStopFacility().getId(),node,node);
-							dwellLink.setLength(50);
-							dwellLink.setFreespeed(99999.0);
-							dwellLink.setCapacity(99999.0);
-							dwellLink.setNumberOfLanes(1);
+							dwellLink.setLength(WagonSimConstants.DEFAULT_LENGTH_LOOPLINK);
+							dwellLink.setFreespeed(WagonSimConstants.DEFAULT_FREESPEED);
+							dwellLink.setCapacity(WagonSimConstants.DEFAULT_CAPACITY);
+							dwellLink.setNumberOfLanes(WagonSimConstants.DEFAULT_NUMLANES);
 							dwellLink.setAllowedModes(transitModes);
 							scenario.getNetwork().addLink(dwellLink);
 						}

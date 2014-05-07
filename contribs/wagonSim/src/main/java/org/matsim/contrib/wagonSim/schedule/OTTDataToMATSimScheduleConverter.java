@@ -241,8 +241,8 @@ public class OTTDataToMATSimScheduleConverter {
 		new CreatePseudoNetwork(scenario.getTransitSchedule(),scenario.getNetwork(),"").createNetwork();
 
 		for (Link l : scenario.getNetwork().getLinks().values()) {
-			l.setCapacity(99999.0);
-			l.setFreespeed(99999.0);
+			l.setCapacity(WagonSimConstants.DEFAULT_CAPACITY);
+			l.setFreespeed(WagonSimConstants.DEFAULT_FREESPEED);
 		}
 	}
 	
