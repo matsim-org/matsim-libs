@@ -36,8 +36,10 @@ public class CarsharingDepartureTimes {
 						
 						if (((Leg) pe).getMode().equals( "carsharingwalk" )) 		
 							if (!a.getType().equals( "carsharingInteraction" )) {
-								bla[(int)a.getEndTime()/3600]++;
-								count++;
+								if (a.getEndTime() > 0.0) {
+									bla[(int)a.getEndTime()/3600]++;
+									count++;
+								}
 							}
 				}
 			}

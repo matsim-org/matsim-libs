@@ -20,11 +20,7 @@ public class ToursPerPurpose {
 		networkReader.readFile(networkFilePath);
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesfilePath);
 		populationReader.readFile(plansFilePath);
-		int countCS = 0;
-		int countC = 0;
-		int countW = 0;
-		int countB = 0;
-		int countPT = 0;
+		
 		int count = 0;
 		int countWork = 0;
 		int countLeisure = 0;
