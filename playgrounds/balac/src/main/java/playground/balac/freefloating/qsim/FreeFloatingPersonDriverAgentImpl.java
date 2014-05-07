@@ -2,11 +2,9 @@ package playground.balac.freefloating.qsim;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -79,11 +77,12 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 
 	private MobsimAgent.State state = MobsimAgent.State.ABORT;
 	
-	private Scenario scenario;
+	private Scenario scenario;	
 	
-	private boolean freeFloatingWalk = false;
 	private Controler controler;
+	
 	private Link startLink;
+	
 	private FreeFloatingVehiclesLocation ffvehiclesLocation;
 
 	// ============================================================================================================================
@@ -249,16 +248,15 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 		} else if (pe instanceof Leg) {
 			Leg leg = (Leg) pe;
 			//start of added stuff		
-			this.freeFloatingWalk = false;
 								
-			if (leg.getMode().equals( "walk" )) {
+			if (leg.getMode().equals( "walk_ff" )) {
 				
-				if (this.plan.getPlanElements().get(this.plan.getPlanElements().indexOf(pe) + 1) instanceof Leg) {
+			//	if (this.plan.getPlanElements().get(this.plan.getPlanElements().indexOf(pe) + 1) instanceof Leg) {
 				
 					initializeFreeFLoatingWalkLeg(leg);
-				}
-				else
-					initializeLeg(leg);
+				//}
+			//	else
+			//		initializeLeg(leg);
 				
 			}
 			else if (leg.getMode().equals( "freefloating" )) {
@@ -277,8 +275,15 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 		this.state = MobsimAgent.State.LEG;
 		Route route = leg.getRoute();
 		Link link = findClosestAvailableCar(route.getStartLinkId());
+		
+		if (link == null) {
+			this.state = MobsimAgent.State.ABORT ;
+			return;
+			
+		}
+		
 		startLink = link;
-		LegImpl walkLeg = new LegImpl("walk");
+		LegImpl walkLeg = new LegImpl("walk_ff");
 		
 		GenericRouteImpl walkRoute = new GenericRouteImpl(route.getStartLinkId(), link.getId());
 		final double dist = CoordUtils.calcDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), link.getCoord());
@@ -292,14 +297,13 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 		
 		walkLeg.setRoute(walkRoute);
 		this.cachedDestinationLinkId = link.getId();
-		leg.setTravelTime(travTime);
+		walkLeg.setTravelTime(travTime);
 		// set the route according to the next leg
 		this.currentLeg = walkLeg;
 		this.cachedRouteLinkIds = null;
 		this.currentLinkIdIndex = 0;
 		this.cachedNextLinkId = null;
 		
-		this.freeFloatingWalk = true;
 		
 		return;
 		
@@ -354,7 +358,6 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 		this.currentLinkIdIndex = 0;
 		this.cachedNextLinkId = null;
 			
-		this.freeFloatingWalk = false;
 			
 		return;
 			
@@ -369,6 +372,7 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 		Link link = scenario.getNetwork().getLinks().get(linkId);
 		
 		FreeFloatingStation location = ffvehiclesLocation.getQuadTree().get(link.getCoord().getX(), link.getCoord().getY());
+		if (location == null) return null;
 		ffvehiclesLocation.removeVehicle(location.getLink());
 		return location.getLink();
 	}
@@ -391,9 +395,7 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 			return;
 		} else {
 			this.cachedDestinationLinkId = route.getEndLinkId();
-			//if (leg.getMode().equals("walk"))
-			//	log.info("bla");
-			// set the route according to the next leg
+			
 			this.currentLeg = leg;
 			this.cachedRouteLinkIds = null;
 			this.currentLinkIdIndex = 0;

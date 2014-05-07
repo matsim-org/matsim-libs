@@ -15,7 +15,6 @@ import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.balac.freefloating.config.FreeFloatingConfigGroup;
@@ -30,7 +29,6 @@ public class FreeFloatingControler extends Controler{
 	
 	public FreeFloatingControler(Scenario scenario) {
 		super(scenario);
-		// TODO Auto-generated constructor stub
 	}
 
 
@@ -48,18 +46,13 @@ public class FreeFloatingControler extends Controler{
     	final Config config = ConfigUtils.loadConfig(args[0]);
     	FreeFloatingConfigGroup configGroup = new FreeFloatingConfigGroup();
     	config.addModule(configGroup);
-		final Scenario sc = ScenarioUtils.createScenario(config);			
-
-		ScenarioLoaderImpl scl = new ScenarioLoaderImpl(sc);
+		final Scenario sc = ScenarioUtils.loadScenario(config);
 		
-		scl.loadScenario();
 		
 		final FreeFloatingControler controler = new FreeFloatingControler( sc );
-
-		String inputFilePath = "C:/Users/balacm/Desktop/FreeFloating/vehicleLocations.txt";
 		
 		try {
-			FreeFloatingVehiclesLocation ffvehiclesLocation = new FreeFloatingVehiclesLocation(inputFilePath, controler);
+			FreeFloatingVehiclesLocation ffvehiclesLocation = new FreeFloatingVehiclesLocation(config.getModule("FreeFloating").getParams().get("vehiclelocationsFreefloating"), controler);
 		
 		
 		controler.setMobsimFactory( new FreeFloatingQsimFactory(sc, controler, ffvehiclesLocation) );
@@ -96,7 +89,7 @@ public class FreeFloatingControler extends Controler{
 												return "freefloating";
 											}
 										}
-										// if the trip doesn't contain a carsharing leg,
+										// if the trip doesn't contain a freefloating leg,
 										// fall back to the default identification method.
 										return defaultModeIdentifier.identifyMainMode( tripElements );
 									}
@@ -109,8 +102,7 @@ public class FreeFloatingControler extends Controler{
 				});
       controler.getConfig().setParam("controler", "runId", "1");
       controler.setOverwriteFiles(true);
-      controler.init(config, sc.getNetwork());
-		
+      controler.init(config, sc.getNetwork());		
 		
 		controler.run();
 } catch (IOException e) {

@@ -26,24 +26,43 @@ public class FreeFloatingConfigGroup extends ReflectiveModule {
 	
 	public static final String GROUP_NAME = "FreeFloating";
 		
-	private String travelingFreeFLoating = null;
+	private String travelingFreeFloating = null;
 	
 	private String constantFreeFloating = null;
 	
 	private String vehiclelocationsInputFile = null;
 	
+	private String timeFeeFreeFloating = null;
+	
+	private String distanceFeeFreeFloating = null;
+	
+	private boolean useFeeFreeFloating = false;
+	
+	private String statsFileName = null;
+
+	
 	public FreeFloatingConfigGroup() {
 		super(GROUP_NAME);
 	}
-
-	@StringGetter( "travelingFreeFLoating" )
-	public String getUtilityOfTravelling() {
-		return this.travelingFreeFLoating;
+	
+	@StringGetter( "statsFileName" )
+	public String getStatsFileName() {
+		return this.statsFileName;
 	}
 
-	@StringSetter( "travelingFreeFLoating" )
-	public void setUtilityOfTravelling(final String travelingFreeFLoating) {
-		this.travelingFreeFLoating = travelingFreeFLoating;
+	@StringSetter( "statsFileName" )
+	public void setStatsFileName(final String statsFileName) {
+		this.statsFileName = statsFileName;
+	}
+
+	@StringGetter( "travelingFreeFloating" )
+	public String getUtilityOfTravelling() {
+		return this.travelingFreeFloating;
+	}
+
+	@StringSetter( "travelingFreeFloating" )
+	public void setUtilityOfTravelling(final String travelingFreeFloating) {
+		this.travelingFreeFloating = travelingFreeFloating;
 	}
 
 	@StringGetter( "constantFreeFloating" )
@@ -65,4 +84,35 @@ public class FreeFloatingConfigGroup extends ReflectiveModule {
 	public void setvehiclelocations(final String vehiclelocationsInputFile) {
 		this.vehiclelocationsInputFile = vehiclelocationsInputFile;
 	}
+	
+	@StringGetter( "timeFeeFreeFloating" )
+	public String timeFeeFreeFloating() {
+		return this.timeFeeFreeFloating;
+	}
+
+	@StringSetter( "timeFeeFreeFloating" )
+	public void setTimeFeeFreeFloating(final String timeFeeFreeFloating) {
+		this.timeFeeFreeFloating = timeFeeFreeFloating;
+	}
+	
+	@StringGetter( "distanceFeeFreeFloating" )
+	public String distanceFeeFreeFloating() {
+		return this.distanceFeeFreeFloating;
+	}
+
+	@StringSetter( "distanceFeeFreeFloating" )
+	public void setDistanceFeeFreeFloating(final String distanceFeeFreeFloating) {
+		this.distanceFeeFreeFloating = distanceFeeFreeFloating;
+	}
+	
+	@StringGetter( "useFreeFloating" )
+	public boolean useFeeFreeFloating() {
+		return this.useFeeFreeFloating;
+	}
+
+	@StringSetter( "useFreeFloating" )
+	public void setUseFeeFreeFloating(final boolean useFeeFreeFloating) {
+		this.useFeeFreeFloating = useFeeFreeFloating;
+	}
+	
 }

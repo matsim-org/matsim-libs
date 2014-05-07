@@ -2,6 +2,7 @@ package playground.balac.freefloating.qsim;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.network.Link;
@@ -48,6 +49,35 @@ public class FreeFloatingVehiclesLocation {
 	   
 	  }
 	
+	public FreeFloatingVehiclesLocation(Controler controler, ArrayList<FreeFloatingStation> stations) throws IOException {
+	    double minx = (1.0D / 0.0D);
+	    double miny = (1.0D / 0.0D);
+	    double maxx = (-1.0D / 0.0D);
+	    double maxy = (-1.0D / 0.0D);
+
+	    for (Link l : controler.getNetwork().getLinks().values()) {
+	      if (l.getCoord().getX() < minx) minx = l.getCoord().getX();
+	      if (l.getCoord().getY() < miny) miny = l.getCoord().getY();
+	      if (l.getCoord().getX() > maxx) maxx = l.getCoord().getX();
+	      if (l.getCoord().getY() <= maxy) continue; maxy = l.getCoord().getY();
+	    }
+	    minx -= 1.0D; miny -= 1.0D; maxx += 1.0D; maxy += 1.0D;
+
+	    vehicleLocationQuadTree = new QuadTree<FreeFloatingStation>(minx, miny, maxx, maxy);
+	    
+	    
+	    for(FreeFloatingStation f: stations) {  
+	    	
+	    	vehicleLocationQuadTree.put(f.getLink().getCoord().getX(), f.getLink().getCoord().getY(), f);
+	    }
+	    
+	  
+	    
+	   
+	  }
+	
+	
+	
 	public QuadTree<FreeFloatingStation> getQuadTree() {
 		
 		return vehicleLocationQuadTree;
@@ -57,17 +87,18 @@ public class FreeFloatingVehiclesLocation {
 		
 		FreeFloatingStation f = vehicleLocationQuadTree.get(link.getCoord().getX(), link.getCoord().getY());
 		
-		if ( f.getLink().getId().toString().equals(link.getId().toString())) {
+		if (f == null || !f.getLink().getId().toString().equals(link.getId().toString())) {
 			
-			FreeFloatingStation fNew = new FreeFloatingStation(link, f.getNumberOfVehicles() + 1);		
-			vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), f);
+			FreeFloatingStation fNew = new FreeFloatingStation(link,  1);		
+			
 			vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), fNew);
+			
 			
 		}
 		else {
 			
-			FreeFloatingStation fNew = new FreeFloatingStation(link,  1);		
-			
+			FreeFloatingStation fNew = new FreeFloatingStation(link, f.getNumberOfVehicles() + 1);		
+			vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), f);
 			vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), fNew);
 			
 		}

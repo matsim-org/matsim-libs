@@ -1,15 +1,12 @@
 package playground.balac.freefloating.scoring;
 
 import java.util.TreeSet;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
@@ -17,16 +14,13 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 public class FreeFloatingLegScoringFunction extends org.matsim.core.scoring.functions.CharyparNagelLegScoring {
 
 	private PlanImpl plan;
-	private Network network;	
 	
 	private Config config;
 	
 	public FreeFloatingLegScoringFunction(PlanImpl plan, CharyparNagelScoringParameters params, Config config,  Network network)
 	{
 		super(params, network);
-		this.plan = plan;
-		this.network = network;
-		
+		this.plan = plan;		
 		this.config = config;
 	}
 	@Override
@@ -59,7 +53,8 @@ public class FreeFloatingLegScoringFunction extends org.matsim.core.scoring.func
 		else if (("freefloating").equals(leg.getMode())) {				
 			
 			travelTime = arrivalTime - departureTime;
-			tmpScore += travelTime * Double.parseDouble(this.config.getModule("FreeFLoating").getParams().get("travelingFreeFloating"));
+			tmpScore += Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("constantFreeFloating"));
+			tmpScore += travelTime * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("travelingFreeFloating"));
 		}
 		
 		else if (TransportMode.pt.equals(leg.getMode()))
@@ -71,6 +66,11 @@ public class FreeFloatingLegScoringFunction extends org.matsim.core.scoring.func
 
 		}
 		else if (TransportMode.walk.equals(leg.getMode()))
+		{
+			
+			tmpScore += getWalkScore(dist, travelTime);
+		}
+		else if (leg.getMode().equals("walk_ff"))
 		{
 			
 			tmpScore += getWalkScore(dist, travelTime);
@@ -98,7 +98,6 @@ public class FreeFloatingLegScoringFunction extends org.matsim.core.scoring.func
 	}
 
 	private double getRideScore(double distance, double travelTime) {
-		double score = 0.0D;
 
 		
 		return -100;
@@ -118,7 +117,7 @@ public class FreeFloatingLegScoringFunction extends org.matsim.core.scoring.func
 		double score = 0.0D;
 
 		double distanceCost = 0.0D;
-		TreeSet travelCards = ((PersonImpl)this.plan.getPerson()).getTravelcards();
+		TreeSet<String> travelCards = ((PersonImpl)this.plan.getPerson()).getTravelcards();
 		if (travelCards == null || travelCards.contains("ch-HT-mobility"))
 			distanceCost = this.params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m;
 		else if (travelCards.contains("unknown"))
