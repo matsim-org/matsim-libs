@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 public class CSVReader {
+	public  LinkedList<String[]> readCSV(String fileName){
+		return readCSV(fileName, "\t");
+	}
 	public  LinkedList<String[]> readCSV(String fileName, String trennzeichen){
 		BufferedReader reader = null;
 		LinkedList<String[]> liste = new LinkedList<String[]>();

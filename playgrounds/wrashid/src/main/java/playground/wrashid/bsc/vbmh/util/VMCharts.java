@@ -24,6 +24,17 @@ public class VMCharts {
 		charts.get(chartName).line=line;
 	}
 	
+	public void setBoxXStart(String chartName, double xStart){
+		charts.get(chartName).boxXStart=xStart;
+	}
+	public void setBoxXEnd(String chartName, double xEnd){
+		charts.get(chartName).boxXEnd=xEnd;
+	}
+	
+	public void setBox(String chartName, Boolean box){
+		charts.get(chartName).box=box;
+	}
+	
 	public void addSeries(String chartName, String seriesName){
 		charts.get(chartName).series.put(seriesName, new LinkedList<double[]>());
 	}
@@ -37,6 +48,10 @@ public class VMCharts {
 	static public void setAxis(String chartName, String xName, String yName){
 		charts.get(chartName).xName=xName;
 		charts.get(chartName).yName=yName;
+	}
+	
+	static public void setInterval(String chartName, double interval){
+		charts.get(chartName).interval=interval;
 	}
 	
 	static public void printCharts(String directory, int iter){
@@ -53,16 +68,22 @@ public class VMCharts {
 	
 	
 	class SingleChart {
+		double boxXStart=0.0;
+		double boxXEnd=0.0;
 		HashMap<String, LinkedList<double[]>> series = new HashMap<String, LinkedList<double[]>>();
 		String name;
 		String xName = "X";
 		String yName = "Y";
 		Boolean logAx = true;
 		Boolean line = false;
+		Boolean scatter = true;
+		Boolean box = false;
+		double interval;
 		
 		void print(String filename){
 			XYScatterChart chart = new XYScatterChart(name, xName, yName,logAx); //True aktiviert log scale
 			XYLineChart lineChart = new XYLineChart(name, xName, yName,logAx);
+			VMBoxPlot boxPlot = new VMBoxPlot(name, xName, yName, interval);
 			
 			Iterator<String> names = series.keySet().iterator();
 			for (LinkedList<double[]> serie : series.values()){
@@ -89,13 +110,23 @@ public class VMCharts {
 				}
 				chart.addSeries(name, x,y);
 				lineChart.addSeries(name, x,y);
+				boxPlot.addSeries(name, x, y);
 				writer.close();
 			}
 			
 			//chart.getChart().getXYPlot().getRenderer().setBaseShape(new Ellipse2D.Double(0,0,5,5));
 			if(line){
 				lineChart.saveAsPng(filename, 2400, 1500);
-			}else{
+			}
+			
+			if(box){
+				boxPlot.xStartValue=boxXStart;
+				boxPlot.xEndValue=boxXEnd;
+				boxPlot.divideXAxis(interval);
+				boxPlot.saveAsPng(filename, 2400, 1500);
+			}
+			
+			if(!box && !line){
 				chart.saveAsPng(filename, 2400, 1500);
 			}
 			
