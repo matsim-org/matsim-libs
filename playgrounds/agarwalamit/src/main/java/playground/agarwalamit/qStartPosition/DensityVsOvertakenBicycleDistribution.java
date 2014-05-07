@@ -23,7 +23,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
@@ -41,12 +43,13 @@ public class DensityVsOvertakenBicycleDistribution extends AbstractAnalyisModule
 
 	public DensityVsOvertakenBicycleDistribution(String eventFile) {
 		super(DensityVsOvertakenBicycleDistribution.class.getSimpleName());
-		this.dpd = new DensityVsPassingDistributionHandler();
+		Id linkId = new IdImpl("1");
+		this.dpd = new DensityVsPassingDistributionHandler(linkId);
 		this.eventFile = eventFile;
 	}
 
 	public static void main(String[] args) {
-				String outputDir ="../../patnaIndiaSim/outputSS/3links1Km/";
+				String outputDir ="../../patnaIndiaSim/outputSS/2modes/prob5050P40/";
 				String eventFile = outputDir+"/events.xml";
 //		String outputDir = "./output/";
 //		String eventFile =outputDir+"/events2000.xml";
@@ -75,7 +78,7 @@ public class DensityVsOvertakenBicycleDistribution extends AbstractAnalyisModule
 
 	@Override
 	public void writeResults(String outputFolder) {
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"rDensityVsOvertakenBicycleCount.txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"rDensityVsAvgOvertakenBicycleCount.txt");
 		try {
 			writer.write("density \t numberOfBicyclesOvertaken \n");
 			for(Entry<Double, Double> e:this.dpd.getDensity2OvertakenBicycleCount().entrySet()){
