@@ -21,11 +21,11 @@ import org.openstreetmap.josm.gui.NavigatableComponent;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.mappaint.LabelCompositionStrategy;
 import org.openstreetmap.josm.gui.mappaint.TextElement;
+
 /**
- * the MATSim MapRenderer. Draws ways that correspond 
- * to an existing MATSim link in a MATSim blue color.
- * Also offers offset for overlapping links as well 
- * as the option to show MATSim ids on ways
+ * the MATSim MapRenderer. Draws ways that correspond to an existing MATSim link
+ * in a MATSim blue color. Also offers offset for overlapping links as well as
+ * the option to show MATSim ids on ways
  * 
  */
 public class MapRenderer extends StyledMapRenderer {
@@ -52,9 +52,9 @@ public class MapRenderer extends StyledMapRenderer {
 			boolean showOneway, boolean onewayReversed) {
 
 		Layer layer = Main.main.getActiveLayer();
-		if (Layer2Network.containsLayer(layer)) {
-			Map<Way, List<Link>> way2Links = Layer2Network
-					.getWay2Links(layer);
+		if (layer instanceof NetworkLayer) {
+			Map<Way, List<Link>> way2Links = ((NetworkLayer) layer)
+					.getWay2Links();
 			if (way2Links.containsKey(way)) {
 				if (!way2Links.get(way).isEmpty()) {
 					if (!way.isSelected()) {
@@ -128,11 +128,9 @@ public class MapRenderer extends StyledMapRenderer {
 		@Override
 		public String compose(OsmPrimitive prim) {
 			Layer layer = Main.main.getActiveLayer();
-			for(Link link: Layer2Network.getWay2Links(layer).get(prim)) {
-				String id = link.getId().toString();
-				return id.substring(0, id.indexOf("_"));
-			}
-			return null;
+			Id id = new IdImpl(prim.getUniqueId());
+			return ((LinkImpl) ((NetworkLayer) layer).getMatsimNetwork()
+					.getLinks().get(id)).getOrigId();
 		}
 	}
 }
