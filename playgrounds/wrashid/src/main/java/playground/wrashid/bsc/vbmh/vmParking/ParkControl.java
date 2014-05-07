@@ -2,6 +2,7 @@ package playground.wrashid.bsc.vbmh.vmParking;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -63,6 +64,7 @@ public class ParkControl {
 	LinkedList<LinkedList<String>> notParked;
 	HashMap<Integer, Integer> peakLoad;
 	HashMap<Integer, Integer> load;
+	HashMap<Id, Double> personalBetaSOC = new HashMap<Id, Double>();
 	
 	
 	Controler controller;
@@ -296,6 +298,7 @@ public class ParkControl {
 		int countFastCharge=0;
 		int countTurboCharge=0;
 		AdvancedParkingChoice choice = new AdvancedParkingChoice();
+		choice.startUp();
 		
 		//calculate needed Battery Percenatge and check if ev has to charge
 		if(ev){
@@ -307,6 +310,16 @@ public class ParkControl {
 				phwriter.addAgentHasToCharge(Double.toString(time), personId.toString());
 				hasToCharge=true;
 			}
+			
+			//Get Beta SOC
+			Double betaSOC = personalBetaSOC.get(personId);
+			if(betaSOC != null){
+				choice.setBetaSOC(betaSOC);
+			}else{
+				personalBetaSOC.put(personId, choice.getBetaSOC());
+			}
+			
+			
 		}
 		//----------------
 		choice.setRequiredRestOfDayBatPerc(neededBatteryPercentage);
@@ -760,6 +773,22 @@ public class ParkControl {
 		notParked.add(0, headLine);
 		csvWriter.writeAll(notParked);
 		csvWriter.close();
+		
+		csvWriter = new CSVWriter(controller.getConfig().getModule("controler").getValue("outputDirectory")+"/parkhistory/personalBETASOC_"+controller.getIterationNumber());
+		LinkedList<LinkedList<String>> personalBetaSOCOutput = new LinkedList<LinkedList<String>>();
+		headLine = new LinkedList<String>();
+		headLine.add("PersonID");
+		headLine.add("betaSOC");
+		personalBetaSOCOutput.add(0, headLine);
+		Iterator<Id> iterartor = personalBetaSOC.keySet().iterator();
+		for(Double item : personalBetaSOC.values()){
+			personalBetaSOCOutput.add(new LinkedList<String>());
+			personalBetaSOCOutput.getLast().add(iterartor.next().toString());
+			personalBetaSOCOutput.getLast().add(Double.toString(item));
+		}
+		csvWriter.writeAll(personalBetaSOCOutput);
+		csvWriter.close();
+		
 		
 	}
 	

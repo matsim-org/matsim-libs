@@ -15,7 +15,7 @@ public class AdvancedParkingChoice {
 	double betaSOCMean;
 	double betaSOCSD;
 	Random random;
-	double betaSOC;
+	double betaSOC=0;
 	double betaReserve;
 	double requiredRestOfDayBatPerc;
 	LinkedList<Option> options = new LinkedList<Option>();
@@ -30,12 +30,27 @@ public class AdvancedParkingChoice {
 		betaSOCMean = VMConfig.betaSOCMean; // in $/1
 		betaSOCSD = VMConfig.betaSOCSD;	// in $/1
 		random = new Random();
-		betaSOC = (betaSOCMean + (random.nextGaussian()*betaSOCSD))*betaPayMoney*(-1); //in Util/1
+		if(betaSOC==0){
+			betaSOC = (betaSOCMean + (random.nextGaussian()*betaSOCSD))*betaPayMoney*(-1); //in Util/1
+			System.out.println("betaSOC : "+betaSOC);
+		}
 		//System.out.println("betaSOC : "+betaSOC);
 	}
 	
 	
 	
+	public double getBetaSOC() {
+		return betaSOC;
+	}
+
+
+
+	public void setBetaSOC(double betaSOC) {
+		this.betaSOC = betaSOC;
+	}
+
+
+
 	public void setRequiredRestOfDayBatPerc(double requiredRestOfDayBatPerc) {
 		this.requiredRestOfDayBatPerc = requiredRestOfDayBatPerc;
 	}
@@ -85,7 +100,7 @@ public class AdvancedParkingChoice {
 	}
 	
 	public Option selectBestOption(){
-		this.startUp();
+		//this.startUp();
 		Option bestOption = null;
 		
 		for(Option option : options){
