@@ -43,7 +43,7 @@ public class EVControl {
 	
 	//------------------------------------------------------------------------------------
 	
-	public void linkLeave(LinkLeaveEvent event){
+	public void linkLeave(LinkLeaveEvent event){ //!! Sicherstellen dass nicht von fussgaenger ausgeloest wird
 		Id personID = event.getPersonId();
 		if (this.evList.hasEV(personID)){
 			//System.out.println("EV am umme cruise");

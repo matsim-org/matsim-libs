@@ -125,6 +125,8 @@ public class ParkControl {
 		vmCharts.addSeries("Available EVparkings", "fast charge");
 		vmCharts.addSeries("Available EVparkings", "turbo charge");
 		vmCharts.addChart("Walking Distance");
+		vmCharts.setBox("Walking Distance", true);
+		vmCharts.setInterval("Walking Distance", 900);
 		vmCharts.setAxis("Walking Distance", "time", "distance");
 		vmCharts.addSeries("Walking Distance", "Walking distance charge");
 		vmCharts.addSeries("Walking Distance", "Walking distance no charge");
