@@ -373,23 +373,23 @@ public class TtCalculateSimplifiedIntergreens {
 	}
 
 	/**
-	 * Please choose the boolean "simplifyPhases" here in the code. 
+	 * Please choose the boolean "simplifyPhases" here in the code.
 	 * 
-	 * Intergreen times are only calculated to signals in the next phase. 
-	 * So different definitions of phases treat in different numbers of calculated intergreens.
+	 * Intergreen times are only calculated to signals in the next phase. So
+	 * different definitions of phases treat in different numbers of calculated
+	 * intergreens.
 	 * 
-	 * A phase is a
-	 * time period of a (fixed time) signal control, where the end is defined by
-	 * the dropping of the largest setting starting at the phase starting time. 
-	 * So different such phases may overlap each other. If you choose 
-	 * "simplifyPhases" as true, overlapping phases will be simplified in the sense 
-	 * that they get zero intergreen times.
+	 * A phase is a time period of a (fixed time) signal control, where the end
+	 * is defined by the dropping of the largest setting starting at the phase
+	 * starting time. So different such phases may overlap each other. If you
+	 * choose "simplifyPhases" as true, overlapping phases will be simplified in
+	 * the sense that they get zero intergreen times.
 	 * 
-	 * If you choose "simplifyPhases" as false,
-	 * all these simplified phases will be handled as one phase. 
-	 * They will get no intergreen times because they are allowed to show green at the same time. 
-	 * In this case you will get more intergreen times, because all intergreens to signals in the 
-	 * next (now bigger) phase will be calculated.
+	 * If you choose "simplifyPhases" as false, all these simplified phases will
+	 * be handled as one phase. They will get no intergreen times because they
+	 * are allowed to show green at the same time. In this case you will get
+	 * more intergreen times, because all intergreens to signals in the next
+	 * (now bigger) phase will be calculated.
 	 * 
 	 */
 	public static void main(String[] args) {
