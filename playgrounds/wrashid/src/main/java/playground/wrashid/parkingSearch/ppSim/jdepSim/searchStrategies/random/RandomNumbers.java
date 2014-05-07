@@ -57,11 +57,11 @@ public class RandomNumbers {
 		// GeneralLib.generateHistogram(fileName, value, numberOfBins, title,
 		// xLabel, yLabel);
 		for (int i = 0; i < 10; i++) {
-			System.out.println(getLinnearRandomNumber(10));
+			System.out.println(getLinearRandomNumber(10));
 		}
 	}
 
-	public static int getLinnearRandomNumber(int maxSize) {
+	public static int getLinearRandomNumber(int maxSize) {
 		int randomMultiplier = maxSize * (maxSize + 1) / 2;
 		Random r = new Random();
 		int randomInt = r.nextInt(randomMultiplier);
