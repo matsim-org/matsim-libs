@@ -17,22 +17,18 @@ public class CompareSelectedParkingPropertyOneRun {
 		int referenceIteration=499;
 		int startIteration=400;
 		int endIteration=referenceIteration-1;
-		String fieldName="FacilityId";
-		//String fieldName="parkingStrategy";
-		//String fieldName="groupName";
-		
 		
 		StringMatrix eventsReferenceMatrix = GeneralLib.readStringMatrix(getEventsFileName(outputFolder,referenceIteration));
 		StringMatrix eventsMatrixCurrentIter = GeneralLib.readStringMatrix(getEventsFileName(outputFolder,startIteration));
 		
-		System.out.println("iteration\tpctDiffConsequete\tpctDiffReference");
+		System.out.println("iteration\tpctDiffConsequete-FacilityId\tpctDiffReference-FacilityId\tpctDiffConsequete-parkingStrategy\tpctDiffReference-parkingStrategy\tpctDiffConsequete-groupName\tpctDiffReference-groupName");
 		for (int i=startIteration;i<=endIteration;i++){
 			StringMatrix eventsMatrixNextIter = GeneralLib.readStringMatrix(getEventsFileName(outputFolder,i+1));	
 			
-			double pctDiffConsequete = percentageOfDifferentParkingUsages(eventsMatrixCurrentIter,eventsMatrixNextIter,fieldName);
-			double pctDiffReference = percentageOfDifferentParkingUsages(eventsReferenceMatrix,eventsMatrixCurrentIter,fieldName);
-			
-			System.out.println(i + "\t" + pctDiffConsequete + "\t" + pctDiffReference);
+			System.out.print(i + "\t" + percentageOfDifferentParkingUsages(eventsMatrixCurrentIter,eventsMatrixNextIter,"FacilityId") + "\t" + percentageOfDifferentParkingUsages(eventsReferenceMatrix,eventsMatrixCurrentIter,"FacilityId"));
+			System.out.print("\t" + percentageOfDifferentParkingUsages(eventsMatrixCurrentIter,eventsMatrixNextIter,"parkingStrategy") + "\t" + percentageOfDifferentParkingUsages(eventsReferenceMatrix,eventsMatrixCurrentIter,"parkingStrategy"));
+			System.out.print("\t" + percentageOfDifferentParkingUsages(eventsMatrixCurrentIter,eventsMatrixNextIter,"groupName") + "\t" + percentageOfDifferentParkingUsages(eventsReferenceMatrix,eventsMatrixCurrentIter,"groupName"));
+			System.out.println();
 			
 			eventsMatrixCurrentIter=eventsMatrixNextIter;
 		}

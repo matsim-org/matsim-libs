@@ -16,18 +16,16 @@ public class CompareSelectedParkingPropertyTwoRuns {
 		String outputFolderRunB="H:/data/experiments/parkingSearchOct2013/runs/run143/output/";
 		int startIteration=400;
 		int endIteration=499;
-		String fieldName="FacilityId";
-		//String fieldName="parkingStrategy";
-		//String fieldName="groupName";
 		
-		System.out.println("iteration\tpctDifferce");
+		System.out.println("iteration\tpctDifferce-FacilityId\tpctDifferce-parkingStrategy\tpctDifferce-groupName");
 		for (int i=startIteration;i<=endIteration;i++){
 			StringMatrix eventsMatrixA = GeneralLib.readStringMatrix(CompareSelectedParkingPropertyOneRun.getEventsFileName(outputFolderRunA,i));	
 			StringMatrix eventsMatrixB = GeneralLib.readStringMatrix(CompareSelectedParkingPropertyOneRun.getEventsFileName(outputFolderRunB,i));	
 			
-			double pctDifference = CompareSelectedParkingPropertyOneRun.percentageOfDifferentParkingUsages(eventsMatrixA,eventsMatrixB,fieldName);
-			
-			System.out.println(i + "\t" + pctDifference);
+			System.out.print(i + "\t" + CompareSelectedParkingPropertyOneRun.percentageOfDifferentParkingUsages(eventsMatrixA,eventsMatrixB,"FacilityId"));
+			System.out.print("\t" + CompareSelectedParkingPropertyOneRun.percentageOfDifferentParkingUsages(eventsMatrixA,eventsMatrixB,"parkingStrategy"));
+			System.out.print("\t" + CompareSelectedParkingPropertyOneRun.percentageOfDifferentParkingUsages(eventsMatrixA,eventsMatrixB,"groupName"));
+			System.out.println();
 		}
 	}
 
