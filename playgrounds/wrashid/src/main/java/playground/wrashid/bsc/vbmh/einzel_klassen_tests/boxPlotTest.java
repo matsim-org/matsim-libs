@@ -17,6 +17,7 @@ public class boxPlotTest {
 		charts.setBoxXStart("peter", 20000);
 		charts.setBoxXEnd("peter", 20000+3600*15);
 		charts.setBox("peter", true);
+		charts.setLine("peter", true);
 		LinkedList<String[]> werte = reader.readCSV("input/boxp/ev.csv", ",");
 		LinkedList<String[]> werteb = reader.readCSV("input/boxp/nev.csv", ",");
 		boolean firstline = true;

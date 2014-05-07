@@ -56,7 +56,7 @@ public class VMCharts {
 	
 	static public void printCharts(String directory, int iter){
 		for (SingleChart chart : charts.values()){
-			chart.print(directory+"/"+chart.name+"_"+iter+".png");
+			chart.print(directory+"/"+chart.name+"_"+iter);
 		}
 	}
 	
@@ -116,18 +116,18 @@ public class VMCharts {
 			
 			//chart.getChart().getXYPlot().getRenderer().setBaseShape(new Ellipse2D.Double(0,0,5,5));
 			if(line){
-				lineChart.saveAsPng(filename, 2400, 1500);
+				lineChart.saveAsPng(filename+"line"+".png", 2400, 1500);
 			}
 			
 			if(box){
 				boxPlot.xStartValue=boxXStart;
 				boxPlot.xEndValue=boxXEnd;
 				boxPlot.divideXAxis(interval);
-				boxPlot.saveAsPng(filename, 2400, 1500);
+				boxPlot.saveAsPng(filename+"box"+".png", 2400, 1500);
 			}
 			
-			if(!box && !line){
-				chart.saveAsPng(filename, 2400, 1500);
+			if(true){//if(!box && !line){
+				chart.saveAsPng(filename+"scatter"+".png", 2400, 1500);
 			}
 			
 		}

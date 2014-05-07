@@ -23,11 +23,15 @@ public class IterEndStats {
 		VMCharts chart = new VMCharts();
 		chart.addChart("Util vs Traveldistance");
 		chart.setAx("Util vs Traveldistance", false);
+		chart.setBox("Util vs Traveldistance", true);
+		chart.setInterval("Util vs Traveldistance", 10000);
 		chart.addSeries("Util vs Traveldistance", "NEV");
 		chart.addSeries("Util vs Traveldistance", "EV");	
 		
 		chart.addChart("Util vs Traveldistance EV");
 		chart.setAx("Util vs Traveldistance EV", false);
+		chart.setBox("Util vs Traveldistance EV", true);
+		chart.setInterval("Util vs Traveldistance EV", 10000);
 		chart.addSeries("Util vs Traveldistance EV", "EV");
 		
 		

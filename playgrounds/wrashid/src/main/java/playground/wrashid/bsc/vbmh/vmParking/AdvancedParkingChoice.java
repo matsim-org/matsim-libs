@@ -32,7 +32,7 @@ public class AdvancedParkingChoice {
 		random = new Random();
 		if(betaSOC==0){
 			betaSOC = (betaSOCMean + (random.nextGaussian()*betaSOCSD))*betaPayMoney*(-1); //in Util/1
-			System.out.println("betaSOC : "+betaSOC);
+			//System.out.println("betaSOC : "+betaSOC);
 		}
 		//System.out.println("betaSOC : "+betaSOC);
 	}

@@ -70,7 +70,9 @@ public class VMBoxPlot {
 					values = new ArrayList<Double>();
 					System.out.println("NULL");
 				}
-				dataset.add(values, item.name, xMin);
+				else if(values.size()!=0){
+					dataset.add(values, item.name, xMin);
+				}
 			}
 			xMin+=interval;
 		}
