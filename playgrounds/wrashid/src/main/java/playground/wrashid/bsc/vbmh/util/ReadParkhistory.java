@@ -40,6 +40,12 @@ public LinkedList<HashMap<String,String>> events = new LinkedList<HashMap<String
 		
 	}
 	
+	public  ReadParkhistory getSubHist(LinkedList<HashMap<String,String>> e){
+		ReadParkhistory subHist = new ReadParkhistory();
+		subHist.events=e;
+		return subHist;
+	}
+	
 	public HashMap<String,String> getEventByAttribute(String attribute, String value){
 		for(HashMap<String, String> event : events){
 			if(event.containsKey(attribute)){
