@@ -60,6 +60,7 @@ public final class WagonSimConstants {
 	public static final double DEFAULT_FREESPEED = 99999.0;
 	public static final double DEFAULT_NUMLANES = 1.0;
 	public static final double DEFAULT_LENGTH_LOOPLINK = 50.0;
+	public static final String DEFAULT_LINK_MODE = "train";
 	
 	public static final String NODE_PRODUCTIONNODE_TYPE = "productionNodeType";
 	public static final String NODE_INFRANODE_ID = "infraNodeId";

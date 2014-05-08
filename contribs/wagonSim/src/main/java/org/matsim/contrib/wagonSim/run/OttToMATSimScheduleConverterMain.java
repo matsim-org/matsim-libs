@@ -103,14 +103,14 @@ public class OttToMATSimScheduleConverterMain {
 	 */
 	public static void main(String[] args) throws IOException {
 
-//		args = new String[] {
-//				"D:/tmp/sbb/0002/20130715_Fahrplandaten/OTT_20120308.csv",
-//				"D:/tmp/sbb/0002/20130715_Fahrplandaten/Traintypes.csv",
-//				"D:/tmp/sbb/0002/20130524_Daten_Infrastruktur/._infra.xml",
-//				"D:/tmp/sbb/0002/20130828_nodeMergeList/NodeMap.csv",
-//				"true", // true := performance schedule; false := target schedule
-//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance",
-//		};
+		args = new String[] {
+				"S:/raw/europe/ch/ch/sbb/0002/20130715_Fahrplandaten/OTT_20120308.csv",
+				"S:/raw/europe/ch/ch/sbb/0002/20130715_Fahrplandaten/Traintypes.csv",
+				"S:/raw/europe/ch/ch/sbb/0002/20130524_Daten_Infrastruktur/._infra.xml",
+				"S:/raw/europe/ch/ch/sbb/0002/20130828_nodeMergeList/NodeMap.csv",
+				"true", // true := performance schedule; false := target schedule
+				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance",
+		};
 		
 		if (args.length != 6) {
 			log.error(OttToMATSimScheduleConverterMain.class.getCanonicalName()+" ottFile trainTypesFile nemoInfraXmlFile nodeMapFile isPerformance outputBase");
@@ -138,9 +138,18 @@ public class OttToMATSimScheduleConverterMain {
 		OttToMATSimScheduleConverterMain converter = new OttToMATSimScheduleConverterMain();
 		converter.convertFromFiles(ottFile,networkConverter.getScenario().getNetwork(),nodeMapFile,trainTypesFile,isPerformance);
 		
+		MATSimInfraOttNetworkMergerMain merger = new MATSimInfraOttNetworkMergerMain();
+		merger.mergeNetworks(networkConverter.getScenario().getNetwork(),converter.getScenario().getNetwork());
+		
 		if (!Utils.prepareFolder(outputBase)) {
 			throw new RuntimeException("Could not prepare output folder for one of the three reasons: (i) folder exists and is not empty, (ii) it's a path to an existing file or (iii) the folder could not be created. Bailing out.");
 		}
+		
+		if (!Utils.prepareFolder(outputBase+"/merged")) {
+			throw new RuntimeException("Could not prepare output folder for one of the three reasons: (i) folder exists and is not empty, (ii) it's a path to an existing file or (iii) the folder could not be created. Bailing out.");
+		}
+		
+		new NetworkWriter(merger.getMergedNetwork()).write(outputBase+"/merged/network.merged.xml.gz");
 		
 		if (isPerformance) {
 			new NetworkWriter(converter.getScenario().getNetwork()).write(outputBase+"/network.ott.performance.xml.gz");

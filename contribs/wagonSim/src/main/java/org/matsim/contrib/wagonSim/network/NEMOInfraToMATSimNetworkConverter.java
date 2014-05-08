@@ -40,6 +40,7 @@ import org.matsim.contrib.wagonSim.network.NEMOInfraDataContainer.NEMOInfraLinkT
 import org.matsim.contrib.wagonSim.network.NEMOInfraDataContainer.NEMOInfraNode;
 import org.matsim.contrib.wagonSim.network.NEMOInfraDataContainer.NEMOInfraNodeCluster;
 import org.matsim.contrib.wagonSim.network.NEMOInfraDataContainer.NEMOInfraTrack;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
@@ -67,7 +68,7 @@ public class NEMOInfraToMATSimNetworkConverter {
 		this.network = network;
 		this.nodeAttributes = nodeAttributes;
 		this.linkAttributes = linkAttributes;
-		defaultModes.add(TransportMode.pt);
+		defaultModes.add("train");
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -75,7 +76,7 @@ public class NEMOInfraToMATSimNetworkConverter {
 	//////////////////////////////////////////////////////////////////////
 	
 	public static final Set<String> getDefaultModes() {
-		defaultModes.add(TransportMode.pt);
+		defaultModes.add(WagonSimConstants.DEFAULT_LINK_MODE);
 		return defaultModes;
 	}
 	
@@ -151,6 +152,33 @@ public class NEMOInfraToMATSimNetworkConverter {
 		}
 		if (nemoLinkIdsUsed.size() != dataContainer.links.size()) {
 			throw new RuntimeException("Inconsistent data: the amount of links refered by the tracks (="+nemoLinkIdsUsed.size()+") is not equal to the given number of links (="+dataContainer.links.size()+"). Bailing out.");
+		}
+	}
+	
+	//////////////////////////////////////////////////////////////////////
+	
+	public final void makeNetworkBiDirectional() {
+		NetworkFactory factory = network.getFactory();
+
+		Set<Id> linkIds = new HashSet<Id>(network.getLinks().keySet());
+		for (Id linkId : linkIds) {
+			Link link = network.getLinks().get(linkId);
+			boolean hasOtherDirection = false;
+			for (Link otherLink : link.getToNode().getOutLinks().values()) {
+				if (otherLink.getToNode().getId().equals(link.getFromNode().getId())) {
+					hasOtherDirection = true;
+					break;
+				}
+			}
+			if (!hasOtherDirection) {
+				Link l = factory.createLink(new IdImpl(link.getId().toString()+"-r"),link.getToNode(),link.getFromNode());
+				l.setLength(link.getLength());
+				l.setFreespeed(link.getFreespeed());
+				l.setCapacity(link.getCapacity());
+				l.setNumberOfLanes(link.getNumberOfLanes());
+				l.setAllowedModes(link.getAllowedModes());
+				network.addLink(l);
+			}
 		}
 	}
 	

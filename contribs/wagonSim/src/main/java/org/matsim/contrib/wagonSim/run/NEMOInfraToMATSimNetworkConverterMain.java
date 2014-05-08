@@ -66,6 +66,8 @@ public class NEMOInfraToMATSimNetworkConverterMain {
 		new NEMOInfraParser(dataContainer).parse(nemoInfraXmlFile);
 		NEMOInfraToMATSimNetworkConverter converter = new NEMOInfraToMATSimNetworkConverter(scenario.getNetwork(),nodeAttributes,linkAttributes);
 		converter.convert(dataContainer);
+		converter.makeNetworkBiDirectional();
+		log.info("network contains "+scenario.getNetwork().getNodes().size()+" nodes and "+scenario.getNetwork().getLinks().size()+" links.");
 		if (converter.validateNetwork()) { log.info("network is valid."); }
 		else { log.warn("network is not yet valid."); }
 	}
@@ -97,10 +99,10 @@ public class NEMOInfraToMATSimNetworkConverterMain {
 	 */
 	public static void main(String[] args) {
 
-//		args = new String[] {
-//				"D:/tmp/sbb/0002/20130524_Daten_Infrastruktur/._infra.xml",
-//				"D:/Users/balmermi/Documents/eclipse/output/sbb/networkNemoInfra",
-//		};
+		args = new String[] {
+				"S:/raw/europe/ch/ch/sbb/0002/20130524_Daten_Infrastruktur/._infra.xml",
+				"D:/Users/balmermi/Documents/eclipse/output/sbb/networkNemoInfra",
+		};
 		
 		if (args.length != 2) {
 			log.error(NEMOInfraToMATSimNetworkConverterMain.class.getCanonicalName()+" nemoInfraXmlFile outputBase");
