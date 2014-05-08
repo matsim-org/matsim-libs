@@ -10,7 +10,7 @@ import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 
-public class PrepareTwoRunDifferenceFloatFieldsForHistogram {
+public class PrepareHistogramForTwoRuns_DifferenceFloatFields {
 
 	/**
 	 * @param args
@@ -77,7 +77,7 @@ public class PrepareTwoRunDifferenceFloatFieldsForHistogram {
 			ArrayList<Float> pctScoreDifference, String outputFolder, String fileName) {
 		String outputPath=outputFolder+fileName;
 		GeneralLib.writeList(Lists.converFloatToStringArrayList(pctScoreDifference), outputPath);
-		System.out.println(outputPath);
+		//System.out.println(outputPath);
 		return outputPath;
 	}
 
