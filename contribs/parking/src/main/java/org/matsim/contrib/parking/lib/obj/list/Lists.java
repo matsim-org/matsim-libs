@@ -97,4 +97,12 @@ public class Lists {
 		return result;
 	}
 	
+	public static ArrayList<String> converFloatToStringArrayList(ArrayList<Float> list){
+		ArrayList<String> result=new ArrayList<String>();
+		for (int i=0;i<list.size();i++){
+			result.add(list.get(i).toString());
+		}
+		return result;
+	}
+	
 }

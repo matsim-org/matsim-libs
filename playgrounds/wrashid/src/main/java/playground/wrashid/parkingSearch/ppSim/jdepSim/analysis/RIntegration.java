@@ -50,7 +50,7 @@ public class RIntegration {
 	public void generateHistogram(String inputData, String outputPlotPath,
 			String title, String xAxis, String yAxis, String outputLogPath) {
 		String scriptPath = scriptFolder + "generalHistogram.R";
-		String[] args = new String[2];
+		String[] args = new String[5];
 		args[0] = inputData;
 		args[1] = outputPlotPath;
 		args[2] = title;

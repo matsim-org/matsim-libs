@@ -100,4 +100,8 @@ public class Matrix<T> {
 		}
 		GeneralLib.writeList(outputArrayList, fileName);
 	}
+
+	public Float getFloat(int row, int column){
+		return new Float(getString(row,column));
+	}
 }
