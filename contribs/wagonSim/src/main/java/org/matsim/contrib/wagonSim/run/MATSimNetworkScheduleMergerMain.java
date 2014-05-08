@@ -140,13 +140,13 @@ public class MATSimNetworkScheduleMergerMain {
 	 */
 	public static void main(String[] args) {
 
-		args = new String[] {
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/merged/edits00.txt",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/merged/network.merged.xml.gz",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/transitSchedule.ott.performance.xml.gz",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/merged/network.ott.performance.merged.xml.gz",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/merged/transitSchedule.ott.performance.merged.xml.gz",
-		};
+//		args = new String[] {
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/merged/edits00.txt",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/merged/network.merged.xml.gz",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/transitSchedule.ott.performance.xml.gz",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/merged/network.ott.performance.merged.xml.gz",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/merged/transitSchedule.ott.performance.merged.xml.gz",
+//		};
 		
 		if (args.length != 5) {
 			log.error(MATSimNetworkScheduleMergerMain.class.getCanonicalName()+" viaNetwotkEditsFile networkMergedFile scheduleFile outputNetworkFile outputScheduleFile");

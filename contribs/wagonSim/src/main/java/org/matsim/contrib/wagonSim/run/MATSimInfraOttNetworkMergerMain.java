@@ -105,11 +105,11 @@ public class MATSimInfraOttNetworkMergerMain {
 	 */
 	public static void main(String[] args) {
 
-		args = new String[] {
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/networkNemoInfra/network.infra.xml.gz",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/network.ott.performance.xml.gz",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/networkMerged",
-		};
+//		args = new String[] {
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/networkNemoInfra/network.infra.xml.gz",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/network.ott.performance.xml.gz",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/networkMerged",
+//		};
 		
 		if (args.length != 3) {
 			log.error(MATSimInfraOttNetworkMergerMain.class.getCanonicalName()+" matsimInfraNetworkFile matsimOttNetworkFile outputBase");
