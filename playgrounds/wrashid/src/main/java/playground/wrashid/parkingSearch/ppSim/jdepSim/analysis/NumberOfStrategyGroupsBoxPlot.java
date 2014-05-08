@@ -17,7 +17,8 @@ public class NumberOfStrategyGroupsBoxPlot extends AverageNumberOfStrategyGroups
 		int endIteration = 10;
 		int iterationStep = 1;
 		String runOutputFolder = "C:/data/parkingSearch/psim/zurich/output/run20/output/";
-		String boxPlotOutputFile="C:/tmp/abc.png";
+		String outpputFolder="C:/tmp/";
+		String outputFileName="NumberOfStrategyGroups";
 		boolean removePrivateParking = false;
 		
 		
@@ -34,11 +35,10 @@ public class NumberOfStrategyGroupsBoxPlot extends AverageNumberOfStrategyGroups
 				row++;
 			}
 		}
-		String tempOutputPath=new RIntegration().getPathToTempFile("txt");
-		System.out.println(tempOutputPath);
-		table.writeMatrix(tempOutputPath);
+		String txtOutputPath=outpputFolder + outputFileName + ".txt";
+		table.writeMatrix(txtOutputPath);
 		
-		new RIntegration().generateBoxPlot(tempOutputPath, boxPlotOutputFile, "Number of Strategy Groups", "iteration", "number of strategy Groups", null);
+		new RIntegration().generateBoxPlot(txtOutputPath, outpputFolder + outputFileName + ".png", "Number of Strategy Groups", "iteration", "number of strategy Groups", null);
 	}
 
 }
