@@ -86,7 +86,14 @@ public class StringMatrix {
 			}
 			outputArrayList.add(sb.toString());
 		}
-		
+		GeneralLib.writeList(outputArrayList, fileName);
+	}
+	
+	public void writeColumn(int columnIndex, String fileName){
+		ArrayList<String> outputArrayList=new ArrayList<String>();
+		for (int i=0;i<getNumberOfRows();i++){
+			outputArrayList.add(getString(i, columnIndex));
+		}
 		GeneralLib.writeList(outputArrayList, fileName);
 	}
 }
