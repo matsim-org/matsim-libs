@@ -89,4 +89,12 @@ public class Lists {
 		return randomizedList;
 	}
 	
+	public static ArrayList<String> converDoubleToStringArrayList(ArrayList<Double> list){
+		ArrayList<String> result=new ArrayList<String>();
+		for (int i=0;i<list.size();i++){
+			result.add(list.get(i).toString());
+		}
+		return result;
+	}
+	
 }
