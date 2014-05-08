@@ -12,14 +12,15 @@ public class CompareSelectedParkingPropertyTwoRuns extends CompareSelectedParkin
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String outputFolderRunA="H:/data/experiments/parkingSearchOct2013/runs/run136/output1/";
-		String outputFolderRunB="H:/data/experiments/parkingSearchOct2013/runs/run143/output/";
+		String outputFolderRunA="H:/data/experiments/parkingSearchOct2013/runs/run163/output/";
+		String outputFolderRunB="H:/data/experiments/parkingSearchOct2013/runs/run164/output/";
 		int startIteration=400;
 		int endIteration=499;
+		int iterationStep = 10;
 		boolean ignoreCasesWithBothPPUse=true;
 		
 		System.out.println("iteration\tpctDifferce-FacilityId\tpctDifferce-parkingStrategy\tpctDifferce-groupName");
-		for (int i=startIteration;i<=endIteration;i++){
+		for (int i=startIteration;i<=endIteration; i += iterationStep){
 			StringMatrix eventsMatrixA = GeneralLib.readStringMatrix(getEventsFileName(outputFolderRunA,i));	
 			StringMatrix eventsMatrixB = GeneralLib.readStringMatrix(getEventsFileName(outputFolderRunB,i));	
 			

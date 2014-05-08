@@ -22,6 +22,7 @@ public class CompareSelectedParkingPropertyOneRun {
 		int referenceIteration = 499;
 		int startIteration = 400;
 		int endIteration = referenceIteration - 1;
+		int iterationStep = 10;
 		boolean ignoreCasesWithBothPPUse=true;
 
 		StringMatrix eventsReferenceMatrix = GeneralLib
@@ -33,7 +34,7 @@ public class CompareSelectedParkingPropertyOneRun {
 
 		System.out
 				.println("iteration\tpctDiffConsequete-FacilityId\tpctDiffReference-FacilityId\tpctDiffConsequete-parkingStrategy\tpctDiffReference-parkingStrategy\tpctDiffConsequete-groupName\tpctDiffReference-groupName");
-		for (int i = startIteration; i <= endIteration; i++) {
+		for (int i = startIteration; i <= endIteration; i += iterationStep) {
 			StringMatrix eventsMatrixNextIter = GeneralLib
 					.readStringMatrix(getEventsFileName(outputFolder, i + 1));
 
