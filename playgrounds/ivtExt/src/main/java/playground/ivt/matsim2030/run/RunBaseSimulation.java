@@ -22,6 +22,7 @@ package playground.ivt.matsim2030.run;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ivt.matsim2030.Matsim2030Utils;
@@ -32,6 +33,10 @@ import playground.ivt.matsim2030.Matsim2030Utils;
 public class RunBaseSimulation {
 	public static void main(final String[] args) {
 		final String configFile = args[ 0 ];
+
+		// This allows to get a log file containing the log messages happening
+		// before controler init.
+		OutputDirectoryLogging.catchLogEntries();
 
 		final Config config = Matsim2030Utils.loadConfig( configFile );
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
