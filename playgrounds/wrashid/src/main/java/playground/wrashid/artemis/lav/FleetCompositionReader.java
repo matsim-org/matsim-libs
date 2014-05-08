@@ -2,7 +2,7 @@ package playground.wrashid.artemis.lav;
 
 import java.util.HashMap;
 
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 
 
 public class FleetCompositionReader {
@@ -35,7 +35,7 @@ public class FleetCompositionReader {
 	
 	public static HashMap<VehicleTypeLAV,Integer> getVehicleFleet(String fileName){
 		HashMap<VehicleTypeLAV, Integer> hashMap=new HashMap<VehicleTypeLAV, Integer>();
-		StringMatrix modelFile = LAVLib.readLAVModelFile(fileName, true);
+		Matrix modelFile = LAVLib.readLAVModelFile(fileName, true);
 		
 		for (int i=0;i<modelFile.getNumberOfRows();i++){
 			VehicleTypeLAV vehicleType=new VehicleTypeLAV();

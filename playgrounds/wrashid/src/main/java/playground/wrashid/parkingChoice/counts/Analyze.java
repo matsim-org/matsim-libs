@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.contrib.parking.lib.obj.StringMatrixFilter;
 
 import playground.wrashid.parkingChoice.trb2011.counts.SingleDayGarageParkingsCount;
@@ -25,7 +25,7 @@ public class Analyze {
 
 		for (File f : rootFolder.listFiles()) {
 			if (!f.isDirectory()) {
-				StringMatrix countsMatrix = GeneralLib.readStringMatrix(f.getAbsolutePath(), "\t", new RemoveNonRelevantGarageInformation(garageName));
+				Matrix countsMatrix = GeneralLib.readStringMatrix(f.getAbsolutePath(), "\t", new RemoveNonRelevantGarageInformation(garageName));
 
 				printLowAndHigh(countsMatrix, garageName, capacity);
 			}
@@ -35,7 +35,7 @@ public class Analyze {
 	
 	
 
-	public static void printLowAndHigh(StringMatrix countsMatrix, String garageName, int capacity) {
+	public static void printLowAndHigh(Matrix countsMatrix, String garageName, int capacity) {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
 
 		HashMap<String, DailyLowHigh> lowHigh = new HashMap<String, Analyze.DailyLowHigh>();

@@ -24,7 +24,7 @@ import org.geotools.metadata.iso.identification.IdentificationImpl;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.basic.v01.IdImpl;
 
 public class TTMatrixFromStoredTable extends TTMatrix {
@@ -46,7 +46,7 @@ public class TTMatrixFromStoredTable extends TTMatrix {
 	}
 
 	private void readMatrix(String ttMatrixFile) {
-		StringMatrix sm=GeneralLib.readStringMatrix(ttMatrixFile);
+		Matrix sm=GeneralLib.readStringMatrix(ttMatrixFile);
 		
 		for (int i=0;i<sm.getNumberOfColumnsInRow(0);i++){
 			if (sm.getString(0, i).contains("simulatedTimePeriod")){

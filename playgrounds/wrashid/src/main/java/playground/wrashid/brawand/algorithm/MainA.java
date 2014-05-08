@@ -5,13 +5,13 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class MainA {
 
 	public static void main(String[] args) {
-		StringMatrix matrix = GeneralLib.readStringMatrix("c:/tmp/homeDemand.txt", "\t");
+		Matrix matrix = GeneralLib.readStringMatrix("c:/tmp/homeDemand.txt", "\t");
 		
 		LinkedList<WeightedDemand> demand=new LinkedList<WeightedDemand>();
 		LinkedList<Coord> possibleChargingLocations=new LinkedList<Coord>(); 

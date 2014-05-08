@@ -4,7 +4,7 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 
@@ -18,7 +18,7 @@ public class EstimateRadiusOfHubSubMangers {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		StringMatrix matrix=GeneralLib.readStringMatrix("A:/data/ewz daten/GIS_coordinates_of_managers.txt");
+		Matrix matrix=GeneralLib.readStringMatrix("A:/data/ewz daten/GIS_coordinates_of_managers.txt");
 
 		double sumOfMinimumDistancesOfHubSubMangers=0;
 		int numberOfSamplesUsed=0;
@@ -47,7 +47,7 @@ public class EstimateRadiusOfHubSubMangers {
 	 * @param targetHubId
 	 * @return
 	 */
-	private static double getMinimumDistanceBetweenHubSubMangersForHub(StringMatrix matrix,int targetHubId){
+	private static double getMinimumDistanceBetweenHubSubMangersForHub(Matrix matrix,int targetHubId){
 		double minimumDistance=Double.MAX_VALUE;
 		
 		int minIndex=-1;

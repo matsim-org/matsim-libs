@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 
 import playground.wrashid.parkingChoice.trb2011.flatFormat.zhCity.PrivateParkingsIndoorWriter_v0;
 
@@ -18,7 +18,7 @@ public class PrivatParking {
 	private static void printPrivatIndoorParkingTotalCapacitiesWithMainBuildingPurpose() {
 		HashMap<Integer, String> mainBuildingUsagePurpose = PrivateParkingsIndoorWriter_v0.getMainBuildingUsagePurpose();
 		
-		StringMatrix privateParkingIndoor = GeneralLib.readStringMatrix(Config.baseFolder + "../PrivateParkingIndoor.TXT");
+		Matrix privateParkingIndoor = GeneralLib.readStringMatrix(Config.baseFolder + "../PrivateParkingIndoor.TXT");
 				
 		DoubleValueHashMap<String> parkingCapacities=new DoubleValueHashMap<String>();
 		for (int i=1;i<privateParkingIndoor.getNumberOfRows();i++){
@@ -36,7 +36,7 @@ public class PrivatParking {
 	}
 
 	private static void printPrivateOutdoorParkingTotalCapacity() {
-		StringMatrix privateParkingOutdoor = GeneralLib.readStringMatrix(Config.baseFolder + "../PrivateParkingOutdoor.txt");
+		Matrix privateParkingOutdoor = GeneralLib.readStringMatrix(Config.baseFolder + "../PrivateParkingOutdoor.txt");
 		
 		double totalNumberOfOutdoorPrivateParking=0;
 		for (int i=1;i<privateParkingOutdoor.getNumberOfRows();i++){

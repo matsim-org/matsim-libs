@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.lib.MathLib;
@@ -13,7 +13,7 @@ import playground.wrashid.lib.MathLib;
 public class CheckUncontrolledCharging {
 
 	public static void main(String[] args) {
-		StringMatrix parkingTimes = GeneralLib.readStringMatrix(
+		Matrix parkingTimes = GeneralLib.readStringMatrix(
 				"H:/data/experiments/ARTEMIS/nov2011/N-szenario11/run1/output/parkingTimesAndLegEnergyConsumption.txt", "\t");
 		// StringMatrix parkingTimes =
 		// GeneralLib.readStringMatrix("c:/tmp/parkingTimesAndLegEnergyConsumption.txt",
@@ -28,7 +28,7 @@ public class CheckUncontrolledCharging {
 			}
 		}
 
-		StringMatrix chargingLog = GeneralLib.readStringMatrix(
+		Matrix chargingLog = GeneralLib.readStringMatrix(
 				"H:/data/experiments/ARTEMIS/nov2011/N-szenario11/run1/output/chargingLog.txt", "\t");
 		// StringMatrix chargingLog =
 		// GeneralLib.readStringMatrix("c:/tmp/chargingLog.txt", "\t");

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
@@ -23,7 +23,7 @@ public class ParkingLots {
 	}
 
 	private static void collectGarageParkings(ArrayList<String> outputList) {
-		StringMatrix garageParkingData = GeneralLib.readStringMatrix(Config.baseFolder + "../parkhäuser.txt");
+		Matrix garageParkingData = GeneralLib.readStringMatrix(Config.baseFolder + "../parkhäuser.txt");
 
 		int totalCapacity = 0;
 		for (int i = 1; i < garageParkingData.getNumberOfRows(); i++) {

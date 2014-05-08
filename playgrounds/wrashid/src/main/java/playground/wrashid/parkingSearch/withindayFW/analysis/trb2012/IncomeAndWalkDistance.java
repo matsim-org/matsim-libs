@@ -24,7 +24,7 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.lib.obj.IntegerValueHashMap;
@@ -46,7 +46,7 @@ public class IncomeAndWalkDistance {
 
 		IntegerValueHashMap<Id> numberOfParkingActs = new IntegerValueHashMap<Id>();
 		DoubleValueHashMap<Id> walkTimes = new DoubleValueHashMap<Id>();
-		StringMatrix walkTimesMatrix = GeneralLib.readStringMatrix(walkTimesFile, "\t");
+		Matrix walkTimesMatrix = GeneralLib.readStringMatrix(walkTimesFile, "\t");
 
 		for (int i = 1; i < walkTimesMatrix.getNumberOfRows(); i++) {
 			String parkingIdString = walkTimesMatrix.getString(i, 1);
@@ -85,7 +85,7 @@ public class IncomeAndWalkDistance {
 	public static DoubleValueHashMap<Id> readIncome(String fileName) {
 		DoubleValueHashMap<Id> houseHoldIncome = new DoubleValueHashMap<Id>();
 
-		StringMatrix morningMatrix = GeneralLib.readStringMatrix(fileName, "\t");
+		Matrix morningMatrix = GeneralLib.readStringMatrix(fileName, "\t");
 
 		for (int i = 1; i < morningMatrix.getNumberOfRows(); i++) {
 			Id id = new IdImpl(morningMatrix.getString(i, 0));

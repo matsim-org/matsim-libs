@@ -25,7 +25,7 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
@@ -40,7 +40,7 @@ public class EnergyConsumptionTable {
 	TwoHashMapsConcatenated<Id,Double, Polynomial> energyConsumptionRegressionModel=new TwoHashMapsConcatenated<Id, Double, Polynomial>();
 	
 	public EnergyConsumptionTable(String filePathName){		
-		StringMatrix stringMatrix = GeneralLib.readStringMatrix(filePathName);
+		Matrix stringMatrix = GeneralLib.readStringMatrix(filePathName);
 		
 		for (int i=1;i<stringMatrix.getNumberOfRows();i++){
 			Id vehicleClassId=new IdImpl(stringMatrix.getString(i, 0));

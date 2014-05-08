@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
@@ -16,7 +16,7 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 
 public class GarageParkingsWriter extends MatsimXmlWriter {
 
-	public void writeFile(final String filename, String source, StringMatrix garageParkingData) {
+	public void writeFile(final String filename, String source, Matrix garageParkingData) {
 		String dtd = "./test/input/playground/wrashid/parkingChoice/infrastructure/flatParkingFormat_v1.dtd";
 
 		try {
@@ -39,7 +39,7 @@ public class GarageParkingsWriter extends MatsimXmlWriter {
 		}
 	}
 	
-	private void writeFacilities(StringMatrix garageParkingData, BufferedWriter writer) throws IOException {
+	private void writeFacilities(Matrix garageParkingData, BufferedWriter writer) throws IOException {
 		for (int i=1;i<garageParkingData.getNumberOfRows();i++){
 			writer.write("\t<parking type=\"public\"");
 			writer.write(" id=\"gp-" + i +"\"");
@@ -58,7 +58,7 @@ public class GarageParkingsWriter extends MatsimXmlWriter {
 	public static void main(String[] args) {
 		String sourcePath = "ETH/static data/parking/zürich city/Parkhaeuser/parkhäuser.txt";
 
-		StringMatrix garageParkingData = GeneralLib.readStringMatrix("c:/data/My Dropbox/" + sourcePath);
+		Matrix garageParkingData = GeneralLib.readStringMatrix("c:/data/My Dropbox/" + sourcePath);
 		
 		GarageParkingsWriter garageParkingsWriter=new GarageParkingsWriter();
 		garageParkingsWriter.writeFile("C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/garageParkings.xml", sourcePath,garageParkingData);

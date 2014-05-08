@@ -21,7 +21,7 @@ package org.matsim.contrib.parking.lib;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -112,7 +112,7 @@ public class GeneralLibTest extends MatsimTestCase {
 	
 	public void testReadStringMatrix(){
 		System.out.println();
-		StringMatrix matrix=GeneralLib.readStringMatrix(getClassInputDirectory() +  "tabTable.txt");
+		Matrix matrix=GeneralLib.readStringMatrix(getClassInputDirectory() +  "tabTable.txt");
 		
 		assertEquals(96, matrix.getNumberOfRows());
 		assertEquals(4, matrix.getNumberOfColumnsInRow(0));

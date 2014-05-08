@@ -7,7 +7,7 @@ import java.util.StringTokenizer;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 
 import playground.wrashid.PSF.ParametersPSF;
 
@@ -118,7 +118,7 @@ public class HubLinkMapping {
 
 
 	private void readMappingTable(String fileName) {
-		StringMatrix stringMatrix = GeneralLib.readStringMatrix(fileName);
+		Matrix stringMatrix = GeneralLib.readStringMatrix(fileName);
 		int firstRowAfterTitle=1;
 		
 		for (int i=firstRowAfterTitle;i<stringMatrix.getNumberOfRows();i++){

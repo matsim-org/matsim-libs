@@ -22,7 +22,7 @@ package playground.wrashid.parkingSearch.withindayFW.analysis.trb2012;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.lib.obj.IntegerValueHashMap;
@@ -39,7 +39,7 @@ public class FilterWalkTimes {
 
 		String walkTimesFile = basePath + "ITERS/it." + iterationNumber + "/" + iterationNumber + fileNameInputFile;
 
-		StringMatrix walkTimesMatrix = GeneralLib.readStringMatrix(walkTimesFile, "\t");
+		Matrix walkTimesMatrix = GeneralLib.readStringMatrix(walkTimesFile, "\t");
 
 		for (int i = 1; i < walkTimesMatrix.getNumberOfRows(); i++) {
 			String parkingIdString = walkTimesMatrix.getString(i, 1);

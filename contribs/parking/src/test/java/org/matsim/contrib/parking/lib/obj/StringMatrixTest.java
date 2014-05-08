@@ -3,14 +3,14 @@ package org.matsim.contrib.parking.lib.obj;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 
 import junit.framework.TestCase;
 
 public class StringMatrixTest extends TestCase{
 
 	public void testBasic(){
-		StringMatrix matrix=new StringMatrix();
+		Matrix matrix=new Matrix();
 		
 		assertEquals(0, matrix.getNumberOfRows());
 		

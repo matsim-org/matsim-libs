@@ -2,7 +2,7 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim.analysis;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
@@ -25,17 +25,17 @@ public class CompareSelectedParkingPropertyOneRun {
 		int iterationStep = 10;
 		boolean ignoreCasesWithBothPPUse=true;
 
-		StringMatrix eventsReferenceMatrix = GeneralLib
+		Matrix eventsReferenceMatrix = GeneralLib
 				.readStringMatrix(getEventsFileName(outputFolder,
 						referenceIteration));
-		StringMatrix eventsMatrixCurrentIter = GeneralLib
+		Matrix eventsMatrixCurrentIter = GeneralLib
 				.readStringMatrix(getEventsFileName(outputFolder,
 						startIteration));
 
 		System.out
 				.println("iteration\tpctDiffConsequete-FacilityId\tpctDiffReference-FacilityId\tpctDiffConsequete-parkingStrategy\tpctDiffReference-parkingStrategy\tpctDiffConsequete-groupName\tpctDiffReference-groupName");
 		for (int i = startIteration; i <= endIteration; i += iterationStep) {
-			StringMatrix eventsMatrixNextIter = GeneralLib
+			Matrix eventsMatrixNextIter = GeneralLib
 					.readStringMatrix(getEventsFileName(outputFolder, i + 1));
 
 			System.out.print(i
@@ -74,8 +74,8 @@ public class CompareSelectedParkingPropertyOneRun {
 	}
 
 	public static double percentageOfDifferentParkingUsages(
-			StringMatrix matrixA,
-			StringMatrix matrixB, String fieldName, boolean ignoreCasesWithBothPPUse) {
+			Matrix matrixA,
+			Matrix matrixB, String fieldName, boolean ignoreCasesWithBothPPUse) {
 		
 		// persondId, legIndex, rowId
 		TwoHashMapsConcatenated<Id, Integer, Integer> indexMatrixB=getIndex(matrixB);
@@ -118,7 +118,7 @@ public class CompareSelectedParkingPropertyOneRun {
 	}
 
 	public static TwoHashMapsConcatenated<Id, Integer, Integer> getIndex(
-			StringMatrix matrix) {
+			Matrix matrix) {
 		TwoHashMapsConcatenated<Id, Integer, Integer> index = new TwoHashMapsConcatenated<Id, Integer, Integer>();
 
 		int indexPersonId = matrix.getColumnIndex("personId");

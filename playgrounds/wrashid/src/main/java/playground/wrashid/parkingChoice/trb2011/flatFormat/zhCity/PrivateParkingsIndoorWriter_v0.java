@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -37,7 +37,7 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 	public static void main(String[] args) {
 		String sourcePathPrivateParkingsIndoor = "ETH/static data/parking/zürich city/Private Parkplätze/PrivateParkingIndoor.txt";
 		
-		StringMatrix privateParkingIndoorFile = GeneralLib.readStringMatrix("c:/data/My Dropbox/" + sourcePathPrivateParkingsIndoor);
+		Matrix privateParkingIndoorFile = GeneralLib.readStringMatrix("c:/data/My Dropbox/" + sourcePathPrivateParkingsIndoor);
 
 		
 		
@@ -359,7 +359,7 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 	}
 
 	public static HashMap<Integer, String> getMainBuildingUsagePurpose() {
-		StringMatrix mainUsagePurposeOfBuildingFile = GeneralLib.readStringMatrix("c:/data/My Dropbox/ETH/static data/parking/zürich city/Private Parkplätze/GebaeudeHauptnutzung.txt");
+		Matrix mainUsagePurposeOfBuildingFile = GeneralLib.readStringMatrix("c:/data/My Dropbox/ETH/static data/parking/zürich city/Private Parkplätze/GebaeudeHauptnutzung.txt");
 
 		HashMap<Integer, String> mainUsagePurposeOfBuilding=new HashMap<Integer, String>();
 		

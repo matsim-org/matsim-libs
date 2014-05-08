@@ -1,7 +1,7 @@
 package playground.wrashid.parkingSearch.ppSim.jdepSim.analysis;
 
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 
 public class CompareSelectedParkingPropertyTwoRuns extends CompareSelectedParkingPropertyOneRun {
 
@@ -21,8 +21,8 @@ public class CompareSelectedParkingPropertyTwoRuns extends CompareSelectedParkin
 		
 		System.out.println("iteration\tpctDifferce-FacilityId\tpctDifferce-parkingStrategy\tpctDifferce-groupName");
 		for (int i=startIteration;i<=endIteration; i += iterationStep){
-			StringMatrix eventsMatrixA = GeneralLib.readStringMatrix(getEventsFileName(outputFolderRunA,i));	
-			StringMatrix eventsMatrixB = GeneralLib.readStringMatrix(getEventsFileName(outputFolderRunB,i));	
+			Matrix eventsMatrixA = GeneralLib.readStringMatrix(getEventsFileName(outputFolderRunA,i));	
+			Matrix eventsMatrixB = GeneralLib.readStringMatrix(getEventsFileName(outputFolderRunB,i));	
 			
 			System.out.print(i + "\t" + percentageOfDifferentParkingUsages(eventsMatrixA,eventsMatrixB,"FacilityId",ignoreCasesWithBothPPUse));
 			System.out.print("\t" + percentageOfDifferentParkingUsages(eventsMatrixA,eventsMatrixB,"parkingStrategy",ignoreCasesWithBothPPUse));

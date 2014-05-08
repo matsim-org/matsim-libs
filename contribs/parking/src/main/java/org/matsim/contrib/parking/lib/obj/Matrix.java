@@ -7,11 +7,11 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 
 
-public class StringMatrix {
+public class Matrix<T> {
 
-	ArrayList<ArrayList<String>> matrix=new ArrayList<ArrayList<String>>();
+	ArrayList<ArrayList<T>> matrix=new ArrayList<ArrayList<T>>();
 	
-	public ArrayList<String> getRow(int rowNumber){
+	public ArrayList<T> getRow(int rowNumber){
 		return matrix.get(rowNumber);
 	}
 	
@@ -28,7 +28,12 @@ public class StringMatrix {
 	}
 	
 	public String getString(int row, int column){
-		return matrix.get(row).get(column);
+		T t = matrix.get(row).get(column);
+		if (t==null){
+			return "";
+		} else {
+			return matrix.get(row).get(column).toString();
+		}
 	}
 	
 	public double getDouble(int row, int column){
@@ -43,7 +48,7 @@ public class StringMatrix {
 		return (int) Math.round(getDouble(row, column));
 	}
 	
-	public void addRow(ArrayList<String> row){
+	public void addRow(ArrayList<T> row){
 		matrix.add(row);
 	}
 	
@@ -51,7 +56,7 @@ public class StringMatrix {
 		matrix.remove(row);
 	}
 	
-	public void replaceString(int row,int column, String value){
+	public void replaceString(int row,int column, T value){
 		try{
 			matrix.get(row).remove(column);
 			matrix.get(row).add(column, value);
@@ -60,13 +65,13 @@ public class StringMatrix {
 		}
 	}
 	
-	public void putString(int row,int column, String value){
+	public void putString(int row,int column, T value){
 		while (row>=getNumberOfRows()){
-			matrix.add(new ArrayList<String>());
+			matrix.add(new ArrayList<T>());
 		}
 		
 		while (column>=getNumberOfColumnsInRow(row)){
-			matrix.get(row).add("");
+			matrix.get(row).add(null);
 		}
 		
 		replaceString(row,column,value);
@@ -82,7 +87,6 @@ public class StringMatrix {
 				if (j<getNumberOfColumnsInRow(i)-1){
 					sb.append("\t");
 				}
-				
 			}
 			outputArrayList.add(sb.toString());
 		}

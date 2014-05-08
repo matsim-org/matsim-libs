@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 
@@ -16,8 +16,8 @@ public class JoinTwoMatrices {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		StringMatrix leftMatrix = GeneralLib.readStringMatrix("C:/data/parkingSearch/psim/zurich/output/run20/output/ITERS/0.parkingEvents.txt.gz");
-		StringMatrix rightMatrix = GeneralLib.readStringMatrix("C:/data/parkingSearch/psim/zurich/output/run20/output/parkingProperties.txt");
+		Matrix leftMatrix = GeneralLib.readStringMatrix("C:/data/parkingSearch/psim/zurich/output/run20/output/ITERS/0.parkingEvents.txt.gz");
+		Matrix rightMatrix = GeneralLib.readStringMatrix("C:/data/parkingSearch/psim/zurich/output/run20/output/parkingProperties.txt");
 		String outputPathJoinedMatrix="C:/data/parkingSearch/psim/zurich/tmp/joinedMatrix.txt";
 
 		String joinFieldNameLeftMatrix="FacilityId";
@@ -38,7 +38,7 @@ public class JoinTwoMatrices {
 	}
 
 	private static IntegerValueHashMap<String> initHashMap(
-			StringMatrix rightMatrix, int joinFieldIndexRightMatrix) {
+			Matrix rightMatrix, int joinFieldIndexRightMatrix) {
 		IntegerValueHashMap<String> keyToIndexMapping=new IntegerValueHashMap<String>();
 		
 		for (int i=1;i<rightMatrix.getNumberOfRows();i++){
@@ -50,8 +50,8 @@ public class JoinTwoMatrices {
 		return keyToIndexMapping;
 	}
 
-	private static void joinMatrices(StringMatrix leftMatrix,
-			StringMatrix rightMatrix, int joinFieldIndexLeftMatrix,
+	private static void joinMatrices(Matrix leftMatrix,
+			Matrix rightMatrix, int joinFieldIndexLeftMatrix,
 			IntegerValueHashMap<String> keyToIndexMapping) {
 		for (int i=1;i<leftMatrix.getNumberOfRows();i++){
 			ArrayList<String> currrentRowLeftMatrix = leftMatrix.getRow(i);
@@ -64,8 +64,8 @@ public class JoinTwoMatrices {
 		}
 	}
 
-	private static void updateHeader(StringMatrix leftMatrix,
-			StringMatrix rightMatrix) {
+	private static void updateHeader(Matrix leftMatrix,
+			Matrix rightMatrix) {
 		ArrayList<String> titleRowLeftMatrix = leftMatrix.getRow(0);
 		for (int i=0;i<rightMatrix.getNumberOfColumnsInRow(0);i++){
 			titleRowLeftMatrix.add("RHT_" + rightMatrix.getString(0, i));

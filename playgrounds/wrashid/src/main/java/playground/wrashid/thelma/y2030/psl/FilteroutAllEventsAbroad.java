@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -47,7 +47,7 @@ public class FilteroutAllEventsAbroad {
 		Polygon swissBorders = getSwissBorders(1);
 		System.out.println("-1");
 		Network network = GeneralLib.readNetwork("H:/data/cvs/ivt/studies/switzerland/networks/teleatlas-ivtcheu/network.xml.gz");
-		StringMatrix outputNetwork=new StringMatrix();
+		Matrix outputNetwork=new Matrix();
 		ArrayList<String> strArr=new ArrayList<String>();
 		strArr.add("linkId");
 		strArr.add("x");
@@ -77,7 +77,7 @@ public class FilteroutAllEventsAbroad {
 		
 		
 		
-		StringMatrix parkingTimesMatrix = GeneralLib.readStringMatrix("C:/eTmp/parkingTimesAndEnergyConsumptionCH.txt");
+		Matrix parkingTimesMatrix = GeneralLib.readStringMatrix("C:/eTmp/parkingTimesAndEnergyConsumptionCH.txt");
 		// detect agents, which perform activities outside Switzerland
 		HashMap<Id,Id> foreignActAgents=new HashMap<Id,Id>();
 		for (int i=1;i<parkingTimesMatrix.getNumberOfRows();i++){

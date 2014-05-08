@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 
 
 /**
@@ -38,7 +38,7 @@ public class TxtConfig {
 		parentDirectory = file.getParentFile().toString().replace("\\", "/");
 
 		parameterValues = new HashMap<String, String>();
-		StringMatrix stringMatrix = GeneralLib.readStringMatrix(fileName, "\t");
+		Matrix stringMatrix = GeneralLib.readStringMatrix(fileName, "\t");
 
 		for (int i = 0; i < stringMatrix.getNumberOfRows(); i++) {
 			parameterValues.put(stringMatrix.getString(i, 0), stringMatrix.getString(i, 1));

@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -41,7 +41,7 @@ public class GenerateTableHubLinkMapping {
 	public final static Integer unMappedLinkHubNumber=0;
 	
 	public static void main(String[] args) {
-		StringMatrix matrix = GeneralLib
+		Matrix matrix = GeneralLib
 				.readStringMatrix("C:/Users/Admin/Desktop/psl-temp/GIS_coordinates_of_managers.txt");
 		// key: hub number, value: linkIds
 		LinkedListValueHashMap<Integer, Id> hubLinkMapping = new LinkedListValueHashMap<Integer, Id>();
@@ -109,7 +109,7 @@ public class GenerateTableHubLinkMapping {
 	}
 
 
-	private static Integer getHubNumberForLink(Link link, StringMatrix matrix) {
+	private static Integer getHubNumberForLink(Link link, Matrix matrix) {
 		Random rand=new Random();
 		// as the values used for the distance were average values, the spread of the sample needs to be bigger than 1
 		double sampleSpread=3;
@@ -146,7 +146,7 @@ public class GenerateTableHubLinkMapping {
 		return false;
 	}
 
-	private static GenericResult getCornerCoordinates(StringMatrix matrix) {
+	private static GenericResult getCornerCoordinates(Matrix matrix) {
 		GenericResult genericResult;
 
 		Coord bottomLeft = new CoordImpl(Double.MAX_VALUE, Double.MAX_VALUE);

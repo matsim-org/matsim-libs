@@ -9,14 +9,14 @@ import java.util.Locale;
 
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 
 
 public class SingleDayGarageParkingsCount {
 
 	public static void main(String[] args) {
 		String baseFolder = "H:/data/experiments/TRBAug2011/parkings/counts/";
-		StringMatrix countsMatrix = GeneralLib.readStringMatrix(baseFolder + "parkingGarageCountsCityZH27-April-2011.txt", "\t");
+		Matrix countsMatrix = GeneralLib.readStringMatrix(baseFolder + "parkingGarageCountsCityZH27-April-2011.txt", "\t");
 
 		// generateOccupancyPlotsForAllParkings(countsMatrix, baseFolder +
 		// "pngs/");
@@ -46,7 +46,7 @@ public class SingleDayGarageParkingsCount {
 		}
 	}
 
-	public static HashMap<String, Double[]> getOccupancyOfAllSelectedParkings(StringMatrix countsMatrix) {		
+	public static HashMap<String, Double[]> getOccupancyOfAllSelectedParkings(Matrix countsMatrix) {		
 		HashMap<String, String> mappingOfParkingNameToParkingId = getMappingOfParkingNameToParkingId();
 
 		LinkedList<String> parkingNames = getParkingNames(countsMatrix);
@@ -70,7 +70,7 @@ public class SingleDayGarageParkingsCount {
 		return parkingOccupanciesSelectedParkings;
 	}
 
-	public static void generateOccupancyPlotsForAllParkings(StringMatrix countsMatrix, String outputFolder) {
+	public static void generateOccupancyPlotsForAllParkings(Matrix countsMatrix, String outputFolder) {
 		LinkedList<String> parkingNames = getParkingNames(countsMatrix);
 
 		HashMap<String, Double> parkingCapacities = getParkingCapacities();
@@ -91,7 +91,7 @@ public class SingleDayGarageParkingsCount {
 		}
 	}
 
-	private static LinkedList<String> getParkingNames(StringMatrix countsMatrix) {
+	private static LinkedList<String> getParkingNames(Matrix countsMatrix) {
 		LinkedList<String> parkingNames = new LinkedList<String>();
 
 		for (int i = 0; i < countsMatrix.getNumberOfRows(); i++) {
@@ -112,7 +112,7 @@ public class SingleDayGarageParkingsCount {
 		return parkingNameString.split("/")[0].replace(" ", "") + ".png";
 	}
 
-	private static void generateParkingOccupancyPlot(StringMatrix countsMatrix, String parkingName, String outputFileName,
+	private static void generateParkingOccupancyPlot(Matrix countsMatrix, String parkingName, String outputFileName,
 			Double parkingCapacity) {
 		Double[] freeParkings = getNumberOfFreeParkings(countsMatrix, parkingName);
 
@@ -177,7 +177,7 @@ public class SingleDayGarageParkingsCount {
 		return occupiedParkings;
 	}
 
-	private static Double[] getNumberOfFreeParkings(StringMatrix countsData, String parkingName) {
+	private static Double[] getNumberOfFreeParkings(Matrix countsData, String parkingName) {
 		Double[] parkingOccupancy = new Double[96];
 		boolean parkingNameFound = false;
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.US);

@@ -23,7 +23,7 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
@@ -36,7 +36,7 @@ public class CityZones {
 	public CityZones(String fileName){
 		
 		
-		StringMatrix matrix = GeneralLib.readStringMatrix(fileName,";");
+		Matrix matrix = GeneralLib.readStringMatrix(fileName,";");
 		
 		int gidIndex=matrix.getColumnIndex("gid");
 		int nameIndex=matrix.getColumnIndex("NAME");

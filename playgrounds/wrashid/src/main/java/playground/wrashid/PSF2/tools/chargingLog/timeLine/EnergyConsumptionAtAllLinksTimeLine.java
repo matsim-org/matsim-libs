@@ -5,7 +5,7 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.basic.v01.IdImpl;
 
 
@@ -44,7 +44,7 @@ public class EnergyConsumptionAtAllLinksTimeLine {
 	
 
 	public static HashMap<Id,double[]> readChargingLog(String chargingLogFileNamePath) {
-		StringMatrix matrix=GeneralLib.readStringMatrix(chargingLogFileNamePath);
+		Matrix matrix=GeneralLib.readStringMatrix(chargingLogFileNamePath);
 		HashMap<Id,double[]> energyConsumptionPerLinkDuringTheDay=new HashMap<Id, double[]>();
 		
 		// starting with index 1 (ignoring first line)

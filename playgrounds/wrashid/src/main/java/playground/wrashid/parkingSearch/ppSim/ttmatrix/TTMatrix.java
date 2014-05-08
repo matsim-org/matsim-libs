@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 
 public class  TTMatrix {
 	
@@ -37,7 +37,7 @@ public class  TTMatrix {
 	}
 	
 	public void writeTTMatrixToFile(String outputFile){
-		StringMatrix sm=new StringMatrix();
+		Matrix sm=new Matrix();
 		
 		ArrayList<String> row=new ArrayList<String>();
 		row.add("firstColumn=linkId");

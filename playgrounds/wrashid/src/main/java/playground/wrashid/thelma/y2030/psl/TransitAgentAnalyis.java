@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -17,7 +17,7 @@ import playground.wrashid.lib.tools.kml.Color;
 public class TransitAgentAnalyis {
 
 	public static void main(String[] args) {
-		StringMatrix parkingTimesEC = GeneralLib
+		Matrix parkingTimesEC = GeneralLib
 				.readStringMatrix("A:/for marina/26. april 2012/parkingTimesAndEnergyConsumptionCH.txt");
 		Network network = GeneralLib.readNetwork("H:/data/cvs/ivt/studies/switzerland/networks/teleatlas-ivtcheu/network.xml.gz");
 

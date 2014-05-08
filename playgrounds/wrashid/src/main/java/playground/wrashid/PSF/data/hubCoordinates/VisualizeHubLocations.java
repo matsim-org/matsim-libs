@@ -2,7 +2,7 @@ package playground.wrashid.PSF.data.hubCoordinates;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
@@ -11,7 +11,7 @@ import playground.wrashid.lib.tools.kml.Color;
 public class VisualizeHubLocations {
 
 	public static void main(String[] args) {
-		StringMatrix matrix=GeneralLib.readStringMatrix("A:/data/ewz daten/GIS_coordinates_of_managers.txt");
+		Matrix matrix=GeneralLib.readStringMatrix("A:/data/ewz daten/GIS_coordinates_of_managers.txt");
 		BasicPointVisualizer visualizer=new BasicPointVisualizer();
 		
 		for (int i=0;i<matrix.getNumberOfRows();i++){

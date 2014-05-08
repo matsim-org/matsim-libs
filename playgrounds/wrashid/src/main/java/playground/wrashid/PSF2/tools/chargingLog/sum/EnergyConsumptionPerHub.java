@@ -3,7 +3,7 @@ package playground.wrashid.PSF2.tools.chargingLog.sum;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 
 
 public class EnergyConsumptionPerHub {
@@ -22,7 +22,7 @@ public class EnergyConsumptionPerHub {
 
 	private static DoubleValueHashMap<String> getEnergyConsumptionPerHub(String chargingLogFileNamePath, String linkHubMappingTable) {
 		DoubleValueHashMap<String> energyConsumptionPerLink = EnergyConsumptionPerLink.readChargingLog(chargingLogFileNamePath);
-		StringMatrix matrix = GeneralLib.readStringMatrix(linkHubMappingTable);
+		Matrix matrix = GeneralLib.readStringMatrix(linkHubMappingTable);
 		DoubleValueHashMap<String> energyConsumptionPerHub = new DoubleValueHashMap<String>();
 
 		for (int i = 1; i < matrix.getNumberOfRows(); i++) {

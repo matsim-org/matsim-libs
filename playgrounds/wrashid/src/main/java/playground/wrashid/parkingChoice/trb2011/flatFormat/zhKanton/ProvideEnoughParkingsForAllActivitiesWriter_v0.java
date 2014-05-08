@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
@@ -78,7 +78,7 @@ public class ProvideEnoughParkingsForAllActivitiesWriter_v0 extends MatsimXmlWri
 		
 		String sourcePath = "ETH/static data/parking/zürich city/Parkhaeuser/parkhäuser.txt";
 
-		StringMatrix garageParkingData = GeneralLib.readStringMatrix("c:/data/My Dropbox/" + sourcePath);
+		Matrix garageParkingData = GeneralLib.readStringMatrix("c:/data/My Dropbox/" + sourcePath);
 		
 		ProvideEnoughParkingsForAllActivitiesWriter_v0 garageParkingsOutsideZHCityWriter=new ProvideEnoughParkingsForAllActivitiesWriter_v0();
 		garageParkingsOutsideZHCityWriter.writeFile(outputParkingFileName, sourcePath,garageParkingData);
@@ -133,7 +133,7 @@ public class ProvideEnoughParkingsForAllActivitiesWriter_v0 extends MatsimXmlWri
 		return GeneralLib.getDistance(actCoord, closestParkingZHCity.getCoord()) > 300;
 	}
 	
-	public void writeFile(final String filename, String source, StringMatrix garageParkingData) {
+	public void writeFile(final String filename, String source, Matrix garageParkingData) {
 		String dtd = "./test/input/playground/wrashid/parkingChoice/infrastructure/flatParkingFormat_v1.dtd";
 
 		try {
@@ -156,7 +156,7 @@ public class ProvideEnoughParkingsForAllActivitiesWriter_v0 extends MatsimXmlWri
 		}
 	}
 	
-	private void writeFacilities(StringMatrix garageParkingData, BufferedWriter writer) throws IOException {
+	private void writeFacilities(Matrix garageParkingData, BufferedWriter writer) throws IOException {
 		int i=1;
 		for (Parking parking:parkingsQuadTreeOutsideCityZH.values()){
 			writer.write("\t<parking type=\"public\"");

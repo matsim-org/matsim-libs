@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.contrib.parking.lib.obj.TwoKeyHashMapWithDouble;
 import org.matsim.core.basic.v01.IdImpl;
 
@@ -99,7 +99,7 @@ public class PriceChangeBetweenIterations {
 	private static DoubleValueHashMap<Id> readPrices(String fileName) {
 		DoubleValueHashMap<Id> parkingPrice=new DoubleValueHashMap<Id>();
 		
-		StringMatrix morningMatrix = GeneralLib.readStringMatrix(fileName,"\t");
+		Matrix morningMatrix = GeneralLib.readStringMatrix(fileName,"\t");
 		
 		for (int i=1;i<morningMatrix.getNumberOfRows();i++){
 			Id id=new IdImpl(morningMatrix.getString(i, 0));

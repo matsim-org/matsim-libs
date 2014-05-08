@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 
 
 import playground.wrashid.lib.tools.txtConfig.TxtConfig;
@@ -17,7 +17,7 @@ public class AddParkingIdsToSmartChargingLog {
 	public static void main(String[] args) {
 		config = new TxtConfig(args[0]);
 		
-		StringMatrix parkingTimes = GeneralLib.readStringMatrix(config.getParameterValue("parkingTimesFileWithCorrectParkingIds"), "\t");
+		Matrix parkingTimes = GeneralLib.readStringMatrix(config.getParameterValue("parkingTimesFileWithCorrectParkingIds"), "\t");
 		
 		HashMap<String, Integer> indexOfParkingTimesOfAgent=new HashMap<String, Integer>();
 		
@@ -28,7 +28,7 @@ public class AddParkingIdsToSmartChargingLog {
 			}
 		}
 		
-		StringMatrix chargingLog = GeneralLib.readStringMatrix(config.getParameterValue("inputChargingLog"), "\t");
+		Matrix chargingLog = GeneralLib.readStringMatrix(config.getParameterValue("inputChargingLog"), "\t");
 		
 		for (int i=1;i<chargingLog.getNumberOfRows();i++){
 			String agentId = parkingTimes.getString(i, 0);

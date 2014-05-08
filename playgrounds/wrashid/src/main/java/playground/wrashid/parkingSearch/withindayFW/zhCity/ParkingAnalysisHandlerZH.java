@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Pair;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 
@@ -74,7 +74,7 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 		} else {
 			baseFolder = "H:/data/experiments/TRBAug2011/parkings/counts/";
 		}
-		StringMatrix countsMatrix = GeneralLib.readStringMatrix(baseFolder + "parkingGarageCountsCityZH27-April-2011.txt", "\t");
+		Matrix countsMatrix = GeneralLib.readStringMatrix(baseFolder + "parkingGarageCountsCityZH27-April-2011.txt", "\t");
 
 		HashMap<String, Double[]> occupancyOfAllSelectedParkings = SingleDayGarageParkingsCount
 				.getOccupancyOfAllSelectedParkings(countsMatrix);

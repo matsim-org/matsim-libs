@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -468,7 +468,7 @@ public class ParkingScoreAccumulator implements StartupListener, AfterMobsimList
         } else {
             baseFolder = "H:/data/experiments/TRBAug2011/parkings/counts/";
         }
-        StringMatrix countsMatrix = GeneralLib.readStringMatrix(baseFolder + "parkingGarageCountsCityZH27-April-2011.txt", "\t");
+        Matrix countsMatrix = GeneralLib.readStringMatrix(baseFolder + "parkingGarageCountsCityZH27-April-2011.txt", "\t");
 
         HashMap<String, Double[]> occupancyOfAllSelectedParkings = SingleDayGarageParkingsCount
                 .getOccupancyOfAllSelectedParkings(countsMatrix);

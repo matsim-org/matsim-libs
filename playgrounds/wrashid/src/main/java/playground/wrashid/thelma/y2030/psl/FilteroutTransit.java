@@ -5,13 +5,13 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 
 
 public class FilteroutTransit {
 
 	public static void main(String[] args) {
-		StringMatrix parkingTimesEC = GeneralLib
+		Matrix parkingTimesEC = GeneralLib
 				.readStringMatrix("A:/for marina/26. april 2012/parkingTimesAndEnergyConsumptionCH.txt");
 
 		HashMap<String, Id> agentIds = new HashMap();

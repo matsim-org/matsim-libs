@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree;
@@ -23,7 +23,7 @@ public class PrivateParkingsOutdoorWriter_v0 extends MatsimXmlWriter {
 	
 	public static void main(String[] args) {
 		String sourcePathPrivateParkingsOutdoor = "ETH/static data/parking/zürich city/Private Parkplätze/PrivateParkingOutdoor.txt";
-		StringMatrix privateParkingOutdoorFile = GeneralLib.readStringMatrix("c:/data/My Dropbox/" + sourcePathPrivateParkingsOutdoor);
+		Matrix privateParkingOutdoorFile = GeneralLib.readStringMatrix("c:/data/My Dropbox/" + sourcePathPrivateParkingsOutdoor);
 
 		facilitiesQuadTree = PrivateParkingsIndoorWriter_v0.getFacilitiesQuadTree();
 		

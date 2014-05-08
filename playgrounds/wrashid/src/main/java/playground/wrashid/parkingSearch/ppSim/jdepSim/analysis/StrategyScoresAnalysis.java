@@ -24,7 +24,7 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 
@@ -254,7 +254,7 @@ public class StrategyScoresAnalysis {
 		return false;
 	}
 
-	public static TwoHashMapsConcatenated<String, Integer, Boolean> usesPrivateParking(StringMatrix matrix){
+	public static TwoHashMapsConcatenated<String, Integer, Boolean> usesPrivateParking(Matrix matrix){
 		TwoHashMapsConcatenated<String, Integer, Boolean> usesPrivateParking=new TwoHashMapsConcatenated<String, Integer, Boolean>();
 		
 		for (int i=1;i<matrix.getNumberOfRows();i++){
@@ -272,12 +272,12 @@ public class StrategyScoresAnalysis {
 	
 	
 	public static TwoHashMapsConcatenated<String, Integer, Boolean> usesPrivateParking(int iterationNumber){
-		StringMatrix matrix = GeneralLib.readStringMatrix(getEventsFileName(iterationNumber));
+		Matrix matrix = GeneralLib.readStringMatrix(getEventsFileName(iterationNumber));
 		return usesPrivateParking(matrix);
 	}
 	
 	public static TwoHashMapsConcatenated<String, Integer, ArrayList<String>> getParkingEvents(String outputPath,int iterationNumber){
-		StringMatrix matrix = GeneralLib.readStringMatrix(outputPath + "/ITERS/" + iterationNumber +".parkingEvents.txt.gz");
+		Matrix matrix = GeneralLib.readStringMatrix(outputPath + "/ITERS/" + iterationNumber +".parkingEvents.txt.gz");
 		TwoHashMapsConcatenated<String, Integer, ArrayList<String>> result=new TwoHashMapsConcatenated<String, Integer, ArrayList<String>>();
 		
 		int personIdColIndex=matrix.getColumnIndex("personId");
@@ -290,7 +290,7 @@ public class StrategyScoresAnalysis {
 		return result;
 	}
 
-	public static TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> getScores(StringMatrix scoresMatrix,StringMatrix eventsMatrix,boolean removePrivateParking) {
+	public static TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> getScores(Matrix scoresMatrix,Matrix eventsMatrix,boolean removePrivateParking) {
 TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> scores=new TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>>();
 		
 		TwoHashMapsConcatenated<String, Integer, Boolean> usesPrivateParking = usesPrivateParking(eventsMatrix);
@@ -326,14 +326,14 @@ TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> scores=ne
 	}
 	
 	public static TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> getScores(String outputPath,int iterationNumber, boolean removePrivateParking) {
-		StringMatrix scoresMatrix = GeneralLib.readStringMatrix(outputPath + "/ITERS/" + iterationNumber +".strategyScores.txt.gz");
-		StringMatrix eventsMatrix = GeneralLib.readStringMatrix(outputPath + "/ITERS/" + iterationNumber +".parkingEvents.txt.gz");		
+		Matrix scoresMatrix = GeneralLib.readStringMatrix(outputPath + "/ITERS/" + iterationNumber +".strategyScores.txt.gz");
+		Matrix eventsMatrix = GeneralLib.readStringMatrix(outputPath + "/ITERS/" + iterationNumber +".parkingEvents.txt.gz");		
 		return getScores(scoresMatrix,eventsMatrix,removePrivateParking);
 	}
 	
 	public static TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> getScores(int iterationNumber, boolean removePrivateParking) {
-		StringMatrix scoresMatrix = GeneralLib.readStringMatrix(getScoresFileName(iterationNumber));
-		StringMatrix eventsMatrix = GeneralLib.readStringMatrix(getEventsFileName(iterationNumber));		
+		Matrix scoresMatrix = GeneralLib.readStringMatrix(getScoresFileName(iterationNumber));
+		Matrix eventsMatrix = GeneralLib.readStringMatrix(getEventsFileName(iterationNumber));		
 		return getScores(scoresMatrix,eventsMatrix,removePrivateParking);
 	}
 	

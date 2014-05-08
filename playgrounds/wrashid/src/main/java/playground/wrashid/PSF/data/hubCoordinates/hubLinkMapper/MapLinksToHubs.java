@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.lib.obj.HashMapInverter;
@@ -41,7 +41,7 @@ public class MapLinksToHubs {
 		HashMap<Id,Integer> linkHubMapping=new HashMap<Id,Integer>();
 		// key: hub number, value: linkIds
 		LinkedListValueHashMap<Integer,LinkedList<Id>> hubLinkMapping=new LinkedListValueHashMap<Integer,LinkedList<Id>>();
-		StringMatrix matrix=GeneralLib.readStringMatrix("A:/data/ewz daten/GIS_coordinates_of_managers.txt");
+		Matrix matrix=GeneralLib.readStringMatrix("A:/data/ewz daten/GIS_coordinates_of_managers.txt");
 		Network network=GeneralLib.readNetwork("A:/data/matsim/input/runRW1003/network-osm-ch.xml.gz");
 		
 		double averageHubSubManagers=6.381134321058625;
@@ -72,7 +72,7 @@ public class MapLinksToHubs {
 		return new HashMapInverter(linkHubMapping).getLinkedListValueHashMap();
 	}
 	
-	private static int getNumberOfHubs(StringMatrix matrix){
+	private static int getNumberOfHubs(Matrix matrix){
 		int numberOfHubs=Integer.MIN_VALUE;
 		for (int i=0;i<matrix.getNumberOfRows();i++){
 			int currentHubNumber=matrix.convertDoubleToInteger(i, 0);

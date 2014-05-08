@@ -5,7 +5,7 @@ import java.util.LinkedList;
 
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 
 
 public class LAVLib {
@@ -17,9 +17,9 @@ public class LAVLib {
 	 * @param ignoreFirstLine
 	 * @return
 	 */
-	public static StringMatrix readLAVModelFile(String fileName, boolean ignoreFirstLine){
+	public static Matrix readLAVModelFile(String fileName, boolean ignoreFirstLine){
 		LinkedList<String> fileRows = GeneralLib.readFileRows(fileName);
-		StringMatrix stringMatrix=new StringMatrix();
+		Matrix stringMatrix=new Matrix();
 		
 		int maxNumberOfTabs=0;		
 		for (String row:fileRows){

@@ -23,7 +23,7 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 
@@ -34,7 +34,7 @@ import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 public class NumberOfParkingsPerLinkAndHub {
 
 	public static void main(String[] args) {
-		StringMatrix stringMatrix = GeneralLib.readStringMatrix("H:/data/experiments/ARTEMIS/nov2011/inputs/linkHubMappings/linkHub.mappingTable.txt", "\t");
+		Matrix stringMatrix = GeneralLib.readStringMatrix("H:/data/experiments/ARTEMIS/nov2011/inputs/linkHubMappings/linkHub.mappingTable.txt", "\t");
 		NetworkImpl network = (NetworkImpl) GeneralLib.readNetwork("H:/data/experiments/TRBAug2011/runs/ktiRun45/output/output_network.xml.gz");
 		String parkingBasePath =	"H:/data/experiments/TRBAug2011/parkings/flat/";
 		

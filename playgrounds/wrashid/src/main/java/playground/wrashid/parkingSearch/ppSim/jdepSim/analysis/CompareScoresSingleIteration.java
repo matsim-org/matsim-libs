@@ -23,7 +23,7 @@ import java.util.LinkedList;
 
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.contrib.parking.lib.obj.list.Lists;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;

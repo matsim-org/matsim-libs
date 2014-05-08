@@ -65,7 +65,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.contrib.parking.lib.obj.StringMatrixFilter;
 import org.matsim.contrib.parking.lib.obj.list.Lists;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -820,7 +820,7 @@ public class GeneralLib {
 	// TODO: there are some classes (e.g.
 	// playground.wrashid.PSF.data.HubLinkMapping and HubPriceInfo, which could
 	// be refactored by calling this method.
-	public static StringMatrix readStringMatrix(String fileName) {
+	public static Matrix readStringMatrix(String fileName) {
 		return readStringMatrix(fileName, null);
 	}
 
@@ -847,9 +847,9 @@ public class GeneralLib {
 		return list;
 	}
 
-	public static StringMatrix readStringMatrix(String fileName, String delim,
+	public static Matrix readStringMatrix(String fileName, String delim,
 			StringMatrixFilter filter) {
-		StringMatrix matrix = new StringMatrix();
+		Matrix matrix = new Matrix();
 
 		try {
 
@@ -899,7 +899,7 @@ public class GeneralLib {
 	}
 
 	// TODO: move implementation to String matrix class...
-	public static StringMatrix readStringMatrix(String fileName, String delim) {
+	public static Matrix readStringMatrix(String fileName, String delim) {
 		return readStringMatrix(fileName, delim, null);
 	}
 

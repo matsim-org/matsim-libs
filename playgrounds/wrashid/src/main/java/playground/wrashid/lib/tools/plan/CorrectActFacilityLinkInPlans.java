@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -32,7 +32,7 @@ public class CorrectActFacilityLinkInPlans {
 
 		String outputPlansFile = "H:/data/cvs/ivt/studies/switzerland/plans/teleatlas-ivtcheu/census2000v2_dilZh30km_10pct/plans_new.xml.gz";
 
-		StringMatrix matrix = GeneralLib.readStringMatrix(facilitiesToLinkFile);
+		Matrix matrix = GeneralLib.readStringMatrix(facilitiesToLinkFile);
 
 		// factilityId, linkId
 		HashMap<Id, Id> f2l = new HashMap<Id, Id>();

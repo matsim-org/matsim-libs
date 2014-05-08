@@ -9,7 +9,7 @@ import java.util.Random;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.SortableMapObject;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 
 import playground.wrashid.lib.MathLib;
 import playground.wrashid.lib.tools.txtConfig.TxtConfig;
@@ -22,7 +22,7 @@ public class SmartCharger {
 	public static void main(String[] args) {
 		config = new TxtConfig(args[0]);
 
-		StringMatrix parkingTimes = GeneralLib.readStringMatrix(
+		Matrix parkingTimes = GeneralLib.readStringMatrix(
 				config.getParameterValue("parkingTimesFileWithCorrectParkingIds"), "\t");
 		removeInconsistentAgents(parkingTimes, 0);
 
@@ -35,11 +35,11 @@ public class SmartCharger {
 			}
 		}
 
-		StringMatrix chargingLog = GeneralLib.readStringMatrix(config.getParameterValue("dumbChargingLogWithCorrectParkingIds"),
+		Matrix chargingLog = GeneralLib.readStringMatrix(config.getParameterValue("dumbChargingLogWithCorrectParkingIds"),
 				"\t");
 		removeInconsistentAgents(chargingLog,1);
 
-		StringMatrix outputChargingLog = initOutputCharingLogMatrix();
+		Matrix outputChargingLog = initOutputCharingLogMatrix();
 		
 		for (int i = 1; i < chargingLog.getNumberOfRows(); i++) {
 			String agentId = chargingLog.getString(i, 1);
@@ -99,8 +99,8 @@ public class SmartCharger {
 		parkingTimes.writeMatrix(config.getParameterValue("outputParkingTimes"));
 	}
 
-	private static StringMatrix initOutputCharingLogMatrix() {
-		StringMatrix outputChargingLog=new StringMatrix();
+	private static Matrix initOutputCharingLogMatrix() {
+		Matrix outputChargingLog=new Matrix();
 		ArrayList<String> titleArray=new ArrayList<String>();
 		titleArray.add("linkId");
 		titleArray.add("agentId");
@@ -112,7 +112,7 @@ public class SmartCharger {
 		return outputChargingLog;
 	}
 
-	private static void removeInconsistentAgents(StringMatrix stringMatrix, int columnIndexOfAgentIds) {
+	private static void removeInconsistentAgents(Matrix stringMatrix, int columnIndexOfAgentIds) {
 		String removeInconsistentAgents = config.getParameterValue("removeInconsistentAgents");
 		System.out.println("removing agents: " + removeInconsistentAgents + " ");
 		if (removeInconsistentAgents != null) {

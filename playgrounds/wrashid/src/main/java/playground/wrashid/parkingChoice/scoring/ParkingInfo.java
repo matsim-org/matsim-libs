@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
@@ -34,7 +34,7 @@ public class ParkingInfo {
 	public static LinkedListValueHashMap<Id, ParkingInfo> readParkingInfo(String fileName){
 		LinkedListValueHashMap<Id, ParkingInfo> container=new LinkedListValueHashMap<Id, ParkingInfo>();
 		
-		StringMatrix matrix = GeneralLib.readStringMatrix(fileName,"\t");
+		Matrix matrix = GeneralLib.readStringMatrix(fileName,"\t");
 		
 		for (int i=1;i<matrix.getNumberOfRows();i++){
 			Id personId=new IdImpl(matrix.getString(i, 0));

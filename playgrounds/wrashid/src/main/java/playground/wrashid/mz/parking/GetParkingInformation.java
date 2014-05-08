@@ -2,31 +2,31 @@ package playground.wrashid.mz.parking;
 
 import org.apache.log4j.chainsaw.Main;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 
 
 public class GetParkingInformation {
 
 	public static void main(String[] args) {
-		StringMatrix table = GeneralLib.readStringMatrix("H:/data/static/MZ2005/Zielpersonen.txt");
+		Matrix table = GeneralLib.readStringMatrix("H:/data/static/MZ2005/Zielpersonen.txt");
 		
 		System.out.println(table.getColumnIndex("F22A"));
 		
 	}
 	
-	private static int getColumnIndexOfPersonWeight(StringMatrix table){
+	private static int getColumnIndexOfPersonWeight(Matrix table){
 		return table.getColumnIndex("WP");
 	}
 	
-	private static int getColumnIndexOfWorkingLocationXCoordinate(StringMatrix table){
+	private static int getColumnIndexOfWorkingLocationXCoordinate(Matrix table){
 		return table.getColumnIndex("W_X");
 	}
 	
-	private static int getColumnIndexOfWorkingLocationYCoordinate(StringMatrix table){
+	private static int getColumnIndexOfWorkingLocationYCoordinate(Matrix table){
 		return table.getColumnIndex("W_Y");
 	}
 	
-	private static int getColumnIndexOfParkingAvailabilityAtWorkingLocation(StringMatrix table){
+	private static int getColumnIndexOfParkingAvailabilityAtWorkingLocation(Matrix table){
 		return table.getColumnIndex("F411");
 	}
 	

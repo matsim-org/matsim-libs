@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 
 
 public class EnergyConsumptionRegressionModel {
@@ -86,7 +86,7 @@ public class EnergyConsumptionRegressionModel {
 
 	public static LinkedList<EnergyConsumptionModelRow> getEnergyConsumptionRegressionModel(String fileName) {
 		LinkedList<EnergyConsumptionModelRow> list = new LinkedList<EnergyConsumptionModelRow>();
-		StringMatrix modelFile = LAVLib.readLAVModelFile(fileName, true);
+		Matrix modelFile = LAVLib.readLAVModelFile(fileName, true);
 
 		for (int i = 0; i < modelFile.getNumberOfRows(); i++) {
 			EnergyConsumptionModelRow energyConsumptionModelRow = new EnergyConsumptionModelRow();

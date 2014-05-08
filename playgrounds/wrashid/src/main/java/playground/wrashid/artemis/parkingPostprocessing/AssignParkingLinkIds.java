@@ -25,7 +25,7 @@ import java.util.LinkedList;
 import org.geotools.math.Statistics;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 
@@ -68,7 +68,7 @@ public class AssignParkingLinkIds {
 	}
 
 	private static void replaceLinkIdsInLogChargigLong(String chargingLogInputFileName, String chargingLogOutputFileName) {
-		StringMatrix chargingLog = GeneralLib.readStringMatrix(chargingLogInputFileName, "\t");
+		Matrix chargingLog = GeneralLib.readStringMatrix(chargingLogInputFileName, "\t");
 
 		for (int i = 1; i < chargingLog.getNumberOfRows(); i++) {
 			Id personId = new IdImpl(chargingLog.getString(i, 1));
@@ -98,7 +98,7 @@ public class AssignParkingLinkIds {
 	}
 
 	private static void replaceLinkIdsInParkingTimesLog(String parkingTimesInputFileName, String parkingTimesOutputFileName) {
-		StringMatrix parkingTimes = GeneralLib.readStringMatrix(parkingTimesInputFileName, "\t");
+		Matrix parkingTimes = GeneralLib.readStringMatrix(parkingTimesInputFileName, "\t");
 
 		Statistics statisticsOnDistanceBetweenParkingAndActivity=new Statistics();
 		
