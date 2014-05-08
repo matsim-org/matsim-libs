@@ -4,25 +4,11 @@
  *  
  *  <h2>Usage</h2>
  *  
- *  If input files for signal systems are already available, simulation of traffic lights can be enabled via MATSim config options:
- *  <ol>
- *    <li>Set the parameter <code>useSignalsystems</code> to <code>true</code> in the 
- *    config module <code>scenario</code></li>
- *    <li>Set at least three input file names in the config module <code>signalsystems</code>:
- *    <ol>
- *    	<li> parameter name: <code>signalsystems</code> value: path to a file in the <code>signalSystems_v2.0.xsd</code> file format </li>
- *    	<li> parameter name: <code>signalgroups</code> value: path to a file in the <code>signalGroups_v2.0.xsd</code> file format </li>
- *    	<li> parameter name: <code>signalcontrol</code> value: path to a file in the <code>signalControl_v2.0.xsd</code> file format </li>
- *    	<li> parameter name: <code>ambertimes</code> (optional) value: path to a file in the <code>amberTimes_v1.0.xsd</code> file format </li>
- *    	<li> parameter name: <code>useIntergreenTimes</code> (optional) value: <code>true</code> or <code>false</code> </li>
- *    	<li> parameter name: <code>intergreentimes</code> (optional) value: path to a file in the <code>intergreenTimes_v1.0.xsd</code> file format </li>
- *     	<li> parameter name: <code>actionOnIntergreenViolation</code> (optional) value: <code>warn</code> or <code>exception</code> </li>
- *    </ol>
- *    </li>
- *  </ol>
- *  
+ *  If input files for signal systems are already available, simulation of traffic lights can be enabled via MATSim config options.
+ *  <p>
  *  An example of such a configuration can be found in the input folder of the SignalSystemsIntegrationTest. If your data is in an older file format have a look at the
  *  package playground.dgrether.signalsystems.data.conversion for converters to the required file formats.
+ *  </p>
  *  <p>
  *  For more information see the documentation in <code>contrib/signals/docs/user-guide</code>.
  *  </p>
@@ -50,9 +36,9 @@
  * 
  * <ul>
  *		<li><code>signalsystems.data</code> the package containing the data layer</li>
- *		<li><code>signalsystems.model </code> the package containing the model layer</li>
- *		<li><code>signalsystems.mobsim</code>the package containing the layer to couple the model to the mobility simulation</li>
- *		<li><code>signalsystems.builder </code>the package containing the layer to build the other layers</li>
+ *		<li><code>signalsystems.model</code> the package containing the model layer</li>
+ *		<li><code>signalsystems.mobsim</code> the package containing the layer to couple the model to the mobility simulation</li>
+ *		<li><code>signalsystems.builder</code> the package containing the layer to build the other layers</li>
  *	</ul>
  * 
  * Each layer is documented separately in the package-info.java of the subpackage.
@@ -71,16 +57,10 @@
  * the factories/builders of the default implementation by your instances to get your extension or customization into the model. 
  * Also have a look at the package-info.java documentation in the subpackages to get an idea how the components work and what can be 
  * customized.
- *
+ * <p>
  * An example of an adaptive signal control implementation can be found in the package 
  * playground.dgrether.signalsystems.sylvia in the playground project. 
- * 
- *  @see org.matsim.signalsystems.data
- *  @see org.matsim.signalsystems.model
- *  @see org.matsim.signalsystems.builder
- *  @see org.matsim.signalsystems.mobsim
- *  @see org.matsim.signalsystems.controler
- *  
+ * </p>
  *  
  * <h2>Package Maintainer(s):</h2>
  * <ul>
@@ -91,6 +71,12 @@
  * 
  * @author dgrether
  * @author tthunig
+ * 
+ * @see org.matsim.signalsystems.data
+ * @see org.matsim.signalsystems.model
+ * @see org.matsim.signalsystems.builder
+ * @see org.matsim.signalsystems.mobsim
+ * @see org.matsim.signalsystems.controler
  */
 package org.matsim.signalsystems;
 
