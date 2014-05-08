@@ -847,9 +847,9 @@ public class GeneralLib {
 		return list;
 	}
 
-	public static Matrix readStringMatrix(String fileName, String delim,
+	public static Matrix<String> readStringMatrix(String fileName, String delim,
 			StringMatrixFilter filter) {
-		Matrix matrix = new Matrix();
+		Matrix<String> matrix = new Matrix<String>();
 
 		try {
 
@@ -899,7 +899,7 @@ public class GeneralLib {
 	}
 
 	// TODO: move implementation to String matrix class...
-	public static Matrix readStringMatrix(String fileName, String delim) {
+	public static Matrix<String> readStringMatrix(String fileName, String delim) {
 		return readStringMatrix(fileName, delim, null);
 	}
 
