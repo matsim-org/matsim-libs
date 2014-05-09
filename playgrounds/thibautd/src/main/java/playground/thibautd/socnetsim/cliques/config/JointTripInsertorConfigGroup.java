@@ -41,8 +41,19 @@ public class JointTripInsertorConfigGroup extends ReflectiveModule {
 		super( GROUP_NAME );
 	}
 
-	// XXX: invalid!
 	@StringGetter( "chainBasedModes" )
+	public String getStringChainBasedModes() {
+		if ( chainBasedModes.isEmpty() ) return "";
+
+		final StringBuffer b = new StringBuffer( chainBasedModes.get( 0 ) );
+		for ( int i=1; i < chainBasedModes.size(); i++ ) {
+			b.append( ',' );
+			b.append( chainBasedModes.get( i ) );
+		}
+
+		return b.toString();
+	}
+
 	public List<String> getChainBasedModes() {
 		return this.chainBasedModes;
 	}
