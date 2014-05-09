@@ -49,10 +49,10 @@ public class OTFClientQuadTree extends QuadTree<OTFDataReader> {
 
 	private static final Logger log = Logger.getLogger(OTFClientQuadTree.class);
 
-	private final double minEasting;
-	private final double maxEasting;
-	private final double minNorthing;
-	private final double maxNorthing;
+	private double minEasting;
+	private double maxEasting;
+	private double minNorthing;
+	private double maxNorthing;
 	private SceneGraph lastGraph = null;
 
 	public double offsetEast;
@@ -279,20 +279,36 @@ public class OTFClientQuadTree extends QuadTree<OTFDataReader> {
 	public double getMinEasting() {
 		return this.minEasting;
 	}
+	
+	public void setMinEasting(double minEasting) {
+		this.minEasting = minEasting;
+	}
 
 	@Override
 	public double getMaxEasting() {
 		return this.maxEasting;
+	}
+	
+	public void setMaxEasting(double maxEasting) {
+		this.maxEasting = maxEasting;
 	}
 
 	@Override
 	public double getMinNorthing() {
 		return this.minNorthing;
 	}
+	
+	public void setMinNorthing(double minNorthing) {
+		this.minNorthing = minNorthing;
+	}
 
 	@Override
 	public double getMaxNorthing() {
 		return this.maxNorthing;
+	}
+	
+	public void setMaxNorthing(double maxNorthing) {
+		this.maxNorthing = maxNorthing;
 	}
 
 }

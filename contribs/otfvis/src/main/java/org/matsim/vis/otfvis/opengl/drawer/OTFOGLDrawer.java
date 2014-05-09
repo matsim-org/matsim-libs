@@ -308,6 +308,12 @@ public class OTFOGLDrawer implements GLEventListener {
     private int statusWidth;
 
 	private OTFVisConfigGroup otfVisConfig;
+	
+	private boolean includeLogo = true;
+	
+	private int screenshotInterval = 1;
+	
+	private int timeOfLastScreenshot = Integer.MAX_VALUE;
 
 	public OTFOGLDrawer(OTFClientQuadTree clientQ, OTFHostControlBar hostControlBar, OTFVisConfigGroup otfVisConfig) {
 		Font font = new Font("SansSerif", Font.PLAIN, 32);
@@ -322,8 +328,10 @@ public class OTFOGLDrawer implements GLEventListener {
 		this.canvas.addMouseMotionListener(mouseMan);
 		this.canvas.addMouseWheelListener(mouseMan);
 		this.scaleBar = new OTFScaleBarDrawer();
-		OTFGLOverlay matsimLogo = new OTFGLOverlay("matsim_logo_blue.png", -0.03f, 0.05f, 1.5f, false);
-		this.overlayItems.add(matsimLogo);
+		if (includeLogo == true) {
+			OTFGLOverlay matsimLogo = new OTFGLOverlay("matsim_logo_blue.png", -0.03f, 0.05f, 1.5f, false);
+			this.overlayItems.add(matsimLogo);
+		}
 		Rectangle2D initialZoom = otfVisConfig.getZoomValue("*Initial*");
 		if (initialZoom != null) {
 			this.setViewBounds(initialZoom);
@@ -416,7 +424,9 @@ public class OTFOGLDrawer implements GLEventListener {
 			this.lastShot = this.now;
 			String nr = String.format("%07d", this.now);
 			try {
-				Screenshot.writeToFile(new File("movie"+ this +" Frame" + nr + ".jpg"), drawable.getWidth(), drawable.getHeight());
+				if (this.now % screenshotInterval == 0 && this.now <= timeOfLastScreenshot) {
+					Screenshot.writeToFile(new File("movie"+ this +" Frame" + nr + ".jpg"), drawable.getWidth(), drawable.getHeight());
+				}
 			} catch (GLException e) {
 				e.printStackTrace();
 			} catch (IllegalArgumentException e) {
@@ -430,7 +440,7 @@ public class OTFOGLDrawer implements GLEventListener {
 		}
 		gl.glDisable(GL.GL_BLEND);
 	}
-
+	
 	private void displayLinkIds(Map<Coord, String> linkIds, GLAutoDrawable glAutoDrawable) {
 		String testText = "0000000";
 		Rectangle2D test = textRenderer.getBounds(testText);
@@ -756,7 +766,7 @@ public class OTFOGLDrawer implements GLEventListener {
 	public void setViewBounds(Rectangle2D viewBounds) {
 		this.viewBounds = new QuadTree.Rect(viewBounds.getMinX(), viewBounds.getMinY(), viewBounds.getMaxX(), viewBounds.getMaxY());
 	}
-
+	
 	private void showZoomDialog() {
 		this.zoomD = new JDialog();
 		this.zoomD.setUndecorated(true);
@@ -830,6 +840,18 @@ public class OTFOGLDrawer implements GLEventListener {
 		this.canvas.repaint();
 		BufferedImage image = ImageUtil.createThumbnail(this.current, 300);
 		otfVisConfig.addZoom(new ZoomEntry(image,zoomstore, name));
+	}
+	
+	public void setIncludeLogo(boolean includeLogo) {
+		this.includeLogo = includeLogo;
+	}
+	
+	public void setScreenshotInterval(int screenshotInterval) {
+		this.screenshotInterval = screenshotInterval;
+	}
+	
+	public void setTimeOfLastScreenshot(int timeOfLastScreenshot) {
+		this.timeOfLastScreenshot = timeOfLastScreenshot;
 	}
 
 	@Override
