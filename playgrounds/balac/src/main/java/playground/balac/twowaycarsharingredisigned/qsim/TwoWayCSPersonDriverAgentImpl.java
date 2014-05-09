@@ -91,24 +91,26 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 	private Link startLink;
 	
 
-	private TwoWayCSVehicleLocation ffvehiclesLocation;	
+	private TwoWayCSVehicleLocation twvehiclesLocation;	
 	
 	ArrayList<ActivityFacility> carsharingVehicleLocations;
 	
 	ArrayList<ActivityFacility> startFacilities;
+	
+	private String twVehId;
 	
 	HashMap<Link, Link> map = new HashMap<Link, Link>();
 
 	// ============================================================================================================================
 	// c'tor
 
-	public TwoWayCSPersonDriverAgentImpl(final Person person, final Plan plan, final Netsim simulation, final Scenario scenario, final Controler controler, TwoWayCSVehicleLocation ffvehiclesLocation) {
+	public TwoWayCSPersonDriverAgentImpl(final Person person, final Plan plan, final Netsim simulation, final Scenario scenario, final Controler controler, TwoWayCSVehicleLocation twvehiclesLocation) {
 		this.person = person;
 		this.simulation = simulation;
 		this.controler = controler;
 		this.plan = plan;
 		this.scenario = scenario;
-		this.ffvehiclesLocation = ffvehiclesLocation;
+		this.twvehiclesLocation = twvehiclesLocation;
 		carsharingVehicleLocations = new ArrayList<ActivityFacility>();
 		map = new HashMap<Link, Link>();
 		List<? extends PlanElement> planElements = this.plan.getPlanElements();
@@ -148,7 +150,7 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 			// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
 				if (currentLeg.getMode().equals("twowaycarsharing") && plan.getPlanElements().get(currentPlanElementIndex + 1) instanceof Leg) {
 					
-					ffvehiclesLocation.addVehicle(scenario.getNetwork().getLinks().get(this.cachedDestinationLinkId));
+					twvehiclesLocation.addVehicle(scenario.getNetwork().getLinks().get(this.cachedDestinationLinkId), twVehId);
 					
 				}
 				advancePlan(now) ;
@@ -307,22 +309,24 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		
 		this.state = MobsimAgent.State.LEG;
 		Route route = leg.getRoute();
-		Link link = findClosestAvailableCar(route.getStartLinkId());
+		TwoWayCSStation station = findClosestAvailableTWCar(route.getStartLinkId());
 		
-		if (link == null) {
+		if (station == null) {
 			this.state = MobsimAgent.State.ABORT ;
 			return;
 			
-		}
+		}		
+				
+		startLink = station.getLink();
+		twVehId = station.getIDs().get(0);
+		twvehiclesLocation.removeVehicle(station.getLink(), station.getIDs().get(0));
 		
-		startLink = link;
-		
-		map.put(scenario.getNetwork().getLinks().get(leg.getRoute().getStartLinkId()), link);
+		map.put(scenario.getNetwork().getLinks().get(leg.getRoute().getStartLinkId()), startLink);
 		
 		LegImpl walkLeg = new LegImpl("walk_rb");
 		
-		GenericRouteImpl walkRoute = new GenericRouteImpl(route.getStartLinkId(), link.getId());
-		final double dist = CoordUtils.calcDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), link.getCoord());
+		GenericRouteImpl walkRoute = new GenericRouteImpl(route.getStartLinkId(), startLink.getId());
+		final double dist = CoordUtils.calcDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startLink.getCoord());
 		final double estimatedNetworkDistance = dist * 1.3;
 
 		final int travTime = (int) (estimatedNetworkDistance / 0.77 );
@@ -330,7 +334,7 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		walkRoute.setDistance(estimatedNetworkDistance);	
 		
 		walkLeg.setRoute(walkRoute);
-		this.cachedDestinationLinkId = link.getId();
+		this.cachedDestinationLinkId = startLink.getId();
 		walkLeg.setTravelTime(travTime);
 		// set the route according to the next leg
 		this.currentLeg = walkLeg;
@@ -465,10 +469,7 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		Link link = map.get(network.getLinks().get(leg.getRoute().getEndLinkId()));
 		
 		TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(new IdImpl("1000000000"), network.getLinks().get(leg.getRoute().getStartLinkId()).getCoord() , leg.getRoute().getStartLinkId());
-		if (link == null) {
-			
-			System.out.println("");
-		}
+		
 		TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(new IdImpl("1000000001"), link.getCoord(), link.getId());
 		
 		for(PlanElement pe1: tripRouter.calcRoute("car", startFacility, endFacility, now, person)) {
@@ -527,27 +528,27 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		
 	}
 
-	private Link findClosestAvailableCar(Id linkId) {
+	private TwoWayCSStation findClosestAvailableTWCar(Id linkId) {
 		
 		
 		//find the closest available car in the quad tree(?) reserve it (make it unavailable)
 		//if no cars within certain radius return null
 		Link link = scenario.getNetwork().getLinks().get(linkId);
 		
-		Collection<TwoWayCSStation> location = ffvehiclesLocation.getQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 5000);
+		Collection<TwoWayCSStation> location = twvehiclesLocation.getQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), Double.parseDouble(scenario.getConfig().getModule("TwoWayCarsharing").getParams().get("searchDistanceTwoWayCarsharing")));
 		if (location.isEmpty()) return null;
-		
+		double distanceSearch = Double.parseDouble(scenario.getConfig().getModule("TwoWayCarsharing").getParams().get("searchDistanceTwoWayCarsharing"));
+		TwoWayCSStation closest = null;
 		for(TwoWayCSStation station: location) {
-			if (station.getNumberOfVehicles() > 0) {
-				
-				ffvehiclesLocation.removeVehicle(station.getLink());
-				return station.getLink();
-			}
+			if (CoordUtils.calcDistance(link.getCoord(), station.getLink().getCoord()) < distanceSearch && station.getNumberOfVehicles() > 0) {
+				closest = station;
+				distanceSearch = CoordUtils.calcDistance(link.getCoord(), station.getLink().getCoord());
+			}			
 			
 		}
-		
-		return null;
-		
+					
+		return closest;
+				
 	}
 	
 	//the end of added methods	

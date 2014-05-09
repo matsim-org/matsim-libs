@@ -84,6 +84,8 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 	private Link startLink;
 	
 	private FreeFloatingVehiclesLocation ffvehiclesLocation;
+	
+	private String vehID;
 
 	// ============================================================================================================================
 	// c'tor
@@ -133,7 +135,7 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 			
 				if (currentLeg.getMode().equals("freefloating")) {
 					
-					ffvehiclesLocation.addVehicle(scenario.getNetwork().getLinks().get(this.cachedDestinationLinkId));
+					ffvehiclesLocation.addVehicle(scenario.getNetwork().getLinks().get(this.cachedDestinationLinkId), vehID);
 					
 				}
 				advancePlan(now) ;
@@ -274,19 +276,20 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 		
 		this.state = MobsimAgent.State.LEG;
 		Route route = leg.getRoute();
-		Link link = findClosestAvailableCar(route.getStartLinkId());
+		FreeFloatingStation location = findClosestAvailableCar(route.getStartLinkId());
 		
-		if (link == null) {
+		if (location == null) {
 			this.state = MobsimAgent.State.ABORT ;
 			return;
 			
 		}
-		
-		startLink = link;
+		vehID = location.getIDs().get(0);
+		ffvehiclesLocation.removeVehicle(location.getLink(), location.getIDs().get(0));
+		startLink = location.getLink();
 		LegImpl walkLeg = new LegImpl("walk_ff");
 		
-		GenericRouteImpl walkRoute = new GenericRouteImpl(route.getStartLinkId(), link.getId());
-		final double dist = CoordUtils.calcDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), link.getCoord());
+		GenericRouteImpl walkRoute = new GenericRouteImpl(route.getStartLinkId(), startLink.getId());
+		final double dist = CoordUtils.calcDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startLink.getCoord());
 		final double estimatedNetworkDistance = dist * 1.3;
 
 		final int travTime = (int) (estimatedNetworkDistance / 0.77 );
@@ -296,7 +299,7 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 		
 		
 		walkLeg.setRoute(walkRoute);
-		this.cachedDestinationLinkId = link.getId();
+		this.cachedDestinationLinkId = startLink.getId();
 		walkLeg.setTravelTime(travTime);
 		// set the route according to the next leg
 		this.currentLeg = walkLeg;
@@ -349,6 +352,7 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", l.getId(), leg.getRoute().getEndLinkId());
 		route.setLinkIds( l.getId(), ids, leg.getRoute().getEndLinkId());
 		route.setTravelTime( travelTime);
+		route.setVehicleId(new IdImpl("FF_" + (vehID)));
 		carLeg.setRoute(route);
 		this.cachedDestinationLinkId = route.getEndLinkId();
 
@@ -365,16 +369,14 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 	}
 	
 
-	private Link findClosestAvailableCar(Id linkId) {
-		
+	private FreeFloatingStation findClosestAvailableCar(Id linkId) {		
 		
 		//find the closest available car in the quad tree(?) reserve it (make it unavailable)
 		Link link = scenario.getNetwork().getLinks().get(linkId);
 		
 		FreeFloatingStation location = ffvehiclesLocation.getQuadTree().get(link.getCoord().getX(), link.getCoord().getY());
-		if (location == null) return null;
-		ffvehiclesLocation.removeVehicle(location.getLink());
-		return location.getLink();
+				
+		return location;
 	}
 	
 	//the end of added methods

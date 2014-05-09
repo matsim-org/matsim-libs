@@ -1,5 +1,7 @@
 package playground.balac.twowaycarsharingredisigned.qsim;
 
+import java.util.ArrayList;
+
 import org.matsim.api.core.v01.network.Link;
 
 public class TwoWayCSStation  {
@@ -7,11 +9,13 @@ public class TwoWayCSStation  {
 	
 	private Link link;
 	private int numberOfVehicles;
-	
-	public TwoWayCSStation(Link link, int numberOfVehicles) {
+	private ArrayList<String> vehicleIDs = new ArrayList<String>();
+
+	public TwoWayCSStation(Link link, int numberOfVehicles, ArrayList<String> vehicleIDs) {
 		
 		this.link = link;
 		this.numberOfVehicles = numberOfVehicles;
+		this.vehicleIDs = vehicleIDs;
 	}
 	
 	public int getNumberOfVehicles() {
@@ -22,6 +26,11 @@ public class TwoWayCSStation  {
 	public Link getLink() {
 		
 		return link;
+	}
+	
+	public ArrayList<String> getIDs() {
+		
+		return vehicleIDs;
 	}
 	
 }

@@ -90,18 +90,21 @@ public class OneWayCSRDPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	
 	private Link endLink;
 	
-	private OneWayCarsharingRDVehicleLocation ffvehiclesLocation;
+	private OneWayCarsharingRDVehicleLocation owvehiclesLocation;
+	
+	private String owVehId;
+
 
 	// ============================================================================================================================
 	// c'tor
 
-	public OneWayCSRDPersonDriverAgentImpl(final Person person, final Plan plan, final Netsim simulation, final Scenario scenario, final Controler controler, OneWayCarsharingRDVehicleLocation ffvehiclesLocation) {
+	public OneWayCSRDPersonDriverAgentImpl(final Person person, final Plan plan, final Netsim simulation, final Scenario scenario, final Controler controler, OneWayCarsharingRDVehicleLocation owvehiclesLocation) {
 		this.person = person;
 		this.simulation = simulation;
 		this.controler = controler;
 		this.plan = plan;
 		this.scenario = scenario;
-		this.ffvehiclesLocation = ffvehiclesLocation;
+		this.owvehiclesLocation = owvehiclesLocation;
 		List<? extends PlanElement> planElements = this.plan.getPlanElements();
 		if (planElements.size() > 0) {
 			this.currentPlanElementIndex = 0;
@@ -140,7 +143,7 @@ public class OneWayCSRDPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			
 				if (currentLeg.getMode().equals("onewaycarsharing")) {
 					
-					ffvehiclesLocation.addVehicle(scenario.getNetwork().getLinks().get(this.cachedDestinationLinkId));
+					owvehiclesLocation.addVehicle(scenario.getNetwork().getLinks().get(this.cachedDestinationLinkId), owVehId);
 					
 				}
 				advancePlan(now) ;
@@ -285,19 +288,23 @@ public class OneWayCSRDPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		
 		this.state = MobsimAgent.State.LEG;
 		Route route = leg.getRoute();
-		Link link = findClosestAvailableCar(route.getStartLinkId());
+OneWayCarsharingRDStation station = findClosestAvailableOWCar(route.getStartLinkId());
 		
-		if (link == null) {
+		if (station == null) {
 			this.state = MobsimAgent.State.ABORT ;
 			return;
 			
 		}
+		if (station.getIDs().size() == 0)
+			System.out.println();
+		owVehId = station.getIDs().get(0);
+		owvehiclesLocation.removeVehicle(station.getLink(), owVehId);
 		
-		startLink = link;
+		startLink = station.getLink();
 		LegImpl walkLeg = new LegImpl("walk_ow_sb");
 		
-		GenericRouteImpl walkRoute = new GenericRouteImpl(route.getStartLinkId(), link.getId());
-		final double dist = CoordUtils.calcDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), link.getCoord());
+		GenericRouteImpl walkRoute = new GenericRouteImpl(route.getStartLinkId(), startLink.getId());
+		final double dist = CoordUtils.calcDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startLink.getCoord());
 		final double estimatedNetworkDistance = dist * 1.3;
 
 		final int travTime = (int) (estimatedNetworkDistance / 0.77 );
@@ -307,7 +314,7 @@ public class OneWayCSRDPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		
 		
 		walkLeg.setRoute(walkRoute);
-		this.cachedDestinationLinkId = link.getId();
+		this.cachedDestinationLinkId = startLink.getId();
 		walkLeg.setTravelTime(travTime);
 		// set the route according to the next leg
 		this.currentLeg = walkLeg;
@@ -343,7 +350,7 @@ public class OneWayCSRDPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		OneWayCarsharingRDFacilityImpl startFacility = new OneWayCarsharingRDFacilityImpl(new IdImpl("1000000000"), coordStart, l.getId());
 		
 		CoordImpl coordEnd = new CoordImpl(network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord());
-		Link destinationLink = ffvehiclesLocation.getQuadTree().get(network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord().getX(), network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord().getY()).getLink();
+		Link destinationLink = owvehiclesLocation.getQuadTree().get(network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord().getX(), network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord().getY()).getLink();
 		OneWayCarsharingRDFacilityImpl endFacility = new OneWayCarsharingRDFacilityImpl(new IdImpl("1000000001"), coordEnd, destinationLink.getId());
 		
 		endLink = destinationLink;
@@ -403,26 +410,30 @@ public class OneWayCSRDPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		
 	}
 
-	private Link findClosestAvailableCar(Id linkId) {
+	private OneWayCarsharingRDStation findClosestAvailableOWCar(Id linkId) {
 		
 		
 		//find the closest available car in the quad tree(?) reserve it (make it unavailable)
 		//if no cars within certain radius return null
 		Link link = scenario.getNetwork().getLinks().get(linkId);
-		
-		Collection<OneWayCarsharingRDStation> location = ffvehiclesLocation.getQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 5000);
+		double distanceSearch = Double.parseDouble(scenario.getConfig().getModule("OneWayCarsharing").getParams().get("searchDistanceOneWayCarsharing"));
+
+		Collection<OneWayCarsharingRDStation> location = owvehiclesLocation.getQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), distanceSearch);
 		if (location.isEmpty()) return null;
-		
+
+		OneWayCarsharingRDStation closest = null;
 		for(OneWayCarsharingRDStation station: location) {
-			if (station.getNumberOfVehicles() > 0) {
-				
-				ffvehiclesLocation.removeVehicle(station.getLink());
-				return station.getLink();
-			}
+			if (CoordUtils.calcDistance(link.getCoord(), station.getLink().getCoord()) < distanceSearch && station.getNumberOfVehicles() > 0) {
+				closest = station;
+				distanceSearch = CoordUtils.calcDistance(link.getCoord(), station.getLink().getCoord());
+			}			
 			
 		}
 		
-		return null;
+			
+		//owvehiclesLocation.removeVehicle(closest.getLink());
+		return closest;
+		
 		
 	}
 	

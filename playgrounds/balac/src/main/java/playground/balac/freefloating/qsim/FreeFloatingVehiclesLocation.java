@@ -33,16 +33,23 @@ public class FreeFloatingVehiclesLocation {
 	    
 	    BufferedReader reader = IOUtils.getBufferedReader(inputFilePath);
 	    String s = reader.readLine();
+	    int i = 1;
 	    while(s != null) {
 	    	
 	    	String[] arr = s.split("\t", -1);
 	    
 	    	Link l = controler.getNetwork().getLinks().get(new IdImpl(arr[0]));
+	    	ArrayList<String> vehIDs = new ArrayList<String>();
 	    	
-	    	FreeFloatingStation f = new FreeFloatingStation(l, Integer.parseInt(arr[1]));
+	    	for (int k = 0; k < Integer.parseInt(arr[1]); k++) {
+	    		vehIDs.add(Integer.toString(i));
+	    		i++;
+	    	}
+	    	FreeFloatingStation f = new FreeFloatingStation(l, Integer.parseInt(arr[1]), vehIDs);
 	    	
 	    	vehicleLocationQuadTree.put(l.getCoord().getX(), l.getCoord().getY(), f);
 	    	s = reader.readLine();
+	    	
 	    	
 	    }	    
 	    
@@ -83,21 +90,30 @@ public class FreeFloatingVehiclesLocation {
 		return vehicleLocationQuadTree;
 	}
 	
-	public void addVehicle(Link link) {
+	public void addVehicle(Link link, String id) {
 		
 		FreeFloatingStation f = vehicleLocationQuadTree.get(link.getCoord().getX(), link.getCoord().getY());
 		
 		if (f == null || !f.getLink().getId().toString().equals(link.getId().toString())) {
 			
-			FreeFloatingStation fNew = new FreeFloatingStation(link,  1);		
+			ArrayList<String> vehIDs = new ArrayList<String>();
+			
+			vehIDs.add(id);
+			
+			FreeFloatingStation fNew = new FreeFloatingStation(link, 1, vehIDs);		
 			
 			vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), fNew);
 			
 			
 		}
 		else {
-			
-			FreeFloatingStation fNew = new FreeFloatingStation(link, f.getNumberOfVehicles() + 1);		
+			ArrayList<String> vehIDs = f.getIDs();
+			ArrayList<String> newvehIDs = new ArrayList<String>();
+			for (String s : vehIDs) {
+				newvehIDs.add(s);
+			}
+			newvehIDs.add(id);
+			FreeFloatingStation fNew = new FreeFloatingStation(link, f.getNumberOfVehicles() + 1, newvehIDs);		
 			vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), f);
 			vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), fNew);
 			
@@ -106,17 +122,24 @@ public class FreeFloatingVehiclesLocation {
 		
 	}
 	
-	public void removeVehicle(Link link) {
+	public void removeVehicle(Link link, String id) {
 		
 		FreeFloatingStation f = vehicleLocationQuadTree.get(link.getCoord().getX(), link.getCoord().getY());
 		
 		if ( f.getLink().getId().toString().equals(link.getId().toString())) {
 			
-			FreeFloatingStation fNew = new FreeFloatingStation(link, f.getNumberOfVehicles() - 1);	
-			
 			if (f.getNumberOfVehicles() == 1)
-			vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), f);
+				vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), f);
+			
+			
 			else {
+				ArrayList<String> vehIDs = f.getIDs();
+				ArrayList<String> newvehIDs = new ArrayList<String>();
+				for (String s : vehIDs) {
+					newvehIDs.add(s);
+				}
+				newvehIDs.remove(id);
+				FreeFloatingStation fNew = new FreeFloatingStation(link, f.getNumberOfVehicles() - 1, newvehIDs);	
 				
 				vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), f);
 				vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), fNew);

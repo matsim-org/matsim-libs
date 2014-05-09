@@ -5,8 +5,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -29,10 +32,10 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.balac.carsharing.preprocess.membership.MyLinkUtils;
 import playground.balac.freefloating.config.FreeFloatingConfigGroup;
 import playground.balac.freefloating.qsim.FreeFloatingStation;
 import playground.balac.freefloating.qsim.FreeFloatingVehiclesLocation;
@@ -75,16 +78,26 @@ public class AllCSModesQsimFactory implements MobsimFactory{
 				scenario.getConfig().getModule( TwoWayCSConfigGroup.GROUP_NAME );
 		BufferedReader reader;
 		String s;
+		
+		LinkUtils linkUtils = new LinkUtils(controler.getNetwork());
+		
 		if (configGroupff.useFeeFreeFloating()) {
 		 reader = IOUtils.getBufferedReader(configGroupff.getvehiclelocations());
 		    s = reader.readLine();
+		    int i = 1;
 		    while(s != null) {
 		    	
 		    	String[] arr = s.split("\t", -1);
 		    
 		    	Link l = controler.getNetwork().getLinks().get(new IdImpl(arr[0]));
 		    	
-		    	FreeFloatingStation f = new FreeFloatingStation(l, Integer.parseInt(arr[1]));
+		    	ArrayList<String> vehIDs = new ArrayList<String>();
+		    	
+		    	for (int k = 0; k < Integer.parseInt(arr[1]); k++) {
+		    		vehIDs.add(Integer.toString(i));
+		    		i++;
+		    	}
+		    	FreeFloatingStation f = new FreeFloatingStation(l, Integer.parseInt(arr[1]), vehIDs);
 		    	
 		    	ffvehiclesLocation.add(f);
 		    	s = reader.readLine();
@@ -95,15 +108,20 @@ public class AllCSModesQsimFactory implements MobsimFactory{
 		reader = IOUtils.getBufferedReader(configGroupow.getvehiclelocations());
 		s = reader.readLine();
 		    s = reader.readLine();
-		    
+		    int i = 1;
 		    while(s != null) {
 		    	
 		    	String[] arr = s.split("\t", -1);
 		    
 		    	CoordImpl coordStart = new CoordImpl(arr[2], arr[3]);
-				Link l = MyLinkUtils.getClosestLink(controler.getNetwork(), coordStart);		    	
+				Link l = linkUtils.getClosestLink(coordStart);		    	
+				ArrayList<String> vehIDs = new ArrayList<String>();
 		    	
-		    	OneWayCarsharingRDStation f = new OneWayCarsharingRDStation(l, Integer.parseInt(arr[6]));
+		    	for (int k = 0; k < Integer.parseInt(arr[6]); k++) {
+		    		vehIDs.add(Integer.toString(i));
+		    		i++;
+		    	}
+		    	OneWayCarsharingRDStation f = new OneWayCarsharingRDStation(l, Integer.parseInt(arr[6]), vehIDs);
 		    	
 		    	owvehiclesLocation.add(f);
 		    	s = reader.readLine();
@@ -114,15 +132,20 @@ public class AllCSModesQsimFactory implements MobsimFactory{
 		    reader = IOUtils.getBufferedReader(configGrouptw.getvehiclelocations());
 		    s = reader.readLine();
 		    s = reader.readLine();
-		    
+		    int i = 1;
 		    while(s != null) {
 		    	
 		    	String[] arr = s.split("\t", -1);
 		    
 		    	CoordImpl coordStart = new CoordImpl(arr[2], arr[3]);
-				Link l = MyLinkUtils.getClosestLink(controler.getNetwork(), coordStart);		    	
+		    	Link l = linkUtils.getClosestLink(coordStart);			    	
+				ArrayList<String> vehIDs = new ArrayList<String>();
 		    	
-				TwoWayCSStation f = new TwoWayCSStation(l, Integer.parseInt(arr[6]));
+		    	for (int k = 0; k < Integer.parseInt(arr[6]); k++) {
+		    		vehIDs.add(Integer.toString(i));
+		    		i++;
+		    	}
+				TwoWayCSStation f = new TwoWayCSStation(l, Integer.parseInt(arr[6]), vehIDs);
 		    	
 				twvehiclesLocation.add(f);
 		    	s = reader.readLine();
@@ -169,7 +192,9 @@ public class AllCSModesQsimFactory implements MobsimFactory{
 		
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
-
+		FreeFloatingVehiclesLocation ffvehiclesLocationqt = null;
+		OneWayCarsharingRDVehicleLocation owvehiclesLocationqt = null;
+		TwoWayCSVehicleLocation twvehiclesLocationqt = null;
 		AgentFactory agentFactory = null;
 		if (sc.getConfig().scenario().isUseTransit()) {
 			agentFactory = new TransitAgentFactory(qSim);
@@ -182,9 +207,9 @@ public class AllCSModesQsimFactory implements MobsimFactory{
 			
 			
 			try {
-				FreeFloatingVehiclesLocation ffvehiclesLocationqt = new FreeFloatingVehiclesLocation(controler, ffvehiclesLocation);
-				OneWayCarsharingRDVehicleLocation owvehiclesLocationqt = new OneWayCarsharingRDVehicleLocation(controler, owvehiclesLocation);
-				TwoWayCSVehicleLocation twvehiclesLocationqt = new TwoWayCSVehicleLocation(controler, twvehiclesLocation);
+				ffvehiclesLocationqt = new FreeFloatingVehiclesLocation(controler, ffvehiclesLocation);
+				owvehiclesLocationqt = new OneWayCarsharingRDVehicleLocation(controler, owvehiclesLocation);
+				twvehiclesLocationqt = new TwoWayCSVehicleLocation(controler, twvehiclesLocation);
 			
 			agentFactory = new AllCSModesAgentFactory(qSim, scenario, controler, ffvehiclesLocationqt, owvehiclesLocationqt, twvehiclesLocationqt);
 			
@@ -197,10 +222,37 @@ public class AllCSModesQsimFactory implements MobsimFactory{
 			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
 		}
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+		ParkCSVehicles parkSource = new ParkCSVehicles(sc.getPopulation(), agentFactory, qSim, ffvehiclesLocationqt, owvehiclesLocationqt, twvehiclesLocationqt);
 		qSim.addAgentSource(agentSource);
+		qSim.addAgentSource(parkSource);
 		return qSim;
 	}
 	
-	
+	private class LinkUtils {
+		
+		Network network;
+		public LinkUtils(Network network) {
+			
+			this.network = network;		}
+		
+		public LinkImpl getClosestLink(Coord coord) {
+			
+			double distance = (1.0D / 0.0D);
+		    Id closestLinkId = new IdImpl(0L);
+		    for (Link link : network.getLinks().values()) {
+		      LinkImpl mylink = (LinkImpl)link;
+		      Double newDistance = Double.valueOf(mylink.calcDistance(coord));
+		      if (newDistance.doubleValue() < distance) {
+		        distance = newDistance.doubleValue();
+		        closestLinkId = link.getId();
+		      }
+
+		    }
+
+		    return (LinkImpl)network.getLinks().get(closestLinkId);
+			
+			
+		}
+	}
 	
 }

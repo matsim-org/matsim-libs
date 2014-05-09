@@ -1,5 +1,7 @@
 package playground.balac.onewaycarsharingredisgned.qsim;
 
+import java.util.ArrayList;
+
 import org.matsim.api.core.v01.network.Link;
 
 public class OneWayCarsharingRDStation  {
@@ -7,11 +9,17 @@ public class OneWayCarsharingRDStation  {
 	
 	private Link link;
 	private int numberOfVehicles;
+	private ArrayList<String> vehicleIDs = new ArrayList<String>();
+
 	
-	public OneWayCarsharingRDStation(Link link, int numberOfVehicles) {
+	public OneWayCarsharingRDStation(Link link, int numberOfVehicles, ArrayList<String> vehicleIDs) {
 		
 		this.link = link;
+		if (numberOfVehicles != vehicleIDs.size())
+			System.out.println("Error");
 		this.numberOfVehicles = numberOfVehicles;
+		this.vehicleIDs = vehicleIDs;
+
 	}
 	
 	public int getNumberOfVehicles() {
@@ -22,6 +30,11 @@ public class OneWayCarsharingRDStation  {
 	public Link getLink() {
 		
 		return link;
+	}
+	
+	public ArrayList<String> getIDs() {
+		
+		return vehicleIDs;
 	}
 	
 }
