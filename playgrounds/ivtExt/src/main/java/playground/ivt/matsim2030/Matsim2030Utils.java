@@ -98,7 +98,10 @@ public class Matsim2030Utils {
 					controler,
 					lcContext); 	
 		controler.setScoringFunctionFactory( scoringFunctionFactory );
-		// XXX What the hell does that mean???
+		// This is a way to choose between opening times from facilities
+		// or opening times from the config file.
+		// Why isn't it just implemented as two different ScoringFunctionFactories?
+		// Don't ask me...
 		scoringFunctionFactory.setUsingConfigParamsForScoring(false);		
 
 		// XXX this thing is awful. I think one can (and should) avoid using it...
