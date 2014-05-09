@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.ivt.matsim2030;
 
+import java.io.File;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
@@ -35,6 +37,7 @@ import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -165,6 +168,14 @@ public class Matsim2030Utils {
 					// XXX This should come from a trip router...
 					new MainModeIdentifierImpl(),
 					new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE )));
+	}
+
+	public static void createEmptyDirectoryOrFailIfExists(final String directory) {
+		final File file = new File( directory +"/" );
+		if ( file.exists() && file.list().length > 0 ) {
+			throw new UncheckedIOException( "Directory "+directory+" exists and is not empty!" );
+		}
+		file.mkdirs();
 	}
 }
 

@@ -39,11 +39,20 @@ public class RunBaseSimulation {
 		OutputDirectoryLogging.catchLogEntries();
 
 		final Config config = Matsim2030Utils.loadConfig( configFile );
+		// This is ugly, but is currently needed for location choice: initializing
+		// the location choice writes K-values files to the output directory, which:
+		// - fails if the directory does not exist
+		// - makes the controler crash latter if the unsafe setOverwriteFiles( true )
+		// is not called.
+		// This ensures that we get safety with location choice working as expected,
+		// before we sort this out and definitely kick out setOverwriteFiles.
+		Matsim2030Utils.createEmptyDirectoryOrFailIfExists( config.controler().getOutputDirectory() );
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 
 		Matsim2030Utils.connectFacilitiesWithLinks( scenario );
 
 		final Controler controler = new Controler( scenario );
+		controler.setOverwriteFiles( true );
 
 		Matsim2030Utils.initializeLocationChoice( controler );
 		controler.setTripRouterFactory(
