@@ -34,6 +34,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -160,14 +161,14 @@ public class Matsim2030Utils {
 				new LegDistanceDistributionWriter(
 					LEG_DISTANCE_DISTRIBUTION_FILE_NAME,
 					controler.getScenario().getNetwork()));
+		final TripRouter router = controler.getTripRouterFactory().instantiateAndConfigureTripRouter();
 		controler.addControlerListener(
 				new TripModeShares(
 					25, // write interval. TODO: pass by config
 					controler.getControlerIO(),
 					controler.getScenario(),
-					// XXX This should come from a trip router...
-					new MainModeIdentifierImpl(),
-					new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE )));
+					router.getMainModeIdentifier(),
+					router.getStageActivityTypes() ) );
 	}
 
 	public static void createEmptyDirectoryOrFailIfExists(final String directory) {
