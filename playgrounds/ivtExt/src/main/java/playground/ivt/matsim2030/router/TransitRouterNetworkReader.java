@@ -104,60 +104,76 @@ public class TransitRouterNetworkReader extends MatsimXmlParser {
 	@SuppressWarnings("unchecked")
 	private void startNode(final Attributes atts) {	
 		
-		Id nodeId = this.idFactory.createId(atts.getValue("id"));
-		Id stopId = this.idFactory.createId(atts.getValue("stopfacility"));
-		Id routeId = this.idFactory.createId(atts.getValue("route"));
-		Id lineId = this.idFactory.createId(atts.getValue("line"));
+		final Id nodeId = this.idFactory.createId(atts.getValue("id"));
+		final Id stopId = this.idFactory.createId(atts.getValue("stopfacility"));
+		final Id routeId = this.idFactory.createId(atts.getValue("route"));
+		final Id lineId = this.idFactory.createId(atts.getValue("line"));
+
+		final TransitLine line = this.transitSchedule.getTransitLines().get(lineId);
+		if ( line == null ) {
+			throw new RuntimeException( "no transit line "+lineId+" found in schedule "+transitSchedule );
+		}
+
+		final TransitRoute route = line.getRoutes().get(routeId);
+		if ( route == null ) {
+			throw new RuntimeException( "no route "+routeId+" found in line "+line );
+		}
+
+		final TransitStopFacility stopFacility = this.transitSchedule.getFacilities().get(stopId);
+		if ( stopFacility == null ) {
+			throw new RuntimeException( "no stop facility "+stopId+" found in schedule "+transitSchedule );
+		}
+
+		final TransitRouteStop stop = route.getStop(stopFacility);
+		if ( stop == null ) {
+			throw new RuntimeException( "no stop for facility "+stopFacility+" found in route "+route );
+		}
 		
-		TransitLine line = this.transitSchedule.getTransitLines().get(lineId);
-		TransitRoute route = line.getRoutes().get(routeId);
-		TransitStopFacility stopFacility = this.transitSchedule.getFacilities().get(stopId);
-		TransitRouteStop stop = route.getStop(stopFacility);
-		
-		TransitRouterNetworkNode node = new TransitRouterNetworkNode(nodeId, stop, route, line);
+		final TransitRouterNetworkNode node = new TransitRouterNetworkNode(nodeId, stop, route, line);
+		// XXX Should be done with the addNode method... But it throws an UnsupportedOpperationException.
 		((Map<Id, TransitRouterNetworkNode>) network.getNodes()).put(nodeId, node);
 	}
 	
 	@SuppressWarnings("unchecked")
 	private void startLink(final Attributes atts) {
 		
-//		Id linkId = this.scenario.createId(atts.getValue("id"));
-//		Id fromId = this.scenario.createId(atts.getValue("from"));
-//		Id toId = this.scenario.createId(atts.getValue("to"));
-		Id linkId = new IdImpl(atts.getValue("id"));
-		Id fromId = new IdImpl(atts.getValue("from"));
-		Id toId = new IdImpl(atts.getValue("to"));
+		final Id linkId = this.idFactory.createId(atts.getValue("id"));
+		final Id fromId = this.idFactory.createId(atts.getValue("from"));
+		final Id toId = this.idFactory.createId(atts.getValue("to"));
 		
-		String string = null;
-		Id routeId = null;
-		Id lineId = null;
+		final String routeAtt = atts.getValue("route");
+		final Id routeId =
+			routeAtt != null ?
+				this.idFactory.createId( routeAtt ) :
+				null;
 		
-		string = atts.getValue("route");
-//		if (string != null) routeId = this.scenario.createId(string);
-		if (string != null) routeId = new IdImpl(string);
+		final String lineAtt = atts.getValue("line");
+		final Id lineId =
+			lineAtt != null ?
+				this.idFactory.createId( lineAtt ) :
+				null;
 		
-		string = atts.getValue("line");
-//		if (string != null) lineId = this.scenario.createId(string);
-		if (string != null) lineId = new IdImpl(string);
+		final TransitLine line =
+			lineId != null ?
+				this.transitSchedule.getTransitLines().get(lineId) :
+				null;
+		final TransitRoute route =
+			line != null && routeId != null ?
+				line.getRoutes().get(routeId) :
+				null;
 		
-		TransitLine line = null;
-		TransitRoute route = null;
-		if (lineId != null) {
-			line = this.transitSchedule.getTransitLines().get(lineId);
-			route = null;
-			if (line != null) route = line.getRoutes().get(routeId);			
-		}
-		
-		TransitRouterNetworkNode fromNode = this.network.getNodes().get(fromId);
-		TransitRouterNetworkNode toNode = this.network.getNodes().get(toId);
+		final TransitRouterNetworkNode fromNode = this.network.getNodes().get(fromId);
+		final TransitRouterNetworkNode toNode = this.network.getNodes().get(toId);
+
 		if (fromNode == null) {
-			throw new RuntimeException("FromNode " + fromId + " was not found!");			
-		} else if (toNode == null) {
+			throw new RuntimeException("FromNode " + fromId + " was not found!");
+		}
+		if (toNode == null) {
 			throw new RuntimeException("ToNode " + fromId + " was not found!");
 		}
 		
-		double length = Double.parseDouble(atts.getValue("length"));
-		TransitRouterNetworkLink link = new TransitRouterNetworkLink(linkId, fromNode, toNode, route, line, length);
+		final double length = Double.parseDouble(atts.getValue("length"));
+		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(linkId, fromNode, toNode, route, line, length);
 		
 		((Map<Id, TransitRouterNetworkLink>) network.getLinks()).put(linkId, link);
 		((Map<Id, TransitRouterNetworkLink>) fromNode.getOutLinks()).put(link.getId(), link);
