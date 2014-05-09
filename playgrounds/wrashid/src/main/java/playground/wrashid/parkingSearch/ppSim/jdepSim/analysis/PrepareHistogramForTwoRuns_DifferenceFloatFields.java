@@ -23,6 +23,7 @@ public class PrepareHistogramForTwoRuns_DifferenceFloatFields {
 		int iterationStep = 10;
 		boolean ignoreCasesWithBothPPUse = true;
 		String outputFolder = "c:/tmp/comparisonRun164And135/";
+		double cutPctAccumulationFreq=0.95;
 
 		ArrayList<Float> pctScoreDifference = new ArrayList<Float>();
 		ArrayList<Float> pctWalkDistanceDifference = new ArrayList<Float>();
@@ -54,22 +55,22 @@ public class PrepareHistogramForTwoRuns_DifferenceFloatFields {
 		
 		
 		String tempOutputPath = writeTempDataAndGetPath(pctScoreDifference,outputFolder,"pctScoreDifference.txt");
-		new RIntegration().generateHistogram(tempOutputPath, outputFolder + "pctScoreDifference.png", "Score Difference pct", "score difference pct", "frequency", outputFolder + "pctScoreDifference.batch");
+		new RIntegration().generateCumulativeFrequencyGraph(tempOutputPath, outputFolder + "pctScoreDifference.png", "Score Difference pct", "score difference pct", "frequency", outputFolder + "pctScoreDifference.batch",cutPctAccumulationFreq);
 		
 		tempOutputPath = writeTempDataAndGetPath(pctWalkDistanceDifference,outputFolder,"pctWalkDistanceDifference.txt");
-		new RIntegration().generateHistogram(tempOutputPath, outputFolder + "pctWalkDistanceDifference.png", "walk distance difference pct", "walk distance difference pct", "frequency", outputFolder + "pctWalkDistanceDifference.batch");
+		new RIntegration().generateCumulativeFrequencyGraph(tempOutputPath, outputFolder + "pctWalkDistanceDifference.png", "walk distance difference pct", "walk distance difference pct", "frequency", outputFolder + "pctWalkDistanceDifference.batch",cutPctAccumulationFreq);
 		
 		tempOutputPath = writeTempDataAndGetPath(pctSearchTimeDuration,outputFolder,"pctSearchTimeDuration.txt");
-		new RIntegration().generateHistogram(tempOutputPath, outputFolder + "pctSearchTimeDuration.png", "Search Time Difference pct", "search time difference pct", "frequency", outputFolder + "pctSearchTimeDuration.batch");
+		new RIntegration().generateCumulativeFrequencyGraph(tempOutputPath, outputFolder + "pctSearchTimeDuration.png", "Search Time Difference pct", "search time difference pct", "frequency", outputFolder + "pctSearchTimeDuration.batch",cutPctAccumulationFreq);
 		
 		tempOutputPath = writeTempDataAndGetPath(absScoreDifference,outputFolder,"absScoreDifference.txt");
-		new RIntegration().generateHistogram(tempOutputPath, outputFolder + "absScoreDifference.png", "Score Difference Abs", "score difference abs", "frequency", outputFolder + "absScoreDifference.batch");
+		new RIntegration().generateCumulativeFrequencyGraph(tempOutputPath, outputFolder + "absScoreDifference.png", "Score Difference Abs", "score difference abs", "frequency", outputFolder + "absScoreDifference.batch",cutPctAccumulationFreq);
 		
 		tempOutputPath = writeTempDataAndGetPath(absWalkDistanceDifference,outputFolder,"absWalkDistanceDifference.txt");
-		new RIntegration().generateHistogram(tempOutputPath, outputFolder + "absWalkDistanceDifference.png", "Walk Distance Difference Abs", "walk distance difference abs [m]", "frequency", outputFolder + "absWalkDistanceDifference.batch");
+		new RIntegration().generateCumulativeFrequencyGraph(tempOutputPath, outputFolder + "absWalkDistanceDifference.png", "Walk Distance Difference Abs", "walk distance difference abs [m]", "frequency", outputFolder + "absWalkDistanceDifference.batch",cutPctAccumulationFreq);
 		
 		tempOutputPath = writeTempDataAndGetPath(absSearchTimeDuration,outputFolder,"absSearchTimeDuration.txt");
-		new RIntegration().generateHistogram(tempOutputPath, outputFolder + "absSearchTimeDuration.png", "Search Time Difference Abs", "search time difference abs [s]", "frequency", outputFolder + "absSearchTimeDuration.batch");
+		new RIntegration().generateCumulativeFrequencyGraph(tempOutputPath, outputFolder + "absSearchTimeDuration.png", "Search Time Difference Abs", "search time difference abs [s]", "frequency", outputFolder + "absSearchTimeDuration.batch",cutPctAccumulationFreq);
 			
 	}
 
@@ -77,7 +78,7 @@ public class PrepareHistogramForTwoRuns_DifferenceFloatFields {
 			ArrayList<Float> pctScoreDifference, String outputFolder, String fileName) {
 		String outputPath=outputFolder+fileName;
 		GeneralLib.writeList(Lists.converFloatToStringArrayList(pctScoreDifference), outputPath);
-		//System.out.println(outputPath);
+		System.out.println(outputPath);
 		return outputPath;
 	}
 
@@ -111,10 +112,10 @@ public class PrepareHistogramForTwoRuns_DifferenceFloatFields {
 				if (!(facilityIdA.toString().contains("private") && facilityIdB
 						.toString().contains("private"))) {
 					if (isAbsolute){
-						outputArray.add(Math.abs(selectedFieldA) - Math.abs(selectedFieldB));
+						outputArray.add(Math.abs(Math.abs(selectedFieldA) - Math.abs(selectedFieldB)));
 					} else {
 						if (selectedFieldA!=0.0 && selectedFieldA!=0.0){
-							outputArray.add((Math.abs(selectedFieldA) - Math.abs(selectedFieldB))/(Math.abs(selectedFieldA)+Math.abs(selectedFieldB)));
+							outputArray.add(Math.abs((Math.abs(selectedFieldA) - Math.abs(selectedFieldB))/(Math.abs(selectedFieldA)+Math.abs(selectedFieldB))));
 						} else {
 							outputArray.add(0.0f);
 						}
@@ -122,10 +123,10 @@ public class PrepareHistogramForTwoRuns_DifferenceFloatFields {
 				}
 			} else {
 				if (isAbsolute){
-					outputArray.add(Math.abs(selectedFieldA) - Math.abs(selectedFieldB));
+					outputArray.add(Math.abs(Math.abs(selectedFieldA) - Math.abs(selectedFieldB)));
 				} else {
 					if (selectedFieldA!=0.0 && selectedFieldA!=0.0){
-						outputArray.add((Math.abs(selectedFieldA) - Math.abs(selectedFieldB))/(Math.abs(selectedFieldA)+Math.abs(selectedFieldB)));
+						outputArray.add(Math.abs((Math.abs(selectedFieldA) - Math.abs(selectedFieldB))/(Math.abs(selectedFieldA)+Math.abs(selectedFieldB))));
 					} else {
 						outputArray.add(0.0f);
 					}

@@ -7,9 +7,16 @@ import java.util.Random;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
 
+/**
+ * Requirements: some scripts need write access to r folder to install new packages -> put r folder outside of programms folder and remove read only access
+ * 
+ * @author wrashid
+ *
+ */
 public class RIntegration {
 
-	public String pathToRScriptExe = "C:\\Program Files\\R\\R-3.1.0\\bin\\RScript.exe";
+//	public String pathToRScriptExe = "C:\\Program Files\\R\\R-3.1.0\\bin\\RScript.exe";
+	public String pathToRScriptExe = "C:\\soft\\R-3.1.0\\bin\\RScript.exe";
 	public String scriptFolder = "C:\\data\\Dropbox\\ETH\\static data\\r-script-lib\\";
 	public String tempFolder = "c:/tmp/";
 
@@ -56,6 +63,30 @@ public class RIntegration {
 		args[2] = title;
 		args[3] = xAxis;
 		args[4] = yAxis;
+		callRScript(scriptPath, args, outputLogPath);
+	}
+	
+	
+	/**
+	 * 
+	 * @param inputData
+	 * @param outputPlotPath
+	 * @param title
+	 * @param xAxis
+	 * @param yAxis
+	 * @param outputLogPath
+	 * @param cutPct => until which percentage graph should be drawn, e.g. 0.95
+	 */
+	public void generateCumulativeFrequencyGraph(String inputData, String outputPlotPath,
+			String title, String xAxis, String yAxis, String outputLogPath, double cutPct) {
+		String scriptPath = scriptFolder + "generalCumulativeFrquencyGraph.R";
+		String[] args = new String[6];
+		args[0] = inputData;
+		args[1] = outputPlotPath;
+		args[2] = title;
+		args[3] = xAxis;
+		args[4] = yAxis;
+		args[5] = Double.toString(cutPct);
 		callRScript(scriptPath, args, outputLogPath);
 	}
 
