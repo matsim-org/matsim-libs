@@ -788,7 +788,16 @@ public class Controler extends AbstractController {
 	 * @param overwrite
 	 *            whether files and directories should be overwritten (true) or
 	 *            not (false)
+	 * @deprecated the danger represented by this method seems too great compared to
+	 * the small convenience it brings: it will thus be removed soon.
+	 * If you are sure that you want to get rid of previous results, call
+	 * {@link IOUtils.deleteDirectory( String )} on your output directory.
+	 * If you want to write stuff to the output directory before lanching the controler,
+	 * you might (i) write this stuff to another directory, or (ii) put your
+	 * IO code in a StartupListenner, to get it executed after the controler
+	 * created the output directory.
 	 */
+	@Deprecated
 	public final void setOverwriteFiles(final boolean overwrite) {
 		this.overwriteFiles = overwrite;
 	}
