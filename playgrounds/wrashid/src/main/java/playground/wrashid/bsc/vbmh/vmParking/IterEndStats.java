@@ -111,7 +111,7 @@ public class IterEndStats {
 				homeSpot=new ParkingSpot();
 				notParked=true;
 			}
-			if (homeSpot.parking.facilityActType != null) {
+			if (homeSpot!=null && homeSpot.parking!=null && homeSpot.parking.facilityActType != null) {
 				if (homeSpot.parking.facilityActType.equals("home")) {
 					parkedAtHome = true;
 				}
