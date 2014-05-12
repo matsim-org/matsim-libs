@@ -25,9 +25,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
-import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
-import org.matsim.contrib.multimodal.router.DefaultDelegateFactory;
-import org.matsim.contrib.multimodal.router.TransitTripRouterFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -37,7 +34,6 @@ import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
@@ -71,10 +67,6 @@ public class Matsim2030Utils {
 
 	public static void addDefaultGroups( final Config config ) {
 		config.addModule( new Matsim2030RoutingConfigGroup() );
-
-		final MultiModalConfigGroup mmcg = new MultiModalConfigGroup();
-		mmcg.setSimulatedModes("");
-		config.addModule( mmcg );
 	}
 
 	public static void connectFacilitiesWithLinks( final Scenario sc ) {
@@ -126,33 +118,15 @@ public class Matsim2030Utils {
 				transitRouterNetwork ).parse(
 					matsim2030conf.getThinnedTransitRouterNetworkFile() );
 
-		final TransitRouterWithThinnedNetworkFactory factory =
+		final TransitRouterWithThinnedNetworkFactory transitRouterFactory =
 			new TransitRouterWithThinnedNetworkFactory(
 					scenario.getTransitSchedule(),
 					conf,
 					transitRouterNetwork );
 
 		final TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
-		final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory =
-			builder.createDefaultLeastCostPathCalculatorFactory(
-					scenario );
-		
-		/*
-		 * Use a ...
-		 * - defaultDelegateFactory for the QNetsim modes
-		 * - transitTripRouterFactory for transit trips
-		 * 
-		 * Note that a FastDijkstraFactory is used for the multiModalTripRouterFactory
-		 * since ...
-		 * - only "fast" router implementations handle sub-networks correct
-		 * - AStarLandmarks uses link speed information instead of agent speeds
-		 */
-		return new TransitTripRouterFactory(
-				scenario,
-				new DefaultDelegateFactory(
-					scenario,
-					leastCostPathCalculatorFactory),
-				factory);
+		builder.setTransitRouterFactory( transitRouterFactory );
+		return builder.build( scenario );
 	}
 
 	public static void loadControlerListeners( final Controler controler ) {
