@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.router.MultiNodeDijkstra; // this is from LocationChoice contrib!
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ivt.matsim2030.Matsim2030Utils;
@@ -44,7 +43,8 @@ public class RunBaseSimulation {
 		// This is the location choice MultiNodeDijkstra.
 		// Suppress all log messages of level below error --- to avoid spaming the config
 		// file with zillions of "not route found" messages.
-		Logger.getLogger( MultiNodeDijkstra.class ).setLevel( Level.ERROR );
+		Logger.getLogger( org.matsim.core.router.MultiNodeDijkstra.class ).setLevel( Level.ERROR ); // this is location choice
+		Logger.getLogger( org.matsim.pt.router.MultiNodeDijkstra.class ).setLevel( Level.ERROR ); // this is "core"
 
 		final Config config = Matsim2030Utils.loadConfig( configFile );
 		// This is ugly, but is currently needed for location choice: initializing
