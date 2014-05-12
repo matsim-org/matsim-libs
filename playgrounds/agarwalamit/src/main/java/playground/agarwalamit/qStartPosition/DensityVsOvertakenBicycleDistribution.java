@@ -39,20 +39,22 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
 public class DensityVsOvertakenBicycleDistribution extends AbstractAnalyisModule {
 
 	private DensityVsPassingDistributionHandler dpd;
+	private DensityVsFractionOfStoppedVehiclesHandler dfsv;
 	private String eventFile;
 
 	public DensityVsOvertakenBicycleDistribution(String eventFile) {
 		super(DensityVsOvertakenBicycleDistribution.class.getSimpleName());
 		Id linkId = new IdImpl("1");
 		this.dpd = new DensityVsPassingDistributionHandler(linkId);
+		this.dfsv = new DensityVsFractionOfStoppedVehiclesHandler(linkId, 1000);
 		this.eventFile = eventFile;
 	}
 
 	public static void main(String[] args) {
-				String outputDir ="../../patnaIndiaSim/outputSS/2modes/prob5050P40/";
-				String eventFile = outputDir+"/events.xml";
-//		String outputDir = "./output/";
-//		String eventFile =outputDir+"/events2000.xml";
+//		String outputDir ="../../patnaIndiaSim/outputTest/";
+//		String eventFile = outputDir+"ITERS/it.10/10.events.xml.gz";
+				String outputDir = "./output/";
+				String eventFile =outputDir+"/events.xml";
 		DensityVsOvertakenBicycleDistribution dobd = new DensityVsOvertakenBicycleDistribution(eventFile);
 		dobd.preProcessData();
 		dobd.writeResults(outputDir);
@@ -68,6 +70,7 @@ public class DensityVsOvertakenBicycleDistribution extends AbstractAnalyisModule
 		EventsManager manager = EventsUtils.createEventsManager();
 		MatsimEventsReader reader = new MatsimEventsReader(manager);
 		manager.addHandler(this.dpd);
+//		manager.addHandler(this.dfsv);
 		reader.readFile(this.eventFile);
 	}
 
@@ -80,11 +83,36 @@ public class DensityVsOvertakenBicycleDistribution extends AbstractAnalyisModule
 	public void writeResults(String outputFolder) {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"rDensityVsAvgOvertakenBicycleCount.txt");
 		try {
-			writer.write("density \t numberOfBicyclesOvertaken \n");
-			for(Entry<Double, Double> e:this.dpd.getDensity2OvertakenBicycleCount().entrySet()){
+			writer.write("density \t averageNumberOfBicyclesOvertaken \n");
+			for(Entry<Double, Double> e:this.dpd.getDensity2AverageOvertakenBicycleCount().entrySet()){
 				writer.write(e.getKey()+"\t"+e.getValue()+"\n");
 			}
 			writer.close();
+
+		} catch (IOException e) {
+			throw new RuntimeException("Data is not written in file. Reason : "+e);
+		}
+
+		BufferedWriter writer1 = IOUtils.getBufferedWriter(outputFolder+"rDensityVsTotalOvertakenBicycleCount.txt");
+		try {
+			writer1.write("density \t numberOfBicyclesOvertaken \n");
+			for(Entry<Double, Double> e:this.dpd.getDensity2TotalOvertakenBicycleCount().entrySet()){
+				writer1.write(e.getKey()+"\t"+e.getValue()+"\n");
+			}
+			writer1.close();
+
+		} catch (IOException e) {
+			throw new RuntimeException("Data is not written in file. Reason : "+e);
+		}
+		
+		
+		BufferedWriter writer2 = IOUtils.getBufferedWriter(outputFolder+"rDensityVsFractionOfStoppedVehicles.txt");
+		try {
+			writer2.write("density \t fractionOfStoppedVehicles \n");
+			for(Entry<Double, Double> e:this.dfsv.getDensityVsFractionOfStoppedVehicles().entrySet()){
+				writer2.write(e.getKey()+"\t"+e.getValue()+"\n");
+			}
+			writer2.close();
 
 		} catch (IOException e) {
 			throw new RuntimeException("Data is not written in file. Reason : "+e);
