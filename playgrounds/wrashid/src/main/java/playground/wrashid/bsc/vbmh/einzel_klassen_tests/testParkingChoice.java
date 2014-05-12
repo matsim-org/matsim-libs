@@ -16,6 +16,8 @@ public class testParkingChoice {
 		choice.calcLMSOC(0.5);
 		choice.calcLMSOC(0.6);
 		System.out.println(choice.calcLMSOC(1));
+		System.out.println(choice.calcLMReserve(0.5, 0.3));
+		
 //		
 //		choice.calcLMReserve(0.5, 0.3);
 //		choice.calcLMReserve(0.5, 0.48);

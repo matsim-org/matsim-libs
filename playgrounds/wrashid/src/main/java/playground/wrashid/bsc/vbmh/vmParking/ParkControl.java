@@ -299,7 +299,7 @@ public class ParkControl {
 		int countSlowCharge=0;
 		int countFastCharge=0;
 		int countTurboCharge=0;
-		AdvancedParkingChoice choice = new AdvancedParkingChoice();
+		AdvancedParkingChoice choice = new AdvancedParkingChoice(); //!! direkt im start up initienren, dafuer eine clear methode in der adv parking choice einbauen, damit ein overwrite mit anderem model moeglich ist
 		choice.startUp();
 		
 		//calculate needed Battery Percenatge and check if ev has to charge
