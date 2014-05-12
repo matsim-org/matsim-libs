@@ -28,6 +28,7 @@ import playground.wrashid.bsc.vbmh.util.VMCharts;
 public class ParkControlerListener implements StartupListener, IterationEndsListener, IterationStartsListener{
 	private ParkHandler parkHandler = new ParkHandler();
 	private String parkHistoryOutputFileName=null;
+	IterEndStats iterEndStats;
 	
 	public ParkHandler getParkHandler() {
 		return parkHandler;
@@ -52,7 +53,7 @@ public class ParkControlerListener implements StartupListener, IterationEndsList
 		//Park Statistik Drucken und zuruecksetzen:
 		this.getParkHandler().parkControl.printStatistics();
 		this.getParkHandler().parkControl.resetStatistics();
-		IterEndStats iterEndStats=new IterEndStats();
+		
 		iterEndStats.run(getParkHandler().getParkControl());
 		
 		
@@ -121,9 +122,11 @@ public class ParkControlerListener implements StartupListener, IterationEndsList
 		}
 		
 		
-		
+		//Iter End Stats Zuruecksetzen
+		iterEndStats=new IterEndStats();
 		
 		//Par control Statistik starten
+		getParkHandler().getParkControl().iterEndStats=iterEndStats;
 		getParkHandler().getParkControl().iterStart();
 		
 		

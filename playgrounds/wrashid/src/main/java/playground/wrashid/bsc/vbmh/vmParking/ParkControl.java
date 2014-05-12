@@ -72,6 +72,7 @@ public class ParkControl {
 	PricingModels pricing = new PricingModels(); //Behinhaltet die Preismodelle
 	ParkHistoryWriter phwriter = new ParkHistoryWriter(); //Schreibt XML Datei mit Park events
 	EVControl evControl;
+	IterEndStats iterEndStats;
 	boolean evUsage=false;
 	
 	double time; //Wird auf aktuelle Zeit gesetzt (Vom event)
@@ -701,7 +702,7 @@ public class ParkControl {
 			vmCharts.addValues("Walking Distance", "Walking distance no charge", time, distance/2);
 		}
 		
-		
+		iterEndStats.parkEventHandler(selectedSpotToSet, personId, time);
 		
 		
 		//--
