@@ -304,9 +304,16 @@ public class TestWarmEmissionAnalysisModule {
 		Double sgffLinklength = 4000.;
 		String sgffVehicleInformaition = passengercar + ";" + sgffTechnology + ";"+ sgffSizeClass + ";"+sgffConcept;
 		
-		//avg>ff 
-		warmEmissions= weam.checkVehicleInfoAndCalculateWarmEmissions(sgffPersonId, roadType, sgffDetailedFfSpeed/3.6, sgffLinklength, .5*sgffLinklength/sgffDetailedFfSpeed*3.6, sgffVehicleInformaition);
-		Assert.assertEquals(detailedSgffFactorFf*sgffLinklength/1000., warmEmissions.get(WarmPollutant.NO2), MatsimTestUtils.EPSILON);
+		//avg>ff
+		boolean exceptionThrown = false;
+		try{
+			warmEmissions= weam.checkVehicleInfoAndCalculateWarmEmissions(sgffPersonId, roadType, sgffDetailedFfSpeed/3.6, sgffLinklength, .5*sgffLinklength/sgffDetailedFfSpeed*3.6, sgffVehicleInformaition);
+		}
+		catch(RuntimeException re){
+			exceptionThrown = true;
+		}
+		Assert.assertTrue("An average speed higher than the free flow speed should throw a runtime exception",exceptionThrown);
+		//Assert.assertEquals(detailedSgffFactorFf*sgffLinklength/1000., warmEmissions.get(WarmPollutant.NO2), MatsimTestUtils.EPSILON);
 		//avg=ff=sg -> use ff factors
 		warmEmissions= weam.checkVehicleInfoAndCalculateWarmEmissions(sgffPersonId, roadType, sgffDetailedFfSpeed/3.6, sgffLinklength, sgffLinklength/sgffDetailedFfSpeed*3.6, sgffVehicleInformaition);
 		Assert.assertEquals(detailedSgffFactorFf*sgffLinklength/1000., warmEmissions.get(WarmPollutant.NO2), MatsimTestUtils.EPSILON);
@@ -467,15 +474,14 @@ public class TestWarmEmissionAnalysisModule {
 		weam.reset();
 		
 		//> ff speed
+		boolean exceptionThrown = false;
+		try{
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(personId, roadType, petrolSpeedFf/3.6, 
 				linkLength, 0.4*linkLength/petrolSpeedFf*3.6, vehicleInformation);
-		Assert.assertEquals(0, weam.getFractionOccurences());
-		Assert.assertEquals(linkLength/1000, weam.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, weam.getFreeFlowOccurences());
-		Assert.assertEquals(linkLength/1000, weam.getKmCounter(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(.0, weam.getStopGoKmCounter(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(0, weam.getStopGoOccurences());
-		Assert.assertEquals(1, weam.getWarmEmissionEventCounter());
+		}catch(RuntimeException re){
+			exceptionThrown = true;
+		}
+		Assert.assertTrue("An average speed higher than the free flow speed should throw a runtime exception", exceptionThrown);
 		weam.reset();
 		
 		
@@ -624,9 +630,10 @@ public class TestWarmEmissionAnalysisModule {
 		Id tablePersonId = new IdImpl("person 8");
 		Double tableLinkLength= 30.*1000;
 		String tableVehicleInformation = passengercar + ";" + tableTechnology +";" + tableSizeClass+";"+tableConcept;
-		
-		// ff < avg < sg - handled like free flow 
-		weam.checkVehicleInfoAndCalculateWarmEmissions(tablePersonId, roadType, tableffSpeed/3.6, tableLinkLength, 2* tableLinkLength/(tableffSpeed+tablesgSpeed)*3.6, tableVehicleInformation);
+		 
+		// ff < avg < ff+1 - handled like free flow
+		Double travelTime =  tableLinkLength/(tableffSpeed+0.5)*3.6;
+		weam.checkVehicleInfoAndCalculateWarmEmissions(tablePersonId, roadType, tableffSpeed/3.6, tableLinkLength, travelTime, tableVehicleInformation);
 		Assert.assertEquals(0, weam.getFractionOccurences());
 		Assert.assertEquals(tableLinkLength/1000., weam.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1, weam.getFreeFlowOccurences());
@@ -685,18 +692,7 @@ public class TestWarmEmissionAnalysisModule {
 		// = ff speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(personId, roadType, petrolSpeedFf/3.6, 
 				linkLength, linkLength/petrolSpeedFf*3.6, vehicleInformation);
-		//> ff speed
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(personId, roadType, petrolSpeedFf/3.6, 
-				linkLength, 0.4*linkLength/petrolSpeedFf*3.6, vehicleInformation);
-		
-		Assert.assertEquals(1, weam.getFractionOccurences());
-		Assert.assertEquals(2.5* linkLength/1000., weam.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(2, weam.getFreeFlowOccurences());
-		Assert.assertEquals(5* linkLength/1000., weam.getKmCounter(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(2.5* linkLength/1000, weam.getStopGoKmCounter());
-		Assert.assertEquals(2, weam.getStopGoOccurences());
-		Assert.assertEquals(5, weam.getWarmEmissionEventCounter());
-
+		//> ff speed - has been tested to throw runtime exceptions
 	}
 	
 	@Test 
