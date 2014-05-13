@@ -16,14 +16,17 @@ public class PrepareHistogramForTwoRuns_DifferenceFloatFields {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String outputFolderRunA = "H:/data/experiments/parkingSearchOct2013/runs/run164/output/";
-		String outputFolderRunB = "H:/data/experiments/parkingSearchOct2013/runs/run135/output/";
+		String outputFolderRunA = "H:/data/experiments/parkingSearchOct2013/runs/run144/output/";
+		String outputFolderRunB = "H:/data/experiments/parkingSearchOct2013/runs/run145/output/";
 		int startIteration = 400;
 		int endIteration = 405;
 		int iterationStep = 10;
 		boolean ignoreCasesWithBothPPUse = true;
-		String outputFolder = "c:/tmp/comparisonRun164And135/";
+		String outputFolder = "C:/data/Dropbox/ETH/Projekte/STRC2014/experiments/comparison different strategy groups/comparisonRun144And145/";
 		double cutPctAccumulationFreq=0.95;
+		
+		boolean compareIterationsOfSameRun=false; // in this case only 'outputFolderRunA' needs to be provided ('outputFolderRunB' one is ignored)
+		int offSet=1;
 
 		ArrayList<Float> pctScoreDifference = new ArrayList<Float>();
 		ArrayList<Float> pctWalkDistanceDifference = new ArrayList<Float>();
@@ -33,13 +36,25 @@ public class PrepareHistogramForTwoRuns_DifferenceFloatFields {
 		ArrayList<Float> absSearchTimeDuration = new ArrayList<Float>();
 
 		for (int i = startIteration; i <= endIteration; i += iterationStep) {
-			Matrix eventsMatrixA = GeneralLib
-					.readStringMatrix(CompareSelectedParkingPropertyOneRun
-							.getEventsFileName(outputFolderRunA, i));
-			Matrix eventsMatrixB = GeneralLib
-					.readStringMatrix(CompareSelectedParkingPropertyOneRun
-							.getEventsFileName(outputFolderRunB, i));
-
+			Matrix eventsMatrixA=null;
+			Matrix eventsMatrixB=null;
+			
+			if (compareIterationsOfSameRun){
+				eventsMatrixA = GeneralLib
+						.readStringMatrix(CompareSelectedParkingPropertyOneRun
+								.getEventsFileName(outputFolderRunA, i));
+				eventsMatrixB = GeneralLib
+						.readStringMatrix(CompareSelectedParkingPropertyOneRun
+								.getEventsFileName(outputFolderRunA, i+offSet));
+			} else {
+				eventsMatrixA = GeneralLib
+						.readStringMatrix(CompareSelectedParkingPropertyOneRun
+								.getEventsFileName(outputFolderRunA, i));
+				eventsMatrixB = GeneralLib
+						.readStringMatrix(CompareSelectedParkingPropertyOneRun
+								.getEventsFileName(outputFolderRunB, i));
+			}
+			
 			boolean isAbsolute = false;
 			collectData(eventsMatrixA, eventsMatrixB, "score", isAbsolute,ignoreCasesWithBothPPUse, pctScoreDifference);
 			collectData(eventsMatrixA, eventsMatrixB, "walkDistance", isAbsolute,ignoreCasesWithBothPPUse, pctWalkDistanceDifference);

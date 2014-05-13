@@ -291,7 +291,7 @@ public class MainPPSimZurich30km {
 			double scaling = ZHScenarioGlobal.loadDoubleParam("special.scenario.changeSupply.newScaling");
 			LinkedList<Parking> parkings = AgentWithParking.parkingManager.getParkings();
 			for (Parking parking : parkings) {
-				int newCapacity = (int) Math.round(ZHScenarioGlobal.privateParkingCalibrationOriginalCapacities.get(parking.getId())*scaling);
+				int newCapacity = (int) Math.round(parking.getIntCapacity()*scaling);
 				parking.setCapacity(newCapacity);
 			}
 		}
