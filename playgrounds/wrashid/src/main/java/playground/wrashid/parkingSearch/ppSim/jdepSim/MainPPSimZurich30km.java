@@ -168,6 +168,7 @@ public class MainPPSimZurich30km {
 			
 			if (ZHScenarioGlobal.paramterExists("special.scenario.changeSupply") && ZHScenarioGlobal.loadBooleanParam("special.scenario.changeSupply")) {
 				scenario_changeSupply();
+				
 			}
 
 			EventsManager eventsManager = EventsUtils.createEventsManager();
@@ -294,6 +295,7 @@ public class MainPPSimZurich30km {
 				int newCapacity = (int) Math.round(parking.getIntCapacity()*scaling);
 				parking.setCapacity(newCapacity);
 			}
+			AgentWithParking.parkingManager.resetFirstAdaptedLegCache();
 		}
 	}
 

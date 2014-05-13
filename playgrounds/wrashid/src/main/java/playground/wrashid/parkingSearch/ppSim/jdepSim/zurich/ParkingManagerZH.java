@@ -140,6 +140,10 @@ public class ParkingManagerZH {
 		reset();
 
 	}
+	
+	public void resetFirstAdaptedLegCache(){
+		firstAdaptedLegCache=new HashMap<Id, Route>();
+	}
 
 	private void initializeGarageParkings(LinkedList<Parking> parking) {
 		EnclosingRectangle rect = new EnclosingRectangle();
@@ -567,7 +571,7 @@ public class ParkingManagerZH {
 
 			rtPool.start();
 
-		if (ZHScenarioGlobal.iteration == 0) {
+		if (firstAdaptedLegCache.size()==0) {
 			logInitialOccupancyToTxtFile();
 			logInitialParkingOfEachAgent();
 			
