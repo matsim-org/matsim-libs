@@ -50,6 +50,7 @@ import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.analysis.TripDistanceTask;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
 import playground.johannes.gsv.analysis.KMLRailCountsWriter;
+import playground.johannes.gsv.analysis.LineSwitchTask;
 import playground.johannes.gsv.analysis.ModeShareTask;
 import playground.johannes.gsv.analysis.PKmAnalyzer;
 import playground.johannes.gsv.analysis.RailCounts;
@@ -75,6 +76,7 @@ public class Simulator {
 		TrajectoryAnalyzerTaskComposite task = new TrajectoryAnalyzerTaskComposite();
 		task.addTask(new TripDistanceTask(controler.getFacilities()));
 		task.addTask(new ModeShareTask());
+		task.addTask(new LineSwitchTask());
 		
 		TransitLineAttributes attribs = TransitLineAttributes.createFromFile(controler.getConfig().getParam("gsv", "transitLineAttributes"));
 		

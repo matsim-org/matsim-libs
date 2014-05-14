@@ -22,6 +22,11 @@ import playground.johannes.gsv.demand.PopulationTask;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+
 public class PlanPrimaryActivity2 implements PopulationTask {
 
 	private final List<Coord> stops;
@@ -36,14 +41,17 @@ public class PlanPrimaryActivity2 implements PopulationTask {
 	
 	private final ExecutorService executor;
 	
-	private final int numThreads = 48;
+	private final int numThreads = 24;
 	
-	public PlanPrimaryActivity2(TransitSchedule schedule, Random random) {
+	public PlanPrimaryActivity2(TransitSchedule schedule, Random random, Geometry geometry) {
 		this.random = random;
 		
+		GeometryFactory factory = new GeometryFactory();
 		stops = new ArrayList<Coord>(schedule.getFacilities().size());
 		for(TransitStopFacility stop : schedule.getFacilities().values()) {
-			stops.add(stop.getCoord());
+			Point point = factory.createPoint(new Coordinate(stop.getCoord().getX(), stop.getCoord().getY()));
+			if(geometry.contains(point))
+				stops.add(stop.getCoord());
 		}
 		
 		executor = Executors.newFixedThreadPool(numThreads);
@@ -107,7 +115,7 @@ public class PlanPrimaryActivity2 implements PopulationTask {
 					double dx = coord.getX() - target.getX();
 					double dy = coord.getY() - target.getY();
 					double d = Math.sqrt(dx*dx + dy*dy);
-					double p = Math.pow(d, -1.4);
+					double p = Math.pow(d, -1.3);
 					choiceSet.addChoice(target, p);
 				}
 				

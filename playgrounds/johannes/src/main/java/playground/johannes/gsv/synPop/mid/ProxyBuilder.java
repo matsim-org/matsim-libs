@@ -17,35 +17,43 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.johannes.gsv.demand.loader;
+package playground.johannes.gsv.synPop.mid;
 
-import java.io.IOException;
-import java.util.Random;
-import java.util.Set;
+import java.util.Map;
 
-import org.matsim.api.core.v01.Scenario;
-import org.opengis.feature.simple.SimpleFeature;
-
-import playground.johannes.gsv.demand.AbstractTaskWrapper;
-import playground.johannes.gsv.demand.tasks.PlanPrimaryActivity2;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-
-import com.vividsolutions.jts.geom.Geometry;
+import playground.johannes.gsv.synPop.ProxyLeg;
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.ProxyPlan;
 
 /**
  * @author johannes
  *
  */
-public class PlanPrimaryActivityLoader2 extends AbstractTaskWrapper {
+public class ProxyBuilder {
 
-	public PlanPrimaryActivityLoader2(Scenario scenario, String zoneFile, Random random) throws IOException {
-		Set<SimpleFeature> features = FeatureSHP.readFeatures(zoneFile);
-		SimpleFeature feature = features.iterator().next();
-		Geometry geometry = ((Geometry) feature.getDefaultGeometry()).getGeometryN(0);
-				
-		delegate = new PlanPrimaryActivity2(scenario.getTransitSchedule(), random, geometry);
+	public ProxyPerson buildPerson(Map<String, String> attributes) {
+		ProxyPerson person = new ProxyPerson(personIdBuilder(attributes));
+		
+		return person;
+	}
+	
+	public ProxyLeg addLeg(Map<String, String> attributes, Map<String, ProxyPerson> persons) {
+		String personId = personIdBuilder(attributes);
+		ProxyPerson person = persons.get(personId); 
+		ProxyPlan plan = person.getPlan();
+		
+		ProxyLeg leg = new ProxyLeg();
+		plan.addLeg(leg);
+		
+		return leg;
+	}
+	
+	public String personIdBuilder(Map<String, String> attributes) {
+		StringBuilder builder = new StringBuilder(20);
+		builder.append(attributes.get(MIDKeys.HOUSEHOLD_ID));
+		builder.append(".");
+		builder.append(attributes.get(MIDKeys.PERSON_ID));
+		
+		return builder.toString();
 	}
 }

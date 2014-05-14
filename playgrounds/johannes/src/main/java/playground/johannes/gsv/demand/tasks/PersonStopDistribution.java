@@ -134,8 +134,20 @@ public class PersonStopDistribution implements PopulationTask {
 
 		ProgressLogger.init(N, 1, 10);
 		int processed = 0;
+		double fracSum = 0;
+		List<Zone<Double>> zones = new ArrayList<Zone<Double>>();
 		for (Zone<Double> zone : zoneLayer.getZones()) {
-			double fraction = zone.getAttribute();
+			Collection<Coord> stops = stopMap.get(zone);
+			if(stops != null) {
+				zones.add(zone);
+				fracSum += zone.getAttribute();
+			}
+		}
+		
+		logger.info(String.format("%s out of %s zone with stops.", zones.size(), zoneLayer.getZones().size()));
+		for(Zone<Double> zone : zones) {
+			double fraction = zone.getAttribute()/fracSum;
+			
 			/*
 			 * number of persons to create;
 			 */
@@ -143,21 +155,22 @@ public class PersonStopDistribution implements PopulationTask {
 
 			Collection<Coord> stops = stopMap.get(zone);
 			if (stops == null) {
-				logger.warn("Zone has no stops. Creating dummy stop.");
-
-				Point p = zone.getGeometry().getCentroid();
-				double points[] = new double[] { p.getCoordinate().x, p.getCoordinate().y };
-				logger.warn(String.format("Centroid x=%s,  y=%s.", points[0], points[1]));
-				
-				try {
-					transform.transform(points, 0, points, 0, 1);
-				} catch (TransformException e) {
-					e.printStackTrace();
-				}
-
-				stops = new ArrayList<Coord>(1);
-				stops.add(new CoordImpl(points[0], points[1]));
-
+				throw new RuntimeException("Ooops");
+//				logger.warn("Zone has no stops. Creating dummy stop.");
+//
+//				Point p = zone.getGeometry().getCentroid();
+//				double points[] = new double[] { p.getCoordinate().x, p.getCoordinate().y };
+//				logger.warn(String.format("Centroid x=%s,  y=%s.", points[0], points[1]));
+//				
+//				try {
+//					transform.transform(points, 0, points, 0, 1);
+//				} catch (TransformException e) {
+//					e.printStackTrace();
+//				}
+//
+//				stops = new ArrayList<Coord>(1);
+//				stops.add(new CoordImpl(points[0], points[1]));
+//
 			}
 			
 			int nPerStop = (int) Math.ceil(n / (double) stops.size());

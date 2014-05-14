@@ -20,32 +20,27 @@
 /**
  * 
  */
-package playground.johannes.gsv.demand.loader;
+package playground.johannes.gsv.synPop;
 
-import java.io.IOException;
-import java.util.Random;
-import java.util.Set;
-
-import org.matsim.api.core.v01.Scenario;
-import org.opengis.feature.simple.SimpleFeature;
-
-import playground.johannes.gsv.demand.AbstractTaskWrapper;
-import playground.johannes.gsv.demand.tasks.PlanPrimaryActivity2;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author johannes
  *
  */
-public class PlanPrimaryActivityLoader2 extends AbstractTaskWrapper {
+public class ProxyHoushold {
 
-	public PlanPrimaryActivityLoader2(Scenario scenario, String zoneFile, Random random) throws IOException {
-		Set<SimpleFeature> features = FeatureSHP.readFeatures(zoneFile);
-		SimpleFeature feature = features.iterator().next();
-		Geometry geometry = ((Geometry) feature.getDefaultGeometry()).getGeometryN(0);
-				
-		delegate = new PlanPrimaryActivity2(scenario.getTransitSchedule(), random, geometry);
+	private String id;
+	
+	private List<ProxyPerson> persons;
+	
+	public ProxyHoushold(String id) {
+		this.id = id;
+		this.persons = new ArrayList<ProxyPerson>(4);
+	}
+	
+	public void addPerson(ProxyPerson person) {
+		
 	}
 }

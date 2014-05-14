@@ -17,35 +17,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.johannes.gsv.demand.loader;
+package playground.johannes.gsv.synPop.mid;
 
-import java.io.IOException;
-import java.util.Random;
-import java.util.Set;
+import java.util.Map;
 
-import org.matsim.api.core.v01.Scenario;
-import org.opengis.feature.simple.SimpleFeature;
-
-import playground.johannes.gsv.demand.AbstractTaskWrapper;
-import playground.johannes.gsv.demand.tasks.PlanPrimaryActivity2;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-
-import com.vividsolutions.jts.geom.Geometry;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyLeg;
 
 /**
  * @author johannes
  *
  */
-public class PlanPrimaryActivityLoader2 extends AbstractTaskWrapper {
+public class LegEndTimeHandler implements LegAttributeHandler {
 
-	public PlanPrimaryActivityLoader2(Scenario scenario, String zoneFile, Random random) throws IOException {
-		Set<SimpleFeature> features = FeatureSHP.readFeatures(zoneFile);
-		SimpleFeature feature = features.iterator().next();
-		Geometry geometry = ((Geometry) feature.getDefaultGeometry()).getGeometryN(0);
-				
-		delegate = new PlanPrimaryActivity2(scenario.getTransitSchedule(), random, geometry);
+	/* (non-Javadoc)
+	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
+	 */
+	@Override
+	public void handle(ProxyLeg leg, Map<String, String> attributes) {
+		String hour = attributes.get(MIDKeys.LEG_END_TIME_HOUR);
+		String min = attributes.get(MIDKeys.LEG_END_TIME_MIN);
+		
+		int time = Integer.parseInt(min) * 60 + Integer.parseInt(hour) * 60 * 60;
+
+		leg.setAttribute(CommonKeys.LEG_END_TIME, time);
+
 	}
+
 }

@@ -17,35 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.johannes.gsv.demand.loader;
-
-import java.io.IOException;
-import java.util.Random;
-import java.util.Set;
-
-import org.matsim.api.core.v01.Scenario;
-import org.opengis.feature.simple.SimpleFeature;
-
-import playground.johannes.gsv.demand.AbstractTaskWrapper;
-import playground.johannes.gsv.demand.tasks.PlanPrimaryActivity2;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-
-import com.vividsolutions.jts.geom.Geometry;
+package playground.johannes.gsv.synPop.mid;
 
 /**
  * @author johannes
  *
  */
-public class PlanPrimaryActivityLoader2 extends AbstractTaskWrapper {
+public interface MIDKeys {
 
-	public PlanPrimaryActivityLoader2(Scenario scenario, String zoneFile, Random random) throws IOException {
-		Set<SimpleFeature> features = FeatureSHP.readFeatures(zoneFile);
-		SimpleFeature feature = features.iterator().next();
-		Geometry geometry = ((Geometry) feature.getDefaultGeometry()).getGeometryN(0);
-				
-		delegate = new PlanPrimaryActivity2(scenario.getTransitSchedule(), random, geometry);
-	}
+	public static final String HOUSEHOLD_ID = "hhid";
+	
+	public static final String PERSON_ID = "pid";
+	
+	public static final String LEG_START_TIME_HOUR = "st_std";
+	
+	public static final String LEG_START_TIME_MIN = "st_min";
+	
+	public static final String LEG_END_TIME_HOUR = "en_std";
+	
+	public static final String LEG_END_TIME_MIN = "en_min";
+	
+	public static final String LEG_MAIN_TYPE = "hwzweck";
+	
+	public static final String LEG_ORIGIN = "w01";
 }

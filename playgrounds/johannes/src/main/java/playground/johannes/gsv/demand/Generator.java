@@ -107,19 +107,19 @@ public class Generator {
 		 */
 		PopulationTaskComposite tasks = new PopulationTaskComposite();
 //		tasks.addComponent(new PersonEqualZoneDistribuionWrapper(baseDir + "innoz/inhabitants.csv" , "Einw_g_" + year, random));
-//		tasks.addComponent(new PersonStopDistributionLoader(baseDir + "innoz/inhabitants.csv" , "Einw_g_" + year, scenario, random));
-//		tasks.addComponent(new PersonGenderWrapper(baseDir + "innoz/inhabitants.csv", "Einw_m_" + year, "Einw_w_" + year, random));
-//		tasks.addComponent(new PersonAgeWrapper(baseDir+"innoz/", "Einw_g_" + year, random));
-//		tasks.addComponent(new PersonEmployedLoader(baseDir + "innoz/employees.csv", "EWTAO_" + year, baseDir + "innoz/inhabitants.csv" , "Einw_g_" + year, random));
-//		tasks.addComponent(new PersonCarAvailabilityLoader(baseDir + "mid/caravailability.age.txt", random));
-//		
-////		tasks.addComponent(new PlanPrimaryActivityLoader(baseDir + "StrukturAttraktivitaet2010.csv", "A2010", scenario, random));
-//		tasks.addComponent(new PlanTransformCoord(CRSUtils.getCRS(4326), CRSUtils.getCRS(31467)));
-//		tasks.addComponent(new PlanPrimaryActivityLoader2(scenario, random));
-//		tasks.addComponent(new PlanDepartureTimeLoader(baseDir + "Ganglinien_Standardtag.csv", random));
-//		tasks.addComponent(new PlanModeCarPT(0.0, random));
-//		
-//		tasks.addComponent(new PlanNetworkConnect(roadNetFile));
+		tasks.addComponent(new PersonStopDistributionLoader(baseDir + "innoz/inhabitants.csv" , "Einw_g_" + year, scenario, random));
+		tasks.addComponent(new PersonGenderWrapper(baseDir + "innoz/inhabitants.csv", "Einw_m_" + year, "Einw_w_" + year, random));
+		tasks.addComponent(new PersonAgeWrapper(baseDir+"innoz/", "Einw_g_" + year, random));
+		tasks.addComponent(new PersonEmployedLoader(baseDir + "innoz/employees.csv", "EWTAO_" + year, baseDir + "innoz/inhabitants.csv" , "Einw_g_" + year, random));
+		tasks.addComponent(new PersonCarAvailabilityLoader(baseDir + "mid/caravailability.age.txt", random));
+		
+//		tasks.addComponent(new PlanPrimaryActivityLoader(baseDir + "StrukturAttraktivitaet2010.csv", "A2010", scenario, random));
+		tasks.addComponent(new PlanTransformCoord(CRSUtils.getCRS(4326), CRSUtils.getCRS(31467)));
+		tasks.addComponent(new PlanPrimaryActivityLoader2(scenario, baseDir + "de.nuts0.shp", random));
+		tasks.addComponent(new PlanDepartureTimeLoader(baseDir + "Ganglinien_Standardtag.csv", random));
+		tasks.addComponent(new PlanModeCarPT(0.0, random));
+		
+		tasks.addComponent(new PlanNetworkConnect(roadNetFile));
 		tasks.addComponent(new PlanRouteLegs(scenario));
 		tasks.apply(pop);
 		

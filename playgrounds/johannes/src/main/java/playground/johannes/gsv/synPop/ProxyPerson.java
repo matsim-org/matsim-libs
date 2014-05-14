@@ -17,35 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.johannes.gsv.demand.loader;
+package playground.johannes.gsv.synPop;
 
-import java.io.IOException;
-import java.util.Random;
-import java.util.Set;
-
-import org.matsim.api.core.v01.Scenario;
-import org.opengis.feature.simple.SimpleFeature;
-
-import playground.johannes.gsv.demand.AbstractTaskWrapper;
-import playground.johannes.gsv.demand.tasks.PlanPrimaryActivity2;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author johannes
  *
  */
-public class PlanPrimaryActivityLoader2 extends AbstractTaskWrapper {
+public class ProxyPerson {
 
-	public PlanPrimaryActivityLoader2(Scenario scenario, String zoneFile, Random random) throws IOException {
-		Set<SimpleFeature> features = FeatureSHP.readFeatures(zoneFile);
-		SimpleFeature feature = features.iterator().next();
-		Geometry geometry = ((Geometry) feature.getDefaultGeometry()).getGeometryN(0);
-				
-		delegate = new PlanPrimaryActivity2(scenario.getTransitSchedule(), random, geometry);
+	private String id;
+	
+	private Map<String, Object> attributes;
+	
+	private ProxyPlan plan;
+	
+	public ProxyPerson(String id) {
+		this.id = id;
+		
+		attributes = new HashMap<String, Object>();
+	}
+	
+	public String getId() {
+		return id;
+	}
+	
+	public Object setAttribute(String key, Object value) {
+		return attributes.put(key, value);
+	}
+	
+	public void setPlan(ProxyPlan plan) {
+		this.plan = plan;
+	}
+	
+	public ProxyPlan getPlan() {
+		return plan;
 	}
 }

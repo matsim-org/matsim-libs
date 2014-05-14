@@ -17,35 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.johannes.gsv.demand.loader;
+package playground.johannes.gsv.synPop.mid;
 
-import java.io.IOException;
-import java.util.Random;
-import java.util.Set;
+import java.util.Map;
 
-import org.matsim.api.core.v01.Scenario;
-import org.opengis.feature.simple.SimpleFeature;
-
-import playground.johannes.gsv.demand.AbstractTaskWrapper;
-import playground.johannes.gsv.demand.tasks.PlanPrimaryActivity2;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-
-import com.vividsolutions.jts.geom.Geometry;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyLeg;
 
 /**
  * @author johannes
  *
  */
-public class PlanPrimaryActivityLoader2 extends AbstractTaskWrapper {
+public class LegMainPurposeHandler implements LegAttributeHandler {
 
-	public PlanPrimaryActivityLoader2(Scenario scenario, String zoneFile, Random random) throws IOException {
-		Set<SimpleFeature> features = FeatureSHP.readFeatures(zoneFile);
-		SimpleFeature feature = features.iterator().next();
-		Geometry geometry = ((Geometry) feature.getDefaultGeometry()).getGeometryN(0);
-				
-		delegate = new PlanPrimaryActivity2(scenario.getTransitSchedule(), random, geometry);
+	/* (non-Javadoc)
+	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
+	 */
+	@Override
+	public void handle(ProxyLeg leg, Map<String, String> attributes) {
+		String typeId = attributes.get(MIDKeys.LEG_MAIN_TYPE);
+
+		if(typeId.equalsIgnoreCase("1")) {
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, "work");
+		} else if(typeId.equalsIgnoreCase("2")) {
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, "misc");
+		} else if(typeId.equalsIgnoreCase("3")) {
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, "edu");
+		} else if(typeId.equalsIgnoreCase("4")) {
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, "shop");
+		} else if(typeId.equalsIgnoreCase("5")) {
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, "misc");
+		} else if(typeId.equalsIgnoreCase("6")) {
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, "leisure");
+		} else {
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, "misc");
+		}
+		
 	}
+
 }

@@ -62,7 +62,7 @@ public class TransitLineRemover {
 		Set<TransitLine> toRemove = new HashSet<TransitLine>();
 		for(TransitLine line : lines.values()) {
 //			if(Math.random() > 0.5)
-			if(!line.getId().toString().startsWith("80"))
+			if(line.getId().toString().startsWith("s"))
 				toRemove.add(line);
 		}
 		
@@ -89,7 +89,7 @@ public class TransitLineRemover {
 			schedule.removeStopFacility(fac);
 		
 		TransitScheduleWriter writer = new TransitScheduleWriter(schedule);
-		writer.writeFile("/home/johannes/gsv/matsim/studies/netz2030/data/transitSchedule.longdist.xml");
+		writer.writeFile("/home/johannes/gsv/matsim/studies/netz2030/data/transitSchedule.nosbahn.xml");
 	}
 
 }

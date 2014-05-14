@@ -17,35 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.johannes.gsv.demand.loader;
-
-import java.io.IOException;
-import java.util.Random;
-import java.util.Set;
-
-import org.matsim.api.core.v01.Scenario;
-import org.opengis.feature.simple.SimpleFeature;
-
-import playground.johannes.gsv.demand.AbstractTaskWrapper;
-import playground.johannes.gsv.demand.tasks.PlanPrimaryActivity2;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-
-import com.vividsolutions.jts.geom.Geometry;
+package playground.johannes.gsv.synPop;
 
 /**
  * @author johannes
  *
  */
-public class PlanPrimaryActivityLoader2 extends AbstractTaskWrapper {
+public interface CommonKeys {
 
-	public PlanPrimaryActivityLoader2(Scenario scenario, String zoneFile, Random random) throws IOException {
-		Set<SimpleFeature> features = FeatureSHP.readFeatures(zoneFile);
-		SimpleFeature feature = features.iterator().next();
-		Geometry geometry = ((Geometry) feature.getDefaultGeometry()).getGeometryN(0);
-				
-		delegate = new PlanPrimaryActivity2(scenario.getTransitSchedule(), random, geometry);
-	}
+	public static final String LEG_START_TIME = "legstarttime";
+	
+	public static final String LEG_END_TIME = "legendtime";
+	
+	public static final String LEG_PURPOSE = "legpurpose";
+	
+	public static final String ACTIVITY_TYPE = "activitytype";
+	
+	public static final String LEG_ORIGIN = "origin";
 }

@@ -75,4 +75,37 @@
       <version>3.1-beta1</version>
     </dependency>
   </dependencies>
+  
+  <profiles>
+  		<profile>
+			<id>release</id>
+			<build>
+				<defaultGoal>assembly:assembly</defaultGoal>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<artifactId>maven-jar-plugin</artifactId>
+							<configuration>
+								<archive>
+									<manifest>
+										<addClasspath>true</addClasspath>
+										<classpathPrefix>libs/</classpathPrefix>
+										<mainClass>org.matsim.run.ReleaseInfo</mainClass>
+									</manifest>
+								</archive>
+							</configuration>
+						</plugin>
+						<plugin>
+							<artifactId>maven-assembly-plugin</artifactId>
+							<configuration>
+								<descriptors>
+									<descriptor>src/main/assembly/assembly-release.xml</descriptor>
+								</descriptors>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+	</profiles>
 </project>

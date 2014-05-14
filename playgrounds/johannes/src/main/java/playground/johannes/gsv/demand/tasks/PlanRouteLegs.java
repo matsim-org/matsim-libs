@@ -60,7 +60,7 @@ public class PlanRouteLegs implements PopulationTask {
 	
 	private final ExecutorService executor;
 	
-	private final int numThreads = 48;
+	private final int numThreads = 24;
 	
 	public PlanRouteLegs(Scenario scenario) {
 		this.scenario = scenario;
