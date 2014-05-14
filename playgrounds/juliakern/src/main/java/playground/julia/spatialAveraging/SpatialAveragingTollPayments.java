@@ -51,11 +51,11 @@ import playground.vsp.emissions.types.WarmPollutant;
  * @author julia, benjamin
  *
  */
-public class SpatialAveragingNOXbyHomeLocationV2 {
-	private static final Logger logger = Logger.getLogger(SpatialAveragingNOXbyHomeLocationV2.class);
+public class SpatialAveragingTollPayments {
+	private static final Logger logger = Logger.getLogger(SpatialAveragingTollPayments.class);
 
 	final double scalingFactor = 100.;
-//	private final static String runNumber1 = "baseCase";
+	private final static String runNumber1 = "baseCase";
 	private final static String runDirectory1 = "../../runs-svn/detEval/emissionInternalization/output/output_baseCase_ctd_newCode/";
 //	private final static String runNumber2 = "zone30";
 //	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
@@ -67,9 +67,9 @@ public class SpatialAveragingNOXbyHomeLocationV2 {
 //
 //	private static String configFile1 = runDirectory1 + "output_config.xml.gz";
 	//private final static Integer lastIteration1 = getLastIteration(configFile1);
-//	private final static Integer lastIteration1 = 1500;
+	private final static Integer lastIteration1 = 1500;
 //	private static String configFile2 = runDirectory1 + "output_config.xml.gz";
-//	private final static Integer lastIteration2 = 1500;
+	private final static Integer lastIteration2 = 1500;
 //	private final static Integer lastIteration2 = getLastIteration(configFile2);
 	private final String plansFile1 = runDirectory1 + "ITERS/it.1500/1500.plans.xml";
 //	private final String plansFile2 = runDirectory2 + "ITERS/it.1500/1500.plans.xml";
@@ -110,8 +110,6 @@ public class SpatialAveragingNOXbyHomeLocationV2 {
 
 	private boolean substractAverageValue = false; // personal value
 
-	private String outputPathForR = "../../runs-svn/detEval/emissionInternalization/output/output_policyCase_pricing_newCode/";
-
 	private void run() throws IOException{
 		this.sau = new SpatialAveragingUtils(xMin, xMax, yMin, yMax, noOfXbins, noOfYbins, smoothingRadius_m, munichShapeFile, null);
 		this.lf = new LocationFilter();
@@ -124,9 +122,8 @@ public class SpatialAveragingNOXbyHomeLocationV2 {
 		Config config = scenario.getConfig();
 		Population pop = scenario.getPopulation();
 		
-		
-		// calculate nox emissions per person
-		Map<Id, Double> personId2NoxAmount = new HashMap<Id, Double>();
+		// calculate paid toll per person
+		Map<Id, Double> personId2paidToll = new HashMap<Id, Double>();
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
 		
@@ -136,170 +133,44 @@ public class SpatialAveragingNOXbyHomeLocationV2 {
 		eventsManager.addHandler(ceeh);
 		emissionReader.parse(emissionFile);
 		
-		Map<Id, Double> personId2noxWarm = weeh.getPersonId2pollutant(WarmPollutant.NOX);
-		Map<Id, Double> personId2noxCold = ceeh.getPersonId2pollutant(ColdPollutant.NOX);
-		//EmissionCostModule emissionCostModule = new EmissionCostModule(emissionCostFactor );
+		Map<Id, Map<WarmPollutant, Double>> personId2warmEmissions = weeh.getPersonId2warmEmissions();
+		Map<Id, Map<ColdPollutant, Double>> personId2coldEmissions = ceeh.getPersonId2coldEmissions();
+		EmissionCostModule emissionCostModule = new EmissionCostModule(emissionCostFactor );
 		
 		for(Id personId: pop.getPersons().keySet()){
-			if(personId2noxWarm.get(personId)!=null){
-				Double value = personId2noxWarm.get(personId);
-				if(personId2noxCold.get(personId)!=null){
-					value += personId2noxCold.get(personId);
-				}
-				personId2NoxAmount.put(personId, value);
+			
+			Map<WarmPollutant, Double> warmEmissions = personId2warmEmissions.get(personId);
+			Map<ColdPollutant, Double> coldEmissions = personId2coldEmissions.get(personId);
+		
+			Double warmEmissionCosts =0.0;
+			Double coldEmissionCosts =0.0;
+			
+			if(warmEmissions!=null){
+				warmEmissionCosts = emissionCostModule.calculateWarmEmissionCosts(warmEmissions);
 			}
-			//Map<WarmPollutant, Double> warmEmissions = personId2warmEmissions.get(personId);
-		//emissionCostModule.calculateColdEmissionCosts(coldEmissions);
-			//Double personalEmissionCost = emissionCostModule.calculateWarmEmissionCosts(warmEmissions);
-			//personId2paidToll.put(personId, personalEmissionCost);
+			if(coldEmissions!=null){		
+				coldEmissionCosts = emissionCostModule.calculateColdEmissionCosts(coldEmissions);
+			}
+			Double personalEmissionCost = warmEmissionCosts+coldEmissionCosts;
+			personId2paidToll.put(personId, personalEmissionCost);		
 		}
+			
 		
-//		for(Id personId: personId2coldEmissions.keySet()){
-//			Map<ColdPollutant, Double> coldEmissions = personId2coldEmissions.get(personId);
-//			Double personalEmissionCost = emissionCostModule.calculateColdEmissionCosts(coldEmissions);
-//			if(personId2paidToll.containsKey(personId)){
-//				personId2paidToll.put(personId, personalEmissionCost+personId2paidToll.get(personId));
-//			}else{
-//				personId2paidToll.put(personId, personalEmissionCost);
-//			}
-//		}
+		double [][] weightsBaseCase = calculateWeights(pop);
+		double [][] normalizedWeightsBaseCase = this.sau.normalizeArray(weightsBaseCase);
 		
-		// subtract average/personal toll value from monetized utility
-//		if(substractAverageValue ){
-//			// calculate average value
-//			Double totalPaidTolls = 0.0;
-//			for(Id personId: personId2paidToll.keySet()){
-//				totalPaidTolls += personId2paidToll.get(personId);
-//			}
-//			Double averagePaidToll = totalPaidTolls/personId2Utility.size();
-//			
-//			for(Id personId: personId2Utility.keySet()){
-//				personId2Utility.put(personId, personId2Utility.get(personId)-averagePaidToll);
-//			}
-//			
-//		}else{ // personal costs
-//			for(Id personId: personId2Utility.keySet())
-//			if(personId2paidToll.containsKey(personId)){
-//				personId2Utility.put(personId, personId2Utility.get(personId)-personId2paidToll.get(personId));
-//			}
-//		}
-//		
-//		
-//		logger.info("There were " + ubc.getPersonsWithoutValidPlanCnt() + " persons without any valid plan.");
+		double [][] userTollPayments = fillUserBenefits(personId2paidToll, pop);
+		double [][] normalizedUserTollPayments = this.sau.normalizeArray(userTollPayments);
 		
-		double [][] populationDensity = calculatePopulationDensity(pop);
-		double [][] noxAmountBaseCase = fillNoxAmount(personId2NoxAmount, pop);
-		double [][] averageNOXAmountPerPerson = calculateAverage(noxAmountBaseCase, populationDensity);
+		double [][] averageUserBenefitsBaseCase = calculateAverage(normalizedUserTollPayments, normalizedWeightsBaseCase);
 		
-		this.sau.writeRoutput(populationDensity, outputPathForR +".populationDensity.txt");
-		this.sau.writeRoutput(noxAmountBaseCase, outputPathForR+".totalNOXAmount.txt");
-		this.sau.writeRoutput(averageNOXAmountPerPerson, outputPathForR+"averageNOXamountPerPerson");
+		this.sau.writeRoutput(normalizedUserTollPayments, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "UserEmissionCostsByHomeLocation.txt");
+		this.sau.writeRoutput(averageUserBenefitsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "UserEmissionCostsByHomeLocationAverage.txt");
+		this.sau.writeRoutput(normalizedWeightsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "NormalizedWeightsBaseCase.txt");
 		
-		//double [][] weightsBaseCase = calculateWeights(personId2Utility, pop);
-//		double [][] normalizedWeightsBaseCase = this.sau.normalizeArray(weightsBaseCase);
 		
-//		double [][] userBenefitsBaseCase = fillUserBenefits(personId2Utility, pop);
-//		double [][] normalizedUserBenefitsBaseCase = this.sau.normalizeArray(userBenefitsBaseCase);
-		
-//		double [][] averageUserBenefitsBaseCase = calculateAverage(normalizedUserBenefitsBaseCase, normalizedWeightsBaseCase);
-		
-//		this.sau.writeRoutput(normalizedUserBenefitsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "UserBenefits.txt");
-//		this.sau.writeRoutput(averageUserBenefitsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "UserBenefitsAverage.txt");
-//		this.sau.writeRoutput(normalizedWeightsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "NormalizedWeightsBaseCase.txt");
-	
-		
-//		if(compareToBaseCase){
-//			Scenario scenario2 = loadScenario(netFile1);
-//			MatsimPopulationReader mpr2 = new MatsimPopulationReader(scenario2);
-//			mpr2.readFile(plansFile2);
-//			
-//			Config config2 = scenario2.getConfig();
-//			Population pop2 = scenario2.getPopulation();
-//			UserBenefitsCalculator ubc2 = new UserBenefitsCalculator(config2, WelfareMeasure.LOGSUM, false);
-//			ubc2.calculateUtility_money(pop2);
-//			Map<Id, Double> personId2Utility2 = ubc2.getPersonId2MonetizedUtility();
-//			logger.info("There were " + ubc2.getPersonsWithoutValidPlanCnt() + " persons without any valid plan.");
-//			
-//			double [][] weightsPolicyCase = calculateWeights(personId2Utility2, pop2);
-//			double [][] normalizedWeightsPolicyCase = this.sau.normalizeArray(weightsPolicyCase);
-//			
-//			double [][] userBenefitsPolicyCase = fillUserBenefits(personId2Utility2, pop2);
-//			double [][] normalizedUserBenefitsPolicyCase = this.sau.normalizeArray(userBenefitsPolicyCase);
-//			"../../runs-svn/detEval/emissionInternalization/output/output_policyCase_pricing_newCode/";
-//			double [][] averageUserBenefitsPolicyCase = calculateAverage(normalizedUserBenefitsPolicyCase, normalizedWeightsPolicyCase);
-//			
-//			// calculate differences base case <-> policy case
-//			double [][] normalizedUserBenefitDifferences = calculateDifferences(normalizedUserBenefitsPolicyCase, normalizedUserBenefitsBaseCase);
-//			double [][] normalizedAverageUserBenefitDifferences = calculateDifferences(averageUserBenefitsPolicyCase, averageUserBenefitsBaseCase);
-//			// double [][] normalizedWeightsDifferences = calculateDifferences(normalizedWeightsPolicyCase, normalizedWeightsBaseCase);
-//
-//			String outputPath = outPathStub + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".Routput.";
-//			String outNormalizedDifferences;
-//			String outNormalizedAverageDifferences;
-//			if(substractAverageValue){
-//				outNormalizedDifferences = outputPath + "UserBenefitsDifferences.AverageRefund.txt";
-//				outNormalizedAverageDifferences = outputPath + "UserBenefitsAverageDifferences.AverageRefund.txt";
-//			}else{
-//				outNormalizedDifferences = outputPath + "UserBenefitsDifferences.PersonalRefund.txt";
-//				outNormalizedAverageDifferences = outputPath + "UserBenefitsAverageDifferences.PersonalRefund.txt";		
-//			}
-//			
-//			this.sau.writeRoutput(normalizedUserBenefitDifferences, outNormalizedDifferences);
-//			this.sau.writeRoutput(normalizedAverageUserBenefitDifferences, outNormalizedAverageDifferences);
-//			//	this.sau.writeRoutput(normalizedWeightsDifferences, outPathStub + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".Routput_" + "WeightsDifferences.txt"); // should be zero
-//		}
 	}
 
-private double[][] fillNoxAmount(Map<Id, Double> personId2NoxAmount,
-			Population pop) {
-	double[][] noxAmount = new double[noOfXbins][noOfYbins];
-	for(Id personId: personId2NoxAmount.keySet()){
-		Person person = pop.getPersons().get(personId);
-		Coord homeCoord = this.lf.getHomeActivityCoord(person);
-		if (this.sau.isInResearchArea(homeCoord)){
-			int xHome = sau.getXbin(homeCoord.getX());
-			int yHome = sau.getYbin(homeCoord.getY());
-			//TODO check this
-			if(noxAmount[xHome][yHome]>0.){
-				noxAmount[xHome][yHome]+=personId2NoxAmount.get(personId);
-			}else{
-				noxAmount[xHome][yHome]=personId2NoxAmount.get(personId);
-			}
-		}
-		
-	}
-return noxAmount;
-	}
-
-private double[][] calculatePopulationDensity(Population pop) {
-			double[][] populationDensity = new double[noOfXbins][noOfYbins];
-			for(Id personId: pop.getPersons().keySet()){
-				Person person = pop.getPersons().get(personId);
-				Coord homeCoord = this.lf.getHomeActivityCoord(person);
-				if (this.sau.isInResearchArea(homeCoord)){
-					int xHome = sau.getXbin(homeCoord.getX());
-					int yHome = sau.getYbin(homeCoord.getY());
-					//TODO check this
-					if(populationDensity[xHome][yHome]>0.){
-						populationDensity[xHome][yHome]+=1.;
-					}else{
-						populationDensity[xHome][yHome]=1.;
-					}
-				}
-				
-			}
-		return populationDensity;
-	}
-
-//	private double[][] calculateDifferences(double[][] normalizedArrayPolicyCase, double[][] normalizedArrayBaseCase) {
-//		double [][] diff = new double[noOfXbins][noOfYbins];
-//		for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
-//			for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
-//				diff[xIndex][yIndex]= normalizedArrayPolicyCase[xIndex][yIndex] - normalizedArrayBaseCase[xIndex][yIndex];
-//			}
-//		}
-//		return diff;
-//	}
 
 	private double[][] calculateAverage(double[][] userBenefits, double[][] weights) {
 		double[][] average = new double [noOfXbins][noOfYbins];
@@ -315,13 +186,13 @@ private double[][] calculatePopulationDensity(Population pop) {
 		return average;
 	}
 
-	private double [][] calculateWeights(Map<Id, Double> personId2Utility, Population pop){
+	private double [][] calculateWeights(Population pop){
 		double[][] weights = new double[noOfXbins][noOfYbins];
 
-		for(Id personId : personId2Utility.keySet()){ 
+		for(Id personId : pop.getPersons().keySet()){ 
 			Person person = pop.getPersons().get(personId);
 			Coord homeCoord = this.lf.getHomeActivityCoord(person);
-			if (this.sau.isInResearchArea(homeCoord)){
+			
 				double personCount = 1.0;
 				// one person stands for this.scalingFactor persons
 				double scaledPersonCount = this.scalingFactor * personCount;
@@ -332,7 +203,7 @@ private double[][] calculatePopulationDensity(Population pop) {
 						weights[xIndex][yIndex] += weightOfPersonForCell * scaledPersonCount;
 					}
 				}
-			}
+			
 		}
 		return weights;
 	}
@@ -343,7 +214,7 @@ private double[][] calculatePopulationDensity(Population pop) {
 		for(Id personId : personId2Utility.keySet()){ 
 			Person person = pop.getPersons().get(personId);
 			Coord homeCoord = this.lf.getHomeActivityCoord(person);
-			if (this.sau.isInResearchArea(homeCoord)){
+			
 				double benefitOfPerson = personId2Utility.get(personId);
 				// one person stands for this.scalingFactor persons; thus, that person earns the sum of these person's benefits (additivity required!)
 				double scaledBenefitOfPerson = this.scalingFactor * benefitOfPerson;
@@ -355,9 +226,7 @@ private double[][] calculatePopulationDensity(Population pop) {
 						scaledWeightedBenefits[xIndex][yIndex] += weightOfPersonForCell * scaledBenefitOfPerson;
 					}
 				}
-			} else {
-				// do nothing...
-			}
+			
 		}
 		return scaledWeightedBenefits;
 	}
@@ -378,6 +247,6 @@ private double[][] calculatePopulationDensity(Population pop) {
 	}
 
 	public static void main(String[] args) throws IOException{
-		new SpatialAveragingNOXbyHomeLocationV2().run();
+		new SpatialAveragingTollPayments().run();
 	}
 }

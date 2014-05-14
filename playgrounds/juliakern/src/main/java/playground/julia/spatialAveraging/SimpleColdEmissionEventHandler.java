@@ -33,6 +33,9 @@ public class SimpleColdEmissionEventHandler implements ColdEmissionEventHandler 
 
 	Map<Id, Map<ColdPollutant, Double>> personId2coldEmissions;
 
+	public SimpleColdEmissionEventHandler(){
+		this.personId2coldEmissions = new HashMap<Id, Map<ColdPollutant,Double>>();
+	}
 	@Override
 	public void reset(int iteration) {
 		personId2coldEmissions = new HashMap<Id, Map<ColdPollutant, Double>>();
@@ -73,4 +76,4 @@ public class SimpleColdEmissionEventHandler implements ColdEmissionEventHandler 
 		}
 	}
 
-}
+

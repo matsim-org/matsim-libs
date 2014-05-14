@@ -22,54 +22,55 @@ package playground.julia.spatialAveraging;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.SortedSet;
 
-import org.apache.commons.math.MathException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import playground.benjamin.internalization.EmissionCostModule;
 import playground.benjamin.scenarios.munich.analysis.filter.LocationFilter;
 import playground.vsp.emissions.events.EmissionEventsReader;
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;
-import playground.vsp.emissions.utils.EmissionUtils;
 
 /**
- * @author benjamin
+ * @author julia, benjamin
  *
  */
 public class SpatialAveragingNOXbyHomeLocation {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingNOXbyHomeLocation.class);
 
 	final double scalingFactor = 100.;
-	private final static String runNumber1 = "baseCase";
-	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
-	private final static String runNumber2 = "zone30";
-	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
+//	private final static String runNumber1 = "baseCase";
+	private final static String runDirectory1 = "../../runs-svn/detEval/emissionInternalization/output/output_baseCase_ctd_newCode/";
+//	private final static String runNumber2 = "zone30";
+//	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
 //	private final static String runNumber2 = "pricing";
-//	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
+//	private final static String runDirectory2 = "../../runs-svn/detEval/emissionInternalization/output/output_policyCase_pricing_newCode/";
+//	private final String netFile1 = runDirectory2 + "output_network.xml.gz";
 	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
 	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-
-	private static String configFile1 = runDirectory1 + "output_config.xml.gz";
-	private final static Integer lastIteration1 = getLastIteration(configFile1);
-	private static String configFile2 = runDirectory1 + "output_config.xml.gz";
-	private final static Integer lastIteration2 = getLastIteration(configFile2);
-	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
-	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + lastIteration2 + ".emission.events.xml.gz";
+//
+//	private static String configFile1 = runDirectory1 + "output_config.xml.gz";
+	//private final static Integer lastIteration1 = getLastIteration(configFile1);
+//	private final static Integer lastIteration1 = 1500;
+//	private static String configFile2 = runDirectory1 + "output_config.xml.gz";
+//	private final static Integer lastIteration2 = 1500;
+//	private final static Integer lastIteration2 = getLastIteration(configFile2);
+	private final String plansFile1 = runDirectory1 + "ITERS/it.1500/1500.plans.xml";
+//	private final String plansFile2 = runDirectory2 + "ITERS/it.1500/1500.plans.xml";
+	private final String emissionFile = runDirectory1 + "ITERS/it.1500/1500.emission.events.xml.gz";
 	
 //	final double scalingFactor = 10.;
 //	private final static String runNumber1 = "981";
@@ -78,340 +79,311 @@ public class SpatialAveragingNOXbyHomeLocation {
 //	private final static String runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
 //	private final String netFile1 = runDirectory1 + runNumber1 + ".output_network.xml.gz";
 //	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-//
+
 //	private static String configFile1 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
 //	private final static Integer lastIteration1 = getLastIteration(configFile1);
-//	private static String configFile2 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
-//	private final static Integer lastIteration2 = getLastIteration(configFile2);
-//	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + runNumber1 + "." + lastIteration1 + ".emission.events.xml.gz";
-//	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + runNumber2 + "." + lastIteration2 + ".emission.events.xml.gz";
+//	private final String plansFile1 = runDirectory1 + runNumber1 + ".output_plans.xml";
+//	private final String plansFile2 = runDirectory2 + runNumber2 + ".output_plans.xml.gz";
 
-	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
 	final double xMin = 4452550.25;
 	final double xMax = 4479483.33;
 	final double yMin = 5324955.00;
 	final double yMax = 5345696.81;
 	final int noOfXbins = 160;
 	final int noOfYbins = 120;
+
+	final double smoothingRadius_m = 1000.;
+	final double area_in_smoothing_circle_sqkm = (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m) / (1000. * 1000.);
 	
-	final int noOfTimeBins = 1;
-	
-	final double smoothingRadius_m = 500.;
-	
-	final String pollutant2analyze = WarmPollutant.NO2.toString();
-//	final boolean compareToBaseCase = true;
 	final boolean compareToBaseCase = false;
 	
 	SpatialAveragingUtils sau;
-	//SpatialAveragingUtilsExtended saue;
 	LocationFilter lf;
-	double simulationEndTime;
-	SortedSet<String> listOfPollutants;
 	Network network;
-	
-	EmissionUtils emissionUtils = new EmissionUtils();
-	EmissionsPerLinkWarmEventHandler warmHandler;
-	EmissionsPerLinkColdEventHandler coldHandler;
-	String outPathStub;
-	
+
+	String outPathStub = runDirectory1 + "analysis/spatialAveraging/welfare/";
+
+	private double emissionCostFactor = 1.0;
+
+	private boolean substractAverageValue = false; // personal value
+
+	private String outputPathForR = "../../runs-svn/detEval/emissionInternalization/output/output_baseCase_ctd_newCode/analysis/";
+
 	private void run() throws IOException{
-		this.sau = new SpatialAveragingUtils(xMin, xMax, yMin, yMax, noOfXbins, noOfYbins, smoothingRadius_m, munichShapeFile, targetCRS);
-		this.saue = new SpatialAveragingUtilsExtended(smoothingRadius_m);
+		this.sau = new SpatialAveragingUtils(xMin, xMax, yMin, yMax, noOfXbins, noOfYbins, smoothingRadius_m, munichShapeFile, null);
 		this.lf = new LocationFilter();
 		
-		this.simulationEndTime = getEndTime(configFile1);
-		this.listOfPollutants = emissionUtils.getListOfPollutants();
 		Scenario scenario = loadScenario(netFile1);
 		this.network = scenario.getNetwork();		
+		MatsimPopulationReader mpr = new MatsimPopulationReader(scenario);
+		mpr.readFile(plansFile1);
 		
-		processEmissions(emissionFile1);
-		Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2WarmEmissionsTotal1 = this.warmHandler.getWarmEmissionsPerLinkAndTimeInterval();
-		Map<Double, Map<Id, Map<ColdPollutant, Double>>> time2ColdEmissionsTotal1 = this.coldHandler.getColdEmissionsPerLinkAndTimeInterval();
-		Map<Double, Map<Id, Double>> time2CountsPerLink1 = this.warmHandler.getTime2linkIdLeaveCount();
-
-		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal1 = sumUpEmissionsPerTimeInterval(time2WarmEmissionsTotal1, time2ColdEmissionsTotal1);
-		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled1 = setNonCalculatedEmissions(time2EmissionsTotal1);
-		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered1 = filterEmissionLinks(time2EmissionsTotalFilled1);
-		Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered1 = setNonCalculatedCountsAndFilter(time2CountsPerLink1);
-
-		this.warmHandler.reset(0);
-		this.coldHandler.reset(0);
-
-		Map<Double, double[][]> time2WeightedEmissions1 = fillWeightedEmissionValues(time2EmissionsTotalFilledAndFiltered1);
-		Map<Double, double[][]> time2NormalizedWeightedEmissions1 = normalizeAllArrays(time2WeightedEmissions1);
-				
-		Map<Double, double[][]> time2WeightedDemand1 = fillWeightedDemandValues(time2CountsPerLinkFilledAndFiltered1);
-		Map<Double, double[][]> time2NormalizedWeightedDemand1 = normalizeAllArrays(time2WeightedDemand1);
+		Config config = scenario.getConfig();
+		Population pop = scenario.getPopulation();
 		
-		/* Sum over weighted values for cell does not need to be normalized, since normalization canceles out.
-		 * Result is an average value for cell*/
-		Map<Double, double[][]> time2SpecificEmissions1 = calculateSpecificEmissionsPerBin(time2WeightedEmissions1, time2WeightedDemand1);
-//		Map<Double, double[][]> time2SpecificEmissions1 = calculateSpecificEmissionsPerBin(time2NormalizedWeightedEmissions1, time2NormalizedWeightedDemand1);
 		
-
-		outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber1 + "." + lastIteration1;
-		for(double endOfTimeInterval: time2WeightedEmissions1.keySet()){
-			this.sau.writeRoutput(time2NormalizedWeightedEmissions1.get(endOfTimeInterval), outPathStub + ".Routput." + pollutant2analyze.toString() + ".g." + endOfTimeInterval + ".txt");
-			this.sau.writeRoutput(time2NormalizedWeightedDemand1.get(endOfTimeInterval), outPathStub + ".Routput.Demand.vkm." + endOfTimeInterval + ".txt");
-			this.sau.writeRoutput(time2SpecificEmissions1.get(endOfTimeInterval), outPathStub+ ".Routput." + pollutant2analyze + ".gPerVkm." + endOfTimeInterval + ".txt");
-			
-//			this.sau.writeGISoutput(time2WeightedEmissions1, outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".g.movie.shp");
-//			this.sau.writeGISoutput(time2WeightedDemand1, outPathStub + ".GISoutput.Demand.vkm.movie.shp");
-//			this.sau.writeGISoutput(time2SpecificEmissions, outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".gPerVkm.movie.shp");
-		}
-		
-		if(compareToBaseCase){
-			processEmissions(emissionFile2);
-			Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2WarmEmissionsTotal2 = this.warmHandler.getWarmEmissionsPerLinkAndTimeInterval();
-			Map<Double, Map<Id, Map<ColdPollutant, Double>>> time2ColdEmissionsTotal2 = this.coldHandler.getColdEmissionsPerLinkAndTimeInterval();
-			Map<Double, Map<Id, Double>> time2CountsPerLink2 = this.warmHandler.getTime2linkIdLeaveCount();
-
-			Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal2 = sumUpEmissionsPerTimeInterval(time2WarmEmissionsTotal2, time2ColdEmissionsTotal2);
-			Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled2 = setNonCalculatedEmissions(time2EmissionsTotal2);
-			Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered2 = filterEmissionLinks(time2EmissionsTotalFilled2);
-			Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered2 = setNonCalculatedCountsAndFilter(time2CountsPerLink2);
-
-			Map<Double, double[][]> time2WeightedEmissions2 = fillWeightedEmissionValues(time2EmissionsTotalFilledAndFiltered2);
-			Map<Double, double[][]> time2NormalizedWeightedEmissions2 = normalizeAllArrays(time2WeightedEmissions2);
-			
-			Map<Double, double[][]> time2WeightedDemand2 = fillWeightedDemandValues(time2CountsPerLinkFilledAndFiltered2);
-			Map<Double, double[][]> time2NormalizedWeightedDemand2 = normalizeAllArrays(time2WeightedDemand2);
-			
-			/* Sum over weighted values for cell does not need to be normalized, since normalization canceles out.
-			 * Result is an average value for cell*/
-			Map<Double, double[][]> time2SpecificEmissions2 = calculateSpecificEmissionsPerBin(time2WeightedEmissions2, time2WeightedDemand2);
-//			Map<Double, double[][]> time2SpecificEmissions2 = calculateSpecificEmissionsPerBin(time2NormalizedWeightedEmissions2, time2NormalizedWeightedDemand2);
-			
-			/* Sum over weighted values for cell is normalized to "per sqkm" (dependent on calcluateWeightOfLinkForCell)
-			 * Values NEED to be additive (e.g. vkm, g, counts, or AVERAGE g/vkm!)
-			 * Make sure coordinate system is metric */
-			Map<Double, double[][]> time2AbsoluteEmissionDifferences = calculateAbsoluteDifferencesPerBin(time2NormalizedWeightedEmissions1, time2NormalizedWeightedEmissions2);
-			Map<Double, double[][]> time2AbsoluteDemandDifferences = calculateAbsoluteDifferencesPerBin(time2NormalizedWeightedDemand1, time2NormalizedWeightedDemand2);
-			Map<Double, double[][]> time2SpecificEmissionDifferences = calculateAbsoluteDifferencesPerBin(time2SpecificEmissions1, time2SpecificEmissions2);
-
-			outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".absoluteDelta";
-			for(double endOfTimeInterval : time2AbsoluteDemandDifferences.keySet()){
-				this.sau.writeRoutput(time2AbsoluteEmissionDifferences.get(endOfTimeInterval), outPathStub + ".Routput." + pollutant2analyze + ".g." + endOfTimeInterval + ".txt");
-				this.sau.writeRoutput(time2AbsoluteDemandDifferences.get(endOfTimeInterval),	outPathStub + ".Routput.Demand.vkm." + endOfTimeInterval + ".txt");
-				this.sau.writeRoutput(time2SpecificEmissionDifferences.get(endOfTimeInterval), outPathStub + ".Routput." + pollutant2analyze.toString() + ".gPerVkm." + endOfTimeInterval + ".txt");
-
-//				this.sau.writeGISoutput(time2AbsoluteEmissionDifferences, outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".g.movie.shp");
-//				this.sau.writeGISoutput(time2AbsoluteDemandDifferences, outPathStub + ".GISoutput.Demand.vkm.movie.shp");
-//				this.sau.writeGISoutput(time2SpecificEmissionDifferences, outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".gPerVkm.movie.shp");
-			}	
-		}
-	}
-	
-	private Map<Double, double[][]> fillWeightedEmissionValues(Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered){
-		Map<Double, double[][]> time2weightedEmissions = new HashMap<Double, double[][]>();
-		
-		for(Double endOfTimeInterval : time2EmissionsTotalFilledAndFiltered.keySet()){
-			double[][]weightedEmissions = new double[noOfXbins][noOfYbins];
-			
-			for(Id linkId : time2EmissionsTotalFilledAndFiltered.get(endOfTimeInterval).keySet()){
-//				Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
-//				double xLink = linkCoord.getX();
-//				double yLink = linkCoord.getY();
-				Coord fromNodeCoord = this.network.getLinks().get(linkId).getFromNode().getCoord();
-				Coord toNodeCoord = this.network.getLinks().get(linkId).getToNode().getCoord();
-				
-				double value = time2EmissionsTotalFilledAndFiltered.get(endOfTimeInterval).get(linkId).get(this.pollutant2analyze);
-				double scaledValue = this.scalingFactor * value;
-				
-				// TODO: maybe calculate the following once and look it up here?
-				for(int xIndex=0; xIndex<noOfXbins; xIndex++){
-					for (int yIndex=0; yIndex<noOfYbins; yIndex++){
-						Coord cellCentroid = this.sau.findCellCentroid(xIndex, yIndex);
-//						double weightOfLinkForCell = this.sau.calculateWeightOfPointForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
-						double weightOfLinkForCell = this.saue.calculateWeightOfLineForCellV2(fromNodeCoord, toNodeCoord, cellCentroid.getX(), cellCentroid.getY());
-						weightedEmissions[xIndex][yIndex] += weightOfLinkForCell * scaledValue;					
-					}
-				}
-			}
-			time2weightedEmissions.put(endOfTimeInterval, weightedEmissions);
-		}
-		return time2weightedEmissions;
-	}
-	
-	private Map<Double, double[][]> fillWeightedDemandValues(Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered) {
-		Map<Double, double[][]> time2weightedDemand = new HashMap<Double, double[][]>();
-		
-		for(Double endOfTimeInterval : time2CountsPerLinkFilledAndFiltered.keySet()){
-			double[][]weightedDemand = new double[noOfXbins][noOfYbins];
-			
-			for(Id linkId : time2CountsPerLinkFilledAndFiltered.get(endOfTimeInterval).keySet()){
-//				Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
-//				double xLink = linkCoord.getX();
-//				double yLink = linkCoord.getY();
-				Coord fromNodeCoord = this.network.getLinks().get(linkId).getFromNode().getCoord();
-				Coord toNodeCoord = this.network.getLinks().get(linkId).getToNode().getCoord();
-				double linkLength_km = this.network.getLinks().get(linkId).getLength() / 1000.;
-				
-				double count = time2CountsPerLinkFilledAndFiltered.get(endOfTimeInterval).get(linkId);
-				double vkm = count * linkLength_km;
-				double scaledVkm = this.scalingFactor * vkm;
-				
-				// TODO: maybe calculate the following once and look it up here?
-				for(int xIndex=0; xIndex<noOfXbins; xIndex++){
-					for (int yIndex=0; yIndex<noOfYbins; yIndex++){
-						Coord cellCentroid = this.sau.findCellCentroid(xIndex, yIndex);
-//						double weightOfLinkForCell = this.sau.calculateWeightOfPointForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
-						double weightOfLinkForCell = this.saue.calculateWeightOfLineForCellV2(fromNodeCoord, toNodeCoord, cellCentroid.getX(), cellCentroid.getY());
-						weightedDemand[xIndex][yIndex] += weightOfLinkForCell * scaledVkm;					
-					}
-				}
-			}
-			time2weightedDemand.put(endOfTimeInterval, weightedDemand);
-		}
-		return time2weightedDemand;
-	}
-
-	private Map<Double, double[][]> calculateSpecificEmissionsPerBin(
-			Map<Double, double[][]> time2weightedEmissions,
-			Map<Double, double[][]> time2weightedDemand) {
-		
-		Map<Double, double[][]> time2specificEmissions = new HashMap<Double, double[][]>();
-		for( Double endOfTimeInterval : time2weightedEmissions.keySet()){
-			double [][] specificEmissions = new double[noOfXbins][noOfYbins];
-			for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
-				for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
-					specificEmissions[xIndex][yIndex] = time2weightedEmissions.get(endOfTimeInterval)[xIndex][yIndex] / time2weightedDemand.get(endOfTimeInterval)[xIndex][yIndex];
-				}
-			}
-			time2specificEmissions.put(endOfTimeInterval, specificEmissions);
-		}
-		return time2specificEmissions;
-	}
-	
-	private Map<Double, double[][]> calculateAbsoluteDifferencesPerBin(
-			Map<Double, double[][]> time2weightedValues1,
-			Map<Double, double[][]> time2weightedValues2){
-		
-		Map<Double, double[][]> time2absoluteDifferences = new HashMap<Double, double[][]>();
-		for(Double endOfTimeInterval : time2weightedValues1.keySet()){
-			double [][] absoluteDifferences = new double[noOfXbins][noOfYbins];
-			for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
-				for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
-					absoluteDifferences[xIndex][yIndex] = time2weightedValues2.get(endOfTimeInterval)[xIndex][yIndex] - time2weightedValues1.get(endOfTimeInterval)[xIndex][yIndex];
-				}
-			}
-			time2absoluteDifferences.put(endOfTimeInterval, absoluteDifferences);
-		}		
-		return time2absoluteDifferences;
-	}
-
-	private Map<Double, double[][]> normalizeAllArrays(
-			Map<Double, double[][]> time2Array) {
-		Map<Double, double[][]> time2NormalizedArray = new HashMap<Double, double[][]>();
-			for(Double endOfTimeInterval : time2Array.keySet()){
-				double[][] normalizedArray = this.sau.normalizeArray(time2Array.get(endOfTimeInterval));
-				time2NormalizedArray.put(endOfTimeInterval, normalizedArray);
-			}
-		return time2NormalizedArray;
-	}
-
-	private Map<Double, Map<Id, Double>> setNonCalculatedCountsAndFilter(Map<Double, Map<Id, Double>> time2CountsPerLink) {
-		Map<Double, Map<Id, Double>> time2CountsTotalFiltered = new HashMap<Double, Map<Id,Double>>();
-	
-		for(Double endOfTimeInterval : time2CountsPerLink.keySet()){
-			Map<Id, Double> linkId2Count = time2CountsPerLink.get(endOfTimeInterval);
-			Map<Id, Double> linkId2CountFiltered = new HashMap<Id, Double>();
-		
-			for(Link link : network.getLinks().values()){
-				Coord linkCoord = link.getCoord();
-				if(this.sau.isInResearchArea(linkCoord)){
-					Id linkId = link.getId();
-	
-					if(linkId2Count.get(linkId) == null){
-						linkId2CountFiltered.put(linkId, 0.);
-					} else {
-						linkId2CountFiltered.put(linkId, linkId2Count.get(linkId));
-					}
-				}
-			}
-			time2CountsTotalFiltered.put(endOfTimeInterval, linkId2CountFiltered);
-		}
-		return time2CountsTotalFiltered;
-	}
-
-	private Map<Double, Map<Id, SortedMap<String, Double>>> setNonCalculatedEmissions(Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal) {
-		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled = new HashMap<Double, Map<Id, SortedMap<String, Double>>>();
-		
-		for(double endOfTimeInterval : time2EmissionsTotal.keySet()){
-			Map<Id, SortedMap<String, Double>> emissionsTotalFilled = this.emissionUtils.setNonCalculatedEmissionsForNetwork(this.network, time2EmissionsTotal.get(endOfTimeInterval));
-			time2EmissionsTotalFilled.put(endOfTimeInterval, emissionsTotalFilled);
-		}
-		return time2EmissionsTotalFilled;
-	}
-
-	private Map<Double, Map<Id, Map<String, Double>>> filterEmissionLinks(Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal) {
-		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFiltered = new HashMap<Double, Map<Id, Map<String, Double>>>();
-		
-		for(Double endOfTimeInterval : time2EmissionsTotal.keySet()){
-			Map<Id, SortedMap<String, Double>> emissionsTotal = time2EmissionsTotal.get(endOfTimeInterval);
-			Map<Id, Map<String, Double>> emissionsTotalFiltered = new HashMap<Id, Map<String, Double>>();
-
-			for(Link link : network.getLinks().values()){
-				Coord linkCoord = link.getCoord();
-				if(this.sau.isInResearchArea(linkCoord)){
-					Id linkId = link.getId();
-					emissionsTotalFiltered.put(linkId, emissionsTotal.get(linkId));
-				}
-			}
-			time2EmissionsTotalFiltered.put(endOfTimeInterval, emissionsTotalFiltered);
-		}
-		return time2EmissionsTotalFiltered;
-	}
-
-	private Map<Double, Map<Id, SortedMap<String, Double>>> sumUpEmissionsPerTimeInterval(
-			Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2warmEmissionsTotal,
-			Map<Double, Map<Id, Map<ColdPollutant, Double>>> time2coldEmissionsTotal) {
-	
-		Map<Double, Map<Id, SortedMap<String, Double>>> time2totalEmissions = new HashMap<Double, Map<Id, SortedMap<String, Double>>>();
-	
-		for(double endOfTimeInterval: time2warmEmissionsTotal.keySet()){
-			Map<Id, Map<WarmPollutant, Double>> warmEmissions = time2warmEmissionsTotal.get(endOfTimeInterval);
-			
-			Map<Id, SortedMap<String, Double>> totalEmissions = new HashMap<Id, SortedMap<String, Double>>();
-			if(time2coldEmissionsTotal.get(endOfTimeInterval) == null){
-				for(Id id : warmEmissions.keySet()){
-					SortedMap<String, Double> warmEmissionsOfLink = this.emissionUtils.convertWarmPollutantMap2String(warmEmissions.get(id));
-					totalEmissions.put(id, warmEmissionsOfLink);
-				}
-			} else {
-				Map<Id, Map<ColdPollutant, Double>> coldEmissions = time2coldEmissionsTotal.get(endOfTimeInterval);
-				totalEmissions = this.emissionUtils.sumUpEmissionsPerId(warmEmissions, coldEmissions);
-			}
-			time2totalEmissions.put(endOfTimeInterval, totalEmissions);
-		}
-		return time2totalEmissions;
-	}
-
-	private void processEmissions(String emissionFile) {
+		// calculate nox emissions per person
+		Map<Id, Double> personId2NoxAmount = new HashMap<Id, Double>();
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
-		this.warmHandler = new EmissionsPerLinkWarmEventHandler(this.simulationEndTime, noOfTimeBins);
-		this.coldHandler = new EmissionsPerLinkColdEventHandler(this.simulationEndTime, noOfTimeBins);
-		eventsManager.addHandler(this.warmHandler);
-		eventsManager.addHandler(this.coldHandler);
+		
+		SimpleWarmEmissionEventHandler weeh = new SimpleWarmEmissionEventHandler();
+		eventsManager.addHandler(weeh);
+		SimpleColdEmissionEventHandler ceeh = new SimpleColdEmissionEventHandler();
+		eventsManager.addHandler(ceeh);
 		emissionReader.parse(emissionFile);
+		
+		Map<Id, Double> personId2noxWarm = weeh.getPersonId2pollutant(WarmPollutant.NOX);
+		Map<Id, Double> personId2noxCold = ceeh.getPersonId2pollutant(ColdPollutant.NOX);
+		EmissionCostModule emissionCostModule = new EmissionCostModule(emissionCostFactor );
+		
+		Map<Id, Map<WarmPollutant, Double>> personId2warmEmissions = weeh.getPersonId2warmEmissions();
+		Map<Id, Map<ColdPollutant, Double>> personId2coldEmissions = ceeh.getPersonId2coldEmissions();
+		Map<Id, Double> personId2paidToll = new HashMap<Id, Double>();
+		
+		for(Id personId: pop.getPersons().keySet()){
+			if(personId2noxWarm.get(personId)!=null){
+				Double value = personId2noxWarm.get(personId);
+//				if(personId2noxCold.get(personId)!=null){
+//					value += personId2noxCold.get(personId);
+//				}
+				personId2NoxAmount.put(personId, value);
+			}
+			
+			Map<WarmPollutant, Double> warmEmissions = personId2warmEmissions.get(personId);
+			Map<ColdPollutant, Double> coldEmissions = personId2coldEmissions.get(personId);
+			
+			Double warmEmissionCosts =0.0;
+			Double coldEmissionCosts =0.0;
+			if(warmEmissions!=null){
+				warmEmissionCosts = emissionCostModule.calculateWarmEmissionCosts(warmEmissions);
+			}
+			if(coldEmissions!=null){		
+				coldEmissionCosts = emissionCostModule.calculateColdEmissionCosts(coldEmissions);
+			}
+			Double personalEmissionCost = warmEmissionCosts+coldEmissionCosts;
+			
+			personId2paidToll.put(personId, personalEmissionCost);
+		}
+		
+//		for(Id personId: personId2coldEmissions.keySet()){
+//			Map<ColdPollutant, Double> coldEmissions = personId2coldEmissions.get(personId);
+//			Double personalEmissionCost = emissionCostModule.calculateColdEmissionCosts(coldEmissions);
+//			if(personId2paidToll.containsKey(personId)){
+//				personId2paidToll.put(personId, personalEmissionCost+personId2paidToll.get(personId));
+//			}else{
+//				personId2paidToll.put(personId, personalEmissionCost);
+//			}
+//		}
+		
+		// subtract average/personal toll value from monetized utility
+//		if(substractAverageValue ){
+//			// calculate average value
+//			Double totalPaidTolls = 0.0;
+//			for(Id personId: personId2paidToll.keySet()){
+//				totalPaidTolls += personId2paidToll.get(personId);
+//			}
+//			Double averagePaidToll = totalPaidTolls/personId2Utility.size();
+//			
+//			for(Id personId: personId2Utility.keySet()){
+//				personId2Utility.put(personId, personId2Utility.get(personId)-averagePaidToll);
+//			}
+//			
+//		}else{ // personal costs
+//			for(Id personId: personId2Utility.keySet())
+//			if(personId2paidToll.containsKey(personId)){
+//				personId2Utility.put(personId, personId2Utility.get(personId)-personId2paidToll.get(personId));
+//			}
+//		}
+//		
+//		
+//		logger.info("There were " + ubc.getPersonsWithoutValidPlanCnt() + " persons without any valid plan.");
+		
+		double [][] populationDensity = calculatePopulationDensity(pop);
+		double [][] noxAmountBaseCase = fillAmount(personId2NoxAmount, pop);
+		double [][] averageNOXAmountPerPerson = calculateAverage(noxAmountBaseCase, populationDensity);
+		double [][] paidEmissionCosts = fillAmount(personId2paidToll, pop);
+		double [][] averageEmissionCosts = calculateAverage(paidEmissionCosts, populationDensity);
+		
+		this.sau.writeRoutput(populationDensity, outputPathForR +"populationDensity.txt");
+		this.sau.writeRoutput(noxAmountBaseCase, outputPathForR+"totalNOXAmount.txt");
+		this.sau.writeRoutput(averageNOXAmountPerPerson, outputPathForR+"averageNOXamountPerPerson.txt");
+		this.sau.writeRoutput(paidEmissionCosts, outputPathForR+"emissionCostsbyHomeLocation.txt");
+		this.sau.writeRoutput(averageEmissionCosts, outputPathForR+"averageEmissionCostsByHomeLocation.txt");
+		
+		//double [][] weightsBaseCase = calculateWeights(personId2Utility, pop);
+//		double [][] normalizedWeightsBaseCase = this.sau.normalizeArray(weightsBaseCase);
+		
+//		double [][] userBenefitsBaseCase = fillUserBenefits(personId2Utility, pop);
+//		double [][] normalizedUserBenefitsBaseCase = this.sau.normalizeArray(userBenefitsBaseCase);
+		
+//		double [][] averageUserBenefitsBaseCase = calculateAverage(normalizedUserBenefitsBaseCase, normalizedWeightsBaseCase);
+		
+//		this.sau.writeRoutput(normalizedUserBenefitsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "UserBenefits.txt");
+//		this.sau.writeRoutput(averageUserBenefitsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "UserBenefitsAverage.txt");
+//		this.sau.writeRoutput(normalizedWeightsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "NormalizedWeightsBaseCase.txt");
+	
+		
+//		if(compareToBaseCase){
+//			Scenario scenario2 = loadScenario(netFile1);
+//			MatsimPopulationReader mpr2 = new MatsimPopulationReader(scenario2);
+//			mpr2.readFile(plansFile2);
+//			
+//			Config config2 = scenario2.getConfig();
+//			Population pop2 = scenario2.getPopulation();
+//			UserBenefitsCalculator ubc2 = new UserBenefitsCalculator(config2, WelfareMeasure.LOGSUM, false);
+//			ubc2.calculateUtility_money(pop2);
+//			Map<Id, Double> personId2Utility2 = ubc2.getPersonId2MonetizedUtility();
+//			logger.info("There were " + ubc2.getPersonsWithoutValidPlanCnt() + " persons without any valid plan.");
+//			
+//			double [][] weightsPolicyCase = calculateWeights(personId2Utility2, pop2);
+//			double [][] normalizedWeightsPolicyCase = this.sau.normalizeArray(weightsPolicyCase);
+//			
+//			double [][] userBenefitsPolicyCase = fillUserBenefits(personId2Utility2, pop2);
+//			double [][] normalizedUserBenefitsPolicyCase = this.sau.normalizeArray(userBenefitsPolicyCase);
+//			"../../runs-svn/detEval/emissionInternalization/output/output_policyCase_pricing_newCode/";
+//			double [][] averageUserBenefitsPolicyCase = calculateAverage(normalizedUserBenefitsPolicyCase, normalizedWeightsPolicyCase);
+//			
+//			// calculate differences base case <-> policy case
+//			double [][] normalizedUserBenefitDifferences = calculateDifferences(normalizedUserBenefitsPolicyCase, normalizedUserBenefitsBaseCase);
+//			double [][] normalizedAverageUserBenefitDifferences = calculateDifferences(averageUserBenefitsPolicyCase, averageUserBenefitsBaseCase);
+//			// double [][] normalizedWeightsDifferences = calculateDifferences(normalizedWeightsPolicyCase, normalizedWeightsBaseCase);
+//
+//			String outputPath = outPathStub + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".Routput.";
+//			String outNormalizedDifferences;
+//			String outNormalizedAverageDifferences;
+//			if(substractAverageValue){
+//				outNormalizedDifferences = outputPath + "UserBenefitsDifferences.AverageRefund.txt";
+//				outNormalizedAverageDifferences = outputPath + "UserBenefitsAverageDifferences.AverageRefund.txt";
+//			}else{
+//				outNormalizedDifferences = outputPath + "UserBenefitsDifferences.PersonalRefund.txt";
+//				outNormalizedAverageDifferences = outputPath + "UserBenefitsAverageDifferences.PersonalRefund.txt";		
+//			}
+//			
+//			this.sau.writeRoutput(normalizedUserBenefitDifferences, outNormalizedDifferences);
+//			this.sau.writeRoutput(normalizedAverageUserBenefitDifferences, outNormalizedAverageDifferences);
+//			//	this.sau.writeRoutput(normalizedWeightsDifferences, outPathStub + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".Routput_" + "WeightsDifferences.txt"); // should be zero
+//		}
 	}
 
+private double[][] fillAmount(Map<Id, Double> personId2NoxAmount,
+			Population pop) {
+	double[][] noxAmount = new double[noOfXbins][noOfYbins];
+	for(Id personId: personId2NoxAmount.keySet()){
+		Person person = pop.getPersons().get(personId);
+		Coord homeCoord = this.lf.getHomeActivityCoord(person);
+		if (this.sau.isInResearchArea(homeCoord)){
+			int xHome = sau.getXbin(homeCoord.getX());
+			int yHome = sau.getYbin(homeCoord.getY());
+			//TODO check this
+			if(noxAmount[xHome][yHome]>0.){
+				noxAmount[xHome][yHome]+=personId2NoxAmount.get(personId);
+			}else{
+				noxAmount[xHome][yHome]=personId2NoxAmount.get(personId);
+			}
+		}
+		
+	}
+return noxAmount;
+	}
+
+private double[][] calculatePopulationDensity(Population pop) {
+			double[][] populationDensity = new double[noOfXbins][noOfYbins];
+			for(Id personId: pop.getPersons().keySet()){
+				Person person = pop.getPersons().get(personId);
+				Coord homeCoord = this.lf.getHomeActivityCoord(person);
+				if (this.sau.isInResearchArea(homeCoord)){
+					int xHome = sau.getXbin(homeCoord.getX());
+					int yHome = sau.getYbin(homeCoord.getY());
+					//TODO check this
+					if(populationDensity[xHome][yHome]>0.){
+						populationDensity[xHome][yHome]+=1.;
+					}else{
+						populationDensity[xHome][yHome]=1.;
+					}
+				}
+				
+			}
+		return populationDensity;
+	}
+
+//	private double[][] calculateDifferences(double[][] normalizedArrayPolicyCase, double[][] normalizedArrayBaseCase) {
+//		double [][] diff = new double[noOfXbins][noOfYbins];
+//		for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
+//			for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
+//				diff[xIndex][yIndex]= normalizedArrayPolicyCase[xIndex][yIndex] - normalizedArrayBaseCase[xIndex][yIndex];
+//			}
+//		}
+//		return diff;
+//	}
+
+	private double[][] calculateAverage(double[][] userBenefits, double[][] weights) {
+		double[][] average = new double [noOfXbins][noOfYbins];
+		for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
+			for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
+				if(weights[xIndex][yIndex] > 0){
+					average[xIndex][yIndex]= userBenefits[xIndex][yIndex] / weights[xIndex][yIndex];
+				} else {
+					//throw new RuntimeException("Weights for " + xIndex + "," + yIndex + "is undefined. Aborting ...");
+					average[xIndex][yIndex]=0.;
+				}
+			}
+		}
+		return average;
+	}
+
+	private double [][] calculateWeights(Map<Id, Double> personId2Utility, Population pop){
+		double[][] weights = new double[noOfXbins][noOfYbins];
+
+		for(Id personId : personId2Utility.keySet()){ 
+			Person person = pop.getPersons().get(personId);
+			Coord homeCoord = this.lf.getHomeActivityCoord(person);
+			if (this.sau.isInResearchArea(homeCoord)){
+				double personCount = 1.0;
+				// one person stands for this.scalingFactor persons
+				double scaledPersonCount = this.scalingFactor * personCount;
+				for(int xIndex = 0 ; xIndex < noOfXbins; xIndex++){
+					for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
+						Coord cellCentroid = this.sau.findCellCentroid(xIndex, yIndex);
+						double weightOfPersonForCell = this.sau.calculateWeightOfPointForCell(homeCoord.getX(), homeCoord.getY(), cellCentroid.getX(), cellCentroid.getY());
+						weights[xIndex][yIndex] += weightOfPersonForCell * scaledPersonCount;
+					}
+				}
+			}
+		}
+		return weights;
+	}
+	
+	private double [][] fillUserBenefits(Map<Id, Double> personId2Utility, Population pop){
+		double[][] scaledWeightedBenefits = new double [noOfXbins][noOfYbins];
+
+		for(Id personId : personId2Utility.keySet()){ 
+			Person person = pop.getPersons().get(personId);
+			Coord homeCoord = this.lf.getHomeActivityCoord(person);
+			if (this.sau.isInResearchArea(homeCoord)){
+				double benefitOfPerson = personId2Utility.get(personId);
+				// one person stands for this.scalingFactor persons; thus, that person earns the sum of these person's benefits (additivity required!)
+				double scaledBenefitOfPerson = this.scalingFactor * benefitOfPerson;
+
+				for(int xIndex = 0 ; xIndex < noOfXbins; xIndex++){
+					for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
+						Coord cellCentroid = this.sau.findCellCentroid(xIndex, yIndex);
+						double weightOfPersonForCell = this.sau.calculateWeightOfPointForCell(homeCoord.getX(), homeCoord.getY(), cellCentroid.getX(), cellCentroid.getY());
+						scaledWeightedBenefits[xIndex][yIndex] += weightOfPersonForCell * scaledBenefitOfPerson;
+					}
+				}
+			} else {
+				// do nothing...
+			}
+		}
+		return scaledWeightedBenefits;
+	}
+	
 	private Scenario loadScenario(String netFile) {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(netFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		return scenario;
-	}
-
-	private Double getEndTime(String configfile) {
-		Config config = ConfigUtils.createConfig();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
-		configReader.readFile(configfile);
-		Double endTime = config.qsim().getEndTime();
-		logger.info("Simulation end time is: " + endTime / 3600 + " hours.");
-		logger.info("Aggregating emissions for " + (int) (endTime / 3600 / noOfTimeBins) + " hour time bins.");
-		return endTime;
 	}
 
 	private static Integer getLastIteration(String configFile) {
