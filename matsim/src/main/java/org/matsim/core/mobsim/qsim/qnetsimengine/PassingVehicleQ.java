@@ -1,10 +1,6 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.AbstractQueue;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 final class PassingVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle> {
 
@@ -36,7 +32,11 @@ final class PassingVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<
 
 	@Override
 	public void addFirst(QVehicle previous) {
-		throw new RuntimeException();
+		// This implementation of VehicleQ does not support adding a Vehicle to the front of the Queue.
+        // At the moment, this will mean that people with one-link trips will behave differently
+        // (they will have to queue in), and transit will probably behave unplausibly (it
+        // will have to queue in each time for multiple stops on the same link). michaz 2014
+        delegate.offer(previous);
 	}
 
 	@Override

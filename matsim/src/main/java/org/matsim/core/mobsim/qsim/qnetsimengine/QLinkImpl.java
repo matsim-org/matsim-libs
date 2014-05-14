@@ -20,9 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -39,6 +36,9 @@ import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisData;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Please read the docu of QBufferItem, QLane, QLinkInternalI (arguably to be renamed
@@ -79,7 +79,6 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
 	 * @param link2
-	 * @param queueNetwork
 	 * @param toNode
 	 */
 	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode) {
@@ -118,8 +117,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 
 	/**
-	 * Adds a vehicle to the link (i.e. the "queue"), called by
-	 * {@link QNode#moveVehicleOverNode(QVehicle, QueueLane, double)}.
+	 * Adds a vehicle to the link (i.e. the "queue").
 	 *
 	 * @param veh
 	 *          the vehicle
@@ -182,10 +180,6 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 			if (veh.getDriver().chooseNextLinkId() == null) {
 				// If the driver wants to stop on this link, give them a special treatment.
 				// addFromWait doesn't work here, because after that, they cannot stop anymore.
-				// This is required by transit drivers (hence the method name) who enter this link even though it is the only link on their route.
-				// (Normal agents don't do that). 
-				// I deliberately removed the condition that this is a TransitDriver, because I don't think it can
-				// hurt to allow all vehicles the same special case if it needs to be there at all. michaz 2013-08
 				road.addTransitSlightlyUpstreamOfStop(veh) ;
 				continue;
 			}

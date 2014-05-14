@@ -23,8 +23,6 @@ package org.matsim.core.replanning.selectors;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -131,8 +129,8 @@ public class ExpBetaPlanSelector<T extends BasicPlan> implements GenericPlanSele
     /**
      * @return the probability that this expBetaPlanSelector will select this plan for this person.
      */
-	public static double getSelectionProbability(ExpBetaPlanSelector<Plan> expBetaPlanSelector, Person person, final Plan plan) {
-		Map<Plan, Double> weights = expBetaPlanSelector.calcWeights(person);
+	public static <T extends BasicPlan> double getSelectionProbability(ExpBetaPlanSelector<T> expBetaPlanSelector, HasPlansAndId<T> person, final T plan) {
+		Map<T, Double> weights = expBetaPlanSelector.calcWeights(person);
 		double thisWeight = weights.get(plan);
 
 		double sumWeights = 0.0;

@@ -19,17 +19,13 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.population.routes.NetworkRoute;
+
+import java.util.List;
 
 /**
  * Represents a vehicle.
@@ -81,7 +77,7 @@ public class Vehicle extends SimUnit {
 		 * scheduled for this person.
 		 */
 
-		if (actsLegs.size()==1){
+		if (actsLegs.size()<=1){
 			return;
 		}
 

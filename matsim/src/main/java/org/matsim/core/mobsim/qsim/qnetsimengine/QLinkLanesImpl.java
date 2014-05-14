@@ -20,16 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -48,6 +38,8 @@ import org.matsim.lanes.vis.VisLinkWLanes;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisData;
+
+import java.util.*;
 
 /**
  * Please read the docu of QBufferItem, QLane, QLinkInternalI (arguably to be renamed
@@ -141,10 +133,6 @@ public final class QLinkLanesImpl extends AbstractQLink {
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
-	 * @param link2
-	 * @param queueNetwork
-	 * @param toNode
-	 * @see NetsimLink#createLanes(List)
 	 */
 	QLinkLanesImpl(final Link link2, QNetwork network, final QNode toNode, List<ModelLane> lanes) {
 		super(link2, network) ;
@@ -213,8 +201,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 
 
 	/**
-	 * Adds a vehicle to the link, called by
-	 * {@link QNode#moveVehicleOverNode(QVehicle, QLane, double)}.
+	 * Adds a vehicle to the link.
 	 *
 	 * @param veh
 	 *          the vehicle
@@ -354,10 +341,6 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			if (veh.getDriver().chooseNextLinkId() == null) {
 				// If the driver wants to stop on this link, give them a special treatment.
 				// addFromWait doesn't work here, because after that, they cannot stop anymore.
-				// This is required by transit drivers (hence the method name) who enter this link even though it is the only link on their route.
-				// (Normal agents don't do that). 
-				// I deliberately removed the condition that this is a TransitDriver, because I don't think it can
-				// hurt to allow all vehicles the same special case if it needs to be there at all. michaz 2013-08
 				this.firstLaneQueue.addTransitSlightlyUpstreamOfStop(veh) ;
 				continue;
 			}
