@@ -227,4 +227,13 @@ public class SpatialAveragingUtils {
 		}
 		return false;
 	}
+
+	public int getXbin(double x) {
+		// TODO Auto-generated method stub
+		return this.mapXCoordToBin(x);
+	}
+	
+	public int getYbin(double y){
+		return this.mapYCoordToBin(y);
+	}
 }

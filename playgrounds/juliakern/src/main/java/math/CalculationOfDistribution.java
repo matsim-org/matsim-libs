@@ -36,7 +36,7 @@ public class CalculationOfDistribution {
 				double fy = fystart + yshift * 25;
 				//rsquared = Math.PI;
 				for(int x=1; x<161;x++){
-					for(int y=1; y<121; y++){
+					for(int y=1; y<121; y++){ 
 						double xdistance = (fx-250.*x)*(fx-250.*x);
 						double ydistance = (fy-250.*y)*(fy-250.*y);
 						double distanceSquared = xdistance + ydistance;

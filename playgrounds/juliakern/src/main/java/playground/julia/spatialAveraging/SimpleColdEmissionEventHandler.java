@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import playground.vsp.emissions.events.ColdEmissionEvent;
 import playground.vsp.emissions.events.ColdEmissionEventHandler;
 import playground.vsp.emissions.types.ColdPollutant;
+import playground.vsp.emissions.types.WarmPollutant;
 
 public class SimpleColdEmissionEventHandler implements ColdEmissionEventHandler {
 
@@ -61,6 +62,15 @@ public class SimpleColdEmissionEventHandler implements ColdEmissionEventHandler 
 
 	public Map<Id, Map<ColdPollutant, Double>> getPersonId2coldEmissions() {
 		return personId2coldEmissions;
+	}
+
+	public Map<Id, Double> getPersonId2pollutant(ColdPollutant cp) {
+			Map<Id, Double> personId2coldPollutant = new HashMap<Id, Double>();
+			for(Id personId: personId2coldEmissions.keySet()){
+				personId2coldPollutant.put(personId, personId2coldEmissions.get(personId).get(cp));
+			}
+			return personId2coldPollutant;
+		}
 	}
 
 }

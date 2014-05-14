@@ -65,4 +65,12 @@ public class SimpleWarmEmissionEventHandler implements WarmEmissionEventHandler 
 		return personId2warmEmissions;
 	}
 
+	public Map<Id, Double> getPersonId2pollutant(WarmPollutant wp) {
+		Map<Id, Double> personId2warmPollutant = new HashMap<Id, Double>();
+		for(Id personId: personId2warmEmissions.keySet()){
+			personId2warmPollutant.put(personId, personId2warmEmissions.get(personId).get(wp));
+		}
+		return personId2warmPollutant;
+	}
+
 }

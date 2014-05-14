@@ -61,14 +61,20 @@ public class MultiAnalyzerRelativeDurations {
 	private static String [] cases = {
 
 	// responsibility
-	"baseCase_ctd" ,
+//	"baseCase_ctd" ,
+//	"policyCase_zone30" ,
+//	"policyCase_pricing",
+//	"policyCase_exposurePricing"
+	
+	// internalization
+	"baseCase_ctd_newCode" ,
 	"policyCase_zone30" ,
-	"policyCase_pricing",
-	"policyCase_exposurePricing"
+	"policyCase_pricing_newCode"
 	};
 	
 	//latsis
-		private static String runDirectoryStub = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_";
+//		private static String runDirectoryStub = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_";
+		private static String runDirectoryStub = "../../runs-svn/detEval/emissionInternalization/output/output_";
 	//	private static String initialIterationNo = "1000";
 		private static String finalIterationNo = "1500";
 	
@@ -112,7 +118,7 @@ public class MultiAnalyzerRelativeDurations {
 			
 			//latsis
 			netFile = runDirectory + "output_network.xml.gz";
-			configFile = runDirectory + "output_config.xml.gz";
+			configFile = runDirectory + "output_config.xml";
 			plansFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".plans.xml.gz";
 			eventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".events.xml.gz";
 			emissionEventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".emission.events.xml.gz";
