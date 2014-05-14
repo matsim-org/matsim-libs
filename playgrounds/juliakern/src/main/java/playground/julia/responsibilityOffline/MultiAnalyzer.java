@@ -32,13 +32,11 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
@@ -49,34 +47,74 @@ import playground.benjamin.scenarios.munich.analysis.kuhmo.TravelTimePerModeEven
 import playground.benjamin.scenarios.zurich.analysis.MoneyEventHandler;
 import playground.julia.distribution.GridTools;
 import playground.julia.newInternalization.IntervalHandler;
+
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 
 /**
- * @author benjamin, julia
+ * @author benjamin
  *
  */
-public class MultiAnalyzerRelativeDurations {
-	private static final Logger logger = Logger.getLogger(MultiAnalyzerRelativeDurations.class);
+public class MultiAnalyzer {
+	private static final Logger logger = Logger.getLogger(MultiAnalyzer.class);
+
+	//mobilTUM
+//	static String runNr1 = "1";
+//	static String runNr2 = "16";
+//	static String runNr3 = "20";
 	
 	private static String [] cases = {
-
-	// responsibility
-//	"baseCase_ctd" ,
-//	"policyCase_zone30" ,
-//	"policyCase_pricing",
-//	"policyCase_exposurePricing"
 	
-	// internalization
-	"baseCase_ctd_newCode" ,
-	"policyCase_zone30" ,
-	"policyCase_pricing_newCode"
+	//nectar
+	"981",
+	"982",
+	"983",
+	"984",
+	"985",
+			
+	//mobilTUM
+//	runNr1,
+//	runNr2,
+//	runNr3
+		
+	//latsis	
+//	"baseCase_ctd_newCode" ,
+//	"policyCase_zone30" ,
+//	"policyCase_pricing_newCode",
+////	"policyCase_pricing_modeOnly",
+//	"policyCase_pricing_fuelEff_2.5pct",
+//	"policyCase_pricing_fuelEff_5pct",
+//	"policyCase_pricing_fuelEff_7.5pct",
+//	"policyCase_pricing_fuelEff_10pct",
+//	"policyCase_pricing_fuelEff_20pct"
 	};
 	
+	//nectar
+	private static String runDirectoryStub = "../../runs-svn/run";
+//	private static String initialIterationNo = "1000";
+	private static String finalIterationNo = "1500";
+	
+	//mobilTUM
+//	private static String runDirectoryStub = "../../runs-svn/detEval/mobilTUMPaper/1pct/run";
+//	private static String initialIterationNo = "1000";
+//	private static String finalIterationNo = "1500";
+	
 	//latsis
-//		private static String runDirectoryStub = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_";
-		private static String runDirectoryStub = "../../runs-svn/detEval/emissionInternalization/output/output_";
-	//	private static String initialIterationNo = "1000";
-		private static String finalIterationNo = "1500";
+//	private static String runDirectoryStub = "../../runs-svn/detEval/latsis/output/output_";
+//	private static String initialIterationNo = "1000";
+//	private static String finalIterationNo = "1500";
+		
+	private Double simulationEndTime= 30*60*60.;
+
+	private int noOfXbins = 160;
+
+	private int noOfYbins = 120;
+
+	private Double timeBinSize = 60*60.;
+
+	final double xMin = 4452550.25;
+	final double xMax = 4479483.33;
+	final double yMin = 5324955.00;
+	final double yMax = 5345696.81;	
 	
 	private static String netFile;
 	private static String configFile;
@@ -89,22 +127,8 @@ public class MultiAnalyzerRelativeDurations {
 
 	private final UserGroupUtils userGroupUtils;
 
-	private Double simulationEndTime= 30*60*60.;
 
-	private int noOfXbins = 160;
-
-	private int noOfYbins = 120;
-
-	private Double timeBinSize = 60*60.;
-
-	final double xMin = 4452550.25;
-	final double xMax = 4479483.33;
-	final double yMin = 5324955.00;
-	final double yMax = 5345696.81;
-	
-
-
-	MultiAnalyzerRelativeDurations(){
+	MultiAnalyzer(){
 		this.writer = new MultiAnalyzerWriter(runDirectoryStub + cases[0] + "/");
 		this.case2personId2carDistance = new HashMap<String, Map<Id,Double>>();
 		this.userGroupUtils = new UserGroupUtils();
@@ -116,16 +140,30 @@ public class MultiAnalyzerRelativeDurations {
 			
 			String runDirectory = runDirectoryStub + caseName + "/";
 			
-			//latsis
-			netFile = runDirectory + "output_network.xml.gz";
-			configFile = runDirectory + "output_config.xml";
-			plansFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".plans.xml.gz";
-			eventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".events.xml.gz";
-			emissionEventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".emission.events.xml.gz";
+			//mobilTUM
+			netFile = runDirectory + caseName + ".output_network.xml.gz";
+			configFile = runDirectory + caseName + ".output_config.xml.gz";
 			
-			calculateUserWelfareAndTollRevenueStatisticsByUserGroup(netFile, configFile, plansFile, eventsFile, caseName);
+//			if(caseName.equals(cases[0])){
+//				plansFile = runDirectory + "ITERS/it." + initialIterationNo + "/" + caseName + "." +  initialIterationNo + ".plans.xml.gz";
+//				eventsFile = runDirectory + "ITERS/it." + initialIterationNo + "/" + caseName + "." +  initialIterationNo + ".events.xml.gz";
+//				emissionEventsFile = runDirectory + "ITERS/it." + initialIterationNo + "/" + caseName + "." + initialIterationNo +  ".emission.events.xml.gz";
+//			} else {
+				plansFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + caseName + "." +  finalIterationNo + ".plans.xml.gz";
+				eventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + caseName + "." +  finalIterationNo + ".events.xml.gz";
+				emissionEventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + caseName + "." + finalIterationNo +  ".emission.events.xml.gz";
+//			}
+			
+			//latsis
+//			netFile = runDirectory + "output_network.xml.gz";
+//			configFile = runDirectory + "output_config.xml.gz";
+//			plansFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".plans.xml.gz";
+//			eventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".events.xml.gz";
+//			emissionEventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".emission.events.xml.gz";
+			
+//			calculateUserWelfareAndTollRevenueStatisticsByUserGroup(netFile, configFile, plansFile, eventsFile, caseName);
 			calculateDistanceTimeStatisticsByUserGroup(netFile, eventsFile, caseName);
-			calculateEmissionStatisticsByUserGroup(eventsFile, emissionEventsFile, caseName);
+//			calculateEmissionStatisticsByUserGroup(emissionEventsFile, caseName);
 			calculateExposureEmissionCostsByUserGroup(eventsFile, emissionEventsFile, caseName);
 		}
 		calculateDistanceTimeStatisticsByUserGroupDifferences(case2personId2carDistance);
@@ -185,6 +223,19 @@ public class MultiAnalyzerRelativeDurations {
 		writer.writeWelfareTollInformation(configFile, pop, personId2Toll);
 	}
 
+	private void calculateEmissionStatisticsByUserGroup(String emissionFile, String runName) {
+		EmissionsAnalyzer ema = new EmissionsAnalyzer(emissionFile);
+		ema.init(null);
+		ema.preProcessData();
+		ema.postProcessData();
+		
+		Map<Id, SortedMap<String, Double>> person2totalEmissions = ema.getPerson2totalEmissions();
+		SortedMap<UserGroup, SortedMap<String, Double>> group2totalEmissions = userGroupUtils.getEmissionsPerGroup(person2totalEmissions);
+
+		writer.setRunName(runName);
+		writer.writeEmissionInformation(group2totalEmissions);
+	}
+	
 	private void calculateExposureEmissionCostsByUserGroup(String eventsFile, String emissionEventsFile, String runName) {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(netFile);
@@ -223,19 +274,6 @@ public class MultiAnalyzerRelativeDurations {
 		writer.setRunName(runName);
 		writer.writeEmissionCostInformation(group2totalEmissionCosts);
 		
-	}
-	
-	private void calculateEmissionStatisticsByUserGroup(String eventsFile, String emissionFile, String runName) {
-		EmissionsAnalyzer ema = new EmissionsAnalyzer(emissionFile);
-		ema.init(null);
-		ema.preProcessData();
-		ema.postProcessData();
-		
-		Map<Id, SortedMap<String, Double>> person2totalEmissions = ema.getPerson2totalEmissions();
-		SortedMap<UserGroup, SortedMap<String, Double>> group2totalEmissions = userGroupUtils.getEmissionsPerGroup(person2totalEmissions);
-
-		writer.setRunName(runName);
-		writer.writeEmissionInformation(group2totalEmissions);
 	}
 
 	private void calculateDistanceTimeStatisticsByUserGroup(String netFile, String eventsFile, String runName) {
@@ -289,7 +327,7 @@ public class MultiAnalyzerRelativeDurations {
 	}
 
 	public static void main(String[] args) {
-		MultiAnalyzerRelativeDurations ma = new MultiAnalyzerRelativeDurations();
+		MultiAnalyzer ma = new MultiAnalyzer();
 		ma.run();
 	}
 }
