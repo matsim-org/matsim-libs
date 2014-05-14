@@ -27,18 +27,25 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroupUtils;
 import playground.benjamin.scenarios.zurich.analysis.MoneyEventHandler;
+
+import playground.julia.distribution.GridTools;
+import playground.julia.newInternalization.IntervalHandler;
+import playground.julia.responsibilityOffline.EmissionsAnalyzerRelativeDurations;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 
 /**
@@ -94,7 +101,18 @@ public class MultiAnalyzer {
 //	private static String initialIterationNo = "1000";
 //	private static String finalIterationNo = "1500";
 		
-		
+	private Double simulationEndTime= 30*60*60.;
+
+	private int noOfXbins = 160;
+
+	private int noOfYbins = 120;
+
+	private Double timeBinSize = 60*60.;
+
+	final double xMin = 4452550.25;
+	final double xMax = 4479483.33;
+	final double yMin = 5324955.00;
+	final double yMax = 5345696.81;	
 	
 	private static String netFile;
 	private static String configFile;
@@ -144,6 +162,7 @@ public class MultiAnalyzer {
 //			calculateUserWelfareAndTollRevenueStatisticsByUserGroup(netFile, configFile, plansFile, eventsFile, caseName);
 			calculateDistanceTimeStatisticsByUserGroup(netFile, eventsFile, caseName);
 //			calculateEmissionStatisticsByUserGroup(emissionEventsFile, caseName);
+			calculateExposureEmissionCostsByUserGroup(eventsFile, emissionEventsFile, caseName);
 		}
 		calculateDistanceTimeStatisticsByUserGroupDifferences(case2personId2carDistance);
 	}
@@ -213,6 +232,46 @@ public class MultiAnalyzer {
 
 		writer.setRunName(runName);
 		writer.writeEmissionInformation(group2totalEmissions);
+	}
+	
+	private void calculateExposureEmissionCostsByUserGroup(String eventsFile, String emissionEventsFile, String runName) {
+		Config config = ConfigUtils.createConfig();
+		config.network().setInputFile(netFile);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Network network = scenario.getNetwork();		
+		MatsimPopulationReader mpr = new MatsimPopulationReader(scenario);
+		mpr.readFile(plansFile);
+		
+		config = scenario.getConfig();
+//		Population pop = scenario.getPopulation();
+//		Controler controler=  new Controler(config);
+		
+		// map links to cells
+		GridTools gt = new GridTools(network.getLinks(), xMin, xMax, yMin, yMax);
+		Map<Id, Integer> link2xbins = gt.mapLinks2Xcells(noOfXbins);
+		Map<Id, Integer> link2ybins = gt.mapLinks2Ycells(noOfYbins);
+		
+		// calc durations
+		IntervalHandler intervalHandler = new IntervalHandler(timeBinSize, simulationEndTime, noOfXbins, noOfYbins, link2xbins, link2ybins); 
+				//new IntervalHandler(timeBinSize, simulationEndTime, noOfXbins, noOfYbins, link2xbins, link2ybins, gt, network);
+		intervalHandler.reset(0);
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		eventsManager.addHandler(intervalHandler);
+		MatsimEventsReader mer = new MatsimEventsReader(eventsManager);
+		mer.readFile(eventsFile);
+		HashMap<Double, Double[][]> durations = intervalHandler.getDuration();
+		
+		EmissionsAnalyzerRelativeDurations ema = new EmissionsAnalyzerRelativeDurations(emissionEventsFile, durations, link2xbins, link2ybins);
+		ema.init(null);
+		ema.preProcessData();
+		ema.postProcessData();
+		
+		Map<Id, SortedMap<String, Double>> person2totalEmissionCosts = ema.getPerson2totalEmissionCosts();
+		SortedMap<UserGroup, SortedMap<String, Double>> group2totalEmissionCosts = userGroupUtils.getEmissionsPerGroup(person2totalEmissionCosts);
+
+		writer.setRunName(runName);
+		writer.writeEmissionCostInformation(group2totalEmissionCosts);
+		
 	}
 
 	private void calculateDistanceTimeStatisticsByUserGroup(String netFile, String eventsFile, String runName) {
