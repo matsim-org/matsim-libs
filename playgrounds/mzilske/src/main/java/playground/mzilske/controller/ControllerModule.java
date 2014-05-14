@@ -44,6 +44,7 @@ import org.matsim.core.controler.corelisteners.*;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.StrategyManager;
@@ -74,7 +75,6 @@ import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 public class ControllerModule extends AbstractModule {
 
@@ -85,6 +85,7 @@ public class ControllerModule extends AbstractModule {
         requireBinding(ScoringFunctionFactory.class);
         Multibinder.newSetBinder(binder(), ControlerListener.class);
         MapBinder.newMapBinder(binder(), String.class, PlanStrategyFactory.class);
+        MapBinder.newMapBinder(binder(), String.class, MobsimFactory.class);
 
         bind(Controller.class).to(InjectableController.class).in(Singleton.class);
         bind(ScoreStats.class).to(ScoreStatsControlerListener.class).in(Singleton.class);

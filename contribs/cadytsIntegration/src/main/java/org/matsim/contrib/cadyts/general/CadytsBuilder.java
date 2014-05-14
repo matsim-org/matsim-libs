@@ -19,20 +19,20 @@
 
 package org.matsim.contrib.cadyts.general;
 
-import java.util.Map;
-
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import cadyts.measurements.SingleLinkMeasurement;
+import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 
-import cadyts.calibrators.analytical.AnalyticalCalibrator;
-import cadyts.measurements.SingleLinkMeasurement;
-import cadyts.measurements.SingleLinkMeasurement.TYPE;
+import java.util.Map;
 
 /**
  * @author nagel
@@ -46,7 +46,7 @@ public final class CadytsBuilder {
 	}
 
 	public static <T> AnalyticalCalibrator<T> buildCalibrator(final Config config, final Counts occupCounts, LookUp<T> lookUp ) {
-		CadytsConfigGroup cadytsConfig = (CadytsConfigGroup) config.getModule(CadytsConfigGroup.GROUP_NAME);
+		CadytsConfigGroup cadytsConfig = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
 
 		//get timeBinSize_s and validate it
 		int timeBinSize_s = cadytsConfig.getTimeBinSize();

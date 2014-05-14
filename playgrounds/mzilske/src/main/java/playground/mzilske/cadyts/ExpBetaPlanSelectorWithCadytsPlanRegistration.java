@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * CadytsScoring.java
+ *  * ExpBetaPlanSelectorWithCadytsPlanRegistration.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -26,48 +26,35 @@
 package playground.mzilske.cadyts;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
-import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
-import org.matsim.core.config.Config;
-import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
+import org.matsim.core.replanning.selectors.PlanSelector;
 
 /**
  * @author nagel
  *
  */
-public class CadytsScoring<T> implements SumScoringFunction.BasicScoring {
-	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(CadytsScoring.class);
+final class ExpBetaPlanSelectorWithCadytsPlanRegistration<T> implements PlanSelector {
 
-	private double score = 0.;
-	private PlansTranslator<T> ptPlanToPlanStep;
-	private AnalyticalCalibrator<T> matsimCalibrator;
-	private Plan plan;
-	private final double beta;
+	private final ExpBetaPlanSelector<Plan> delegate;
+    private final PlansTranslator<T> plansTranslator;
+    private final AnalyticalCalibrator<T> calibrator;
 
-    public void setWeight(double weight) {
-        this.weight = weight;
+
+    public ExpBetaPlanSelectorWithCadytsPlanRegistration(double beta, PlansTranslator<T> plansTranslator, AnalyticalCalibrator<T> calibrator) {
+        delegate = new ExpBetaPlanSelector<Plan>(beta);
+        this.plansTranslator = plansTranslator;
+        this.calibrator = calibrator;
     }
 
-    private double weight = 1.0;
-
-	public CadytsScoring(final Plan plan, Config config, PlansTranslator<T> ptPlanToPlanStep, AnalyticalCalibrator<T> matsimCalibrator) {
-		this.ptPlanToPlanStep = ptPlanToPlanStep;
-		this.matsimCalibrator = matsimCalibrator;
-		this.plan = plan;
-		this.beta = config.planCalcScore().getBrainExpBeta();
+    @Override
+	public Plan selectPlan(HasPlansAndId<Plan> person) {
+		Plan selectedPlan = delegate.selectPlan(person);
+		cadyts.demand.Plan<T> cadytsPlan = plansTranslator.getPlanSteps(selectedPlan);
+		calibrator.addToDemand(cadytsPlan);
+		return selectedPlan;
 	}
 	
-	@Override
-	public void finish() {
-		cadyts.demand.Plan<T> currentPlanSteps = this.ptPlanToPlanStep.getPlanSteps(plan);
-        this.score = this.matsimCalibrator.calcLinearPlanEffect(currentPlanSteps) / this.beta;
-	}
-
-	@Override
-	public double getScore() {
-		return weight * score;
-	}
-
 }

@@ -61,10 +61,11 @@ public class CadytsModule extends AbstractModule {
     protected void configure() {
         Multibinder <ControlerListener> controlerListenerBinder = Multibinder.newSetBinder(binder(), ControlerListener.class);
         controlerListenerBinder.addBinding().to(CadytsControlerListener.class);
-        controlerListenerBinder.addBinding().toProvider(MyControlerListenerProvider.class);
+//        controlerListenerBinder.addBinding().toProvider(MyControlerListenerProvider.class);
         MapBinder<String, PlanStrategyFactory> planStrategyFactoryBinder
                 = MapBinder.newMapBinder(binder(), String.class, PlanStrategyFactory.class);
-        planStrategyFactoryBinder.addBinding("ccc").toProvider(MyPlanStrategyFactoryProvider.class);
+        planStrategyFactoryBinder.addBinding("ccc").toProvider(PlanChangerFactoryProvider.class);
+        planStrategyFactoryBinder.addBinding("ccs").toProvider(PlanSelectorFactoryProvider.class);
         bind(new TypeLiteral<AnalyticalCalibrator<Link>>(){}).toProvider(CalibratorProvider.class).in(Singleton.class);
         bind(new TypeLiteral<PlansTranslator<Link>>(){}).to(PlanToPlanStepBasedOnEvents.class).in(Singleton.class);
     }
@@ -80,7 +81,7 @@ public class CadytsModule extends AbstractModule {
         }
     }
 
-    static class MyPlanStrategyFactoryProvider implements Provider<PlanStrategyFactory> {
+    static class PlanChangerFactoryProvider implements Provider<PlanStrategyFactory> {
         @Inject PlansTranslator<Link> plansTranslator;
         @Inject AnalyticalCalibrator<Link> calibrator;
 
@@ -90,6 +91,22 @@ public class CadytsModule extends AbstractModule {
                 @Override
                 public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager events) {
                     ExpBetaPlanChangerWithCadytsPlanRegistration<Link> planSelector = new ExpBetaPlanChangerWithCadytsPlanRegistration<Link>(1.0, plansTranslator, calibrator);
+                    return new PlanStrategyImpl(planSelector);
+                }
+            };
+        }
+    }
+
+    static class PlanSelectorFactoryProvider implements Provider<PlanStrategyFactory> {
+        @Inject PlansTranslator<Link> plansTranslator;
+        @Inject AnalyticalCalibrator<Link> calibrator;
+
+        @Override
+        public PlanStrategyFactory get() {
+            return new PlanStrategyFactory() {
+                @Override
+                public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager events) {
+                    ExpBetaPlanSelectorWithCadytsPlanRegistration<Link> planSelector = new ExpBetaPlanSelectorWithCadytsPlanRegistration<Link>(1.0, plansTranslator, calibrator);
                     return new PlanStrategyImpl(planSelector);
                 }
             };

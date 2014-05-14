@@ -26,7 +26,6 @@ import cadyts.demand.PlanBuilder;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -42,119 +41,61 @@ import org.matsim.counts.Counts;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 @Singleton
 class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler,
-		PersonDepartureEventHandler, PersonArrivalEventHandler {
-	
-	private static final Logger log = Logger.getLogger(PlanToPlanStepBasedOnEvents.class);
+        PersonDepartureEventHandler, PersonArrivalEventHandler {
 
-	private final Scenario scenario;
+    private static final Logger log = Logger.getLogger(PlanToPlanStepBasedOnEvents.class);
+
+    private final Scenario scenario;
     private Counts counts;
 
-    private final Set<Id> driverAgents;
-	
-	private int iteration = -1;
-
-	// this is _only_ there for output:
-	Set<Plan> plansEverSeen = new HashSet<Plan>();
-
-	private static final String STR_PLANSTEPFACTORY = "planStepFactory";
-	private static final String STR_ITERATION = "iteration";
-
+    private final Map<Id, PlanBuilder<Link>> driverAgents;
 
     @Inject
-	PlanToPlanStepBasedOnEvents(final Scenario scenario, @Named("calibrationCounts") Counts counts) {
-		this.scenario = scenario;
+    PlanToPlanStepBasedOnEvents(final Scenario scenario, @Named("calibrationCounts") Counts counts) {
+        this.scenario = scenario;
         this.counts = counts;
-        this.driverAgents = new HashSet<Id>();
-	}
+        this.driverAgents = new HashMap<Id, PlanBuilder<Link>>();
+        for (Person person : scenario.getPopulation().getPersons().values()) {
+            driverAgents.put(person.getId(), new PlanBuilder<Link>());
+        }
+    }
 
-	private long plansFound = 0;
-	private long plansNotFound = 0;
+    @Override
+    public final cadyts.demand.Plan<Link> getPlanSteps(final Plan plan) {
+        final cadyts.demand.Plan<Link> planSteps = driverAgents.get(plan.getPerson().getId()).getResult();
+        return planSteps;
+    }
 
-	@Override
-	public final cadyts.demand.Plan<Link> getPlanSteps(final Plan plan) {
-		PlanBuilder<Link> planStepFactory = (PlanBuilder<Link>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
-		if (planStepFactory == null) {
-			this.plansNotFound++;
-			return null;
-		}
-		this.plansFound++;
-		final cadyts.demand.Plan<Link> planSteps = planStepFactory.getResult();
-		return planSteps;
-	}
+    @Override
+    public void reset(final int iteration) {
+        this.driverAgents.clear();
+        for (Person person : scenario.getPopulation().getPersons().values()) {
+            driverAgents.put(person.getId(), new PlanBuilder<Link>());
+        }
+    }
 
-	@Override
-	public void reset(final int iteration) {
-		this.iteration = iteration;
+    @Override
+    public void handleEvent(PersonDepartureEvent event) {
 
-		log.warn("found " + this.plansFound + " out of " + (this.plansFound + this.plansNotFound) + " ("
-				+ (100. * this.plansFound / (this.plansFound + this.plansNotFound)) + "%)");
-		log.warn("(above values may both be at zero for a couple of iterations if multiple plans per agent all have no score)");
+    }
 
-		this.driverAgents.clear();
-	}
+    @Override
+    public void handleEvent(PersonArrivalEvent event) {
 
-	@Override
-	public void handleEvent(PersonDepartureEvent event) {
-		if (event.getLegMode().equals(TransportMode.car)) this.driverAgents.add(event.getPersonId());
-	}
-	
-	@Override
-	public void handleEvent(PersonArrivalEvent event) {
-		this.driverAgents.remove(event.getPersonId());
-	}
-	
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-		
-		// if it is not a driver, ignore the event
-		if (!driverAgents.contains(event.getPersonId())) return;
+    }
 
+    @Override
+    public void handleEvent(LinkLeaveEvent event) {
+        if (!driverAgents.containsKey(event.getPersonId())) return;
         if (!counts.getCounts().keySet().contains(event.getLinkId())) return;
-
-		// get the "Person" behind the id:
-		Person person = this.scenario.getPopulation().getPersons().get(event.getPersonId());
-		
-		// get the selected plan:
-		Plan selectedPlan = person.getSelectedPlan();
-		
-		// get the planStepFactory for the plan (or create one):
-		PlanBuilder<Link> tmpPlanStepFactory = getPlanStepFactoryForPlan(selectedPlan);
-		
-		if (tmpPlanStepFactory != null) {
-						
-			Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
-					
-			// add the "turn" to the planStepfactory
-			tmpPlanStepFactory.addTurn(link, (int) event.getTime());
-		}
-	}
-
-	// ###################################################################################
-	// only private functions below here (low level functionality)
-
-	private PlanBuilder<Link> getPlanStepFactoryForPlan(final Plan selectedPlan) {
-		PlanBuilder<Link> planStepFactory = null;
-
-		planStepFactory = (PlanBuilder<Link>) selectedPlan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
-		Integer factoryIteration = (Integer) selectedPlan.getCustomAttributes().get(STR_ITERATION);
-		if (planStepFactory == null || factoryIteration == null || factoryIteration != this.iteration) {
-			// attach the iteration number to the plan:
-			selectedPlan.getCustomAttributes().put(STR_ITERATION, this.iteration);
-
-			// construct a new PlanBulder and attach it to the plan:
-			planStepFactory = new PlanBuilder<Link>();
-			selectedPlan.getCustomAttributes().put(STR_PLANSTEPFACTORY, planStepFactory);
-
-			// memorize the plan as being seen:
-			this.plansEverSeen.add(selectedPlan);
-		}
-
-		return planStepFactory;
-	}
+        PlanBuilder<Link> planBuilder = driverAgents.get(event.getPersonId());
+        Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
+        planBuilder.addTurn(link, (int) event.getTime());
+    }
 
 }

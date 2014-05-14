@@ -22,7 +22,6 @@
 
 package playground.mzilske.stratum;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.*;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
@@ -30,9 +29,6 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.counts.Counts;
@@ -40,14 +36,9 @@ import playground.mzilske.cadyts.CadytsModule;
 import playground.mzilske.cdr.CallBehavior;
 import playground.mzilske.cdr.CompareMain;
 import playground.mzilske.cdr.ZoneTracker;
-import playground.mzilske.cdranalysis.StreamingOutput;
 import playground.mzilske.controller.CharyparNagelModule;
 import playground.mzilske.controller.Controller;
 import playground.mzilske.controller.ControllerModule;
-import playground.mzilske.util.IterationSummaryFileControlerListener;
-
-import java.io.IOException;
-import java.io.PrintWriter;
 
 public class Main2 {
 
@@ -105,70 +96,16 @@ public class Main2 {
 
                         bind(ScoringFunctionFactory.class).to(MyScoringFunctionFactory2.class);
 
-                        Multibinder<ControlerListener> controlerListenerBinder = Multibinder.newSetBinder(binder(), ControlerListener.class);
-                        controlerListenerBinder.addBinding().to(MetaPopulationReplanningControlerListener.class);
-                        controlerListenerBinder.addBinding().to(MetaPopulationScoringControlerListener.class);
-                        controlerListenerBinder.addBinding().toProvider(MyControlerListenerProvider.class);
+
                     }
                 },
+                new MetaPopulationModule(),
                 phoneModule
         );
 
         Controller controler2 = injector2.getInstance(Controller.class);
 
         controler2.run();
-    }
-
-    static class MyControlerListenerProvider implements javax.inject.Provider<ControlerListener> {
-
-        @javax.inject.Inject
-        OutputDirectoryHierarchy controlerIO;
-
-        @javax.inject.Inject
-        MetaPopulations metaPopulations;
-
-        @Override
-        public ControlerListener get() {
-            return new IterationSummaryFileControlerListener(controlerIO,
-                    ImmutableMap.<String, IterationSummaryFileControlerListener.Writer>of(
-                            "metapopulationplans.txt",
-                            new IterationSummaryFileControlerListener.Writer() {
-                                @Override
-                                public StreamingOutput notifyStartup(StartupEvent event) {
-                                    return new StreamingOutput() {
-                                        @Override
-                                        public void write(PrintWriter pw) throws IOException {
-                                            pw.printf("%s\t%s\t%s\t%s\n",
-                                                    "iteration",
-                                                    "metapopulation",
-                                                    "scalefactor",
-                                                    "score");
-                                        }
-                                    };
-                                }
-
-                                @Override
-                                public StreamingOutput notifyIterationEnds(final IterationEndsEvent event) {
-                                    return new StreamingOutput() {
-                                        @Override
-                                        public void write(PrintWriter pw) throws IOException {
-                                            int i=0;
-                                            for (MetaPopulation countLink : metaPopulations.getMetaPopulations()) {
-                                                for (MetaPopulationPlan plan : countLink.getPlans()) {
-                                                    pw.printf("%d\t%d\t%f\t%f\n",
-                                                            event.getIteration(),
-                                                            i,
-                                                            plan.getScaleFactor(),
-                                                            plan.getScore());
-                                                }
-                                                i++;
-                                            }
-                                        }
-                                    };
-                                }
-                            }
-                    ));
-        }
     }
 
 }

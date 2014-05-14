@@ -41,6 +41,7 @@ import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.List;
+import java.util.Map;
 
 class MobsimProvider {
 
@@ -48,6 +49,7 @@ class MobsimProvider {
     @Inject Scenario scenario;
     @Inject @Named("fullyLoadedEventsManager") EventsManager events;
     @Inject OutputDirectoryHierarchy controlerIO;
+    @Inject Map<String, MobsimFactory> mobsimFactories;
     @Inject List<MobsimListener> mobsimListeners;
     @Inject List<SnapshotWriterFactory> snapshotWriterFactories;
 
@@ -60,6 +62,9 @@ class MobsimProvider {
         } else {
             MobsimRegistrar mobsimRegistrar = new MobsimRegistrar();
             MobsimFactoryRegister mobsimFactoryRegister = mobsimRegistrar.getFactoryRegister();
+            for (Map.Entry<String, MobsimFactory> entry : mobsimFactories.entrySet()) {
+                mobsimFactoryRegister.register(entry.getKey(), entry.getValue());
+            }
             MobsimFactory mobsimFactory = mobsimFactoryRegister.getInstance(config.controler().getMobsim());
             Mobsim sim = mobsimFactory.createMobsim(scenario, events);
             if (sim instanceof ObservableMobsim) {

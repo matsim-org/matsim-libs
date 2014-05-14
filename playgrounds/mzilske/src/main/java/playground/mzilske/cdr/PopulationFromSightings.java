@@ -81,7 +81,7 @@ public class PopulationFromSightings {
     }
 
     public static void createPopulationWithEndTimesAtLastSightingsAndAdditionalInflationPopulation(Scenario scenario, LinkToZoneResolver zones, final Map<Id, List<Sighting>> sightings) {
-        int count = 1;
+        int count = 10;
         for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.entrySet()) {
             Id personId = sightingsPerPerson.getKey();
             List<Sighting> sightingsForThisPerson = sightingsPerPerson.getValue();

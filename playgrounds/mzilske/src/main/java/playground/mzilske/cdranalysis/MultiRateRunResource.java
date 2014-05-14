@@ -43,308 +43,309 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class MultiRateRunResource {
+class MultiRateRunResource {
 
-	private String WD;
+    private String WD;
 
-	private String regime;
+    private String regime;
 
-	private String alternative;
+    private String alternative;
 
-	public MultiRateRunResource(String wd, String regime, String alternative) {
-		this.WD = wd;
-		this.regime = regime;
-		this.alternative = alternative;
-	}
+    public MultiRateRunResource(String wd, String regime, String alternative) {
+        this.WD = wd;
+        this.regime = regime;
+        this.alternative = alternative;
+    }
 
-	final static int TIME_BIN_SIZE = 60*60;
-	final static int MAX_TIME = 30 * TIME_BIN_SIZE - 1;
+    final static int TIME_BIN_SIZE = 60*60;
+    final static int MAX_TIME = 30 * TIME_BIN_SIZE - 1;
 
-	public Collection<String> getRates() {
-		final List<String> RATES = new ArrayList<String>();
-		RATES.add(Integer.toString(0));
-		RATES.add(Integer.toString(2));
-		RATES.add(Integer.toString(5));
-		RATES.add(Integer.toString(10));
-		RATES.add(Integer.toString(20));
-		RATES.add(Integer.toString(30));
-		RATES.add(Integer.toString(40));
-		RATES.add(Integer.toString(50));
-		RATES.add(Integer.toString(100));
-		RATES.add(Integer.toString(150));
-		RATES.add("activity");
-		RATES.add("contbaseplans");
-		return RATES;
-	}
-	
-	private RunResource getBaseRun() {
-		return new RegimeResource(WD + "/../..", regime).getBaseRun();
-	}
+    public Collection<String> getRates() {
+        final List<String> RATES = new ArrayList<String>();
+        RATES.add(Integer.toString(0));
+        RATES.add(Integer.toString(2));
+        RATES.add(Integer.toString(5));
+        RATES.add(Integer.toString(10));
+        RATES.add(Integer.toString(20));
+        RATES.add(Integer.toString(30));
+        RATES.add(Integer.toString(40));
+        RATES.add(Integer.toString(50));
+        RATES.add(Integer.toString(100));
+        RATES.add(Integer.toString(150));
+        RATES.add("activity");
+        RATES.add("contbaseplans");
+        return RATES;
+    }
 
-	public void rate(String string) {
-		Scenario scenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
-		if (string.equals("contbaseplans")) {
-			runContinuedBasePlans(scenario);
-		} else if (string.equals("actevents")) {
-			runPhoneOnActivityStartEnd(scenario);
-		} else {
-			int rate = Integer.parseInt(string);
-			runRate(scenario, rate);
-		}
-	}
+    private RunResource getBaseRun() {
+        return new RegimeResource(WD + "/../..", regime).getBaseRun();
+    }
 
-	public void allRates() {
-		for (String rate : getRates()) {
-			rate(rate);
-		}
-	}
+    public void rate(String string) {
+        Scenario scenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
+        if (string.equals("contbaseplans")) {
+            runContinuedBasePlans(scenario);
+        } else if (string.equals("actevents")) {
+            runPhoneOnActivityStartEnd(scenario);
+        } else {
+            int rate = Integer.parseInt(string);
+            runRate(scenario, rate);
+        }
+    }
 
-	private Config phoneConfigCongested() {
-		Config config = ConfigUtils.createConfig();
-		ActivityParams sightingParam = new ActivityParams("sighting");
-		sightingParam.setScoringThisActivityAtAll(false);
-		config.planCalcScore().addActivityParams(sightingParam);
-		config.planCalcScore().setTraveling_utils_hr(-6);
-		config.planCalcScore().setWriteExperiencedPlans(true);
-		config.controler().setWritePlansInterval(1);
-		config.controler().setLastIteration(20);
-		QSimConfigGroup tmp = config.qsim();
-		tmp.setFlowCapFactor(0.02);
-		tmp.setStorageCapFactor(0.06);
-		tmp.setRemoveStuckVehicles(false);
-		tmp.setStuckTime(10.0);
-		{
-			StrategySettings stratSets = new StrategySettings(new IdImpl(1));
-			stratSets.setModuleName("ChangeExpBeta");
-			stratSets.setProbability(0.7);
-			config.strategy().addStrategySettings(stratSets);
-		}
-		{
-			StrategySettings stratSets = new StrategySettings(new IdImpl(2));
-			stratSets.setModuleName("ReRoute");
-			stratSets.setProbability(0.3);
-			config.strategy().addStrategySettings(stratSets);
-		}
-		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
-		return config;
-	}
+    public void allRates() {
+        for (String rate : getRates()) {
+            rate(rate);
+        }
+    }
 
-	private static Config phoneConfigUncongested() {
-		Config config = ConfigUtils.createConfig();
-		ActivityParams sightingParam = new ActivityParams("sighting");
-		sightingParam.setTypicalDuration(30.0 * 60);
-		config.controler().setWritePlansInterval(1);
-		config.planCalcScore().addActivityParams(sightingParam);
-		config.planCalcScore().setTraveling_utils_hr(-6);
-		config.planCalcScore().setPerforming_utils_hr(0);
-		config.planCalcScore().setTravelingOther_utils_hr(-6);
-		config.planCalcScore().setConstantCar(0);
-		config.planCalcScore().setMonetaryDistanceCostRateCar(0);
-		config.planCalcScore().setWriteExperiencedPlans(true);
-		config.controler().setLastIteration(0);
-		QSimConfigGroup tmp = config.qsim();
-		tmp.setFlowCapFactor(100);
-		tmp.setStorageCapFactor(100);
-		tmp.setRemoveStuckVehicles(false);
-		tmp.setStuckTime(10.0);
-		{
-			StrategySettings stratSets = new StrategySettings(new IdImpl(1));
-			stratSets.setModuleName("ChangeExpBeta");
-			stratSets.setProbability(0.7);
-			config.strategy().addStrategySettings(stratSets);
-		}
-		{
-			StrategySettings stratSets = new StrategySettings(new IdImpl(2));
-			stratSets.setModuleName("ReRoute");
-			stratSets.setProbability(0.3);
-			config.strategy().addStrategySettings(stratSets);
-		}
-		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
-		return config;
-	}
+    private Config phoneConfigCongested() {
+        Config config = ConfigUtils.createConfig();
+        ActivityParams sightingParam = new ActivityParams("sighting");
+        sightingParam.setScoringThisActivityAtAll(false);
+        config.planCalcScore().addActivityParams(sightingParam);
+        config.planCalcScore().setTraveling_utils_hr(-6);
+        config.planCalcScore().setWriteExperiencedPlans(true);
+        config.controler().setWritePlansInterval(1);
+        config.controler().setLastIteration(20);
+        QSimConfigGroup tmp = config.qsim();
+        tmp.setFlowCapFactor(0.02);
+        tmp.setStorageCapFactor(0.06);
+        tmp.setRemoveStuckVehicles(false);
+        tmp.setStuckTime(10.0);
+        {
+            StrategySettings stratSets = new StrategySettings(new IdImpl(1));
+            stratSets.setModuleName("ChangeExpBeta");
+            stratSets.setProbability(0.7);
+            config.strategy().addStrategySettings(stratSets);
+        }
+        {
+            StrategySettings stratSets = new StrategySettings(new IdImpl(2));
+            stratSets.setModuleName("ReRoute");
+            stratSets.setProbability(0.3);
+            config.strategy().addStrategySettings(stratSets);
+        }
+        config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
+        return config;
+    }
 
-	private void runPhoneOnActivityStartEnd(Scenario scenario) {
-		EventsManager events = EventsUtils.createEventsManager();
-		CompareMain compareMain = new CompareMain(scenario, events, new CallBehavior() {
+    private static Config phoneConfigUncongested() {
+        Config config = ConfigUtils.createConfig();
+        ActivityParams sightingParam = new ActivityParams("sighting");
+        sightingParam.setTypicalDuration(30.0 * 60);
+        config.controler().setWritePlansInterval(1);
+        config.planCalcScore().addActivityParams(sightingParam);
+        config.planCalcScore().setTraveling_utils_hr(-6);
+        config.planCalcScore().setPerforming_utils_hr(0);
+        config.planCalcScore().setTravelingOther_utils_hr(-6);
+        config.planCalcScore().setConstantCar(0);
+        config.planCalcScore().setMonetaryDistanceCostRateCar(0);
+        config.planCalcScore().setWriteExperiencedPlans(true);
+        config.controler().setLastIteration(0);
+        QSimConfigGroup tmp = config.qsim();
+        tmp.setFlowCapFactor(100);
+        tmp.setStorageCapFactor(100);
+        tmp.setRemoveStuckVehicles(false);
+        tmp.setStuckTime(10.0);
+        {
+            StrategySettings stratSets = new StrategySettings(new IdImpl(1));
+            stratSets.setModuleName("ChangeExpBeta");
+            stratSets.setProbability(0.7);
+            config.strategy().addStrategySettings(stratSets);
+        }
+        {
+            StrategySettings stratSets = new StrategySettings(new IdImpl(2));
+            stratSets.setModuleName("ReRoute");
+            stratSets.setProbability(0.3);
+            config.strategy().addStrategySettings(stratSets);
+        }
+        config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
+        return config;
+    }
 
-			@Override
-			public boolean makeACall(ActivityEndEvent event) {
-				return true;
-			}
+    private void runPhoneOnActivityStartEnd(Scenario scenario) {
+        EventsManager events = EventsUtils.createEventsManager();
+        CompareMain compareMain = new CompareMain(scenario, events, new CallBehavior() {
 
-			@Override
-			public boolean makeACall(ActivityStartEvent event) {
-				return true;
-			}
+            @Override
+            public boolean makeACall(ActivityEndEvent event) {
+                return true;
+            }
 
-			@Override
-			public boolean makeACall(Id id, double time) {
-				return false;
-			}
+            @Override
+            public boolean makeACall(ActivityStartEvent event) {
+                return true;
+            }
 
-			@Override
-			public boolean makeACallAtMorningAndNight() {
-				return true;
-			}
+            @Override
+            public boolean makeACall(Id id, double time) {
+                return false;
+            }
 
-		}, new ZoneTracker.LinkToZoneResolver() {
+            @Override
+            public boolean makeACallAtMorningAndNight() {
+                return true;
+            }
 
-			@Override
-			public Id resolveLinkToZone(Id linkId) {
-				return linkId;
-			}
+        }, new ZoneTracker.LinkToZoneResolver() {
 
-			public IdImpl chooseLinkInZone(String zoneId) {
-				return new IdImpl(zoneId);
-			}
+            @Override
+            public Id resolveLinkToZone(Id linkId) {
+                return linkId;
+            }
 
-		});
-		new MatsimEventsReader(events).readFile(getBaseRun().getLastIteration().getEventsFileName());
+            public IdImpl chooseLinkInZone(String zoneId) {
+                return new IdImpl(zoneId);
+            }
 
-		Config config = phoneConfig();
-		config.controler().setOutputDirectory(WD + "/rates/actevents");
-		compareMain.close();
-		final ScenarioImpl scenario2 = compareMain.createScenarioFromSightings(config);
-		
-		Controler controler = new Controler(scenario2);
-		controler.setOverwriteFiles(true);
-		
-		controler.setCreateGraphs(false);
-		controler.run();
-	}
+        });
+        new MatsimEventsReader(events).readFile(getBaseRun().getLastIteration().getEventsFileName());
 
-	private void runRate(final Scenario baseScenario, final int dailyRate) {
-		final RunResource run = getRateRun(Integer.toString(dailyRate)); // The run we are producing
-		EventsManager events = EventsUtils.createEventsManager();
-		CompareMain compareMain = new CompareMain(baseScenario, events, new CallBehavior() {
+        Config config = phoneConfig();
+        config.controler().setOutputDirectory(WD + "/rates/actevents");
+        compareMain.close();
+        final ScenarioImpl scenario2 = compareMain.createScenarioFromSightings(config);
 
-			@Override
-			public boolean makeACall(ActivityEndEvent event) {
-				return false;
-			}
+        Controler controler = new Controler(scenario2);
+        controler.setOverwriteFiles(true);
 
-			@Override
-			public boolean makeACall(ActivityStartEvent event) {
-				return false;
-			}
+        controler.setCreateGraphs(false);
+        controler.run();
+    }
 
-			@Override
-			public boolean makeACall(Id id, double time) {
-				double secondlyProbability = dailyRate / (double) (24*60*60);
-				return Math.random() < secondlyProbability;
-			}
+    private void runRate(final Scenario baseScenario, final int dailyRate) {
+        final RunResource run = getRateRun(Integer.toString(dailyRate)); // The run we are producing
+        EventsManager events = EventsUtils.createEventsManager();
+        final CompareMain compareMain = new CompareMain(baseScenario, events, new CallBehavior() {
 
-			@Override
-			public boolean makeACallAtMorningAndNight() {
-				return false;
-			}
+            @Override
+            public boolean makeACall(ActivityEndEvent event) {
+                return false;
+            }
 
-		}, new ZoneTracker.LinkToZoneResolver() {
+            @Override
+            public boolean makeACall(ActivityStartEvent event) {
+                return false;
+            }
 
-			@Override
-			public Id resolveLinkToZone(Id linkId) {
-				return linkId;
-			}
+            @Override
+            public boolean makeACall(Id id, double time) {
+                double secondlyProbability = dailyRate / (double) (24*60*60);
+                return Math.random() < secondlyProbability;
+            }
 
-			public IdImpl chooseLinkInZone(String zoneId) {
-				return new IdImpl(zoneId);
-			}
+            @Override
+            public boolean makeACallAtMorningAndNight() {
+                return false;
+            }
 
-		});
-		new MatsimEventsReader(events).readFile(getBaseRun().getLastIteration().getEventsFileName());
-		final Config config = phoneConfig();
-		config.controler().setOutputDirectory(WD + "/rates/" + dailyRate);
-		compareMain.close();
-		final Scenario scenario = compareMain.createScenarioFromSightings(config);
-		final double flowCapacityFactor = config.qsim().getFlowCapFactor();
-		final double storageCapacityFactor = config.qsim().getStorageCapFactor();	
-		Controler controler = new Controler(scenario);
-		controler.setOverwriteFiles(true);
-		if (alternative.equals("sense")) {
-			final double travelledKilometersBase = sum(PowerPlans.travelledDistancePerPerson(baseScenario.getPopulation(), baseScenario.getNetwork()).values());
-			controler.addControlerListener(new BeforeMobsimListener() {
-				@Override
-				public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-					if (event.getIteration() > config.controler().getFirstIteration()) {
-						Population previous = run.getIteration(event.getIteration()-1).getExperiencedPlans();
-						double distanceSum = sum(PowerPlans.travelledDistancePerPerson(previous, baseScenario.getNetwork()).values());
-						double sensedSampleSize = distanceSum / travelledKilometersBase;
-						config.qsim().setFlowCapFactor(flowCapacityFactor * sensedSampleSize);
-						config.qsim().setStorageCapFactor(storageCapacityFactor * sensedSampleSize);
-					}
-					final String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "config.xml.gz");
-					new ConfigWriter(config).write(filename);
-				}
-			});
-		}
+        }, new ZoneTracker.LinkToZoneResolver() {
 
-		controler.setCreateGraphs(false);
-		controler.run();
-	}
+            @Override
+            public Id resolveLinkToZone(Id linkId) {
+                return linkId;
+            }
 
-	private Config phoneConfig() {
-		if (regime.equals("congested")) {
-			return phoneConfigCongested();
-		} else if (regime.equals("uncongested")) {
-			return phoneConfigUncongested();
-		}
-		throw new RuntimeException("Unknown regime");
-	}
+            public IdImpl chooseLinkInZone(String zoneId) {
+                return new IdImpl(zoneId);
+            }
 
-	private void runContinuedBasePlans(Scenario baseScenario) {
-		Config config = phoneConfig();
-		for (ActivityParams params : baseScenario.getConfig().planCalcScore().getActivityParams()) {
-			ActivityParams zero = new ActivityParams(params.getType());
-			zero.setScoringThisActivityAtAll(false);
-			config.planCalcScore().addActivityParams(zero);
-		}
-		config.controler().setOutputDirectory(WD + "/rates/contbaseplans");
+        });
+        new MatsimEventsReader(events).readFile(getBaseRun().getLastIteration().getEventsFileName());
+        final Config config = phoneConfig();
+        config.controler().setOutputDirectory(WD + "/rates/" + dailyRate);
+        compareMain.close();
+        final Scenario scenario = compareMain.createScenarioFromSightings(config);
+        final double flowCapacityFactor = config.qsim().getFlowCapFactor();
+        final double storageCapacityFactor = config.qsim().getStorageCapFactor();
+        Controler controler = new Controler(scenario);
+        controler.setOverwriteFiles(true);
+        if (alternative.equals("sense")) {
+            final double travelledKilometersBase = sum(PowerPlans.travelledDistancePerPerson(baseScenario.getPopulation(), baseScenario.getNetwork()).values());
+            controler.addControlerListener(new BeforeMobsimListener() {
+                @Override
+                public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+                    if (event.getIteration() > config.controler().getFirstIteration()) {
+                        Population previous = run.getIteration(event.getIteration() - 1).getExperiencedPlans();
+                        double distanceSum = sum(PowerPlans.travelledDistancePerPerson(previous, baseScenario.getNetwork()).values());
+                        double sensedSampleSize = distanceSum / travelledKilometersBase;
+                        config.qsim().setFlowCapFactor(flowCapacityFactor * sensedSampleSize);
+                        config.qsim().setStorageCapFactor(storageCapacityFactor * sensedSampleSize);
+                    }
+                    final String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "config.xml.gz");
+                    new ConfigWriter(config).write(filename);
+                }
+            });
+        }
 
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		((ScenarioImpl) scenario).setNetwork(baseScenario.getNetwork());
+        controler.setCreateGraphs(false);
+        controler.run();
 
-		for (Person basePerson : baseScenario.getPopulation().getPersons().values()) {
-			Person person = scenario.getPopulation().getFactory().createPerson(basePerson.getId());
-			PlanImpl planImpl = (PlanImpl) scenario.getPopulation().getFactory().createPlan();
-			planImpl.copyFrom(basePerson.getSelectedPlan());
-			person.addPlan(planImpl);
-			scenario.getPopulation().addPerson(person);
-		}
+    }
 
-		Controler controler = new Controler(scenario);
-		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
-		controler.run();
-	}
+    private Config phoneConfig() {
+        if (regime.equals("congested")) {
+            return phoneConfigCongested();
+        } else if (regime.equals("uncongested")) {
+            return phoneConfigUncongested();
+        }
+        throw new RuntimeException("Unknown regime");
+    }
+
+    private void runContinuedBasePlans(Scenario baseScenario) {
+        Config config = phoneConfig();
+        for (ActivityParams params : baseScenario.getConfig().planCalcScore().getActivityParams()) {
+            ActivityParams zero = new ActivityParams(params.getType());
+            zero.setScoringThisActivityAtAll(false);
+            config.planCalcScore().addActivityParams(zero);
+        }
+        config.controler().setOutputDirectory(WD + "/rates/contbaseplans");
+
+        Scenario scenario = ScenarioUtils.createScenario(config);
+        ((ScenarioImpl) scenario).setNetwork(baseScenario.getNetwork());
+
+        for (Person basePerson : baseScenario.getPopulation().getPersons().values()) {
+            Person person = scenario.getPopulation().getFactory().createPerson(basePerson.getId());
+            PlanImpl planImpl = (PlanImpl) scenario.getPopulation().getFactory().createPlan();
+            planImpl.copyFrom(basePerson.getSelectedPlan());
+            person.addPlan(planImpl);
+            scenario.getPopulation().addPerson(person);
+        }
+
+        Controler controler = new Controler(scenario);
+        controler.setOverwriteFiles(true);
+        controler.setCreateGraphs(false);
+        controler.run();
+    }
 
     // TODO: Why does the volumeanalyzer measure something different from the routesums?
-	public void distances() {
-		final String filename = WD + "/distances.txt";
-		final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
-		EventsManager events = EventsUtils.createEventsManager();
-		VolumesAnalyzer baseVolumes = new VolumesAnalyzer(TIME_BIN_SIZE, MAX_TIME, baseScenario.getNetwork());
-		events.addHandler(baseVolumes);
-		new MatsimEventsReader(events).readFile(getBaseRun().getLastIteration().getEventsFileName());
-		final double baseSum = PowerPlans.drivenKilometersWholeDay(baseScenario, baseVolumes);
-		FileIO.writeToFile(filename, new StreamingOutput() {
-			@Override
-			public void write(PrintWriter pw) throws IOException {
-				pw.printf("callrate\troutesum\tvolumesum\tvolumesumdiff\n");
-				for (String rate : getRates()) {
-					final IterationResource lastIteration = getRateRun(rate).getLastIteration();
-					Scenario scenario = lastIteration.getExperiencedPlansAndNetwork();
-				    double km = sum(PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), baseScenario.getNetwork()).values());
-					EventsManager events1 = EventsUtils.createEventsManager();
-					VolumesAnalyzer volumes = new VolumesAnalyzer(TIME_BIN_SIZE, MAX_TIME, baseScenario.getNetwork());
-					events1.addHandler(volumes);
-					new MatsimEventsReader(events1).readFile(lastIteration.getEventsFileName());
-					double sum = PowerPlans.drivenKilometersWholeDay(baseScenario, volumes);
-					pw.printf("%s\t%f\t%f\t%f\n", rate, km, sum, baseSum - sum);
-					pw.flush();
-				}
-			}
-		});
-	}
+    public void distances() {
+        final String filename = WD + "/distances.txt";
+        final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
+        EventsManager events = EventsUtils.createEventsManager();
+        VolumesAnalyzer baseVolumes = new VolumesAnalyzer(TIME_BIN_SIZE, MAX_TIME, baseScenario.getNetwork());
+        events.addHandler(baseVolumes);
+        new MatsimEventsReader(events).readFile(getBaseRun().getLastIteration().getEventsFileName());
+        final double baseSum = PowerPlans.drivenKilometersWholeDay(baseScenario, baseVolumes);
+        FileIO.writeToFile(filename, new StreamingOutput() {
+            @Override
+            public void write(PrintWriter pw) throws IOException {
+                pw.printf("callrate\troutesum\tvolumesum\tvolumesumdiff\n");
+                for (String rate : getRates()) {
+                    final IterationResource lastIteration = getRateRun(rate).getLastIteration();
+                    Scenario scenario = lastIteration.getExperiencedPlansAndNetwork();
+                    double km = sum(PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), baseScenario.getNetwork()).values());
+                    EventsManager events1 = EventsUtils.createEventsManager();
+                    VolumesAnalyzer volumes = new VolumesAnalyzer(TIME_BIN_SIZE, MAX_TIME, baseScenario.getNetwork());
+                    events1.addHandler(volumes);
+                    new MatsimEventsReader(events1).readFile(lastIteration.getEventsFileName());
+                    double sum = PowerPlans.drivenKilometersWholeDay(baseScenario, volumes);
+                    pw.printf("%s\t%f\t%f\t%f\n", rate, km, sum, baseSum - sum);
+                    pw.flush();
+                }
+            }
+        });
+    }
 
     public void distances2() {
         final String filename = WD + "/distances2.txt";
@@ -368,127 +369,127 @@ public class MultiRateRunResource {
         });
     }
 
-	public RunResource getRateRun(String rate) {
-		return new RunResource(WD + "/rates/" + rate, null); 
-	}
+    public RunResource getRateRun(String rate) {
+        return new RunResource(WD + "/rates/" + rate, null);
+    }
 
-	public void personKilometers() {
-		final String filename = WD + "/person-kilometers.txt";
-		final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
-		FileIO.writeToFile(filename, new StreamingOutput() {
-			@Override
-			public void write(PrintWriter pw) throws IOException {
-				final Map<Id, Double> distancePerPersonBase = PowerPlans.travelledDistancePerPerson(baseScenario.getPopulation(), baseScenario.getNetwork());
-				pw.printf("regime\trate\tperson\tkilometers-base\tkilometers\n");
-				for (String rate : getRates()) {
-					Scenario scenario = getRateRun(rate).getLastIteration().getExperiencedPlansAndNetwork();
-					final Map<Id, Double> distancePerPerson = PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), scenario.getNetwork());
-					for (Person person : baseScenario.getPopulation().getPersons().values()) {
-						pw.printf("%s\t%s\t%s\t%f\t%f\n", 
-								regime, rate, person.getId().toString(), 
-								zeroForNull(distancePerPersonBase.get(person.getId())),
-								zeroForNull(distancePerPerson.get(person.getId())));
-					}
-					pw.flush();
-				}
-			} 
-		});
-	}
+    public void personKilometers() {
+        final String filename = WD + "/person-kilometers.txt";
+        final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
+        FileIO.writeToFile(filename, new StreamingOutput() {
+            @Override
+            public void write(PrintWriter pw) throws IOException {
+                final Map<Id, Double> distancePerPersonBase = PowerPlans.travelledDistancePerPerson(baseScenario.getPopulation(), baseScenario.getNetwork());
+                pw.printf("regime\trate\tperson\tkilometers-base\tkilometers\n");
+                for (String rate : getRates()) {
+                    Scenario scenario = getRateRun(rate).getLastIteration().getExperiencedPlansAndNetwork();
+                    final Map<Id, Double> distancePerPerson = PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), scenario.getNetwork());
+                    for (Person person : baseScenario.getPopulation().getPersons().values()) {
+                        pw.printf("%s\t%s\t%s\t%f\t%f\n",
+                                regime, rate, person.getId().toString(),
+                                zeroForNull(distancePerPersonBase.get(person.getId())),
+                                zeroForNull(distancePerPerson.get(person.getId())));
+                    }
+                    pw.flush();
+                }
+            }
+        });
+    }
 
-	public void detourFactor() {
-		final String filename = WD + "/detour-factor.txt";	
-		final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
-		final double travelledBase = sum(PowerPlans.travelledDistancePerPerson(baseScenario.getPopulation(), baseScenario.getNetwork()).values());
-		FileIO.writeToFile(filename, new StreamingOutput() {
-			@Override
-			public void write(PrintWriter pw) throws IOException {	
-				for (String rate : getRates()) {
-					Scenario scenario = getRateRun(rate).getLastIteration().getExperiencedPlansAndNetwork();
-					TripRouter tripRouter = new TripRouterFactoryImpl(
-							scenario.getConfig(), 
-							scenario.getNetwork(), 
-							new OnlyTimeDependentTravelDisutilityFactory(), 
-							new FreeSpeedTravelTime(), 
-							new DijkstraFactory(), 
-							scenario.getPopulation().getFactory(), 
-							new ModeRouteFactory(), 
-							null, null)
-					.instantiateAndConfigureTripRouter();
-					double travelled = sum(PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), scenario.getNetwork()).values());
-					double freespeedDistances = 0.0;
-					for (Person person : scenario.getPopulation().getPersons().values()) {
-						double freespeedDistance = PowerPlans.distance(scenario.getNetwork(), tripRouter, person.getSelectedPlan().getPlanElements());
-						freespeedDistances += freespeedDistance;
-					}		
-					double detourFactor = travelled / freespeedDistances;
-					double reconstructionWithoutDetours = freespeedDistances / travelledBase;
-					pw.printf("%s\t%s\t%f\t%f\t%f\t%f\n",
-							regime, rate, travelled, freespeedDistances, detourFactor, reconstructionWithoutDetours);
-					pw.flush();
-				}	
-			}
-		});
-	}
-
-
-	private double sum(Collection<Double> values) {
-		double result = 0.0;
-		for (double summand : values) {
-			result += summand;
-		}
-		return result;
-	}
+    public void detourFactor() {
+        final String filename = WD + "/detour-factor.txt";
+        final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
+        final double travelledBase = sum(PowerPlans.travelledDistancePerPerson(baseScenario.getPopulation(), baseScenario.getNetwork()).values());
+        FileIO.writeToFile(filename, new StreamingOutput() {
+            @Override
+            public void write(PrintWriter pw) throws IOException {
+                for (String rate : getRates()) {
+                    Scenario scenario = getRateRun(rate).getLastIteration().getExperiencedPlansAndNetwork();
+                    TripRouter tripRouter = new TripRouterFactoryImpl(
+                            scenario.getConfig(),
+                            scenario.getNetwork(),
+                            new OnlyTimeDependentTravelDisutilityFactory(),
+                            new FreeSpeedTravelTime(),
+                            new DijkstraFactory(),
+                            scenario.getPopulation().getFactory(),
+                            new ModeRouteFactory(),
+                            null, null)
+                            .instantiateAndConfigureTripRouter();
+                    double travelled = sum(PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), scenario.getNetwork()).values());
+                    double freespeedDistances = 0.0;
+                    for (Person person : scenario.getPopulation().getPersons().values()) {
+                        double freespeedDistance = PowerPlans.distance(scenario.getNetwork(), tripRouter, person.getSelectedPlan().getPlanElements());
+                        freespeedDistances += freespeedDistance;
+                    }
+                    double detourFactor = travelled / freespeedDistances;
+                    double reconstructionWithoutDetours = freespeedDistances / travelledBase;
+                    pw.printf("%s\t%s\t%f\t%f\t%f\t%f\n",
+                            regime, rate, travelled, freespeedDistances, detourFactor, reconstructionWithoutDetours);
+                    pw.flush();
+                }
+            }
+        });
+    }
 
 
+    private double sum(Collection<Double> values) {
+        double result = 0.0;
+        for (double summand : values) {
+            result += summand;
+        }
+        return result;
+    }
 
-	public void permutations() {
-		File file = new File(WD + "/permutations.txt");
-		Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
-		PowerPlans.writePermutations(baseScenario, file);
-	}
 
-	private static Double zeroForNull(Double maybeDouble) {
-		if (maybeDouble == null) {
-			return 0.0;
-		}
-		return maybeDouble;
-	}
 
-	public void putPersonKilometers(final BufferedReader personKilometers) {
-		final String filename = WD + "/person-kilometers.txt";
-		FileIO.writeToFile(filename, new StreamingOutput() {
-			@Override
-			public void write(final PrintWriter pw) throws IOException {
-				FileIO.readFromInput(personKilometers, new Reading() {
-					@Override
-					public void read(BufferedReader br) throws IOException {
-						String line = br.readLine();
-						while (br != null) {
-							pw.println(line);
-						}
-					}	
-				});
-			}	
-		});
-	}
+    public void permutations() {
+        File file = new File(WD + "/permutations.txt");
+        Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
+        PowerPlans.writePermutations(baseScenario, file);
+    }
 
-	public StreamingOutput getPersonKilometers() {
-		final String filename = WD + "/person-kilometers.txt";
-		return new StreamingOutput() {
-			@Override
-			public void write(final PrintWriter pw) throws IOException {
-				FileIO.readFromFile(filename, new Reading() {
-					@Override
-					public void read(BufferedReader br) throws IOException {
-						String line = br.readLine();
-						while (line != null) {
-							pw.println(line);
-							line = br.readLine();
-						}
-					}
-				});
-			}
-		};
-	}
+    private static Double zeroForNull(Double maybeDouble) {
+        if (maybeDouble == null) {
+            return 0.0;
+        }
+        return maybeDouble;
+    }
+
+    public void putPersonKilometers(final BufferedReader personKilometers) {
+        final String filename = WD + "/person-kilometers.txt";
+        FileIO.writeToFile(filename, new StreamingOutput() {
+            @Override
+            public void write(final PrintWriter pw) throws IOException {
+                FileIO.readFromInput(personKilometers, new Reading() {
+                    @Override
+                    public void read(BufferedReader br) throws IOException {
+                        String line = br.readLine();
+                        while (br != null) {
+                            pw.println(line);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public StreamingOutput getPersonKilometers() {
+        final String filename = WD + "/person-kilometers.txt";
+        return new StreamingOutput() {
+            @Override
+            public void write(final PrintWriter pw) throws IOException {
+                FileIO.readFromFile(filename, new Reading() {
+                    @Override
+                    public void read(BufferedReader br) throws IOException {
+                        String line = br.readLine();
+                        while (line != null) {
+                            pw.println(line);
+                            line = br.readLine();
+                        }
+                    }
+                });
+            }
+        };
+    }
 
 }

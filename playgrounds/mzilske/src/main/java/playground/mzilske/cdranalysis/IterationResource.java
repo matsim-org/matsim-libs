@@ -67,4 +67,11 @@ public class IterationResource {
 		return scenario.getPopulation();
 	}
 
+    public Population getPlans() {
+        final Config config = ConfigUtils.createConfig();
+        final Scenario scenario = ScenarioUtils.createScenario(config);
+        new PopulationReaderMatsimV5(scenario).readFile(wd + "/" + iterationPrefix() + "plans.xml.gz");
+        return scenario.getPopulation();
+    }
+
 }

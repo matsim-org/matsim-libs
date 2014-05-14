@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * MetaPopulationScoringControlerListener.java
+ *  * PersonExperienceListenerFactory.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,29 +20,13 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.stratum;
+package org.matsim.core.scoring;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.listener.ScoringListener;
+import org.matsim.core.api.internal.MatsimFactory;
 
-import javax.inject.Inject;
+interface PersonExperienceListenerProvider extends MatsimFactory {
 
-class MetaPopulationScoringControlerListener implements ScoringListener {
-
-    @Inject
-    MetaPopulations metaPopulations;
-
-    @Override
-    public void notifyScoring(ScoringEvent event) {
-        for (MetaPopulation metaPopulation : metaPopulations.getMetaPopulations()) {
-            double score = 0.0;
-            for (Person person : metaPopulation.getPersons()) {
-                score += person.getSelectedPlan().getScore();
-            }
-            MetaPopulationPlan plan = metaPopulation.getSelectedPlan();
-            plan.setScore(score / metaPopulation.getPersons().size());
-        }
-    }
+    PersonExperienceListener provideFor(Person person);
 
 }

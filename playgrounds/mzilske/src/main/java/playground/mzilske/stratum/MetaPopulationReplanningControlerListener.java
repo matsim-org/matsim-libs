@@ -25,8 +25,12 @@ package playground.mzilske.stratum;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
@@ -47,26 +51,38 @@ class MetaPopulationReplanningControlerListener implements ReplanningListener {
         this.metaPopulations = metaPopulations;
         this.scenario = scenario;
         this.strategyManager = new GenericStrategyManager<MetaPopulationPlan>();
-        this.strategyManager.setMaxPlansPerAgent(1);
-        GenericPlanStrategyImpl<MetaPopulationPlan> select = new GenericPlanStrategyImpl<MetaPopulationPlan>(new ExpBetaPlanSelector<MetaPopulationPlan>(0.01));
+        this.strategyManager.setMaxPlansPerAgent(5);
+        final ExpBetaPlanSelector<MetaPopulationPlan> metaPopulationPlanExpBetaPlanSelector = new ExpBetaPlanSelector<MetaPopulationPlan>(1.0);
+        GenericPlanStrategyImpl<MetaPopulationPlan> select = new GenericPlanStrategyImpl<MetaPopulationPlan>(metaPopulationPlanExpBetaPlanSelector);
         this.strategyManager.addStrategy(select, null, 0.5);
         GenericPlanStrategy<MetaPopulationPlan> replan = new GenericPlanStrategy<MetaPopulationPlan>() {
+            ReplanningContext replanningContext;
+
             @Override
             public void run(HasPlansAndId<MetaPopulationPlan> metaPopulation) {
                 MetaPopulationPlan selectedPlan = metaPopulation.getSelectedPlan();
-                double newScaleFactor = selectedPlan.getScaleFactor() + 0.1 * selectedPlan.getScore();
-                if (newScaleFactor > selectedPlan.getScaleFactor() * 1.01) {
-                    newScaleFactor = selectedPlan.getScaleFactor() * 1.01;
-                } else if (newScaleFactor < selectedPlan.getScaleFactor() * 0.99) {
-                    newScaleFactor = selectedPlan.getScaleFactor() * 0.99;
+                Person person = new PersonImpl(new IdImpl("wurst"));
+                PlanImpl p0 = new PlanImpl();
+                p0.setScore(0.0);
+                person.addPlan(p0);
+                PlanImpl p1 = new PlanImpl();
+                p1.setScore(selectedPlan.getScore());
+                person.addPlan(p1);
+
+                double newScaleFactor = selectedPlan.getScaleFactor() * (ExpBetaPlanSelector.getSelectionProbability(new ExpBetaPlanSelector<Plan>(1.0), person, p1) / 0.5);
+                if (replanningContext.getIteration() < 25) {
+                    newScaleFactor += Math.random() * 0.1 - 0.05;
                 }
+
                 MetaPopulationPlan newPlan = new MetaPopulationPlan(newScaleFactor);
                 metaPopulation.addPlan(newPlan);
                 metaPopulation.setSelectedPlan(newPlan);
             }
 
             @Override
-            public void init(ReplanningContext replanningContext) {}
+            public void init(ReplanningContext replanningContext) {
+                this.replanningContext = replanningContext;
+            }
 
             @Override
             public void finish() {}

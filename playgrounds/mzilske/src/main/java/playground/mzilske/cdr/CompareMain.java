@@ -421,13 +421,17 @@ public class CompareMain {
 	}
 	
 	public static int[] getVolumesForLink(VolumesAnalyzer volumesAnalyzer1, Link link) {
-		int maxSlotIndex = (MAX_TIME / TIME_BIN_SIZE) + 1;
-		int[] maybeVolumes = volumesAnalyzer1.getVolumesForLink(link.getId());
-		if(maybeVolumes == null) {
-			return new int[maxSlotIndex + 1];
-		}
-		return maybeVolumes;
+		return getVolumesForLink(volumesAnalyzer1, link.getId());
 	}
+
+    public static int[] getVolumesForLink(VolumesAnalyzer volumesAnalyzer1, Id linkId) {
+        int maxSlotIndex = (MAX_TIME / TIME_BIN_SIZE) + 1;
+        int[] maybeVolumes = volumesAnalyzer1.getVolumesForLink(linkId);
+        if(maybeVolumes == null) {
+            return new int[maxSlotIndex + 1];
+        }
+        return maybeVolumes;
+    }
 
 	public static VolumesAnalyzer calculateVolumes(Network network, String eventsFilename) {
 		VolumesAnalyzer volumesAnalyzer = new VolumesAnalyzer(TIME_BIN_SIZE, MAX_TIME, network);

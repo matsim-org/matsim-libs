@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * MetaPopulationScoringControlerListener.java
+ *  * CountWokers.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,29 +20,36 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.stratum;
+package playground.mzilske.populationsize;
 
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.listener.ScoringListener;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 
-import javax.inject.Inject;
+public class CountWorkers {
 
-class MetaPopulationScoringControlerListener implements ScoringListener {
-
-    @Inject
-    MetaPopulations metaPopulations;
-
-    @Override
-    public void notifyScoring(ScoringEvent event) {
-        for (MetaPopulation metaPopulation : metaPopulations.getMetaPopulations()) {
-            double score = 0.0;
-            for (Person person : metaPopulation.getPersons()) {
-                score += person.getSelectedPlan().getScore();
-            }
-            MetaPopulationPlan plan = metaPopulation.getSelectedPlan();
-            plan.setScore(score / metaPopulation.getPersons().size());
+    public static void main(String[] args) {
+        final ExperimentResource experiment = new ExperimentResource("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/");
+        final RegimeResource uncongested = experiment.getRegime("uncongested");
+        RunResource baseRun = uncongested.getBaseRun();
+        Population population = baseRun.getOutputScenario().getPopulation();
+        int nWorkers = 0;
+        for (Person person : population.getPersons().values()) {
+            if (isWorker(person)) nWorkers++;
         }
+        System.out.printf("Workers: %d, non-workers: %d", nWorkers, population.getPersons().size() - nWorkers);
+    }
+
+    static boolean isWorker(Person person) {
+        for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+            if (pe instanceof Activity) {
+                if (((Activity) pe).getType().equals("work")) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

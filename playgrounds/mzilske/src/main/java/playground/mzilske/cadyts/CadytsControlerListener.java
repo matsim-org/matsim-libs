@@ -30,13 +30,18 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.cadyts.general.*;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.counts.Counts;
@@ -44,16 +49,13 @@ import org.matsim.counts.Counts;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.io.IOException;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * {@link org.matsim.core.replanning.PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to
  * select plans that better match to given occupancy counts.
  */
 @Singleton
-class CadytsControlerListener implements StartupListener, IterationEndsListener {
+class CadytsControlerListener implements StartupListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
 
 	private final static Logger log = Logger.getLogger(CadytsControlerListener.class);
 
@@ -86,13 +88,9 @@ class CadytsControlerListener implements StartupListener, IterationEndsListener 
         this.volumesAnalyzer = volumesAnalyzer;
         this.calibrator = calibrator;
         this.countsScaleFactor = config.counts().getCountsScaleFactor();
-		
 		this.cadytsConfig = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
 		cadytsConfig.setWriteAnalysisFile(true);
-		
 		this.counts = counts;
-
-		
 		this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
 	}
 	
@@ -100,6 +98,21 @@ class CadytsControlerListener implements StartupListener, IterationEndsListener 
 	public void notifyStartup(StartupEvent event) {
 		eventsManager.addHandler(ptStep);
 	}
+
+    @Override
+    public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+
+    }
+
+    @Override
+    public void notifyAfterMobsim(AfterMobsimEvent event) {
+        if (event.getIteration() > 1) {
+            for (Person person : scenario.getPopulation().getPersons().values()) {
+                this.calibrator.addToDemand(ptStep.getPlanSteps(person.getSelectedPlan()));
+            }
+            this.calibrator.afterNetworkLoading(new SimResultsContainerImpl(volumesAnalyzer, this.countsScaleFactor));
+        }
+    }
 	
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
@@ -110,15 +123,13 @@ class CadytsControlerListener implements StartupListener, IterationEndsListener 
 			}
 			this.calibrator.setFlowAnalysisFile(analysisFilepath);
 		}
-
-		this.calibrator.afterNetworkLoading(new SimResultsContainerImpl(volumesAnalyzer, this.countsScaleFactor));
 	}
 
 	private boolean isActiveInThisIteration(final int iter) {
 		return (iter > 0 && iter % scenario.getConfig().counts().getWriteCountsInterval() == 0);
 	}
 
-	static class SimResultsContainerImpl implements SimResults<Link> {
+    static class SimResultsContainerImpl implements SimResults<Link> {
 		private static final long serialVersionUID = 1L;
 		private final VolumesAnalyzer volumesAnalyzer;
 		private final double countsScaleFactor;

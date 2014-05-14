@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * MetaPopulationScoringControlerListener.java
+ *  * MetaPopulationModule.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -22,27 +22,16 @@
 
 package playground.mzilske.stratum;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.listener.ScoringListener;
+import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.Multibinder;
+import org.matsim.core.controler.listener.ControlerListener;
 
-import javax.inject.Inject;
-
-class MetaPopulationScoringControlerListener implements ScoringListener {
-
-    @Inject
-    MetaPopulations metaPopulations;
-
+public class MetaPopulationModule extends AbstractModule {
     @Override
-    public void notifyScoring(ScoringEvent event) {
-        for (MetaPopulation metaPopulation : metaPopulations.getMetaPopulations()) {
-            double score = 0.0;
-            for (Person person : metaPopulation.getPersons()) {
-                score += person.getSelectedPlan().getScore();
-            }
-            MetaPopulationPlan plan = metaPopulation.getSelectedPlan();
-            plan.setScore(score / metaPopulation.getPersons().size());
-        }
+    protected void configure() {
+        Multibinder<ControlerListener> controlerListenerBinder = Multibinder.newSetBinder(binder(), ControlerListener.class);
+        controlerListenerBinder.addBinding().to(MetaPopulationReplanningControlerListener.class);
+        controlerListenerBinder.addBinding().to(MetaPopulationScoringControlerListener.class);
+        controlerListenerBinder.addBinding().toProvider(MetaPopulationStatsControlerListenerProvider.class);
     }
-
 }

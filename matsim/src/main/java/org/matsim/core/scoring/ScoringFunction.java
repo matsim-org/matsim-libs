@@ -20,11 +20,6 @@
 
 package org.matsim.core.scoring;
 
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.PersonMoneyEvent;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-
 /**
  * A scoring function calculates the score for one plan of an agent.  The score
  * usually depends on how much time an agent is traveling and how much time an
@@ -35,52 +30,8 @@ import org.matsim.api.core.v01.population.Leg;
  *
  * @author mrieser
  */
-public interface ScoringFunction {
+public interface ScoringFunction extends PersonExperienceListener {
 
-	/**
-	 * Tells the scoring function about an Activity. The Activity which
-	 * the agent is in when the simulation starts will have a startTime
-	 * of Time.UNDEFINED_TIME. The Activity which the agent is in when
-	 * the simulation ends will have an endTime of Time.UNDEFINED_TIME.
-	 * It is up to the implementation what to make of this, 
-	 * especially to "wrap" it "around".
-	 * @param activity
-	 */
-    public void handleActivity(Activity activity);
-
-    /**
-     * Tells the scoring function about a Leg. Will contain complete route
-     * information for network routes (as you would expect in a Plan), but
-     * only a GenericRoute for everything else, especially transit.
-     */
-    public void handleLeg(Leg leg);
-
-	/**
-	 * Tells the scoring function that the agent got stuck in the simulation and
-	 * is removed from the simulation. This should usually lead to a high penalty
-	 * in the score, as the agent was not able to perform its plan as wanted.
-	 * An agent can get stuck while performing an activity or while driving.
-	 *
-	 * @param time The time at which the agent got stuck and was removed from the
-	 * simulation.
-	 */
-	public void agentStuck(final double time);
-
-	/**
-	 * Adds the specified amount of utility to the agent's score. This is mostly
-	 * used for handling {@link PersonMoneyEvent}s, allowing other parts of the
-	 * code to influence an agent's score.
-	 *
-	 * @param amount amount to be added to the agent's score
-	 */
-	public void addMoney(final double amount);
-
-	/**
-	 * Tells the scoring function that no more information will be given to it
-	 * and that the final score should be calculated.  But the score must <b>not</b>
-	 * be written to the plan!
-	 */
-	public void finish();
 
 	/**
 	 * Returns the score for this plan.
@@ -89,6 +40,5 @@ public interface ScoringFunction {
 	 */
 	public double getScore();
 
-	public void handleEvent( Event event ) ;
 
 }

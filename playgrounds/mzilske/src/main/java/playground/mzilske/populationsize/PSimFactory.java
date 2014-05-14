@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * MetaPopulationScoringControlerListener.java
+ *  * PSimFactory.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,29 +20,25 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.stratum;
+package playground.mzilske.populationsize;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.listener.ScoringListener;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.SynchronizedEventsManagerImpl;
+import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.router.util.TravelTime;
 
 import javax.inject.Inject;
 
-class MetaPopulationScoringControlerListener implements ScoringListener {
+public class PSimFactory implements MobsimFactory {
 
     @Inject
-    MetaPopulations metaPopulations;
+    TravelTime travelTime;
 
     @Override
-    public void notifyScoring(ScoringEvent event) {
-        for (MetaPopulation metaPopulation : metaPopulations.getMetaPopulations()) {
-            double score = 0.0;
-            for (Person person : metaPopulation.getPersons()) {
-                score += person.getSelectedPlan().getScore();
-            }
-            MetaPopulationPlan plan = metaPopulation.getSelectedPlan();
-            plan.setScore(score / metaPopulation.getPersons().size());
-        }
+    public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+        return new PSim(sc, new SynchronizedEventsManagerImpl(eventsManager), travelTime);
     }
 
 }

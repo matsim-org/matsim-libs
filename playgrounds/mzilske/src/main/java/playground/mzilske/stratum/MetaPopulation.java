@@ -91,7 +91,7 @@ class MetaPopulation implements HasPlansAndId<MetaPopulationPlan> {
         return id;
     }
 
-    public Iterable<Person> getPersons() {
+    public List<Person> getPersons() {
         int nAgents = (int) Math.round(selectedPlan.getScaleFactor() * templatePopulation.size());
         int deltaAgents = nAgents - currentPersons.size();
         if (deltaAgents > 0) {
