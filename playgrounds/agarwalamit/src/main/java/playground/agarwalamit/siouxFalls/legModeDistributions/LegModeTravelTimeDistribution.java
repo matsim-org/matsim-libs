@@ -144,7 +144,7 @@ public class LegModeTravelTimeDistribution extends AbstractAnalyisModule {
 			classCounter++;
 			this.travelTimeClasses.add(endOfTravelTimeClass);
 		}
-		logger.info("The following distance classes were defined: " + this.travelTimeClasses);
+		logger.info("The following travel time classes were defined: " + this.travelTimeClasses);
 	}
 
 	private double getHighestTravelTime(){

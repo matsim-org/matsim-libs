@@ -30,8 +30,8 @@ import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistan
  */
 public class ModeDistancDistributionAndModalSplit {
 
-	private final static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/";//outputModalSplitSetUp
-	private final static String run = "/run33/";
+	private final static String runDir = "./patnaOutput/modeChoice/";//"/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/";//outputModalSplitSetUp
+	private final static String run = "/run1/";
 //	private  String initialPlanFile = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/input/SiouxFalls_population_probably_v3.xml";
 //	private  String initialPlanFile = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/run33/output_plans.xml.gz";
 	private static String finalPlanFileLocation = runDir+run+"/ITERS/";
