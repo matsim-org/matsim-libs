@@ -90,24 +90,20 @@ public class EmissionCostDensityHandler implements WarmEmissionEventHandler {
 		try {
 			int xCell = link2xbins.get(event.getLinkId());
 			int yCell = link2ybins.get(event.getLinkId());
+			
+			Double timeBin = Math.ceil(event.getTime()/timeBinSize )*timeBinSize;
+			
 			// calc pm costs
-			Double pmCostsValue = warmEmissions.get(WarmPollutant.PM) * EURO_PER_GRAMM_PM2_5_EXHAUST;
+			Double pmCosts = warmEmissions.get(WarmPollutant.PM) * EURO_PER_GRAMM_PM2_5_EXHAUST;
 //		Double pmCostsValue = warmEmissions.get("PM") * EURO_PER_GRAMM_PM2_5_EXHAUST;
 			// distribute em costs
 
-			Double timeBin = Math.ceil(event.getTime()/timeBinSize )*timeBinSize;
-			
-			Double pmCosts = relativeFactor(timeBin, xCell, yCell) * pmCostsValue;
-//			System.out.println("pm costs" + pmCosts);
-//			System.out.println("pmCostsValue" + pmCostsValue);
-			
-			
-			// calc other costs
 			Double noxCosts = warmEmissions.get(WarmPollutant.NOX) * EURO_PER_GRAMM_NOX;
 			Double nmCosts = warmEmissions.get(WarmPollutant.NMHC) * EURO_PER_GRAMM_NMVOC;
 			Double soCosts = warmEmissions.get(WarmPollutant.SO2) * EURO_PER_GRAMM_SO2;
+			Double coCosts = warmEmissions.get(WarmPollutant.CO2_TOTAL) * EURO_PER_GRAMM_CO2;
 			
-			Double totalCosts = pmCosts + noxCosts + nmCosts + soCosts;
+			Double totalCosts = (pmCosts + noxCosts + nmCosts + soCosts + pmCosts + coCosts) * relativeFactor(timeBin, xCell, yCell);
 //			System.out.println("NOX " + warmEmissions.get(WarmPollutant.NOX));
 //			System.out.println("NMHC " + warmEmissions.get(WarmPollutant.NMHC));
 //			System.out.println("SO2 " + warmEmissions.get(WarmPollutant.SO2));
