@@ -53,7 +53,7 @@ public class EmissionCostPerPersonWarmEventHandlerRelativeDurations implements W
 
 	private Map<Id, Integer> links2ybins;
 
-	private boolean considerCO2 =false;
+	private boolean considerCO2 =true;
 
 	public EmissionCostPerPersonWarmEventHandlerRelativeDurations(HashMap<Double, Double[][]> relativeDurationFactor, Map<Id, Integer> links2xbins, Map<Id, Integer> links2ybins) {
 		this.relativeDurationFactor = relativeDurationFactor;
