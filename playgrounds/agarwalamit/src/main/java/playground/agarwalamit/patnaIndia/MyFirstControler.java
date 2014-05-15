@@ -16,7 +16,7 @@ public class MyFirstControler {
 		myController.setOverwriteFiles(true) ;
 		myController.setCreateGraphs(true);
 		myController.setMobsimFactory(new PatnaQSimFactory()); 
-		myController.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+//		myController.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		myController.setDumpDataAtEnd(true);
 		myController.run();
 	}
