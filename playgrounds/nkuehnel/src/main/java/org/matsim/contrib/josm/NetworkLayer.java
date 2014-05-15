@@ -23,6 +23,7 @@ import org.openstreetmap.josm.actions.RenameLayerAction;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.data.osm.WaySegment;
 import org.openstreetmap.josm.gui.dialogs.LayerListDialog;
 import org.openstreetmap.josm.gui.dialogs.LayerListPopup;
 import org.openstreetmap.josm.gui.layer.Layer;
@@ -41,6 +42,7 @@ public class NetworkLayer extends OsmDataLayer {
 	private String coordSystem;
 
 	private Map<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
+	private Map<Link, WaySegment> link2Segment = new HashMap<Link, WaySegment>();
 
 	public String getCoordSystem() {
 		return coordSystem;
@@ -48,14 +50,15 @@ public class NetworkLayer extends OsmDataLayer {
 
 	public NetworkLayer(DataSet data, String name, File associatedFile,
 			Network network, String coordSystem,
-			HashMap<Way, List<Link>> way2Links) {
+			HashMap<Way, List<Link>> way2Links, Map<Link, WaySegment> link2Segment) {
 		super(data, name, associatedFile);
 		this.matsimNetwork = network;
 		this.coordSystem = coordSystem;
 		this.way2Links = way2Links;
+		this.link2Segment = link2Segment;
 		NetworkListener listener;
 		try {
-			listener = new NetworkListener(this, network, way2Links);
+			listener = new NetworkListener(this, network, way2Links, link2Segment);
 		} catch (IllegalArgumentException e) {
 			 JOptionPane.showMessageDialog(
 		                Main.parent,
@@ -71,6 +74,10 @@ public class NetworkLayer extends OsmDataLayer {
 
 	public Map<Way, List<Link>> getWay2Links() {
 		return way2Links;
+	}
+	
+	public Map<Link, WaySegment> getLink2Segment() {
+		return link2Segment;
 	}
 
 	public Network getMatsimNetwork() {

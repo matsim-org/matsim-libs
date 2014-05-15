@@ -44,7 +44,6 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 	private final static JCheckBox showInternalIds = new JCheckBox(
 			"Show internal Ids in table");
 
-	private final static JCheckBox keepPaths = new JCheckBox("Keep paths");
 	private final static JCheckBox cleanNetwork = new JCheckBox("Clean network");
 
 	protected static String[] coordSystems = { TransformationFactory.WGS84,
@@ -101,24 +100,27 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 
 		cOptions.insets = new Insets(4, 4, 4, 4);
 
+		cOptions.weightx = 0;
+		cOptions.weighty = 0;
 		cOptions.gridx = 0;
 		cOptions.gridy = 0;
 		pnl.add(renderMatsim, cOptions);
 
-		cOptions.gridx = 1;
-		cOptions.weightx = 1.0;
-		cOptions.weighty = 1.0;
+		cOptions.gridy = 1;
 		pnl.add(showIds, cOptions);
 
-		cOptions.gridx = 0;
-		cOptions.gridy = 1;
+		cOptions.weightx = 0;
+		cOptions.gridy = 2;
 		pnl.add(wayOffsetLabel, cOptions);
 
+		cOptions.weightx = 1;
 		cOptions.gridx = 1;
 		pnl.add(wayOffset, cOptions);
 
+		cOptions.weightx = 0;
+		cOptions.weighty = 1;
 		cOptions.gridx = 0;
-		cOptions.gridy = 2;
+		cOptions.gridy = 3;
 		pnl.add(showInternalIds, cOptions);
 
 		return pnl;
@@ -130,8 +132,6 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 
 		cleanNetwork.setSelected(Main.pref.getBoolean("matsim_cleanNetwork",
 				true));
-		keepPaths.setSelected(Main.pref.getBoolean(
-				"matsim_convertDefaults_keepPaths", false));
 		convertingDefaults.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -163,22 +163,23 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 
 		cOptions.insets = new Insets(4, 4, 4, 4);
 
+		cOptions.weighty = 0;
+		cOptions.weightx = 0;
 		cOptions.gridx = 0;
 		cOptions.gridy = 0;
 		pnl.add(cleanNetwork, cOptions);
 
 		cOptions.gridy = 1;
-		pnl.add(keepPaths, cOptions);
-
-		cOptions.gridy = 2;
 		pnl.add(convertingDefaults, cOptions);
 
-		cOptions.gridy = 3;
+		cOptions.gridy = 2;
 		pnl.add(filterActive, cOptions);
 
-		cOptions.gridy = 4;
+		cOptions.gridy = 3;
 		pnl.add(hierarchyLabel, cOptions);
 		cOptions.gridx = 1;
+		cOptions.weighty = 1;
+		cOptions.weightx = 1;
 		pnl.add(hierarchyLayer, cOptions);
 
 		return pnl;
@@ -223,11 +224,6 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 			Main.pref.put("matsim_showInternalIds", true);
 		} else {
 			Main.pref.put("matsim_showInternalIds", false);
-		}
-		if (Preferences.keepPaths.isSelected()) {
-			Main.pref.put("matsim_convertDefaults_keepPaths", true);
-		} else {
-			Main.pref.put("matsim_convertDefaults_keepPaths", false);
 		}
 		if (filterActive.isSelected()) {
 			Main.pref.put("matsim_filterActive", true);

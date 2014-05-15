@@ -47,7 +47,7 @@ public class Converter implements PreferenceChangedListener {
 	private final static String TAG_JUNCTION = "junction";
 	private final static String TAG_ONEWAY = "oneway";
 
-	public final static String[] ALL_TAGS = new String[] { TAG_LANES,
+	private final static String[] ALL_TAGS = new String[] { TAG_LANES,
 			TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY };
 
 	private final Map<Long, OsmNode> nodes = new HashMap<Long, OsmNode>();
@@ -277,7 +277,7 @@ public class Converter implements PreferenceChangedListener {
 		log.info("= end of conversion statistics ====================");
 	}
 
-	public void createLink(final Network network, final OsmWay way,
+	private void createLink(final Network network, final OsmWay way,
 			final OsmNode fromNode, final OsmNode toNode, final double length, final int i) {
 		String highway = way.tags.get(TAG_HIGHWAY);
 
@@ -380,7 +380,7 @@ public class Converter implements PreferenceChangedListener {
 			String origId = Long.toString(way.id)+"_"+i;
 
 			if (!onewayReverse) {
-				Link l = network.getFactory().createLink(new IdImpl(origId),
+				Link l = network.getFactory().createLink(new IdImpl(this.id),
 						network.getNodes().get(fromId),
 						network.getNodes().get(toId));
 				l.setLength(length);
@@ -388,14 +388,14 @@ public class Converter implements PreferenceChangedListener {
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
 				if (l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(String.valueOf(this.id));
+					((LinkImpl) l).setOrigId(origId);
 				}
 				network.addLink(l);
 				links.add(l);
 				this.id++;
 			}
 			if (!oneway) {
-				Link l = network.getFactory().createLink(new IdImpl(origId+"_r"),
+				Link l = network.getFactory().createLink(new IdImpl(this.id),
 						network.getNodes().get(toId),
 						network.getNodes().get(fromId));
 				l.setLength(length);
@@ -403,7 +403,7 @@ public class Converter implements PreferenceChangedListener {
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
 				if (l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(String.valueOf(this.id));
+					((LinkImpl) l).setOrigId(origId+"_r");
 				}
 				network.addLink(l);
 				links.add(l);
@@ -418,7 +418,7 @@ public class Converter implements PreferenceChangedListener {
 		}
 	}
 
-	public static class OsmNode {
+	private static class OsmNode {
 		public final long id;
 		public boolean used = false;
 		public int ways = 0;
@@ -430,7 +430,7 @@ public class Converter implements PreferenceChangedListener {
 		}
 	}
 
-	public static class OsmWay {
+	private static class OsmWay {
 		public final long id;
 		public final List<Long> nodes = new ArrayList<Long>();
 		public final Map<String, String> tags = new HashMap<String, String>();

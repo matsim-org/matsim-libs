@@ -66,7 +66,7 @@ public class MapRenderer extends StyledMapRenderer {
 											Properties.MATSIMCOLOR, 0.f, null));
 						}
 						super.drawWay(way, Properties.MATSIMCOLOR, line,
-								dashes, dashedColor, Properties.wayOffset,
+								dashes, dashedColor, Properties.wayOffset*-1,
 								showOrientation, showHeadArrowOnly, showOneway,
 								onewayReversed);
 						return;
@@ -83,12 +83,12 @@ public class MapRenderer extends StyledMapRenderer {
 			}
 		}
 		super.drawWay(way, color, line, dashes, dashedColor,
-				Properties.wayOffset, showOrientation, showHeadArrowOnly,
+				Properties.wayOffset*-1, showOrientation, showHeadArrowOnly,
 				showOneway, onewayReversed);
 	}
 
 	private int textOffset(Way way) {
-		int offset = -10;
+		int offset = -15;
 
 		if (way.firstNode().getUniqueId() < way.lastNode().getUniqueId()) {
 			offset *= -1;
@@ -128,9 +128,13 @@ public class MapRenderer extends StyledMapRenderer {
 		@Override
 		public String compose(OsmPrimitive prim) {
 			Layer layer = Main.main.getActiveLayer();
-			Id id = new IdImpl(prim.getUniqueId());
-			return ((LinkImpl) ((NetworkLayer) layer).getMatsimNetwork()
-					.getLinks().get(id)).getOrigId();
+			StringBuilder sB = new StringBuilder();
+			if (((NetworkLayer) layer).getWay2Links().containsKey(prim)) {
+				for (Link link: ((NetworkLayer) layer).getWay2Links().get(prim)) {
+					sB.append(" ["+((LinkImpl)link).getOrigId()+"] ");
+				}
+			}
+			return sB.toString();
 		}
 	}
 }

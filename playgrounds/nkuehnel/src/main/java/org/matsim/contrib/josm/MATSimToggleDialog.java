@@ -32,6 +32,7 @@ import javax.swing.table.DefaultTableModel;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.openstreetmap.josm.Main;
@@ -42,8 +43,8 @@ import org.openstreetmap.josm.data.Preferences.PreferenceChangedListener;
 import org.openstreetmap.josm.data.SelectionChangedListener;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
-import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.data.osm.WaySegment;
 import org.openstreetmap.josm.gui.MapView.LayerChangeListener;
 import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
 import org.openstreetmap.josm.gui.layer.Layer;
@@ -66,7 +67,8 @@ public class MATSimToggleDialog extends ToggleDialog implements
 			"dialogs", "edit").setWidth(16).get());
 	private List<FileExporter> exporterCopy = new ArrayList<FileExporter>();
 	private Network currentNetwork;
-	private Map<Way, List<Link>> way2Links;
+	private Map<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
+	private Map<Link, WaySegment> link2Segment = new HashMap<Link, WaySegment>();
 	private NetworkListener osmNetworkListener;
 
 	public MATSimToggleDialog() {
@@ -118,25 +120,29 @@ public class MATSimToggleDialog extends ToggleDialog implements
 	@Override
 	public void activeLayerChange(Layer oldLayer, Layer newLayer) {
 		DataSet.removeSelectionListener(tableModel);
+		if (osmNetworkListener != null && oldLayer != null) {
+			((OsmDataLayer) oldLayer).data
+					.removeDataSetListener(osmNetworkListener);
+		}
 		table.getSelectionModel().removeListSelectionListener(tableModel);
 		if (newLayer instanceof OsmDataLayer) {
 			if (newLayer instanceof NetworkLayer) {
 				currentNetwork = ((NetworkLayer) newLayer).getMatsimNetwork();
 				way2Links = ((NetworkLayer) newLayer).getWay2Links();
+				link2Segment = ((NetworkLayer) newLayer).getLink2Segment();
 				ExtensionFileFilter.exporters.clear();
 				ExtensionFileFilter.exporters.add(0,
 						new MATSimNetworkFileExporter());
 			} else {
-				way2Links = new HashMap<Way, List<Link>>();
 				currentNetwork = NetworkImpl.createNetwork();
-				new Converter(((OsmDataLayer) newLayer).data, currentNetwork,
-						way2Links).convert();
-				if(this.osmNetworkListener!=null) {
-					((OsmDataLayer) newLayer).data.removeDataSetListener(this.osmNetworkListener);
-				}
-				this.osmNetworkListener = new NetworkListener((OsmDataLayer) newLayer, currentNetwork, way2Links);
-				((OsmDataLayer) newLayer).data.addDataSetListener(this.osmNetworkListener);
-				if (oldLayer instanceof NetworkLayer) {
+				NewConverter.convertOsmLayer(((OsmDataLayer) newLayer).data,
+						currentNetwork, way2Links, link2Segment);
+				this.osmNetworkListener = new NetworkListener(
+						(OsmDataLayer) newLayer, currentNetwork, way2Links,
+						link2Segment);
+				((OsmDataLayer) newLayer).data
+						.addDataSetListener(this.osmNetworkListener);
+				if (oldLayer instanceof NetworkLayer || oldLayer == null) {
 					ExtensionFileFilter.exporters.clear();
 					ExtensionFileFilter.exporters.addAll(this.exporterCopy);
 				}
@@ -198,7 +204,7 @@ public class MATSimToggleDialog extends ToggleDialog implements
 			SelectionChangedListener, ListSelectionListener {
 
 		private String[] columnNames = { "id", "internal-id", "length",
-				"freespeed", "capacity", "permlanes" };
+				"freespeed", "capacity", "permlanes", "modes" };
 
 		private Network network;
 
@@ -227,6 +233,8 @@ public class MATSimToggleDialog extends ToggleDialog implements
 				return Double.class;
 			} else if (columnIndex == 5) {
 				return Double.class;
+			} else if (columnIndex == 6) {
+				return String.class;
 			}
 			throw new RuntimeException();
 		}
@@ -266,6 +274,8 @@ public class MATSimToggleDialog extends ToggleDialog implements
 				return link.getCapacity();
 			} else if (columnIndex == 5) {
 				return link.getNumberOfLanes();
+			} else if (columnIndex == 6) {
+				return link.getAllowedModes().toString();
 			}
 			throw new RuntimeException();
 		}
@@ -290,24 +300,29 @@ public class MATSimToggleDialog extends ToggleDialog implements
 
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
-			helper.clear();
 			if (!layer.data.selectionEmpty() && !e.getValueIsAdjusting()
 					&& !((ListSelectionModel) e.getSource()).isSelectionEmpty()) {
 				int row = table.getRowSorter().convertRowIndexToModel(
 						table.getSelectedRow());
 				String tempId = (String) this.getValueAt(row, 1);
 				long id;
-				if(tempId.contains("_")){
-					id = Long.parseLong(tempId.substring(0, tempId.indexOf("_")));
+				if (tempId.contains("_")) {
+					id = Long
+							.parseLong(tempId.substring(0, tempId.indexOf("_")));
 				} else {
 					id = Long.parseLong(tempId);
 				}
-				Way way = (Way) layer.data.getPrimitiveById(id,
-						OsmPrimitiveType.WAY);
-				helper.highlightOnly(way);
-				AutoScaleAction.zoomTo(Collections
-						.singleton(((OsmPrimitive) (way))));
-				Main.map.mapView.repaint();
+				Link link = network.getLinks().get(new IdImpl(tempId));
+				if (link2Segment.containsKey(link)) {
+					WaySegment segment = link2Segment.get(link);
+					layer.data.setHighlightedWaySegments(Collections
+							.singleton(segment));
+					Collection<OsmPrimitive> zoomTo = new ArrayList<OsmPrimitive>();
+					zoomTo.add(segment.getFirstNode());
+					zoomTo.add(segment.getSecondNode());
+					AutoScaleAction.zoomTo(zoomTo);
+					Main.map.mapView.repaint();
+				}
 			}
 		}
 	}

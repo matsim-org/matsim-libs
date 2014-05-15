@@ -14,13 +14,12 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.data.osm.WaySegment;
 import org.openstreetmap.josm.gui.PleaseWaitRunnable;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
@@ -57,28 +56,10 @@ public class ConvertTask extends PleaseWaitRunnable {
 		Network tempNetwork = NetworkImpl.createNetwork();
 		Network network = NetworkImpl.createNetwork();
 
-		String convertSystem = Main.pref.get("matsim_convertSystem", "WGS84");
-		CoordinateTransformation ctOut = TransformationFactory
-				.getCoordinateTransformation(TransformationFactory.WGS84,
-						convertSystem);
-		Converter converter;
-		if (Main.pref.getBoolean("matsim_filterActive", false)) {
-			OsmFilter filter = new OsmFilter(null, null, Main.pref.getInteger(
-					"matsim_filter_hierarchy", 6));
-			converter = new Converter(((OsmDataLayer) layer).data, tempNetwork,
-					filter);
-		} else {
-			converter = new Converter(((OsmDataLayer) layer).data, tempNetwork);
-		}
 		this.progressMonitor.setTicks(1);
 		this.progressMonitor.setCustomText("converting osm data..");
-		converter.convert();
-		if (!(convertSystem.equals(TransformationFactory.WGS84))) {
-			for (Node node : ((NetworkImpl) tempNetwork).getNodes().values()) {
-				Coord temp = ctOut.transform(node.getCoord());
-				node.getCoord().setXY(temp.getX(), temp.getY());
-			}
-		}
+		
+		NewConverter.convertOsmLayer(((OsmDataLayer) layer).data, tempNetwork, new HashMap<Way, List<Link>>(), new HashMap<Link, WaySegment>());
 		if (Main.pref.getBoolean("matsim_cleanNetwork")) {
 			this.progressMonitor.setTicks(2);
 			this.progressMonitor.setCustomText("cleaning network..");
@@ -86,38 +67,29 @@ public class ConvertTask extends PleaseWaitRunnable {
 		}
 
 		this.progressMonitor.setTicks(3);
-		this.progressMonitor.setCustomText("preparing new layer..");
+		this.progressMonitor.setCustomText("preparing data set..");
 		DataSet dataSet = new DataSet();
-		CoordinateTransformation ctIn = TransformationFactory
-				.getCoordinateTransformation(convertSystem,
-						TransformationFactory.WGS84);
 
 		HashMap<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
+		HashMap<Link, WaySegment> link2Segment = new HashMap<Link, WaySegment>();
 		HashMap<Node, org.openstreetmap.josm.data.osm.Node> node2OsmNode = new HashMap<Node, org.openstreetmap.josm.data.osm.Node>();
 		this.progressMonitor.setTicks(4);
 		this.progressMonitor.setCustomText("loading nodes..");
 
 		for (Node node : tempNetwork.getNodes().values()) {
 			Coord tmpCoor = node.getCoord();
-			LatLon coor;
-
-			if (convertSystem.equals("WGS84")) {
-				coor = new LatLon(tmpCoor.getY(), tmpCoor.getX());
-			} else {
-				tmpCoor = ctIn.transform(new CoordImpl(tmpCoor.getX(), tmpCoor
-						.getY()));
-				coor = new LatLon(tmpCoor.getY(), tmpCoor.getX());
-			}
+			LatLon coor = new LatLon(tmpCoor.getY(), tmpCoor.getX());
 			org.openstreetmap.josm.data.osm.Node nodeOsm = new org.openstreetmap.josm.data.osm.Node(
 					coor);
-			nodeOsm.put(ImportTask.NODE_TAG_ID, node.getId().toString());
+			nodeOsm.put(ImportTask.NODE_TAG_ID, ((NodeImpl)node).getOrigId());
 			node2OsmNode.put(node, nodeOsm);
 			dataSet.addPrimitive(nodeOsm);
 			Node newNode = network.getFactory().createNode(
 					new IdImpl(Long.toString(nodeOsm.getUniqueId())),
 					node.getCoord());
-			((NodeImpl) newNode).setOrigId(node.getId().toString());
+			((NodeImpl) newNode).setOrigId(((NodeImpl)node).getOrigId());
 			network.addNode(newNode);
+			
 		}
 
 		this.progressMonitor.setTicks(5);
@@ -144,7 +116,6 @@ public class ConvertTask extends PleaseWaitRunnable {
 				}
 			}
 			way.put("modes", modes.toString());
-
 			dataSet.addPrimitive(way);
 			Link newLink = network.getFactory().createLink(
 					new IdImpl(Long.toString(way.getUniqueId())),
@@ -160,13 +131,14 @@ public class ConvertTask extends PleaseWaitRunnable {
 			((LinkImpl) newLink).setOrigId(((LinkImpl)link).getOrigId());
 			network.addLink(newLink);
 			way2Links.put(way, Collections.singletonList(newLink));
+			link2Segment.put(newLink, new WaySegment(way, 0));
 		}
 
 		this.progressMonitor.setTicks(6);
 		this.progressMonitor.setCustomText("creating layer..");
 
 		newLayer = new NetworkLayer(dataSet, null, null, network,
-				convertSystem, way2Links);
+				TransformationFactory.WGS84, way2Links, link2Segment);
 	}
 
 	@Override

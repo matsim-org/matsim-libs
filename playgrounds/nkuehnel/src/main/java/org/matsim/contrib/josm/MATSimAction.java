@@ -24,6 +24,7 @@ import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.data.osm.WaySegment;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.tools.Shortcut;
@@ -110,7 +111,7 @@ public class MATSimAction {
 			Scenario scenario = ScenarioUtils.createScenario(config);
 			NetworkLayer layer = new NetworkLayer(dataSet, "new Layer", null,
 					scenario.getNetwork(), TransformationFactory.WGS84,
-					new HashMap<Way, List<Link>>());
+					new HashMap<Way, List<Link>>(), new HashMap<Link, WaySegment>());
 			Main.main.addLayer(layer);
 		}
 	}
