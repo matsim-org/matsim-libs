@@ -205,7 +205,7 @@ public class ParkControl {
 		if (ev){
 			ParkingSpot privateParkingEV = checkPrivateParking(facilityid.toString(), event.getActType(), true);
 			LinkedList<ParkingSpot> spotsInAreaEV = getPublicParkings(cordinate, true);
-			if (privateParking != null) {
+			if (privateParkingEV != null) {
 				spotsInAreaEV.add(privateParkingEV); // Privates Parking anfuegen
 			} 
 			
