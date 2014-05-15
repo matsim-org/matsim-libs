@@ -20,7 +20,6 @@
 package playground.ikaddoura.analysis.shapes;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,20 +34,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
-
-import playground.ikaddoura.analysis.extCost.ExtCostEventHandler;
-import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
@@ -57,8 +45,10 @@ import com.vividsolutions.jts.geom.Point;
  * 
  * Reads in a shapeFile and performs a zone-based analysis:
  * Calculates the number of home activities, work activities, all activities per zone.
- * Calculates the tolls paid during the day mapped back to the agents' home zones (toll payments).
- * Calculates the tolls paid during the day mapped back to the agents's home zones in relation to the number of home activities (avg. toll payments)
+ * Calculates the congestion costs of the whole day mapped back to the causing agents' home zones (toll payments 'caused').
+ * Calculates the congestion costs of the whole day mapped back to the causing agents' home zones in relation to the number of home activities (avg. toll payments 'caused')
+ * Calculates the congestion costs of the whole day mapped back to the affected agents' home zones (toll payments 'affected').
+ * Calculates the congestion costs of the whole day mapped back to the affected agents' home zones in relation to the number of home activities (avg. toll payments 'affected')
  * 
  * The shape file has to contain a grid (e.g. squares, hexagons) which can be created using a QGIS plugin called MMQGIS.
  * 
@@ -67,45 +57,24 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class IKGISAnalyzer {
 	
-	private static final Logger log = Logger.getLogger(IKGISAnalyzer.class);
-
-	// Run1
-	private final static String runNumber1 = "baseCase";
-	private final static String runDirectory1 = "../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
-		
-	// Run2
-//	private final static String runNumber2 = "internalization";
-//	private final static String runDirectory2 = "../../runs-svn/berlin_internalizationCar/output/internalization_2/";
+	private final String homeActivity;
+	private final String workActivity;
 	
 	// the number of persons a single agent represents
-	final int scalingFactor = 10;
+	private final int scalingFactor;
 		
-	private final String shapeFileZones = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/berlin/shapeFiles/berlin_grid_1000/berlin_grid_1000.shp";
-	
-	private final String outputPath1 = runDirectory1 + "analysis/gridBasedAnalysis/moneyAmounts/";
-//	private String outputPath2 = runDirectory2 + "analysis/gridBasedAnalysis/moneyAmounts/";
-	
-	private final String homeActivity = "home";
-	private final String workActivity = "work";
-	
+	private static final Logger log = Logger.getLogger(IKGISAnalyzer.class);
 	private Map<Integer, Geometry> zoneId2geometry = new HashMap<Integer, Geometry>();
 	
-	private IKShapeFileWriter shapeFileWriter = new IKShapeFileWriter();
-			
-	public static void main(String[] args) throws IOException {
-		IKGISAnalyzer main = new IKGISAnalyzer();
-		main.run();
-	}
-	
-	private Scenario loadScenario(String configFile, String netFile) {
-		Config config = ConfigUtils.loadConfig(configFile);
-		config.network().setInputFile(netFile);
-		config.plans().setInputFile(null);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
-	}
-	
-	public void run() throws IOException {
+	public IKGISAnalyzer(
+			String shapeFileZones,
+			int scalingFactor,
+			String homeActivity,
+			String workActivity) {
+		
+		this.scalingFactor = scalingFactor;
+		this.homeActivity = homeActivity;
+		this.workActivity = workActivity;
 		
 		log.info("Reading zone shapefile...");
 		Collection<SimpleFeature> features;
@@ -115,62 +84,39 @@ public class IKGISAnalyzer {
 			this.zoneId2geometry.put(featureCounter, (Geometry) feature.getDefaultGeometry());
 			featureCounter++;
 		}
-		
 		log.info("Reading zone shapefile... Done.");
-		
-		log.info("Loading scenario...");
-		Scenario scenario1 = loadScenario(runDirectory1 + "output_config.xml.gz", runDirectory1 + "output_network.xml.gz");
-		MatsimPopulationReader mpr = new MatsimPopulationReader(scenario1);
-		mpr.readFile(runDirectory1 + "output_plans.xml.gz");
-		log.info("Loading scenario... Done.");
-		
-		// do some analysis here
-		log.info("Analyzing the scenario...");
-		EventsManager events = EventsUtils.createEventsManager();
+	}
 
-		// Compute marginal congestion events based on normal events file.
-		MarginalCongestionHandlerImplV3 congestionHandler = new MarginalCongestionHandlerImplV3(events, (ScenarioImpl) scenario1);
-		events.addHandler(congestionHandler);
+	public void analyzeZones(Scenario scenario, String runDirectory, Map<Id, Double> causingAgentId2amountSum, Map<Id, Double> affectedAgentId2amountSum) {
 		
-		// Analyze external cost per person based on marginal congestion events.
-		ExtCostEventHandler extCostHandler = new ExtCostEventHandler(scenario1, false);
-		events.addHandler(extCostHandler);
-		
-		log.info("Reading events file...");
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		String eventsFile1 = runDirectory1 + "/ITERS/it." + scenario1.getConfig().controler().getLastIteration() + "/" + scenario1.getConfig().controler().getLastIteration() + ".events.xml.gz";
-		reader.readFile(eventsFile1);
-		log.info("Reading events file... Done.");
-		
-		Map<Id, Double> personId2amountSum = extCostHandler.getPersonId2amountSumAllAgents();
-		log.info("Analyzing the scenario... Done.");
+		String outputPath1 = runDirectory + "spatial_analysis/grid/";
 		
 		File file = new File(outputPath1);
 		file.mkdirs();
 				
-		this.analyzeZones(personId2amountSum, scenario1.getPopulation(), outputPath1 + runNumber1 + "." + scenario1.getConfig().controler().getLastIteration() + "extCost_Zones.shp");
-	
-		System.out.println();
-		System.out.println("Done.");
-	}
-
-	private void analyzeZones(Map<Id, Double> personId2amountSum, Population population, String outputFile) {
 		// home activities
-		Map<Integer,Integer> zoneNr2homeActivities = getZoneNr2activityLocations(homeActivity, population, this.zoneId2geometry, this.scalingFactor);
+		Map<Integer,Integer> zoneNr2homeActivities = getZoneNr2activityLocations(homeActivity, scenario.getPopulation(), this.zoneId2geometry, this.scalingFactor);
 		
 		// work activities
-		Map<Integer,Integer> zoneNr2workActivities = getZoneNr2activityLocations(workActivity, population, this.zoneId2geometry, this.scalingFactor);
+		Map<Integer,Integer> zoneNr2workActivities = getZoneNr2activityLocations(workActivity, scenario.getPopulation(), this.zoneId2geometry, this.scalingFactor);
 
 		// all activities
-		Map<Integer,Integer> zoneNr2activities = getZoneNr2activityLocations(null, population, this.zoneId2geometry, this.scalingFactor);
+		Map<Integer,Integer> zoneNr2activities = getZoneNr2activityLocations(null, scenario.getPopulation(), this.zoneId2geometry, this.scalingFactor);
 		
 		// toll payments mapped back to home location
-		Map<Integer,Double> zoneNr2tollPayments = getZoneNr2tollPayments(population, personId2amountSum, this.zoneId2geometry, this.scalingFactor);
+		Map<Integer,Double> zoneNr2tollPaymentsCaused = getZoneNr2tollPayments(scenario.getPopulation(), causingAgentId2amountSum, this.zoneId2geometry, this.scalingFactor);
+		Map<Integer,Double> zoneNr2tollPaymentsAffected = getZoneNr2tollPayments(scenario.getPopulation(), affectedAgentId2amountSum, this.zoneId2geometry, this.scalingFactor);
 		
 		// toll payments mapped back to home location in relation to home activities
-		Map<Integer,Double> zoneNr2AvgTollPayments = getZoneId2avgToll(zoneNr2tollPayments, zoneNr2homeActivities);
+		Map<Integer,Double> zoneNr2AvgTollPaymentsCaused = getZoneId2avgToll(zoneNr2tollPaymentsCaused, zoneNr2homeActivities);
+		Map<Integer,Double> zoneNr2AvgTollPaymentsAffected = getZoneId2avgToll(zoneNr2tollPaymentsAffected, zoneNr2homeActivities);
 		
-		shapeFileWriter.writeShapeFileGeometry(this.zoneId2geometry, zoneNr2homeActivities, zoneNr2workActivities, zoneNr2activities, zoneNr2tollPayments, zoneNr2AvgTollPayments, outputFile);
+		IKShapeFileWriter shapeFileWriter = new IKShapeFileWriter();
+		shapeFileWriter.writeShapeFileGeometry(
+				this.zoneId2geometry, zoneNr2homeActivities, zoneNr2workActivities, zoneNr2activities,
+				zoneNr2tollPaymentsCaused, zoneNr2AvgTollPaymentsCaused,
+				zoneNr2tollPaymentsAffected, zoneNr2AvgTollPaymentsAffected,
+				outputPath1 + "." + scenario.getConfig().controler().getLastIteration() + "extCost_zones.shp");		
 	}
 	
 	private Map<Integer, Double> getZoneId2avgToll(Map<Integer, Double> zoneNr2tollPayments, Map<Integer, Integer> zoneNr2homeActivities) {
@@ -243,7 +189,7 @@ public class IKGISAnalyzer {
 				if (pE instanceof Activity){
 					Activity act = (Activity) pE;
 					
-					if (act.getType().equals(activity) || act.getType().equals(null)) {
+					if (act.getType().equals(activity) || activity == null) {
 						
 						Coord coord = act.getCoord();
 						personId2coord.put(person.getId(), coord);

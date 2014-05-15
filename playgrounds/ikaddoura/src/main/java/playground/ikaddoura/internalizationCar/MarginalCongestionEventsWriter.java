@@ -1,25 +1,28 @@
 /* *********************************************************************** *
-* project: org.matsim.*
-* firstControler
-* *
-* *********************************************************************** *
-* *
-* copyright : (C) 2007 by the members listed in the COPYING, *
-* LICENSE and WARRANTY file. *
-* email : info at matsim dot org *
-* *
-* *********************************************************************** *
-* *
-* This program is free software; you can redistribute it and/or modify *
-* it under the terms of the GNU General Public License as published by *
-* the Free Software Foundation; either version 2 of the License, or *
-* (at your option) any later version. *
-* See also COPYING, LICENSE and WARRANTY file *
-* *
-* *********************************************************************** */ 
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 
 package playground.ikaddoura.internalizationCar;
 
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -32,38 +35,72 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.extCost.ExtCostEventHandler;
 import playground.ikaddoura.analysis.extCost.TripInfoWriter;
+import playground.ikaddoura.analysis.shapes.IKGISAnalyzer;
 
 /**
- * (1) Writes marginal congestion events based on a standard events file.
- * (2) Writes agent money events based on these marginal congestion events.
- * (3) Does some analysis
+ * (1) Computes marginal congestion events based on a standard events file.
+ * (2) Computes agent money events based on these marginal congestion events.
+ * (3) Does some spatial, person- and trip-based analysis
  * 
  * @author ikaddoura
  *
  */
 public class MarginalCongestionEventsWriter {
-
-	static String configFile = "../../runs-svn/berlin_internalizationCar/output/baseCase_4/output_config.xml.gz";
-	static String networkFile = "../../runs-svn/berlin_internalizationCar/output/baseCase_4/output_network.xml.gz";
+	private static final Logger log = Logger.getLogger(MarginalCongestionEventsWriter.class);
 	
-	static String outputPath = "../../runs-svn/berlin_internalizationCar/output/baseCase_4/ITERS/it.0";
-	static String inputEventsFile = outputPath + "/0.events.xml.gz";
+	static String runDirectory;
 	
+	static String shapeFileZones;
+	static String homeActivity;
+	static String workActivity;
+	
+	// the number of persons a single agent represents
+	static int scalingFactor;
+			
 	public static void main(String[] args) {
-		MarginalCongestionEventsWriter anaMain = new MarginalCongestionEventsWriter();
-		anaMain.run();
+		
+		if (args.length > 0) {
+			
+			runDirectory = args[0];		
+			log.info("runDirectory: " + runDirectory);
+			
+			shapeFileZones = args[1];		
+			log.info("shapeFileZones: " + shapeFileZones);
+			
+			homeActivity = args[2];		
+			log.info("homeActivity: " + homeActivity);
+			
+			workActivity = args[3];		
+			log.info("workActivity: " + workActivity);
+			
+			scalingFactor = Integer.valueOf(args[4]);		
+			log.info("scalingFactor: " + scalingFactor);
+			
+		} else {
+			
+			runDirectory = "../../runs-svn/berlin_internalizationCar2/output/baseCase_2/";
+			shapeFileZones = "../../shared-svn/studies/ihab/berlin/shapeFiles/berlin_grid_1500/berlin_grid_1500.shp";
+			homeActivity = "home";
+			workActivity = "work";
+			scalingFactor = 10;
+		}
+		
+		MarginalCongestionEventsWriter congestionEventsWriter = new MarginalCongestionEventsWriter();
+		congestionEventsWriter.run();
 	}
 
 	private void run() {
 	
-		Config config = ConfigUtils.loadConfig(configFile);
-		config.network().setInputFile(networkFile);
-		config.plans().setInputFile(null);
+		log.info("Loading scenario...");
+		Config config = ConfigUtils.loadConfig(runDirectory + "output_config.xml.gz");
+		config.network().setInputFile(runDirectory + "output_network.xml.gz");
+		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		log.info("Loading scenario... Done.");
 		
 		EventsManager events = EventsUtils.createEventsManager();		
 		
-		EventWriterXML eventWriter = new EventWriterXML(outputPath + "/eventsCongestionPrices_Offline.xml.gz");
+		EventWriterXML eventWriter = new EventWriterXML(runDirectory + "analysis_it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events_ExternalCongestionCost_Offline.xml.gz");
 		MarginalCongestionHandlerImplV3 congestionHandler = new MarginalCongestionHandlerImplV3(events, scenario);
 		MarginalCostPricingCarHandler marginalCostTollHandler = new MarginalCostPricingCarHandler(events, scenario);
 
@@ -77,21 +114,31 @@ public class MarginalCongestionEventsWriter {
 		events.addHandler(tollHandler);
 		events.addHandler(extCostHandler);
 		
+		log.info("Reading events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(inputEventsFile);
-		
+		reader.readFile(runDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + "events.xml.gz");
+		log.info("Reading events file... Done.");
+
 		eventWriter.closeFile();
 		
-		// analyze the marginal congestion costs
-		System.out.println("Total amounts in AgentMoneyEvents: " + marginalCostTollHandler.getAmountSum());
-		congestionHandler.writeCongestionStats(outputPath + "/congestionStats_Offline.csv");
-		
-		tollHandler.writeTollStats(outputPath + "/tollStats_Offline.csv");
+		congestionHandler.writeCongestionStats(runDirectory + "analysis_it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".congestionStats_Offline.csv");
+		tollHandler.writeTollStats(runDirectory + "analysis_it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".tollStats_Offline.csv");
 
-		TripInfoWriter writer = new TripInfoWriter(extCostHandler, outputPath);
+		TripInfoWriter writer = new TripInfoWriter(extCostHandler, runDirectory + "analysis_it." + config.controler().getLastIteration());
 		writer.writeDetailedResults(TransportMode.car);
 		writer.writeAvgTollPerTimeBin(TransportMode.car);
 		writer.writeAvgTollPerDistance(TransportMode.car);
+		writer.writeAffectedAgentId2totalAmount();
+		writer.writeCausingAgentId2totalAmount();
+		
+		// spatial analysis
+		Map<Id, Double> causingAgentId2amountSum = extCostHandler.getCausingAgentId2amountSumAllAgents();
+		Map<Id, Double> affectedAgentId2amountSum = extCostHandler.getAffectedAgentId2amountSumAllAgents();
+		
+		log.info("Analyzing zones...");
+		IKGISAnalyzer gisAnalysis = new IKGISAnalyzer(shapeFileZones, scalingFactor, homeActivity, workActivity);
+		gisAnalysis.analyzeZones(scenario, runDirectory, causingAgentId2amountSum, affectedAgentId2amountSum);
+		log.info("Analyzing zones... Done.");
 	}
 			 
 }

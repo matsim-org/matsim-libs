@@ -150,9 +150,9 @@ public class TripInfoWriter {
 		}	
 	}
 	
-	public void writePersonId2totalAmount() {
+	public void writeCausingAgentId2totalAmount() {
 		
-		String fileName = this.outputFolder + "/personId2totalAmount.csv";
+		String fileName = this.outputFolder + "/causingAgentId2totalAmount.csv";
 		File file = new File(fileName);
 			
 		try {
@@ -166,7 +166,7 @@ public class TripInfoWriter {
 			bw.newLine();
 			
 			Map<Id,List<Double>> personId2listOfAmounts = this.handler.getPersonId2listOfAmounts(TransportMode.car);
-			Map<Id,Double> personId2totalAmount = this.handler.getPersonId2amountSumAllAgents();
+			Map<Id,Double> personId2totalAmount = this.handler.getCausingAgentId2amountSumAllAgents();
 
 			for (Id id : personId2totalAmount.keySet()) {
 				double totalAmount = personId2totalAmount.get(id);
@@ -193,5 +193,37 @@ public class TripInfoWriter {
 			e.printStackTrace();
 		}
 	}
+	
+	public void writeAffectedAgentId2totalAmount() {
+			
+			String fileName = this.outputFolder + "/affectedAgentId2totalAmount.csv";
+			File file = new File(fileName);
+				
+			try {
+				BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+				bw.write(fileName);
+				bw.newLine();
+				bw.write("____________________________________________________________________________");
+				bw.newLine();
+	
+				bw.write("person Id;total amount [monetary units]");
+				bw.newLine();
+				
+				Map<Id,Double> personId2totalAmount = this.handler.getAffectedAgentId2amountSumAllAgents();
+	
+				for (Id id : personId2totalAmount.keySet()) {
+					double totalAmount = personId2totalAmount.get(id);
+					
+					bw.write(id + ";" + totalAmount);
+					bw.newLine();
+				}
+				
+				log.info("Output written to " + fileName);
+				bw.close();
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
 }

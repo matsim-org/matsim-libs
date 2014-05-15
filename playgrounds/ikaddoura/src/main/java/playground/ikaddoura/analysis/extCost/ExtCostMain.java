@@ -41,10 +41,10 @@ public class ExtCostMain {
 	
 	private static final Logger log = Logger.getLogger(ExtCostMain.class);
 	
-	private String eventsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/internalization_2/ITERS/it.100/100.events.xml.gz";
-	private String configFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/input/config_baseCase_2.xml";
-	private String netFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/internalization_2/output_network.xml.gz";
-	private String outputFolder = "/Users/ihab/Desktop/analysis_2";
+	private String eventsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar2/output/baseCase_2/ITERS/it.100/100.events.xml.gz";
+	private String configFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar2/input/config_baseCase_2.xml";
+	private String netFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar2/output/internalization_2/output_network.xml.gz";
+	private String outputFolder = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar2/output/internalization_2/analysis";
 	
 	public static void main(String[] args) {
 		ExtCostMain anaMain = new ExtCostMain();
@@ -82,7 +82,8 @@ public class ExtCostMain {
 		writer.writeDetailedResults(TransportMode.pt);
 		writer.writeAvgTollPerDistance(TransportMode.pt);
 		writer.writeAvgTollPerTimeBin(TransportMode.pt);
-		writer.writePersonId2totalAmount();
+		writer.writeCausingAgentId2totalAmount();
+		writer.writeAffectedAgentId2totalAmount();
 		
 		log.info("Writing output files... Done.");
 

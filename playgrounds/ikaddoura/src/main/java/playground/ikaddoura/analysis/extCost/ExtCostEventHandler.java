@@ -70,7 +70,8 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 	private Map<Id,Map<Integer,Double>> personId2tripNumber2amount = new HashMap<Id, Map<Integer,Double>>();
 	private Map<Id,Double> driverId2totalDistance = new HashMap<Id,Double>();
 	
-	private Map<Id, Double> personId2amountSum = new HashMap <Id, Double>();
+	private Map<Id, Double> causingAgentId2amountSum = new HashMap <Id, Double>();
+	private Map<Id, Double> affectedAgentId2amountSum = new HashMap <Id, Double>();
 	private List<Id> persons = new ArrayList<Id>();
 	
 	// for pt-distance calculation
@@ -101,7 +102,8 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 		driverId2totalDistance.clear();
 		personId2distanceEnterValue.clear();
 		ptDrivers.clear(); // not really necessary
-		personId2amountSum.clear();
+		causingAgentId2amountSum.clear();
+		affectedAgentId2amountSum.clear();
 	}
 
 	@Override
@@ -130,13 +132,22 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 			tripNumber2amount.put(tripNumber, updatedAmount);
 			personId2tripNumber2amount.put(event.getCausingAgentId(), tripNumber2amount);
 			
-			// person-based analysis
-			if (this.personId2amountSum.get(event.getCausingAgentId()) == null) {
-				this.personId2amountSum.put(event.getCausingAgentId(), amount);
+			// person-based analysis - causing agent
+			if (this.causingAgentId2amountSum.get(event.getCausingAgentId()) == null) {
+				this.causingAgentId2amountSum.put(event.getCausingAgentId(), amount);
 			} else {
-				double amountSoFar = this.personId2amountSum.get(event.getCausingAgentId());
+				double amountSoFar = this.causingAgentId2amountSum.get(event.getCausingAgentId());
 				double amountNew = amountSoFar + amount;
-				this.personId2amountSum.put(event.getCausingAgentId(), amountNew);
+				this.causingAgentId2amountSum.put(event.getCausingAgentId(), amountNew);
+			}
+			
+			// person-based analysis - affected agent
+			if (this.affectedAgentId2amountSum.get(event.getAffectedAgentId()) == null) {
+				this.affectedAgentId2amountSum.put(event.getAffectedAgentId(), amount);
+			} else {
+				double amountSoFar = this.affectedAgentId2amountSum.get(event.getAffectedAgentId());
+				double amountNew = amountSoFar + amount;
+				this.affectedAgentId2amountSum.put(event.getAffectedAgentId(), amountNew);
 			}
 		}
 	}
@@ -167,14 +178,15 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 			tripNumber2amount.put(tripNumber, updatedAmount);
 			personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
 			
-			// person-based analysis
-			if (this.personId2amountSum.get(event.getPersonId()) == null) {
-				this.personId2amountSum.put(event.getPersonId(), amount);
+			// person-based analysis - causing agent
+			if (this.causingAgentId2amountSum.get(event.getPersonId()) == null) {
+				this.causingAgentId2amountSum.put(event.getPersonId(), amount);
 			} else {
-				double amountSoFar = this.personId2amountSum.get(event.getPersonId());
+				double amountSoFar = this.causingAgentId2amountSum.get(event.getPersonId());
 				double amountNew = amountSoFar + amount;
-				this.personId2amountSum.put(event.getPersonId(), amountNew);
+				this.causingAgentId2amountSum.put(event.getPersonId(), amountNew);
 			}
+			
 		}
 	}
 	
@@ -505,11 +517,15 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 		}
 	}
 
-	public Map<Id, Double> getPersonId2amountSum() {
-		return personId2amountSum;
+	public Map<Id, Double> getCausingAgentId2amountSum() {
+		return causingAgentId2amountSum;
 	}
 	
-	public Map<Id, Double> getPersonId2amountSumAllAgents() {
+	public Map<Id, Double> getAffectedAgentId2amountSum() {
+		return affectedAgentId2amountSum;
+	}
+
+	public Map<Id, Double> getCausingAgentId2amountSumAllAgents() {
 		Map<Id, Double> personId2amountSumAllAgents = new HashMap<Id, Double>();
 		
 		List<Id> personIds = new ArrayList<Id>();
@@ -523,12 +539,41 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 		
 		for (Id id : personIds) {
 			double amountSum = 0.;
-			if (this.personId2amountSum.get(id) == null) {
+			if (this.causingAgentId2amountSum.get(id) == null) {
 				// no monetary payments
 			} else {
-				amountSum = -1.0 * this.personId2amountSum.get(id);
+				amountSum = -1.0 * this.causingAgentId2amountSum.get(id);
 			}
 			personId2amountSumAllAgents.put(id, amountSum);
+		}
+		return personId2amountSumAllAgents;
+	}
+	
+	public Map<Id, Double> getAffectedAgentId2amountSumAllAgents() {
+		Map<Id, Double> personId2amountSumAllAgents = new HashMap<Id, Double>();
+		
+		if (this.affectedAgentId2amountSum.isEmpty()) {
+			log.warn("There is no info re the affected agents. This info is only avalable when analyzing congestion events and not the money events.");		
+		
+		} else {
+			List<Id> personIds = new ArrayList<Id>();
+			if (this.scenario.getPopulation().getPersons().isEmpty()) {
+				log.warn("Scenario does not contain a Population. Using the person IDs from the events file for the person-based analysis.");
+				personIds.addAll(this.persons);
+			} else {
+				log.info("Scenario contains a Population. Using the person IDs from the population for the person-based analysis.");
+				personIds.addAll(this.scenario.getPopulation().getPersons().keySet());
+			}
+			
+			for (Id id : personIds) {
+				double amountSum = 0.;
+				if (this.affectedAgentId2amountSum.get(id) == null) {
+					// no monetary payments
+				} else {
+					amountSum = -1.0 * this.affectedAgentId2amountSum.get(id);
+				}
+				personId2amountSumAllAgents.put(id, amountSum);
+			}
 		}
 		return personId2amountSumAllAgents;
 	}

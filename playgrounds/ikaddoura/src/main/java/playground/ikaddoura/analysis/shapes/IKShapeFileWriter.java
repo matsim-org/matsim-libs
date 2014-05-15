@@ -49,8 +49,10 @@ public class IKShapeFileWriter {
 		b.add("Act_home", Integer.class);
 		b.add("Act_work", Integer.class);
 		b.add("Act_all", Integer.class);
-		b.add("tolls", Double.class);
-		b.add("avg_tolls", Double.class);
+		b.add("caused", Double.class);
+		b.add("avgCaused", Double.class);
+		b.add("affected", Double.class);
+		b.add("avgAffected", Double.class);
 		
 		return new SimpleFeatureBuilder(b.buildFeatureType());
 	}
@@ -59,11 +61,22 @@ public class IKShapeFileWriter {
 			Map<Integer, Integer> zoneNr2homeActivities,
 			Map<Integer, Integer> zoneNr2workActivities,
 			Map<Integer, Integer> zoneNr2activities,
-			Map<Integer, Double> zoneNr2tollPayments,
-			Map<Integer, Double> zoneNr2AvgTollPayments, String outputFile) {
+			Map<Integer, Double> zoneNr2tollPaymentsCaused,
+			Map<Integer, Double> zoneNr2AvgTollPaymentsCaused,
+			Map<Integer, Double> zoneNr2tollPaymentsAffected,
+			Map<Integer, Double> zoneNr2AvgTollPaymentsAffected,
+			String outputFile) {
 
 		SimpleFeatureBuilder factory = initFeatureType();
-		Set<SimpleFeature> features = createFeatures(zoneId2geometry, zoneNr2homeActivities, zoneNr2workActivities, zoneNr2activities, zoneNr2tollPayments, zoneNr2AvgTollPayments, factory);
+		Set<SimpleFeature> features = createFeatures(zoneId2geometry,
+				zoneNr2homeActivities,
+				zoneNr2workActivities,
+				zoneNr2activities,
+				zoneNr2tollPaymentsCaused,
+				zoneNr2AvgTollPaymentsCaused,
+				zoneNr2tollPaymentsAffected,
+				zoneNr2AvgTollPaymentsAffected,
+				factory);
 		ShapeFileWriter.writeGeometries(features, outputFile);
 		System.out.println("ShapeFile " + outputFile + " written.");	
 	}
@@ -73,13 +86,15 @@ public class IKShapeFileWriter {
 			Map<Integer, Integer> zoneNr2homeActivities,
 			Map<Integer, Integer> zoneNr2workActivities,
 			Map<Integer, Integer> zoneNr2activities,
-			Map<Integer, Double> zoneNr2tollPayments,
-			Map<Integer, Double> zoneNr2AvgTollPayments,
+			Map<Integer, Double> zoneNr2tollPaymentsCaused,
+			Map<Integer, Double> zoneNr2AvgTollPaymentsCaused,
+			Map<Integer, Double> zoneNr2tollPaymentsAffected,
+			Map<Integer, Double> zoneNr2AvgTollPaymentsAffected,
 			SimpleFeatureBuilder factory) {
 		
 		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
 		for (Integer nr : zoneId2geometry.keySet()){
-			features.add(getFeature(nr, zoneId2geometry.get(nr), zoneNr2homeActivities, zoneNr2workActivities, zoneNr2activities, zoneNr2tollPayments, zoneNr2AvgTollPayments, factory));
+			features.add(getFeature(nr, zoneId2geometry.get(nr), zoneNr2homeActivities, zoneNr2workActivities, zoneNr2activities, zoneNr2tollPaymentsCaused, zoneNr2AvgTollPaymentsCaused, zoneNr2tollPaymentsAffected, zoneNr2AvgTollPaymentsAffected, factory));
 		}
 		return (HashSet<SimpleFeature>) features;
 		
@@ -89,14 +104,16 @@ public class IKShapeFileWriter {
 			Map<Integer, Integer> zoneNr2homeActivities,
 			Map<Integer, Integer> zoneNr2workActivities,
 			Map<Integer, Integer> zoneNr2activities,
-			Map<Integer, Double> zoneNr2tollPayments,
-			Map<Integer, Double> zoneNr2AvgTollPayments,
+			Map<Integer, Double> zoneNr2tollPaymentsCaused,
+			Map<Integer, Double> zoneNr2AvgTollPaymentsCaused,
+			Map<Integer, Double> zoneNr2tollPaymentsAffected,
+			Map<Integer, Double> zoneNr2AvgTollPaymentsAffected,
 			SimpleFeatureBuilder factory) {
 
 		GeometryFactory geometryFactory = new GeometryFactory();
 		MultiPolygon g = (MultiPolygon) geometryFactory.createGeometry(geometry);
 		
-		Object [] attribs = new Object[7];
+		Object [] attribs = new Object[9];
 		attribs[0] = g;
 		attribs[1] = String.valueOf(nr);
 		
@@ -118,16 +135,28 @@ public class IKShapeFileWriter {
 			attribs[4] = 0;
 		}
 		
-		if (zoneNr2tollPayments.containsKey(nr)){
-			attribs[5] = zoneNr2tollPayments.get(nr);
+		if (zoneNr2tollPaymentsCaused.containsKey(nr)){
+			attribs[5] = zoneNr2tollPaymentsCaused.get(nr);
 		} else {
 			attribs[5] = 0;
 		}
 		
-		if (zoneNr2AvgTollPayments.containsKey(nr)){
-			attribs[6] = zoneNr2AvgTollPayments.get(nr);
+		if (zoneNr2AvgTollPaymentsCaused.containsKey(nr)){
+			attribs[6] = zoneNr2AvgTollPaymentsCaused.get(nr);
 		} else {
 			attribs[6] = 0;
+		}
+		
+		if (zoneNr2tollPaymentsAffected.containsKey(nr)){
+			attribs[7] = zoneNr2tollPaymentsAffected.get(nr);
+		} else {
+			attribs[7] = 0;
+		}
+		
+		if (zoneNr2AvgTollPaymentsAffected.containsKey(nr)){
+			attribs[8] = zoneNr2AvgTollPaymentsAffected.get(nr);
+		} else {
+			attribs[8] = 0;
 		}
 		
 		return factory.buildFeature(null, attribs);
