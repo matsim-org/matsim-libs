@@ -74,14 +74,14 @@ public class PathSizeLogitControler {
 		controler.setOverwriteFiles(true);
 		final Network network = controler.getNetwork();
 		
-		if (pathSizeLogit){
-			controler.addControlerListener(new StartupListener(){
-				@Override
-				public void notifyStartup(StartupEvent event) {
-					event.getControler().getStrategyManager().setPlanSelectorForRemoval(new DiversityGeneratingPlansRemover(network, endTimeWeight));
-				}
-			});
-		}
+//		if (pathSizeLogit){
+//			controler.addControlerListener(new StartupListener(){
+//				@Override
+//				public void notifyStartup(StartupEvent event) {
+//					event.getControler().getStrategyManager().setPlanSelectorForRemoval(new DiversityGeneratingPlansRemover(network, endTimeWeight));
+//				}
+//			});
+//		}
 		
 		controler.run();
 	}
