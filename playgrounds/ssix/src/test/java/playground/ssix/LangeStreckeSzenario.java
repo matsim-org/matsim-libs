@@ -7,10 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -21,11 +18,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.EventsUtils;
@@ -56,9 +53,9 @@ import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
-import playgrounds.ssix.BinaryAdditionModule;
-import playgrounds.ssix.FundamentalDiagramsNmodes;
 import playgrounds.ssix.MZilskePassingVehicleQ;
 import playgrounds.ssix.ModeData;
 
@@ -98,67 +95,46 @@ public class LangeStreckeSzenario{
 		
 		//Initializing scenario Config file
 		Config config = ConfigUtils.createConfig();
-		//config.addQSimConfigGroup(new QSimConfigGroup());
 		config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE) ;
 		config.qsim().setMainModes(Arrays.asList(NAMES));
 		config.qsim().setStuckTime(100*3600.);//allows to overcome maximal density regime
-		config.qsim().setEndTime(14*3600);//allows to set agents to abort after getting the wanted data.
-		//todo: is for actual network configurations correct, needs dependency on bigger network length 
+		config.qsim().setEndTime(END_TIME);
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", VspExperimentalConfigGroup.ABORT) ;
-		// this may lead to abort during execution.  In such cases, please fix the configuration.  if necessary, talk
-		// to me (kn).
 		this.scenario = ScenarioUtils.createScenario(config);
-		ConfigWriter cWriter = new ConfigWriter(config);
-		//cWriter.write("Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\config.xml");
-		
-		//Initializing modeData objects//TODO: should be initialized when instancing FundamentalDiagrams, no workaround still found
-		//Need to be currently initialized at this point to initialize output and modified QSim
-		this.modesData = new HashMap<Id, ModeData>();
-		for (int i=0; i < NUMBER_OF_MODES; i++){
-			Id modeId = new IdImpl(NAMES[i]);
-			VehicleType vehicleType = VehicleUtils.getFactory().createVehicleType(modeId);
-			vehicleType.setPcuEquivalents(Pcus[i]);
-			vehicleType.setMaximumVelocity(Speeds[i]);
-			VehicleCapacity cap = new VehicleCapacityImpl();
-			cap.setSeats(3);//this is default for now, could be improved with mode-dependent vehicle capacity
-			vehicleType.setCapacity(cap);
-			ModeData modeData = new ModeData(modeId, vehicleType);
-			this.modesData.put(modeId, modeData);
-		}
 	}
 	
 	public static void main(String[] args) {
 		LangeStreckeSzenario autobahn = new LangeStreckeSzenario(NETWORK_CAPACITY);
 		autobahn.fillNetworkData();
 		autobahn.openFile(OUTPUT_DIR);
-		//TODO: runExperiment
+		autobahn.runExperiment();
 
 		autobahn.closeFile();
 	}
 
 	private void runExperiment() {
 		this.createPopulation();
-//		for (int i=0; i<NAMES.length; i++){
-//			this.modesData.get(new IdImpl(NAMES[i])).setnumberOfAgents(pointToRun.get(i).intValue());
-//		}
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		
-		DataAnalyzer analyze = new DataAnalyzer(this.scenario, this.modesData);
-		this.modesData = analyze.getModesData();
+		DataAnalyzer analyze = new DataAnalyzer(this.scenario);
 		LangeStreckeSzenario.analyzer =  analyze;
 		events.addHandler(analyze);
 		events.addHandler(new EventWriterXML(OUTPUT_EVENTS));
 		
 		Netsim qSim = createModifiedQSim(this.scenario, events);
 		
+		//OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, (QSim)qSim);
+		//OTFClientLive.run(scenario.getConfig(), server);
+		
 		qSim.run();
+		analyzer.analyze();
 		
-		//TODO
-		//analyzer.analyze
+		for (Integer interval : analyzer.getIntervalNVeh().keySet()){
+			writer.format("%.2f\t", analyzer.getIntervalMeanSpeed().get(interval));
+			writer.format("%.2f\n", analyzer.getIntervalFlow().get(interval));
+		}
 		
-		//writer.doSomething
-		writer.format("%d\t\t",analyze.getGlobalData().numberOfAgents);
 	}
 
 	private void fillNetworkData(){
@@ -186,7 +162,7 @@ public class LangeStreckeSzenario{
 		
 		//LINKS
 		double speedUp = 35;
-		double speedDown = 30;
+		double speedDown = 25;
 		
 		Link link = this.scenario.getNetwork().getFactory().createLink( new IdImpl("0to1")  ,  n.getNodes().get(new IdImpl((long)0))  ,   n.getNodes().get(new IdImpl((long)1)));
 		link.setCapacity(LangeStreckeSzenario.NETWORK_CAPACITY);
@@ -225,7 +201,7 @@ public class LangeStreckeSzenario{
 		
 		link = this.scenario.getNetwork().getFactory().createLink( new IdImpl("5to6")  ,  n.getNodes().get(new IdImpl((long)5))  ,   n.getNodes().get(new IdImpl((long)6)));
 		link.setCapacity(LangeStreckeSzenario.NETWORK_CAPACITY);
-		link.setFreespeed(speedUp);
+		link.setFreespeed(speedDown);
 		link.setLength(1800.);
 		link.setNumberOfLanes(1.);
 		n.addLink(link);
@@ -272,7 +248,7 @@ public class LangeStreckeSzenario{
 					Map<String, Object> customMap = person.getCustomAttributes();
 					
 					Plan plan = population.getFactory().createPlan();
-					plan.addActivity(createHome(vehID));
+					plan.addActivity(createHome(t));
 					
 					//Assigning transport mode
 					customMap.put("transportMode", transportMode);
@@ -367,11 +343,17 @@ public class LangeStreckeSzenario{
         
         //Second modification: Mobsim needs to know the different vehicle types (and their respective speeds)
         Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
-        for (int i=0; i<modesData.size(); i++){
-        	String id = modesData.get(new IdImpl(NAMES[i])).getModeId().toString();
-        	VehicleType vT = modesData.get(new IdImpl(NAMES[i])).getVehicleType();
-        	modeVehicleTypes.put(id, vT);
-        }
+        
+        for (int i=0; i < NUMBER_OF_MODES; i++){
+			Id modeId = new IdImpl(NAMES[i]);
+			VehicleType vehicleType = VehicleUtils.getFactory().createVehicleType(modeId);
+			vehicleType.setPcuEquivalents(Pcus[i]);
+			vehicleType.setMaximumVelocity(Speeds[i]);
+			VehicleCapacity cap = new VehicleCapacityImpl();
+			cap.setSeats(3);//this is default for now, could be improved with mode-dependent vehicle capacity
+			vehicleType.setCapacity(cap);
+			modeVehicleTypes.put(modeId.toString(), vehicleType);
+		}
         agentSource.setModeVehicleTypes(modeVehicleTypes);
         //////////////////////////////////////////////////////
         
