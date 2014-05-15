@@ -26,7 +26,6 @@ import com.google.inject.*;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import org.matsim.analysis.VolumesAnalyzer;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -40,10 +39,6 @@ import playground.mzilske.cdr.ZoneTracker;
 import playground.mzilske.controller.CharyparNagelModule;
 import playground.mzilske.controller.Controller;
 import playground.mzilske.controller.ControllerModule;
-import playground.mzilske.d4d.Sighting;
-
-import java.util.List;
-import java.util.Map;
 
 public class Main {
 
@@ -93,7 +88,8 @@ public class Main {
                         bind(Network.class).annotatedWith(Names.named("groundTruthNetwork")).toInstance(groundTruthNetwork);
                         bind(VolumesAnalyzer.class).annotatedWith(Names.named("groundTruthVolumes")).toInstance(groundTruthVolumes);
                         bind(CompareMain.class).toInstance(compareMain);
-
+                        bind(Double.class).annotatedWith(Names.named("clonefactor")).toInstance(5.0);
+                        bind(Double.class).annotatedWith(Names.named("cadytsweight")).toInstance(10.0);
                         bind(Config.class).toProvider(ScenarioReconstructor.ConfigProvider.class).in(Singleton.class);
                         bind(Scenario.class).toProvider(ScenarioReconstructor.class).in(Singleton.class);
                         bind(Counts.class).annotatedWith(Names.named("allCounts")).toInstance(allCounts);
@@ -106,8 +102,8 @@ public class Main {
         );
 
         Controller controler2 = injector2.getInstance(Controller.class);
-
         controler2.run();
+
     }
 
 }

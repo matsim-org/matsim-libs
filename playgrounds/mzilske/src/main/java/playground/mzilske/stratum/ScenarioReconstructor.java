@@ -38,6 +38,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.mzilske.cdr.CompareMain;
 import playground.mzilske.cdr.PopulationFromSightings;
 import playground.mzilske.cdr.ZoneTracker;
+import playground.mzilske.populationsize.CloneHistogram;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -57,6 +58,9 @@ class ScenarioReconstructor implements Provider<Scenario> {
     @Inject
     ZoneTracker.LinkToZoneResolver linkToZoneResolver;
 
+    @Inject @com.google.inject.name.Named("clonefactor")
+    double clonefactor;
+
     public Scenario get() {
 
 
@@ -66,12 +70,12 @@ class ScenarioReconstructor implements Provider<Scenario> {
         PopulationFromSightings.createPopulationWithEndTimesAtLastSightings(scenario, linkToZoneResolver, compareMain.getSightingsPerPerson());
         PopulationFromSightings.preparePopulation(scenario, linkToZoneResolver, compareMain.getSightingsPerPerson());
 
+        CloneHistogram.clonePopulation(scenario, (int) clonefactor);
 
         final ObjectAttributes personAttributes = scenario.getPopulation().getPersonAttributes();
 
-        final String CLONE_FACTOR = "cloneScore";
         for (Person person : scenario.getPopulation().getPersons().values()) {
-            personAttributes.putAttribute(person.getId().toString(), CLONE_FACTOR, 0.0);
+            personAttributes.putAttribute(person.getId().toString(), "PID", 0.0);
         }
         for (Person person : scenario.getPopulation().getPersons().values()) {
             person.setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(person));
@@ -83,15 +87,13 @@ class ScenarioReconstructor implements Provider<Scenario> {
         public Config get() {
             final Config config = ConfigUtils.createConfig();
             ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
-            config.strategy().setMaxAgentPlanMemorySize(100);
-            config.planCalcScore().setWriteExperiencedPlans(true);
-            config.controler().setLastIteration(1000);
+            config.controler().setLastIteration(150);
             config.qsim().setFlowCapFactor(100);
             config.qsim().setStorageCapFactor(100);
             config.qsim().setRemoveStuckVehicles(false);
 
             StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(new IdImpl(1));
-            stratSets.setModuleName("ccc") ;
+            stratSets.setModuleName("SelectExpBeta") ;
             stratSets.setProbability(1.) ;
             config.strategy().addStrategySettings(stratSets) ;
             return config;

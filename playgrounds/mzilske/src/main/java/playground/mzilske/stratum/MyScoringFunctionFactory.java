@@ -23,7 +23,7 @@
 package playground.mzilske.stratum;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
-import org.matsim.api.core.v01.Scenario;
+import com.google.inject.name.Named;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -32,7 +32,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.mzilske.cadyts.CadytsScoring;
 
 import javax.inject.Inject;
@@ -41,21 +40,30 @@ class MyScoringFunctionFactory implements ScoringFunctionFactory {
 
     @Inject
     Config config;
-    @Inject
-    Scenario scenario;
+
     @Inject
     AnalyticalCalibrator<Link> cadyts;
 
     @Inject
     PlansTranslator<Link> ptStep;
 
-    private final String CLONE_FACTOR = "cloneScore";
+    @Inject @Named("clonefactor")
+    double clonefactor;
+
+    @Inject @Named("cadytsweight")
+    double cadytsweight;
 
     @Override
     public ScoringFunction createNewScoringFunction(final Person person) {
         SumScoringFunction sumScoringFunction = new SumScoringFunction();
         CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, ptStep, cadyts);
+        scoringFunction.setWeight(cadytsweight);
         sumScoringFunction.addScoringFunction(scoringFunction);
+
+        // prior
+        // das funktioniert für genau diese konstellation, mit je zwei plänen und keinem (oder niedrigem)
+        // sonstigem utility. keine ahnung, wie das sonst ist.
+
         sumScoringFunction.addScoringFunction(new SumScoringFunction.LegScoring() {
             boolean hasLeg = false;
             @Override
@@ -63,13 +71,7 @@ class MyScoringFunctionFactory implements ScoringFunctionFactory {
             @Override
             public double getScore() {
                 if (hasLeg) {
-                    final ObjectAttributes personAttributes = scenario.getPopulation().getPersonAttributes();
-                    double cloneFactor = (Double) personAttributes.getAttribute(person.getId().toString(), CLONE_FACTOR);
-                    cadyts.demand.Plan<Link> currentPlanSteps = ptStep.getPlanSteps(person.getSelectedPlan());
-                    double currentPlanCadytsCorrection = cadyts.calcLinearPlanEffect(currentPlanSteps);
-                    cloneFactor = cloneFactor + 0.01 * currentPlanCadytsCorrection;
-                    personAttributes.putAttribute(person.getId().toString(), CLONE_FACTOR, cloneFactor);
-                    return cloneFactor;
+                    return - Math.log( clonefactor - 1.0 );
                 } else {
                     return 0.0;
                 }
@@ -81,4 +83,5 @@ class MyScoringFunctionFactory implements ScoringFunctionFactory {
         });
         return sumScoringFunction;
     }
+
 }

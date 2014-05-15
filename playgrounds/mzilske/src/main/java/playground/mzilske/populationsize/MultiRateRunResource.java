@@ -55,8 +55,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -435,10 +433,10 @@ class MultiRateRunResource {
         new CountsReaderMatsimV1(allCounts).parse(WD + "/rates/" + rate + "/all_counts.xml.gz");
         final Counts someCounts = new Counts();
         new CountsReaderMatsimV1(someCounts).parse(WD + "/rates/" + rate + "/calibration_counts.xml.gz");
-        if (cloneFactor != 1) {
-            // CloneFactor == 1 will leave everything as is, without stay-at-home-plans.
-            clonePopulation(scenario, cloneFactor);
-        }
+
+        // CloneFactor == 1 will leave everything as is, without stay-at-home-plans.
+        CloneHistogram.clonePopulation(scenario, cloneFactor);
+
 
 
         List<Module> modules = new ArrayList<Module>();
@@ -465,27 +463,6 @@ class MultiRateRunResource {
         Injector injector2 = Guice.createInjector(modules);
         Controller controler2 = injector2.getInstance(Controller.class);
         controler2.run();
-    }
-
-    private void clonePopulation(Scenario scenario, int count) {
-        for (Person person : scenario.getPopulation().getPersons().values()) {
-            Plan plan2 = scenario.getPopulation().getFactory().createPlan();
-            person.addPlan(plan2);
-            person.setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(person));
-        }
-        for (Person person : new ArrayList<Person>(scenario.getPopulation().getPersons().values())) {
-            for (int i=0; i<count-1; i++) {
-                Id personId = new IdImpl("I"+i+"_" + person.getId().toString());
-                Person clone = scenario.getPopulation().getFactory().createPerson(personId);
-                for (Plan plan : person.getPlans()) {
-                    Plan clonePlan = scenario.getPopulation().getFactory().createPlan();
-                    ((PlanImpl) clonePlan).copyFrom(plan);
-                    clone.addPlan(clonePlan);
-                }
-                clone.setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(clone));
-                scenario.getPopulation().addPerson(clone);
-            }
-        }
     }
 
 

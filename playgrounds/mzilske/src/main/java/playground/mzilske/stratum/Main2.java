@@ -94,7 +94,8 @@ public class Main2 {
                         bind(Counts.class).annotatedWith(Names.named("allCounts")).toInstance(allCounts);
                         bind(Counts.class).annotatedWith(Names.named("calibrationCounts")).toInstance(allCounts);
 
-                        bind(ScoringFunctionFactory.class).to(MyScoringFunctionFactory2.class);
+                        bind(Double.class).annotatedWith(Names.named("clonefactor")).toInstance(1.0);
+                        bind(ScoringFunctionFactory.class).to(MyScoringFunctionFactory.class);
 
 
                     }

@@ -61,7 +61,7 @@ public class CadytsModule extends AbstractModule {
     protected void configure() {
         Multibinder <ControlerListener> controlerListenerBinder = Multibinder.newSetBinder(binder(), ControlerListener.class);
         controlerListenerBinder.addBinding().to(CadytsControlerListener.class);
-//        controlerListenerBinder.addBinding().toProvider(MyControlerListenerProvider.class);
+        controlerListenerBinder.addBinding().toProvider(MyControlerListenerProvider.class);
         MapBinder<String, PlanStrategyFactory> planStrategyFactoryBinder
                 = MapBinder.newMapBinder(binder(), String.class, PlanStrategyFactory.class);
         planStrategyFactoryBinder.addBinding("ccc").toProvider(PlanChangerFactoryProvider.class);
