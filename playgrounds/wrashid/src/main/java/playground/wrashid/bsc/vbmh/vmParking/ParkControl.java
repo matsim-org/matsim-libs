@@ -602,12 +602,14 @@ public class ParkControl {
 				personAttributes.put("VMScoreKeeper", scorekeeper);
 			}
 			scorekeeper.add(payedParking*this.betaMoney);
-		
+			//System.out.println("payedParking util :"+payedParking*this.betaMoney);
 			//EVs:
 			if(!evUsage){return;}
 			if(evControl.hasEV(event.getPersonId())){
 				if(selectedSpot.charge){
-					evControl.charge(personId, selectedSpot.chargingRate, duration);
+					double chargedAmountOfEnergy;
+					chargedAmountOfEnergy=evControl.charge(personId, selectedSpot.chargingRate, duration);
+					//scorekeeper.add(VMConfig.pricePerKWH*VMConfig.betaPayMoney*(-1)*chargedAmountOfEnergy);
 					//System.out.println("EV charged person: "+personId.toString()+" parking: "+selectedSpot.parking.id+" new state of charge [%]: "+evControl.stateOfChargePercentage(personId));
 				}
 			}
