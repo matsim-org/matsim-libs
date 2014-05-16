@@ -42,15 +42,15 @@ public class QPositionDataWriterForR {
 //		private static String outputDir = "../../patnaIndiaSim/outputTestCase/3modesNoPassing/";//"./outputTest/";//
 //		private static String eventFile = outputDir+"ITERS/data_Patna_3modes_withoutPassing_alternativeSpeed_events.xml";//outputDir+"/ITERS/it.10/10.events.xml.gz";//
 //		private static String networkFile="../../patnaIndiaSim/input/dreieck_network.xml";
-//	private static String configFile ="../../patnaIndiaSim/outputSS/3links1Km/config.xml";
-//	private static String outputDir ="../../patnaIndiaSim/outputSS/3links1Km/";
-//	private static String eventFile = outputDir+"/events.xml";
-//	private static String networkFile="../../patnaIndiaSim/outputSS/3links1Km/dreieck_network.xml";
+	private static String configFile ="../../patnaIndiaSim/outputSS/2modesNoStuck/config.xml";
+	private static String outputDir ="../../patnaIndiaSim/outputSS/2modesNoStuck/";
+	private static String eventFile = outputDir+"/events.xml";
+	private static String networkFile="../../patnaIndiaSim/outputSS/2modesNoStuck/dreieck_network.xml";
 	
-		private static String configFile ="./output/config.xml";
-		private static String outputDir = "./output/";
-		private static String eventFile = outputDir+"events.xml";
-		private static String networkFile = outputDir+"network.xml";
+//		private static String configFile ="./output/config.xml";
+//		private static String outputDir = "./output/";
+//		private static String eventFile = outputDir+"events.xml";
+//		private static String networkFile = outputDir+"network.xml";
 
 	private static Scenario scenario;
 	private static QueuePositionCalculationHandler calculationHandler;

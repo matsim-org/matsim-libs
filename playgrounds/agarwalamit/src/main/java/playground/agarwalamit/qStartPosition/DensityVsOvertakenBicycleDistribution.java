@@ -51,8 +51,8 @@ public class DensityVsOvertakenBicycleDistribution extends AbstractAnalyisModule
 	}
 
 	public static void main(String[] args) {
-//		String outputDir ="../../patnaIndiaSim/outputTest/";
-//		String eventFile = outputDir+"ITERS/it.10/10.events.xml.gz";
+//		String outputDir ="../../patnaIndiaSim/outputSS/3links1KmNoStuckEqualModalSplit/";
+//		String eventFile = outputDir+"events.xml";
 				String outputDir = "./output/";
 				String eventFile =outputDir+"/events.xml";
 		DensityVsOvertakenBicycleDistribution dobd = new DensityVsOvertakenBicycleDistribution(eventFile);

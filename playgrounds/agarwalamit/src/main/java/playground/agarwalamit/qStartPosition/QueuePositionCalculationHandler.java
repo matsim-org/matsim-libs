@@ -148,7 +148,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 			linkId2PersonId2LinkInfo.get(linkId).remove(personId);
 		}
 	}
-
+	
 	private PersonOnLinkInformation insertLinkEnterInfo(LinkEnterEvent event, Link link){
 		PersonOnLinkInformation personOnLinkInfo = new PersonOnLinkInformation();
 		personOnLinkInfo.setLink(link);
@@ -207,4 +207,6 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		}
 		return effCellSize;
 	}
+
+	
 }
