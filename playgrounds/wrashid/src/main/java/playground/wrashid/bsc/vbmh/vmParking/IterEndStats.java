@@ -260,7 +260,7 @@ public class IterEndStats {
 				chart.addSeries("Parkinglot occupancy", Integer.toString(parking.id)+"EV");
 				chart.addSeries("Parkinglot occupancy", Integer.toString(parking.id)+"NEV");
 				for(Double[] values : parking.occupancyList){
-					VMCharts.addValues("Parkinglot occupancy", Integer.toString(parking.id)+"EV", values[0], values[2]);
+					VMCharts.addValues("Parkinglot occupancy", Integer.toString(parking.id)+"EV", values[0], values[1]);
 					VMCharts.addValues("Parkinglot occupancy", Integer.toString(parking.id)+"NEV", values[0], values[2]);
 				}
 				
