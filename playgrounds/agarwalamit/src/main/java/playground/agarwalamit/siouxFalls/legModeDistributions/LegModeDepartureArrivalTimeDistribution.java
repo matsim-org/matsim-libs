@@ -19,6 +19,7 @@
 package playground.agarwalamit.siouxFalls.legModeDistributions;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +78,8 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModu
 			LegModeDepartureArrivalTimeDistribution lmdatd = new LegModeDepartureArrivalTimeDistribution(eventsFile, configFile);
 			lmdatd.preProcessData();
 			lmdatd.postProcessData();
-			lmdatd.writeResults(runDir+"/analysis/"+run);
+			new File(runDir+run+"/analysis/legModeDistribution/").mkdir();
+			lmdatd.writeResults(runDir+run+"/analysis/legModeDistribution/");
 		}
 	}
 
@@ -113,6 +115,7 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModu
 				for(Id id:mode2personId2DepOrArrTime.get(mode).keySet()){
 					double tt [] = mode2personId2DepOrArrTime.get(mode).get(id);
 					for(double d:tt){
+						d=d/(2*3600);
 						if(d > this.timeStepClasses.get(i) && d < this.timeStepClasses.get(i+1)){
 							legCount++;
 						}
@@ -127,7 +130,7 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModu
 
 	@Override
 	public void writeResults(String outputFolder) {
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+".rLegModeDepartureTimeDistribution.txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"rLegModeDepartureTimeDistribution.txt");
 		try {
 			writer.write("# \t");
 			for(String mode:this.travelModes){

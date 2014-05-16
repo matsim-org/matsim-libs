@@ -72,7 +72,7 @@ public class LegModeDistributionForActivityStartEndTimeDuration extends Abstract
 	public static void main(String[] args) {
 		String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/";
 		//		String [] runs = {"run33"};
-		String [] runs = {"run105"/*,"run106","run107","run108"*/};
+		String [] runs = {"run105","run106","run107","run108"};
 
 		for(String run:runs){
 			String eventsFile = runDir+run+"/ITERS/it.100/100.events.xml.gz";
@@ -158,7 +158,7 @@ public class LegModeDistributionForActivityStartEndTimeDuration extends Abstract
 		BufferedWriter writer;
 
 		for(String actTyp:inputMap.keySet()){
-			writer = IOUtils.getBufferedWriter(outputFolder+".r"+actTyp+"Act2Mode2Act"+actStartActEndOrActDuration+"Distribution.txt");
+			writer = IOUtils.getBufferedWriter(outputFolder+"r"+actTyp+"Act2Mode2Act"+actStartActEndOrActDuration+"Distribution.txt");
 			try {
 				writer.write("# \t");
 				for(String mode:this.travelModes){
