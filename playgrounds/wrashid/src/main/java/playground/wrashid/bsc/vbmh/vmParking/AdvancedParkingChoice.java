@@ -135,7 +135,7 @@ public class AdvancedParkingChoice {
 		}
 		
 		public String toString(){
-			return "price : "+price+" walkingDistance "+walkingDistance+" newSOC "+newSOC;
+			return "price : "+price+" walkingDistance "+walkingDistance+" newSOC "+newSOC+" score "+score;
 		}
 	}
 	

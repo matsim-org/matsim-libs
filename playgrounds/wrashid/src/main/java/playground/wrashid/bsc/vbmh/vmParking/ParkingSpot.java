@@ -20,5 +20,11 @@ public class ParkingSpot {
 	void setOccupied(boolean occupied) {
 		this.occupied = occupied;
 	}
+	public boolean isCharge() {
+		return charge;
+	}
+	public double getChargingRate() {
+		return chargingRate;
+	}
 
 }

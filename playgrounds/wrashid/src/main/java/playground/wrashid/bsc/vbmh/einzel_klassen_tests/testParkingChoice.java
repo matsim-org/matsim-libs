@@ -32,14 +32,16 @@ public class testParkingChoice {
 //		choice.calcUtil(500, 5, 0, 0.6);
 //		choice.calcUtil(500, 5, -1, 0.6);
 //		
+		System.out.println("fall test");
 		choice = new AdvancedParkingChoice();
 		choice.startUp();
-		choice.setBetaSOC(0.279);
-		choice.setRequiredRestOfDayBatPerc(0.3);
-		System.out.println("fall test");
-		choice.addOption(choice.new Option(null, 5, 100, 0.6));
-		choice.addOption(choice.new Option(null, 5, 1400, 0.8));
-		choice.addOption(choice.new Option(null, 8.5, 700, 0.0));
+		
+		choice.setBetaSOC(0.237);
+		choice.setRequiredRestOfDayBatPerc(0.002);
+
+		//choice.addOption(choice.new Option(null, 3.416, 2*1736, 0.784));
+		choice.addOption(choice.new Option(null, 8.416, 2*1736, 0.99));
+
 		System.out.println(choice.selectBestOption().toString());
 		System.out.println("beta SOC :" +choice.getBetaSOC());
 	}

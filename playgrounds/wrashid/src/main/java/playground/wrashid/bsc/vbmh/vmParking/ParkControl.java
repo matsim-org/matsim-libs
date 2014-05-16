@@ -68,7 +68,7 @@ public class ParkControl {
 	
 	
 	Controler controller;
-	ParkingMap parkingMap = new ParkingMap(); //Beinhaltet alle Parkplaetze
+	public ParkingMap parkingMap = new ParkingMap(); //Beinhaltet alle Parkplaetze
 	PricingModels pricing = new PricingModels(); //Behinhaltet die Preismodelle
 	ParkHistoryWriter phwriter = new ParkHistoryWriter(); //Schreibt XML Datei mit Park events
 	EVControl evControl;
@@ -507,7 +507,7 @@ public class ParkControl {
 	}
 
 	//--------------------------- G E T  P U B L I C ---------------------------------------------
-	LinkedList<ParkingSpot> getPublicParkings(Coord coord, boolean ev) {
+	public LinkedList<ParkingSpot> getPublicParkings(Coord coord, boolean ev) {
 		return getPublicParkings(coord, ev, VMConfig.maxDistance);
 	}
 	
