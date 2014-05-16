@@ -38,7 +38,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
 import playground.benjamin.internalization.EmissionCostModule;
-import playground.julia.distribution.EmissionModule;
+import playground.vsp.emissions.EmissionModule;
 
 /**
  * @author benjamin

@@ -65,11 +65,11 @@ public class MultiAnalyzer {
 	private static String [] cases = {
 	
 	//nectar
-	"981",
-	"982",
-	"983",
-	"984",
-	"985",
+//	"981",
+//	"982",
+//	"983",
+//	"984",
+//	"985",
 			
 	//mobilTUM
 //	runNr1,
@@ -86,12 +86,19 @@ public class MultiAnalyzer {
 //	"policyCase_pricing_fuelEff_7.5pct",
 //	"policyCase_pricing_fuelEff_10pct",
 //	"policyCase_pricing_fuelEff_20pct"
+	
+	// exposure internalization
+	"baseCase_ctd" ,
+	"policyCase_zone30" ,
+	"policyCase_pricing",
+	"policyCase_exposurePricing"	
+	
 	};
 	
 	//nectar
-	private static String runDirectoryStub = "../../runs-svn/run";
-//	private static String initialIterationNo = "1000";
-	private static String finalIterationNo = "1500";
+//	private static String runDirectoryStub = "../../runs-svn/run";
+////	private static String initialIterationNo = "1000";
+//	private static String finalIterationNo = "1500";
 	
 	//mobilTUM
 //	private static String runDirectoryStub = "../../runs-svn/detEval/mobilTUMPaper/1pct/run";
@@ -102,6 +109,11 @@ public class MultiAnalyzer {
 //	private static String runDirectoryStub = "../../runs-svn/detEval/latsis/output/output_";
 //	private static String initialIterationNo = "1000";
 //	private static String finalIterationNo = "1500";
+	
+	// exposure internalization
+	private static String runDirectoryStub = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_";
+//	private static String initialIterationNo = "1000";
+	private static String finalIterationNo = "1500";
 		
 	private Double simulationEndTime= 30*60*60.;
 
@@ -141,17 +153,17 @@ public class MultiAnalyzer {
 			String runDirectory = runDirectoryStub + caseName + "/";
 			
 			//mobilTUM
-			netFile = runDirectory + caseName + ".output_network.xml.gz";
-			configFile = runDirectory + caseName + ".output_config.xml.gz";
+//			netFile = runDirectory + caseName + ".output_network.xml.gz";
+//			configFile = runDirectory + caseName + ".output_config.xml.gz";
 			
 //			if(caseName.equals(cases[0])){
 //				plansFile = runDirectory + "ITERS/it." + initialIterationNo + "/" + caseName + "." +  initialIterationNo + ".plans.xml.gz";
 //				eventsFile = runDirectory + "ITERS/it." + initialIterationNo + "/" + caseName + "." +  initialIterationNo + ".events.xml.gz";
 //				emissionEventsFile = runDirectory + "ITERS/it." + initialIterationNo + "/" + caseName + "." + initialIterationNo +  ".emission.events.xml.gz";
 //			} else {
-				plansFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + caseName + "." +  finalIterationNo + ".plans.xml.gz";
-				eventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + caseName + "." +  finalIterationNo + ".events.xml.gz";
-				emissionEventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + caseName + "." + finalIterationNo +  ".emission.events.xml.gz";
+//				plansFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + caseName + "." +  finalIterationNo + ".plans.xml.gz";
+//				eventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + caseName + "." +  finalIterationNo + ".events.xml.gz";
+//				emissionEventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + caseName + "." + finalIterationNo +  ".emission.events.xml.gz";
 //			}
 			
 			//latsis
@@ -161,9 +173,16 @@ public class MultiAnalyzer {
 //			eventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".events.xml.gz";
 //			emissionEventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".emission.events.xml.gz";
 			
-//			calculateUserWelfareAndTollRevenueStatisticsByUserGroup(netFile, configFile, plansFile, eventsFile, caseName);
+				// exposure internalization
+				netFile = runDirectory + "output_network.xml.gz";
+				configFile = runDirectory + "output_config.xml.gz";
+				plansFile = runDirectory + "ITERS/it." + finalIterationNo +"/" + finalIterationNo + ".plans.xml.gz";
+				eventsFile = runDirectory + "ITERS/it." + finalIterationNo +"/" + finalIterationNo + ".events.xml.gz";
+				emissionEventsFile = runDirectory + "ITERS/it." + finalIterationNo +"/" + finalIterationNo + ".emission.events.xml.gz";
+				
+			calculateUserWelfareAndTollRevenueStatisticsByUserGroup(netFile, configFile, plansFile, eventsFile, caseName);
 			calculateDistanceTimeStatisticsByUserGroup(netFile, eventsFile, caseName);
-//			calculateEmissionStatisticsByUserGroup(emissionEventsFile, caseName);
+			calculateEmissionStatisticsByUserGroup(emissionEventsFile, caseName);
 			calculateExposureEmissionCostsByUserGroup(eventsFile, emissionEventsFile, caseName);
 		}
 		calculateDistanceTimeStatisticsByUserGroupDifferences(case2personId2carDistance);

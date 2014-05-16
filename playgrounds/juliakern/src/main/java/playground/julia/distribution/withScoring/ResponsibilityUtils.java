@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import playground.julia.distribution.EmActivity;
 import playground.julia.distribution.EmPerCell;
 import playground.julia.distribution.ResponsibilityEvent;
+import playground.julia.distribution.withScoringFast.ResponsibilityEventImpl;
 
 public class ResponsibilityUtils {
 

@@ -28,6 +28,7 @@ import org.matsim.core.router.util.TravelTime;
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.julia.distribution.withScoring.EmissionControlerListener;
 import playground.julia.distribution.withScoring.ResDisCalculator;
+import playground.vsp.emissions.EmissionModule;
 
 
 

@@ -43,12 +43,12 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 
 import playground.julia.distribution.EmActivity;
 import playground.julia.distribution.EmPerCell;
-import playground.julia.distribution.EmissionModule;
 import playground.julia.distribution.GridTools;
 import playground.julia.newInternalization.IntervalHandler;
 import playground.julia.responsibilityOffline.EmCarTrip;
 import playground.julia.spatialAveraging.SimpleWarmEmissionEventHandler;
 import playground.vsp.emissions.events.EmissionEventsReader;
+import playground.vsp.emissions.*;
 
 /**
  * @author benjamin

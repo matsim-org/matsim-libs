@@ -35,12 +35,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.benjamin.scenarios.munich.analysis.filter.LocationFilter;
+import playground.benjamin.scenarios.zurich.analysis.MoneyEventHandler;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 import playground.vsp.emissions.events.EmissionEventsReader;
@@ -55,8 +57,12 @@ public class SpatialAveragingTollPayments {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingTollPayments.class);
 
 	final double scalingFactor = 100.;
-	private final static String runNumber1 = "baseCase";
-	private final static String runDirectory1 = "../../runs-svn/detEval/emissionInternalization/output/output_baseCase_ctd_newCode/";
+	private final static String runNumber1 = "exposurePricing";
+	private final static String runDirectory1 = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_policyCase_exposurePricing/";
+
+//	private final static String runNumber1 = "pricing";
+//	private final static String runDirectory1 = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_policyCase_pricing/";
+//	private final static String runDirectory1 = "../../runs-svn/detEval/emissionInternalization/output/output_baseCase_ctd_newCode/";
 //	private final static String runNumber2 = "zone30";
 //	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
 //	private final static String runNumber2 = "pricing";
@@ -74,6 +80,7 @@ public class SpatialAveragingTollPayments {
 	private final String plansFile1 = runDirectory1 + "ITERS/it.1500/1500.plans.xml";
 //	private final String plansFile2 = runDirectory2 + "ITERS/it.1500/1500.plans.xml";
 	private final String emissionFile = runDirectory1 + "ITERS/it.1500/1500.emission.events.xml.gz";
+	private final String eventsfile = runDirectory1 +  "ITERS/it.1500/1500.events.xml.gz";
 	
 //	final double scalingFactor = 10.;
 //	private final static String runNumber1 = "981";
@@ -104,11 +111,7 @@ public class SpatialAveragingTollPayments {
 	LocationFilter lf;
 	Network network;
 
-	String outPathStub = runDirectory1 + "analysis/spatialAveraging/welfare/";
-
-	private double emissionCostFactor = 1.0;
-
-	private boolean substractAverageValue = false; // personal value
+	String outPathStub = runDirectory1 + "analysis/spatialAveraging/";
 
 	private void run() throws IOException{
 		this.sau = new SpatialAveragingUtils(xMin, xMax, yMin, yMax, noOfXbins, noOfYbins, smoothingRadius_m, munichShapeFile, null);
@@ -122,38 +125,49 @@ public class SpatialAveragingTollPayments {
 		Config config = scenario.getConfig();
 		Population pop = scenario.getPopulation();
 		
-		// calculate paid toll per person
-		Map<Id, Double> personId2paidToll = new HashMap<Id, Double>();
+		
+		// get paid toll
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
+		MoneyEventHandler moneyEventHandler = new MoneyEventHandler();
+		eventsManager.addHandler(moneyEventHandler);
+		MatsimEventsReader mer = new MatsimEventsReader(eventsManager);
+		mer.readFile(eventsfile);
 		
-		SimpleWarmEmissionEventHandler weeh = new SimpleWarmEmissionEventHandler();
-		eventsManager.addHandler(weeh);
-		SimpleColdEmissionEventHandler ceeh = new SimpleColdEmissionEventHandler();
-		eventsManager.addHandler(ceeh);
-		emissionReader.parse(emissionFile);
+		Map<Id, Double> personId2paidToll = moneyEventHandler.getPersonId2TollMap();
 		
-		Map<Id, Map<WarmPollutant, Double>> personId2warmEmissions = weeh.getPersonId2warmEmissions();
-		Map<Id, Map<ColdPollutant, Double>> personId2coldEmissions = ceeh.getPersonId2coldEmissions();
-		EmissionCostModule emissionCostModule = new EmissionCostModule(emissionCostFactor );
 		
-		for(Id personId: pop.getPersons().keySet()){
-			
-			Map<WarmPollutant, Double> warmEmissions = personId2warmEmissions.get(personId);
-			Map<ColdPollutant, Double> coldEmissions = personId2coldEmissions.get(personId);
-		
-			Double warmEmissionCosts =0.0;
-			Double coldEmissionCosts =0.0;
-			
-			if(warmEmissions!=null){
-				warmEmissionCosts = emissionCostModule.calculateWarmEmissionCosts(warmEmissions);
-			}
-			if(coldEmissions!=null){		
-				coldEmissionCosts = emissionCostModule.calculateColdEmissionCosts(coldEmissions);
-			}
-			Double personalEmissionCost = warmEmissionCosts+coldEmissionCosts;
-			personId2paidToll.put(personId, personalEmissionCost);		
-		}
+//		// calculate paid toll per person -- for internalization
+//		Map<Id, Double> personId2paidToll = new HashMap<Id, Double>();
+//		EventsManager eventsManager = EventsUtils.createEventsManager();
+//		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
+//		
+//		SimpleWarmEmissionEventHandler weeh = new SimpleWarmEmissionEventHandler();
+//		eventsManager.addHandler(weeh);
+//		SimpleColdEmissionEventHandler ceeh = new SimpleColdEmissionEventHandler();
+//		eventsManager.addHandler(ceeh);
+//		emissionReader.parse(emissionFile);
+//		
+//		Map<Id, Map<WarmPollutant, Double>> personId2warmEmissions = weeh.getPersonId2warmEmissions();
+//		Map<Id, Map<ColdPollutant, Double>> personId2coldEmissions = ceeh.getPersonId2coldEmissions();
+//		EmissionCostModule emissionCostModule = new EmissionCostModule(emissionCostFactor );
+//		
+//		for(Id personId: pop.getPersons().keySet()){
+//			
+//			Map<WarmPollutant, Double> warmEmissions = personId2warmEmissions.get(personId);
+//			Map<ColdPollutant, Double> coldEmissions = personId2coldEmissions.get(personId);
+//		
+//			Double warmEmissionCosts =0.0;
+//			Double coldEmissionCosts =0.0;
+//			
+//			if(warmEmissions!=null){
+//				warmEmissionCosts = emissionCostModule.calculateWarmEmissionCosts(warmEmissions);
+//			}
+//			if(coldEmissions!=null){		
+//				coldEmissionCosts = emissionCostModule.calculateColdEmissionCosts(coldEmissions);
+//			}
+//			Double personalEmissionCost = warmEmissionCosts+coldEmissionCosts;
+//			personId2paidToll.put(personId, personalEmissionCost);		
+//		}
 			
 		
 		double [][] weightsBaseCase = calculateWeights(pop);
@@ -162,11 +176,11 @@ public class SpatialAveragingTollPayments {
 		double [][] userTollPayments = fillUserBenefits(personId2paidToll, pop);
 		double [][] normalizedUserTollPayments = this.sau.normalizeArray(userTollPayments);
 		
-		double [][] averageUserBenefitsBaseCase = calculateAverage(normalizedUserTollPayments, normalizedWeightsBaseCase);
+		double [][] averageUserTollPaymentsBaseCase = calculateAverage(normalizedUserTollPayments, normalizedWeightsBaseCase);
 		
-		this.sau.writeRoutput(normalizedUserTollPayments, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "UserEmissionCostsByHomeLocation.txt");
-		this.sau.writeRoutput(averageUserBenefitsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "UserEmissionCostsByHomeLocationAverage.txt");
-		this.sau.writeRoutput(normalizedWeightsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "NormalizedWeightsBaseCase.txt");
+		this.sau.writeRoutput(normalizedUserTollPayments, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "PaidTollsByHomeLocation.txt");
+		this.sau.writeRoutput(averageUserTollPaymentsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "PaidTollsPerPersonByHomeLocationAverage.txt");
+		//this.sau.writeRoutput(normalizedWeightsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "NormalizedWeightsBaseCase.txt");
 		
 		
 	}
@@ -192,7 +206,7 @@ public class SpatialAveragingTollPayments {
 		for(Id personId : pop.getPersons().keySet()){ 
 			Person person = pop.getPersons().get(personId);
 			Coord homeCoord = this.lf.getHomeActivityCoord(person);
-			
+			if (this.sau.isInResearchArea(homeCoord)){
 				double personCount = 1.0;
 				// one person stands for this.scalingFactor persons
 				double scaledPersonCount = this.scalingFactor * personCount;
@@ -203,10 +217,32 @@ public class SpatialAveragingTollPayments {
 						weights[xIndex][yIndex] += weightOfPersonForCell * scaledPersonCount;
 					}
 				}
-			
+			}
 		}
 		return weights;
 	}
+	
+//	private double [][] calculateWeights(Population pop){
+//		double[][] weights = new double[noOfXbins][noOfYbins];
+//
+//		for(Id personId : pop.getPersons().keySet()){ 
+//			Person person = pop.getPersons().get(personId);
+//			Coord homeCoord = this.lf.getHomeActivityCoord(person);
+//			
+//				double personCount = 1.0;
+//				// one person stands for this.scalingFactor persons
+//				double scaledPersonCount = this.scalingFactor * personCount;
+//				for(int xIndex = 0 ; xIndex < noOfXbins; xIndex++){
+//					for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
+//						Coord cellCentroid = this.sau.findCellCentroid(xIndex, yIndex);
+//						double weightOfPersonForCell = this.sau.calculateWeightOfPointForCell(homeCoord.getX(), homeCoord.getY(), cellCentroid.getX(), cellCentroid.getY());
+//						weights[xIndex][yIndex] += weightOfPersonForCell * scaledPersonCount;
+//					}
+//				}
+//			
+//		}
+//		return weights;
+//	}
 	
 	private double [][] fillUserBenefits(Map<Id, Double> personId2Utility, Population pop){
 		double[][] scaledWeightedBenefits = new double [noOfXbins][noOfYbins];
@@ -223,7 +259,8 @@ public class SpatialAveragingTollPayments {
 					for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
 						Coord cellCentroid = this.sau.findCellCentroid(xIndex, yIndex);
 						double weightOfPersonForCell = this.sau.calculateWeightOfPointForCell(homeCoord.getX(), homeCoord.getY(), cellCentroid.getX(), cellCentroid.getY());
-						scaledWeightedBenefits[xIndex][yIndex] += weightOfPersonForCell * scaledBenefitOfPerson;
+						// negative since payments = - moneyevent
+						scaledWeightedBenefits[xIndex][yIndex] += -weightOfPersonForCell * scaledBenefitOfPerson;
 					}
 				}
 			

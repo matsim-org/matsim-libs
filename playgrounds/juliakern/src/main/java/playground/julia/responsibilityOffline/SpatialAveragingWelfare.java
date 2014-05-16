@@ -70,7 +70,8 @@ public class SpatialAveragingWelfare {
 //	private final static String runNumber2 = "zone30";
 //	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
 	private final static String runNumber2 = "exposurePricing";
-	private final static String runDirectory2 = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_policyCase_pricing_exposurePricing/";
+//	private final static String runDirectory2 = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_policyCase_exposurePricing/";
+	private final static String runDirectory2 = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_policyCase_zone30/";
 //	private final String netFile1 = runDirectory2 + "output_network.xml.gz";
 	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
 	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
@@ -272,8 +273,8 @@ public class SpatialAveragingWelfare {
 		
 		// map links to cells
 			GridTools gt2 = new GridTools(network.getLinks(), xMin, xMax, yMin, yMax);
-			Map<Id, Integer> link2xbins2 = gt.mapLinks2Xcells(noOfXbins);
-			Map<Id, Integer> link2ybins2 = gt.mapLinks2Ycells(noOfYbins);
+			Map<Id, Integer> link2xbins2 = gt2.mapLinks2Xcells(noOfXbins);
+			Map<Id, Integer> link2ybins2 = gt2.mapLinks2Ycells(noOfYbins);
 		
 		// calc durations
 			IntervalHandler intervalHandler2 = new IntervalHandler(timeBinSize, simulationEndTime, noOfXbins, noOfYbins, link2xbins2, link2ybins2); 

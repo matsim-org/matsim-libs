@@ -94,11 +94,11 @@ public class SpatialAveragingUtils {
 				//table contents
 				for(int xIndex = 0; xIndex < results.length; xIndex++){ 
 					Coord cellCentroid = findCellCentroid(xIndex, yIndex);
-//					if(isInVisBoundary(cellCentroid)){
+					if(isInVisBoundary(cellCentroid)){
 						valueString += Double.toString(results[xIndex][yIndex]) + "\t"; 
-//					} else {
-//						valueString += "NA" + "\t";
-//					}
+					} else {
+						valueString += "NA" + "\t";
+					}
 				}
 				buffW.write(valueString);
 				buffW.newLine();
