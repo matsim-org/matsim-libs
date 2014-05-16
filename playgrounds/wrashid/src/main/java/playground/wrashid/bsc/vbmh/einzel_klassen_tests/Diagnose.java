@@ -5,6 +5,7 @@ import java.util.LinkedList;
 
 import playground.wrashid.bsc.vbmh.util.CSVReader;
 import playground.wrashid.bsc.vbmh.util.ReadParkhistory;
+import playground.wrashid.bsc.vbmh.util.RemoveDuplicate;
 
 public class Diagnose {
 
@@ -12,13 +13,18 @@ public class Diagnose {
 		// TODO Auto-generated method stub
 
 		ReadParkhistory hist = new ReadParkhistory();
-		hist.readXML("parkhistory_67.xml");
-		CSVReader csv = new CSVReader();
-		LinkedList<String[]> walking = csv.readCSV("walking.csv", ",");
-		ReadParkhistory subHist =new ReadParkhistory();
+		hist.readXML("parkhistory_200.xml");
+		LinkedList<HashMap<String, String>> list = hist.getAllEventByAttribute("parking", "9000006");
+		ReadParkhistory a = hist.getSubHist(list);
+		LinkedList<HashMap<String, String>> list1 = a.getAllEventByAttribute("spotType", "ev");
+		a=hist.getSubHist(list1);
+		LinkedList<HashMap<String, String>> list2 = a.getAllEventByAttribute("eventtype", "EV_left");
 		
+		for(HashMap<String, String> events:list2){
+			
+		}
 		
-		
+		System.out.println(list2.size());
 		
 		
 		
