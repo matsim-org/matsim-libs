@@ -58,7 +58,7 @@ public class EmissionModule {
 	final Scenario scenario;
 	WarmEmissionHandler warmEmissionHandler;
 	ColdEmissionHandler coldEmissionHandler;
-	EventsManager emissionEventsManager;
+	public EventsManager emissionEventsManager;
 	Double emissionEfficiencyFactor;
 
 	//===
