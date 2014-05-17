@@ -9,15 +9,15 @@ public class testParkingChoice {
 		// TODO Auto-generated method stub
 		AdvancedParkingChoice choice = new AdvancedParkingChoice();
 		choice.startUp();
-		choice.calcLMSOC(0.0);
-		choice.calcLMSOC(0.05);
-		choice.calcLMSOC(0.1);
-		choice.calcLMSOC(0.25);
-		choice.calcLMSOC(0.5);
-		choice.calcLMSOC(0.6);
-		System.out.println(choice.calcLMSOC(0.75));
-		System.out.println(choice.calcLMReserve(0.5, 0.55));
-		System.out.println((choice.calcLMSOC(1)-choice.calcLMSOC(0.75))*4.5);
+//		choice.calcLMSOC(0.0);
+//		choice.calcLMSOC(0.05);
+		System.out.println(choice.calcLMSOC(15));
+//		choice.calcLMSOC(0.25);
+//		choice.calcLMSOC(0.5);
+//		choice.calcLMSOC(0.6);
+//		System.out.println(choice.calcLMSOC(0.75));
+//		System.out.println(choice.calcLMReserve(0.5, 0.55));
+//		System.out.println((choice.calcLMSOC(1)-choice.calcLMSOC(0.75))*4.5);
 //		
 //		choice.calcLMReserve(0.5, 0.3);
 //		choice.calcLMReserve(0.5, 0.48);
@@ -26,9 +26,11 @@ public class testParkingChoice {
 //		choice.calcLMReserve(0.5, 0.55);
 //		choice.calcLMReserve(0.5, 0.6);
 //		choice.calcLMReserve(0.5, 0.8);
-//		
-		System.out.println(choice.calcUtil(500, 7, 0, 0.96));
-		System.out.println(choice.calcUtil(600, 7, 0, 1));
+		choice.setBetaSOC(0.2759);
+		System.out.println("-----------");
+		System.out.println(choice.calcUtil(1206, 20.5627, -1, 0));
+		System.out.println("-----------");
+//		System.out.println(choice.calcUtil(600, 7, 0, 1));
 //		choice.calcUtil(500, 5, 0, 0.6);
 //		choice.calcUtil(500, 5, -1, 0.6);
 //		

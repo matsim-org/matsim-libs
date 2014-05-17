@@ -52,7 +52,7 @@ public class AdvancedParkingChoice {
 
 
 	public void setRequiredRestOfDayBatPerc(double requiredRestOfDayBatPerc) {
-		this.requiredRestOfDayBatPerc = requiredRestOfDayBatPerc;
+		this.requiredRestOfDayBatPerc = requiredRestOfDayBatPerc/100.0;
 	}
 
 
@@ -89,7 +89,16 @@ public class AdvancedParkingChoice {
 		double priceAmount = betaPayMoney * price;
 		double reserveAmount = betaReserve * LMReserve;
 		double socAmount = betaSOC*newLMSOC;
-		//System.out.println("walk "+walkAmount+" price "+priceAmount+" reserve "+reserveAmount+" soc "+socAmount);
+//		if (newLMSOC<0.0) {
+//			System.out
+//					.println("-----------------------------------------------");
+//			System.out.println("beta SOC" + betaSOC);
+//			System.out.println("distance " + walkingDistance + " price "
+//					+ price + " LMReserve " + LMReserve + " LMSOC " + newLMSOC);
+//			System.out.println("walk " + walkAmount + " price " + priceAmount
+//					+ " reserve " + reserveAmount + " soc " + socAmount);
+//			double abc = 1/0;
+//		}
 		double util = walkAmount+priceAmount+reserveAmount+socAmount;
 		//System.out.println("util "+util);
 		return util;
@@ -102,13 +111,14 @@ public class AdvancedParkingChoice {
 	public Option selectBestOption(){
 		//this.startUp();
 		Option bestOption = null;
-		
+//		System.out.println("---------Pruefe optionen:-------");
 		for(Option option : options){
 			double LMSOC = this.calcLMSOC(option.newSOC);
+//			System.out.println("option new SOC : "+option.newSOC);
 			double price = option.price;
 			double walkingDistance = option.walkingDistance;
 			double LMReserve = this.calcLMReserve(this.requiredRestOfDayBatPerc, option.newSOC);
-			if(requiredRestOfDayBatPerc==-1){ //Special value for NEVs
+			if(requiredRestOfDayBatPerc==-1/100.0){ //Special value for NEVs
 				LMSOC=0.0;
 				LMReserve=0.0;
 			}

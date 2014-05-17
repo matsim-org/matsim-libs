@@ -294,7 +294,7 @@ public class ParkControl {
 	
 	//--------------------------- SELECT PARKING --------Using Advanced Parking Choice Model-------------------------------------	
 	private void selectParkingAdvanced(LinkedList<ParkingSpot> spotsInArea, Id personId, double duration, double restOfDayDistance, boolean ev){
-		double stateOfCharge;
+		double stateOfCharge=0;
 		double neededBatteryPercentage=-1.0; //Stays -1 for NEVs which tells the Advanced Parking Choice that it is an NEV
 		boolean hasToCharge = false;
 		int countSlowCharge=0;
@@ -336,8 +336,10 @@ public class ParkControl {
 			}
 			if (ev && spot.charge) {
 				newStateOfChargePerc = evControl.calcNewStateOfChargePercentage(personId,spot.chargingRate, duration);
+			}else if(ev){
+				newStateOfChargePerc=stateOfCharge;
 			}
-			choice.addOption(choice.new Option(spot, cost, distance, newStateOfChargePerc));
+			choice.addOption(choice.new Option(spot, cost, distance, newStateOfChargePerc/100.0));
 			
 			//STATS
 			if(spot.chargingRate<3){
