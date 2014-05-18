@@ -23,6 +23,7 @@ import org.matsim.core.utils.collections.QuadTree;
 public class ParkingMap {
 	private static List<Parking> parkings = new LinkedList<Parking>();
 	private static HashMap<String, Parking> parkingsHash;
+	private static HashMap<Integer, Parking> idHash;
 	private static QuadTree publicParktTree;
 
 	@XmlElement(name = "Parking")
@@ -94,6 +95,10 @@ public class ParkingMap {
 				publicParktTree.put(parking.coordinateX, parking.coordinateY, parking);
 			}
 		}
+		this.idHash= new HashMap<Integer, Parking>();
+		for(Parking parking : parkings){
+			this.idHash.put(parking.id, parking);
+		}
 	}
 
 
@@ -109,6 +114,8 @@ public class ParkingMap {
 		return publicParktTree.get(x, y, radius);
 	}
 
-
+	public Parking getParkingById(int id){
+		return idHash.get(id);
+	}
 
 }
