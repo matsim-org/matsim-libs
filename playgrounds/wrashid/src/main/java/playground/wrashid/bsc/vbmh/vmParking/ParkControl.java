@@ -877,7 +877,8 @@ public class ParkControl {
 		while (foundNextCarLeg == false){
 			Leg leg = plan.getNextLeg(activity);
 			if(leg.getMode().equalsIgnoreCase("car")){
-				endTime = leg.getDepartureTime();
+				//endTime = leg.getDepartureTime(); //!!!!!!! MatSim provides a wrong time !!!
+				endTime=activity.getEndTime();
 				nextCarLeg=leg;
 				foundNextCarLeg=true;
 			}else{

@@ -19,7 +19,7 @@ public class DiagnoseMoritz {
 
 
 //	---------------------
-		//fetchPerson("38713_1");
+	
 		
 		ReadParkhistory hist = new ReadParkhistory();
 		//hist.readXML("parkhistory_200.xml");
@@ -33,7 +33,7 @@ public class DiagnoseMoritz {
 			hist.readXML("alles_null_sa/parkhistory/parkhistory_200.xml");
 			System.out.println("alles_null gelesen");
 		}
-		if(1==0){
+		if(1==1){
 			hist.readXML("normal_sa/parkhistory/parkhistory_200.xml");
 			System.out.println("normal gelesen");
 		}
@@ -41,13 +41,40 @@ public class DiagnoseMoritz {
 			hist.readXML("erste_min_5_sa/parkhistory/parkhistory_200.xml");
 			System.out.println("erste_min_5 gelesen");
 		}
-		if(1==1){
+		if(1==0){
 			hist.readXML("null_ev_exc_sa/parkhistory/parkhistory_200.xml");
 			System.out.println("ev_exc gelesen");
 		}
-		
+		System.out.println("Los jetzt Person");
+		fetchPerson("35287_1", hist);
+		System.out.println("Fertig Person");
 		
 		if(1==1){
+			int i =0;
+			HashMap<String, Boolean> outOfBattery = new HashMap<String, Boolean>();
+			for(HashMap<String, String> event : hist.getAllEventByAttribute("eventtype", "ev_out_of_battery")){
+				outOfBattery.put(event.get("person"), true);
+			}
+			for(HashMap<String, String> event : hist.getAllEventByAttribute("eventtype", "EV_parked")){
+				if(checkIfHome(event.get("person"), personList)){
+					continue;
+				}
+				if(outOfBattery.containsKey(event.get("person"))){
+					if(!(Double.parseDouble(event.get("spot_score"))<-15)){
+						i++;
+						System.out.println(event.toString());
+					}
+				}
+				
+			}
+			
+			System.out.println(i);
+		}
+		
+		
+		
+		
+		if(1==2){
 			int i = 0;
 			int j = 0;
 			for(HashMap<String, String> event : hist.getAllEventByAttribute("eventtype", "agent_not_parked_within_default_distance")){
@@ -63,6 +90,24 @@ public class DiagnoseMoritz {
 			System.out.println("NEVs "+j);
 		}
 		
+		
+		if(1==2){
+		
+			for(HashMap<String, String> event : hist.getAllEventByAttribute("eventtype", "EV_parked")){
+				if(Double.parseDouble(event.get("stateOfChargePercent"))<0 &&Double.parseDouble(event.get("stateOfChargePercent"))>-5){
+					System.out.println(event.toString());	
+				}
+			}
+		}
+
+		
+		if(1==2){
+			for(HashMap<String, String> event : hist.getAllEventByAttribute("eventtype", "EV_parked")){
+				if(Double.parseDouble(event.get("spot_score"))<-15 && event.get("spotType").equals("ev") && event.get("parkingType").equals("private")){
+					System.out.println(event.toString());	
+				}
+			}
+		}
 		
 		
 		
@@ -120,11 +165,7 @@ public class DiagnoseMoritz {
 			
 		}
 		
-//		for(HashMap<String, String> event : hist.getAllEventByAttribute("eventtype", "EV_parked")){
-//			if(Double.parseDouble(event.get("stateOfChargePercent"))<0&&Double.parseDouble(event.get("stateOfChargePercent"))>-5){
-//			System.out.println(event.toString());	
-//			}
-//		}
+
 		
 		writer.close();
 		
@@ -215,9 +256,9 @@ public class DiagnoseMoritz {
 		
 	}
 	
-	static void fetchPerson(String person){
-		ReadParkhistory hist = new ReadParkhistory();
-		hist.readXML("parkhistory_200.xml");
+	static void fetchPerson(String person, ReadParkhistory hist){
+		//ReadParkhistory hist = new ReadParkhistory();
+		//hist.readXML("parkhistory_200.xml");
 		LinkedList<HashMap<String, String>> list = hist.getAllEventByAttribute("person",person);
 		for(HashMap<String, String> event : list){
 			System.out.println(event.toString());
