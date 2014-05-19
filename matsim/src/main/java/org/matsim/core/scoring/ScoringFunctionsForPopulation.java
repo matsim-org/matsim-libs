@@ -85,8 +85,8 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 		if (scoringFunctionForAgent != null) {
             for (PersonExperienceListener listener : scoringFunctionForAgent) {
                 listener.handleActivity(activity);
-                agentRecords.get(agentId).addActivity(activity);
             }
+            agentRecords.get(agentId).addActivity(activity);
 		}
 	}
 
@@ -96,8 +96,8 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 		if (scoringFunctionForAgent != null) {
             for (PersonExperienceListener listener : scoringFunctionForAgent) {
                 listener.handleLeg(leg);
-                agentRecords.get(agentId).addLeg(leg);
             }
+            agentRecords.get(agentId).addLeg(leg);
 		}
 	}
 
