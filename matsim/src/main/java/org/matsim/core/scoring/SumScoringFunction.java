@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.utils.misc.Time;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class SumScoringFunction implements ScoringFunction {
 
@@ -45,9 +44,7 @@ public class SumScoringFunction implements ScoringFunction {
 	private ArrayList<MoneyScoring> moneyScoringFunctions = new ArrayList<MoneyScoring>();
 	private ArrayList<LegScoring> legScoringFunctions = new ArrayList<LegScoring>();
 	private ArrayList<AgentStuckScoring> agentStuckScoringFunctions = new ArrayList<AgentStuckScoring>();
-	private ArrayList<ArbitraryEventScoring> arbtraryEventScoringFunctions = new ArrayList<ArbitraryEventScoring>();
-
-    private List<Double> partialScores = new ArrayList<Double>();
+	private ArrayList<ArbitraryEventScoring> arbtraryEventScoringFunctions = new ArrayList<ArbitraryEventScoring>() ;
 	
 	@Override
 	public final void handleActivity(Activity activity) {
@@ -68,7 +65,6 @@ public class SumScoringFunction implements ScoringFunction {
         } else {
         	throw new RuntimeException("Trying to score an activity without start or end time. Should not happen."); 	
         }
-        this.partialScores.add(getScore());
     }
 
 	@Override
@@ -76,7 +72,6 @@ public class SumScoringFunction implements ScoringFunction {
 		for (LegScoring legScoringFunction : legScoringFunctions) {
 			legScoringFunction.handleLeg(leg);
 		}
-        this.partialScores.add(getScore());
     }
 	
 	@Override
@@ -84,7 +79,6 @@ public class SumScoringFunction implements ScoringFunction {
 		for (MoneyScoring moneyScoringFunction : moneyScoringFunctions) {
 			moneyScoringFunction.addMoney(amount);
 		}
-        this.partialScores.add(getScore());
 	}
 
 	@Override
@@ -92,15 +86,13 @@ public class SumScoringFunction implements ScoringFunction {
 		for (AgentStuckScoring agentStuckScoringFunction : agentStuckScoringFunctions) {
 			agentStuckScoringFunction.agentStuck(time);
 		}
-        this.partialScores.add(getScore());
 	}
 
 	@Override
 	public void handleEvent(Event event) {
-		for (ArbitraryEventScoring eventScoringFunction : this.arbtraryEventScoringFunctions) {
+		for ( ArbitraryEventScoring eventScoringFunction : this.arbtraryEventScoringFunctions ) {
 			eventScoringFunction.handleEvent(event) ;
 		}
-        this.partialScores.add(getScore());
 	}
 
 	@Override
@@ -108,7 +100,6 @@ public class SumScoringFunction implements ScoringFunction {
 		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
 			basicScoringFunction.finish();
 		}
-        this.partialScores.add(getScore());
 	}
 
 	/**
@@ -127,11 +118,7 @@ public class SumScoringFunction implements ScoringFunction {
 		return score;
 	}
 
-    List<Double> getPartialScores() {
-        return partialScores;
-    }
-
-    public void addScoringFunction(BasicScoring scoringFunction) {
+	public void addScoringFunction(BasicScoring scoringFunction) {
 		basicScoringFunctions.add(scoringFunction);
 
 		if (scoringFunction instanceof ActivityScoring) {
@@ -153,6 +140,8 @@ public class SumScoringFunction implements ScoringFunction {
 		if (scoringFunction instanceof ArbitraryEventScoring ) {
 			this.arbtraryEventScoringFunctions.add((ArbitraryEventScoring) scoringFunction) ;
 		}
+
 	}
+
 
 }

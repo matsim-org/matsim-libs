@@ -26,22 +26,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.utils.io.IOUtils;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Calculates the score of the selected plans of a given scenario
@@ -66,8 +56,7 @@ public class EventsToScore implements BasicEventHandler {
 	private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
 	private Scenario scenario;
 	private ScoringFunctionFactory scoringFunctionFactory;
-    private final Map<Id, ScoringFunction> scoringFunctions = new TreeMap<Id, ScoringFunction>();
-    private double learningRate;
+	private double learningRate;
 	private boolean finished = false;
 	
 	private int iteration = -1 ;
@@ -79,6 +68,9 @@ public class EventsToScore implements BasicEventHandler {
 
 	/**
 	 * Initializes EventsToScore with a learningRate of 1.0.
+	 *
+	 * @param scenario
+	 * @param factory
 	 */
 	public EventsToScore(final Scenario scenario, final ScoringFunctionFactory factory) {
 		this(scenario, factory, 1.0);
@@ -89,22 +81,13 @@ public class EventsToScore implements BasicEventHandler {
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.learningRate = learningRate;
 		initHandlers(scoringFunctionFactory);
+		
 		this.scoreMSAstartsAtIteration = this.scenario.getConfig().vspExperimental().getScoreMSAStartsAtIteration() ;
 	}
 
 	private void initHandlers(final ScoringFunctionFactory factory) {
-        for (Person person : scenario.getPopulation().getPersons().values()) {
-            this.scoringFunctions.put(person.getId(), factory.createNewScoringFunction(person));
-        }
-        HashSet<PersonExperienceListenerProvider> personExperienceListenerProviders = new HashSet<PersonExperienceListenerProvider>();
-        personExperienceListenerProviders.add(new PersonExperienceListenerProvider() {
-            @Override
-            public PersonExperienceListener provideFor(Person person) {
-                return scoringFunctions.get(person.getId());
-            }
-        });
-        this.scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(scenario, personExperienceListenerProviders);
-        this.eventsToActivities = new EventsToActivities();
+		this.eventsToActivities = new EventsToActivities();
+		this.scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(scenario, factory);
 		this.eventsToActivities.setActivityHandler(this.scoringFunctionsForPopulation);
 		this.eventsToLegs = new EventsToLegs(this.scenario);
 		this.eventsToLegs.setLegHandler(this.scoringFunctionsForPopulation);
@@ -172,9 +155,10 @@ public class EventsToScore implements BasicEventHandler {
 	}
 	
 	private void assignNewScores() {
-		log.info("it: " + this.iteration + " msaStart: " + this.scoreMSAstartsAtIteration);
+		log.info("it: " + this.iteration + " msaStart: " + this.scoreMSAstartsAtIteration );
+
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			ScoringFunction sf = scoringFunctions.get(person.getId());
+			ScoringFunction sf = scoringFunctionsForPopulation.getScoringFunctionForAgent(person.getId());
 			double score = sf.getScore();
 			Plan plan = person.getSelectedPlan();
 			Double oldScore = plan.getScore();
@@ -274,7 +258,7 @@ public class EventsToScore implements BasicEventHandler {
 	}
 
 	public ScoringFunction getScoringFunctionForAgent(Id agentId) {
-		return scoringFunctions.get(agentId);
+		return scoringFunctionsForPopulation.getScoringFunctionForAgent(agentId);
 	}
 
 	public Map<Id, Plan> getAgentRecords() {
@@ -282,38 +266,7 @@ public class EventsToScore implements BasicEventHandler {
 	}
 
 	public void writeExperiencedPlans(String iterationFilename) {
-        Population population = PopulationUtils.createPopulation(scenario.getConfig());
-        for (Map.Entry<Id, Plan> entry : scoringFunctionsForPopulation.getAgentRecords().entrySet()) {
-            PersonImpl person = new PersonImpl(entry.getKey());
-            Plan plan = entry.getValue();
-            plan.setScore(getScoringFunctionForAgent(person.getId()).getScore());
-            person.addPlan(plan);
-            population.addPerson(person);
-            if (plan.getScore().isNaN()) {
-                log.warn("score is NaN; plan:" + plan.toString());
-            }
-        }
-        new PopulationWriter(population, scenario.getNetwork()).writeV5(iterationFilename + ".xml.gz");
-
-        Map<Id, List<Double>> partialScores = new TreeMap<Id, List<Double>>();
-        for (Map.Entry<Id, ScoringFunction> entry : this.scoringFunctions.entrySet()) {
-            if (entry.getValue() instanceof SumScoringFunction) {
-                partialScores.put(entry.getKey(), ((SumScoringFunction) entry.getValue()).getPartialScores());
-            }
-        }
-        BufferedWriter out = IOUtils.getBufferedWriter(iterationFilename + "_scores.xml.gz");
-        try {
-            for (Map.Entry<Id,List<Double>> entry : partialScores.entrySet()) {
-                out.write( entry.getKey().toString());
-                for (Double score : entry.getValue()) {
-                    out.write('\t'+ score.toString());
-                }
-                out.newLine();
-            }
-            out.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+		scoringFunctionsForPopulation.writeExperiencedPlans(iterationFilename);
 	}
 
 }
