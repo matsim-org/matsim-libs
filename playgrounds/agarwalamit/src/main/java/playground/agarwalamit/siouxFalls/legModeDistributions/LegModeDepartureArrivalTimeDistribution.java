@@ -130,7 +130,14 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModu
 
 	@Override
 	public void writeResults(String outputFolder) {
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"rLegModeDepartureTimeDistribution.txt");
+
+		writeLegMode2DepOrArrivalTimeDistribution(outputFolder,this.mode2DepartureTimeClasses2LegCount,"Departure");
+		writeLegMode2DepOrArrivalTimeDistribution(outputFolder,this.mode2ArrivalTimeClasses2LegCount,"Arrival");
+	}
+
+	private void writeLegMode2DepOrArrivalTimeDistribution(String outputFolder, SortedMap<String, Map<Integer, Integer>> inputMap, String depOrArr){
+
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"rLegMode"+depOrArr+"TimeDistribution.txt");
 		try {
 			writer.write("# \t");
 			for(String mode:this.travelModes){
@@ -141,7 +148,7 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModu
 			for(int i=0; i<this.timeStepClasses.size()-1;i++){
 				writer.write(this.timeStepClasses.get(i+1)+"\t");
 				for(String mode :this.travelModes){
-					writer.write(this.mode2DepartureTimeClasses2LegCount.get(mode).get(this.timeStepClasses.get(i+1))+"\t");
+					writer.write(inputMap.get(mode).get(this.timeStepClasses.get(i+1))+"\t");
 				}
 				writer.newLine();
 			}
@@ -149,36 +156,16 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModu
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written in File. Reason : "+e);
 		}
-
-		BufferedWriter writer2 = IOUtils.getBufferedWriter(outputFolder+".rLegModeArrivalTimeDistribution.txt");
-		try {
-			writer2.write("# \t");
-			for(String mode:this.travelModes){
-				writer2.write(mode+"\t");
-			}
-			writer2.newLine();
-
-			for(int i=0; i<this.timeStepClasses.size()-1;i++){
-				writer2.write(this.timeStepClasses.get(i+1)+"\t");
-				for(String mode :this.travelModes){
-					writer2.write(this.mode2ArrivalTimeClasses2LegCount.get(mode).get(this.timeStepClasses.get(i+1))+"\t");
-				}
-				writer2.newLine();
-			}
-			writer2.close();
-		} catch (Exception e) {
-			throw new RuntimeException("Data is not written in File. Reason : "+e);
-		}
-
-
+		logger.info("Data is written at "+outputFolder+"rLegMode"+depOrArr+"TimeDistribution.txt");
 	}
+
+
 	private void initializeTimeStepClasses() {
 		double simulationEndTime = getSimulationEndTime();
 
 		for(int endOfTimeStep =0; endOfTimeStep<=(int)simulationEndTime/(2*3600);endOfTimeStep++){
 			this.timeStepClasses.add(endOfTimeStep);
 		}
-
 		logger.info("The following time classes were defined: " + this.timeStepClasses);
 	}
 
@@ -190,5 +177,6 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModu
 	}
 	private void getTravelModes(){
 		this.travelModes.addAll(this.mode2PersonId2DepartureTime.keySet());
+		logger.info("Travel modes are "+this.travelModes.toString());
 	}
 }
