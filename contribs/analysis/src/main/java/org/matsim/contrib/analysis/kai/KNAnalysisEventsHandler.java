@@ -548,11 +548,18 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		// do we need to do anything here?
 	}
 
+	private static int cnt = 0 ;
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		Double result = vehicleEnterTimes.remove( event.getVehicleId() ) ;
 		if ( result == null ) {
-			throw new RuntimeException("vehicle arrival for vehicle that never entered link.  teleportation?") ;
+			if ( cnt==0 ) {
+				cnt++ ;
+//				throw new RuntimeException("vehicle arrival for vehicle that never entered link.  teleportation?") ;
+				Logger.getLogger(this.getClass()).warn("vehicle arrival for vehicle that never entered link.  I think this can happen with departures "
+						+ "that have empty routes, i.e. go to a location on the same link. kai, may'14");
+				Logger.getLogger(this.getClass()).warn( Gbl.ONLYONCE ) ;
+			}
 		}
 	}
 
