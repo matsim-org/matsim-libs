@@ -40,7 +40,8 @@ import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.ActivityScoring;
+import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.Desires;
@@ -55,7 +56,7 @@ import org.matsim.population.Desires;
  * There's lots of quick copy-paste here!
  * @author thibautd
  */
-public class KtiActivityScoring implements ActivityScoring {
+public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccumulator.ActivityScoring {
 	private static final Logger logger = Logger.getLogger(KtiActivityScoring.class);
 
 	// lock at reset or getScore, to avoid strange hard-to detect bugs
@@ -98,6 +99,22 @@ public class KtiActivityScoring implements ActivityScoring {
 	private double accumulatedTooShortDuration;
 	private double timeSpentWaiting;
 	private double accumulatedNegativeDuration;
+
+	@Override
+	public void handleFirstActivity(final Activity act) {
+		endActivity( act.getEndTime() , act );
+	}
+
+	@Override
+	public void handleActivity(final Activity act) {
+		startActivity( act.getStartTime() , act );
+		endActivity( act.getEndTime() , act );
+	}
+
+	@Override
+	public void handleLastActivity(final Activity act) {
+		startActivity( act.getStartTime() , act );
+	}
 
 	private Activity activityWithoutStart = null;
 	@Override

@@ -21,7 +21,7 @@ package playground.ivt.scoring;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.ActivityScoring;
+import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
 
 /**
  * @author thibautd
@@ -37,16 +37,23 @@ public class BlackListedActivityScoringFunction implements ActivityScoring {
 		this.delegate = delegate;
 	}
 
+
 	@Override
-	public void startActivity(double time, Activity act) {
+	public void handleFirstActivity(Activity act) {
 		if ( blackList.isStageActivity( act.getType() ) ) return;
-		delegate.startActivity(time, act);
+		delegate.handleFirstActivity( act);
 	}
 
 	@Override
-	public void endActivity(double time, Activity act) {
+	public void handleActivity(Activity act) {
 		if ( blackList.isStageActivity( act.getType() ) ) return;
-		delegate.endActivity(time, act);
+		delegate.handleActivity( act);
+	}
+
+	@Override
+	public void handleLastActivity(Activity act) {
+		if ( blackList.isStageActivity( act.getType() ) ) return;
+		delegate.handleLastActivity( act);
 	}
 
 	@Override
@@ -57,11 +64,6 @@ public class BlackListedActivityScoringFunction implements ActivityScoring {
 	@Override
 	public double getScore() {
 		return delegate.getScore();
-	}
-
-	@Override
-	public void reset() {
-		delegate.reset();
 	}
 }
 

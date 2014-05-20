@@ -27,12 +27,13 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.SumScoringFunction.LegScoring;
 
 /**
  * @author thibautd
  */
-public class ElementalCharyparNagelLegScoringFunction implements LegScoring {
+public class ElementalCharyparNagelLegScoringFunction implements LegScoring, ScoringFunctionAccumulator.LegScoring {
 	private static final Logger log =
 		Logger.getLogger(ElementalCharyparNagelLegScoringFunction.class);
 
@@ -57,6 +58,7 @@ public class ElementalCharyparNagelLegScoringFunction implements LegScoring {
 		this.score = 0;
 	}
 
+	@Override
 	public void handleLeg( final Leg leg ) {
 		score += calcLegScore( leg );
 		if ( log.isTraceEnabled() ) {

@@ -42,6 +42,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.ivt.kticompatibility.KtiActivityScoring;
@@ -82,7 +83,7 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 		// TODO use the ones from the population
 		final ObjectAttributes personAttributes = locationChoiceContext.getPrefsAttributes();
 
-		final ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+		final SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 		final CharyparNagelScoringParameters params = createParams( person , config , personAttributes );
 
 		scoringFunctionAccumulator.addScoringFunction(

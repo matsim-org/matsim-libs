@@ -24,14 +24,15 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.ArbitraryEventScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
 /**
  * @author thibautd
  */
-public class LineChangeScoringFunction implements ArbitraryEventScoring {
+public class LineChangeScoringFunction implements ArbitraryEventScoring, ScoringFunctionAccumulator.ArbitraryEventScoring {
 	private final LineChangeScoringParameters params;
 
 	private double score = 0;

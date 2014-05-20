@@ -28,9 +28,9 @@ import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.ActivityScoring;
+import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.ivt.kticompatibility.KtiLikeActivitiesScoringFunctionFactory;
@@ -71,8 +71,8 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 
 	@Override
 	public ScoringFunction createNewScoringFunction(final Person person) {
-		final ScoringFunctionAccumulator scoringFunctionAccumulator =
-			(ScoringFunctionAccumulator) delegate.createNewScoringFunction( person );
+		final SumScoringFunction scoringFunctionAccumulator =
+			(SumScoringFunction) delegate.createNewScoringFunction( person );
 
 		// joint modes
 		// XXX: do better for shared cost
@@ -113,15 +113,15 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 					}
 
 					@Override
-					public void reset() {}
-
-					@Override
-					public void startActivity(double time, Activity act) {
+					public void handleActivity(Activity act) {
 						actCount++;
 					}
 
 					@Override
-					public void endActivity(double time, Activity act) {}
+					public void handleFirstActivity(Activity act) { actCount++; }
+					
+					@Override
+					public void handleLastActivity(Activity act) { actCount++; }
 				});
 
 		// XXX this doesn't work, because it just gets the events from the agent

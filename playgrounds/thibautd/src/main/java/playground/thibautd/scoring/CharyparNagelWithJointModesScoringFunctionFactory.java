@@ -23,23 +23,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.ivt.scoring.BlackListedActivityScoringFunction;
 import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction;
 import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
-
 import playground.thibautd.socnetsim.population.JointActingTypes;
 
 /**
@@ -104,7 +102,7 @@ public class CharyparNagelWithJointModesScoringFunctionFactory implements Scorin
 
 	@Override
 	public ScoringFunction createNewScoringFunction(final Person person) {
-		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+		SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 
 		scoringFunctionAccumulator.addScoringFunction(
 				new BlackListedActivityScoringFunction(
