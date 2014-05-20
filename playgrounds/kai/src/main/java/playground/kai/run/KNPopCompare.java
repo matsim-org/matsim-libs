@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -115,23 +116,24 @@ public class KNPopCompare {
 
 		// yy could try to first sort the person files and then align them
 		for ( Person person1 : pop1.getPersons().values() ) {
-			String subPop = (String) pop1.getPersonAttributes().getAttribute(person1.getId().toString(), config.plans().getSubpopulationAttributeName() ) ;
-//			if ( subPop.equals("car") ) {
 				Person person2 = pop2.getPersons().get( person1.getId() ) ;
 				if ( person2==null ) {
 					throw new RuntimeException( "did not find person in other population") ;
 				}
 
-				Activity firstAct = (Activity) person1.getSelectedPlan().getPlanElements().get(0) ;
-				Coord coord = firstAct.getCoord() ;
-				{
+				// determine coordinate of home location:
+				Coord coord = ((Activity) person1.getSelectedPlan().getPlanElements().get(0)).getCoord() ;
+				{ // process score differences
+					final double deltaScore = person2.getSelectedPlan().getScore() - person1.getSelectedPlan().getScore();
+					
+					person1.getCustomAttributes().put( "deltaScore", deltaScore ) ;
+
 					ActivityFacility fac = ff.createActivityFacility(person1.getId(), coord) ;
-					fac.getCustomAttributes().put(GridUtils.WEIGHT, person2.getSelectedPlan().getScore() - person1.getSelectedPlan().getScore() ) ;
+					fac.getCustomAttributes().put(GridUtils.WEIGHT, deltaScore ) ;
 					homesWithScoreDifferences.addActivityFacility(fac);
 				}
 				List<String> popTypes = new ArrayList<String>() ;
-				{
-					ActivityFacility fac = ff.createActivityFacility(person1.getId(), coord) ;
+				{ // process money differences:
 					Double money1 = (Double) pop1.getPersonAttributes().getAttribute(person1.getId().toString(), KNAnalysisEventsHandler.MONEY ) ;
 					if ( money1==null ) {
 						money1 = 0. ;
@@ -140,7 +142,12 @@ public class KNPopCompare {
 					if ( money2==null ) {
 						money2 = 0. ;
 					}
-					fac.getCustomAttributes().put(GridUtils.WEIGHT, money2 - money1 ) ; 
+					final double deltaMoney = money2 - money1;
+
+					person1.getCustomAttributes().put( "deltaMoney", deltaMoney ) ;
+					
+					ActivityFacility fac = ff.createActivityFacility(person1.getId(), coord) ;
+					fac.getCustomAttributes().put(GridUtils.WEIGHT, deltaMoney ) ; 
 					homesWithMoneyDifferences.addActivityFacility(fac);
 
 					// to which subPopType does the agent belong?
@@ -158,11 +165,10 @@ public class KNPopCompare {
 					
 					addItemToStatsContainer( StatType.money1, popTypes, money1 );
 					addItemToStatsContainer( StatType.money2, popTypes, money2 );
-					addItemToStatsContainer( StatType.moneyDiff, popTypes, money2 - money1 );
+					addItemToStatsContainer( StatType.moneyDiff, popTypes, deltaMoney );
 
 				}
-				{
-					ActivityFacility fac = ff.createActivityFacility(person1.getId(), coord) ;
+				{ // process travtime differences:
 					Double item1 = (Double) pop1.getPersonAttributes().getAttribute(person1.getId().toString(), KNAnalysisEventsHandler.TRAV_TIME ) ;
 					if ( item1==null ) {
 						item1 = 0. ;
@@ -171,12 +177,17 @@ public class KNPopCompare {
 					if ( item2==null ) {
 						item2 = 0. ;
 					}
-					fac.getCustomAttributes().put(GridUtils.WEIGHT, item2 - item1 ) ;
+					final double deltaTtime = item2 - item1;
+
+					person1.getCustomAttributes().put( "deltaTtime", deltaTtime ) ;
+					
+					ActivityFacility fac = ff.createActivityFacility(person1.getId(), coord) ;
+					fac.getCustomAttributes().put(GridUtils.WEIGHT, deltaTtime ) ;
 					homesWithTtimeDifferences.addActivityFacility(fac);
 					
 					addItemToStatsContainer( StatType.ttime1, popTypes, item1 ) ;
 					addItemToStatsContainer( StatType.ttime2, popTypes, item2 ) ;
-					addItemToStatsContainer( StatType.ttimeDiff, popTypes, item2 - item1 ) ;
+					addItemToStatsContainer( StatType.ttimeDiff, popTypes, deltaTtime ) ;
 
 				}
 //			}
@@ -234,6 +245,18 @@ public class KNPopCompare {
 			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		try {
+			BufferedWriter writer = IOUtils.getBufferedWriter("personscompare.txt") ;
+			for ( Person person : pop1.getPersons().values() ) {
+				writer.write( person.getId().toString() ) ;
+				for ( Entry<String,Object> entry : person.getCustomAttributes().entrySet() ) {
+					writer.write( "\t" + entry.getKey() + "\t" + entry.getValue() ) ;
+				}
+				writer.newLine(); 
+			}
+		} catch ( IOException ee ) {
+			ee.printStackTrace();
 		}
 	}
 
