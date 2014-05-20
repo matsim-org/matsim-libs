@@ -31,7 +31,15 @@ public interface CommonKeys {
 	
 	public static final String LEG_PURPOSE = "legpurpose";
 	
+	public static final String LEG_ORIGIN = "origin";
+	
+	public static final String LEG_ROUNDTRIP = "roundtip";
+	
+	public static final String LEG_DISTANCE = "legdistance";
+	
 	public static final String ACTIVITY_TYPE = "activitytype";
 	
-	public static final String LEG_ORIGIN = "origin";
+	public static final String ACTIVITY_START_TIME = "actstarttime";
+	
+	public static final String ACTIVITY_END_TIME = "actendtime";
 }

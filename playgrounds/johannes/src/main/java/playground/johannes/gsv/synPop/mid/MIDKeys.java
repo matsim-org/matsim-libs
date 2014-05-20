@@ -37,7 +37,11 @@ public interface MIDKeys {
 	
 	public static final String LEG_END_TIME_MIN = "en_min";
 	
-	public static final String LEG_MAIN_TYPE = "hwzweck";
+	public static final String LEG_MAIN_TYPE = "w04";
 	
 	public static final String LEG_ORIGIN = "w01";
+	
+	public static final String LEG_DESTINATION = "w13";
+	
+	public static final String LEG_DISTANCE = "wegkm_k";
 }

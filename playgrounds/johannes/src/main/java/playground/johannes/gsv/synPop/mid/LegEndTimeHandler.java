@@ -38,6 +38,9 @@ public class LegEndTimeHandler implements LegAttributeHandler {
 		String hour = attributes.get(MIDKeys.LEG_END_TIME_HOUR);
 		String min = attributes.get(MIDKeys.LEG_END_TIME_MIN);
 		
+		if(hour.equalsIgnoreCase("301") || min.equalsIgnoreCase("301"))
+			return;
+		
 		int time = Integer.parseInt(min) * 60 + Integer.parseInt(hour) * 60 * 60;
 
 		leg.setAttribute(CommonKeys.LEG_END_TIME, time);

@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class ProxyPlan {
 
-	private List<ProxyActivity> activities;
+	private List<ProxyActivity> activities = new ArrayList<ProxyActivity>();
 	
 	private List<ProxyLeg> legs = new ArrayList<ProxyLeg>();
 	

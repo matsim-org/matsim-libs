@@ -17,33 +17,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
-
-import java.util.Map;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyLeg;
+package playground.johannes.gsv.synPop;
 
 /**
  * @author johannes
  *
  */
-public class LegStartTimeHandler implements LegAttributeHandler {
+public class SetActivityTimeTask implements ProxyPlanTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
+	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.gsv.synPop.ProxyPlan)
 	 */
 	@Override
-	public void handle(ProxyLeg leg, Map<String, String> attributes) {
-		String hour = attributes.get(MIDKeys.LEG_START_TIME_HOUR);
-		String min = attributes.get(MIDKeys.LEG_START_TIME_MIN);
+	public void apply(ProxyPlan plan) {
+		if(plan.getActivities().size() == 1) {
+			ProxyActivity act = plan.getActivities().get(0);
+			
+			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, 0);
+			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, 86400);
+		} else {
+			
 		
-		if(hour.equalsIgnoreCase("301") || min.equalsIgnoreCase("301"))
-			return;
-		
-		int time = Integer.parseInt(min) * 60 + Integer.parseInt(hour) * 60 * 60;
-
-		leg.setAttribute(CommonKeys.LEG_START_TIME, time);
+		for(int i = 0; i < plan.getActivities().size(); i++) {
+			Integer startTime = 0;
+			Integer endTime = 86400;
+			
+			ProxyActivity act = plan.getActivities().get(i);
+			
+			if(i > 0) {
+				ProxyLeg prev = plan.getLegs().get(i-1);
+				startTime = (Integer) prev.getAttribute(CommonKeys.LEG_END_TIME);
+			}
+			
+			if(i < plan.getActivities().size() - 1) {
+				ProxyLeg next = plan.getLegs().get(i);
+				endTime = (Integer) next.getAttribute(CommonKeys.LEG_START_TIME);
+			}
+			
+			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, startTime);
+			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, endTime);
+		}
+		}
 	}
 
 }

@@ -17,33 +17,51 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.synPop;
 
-import java.util.Map;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyLeg;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author johannes
  *
  */
-public class LegStartTimeHandler implements LegAttributeHandler {
+public class RoundTripTask implements ProxyPlanTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
+	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.gsv.synPop.ProxyPlan)
 	 */
 	@Override
-	public void handle(ProxyLeg leg, Map<String, String> attributes) {
-		String hour = attributes.get(MIDKeys.LEG_START_TIME_HOUR);
-		String min = attributes.get(MIDKeys.LEG_START_TIME_MIN);
+	public void apply(ProxyPlan plan) {
+		List<Integer> insertPoints = new ArrayList<Integer>();
 		
-		if(hour.equalsIgnoreCase("301") || min.equalsIgnoreCase("301"))
-			return;
+		for(int i = 0; i < plan.getLegs().size(); i++) {
+			ProxyLeg leg = plan.getLegs().get(i);
+			String val = (String) leg.getAttribute(CommonKeys.LEG_ROUNDTRIP); 
+			if(val.equalsIgnoreCase("true")) {
+				ProxyActivity act = plan.getActivities().get(i+1);
+				String type = (String) act.getAttribute(CommonKeys.ACTIVITY_TYPE);
+				act.setAttribute(CommonKeys.ACTIVITY_TYPE, type + "_rt");
+				
+				insertPoints.add(i+2);
+//				
+			}
+		}
 		
-		int time = Integer.parseInt(min) * 60 + Integer.parseInt(hour) * 60 * 60;
+		int offset = 0;
+		for(Integer idx : insertPoints) {
+			int i = idx + offset;
+			String prevType = (String) plan.getActivities().get(i-2).getAttribute(CommonKeys.ACTIVITY_TYPE);
+			
+			ProxyActivity act = new ProxyActivity();
+			act.setAttribute(CommonKeys.ACTIVITY_TYPE, prevType);
+			
+			plan.getActivities().add(i, act);
+			plan.getLegs().add(i-1, new ProxyLeg());
+			
+			offset += 1;
+		}
 
-		leg.setAttribute(CommonKeys.LEG_START_TIME, time);
 	}
 
 }

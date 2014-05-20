@@ -28,22 +28,20 @@ import playground.johannes.gsv.synPop.ProxyLeg;
  * @author johannes
  *
  */
-public class LegStartTimeHandler implements LegAttributeHandler {
+public class LegRoundTrip implements LegAttributeHandler {
 
 	/* (non-Javadoc)
 	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
 	 */
 	@Override
 	public void handle(ProxyLeg leg, Map<String, String> attributes) {
-		String hour = attributes.get(MIDKeys.LEG_START_TIME_HOUR);
-		String min = attributes.get(MIDKeys.LEG_START_TIME_MIN);
-		
-		if(hour.equalsIgnoreCase("301") || min.equalsIgnoreCase("301"))
-			return;
-		
-		int time = Integer.parseInt(min) * 60 + Integer.parseInt(hour) * 60 * 60;
+		String val = attributes.get(MIDKeys.LEG_DESTINATION);
 
-		leg.setAttribute(CommonKeys.LEG_START_TIME, time);
+		if(val.equalsIgnoreCase("Rundweg")) {
+			leg.setAttribute(CommonKeys.LEG_ROUNDTRIP, "true");
+		} else {
+			leg.setAttribute(CommonKeys.LEG_ROUNDTRIP, "false");
+		}
 	}
 
 }

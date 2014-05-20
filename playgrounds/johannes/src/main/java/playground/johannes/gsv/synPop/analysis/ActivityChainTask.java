@@ -17,33 +17,56 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.synPop.analysis;
 
-import java.util.Map;
+import gnu.trove.TObjectDoubleHashMap;
+
+import java.io.IOException;
+import java.util.Collection;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyLeg;
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author johannes
  *
  */
-public class LegStartTimeHandler implements LegAttributeHandler {
+public class ActivityChainTask implements ProxyAnalyzerTask {
+	
+	String outDir = "/home/johannes/gsv/mid2008/";
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
+	 * @see playground.johannes.gsv.synPop.analysis.ProxyAnalyzerTask#analyze(java.util.Collection)
 	 */
 	@Override
-	public void handle(ProxyLeg leg, Map<String, String> attributes) {
-		String hour = attributes.get(MIDKeys.LEG_START_TIME_HOUR);
-		String min = attributes.get(MIDKeys.LEG_START_TIME_MIN);
+	public void analyze(Collection<ProxyPerson> persons) {
+//		DescriptiveStatistics stats = new DescriptiveStatistics();
+		TObjectDoubleHashMap<String> chains = new TObjectDoubleHashMap<String>();
 		
-		if(hour.equalsIgnoreCase("301") || min.equalsIgnoreCase("301"))
-			return;
+		for(ProxyPerson person : persons) {
+			ProxyPlan trajectory = person.getPlan();
+			StringBuilder builder = new StringBuilder();
+			for(int i = 0; i < trajectory.getActivities().size(); i++) {
+				String type = (String) trajectory.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE);
+				builder.append(type);
+				builder.append("-");
+			}
+			
+			String chain = builder.toString();
+			chains.adjustOrPutValue(chain, 1, 1);
+		}
 		
-		int time = Integer.parseInt(min) * 60 + Integer.parseInt(hour) * 60 * 60;
+		try {
+			TXTWriter.writeMap(chains, "chain", "n", outDir + "/actchains.txt", true);
+				
+//			writeHistograms(stats, new DummyDiscretizer(), "actchain", false);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 
-		leg.setAttribute(CommonKeys.LEG_START_TIME, time);
 	}
 
 }

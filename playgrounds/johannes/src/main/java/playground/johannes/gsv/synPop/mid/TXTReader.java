@@ -57,8 +57,17 @@ public class TXTReader {
 			person.setPlan(new ProxyPlan());
 		}
 		
+
+		legHandlers.add(new LegMainPurposeHandler());
+		legHandlers.add(new LegOriginHandler());
+		legHandlers.add(new LegRoundTrip());
+		legHandlers.add(new LegStartTimeHandler());
+		legHandlers.add(new LegEndTimeHandler());
+		legHandlers.add(new LegDistanceHandler());
+		
 		LegRowHandler legHandler = new LegRowHandler();
 		legHandler.read(legFile);
+		
 		
 		return handler.getPersons();
 	}

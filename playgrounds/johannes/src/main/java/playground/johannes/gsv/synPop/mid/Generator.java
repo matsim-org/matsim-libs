@@ -22,7 +22,17 @@ package playground.johannes.gsv.synPop.mid;
 import java.io.IOException;
 import java.util.Map;
 
+import playground.johannes.gsv.synPop.FixActivityTimesTask;
+import playground.johannes.gsv.synPop.InsertActivitiesTask;
 import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.ProxyPlanTaskComposite;
+import playground.johannes.gsv.synPop.RoundTripTask;
+import playground.johannes.gsv.synPop.SetActivityTimeTask;
+import playground.johannes.gsv.synPop.SetActivityTypeTask;
+import playground.johannes.gsv.synPop.SetFirstActivityTypeTask;
+import playground.johannes.gsv.synPop.analysis.ActivityChainTask;
+import playground.johannes.gsv.synPop.analysis.ActivityLoadTask;
+import playground.johannes.gsv.synPop.analysis.LegDistanceTask;
 
 /**
  * @author johannes
@@ -40,6 +50,28 @@ public class Generator {
 		
 		TXTReader reader = new TXTReader();
 		Map<String, ProxyPerson> persons = reader.read(personFile, legFile);
+		
+		ProxyPlanTaskComposite composite = new ProxyPlanTaskComposite();
+		
+		composite.addComponent(new InsertActivitiesTask());
+		composite.addComponent(new SetActivityTypeTask());
+		composite.addComponent(new SetFirstActivityTypeTask());
+//		composite.addComponent(new RoundTripTask());
+		composite.addComponent(new SetActivityTimeTask());
+		composite.addComponent(new FixActivityTimesTask());
+		
+		for(ProxyPerson person : persons.values()) {
+			composite.apply(person.getPlan());
+		}
+		
+		ActivityChainTask task = new ActivityChainTask();
+		task.analyze(persons.values());
+		
+		ActivityLoadTask taks2 = new ActivityLoadTask();
+		taks2.analyze(persons.values());
+		
+		LegDistanceTask task3 = new LegDistanceTask();
+		task3.analyze(persons.values());
 		
 		System.out.println(String.format("Generated %s persons.", persons.size()));
 	}

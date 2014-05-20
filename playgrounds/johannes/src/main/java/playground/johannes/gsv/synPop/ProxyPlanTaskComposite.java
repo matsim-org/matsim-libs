@@ -17,33 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.synPop;
 
-import java.util.Map;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyLeg;
+import playground.johannes.sna.util.Composite;
 
 /**
  * @author johannes
  *
  */
-public class LegStartTimeHandler implements LegAttributeHandler {
+public class ProxyPlanTaskComposite extends Composite<ProxyPlanTask> implements ProxyPlanTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
+	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.gsv.synPop.ProxyPlan)
 	 */
 	@Override
-	public void handle(ProxyLeg leg, Map<String, String> attributes) {
-		String hour = attributes.get(MIDKeys.LEG_START_TIME_HOUR);
-		String min = attributes.get(MIDKeys.LEG_START_TIME_MIN);
-		
-		if(hour.equalsIgnoreCase("301") || min.equalsIgnoreCase("301"))
-			return;
-		
-		int time = Integer.parseInt(min) * 60 + Integer.parseInt(hour) * 60 * 60;
-
-		leg.setAttribute(CommonKeys.LEG_START_TIME, time);
+	public void apply(ProxyPlan plan) {
+		for(ProxyPlanTask task : components) {
+			task.apply(plan);
+		}
 	}
 
 }

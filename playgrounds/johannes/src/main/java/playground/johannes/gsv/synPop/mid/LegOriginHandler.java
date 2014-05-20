@@ -36,12 +36,16 @@ public class LegOriginHandler implements LegAttributeHandler {
 	@Override
 	public void handle(ProxyLeg leg, Map<String, String> attributes) {
 		String origin = attributes.get(MIDKeys.LEG_ORIGIN);
-		if(origin.equalsIgnoreCase("1"))
+		if(origin.equalsIgnoreCase("zu Hause"))
 			leg.setAttribute(CommonKeys.LEG_ORIGIN, "home");
-		else if(origin.equalsIgnoreCase("2"))
+		else if(origin.equalsIgnoreCase("Arbeitsplatz"))
 			leg.setAttribute(CommonKeys.LEG_ORIGIN, "work");
+		else if(origin.equalsIgnoreCase("woanders innerhalb des Ortes"))
+			leg.setAttribute(CommonKeys.LEG_ORIGIN, "intown");
+		else if(origin.equalsIgnoreCase("woanders außerhalb"))
+			leg.setAttribute(CommonKeys.LEG_ORIGIN, "outoftown");
 		else
-			leg.setAttribute(CommonKeys.LEG_ORIGIN, "misc");
+			leg.setAttribute(CommonKeys.LEG_ORIGIN, "unknown");
 	}
 
 }
