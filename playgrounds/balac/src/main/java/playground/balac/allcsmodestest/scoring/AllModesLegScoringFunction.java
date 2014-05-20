@@ -206,7 +206,7 @@ public class AllModesLegScoringFunction extends org.matsim.core.scoring.function
 		else if (("twowaycarsharing").equals(leg.getMode())) {				
 			
 			travelTime = arrivalTime - departureTime;
-			//tmpScore += Double.parseDouble(this.config.getModule("TwoWayCarsharing").getParams().get("constantTwoWayCarsharing"));
+			tmpScore += Double.parseDouble(this.config.getModule("TwoWayCarsharing").getParams().get("constantTwoWayCarsharing"));
 			tmpScore += travelTime * Double.parseDouble(this.config.getModule("TwoWayCarsharing").getParams().get("travelingTwoWayCarsharing")) / 3600.0;
 		}
 		
@@ -214,7 +214,6 @@ public class AllModesLegScoringFunction extends org.matsim.core.scoring.function
 		{
 			
 			tmpScore += getWalkScore(dist, travelTime);
-			tmpScore +=	Double.parseDouble(this.config.getModule("TwoWayCarsharing").getParams().get("constantTwoWayCarsharing"));
 
 		}
 		else if (TransportMode.bike.equals(leg.getMode()))
