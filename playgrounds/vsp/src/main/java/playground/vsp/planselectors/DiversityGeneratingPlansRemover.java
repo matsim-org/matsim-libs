@@ -31,6 +31,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.selectors.AbstractPlanSelector;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.pt.PtConstants;
 
 /**
  * The idea, as the name says, is to not remove the worst plan, but remove plans such that diversity is maintained.
@@ -48,30 +49,96 @@ import org.matsim.core.router.TripStructureUtils;
  * should be set differently.  If someone wants to experiment, the class presumably should be made configurable (or copied before 
  * modification). 
  * 
- * @author nagel
+ * @author nagel, ikaddoura
  */
 public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector {
-	static private final Logger log = Logger.getLogger(DiversityGeneratingPlansRemover.class);
 	
-	private static final double actTypeWeight = 5;
-	private static final double locationWeight = 5;
-	private static final double endTimeWeight_s = 1./3600. ; // per sec, i.e. 1./3600. means that one hour difference results in 1 penalty point.
+	public static final class Builder {
+		private double actTypeWeight = 1.;
+		private double locationWeight = 1.;
+		private double actTimeParameter = 1.;
+		private double sameRoutePenalty = 1.;
+		private double sameModePenalty = 1.;
+		
+		private StageActivityTypes stageActivities = new StageActivityTypes() {
+			
+			@Override
+			public boolean isStageActivity(String activityType) {
+				return activityType.equals(PtConstants.TRANSIT_ACTIVITY_TYPE);
+			}
+		};
 	
-	private static final double sameRouteWeight = 5;
-	private static final double sameModeWeight = 5;
-	private final Network network;
+		public final void setActTypeWeight ( double val ) {
+			this.actTypeWeight = val ;
+		}
+		public final void setLocationWeight( double val ) {
+			this.locationWeight = val ;
+		}
+		public final void setActTimeParameter( double val) {
+			this.actTimeParameter = val ;
+		}
+		public final void setSameRoutePenalty( double val) {
+			this.sameRoutePenalty = val;
+		}
+		public final void setSameModePenalty( double val) {
+			this.sameModePenalty = val;
+		}
+		public final void setStageActivityTypes( StageActivityTypes val) {
+			this.stageActivities = val;
+		}
+		
+		public final DiversityGeneratingPlansRemover build( Network network ) {
+			return new DiversityGeneratingPlansRemover(
+					network,
+					this.actTypeWeight,
+					this.locationWeight,
+					this.actTimeParameter,
+					this.sameRoutePenalty,
+					this.sameModePenalty,
+					this.stageActivities);
+		}
+	}
 	
-	public DiversityGeneratingPlansRemover( Network network ) {
-		this.network = network ;
+	/**
+	 * @param network
+	 * @param actTypeWeight
+	 * @param locationWeight
+	 * @param actTimeParameter
+	 * @param sameRoutePenalty
+	 * @param sameModePenalty
+	 * @param stageActivities
+	 */
+	public DiversityGeneratingPlansRemover(Network network,
+			double actTypeWeight, double locationWeight,
+			double actTimeParameter, double sameRoutePenalty,
+			double sameModePenalty, StageActivityTypes stageActivities) {
+		this.network = network;
+		this.actTypeWeight = actTypeWeight;
+		this.locationWeight = locationWeight;
+		this.actTimeWeight = actTimeParameter;
+		this.sameRoutePenalty = sameRoutePenalty;
+		this.sameModePenalty = sameModePenalty;
+		this.stageActivities = stageActivities;
 	}
 
+	static private final Logger log = Logger.getLogger(DiversityGeneratingPlansRemover.class);
+
+	private final Network network;
+	
+	private final double actTypeWeight;
+	private final double locationWeight;
+	private final double actTimeWeight;
+	
+	private final double sameRoutePenalty;
+	private final double sameModePenalty;
+	private final StageActivityTypes stageActivities;
+	
 	@Override
 	protected Map<Plan, Double> calcWeights(List<? extends Plan> plans) {
 		if ( plans.isEmpty() ) {
 			throw new RuntimeException("empty plans set; this will not work ...") ;
 		}
-		
-		
+				
 		Map<Plan,Double> map = new HashMap<Plan,Double>() ;
 
 		double[] utils = new double[plans.size()] ;
@@ -81,19 +148,26 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 		for ( Plan plan : plans ) {
 			utils[pp] = plan.getScore() ;
 			if ( Double.isNaN(utils[pp]) ) {
-				log.warn( "utils is NaN; id: "  + plan.getPerson().getId() ) ;
+				log.warn( "utils is NaN; id: "  + plan.getPerson().getId());
 			}
 			pp++ ;
 		}
 
 		int rr=0 ;
+		int cc=0;
 		for ( Plan plan1 : plans ) {
 			for ( Plan plan2 : plans ) {
-				// yyyy there is really no need to compare the plan with itself.  kai/johan, mar'14
-				utils[rr] -= similarity( plan1, plan2, null, network ) ; 
-				if ( Double.isNaN(utils[rr]) ) {
-					log.warn( "utils is NaN; id: " + plan1.getPerson().getId() ) ;
-				}
+				// yyyy there is really no need to compare the plan with itself.  kai/johan, mar'14, should not happen anymore... ihab, may'14
+				if (cc == rr) {
+					// same plan
+				} else {
+					utils[rr] -= similarity( plan1, plan2, stageActivities, network ) ;
+
+					if ( Double.isNaN(utils[rr]) ) {
+						log.warn( "utils is NaN; id: " + plan1.getPerson().getId() ) ;
+					}
+				}	
+				cc++;
 			}
 			rr++ ;
 		}
@@ -110,8 +184,9 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 //			double weight = Math.exp( utils[qq] ) / expSum ;
 //			map.put( plan,  weight ) ;
 //		}
-		
+			
 		// start with an exact version: for the time being, we do not want that the best plan vanishes.
+		// The worst plan (taking into account the penalty for similarity!) will be removed.
 		// Alternative (Ihab): Remove the best plan from the evaluation; apply algo only to other plans. may'14
 		double minUtil = Double.POSITIVE_INFINITY ;
 		Integer minIdx = null ;
@@ -142,12 +217,12 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 		return map ;
 	}
 
-	private static double similarity( Plan plan1, Plan plan2, StageActivityTypes stageActivities, Network network ) {
+	private double similarity( Plan plan1, Plan plan2, StageActivityTypes stageActivities, Network network ) {
 		double simil = 0. ;
 		{
 			List<Activity> activities1 = TripStructureUtils.getActivities(plan1, stageActivities) ;
 			List<Activity> activities2 = TripStructureUtils.getActivities(plan2, stageActivities) ;
-			simil += PopulationUtils.calculateSimilarity(activities1, activities2, actTypeWeight, locationWeight, endTimeWeight_s ) ;
+			simil += PopulationUtils.calculateSimilarity(activities1, activities2, actTypeWeight, locationWeight, actTimeWeight ) ;
 			if ( Double.isNaN(simil) ) {
 				log.warn("simil is NaN; id: " + plan1.getPerson().getId() ) ;
 			}
@@ -155,7 +230,7 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 		{
 			List<Leg> legs1 = TripStructureUtils.getLegs(plan1 ) ;
 			List<Leg> legs2 = TripStructureUtils.getLegs(plan2 ) ;
-			simil += PopulationUtils.calculateSimilarity(legs1, legs2, network, sameModeWeight, sameRouteWeight ) ;
+			simil += PopulationUtils.calculateSimilarity(legs1, legs2, network, this.sameModePenalty, this.sameRoutePenalty ) ;
 			if ( Double.isNaN(simil) ) {
 				log.warn("simil is NaN; id: " + plan1.getPerson().getId() ) ;
 			}

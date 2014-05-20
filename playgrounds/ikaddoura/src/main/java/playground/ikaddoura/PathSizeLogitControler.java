@@ -30,8 +30,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.replanning.selectors.AbstractPlanSelector;
 
 import playground.vsp.planselectors.DiversityGeneratingPlansRemover;
+import playground.vsp.planselectors.DiversityGeneratingPlansRemover.Builder;
 
 /**
  * @author ikaddoura
@@ -59,7 +61,7 @@ public class PathSizeLogitControler {
 			log.info("endTimeWeight: "+ endTimeWeight);
 			
 		} else {
-			configFile = "/Users/ihab/Desktop/ils4/virginia2/config_n_60_1000.xml";
+			configFile = "../../runs-svn/pathSizeLogit/config_n_60_1000_2.xml";
 			endTimeWeight = 1.;
 			pathSizeLogit = true;
 		}
@@ -72,16 +74,27 @@ public class PathSizeLogitControler {
 		
 		Controler controler = new Controler(configFile);
 		controler.setOverwriteFiles(true);
+		controler.setCreateGraphs(false);
 		final Network network = controler.getNetwork();
 		
-//		if (pathSizeLogit){
-//			controler.addControlerListener(new StartupListener(){
-//				@Override
-//				public void notifyStartup(StartupEvent event) {
-//					event.getControler().getStrategyManager().setPlanSelectorForRemoval(new DiversityGeneratingPlansRemover(network, endTimeWeight));
-//				}
-//			});
-//		}
+		if (pathSizeLogit){
+			
+			Builder builder = new DiversityGeneratingPlansRemover.Builder() ;
+			builder.setActTypeWeight(0.);
+			builder.setLocationWeight(0.);
+			builder.setSameModePenalty(0.);
+			builder.setSameRoutePenalty(0.);
+			builder.setActTimeParameter(10.);
+			
+			final AbstractPlanSelector remover = builder.build(network) ;
+			
+			controler.addControlerListener(new StartupListener(){
+				@Override
+				public void notifyStartup(StartupEvent event) {
+					event.getControler().getStrategyManager().setPlanSelectorForRemoval(remover);
+				}
+			});
+		}
 		
 		controler.run();
 	}

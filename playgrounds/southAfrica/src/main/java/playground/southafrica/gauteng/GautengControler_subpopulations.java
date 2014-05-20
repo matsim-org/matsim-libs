@@ -80,6 +80,7 @@ import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
+import org.matsim.core.replanning.selectors.AbstractPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -101,6 +102,7 @@ import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
 import playground.southafrica.kai.gauteng.ConfigurableTravelDisutilityFactory;
 import playground.southafrica.utilities.Header;
 import playground.vsp.planselectors.DiversityGeneratingPlansRemover;
+import playground.vsp.planselectors.DiversityGeneratingPlansRemover.Builder;
 
 /**
  * 
@@ -283,7 +285,17 @@ public class GautengControler_subpopulations {
 		controler.addControlerListener(new StartupListener(){
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				event.getControler().getStrategyManager().setPlanSelectorForRemoval(new DiversityGeneratingPlansRemover( sc.getNetwork() ));
+				
+				Builder builder = new DiversityGeneratingPlansRemover.Builder() ;
+				builder.setActTypeWeight(5.);
+				builder.setLocationWeight(5.);
+				builder.setSameModePenalty(5.);
+				builder.setSameRoutePenalty(5.);
+				builder.setActTimeParameter(0.);
+				
+				final AbstractPlanSelector remover = builder.build(sc.getNetwork()) ;
+				
+				event.getControler().getStrategyManager().setPlanSelectorForRemoval(remover);
 			}
 		});
 		// needs to be tested.  But in current runs, all plans of an agent are exactly identical at end of 1000it.  kai, mar'13
