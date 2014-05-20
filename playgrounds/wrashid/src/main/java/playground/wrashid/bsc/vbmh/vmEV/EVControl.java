@@ -133,6 +133,11 @@ public class EVControl {
 		//during the given time in kwh
 		EV ev = evList.getEV(personId);
 		
+		if(duration<0){
+			System.out.println("E R R O R: Negative duration observed >> Set chargeable amount of engery to zero (Not fatal)");
+			return 0.0;
+		}
+		
 		return ev.calcNewStateOfCharge(chargingRate, duration)-ev.stateOfCharge;
 		
 	}

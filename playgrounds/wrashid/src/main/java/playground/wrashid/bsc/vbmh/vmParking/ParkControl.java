@@ -332,8 +332,12 @@ public class ParkControl {
 			double cost = pricing.calculateParkingPrice(duration, ev, spot);
 			double newStateOfChargePerc = 0.0;
 			if(cost==-1){ //this vehicle seems to be not allowed to park here
-				continue;
+				//continue; //War fuer ev exc, sollte nicht mehr gebraucht werden
 			}
+			if(cost<0){
+				cost=0;
+			}
+			
 			if (ev && spot.charge) {
 				newStateOfChargePerc = evControl.calcNewStateOfChargePercentage(personId,spot.chargingRate, duration);
 			}else if(ev){
@@ -384,6 +388,7 @@ public class ParkControl {
 			System.out.println("Zeit "+this.time);
 			System.out.println("Person "+personId.toString());
 			System.out.println("Spots in area Size "+spotsInArea.size());
+			System.out.println("Duration "+duration);
 			System.out.println(spotsInArea.toString());
 
 			int a = 1/0;

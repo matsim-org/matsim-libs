@@ -130,6 +130,9 @@ public class Testcontroller {
 			}
 		}
 		
+		testmodel = preisemodelle.get_model(2);
+		System.out.println(testmodel.calculateParkingPrice(-1800, false));
+		
 		
 		
 		

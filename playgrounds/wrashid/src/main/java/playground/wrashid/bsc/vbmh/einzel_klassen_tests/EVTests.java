@@ -11,8 +11,10 @@ public class EVTests {
 		EVControl evControl = new EVControl();
 		evControl.startUp("input/SF_PLUS/generalinput/evs.xml", null);
 		IdImpl personId = new IdImpl("35287_1");
+		IdImpl personIdb = new IdImpl("39780_1");
+		System.out.println(evControl.hasEV(personIdb));
 		System.out.println(evControl.stateOfChargePercentage(personId));
-		System.out.println(evControl.clalcChargedAmountOfEnergy(personId, 8.04, 3600));
+		System.out.println(evControl.clalcChargedAmountOfEnergy(personId, 8.04, -3600));
 		System.out.println(evControl.calcNewStateOfChargePercentage(personId, 8.04, 2500));
 		System.out.println(evControl.stateOfChargePercentage(personId));
 	}
