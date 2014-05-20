@@ -154,11 +154,11 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 				dataBoundaries.put( type, dataBoundariesTmp ) ;
 				break; }
 			case scores:{
-				double[] dataBoundariesTmp = {Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY } ; // yy ??
+				double[] dataBoundariesTmp = {Double.NEGATIVE_INFINITY} ; // yy ??
 				dataBoundaries.put( type, dataBoundariesTmp ) ;
 				break; }
 			case payments:{
-				double[] dataBoundariesTmp = {Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY } ; // yy ??
+				double[] dataBoundariesTmp = {Double.NEGATIVE_INFINITY } ; // yy ??
 				dataBoundaries.put( type, dataBoundariesTmp ) ;
 				break; }
 			default:
@@ -202,6 +202,9 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		Person person = this.population.getPersons().get(event.getPersonId());
 		if (depTime != null && person != null) {
 			double travTime = event.getTime() - depTime;
+			if ( person.getId().toString().equals("car_0") ) {
+				System.err.println( " travTime: " + travTime );
+			}
 			controlStatisticsSum += travTime ;
 			controlStatisticsCnt ++ ;
 
@@ -342,6 +345,15 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 			this.statsContainer.get(type).clear() ;
 			this.sumsContainer.get(type).clear() ;
 		}
+		
+		for ( Person person : this.scenario.getPopulation().getPersons().values() ) {
+			ObjectAttributes attribs = this.scenario.getPopulation().getPersonAttributes() ;
+			attribs.putAttribute( person.getId().toString(), TRAV_TIME, 0. ) ;
+			if ( attribs.getAttribute( person.getId().toString(), MONEY) != null ) {
+				attribs.putAttribute( person.getId().toString(), MONEY, 0. ) ;
+			}
+		}
+		// (yy not sure if I like the above; might be better to just use a local data structure. kai, may'14)
 
 		controlStatisticsSum = 0. ;
 		controlStatisticsCnt = 0. ;
@@ -366,13 +378,16 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		add(person, item, MONEY);
 	}
 
-	private void add(Person person, double item, final String attributeName) {
+	private void add(Person person, double val, final String attributeName) {
 		final ObjectAttributes pAttribs = this.scenario.getPopulation().getPersonAttributes();
-		Double oldMoney = (Double) pAttribs.getAttribute( person.getId().toString(), attributeName) ;
-		if ( oldMoney==null ) {
-			pAttribs.putAttribute( person.getId().toString(), attributeName, item ) ; 
-		} else {
-			pAttribs.putAttribute( person.getId().toString(), attributeName, item + oldMoney ) ; 
+		Double oldVal = (Double) pAttribs.getAttribute( person.getId().toString(), attributeName) ;
+		double newVal = val ;
+		if ( oldVal!=null ) {
+			newVal += oldVal ;
+		}
+		pAttribs.putAttribute( person.getId().toString(), attributeName, newVal ) ; 
+		if ( person.getId().toString().equals("car_0") ) {
+			System.err.println( " oldVal: " + oldVal + "; val: " + val + "; newVal: " + newVal );
 		}
 	}
 
