@@ -51,7 +51,7 @@ public interface NetworkRoute extends Route {
 	/**
 	 * Returns the list of link ids that build the route. The links where the route
 	 * starts and ends (the links where the activities are on) are <b>not</b>
-	 * included in the list.
+	 * included in the list (note that they are in getStartLinkId() and getEndLinkId() of the Route super-interface).
 	 * @return a list containing the link ids the agents plans to travel along
 	 */
 	public List<Id> getLinkIds();
