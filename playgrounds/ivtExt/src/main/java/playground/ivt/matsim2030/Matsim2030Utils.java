@@ -29,7 +29,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
@@ -43,9 +42,11 @@ import org.matsim.pt.router.TransitRouterNetwork;
 import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
 
+import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.matsim2030.router.Matsim2030RoutingConfigGroup;
 import playground.ivt.matsim2030.router.TransitRouterNetworkReader;
 import playground.ivt.matsim2030.router.TransitRouterWithThinnedNetworkFactory;
+import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
 import playground.ivt.utils.TripModeShares;
 
 /**
@@ -67,6 +68,7 @@ public class Matsim2030Utils {
 
 	public static void addDefaultGroups( final Config config ) {
 		config.addModule( new Matsim2030RoutingConfigGroup() );
+		config.addModule( new KtiLikeScoringConfigGroup() );
 	}
 
 	public static void connectFacilitiesWithLinks( final Scenario sc ) {
@@ -81,27 +83,20 @@ public class Matsim2030Utils {
 			new DestinationChoiceBestResponseContext( scenario );
 		lcContext.init();
 
-  		final DCScoringFunctionFactory scoringFunctionFactory =
-			new DCScoringFunctionFactory(
-					scenario.getConfig(),
-					// XXX NO! This should NEVER, EVER be done, in absolutely ANY circumstances!!!
-					// fortunately, this is only used to get the network.
-					// But then, why not just ask for the Scenario!?
-					controler,
-					lcContext); 	
-		controler.setScoringFunctionFactory( scoringFunctionFactory );
-		// This is a way to choose between opening times from facilities
-		// or opening times from the config file.
-		// Why isn't it just implemented as two different ScoringFunctionFactories?
-		// Don't ask me...
-		scoringFunctionFactory.setUsingConfigParamsForScoring(false);		
-
 		// XXX this thing is awful. I think one can (and should) avoid using it...
 		// There does not seem to be a reason not to do all the notify startup
 		// method does before calling run().
 		controler.addControlerListener(
 				new DestinationChoiceInitializer(
 					lcContext));
+	}
+
+	public static void initializeScoring( final Controler controler ) {
+ 		final MATSim2010ScoringFunctionFactory scoringFunctionFactory =
+			new MATSim2010ScoringFunctionFactory(
+					controler.getScenario(),
+					new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ) ); 	
+		controler.setScoringFunctionFactory( scoringFunctionFactory );
 	}
 
 	public static TripRouterFactory createTripRouterFactory( final Scenario scenario ) {

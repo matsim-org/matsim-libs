@@ -66,6 +66,8 @@ public class RunBaseSimulation {
 		controler.setTripRouterFactory(
 				Matsim2030Utils.createTripRouterFactory(
 					scenario ) );
+
+		Matsim2030Utils.initializeScoring( controler );
 		
 		// Code from Alex called (i) Controler.setOverrideFiles( true ) and
 		// (ii) Controler.setCreateGraphs( true ), but

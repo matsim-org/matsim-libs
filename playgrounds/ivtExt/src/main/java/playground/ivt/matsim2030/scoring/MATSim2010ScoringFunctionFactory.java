@@ -55,37 +55,35 @@ import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction.LegScorin
  */
 public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory {
 
+	private final Scenario scenario;
 	private final StageActivityTypes blackList;
-	private final KtiLikeScoringConfigGroup ktiConfig;
-	private final PlanCalcScoreConfigGroup config;
-    private final Scenario scenario;
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
-	private final DestinationChoiceBestResponseContext locationChoiceContext;
-	private final ObjectAttributes personAttributes;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// constructors
 	// /////////////////////////////////////////////////////////////////////////
     public MATSim2010ScoringFunctionFactory(
-			final DestinationChoiceBestResponseContext locationChoiceContext,
-			final StageActivityTypes typesNotToScore,
-			final KtiLikeScoringConfigGroup ktiConfig,
-			final PlanCalcScoreConfigGroup config,
-			final Scenario scenario) {
-		this.locationChoiceContext = locationChoiceContext;
-		this.ktiConfig = ktiConfig;
-		this.config = config;
+			final Scenario scenario,
+			final StageActivityTypes typesNotToScore ) {
 		this.scenario = scenario;
 		this.facilityPenalties = new TreeMap<Id, FacilityPenalty>();
 		this.blackList = typesNotToScore;
-		this.personAttributes = locationChoiceContext.getPrefsAttributes();
 	}
 
 
 	@Override
 	public ScoringFunction createNewScoringFunction(final Person person) {
+		// get scenario elements at the lattest possible, to be sure all is initialized
+		final KtiLikeScoringConfigGroup ktiConfig = (KtiLikeScoringConfigGroup)
+			scenario.getConfig().getModule( KtiLikeScoringConfigGroup.GROUP_NAME );
+		final PlanCalcScoreConfigGroup config = scenario.getConfig().planCalcScore();
+		final DestinationChoiceBestResponseContext locationChoiceContext = (DestinationChoiceBestResponseContext)
+			scenario.getScenarioElement( DestinationChoiceBestResponseContext.ELEMENT_NAME );
+		// TODO use the ones from the population
+		final ObjectAttributes personAttributes = locationChoiceContext.getPrefsAttributes();
+
 		final ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-		final CharyparNagelScoringParameters params = createParams( person );
+		final CharyparNagelScoringParameters params = createParams( person , config , personAttributes );
 
 		scoringFunctionAccumulator.addScoringFunction(
 				new BlackListedActivityScoringFunction(
@@ -155,7 +153,9 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 
 
 	private CharyparNagelScoringParameters createParams(
-			final Person person) {
+			final Person person,
+			final PlanCalcScoreConfigGroup config,
+			final ObjectAttributes personAttributes) {
 		final PlanCalcScoreConfigGroup dummyGroup = new PlanCalcScoreConfigGroup();
 		for ( Map.Entry<String, String> e : config.getParams().entrySet() ) {
 			dummyGroup.addParam( e.getKey() , e.getValue() );
