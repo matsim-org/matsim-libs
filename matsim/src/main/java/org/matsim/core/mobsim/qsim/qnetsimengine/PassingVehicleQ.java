@@ -33,7 +33,7 @@ final class PassingVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<
 	@Override
 	public void addFirst(QVehicle qveh) {
 		qveh.setEarliestLinkExitTime(Double.NEGATIVE_INFINITY);
-		this.add(qveh) ; // uses the AbstractQueue.add, which in turn uses the PassingVehicleQ.ofer.
+		this.add(qveh) ; // uses the AbstractQueue.add, which in turn uses the PassingVehicleQ.offer.
 	}
 
 	@Override
