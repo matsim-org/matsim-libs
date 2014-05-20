@@ -7,7 +7,7 @@ import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 
-public class PctStrategySwitchWithinSameGroup extends
+public class CategorizationOfStrategySwitches extends
 		CompareSelectedParkingPropertyOneRun {
 
 	/**
@@ -29,19 +29,58 @@ public class PctStrategySwitchWithinSameGroup extends
 						startIteration));
 
 		System.out
-				.println("iteration\tpcConsequeteIteration-SwitchWithinSameStrategyGroup\tpctReferenceIteration-SwitchWithinSameStrategyGroup");
+				.println("iteration\tpcConsequeteIter-SameStrategy\tpctReferenceIteration-SwitchWithinSameStrategyGroup\tpctDiffConsequete-parkingStrategy\tpctDiffReference-parkingStrategy");
+		
+		System.out.print("iteration");
+		System.out.print("\t");
+		System.out.print("pctSameStrategy_conseqIter");
+		System.out.print("\t");
+		System.out.print("pctOfStrategySwitchesWithinSameGroup_conseqIter");
+		System.out.print("\t");
+		System.out.print("pctOfStrategySwitchesToDiffGroup_conseqIter");
+		System.out.print("\t");
+		System.out.print("pctSameStrategy_refIter");
+		System.out.print("\t");
+		System.out.print("pctOfStrategySwitchesWithinSameGroup_refIter");
+		System.out.print("\t");
+		System.out.print("pctOfStrategySwitchesToDiffGroup_refIter");
+		System.out.println();
+		
 		for (int i = startIteration; i <= endIteration; i += iterationStep) {
 			Matrix eventsMatrixNextIter = GeneralLib
 					.readStringMatrix(getEventsFileName(outputFolder, i + 1));
 			
-			System.out.print(i
-					+ "\t"
-					+ percentageOfStrategySwitchesWithinSameGroup(
-							eventsMatrixCurrentIter, eventsMatrixNextIter,
-							"FacilityId",ignoreCasesWithBothPPUse)
-					+ "\t"
-					+ percentageOfStrategySwitchesWithinSameGroup(eventsReferenceMatrix,
-							eventsMatrixCurrentIter, "FacilityId",ignoreCasesWithBothPPUse));
+			double pctSameStrategy_conseqIter=100-percentageOfDifferentParkingUsages(
+					eventsMatrixCurrentIter, eventsMatrixNextIter,
+					"parkingStrategy",ignoreCasesWithBothPPUse);
+			
+			double pctOfStrategySwitchesWithinSameGroup_conseqIter = percentageOfStrategySwitchesWithinSameGroup(
+					eventsMatrixCurrentIter, eventsMatrixNextIter,ignoreCasesWithBothPPUse)*((100-pctSameStrategy_conseqIter)/100);
+			
+			double pctOfStrategySwitchesToDiffGroup_conseqIter=100-pctSameStrategy_conseqIter-pctOfStrategySwitchesWithinSameGroup_conseqIter;
+			
+			
+			double pctSameStrategy_refIter=100-percentageOfDifferentParkingUsages(eventsReferenceMatrix,
+					eventsMatrixCurrentIter, "parkingStrategy",ignoreCasesWithBothPPUse);
+			
+			double pctOfStrategySwitchesWithinSameGroup_refIter = percentageOfStrategySwitchesWithinSameGroup(eventsReferenceMatrix,
+					eventsMatrixCurrentIter,ignoreCasesWithBothPPUse)*((100-pctSameStrategy_refIter)/100);
+			
+			double pctOfStrategySwitchesToDiffGroup_refIter=100-pctSameStrategy_refIter-pctOfStrategySwitchesWithinSameGroup_refIter;
+			
+			System.out.print(i);
+			System.out.print("\t");
+			System.out.print(pctSameStrategy_conseqIter);
+			System.out.print("\t");
+			System.out.print(pctOfStrategySwitchesWithinSameGroup_conseqIter);
+			System.out.print("\t");
+			System.out.print(pctOfStrategySwitchesToDiffGroup_conseqIter);
+			System.out.print("\t");
+			System.out.print(pctSameStrategy_refIter);
+			System.out.print("\t");
+			System.out.print(pctOfStrategySwitchesWithinSameGroup_refIter);
+			System.out.print("\t");
+			System.out.print(pctOfStrategySwitchesToDiffGroup_refIter);
 			System.out.println();
 			
 			eventsMatrixCurrentIter = eventsMatrixNextIter;
@@ -52,7 +91,7 @@ public class PctStrategySwitchWithinSameGroup extends
 	
 	public static double percentageOfStrategySwitchesWithinSameGroup(
 			Matrix matrixA,
-			Matrix matrixB, String fieldName, boolean ignoreCasesWithBothPPUse) {
+			Matrix matrixB, boolean ignoreCasesWithBothPPUse) {
 		
 		// persondId, legIndex, rowId
 		TwoHashMapsConcatenated<Id, Integer, Integer> indexMatrixB=getIndex(matrixB);
