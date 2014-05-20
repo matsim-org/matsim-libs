@@ -52,7 +52,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 
 /**
- * @author nagel
+ * @author nagel, ikaddoura
  */
 public final class PopulationUtils {
 	/**
@@ -379,30 +379,44 @@ public final class PopulationUtils {
 	 * </ul>
 	 * @param activities1
 	 * @param activities2
-	 * @param sameActivityTypeReward
-	 * @param sameActivityLocationReward
-	 * @param differentTimePenalty_s TODO
+	 * @param sameActivityTypePenalty
+	 * @param sameActivityLocationPenalty
+	 * @param actTimeParameter
 	 * @return
 	 */
-	public static double calculateSimilarity(List<Activity> activities1, List<Activity> activities2, double sameActivityTypeReward, 
-			double sameActivityLocationReward, double differentTimePenalty_s ) {
+	public static double calculateSimilarity(List<Activity> activities1, List<Activity> activities2, double sameActivityTypePenalty, 
+			double sameActivityLocationPenalty, double actTimeParameter ) {
 		double simil = 0. ;
 		Iterator<Activity> it1 = activities1.iterator() ;
 		Iterator<Activity> it2 = activities2.iterator() ;
 		for ( ; it1.hasNext() && it2.hasNext() ; ) {
 			Activity act1 = it1.next() ;
 			Activity act2 = it2.next() ;
+			
+			// activity type
 			if ( act1.getType().equals(act2.getType() ) ) {
-				simil += sameActivityTypeReward ;
+				simil += sameActivityTypePenalty ;
 			}
+			
+			// activity location
 			if ( act1.getCoord().equals( act2.getCoord() ) ){ 
-				simil += sameActivityLocationReward ;
+				simil += sameActivityLocationPenalty ;
 			}
-			double delta = act1.getEndTime() - act2.getEndTime() ;
-			double penalty = Math.abs(delta) * differentTimePenalty_s ;
-			simil -= penalty ;
+			
+			// activity end times
+			if ( Double.isInfinite( act1.getEndTime() ) && Double.isInfinite( act2.getEndTime() ) ){
+				// both activities have no end time, no need to compute a similarity penalty
+			} else {
+				// both activities have an end time, comparing the end times
+				
+				// 300/ln(2) means a penalty of 0.5 for 300 sec difference
+				double delta = Math.abs(act1.getEndTime() - act2.getEndTime()) ;
+				simil += actTimeParameter * Math.exp( - delta/(300/Math.log(2)) ) ;
+			}
 			
 		}
+		
+		// a positive value is interpreted as a penalty
 		return simil ;
 	}
 	
