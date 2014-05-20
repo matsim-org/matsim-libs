@@ -48,10 +48,8 @@ import org.matsim.core.utils.misc.Time;
 
 import playground.balac.freefloating.qsim.FreeFloatingStation;
 import playground.balac.freefloating.qsim.FreeFloatingVehiclesLocation;
-import playground.balac.freefloating.scenario.FreeFloatingFacilityImpl;
 import playground.balac.onewaycarsharingredisgned.qsim.OneWayCarsharingRDStation;
 import playground.balac.onewaycarsharingredisgned.qsim.OneWayCarsharingRDVehicleLocation;
-import playground.balac.onewaycarsharingredisgned.scenario.OneWayCarsharingRDFacilityImpl;
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSStation;
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSVehicleLocation;
 import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacilityImpl;
@@ -175,23 +173,34 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			this.state = MobsimAgent.State.ABORT ;
 		} else {
 			// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
-				if (currentLeg.getMode().equals("twowaycarsharing") && plan.getPlanElements().get(currentPlanElementIndex + 1) instanceof Leg) {
-					
-					twvehiclesLocation.addVehicle(scenario.getNetwork().getLinks().get(this.cachedDestinationLinkId), twVehId);
-					
-				}
-				else if (currentLeg.getMode().equals("freefloating")) {
-					
-					ffvehiclesLocation.addVehicle(scenario.getNetwork().getLinks().get(this.cachedDestinationLinkId), ffVehId);
-					
-				}
-				else if (currentLeg.getMode().equals("onewaycarsharing")) {
-					
-					owvehiclesLocation.addVehicle(scenario.getNetwork().getLinks().get(this.cachedDestinationLinkId), owVehId);
-					
-				}
-				advancePlan(now) ;
+			if (this.getVehicle()!=null && (this.getVehicle().getId().toString().startsWith("TW") ||
+			this.getVehicle().getId().toString().startsWith("OW") || 
+			this.getVehicle().getId().toString().startsWith("FF")))
+				
+				parkCSVehicle(this.currentLeg, this.plan);			
+				
+			advancePlan(now) ;
 		}
+	}	
+	
+	private void parkCSVehicle( Leg currentLeg, Plan plan) {
+		
+		if (currentLeg.getMode().equals("twowaycarsharing") && plan.getPlanElements().get(currentPlanElementIndex + 1) instanceof Leg) {
+			
+			twvehiclesLocation.addVehicle(scenario.getNetwork().getLinks().get(this.cachedDestinationLinkId), twVehId);
+			
+		}
+		else if (this.currentLeg.getMode().equals("freefloating")) {
+			
+			ffvehiclesLocation.addVehicle(scenario.getNetwork().getLinks().get(this.cachedDestinationLinkId), ffVehId);
+			
+		}
+		else if (this.currentLeg.getMode().equals("onewaycarsharing")) {
+			
+			owvehiclesLocation.addVehicle(scenario.getNetwork().getLinks().get(this.cachedDestinationLinkId), owVehId);
+			
+		}
+		
 	}
 
 	@Override
@@ -301,67 +310,74 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			initializeActivity(act);
 		} else if (pe instanceof Leg) {
 			Leg leg = (Leg) pe;
-			//start of added stuff		
+			//start of added stuff
+			
+			String mode = leg.getMode();
+			
+			PlanElement previousPlanElement = this.plan.getPlanElements().get(this.plan.getPlanElements().indexOf(pe) - 1);
+			PlanElement nextPlanElement = this.plan.getPlanElements().get(this.plan.getPlanElements().indexOf(pe) + 1);
 				
-			if (leg.getMode().equals( "walk_rb" )) {
+			if (mode.equals( "walk_rb" )) {
 				
-				if (this.plan.getPlanElements().get(this.plan.getPlanElements().indexOf(pe) + 1) instanceof Leg) {
+				if (nextPlanElement instanceof Leg) {
 				
 					initializeTwoWayCarsharingStartWalkLeg(leg, now);
 				}
-				else if (this.plan.getPlanElements().get(this.plan.getPlanElements().indexOf(pe) - 1) instanceof Leg) {
+				else if (previousPlanElement instanceof Leg) {
 					
 					initializeTwoWayCarsharingEndWalkLeg(leg, now);
 					
 				}
+				
+				//TODO:not sure if this is needed, probably leftover from some previous version
 				else
 					initializeLeg(leg);
 				
 			}
-			else if (leg.getMode().equals("twowaycarsharing")) {
-				if (this.plan.getPlanElements().get(this.plan.getPlanElements().indexOf(pe) - 1) instanceof Activity &&
-						this.plan.getPlanElements().get(this.plan.getPlanElements().indexOf(pe) + 1) instanceof Activity)
+			else if (mode.equals("twowaycarsharing")) {
+				if (previousPlanElement instanceof Activity &&
+						nextPlanElement instanceof Activity)
 					
 					initializeTwoWayCSMidleCarLeg(startLinkTW, now);
 				
-				else if (this.plan.getPlanElements().get(this.plan.getPlanElements().indexOf(pe) - 1) instanceof Leg && !(this.plan.getPlanElements().get(this.plan.getPlanElements().indexOf(pe) + 1) instanceof Leg))
+				else if (previousPlanElement instanceof Leg && !(nextPlanElement instanceof Leg))
 					
 					initializeTwoWayCarsharingCarLeg(startLinkTW, now);
 				
-				else if (this.plan.getPlanElements().get(this.plan.getPlanElements().indexOf(pe) - 1) instanceof Leg && (this.plan.getPlanElements().get(this.plan.getPlanElements().indexOf(pe) + 1) instanceof Leg))
+				else if (previousPlanElement instanceof Leg && (nextPlanElement instanceof Leg))
 					
 					initializeTwoWayCarsharingEmptyCarLeg(startLinkTW, now);
 				
-				else if (this.plan.getPlanElements().get(this.plan.getPlanElements().indexOf(pe) + 1) instanceof Leg)
+				else if (nextPlanElement instanceof Leg)
 					
 					initializeTwoWayCarsharingEndCarLeg(startLinkTW, now);
 				else 
 					log.error("this should neevr happen");
 				
 			}
-			else if (leg.getMode().equals( "walk_ff" )) {				
+			else if (mode.equals( "walk_ff" )) {				
 				
-					initializeFreeFLoatingWalkLeg(leg);
+					initializeFreeFLoatingWalkLeg(leg, now);
 			
 			}
-			else if (leg.getMode().equals( "freefloating" )) {
+			else if (mode.equals( "freefloating" )) {
 				initializeFreeFLoatingCarLeg(startLinkFF, now);
 				
 			} 
-			else if (leg.getMode().equals( "walk_ow_sb" )) {
+			else if (mode.equals( "walk_ow_sb" )) {
 				
-				if (this.plan.getPlanElements().get(this.plan.getPlanElements().indexOf(pe) + 1) instanceof Leg) {
+				if (nextPlanElement instanceof Leg) {
 				
-					initializeOneWayCarsharingStartWalkLeg(leg);
+					initializeOneWayCarsharingStartWalkLeg(leg, now);
 				}
-				else if (this.plan.getPlanElements().get(this.plan.getPlanElements().indexOf(pe) - 1) instanceof Leg) {
+				else if (previousPlanElement instanceof Leg) {
 					
-					initializeOneWayCarsharingEndWalkLeg(leg);
+					initializeOneWayCarsharingEndWalkLeg(leg, now);
 					
 				}				
 				
 			}
-			else if (leg.getMode().equals( "onewaycarsharing" )) {
+			else if (mode.equals( "onewaycarsharing" )) {
 				initializeOneWayCarsharingCarLeg(startLinkOW, now);
 				
 			}
@@ -373,6 +389,82 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	}
 	
 	//added methods
+	
+	private void initializeCSWalkLeg(String mode, double now, Link startLink, Link destinationLink) {
+		LegImpl walkLeg = new LegImpl(mode);
+		
+		GenericRouteImpl walkRoute = new GenericRouteImpl(startLink.getId(), destinationLink.getId());
+		final double dist = CoordUtils.calcDistance(startLink.getCoord(), destinationLink.getCoord());
+		final double estimatedNetworkDistance = dist * beelineFactor;
+
+		final int travTime = (int) (estimatedNetworkDistance / walkSpeed);
+		walkRoute.setTravelTime(travTime);
+		walkRoute.setDistance(estimatedNetworkDistance);	
+		
+		walkLeg.setRoute(walkRoute);
+		this.cachedDestinationLinkId = destinationLink.getId();
+		
+		walkLeg.setDepartureTime(now);
+		walkLeg.setTravelTime(travTime);
+		walkLeg.setArrivalTime(now + travTime);
+		// set the route according to the next leg
+		this.currentLeg = walkLeg;
+		this.cachedRouteLinkIds = null;
+		this.currentLinkIdIndex = 0;
+		this.cachedNextLinkId = null;
+		
+	}
+	
+	private void initializeCSVehicleLeg (String mode, double now, Link startLink, Link destinationLink) {
+		double travelTime = 0.0;
+		List<Id> ids = new ArrayList<Id>();
+		
+		TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
+		
+		TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();		
+		
+		CoordImpl coordStart = new CoordImpl(startLink.getCoord());
+		
+		TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(new IdImpl("1000000000"), coordStart, startLink.getId());
+		
+		CoordImpl coordEnd = new CoordImpl(destinationLink.getCoord());
+
+		TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(new IdImpl("1000000001"), coordEnd, destinationLink.getId());
+		
+		for(PlanElement pe1: tripRouter.calcRoute("car", startFacility, endFacility, now, person)) {
+	    	
+			if (pe1 instanceof Leg) {
+				ids = ((NetworkRoute)((Leg) pe1).getRoute()).getLinkIds();
+	    			travelTime += ((Leg) pe1).getTravelTime();
+			}
+		}
+		
+		LegImpl carLeg = new LegImpl(mode);
+		
+		carLeg.setTravelTime( travelTime );
+		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", startLink.getId(), destinationLink.getId());
+		route.setLinkIds( startLink.getId(), ids, destinationLink.getId());
+		route.setTravelTime( travelTime);
+		if (mode.equals("twowaycarsharing"))
+			route.setVehicleId(new IdImpl("TW_" + (twVehId)));
+		else if (mode.equals("onewaycarsharing"))
+			route.setVehicleId(new IdImpl("OW_" + (owVehId)));
+		else if (mode.equals("freefloating"))
+			route.setVehicleId(new IdImpl("FF_" + (ffVehId)));
+
+		carLeg.setRoute(route);
+		this.cachedDestinationLinkId = route.getEndLinkId();
+
+			// set the route according to the next leg
+		this.currentLeg = carLeg;
+		this.cachedRouteLinkIds = null;
+		this.currentLinkIdIndex = 0;
+		this.cachedNextLinkId = null;	
+		
+		
+		
+	}
+	
 	private void initializeTwoWayCarsharingStartWalkLeg(Leg leg, double now) {
 		
 		this.state = MobsimAgent.State.LEG;
@@ -390,31 +482,8 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		twvehiclesLocation.removeVehicle(station.getLink(), station.getIDs().get(0));
 		
 		mapTW.put(scenario.getNetwork().getLinks().get(leg.getRoute().getStartLinkId()), startLinkTW);
-		
-		LegImpl walkLeg = new LegImpl("walk_rb");
-		
-		GenericRouteImpl walkRoute = new GenericRouteImpl(route.getStartLinkId(), startLinkTW.getId());
-		final double dist = CoordUtils.calcDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startLinkTW.getCoord());
-		final double estimatedNetworkDistance = dist * beelineFactor;
-
-		final int travTime = (int) (estimatedNetworkDistance / walkSpeed);
-		walkRoute.setTravelTime(travTime);
-		walkRoute.setDistance(estimatedNetworkDistance);	
-		
-		walkLeg.setRoute(walkRoute);
-		this.cachedDestinationLinkId = startLinkTW.getId();
-		
-		walkLeg.setDepartureTime(now);
-		walkLeg.setTravelTime(travTime);
-		walkLeg.setArrivalTime(now + travTime);
-		// set the route according to the next leg
-		this.currentLeg = walkLeg;
-		this.cachedRouteLinkIds = null;
-		this.currentLinkIdIndex = 0;
-		this.cachedNextLinkId = null;		
-		
-		return;
-		
+		initializeCSWalkLeg("walk_rb", now, scenario.getNetwork().getLinks().get(route.getStartLinkId()), startLinkTW);
+					
 	}
 	
 	private void initializeTwoWayCarsharingCarLeg(Link l, double now) {
@@ -425,78 +494,15 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		Leg leg =  (Leg) pe;
 		
 		//create route for the car part of the twowaycarsharing trip
+		initializeCSVehicleLeg("twowaycarsharing", now, l, scenario.getNetwork().getLinks().get(leg.getRoute().getEndLinkId()));
 		
-		double travelTime = 0.0;
-		List<Id> ids = new ArrayList<Id>();
-		
-		TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
-		
-		TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();
-		
-		Network network = scenario.getNetwork();
-		
-		CoordImpl coordStart = new CoordImpl(l.getCoord());
-		
-		TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(new IdImpl("1000000000"), coordStart, l.getId());
-		
-		CoordImpl coordEnd = new CoordImpl(network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord());
-
-		TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(new IdImpl("1000000001"), coordEnd, leg.getRoute().getEndLinkId());
-		
-		for(PlanElement pe1: tripRouter.calcRoute("car", startFacility, endFacility, now, person)) {
-	    	
-			if (pe1 instanceof Leg) {
-				ids = ((NetworkRoute)((Leg) pe1).getRoute()).getLinkIds();
-	    			travelTime += ((Leg) pe1).getTravelTime();
-			}
-		}
-		
-		LegImpl carLeg = new LegImpl("twowaycarsharing");
-		
-		carLeg.setTravelTime( travelTime );
-		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", l.getId(), leg.getRoute().getEndLinkId());
-		route.setLinkIds( l.getId(), ids, leg.getRoute().getEndLinkId());
-		route.setTravelTime( travelTime);
-		route.setVehicleId(new IdImpl("TW_" + (twVehId)));
-
-		carLeg.setRoute(route);
-		this.cachedDestinationLinkId = route.getEndLinkId();
-
-			// set the route according to the next leg
-		this.currentLeg = carLeg;
-		this.cachedRouteLinkIds = null;
-		this.currentLinkIdIndex = 0;
-		this.cachedNextLinkId = null;			
-			
-		return;		
 			
 	}	
 	private void initializeTwoWayCarsharingEmptyCarLeg(Link l, double now) {
 		this.state = MobsimAgent.State.LEG;
 		
-		
-		double travelTime = 0.0;
-		List<Id> ids = new ArrayList<Id>();
-		
-		
-		LegImpl carLeg = new LegImpl("twowaycarsharing");
-		
-		carLeg.setTravelTime( 0.0 );
-		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", l.getId(), l.getId());
-		route.setLinkIds( l.getId(), ids, l.getId());
-		route.setTravelTime( travelTime);
-		route.setVehicleId(new IdImpl("TW_" + (twVehId)));
-
-		carLeg.setRoute(route);
-		this.cachedDestinationLinkId = l.getId();
-
-			// set the route according to the next leg
-		this.currentLeg = carLeg;
-		this.cachedRouteLinkIds = null;
-		this.currentLinkIdIndex = 0;
-		this.cachedNextLinkId = null;			
-			
-		return;		
+				
+		initializeCSVehicleLeg("twowaycarsharing", now, l, l);		
 			
 	}
 	private void initializeTwoWayCSMidleCarLeg(Link l, double now) {
@@ -505,49 +511,11 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		PlanElement pe = this.getCurrentPlanElement() ;
 		
 		Leg leg =  (Leg) pe;
-		
-		//create route for the car part of the twowaycarsharing trip
-		
-		double travelTime = 0.0;
-		List<Id> ids = new ArrayList<Id>();
-		
-		TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
-		
-		TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();
-		
 		Network network = scenario.getNetwork();
 		
+		//create route for the car part of the twowaycarsharing trip
+		initializeCSVehicleLeg("twowaycarsharing", now, network.getLinks().get(leg.getRoute().getStartLinkId()), network.getLinks().get(leg.getRoute().getEndLinkId()));
 		
-		TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(new IdImpl("1000000000"), network.getLinks().get(leg.getRoute().getStartLinkId()).getCoord(), leg.getRoute().getStartLinkId());
-		
-		TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(new IdImpl("1000000001"), network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord(), leg.getRoute().getEndLinkId());
-		
-		for(PlanElement pe1: tripRouter.calcRoute("car", startFacility, endFacility, now, person)) {
-	    	
-			if (pe1 instanceof Leg) {
-				ids = ((NetworkRoute)((Leg) pe1).getRoute()).getLinkIds();
-	    			travelTime += ((Leg) pe1).getTravelTime();
-			}
-			}
-		
-		LegImpl carLeg = new LegImpl("twowaycarsharing");
-		
-		carLeg.setTravelTime( travelTime );
-		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", leg.getRoute().getStartLinkId(), leg.getRoute().getEndLinkId());
-		route.setLinkIds( leg.getRoute().getStartLinkId(), ids, leg.getRoute().getEndLinkId());
-		route.setTravelTime( travelTime);
-		route.setVehicleId(new IdImpl("TW_" + (twVehId)));
-
-		carLeg.setRoute(route);
-		this.cachedDestinationLinkId = route.getEndLinkId();
-
-			// set the route according to the next leg
-		this.currentLeg = carLeg;
-		this.cachedRouteLinkIds = null;
-		this.currentLinkIdIndex = 0;
-		this.cachedNextLinkId = null;		
-			
-		return;
 	}
 	
 	private void initializeTwoWayCarsharingEndCarLeg(Link l, double now) {
@@ -556,52 +524,12 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		PlanElement pe = this.getCurrentPlanElement() ;
 		
 		Leg leg =  (Leg) pe;
-		
-		//create route for the car part of the twowaycarsharing trip
-		
-		double travelTime = 0.0;
-		List<Id> ids = new ArrayList<Id>();
-		
-		TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
-		
-		TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();
-		
 		Network network = scenario.getNetwork();
-		
 		Link link = mapTW.get(network.getLinks().get(leg.getRoute().getEndLinkId()));
 		
-		TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(new IdImpl("1000000000"), network.getLinks().get(leg.getRoute().getStartLinkId()).getCoord() , leg.getRoute().getStartLinkId());
-	//	if (link == null) {
-			
-	//		System.out.println("vratio je link null, should never happen " + person.getId().toString());
-	//	}
-		TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(new IdImpl("1000000001"), link.getCoord(), link.getId());
+		//create route for the car part of the twowaycarsharing trip
+		initializeCSVehicleLeg("twowaycarsharing", now, network.getLinks().get(leg.getRoute().getStartLinkId()), link);
 		
-		for(PlanElement pe1: tripRouter.calcRoute("car", startFacility, endFacility, now, person)) {
-	    	
-			if (pe1 instanceof Leg) {
-				ids = ((NetworkRoute)((Leg) pe1).getRoute()).getLinkIds();
-	    			travelTime += ((Leg) pe1).getTravelTime();
-			}
-		}
-		
-		LegImpl carLeg = new LegImpl("twowaycarsharing");
-		
-		carLeg.setTravelTime( travelTime );
-		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", leg.getRoute().getStartLinkId(), link.getId());
-		route.setLinkIds( leg.getRoute().getStartLinkId(), ids, link.getId());
-		route.setTravelTime( travelTime);
-		route.setVehicleId(new IdImpl("TW_" + (twVehId)));
-		carLeg.setRoute(route);
-		this.cachedDestinationLinkId = link.getId();
-
-			// set the route according to the next leg
-		this.currentLeg = carLeg;
-		this.cachedRouteLinkIds = null;
-		this.currentLinkIdIndex = 0;
-		this.cachedNextLinkId = null;		
-			
-		return;
 	}
 	
 	private void initializeTwoWayCarsharingEndWalkLeg(Leg leg, double now) {
@@ -609,32 +537,10 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		this.state = MobsimAgent.State.LEG;
 		Route route = leg.getRoute();		
 		
-		LegImpl walkLeg = new LegImpl("walk_rb");
-		
 		Link link = mapTW.get(scenario.getNetwork().getLinks().get(leg.getRoute().getEndLinkId()));
 		mapTW.remove(scenario.getNetwork().getLinks().get(leg.getRoute().getEndLinkId()));
-		
-		GenericRouteImpl walkRoute = new GenericRouteImpl(link.getId(), route.getEndLinkId());
-		final double dist = CoordUtils.calcDistance(link.getCoord(), scenario.getNetwork().getLinks().get(route.getEndLinkId()).getCoord());
-		final double estimatedNetworkDistance = dist * beelineFactor;
-
-		final int travTime = (int) (estimatedNetworkDistance / walkSpeed );
-		walkRoute.setTravelTime(travTime);
-		walkRoute.setDistance(estimatedNetworkDistance);		
-		
-		walkLeg.setRoute(walkRoute);
-		this.cachedDestinationLinkId = route.getEndLinkId();
-		walkLeg.setDepartureTime(now);
-		walkLeg.setTravelTime(travTime);
-		walkLeg.setArrivalTime(now + travTime);
-		// set the route according to the next leg
-		this.currentLeg = walkLeg;
-		this.cachedRouteLinkIds = null;
-		this.currentLinkIdIndex = 0;
-		this.cachedNextLinkId = null;		
-		
-		return;
-		
+		initializeCSWalkLeg("walk_rb", now, link, scenario.getNetwork().getLinks().get(route.getEndLinkId()));				
+				
 	}
 
 	private TwoWayCSStation findClosestAvailableTWCar(Id linkId) {
@@ -658,11 +564,9 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 					
 		return closest;
 				
-	}
+	}	
 	
-	
-	
-	private void initializeFreeFLoatingWalkLeg(Leg leg) {
+	private void initializeFreeFLoatingWalkLeg(Leg leg, double now) {
 		
 		this.state = MobsimAgent.State.LEG;
 		Route route = leg.getRoute();
@@ -676,28 +580,8 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		ffVehId = location.getIDs().get(0);
 		ffvehiclesLocation.removeVehicle(location.getLink(), ffVehId);
 		startLinkFF = location.getLink();
-		LegImpl walkLeg = new LegImpl("walk_ff");
-		
-		GenericRouteImpl walkRoute = new GenericRouteImpl(route.getStartLinkId(), startLinkFF.getId());
-		final double dist = CoordUtils.calcDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startLinkFF.getCoord());
-		final double estimatedNetworkDistance = dist * beelineFactor;
-
-		final int travTime = (int) (estimatedNetworkDistance / walkSpeed );
-		walkRoute.setTravelTime(travTime);
-		walkRoute.setDistance(estimatedNetworkDistance);		
-		
-		walkLeg.setRoute(walkRoute);
-		this.cachedDestinationLinkId = startLinkFF.getId();
-		walkLeg.setTravelTime(travTime);
-		// set the route according to the next leg
-		this.currentLeg = walkLeg;
-		this.cachedRouteLinkIds = null;
-		this.currentLinkIdIndex = 0;
-		this.cachedNextLinkId = null;
-		
-		
-		return;
-		
+		initializeCSWalkLeg("walk_ff", now, scenario.getNetwork().getLinks().get(route.getStartLinkId()), startLinkFF);
+				
 	}
 	
 	private void initializeFreeFLoatingCarLeg(Link l, double now) {
@@ -708,52 +592,8 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		Leg leg =  (Leg) pe;
 		
 		//create route for the car part of the freefloating trip
-		
-		double travelTime = 0.0;
-		List<Id> ids = new ArrayList<Id>();
-		
-		TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
-		
-		TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();
-		
-		
-		
-		CoordImpl coordStart = new CoordImpl(l.getCoord());
-		
-		FreeFloatingFacilityImpl startFacility = new FreeFloatingFacilityImpl(new IdImpl("1000000000"), coordStart, l.getId());
-		
-		CoordImpl coordEnd = new CoordImpl(scenario.getNetwork().getLinks().get(leg.getRoute().getEndLinkId()).getCoord());
-		FreeFloatingFacilityImpl endFacility = new FreeFloatingFacilityImpl(new IdImpl("1000000001"), coordEnd, leg.getRoute().getEndLinkId());
-		
-		
-		for(PlanElement pe1: tripRouter.calcRoute("car", startFacility, endFacility, now, person)) {
-	    	
-			if (pe1 instanceof Leg) {
-				ids = ((NetworkRoute)((Leg) pe1).getRoute()).getLinkIds();
-	    			travelTime += ((Leg) pe1).getTravelTime();
-			}
-			}
-		
-		LegImpl carLeg = new LegImpl("freefloating");
-		
-		carLeg.setTravelTime( travelTime );
-		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", l.getId(), leg.getRoute().getEndLinkId());
-		route.setLinkIds( l.getId(), ids, leg.getRoute().getEndLinkId());
-		route.setTravelTime( travelTime);
-		route.setVehicleId(new IdImpl("FF_" + (ffVehId)));
-
-		carLeg.setRoute(route);
-		this.cachedDestinationLinkId = route.getEndLinkId();
-
-			// set the route according to the next leg
-		this.currentLeg = carLeg;
-		this.cachedRouteLinkIds = null;
-		this.currentLinkIdIndex = 0;
-		this.cachedNextLinkId = null;
-			
-			
-		return;
-			
+		initializeCSVehicleLeg("freefloating", now, l, scenario.getNetwork().getLinks().get(leg.getRoute().getEndLinkId()));
+				
 			
 	}
 	
@@ -769,7 +609,7 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	}
 	
 	
-	private void initializeOneWayCarsharingStartWalkLeg(Leg leg) {
+	private void initializeOneWayCarsharingStartWalkLeg(Leg leg, double now) {
 		
 		this.state = MobsimAgent.State.LEG;
 		Route route = leg.getRoute();
@@ -785,29 +625,9 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		owVehId = station.getIDs().get(0);
 		owvehiclesLocation.removeVehicle(station.getLink(), owVehId);
 		startLinkOW = station.getLink();
-		LegImpl walkLeg = new LegImpl("walk_ow_sb");
 		
-		GenericRouteImpl walkRoute = new GenericRouteImpl(route.getStartLinkId(), startLinkOW.getId());
-		final double dist = CoordUtils.calcDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startLinkOW.getCoord());
-		final double estimatedNetworkDistance = dist * beelineFactor;
-
-		final int travTime = (int) (estimatedNetworkDistance / walkSpeed );
-		walkRoute.setTravelTime(travTime);
-		walkRoute.setDistance(estimatedNetworkDistance);
+		initializeCSWalkLeg("walk_ow_sb", now, scenario.getNetwork().getLinks().get(route.getStartLinkId()), startLinkOW);
 		
-		
-		
-		walkLeg.setRoute(walkRoute);
-		this.cachedDestinationLinkId = startLinkOW.getId();
-		walkLeg.setTravelTime(travTime);
-		// set the route according to the next leg
-		this.currentLeg = walkLeg;
-		this.cachedRouteLinkIds = null;
-		this.currentLinkIdIndex = 0;
-		this.cachedNextLinkId = null;
-		
-		
-		return;
 		
 	}
 	
@@ -817,83 +637,22 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		PlanElement pe = this.getCurrentPlanElement() ;
 		
 		Leg leg =  (Leg) pe;
-		
-		//create route for the car part of the onewaycarsharing trip
-		
-		double travelTime = 0.0;
-		List<Id> ids = new ArrayList<Id>();
-		
-		TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
-		
-		TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();
-		
 		Network network = scenario.getNetwork();
-		
-		CoordImpl coordStart = new CoordImpl(l.getCoord());
-		
-		OneWayCarsharingRDFacilityImpl startFacility = new OneWayCarsharingRDFacilityImpl(new IdImpl("1000000000"), coordStart, l.getId());
-		
-		CoordImpl coordEnd = new CoordImpl(network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord());
+
 		Link destinationLink = owvehiclesLocation.getQuadTree().get(network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord().getX(), network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord().getY()).getLink();
-		OneWayCarsharingRDFacilityImpl endFacility = new OneWayCarsharingRDFacilityImpl(new IdImpl("1000000001"), coordEnd, destinationLink.getId());
-		
-		endLinkOW = destinationLink;
-		for(PlanElement pe1: tripRouter.calcRoute("car", startFacility, endFacility, now, person)) {
-	    	
-			if (pe1 instanceof Leg) {
-				ids = ((NetworkRoute)((Leg) pe1).getRoute()).getLinkIds();
-	    			travelTime += ((Leg) pe1).getTravelTime();
-			}
-			}
-		
-		LegImpl carLeg = new LegImpl("onewaycarsharing");
-		
-		carLeg.setTravelTime( travelTime );
-		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", l.getId(),  destinationLink.getId());
-		route.setLinkIds( l.getId(), ids, leg.getRoute().getEndLinkId());
-		route.setTravelTime( travelTime);
-		route.setVehicleId(new IdImpl("OW_" + (owVehId)));
-
-		carLeg.setRoute(route);
-		this.cachedDestinationLinkId =  destinationLink.getId();
-
-			// set the route according to the next leg
-		this.currentLeg = carLeg;
-		this.cachedRouteLinkIds = null;
-		this.currentLinkIdIndex = 0;
-		this.cachedNextLinkId = null;
-			
-			
-		return;
+		//create route for the car part of the onewaycarsharing trip
+		this.endLinkOW = destinationLink;
+		initializeCSVehicleLeg("onewaycarsharing", now, l, destinationLink);
 			
 			
 	}
-	private void initializeOneWayCarsharingEndWalkLeg(Leg leg) {
+	private void initializeOneWayCarsharingEndWalkLeg(Leg leg, double now) {
 		
 		this.state = MobsimAgent.State.LEG;
 		Route route = leg.getRoute();		
-		
-		LegImpl walkLeg = new LegImpl("walk_ow_sb");
-		
-		GenericRouteImpl walkRoute = new GenericRouteImpl(endLinkOW.getId(), route.getEndLinkId());
-		final double dist = CoordUtils.calcDistance(endLinkOW.getCoord(), scenario.getNetwork().getLinks().get(route.getEndLinkId()).getCoord());
-		final double estimatedNetworkDistance = dist * beelineFactor;
 
-		final int travTime = (int) (estimatedNetworkDistance / walkSpeed );
-		walkRoute.setTravelTime(travTime);
-		walkRoute.setDistance(estimatedNetworkDistance);		
-		
-		walkLeg.setRoute(walkRoute);
-		this.cachedDestinationLinkId = route.getEndLinkId();
-		walkLeg.setTravelTime(travTime);
-		// set the route according to the next leg
-		this.currentLeg = walkLeg;
-		this.cachedRouteLinkIds = null;
-		this.currentLinkIdIndex = 0;
-		this.cachedNextLinkId = null;		
-		
-		return;
-		
+		initializeCSWalkLeg("walk_ow_sb", now, endLinkOW, scenario.getNetwork().getLinks().get(route.getEndLinkId()));
+				
 	}
 
 	private OneWayCarsharingRDStation findClosestAvailableOWCar(Id linkId) {
@@ -914,10 +673,8 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 				distanceSearch = CoordUtils.calcDistance(link.getCoord(), station.getLink().getCoord());
 			}			
 			
-		}
-		
+		}		
 			
-		//owvehiclesLocation.removeVehicle(closest.getLink());
 		return closest;
 		
 		
