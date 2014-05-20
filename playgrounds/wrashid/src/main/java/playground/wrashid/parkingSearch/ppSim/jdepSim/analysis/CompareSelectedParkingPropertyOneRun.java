@@ -18,11 +18,11 @@ public class CompareSelectedParkingPropertyOneRun {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String outputFolder = "H:/data/experiments/parkingSearchOct2013/runs/run143/output/";
-		int referenceIteration = 499;
+		String outputFolder = "f:/data/experiments/parkingSearchOct2013/runs/run135/output/";
+		int referenceIteration = 410;
 		int startIteration = 400;
 		int endIteration = referenceIteration - 1;
-		int iterationStep = 10;
+		int iterationStep = 1;
 		boolean ignoreCasesWithBothPPUse=true;
 
 		Matrix eventsReferenceMatrix = GeneralLib

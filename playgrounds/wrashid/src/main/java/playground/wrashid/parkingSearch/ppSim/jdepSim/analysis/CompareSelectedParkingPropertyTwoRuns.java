@@ -12,10 +12,10 @@ public class CompareSelectedParkingPropertyTwoRuns extends CompareSelectedParkin
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String outputFolderRunA="H:/data/experiments/parkingSearchOct2013/runs/run163/output/";
-		String outputFolderRunB="H:/data/experiments/parkingSearchOct2013/runs/run164/output/";
-		int startIteration=400;
-		int endIteration=499;
+		String outputFolderRunA="f:/data/experiments/parkingSearchOct2013/runs/run179/output/";
+		String outputFolderRunB="f:/data/experiments/parkingSearchOct2013/runs/run180/output/";
+		int startIteration=1200;
+		int endIteration=1205;
 		int iterationStep = 10;
 		boolean ignoreCasesWithBothPPUse=true;
 		

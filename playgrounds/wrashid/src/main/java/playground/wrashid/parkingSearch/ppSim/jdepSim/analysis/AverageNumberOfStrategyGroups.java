@@ -14,10 +14,10 @@ public class AverageNumberOfStrategyGroups {
 
 	public static void main(String[] args) {
 		int startIteration = 0;
-		int endIteration = 490;
-		int iterationStep = 10;
+		int endIteration = 550;
+		int iterationStep = 5;
 		boolean removePrivateParking = false;
-		String runOutputFolder = "H:/data/experiments/parkingSearchOct2013/runs/run143/output/";
+		String runOutputFolder = "f:/data/experiments/parkingSearchOct2013/runs/run150/output/";
 
 		for (int i = startIteration; i < endIteration; i += iterationStep) {
 			TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> parkingScores = StrategyScoresAnalysis

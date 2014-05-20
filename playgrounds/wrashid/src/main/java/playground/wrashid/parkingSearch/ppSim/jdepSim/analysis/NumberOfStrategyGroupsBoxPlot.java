@@ -14,17 +14,17 @@ public class NumberOfStrategyGroupsBoxPlot extends AverageNumberOfStrategyGroups
 	 */
 	public static void main(String[] args) {
 		int startIteration = 0;
-		int endIteration = 10;
-		int iterationStep = 1;
-		String runOutputFolder = "C:/data/parkingSearch/psim/zurich/output/run20/output/";
-		String outpputFolder="C:/tmp/";
-		String outputFileName="NumberOfStrategyGroups";
+		int endIteration = 550;
+		int iterationStep = 100;
+		String runOutputFolder = "f:/data/experiments/parkingSearchOct2013/runs/run150/output/";
+		String outpputFolder="C:/data/Dropbox/ETH/Projekte/STRC2014/experiments/diverse/";
+		String outputFileName="NumberOfStrategyGroups_run150";
 		boolean removePrivateParking = false;
 		
 		
 		Matrix table=new Matrix();
 		for (int i = startIteration; i < endIteration; i += iterationStep) {
-			table.putString(0, i, "it." + i);
+			table.putString(0, i, i);
 			System.out.println("processing iteration: " + i);
 			TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> parkingScores = StrategyScoresAnalysis
 					.getScores(runOutputFolder, i, removePrivateParking);

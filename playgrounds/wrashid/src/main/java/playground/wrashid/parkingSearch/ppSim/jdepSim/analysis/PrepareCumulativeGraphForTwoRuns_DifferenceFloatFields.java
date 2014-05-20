@@ -10,19 +10,19 @@ import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 
-public class PrepareHistogramForTwoRuns_DifferenceFloatFields {
+public class PrepareCumulativeGraphForTwoRuns_DifferenceFloatFields {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String outputFolderRunA = "H:/data/experiments/parkingSearchOct2013/runs/run144/output/";
-		String outputFolderRunB = "H:/data/experiments/parkingSearchOct2013/runs/run145/output/";
-		int startIteration = 400;
-		int endIteration = 405;
+		String outputFolderRunA = "f:/data/experiments/parkingSearchOct2013/runs/run179/output/";
+		String outputFolderRunB = "f:/data/experiments/parkingSearchOct2013/runs/run180/output/";
+		int startIteration = 1200;
+		int endIteration = 1205;
 		int iterationStep = 10;
 		boolean ignoreCasesWithBothPPUse = true;
-		String outputFolder = "C:/data/Dropbox/ETH/Projekte/STRC2014/experiments/comparison different strategy groups/comparisonRun144And145/";
+		String outputFolder = "C:/data/Dropbox/ETH/Projekte/STRC2014/experiments/compare different seeds/comparisonRun179And180/";
 		double cutPctAccumulationFreq=0.95;
 		
 		boolean compareIterationsOfSameRun=false; // in this case only 'outputFolderRunA' needs to be provided ('outputFolderRunB' one is ignored)
