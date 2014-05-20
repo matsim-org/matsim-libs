@@ -80,6 +80,9 @@ public interface MobsimAgent extends NetworkAgent, Identifiable {
 	 * This is another method besides endLeg... and endActivity... .  Seems to be necessary to abort agents
 	 * in states where they should not be.  They should then either set their internal state to abort, or try to recover
 	 * if possible.  If neither is done, an infinite loop may result.  kai, feb'12
+	 * <p/>
+	 * With respect to "recovery": Possible states (may'14) are LEG and ACTIVITY.  I cannot say what the consistency requirements here are
+	 * (e.g. if the agent can only start an activity on the link from where the abort is called).
 	 */
 	public void abort(final double now) ;
 
