@@ -16,13 +16,13 @@ public class PrepareCumulativeGraphForTwoRuns_DifferenceFloatFields {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String outputFolderRunA = "f:/data/experiments/parkingSearchOct2013/runs/run179/output/";
-		String outputFolderRunB = "f:/data/experiments/parkingSearchOct2013/runs/run180/output/";
-		int startIteration = 1200;
-		int endIteration = 1205;
+		String outputFolderRunA = "f:/data/experiments/parkingSearchOct2013/runs/run151/output/";
+		String outputFolderRunB = "f:/data/experiments/parkingSearchOct2013/runs/run152/output/";
+		int startIteration = 450;
+		int endIteration = 455;
 		int iterationStep = 10;
 		boolean ignoreCasesWithBothPPUse = true;
-		String outputFolder = "C:/data/Dropbox/ETH/Projekte/STRC2014/experiments/compare different seeds/comparisonRun179And180/";
+		String outputFolder = "C:/data/Dropbox/ETH/Projekte/STRC2014/experiments/compare different seeds/temp/";
 		double cutPctAccumulationFreq=0.95;
 		
 		boolean compareIterationsOfSameRun=false; // in this case only 'outputFolderRunA' needs to be provided ('outputFolderRunB' one is ignored)
@@ -31,9 +31,11 @@ public class PrepareCumulativeGraphForTwoRuns_DifferenceFloatFields {
 		ArrayList<Float> pctScoreDifference = new ArrayList<Float>();
 		ArrayList<Float> pctWalkDistanceDifference = new ArrayList<Float>();
 		ArrayList<Float> pctSearchTimeDuration = new ArrayList<Float>();
+		ArrayList<Float> pctParkingCost = new ArrayList<Float>();
 		ArrayList<Float> absScoreDifference = new ArrayList<Float>();
 		ArrayList<Float> absWalkDistanceDifference = new ArrayList<Float>();
 		ArrayList<Float> absSearchTimeDuration = new ArrayList<Float>();
+		ArrayList<Float> absParkingCost = new ArrayList<Float>();
 
 		for (int i = startIteration; i <= endIteration; i += iterationStep) {
 			Matrix eventsMatrixA=null;
@@ -59,11 +61,13 @@ public class PrepareCumulativeGraphForTwoRuns_DifferenceFloatFields {
 			collectData(eventsMatrixA, eventsMatrixB, "score", isAbsolute,ignoreCasesWithBothPPUse, pctScoreDifference);
 			collectData(eventsMatrixA, eventsMatrixB, "walkDistance", isAbsolute,ignoreCasesWithBothPPUse, pctWalkDistanceDifference);
 			collectData(eventsMatrixA, eventsMatrixB, "parkingSearchDuration", isAbsolute,ignoreCasesWithBothPPUse, pctSearchTimeDuration);
+			collectData(eventsMatrixA, eventsMatrixB, "parkingCost", isAbsolute,ignoreCasesWithBothPPUse, pctParkingCost);
 			
 			isAbsolute = true;
 			collectData(eventsMatrixA, eventsMatrixB, "score", isAbsolute,ignoreCasesWithBothPPUse, absScoreDifference);
 			collectData(eventsMatrixA, eventsMatrixB, "walkDistance", isAbsolute,ignoreCasesWithBothPPUse, absWalkDistanceDifference);
 			collectData(eventsMatrixA, eventsMatrixB, "parkingSearchDuration", isAbsolute,ignoreCasesWithBothPPUse, absSearchTimeDuration);
+			collectData(eventsMatrixA, eventsMatrixB, "parkingCost", isAbsolute,ignoreCasesWithBothPPUse, absParkingCost);
 			
 			System.out.println("iteration " + i + " processed.");
 		}
@@ -76,7 +80,10 @@ public class PrepareCumulativeGraphForTwoRuns_DifferenceFloatFields {
 		new RIntegration().generateCumulativeFrequencyGraph(tempOutputPath, outputFolder + "pctWalkDistanceDifference.png", "walk distance difference pct", "walk distance difference pct", "frequency", outputFolder + "pctWalkDistanceDifference.batch",cutPctAccumulationFreq);
 		
 		tempOutputPath = writeTempDataAndGetPath(pctSearchTimeDuration,outputFolder,"pctSearchTimeDuration.txt");
-		new RIntegration().generateCumulativeFrequencyGraph(tempOutputPath, outputFolder + "pctSearchTimeDuration.png", "Search Time Difference pct", "search time difference pct", "frequency", outputFolder + "pctSearchTimeDuration.batch",cutPctAccumulationFreq);
+		new RIntegration().generateCumulativeFrequencyGraph(tempOutputPath, outputFolder + "pctSearchTimeDuration.png", "Search Time Difference pct", "search time difference pct", "frequency", outputFolder + "pctSearchTimeDifference.batch",cutPctAccumulationFreq);
+		
+		tempOutputPath = writeTempDataAndGetPath(pctParkingCost,outputFolder,"pctParkingCost.txt");
+		new RIntegration().generateCumulativeFrequencyGraph(tempOutputPath, outputFolder + "pctParkingCost.png", "Parking Cost Difference pct", "parking cost difference pct", "frequency", outputFolder + "pctParkingCostDifference.batch",cutPctAccumulationFreq);
 		
 		tempOutputPath = writeTempDataAndGetPath(absScoreDifference,outputFolder,"absScoreDifference.txt");
 		new RIntegration().generateCumulativeFrequencyGraph(tempOutputPath, outputFolder + "absScoreDifference.png", "Score Difference Abs", "score difference abs", "frequency", outputFolder + "absScoreDifference.batch",cutPctAccumulationFreq);
@@ -85,8 +92,11 @@ public class PrepareCumulativeGraphForTwoRuns_DifferenceFloatFields {
 		new RIntegration().generateCumulativeFrequencyGraph(tempOutputPath, outputFolder + "absWalkDistanceDifference.png", "Walk Distance Difference Abs", "walk distance difference abs [m]", "frequency", outputFolder + "absWalkDistanceDifference.batch",cutPctAccumulationFreq);
 		
 		tempOutputPath = writeTempDataAndGetPath(absSearchTimeDuration,outputFolder,"absSearchTimeDuration.txt");
-		new RIntegration().generateCumulativeFrequencyGraph(tempOutputPath, outputFolder + "absSearchTimeDuration.png", "Search Time Difference Abs", "search time difference abs [s]", "frequency", outputFolder + "absSearchTimeDuration.batch",cutPctAccumulationFreq);
-			
+		new RIntegration().generateCumulativeFrequencyGraph(tempOutputPath, outputFolder + "absSearchTimeDuration.png", "Search Time Difference Abs", "search time difference abs [s]", "frequency", outputFolder + "absSearchTimeDifference.batch",cutPctAccumulationFreq);
+		
+		tempOutputPath = writeTempDataAndGetPath(absParkingCost,outputFolder,"absParkingCost.txt");
+		new RIntegration().generateCumulativeFrequencyGraph(tempOutputPath, outputFolder + "absParkingCost.png", "Parking Cost Difference Abs", "parking cost difference abs [CHF]", "frequency", outputFolder + "absParkingCostDifference.batch",cutPctAccumulationFreq);
+		
 	}
 
 	private static String writeTempDataAndGetPath(
