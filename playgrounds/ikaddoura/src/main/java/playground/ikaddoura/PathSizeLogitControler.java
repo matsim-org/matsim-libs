@@ -44,7 +44,7 @@ public class PathSizeLogitControler {
 	private static final Logger log = Logger.getLogger(PathSizeLogitControler.class);
 	
 	static String configFile;
-	static double endTimeWeight;
+	static double actTimeParam;
 	static boolean pathSizeLogit = false;
 			
 	public static void main(String[] args) throws IOException {
@@ -57,12 +57,12 @@ public class PathSizeLogitControler {
 			pathSizeLogit = Boolean.parseBoolean(args[1]);		
 			log.info("pathSizeLogit: "+ pathSizeLogit);
 			
-			endTimeWeight = Double.valueOf(args[2]);		
-			log.info("endTimeWeight: "+ endTimeWeight);
+			actTimeParam = Double.valueOf(args[2]);		
+			log.info("actTimeParameter: "+ actTimeParam);
 			
 		} else {
 			configFile = "../../runs-svn/pathSizeLogit/config_n_60_1000_2.xml";
-			endTimeWeight = 1.;
+			actTimeParam = 10.;
 			pathSizeLogit = true;
 		}
 		
@@ -84,7 +84,7 @@ public class PathSizeLogitControler {
 			builder.setLocationWeight(0.);
 			builder.setSameModePenalty(0.);
 			builder.setSameRoutePenalty(0.);
-			builder.setActTimeParameter(10.);
+			builder.setActTimeParameter(actTimeParam);
 			
 			final AbstractPlanSelector remover = builder.build(network) ;
 			
