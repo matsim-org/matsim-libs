@@ -255,11 +255,15 @@ public class KtiActivityScoring implements ActivityScoring {
 			}
 
 			// disutility if duration of that activity was too short
-			if (timeSpentPerforming < MINIMUM_DURATION) {
-				this.accumulatedTooShortDuration += (MINIMUM_DURATION - timeSpentPerforming);
+			final double minimalDuration =  
+				params.utilParams.containsKey( act.getType() ) ?
+					params.utilParams.get( act.getType() ).getMinimalDuration() :
+					MINIMUM_DURATION;
+			if (timeSpentPerforming < minimalDuration) {
+				this.accumulatedTooShortDuration += (minimalDuration - timeSpentPerforming);
 			}
 			if ( logger.isTraceEnabled() ) {
-				logger.trace( "adding "+Time.writeTime( MINIMUM_DURATION - timeSpentPerforming )+" to short time penalty" );
+				logger.trace( "adding "+Time.writeTime( minimalDuration - timeSpentPerforming )+" to short time penalty" );
 			}
 
 		}
@@ -313,7 +317,10 @@ public class KtiActivityScoring implements ActivityScoring {
 	protected double getPerformanceScore(String actType, double duration) {
 		final PersonImpl person = (PersonImpl) plan.getPerson();
 		final Desires desires = person.getDesires();
-		final double typicalDuration = desires.getActivityDuration(actType);
+		final double typicalDuration =
+			desires != null ?
+				desires.getActivityDuration(actType) :
+				params.utilParams.get( actType ).getTypicalDuration();
 
 		// initialize zero utility durations here for better code readability, because we only need them here
 		double zeroUtilityDuration;
