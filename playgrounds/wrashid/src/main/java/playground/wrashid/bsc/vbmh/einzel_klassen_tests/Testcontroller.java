@@ -10,6 +10,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.bsc.vbmh.extendedPricingModels.specialTestModel;
@@ -128,10 +131,19 @@ public class Testcontroller {
 		}
 		
 		
-//		controler.run();
-	
 		
-	
+		
+		
+		
+//		controler.run();
+//		LegImpl leg = new LegImpl(null);
+//		leg.getDepartureTime()
+//		System.out.println((LegImpl)controler.getPopulation().getPersons().values().iterator().next().getSelectedPlan().getPlanElements().get(3));
+//	
+//		PopulationImpl pops = (PopulationImpl) controler.getPopulation();
+//		ScenarioImpl scen = (ScenarioImpl) controler.getScenario();
+//	
+		
 	
 	}
 

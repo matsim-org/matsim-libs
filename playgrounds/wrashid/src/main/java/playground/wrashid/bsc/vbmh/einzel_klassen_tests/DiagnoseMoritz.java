@@ -20,7 +20,7 @@ public class DiagnoseMoritz {
 
 //	---------------------
 	
-		
+		String lauf;
 		ReadParkhistory hist = new ReadParkhistory();
 		//hist.readXML("parkhistory_200.xml");
 //		LinkedList<HashMap<String, String>> list = hist.getAllEventByAttribute("spotType","ev");
@@ -33,11 +33,11 @@ public class DiagnoseMoritz {
 			hist.readXML("alles_null_sa/parkhistory/parkhistory_200.xml");
 			System.out.println("alles_null gelesen");
 		}
-		if(1==1){
+		if(1==0){
 			hist.readXML("normal_sa/parkhistory/parkhistory_200.xml");
 			System.out.println("normal gelesen");
 		}
-		if(1==0){
+		if(1==1){
 			hist.readXML("erste_min_5_sa/parkhistory/parkhistory_200.xml");
 			System.out.println("erste_min_5 gelesen");
 		}
@@ -45,6 +45,20 @@ public class DiagnoseMoritz {
 			hist.readXML("null_ev_exc_sa/parkhistory/parkhistory_200.xml");
 			System.out.println("ev_exc gelesen");
 		}
+		
+		if(1==0){
+			hist.readXML("has_to_only_mo/parkhistory/parkhistory_200.xml");
+			System.out.println("has to only gelesen");
+			lauf="has_to_only_mo";
+		}
+
+		if(1==0){
+			hist.readXML("has_to_only_a/parkhistory/parkhistory_200.xml");
+			System.out.println("has to only gelesen");
+			lauf="has_to_only_a";
+		}
+		
+		
 		System.out.println("Los jetzt Person");
 		fetchPerson("35287_1", hist);
 		System.out.println("Fertig Person");
