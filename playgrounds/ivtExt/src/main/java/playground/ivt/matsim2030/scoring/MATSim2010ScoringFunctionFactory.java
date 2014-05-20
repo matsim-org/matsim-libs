@@ -55,15 +55,18 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 	private final CharyparNagelScoringParameters params;
     private final Scenario scenario;
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
+	private final DestinationChoiceBestResponseContext locationChoiceContext;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// constructors
 	// /////////////////////////////////////////////////////////////////////////
     public MATSim2010ScoringFunctionFactory(
+			final DestinationChoiceBestResponseContext locationChoiceContext,
 			final StageActivityTypes typesNotToScore,
 			final KtiLikeScoringConfigGroup ktiConfig,
 			final PlanCalcScoreConfigGroup config,
 			final Scenario scenario) {
+		this.locationChoiceContext = locationChoiceContext;
 		this.ktiConfig = ktiConfig;
 		this.params = new CharyparNagelScoringParameters(config);
 		this.scenario = scenario;
@@ -132,13 +135,12 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 		scoringFunctionAccumulator.addScoringFunction(
 				new CharyparNagelAgentStuckScoring( params ));
 
-		/*
-		final DestinationChoiceBestResponseContext locationChoiceContext = null;
-		scoringFunctionAccumulator.addScoringFunction(
-				new DestinationEspilonScoring(
-					person,
-					locationChoiceContext ) );
-					*/
+		if ( locationChoiceContext != null ) {
+			scoringFunctionAccumulator.addScoringFunction(
+					new DestinationEspilonScoring(
+						person,
+						locationChoiceContext ) );
+		}
 
 		return scoringFunctionAccumulator;
 	}

@@ -27,14 +27,17 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestRespo
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
 import org.matsim.core.scoring.SumScoringFunction.LegScoring;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * TODO: propose to put in location choice contrib
  * @author thibautd
  */
-public class DestinationEspilonScoring implements ActivityScoring, LegScoring {
+public class DestinationEspilonScoring implements ActivityScoring, LegScoring,
+	   ScoringFunctionAccumulator.ActivityScoring, ScoringFunctionAccumulator.LegScoring {
 	private final DestinationChoiceBestResponseContext context;
 	private final DestinationScoring scoring;
 
@@ -91,6 +94,41 @@ public class DestinationEspilonScoring implements ActivityScoring, LegScoring {
 	@Override
 	public void handleLeg(Leg leg) {
 		currentPlan.addLeg( leg );
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// For compatibility with elements still implementing the old deprecated interfaces.
+	@Override
+	@Deprecated
+	public void reset() {}
+
+	@Override
+	@Deprecated
+	public void startLeg(double time, Leg leg) {
+		handleLeg( leg );
+	}
+
+	@Override
+	@Deprecated
+	public void endLeg(double time) {}
+
+	@Override
+	@Deprecated
+	public void startActivity(double time, Activity act) {
+		if ( act.getEndTime() != Time.UNDEFINED_TIME ) {
+			handleActivity( act );
+		}
+		else {
+			handleLastActivity( act );
+		}
+	}
+
+	@Override
+	@Deprecated
+	public void endActivity(double time, Activity act) {
+		if ( act.getStartTime() == Time.UNDEFINED_TIME ) {
+			handleFirstActivity( act );
+		}
 	}
 }
 
