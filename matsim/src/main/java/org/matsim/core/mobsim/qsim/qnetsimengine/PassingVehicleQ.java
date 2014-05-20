@@ -31,12 +31,9 @@ final class PassingVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<
 	}
 
 	@Override
-	public void addFirst(QVehicle previous) {
-		// This implementation of VehicleQ does not support adding a Vehicle to the front of the Queue.
-        // At the moment, this will mean that people with one-link trips will behave differently
-        // (they will have to queue in), and transit will probably behave unplausibly (it
-        // will have to queue in each time for multiple stops on the same link). michaz 2014
-        delegate.offer(previous);
+	public void addFirst(QVehicle qveh) {
+		qveh.setEarliestLinkExitTime(Double.NEGATIVE_INFINITY);
+		this.add(qveh) ; // uses the AbstractQueue.add, which in turn uses the PassingVehicleQ.ofer.
 	}
 
 	@Override
