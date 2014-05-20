@@ -19,6 +19,11 @@
  * *********************************************************************** */
 package playground.ivt.matsim2030.generation;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -28,6 +33,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTimeImpl;
@@ -39,6 +45,8 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.PtConstants;
@@ -47,10 +55,14 @@ import org.matsim.pt.PtConstants;
  * @author thibautd
  */
 public class GenerateDummyFacilitiesForHomeAndWork {
-	public static void main(final String[] args) {
+	private static final Logger log =
+		Logger.getLogger(GenerateDummyFacilitiesForHomeAndWork.class);
+
+	public static void main(final String[] args) throws Exception {
 		final String inputPopFile = args[ 0 ];
 		final String outputFacilitiesFile = args[ 1 ];
 		final String outputPopFile = args[ 2 ];
+		final String outputF2lFile = args[ 3 ];
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		final PopulationImpl population = (PopulationImpl) scenario.getPopulation();
@@ -84,23 +96,46 @@ public class GenerateDummyFacilitiesForHomeAndWork {
 		new MatsimPopulationReader( scenario ).readFile( inputPopFile );
 
 		writer.closeStreaming();
+
+		log.info( "writing facilities" );
 		new FacilitiesWriter( facilities ).write( outputFacilitiesFile );
+
+		log.info( "writing facilities 2 links" );
+		writeF2l( facilities , outputF2lFile );
+	}
+
+	private static void writeF2l(
+			final ActivityFacilities facilities,
+			final String outputF2lFile) throws IOException {
+		final BufferedWriter writer = IOUtils.getBufferedWriter( outputF2lFile );
+
+		final Counter counter = new Counter( "[f2l] association # " );
+		writer.write( "fid\tlid" );
+		for ( ActivityFacility f : facilities.getFacilities().values() ) {
+			counter.incCounter();
+			writer.newLine();
+			writer.write( f.getId() +"\t"+ f.getLinkId() );
+		}
+		counter.printCounter();
+
+		writer.close();
 	}
 
 	private static ActivityFacility getWorkFacility(
 			final Activity act,
 			final ActivityFacilities facilities ) {
-		return getFacility( act.getCoord() , "work" , 6 * 3600 , 22 * 3600 , facilities );
+		return getFacility( act.getCoord() , act.getLinkId() , "work" , 6 * 3600 , 22 * 3600 , facilities );
 	}
 
 	private static ActivityFacility getHomeFacility(
 			final Activity act,
 			final ActivityFacilities facilities ) {
-		return getFacility( act.getCoord() , "home" , Time.UNDEFINED_TIME , Time.UNDEFINED_TIME , facilities );
+		return getFacility( act.getCoord() , act.getLinkId() , "home" , Time.UNDEFINED_TIME , Time.UNDEFINED_TIME , facilities );
 	}
 
 	private static ActivityFacility getFacility(
 			final Coord coord,
+			final Id linkId,
 			final String type,
 			final double opening,
 			final double closing,
@@ -110,6 +145,7 @@ public class GenerateDummyFacilitiesForHomeAndWork {
 
 		if ( facility == null ) {
 			facility = facilities.getFactory().createActivityFacility( id , coord );
+			((ActivityFacilityImpl) facility).setLinkId( linkId );
 			facilities.addActivityFacility( facility );
 
 			final ActivityOption option = facilities.getFactory().createActivityOption( type );
@@ -118,6 +154,10 @@ public class GenerateDummyFacilitiesForHomeAndWork {
 			}
 
 			facility.addActivityOption( option );
+		}
+
+		if ( !facility.getLinkId().equals( linkId ) ) {
+			log.warn( "Activities linked to facility "+id+" have different links" );
 		}
 
 		return facility;
