@@ -86,7 +86,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
@@ -195,18 +194,26 @@ public class GautengControler_subpopulations {
 		final double sampleFactor = 0.01 ;
 
 		config.counts().setCountsScaleFactor(1./sampleFactor);
+
 		config.qsim().setFlowCapFactor(sampleFactor);
-		config.qsim().setStorageCapFactor(Math.pow(sampleFactor, -0.25)); // interpolates between 0.03 @ 0.01 and 1 @ 1
+//		config.qsim().setStorageCapFactor(Math.pow(sampleFactor, -0.25)); // interpolates between 0.03 @ 0.01 and 1 @ 1
+		// yyyyyy was wrong!! Corrected version is
+		config.qsim().setStorageCapFactor(sampleFactor * Math.pow(sampleFactor, -0.25)); // interpolates between 0.03 @ 0.01 and 1 @ 1
+
 		config.counts().setOutputFormat("all");
+
 		config.qsim().setEndTime(36.*3600.);
-		
+
 		config.qsim().setStuckTime(10.);
 		config.qsim().setRemoveStuckVehicles(false);
-		config.qsim().setSnapshotPeriod(Double.POSITIVE_INFINITY);
+
+		config.qsim().setSnapshotPeriod(72.*3600.); 
+		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
+
 		config.controler().setWriteSnapshotsInterval(0);
 		
 		if ( user==User.kai ) {
-//			config.parallelEventHandling().setNumberOfThreads(1); // even "1" is slowing down my laptop quite a lot
+			config.parallelEventHandling().setNumberOfThreads(1); // even "1" is slowing down my laptop quite a lot
 		} else if(user == User.johan){
 			config.parallelEventHandling().setNumberOfThreads(1); 
 		}
@@ -242,7 +249,6 @@ public class GautengControler_subpopulations {
 		// ===========================================
 
 		final Controler controler = new Controler(sc);
-//		controler.setOverwriteFiles(true);
 
 		// SET VEHICLES ...
 		// ... at beginning:
