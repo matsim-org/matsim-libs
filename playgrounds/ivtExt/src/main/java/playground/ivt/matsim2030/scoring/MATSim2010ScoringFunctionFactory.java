@@ -20,17 +20,21 @@
 package playground.ivt.matsim2030.scoring;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
@@ -38,6 +42,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.ivt.kticompatibility.KtiActivityScoring;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
@@ -52,10 +57,11 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 
 	private final StageActivityTypes blackList;
 	private final KtiLikeScoringConfigGroup ktiConfig;
-	private final CharyparNagelScoringParameters params;
+	private final PlanCalcScoreConfigGroup config;
     private final Scenario scenario;
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final DestinationChoiceBestResponseContext locationChoiceContext;
+	private final ObjectAttributes personAttributes;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// constructors
@@ -68,16 +74,18 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 			final Scenario scenario) {
 		this.locationChoiceContext = locationChoiceContext;
 		this.ktiConfig = ktiConfig;
-		this.params = new CharyparNagelScoringParameters(config);
+		this.config = config;
 		this.scenario = scenario;
 		this.facilityPenalties = new TreeMap<Id, FacilityPenalty>();
 		this.blackList = typesNotToScore;
+		this.personAttributes = locationChoiceContext.getPrefsAttributes();
 	}
 
 
 	@Override
 	public ScoringFunction createNewScoringFunction(final Person person) {
-		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+		final ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+		final CharyparNagelScoringParameters params = createParams( person );
 
 		scoringFunctionAccumulator.addScoringFunction(
 				new BlackListedActivityScoringFunction(
@@ -143,6 +151,41 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 		}
 
 		return scoringFunctionAccumulator;
+	}
+
+
+	private CharyparNagelScoringParameters createParams(
+			final Person person) {
+		final PlanCalcScoreConfigGroup dummyGroup = new PlanCalcScoreConfigGroup();
+		for ( Map.Entry<String, String> e : config.getParams().entrySet() ) {
+			dummyGroup.addParam( e.getKey() , e.getValue() );
+		}
+
+		for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan() , blackList ) ) {
+			// XXX works only if no variation of type of activities between plans
+			if ( dummyGroup.getActivityParams( act.getType() ) != null ) continue;
+
+			final ActivityParams actParams = new ActivityParams( act.getType() );
+			actParams.setEarliestEndTime(
+					(Double) personAttributes.getAttribute(
+						person.getId().toString(),
+						"earliestEndTime_"+act.getType() ) );
+			actParams.setLatestStartTime(
+					(Double) personAttributes.getAttribute(
+						person.getId().toString(),
+						"latestStartTime_"+act.getType() ) );
+			actParams.setMinimalDuration(
+					(Double) personAttributes.getAttribute(
+						person.getId().toString(),
+						"minimalDuration_"+act.getType() ) );
+			actParams.setTypicalDuration(
+					(Double) personAttributes.getAttribute(
+						person.getId().toString(),
+						"typicalDuration_"+act.getType() ) );
+			dummyGroup.addActivityParams( actParams );
+		}
+
+		return new CharyparNagelScoringParameters( dummyGroup );
 	}
 }
 
