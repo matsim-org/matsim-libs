@@ -24,12 +24,12 @@ public class GetEfficiencyCSV {
 			lauf="alles_null";
 		}
 		if(1==0){
-			hist.readXML("normal_sa/parkhistory/parkhistory_200.xml");
+			hist.readXML("normal_mo/parkhistory/parkhistory_200.xml");
 			System.out.println("normal gelesen");
 			lauf="normal";
 		}
-		if(1==0){
-			hist.readXML("erste_min_5_sa/parkhistory/parkhistory_200.xml");
+		if(1==1){
+			hist.readXML("erste_min_5_mo/parkhistory/parkhistory_200.xml");
 			System.out.println("erste_min_5 gelesen");
 			lauf="erste_min_5";
 		}
@@ -38,7 +38,7 @@ public class GetEfficiencyCSV {
 			System.out.println("ev_exc gelesen");
 			lauf="ev_exc";
 		}
-		if(1==1){
+		if(1==0){
 			hist.readXML("has_to_only_mo/parkhistory/parkhistory_200.xml");
 			System.out.println("has to only gelesen");
 			lauf="has_to_only_mo";

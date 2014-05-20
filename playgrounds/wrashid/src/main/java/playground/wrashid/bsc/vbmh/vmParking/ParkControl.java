@@ -362,7 +362,33 @@ public class ParkControl {
 		}
 		//-----
 		
-		parkOnSpot(bestOption.spot, bestOption.score, personId);
+		
+		try {
+			parkOnSpot(bestOption.spot, bestOption.score, personId); //!!!!
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			if(bestOption != null){
+				System.out.println(bestOption.toString());
+				if(bestOption.spot!=null){
+					System.out.println(bestOption.spot.toString());
+				}
+			}else{
+				System.out.println("Best option ist null");
+				System.out.println("Zeit "+this.time);
+				System.out.println("Person "+personId.toString());
+				System.out.println("Spots in area Size "+spotsInArea.size());
+				System.out.println(spotsInArea.toString());
+			}
+			System.out.println();
+			e.printStackTrace();
+			System.out.println("Zeit "+this.time);
+			System.out.println("Person "+personId.toString());
+			System.out.println("Spots in area Size "+spotsInArea.size());
+			System.out.println(spotsInArea.toString());
+
+			int a = 1/0;
+		}
+		
 		
 		
 		

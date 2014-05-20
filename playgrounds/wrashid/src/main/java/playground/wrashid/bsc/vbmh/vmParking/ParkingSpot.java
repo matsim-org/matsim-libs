@@ -26,5 +26,9 @@ public class ParkingSpot {
 	public double getChargingRate() {
 		return chargingRate;
 	}
+	
+	public String toString(){
+		return "Parking ID "+this.parking.id+ " Occupied "+this.isOccupied()+" charge "+this.isCharge();
+	}
 
 }
