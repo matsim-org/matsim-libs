@@ -57,8 +57,8 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 	private static final double locationWeight = 5;
 	private static final double endTimeWeight_s = 1./3600. ; // per sec, i.e. 1./3600. means that one hour difference results in 1 penalty point.
 	
-	private static final double sameRoutePenalty = 5;
-	private static final double sameModePenalty = 5;
+	private static final double sameRouteWeight = 5;
+	private static final double sameModeWeight = 5;
 	private final Network network;
 	
 	public DiversityGeneratingPlansRemover( Network network ) {
@@ -112,6 +112,7 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 //		}
 		
 		// start with an exact version: for the time being, we do not want that the best plan vanishes.
+		// Alternative (Ihab): Remove the best plan from the evaluation; apply algo only to other plans. may'14
 		double minUtil = Double.POSITIVE_INFINITY ;
 		Integer minIdx = null ;
 		for ( int kk = 0 ; kk<utils.length ; kk++ ) {
@@ -154,7 +155,7 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 		{
 			List<Leg> legs1 = TripStructureUtils.getLegs(plan1 ) ;
 			List<Leg> legs2 = TripStructureUtils.getLegs(plan2 ) ;
-			simil += PopulationUtils.calculateSimilarity(legs1, legs2, network, sameModePenalty, sameRoutePenalty ) ;
+			simil += PopulationUtils.calculateSimilarity(legs1, legs2, network, sameModeWeight, sameRouteWeight ) ;
 			if ( Double.isNaN(simil) ) {
 				log.warn("simil is NaN; id: " + plan1.getPerson().getId() ) ;
 			}
