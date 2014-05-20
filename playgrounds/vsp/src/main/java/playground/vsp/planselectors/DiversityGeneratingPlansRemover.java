@@ -99,16 +99,7 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 		}
 	}
 	
-	/**
-	 * @param network
-	 * @param actTypeWeight
-	 * @param locationWeight
-	 * @param actTimeParameter
-	 * @param sameRoutePenalty
-	 * @param sameModePenalty
-	 * @param stageActivities
-	 */
-	public DiversityGeneratingPlansRemover(Network network,
+	private DiversityGeneratingPlansRemover(Network network,
 			double actTypeWeight, double locationWeight,
 			double actTimeParameter, double sameRoutePenalty,
 			double sameModePenalty, StageActivityTypes stageActivities) {
