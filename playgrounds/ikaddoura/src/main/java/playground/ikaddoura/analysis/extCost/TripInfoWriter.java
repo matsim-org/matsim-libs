@@ -45,7 +45,8 @@ public class TripInfoWriter {
 	
 	public TripInfoWriter(ExtCostEventHandler handler, String outputFolder) {
 		this.handler = handler;
-		this.outputFolder = outputFolder;
+		String directory = outputFolder + (outputFolder.endsWith("/") ? "" : "/");
+		this.outputFolder = directory;
 		
 		String fileName = outputFolder;
 		File file = new File(fileName);
@@ -54,7 +55,7 @@ public class TripInfoWriter {
 
 	public void writeDetailedResults(String mode) {
 		
-		String fileName = this.outputFolder + "/monetary_amounts_trip_infos_" + mode + ".csv";
+		String fileName = this.outputFolder + "monetary_amounts_trip_infos_" + mode + ".csv";
 		File file = new File(fileName);
 			
 		try {
@@ -93,7 +94,7 @@ public class TripInfoWriter {
 	}
 	
 	public void writeAvgTollPerTimeBin(String mode) {
-		String fileName = this.outputFolder + "/avg_amount_per_trip_departure_time_" + mode + ".csv";
+		String fileName = this.outputFolder + "avg_amount_per_trip_departure_time_" + mode + ".csv";
 		File file = new File(fileName);
 		Map<Double, Double> departureTime2avgAmount = this.handler.getAvgAmountPerTripDepartureTime(mode);
 
@@ -122,7 +123,7 @@ public class TripInfoWriter {
 	}
 	
 	public void writeAvgTollPerDistance(String mode) {
-		String fileName = this.outputFolder + "/avg_amount_per_trip_distance_" + mode + ".csv";
+		String fileName = this.outputFolder + "avg_amount_per_trip_distance_" + mode + ".csv";
 		File file = new File(fileName);
 		Map<Double, Double> tripDistance2avgAmount = this.handler.getAvgAmountPerTripDistance(mode);
 
@@ -152,7 +153,7 @@ public class TripInfoWriter {
 	
 	public void writeCausingAgentId2totalAmount() {
 		
-		String fileName = this.outputFolder + "/causingAgentId2totalAmount.csv";
+		String fileName = this.outputFolder + "causingAgentId2totalAmount.csv";
 		File file = new File(fileName);
 			
 		try {
@@ -196,7 +197,7 @@ public class TripInfoWriter {
 	
 	public void writeAffectedAgentId2totalAmount() {
 			
-			String fileName = this.outputFolder + "/affectedAgentId2totalAmount.csv";
+			String fileName = this.outputFolder + "affectedAgentId2totalAmount.csv";
 			File file = new File(fileName);
 				
 			try {
