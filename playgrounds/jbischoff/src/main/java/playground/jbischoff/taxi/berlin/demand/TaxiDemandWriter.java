@@ -83,7 +83,9 @@ public class TaxiDemandWriter {
 	private final static String DATADIR = "C:/local_jb/data/";
 	private final static String NETWORKFILE = DATADIR+"network/berlin_brb.xml.gz";
 	private final static Id TXLLORID = new IdImpl("12214125");
-	private final static double SCALEFACTOR = 1.5;
+	private final static Id SXFLORID = new IdImpl("12061433");
+	
+	private final static double SCALEFACTOR = 1.0;
 	static int fromTXL = 0;
 	static int toTXL = 0;
 	
@@ -102,6 +104,22 @@ public class TaxiDemandWriter {
 			tdw.writeDemand(DATADIR+"/OD/201304"+i+"/", "OD_201304"+i);
 //			tdw.writeODbyZone(DATADIR+"OD/201304"+i+"/od.csv");
 		}
+		
+//		for (int i = 25; i <29 ; i++){
+//			TaxiDemandWriter tdw = new TaxiDemandWriter();
+//			tdw.setMunicipalityMap(lsr.getShapeMap());
+//			tdw.writeDemand(DATADIR+"OD/kw9/201302"+i+"/", "OD_201302"+i);
+////			tdw.writeODbyZone(DATADIR+"OD/201304"+i+"/od.csv");
+//		}
+//		
+//		for (int i = 1; i <4 ; i++){
+//			TaxiDemandWriter tdw = new TaxiDemandWriter();
+//			tdw.setMunicipalityMap(lsr.getShapeMap());
+//			tdw.writeDemand(DATADIR+"OD/kw9/2013030"+i+"/", "OD_2013030"+i);
+////			tdw.writeODbyZone(DATADIR+"OD/201304"+i+"/od.csv");
+//		}
+		
+		
 		System.out.println("trips from TXL "+TaxiDemandWriter.fromTXL);
 		System.out.println("trips to TXL "+TaxiDemandWriter.toTXL);
 	}
@@ -162,6 +180,8 @@ public class TaxiDemandWriter {
 		PopulationWriter populationWriter = new PopulationWriter(
 				scenario.getPopulation(), scenario.getNetwork());
 		populationWriter.write(dirname+fileNamePrefix+"_SCALE_"+SCALEFACTOR+"_"+"plans4to3.xml.gz");
+//		populationWriter.write(dirname+fileNamePrefix+"_SCALE_"+SCALEFACTOR+"_"+"plans.xml.gz");
+
 	}
 
 	private void generatePopulation(String dirname, String fileNamePrefix) {
@@ -238,6 +258,7 @@ public class TaxiDemandWriter {
 		long extraAmount = Math.round(desiredAmount-actualAmount);
 		Collections.sort(hourlyTaxiDemand);
 		for (int i = 0; i<= extraAmount; i++){
+			try{
 			TaxiDemandElement tde = hourlyTaxiDemand.get(i%3);
 			Person p;
 			Id pId = scenario.createId("p"+tde.fromId+"_"+tde.toId+"_hr_"+hr+"_nr_x"+i);
@@ -245,7 +266,9 @@ public class TaxiDemandWriter {
 			if (p == null ) continue;
 			population.addPerson(p);
 			incMap(oMap,tde.fromId);
-			incMap(dMap,tde.toId);
+			incMap(dMap,tde.toId);}
+			catch 
+			(IndexOutOfBoundsException e) {}
 		}
 	}
 
@@ -285,6 +308,27 @@ public class TaxiDemandWriter {
 			toCoord = new CoordImpl(4588009.07923,5825207.56463);
 			TaxiDemandWriter.toTXL++;
 			if (from.equals(TXLLORID))
+				{
+				fromCoord = this.shoot(from);
+				toCoord = this.shoot(to);
+				//quite a lot of trips are TXL to TXL
+				}
+				} else {
+			toCoord = this.shoot(to);
+		}
+		
+		if (from.equals(SXFLORID)){
+			
+			fromCoord = new CoordImpl(4603210.22153,5807381.44468);
+			TaxiDemandWriter.fromTXL++;
+		} else {
+		 fromCoord = this.shoot(from);
+		}
+		if (to.equals(SXFLORID)){
+			
+			toCoord = new CoordImpl(4603210.22153,5807381.44468);
+			TaxiDemandWriter.toTXL++;
+			if (from.equals(SXFLORID))
 				{
 				fromCoord = this.shoot(from);
 				toCoord = this.shoot(to);
