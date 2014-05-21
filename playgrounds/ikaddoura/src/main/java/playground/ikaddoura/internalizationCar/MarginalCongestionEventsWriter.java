@@ -95,8 +95,7 @@ public class MarginalCongestionEventsWriter {
 		log.info("Loading scenario...");
 		Config config = ConfigUtils.loadConfig(runDirectory + "output_config.xml.gz");
 		config.network().setInputFile(runDirectory + "output_network.xml.gz");
-//		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
-		config.plans().setInputFile(null);
+		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		log.info("Loading scenario... Done.");
 		
