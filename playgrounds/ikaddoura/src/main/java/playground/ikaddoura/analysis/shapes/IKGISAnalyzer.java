@@ -89,6 +89,9 @@ public class IKGISAnalyzer {
 
 	public void analyzeZones(Scenario scenario, String runDirectory, Map<Id, Double> causingAgentId2amountSum, Map<Id, Double> affectedAgentId2amountSum) {
 		
+		log.info("Number of causing agent IDs: " + causingAgentId2amountSum.size());
+		log.info("Number of affected agent IDs: " + affectedAgentId2amountSum.size());
+
 		String outputPath1 = runDirectory + "spatial_analysis/grid/";
 		
 		File file = new File(outputPath1);
@@ -116,7 +119,7 @@ public class IKGISAnalyzer {
 				this.zoneId2geometry, zoneNr2homeActivities, zoneNr2workActivities, zoneNr2activities,
 				zoneNr2tollPaymentsCaused, zoneNr2AvgTollPaymentsCaused,
 				zoneNr2tollPaymentsAffected, zoneNr2AvgTollPaymentsAffected,
-				outputPath1 + "." + scenario.getConfig().controler().getLastIteration() + "extCost_zones.shp");		
+				outputPath1 + scenario.getConfig().controler().getLastIteration() + ".extCost_zones.shp");		
 	}
 	
 	private Map<Integer, Double> getZoneId2avgToll(Map<Integer, Double> zoneNr2tollPayments, Map<Integer, Integer> zoneNr2homeActivities) {

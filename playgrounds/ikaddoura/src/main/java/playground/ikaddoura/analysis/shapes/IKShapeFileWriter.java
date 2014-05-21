@@ -52,7 +52,7 @@ public class IKShapeFileWriter {
 		b.add("caused", Double.class);
 		b.add("avgCaused", Double.class);
 		b.add("affected", Double.class);
-		b.add("avgAffected", Double.class);
+		b.add("avgAffect.", Double.class);
 		
 		return new SimpleFeatureBuilder(b.buildFeatureType());
 	}
