@@ -104,6 +104,7 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 		ptDrivers.clear(); // not really necessary
 		causingAgentId2amountSum.clear();
 		affectedAgentId2amountSum.clear();
+		this.persons.clear();
 	}
 
 	@Override
@@ -530,7 +531,7 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 		
 		List<Id> personIds = new ArrayList<Id>();
 		if (this.scenario.getPopulation().getPersons().isEmpty()) {
-			log.warn("Scenario does not contain a Population. Using the person IDs from the events file for the person-based analysis.");
+			log.warn("Scenario does not contain a Population. Using the person IDs from the events file for the person-based analysis (total: " + personIds.size() +").");
 			personIds.addAll(this.persons);
 		} else {
 			log.info("Scenario contains a Population. Using the person IDs from the population for the person-based analysis.");
@@ -558,7 +559,7 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 		} else {
 			List<Id> personIds = new ArrayList<Id>();
 			if (this.scenario.getPopulation().getPersons().isEmpty()) {
-				log.warn("Scenario does not contain a Population. Using the person IDs from the events file for the person-based analysis.");
+				log.warn("Scenario does not contain a Population. Using the person IDs from the events file for the person-based analysis (total: " + personIds.size() +").");
 				personIds.addAll(this.persons);
 			} else {
 				log.info("Scenario contains a Population. Using the person IDs from the population for the person-based analysis.");
