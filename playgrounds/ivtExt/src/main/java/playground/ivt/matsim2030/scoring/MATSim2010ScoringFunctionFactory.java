@@ -23,6 +23,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -152,11 +155,14 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 		return scoringFunctionAccumulator;
 	}
 
-
 	private CharyparNagelScoringParameters createParams(
 			final Person person,
 			final PlanCalcScoreConfigGroup config,
 			final ObjectAttributes personAttributes) {
+		// this is ugly, but otherwise there are warnings logged for each
+		// scoring function creation about the (default) non-null PathSizeBeta...
+		Logger.getLogger( PlanCalcScoreConfigGroup.class ).setLevel( Level.ERROR );
+
 		final PlanCalcScoreConfigGroup dummyGroup = new PlanCalcScoreConfigGroup();
 		for ( Map.Entry<String, String> e : config.getParams().entrySet() ) {
 			dummyGroup.addParam( e.getKey() , e.getValue() );
