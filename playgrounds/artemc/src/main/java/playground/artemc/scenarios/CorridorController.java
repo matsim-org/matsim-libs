@@ -16,6 +16,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.artemc.annealing.SimpleAnnealer;
 import playground.artemc.scoreAnalyzer.DisaggregatedCharyparNagelScoringFunctionFactory;
 import playground.artemc.scoreAnalyzer.DisaggregatedScoreAnalyzer;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
@@ -42,10 +43,14 @@ public class CorridorController {
 		controler.addControlerListener(initializer);
 		controler.setOverwriteFiles(true);
 		
+		controler.addControlerListener(new SimpleAnnealer());
+		
 		ScenarioImpl scnearioImpl = (ScenarioImpl) controler.getScenario();
 		controler.setScoringFunctionFactory(new DisaggregatedCharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getNetwork()));
 		controler.addControlerListener(new DisaggregatedScoreAnalyzer(scnearioImpl));
 
+		
+		
 		Logger root = Logger.getRootLogger();
 		root.setLevel(Level.ALL);
 		
@@ -56,7 +61,7 @@ public class CorridorController {
 	
 	private static Scenario initSampleScenario() {
 
-		Config config = ConfigUtils.loadConfig("C:/Workspace/roadpricingSingapore/scenarios/corridor/localRun/config_corridor.xml");
+		Config config = ConfigUtils.loadConfig("C:/Work/localRun/config_corridor.xml");
 //		config.controler().setOutputDirectory("C:/Workspace/roadpricingSingapore/output_Corridor/corridor_test");
 //		config.controler().setLastIteration(10);
 		Scenario scenario = ScenarioUtils.loadScenario(config);

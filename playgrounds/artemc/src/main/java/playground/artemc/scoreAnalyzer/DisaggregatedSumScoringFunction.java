@@ -93,9 +93,9 @@ public class DisaggregatedSumScoringFunction implements ScoringFunction {
 		double score = 0.0;
 		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
             double contribution = basicScoringFunction.getScore();
-			if (log.isTraceEnabled()) {
-				log.trace("Contribution of scoring function: " + basicScoringFunction.getClass().getName() + " is: " + contribution);
-			}
+//			if (log.isTraceEnabled()) {
+//				log.trace("Contribution of scoring function: " + basicScoringFunction.getClass().getName() + " is: " + contribution);
+//			}
             score += contribution;
 		}
 		return score;
@@ -105,9 +105,9 @@ public class DisaggregatedSumScoringFunction implements ScoringFunction {
 		double score = 0.0;
 		for (ActivityScoring scoringFunction : activityScoringFunctions) {
             double contribution = scoringFunction.getScore();
-			if (log.isTraceEnabled()) {
-				log.trace("Contribution of activity scoring function: " + scoringFunction.getClass().getName() + " is: " + contribution);
-			}
+//			if (log.isTraceEnabled()) {
+//				log.trace("Contribution of activity scoring function: " + scoringFunction.getClass().getName() + " is: " + contribution);
+//			}
             score += contribution;
 		}
 		return score;
@@ -117,9 +117,9 @@ public class DisaggregatedSumScoringFunction implements ScoringFunction {
 		double score = 0.0;
 		for(LegScoring legScoring:legScoringFunctions.values()) {
 			double contribution = legScoring.getScore();
-			if (log.isTraceEnabled()) {
-				log.trace("Contribution of leg scoring function: " + legScoring.getClass().getName() + " is: " + contribution);
-			}
+//			if (log.isTraceEnabled()) {
+//				log.trace("Contribution of leg scoring function: " + legScoring.getClass().getName() + " is: " + contribution);
+//			}
             score += contribution;
 		}
 		return score;
@@ -129,9 +129,9 @@ public class DisaggregatedSumScoringFunction implements ScoringFunction {
 		double score = 0.0;
 		for (MoneyScoring scoringFunction : moneyScoringFunctions) {
             double contribution = scoringFunction.getScore();
-			if (log.isTraceEnabled()) {
-				log.trace("Contribution of money scoring function: " + scoringFunction.getClass().getName() + " is: " + contribution);
-			}
+//			if (log.isTraceEnabled()) {
+//				log.trace("Contribution of money scoring function: " + scoringFunction.getClass().getName() + " is: " + contribution);
+//			}
             score += contribution;
 		}
 		return score;
@@ -141,9 +141,9 @@ public class DisaggregatedSumScoringFunction implements ScoringFunction {
 		double score = 0.0;
 		for (AgentStuckScoring scoringFunction : agentStuckScoringFunctions) {
             double contribution = scoringFunction.getScore();
-			if (log.isTraceEnabled()) {
-				log.trace("Contribution of stuck scoring function: " + scoringFunction.getClass().getName() + " is: " + contribution);
-			}
+//			if (log.isTraceEnabled()) {
+//				log.trace("Contribution of stuck scoring function: " + scoringFunction.getClass().getName() + " is: " + contribution);
+//			}
             score += contribution;
 		}
 		return score;
@@ -153,9 +153,9 @@ public class DisaggregatedSumScoringFunction implements ScoringFunction {
 		Map<String, Double> scoreMap = new HashMap<String, Double>();
 		for(Entry<String, LegScoring> modeEntry:legScoringFunctions.entrySet()) {
 			double contribution = modeEntry.getValue().getScore();
-			if (log.isTraceEnabled()) {
-				log.trace("Contribution of leg scoring function: " + legScoringFunctions.get(modeEntry.getKey()).getClass().getName() + " is: " + contribution);
-			}
+//			if (log.isTraceEnabled()) {
+//				log.trace("Contribution of leg scoring function: " + legScoringFunctions.get(modeEntry.getKey()).getClass().getName() + " is: " + contribution);
+//			}
             scoreMap.put(modeEntry.getKey(), contribution);
 		}
 		return scoreMap;

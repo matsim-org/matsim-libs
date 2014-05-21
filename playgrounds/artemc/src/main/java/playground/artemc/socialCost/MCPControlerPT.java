@@ -4,6 +4,9 @@ import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 
+import playground.artemc.annealing.SimpleAnnealer;
+import playground.artemc.scoreAnalyzer.DisaggregatedCharyparNagelScoringFunctionFactory;
+import playground.artemc.scoreAnalyzer.DisaggregatedScoreAnalyzer;
 import playground.artemc.socialCost.SocialCostControllerWithPT.InitializerPT;
 
 
@@ -26,6 +29,11 @@ private static final Logger log = Logger.getLogger(MCPControlerPT.class);
 		controler.addControlerListener(initializer);
 		
 		// Additional analysis
+		ScenarioImpl scnearioImpl = (ScenarioImpl) controler.getScenario();
+		controler.setScoringFunctionFactory(new DisaggregatedCharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getNetwork()));
+		controler.addControlerListener(new DisaggregatedScoreAnalyzer(scnearioImpl));
+		controler.addControlerListener(new SimpleAnnealer());
+		
 		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
 		controler.setOverwriteFiles(true);
 		controler.run();

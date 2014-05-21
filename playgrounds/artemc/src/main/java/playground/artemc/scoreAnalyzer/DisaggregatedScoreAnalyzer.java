@@ -63,11 +63,13 @@ public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
 		this.sumUtility2it.put(event.getIteration(),0.0);
 
 		for(Person person:event.getControler().getPopulation().getPersons().values()) {
-			DisaggregatedSumScoringFunction sf = (DisaggregatedSumScoringFunction) event.getControler().getPlansScoring().getScoringFunctionForAgent(person.getId());
-
+			//DisaggregatedSumScoringFunction sf = (DisaggregatedSumScoringFunction) event.getControler().getPlansScoring().getScoringFunctionForAgent(person.getId());
+			DisaggregatedCharyparNagelScoringFunctionFactory disScoringFactory = (DisaggregatedCharyparNagelScoringFunctionFactory) event.getControler().getScoringFunctionFactory();
+			DisaggregatedSumScoringFunction sf = (DisaggregatedSumScoringFunction) disScoringFactory.getPersonScoringFunctions().get(person.getId());
+			
 			disaggregatedScores.put(person.getId(), new DisaggregatedScore(sf.getActivityTotalScore(), sf.getLegScores(), sf.getMoneyTotalScore(), sf.getStuckScore()));
 			this.activityUtility2it.put(event.getIteration(),activityUtility2it.get(event.getIteration())+sf.getActivityTotalScore());
-			this.legUtilityTotal2it.put(event.getIteration(),legUtilityTotal2it.get(event.getIteration())+sf.getLegTotalScore());
+			this.legUtilityTotal2it.put(event.getIteration(),legUtilityTotal2it.get(event.getIteration())+sf.getLegTotalScore( ));
 			this.moneyUtility2it.put(event.getIteration(),moneyUtility2it.get(event.getIteration())+sf.getMoneyTotalScore());
 			this.stuckUtility2it.put(event.getIteration(),stuckUtility2it.get(event.getIteration())+sf.getStuckScore());
 			for(String mode:legUtility2it.keySet()){

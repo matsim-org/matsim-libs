@@ -20,6 +20,9 @@
 
 package playground.artemc.scoreAnalyzer;
 
+import java.util.HashMap;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -48,10 +51,12 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 	protected Network network;
 	private final PlanCalcScoreConfigGroup config;
 	private CharyparNagelScoringParameters params = null;
+	private HashMap<Id, ScoringFunction> personScoringFunctions;
 
 	public DisaggregatedCharyparNagelScoringFunctionFactory(final PlanCalcScoreConfigGroup config, Network network) {
 		this.config = config;
 		this.network = network;
+		this.personScoringFunctions = new HashMap<Id, ScoringFunction>();
 	}
 
 	/**
@@ -107,7 +112,13 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 //		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(this.params));
 		
 		
+		personScoringFunctions.put(person.getId(), sumScoringFunction);
+		
 		return sumScoringFunction;
 	}
 	
+	public HashMap<Id, ScoringFunction> getPersonScoringFunctions() {
+		return personScoringFunctions;
+	}
+
 }
