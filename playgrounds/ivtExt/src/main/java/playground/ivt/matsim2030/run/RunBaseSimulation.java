@@ -55,7 +55,7 @@ public class RunBaseSimulation {
 		// This ensures that we get safety with location choice working as expected,
 		// before we sort this out and definitely kick out setOverwriteFiles.
 		Matsim2030Utils.createEmptyDirectoryOrFailIfExists( config.controler().getOutputDirectory() );
-		final Scenario scenario = ScenarioUtils.loadScenario( config );
+		final Scenario scenario = Matsim2030Utils.loadScenario( config );
 
 		Matsim2030Utils.connectFacilitiesWithLinks( scenario );
 
@@ -69,11 +69,9 @@ public class RunBaseSimulation {
 
 		Matsim2030Utils.initializeScoring( controler );
 		
-		// Code from Alex called (i) Controler.setOverrideFiles( true ) and
-		// (ii) Controler.setCreateGraphs( true ), but
-		// - (i) is wrong. Whatever you expect it to do, it does something different.
-		// - (ii) sets a config option, and config options should be set from config, not code.
-		// So I do not call them here.
+		// Code from Alex called Controler.setCreateGraphs( true ), but
+		// it sets a config option, and config options should be set from config, not code.
+		// So I do not it them here.
 		controler.run();
 	}
 }

@@ -19,12 +19,22 @@
  * *********************************************************************** */
 package playground.ivt.matsim2030;
 
+import org.apache.log4j.Logger;
+
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioUtils;
+
+import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
+import herbie.running.controler.listeners.LegDistanceDistributionWriter;
+
 import java.io.File;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -39,11 +49,8 @@ import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
 
-import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
-import herbie.running.controler.listeners.LegDistanceDistributionWriter;
-
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
-import playground.ivt.matsim2030.router.Matsim2030RoutingConfigGroup;
+import playground.ivt.matsim2030.generation.ScenarioMergingConfigGroup;
 import playground.ivt.matsim2030.router.TransitRouterNetworkReader;
 import playground.ivt.matsim2030.router.TransitRouterWithThinnedNetworkFactory;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
@@ -53,6 +60,9 @@ import playground.ivt.utils.TripModeShares;
  * @author thibautd
  */
 public class Matsim2030Utils {
+	private static final Logger log =
+		Logger.getLogger(Matsim2030Utils.class);
+
 	
 	private static final String CALC_LEG_TIMES_FILE_NAME = "calcLegTimes.txt";
 	private static final String LEG_DISTANCE_DISTRIBUTION_FILE_NAME = "multimodalLegDistanceDistribution.txt";
@@ -67,8 +77,67 @@ public class Matsim2030Utils {
 	}
 
 	public static void addDefaultGroups( final Config config ) {
-		config.addModule( new Matsim2030RoutingConfigGroup() );
+		config.addModule( new ScenarioMergingConfigGroup() );
 		config.addModule( new KtiLikeScoringConfigGroup() );
+	}
+
+	public static Scenario loadScenario( final Config config ) {
+		final Scenario scenario = ScenarioUtils.loadScenario( config );
+
+		final ScenarioMergingConfigGroup mergingGroup = (ScenarioMergingConfigGroup)
+			config.getModule( ScenarioMergingConfigGroup.GROUP_NAME );
+
+		if ( mergingGroup.getCrossBorderPlansFile() != null ) {
+			log.info( "reading cross border plans from "+mergingGroup.getCrossBorderPlansFile() );
+			addSubpopulation(
+					mergingGroup.getCrossBorderPopulationId(),
+					mergingGroup.getCrossBorderPlansFile(),
+					scenario );
+		}
+
+		if ( mergingGroup.getCrossBorderFacilities() != null ) {
+			log.info( "reading facilities for cross-border population from "+mergingGroup.getCrossBorderFacilities() );
+			new MatsimFacilitiesReader( scenario ).readFile( mergingGroup.getCrossBorderFacilities() );
+		}
+
+		if ( mergingGroup.getFreightPlansFile() != null ) {
+			log.info( "reading freight plans from "+mergingGroup.getFreightPlansFile() );
+			addSubpopulation(
+					mergingGroup.getFreightPopulationId(),
+					mergingGroup.getFreightPlansFile(),
+					scenario );
+		}
+
+		if ( mergingGroup.getFreightFacilitiesFile() != null ) {
+			log.info( "reading facilities for freight population from "+mergingGroup.getFreightFacilitiesFile() );
+			new MatsimFacilitiesReader( scenario ).readFile( mergingGroup.getFreightFacilitiesFile() );
+		}
+
+		if ( mergingGroup.getPtSubnetworkFile() != null ) {
+			log.info( "reading pt network from "+mergingGroup.getPtSubnetworkFile() );
+			new MatsimNetworkReader( scenario ).readFile( mergingGroup.getPtSubnetworkFile() );
+		}
+
+		return scenario;
+	}
+
+	private static void addSubpopulation(
+			final String subpopulationName,
+			final String subpopulationFile,
+			final Scenario scenario ) {
+		// we could read directly the population in the global scenario,
+		// but this would make creation of object attributes tricky.
+		final Scenario tempSc = ScenarioUtils.createScenario( scenario.getConfig() );
+		new MatsimPopulationReader( tempSc ).readFile( subpopulationFile );
+
+		final String attribute = scenario.getConfig().plans().getSubpopulationAttributeName();
+		for ( Person p : tempSc.getPopulation().getPersons().values() ) {
+			scenario.getPopulation().addPerson( p );
+			scenario.getPopulation().getPersonAttributes().putAttribute(
+					p.getId().toString(),
+					attribute,
+					subpopulationName );
+		}
 	}
 
 	public static void connectFacilitiesWithLinks( final Scenario sc ) {
@@ -102,25 +171,34 @@ public class Matsim2030Utils {
 	public static TripRouterFactory createTripRouterFactory( final Scenario scenario ) {
 		final TransitRouterConfig conf = new TransitRouterConfig( scenario.getConfig() );
 
-		final Matsim2030RoutingConfigGroup matsim2030conf =
-			(Matsim2030RoutingConfigGroup)
+		final ScenarioMergingConfigGroup matsim2030conf =
+			(ScenarioMergingConfigGroup)
 			scenario.getConfig().getModule(
-					Matsim2030RoutingConfigGroup.GROUP_NAME );
-		final TransitRouterNetwork transitRouterNetwork = new TransitRouterNetwork();
-		new TransitRouterNetworkReader(
-				scenario,
-				scenario.getTransitSchedule(),
-				transitRouterNetwork ).parse(
-					matsim2030conf.getThinnedTransitRouterNetworkFile() );
-
-		final TransitRouterWithThinnedNetworkFactory transitRouterFactory =
-			new TransitRouterWithThinnedNetworkFactory(
-					scenario.getTransitSchedule(),
-					conf,
-					transitRouterNetwork );
-
+					ScenarioMergingConfigGroup.GROUP_NAME );
+		
 		final TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
-		builder.setTransitRouterFactory( transitRouterFactory );
+		
+		if ( matsim2030conf.getThinnedTransitRouterNetworkFile() != null ) {
+			log.info( "using thinned transit router network from "+matsim2030conf.getThinnedTransitRouterNetworkFile() );
+			final TransitRouterNetwork transitRouterNetwork = new TransitRouterNetwork();
+			new TransitRouterNetworkReader(
+					scenario,
+					scenario.getTransitSchedule(),
+					transitRouterNetwork ).parse(
+						matsim2030conf.getThinnedTransitRouterNetworkFile() );
+	
+			final TransitRouterWithThinnedNetworkFactory transitRouterFactory =
+				new TransitRouterWithThinnedNetworkFactory(
+						scenario.getTransitSchedule(),
+						conf,
+						transitRouterNetwork );
+	
+			builder.setTransitRouterFactory( transitRouterFactory );
+		}
+		else {
+			log.warn( "using no pre-processed transit router network --- This would be more efficient!" );
+		}
+
 		return builder.build( scenario );
 	}
 
