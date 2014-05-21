@@ -166,22 +166,10 @@ public class TripInfoWriter {
 			bw.write("person Id;total amount [monetary units]");
 			bw.newLine();
 			
-			Map<Id,List<Double>> personId2listOfAmounts = this.handler.getPersonId2listOfAmounts(TransportMode.car);
 			Map<Id,Double> personId2totalAmount = this.handler.getCausingAgentId2amountSumAllAgents();
 
 			for (Id id : personId2totalAmount.keySet()) {
 				double totalAmount = personId2totalAmount.get(id);
-				
-				// to check if person-based analysis is consistent with trip-based analysis
-				List<Double> fares = personId2listOfAmounts.get(id);
-				double amountSumFromList = 0.;
-				for(Double amount : fares){
-					amountSumFromList = amountSumFromList + amount;
-				}
-				
-				if ((Math.abs(amountSumFromList) - Math.abs(totalAmount)) >= 0.001) {
-					log.warn("Inconsistent data: Total amount from trip-based analysis: " + amountSumFromList + " // total amount from person-based analysis: " + totalAmount);
-				}
 				
 				bw.write(id + ";" + totalAmount);
 				bw.newLine();
