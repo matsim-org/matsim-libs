@@ -50,5 +50,16 @@ public class TwoHashMapsConcatenated<ClassKey1,ClassKey2,ClassValue> {
 		hashMap.get(key1).remove(key2);
 	}
 	
+	public boolean containsValue(ClassKey1 key1, ClassKey2 key2){
+		if (!hashMap.containsKey(key1)){
+			return false;
+		} else {
+			if (!hashMap.containsKey(key2)){
+				return false;
+			} else {
+				return true;
+			}
+		}
+	}
 	
 }
