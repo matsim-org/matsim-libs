@@ -128,5 +128,22 @@ public class CompareSelectedParkingPropertyOneRun {
 
 		return index;
 	}
+	
+	public static TwoHashMapsConcatenated<Id, Integer, String> getColumnValues(
+			Matrix matrix, int columnIndex) {
+		
+		TwoHashMapsConcatenated<Id, Integer, String> values = new TwoHashMapsConcatenated<Id, Integer, String>();
+		
+		int indexPersonId=matrix.getColumnIndex("personId");
+		int indexLeg=matrix.getColumnIndex("legIndex");
+		
+		for (int i=1;i<matrix.getNumberOfRows();i++){
+			Id personId=new IdImpl(matrix.getString(i, indexPersonId));
+			int legIndex=matrix.getInteger(i, indexLeg);
+			values.put(personId, legIndex, matrix.getString(i, columnIndex));
+		}	
+		
+		return values;
+	}
 
 }

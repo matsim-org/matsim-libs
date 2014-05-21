@@ -28,9 +28,6 @@ public class CategorizationOfStrategySwitches extends
 				.readStringMatrix(getEventsFileName(outputFolder,
 						startIteration));
 
-		System.out
-				.println("iteration\tpcConsequeteIter-SameStrategy\tpctReferenceIteration-SwitchWithinSameStrategyGroup\tpctDiffConsequete-parkingStrategy\tpctDiffReference-parkingStrategy");
-		
 		System.out.print("iteration");
 		System.out.print("\t");
 		System.out.print("pctSameStrategy_conseqIter");
