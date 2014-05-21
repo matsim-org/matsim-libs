@@ -115,7 +115,9 @@ import playground.michalm.util.RunningVehicleRegister;
 //           taxisFileName = dirName + "taxis-3000.xml";
 
 
-    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v2\\";
+//    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v2\\";
+    	   dirName = "/Users/jb/tucloud/sim/";
+
            plansFileName = dirName + "plans4to4.xml.gz";
 //           plansFileName = dirName + "1.5plans4to4.xml.gz";
 //    	   	plansFileName = dirName + "1.5plans4to3.xml.gz";
@@ -128,8 +130,8 @@ import playground.michalm.util.RunningVehicleRegister;
 //           taxisFileName = dirName + "taxis4to4_EV0.7.xml";
 //           taxisFileName = dirName + "taxis4to4_EV0.8.xml";
 //           taxisFileName = dirName + "taxis4to4_EV0.9.xml";
-           taxisFileName = dirName + "taxis4to4_EV1.0.xml";
-//           taxisFileName = dirName + "taxis4to4.xml"; //all conventional
+//           taxisFileName = dirName + "taxis4to4_EV1.0.xml";
+           taxisFileName = dirName + "taxis4to4.xml"; //all conventional
            
 
            
@@ -140,7 +142,7 @@ import playground.michalm.util.RunningVehicleRegister;
         ////////////////////////////////////////////////////////         
 
    
-        electricStatsDir = dirName + "ev10fs05/";
+        electricStatsDir = dirName + "gas10td/";
 
         //        plansFileName = dirName + "20.plans.xml.gz";
         //
@@ -165,8 +167,8 @@ import playground.michalm.util.RunningVehicleRegister;
         writeSimEvents = true;
         waitList = new ArrayList<String>();
 
-//        scenario = VrpLauncherUtils.initTimeVariantScenario(netFileName, plansFileName, changeEventsFilename);
-        scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName);
+        scenario = VrpLauncherUtils.initTimeVariantScenario(netFileName, plansFileName, changeEventsFilename);
+//        scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName);
         
 
         //        List<String> taxiCustomerIds;
@@ -189,10 +191,10 @@ import playground.michalm.util.RunningVehicleRegister;
         File f = new File(electricStatsDir);
         f.mkdirs();
 
-        TravelTimeSource ttimeSource = TravelTimeSource.FREE_FLOW_SPEED;
-//        TravelTimeSource ttimeSource = TravelTimeSource.EVENTS_15_MIN;
+//        TravelTimeSource ttimeSource = TravelTimeSource.FREE_FLOW_SPEED;
+        TravelTimeSource ttimeSource = TravelTimeSource.EVENTS_15_MIN;
 
-        TravelDisutilitySource tdisSource = TravelDisutilitySource.STRAIGHT_LINE;
+        TravelDisutilitySource tdisSource = TravelDisutilitySource.TIME;
 
         if (scenario == null)
             System.out.println("scen");
