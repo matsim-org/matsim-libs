@@ -179,7 +179,7 @@ public class TripInfoWriter {
 					amountSumFromList = amountSumFromList + amount;
 				}
 				
-				if (Math.abs(amountSumFromList - totalAmount) >= 0.001) {
+				if ((Math.abs(amountSumFromList) - Math.abs(totalAmount)) >= 0.001) {
 					log.warn("Inconsistent data: Total amount from trip-based analysis: " + amountSumFromList + " // total amount from person-based analysis: " + totalAmount);
 				}
 				
