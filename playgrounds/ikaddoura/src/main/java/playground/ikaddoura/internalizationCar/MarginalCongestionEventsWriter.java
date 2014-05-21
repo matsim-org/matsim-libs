@@ -19,6 +19,7 @@
 
 package playground.ikaddoura.internalizationCar;
 
+import java.io.File;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -94,20 +95,25 @@ public class MarginalCongestionEventsWriter {
 		log.info("Loading scenario...");
 		Config config = ConfigUtils.loadConfig(runDirectory + "output_config.xml.gz");
 		config.network().setInputFile(runDirectory + "output_network.xml.gz");
-		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
+//		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
+		config.plans().setInputFile(null);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		log.info("Loading scenario... Done.");
 		
-		EventsManager events = EventsUtils.createEventsManager();		
+		String outputDirectory = runDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
+		File file = new File(outputDirectory);
+		file.mkdirs();
 		
-		EventWriterXML eventWriter = new EventWriterXML(runDirectory + "analysis_it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events_ExternalCongestionCost_Offline.xml.gz");
+		EventsManager events = EventsUtils.createEventsManager();
+		
+//		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_ExternalCongestionCost_Offline.xml.gz");
 		MarginalCongestionHandlerImplV3 congestionHandler = new MarginalCongestionHandlerImplV3(events, scenario);
 		MarginalCostPricingCarHandler marginalCostTollHandler = new MarginalCostPricingCarHandler(events, scenario);
 
 		TollHandler tollHandler = new TollHandler(scenario);
-		ExtCostEventHandler extCostHandler = new ExtCostEventHandler(scenario, true);
+		ExtCostEventHandler extCostHandler = new ExtCostEventHandler(scenario, false);
 		
-		events.addHandler(eventWriter);
+//		events.addHandler(eventWriter);
 		events.addHandler(congestionHandler);
 		events.addHandler(marginalCostTollHandler);
 		
@@ -116,15 +122,15 @@ public class MarginalCongestionEventsWriter {
 		
 		log.info("Reading events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(runDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + "events.xml.gz");
+		reader.readFile(runDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz");
 		log.info("Reading events file... Done.");
 
-		eventWriter.closeFile();
+//		eventWriter.closeFile();
 		
-		congestionHandler.writeCongestionStats(runDirectory + "analysis_it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".congestionStats_Offline.csv");
-		tollHandler.writeTollStats(runDirectory + "analysis_it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".tollStats_Offline.csv");
+		congestionHandler.writeCongestionStats(outputDirectory + config.controler().getLastIteration() + ".congestionStats_Offline.csv");
+		tollHandler.writeTollStats(outputDirectory + config.controler().getLastIteration() + ".tollStats_Offline.csv");
 
-		TripInfoWriter writer = new TripInfoWriter(extCostHandler, runDirectory + "analysis_it." + config.controler().getLastIteration());
+		TripInfoWriter writer = new TripInfoWriter(extCostHandler, outputDirectory);
 		writer.writeDetailedResults(TransportMode.car);
 		writer.writeAvgTollPerTimeBin(TransportMode.car);
 		writer.writeAvgTollPerDistance(TransportMode.car);
