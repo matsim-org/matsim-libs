@@ -7,17 +7,22 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.network.Network;
 
-public class OWEventsHandler implements PersonArrivalEventHandler, PersonDepartureEventHandler, LinkLeaveEventHandler{
+public class OWEventsHandler implements PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, LinkLeaveEventHandler{
 	HashMap<Id, RentalInfoFF> ffRentalsStats = new HashMap<Id, RentalInfoFF>();
 	HashMap<Id, String> arrivals = new HashMap<Id, String>();
 	ArrayList<RentalInfoFF> arr = new ArrayList<RentalInfoFF>();
 	HashMap<Id, Boolean> inVehicle = new HashMap<Id, Boolean>();
-	
+	HashMap<Id, Id> personVehicles = new HashMap<Id, Id>();
+
 	Network network;
 	public OWEventsHandler(Network network) {
 		
@@ -31,13 +36,25 @@ public class OWEventsHandler implements PersonArrivalEventHandler, PersonDepartu
 		arrivals = new HashMap<Id, String>();
 		arr = new ArrayList<RentalInfoFF>();
 		inVehicle = new HashMap<Id, Boolean>();
-		
+		personVehicles = new HashMap<Id, Id>();
+
+	}
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent event) {
+		// TODO Auto-generated method stub
+		personVehicles.remove(event.getVehicleId());
 	}
 
 	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		// TODO Auto-generated method stub
+		if (event.getVehicleId().toString().startsWith("OW"))
+			personVehicles.put(event.getVehicleId(), event.getPersonId());
+	}
+	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id perid = event.getVehicleId();
-		if(inVehicle.get(perid) != null && inVehicle.get(perid)) {
+		if (event.getVehicleId().toString().startsWith("OW")) {
+			Id perid = personVehicles.get(event.getVehicleId());
 			
 			RentalInfoFF info = ffRentalsStats.get(perid);
 			info.distance += network.getLinks().get(event.getLinkId()).getLength();

@@ -22,7 +22,7 @@ public class CSEventsHandler implements  PersonLeavesVehicleEventHandler, Person
 	HashMap<Id, String> arrivals = new HashMap<Id, String>();
 	ArrayList<RentalInfo> arr = new ArrayList<RentalInfo>();
 	HashMap<Id, Boolean> inVehicle = new HashMap<Id, Boolean>();
-	
+	HashMap<Id, Id> personVehicles = new HashMap<Id, Id>();
 	Network network;
 	public CSEventsHandler(Network network) {
 		
@@ -36,16 +36,20 @@ public class CSEventsHandler implements  PersonLeavesVehicleEventHandler, Person
 		arrivals = new HashMap<Id, String>();
 		arr = new ArrayList<RentalInfo>();
 		inVehicle = new HashMap<Id, Boolean>();
+		personVehicles = new HashMap<Id, Id>();
 	}
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		// TODO Auto-generated method stub
+		personVehicles.remove(event.getVehicleId());
 	}
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		// TODO Auto-generated method stub
+		if (event.getVehicleId().toString().startsWith("TW"))
+			personVehicles.put(event.getVehicleId(), event.getPersonId());
 	}
 
 	@Override
@@ -143,8 +147,8 @@ public class CSEventsHandler implements  PersonLeavesVehicleEventHandler, Person
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		// TODO Auto-generated method stub
-		Id perid = event.getVehicleId();
-		if(inVehicle.get(perid) != null && inVehicle.get(perid)) {
+		if (event.getVehicleId().toString().startsWith("TW")) {
+			Id perid = personVehicles.get(event.getVehicleId());
 			
 			RentalInfo info = twRentalsStats.get(perid).get(twRentalsStats.get(perid).size() - 1);
 			info.distance += network.getLinks().get(event.getLinkId()).getLength();
