@@ -108,6 +108,12 @@ public class EV {
 		double effChargingRate = chargingRate * 0.93;
 		double timeNeededFor80p = (this.batteryCapacity*0.8-stateOfCharge)/effChargingRate;
 		
+		//Fuer DC Laden
+		if(chargingRate >8){
+			effChargingRate=4*effChargingRate;
+		}
+		
+		
 		//Laden bis 80%
 		if(timeNeededFor80p>0){
 			if(time<timeNeededFor80p){

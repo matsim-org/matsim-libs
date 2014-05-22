@@ -15,7 +15,7 @@ public class EVTests {
 		System.out.println(evControl.hasEV(personIdb));
 		System.out.println(evControl.stateOfChargePercentage(personId));
 		System.out.println(evControl.clalcChargedAmountOfEnergy(personId, 8.04, -3600));
-		System.out.println(evControl.calcNewStateOfChargePercentage(personId, 8.04, 2500));
+		System.out.println(evControl.calcNewStateOfChargePercentage(personId, 32, 0.5*3600));
 		System.out.println(evControl.stateOfChargePercentage(personId));
 	}
 
