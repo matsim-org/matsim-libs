@@ -145,11 +145,10 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 		}
 
 		int rr=0 ;
-		int cc=0;
 		for ( Plan plan1 : plans ) {
 			for ( Plan plan2 : plans ) {
 				// yyyy there is really no need to compare the plan with itself.  kai/johan, mar'14, should not happen anymore... ihab, may'14
-				if (cc == rr) {
+				if (plan1 == plan2) {
 					// same plan
 				} else {
 					utils[rr] -= similarity( plan1, plan2, stageActivities, network ) ;
@@ -158,7 +157,6 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 						log.warn( "utils is NaN; id: " + plan1.getPerson().getId() ) ;
 					}
 				}	
-				cc++;
 			}
 			rr++ ;
 		}
