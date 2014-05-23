@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -26,6 +26,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.selectors.AbstractPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 import org.matsim.core.router.StageActivityTypes;
@@ -33,63 +34,67 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.pt.PtConstants;
 
 /**
- * The idea, as the name says, is to not remove the worst plan, but remove plans such that diversity is maintained.
- * The design idea stems from path size logit, which reduces the probability to select alternatives which are similar
- * to other alternatives by adding a penalty to their utility.  
- * <p/>
- * So if you have, for example, 4 similar plans with high scores and one other plan with a lower score, then the scores of 
- * the similar plans are artificially reduced, and one of them will in consequence be removed. 
- * In the present incarnation, we make sure that not the best of those 4 will be removed.
- * <p/>
- * Note that once all similar plans are removed, the remaining best plan will not be similar to any other plan any more, and
- * thus no longer incurr a similarity penalty.  So it will never be removed.
- * <p/>
- * This class has <i>not</i> yet been extensively tested and so it is not clear if it contains bugs, how well it works, or if parameters
- * should be set differently.  If someone wants to experiment, the class presumably should be made configurable (or copied before 
- * modification). 
+ * This class aims to increase the diversity of plans in an agent's choice set. This is achieved by removing a plan once
+ * it is found to be <i>similar</i> to another plan of the choice set. If no plan is considered <i>similar</i> to another plan
+ * the standard MATSim behavior is preserved, i.e. as of May 2014 the worst scored plan will be removed from the choice set.
+ * As first tests indicate, this effectively prevents agents from over-adapting, i.e. arriving at a stop only seconds before
+ * the bus departs.
+ * <p>
+ * Details:<br>
+ * A plan is considered <i>similar</i> to another plan if all of the similarity checkers consider the plan <i>similar</i>.
+ * For example, two plans with the same activity end times are <i>similar</i> if they also use the same mode of transport.
+ * If one of the similarity checkers fails, the plans are considered <i>dissimilar</i>. Note that currently only activity
+ * end times are checked for. See {@link DiversityGeneratingPlansRemoverANIK#similarity(Plan, Plan, StageActivityTypes, double)}
+ * for information on adding further similarity checkers. From two plans considered as <i>similar</i> the older one is preserved
+ * and the newer one will be deleted. The comparison stops at this point and further plans are not checked for. Note that this
+ * class can only delete one plan at a time. Multiple iterations are required in case more than two plans would be considered
+ * as <i>similar</i>. Note that the similarity checks depend on the plans of the choice set and may thus yield different results
+ * once a plan is removed. Further note that the order in which plans are compared to each other depends on the List implementation
+ * in which the plans are stored. As of May 2014 this is an ArrayList ({@link PersonImpl#plans}).
  * 
- * @author nagel, ikaddoura, aneumann
+ * @author aneumann
+ * @author ikaddoura
  */
 public final class DiversityGeneratingPlansRemoverANIK extends AbstractPlanSelector {
 	
+	private final StageActivityTypes stageActivities;
+	private final double similarTimeInterval;
+	
+	/**
+	 * Private - use the {@link DiversityGeneratingPlansRemoverANIK.Builder} instead.
+	 */
+	private DiversityGeneratingPlansRemoverANIK(Network network, double similarTimeInterval, StageActivityTypes stageActivities) {
+		this.similarTimeInterval = similarTimeInterval;
+		this.stageActivities = stageActivities;
+	}
+
 	public static final class Builder {
+		// Defining default values
 		private double similarTimeInterval = 5.0 * 60.;
 		
 		private StageActivityTypes stageActivities = new StageActivityTypes() {
-			
 			@Override
 			public boolean isStageActivity(String activityType) {
 				return activityType.equals(PtConstants.TRANSIT_ACTIVITY_TYPE);
 			}
 		};
-	
-		public final void setSimilarTimeInterval( double val) {
-			this.similarTimeInterval = val ;
-		}
-		public final void setStageActivityTypes( StageActivityTypes val) {
-			this.stageActivities = val;
-		}
-		
-		public final DiversityGeneratingPlansRemoverANIK build( Network network ) {
-			return new DiversityGeneratingPlansRemoverANIK(
-					network,
-					this.similarTimeInterval,
-					this.stageActivities);
-		}
-	}
-	
-	private DiversityGeneratingPlansRemoverANIK(Network network,
-			double similarTimeInterval,
-			StageActivityTypes stageActivities) {
-		this.network = network;
-		this.similarTimeInterval = similarTimeInterval;
-		this.stageActivities = stageActivities;
-	}
 
-	private final Network network;
-	private final StageActivityTypes stageActivities;
-	private final double similarTimeInterval;
+		public final void setSimilarTimeInterval(double setSimilarTimeInterval) {
+			this.similarTimeInterval = setSimilarTimeInterval;
+		}
+
+		public final void setStageActivityTypes(StageActivityTypes stageActivities) {
+			this.stageActivities = stageActivities;
+		}
+
+		public final DiversityGeneratingPlansRemoverANIK build(Network network) {
+			return new DiversityGeneratingPlansRemoverANIK(network,	this.similarTimeInterval, this.stageActivities);
+		}
+	}
 	
+	/**
+	 * @return Map giving a weight for each plan. Higher weights have a higher probability of being selected.
+	 */
 	@Override
 	protected Map<Plan, Double> calcWeights(List<? extends Plan> plans) {
 		if ( plans.isEmpty() ) {
@@ -97,40 +102,56 @@ public final class DiversityGeneratingPlansRemoverANIK extends AbstractPlanSelec
 		}
 				
 		Map<Plan,Double> map = new HashMap<Plan,Double>() ;
+		// Initialize all plans with a weight of zero. 
 		for (Plan plan : plans) {
 			map.put(plan, 0.);
 		}
 		
+		// Compare each plan with each other. If two plans are similar. The newer one gets dropped.
 		for ( Plan plan1 : plans ) {
-			
 			for ( Plan plan2 : plans ) {
 				
 				if (plan1 == plan2){
-					// same plan
+					// same plan, those are definitely similar. So, ignore them.
 				} else {
-					if (similarity( plan1, plan2, stageActivities, similarTimeInterval, network)) {
+					// check two plans for similarity TODO Should be a kind of builder passed further down that configures all similarity checkers
+					if (similarity( plan1, plan2, this.stageActivities, this.similarTimeInterval)) {
+						// This one is similar. Tag it as to be removed and return. We only can remove one plan. So we remove the newer one.
 						map.put(plan2, 1.);
 						return map;
-						
 					} else {
-						// proceed with the next plan
+						// Not similar. Proceed with the next plan.
 					}
 				}	
 			}
 		}
 		
-		// in case there is no similar plan, fall back to standard behavior
+		// In case there is no similar plan, fall back to the standard behavior of MATSim (as of May, 2014). Remove worst plan from choice set.
 		Plan plan = new WorstPlanForRemovalSelector().selectPlan(plans.get(0).getPerson());
 		map.put(plan, 1.);
 		
 		return map ;
 	}
 
-	private boolean similarity( Plan plan1, Plan plan2, StageActivityTypes stageActivities, double similarTimeInterval, Network network ) {
+	/**
+	 * Compare two plans for similarity. A plan is considered similar to another plan, if all similarity checkers consider it being similar.<br>
+	 * TODO The checkers should be implemented as individual classes being configured once with a builder passed to them.
+	 * 
+	 * @param plan1 First plan to be compared.
+	 * @param plan2 Second plan to be compared.
+	 * @param stageActivities Type of activities that should be ignored, e.g. {@link PtConstants#TRANSIT_ACTIVITY_TYPE}.
+	 * @param similarTimeInterval The interval in which two activities are considered as being the same. TODO Builder implemenation
+	 * @return <code>true</code> if both plans are considered similar, otherwise <code>false</code>.
+	 */
+	private boolean similarity( Plan plan1, Plan plan2, StageActivityTypes stageActivities, double similarTimeInterval) {
 		
+		// Check for the first dimension
 		boolean similarTimes = checkActivityTimes(plan1, plan2, stageActivities, similarTimeInterval);
-		// add further methods
 		
+		// Further checks can be implemented the same way.
+		// boolean similarModes = checkTransportModes(plan1, plan2);
+		
+		// 
 		if (similarTimes /* && similarRoutes && similarModes */) {
 			return true;
 		} else {
@@ -139,11 +160,13 @@ public final class DiversityGeneratingPlansRemoverANIK extends AbstractPlanSelec
 	}
 
 	/**
-	 * @param plan1
-	 * @param plan2
-	 * @param stageActivities 
-	 * @param similarTimeInterval 
-	 * @return
+	 * Compare two plans for similarity. A plan is considered similar to another plan, if all activities are within the specified interval.
+	 * 
+	 * @param plan1 First plan to be compared.
+	 * @param plan2 Second plan to be compared.
+	 * @param stageActivities Type of activities that should be ignored, e.g. {@link PtConstants#TRANSIT_ACTIVITY_TYPE}.
+	 * @param similarTimeInterval The interval in which two activities are considered as being the same.
+	 * @return <code>true</code> if both plans are considered similar, otherwise <code>false</code>.
 	 */
 	private boolean checkActivityTimes(Plan plan1, Plan plan2, StageActivityTypes stageActivities, double similarTimeInterval) {
 		
@@ -162,15 +185,18 @@ public final class DiversityGeneratingPlansRemoverANIK extends AbstractPlanSelec
 			} else {
 				// both activities have an end time, comparing the end times
 				
+				// Calculate the difference of both activities' end times.
 				double delta = Math.abs(act1.getEndTime() - act2.getEndTime()) ;
 				if (delta <= similarTimeInterval) {
-					return true;
+					// This one is similar. Proceed with the next activity.
 				} else {
+					// Those two are not similar. Thus, the whole plan is considered as being not similar.
 					return false;
 				}
 			}
 		}
-		return false;
+		// We never found two dissimilar activities. So, both plans are considered as being similar. 
+		return true;
 	}
 
 }
