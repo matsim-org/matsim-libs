@@ -30,10 +30,11 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.XY2Links;
 
 import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
@@ -46,13 +47,11 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializ
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
@@ -153,38 +152,21 @@ public class Matsim2030Utils {
 
 	private static void connectFacilitiesWithLinks( final Scenario sc ) {
 		final StageActivityTypes stages = new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE );
+		final PersonAlgorithm xy2Links = new XY2Links( sc );
+
 		// first: if there are links indicated in the activities, use them
 		for ( Person person : sc.getPopulation().getPersons().values() ) {
-			for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan(), stages ) ) {
-				final Id linkId = act.getLinkId();
-				final Id facilityId = act.getFacilityId();
+			// allocate links to activities which have none
+			xy2Links.run( person );
 
-				if ( linkId != null ) {
-					final ActivityFacility fac = sc.getActivityFacilities().getFacilities().get( facilityId );
-					if ( fac.getLinkId() == null ) ((ActivityFacilityImpl) fac).setLinkId( linkId );
-					else if ( !fac.getLinkId().equals( linkId ) ) throw new RuntimeException( "inconsistent links for facility "+facilityId );
-				}
-			}
-		}
-
-		// Then use the f2l algo/file
-		new WorldConnectLocations( sc.getConfig() ).connectFacilitiesWithLinks(
-				sc.getActivityFacilities(),
-				(NetworkImpl) sc.getNetwork() );
-
-		// finally check that everything is fine, and put link ids in activity if none
-		for ( Person person : sc.getPopulation().getPersons().values() ) {
+			// use links of activities to locate facilities
 			for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan(), stages ) ) {
 				final Id linkId = act.getLinkId();
 				final Id facilityId = act.getFacilityId();
 
 				final ActivityFacility fac = sc.getActivityFacilities().getFacilities().get( facilityId );
-				if ( linkId == null ) {
-					((ActivityImpl) act).setLinkId( fac.getLinkId() );
-				}
-				else if ( !fac.getLinkId().equals( linkId ) ) {
-					throw new RuntimeException( "inconsistent links for facility "+facilityId );
-				}
+				if ( fac.getLinkId() == null ) ((ActivityFacilityImpl) fac).setLinkId( linkId );
+				else if ( !fac.getLinkId().equals( linkId ) ) throw new RuntimeException( "inconsistent links for facility "+facilityId );
 			}
 		}
 
