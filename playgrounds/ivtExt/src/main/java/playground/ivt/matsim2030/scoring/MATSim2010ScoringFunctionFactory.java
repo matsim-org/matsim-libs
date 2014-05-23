@@ -20,7 +20,9 @@
 package playground.ivt.matsim2030.scoring;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Level;
@@ -168,9 +170,10 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 			dummyGroup.addParam( e.getKey() , e.getValue() );
 		}
 
+		final Set<String> handledTypes = new HashSet<String>();
 		for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan() , blackList ) ) {
 			// XXX works only if no variation of type of activities between plans
-			if ( dummyGroup.getActivityParams( act.getType() ) != null ) continue;
+			if ( !handledTypes.add( act.getType() ) ) continue; // parameters already gotten
 
 			final ActivityParams actParams = new ActivityParams( act.getType() );
 			actParams.setEarliestEndTime(
