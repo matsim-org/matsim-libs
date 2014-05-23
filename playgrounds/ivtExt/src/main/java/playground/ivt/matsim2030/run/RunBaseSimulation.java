@@ -57,8 +57,6 @@ public class RunBaseSimulation {
 		Matsim2030Utils.createEmptyDirectoryOrFailIfExists( config.controler().getOutputDirectory() );
 		final Scenario scenario = Matsim2030Utils.loadScenario( config );
 
-		Matsim2030Utils.connectFacilitiesWithLinks( scenario );
-
 		final Controler controler = new Controler( scenario );
 		controler.setOverwriteFiles( true );
 

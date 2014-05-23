@@ -113,6 +113,9 @@ public class Matsim2030Utils {
 			new MatsimFacilitiesReader( scenario ).readFile( mergingGroup.getFreightFacilitiesFile() );
 		}
 
+		// do it BEFORE importing the PT part of the network.
+		connectFacilitiesWithLinks( scenario );
+
 		if ( mergingGroup.getPtSubnetworkFile() != null ) {
 			log.info( "reading pt network from "+mergingGroup.getPtSubnetworkFile() );
 			new MatsimNetworkReader( scenario ).readFile( mergingGroup.getPtSubnetworkFile() );
@@ -140,7 +143,7 @@ public class Matsim2030Utils {
 		}
 	}
 
-	public static void connectFacilitiesWithLinks( final Scenario sc ) {
+	private static void connectFacilitiesWithLinks( final Scenario sc ) {
 		new WorldConnectLocations( sc.getConfig() ).connectFacilitiesWithLinks(
 				sc.getActivityFacilities(),
 				(NetworkImpl) sc.getNetwork() );
