@@ -41,7 +41,7 @@ public class SFControler1 {
 		config.getModule("controler").addParam("outputDirectory", config.getModule("controler").getValue("outputDirectory")+extension);
 		System.out.println(config.getModule("controler").getValue("outputDirectory"));
 
-		//Verzeichnisse erstellen
+		//make directory
 		try{
 			File dir = new File(config.getModule("controler").getValue("outputDirectory"));
 			dir.mkdir();

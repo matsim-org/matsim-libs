@@ -223,5 +223,13 @@ public class Parking {
 			this.occupancyList.add(new Double[]{time, this.occupancyEVSpots*1.0/this.capacityEV, this.occupancyNEVSpots*1.0/this.capacityNEV});
 		}
 	}
+
+	public int getOccupancyEVSpots() {
+		return occupancyEVSpots;
+	}
+
+	public int getOccupancyNEVSpots() {
+		return occupancyNEVSpots;
+	}
 	
 }

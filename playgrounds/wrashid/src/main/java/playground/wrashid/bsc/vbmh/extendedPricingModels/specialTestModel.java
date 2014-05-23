@@ -1,22 +1,27 @@
 package playground.wrashid.bsc.vbmh.extendedPricingModels;
 
 import playground.wrashid.bsc.vbmh.vmParking.ParkingPricingModel;
+import playground.wrashid.bsc.vbmh.vmParking.ParkingSpot;
 
 public class specialTestModel extends ParkingPricingModel {
 	public int id = 0;
 	
-	public double calculateParkingPrice(double duration, boolean ev){
-		duration = duration/3600; //von Sekunden auf Minuten
+	public double calculateParkingPrice(double duration, boolean ev, ParkingSpot spot){
+		duration = duration/3600; //seconds to hours
+		double occupancyEV = spot.parking.getOccupancyEVSpots();
 		double price = 0;
-		System.out.println("test model benutzt");
+		System.out.println("test model in use");
 		if (ev){
 			
-			price = 100;
+			price = 10;
 		} else {
-			//System.out.println(model.getPricePerMinuteNEV());
-			price = 200;
+
+			price = 20;
 		}
 		
+		if(spot.isCharge()){
+			price += 5*occupancyEV;
+		}
 		return price;
 	}
 
