@@ -175,24 +175,53 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 			// XXX works only if no variation of type of activities between plans
 			if ( !handledTypes.add( act.getType() ) ) continue; // parameters already gotten
 
-			final ActivityParams actParams = new ActivityParams( act.getType() );
-			actParams.setEarliestEndTime(
+			final String id = person.getId().toString();
+
+			// I am not so pleased with this, as wrong parameters may silently be
+			// used (for instance if individual preferences are ill-specified).
+			// This should become nicer once we have a better format for specifying
+			// utility parameters in the config.
+			ActivityParams actParams = dummyGroup.getActivityParams( act.getType() );
+			if ( actParams == null ) {
+				actParams = new ActivityParams( act.getType() );
+				dummyGroup.addActivityParams( actParams );
+			}
+
+			final Double earliestEndTime =
 					(Double) personAttributes.getAttribute(
-						person.getId().toString(),
-						"earliestEndTime_"+act.getType() ) );
-			actParams.setLatestStartTime(
+						id,
+						"earliestEndTime_"+act.getType() );
+			if ( earliestEndTime != null ) {
+				actParams.setScoringThisActivityAtAll( true );
+				actParams.setEarliestEndTime( earliestEndTime );
+			}
+
+			final Double latestStartTime =
 					(Double) personAttributes.getAttribute(
-						person.getId().toString(),
-						"latestStartTime_"+act.getType() ) );
-			actParams.setMinimalDuration(
+						id,
+						"latestStartTime_"+act.getType() );
+			if ( latestStartTime != null ) {
+				actParams.setScoringThisActivityAtAll( true );
+				actParams.setLatestStartTime( latestStartTime );
+			}
+
+			final Double minimalDuration =
 					(Double) personAttributes.getAttribute(
-						person.getId().toString(),
-						"minimalDuration_"+act.getType() ) );
-			actParams.setTypicalDuration(
+						id,
+						"minimalDuration_"+act.getType() );
+			if ( minimalDuration != null ) {
+				actParams.setScoringThisActivityAtAll( true );
+				actParams.setMinimalDuration( minimalDuration );
+			}
+
+			final Double typicalDuration =
 					(Double) personAttributes.getAttribute(
-						person.getId().toString(),
-						"typicalDuration_"+act.getType() ) );
-			dummyGroup.addActivityParams( actParams );
+						id,
+						"typicalDuration_"+act.getType() );
+			if ( typicalDuration != null ) {
+				actParams.setScoringThisActivityAtAll( true );
+				actParams.setTypicalDuration( typicalDuration );
+			}
 		}
 
 		return new CharyparNagelScoringParameters( dummyGroup );
