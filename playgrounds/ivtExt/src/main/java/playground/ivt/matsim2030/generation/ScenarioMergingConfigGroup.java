@@ -33,6 +33,8 @@ import org.matsim.core.config.experimental.ReflectiveModule;
 public class ScenarioMergingConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME = "scenarioMerging";
 
+	private double samplingRate = 0.1;
+
 	private String freightPopulationId = "freight";
 	private String freightPlansFile = null;
 	private String freightFacilitiesFile = null;
@@ -60,7 +62,20 @@ public class ScenarioMergingConfigGroup extends ReflectiveModule {
 	
 		comments.put( "thinnedTransitRouterNetworkFile" , "the file containing the pre-processed transit router network. This is a performance pre-processing, which is by no means mandatory." );
 
+		comments.put( "samplingRate" , "the proportion of the subpopulation to retain: those files are 100pct samples, the filtering is done at import." );
+
 		return comments;
+	}
+
+	@StringGetter( "samplingRate" )
+	public double getSamplingRate() {
+		return this.samplingRate;
+	}
+
+	@StringSetter( "samplingRate" )
+	public void setSamplingRate(final double samplingRate) {
+		if ( samplingRate < 0 || samplingRate > 1 ) throw new IllegalArgumentException( samplingRate+" is not between 0 and 1" );
+		this.samplingRate = samplingRate;
 	}
 
 	@StringGetter( "freightPopulationId" )

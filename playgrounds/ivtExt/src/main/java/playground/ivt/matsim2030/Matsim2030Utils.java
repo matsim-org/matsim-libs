@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.ivt.matsim2030;
 
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Id;
@@ -27,6 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -94,9 +97,13 @@ public class Matsim2030Utils {
 		final ScenarioMergingConfigGroup mergingGroup = (ScenarioMergingConfigGroup)
 			config.getModule( ScenarioMergingConfigGroup.GROUP_NAME );
 
+		final Random random = MatsimRandom.getLocalInstance();
+
 		if ( mergingGroup.getCrossBorderPlansFile() != null ) {
 			log.info( "reading cross border plans from "+mergingGroup.getCrossBorderPlansFile() );
 			addSubpopulation(
+					random,
+					mergingGroup.getSamplingRate(),
 					mergingGroup.getCrossBorderPopulationId(),
 					mergingGroup.getCrossBorderPlansFile(),
 					scenario );
@@ -110,6 +117,8 @@ public class Matsim2030Utils {
 		if ( mergingGroup.getFreightPlansFile() != null ) {
 			log.info( "reading freight plans from "+mergingGroup.getFreightPlansFile() );
 			addSubpopulation(
+					random,
+					mergingGroup.getSamplingRate(),
 					mergingGroup.getFreightPopulationId(),
 					mergingGroup.getFreightPlansFile(),
 					scenario );
@@ -132,16 +141,20 @@ public class Matsim2030Utils {
 	}
 
 	private static void addSubpopulation(
+			final Random random,
+			final double samplingRate,
 			final String subpopulationName,
 			final String subpopulationFile,
 			final Scenario scenario ) {
 		// we could read directly the population in the global scenario,
 		// but this would make creation of object attributes tricky.
+		// This also makes sampling easier
 		final Scenario tempSc = ScenarioUtils.createScenario( scenario.getConfig() );
 		new MatsimPopulationReader( tempSc ).readFile( subpopulationFile );
 
 		final String attribute = scenario.getConfig().plans().getSubpopulationAttributeName();
 		for ( Person p : tempSc.getPopulation().getPersons().values() ) {
+			if ( random.nextDouble() > samplingRate ) continue;
 			scenario.getPopulation().addPerson( p );
 			scenario.getPopulation().getPersonAttributes().putAttribute(
 					p.getId().toString(),
