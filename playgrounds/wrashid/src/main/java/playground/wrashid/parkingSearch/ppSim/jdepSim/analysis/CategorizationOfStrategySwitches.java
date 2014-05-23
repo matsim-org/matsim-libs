@@ -117,7 +117,7 @@ public class CategorizationOfStrategySwitches extends
 				String facilityIdA=matrixA.getString(i, indexFacilityId);
 				String facilityIdB=matrixB.getString(indexMatrixB.get(personId, legIndex), indexFacilityId);
 				
-				if (!(facilityIdA.toString().contains("private") && facilityIdB.toString().contains("private"))){
+				if (!(facilityIdA.toString().contains("private") && facilityIdB.toString().contains("private") || facilityIdA.toString().contains("publicPOutside") && facilityIdB.toString().contains("publicPOutside"))){
 					if (!parkingStrategyA.equalsIgnoreCase(parkingStrategyB)){
 						totalNumberOfStrategyChanges++;
 						

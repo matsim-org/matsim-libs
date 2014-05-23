@@ -135,7 +135,8 @@ public class PrepareCumulativeGraphForTwoRuns_DifferenceFloatFields {
 						indexMatrixB.get(personId, legIndex), indexFacilityId);
 
 				if (!(facilityIdA.toString().contains("private") && facilityIdB
-						.toString().contains("private"))) {
+						.toString().contains("private") || facilityIdA.toString().contains("publicPOutside") && facilityIdB
+						.toString().contains("publicPOutside"))) {
 					if (isAbsolute){
 						outputArray.add(Math.abs(Math.abs(selectedFieldA) - Math.abs(selectedFieldB)));
 					} else {

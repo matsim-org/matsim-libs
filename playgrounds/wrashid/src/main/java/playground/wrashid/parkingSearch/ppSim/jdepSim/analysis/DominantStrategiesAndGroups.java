@@ -14,9 +14,9 @@ CompareSelectedParkingPropertyOneRun {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String outputFolder = "f:/data/experiments/parkingSearchOct2013/runs/run144/output/";
-		int startIteration = 450;
-		int endIteration = 499;
+		String outputFolder = "f:/data/experiments/parkingSearchOct2013/runs/run135/output/";
+		int startIteration = 290;
+		int endIteration = 340;
 		boolean ignoreCasesWithPPUse=true;
 
 		Matrix eventsMatrixCurrentIter = GeneralLib
@@ -37,7 +37,7 @@ CompareSelectedParkingPropertyOneRun {
 		if (ignoreCasesWithPPUse){
 			for (Id personId:facilityIds.getKeySet1()){
 				for (Integer legIndex:facilityIds.getKeySet2(personId)){
-					if (facilityIds.get(personId, legIndex).contains("private")){
+					if (facilityIds.get(personId, legIndex).contains("private") || facilityIds.get(personId, legIndex).contains("publicPOutside")){
 						strategies.removeValue(personId, legIndex);
 						strategyGroups.removeValue(personId, legIndex);
 					}

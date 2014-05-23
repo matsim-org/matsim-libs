@@ -29,7 +29,7 @@ import org.matsim.contrib.parking.lib.obj.list.Lists;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.analysis.StrategyScoresAnalysis.StrategyScoreLog;
 
-public class CompareScoresSingleIteration {
+public class CompareScoresSingleIterationObsolete {
 
 	/**
 	 * @param args
@@ -68,7 +68,9 @@ public class CompareScoresSingleIteration {
 			}
 		}
 		
+		DebugLib.stopSystemAndReportInconsistency("obsolete class");
 		GeneralLib.generateHistogram("c:/tmp2/abc.png",Lists.getArray(values),4,"","","");
+		
 	}
 
 }

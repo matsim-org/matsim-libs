@@ -85,7 +85,7 @@ public class CompareSelectedParkingPropertyOneRun {
 		
 		int indexSelectedField=matrixA.getColumnIndex(fieldName);
 		
-		int totalNumberOfParkingOperations=matrixA.getNumberOfRows()-1;
+		int totalNumberOfParkingOperations=0;
 		int numberOfTimesSameParkingFacilityChosen=0;
 		for (int i=1;i<matrixA.getNumberOfRows();i++){
 			Id personId=new IdImpl(matrixA.getString(i, indexPersonId));
@@ -99,15 +99,17 @@ public class CompareSelectedParkingPropertyOneRun {
 				String facilityIdA=matrixA.getString(i, indexFacilityId);
 				String facilityIdB=matrixB.getString(indexMatrixB.get(personId, legIndex), indexFacilityId);
 				
-				if (!(facilityIdA.toString().contains("private") && facilityIdB.toString().contains("private"))){
+				if (!((facilityIdA.toString().contains("private") && facilityIdB.toString().contains("private")) || (facilityIdA.toString().contains("publicPOutside") && facilityIdB.toString().contains("publicPOutside")))){
 					if (selectedFieldIdA.equalsIgnoreCase(selectedFieldIdB)){
 						numberOfTimesSameParkingFacilityChosen++;
 					}
+					totalNumberOfParkingOperations++;
 				}
 			} else {
 				if (selectedFieldIdA.equalsIgnoreCase(selectedFieldIdB)){
 					numberOfTimesSameParkingFacilityChosen++;
 				}
+				totalNumberOfParkingOperations++;
 			}
 		}
 		

@@ -262,7 +262,7 @@ public class StrategyScoresAnalysis {
 			String parkingFacilityId=matrix.getString(i, 6);
 			int curLegIndexId=matrix.getInteger(i, 8);
 			
-			if (parkingFacilityId.contains("privateParking")){
+			if (parkingFacilityId.contains("privateParking") || parkingFacilityId.contains("publicPOutside")){
 				usesPrivateParking.put(currentPersonId, curLegIndexId, Boolean.TRUE);
 			}
 		}
