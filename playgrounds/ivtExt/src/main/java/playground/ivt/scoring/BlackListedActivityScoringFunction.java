@@ -85,6 +85,7 @@ public class BlackListedActivityScoringFunction implements SumScoringFunction.Ac
 	@Deprecated
 	public void startActivity(double time, Activity act) {
 		if ( accDelegate != null ) {
+			if ( blackList.isStageActivity( act.getType() ) ) return;
 			accDelegate.startActivity( time , act );
 		}
 		else throw new UnsupportedOperationException();
@@ -94,6 +95,7 @@ public class BlackListedActivityScoringFunction implements SumScoringFunction.Ac
 	@Deprecated
 	public void endActivity(double time, Activity act) {
 		if ( accDelegate != null ) {
+			if ( blackList.isStageActivity( act.getType() ) ) return;
 			accDelegate.endActivity( time , act );
 		}
 		else throw new UnsupportedOperationException();
