@@ -39,9 +39,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -141,6 +139,7 @@ public class Matsim2030Utils {
 		}
 
 		// do it BEFORE importing the PT part of the network.
+		log.info( "connecting activities, links and facilities" );
 		connectFacilitiesWithLinks( scenario );
 
 		if ( mergingGroup.getPtSubnetworkFile() != null ) {
@@ -154,6 +153,7 @@ public class Matsim2030Utils {
 		// Particularly for the freight population
 		// TODO: check that it is no problem (or route the populations)
 		if ( mergingGroup.getPerformDilution() ) {
+			log.info( "performing \"dilution\"" );
 			diluteScenario( scenario , mergingGroup.getDilutionCenter() , mergingGroup.getDilutionRadiusM() );
 		}
 
@@ -193,12 +193,16 @@ public class Matsim2030Utils {
 
 		// XXX this should actually not be allowed. Should we add a remove method to population?
 		final Iterator<Id> it = scenario.getPopulation().getPersons().keySet().iterator();
+		final int initialSize = scenario.getPopulation().getPersons().size();
 		while ( it.hasNext() ) {
 			final Id current = it.next();
 			if ( !idsToKeep.contains( current ) ) it.remove();
 			scenario.getPopulation().getPersonAttributes().removeAllAttributes( current.toString() );
 		}
 		assert scenario.getPopulation().getPersons().size() == idsToKeep.size();
+		final int finalSize = scenario.getPopulation().getPersons().size();
+
+		log.info( finalSize+" persons out of "+initialSize+" retained in dilution ("+(100d * finalSize / initialSize)+"%)" );
 	}
 
 	private static void addSubpopulation(
@@ -214,14 +218,22 @@ public class Matsim2030Utils {
 		new MatsimPopulationReader( tempSc ).readFile( subpopulationFile );
 
 		final String attribute = scenario.getConfig().plans().getSubpopulationAttributeName();
+		int inputCount = 0;
+		int acceptCount = 0;
 		for ( Person p : tempSc.getPopulation().getPersons().values() ) {
+			inputCount++;
 			if ( random.nextDouble() > samplingRate ) continue;
+			acceptCount++;
+
 			scenario.getPopulation().addPerson( p );
 			scenario.getPopulation().getPersonAttributes().putAttribute(
 					p.getId().toString(),
 					attribute,
 					subpopulationName );
 		}
+
+		log.info( acceptCount+" persons out of "+inputCount+" were retained in the population (effective sampling rate "+
+				( ((double) acceptCount) / inputCount )+")" );
 	}
 
 	private static void connectFacilitiesWithLinks( final Scenario sc ) {
