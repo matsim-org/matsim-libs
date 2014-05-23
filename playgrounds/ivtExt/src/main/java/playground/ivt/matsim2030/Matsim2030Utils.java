@@ -21,10 +21,17 @@ package playground.ivt.matsim2030;
 
 import org.apache.log4j.Logger;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
@@ -144,9 +151,42 @@ public class Matsim2030Utils {
 	}
 
 	private static void connectFacilitiesWithLinks( final Scenario sc ) {
+		// first: if there are links indicated in the activities, use them
+		for ( Person person : sc.getPopulation().getPersons().values() ) {
+			for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan(), EmptyStageActivityTypes.INSTANCE ) ) {
+				final Id linkId = act.getLinkId();
+				final Id facilityId = act.getFacilityId();
+
+				if ( linkId != null ) {
+					final ActivityFacility fac = sc.getActivityFacilities().getFacilities().get( facilityId );
+					if ( fac.getLinkId() == null ) ((ActivityFacilityImpl) fac).setLinkId( linkId );
+					else if ( !fac.getLinkId().equals( linkId ) ) throw new RuntimeException( "inconsistent links for facility "+facilityId );
+				}
+			}
+		}
+
+		// Then use the f2l algo/file
 		new WorldConnectLocations( sc.getConfig() ).connectFacilitiesWithLinks(
 				sc.getActivityFacilities(),
 				(NetworkImpl) sc.getNetwork() );
+
+		// finally check that everything is fine, and put link ids in activity if none
+		for ( Person person : sc.getPopulation().getPersons().values() ) {
+			for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan(), EmptyStageActivityTypes.INSTANCE ) ) {
+				final Id linkId = act.getLinkId();
+				final Id facilityId = act.getFacilityId();
+
+				final ActivityFacility fac = sc.getActivityFacilities().getFacilities().get( facilityId );
+				if ( linkId == null ) {
+					((ActivityImpl) act).setLinkId( fac.getLinkId() );
+				}
+				else if ( !fac.getLinkId().equals( linkId ) ) {
+					throw new RuntimeException( "inconsistent links for facility "+facilityId );
+				}
+			}
+		}
+
+		// now hopefully everything is nice and consistent...
 	}
 
 	public static void initializeLocationChoice( final Controler controler ) {
