@@ -53,8 +53,7 @@ import org.matsim.pt.PtConstants;
 public final class DiversityGeneratingPlansRemoverANIK extends AbstractPlanSelector {
 	
 	public static final class Builder {
-		// 2.5 min in both direction results in a time interval of 5 min
-		private double similarTimeInterval = 2.5 * 60.;
+		private double similarTimeInterval = 5.0 * 60.;
 		
 		private StageActivityTypes stageActivities = new StageActivityTypes() {
 			
