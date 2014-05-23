@@ -31,6 +31,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -151,9 +152,10 @@ public class Matsim2030Utils {
 	}
 
 	private static void connectFacilitiesWithLinks( final Scenario sc ) {
+		final StageActivityTypes stages = new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE );
 		// first: if there are links indicated in the activities, use them
 		for ( Person person : sc.getPopulation().getPersons().values() ) {
-			for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan(), EmptyStageActivityTypes.INSTANCE ) ) {
+			for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan(), stages ) ) {
 				final Id linkId = act.getLinkId();
 				final Id facilityId = act.getFacilityId();
 
@@ -172,7 +174,7 @@ public class Matsim2030Utils {
 
 		// finally check that everything is fine, and put link ids in activity if none
 		for ( Person person : sc.getPopulation().getPersons().values() ) {
-			for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan(), EmptyStageActivityTypes.INSTANCE ) ) {
+			for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan(), stages ) ) {
 				final Id linkId = act.getLinkId();
 				final Id facilityId = act.getFacilityId();
 
