@@ -95,9 +95,9 @@ public class Matsim2030Utils {
 					scenario );
 		}
 
-		if ( mergingGroup.getCrossBorderFacilities() != null ) {
-			log.info( "reading facilities for cross-border population from "+mergingGroup.getCrossBorderFacilities() );
-			new MatsimFacilitiesReader( scenario ).readFile( mergingGroup.getCrossBorderFacilities() );
+		if ( mergingGroup.getCrossBorderFacilitiesFile() != null ) {
+			log.info( "reading facilities for cross-border population from "+mergingGroup.getCrossBorderFacilitiesFile() );
+			new MatsimFacilitiesReader( scenario ).readFile( mergingGroup.getCrossBorderFacilitiesFile() );
 		}
 
 		if ( mergingGroup.getFreightPlansFile() != null ) {

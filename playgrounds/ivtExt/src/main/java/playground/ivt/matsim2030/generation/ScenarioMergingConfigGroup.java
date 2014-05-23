@@ -39,7 +39,7 @@ public class ScenarioMergingConfigGroup extends ReflectiveModule {
 
 	private String crossBorderPopulationId = "crossBorder";
 	private String crossBorderPlansFile = null;
-	private String crossBorderFacilities = null;
+	private String crossBorderFacilitiesFile = null;
 
 	private String ptSubnetworkFile = null;
 
@@ -113,14 +113,14 @@ public class ScenarioMergingConfigGroup extends ReflectiveModule {
 		this.crossBorderPlansFile = crossBorderPlansFile;
 	}
 
-	@StringGetter( "crossBorderFacilities" )
-	public String getCrossBorderFacilities() {
-		return this.crossBorderFacilities;
+	@StringGetter( "crossBorderFacilitiesFile" )
+	public String getCrossBorderFacilitiesFile() {
+		return this.crossBorderFacilitiesFile;
 	}
 
-	@StringSetter( "crossBorderFacilities" )
-	public void setCrossBorderFacilities(String crossBorderFacilities) {
-		this.crossBorderFacilities = crossBorderFacilities;
+	@StringSetter( "crossBorderFacilitiesFile" )
+	public void setCrossBorderFacilitiesFile(String crossBorderFacilities) {
+		this.crossBorderFacilitiesFile = crossBorderFacilities;
 	}
 
 	@StringGetter( "ptSubnetworkFile" )
