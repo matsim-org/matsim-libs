@@ -19,11 +19,19 @@
  * *********************************************************************** */
 package playground.ivt.matsim2030;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -33,11 +41,14 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.XY2Links;
+import org.matsim.population.filters.PersonIntersectAreaFilter;
 
 import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
@@ -137,7 +148,57 @@ public class Matsim2030Utils {
 			new MatsimNetworkReader( scenario ).readFile( mergingGroup.getPtSubnetworkFile() );
 		}
 
+		// now that coordinates are allocated, we can "dilute" the scenario.
+		// Note that if no routes are defined in the population(s), straight lines will be used,
+		// which may lead to significantly different results in Zurich due to the lake...
+		// Particularly for the freight population
+		// TODO: check that it is no problem (or route the populations)
+		if ( mergingGroup.getPerformDilution() ) {
+			diluteScenario( scenario , mergingGroup.getDilutionCenter() , mergingGroup.getDilutionRadiusM() );
+		}
+
+
 		return scenario;
+	}
+
+	private static void diluteScenario(
+			final Scenario scenario,
+			final Coord center,
+			final double radius) {
+		// TODO Auto-generated method stub
+		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
+
+		for (Link link : scenario.getNetwork().getLinks().values()) {
+			final Node from = link.getFromNode();
+			final Node to = link.getToNode();
+			if ((CoordUtils.calcDistance(from.getCoord(), center) <= radius) || (CoordUtils.calcDistance(to.getCoord(), center) <= radius)) {
+				areaOfInterest.put(link.getId(),link);
+			}
+		}
+
+		final Set<Id> idsToKeep = new HashSet<Id>();
+		final PersonIntersectAreaFilter filter =
+			new PersonIntersectAreaFilter(
+					new PersonAlgorithm() {
+						@Override
+						public void run(final Person person) {
+							idsToKeep.add( person.getId() );
+						}
+					},
+					areaOfInterest,
+					scenario.getNetwork());
+		filter.setAlternativeAOI(center,radius);
+
+		filter.run( scenario.getPopulation() );
+
+		// XXX this should actually not be allowed. Should we add a remove method to population?
+		final Iterator<Id> it = scenario.getPopulation().getPersons().keySet().iterator();
+		while ( it.hasNext() ) {
+			final Id current = it.next();
+			if ( !idsToKeep.contains( current ) ) it.remove();
+			scenario.getPopulation().getPersonAttributes().removeAllAttributes( current.toString() );
+		}
+		assert scenario.getPopulation().getPersons().size() == idsToKeep.size();
 	}
 
 	private static void addSubpopulation(

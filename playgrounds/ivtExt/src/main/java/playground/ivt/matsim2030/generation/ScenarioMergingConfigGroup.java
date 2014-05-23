@@ -21,7 +21,9 @@ package playground.ivt.matsim2030.generation;
 
 import java.util.Map;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * For increased modularity, the different scenario elements
@@ -34,6 +36,10 @@ public class ScenarioMergingConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME = "scenarioMerging";
 
 	private double samplingRate = 0.1;
+
+	private Coord dilutionCenter = new CoordImpl(683518.0,246836.0);
+	private double dilutionRadiusKm = 30;
+	private boolean performDilution = true;
 
 	private String freightPopulationId = "freight";
 	private String freightPlansFile = null;
@@ -62,7 +68,7 @@ public class ScenarioMergingConfigGroup extends ReflectiveModule {
 	
 		comments.put( "thinnedTransitRouterNetworkFile" , "the file containing the pre-processed transit router network. This is a performance pre-processing, which is by no means mandatory." );
 
-		comments.put( "samplingRate" , "the proportion of the subpopulation to retain: those files are 100pct samples, the filtering is done at import." );
+		comments.put( "samplingRate" , "the proportion of the subpopulation to retain: those files are 100pct samples, the filtering is done at import. One can of course also create sample files and set this parameter to 1." );
 
 		return comments;
 	}
@@ -76,6 +82,55 @@ public class ScenarioMergingConfigGroup extends ReflectiveModule {
 	public void setSamplingRate(final double samplingRate) {
 		if ( samplingRate < 0 || samplingRate > 1 ) throw new IllegalArgumentException( samplingRate+" is not between 0 and 1" );
 		this.samplingRate = samplingRate;
+	}
+
+	public Coord getDilutionCenter() {
+		return this.dilutionCenter;
+	}
+
+	@StringGetter( "dilutionCenter" )
+	private String getDilutionCenterString() {
+		return this.dilutionCenter.getX() +";"+ this.dilutionCenter.getY();
+	}
+
+	public void setDilutionCenter(final Coord dilutionCenter) {
+		this.dilutionCenter = dilutionCenter;
+	}
+
+	@StringSetter( "dilutionCenter" )
+	private void setDilutionCenter(final String v) {
+		final String[] xy = v.split( ";" );
+
+		if ( xy.length != 2 ) throw new IllegalArgumentException( v+" is not in form x;y" );
+
+		final double x = Double.parseDouble( xy[ 0 ] );
+		final double y = Double.parseDouble( xy[ 1 ] );
+
+		setDilutionCenter( new CoordImpl( x , y ) );
+	}
+
+	@StringGetter( "dilutionRadiusKm" )
+	public double getDilutionRadiusKm() {
+		return this.dilutionRadiusKm;
+	}
+
+	public double getDilutionRadiusM() {
+		return this.dilutionRadiusKm * 1000;
+	}
+
+	@StringSetter( "dilutionRadiusKm" )
+	public void setDilutionRadiusKm(double dilutionRadiusKm) {
+		this.dilutionRadiusKm = dilutionRadiusKm;
+	}
+
+	@StringGetter( "performDilution" )
+	public boolean getPerformDilution() {
+		return this.performDilution;
+	}
+
+	@StringSetter( "performDilution" )
+	public void setPerformDilution(boolean performDilution) {
+		this.performDilution = performDilution;
 	}
 
 	@StringGetter( "freightPopulationId" )
