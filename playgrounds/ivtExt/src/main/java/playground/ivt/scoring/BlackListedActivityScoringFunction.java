@@ -21,22 +21,27 @@ package playground.ivt.scoring;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.SumScoringFunction;
 
 /**
  * @author thibautd
  */
-public class BlackListedActivityScoringFunction implements ActivityScoring {
-	private final ActivityScoring delegate;
+public class BlackListedActivityScoringFunction implements SumScoringFunction.ActivityScoring, ScoringFunctionAccumulator.ActivityScoring {
+	private final SumScoringFunction.ActivityScoring delegate;
+	private final ScoringFunctionAccumulator.ActivityScoring accDelegate;
+
 	private final StageActivityTypes blackList;
 
 	public BlackListedActivityScoringFunction(
 			final StageActivityTypes blackList,
-			final ActivityScoring delegate) {
+			final SumScoringFunction.ActivityScoring delegate) {
 		this.blackList = blackList;
 		this.delegate = delegate;
+		this.accDelegate = delegate instanceof ScoringFunctionAccumulator.ActivityScoring ?
+			(ScoringFunctionAccumulator.ActivityScoring) delegate :
+			null;
 	}
-
 
 	@Override
 	public void handleFirstActivity(Activity act) {
@@ -64,6 +69,34 @@ public class BlackListedActivityScoringFunction implements ActivityScoring {
 	@Override
 	public double getScore() {
 		return delegate.getScore();
+	}
+
+
+	@Override
+	@Deprecated
+	public void reset() {
+		if ( accDelegate != null ) {
+			accDelegate.reset();
+		}
+		else throw new UnsupportedOperationException();
+	}
+
+	@Override
+	@Deprecated
+	public void startActivity(double time, Activity act) {
+		if ( accDelegate != null ) {
+			accDelegate.startActivity( time , act );
+		}
+		else throw new UnsupportedOperationException();
+	}
+
+	@Override
+	@Deprecated
+	public void endActivity(double time, Activity act) {
+		if ( accDelegate != null ) {
+			accDelegate.endActivity( time , act );
+		}
+		else throw new UnsupportedOperationException();
 	}
 }
 
