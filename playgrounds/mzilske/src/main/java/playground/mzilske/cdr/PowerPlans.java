@@ -35,10 +35,11 @@ public class PowerPlans {
 		try {
 			pw = new PrintWriter(file);
 			TripRouter tripRouter = new TripRouterFactoryImpl(
-					ConfigUtils.createConfig(), 
-					scenario.getNetwork(), 
+					scenario, 
 					new OnlyTimeDependentTravelDisutilityFactory(), 
-					new FreeSpeedTravelTime(), new DijkstraFactory(), new PopulationFactoryImpl(ScenarioUtils.createScenario(ConfigUtils.createConfig())), new ModeRouteFactory(), null, null)
+					new FreeSpeedTravelTime(),
+					new DijkstraFactory(),
+					null)
 			.instantiateAndConfigureTripRouter();
 			for (Person person : scenario.getPopulation().getPersons().values()) {
 				Plan plan = person.getSelectedPlan();

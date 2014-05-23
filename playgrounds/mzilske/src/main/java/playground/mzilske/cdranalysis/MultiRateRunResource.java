@@ -406,14 +406,11 @@ class MultiRateRunResource {
                 for (String rate : getRates()) {
                     Scenario scenario = getRateRun(rate).getLastIteration().getExperiencedPlansAndNetwork();
                     TripRouter tripRouter = new TripRouterFactoryImpl(
-                            scenario.getConfig(),
-                            scenario.getNetwork(),
+                            scenario,
                             new OnlyTimeDependentTravelDisutilityFactory(),
                             new FreeSpeedTravelTime(),
                             new DijkstraFactory(),
-                            scenario.getPopulation().getFactory(),
-                            new ModeRouteFactory(),
-                            null, null)
+                            null)
                             .instantiateAndConfigureTripRouter();
                     double travelled = sum(PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), scenario.getNetwork()).values());
                     double freespeedDistances = 0.0;
