@@ -62,7 +62,7 @@ public class PathSizeLogitControlerANIK {
 			
 		} else {
 			configFile = "../../runs-svn/pathSizeLogit/config_n_60_1000_2.xml";
-			actTimeParam = 2.5;
+			actTimeParam = 5. * 60.;
 			pathSizeLogit = true;
 		}
 		
