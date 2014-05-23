@@ -25,13 +25,9 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
 		
 	}
 
-	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
-    private TransitRouterFactory transitRouterFactory;
-    private Scenario scenario;
-
-    protected DefaultTripRouterFactoryImpl(Scenario scenario) {
-        this.scenario = scenario;
-    }
+	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+    private final TransitRouterFactory transitRouterFactory;
+    private final Scenario scenario;
 
     public DefaultTripRouterFactoryImpl(Scenario scenario, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, TransitRouterFactory transitRouterFactory) {
     	this.scenario = scenario;

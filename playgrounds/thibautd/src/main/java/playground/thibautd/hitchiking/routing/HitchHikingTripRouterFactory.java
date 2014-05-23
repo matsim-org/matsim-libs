@@ -46,7 +46,7 @@ public class HitchHikingTripRouterFactory extends DefaultTripRouterFactoryImpl {
 			final HitchHikingSpots spots,
 			final SpotWeighter spotWeighter,
 			final HitchHikingConfigGroup config) {
-		super(controler.getScenario());
+		super(controler.getScenario(), null, null);
 		this.controler = controler;
 		this.spotWeighter = spotWeighter;
 		this.spots = spots;
