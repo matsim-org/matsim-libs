@@ -19,6 +19,49 @@ CompareSelectedParkingPropertyOneRun {
 		int endIteration = 340;
 		boolean ignoreCasesWithPPUse=true;
 
+		String basePath="f:/data/experiments/parkingSearchOct2013/runs/";
+		
+		analyzeRuns(basePath,127,149,450,499);
+		analyzeRuns(basePath,150,150,950,999);
+		analyzeRuns(basePath,151,156,450,499);
+		analyzeRuns(basePath,157,157,950,999);
+		analyzeRuns(basePath,159,164,450,499);
+		analyzeRuns(basePath,165,171,650,699);
+
+		analyzeRuns(basePath,179,181,1200,1249);
+		
+		analyzeRuns(basePath,182,189,450,499);
+		analyzeRuns(basePath,190,191,1950,1999);
+		analyzeRuns(basePath,192,193,2450,2499);
+		analyzeRuns(basePath,194,195,2950,2999);
+		analyzeRuns(basePath,196,197,1950,1999);
+		analyzeRuns(basePath,198,199,2450,2499);
+		analyzeRuns(basePath,200,209,450,499);
+	}
+	
+	public static void analyzeRuns(String basePath, int runStartId, int runEndId, int startIteration, int endIteration){
+		for (int i=runStartId;i<=runEndId;i++){
+			startAnalysis_tryCatch(basePath + "run"+ i +"/output/", startIteration, endIteration,true);
+		}
+	}
+	
+	public static void startAnalysis_tryCatch(String outputFolder, int startIteration,
+			int endIteration, boolean ignoreCasesWithPPUse){
+		try{
+			startAnalysis(outputFolder, startIteration, endIteration,true);
+		}catch (Throwable e){
+			e.printStackTrace();
+		}
+	}
+	
+	
+	private static void startAnalysis(String outputFolder, int startIteration,
+			int endIteration, boolean ignoreCasesWithPPUse) {
+		
+		System.out.println(outputFolder);
+		System.out.println("startIteration:" + startIteration);
+		System.out.println("endIteration:" + endIteration);
+		
 		Matrix eventsMatrixCurrentIter = GeneralLib
 				.readStringMatrix(getEventsFileName(outputFolder,
 						startIteration));
@@ -49,8 +92,10 @@ CompareSelectedParkingPropertyOneRun {
 			eventsMatrixCurrentIter=GeneralLib
 					.readStringMatrix(getEventsFileName(outputFolder,
 							i+1));
+			if (i%5==0){
+				System.out.println("iteration: "+ i);
+			}
 			
-			System.out.println("iteration: "+ i);
 			
 			for (int j=1;j<eventsMatrixCurrentIter.getNumberOfRows();j++){
 				Id personId=new IdImpl(eventsMatrixCurrentIter.getString(j, indexPersonId));
@@ -88,7 +133,6 @@ CompareSelectedParkingPropertyOneRun {
 		}
 		
 		System.out.println("percentage of operations with single dominant strategy group:" + 100.0*numberOfDominantStrategyGroups/strategyGroups.getValues().size());
-	
 	}
 
 	
