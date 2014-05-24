@@ -15,7 +15,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.LegImpl;
 
 /**
- * Handles AktivityStartEvent and starts parking process. Same for ActivityEndEvent.
+ * Handles the AktivityStartEvent and starts the parking process; Same for the ActivityEndEvent; Additionally all the events of
+ * each agent are counted to be able to get the activity which the agent currently performs.
  * @author Valentin Bemetz & Moritz Hohenfellner
  *
  */

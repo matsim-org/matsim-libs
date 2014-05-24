@@ -5,6 +5,16 @@ import java.util.Random;
 
 import playground.wrashid.bsc.vbmh.controler.VMConfig;
 
+/**
+ * 
+ * Implements the actual parking choice model which is described in the paper; It gets all the available options as input;
+ * assigns scores to them and returns the best one;
+ * 
+ * 
+ * 
+ * @author Valentin Bemetz & Moritz Hohenfellner
+ *
+ */
 public class AdvancedParkingChoice {
 	/*
 	 * LMOSC values between 0 and 1; 1 is the best

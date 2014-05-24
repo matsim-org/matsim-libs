@@ -10,7 +10,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.matsim.core.utils.collections.QuadTree;
 
 /**
- * Keeps a list of all parking in the network.
+ * Keeps a list of all parking in the network; getPrivateParking() returns an available private parking space at
+ * a specific facility; getPublicParking() returns available public parkign spaces in specific area.
  * 
  * !! Quadtree und evntl umkreis Suche hier her?
  * @author Valentin Bemetz & Moritz Hohenfellner

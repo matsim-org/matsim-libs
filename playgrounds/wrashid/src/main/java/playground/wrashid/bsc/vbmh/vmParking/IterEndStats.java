@@ -20,6 +20,14 @@ import playground.wrashid.bsc.vbmh.util.RemoveDuplicate;
 import playground.wrashid.bsc.vbmh.util.VMCharts;
 import playground.wrashid.bsc.vbmh.vmEV.EVControl;
 
+/**
+ * Generates some statistics and charts at the end of each iteration; All the data used for the charts is
+ * saved in cvs files as well;
+ * 
+ * 
+ * @author Valentin Bemetz & Moritz Hohenfellner
+ *
+ */
 public class IterEndStats {
 	HashMap<Id, LinkedList<ParkingSpot>> parkings=new HashMap<Id, LinkedList<ParkingSpot>>();
 	public void run(ParkControl parkControl){

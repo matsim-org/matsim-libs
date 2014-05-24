@@ -6,7 +6,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
 /**
- * Writes Pricing Models using jaxb
+ * Writes Pricing Models into an XML file using jaxb
  * 
  * 
  * @author Valentin Bemetz & Moritz Hohenfellner

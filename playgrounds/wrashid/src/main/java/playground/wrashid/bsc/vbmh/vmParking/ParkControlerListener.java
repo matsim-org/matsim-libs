@@ -16,7 +16,7 @@ import playground.wrashid.bsc.vbmh.util.CSVWriter;
 import playground.wrashid.bsc.vbmh.util.VMCharts;
 
 /**
- * Sets up event handlers and does some restes after and before each.
+ * Sets up event handlers and does some resets before and after each iteration.
  * 
  * 
  * 

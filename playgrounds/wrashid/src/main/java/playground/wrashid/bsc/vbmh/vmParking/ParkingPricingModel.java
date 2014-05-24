@@ -1,7 +1,10 @@
 package playground.wrashid.bsc.vbmh.vmParking;
 
 /**
- * Parameters for the pricing models. 
+ * Implementation of the static pricing models which are given in the XML input file; Calculates the costs for a given
+ * vehicle type and a given duration.
+ * 
+ * 
  * !! Preis im Model berechnen um Flexibler zu sein / Model eher als Interface?
  * 
  * @author Valentin Bemetz & Moritz Hohenfellner

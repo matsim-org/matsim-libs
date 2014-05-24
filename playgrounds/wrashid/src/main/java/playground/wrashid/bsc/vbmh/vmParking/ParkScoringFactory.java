@@ -8,7 +8,7 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
 /**
- * Adds the Park_Scoring function to the default scoring function
+ * Adds the ParkScoring function to the default scoring function
  * 
  * @author Valentin Bemetz & Moritz Hohenfellner
  *

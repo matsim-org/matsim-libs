@@ -35,11 +35,8 @@ import playground.wrashid.bsc.vbmh.vmParking.AdvancedParkingChoice.Option;
 
 
 /**
- * Manages the whole parking process of one Agent at a time. One instance of this class is kept by the Park_Handler 
- * which starts the Park() / leave().
- * Parking: First the availability of a private parking belonging to the destination facility is checked. Then all public 
- * parking in a specific area around the destination of the agent are checked for free spots
- * and then the best one is selected. 
+ * Manages the whole parking process of one Agent at a time; One instance of this class is kept by the ParkHandler 
+ * which starts the park() / leave();
  * 
  * @author Valentin Bemetz & Moritz Hohenfellner
  *
@@ -59,7 +56,7 @@ public class ParkControl {
 	int countNotParked = 0;
 	int countEVParkedOnEVSpot = 0;
 	
-	LinkedList<double[]> availableParkingStat = new LinkedList<double[]>();  //zaehlt für jeden Parkvorgang die Parkplaetze, die zur verfuegung stehen
+	LinkedList<double[]> availableParkingStat = new LinkedList<double[]>();  //zaehlt fuer jeden Parkvorgang die Parkplaetze, die zur verfuegung stehen
 	VMCharts vmCharts = new VMCharts(); 
 	LinkedList<LinkedList<String>> notParked;
 	HashMap<Integer, Integer> peakLoad;

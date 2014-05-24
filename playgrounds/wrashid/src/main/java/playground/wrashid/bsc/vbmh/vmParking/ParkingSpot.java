@@ -1,5 +1,13 @@
 package playground.wrashid.bsc.vbmh.vmParking;
 
+/**
+ * Represents a single parking space.
+ * 
+ * 
+ * 
+ * @author Valentin Bemetz & Moritz Hohenfellner
+ *
+ */
 public class ParkingSpot {
 	boolean charge, evExclusive;
 	private boolean occupied;

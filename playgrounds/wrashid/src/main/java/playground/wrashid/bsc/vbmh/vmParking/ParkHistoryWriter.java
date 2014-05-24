@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 /**
- * Writes a file with parking related events. At the moments there are events for:
+ * Writes a file with parking related events; The start() should be called before each iteration, the end() should be called at the end of 
+ * each iteration to write the file.
+ * At the moments there are events for:
  * -Parking lot is fully occupied
  * -Parking lot is available again
  * -Agent can not park
@@ -14,8 +16,7 @@ import java.util.LinkedList;
  * -EV / NEV leaves parking (containins information on state of charge)
  * -EV runs out of Battery 
  * 
- * The start() should be called before each iteration, the end() should be called at the end of 
- * each iteration to close the file stream.
+ * 
  * 
  * @author Valentin Bemetz & Moritz Hohenfellner
  *

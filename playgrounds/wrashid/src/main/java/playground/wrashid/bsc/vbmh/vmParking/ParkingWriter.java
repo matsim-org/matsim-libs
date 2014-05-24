@@ -10,7 +10,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
 /**
- * Does some jaxb magic to write parkings into a xml file
+ * Does some jaxb magic to write a parkingMap with all its parking lots into a XML file.
  * 
  * 
  * 

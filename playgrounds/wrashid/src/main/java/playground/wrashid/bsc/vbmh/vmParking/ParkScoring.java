@@ -4,8 +4,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
 
 /**
- * Gets the parking related score (which is saved in money so far) out of the agents vm_scorekeeper and calculates 
- * a score out of if. 
+ *Takes the score from the VMScoreKeeper and adds it to the MATSim score. 
  * 
  * 
  *

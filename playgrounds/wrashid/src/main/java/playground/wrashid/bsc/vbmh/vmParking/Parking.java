@@ -10,10 +10,10 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 
 /**
- * This represents a public / private parking lot. Every parking space is an own parking_spot object.
- * create_spots() creates the specified number of ev / nev parking spots with the specified attributes.
- * check_for_free_spot() checks if one of those spots is available.
- * clear_spots() should be called after each iteration to make sure there are no occupied spots at the begion of 
+ * This represents a public / private parking lot; Every parking space is an own parkingSpot object;
+ * create_spots() creates the specified number of EVPS/CPS with the specified attributes;
+ * checkForFreeSpot() checks if one of those spots is available (functions for EVPS/CPS are available);
+ * clearSpots() should be called after each iteration to make sure there are no occupied spots at the beginning of 
  * the next iteration.
  * 
  * 

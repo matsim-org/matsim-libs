@@ -1,8 +1,7 @@
 package playground.wrashid.bsc.vbmh.vmParking;
 
 /**
- * Is added as an agents Attribute to keep for example the money which is paid for parking.
- * !! Could probably be replaced by a matsim on board solution.
+ * Is added as an agents Attribute to keep all the parking related score.
  * 
  * 
  * @author Valentin Bemetz & Moritz Hohenfellner
