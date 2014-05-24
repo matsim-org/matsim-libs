@@ -10,4 +10,13 @@ public class VMConfig {
 	public static double betaSOCMean = 4.5; //mittelwert in $
 	public static double betaSOCSD = 1; // standardabweichung in $
 	public static double betaReserve = 30;
+	
+	public static double LMSOCa = -3.889; //x^2 term
+	public static double LMSOCb = 10.97; // x term
+	public static double LMSOCc = -2.159; // constant
+	public static double LMSOCd = 2.425; // constant outside of exp
+	public static double LMSOCe = 0.0454411; //shift down
+	public static double LMSOCf = 1.067; //scale up
+	
+	
 }

@@ -68,12 +68,24 @@ public class AdvancedParkingChoice {
 
 
 	public double calcLMSOC(double soc){
-		double a = -3.889; //x^2 term
-		double b = 10.97; // x term
-		double c = -2.159; // constant
-		double d = 2.425; // constant outside of exp
-		double e = 0.0454411; //shift down
-		double f = 1.067; //scale up
+		
+		double a; // = -3.889; //x^2 term
+		double b; // = 10.97; // x term
+		double c; // = -2.159; // constant
+		double d; //= 2.425; // constant outside of exp
+		double e; // = 0.0454411; //shift down
+		double f; //= 1.067; //scale up
+		
+		if(true){
+			a = VMConfig.LMSOCa;
+			b = VMConfig.LMSOCb;
+			c = VMConfig.LMSOCc;
+			d = VMConfig.LMSOCd;
+			e = VMConfig.LMSOCe;
+			f = VMConfig.LMSOCf;
+		}
+		
+		
 		
 		double LMSOC = 0.0;
 		LMSOC = (((Math.exp(a*soc*soc+b*soc+c))/(d+Math.exp(a*soc*soc+b*soc+c))-e)*f);
