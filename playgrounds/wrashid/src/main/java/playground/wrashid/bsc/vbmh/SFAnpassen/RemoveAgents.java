@@ -14,7 +14,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.wrashid.bsc.vbmh.vmEV.EVControl;
 
-public class agentsentfernen {
+public class RemoveAgents {
 
 	@SuppressWarnings("deprecation")
 	public static void main(String[] args) {

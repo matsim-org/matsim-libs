@@ -215,7 +215,7 @@ public class VMScenarioTool {
 		//Parkplaetze bauen:
 		
 		String [] parameter = {newConfigFileName, parkingOutput};
-		create_demo_parking.main(parameter);
+		CreateDemoParking.main(parameter);
 		
 		
 		

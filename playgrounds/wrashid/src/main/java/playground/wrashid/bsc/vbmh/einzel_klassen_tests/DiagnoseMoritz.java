@@ -38,7 +38,7 @@ public class DiagnoseMoritz {
 			System.out.println("normal gelesen");
 		}
 		if(1==1){
-			hist.readXML("erste_min_5_sa/parkhistory/parkhistory_200.xml");
+			hist.readXML("erste_min_5_di/parkhistory/parkhistory_200.xml");
 			System.out.println("erste_min_5 gelesen");
 		}
 		if(1==0){
@@ -74,7 +74,7 @@ public class DiagnoseMoritz {
 					continue;
 				}
 				if(outOfBattery.containsKey(event.get("person"))){
-					if(!(Double.parseDouble(event.get("spot_score"))<-15)){
+					if(event.get("spotType").equals("ev")){
 						i++;
 						System.out.println(event.toString());
 					}

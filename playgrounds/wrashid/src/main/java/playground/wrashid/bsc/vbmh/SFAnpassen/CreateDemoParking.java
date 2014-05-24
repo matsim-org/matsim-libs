@@ -25,7 +25,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import playground.wrashid.bsc.vbmh.vmParking.Parking;
 import playground.wrashid.bsc.vbmh.vmParking.ParkingMap;
 import playground.wrashid.bsc.vbmh.vmParking.ParkingWriter;
-public class create_demo_parking {
+public class CreateDemoParking {
 	
 	static HashMap <String,Double> pAnteile = new HashMap<String,Double>();	//Anzahl Parkplaetze / what ever nach P typ
 	static HashMap <String,Double> evAnteile = new HashMap<String,Double>(); //Anteil EV Nach P Typ
@@ -184,15 +184,15 @@ public class create_demo_parking {
 		
 		writer.write(parking_map, outputFile);
 		System.out.println("feddisch");
-		System.out.println("EV: "+create_demo_parking.diagZaehlEV);
-		System.out.println("NEV: "+create_demo_parking.diagZaehlNEV);
+		System.out.println("EV: "+CreateDemoParking.diagZaehlEV);
+		System.out.println("NEV: "+CreateDemoParking.diagZaehlNEV);
 	}
 	
 	static void setCapacity(Parking parking, String location_type, double location_capacity){
 		parking.capacityEV=Math.round(location_capacity * pAnteile.get(location_type) * evAnteile.get(location_type));
 		parking.capacityNEV=Math.round(location_capacity * pAnteile.get(location_type) * (1-evAnteile.get(location_type)));
-		create_demo_parking.diagZaehlEV+=Math.round(location_capacity * pAnteile.get(location_type) * evAnteile.get(location_type));
-		create_demo_parking.diagZaehlNEV+=Math.round(location_capacity * pAnteile.get(location_type) * (1-evAnteile.get(location_type)));
+		CreateDemoParking.diagZaehlEV+=Math.round(location_capacity * pAnteile.get(location_type) * evAnteile.get(location_type));
+		CreateDemoParking.diagZaehlNEV+=Math.round(location_capacity * pAnteile.get(location_type) * (1-evAnteile.get(location_type)));
 		
 		parking.chargingRate=chargingRates.get(location_type);//!! Gehoert nicht hier her und muss dynamisch werden
 		parking.parkingPriceMEVSpot=preiseEVSpots.get(location_type); //!! Nach typ + Zone unterscheiden; Zu hause aufs Laden den Stromtarif verechnen >> vorausgesetzt der Anschluss gehoert dem Agent..

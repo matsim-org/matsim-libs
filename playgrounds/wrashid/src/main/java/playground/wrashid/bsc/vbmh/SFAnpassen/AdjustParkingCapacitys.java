@@ -14,7 +14,7 @@ import playground.wrashid.bsc.vbmh.vmParking.ParkingMap;
 import playground.wrashid.bsc.vbmh.vmParking.ParkingWriter;
 
 
-public class adjustParkingCpacitys {
+public class AdjustParkingCapacitys {
 
 	
 	static HashMap <String,Double> pAnteile = new HashMap<String,Double>();	//Anzahl Parkplaetze / what ever nach P typ

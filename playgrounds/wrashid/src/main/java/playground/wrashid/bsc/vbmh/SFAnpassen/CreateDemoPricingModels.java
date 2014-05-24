@@ -4,7 +4,7 @@ import playground.wrashid.bsc.vbmh.vmParking.ParkingPricingModel;
 import playground.wrashid.bsc.vbmh.vmParking.PricingModels;
 import playground.wrashid.bsc.vbmh.vmParking.PricingModelsWriter;
 
-public class create_demo_pricing_models {
+public class CreateDemoPricingModels {
 	
 	
 	public static void main(String[] args) {

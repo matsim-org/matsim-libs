@@ -11,7 +11,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.wrashid.bsc.vbmh.vmEV.*;
 
 
-public class evsErzeugen {
+public class AssignEVs {
 	static Scenario scenario;
 	static Random zufall = new Random();
 	static EVListWriter writer = new EVListWriter();
