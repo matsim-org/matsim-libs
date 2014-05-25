@@ -87,4 +87,7 @@ private HashMap<ClassKey1, DoubleValueHashMap<ClassKey2>> hashMap=new HashMap<Cl
 		}
 	}
 	
+	public Set<ClassKey2> getKeySet2(ClassKey1 key1){
+		return hashMap.get(key1).keySet();
+	}
 }
