@@ -1,14 +1,5 @@
 package org.matsim.contrib.josm;
 
-import static org.openstreetmap.josm.tools.I18n.tr;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
@@ -25,12 +16,17 @@ import org.openstreetmap.josm.data.validation.TestError;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.progress.ProgressMonitor;
 
+import java.util.*;
+import java.util.Map.Entry;
+
+import static org.openstreetmap.josm.tools.I18n.tr;
+
 /**
  * The Test which is used for the validation of MATSim content.
  * 
  * 
  */
-public class MATSimTest extends Test {
+class MATSimTest extends Test {
 
 	Map<String, ArrayList<Way>> linkIds;
 	Map<String, ArrayList<Node>> nodeIds;

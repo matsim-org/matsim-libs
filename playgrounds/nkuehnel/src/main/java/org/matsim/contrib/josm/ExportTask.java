@@ -3,11 +3,6 @@
  */
 package org.matsim.contrib.josm;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.swing.JOptionPane;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -28,6 +23,10 @@ import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.xml.sax.SAXException;
 
+import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
+
 /**
  * The task which which writes out the network xml file
  * 
@@ -35,10 +34,9 @@ import org.xml.sax.SAXException;
  * 
  */
 
-public class ExportTask extends PleaseWaitRunnable {
-	protected int exportResult;
+class ExportTask extends PleaseWaitRunnable {
 
-	private File file;
+    private File file;
 
 	public ExportTask(File file) {
 		super("MATSim Export");

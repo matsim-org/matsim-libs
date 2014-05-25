@@ -1,17 +1,17 @@
 package org.matsim.contrib.josm;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.openstreetmap.josm.Main;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Holds the default converting values
  * 
  * 
  */
-public class OsmConvertDefaults {
+class OsmConvertDefaults {
 	private static Map<String, OsmHighwayDefaults> defaults = new HashMap<String, OsmHighwayDefaults>();
 
 	static String[] types = { "motorway", "motorway_link", "trunk",

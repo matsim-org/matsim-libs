@@ -1,21 +1,5 @@
 package org.matsim.contrib.josm;
 
-import static org.openstreetmap.josm.tools.I18n.tr;
-import static org.openstreetmap.josm.tools.I18n.trn;
-
-import java.awt.GridBagLayout;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.Action;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.openstreetmap.josm.Main;
@@ -31,13 +15,22 @@ import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.ImageProvider;
 
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+import java.util.*;
+import java.util.List;
+
+import static org.openstreetmap.josm.tools.I18n.tr;
+import static org.openstreetmap.josm.tools.I18n.trn;
+
 /**
  * a layer which contains MATSim-network data to differ from normal OSM layers
  * 
  * @author nkuehnel
  * 
  */
-public class NetworkLayer extends OsmDataLayer {
+class NetworkLayer extends OsmDataLayer {
 	private Network matsimNetwork;
 	private String coordSystem;
 

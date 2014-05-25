@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.Coord;
  * 
  * 
  */
-public class OsmFilter {
+class OsmFilter {
 	private final Coord coordNW;
 	private final Coord coordSE;
 	private final int hierarchy;

@@ -1,8 +1,5 @@
 package org.matsim.contrib.josm;
 
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -13,23 +10,18 @@ import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.WaySegment;
-import org.openstreetmap.josm.data.osm.event.AbstractDatasetChangedEvent;
-import org.openstreetmap.josm.data.osm.event.DataChangedEvent;
-import org.openstreetmap.josm.data.osm.event.DataSetListener;
-import org.openstreetmap.josm.data.osm.event.NodeMovedEvent;
-import org.openstreetmap.josm.data.osm.event.PrimitivesAddedEvent;
-import org.openstreetmap.josm.data.osm.event.PrimitivesRemovedEvent;
-import org.openstreetmap.josm.data.osm.event.RelationMembersChangedEvent;
-import org.openstreetmap.josm.data.osm.event.TagsChangedEvent;
-import org.openstreetmap.josm.data.osm.event.WayNodesChangedEvent;
+import org.openstreetmap.josm.data.osm.event.*;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Listens to changes in the dataset and their effects on the Network
  * 
  * 
  */
-public class NetworkListener implements DataSetListener {
+class NetworkListener implements DataSetListener {
 	private Network network;
 	private OsmDataLayer layer;
 
@@ -68,8 +60,8 @@ public class NetworkListener implements DataSetListener {
 			} else {
 				wayId = Long.parseLong(tempId);
 			}
-			if (!((Way) layer.data
-					.getPrimitiveById(wayId, OsmPrimitiveType.WAY))
+			if (!layer.data
+					.getPrimitiveById(wayId, OsmPrimitiveType.WAY)
 					.hasKey("length")) {
 				link.setLength(OsmConvertDefaults.calculateWGS84Length(link
 						.getFromNode().getCoord(), link.getToNode().getCoord()));
@@ -84,8 +76,8 @@ public class NetworkListener implements DataSetListener {
 			} else {
 				wayId = Long.parseLong(tempId);
 			}
-			if (!((Way) layer.data
-					.getPrimitiveById(wayId, OsmPrimitiveType.WAY))
+			if (!layer.data
+					.getPrimitiveById(wayId, OsmPrimitiveType.WAY)
 					.hasKey("length")) {
 				link.setLength(OsmConvertDefaults.calculateWGS84Length(link
 						.getFromNode().getCoord(), link.getToNode().getCoord()));
@@ -131,8 +123,8 @@ public class NetworkListener implements DataSetListener {
 					network.removeNode(node.getId());
 				}
 			} else if (primitive instanceof Way) {
-				if (way2Links.containsKey((Way) primitive)) {
-					List<Link> links = way2Links.remove(((Way) primitive));
+				if (way2Links.containsKey(primitive)) {
+					List<Link> links = way2Links.remove(primitive);
 					for (Link link : links) {
 						link2Segment.remove(link);
 						network.removeLink(link.getId());

@@ -1,26 +1,16 @@
 package org.matsim.contrib.josm;
 
-import static org.openstreetmap.josm.tools.I18n.tr;
+import org.matsim.contrib.josm.OsmConvertDefaults.OsmHighwayDefaults;
+import org.openstreetmap.josm.Main;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
-import org.matsim.contrib.josm.OsmConvertDefaults.OsmHighwayDefaults;
-
-import org.openstreetmap.josm.Main;
+import static org.openstreetmap.josm.tools.I18n.tr;
 
 /**
  * This dialog is used to show and edit the values which are used when
@@ -29,7 +19,7 @@ import org.openstreetmap.josm.Main;
  * @author nkuehnel
  * 
  */
-public class OsmConvertDefaultsDialog extends JPanel {
+class OsmConvertDefaultsDialog extends JPanel {
 	private JOptionPane optionPane;
 	private Map<String, JComponent> input = new HashMap<String, JComponent>();
 	private GridBagConstraints c = new GridBagConstraints();

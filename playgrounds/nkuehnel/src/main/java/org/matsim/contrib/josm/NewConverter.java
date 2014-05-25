@@ -1,12 +1,5 @@
 package org.matsim.contrib.josm;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -23,8 +16,10 @@ import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.WaySegment;
 
-public class NewConverter {
-	private final static Logger log = Logger.getLogger(Converter.class);
+import java.util.*;
+
+class NewConverter {
+	private final static Logger log = Logger.getLogger(NewConverter.class);
 	
 	private final static String TAG_LANES = "lanes";
 	private final static String TAG_HIGHWAY = "highway";
@@ -34,10 +29,7 @@ public class NewConverter {
 	private final static Set<String> unknownMaxspeedTags = new HashSet<String>();
 	private final static Set<String> unknownLanesTags = new HashSet<String>();
 
-	public final static String[] ALL_TAGS = new String[] { TAG_LANES,
-			TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY };
-	
-	private static final List<String> TRANSPORT_MODES = Arrays.asList(
+    private static final List<String> TRANSPORT_MODES = Arrays.asList(
 			TransportMode.bike, TransportMode.car, TransportMode.other,
 			TransportMode.pt, TransportMode.ride, TransportMode.transit_walk,
 			TransportMode.walk);
@@ -238,12 +230,11 @@ public class NewConverter {
 		if(keys.containsKey("modes")) {
 			Set<String> tempModes = new HashSet<String>();
 			String tempArray[] = keys.get("modes").split(";");
-			for (int i = 0; i < tempArray.length; i++) {
-				String mode = tempArray[i];
-				if (TRANSPORT_MODES.contains(mode)) {
-					tempModes.add(tempArray[i]);
-				}
-			}
+            for (String mode : tempArray) {
+                if (TRANSPORT_MODES.contains(mode)) {
+                    tempModes.add(mode);
+                }
+            }
 			if (tempModes.size() != 0) {
 				modes.clear();
 				modes.addAll(tempModes);

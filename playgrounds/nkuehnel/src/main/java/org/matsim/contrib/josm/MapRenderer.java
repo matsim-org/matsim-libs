@@ -1,15 +1,6 @@
 package org.matsim.contrib.josm;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.util.List;
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.Preferences.PreferenceChangeEvent;
@@ -21,6 +12,10 @@ import org.openstreetmap.josm.gui.NavigatableComponent;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.mappaint.LabelCompositionStrategy;
 import org.openstreetmap.josm.gui.mappaint.TextElement;
+
+import java.awt.*;
+import java.util.List;
+import java.util.Map;
 
 /**
  * the MATSim MapRenderer. Draws ways that correspond to an existing MATSim link
@@ -131,7 +126,7 @@ public class MapRenderer extends StyledMapRenderer {
 			StringBuilder sB = new StringBuilder();
 			if (((NetworkLayer) layer).getWay2Links().containsKey(prim)) {
 				for (Link link: ((NetworkLayer) layer).getWay2Links().get(prim)) {
-					sB.append(" ["+((LinkImpl)link).getOrigId()+"] ");
+					sB.append(" [").append(((LinkImpl) link).getOrigId()).append("] ");
 				}
 			}
 			return sB.toString();

@@ -1,10 +1,5 @@
 package org.matsim.contrib.josm;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -26,12 +21,18 @@ import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.xml.sax.SAXException;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * The Task that handles the convert action
  * 
  * 
  */
-public class ConvertTask extends PleaseWaitRunnable {
+
+class ConvertTask extends PleaseWaitRunnable {
 
 	private NetworkLayer newLayer;
 

@@ -1,11 +1,5 @@
 package org.matsim.contrib.josm;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -32,6 +26,12 @@ import org.openstreetmap.josm.gui.PleaseWaitRunnable;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.xml.sax.SAXException;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * The task which is executed after confirming the ImportDialog. Creates a new
  * layer showing the network data.
@@ -39,7 +39,7 @@ import org.xml.sax.SAXException;
  * @author nkuehnel
  * 
  */
-public class ImportTask extends PleaseWaitRunnable {
+class ImportTask extends PleaseWaitRunnable {
 	public static final String NODE_TAG_ID = "id";
 	public static final String WAY_TAG_ID = "id";
 	private NetworkLayer layer;
