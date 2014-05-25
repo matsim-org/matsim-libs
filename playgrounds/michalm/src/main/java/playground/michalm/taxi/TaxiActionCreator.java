@@ -31,11 +31,11 @@ public class TaxiActionCreator
     implements VrpAgentLogic.DynActionCreator
 {
     private final PassengerEngine passengerEngine;
-    private final VrpDynLegs.LegCreator legCreator;
+    private final VrpLegs.LegCreator legCreator;
     private final double pickupDuration;
 
 
-    public TaxiActionCreator(PassengerEngine passengerEngine, VrpDynLegs.LegCreator legCreator,
+    public TaxiActionCreator(PassengerEngine passengerEngine, VrpLegs.LegCreator legCreator,
             double pickupDuration)
     {
         this.passengerEngine = passengerEngine;

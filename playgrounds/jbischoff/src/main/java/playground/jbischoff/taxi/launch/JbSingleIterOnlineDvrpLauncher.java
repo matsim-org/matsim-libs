@@ -35,7 +35,7 @@ import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.contrib.dvrp.util.chart.ScheduleChartUtils;
 import org.matsim.contrib.dvrp.util.gis.Schedules2GIS;
 import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
-import org.matsim.contrib.dvrp.vrpagent.VrpDynLegs;
+import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.*;
@@ -244,7 +244,7 @@ import playground.michalm.util.RunningVehicleRegister;
                 TaxiRequestCreator.MODE, new TaxiRequestCreator(), optimizer, context, qSim);
 
         VrpLauncherUtils.initAgentSources(qSim, context, optimizer, new TaxiActionCreator(
-                passengerEngine, VrpDynLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR, pickupDuration));
+                passengerEngine, VrpLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR, pickupDuration));
 
         EventsManager events = qSim.getEventsManager();
 

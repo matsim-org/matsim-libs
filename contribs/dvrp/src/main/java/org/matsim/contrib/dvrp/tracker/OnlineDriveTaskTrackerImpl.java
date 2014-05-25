@@ -24,7 +24,7 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
-import org.matsim.contrib.dvrp.vrpagent.VrpDynLeg;
+import org.matsim.contrib.dvrp.vrpagent.VrpLeg;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 
@@ -40,7 +40,7 @@ public class OnlineDriveTaskTrackerImpl
     implements OnlineDriveTaskTracker
 {
     private final DriveTask driveTask;
-    private final VrpDynLeg vrpDynLeg;
+    private final VrpLeg vrpDynLeg;
 
     private final VrpOptimizerWithOnlineTracking optimizer;
     private final MobsimTimer timer;
@@ -55,7 +55,7 @@ public class OnlineDriveTaskTrackerImpl
     private Link currentLink;
 
 
-    public OnlineDriveTaskTrackerImpl(DriveTask driveTask, VrpDynLeg vrpDynLeg,
+    public OnlineDriveTaskTrackerImpl(DriveTask driveTask, VrpLeg vrpDynLeg,
             VrpOptimizerWithOnlineTracking optimizer, MobsimTimer timer)
     {
         this.driveTask = driveTask;

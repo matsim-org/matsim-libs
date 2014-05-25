@@ -27,8 +27,8 @@ import org.matsim.contrib.dvrp.tracker.*;
 /**
  * ASSUMPTION: A vehicle enters and exits links at their ends (link.getToNode())
  */
-public class VrpDynLeg
-    implements DivertibleDynLeg
+public class VrpLeg
+    implements DivertibleLeg
 {
     private TaskTracker tracker;
     private Boolean onlineTracking = null;
@@ -37,10 +37,10 @@ public class VrpDynLeg
     private int currentLinkIdx = 0;
     private boolean askedAboutNextLink = false;
 
-    private String mode = TransportMode.car;
+    private final String mode = TransportMode.car;
 
 
-    public VrpDynLeg(VrpPath path)
+    public VrpLeg(VrpPath path)
     {
         this.path = path;
     }
@@ -136,12 +136,6 @@ public class VrpDynLeg
     public String getMode()
     {
         return mode;
-    }
-
-
-    public void setMode(String mode)
-    {
-        this.mode = mode;
     }
 
 

@@ -23,7 +23,7 @@ import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dynagent.DynLeg;
 
 
-public interface DivertibleDynLeg
+public interface DivertibleLeg
     extends DynLeg
 {
     VrpPath getPath();

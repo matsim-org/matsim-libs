@@ -30,7 +30,7 @@ import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.contrib.dvrp.util.gis.Schedules2GIS;
 import org.matsim.contrib.dvrp.vrpagent.*;
-import org.matsim.contrib.dvrp.vrpagent.VrpDynLegs.LegCreator;
+import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.*;
@@ -256,9 +256,9 @@ import playground.michalm.util.RunningVehicleRegister;
             qSim.addQueueSimulationListeners(new BeforeSimulationTaxiCaller(passengerEngine));
         }
 
-        LegCreator legCreator = onlineVehicleTracker ? VrpDynLegs
+        LegCreator legCreator = onlineVehicleTracker ? VrpLegs
                 .createLegWithOnlineTrackerCreator(optimizer, qSim.getSimTimer())
-                : VrpDynLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR;
+                : VrpLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR;
 
         TaxiActionCreator actionCreator = new TaxiActionCreator(passengerEngine, legCreator,
                 pickupDuration);
