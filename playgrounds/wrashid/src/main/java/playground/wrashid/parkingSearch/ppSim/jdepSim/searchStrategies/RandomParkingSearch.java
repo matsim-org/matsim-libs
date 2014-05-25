@@ -574,7 +574,9 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
 		parkingScore = handleCostScore(personId, parkingAttributesForScoring, parkingScore);
 
-		Activity nextActivity = (Activity) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getIndexOfFirstCarLegOfDay() + 3);
+		Activity nextActivity = (Activity) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex() + 3);
+		parkingAttributesForScoring.destinationCoord=nextActivity.getCoord();
+		
 		
 		AgentWithParking.parkingStrategyManager.updateScore(personId, aem.getPlanElementIndex(), parkingScore);
 		ZHScenarioGlobal.parkingEventDetails
