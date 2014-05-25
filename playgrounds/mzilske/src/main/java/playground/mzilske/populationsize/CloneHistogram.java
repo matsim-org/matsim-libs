@@ -28,14 +28,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import playground.mzilske.cdranalysis.StreamingOutput;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -110,27 +107,4 @@ public class CloneHistogram {
 
     }
 
-    public static void clonePopulation(Scenario scenario, int count) {
-        // CloneFactor == 1 will leave everything as is, without stay-at-home-plans.
-        if (count > 1) {
-            for (Person person : scenario.getPopulation().getPersons().values()) {
-                Plan plan2 = scenario.getPopulation().getFactory().createPlan();
-                person.addPlan(plan2);
-                person.setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(person));
-            }
-            for (Person person : new ArrayList<Person>(scenario.getPopulation().getPersons().values())) {
-                for (int i = 0; i < count - 1; i++) {
-                    Id personId = new IdImpl("I" + i + "_" + person.getId().toString());
-                    Person clone = scenario.getPopulation().getFactory().createPerson(personId);
-                    for (Plan plan : person.getPlans()) {
-                        Plan clonePlan = scenario.getPopulation().getFactory().createPlan();
-                        ((PlanImpl) clonePlan).copyFrom(plan);
-                        clone.addPlan(clonePlan);
-                    }
-                    clone.setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(clone));
-                    scenario.getPopulation().addPerson(clone);
-                }
-            }
-        }
-    }
 }

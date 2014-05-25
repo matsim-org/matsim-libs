@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * MetaPopulationPlan.java
+ *  * ClonesModule.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,35 +20,19 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.stratum;
+package playground.mzilske.clones;
 
-import org.matsim.api.core.v01.population.BasicPlan;
+import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.Multibinder;
+import org.matsim.core.controler.listener.ControlerListener;
 
-class MetaPopulationPlan implements BasicPlan {
-
-    private double scaleFactor;
-    private Double score;
-
-    public MetaPopulationPlan(double scaleFactor) {
-        this.scaleFactor = scaleFactor;
-    }
+public class ClonesModule extends AbstractModule {
 
     @Override
-    public void setScore(Double score) {
-        this.score = score;
-    }
-
-    @Override
-    public Double getScore() {
-        return this.score;
-    }
-
-    public double getScaleFactor() {
-        return scaleFactor;
-    }
-
-    public void setScaleFactor(double scaleFactor) {
-        this.scaleFactor = scaleFactor;
+    protected void configure() {
+        Multibinder<ControlerListener> controlerListenerBinder = Multibinder.newSetBinder(binder(), ControlerListener.class);
+        controlerListenerBinder.addBinding().toProvider(ClonesControlerListener.class);
+        controlerListenerBinder.addBinding().toProvider(CloneHistogramControlerListener.class);
     }
 
 }

@@ -11,6 +11,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
@@ -65,51 +66,49 @@ public class PopulationFromSightings {
         }
     }
 
-    public static void createPopulationWithEndTimesAtLastSightingsAndStayAtHomePlan(Scenario scenario, LinkToZoneResolver zones, final Map<Id, List<Sighting>> sightings) {
+    public static void createPopulationWithRandomEndTimesInPermittedWindow(Scenario scenario, LinkToZoneResolver zones, final Map<Id, List<Sighting>> sightings) {
         for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.entrySet()) {
             Id personId = sightingsPerPerson.getKey();
             List<Sighting> sightingsForThisPerson = sightingsPerPerson.getValue();
             Person person = scenario.getPopulation().getFactory().createPerson(personId);
-            Plan plan1 = createPlanWithEndTimeAtLastSighting(scenario, zones,
+            Plan plan1 = createPlanWithRandomEndTimesInPermittedWindow(scenario, zones,
                     sightingsForThisPerson);
             person.addPlan(plan1);
             Plan plan2 = scenario.getPopulation().getFactory().createPlan();
             person.addPlan(plan2);
-            person.setSelectedPlan(plan1);
+            person.setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(person));
             scenario.getPopulation().addPerson(person);
         }
     }
 
-    public static void createPopulationWithEndTimesAtLastSightingsAndAdditionalInflationPopulation(Scenario scenario, LinkToZoneResolver zones, final Map<Id, List<Sighting>> sightings) {
-        int count = 10;
+    public static void createClonedPopulationWithRandomEndTimesInPermittedWindow(Scenario scenario, LinkToZoneResolver zones, final Map<Id, List<Sighting>> sightings, int clonefactor) {
+        if (clonefactor < 2)
+            return;
         for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.entrySet()) {
             Id personId = sightingsPerPerson.getKey();
             List<Sighting> sightingsForThisPerson = sightingsPerPerson.getValue();
             Person person = scenario.getPopulation().getFactory().createPerson(personId);
-            Plan plan1 = createPlanWithEndTimeAtLastSighting(scenario, zones,
+            Plan plan1 = createPlanWithRandomEndTimesInPermittedWindow(scenario, zones,
                     sightingsForThisPerson);
             person.addPlan(plan1);
             Plan plan2 = scenario.getPopulation().getFactory().createPlan();
             person.addPlan(plan2);
-
-
+            person.setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(person));
             scenario.getPopulation().addPerson(person);
-        }
-        for (int i=0; i<count-1; i++) {
-            for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.entrySet()) {
-                Id personId = new IdImpl("I"+i+"_" + sightingsPerPerson.getKey().toString());
-                List<Sighting> sightingsForThisPerson = sightingsPerPerson.getValue();
-                Person person = scenario.getPopulation().getFactory().createPerson(personId);
-                Plan plan1 = createPlanWithEndTimeAtLastSighting(scenario, zones,
+            for (int i = 0; i < clonefactor - 1; i++) {
+                Id cloneId = new IdImpl("I" + i + "_" + person.getId().toString());
+                Person clone = scenario.getPopulation().getFactory().createPerson(cloneId);
+                Plan clonePlan = createPlanWithRandomEndTimesInPermittedWindow(scenario, zones,
                         sightingsForThisPerson);
-                person.addPlan(plan1);
-                Plan plan2 = scenario.getPopulation().getFactory().createPlan();
-                person.addPlan(plan2);
-
-                scenario.getPopulation().addPerson(person);
+                clone.addPlan(clonePlan);
+                Plan clonePlan2 = scenario.getPopulation().getFactory().createPlan();
+                clone.addPlan(clonePlan2);
+                clone.setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(clone));
+                scenario.getPopulation().addPerson(clone);
             }
         }
     }
+
 
     public static Plan createPlanWithEndTimeAtLastSighting(Scenario scenario,
                                                            LinkToZoneResolver zones, List<Sighting> sightingsForThisPerson) {
@@ -167,6 +166,43 @@ public class PopulationFromSightings {
                     List<? extends PlanElement> route = tripRouter.calcRoute("unknown", new ActivityWrapperFacility(lastActivity), new ActivityWrapperFacility(activity), sighting.getTime(), null);
                     double travelTime = ((Leg) route.get(0)).getTravelTime();
                     lastActivity.setEndTime(sighting.getTime() - travelTime);
+                } else {
+                    lastActivity.setEndTime(sighting.getTime());
+                }
+            }
+        }
+        return plan;
+    }
+
+    public static Plan createPlanWithRandomEndTimesInPermittedWindow(Scenario scenario,
+                                                                    LinkToZoneResolver zones, List<Sighting> sightingsForThisPerson) {
+        Plan plan = scenario.getPopulation().getFactory().createPlan();
+        boolean first = true;
+        Map<Activity, String> cellsOfSightings;
+        cellsOfSightings = new HashMap<Activity, String>();
+        for (Sighting sighting : sightingsForThisPerson) {
+            String zoneId = sighting.getCellTowerId();
+            Activity activity = createActivityInZone(scenario, zones,
+                    zoneId);
+            cellsOfSightings.put(activity, zoneId);
+            activity.setEndTime(sighting.getTime());
+            if (first) {
+                plan.addActivity(activity);
+                first = false;
+            } else {
+                Activity lastActivity = (Activity) plan.getPlanElements().get(plan.getPlanElements().size()-1);
+                if ( !(zoneId.equals(cellsOfSightings.get(lastActivity))) ) {
+                    Leg leg = scenario.getPopulation().getFactory().createLeg("unknown");
+                    plan.addLeg(leg);
+                    plan.addActivity(activity);
+                    TripRouter tripRouter = new TripRouter();
+                    tripRouter.setRoutingModule("unknown", new NetworkRoutingModule(scenario.getPopulation().getFactory(), (NetworkImpl) scenario.getNetwork(), new FreeSpeedTravelTime()));
+                    List<? extends PlanElement> route = tripRouter.calcRoute("unknown", new ActivityWrapperFacility(lastActivity), new ActivityWrapperFacility(activity), sighting.getTime(), null);
+                    double travelTime = ((Leg) route.get(0)).getTravelTime();
+                    double latestStartTime = sighting.getTime() - travelTime;
+                    double earliestStartTime = lastActivity.getEndTime();
+                    double startTime = earliestStartTime + (Math.random() * (latestStartTime - earliestStartTime));
+                    lastActivity.setEndTime(startTime);
                 } else {
                     lastActivity.setEndTime(sighting.getTime());
                 }

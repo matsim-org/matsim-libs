@@ -68,6 +68,7 @@ import playground.mzilske.cdranalysis.FileIO;
 import playground.mzilske.cdranalysis.IterationResource;
 import playground.mzilske.cdranalysis.Reading;
 import playground.mzilske.cdranalysis.StreamingOutput;
+import playground.mzilske.clones.ClonesModule;
 import playground.mzilske.controller.Controller;
 import playground.mzilske.controller.ControllerModule;
 import playground.mzilske.d4d.Sighting;
@@ -100,17 +101,9 @@ class MultiRateRunResource {
 
     public Collection<String> getRates() {
         final List<String> RATES = new ArrayList<String>();
-        RATES.add("7");
-        RATES.add("7_4");
-        RATES.add("7_5");
-        RATES.add("7_7");
-        RATES.add("actevents");
-        RATES.add("actevents_4");
-        RATES.add("actevents_5");
-        RATES.add("actevents_7");
-//        RATES.add(Integer.toString(4));
-//        RATES.add(Integer.toString(5));
-//        RATES.add("activity");
+        RATES.add("0");
+        RATES.add("5");
+        RATES.add("50");
         return RATES;
     }
 
@@ -183,14 +176,16 @@ class MultiRateRunResource {
         final Map<Id, List<Sighting>> allSightings = compareMain.getSightingsPerPerson();
 
         final Config config = phoneConfig();
-        config.controler().setOutputDirectory(WD + "/rates/two_" + rate);
+        config.controler().setOutputDirectory(WD + "/rates/twotimes_" + rate);
 
         final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
         scenario.setNetwork(baseScenario.getNetwork());
-        PopulationFromSightings.createPopulationWithEndTimesAtLastSightings(scenario, linkToZoneResolver, allSightings);
+//        PopulationFromSightings.createPopulationWithEndTimesAtLastSightings(scenario, linkToZoneResolver, allSightings);
+
+        PopulationFromSightings.createPopulationWithRandomEndTimesInPermittedWindow(scenario, linkToZoneResolver, allSightings);
         PopulationFromSightings.preparePopulation(scenario, linkToZoneResolver, allSightings);
 
-        String rateDir = WD + "/rates/two_" + rate;
+        String rateDir = WD + "/rates/twotimes_" + rate;
         new File(rateDir).mkdirs();
 
         new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(rateDir + "/input_population.xml.gz");
@@ -203,92 +198,118 @@ class MultiRateRunResource {
 
     }
 
+    public void twoRatesRolling(String string) {
+        final int cloneFactor = 10;
+        final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
+        final int rate = Integer.parseInt(string);
+        for (Person person : baseScenario.getPopulation().getPersons().values()) {
+            if (CountWorkers.isWorker(person)) {
+                person.getCustomAttributes().put("phonerate", 50);
+            } else {
+                person.getCustomAttributes().put("phonerate", rate);
+            }
+        }
+        EventsManager events = EventsUtils.createEventsManager();
+        ZoneTracker.LinkToZoneResolver linkToZoneResolver = new ZoneTracker.LinkToZoneResolver() {
+
+            @Override
+            public Id resolveLinkToZone(Id linkId) {
+                return linkId;
+            }
+
+            public IdImpl chooseLinkInZone(String zoneId) {
+                return new IdImpl(zoneId);
+            }
+
+        };
+        final CompareMain compareMain = new CompareMain(baseScenario, events, new CallBehavior() {
+
+            @Override
+            public boolean makeACall(ActivityEndEvent event) {
+                return false;
+            }
+
+            @Override
+            public boolean makeACall(ActivityStartEvent event) {
+                return false;
+            }
+
+            @Override
+            public boolean makeACall(Id id, double time) {
+                Person person = baseScenario.getPopulation().getPersons().get(id);
+                double secondlyProbability = (Integer) person.getCustomAttributes().get("phonerate") / (double) (24*60*60);
+                return Math.random() < secondlyProbability;
+            }
+
+            @Override
+            public boolean makeACallAtMorningAndNight() {
+                return false;
+            }
+
+        }, linkToZoneResolver);
+        new MatsimEventsReader(events).readFile(getBaseRun().getLastIteration().getEventsFileName());
+        compareMain.close();
+
+
+        final Map<Id, List<Sighting>> allSightings = compareMain.getSightingsPerPerson();
+
+
+
+
+        final Config phoneConfig = phoneConfig();
+
+
+        final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(phoneConfig);
+        scenario.setNetwork(baseScenario.getNetwork());
+
+
+
+        PopulationFromSightings.createClonedPopulationWithRandomEndTimesInPermittedWindow(scenario, linkToZoneResolver, allSightings, cloneFactor);
+        PopulationFromSightings.preparePopulation(scenario, linkToZoneResolver, allSightings);
+
+
+        if(cloneFactor == 1) {
+            phoneConfig.controler().setLastIteration(0);
+            phoneConfig.planCalcScore().setWriteExperiencedPlans(true);
+        }
+        phoneConfig.controler().setOutputDirectory(WD + "/rates/rtwo_" + rate + "/" + cloneFactor);
+
+        final Counts allCounts = CompareMain.volumesToCounts(baseScenario.getNetwork(), compareMain.getGroundTruthVolumes());
+        allCounts.setYear(2012);
+        final Counts someCounts = filterCounts(allCounts);
+        someCounts.setYear(2012);
+
+        simulate(cloneFactor, scenario, allCounts, someCounts);
+    }
+
+    private void simulate(final double cloneFactor, final ScenarioImpl scenario, final Counts allCounts, final Counts someCounts) {
+        List<Module> modules = new ArrayList<Module>();
+        modules.add(new ControllerModule());
+        modules.add(new CadytsModule());
+        modules.add(new ClonesModule());
+        modules.add(new AbstractModule() {
+            @Override
+            protected void configure() {
+                bind(Config.class).toInstance(scenario.getConfig());
+                bind(Scenario.class).toInstance(scenario);
+                bind(ScoringFunctionFactory.class).to(CharyparNagelCadytsScoringFunctionFactory.class);
+                bind(Counts.class).annotatedWith(Names.named("allCounts")).toInstance(allCounts);
+                bind(Counts.class).annotatedWith(Names.named("calibrationCounts")).toInstance(someCounts);
+                bind(Double.class).annotatedWith(Names.named("clonefactor")).toInstance(cloneFactor);
+                bind(Boolean.class).annotatedWith(Names.named("alreadyCloned")).toInstance(true);
+            }
+        });
+        Injector injector2 = Guice.createInjector(modules);
+        Controller controler2 = injector2.getInstance(Controller.class);
+        controler2.run();
+    }
+
     public void allRates() {
         for (String rate : getRates()) {
             rate(rate);
         }
     }
 
-    private Config phoneConfigCongested() {
-        Config config = ConfigUtils.createConfig();
-        ActivityParams sightingParam = new ActivityParams("sighting");
-        sightingParam.setScoringThisActivityAtAll(false);
-        config.planCalcScore().addActivityParams(sightingParam);
-        config.planCalcScore().setTraveling_utils_hr(-6);
-        config.planCalcScore().setWriteExperiencedPlans(true);
-        config.controler().setWritePlansInterval(1);
-        config.controler().setLastIteration(20);
-        QSimConfigGroup tmp = config.qsim();
-        tmp.setFlowCapFactor(0.02);
-        tmp.setStorageCapFactor(0.06);
-        tmp.setRemoveStuckVehicles(false);
-        tmp.setStuckTime(10.0);
-        {
-            StrategySettings stratSets = new StrategySettings(new IdImpl(1));
-            stratSets.setModuleName("ccc");
-            stratSets.setProbability(0.7);
-            config.strategy().addStrategySettings(stratSets);
-        }
-        {
-            StrategySettings stratSets = new StrategySettings(new IdImpl(2));
-            stratSets.setModuleName("ReRoute");
-            stratSets.setProbability(0.3);
-            config.strategy().addStrategySettings(stratSets);
-        }
-        config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
-        return config;
-    }
-
-    private static Config phoneConfigUncongested() {
-        Config config = ConfigUtils.createConfig();
-
-        config.controler().setLastIteration(200);
-        ActivityParams sightingParam = new ActivityParams("sighting");
-        sightingParam.setTypicalDuration(30.0 * 60);
-        config.controler().setWritePlansInterval(10);
-        config.planCalcScore().addActivityParams(sightingParam);
-        config.planCalcScore().setTraveling_utils_hr(-6);
-        config.planCalcScore().setPerforming_utils_hr(0);
-        config.planCalcScore().setTravelingOther_utils_hr(-6);
-        config.planCalcScore().setConstantCar(0);
-        config.planCalcScore().setMonetaryDistanceCostRateCar(0);
-//        config.planCalcScore().setWriteExperiencedPlans(true);
-        CadytsConfigGroup cadytsConfig = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
-        cadytsConfig.setPreparatoryIterations(1);
-
-        config.controler().setMobsim("psim");
-
-        QSimConfigGroup tmp = config.qsim();
-        tmp.setFlowCapFactor(100);
-        tmp.setStorageCapFactor(100);
-        tmp.setRemoveStuckVehicles(false);
-//        tmp.setStuckTime(10.0);
-
-
-//        config.controler().setMobsim("JDEQSim");
-//        config.setParam("JDEQSim", "squeezeTime", "10.0");
-//        config.setParam("JDEQSim", "flowCapacityFactor", "100");
-//        config.setParam("JDEQSim", "storageCapacityFactor", "100");
-
-
-
-        {
-            StrategySettings stratSets = new StrategySettings(new IdImpl(1));
-//            stratSets.setModuleName("ccs");
-            stratSets.setModuleName("SelectExpBeta");
-
-            stratSets.setProbability(1.0);
-            config.strategy().addStrategySettings(stratSets);
-        }
-//        {
-//            StrategySettings stratSets = new StrategySettings(new IdImpl(2));
-//            stratSets.setModuleName("SelectRandom");
-//            stratSets.setProbability(0.1);
-//            stratSets.setDisableAfter(100);
-//            config.strategy().addStrategySettings(stratSets);
-//        }
-        return config;
-    }
 
     private void runPhoneOnActivityStartEnd(Scenario baseScenario) {
         EventsManager events = EventsUtils.createEventsManager();
@@ -423,6 +444,11 @@ class MultiRateRunResource {
 
     public void simulateRate(String rate, final int cloneFactor) {
         final Config config = phoneConfig();
+
+        if(cloneFactor == 1) {
+            config.controler().setLastIteration(0);
+            config.planCalcScore().setWriteExperiencedPlans(true);
+        }
         config.controler().setOutputDirectory(WD + "/rates/" + rate + "/" + cloneFactor);
 
         Scenario baseScenario = getBaseRun().getConfigAndNetwork();
@@ -434,14 +460,11 @@ class MultiRateRunResource {
         final Counts someCounts = new Counts();
         new CountsReaderMatsimV1(someCounts).parse(WD + "/rates/" + rate + "/calibration_counts.xml.gz");
 
-        // CloneFactor == 1 will leave everything as is, without stay-at-home-plans.
-        CloneHistogram.clonePopulation(scenario, cloneFactor);
-
-
 
         List<Module> modules = new ArrayList<Module>();
         modules.add(new ControllerModule());
         modules.add(new CadytsModule());
+        modules.add(new ClonesModule());
         modules.add(new AbstractModule() {
             @Override
             protected void configure() {
@@ -452,14 +475,11 @@ class MultiRateRunResource {
                 bind(Counts.class).annotatedWith(Names.named("calibrationCounts")).toInstance(someCounts);
                 bind(Double.class).annotatedWith(Names.named("clonefactor")).toInstance((double) cloneFactor);
                 Multibinder<ControlerListener> controlerListenerBinder = Multibinder.newSetBinder(binder(), ControlerListener.class);
-                controlerListenerBinder.addBinding().toProvider(MyControlerListenerProvider.class);
+//                controlerListenerBinder.addBinding().toProvider(MyControlerListenerProvider.class);
                 MapBinder<String, MobsimFactory> mobsimFactoryMapBinder = MapBinder.newMapBinder(binder(), String.class, MobsimFactory.class);
-                mobsimFactoryMapBinder.addBinding("psim").to(PSimFactory.class);
             }
         });
-//        if (cloneFactor == 0) {
-//            modules.add(new MetaPopulationModule());
-//        }
+
         Injector injector2 = Guice.createInjector(modules);
         Controller controler2 = injector2.getInstance(Controller.class);
         controler2.run();
@@ -525,12 +545,56 @@ class MultiRateRunResource {
     }
 
     private Config phoneConfig() {
-        if (regime.equals("congested")) {
-            return phoneConfigCongested();
-        } else if (regime.equals("uncongested")) {
-            return phoneConfigUncongested();
+        Config config = ConfigUtils.createConfig();
+
+        config.controler().setLastIteration(100);
+        ActivityParams sightingParam = new ActivityParams("sighting");
+        sightingParam.setTypicalDuration(30.0 * 60);
+        config.controler().setWritePlansInterval(10);
+        config.planCalcScore().addActivityParams(sightingParam);
+        config.planCalcScore().setTraveling_utils_hr(-6);
+        config.planCalcScore().setPerforming_utils_hr(0);
+        config.planCalcScore().setTravelingOther_utils_hr(-6);
+        config.planCalcScore().setConstantCar(0);
+        config.planCalcScore().setMonetaryDistanceCostRateCar(0);
+        config.planCalcScore().setWriteExperiencedPlans(true);
+        CadytsConfigGroup cadytsConfig = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
+        cadytsConfig.setVarianceScale(0.001);
+        cadytsConfig.setMinFlowStddev_vehPerHour(2.0);
+
+
+        cadytsConfig.setPreparatoryIterations(1);
+
+        QSimConfigGroup tmp = config.qsim();
+        tmp.setFlowCapFactor(100);
+        tmp.setStorageCapFactor(100);
+        tmp.setRemoveStuckVehicles(false);
+//        tmp.setStuckTime(10.0);
+
+
+//        config.controler().setMobsim("JDEQSim");
+//        config.setParam("JDEQSim", "squeezeTime", "10.0");
+//        config.setParam("JDEQSim", "flowCapacityFactor", "100");
+//        config.setParam("JDEQSim", "storageCapacityFactor", "100");
+
+
+        {
+            StrategySettings stratSets = new StrategySettings(new IdImpl(1));
+//            stratSets.setModuleName("ccs");
+            stratSets.setModuleName("SelectExpBeta");
+
+            stratSets.setProbability(1.0);
+            config.strategy().addStrategySettings(stratSets);
         }
-        throw new RuntimeException("Unknown regime");
+        {
+            StrategySettings stratSets = new StrategySettings(new IdImpl(2));
+            stratSets.setModuleName("SelectRandom");
+            stratSets.setProbability(0.1);
+            stratSets.setDisableAfter(30);
+            config.strategy().addStrategySettings(stratSets);
+        }
+        return config;
+
     }
 
     public void errors() {
@@ -565,37 +629,8 @@ class MultiRateRunResource {
     }
 
     private Collection<String> getCloneFactors(String rate) {
-        Collection<String> cloneFactors;
-        if (rate.equals("actevents_4")) {
-            cloneFactors = Arrays.asList("4");
-        } else if (rate.equals("actevents_5")) {
-            cloneFactors = Arrays.asList("4");
-        }  else if (rate.equals("actevents_7")) {
-            cloneFactors = Arrays.asList("4");
-        } else if (rate.equals("actevents")) {
-            cloneFactors = Arrays.asList("2", "4");
-        } else if (rate.equals("7")) {
-            cloneFactors = Arrays.asList("5", "10");
-        } else if (rate.equals("7_4")) {
-            cloneFactors = Arrays.asList("5", "10");
-        } else if (rate.equals("7_5")) {
-            cloneFactors = Arrays.asList("5");
-        } else if (rate.equals("7_7")) {
-            cloneFactors = Arrays.asList("5");
-        } else throw new RuntimeException();
-        return cloneFactors;
+        return Arrays.asList("10");
     }
-//
-//    private double meanRelativeError(VolumesAnalyzer baseVolumes, VolumesAnalyzer volumes) {
-//        double result = 0.0;
-//        for (Id id : baseVolumes.getLinkIds()) {
-//            int[] us = baseVolumes.getVolumesForLink(id);
-//            int[] vs = volumes.getVolumesForLink(id);
-//            for (int i = 0; i < us.length; i++) {
-//
-//            }
-//        }
-//    }
 
     private double meanAbsoluteError(VolumesAnalyzer baseVolumes, VolumesAnalyzer volumes) {
         double result = 0.0;
@@ -640,8 +675,8 @@ class MultiRateRunResource {
                     for (String cloneFactor : cloneFactors) {
                         Scenario scenario = getRateRun(rate, cloneFactor).getOutputScenario();
                         double km = sum(PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), baseScenario.getNetwork()).values());
-                        pw.printf("%s\t%s\t%s\t%f\t%f\n",
-                                regime, rate, cloneFactor, km, km / baseKm);
+                        pw.printf("%s\t%s\t%f\t%f\n",
+                                regime, rate, km, km / baseKm);
                         pw.flush();
                     }
                 }
@@ -649,31 +684,57 @@ class MultiRateRunResource {
         });
     }
 
-    public RunResource getRateRun(String rate, String variant) {
-        return new RunResource(WD + "/rates/" + rate + "/" + variant, null);
-    }
-
-    public void personKilometers() {
-        final String filename = WD + "/person-kilometers.txt";
+    public void persodisthisto() {
+        final String filename = WD + "/perso-dist-histo.txt";
         final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
         FileIO.writeToFile(filename, new StreamingOutput() {
             @Override
             public void write(PrintWriter pw) throws IOException {
-                final Map<Id, Double> distancePerPersonBase = PowerPlans.travelledDistancePerPerson(baseScenario.getPopulation(), baseScenario.getNetwork());
-                pw.printf("regime\trate\tperson\tkilometers-base\tkilometers\n");
+                pw.printf("person\trate\tCase\tstatus\tkilometers\n");
                 for (String rate : getRates()) {
-                    Scenario scenario = getRateRun(rate, "5").getLastIteration().getExperiencedPlansAndNetwork();
-                    final Map<Id, Double> distancePerPerson = PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), scenario.getNetwork());
-                    for (Person person : baseScenario.getPopulation().getPersons().values()) {
-                        pw.printf("%s\t%s\t%s\t%f\t%f\n",
-                                regime, rate, person.getId().toString(),
-                                zeroForNull(distancePerPersonBase.get(person.getId())),
-                                zeroForNull(distancePerPerson.get(person.getId())));
+                    final Map<Id, Double> baseKm = PowerPlans.travelledDistancePerPerson(baseScenario.getPopulation(), baseScenario.getNetwork());
+                    dumpnonzero(pw, rate, "base", baseKm, baseScenario);
+                    {
+                        Scenario scenario = getRateRun(rate, "10").getOutputScenario();
+                        Map<Id, Double> km = PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), baseScenario.getNetwork());
+                        dumpnonzero(pw, rate, "calibrated-CDR", km, baseScenario);
                     }
-                    pw.flush();
+                    {
+                        ArrayList<Person> it0 = new ArrayList<Person>(getRateRun(rate, "10").getIteration(0).getPlans().getPersons().values());
+                        for (Iterator<Person> i = it0.iterator(); i.hasNext(); ) {
+                            Person person = i.next();
+                            if (person.getId().toString().startsWith("I")) {
+                                i.remove();
+                            } else {
+                                person.setSelectedPlan(person.getPlans().get(0));
+                            }
+                        }
+                        Map<Id, Double> km = PowerPlans.travelledDistancePerPerson(baseScenario.getNetwork(), it0);
+                        dumpnonzero(pw, rate, "raw-CDR", km, baseScenario);
+                    }
                 }
             }
         });
+    }
+
+    private void dumpnonzero(PrintWriter pw, String rate, String ccase, Map<Id, Double> baseKm, Scenario baseScenario) {
+        for (Map.Entry<Id, Double> entry : baseKm.entrySet()) {
+            Double km = entry.getValue();
+            if (km != 0.0) {
+                String id = entry.getKey().toString();
+                String originalId;
+                if (id.startsWith("I"))
+                    originalId = id.substring(id.indexOf("_")+1);
+                else
+                    originalId = id;
+                pw.printf("%s\t%s\t%s\t%s\t%f\n", entry.getKey().toString(), rate, ccase, CountWorkers.isWorker(baseScenario.getPopulation().getPersons().get(new IdImpl(originalId))) ? "workers" : "non-workers", km);
+                pw.printf("%s\t%s\t%s\t%s\t%f\n", entry.getKey().toString(), rate, ccase, "all", km);
+            }
+        }
+    }
+
+    public RunResource getRateRun(String rate, String variant) {
+        return new RunResource(WD + "/rates/" + rate + "/" + variant, null);
     }
 
 

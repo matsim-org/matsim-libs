@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * MetaPopulations.java
+ *  * MetaPopulationPlan.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,11 +20,35 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.stratum;
+package playground.mzilske.metapopulation;
 
-import com.google.inject.ImplementedBy;
+import org.matsim.api.core.v01.population.BasicPlan;
 
-@ImplementedBy(RealMetaPopulations.class)
-interface MetaPopulations {
-    Iterable<? extends MetaPopulation> getMetaPopulations();
+class MetaPopulationPlan implements BasicPlan {
+
+    private double scaleFactor;
+    private Double score;
+
+    public MetaPopulationPlan(double scaleFactor) {
+        this.scaleFactor = scaleFactor;
+    }
+
+    @Override
+    public void setScore(Double score) {
+        this.score = score;
+    }
+
+    @Override
+    public Double getScore() {
+        return this.score;
+    }
+
+    public double getScaleFactor() {
+        return scaleFactor;
+    }
+
+    public void setScaleFactor(double scaleFactor) {
+        this.scaleFactor = scaleFactor;
+    }
+
 }

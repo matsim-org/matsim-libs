@@ -6,16 +6,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.*;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.UncheckedIOException;
 import playground.mzilske.util.PowerList;
@@ -23,10 +19,7 @@ import playground.mzilske.util.PowerList;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PowerPlans {
 
@@ -187,13 +180,18 @@ public class PowerPlans {
 
 	public static Map<Id, Double> travelledDistancePerPerson(Population population,
 			Network network) {
-		Map<Id, Double> result = new HashMap<Id, Double>();
-		for (Person person : population.getPersons().values()) {	
+        Collection<? extends Person> values = population.getPersons().values();
+        return travelledDistancePerPerson(network, values);
+	}
+
+    public static Map<Id, Double> travelledDistancePerPerson(Network network, Collection<? extends Person> values) {
+        Map<Id, Double> result = new HashMap<Id, Double>();
+        for (Person person : values) {
 			Plan plan = person.getSelectedPlan();
 			double personKm = distance(network, plan);
 			result.put(person.getId(), personKm);
 		}
-		return result;
-	}
+        return result;
+    }
 
 }

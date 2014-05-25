@@ -49,7 +49,14 @@ class MyCallBehavior implements CallBehavior {
 
     @Override
     public boolean makeACall(ActivityStartEvent event) {
-        return false;
+        Plan plan = scenario.getPopulation().getPersons().get(event.getPersonId()).getSelectedPlan();
+        if (event.getActType().equals("home") || plan.getCustomAttributes().get("prop").equals(0)) {
+            return true;
+        } else if (plan.getCustomAttributes().get("prop").equals(2)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override

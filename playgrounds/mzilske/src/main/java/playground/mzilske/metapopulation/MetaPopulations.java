@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * MetaPopulationScoringControlerListener.java
+ *  * MetaPopulations.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,29 +20,11 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.stratum;
+package playground.mzilske.metapopulation;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.listener.ScoringListener;
+import com.google.inject.ImplementedBy;
 
-import javax.inject.Inject;
-
-class MetaPopulationScoringControlerListener implements ScoringListener {
-
-    @Inject
-    MetaPopulations metaPopulations;
-
-    @Override
-    public void notifyScoring(ScoringEvent event) {
-        for (MetaPopulation metaPopulation : metaPopulations.getMetaPopulations()) {
-            double score = 0.0;
-            for (Person person : metaPopulation.getPersons()) {
-                score += person.getSelectedPlan().getScore();
-            }
-            MetaPopulationPlan plan = metaPopulation.getSelectedPlan();
-            plan.setScore(score / metaPopulation.getPersons().size());
-        }
-    }
-
+@ImplementedBy(RealMetaPopulations.class)
+interface MetaPopulations {
+    Iterable<? extends MetaPopulation> getMetaPopulations();
 }

@@ -9,8 +9,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.counts.Count;
@@ -109,7 +107,7 @@ class OneWorkplaceOneStratumUnderestimated implements Provider<Scenario> {
 
     private Activity createWork(IdImpl idImpl) {
         Activity act = scenario.getPopulation().getFactory().createActivityFromLinkId("work", idImpl);
-        act.setEndTime(13 * 60 * 60);
+        act.setEndTime(17 * 60 * 60);
         return act;
     }
 

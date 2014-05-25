@@ -26,7 +26,6 @@ import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import com.google.inject.name.Named;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
@@ -34,8 +33,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.mzilske.cadyts.CadytsScoring;
 
 import javax.inject.Inject;
@@ -54,9 +51,6 @@ class CharyparNagelCadytsScoringFunctionFactory implements ScoringFunctionFactor
     @Inject
     PlansTranslator<Link> ptStep;
 
-    @Inject
-    Network network;
-
     @Inject @Named("clonefactor")
     double clonefactor;
 
@@ -64,42 +58,9 @@ class CharyparNagelCadytsScoringFunctionFactory implements ScoringFunctionFactor
     @Override
     public ScoringFunction createNewScoringFunction(final Person person) {
 
-        final double maxabs = Math.log(10.0 * clonefactor);
-        CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());
         SumScoringFunction sumScoringFunction = new SumScoringFunction();
-//        sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
-//        sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, network));
-//        sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
         CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, ptStep, cadyts);
-//        scoringFunction.setWeight(10.0);
-
         sumScoringFunction.addScoringFunction(scoringFunction);
-        sumScoringFunction.addScoringFunction(new SumScoringFunction.LegScoring() {
-            boolean hasLeg = false;
-            @Override
-            public void finish() {}
-            @Override
-            public double getScore() {
-                if (hasLeg) {
-                    final ObjectAttributes personAttributes = scenario.getPopulation().getPersonAttributes();
-                    Double signal = (Double) personAttributes.getAttribute(person.getId().toString(), "PID");
-                    if (signal == null) signal = 0.0;
-                    cadyts.demand.Plan<Link> currentPlanSteps = ptStep.getPlanSteps(person.getSelectedPlan());
-                    double currentPlanCadytsCorrection = cadyts.calcLinearPlanEffect(currentPlanSteps);
-                    signal = signal + currentPlanCadytsCorrection;
-                    if (signal < -maxabs) signal = - maxabs;
-                    if (signal > maxabs) signal = maxabs;
-                    personAttributes.putAttribute(person.getId().toString(), "PID", signal);
-                    return signal;
-                } else {
-                    return 0.0;
-                }
-            }
-            @Override
-            public void handleLeg(Leg leg) {
-                hasLeg=true;
-            }
-        });
 
         // prior
         sumScoringFunction.addScoringFunction(new SumScoringFunction.LegScoring() {

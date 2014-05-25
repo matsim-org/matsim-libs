@@ -34,11 +34,9 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.mzilske.cdr.CompareMain;
 import playground.mzilske.cdr.PopulationFromSightings;
 import playground.mzilske.cdr.ZoneTracker;
-import playground.mzilske.populationsize.CloneHistogram;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -58,25 +56,15 @@ class ScenarioReconstructor implements Provider<Scenario> {
     @Inject
     ZoneTracker.LinkToZoneResolver linkToZoneResolver;
 
-    @Inject @com.google.inject.name.Named("clonefactor")
-    double clonefactor;
+
 
     public Scenario get() {
-
-
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
         scenario.setNetwork(network);
 
-        PopulationFromSightings.createPopulationWithEndTimesAtLastSightings(scenario, linkToZoneResolver, compareMain.getSightingsPerPerson());
+        PopulationFromSightings.createPopulationWithRandomEndTimesInPermittedWindow(scenario, linkToZoneResolver, compareMain.getSightingsPerPerson());
         PopulationFromSightings.preparePopulation(scenario, linkToZoneResolver, compareMain.getSightingsPerPerson());
 
-        CloneHistogram.clonePopulation(scenario, (int) clonefactor);
-
-        final ObjectAttributes personAttributes = scenario.getPopulation().getPersonAttributes();
-
-        for (Person person : scenario.getPopulation().getPersons().values()) {
-            personAttributes.putAttribute(person.getId().toString(), "PID", 0.0);
-        }
         for (Person person : scenario.getPopulation().getPersons().values()) {
             person.setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(person));
         }
@@ -84,18 +72,34 @@ class ScenarioReconstructor implements Provider<Scenario> {
     }
 
     static class ConfigProvider implements Provider<Config> {
+
+        @Inject @Named("outputDirectory")
+        String outputDirectory;
+
         public Config get() {
             final Config config = ConfigUtils.createConfig();
-            ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
-            config.controler().setLastIteration(150);
+            CadytsConfigGroup cadyts = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
+            cadyts.setVarianceScale(0.00000000001);
+            cadyts.setMinFlowStddev_vehPerHour(10.0);
+
+            config.controler().setOutputDirectory(outputDirectory);
+            config.controler().setLastIteration(50);
             config.qsim().setFlowCapFactor(100);
             config.qsim().setStorageCapFactor(100);
             config.qsim().setRemoveStuckVehicles(false);
-
-            StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(new IdImpl(1));
-            stratSets.setModuleName("SelectExpBeta") ;
-            stratSets.setProbability(1.) ;
-            config.strategy().addStrategySettings(stratSets) ;
+            {
+                StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(new IdImpl(1));
+                stratSets.setModuleName("SelectExpBeta");
+                stratSets.setProbability(0.9);
+                config.strategy().addStrategySettings(stratSets);
+            }
+            {
+                StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(new IdImpl(2));
+                stratSets.setModuleName("SelectRandom");
+                stratSets.setProbability(0.1);
+                stratSets.setDisableAfter(10);
+                config.strategy().addStrategySettings(stratSets);
+            }
             return config;
         }
     }

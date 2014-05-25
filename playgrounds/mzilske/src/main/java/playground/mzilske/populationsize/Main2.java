@@ -22,35 +22,42 @@
 
 package playground.mzilske.populationsize;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Population;
-
 public class Main2 {
 
 	public static void main(String[] args) {
-		final ExperimentResource experiment = new ExperimentResource("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/");
+		final ExperimentResource experiment = new ExperimentResource("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/berlin/");
 		final RegimeResource uncongested = experiment.getRegime("uncongested");
 
-        Scenario baseScenario = uncongested.getBaseRun().getOutputScenario();
-        Population basePopulation = baseScenario.getPopulation();
+        uncongested.getMultiRateRun("cadyts").persodisthisto();
+//        Scenario baseScenario = uncongested.getBaseRun().getOutputScenario();
+//        Population basePopulation = baseScenario.getPopulation();
 
 //        Map<Id, Double> travelledDistancePerPerson = PowerPlans.travelledDistancePerPerson(basePopulation, baseScenario.getNetwork());
-//        CloneHistogram.cloneHistogram(basePopulation, travelledDistancePerPerson, uncongested.getMultiRateRun("cadyts").getRateRun("two_0", "5"));
-//        CloneHistogram.cloneHistogram(basePopulation, travelledDistancePerPerson, uncongested.getMultiRateRun("cadyts").getRateRun("two_5_3", "5"));
-//        CloneHistogram.cloneHistogram(basePopulation, travelledDistancePerPerson, uncongested.getMultiRateRun("cadyts").getRateRun("two_10", "5"));
+//        CloneHistogram.cloneHistogram(basePopulation, travelledDistancePerPerson, uncongested.getMultiRateRun("cadyts").getRateRun("twotimes_0", "10"));
+//        CloneHistogram.cloneHistogram(basePopulation, travelledDistancePerPerson, uncongested.getMultiRateRun("cadyts").getRateRun("two_5", "10"));
+//        CloneHistogram.cloneHistogram(basePopulation, travelledDistancePerPerson, uncongested.getMultiRateRun("cadyts").getRateRun("two_10", "10"));
+
 //        CloneHistogram.cloneHistogram(basePopulation, travelledDistancePerPerson, uncongested.getMultiRateRun("cadyts").getRateRun("two_20", "5"));
 //        CloneHistogram.cloneHistogram(basePopulation, travelledDistancePerPerson, uncongested.getMultiRateRun("cadyts").getRateRun("two_50", "5"));
 
 
 //        uncongested.getMultiRateRun("cadyts").twoRates("5");
 
+//        uncongested.getMultiRateRun("cadyts").twoRates("50");
+
 //        uncongested.getMultiRateRun("cadyts").twoRates("0");
+
+
 //        uncongested.getMultiRateRun("cadyts").simulateRate("two_5_6", 5);
-//        uncongested.getMultiRateRun("cadyts").twoRates("10");
+//        uncongested.getMultiRateRun("cadyts").twoRates("5");
 
 //        uncongested.getMultiRateRun("cadyts").simulateRate("two_0", 5);
 
-//        uncongested.getMultiRateRun("cadyts").simulateRate("two_5", 5);
+//        uncongested.getMultiRateRun("cadyts").simulateRate("twotimes_5", 1);
+
+//        uncongested.getMultiRateRun("cadyts").simulateRate("twotimes_50", 1);
+
+//        uncongested.getMultiRateRun("cadyts").simulateRate("twotimes_0", 1);
 //        uncongested.getMultiRateRun("cadyts").simulateRate("two_10", 5);
 //        uncongested.getMultiRateRun("cadyts").twoRates("20");
 //        uncongested.getMultiRateRun("cadyts").simulateRate("two_20", 5);
@@ -62,7 +69,10 @@ public class Main2 {
 //        uncongested.getMultiRateRun("cadyts").simulateRate("two_5", 10);
 //        uncongested.getMultiRateRun("cadyts").simulateRate("two_10", 10);
 //        uncongested.getMultiRateRun("cadyts").simulateRate("two_20", 10);
-        uncongested.getMultiRateRun("cadyts").simulateRate("two_50", 10);
+
+//        uncongested.getMultiRateRun("cadyts").twoRatesRolling("50");
+
+//        uncongested.getMultiRateRun("cadyts").simulateRate("twotwotwo_50", 1);
 
 
 
