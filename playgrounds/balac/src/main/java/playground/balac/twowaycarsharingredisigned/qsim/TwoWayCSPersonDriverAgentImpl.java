@@ -319,7 +319,7 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 				
 		startLink = station.getLink();
 		twVehId = station.getIDs().get(0);
-		twvehiclesLocation.removeVehicle(station.getLink(), station.getIDs().get(0));
+		twvehiclesLocation.removeVehicle(station, station.getIDs().get(0));
 		
 		map.put(scenario.getNetwork().getLinks().get(leg.getRoute().getStartLinkId()), startLink);
 		

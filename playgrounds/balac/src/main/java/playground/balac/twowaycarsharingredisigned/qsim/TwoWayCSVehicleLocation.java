@@ -125,32 +125,25 @@ public class TwoWayCSVehicleLocation {
 		
 	}
 	
-	public void removeVehicle(Link link, String id) {
+	public void removeVehicle(TwoWayCSStation station, String id) {
 		
-		TwoWayCSStation f = vehicleLocationQuadTree.get(link.getCoord().getX(), link.getCoord().getY());
 		
-		if ( f.getLink().getId().toString().equals(link.getId().toString())) {
-			ArrayList<String> vehIDs = f.getIDs();
+			ArrayList<String> vehIDs = station.getIDs();
 			ArrayList<String> newvehIDs = new ArrayList<String>();
 			for (String s : vehIDs) {
 				newvehIDs.add(s);
 			}
 			
-			newvehIDs.remove(id);
-			TwoWayCSStation fNew = new TwoWayCSStation(link, f.getNumberOfVehicles() - 1, newvehIDs);	
+			if (!newvehIDs.remove(id))
+				throw new NullPointerException("Removing the vehicle did not wok");
+
+			TwoWayCSStation fNew = new TwoWayCSStation(station.getLink(), station.getNumberOfVehicles() - 1, newvehIDs);	
 			
 						
-			vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), f);
-			vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), fNew);
+			if (!vehicleLocationQuadTree.remove(station.getLink().getCoord().getX(), station.getLink().getCoord().getY(), station)) 
+				throw new NullPointerException("Removing the station did not wok");
+			vehicleLocationQuadTree.put(station.getLink().getCoord().getX(), station.getLink().getCoord().getY(), fNew);
 			
-			
-		}
-		else {
-			
-			Log.error("trying to take a car from the station with no cars, this should never happen");
-			
-		}
-		
 		
 	}
 	

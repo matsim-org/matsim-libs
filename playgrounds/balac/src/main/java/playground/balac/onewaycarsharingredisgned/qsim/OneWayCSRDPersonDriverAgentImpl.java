@@ -298,7 +298,7 @@ OneWayCarsharingRDStation station = findClosestAvailableOWCar(route.getStartLink
 		if (station.getIDs().size() == 0)
 			System.out.println();
 		owVehId = station.getIDs().get(0);
-		owvehiclesLocation.removeVehicle(station.getLink(), owVehId);
+		owvehiclesLocation.removeVehicle(station, owVehId);
 		
 		startLink = station.getLink();
 		LegImpl walkLeg = new LegImpl("walk_ow_sb");

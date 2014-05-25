@@ -126,31 +126,24 @@ public class OneWayCarsharingRDVehicleLocation {
 		
 	}
 	
-	public void removeVehicle(Link link, String id) {
+	public void removeVehicle(OneWayCarsharingRDStation station, String id) {
 		
-		OneWayCarsharingRDStation f = vehicleLocationQuadTree.get(link.getCoord().getX(), link.getCoord().getY());
 		
-		if ( f.getLink().getId().toString().equals(link.getId().toString())) {
-			vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), f);
-			ArrayList<String> vehIDs = f.getIDs();
+			ArrayList<String> vehIDs = station.getIDs();
 			ArrayList<String> newvehIDs = new ArrayList<String>();
 			for (String s : vehIDs) {
 				newvehIDs.add(s);
 			}
 			newvehIDs.remove(id);
-			OneWayCarsharingRDStation fNew = new OneWayCarsharingRDStation(link, f.getNumberOfVehicles() - 1,newvehIDs);	
+			OneWayCarsharingRDStation fNew = new OneWayCarsharingRDStation(station.getLink(), station.getNumberOfVehicles() - 1,newvehIDs);	
 			
-						
+			if (!vehicleLocationQuadTree.remove(station.getLink().getCoord().getX(), station.getLink().getCoord().getY(), station)) 
+				throw new NullPointerException("Removing the station did not wok");		
 			
-			vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), fNew);
+			vehicleLocationQuadTree.put(station.getLink().getCoord().getX(), station.getLink().getCoord().getY(), fNew);
 			
 			
-		}
-		else {
-			
-			Log.error("trying to take a car from the station with no cars, this should never happen");
-			
-		}
+		
 		
 		
 	}

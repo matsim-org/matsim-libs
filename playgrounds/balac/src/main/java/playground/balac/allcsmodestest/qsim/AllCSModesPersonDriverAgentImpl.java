@@ -188,17 +188,17 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		if (currentLeg.getMode().equals("twowaycarsharing") && plan.getPlanElements().get(currentPlanElementIndex + 1) instanceof Leg) {
 			
 			twvehiclesLocation.addVehicle(scenario.getNetwork().getLinks().get(this.cachedDestinationLinkId), twVehId);
-			
+			twVehId = null;
 		}
 		else if (this.currentLeg.getMode().equals("freefloating")) {
 			
 			ffvehiclesLocation.addVehicle(scenario.getNetwork().getLinks().get(this.cachedDestinationLinkId), ffVehId);
-			
+			ffVehId = null;
 		}
 		else if (this.currentLeg.getMode().equals("onewaycarsharing")) {
 			
 			owvehiclesLocation.addVehicle(scenario.getNetwork().getLinks().get(this.cachedDestinationLinkId), owVehId);
-			
+			owVehId = null;
 		}
 		
 	}
@@ -469,6 +469,7 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		
 		this.state = MobsimAgent.State.LEG;
 		Route route = leg.getRoute();
+				
 		TwoWayCSStation station = findClosestAvailableTWCar(route.getStartLinkId());
 		
 		if (station == null) {
@@ -479,7 +480,7 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 				
 		startLinkTW = station.getLink();
 		twVehId = station.getIDs().get(0);
-		twvehiclesLocation.removeVehicle(station.getLink(), station.getIDs().get(0));
+		twvehiclesLocation.removeVehicle(station, station.getIDs().get(0));
 		
 		mapTW.put(scenario.getNetwork().getLinks().get(leg.getRoute().getStartLinkId()), startLinkTW);
 		initializeCSWalkLeg("walk_rb", now, scenario.getNetwork().getLinks().get(route.getStartLinkId()), startLinkTW);
@@ -623,7 +624,7 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		if (station.getIDs().size() == 0)
 			System.out.println();
 		owVehId = station.getIDs().get(0);
-		owvehiclesLocation.removeVehicle(station.getLink(), owVehId);
+		owvehiclesLocation.removeVehicle(station, owVehId);
 		startLinkOW = station.getLink();
 		
 		initializeCSWalkLeg("walk_ow_sb", now, scenario.getNetwork().getLinks().get(route.getStartLinkId()), startLinkOW);
