@@ -103,6 +103,20 @@ public class Matsim2030Utils {
 	public static Scenario loadScenario( final Config config ) {
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		enrichScenario( scenario );
+
+		final ScenarioMergingConfigGroup mergingGroup = (ScenarioMergingConfigGroup)
+			config.getModule( ScenarioMergingConfigGroup.GROUP_NAME );
+
+		// now that coordinates are allocated, we can "dilute" the scenario.
+		// Note that if no routes are defined in the population(s), straight lines will be used,
+		// which may lead to significantly different results in Zurich due to the lake...
+		// Particularly for the freight population
+		// TODO: check that it is no problem (or route the populations)
+		if ( mergingGroup.getPerformDilution() ) {
+			log.info( "performing \"dilution\"" );
+			diluteScenario( scenario , mergingGroup.getDilutionCenter() , mergingGroup.getDilutionRadiusM() );
+		}
+
 		return scenario;
 	}
 
@@ -152,15 +166,6 @@ public class Matsim2030Utils {
 			new MatsimNetworkReader( scenario ).readFile( mergingGroup.getPtSubnetworkFile() );
 		}
 
-		// now that coordinates are allocated, we can "dilute" the scenario.
-		// Note that if no routes are defined in the population(s), straight lines will be used,
-		// which may lead to significantly different results in Zurich due to the lake...
-		// Particularly for the freight population
-		// TODO: check that it is no problem (or route the populations)
-		if ( mergingGroup.getPerformDilution() ) {
-			log.info( "performing \"dilution\"" );
-			diluteScenario( scenario , mergingGroup.getDilutionCenter() , mergingGroup.getDilutionRadiusM() );
-		}
 	}
 
 	private static void diluteScenario(
