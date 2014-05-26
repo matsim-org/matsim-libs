@@ -40,6 +40,7 @@ import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
@@ -158,6 +159,11 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 		if ( logger.isTraceEnabled() ) {
 			logger.trace( "handling activity "+act+" from "+Time.writeTime( arrivalTime )+" to "+Time.writeTime( departureTime ) ); 
 		}
+
+		final ActivityUtilityParameters utilityParams = params.utilParams.get( act.getType() );
+		// null params are allowed if there are Desires.
+		if ( utilityParams != null && !utilityParams.isScoreAtAll() ) return;
+
 		double fromArrivalToDeparture = departureTime - arrivalTime;
 
 		// technical penalty: negative activity durations are penalized heavily
@@ -273,8 +279,8 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 
 			// disutility if duration of that activity was too short
 			final double minimalDuration =  
-				params.utilParams.containsKey( act.getType() ) ?
-					params.utilParams.get( act.getType() ).getMinimalDuration() :
+				utilityParams != null ?
+					utilityParams.getMinimalDuration() :
 					MINIMUM_DURATION;
 			if (timeSpentPerforming < minimalDuration) {
 				this.accumulatedTooShortDuration += (minimalDuration - timeSpentPerforming);
