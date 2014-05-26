@@ -69,6 +69,17 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 			scenario);
 	}
 
+	public KtiScoringFunctionFactoryWithJointModes(
+			final ScoringFunctionFactory delegate,
+			final PlanCalcScoreConfigGroup config,
+			final ScoringFunctionConfigGroup group,
+			final Scenario scenario) {
+		this.scenario = scenario;
+		this.params = new CharyparNagelScoringParameters(config);
+		this.group = group;
+		this.delegate = delegate;
+	}
+
 	@Override
 	public ScoringFunction createNewScoringFunction(final Person person) {
 		final SumScoringFunction scoringFunctionAccumulator =
