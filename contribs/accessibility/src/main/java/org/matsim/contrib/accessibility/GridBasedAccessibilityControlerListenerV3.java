@@ -1,5 +1,6 @@
 package org.matsim.contrib.accessibility;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -129,6 +130,12 @@ implements ShutdownListener, StartupListener {
 	private UrbansimCellBasedAccessibilityCSVWriterV2 urbansimAccessibilityWriter;
 	private Network network;
 	private Config config;
+	
+	//new ... testing
+	private String subdirectory;
+	// end new
+	
+	
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructors
@@ -180,7 +187,19 @@ implements ShutdownListener, StartupListener {
 
 		// writing accessibility measures continuously into a csv file, which is not 
 		// dedicated for as input for UrbanSim, but for analysis purposes
-		urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(config.controler().getOutputDirectory());
+		
+		// new ... testing
+		if (subdirectory == null) {
+			// end new
+			urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(config.controler().getOutputDirectory());
+		// new ... testing
+		} else {
+			File file = new File(config.controler().getOutputDirectory() + "/" + subdirectory);
+			file.mkdir();
+			urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(
+					config.controler().getOutputDirectory() + "/" + subdirectory);
+		}
+		// end new
 
 	}
 
@@ -262,11 +281,21 @@ implements ShutdownListener, StartupListener {
 					+ this.benchmark.getDurationInSeconds(benchmarkID)
 					/ 60. + " minutes).");
 		}
-
+		
+		
 		String matsimOutputDirectory = event.getControler().getScenario().getConfig().controler().getOutputDirectory();
+			
 
-		urbansimAccessibilityWriter.close(); 
-		writePlottingData(matsimOutputDirectory);			
+		urbansimAccessibilityWriter.close();
+		// new ... testing
+		if (subdirectory == null) {
+			// end new
+			writePlottingData(matsimOutputDirectory);
+			// new testing....
+		} else {
+			writePlottingData(matsimOutputDirectory + "/" + subdirectory);
+		}
+		// end new
 
 		if(this.spatialGridDataExchangeListenerList != null){
 			log.info("Triggering " + this.spatialGridDataExchangeListenerList.size() + " SpatialGridDataExchangeListener(s) ...");
@@ -465,5 +494,11 @@ implements ShutdownListener, StartupListener {
 
 		this.additionalFacilityData.add( facilities ) ;
 	}
+
+	// new .... testing
+	public void writeResultsToSubdirectory(String subdirectory) {
+		this.subdirectory = subdirectory;
+	}
+	// end new
 
 }
