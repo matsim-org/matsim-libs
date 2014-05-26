@@ -71,6 +71,15 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 
 	public KtiScoringFunctionFactoryWithJointModes(
 			final ScoringFunctionFactory delegate,
+			final Scenario scenario) {
+		this( delegate,
+				scenario.getConfig().planCalcScore(),
+				( ScoringFunctionConfigGroup ) scenario.getConfig().getModule( ScoringFunctionConfigGroup.GROUP_NAME ),
+				scenario );
+	}
+
+	public KtiScoringFunctionFactoryWithJointModes(
+			final ScoringFunctionFactory delegate,
 			final PlanCalcScoreConfigGroup config,
 			final ScoringFunctionConfigGroup group,
 			final Scenario scenario) {
