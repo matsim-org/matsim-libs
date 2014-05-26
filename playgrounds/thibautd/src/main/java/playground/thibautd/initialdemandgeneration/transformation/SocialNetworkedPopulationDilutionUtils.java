@@ -48,6 +48,28 @@ public class SocialNetworkedPopulationDilutionUtils {
 	private static final Logger log =
 		Logger.getLogger(SocialNetworkedPopulationDilutionUtils.class);
 
+	public static enum DilutionType {allContacts, areaOnly, leisureOnly};
+
+	public static void dilute(
+			final DilutionType dilutionType,
+			final Scenario scenario,
+			final Coord center,
+			final double radius ) {
+		switch ( dilutionType ) {
+		case allContacts:
+			dilute( scenario , center , radius );
+			break;
+		case areaOnly:
+			diluteAreaOnly( scenario , center , radius );
+			break;
+		case leisureOnly:
+			diluteLeisureOnly( scenario , center , radius );
+			break;
+		default:
+			throw new IllegalArgumentException( dilutionType.toString() );
+		}
+	}
+
 	/**
 	 * Dilutes the population of the scenario, by retaining only agents passing
 	 * by the area defined by center and radius, as well as their social contacts.
