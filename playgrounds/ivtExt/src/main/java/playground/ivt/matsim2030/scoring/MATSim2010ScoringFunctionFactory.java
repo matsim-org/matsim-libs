@@ -91,8 +91,8 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 		// XXX Best response location choice depends on the fact that the scoring function
 		// is a ScoringFunctionAccumulator, and changing this fact is not easy. Just
 		// return this for the time being... But fix it!
-		// final SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-		final ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+		final SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
+		//final ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		final CharyparNagelScoringParameters params = createParams( person , config , personAttributes );
 
 		scoringFunctionAccumulator.addScoringFunction(
