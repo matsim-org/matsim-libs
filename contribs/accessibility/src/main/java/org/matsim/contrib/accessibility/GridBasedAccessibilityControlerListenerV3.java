@@ -17,6 +17,7 @@ import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
@@ -25,10 +26,13 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.utils.LeastCostPathTree;
@@ -247,7 +251,20 @@ implements ShutdownListener, StartupListener {
 		LeastCostPathTreeExtended lcptExtFreeSpeedCarTrvelTime = new LeastCostPathTreeExtended( ttf, tdFree, (RoadPricingScheme) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME) ) ;
 
 		// get the congested car travel time (in seconds)
-		TravelTime ttc = controler.getLinkTravelTimes(); // congested
+		TravelTime ttc = null ;
+		if ( controler != null ) {
+			ttc = controler.getLinkTravelTimes(); // congested
+		} else {
+			EventsManager events = EventsUtils.createEventsManager() ;
+			
+			TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, this.config.travelTimeCalculator() ) ;
+			events.addHandler( ttcalc );
+			
+			MatsimEventsReader reader = new MatsimEventsReader(events);
+			reader.readFile("events.xml.gz");
+			
+			ttc = ttcalc.getLinkTravelTimes() ;
+		}
 		TravelDisutility tdCongested = controler.getTravelDisutilityFactory().createTravelDisutility(ttc, controler.getConfig().planCalcScore() ) ;
 		LeastCostPathTreeExtended  lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended(ttc, tdCongested, (RoadPricingScheme) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME) ) ;
 
