@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
  * This EventHandler implementation counts the travel time of
  * all agents and provides the average travel time per
  * agent.
+ * Actually, handling Departures and Arrivals should be sufficient for this (may 2014)
  * @author dgrether
  *
  */
