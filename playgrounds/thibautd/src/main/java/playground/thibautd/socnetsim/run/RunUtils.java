@@ -714,10 +714,16 @@ public class RunUtils {
 	}
 
 	public static Scenario loadScenario(final Config config) {
+		final Scenario scenario = JointScenarioUtils.loadScenario( config );
+		enrichScenario( scenario );
+		return scenario;
+	}
+	
+	public static void enrichScenario(final Scenario scenario) {
+		final Config config = scenario.getConfig();
 		final GroupReplanningConfigGroup weights =  (GroupReplanningConfigGroup)
 			config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
-		final Scenario scenario = JointScenarioUtils.loadScenario( config );
-	
+
 		if ( config.scenario().isUseHouseholds() && weights.getUseLimitedVehicles() ) {
 			scenario.addScenarioElement(
 							VehicleRessources.ELEMENT_NAME,

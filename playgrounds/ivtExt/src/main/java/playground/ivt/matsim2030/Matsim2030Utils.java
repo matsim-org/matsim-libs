@@ -102,7 +102,12 @@ public class Matsim2030Utils {
 
 	public static Scenario loadScenario( final Config config ) {
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
+		enrichScenario( scenario );
+		return scenario;
+	}
 
+	public static void enrichScenario( final Scenario scenario ) {
+		final Config config = scenario.getConfig();
 		final ScenarioMergingConfigGroup mergingGroup = (ScenarioMergingConfigGroup)
 			config.getModule( ScenarioMergingConfigGroup.GROUP_NAME );
 
@@ -156,9 +161,6 @@ public class Matsim2030Utils {
 			log.info( "performing \"dilution\"" );
 			diluteScenario( scenario , mergingGroup.getDilutionCenter() , mergingGroup.getDilutionRadiusM() );
 		}
-
-
-		return scenario;
 	}
 
 	private static void diluteScenario(

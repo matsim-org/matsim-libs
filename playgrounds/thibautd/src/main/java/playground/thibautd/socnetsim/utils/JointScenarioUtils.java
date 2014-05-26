@@ -94,7 +94,12 @@ public class JointScenarioUtils {
 	public static Scenario loadScenario(final Config config) {
 		final Scenario scenario = createScenario( config );
 		ScenarioUtils.loadScenario( scenario );
+		enrichScenario( scenario );
+		return scenario;
+	}
 
+	public static void enrichScenario(final Scenario scenario) {
+		final Config config = scenario.getConfig();
 		final JointPlansConfigGroup jpConfig = (JointPlansConfigGroup)
 			config.getModule( JointPlansConfigGroup.GROUP_NAME );
 		if ( jpConfig.getFileName() != null) {
@@ -138,8 +143,6 @@ public class JointScenarioUtils {
 				}
 			}
 		}
-
-		return scenario;
 	}
 
 	/**
