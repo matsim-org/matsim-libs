@@ -1,6 +1,7 @@
 package playground.wrashid.parkingSearch.ppSim.jdepSim.analysis;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.contrib.parking.lib.obj.TwoKeyHashMapWithDouble;
@@ -13,8 +14,9 @@ public class ActivityStrategyGroupShares extends
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String outputFolder = "f:/data/experiments/parkingSearchOct2013/runs/run135/output/";
+		String outputFolder = "h:/data/experiments/parkingSearchOct2013/runs/run135/output1/";
 		int startIteration = 499;
+		boolean makeRoughStrategyGroups=true;
 
 		Matrix eventsMatrix = GeneralLib.readStringMatrix(getEventsFileName(
 				outputFolder, startIteration));
@@ -26,15 +28,55 @@ public class ActivityStrategyGroupShares extends
 			String facilityId = eventsMatrix.getString(i, 6);
 			String groupName = eventsMatrix.getString(i, 11);
 			String activity = eventsMatrix.getString(i, 14);
-			// if (facilityId.contains("stp") || facilityId.contains("gp") ||
-			// facilityId.contains("illegal") ){
-			
-			if (activity.contains("work")){
-				activity="work";
-			}
+			if (facilityId.contains("stp") || facilityId.contains("gp")
+					|| facilityId.contains("illegal")) {
 
-			activityStrategyGroupFrequencies.increment(groupName, activity);
-			// }
+				if (makeRoughStrategyGroups){
+					if (groupName.equalsIgnoreCase("ARD-G")){
+						groupName="garage";
+					} else if (groupName.equalsIgnoreCase("BRD(300m)-G")){
+						groupName="garage";
+					} else if (groupName.equalsIgnoreCase("ARD-TakeClosestGarageParking")){
+						groupName="garage";
+					}else if (groupName.equalsIgnoreCase("BRD-TakeClosestGarageParking")){
+						groupName="garage";
+					}else if (groupName.equalsIgnoreCase("BRD(300m)-S-G")){
+						groupName="street";
+					}else if (groupName.equalsIgnoreCase("Parkagent")){
+						groupName="street";
+					}else if (groupName.equalsIgnoreCase("ARD-S")){
+						groupName="street";
+					}else if (groupName.equalsIgnoreCase("BRD(300m)-S")){
+						groupName="street";
+					}else if (groupName.equalsIgnoreCase("ARD-waiting-S")){
+						groupName="street";
+					}else if (groupName.equalsIgnoreCase("ARD-illegal-S")){
+						groupName="illegal";
+					}else{
+						DebugLib.stopSystemAndReportInconsistency();
+					} 
+				}
+				
+				
+				if (activity.contains("work")) {
+					activity = "work";
+				}
+
+				if (activity.contains("education")) {
+					activity = "education";
+				}
+
+				if (groupName.contains("TakeClosestGarageParking")) {
+					groupName = groupName.replace("TakeClosestGarageParking",
+							"TCGP");
+				}
+				
+				
+				
+				
+
+				activityStrategyGroupFrequencies.increment(groupName, activity);
+			}
 		}
 
 		System.out.print("strategyGroup");
