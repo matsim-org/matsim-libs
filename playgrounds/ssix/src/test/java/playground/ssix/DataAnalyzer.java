@@ -13,8 +13,6 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 
-import playgrounds.ssix.ModeData;
-
 public class DataAnalyzer implements LinkLeaveEventHandler, LinkEnterEventHandler {
 	
 	private Scenario scenario;
@@ -53,13 +51,13 @@ public class DataAnalyzer implements LinkLeaveEventHandler, LinkEnterEventHandle
 
 
 	public void handleEvent(LinkEnterEvent event) {
-		if (event.getLinkId().equals(new IdImpl("4to5"))){
+		if (event.getLinkId().equals(new IdImpl("9to1"))){
 			this.linkEnterTimes.put(event.getPersonId(), event.getTime());
 		}
 	}
 	
 	public void handleEvent(LinkLeaveEvent event) {
-		if (event.getLinkId().equals(new IdImpl("4to5"))){
+		if (event.getLinkId().equals(new IdImpl("9to1"))){
 			double nowTime = event.getTime();
 			
 			Integer key =  new Integer ( (int) (nowTime / DataAnalyzer.AGGREGATION_TIME) ) * 600;
