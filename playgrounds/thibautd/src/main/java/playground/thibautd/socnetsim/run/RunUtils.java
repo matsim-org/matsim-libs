@@ -451,7 +451,13 @@ public class RunUtils {
 
 	public static ControllerRegistryBuilder loadDefaultRegistryBuilder(final Scenario scenario) {
 		final ControllerRegistryBuilder builder = new ControllerRegistryBuilder( scenario );
+		loadDefaultRegistryBuilder( builder, scenario );
+		return builder;
+	}
 
+	public static ControllerRegistryBuilder loadDefaultRegistryBuilder(
+			final ControllerRegistryBuilder builder,
+			final Scenario scenario) {
 		final GroupReplanningConfigGroup weights = (GroupReplanningConfigGroup)
 					scenario.getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME );
 
