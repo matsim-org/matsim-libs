@@ -702,10 +702,14 @@ public class RunUtils {
 
 	public static Config loadConfig(final String configFile) {
 		final Config config = JointScenarioUtils.createConfig();
-		config.addModule( new ScoringFunctionConfigGroup() );
-		config.addModule( new KtiInputFilesConfigGroup() );
+		addConfigGroups( config );
 		new NonFlatConfigReader( config ).parse( configFile );
 		return config;
+	}
+
+	public static void addConfigGroups(final Config config) {
+		config.addModule( new ScoringFunctionConfigGroup() );
+		config.addModule( new KtiInputFilesConfigGroup() );
 	}
 
 	public static Scenario createScenario(final String configFile) {
@@ -747,8 +751,6 @@ public class RunUtils {
 				}
 			}
 		}
-	
-		return scenario;
 	}
 
 	public static void loadBeingTogetherListenner(final ImmutableJointController controller) {

@@ -152,6 +152,12 @@ public class JointScenarioUtils {
 	public static Config createConfig() {
 		final Config config = ConfigUtils.createConfig();
 
+		addConfigGroups( config );
+
+		return config;
+	}
+
+	public static void addConfigGroups(final Config config) {
 		config.addModule( new CliquesConfigGroup());
 		config.addModule( new JointTripsMutatorConfigGroup());
 		config.addModule( new JointTimeModeChooserConfigGroup());
@@ -164,8 +170,6 @@ public class JointScenarioUtils {
 		config.addModule( new RandomJointLocationChoiceConfigGroup() );
 		config.addModule( new PlanLinkConfigGroup() );
 		config.addModule( new PrismicLocationChoiceConfigGroup() );
-
-		return config;
 	}
 
 	public static Config loadConfig(final String configFile) {
