@@ -22,11 +22,7 @@ package tutorial.programming.multipleSubpopulations;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -137,7 +133,6 @@ public class SubpopulationsExample {
 		
 		/* Run the model. */
 		Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
 		controler.run();
 	}
 

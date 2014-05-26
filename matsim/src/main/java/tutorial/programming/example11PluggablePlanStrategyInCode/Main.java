@@ -43,7 +43,6 @@ class Main {
 		config.strategy().addStrategySettings(stratSets);
 		
 		final Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
 		controler.addPlanStrategyFactory("doSomethingSpecial", new MyPlanStrategyFactory());
 		controler.run();
 

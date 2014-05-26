@@ -15,11 +15,7 @@ import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetwork;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
+import org.matsim.core.mobsim.qsim.qnetsimengine.*;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -46,7 +42,6 @@ class MyControler {
 
 		// prepare the control(l)er:
 		Controler controler = new Controler( scenario ) ;
-		controler.setOverwriteFiles(true) ;
 		controler.setMobsimFactory(new PatnaMobsimFactory()) ;
 
 		// run everything:

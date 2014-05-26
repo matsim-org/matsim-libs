@@ -39,8 +39,6 @@ public class MyControler5 {
 		String configFile = "examples/tutorial/config/example5-config.xml" ;
 		
 		Controler controler = new Controler( configFile ) ;
-		
-		controler.setOverwriteFiles(true) ;
 		controler.run() ;
 		
 		Scenario sc = controler.getScenario() ;

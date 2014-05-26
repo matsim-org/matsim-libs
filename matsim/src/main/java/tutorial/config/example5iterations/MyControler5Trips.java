@@ -40,8 +40,6 @@ public class MyControler5Trips {
 		String configFile = "examples/tutorial/config/example5trips-config.xml" ;
 		
 		Controler controler = new Controler( configFile ) ;
-		
-		controler.setOverwriteFiles(true) ;
 		controler.run() ;
 		
 		Scenario sc = controler.getScenario() ;

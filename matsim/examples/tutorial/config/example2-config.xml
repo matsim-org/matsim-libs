@@ -16,7 +16,6 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
 		<param name="eventsFileFormat" value="xml" />
-		<param name="mobsim" value="queueSimulation" />
 		<param name="snapshotFormat" value="googleearth,otfvis" />
 <!-- 		Produces visualiser output in the following formats: -->
 <!-- 		"googleearth": a *.kml file which can be opened into google earth.  Uncomplicated, but VERRYYY slow. -->

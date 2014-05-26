@@ -1,8 +1,5 @@
 package tutorial.programming.example16customscoring;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
@@ -20,12 +17,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.*;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Main {
 
@@ -141,7 +137,6 @@ public class Main {
 		// We add an EventHandler which reacts on people who enter a link and lets it rain on them
 		// if we are within a certain time window.
 		eventsManager.addHandler(new RainEngine(eventsManager));
-		controler.setOverwriteFiles(true) ;
 		controler.run() ;	
 	}
 	

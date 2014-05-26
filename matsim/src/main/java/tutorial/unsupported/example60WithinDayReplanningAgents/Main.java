@@ -56,7 +56,6 @@ public class Main {
 		
 		// base the controler on that:
 		Controler ctrl = new Controler( config ) ;
-		ctrl.setOverwriteFiles(true) ;
 		ctrl.setMobsimFactory(new MobsimFactory(){
 			@Override
 			public Mobsim createMobsim(final Scenario sc, final EventsManager ev) {

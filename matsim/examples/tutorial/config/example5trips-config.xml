@@ -16,12 +16,11 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
 		<param name="eventsFileFormat" value="xml" />
-		<param name="mobsim" value="queueSimulation" />
 		<param name="snapshotFormat" value="otfvis" />
 	</module>
 
 
-	<module name="simulation">
+	<module name="qsim">
 		<param name="snapshotperiod" value="00:01:00" />
 	</module>
 

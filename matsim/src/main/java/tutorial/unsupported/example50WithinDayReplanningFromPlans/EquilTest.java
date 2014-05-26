@@ -19,9 +19,6 @@
 
 package tutorial.unsupported.example50WithinDayReplanningFromPlans;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
@@ -33,11 +30,13 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class EquilTest {
 
 	public static void main(String[] args){		
 		final Controler controler = new Controler("examples/tutorial/programming/example50VeryExperimentalWithindayReplanning/withinday-config.xml");
-		controler.setOverwriteFiles(true);
 		controler.addControlerListener(new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent event) {
