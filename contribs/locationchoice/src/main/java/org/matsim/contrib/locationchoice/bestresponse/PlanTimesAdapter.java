@@ -109,8 +109,10 @@ public class PlanTimesAdapter {
 			double actDur = act.getMaximumDuration();
 								
 			// set new leg travel time, departure time and arrival time
+			// XXX This will silently fail with multi-legs trips without "stage" activity! td may'14
 			Leg previousLegPlanTmp = (Leg)planTmp.getPlanElements().get(planElementIndex -1);
 			previousLegPlanTmp.setTravelTime(legTravelTime);
+			// XXX The end time is not always defined. td may'14
 			double departureTime = ((Activity)planTmp.getPlanElements().get(planElementIndex -2)).getEndTime();
 			previousLegPlanTmp.setDepartureTime(departureTime);
 			double arrivalTime = departureTime + legTravelTime;
@@ -138,11 +140,9 @@ public class PlanTimesAdapter {
 			ActivityDurationInterpretation actDurInterpr = ( config.plans().getActivityDurationInterpretation() ) ;
 			switch ( actDurInterpr ) {
 			case tryEndTimeThenDuration:
-				if ( act.getEndTime() != Time.UNDEFINED_TIME ) {
-					actTmp.setEndTime( act.getEndTime() ) ;
-					scoringFunction.handleActivity( actTmp );
-				}
-				else if ( act.getMaximumDuration() != Time.UNDEFINED_TIME) {
+				if ( act.getEndTime() == Time.UNDEFINED_TIME &&
+						act.getMaximumDuration() != Time.UNDEFINED_TIME) {
+					// duration based definition: requires some care
 					actTmp.setMaximumDuration( act.getMaximumDuration() ) ;
 
 					// scoring function works with start and end time, not duration,
@@ -151,6 +151,10 @@ public class PlanTimesAdapter {
 					actTmp.setEndTime( arrivalTime + actDur ) ;
 					scoringFunction.handleActivity( actTmp );
 					actTmp.setEndTime( Time.UNDEFINED_TIME );
+				}
+				else {
+					actTmp.setEndTime( act.getEndTime() ) ;
+					scoringFunction.handleActivity( actTmp );
 				}
 				break;
 			default:
