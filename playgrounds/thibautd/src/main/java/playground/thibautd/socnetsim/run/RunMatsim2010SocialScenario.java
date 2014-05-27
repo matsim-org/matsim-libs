@@ -156,7 +156,9 @@ public class RunMatsim2010SocialScenario {
 		final Config config = ConfigUtils.createConfig();
 		JointScenarioUtils.addConfigGroups( config );
 		RunUtils.addConfigGroups( config );
-		Matsim2030Utils.addDefaultGroups( config );
+		// some redundancy here... just add scenarioMerging "by hand"
+		//Matsim2030Utils.addDefaultGroups( config );
+		config.addModule( new ScenarioMergingConfigGroup() );
 		config.addModule( new SocialDilutionConfigGroup() );
 		new NonFlatConfigReader( config ).parse( configFile );
 		return config;
