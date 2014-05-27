@@ -19,8 +19,11 @@
 
 package playground.michalm.taxi.data;
 
+import java.util.Queue;
+
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.Vehicle;
 
 
 public class TaxiRank
@@ -29,15 +32,27 @@ public class TaxiRank
     private final Id id;
     private final String name;
     private final Link link;
-
-
+    private final static int STANDARDCAPACITY = 5;
+    private int capacity;
+    
+    private Queue<Vehicle> taxisInRank;
+    
+    
     public TaxiRank(Id id, String name, Link link)
     {
         this.id = id;
         this.name = name;
         this.link = link;
+        this.capacity = STANDARDCAPACITY;
     }
 
+    public TaxiRank(Id id, String name, Link link, int capacity)
+    {
+        this.id = id;
+        this.name = name;
+        this.link = link;
+        this.capacity = capacity;
+    }
 
     @Override
     public Id getId()
@@ -63,4 +78,21 @@ public class TaxiRank
     {
         return link;
     }
+    
+    public boolean addTaxi(Vehicle veh){
+        if (taxisInRank.size()<this.capacity) {
+            taxisInRank.add(veh);
+            return true;
+            }
+        else return false;
+    }
+    
+    public void removeTaxi(Vehicle veh){
+        this.taxisInRank.remove(veh);
+    }
+    
+    public Vehicle getFirstTaxiFromRank(){
+        return  this.taxisInRank.poll();
+    }
+    
 }
