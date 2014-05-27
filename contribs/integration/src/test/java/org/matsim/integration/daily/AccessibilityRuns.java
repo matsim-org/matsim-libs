@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -24,7 +23,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.PlanStrategyRegistrar;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.FacilitiesUtils;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ExeRunner;
@@ -101,7 +99,7 @@ public class AccessibilityRuns {
 			stratSets.setProbability(1.);
 			config.strategy().addStrategySettings(stratSets);
 		}
-
+		
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		
 		List<String> activityTypes = new ArrayList<String>() ;
@@ -175,9 +173,9 @@ public class AccessibilityRuns {
 		}
 					
 		controler.run();
+
 		
-		
-		for (String actType: activityFacilitiesMap.keySet()) {
+		for (String actType : activityTypes) {
 			Boolean doPopulationWeightedPlot = true;
 			Boolean doNonPopulationWeightedPlot = false;		
 	
