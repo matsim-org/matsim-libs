@@ -415,11 +415,6 @@
 			<artifactId>xercesImpl</artifactId>
 			<version>2.7.1</version>
 		</dependency>
-		<dependency>
-			<groupId>com.googlecode.java-diff-utils</groupId>
-			<artifactId>diffutils</artifactId>
-			<version>1.2.1</version>
-		</dependency>
 	</dependencies>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
