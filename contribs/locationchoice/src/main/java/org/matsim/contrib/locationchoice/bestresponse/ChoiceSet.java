@@ -46,7 +46,7 @@ import org.matsim.core.router.ImaginaryNode;
 import org.matsim.core.router.InitialNode;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 public class ChoiceSet {
 	private int numberOfAlternatives;	
@@ -125,7 +125,7 @@ public class ChoiceSet {
 	}
 	
 	public Id getWeightedRandomChoice(int actlegIndex, ActivityFacilities facilities,
-			ScoringFunctionAccumulator scoringFunction, Plan plan, TripRouter tripRouter, double pKVal,
+			ScoringFunctionFactory scoringFunction, Plan plan, TripRouter tripRouter, double pKVal,
 			MultiNodeDijkstra forwardMultiNodeDijkstra, BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra,
 			int interation) {
 				
@@ -201,8 +201,14 @@ public class ChoiceSet {
 		return id;
 	}
 	
-	private TreeMap<Double,Id> createReducedChoiceSetWithScores(int actlegIndex, ActivityFacilities facilities, ScoringFunctionAccumulator scoringFunction,
-			Plan plan, TripRouter router, MultiNodeDijkstra forwardMultiNodeDijkstra, BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra) {
+	private TreeMap<Double,Id> createReducedChoiceSetWithScores(
+			int actlegIndex,
+			ActivityFacilities facilities,
+			ScoringFunctionFactory scoringFunction,
+			Plan plan,
+			TripRouter router,
+			MultiNodeDijkstra forwardMultiNodeDijkstra,
+			BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra) {
 		
 		// currently handled activity which should be re-located
 		Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
@@ -288,19 +294,19 @@ public class ChoiceSet {
 			((ActivityImpl)act).setCoord(facilities.getFacilities().get(destinationId).getCoord());
 			((ActivityImpl)act).setLinkId(((NetworkImpl) this.network).getNearestLink(facilities.getFacilities().get(destinationId).getCoord()).getId());
 			
-			scoringFunction.reset();
 			PlanImpl planTmp = new PlanImpl();
 			planTmp.copyFrom(plan);
-			this.adaptAndScoreTimes((PlanImpl)plan,  actlegIndex,  planTmp, scoringFunction,
-					forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, router, this.approximationLevel);
+			final double score =
+					this.adaptAndScoreTimes(
+							(PlanImpl)plan,
+							actlegIndex,
+							planTmp,
+							scoringFunction,
+							forwardMultiNodeDijkstra,
+							backwardMultiNodeDijkstra,
+							router,
+							this.approximationLevel);
 			
-			// not needed anymore
-			// yyyy why not?  kai, jan'13
-			//scoringFunction.finish();
-			
-			double score = scoringFunction.getScore();
-			scoringFunction.reset();
-									
 			if (score > largestValue) {
 				largestValue = score;
 				facilityIdWithLargestScore = destinationId;
@@ -419,11 +425,11 @@ public class ChoiceSet {
 		return mapNormalized;
 	}
 			
-	void adaptAndScoreTimes(PlanImpl plan, int actlegIndex, PlanImpl planTmp, ScoringFunctionAccumulator scoringFunction, 
+	double adaptAndScoreTimes(PlanImpl plan, int actlegIndex, PlanImpl planTmp, ScoringFunctionFactory scoringFunction, 
 			MultiNodeDijkstra forwardMultiNodeDijkstra, BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, TripRouter router, 
 			ApproximationLevel approximationLevelTmp) {
 		PlanTimesAdapter adapter = new PlanTimesAdapter(approximationLevelTmp, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, 
 				router, this.scenario);
-		adapter.adaptTimesAndScorePlan(plan, actlegIndex, planTmp, scoringFunction);
+		return adapter.adaptTimesAndScorePlan(plan, actlegIndex, planTmp, scoringFunction);
 	}
 }

@@ -42,7 +42,9 @@ import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.old.PlanRouterAdapter;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
 
 public class PlanTimesAdapter {
@@ -58,7 +60,6 @@ public class PlanTimesAdapter {
 	private final Network network;
 	private final Config config;
 	private final TripRouter router;
-	private Scenario scenario;
 	
 	private static final Logger log = Logger.getLogger(PlanTimesAdapter.class);
 		
@@ -70,107 +71,98 @@ public class PlanTimesAdapter {
 		this.network = scenario.getNetwork();
 		this.router = router;
 		this.config = scenario.getConfig();
-		this.scenario = scenario;
 	}
 	
-	/* package */ void adaptTimesAndScorePlan(PlanImpl plan, int actlegIndex, PlanImpl planTmp, ScoringFunctionAccumulator scoringFunction) {	
+	/* package */ double adaptTimesAndScorePlan(PlanImpl plan, int actlegIndex, PlanImpl planTmp, ScoringFunctionFactory scoringFunctionFactory) {	
 		
 		// yyyy Note: getPrevious/NextLeg/Activity all relies on alternating activities and leg, which was given up as a requirement
 		// a long time ago (which is why it is not in the interface).  kai, jan'13
 		
-		// yy This only works when the ScoringFunction is an implementation of ScoringFunctionAccumulator.  This may not always be the case.
-		// kai, jan'13
+		// This used to use ScoringFunction accumulator (wrongly, as it started the first activity),
+		// with the same instance used over and over. td, mai'14
+		final ScoringFunction scoringFunction = scoringFunctionFactory.createNewScoringFunction( plan.getPerson() );
 		
 		// iterate through plan and adapt travel and activity times
 		int planElementIndex = -1;
 		for (PlanElement pe : plan.getPlanElements()) {
 			planElementIndex++;
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe ;
-				if (planElementIndex == 0) {
-					scoringFunction.startActivity(0.0, act);
-					scoringFunction.endActivity(act.getEndTime(), act);
-//					System.err.println("10 score: " + scoringFunction.getScore() ) ;
-					continue; 
-				}
-				else {					
-					PathCosts pathCosts = null;
-					if (approximationLevel == ApproximationLevel.COMPLETE_ROUTING ) {
-						pathCosts = computeTravelTimeFromCompleteRouting(plan.getPerson(),
-							plan.getPreviousActivity(plan.getPreviousLeg(act)), act, ((Leg)plan.getPreviousLeg(act)).getMode());
-					} else if (approximationLevel == ApproximationLevel.LOCAL_ROUTING ){
-						pathCosts = computeTravelTimeFromLocalRouting(plan, actlegIndex, planElementIndex, act);
-					} else if (approximationLevel == ApproximationLevel.NO_ROUTING ) {
-						pathCosts = approximateTravelTimeFromDistance(plan, actlegIndex, planElementIndex, act);
-					}
-					
-					double legTravelTime = pathCosts.getRoute().getTravelTime();
-					double actDur = act.getMaximumDuration();
-										
-					// set new leg travel time, departure time and arrival time
-					Leg previousLegPlanTmp = (Leg)planTmp.getPlanElements().get(planElementIndex -1);
-					previousLegPlanTmp.setTravelTime(legTravelTime);
-					double departureTime = ((Activity)planTmp.getPlanElements().get(planElementIndex -2)).getEndTime();
-					previousLegPlanTmp.setDepartureTime(departureTime);
-					double arrivalTime = departureTime + legTravelTime;
-					previousLegPlanTmp.setRoute(pathCosts.getRoute());
-					
-					// yyyy I think this is really more complicated than it should be since it could/should just copy the time structure of the 
-					// original plan and not think so much.  kai, jan'13
-					
-					// set new activity end time
-					Activity actTmp = (Activity) planTmp.getPlanElements().get(planElementIndex);
-					// yy Isn't this the same as "act"?  (The code originally was a bit different, but in the original code it was also not using the
-					// iterated element.)  kai, jan'13
-					
-//					actTmp.setStartTime(arrivalTime);
-					
-					ActivityDurationInterpretation actDurInterpr = ( config.plans().getActivityDurationInterpretation() ) ;
-					if ( actDurInterpr == ActivityDurationInterpretation.endTimeOnly ) {
-						throw new RuntimeException("activity duration interpretation of " 
-								+ config.plans().getActivityDurationInterpretation().toString() + " is not supported for locationchoice; aborting ... " +
-										"Use " + ActivityDurationInterpretation.tryEndTimeThenDuration.toString() + "instead.") ;
-					} else 
-//						if ( config.vspExperimental().getActivityDurationInterpretation()==ActivityDurationInterpretation.tryEndTimeThenDuration ) 
-					{
-						if ( act.getEndTime() != Time.UNDEFINED_TIME ) {
-							actTmp.setEndTime( act.getEndTime() ) ;
-						} else if ( act.getMaximumDuration() != Time.UNDEFINED_TIME) {
-							actTmp.setMaximumDuration( act.getMaximumDuration() ) ;
-						}
-					} 
-//					else {
-//						actTmp.setEndTime(arrivalTime + actDur);
-//						// This is the original variant.  I would not make "duration" take absolute precedence over "endTime", but since
-//						// VSP should use "tryEndTimeThenDuration", I will leave it for the time being.  kai, jan'13
-//					}
-					
-					scoringFunction.startLeg(departureTime, previousLegPlanTmp);
-					scoringFunction.endLeg(arrivalTime);
-										
-//					System.err.println("20 score: " + scoringFunction.getScore() ) ;
+			if ( !( pe instanceof Activity ) ) continue;
 
-					scoringFunction.startActivity(arrivalTime, actTmp);
-//					System.err.println("arrivalTime: " + arrivalTime ) ;
-					if (planElementIndex < plan.getPlanElements().size() -1) {
-						
-						if ( actTmp.getEndTime() != Time.UNDEFINED_TIME ) {
-							scoringFunction.endActivity( actTmp.getEndTime(), actTmp ) ;
-//							System.err.println( "actEndTime: " + actTmp.getEndTime() ) ;
-						} else if ( actTmp.getMaximumDuration() != Time.UNDEFINED_TIME ) {
-							scoringFunction.endActivity(arrivalTime + actDur, actTmp);
-//							System.err.println( "arrivalTime: " + arrivalTime + " actDur: " + actDur ) ;
-						}
-//						System.err.println("30 score: " + scoringFunction.getScore() ) ;
-					}
-					else {
-						// (last (home) activity does not end the activity:)
-						scoringFunction.finish();
-//						System.err.println("40 score: " + scoringFunction.getScore() ) ;
-					}
-				}				
+			Activity act = (Activity) pe ;
+			if (planElementIndex == 0) {
+				scoringFunction.handleActivity( act );
+//					System.err.println("10 score: " + scoringFunction.getScore() ) ;
+				continue; 
 			}
+			
+			PathCosts pathCosts = null;
+			if (approximationLevel == ApproximationLevel.COMPLETE_ROUTING ) {
+				pathCosts = computeTravelTimeFromCompleteRouting(plan.getPerson(),
+					plan.getPreviousActivity(plan.getPreviousLeg(act)), act, ((Leg)plan.getPreviousLeg(act)).getMode());
+			} else if (approximationLevel == ApproximationLevel.LOCAL_ROUTING ){
+				pathCosts = computeTravelTimeFromLocalRouting(plan, actlegIndex, planElementIndex, act);
+			} else if (approximationLevel == ApproximationLevel.NO_ROUTING ) {
+				pathCosts = approximateTravelTimeFromDistance(plan, actlegIndex, planElementIndex, act);
+			}
+			
+			double legTravelTime = pathCosts.getRoute().getTravelTime();
+			double actDur = act.getMaximumDuration();
+								
+			// set new leg travel time, departure time and arrival time
+			Leg previousLegPlanTmp = (Leg)planTmp.getPlanElements().get(planElementIndex -1);
+			previousLegPlanTmp.setTravelTime(legTravelTime);
+			double departureTime = ((Activity)planTmp.getPlanElements().get(planElementIndex -2)).getEndTime();
+			previousLegPlanTmp.setDepartureTime(departureTime);
+			double arrivalTime = departureTime + legTravelTime;
+			previousLegPlanTmp.setRoute(pathCosts.getRoute());
+			if ( previousLegPlanTmp instanceof LegImpl ) {
+				// this should not be necessary, as scoring functions can reconstruct
+				// this information from interface methods,
+				// but one never knows. I feel safer this way. td, may'14
+				((LegImpl) previousLegPlanTmp).setArrivalTime( arrivalTime );
+			}
+			
+			scoringFunction.handleLeg(previousLegPlanTmp);
+
+			// yyyy I think this is really more complicated than it should be since it could/should just copy the time structure of the 
+			// original plan and not think so much.  kai, jan'13
+
+			// set new activity end time
+			// yy Isn't this the same as "act"?  (The code originally was a bit different, but in the original code it was also not using the
+			// iterated element.)  kai, jan'13
+			// No, it is not: this one comes from planTmp, not plan... Not sure why this duplication is there, though. td may '14
+			final Activity actTmp = (Activity) planTmp.getPlanElements().get(planElementIndex);
+
+			actTmp.setStartTime(arrivalTime);
+
+			ActivityDurationInterpretation actDurInterpr = ( config.plans().getActivityDurationInterpretation() ) ;
+			switch ( actDurInterpr ) {
+			case tryEndTimeThenDuration:
+				if ( act.getEndTime() != Time.UNDEFINED_TIME ) {
+					actTmp.setEndTime( act.getEndTime() ) ;
+					scoringFunction.handleActivity( actTmp );
+				}
+				else if ( act.getMaximumDuration() != Time.UNDEFINED_TIME) {
+					actTmp.setMaximumDuration( act.getMaximumDuration() ) ;
+
+					// scoring function works with start and end time, not duration,
+					// but we do not want to put an end time in the plan.
+					assert actTmp.getEndTime() == Time.UNDEFINED_TIME : actTmp;
+					actTmp.setEndTime( arrivalTime + actDur ) ;
+					scoringFunction.handleActivity( actTmp );
+					actTmp.setEndTime( Time.UNDEFINED_TIME );
+				}
+				break;
+			default:
+				throw new RuntimeException("activity duration interpretation of " 
+						+ config.plans().getActivityDurationInterpretation().toString() + " is not supported for locationchoice; aborting ... " +
+								"Use " + ActivityDurationInterpretation.tryEndTimeThenDuration.toString() + "instead.") ;
+			}
+
 		}
+
+		scoringFunction.finish();
+		return scoringFunction.getScore();
 	}
 
 	private PathCosts approximateTravelTimeFromDistance(Plan thePlan, int actlegIndex, int planElementIndex, PlanElement pe) {

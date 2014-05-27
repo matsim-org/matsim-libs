@@ -135,11 +135,6 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		// yyyy the above is not great, but when I found it, it was passing integers all the way down to the method.  kai, jan'13
 
 		
-		ScoringFunctionAccumulator scoringFunction = 
-			(ScoringFunctionAccumulator) this.scoringFunctionFactory.createNewScoringFunction(plan.getPerson()); 
-		// (scoringFunction inserted into getWeightedRandomChoice as well as into evaluateAndAdaptPlans.  Presumably, could as well
-		// insert factory (which is already in the replanning context), but this would need to be checked.  kai, jan'13
-		
 		int actlegIndex = -1;
 		for (PlanElement pe : plan.getPlanElements()) {
 			actlegIndex++;
@@ -172,7 +167,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 					// yy why? kai, feb'13
 
 					final Id choice = cs.getWeightedRandomChoice(
-							actlegIndex, this.facilities, scoringFunction, plan, this.getTripRouter(), this.lcContext.getPersonsKValuesArray()[personIndex],
+							actlegIndex, this.facilities, scoringFunctionFactory, plan, this.getTripRouter(), this.lcContext.getPersonsKValuesArray()[personIndex],
 							this.forwardMultiNodeDijkstra, this.backwardMultiNodeDijkstra, this.iteration);
 
 					this.setLocation(actToMove, choice);	
@@ -180,7 +175,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 //					printTentativePlanToConsole(plan);
 
 					// the change was done to "plan".  Now check if we want to copy this to bestPlan:
-					this.evaluateAndAdaptPlans(plan, bestPlan, cs, scoringFunction);
+					this.evaluateAndAdaptPlans(plan, bestPlan, cs, scoringFunctionFactory);
 
 					// yyyy if I understand this correctly, this means that, if the location change is accepted, all subsequent locachoice 
 					// optimization attempts will be run with that new location.  kai, jan'13
@@ -246,7 +241,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		act.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 	}
 	
-	private void evaluateAndAdaptPlans(Plan plan, Plan bestPlanSoFar, ChoiceSet cs, ScoringFunctionAccumulator scoringFunction) {		
+	private void evaluateAndAdaptPlans(Plan plan, Plan bestPlanSoFar, ChoiceSet cs, ScoringFunctionFactory scoringFunction) {		
 		double score = this.computeScoreAndAdaptPlan(plan, cs, scoringFunction);	
 //		System.err.println("expected score of new plan is: " + score ) ;
 //		System.err.println("existing score of old plan is: " + bestPlanSoFar.getScore() ) ;
@@ -257,17 +252,22 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		}
 	}
 
-	private double computeScoreAndAdaptPlan(Plan plan, ChoiceSet cs, ScoringFunctionAccumulator scoringFunction) {
+	private double computeScoreAndAdaptPlan(Plan plan, ChoiceSet cs, ScoringFunctionFactory scoringFunction) {
 		// yyyy why is all this plans copying necessary?  kai, jan'13
 
 		PlanImpl planTmp = new PlanImpl(plan.getPerson());
 		planTmp.copyFrom(plan);			
-		scoringFunction.reset();
 
-		cs.adaptAndScoreTimes((PlanImpl) plan, 0, planTmp, scoringFunction, null, null, this.getTripRouter(), 
-				ApproximationLevel.COMPLETE_ROUTING);	
-		double score = scoringFunction.getScore();
-		scoringFunction.reset();
+		final double score = 
+				cs.adaptAndScoreTimes(
+						(PlanImpl) plan,
+						0,
+						planTmp,
+						scoringFunction,
+						null,
+						null,
+						this.getTripRouter(), 
+						ApproximationLevel.COMPLETE_ROUTING);	
 		PlanUtils.copyPlanFieldsToFrom((PlanImpl)plan, (PlanImpl)planTmp);	// copy( to, from )
 		return score;
 	}
