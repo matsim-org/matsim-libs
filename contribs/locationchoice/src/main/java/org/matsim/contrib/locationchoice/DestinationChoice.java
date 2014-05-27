@@ -19,11 +19,6 @@
 
 package org.matsim.contrib.locationchoice;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeMap;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.random.RandomLocationMutator;
@@ -42,16 +37,17 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import java.util.List;
+import java.util.TreeMap;
+import java.util.Vector;
 
 public class DestinationChoice extends AbstractMultithreadedModule {
 
-	/**
-	 * yyyy It is unclear to me why we need this as a collection and not just as a variable.  kai, dec'12
-	 */
+    private static final Logger log = Logger.getLogger(DestinationChoice.class);
+
 	private final List<PlanAlgorithm>  planAlgoInstances = new Vector<PlanAlgorithm>();
-	private static final Logger log = Logger.getLogger(DestinationChoice.class);
 	private ActivitiesHandler defineFlexibleActivities;
 	private ActTypeConverter actTypeConverter;
 
@@ -64,9 +60,7 @@ public class DestinationChoice extends AbstractMultithreadedModule {
 		super(scenario.getConfig().global());
 		if ( LocationChoiceConfigGroup.Algotype.bestResponse.equals(scenario.getConfig().locationchoice().getAlgorithm()) ) {
 			throw new RuntimeException("best response location choice not supported as part of LocationChoice. " +
-					"Use BestReplyLocationChoice instead, but be aware that as of now some Java coding is necessary to do that. kai, feb'13") ;
-			// yyyyyy the best reply code pieces can be removed from this here.  kai, feb'13
-			// done. ah feb'13
+					"Use BestReplyLocationChoice instead, but be aware that as of now some Java coding is necessary to do that. kai, feb'13");
 		}
 		this.scenario = scenario;
 		initLocal();
@@ -77,7 +71,7 @@ public class DestinationChoice extends AbstractMultithreadedModule {
 		((NetworkImpl) this.scenario.getNetwork()).connect();
 
 		this.actTypeConverter = this.defineFlexibleActivities.getConverter();
-		this.initTrees(((ScenarioImpl) this.scenario).getActivityFacilities(), this.scenario.getConfig().locationchoice());
+		this.initTrees(this.scenario.getActivityFacilities(), this.scenario.getConfig().locationchoice());
 	}
 
 	/**
@@ -104,19 +98,15 @@ public class DestinationChoice extends AbstractMultithreadedModule {
 		if ( LocationChoiceConfigGroup.Algotype.localSearchRecursive.equals(algorithm) 
 				|| LocationChoiceConfigGroup.Algotype.localSearchSingleAct.equals(algorithm) ) {
 			int unsuccessfull = 0;
-			Iterator<PlanAlgorithm> planAlgo_it = this.planAlgoInstances.iterator();
-			while (planAlgo_it.hasNext()) {
-				PlanAlgorithm plan_algo = planAlgo_it.next();
-
-				if ( LocationChoiceConfigGroup.Algotype.localSearchSingleAct.equals(algorithm) ) {
-					unsuccessfull += ((SingleActLocationMutator)plan_algo).getNumberOfUnsuccessfull();
-					((SingleActLocationMutator)plan_algo).resetUnsuccsessfull();
-				}
-				else if ( LocationChoiceConfigGroup.Algotype.localSearchRecursive.equals(algorithm) ) {
-					unsuccessfull += ((RecursiveLocationMutator)plan_algo).getNumberOfUnsuccessfull();
-					((RecursiveLocationMutator)plan_algo).resetUnsuccsessfull();
-				}
-			}
+            for (PlanAlgorithm plan_algo : this.planAlgoInstances) {
+                if (Algotype.localSearchSingleAct.equals(algorithm)) {
+                    unsuccessfull += ((SingleActLocationMutator) plan_algo).getNumberOfUnsuccessfull();
+                    ((SingleActLocationMutator) plan_algo).resetUnsuccsessfull();
+                } else if (Algotype.localSearchRecursive.equals(algorithm)) {
+                    unsuccessfull += ((RecursiveLocationMutator) plan_algo).getNumberOfUnsuccessfull();
+                    ((RecursiveLocationMutator) plan_algo).resetUnsuccsessfull();
+                }
+            }
 			log.info("Number of unsuccessfull LC in this iteration: "+ unsuccessfull);
 		}
 		this.planAlgoInstances.clear();

@@ -19,14 +19,6 @@
 
 package org.matsim.contrib.locationchoice;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -52,20 +44,18 @@ import org.matsim.core.router.priorityqueue.HasIndex;
 import org.matsim.core.router.util.BackwardsFastMultiNodeDijkstraFactory;
 import org.matsim.core.router.util.FastMultiNodeDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import java.util.*;
+import java.util.Map.Entry;
+
 public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 
-	/**
-	 * yyyy It is unclear to me why we need this as a collection and not just as a variable.  kai, dec'12
-	 */
-	private final List<PlanAlgorithm>  planAlgoInstances = new Vector<PlanAlgorithm>();
+    private static final Logger log = Logger.getLogger(BestReplyDestinationChoice.class);
 
-	private static final Logger log = Logger.getLogger(BestReplyDestinationChoice.class);
-	
+    private final List<PlanAlgorithm>  planAlgoInstances = new Vector<PlanAlgorithm>();
 	private ObjectAttributes personsMaxEpsUnscaled;
 	private DestinationSampler sampler;
 	protected TreeMap<String, QuadTreeRing<ActivityFacilityWithIndex>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacilityWithIndex>>();
@@ -94,8 +84,8 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 
 	private void initLocal() {
 		this.flexibleTypes = this.lcContext.getFlexibleTypes() ;		
-		((NetworkImpl) this.scenario.getNetwork()).connect(); // ???	
-		this.initTrees(((ScenarioImpl) this.scenario).getActivityFacilities(), this.scenario.getConfig().locationchoice());	
+		((NetworkImpl) this.scenario.getNetwork()).connect();
+		this.initTrees(this.scenario.getActivityFacilities(), this.scenario.getConfig().locationchoice());
 		this.sampler = new DestinationSampler(
 				this.lcContext.getPersonsKValuesArray(), 
 				this.lcContext.getFacilitiesKValuesArray(), 
@@ -164,14 +154,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		
 		// this one corresponds to the "frozen epsilon" paper(s)
 		// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
-		/*
-		 * Previously, the ReplanningContext was handed over to the BestResponseLocationMutator.
-		 * There, a huge amount of TripRouter object where created. As a result, FastRouter instances
-		 * had to be initialized over and over again. Now a single TripRouter object is re-used.
-		 * 
-		 * Is there a reason for the old implementation style?
-		 * cdobler, oct'13 
-		 */
+
 		TripRouter tripRouter = replanningContext.getTripRouter();
 		ScoringFunctionFactory scoringFunctionFactory = replanningContext.getScoringFunctionFactory();
 		int iteration = replanningContext.getIteration();
