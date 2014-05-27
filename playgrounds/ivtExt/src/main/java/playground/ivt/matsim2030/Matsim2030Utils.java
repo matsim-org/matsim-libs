@@ -245,7 +245,13 @@ public class Matsim2030Utils {
 
 	private static void connectFacilitiesWithLinks( final Scenario sc ) {
 		final StageActivityTypes stages = new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE );
-		final PersonAlgorithm xy2Links = new XY2Links( sc );
+		// ignore facilities, as otherwise the following happens:
+		// - if there is a facility, the activity link id is set to the one of the facility
+		// - thus, if the facility has no link, the coordinate of the activity is overriden
+		// - if the activity has no link, a new one is computed
+		// This caused problems when I had routes in the population: activities were
+		// moved to a close link, and routes became wrong.
+		final PersonAlgorithm xy2Links = new XY2Links( sc.getNetwork() , null );
 
 		// first: if there are links indicated in the activities, use them
 		for ( Person person : sc.getPopulation().getPersons().values() ) {
