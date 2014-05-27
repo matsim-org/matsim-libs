@@ -112,8 +112,12 @@ public class PlanTimesAdapter {
 			// XXX This will silently fail with multi-legs trips without "stage" activity! td may'14
 			Leg previousLegPlanTmp = (Leg)planTmp.getPlanElements().get(planElementIndex -1);
 			previousLegPlanTmp.setTravelTime(legTravelTime);
-			// XXX The end time is not always defined. td may'14
-			double departureTime = ((Activity)planTmp.getPlanElements().get(planElementIndex -2)).getEndTime();
+			// this assumes "tryEndTimeThenDuration"
+			final Activity prevActTmp = (Activity) planTmp.getPlanElements().get(planElementIndex -2);
+			double departureTime = 
+				prevActTmp.getEndTime() != Time.UNDEFINED_TIME ?
+					prevActTmp.getEndTime() :
+					prevActTmp.getStartTime() + prevActTmp.getMaximumDuration();
 			previousLegPlanTmp.setDepartureTime(departureTime);
 			double arrivalTime = departureTime + legTravelTime;
 			previousLegPlanTmp.setRoute(pathCosts.getRoute());
