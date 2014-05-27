@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.experimental.ReflectiveModule;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.pt.PtConstants;
@@ -55,9 +56,6 @@ import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 public class RunMatsim2010SocialScenario {
 	private static final Logger log =
 		Logger.getLogger(RunMatsim2010SocialScenario.class);
-
-	// this is the most efficient (it removes the most agents)
-	private final static DilutionType DILUTION_TYPE = DilutionType.areaOnly;
 
 	public static void main(final String[] args) {
 		OutputDirectoryLogging.catchLogEntries();
@@ -142,10 +140,11 @@ public class RunMatsim2010SocialScenario {
 		final ScenarioMergingConfigGroup mergingGroup = (ScenarioMergingConfigGroup)
 			config.getModule( ScenarioMergingConfigGroup.GROUP_NAME );
 		if ( mergingGroup.getPerformDilution() ) {
-			// XXX it would be nicer if dilution type came from config
-			log.info( "performing \"dilution\" with method "+DILUTION_TYPE );
+			final SocialDilutionConfigGroup dilutionConfig = (SocialDilutionConfigGroup)
+				config.getModule( SocialDilutionConfigGroup.GROUP_NAME );
+			log.info( "performing \"dilution\" with method "+dilutionConfig.getDilutionType() );
 			SocialNetworkedPopulationDilutionUtils.dilute(
-					DILUTION_TYPE,
+					dilutionConfig.getDilutionType(),
 					scenario,
 					mergingGroup.getDilutionCenter(),
 					mergingGroup.getDilutionRadiusM() );
@@ -158,8 +157,29 @@ public class RunMatsim2010SocialScenario {
 		JointScenarioUtils.addConfigGroups( config );
 		RunUtils.addConfigGroups( config );
 		Matsim2030Utils.addDefaultGroups( config );
+		config.addModule( new SocialDilutionConfigGroup() );
 		new NonFlatConfigReader( config ).parse( configFile );
 		return config;
 	}
-}
 
+	private static class SocialDilutionConfigGroup extends ReflectiveModule {
+		public static final String GROUP_NAME = "socialDilution";
+
+		// this is the most efficient (it removes the most agents)
+		private DilutionType dilutionType = DilutionType.areaOnly;
+
+		public SocialDilutionConfigGroup() {
+			super( GROUP_NAME );
+		}
+
+		@StringGetter( "dilutionType" )
+		public DilutionType getDilutionType() {
+			return this.dilutionType;
+		}
+
+		@StringSetter( "dilutionType" )
+		public void setDilutionType(DilutionType dilutionType) {
+			this.dilutionType = dilutionType;
+		}
+	}
+}
