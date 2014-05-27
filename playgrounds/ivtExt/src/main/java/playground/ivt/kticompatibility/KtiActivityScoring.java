@@ -141,6 +141,10 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 		lock.checkLock();
 
 		if ( act.getEndTime() == Time.UNDEFINED_TIME ) {
+			if ( activityWithoutStart == null ) {
+				throw new IllegalStateException( "activity "+act+" has not end time, but no activity without a start is stored for person "+plan.getPerson().getId() );
+			}
+
 			// assume wraparound
 			if ( !activityWithoutStart.getType().equals( act.getType() ) ) {
 				//throw new IllegalStateException( act+" cannot be wraped around with "+activityWithoutStart );
