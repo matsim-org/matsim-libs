@@ -25,7 +25,6 @@ package playground.mzilske.cadyts;
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.supply.SimResults;
-import org.apache.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -44,10 +43,8 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.counts.Counts;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 /**
@@ -57,18 +54,15 @@ import javax.inject.Singleton;
 @Singleton
 class CadytsControlerListener implements StartupListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
 
-	private final static Logger log = Logger.getLogger(CadytsControlerListener.class);
+    private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
 
-	private final static String LINKOFFSET_FILENAME = "linkCostOffsets.xml";
-	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
+
+    @Inject
+    PlanToPlanStepBasedOnEvents ptStep;
 
 	private final double countsScaleFactor;
-	private final Counts counts;
-	private final boolean writeAnalysisFile;
-	private final CadytsConfigGroup cadytsConfig;
-
-	private AnalyticalCalibrator<Link> calibrator;
-	@Inject PlanToPlanStepBasedOnEvents ptStep;
+    private final boolean writeAnalysisFile;
+    private AnalyticalCalibrator<Link> calibrator;
     private EventsManager eventsManager;
     private OutputDirectoryHierarchy controlerIO;
     private Scenario scenario;
@@ -80,7 +74,6 @@ class CadytsControlerListener implements StartupListener, BeforeMobsimListener, 
                             OutputDirectoryHierarchy controlerIO,
                             Scenario scenario,
                             VolumesAnalyzer volumesAnalyzer,
-                            @Named("calibrationCounts") Counts counts,
                             AnalyticalCalibrator<Link> calibrator) {
         this.eventsManager = eventsManager;
         this.controlerIO = controlerIO;
@@ -88,10 +81,9 @@ class CadytsControlerListener implements StartupListener, BeforeMobsimListener, 
         this.volumesAnalyzer = volumesAnalyzer;
         this.calibrator = calibrator;
         this.countsScaleFactor = config.counts().getCountsScaleFactor();
-		this.cadytsConfig = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
+        CadytsConfigGroup cadytsConfig = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
 		cadytsConfig.setWriteAnalysisFile(true);
-		this.counts = counts;
-		this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
+        this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
 	}
 	
 	@Override
@@ -110,7 +102,20 @@ class CadytsControlerListener implements StartupListener, BeforeMobsimListener, 
             for (Person person : scenario.getPopulation().getPersons().values()) {
                 this.calibrator.addToDemand(ptStep.getPlanSteps(person.getSelectedPlan()));
             }
-            this.calibrator.afterNetworkLoading(new SimResultsContainerImpl(volumesAnalyzer, this.countsScaleFactor));
+            this.calibrator.afterNetworkLoading(new SimResults<Link>() {
+
+                @Override
+                public double getSimValue(final Link link, final int startTime_s, final int endTime_s, final TYPE type) {
+                    int hour = startTime_s / 3600;
+                    Id linkId = link.getId();
+                    double[] values = volumesAnalyzer.getVolumesPerHourForLink(linkId);
+                    if (values == null) {
+                        return 0;
+                    }
+                    return values[hour] * countsScaleFactor;
+                }
+
+            });
         }
     }
 	
@@ -129,58 +134,4 @@ class CadytsControlerListener implements StartupListener, BeforeMobsimListener, 
 		return (iter > 0 && iter % scenario.getConfig().counts().getWriteCountsInterval() == 0);
 	}
 
-    static class SimResultsContainerImpl implements SimResults<Link> {
-		private static final long serialVersionUID = 1L;
-		private final VolumesAnalyzer volumesAnalyzer;
-		private final double countsScaleFactor;
-
-		SimResultsContainerImpl(final VolumesAnalyzer volumesAnalyzer, final double countsScaleFactor) {
-			this.volumesAnalyzer = volumesAnalyzer;
-			this.countsScaleFactor = countsScaleFactor;
-		}
-
-		@Override
-		public double getSimValue(final Link link, final int startTime_s, final int endTime_s, final TYPE type) { // stopFacility or link
-
-			int hour = startTime_s / 3600;
-			Id linkId = link.getId();
-			double[] values = volumesAnalyzer.getVolumesPerHourForLink(linkId);
-			
-			if (values == null) {
-				return 0;
-			}
-
-			return values[hour] * this.countsScaleFactor;
-		}
-
-		@Override
-		public String toString() {
-			final StringBuffer stringBuffer2 = new StringBuffer();
-			final String LINKID = "linkId: ";
-			final String VALUES = "; values:";
-			final char TAB = '\t';
-			final char RETURN = '\n';
-
-			for (Id linkId : this.volumesAnalyzer.getLinkIds()) { // Only occupancy!
-				StringBuffer stringBuffer = new StringBuffer();
-				stringBuffer.append(LINKID);
-				stringBuffer.append(linkId);
-				stringBuffer.append(VALUES);
-
-				boolean hasValues = false; // only prints stops with volumes > 0
-				int[] values = this.volumesAnalyzer.getVolumesForLink(linkId);
-
-				for (int ii = 0; ii < values.length; ii++) {
-					hasValues = hasValues || (values[ii] > 0);
-
-					stringBuffer.append(TAB);
-					stringBuffer.append(values[ii]);
-				}
-				stringBuffer.append(RETURN);
-				if (hasValues) stringBuffer2.append(stringBuffer.toString());
-			}
-			return stringBuffer2.toString();
-		}
-
-	}
 }
