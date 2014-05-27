@@ -36,7 +36,7 @@ import playground.jbischoff.energy.charging.ElectricTaxiChargingHandler;
 import playground.jbischoff.energy.vehicles.BatteryElectricVehicleImpl;
 import playground.jbischoff.taxi.evaluation.*;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
-import playground.jbischoff.taxi.optimizer.rank.TaxiRankHandler;
+//import playground.jbischoff.taxi.optimizer.rank.TaxiRankHandler;
 import playground.jbischoff.taxi.sim.ElectricTaxiSimEngine;
 import playground.jbischoff.taxi.vehicles.ElectricTaxi;
 import playground.michalm.taxi.data.*;
@@ -54,7 +54,7 @@ public class ElectroCabLaunchUtils
     private TravelDistanceTimeEvaluator travelDistanceEvaluator;
     private TaxiCustomerWaitTimeAnalyser taxiCustomerWaitTimeAnalyser;
     private ElectricTaxiChargingHandler ecabhandler;
-    private TaxiRankHandler rankhandler;
+//    private TaxiRankHandler rankhandler;
 
     /**
      * Mandatory
@@ -75,11 +75,11 @@ public class ElectroCabLaunchUtils
         
         travelDistanceEvaluator = new TravelDistanceTimeEvaluator(scenario.getNetwork());
         ecabhandler = new ElectricTaxiChargingHandler(events);
-        rankhandler = new TaxiRankHandler();
+//        rankhandler = new TaxiRankHandler();
         HashMap<Id,org.matsim.contrib.transEnergySim.vehicles.api.Vehicle> bevs = new HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle>();
        	 for (Vehicle v : context.getVrpData().getVehicles()) {
              	Id aid = v.getId();
-             	rankhandler.addVehicle(v);
+//             	rankhandler.addVehicle(v);
              	if (aid.toString().startsWith("et"))
              		{
              	    BatteryElectricVehicleImpl bev = new BatteryElectricVehicleImpl(ecm, 20*1000*3600);
@@ -101,19 +101,19 @@ public class ElectroCabLaunchUtils
         handlerGroup.addHandler(travelDistanceEvaluator);
         handlerGroup.addHandler(energyConsumptionTracker);
         handlerGroup.addHandler(ecabhandler);
-        handlerGroup.addHandler(rankhandler);
+//        handlerGroup.addHandler(rankhandler);
         handlerGroup.addHandler(taxiCustomerWaitTimeAnalyser);
 
         for (TaxiRank r : ((TaxiData)context.getVrpData()).getTaxiRanks()) {
-            rankhandler.addRank(r);
+//            rankhandler.addRank(r);
             ecabhandler.addCharger(new Charger(1000, 50, r.getLink().getId()));
         }
 
         
         events.addHandler(handlerGroup);
 
-        optimizer.setEcabhandler(ecabhandler);
-        optimizer.createNearestChargerDb();
+//        optimizer.setEcabhandler(ecabhandler);
+//        optimizer.createNearestChargerDb();
 
         
 
