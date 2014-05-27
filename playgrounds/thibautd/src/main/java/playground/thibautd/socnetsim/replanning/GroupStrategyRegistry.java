@@ -20,17 +20,77 @@
 package playground.thibautd.socnetsim.replanning;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+
+import playground.thibautd.utils.MapUtils;
 
 /**
  * @author thibautd
  */
 public final class GroupStrategyRegistry {
-	private static final Logger log = Logger.getLogger( GroupStrategyRegistry.class );
+	private final static MapUtils.Factory<SubpopulationRegistry> registryFactory =
+		new MapUtils.Factory<SubpopulationRegistry>() {
+			@Override
+			public SubpopulationRegistry create() {
+				return new SubpopulationRegistry();
+			}
+		};
 
 	private ExtraPlanRemover remover = null;
+	private final Map<String, SubpopulationRegistry> populationRegistries = new HashMap<String, SubpopulationRegistry>();
+
+	public final void addStrategy(
+			final GroupPlanStrategy strategy,
+			final String subpopulation,
+			final double weight,
+			final int lastIteration) {
+		final SubpopulationRegistry registry = 
+			MapUtils.getArbitraryObject(
+					subpopulation,
+					populationRegistries,
+					registryFactory );
+		registry.addStrategy(
+				strategy,
+				weight,
+				lastIteration );
+	}
+
+	public GroupPlanStrategy chooseStrategy(
+			final int iteration,
+			final String subpopulation,
+			final double randomDraw ) {
+		final SubpopulationRegistry registry = 
+			MapUtils.getArbitraryObject(
+					subpopulation,
+					populationRegistries,
+					registryFactory );
+		return registry.chooseStrategy(
+				iteration,
+				randomDraw );
+	}
+
+	public ExtraPlanRemover getExtraPlanRemover() {
+		if ( this.remover == null ) {
+			throw new IllegalStateException( "no removal selector factory defined" );
+		}
+		return this.remover;
+	}
+
+	public void setExtraPlanRemover(
+			final ExtraPlanRemover remover) {
+		if ( this.remover != null ) {
+			throw new IllegalStateException( "already removal selector "+this.remover );
+		}
+		this.remover = remover;
+	}
+}
+
+class SubpopulationRegistry {
+	private static final Logger log = Logger.getLogger( SubpopulationRegistry.class );
 	private final List<GroupPlanStrategy> strategies = new ArrayList<GroupPlanStrategy>();
 	private final List<Double> weights = new ArrayList<Double>();
 	private final List<Integer> lastIters = new ArrayList<Integer>();
@@ -75,19 +135,4 @@ public final class GroupStrategyRegistry {
 		return sum;
 	}
 
-	public ExtraPlanRemover getExtraPlanRemover() {
-		if ( this.remover == null ) {
-			throw new IllegalStateException( "no removal selector factory defined" );
-		}
-		return this.remover;
-	}
-
-	public void setExtraPlanRemover(
-			final ExtraPlanRemover remover) {
-		if ( this.remover != null ) {
-			throw new IllegalStateException( "already removal selector "+this.remover );
-		}
-		this.remover = remover;
-	}
 }
-

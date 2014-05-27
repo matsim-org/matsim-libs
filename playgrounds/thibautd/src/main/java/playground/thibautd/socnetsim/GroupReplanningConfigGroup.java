@@ -39,6 +39,7 @@ public class GroupReplanningConfigGroup extends ReflectiveNonFlatModule {
 		private String strategyName = null;
 		private double weight = 0;
 		private boolean isInnovative = true;
+		private String subpopulation = null;
 
 		public StrategyParameterSet() {
 			super( SET_NAME );
@@ -72,6 +73,16 @@ public class GroupReplanningConfigGroup extends ReflectiveNonFlatModule {
 		@StringSetter( "isInnovative" )
 		public void setIsInnovative(boolean isInnovative) {
 			this.isInnovative = isInnovative;
+		}
+
+		@StringGetter( "subpopulation" )
+		public String getSubpopulation() {
+			return subpopulation;
+		}
+
+		@StringSetter( "subpopulation" )
+		public void setSubpopulation(String subpopulation) {
+			this.subpopulation = subpopulation;
 		}
 	}
 

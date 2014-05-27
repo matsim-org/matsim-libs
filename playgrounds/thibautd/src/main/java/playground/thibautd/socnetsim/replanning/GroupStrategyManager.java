@@ -28,8 +28,10 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.population.JointPlans;
@@ -84,7 +86,8 @@ public class GroupStrategyManager {
 					jointPlans,
 					g );
 
-			final GroupPlanStrategy strategy = registry.chooseStrategy( iteration , random.nextDouble() );
+			final String subpop = identifySubpopulation( g , controllerRegistry );
+			final GroupPlanStrategy strategy = registry.chooseStrategy( iteration , subpop , random.nextDouble() );
 			final List<ReplanningGroup> alloc = MapUtils.getList( strategy , strategyAllocations );
 
 			notifyAlloc( iteration , g , strategy );
@@ -104,6 +107,24 @@ public class GroupStrategyManager {
 			if ( stopWatch != null ) stopWatch.endOperation( "strategy "+strategy );
 			log.info( "strategy "+strategy+" finished" );
 		}
+	}
+
+	private static String identifySubpopulation(
+			final ReplanningGroup g,
+			final ControllerRegistry controllerRegistry) {
+		final String attName = controllerRegistry.getScenario().getConfig().plans().getSubpopulationAttributeName();
+		final ObjectAttributes atts = controllerRegistry.getScenario().getPopulation().getPersonAttributes();
+
+		String name = null;
+
+		for ( Person p : g.getPersons() ) {
+			final String persSubPop = (String) atts.getAttribute( p.getId().toString() , attName );
+			if ( persSubPop == null && name != null ) throw new RuntimeException( "inconsistent subpopulations in group "+g );
+			if ( name != null && !name.equals( persSubPop ) ) throw new RuntimeException( "inconsistent subpopulations in group "+g );
+			name = persSubPop;
+		}
+
+		return name;
 	}
 
 	private void notifyAlloc(

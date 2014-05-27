@@ -158,6 +158,7 @@ public class RunUtils {
 					factories.createStrategy(
 						set.getStrategyName(),
 						controllerRegistry ),
+					set.getSubpopulation(),
 					set.getWeight(),
 					set.isInnovative() ?
 						weights.getDisableInnovationAfterIter() :
@@ -206,6 +207,7 @@ public class RunUtils {
 						factories.createStrategy(
 							set.getStrategyName(),
 							controllerRegistry ),
+						set.getSubpopulation(),
 						set.getWeight(),
 						-1 );
 			}
