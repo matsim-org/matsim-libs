@@ -26,21 +26,18 @@ import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
-import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.cadyts.general.CadytsBuilder;
+import org.matsim.contrib.cadyts.general.LookUp;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
-import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
@@ -62,10 +59,6 @@ public class CadytsModule extends AbstractModule {
         Multibinder <ControlerListener> controlerListenerBinder = Multibinder.newSetBinder(binder(), ControlerListener.class);
         controlerListenerBinder.addBinding().to(CadytsControlerListener.class);
         controlerListenerBinder.addBinding().toProvider(MyControlerListenerProvider.class);
-        MapBinder<String, PlanStrategyFactory> planStrategyFactoryBinder
-                = MapBinder.newMapBinder(binder(), String.class, PlanStrategyFactory.class);
-        planStrategyFactoryBinder.addBinding("ccc").toProvider(PlanChangerFactoryProvider.class);
-        planStrategyFactoryBinder.addBinding("ccs").toProvider(PlanSelectorFactoryProvider.class);
         bind(new TypeLiteral<AnalyticalCalibrator<Link>>(){}).toProvider(CalibratorProvider.class).in(Singleton.class);
         bind(new TypeLiteral<PlansTranslator<Link>>(){}).to(PlanToPlanStepBasedOnEvents.class).in(Singleton.class);
     }
@@ -76,40 +69,13 @@ public class CadytsModule extends AbstractModule {
         @Inject @Named("calibrationCounts") Counts counts;
 
         @Override
-        public AnalyticalCalibrator get() {
-            return CadytsBuilder.buildCalibrator(scenario.getConfig(), this.counts, new LinkLookUp(scenario));
-        }
-    }
-
-    static class PlanChangerFactoryProvider implements Provider<PlanStrategyFactory> {
-        @Inject PlansTranslator<Link> plansTranslator;
-        @Inject AnalyticalCalibrator<Link> calibrator;
-
-        @Override
-        public PlanStrategyFactory get() {
-            return new PlanStrategyFactory() {
+        public AnalyticalCalibrator<Link> get() {
+            return CadytsBuilder.buildCalibrator(scenario.getConfig(), this.counts, new LookUp<Link>() {
                 @Override
-                public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager events) {
-                    ExpBetaPlanChangerWithCadytsPlanRegistration<Link> planSelector = new ExpBetaPlanChangerWithCadytsPlanRegistration<Link>(1.0, plansTranslator, calibrator);
-                    return new PlanStrategyImpl(planSelector);
+                public Link lookUp(Id id) {
+                    return scenario.getNetwork().getLinks().get(id);
                 }
-            };
-        }
-    }
-
-    static class PlanSelectorFactoryProvider implements Provider<PlanStrategyFactory> {
-        @Inject PlansTranslator<Link> plansTranslator;
-        @Inject AnalyticalCalibrator<Link> calibrator;
-
-        @Override
-        public PlanStrategyFactory get() {
-            return new PlanStrategyFactory() {
-                @Override
-                public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager events) {
-                    ExpBetaPlanSelectorWithCadytsPlanRegistration<Link> planSelector = new ExpBetaPlanSelectorWithCadytsPlanRegistration<Link>(1.0, plansTranslator, calibrator);
-                    return new PlanStrategyImpl(planSelector);
-                }
-            };
+            });
         }
     }
 

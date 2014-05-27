@@ -23,7 +23,6 @@
 package playground.mzilske.cadyts;
 
 import cadyts.demand.PlanBuilder;
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -47,8 +46,6 @@ import java.util.Map;
 @Singleton
 class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler,
         PersonDepartureEventHandler, PersonArrivalEventHandler {
-
-    private static final Logger log = Logger.getLogger(PlanToPlanStepBasedOnEvents.class);
 
     private final Scenario scenario;
     private Counts counts;
