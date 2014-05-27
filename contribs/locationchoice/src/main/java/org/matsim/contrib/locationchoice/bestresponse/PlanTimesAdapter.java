@@ -90,7 +90,12 @@ public class PlanTimesAdapter {
 
 			Activity act = (Activity) pe ;
 			if (planElementIndex == 0) {
-				scoringFunction.handleActivity( act );
+				final Activity actTmp = (Activity) planTmp.getPlanElements().get(planElementIndex);
+				// this used to assume the activity starts at 00:00:00, but this
+				// is not what happens in the iterations: the first activity
+				// has no start time, the last has no end time.
+				actTmp.setStartTime( Time.UNDEFINED_TIME );
+				scoringFunction.handleActivity( actTmp );
 //					System.err.println("10 score: " + scoringFunction.getScore() ) ;
 				continue; 
 			}
