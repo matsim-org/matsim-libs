@@ -5,12 +5,8 @@ import org.matsim.core.mobsim.jdeqsim.Message;
 import org.matsim.core.mobsim.jdeqsim.MessageQueue;
 import org.matsim.core.mobsim.jdeqsim.Scheduler;
 
-/**
- * Created by michaelzilske on 19/03/14.
- */
 class SteppableScheduler extends Scheduler implements Steppable {
 
-    private double lastHandledMessageTimeStep;
     private Message lookahead;
     private boolean finished = false;
 
@@ -32,7 +28,6 @@ class SteppableScheduler extends Scheduler implements Steppable {
         while (!queue.isEmpty()) {
             Message m = queue.getNextMessage();
             if (m != null && m.getMessageArrivalTime() == time) {
-                lastHandledMessageTimeStep = time;
                 m.processEvent();
                 m.handleMessage();
             } else {
