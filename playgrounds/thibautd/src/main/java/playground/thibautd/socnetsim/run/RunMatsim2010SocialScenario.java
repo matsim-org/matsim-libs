@@ -63,64 +63,16 @@ public class RunMatsim2010SocialScenario {
 		OutputDirectoryLogging.catchLogEntries();
 		final String configFile = args[ 0 ];
 
-		final Config config = ConfigUtils.createConfig();
-		JointScenarioUtils.addConfigGroups( config );
-		RunUtils.addConfigGroups( config );
-		Matsim2030Utils.addDefaultGroups( config );
+		final Config config = loadConfig(configFile);
+		final Scenario scenario = loadScenario(config);
 
-		new NonFlatConfigReader( config ).parse( configFile );
-		final Scenario scenario = RunUtils.loadScenario( config );
-		Matsim2030Utils.enrichScenario( scenario );
-		scenario.getConfig().controler().setCreateGraphs( false ); // cannot set that from config file...
-
-		final GroupReplanningConfigGroup weights = (GroupReplanningConfigGroup)
-				config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
-		final SocialNetworkConfigGroup snConf = (SocialNetworkConfigGroup)
-				config.getModule( SocialNetworkConfigGroup.GROUP_NAME );
-
-		new SocialNetworkReader( scenario ).parse( snConf.getInputFile() );
-
-		final SocialNetwork sn = (SocialNetwork) scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME );
-		for ( Id p : scenario.getPopulation().getPersons().keySet() ) {
-			if ( !sn.getEgos().contains( p ) ) sn.addEgo( p );
-		}
-
-		final ScenarioMergingConfigGroup mergingGroup = (ScenarioMergingConfigGroup)
-			config.getModule( ScenarioMergingConfigGroup.GROUP_NAME );
-		if ( mergingGroup.getPerformDilution() ) {
-			// XXX it would be nicer if dilution type came from config
-			log.info( "performing \"dilution\" with method "+DILUTION_TYPE );
-			SocialNetworkedPopulationDilutionUtils.dilute(
-					DILUTION_TYPE,
-					scenario,
-					mergingGroup.getDilutionCenter(),
-					mergingGroup.getDilutionRadiusM() );
-		}
-
-		if ( ((ScoringFunctionConfigGroup) config.getModule( ScoringFunctionConfigGroup.GROUP_NAME )).isUseKtiScoring() ) {
-			log.warn( "the parameter \"useKtiScoring\" from module "+ScoringFunctionConfigGroup.GROUP_NAME+" will be set to false" );
-			log.warn( "a KTI-like scoring is already set from the script." );
-		}
-		final ControllerRegistry controllerRegistry =
-			RunUtils.loadDefaultRegistryBuilder(
-				new ControllerRegistryBuilder( scenario )
-					.withGroupIdentifier( 
-							new DynamicGroupIdentifier(
-								scenario ) )
-					.withScoringFunctionFactory(
-							new KtiScoringFunctionFactoryWithJointModes(
-								new MATSim2010ScoringFunctionFactory(
-									scenario,
-									new StageActivityTypesImpl(
-										PtConstants.TRANSIT_ACTIVITY_TYPE,
-										JointActingTypes.INTERACTION) ),
-								scenario )),
-				scenario ).build();
-
-		final ImmutableJointController controller = RunUtils.initializeController( controllerRegistry );
+		final ImmutableJointController controller = createController( scenario );
 
 		RunUtils.loadBeingTogetherListenner( controller );
 
+		final GroupReplanningConfigGroup weights = (GroupReplanningConfigGroup)
+				config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
+		
 		RunUtils.loadDefaultAnalysis(
 				weights.getGraphWriteInterval(),
 				null , // cliques...
@@ -142,6 +94,72 @@ public class RunMatsim2010SocialScenario {
 			new NonFlatConfigWriter( config ).write( controller.getControlerIO().getOutputFilename( "output_config.xml.gz" ) );
 		}
 
+	}
+
+	private static ImmutableJointController createController(
+			final Scenario scenario) {
+		final Config config = scenario.getConfig();
+		if ( ((ScoringFunctionConfigGroup) config.getModule( ScoringFunctionConfigGroup.GROUP_NAME )).isUseKtiScoring() ) {
+			log.warn( "the parameter \"useKtiScoring\" from module "+ScoringFunctionConfigGroup.GROUP_NAME+" will be set to false" );
+			log.warn( "a KTI-like scoring is already set from the script." );
+			((ScoringFunctionConfigGroup) config.getModule( ScoringFunctionConfigGroup.GROUP_NAME )).setUseKtiScoring( false );
+		}
+		final ControllerRegistry controllerRegistry =
+			RunUtils.loadDefaultRegistryBuilder(
+				new ControllerRegistryBuilder( scenario )
+					.withGroupIdentifier( 
+							new DynamicGroupIdentifier(
+								scenario ) )
+					.withScoringFunctionFactory(
+							new KtiScoringFunctionFactoryWithJointModes(
+								new MATSim2010ScoringFunctionFactory(
+									scenario,
+									new StageActivityTypesImpl(
+										PtConstants.TRANSIT_ACTIVITY_TYPE,
+										JointActingTypes.INTERACTION) ),
+								scenario )),
+				scenario ).build();
+
+		final ImmutableJointController controller = RunUtils.initializeController( controllerRegistry );
+		return controller;
+	}
+
+	private static Scenario loadScenario(final Config config) {
+		final Scenario scenario = RunUtils.loadScenario( config );
+		Matsim2030Utils.enrichScenario( scenario );
+		scenario.getConfig().controler().setCreateGraphs( false ); // cannot set that from config file...
+
+		final SocialNetworkConfigGroup snConf = (SocialNetworkConfigGroup)
+				config.getModule( SocialNetworkConfigGroup.GROUP_NAME );
+
+		new SocialNetworkReader( scenario ).parse( snConf.getInputFile() );
+
+		final SocialNetwork sn = (SocialNetwork) scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME );
+		for ( Id p : scenario.getPopulation().getPersons().keySet() ) {
+			if ( !sn.getEgos().contains( p ) ) sn.addEgo( p );
+		}
+
+		final ScenarioMergingConfigGroup mergingGroup = (ScenarioMergingConfigGroup)
+			config.getModule( ScenarioMergingConfigGroup.GROUP_NAME );
+		if ( mergingGroup.getPerformDilution() ) {
+			// XXX it would be nicer if dilution type came from config
+			log.info( "performing \"dilution\" with method "+DILUTION_TYPE );
+			SocialNetworkedPopulationDilutionUtils.dilute(
+					DILUTION_TYPE,
+					scenario,
+					mergingGroup.getDilutionCenter(),
+					mergingGroup.getDilutionRadiusM() );
+		}
+		return scenario;
+	}
+
+	private static Config loadConfig(final String configFile) {
+		final Config config = ConfigUtils.createConfig();
+		JointScenarioUtils.addConfigGroups( config );
+		RunUtils.addConfigGroups( config );
+		Matsim2030Utils.addDefaultGroups( config );
+		new NonFlatConfigReader( config ).parse( configFile );
+		return config;
 	}
 }
 
