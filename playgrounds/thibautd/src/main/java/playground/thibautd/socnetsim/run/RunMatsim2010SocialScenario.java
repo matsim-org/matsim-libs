@@ -123,7 +123,8 @@ public class RunMatsim2010SocialScenario {
 	}
 
 	private static Scenario loadScenario(final Config config) {
-		final Scenario scenario = RunUtils.loadScenario( config );
+		final Scenario scenario = JointScenarioUtils.loadScenario( config );
+		RunUtils.enrichScenario( scenario );
 		Matsim2030Utils.enrichScenario( scenario );
 		scenario.getConfig().controler().setCreateGraphs( false ); // cannot set that from config file...
 

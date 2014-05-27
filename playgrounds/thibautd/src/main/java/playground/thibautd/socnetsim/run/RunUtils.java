@@ -728,6 +728,7 @@ public class RunUtils {
 	public static Scenario loadScenario(final Config config) {
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );
 		enrichScenario( scenario );
+		connectLocations( scenario );
 		return scenario;
 	}
 	
@@ -743,12 +744,6 @@ public class RunUtils {
 								((ScenarioImpl) scenario).getHouseholds() ) );
 		}
 
-		if ( scenario.getActivityFacilities() != null ) {
-			new WorldConnectLocations( config ).connectFacilitiesWithLinks(
-					scenario.getActivityFacilities(),
-					(NetworkImpl) scenario.getNetwork() );
-		}
-	
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				for (Activity act : TripStructureUtils.getActivities( plan , EmptyStageActivityTypes.INSTANCE )) {
@@ -758,6 +753,14 @@ public class RunUtils {
 						scenario.getNetwork().getLinks().get( act.getLinkId() ).getCoord() );
 				}
 			}
+		}
+	}
+	
+	public static void connectLocations(final Scenario scenario) {
+		if ( scenario.getActivityFacilities() != null ) {
+			new WorldConnectLocations( scenario.getConfig() ).connectFacilitiesWithLinks(
+					scenario.getActivityFacilities(),
+					(NetworkImpl) scenario.getNetwork() );
 		}
 	}
 
