@@ -76,7 +76,7 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 
 	public void init(Scenario sc){
 		this.scenario = sc;
-		initializeDistanceClasses(this.scenario.getPopulation(),this.scenario.getNetwork());
+		initializeDistanceClasses(this.scenario.getPopulation());
 		initializeUsedModes(this.scenario.getPopulation());
 	}
 
@@ -119,7 +119,7 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 
 	@Override
 	public void postProcessData() {
-		this.mode2DistanceClass2LegCount = calculateMode2DistanceClass2LegCount(this.scenario.getPopulation(),this.scenario.getNetwork());
+		this.mode2DistanceClass2LegCount = calculateMode2DistanceClass2LegCount(this.scenario.getPopulation());
 	}
 
 	@Override
@@ -155,7 +155,7 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 		}
 	}
 
-	private SortedMap<String, Map<Integer, Integer>> calculateMode2DistanceClass2LegCount(Population pop, Network net) {
+	private SortedMap<String, Map<Integer, Integer>> calculateMode2DistanceClass2LegCount(Population pop) {
 		SortedMap<String, Map<Integer, Integer>> mode2DistanceClassNoOfLegs = new TreeMap<String, Map<Integer, Integer>>();
 
 		for(String mode : this.usedModes){
@@ -167,16 +167,17 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 					List<PlanElement> planElements = plan.getPlanElements();
 					for(PlanElement pe : planElements){
 						if(pe instanceof Leg){
-							Route route = ((NetworkRoute)((Leg)pe).getRoute());
-							double distance=route.getDistance();
-//							double distance;
-//							if (route instanceof NetworkRoute) {
-//								distance = RouteUtils.calcDistance((NetworkRoute) route, net);
-//							} else distance = route.getDistance();
-
-							if(distance > this.distanceClasses.get(i) && distance <= this.distanceClasses.get(i + 1)){
-								noOfLegs++;
-							} 
+							Leg leg = (Leg)pe;
+							Route route = ((Route)((Leg)pe).getRoute());
+							double distance = route.getDistance();
+							//							if (route instanceof NetworkRoute) {
+							//								distance = RouteUtils.calcDistance((NetworkRoute) route, net);
+							//							} else distance = route.getDistance();
+							if(leg.getMode().equals(mode)){
+								if(distance > this.distanceClasses.get(i) && distance <= this.distanceClasses.get(i + 1)){
+									noOfLegs++;
+								} 
+							}
 						}
 					}
 				}
@@ -187,19 +188,20 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 		return mode2DistanceClassNoOfLegs;
 	}
 
-	private double getLongestDistance(Population pop, Network net){
+	private double getLongestDistance(Population pop){
 		double longestDistance = 0.0;
 		for(Person person : pop.getPersons().values()){
 			PlanImpl plan = (PlanImpl) person.getSelectedPlan();
 			List<PlanElement> planElements = plan.getPlanElements();
 			for(PlanElement pe : planElements){
-				if(pe instanceof Route ){
+				if(pe instanceof Leg ){
 
-					Route route = (Route) pe;
-					double distance;
-					if (route instanceof NetworkRoute) {
-						distance = RouteUtils.calcDistance((NetworkRoute) route, net);
-					} else distance = route.getDistance();
+					Route route = ((Route)((Leg)pe).getRoute());
+					double distance = route.getDistance();
+
+					//					if (route instanceof NetworkRoute) {
+					//						distance = RouteUtils.calcDistance((NetworkRoute) route, net);
+					//					} else distance = route.getDistance();
 
 					if(distance > longestDistance){
 						longestDistance = distance;
@@ -210,8 +212,8 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 		log.info("The longest distance is found to be: " + longestDistance);
 		return longestDistance;
 	}
-	private void initializeDistanceClasses(Population pop, Network net) {
-		double longestDistance = getLongestDistance(pop,net);
+	private void initializeDistanceClasses(Population pop) {
+		double longestDistance = getLongestDistance(pop);
 		int endOfDistanceClass = 0;
 		int classCounter = 0;
 		this.distanceClasses.add(endOfDistanceClass);

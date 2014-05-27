@@ -30,22 +30,27 @@ import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistan
  */
 public class ModeDistancDistributionAndModalSplit {
 
-	private final static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMC/";//outputModalSplitSetUp
+	private final static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/";//outputModalSplitSetUp
 	private final static String run = "/run101/";
-//	private  String initialPlanFile = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/input/SiouxFalls_population_probably_v3.xml";
+	private final static String [] runs = {"run105","run106","run107","run108"};
+	//	private  String initialPlanFile = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/input/SiouxFalls_population_probably_v3.xml";
 //	private  String initialPlanFile = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/run33/output_plans.xml.gz";
 	private static String finalPlanFileLocation = runDir+run+"/ITERS/";
-	private static final String networkFile = runDir+run+"output_network.xml.gz";
 	
 	public static void main(String[] args) {
 		ModeDistancDistributionAndModalSplit ms= new ModeDistancDistributionAndModalSplit();
 
-		for(int i=1;i<2;i++){
-			String itNr = String.valueOf(i*100);
-			String finalPlanFile = finalPlanFileLocation+"it."+itNr+"/"+itNr+".plans.xml.gz";
+//		for(int i=1;i<2;i++){
+//			String itNr = String.valueOf(i*100);
+//			String finalPlanFile = finalPlanFileLocation+"it."+itNr+"/"+itNr+".plans.xml.gz";
 //			ms.runBeelineDistance(itNr, finalPlanFile);
-			ms.runRouteskDistance(itNr, finalPlanFile, networkFile);
+//		}
+		
+		for(String str:runs){
+			String finalPlanFile = runDir+str+"/ITERS/it.100/100.plans.xml.gz";
+			ms.runRouteskDistance(str, finalPlanFile);
 		}
+		
 	}
 
 	private void runBeelineDistance(String runNr,String finalPlanFile){
@@ -57,8 +62,8 @@ public class ModeDistancDistributionAndModalSplit {
 		lmdd.writeResults(runDir+run+"/analysis/legModeDistributions/"+runNr+".");
 	}
 	
-	private void runRouteskDistance(String runNr,String finalPlanFile, String networkFile){
-		Scenario sc = loadScenario(finalPlanFile, networkFile);
+	private void runRouteskDistance(String runNr,String finalPlanFile){
+		Scenario sc = loadScenario(finalPlanFile);
 		LegModeRouteDistanceDistributionHandler	lmdfed = new LegModeRouteDistanceDistributionHandler();
 		lmdfed.init(sc);
 		lmdfed.preProcessData();
