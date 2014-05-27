@@ -33,7 +33,7 @@ import playground.vsp.emissions.types.WarmPollutant;
  */
 	public class AbsoluteAndChangeInEmissions {
 
-	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/";
+	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMC/";
 	
 	public static void main(String[] args) {
 
@@ -42,10 +42,10 @@ import playground.vsp.emissions.types.WarmPollutant;
 		
 		
 		
-		SortedMap<String, Double> emissions1 = calculateTotalEmissions(clusterPathDesktop+"/run105/"+eventFileLocation);
-		SortedMap<String, Double> emissions2 = calculateTotalEmissions(clusterPathDesktop+"/run106/"+eventFileLocation);
-		SortedMap<String, Double> emissions3 = calculateTotalEmissions(clusterPathDesktop+"/run107/"+eventFileLocation);
-		SortedMap<String, Double> emissions4 = calculateTotalEmissions(clusterPathDesktop+"/run108/"+eventFileLocation);
+		SortedMap<String, Double> emissions1 = calculateTotalEmissions(clusterPathDesktop+"/run113/"+eventFileLocation);
+		SortedMap<String, Double> emissions2 = calculateTotalEmissions(clusterPathDesktop+"/run114/"+eventFileLocation);
+		SortedMap<String, Double> emissions3 = calculateTotalEmissions(clusterPathDesktop+"/run115/"+eventFileLocation);
+		SortedMap<String, Double> emissions4 = calculateTotalEmissions(clusterPathDesktop+"/run116/"+eventFileLocation);
 
 		String [] pollutants =  emissions1.keySet().toArray(new String [0]);
 
@@ -63,7 +63,7 @@ import playground.vsp.emissions.types.WarmPollutant;
 		double [] r4 = new double [pollutants.length];
 
 		try {
-			writer = IOUtils.getBufferedWriter(clusterPathDesktop+"/analysis/r/rAbsoluteEmissions.txt");
+			writer = IOUtils.getBufferedWriter(clusterPathDesktop+"/analysisExecutedPlans/r/rAbsoluteEmissions.txt");
 			writer.write("pollutants"+"\t"+"baseCase"+"\t"+"onlyEmissions"+"\t"+"onlyCongestion"+"\t"+"both"+"\n");
 
 			for(Entry<String, Double> e : emissions1.entrySet()){
@@ -75,7 +75,7 @@ import playground.vsp.emissions.types.WarmPollutant;
 			}
 			writer.close();
 			
-			writer = IOUtils.getBufferedWriter(clusterPathDesktop+"/analysis/r/rChangeInEmissions.txt");
+			writer = IOUtils.getBufferedWriter(clusterPathDesktop+"/analysisExecutedPlans/r/rChangeInEmissions.txt");
 			writer.write("pollutants"+"\t"+"onlyEmissions"+"\t"+"onlyCongestion"+"\t"+"both"+"\n");
 			//for(int j=0;j<relativeChangeInEmissions.length;j++){
 			for(int i=0;i<pollutants.length;i++){

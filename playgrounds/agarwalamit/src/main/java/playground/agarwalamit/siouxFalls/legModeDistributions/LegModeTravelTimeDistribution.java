@@ -59,16 +59,16 @@ public class LegModeTravelTimeDistribution extends AbstractAnalyisModule {
 	}
 
 	public static void main(String[] args) {
-		String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/";
-//		String [] runs = {"run33"};
-		String [] runs = {"run105","run106","run107","run108"};
+		String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMC/";
+		String [] runs = {"run33"};
+//		String [] runs = {"run113","run114","run115","run116"};
 
 		for(String run:runs){
 			String eventsFile = runDir+run+"/ITERS/it.100/100.events.xml.gz";
 			LegModeTravelTimeDistribution lmttd = new LegModeTravelTimeDistribution(eventsFile);
 			lmttd.preProcessData();
 			lmttd.postProcessData();
-			lmttd.writeResults(runDir+"/analysis/"+run);
+			lmttd.writeResults(runDir+"/analysisExecutedPlans/legModeDistributions/"+run);
 		}
 	}
 

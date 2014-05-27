@@ -39,10 +39,10 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
 public class AbsoluteDelays {
 
 	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/";
-	private static String [] runNumber =  {"run101","run102","run103","run104"};
+	private static String [] runNumber =  {"run113","run114","run115","run116"};
 	public static void main(String[] args) {
 		
-		BufferedWriter writer =IOUtils.getBufferedWriter(clusterPathDesktop+"/outputMC/analysis/r/rAbsoluteDelays.txt");
+		BufferedWriter writer =IOUtils.getBufferedWriter(clusterPathDesktop+"/outputMC/analysisExecutedPlans/r/rAbsoluteDelaysExecutedPlans.txt");
 		
 		double [] delays = new double [runNumber.length];
 		

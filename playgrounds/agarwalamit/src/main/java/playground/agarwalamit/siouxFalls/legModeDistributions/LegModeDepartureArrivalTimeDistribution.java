@@ -68,9 +68,9 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModu
 	}
 
 	public static void main(String[] args) {
-		String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/";
-		//		String [] runs = {"run33"};
-		String [] runs = {"run105","run106","run107","run108"};
+		String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMC/";
+//				String [] runs = {"run33"};
+		String [] runs = {"run113","run114","run115","run116"};
 
 		for(String run:runs){
 			String eventsFile = runDir+run+"/ITERS/it.100/100.events.xml.gz";
@@ -78,8 +78,9 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModu
 			LegModeDepartureArrivalTimeDistribution lmdatd = new LegModeDepartureArrivalTimeDistribution(eventsFile, configFile);
 			lmdatd.preProcessData();
 			lmdatd.postProcessData();
-			new File(runDir+run+"/analysis/legModeDistribution/").mkdir();
-			lmdatd.writeResults(runDir+run+"/analysis/legModeDistribution/");
+			new File(runDir+"/analysis/legModeDistributions/").mkdir();
+//			lmdatd.writeResults(runDir+"/analysis/legModeDistributions/"+run);
+			lmdatd.writeResults(runDir+"/analysisExecutedPlans/legModeDistributions/"+run);
 		}
 	}
 
@@ -115,7 +116,7 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModu
 				for(Id id:mode2personId2DepOrArrTime.get(mode).keySet()){
 					double tt [] = mode2personId2DepOrArrTime.get(mode).get(id);
 					for(double d:tt){
-						d=d/(2*3600);
+						d=d/(3600);
 						if(d > this.timeStepClasses.get(i) && d < this.timeStepClasses.get(i+1)){
 							legCount++;
 						}
@@ -137,7 +138,7 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModu
 
 	private void writeLegMode2DepOrArrivalTimeDistribution(String outputFolder, SortedMap<String, Map<Integer, Integer>> inputMap, String depOrArr){
 
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"rLegMode"+depOrArr+"TimeDistribution.txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+".rLegMode"+depOrArr+"TimeDistribution.txt");
 		try {
 			writer.write("# \t");
 			for(String mode:this.travelModes){
@@ -156,7 +157,7 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModu
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written in File. Reason : "+e);
 		}
-		logger.info("Data is written at "+outputFolder+"rLegMode"+depOrArr+"TimeDistribution.txt");
+		logger.info("Data is written at "+outputFolder+".rLegMode"+depOrArr+"TimeDistribution.txt");
 	}
 
 
@@ -164,7 +165,7 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModu
 		double simulationEndTime = getSimulationEndTime();
 
 		for(int endOfTimeStep =0; endOfTimeStep<=(int)simulationEndTime/(2*3600);endOfTimeStep++){
-			this.timeStepClasses.add(endOfTimeStep);
+			this.timeStepClasses.add(endOfTimeStep*2);
 		}
 		logger.info("The following time classes were defined: " + this.timeStepClasses);
 	}
