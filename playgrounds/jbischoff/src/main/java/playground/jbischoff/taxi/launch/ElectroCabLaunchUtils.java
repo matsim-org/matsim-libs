@@ -21,7 +21,6 @@ package playground.jbischoff.taxi.launch;
 
 import java.util.*;
 
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
@@ -32,11 +31,14 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 
-import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
+import playground.jbischoff.energy.charging.Charger;
+import playground.jbischoff.energy.charging.ElectricTaxiChargingHandler;
 import playground.jbischoff.energy.vehicles.BatteryElectricVehicleImpl;
 import playground.jbischoff.taxi.evaluation.*;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
+import playground.jbischoff.taxi.optimizer.rank.TaxiRankHandler;
 import playground.jbischoff.taxi.sim.ElectricTaxiSimEngine;
+import playground.jbischoff.taxi.vehicles.ElectricTaxi;
 import playground.michalm.taxi.data.*;
 
 
@@ -49,10 +51,10 @@ public class ElectroCabLaunchUtils
 
     private EnergyConsumptionTracker energyConsumptionTracker;
     // private ChargeUponRankArrival chargeUponRankArrival;
-    private RankArrivalDepartureCharger rankArrivalDepartureCharger;
     private TravelDistanceTimeEvaluator travelDistanceEvaluator;
     private TaxiCustomerWaitTimeAnalyser taxiCustomerWaitTimeAnalyser;
-
+    private ElectricTaxiChargingHandler ecabhandler;
+    private TaxiRankHandler rankhandler;
 
     /**
      * Mandatory
@@ -63,7 +65,6 @@ public class ElectroCabLaunchUtils
         Scenario scenario = context.getScenario();
         optimizer.setRankMode(false);
         optimizer.setIdleRankMode(true);
-        boolean ALLCARSELECTRIC = false;
 
         EventsManager events = qSim.getEventsManager();
 
@@ -71,59 +72,53 @@ public class ElectroCabLaunchUtils
 
         EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
 
-        HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle> elvehicles = new HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle>();
-
+        
         travelDistanceEvaluator = new TravelDistanceTimeEvaluator(scenario.getNetwork());
-        
-        if (ALLCARSELECTRIC) {
-   
-            for (Vehicle v : context.getVrpData().getVehicles()) {
-            	Id aid = v.getId();
-            	elvehicles.put(aid, new BatteryElectricVehicleImpl(ecm, 20 * 1000 * 3600));
-            	
-            }
-        }
-        
-        else {
-        	 for (Vehicle v : context.getVrpData().getVehicles()) {
+        ecabhandler = new ElectricTaxiChargingHandler(events);
+        rankhandler = new TaxiRankHandler();
+        HashMap<Id,org.matsim.contrib.transEnergySim.vehicles.api.Vehicle> bevs = new HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle>();
+       	 for (Vehicle v : context.getVrpData().getVehicles()) {
              	Id aid = v.getId();
+             	rankhandler.addVehicle(v);
              	if (aid.toString().startsWith("et"))
-             		{elvehicles.put(aid, new BatteryElectricVehicleImpl(ecm, 20 * 1000 * 3600));
+             		{
+             	    BatteryElectricVehicleImpl bev = new BatteryElectricVehicleImpl(ecm, 20*1000*3600);
+             	    bevs.put(v.getId(), bev);
+             	    ecabhandler.addVehicle(new ElectricTaxi(bev, v));   
              		}
              	
              }
-        	 System.out.println( context.getVrpData().getVehicles().size() + " taxis in total, of which " + elvehicles.size() + " are electric.");
-        }
+      	 System.out.println( context.getVrpData().getVehicles().size() + " taxis in total, of which " + ecabhandler.getVehicles().size()+ " are electric.");
         
         for (Vehicle v : context.getVrpData().getVehicles()) {
             travelDistanceEvaluator.addAgent(v.getId());
         }
 
-        energyConsumptionTracker = new EnergyConsumptionTracker(elvehicles, scenario.getNetwork());
-        rankArrivalDepartureCharger = new RankArrivalDepartureCharger(elvehicles, events, optimizer);
+        energyConsumptionTracker = new EnergyConsumptionTracker(bevs, scenario.getNetwork());
+
         taxiCustomerWaitTimeAnalyser = new TaxiCustomerWaitTimeAnalyser(scenario);
 
         handlerGroup.addHandler(travelDistanceEvaluator);
         handlerGroup.addHandler(energyConsumptionTracker);
-        handlerGroup.addHandler(rankArrivalDepartureCharger);
+        handlerGroup.addHandler(ecabhandler);
+        handlerGroup.addHandler(rankhandler);
         handlerGroup.addHandler(taxiCustomerWaitTimeAnalyser);
 
-        List<Id> rankLinkIds = new ArrayList<Id>();
         for (TaxiRank r : ((TaxiData)context.getVrpData()).getTaxiRanks()) {
-            rankLinkIds.add(r.getLink().getId());
+            rankhandler.addRank(r);
+            ecabhandler.addCharger(new Charger(1000, 50, r.getLink().getId()));
         }
 
-        rankArrivalDepartureCharger.setRankLocations(rankLinkIds);
         
         events.addHandler(handlerGroup);
 
-        optimizer.setRankArrivalCharger(rankArrivalDepartureCharger);
-        optimizer.createNearestRankDb();
+        optimizer.setEcabhandler(ecabhandler);
+        optimizer.createNearestChargerDb();
 
         
 
         ElectricTaxiSimEngine taxiSimEngine = new ElectricTaxiSimEngine(optimizer,
-                rankArrivalDepartureCharger);
+                ecabhandler);
         
         qSim.addMobsimEngine(taxiSimEngine);
 		if (qSim.getScenario().getConfig().network().isTimeVariantNetwork()) {
@@ -137,7 +132,7 @@ public class ElectroCabLaunchUtils
     public void printStatisticsToConsole()
     {
         System.out.println("energy consumption stats");
-        rankArrivalDepartureCharger.getSoCLog().printToConsole();
+        ecabhandler.getSoCLog().printToConsole();
         System.out.println("===");
 
     }
@@ -146,8 +141,8 @@ public class ElectroCabLaunchUtils
     public String writeStatisticsToFiles(String dirname)
     {
         System.out.println("writing energy consumption stats directory to " + dirname);
-        rankArrivalDepartureCharger.getSoCLog().writeToFiles(dirname);
-        rankArrivalDepartureCharger.getChargeLog().writeToFiles(dirname);
+        ecabhandler.getSoCLog().writeToFiles(dirname);
+        ecabhandler.getChargerLog().writeToFiles(dirname);
         String dist = travelDistanceEvaluator.writeTravelDistanceStatsToFiles(dirname
                 + "travelDistanceStats.txt");
         String wait = taxiCustomerWaitTimeAnalyser.writeCustomerWaitStats(dirname

@@ -115,11 +115,11 @@ import playground.michalm.util.RunningVehicleRegister;
 //           taxisFileName = dirName + "taxis-3000.xml";
 
 
-//    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v2\\";
-    	   dirName = "/Users/jb/tucloud/sim/";
+    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v2\\";
+//    	   dirName = "/Users/jb/tucloud/sim/";
 
-           plansFileName = dirName + "plans4to4.xml.gz";
-//           plansFileName = dirName + "1.5plans4to4.xml.gz";
+           plansFileName = dirName + "1.0plans4to3.xml.gz";
+//           plansFileName = dirName + "1.5plans4to3.xml.gz";
 //    	   	plansFileName = dirName + "1.5plans4to3.xml.gz";
 
 //           plansFileName = dirName + "2.0plans4to4.xml.gz";
@@ -130,19 +130,20 @@ import playground.michalm.util.RunningVehicleRegister;
 //           taxisFileName = dirName + "taxis4to4_EV0.7.xml";
 //           taxisFileName = dirName + "taxis4to4_EV0.8.xml";
 //           taxisFileName = dirName + "taxis4to4_EV0.9.xml";
-//           taxisFileName = dirName + "taxis4to4_EV1.0.xml";
-           taxisFileName = dirName + "taxis4to4.xml"; //all conventional
+           taxisFileName = dirName + "taxis4to4_EV1.0.xml";
+//           taxisFileName = dirName + "taxis4to4.xml"; //all conventional
            
 
            
-           changeEventsFilename = dirName + "changeevents.xml.gz";
+           changeEventsFilename = dirName + "changeevents_min.xml";
            eventsFileName = dirName +"2kW.15.1000.events.xml.gz" ;
-           netFileName = dirName + "berlin_brb05.xml.gz";
+           netFileName = dirName + "berlin_brb.xml.gz";
            
         ////////////////////////////////////////////////////////         
 
    
-        electricStatsDir = dirName + "gas10td/";
+        electricStatsDir = dirName + "test/";
+
 
         //        plansFileName = dirName + "20.plans.xml.gz";
         //
@@ -167,8 +168,9 @@ import playground.michalm.util.RunningVehicleRegister;
         writeSimEvents = true;
         waitList = new ArrayList<String>();
 
+//          scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName, dirName+"2kW.15.1000.plans.xml.gz");
         scenario = VrpLauncherUtils.initTimeVariantScenario(netFileName, plansFileName, changeEventsFilename);
-//        scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName);
+
         
 
         //        List<String> taxiCustomerIds;

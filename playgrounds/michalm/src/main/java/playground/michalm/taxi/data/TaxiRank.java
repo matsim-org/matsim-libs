@@ -19,6 +19,7 @@
 
 package playground.michalm.taxi.data;
 
+import java.util.LinkedList;
 import java.util.Queue;
 
 import org.matsim.api.core.v01.*;
@@ -44,6 +45,7 @@ public class TaxiRank
         this.name = name;
         this.link = link;
         this.capacity = STANDARDCAPACITY;
+        this.taxisInRank = new LinkedList<Vehicle>();
     }
 
     public TaxiRank(Id id, String name, Link link, int capacity)
@@ -52,6 +54,8 @@ public class TaxiRank
         this.name = name;
         this.link = link;
         this.capacity = capacity;
+        this.taxisInRank = new LinkedList<Vehicle>();
+
     }
 
     @Override
