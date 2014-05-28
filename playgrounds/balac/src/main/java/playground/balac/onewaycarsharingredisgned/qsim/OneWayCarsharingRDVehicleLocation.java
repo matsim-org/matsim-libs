@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -11,6 +12,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -19,7 +21,8 @@ import org.matsim.core.utils.io.IOUtils;
 
 public class OneWayCarsharingRDVehicleLocation {
 
-	
+	private final static Logger log = Logger.getLogger(OneWayCarsharingRDVehicleLocation.class);
+
 	private QuadTree<OneWayCarsharingRDStation> vehicleLocationQuadTree;	
 	
 	public OneWayCarsharingRDVehicleLocation(String inputFilePath, Controler controler) throws IOException {
@@ -99,6 +102,7 @@ public class OneWayCarsharingRDVehicleLocation {
 		OneWayCarsharingRDStation f = vehicleLocationQuadTree.get(link.getCoord().getX(), link.getCoord().getY());
 		
 		if (f == null || !f.getLink().getId().toString().equals(link.getId().toString())) {
+			log.error("Adding a onewaycarsharing vehicle to the link where there is no station! Continuing anyway.");
 			
 			ArrayList<String> vehIDs = new ArrayList<String>();
 			

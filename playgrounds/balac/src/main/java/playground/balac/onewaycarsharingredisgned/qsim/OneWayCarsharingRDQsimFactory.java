@@ -1,10 +1,17 @@
 package playground.balac.onewaycarsharingredisgned.qsim;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.SimStepParallelEventsManagerImpl;
@@ -25,9 +32,11 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.balac.onewaycarsharingredisgned.config.OneWayCarsharingRDConfigGroup;
-
 
 public class OneWayCarsharingRDQsimFactory implements MobsimFactory{
 
@@ -35,25 +44,56 @@ public class OneWayCarsharingRDQsimFactory implements MobsimFactory{
 
 	private final Scenario scenario;
 	private final Controler controler;
-	
-	public OneWayCarsharingRDQsimFactory(final Scenario scenario, final Controler controler, OneWayCarsharingRDVehicleLocation ffvehiclesLocation) {
+	private final ArrayList<OneWayCarsharingRDStation> owvehiclesLocation;
+
+	public OneWayCarsharingRDQsimFactory(final Scenario scenario, final Controler controler) throws IOException {
 		
 		this.scenario = scenario;
 		this.controler = controler;
-		
+		owvehiclesLocation = new ArrayList<OneWayCarsharingRDStation>();
+		readVehicleLocations();
 	}
-	
-	@Override
-	public Netsim createMobsim(Scenario sc, EventsManager eventsManager) {
-
-		//TODO: create vehicle locations here
-		final OneWayCarsharingRDConfigGroup configGroup = (OneWayCarsharingRDConfigGroup)
+	public void readVehicleLocations() throws IOException {
+		
+		
+		final OneWayCarsharingRDConfigGroup configGroupow = (OneWayCarsharingRDConfigGroup)
 				scenario.getConfig().getModule( OneWayCarsharingRDConfigGroup.GROUP_NAME );
 		
-		OneWayCarsharingRDVehicleLocation ffvehiclesLocation;
 		
-
+		BufferedReader reader;
+		String s;
 		
+		LinkUtils linkUtils = new LinkUtils(controler.getNetwork());
+		
+	
+		if (configGroupow.useOneWayCarsharing()) {
+		reader = IOUtils.getBufferedReader(configGroupow.getvehiclelocations());
+		s = reader.readLine();
+		    s = reader.readLine();
+		    int i = 1;
+		    while(s != null) {
+		    	
+		    	String[] arr = s.split("\t", -1);
+		    
+		    	CoordImpl coordStart = new CoordImpl(arr[2], arr[3]);
+				Link l = linkUtils.getClosestLink(coordStart);		    	
+				ArrayList<String> vehIDs = new ArrayList<String>();
+		    	
+		    	for (int k = 0; k < Integer.parseInt(arr[6]); k++) {
+		    		vehIDs.add(Integer.toString(i));
+		    		i++;
+		    	}
+		    	OneWayCarsharingRDStation f = new OneWayCarsharingRDStation(l, Integer.parseInt(arr[6]), vehIDs);
+		    	
+		    	owvehiclesLocation.add(f);
+		    	s = reader.readLine();
+		    	
+		    }	 
+		}
+		
+	}
+	@Override
+	public Netsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		
 		QSimConfigGroup conf = sc.getConfig().qsim();
 		if (conf == null) {
@@ -89,7 +129,8 @@ public class OneWayCarsharingRDQsimFactory implements MobsimFactory{
 		qSim.addMobsimEngine(teleportationEngine);
 
 		AgentFactory agentFactory = null;
-		
+		OneWayCarsharingRDVehicleLocation owvehiclesLocationqt = null;
+
 		
 		if (sc.getConfig().scenario().isUseTransit()) {
 			agentFactory = new TransitAgentFactory(qSim);
@@ -102,9 +143,9 @@ public class OneWayCarsharingRDQsimFactory implements MobsimFactory{
 			
 			
 			try {
-				ffvehiclesLocation = new OneWayCarsharingRDVehicleLocation(configGroup.getvehiclelocations(), controler);
-				
-				agentFactory = new OneWayCarsharingRDAgentFactory(qSim, scenario, controler, ffvehiclesLocation);
+				owvehiclesLocationqt = new OneWayCarsharingRDVehicleLocation(controler, owvehiclesLocation);
+
+				agentFactory = new OneWayCarsharingRDAgentFactory(qSim, scenario, controler, owvehiclesLocationqt);
 			
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -114,10 +155,42 @@ public class OneWayCarsharingRDQsimFactory implements MobsimFactory{
 			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
 		}
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+		
+		ParkOWVehicles parkSource = new ParkOWVehicles(sc.getPopulation(), agentFactory, qSim,  owvehiclesLocationqt);
+		
 		qSim.addAgentSource(agentSource);
 		
-		
+		qSim.addAgentSource(parkSource);
 		
 		return qSim;
 	}
+	
+	private class LinkUtils {
+		
+		Network network;
+		public LinkUtils(Network network) {
+			
+			this.network = network;		}
+		
+		public LinkImpl getClosestLink(Coord coord) {
+			
+			double distance = (1.0D / 0.0D);
+		    Id closestLinkId = new IdImpl(0L);
+		    for (Link link : network.getLinks().values()) {
+		      LinkImpl mylink = (LinkImpl)link;
+		      Double newDistance = Double.valueOf(mylink.calcDistance(coord));
+		      if (newDistance.doubleValue() < distance) {
+		        distance = newDistance.doubleValue();
+		        closestLinkId = link.getId();
+		      }
+
+		    }
+
+		    return (LinkImpl)network.getLinks().get(closestLinkId);
+			
+			
+		}
+	}
+	
+	
 }

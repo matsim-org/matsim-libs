@@ -51,10 +51,8 @@ public class OneWayCarSharingRDControler extends Controler{
 		final OneWayCarSharingRDControler controler = new OneWayCarSharingRDControler( sc );
 		
 		try {
-			OneWayCarsharingRDVehicleLocation ffvehiclesLocation = new OneWayCarsharingRDVehicleLocation(config.getModule("OneWayCarsharing").getParams().get("vehiclelocationsOneWayCarsharing"), controler);
 		
-		
-		controler.setMobsimFactory( new OneWayCarsharingRDQsimFactory(sc, controler, ffvehiclesLocation) );
+		controler.setMobsimFactory( new OneWayCarsharingRDQsimFactory(sc, controler) );
 
 		controler.setTripRouterFactory(
 				new TripRouterFactory() {

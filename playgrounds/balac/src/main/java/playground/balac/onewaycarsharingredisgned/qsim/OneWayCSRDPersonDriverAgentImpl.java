@@ -144,7 +144,7 @@ public class OneWayCSRDPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 				if (currentLeg.getMode().equals("onewaycarsharing")) {
 					
 					owvehiclesLocation.addVehicle(scenario.getNetwork().getLinks().get(this.cachedDestinationLinkId), owVehId);
-					
+					owVehId = null;
 				}
 				advancePlan(now) ;
 		}
@@ -365,8 +365,8 @@ OneWayCarsharingRDStation station = findClosestAvailableOWCar(route.getStartLink
 		LegImpl carLeg = new LegImpl("onewaycarsharing");
 		
 		carLeg.setTravelTime( travelTime );
-		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", l.getId(), leg.getRoute().getEndLinkId());
-		route.setLinkIds( l.getId(), ids, leg.getRoute().getEndLinkId());
+		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", l.getId(), endLink.getId());
+		route.setLinkIds( l.getId(), ids, destinationLink.getId());
 		route.setTravelTime( travelTime);
 		carLeg.setRoute(route);
 		this.cachedDestinationLinkId = route.getEndLinkId();
@@ -622,7 +622,13 @@ OneWayCarsharingRDStation station = findClosestAvailableOWCar(route.getStartLink
 	public final Id getPlannedVehicleId() {
 		PlanElement currentPlanElement = this.getCurrentPlanElement();
 		NetworkRoute route = (NetworkRoute) ((Leg) currentPlanElement).getRoute(); // if casts fail: illegal state.
-		if (route.getVehicleId() != null) {
+		
+		 if (((Leg)currentPlanElement).getMode().equals("onewaycarsharing")){
+				
+				return new IdImpl("OW_"+ (owVehId));	
+			
+		}
+		 else if (route.getVehicleId() != null) {
 			return route.getVehicleId();
 		} else {
 			return this.getId(); // we still assume the vehicleId is the agentId if no vehicleId is given.
