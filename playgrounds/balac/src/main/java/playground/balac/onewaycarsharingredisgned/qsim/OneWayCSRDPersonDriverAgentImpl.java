@@ -93,7 +93,10 @@ public class OneWayCSRDPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	private OneWayCarsharingRDVehicleLocation owvehiclesLocation;
 	
 	private String owVehId;
-
+	
+	double beelineFactor = 0.0;
+	
+	double walkSpeed = 0.0;
 
 	// ============================================================================================================================
 	// c'tor
@@ -105,6 +108,11 @@ public class OneWayCSRDPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		this.plan = plan;
 		this.scenario = scenario;
 		this.owvehiclesLocation = owvehiclesLocation;
+		
+		beelineFactor = Double.parseDouble(controler.getConfig().getModule("planscalcroute").getParams().get("beelineDistanceFactor"));
+		walkSpeed = Double.parseDouble(controler.getConfig().getModule("planscalcroute").getParams().get("teleportedModeSpeed_walk"));
+		
+		
 		List<? extends PlanElement> planElements = this.plan.getPlanElements();
 		if (planElements.size() > 0) {
 			this.currentPlanElementIndex = 0;
