@@ -69,7 +69,7 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModu
 	}
 
 	public static void main(String[] args) {
-		String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMC/";
+		String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/";
 		String [] runs = {"run33"};
 		//		String [] runs = {"run113","run114","run115","run116"};
 
