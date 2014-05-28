@@ -53,7 +53,7 @@ class MATSimToggleDialog extends ToggleDialog implements
 	private List<FileExporter> exporterCopy = new ArrayList<FileExporter>();
 	private Network currentNetwork;
 	private Map<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
-	private Map<Link, WaySegment> link2Segment = new HashMap<Link, WaySegment>();
+	private Map<Link, List<WaySegment>> link2Segments = new HashMap<Link, List<WaySegment>>();
 	private NetworkListener osmNetworkListener;
 
 	public MATSimToggleDialog() {
@@ -114,17 +114,17 @@ class MATSimToggleDialog extends ToggleDialog implements
 			if (newLayer instanceof NetworkLayer) {
 				currentNetwork = ((NetworkLayer) newLayer).getMatsimNetwork();
 				way2Links = ((NetworkLayer) newLayer).getWay2Links();
-				link2Segment = ((NetworkLayer) newLayer).getLink2Segment();
+				link2Segments = ((NetworkLayer) newLayer).getLink2Segments();
 				ExtensionFileFilter.exporters.clear();
 				ExtensionFileFilter.exporters.add(0,
 						new MATSimNetworkFileExporter());
 			} else {
 				currentNetwork = NetworkImpl.createNetwork();
 				NewConverter.convertOsmLayer(((OsmDataLayer) newLayer).data,
-						currentNetwork, way2Links, link2Segment);
+						currentNetwork, way2Links, link2Segments);
 				this.osmNetworkListener = new NetworkListener(
 						(OsmDataLayer) newLayer, currentNetwork, way2Links,
-						link2Segment);
+						link2Segments);
 				((OsmDataLayer) newLayer).data
 						.addDataSetListener(this.osmNetworkListener);
 				if (oldLayer instanceof NetworkLayer || oldLayer == null) {
@@ -298,15 +298,15 @@ class MATSimToggleDialog extends ToggleDialog implements
 					id = Long.parseLong(tempId);
 				}
 				Link link = network.getLinks().get(new IdImpl(tempId));
-				if (link2Segment.containsKey(link)) {
-					WaySegment segment = link2Segment.get(link);
-					layer.data.setHighlightedWaySegments(Collections
-							.singleton(segment));
-					Collection<OsmPrimitive> zoomTo = new ArrayList<OsmPrimitive>();
-					zoomTo.add(segment.getFirstNode());
-					zoomTo.add(segment.getSecondNode());
-					AutoScaleAction.zoomTo(zoomTo);
-					Main.map.mapView.repaint();
+				if (link2Segments.containsKey(link)) {
+					List<WaySegment> segments = link2Segments.get(link);
+					layer.data.setHighlightedWaySegments(segments);
+					Collection<OsmPrimitive> zoom = new ArrayList<OsmPrimitive>();
+					if(!segments.isEmpty()) {
+						zoom.add(segments.get(0).way);
+						AutoScaleAction.zoomTo(zoom);
+						Main.map.mapView.repaint();
+					}
 				}
 			}
 		}

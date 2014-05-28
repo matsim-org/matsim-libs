@@ -60,7 +60,7 @@ class ConvertTask extends PleaseWaitRunnable {
 		this.progressMonitor.setTicks(1);
 		this.progressMonitor.setCustomText("converting osm data..");
 		
-		NewConverter.convertOsmLayer(((OsmDataLayer) layer).data, tempNetwork, new HashMap<Way, List<Link>>(), new HashMap<Link, WaySegment>());
+		NewConverter.convertOsmLayer(((OsmDataLayer) layer).data, tempNetwork, new HashMap<Way, List<Link>>(), new HashMap<Link, List<WaySegment>>());
 		if (Main.pref.getBoolean("matsim_cleanNetwork")) {
 			this.progressMonitor.setTicks(2);
 			this.progressMonitor.setCustomText("cleaning network..");
@@ -72,7 +72,7 @@ class ConvertTask extends PleaseWaitRunnable {
 		DataSet dataSet = new DataSet();
 
 		HashMap<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
-		HashMap<Link, WaySegment> link2Segment = new HashMap<Link, WaySegment>();
+		HashMap<Link, List<WaySegment>> link2Segment = new HashMap<Link, List<WaySegment>>();
 		HashMap<Node, org.openstreetmap.josm.data.osm.Node> node2OsmNode = new HashMap<Node, org.openstreetmap.josm.data.osm.Node>();
 		this.progressMonitor.setTicks(4);
 		this.progressMonitor.setCustomText("loading nodes..");
@@ -132,7 +132,7 @@ class ConvertTask extends PleaseWaitRunnable {
 			((LinkImpl) newLink).setOrigId(((LinkImpl)link).getOrigId());
 			network.addLink(newLink);
 			way2Links.put(way, Collections.singletonList(newLink));
-			link2Segment.put(newLink, new WaySegment(way, 0));
+			link2Segment.put(newLink, Collections.singletonList(new WaySegment(way, 0)));
 		}
 
 		this.progressMonitor.setTicks(6);

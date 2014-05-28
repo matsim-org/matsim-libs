@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JOptionPane;
+import javax.swing.ProgressMonitor;
 
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.ExtensionFileFilter;
@@ -13,6 +14,7 @@ import org.openstreetmap.josm.data.validation.TestError;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.gui.progress.NullProgressMonitor;
+import org.openstreetmap.josm.gui.progress.PleaseWaitProgressMonitor;
 import org.openstreetmap.josm.io.FileExporter;
 import org.openstreetmap.josm.tools.ImageProvider;
 
@@ -38,26 +40,15 @@ final class MATSimNetworkFileExporter extends FileExporter {
 	public void exportData(File file, Layer layer) throws IOException {
 
 		MATSimTest test = new MATSimTest();
-		test.startTest(NullProgressMonitor.INSTANCE);
+		PleaseWaitProgressMonitor progMonitor = new PleaseWaitProgressMonitor(
+				"Validation");
+		test.startTest(progMonitor);
 		test.visit(((OsmDataLayer) layer).data.allPrimitives());
 		test.endTest();
+		progMonitor.finishTask();
+		progMonitor.close();
 
 		boolean okToExport = true;
-
-		for (TestError error : test.getErrors()) {
-			if (error.getSeverity().equals(Severity.WARNING)) {
-				int proceed = JOptionPane.showConfirmDialog(Main.parent,
-						"Validaton resulted in warnings.\n Proceed?",
-						"Warning", JOptionPane.YES_NO_OPTION,
-						JOptionPane.WARNING_MESSAGE);
-				if (proceed == JOptionPane.NO_OPTION) {
-					okToExport = false;
-					break;
-				} else if (proceed == JOptionPane.YES_OPTION) {
-					break;
-				}
-			}
-		}
 
 		for (TestError error : test.getErrors()) {
 			if (error.getSeverity().equals(Severity.ERROR)) {
@@ -70,6 +61,23 @@ final class MATSimNetworkFileExporter extends FileExporter {
 										.get());
 				okToExport = false;
 				break;
+			}
+		}
+
+		if (okToExport == true) {
+			for (TestError error : test.getErrors()) {
+				if (error.getSeverity().equals(Severity.WARNING)) {
+					int proceed = JOptionPane.showConfirmDialog(Main.parent,
+							"Validaton resulted in warnings.\n Proceed?",
+							"Warning", JOptionPane.YES_NO_OPTION,
+							JOptionPane.WARNING_MESSAGE);
+					if (proceed == JOptionPane.NO_OPTION) {
+						okToExport = false;
+						break;
+					} else if (proceed == JOptionPane.YES_OPTION) {
+						break;
+					}
+				}
 			}
 		}
 

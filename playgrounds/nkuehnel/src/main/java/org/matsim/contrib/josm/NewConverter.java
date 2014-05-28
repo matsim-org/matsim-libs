@@ -1,7 +1,13 @@
 package org.matsim.contrib.josm;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -13,10 +19,9 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.WaySegment;
-
-import java.util.*;
 
 class NewConverter {
 	private final static Logger log = Logger.getLogger(NewConverter.class);
@@ -37,28 +42,46 @@ class NewConverter {
 	static Map<String, OsmHighwayDefaults> highwayDefaults;
 	
 	
-	public static void convertOsmLayer(DataSet dataSet, Network network, Map<Way, List<Link>> way2Links, Map<Link, WaySegment> link2Segment) {
-		long id=0;
+	public static void convertOsmLayer(DataSet dataSet, Network network, Map<Way, List<Link>> way2Links, Map<Link, List<WaySegment>> link2Segments) {
 		if(!dataSet.getWays().isEmpty()) {
 			for(Way way: dataSet.getWays()) {
 				if(!way.isDeleted()) {
-				convertWay(way, network, id, way2Links, link2Segment);
-				id++;
+				convertWay(way, network, way2Links, link2Segments);
 				}
 			}
 		}
 	}
 	
 
-	public static void convertWay(Way way, Network network, long id, Map<Way, List<Link>> way2Links, Map<Link, WaySegment> link2Segment) {
+	public static void convertWay(Way way, Network network, Map<Way, List<Link>> way2Links, Map<Link, List<WaySegment>> link2Segments) {
 		List<Link> links = new ArrayList<Link>();
 		highwayDefaults = OsmConvertDefaults.getDefaults();
 
+		if(way.getNodesCount()<2) {
+			return;
+		}
 		if (way.hasKey(TAG_HIGHWAY) ||  meetsMatsimReq(way.getKeys())) {
 			if (highwayDefaults.containsKey(way.getKeys().get(TAG_HIGHWAY)) || meetsMatsimReq(way.getKeys())) {
-				List<WaySegment> segments = new ArrayList<WaySegment>();
 				
-				for (Node node: way.getNodes()) {
+				
+				
+				List<Node> nodeOrder = new ArrayList<Node>();
+				for (int l=0; l<way.getNodesCount(); l++) {
+					Node current = way.getNode(l);
+					if(l == 0 || l==way.getNodesCount()-1) {
+						nodeOrder.add(current);
+					} else if ( current.isReferredByWays(2)) {
+						for (OsmPrimitive prim: current.getReferrers()) {
+							if(prim instanceof Way && !prim.equals(way)) {
+								if (((Way) prim).hasKey(TAG_HIGHWAY) || meetsMatsimReq(prim.getKeys())) {
+									nodeOrder.add(current);
+								}
+							}
+						}
+					} 
+				}
+				
+				for (Node node: nodeOrder) {
 					if(!network.getNodes().containsKey(new IdImpl(node.getUniqueId()))) {
 						double lat = node.getCoor().lat();
 						double lon = node.getCoor().lon();
@@ -69,25 +92,50 @@ class NewConverter {
 					}
 				}
 				
-				segments.add(new WaySegment(way, 0));
-				for (int i = 1; i < way.getRealNodesCount()-1; i++) {
-					segments.add(new WaySegment(way, i));
+				System.out.println(nodeOrder.size()+" nodes.");
+				
+				long increment = 0;
+				for(int k=1; k<nodeOrder.size(); k++) {
+					List<WaySegment> segs = new ArrayList<WaySegment>();
+					Node nodeFrom = nodeOrder.get(k-1);
+					Node nodeTo = nodeOrder.get(k);
+					int fromIdx = way.getNodes().indexOf(nodeFrom);
+					int toIdx = way.getNodes().indexOf(nodeTo);
+					
+					double length =0;
+					for(int m=fromIdx; m<toIdx; m++) {
+						segs.add(new WaySegment(way, m));
+						length += way.getNode(m).getCoor().greatCircleDistance(way.getNode(m+1).getCoor());
+					}
+					List<Link> tempLinks = createLink(network, way, nodeFrom, nodeTo, length, increment);
+					for(Link link: tempLinks) {
+						link2Segments.put(link, segs);
+					}
+					links.addAll(tempLinks);
+					increment++;
 				}
 				
-				if (way.firstNode().equals(way.lastNode())) {
-					segments.add(new WaySegment(way, way.getRealNodesCount()-1));
-				}
 				
-				System.out.println("Segments: " + segments.size());
 				
-				for(WaySegment segment: segments) {
-					Coord first = new CoordImpl(segment.getFirstNode().getCoor().lon(), segment.getFirstNode().getCoor().lat());
-					Coord second = new CoordImpl(segment.getSecondNode().getCoor().lon(), segment.getSecondNode().getCoor().lat());
-					Double length = OsmConvertDefaults.calculateWGS84Length(
-							first, second);
-					createLink(network, segment,
-							segment.getFirstNode(), segment.getSecondNode(), length, links, id, link2Segment);
-				}
+//				segments.add(new WaySegment(way, 0));
+//				for (int i = 1; i < way.getRealNodesCount()-1; i++) {
+//					segments.add(new WaySegment(way, i));
+//				}
+//				
+//				if (way.firstNode().equals(way.lastNode())) {
+//					segments.add(new WaySegment(way, way.getRealNodesCount()-1));
+//				}
+//				
+//				System.out.println("Segments: " + segments.size());
+//				
+//				for(WaySegment segment: segments) {
+//					Coord first = new CoordImpl(segment.getFirstNode().getCoor().lon(), segment.getFirstNode().getCoor().lat());
+//					Coord second = new CoordImpl(segment.getSecondNode().getCoor().lon(), segment.getSecondNode().getCoor().lat());
+//					Double length = OsmConvertDefaults.calculateWGS84Length(
+//							first, second);
+//					createLink(network, segment,
+//							segment.getFirstNode(), segment.getSecondNode(), length, links, id, link2Segment);
+//				}
 			}
 		}
 		way2Links.put(way, links);
@@ -113,10 +161,8 @@ class NewConverter {
 		}
 	}
 
-
-
-	private static void createLink(final Network network, final WaySegment segment,
-			final Node fromNode, final Node toNode, double length, List<Link> links, long id, Map<Link, WaySegment> link2Segment) {
+	private static List<Link> createLink(final Network network, final Way way,
+			final Node fromNode, final Node toNode, double length, long increment) {
 		
 		Double capacity = 0.;
 		Double freespeed = 0.;
@@ -126,7 +172,7 @@ class NewConverter {
 		modes.add(TransportMode.car);
 		boolean onewayReverse = false;
 		
-		Map<String, String> keys = segment.way.getKeys();
+		Map<String, String> keys = way.getKeys();
 		if(keys.containsKey(TAG_HIGHWAY)) {
 			String highway = keys.get(TAG_HIGHWAY);
 			
@@ -249,21 +295,17 @@ class NewConverter {
 		
 		// only create link, if both nodes were found, node could be null, since
 		// nodes outside a layer were dropped
-	
+		List<Link> links = new ArrayList<Link>();
 		Id fromId = new IdImpl(fromNode.getUniqueId());
 		Id toId = new IdImpl(toNode.getUniqueId());
 		if (network.getNodes().get(fromId) != null
 				&& network.getNodes().get(toId) != null) {
-			String origId = id+"_"+segment.lowerIndex;
+			String origId = way.getUniqueId()+"_"+(increment);
 			if (keys.containsKey(ImportTask.WAY_TAG_ID)) {
-				if(segment.way.getNodesCount()>2) {
-					origId = keys.get(ImportTask.WAY_TAG_ID)+"_"+segment.lowerIndex;
-				} else {
-					origId = keys.get(ImportTask.WAY_TAG_ID);
-				}
+					origId = keys.get(ImportTask.WAY_TAG_ID)+"_"+(increment);
 			}
 			if (!onewayReverse) {
-				Link l = network.getFactory().createLink(new IdImpl(Long.toString(segment.way.getUniqueId())+"_"+segment.lowerIndex),
+				Link l = network.getFactory().createLink(new IdImpl(Long.toString(way.getUniqueId())+"_"+(increment)),
 						network.getNodes().get(fromId),
 						network.getNodes().get(toId));
 				l.setLength(length);
@@ -274,13 +316,12 @@ class NewConverter {
 				if (l instanceof LinkImpl) {
 					((LinkImpl) l).setOrigId(origId);
 				}
-				links.add(l);
 				network.addLink(l);
-				link2Segment.put(l, segment);
+				links.add(l);
 				System.out.println(l.toString());
 			}
 			if (!oneway) {
-				Link l = network.getFactory().createLink(new IdImpl(Long.toString(segment.way.getUniqueId())+"_"+segment.lowerIndex+"_r"),
+				Link l = network.getFactory().createLink(new IdImpl(Long.toString(way.getUniqueId())+"_"+(increment)+"_r"),
 						network.getNodes().get(toId),
 						network.getNodes().get(fromId));
 				l.setLength(length);
@@ -291,12 +332,12 @@ class NewConverter {
 				if (l instanceof LinkImpl) {
 					((LinkImpl) l).setOrigId(origId+"_r");
 				}
-				links.add(l);
 				network.addLink(l);
-				link2Segment.put(l, segment);
+				links.add(l);
 				System.out.println(l.toString());
 			}
 		}
+		return links;
 	}
 }
 

@@ -35,7 +35,7 @@ class NetworkLayer extends OsmDataLayer {
 	private String coordSystem;
 
 	private Map<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
-	private Map<Link, WaySegment> link2Segment = new HashMap<Link, WaySegment>();
+	private Map<Link, List<WaySegment>> link2Segment = new HashMap<Link, List<WaySegment>>();
 
 	public String getCoordSystem() {
 		return coordSystem;
@@ -43,7 +43,7 @@ class NetworkLayer extends OsmDataLayer {
 
 	public NetworkLayer(DataSet data, String name, File associatedFile,
 			Network network, String coordSystem,
-			HashMap<Way, List<Link>> way2Links, Map<Link, WaySegment> link2Segment) {
+			HashMap<Way, List<Link>> way2Links, Map<Link, List<WaySegment>> link2Segment) {
 		super(data, name, associatedFile);
 		this.matsimNetwork = network;
 		this.coordSystem = coordSystem;
@@ -69,7 +69,7 @@ class NetworkLayer extends OsmDataLayer {
 		return way2Links;
 	}
 	
-	public Map<Link, WaySegment> getLink2Segment() {
+	public Map<Link, List<WaySegment>> getLink2Segments() {
 		return link2Segment;
 	}
 

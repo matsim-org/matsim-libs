@@ -48,7 +48,7 @@ class ImportTask extends PleaseWaitRunnable {
 	private Network network;
 	private String importSystem;
 	private HashMap<Way, List<Link>> way2Links;
-	private HashMap<Link, WaySegment> link2Segment;
+	private HashMap<Link, List<WaySegment>> link2Segment;
 
 	public ImportTask(String path) {
 		super("MATSim Import");
@@ -110,7 +110,7 @@ class ImportTask extends PleaseWaitRunnable {
 		network = NetworkImpl.createNetwork();
 
 		way2Links = new HashMap<Way, List<Link>>();
-		link2Segment = new HashMap<Link, WaySegment>();
+		link2Segment = new HashMap<Link, List<WaySegment>>();
 		HashMap<Node, org.openstreetmap.josm.data.osm.Node> node2OsmNode = new HashMap<Node, org.openstreetmap.josm.data.osm.Node>();
 		this.progressMonitor.setTicks(3);
 		this.progressMonitor.setCustomText("creating nodes..");
@@ -177,7 +177,7 @@ class ImportTask extends PleaseWaitRunnable {
 			((LinkImpl) newLink).setOrigId(link.getId().toString());
 			network.addLink(newLink);
 			way2Links.put(way, Collections.singletonList(newLink));
-			link2Segment.put(newLink, new WaySegment(way, 0));
+			link2Segment.put(newLink, Collections.singletonList(new WaySegment(way, 0)));
 		}
 
 		this.progressMonitor.setTicks(5);
