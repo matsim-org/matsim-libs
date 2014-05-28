@@ -30,27 +30,27 @@ import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistan
  */
 public class ModeDistancDistributionAndModalSplit {
 
-	private final static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/";//outputModalSplitSetUp
+	private final static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMC/";//outputModalSplitSetUp
 	private final static String run = "/run101/";
-	private final static String [] runs = {"run105","run106","run107","run108"};
+	private final static String [] runs = {"run33"};//{"run105","run106","run107","run108"};
 	//	private  String initialPlanFile = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/input/SiouxFalls_population_probably_v3.xml";
-//	private  String initialPlanFile = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/run33/output_plans.xml.gz";
+	//	private  String initialPlanFile = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/run33/output_plans.xml.gz";
 	private static String finalPlanFileLocation = runDir+run+"/ITERS/";
-	
+
 	public static void main(String[] args) {
 		ModeDistancDistributionAndModalSplit ms= new ModeDistancDistributionAndModalSplit();
 
-//		for(int i=1;i<2;i++){
-//			String itNr = String.valueOf(i*100);
-//			String finalPlanFile = finalPlanFileLocation+"it."+itNr+"/"+itNr+".plans.xml.gz";
-//			ms.runBeelineDistance(itNr, finalPlanFile);
-//		}
-		
+		//		for(int i=1;i<2;i++){
+		//			String itNr = String.valueOf(i*100);
+		//			String finalPlanFile = finalPlanFileLocation+"it."+itNr+"/"+itNr+".plans.xml.gz";
+		//			ms.runBeelineDistance(itNr, finalPlanFile);
+		//		}
+
 		for(String str:runs){
-			String finalPlanFile = runDir+str+"/ITERS/it.100/100.plans.xml.gz";
+			String finalPlanFile = runDir+str+"/output_plans.xml.gz";
 			ms.runRouteskDistance(str, finalPlanFile);
 		}
-		
+
 	}
 
 	private void runBeelineDistance(String runNr,String finalPlanFile){
@@ -61,7 +61,7 @@ public class ModeDistancDistributionAndModalSplit {
 		lmdd.postProcessData();
 		lmdd.writeResults(runDir+run+"/analysis/legModeDistributions/"+runNr+".");
 	}
-	
+
 	private void runRouteskDistance(String runNr,String finalPlanFile){
 		Scenario sc = loadScenario(finalPlanFile);
 		LegModeRouteDistanceDistributionHandler	lmdfed = new LegModeRouteDistanceDistributionHandler();
@@ -69,19 +69,12 @@ public class ModeDistancDistributionAndModalSplit {
 		lmdfed.preProcessData();
 		lmdfed.postProcessData();
 		lmdfed.writeResults(runDir+"/analysis/legModeDistributions/"+runNr+".");
+		lmdfed.writeResults(runDir+"/analysisExecutedPlans/legModeDistributions/"+runNr+".");
 	}
 
 	private Scenario loadScenario(String planFile) {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setInputFile(planFile);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
-	}
-	
-	private Scenario loadScenario(String planFile, String networkFile) {
-		Config config = ConfigUtils.createConfig();
-		config.plans().setInputFile(planFile);
-		config.network().setInputFile(networkFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		return scenario;
 	}

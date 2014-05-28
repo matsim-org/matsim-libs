@@ -28,6 +28,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -69,17 +70,19 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModu
 
 	public static void main(String[] args) {
 		String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMC/";
-//				String [] runs = {"run33"};
-		String [] runs = {"run113","run114","run115","run116"};
+		String [] runs = {"run33"};
+		//		String [] runs = {"run113","run114","run115","run116"};
 
 		for(String run:runs){
-			String eventsFile = runDir+run+"/ITERS/it.100/100.events.xml.gz";
 			String configFile = runDir+run+"/output_config.xml.gz";
+			int lastItr = (int)getLastIteration(configFile);
+			String eventsFile = runDir+run+"/ITERS/it."+lastItr+"/"+lastItr+".events.xml.gz";
+
 			LegModeDepartureArrivalTimeDistribution lmdatd = new LegModeDepartureArrivalTimeDistribution(eventsFile, configFile);
 			lmdatd.preProcessData();
 			lmdatd.postProcessData();
 			new File(runDir+"/analysis/legModeDistributions/").mkdir();
-//			lmdatd.writeResults(runDir+"/analysis/legModeDistributions/"+run);
+			lmdatd.writeResults(runDir+"/analysis/legModeDistributions/"+run);
 			lmdatd.writeResults(runDir+"/analysisExecutedPlans/legModeDistributions/"+run);
 		}
 	}
@@ -179,5 +182,11 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModu
 	private void getTravelModes(){
 		this.travelModes.addAll(this.mode2PersonId2DepartureTime.keySet());
 		logger.info("Travel modes are "+this.travelModes.toString());
+	}
+	private static double getLastIteration(String configFile){
+		Config config = ConfigUtils.createConfig();
+		MatsimConfigReader reader= new MatsimConfigReader(config);
+		reader.readFile(configFile);
+		return config.controler().getLastIteration();
 	}
 }

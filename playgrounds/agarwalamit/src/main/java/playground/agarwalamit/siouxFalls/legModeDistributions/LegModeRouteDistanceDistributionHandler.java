@@ -20,8 +20,6 @@
 package playground.agarwalamit.siouxFalls.legModeDistributions;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,7 +32,6 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -44,8 +41,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.PtConstants;
 
