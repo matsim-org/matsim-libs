@@ -265,10 +265,10 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 				
 				if (this.plan.getPlanElements().get(this.plan.getPlanElements().indexOf(pe) + 1) instanceof Leg) {
 				
-					initializeFreeFloatingStartWalkLeg(leg);
+					initializeFreeFloatingStartWalkLeg(leg, now);
 				}
 				else
-					initializeFreeFloatingEndWalkLeg(leg);
+					initializeFreeFloatingEndWalkLeg(leg, now);
 							
 			}
 			else if (leg.getMode().equals( "freefloating" )) {
@@ -282,7 +282,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		}
 	}
 	//added methods
-	private void initializeFreeFloatingStartWalkLeg(Leg leg) {
+	private void initializeFreeFloatingStartWalkLeg(Leg leg, double now) {
 		
 		this.state = MobsimAgent.State.LEG;
 		Route route = leg.getRoute();
@@ -310,7 +310,9 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		
 		walkLeg.setRoute(walkRoute);
 		this.cachedDestinationLinkId = startLink.getId();
+		walkLeg.setDepartureTime(now);
 		walkLeg.setTravelTime(travTime);
+		walkLeg.setArrivalTime(now + travTime);
 		// set the route according to the next leg
 		this.currentLeg = walkLeg;
 		this.cachedRouteLinkIds = null;
@@ -378,7 +380,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 			
 	}
 	
-	private void initializeFreeFloatingEndWalkLeg(Leg leg) {
+	private void initializeFreeFloatingEndWalkLeg(Leg leg, double now) {
 		
 		this.state = MobsimAgent.State.LEG;
 		Route route = leg.getRoute();
@@ -399,7 +401,9 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		
 		walkLeg.setRoute(walkRoute);
 		this.cachedDestinationLinkId = route.getEndLinkId();
+		walkLeg.setDepartureTime(now);
 		walkLeg.setTravelTime(travTime);
+		walkLeg.setArrivalTime(now + travTime);
 		// set the route according to the next leg
 		this.currentLeg = walkLeg;
 		this.cachedRouteLinkIds = null;
@@ -580,11 +584,8 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 
 	@Override
 	public final Double getExpectedTravelTime() {
-		PlanElement currentPlanElement = this.getCurrentPlanElement();
-		if (!(currentPlanElement instanceof Leg)) {
-			return null;
-		}
-		return ((Leg) currentPlanElement).getTravelTime();
+		
+		return (this.currentLeg).getTravelTime();
 	}
 
 	@Override

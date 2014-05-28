@@ -596,11 +596,8 @@ OneWayCarsharingRDStation station = findClosestAvailableOWCar(route.getStartLink
 
 	@Override
 	public final Double getExpectedTravelTime() {
-		PlanElement currentPlanElement = this.getCurrentPlanElement();
-		if (!(currentPlanElement instanceof Leg)) {
-			return null;
-		}
-		return ((Leg) currentPlanElement).getTravelTime();
+		
+		return (this.currentLeg).getTravelTime();
 	}
 
 	@Override
