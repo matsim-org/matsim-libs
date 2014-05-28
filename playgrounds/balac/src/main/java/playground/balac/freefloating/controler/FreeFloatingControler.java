@@ -20,7 +20,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.balac.freefloating.config.FreeFloatingConfigGroup;
 import playground.balac.freefloating.qsim.FreeFloatingQsimFactory;
 import playground.balac.freefloating.qsim.FreeFloatingVehiclesLocation;
-import playground.balac.freefloating.router.FreeFloatingRoutingModule;
+import playground.balac.freefloating.router.FreeFloatingParkingRoutingModule;
 import playground.balac.freefloating.scoring.FreeFloatingScoringFunctionFactory;
 
 
@@ -32,10 +32,10 @@ public class FreeFloatingControler extends Controler{
 	}
 
 
-	public void init(Config config, Network network) {
+	public void init(Config config, Network network, Scenario sc) {
 		FreeFloatingScoringFunctionFactory ffScoringFunctionFactory = new FreeFloatingScoringFunctionFactory(
 				      config, 
-				      network);
+				      network, sc);
 	    this.setScoringFunctionFactory(ffScoringFunctionFactory); 	
 				
 		}
@@ -51,11 +51,9 @@ public class FreeFloatingControler extends Controler{
 		
 		final FreeFloatingControler controler = new FreeFloatingControler( sc );
 		
-		try {
-			FreeFloatingVehiclesLocation ffvehiclesLocation = new FreeFloatingVehiclesLocation(config.getModule("FreeFloating").getParams().get("vehiclelocationsFreefloating"), controler);
+		try {		
 		
-		
-		controler.setMobsimFactory( new FreeFloatingQsimFactory(sc, controler, ffvehiclesLocation) );
+			controler.setMobsimFactory( new FreeFloatingQsimFactory(sc, controler) );
 
 		controler.setTripRouterFactory(
 				new TripRouterFactory() {
@@ -72,7 +70,7 @@ public class FreeFloatingControler extends Controler{
 						// add our module to the instance
 						router.setRoutingModule(
 							"freefloating",
-							new FreeFloatingRoutingModule());
+							new FreeFloatingParkingRoutingModule());
 
 						// we still need to provide a way to identify our trips
 						// as being freefloating trips.
@@ -101,8 +99,7 @@ public class FreeFloatingControler extends Controler{
 					
 				});
       controler.getConfig().setParam("controler", "runId", "1");
-      controler.setOverwriteFiles(true);
-      controler.init(config, sc.getNetwork());		
+      controler.init(config, sc.getNetwork(), sc);		
 		
 		controler.run();
 } catch (IOException e) {

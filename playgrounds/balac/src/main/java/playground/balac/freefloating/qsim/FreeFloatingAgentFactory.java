@@ -23,7 +23,8 @@ public class FreeFloatingAgentFactory implements AgentFactory{
 
 	@Override
 	public MobsimDriverAgent createMobsimAgentFromPerson(final Person p) {
-		FreeFloatingPersonDriverAgentImpl agent = new FreeFloatingPersonDriverAgentImpl(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), this.simulation, this.scenario, this.controler, this.ffvehiclesLocation); 
+		
+		FreeFloatingParkingPersonDriverAgentImpl agent = new FreeFloatingParkingPersonDriverAgentImpl(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), this.simulation, this.scenario, this.controler, this.ffvehiclesLocation); 
 		return agent;
 	}
 }
