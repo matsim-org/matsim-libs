@@ -90,7 +90,7 @@ public class IKGISAnalyzerMain {
 
 		log.info("Analyzing zones...");
 		IKGISAnalyzer gisAnalysis = new IKGISAnalyzer(shapeFileZones, scalingFactor, homeActivity, workActivity);
-		gisAnalysis.analyzeZones(scenario1, runDirectory1, causingAgentId2amountSum, affectedAgentId2amountSum);
+		gisAnalysis.analyzeZones_congestionCost(scenario1, runDirectory1, causingAgentId2amountSum, affectedAgentId2amountSum);
 		log.info("Analyzing zones... Done.");
 	}
 	

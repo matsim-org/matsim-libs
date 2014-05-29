@@ -87,42 +87,100 @@ public class IKGISAnalyzer {
 		log.info("Reading zone shapefile... Done.");
 	}
 
-	public void analyzeZones(Scenario scenario, String runDirectory, Map<Id, Double> causingAgentId2amountSum, Map<Id, Double> affectedAgentId2amountSum) {
+	public void analyzeZones_congestionCost(Scenario scenario, String runDirectory, Map<Id, Double> causingAgentId2amountSum, Map<Id, Double> affectedAgentId2amountSum) {
 		
 		log.info("Number of causing agent IDs: " + causingAgentId2amountSum.size());
 		log.info("Number of affected agent IDs: " + affectedAgentId2amountSum.size());
 
-		String outputPath1 = runDirectory + "spatial_analysis/grid/";
+		String outputPath1 = runDirectory + "spatial_analysis/congestionCost_zones/";
 		
 		File file = new File(outputPath1);
 		file.mkdirs();
 				
 		// home activities
+		log.info("Analyzing Home activities per zone...");
 		Map<Integer,Integer> zoneNr2homeActivities = getZoneNr2activityLocations(homeActivity, scenario.getPopulation(), this.zoneId2geometry, this.scalingFactor);
+		log.info("Analyzing Home activities per zone... Done.");
 		
 		// work activities
+		log.info("Analyzing Work activities per zone...");
 		Map<Integer,Integer> zoneNr2workActivities = getZoneNr2activityLocations(workActivity, scenario.getPopulation(), this.zoneId2geometry, this.scalingFactor);
+		log.info("Analyzing Work activities per zone... Done.");
 
 		// all activities
+		log.info("Analyzing all activities per zone...");
 		Map<Integer,Integer> zoneNr2activities = getZoneNr2activityLocations(null, scenario.getPopulation(), this.zoneId2geometry, this.scalingFactor);
+		log.info("Analyzing all activities per zone... Done.");
 		
 		// toll payments mapped back to home location
-		Map<Integer,Double> zoneNr2tollPaymentsCaused = getZoneNr2tollPayments(scenario.getPopulation(), causingAgentId2amountSum, this.zoneId2geometry, this.scalingFactor);
-		Map<Integer,Double> zoneNr2tollPaymentsAffected = getZoneNr2tollPayments(scenario.getPopulation(), affectedAgentId2amountSum, this.zoneId2geometry, this.scalingFactor);
-		
+		log.info("Mapping back congestion cost back to home location...");
+		Map<Integer,Double> zoneNr2tollPaymentsCaused = getZoneNr2totalAmount(scenario.getPopulation(), causingAgentId2amountSum, this.zoneId2geometry, this.scalingFactor);
+		Map<Integer,Double> zoneNr2tollPaymentsAffected = getZoneNr2totalAmount(scenario.getPopulation(), affectedAgentId2amountSum, this.zoneId2geometry, this.scalingFactor);
+		log.info("Mapping back congestion cost back to home location... Done.");
+
 		// toll payments mapped back to home location in relation to home activities
-		Map<Integer,Double> zoneNr2AvgTollPaymentsCaused = getZoneId2avgToll(zoneNr2tollPaymentsCaused, zoneNr2homeActivities);
-		Map<Integer,Double> zoneNr2AvgTollPaymentsAffected = getZoneId2avgToll(zoneNr2tollPaymentsAffected, zoneNr2homeActivities);
+		log.info("Mapping back congestion cost back to home location (in relation to home activities)...");
+		Map<Integer,Double> zoneNr2AvgTollPaymentsCaused = getZoneId2avg(zoneNr2tollPaymentsCaused, zoneNr2homeActivities);
+		Map<Integer,Double> zoneNr2AvgTollPaymentsAffected = getZoneId2avg(zoneNr2tollPaymentsAffected, zoneNr2homeActivities);
+		log.info("Mapping back congestion cost back to home location (in relation to home activities)... Done.");
 		
+		log.info("Writing shape file...");
 		IKShapeFileWriter shapeFileWriter = new IKShapeFileWriter();
 		shapeFileWriter.writeShapeFileGeometry(
 				this.zoneId2geometry, zoneNr2homeActivities, zoneNr2workActivities, zoneNr2activities,
 				zoneNr2tollPaymentsCaused, zoneNr2AvgTollPaymentsCaused,
 				zoneNr2tollPaymentsAffected, zoneNr2AvgTollPaymentsAffected,
-				outputPath1 + scenario.getConfig().controler().getLastIteration() + ".extCost_zones.shp");		
+				outputPath1 + scenario.getConfig().controler().getLastIteration() + ".congestionCost_zones.shp");
+		log.info("Writing shape file... Done.");
 	}
 	
-	private Map<Integer, Double> getZoneId2avgToll(Map<Integer, Double> zoneNr2tollPayments, Map<Integer, Integer> zoneNr2homeActivities) {
+	public void analyzeZones_welfare(String runId, Scenario scenario, String runDirectory, Map<Id, Double> personId2userBenefits, Map<Id, Double> personId2tollPayments, Map<Id, Double> personId2welfareContribution) {
+		String outputPath = runDirectory + "spatial_analysis/welfare_zones/";
+		
+		File file = new File(outputPath);
+		file.mkdirs();
+				
+		// home activities
+		log.info("Analyzing Home activities per zone...");
+		Map<Integer,Integer> zoneNr2homeActivities = getZoneNr2activityLocations(homeActivity, scenario.getPopulation(), this.zoneId2geometry, this.scalingFactor);
+		log.info("Analyzing Home activities per zone... Done.");
+		
+		// work activities
+		log.info("Analyzing Work activities per zone...");
+		Map<Integer,Integer> zoneNr2workActivities = getZoneNr2activityLocations(workActivity, scenario.getPopulation(), this.zoneId2geometry, this.scalingFactor);
+		log.info("Analyzing Work activities per zone... Done.");
+
+		// all activities
+		log.info("Analyzing all activities per zone...");
+		Map<Integer,Integer> zoneNr2activities = getZoneNr2activityLocations(null, scenario.getPopulation(), this.zoneId2geometry, this.scalingFactor);
+		log.info("Analyzing all activities per zone... Done.");
+		
+		// absolute numbers mapped back to home location
+		log.info("Mapping back absolute toll payments and user benefits back to home location...");
+		Map<Integer,Double> zoneNr2tollPayments = getZoneNr2totalAmount(scenario.getPopulation(), personId2tollPayments, this.zoneId2geometry, this.scalingFactor);
+		Map<Integer,Double> zoneNr2userBenefits = getZoneNr2totalAmount(scenario.getPopulation(), personId2userBenefits, this.zoneId2geometry, this.scalingFactor);
+		Map<Integer,Double> zoneNr2welfareContribution = getZoneNr2totalAmount(scenario.getPopulation(), personId2welfareContribution, this.zoneId2geometry, this.scalingFactor);
+		log.info("Mapping back absolute toll payments and user benefits back to home location... Done.");
+
+		// relative numbers mapped back to home location
+		log.info("Mapping back relative numbers to home location (in relation to home activities)...");
+		Map<Integer,Double> zoneNr2AvgTollPayments = getZoneId2avg(zoneNr2tollPayments, zoneNr2homeActivities);
+		Map<Integer,Double> zoneNr2AvgUserBenefits = getZoneId2avg(zoneNr2userBenefits, zoneNr2homeActivities);
+		Map<Integer,Double> zoneNr2AvgWelfareContribution = getZoneId2avg(zoneNr2welfareContribution, zoneNr2homeActivities);
+		log.info("Mapping back relative numbers to home location (in relation to home activities)... Done.");
+		
+		log.info("Writing shape file...");
+		IKWelfareShapeFileWriter shapeFileWriter = new IKWelfareShapeFileWriter();
+		shapeFileWriter.writeShapeFileGeometry(
+				this.zoneId2geometry, zoneNr2homeActivities, zoneNr2workActivities, zoneNr2activities,
+				zoneNr2tollPayments, zoneNr2userBenefits, zoneNr2welfareContribution,
+				zoneNr2AvgTollPayments, zoneNr2AvgUserBenefits, zoneNr2AvgWelfareContribution,
+				outputPath + scenario.getConfig().controler().getLastIteration() + ".welfare_" + runId + ".shp");
+		log.info("Writing shape file... Done.");
+		
+	}
+	
+	private Map<Integer, Double> getZoneId2avg(Map<Integer, Double> zoneNr2tollPayments, Map<Integer, Integer> zoneNr2homeActivities) {
 		Map<Integer, Double> zoneId2avgToll = new HashMap<Integer, Double>();
 		for (Integer zoneId : zoneNr2tollPayments.keySet()) {
 			zoneId2avgToll.put(zoneId, zoneNr2tollPayments.get(zoneId) / zoneNr2homeActivities.get(zoneId));
@@ -131,8 +189,8 @@ public class IKGISAnalyzer {
 		return zoneId2avgToll;
 	}
 
-	private Map<Integer, Double> getZoneNr2tollPayments(Population population, Map<Id, Double> personId2amountSum, Map<Integer, Geometry> zoneId2geometry, int scalingFactor) {
-		Map<Integer, Double> zoneNr2tollPayments = new HashMap<Integer, Double>();	
+	private Map<Integer, Double> getZoneNr2totalAmount(Population population, Map<Id, Double> personId2amountSum, Map<Integer, Geometry> zoneId2geometry, int scalingFactor) {
+		Map<Integer, Double> zoneNr2totalAmount = new HashMap<Integer, Double>();	
 		
 		SortedMap<Id,Coord> personId2homeCoord = getPersonId2Coordinates(population, homeActivity);
 		
@@ -143,11 +201,11 @@ public class IKGISAnalyzer {
 					Point p = MGC.coord2Point(personId2homeCoord.get(personId)); 
 					
 					if (p.within(geometry)){
-						if (zoneNr2tollPayments.get(zoneId) == null){
-							zoneNr2tollPayments.put(zoneId, personId2amountSum.get(personId) * scalingFactor);
+						if (zoneNr2totalAmount.get(zoneId) == null){
+							zoneNr2totalAmount.put(zoneId, personId2amountSum.get(personId) * scalingFactor);
 						} else {
-							double tollPayments = zoneNr2tollPayments.get(zoneId);
-							zoneNr2tollPayments.put(zoneId, tollPayments + (personId2amountSum.get(personId) * scalingFactor) );
+							double tollPayments = zoneNr2totalAmount.get(zoneId);
+							zoneNr2totalAmount.put(zoneId, tollPayments + (personId2amountSum.get(personId) * scalingFactor) );
 						}
 					}
 				}
@@ -156,7 +214,7 @@ public class IKGISAnalyzer {
 			}
 		}
 		
-		return zoneNr2tollPayments;
+		return zoneNr2totalAmount;
 	}
 
 	private Map<Integer, Integer> getZoneNr2activityLocations(String activity, Population population, Map<Integer, Geometry> zoneNr2zoneGeometry, int scalingFactor) {
