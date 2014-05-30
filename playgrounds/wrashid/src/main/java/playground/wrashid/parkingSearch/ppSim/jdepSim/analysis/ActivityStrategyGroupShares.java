@@ -16,7 +16,8 @@ public class ActivityStrategyGroupShares extends
 	public static void main(String[] args) {
 		String outputFolder = "h:/data/experiments/parkingSearchOct2013/runs/run135/output1/";
 		int startIteration = 499;
-		boolean makeRoughStrategyGroups=true;
+		boolean makeRoughStrategyGroups=false;
+		boolean addPrefix=true;
 
 		Matrix eventsMatrix = GeneralLib.readStringMatrix(getEventsFileName(
 				outputFolder, startIteration));
@@ -52,6 +53,32 @@ public class ActivityStrategyGroupShares extends
 						groupName="street";
 					}else if (groupName.equalsIgnoreCase("ARD-illegal-S")){
 						groupName="illegal";
+					}else{
+						DebugLib.stopSystemAndReportInconsistency();
+					} 
+				}
+				
+				if (addPrefix){
+					if (groupName.equalsIgnoreCase("ARD-G")){
+						groupName="GP-" + groupName;
+					} else if (groupName.equalsIgnoreCase("BRD(300m)-G")){
+						groupName="GP-" + groupName;
+					} else if (groupName.equalsIgnoreCase("ARD-TakeClosestGarageParking")){
+						groupName="GP-" + groupName;
+					}else if (groupName.equalsIgnoreCase("BRD-TakeClosestGarageParking")){
+						groupName="GP-" + groupName;
+					}else if (groupName.equalsIgnoreCase("BRD(300m)-S-G")){
+						groupName="SP-" + groupName;
+					}else if (groupName.equalsIgnoreCase("Parkagent")){
+						groupName="SP-" + groupName;
+					}else if (groupName.equalsIgnoreCase("ARD-S")){
+						groupName="SP-" + groupName;
+					}else if (groupName.equalsIgnoreCase("BRD(300m)-S")){
+						groupName="SP-" + groupName;
+					}else if (groupName.equalsIgnoreCase("ARD-waiting-S")){
+						groupName="SP-" + groupName;
+					}else if (groupName.equalsIgnoreCase("ARD-illegal-S")){
+						groupName="IP-" + groupName;
 					}else{
 						DebugLib.stopSystemAndReportInconsistency();
 					} 

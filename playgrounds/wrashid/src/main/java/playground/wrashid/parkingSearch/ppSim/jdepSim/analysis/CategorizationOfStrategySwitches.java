@@ -14,9 +14,9 @@ public class CategorizationOfStrategySwitches extends
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String outputFolder = "f:/data/experiments/parkingSearchOct2013/runs/run135/output/";
-		int referenceIteration = 410;
-		int startIteration = 400;
+		String outputFolder = "f:/data/experiments/parkingSearchOct2013/runs/run179/output/";
+		int referenceIteration = 1249;
+		int startIteration = 1240;
 		int endIteration = referenceIteration - 1;
 		int iterationStep = 1;
 		boolean ignoreCasesWithBothPPUse = true;
