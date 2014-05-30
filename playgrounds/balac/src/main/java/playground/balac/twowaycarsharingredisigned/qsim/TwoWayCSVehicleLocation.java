@@ -64,7 +64,7 @@ public class TwoWayCSVehicleLocation {
 	    
 	   
 	  }
-	public TwoWayCSVehicleLocation(Controler controler, ArrayList<TwoWayCSStation> stations) throws IOException {
+	public TwoWayCSVehicleLocation(Controler controler, ArrayList<TwoWayCSStation> stations) {
 	    double minx = (1.0D / 0.0D);
 	    double miny = (1.0D / 0.0D);
 	    double maxx = (-1.0D / 0.0D);

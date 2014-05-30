@@ -100,7 +100,10 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 	private String twVehId;
 	
 	HashMap<Link, Link> map = new HashMap<Link, Link>();
-
+	
+	double beelineFactor = 0.0;
+	
+	double walkSpeed = 0.0;
 	// ============================================================================================================================
 	// c'tor
 
@@ -111,6 +114,10 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		this.plan = plan;
 		this.scenario = scenario;
 		this.twvehiclesLocation = twvehiclesLocation;
+		
+		beelineFactor = Double.parseDouble(controler.getConfig().getModule("planscalcroute").getParams().get("beelineDistanceFactor"));
+		walkSpeed = Double.parseDouble(controler.getConfig().getModule("planscalcroute").getParams().get("teleportedModeSpeed_walk"));
+		
 		carsharingVehicleLocations = new ArrayList<ActivityFacility>();
 		map = new HashMap<Link, Link>();
 		List<? extends PlanElement> planElements = this.plan.getPlanElements();
@@ -151,7 +158,7 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 				if (currentLeg.getMode().equals("twowaycarsharing") && plan.getPlanElements().get(currentPlanElementIndex + 1) instanceof Leg) {
 					
 					twvehiclesLocation.addVehicle(scenario.getNetwork().getLinks().get(this.cachedDestinationLinkId), twVehId);
-					
+					twVehId = null;
 				}
 				advancePlan(now) ;
 		}
@@ -327,9 +334,9 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		
 		GenericRouteImpl walkRoute = new GenericRouteImpl(route.getStartLinkId(), startLink.getId());
 		final double dist = CoordUtils.calcDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startLink.getCoord());
-		final double estimatedNetworkDistance = dist * 1.3;
+		final double estimatedNetworkDistance = dist * this.beelineFactor;
 
-		final int travTime = (int) (estimatedNetworkDistance / 0.77 );
+		final int travTime = (int) (estimatedNetworkDistance / this.walkSpeed );
 		walkRoute.setTravelTime(travTime);
 		walkRoute.setDistance(estimatedNetworkDistance);	
 		
@@ -509,9 +516,9 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		map.remove(scenario.getNetwork().getLinks().get(leg.getRoute().getEndLinkId()));
 		GenericRouteImpl walkRoute = new GenericRouteImpl(link.getId(), route.getEndLinkId());
 		final double dist = CoordUtils.calcDistance(link.getCoord(), scenario.getNetwork().getLinks().get(route.getEndLinkId()).getCoord());
-		final double estimatedNetworkDistance = dist * 1.3;
+		final double estimatedNetworkDistance = dist * this.beelineFactor;
 
-		final int travTime = (int) (estimatedNetworkDistance / 0.77 );
+		final int travTime = (int) (estimatedNetworkDistance / this.walkSpeed );
 		walkRoute.setTravelTime(travTime);
 		walkRoute.setDistance(estimatedNetworkDistance);		
 		
@@ -708,11 +715,8 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 
 	@Override
 	public final Double getExpectedTravelTime() {
-		PlanElement currentPlanElement = this.getCurrentPlanElement();
-		if (!(currentPlanElement instanceof Leg)) {
-			return null;
-		}
-		return ((Leg) currentPlanElement).getTravelTime();
+		
+		return (this.currentLeg).getTravelTime();
 	}
 
 	@Override
@@ -734,7 +738,12 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 	public final Id getPlannedVehicleId() {
 		PlanElement currentPlanElement = this.getCurrentPlanElement();
 		NetworkRoute route = (NetworkRoute) ((Leg) currentPlanElement).getRoute(); // if casts fail: illegal state.
-		if (route.getVehicleId() != null) {
+		if (((Leg)currentPlanElement).getMode().equals("twowaycarsharing")){
+			
+			return new IdImpl("TW_"+ (twVehId));	
+		
+		}
+		else if (route.getVehicleId() != null) {
 			return route.getVehicleId();
 		} else {
 			return this.getId(); // we still assume the vehicleId is the agentId if no vehicleId is given.

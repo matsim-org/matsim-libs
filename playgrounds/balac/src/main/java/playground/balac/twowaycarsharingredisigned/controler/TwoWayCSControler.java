@@ -17,6 +17,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.balac.allcsmodestest.controler.listener.AllCSModesTestListener;
 import playground.balac.twowaycarsharingredisigned.config.TwoWayCSConfigGroup;
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSQsimFactory;
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSVehicleLocation;
@@ -39,7 +40,11 @@ public class TwoWayCSControler extends Controler{
 				
 		}
 	
-	
+	  protected void loadControlerListeners() {  
+		  
+		    super.loadControlerListeners();   
+		    this.addControlerListener(new TWListener(this.getConfig().getModule("TwoWayCarsharing").getValue("statsFileName")));
+		  }
 	public static void main(final String[] args) {
 		
     	final Config config = ConfigUtils.loadConfig(args[0]);
@@ -51,10 +56,8 @@ public class TwoWayCSControler extends Controler{
 		final TwoWayCSControler controler = new TwoWayCSControler( sc );
 		
 		try {
-			TwoWayCSVehicleLocation ffvehiclesLocation = new TwoWayCSVehicleLocation(config.getModule("TwoWayCarsharing").getParams().get("vehiclelocationsTwoWayCarsharing"), controler);
 		
-		
-		controler.setMobsimFactory( new TwoWayCSQsimFactory(sc, controler, ffvehiclesLocation) );
+		controler.setMobsimFactory( new TwoWayCSQsimFactory(sc, controler) );
 
 		controler.setTripRouterFactory(
 				new TripRouterFactory() {
