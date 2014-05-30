@@ -9,13 +9,13 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 
-public class DummyParkingModuleWithCarSharing implements ParkingModuleWithCarSharing {
+public class DummyParkingModuleWithFreeFloatingCarSharing implements ParkingModuleWithFreeFloatingCarSharing {
 
 	private Controler controler;
 	private Collection<Id> allVehicles;
 	private LinkedList<Id> availableVehicles;
 
-	public DummyParkingModuleWithCarSharing(Controler controler, Collection<Id> vehicles){
+	public DummyParkingModuleWithFreeFloatingCarSharing(Controler controler, Collection<Id> vehicles){
 		this.controler=controler;
 		this.allVehicles = vehicles;
 		availableVehicles=new LinkedList<Id>(vehicles);
