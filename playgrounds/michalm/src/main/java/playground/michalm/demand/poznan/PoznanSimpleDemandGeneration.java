@@ -29,11 +29,14 @@ import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.matrices.Matrix;
 import org.xml.sax.SAXException;
 
 import pl.poznan.put.util.array2d.Array2DReader;
 import pl.poznan.put.util.random.RandomUtils;
-import playground.michalm.demand.*;
+import playground.michalm.demand.ODDemandGenerator;
+import playground.michalm.zone.*;
+import playground.michalm.zone.util.MatrixUtils;
 
 
 public class PoznanSimpleDemandGeneration
@@ -48,7 +51,6 @@ public class PoznanSimpleDemandGeneration
 
         String odMatrixFilePrefix = dirName + "odMatrices\\odMatrix";
         String plansFile = dirName + "plans.xml.gz";
-        String idField = "NO";
         int randomSeed = RandomUtils.DEFAULT_SEED;
 
         // String taxiFile = dirName + "taxiCustomers_07_pc.txt";
@@ -63,10 +65,9 @@ public class PoznanSimpleDemandGeneration
 
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         new MatsimNetworkReader(scenario).readFile(networkFile);
-        Map<Id, Zone> zones = Zone.readZones(scenario, zonesXmlFile, zonesShpFile, idField);
+        Map<Id, Zone> zones = Zones.readZones(scenario, zonesXmlFile, zonesShpFile);
 
-        ActivityGenerator lg = new DefaultActivityGenerator(scenario);
-        ODDemandGenerator dg = new ODDemandGenerator(scenario, lg, zones);
+        ODDemandGenerator dg = new ODDemandGenerator(scenario, zones);
 
         RandomUtils.reset(randomSeed);
 
@@ -74,9 +75,12 @@ public class PoznanSimpleDemandGeneration
             String timePeriod = i + "-" + (i + 1);
             System.out.println("Generation for " + timePeriod);
             String odMatrixFile = odMatrixFilePrefix + timePeriod + ".dat";
-            double[][] odMatrix = Array2DReader
-                    .getDoubleArray(new File(odMatrixFile), zones.size());
-            dg.generateSinglePeriod(odMatrix, "dummy", "dummy", 1, 1, 0, i * 3600);
+            double[][] odMatrixFromFile = Array2DReader.getDoubleArray(new File(odMatrixFile),
+                    zones.size());
+            Matrix odMatrix = MatrixUtils.create("m" + i, zones.keySet(), odMatrixFromFile);
+
+            dg.generateSinglePeriod(odMatrix, "dummy", "dummy", TransportMode.car, i * 3600, 3600,
+                    1);
         }
 
         dg.write(plansFile);

@@ -19,10 +19,13 @@
 
 package playground.michalm.supply;
 
-import java.io.*;
-import java.util.Set;
+import java.io.IOException;
+import java.util.*;
 
 import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.file.VehicleWriter;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -30,35 +33,29 @@ import org.matsim.core.scenario.ScenarioUtils;
 import pl.poznan.put.util.random.*;
 
 
-public class VehicleGenerator
+public class RandomVehicleGenerator
 {
-    public static void generateVehicles(String networkFilename, String vehiclesFilename, int count,
-            int t1)
+    public static void generateVehicles(String networkFile, String vehiclesFile, int count, int t1)
         throws IOException
     {
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
-        nr.readFile(networkFilename);
+        nr.readFile(networkFile);
 
-        Set<Id> linkIdSet = scenario.getNetwork().getLinks().keySet();
-        Id[] linkIds = linkIdSet.toArray(new Id[linkIdSet.size()]);
+        Collection<? extends Link> linkCollection = scenario.getNetwork().getLinks().values();
+
+        Link[] links = linkCollection.toArray(new Link[linkCollection.size()]);
         UniformRandom uniform = RandomUtils.getGlobalUniform();
 
-        PrintWriter pw = new PrintWriter(new File(vehiclesFilename));
-        pw.println("<?xml version=\"1.0\" ?>");
-        pw.println("<!DOCTYPE vehicles SYSTEM \"http://matsim.org/files/dtd/vehicles_v1.dtd\">");
-        pw.println();
-
-        pw.println("<vehicles>");
-
+        List<Vehicle> vehicles = new ArrayList<Vehicle>(count);
         for (int i = 0; i < count; i++) {
-            Id startLinkId = linkIds[uniform.nextInt(0, linkIds.length - 1)];
-            pw.printf("\t<vehicle id=\"taxi_%d\" start_link=\"%s\" t_0=\"0\" t_1=\"%d\"/>\n", i,
-                    startLinkId, t1);
+            Id id = scenario.createId(i + "");
+            Link startLink = links[uniform.nextInt(0, links.length - 1)];
+            Vehicle v = new VehicleImpl(id, startLink, 1, 0, t1);
+            vehicles.add(v);
         }
 
-        pw.println("</vehicles>");
-        pw.close();
+        new VehicleWriter(vehicles).write(vehiclesFile);
     }
 
 
@@ -69,9 +66,9 @@ public class VehicleGenerator
         int t1 = 30 * 60 * 60;
 
         String dir = "d:\\michalm\\eCab\\";
-        String networkFilename = dir + "2kW.15.output_network.xml";
-        String vehiclesFilename = dir + "taxis-" + count + ".xml";
+        String networkFile = dir + "2kW.15.output_network.xml";
+        String vehiclesFile = dir + "taxis-" + count + ".xml";
 
-        generateVehicles(networkFilename, vehiclesFilename, count, t1);
+        generateVehicles(networkFile, vehiclesFile, count, t1);
     }
 }

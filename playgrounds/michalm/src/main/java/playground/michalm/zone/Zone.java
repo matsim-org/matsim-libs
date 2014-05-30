@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,24 +17,57 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.run;
+package playground.michalm.zone;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 
-import playground.michalm.taxi.data.TaxiData;
-import playground.michalm.taxi.data.file.*;
+import com.vividsolutions.jts.geom.Polygon;
 
 
-public class TaxiLauncherUtils
+public class Zone
+    implements Identifiable
 {
-    public static TaxiData initTaxiData(Scenario scenario, String taxisFileName,
-            String ranksFileName)
+    private final Id id;
+    private final String type;
+    private Polygon polygon;
+
+
+    public Zone(Id id, String type)
     {
-        TaxiData taxiData = new TaxiData();
+        this.id = id;
+        this.type = type;
+    }
 
-        new ElectricVehicleReader(scenario, taxiData).parse(taxisFileName);
-        new TaxiRankReader(scenario, taxiData).parse(ranksFileName);
 
-        return taxiData;
+    public Zone(Id id, String type, Polygon polygon)
+    {
+        this.id = id;
+        this.type = type;
+        this.polygon = polygon;
+    }
+
+
+    @Override
+    public Id getId()
+    {
+        return id;
+    }
+
+
+    public String getType()
+    {
+        return type;
+    }
+
+
+    public Polygon getPolygon()
+    {
+        return polygon;
+    }
+
+
+    void setPolygon(Polygon polygon)
+    {
+        this.polygon = polygon;
     }
 }

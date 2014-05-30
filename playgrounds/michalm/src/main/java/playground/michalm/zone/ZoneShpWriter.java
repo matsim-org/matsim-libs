@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,36 +17,45 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.demand;
+package playground.michalm.zone;
 
-import java.io.*;
-import java.util.Scanner;
+import java.util.*;
 
-import pl.poznan.put.util.random.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.*;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
-public class TaxiDemandReducer
+public class ZoneShpWriter
 {
-    public static void main(String[] args)
-        throws IOException
+    public static final String ID_HEADER = "ID";
+
+    private final Map<Id, Zone> zones;
+    private final String coordinateSystem;
+
+
+    public ZoneShpWriter(Map<Id, Zone> zones, String coordinateSystem)
     {
-        UniformRandom uniform = RandomUtils.getGlobalUniform();
+        this.zones = zones;
+        this.coordinateSystem = coordinateSystem;
+    }
 
-        Scanner sc = new Scanner(new File(
-                "d:\\michalm\\2013_07\\mielec-2-peaks-new-03-100\\taxiCustomers_03_pc.txt"));
-        BufferedWriter bw = new BufferedWriter(new FileWriter(
-                "d:\\michalm\\2013_07\\mielec-2-peaks-new-03-100\\taxiCustomers_01_pc.txt"));
 
-        while (sc.hasNext()) {
-            String id = sc.next();
+    public void write(String shpFile)
+    {
+        CoordinateReferenceSystem crs = MGC.getCRS(coordinateSystem);
 
-            if (uniform.nextDouble(0, 1) < 1. / 3) {
-                bw.write(id);
-                bw.newLine();
-            }
+        PolygonFeatureFactory factory = new PolygonFeatureFactory.Builder()
+                .addAttribute(ID_HEADER, String.class).setCrs(crs).setName("zone").create();
+
+        List<SimpleFeature> features = new ArrayList<SimpleFeature>();
+        for (Zone z : zones.values()) {
+            String id = z.getId() + "";
+            features.add(factory.createPolygon(z.getPolygon(), new Object[] { id }, id));
         }
 
-        sc.close();
-        bw.close();
+        ShapeFileWriter.writeGeometries(features, shpFile);
     }
 }

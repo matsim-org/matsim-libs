@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,24 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.run;
+package playground.michalm.demand;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.*;
 
-import playground.michalm.taxi.data.TaxiData;
-import playground.michalm.taxi.data.file.*;
+import playground.michalm.zone.Zone;
 
 
-public class TaxiLauncherUtils
+public class DefaultPersonCreator
+    implements PersonCreator
 {
-    public static TaxiData initTaxiData(Scenario scenario, String taxisFileName,
-            String ranksFileName)
+    private final Scenario scenario;
+    private final PopulationFactory pf;
+
+    private int curentAgentId = 0;
+
+
+    public DefaultPersonCreator(Scenario scenario)
     {
-        TaxiData taxiData = new TaxiData();
+        this.scenario = scenario;
+        this.pf = scenario.getPopulation().getFactory();
+    }
 
-        new ElectricVehicleReader(scenario, taxiData).parse(taxisFileName);
-        new TaxiRankReader(scenario, taxiData).parse(ranksFileName);
 
-        return taxiData;
+    @Override
+    public Person createPerson(Plan plan, Zone fromZone, Zone toZone)
+    {
+        String strId = String.format("%07d", curentAgentId++);
+        Person person = pf.createPerson(scenario.createId(strId));
+        person.addPlan(plan);
+        return person;
     }
 }

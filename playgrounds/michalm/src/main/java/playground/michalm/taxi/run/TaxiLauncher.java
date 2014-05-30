@@ -42,7 +42,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 import pl.poznan.put.util.jfreechart.ChartUtils;
-import playground.michalm.demand.ODDemandGenerator;
+import playground.michalm.demand.taxi.PersonCreatorWithRandomTaxiMode;
 import playground.michalm.taxi.*;
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
@@ -57,23 +57,23 @@ import playground.michalm.util.RunningVehicleRegister;
 
 /*package*/class TaxiLauncher
 {
-    /*package*/final String dirName;
-    /*package*/final String netFileName;
-    /*package*/final String plansFileName;
-    /*package*/final String taxiCustomersFileName;
-    /*package*/String taxisFileName;
-    /*package*/final String ranksFileName;
+    /*package*/final String dir;
+    /*package*/final String netFile;
+    /*package*/final String plansFile;
+    /*package*/final String taxiCustomersFile;
+    /*package*/String taxisFile;
+    /*package*/final String ranksFile;
 
     /*package*/final boolean vrpOutFiles;
-    /*package*/final String vrpOutDirName;
+    /*package*/final String vrpOutDir;
 
     /*package*/final boolean outHistogram;
-    /*package*/final String histogramOutDirName;
+    /*package*/final String histogramOutDir;
 
     /*package*/final boolean otfVis;
 
     /*package*/final boolean writeSimEvents;
-    /*package*/final String eventsFileName;
+    /*package*/final String eventsFile;
 
     /*package*/final Scenario scenario;
 
@@ -98,21 +98,21 @@ import playground.michalm.util.RunningVehicleRegister;
 
     /*package*/TaxiLauncher()
     {
-        dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\";
-        netFileName = dirName + "network.xml";
+        dir = "D:\\PP-rad\\taxi\\mielec-2-peaks\\";
+        netFile = dir + "network.xml";
 
-        plansFileName = dirName + "output\\ITERS\\it.20\\20.plans.xml.gz";
+        plansFile = dir + "output\\ITERS\\it.20\\20.plans.xml.gz";
 
-        taxiCustomersFileName = dirName + "taxiCustomers_05_pc.txt";
+        taxiCustomersFile = dir + "taxiCustomers_05_pc.txt";
         // taxiCustomersFileName = dirName + "taxiCustomers_10_pc.txt";
 
-        ranksFileName = null;
-        taxisFileName = dirName + "ranks-5_taxis-50.xml";
+        ranksFile = null;
+        taxisFile = dir + "ranks-5_taxis-50.xml";
         // ranksFileName = dirName + "ranks-5_taxis-150.xml";
 
         // reqIdToVehIdFileName = dirName + "reqIdToVehId";
 
-        eventsFileName = dirName + "output\\ITERS\\it.20\\20.events.xml.gz";
+        eventsFile = dir + "output\\ITERS\\it.20\\20.events.xml.gz";
 
         //optimizer:
         algorithmConfig = AlgorithmConfig.NOS_DSE_SL;
@@ -128,15 +128,16 @@ import playground.michalm.util.RunningVehicleRegister;
         otfVis = !true;
 
         vrpOutFiles = !true;
-        vrpOutDirName = dirName + "vrp_output";
+        vrpOutDir = dir + "vrp_output";
 
         outHistogram = true;
-        histogramOutDirName = dirName + "histograms";
+        histogramOutDir = dir + "histograms";
 
         writeSimEvents = !true;
 
-        scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName);
-        List<String> passengerIds = ODDemandGenerator.readTaxiCustomerIds(taxiCustomersFileName);
+        scenario = VrpLauncherUtils.initScenario(netFile, plansFile);
+        List<String> passengerIds = PersonCreatorWithRandomTaxiMode
+                .readTaxiCustomerIds(taxiCustomersFile);
         VrpLauncherUtils.convertLegModes(passengerIds, TaxiRequestCreator.MODE, scenario);
     }
 
@@ -161,17 +162,17 @@ import playground.michalm.util.RunningVehicleRegister;
         scanner.close();
 
         //        dirName = params.get("dirName") + '/';
-        dirName = new File(paramFile).getParent() + '/';
-        netFileName = dirName + params.get("netFileName");
+        dir = new File(paramFile).getParent() + '/';
+        netFile = dir + params.get("netFileName");
 
-        plansFileName = dirName + params.get("plansFileName");
+        plansFile = dir + params.get("plansFileName");
 
-        taxiCustomersFileName = dirName + params.get("taxiCustomersFileName");
+        taxiCustomersFile = dir + params.get("taxiCustomersFileName");
 
-        ranksFileName = dirName + params.get("ranksFileName");
-        taxisFileName = dirName + params.get("taxisFileName");
+        ranksFile = dir + params.get("ranksFileName");
+        taxisFile = dir + params.get("taxisFileName");
 
-        eventsFileName = dirName + params.get("eventsFileName");
+        eventsFile = dir + params.get("eventsFileName");
 
         algorithmConfig = AlgorithmConfig.valueOf(params.get("algorithmConfig"));
         onlineVehicleTracker = Boolean.valueOf(params.get("onlineVehicleTracker"));
@@ -184,18 +185,19 @@ import playground.michalm.util.RunningVehicleRegister;
         otfVis = Boolean.valueOf(params.get("otfVis"));
 
         vrpOutFiles = Boolean.valueOf(params.get("vrpOutFiles"));
-        vrpOutDirName = dirName + params.get("vrpOutDirName");
+        vrpOutDir = dir + params.get("vrpOutDirName");
 
         outHistogram = Boolean.valueOf(params.get("outHistogram"));
-        histogramOutDirName = dirName + params.get("histogramOutDirName");
+        histogramOutDir = dir + params.get("histogramOutDirName");
 
         writeSimEvents = Boolean.valueOf(params.get("writeSimEvents"));
 
-        scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName);
-//        scenario = VrpLauncherUtils.initTimeVariantScenario(netFileName, plansFileName,
-//                dirName + "changeevents.xml.gz");
+        scenario = VrpLauncherUtils.initScenario(netFile, plansFile);
+        //        scenario = VrpLauncherUtils.initTimeVariantScenario(netFileName, plansFileName,
+        //                dirName + "changeevents.xml.gz");
 
-        List<String> passengerIds = ODDemandGenerator.readTaxiCustomerIds(taxiCustomersFileName);
+        List<String> passengerIds = PersonCreatorWithRandomTaxiMode
+                .readTaxiCustomerIds(taxiCustomersFile);
         VrpLauncherUtils.convertLegModes(passengerIds, TaxiRequestCreator.MODE, scenario);
     }
 
@@ -204,7 +206,7 @@ import playground.michalm.util.RunningVehicleRegister;
     {
         TravelTime travelTime = travelTimeCalculator == null ? //
                 VrpLauncherUtils.initTravelTime(scenario, algorithmConfig.ttimeSource,
-                        eventsFileName) : //
+                        eventsFile) : //
                 travelTimeCalculator.getLinkTravelTimes();
 
         TravelDisutility travelDisutility = VrpLauncherUtils.initTravelDisutility(
@@ -238,7 +240,7 @@ import playground.michalm.util.RunningVehicleRegister;
 
         contextImpl.setScenario(scenario);
 
-        TaxiData taxiData = TaxiLauncherUtils.initTaxiData(scenario, taxisFileName, ranksFileName);
+        TaxiData taxiData = TaxiLauncherUtils.initTaxiData(scenario, taxisFile, ranksFile);
         contextImpl.setVrpData(taxiData);
 
         TaxiOptimizerConfiguration optimizerConfig = createOptimizerConfiguration();
@@ -256,9 +258,8 @@ import playground.michalm.util.RunningVehicleRegister;
             qSim.addQueueSimulationListeners(new BeforeSimulationTaxiCaller(passengerEngine));
         }
 
-        LegCreator legCreator = onlineVehicleTracker ? VrpLegs
-                .createLegWithOnlineTrackerCreator(optimizer, qSim.getSimTimer())
-                : VrpLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR;
+        LegCreator legCreator = onlineVehicleTracker ? VrpLegs.createLegWithOnlineTrackerCreator(
+                optimizer, qSim.getSimTimer()) : VrpLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR;
 
         TaxiActionCreator actionCreator = new TaxiActionCreator(passengerEngine, legCreator,
                 pickupDuration);
@@ -269,7 +270,7 @@ import playground.michalm.util.RunningVehicleRegister;
 
         EventWriter eventWriter = null;
         if (writeSimEvents) {
-            eventWriter = new EventWriterXML(dirName + "events.xml.gz");
+            eventWriter = new EventWriterXML(dir + "events.xml.gz");
             events.addHandler(eventWriter);
         }
 
@@ -326,7 +327,7 @@ import playground.michalm.util.RunningVehicleRegister;
         VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(pathCalculator, scheduler);
 
         return new TaxiOptimizerConfiguration(context, pathCalculator, scheduler, vrpFinder,
-                algorithmConfig.goal, dirName);
+                algorithmConfig.goal, dir);
     }
 
 
@@ -336,13 +337,14 @@ import playground.michalm.util.RunningVehicleRegister;
         pw.println("m\t" + context.getVrpData().getVehicles().size());
         pw.println("n\t" + context.getVrpData().getRequests().size());
         pw.println(TaxiStats.HEADER);
-        TaxiStats stats = new TaxiStatsCalculator().calculateStats(context.getVrpData().getVehicles());
+        TaxiStats stats = new TaxiStatsCalculator().calculateStats(context.getVrpData()
+                .getVehicles());
         pw.println(stats);
         pw.flush();
 
         if (vrpOutFiles) {
             new Schedules2GIS(context.getVrpData().getVehicles(),
-                    TransformationFactory.WGS84_UTM33N).write(vrpOutDirName);
+                    TransformationFactory.WGS84_UTM33N).write(vrpOutDir);
         }
 
         // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
@@ -350,7 +352,7 @@ import playground.michalm.util.RunningVehicleRegister;
                 .getVehicles()));
 
         if (outHistogram) {
-            VrpLauncherUtils.writeHistograms(legHistogram, histogramOutDirName);
+            VrpLauncherUtils.writeHistograms(legHistogram, histogramOutDir);
         }
     }
 

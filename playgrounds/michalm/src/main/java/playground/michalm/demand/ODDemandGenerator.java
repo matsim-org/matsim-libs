@@ -19,210 +19,103 @@
 
 package playground.michalm.demand;
 
-import java.io.*;
-import java.util.*;
-
-import javax.naming.ConfigurationException;
-import javax.xml.parsers.ParserConfigurationException;
+import java.util.Map;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.dvrp.run.VrpConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.xml.sax.SAXException;
+import org.matsim.matrices.*;
 
-import pl.poznan.put.util.array2d.Array2DReader;
 import pl.poznan.put.util.random.*;
-import playground.michalm.demand.Zone.Type;
-
-import com.google.common.collect.Lists;
+import playground.michalm.zone.Zone;
+import playground.michalm.zone.util.MatrixUtils;
 
 
 public class ODDemandGenerator
-// extends AbstractDemandGenerator
 {
     private final UniformRandom uniform = RandomUtils.getGlobalUniform();
 
     private final Scenario scenario;
-    private final ActivityGenerator lg;
-    private final List<Zone> zones;
+    private final ActivityCreator activityCreator;
+    private final PersonCreator personCreator;
+    private final Map<Id, Zone> zones;
     private final PopulationFactory pf;
-    private final List<Person> taxiCustomers = new ArrayList<Person>();
-    private int curentAgentId = 0;
 
 
-    public ODDemandGenerator(Scenario scenario, ActivityGenerator lg, Map<Id, Zone> zoneMap)
+    public ODDemandGenerator(Scenario scenario, Map<Id, Zone> zones)
+    {
+        this(scenario, new DefaultActivityCreator(scenario), new DefaultPersonCreator(scenario),
+                zones);
+    }
+
+
+    public ODDemandGenerator(Scenario scenario, ActivityCreator activityCreator,
+            PersonCreator personCreator, Map<Id, Zone> zones)
     {
         this.scenario = scenario;
-        this.lg = lg;
-        this.zones = Lists.newArrayList(zoneMap.values());
+        this.activityCreator = activityCreator;
+        this.personCreator = personCreator;
+        this.zones = zones;
         pf = scenario.getPopulation().getFactory();
     }
 
 
-    private Person createAndInitPerson(Plan plan)
+    public void generateSinglePeriod(Matrix matrix, String fromActivityType, String toActivityType,
+            String mode, double startTime, double duration, double flowCoeff)//TransportMode.car
     {
-        String strId = String.format("%07d", curentAgentId);
-        curentAgentId++;
+        Iterable<Entry> entryIter = MatrixUtils.createEntryIterable(matrix);
 
-        Person person = pf.createPerson(scenario.createId(strId));
-        person.addPlan(plan);
+        for (Entry e : entryIter) {
+            Zone fromZone = zones.get(e.getFromLocation());
+            Zone toZone = zones.get(e.getToLocation());
+            int trips = (int)uniform.floorOrCeil(flowCoeff * e.getValue());
 
-        scenario.getPopulation().addPerson(person);
-        return person;
-    }
+            for (int k = 0; k < trips; k++) {
+                Plan plan = pf.createPlan();
 
+                // act0
+                Activity startAct = activityCreator.createActivity(fromZone, fromActivityType);
+                startAct.setEndTime((int)uniform.nextDouble(startTime, startTime + duration));
+                plan.addActivity(startAct);
 
-    public void generateSinglePeriod(double[][] odMatrix, String fromActivityType,
-            String toActivityType, double hours, double flowCoeff, double taxiProbability,
-            double startTime)
-    {
-        int zoneCount = zones.size();
+                // leg
+                plan.addLeg(pf.createLeg(mode));
 
-        for (int i = 0; i < zoneCount; i++) {
-            Zone oZone = zones.get(i);
+                // act1
+                plan.addActivity(activityCreator.createActivity(toZone, toActivityType));
 
-            for (int j = 0; j < zoneCount; j++) {
-                Zone dZone = zones.get(j);
-
-                double flow = hours * flowCoeff * odMatrix[i][j];// assumption: positive number!
-                boolean roundUp = uniform.nextDouble(0, 1) < (flow - (int)flow);
-
-                int trips = (int)flow + (roundUp ? 1 : 0);
-
-                if (trips == 0) {
-                    continue;
-                }
-
-                boolean isInternalFlow = oZone.getType() == Type.INTERNAL
-                        && dZone.getType() == Type.INTERNAL;
-
-                double timeStep = hours * 3600 / trips;
-
-                for (int k = 0; k < trips; k++) {
-                    Plan plan = pf.createPlan();
-
-                    // act 0
-                    Activity startAct = lg.createActivityInZone(oZone, fromActivityType);
-                    startAct.setEndTime((int) (startTime + k * timeStep + uniform.nextDouble(0,
-                            timeStep)));
-                    plan.addActivity(startAct);
-
-                    // leg
-                    plan.addLeg(pf.createLeg(TransportMode.car));
-
-                    // act1
-                    Activity endAct = lg.createActivityInZone(dZone, toActivityType, startAct);
-                    plan.addActivity(endAct);
-
-                    createAndInitPerson(plan);
-
-                    // isTaxi?
-                    if (isInternalFlow && taxiProbability > 0
-                            && uniform.nextDouble(0, 1) < taxiProbability) {
-                        taxiCustomers.add(plan.getPerson());
-                    }
-                }
+                Person person = personCreator.createPerson(plan, fromZone, toZone);
+                scenario.getPopulation().addPerson(person);
             }
         }
     }
 
 
-    public void generateMultiplePeriods(double[][] odMatrix, String fromActivityType,
-            String toActivityType, double[] hours, double[] flowCoeff, double[] taxiProbability)
+    public void generateMultiplePeriods(Matrix matrix, String fromActivityType,
+            String toActivityType, String mode, double startTime, double duration,
+            double[] flowCoeffs)
     {
-        double startTime = 0;
-        for (int i = 0; i < hours.length; i++) {
-            generateSinglePeriod(odMatrix, fromActivityType, toActivityType, hours[i],
-                    flowCoeff[i], taxiProbability[i], startTime);
-            startTime += 3600 * hours[i];
+        for (int i = 0; i < flowCoeffs.length; i++) {
+            generateSinglePeriod(matrix, fromActivityType, toActivityType, mode, startTime,
+                    duration, flowCoeffs[i]);
+            startTime += duration;
         }
     }
 
 
-    public void generateMultiplePeriods(double[][][] odMatrix, String fromActivityType,
-            String toActivityType, double[] taxiProbability)
+    public void generateMultiplePeriods(Matrix[] matrices, String fromActivityType,
+            String toActivityType, String mode, double startTime, double duration, double flowCoeffs)
     {
-        double startTime = 0;
-        for (int i = 0; i < odMatrix.length; i++) {
-            generateSinglePeriod(odMatrix[i], fromActivityType, toActivityType, 1, 1,
-                    taxiProbability[i], startTime);
-            startTime += 3600;
-        }
-    }
-
-
-    public void writeTaxiCustomers(String taxiCustomersFile)
-        throws IOException
-    {
-        BufferedWriter bw = new BufferedWriter(new FileWriter(new File(taxiCustomersFile)));
-
-        for (Person p : taxiCustomers) {
-            bw.write(p.getId().toString());
-            bw.newLine();
-        }
-
-        bw.close();
-    }
-
-
-    public static List<String> readTaxiCustomerIds(String taxiCustomersFile)
-    {
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(new File(taxiCustomersFile)));
-            List<String> taxiCustomerIds = new ArrayList<String>();
-
-            String line;
-            while ( (line = br.readLine()) != null) {
-                taxiCustomerIds.add(line);
-            }
-
-            br.close();
-            return taxiCustomerIds;
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
+        for (int i = 0; i < matrices.length; i++) {
+            generateSinglePeriod(matrices[i], fromActivityType, toActivityType, mode, startTime,
+                    duration, flowCoeffs);
+            startTime += duration;
         }
     }
 
 
     public void write(String plansFile)
     {
-        new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV4(plansFile);
+        new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(plansFile);
         System.out.println("Generated population written to: " + plansFile);
-    }
-
-
-    public static void main(String[] args)
-        throws ConfigurationException, IOException, SAXException, ParserConfigurationException
-    {
-        String dirName = "D:\\PP-rad\\taxi\\mielec\\";
-        String networkFile = dirName + "network.xml";
-        String zonesXmlFile = dirName + "zones.xml";
-        String zonesShpFile = dirName + "GIS\\zones_with_no_zone.SHP";
-        String odMatrixFile = dirName + "odMatrix.dat";
-        String plansFile = dirName + "plans.xml";
-        String idField = "NO";
-
-        double hours = 2;
-        double flowCoeff = 0.5;
-        double taxiProbability = 0.10;
-
-        String taxiFile = dirName + "taxiCustomers_" + ((int) (taxiProbability * 100)) + "_pc.txt";
-
-        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
-        new MatsimNetworkReader(scenario).readFile(networkFile);
-        Map<Id, Zone> zones = Zone.readZones(scenario, zonesXmlFile, zonesShpFile, idField);
-
-        ActivityGenerator lg = new DefaultActivityGenerator(scenario);
-        ODDemandGenerator dg = new ODDemandGenerator(scenario, lg, zones);
-
-        double[][] odMatrix = Array2DReader.getDoubleArray(new File(odMatrixFile), zones.size());
-
-        dg.generateMultiplePeriods(odMatrix, "dummy", "dummy", new double[] { hours },
-                new double[] { flowCoeff }, new double[] { taxiProbability });
-        dg.write(plansFile);
-        dg.writeTaxiCustomers(taxiFile);
     }
 }

@@ -30,8 +30,8 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 public class RandomDynAgentLauncher
 {
-    private final String dirName;
-    private final String netFileName;
+    private final String dir;
+    private final String netFile;
     private final boolean otfVis;
     private final int agentCount;
 
@@ -40,8 +40,8 @@ public class RandomDynAgentLauncher
 
     public RandomDynAgentLauncher()
     {
-        dirName = "./src/main/resources/";
-        netFileName = dirName + "grid_network.xml";
+        dir = "./src/main/resources/";
+        netFile = dir + "grid_network.xml";
 
         otfVis = true;//or false -- turning ON/OFF visualization
         agentCount = 100;
@@ -52,7 +52,7 @@ public class RandomDynAgentLauncher
 
     public void go()
     {
-        new MatsimNetworkReader(scenario).readFile(netFileName);
+        new MatsimNetworkReader(scenario).readFile(netFile);
 
         QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
         qSim.addAgentSource(new RandomDynAgentSource(qSim, agentCount));

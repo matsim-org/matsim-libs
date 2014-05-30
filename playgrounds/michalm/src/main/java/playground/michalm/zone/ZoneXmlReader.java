@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,16 +17,54 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.demand;
+package playground.michalm.zone;
 
-import org.matsim.api.core.v01.population.Activity;
+import java.util.*;
+
+import org.matsim.api.core.v01.*;
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.xml.sax.Attributes;
 
 
-public interface ActivityGenerator
+public class ZoneXmlReader
+    extends MatsimXmlParser
 {
-    public abstract Activity createActivityInZone(Zone zone, String actType);
+    private final static String ZONE = "zone";
+
+    private final Scenario scenario;
+    private final Map<Id, Zone> zones = new LinkedHashMap<Id, Zone>();
 
 
-    public abstract Activity createActivityInZone(Zone zone, String actType,
-            Activity perviousActivity);
+    public ZoneXmlReader(Scenario scenario)
+    {
+        this.scenario = scenario;
+    }
+
+
+    public Map<Id, Zone> getZones()
+    {
+        return zones;
+    }
+
+
+    @Override
+    public void startTag(String name, Attributes atts, Stack<String> context)
+    {
+        if (ZONE.equals(name)) {
+            startZone(atts);
+        }
+    }
+
+
+    @Override
+    public void endTag(String name, String content, Stack<String> context)
+    {}
+
+
+    private void startZone(Attributes atts)
+    {
+        Id id = scenario.createId(atts.getValue("id"));
+        String type = atts.getValue("type");
+        zones.put(id, new Zone(id, type));
+    }
 }

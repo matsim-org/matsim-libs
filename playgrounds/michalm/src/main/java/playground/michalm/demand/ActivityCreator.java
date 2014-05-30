@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,67 +19,12 @@
 
 package playground.michalm.demand;
 
-import java.io.IOException;
-import java.util.Map;
+import org.matsim.api.core.v01.population.Activity;
 
-import org.matsim.api.core.v01.*;
-import org.opengis.feature.simple.SimpleFeature;
+import playground.michalm.zone.Zone;
 
 
-public class Zone
-    implements Identifiable
+public interface ActivityCreator
 {
-    public static enum Type
-    {
-        INTERNAL, EXTERNAL, SPECIAL
-    }
-
-
-    private Id id;
-    private Type type;
-    private SimpleFeature zonePolygon;
-
-
-    public Zone(Id id, Type type)
-    {
-        this.id = id;
-        this.type = type;
-    }
-
-
-    @Override
-    public Id getId()
-    {
-        return id;
-    }
-
-
-    public Type getType()
-    {
-        return type;
-    }
-
-
-    public SimpleFeature getZonePolygon()
-    {
-        return zonePolygon;
-    }
-
-
-    public void setZonePolygon(SimpleFeature zonePolygon)
-    {
-        this.zonePolygon = zonePolygon;
-    }
-
-
-    public static Map<Id, Zone> readZones(Scenario scenario, String zonesXmlFile,
-            String zonesShpFile, String idField)
-        throws IOException
-    {
-        ZoneXmlReader xmlReader = new ZoneXmlReader(scenario);
-        xmlReader.parse(zonesXmlFile);
-        Map<Id, Zone> zones = xmlReader.getZones();
-        ZoneShpReader.readZones(zonesShpFile, idField, scenario, zones);
-        return zones;
-    }
+    public Activity createActivity(Zone zone, String actType);
 }

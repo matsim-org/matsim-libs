@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,24 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.run;
+package playground.michalm.zone.util;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.Id;
+import org.matsim.matrices.*;
 
-import playground.michalm.taxi.data.TaxiData;
-import playground.michalm.taxi.data.file.*;
+import com.google.common.collect.Iterables;
 
 
-public class TaxiLauncherUtils
+public class MatrixUtils
 {
-    public static TaxiData initTaxiData(Scenario scenario, String taxisFileName,
-            String ranksFileName)
+    public static Matrix create(String id, Iterable<Id> ids, double[][] values)
     {
-        TaxiData taxiData = new TaxiData();
+        Matrix matrix = new Matrix(id, null);
+        Id[] idArray = Iterables.toArray(ids, Id.class);
 
-        new ElectricVehicleReader(scenario, taxiData).parse(taxisFileName);
-        new TaxiRankReader(scenario, taxiData).parse(ranksFileName);
+        for (int i = 0; i < idArray.length; i++) {
+            for (int j = 0; j < idArray.length; j++) {
+                matrix.createEntry(idArray[i], idArray[j], values[i][j]);
+            }
+        }
 
-        return taxiData;
+        return matrix;
+    }
+
+
+    public static Iterable<Entry> createEntryIterable(Matrix matrix)
+    {
+        return Iterables.concat(matrix.getFromLocations().values());
     }
 }

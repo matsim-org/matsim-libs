@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.demand;
+package playground.michalm.zone.util;
 
 import java.io.*;
 import java.util.*;
@@ -38,8 +38,15 @@ public class InterZoneDistanceCalculator
 {
     private static class ZoneCentroid
     {
-        private int zoneId;
-        private Node node;
+        private final int zoneId;
+        private final Node node;
+
+
+        private ZoneCentroid(int zoneId, Node node)
+        {
+            this.zoneId = zoneId;
+            this.node = node;
+        }
     }
 
 
@@ -62,24 +69,19 @@ public class InterZoneDistanceCalculator
         NetworkImpl network = (NetworkImpl)scenario.getNetwork();
         List<ZoneCentroid> zoneCentroidList = new ArrayList<ZoneCentroid>();
 
-        File file = new File(filename);
-        Scanner scanner = new Scanner(file);
-
+        Scanner scanner = new Scanner(new File(filename));
         scanner.nextLine();// skip the header line
 
         while (scanner.hasNext()) {
-            ZoneCentroid zc = new ZoneCentroid();
-            zc.zoneId = scanner.nextInt();
-
+            int zoneId = scanner.nextInt();
             double x = scanner.nextDouble();
             double y = scanner.nextDouble();
-            zc.node = network.getNearestNode(scenario.createCoord(x, y));
+            Node node = network.getNearestNode(scenario.createCoord(x, y));
 
-            zoneCentroidList.add(zc);
+            zoneCentroidList.add(new ZoneCentroid(zoneId, node));
         }
 
         scanner.close();
-
         zoneCentroids = zoneCentroidList.toArray(new ZoneCentroid[zoneCentroidList.size()]);
     }
 

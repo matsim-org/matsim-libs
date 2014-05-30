@@ -31,7 +31,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.michalm.demand.ODDemandGenerator;
+import playground.michalm.demand.*;
+import playground.michalm.demand.taxi.PersonCreatorWithRandomTaxiMode;
 
 /**
  *@author jbischoff
@@ -65,7 +66,7 @@ public class MielecDemandExtender {
 	private void readCustomers() {
 
 		  List<String> taxiCustomerIds;
-            taxiCustomerIds = ODDemandGenerator.readTaxiCustomerIds(inputTaxiDemand);
+            taxiCustomerIds = PersonCreatorWithRandomTaxiMode.readTaxiCustomerIds(inputTaxiDemand);
 	        for (String s : taxiCustomerIds){
 	        	customerIds.add(new IdImpl(s));
 	        }

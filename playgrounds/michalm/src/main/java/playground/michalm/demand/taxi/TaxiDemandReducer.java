@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,56 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.demand;
+package playground.michalm.demand.taxi;
 
-import java.util.*;
+import java.io.*;
+import java.util.Scanner;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.core.utils.io.MatsimXmlParser;
-import org.xml.sax.Attributes;
-
-import playground.michalm.demand.Zone.Type;
+import pl.poznan.put.util.random.*;
 
 
-public class ZoneXmlReader
-    extends MatsimXmlParser
+public class TaxiDemandReducer
 {
-    private final static String ZONE = "zone";
-
-    private final Scenario scenario;
-    private final Map<Id, Zone> zones = new LinkedHashMap<Id, Zone>();
-
-
-    public ZoneXmlReader(Scenario scenario)
+    public static void main(String[] args)
+        throws IOException
     {
-        this.scenario = scenario;
-    }
+        UniformRandom uniform = RandomUtils.getGlobalUniform();
 
+        Scanner sc = new Scanner(new File(
+                "d:\\michalm\\2013_07\\mielec-2-peaks-new-03-100\\taxiCustomers_03_pc.txt"));
+        BufferedWriter bw = new BufferedWriter(new FileWriter(
+                "d:\\michalm\\2013_07\\mielec-2-peaks-new-03-100\\taxiCustomers_01_pc.txt"));
 
-    public Map<Id, Zone> getZones()
-    {
-        return zones;
-    }
+        while (sc.hasNext()) {
+            String id = sc.next();
 
-
-    @Override
-    public void startTag(String name, Attributes atts, Stack<String> context)
-    {
-        if (ZONE.equals(name)) {
-            startZone(atts);
+            if (uniform.nextDouble(0, 1) < 1. / 3) {
+                bw.write(id);
+                bw.newLine();
+            }
         }
-    }
 
-
-    @Override
-    public void endTag(String name, String content, Stack<String> context)
-    {}
-
-
-    private void startZone(Attributes atts)
-    {
-        Id id = scenario.createId(atts.getValue("id"));
-        Type type = Type.valueOf(atts.getValue("type").toUpperCase());
-        zones.put(id, new Zone(id, type));
+        sc.close();
+        bw.close();
     }
 }

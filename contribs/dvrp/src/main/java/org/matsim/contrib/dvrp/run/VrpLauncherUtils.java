@@ -190,7 +190,7 @@ public class VrpLauncherUtils
     public static VrpData initVrpData(MatsimVrpContext context, String vehiclesFileName)
     {
         VrpData vrpData = new VrpDataImpl();
-        new VehicleReader(context.getScenario(), vrpData).readFile(vehiclesFileName);
+        new VehicleReader(context.getScenario(), vrpData).parse(vehiclesFileName);
         return vrpData;
     }
 

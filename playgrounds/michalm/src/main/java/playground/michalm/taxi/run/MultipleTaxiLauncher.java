@@ -64,12 +64,12 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
     /*package*/void initOutputFiles(String outputFileSuffix)
     {
         try {
-            pw = new PrintWriter(launcher.dirName + "stats" + outputFileSuffix);
+            pw = new PrintWriter(launcher.dir + "stats" + outputFileSuffix);
             pw.print("cfg\tn\tm\tPW\tPWp95\tPWmax\tPD\tPDp95\tPDmax\tDD\tPS\tDS\tW\tComp\n");
 
-            pw2 = new PrintWriter(launcher.dirName + "timeUpdates" + outputFileSuffix);
+            pw2 = new PrintWriter(launcher.dir + "timeUpdates" + outputFileSuffix);
 
-            pw3 = new PrintWriter(launcher.dirName + "cacheStats" + outputFileSuffix);
+            pw3 = new PrintWriter(launcher.dir + "cacheStats" + outputFileSuffix);
             pw3.print("cfg\tHits\tMisses\n");
         }
         catch (IOException e) {

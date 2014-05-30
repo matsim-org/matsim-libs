@@ -53,12 +53,6 @@ public class TaxiRankReader
     }
 
 
-    public void readFile(String filename)
-    {
-        parse(filename);
-    }
-
-
     @Override
     public void startTag(String name, Attributes atts, Stack<String> context)
     {

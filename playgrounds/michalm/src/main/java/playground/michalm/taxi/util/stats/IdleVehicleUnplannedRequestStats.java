@@ -21,7 +21,6 @@ package playground.michalm.taxi.util.stats;
 
 import java.io.*;
 
-import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.matsim.core.mobsim.framework.events.*;
 import org.matsim.core.mobsim.framework.listeners.*;
 

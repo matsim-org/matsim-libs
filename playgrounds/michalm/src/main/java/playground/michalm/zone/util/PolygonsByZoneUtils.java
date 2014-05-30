@@ -17,75 +17,64 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.demand;
+package playground.michalm.zone.util;
 
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.opengis.feature.simple.SimpleFeature;
 
-import pl.poznan.put.util.random.WeightedRandomSelection;
+import playground.michalm.zone.Zone;
 
 import com.vividsolutions.jts.geom.*;
 
 
-public class LanduseByZoneUtils
+public class PolygonsByZoneUtils
 {
-    public static Map<Id, List<Geometry>> buildMap(Map<Id, Zone> zones,
+    public static Map<Id, List<Polygon>> buildMap(Map<Id, Zone> zones,
             Collection<SimpleFeature> features)
     {
-        Map<Id, List<Geometry>> geometriesByZone = new LinkedHashMap<Id, List<Geometry>>();
+        Map<Id, List<Polygon>> polygonsByZone = new HashMap<Id, List<Polygon>>();
 
         for (Zone z : zones.values()) {
-            Geometry zg = (Geometry)z.getZonePolygon().getDefaultGeometry();
-            List<Geometry> gList = new ArrayList<Geometry>();
+            Polygon zonePoly = z.getPolygon();
+            List<Polygon> polyList = new ArrayList<Polygon>();
 
             for (SimpleFeature f : features) {
-                Geometry fg = (Geometry)f.getDefaultGeometry();
+                Geometry featureGeometry = (Geometry)f.getDefaultGeometry();
 
                 Geometry intersection = null;
                 try {
-                    intersection = zg.intersection(fg);
+                    intersection = zonePoly.intersection(featureGeometry);
                 }
-                catch (TopologyException e) {}
+                catch (TopologyException e) {
+                    System.err.println(e);
+                }
 
                 if (intersection != null) {
-                    addGeometries(gList, intersection);
+                    addPolygons(polyList, intersection);
                 }
             }
 
-            geometriesByZone.put(z.getId(), gList);
+            polygonsByZone.put(z.getId(), polyList);
         }
 
         //TODO check out if geometries overlay one another!!!
 
-        return geometriesByZone;
+        return polygonsByZone;
     }
 
 
-    private static void addGeometries(List<Geometry> gList, Geometry g)
+    private static void addPolygons(List<Polygon> polygonList, Geometry intersection)
     {
-        if (g instanceof GeometryCollection) {
-            GeometryCollection gc = (GeometryCollection)g;
+        if (intersection instanceof GeometryCollection) {
+            GeometryCollection gc = (GeometryCollection)intersection;
             for (int i = 0; i < gc.getNumGeometries(); i++) {
-                addGeometries(gList, gc.getGeometryN(i));
+                addPolygons(polygonList, gc.getGeometryN(i));
             }
         }
         else {
-            gList.add(g);
+            polygonList.add((Polygon)intersection);
         }
-    }
-
-
-    public static WeightedRandomSelection<Geometry> buildRandomSelectionByArea(
-            List<Geometry> geometries)
-    {
-        WeightedRandomSelection<Geometry> randomSelection = new WeightedRandomSelection<Geometry>();
-
-        for (Geometry g : geometries) {
-            randomSelection.add(g, g.getArea());
-        }
-
-        return randomSelection;
     }
 }

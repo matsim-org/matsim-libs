@@ -38,10 +38,10 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 public class OneTaxiLauncher
 {
-    private final String dirName;
-    private final String netFileName;
-    private final String plansFileName;
-    private final String vehiclesFileName;
+    private final String dir;
+    private final String netFile;
+    private final String plansFile;
+    private final String vehiclesFile;
     private final boolean otfVis;
 
     private final Scenario scenario;
@@ -49,14 +49,14 @@ public class OneTaxiLauncher
 
     public OneTaxiLauncher()
     {
-        dirName = "./src/main/resources/";
-        netFileName = dirName + "grid_network.xml";
-        plansFileName = dirName + "one_taxi/one_taxi_population.xml";
-        vehiclesFileName = dirName + "one_taxi/one_taxi_vehicles.xml";
+        dir = "./src/main/resources/";
+        netFile = dir + "grid_network.xml";
+        plansFile = dir + "one_taxi/one_taxi_population.xml";
+        vehiclesFile = dir + "one_taxi/one_taxi_vehicles.xml";
 
         otfVis = true;//or false -- turning ON/OFF visualization
 
-        scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName);
+        scenario = VrpLauncherUtils.initScenario(netFile, plansFile);
     }
 
 
@@ -73,7 +73,7 @@ public class OneTaxiLauncher
         VrpPathCalculator calculator = new VrpPathCalculatorImpl(router, travelTime,
                 travelDisutility);
 
-        VrpData vrpData = VrpLauncherUtils.initVrpData(context, vehiclesFileName);
+        VrpData vrpData = VrpLauncherUtils.initVrpData(context, vehiclesFile);
         context.setVrpData(vrpData);
 
         OneTaxiOptimizer optimizer = new OneTaxiOptimizer(context, calculator);

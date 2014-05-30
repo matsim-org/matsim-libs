@@ -29,9 +29,9 @@ import playground.michalm.util.visum.VisumODMatrixReader;
 
 public class PoznanODMatrixAdder
 {
-    private static String dirName = "D:\\eTaxi\\Poznan_MATSim\\";
-    private static String odMatrixFilePrefix = dirName + "odMatricesByType\\";
-    private static String put2PrtRatiosFile = dirName + "PuT_PrT_ratios";
+    private static String dir = "D:\\eTaxi\\Poznan_MATSim\\";
+    private static String odMatrixFilePrefix = dir + "odMatricesByType\\";
+    private static String put2PrtRatiosFile = dir + "PuT_PrT_ratios";
 
     private static EnumMap<ActivityPair, Double> prtCoeffs;
     private static double[][][] totalODMatrices;

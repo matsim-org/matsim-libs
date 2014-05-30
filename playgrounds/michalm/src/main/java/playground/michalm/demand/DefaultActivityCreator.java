@@ -19,121 +19,87 @@
 
 package playground.michalm.demand;
 
-import java.util.*;
-
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.*;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import pl.poznan.put.util.random.*;
+import playground.michalm.zone.Zone;
 
 import com.vividsolutions.jts.geom.*;
 
 
-public class DefaultActivityGenerator
-    implements ActivityGenerator
+public class DefaultActivityCreator
+    implements ActivityCreator
 {
     private final UniformRandom uniform = RandomUtils.getGlobalUniform();
     private final NetworkImpl network;
     private final Scenario scenario;
     private final PopulationFactory pf;
 
-    private GeometryProvider geometryProvider;
+    private PolygonProvider polygonProvider;
     private PointAcceptor pointAcceptor;
 
 
-    public DefaultActivityGenerator(Scenario scenario)
+    public DefaultActivityCreator(Scenario scenario)
     {
-        this(scenario, DEFAULT_GEOMETRY_PROVIDER, DEFAULT_POINT_ACCEPTOR);
+        this(scenario, DEFAULT_POLYGON_PROVIDER, DEFAULT_POINT_ACCEPTOR);
     }
 
 
-    public DefaultActivityGenerator(Scenario scenario, GeometryProvider geometryProvider,
+    public DefaultActivityCreator(Scenario scenario, PolygonProvider polygonProvider,
             PointAcceptor pointAcceptor)
     {
         this.scenario = scenario;
         this.network = (NetworkImpl)scenario.getNetwork();
         this.pf = scenario.getPopulation().getFactory();
-        this.geometryProvider = geometryProvider;
+        this.polygonProvider = polygonProvider;
         this.pointAcceptor = pointAcceptor;
     }
 
 
     @Override
-    public Activity createActivityInZone(Zone zone, String actType)
+    public Activity createActivity(Zone zone, String actType)
     {
-        return createActivityInZone(zone, actType, null);
-    }
-
-
-    @Override
-    public Activity createActivityInZone(Zone zone, String actType, Activity previousActivity)
-    {
-        Geometry geometry = geometryProvider.getGeometry(zone, actType);
-        Envelope envelope = geometry.getEnvelopeInternal();
+        Polygon polygon = polygonProvider.getPolygon(zone, actType);
+        Envelope envelope = polygon.getEnvelopeInternal();
         double minX = envelope.getMinX();
         double maxX = envelope.getMaxX();
         double minY = envelope.getMinY();
         double maxY = envelope.getMaxY();
 
         Point p = null;
-        Id bannedLinkId = previousActivity != null ? previousActivity.getLinkId() : null;
 
-        for (int i = 0;; i++) {
+        do {
             double x = uniform.nextDouble(minX, maxX);
             double y = uniform.nextDouble(minY, maxY);
             p = MGC.xy2Point(x, y);
-
-            if (i == 1000) {
-                CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
-                PolygonFeatureFactory factory = new PolygonFeatureFactory.Builder().setCrs(crs)
-                        .setName("PolygonFeatureType").create();
-                SimpleFeature feature = factory.createPolygon((Polygon)geometry,
-                        Collections.<String, Object>emptyMap(), null);
-                Set<SimpleFeature> featureSet = new HashSet<SimpleFeature>();
-                featureSet.add(feature);
-                ShapeFileWriter.writeGeometries(featureSet, "d:\\looped_zoneId_" + zone.getId()
-                        + "_actType_" + actType + ".shp");
-
-                System.out.println("Got stuck at zoneId=" + zone.getId() + " actType=" + actType);
-            }
-
-            if (!geometry.contains(p) || !pointAcceptor.acceptPoint(zone, actType, p)) {
-                continue;
-            }
-
-            Coord coord = scenario.createCoord(p.getX(), p.getY());
-            Link link = network.getNearestLink(coord);
-
-            if (link.getId().equals(bannedLinkId)) {
-                continue;
-            }
-
-            ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
-            activity.setLinkId(link.getId());
-            return activity;
         }
+        while (!polygon.contains(p) || !pointAcceptor.acceptPoint(zone, actType, p));
+
+        Coord coord = scenario.createCoord(p.getX(), p.getY());
+        Link link = network.getNearestLink(coord);
+
+        ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
+        activity.setLinkId(link.getId());
+        return activity;
     }
 
 
-    public static final GeometryProvider DEFAULT_GEOMETRY_PROVIDER = new GeometryProvider() {
-        public Geometry getGeometry(Zone zone, String actType)
+    public static final PolygonProvider DEFAULT_POLYGON_PROVIDER = new PolygonProvider() {
+        public Polygon getPolygon(Zone zone, String actType)
         {
-            return (Geometry)zone.getZonePolygon().getDefaultGeometry();
+            return zone.getPolygon();
         }
     };
 
 
-    public static interface GeometryProvider
+    public static interface PolygonProvider
     {
-        Geometry getGeometry(Zone zone, String actType);
+        Polygon getPolygon(Zone zone, String actType);
     }
 
 

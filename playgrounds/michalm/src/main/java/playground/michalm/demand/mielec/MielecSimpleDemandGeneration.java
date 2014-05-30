@@ -29,10 +29,14 @@ import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.matrices.Matrix;
 import org.xml.sax.SAXException;
 
 import pl.poznan.put.util.array2d.*;
 import playground.michalm.demand.*;
+import playground.michalm.demand.taxi.PersonCreatorWithRandomTaxiMode;
+import playground.michalm.zone.*;
+import playground.michalm.zone.util.MatrixUtils;
 
 
 public class MielecSimpleDemandGeneration
@@ -46,7 +50,6 @@ public class MielecSimpleDemandGeneration
         String zonesShpFile = dirName + "GIS\\zones_with_no_zone.SHP";
         String odMatrixFile = dirName + "odMatrix.dat";
         String plansFile = dirName + "plans.xml";
-        String idField = "NO";
 
         String taxiFile = dirName + "taxiCustomers_03_pc.txt";
 
@@ -54,37 +57,33 @@ public class MielecSimpleDemandGeneration
         // double flowCoeff = 1;
         // double taxiProbability = 0;
 
-        double hours = 1;
-        double[] flowCoeff = { 0.2, 0.4, 0.6, 0.8, 0.6, 0.4, 0.2 };
+        double duration = 3600;
+        double[] flowCoeffs = { 0.2, 0.4, 0.6, 0.8, 0.6, 0.4, 0.2 };
         double taxiProbability = 0.03;
 
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         new MatsimNetworkReader(scenario).readFile(networkFile);
-        Map<Id, Zone> zones = Zone.readZones(scenario, zonesXmlFile, zonesShpFile, idField);
+        Map<Id, Zone> zones = Zones.readZones(scenario, zonesXmlFile, zonesShpFile);
 
-        ActivityGenerator lg = new DefaultActivityGenerator(scenario);
-        ODDemandGenerator dg = new ODDemandGenerator(scenario, lg, zones);
+        ActivityCreator ac = new DefaultActivityCreator(scenario);
+        PersonCreatorWithRandomTaxiMode pc = new PersonCreatorWithRandomTaxiMode(scenario,
+                taxiProbability);
+        ODDemandGenerator dg = new ODDemandGenerator(scenario, ac, pc, zones);
 
-        double[][] odMatrix = Array2DReader.getDoubleArray(new File(odMatrixFile), zones.size());
-        double[][] odMatrixTransposed = Array2DUtils.transponse(odMatrix);
+        double[][] matrix = Array2DReader.getDoubleArray(new File(odMatrixFile), zones.size());
+        Matrix afternoonODMatrix = MatrixUtils.create("afternoon", zones.keySet(), matrix);
+        double[][] transposedMatrix = Array2DUtils.transponse(matrix);
+        Matrix morningODMatrix = MatrixUtils.create("morning", zones.keySet(), transposedMatrix);
 
         double startTime = 6 * 3600;
+        dg.generateMultiplePeriods(morningODMatrix, "dummy", "dummy", TransportMode.car, startTime,
+                duration, flowCoeffs);
 
-        // symmetric morning peak
-        for (int i = 0; i < flowCoeff.length; i++) {
-            dg.generateSinglePeriod(odMatrixTransposed, "dummy", "dummy", hours, flowCoeff[i],
-                    taxiProbability, startTime);
-            startTime += 3600 * hours;
-        }
-
-        // evening peak
-        for (int i = 0; i < flowCoeff.length; i++) {
-            dg.generateSinglePeriod(odMatrix, "dummy", "dummy", hours, flowCoeff[i],
-                    taxiProbability, startTime);
-            startTime += 3600 * hours;
-        }
+        startTime += 3600 * flowCoeffs.length;
+        dg.generateMultiplePeriods(afternoonODMatrix, "dummy", "dummy", TransportMode.car,
+                startTime, duration, flowCoeffs);
 
         dg.write(plansFile);
-        dg.writeTaxiCustomers(taxiFile);
+        pc.writeTaxiCustomers(taxiFile);
     }
 }
