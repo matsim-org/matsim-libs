@@ -22,12 +22,14 @@ public class AllCSModesTestListener implements StartupListener, IterationEndsLis
 	String inputFilerb;
 	String inputFileow;
 	String inputFileff;
+	int frequency = 0;
 	
-	public AllCSModesTestListener(String inputFilerb, String inputFileff, String inputFileow) {
+	public AllCSModesTestListener(String inputFilerb, String inputFileff, String inputFileow, int frequency) {
 		
 		this.inputFilerb = inputFilerb;
 		this.inputFileff = inputFileff;
 		this.inputFileow = inputFileow;
+		this.frequency = frequency;
 		
 	}
 	
@@ -35,7 +37,7 @@ public class AllCSModesTestListener implements StartupListener, IterationEndsLis
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		// TODO Auto-generated method stub
 		
-		if (event.getIteration() % 10 == 0) {
+		if (event.getIteration() % this.frequency == 0) {
 		
 		ArrayList<RentalInfo> info = cshandler.rentals();
 		
@@ -124,7 +126,7 @@ public class AllCSModesTestListener implements StartupListener, IterationEndsLis
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		// TODO Auto-generated method stub
-		if (event.getIteration() % 10 == 0) {
+		if (event.getIteration() % this.frequency == 0) {
 			event.getControler().getEvents().addHandler(cshandler);
 			event.getControler().getEvents().addHandler(ffhandler);
 			event.getControler().getEvents().addHandler(owhandler);

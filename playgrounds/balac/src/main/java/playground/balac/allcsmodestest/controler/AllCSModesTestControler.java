@@ -17,10 +17,12 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.balac.allcsmodestest.config.AllCSModesConfigGroup;
 import playground.balac.allcsmodestest.controler.listener.AllCSModesTestListener;
 import playground.balac.allcsmodestest.qsim.AllCSModesQsimFactory;
 import playground.balac.allcsmodestest.scoring.AllCSModesScoringFunctionFactory;
 import playground.balac.freefloating.config.FreeFloatingConfigGroup;
+import playground.balac.freefloating.router.FreeFloatingParkingRoutingModule;
 import playground.balac.freefloating.router.FreeFloatingRoutingModule;
 import playground.balac.onewaycarsharingredisgned.config.OneWayCarsharingRDConfigGroup;
 import playground.balac.onewaycarsharingredisgned.router.OneWayCarsharingRDRoutingModule;
@@ -47,7 +49,10 @@ public class AllCSModesTestControler extends Controler{
 	  protected void loadControlerListeners() {  
 		  
 	    super.loadControlerListeners();   
-	    this.addControlerListener(new AllCSModesTestListener(this.getConfig().getModule("TwoWayCarsharing").getValue("statsFileName"), this.getConfig().getModule("FreeFloating").getValue("statsFileName"),this.getConfig().getModule("OneWayCarsharing").getValue("statsFileName")));
+	    this.addControlerListener(new AllCSModesTestListener(this.getConfig().getModule("TwoWayCarsharing").getValue("statsFileName"),
+	    		this.getConfig().getModule("FreeFloating").getValue("statsFileName"),
+	    		this.getConfig().getModule("OneWayCarsharing").getValue("statsFileName"),
+	    		Integer.parseInt(this.getConfig().getModule("AllCSModes").getValue("statsWriterFrequency"))));
 	  }
 	public static void main(final String[] args) {
 		
@@ -60,6 +65,9 @@ public class AllCSModesTestControler extends Controler{
     	
     	TwoWayCSConfigGroup configGrouptw = new TwoWayCSConfigGroup();
     	config.addModule(configGrouptw);
+    	
+    	AllCSModesConfigGroup configGroupAll = new AllCSModesConfigGroup();
+    	config.addModule(configGroupAll);
     	
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 		
@@ -88,7 +96,7 @@ public class AllCSModesTestControler extends Controler{
 						
 						router.setRoutingModule(
 								"freefloating",
-								new FreeFloatingRoutingModule());
+								new FreeFloatingParkingRoutingModule());
 						
 						router.setRoutingModule(
 								"onewaycarsharing",
