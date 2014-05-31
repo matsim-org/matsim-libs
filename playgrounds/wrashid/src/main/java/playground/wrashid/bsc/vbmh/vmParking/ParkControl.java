@@ -81,6 +81,8 @@ public class ParkControl {
 	public int startup(String parkingFilename, String pricingFilename, Controler controller){
 		this.controller=controller;
 		
+		System.out.println("Start up park control");
+		
 		//Get Betas from Config
 		Map<String, String> planCalcParams = this.controller.getConfig().getModule("planCalcScore").getParams();
 		betaMoney=-Double.parseDouble(planCalcParams.get("marginalUtilityOfMoney")); //!! in Config positiver Wert >> stimmt das dann so?
@@ -107,6 +109,7 @@ public class ParkControl {
 		File pricingfile = new File( pricingFilename ); 
 		this.pricing = JAXB.unmarshal( pricingfile, PricingModels.class ); //Laedt Preise aus XML
 		
+		System.out.println("Number of initialised pricing models: "+this.pricing.getParking_Pricing_Models().size());
 		
 		return 0;
 	
@@ -639,7 +642,7 @@ public class ParkControl {
 				if(selectedSpot.charge){
 					double chargedAmountOfEnergy;
 					chargedAmountOfEnergy=evControl.charge(personId, selectedSpot.chargingRate, duration);
-					//scorekeeper.add(VMConfig.pricePerKWH*VMConfig.betaPayMoney*(-1)*chargedAmountOfEnergy);
+					scorekeeper.add(VMConfig.pricePerKWH*VMConfig.betaPayMoney*(-1)*chargedAmountOfEnergy);
 					//System.out.println("EV charged person: "+personId.toString()+" parking: "+selectedSpot.parking.id+" new state of charge [%]: "+evControl.stateOfChargePercentage(personId));
 				}
 			}

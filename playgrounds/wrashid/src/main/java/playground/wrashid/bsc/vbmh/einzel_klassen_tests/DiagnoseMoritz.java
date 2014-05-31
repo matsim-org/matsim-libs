@@ -37,12 +37,12 @@ public class DiagnoseMoritz {
 			hist.readXML("normal_sa/parkhistory/parkhistory_200.xml");
 			System.out.println("normal gelesen");
 		}
-		if(1==1){
+		if(1==0){
 			hist.readXML("erste_min_5_di/parkhistory/parkhistory_200.xml");
 			System.out.println("erste_min_5 gelesen");
 		}
-		if(1==0){
-			hist.readXML("null_ev_exc_sa/parkhistory/parkhistory_200.xml");
+		if(1==1){
+			hist.readXML("ev_exc_di/parkhistory/parkhistory_200.xml");
 			System.out.println("ev_exc gelesen");
 		}
 		
@@ -53,7 +53,7 @@ public class DiagnoseMoritz {
 		}
 
 		if(1==0){
-			hist.readXML("has_to_only_a/parkhistory/parkhistory_200.xml");
+			hist.readXML("has_to_only_di/parkhistory/parkhistory_200.xml");
 			System.out.println("has to only gelesen");
 			lauf="has_to_only_a";
 		}

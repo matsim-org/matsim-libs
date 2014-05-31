@@ -9,7 +9,7 @@ public class ChoiceSet {
 	//2: SOC
 	//3: Wie oft genommen
 	//4: exp
-	//5: Wkeit, dass so gewählt
+	//5: Wkeit, dass so gewaehlt
 	//6: ln(4)
 	//7: ln Summe
 	
