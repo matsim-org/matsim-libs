@@ -60,13 +60,13 @@ public class Diagnose {
 ////				}
 //			}
 //		}
-		
-		for(HashMap<String, String> event:list){
-			if(event.get("Parkingid").contains("900000")){
-				System.out.println(event.toString());
-			}
-		}
-		
+//		
+//		for(HashMap<String, String> event:list){
+//			if(event.get("Parkingid").contains("900000")){
+//				System.out.println(event.toString());
+//			}
+//		}
+//		
 		
 //		System.out.println(list.size());
 		System.out.println(count);

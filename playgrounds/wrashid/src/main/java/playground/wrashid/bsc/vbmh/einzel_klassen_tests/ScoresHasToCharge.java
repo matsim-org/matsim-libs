@@ -23,126 +23,10 @@ public class ScoresHasToCharge {
 		ev_exc.readXML("null_ev_exc_sa/parkhistory/parkhistory_200.xml");
 		System.out.println("ev_exc gelesen");
 		
-		
-		//------------alles_null
-		LinkedList<Double> alles_null_scores=new LinkedList<Double>();
-		
-		LinkedList<HashMap<String, String>> alles_null_public = alles_null.getAllEventByAttribute("parkingType", "public");
-		for(HashMap<String, String> values:alles_null_public){
-			if(values.get("stateOfChargePercent")!=null&&Float.parseFloat(values.get("stateOfChargePercent"))<50.0){
-				String spot_score = values.get("spot_score");
-				if(spot_score!=null){
-					alles_null_scores.add(Double.parseDouble(spot_score));
-				}
-			}
-		}	
-		LinkedList<HashMap<String, String>> alles_null_private = alles_null.getAllEventByAttribute("parkingType", "private");
-		HashMap<String, Double> alles_null_private_scores =new HashMap<String, Double>();
-		for(HashMap<String, String> values:alles_null_private){
-			if(values.get("stateOfChargePercent")!=null&&Float.parseFloat(values.get("stateOfChargePercent"))<50.0){
-				String spot_score = values.get("spot_score");
-				if(spot_score!=null){
-					String person = values.get("person");
-					if(!(alles_null_private_scores.containsKey(person))){
-						alles_null_private_scores.put(person, Double.parseDouble(spot_score));
-					}
-				}
-			}
-		}
-		for(Double value:alles_null_private_scores.values()){
-			alles_null_scores.add(value);
-		}
-		
-		
-		//----------------normal
-		LinkedList<Double> normal_scores=new LinkedList<Double>();
-		
-		LinkedList<HashMap<String, String>> normal_public = normal.getAllEventByAttribute("parkingType", "public");
-		for(HashMap<String, String> values:normal_public){
-			if(values.get("stateOfChargePercent")!=null&&Float.parseFloat(values.get("stateOfChargePercent"))<50.0){
-				String spot_score = values.get("spot_score");
-				if(spot_score!=null){
-					normal_scores.add(Double.parseDouble(spot_score));
-				}
-			}
-		}	
-		LinkedList<HashMap<String, String>> normal_private = normal.getAllEventByAttribute("parkingType", "private");
-		HashMap<String, Double> normal_private_scores =new HashMap<String, Double>();
-		for(HashMap<String, String> values:normal_private){
-			if(values.get("stateOfChargePercent")!=null&&Float.parseFloat(values.get("stateOfChargePercent"))<50.0){
-				String spot_score = values.get("spot_score");
-				if(spot_score!=null){
-					String person = values.get("person");
-					if(!(normal_private_scores.containsKey(person))){
-						normal_private_scores.put(person, Double.parseDouble(spot_score));
-					}
-				}
-			}
-		}
-		for(Double value:normal_private_scores.values()){
-			normal_scores.add(value);
-		}
-		
-		
-		//------------erste_min_5
-		LinkedList<Double> erste_min_5_scores=new LinkedList<Double>();
-		
-		LinkedList<HashMap<String, String>> erste_min_5_public = erste_min_5.getAllEventByAttribute("parkingType", "public");
-		for(HashMap<String, String> values:erste_min_5_public){
-			if(values.get("stateOfChargePercent")!=null&&Float.parseFloat(values.get("stateOfChargePercent"))<50.0){
-				String spot_score = values.get("spot_score");
-				if(spot_score!=null){
-					erste_min_5_scores.add(Double.parseDouble(spot_score));
-				}
-			}
-		}	
-		LinkedList<HashMap<String, String>> erste_min_5_private = erste_min_5.getAllEventByAttribute("parkingType", "private");
-		HashMap<String, Double> erste_min_5_private_scores =new HashMap<String, Double>();
-		for(HashMap<String, String> values:erste_min_5_private){
-			if(values.get("stateOfChargePercent")!=null&&Float.parseFloat(values.get("stateOfChargePercent"))<50.0){
-				String spot_score = values.get("spot_score");
-				if(spot_score!=null){
-					String person = values.get("person");
-					if(!(erste_min_5_private_scores.containsKey(person))){
-						erste_min_5_private_scores.put(person, Double.parseDouble(spot_score));
-					}
-				}
-			}
-		}
-		for(Double value:erste_min_5_private_scores.values()){
-			erste_min_5_scores.add(value);
-		}
-		
-		
-		//-------ev_exc
-		LinkedList<Double> ev_exc_scores=new LinkedList<Double>();
-		
-		LinkedList<HashMap<String, String>> ev_exc_public = ev_exc.getAllEventByAttribute("parkingType", "public");
-		for(HashMap<String, String> values:ev_exc_public){
-			if(values.get("stateOfChargePercent")!=null&&Float.parseFloat(values.get("stateOfChargePercent"))<50.0){
-				String spot_score = values.get("spot_score");
-				if(spot_score!=null){
-					ev_exc_scores.add(Double.parseDouble(spot_score));
-				}
-			}
-		}	
-		LinkedList<HashMap<String, String>> ev_exc_private = ev_exc.getAllEventByAttribute("parkingType", "private");
-		HashMap<String, Double> ev_exc_private_scores =new HashMap<String, Double>();
-		for(HashMap<String, String> values:ev_exc_private){
-			if(values.get("stateOfChargePercent")!=null&&Float.parseFloat(values.get("stateOfChargePercent"))<50.0){
-				String spot_score = values.get("spot_score");
-				if(spot_score!=null){
-					String person = values.get("person");
-					if(!(ev_exc_private_scores.containsKey(person))){
-						ev_exc_private_scores.put(person, Double.parseDouble(spot_score));
-					}
-				}
-			}
-		}
-		for(Double value:ev_exc_private_scores.values()){
-			ev_exc_scores.add(value);
-		}
-		
+		LinkedList<Double> alles_null_scores = getHasToScore(alles_null);
+		LinkedList<Double> normal_scores = getHasToScore(normal);
+		LinkedList<Double> erste_min_5_scores = getHasToScore(erste_min_5);
+		LinkedList<Double> ev_exc_scores = getHasToScore(ev_exc);
 		
 		CSVWriter writer = new CSVWriter("ScoresHasToCharge.csv");
 		writer.writeLine("alles_null, normal, erste_min_5, ev_exc");
@@ -186,6 +70,46 @@ public class ScoresHasToCharge {
 		
 		writer.close();
 		System.out.println("Fertig");
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public static LinkedList<Double> getHasToScore(ReadParkhistory scenario){
+		LinkedList<Double> scenario_scores=new LinkedList<Double>();
+		
+		LinkedList<HashMap<String, String>> scenario_public = scenario.getAllEventByAttribute("parkingType", "public");
+		for(HashMap<String, String> values:scenario_public){
+			if(values.get("stateOfChargePercent")!=null&&Float.parseFloat(values.get("stateOfChargePercent"))<50.0){
+				String spot_score = values.get("spot_score");
+				if(spot_score!=null){
+					scenario_scores.add(Double.parseDouble(spot_score));
+				}
+			}
+		}	
+		LinkedList<HashMap<String, String>> scenario_private = scenario.getAllEventByAttribute("parkingType", "private");
+		HashMap<String, Double> scenario_private_scores =new HashMap<String, Double>();
+		for(HashMap<String, String> values:scenario_private){
+			if(values.get("stateOfChargePercent")!=null&&Float.parseFloat(values.get("stateOfChargePercent"))<50.0){
+				String spot_score = values.get("spot_score");
+				if(spot_score!=null){
+					String person = values.get("person");
+					if(!(scenario_private_scores.containsKey(person))){
+						scenario_private_scores.put(person, Double.parseDouble(spot_score));
+					}
+				}
+			}
+		}
+		for(Double value:scenario_private_scores.values()){
+			scenario_scores.add(value);
+		}
+		return scenario_scores;
 	}
 
 }

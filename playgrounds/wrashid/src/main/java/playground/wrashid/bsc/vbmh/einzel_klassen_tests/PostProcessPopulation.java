@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -32,23 +33,40 @@ public class PostProcessPopulation {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		String lauf="null_ev_exc_sa";
-		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("output/finalEXP/"+lauf+"/output_config.xml"));
+		String lauf="normal_di";
+		int zaehl=0;
+//		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("output/finalEXP/"+lauf+"/output_config.xml"));
+		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("output/finalEXP/normal_sa/output_config.xml"));
+//		Controler controler = new Controler(ConfigUtils.loadConfig("output/finalEXP/"+lauf+"/output_config.xml"));
 		Map<Id, ? extends Person> persons = scenario.getPopulation().getPersons();
 		File parkingfile = new File("input/SF_PLUS/generalinput/parking_08pmsl.xml");
-//		CSVWriter evWriter = new CSVWriter("output/distances/evDistances_"+lauf);
-//		CSVWriter nevWriter = new CSVWriter("output/distances/nevDistances_"+lauf);
+		CSVWriter evWriter = new CSVWriter("output/distances_di/evDistances_"+lauf);
+		CSVWriter nevWriter = new CSVWriter("output/distances_di/nevDistances_"+lauf);
 		ParkingMap karte = JAXB.unmarshal( parkingfile, ParkingMap.class ); //Laedt Parkplaetze aus XML
 		karte.initHashMap();
 		ReadParkhistory parkhistory = new ReadParkhistory();
 		parkhistory.readXML("output/finalEXP/"+lauf+"/parkhistory/parkhistory_200.xml");
-		LinkedList<HashMap<String, String>> evParked = parkhistory.getAllEventByAttribute("eventtype", "EV_left");
-		LinkedList<LinkedList<String>> evList = getPersonDistance(evParked, karte, persons);
-		printDepartureTimeDifferent(evParked, persons);
+		LinkedList<HashMap<String, String>> evParked = parkhistory.getAllEventByAttribute("parking", "9000006");
+//		LinkedList<LinkedList<String>> evList = getPersonDistance(evParked, karte, persons);
+//		ReadParkhistory park = parkhistory.getSubHist(evParked);
+//		evParked=park.getAllEventByAttribute("eventtype", "EV_left");
+//		for(HashMap<String, String> events:evParked){
+//			if(Double.parseDouble(events.get("time"))>6500){
+//				String personId = events.get("person");
+//				Person person = persons.get(new IdImpl(personId));
+//				ActivityImpl act = (ActivityImpl)person.getSelectedPlan().getPlanElements().get(2);
+//				if(act.getType().equals("work")){
+//					System.out.println("work");
+//					zaehl++;
+//				}
+//			}
+//		}
+		System.out.println(zaehl);
+//		printDepartureTimeDifferent(evParked, persons);
 //		evWriter.writeAll(evList);
 //		evWriter.close();
-		LinkedList<HashMap<String, String>> nevParked = parkhistory.getAllEventByAttribute("eventtype", "NEV_left");
-		LinkedList<LinkedList<String>> nevList = getPersonDistance(nevParked, karte, persons);
+//		LinkedList<HashMap<String, String>> nevParked = parkhistory.getAllEventByAttribute("eventtype", "NEV_left");
+//		LinkedList<LinkedList<String>> nevList = getPersonDistance(nevParked, karte, persons);
 //		nevWriter.writeAll(nevList);
 //		nevWriter.close();
 		System.out.println("Fertig!");
@@ -83,21 +101,41 @@ public class PostProcessPopulation {
 	}
 	
 	public static void printDepartureTimeDifferent(LinkedList<HashMap<String, String>> parkhisEvents, Map<Id, ? extends Person> persons){
-		
+		int count=0;
+		int fehler=0;
+		int stunde=0;
 		for(HashMap<String, String> event:parkhisEvents){
+			
+			
 			String personId = event.get("person");
 			double histTime = Double.parseDouble(event.get("time"));
 			Person person = persons.get(new IdImpl(personId));
 			PlanElement element = person.getSelectedPlan().getPlanElements().get(3);
-			System.out.println((ActivityImpl)person.getSelectedPlan().getPlanElements().get(2));
-			System.out.println((LegImpl)person.getSelectedPlan().getPlanElements().get(3));
-//			LegImpl legImpl = (LegImpl)person.getSelectedPlan().getPlanElements().get(3);
+			ActivityImpl actImpl = (ActivityImpl)person.getSelectedPlan().getPlanElements().get(2);
+//			System.out.println((LegImpl)person.getSelectedPlan().getPlanElements().get(3));
+			LegImpl legImpl = (LegImpl)person.getSelectedPlan().getPlanElements().get(3);
 //			System.out.println(legImpl.toString());
-//			double planTime = legImpl.getDepartureTime();
-//			double differenz = histTime-planTime;
-//			System.out.println(differenz);
-//			System.out.println(histTime);
+			double planStartTime = actImpl.getStartTime();
+			double planEndTime = actImpl.getEndTime();
+			double planDepTime = legImpl.getDepartureTime();
+			double differenz = histTime-planDepTime;
+//			count++;
+			if(differenz!=0.0){
+				fehler++;
+			}
+//			System.out.println(personId+"\t"+differenz);
+//			if(differenz>1800){
+//				System.out.println(differenz);
+//				stunde++;
+////				System.out.println(person.getSelectedPlan().toString());
+//			}
+			if(planEndTime-planStartTime<3601){
+				System.out.println(personId);
+				count++;
+			}
+			System.out.println(count);
 		}
+		System.out.println(fehler+" fehler von "+count);
 	}
 
 }
