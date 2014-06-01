@@ -135,6 +135,7 @@
 		<module>ssix</module>
 		<module>qvanheerden</module>
 		<module>wbean</module>
+		<module>vbmh</module>
 	</modules>
 	<repositories>
 		<repository>
