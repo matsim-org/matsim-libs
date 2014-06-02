@@ -535,58 +535,6 @@ public class RunUtils {
 						builder.getScoringFunctionFactory() ) );
 		}
 
-		if ( false && scoringFunctionConf.isUseKtiScoring() && !scenario.getConfig().scenario().isUseTransit() ) {
-			final KtiInputFilesConfigGroup ktiInputFilesConf = (KtiInputFilesConfigGroup)
-						scenario.getConfig().getModule( KtiInputFilesConfigGroup.GROUP_NAME );
-
-			builder.withTripRouterFactory(
-					new TripRouterFactoryInternal() {
-						private final TripRouterFactoryInternal delegate =
-							new JointTripRouterFactory(
-								scenario,
-								builder.getTravelDisutilityFactory(),
-								builder.getTravelTime().getLinkTravelTimes(),
-								builder.getLeastCostPathCalculatorFactory(),
-								null);
-						private final KtiPtRoutingModuleInfo info =
-							new KtiPtRoutingModuleInfo(
-									ktiInputFilesConf.getIntrazonalPtSpeed(),
-									ktiInputFilesConf.getWorldFile(),
-									ktiInputFilesConf.getTravelTimesFile(),
-									ktiInputFilesConf.getPtStopsFile(),
-									scenario.getNetwork());
-
-						@Override
-						public TripRouter instantiateAndConfigureTripRouter() {
-							final TripRouter tripRouter = delegate.instantiateAndConfigureTripRouter();
-
-							tripRouter.setRoutingModule(
-								TransportMode.pt,
-								new KtiPtRoutingModule(
-									scenario.getConfig().plansCalcRoute(),
-									info,
-									scenario.getNetwork()) );
-
-							final MainModeIdentifier identifier = tripRouter.getMainModeIdentifier();
-							tripRouter.setMainModeIdentifier(
-								new MainModeIdentifier() {
-									@Override
-									public String identifyMainMode(
-											final List<PlanElement> tripElements) {
-										for ( PlanElement pe : tripElements ) {
-											if ( pe instanceof Activity && ((Activity) pe).getType().equals( PtConstants.TRANSIT_ACTIVITY_TYPE ) ) {
-												return TransportMode.pt;
-											}
-										}
-										return identifier.identifyMainMode( tripElements );
-									}
-								});
-
-							return tripRouter;
-						}
-					});
-		}
-
 		return builder;
 	}
 
