@@ -14,14 +14,15 @@ public class DummyParkingModuleWithFreeFloatingCarSharing implements ParkingModu
 	private Controler controler;
 	private LinkedList<Id> availableVehicles;
 
-	public DummyParkingModuleWithFreeFloatingCarSharing(Controler controler, Collection<ParkingInfo> initialVehicleCoordinates){
+	public DummyParkingModuleWithFreeFloatingCarSharing(Controler controler, Collection<ParkingInfo> initialDesiredVehicleCoordinates){
 		this.controler=controler;
 		
 		availableVehicles=new LinkedList<Id>();
 		
-		for (ParkingInfo parkInfo:initialVehicleCoordinates){
+		for (ParkingInfo parkInfo:initialDesiredVehicleCoordinates){
 			availableVehicles.add(parkInfo.getVehicleId());
 		}
+		// the vehicle will be parked at the closest free parking from desired coordinate.
 	}
 	
 	@Override
