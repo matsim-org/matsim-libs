@@ -26,7 +26,7 @@ import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.*;
 
-import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
+import playground.jbischoff.energy.charging.ElectricTaxiChargingHandler;
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.query.*;
 import playground.michalm.taxi.scheduler.*;
@@ -43,10 +43,11 @@ public class IdleRankVehicleFinder
 {
     private final MatsimVrpContext context;
     private final TaxiScheduler scheduler;
-    private RankArrivalDepartureCharger rankArrivaldeparturecharger;
+    private ElectricTaxiChargingHandler ecabHandler;
     private boolean IsElectric;
     private boolean useChargeOverTime;
     Random rnd;
+    private static double MINIMUMSOCFORDISPATCH = 0.25;
 
 
     public IdleRankVehicleFinder(MatsimVrpContext context, TaxiScheduler scheduler)
@@ -60,9 +61,9 @@ public class IdleRankVehicleFinder
     }
 
 
-    public void addRankArrivalCharger(RankArrivalDepartureCharger rankArrivalDepartureCharger)
+    public void addEcabHandler(ElectricTaxiChargingHandler ecabHandler)
     {
-        this.rankArrivaldeparturecharger = rankArrivalDepartureCharger;
+        this.ecabHandler = ecabHandler;
         this.IsElectric = true;
     }
 
@@ -75,13 +76,13 @@ public class IdleRankVehicleFinder
 
     private boolean hasEnoughCapacityForTask(Vehicle veh)
     {
-        return this.rankArrivaldeparturecharger.isChargedForTask(veh.getId());
+        return (getVehicleSoc(veh)>MINIMUMSOCFORDISPATCH);
     }
 
 
     private double getVehicleSoc(Vehicle veh)
     {
-        return this.rankArrivaldeparturecharger.getVehicleSoc(veh.getId());
+        return this.ecabHandler.getRelativeTaxiSoC(veh.getId());
     }
 
 

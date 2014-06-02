@@ -35,7 +35,7 @@ import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.dvrp.schedule.Task.TaskType;
 import org.matsim.contrib.dvrp.util.DistanceUtils;
 
-import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
+import playground.jbischoff.energy.charging.ElectricTaxiChargingHandler;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
 import playground.michalm.taxi.optimizer.fifo.NOSTaxiOptimizer;
@@ -54,13 +54,14 @@ public class NOSRankTaxiOptimizer
 {
     private final TaxiOptimizerConfiguration optimConfig;
     private final IdleRankVehicleFinder idleVehicleFinder;
-
+    private  ElectricTaxiChargingHandler ecabhandler;
+    private final static double NEEDSTOCHARGESOC = 0.2;
+    
     private boolean idleRankMode;
 
     //    private final List<Id> shortTimeIdlers;
-
-    private RankArrivalDepartureCharger rankArrivalDepartureCharger;
-    private Map<Id, Link> nearestRanks;
+    
+    private Map<Id, Link> nearestChargers;
     private static Logger log = Logger.getLogger(NOSRankTaxiOptimizer.class);
 
 
@@ -96,11 +97,7 @@ public class NOSRankTaxiOptimizer
     }
 
 
-    public void setRankArrivalCharger(RankArrivalDepartureCharger rankArrivalDepartureCharger)
-    {
-        this.rankArrivalDepartureCharger = rankArrivalDepartureCharger;
-        idleVehicleFinder.addRankArrivalCharger(this.rankArrivalDepartureCharger);
-    }
+    
 
 
     private static class RankModeTaxiScheduler
@@ -147,6 +144,14 @@ public class NOSRankTaxiOptimizer
             }
         }
     }
+    
+    
+
+    public void setEcabhandler(ElectricTaxiChargingHandler ecabhandler)
+    {
+        this.ecabhandler = ecabhandler;
+        this.idleVehicleFinder.addEcabHandler(ecabhandler);
+    }
 
 
     public void setIdleRankMode(boolean b)
@@ -183,8 +188,8 @@ public class NOSRankTaxiOptimizer
                 continue;
             if (veh.getSchedule().getCurrentTask().getType().equals(TaxiTaskType.WAIT_STAY)) {
                 TaxiWaitStayTask twst = (TaxiWaitStayTask)veh.getSchedule().getCurrentTask();
-                if (!this.rankArrivalDepartureCharger.isAtRankLocation(twst.getLink().getId())) {
-                    if (this.rankArrivalDepartureCharger.needsToReturnToRank(veh.getId())) {
+                if (!this.ecabhandler.isAtCharger(twst.getLink().getId())) {
+                    if (this.needsToCharge(veh.getId())) {
                         scheduleRankReturn(veh, time);
                     }
 
@@ -206,7 +211,7 @@ public class NOSRankTaxiOptimizer
 
         last.setEndTime(time);
         Link currentLink = last.getLink();
-        Link nearestRank = this.nearestRanks.get(currentLink.getId());
+        Link nearestRank = this.nearestChargers.get(currentLink.getId());
 
         VrpPathWithTravelData path = optimConfig.calculator
                 .calcPath(currentLink, nearestRank, time);
@@ -217,21 +222,21 @@ public class NOSRankTaxiOptimizer
     }
 
 
-    private Link findNearestRank(Link positionLink)
+    private Link findNearestCharger(Link positionLink)
     {
-        Link nearestRankLink = null;
+        Link nearestChargerLink = null;
         double bestTravelCost = Double.MAX_VALUE;
-        for (Entry<Id, Integer> e : this.rankArrivalDepartureCharger.getRankLocations().entrySet()) {
+        for (Id cid : ecabhandler.getChargers().keySet()) {
             Link currentLink = optimConfig.context.getScenario().getNetwork().getLinks()
-                    .get(e.getKey());
+                    .get(cid);
             //            double currentCost = optimConfig.calculator.calcPath(positionLink, currentLink,     optimConfig.context.getTime()).getTravelCost();
             double currentCost = DistanceUtils.calculateSquaredDistance(positionLink, currentLink);
             if (currentCost < bestTravelCost) {
                 bestTravelCost = currentCost;
-                nearestRankLink = currentLink;
+                nearestChargerLink = currentLink;
             }
         }
-        return nearestRankLink;
+        return nearestChargerLink;
     }
 
 
@@ -248,7 +253,7 @@ public class NOSRankTaxiOptimizer
             if (veh.getSchedule().getCurrentTask().getType().equals(TaskType.STAY)) {
             	
                 TaxiWaitStayTask twst = (TaxiWaitStayTask)veh.getSchedule().getCurrentTask();
-                if (!this.rankArrivalDepartureCharger.isAtRankLocation(twst.getLink().getId())) {
+                if (!this.ecabhandler.isAtCharger(twst.getLink().getId())) {
                     if (time - twst.getBeginTime() > 60.) {
                     	scheduleRankReturn(veh, time);
                         
@@ -262,14 +267,13 @@ public class NOSRankTaxiOptimizer
     }
 
 
-    public void createNearestRankDb()
+    public void createNearestChargerDb()
     {
-        this.nearestRanks = new HashMap<Id, Link>();
-        log.info("Beginning to create nearest rank db for"
-                + optimConfig.context.getScenario().getNetwork().getLinks().size() + " links...");
+        this.nearestChargers = new HashMap<Id, Link>();
+
         for (Link l : optimConfig.context.getScenario().getNetwork().getLinks().values()) {
-            Link rankLink = findNearestRank(l);
-            this.nearestRanks.put(l.getId(), rankLink);
+            Link chargerLink = findNearestCharger(l);
+            this.nearestChargers.put(l.getId(), chargerLink);
 
         }
 
@@ -277,27 +281,8 @@ public class NOSRankTaxiOptimizer
 
     }
 
-//    public void scheduleCharging(Id vehid, double startTime, double endTime){
-//    	double end = endTime;
-//    	Vehicle vehicle = null;
-//        for (Vehicle veh : optimConfig.context.getVrpData().getVehicles()) {
-//        	if (veh.getId().equals(vehid)) vehicle = veh;
-//        }
-//        if (vehicle == null) throw new IllegalStateException();
-//        if (vehicle.getSchedule().getStatus() != ScheduleStatus.STARTED)
-//            return;
-//        if (! (Schedules.getLastTask(vehicle.getSchedule()).getTaskIdx() == vehicle.getSchedule()
-//                .getCurrentTask().getTaskIdx())) throw new IllegalStateException();
-//        
-//        @SuppressWarnings("unchecked")
-//		Schedule<Task> sched = (Schedule<Task>)vehicle.getSchedule();
-//
-//        TaxiWaitStayTask twst = (TaxiWaitStayTask)vehicle.getSchedule().getCurrentTask();
-//        double oldEndTime = twst.getEndTime();
-//        if (end > oldEndTime) end = oldEndTime - 1.;
-//        twst.setEndTime(startTime);
-//        sched.addTask(new TaxiChargeStayTask(startTime, end, twst.getLink()));
-//        sched.addTask(new TaxiWaitStayTask(end, oldEndTime, twst.getLink()));
-//        }
+    private boolean needsToCharge(Id vid){
+        return (this.ecabhandler.getRelativeTaxiSoC(vid)<=NEEDSTOCHARGESOC);
+    }
     
 }
