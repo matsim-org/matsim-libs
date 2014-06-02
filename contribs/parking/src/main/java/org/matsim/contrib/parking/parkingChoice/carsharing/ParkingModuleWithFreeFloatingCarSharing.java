@@ -11,7 +11,7 @@ public interface ParkingModuleWithFreeFloatingCarSharing {
 	 * @param coord
 	 * @return
 	 */
-	public ParkingInfo getNextFreeFloatingVehicle(Coord coord);
+	public ParkingLinkInfo getNextFreeFloatingVehicle(Coord coord);
 	
 	/**
 	 * finds closest available parking for vehicle from destCoord
@@ -21,6 +21,6 @@ public interface ParkingModuleWithFreeFloatingCarSharing {
 	 * @param destCoord
 	 * @return
 	 */
-	public ParkingInfo parkFreeFloatingVehicle(Id vehicleId, Coord destCoord);
+	public ParkingLinkInfo parkFreeFloatingVehicle(Id vehicleId, Coord destCoord);
 	
 }

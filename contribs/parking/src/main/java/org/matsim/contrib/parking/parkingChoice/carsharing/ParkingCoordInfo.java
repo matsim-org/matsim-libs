@@ -3,8 +3,8 @@ package org.matsim.contrib.parking.parkingChoice.carsharing;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
-public class ParkingInfo {
-	public ParkingInfo(Id vehicleId, Coord parkingCoordinate) {
+public class ParkingCoordInfo {
+	public ParkingCoordInfo(Id vehicleId, Coord parkingCoordinate) {
 		super();
 		this.vehicleId = vehicleId;
 		this.parkingCoordinate = parkingCoordinate;
