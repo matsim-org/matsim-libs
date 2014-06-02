@@ -83,10 +83,15 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 		final KtiLikeScoringConfigGroup ktiConfig = (KtiLikeScoringConfigGroup)
 			scenario.getConfig().getModule( KtiLikeScoringConfigGroup.GROUP_NAME );
 		final PlanCalcScoreConfigGroup config = scenario.getConfig().planCalcScore();
+
 		final DestinationChoiceBestResponseContext locationChoiceContext = (DestinationChoiceBestResponseContext)
 			scenario.getScenarioElement( DestinationChoiceBestResponseContext.ELEMENT_NAME );
-		// TODO use the ones from the population
-		final ObjectAttributes personAttributes = locationChoiceContext.getPrefsAttributes();
+		final ObjectAttributes personAttributes =
+			locationChoiceContext != null ?
+				// XXX should always be taken from the population ---
+				// just wait for a better format for that (no underscores)
+				locationChoiceContext.getPrefsAttributes() :
+				scenario.getPopulation().getPersonAttributes();
 
 		// XXX Best response location choice depends on the fact that the scoring function
 		// is a ScoringFunctionAccumulator, and changing this fact is not easy. Just
