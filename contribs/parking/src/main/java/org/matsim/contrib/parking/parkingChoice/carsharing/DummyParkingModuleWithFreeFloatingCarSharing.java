@@ -12,13 +12,16 @@ import org.matsim.core.controler.Controler;
 public class DummyParkingModuleWithFreeFloatingCarSharing implements ParkingModuleWithFreeFloatingCarSharing {
 
 	private Controler controler;
-	private Collection<Id> allVehicles;
 	private LinkedList<Id> availableVehicles;
 
-	public DummyParkingModuleWithFreeFloatingCarSharing(Controler controler, Collection<Id> vehicles){
+	public DummyParkingModuleWithFreeFloatingCarSharing(Controler controler, Collection<ParkingInfo> initialVehicleCoordinates){
 		this.controler=controler;
-		this.allVehicles = vehicles;
-		availableVehicles=new LinkedList<Id>(vehicles);
+		
+		availableVehicles=new LinkedList<Id>();
+		
+		for (ParkingInfo parkInfo:initialVehicleCoordinates){
+			availableVehicles.add(parkInfo.getVehicleId());
+		}
 	}
 	
 	@Override
