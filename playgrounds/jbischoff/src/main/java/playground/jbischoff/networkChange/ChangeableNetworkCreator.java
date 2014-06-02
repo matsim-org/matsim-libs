@@ -31,7 +31,7 @@ public class ChangeableNetworkCreator {
 	private final String NETWORKFILE = "C:/local_jb/tucloud/taxi/berlin/2kW.15.output_network.xml.gz";
 	private final String EVENTSFILE =  "C:/local_jb/tucloud/taxi/berlin/2kW.15.1000.events.xml.gz";
 	private final String CHANGEFILE = "C:/local_jb/tucloud/taxi/berlin/changeevents_min.xml";
-	private final double MINIMUMFREESPEED = 4.17;
+	private final double MINIMUMFREESPEED = 0;
 
 	public ChangeableNetworkCreator(){
 		this.networkChangeEvents = new ArrayList<NetworkChangeEvent>();
