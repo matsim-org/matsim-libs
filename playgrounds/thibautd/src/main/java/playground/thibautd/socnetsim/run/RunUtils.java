@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -727,8 +726,7 @@ public class RunUtils {
 						scoringFunctionConf.getActTypeFilterForJointScoring(),
 						scoringFunctionConf.getModeFilterForJointScoring(),
 						getPersonOverlapScorerFactory(
-							scoringFunctionConf,
-							scenario.getPopulation() ),
+							scenario ),
 						scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney(),
 						scenario.getActivityFacilities(),
 						(SocialNetwork) scenario.getScenarioElement(
@@ -742,8 +740,9 @@ public class RunUtils {
 	}
 
 	public static GenericFactory<PersonOverlapScorer, Id> getPersonOverlapScorerFactory(
-			final ScoringFunctionConfigGroup scoringFunctionConf,
-			final Population population) {
+			final Scenario scenario ) {
+		final ScoringFunctionConfigGroup scoringFunctionConf = (ScoringFunctionConfigGroup)
+			scenario.getConfig().getModule( ScoringFunctionConfigGroup.GROUP_NAME );
 		switch ( scoringFunctionConf.getTogetherScoringForm() ) {
 			case linear:
 				return new GenericFactory<PersonOverlapScorer, Id>() {
@@ -757,13 +756,16 @@ public class RunUtils {
 				return new GenericFactory<PersonOverlapScorer, Id>() {
 						@Override
 						public PersonOverlapScorer create( final Id id ) {
-							final PersonImpl person = (PersonImpl) population.getPersons().get( id );
+							final PersonImpl person = (PersonImpl) scenario.getPopulation().getPersons().get( id );
 							if ( person == null ) {
 								// eg transit agent
 								return new LinearOverlapScorer( 0 );
 							}
-							final Desires desires = person.getDesires();
-							final double typicalDuration = desires.getActivityDuration( scoringFunctionConf.getActivityTypeForContactInDesires() );
+							final double typicalDuration =
+								getTypicalDuration( 
+										scenario,
+										person,
+										scoringFunctionConf.getActivityTypeForContactInDesires() );
 							final double zeroDuration = typicalDuration * Math.exp( -10.0 / typicalDuration );
 							return new LogOverlapScorer(
 									scoringFunctionConf.getMarginalUtilityOfBeingTogether_s(),
@@ -774,6 +776,25 @@ public class RunUtils {
 			default:
 				throw new RuntimeException( ""+scoringFunctionConf.getTogetherScoringForm() );
 		}
+	}
+
+	public static double getTypicalDuration(
+			final Scenario scenario,
+			final PersonImpl person,
+			final String type ) {
+		final Desires desires = person.getDesires();
+		if ( desires != null ) {
+			return desires.getActivityDuration( type );
+		}
+
+		final Double typicalDuration =
+					(Double) scenario.getPopulation().getPersonAttributes().getAttribute(
+						person.getId().toString(),
+						"typicalDuration_"+type );
+
+		if ( typicalDuration != null ) return typicalDuration.doubleValue();
+
+		return scenario.getConfig().planCalcScore().getActivityParams( type ).getTypicalDuration();
 	}
 }
 
