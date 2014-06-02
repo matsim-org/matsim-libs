@@ -10,7 +10,6 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.bouncycastle.jce.provider.JDKGOST3410Signer.gost3410;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -35,10 +34,10 @@ public class TaxiIdReader {
 	private void go(int i){
 		
 		TaxiIdParser tip = new TaxiIdParser();
-		this.read("C:/local_jb/data/OD/tripids/rawFCD_20130415-20130422.dat", tip);
+		this.read("C:/local_jb/data/OD/kw9/rawFCD_20130225-20130304.dat", tip);
 		this.taxiIdData = tip.getTaxiIds();
 		this.analyse();
-		this.write("C:/local_jb/data/OD/tripids/taxisOverTimeWeek.csv");
+		this.write("C:/local_jb/data/OD/kw9/taxisweekly.csv");
 		
 	}
 	
@@ -176,10 +175,14 @@ class TaxiIdParser implements TabularFileHandler{
 	}
 
 	private int getDayOffset(String startDate) {
+		int month = Integer.parseInt(startDate.split("-")[1]);
 		int day = Integer.parseInt(startDate.split("-")[2]);
-		day = day-15;
-//		System.out.println(startDate + ":"+  day);
-		return day; //Offset: Start at 15.4.2013
+		if (month == 2) day = day-25;
+		if (month == 3) day = day+3;
+		if (month == 4) day = day-15;
+
+		System.out.println(startDate + ":"+  day);
+		return day; //Offset
 	}
 
 	private int parseTime(String timeString) {
