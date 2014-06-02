@@ -57,10 +57,11 @@ public class ZurichFromSwitzerland {
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig(args[0]);
-		createSubscenario(config, args[1]);
+		int radiusZone = Integer.parseInt(args[2]);
+		createSubscenario(config, args[1], radiusZone);
 	}
 	
-	public static void createSubscenario(Config config, String filenameOutput) {
+	public static void createSubscenario(Config config, String filenameOutput, int radiusZone) {
 
 		log.info("Create Subscenario...");
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
@@ -87,7 +88,7 @@ public class ZurichFromSwitzerland {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  calculate area of interest... ");
-		double radius = 25000.0;
+		double radius = radiusZone;// 30000.0;
 		final CoordImpl center = new CoordImpl(683518.0,246836.0);
 		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
 		log.info("    => area of interest (aoi): center=" + center + "; radius=" + radius);
