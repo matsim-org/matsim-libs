@@ -290,6 +290,32 @@ public class StrategyScoresAnalysis {
 		return result;
 	}
 
+	
+	
+	
+	public static  TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> getAllScores(String outputPath,int iterationNumber){
+		TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> scores=new TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>>();
+		
+		Matrix scoresMatrix = GeneralLib.readStringMatrix(outputPath + "/ITERS/" + iterationNumber +".strategyScores.txt.gz");
+		LinkedList<StrategyScoreLog> tmpList=null;
+		for (int i=1;i< scoresMatrix.getNumberOfRows();i++){
+			String currentPersonId= scoresMatrix.getString(i, 0);
+			int curLegIndexId= scoresMatrix.getInteger(i, 1);
+			String strategyName= scoresMatrix.getString(i, 2);
+			double score= scoresMatrix.getDouble(i, 3);
+			
+			if (!scores.containsValue(currentPersonId, curLegIndexId)){
+				scores.put(currentPersonId, curLegIndexId, new LinkedList<StrategyScoresAnalysis.StrategyScoreLog>());
+			}
+			tmpList=scores.get(currentPersonId, curLegIndexId);
+			
+			tmpList.add(new StrategyScoreLog(strategyName, score));
+		}
+		return scores;
+	}
+	
+	
+	
 	public static TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> getScores(Matrix scoresMatrix,Matrix eventsMatrix,boolean removePrivateParking) {
 TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>> scores=new TwoHashMapsConcatenated<String, Integer, LinkedList<StrategyScoreLog>>();
 		
