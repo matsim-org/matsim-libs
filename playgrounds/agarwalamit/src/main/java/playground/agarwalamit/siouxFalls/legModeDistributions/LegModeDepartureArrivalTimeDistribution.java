@@ -45,7 +45,7 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  */
 public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModule {
 
-	private final Logger logger = Logger.getLogger(LegModeDepartureArrivalTimeDistribution.class);
+	private static final Logger logger = Logger.getLogger(LegModeDepartureArrivalTimeDistribution.class);
 	private LegModeDepartureArrivalTimeHandler lmdah;
 	private Map<String, Map<Id, double[]>> mode2PersonId2DepartureTime;
 	private Map<String, Map<Id, double[]>> mode2PersonId2ArrivalTime;
@@ -69,11 +69,11 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModu
 
 	public static void main(String[] args) {
 		String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/";
-		String [] runs = {"run33"};
-		//		String [] runs = {"run113","run114","run115","run116"};
+		final String [] runs = {"run33"};
+		//		final String [] runs = {"run113","run114","run115","run116"};
 
 		for(String run:runs){
-			String configFile = runDir+run+"/output_config.xml.gz";
+			final String configFile = runDir+run+"/output_config.xml.gz";
 			int lastItr = (int)getLastIteration(configFile);
 			String eventsFile = runDir+run+"/ITERS/it."+lastItr+"/"+lastItr+".events.xml.gz";
 
