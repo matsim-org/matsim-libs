@@ -55,7 +55,7 @@ public class FastAStarLandmarks extends AStarLandmarks {
 	public FastAStarLandmarks(final Network network, final PreProcessLandmarks preProcessData,
 			final TravelDisutility costFunction, final TravelTime timeFunction, final double overdoFactor,
 			final RoutingNetwork routingNetwork, final FastRouterDelegateFactory fastRouterFactory) {
-		super(network, preProcessData, costFunction, timeFunction, overdoFactor);
+		super(routingNetwork, preProcessData, costFunction, timeFunction, overdoFactor);
 
 		this.routingNetwork = routingNetwork;
 		this.fastRouter = fastRouterFactory.createFastRouterDelegate(this, new AStarNodeDataFactory(), routingNetwork);

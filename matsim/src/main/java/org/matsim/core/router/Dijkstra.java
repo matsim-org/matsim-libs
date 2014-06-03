@@ -210,6 +210,18 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	@Override
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime, final Person person2, final Vehicle vehicle2) {
 
+		/*
+		 * Ensure that the given nodes are part of the network used by the router. Otherwise, the router would
+		 * route within the network of the nodes and NOT the one provided when it was created. Previously, this 
+		 * caused problems when sub-networks where used.
+		 * cdobler, jun'14
+		 */
+		if (network.getNodes().get( fromNode.getId()) != fromNode ||
+				network.getNodes().get( toNode.getId()) != toNode ) {
+			throw new IllegalArgumentException("The nodes passed as parameters are not part of the network stored by "+
+					getClass().getSimpleName() + ": the validity of the results cannot be guaranteed. Aborting!");
+		}
+		
 		augmentIterationId(); // this call makes the class not thread-safe
 		this.person = person2;
 		this.vehicle = vehicle2;

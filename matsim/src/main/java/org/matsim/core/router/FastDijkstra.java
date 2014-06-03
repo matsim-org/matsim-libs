@@ -59,7 +59,7 @@ public class FastDijkstra extends Dijkstra {
 	public FastDijkstra(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction,
 			final PreProcessDijkstra preProcessData, final RoutingNetwork routingNetwork, 
 			final FastRouterDelegateFactory fastRouterFactory) {
-		super(network, costFunction, timeFunction, preProcessData);
+		super(routingNetwork, costFunction, timeFunction, preProcessData);
 		
 		this.routingNetwork = routingNetwork;
 		this.fastRouter = fastRouterFactory.createFastRouterDelegate(this, new DijkstraNodeDataFactory(), routingNetwork);
