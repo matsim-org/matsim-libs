@@ -39,6 +39,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
@@ -261,11 +262,26 @@ public class Matsim2030Utils {
 			// use links of activities to locate facilities
 			for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan(), stages ) ) {
 				final Id linkId = act.getLinkId();
+				if ( !sc.getNetwork().getLinks().containsKey( linkId ) ) {
+					throw new RuntimeException( "There is no link "+linkId+
+							" in the car part of the network, but activity "+act+
+							" for "+person+
+							" is there. Might be a PT link, which is wrong. Check your initial plans!" );
+				}
 				final Id facilityId = act.getFacilityId();
 
 				final ActivityFacility fac = sc.getActivityFacilities().getFacilities().get( facilityId );
 				if ( fac.getLinkId() == null ) ((ActivityFacilityImpl) fac).setLinkId( linkId );
 				else if ( !fac.getLinkId().equals( linkId ) ) throw new RuntimeException( "inconsistent links for facility "+facilityId );
+			}
+		}
+
+		// there might still be some facilities without a link (ie facilities not used by anybody):
+		// allocate a link here (before loading the PT part of the network)
+		for ( ActivityFacility fac : sc.getActivityFacilities().getFacilities().values() ) {
+			if ( fac.getLinkId() != null ) {
+				final NetworkImpl net = (NetworkImpl) sc.getNetwork();
+				((ActivityFacilityImpl) fac).setLinkId( net.getNearestLink( fac.getCoord() ).getId() );
 			}
 		}
 
