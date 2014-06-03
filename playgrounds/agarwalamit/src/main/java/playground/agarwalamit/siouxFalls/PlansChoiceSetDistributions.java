@@ -46,16 +46,16 @@ import org.matsim.core.utils.io.IOUtils;
  * @author aagarwal
  *
  */
-public class PlansComparison {
+public class PlansChoiceSetDistributions {
 
 	private static final String absolutePath = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/";
 	private static final String plansAt0Iter = absolutePath+"/outputMC/run33/output_plans.xml.gz";
 	private static final String plansAtStopReplannig = absolutePath+"outputMC/run101_2/ITERS/it.80/80.plans.xml.gz";
 	private static final String plansAtLastIter =  absolutePath+"outputMC/run101_2/ITERS/it.100/100.plans.xml.gz";
-	private final Logger log = Logger.getLogger(PlansComparison.class);
+	private final Logger log = Logger.getLogger(PlansChoiceSetDistributions.class);
 	
 	public static void main(String[] args) {
-		PlansComparison pc =  new PlansComparison();
+		PlansChoiceSetDistributions pc =  new PlansChoiceSetDistributions();
 		pc.writeLegsDistributionWRTSelectedPlan(plansAt0Iter, absolutePath+"/outputMC/run101_2/analysis/it.0.selectedLeg2OtherLegsDistribution.txt");
 		pc.writeLegsDistributionWRTSelectedPlan(plansAtStopReplannig, absolutePath+"/outputMC/run101_2/analysis/it.80.selectedLeg2OtherLegsDistribution.txt");
 		pc.writeLegsDistributionWRTSelectedPlan(plansAtLastIter, absolutePath+"/outputMC/run101_2/analysis/it.100.selectedLeg2OtherLegsDistribution.txt");
