@@ -119,8 +119,7 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 				// all activities.
 				// This is necessary when using huge time mutation ranges.
 				new ActivityScoring() {
-					// start at one, because first act doesnt generate a start event
-					int actCount = 1;
+					int actCount = 0;
 
 					@Override
 					public void finish() {}
