@@ -53,7 +53,7 @@ public class ZoneShpWriter
         List<SimpleFeature> features = new ArrayList<SimpleFeature>();
         for (Zone z : zones.values()) {
             String id = z.getId() + "";
-            features.add(factory.createPolygon(z.getPolygon(), new Object[] { id }, id));
+            features.add(factory.createPolygon(z.getMultiPolygon(), new Object[] { id }, id));
         }
 
         ShapeFileWriter.writeGeometries(features, shpFile);

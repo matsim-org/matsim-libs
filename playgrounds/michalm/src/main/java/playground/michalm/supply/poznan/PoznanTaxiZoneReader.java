@@ -118,8 +118,9 @@ public class PoznanTaxiZoneReader
             ringCoords[count] = ringCoords[0];
 
             LinearRing shell = geometryFactory.createLinearRing(ringCoords);
-            Polygon polygon = geometryFactory.createPolygon(shell, null);
-            zones.put(zoneId, new Zone(zoneId, "taxi_zone", polygon));
+            Polygon[] polygons = { geometryFactory.createPolygon(shell, null) };
+            MultiPolygon multiPolygon = geometryFactory.createMultiPolygon(polygons);
+            zones.put(zoneId, new Zone(zoneId, "taxi_zone", multiPolygon));
         }
     }
 

@@ -17,57 +17,55 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.zone.util;
+package playground.michalm.util;
 
 import org.matsim.api.core.v01.Id;
 
 import pl.poznan.put.util.random.WeightedRandomSelection;
 
 import com.google.common.collect.*;
-import com.vividsolutions.jts.geom.Polygon;
 
 
-public class SubzonePolygonSelection<T>
+public class IdKeySelection<K, V>
 {
-    // zoneId x T -> random selection of polygons
-    private final Table<Id, T, WeightedRandomSelection<Polygon>> selectionTable;
+    // (Id, K) -> random selection of V
+    private final Table<Id, K, WeightedRandomSelection<V>> selectionTable;
 
 
-    public SubzonePolygonSelection(Iterable<? extends Id> zoneIds, Iterable<? extends T> attributes)
+    public IdKeySelection(Iterable<? extends Id> ids, Iterable<? extends K> keys)
     {
-        selectionTable = ArrayTable.create(zoneIds, attributes);
+        selectionTable = ArrayTable.create(ids, keys);
     }
 
 
-    public SubzonePolygonSelection()
+    public IdKeySelection()
     {
         selectionTable = HashBasedTable.create();
     }
 
 
-    public void add(Id zoneId, T attribute, Polygon polygon, double weight)
+    public void add(Id id, K key, V value, double weight)
     {
-        WeightedRandomSelection<Polygon> selection = selectionTable.get(zoneId, attribute);
+        WeightedRandomSelection<V> selection = selectionTable.get(id, key);
 
         if (selection == null) {
-            selection = new WeightedRandomSelection<Polygon>();
-            selectionTable.put(zoneId, attribute, selection);
+            selection = new WeightedRandomSelection<V>();
+            selectionTable.put(id, key, selection);
         }
 
-        selection.add(polygon, weight);
+        selection.add(value, weight);
     }
 
 
-    public boolean contains(Id zoneId, T attribute)
+    public boolean contains(Id id, K key)
     {
-        WeightedRandomSelection<Polygon> selection = selectionTable.get(zoneId, attribute);
-        return selection != null && selection.size() > 0;
+        return selectionTable.get(id, key) != null;
     }
 
 
-    public Polygon select(Id zoneId, T attribute)
+    public V select(Id id, K key)
     {
-        WeightedRandomSelection<Polygon> selection = selectionTable.get(zoneId, attribute);
+        WeightedRandomSelection<V> selection = selectionTable.get(id, key);
         return selection == null ? null : selection.select();
     }
 }

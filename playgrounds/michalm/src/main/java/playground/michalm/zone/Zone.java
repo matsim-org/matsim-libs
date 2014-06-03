@@ -21,7 +21,7 @@ package playground.michalm.zone;
 
 import org.matsim.api.core.v01.*;
 
-import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.MultiPolygon;
 
 
 public class Zone
@@ -29,7 +29,7 @@ public class Zone
 {
     private final Id id;
     private final String type;
-    private Polygon polygon;
+    private MultiPolygon multiPolygon;
 
 
     public Zone(Id id, String type)
@@ -39,11 +39,11 @@ public class Zone
     }
 
 
-    public Zone(Id id, String type, Polygon polygon)
+    public Zone(Id id, String type, MultiPolygon multiPolygon)
     {
         this.id = id;
         this.type = type;
-        this.polygon = polygon;
+        this.multiPolygon = multiPolygon;
     }
 
 
@@ -60,14 +60,14 @@ public class Zone
     }
 
 
-    public Polygon getPolygon()
+    public MultiPolygon getMultiPolygon()
     {
-        return polygon;
+        return multiPolygon;
     }
 
 
-    void setPolygon(Polygon polygon)
+    void setMultiPolygon(MultiPolygon multiPolygon)
     {
-        this.polygon = polygon;
+        this.multiPolygon = multiPolygon;
     }
 }

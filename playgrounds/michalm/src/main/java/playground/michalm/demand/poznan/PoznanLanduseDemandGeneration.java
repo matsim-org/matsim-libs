@@ -38,8 +38,9 @@ import org.xml.sax.SAXException;
 
 import pl.poznan.put.util.random.RandomUtils;
 import playground.michalm.demand.*;
+import playground.michalm.demand.DefaultActivityCreator.GeometryProvider;
 import playground.michalm.demand.DefaultActivityCreator.PointAcceptor;
-import playground.michalm.demand.DefaultActivityCreator.PolygonProvider;
+import playground.michalm.util.IdKeySelection;
 import playground.michalm.util.visum.VisumODMatrixReader;
 import playground.michalm.zone.*;
 import playground.michalm.zone.util.*;
@@ -98,10 +99,10 @@ public class PoznanLanduseDemandGeneration
 
 
     public class LanduseLocationGeneratorStrategy
-        implements PolygonProvider, PointAcceptor
+        implements GeometryProvider, PointAcceptor
     {
         @Override
-        public Polygon getPolygon(Zone zone, String actType)
+        public Geometry getGeometry(Zone zone, String actType)
         {
             ActivityType activityType = ActivityType.valueOf(actType);
 
@@ -113,7 +114,7 @@ public class PoznanLanduseDemandGeneration
                 }
             }
 
-            return zone.getPolygon(); // whole zone
+            return zone.getMultiPolygon(); // whole zone
         }
 
 
@@ -155,7 +156,7 @@ public class PoznanLanduseDemandGeneration
     private final EnumSet<ActivityType> constrainedActivities = EnumSet.of(HOME, WORK, EDUCATION,
             SHOPPING);
 
-    private SubzonePolygonSelection<ActivityType> selection;
+    private IdKeySelection<ActivityType, Polygon> selection;
 
 
     public void generate(String dirName)
@@ -187,11 +188,11 @@ public class PoznanLanduseDemandGeneration
 
         readValidatedZones(zonesWithLanduseFile);
 
-        forestByZone = getLanduseByZone(forestShpFile);
-        industrialByZone = getLanduseByZone(industrialShpFile);
-        residentialByZone = getLanduseByZone(residentialShpFile);
-        schoolByZone = getLanduseByZone(schoolShpFile);
-        shopByZone = getLanduseByZone(shopShpFile);
+        forestByZone = getLandusePolygonsByZone(forestShpFile);
+        industrialByZone = getLandusePolygonsByZone(industrialShpFile);
+        residentialByZone = getLandusePolygonsByZone(residentialShpFile);
+        schoolByZone = getLandusePolygonsByZone(schoolShpFile);
+        shopByZone = getLandusePolygonsByZone(shopShpFile);
 
         initSelection();
 
@@ -224,26 +225,26 @@ public class PoznanLanduseDemandGeneration
     }
 
 
-    private Map<Id, List<Polygon>> getLanduseByZone(String shpFile)
+    private Map<Id, List<Polygon>> getLandusePolygonsByZone(String shpFile)
     {
         System.out.println("getLanduseByZone() for: " + shpFile);
-        return PolygonsByZoneUtils.buildMap(zones, ShapeFileReader.getAllFeatures(shpFile));
+        return SubzoneUtils.extractSubzonePolygons(zones, ShapeFileReader.getAllFeatures(shpFile));
     }
 
 
     private void initSelection()
     {
-        selection = new SubzonePolygonSelection<ActivityType>(zoneLanduseValidation.keySet(),
+        selection = new IdKeySelection<ActivityType, Polygon>(zoneLanduseValidation.keySet(),
                 constrainedActivities);
 
         for (Entry<Id, ZoneLanduseValidation> e : zoneLanduseValidation.entrySet()) {
             Id zoneId = e.getKey();
             ZoneLanduseValidation validation = e.getValue();
-            Polygon zonePolygon = zones.get(zoneId).getPolygon();
+            Zone zone = zones.get(zoneId);
 
-            Iterable<Polygon> industrialPolygons = validation.industrial ? //
+            List<Polygon> industrialPolygons = validation.industrial ? //
                     industrialByZone.get(zoneId) : //
-                    Collections.singleton(zonePolygon);
+                    Zones.getPolygons(zone);
 
             for (Polygon p : industrialPolygons) {
                 selection.add(zoneId, WORK, p, p.getArea());
@@ -251,7 +252,7 @@ public class PoznanLanduseDemandGeneration
 
             Iterable<Polygon> residentialPolygons = validation.residential ? //
                     residentialByZone.get(zoneId) : //
-                    Collections.singleton(zonePolygon);
+                    Zones.getPolygons(zone);
 
             for (Polygon p : residentialPolygons) {
                 double area = p.getArea();

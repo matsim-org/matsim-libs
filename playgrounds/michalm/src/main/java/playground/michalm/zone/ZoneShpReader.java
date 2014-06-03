@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.*;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.*;
 
 
 public class ZoneShpReader
@@ -63,7 +63,7 @@ public class ZoneShpReader
         for (SimpleFeature ft : features) {
             String id = ft.getAttribute(idHeader).toString();
             Zone z = zones.get(scenario.createId(id));
-            z.setPolygon((Polygon)ft.getDefaultGeometry());
+            z.setMultiPolygon((MultiPolygon)ft.getDefaultGeometry());
         }
     }
 }

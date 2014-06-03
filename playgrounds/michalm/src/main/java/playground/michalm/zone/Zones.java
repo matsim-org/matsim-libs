@@ -20,7 +20,7 @@
 package playground.michalm.zone;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.*;
 
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
@@ -30,7 +30,8 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.*;
 
-import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.util.PolygonExtracter;
 
 
 public class Zones
@@ -63,7 +64,7 @@ public class Zones
         MathTransform transform = getTransform(fromCoordSystem, toCoordSystem);
 
         for (Zone z : zones.values()) {
-            z.setPolygon(transformPolygon(z.getPolygon(), transform));
+            z.setMultiPolygon(transformMultiPolygon(z.getMultiPolygon(), transform));
         }
     }
 
@@ -82,13 +83,21 @@ public class Zones
     }
 
 
-    public static Polygon transformPolygon(Polygon polygon, MathTransform transform)
+    public static MultiPolygon transformMultiPolygon(MultiPolygon multiPolygon,
+            MathTransform transform)
     {
         try {
-            return (Polygon)JTS.transform(polygon, transform);
+            return (MultiPolygon)JTS.transform(multiPolygon, transform);
         }
         catch (TransformException e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public static List<Polygon> getPolygons(Zone zone)
+    {
+        return (List<Polygon>)PolygonExtracter.getPolygons(zone.getMultiPolygon());
     }
 }

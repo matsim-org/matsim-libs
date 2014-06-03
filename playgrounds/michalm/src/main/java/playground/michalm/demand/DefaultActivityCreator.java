@@ -40,23 +40,23 @@ public class DefaultActivityCreator
     private final NetworkImpl network;
     private final PopulationFactory pf;
 
-    private PolygonProvider polygonProvider;
+    private GeometryProvider geometryProvider;
     private PointAcceptor pointAcceptor;
 
 
     public DefaultActivityCreator(Scenario scenario)
     {
-        this(scenario, DEFAULT_POLYGON_PROVIDER, DEFAULT_POINT_ACCEPTOR);
+        this(scenario, DEFAULT_GEOMETRY_PROVIDER, DEFAULT_POINT_ACCEPTOR);
     }
 
 
-    public DefaultActivityCreator(Scenario scenario, PolygonProvider polygonProvider,
+    public DefaultActivityCreator(Scenario scenario, GeometryProvider geometryProvider,
             PointAcceptor pointAcceptor)
     {
         this.scenario = scenario;
         this.network = (NetworkImpl)scenario.getNetwork();
         this.pf = scenario.getPopulation().getFactory();
-        this.polygonProvider = polygonProvider;
+        this.geometryProvider = geometryProvider;
         this.pointAcceptor = pointAcceptor;
     }
 
@@ -64,8 +64,8 @@ public class DefaultActivityCreator
     @Override
     public Activity createActivity(Zone zone, String actType)
     {
-        Polygon polygon = polygonProvider.getPolygon(zone, actType);
-        Envelope envelope = polygon.getEnvelopeInternal();
+        Geometry geometry = geometryProvider.getGeometry(zone, actType);
+        Envelope envelope = geometry.getEnvelopeInternal();
         double minX = envelope.getMinX();
         double maxX = envelope.getMaxX();
         double minY = envelope.getMinY();
@@ -78,7 +78,7 @@ public class DefaultActivityCreator
             double y = uniform.nextDouble(minY, maxY);
             p = MGC.xy2Point(x, y);
         }
-        while (!polygon.contains(p) || !pointAcceptor.acceptPoint(zone, actType, p));
+        while (!geometry.contains(p) || !pointAcceptor.acceptPoint(zone, actType, p));
 
         Coord coord = scenario.createCoord(p.getX(), p.getY());
         Link link = network.getNearestLink(coord);
@@ -89,17 +89,17 @@ public class DefaultActivityCreator
     }
 
 
-    public static final PolygonProvider DEFAULT_POLYGON_PROVIDER = new PolygonProvider() {
-        public Polygon getPolygon(Zone zone, String actType)
+    public static final GeometryProvider DEFAULT_GEOMETRY_PROVIDER = new GeometryProvider() {
+        public Geometry getGeometry(Zone zone, String actType)
         {
-            return zone.getPolygon();
+            return zone.getMultiPolygon();
         }
     };
 
 
-    public static interface PolygonProvider
+    public interface GeometryProvider
     {
-        Polygon getPolygon(Zone zone, String actType);
+        Geometry getGeometry(Zone zone, String actType);
     }
 
 
@@ -111,7 +111,7 @@ public class DefaultActivityCreator
     };
 
 
-    public static interface PointAcceptor
+    public interface PointAcceptor
     {
         boolean acceptPoint(Zone zone, String actType, Point point);
     }

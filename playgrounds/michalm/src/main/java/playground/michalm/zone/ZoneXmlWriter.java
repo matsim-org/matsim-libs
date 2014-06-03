@@ -22,7 +22,7 @@ public class ZoneXmlWriter
     public void write(String fileName)
     {
         openFile(fileName);
-        writeDoctype("zones", "http://matsim.org/files/dtd/zones.dtd");
+        writeDoctype("zones", "http://matsim.org/files/dtd/zones_v1.dtd");
         writeStartTag("zones", Collections.<Tuple<String, String>>emptyList());
         writeZones();
         writeEndTag("zones");

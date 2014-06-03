@@ -21,7 +21,7 @@ package playground.michalm.demand.poznan;
 
 import java.io.*;
 import java.lang.reflect.Array;
-import java.util.EnumMap;
+import java.util.*;
 
 import playground.michalm.demand.poznan.PoznanLanduseDemandGeneration.ActivityPair;
 import playground.michalm.util.visum.VisumODMatrixReader;
@@ -33,7 +33,7 @@ public class PoznanODMatrixAdder
     private static String odMatrixFilePrefix = dir + "odMatricesByType\\";
     private static String put2PrtRatiosFile = dir + "PuT_PrT_ratios";
 
-    private static EnumMap<ActivityPair, Double> prtCoeffs;
+    private static Map<ActivityPair, Double> prtCoeffs;
     private static double[][][] totalODMatrices;
 
 

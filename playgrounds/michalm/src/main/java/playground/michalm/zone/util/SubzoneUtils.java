@@ -21,60 +21,44 @@ package playground.michalm.zone.util;
 
 import java.util.*;
 
+import org.geotools.geometry.jts.GeometryCollector;
 import org.matsim.api.core.v01.Id;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.michalm.zone.Zone;
 
 import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.util.PolygonExtracter;
 
 
-public class PolygonsByZoneUtils
+public class SubzoneUtils
 {
-    public static Map<Id, List<Polygon>> buildMap(Map<Id, Zone> zones,
-            Collection<SimpleFeature> features)
+    public static Map<Id, List<Polygon>> extractSubzonePolygons(Map<Id, Zone> zones,
+            Collection<SimpleFeature> subzonePattern)
     {
         Map<Id, List<Polygon>> polygonsByZone = new HashMap<Id, List<Polygon>>();
 
         for (Zone z : zones.values()) {
-            Polygon zonePoly = z.getPolygon();
-            List<Polygon> polyList = new ArrayList<Polygon>();
+            MultiPolygon zoneMultiPoly = z.getMultiPolygon();
+            GeometryCollector geometryCollector = new GeometryCollector();
 
-            for (SimpleFeature f : features) {
+            for (SimpleFeature f : subzonePattern) {
                 Geometry featureGeometry = (Geometry)f.getDefaultGeometry();
 
-                Geometry intersection = null;
                 try {
-                    intersection = zonePoly.intersection(featureGeometry);
+                    geometryCollector.add(zoneMultiPoly.intersection(featureGeometry));
                 }
                 catch (TopologyException e) {
                     System.err.println(e);
                 }
-
-                if (intersection != null) {
-                    addPolygons(polyList, intersection);
-                }
             }
 
-            polygonsByZone.put(z.getId(), polyList);
+            @SuppressWarnings("unchecked")
+            List<Polygon> polygons = PolygonExtracter.getPolygons(geometryCollector.collect());
+            polygonsByZone.put(z.getId(), polygons);
         }
 
         //TODO check out if geometries overlay one another!!!
-
         return polygonsByZone;
-    }
-
-
-    private static void addPolygons(List<Polygon> polygonList, Geometry intersection)
-    {
-        if (intersection instanceof GeometryCollection) {
-            GeometryCollection gc = (GeometryCollection)intersection;
-            for (int i = 0; i < gc.getNumGeometries(); i++) {
-                addPolygons(polygonList, gc.getGeometryN(i));
-            }
-        }
-        else {
-            polygonList.add((Polygon)intersection);
-        }
     }
 }
