@@ -36,27 +36,24 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsFactory;
-import org.matsim.households.HouseholdsFactoryImpl;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.households.Income;
 import org.matsim.households.Income.IncomePeriod;
 import org.matsim.households.IncomeImpl;
-import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.southafrica.utilities.Header;
 
 public class Census2011SampleParser {
-	private static final Logger LOG = Logger.getLogger(Census2011SampleParser.class);
+	static final Logger LOG = Logger.getLogger(Census2011SampleParser.class);
 	private Map<Id,String> householdMap = new HashMap<Id, String>();
 	private Map<Id,String> personMap = new HashMap<Id, String>();
 	private Map<Id,String> geographyMap = new HashMap<Id, String>();
@@ -158,7 +155,6 @@ public class Census2011SampleParser {
 	 * currently parsed (The first number indicates the position in the string,
 	 * and the second number in brackets the number of characters):
 	 * 
-	 * FIXME Must be updated for 2011!!
 	 * <ul>
 	 * 		<li> Serial number - 2(11);
 	 * 		<li> Person number - 13(3);
@@ -202,13 +198,6 @@ public class Census2011SampleParser {
 				personMap.put(new IdImpl(serial + "_" + String.valueOf(Integer.parseInt(person.replaceAll(" ", "")))), s);
 				
 				counter.incCounter();
-
-				/* FIXME Remove after debugging */
-				Id idTmp = new IdImpl("11472276569_5");
-				Id thisId = new IdImpl((serial + "_" + String.valueOf(Integer.parseInt(person.replaceAll(" ", "")))));
-				if(idTmp.toString().equalsIgnoreCase(thisId.toString())){
-					LOG.warn("Found the null-income problem child.");
-				}
 			}
 		} catch (IOException e) {
 			throw new RuntimeException("Could not read from BufferedReader "
@@ -271,6 +260,7 @@ public class Census2011SampleParser {
 			Income pIncome = null;
 			if(!pIncomeString.equalsIgnoreCase("Unknown")){
 				pIncome = hhf.createIncome(Double.parseDouble(sa[6]), IncomePeriod.year);
+				pIncome.setCurrency("ZAR");
 			}
 			
 			PersonImpl person = (PersonImpl) pf.createPerson(pid);
@@ -297,7 +287,8 @@ public class Census2011SampleParser {
 				String incomeString = hsa[4];
 				Income hhIncome = null;
 				if(!incomeString.equalsIgnoreCase("Unknown")){
-					hhIncome = hhf.createIncome(Double.parseDouble(hsa[4]), IncomePeriod.year);					
+					hhIncome = hhf.createIncome(Double.parseDouble(hsa[4]), IncomePeriod.year);		
+					hhIncome.setCurrency("ZAR");
 				} 
 				Household hh = hhf.createHousehold(hid);
 				hh.setIncome(hhIncome);
@@ -330,21 +321,7 @@ public class Census2011SampleParser {
 		LOG.info("Number of households: " + households.getHouseholds().size());
 		LOG.info("================================================================");
 	}
-	
-	private String correctCase(String s){
-		s.toLowerCase();
-		String newS = "";
-		String[] sa = s.split(" ");
-		for(String ss : sa){
-			if(!ss.equalsIgnoreCase("of")){
-				ss.substring(0,1).toUpperCase();
-				newS += ss + " ";
-			}
-		}
-		String rNew = newS.substring(0, newS.length()-1);
-		return rNew;
-	}
-	
+		
 	
 	public void writePopulationAndAttributes(String outputFolder){
 		writeHouseholds(outputFolder);
@@ -386,55 +363,13 @@ public class Census2011SampleParser {
 
 			LOG.info("Writing person attributes to file...");
 			ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(this.personAttributes);
-			oaw.putAttributeConverter(IncomeImpl.class, new IncomeConverter());
+			oaw.putAttributeConverter(IncomeImpl.class, new SAIncomeConverter());
 			
 			oaw.setPrettyPrint(true);
 			oaw.writeFile(outputfolder + "PersonAttributes.xml");
 		}
 	}
 
-	private static class IncomeConverter implements AttributeConverter<IncomeImpl>{
-		@Override
-		public IncomeImpl convert(String value) {
-			if(value.equalsIgnoreCase("")){
-				/* Unknown income. */
-				return null;
-			}
-			
-			String[] sa = value.split("_");
-			String currency = sa[0];
-			String incomeString = sa[1].substring(0, sa[1].indexOf("("));
-			double incomeValue = Double.parseDouble(incomeString);
-			String incomePeriodString = sa[1].substring(sa[1].indexOf("(")+1, sa[1].indexOf(")"));
-			IncomePeriod incomePeriod = null;
-			if(incomePeriodString.equalsIgnoreCase("year")){
-				incomePeriod = IncomePeriod.year;
-			} else if(incomePeriodString.equalsIgnoreCase("month")){
-				incomePeriod = IncomePeriod.month;
-			}
-			
-			Income income = new IncomeImpl(incomeValue, incomePeriod);
-			income.setCurrency(currency);
-			
-			return (IncomeImpl)income;
-		}
-		
-		@Override
-		public String convertToString(Object o) {
-			if(o == null){
-				return "";
-			} else if(o instanceof IncomeImpl){
-				Income income = (Income)o;
-				String s = String.format("%s_%.2f(%s)", income.getCurrency(), income.getIncome(), income.getIncomePeriod().toString());
-				return s;
-			}
-			LOG.warn("Couldn't convert Income: " + o.toString() + "; returning empty string.");
-			return "";
-		}
-		
-	}
-	
-	
 	class SAHouseholdsFactory implements HouseholdsFactory{
 
 		@Override
@@ -709,45 +644,6 @@ public class Census2011SampleParser {
 		}
 		return "No";
 	}
-	
-	private String getMainPlaceOfWork(String code){
-		Integer mp = null;
-		try{
-			mp = Integer.parseInt(code);
-			if(mp > 10000000){
-				return code;
-			}
-		} catch(NumberFormatException e){
-		}
-		return "Unknown";
-	}
-	
-	private String getMainModeToPrimary(String code){
-		int codeInt = Integer.parseInt(code);
-		switch (codeInt) {
-		case 0:
-			return "notApplicable";
-		case 1:
-			return "walk";
-		case 2:
-			return "bicycle";
-		case 3: // Motorcycle
-		case 4: // Car
-			return "car";
-		case 5: // Passenger
-			return "passenger";
-		case 6:
-			return "taxi";
-		case 7:
-			return "bus";
-		case 8:
-			return "train";
-		case 9:
-			return "other";
- 	 	}
-		return "unknown";
-	}
-	
-	
+		
 }
 

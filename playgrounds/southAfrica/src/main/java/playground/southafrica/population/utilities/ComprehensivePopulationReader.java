@@ -7,11 +7,19 @@ import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
+import org.matsim.households.IncomeImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.southafrica.utilities.Header;
 
+/**
+ * Reading a comprehensive population that contains (all) four population-
+ * related files: a persons file, a person attributes file, household file, and
+ * household attributes file.
+ *
+ * @author jwjoubert
+ */
 public class ComprehensivePopulationReader {
 	private static final Logger LOG = Logger.getLogger(Census2001SampleParser.class);
 	private Scenario sc;
@@ -46,6 +54,9 @@ public class ComprehensivePopulationReader {
 	}
 	
 	public void parse(String inputfolder){
+		/* Check that the given folder ends with a '/'. */
+		inputfolder = inputfolder + (inputfolder.endsWith("/") ? "" : "/");
+		
 		/* Read population. */
 		LOG.info("Reading population...");
 		PopulationReaderMatsimV5 pr = new PopulationReaderMatsimV5(this.sc);
@@ -54,6 +65,7 @@ public class ComprehensivePopulationReader {
 		/* Read population attributes. */
 		LOG.info("Reading person attributes...");
 		ObjectAttributesXmlReader oar1 = new ObjectAttributesXmlReader(personAttributes);
+		oar1.putAttributeConverter(IncomeImpl.class, new SAIncomeConverter());
 		oar1.parse(inputfolder + "PersonAttributes.xml");
 		
 		/* Read households */
@@ -64,6 +76,7 @@ public class ComprehensivePopulationReader {
 		/* Read household attributes. */ 
 		LOG.info("Reading household attributes...");
 		ObjectAttributesXmlReader oar2 = new ObjectAttributesXmlReader(householdAttributes);
+		oar2.putAttributeConverter(IncomeImpl.class, new SAIncomeConverter());
 		oar2.parse(inputfolder + "HouseholdAttributes.xml");
 
 		LOG.info("================================================================");
