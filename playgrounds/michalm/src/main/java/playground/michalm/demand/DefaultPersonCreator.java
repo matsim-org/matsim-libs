@@ -30,23 +30,30 @@ public class DefaultPersonCreator
 {
     private final Scenario scenario;
     private final PopulationFactory pf;
-
-    private int curentAgentId = 0;
+    private final String idFormat;
+    private int currentAgentId = 0;
 
 
     public DefaultPersonCreator(Scenario scenario)
     {
+        this(scenario, "%07d");
+    }
+
+
+    //idFormat: e.g. "%07d", "taxi_customer_%04d"... 
+    public DefaultPersonCreator(Scenario scenario, String idFormat)
+    {
         this.scenario = scenario;
         this.pf = scenario.getPopulation().getFactory();
+        this.idFormat = idFormat;
     }
 
 
     @Override
     public Person createPerson(Plan plan, Zone fromZone, Zone toZone)
     {
-        String strId = String.format("%07d", curentAgentId++);
+        String strId = String.format(idFormat, currentAgentId++);
         Person person = pf.createPerson(scenario.createId(strId));
-        person.addPlan(plan);
         return person;
     }
 }

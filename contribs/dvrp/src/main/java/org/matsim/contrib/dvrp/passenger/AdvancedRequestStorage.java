@@ -78,5 +78,4 @@ public class AdvancedRequestStorage
 
         return null;//this is an immediate request
     }
-
 }

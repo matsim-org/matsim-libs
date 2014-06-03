@@ -36,8 +36,8 @@ public class DefaultActivityCreator
     implements ActivityCreator
 {
     private final UniformRandom uniform = RandomUtils.getGlobalUniform();
-    private final NetworkImpl network;
     private final Scenario scenario;
+    private final NetworkImpl network;
     private final PopulationFactory pf;
 
     private PolygonProvider polygonProvider;

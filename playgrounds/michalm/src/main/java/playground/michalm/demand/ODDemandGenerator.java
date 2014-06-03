@@ -84,6 +84,7 @@ public class ODDemandGenerator
                 plan.addActivity(activityCreator.createActivity(toZone, toActivityType));
 
                 Person person = personCreator.createPerson(plan, fromZone, toZone);
+                person.addPlan(plan);
                 scenario.getPopulation().addPerson(person);
             }
         }

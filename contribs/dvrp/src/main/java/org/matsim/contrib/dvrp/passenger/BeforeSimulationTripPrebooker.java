@@ -28,13 +28,13 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 
 
-public class BeforeSimulationTaxiCaller
+public class BeforeSimulationTripPrebooker
     implements MobsimInitializedListener
 {
     private final PassengerEngine passengerEngine;
 
 
-    public BeforeSimulationTaxiCaller(PassengerEngine passengerEngine)
+    public BeforeSimulationTripPrebooker(PassengerEngine passengerEngine)
     {
         this.passengerEngine = passengerEngine;
     }
@@ -55,7 +55,7 @@ public class BeforeSimulationTaxiCaller
                         Leg leg = (Leg)elem;
 
                         if (leg.getMode().equals(mode)) {
-                            passengerEngine.callAhead(0, (MobsimPassengerAgent)mobsimAgent, leg);
+                            passengerEngine.prebookTrip(0, (MobsimPassengerAgent)mobsimAgent, leg);
                         }
                     }
                 }

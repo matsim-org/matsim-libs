@@ -89,7 +89,7 @@ public class PassengerEngine
     {}
 
 
-    public boolean callAhead(double now, MobsimPassengerAgent passenger, Leg leg)
+    public boolean prebookTrip(double now, MobsimPassengerAgent passenger, Leg leg)
     {
         if (!leg.getMode().equals(mode)) {
             return false;

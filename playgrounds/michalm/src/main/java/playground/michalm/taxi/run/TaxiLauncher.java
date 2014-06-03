@@ -255,7 +255,7 @@ import playground.michalm.util.RunningVehicleRegister;
                 TaxiRequestCreator.MODE, new TaxiRequestCreator(), optimizer, context, qSim);
 
         if (advanceRequestSubmission) {
-            qSim.addQueueSimulationListeners(new BeforeSimulationTaxiCaller(passengerEngine));
+            qSim.addQueueSimulationListeners(new BeforeSimulationTripPrebooker(passengerEngine));
         }
 
         LegCreator legCreator = onlineVehicleTracker ? VrpLegs.createLegWithOnlineTrackerCreator(

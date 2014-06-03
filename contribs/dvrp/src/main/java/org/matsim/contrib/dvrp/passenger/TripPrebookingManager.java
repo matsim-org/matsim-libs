@@ -1,0 +1,98 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package org.matsim.contrib.dvrp.passenger;
+
+import java.util.*;
+
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+import org.matsim.core.mobsim.framework.events.*;
+import org.matsim.core.mobsim.framework.listeners.*;
+import org.matsim.core.mobsim.qsim.QSim;
+
+
+public class TripPrebookingManager
+    implements MobsimInitializedListener, MobsimBeforeSimStepListener
+{
+    private static class PrebookingEntry
+    {
+        private final double submissionTime;
+        private final MobsimPassengerAgent passenger;
+        private final Leg leg;
+
+
+        private PrebookingEntry(double submissionTime, MobsimPassengerAgent passenger, Leg leg)
+        {
+            this.submissionTime = submissionTime;
+            this.passenger = passenger;
+            this.leg = leg;
+        }
+    }
+
+
+    public static final Comparator<PrebookingEntry> BOOKING_COMPARATOR = new Comparator<PrebookingEntry>() {
+        public int compare(PrebookingEntry p1, PrebookingEntry p2)
+        {
+            return Double.compare(p1.submissionTime, p2.submissionTime);
+        }
+    };
+
+    private final PassengerEngine passengerEngine;
+    private final Queue<PrebookingEntry> prebookingQueue = new PriorityQueue<PrebookingEntry>(111,
+            BOOKING_COMPARATOR);
+
+
+    public TripPrebookingManager(PassengerEngine passengerEngine)
+    {
+        this.passengerEngine = passengerEngine;
+    }
+
+
+    public void scheduleTripPrebooking(double submissionTime, MobsimPassengerAgent passenger,
+            Leg leg)
+    {
+        PrebookingEntry prebooking = new PrebookingEntry(submissionTime, passenger, leg);
+        prebookingQueue.add(prebooking);
+    }
+
+
+    @Override
+    public void notifyMobsimInitialized(@SuppressWarnings("rawtypes") MobsimInitializedEvent e)
+    {
+        double startTime = ((QSim)e.getQueueSimulation()).getSimTimer().getSimStartTime();
+        prebookTrips(startTime - 1);
+    }
+
+
+    @Override
+    public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
+    {
+        prebookTrips(e.getSimulationTime());
+    }
+
+
+    private void prebookTrips(double now)
+    {
+        while (prebookingQueue.peek().submissionTime <= now) {
+            PrebookingEntry pe = prebookingQueue.poll();
+            passengerEngine.prebookTrip(now, pe.passenger, pe.leg);
+        }
+    }
+}

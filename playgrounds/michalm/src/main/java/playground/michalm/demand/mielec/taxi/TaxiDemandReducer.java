@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.demand.taxi;
+package playground.michalm.demand.mielec.taxi;
 
 import java.io.*;
 import java.util.Scanner;
