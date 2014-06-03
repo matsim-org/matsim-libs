@@ -150,6 +150,8 @@ public class RunMatsim2010SocialScenario {
 					mergingGroup.getDilutionCenter(),
 					mergingGroup.getDilutionRadiusM() );
 		}
+
+		assert sn.getEgos().size() == scenario.getPopulation().getPersons().size() : sn.getEgos().size() +" != "+ scenario.getPopulation().getPersons().size();
 		return scenario;
 	}
 
