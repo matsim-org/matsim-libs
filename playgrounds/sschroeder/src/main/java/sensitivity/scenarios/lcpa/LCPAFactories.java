@@ -60,8 +60,8 @@ public class LCPAFactories {
 			rn = routingNetwork;
 			fastRouterFactory = new ArrayFastRouterDelegateFactory();
 			
-			return new FastAStarEuclidean(network, preProcessData, travelCosts, travelTimes, 1,
-				rn, fastRouterFactory);
+			return new FastAStarEuclidean(rn, preProcessData, travelCosts, travelTimes, 1,
+				fastRouterFactory);
 			
 		}
 		
@@ -88,8 +88,8 @@ public class LCPAFactories {
 			rn = routingNetwork;
 			fastRouterFactory = new ArrayFastRouterDelegateFactory();
 			
-			return new FastAStarLandmarks(network, preProcessData, travelCosts, travelTimes, 1,
-				rn, fastRouterFactory);
+			return new FastAStarLandmarks(rn, preProcessData, travelCosts, travelTimes, 1,
+				fastRouterFactory);
 			
 		}
 		

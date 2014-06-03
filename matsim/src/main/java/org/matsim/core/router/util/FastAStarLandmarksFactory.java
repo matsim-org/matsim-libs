@@ -91,7 +91,7 @@ public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory
 		default:
 			throw new RuntimeException("Undefined FastRouterType: " + fastRouterType);
 		}
-		return new FastAStarLandmarks(network, this.preProcessData, travelCosts, travelTimes, 1,
-				rn, fastRouterFactory);
+		return new FastAStarLandmarks(rn, this.preProcessData, travelCosts, travelTimes, 1,
+				fastRouterFactory);
 	}
 }

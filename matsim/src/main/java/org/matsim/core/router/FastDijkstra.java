@@ -20,7 +20,6 @@
 
 package org.matsim.core.router;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.priorityqueue.BinaryMinHeap;
@@ -56,9 +55,8 @@ public class FastDijkstra extends Dijkstra {
 	 * Create the routing network here and clear the nodeData map 
 	 * which is not used by this implementation.
 	 */
-	public FastDijkstra(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction,
-			final PreProcessDijkstra preProcessData, final RoutingNetwork routingNetwork, 
-			final FastRouterDelegateFactory fastRouterFactory) {
+	public FastDijkstra(final RoutingNetwork routingNetwork, final TravelDisutility costFunction, final TravelTime timeFunction,
+			final PreProcessDijkstra preProcessData, final FastRouterDelegateFactory fastRouterFactory) {
 		super(routingNetwork, costFunction, timeFunction, preProcessData);
 		
 		this.routingNetwork = routingNetwork;
@@ -77,8 +75,8 @@ public class FastDijkstra extends Dijkstra {
 		this.fastRouter.initialize();
 		this.routingNetwork.initialize();
 		
-		RoutingNetworkNode routingNetworkFromNode = routingNetwork.getNodes().get(fromNode.getId());
-		RoutingNetworkNode routingNetworkToNode = routingNetwork.getNodes().get(toNode.getId());
+		RoutingNetworkNode routingNetworkFromNode = this.routingNetwork.getNodes().get(fromNode.getId());
+		RoutingNetworkNode routingNetworkToNode = this.routingNetwork.getNodes().get(toNode.getId());
 
 		return super.calcLeastCostPath(routingNetworkFromNode, routingNetworkToNode, startTime, person, vehicle);
 	}
@@ -109,7 +107,7 @@ public class FastDijkstra extends Dijkstra {
 	 */
 	@Override
 	protected void relaxNode(final Node outNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes) {
-		fastRouter.relaxNode(outNode, toNode, pendingNodes);
+		this.fastRouter.relaxNode(outNode, toNode, pendingNodes);
 	}
 	
 	/*
@@ -117,7 +115,7 @@ public class FastDijkstra extends Dijkstra {
 	 */
 	@Override
 	protected DijkstraNodeData getData(final Node n) {
-		return (DijkstraNodeData) fastRouter.getData(n);
+		return (DijkstraNodeData) this.fastRouter.getData(n);
 	}
 
 	/*
@@ -125,6 +123,6 @@ public class FastDijkstra extends Dijkstra {
 	 */
 	@Override
 	protected PreProcessDijkstra.DeadEndData getPreProcessData(final Node n) {
-		return fastRouter.getPreProcessData(n);
+		return this.fastRouter.getPreProcessData(n);
 	}
 }

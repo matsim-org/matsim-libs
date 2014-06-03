@@ -94,6 +94,6 @@ public class FastDijkstraFactory implements LeastCostPathCalculatorFactory {
 			throw new RuntimeException("Undefined FastRouterType: " + fastRouterType);
 		}	
 		
-		return new FastDijkstra(network, travelCosts, travelTimes, preProcessData, rn, fastRouterFactory);
+		return new FastDijkstra(rn, travelCosts, travelTimes, preProcessData, fastRouterFactory);
 	}
 }

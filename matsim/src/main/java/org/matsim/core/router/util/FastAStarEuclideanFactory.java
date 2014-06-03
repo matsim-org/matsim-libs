@@ -92,7 +92,7 @@ public class FastAStarEuclideanFactory implements LeastCostPathCalculatorFactory
 			throw new RuntimeException("Undefined FastRouterType: " + fastRouterType);
 		}
 		
-		return new FastAStarEuclidean(network, this.preProcessData, travelCosts, travelTimes, 1,
-			rn, fastRouterFactory);
+		return new FastAStarEuclidean(rn, this.preProcessData, travelCosts, travelTimes, 1,
+			fastRouterFactory);
 	}
 }

@@ -20,7 +20,6 @@
 
 package org.matsim.core.router;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.priorityqueue.BinaryMinHeap;
@@ -52,9 +51,9 @@ public class FastAStarLandmarks extends AStarLandmarks {
 	private final RoutingNetwork routingNetwork;
 	private final FastRouterDelegate fastRouter;
 
-	public FastAStarLandmarks(final Network network, final PreProcessLandmarks preProcessData,
+	public FastAStarLandmarks(final RoutingNetwork routingNetwork, final PreProcessLandmarks preProcessData,
 			final TravelDisutility costFunction, final TravelTime timeFunction, final double overdoFactor,
-			final RoutingNetwork routingNetwork, final FastRouterDelegateFactory fastRouterFactory) {
+			final FastRouterDelegateFactory fastRouterFactory) {
 		super(routingNetwork, preProcessData, costFunction, timeFunction, overdoFactor);
 
 		this.routingNetwork = routingNetwork;

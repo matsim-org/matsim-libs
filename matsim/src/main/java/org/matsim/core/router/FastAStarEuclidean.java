@@ -20,7 +20,6 @@
 
 package org.matsim.core.router;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.priorityqueue.BinaryMinHeap;
@@ -53,10 +52,9 @@ public class FastAStarEuclidean extends AStarEuclidean {
 	private final RoutingNetwork routingNetwork;
 	private final FastRouterDelegate fastRouter;
 	
-	public FastAStarEuclidean(final Network network,
-			final PreProcessEuclidean preProcessData,
+	public FastAStarEuclidean(final RoutingNetwork routingNetwork, final PreProcessEuclidean preProcessData,
 			final TravelDisutility costFunction, final TravelTime timeFunction, final double overdoFactor,
-			 final RoutingNetwork routingNetwork, final FastRouterDelegateFactory fastRouterFactory) {
+			final FastRouterDelegateFactory fastRouterFactory) {
 		super(routingNetwork, preProcessData, costFunction, timeFunction, overdoFactor);
 
 		this.routingNetwork = routingNetwork;
@@ -75,8 +73,8 @@ public class FastAStarEuclidean extends AStarEuclidean {
 		this.fastRouter.initialize();
 		this.routingNetwork.initialize();
 		
-		RoutingNetworkNode routingNetworkFromNode = routingNetwork.getNodes().get(fromNode.getId());
-		RoutingNetworkNode routingNetworkToNode = routingNetwork.getNodes().get(toNode.getId());
+		RoutingNetworkNode routingNetworkFromNode = this.routingNetwork.getNodes().get(fromNode.getId());
+		RoutingNetworkNode routingNetworkToNode = this.routingNetwork.getNodes().get(toNode.getId());
 
 		return super.calcLeastCostPath(routingNetworkFromNode, routingNetworkToNode, startTime, person, vehicle);
 	}
@@ -107,7 +105,7 @@ public class FastAStarEuclidean extends AStarEuclidean {
 	 */
 	@Override
 	protected void relaxNode(final Node outNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes) {
-		fastRouter.relaxNode(outNode, toNode, pendingNodes);
+		this.fastRouter.relaxNode(outNode, toNode, pendingNodes);
 	}
 	
 	/*
@@ -115,7 +113,7 @@ public class FastAStarEuclidean extends AStarEuclidean {
 	 */
 	@Override
 	protected AStarNodeData getData(final Node n) {
-		return (AStarNodeData) fastRouter.getData(n);
+		return (AStarNodeData) this.fastRouter.getData(n);
 	}
 
 	/*
@@ -123,6 +121,6 @@ public class FastAStarEuclidean extends AStarEuclidean {
 	 */
 	@Override
 	protected PreProcessDijkstra.DeadEndData getPreProcessData(final Node n) {
-		return fastRouter.getPreProcessData(n);
+		return this.fastRouter.getPreProcessData(n);
 	}
 }
