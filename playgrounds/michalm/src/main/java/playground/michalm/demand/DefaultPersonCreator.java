@@ -52,7 +52,8 @@ public class DefaultPersonCreator
     @Override
     public Person createPerson(Plan plan, Zone fromZone, Zone toZone)
     {
-        String strId = String.format(idFormat, currentAgentId++);
+        String strId = String.format(idFormat + "_%s_%s", currentAgentId++, fromZone.getId(),
+                toZone.getId());
         Person person = pf.createPerson(scenario.createId(strId));
         return person;
     }
