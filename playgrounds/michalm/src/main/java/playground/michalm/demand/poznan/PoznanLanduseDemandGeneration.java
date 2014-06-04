@@ -36,11 +36,10 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.matrices.Matrix;
 import org.xml.sax.SAXException;
 
-import pl.poznan.put.util.random.RandomUtils;
+import pl.poznan.put.util.random.*;
 import playground.michalm.demand.*;
 import playground.michalm.demand.DefaultActivityCreator.GeometryProvider;
 import playground.michalm.demand.DefaultActivityCreator.PointAcceptor;
-import playground.michalm.util.IdKeySelection;
 import playground.michalm.util.visum.VisumODMatrixReader;
 import playground.michalm.zone.*;
 import playground.michalm.zone.util.*;
@@ -156,7 +155,7 @@ public class PoznanLanduseDemandGeneration
     private final EnumSet<ActivityType> constrainedActivities = EnumSet.of(HOME, WORK, EDUCATION,
             SHOPPING);
 
-    private IdKeySelection<ActivityType, Polygon> selection;
+    private WeightedRandomSelectionByKeyPair<Id, ActivityType, Polygon> selection;
 
 
     public void generate(String dirName)
@@ -234,8 +233,8 @@ public class PoznanLanduseDemandGeneration
 
     private void initSelection()
     {
-        selection = new IdKeySelection<ActivityType, Polygon>(zoneLanduseValidation.keySet(),
-                constrainedActivities);
+        selection = WeightedRandomSelectionByKeyPair.createWithArrayTable(
+                zoneLanduseValidation.keySet(), constrainedActivities);
 
         for (Entry<Id, ZoneLanduseValidation> e : zoneLanduseValidation.entrySet()) {
             Id zoneId = e.getKey();
