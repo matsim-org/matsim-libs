@@ -47,11 +47,6 @@
 <!-- ATTRIBUTE id:
      Each matrix holds a UNIQUE id for the given scenario (for identification).
      format := string -->
-<!-- ATTRIBUTE world_layer:
-     defines on which layer of the given world this matrix refers to.
-     it must be the same name as defined in world.dtd given as "type" of
-     element "layer".
-     format := string -->
 <!-- ATTRIBUTE desc:
      describes the meaning of that matrix.
      format := string -->
