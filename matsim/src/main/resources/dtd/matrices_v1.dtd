@@ -17,7 +17,6 @@
 <!ELEMENT matrix     (entry*)>
 <!ATTLIST matrix
           id          CDATA    #REQUIRED
-          world_layer CDATA    #REQUIRED
           desc        CDATA    #IMPLIED>
 
 <!ELEMENT entry       EMPTY>
