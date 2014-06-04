@@ -44,6 +44,7 @@ public class FreeFloatingQsimFactory implements MobsimFactory{
 
 	private final Scenario scenario;
 	private final Controler controler;
+	private Collection<ParkingCoordInfo> freefloatingCars;
 
 	private DummyParkingModuleWithFreeFloatingCarSharing parkingModule;
 	public FreeFloatingQsimFactory(final Scenario scenario, final Controler controler) throws IOException {
@@ -66,7 +67,7 @@ public class FreeFloatingQsimFactory implements MobsimFactory{
 		    s = reader.readLine();
 		    int i = 1;
 		    
-		    Collection<ParkingCoordInfo> freefloatingCars = new ArrayList<ParkingCoordInfo>();
+		   freefloatingCars = new ArrayList<ParkingCoordInfo>();
 		    while(s != null) {
 		    	
 		    	String[] arr = s.split("\t", -1);
@@ -97,7 +98,7 @@ public class FreeFloatingQsimFactory implements MobsimFactory{
 		final FreeFloatingConfigGroup configGroup = (FreeFloatingConfigGroup)
 				scenario.getConfig().getModule( FreeFloatingConfigGroup.GROUP_NAME );
 		
-
+		parkingModule.resetForNewIterationStart();
 		
 		QSimConfigGroup conf = sc.getConfig().qsim();
 		if (conf == null) {
@@ -152,10 +153,10 @@ public class FreeFloatingQsimFactory implements MobsimFactory{
 			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
 		}
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-		//ParkFFVehicles parkSource = new ParkFFVehicles(sc.getPopulation(), agentFactory, qSim, ffvehiclesLocationqt);
+		ParkFFVehicles parkSource = new ParkFFVehicles(sc.getPopulation(), agentFactory, qSim, freefloatingCars, this.scenario);
 
 		qSim.addAgentSource(agentSource);
-		//qSim.addAgentSource(parkSource);
+		qSim.addAgentSource(parkSource);
 
 		
 		

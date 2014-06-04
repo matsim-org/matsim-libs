@@ -21,6 +21,7 @@ import playground.balac.freefloating.config.FreeFloatingConfigGroup;
 import playground.balac.freefloating.controler.listener.FFListener;
 import playground.balac.freefloating.qsimParkingModule.FreeFloatingQsimFactory;
 import playground.balac.freefloating.router.FreeFloatingParkingRoutingModule;
+import playground.balac.freefloating.routerparkingmodule.FreeFloatingRoutingModule;
 import playground.balac.freefloating.scoring.FreeFloatingScoringFunctionFactory;
 
 
@@ -75,7 +76,7 @@ public class FreeFloatingWithParkingControler extends Controler{
 						// add our module to the instance
 						router.setRoutingModule(
 							"freefloating",
-							new FreeFloatingParkingRoutingModule());
+							new FreeFloatingRoutingModule());
 
 						// we still need to provide a way to identify our trips
 						// as being freefloating trips.

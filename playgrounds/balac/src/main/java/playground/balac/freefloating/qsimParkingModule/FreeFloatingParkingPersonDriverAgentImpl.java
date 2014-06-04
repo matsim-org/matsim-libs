@@ -145,10 +145,10 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		} else {
 			// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
 			
-				if (currentLeg.getMode().equals("freefloating")) {
+				/*if (currentLeg.getMode().equals("freefloating")) {
 					
 					vehID = null;
-				}
+				}*/
 				advancePlan(now) ;
 		}
 	}
@@ -272,7 +272,11 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 					initializeFreeFloatingEndWalkLeg(leg, now);
 							
 			}
-			else if (leg.getMode().equals( "freefloating" )) {
+			else if (leg.getMode().equals( "freefloating" ) && this.plan.getPlanElements().get(this.plan.getPlanElements().indexOf(pe) + 2) instanceof Activity) {
+				initializeFreeFLoatingParkingCarLeg( now);
+				
+			}
+			else if (leg.getMode().equals( "freefloating" ) && this.plan.getPlanElements().get(this.plan.getPlanElements().indexOf(pe) + 2) instanceof Leg) {
 				initializeFreeFLoatingCarLeg(startLink, now);
 				
 			}
@@ -288,7 +292,8 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		this.state = MobsimAgent.State.LEG;
 		Route route = leg.getRoute();
 		ParkingLinkInfo vehicleLocation = this.parkingModule.getNextFreeFloatingVehicle(this.scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord());		
-		if (vehicleLocation == null) {
+		if (vehicleLocation == null || vehicleLocation.getLinkId() == null) {
+			log.warn("Agent with id: " + this.getId().toString() + " was aborted because the freefloating vehicle was not avaialble or the vehicle id was not set up.");
 			this.state = MobsimAgent.State.ABORT ;
 			return;
 			
@@ -379,6 +384,64 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 			
 	}
 	
+	private void initializeFreeFLoatingParkingCarLeg(double now) {
+		this.state = MobsimAgent.State.LEG;
+		
+		PlanElement pe = this.getCurrentPlanElement() ;
+		
+		Leg leg =  (Leg) pe;
+		Route route = leg.getRoute();
+
+		//create route for the car part of the freefloating trip
+		ParkingLinkInfo parkingSpot = parkingModule.parkFreeFloatingVehicle(new IdImpl((vehID)), this.scenario.getNetwork().getLinks().get(route.getEndLinkId()).getCoord());
+		
+		double travelTime = 0.0;
+		List<Id> ids = new ArrayList<Id>();
+		
+		TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
+		
+		TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();
+		
+		
+		
+		CoordImpl coordStart = new CoordImpl(scenario.getNetwork().getLinks().get(route.getEndLinkId()).getCoord());
+		
+		FreeFloatingFacilityImpl startFacility = new FreeFloatingFacilityImpl(new IdImpl("1000000000"), coordStart, route.getEndLinkId());
+		
+		CoordImpl coordEnd = new CoordImpl(scenario.getNetwork().getLinks().get(parkingSpot.getLinkId()).getCoord());
+		FreeFloatingFacilityImpl endFacility = new FreeFloatingFacilityImpl(new IdImpl("1000000001"), coordEnd, parkingSpot.getLinkId());
+		
+		
+		for(PlanElement pe1: tripRouter.calcRoute("car", startFacility, endFacility, now, person)) {
+	    	
+			if (pe1 instanceof Leg) {
+				ids = ((NetworkRoute)((Leg) pe1).getRoute()).getLinkIds();
+	    			travelTime += ((Leg) pe1).getTravelTime();
+			}
+		}
+		
+		LegImpl carLeg = new LegImpl("freefloating");
+		
+		carLeg.setTravelTime( travelTime );
+		LinkNetworkRouteImpl route1 = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", route.getEndLinkId(), parkingSpot.getLinkId());
+		route1.setLinkIds( route.getEndLinkId(), ids,  parkingSpot.getLinkId());
+		route1.setTravelTime( travelTime);
+		route1.setVehicleId(new IdImpl("FF_" + (vehID)));
+		carLeg.setRoute(route1);
+		this.cachedDestinationLinkId = parkingSpot.getLinkId();
+
+			// set the route according to the next leg
+		this.currentLeg = carLeg;
+		this.cachedRouteLinkIds = null;
+		this.currentLinkIdIndex = 0;
+		this.cachedNextLinkId = null;
+			
+			
+		return;
+			
+			
+	}
+	
 	private void initializeFreeFloatingEndWalkLeg(Leg leg, double now) {
 		
 		this.state = MobsimAgent.State.LEG;
@@ -388,14 +451,16 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		
 		LegImpl walkLeg = new LegImpl("walk_ff");
 		
-		ParkingLinkInfo parkingSpot = parkingModule.parkFreeFloatingVehicle(new IdImpl((vehID)), this.scenario.getNetwork().getLinks().get(route.getEndLinkId()).getCoord());
-		
+		//ParkingLinkInfo parkingSpot = parkingModule.parkFreeFloatingVehicle(new IdImpl((vehID)), this.scenario.getNetwork().getLinks().get(route.getEndLinkId()).getCoord());
+		vehID = null;
 		GenericRouteImpl walkRoute = new GenericRouteImpl(route.getEndLinkId(), route.getEndLinkId());
-		final double dist = CoordUtils.calcDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(),
+	/*	final double dist = CoordUtils.calcDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(),
 				scenario.getNetwork().getLinks().get(parkingSpot.getLinkId()).getCoord());
 		final double estimatedNetworkDistance = dist * this.beelineFactor;
-
-		final int travTime = (int) (estimatedNetworkDistance / this.walkSpeed );
+*/
+		//final int travTime = (int) (estimatedNetworkDistance / this.walkSpeed );
+		//for the purposes of consistency setting walking time to 0
+		final int travTime = 0;
 		walkRoute.setTravelTime(travTime);
 		walkRoute.setDistance(distance);
 		
