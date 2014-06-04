@@ -27,14 +27,29 @@ import com.google.common.collect.Iterables;
 
 public class MatrixUtils
 {
-    public static Matrix create(String id, Iterable<Id> ids, double[][] values)
+    public static Matrix createDenseMatrix(String id, Iterable<Id> ids, double[][] values)
+    {
+        return createMatrix(id, ids, values, true);
+    }
+
+
+    public static Matrix createSparseMatrix(String id, Iterable<Id> ids, double[][] values)
+    {
+        return createMatrix(id, ids, values, false);
+    }
+
+
+    public static Matrix createMatrix(String id, Iterable<Id> ids, double[][] values,
+            boolean denseMatrix)
     {
         Matrix matrix = new Matrix(id, null);
         Id[] idArray = Iterables.toArray(ids, Id.class);
 
         for (int i = 0; i < idArray.length; i++) {
             for (int j = 0; j < idArray.length; j++) {
-                matrix.createEntry(idArray[i], idArray[j], values[i][j]);
+                if (denseMatrix || values[i][j] != 0) {
+                    matrix.createEntry(idArray[i], idArray[j], values[i][j]);
+                }
             }
         }
 

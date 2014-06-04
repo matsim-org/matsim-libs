@@ -47,7 +47,7 @@ public class PoznanSimpleDemandGeneration
         String dirName = "D:\\eTaxi\\Poznan_MATSim\\";
         String networkFile = dirName + "network.xml";
         String zonesXmlFile = dirName + "zones.xml";
-        String zonesShpFile = dirName + "GIS\\zones_with_no_zone.SHP";
+        String zonesShpFile = dirName + "GIS\\zones.SHP";
 
         String odMatrixFilePrefix = dirName + "odMatrices\\odMatrix";
         String plansFile = dirName + "plans.xml.gz";
@@ -77,7 +77,8 @@ public class PoznanSimpleDemandGeneration
             String odMatrixFile = odMatrixFilePrefix + timePeriod + ".dat";
             double[][] odMatrixFromFile = Array2DReader.getDoubleArray(new File(odMatrixFile),
                     zones.size());
-            Matrix odMatrix = MatrixUtils.create("m" + i, zones.keySet(), odMatrixFromFile);
+            Matrix odMatrix = MatrixUtils.createSparseMatrix("m" + i, zones.keySet(),
+                    odMatrixFromFile);
 
             dg.generateSinglePeriod(odMatrix, "dummy", "dummy", TransportMode.car, i * 3600, 3600,
                     1);

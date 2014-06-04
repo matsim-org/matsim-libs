@@ -37,6 +37,7 @@ public class SubzoneUtils
             Collection<SimpleFeature> subzonePattern)
     {
         Map<Id, List<Polygon>> polygonsByZone = new HashMap<Id, List<Polygon>>();
+        int topologyExceptionCount = 0;
 
         for (Zone z : zones.values()) {
             MultiPolygon zoneMultiPoly = z.getMultiPolygon();
@@ -49,7 +50,7 @@ public class SubzoneUtils
                     geometryCollector.add(zoneMultiPoly.intersection(featureGeometry));
                 }
                 catch (TopologyException e) {
-                    System.err.println(e);
+                    topologyExceptionCount++;
                 }
             }
 
@@ -59,6 +60,11 @@ public class SubzoneUtils
         }
 
         //TODO check out if geometries overlay one another!!!
+        
+        if (topologyExceptionCount > 0) {
+            System.err.println(topologyExceptionCount + " ignored TopologyExceptions");
+        }
+        
         return polygonsByZone;
     }
 }

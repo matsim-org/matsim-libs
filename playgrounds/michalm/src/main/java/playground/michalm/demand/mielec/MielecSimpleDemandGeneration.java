@@ -47,7 +47,7 @@ public class MielecSimpleDemandGeneration
         String dirName = "D:\\michalm\\2013_07\\mielec-2-peaks-new\\";
         String networkFile = dirName + "network.xml";
         String zonesXmlFile = dirName + "zones.xml";
-        String zonesShpFile = dirName + "GIS\\zones_with_no_zone.SHP";
+        String zonesShpFile = dirName + "GIS\\zones.SHP";
         String odMatrixFile = dirName + "odMatrix.dat";
         String plansFile = dirName + "plans.xml";
 
@@ -71,9 +71,11 @@ public class MielecSimpleDemandGeneration
         ODDemandGenerator dg = new ODDemandGenerator(scenario, ac, pc, zones);
 
         double[][] matrix = Array2DReader.getDoubleArray(new File(odMatrixFile), zones.size());
-        Matrix afternoonODMatrix = MatrixUtils.create("afternoon", zones.keySet(), matrix);
+        Matrix afternoonODMatrix = MatrixUtils.createSparseMatrix("afternoon", zones.keySet(),
+                matrix);
         double[][] transposedMatrix = Array2DUtils.transponse(matrix);
-        Matrix morningODMatrix = MatrixUtils.create("morning", zones.keySet(), transposedMatrix);
+        Matrix morningODMatrix = MatrixUtils.createSparseMatrix("morning", zones.keySet(),
+                transposedMatrix);
 
         double startTime = 6 * 3600;
         dg.generateMultiplePeriods(morningODMatrix, "dummy", "dummy", TransportMode.car, startTime,

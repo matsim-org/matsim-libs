@@ -163,7 +163,7 @@ public class PoznanLanduseDemandGeneration
     {
         String networkFile = dirName + "network.xml";
         String zonesXmlFile = dirName + "zones.xml";
-        String zonesShpFile = dirName + "GIS\\zones_with_no_zone.SHP";
+        String zonesShpFile = dirName + "GIS\\zones.SHP";
 
         String forestShpFile = dirName + "GIS\\forests.SHP";
         String industrialShpFile = dirName + "GIS\\industrial.SHP";
@@ -325,7 +325,8 @@ public class PoznanLanduseDemandGeneration
             String odMatrixFile = filePrefix + actPair.name() + "_" + i + "-" + (i + 1);
             System.out.println("Generation for " + odMatrixFile);
             double[][] visumODMatrix = VisumODMatrixReader.readMatrixFile(new File(odMatrixFile));
-            Matrix odMatrix = MatrixUtils.create("m" + i, zones.keySet(), visumODMatrix);
+            Matrix odMatrix = MatrixUtils
+                    .createSparseMatrix("m" + i, zones.keySet(), visumODMatrix);
 
             dg.generateSinglePeriod(odMatrix, actTypeFrom, actTypeTo, TransportMode.car, i * 3600,
                     3600, flowCoeff);
