@@ -23,4 +23,7 @@ public interface ParkingModuleWithFreeFloatingCarSharing {
 	 */
 	public ParkingLinkInfo parkFreeFloatingVehicle(Id vehicleId, Coord destCoord);
 	
+	
+	public void resetForNewIterationStart();
+	
 }

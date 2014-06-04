@@ -52,4 +52,10 @@ public class DummyParkingModuleWithFreeFloatingCarSharing implements
 				.getId());
 	}
 
+	@Override
+	public void resetForNewIterationStart() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
