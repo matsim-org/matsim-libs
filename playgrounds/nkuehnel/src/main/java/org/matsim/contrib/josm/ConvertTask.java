@@ -43,7 +43,6 @@ class ConvertTask extends PleaseWaitRunnable {
 	@Override
 	protected void cancel() {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override

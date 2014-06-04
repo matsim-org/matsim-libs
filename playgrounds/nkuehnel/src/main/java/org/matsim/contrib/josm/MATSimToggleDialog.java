@@ -43,8 +43,8 @@ import static org.openstreetmap.josm.tools.I18n.tr;
  * 
  * 
  */
-class MATSimToggleDialog extends ToggleDialog implements
-		LayerChangeListener, PreferenceChangedListener {
+class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
+		PreferenceChangedListener {
 	private JTable table;
 	private OsmDataLayer layer;
 	private MATSimTableModel tableModel;
@@ -122,9 +122,8 @@ class MATSimToggleDialog extends ToggleDialog implements
 				currentNetwork = NetworkImpl.createNetwork();
 				NewConverter.convertOsmLayer(((OsmDataLayer) newLayer).data,
 						currentNetwork, way2Links, link2Segments);
-				this.osmNetworkListener = new NetworkListener(
-						(OsmDataLayer) newLayer, currentNetwork, way2Links,
-						link2Segments);
+				this.osmNetworkListener = new NetworkListener(currentNetwork,
+						way2Links, link2Segments);
 				((OsmDataLayer) newLayer).data
 						.addDataSetListener(this.osmNetworkListener);
 				if (oldLayer instanceof NetworkLayer || oldLayer == null) {
@@ -290,19 +289,12 @@ class MATSimToggleDialog extends ToggleDialog implements
 				int row = table.getRowSorter().convertRowIndexToModel(
 						table.getSelectedRow());
 				String tempId = (String) this.getValueAt(row, 1);
-				long id;
-				if (tempId.contains("_")) {
-					id = Long
-							.parseLong(tempId.substring(0, tempId.indexOf("_")));
-				} else {
-					id = Long.parseLong(tempId);
-				}
 				Link link = network.getLinks().get(new IdImpl(tempId));
 				if (link2Segments.containsKey(link)) {
 					List<WaySegment> segments = link2Segments.get(link);
 					layer.data.setHighlightedWaySegments(segments);
 					Collection<OsmPrimitive> zoom = new ArrayList<OsmPrimitive>();
-					if(!segments.isEmpty()) {
+					if (!segments.isEmpty()) {
 						zoom.add(segments.get(0).way);
 						AutoScaleAction.zoomTo(zoom);
 						Main.map.mapView.repaint();

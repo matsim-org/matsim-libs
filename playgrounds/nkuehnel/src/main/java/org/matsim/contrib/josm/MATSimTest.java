@@ -42,7 +42,6 @@ class MATSimTest extends Test {
 	Map<TestError, String> links2Fix;
 	Map<TestError, String> nodes2Fix;
 
-	int visitCount = 0;
 
 	protected final static int DUPLICATE_LINK_ID = 3001;
 	protected final static int DUPLICATE_NODE_ID = 3002;
@@ -85,7 +84,6 @@ class MATSimTest extends Test {
 				}
 			}
 		}
-		visitCount++;
 	}
 
 	private boolean doubtfulAttributes(Link link) {
@@ -101,13 +99,14 @@ class MATSimTest extends Test {
 		if (this.network != null) {
 			org.matsim.api.core.v01.network.Node node = network.getNodes().get(
 					new IdImpl(n.getUniqueId()));
-			String origId = ((NodeImpl) node).getOrigId();
-			if (!nodeIds.containsKey(origId)) {
-				nodeIds.put(origId, new ArrayList<Node>());
+			if (node != null) {
+				String origId = ((NodeImpl) node).getOrigId();
+				if (!nodeIds.containsKey(origId)) {
+					nodeIds.put(origId, new ArrayList<Node>());
+				}
+				nodeIds.get(origId).add(n);
 			}
-			nodeIds.get(origId).add(n);
 		}
-		visitCount++;
 	}
 
 	@Override

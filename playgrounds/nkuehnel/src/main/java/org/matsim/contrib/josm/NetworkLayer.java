@@ -43,7 +43,8 @@ class NetworkLayer extends OsmDataLayer {
 
 	public NetworkLayer(DataSet data, String name, File associatedFile,
 			Network network, String coordSystem,
-			HashMap<Way, List<Link>> way2Links, Map<Link, List<WaySegment>> link2Segment) {
+			HashMap<Way, List<Link>> way2Links,
+			Map<Link, List<WaySegment>> link2Segment) {
 		super(data, name, associatedFile);
 		this.matsimNetwork = network;
 		this.coordSystem = coordSystem;
@@ -51,24 +52,24 @@ class NetworkLayer extends OsmDataLayer {
 		this.link2Segment = link2Segment;
 		NetworkListener listener;
 		try {
-			listener = new NetworkListener(this, network, way2Links, link2Segment);
+			listener = new NetworkListener(network, way2Links, link2Segment);
 		} catch (IllegalArgumentException e) {
-			 JOptionPane.showMessageDialog(
-		                Main.parent,
-		                "Could not initialize network listener with the given coordinate system.\nChanges on layer data will NOT affect the network.",
-		                tr("Error"),
-		                JOptionPane.ERROR_MESSAGE);
-			 listener=null;
+			JOptionPane
+					.showMessageDialog(
+							Main.parent,
+							"Could not initialize network listener with the given coordinate system.\nChanges on layer data will NOT affect the network.",
+							tr("Error"), JOptionPane.ERROR_MESSAGE);
+			listener = null;
 		}
-		if (listener!=null) {
+		if (listener != null) {
 			data.addDataSetListener(listener);
-		} 
+		}
 	}
 
 	public Map<Way, List<Link>> getWay2Links() {
 		return way2Links;
 	}
-	
+
 	public Map<Link, List<WaySegment>> getLink2Segments() {
 		return link2Segment;
 	}
