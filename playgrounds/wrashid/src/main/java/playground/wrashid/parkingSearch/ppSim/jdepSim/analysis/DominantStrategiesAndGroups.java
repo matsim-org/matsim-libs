@@ -43,7 +43,8 @@ CompareSelectedParkingPropertyOneRun {
 //		analyzeRuns(basePath,198,199,2450,2499);
 //		analyzeRuns(basePath,200,209,450,499);
 //		analyzeRuns(basePath,222,225,450,499);
-		analyzeRuns(basePath,261,265,450,499);
+//		analyzeRuns(basePath,261,265,450,499);
+		analyzeRuns(basePath,199,199,2399,2499);
 	}
 	
 	public static void analyzeRuns(String basePath, int runStartId, int runEndId, int startIteration, int endIteration){

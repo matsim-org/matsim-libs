@@ -1,8 +1,10 @@
 package playground.wrashid.parkingSearch.ppSim.jdepSim.analysis;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.contrib.parking.lib.obj.list.Lists;
@@ -16,18 +18,31 @@ public class PrepareCumulativeGraphForTwoRuns_DifferenceFloatFields {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String outputFolderRunA = "f:/data/experiments/parkingSearchOct2013/runs/run151/output/";
-		String outputFolderRunB = "f:/data/experiments/parkingSearchOct2013/runs/run152/output/";
-		int startIteration = 450;
-		int endIteration = 455;
+		String outputFolderRunA = "f:/data/experiments/parkingSearchOct2013/runs/run135/output/";
+		String outputFolderRunB = "f:/data/experiments/parkingSearchOct2013/runs/run135/output/";
+		int startIteration = 11;
+		int endIteration = startIteration+5;
 		int iterationStep = 10;
 		boolean ignoreCasesWithBothPPUse = true;
-		String outputFolder = "C:/data/Dropbox/ETH/Projekte/STRC2014/experiments/compare different seeds/temp/";
+		String outputFolder = "C:/data/Dropbox/ETH/Projekte/STRC2014/experiments/comparison different strategy groups/comparisonRun135ToItSelfIt11And499/";
 		double cutPctAccumulationFreq=0.95;
 		
-		boolean compareIterationsOfSameRun=false; // in this case only 'outputFolderRunA' needs to be provided ('outputFolderRunB' one is ignored)
-		int offSet=1;
+		int runNumber=199;
+		int offSet=488;
+		boolean compareIterationsOfSameRun=true; // in this case only 'outputFolderRunA' needs to be provided ('outputFolderRunB' one is ignored)
 
+		
+		if (compareIterationsOfSameRun){
+			//outputFolder = "C:/data/Dropbox/ETH/Projekte/STRC2014/experiments/compare different seeds/run199Selfs/";
+			//outputFolder += "comparisonRun" + runNumber + "ToItSelf_It" + startIteration + "AndOffSet" +   offSet + "/";
+			
+			endIteration = startIteration+1;
+			iterationStep = 10;
+					
+			new File(outputFolder).mkdir();
+		}
+	
+		
 		ArrayList<Float> pctScoreDifference = new ArrayList<Float>();
 		ArrayList<Float> pctWalkDistanceDifference = new ArrayList<Float>();
 		ArrayList<Float> pctSearchTimeDuration = new ArrayList<Float>();

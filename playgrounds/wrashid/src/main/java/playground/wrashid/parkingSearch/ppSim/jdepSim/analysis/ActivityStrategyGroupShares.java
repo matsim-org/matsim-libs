@@ -33,55 +33,11 @@ public class ActivityStrategyGroupShares extends
 					|| facilityId.contains("illegal")) {
 
 				if (makeRoughStrategyGroups){
-					if (groupName.equalsIgnoreCase("ARD-G")){
-						groupName="garage";
-					} else if (groupName.equalsIgnoreCase("BRD(300m)-G")){
-						groupName="garage";
-					} else if (groupName.equalsIgnoreCase("ARD-TakeClosestGarageParking")){
-						groupName="garage";
-					}else if (groupName.equalsIgnoreCase("BRD-TakeClosestGarageParking")){
-						groupName="garage";
-					}else if (groupName.equalsIgnoreCase("BRD(300m)-S-G")){
-						groupName="street";
-					}else if (groupName.equalsIgnoreCase("Parkagent")){
-						groupName="street";
-					}else if (groupName.equalsIgnoreCase("ARD-S")){
-						groupName="street";
-					}else if (groupName.equalsIgnoreCase("BRD(300m)-S")){
-						groupName="street";
-					}else if (groupName.equalsIgnoreCase("ARD-waiting-S")){
-						groupName="street";
-					}else if (groupName.equalsIgnoreCase("ARD-illegal-S")){
-						groupName="illegal";
-					}else{
-						DebugLib.stopSystemAndReportInconsistency();
-					} 
+					groupName = makeRoughStrategyGroups(groupName); 
 				}
 				
 				if (addPrefix){
-					if (groupName.equalsIgnoreCase("ARD-G")){
-						groupName="GP-" + groupName;
-					} else if (groupName.equalsIgnoreCase("BRD(300m)-G")){
-						groupName="GP-" + groupName;
-					} else if (groupName.equalsIgnoreCase("ARD-TakeClosestGarageParking")){
-						groupName="GP-" + groupName;
-					}else if (groupName.equalsIgnoreCase("BRD-TakeClosestGarageParking")){
-						groupName="GP-" + groupName;
-					}else if (groupName.equalsIgnoreCase("BRD(300m)-S-G")){
-						groupName="SP-" + groupName;
-					}else if (groupName.equalsIgnoreCase("Parkagent")){
-						groupName="SP-" + groupName;
-					}else if (groupName.equalsIgnoreCase("ARD-S")){
-						groupName="SP-" + groupName;
-					}else if (groupName.equalsIgnoreCase("BRD(300m)-S")){
-						groupName="SP-" + groupName;
-					}else if (groupName.equalsIgnoreCase("ARD-waiting-S")){
-						groupName="SP-" + groupName;
-					}else if (groupName.equalsIgnoreCase("ARD-illegal-S")){
-						groupName="IP-" + groupName;
-					}else{
-						DebugLib.stopSystemAndReportInconsistency();
-					} 
+					groupName = addGroupPrefix(groupName); 
 				}
 				
 				
@@ -97,9 +53,6 @@ public class ActivityStrategyGroupShares extends
 					groupName = groupName.replace("TakeClosestGarageParking",
 							"TCGP");
 				}
-				
-				
-				
 				
 
 				activityStrategyGroupFrequencies.increment(groupName, activity);
@@ -123,6 +76,60 @@ public class ActivityStrategyGroupShares extends
 						strategyGroup, activity));
 			}
 		}
+	}
+
+	public static String addGroupPrefix(String groupName) {
+		if (groupName.equalsIgnoreCase("ARD-G")){
+			groupName="GP-" + groupName;
+		} else if (groupName.equalsIgnoreCase("BRD(300m)-G")){
+			groupName="GP-" + groupName;
+		} else if (groupName.equalsIgnoreCase("ARD-TakeClosestGarageParking")){
+			groupName="GP-" + groupName;
+		}else if (groupName.equalsIgnoreCase("BRD-TakeClosestGarageParking")){
+			groupName="GP-" + groupName;
+		}else if (groupName.equalsIgnoreCase("BRD(300m)-S-G")){
+			groupName="SP-" + groupName;
+		}else if (groupName.equalsIgnoreCase("Parkagent")){
+			groupName="SP-" + groupName;
+		}else if (groupName.equalsIgnoreCase("ARD-S")){
+			groupName="SP-" + groupName;
+		}else if (groupName.equalsIgnoreCase("BRD(300m)-S")){
+			groupName="SP-" + groupName;
+		}else if (groupName.equalsIgnoreCase("ARD-waiting-S")){
+			groupName="SP-" + groupName;
+		}else if (groupName.equalsIgnoreCase("ARD-illegal-S")){
+			groupName="IP-" + groupName;
+		}else{
+			DebugLib.stopSystemAndReportInconsistency();
+		}
+		return groupName;
+	}
+
+	public static String makeRoughStrategyGroups(String groupName) {
+		if (groupName.equalsIgnoreCase("ARD-G")){
+			groupName="garage";
+		} else if (groupName.equalsIgnoreCase("BRD(300m)-G")){
+			groupName="garage";
+		} else if (groupName.equalsIgnoreCase("ARD-TakeClosestGarageParking")){
+			groupName="garage";
+		}else if (groupName.equalsIgnoreCase("BRD-TakeClosestGarageParking")){
+			groupName="garage";
+		}else if (groupName.equalsIgnoreCase("BRD(300m)-S-G")){
+			groupName="street";
+		}else if (groupName.equalsIgnoreCase("Parkagent")){
+			groupName="street";
+		}else if (groupName.equalsIgnoreCase("ARD-S")){
+			groupName="street";
+		}else if (groupName.equalsIgnoreCase("BRD(300m)-S")){
+			groupName="street";
+		}else if (groupName.equalsIgnoreCase("ARD-waiting-S")){
+			groupName="street";
+		}else if (groupName.equalsIgnoreCase("ARD-illegal-S")){
+			groupName="illegal";
+		}else{
+			DebugLib.stopSystemAndReportInconsistency();
+		}
+		return groupName;
 	}
 
 }
