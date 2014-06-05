@@ -37,10 +37,10 @@ public class DefaultActivityCreator
 {
     private final UniformRandom uniform = RandomUtils.getGlobalUniform();
     private final Scenario scenario;
-    private final NetworkImpl network;
-    private final PopulationFactory pf;
+    protected final NetworkImpl network;
+    protected final PopulationFactory pf;
 
-    private GeometryProvider geometryProvider;
+    private  GeometryProvider geometryProvider;
     private PointAcceptor pointAcceptor;
 
 
