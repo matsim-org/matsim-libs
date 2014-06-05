@@ -316,9 +316,9 @@ public class OneWayCSRDWithParkingPersonDriverAgentImpl implements MobsimDriverA
 		
 		GenericRouteImpl walkRoute = new GenericRouteImpl(route.getStartLinkId(), startLink.getId());
 		final double dist = CoordUtils.calcDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startLink.getCoord());
-		final double estimatedNetworkDistance = dist * 1.3;
+		final double estimatedNetworkDistance = dist * this.beelineFactor;
 
-		final int travTime = (int) (estimatedNetworkDistance / 0.77 );
+		final int travTime = (int) (estimatedNetworkDistance / this.walkSpeed );
 		walkRoute.setTravelTime(travTime);
 		walkRoute.setDistance(estimatedNetworkDistance);
 		
@@ -416,9 +416,9 @@ public class OneWayCSRDWithParkingPersonDriverAgentImpl implements MobsimDriverA
 		
 		GenericRouteImpl walkRoute = new GenericRouteImpl(endLink.getId(), route.getEndLinkId());
 		final double dist = CoordUtils.calcDistance(endLink.getCoord(), scenario.getNetwork().getLinks().get(route.getEndLinkId()).getCoord());
-		final double estimatedNetworkDistance = dist * 1.3;
+		final double estimatedNetworkDistance = dist * this.beelineFactor;
 
-		final int travTime = (int) (estimatedNetworkDistance / 0.77 );
+		final int travTime = (int) (estimatedNetworkDistance / this.walkSpeed );
 		walkRoute.setTravelTime(travTime);
 		walkRoute.setDistance(estimatedNetworkDistance);		
 		
