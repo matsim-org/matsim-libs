@@ -12,11 +12,11 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.balac.freefloating.controler.listener.FFEventsHandler.RentalInfoFF;
+import playground.balac.freefloating.controler.listener.FFParkingEventsHandler.RentalInfoFF;
 
 
 public class FFListener implements StartupListener, IterationEndsListener, IterationStartsListener{
-	FFEventsHandler ffhandler;
+	FFParkingEventsHandler ffhandler;
 	String inputFileff;
 	
 	public FFListener( String inputFileff) {
@@ -68,7 +68,7 @@ public class FFListener implements StartupListener, IterationEndsListener, Itera
 		// TODO Auto-generated method stub
 		
 		
-		ffhandler = new FFEventsHandler(event.getControler().getNetwork());
+		ffhandler = new FFParkingEventsHandler(event.getControler().getNetwork());
 		
 
 		

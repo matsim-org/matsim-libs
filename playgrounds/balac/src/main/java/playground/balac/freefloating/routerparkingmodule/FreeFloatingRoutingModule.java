@@ -33,7 +33,7 @@ public class FreeFloatingRoutingModule implements RoutingModule {
 		leg1.setRoute(route1);
 		trip.add( leg1 );	
 		
-		final Leg leg3 = new LegImpl( "freefloating" );
+		final Leg leg3 = new LegImpl( "freefloatingparking" );
 		LinkNetworkRouteImpl route3 = new LinkNetworkRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
 		leg3.setRoute(route3);
 		trip.add( leg3 );

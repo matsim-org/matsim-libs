@@ -275,11 +275,11 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 					initializeFreeFloatingEndWalkLeg(leg, now);
 							
 			}
-			else if (leg.getMode().equals( "freefloating" ) && this.plan.getPlanElements().get(this.plan.getPlanElements().indexOf(pe) + 2) instanceof Activity) {
+			else if (leg.getMode().equals( "freefloatingparking" )) {
 				initializeFreeFLoatingParkingCarLeg( now);
 				
 			}
-			else if (leg.getMode().equals( "freefloating" ) && this.plan.getPlanElements().get(this.plan.getPlanElements().indexOf(pe) + 2) instanceof Leg) {
+			else if (leg.getMode().equals( "freefloating" ) ) {
 				initializeFreeFLoatingCarLeg(startLink, now);
 				
 			}
@@ -423,7 +423,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 			}
 		}
 		
-		LegImpl carLeg = new LegImpl("freefloating");
+		LegImpl carLeg = new LegImpl("freefloatingparking");
 		
 		carLeg.setTravelTime( travelTime );
 		LinkNetworkRouteImpl route1 = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", route.getEndLinkId(), parkingSpot.getLinkId());
@@ -670,7 +670,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		PlanElement currentPlanElement = this.getCurrentPlanElement();
 		NetworkRoute route = (NetworkRoute) ((Leg) currentPlanElement).getRoute(); // if casts fail: illegal state.
 		
-		if (((Leg)currentPlanElement).getMode().equals("freefloating")){
+		if (((Leg)currentPlanElement).getMode().equals("freefloating") || ((Leg)currentPlanElement).getMode().equals("freefloatingparking")){
 			
 			return new IdImpl("FF_"+ (vehID));	
 		
