@@ -41,6 +41,8 @@ import playground.balac.freefloating.qsim.FreeFloatingStation;
 import playground.balac.freefloating.qsim.FreeFloatingVehiclesLocation;
 import playground.balac.onewaycarsharingredisgned.qsim.OneWayCarsharingRDStation;
 import playground.balac.onewaycarsharingredisgned.qsim.OneWayCarsharingRDVehicleLocation;
+import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingStation;
+import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingVehicleLocation;
 import playground.balac.twowaycarsharingredisigned.config.TwoWayCSConfigGroup;
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSStation;
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSVehicleLocation;
@@ -53,14 +55,14 @@ public class AllCSModesQsimFactory implements MobsimFactory{
 	private final Scenario scenario;
 	private final Controler controler;
 	private final ArrayList<FreeFloatingStation> ffvehiclesLocation;
-	private final ArrayList<OneWayCarsharingRDStation> owvehiclesLocation;
+	private final ArrayList<OneWayCarsharingRDWithParkingStation> owvehiclesLocation;
 	private final ArrayList<TwoWayCSStation> twvehiclesLocation;
 	public AllCSModesQsimFactory(final Scenario scenario, final Controler controler) throws IOException {
 		
 		this.scenario = scenario;
 		this.controler = controler;
 		ffvehiclesLocation = new ArrayList<FreeFloatingStation>();
-		owvehiclesLocation = new ArrayList<OneWayCarsharingRDStation>();
+		owvehiclesLocation = new ArrayList<OneWayCarsharingRDWithParkingStation>();
 		twvehiclesLocation = new ArrayList<TwoWayCSStation>();
 		readVehicleLocations();
 		//lets copy here locations and create another structure from this, might be faster
@@ -121,7 +123,8 @@ public class AllCSModesQsimFactory implements MobsimFactory{
 		    		vehIDs.add(Integer.toString(i));
 		    		i++;
 		    	}
-		    	OneWayCarsharingRDStation f = new OneWayCarsharingRDStation(l, Integer.parseInt(arr[6]), vehIDs);
+		    	//add parking spaces
+		    	OneWayCarsharingRDWithParkingStation f = new OneWayCarsharingRDWithParkingStation(l, Integer.parseInt(arr[6]), vehIDs, Integer.parseInt(arr[6]) * 2);
 		    	
 		    	owvehiclesLocation.add(f);
 		    	s = reader.readLine();
@@ -193,7 +196,7 @@ public class AllCSModesQsimFactory implements MobsimFactory{
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
 		FreeFloatingVehiclesLocation ffvehiclesLocationqt = null;
-		OneWayCarsharingRDVehicleLocation owvehiclesLocationqt = null;
+		OneWayCarsharingRDWithParkingVehicleLocation owvehiclesLocationqt = null;
 		TwoWayCSVehicleLocation twvehiclesLocationqt = null;
 		AgentFactory agentFactory = null;
 		if (sc.getConfig().scenario().isUseTransit()) {
@@ -208,7 +211,8 @@ public class AllCSModesQsimFactory implements MobsimFactory{
 			
 			try {
 				ffvehiclesLocationqt = new FreeFloatingVehiclesLocation(controler, ffvehiclesLocation);
-				owvehiclesLocationqt = new OneWayCarsharingRDVehicleLocation(controler, owvehiclesLocation);
+				owvehiclesLocationqt = new OneWayCarsharingRDWithParkingVehicleLocation
+						(controler, owvehiclesLocation);
 				twvehiclesLocationqt = new TwoWayCSVehicleLocation(controler, twvehiclesLocation);
 			
 			agentFactory = new AllCSModesAgentFactory(qSim, scenario, controler, ffvehiclesLocationqt, owvehiclesLocationqt, twvehiclesLocationqt);

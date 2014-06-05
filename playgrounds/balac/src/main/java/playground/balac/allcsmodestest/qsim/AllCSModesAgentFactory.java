@@ -9,7 +9,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.PopulationUtils;
 
 import playground.balac.freefloating.qsim.FreeFloatingVehiclesLocation;
-import playground.balac.onewaycarsharingredisgned.qsim.OneWayCarsharingRDVehicleLocation;
+import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingVehicleLocation;
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSVehicleLocation;
 
 public class AllCSModesAgentFactory implements AgentFactory{
@@ -17,9 +17,9 @@ public class AllCSModesAgentFactory implements AgentFactory{
 	private final Scenario scenario;
 	private final Controler controler;
 	private FreeFloatingVehiclesLocation ffvehiclesLocation;
-	private OneWayCarsharingRDVehicleLocation owvehiclesLocation;
+	private OneWayCarsharingRDWithParkingVehicleLocation owvehiclesLocation;
 	private TwoWayCSVehicleLocation twvehiclesLocation;
-	public AllCSModesAgentFactory(final Netsim simulation, final Scenario scenario, final Controler controler, FreeFloatingVehiclesLocation ffvehiclesLocation, OneWayCarsharingRDVehicleLocation owvehiclesLocation, TwoWayCSVehicleLocation twvehiclesLocation) {
+	public AllCSModesAgentFactory(final Netsim simulation, final Scenario scenario, final Controler controler, FreeFloatingVehiclesLocation ffvehiclesLocation, OneWayCarsharingRDWithParkingVehicleLocation owvehiclesLocation, TwoWayCSVehicleLocation twvehiclesLocation) {
 		this.simulation = simulation;
 		this.scenario = scenario;
 		this.controler = controler;

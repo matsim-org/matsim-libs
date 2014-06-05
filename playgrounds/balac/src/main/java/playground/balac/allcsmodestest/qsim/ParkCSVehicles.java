@@ -16,6 +16,8 @@ import playground.balac.freefloating.qsim.FreeFloatingStation;
 import playground.balac.freefloating.qsim.FreeFloatingVehiclesLocation;
 import playground.balac.onewaycarsharingredisgned.qsim.OneWayCarsharingRDStation;
 import playground.balac.onewaycarsharingredisgned.qsim.OneWayCarsharingRDVehicleLocation;
+import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingStation;
+import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingVehicleLocation;
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSStation;
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSVehicleLocation;
 
@@ -27,10 +29,10 @@ public class ParkCSVehicles implements AgentSource {
 	private Collection<String> mainModes;
 	private boolean insertVehicles = true;
 	private FreeFloatingVehiclesLocation ffvehiclesLocationqt;
-	private OneWayCarsharingRDVehicleLocation owvehiclesLocationqt;
+	private OneWayCarsharingRDWithParkingVehicleLocation owvehiclesLocationqt;
 	private TwoWayCSVehicleLocation twvehiclesLocationqt;
 	public ParkCSVehicles(Population population, AgentFactory agentFactory, QSim qsim,
-			FreeFloatingVehiclesLocation ffvehiclesLocationqt, OneWayCarsharingRDVehicleLocation owvehiclesLocationqt, TwoWayCSVehicleLocation twvehiclesLocationqt) {
+			FreeFloatingVehiclesLocation ffvehiclesLocationqt, OneWayCarsharingRDWithParkingVehicleLocation owvehiclesLocationqt, TwoWayCSVehicleLocation twvehiclesLocationqt) {
 		this.population = population;
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;  
@@ -57,14 +59,14 @@ public class ParkCSVehicles implements AgentSource {
 			
 		}
 		if (owvehiclesLocationqt != null)
-		for (OneWayCarsharingRDStation owstation: owvehiclesLocationqt.getQuadTree().values()) {
-			
-			for (String id : owstation.getIDs()) {
-				qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("OW_"+id), modeVehicleTypes.get("onewaycarsharing")), owstation.getLink().getId());
+			for (OneWayCarsharingRDWithParkingStation owstation: owvehiclesLocationqt.getQuadTree().values()) {
+				
+				for (String id:owstation.getIDs()) {
+					qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("OW_"+(id)), modeVehicleTypes.get("onewaycarsharing")), owstation.getLink().getId());
 
+				}
+				
 			}
-			
-		}
 		
 		if (twvehiclesLocationqt != null)
 			for (TwoWayCSStation twstation: twvehiclesLocationqt.getQuadTree().values()) {

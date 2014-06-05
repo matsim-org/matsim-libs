@@ -38,7 +38,7 @@ public class OneWayCarsharingRDWithParkingStation  {
 		return this.availableParkingSpaces ;
 	}
 	
-	public void rmeoveCar() {
+	public void removeCar() {
 		this.numberOfVehicles--;
 	}
 	
@@ -53,7 +53,7 @@ public class OneWayCarsharingRDWithParkingStation  {
 	}
 	
 	public void freeParkingSpot() {
-		availableParkingSpaces--;
+		availableParkingSpaces++;
 		
 	}
 	

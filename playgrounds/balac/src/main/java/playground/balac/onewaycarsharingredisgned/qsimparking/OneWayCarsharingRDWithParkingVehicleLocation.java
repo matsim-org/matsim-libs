@@ -62,7 +62,7 @@ public class OneWayCarsharingRDWithParkingVehicleLocation {
 	public void removeVehicle(OneWayCarsharingRDWithParkingStation station, String id) {
 		
 		station.getIDs().remove(id);
-		station.rmeoveCar();
+		station.removeCar();
 				
 	}
 	
