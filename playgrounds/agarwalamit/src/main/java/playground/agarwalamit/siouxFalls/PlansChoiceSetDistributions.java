@@ -42,27 +42,24 @@ import org.matsim.core.utils.io.IOUtils;
 /**
  * @author amit
  */
-/**
- * @author aagarwal
- *
- */
+
 public class PlansChoiceSetDistributions {
 
 	private static final String absolutePath = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/";
-	private static final String plansAt0Iter = absolutePath+"/outputMC/run33/output_plans.xml.gz";
-	private static final String plansAtStopReplannig = absolutePath+"outputMC/run101_2/ITERS/it.80/80.plans.xml.gz";
-	private static final String plansAtLastIter =  absolutePath+"outputMC/run101_2/ITERS/it.100/100.plans.xml.gz";
+	private static final String plansAt0Iter = absolutePath+"/outputMCOff/run33/output_plans.xml.gz";
+	private static final String plansAtStopReplannig = absolutePath+"outputMCOff/run105_2/ITERS/it.80/80.plans.xml.gz";
+	private static final String plansAtLastIter =  absolutePath+"outputMCOff/run105_2/ITERS/it.100/100.plans.xml.gz";
 	private final Logger log = Logger.getLogger(PlansChoiceSetDistributions.class);
 	
 	public static void main(String[] args) {
 		PlansChoiceSetDistributions pc =  new PlansChoiceSetDistributions();
-		pc.writeLegsDistributionWRTSelectedPlan(plansAt0Iter, absolutePath+"/outputMC/run101_2/analysis/it.0.selectedLeg2OtherLegsDistribution.txt");
-		pc.writeLegsDistributionWRTSelectedPlan(plansAtStopReplannig, absolutePath+"/outputMC/run101_2/analysis/it.80.selectedLeg2OtherLegsDistribution.txt");
-		pc.writeLegsDistributionWRTSelectedPlan(plansAtLastIter, absolutePath+"/outputMC/run101_2/analysis/it.100.selectedLeg2OtherLegsDistribution.txt");
+		pc.writeLegsDistributionWRTSelectedPlan(plansAt0Iter, absolutePath+"/outputMCOff/run105_2/analysis/it.0.selectedLeg2OtherLegsDistribution.txt");
+		pc.writeLegsDistributionWRTSelectedPlan(plansAtStopReplannig, absolutePath+"/outputMCOff/run105_2/analysis/it.80.selectedLeg2OtherLegsDistribution.txt");
+		pc.writeLegsDistributionWRTSelectedPlan(plansAtLastIter, absolutePath+"/outputMCOff/run105_2/analysis/it.100.selectedLeg2OtherLegsDistribution.txt");
 
-		pc.writeLegsDistribution(plansAt0Iter, absolutePath+"/outputMC/run101_2/analysis/it.0.personId2TravelLegsDistribution.txt");
-		pc.writeLegsDistribution(plansAtStopReplannig, absolutePath+"/outputMC/run101_2/analysis/it.80.personId2TravelLegsDistribution.txt");
-		pc.writeLegsDistribution(plansAtLastIter, absolutePath+"/outputMC/run101_2/analysis/it.100.personId2TravelLegsDistribution.txt");
+		pc.writeLegsDistribution(plansAt0Iter, absolutePath+"/outputMCOff/run105_2/analysis/it.0.personId2TravelLegsDistribution.txt");
+		pc.writeLegsDistribution(plansAtStopReplannig, absolutePath+"/outputMCOff/run105_2/analysis/it.80.personId2TravelLegsDistribution.txt");
+		pc.writeLegsDistribution(plansAtLastIter, absolutePath+"/outputMCOff/run105_2/analysis/it.100.personId2TravelLegsDistribution.txt");
 		//		Map<Id, List<String>> personId2legs =  pc.getLegsForAllPlansInChoiceSet(plansAtStopReplannig);
 		//		pc.writeMap2TxtFile(personId2legs, absolutePath+"/outputMC/run101_2/analysis/personId2TravelLegsForChoiceSet.txt");
 
