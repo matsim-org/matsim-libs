@@ -97,9 +97,14 @@ class TaxiDemandParser implements TabularFileHandler{
     }
     @Override
     public void startRow(String[] row)
-    {
-           Id fromLor = new IdImpl(row[0]);
-           Id toLor = new IdImpl(row[1]);
+    {       
+            String from = row[0];
+            if (from.equals("null")) return;
+            String to = row[1];
+            if (to.equals("null")) return;
+            
+           Id fromLor = new IdImpl(from);
+           Id toLor = new IdImpl(to);
            double demand = Double.parseDouble(row[2]);
            System.out.println(fromLor);
            this.matrix.createEntry(fromLor, toLor, demand);
