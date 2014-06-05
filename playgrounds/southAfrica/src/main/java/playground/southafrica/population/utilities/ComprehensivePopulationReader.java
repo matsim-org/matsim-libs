@@ -11,6 +11,7 @@ import org.matsim.households.IncomeImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
+import playground.southafrica.population.census2001.Census2001SampleParser;
 import playground.southafrica.utilities.Header;
 
 /**

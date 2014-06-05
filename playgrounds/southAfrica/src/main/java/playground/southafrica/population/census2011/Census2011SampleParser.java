@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southafrica.population.utilities;
+package playground.southafrica.population.census2011;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -50,6 +50,15 @@ import org.matsim.households.IncomeImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
+import playground.southafrica.population.census2011.containers.Employment2011;
+import playground.southafrica.population.census2011.containers.Gender2011;
+import playground.southafrica.population.census2011.containers.HousingType2011;
+import playground.southafrica.population.census2011.containers.Income2011;
+import playground.southafrica.population.census2011.containers.MainDwellingType2011;
+import playground.southafrica.population.census2011.containers.PopulationGroup2011;
+import playground.southafrica.population.census2011.containers.Relationship2011;
+import playground.southafrica.population.census2011.containers.School2011;
+import playground.southafrica.population.utilities.SAIncomeConverter;
 import playground.southafrica.utilities.Header;
 
 public class Census2011SampleParser {
@@ -127,7 +136,11 @@ public class Census2011SampleParser {
 				String population = line.substring(80, 81);
 				String income = line.substring(81, 83);
 				
-				householdMap.put(new IdImpl(serial), size.replaceAll(" ", "") + "," + this.getHousingType(type) + "," + this.getMainDwellingType(dwelling) + "," + this.getPopulation(population) + "," + this.getIncome(income));
+				householdMap.put(new IdImpl(serial), size.replaceAll(" ", "") + "," 
+						+ HousingType2011.parseTypeFromCensusCode(type) + "," 
+						+ MainDwellingType2011.parseTypeFromCensusCode(dwelling) + "," 
+						+ PopulationGroup2011.parseTypeFromCensusCode(population) + "," 
+						+ Income2011.parseIncome2011FromCensusCode(income));
 				
 				String province = line.substring(58, 59);
 				String district = line.substring(59, 62);
@@ -189,12 +202,12 @@ public class Census2011SampleParser {
 				String employment = line.substring(147, 148);
 				
 				String s = Integer.parseInt(age.replaceAll(" ", "")) + "," +
-						getGender(gender) + "," +
-						getRelationship(relationship) + "," +
-						getPopulation(population) + "," + 
-						getSchool(school, educationInstitution) + "," + 
-						getEmployment(employment) + "," + 
-						getIncome(income);
+						Gender2011.parseGenderFromCensusCode(gender) + "," +
+						Relationship2011.parseRelationshipFromCensusCode(relationship) + "," +
+						PopulationGroup2011.parseTypeFromCensusCode(population) + "," + 
+						School2011.parseEducationFromCensusCode(school, educationInstitution) + "," + 
+						Employment2011.parseEmploymentFromCensusCode(employment) + "," + 
+						Income2011.parseIncome2011FromCensusCode(income);
 				personMap.put(new IdImpl(serial + "_" + String.valueOf(Integer.parseInt(person.replaceAll(" ", "")))), s);
 				
 				counter.incCounter();
@@ -248,54 +261,67 @@ public class Census2011SampleParser {
 		
 		Population population = sc.getPopulation();
 		PopulationFactoryImpl pf = (PopulationFactoryImpl) population.getFactory();
-		for(Id pid : personMap.keySet()){
-			String[] sa = personMap.get(pid).split(",");
+		for(Id personId : personMap.keySet()){
+			String[] sa = personMap.get(personId).split(",");
 			int age = Integer.parseInt(sa[0]);
-			String gender = sa[1].equalsIgnoreCase("Male") ? "m" : "f";
-			String relationship = sa[2];
-			String race = sa[3];
-			String school = sa[4];
-			boolean employment = sa[5].equalsIgnoreCase("Yes") ? true : false;
-			String pIncomeString = sa[6];
-			Income pIncome = null;
-			if(!pIncomeString.equalsIgnoreCase("Unknown")){
-				pIncome = hhf.createIncome(Double.parseDouble(sa[6]), IncomePeriod.year);
-				pIncome.setCurrency("ZAR");
-			}
 			
-			PersonImpl person = (PersonImpl) pf.createPerson(pid);
+			Gender2011 gender = Gender2011.parseGenderFromString(sa[1]);
+			
+			Relationship2011 relationship = Relationship2011.parseRelationshipFromString(sa[2]);
+			PopulationGroup2011 populationGroup = PopulationGroup2011.parseTypeFromString(sa[3]);
+			School2011 school = School2011.parseEducationFromString(sa[4]);
+			
+			Employment2011 employment = Employment2011.parseEmploymentFromString(sa[5]);
+			boolean isEmployed = false;
+			switch (employment) {
+			case Employed:
+				isEmployed = true;
+			case Discouraged:
+				break;
+			case Inactive:
+				break;
+			case NotApplicable:
+				break;
+			case Unemployed:
+				break;
+			default:
+				break;
+			}			
+
+			Income2011 pIncome = Income2011.parseIncome2011FromString(sa[6]);
+			
+			PersonImpl person = (PersonImpl) pf.createPerson(personId);
 			person.setAge(age);
-			person.setSex(gender);
-			person.setEmployed(employment);
-			personAttributes.putAttribute(pid.toString(), "relationship", relationship);
-			personAttributes.putAttribute(pid.toString(), "race", race);
-			personAttributes.putAttribute(pid.toString(), "school", school);
+			person.setSex(Gender2011.getMatsimGender(gender));
+			person.setEmployed(isEmployed);
+			personAttributes.putAttribute(personId.toString(), "relationship", relationship.toString());
+			personAttributes.putAttribute(personId.toString(), "race", populationGroup.toString());
+			personAttributes.putAttribute(personId.toString(), "school", school.toString());
 			if(pIncome != null){
-				personAttributes.putAttribute(pid.toString(), "income", pIncome);
+				personAttributes.putAttribute(personId.toString(), "income", pIncome.toString());
 			}
 			population.addPerson(person);
 			
 			/* Add to household */
-			Id hid = new IdImpl(pid.toString().split("_")[0]);
+			Id hid = new IdImpl(personId.toString().split("_")[0]);
 			if(!this.households.getHouseholds().containsKey(hid)){
 				/* Household data */
 				String[] hsa = householdMap.get(hid).split(",");
 				int hhSize = Integer.parseInt(hsa[0]);
-				String housingType = hsa[1];
-				String mainDwellingType = hsa[2];
-				String hhPopulation = hsa[3];
-				String incomeString = hsa[4];
-				Income hhIncome = null;
-				if(!incomeString.equalsIgnoreCase("Unknown")){
-					hhIncome = hhf.createIncome(Double.parseDouble(hsa[4]), IncomePeriod.year);		
-					hhIncome.setCurrency("ZAR");
-				} 
+				
+				HousingType2011 housingType = HousingType2011.parseTypeFromString(hsa[1]);
+				MainDwellingType2011 mainDwellingType = MainDwellingType2011.parseTypeFromString(hsa[2]);
+				PopulationGroup2011 hhPopulation = PopulationGroup2011.parseTypeFromString(hsa[3]);
+				
+				Income2011 hhIncome = Income2011.parseIncome2011FromString(hsa[4]);
+
 				Household hh = hhf.createHousehold(hid);
-				hh.setIncome(hhIncome);
-				householdAttributes.putAttribute(hid.toString(), "housingType", housingType);
-				householdAttributes.putAttribute(hid.toString(), "mainDwellingType", mainDwellingType);
+				hh.setIncome(Income2011.getIncome(hhIncome));
+				
+				householdAttributes.putAttribute(hid.toString(), "housingType", housingType.toString());
+				householdAttributes.putAttribute(hid.toString(), "mainDwellingType", mainDwellingType.toString());
 				householdAttributes.putAttribute(hid.toString(), "householdSize", hhSize);
-				householdAttributes.putAttribute(hid.toString(), "population", hhPopulation);
+				householdAttributes.putAttribute(hid.toString(), "population", hhPopulation.toString());
 				
 				/* Geography data */
 				String[] gsa = geographyMap.get(hid).split(",");
@@ -308,7 +334,7 @@ public class Census2011SampleParser {
 
 				this.households.getHouseholds().put(hid, hh);
 			}
-			this.households.getHouseholds().get(hid).getMemberIds().add(pid);
+			this.households.getHouseholds().get(hid).getMemberIds().add(personId);
 		}		
 		/* Validate: */
 		LOG.info("================================================================");
@@ -407,243 +433,5 @@ public class Census2011SampleParser {
 		
 	}
 
-	
-	private String getPopulation(String code){
-		if(code.contains(".")){
-			return "NotApplicable";
-		}
-		code = code.replaceAll(" ", "");
-		int codeInt = Integer.parseInt(code);
-		
-		switch (codeInt) {
-		case 1:
-			return "Black"; 
-		case 2:
-			return "Coloured"; 
-		case 3:
-			return "Indian-Asian";
-		case 4:
-			return "White";
-		case 5:
-			return "Other";
-		}
-		return "Unknown";
-	}
-	
-	/**
-	 * Convert income code to <b><i>annual</i></b> income value in South African
-	 * Rand (ZAR). The <i>upper</i> upper income level is given.
-	 * @param code
-	 * @return
-	 */
-	private String getIncome(String code){
-		if(code.contains(".")){
-			return "NotApplicable";
-		}
-		code = code.replaceAll(" ", "");
-		int codeInt = Integer.parseInt(code);
-		
-		switch (codeInt) {
-		case 1:
-			return "0.00";
-		case 2:
-			return "4800.00";
-		case 3:
-			return "9600.00";
-		case 4:
-			return "19200.00";
-		case 5:
-			return "38400.00";
-		case 6:
-			return "76800.00";
-		case 7:
-			return "153600.00";
-		case 8:
-			return "307200.00";
-		case 9:
-			return "614400.00";
-		case 10:
-			return "1228800.00";
-		case 11:
-			return "2457600.00";
-		case 12:
-			return "4915200.00"; /* Twice the category 11 value. */
-		}
-		return "Unknown";
-	}
-
-	
-	private String getHousingType(String code){
-		if(code.contains(".")){
-			return "NotApplicable";
-		}
-		code = code.replaceAll(" ", "");
-		int codeInt = Integer.parseInt(code);
-		
-		switch (codeInt) {
-		case 1:
-			return "House";
-		case 2:
-			return "Hostel";
-		case 3:
-			return "Hotel";
-		case 4:
-			return "OldAgeHome";
-		}
-		return "Other";
-	}
-	
-	
-	private String getMainDwellingType(String code){
-		if(code.contains(".")){
-			return "NotApplicable";
-		}
-		code = code.replaceAll(" ", "");
-		int codeInt = Integer.parseInt(code);
-		
-		switch (codeInt) {
-		case 1:
-			return "FormalHouse";
-		case 2:
-			return "TraditionalDwelling";
-		case 3:
-			return "Apartment";
-		case 4:
-			return "Cluster";
-		case 5:
-			return "Townhouse";
-		case 6:
-			return "Semi-detachedHouse";
-		case 7:
-			return "BackyardFormal";
-		case 8:
-			return "BackyardInformal";
-		case 9:
-			return "Informal";
-		case 10: 
-			return "BackyardFormal";
-		case 11:
-			return "Caravan/Tent";
-		case 12:
-			return "Other";
-		}
-		return "Unknown";
-	}
-	
-	private String getGender(String code){
-		if(code.contains(".")){
-			return "NotApplicable";
-		}
-		
-		code = code.replaceAll(" ", "");
-		int codeInt = Integer.parseInt(code);
-		switch (codeInt) {
-		case 1:
-			return "Male";
-		case 2:
-			return "Female";
-		}
-		return "Unknown";
-	}
-	
-	private String getRelationship(String code){
-		if(code.contains(".")){
-			return "NotApplicable";
-		}
-		
-		code = code.replaceAll(" ", "");
-		int codeInt = Integer.parseInt(code);
-		switch (codeInt) {
-		case 1:
-			return "Head";
-		case 2:
-			return "Partner";
-		case 3: // Son/daughter
-		case 4: // Adopted son/daughter
-		case 5: // Stepson/stepdaughter
-		case 10: // Son/daughter-in-law
-			return "Child";
-		case 6: // Brother/sister
-		case 11: // Brother/sister-in-law
-			return "Sibling";
-		case 7: // Parent
-		case 8: // Parent-in-law
-			return "Parent";
-		case 9:
-			return "Grandchild";
-		case 12:
-		case 13:
-			return "Other";
-		case 14:
-			return "Unrelated";
-		case 99:
-			return "Unspecified";
-		}
-		return "Unknown";
-	}
-	
-	/**
-	 * Take care: only children five years and older were surveyed, so day-care
-	 * is not covered, at least by definition.
-	 * 
-	 * @param code
-	 * @param educationInstitution
-	 * @return
-	 */
-	private String getSchool(String code, String educationInstitution){
-		if(code.contains(".")){
-			return "None";
-		}
-		code = code.replaceAll(" ", "");
-		int codeInt = Integer.parseInt(code);
-		
-		/* Deal with explicit "No". */
-		switch (codeInt) {
-		case 2: // No
-			return "None";
-		}
-
-		/* Deal with variations. */
-		if(educationInstitution.equalsIgnoreCase(".")){
-			return "None";
-		}
-		educationInstitution = educationInstitution.replaceAll(" ", "");
-		int eduInt = Integer.parseInt(educationInstitution);
-		switch (eduInt){
-		case 1:
-			return "PreSchool";
-		case 2: // Normal grade R-12
-		case 3: // Special school
-			return "School";
-		case 4: // FET
-		case 5: // College
-		case 6: // University & University of Technology
-			return "Tertiary";
-		case 7: 
-		case 8:
-			return "AdultEducation";
-		case 9:
-			return "HomeSchooling";
-		}
-		return "Unknown";
-	}
-	
-	private String getEmployment(String code){
-		if(code.contains(".")){
-			return "No"; /* Not applicable */
-		}
-		code = code.replaceAll(" ", "");
-		int codeInt = Integer.parseInt(code);
-		switch (codeInt) {
-		case 1:
-			return "Yes";
-		case 2: // Unemployed
-		case 3: // Do not know
-		case 9: // Unspecified
-			return "No";
-		}
-		return "No";
-	}
-		
 }
 

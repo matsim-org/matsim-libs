@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LivingQuarterType.java
+ * Schooling.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,77 +18,68 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southafrica.population.containers;
+package playground.southafrica.population.census2001.containers;
 
-public class LivingQuarterType {
-	private enum Type{House, Hotel, StudentResidence, OldAgeHome, Hostel, Other};
-//	HOUSE("House", 1), 
-//	HOTEL("Hotel", 2), 
-//	STUDENT_RESIDENCE("StrudentResidence", 3),
-//	OLD_AGE_HOME("OldAgeHome", 4), 
-//	HOSTEL("Hostel", 5),
-//	OTHER("Other", 6);
+public class Schooling {
+	private enum Type{None, PreSchool, School, Tertiary, AdultEducation, Unknown};
 	
-	private final String stringDescription;
-	private final int code;
-	
-	private LivingQuarterType(String description, int code) {
-		this.stringDescription = description;
-		this.code = code;
-	}
-
-	public static Type getLivingQuarterType(int code){
+	public static Type getSchool(int code){
 		switch (code) {
 		case 1:
-			return Type.House;
+			return Type.None;
 		case 2:
-			return Type.Hotel;
+			return Type.PreSchool;
 		case 3:
-			return Type.StudentResidence;
-		case 4: 
-			return Type.OldAgeHome;
-		case 5:
-			return Type.Hostel;
+			return Type.School;
+		case 6:
+			return Type.Tertiary;
+		case 7:
+			return Type.AdultEducation;
+		case 8:
+			return Type.Unknown;
 		default:
 			break;
 		}
-		return Type.Other;
+		return null;
 	}
+	
 	
 	public static int getCode(String description){
-		if(description.equalsIgnoreCase("House")){
+		if(description.equalsIgnoreCase("None")){
 			return 1;
-		} else if(description.equalsIgnoreCase("Hotel")){
+		} else if(description.equalsIgnoreCase("PreSchool")){
 			return 2;
-		} else if(description.equalsIgnoreCase("StudentResidence")){
+		} else if(description.equalsIgnoreCase("School")){
 			return 3;
-		} else if(description.equalsIgnoreCase("OldAgeHome")){
-			return 4;
-		} else if(description.equalsIgnoreCase("Hostel")){
-			return 5;
-		} else{
+		} else if(description.equalsIgnoreCase("Tertiary")){
 			return 6;
+		} else if(description.equalsIgnoreCase("AdultEducation")){
+			return 7;
 		}
+		return 8;
 	}
 	
-	public static String getDescription(Type type){
-		switch (type) {
-		case House:
-			return "House";
-		case Hotel:
-			return "Hotel";
-		case StudentResidence:
-			return "StudentResidence";
-		case OldAgeHome:
-			return "OldAgeHome";
-		case Hostel:
-			return "Hostel";
-		case Other:
-			return "Other";
+	
+	public static String getDescription(Type schoolType){
+		switch (schoolType) {
+		case None:
+			return "None";
+		case PreSchool:
+			return "PreSchool";
+		case School:
+			return "School";
+		case Tertiary:
+			return "Tertiary";
+		case AdultEducation:
+			return "AdultEducation";
+		case Unknown:
+			return "Unknown";
 		default:
-			return null;
+			break;
 		}
+		return "";
 	}
-	
+
+
 }
 

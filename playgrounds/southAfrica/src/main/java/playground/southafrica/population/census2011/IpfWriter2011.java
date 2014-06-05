@@ -1,4 +1,4 @@
-package playground.southafrica.population.utilities;
+package playground.southafrica.population.census2011;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -10,22 +10,25 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.households.Households;
-import org.matsim.households.Income;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-import playground.southafrica.population.containers.LivingQuarterType;
-import playground.southafrica.population.containers.Race;
-import playground.southafrica.population.containers.Schooling;
+import playground.southafrica.population.census2011.containers.HousingType2011;
+import playground.southafrica.population.census2011.containers.Income2011;
+import playground.southafrica.population.census2011.containers.MainDwellingType2011;
+import playground.southafrica.population.census2011.containers.PopulationGroup2011;
+import playground.southafrica.population.census2011.containers.Relationship2011;
+import playground.southafrica.population.census2011.containers.School2011;
+import playground.southafrica.population.utilities.ComprehensivePopulationReader;
 import playground.southafrica.utilities.Header;
 
-public class IpfWriter {
-	private final static Logger LOG = Logger.getLogger(IpfWriter.class);
+public class IpfWriter2011 {
+	private final static Logger LOG = Logger.getLogger(IpfWriter2011.class);
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Header.printHeader(IpfWriter.class.toString(), args);
+		Header.printHeader(IpfWriter2011.class.toString(), args);
 		String inputFolder = args[0];
 		String outputFile = args[1];
 		
@@ -39,40 +42,60 @@ public class IpfWriter {
 		
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
 		try{
-			bw.write(String.format("HHNR\tPNR\tHHS\tLQ\tPOP\tINC\tPNR\tAGE\tGEN\tREL\tEMPL\tSCH\n"));
+			bw.write(String.format("HHNR\tPNR\tHHS\tHT\tMDT\tPOP\tINC\tPNR\tAGE\tGEN\tREL\tEMPL\tSCH\n"));
 			int personNumber = 1;
 			for(Id personId : population.getPersons().keySet()){
 				
 				Id householdId = new IdImpl(personId.toString().split("_")[0]);
 
-				/* Only add the person if the income class is NOT 13, i.e. unknown. */
-				int incomeCode = getHouseholdIncomeCode(households.getHouseholds().get(householdId).getIncome() );
-				if(incomeCode != 13){
+				/* Only add the person if the income class is known. */
+				Income2011 income = Income2011.getIncomeEnum(households.getHouseholds().get(householdId).getIncome());
+
+				if(income != Income2011.Unspecified && income != Income2011.NotApplicable){
+					int incomeCode = Income2011.getCode(income);
+					
+					/* Household id. */
 					bw.write(householdId.toString());
 					bw.write("\t");
+					/* Unique person number. */
 					bw.write(String.valueOf(personNumber++));
 					bw.write("\t");
+					/* Household size. */
 					bw.write(String.valueOf(households.getHouseholds().get(householdId).getMemberIds().size()));
 					bw.write("\t");
-					bw.write(String.valueOf(LivingQuarterType.getCode((String) householdAttributes.getAttribute(householdId.toString(), "dwellingType"))));
+					/* Household type. */
+					bw.write(String.valueOf(HousingType2011.getCode((String) householdAttributes.getAttribute(householdId.toString(), "housingType"))));
 					bw.write("\t");
-					bw.write(String.valueOf(Race.getCode((String) householdAttributes.getAttribute(householdId.toString(), "population"))));
+					/* Main dwelling type. */
+					bw.write(String.valueOf(MainDwellingType2011.getCode((String) householdAttributes.getAttribute(householdId.toString(), "mainDwellingType"))));
 					bw.write("\t");
+					/* Population group. */
+					bw.write(String.valueOf(PopulationGroup2011.getCode((String) householdAttributes.getAttribute(householdId.toString(), "population"))));
+					bw.write("\t");
+					/* Income code. */
 					bw.write(String.valueOf( incomeCode ) );
 					bw.write("\t");
+					/* Number of person IN the household. */
 					bw.write(personId.toString().split("_")[1]);
 					bw.write("\t");
+					/* Age. */
 					bw.write(String.valueOf(((PersonImpl) population.getPersons().get(personId)).getAge()));
 					bw.write("\t");
+					/* Gender. */
 					int gender = ((PersonImpl) population.getPersons().get(personId)).getSex().equalsIgnoreCase("m") ? 1 : 2;
 					bw.write(String.valueOf(gender));
 					bw.write("\t");
-					bw.write(String.valueOf(getRelationshipCode((String) personAttributes.getAttribute(personId.toString(), "relationship"))));
+					/* Relation/role in household. */
+					Relationship2011 relationship = Relationship2011.parseRelationshipFromString((String) personAttributes.getAttribute(personId.toString(), "relationship"));
+					bw.write(String.valueOf(Relationship2011.getCode(relationship)));
 					bw.write("\t");
+					/* Employment status */
 					int employed = ((PersonImpl) population.getPersons().get(personId)).isEmployed() ? 1 : 0;
 					bw.write(String.valueOf(employed));
 					bw.write("\t");
-					bw.write(String.valueOf(Schooling.getCode((String) personAttributes.getAttribute(personId.toString(), "school"))));
+					/* Level of school currently attending. */
+					School2011 school = School2011.parseEducationFromString((String) personAttributes.getAttribute(personId.toString(), "school"));
+					bw.write(String.valueOf(School2011.getCode(school)));
 					bw.newLine();
 				}
 			}
@@ -87,55 +110,5 @@ public class IpfWriter {
 		}
 		Header.printFooter();
 	}
-
-	
-	public static int getHouseholdIncomeCode(Income income){
-		if(income != null){
-			double incomeDouble = income.getIncome();
-			if(incomeDouble == 0){
-				return 1;
-			} else if(incomeDouble <= 7200){
-				return 3;
-			} else if(incomeDouble <= 26152){
-				return 5;
-			} else if(incomeDouble <= 108612){
-				return 7;
-			} else if(incomeDouble <= 434446){
-				return 9;
-			} else if(incomeDouble <= 1737786){
-				return 11;
-			} else if(incomeDouble <= 4915200){
-				return 12;			
-			} else {
-				return 13;
-			}
-		} else {
-			return 13;
-		}
-	}
-	
-	private static int getRelationshipCode(String type){
-		if(type.equalsIgnoreCase("Head")){
-			return 1;
-		} else if(type.equalsIgnoreCase("Partner")){
-			return 2;
-		} else if(type.equalsIgnoreCase("Child")){
-			return 3;
-		} else if(type.equalsIgnoreCase("Sibling")){
-			return 6;
-		} else if(type.equalsIgnoreCase("Parent")){
-			return 7;
-		} else if(type.equalsIgnoreCase("Grandchild")){
-			return 9;
-//		} else if(type.equalsIgnoreCase("Other") ||
-//				type.equalsIgnoreCase("Unrelated") ||
-//				type.equalsIgnoreCase("NotApplicable") ||
-//				type.equalsIgnoreCase("Unknown") ){
-//			return 12;
-		} else{
-			return 12;
-		}
-	}
-	
 
 }

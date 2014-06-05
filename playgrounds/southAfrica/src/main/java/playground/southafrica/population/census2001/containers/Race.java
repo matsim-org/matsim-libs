@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Schooling.java
+ * Race.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,68 +18,63 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southafrica.population.containers;
+package playground.southafrica.population.census2001.containers;
 
-public class Schooling {
-	private enum Type{None, PreSchool, School, Tertiary, AdultEducation, Unknown};
+public class Race {
+	private enum Type{Black, Coloured, IndianAsian, White, Other, Unknown};
 	
-	public static Type getSchool(int code){
+	public static Type getRace(int code){
 		switch (code) {
 		case 1:
-			return Type.None;
+			return Type.Black;
 		case 2:
-			return Type.PreSchool;
+			return Type.Coloured;
 		case 3:
-			return Type.School;
-		case 6:
-			return Type.Tertiary;
-		case 7:
-			return Type.AdultEducation;
-		case 8:
-			return Type.Unknown;
+			return Type.IndianAsian;
+		case 4:
+			return Type.White;
+		case 5:
+			return Type.Other;
 		default:
 			break;
 		}
-		return null;
+		return Type.Unknown;
 	}
-	
+
 	
 	public static int getCode(String description){
-		if(description.equalsIgnoreCase("None")){
+		if(description.equalsIgnoreCase("Black")){
 			return 1;
-		} else if(description.equalsIgnoreCase("PreSchool")){
+		} else if(description.equalsIgnoreCase("Coloured")){
 			return 2;
-		} else if(description.equalsIgnoreCase("School")){
+		} else if(description.equalsIgnoreCase("Indian-Asian")){
 			return 3;
-		} else if(description.equalsIgnoreCase("Tertiary")){
-			return 6;
-		} else if(description.equalsIgnoreCase("AdultEducation")){
-			return 7;
+		}else if(description.equalsIgnoreCase("White")){
+			return 4;
+		}else if(description.equalsIgnoreCase("Other")){
+			return 5;
+		} else{
+			return 6;			
 		}
-		return 8;
 	}
 	
 	
-	public static String getDescription(Type schoolType){
-		switch (schoolType) {
-		case None:
-			return "None";
-		case PreSchool:
-			return "PreSchool";
-		case School:
-			return "School";
-		case Tertiary:
-			return "Tertiary";
-		case AdultEducation:
-			return "AdultEducation";
-		case Unknown:
-			return "Unknown";
+	public static String getDescription(Type race){
+		switch (race) {
+		case Black:
+			return "Black";
+		case Coloured:
+			return "Coloured";
+		case IndianAsian:
+			return "Indian-Asian";
+		case White:
+			return "White";
+		case Other:
+			return "Other";
 		default:
 			break;
 		}
-		return "";
+		return "Unknown";
 	}
-
-
 }
 

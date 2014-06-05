@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Race.java
+ * LivingQuarterType.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,63 +18,77 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southafrica.population.containers;
+package playground.southafrica.population.census2001.containers;
 
-public class Race {
-	private enum Type{Black, Coloured, IndianAsian, White, Other, Unknown};
+public class LivingQuarterType2001 {
+	private enum Type{House, Hotel, StudentResidence, OldAgeHome, Hostel, Other};
+//	HOUSE("House", 1), 
+//	HOTEL("Hotel", 2), 
+//	STUDENT_RESIDENCE("StrudentResidence", 3),
+//	OLD_AGE_HOME("OldAgeHome", 4), 
+//	HOSTEL("Hostel", 5),
+//	OTHER("Other", 6);
 	
-	public static Type getRace(int code){
+	private final String stringDescription;
+	private final int code;
+	
+	private LivingQuarterType2001(String description, int code) {
+		this.stringDescription = description;
+		this.code = code;
+	}
+
+	public static Type getLivingQuarterType(int code){
 		switch (code) {
 		case 1:
-			return Type.Black;
+			return Type.House;
 		case 2:
-			return Type.Coloured;
+			return Type.Hotel;
 		case 3:
-			return Type.IndianAsian;
-		case 4:
-			return Type.White;
+			return Type.StudentResidence;
+		case 4: 
+			return Type.OldAgeHome;
 		case 5:
-			return Type.Other;
+			return Type.Hostel;
 		default:
 			break;
 		}
-		return Type.Unknown;
+		return Type.Other;
 	}
-
 	
 	public static int getCode(String description){
-		if(description.equalsIgnoreCase("Black")){
+		if(description.equalsIgnoreCase("House")){
 			return 1;
-		} else if(description.equalsIgnoreCase("Coloured")){
+		} else if(description.equalsIgnoreCase("Hotel")){
 			return 2;
-		} else if(description.equalsIgnoreCase("Indian-Asian")){
+		} else if(description.equalsIgnoreCase("StudentResidence")){
 			return 3;
-		}else if(description.equalsIgnoreCase("White")){
+		} else if(description.equalsIgnoreCase("OldAgeHome")){
 			return 4;
-		}else if(description.equalsIgnoreCase("Other")){
+		} else if(description.equalsIgnoreCase("Hostel")){
 			return 5;
 		} else{
-			return 6;			
+			return 6;
 		}
 	}
 	
-	
-	public static String getDescription(Type race){
-		switch (race) {
-		case Black:
-			return "Black";
-		case Coloured:
-			return "Coloured";
-		case IndianAsian:
-			return "Indian-Asian";
-		case White:
-			return "White";
+	public static String getDescription(Type type){
+		switch (type) {
+		case House:
+			return "House";
+		case Hotel:
+			return "Hotel";
+		case StudentResidence:
+			return "StudentResidence";
+		case OldAgeHome:
+			return "OldAgeHome";
+		case Hostel:
+			return "Hostel";
 		case Other:
 			return "Other";
 		default:
-			break;
+			return null;
 		}
-		return "Unknown";
 	}
+	
 }
 

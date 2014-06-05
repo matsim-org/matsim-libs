@@ -1,4 +1,4 @@
-package playground.southafrica.population.utilities;
+package playground.southafrica.population.census2011;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +20,8 @@ import org.matsim.households.IncomeImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
+import playground.southafrica.population.utilities.ComprehensivePopulationReader;
+import playground.southafrica.population.utilities.SAIncomeConverter;
 import playground.southafrica.utilities.Header;
 
 /**
@@ -102,36 +104,28 @@ public class ProvincialPopulationExtractor2011 {
 				Household hh = cr.getHouseholds().getHouseholds().get(id);
 				households.getHouseholds().put(id, hh);
 				
-				householdAttributes.putAttribute(id.toString(), "householdSize", 
-						cr.getHouseholdAttributes().getAttribute(id.toString(), "householdSize"));
-				householdAttributes.putAttribute(id.toString(), "population", 
-						cr.getHouseholdAttributes().getAttribute(id.toString(), "population"));
-				householdAttributes.putAttribute(id.toString(), "housingType", 
-						cr.getHouseholdAttributes().getAttribute(id.toString(), "housingType"));
-				householdAttributes.putAttribute(id.toString(), "mainDwellingType", 
-						cr.getHouseholdAttributes().getAttribute(id.toString(), "mainDwellingType"));
-				householdAttributes.putAttribute(id.toString(), "municipalCode", 
-						cr.getHouseholdAttributes().getAttribute(id.toString(), "municipalCode"));
-				householdAttributes.putAttribute(id.toString(), "districtCode", 
-						cr.getHouseholdAttributes().getAttribute(id.toString(), "districtCode"));
+				String[] attributes_household = {"householdSize", "population", "housingType", 
+						"mainDwellingType", "municipalCode", "districtCode", "provinceCode"};
+
+				for(String attribute : attributes_household){
+					Object currentAttribute = cr.getHouseholdAttributes().getAttribute(id.toString(), attribute);
+					if(currentAttribute != null){
+						householdAttributes.putAttribute(id.toString(), attribute, currentAttribute);
+					}
+				}
 				
 				/* Copy the members of the household */
 				for(Id memberId : hh.getMemberIds()){
 					Person p = cr.getScenario().getPopulation().getPersons().get(memberId);
 					sc.getPopulation().addPerson(p);
 					
-					personAttributes.putAttribute(memberId.toString(), "race", 
-							cr.getPersonAttributes().getAttribute(memberId.toString(), "race"));
-					personAttributes.putAttribute(memberId.toString(), "relationship", 
-							cr.getPersonAttributes().getAttribute(memberId.toString(), "relationship"));
-					personAttributes.putAttribute(memberId.toString(), "school", 
-							cr.getPersonAttributes().getAttribute(memberId.toString(), "school"));
-
-					/* There is a possibility that no income attribute exists.
-					 * That will happen if the income was originally 'Unknown'. */
-					Object incomeObject = cr.getPersonAttributes().getAttribute(memberId.toString(), "income");
-					if(incomeObject != null && incomeObject instanceof Income){
-						personAttributes.putAttribute(memberId.toString(), "income", (IncomeImpl)incomeObject);
+					String[] attributes_person = {"race", "relationship", "school", "income"};
+					
+					for(String attribute : attributes_person){
+						Object currentAttribute = cr.getPersonAttributes().getAttribute(memberId.toString(), attribute);
+						if(currentAttribute != null){
+							personAttributes.putAttribute(memberId.toString(), attribute, currentAttribute);
+						}
 					}
 				}
 			}

@@ -65,8 +65,9 @@ import org.matsim.households.IncomeImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
-import playground.southafrica.population.containers.Race;
-import playground.southafrica.population.containers.Schooling;
+import playground.southafrica.population.census2001.IpfWriter;
+import playground.southafrica.population.census2001.containers.Race;
+import playground.southafrica.population.census2001.containers.Schooling;
 import playground.southafrica.utilities.Header;
 import playground.southafrica.utilities.RandomVariateGenerator;
 import playground.southafrica.utilities.SouthAfricaInflationCorrector;
