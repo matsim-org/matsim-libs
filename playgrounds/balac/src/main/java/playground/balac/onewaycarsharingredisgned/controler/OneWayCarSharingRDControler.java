@@ -18,8 +18,7 @@ import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.balac.onewaycarsharingredisgned.config.OneWayCarsharingRDConfigGroup;
-import playground.balac.onewaycarsharingredisgned.qsim.OneWayCarsharingRDQsimFactory;
-import playground.balac.onewaycarsharingredisgned.qsim.OneWayCarsharingRDVehicleLocation;
+import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingQsimFactory;
 import playground.balac.onewaycarsharingredisgned.router.OneWayCarsharingRDRoutingModule;
 import playground.balac.onewaycarsharingredisgned.scoring.OneWayCarsharingRDScoringFunctionFactory;
 
@@ -31,15 +30,20 @@ public class OneWayCarSharingRDControler extends Controler{
 	}
 
 
-	public void init(Config config, Network network) {
+	public void init(Config config, Network network, Scenario sc) {
 		OneWayCarsharingRDScoringFunctionFactory onewayScoringFunctionFactory = new OneWayCarsharingRDScoringFunctionFactory(
 				      config, 
-				      network);
+				      network, sc);
 	    this.setScoringFunctionFactory(onewayScoringFunctionFactory); 	
 				
 		}
 	
-	
+	@Override
+	  protected void loadControlerListeners() {  
+		  
+	    super.loadControlerListeners();   
+	    this.addControlerListener(new OWListener(this.getConfig().getModule("OneWayCarsharing").getValue("statsFileName")));
+	  }
 	public static void main(final String[] args) {
 		
     	final Config config = ConfigUtils.loadConfig(args[0]);
@@ -52,7 +56,7 @@ public class OneWayCarSharingRDControler extends Controler{
 		
 		try {
 		
-		controler.setMobsimFactory( new OneWayCarsharingRDQsimFactory(sc, controler) );
+		controler.setMobsimFactory( new OneWayCarsharingRDWithParkingQsimFactory(sc, controler) );
 
 		controler.setTripRouterFactory(
 				new TripRouterFactory() {
@@ -97,7 +101,7 @@ public class OneWayCarSharingRDControler extends Controler{
 
 					
 				});
-      controler.init(config, sc.getNetwork());		
+      controler.init(config, sc.getNetwork(), sc);		
 		
 		controler.run();
 } catch (IOException e) {

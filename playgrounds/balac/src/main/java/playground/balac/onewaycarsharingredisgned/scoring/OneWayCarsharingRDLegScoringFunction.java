@@ -1,6 +1,7 @@
 package playground.balac.onewaycarsharingredisgned.scoring;
 
 import java.util.TreeSet;
+
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -53,7 +54,10 @@ public class OneWayCarsharingRDLegScoringFunction extends org.matsim.core.scorin
 			
 			travelTime = arrivalTime - departureTime;
 			tmpScore += Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("constantOneWayCarsharing"));
-			tmpScore += travelTime * Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("travelingOneWayCarsharing"));
+			tmpScore += travelTime * Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("travelingOneWayCarsharing"))/3600.0;
+			tmpScore += leg.getRoute().getDistance() * Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("distanceFeeOneWayCarsharing"));
+			tmpScore += travelTime * Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("timeFeeOneWayCarsharing"));
+
 		}
 		
 		else if (TransportMode.pt.equals(leg.getMode()))

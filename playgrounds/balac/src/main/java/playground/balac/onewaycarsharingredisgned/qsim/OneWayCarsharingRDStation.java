@@ -15,8 +15,7 @@ public class OneWayCarsharingRDStation  {
 	public OneWayCarsharingRDStation(Link link, int numberOfVehicles, ArrayList<String> vehicleIDs) {
 		
 		this.link = link;
-		if (numberOfVehicles != vehicleIDs.size())
-			System.out.println("Error");
+	
 		this.numberOfVehicles = numberOfVehicles;
 		this.vehicleIDs = vehicleIDs;
 
