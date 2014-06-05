@@ -3,6 +3,7 @@ package playground.balac.freefloating.qsimParkingModule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.parkingChoice.carsharing.DummyParkingModuleWithFreeFloatingCarSharing;
+import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingModuleWithFreeFloatingCarSharing;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
@@ -13,9 +14,10 @@ public class FreeFloatingAgentFactory implements AgentFactory{
 	private final Netsim simulation;
 	private final Scenario scenario;
 	private final Controler controler;
-	private DummyParkingModuleWithFreeFloatingCarSharing parkingModule;
+	private ParkingModuleWithFreeFloatingCarSharing parkingModule;
 
-	public FreeFloatingAgentFactory(final Netsim simulation, final Scenario scenario, final Controler controler, DummyParkingModuleWithFreeFloatingCarSharing parkingModule) {
+	public FreeFloatingAgentFactory(final Netsim simulation, final Scenario scenario, final Controler controler, 
+			ParkingModuleWithFreeFloatingCarSharing parkingModule) {
 		this.simulation = simulation;
 		this.scenario = scenario;
 		this.controler = controler;

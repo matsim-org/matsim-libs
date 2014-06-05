@@ -18,6 +18,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.parking.parkingChoice.carsharing.DummyParkingModuleWithFreeFloatingCarSharing;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingLinkInfo;
+import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingModuleWithFreeFloatingCarSharing;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
@@ -86,7 +87,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 	
 	private Link startLink;
 	
-	private DummyParkingModuleWithFreeFloatingCarSharing parkingModule;
+	private ParkingModuleWithFreeFloatingCarSharing parkingModule;
 	
 	private String vehID;
 
@@ -97,7 +98,9 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 	// ============================================================================================================================
 	// c'tor
 
-	public FreeFloatingParkingPersonDriverAgentImpl(final Person person, final Plan plan, final Netsim simulation, final Scenario scenario, final Controler controler, DummyParkingModuleWithFreeFloatingCarSharing parkingModule) {
+	public FreeFloatingParkingPersonDriverAgentImpl(final Person person, final Plan plan, final Netsim simulation,
+			final Scenario scenario, final Controler controler, 
+			ParkingModuleWithFreeFloatingCarSharing parkingModule) {
 		this.person = person;
 		this.simulation = simulation;
 		this.controler = controler;

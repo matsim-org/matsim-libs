@@ -1,12 +1,18 @@
 package playground.balac.freefloating.controler;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.parking.parkingChoice.carsharing.DummyParkingModuleWithFreeFloatingCarSharing;
+import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingCoordInfo;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -16,6 +22,7 @@ import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.balac.freefloating.config.FreeFloatingConfigGroup;
 import playground.balac.freefloating.controler.listener.FFListener;
@@ -56,11 +63,44 @@ public class FreeFloatingWithParkingControler extends Controler{
 		
 		
 		final FreeFloatingWithParkingControler controler = new FreeFloatingWithParkingControler( sc );
-		
 		try {		
+		DummyParkingModuleWithFreeFloatingCarSharing parkingModule;
+		final FreeFloatingConfigGroup configGroupff = (FreeFloatingConfigGroup)
+				sc.getConfig().getModule( FreeFloatingConfigGroup.GROUP_NAME );
 		
-			controler.setMobsimFactory( new FreeFloatingQsimFactory(sc, controler) );
-
+		
+		BufferedReader reader;
+		String s;
+		
+		
+		if (configGroupff.useFeeFreeFloating()) {
+		 reader = IOUtils.getBufferedReader(configGroupff.getvehiclelocations());
+		    s = reader.readLine();
+		    int i = 1;
+		    
+		    ArrayList<ParkingCoordInfo> freefloatingCars = new ArrayList<ParkingCoordInfo>();
+		    while(s != null) {
+		    	
+		    	String[] arr = s.split("\t", -1);
+		    
+		    	Link l = controler.getNetwork().getLinks().get(new IdImpl(arr[0]));	    	
+		    	
+		    	for (int k = 0; k < Integer.parseInt(arr[1]); k++) {
+		    		ParkingCoordInfo parkingInfo = new ParkingCoordInfo(new IdImpl(Integer.toString(i)), l.getCoord());
+		    		freefloatingCars.add(parkingInfo);
+		    		i++;
+		    	}
+		    	
+		    	s = reader.readLine();
+		    	
+		    }
+		    
+		    parkingModule = new DummyParkingModuleWithFreeFloatingCarSharing(controler, freefloatingCars);
+		    
+		    controler.setMobsimFactory( new FreeFloatingQsimFactory(sc, controler, 
+		    		parkingModule,  freefloatingCars) );
+		}
+		
 		controler.setTripRouterFactory(
 				new TripRouterFactory() {
 					@Override

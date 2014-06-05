@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.parkingChoice.carsharing.DummyParkingModuleWithFreeFloatingCarSharing;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingCoordInfo;
+import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingModuleWithFreeFloatingCarSharing;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -46,51 +47,17 @@ public class FreeFloatingQsimFactory implements MobsimFactory{
 	private final Controler controler;
 	private Collection<ParkingCoordInfo> freefloatingCars;
 
-	private DummyParkingModuleWithFreeFloatingCarSharing parkingModule;
-	public FreeFloatingQsimFactory(final Scenario scenario, final Controler controler) throws IOException {
+	private ParkingModuleWithFreeFloatingCarSharing parkingModule;
+	public FreeFloatingQsimFactory(final Scenario scenario, final Controler controler,
+			ParkingModuleWithFreeFloatingCarSharing parkingModule,
+			ArrayList<ParkingCoordInfo> freefloatingCars) throws IOException {
 
 		this.scenario = scenario;
 		this.controler = controler;
-		readVehicleLocations();
+		this.parkingModule = parkingModule;
+		this.freefloatingCars = freefloatingCars;
 	}
-	public void readVehicleLocations() throws IOException {
-		final FreeFloatingConfigGroup configGroupff = (FreeFloatingConfigGroup)
-				scenario.getConfig().getModule( FreeFloatingConfigGroup.GROUP_NAME );
-		
-		
-		BufferedReader reader;
-		String s;
-		
-		
-		if (configGroupff.useFeeFreeFloating()) {
-		 reader = IOUtils.getBufferedReader(configGroupff.getvehiclelocations());
-		    s = reader.readLine();
-		    int i = 1;
-		    
-		   freefloatingCars = new ArrayList<ParkingCoordInfo>();
-		    while(s != null) {
-		    	
-		    	String[] arr = s.split("\t", -1);
-		    
-		    	Link l = controler.getNetwork().getLinks().get(new IdImpl(arr[0]));
-		    	
-		    	
-		    	
-		    	for (int k = 0; k < Integer.parseInt(arr[1]); k++) {
-		    		ParkingCoordInfo parkingInfo = new ParkingCoordInfo(new IdImpl(Integer.toString(i)), l.getCoord());
-		    		freefloatingCars.add(parkingInfo);
-		    		i++;
-		    	}
-		    	
-		    	s = reader.readLine();
-		    	
-		    }
-		    
-		    parkingModule = new DummyParkingModuleWithFreeFloatingCarSharing(this.controler, freefloatingCars);
-		    
-		}
 	
-	}
 	@Override
 	public Netsim createMobsim(Scenario sc, EventsManager eventsManager) {
 
