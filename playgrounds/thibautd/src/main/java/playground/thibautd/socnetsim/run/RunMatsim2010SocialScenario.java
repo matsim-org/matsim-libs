@@ -46,6 +46,7 @@ import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkReader;
+import playground.thibautd.socnetsim.population.SocialNetworkWriter;
 import playground.thibautd.socnetsim.replanning.grouping.DynamicGroupIdentifier;
 import playground.thibautd.socnetsim.SocialNetworkConfigGroup;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
@@ -88,10 +89,9 @@ public class RunMatsim2010SocialScenario {
 			controller.run();
 		}
 		finally {
-			// dump non flat config
 			new NonFlatConfigWriter( config ).write( controller.getControlerIO().getOutputFilename( "output_config.xml.gz" ) );
+			new SocialNetworkWriter( (SocialNetwork) scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME ) ).write( controller.getControlerIO().getOutputFilename( "output_socialnetwork.xml.gz" ) );
 		}
-
 	}
 
 	private static ImmutableJointController createController(
