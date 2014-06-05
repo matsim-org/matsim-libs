@@ -53,7 +53,11 @@ public final class BoxedHashMap<K, V> {
      * or {@code null} if this map contains no mapping for the key.
      */
 	public ArrayList<V> getValues(K k) {
-		return boxedHashMap.get(k);
+		if (boxedHashMap.containsKey(k)) {
+			return boxedHashMap.get(k);
+		} else {
+			return null;
+		}
 	}
 	
 	/**
@@ -61,7 +65,11 @@ public final class BoxedHashMap<K, V> {
      * or {@code null} if this map contains no mapping for the key.
 	 */
 	public V getValue(K k) {
-		return boxedHashMap.get(k).get(0);
+		if (boxedHashMap.containsKey(k)) {
+			return boxedHashMap.get(k).get(0);
+		} else {
+			return null;
+		}
 	}
 	
 	public boolean containsKey(K k) {
@@ -86,7 +94,7 @@ public final class BoxedHashMap<K, V> {
 	 * Removes from this map the specified key and with it all values to 
 	 * which the is mapped.
      */
-	public void removeValues(K k) {
+	public void remove(K k) {
 		boxedHashMap.remove(k);
 	}
 	
