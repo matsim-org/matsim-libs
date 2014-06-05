@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+r * project: org.matsim.*
  * KeyControl.java
  *                                                                         *
  * *********************************************************************** *
@@ -72,6 +72,7 @@ public class Control implements KeyListener, MouseWheelListener {
 	
 	private final FrameSaver fs;
 	private final int cameraTrackFrameSkip;
+	private TileMap tileMap;
 
 	//static zoom
 	//13189.192:7476.9673x20.593802448270605
@@ -151,7 +152,7 @@ public class Control implements KeyListener, MouseWheelListener {
 		} else if (e.getKeyChar() == 'o') {
 			log.info("serializing zooms and camera movements");
 			try {
-				FileOutputStream out = new FileOutputStream("/Users/laemmel/devel/bipedexp/zooms.data");
+				FileOutputStream out = new FileOutputStream("/Users/laemmel/devel/hhw_hybrid/zooms.data");
 				ObjectOutputStream oOut = new ObjectOutputStream (out);
 				oOut.writeObject(this.zooms);
 				oOut.writeObject(this.movements);
@@ -166,7 +167,7 @@ public class Control implements KeyListener, MouseWheelListener {
 		} else if (e.getKeyChar() == 'l') {
 			log.info("restoring zooms and camera movements");
 			try {
-				FileInputStream out = new FileInputStream("/Users/laemmel/devel/bipedexp/zooms.data");
+				FileInputStream out = new FileInputStream("/Users/laemmel/devel/hhw_hybrid/zooms.data");
 				ObjectInputStream oOut = new ObjectInputStream (out);
 //				oOut.writeObject(this.zooms);
 				Object o1 = oOut.readObject();
@@ -224,6 +225,7 @@ public class Control implements KeyListener, MouseWheelListener {
 				this.zoomer.setZoomScale(z.z);
 				this.zoomer.setPanOffset(z.o.x, z.o.y);
 				//				this.zoomer.transform();
+				this.tileMap.panEnded();
 			}
 		}
 		System.out.println(e.getKeyCode() + "  " + e.getModifiers());
@@ -342,6 +344,8 @@ public class Control implements KeyListener, MouseWheelListener {
 					this.zoomer.setPanOffset(z.o.x, z.o.y);
 				}
 			}
+			this.tileMap.panEnded();
+//			this.zoomer.
 			this.current.skip = 0;
 			if (this.fs != null) {
 				int round = (int)(this.current.cameraTrackFrameSkipDbl+.5);
@@ -364,5 +368,9 @@ public class Control implements KeyListener, MouseWheelListener {
 		int cameraTrackFrameSkip;
 		int skip = 0;
 		double cameraTrackFrameSkipDbl;
+	}
+
+	public void addTileMap(TileMap tileMap) {
+		this.tileMap = tileMap;
 	}
 }

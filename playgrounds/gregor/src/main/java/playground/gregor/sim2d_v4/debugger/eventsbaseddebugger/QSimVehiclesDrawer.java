@@ -43,13 +43,15 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkImpl;
 
+import processing.core.PApplet;
 import processing.core.PConstants;
+import processing.core.PImage;
 
 
 
-public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler, ActivityStartEventHandler, ActivityEndEventHandler{
+public class QSimVehiclesDrawer implements VisDebuggerAdditionalDrawer, PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler, ActivityStartEventHandler, ActivityEndEventHandler{
 
-	private static final Logger log = Logger.getLogger(QSimDensityDrawer.class);
+	private static final Logger log = Logger.getLogger(QSimVehiclesDrawer.class);
 	
 	List<LinkInfo> links = new ArrayList<LinkInfo>();
 	Map<Id,LinkInfo> map = new HashMap<Id,LinkInfo>();
@@ -57,7 +59,26 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, PersonDep
 	private final double maxScale = 10;
 	private final double fadeOutScale = 1.6;
 	
-	public QSimDensityDrawer(Scenario sc) {
+	private PImage red;
+	private PImage green;
+	private PImage yellow;
+	private PImage pedRed;
+	private PImage pedGreen;
+	private PImage pedYellow;
+
+	private PImage flipRotPedYellow;
+
+	private PImage flipRotPedGreen;
+
+	private PImage flipRotPedRed;
+
+	private PImage flipRotRed;
+
+	private PImage flipRotGreen;
+
+	private PImage flipRotYellow;
+	
+	public QSimVehiclesDrawer(Scenario sc) {
 		for (Link l : sc.getNetwork().getLinks().values()) {
 		if (l.getAllowedModes().contains("walk2d")||  l.getCapacity() >= 100000 || l.getFreespeed() > 100 || l.getId().toString().contains("el")) {
 			continue;
@@ -75,10 +96,20 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, PersonDep
 		
 		double dx = l.getToNode().getCoord().getX() - l.getFromNode().getCoord().getX();
 		double dy = l.getToNode().getCoord().getY() - l.getFromNode().getCoord().getY();
+		
+		
+		
 		double length = Math.sqrt(dx*dx + dy*dy);
 		dx /= length;
 		dy /= length;
+		
+		
 		LinkInfo info = new LinkInfo();
+		if (dx > 0){
+			info.angle = (float) Math.PI;
+		} else if(dx < 0) {
+			info.angle = 0;
+		} 
 		
 		info.id = l.getId();
 		info.cap = (l.getLength()/((NetworkImpl)sc.getNetwork()).getEffectiveCellSize())*l.getNumberOfLanes();
@@ -99,6 +130,9 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, PersonDep
 		info.x1 = x1;
 		info.y0 = y0;
 		info.y1 = y1;
+		info.dx = dx;
+		info.dy = dy;
+		info.length = length;
 		
 		double tan = dx/dy;
 		double atan = Math.atan(tan);
@@ -133,31 +167,65 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, PersonDep
 
 	@Override
 	public void draw(EventsBasedVisDebugger p) {
-		float scale = 1;
-		if (p.zoomer.getZoomScale() <= 5) {
-			scale += 0.5/p.zoomer.getZoomScale();
+
+		
+		if (this.red == null) {
+			this.red = p.loadImage("/Users/laemmel/tmp/resources/red.png","png");
+			this.green = p.loadImage("/Users/laemmel/tmp/resources/green.png","png");
+			this.yellow = p.loadImage("/Users/laemmel/tmp/resources/yellow.png","png");
+			this.pedRed = p.loadImage("/Users/laemmel/tmp/resources/pedRed.png","png");
+			this.pedGreen = p.loadImage("/Users/laemmel/tmp/resources/pedGreen.png","png");
+			this.pedYellow = p.loadImage("/Users/laemmel/tmp/resources/pedYellow.png","png");
+			this.flipRotPedRed = p.loadImage("/Users/laemmel/tmp/resources/flipRotPedRed.png","png");
+			this.flipRotPedGreen = p.loadImage("/Users/laemmel/tmp/resources/flipRotPedGreen.png","png");
+			this.flipRotPedYellow = p.loadImage("/Users/laemmel/tmp/resources/flipRotPedYellow.png","png");
+			this.flipRotRed = p.loadImage("/Users/laemmel/tmp/resources/flipRotRed.png","png");
+			this.flipRotGreen = p.loadImage("/Users/laemmel/tmp/resources/flipRotGreen.png","png");
+			this.flipRotYellow = p.loadImage("/Users/laemmel/tmp/resources/flipRotYellow.png","png");
 		}
 		
-		p.stroke(0,0,0,128);//li.a * fade);
-//		float fade =1;
-//		if (p.zoomer.getZoomScale() > this.fadeOutScale) {
-//			fade = (float) (1 - (p.zoomer.getZoomScale()-this.fadeOutScale)/(this.maxScale - this.fadeOutScale));
-//			fade = fade < .75f ? .75f : fade;
-//		}
-//		p.stroke(0);
+
+		
+		
+		float scale = 1;
+		float alfa = 255;
+		if (p.zoomer.getZoomScale() <= 2) {
+			return;
+//			scale += 0.5/p.zoomer.getZoomScale();
+		} else if (p.zoomer.getZoomScale() <= 4){
+			alfa=(float) (255*(p.zoomer.getZoomScale()-2)/2);
+		}
+		
+		p.stroke(0);
 //		p.strokeCap(PConstants.ROUND);
 		p.strokeCap(PConstants.SQUARE);
+		p.imageMode(PApplet.CENTER);
+		
 		for (LinkInfo li : this.links) {
 			if (li.onLink > 0) {
 					p.strokeWeight(li.width*scale);
 			} else {
 				p.strokeWeight(li.width);
 			}
-			if (p.zoomer.getZoomScale() <= 5) {
-				p.stroke(li.r,li.g,li.b,li.a);//li.a * fade);
+			p.stroke(0,0,0,alfa);//li.a * fade);
+//			p.line((float)(li.x0+p.offsetX),(float)-(li.y0+p.offsetY),(float)(li.x1+p.offsetX),(float)-(li.y1+p.offsetY));
+			
+			double incr = li.length/(li.onLink+1);
+			for (double mv = incr; mv < li.length; mv += incr) {
+				p.pushMatrix();
+				float mvX = (float) (mv*li.dx);
+				float mvY = (float) (mv*li.dy);
+				p.translate((float)(li.x0+p.offsetX+mvX),(float)-(li.y0+p.offsetY+mvY));
+				p.rotate((float) li.atan+li.angle);
+				if (li.isCar) {
+				p.image(li.veh, 0,0,2.14f*li.width,1f*li.width);
+				} else {
+					p.image(li.veh, 0,0,0.5903f*li.width,1f*li.width);
+				}
+				p.popMatrix();
 			}
-			p.line((float)(li.x0+p.offsetX),(float)-(li.y0+p.offsetY),(float)(li.x1+p.offsetX),(float)-(li.y1+p.offsetY));
 		}
+		p.imageMode(PApplet.CORNER);
 //		p.strokeCap(PConstants.SQUARE);
 	}
 
@@ -196,51 +264,89 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, PersonDep
 			l.r = 0;
 			l.g = 0;
 			l.b = 0;
-			l.a =128;
-		} else if (density < 1) {
-//			l.a = (int) (128 + 128 * (density/0.25));
-//			l.r = 0;
-//			l.g = 255;
-//			l.b = 0;
-//			l.a = (int) (128 + 128 * (density/0.25));
+			l.a =0;
+		} else if (density < 0.25) {
+			l.a = (int) (128 + 128 * (density/0.25));
 			l.r = 0;
-			l.g = 192;
+			l.g = 255;
 			l.b = 0;
-			l.a=255;
+			if (l.isCar) {
+				if (l.dx < 0) {
+					l.veh = this.green;
+				} else {
+					l.veh = this.flipRotGreen;
+				}
+			} else {
+				if (l.dx < 0) {
+					l.veh = this.pedGreen;
+				} else {
+					l.veh = this.flipRotPedGreen;
+				}
+			}
+		} else if (density < 1) {
+			l.a = 255;
+			l.g = 255;
+			l.b = 0;
+			l.r = (int) (255 * ((density-.25)/0.75));
+			if (l.isCar) {
+				if (l.dx < 0) {
+					l.veh = this.green;
+				} else {
+					l.veh = this.flipRotGreen;
+				}
+			} else {
+				if (l.dx < 0) {
+					l.veh = this.pedGreen;
+				} else {
+					l.veh = this.flipRotPedGreen;
+				}
+			}
 		} else if (density < 2) {
-//			l.a = 255;
-//			l.g = 255;
-//			l.b = 0;
-//			l.r = (int) (255 * ((density-.25)/0.75));
-			l.r = 192;
-			l.g = 192;
+			l.a = 255;
+			l.g = 255 - (int) (255 * ((density-1)));;
 			l.b = 0;
-			l.a=255;
-//			l.r = (int) (255 * ((density-.25)/0.75));
-		} else if (density < 2) {
-//			l.a = 255;
-//			l.g = 255 - (int) (255 * ((density-1)));;
-//			l.b = 0;
-//			l.r = 255;
-			l.r = 192;
-			l.g = 192;
-			l.b = 0;
-			l.a=255;
+			l.r = 255;			
+			if (l.isCar) {
+				if (l.dx < 0) {
+					l.veh = this.yellow;
+				} else {
+					l.veh = this.flipRotYellow;
+				}
+			} else {
+				if (l.dx < 0) {
+					l.veh = this.pedYellow;
+				} else {
+					l.veh = this.flipRotPedYellow;
+				}
+			}
 		} else {
-//			l.a = 255;
-//			l.g = 0;
-//			l.b = (int) (128 * (density-2)/3.4);
-//			l.r = 255 - l.b;
-			l.r = 192;
+			l.a = 255;
 			l.g = 0;
-			l.b = 0;
-			l.a=255;
+			l.b = (int) (128 * (density-2)/3.4);
+			l.r = 255 - l.b;
+			if (l.isCar) {
+				if (l.dx < 0) {
+					l.veh = this.red;
+				} else {
+					l.veh = this.flipRotRed;
+				}
+			} else {
+				if (l.dx < 0) {
+					l.veh = this.pedRed;
+				} else {
+					l.veh = this.flipRotPedRed;
+				}
+			}
 		}
-		
 	}
 //
 //
 	private static final class LinkInfo {
+		public PImage veh;
+		public double dx;
+		public double dy;
+		public double length;
+		public float angle;
 		public boolean isCar;
 		public Id id;
 		public double atan;

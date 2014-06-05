@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.burgdorf;
+package playground.gregor.scenariogen.burgdorf;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

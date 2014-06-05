@@ -68,6 +68,9 @@ public abstract class CAAgent {
 	
 	abstract void moveOverNode(CALink nextLink,double time);
 
+	abstract CALink getCurrentLink();
+	
+	
 	public Id getId() {
 		return this.id;
 	}

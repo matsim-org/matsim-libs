@@ -52,18 +52,18 @@ public class XYVxVyEventImpl extends Event {
 		this.vy = vy;
 	}
 	
-//	public XYVxVyEventImpl(Id id, double x, double y, double vx, double vy, double time,Sim2DAgent agent) {
-//		super(time);
-//		this.personId = id;
-//		this.x = x;
-//		this.y = y;
-//		this.vx = vx;
-//		this.vy = vy;
-//		this.agent = agent;
-//	}
-//	public Sim2DAgent getAgent() {
-//		return this.agent;
-//	}
+	public XYVxVyEventImpl(Id id, double x, double y, double vx, double vy, double time,Sim2DAgent agent) {
+		super(time);
+		this.personId = id;
+		this.x = x;
+		this.y = y;
+		this.vx = vx;
+		this.vy = vy;
+		this.agent = agent;
+	}
+	public Sim2DAgent getAgent() {
+		return this.agent;
+	}
 	
 	@Override
 	public Map<String, String> getAttributes() {

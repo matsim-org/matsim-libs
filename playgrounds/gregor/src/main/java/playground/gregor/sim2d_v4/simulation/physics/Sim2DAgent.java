@@ -73,7 +73,7 @@ public class Sim2DAgent implements VoronoiCenter, TwoDObject {
 
 	private VelocityUpdater vu;
 
-	private boolean emitPosEvents = false;
+	private boolean emitPosEvents = true;
 
 	/*package*/ int ttl; //workaround - think about this [gl August '13]
 
@@ -121,6 +121,9 @@ public class Sim2DAgent implements VoronoiCenter, TwoDObject {
 	}
 
 	public void updateVelocity() {
+//		if (this.getId().toString().equals("a118") && this.getPos()[1] > 3.8) {
+//			System.out.println("stop");
+//		}
 		this.vu.updateVelocity();
 	}
 
@@ -146,7 +149,7 @@ public class Sim2DAgent implements VoronoiCenter, TwoDObject {
 					veh.setCurrentLink(loResLink.getLink());
 					loResLink.addFromUpstream(veh);
 					this.hasLeft2DSim = true;
-					this.ttl = 1000;
+					this.ttl = 100;
 					this.pEnv.getEventsManager().processEvent(new LinkLeaveEvent(time, this.id, this.getCurrentLinkId(), this.veh.getId()));
 					this.notifyMoveOverNode(nextLinkId);
 				} else {
@@ -177,7 +180,7 @@ public class Sim2DAgent implements VoronoiCenter, TwoDObject {
 		if (this.emitPosEvents) {
 //			XYVxVyEventImpl e = new XYVxVyEventImpl(this.id, this.pos[0], this.pos[1], this.v[0], this.v[1], time,this);
 			XYVxVyEventImpl e = new XYVxVyEventImpl(this.id, this.pos[0], this.pos[1], this.v[0], this.v[1], time);
-			this.pEnv.getEventsManager().processEvent(e);
+//			this.pEnv.getEventsManager().processEvent(e);
 		}
 	}
 

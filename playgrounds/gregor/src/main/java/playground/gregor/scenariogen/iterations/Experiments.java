@@ -78,12 +78,14 @@ public class Experiments {
 	private static String outputDir = "/Users/laemmel/devel/iterations/output";
 
 	private static final double WIDTH = 4;
-	private static final double BOTTLENECK = .8;
+	private static final double BOTTLENECK = 0.6;
 
 
-	private static final int nrAgents = 200;
+	private static final int nrAgents = 20;
 
-	public static final double MAX_FLOW =0.4;//1.2;//1.2;
+	public static final double MAX_FLOW =0.4*3600;//1.2;//1.2;
+	private static final int DPETH = 0;
+	
 
 	public static void main(String [] args) {
 		Config c = ConfigUtils.createConfig();
@@ -98,7 +100,7 @@ public class Experiments {
 
 		((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(.26);
 		((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(.71);
-		((NetworkImpl)sc.getNetwork()).setCapacityPeriod(1);
+		((NetworkImpl)sc.getNetwork()).setCapacityPeriod(3600);
 		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, s2dsc);
 
 		//write s2d envs
@@ -153,7 +155,7 @@ public class Experiments {
 
 
 		QSimConfigGroup qsim = sc.getConfig().qsim();
-		qsim.setEndTime(4*3600);
+		qsim.setEndTime(20*60);
 		c.controler().setMobsim("hybridQ2D");
 		c.global().setCoordinateSystem("EPSG:3395");
 
@@ -231,7 +233,7 @@ double f2 = flowCap;
 	private static void create2DWorld(Sim2DScenario sc2) {
 		Sim2DEnvironment env = new Sim2DEnvironment();
 		env.setId(new IdImpl("env0"));
-		env.setEnvelope(new Envelope(0,30,0,-10));
+		env.setEnvelope(new Envelope(0,30,0,-10-DPETH));
 		try {
 			env.setCRS(CRS.decode("EPSG:3395"));
 		} catch (NoSuchAuthorityCodeException e) {
@@ -378,9 +380,9 @@ double f2 = flowCap;
 			Coordinate c02 = new Coordinate(x0,y0);
 			x0 = 10;
 			Coordinate c1 = new Coordinate(x0,y0);
-			y0 = -6;
+			y0 = -6-DPETH;
 			Coordinate c2 = new Coordinate(x0,y0);
-			y0 = -10;
+			y0 = -10-DPETH;
 			Coordinate c3 = new Coordinate(x0,y0);
 			x0 = 6;
 			Coordinate c4 = new Coordinate(x0,y0);			
@@ -395,14 +397,14 @@ double f2 = flowCap;
 		}
 		{
 			double x0 = 10;
-			double y0 = -10;		
+			double y0 = -10-DPETH;		
 			int[] open = {0,2};
 			Coordinate c0 = new Coordinate(x0,y0);
-			y0 = -6;
+			y0 = -6-DPETH;
 			Coordinate c1 = new Coordinate(x0,y0);
 			x0 = 20;
 			Coordinate c2 = new Coordinate(x0,y0);
-			y0 = -10;
+			y0 = -10-DPETH;
 			Coordinate c3 = new Coordinate(x0,y0);
 			x0 = 10;
 			Coordinate c4 = new Coordinate(x0,y0);			
@@ -421,11 +423,11 @@ double f2 = flowCap;
 			Coordinate c0 = new Coordinate(x0,y0);
 			x0 = 24;
 			Coordinate c1 = new Coordinate(x0,y0);
-			y0 = -10;
+			y0 = -10-DPETH;
 			Coordinate c2 = new Coordinate(x0,y0);
 			x0 = 20;
 			Coordinate c3 = new Coordinate(x0,y0);
-			y0 = -6;
+			y0 = -6-DPETH;
 			Coordinate c4 = new Coordinate(x0,y0);			
 			y0 = -4;
 			Coordinate c5 = new Coordinate(x0,y0);

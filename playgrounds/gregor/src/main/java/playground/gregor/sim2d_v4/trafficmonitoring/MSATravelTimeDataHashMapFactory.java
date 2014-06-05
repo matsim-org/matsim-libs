@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CASimpleAgent.java
+ * MSATravelTimeDataHashMapFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,56 +17,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.gregor.sim2d_v4.trafficmonitoring;
 
-package playground.gregor.casim.simulation.physics;
-
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.trafficmonitoring.TravelTimeData;
+import org.matsim.core.trafficmonitoring.TravelTimeDataFactory;
 
-public class CASimpleAgent extends CAAgent {
+public class MSATravelTimeDataHashMapFactory implements TravelTimeDataFactory {
 
-	private final List<Link> links;
-	private int next;
-	private final Id id;
-	private CALink link;
-
-	public CASimpleAgent(List<Link> links, int i, Id id, CALink caLink) {
-		super(id);
-		this.links = links;
-		this.next = i;
-		this.id = id;
-		this.link = caLink;
-	}
-
-	@Override
-	Id getNextLinkId() {
-		return this.links.get(this.next).getId();
-	}
-
-	@Override
-	void moveOverNode(CALink link, double time) {
-//		System.out.println("DEBUG");
-//		if (this.id.toString().equals("46") && link.getLink().getId().toString().equals("7") && time > 300){
-//			System.out.println("DEBUG");
-//		}
-		this.link = link;
-		this.next++;
-		if (this.next == this.links.size()) {
-			this.next = 2;
-		}
-//		System.out.println(this.next);
-	}
-
-	@Override
-	public String toString() {
-		return "a:"+this.id;
-	}
-		
 	
-	@Override
-	public CALink getCurrentLink() {
-		return this.link;
+	private final Network network;
+	private final int binSize;
+	
+	private Map<Id, HashMap<Integer,Double>> msaTT = new HashMap<Id, HashMap<Integer,Double>>();
+
+	public MSATravelTimeDataHashMapFactory(Network network, int binSize) {
+		this.network = network;
+		this.binSize = binSize;
 	}
+
+	@Override
+	public TravelTimeData createTravelTimeData(Id linkId) {
+		HashMap<Integer, Double> lmsa = this.msaTT.get(linkId);
+		if (lmsa == null) {
+			lmsa = new HashMap<Integer, Double>(7200/this.binSize);
+			this.msaTT.put(linkId, lmsa);
+		}
+		return new MSATravelTimeDataHashMap(this.network.getLinks().get(linkId),this.binSize, lmsa);
+	}
+
 }

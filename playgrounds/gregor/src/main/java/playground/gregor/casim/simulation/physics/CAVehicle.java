@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CASimpleAgent.java
+ * CAVehicle.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,53 +20,41 @@
 
 package playground.gregor.casim.simulation.physics;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
-public class CASimpleAgent extends CAAgent {
+public class CAVehicle extends CAAgent {
 
-	private final List<Link> links;
-	private int next;
-	private final Id id;
-	private CALink link;
+	private final MobsimDriverAgent agent;
+	private final Id initialLinkId;
+	private CALink currentLink;
 
-	public CASimpleAgent(List<Link> links, int i, Id id, CALink caLink) {
+	public CAVehicle(Id id, MobsimDriverAgent agent, Id linkId, CALink current) {
 		super(id);
-		this.links = links;
-		this.next = i;
-		this.id = id;
-		this.link = caLink;
+		this.agent = agent;
+		this.initialLinkId = linkId;
+		this.currentLink = current;
 	}
 
 	@Override
 	Id getNextLinkId() {
-		return this.links.get(this.next).getId();
+		return this.agent.chooseNextLinkId();
 	}
 
 	@Override
-	void moveOverNode(CALink link, double time) {
-//		System.out.println("DEBUG");
-//		if (this.id.toString().equals("46") && link.getLink().getId().toString().equals("7") && time > 300){
-//			System.out.println("DEBUG");
-//		}
-		this.link = link;
-		this.next++;
-		if (this.next == this.links.size()) {
-			this.next = 2;
-		}
-//		System.out.println(this.next);
-	}
+	void moveOverNode(CALink nextLink, double time) {
+		this.agent.notifyMoveOverNode(nextLink.getLink().getId());
+		this.currentLink = nextLink;
 
-	@Override
-	public String toString() {
-		return "a:"+this.id;
 	}
-		
 	
-	@Override
-	public CALink getCurrentLink() {
-		return this.link;
+	/*package*/ Id getInitialLinkId() {
+		return this.initialLinkId;
 	}
+
+	@Override
+	CALink getCurrentLink() {
+		return this.currentLink;
+	}
+
 }

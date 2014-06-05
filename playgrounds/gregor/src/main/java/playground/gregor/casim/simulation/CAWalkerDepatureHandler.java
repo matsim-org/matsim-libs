@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CASimpleAgent.java
+ * CAWalkerDepatureHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,55 +18,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.casim.simulation.physics;
-
-import java.util.List;
+package playground.gregor.casim.simulation;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 
-public class CASimpleAgent extends CAAgent {
+import playground.gregor.casim.simulation.physics.CALink;
+import playground.gregor.casim.simulation.physics.CAVehicle;
+import playground.gregor.sim2d_v4.scenario.TransportMode;
 
-	private final List<Link> links;
-	private int next;
-	private final Id id;
-	private CALink link;
-
-	public CASimpleAgent(List<Link> links, int i, Id id, CALink caLink) {
-		super(id);
-		this.links = links;
-		this.next = i;
-		this.id = id;
-		this.link = caLink;
-	}
-
-	@Override
-	Id getNextLinkId() {
-		return this.links.get(this.next).getId();
-	}
-
-	@Override
-	void moveOverNode(CALink link, double time) {
-//		System.out.println("DEBUG");
-//		if (this.id.toString().equals("46") && link.getLink().getId().toString().equals("7") && time > 300){
-//			System.out.println("DEBUG");
-//		}
-		this.link = link;
-		this.next++;
-		if (this.next == this.links.size()) {
-			this.next = 2;
-		}
-//		System.out.println(this.next);
-	}
-
-	@Override
-	public String toString() {
-		return "a:"+this.id;
-	}
-		
+public class CAWalkerDepatureHandler implements DepartureHandler {
 	
-	@Override
-	public CALink getCurrentLink() {
-		return this.link;
+	private static final String transportMode = TransportMode.walkca;
+	private final CAEngine engine;
+
+	public CAWalkerDepatureHandler(CAEngine caEngine) {
+		this.engine = caEngine;
 	}
+
+	@Override
+	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId) {
+		if (agent.getMode().equals(transportMode)) {
+			if ( agent instanceof MobsimDriverAgent ) {
+				handleCarDeparture(now, (MobsimDriverAgent)agent, linkId);
+				return true;
+			} else {
+				throw new UnsupportedOperationException("wrong agent type to depart on a network mode");
+			}
+		} 
+		return false;
+	}
+
+	private void handleCarDeparture(double now, MobsimDriverAgent agent,
+			Id linkId) {
+		CALink link = this.engine.getCANetwork().getCALink(linkId);
+		Id vehicleId = agent.getPlannedVehicleId() ;
+		CAVehicle veh = new CAVehicle(vehicleId,agent,linkId,link);
+		link.letAgentDepart(veh);
+		
+	}
+
 }

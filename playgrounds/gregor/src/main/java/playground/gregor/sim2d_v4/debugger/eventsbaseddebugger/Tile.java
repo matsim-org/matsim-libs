@@ -83,7 +83,7 @@ public class Tile {
 				dest1.x +
 				"," +
 				dest1.y +
-				"&width=256&height=256&srs=EPSG:4326&format=image/jpeg&BGCOLOR=0x000000";
+				"&width=256&height=256&srs=EPSG:4326&format=image/jpeg&BGCOLOR=0xFFFFFF";
 
 
 		return url;

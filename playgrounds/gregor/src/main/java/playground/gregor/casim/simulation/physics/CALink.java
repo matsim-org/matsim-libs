@@ -20,6 +20,8 @@
 
 package playground.gregor.casim.simulation.physics;
 
+import java.util.LinkedList;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -58,12 +60,17 @@ public class CALink implements CANetworkEntity{
 
 	private final CANetwork net;
 
+	private final LinkedList<CAVehicle> dWaiting = new LinkedList<CAVehicle>();
+	private final LinkedList<CAVehicle> uWaiting = new LinkedList<CAVehicle>();
+
+	private final double zOrig;
+	
 	public CALink(Link dsl, Link usl, CANode ds, CANode us, CANetwork net) {
 		
 		double tmp = Math.pow(CANetwork.RHO, gamma);
 		this.D = alpha+beta*tmp;
 		
-		double width = dsl.getCapacity();
+		double width = dsl.getNumberOfLanes();
 		this.D /= width;
 		this.vHat *= width;
 //		this.rhoHat *= cap;
@@ -81,21 +88,58 @@ public class CALink implements CANetworkEntity{
 		this.us = us;
 		this.net = net;
 		this.z = this.D+1/(this.vHat*this.rhoHat);
+		this.zOrig = this.z;
 
 	}
+	
 
 	@Override
 	public void handleEvent(CAEvent e) {
+//		this.z = this.zOrig + ((MatsimRandom.getRandom().nextDouble()-0.5)/10);
 		CAAgent a = e.getCAAgent();
 		double time = e.getEventExcexutionTime();
 		if (e.getCAEventType() == CAEventType.SWAP){
 			handelSwap(a,time);
 		} else if (e.getCAEventType() == CAEventType.TTA){
 			handleTTA(a,time);
-		} else {
+		} else if (e.getCAEventType() == CAEventType.TTE) {
+			handleTTE(a,time);
+		}else {
 			throw new RuntimeException("Unknown event type: " + e.getCAEventType());
 		}
 	}
+
+	
+	private void handleTTE(CAAgent a, double time) {
+		
+		int idx = a.getPos();
+		int dir = a.getDir();
+		if (this.particles[idx] == null) {
+			this.particles[idx] = a;
+			if (dir == -1) {
+				this.uWaiting.poll();
+				handleTTE(a,time,this.us);
+			} else {
+				this.dWaiting.poll();
+				handleTTE(a,time,this.ds);
+			}
+		}
+	}
+	
+
+
+	private void handleTTE(CAAgent a, double time, CANode node) {
+		
+		if (node.peekForAgent() == null){
+			CAEvent e = new CAEvent(time + 1/(this.vHat*this.rhoHat), a, this, CAEventType.TTA);
+			this.net.pushEvent(e);
+		} else if (this.net.getCALink(node.peekForAgent().getNextLinkId()) == this){
+			CAEvent e = new CAEvent(time + this.D+ 1/(this.vHat*this.rhoHat), a, this, CAEventType.SWAP);
+			this.net.pushEvent(e);
+		}
+		
+	}
+
 
 	private void handleTTA(CAAgent a, double time) {
 		int idx = a.getPos();
@@ -139,7 +183,13 @@ public class CALink implements CANetworkEntity{
 						CAEvent e = new CAEvent(time + this.D + 1/(this.vHat*this.rhoHat), a, this.us, CAEventType.SWAP);
 						this.net.pushEvent(e);
 					}
-					if (this.particles[prevIdx] != null && this.particles[prevIdx].getDir() == dir) {
+					
+					//check for waiting
+					if (this.uWaiting.size() > 0){
+//						CAEvent e = new CAEvent(time + this.z + 1/(this.vHat*this.rhoHat), this.particles[prevIdx], this, CAEventType.TTA);
+						CAEvent e = new CAEvent(time + this.z, this.uWaiting.peek(), this, CAEventType.TTE);
+						this.net.pushEvent(e);
+					}else if (this.particles[prevIdx] != null && this.particles[prevIdx].getDir() == dir) {
 //						CAEvent e = new CAEvent(time + this.z + 1/(this.vHat*this.rhoHat), this.particles[prevIdx], this, CAEventType.TTA);
 						CAEvent e = new CAEvent(time + this.z, this.particles[prevIdx], this, CAEventType.TTA);
 						this.net.pushEvent(e);
@@ -182,7 +232,11 @@ public class CALink implements CANetworkEntity{
 						CAEvent e = new CAEvent(time + this.D + 1/(this.vHat*this.rhoHat), a, this.ds, CAEventType.SWAP);
 						this.net.pushEvent(e);
 					}
-					if (this.particles[prevIdx] != null && this.particles[prevIdx].getDir() == dir) {
+					if (this.dWaiting.size() > 0) {
+//						CAEvent e = new CAEvent(time + this.z + 1/(this.vHat*this.rhoHat), this.particles[prevIdx], this, CAEventType.TTA);
+						CAEvent e = new CAEvent(time + this.z, this.dWaiting.peek(), this, CAEventType.TTE);
+						this.net.pushEvent(e);
+					}else if (this.particles[prevIdx] != null && this.particles[prevIdx].getDir() == dir) {
 //						CAEvent e = new CAEvent(time + this.z + 1/(this.vHat*this.rhoHat), this.particles[prevIdx], this, CAEventType.TTA);
 						CAEvent e = new CAEvent(time + this.z, this.particles[prevIdx], this, CAEventType.TTA);
 						this.net.pushEvent(e);
@@ -286,13 +340,14 @@ public class CALink implements CANetworkEntity{
 	/*package*/ void fireDownstreamEntered(CAAgent a, double time) {
 		LinkEnterEvent e = new LinkEnterEvent(time, a.getId(), this.usl.getId(), a.getId());
 		this.net.getEventsManager().processEvent(e);
+//		System.out.println("down");
 
 	}
 
 	/*package*/ void fireUpstreamEntered(CAAgent a, double time) {
 		LinkEnterEvent e = new LinkEnterEvent(time, a.getId(), this.dsl.getId(), a.getId());
 		this.net.getEventsManager().processEvent(e);
-
+//		System.out.println("up");
 	}
 
 	/*package*/ void fireDownstreamLeft(CAAgent a, double time) {
@@ -316,17 +371,20 @@ public class CALink implements CANetworkEntity{
 		Id nextLinkId = a.getNextLinkId();
 		CALink nextCALink = this.net.getCALink(nextLinkId);
 		int nextNextA;
+		int nextRevDir;
 		if (nextCALink.getUpstreamCANode() == n) {
 			nextNextA = 0;
+			nextRevDir = -1;
 		} else if (nextCALink.getDownstreamCANode() == n) {
 			nextNextA = nextCALink.getNumOfCells()-1;
+			nextRevDir = 1;
 		} else {
 			log.warn("inconsitent network, agent:" + a + " becomes stuck!");
 			return;
 //			throw new RuntimeException("inconsisten network!");
 		}
 		if (nextCALink.getParticles()[nextNextA] != null) {
-			if (nextCALink.getParticles()[nextNextA].getNextLinkId() == this.dsl.getId()){
+			if (nextCALink.getParticles()[nextNextA].getDir() == nextRevDir){
 				//TODO dynamic D
 				CAEvent e = new CAEvent(time + this.D + 1/(this.vHat*this.rhoHat), a, n, CAEventType.SWAP);
 				this.net.pushEvent(e);		
@@ -467,9 +525,31 @@ public class CALink implements CANetworkEntity{
 	public Link getLink() {
 		return this.dsl;
 	}
+	
+	public Link getUpstreamLink() {
+		return this.usl;
+	}
 
 	@Override
 	public String toString() {
 		return this.dsl.getId().toString();
-	};
+	}
+
+	
+	//MATSim integration
+	public void letAgentDepart(CAVehicle veh) {
+		Id id = veh.getInitialLinkId();
+		if (id == this.dsl.getId()) {
+			veh.materialize(getNumOfCells()-1, 1);
+			this.dWaiting.add(veh);
+		} else if(id == this.usl.getId()) {
+			veh.materialize(0, -1);
+			this.uWaiting.add(veh);
+		}
+		
+		if (this.particles[veh.getPos()] == null) {
+			CAEvent e = new CAEvent(this.time[veh.getPos()], veh, this, CAEventType.TTE);
+			this.net.pushEvent(e);
+		} 
+	}
 }

@@ -41,6 +41,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import playground.gregor.casim.events.CASimAgentConstructEvent;
 import playground.gregor.casim.monitoring.CALinkMonitor;
 import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
+import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
+import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
+import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
@@ -137,10 +140,10 @@ public class CASimExperimentBi {
 		links2.add(l6);
 
 		for (Link link : links) {
-			link.setCapacity(2);
+			link.setCapacity(1);
 		}
 		for (Link link : links2) {
-			link.setCapacity(2);
+			link.setCapacity(1);
 		}
 		CALinkMonitor monitor = new CALinkMonitor(l2.getId(), l2rev.getId(),l2);
 		for (double dist = 32; dist >= 1; dist--) {
@@ -154,10 +157,12 @@ public class CASimExperimentBi {
 	private static void runIt(Network net,CALinkMonitor monitor,List<Link>links,double dist, Scenario sc){
 		//visualization stuff
 		EventsManager em = new EventsManagerImpl();
-//		EventBasedVisDebuggerEngine vis = new EventBasedVisDebuggerEngine(sc);
-//		em.addHandler(vis);
-//		vis.addAdditionalDrawer(new InfoBox(vis, sc));
-
+		EventBasedVisDebuggerEngine vis = new EventBasedVisDebuggerEngine(sc);
+		em.addHandler(vis);
+		QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
+		em.addHandler(qDbg);
+		vis.addAdditionalDrawer(new InfoBox(vis, sc));
+		vis.addAdditionalDrawer(qDbg);
 		CANetwork caNet = new CANetwork(net,em);
 
 		int id = 0;

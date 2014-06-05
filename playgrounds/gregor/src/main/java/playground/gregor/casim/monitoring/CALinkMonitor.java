@@ -26,14 +26,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 
+import playground.gregor.casim.events.CASimAgentConstructEvent;
+import playground.gregor.casim.events.CASimAgentConstructEventHandler;
+import playground.gregor.casim.simulation.physics.CASimpleAgent;
+
 public class CALinkMonitor implements LinkEnterEventHandler,
-		LinkLeaveEventHandler {
+		LinkLeaveEventHandler, CASimAgentConstructEventHandler {
 	
 	private static final long WARMUP = 100;
 	int dsCnt;
@@ -88,10 +93,11 @@ public class CALinkMonitor implements LinkEnterEventHandler,
 		double time = event.getTime() - ai.e.getTime();
 		double speed = this.link.getLength()/time;
 		double rho = (this.dsCnt+this.usCnt)/(this.link.getLength())/this.link.getCapacity();
+
 		double flow = ((this.left-ai.left-1)/time);///this.caLink.getLink().getCapacity();
 		double flowComp = rho * speed;
 		
-		if (this.left < WARMUP) {
+		if (event.getTime() < WARMUP) {
 			return;
 		}
 		
@@ -107,6 +113,32 @@ public class CALinkMonitor implements LinkEnterEventHandler,
 			this.current.cnt++;
 		}
 //		System.out.println("dsCnt:" + this.dsCnt +" usCnt:" + this.usCnt + " total:" + (this.dsCnt+this.usCnt) + " speed:" + speed + " flow:" + flow + " rho:" + rho + " flowComp:" + flowComp);
+	}
+	
+	
+	@Override
+	public void handleEvent(CASimAgentConstructEvent e) {
+		CASimpleAgent a = (CASimpleAgent) e.getCAAgent();
+		
+		if (a.getCurrentLink().getLink().getId() != this.ds) {
+			return;
+		}
+		
+		
+		
+		if (a.getDir() == 1) {
+			AgentInfo ai = new AgentInfo();
+			ai.e = e;
+			ai.left = 0;
+			this.onLink.put(a.getId(), ai);
+			this.dsCnt++;
+		} else if (a.getDir() == -1){
+			AgentInfo ai = new AgentInfo();
+			ai.e = e;
+			ai.left = 0;
+			this.onLink.put(a.getId(), ai);
+			this.usCnt++;			
+		}
 	}
 
 	@Override
@@ -138,7 +170,7 @@ public class CALinkMonitor implements LinkEnterEventHandler,
 	
 	private static final class AgentInfo {
 		long left;
-		LinkEnterEvent e;
+		Event e;
 	}
 
 	private static final class Measure {
@@ -147,4 +179,7 @@ public class CALinkMonitor implements LinkEnterEventHandler,
 		double flow = 0;
 		double rho = 0;
 	}
+
+	
+
 }

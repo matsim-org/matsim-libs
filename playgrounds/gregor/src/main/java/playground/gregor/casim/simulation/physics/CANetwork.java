@@ -36,29 +36,29 @@ import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
 
 
 public class CANetwork {
-	
-	
+
+
 	public static double RHO = 1;
-	
+
 	private static final Logger log = Logger.getLogger(CANetwork.class);
-	
+
 	private final PriorityQueue<CAEvent> events = new PriorityQueue<CAEvent>();
 	private final Network net;
-	
+
 	private final Map<Id,CANode> caNodes = new HashMap<Id,CANode>();
 	private final Map<Id,CALink> caLinks = new HashMap<Id,CALink>();
 	private final EventsManager em;
-	
-	private double globalTime;
-	
+
+	private double globalTime = 0;
+
 	private final long eventCnt = 0;
-	
+
 	public CANetwork(Network net, EventsManager em) {
 		this.net = net;
 		this.em = em;
 		init();
 	}
-	
+
 	private void init() {
 		for (Node n : this.net.getNodes().values()) {
 			CANode caNode = new CANode(n, this);
@@ -73,12 +73,13 @@ public class CANetwork {
 					rev = ll;
 				}
 			}
-			CALink revCA = this.caLinks.get(rev.getId());
-			if (revCA != null){
-				this.caLinks.put(l.getId(), revCA);
-				continue;
+			if (rev != null) {
+				CALink revCA = this.caLinks.get(rev.getId());
+				if (revCA != null){
+					this.caLinks.put(l.getId(), revCA);
+					continue;
+				}
 			}
-			
 			CALink caL = new CALink(l,rev, ds, us, this);
 			us.addLink(caL);
 			ds.addLink(caL);
@@ -87,61 +88,61 @@ public class CANetwork {
 	}
 
 	public void runUntil(double time) {
-		this.globalTime = this.events.peek().getEventExcexutionTime();
+		
 		while (this.events.size() > 0 && this.events.peek().getEventExcexutionTime() < time) {
 			CAEvent e = this.events.poll();
-			if (e.getCANetworkEntity() instanceof CALink && e.getCANetworkEntity() != ((CASimpleAgent)e.getCAAgent()).getCurrentLink()){
+			if (e.getCAEventType() != CAEventType.TTE && e.getCANetworkEntity() instanceof CALink && e.getCANetworkEntity() != e.getCAAgent().getCurrentLink()){
 				log.info("dropping inconsisten event");
 				continue;
 			}
-			
+
 			e.getCANetworkEntity().handleEvent(e);
-			
+
 			if (e.getEventExcexutionTime() > this.globalTime) {
 				draw();
 				this.globalTime = e.getEventExcexutionTime();
 			}
 		}
 	}
-	
-	
+
+
 	/*package*/ void run() {
 		this.globalTime = this.events.peek().getEventExcexutionTime();
 		while (this.events.size() > 0) {
 			CAEvent e = this.events.poll();
-//			if ((e.getCAAgent().getId().toString().equals("-1") || e.getCAAgent().getId().toString().equals("492"))&& this.globalTime >= 22.){
-//				System.out.println("--> " + e);
-//				checkBlockingOnLink();
-//			}
-//			checkConsitency();
-//			
-//			System.out.println("DEBUG");
-//			if (e.getEventExcexutionTime() >= 309.38471064716487 && e.getCAAgent().getId().toString().equals("46")) {
-//				System.out.println("DEBUG");
-//				
-//			}
-			
+			//			if ((e.getCAAgent().getId().toString().equals("-1") || e.getCAAgent().getId().toString().equals("492"))&& this.globalTime >= 22.){
+			//				System.out.println("--> " + e);
+			//				checkBlockingOnLink();
+			//			}
+			//			checkConsitency();
+			//			
+			//			System.out.println("DEBUG");
+			//			if (e.getEventExcexutionTime() >= 309.38471064716487 && e.getCAAgent().getId().toString().equals("46")) {
+			//				System.out.println("DEBUG");
+			//				
+			//			}
+
 			if (e.getCANetworkEntity() instanceof CALink && e.getCANetworkEntity() != ((CASimpleAgent)e.getCAAgent()).getCurrentLink()){
 				log.info("dropping inconsisten event");
 				continue;
 			}
-			
-			e.getCANetworkEntity().handleEvent(e);
-			
-//			checkConsitency();
 
-//			System.out.println(e);
-			
-//			if (e.getEventExcexutionTime() > this.globalTime+0.04) {
-//				
-//				draw();
-//				this.globalTime = e.getEventExcexutionTime();
-//			}
+			e.getCANetworkEntity().handleEvent(e);
+
+			//			checkConsitency();
+
+			//			System.out.println(e);
+
+						if (e.getEventExcexutionTime() > this.globalTime+0.04) {
+							
+							draw();
+							this.globalTime = e.getEventExcexutionTime();
+						}
 		}
 	}
-	
+
 	private void checkBlockingOnLink() {
-		
+
 		System.out.println("DEBUG");
 		for (CALink l : this.caLinks.values()) {
 			for (int i = 1; i < l.getNumOfCells()-1; i++) {
@@ -165,7 +166,7 @@ public class CANetwork {
 			}
 		}
 	}
-	
+
 	private void checkConsitency() {
 		System.out.println("DEBUG");
 		for (CALink l : this.caLinks.values()) {
@@ -178,7 +179,7 @@ public class CANetwork {
 				}
 			}
 		}
-		
+
 	}
 
 	private void draw() {
@@ -195,7 +196,7 @@ public class CANetwork {
 			double y = l.getLink().getFromNode().getCoord().getY()+dy/2;
 			for (int i = 0; i < l.getNumOfCells(); i++) {
 				if (l.getParticles()[i]!= null) {
-					XYVxVyEventImpl e = new XYVxVyEventImpl(l.getParticles()[i].getId(), x, y, l.getParticles()[i].getDir(), l.getParticles()[i].getDir(), this.globalTime);
+					XYVxVyEventImpl e = new XYVxVyEventImpl(l.getParticles()[i].getId(), x, y, 0, 0, this.globalTime);
 					this.em.processEvent(e);
 				}
 				x+=dx;
@@ -206,42 +207,42 @@ public class CANetwork {
 			if (n.peekForAgent() != null) {
 				double x = n.getNode().getCoord().getX();
 				double y = n.getNode().getCoord().getY();
-				XYVxVyEventImpl e = new XYVxVyEventImpl(n.peekForAgent().getId(), x, y, 1, 1, this.globalTime);
+				XYVxVyEventImpl e = new XYVxVyEventImpl(n.peekForAgent().getId(), x, y, 0, 0, this.globalTime);
 				this.em.processEvent(e);
 			}
 		}
-		
+
 	}
 
 	public void pushEvent(CAEvent event) {
-//		System.out.println("DEBUG");
-//		if (event.getCANetworkEntity() instanceof CALink) {
-//			if (((CASimpleAgent)event.getCAAgent()).getCurrentLink() != event.getCANetworkEntity()){
-//				throw new RuntimeException("bug!");
-//			}
-//		} else if (event.getEventExcexutionTime() >= 309.3847106471648){
-//			System.out.println("DEBUG");	
-//		}
-//		event.cnt = this.eventCnt++;
-//		if (event.cnt == 53943){
-//			System.out.println("DEBUG");
-//		}
-//		System.out.println("<-- " + event);
-//		if (event.getCAAgent().getId().toString().equals("36")){
-//			System.out.println("<-- " + event);
-//		}
-		
-//		if ((event.getCAAgent().getId().toString().equals("-24") || event.getCAAgent().getId().toString().equals("-24"))&& event.getEventExcexutionTime() >= 1387.78){
-//			System.out.println("<-- " + event);
-//		}
-		
+		//		System.out.println("DEBUG");
+		//		if (event.getCANetworkEntity() instanceof CALink) {
+		//			if (((CASimpleAgent)event.getCAAgent()).getCurrentLink() != event.getCANetworkEntity()){
+		//				throw new RuntimeException("bug!");
+		//			}
+		//		} else if (event.getEventExcexutionTime() >= 309.3847106471648){
+		//			System.out.println("DEBUG");	
+		//		}
+		//		event.cnt = this.eventCnt++;
+		//		if (event.cnt == 53943){
+		//			System.out.println("DEBUG");
+		//		}
+		//		System.out.println("<-- " + event);
+		//		if (event.getCAAgent().getId().toString().equals("36")){
+		//			System.out.println("<-- " + event);
+		//		}
+
+		//		if ((event.getCAAgent().getId().toString().equals("-24") || event.getCAAgent().getId().toString().equals("-24"))&& event.getEventExcexutionTime() >= 1387.78){
+		//			System.out.println("<-- " + event);
+		//		}
+
 		this.events.add(event);
 	}
-	
+
 	public CAEvent pollEvent() {
 		return this.events.poll();
 	}
-	
+
 	public CAEvent peekEvent() {
 		return this.events.peek();
 	}
@@ -253,7 +254,7 @@ public class CANetwork {
 	public CANode getCANode(Id id) {
 		return this.caNodes.get(id);
 	}
-	
+
 	public EventsManager getEventsManager() {
 		return this.em;
 	}

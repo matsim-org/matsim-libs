@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 import playground.gregor.casim.simulation.physics.CANetwork;
@@ -50,11 +51,15 @@ public class CAEngine implements MobsimEngine {
 
 	private CANetwork caNet;
 
+	private final DepartureHandler dpHandler;
+
 	public CAEngine(QSim sim) {
 		this.scenario = sim.getScenario();
 
 		this.sim = sim;
 		this.qSimStepSize = this.scenario.getConfig().qsim().getTimeStepSize();
+		this.dpHandler = new CAWalkerDepatureHandler(this);
+		
 	}
 
 
@@ -66,6 +71,8 @@ public class CAEngine implements MobsimEngine {
 	@Override
 	public void onPrepareSim() {
 		log.info("prepare");
+		this.caNet = new CANetwork(this.scenario.getNetwork(), this.sim.getEventsManager());
+		
 //		for (Sim2DEnvironment  env: this.sim2dsc.getSim2DEnvironments()) {
 //			PhysicalSim2DEnvironment e = new PhysicalSim2DEnvironment(env, this.sim2dsc, this.sim.getEventsManager());
 //			this.penvs.put(env.getId(),e);
@@ -91,6 +98,11 @@ public class CAEngine implements MobsimEngine {
 		this.internalInterface = internalInterface;
 	}
 
+
+	public DepartureHandler getDepartureHandler() {
+		return this.dpHandler;
+	}
+
 //	public void registerHiResLink(QSimCATransitionLink hiResLink) {
 //		this.hiResLinks.add(hiResLink);
 //		
@@ -100,6 +112,10 @@ public class CAEngine implements MobsimEngine {
 //	public void registerLowResLink(CAQTransitionLink lowResLink) {
 //		this.lowResLinks.put(lowResLink.getLink().getId(),lowResLink);
 //	}
+	
+	public CANetwork getCANetwork(){
+		return this.caNet;
+	}
 
 
 }

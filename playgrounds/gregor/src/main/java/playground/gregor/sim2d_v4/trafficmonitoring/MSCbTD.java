@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CASimpleAgent.java
+ * MSCbTD.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,55 +18,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.casim.simulation.physics;
+package playground.gregor.sim2d_v4.trafficmonitoring;
 
-import java.util.List;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
-public class CASimpleAgent extends CAAgent {
+public class MSCbTD implements TravelDisutility {
 
-	private final List<Link> links;
-	private int next;
-	private final Id id;
-	private CALink link;
-
-	public CASimpleAgent(List<Link> links, int i, Id id, CALink caLink) {
-		super(id);
-		this.links = links;
-		this.next = i;
-		this.id = id;
-		this.link = caLink;
+	public MSCbTD(TravelTime timeCalculator,
+			PlanCalcScoreConfigGroup cnScoringGroup) {
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
-	Id getNextLinkId() {
-		return this.links.get(this.next).getId();
+	public double getLinkTravelDisutility(Link link, double time,
+			Person person, Vehicle vehicle) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
-	void moveOverNode(CALink link, double time) {
-//		System.out.println("DEBUG");
-//		if (this.id.toString().equals("46") && link.getLink().getId().toString().equals("7") && time > 300){
-//			System.out.println("DEBUG");
-//		}
-		this.link = link;
-		this.next++;
-		if (this.next == this.links.size()) {
-			this.next = 2;
-		}
-//		System.out.println(this.next);
+	public double getLinkMinimumTravelDisutility(Link link) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
-	@Override
-	public String toString() {
-		return "a:"+this.id;
-	}
-		
-	
-	@Override
-	public CALink getCurrentLink() {
-		return this.link;
-	}
 }

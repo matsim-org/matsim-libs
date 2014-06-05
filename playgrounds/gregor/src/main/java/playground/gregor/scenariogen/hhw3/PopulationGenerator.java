@@ -118,7 +118,11 @@ public class PopulationGenerator {
 		NetworkImpl net = (NetworkImpl) sc.getNetwork();
 		String crs = conf.global().getCoordinateSystem();
 		transformCRS(r, crs);
+		
 		int id = 0;
+		
+		long tp = 0;
+		long carss = 0;
 		for (SimpleFeature ft : r.getFeatureSet()) {
 			MultiPolygon p = (MultiPolygon) ft.getDefaultGeometry();
 			Coordinate c = p.getCentroid().getCoordinate();
@@ -128,9 +132,14 @@ public class PopulationGenerator {
 			if (dist > CUTOFF_DIST) {
 				continue;
 			}
+			
+			
 
 			long persons = (Long) ft.getAttribute("persons");
+			
+			tp+=persons;
 			double cars = (Double) ft.getAttribute("Privat_PKW");
+			carss += cars;
 			persons -= 1.81 * cars;
 			for (int i = 0; i < persons; i++) {
 
@@ -165,6 +174,7 @@ public class PopulationGenerator {
 				plan.addActivity(act1);
 			}
 		}
+		System.out.println(carss);
 		new PopulationWriter(pop, sc.getNetwork()).write(conf.plans().getInputFile());
 		createNetworkChangeEvents(sc);
 		new ConfigWriter(conf).write(config);

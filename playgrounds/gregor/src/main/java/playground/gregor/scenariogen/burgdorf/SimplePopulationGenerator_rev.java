@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.burgdorf;
+package playground.gregor.scenariogen.burgdorf;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;

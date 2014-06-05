@@ -33,11 +33,17 @@ import org.matsim.core.gbl.MatsimRandom;
 
 public class SOTest {
 
+
+	private static final boolean MSA_INTERNAL = true;
+	private static final boolean MSA_EXTERNAL = true;
+
 	private static final double BETA = 3;//*60.;
 	private static final int MAX_PLANS = 6;
 	private static Map<String,double[]> ttLookUp = new HashMap<String, double[]>();
 	private static Map<String,double[]> xLookUp = new HashMap<String, double[]>();
 	static {
+
+		//travel time lookup table
 		ttLookUp.put("000",new double []{5,7,9});
 		ttLookUp.put("001",new double []{5,7,8});
 		ttLookUp.put("010",new double []{5,8,6});
@@ -47,7 +53,19 @@ public class SOTest {
 		ttLookUp.put("110",new double []{8,8,5});
 		ttLookUp.put("111",new double []{5,7,9});
 
-		xLookUp.put("000",new double []{4,4,0});
+
+		//		//Laemmel external costs
+		//		xLookUp.put("000",new double []{6,3,0});
+		//		xLookUp.put("001",new double []{2,0,0});
+		//		xLookUp.put("010",new double []{1,0,0});
+		//		xLookUp.put("011",new double []{0,0,0});
+		//		xLookUp.put("100",new double []{0,2,0});
+		//		xLookUp.put("101",new double []{0,0,0});
+		//		xLookUp.put("110",new double []{0,0,0});
+		//		xLookUp.put("111",new double []{0,0,0});
+
+		//Kaddoura external costs
+		xLookUp.put("000",new double []{3,3,0});
 		xLookUp.put("001",new double []{2,0,0});
 		xLookUp.put("010",new double []{1,0,0});
 		xLookUp.put("011",new double []{0,0,0});
@@ -70,7 +88,7 @@ public class SOTest {
 			new SOTest(bf).run();
 		}
 		bf.close();
-		
+
 	}
 
 	private int it;
@@ -81,35 +99,14 @@ public class SOTest {
 		for (int i = 0; i< 3; i++) {
 			Agent a0 = new Agent();
 			a0.selected = 0;
-			{
 			Plan p1 = new Plan();
 			p1.strategy = MatsimRandom.getRandom().nextInt(2);
 			a0.plans.add(p1);
-//			Plan p2 = new Plan();
-//			p2.strategy = 1;
-//			a0.plans.add(p2);
-			}
-//			{
-//				Plan p1 = new Plan();
-//				p1.strategy = 1;
-//				a0.plans.add(p1);
-//				Plan p2 = new Plan();
-//				p2.strategy = 0;
-//				a0.plans.add(p2);
-//				}
-//			{
-//				Plan p1 = new Plan();
-//				p1.strategy = 1;
-//				a0.plans.add(p1);
-//				Plan p2 = new Plan();
-//				p2.strategy = 0;
-//				a0.plans.add(p2);
-//				}
 			agents.add(a0);
 		}
 		for (this.it = 0; this.it < 100000; this.it++) {
 			scoreAgents(agents);
-//			report(agents);
+			//			report(agents);
 			replan(agents);
 		}
 
@@ -120,17 +117,17 @@ public class SOTest {
 		for (int i = 0; i< 3; i++) {
 			strategies[i] = getStrategy(agents.get(i));
 		}
-		
+
 		for (int i = 0; i < 3; i++) {
 			Agent a = agents.get(i);
-			if (this.it < 80000 && MatsimRandom.getRandom().nextDouble() < 0.1) {
+			if (this.it < 80000 && MatsimRandom.getRandom().nextDouble() < 0.1) { //10% re-route
 				explorate(a,i,strategies);
 			} else {
 				select(a);
 			}
 		}
-		
-		
+
+
 	}
 
 
@@ -142,7 +139,7 @@ public class SOTest {
 
 	private void explorate(Agent a,int idx,int [] strategies) {
 		Plan p = retrieveWorst(a);
-		
+
 		StringBuffer s0 = new StringBuffer();
 		for (int i = 0; i < idx; i++) {
 			s0.append(strategies[i]);
@@ -160,16 +157,15 @@ public class SOTest {
 			s1.append(strategies[i]);
 		}
 
-		double sc0 = -a.t0- a.x;
+
+		//assumed travel costs for either strategy
+		double sc0 = -a.t0- a.x; 
 		double sc1 = -a.t1;
 		if (sc0 > sc1) {
 			p.strategy = 0;
 		} else {
 			p.strategy = 1;
 		}
-//		if (MatsimRandom.getRandom().nextDouble() < 0.1) {
-//			p.strategy = MatsimRandom.getRandom().nextInt(2);
-//		}
 	}
 
 	private Plan retrieveWorst(Agent a) {
@@ -182,7 +178,7 @@ public class SOTest {
 		Plan w = null;
 		double s = 0;
 		int idx = 0;
-		
+
 		for (int i = 0; i < MAX_PLANS; i++) {
 			Plan p = a.plans.get(i);
 			if (p.score < s) {
@@ -205,7 +201,7 @@ public class SOTest {
 			key.append(p.strategy);
 		}
 		System.out.println(key.toString() + " " + sc.toString());
-		
+
 
 	}
 
@@ -221,8 +217,8 @@ public class SOTest {
 			a.selected = rIdx;
 		}
 	}
-	
-	
+
+
 
 	private void scoreAgents(List<Agent> agents) {
 		StringBuffer key = new StringBuffer();
@@ -237,21 +233,47 @@ public class SOTest {
 			Agent a = agents.get(i);
 			Plan p = a.plans.get(a.selected);
 			if (p.strategy == 0) {
-				a.x = a.x * this.it/(this.it+1.) + x[i]/(this.it+1.);
-				a.t0 = a.t0 * this.it/(this.it+1.) + tt[i]/(this.it+1.);
+
+				if (MSA_EXTERNAL) {
+					//external w/ MSA
+					a.x = a.x * this.it/(this.it+1.) + x[i]/(this.it+1.);
+				} else {
+					//external w/o MSA
+					a.x = x[i];
+				}
+
+				if (MSA_INTERNAL) {
+					//internal w/ MSA
+					a.t0 = a.t0 * this.it/(this.it+1.) + tt[i]/(this.it+1.);
+				} else {
+					//internal w/o MSA
+					a.t0 = tt[i];
+				}
 
 				p.score = -x[i]-tt[i];
-//				p.score = -a.t0-a.x;
 				travelTime+=tt[i];
 			} else {
-				a.x = a.x * this.it/(this.it+1.);
-//				a.x = 0;
-				a.t0 = a.t0 * this.it/(this.it+1.) + 5./(this.it+1.);
+				if (MSA_EXTERNAL) {
+					//external w/ MSA
+					a.x = a.x * this.it/(this.it+1.);
+				} else {
+					//external w/o MSA
+					a.x = 0;
+				}
+
+				if (MSA_INTERNAL) {
+					//internal w/ MSA
+					a.t0 = a.t0 * this.it/(this.it+1.) + 5./(this.it+1.);
+				} else {
+					//internal w/ MSA
+					a.t0 = 5;
+				}
+
 				p.score = -a.t1;
 				travelTime+=8;
 			}
 		}
-//		System.out.println(this.it + " " + (travelTime/3.+4));
+		//		System.out.println(this.it + " " + (travelTime/3.+4));
 		if (this.it < 99000) {
 			return;
 		}

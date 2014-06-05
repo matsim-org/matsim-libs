@@ -64,19 +64,20 @@ public class EventsBasedVisDebugger extends PApplet {
 	private Control keyControl;
 
 	double time;	
-	
+
 	int dummy = 0;
-	
+
 	private final FrameSaver fs;
-//	private final FrameSaver fs = null;
+	//	private final FrameSaver fs = null;
 	private String it;
 	public EventsBasedVisDebugger(Scenario sc,FrameSaver fs) {
 		this.fs = fs;
 		computeOffsets(sc);
 		this.fr = new JFrame();
-//				this.fr.setSize(1024,788);
-		this.fr.setSize(1280,740);
-//		this.fr.setSize(720,740);
+		//				this.fr.setSize(1024,788);
+		this.fr.setSize(1024,788);
+		//		this.fr.setSize(1280,740);
+		//		this.fr.setSize(720,740);
 		JPanel compositePanel = new JPanel();
 		compositePanel.setLayout(new OverlayLayout(compositePanel));
 
@@ -90,9 +91,11 @@ public class EventsBasedVisDebugger extends PApplet {
 		this.tileMap = new TileMap(this.zoomer,this, this.offsetX, this.offsetY, sc.getConfig().global().getCoordinateSystem());
 		this.zoomer.addZoomPanListener(this.tileMap);
 
+
 		this.init();
 		frameRate(90);
-		//		size(1024, 768);
+		//				size(1024, 768);
+		size(1024, 768);
 		this.fr.setVisible(true);
 	}
 
@@ -124,9 +127,9 @@ public class EventsBasedVisDebugger extends PApplet {
 
 	@Override
 	public void setup() {
-//				size(1024,768);
-		size(1280,720);
-//		size(720,720);
+		size(1024,768);
+		//		size(1280,720);
+		//		size(720,720);
 		background(0);
 
 	}
@@ -134,7 +137,7 @@ public class EventsBasedVisDebugger extends PApplet {
 	@Override
 	public void draw() {
 		Font f = this.getFont();
-		
+
 		boolean recording = false;
 		ZoomPan old = null; 
 		if (this.keyControl != null && this.keyControl.isScreenshotRequested() && this.keyControl.isOneObjectWaitingAtScreenshotBarrier()) {
@@ -165,7 +168,7 @@ public class EventsBasedVisDebugger extends PApplet {
 //				coords.add(d);
 			}
 		}
-		
+
 
 		Collection<Tile> tiles = this.tileMap.getTiles(coords);
 		for (Tile tile : tiles) {
@@ -177,7 +180,7 @@ public class EventsBasedVisDebugger extends PApplet {
 				d.draw(this);
 			}
 		}
-		
+
 		popMatrix();
 		if (recording) {
 			this.recorder.popMatrix();
@@ -200,7 +203,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		strokeCap(ROUND);
 
 
-		
+
 		synchronized(this.elementsStatic) {
 			Iterator<Object> it = this.elementsStatic.iterator();
 			while (it.hasNext()) {
@@ -293,9 +296,9 @@ public class EventsBasedVisDebugger extends PApplet {
 			line((float)(tile.getBx()+this.offsetX),-(float)(tile.getTy()+this.offsetY),(float)(tile.getTx()+this.offsetX),(float)-(tile.getBy()+this.offsetY));
 			line((float)(tile.getTx()+this.offsetX),-(float)(tile.getTy()+this.offsetY),(float)(tile.getBx()+this.offsetX),(float)-(tile.getTy()+this.offsetY));
 			line((float)(tile.getBx()+this.offsetX),-(float)(tile.getBy()+this.offsetY),(float)(tile.getTx()+this.offsetX),(float)-(tile.getBy()+this.offsetY));
-			
-//			line((float)(tile.getBx()+this.offsetX),-(float)(tile.getBy()+this.offsetY),(float)(tile.getTx()+this.offsetX),-(float)(tile.getBy()+this.offsetY));
-//			line((float)(tile.getTx()+this.offsetX),-(float)(tile.getBy()+this.offsetY),(float)(tile.getTx()+this.offsetX),-(float)(tile.getTy()+this.offsetY));
+
+			//			line((float)(tile.getBx()+this.offsetX),-(float)(tile.getBy()+this.offsetY),(float)(tile.getTx()+this.offsetX),-(float)(tile.getBy()+this.offsetY));
+			//			line((float)(tile.getTx()+this.offsetX),-(float)(tile.getBy()+this.offsetY),(float)(tile.getTx()+this.offsetX),-(float)(tile.getTy()+this.offsetY));
 		}
 	}
 
@@ -316,7 +319,7 @@ public class EventsBasedVisDebugger extends PApplet {
 			textAlign(LEFT);
 			text(t.text, cv.x-w/2, cv.y+ts/2);
 		}
-//		System.out.println(cv.x  + "  " +  cv.y);
+		//		System.out.println(cv.x  + "  " +  cv.y);
 	}
 
 	private void drawTriangle(Triangle t) {
@@ -339,15 +342,16 @@ public class EventsBasedVisDebugger extends PApplet {
 		}
 		if (c.fill) {
 			fill(c.r,c.g,c.b,c.a);
-//			fill(c.r,c.g,c.b,0);
+			//			fill(c.r,c.g,c.b,0);
 		} else {
 			fill(255,0);
 		}
 		//		stroke(c.r,c.g,c.b,c.a);
-//		stroke(0,0,0,128);;
+		//		stroke(0,0,0,128);;
 		stroke(0,(float) (255*this.zoomer.getZoomScale()/100)+32);
 		ellipseMode(RADIUS);
 		ellipse(c.x,c.y,c.rr,c.rr);
+		//		filter(BLUR, 4);
 	}
 
 	private void drawPolygon(Polygon p) {
@@ -359,10 +363,10 @@ public class EventsBasedVisDebugger extends PApplet {
 		}
 
 		fill(p.r,p.g,p.b,p.a);
-//		stroke(p.r,p.g,p.b,p.a);
-//		strokeWeight(.5f);
+		//		stroke(p.r,p.g,p.b,p.a);
+		//		strokeWeight(.5f);
 		stroke(0);
-//		stroke(0,0);
+		//		stroke(0,0);
 		beginShape();
 		for (int i = 0; i < p.x.length; i++) {
 			vertex(p.x[i],p.y[i]);
@@ -384,7 +388,8 @@ public class EventsBasedVisDebugger extends PApplet {
 		//		} 
 		stroke(l.r, l.g, l.b, a);
 		//		stroke(20);
-		//		strokeWeight(2);
+		//				strokeWeight(2);
+
 		line(l.x0,l.y0,l.x1,l.y1);
 
 	}
@@ -393,7 +398,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		if (this.zoomer.getZoomScale() < r.minScale) {
 			return;
 		}
-		
+
 		stroke(0,255);
 		if (r.fill){
 			fill(r.r,r.g,r.b,r.a);
@@ -402,8 +407,8 @@ public class EventsBasedVisDebugger extends PApplet {
 		}
 		rect(r.tx,r.ty,r.sx,r.sy);
 	}
-	
-	
+
+
 	/*package*/ void addTriangle(double x0, double y0, double x1, double y1, double x2, double y2, int r, int g, int b, int a, int minScale, boolean fill) {
 		Triangle t = new Triangle();
 		t.x0 = (float)(x0+this.offsetX);
@@ -506,7 +511,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		addElement(text);
 
 	}
-	
+
 	public void addRect(double tx, double ty, double sx, double sy, int r,
 			int g, int b, int a, int minScale, boolean fill) {
 		Rect rect = new Rect();
@@ -520,9 +525,9 @@ public class EventsBasedVisDebugger extends PApplet {
 		rect.b = b;
 		rect.minScale = minScale;
 		rect.fill = fill;
-		
+
 		addElement(rect);
-		
+
 	}
 
 	public void addPolygonStatic(double [] x, double [] y, int r, int g, int b, int a, int minScale) {
@@ -590,7 +595,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		float tx,ty,sx,sy;
 		int r,g,b,a, minScale = 0;
 	}
-	
+
 	static final class Text {
 		float x,y, theta = 0;
 		String text = "";
@@ -668,7 +673,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		// TODO Auto-generated method stub
 
 	}
-	
+
 	void addAdditionalDrawer(VisDebuggerAdditionalDrawer drawer) {
 		synchronized (this.additionalDrawers) {
 			this.additionalDrawers.add(drawer);
@@ -679,6 +684,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		this.addKeyListener(keyControl);
 		this.addMouseWheelListener(keyControl);
 		this.keyControl = keyControl;
+		this.keyControl.addTileMap(this.tileMap);
 	}
 
 	public void reset(int it) {
@@ -689,7 +695,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		} else {
 			this.it = "it."+it+"_";
 		}
-		
+
 	}
 
 

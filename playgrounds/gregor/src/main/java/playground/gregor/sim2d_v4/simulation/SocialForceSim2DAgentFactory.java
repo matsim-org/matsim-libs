@@ -60,6 +60,7 @@ public class SocialForceSim2DAgentFactory implements Sim2DAgentFactory {
 //			SocialForceVelocityUpdater vu = new SocialForceVelocityUpdater(new PathAndDrivingDirection(agent, ls), nn, this.conf, agent);
 //			SocialForce2005VelocityUpdater vu = new SocialForce2005VelocityUpdater(new PathAndDrivingDirection(agent, ls), nn, this.conf, agent);
 			SocialForce2005VelocityUpdater vu = new SocialForce2005VelocityUpdater(new NearestPointAtTargetLine(agent, ls), nn, this.conf, agent);
+//			SimpleVelocityUpdater vu = new SimpleVelocityUpdater(agent, ls, this.sc);
 			agent.setVelocityUpdater(vu);
 		}
 		

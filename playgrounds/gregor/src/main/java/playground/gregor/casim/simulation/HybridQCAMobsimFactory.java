@@ -33,14 +33,14 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.HybridQSimCANetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 
-public class HybridQ2DMobsimFactory implements MobsimFactory {
+public class HybridQCAMobsimFactory implements MobsimFactory {
 
-	private final static Logger log = Logger.getLogger(HybridQ2DMobsimFactory.class);
+	private final static Logger log = Logger.getLogger(HybridQCAMobsimFactory.class);
 	
 	CAEngine sim2DEngine = null;
 
@@ -48,7 +48,7 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 
-		if (!sc.getConfig().controler().getMobsim().equals("hybridQ2D")) {
+		if (!sc.getConfig().controler().getMobsim().equals("casim")) {
 			throw new RuntimeException("This factory does not make sense for " + sc.getConfig().controler().getMobsim()  );
 		}
 		
@@ -75,11 +75,15 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
 		
+		
+		
+		
 		CAEngine e = new CAEngine(qSim);
 		
 		
 		this.sim2DEngine = e;
 		qSim.addMobsimEngine(e);
+		qSim.addDepartureHandler(e.getDepartureHandler());
 		
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
@@ -87,9 +91,10 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 		
 		Sim2DScenario sc2d = (Sim2DScenario) sc.getScenarioElement(Sim2DScenario.ELEMENT_NAME);
 		CAAgentFactory aBuilder = new CAAgentFactory(sc2d.getSim2DConfig(),sc);
+//		HybridQSimCANetworkFactory networkFactory = new HybridQSimCANetworkFactory(e,sc, aBuilder);
 //		Sim2DAgentFactory aBuilder = new ORCAAgentFactory(sc2d.getSim2DConfig(),sc);
-		
-		HybridQSimCANetworkFactory networkFactory = new HybridQSimCANetworkFactory(e,sc, aBuilder);
+//		
+		DefaultQNetworkFactory networkFactory = new DefaultQNetworkFactory();
 	
 		QNetsimEngine netsimEngine = new QNetsimEngine( qSim, networkFactory ) ;
 		qSim.addMobsimEngine(netsimEngine);

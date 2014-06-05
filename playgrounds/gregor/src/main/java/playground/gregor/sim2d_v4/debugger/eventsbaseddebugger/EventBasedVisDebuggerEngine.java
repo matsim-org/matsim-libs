@@ -80,14 +80,14 @@ public class EventBasedVisDebuggerEngine implements CASimAgentConstructEventHand
 	private final List<ClockedVisDebuggerAdditionalDrawer> drawers = new ArrayList<ClockedVisDebuggerAdditionalDrawer>();
 	private int nrAgents;
 
-//		FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing/", "png", 100);
+//	FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing/SO/", "png", 90);
 	FrameSaver fs = null;
 
 	public EventBasedVisDebuggerEngine(Scenario sc) {
 		this.sc = sc;
 		this.dT = ((Sim2DScenario) sc.getScenarioElement(Sim2DScenario.ELEMENT_NAME)).getSim2DConfig().getTimeStepSize();
 		this.vis = new EventsBasedVisDebugger(sc,this.fs);
-		this.keyControl = new Control(this.vis.zoomer,100,this.fs);
+		this.keyControl = new Control(this.vis.zoomer,90,this.fs);
 		this.vis.addKeyControl(this.keyControl);
 		init();
 	}
@@ -107,7 +107,7 @@ public class EventBasedVisDebuggerEngine implements CASimAgentConstructEventHand
 
 		//Links
 		LineProperty lp = new LineProperty();
-		lp.r = 0; lp.g = 0; lp.b = 0; lp.a = 255;
+		lp.r = 0; lp.g = 0; lp.b = 0; lp.a = 192;
 		lp.minScale = 10;
 
 		Sim2DScenario s2dsc = (Sim2DScenario) this.sc.getScenarioElement(Sim2DScenario.ELEMENT_NAME);
@@ -148,11 +148,11 @@ public class EventBasedVisDebuggerEngine implements CASimAgentConstructEventHand
 				if (p.getCentroid() != null) {
 					MatsimRandom.getRandom().setSeed((int)(100*x[0])+coords.length);
 					int offset = MatsimRandom.getRandom().nextInt(10)*15;
-					offset += 96;
+//					offset += 96;
 					offset = 0;
-										this.vis.addPolygonStatic(x, y, 255-offset, 255-offset, 255-offset, 255, 0);
+					this.vis.addPolygonStatic(x, y, 255-offset, 255-offset, 255-offset, 255, 0);
 
-					this.vis.addTextStatic(p.getCentroid().getX(), p.getCentroid().getY(), sec.getId().toString(), 90);
+//					this.vis.addTextStatic(p.getCentroid().getX(), p.getCentroid().getY(), sec.getId().toString(), 90);
 				}
 			}
 		}
@@ -175,8 +175,8 @@ public class EventBasedVisDebuggerEngine implements CASimAgentConstructEventHand
 				Coord c0 = l.getFromNode().getCoord();
 				Coord c1 = l.getToNode().getCoord();
 //				this.vis.addDashedLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), lp.r,lp.g,lp.b,lp.a, lp.minScale,.1,.9);
-				this.vis.addLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), lp.r,lp.g,lp.b,lp.a, 0);
-				this.vis.addCircleStatic(c0.getX(), c0.getY(), .04f, 0, 0, 0, 255, 0);
+//				this.vis.addLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), lp.r,lp.g,lp.b,lp.a, 0);
+//				this.vis.addCircleStatic(c0.getX(), c0.getY(), .04f, 0, 0, 0, 255, 0);
 //				this.vis.addCircleStatic(c1.getX(), c1.getY(), .04f, 0, 0, 0, 255, 0);
 //				double dx = c1.getX()-c0.getX();
 //				double dy = c1.getY()-c0.getY();
@@ -234,12 +234,12 @@ public class EventBasedVisDebuggerEngine implements CASimAgentConstructEventHand
 		}
 
 		this.vis.addCircle(event.getX(),event.getY(),cp.rr,cp.r,cp.g,cp.b,cp.a,cp.minScale,cp.fill);
-		//		if (event.getAgent() != null) {
-		//			this.vis.addText(event.getX(),event.getY(), event.getAgent().toString(), 200);
-		//		} else {
-		this.vis.addText(event.getX(),event.getY(), event.getPersonId().toString(), 150);
+				if (event.getAgent() != null) {
+					this.vis.addText(event.getX(),event.getY(), event.getAgent().toString(), 200);
+				} else {
+		this.vis.addText(event.getX(),event.getY(), event.getPersonId().toString(), 90);
 //		this.vis.addText(event.getX(),event.getY(), event.getAgent().toString(), 50);
-		//		}
+				}
 
 	}
 
@@ -298,11 +298,11 @@ public class EventBasedVisDebuggerEngine implements CASimAgentConstructEventHand
 		cp.rr = (float) (0.5/5.091);
 		int nr = a.getId().toString().hashCode()%100;
 		int color = (nr/10)%3;
-		if (Integer.parseInt(a.getId().toString()) < 0) {
-			color = 1;
-		} else {
-			color = 2;
-		}
+//		if (Integer.parseInt(a.getId().toString()) < 0) {
+//			color = 1;
+//		} else {
+//			color = 2;
+//		}
 		if (color == 1){
 			cp.r = 255;
 			cp.g = 255-nr;
@@ -320,11 +320,21 @@ public class EventBasedVisDebuggerEngine implements CASimAgentConstructEventHand
 			cp.a = 255;
 		}
 		
-		if (a.getId().toString().equals("0") || a.getId().toString().equals("1000")) {
-			cp.r=255;
-			cp.g=0;
+		if (a.getId().toString().startsWith("g")) {
+			cp.r=0;
+			cp.g=255-nr;
 			cp.b=0;
+		} else if (a.getId().toString().startsWith("b")) {
+			cp.r=0;
+			cp.g=0;
+			cp.b=255-nr;			
+		}else if (a.getId().toString().startsWith("r")) {
+			cp.r=255-nr;
+			cp.g=0;
+			cp.b=0;			
 		}
+		
+
 		
 		this.circleProperties.put(a.getId(), cp);
 		
@@ -354,23 +364,23 @@ public class EventBasedVisDebuggerEngine implements CASimAgentConstructEventHand
 			cp.b = 255-nr;
 			cp.a = 255;
 		}
-		if (a.getId().toString().contains("b") && a.getId().toString().hashCode()%2 ==0){
-			
-			cp.r = 255;
-			cp.g = 255-nr;
-			cp.b = 0;
-			cp.a = 255;
-		} else if (a.getId().toString().contains("d")) { 
-			cp.r = nr-nr;
-			cp.g = 0;
-			cp.b = 255;
-			cp.a = 255;
-		}else {
-			cp.r = 0;
-			cp.g = 255;
-			cp.b = 255-nr;
-			cp.a = 255;
-		}
+//		if (a.getId().toString().contains("b") && a.getId().toString().hashCode()%2 ==0){
+//			
+//			cp.r = 255;
+//			cp.g = 255-nr;
+//			cp.b = 0;
+//			cp.a = 255;
+//		} else if (a.getId().toString().contains("d")) { 
+//			cp.r = nr-nr;
+//			cp.g = 0;
+//			cp.b = 255;
+//			cp.a = 255;
+//		}else {
+//			cp.r = 0;
+//			cp.g = 255;
+//			cp.b = 255-nr;
+//			cp.a = 255;
+//		}
 //		if (a.getId().toString().contains("b")){
 //			cp.r = 255;
 //			cp.g = 255;
@@ -418,6 +428,13 @@ public class EventBasedVisDebuggerEngine implements CASimAgentConstructEventHand
 		//		cp.b = 0;
 		//		cp.a = 255;
 		//		cp.fill = false;
+		
+//		if (a.getId().toString().equals("a118")) {
+//			cp.r = 255;
+//			cp.g = 0;
+//			cp.b = 0;
+//			cp.a = 255;
+//		}
 		this.circleProperties.put(a.getId(), cp);
 	}
 

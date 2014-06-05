@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CASimpleAgent.java
+ * RunController.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,55 +18,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.casim.simulation.physics;
+package playground.gregor;
 
-import java.util.List;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-
-public class CASimpleAgent extends CAAgent {
-
-	private final List<Link> links;
-	private int next;
-	private final Id id;
-	private CALink link;
-
-	public CASimpleAgent(List<Link> links, int i, Id id, CALink caLink) {
-		super(id);
-		this.links = links;
-		this.next = i;
-		this.id = id;
-		this.link = caLink;
-	}
-
-	@Override
-	Id getNextLinkId() {
-		return this.links.get(this.next).getId();
-	}
-
-	@Override
-	void moveOverNode(CALink link, double time) {
-//		System.out.println("DEBUG");
-//		if (this.id.toString().equals("46") && link.getLink().getId().toString().equals("7") && time > 300){
-//			System.out.println("DEBUG");
-//		}
-		this.link = link;
-		this.next++;
-		if (this.next == this.links.size()) {
-			this.next = 2;
-		}
-//		System.out.println(this.next);
-	}
-
-	@Override
-	public String toString() {
-		return "a:"+this.id;
-	}
-		
+public class RunController {
 	
-	@Override
-	public CALink getCurrentLink() {
-		return this.link;
+	public static void main(String [] args) {
+		String config = "/Users/laemmel/devel/GRIPS/input/config.xml";
+		Config c = ConfigUtils.createConfig();
+		ConfigUtils.loadConfig(c, config);
+		Scenario sc = ScenarioUtils.createScenario(c);
+		ScenarioUtils.loadScenario(sc);
+		Controler cntr = new Controler(sc);
+//		cntr.setOverwriteFiles(true);
+//		TollHandler tollHandler = new TollHandler(cntr.getScenario());
+//		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+//		cntr.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+//		cntr.addControlerListener(new MarginalCostPricing( (ScenarioImpl) cntr.getScenario(), tollHandler ));
+		cntr.run();
 	}
+
 }
