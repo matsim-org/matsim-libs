@@ -24,6 +24,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
 
+/**
+ * A hashmap that stores more than one value under the same key.
+ *  
+ * @author pboesch
+ *
+ * @param <K>	key
+ * @param <V>	value
+ */
 public final class BoxedHashMap<K, V> {
 	
 	private HashMap<K, ArrayList<V>> boxedHashMap;
