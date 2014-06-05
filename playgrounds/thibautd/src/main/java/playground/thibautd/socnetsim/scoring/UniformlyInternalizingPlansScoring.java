@@ -66,7 +66,7 @@ public class UniformlyInternalizingPlansScoring implements ScoringListener, Iter
 			final EventsManager events,
 			final ScoringFunctionFactory scoringFunctionFactory) {
 		this( new ConfigBasedInternalizationRatio(
-					sc.getConfig() ),
+				sc.getConfig() ),
 				sc,
 				events,
 				scoringFunctionFactory );
