@@ -22,7 +22,7 @@ package playground.gregor.sim2d_v4.cgal;
 
 public interface TwoDObject {
 	
-	public double getXLocation();
-	public double getYLocation();
+	public double getX();
+	public double getY();
 
 }

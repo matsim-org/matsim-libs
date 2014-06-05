@@ -161,12 +161,12 @@ public class VDTester implements XYVxVyEventsHandler, IterationEndsListener{
 		}
 
 		@Override
-		public double getXLocation() {
+		public double getX() {
 			return this.e.getX();
 		}
 
 		@Override
-		public double getYLocation() {
+		public double getY() {
 			return this.e.getY();
 		}
 

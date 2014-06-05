@@ -97,8 +97,8 @@ public class VoronoiDiagramCells <T extends VoronoiCenter> {
 
 		int idx = 0;
 		for (T point : points) {
-			double xx = point.getXLocation();
-			double yy = point.getYLocation();
+			double xx = point.getX();
+			double yy = point.getY();
 			VoronoiCell vc = new VoronoiCell(point,idx);
 			point.setVoronoiCell(vc);
 			ca[idx] = vc;
@@ -156,7 +156,7 @@ public class VoronoiDiagramCells <T extends VoronoiCenter> {
 					this.qt.put(ed.x2, ed.y2, new Coordinate(ed.x2,ed.y2));
 				}
 			}
-			if (this.qt.size() == 0 && vc.getGraphEdges().size() > 0 && this.envelope.contains(vc.getVoronoiCenter().getXLocation(),vc.getVoronoiCenter().getYLocation())) {
+			if (this.qt.size() == 0 && vc.getGraphEdges().size() > 0 && this.envelope.contains(vc.getVoronoiCenter().getX(),vc.getVoronoiCenter().getY())) {
 				vc.setIsClosed(true);
 				ret.add(vc);
 				debug(vc.getGraphEdges(),((T) vc.getVoronoiCenter()));

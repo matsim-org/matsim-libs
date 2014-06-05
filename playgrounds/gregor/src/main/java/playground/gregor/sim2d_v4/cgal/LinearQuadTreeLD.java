@@ -146,13 +146,13 @@ public class LinearQuadTreeLD {
 		List<TwoDObject> oNW = new ArrayList<TwoDObject>();
 		List<TwoDObject> oSW = new ArrayList<TwoDObject>();
 		for (TwoDObject o : quad.getObjects()) {
-			if (eSE.contains(o.getXLocation(), o.getYLocation())){
+			if (eSE.contains(o.getX(), o.getY())){
 				oSE.add(o);
-			} else if (eNE.contains(o.getXLocation(), o.getYLocation())){
+			} else if (eNE.contains(o.getX(), o.getY())){
 				oNE.add(o);
-			} else if (eNW.contains(o.getXLocation(), o.getYLocation())){
+			} else if (eNW.contains(o.getX(), o.getY())){
 				oNW.add(o);
-			} else if (eSW.contains(o.getXLocation(), o.getYLocation())){
+			} else if (eSW.contains(o.getX(), o.getY())){
 				oSW.add(o);
 			} else {
 				//				log.warn("Object: " + o + " seems to be out of boundary of quad:" + quad);
@@ -572,12 +572,12 @@ public class LinearQuadTreeLD {
 		double y;
 		
 		@Override
-		public double getXLocation() {
+		public double getX() {
 			return this.x;
 		}
 
 		@Override
-		public double getYLocation() {
+		public double getY() {
 			return this.y;
 		}
 		

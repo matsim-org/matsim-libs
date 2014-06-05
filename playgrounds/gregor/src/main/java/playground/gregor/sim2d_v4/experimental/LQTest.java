@@ -63,12 +63,12 @@ public class LQTest {
 		}
 
 		@Override
-		public double getXLocation() {
+		public double getX() {
 			return this.x;
 		}
 
 		@Override
-		public double getYLocation() {
+		public double getY() {
 			return this.y;
 		}
 		

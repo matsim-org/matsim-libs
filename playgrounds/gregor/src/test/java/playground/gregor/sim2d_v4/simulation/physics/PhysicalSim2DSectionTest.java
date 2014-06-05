@@ -279,12 +279,12 @@ public class PhysicalSim2DSectionTest {
 		}
 
 		@Override
-		public double getXLocation() {
+		public double getX() {
 			return this.pos[0];
 		}
 
 		@Override
-		public double getYLocation() {
+		public double getY() {
 			return this.pos[1];
 		}
 

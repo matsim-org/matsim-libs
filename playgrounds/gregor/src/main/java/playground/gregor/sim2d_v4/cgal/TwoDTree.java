@@ -119,7 +119,7 @@ public class TwoDTree<T extends TwoDObject> {
 
 		private boolean insert(T val) {
 
-			if (this.envelope.intersects(val.getXLocation(), val.getYLocation())) {
+			if (this.envelope.intersects(val.getX(), val.getY())) {
 				if (!this.internalNode) {
 					this.cache.add(val);
 					if (this.cache.size() >= TwoDNode.cacheSize && this.depth < this.maxDepth) {
@@ -137,7 +137,7 @@ public class TwoDTree<T extends TwoDObject> {
 		}
 
 		public void remove(T val) {
-			if (this.envelope.intersects(val.getXLocation(), val.getYLocation())) {
+			if (this.envelope.intersects(val.getX(), val.getY())) {
 
 				if (this.internalNode) {
 					this.left.remove(val);
@@ -171,7 +171,7 @@ public class TwoDTree<T extends TwoDObject> {
 				ret.addAll(this.right.get(e));
 			} else {
 				for (T val : this.cache) {
-					if (e.intersects(val.getXLocation(), val.getYLocation())) {
+					if (e.intersects(val.getX(), val.getY())) {
 						ret.add(val);
 					}
 				}				
@@ -196,7 +196,7 @@ public class TwoDTree<T extends TwoDObject> {
 				Iterator<T> it = this.cache.iterator();
 				while (it.hasNext()) {
 					T next = it.next();
-					double x = next.getXLocation();
+					double x = next.getX();
 					xs[idx++] = x;
 				}
 				Arrays.sort(xs);
@@ -218,7 +218,7 @@ public class TwoDTree<T extends TwoDObject> {
 				Iterator<T> it = this.cache.iterator();
 				while (it.hasNext()) {
 					T next = it.next();
-					double y = next.getYLocation();
+					double y = next.getY();
 					ys[idx++] = y;
 				}
 				Arrays.sort(ys);
@@ -284,7 +284,7 @@ public class TwoDTree<T extends TwoDObject> {
 		for (int i = 0; i < 1000; i ++) {
 			QuadTree<TwoDObj> quadTree = new QuadTree<TwoDObj>(-100,-100,100,100);
 			for (TwoDObj o : os) {
-				quadTree.put(o.getXLocation(), o.getYLocation(), o);
+				quadTree.put(o.getX(), o.getY(), o);
 			}
 		}
 		long stop = System.nanoTime();
@@ -303,7 +303,7 @@ public class TwoDTree<T extends TwoDObject> {
 		QuadTree<TwoDObj> quadTree = new QuadTree<TwoDObj>(-100,-100,100,100);
 		TwoDTree<TwoDObj> twoDTree = new TwoDTree<TwoDObj>(e);
 		for (TwoDObj o : os) {
-			quadTree.put(o.getXLocation(), o.getYLocation(), o);
+			quadTree.put(o.getX(), o.getY(), o);
 		}
 		twoDTree.buildTwoDTree(os);
 
@@ -359,12 +359,12 @@ public class TwoDTree<T extends TwoDObject> {
 		}
 
 		@Override
-		public double getXLocation() {
+		public double getX() {
 			return this.x;
 		}
 
 		@Override
-		public double getYLocation() {
+		public double getY() {
 			return this.y;
 		}
 

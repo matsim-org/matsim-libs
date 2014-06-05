@@ -24,9 +24,10 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 
+import playground.gregor.sim2d_v4.cgal.TwoDObject;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 
-public class XYVxVyEventImpl extends Event {
+public class XYVxVyEventImpl extends Event implements TwoDObject {
 
 	public static final String EVENT_TYPE = "XYVxVyEvent";
 	public static final String ATTRIBUTE_X = "x";
@@ -77,10 +78,12 @@ public class XYVxVyEventImpl extends Event {
 		return attr;
 	}
 	
+	@Override
 	public double getX() {
 		return this.x;
 	}
 
+	@Override
 	public double getY() {
 		return this.y;
 	}

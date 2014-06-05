@@ -46,10 +46,10 @@ public class VoronoiCell {
 	}
 	
 	public double getPointX() {
-		return this.c.getXLocation();
+		return this.c.getX();
 	}
 	public double getPointY() {
-		return this.c.getYLocation();
+		return this.c.getY();
 	}
 	
 	public double getArea() {
