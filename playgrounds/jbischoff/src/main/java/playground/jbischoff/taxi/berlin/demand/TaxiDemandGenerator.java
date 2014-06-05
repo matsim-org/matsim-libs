@@ -127,7 +127,7 @@ public class TaxiDemandGenerator
         catch (IOException e) {
             e.printStackTrace();
         }
-        this.odd = new ODDemandGenerator(scenario, new BerlinTaxiActivityCreator(scenario),new DefaultPersonCreator(scenario), zones);
+        this.odd = new ODDemandGenerator(scenario, new BerlinTaxiActivityCreator(scenario),new DefaultPersonCreator(scenario,"p%05d"), zones);
 
     }
 
