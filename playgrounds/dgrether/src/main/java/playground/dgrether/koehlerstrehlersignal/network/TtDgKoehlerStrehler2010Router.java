@@ -50,6 +50,39 @@ public class TtDgKoehlerStrehler2010Router {
 
 	private static final class SimpleTravelTimeDisutility implements TravelTime, TravelDisutility {
 
+		/**
+		 * 
+		 * @param link
+		 * @return free speed travel time
+		 */
+		private double calcTravelDistance(Link link) {
+			return link.getLength()/link.getFreespeed();
+		}
+		
+		@Override
+		public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
+			return this.calcTravelDistance(link);
+		}
+
+		@Override
+		public double getLinkMinimumTravelDisutility(Link link) {
+			return this.calcTravelDistance(link);
+		}
+
+		@Override
+		public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+			return this.calcTravelDistance(link);
+		}
+		
+	};
+	
+	private static final class SimpleTravelDistanceDisutility implements TravelTime, TravelDisutility {
+
+		/**
+		 * 
+		 * @param link
+		 * @return travel distance
+		 */
 		private double calcTravelDistance(Link link) {
 			return link.getLength();
 		}
@@ -135,10 +168,27 @@ public class TtDgKoehlerStrehler2010Router {
 	private static final Logger log = Logger.getLogger(TtDgKoehlerStrehler2010Router.class);
 	
 	private List<Path> shortestPaths = new LinkedList<Path>();
+	private boolean useFreeSpeedTravelTime = true;
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param useFreeSpeedTravelTime a flag for dijkstras cost function:
+	 * if true, dijkstra will use the free speed travel time, if false, dijkstra will use the travel distance
+	 */
+	public TtDgKoehlerStrehler2010Router(boolean useFreeSpeedTravelTime){
+		this.useFreeSpeedTravelTime = useFreeSpeedTravelTime;
+	}
 	
 	public List<Id> routeCommodities(Network network, DgCommodities commodities) {
 		SimpleTravelTimeDisutility travelTime = new SimpleTravelTimeDisutility();
-		Dijkstra dijkstra = new Dijkstra(network, travelTime, travelTime);
+		SimpleTravelDistanceDisutility travelDistance = new SimpleTravelDistanceDisutility();
+		Dijkstra dijkstra = null;
+		if (this.useFreeSpeedTravelTime)	
+			dijkstra = new Dijkstra(network, travelTime, travelTime);
+		else
+			dijkstra = new Dijkstra(network, travelDistance, travelDistance);
+		
 		List<Id> invalidCommodities = new ArrayList<Id>();
 		for (DgCommodity commodity : commodities.getCommodities().values()){
 			Node fromNode = network.getNodes().get(commodity.getSourceNodeId());

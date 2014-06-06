@@ -34,10 +34,12 @@ public class SignalizedNodesSpeedFilter implements NetworkLinkFilter {
 
 	private Set<Id> signalizedNodes;
 	private Set<Id> shortestPathLinkIds;
-
-	public SignalizedNodesSpeedFilter(Set<Id> signalizedNodes, Set<Id> shortestPathLinkIds) {
+	private double freeSpeedFilter;
+	
+	public SignalizedNodesSpeedFilter(Set<Id> signalizedNodes, Set<Id> shortestPathLinkIds, double freeSpeedFilter) {
 		this.signalizedNodes = signalizedNodes;
 		this.shortestPathLinkIds = shortestPathLinkIds;
+		this.freeSpeedFilter = freeSpeedFilter;
 	}
 
 	@Override
@@ -50,7 +52,7 @@ public class SignalizedNodesSpeedFilter implements NetworkLinkFilter {
 		if (this.signalizedNodes.contains(fromNodeId) || this.signalizedNodes.contains(toNodeId)) {
 			return true;
 		}
-		if (l.getFreespeed() > 10.0) {
+		if (l.getFreespeed() > this.freeSpeedFilter) {
 			return true;
 		}
 		return false;

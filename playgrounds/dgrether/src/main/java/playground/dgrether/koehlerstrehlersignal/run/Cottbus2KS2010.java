@@ -61,32 +61,38 @@ public class Cottbus2KS2010 {
 	public static final String LANES_FILENAME = DgPaths.REPOS
 			+ "shared-svn/projects/cottbus/cottbus_scenario/lanes.xml";
 
+	// change run number here to use another base case
 	public static final String POPULTATION_FILENAME = DgPaths.REPOS
-			+ "runs-svn/run1712/1712.output_plans.xml.gz";
-
-	// public static final String POPULTATION_FILENAME = DgPaths.REPOS +
-	// "runs-svn/run1722/1722.output_plans.xml.gz";
+			+ "runs-svn/run1728/1728.output_plans.xml.gz";
 
 	public static final CoordinateReferenceSystem CRS = MGC
 			.getCRS(TransformationFactory.WGS84_UTM33N);
 
 	public static void main(String[] args) throws Exception {
-		// parameters
-		int cellsX = 5;
-		int cellsY = 5;
-		double signalsBoundingBoxOffset = 50.0;
-		double cuttingBoundingBoxOffset = 50.0; // an offset >= 31000.0 results in a bounding box that contains the hole network
+		/* parameters for the time interval*/
 		double startTime = 5.5 * 3600.0;
 		double endTime = 9.5 * 3600.0;
 		// double startTime = 13.5 * 3600.0;
 		// double endTime = 18.5 * 3600.0;
-		double matsimPopSampleSize = 1.0;
-		double ksModelCommoditySampleSize = 1.0;
-		double minCommodityFlow = 1.0;
-		String name = "run run1722 output plans between 05:30 and 09:30";
-		// String name = "run run1722 output plans between 13:30 and 18:30";
+		/* parameters for the network area */
+		double signalsBoundingBoxOffset = 50.0;
+		double cuttingBoundingBoxOffset = 50.0; // an offset >= 31000.0 results in a bounding box that contains the hole network
+		/* parameters for the interior link filter */
+		double freeSpeedFilter = 15.0; // the minimal free speed value for the interior link filter in m/s
+		boolean useFreeSpeedTravelTime = true; // a flag for dijkstras cost function: if true, dijkstra will use the free speed travel time, if false, dijkstra will use the travel distance as cost function
+		/* parameters for the demand filter */
+		double matsimPopSampleSize = 1.0; // 100% sample
+		double ksModelCommoditySampleSize = 1.0; // 1 vehicle is equivalent to 1 unit of flow
+		double minCommodityFlow = 50.0; // only commodities with at least this demand will be optimized in the BTU model
+		int cellsX = 5;
+		int cellsY = 5;	
+		/* other parameters */
+		String name = "run run1728 output plans between 05:30 and 09:30";
+		// String name = "run run1728 output plans between 13:30 and 18:30";
+		String spCost = "tt";
+		if (!useFreeSpeedTravelTime) spCost = "dist";
 		final String outputDirectory = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/cb2ks2010/2014-04-11_minflow_"+ minCommodityFlow +"_morning_peak_bb"+ cuttingBoundingBoxOffset + "/";
+				+ "shared-svn/projects/cottbus/cb2ks2010/2014-06-06_minflow_"+ minCommodityFlow +"_morning_peak_speedFilter"+freeSpeedFilter+"_SP_"+spCost+"/"; //+"_bb"+ cuttingBoundingBoxOffset + "/";
 		String ksModelOutputFilename = "ks2010_model_";
 		ksModelOutputFilename += Double.toString(minCommodityFlow) + "_"
 				+ Double.toString(startTime) + "_" + Double.toString(cuttingBoundingBoxOffset) + ".xml";
@@ -102,7 +108,7 @@ public class Cottbus2KS2010 {
 		NetLanesSignalsShrinker scenarioShrinker = new NetLanesSignalsShrinker(
 				fullScenario, CRS);
 		scenarioShrinker.shrinkScenario(outputDirectory, shapeFileDirectory,
-				cuttingBoundingBoxOffset);
+				cuttingBoundingBoxOffset, freeSpeedFilter, useFreeSpeedTravelTime);
 
 		// create the geometry for zones. The geometry itsself is not used, but
 		// the object serves as container for the link -> link OD pairs

@@ -44,14 +44,17 @@ public class DgNetworkShrinker {
 	/**
 	 * reduce the network size: delete all edges
 	 * 1. outside the envelope
-	 * 2. with freespeed <= 10 m/s, that are not on a shortest path (according to travel time) between signalized nodes.
+	 * 2. with freespeed <= given value in m/s (freeSpeedFilter), that are not on a shortest path (according to travel time or distance respectively) between signalized nodes.
 	 * 
 	 * @param net the original network
 	 * @param envelope
 	 * @param networkCrs
+	 * @param freeSpeedFilter the minimal free speed value for the interior link filter in m/s
+	 * @param useFreeSpeedTravelTime a flag for dijkstras cost function:
+	 * if true, dijkstra will use the free speed travel time, if false, dijkstra will use the travel distance as cost function 
 	 * @return the small network
 	 */
-	public Network createSmallNetwork(Network net, Envelope envelope, CoordinateReferenceSystem networkCrs) {
+	public Network createSmallNetwork(Network net, Envelope envelope, CoordinateReferenceSystem networkCrs, double freeSpeedFilter, boolean useFreeSpeedTravelTime) {
 		
 		NetworkFilterManager filterManager = new NetworkFilterManager(net);
 		
@@ -59,8 +62,8 @@ public class DgNetworkShrinker {
 		filterManager.addLinkFilter(new EnvelopeLinkStartEndFilter(envelope));
 		
 		//interior link filter - deletes all edges that are not on a shortest path (according to travel time) between signalized nodes
-		Set<Id> shortestPathLinkIds = new TtSignalizedNodeShortestPath().calcShortestPathLinkIdsBetweenSignalizedNodes(net, signalizedNodes);
-		filterManager.addLinkFilter(new SignalizedNodesSpeedFilter(this.signalizedNodes, shortestPathLinkIds));
+		Set<Id> shortestPathLinkIds = new TtSignalizedNodeShortestPath().calcShortestPathLinkIdsBetweenSignalizedNodes(net, signalizedNodes, useFreeSpeedTravelTime);
+		filterManager.addLinkFilter(new SignalizedNodesSpeedFilter(this.signalizedNodes, shortestPathLinkIds, freeSpeedFilter));
 		
 		Network newNetwork = filterManager.applyFilters();
 		return newNetwork;		

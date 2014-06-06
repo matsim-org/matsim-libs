@@ -171,8 +171,9 @@ public class M2KS2010Converter {
 
 		// write ks-model 
 		new KS2010ModelWriter().write(ksNet, commodities, name, description, outputDirectory + filename);
+		
 		// write commodities from the ks-model as matsim population
-		new TtMorningCommodityAsMatsimPopWriter().writePlansFile(this.network, idConverter, commodities, outputDirectory, filename, startTimeSec, endTimeSec);
+		new TtMorningCommodityAsMatsimPopWriter().writeTripPlansFile(this.network, idConverter, commodities, outputDirectory, filename, startTimeSec, endTimeSec);
 		writeStats(ksNet, commodities, totalFlow, removedCommodities);
 		
 		signalsBoundingBox.writeBoundingBox(shapeFileDirectory + "signals_");

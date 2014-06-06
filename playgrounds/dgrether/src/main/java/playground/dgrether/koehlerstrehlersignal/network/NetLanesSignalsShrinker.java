@@ -83,9 +83,12 @@ public class NetLanesSignalsShrinker {
 	 * @param outputDirectory
 	 * @param shapeFileDirectory
 	 * @param cuttingBoundingBoxOffset
+	 * @param freeSpeedFilter the minimal free speed value for the interior link filter in m/s
+	 * @param useFreeSpeedTravelTime a flag for dijkstras cost function:
+	 * if true, dijkstra will use the free speed travel time, if false, dijkstra will use the travel distance as cost function 
 	 * @throws IOException
 	 */
-	public void shrinkScenario(String outputDirectory, String shapeFileDirectory, double cuttingBoundingBoxOffset) throws IOException{
+	public void shrinkScenario(String outputDirectory, String shapeFileDirectory, double cuttingBoundingBoxOffset, double freeSpeedFilter, boolean useFreeSpeedTravelTime) throws IOException{
 		//Some initialization
 		Set<Id> signalizedNodes = this.getSignalizedNodeIds(((SignalsData) this.fullScenario.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData(), this.fullScenario.getNetwork());
 		DgNetworkUtils.writeNetwork2Shape(fullScenario.getNetwork(), crs, shapeFileDirectory + "network_full");
@@ -96,10 +99,10 @@ public class NetLanesSignalsShrinker {
 				((SignalsData) fullScenario.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData(), cuttingBoundingBoxOffset);
 		cuttingBoundingBox.writeBoundingBox(shapeFileDirectory + "cutting_");
 		
-		//Reduce the network size to the bounding box
+		// reduce the network size to the bounding box and filter interior links
 		DgNetworkShrinker netShrinker = new DgNetworkShrinker();
 		netShrinker.setSignalizedNodes(signalizedNodes);
-		Network smallNetwork = netShrinker.createSmallNetwork(fullScenario.getNetwork(), cuttingBoundingBoxEnvelope, crs);
+		Network smallNetwork = netShrinker.createSmallNetwork(fullScenario.getNetwork(), cuttingBoundingBoxEnvelope, crs, freeSpeedFilter, useFreeSpeedTravelTime);
 		
 		DgNetworkUtils.writeNetwork(smallNetwork, outputDirectory +  smallNetworkFilename);
 		DgNetworkUtils.writeNetwork2Shape(smallNetwork, crs, shapeFileDirectory + "network_small");

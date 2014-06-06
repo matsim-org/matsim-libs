@@ -42,7 +42,15 @@ public class TtSignalizedNodeShortestPath {
 
 	private static final Logger log = Logger.getLogger(TtSignalizedNodeShortestPath.class);
 	
-	public Set<Id> calcShortestPathLinkIdsBetweenSignalizedNodes(Network network, Set<Id> signalizedNodes){
+	/**
+	 * 
+	 * @param network
+	 * @param signalizedNodes
+	 * @param useFreeSpeedTravelTime a flag for dijkstras cost function:
+	 * if true, dijkstra will use the free speed travel time, if false, dijkstra will use the travel distance as cost function
+	 * @return
+	 */
+	public Set<Id> calcShortestPathLinkIdsBetweenSignalizedNodes(Network network, Set<Id> signalizedNodes, boolean useFreeSpeedTravelTime){
 		//create commodities between all signal-pairs
 		DgCommodities signalCommodities = new DgCommodities();
 		for (Id fromSignalId : signalizedNodes){
@@ -65,7 +73,7 @@ public class TtSignalizedNodeShortestPath {
 		}
 
 		//calculate shortest distance paths between all signal-pairs with dijkstra
-		TtDgKoehlerStrehler2010Router ttDgKoehlerStrehler2010Router = new TtDgKoehlerStrehler2010Router();
+		TtDgKoehlerStrehler2010Router ttDgKoehlerStrehler2010Router = new TtDgKoehlerStrehler2010Router(useFreeSpeedTravelTime);
 		List<Id> invalidSignalCommodities = ttDgKoehlerStrehler2010Router.routeCommodities(network, signalCommodities);
 		List<Path> shortestPaths = ttDgKoehlerStrehler2010Router.getShortestPaths();
 		if (invalidSignalCommodities.size() != 0) 
