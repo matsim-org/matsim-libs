@@ -71,6 +71,29 @@ public class MixedLaneTestFixture {
 		id4 = sc.createId("4");
 		link1FirstLaneId = sc.createId("1.ol");
 
+		init();
+	}
+
+	public MixedLaneTestFixture(boolean useLanes){
+		Config config = ConfigUtils.createConfig();
+		config.scenario().setUseLanes(useLanes);
+
+		sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		id0 = sc.createId("0");
+		id1 = sc.createId("1");
+		id2 = sc.createId("2");
+		id3 = sc.createId("3");
+		id4 = sc.createId("4");
+		link1FirstLaneId = sc.createId("1.ol");
+
+		init();
+	}
+
+	/**
+	 * Separate init method so we can also construct this without lanes (for comparison purposes)
+	 */
+	private void init() {
+
 		Network n = sc.getNetwork();
 		NetworkFactoryImpl nb = (NetworkFactoryImpl) n.getFactory();
 

@@ -21,6 +21,7 @@ package org.matsim.lanes;
 
 import junit.framework.Assert;
 
+import org.jfree.util.Log;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -152,6 +153,8 @@ public class MixedLaneTest {
 		Assert.assertNull(handler.link3Event);
 	}
 	
+	private static final double linkEnterOffset = 1.0 ;
+	private static final double linkLeaveOffset = 12.0 ;
 	
 	/**
 	 * Tests if one lane with 2 toLinks produces the correct traffic, i.e. one
@@ -175,21 +178,65 @@ public class MixedLaneTest {
 		Assert.assertEquals(3600.0, handler.agentDepartureEvent.getTime());
 
 		Assert.assertNotNull(handler.link1EnterEvent);
-		Assert.assertEquals(3600.0 + 1.0, handler.link1EnterEvent.getTime());
+		Assert.assertEquals(3600.0 + linkEnterOffset, handler.link1EnterEvent.getTime());
 
-		Assert.assertEquals(3600.0 + 1.0, handler.lane1olEnterEvent.getTime());
+		Assert.assertEquals(3600.0 + linkEnterOffset, handler.lane1olEnterEvent.getTime());
 		Assert.assertEquals(3600.0 + 6.0, handler.lane1olLeaveEvent.getTime());
 		Assert.assertEquals(3600.0 + 6.0, handler.lane1EnterEvent.getTime());
-		Assert.assertEquals(3600.0 + 12.0, handler.lane1LeaveEvent.getTime());
+		Assert.assertEquals(3600.0 + linkLeaveOffset, handler.lane1LeaveEvent.getTime());
 		
 		Assert.assertNotNull(handler.link2Event);
 		Assert.assertEquals(this.fixture.id1, handler.link2Event.getPersonId());
-		Assert.assertEquals(3600.0 + 12.0, handler.link2Event.getTime());
+		Assert.assertEquals(3600.0 + linkLeaveOffset, handler.link2Event.getTime());
 
 		Assert.assertNotNull(handler.link3Event);
 		Assert.assertEquals(this.fixture.id2, handler.link3Event.getPersonId());
-		Assert.assertEquals(3600.0 + 12.0, handler.link3Event.getTime());
+		Assert.assertEquals(3600.0 + linkLeaveOffset, handler.link3Event.getTime());
 	}
+
+	/**
+	 * Tests if a regular link generates the same output as the lane test above.
+	 *   
+	 * @author nagel,thunig
+	 */
+	@Test
+	public void testLink2PersonsDriving() {
+		Log.info("starting testLink2PersonsDriving()");
+		
+		@SuppressWarnings("hiding")
+		MixedLaneTestFixture fixture = new MixedLaneTestFixture(false);
+		
+		fixture.create2PersonPopulation();
+		EventsManager events = EventsUtils.createEventsManager();
+
+//		events.addHandler(new LogOutputEventHandler());
+
+		MixedLanesEventsHandler handler = new MixedLanesEventsHandler(fixture);
+		events.addHandler(handler);
+
+		QSim qsim = (QSim) new QSimFactory().createMobsim(fixture.sc, events);
+		qsim.run();
+		
+		Assert.assertNotNull(handler.agentDepartureEvent);
+		Assert.assertEquals(3600.0, handler.agentDepartureEvent.getTime());
+
+		Assert.assertNotNull(handler.link1EnterEvent);
+		Assert.assertEquals(3600.0 + linkEnterOffset, handler.link1EnterEvent.getTime());
+
+//		Assert.assertEquals(3600.0 + linkEnterOffset, handler.lane1olEnterEvent.getTime());
+//		Assert.assertEquals(3600.0 + 6.0, handler.lane1olLeaveEvent.getTime());
+//		Assert.assertEquals(3600.0 + 6.0, handler.lane1EnterEvent.getTime());
+//		Assert.assertEquals(3600.0 + linkLeaveOffset, handler.lane1LeaveEvent.getTime());
+		
+		Assert.assertNotNull(handler.link2Event);
+		Assert.assertEquals(fixture.id1, handler.link2Event.getPersonId());
+		Assert.assertEquals(3600.0 + linkLeaveOffset, handler.link2Event.getTime());
+
+		Assert.assertNotNull(handler.link3Event);
+		Assert.assertEquals(fixture.id2, handler.link3Event.getPersonId());
+		Assert.assertEquals(3600.0 + linkLeaveOffset, handler.link3Event.getTime());
+	}
+
 
 	/**
 	 * Tests if a capacity restriction works as expected with the setup of the previous test. 
