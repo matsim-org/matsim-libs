@@ -30,14 +30,24 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
+import playground.ivt.utils.ArgParser;
+import playground.ivt.utils.ArgParser.Args;
+
 /**
  * @author thibautd
  */
 public class FilterDefaultSubpopulation {
 	public static void main(final String[] args) {
-		final String inPlansFile = args[ 0 ];
-		final String inAttributes = args[ 1 ];
-		final String outPlansFile = args[ 2 ];
+		final ArgParser parser = new ArgParser();
+
+		parser.setDefaultValue( "-p" , "--in-plans-file" , null );
+		parser.setDefaultValue( "-a" , "--in-atts-file" , null );
+		parser.setDefaultValue( "-o" , "--out-plans-file" , null );
+
+		final Args parsed = parser.parseArgs( args );
+		final String inPlansFile = parsed.getValue( "-p" );
+		final String inAttributes = parsed.getValue( "-a" );
+		final String outPlansFile = parsed.getValue( "-o" );
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		((PopulationImpl) sc.getPopulation()).setIsStreaming( true );
