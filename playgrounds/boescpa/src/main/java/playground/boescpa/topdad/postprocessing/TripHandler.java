@@ -21,13 +21,17 @@ package playground.boescpa.topdad.postprocessing;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
@@ -37,15 +41,20 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
  * 
  * @author boescpa
  * 
- * IMPORTANT: This is an adapted version of staheale's class 'TripHandler'.
+ * IMPORTANT: This is an adapted and extended version of staheale's class 'TripHandler'.
  * 
  */
-public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
-
+public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler,
+		ActivityStartEventHandler, PersonStuckEventHandler, LinkLeaveEventHandler {
+	
+	// TODO cut it to Zurich region!
+	// TODO create "path" for pt and transit_walk too! {Will have to adapt TestMainTripCreator if this is done...}
+	
 	BoxedHashMap<Id,Id> startLink;
+	BoxedHashMap<Id,Double> startTime;
 	BoxedHashMap<Id,String> mode;
 	BoxedHashMap<Id,String> purpose;
-	BoxedHashMap<Id,Double> startTime;
+	BoxedHashMap<Id,LinkedList<Id>> path;
 	BoxedHashMap<Id,Id> endLink;
 	BoxedHashMap<Id,Double> endTime;
 
@@ -58,7 +67,11 @@ public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEv
 	public BoxedHashMap<Id, Id> getStartLink() {
 		return startLink;
 	}
-
+	
+	public BoxedHashMap<Id, Double> getStartTime() {
+		return startTime;
+	}
+	
 	public BoxedHashMap<Id, String> getMode() {
 		return mode;
 	}
@@ -66,11 +79,11 @@ public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEv
 	public BoxedHashMap<Id, String> getPurpose() {
 		return purpose;
 	}
-
-	public BoxedHashMap<Id, Double> getStartTime() {
-		return startTime;
+	
+	public BoxedHashMap<Id, LinkedList<Id>> getPath() {
+		return path;
 	}
-
+	
 	public BoxedHashMap<Id, Id> getEndLink() {
 		return endLink;
 	}
@@ -82,9 +95,10 @@ public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEv
 	@Override
 	public void reset(int iteration) {
 		startLink = new BoxedHashMap<Id, Id>();
+		startTime = new BoxedHashMap<Id, Double>();
 		mode = new BoxedHashMap<Id, String>();
 		purpose = new BoxedHashMap<Id, String>();
-		startTime = new BoxedHashMap<Id, Double>();
+		path = new BoxedHashMap<Id, LinkedList<Id>>();
 		endLink = new BoxedHashMap<Id, Id>();
 		endTime = new BoxedHashMap<Id, Double>();
 		ptStageEndLinkId = new HashMap<Id, Id>();
@@ -115,8 +129,9 @@ public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEv
 			// do not add a transit walk trip if it's only a stage
 			if (!ptTripList.contains(event.getPersonId())) {
 				startLink.put(event.getPersonId(), event.getLinkId());
-				mode.put(event.getPersonId(), event.getLegMode());
 				startTime.put(event.getPersonId(), event.getTime());
+				mode.put(event.getPersonId(), event.getLegMode());
+				path.put(event.getPersonId(), new LinkedList<Id>());
 				// set endLink and endTime to null (in case an agent enters a pt vehicle and the pt vehicle is stuck in the end)
 				if (!endInitialisedList.contains(event.getPersonId())) {
 					endLink.put(event.getPersonId(), null);
@@ -129,8 +144,7 @@ public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEv
 			else {
 				//replace transit walk mode with pt
 				ArrayList<String> personModes = mode.getValues(event.getPersonId());
-				if (!personModes.get(personModes.size()).equals("pt")) {
-					
+				if (!personModes.get(personModes.size()-1).equals("pt")) {
 					personModes.set((personModes.size()-1), "pt");
 				}
 			}
@@ -145,8 +159,9 @@ public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEv
 			// do not add a transit walk trip if it's only a stage
 			if (!ptTripList.contains(event.getPersonId())) {
 				startLink.put(event.getPersonId(), event.getLinkId());
-				mode.put(event.getPersonId(), event.getLegMode());
 				startTime.put(event.getPersonId(), event.getTime());
+				mode.put(event.getPersonId(), event.getLegMode());
+				path.put(event.getPersonId(), new LinkedList<Id>());
 				// set endLink and endTime to null (in case an agent enters a pt vehicle and the pt vehicle is stuck in the end)
 				if (!endInitialisedList.contains(event.getPersonId())) {
 					endLink.put(event.getPersonId(), null);
@@ -159,8 +174,9 @@ public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEv
 		// handle other trips
 		else {
 			startLink.put(event.getPersonId(), event.getLinkId());
-			mode.put(event.getPersonId(), event.getLegMode());
 			startTime.put(event.getPersonId(), event.getTime());
+			mode.put(event.getPersonId(), event.getLegMode());
+			path.put(event.getPersonId(), new LinkedList<Id>());
 		}
 
 	}
@@ -200,5 +216,13 @@ public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEv
 		endLink.put(event.getPersonId(), event.getLinkId());
 		endTime.put(event.getPersonId(), event.getTime());
 		purpose.put(event.getPersonId(), "stuck");
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
+		ArrayList<LinkedList<Id>> al = path.getValues(event.getPersonId());
+		LinkedList<Id> currentPath = al.get(al.size()-1);
+		currentPath.add(event.getLinkId());
 	}
 }
