@@ -27,7 +27,8 @@ import org.matsim.core.config.experimental.ReflectiveModule;
 public class PseudoSimConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME = "pseudoSim";
 
-	private boolean isUsePSimAtAll = false;
+	public static enum PSimType { none , detailled , teleported; }
+	private PSimType psimType = PSimType.none;
 	private int nPSimIters = 5;
 	private int period = 3;
 	private int nThreads = 1;
@@ -37,14 +38,14 @@ public class PseudoSimConfigGroup extends ReflectiveModule {
 		super( GROUP_NAME );
 	}
 
-	@StringGetter( "isUsePSimAtAll" )
-	public boolean isIsUsePSimAtAll() {
-		return this.isUsePSimAtAll;
+	@StringGetter( "pSimType" )
+	public PSimType getPsimType() {
+		return psimType;
 	}
 
-	@StringSetter( "isUsePSimAtAll" )
-	public void setIsUsePSimAtAll(boolean isUsePSimAtAll) {
-		this.isUsePSimAtAll = isUsePSimAtAll;
+	@StringSetter( "pSimType" )
+	public void setPsimType(PSimType psimType) {
+		this.psimType = psimType;
 	}
 
 	@StringGetter( "nPSimIters" )

@@ -42,6 +42,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -83,6 +84,7 @@ import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkReader;
 import playground.thibautd.socnetsim.qsim.JointPseudoSimFactory;
+import playground.thibautd.socnetsim.qsim.JointTeleportationSimFactory;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
@@ -536,9 +538,12 @@ public class RunUtils {
 		final PseudoSimConfigGroup pSimConf = (PseudoSimConfigGroup)
 					config.getModule( PseudoSimConfigGroup.GROUP_NAME );
 
-		return  pSimConf.isIsUsePSimAtAll() ?
-			initializePSimController( controllerRegistry ) :
-			initializeNonPSimController( controllerRegistry );
+		switch ( pSimConf.getPsimType() ) {
+		case none:
+			return initializeNonPSimController( controllerRegistry );
+		default:
+			return initializePSimController( controllerRegistry );
+		}
 	}
 
 	public static ImmutableJointController initializePSimController(
@@ -566,13 +571,27 @@ public class RunUtils {
 					innovativeStrategyRegistry );
 
 		// create controler
+		MobsimFactory factory;
+		
+		final PseudoSimConfigGroup pSimConf = (PseudoSimConfigGroup)
+					controllerRegistry.getScenario().getConfig().getModule(
+							PseudoSimConfigGroup.GROUP_NAME );
+		switch ( pSimConf.getPsimType() ) {
+		case detailled:
+			factory = new JointPseudoSimFactory( controllerRegistry.getTravelTime() );
+			break;
+		case teleported:
+			factory = new JointTeleportationSimFactory( );
+			break;
+		default:
+			throw new RuntimeException();
+		}
 		final GroupReplanningListennerWithPSimLoop listenner =
 					new GroupReplanningListennerWithPSimLoop(
 						controllerRegistry,
 						mainStrategyManager,
 						innovativeStrategyManager,
-						new JointPseudoSimFactory( 
-							controllerRegistry.getTravelTime()) );
+						factory );
 		final ImmutableJointController controller =
 			new ImmutableJointController(
 					controllerRegistry,
