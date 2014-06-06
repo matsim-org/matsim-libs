@@ -513,7 +513,7 @@ implements ShutdownListener, StartupListener {
 	}
 
 	// new .... testing
-	public void writeResultsToSubdirectory(String subdirectory) {
+	public void useSubdirectoryWithName(String subdirectory) {
 		this.subdirectory = subdirectory;
 	}
 	// end new
