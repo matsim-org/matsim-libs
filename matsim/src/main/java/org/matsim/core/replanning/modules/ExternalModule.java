@@ -58,6 +58,10 @@ import java.util.Map;
  */
 public class ExternalModule implements PlanStrategyModule {
 
+    interface ExeRunnerDelegate {
+        public boolean invoke();
+    }
+
 	private static final String SCENARIO = "scenario";
 	private static final String SCENARIO_INPUT_PLANS_FILENAME = "inputPlansFilename";
 	private static final String SCENARIO_WORKING_PLANS_FILENAME = "workingPlansFilename";
@@ -69,8 +73,8 @@ public class ExternalModule implements PlanStrategyModule {
 	private static final String ExternalConfigFileName = "config.xml";
 
 	private final Scenario scenario;
-	private String exePath = "";
-	private String moduleId = "";
+    private final ExeRunnerDelegate exeRunnerDelegate;
+    private String modulePrefix = "";
 	private String outFileRoot = "";
 
 	private final OutputDirectoryHierarchy controler;
@@ -81,20 +85,33 @@ public class ExternalModule implements PlanStrategyModule {
 	
 	private Map<Id, Plan> plansToMutate = new HashMap<Id, Plan>();
 
-
 	public ExternalModule(final String exePath, final String moduleId, final OutputDirectoryHierarchy controler, final Scenario scenario) {
-		this.exePath = exePath;
-		this.moduleId = moduleId + "_";
+        this.modulePrefix = moduleId + "_";
 		this.controler = controler;
 		this.outFileRoot = controler.getTempPath() + "/";
 		this.scenario = scenario;
+        this.exeRunnerDelegate = new ExeRunnerDelegate() {
+            @Override
+            public boolean invoke() {
+                String cmd = exePath + " " + outFileRoot + modulePrefix + ExternalConfigFileName;
+                String logfilename = controler.getIterationFilename(currentIteration, modulePrefix + "stdout.log");
+                return (ExeRunner.run(cmd, logfilename, 3600) == 0);
+            }
+        };
 	}
+
+    ExternalModule(ExeRunnerDelegate exeRunnerDelegate, final String moduleId, final OutputDirectoryHierarchy controler, final Scenario scenario) {
+        this.modulePrefix = moduleId + "_";
+        this.controler = controler;
+        this.outFileRoot = controler.getTempPath() + "/";
+        this.scenario = scenario;
+        this.exeRunnerDelegate = exeRunnerDelegate;
+    }
 
 	@Override
 	public void prepareReplanning(ReplanningContext replanningContext) {
 		this.currentIteration = replanningContext.getIteration();
 		this.exportPopulation = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
-
 	}
 
 	@Override
@@ -114,27 +131,22 @@ public class ExternalModule implements PlanStrategyModule {
 	@Override
 	public void finishReplanning() {
 		exportPopulation();
-		if (callExe()) {
+        prepareExternalExeConfig();
+        boolean successful = this.exeRunnerDelegate.invoke();
+        if (successful) {
 			importPopulationAndMutatePlans();
 		} else {
 			throw new RuntimeException("External Replanning exited with error.");
 		}
 	}
 
-	private void exportPopulation() {
-		String filename = this.outFileRoot + this.moduleId + ExternalInFileName;
+    private void exportPopulation() {
+		String filename = this.outFileRoot + this.modulePrefix + ExternalInFileName;
 		PopulationWriter plansWriter = new PopulationWriter(exportPopulation, scenario.getNetwork());
 		plansWriter.write(filename);
 	}
 
-	private boolean callExe() {
-		prepareExternalExeConfig();
-		String cmd = this.exePath + " " + this.outFileRoot + this.moduleId + ExternalConfigFileName;
-		String logfilename = this.controler.getIterationFilename(this.currentIteration, this.moduleId + "stdout.log");
-		return (ExeRunner.run(cmd, logfilename, 3600) == 0);
-	}
-
-	private void prepareExternalExeConfig() {
+    private void prepareExternalExeConfig() {
 		Config extConfig;
 		String configFileName = this.scenario.getConfig().strategy().getExternalExeConfigTemplate();
 		if (configFileName == null) {
@@ -145,19 +157,19 @@ public class ExternalModule implements PlanStrategyModule {
 			reader.readFile(configFileName);
 		}
 		// Change scenario config according to given output- and input-filenames: events, plans, network
-		extConfig.setParam(SCENARIO, SCENARIO_INPUT_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalInFileName);
-		extConfig.setParam(SCENARIO, SCENARIO_WORKING_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalOutFileName);
+		extConfig.setParam(SCENARIO, SCENARIO_INPUT_PLANS_FILENAME, this.outFileRoot + "/" + this.modulePrefix + ExternalInFileName);
+		extConfig.setParam(SCENARIO, SCENARIO_WORKING_PLANS_FILENAME, this.outFileRoot + "/" + this.modulePrefix + ExternalOutFileName);
 		extConfig.setParam(SCENARIO, SCENARIO_WORKING_EVENTS_TXT_FILENAME, this.controler.getIterationFilename(this.currentIteration - 1, "events.txt"));
 		String networkFilename = this.scenario.getConfig().findParam("network", "inputNetworkFile");
 		extConfig.setParam(SCENARIO, SCENARIO_NETWORK_FILENAME, networkFilename);
-		new ConfigWriter(extConfig).write(this.outFileRoot + this.moduleId + ExternalConfigFileName);
+		new ConfigWriter(extConfig).write(this.outFileRoot + this.modulePrefix + ExternalConfigFileName);
 	}
 
 	private void importPopulationAndMutatePlans() {
 		Scenario dummyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader plansReader = new MatsimPopulationReader(dummyScenario);
 		Population plans = dummyScenario.getPopulation();
-		plansReader.readFile(this.outFileRoot + this.moduleId + ExternalOutFileName);
+		plansReader.readFile(this.outFileRoot + this.modulePrefix + ExternalOutFileName);
 		new UpdatePlansAlgo().run(plans);
 	}
 
@@ -166,6 +178,7 @@ public class ExternalModule implements PlanStrategyModule {
 		public void run(final Person dummyPerson) {
 			Plan newPlan = dummyPerson.getPlans().get(0);
 			Plan planToMutate = plansToMutate.get(dummyPerson.getId());
+            planToMutate.getPlanElements().clear();
 			((PlanImpl) planToMutate).copyFrom(newPlan);
 		}
 	}

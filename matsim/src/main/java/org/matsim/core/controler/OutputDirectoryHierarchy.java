@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package org.matsim.core.controler;
 
-import java.io.File;
-
 import org.apache.log4j.Logger;
+
+import java.io.File;
 /**
  * 
  * Represents the directory hierarchy where the MATSim output goes in.
@@ -52,7 +52,7 @@ public class OutputDirectoryHierarchy {
 	 * 
 	 * @param runId the runId, may be null
 	 * @param overwriteFiles overwrite existing files instead of crashing
-	 * @param outputDirectory the path to the output directory
+	 * @param outputPath the path to the output directory
 	 * @param createDirectories create the directories or abort if they exist
 	 */
 	public OutputDirectoryHierarchy(String outputPath, String runId, boolean overwriteFiles, boolean createDirectories){
@@ -134,8 +134,6 @@ public class OutputDirectoryHierarchy {
 
 	/**
 	 * Creates the path where all iteration-related data should be stored.
-	 * 
-	 * @param iteration
 	 */
 	public final void createIterationDirectory(final int iteration) {
 		File dir = new File(getIterationPath(iteration));
