@@ -26,6 +26,7 @@ import java.util.Random;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -69,7 +70,7 @@ public class JointPseudoSimTest {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testEventsSimilarToQsim() {
+	public void testPSimEventsSimilarToQsim() {
 		if (TRACE) Logger.getLogger( "playground.thibautd" ).setLevel( Level.TRACE );
 		utils.getOutputDirectory(); // intended side effect: delete content
 		final Scenario scenario = createTestScenario();
@@ -105,7 +106,48 @@ public class JointPseudoSimTest {
 				new JointPseudoSimFactory(
 					travelTime ),
 				DUMP_EVENTS ? utils.getOutputDirectory()+"/pSimEvent.xml" : null,
-				travelTime );
+				travelTime,
+				false );
+	}
+
+	@Test @Ignore( "test is too restrictive on what is a correct output..." )
+	public void testTSimEventsSimilarToQsim() {
+		if (TRACE) Logger.getLogger( "playground.thibautd" ).setLevel( Level.TRACE );
+		utils.getOutputDirectory(); // intended side effect: delete content
+		final Scenario scenario = createTestScenario();
+
+		final TravelTimeCalculator travelTime =
+			new TravelTimeCalculator(
+					scenario.getNetwork(),
+					scenario.getConfig().travelTimeCalculator());
+
+		final TripRouterFactory defFact =
+				new TripRouterFactoryBuilderWithDefaults().build(
+							scenario );
+		CompareEventsUtils.testEventsSimilarToQsim(
+				createTestScenario(),
+				new JointPlanRouter(
+					new JointTripRouterFactory(
+						new TripRouterFactoryInternal() {
+							@Override
+							public TripRouter instantiateAndConfigureTripRouter() {
+								return defFact.instantiateAndConfigureTripRouter(
+										new RoutingContextImpl(
+											new TravelTimeAndDistanceBasedTravelDisutility(
+												travelTime.getLinkTravelTimes(),
+												scenario.getConfig().planCalcScore() ), 
+											travelTime.getLinkTravelTimes() ) );
+							}
+						},
+						scenario.getPopulation().getFactory()
+						).instantiateAndConfigureTripRouter(),
+					null ),
+				new JointQSimFactory(),
+				DUMP_EVENTS ? utils.getOutputDirectory()+"/qSimEvent.xml" : null,
+				new JointTeleportationSimFactory(),
+				DUMP_EVENTS ? utils.getOutputDirectory()+"/tSimEvent.xml" : null,
+				travelTime,
+				true );
 	}
 
 	private Scenario createTestScenario() {

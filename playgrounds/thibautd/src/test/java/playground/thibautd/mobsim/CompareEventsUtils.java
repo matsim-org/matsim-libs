@@ -79,7 +79,8 @@ public class CompareEventsUtils {
 				null,
 				pseudoSimFactory,
 				null,
-				travelTime );
+				travelTime,
+				false );
 	}
 
 	/**
@@ -93,11 +94,12 @@ public class CompareEventsUtils {
 			final String eventsFileQSim,
 			final MobsimFactory pseudoSimFactory,
 			final String eventsFilePSim,
-			final TravelTimeCalculator travelTime ) {
+			final TravelTimeCalculator travelTime,
+			final boolean ignoreLinkEvents) {
 
 		final EventsManager events = EventsUtils.createEventsManager();
 
-		final EventStreamComparator handler = new EventStreamComparator();
+		final EventStreamComparator handler = new EventStreamComparator( ignoreLinkEvents );
 		events.addHandler( handler );
 
 		events.addHandler( travelTime );
@@ -181,6 +183,12 @@ public class CompareEventsUtils {
 		private boolean store = true;
 		private final Map< Id , Queue<Event> > eventsPerPerson = new HashMap<Id, Queue<Event>>();
 		private final Map< Id , Queue<Event> > eventsPerVehicle = new HashMap<Id, Queue<Event>>();
+
+		private final boolean ignoreLinkEvents;
+
+		public EventStreamComparator(final boolean ignoreLinkEvents) {
+			this.ignoreLinkEvents = ignoreLinkEvents;
+		}
 
 		@Override
 		public void reset(int iteration) {
@@ -287,6 +295,7 @@ public class CompareEventsUtils {
 
 		@Override
 		public void handleEvent(final Wait2LinkEvent event) {
+			if ( ignoreLinkEvents ) return;
 			handleEvent(
 				eventsPerPerson,
 				event.getPersonId(),
@@ -295,6 +304,7 @@ public class CompareEventsUtils {
 
 		@Override
 		public void handleEvent(final LinkLeaveEvent event) {
+			if ( ignoreLinkEvents ) return;
 			handleEvent(
 				eventsPerPerson,
 				event.getPersonId(),
@@ -303,6 +313,7 @@ public class CompareEventsUtils {
 
 		@Override
 		public void handleEvent(final LinkEnterEvent event) {
+			if ( ignoreLinkEvents ) return;
 			handleEvent(
 				eventsPerPerson,
 				event.getPersonId(),

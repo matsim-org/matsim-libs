@@ -128,7 +128,8 @@ public class PSeudoQSimCompareEventsTest {
 				new QSimWithPseudoEngineFactory(
 					travelTime.getLinkTravelTimes() ),
 				DUMP_EVENTS ? utils.getOutputDirectory()+"/pSimEvent.xml" : null,
-				travelTime );
+				travelTime,
+				false );
 	}
 
 	private Scenario createTestScenario(final boolean useTransit) {
