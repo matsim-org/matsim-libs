@@ -65,7 +65,7 @@ public class MixedLaneTest {
 		Assert.assertEquals(2, lanesLink1.getLanes().size());
 		LaneData20 lane1ol = lanesLink1.getLanes().get(fixture.link1FirstLaneId);
 		Assert.assertNotNull(lane1ol);
-		Assert.assertEquals(100.0, lane1ol.getStartsAtMeterFromLinkEnd());
+		Assert.assertEquals(100.1, lane1ol.getStartsAtMeterFromLinkEnd());
 		Assert.assertEquals(7200.0, lane1ol.getCapacityVehiclesPerHour());
 		Assert.assertEquals(2.0 , lane1ol.getNumberOfRepresentedLanes() );
 		Assert.assertEquals(fixture.id1 , lane1ol.getToLaneIds().get(0));
@@ -179,12 +179,9 @@ public class MixedLaneTest {
 
 		Assert.assertNotNull(handler.link1EnterEvent);
 		Assert.assertEquals(3600.0 + linkEnterOffset, handler.link1EnterEvent.getTime());
-
-		Assert.assertEquals(3600.0 + linkEnterOffset, handler.lane1olEnterEvent.getTime());
-		Assert.assertEquals(3600.0 + 6.0, handler.lane1olLeaveEvent.getTime());
-		Assert.assertEquals(3600.0 + 6.0, handler.lane1EnterEvent.getTime());
-		Assert.assertEquals(3600.0 + linkLeaveOffset, handler.lane1LeaveEvent.getTime());
 		
+		// (*)
+
 		Assert.assertNotNull(handler.link2Event);
 		Assert.assertEquals(this.fixture.id1, handler.link2Event.getPersonId());
 		Assert.assertEquals(3600.0 + linkLeaveOffset, handler.link2Event.getTime());
@@ -192,7 +189,15 @@ public class MixedLaneTest {
 		Assert.assertNotNull(handler.link3Event);
 		Assert.assertEquals(this.fixture.id2, handler.link3Event.getPersonId());
 		Assert.assertEquals(3600.0 + linkLeaveOffset, handler.link3Event.getTime());
-	}
+
+		// the following comes chronologically at (*) but was moved here so that it can fail first on
+		// the link leave values (to test equivalency with link only dynamics, see below)
+		Assert.assertEquals(3600.0 + linkEnterOffset, handler.lane1olEnterEvent.getTime());
+		Assert.assertEquals(3600.0 + 6.0, handler.lane1olLeaveEvent.getTime());
+		Assert.assertEquals(3600.0 + 6.0, handler.lane1EnterEvent.getTime());
+		Assert.assertEquals(3600.0 + linkLeaveOffset, handler.lane1LeaveEvent.getTime());
+		
+}
 
 	/**
 	 * Tests if a regular link generates the same output as the lane test above.
@@ -204,7 +209,7 @@ public class MixedLaneTest {
 		Log.info("starting testLink2PersonsDriving()");
 		
 		@SuppressWarnings("hiding")
-		MixedLaneTestFixture fixture = new MixedLaneTestFixture(false);
+		MixedLaneTestFixture fixture = new MixedLaneTestFixture(false, 1.0);
 		
 		fixture.create2PersonPopulation();
 		EventsManager events = EventsUtils.createEventsManager();

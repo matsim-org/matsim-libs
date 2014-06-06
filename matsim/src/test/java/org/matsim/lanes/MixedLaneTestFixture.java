@@ -74,9 +74,11 @@ public class MixedLaneTestFixture {
 		init();
 	}
 
-	public MixedLaneTestFixture(boolean useLanes){
+	public MixedLaneTestFixture(boolean useLanes, double timeStepSize){
 		Config config = ConfigUtils.createConfig();
 		config.scenario().setUseLanes(useLanes);
+		
+		config.qsim().setTimeStepSize(timeStepSize); 
 
 		sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		id0 = sc.createId("0");
@@ -116,25 +118,25 @@ public class MixedLaneTestFixture {
 		n.addNode(node);
 
 		Link link0 = nb.createLink(id0, n.getNodes().get(id0) , n.getNodes().get(id1));
-		link0.setLength(100.0);
+		link0.setLength(100.1);
 		link0.setFreespeed(10.0);
 		link0.setCapacity(7200.0);
 		link0.setNumberOfLanes(2.0);
 		n.addLink(link0);
 		Link link1 = nb.createLink(id1, n.getNodes().get(id1), n.getNodes().get(id2));
-		link1.setLength(100.0);
+		link1.setLength(100.1);
 		link1.setFreespeed(10.0);
 		link1.setCapacity(7200.0); 
 		link1.setNumberOfLanes(2.0);
 		n.addLink(link1);
 		Link link2 = nb.createLink(id2, n.getNodes().get(id2), n.getNodes().get(id3));
-		link2.setLength(100.0);
+		link2.setLength(100.1);
 		link2.setFreespeed(10.0);
 		link2.setCapacity(7200.0);
 		link2.setNumberOfLanes(2.0);
 		n.addLink(link2);
 		Link link3 = nb.createLink(id3, n.getNodes().get(id2), n.getNodes().get(id4));
-		link3.setLength(100.0);
+		link3.setLength(100.1);
 		link3.setFreespeed(10.0);
 		link3.setCapacity(7200.0);
 		link3.setNumberOfLanes(2.0);
