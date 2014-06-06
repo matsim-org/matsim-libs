@@ -380,10 +380,10 @@ public abstract class AccessibilityControlerListenerImpl {
 			for ( ActivityFacility origin : aggregatedOrigins.get( nodeId ) ) {
 				assert( origin.getCoord() != null );
 
-				// captures the distance (as walk time) between a cell centroid and the road network
+				// get the nearest link:
 				Link nearestLink = network.getNearestLinkExactly(origin.getCoord());
 
-				// captures the distance (as walk time) between a zone centroid and its nearest node
+				// captures the distance (as walk time) between the origin via the link to the node:
 				Distances distance = NetworkUtil.getDistances2Node(origin.getCoord(), nearestLink, fromNode);
 
 				// distance to road, and then to node:
