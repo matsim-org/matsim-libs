@@ -40,9 +40,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -83,15 +83,14 @@ import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkReader;
-import playground.thibautd.socnetsim.qsim.JointPseudoSimFactory;
-import playground.thibautd.socnetsim.qsim.JointTeleportationSimFactory;
+import playground.thibautd.socnetsim.qsim.SwitchingJointQSimFactory;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupReplanningListenner;
-import playground.thibautd.socnetsim.replanning.GroupReplanningListennerWithPSimLoop;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
+import playground.thibautd.socnetsim.replanning.InnovationSwitchingGroupReplanningListenner;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
@@ -528,6 +527,10 @@ public class RunUtils {
 						builder.getScoringFunctionFactory() ) );
 		}
 
+		builder.withMobsimFactory(
+				new SwitchingJointQSimFactory(
+						builder.getTravelTime() ) );
+
 		return builder;
 	}
 
@@ -570,35 +573,21 @@ public class RunUtils {
 			new GroupStrategyManager( 
 					innovativeStrategyRegistry );
 
-		// create controler
-		MobsimFactory factory;
-		
-		final PseudoSimConfigGroup pSimConf = (PseudoSimConfigGroup)
-					controllerRegistry.getScenario().getConfig().getModule(
-							PseudoSimConfigGroup.GROUP_NAME );
-		switch ( pSimConf.getPsimType() ) {
-		case detailled:
-			factory = new JointPseudoSimFactory( controllerRegistry.getTravelTime() );
-			break;
-		case teleported:
-			factory = new JointTeleportationSimFactory( );
-			break;
-		default:
-			throw new RuntimeException();
-		}
-		final GroupReplanningListennerWithPSimLoop listenner =
-					new GroupReplanningListennerWithPSimLoop(
+		final InnovationSwitchingGroupReplanningListenner listenner =
+					new InnovationSwitchingGroupReplanningListenner(
 						controllerRegistry,
 						mainStrategyManager,
-						innovativeStrategyManager,
-						factory );
+						innovativeStrategyManager);
 		final ImmutableJointController controller =
 			new ImmutableJointController(
 					controllerRegistry,
 					listenner );
 
-		listenner.setStopWatch( controller.stopwatch );
-		listenner.setOutputDirectoryHierarchy( controller.getControlerIO() );
+		if ( controllerRegistry.getMobsimFactory() instanceof ControlerListener ) {
+			// XXX not that nice, but we do not have the Controller yet when we build
+			// the SwitchingJointQSimFactory...
+			controller.addControlerListener( (ControlerListener) controllerRegistry.getMobsimFactory() );
+		}
 
 		return controller;
 	}
