@@ -38,7 +38,37 @@ public class TtMorningCommodityAsMatsimPopWriter {
 	private double startTimeSecEveningPeak = 13.5 * 3600.0;
 	private double endTimeSecEveningPeak = 18.5 * 3600.0;
 	
-	public void writePlansFile(Network network, DgIdConverter idConverter, DgCommodities commodities, String outputDirectory, String filename, double startTimeSecMorningPeak, double endTimeSecMorningPeak) {
+	public void writeTripPlansFile(Network network, DgIdConverter idConverter, DgCommodities commodities, String outputDirectory, String filename, double startTimeSecMorningPeak, double endTimeSecMorningPeak) {
+
+		this.network = network;
+		this.idConverter = idConverter;
+		this.population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
+		
+		this.startTimeSecMorningPeak = startTimeSecMorningPeak;
+		this.endTimeSecMorningPeak = endTimeSecMorningPeak;
+		
+		// create a person for each flow unit of each commodity (source-drain pairs) in the morning peak as single dummy-dummy trips
+		for (DgCommodity com : commodities.getCommodities().values()){
+			for (int i=0; i<com.getFlow(); i++){
+				Person person = population.getFactory().createPerson(new IdImpl(com.getId().toString()+i));
+				Plan plan = population.getFactory().createPlan();
+				plan.addActivity(createDummyAct(com, false));
+				plan.addLeg(population.getFactory().createLeg(TransportMode.car));
+				plan.addActivity(createDummyAct(com, true));
+				person.addPlan(plan);
+				population.addPerson(person);
+			}
+		}
+		
+		//write population as plans file
+		String[] fileAttributes = filename.split("_");
+		String outputFile = outputDirectory + "trip_plans_from_morning_peak_ks_commodities_minFlow" + fileAttributes[2] + ".xml";
+		MatsimWriter popWriter = new PopulationWriter(population, this.network);
+		popWriter.write(outputFile);
+		log.info("plans file of simplified population written to " + outputFile);
+	}
+	
+	public void writeHomeWorkHomePlansFile(Network network, DgIdConverter idConverter, DgCommodities commodities, String outputDirectory, String filename, double startTimeSecMorningPeak, double endTimeSecMorningPeak) {
 
 		this.network = network;
 		this.idConverter = idConverter;
@@ -53,11 +83,11 @@ public class TtMorningCommodityAsMatsimPopWriter {
 			for (int i=0; i<com.getFlow(); i++){
 				Person person = population.getFactory().createPerson(new IdImpl(com.getId().toString()+i));
 				Plan plan = population.getFactory().createPlan();
-				plan.addActivity(createSourceAct(com, false));
+				plan.addActivity(createHomeAct(com, false));
 				plan.addLeg(population.getFactory().createLeg(TransportMode.car));
-				plan.addActivity(createDrainAct(com));
+				plan.addActivity(createWorkAct(com));
 				plan.addLeg(population.getFactory().createLeg(TransportMode.car));
-				plan.addActivity(createSourceAct(com, true));
+				plan.addActivity(createHomeAct(com, true));
 				person.addPlan(plan);
 				population.addPerson(person);
 			}
@@ -71,14 +101,22 @@ public class TtMorningCommodityAsMatsimPopWriter {
 		log.info("plans file of simplified population written to " + outputFile);
 	}
 
-	private Activity createDrainAct(DgCommodity com) {
+	private Activity createWorkAct(DgCommodity com) {
 		Activity drain = population.getFactory().createActivityFromLinkId("work", com.getDrainLinkId());
 		drain.setEndTime(createEndTime(startTimeSecEveningPeak, endTimeSecEveningPeak));
 		return drain;
 	}
 
-	private Activity createSourceAct(DgCommodity com, boolean endActivity) {
+	private Activity createHomeAct(DgCommodity com, boolean endActivity) {
 		Activity source = population.getFactory().createActivityFromLinkId("home", com.getSourceLinkId());
+		if (!endActivity){
+			source.setEndTime(createEndTime(startTimeSecMorningPeak, endTimeSecMorningPeak));
+		}
+		return source;
+	}
+	
+	private Activity createDummyAct(DgCommodity com, boolean endActivity) {
+		Activity source = population.getFactory().createActivityFromLinkId("dummy", com.getSourceLinkId());
 		if (!endActivity){
 			source.setEndTime(createEndTime(startTimeSecMorningPeak, endTimeSecMorningPeak));
 		}
