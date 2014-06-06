@@ -480,7 +480,7 @@ public class DgAnalyseCottbusKS2010 {
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scSignalsBoundingBox);
 		netReader.readFile(signalsBBNet);
 
-		String signalSystemsFile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_systems_no_13.xml";
+		String signalSystemsFile = DgPaths.REPOS + "shared-svn/projects/cottbus/cottbus_scenario/signal_systems_no_13.xml";
 		SignalSystemsData signalSystems = new SignalSystemsDataImpl();
 		SignalSystemsReader20 signalsReader = new SignalSystemsReader20(signalSystems);
 		signalsReader.readFile(signalSystemsFile);
@@ -498,7 +498,7 @@ public class DgAnalyseCottbusKS2010 {
 		l.add(e);
 		
 		
-		String cityNetwork = DgPaths.REPOS  + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/cottbus_city_network/network_city_wgs84_utm33n.xml.gz";
+		String cityNetwork = DgPaths.REPOS  + "shared-svn/projects/cottbus/cottbus_scenario/cottbus_city_network/network_city_wgs84_utm33n.xml.gz";
 		Scenario sc2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader netReader2= new MatsimNetworkReader(sc2);
 		netReader2.readFile(cityNetwork);
@@ -569,8 +569,10 @@ public class DgAnalyseCottbusKS2010 {
 //		CottbusRuns.add1712BaseCaseRoutesOnlyRandomRuns(l);
 //		CottbusRuns.add1712BaseCaseRoutesOnlyHighStorageCapRuns(l);
 		
+		CottbusRuns.add1933BaseCaseRoutesOnlyRandomRuns(l);
+		
 //		CottbusRuns.add1712BaseCaseRoutesOnlyHighStorageCapRunsOnSimplifiedNetwork(l);
-		CottbusRuns.add1712BaseCaseRoutesTimesHighStorageCapRunsOnSimplifiedNetwork(l);
+//		CottbusRuns.add1712BaseCaseRoutesTimesHighStorageCapRunsOnSimplifiedNetwork(l);
 		
 		//		add1930BaseCase(l);
 //		add1712BaseCaseRoutesOnlyRuns5Percent(l);
@@ -602,7 +604,7 @@ public class DgAnalyseCottbusKS2010 {
 		String timesString = createTimesString(times);
 		List<Extent> extents = createExtentList();
 		String extentString = createExtentString(extents);
-		String outputFilename = outputDirectory + "2014-01-27_analysis" + runIdsString + "_" +  timesString;
+		String outputFilename = outputDirectory + "2014-05-23_analysis" + runIdsString + "_" +  timesString;
 		System.out.println(outputFilename);
 		DgAnalyseCottbusKS2010 ana = new DgAnalyseCottbusKS2010();
 		ana.setUseInMemoryEvents(false);

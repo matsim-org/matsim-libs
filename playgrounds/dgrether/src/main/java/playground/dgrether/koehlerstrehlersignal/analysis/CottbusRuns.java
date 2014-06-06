@@ -219,6 +219,13 @@ public class CottbusRuns {
 		l.add(ri);
 		//
 		ri = new RunInfo();
+		ri.runId = "1912";
+		ri.iteration = 1900;
+		ri.remark  = "continue 1712, com > 50, routes only";
+		ri.remark = "optimization, commodities > 50";
+		l.add(ri);
+		//
+		ri = new RunInfo();
 		ri.runId = "1956";
 		ri.iteration = 2000;
 		ri.remark = "best random, commodities > 50";
@@ -637,6 +644,48 @@ public class CottbusRuns {
 		ri.remark = "1722 base case, it 2000";
 		ri.iteration = 2000;
 		l.add(ri);
+	}
+
+	public static void add1933BaseCaseRoutesOnlyRandomRuns(List<RunInfo> l) {
+		RunInfo ri = null;
+		ri = new RunInfo();
+		ri.runId = "1933";
+		ri.iteration = 2000;
+		ri.baseCase = true;
+		ri.remark = "base case";
+		l.add(ri);
+		//
+		ri = new RunInfo();
+		ri.runId = "1934";
+		ri.iteration = 2000;
+		ri.remark  = "optimization scenario, com > 10, routes only";
+		ri.remark = "optimization, commodities > 10";
+		l.add(ri);
+		//
+		ri = new RunInfo();
+		ri.runId = "1963";
+		ri.iteration = 2000;
+		ri.remark = "best random, commodities > 10";
+		l.add(ri);
+		//
+		ri = new RunInfo();
+		ri.runId = "1966";
+		ri.iteration = 2000;
+		ri.remark = "worst random, commodities > 10";
+		l.add(ri);
+		//
+		ri = new RunInfo();
+		ri.runId = "1965";
+		ri.iteration = 2000;
+		ri.remark = "median random, commodities > 10";
+		l.add(ri);
+
+		ri = new RunInfo();
+		ri.runId = "1964";
+		ri.iteration = 2000;
+		ri.remark = "mean random, commodities > 10";
+		l.add(ri);
+
 	}
 	
 	
