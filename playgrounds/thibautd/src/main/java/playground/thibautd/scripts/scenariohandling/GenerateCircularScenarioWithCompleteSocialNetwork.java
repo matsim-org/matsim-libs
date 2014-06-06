@@ -54,6 +54,7 @@ import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.ivt.utils.ArgParser;
+import playground.ivt.utils.ArgParser.Args;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkImpl;
 import playground.thibautd.socnetsim.population.SocialNetworkWriter;
@@ -65,20 +66,21 @@ import playground.thibautd.utils.DesiresConverter;
  */
 public class GenerateCircularScenarioWithCompleteSocialNetwork {
 	public static void main(final String[] args) throws IOException {
-		final ArgParser argParser = new ArgParser( args );
+		final ArgParser argParser = new ArgParser();
 		argParser.setDefaultValue( "--radius" , "10000" );
 		argParser.setDefaultValue( "--nlinks" , "100" );
 		argParser.setDefaultValue( "--nagentsperlink" , "1" );
 		argParser.setDefaultValue( "--nseparationlinks" , "1" );
 		argParser.setDefaultValue( "--degreesmallworld" , "20" );
 
-		final int nLinks = Integer.parseInt( argParser.getValue( "--nlinks" ) );
-		final int nAgentsPerLink = Integer.parseInt( argParser.getValue( "--nagentsperlink" ) );
-		final int nSeparationLinks = Integer.parseInt( argParser.getValue( "--nseparationlinks" ) );
-		final int smallWorldDegree = Integer.parseInt( argParser.getValue( "--degreesmallworld" ) );
-		final double radius = Integer.parseInt( argParser.getValue( "--radius" ) );
+		final Args parsed = argParser.parseArgs( args );
+		final int nLinks = Integer.parseInt( parsed.getValue( "--nlinks" ) );
+		final int nAgentsPerLink = Integer.parseInt( parsed.getValue( "--nagentsperlink" ) );
+		final int nSeparationLinks = Integer.parseInt( parsed.getValue( "--nseparationlinks" ) );
+		final int smallWorldDegree = Integer.parseInt( parsed.getValue( "--degreesmallworld" ) );
+		final double radius = Integer.parseInt( parsed.getValue( "--radius" ) );
 
-		final String outputDirectory = argParser.getNonSwitchedArgs()[ 0 ];
+		final String outputDirectory = parsed.getNonSwitchedArgs()[ 0 ];
 		createDirectory( outputDirectory );
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );

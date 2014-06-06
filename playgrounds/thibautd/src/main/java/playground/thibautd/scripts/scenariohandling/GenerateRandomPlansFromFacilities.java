@@ -43,13 +43,14 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 
 import playground.ivt.utils.ArgParser;
+import playground.ivt.utils.ArgParser.Args;
 
 /**
  * @author thibautd
  */
 public class GenerateRandomPlansFromFacilities {
 	public static void main(final String[] args) {
-		final ArgParser parser = new ArgParser( args );
+		final ArgParser parser = new ArgParser( );
 
 		parser.setDefaultValue( "--inputfacilities" , null );
 		parser.setDefaultValue( "--outputplans" , null );
@@ -60,14 +61,15 @@ public class GenerateRandomPlansFromFacilities {
 
 		parser.setDefaultValue( "--betadistance" , "0" );
 
-		final String inputFacilities = parser.getValue( "--inputfacilities" );
-		final String outputPlans = parser.getValue( "--outputplans" );
+		final Args parsed = parser.parseArgs( args );
+		final String inputFacilities = parsed.getValue( "--inputfacilities" );
+		final String outputPlans = parsed.getValue( "--outputplans" );
 
-		final int plansSize = Integer.parseInt( parser.getValue( "--planssize" ) );
-		final int popSize = Integer.parseInt( parser.getValue( "--popsize" ) );
-		final String homeType = parser.getValue( "--hometype" );
+		final int plansSize = Integer.parseInt( parsed.getValue( "--planssize" ) );
+		final int popSize = Integer.parseInt( parsed.getValue( "--popsize" ) );
+		final String homeType = parsed.getValue( "--hometype" );
 
-		final double betaDist = Double.parseDouble( parser.getValue( "--betadistance" ) );
+		final double betaDist = Double.parseDouble( parsed.getValue( "--betadistance" ) );
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		new MatsimFacilitiesReader( sc ).readFile( inputFacilities );

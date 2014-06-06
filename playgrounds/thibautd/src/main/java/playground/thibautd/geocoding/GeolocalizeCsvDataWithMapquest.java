@@ -81,10 +81,10 @@ public class GeolocalizeCsvDataWithMapquest {
 		argParser.setDefaultValue( "-r" , null );
 		argParser.setDefaultValue( "-k" , null );
 
-		final String inFile = argParser.getValue( "-i" );
-		final String outFile = argParser.getValue( "-o" );
-		final String rejectFile = argParser.getValue( "-r" );
-		final String key = argParser.getValue( "-k" );
+		final String inFile = argParser.args().getValue( "-i" );
+		final String outFile = argParser.args().getValue( "-o" );
+		final String rejectFile = argParser.args().getValue( "-r" );
+		final String key = argParser.args().getValue( "-k" );
 		
 		final Iterator<Address> addressProvider = new CsvParser( inFile );
 		final CsvWriter successWriter = new CsvWriter( outFile );

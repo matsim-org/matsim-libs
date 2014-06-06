@@ -44,6 +44,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.ivt.utils.ArgParser;
+import playground.ivt.utils.ArgParser.Args;
 
 /**
  * @author thibautd
@@ -53,7 +54,7 @@ public class GenerateRandomFacilities {
 		Logger.getLogger(GenerateRandomFacilities.class);
 
 	public static void main(final String[] args) throws IOException {
-		final ArgParser parser = new ArgParser( args );
+		final ArgParser parser = new ArgParser();
 		parser.setDefaultMultipleValue(
 				"--type",
 				Arrays.asList( "home" , "work" , "leisure" ) );
@@ -69,13 +70,14 @@ public class GenerateRandomFacilities {
 				null );
 		parser.setDefaultValue(
 				"--outf2l",
-				parser.getValue( "--outfile" )+".f2l" );
+				null );
 
-		final List<String> types = parser.getValues( "--type" );
-		final List<String> numbers = parser.getValues( "--number" );
-		final String inNet = parser.getValue( "--netfile" );
-		final String outFile = parser.getValue( "--outfile" );
-		final String outf2l = parser.getValue( "--outf2l" );
+		final Args parsed = parser.parseArgs( args );
+		final List<String> types = parsed.getValues( "--type" );
+		final List<String> numbers = parsed.getValues( "--number" );
+		final String inNet = parsed.getValue( "--netfile" );
+		final String outFile = parsed.getValue( "--outfile" );
+		final String outf2l = parsed.getValue( "--outf2l" );
 
 		if ( types.size() != numbers.size() ) throw new IllegalArgumentException();
 

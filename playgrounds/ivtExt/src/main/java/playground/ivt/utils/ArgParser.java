@@ -39,107 +39,143 @@ public class ArgParser {
 	private final Map<Id, List<String>> defaultMultipleValues = new LinkedHashMap<Id, List<String>>();
 	private final Set<Id> switches = new HashSet<Id>();
 
-	private final String[] args;
+	private boolean locked = false;
 
-	public ArgParser(final String[] args) {
+	// for backward compatibility only...
+	private String[] args;
+	public ArgParser() {
+		this( null );
+	}
+	
+	@Deprecated
+	public  ArgParser( final String... args ) {
 		this.args = args;
 	}
-
+	
+	@Deprecated
+	public Args args() {
+		return parseArgs( args );
+	}
+	
 	public void setDefaultValue( final String longName, final String shortName, final String v ) {
+		checkLock();
 		final Id id = switchFactory.addSwitch( longName , shortName );
 		final String old = defaultValues.put( id , v );
 		if ( old != null ) throw new IllegalStateException( longName+" "+shortName );
 	}
 
 	public void setDefaultValue( final String name, final String v ) {
+		checkLock();
 		final Id id = switchFactory.addSwitch( name );
 		final String old = defaultValues.put( id , v );
 		if ( old != null ) throw new IllegalStateException( name );
 	}
 
 	public void setDefaultMultipleValue( final String name, final List<String> v ) {
+		checkLock();
 		final Id id = switchFactory.addSwitch( name );
 		final List<String> old = defaultMultipleValues.put( id , v );
 		if ( old != null ) throw new IllegalStateException( name );
 	}
 
 	public void addSwitch( final String... names ) {
+		checkLock();
 		switches.add( switchFactory.addSwitch( names ) );
 	}
 
-	public String getValue(final String name) {
-		final Id id = switchFactory.getSwitch( name );
-		if ( id.equals( Switches.unknown ) ) throw new IllegalArgumentException( name+" not in "+switchFactory.getNames() );
-
-		for ( int i=0; i < args.length; i++ ) {
-			if ( switchFactory.getSwitch( args[ i ] ).equals( id ) ) return args[ i + 1 ];
+	private void checkLock() {
+		if ( locked ) {
+			throw new IllegalStateException( "Cannot modify an ArgParser once parseArgs() was called" );
 		}
-		return defaultValues.get( id );
 	}
 
-	public double getDoubleValue(final String name) {
-		return Double.parseDouble( getValue( name ) );
+	public Args parseArgs( final String... args ) {
+		locked = true;
+		return new Args( args );
 	}
 
-	public int getIntegerValue(final String name) {
-		return Integer.parseInt( getValue( name ) );
-	}
+	public class Args {
+		private final String[] args;
 
-	public boolean getBooleanValue(final String name) {
-		return Boolean.parseBoolean( getValue( name ) );
-	}
-
-	// "<T extends Enum<T>>" does read odd, but this is the correct phrasing.
-	// This stackoverflow answer just explains why nicely:
-	// http://stackoverflow.com/a/3061776
-	public <T extends Enum<T>> T getEnumValue(
-			final String name,
-			final Class<T> type) {
-		return Enum.valueOf( type , getValue( name ) );
-	}
-
-	public List<String> getValues(final String name) {
-		final List<String> values = new ArrayList<String>();
-
-		final Id id = switchFactory.getSwitch( name );
-		if ( id.equals( Switches.unknown ) ) throw new IllegalArgumentException( name+" not in "+switchFactory.getNames() );
-
-		for ( int i=0; i < args.length; i++ ) {
-			if ( switchFactory.getSwitch( args[ i ] ).equals( id ) ) {
-				values.add( args[ ++i ] );
-			}
+		private Args(final String[] args) {
+			this.args = args;
 		}
 
-		return values.isEmpty() ? defaultMultipleValues.get( id ) : values;
-	}
+		public String getValue(final String name) {
+			final Id id = switchFactory.getSwitch( name );
+			if ( id.equals( Switches.unknown ) ) throw new IllegalArgumentException( name+" not in "+switchFactory.getNames() );
 
-	public boolean isSwitched(final String name) {
-		final Id id = switchFactory.getSwitch( name );
-		if ( id.equals( Switches.unknown ) ) throw new IllegalArgumentException( name+" not in "+switchFactory.getNames() );
-
-		for ( String a : args ) {
-			if ( switchFactory.getSwitch( a ).equals( id ) ) return true;
+			for ( int i=0; i < args.length; i++ ) {
+				if ( switchFactory.getSwitch( args[ i ] ).equals( id ) ) return args[ i + 1 ];
+			}
+			return defaultValues.get( id );
 		}
 
-		return false;
-	}
-
-	public String[] getNonSwitchedArgs() {
-		final List<String> list = new ArrayList<String>();
-
-		for ( int i=0; i < args.length; i++ ) {
-			if ( defaultValues.containsKey( switchFactory.getSwitch( args[ i ] ) ) ) {
-				i++;
-			}
-			else if ( defaultMultipleValues.containsKey( switchFactory.getSwitch( args[ i ] ) ) ) {
-				i++;
-			}
-			else if ( !switches.contains( switchFactory.getSwitch( args[ i ] ) ) ) {
-				list.add( args[ i ] );
-			}
+		public double getDoubleValue(final String name) {
+			return Double.parseDouble( getValue( name ) );
 		}
 
-		return list.toArray( new String[ list.size() ] );
+		public int getIntegerValue(final String name) {
+			return Integer.parseInt( getValue( name ) );
+		}
+
+		public boolean getBooleanValue(final String name) {
+			return Boolean.parseBoolean( getValue( name ) );
+		}
+
+		// "<T extends Enum<T>>" does read odd, but this is the correct phrasing.
+		// This stackoverflow answer just explains why nicely:
+		// http://stackoverflow.com/a/3061776
+		public <T extends Enum<T>> T getEnumValue(
+				final String name,
+				final Class<T> type) {
+			return Enum.valueOf( type , getValue( name ) );
+		}
+
+		public List<String> getValues(final String name) {
+			final List<String> values = new ArrayList<String>();
+
+			final Id id = switchFactory.getSwitch( name );
+			if ( id.equals( Switches.unknown ) ) throw new IllegalArgumentException( name+" not in "+switchFactory.getNames() );
+
+			for ( int i=0; i < args.length; i++ ) {
+				if ( switchFactory.getSwitch( args[ i ] ).equals( id ) ) {
+					values.add( args[ ++i ] );
+				}
+			}
+
+			return values.isEmpty() ? defaultMultipleValues.get( id ) : values;
+		}
+
+		public boolean isSwitched(final String name) {
+			final Id id = switchFactory.getSwitch( name );
+			if ( id.equals( Switches.unknown ) ) throw new IllegalArgumentException( name+" not in "+switchFactory.getNames() );
+
+			for ( String a : args ) {
+				if ( switchFactory.getSwitch( a ).equals( id ) ) return true;
+			}
+
+			return false;
+		}
+
+		public String[] getNonSwitchedArgs() {
+			final List<String> list = new ArrayList<String>();
+
+			for ( int i=0; i < args.length; i++ ) {
+				if ( defaultValues.containsKey( switchFactory.getSwitch( args[ i ] ) ) ) {
+					i++;
+				}
+				else if ( defaultMultipleValues.containsKey( switchFactory.getSwitch( args[ i ] ) ) ) {
+					i++;
+				}
+				else if ( !switches.contains( switchFactory.getSwitch( args[ i ] ) ) ) {
+					list.add( args[ i ] );
+				}
+			}
+
+			return list.toArray( new String[ list.size() ] );
+		}
+
 	}
 }
 

@@ -100,12 +100,12 @@ public class ExtractTripModeShares20kmFromBellevue {
 		args.setDefaultValue( "-f" , null );
 		args.setDefaultValue( "-n" , null );
 
-		final String plansFile = args.getValue( "-p" );
-		final String outputFile = args.getValue( "-o" );
+		final String plansFile = args.args().getValue( "-p" );
+		final String outputFile = args.args().getValue( "-o" );
 		// for V4 or distance computation: optional
-		final String networkFile = args.getValue( "-n" );
+		final String networkFile = args.args().getValue( "-n" );
 		// useful for V4 only: optional
-		final String facilitiesFile = args.getValue( "-f" );
+		final String facilitiesFile = args.args().getValue( "-f" );
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		if ( facilitiesFile != null ) new MatsimFacilitiesReader( scenario ).parse( facilitiesFile );

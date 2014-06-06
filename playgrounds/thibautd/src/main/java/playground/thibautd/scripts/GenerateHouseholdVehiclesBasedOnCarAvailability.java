@@ -48,6 +48,7 @@ import org.matsim.population.algorithms.PersonAlgorithm;
 import org.xml.sax.Attributes;
 
 import playground.ivt.utils.ArgParser;
+import playground.ivt.utils.ArgParser.Args;
 
 /**
  * Generates as many vehicles as persons with "always" a car in each household.
@@ -57,12 +58,13 @@ public class GenerateHouseholdVehiclesBasedOnCarAvailability {
 	private static final Logger log =
 		Logger.getLogger(GenerateHouseholdVehiclesBasedOnCarAvailability.class);
 
-	public static void main(final String[] args) {
-		main( new ArgParser( args ) );
+	public static void main(final String[] sargs) {
+		final ArgParser args = new ArgParser();
+		args.addSwitch( "--cliques" ); // to read cliques and not households
+		main( args.parseArgs( sargs ) );
 	}
 
-	public static void main(final ArgParser args) {
-		args.addSwitch( "--cliques" ); // to read cliques and not households
+	public static void main(final Args args) {
 		final String inhh = args.getNonSwitchedArgs()[ 0 ];
 		final String inpop = args.getNonSwitchedArgs()[ 1 ];
 		final String outhh = args.getNonSwitchedArgs()[ 2 ];

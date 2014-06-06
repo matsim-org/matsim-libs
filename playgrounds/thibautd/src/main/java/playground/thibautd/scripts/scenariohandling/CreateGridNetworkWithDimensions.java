@@ -37,6 +37,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.ivt.utils.ArgParser;
+import playground.ivt.utils.ArgParser.Args;
 import playground.thibautd.utils.UniqueIdFactory;
 
 /**
@@ -45,20 +46,21 @@ import playground.thibautd.utils.UniqueIdFactory;
 public class CreateGridNetworkWithDimensions {
 
 	public static void main(final String[] args) {
-		final ArgParser argParser = new ArgParser( args );
+		final ArgParser argParser = new ArgParser();
 		argParser.setDefaultValue( "--freespeed" , ""+(75d * 1000 / 3600) );
 		argParser.setDefaultValue( "--link-length" , "1000" );
 		argParser.setDefaultValue( "--link-capacity" , "100" );
 		argParser.setDefaultValue( "--width" , "100" );
 		argParser.setDefaultValue( "--height" , "100" );
 
-		final double freespeed = Double.parseDouble( argParser.getValue( "--freespeed" ) );
-		final double linkLength = Double.parseDouble( argParser.getValue( "--link-length" ) );
-		final double linkCapacity = Double.parseDouble( argParser.getValue( "--link-capacity" ) );
-		final int width = Integer.parseInt( argParser.getValue( "--width" ) );
-		final int height = Integer.parseInt( argParser.getValue( "--height" ) );
+		final Args args1 = argParser.parseArgs( args );
+		final double freespeed = Double.parseDouble( args1.getValue( "--freespeed" ) );
+		final double linkLength = Double.parseDouble( args1.getValue( "--link-length" ) );
+		final double linkCapacity = Double.parseDouble( args1.getValue( "--link-capacity" ) );
+		final int width = Integer.parseInt( args1.getValue( "--width" ) );
+		final int height = Integer.parseInt( args1.getValue( "--height" ) );
 
-		final String outFile = argParser.getNonSwitchedArgs()[ 0 ];
+		final String outFile = args1.getNonSwitchedArgs()[ 0 ];
 
 		final Network network = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getNetwork();
 		createNetwork(

@@ -36,6 +36,7 @@ import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
 
 import playground.ivt.utils.ArgParser;
+import playground.ivt.utils.ArgParser.Args;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkImpl;
 import playground.thibautd.socnetsim.population.SocialNetworkWriter;
@@ -50,14 +51,16 @@ public class GenerateHeadsToChildrenSocialNetwork {
 	private static final int AGE_OF_REASON = 18;
 
 	public static void main(final String[] args) {
-		main( new ArgParser( args ) );
-	}
-
-	private static void main(final ArgParser argParser) {
+		final ArgParser argParser = new ArgParser();
+		
 		argParser.setDefaultValue( "-h" , null );
 		argParser.setDefaultValue( "-p" , null );
 		argParser.setDefaultValue( "-o" , null );
 
+		main( argParser.parseArgs( args ) );
+	}
+
+	private static void main(final Args argParser) {
 		final String householdFile = argParser.getValue( "-h" );
 		final String plansFile = argParser.getValue( "-p" );
 		final String socialNetworkFile = argParser.getValue( "-o" );

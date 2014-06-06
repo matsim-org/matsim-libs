@@ -45,9 +45,9 @@ public class ExecutePlans {
 		argParser.setDefaultValue( "--output-folder" , "-o" , null );
 		argParser.setDefaultValue( "--simulation-type" , "-t" , ""+SimulationType.households );
 
-		final String folder = argParser.getValue( "-f" );
-		final String output = argParser.getValue( "-o" );
-		final SimulationType simType = argParser.getEnumValue( "-t" , SimulationType.class );
+		final String folder = argParser.args().getValue( "-f" );
+		final String output = argParser.args().getValue( "-o" );
+		final SimulationType simType = argParser.args().getEnumValue( "-t" , SimulationType.class );
 
 		MoreIOUtils.checkDirectory( output );
 

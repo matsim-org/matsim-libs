@@ -66,20 +66,20 @@ public class DiluteSocialNetworkedPopulation {
 		final Coord center =
 			new CoordImpl(
 					Double.parseDouble(
-						args.getValue( "--xcenter" ) ),
+						args.args().getValue( "--xcenter" ) ),
 					Double.parseDouble(
-						args.getValue( "--ycenter" ) ) );
+						args.args().getValue( "--ycenter" ) ) );
 
 		final double radius =
 			Double.parseDouble(
-					args.getValue(
+					args.args().getValue(
 						"--radius" ) );
 
-		final DilutionType dilutionType = args.getEnumValue( "--dilution-type" , DilutionType.class );
+		final DilutionType dilutionType = args.args().getEnumValue( "--dilution-type" , DilutionType.class );
 
-		final String inpopfile = args.getValue( "--inpopfile" );
-		final String insocnet = args.getValue( "--insocnet" );
-		final String outdir = args.getValue( "--outdir" );
+		final String inpopfile = args.args().getValue( "--inpopfile" );
+		final String insocnet = args.args().getValue( "--insocnet" );
+		final String outdir = args.args().getValue( "--outdir" );
 
 		MoreIOUtils.initOut( outdir );
 

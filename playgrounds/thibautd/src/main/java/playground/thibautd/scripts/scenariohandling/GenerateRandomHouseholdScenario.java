@@ -48,6 +48,7 @@ import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsWriterV10;
 
 import playground.ivt.utils.ArgParser;
+import playground.ivt.utils.ArgParser.Args;
 import playground.thibautd.utils.UniqueIdFactory;
 
 /**
@@ -55,7 +56,7 @@ import playground.thibautd.utils.UniqueIdFactory;
  */
 public class GenerateRandomHouseholdScenario {
 	public static void main(final String[] args) {
-		final ArgParser parser = new ArgParser( args );
+		final ArgParser parser = new ArgParser( );
 
 		parser.setDefaultValue( "--inputnetfile" , null );
 		parser.setDefaultValue( "--outputplans" , null );
@@ -66,13 +67,14 @@ public class GenerateRandomHouseholdScenario {
 		parser.setDefaultValue( "--doubleplans" , "false" );
 		parser.setDefaultValue( "--fixedactsequence" , "true" );
 
-		final String inputNetworkFile = parser.getValue( "--inputnetfile" );
-		final String outputPopulationFile = parser.getValue( "--outputplans" );
-		final String outputHouseholdsFile = parser.getValue( "--outputhhs" );
-		final int popSize = Integer.parseInt( parser.getValue( "--popsize" ) );
-		final int maxHouseholdSize = Integer.parseInt( parser.getValue( "--maxhhsize" ) );
-		final boolean doublePlans = Boolean.parseBoolean( parser.getValue( "--doubleplans" ) );
-		final boolean fixedActivitySequence = Boolean.parseBoolean( parser.getValue( "--fixedactsequence" ) );
+		final Args parsed = parser.parseArgs( args );
+		final String inputNetworkFile = parsed.getValue( "--inputnetfile" );
+		final String outputPopulationFile = parsed.getValue( "--outputplans" );
+		final String outputHouseholdsFile = parsed.getValue( "--outputhhs" );
+		final int popSize = Integer.parseInt( parsed.getValue( "--popsize" ) );
+		final int maxHouseholdSize = Integer.parseInt( parsed.getValue( "--maxhhsize" ) );
+		final boolean doublePlans = Boolean.parseBoolean( parsed.getValue( "--doubleplans" ) );
+		final boolean fixedActivitySequence = Boolean.parseBoolean( parsed.getValue( "--fixedactsequence" ) );
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		new MatsimNetworkReader( scenario ).readFile( inputNetworkFile );

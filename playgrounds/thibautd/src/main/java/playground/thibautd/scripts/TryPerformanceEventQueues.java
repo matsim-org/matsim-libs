@@ -53,10 +53,10 @@ public class TryPerformanceEventQueues {
 	static enum Test { spscList , concurrentList , blockingQueue };
 	public static void main(String[] args) {
 
-		final ArgParser p = new ArgParser( args );
+		final ArgParser p = new ArgParser( );
 		p.setDefaultValue( "-t" , null );
 
-		switch ( p.getEnumValue( "-t" , Test.class ) ) {
+		switch ( p.parseArgs( args ).getEnumValue( "-t" , Test.class ) ) {
 			case spscList: {
 			   // time required for ConcurrentList (producer): 3989
 			   // consumed Items:10000

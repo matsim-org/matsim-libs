@@ -31,6 +31,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.ivt.utils.ArgParser;
+import playground.ivt.utils.ArgParser.Args;
 import playground.thibautd.utils.CsvUtils;
 
 /**
@@ -55,15 +56,16 @@ public class GeolocalizeCsvDataWithGoogle {
 	private static final char QUOTE = '"';
 
 	public static void main(final String[] args) {
-		main( new ArgParser( args ) );
-	}
-
-	private static void main(final ArgParser argParser) {
+		final ArgParser argParser = new ArgParser();
 		argParser.setDefaultValue( "-i" , null );
 		argParser.setDefaultValue( "-o" , null );
 		argParser.setDefaultValue( "-r" , null );
 		argParser.setDefaultValue( "-k" , null );
+		
+		main( argParser.parseArgs( args ) );
+	}
 
+	private static void main(final Args argParser) {
 		final String inFile = argParser.getValue( "-i" );
 		final String outFile = argParser.getValue( "-o" );
 		final String rejectFile = argParser.getValue( "-r" );
