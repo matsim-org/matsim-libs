@@ -74,20 +74,9 @@ public final class TripProcessing {
 					ArrayList<Double> startTimes = tripHandler.getStartTime().getValues(personId);
 					ArrayList<Id> endLinks = tripHandler.getEndLink().getValues(personId);
 					ArrayList<Double> endTimes = tripHandler.getEndTime().getValues(personId);
-					ArrayList<LinkedList<Id>> pathList = tripHandler.getPath().getValues(personId);
-		
+					
 					for (int i = 0; i < startLinks.size(); i++) {
 						if (network.getLinks().get(endLinks.get(i)) != null) {
-							// time per mode [minutes]
-							double travelTime = (endTimes.get(i) - startTimes.get(i))/60;
-							
-							// distance per mode [meters]
-							long travelDistance = 0;
-							LinkedList<Id> path = pathList.get(i);
-							for (Id linkId : path) {
-								travelDistance += network.getLinks().get(linkId).getLength();
-							}
-							
 							out.write(personId
 								+ "\t"
 								+ startTimes.get(i)
@@ -109,10 +98,6 @@ public final class TripProcessing {
 								+ modes.get(i)
 								+ "\t"
 								+ purposes.get(i)
-								+ "\t"
-								+ travelDistance
-								+ "\t"
-								+ travelTime
 								);
 							out.newLine();
 						}
@@ -139,10 +124,6 @@ public final class TripProcessing {
 									+ modes.get(i)
 									+ "\t"
 									+ purposes.get(i)
-									+ "\t"
-									+ "null"
-									+ "\t"
-									+ "null"
 									);
 								out.newLine();
 						}
