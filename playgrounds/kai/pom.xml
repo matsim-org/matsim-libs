@@ -35,6 +35,10 @@
 			<name>Janus Project Repository</name>
 			<url>http://www.janus-project.org/maven</url>
 		</repository>
+					<repository>
+						<id>sarl-repository</id>
+						<url>http://maven.sarl.io/</url>
+					</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
