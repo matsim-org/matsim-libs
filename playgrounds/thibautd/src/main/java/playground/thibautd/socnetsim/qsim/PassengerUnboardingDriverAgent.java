@@ -123,15 +123,18 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 
 	@Override
 	public void notifyMoveOverNode(final Id newLinkId) {
-		if ( !passengersToBoard.isEmpty() ) {
-			boardPassengers();
-			assert passengersToBoard.isEmpty();
-		}
+		assert passengersToBoard.isEmpty();
 		delegate.notifyMoveOverNode(newLinkId);
 	}
 
 	private void boardPassengers() {
-		final MobsimVehicle vehicle = vehicleProvider.getVehicle( delegate.getPlannedVehicleId() );
+		// using the vehicle provider might give access to a vehicle which is
+		// used by somebody else, if the sequence is incorrect.
+		// Using getVehicle() looks safer, as it should fail if the vehicle
+		// is somewhere else.
+		// It remains however problematic, as it is not clear whether agents will continue
+		// to be given the vehicle or not...
+		final MobsimVehicle vehicle = getVehicle();// vehicleProvider.getVehicle( delegate.getPlannedVehicleId() );
 		final EventsManager events = internalInterface.getMobsim().getEventsManager();
 		for ( PassengerAgent passenger : passengersToBoard ) {
 			assert passenger.getCurrentLinkId().equals( getCurrentLinkId() ) : passenger+" is at "+passenger.getCurrentLinkId()+" instead of "+getCurrentLinkId()+" for driver "+this;
@@ -160,17 +163,21 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 		passengersToBoard.add( passenger );
 	}
 
+	@Override
+	public void setVehicle(final MobsimVehicle veh) {
+		delegate.setVehicle(veh);
+		if ( !passengersToBoard.isEmpty() ) {
+			boardPassengers();
+			assert passengersToBoard.isEmpty();
+		}
+	}
+
 	// /////////////////////////////////////////////////////////////////////////
 	// pure delegation
 	// /////////////////////////////////////////////////////////////////////////
 	@Override
 	public Id getId() {
 		return delegate.getId();
-	}
-
-	@Override
-	public void setVehicle(final MobsimVehicle veh) {
-		delegate.setVehicle(veh);
 	}
 
 	@Override

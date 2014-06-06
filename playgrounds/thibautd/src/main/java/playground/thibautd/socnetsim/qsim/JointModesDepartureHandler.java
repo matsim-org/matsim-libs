@@ -158,6 +158,7 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 			// identified as such.
 			assert IdentifiableCollectionsUtils.containsAll( passengerIds , vehicle.getPassengers() ) :
 				passengerIds+" does not contains all of "+vehicle.getPassengers()+" with present passengers "+presentPassengers;
+
 			final boolean handled =
 				departureHandler.handleDeparture(
 						now,
