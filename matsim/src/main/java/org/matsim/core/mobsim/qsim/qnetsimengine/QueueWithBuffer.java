@@ -130,6 +130,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 
 	// (still) private:
 	private VisData visData = new VisDataImpl() ;
+	private final double timeStepSize;
 
 	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue ) {
 		this(qLinkImpl, vehicleQueue,  qLinkImpl.getLink().getId() ) ;
@@ -150,6 +151,8 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 		this.length = length;
 		this.unscaledFlowCapacity_s = flowCapacity_s ;
 		this.effectiveNumberOfLanes = effectiveNumberOfLanes;
+		
+		this.timeStepSize = this.network.simEngine.getMobsim().getScenario().getConfig().qsim().getTimeStepSize() ;
 
 		freespeedTravelTime = this.length / qLinkImpl.getLink().getFreespeed();
 		if (Double.isNaN(freespeedTravelTime)) {
@@ -556,48 +559,38 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 
 	@Override
 	public final void addFromUpstream(final QVehicle veh) {
-		// 2nd) need to get the different behavior from lane pulled over here.  test.
-		// final) remove method in QLane. test.
-		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+		
+		// activate link since there is now action on it:
 		qLink.activateLink();
+
+		// reduce storage capacity by size of vehicle:
 		usedStorageCapacity += veh.getSizeInEquivalents();
+
+		// get current time:
+		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+		
+		// compute and set earliest link exit time:
 		double linkTravelTime = this.length / this.network.simEngine.getLinkSpeedCalculator().getMaximumVelocity(veh, this.qLink.link, now);
-		double earliestExitTime = now + linkTravelTime;
+		double earliestExitTime = now + linkTravelTime ;
 
-		earliestExitTime +=  veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime());
-		// (yy this is what makes it pass the tests but I don't see why this is correct. kai, jun'13)
-		// (I now think that this is some fractional leftover from an earlier lane. kai, sep'13)
-		// (I also think it is never triggered for regular lanes since there the numbers are integerized (see below). kai, sep'13)
-
-//		if ( this.endsAtMetersFromLinkEnd == 0.0 ) {
-//			/* It's a QLane that is directly connected to a QNode,
-//			 * so we have to floor the freeLinkTravelTime in order the get the same
-//			 * results compared to the old mobSim */
-			earliestExitTime = Math.floor(earliestExitTime);
-			// yyyy I have no idea why this is in here.  Supposedly pulls the link travel times to "second"
-			// values, but I don't see why this has to be, and worse, it is wrong when the time step is
-			// not one second.  And obviously dangerous if someone tries sub-second time steps.
-			// kai, sep'13
-//		}
+		earliestExitTime = timeStepSize * Math.floor(earliestExitTime/timeStepSize );
 
 		veh.setEarliestLinkExitTime(earliestExitTime);
+		
+		// In theory, one could do something like
+		//		final double discretizedEarliestLinkExitTime = timeStepSize * Math.ceil(veh.getEarliestLinkExitTime()/timeStepSize);
+		//		double effectiveEntryTime = now - ( discretizedEarliestLinkExitTime - veh.getEarliestLinkExitTime() ) ;
+		//		double earliestExitTime = effectiveEntryTime + linkTravelTime;
+		// We decided against this since this would effectively move the simulation to operating on true floating point time steps.  For example,
+		// events could then have arbitrary floating point values (assuming one would use the "effectiveEntryTime" also for the event).  
+		// Also, it could happen that vehicles with an earlier link exit time could be 
+		// inserted and thus end up after vehicles with a later link exit time.  theresa & kai, jun'14
+		
 		veh.setCurrentLink(qLink.getLink());
 		vehQueue.add(veh);
-//		qLink.network.simEngine.getMobsim().getEventsManager().processEvent(
-//				new LinkEnterEvent(now, veh.getDriver().getId(), this.id, veh.getId()));
-		// yy it is a bit inconsistent that the link event in popFirstVehicle is thrown in this class, but
-		// for addFromUpstream it is thrown in the calling class.  Found it in this way QLane.  Overall,
-		// it might make sense to move _all_ link events into the calling classes; also, the problem
-		// looks easier to fix here than for the QLinkLanesImpl. For those reason, I am
-		// here adapting to the QLane inconsistency.  yyyyyy May cause problems with other plugins (like Gregor's).
-		// kai, sep'13
 		if ( QueueWithBuffer.HOLES ) {
 			holes.poll();
 		}
-//		if (this.generatingEvents) {
-//			this.qLink.network.simEngine.getMobsim().getEventsManager()
-//			.processEvent(new LaneEnterEvent(now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()));
-//		}
 	}
 
 	@Override
