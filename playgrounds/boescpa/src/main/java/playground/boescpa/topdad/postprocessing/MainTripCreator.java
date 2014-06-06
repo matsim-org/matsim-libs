@@ -19,8 +19,6 @@
 
 package playground.boescpa.topdad.postprocessing;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.network.Network;
@@ -80,12 +78,8 @@ public class MainTripCreator {
 		log.info("Reading events file...done.");
 		
 		log.info("Postprocessing trips...");
-		try {
-			TripProcessing.printTrips(tripHandler, network, args[2]);
-		}
-		catch (IOException e) {
-			throw new IllegalArgumentException("Given trip-file-path not valid.");
-		}
+		TripProcessing.printTrips(tripHandler, network, args[2]);
+		TripProcessing.analyzeTripsTopdad(tripHandler, network, args[3]);
 		log.info("Postprocessing trips...done.");
 		
 	}
