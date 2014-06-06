@@ -53,10 +53,10 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
+import playground.ivt.utils.ArgParser;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkImpl;
 import playground.thibautd.socnetsim.population.SocialNetworkWriter;
-import playground.thibautd.utils.ArgParser;
 import playground.thibautd.utils.CollectionUtils;
 import playground.thibautd.utils.DesiresConverter;
 

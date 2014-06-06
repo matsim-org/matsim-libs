@@ -39,10 +39,13 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * never be sure that an event is not specific to a person, even if it does not implement
  * {@link HasPerson}. Currently, events implementing {@link HasPerson}, as well as link
  * events, are filtered, the rest simply transmitted.
- *
+ * <br>
  * It always transmits only the events for one specific subpopulation: if non is provided,
  * it will do it for the default subpopulation (the unnamed one, normally corresponding to "normal"
  * agents).
+ * <br>
+ * Be aware that events of "transit driver agents" will show up in the default population,
+ * but not in the others.
  *
  * @author thibautd
  */

@@ -29,10 +29,10 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.ivt.utils.ArgParser;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkReader;
 import playground.thibautd.socnetsim.population.SocialNetworkWriter;
-import playground.thibautd.utils.ArgParser;
 import playground.thibautd.utils.MoreIOUtils;
 
 /**

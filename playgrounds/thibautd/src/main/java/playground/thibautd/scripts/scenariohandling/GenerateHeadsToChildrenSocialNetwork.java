@@ -35,10 +35,10 @@ import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
 
+import playground.ivt.utils.ArgParser;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkImpl;
 import playground.thibautd.socnetsim.population.SocialNetworkWriter;
-import playground.thibautd.utils.ArgParser;
 
 /**
  * Takes households, and generates a social network, where the children are alters

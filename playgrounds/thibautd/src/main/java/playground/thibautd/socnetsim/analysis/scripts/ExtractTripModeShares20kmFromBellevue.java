@@ -54,9 +54,9 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.PtConstants;
 
+import playground.ivt.utils.ArgParser;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
-import playground.thibautd.utils.ArgParser;
 
 /**
  * @author thibautd

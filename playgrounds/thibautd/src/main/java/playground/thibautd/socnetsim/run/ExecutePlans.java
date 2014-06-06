@@ -22,8 +22,8 @@ package playground.thibautd.socnetsim.run;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 
+import playground.ivt.utils.ArgParser;
 import playground.thibautd.socnetsim.population.JointPlansConfigGroup;
-import playground.thibautd.utils.ArgParser;
 import playground.thibautd.utils.MoreIOUtils;
 
 /**

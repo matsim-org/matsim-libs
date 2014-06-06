@@ -38,9 +38,9 @@ import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
+import playground.ivt.utils.ArgParser;
 import playground.thibautd.geocoding.GeolocalizingParser;
 import playground.thibautd.geocoding.MapquestResult.Result;
-import playground.thibautd.utils.ArgParser;
 import playground.thibautd.utils.CsvUtils;
 import playground.thibautd.utils.MapUtils;
 
