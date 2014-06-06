@@ -46,7 +46,7 @@ Pure plan selecting (i.e. non-innovative) strategy module.
 
 Will select the plan with the highest score. The score will be updated after execution of the mobsim.
 
-Disadvantage: Will never try again plans that obtained a bad score  from a fluctuation (e.g. a rare traffic jam). It is therefore  recommended to either use this in conjunction with a small probability  for RandomPlanSelector, or to use ChangeExpBeta.
+Disadvantage: Will never try again plans that obtained a bad score  from a fluctuation (e.g.\ a rare traffic jam). It is therefore  recommended to either use this in conjunction with a small probability  for RandomPlanSelector, or to use ChangeExpBeta.
 
 \subsection{ChangeExpBeta. Status: works. RECOMMENDED!}
 
@@ -112,7 +112,7 @@ It is possible to route such legs on the network, by using a different router.
 
 It is \emph{not} possible to "physically" execute a leg in the  mobsim if it has not been routed before. That is, the capability  of the router needs to be $\ge$ the capability of the mobsim.  (Makes sense, if one thinks about it.)
 
-\subsection{TimeAllocationMutator.  Status: works for vsp and ivt}
+\subsection{TimeAllocationMutator.  Status: works}
 
 Simple  module that shifts activity end times randomly. ("Good" time  shifts will be selected through the matsim plans selection mechanism.)
 
@@ -122,7 +122,7 @@ The maximum extent of the shifts can be configured; see the config  section of t
 
 The usage of the module is configured in the ``strategy'' section.
 
-\subsection{ ChangeSingleLegMode. Status: works}
+\subsection{ChangeSingleLegMode. Status: works}
 
 \textbf{Maintainer:} Marcel Rieser
 
@@ -144,7 +144,7 @@ Add the module to the replanning strategy like this:
 
 Replace the 'X' with the number you assign to this module. For some more details on the syntax of this section, see Sec.~\ref{sec:introduction}.
 
-By default, the simulation will handle legs with modes different from  ``car'' by using a delayed teleportation. If another behavior is  requested (e.g. detailed simulation of public transport), this needs to  be manually configured for the simulation.
+By default, the simulation will handle legs with modes different from  ``car'' by using a delayed teleportation. If another behavior is  requested (e.g.\ detailed simulation of public transport), this needs to  be manually configured for the simulation.
 
 
 \subsection{ChangeLegMode. Status: works}
@@ -152,7 +152,7 @@ By default, the simulation will handle legs with modes different from  ``car'' b
 
 \textbf{Maintainer:} Michael Zilske
 
-This replanning module randomly picks one of the plans of a person  and changes its mode of transport.By default, the supported modes  are driving a car and using public transport. Only one mode of transport  per plan is supported. For using different modes for sub-tours on a  single day see the "SubtourModeChoice" module. Also, this module is able  to (optionally) respect car-availability.
+This replanning module randomly picks one of the plans of a person  and changes its mode of transport. By default, the supported modes  are driving a car and using public transport. Only one mode of transport  per plan is supported. For using different modes for sub-tours on a  single day see the "SubtourModeChoice" module. Also, this module is able  to (optionally) respect car-availability.
 
 The replanning module is configured like this, where the value  parameter lists the modes of transport from which the module randomly  chooses:
 \begin{lstlisting}{language=XML}
@@ -170,7 +170,7 @@ Add the module to the replanning strategy like this:
 
 Replace the 'X' with the number you assign to this module. For some more details on the syntax of this section, see \href{http://matsim.org/node/478}{here}.
 
-By default, the simulation will handle legs with modes different from  "car" by using a delayed teleportation. If another behavior is  requested (e.g. detailed simulation of public transport), this needs to  be manually configured for the simulation.
+By default, the simulation will handle legs with modes different from  "car" by using a delayed teleportation. If another behavior is  requested (e.g.\ detailed simulation of public transport), this needs to  be manually configured for the simulation.
 
 This module can be used with the detailed simulation of public transport by changing the line
 
