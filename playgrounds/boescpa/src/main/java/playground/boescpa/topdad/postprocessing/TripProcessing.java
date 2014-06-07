@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -61,7 +62,7 @@ public final class TripProcessing {
 	 */
 	public static void printTrips(TripHandler tripHandler, Network network, String outFile) {
 		try {
-			final String header="agentId\tstartTime\tstartLink\tstartXCoord\tstartYCoord\tendTime\tendLink\tendXCoord\tendYCoord\tmode\tpurpose";
+			final String header="agentId\tstartTime\tstartLink\tstartXCoord\tstartYCoord\tendTime\tendLink\tendXCoord\tendYCoord\tmode\tpurpose\ttime\tdistance";
 			final BufferedWriter out = IOUtils.getBufferedWriter(outFile); // Path to the trip-File produced as output, e.g. "trips2030combined.txt"
 			out.write(header);
 			out.newLine();
@@ -74,8 +75,14 @@ public final class TripProcessing {
 					ArrayList<Double> startTimes = tripHandler.getStartTime().getValues(personId);
 					ArrayList<Id> endLinks = tripHandler.getEndLink().getValues(personId);
 					ArrayList<Double> endTimes = tripHandler.getEndTime().getValues(personId);
+					ArrayList<LinkedList<Id>> pathList = tripHandler.getPath().getValues(personId);
 					
 					for (int i = 0; i < startLinks.size(); i++) {
+						// travel time per mode [minutes]
+						double travelTime = calcTravelTime(startTimes.get(i), endTimes.get(i))/60;
+						// distance per mode [meters]
+						long travelDistance = calcTravelDistance(pathList.get(i), network, startLinks.get(i), endLinks.get(i));
+						
 						if (network.getLinks().get(endLinks.get(i)) != null) {
 							out.write(personId
 								+ "\t"
@@ -98,6 +105,10 @@ public final class TripProcessing {
 								+ modes.get(i)
 								+ "\t"
 								+ purposes.get(i)
+								+ "\t"
+								+ String.valueOf(travelTime)
+								+ "\t"
+								+ String.valueOf(travelDistance)
 								);
 							out.newLine();
 						}
@@ -124,6 +135,10 @@ public final class TripProcessing {
 									+ modes.get(i)
 									+ "\t"
 									+ purposes.get(i)
+									+ "\t"
+									+ String.valueOf(travelTime)
+									+ "\t"
+									+ String.valueOf(travelDistance)
 									);
 								out.newLine();
 						}
@@ -173,26 +188,11 @@ public final class TripProcessing {
 					if (network.getLinks().get(endLinks.get(i)) != null) {
 						String mode = modes.get(i);
 						
-						// time per mode [minutes]
-						double travelTime = (endTimes.get(i) - startTimes.get(i))/60;
+						// travel time per mode [minutes]
+						double travelTime = calcTravelTime(startTimes.get(i), endTimes.get(i))/60;
 						
 						// distance per mode [meters]
-						long travelDistance = 0;
-						LinkedList<Id> path = pathList.get(i);
-						if (path.size() > 0) {
-							// if a path was recorded, use the actual path for travel-distance calculation
-							for (Id linkId : path) {
-								travelDistance += network.getLinks().get(linkId).getLength();
-							}
-						} else {
-							// if no path available, use euclidian distance as estimation for travel-distance
-							Coord startLink = network.getLinks().get(startLinks.get(i)).getCoord();
-							Coord endLink = network.getLinks().get(endLinks.get(i)).getCoord(); 
-							travelDistance += (long) Math.sqrt(
-									((endLink.getX() - startLink.getX())*(endLink.getX() - startLink.getX()))
-									+ ((endLink.getY() - startLink.getY())*(endLink.getY() - startLink.getY()))); 
-						}
-						
+						long travelDistance = calcTravelDistance(pathList.get(i), network, startLinks.get(i), endLinks.get(i));
 						
 						// store new values
 						if (timeMode.containsKey(mode)) {
@@ -241,6 +241,52 @@ public final class TripProcessing {
 			result.put(mode, val);
 		}
 		return result;
+	}
+	
+	/**
+	 * Calculates the travel time for a given trip.
+	 * 
+	 * If no path is provided (path == null), the euclidian distance between the start and the end link is returned.
+	 * If the trip wasn't finished (endLink == null), the path length is not calculated (return 0).
+	 * 
+	 * @param path		of the trip 
+	 * @param network	of the simulation
+	 * @param startLink	of the trip
+	 * @param endLink	of the trip
+	 * @return	path length of the trip [m]
+	 */
+	private static int calcTravelDistance(LinkedList<Id> path, Network network, Id startLink, Id endLink) {
+		// If the trip wasn't finished (endLink == null), the path length is not calculated.
+		if (endLink == null) {
+			return 0;
+		}
+		
+		int travelDistance = 0;
+		if (path.size() > 0) {
+			// if a path was recorded, use the actual path for travel-distance calculation
+			for (Id linkId : path) {
+				travelDistance += network.getLinks().get(linkId).getLength();
+			}
+		} else {
+			// if no path available, use euclidian distance as estimation for travel-distance
+			Coord coordsStartLink = network.getLinks().get(startLink).getCoord();
+			Coord coordsEndLink = network.getLinks().get(endLink).getCoord(); 
+			travelDistance += (long) Math.sqrt(
+					((coordsEndLink.getX() - coordsStartLink.getX())*(coordsEndLink.getX() - coordsStartLink.getX()))
+					+ ((coordsEndLink.getY() - coordsStartLink.getY())*(coordsEndLink.getY() - coordsStartLink.getY()))); 
+		}
+		return travelDistance;
+	}
+
+	/**
+	 * Calculates the travel time for a given trip.
+	 * 
+	 * @param startTime	of the trip [sec]
+	 * @param endTime	of the trip [sec]
+	 * @return	total travel time of the trip [sec]
+	 */
+	private static double calcTravelTime(Double startTime, Double endTime) {
+		return endTime - startTime;
 	}
 	
 }
