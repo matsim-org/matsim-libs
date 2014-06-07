@@ -71,9 +71,9 @@ public class TestMainTripCreator {
 		reader.parse(eventsFile);
 		
 		// run postprocessing
-		String resultsFile = this.utils.getOutputDirectory() + "tripResults.txt";
-		//TripProcessing.printTrips(tripHandler, network, resultsFile+".2.txt");
-		HashMap<String, Double[]> results = TripProcessing.analyzeTripsTopdad(tripHandler, network, resultsFile);
+		TripProcessing.printTrips(tripHandler, network, this.utils.getOutputDirectory() + "tripResults.txt");
+		HashMap<String, Double[]> results =
+				TripProcessing.analyzeTripsTopdad(tripHandler, network, this.utils.getOutputDirectory() + "analResults.txt");
 		
 		// TripProcessing.analyzeTrips - Time tests
 		Assert.assertEquals("Test: TripProcessing.analyzeTrips - car mode time sum not as expected.", 10147.12, results.get("car")[0], 0.01);
