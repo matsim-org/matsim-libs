@@ -183,6 +183,8 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			this.state = MobsimAgent.State.ABORT ;
 		} else {
 			// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
+			
+			
 			if (this.getVehicle()!=null && (this.getVehicle().getId().toString().startsWith("TW") ||
 			this.getVehicle().getId().toString().startsWith("OW") || 
 			this.getVehicle().getId().toString().startsWith("FF")))
@@ -194,8 +196,12 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	}	
 	
 	private void parkCSVehicle( Leg currentLeg, Plan plan) {
-		
-		if (currentLeg.getMode().equals("twowaycarsharing") && plan.getPlanElements().get(currentPlanElementIndex + 1) instanceof Leg) {
+		if (currentLeg.getMode().equals("onewaycarsharing")) {
+			
+			owvehiclesLocation.addVehicle(endStationOW, owVehId);
+			owVehId = null;
+		}
+		else if (currentLeg.getMode().equals("twowaycarsharing") && plan.getPlanElements().get(currentPlanElementIndex + 1) instanceof Leg) {
 			
 			twvehiclesLocation.addVehicle(scenario.getNetwork().getLinks().get(this.cachedDestinationLinkId), twVehId);
 			twVehId = null;
