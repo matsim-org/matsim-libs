@@ -64,11 +64,14 @@ public final class TripProcessing {
 		try {
 			final String header="agentId\tstartTime\tstartLink\tstartXCoord\tstartYCoord\tendTime\tendLink\tendXCoord\tendYCoord\tmode\tpurpose\ttime\tdistance";
 			final BufferedWriter out = IOUtils.getBufferedWriter(outFile); // Path to the trip-File produced as output, e.g. "trips2030combined.txt"
+			int incognitoPersonId = 0;
 			out.write(header);
 			out.newLine();
 			log.info("Writing trips file...");
 			for (Id personId : tripHandler.getStartLink().keySet()) {
 				if (!personId.toString().contains("pt")) {
+					incognitoPersonId++;
+					
 					ArrayList<Id> startLinks = tripHandler.getStartLink().getValues(personId);
 					ArrayList<String> modes = tripHandler.getMode().getValues(personId);
 					ArrayList<String> purposes = tripHandler.getPurpose().getValues(personId);
@@ -84,7 +87,7 @@ public final class TripProcessing {
 						long travelDistance = calcTravelDistance(pathList.get(i), network, startLinks.get(i), endLinks.get(i));
 						
 						if (network.getLinks().get(endLinks.get(i)) != null) {
-							out.write(personId
+							out.write(incognitoPersonId
 								+ "\t"
 								+ startTimes.get(i)
 								+ "\t"
@@ -114,7 +117,7 @@ public final class TripProcessing {
 						}
 						// in case there is no end link
 						else {
-							out.write(personId
+							out.write(incognitoPersonId
 									+ "\t"
 									+ startTimes.get(i)
 									+ "\t"
