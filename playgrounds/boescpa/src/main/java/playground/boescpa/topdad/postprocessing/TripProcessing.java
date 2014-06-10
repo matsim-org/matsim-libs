@@ -104,12 +104,12 @@ public final class TripProcessing {
 							continue;
 						}
 						
-						// travel time per mode [minutes]
-						double travelTime = calcTravelTime(startTimes.get(i), endTimes.get(i))/60;
-						// distance per mode [meters]
-						long travelDistance = calcTravelDistance(pathList.get(i), network, startLinks.get(i), endLinks.get(i));
-						
 						if (network.getLinks().get(endLinks.get(i)) != null) {
+							// travel time per mode [minutes]
+							double travelTime = calcTravelTime(startTimes.get(i), endTimes.get(i))/60;
+							// distance per mode [meters]
+							long travelDistance = calcTravelDistance(pathList.get(i), network, startLinks.get(i), endLinks.get(i));
+							
 							out.write(incognitoPersonId
 								+ "\t"
 								+ startTimes.get(i)
@@ -162,9 +162,9 @@ public final class TripProcessing {
 									+ "\t"
 									+ purposes.get(i)
 									+ "\t"
-									+ String.valueOf(travelTime)
+									+ "null"
 									+ "\t"
-									+ String.valueOf(travelDistance)
+									+ "null"
 									);
 								out.newLine();
 						}
