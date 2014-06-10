@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.emissions.EmissionModule;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -196,18 +197,20 @@ public class TestEmissionPricing {
 		createPassiveAgents(scenario);
 		
 	// define emission tool input files	
-		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
-		vcg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
-		vcg.setEmissionVehicleFile(emissionVehicleFile);
-		
-		vcg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
-		vcg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
-		
-		vcg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
-		vcg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
-		vcg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
+        EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
+        controler.getConfig().addModule(ecg);
+        ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
+        ecg.setEmissionVehicleFile(emissionVehicleFile);
+        
+        ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
+        ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
+        
+        ecg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
+        ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
+        ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
 		
 	// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
+//		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
 //		vcg.setWritingOutputEvents(false) ;
 //		
 //		EmissionControlerListener ecl = new EmissionControlerListener(controler);

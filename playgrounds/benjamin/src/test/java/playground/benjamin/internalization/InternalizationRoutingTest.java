@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -248,13 +249,15 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		scg.addStrategySettings(reRoute);
 
 		// define emission tool input files	
-		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
-		vcg.setEmissionRoadTypeMappingFile(this.getClassInputDirectory() + "roadTypeMapping.txt");
+	    EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
+	     
+		ecg.setEmissionRoadTypeMappingFile(this.getClassInputDirectory() + "roadTypeMapping.txt");
 
-		vcg.setAverageWarmEmissionFactorsFile(this.getClassInputDirectory() + "EFA_HOT_vehcat_2005average.txt");
-		vcg.setAverageColdEmissionFactorsFile(this.getClassInputDirectory() + "EFA_ColdStart_vehcat_2005average.txt");
+		ecg.setAverageWarmEmissionFactorsFile(this.getClassInputDirectory() + "EFA_HOT_vehcat_2005average.txt");
+		ecg.setAverageColdEmissionFactorsFile(this.getClassInputDirectory() + "EFA_ColdStart_vehcat_2005average.txt");
 
 		// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
+		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
 		vcg.setWritingOutputEvents(false) ;
 	}
 

@@ -20,6 +20,7 @@ package playground.agarwalamit.siouxFalls.simulationInputs;
 
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.example.EmissionControlerListener;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -67,11 +68,15 @@ public class SiouxFallsControler {
 		Controler controler = new Controler(config);
 
 		//===emission files
-		config.vspExperimental().setAverageColdEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_ColdStart_vehcat_2005average.txt");
-		config.vspExperimental().setAverageWarmEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_HOT_vehcat_2005average.txt");
-		config.vspExperimental().setEmissionRoadTypeMappingFile("../../siouxFalls/input/SiouxFalls_roadTypeMapping.txt");
-		config.vspExperimental().setEmissionVehicleFile("../../siouxFalls/input/SiouxFalls_emissionVehicles.xml");
-		config.vspExperimental().setUsingDetailedEmissionCalculation(false);
+		
+	      EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
+	      controler.getConfig().addModule(ecg);
+	    
+		ecg.setAverageColdEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_ColdStart_vehcat_2005average.txt");
+		ecg.setAverageWarmEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_HOT_vehcat_2005average.txt");
+		ecg.setEmissionRoadTypeMappingFile("../../siouxFalls/input/SiouxFalls_roadTypeMapping.txt");
+		ecg.setEmissionVehicleFile("../../siouxFalls/input/SiouxFalls_emissionVehicles.xml");
+		ecg.setUsingDetailedEmissionCalculation(false);
 		//===only emission events genertaion; used with all runs for comparisons
 		EmissionModule emissionModule = new EmissionModule(ScenarioUtils.loadScenario(config));
 		emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));

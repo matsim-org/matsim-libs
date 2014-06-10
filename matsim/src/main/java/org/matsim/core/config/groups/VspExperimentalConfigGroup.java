@@ -61,29 +61,6 @@ public class VspExperimentalConfigGroup extends ReflectiveModule {
 
 	// ---
 
-	private static final String EMISSION_ROADTYPE_MAPPING_FILE = "emissionRoadTypeMappingFile";
-	private String emissionRoadTypeMappingFile = null;
-
-	private static final String EMISSION_VEHICLE_FILE = "emissionVehicleFile";
-	private String emissionVehicleFile = null;
-
-	private static final String EMISSION_FACTORS_WARM_FILE_AVERAGE = "averageFleetWarmEmissionFactorsFile";
-	private String averageFleetWarmEmissionFactorsFile = null;
-
-	private static final String EMISSION_FACTORS_COLD_FILE_AVERAGE = "averageFleetColdEmissionFactorsFile";
-	private String averageFleetColdEmissionFactorsFile = null;
-
-	private static final String USING_DETAILED_EMISSION_CALCULATION = "usingDetailedEmissionCalculation";
-	private boolean isUsingDetailedEmissionCalculation = false;
-
-	private static final String EMISSION_FACTORS_WARM_FILE_DETAILED = "detailedWarmEmissionFactorsFile" ;
-	private String detailedWarmEmissionFactorsFile = null;
-
-	private static final String EMISSION_FACTORS_COLD_FILE_DETAILED = "detailedColdEmissionFactorsFile";
-	private String detailedColdEmissionFactorsFile;
-
-	// ---
-
 	private static final String WRITING_OUTPUT_EVENTS = "writingOutputEvents" ;
 	private boolean writingOutputEvents = false ;
 
@@ -188,22 +165,7 @@ public class VspExperimentalConfigGroup extends ReflectiveModule {
 		map.put(WRITING_OUTPUT_EVENTS, "if true then writes output_events in output directory.  default is `false'." +
 		" Will only work when lastIteration is multiple of events writing interval" ) ;
 
-		map.put(EMISSION_ROADTYPE_MAPPING_FILE, "REQUIRED: mapping from input road types to HBEFA 3.1 road type strings");
 
-		map.put(EMISSION_VEHICLE_FILE, "definition of a vehicle for every person (who is allowed to choose a vehicle in the simulation):" + "\n\t\t" +
-				" - REQUIRED: vehicle type Id must start with the respective HbefaVehicleCategory followed by `;'" + "\n\t\t" +
-				" - OPTIONAL: if detailed emission calculation is switched on, vehicle type Id should aditionally contain" +
-				" HbefaVehicleAttributes (`Technology;SizeClasse;EmConcept'), corresponding to the strings in " + EMISSION_FACTORS_WARM_FILE_DETAILED);
-
-		map.put(EMISSION_FACTORS_WARM_FILE_AVERAGE, "REQUIRED: file with HBEFA 3.1 fleet average warm emission factors");
-
-		map.put(EMISSION_FACTORS_COLD_FILE_AVERAGE, "REQUIRED: file with HBEFA 3.1 fleet average cold emission factors");
-
-		map.put(USING_DETAILED_EMISSION_CALCULATION, "if true then detailed emission factor files must be provided!");
-
-		map.put(EMISSION_FACTORS_WARM_FILE_DETAILED, "OPTIONAL: file with HBEFA 3.1 detailed warm emission factors") ;
-
-		map.put(EMISSION_FACTORS_COLD_FILE_DETAILED, "OPTIONAL: file with HBEFA 3.1 detailed cold emission factors");
 
 		map.put( VSP_DEFAULTS_CHECKING_LEVEL, 
 				"Options: `"+IGNORE+"', `"+WARN+"', `"+ABORT+"'.  Default: either `"+IGNORE+"' or `"
@@ -253,62 +215,7 @@ public class VspExperimentalConfigGroup extends ReflectiveModule {
 	public void setRemovingUnneccessaryPlanAttributes(final boolean removingUnneccessaryPlanAttributes) {
 		this.removingUnneccessaryPlanAttributes = removingUnneccessaryPlanAttributes;
 	}
-	@StringSetter(EMISSION_ROADTYPE_MAPPING_FILE)
-	public void setEmissionRoadTypeMappingFile(String roadTypeMappingFile) {
-		this.emissionRoadTypeMappingFile = roadTypeMappingFile;
-	}
-	@StringGetter(EMISSION_ROADTYPE_MAPPING_FILE)
-	public String getEmissionRoadTypeMappingFile() {
-		return this.emissionRoadTypeMappingFile;
-	}
-	@StringSetter(EMISSION_VEHICLE_FILE)
-	public void setEmissionVehicleFile(String emissionVehicleFile) {
-		this.emissionVehicleFile = emissionVehicleFile;
-	}
-	@StringGetter(EMISSION_VEHICLE_FILE)
-	public String getEmissionVehicleFile() {
-		return this.emissionVehicleFile;
-	}
-	@StringSetter(EMISSION_FACTORS_WARM_FILE_AVERAGE)
-	public void setAverageWarmEmissionFactorsFile(String averageFleetWarmEmissionFactorsFile) {
-		this.averageFleetWarmEmissionFactorsFile = averageFleetWarmEmissionFactorsFile;
-	}
-	@StringGetter(EMISSION_FACTORS_WARM_FILE_AVERAGE)
-	public String getAverageWarmEmissionFactorsFile() {
-		return this.averageFleetWarmEmissionFactorsFile;
-	}
-	@StringSetter(EMISSION_FACTORS_COLD_FILE_AVERAGE)
-	public void setAverageColdEmissionFactorsFile(String averageFleetColdEmissionFactorsFile) {
-		this.averageFleetColdEmissionFactorsFile = averageFleetColdEmissionFactorsFile;
-	}
-	@StringGetter(EMISSION_FACTORS_COLD_FILE_AVERAGE)
-	public String getAverageColdEmissionFactorsFile() {
-		return this.averageFleetColdEmissionFactorsFile;
-	}
-	@StringGetter(USING_DETAILED_EMISSION_CALCULATION)
-	public boolean isUsingDetailedEmissionCalculation(){
-		return this.isUsingDetailedEmissionCalculation;
-	}
-	@StringSetter(USING_DETAILED_EMISSION_CALCULATION)
-	public void setUsingDetailedEmissionCalculation(final boolean isUsingDetailedEmissionCalculation) {
-		this.isUsingDetailedEmissionCalculation = isUsingDetailedEmissionCalculation;
-	}
-	@StringSetter(EMISSION_FACTORS_WARM_FILE_DETAILED)
-	public void setDetailedWarmEmissionFactorsFile(String detailedWarmEmissionFactorsFile) {
-		this.detailedWarmEmissionFactorsFile = detailedWarmEmissionFactorsFile;
-	}
-	@StringGetter(EMISSION_FACTORS_WARM_FILE_DETAILED)
-	public String getDetailedWarmEmissionFactorsFile() {
-		return this.detailedWarmEmissionFactorsFile;
-	}
-	@StringSetter(EMISSION_FACTORS_COLD_FILE_DETAILED)
-	public void setDetailedColdEmissionFactorsFile(String detailedColdEmissionFactorsFile) {
-		this.detailedColdEmissionFactorsFile = detailedColdEmissionFactorsFile;
-	}
-	@StringGetter(EMISSION_FACTORS_COLD_FILE_DETAILED)
-	public String getDetailedColdEmissionFactorsFile(){
-		return this.detailedColdEmissionFactorsFile;
-	}
+
 	@StringGetter(WRITING_OUTPUT_EVENTS)
 	public boolean isWritingOutputEvents() {
 		return this.writingOutputEvents ;

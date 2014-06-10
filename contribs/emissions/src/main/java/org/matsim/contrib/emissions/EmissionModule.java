@@ -39,6 +39,7 @@ import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
 import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactor;
 import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactorKey;
 import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.EventsUtils;
@@ -103,8 +104,8 @@ public class EmissionModule {
 
 		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
 		avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
-		
-		if(scenario.getConfig().vspExperimental().isUsingDetailedEmissionCalculation()){
+		EmissionsConfigGroup ecg = (EmissionsConfigGroup)scenario.getConfig().getModule("emissions");
+		if(ecg.isUsingDetailedEmissionCalculation()){
 			detailedHbefaWarmTable = createDetailedHbefaWarmTable(detailedWarmEmissionFactorsFile);
 			detailedHbefaColdTable = createDetailedHbefaColdTable(detailedColdEmissionFactorsFile);
 		}
@@ -115,15 +116,17 @@ public class EmissionModule {
 	}
 
 	private void getInputFiles() {
-		
-		roadTypeMappingFile = scenario.getConfig().vspExperimental().getEmissionRoadTypeMappingFile();
-		emissionVehicleFile = scenario.getConfig().vspExperimental().getEmissionVehicleFile();
+	      EmissionsConfigGroup ecg = (EmissionsConfigGroup)scenario.getConfig().getModule("emissions");
+
+		roadTypeMappingFile = ecg.getEmissionRoadTypeMappingFile();
+		emissionVehicleFile = ecg.getEmissionVehicleFile();
 	
-		averageFleetWarmEmissionFactorsFile = scenario.getConfig().vspExperimental().getAverageWarmEmissionFactorsFile();
-		averageFleetColdEmissionFactorsFile = scenario.getConfig().vspExperimental().getAverageColdEmissionFactorsFile();
+		averageFleetWarmEmissionFactorsFile = ecg.getAverageWarmEmissionFactorsFile();
+		averageFleetColdEmissionFactorsFile = ecg.getAverageColdEmissionFactorsFile();
 		
-		detailedWarmEmissionFactorsFile = scenario.getConfig().vspExperimental().getDetailedWarmEmissionFactorsFile();
-		detailedColdEmissionFactorsFile = scenario.getConfig().vspExperimental().getDetailedColdEmissionFactorsFile();
+		
+		detailedWarmEmissionFactorsFile = ecg.getDetailedWarmEmissionFactorsFile();
+		detailedColdEmissionFactorsFile = ecg.getDetailedColdEmissionFactorsFile();
 	}
 
 	public void createEmissionHandler() {
