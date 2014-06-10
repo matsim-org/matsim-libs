@@ -42,12 +42,8 @@ public class ModeSubstitutionCSAnalysis {
 					
 					if (((Leg) pe).getMode().equals("onewaycarsharing")) {
 						Leg s = null;
-						int index = person.getSelectedPlan().getPlanElements().indexOf(pe);
 						
-					//	if (((Activity)person.getSelectedPlan().getPlanElements().get(index - 1)).getType().equals("cs_interaction"))
-					//		s = findMode(person.getId(), j, scenario);
-					//	else
-							s = findMode(person.getId(), j, scenario);
+						s = findMode(person.getId(), j, scenario);
 						
 						if (s.getMode().equals("car")) {
 							
