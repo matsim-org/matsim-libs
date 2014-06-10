@@ -47,7 +47,6 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler,
 		ActivityStartEventHandler, PersonStuckEventHandler, LinkLeaveEventHandler {
 	
-	// TODO cut it to Zurich region!
 	// TODO create "path" for pt and transit_walk too! {Will have to adapt TestMainTripCreator if this is done...}
 	
 	BoxedHashMap<Id,Id> startLink;
