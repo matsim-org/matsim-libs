@@ -79,7 +79,7 @@ public class MainTripCreator {
 		log.info("Reading events file...done.");
 		
 		log.info("Postprocessing trips...");
-		TripProcessing.setCuttingStrategy(new CircleBellevueCutting(30000));
+		TripProcessing.setCuttingStrategy(new CircleBellevueCutting(Integer.valueOf(args[4])));
 		TripProcessing.printTrips(tripHandler, network, args[2]);
 		TripProcessing.analyzeTripsTopdad(tripHandler, network, args[3]);
 		log.info("Postprocessing trips...done.");
