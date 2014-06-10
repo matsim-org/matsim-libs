@@ -1,13 +1,9 @@
 package usecases.chessboard;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.TimeWindow;
@@ -15,10 +11,10 @@ import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.scoring.FreightActivity;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.ActivityScoring;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
+import org.matsim.core.scoring.SumScoringFunction;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Defines example carrier scoring function (factory).
@@ -37,11 +33,9 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
 	 * @author stefan
 	 *
 	 */
-	static class DriversActivityScoring implements BasicScoring, ActivityScoring{
+	static class DriversActivityScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ActivityScoring {
 
 		private double score;
-		
-		private Double actStartTime;
 		
 		private double timeParameter = 0.008; 
 		
@@ -49,28 +43,6 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
 		
 		public DriversActivityScoring() {
 			super();
-		}
-
-		@Override
-		public void startActivity(double time, Activity act) {
-			actStartTime = time;
-			if(act instanceof FreightActivity){
-				TimeWindow tw = ((FreightActivity) act).getTimeWindow();
-				if(time > tw.getEnd()){
-					double penalty_score = (-1)*(time - tw.getEnd())*missedTimeWindowPenalty;
-					assert penalty_score <= 0.0 : "penalty score must be negative";
-					score += penalty_score;
-				}
-			}
-		}
-
-		@Override
-		public void endActivity(double time, Activity act) {
-			if(actStartTime!=null){
-				double actTimeCosts = (time-actStartTime)*timeParameter;
-				assert actTimeCosts >= 0.0 : "actTimeCosts must be positive";
-				score += actTimeCosts*(-1);
-			}
 		}
 
 		@Override
@@ -84,13 +56,33 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
 			return score;
 		}
 
-		@Override
-		public void reset() {
-			score = 0.0;
-			actStartTime = null;
-		}
-		
-	}
+        @Override
+        public void handleFirstActivity(Activity act) {
+            handleActivity(act);
+        }
+
+        @Override
+        public void handleActivity(Activity act) {
+            if(act instanceof FreightActivity) {
+                double actStartTime = act.getStartTime();
+                TimeWindow tw = ((FreightActivity) act).getTimeWindow();
+                if(actStartTime > tw.getEnd()){
+                    double penalty_score = (-1)*(actStartTime - tw.getEnd())*missedTimeWindowPenalty;
+                    assert penalty_score <= 0.0 : "penalty score must be negative";
+                    score += penalty_score;
+                }
+                double actTimeCosts = (act.getEndTime()-actStartTime)*timeParameter;
+                assert actTimeCosts >= 0.0 : "actTimeCosts must be positive";
+                score += actTimeCosts*(-1);
+            }
+        }
+
+        @Override
+        public void handleLastActivity(Activity act) {
+            handleActivity(act);
+        }
+
+    }
 	
 	/**
 	 * Example leg scoring.
@@ -98,7 +90,7 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
 	 * @author stefan
 	 *
 	 */
-	static class DriversLegScoring implements BasicScoring, LegScoring {
+	static class DriversLegScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.LegScoring {
 
 		private double score = 0.0;
 
@@ -107,10 +99,6 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
 		private final Carrier carrier;
 		
 		private Set<CarrierVehicle> employedVehicles;
-		
-		private Leg currentLeg = null;
-		
-		private double currentLegStartTime;
 		
 		public DriversLegScoring(Carrier carrier, Network network) {
 			super();
@@ -132,57 +120,13 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
 		public double getScore() {
 			return score;
 		}
-
-
-		@Override
-		public void reset() {
-			score = 0.0;
-			employedVehicles.clear();
-		}
-
-
-		@Override
-		public void startLeg(double time, Leg leg) {
-			currentLeg = leg;
-			currentLegStartTime = time; 
-		}
-
-
-		@Override
-		public void endLeg(double time) {
-			if(currentLeg.getRoute() instanceof NetworkRoute){
-				NetworkRoute nRoute = (NetworkRoute) currentLeg.getRoute();
-				Id vehicleId = nRoute.getVehicleId();
-				CarrierVehicle vehicle = getVehicle(vehicleId);
-				assert vehicle != null : "cannot find vehicle with id=" + vehicleId;
-				if(!employedVehicles.contains(vehicle)){
-					employedVehicles.add(vehicle);
-				}
-				double distance = 0.0;
-				if(currentLeg.getRoute() instanceof NetworkRoute){
-					distance += network.getLinks().get(currentLeg.getRoute().getStartLinkId()).getLength();
-					for(Id linkId : ((NetworkRoute) currentLeg.getRoute()).getLinkIds()){
-						distance += network.getLinks().get(linkId).getLength();
-					}
-					distance += network.getLinks().get(currentLeg.getRoute().getEndLinkId()).getLength();
-				}
-				
-				double distanceCosts = distance*getDistanceParameter(vehicle,null);
-				assert distanceCosts >= 0.0 : "distanceCosts must be positive";
-				score += (-1) * distanceCosts;
-				double timeCosts = (time-currentLegStartTime)*getTimeParameter(vehicle);
-				assert timeCosts >= 0.0 : "timeCosts must be positive";
-				score += (-1) * timeCosts;
-			}
-			
-		}
 		
 		private double getTimeParameter(CarrierVehicle vehicle) {
 			return vehicle.getVehicleType().getVehicleCostInformation().perTimeUnit;
 		}
 
 
-		private double getDistanceParameter(CarrierVehicle vehicle, Person driver) {
+		private double getDistanceParameter(CarrierVehicle vehicle) {
 			return vehicle.getVehicleType().getVehicleCostInformation().perDistanceUnit;
 		}
 
@@ -195,8 +139,36 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
 			}
 			return null;
 		}
-		
-	}
+
+        @Override
+        public void handleLeg(Leg leg) {
+            if(leg.getRoute() instanceof NetworkRoute){
+                NetworkRoute nRoute = (NetworkRoute) leg.getRoute();
+                Id vehicleId = nRoute.getVehicleId();
+                CarrierVehicle vehicle = getVehicle(vehicleId);
+                assert vehicle != null : "cannot find vehicle with id=" + vehicleId;
+                if(!employedVehicles.contains(vehicle)){
+                    employedVehicles.add(vehicle);
+                }
+                double distance = 0.0;
+                if(leg.getRoute() instanceof NetworkRoute){
+                    distance += network.getLinks().get(leg.getRoute().getStartLinkId()).getLength();
+                    for(Id linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()){
+                        distance += network.getLinks().get(linkId).getLength();
+                    }
+                    distance += network.getLinks().get(leg.getRoute().getEndLinkId()).getLength();
+                }
+
+                double distanceCosts = distance*getDistanceParameter(vehicle);
+                assert distanceCosts >= 0.0 : "distanceCosts must be positive";
+                score += (-1) * distanceCosts;
+                double timeCosts = leg.getTravelTime()*getTimeParameter(vehicle);
+                assert timeCosts >= 0.0 : "timeCosts must be positive";
+                score += (-1) * timeCosts;
+            }
+        }
+
+    }
 	
 	private Network network;
 	
@@ -208,7 +180,7 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
 
 	@Override
 	public ScoringFunction createScoringFunction(Carrier carrier) {
-		ScoringFunctionAccumulator sf = new ScoringFunctionAccumulator();
+		SumScoringFunction sf = new SumScoringFunction();
 		DriversLegScoring driverLegScoring = new DriversLegScoring(carrier, network);
 		DriversActivityScoring actScoring = new DriversActivityScoring();
 		sf.addScoringFunction(driverLegScoring);

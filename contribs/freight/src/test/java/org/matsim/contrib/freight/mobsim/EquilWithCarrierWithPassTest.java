@@ -80,7 +80,7 @@ public class EquilWithCarrierWithPassTest extends MatsimTestCase {
 	
 	public void testScoringInMeters(){
 //		try{
-		carrierControler = new CarrierControlerListener(planFile,new StrategyManagerFactoryForTests(),new DistanceScoringFunctionFactoryForTests(controler.getNetwork()));
+		carrierControler = new CarrierControlerListener(planFile,new StrategyManagerFactoryForTests(controler),new DistanceScoringFunctionFactoryForTests(controler.getNetwork()));
 		
 		controler.addControlerListener(carrierControler);
 		controler.setOverwriteFiles(true);

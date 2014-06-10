@@ -22,9 +22,9 @@ package playground.jjoubert.freight;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierControlerListener;
+import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
 import org.matsim.core.config.Config;
@@ -48,9 +48,6 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 final class RunFreight {
 
-	/**
-	 * @param args
-	 */
 	public static void runFreight(final Scenario scenario, final Carriers carriers) {
 
 		final Config config = scenario.getConfig();
@@ -79,8 +76,7 @@ final class RunFreight {
 		CarrierPlanStrategyManagerFactory strategyManagerFactory = new CarrierPlanStrategyManagerFactory() {
 
 			@Override
-			public GenericStrategyManager<CarrierPlan> createStrategyManager(
-					Controler controler) {
+			public GenericStrategyManager<CarrierPlan> createStrategyManager() {
 
 				GenericStrategyManager<CarrierPlan> strategyManager = new GenericStrategyManager<CarrierPlan>() ;
 

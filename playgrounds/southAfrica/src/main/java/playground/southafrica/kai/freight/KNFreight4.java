@@ -18,34 +18,23 @@
  * *********************************************************************** */
 package playground.southafrica.kai.freight;
 
-import java.util.Collection;
-
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import jsprit.core.algorithm.box.SchrimpfFactory;
 import jsprit.core.problem.VehicleRoutingProblem;
 import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import jsprit.core.util.Solutions;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.controler.CarrierControlerListener;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
+import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
 import org.matsim.contrib.freight.replanning.modules.TimeAllocationMutator;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
@@ -77,6 +66,8 @@ import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+
+import java.util.Collection;
 
 /**
  * @author nagel
@@ -161,9 +152,10 @@ public class KNFreight4 {
 		// ### iterations: ###
 
 		CarrierScoringFunctionFactory scoringFunctionFactory = KNFreight4.createMyScoringFunction(scenario);
-		CarrierPlanStrategyManagerFactory strategyManagerFactory  = KNFreight4.createMyStrategyManager(scenario) ;
 		
 		final Controler ctrl = new Controler( scenario ) ;
+
+        CarrierPlanStrategyManagerFactory strategyManagerFactory  = KNFreight4.createMyStrategyManager(scenario, ctrl) ;
 		ctrl.setOverwriteFiles(true);
 		{
 			CarrierControlerListener listener = new CarrierControlerListener(carriers, strategyManagerFactory, scoringFunctionFactory ) ;
@@ -271,10 +263,10 @@ public class KNFreight4 {
 	}
 
 
-	private static CarrierPlanStrategyManagerFactory createMyStrategyManager(final Scenario scenario) {
+	private static CarrierPlanStrategyManagerFactory createMyStrategyManager(final Scenario scenario, final Controler controler) {
 			return new CarrierPlanStrategyManagerFactory() {
 				@Override
-				public GenericStrategyManager<CarrierPlan> createStrategyManager(Controler controler) {
+				public GenericStrategyManager<CarrierPlan> createStrategyManager() {
 					TravelTime travelTimes = controler.getLinkTravelTimes() ;
 					TravelDisutility travelDisutility = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility( 
 							travelTimes , scenario.getConfig().planCalcScore() );

@@ -10,32 +10,12 @@
 
 package playground.qvanheerden.freight;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
-import jsprit.core.problem.VehicleRoutingProblem;
-import jsprit.core.problem.VehicleRoutingProblem.FleetSize;
-import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import jsprit.core.util.Solutions;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.controler.CarrierControlerListener;
-import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
-import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-import org.matsim.contrib.freight.jsprit.NetworkRouter;
+import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
 import org.matsim.contrib.freight.replanning.modules.TimeAllocationMutator;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
@@ -45,14 +25,12 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
@@ -67,11 +45,12 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction.LegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-
 import playground.southafrica.utilities.Header;
 import usecases.analysis.CarrierScoreStats;
 import usecases.analysis.LegHistogram;
-import usecases.chessboard.SelectBestPlanAndOptimizeItsVehicleRouteFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 
 public class MyCarrierSimulation {
@@ -122,11 +101,13 @@ public class MyCarrierSimulation {
 		//assign them to their corresponding vehicles - carriers already have vehicles in the carrier plan file
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
 
-		//get replan strategy and scoring function factory
-		CarrierPlanStrategyManagerFactory stratManFactory = mcs.createReplanStrategyFactory(vehicleTypes);
-		CarrierScoringFunctionFactory scoringFactory = mcs.createScoringFactory();
 
 		Controler controler = new Controler(scenario);
+
+        //get replan strategy and scoring function factory
+        CarrierPlanStrategyManagerFactory stratManFactory = mcs.createReplanStrategyFactory(vehicleTypes, controler);
+        CarrierScoringFunctionFactory scoringFactory = mcs.createScoringFactory();
+
 		controler.setOverwriteFiles(true);
 
 		CarrierControlerListener carrierController = new CarrierControlerListener(carriers, stratManFactory, scoringFactory);
@@ -191,11 +172,11 @@ public class MyCarrierSimulation {
 
 	}
 
-	public CarrierPlanStrategyManagerFactory createReplanStrategyFactory(final CarrierVehicleTypes types){
+	public CarrierPlanStrategyManagerFactory createReplanStrategyFactory(final CarrierVehicleTypes types, final Controler controler){
 		// From KnFreight
 		CarrierPlanStrategyManagerFactory stratManFactory = new CarrierPlanStrategyManagerFactory() {
 			@Override
-			public GenericStrategyManager<CarrierPlan> createStrategyManager(Controler controler) {
+			public GenericStrategyManager<CarrierPlan> createStrategyManager() {
 				TravelTime travelTimes = controler.getLinkTravelTimes() ;
 				TravelDisutility travelCosts = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility(
 						travelTimes , scenario.getConfig().planCalcScore() );
