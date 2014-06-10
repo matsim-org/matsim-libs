@@ -31,6 +31,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.boescpa.topdad.postprocessing.spatialCuttings.NoCutting;
+import playground.boescpa.topdad.postprocessing.spatialCuttings.SpatialCuttingStrategy;
+
 /**
  * Provides static methods to analyse and postprocess the trips created with
  * the class MainTripCreator.
@@ -41,7 +44,23 @@ import org.matsim.core.utils.io.IOUtils;
 public final class TripProcessing {
 	
 	private static Logger log = Logger.getLogger(TripProcessing.class);
+	private static SpatialCuttingStrategy cuttingStrategy = new NoCutting();
 	
+	/**
+	 * Sets the strategy according to which the trips are spatially cut
+	 * before any further processing.
+	 * 
+	 * Currently known implemented strategies:
+	 * 	NoCutting			[DEFAULT] All trips are processed, no spatial cut. ("argument" is not used)
+	 * 	ShpFileCutting		The trips are cut according to a provided shp-file. Needs the shp-file as an extra argument (Path as a String).
+	 * 	CircleBellevueCutting	Only the trips within a circle around Bellevue are processed. Needs the radius of the circle as an extra argument.
+	 * 
+	 * @param cuttingStrategy			
+	 */
+	public static void setCuttingStrategy(SpatialCuttingStrategy cuttingStrategy) {
+		TripProcessing.cuttingStrategy = cuttingStrategy;
+	}
+
 	private TripProcessing() {}
 	
 	/**
@@ -81,6 +100,10 @@ public final class TripProcessing {
 					ArrayList<LinkedList<Id>> pathList = tripHandler.getPath().getValues(personId);
 					
 					for (int i = 0; i < startLinks.size(); i++) {
+						if (!cuttingStrategy.spatiallyConsideringTrip(network, startLinks.get(i), endLinks.get(i))) {
+							continue;
+						}
+						
 						// travel time per mode [minutes]
 						double travelTime = calcTravelTime(startTimes.get(i), endTimes.get(i))/60;
 						// distance per mode [meters]
@@ -188,6 +211,10 @@ public final class TripProcessing {
 				ArrayList<Double> endTimes = tripData.getEndTime().getValues(personId);
 				
 				for (int i = 0; i < startLinks.size(); i++) {
+					if (!cuttingStrategy.spatiallyConsideringTrip(network, startLinks.get(i), endLinks.get(i))) {
+						continue;
+					}
+					
 					if (network.getLinks().get(endLinks.get(i)) != null) {
 						String mode = modes.get(i);
 						
@@ -245,7 +272,7 @@ public final class TripProcessing {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Calculates the travel time for a given trip.
 	 * 
@@ -291,5 +318,4 @@ public final class TripProcessing {
 	private static double calcTravelTime(Double startTime, Double endTime) {
 		return endTime - startTime;
 	}
-	
 }
