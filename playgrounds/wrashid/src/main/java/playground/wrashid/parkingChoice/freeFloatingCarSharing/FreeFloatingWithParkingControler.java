@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.parkingChoice.carsharing.DummyParkingModuleWithFreeFloatingCarSharing;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingCoordInfo;
-import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingModuleWithFFCarSharing;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingModuleWithFreeFloatingCarSharing;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
