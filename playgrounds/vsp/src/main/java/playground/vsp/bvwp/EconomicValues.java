@@ -106,28 +106,28 @@ class EconomicValues {
 			{
 				DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
 //				economicValues.put( makeKey( mode, segm, Attribute.km), -0.0 ) ;
-				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -6.3 ) ;
+				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -4.3 ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Nutzerkosten_Eu), -1. ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu), -1. ) ;
 			}
 			{
 				DemandSegment segm = DemandSegment.PV_AUSBILDUNG ;
 //				economicValues.put( makeKey( mode, segm, Attribute.km), -0.0 ) ;
-				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -6.3 ) ;
+				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -4.1 ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Nutzerkosten_Eu), -1. ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu), -1. ) ;
 			}
 			{
 				DemandSegment segm = DemandSegment.PV_BERUF ;
 //				economicValues.put( makeKey( mode, segm, Attribute.km), -0.0 ) ;
-				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -6.3 ) ;
+				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -4.5 ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Nutzerkosten_Eu), -1. ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu), -1. ) ;
 			}
 			{
 				DemandSegment segm = DemandSegment.PV_EINKAUF ;
 //				economicValues.put( makeKey( mode, segm, Attribute.km), -0.0 ) ;
-				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -6.3 ) ;
+				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -6.2 ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Nutzerkosten_Eu), -1. ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu), -1. ) ;
 			}
@@ -135,19 +135,17 @@ class EconomicValues {
 			{
 				DemandSegment segm = DemandSegment.PV_SONST ;
 //				economicValues.put( makeKey( mode, segm, Attribute.km), -0.0 ) ;
-				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -6.3 ) ;
+				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -4.3 ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Nutzerkosten_Eu), -1. ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu), -1. ) ;
 			}
 			{
 				DemandSegment segm = DemandSegment.PV_URLAUB ;
 //				economicValues.put( makeKey( mode, segm, Attribute.km), -0.0 ) ;
-				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -6.3 ) ;
+				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -4.3 ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Nutzerkosten_Eu), -1. ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu), -1. ) ;
 			}
-			
-			
 			
 			
 			
@@ -155,7 +153,7 @@ class EconomicValues {
 			{
 				DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
 //				economicValues.put( makeKey( mode, segm, Attribute.km), -0.0 ) ;
-				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -23.5 ) ;
+				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -8.7 ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Nutzerkosten_Eu), -1. ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu), -1. ) ;
 			}
@@ -172,28 +170,28 @@ class EconomicValues {
 			{
 				DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
 //				economicValues.put( makeKey( mode, segm, Attribute.km), -0.0 ) ;
-				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -6.3 ) ;
+				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -4.3 ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Nutzerkosten_Eu), -1. ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu), -1. ) ;
 			}
 			{
 				DemandSegment segm = DemandSegment.PV_AUSBILDUNG ;
 //				economicValues.put( makeKey( mode, segm, Attribute.km), -0.0 ) ;
-				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -6.3 ) ;
+				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -4.1 ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Nutzerkosten_Eu), -1. ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu), -1. ) ;
 			}
 			{
 				DemandSegment segm = DemandSegment.PV_BERUF ;
 //				economicValues.put( makeKey( mode, segm, Attribute.km), -0.0 ) ;
-				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -6.3 ) ;
+				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -4.5 ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Nutzerkosten_Eu), -1. ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu), -1. ) ;
 			}
 			{
 				DemandSegment segm = DemandSegment.PV_EINKAUF ;
 //				economicValues.put( makeKey( mode, segm, Attribute.km), -0.0 ) ;
-				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -6.3 ) ;
+				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -6.2 ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Nutzerkosten_Eu), -1. ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu), -1. ) ;
 			}
@@ -201,27 +199,31 @@ class EconomicValues {
 			{
 				DemandSegment segm = DemandSegment.PV_SONST ;
 //				economicValues.put( makeKey( mode, segm, Attribute.km), -0.0 ) ;
-				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -6.3 ) ;
+				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -4.3 ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Nutzerkosten_Eu), -1. ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu), -1. ) ;
 			}
 			{
 				DemandSegment segm = DemandSegment.PV_URLAUB ;
 //				economicValues.put( makeKey( mode, segm, Attribute.km), -0.0 ) ;
-				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -6.3 ) ;
+				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -4.3 ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Nutzerkosten_Eu), -1. ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu), -1. ) ;
 			}
+			
+			
+			
+			
 			{
 				DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
 //				economicValues.put( makeKey( mode, segm, Attribute.km), -0.0 ) ;
-				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -23.5 ) ;
+				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -8.7 ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Nutzerkosten_Eu), -1. ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu), -1. ) ;
 			}
 			{
 				DemandSegment segm = DemandSegment.GV ;
-//				economicValues.put( makeKey( mode, segm, Attribute.km), -0.1 ) ;
+//				economicValues.put( makeKey( mode, segm, Attribute.km), -1.00 ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -0.00 ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Nutzerkosten_Eu), -1. ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu), -1. ) ;

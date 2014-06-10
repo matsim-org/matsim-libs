@@ -48,7 +48,7 @@ public class IVVReaderV2 {
 	private static final Logger log = Logger.getLogger(IVVReaderV2.class);
 	private IVVReaderConfigGroup config;
 	
-	static final double BESETZUNGSGRAD_PV_PRIVAT = 1.74; // Wochenende 2.1, Woche 1.6 gemaess BVWP Methodik 2003
+	static final double BESETZUNGSGRAD_PV_PRIVAT = 1.67; // Sonntag 2.1 sonst Woche 	1.6 gemaess BVWP Methodik 2003
 	static final double BESETZUNGSGRAD_PV_GESCHAEFT = 1.4;
 	
 	static final double BAHNPREISPROKM = 0.12; //Expertenmeinung 10 bis 12 Cent Einnahme je KM
@@ -764,8 +764,8 @@ public class IVVReaderV2 {
 		
 		config.setTravelTimesBaseMatrixFile(dir + "P2030_Widerstaende_Ohnefall.wid");
 		config.setTravelTimesStudyMatrixFile(dir + "P2030_Widerstaende_Mitfall.wid");
-//		config.setImpedanceMatrixFile(dir + "P2030_2010_A14_induz_ME2.wid");
-		config.setImpedanceMatrixFile(dir + "induz_test.wid");
+		config.setImpedanceMatrixFile(dir + "P2030_2010_A14_induz_ME2.wid");
+//		config.setImpedanceMatrixFile(dir + "induz_test.wid");
 //		config.setImpedanceMatrixFile(dir + "induz_mdst.wid");
 		config.setImpedanceShiftedMatrixFile(dir + "P2030_2010_A14_verlagert_ME2.wid");
 		

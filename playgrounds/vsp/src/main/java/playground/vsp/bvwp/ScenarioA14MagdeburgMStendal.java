@@ -80,7 +80,7 @@ class ScenarioA14MagdeburgMStendal {
 					nullfallForOD.put(makeKey(mode, segm, Attribute.Reisezeit_h), 86.30/60. ) ; // Fahrzeit Strasse im Nullfall
 					nullfallForOD.put(makeKey(mode, segm, Attribute.Distanz_km), 65.72 ) ; // Distanz Strasse im Nullfall
 
-					nullfallForOD.put(makeKey(mode, segm, Attribute.Nutzerkosten_Eu), 5.04*1.74) ; // Nutzerkosten Strasse im Nullfall --> Belegungsgrad Privatverkehr = 1.74
+					nullfallForOD.put(makeKey(mode, segm, Attribute.Nutzerkosten_Eu), 5.04*1.67) ; // Nutzerkosten Strasse im Nullfall --> Belegungsgrad Privatverkehr = 1.74
 					nullfallForOD.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu ), 14.13 ) ; // ???  Produktionskosten Strasse im Nullfall
 					
 				}
@@ -115,7 +115,7 @@ class ScenarioA14MagdeburgMStendal {
 				planfallValuesForOD.inc( makeKey( Mode.Strasse, segm, Attribute.XX), 15784. ) ; // Menge Straße im Planfall.
 				planfallValuesForOD.put( makeKey( Mode.Strasse, segm, Attribute.Reisezeit_h), 70.11/60.  ) ; // Fahrzeit Strasse im Planfall 
 				planfallValuesForOD.put( makeKey( Mode.Strasse, segm, Attribute.Distanz_km), 65.35 ) ; // Distanz Strasse im Planfall 
-				planfallValuesForOD.put (makeKey(Mode.Strasse, segm, Attribute.Nutzerkosten_Eu), 5.02 *1.74); // Nutzerkosten Planfall
+				planfallValuesForOD.put (makeKey(Mode.Strasse, segm, Attribute.Nutzerkosten_Eu), 5.02 *1.67); // Nutzerkosten Planfall
 				planfallValuesForOD.put (makeKey(Mode.Strasse, segm, Attribute.Produktionskosten_Eu), 13.73); //Produktionskosten Strasse Planfall
 				
 				double bahnusersNullFalltot =43957.+1606.+4481.+9317.+0.+8547.;
