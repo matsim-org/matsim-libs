@@ -121,7 +121,7 @@ public class Main {
 			listener.generateGridsAndMeasuringPointsByNetwork(1000.);
 			
 			// new
-			listener.writeResultsToSubdirectory(actType);
+			listener.useSubdirectoryWithName(actType);
 			// end new
 			
 			controler.addControlerListener(listener);
