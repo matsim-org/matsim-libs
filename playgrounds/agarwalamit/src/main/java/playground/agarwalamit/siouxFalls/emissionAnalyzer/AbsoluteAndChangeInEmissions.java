@@ -33,7 +33,7 @@ import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
  */
 	public class AbsoluteAndChangeInEmissions {
 
-	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMC/";
+	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCRCOff/";
 	
 	public static void main(String[] args) {
 
@@ -42,10 +42,10 @@ import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 		
 		
 		
-		SortedMap<String, Double> emissions1 = calculateTotalEmissions(clusterPathDesktop+"/run113/"+eventFileLocation);
-		SortedMap<String, Double> emissions2 = calculateTotalEmissions(clusterPathDesktop+"/run114/"+eventFileLocation);
-		SortedMap<String, Double> emissions3 = calculateTotalEmissions(clusterPathDesktop+"/run115/"+eventFileLocation);
-		SortedMap<String, Double> emissions4 = calculateTotalEmissions(clusterPathDesktop+"/run116/"+eventFileLocation);
+		SortedMap<String, Double> emissions1 = calculateTotalEmissions(clusterPathDesktop+"/run117/"+eventFileLocation);
+		SortedMap<String, Double> emissions2 = calculateTotalEmissions(clusterPathDesktop+"/run118/"+eventFileLocation);
+		SortedMap<String, Double> emissions3 = calculateTotalEmissions(clusterPathDesktop+"/run119/"+eventFileLocation);
+		SortedMap<String, Double> emissions4 = calculateTotalEmissions(clusterPathDesktop+"/run120/"+eventFileLocation);
 
 		String [] pollutants =  emissions1.keySet().toArray(new String [0]);
 
@@ -63,7 +63,7 @@ import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 		double [] r4 = new double [pollutants.length];
 
 		try {
-			writer = IOUtils.getBufferedWriter(clusterPathDesktop+"/analysisExecutedPlans/r/rAbsoluteEmissions.txt");
+			writer = IOUtils.getBufferedWriter(clusterPathDesktop+"/analysis/r/rAbsoluteEmissions.txt");
 			writer.write("pollutants"+"\t"+"baseCase"+"\t"+"onlyEmissions"+"\t"+"onlyCongestion"+"\t"+"both"+"\n");
 
 			for(Entry<String, Double> e : emissions1.entrySet()){
@@ -75,7 +75,7 @@ import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 			}
 			writer.close();
 			
-			writer = IOUtils.getBufferedWriter(clusterPathDesktop+"/analysisExecutedPlans/r/rChangeInEmissions.txt");
+			writer = IOUtils.getBufferedWriter(clusterPathDesktop+"/analysis/r/rChangeInEmissions.txt");
 			writer.write("pollutants"+"\t"+"onlyEmissions"+"\t"+"onlyCongestion"+"\t"+"both"+"\n");
 			//for(int j=0;j<relativeChangeInEmissions.length;j++){
 			for(int i=0;i<pollutants.length;i++){
