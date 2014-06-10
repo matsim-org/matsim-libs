@@ -1,10 +1,8 @@
 package playground.balac.aam.replanning;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.replanning.modules.ChangeSingleLegMode;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 /**
@@ -12,7 +10,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  */
 public class AAMTripModeChoice extends AbstractMultithreadedModule{
 
-	private final static Logger log = Logger.getLogger(ChangeSingleLegMode.class);
+	//private final static Logger log = Logger.getLogger(AAMTripModeChoice.class);
 
 	/*package*/ final static String CONFIG_PARAM_IGNORECARAVAILABILITY = "ignoreCarAvailability";
 
