@@ -15,7 +15,7 @@ public class RandomTripToAAMStrategy implements PlanStrategy{
 	private final PlanStrategyImpl strategy;
 	
 	public RandomTripToAAMStrategy(final Scenario controler) {
-		this.strategy = new PlanStrategyImpl( new RandomPlanSelector() );
+		this.strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan>() );
 		 	
 		//addStrategyModule( new TripsToLegsModule(controler.getConfig() ) );   //lets try without this, not sure if it is needed
 		AAMTripModeChoice smc = new AAMTripModeChoice(controler.getConfig());

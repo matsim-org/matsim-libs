@@ -2,36 +2,21 @@ package playground.balac.avignon;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.List;
-import java.util.Random;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 
 public class DistanceControlerListener implements StartupListener, IterationEndsListener {
@@ -39,7 +24,6 @@ public class DistanceControlerListener implements StartupListener, IterationEnds
 	/**
 	 * @param args
 	 */
-	private double freeSpeedFactor = 1.0;
 	double coordX = 683217.0;
 	double coordY = 247300.0;
 	private int numberOutside = 0;
@@ -50,7 +34,6 @@ public class DistanceControlerListener implements StartupListener, IterationEnds
 
 	final BufferedWriter outLink = IOUtils.getBufferedWriter("/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/balacm/MATSim/input/EIRASS_2014_paper/land_price_after/" + "Inside_outside.txt");
 	public DistanceControlerListener(double factor) {
-		freeSpeedFactor = factor;
 	}
 
 	@Override
@@ -61,7 +44,6 @@ public class DistanceControlerListener implements StartupListener, IterationEnds
 		Controler controler = event.getControler();
 		Scenario scenario = (ScenarioImpl) controler.getScenario();
 		Population plans = scenario.getPopulation();
-		Network network = scenario.getNetwork();
 		//if (Integer.toString(event.getIteration()) == scenario.getConfig().getParam("controler", "lastIteration"))
 		for(Person p: plans.getPersons().values()) {
 			
@@ -102,8 +84,6 @@ public class DistanceControlerListener implements StartupListener, IterationEnds
 		// TODO Auto-generated method stub
 		
 		Controler controler = event.getControler();
-		Population population = controler.getPopulation();
-		Scenario scenario = controler.getScenario();
 		/*
 		
 		String plansFilePath = "/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/balacm/MATSim/output/Avignon/plans0.xml";

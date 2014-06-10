@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
@@ -29,11 +28,11 @@ public class ScoreStatistics {
 		ArrayList<Double> a = new ArrayList<Double>();
 		Population pop = scenario.getPopulation();	
 		for (Person p:pop.getPersons().values()) {
-			boolean grocery = false;
+			//boolean grocery = false;
 			for (PlanElement pe: p.getSelectedPlan().getPlanElements()) {
 				if (pe instanceof Activity) {
 					if (((Activity) pe).getType().equals("shopgrocery")) {
-						grocery = true;
+						//grocery = true;
 					}
 				}
 			}

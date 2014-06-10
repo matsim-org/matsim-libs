@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -27,14 +26,14 @@ public class TravelDistanceGrocery {
 		populationReader.readFile(plansFilePath);
 		networkReader.readFile(networkFilePath);
 		double distanceCar = 0.0;
-		int countC = 0;
+	//	int countC = 0;
 		double distanceBike = 0.0;
-		int countB = 0;
+	//	int countB = 0;
 		double distanceWalk = 0.0;
-		int countW = 0;
+	//	int countW = 0;
 		double distancePt = 0.0;
-		int countPt = 0;
-		int count = 0;
+	//	int countPt = 0;
+	//	int count = 0;
 		Population pop = scenario.getPopulation();	
 		for (Person p:pop.getPersons().values()) {
 			Leg previousLeg = null;
@@ -51,19 +50,19 @@ public class TravelDistanceGrocery {
 						if (previousLeg != null) {
 						if (previousLeg.getMode().equals( "car" )) {
 							distanceCar += RouteUtils.calcDistance((NetworkRoute)previousLeg.getRoute(), scenario.getNetwork());
-							countC++;
+					//		countC++;
 						}
 						else if (previousLeg.getMode().equals( "bike" )) {
 							distanceBike += CoordUtils.calcDistance(previousActivity.getCoord(), ((Activity) pe).getCoord());
-							countB++;
+					//		countB++;
 						}
 						else if (previousLeg.getMode().equals( "walk" )) {
 							distanceWalk += CoordUtils.calcDistance(previousActivity.getCoord(), ((Activity) pe).getCoord());
-							countW++;
+						//	countW++;
 						}
 						else if (previousLeg.getMode().equals( "pt" )) {
 							distancePt += CoordUtils.calcDistance(previousActivity.getCoord(), ((Activity) pe).getCoord());
-							countPt++;
+						//	countPt++;
 						}
 						}
 					}

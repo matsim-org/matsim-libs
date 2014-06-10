@@ -26,8 +26,6 @@ public class DistanceFromPAToShop {
 		
 			populationReader.readFile(args[0]);
 			networkReader.readFile(args[1]);
-			int numberInside = 0;
-			int numberOutside = 0;
 			int[] in = new int[60];
 			int[] out = new int[60];
 			double coordX = 683217.0;

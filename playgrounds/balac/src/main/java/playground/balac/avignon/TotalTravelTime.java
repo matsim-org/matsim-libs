@@ -11,11 +11,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.population.routes.RouteUtils;
 
 public class TotalTravelTime {
 	ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -33,7 +30,7 @@ public class TotalTravelTime {
 		int countW = 0;
 		double distancePt = 0.0;
 		int countPt = 0;
-		int count = 0;
+		//int count = 0;
 		Population pop = scenario.getPopulation();	
 		for (Person p:pop.getPersons().values()) {
 			Leg previousLeg = null;
@@ -72,22 +69,22 @@ public class TotalTravelTime {
 						if (previousLeg.getMode().equals("car")) {
 							distanceCar += previousLeg.getTravelTime();
 							countC++;
-							count++;
+							//count++;
 						}
 						else if (previousLeg.getMode().equals("bike")) {
 							distanceBike += previousLeg.getTravelTime();
 							countB++;
-							count++;
+						//	count++;
 						}
 						else if (previousLeg.getMode().equals("walk")) {
 							distanceWalk += previousLeg.getTravelTime();
 							countW++;
-							count++;
+						//	count++;
 						}
 						else if (previousLeg.getMode().equals("pt")) {
 							distancePt += previousLeg.getTravelTime();
 							countPt++;
-							count++;
+						//	count++;
 						}
 					}
 					

@@ -34,7 +34,6 @@ public class TravelTime {
 		Population pop = scenario.getPopulation();	
 		for (Person p:pop.getPersons().values()) {
 			Leg previousLeg = null;
-			Activity previousActivity = null;
 			for (PlanElement pe:p.getSelectedPlan().getPlanElements()) {
 				
 				if (pe instanceof Leg) {
@@ -89,7 +88,6 @@ public class TravelTime {
 						}
 						
 					}
-					previousActivity = (Activity) pe;
 				}
 				
 			}

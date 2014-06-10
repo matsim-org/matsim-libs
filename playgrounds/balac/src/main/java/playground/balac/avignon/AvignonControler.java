@@ -7,7 +7,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 
-import playground.balac.retailers.RetailersLocationListener;
 
 
 public class AvignonControler extends Controler {
@@ -25,7 +24,7 @@ public class AvignonControler extends Controler {
 	public static void main(String[] args) {
 		
 		AvignonControler controler = new AvignonControler(args);
-		controler.setOverwriteFiles(true);
+		//controler.setOverwriteFiles(true);
 		controler.init();
     	controler.run();		   	
     	
