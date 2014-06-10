@@ -46,7 +46,7 @@ public class LorShapeReader {
 		
 		
 		for (SimpleFeature ft : ShapeFileReader.getAllFeatures(filename)) {
-
+		      
 				GeometryFactory geometryFactory= new GeometryFactory();
 				WKTReader wktReader = new WKTReader(geometryFactory);
 				Geometry geometry;
@@ -54,6 +54,7 @@ public class LorShapeReader {
 				try {
 					geometry = wktReader.read((ft.getAttribute("the_geom")).toString());
 					this.shapeMap.put(ft.getAttribute(attrString).toString(),geometry);
+	
 
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
