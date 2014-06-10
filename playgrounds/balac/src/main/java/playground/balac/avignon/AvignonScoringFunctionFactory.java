@@ -1,0 +1,65 @@
+package playground.balac.avignon;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.scoring.DCActivityScoringFunction;
+import org.matsim.contrib.locationchoice.bestresponse.scoring.DCActivityWOFacilitiesScoringFunction;
+import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+/**
+ * @author balacm
+ */
+public class AvignonScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory{
+
+	private final Controler controler;
+	private DestinationChoiceBestResponseContext lcContext;
+	private Config config;
+	private final static Logger log = Logger.getLogger(DCScoringFunctionFactory.class);
+
+	public AvignonScoringFunctionFactory(Config config, Controler controler, DestinationChoiceBestResponseContext lcContext) {
+		super(config.planCalcScore(), controler.getNetwork());
+		this.controler = controler;
+		this.lcContext = lcContext;
+		this.config = config;
+		log.info("creating DCScoringFunctionFactory");
+	}
+		
+	private boolean usingConfigParamsForScoring = true ;
+	public void setUsingConfigParamsForScoring( boolean val ) {
+		usingConfigParamsForScoring = val ;
+	}
+
+	@Override
+	public ScoringFunction createNewScoringFunction(Person person) {		
+ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator(); // TODO: replace this now by SumScore 
+		
+		CharyparNagelActivityScoring scoringFunction ;
+		if ( usingConfigParamsForScoring ) {
+			scoringFunction = new DCActivityWOFacilitiesScoringFunction(
+					person.getSelectedPlan(), 
+					this.lcContext);
+		} else {
+			scoringFunction = new DCActivityScoringFunction(
+					person.getSelectedPlan(), 
+					this.lcContext.getFacilityPenalties(), 
+					lcContext);
+		}
+		scoringFunctionAccumulator.addScoringFunction(scoringFunction);		
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(new CharyparNagelScoringParameters(config.planCalcScore()), controler.getNetwork()));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
+		return scoringFunctionAccumulator;
+	}
+
+}

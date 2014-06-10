@@ -2,7 +2,6 @@ package playground.balac.freefloating.qsimParkingModule;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.parking.parkingChoice.carsharing.DummyParkingModuleWithFreeFloatingCarSharing;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingModuleWithFreeFloatingCarSharing;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;

@@ -1,10 +1,8 @@
 package playground.balac.freefloating.qsimParkingModule;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
