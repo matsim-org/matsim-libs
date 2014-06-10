@@ -13,7 +13,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
-import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.wrashid.fd.AbstractDualSimHandler;
 
 public class MainCalcSlope {

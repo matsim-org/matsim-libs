@@ -23,7 +23,6 @@ import org.matsim.contrib.parking.lib.DebugLib;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingCostCalculatorZH;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
-import playground.wrashid.parkingSearch.withinDay_v_STRC.core.mobsim.ParkingInfrastructure_v2;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingActivityAttributes;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
