@@ -17,43 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.synPop.osm;
 
-import java.util.Map;
-
-import playground.johannes.gsv.synPop.ProxyLeg;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author johannes
  *
  */
-public class ProxyBuilder {
+public class OSM2Geometry {
 
-	public ProxyPerson buildPerson(Map<String, String> attributes) {
-		ProxyPerson person = new ProxyPerson(personIdBuilder(attributes));
-		
-		return person;
-	}
+	private GeometryFactory factory = new GeometryFactory();
 	
-	public ProxyLeg addLeg(Map<String, String> attributes, Map<String, ProxyPerson> persons) {
-		String personId = personIdBuilder(attributes);
-		ProxyPerson person = persons.get(personId); 
-		ProxyPlan plan = person.getPlan();
+	public Geometry convert(OSMWay way) {
+		Coordinate coords[] = new Coordinate[way.getNodes().size()];
+		for(int i = 0; i < way.getNodes().size(); i++) {
+			OSMNode node = way.getNodes().get(i);
+			coords[i] = new Coordinate(node.getLongitude(), node.getLatitude());
+		}
+		LinearRing ring = factory.createLinearRing(coords);
 		
-		ProxyLeg leg = new ProxyLeg();
-		plan.addLeg(leg);
+		Polygon poly = factory.createPolygon(ring, null);
 		
-		return leg;
-	}
-	
-	public String personIdBuilder(Map<String, String> attributes) {
-		StringBuilder builder = new StringBuilder(20);
-		builder.append(attributes.get(MIDKeys.HOUSEHOLD_ID));
-		builder.append(".");
-		builder.append(attributes.get(MIDKeys.PERSON_ID));
-		
-		return builder.toString();
+		return poly;
 	}
 }

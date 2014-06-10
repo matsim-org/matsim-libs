@@ -17,31 +17,65 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.synPop.sim;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyLeg;
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.sna.util.Composite;
 
 /**
  * @author johannes
  *
  */
-public class LegRoundTrip implements LegAttributeHandler {
+public class CompositeHamiltonian extends Composite<Hamiltonian> implements Hamiltonian {
 
+	private List<Double> thetas = new ArrayList<Double>();
+	
+	public void addComponent(Hamiltonian h) {
+		super.addComponent(h);
+		thetas.add(1.0);
+	}
+	
+	public void addComponent(Hamiltonian h, double theta) {
+		super.addComponent(h);
+		thetas.add(theta);
+	}
+	
+	public void removeComponent(Hamiltonian h) {
+		int idx = components.indexOf(h);
+		super.removeComponent(h);
+		thetas.remove(idx);
+	}
+	
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
+	 * @see playground.johannes.gsv.synPop.sim.Hamiltonian#delta(playground.johannes.gsv.synPop.ProxyPerson, playground.johannes.gsv.synPop.ProxyPerson)
 	 */
 	@Override
-	public void handle(ProxyLeg leg, Map<String, String> attributes) {
-		String val = attributes.get(MIDKeys.LEG_DESTINATION);
-
-		if(val.equalsIgnoreCase("Rundweg")) {
-			leg.setAttribute(CommonKeys.LEG_ROUNDTRIP, true);
-		} else {
-			leg.setAttribute(CommonKeys.LEG_ROUNDTRIP, false);
+	public double evaluate(ProxyPerson original, ProxyPerson modified) {
+		double sum = 0;
+		
+		for(Hamiltonian component : components) {
+			sum += component.evaluate(original, modified);
 		}
+		
+		return sum;
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.johannes.gsv.synPop.sim.Hamiltonian#evaluate(java.util.Collection)
+	 */
+	@Override
+	public double evaluate(Collection<ProxyPerson> persons) {
+		double sum = 0;
+		
+		for(Hamiltonian component : components) {
+			sum += component.evaluate(persons);
+		}
+		
+		return sum;
 	}
 
 }

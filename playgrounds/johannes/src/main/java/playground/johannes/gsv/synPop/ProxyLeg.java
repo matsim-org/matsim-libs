@@ -19,12 +19,17 @@
 
 package playground.johannes.gsv.synPop;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author johannes
  *
+ */
+/*
+ * redundant with proxy activity
  */
 public class ProxyLeg {
 
@@ -36,5 +41,19 @@ public class ProxyLeg {
 	
 	public Object getAttribute(String key) {
 		return attributes.get(key);
+	}
+	
+	public Map<String, Object> getAttributes() {
+		return Collections.unmodifiableMap(attributes);
+	}
+	
+	public ProxyLeg clone() {
+		ProxyLeg clone = new ProxyLeg();
+		
+		for(Entry<String, Object> entry : attributes.entrySet()) {
+			clone.setAttribute(entry.getKey(), entry.getValue());
+		}
+		
+		return clone;
 	}
 }

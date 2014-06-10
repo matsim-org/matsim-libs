@@ -20,6 +20,8 @@
 package playground.johannes.sna.gis;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.prep.PreparedGeometry;
+import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
 
 /**
  * Representation of a spatial zone. This class is just a wrapper for feature of
@@ -40,6 +42,8 @@ public class Zone<T> {
 
 	private final Geometry geometry;
 	
+	private final PreparedGeometry preGeometry;
+	
 	private T attribute;
 	
 	/**
@@ -49,6 +53,7 @@ public class Zone<T> {
 	 */
 	public Zone(Geometry geometry) {
 		this.geometry = geometry;
+		this.preGeometry = PreparedGeometryFactory.prepare(geometry);
 	}
 	
 //	/**
@@ -70,6 +75,10 @@ public class Zone<T> {
 		return geometry;
 	}
 
+	public PreparedGeometry getPreparedGeometry() {
+		return preGeometry;
+	}
+	
 	public T getAttribute() {
 		return attribute;
 	}

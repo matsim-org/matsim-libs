@@ -29,6 +29,8 @@ public interface MIDKeys {
 	
 	public static final String PERSON_ID = "pid";
 	
+	public static final String PERSON_MUNICIPALITY = "polgk";
+	
 	public static final String LEG_START_TIME_HOUR = "st_std";
 	
 	public static final String LEG_START_TIME_MIN = "st_min";
@@ -44,4 +46,9 @@ public interface MIDKeys {
 	public static final String LEG_DESTINATION = "w13";
 	
 	public static final String LEG_DISTANCE = "wegkm_k";
+	
+	
+	public static final String PERSON_MUNICIPALITY_LOWER = "inhabLow";
+	
+	public static final String PERSON_MUNICIPALITY_UPPER = "inhabUp";
 }

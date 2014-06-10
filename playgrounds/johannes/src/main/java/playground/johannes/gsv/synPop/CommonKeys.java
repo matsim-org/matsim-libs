@@ -24,22 +24,28 @@ package playground.johannes.gsv.synPop;
  *
  */
 public interface CommonKeys {
+	
+	public static final String PERSON_HOME_COORD_X = "personhomecoordx";
+	
+	public static final String PERSON_HOME_COORD_Y = "personhomecoordy";
 
-	public static final String LEG_START_TIME = "legstarttime";
+	public static final String LEG_START_TIME = "startTime";
 	
-	public static final String LEG_END_TIME = "legendtime";
+	public static final String LEG_END_TIME = "endTime";
 	
-	public static final String LEG_PURPOSE = "legpurpose";
+	public static final String LEG_PURPOSE = "purpose";
 	
 	public static final String LEG_ORIGIN = "origin";
 	
-	public static final String LEG_ROUNDTRIP = "roundtip";
+	public static final String LEG_ROUNDTRIP = "roundTrip";
 	
-	public static final String LEG_DISTANCE = "legdistance";
+	public static final String LEG_DISTANCE = "distance";
 	
-	public static final String ACTIVITY_TYPE = "activitytype";
+	public static final String ACTIVITY_TYPE = "type";
 	
-	public static final String ACTIVITY_START_TIME = "actstarttime";
+	public static final String ACTIVITY_START_TIME = "startTime";
 	
-	public static final String ACTIVITY_END_TIME = "actendtime";
+	public static final String ACTIVITY_END_TIME = "endTime";
+	
+	public static final String ACTIVITY_FACILITY = "activityFacility";
 }

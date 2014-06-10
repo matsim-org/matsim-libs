@@ -23,12 +23,13 @@ import java.util.Map;
 
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyLeg;
+import playground.johannes.gsv.synPop.io.AttributeSerializer;
 
 /**
  * @author johannes
  *
  */
-public class LegDistanceHandler implements LegAttributeHandler {
+public class LegDistanceHandler implements LegAttributeHandler, AttributeSerializer {
 
 	/* (non-Javadoc)
 	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
@@ -45,6 +46,21 @@ public class LegDistanceHandler implements LegAttributeHandler {
 			leg.setAttribute(CommonKeys.LEG_DISTANCE, null);
 		}
 
+	}
+
+	@Override
+	public String getKey() {
+		return MIDKeys.LEG_DISTANCE;
+	}
+
+	@Override
+	public String encode(Object value) {
+		return String.valueOf((Double)value);
+	}
+
+	@Override
+	public Object decode(String value) {
+		return (Double)Double.parseDouble(value);
 	}
 
 }

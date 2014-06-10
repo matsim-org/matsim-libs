@@ -120,22 +120,23 @@ public class ZoneLayerSHP {
 	 * @throws IOException
 	 */
 	public static <T> ZoneLayer<T> read(String filename) throws IOException {
-//		GeometryFactory factory = new GeometryFactory();
-		
 		Set<Zone<T>> zones = new HashSet<Zone<T>>();
 		for(SimpleFeature feature : FeatureSHP.readFeatures(filename)) {
-//			Coordinate[] coordinates = feature.getDefaultGeometry().getCoordinates();
-//			Coordinate[] newCoords = new Coordinate[coordinates.length + 1];
-//			for(int i = 0; i < coordinates.length; i++) {
-//				newCoords[i] = coordinates[i];
-//			}
-//			newCoords[newCoords.length - 1] = coordinates[0];
-//			
-//			LinearRing shell = factory.createLinearRing(newCoords);
-//			zones.add(new Zone<T>(factory.createPolygon(shell, null)));
 			zones.add(new Zone<T>(((Geometry) feature.getDefaultGeometry()).getGeometryN(0)));
 		}
 		
 		return new ZoneLayer<T>(zones);
+	}
+	
+	public static ZoneLayer<Double> read(String filename, String key) throws IOException {
+		Set<Zone<Double>> zones = new HashSet<Zone<Double>>();
+		for(SimpleFeature feature : FeatureSHP.readFeatures(filename)) {
+			Zone<Double> zone = new Zone<Double>(((Geometry) feature.getDefaultGeometry()).getGeometryN(0));
+			double val = (Long)feature.getAttribute(key); //FIXME
+			zone.setAttribute(val);
+			zones.add(zone);
+		}
+		
+		return new ZoneLayer<Double>(zones);
 	}
 }

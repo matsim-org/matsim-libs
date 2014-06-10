@@ -100,7 +100,7 @@ public class ZoneLayer<T> {
 		List<Zone<T>> result = quadtree.query(point.getEnvelopeInternal());
 		List<Zone<T>> zones = new ArrayList<Zone<T>>(result.size());
 		for(Zone<T> z : result) {
-			if(z.getGeometry().contains(point))
+			if(z.getPreparedGeometry().contains(point))
 				zones.add(z);
 		}
 		return zones;

@@ -17,30 +17,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.johannes.gsv.synPop;
+package playground.johannes.gsv.synPop.io;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.mid.LegDistanceHandler;
 
 /**
  * @author johannes
  *
  */
-public class ProxyHoushold {
+public class ParserTest {
 
-	private String id;
-	
-	private List<ProxyPerson> persons;
-	
-	public ProxyHoushold(String id) {
-		this.id = id;
-		this.persons = new ArrayList<ProxyPerson>(4);
-	}
-	
-	public void addPerson(ProxyPerson person) {
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		XMLParser parser = new XMLParser();
+		parser.setValidating(false);
+		parser.addSerializer(new LegDistanceHandler());
+		parser.parse("/home/johannes/gsv/mid2008/pop.xml");
 		
+		Set<ProxyPerson> persons = parser.getPersons();
+		
+		XMLWriter writer = new XMLWriter();
+		writer.addSerializer(new LegDistanceHandler());
+		writer.write("/home/johannes/gsv/mid2008/pop2.xml", persons);
+
 	}
+
 }

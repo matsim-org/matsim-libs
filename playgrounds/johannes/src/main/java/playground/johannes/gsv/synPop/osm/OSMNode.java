@@ -17,31 +17,45 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
-
-import java.util.Map;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyLeg;
+package playground.johannes.gsv.synPop.osm;
 
 /**
  * @author johannes
  *
  */
-public class LegRoundTrip implements LegAttributeHandler {
+public class OSMNode {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
-	 */
-	@Override
-	public void handle(ProxyLeg leg, Map<String, String> attributes) {
-		String val = attributes.get(MIDKeys.LEG_DESTINATION);
-
-		if(val.equalsIgnoreCase("Rundweg")) {
-			leg.setAttribute(CommonKeys.LEG_ROUNDTRIP, true);
-		} else {
-			leg.setAttribute(CommonKeys.LEG_ROUNDTRIP, false);
-		}
+	private String id;
+	
+	private double longitude;
+	
+	private double latitude;
+	
+	public OSMNode(String id) {
+		this.id = id;
 	}
 
+	public String getId() {
+		return id;
+	}
+	
+	public double getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
+	}
+
+	public double getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
+	}
+
+
+	
+	
 }

@@ -24,6 +24,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,78 +37,82 @@ import playground.johannes.gsv.synPop.ProxyPlan;
  *
  */
 public class TXTReader {
+	
+	private final static String DOT = ".";
 
 	private String separator = "\t";
 	
-	private List<PersonAttributeHandler> personHandlers = new ArrayList<PersonAttributeHandler>();
+	private List<PersonAttributeHandler> personAttHandlers = new ArrayList<PersonAttributeHandler>();
 	
-	private List<LegAttributeHandler> legHandlers = new ArrayList<LegAttributeHandler>();
+	private List<LegAttributeHandler> legAttHandlers = new ArrayList<LegAttributeHandler>();
 	
 	private Map<String, ProxyPerson> persons;
 	
-	private ProxyBuilder builder = new ProxyBuilder();
+
+	public void addPersonAttributeHandler(PersonAttributeHandler handler) {
+		personAttHandlers.add(handler);
+	}
+	
+	public void addLegAttributeHandler(LegAttributeHandler handler) {
+		legAttHandlers.add(handler);
+	}
+
+	public void setSeparator(String separator) {
+		this.separator = separator;
+	}
 	
 	public Map<String, ProxyPerson> read(String personFile, String legFile) throws IOException {
-		ProxyBuilder builder = new ProxyBuilder();
-		
-		PersonRowHandler handler = new PersonRowHandler(builder);
-		handler.read(personFile);
-		
-		for(ProxyPerson person : handler.getPersons().values()) {
+		persons = new LinkedHashMap<String, ProxyPerson>(65000);
+		/*
+		 * read and create persons
+		 */
+		new PersonRowHandler().read(personFile);
+		/*
+		 * add an empty plan to each person
+		 */
+		for(ProxyPerson person : persons.values()) {
 			person.setPlan(new ProxyPlan());
 		}
+		/*
+		 * read and create legs
+		 */
+		new LegRowHandler().read(legFile);
 		
-
-		legHandlers.add(new LegMainPurposeHandler());
-		legHandlers.add(new LegOriginHandler());
-		legHandlers.add(new LegRoundTrip());
-		legHandlers.add(new LegStartTimeHandler());
-		legHandlers.add(new LegEndTimeHandler());
-		legHandlers.add(new LegDistanceHandler());
+		return persons;
+	}
+	
+	private String personIdBuilder(Map<String, String> attributes) {
+		StringBuilder builder = new StringBuilder(20);
+		builder.append(attributes.get(MIDKeys.HOUSEHOLD_ID));
+		builder.append(DOT);
+		builder.append(attributes.get(MIDKeys.PERSON_ID));
 		
-		LegRowHandler legHandler = new LegRowHandler();
-		legHandler.read(legFile);
-		
-		
-		return handler.getPersons();
+		return builder.toString();
 	}
 	
 	private class LegRowHandler extends RowHandler {
 
-		/* (non-Javadoc)
-		 * @see playground.johannes.gsv.synPop.mid.TXTReader.RowHandler#handleRow(java.util.Map)
-		 */
 		@Override
 		protected void handleRow(Map<String, String> attributes) {
-			ProxyLeg leg = builder.addLeg(attributes, persons);
-			for(LegAttributeHandler handler : legHandlers)
+			String id = personIdBuilder(attributes);
+			ProxyPerson person = persons.get(id);
+			
+			ProxyLeg leg = new ProxyLeg();
+			for(LegAttributeHandler handler : legAttHandlers)
 				handler.handle(leg, attributes);
+			
+			person.getPlan().addLeg(leg);
 		}
 		
 	}
 	
 	private class PersonRowHandler extends RowHandler {
 
-		
-		
-		
-		public PersonRowHandler(ProxyBuilder builder) {
-//			this.builder = builder;
-			persons = new HashMap<String, ProxyPerson>(40000);
-		}
-		
-		public Map<String, ProxyPerson> getPersons() {
-			return persons;
-		}
-		
-		/* (non-Javadoc)
-		 * @see playground.johannes.gsv.synPop.mid.TXTReader.RowHandler#handleRow(java.util.Map)
-		 */
 		@Override
 		protected void handleRow(Map<String, String> attributes) {
-			ProxyPerson person = builder.buildPerson(attributes);
+			ProxyPerson person = new ProxyPerson(personIdBuilder(attributes));
 			
-			for(PersonAttributeHandler handler : personHandlers) {
+			for(PersonAttributeHandler handler : personAttHandlers) {
 				handler.handle(person, attributes);
 			}
 		
@@ -117,9 +122,7 @@ public class TXTReader {
 	}
 	
 	private abstract class RowHandler {
-		
-//		private String separator = "\t";
-		
+	
 		protected abstract void handleRow(Map<String, String> attributes);
 		
 		public void read(String file) throws IOException {
@@ -142,6 +145,8 @@ public class TXTReader {
 		
 				handleRow(attributes);
 			}
+			
+			reader.close();
 		}
 	}
 }

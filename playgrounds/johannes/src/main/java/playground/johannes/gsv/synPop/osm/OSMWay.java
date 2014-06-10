@@ -17,31 +17,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.synPop.osm;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyLeg;
 
 /**
  * @author johannes
  *
  */
-public class LegRoundTrip implements LegAttributeHandler {
+public class OSMWay {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
-	 */
-	@Override
-	public void handle(ProxyLeg leg, Map<String, String> attributes) {
-		String val = attributes.get(MIDKeys.LEG_DESTINATION);
-
-		if(val.equalsIgnoreCase("Rundweg")) {
-			leg.setAttribute(CommonKeys.LEG_ROUNDTRIP, true);
-		} else {
-			leg.setAttribute(CommonKeys.LEG_ROUNDTRIP, false);
-		}
+	private String id;
+	
+	private List<OSMNode> nodes;
+	
+	private Map<String, String> tags;
+	
+	public OSMWay(String id) {
+		this.id = id;
+		this.nodes = new ArrayList<OSMNode>();
+		this.tags = new HashMap<String, String>();
 	}
-
+	
+	public String getId() {
+		return id;
+	}
+	
+	public void addNode(OSMNode node) {
+		nodes.add(node);
+	}
+	
+	public List<OSMNode> getNodes() {
+		return nodes;
+	}
+	
+	public void addTag(String key, String value) {
+		tags.put(key, value);
+	}
+	
+	public Map<String, String> tags() {
+		return tags;
+	}
 }

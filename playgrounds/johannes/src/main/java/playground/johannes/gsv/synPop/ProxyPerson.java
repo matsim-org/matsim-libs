@@ -19,8 +19,10 @@
 
 package playground.johannes.gsv.synPop;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author johannes
@@ -48,11 +50,31 @@ public class ProxyPerson {
 		return attributes.put(key, value);
 	}
 	
+	public Object getAttribute(String key) {
+		return attributes.get(key);
+	}
+	
+	public Map<String, Object> getAttributes() {
+		return Collections.unmodifiableMap(attributes);
+	}
+	
 	public void setPlan(ProxyPlan plan) {
 		this.plan = plan;
 	}
 	
 	public ProxyPlan getPlan() {
 		return plan;
+	}
+	
+	public ProxyPerson clone() {
+		ProxyPerson clone = new ProxyPerson(id);
+		
+		for(Entry<String, Object> entry : attributes.entrySet()) {
+			clone.setAttribute(entry.getKey(), entry.getValue());
+		}
+		
+		clone.setPlan(plan.clone());
+		
+		return clone;
 	}
 }

@@ -47,4 +47,18 @@ public class ProxyPlan {
 	public List<ProxyActivity> getActivities() {
 		return activities;
 	}
+	
+	public ProxyPlan clone() {
+		ProxyPlan clone = new ProxyPlan();
+		
+		for(ProxyActivity act : activities) {
+			clone.addActivity(act.clone());
+		}
+		
+		for(ProxyLeg leg : legs) {
+			clone.addLeg(leg.clone());
+		}
+		
+		return clone;
+	}
 }
