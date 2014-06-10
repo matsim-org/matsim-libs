@@ -17,10 +17,8 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.balac.allcsmodestest.controler.listener.AllCSModesTestListener;
 import playground.balac.twowaycarsharingredisigned.config.TwoWayCSConfigGroup;
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSQsimFactory;
-import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSVehicleLocation;
 import playground.balac.twowaycarsharingredisigned.router.TwoWayCSRoutingModule;
 import playground.balac.twowaycarsharingredisigned.scoring.TwoWayCSScoringFunctionFactory;
 

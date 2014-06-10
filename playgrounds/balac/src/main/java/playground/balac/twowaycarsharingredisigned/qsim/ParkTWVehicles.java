@@ -16,17 +16,17 @@ import org.matsim.vehicles.VehicleUtils;
 
 
 public class ParkTWVehicles implements AgentSource {
-	private Population population;
-	private AgentFactory agentFactory;
+	//private Population population;
+	//private AgentFactory agentFactory;
 	private QSim qsim;
 	private Map<String, VehicleType> modeVehicleTypes;
 	private Collection<String> mainModes;
-	private boolean insertVehicles = true;
+	//private boolean insertVehicles = true;
 	private TwoWayCSVehicleLocation twvehiclesLocationqt;
 	public ParkTWVehicles(Population population, AgentFactory agentFactory, QSim qsim,
 			TwoWayCSVehicleLocation twvehiclesLocationqt) {
-		this.population = population;
-		this.agentFactory = agentFactory;
+		//this.population = population;
+		//this.agentFactory = agentFactory;
 		this.qsim = qsim;  
 		this.modeVehicleTypes = new HashMap<String, VehicleType>();
 		this.mainModes = qsim.getScenario().getConfig().qsim().getMainModes();
