@@ -14,27 +14,20 @@ import org.matsim.vehicles.VehicleUtils;
 
 import playground.balac.freefloating.qsim.FreeFloatingStation;
 import playground.balac.freefloating.qsim.FreeFloatingVehiclesLocation;
-import playground.balac.onewaycarsharingredisgned.qsim.OneWayCarsharingRDStation;
-import playground.balac.onewaycarsharingredisgned.qsim.OneWayCarsharingRDVehicleLocation;
 import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingStation;
 import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingVehicleLocation;
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSStation;
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSVehicleLocation;
 
 public class ParkCSVehicles implements AgentSource {
-	private Population population;
-	private AgentFactory agentFactory;
 	private QSim qsim;
 	private Map<String, VehicleType> modeVehicleTypes;
 	private Collection<String> mainModes;
-	private boolean insertVehicles = true;
 	private FreeFloatingVehiclesLocation ffvehiclesLocationqt;
 	private OneWayCarsharingRDWithParkingVehicleLocation owvehiclesLocationqt;
 	private TwoWayCSVehicleLocation twvehiclesLocationqt;
 	public ParkCSVehicles(Population population, AgentFactory agentFactory, QSim qsim,
 			FreeFloatingVehiclesLocation ffvehiclesLocationqt, OneWayCarsharingRDWithParkingVehicleLocation owvehiclesLocationqt, TwoWayCSVehicleLocation twvehiclesLocationqt) {
-		this.population = population;
-		this.agentFactory = agentFactory;
 		this.qsim = qsim;  
 		this.modeVehicleTypes = new HashMap<String, VehicleType>();
 		this.mainModes = qsim.getScenario().getConfig().qsim().getMainModes();

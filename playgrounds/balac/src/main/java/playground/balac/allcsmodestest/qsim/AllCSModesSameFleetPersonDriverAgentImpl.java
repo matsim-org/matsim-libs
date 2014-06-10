@@ -49,7 +49,6 @@ import playground.balac.freefloating.qsim.FreeFloatingStation;
 import playground.balac.freefloating.qsim.FreeFloatingVehiclesLocation;
 import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingStation;
 import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingVehicleLocation;
-import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSStation;
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSVehicleLocation;
 import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacilityImpl;
 
@@ -118,7 +117,6 @@ public class AllCSModesSameFleetPersonDriverAgentImpl implements MobsimDriverAge
 	private OneWayCarsharingRDWithParkingStation startStationTW;
 
 	
-	private TwoWayCSVehicleLocation twvehiclesLocation;	
 	private OneWayCarsharingRDWithParkingVehicleLocation owvehiclesLocation;
 	private FreeFloatingVehiclesLocation ffvehiclesLocation;	
 	
@@ -144,7 +142,6 @@ public class AllCSModesSameFleetPersonDriverAgentImpl implements MobsimDriverAge
 		this.scenario = scenario;
 		this.ffvehiclesLocation = ffvehiclesLocation;
 		this.owvehiclesLocation = owvehiclesLocation;
-		this.twvehiclesLocation = twvehiclesLocation;
 		
 		beelineFactor = Double.parseDouble(controler.getConfig().getModule("planscalcroute").getParams().get("beelineDistanceFactor"));
 		walkSpeed = Double.parseDouble(controler.getConfig().getModule("planscalcroute").getParams().get("teleportedModeSpeed_walk"));

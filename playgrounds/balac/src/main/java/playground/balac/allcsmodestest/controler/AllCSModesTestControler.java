@@ -23,7 +23,6 @@ import playground.balac.allcsmodestest.qsim.AllCSModesQsimFactory;
 import playground.balac.allcsmodestest.scoring.AllCSModesScoringFunctionFactory;
 import playground.balac.freefloating.config.FreeFloatingConfigGroup;
 import playground.balac.freefloating.router.FreeFloatingParkingRoutingModule;
-import playground.balac.freefloating.router.FreeFloatingRoutingModule;
 import playground.balac.onewaycarsharingredisgned.config.OneWayCarsharingRDConfigGroup;
 import playground.balac.onewaycarsharingredisgned.router.OneWayCarsharingRDRoutingModule;
 import playground.balac.twowaycarsharingredisigned.config.TwoWayCSConfigGroup;

@@ -176,8 +176,8 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 						now, this.getPerson().getId(), this.getDestinationLinkId(), currentLeg.getMode()));
 	
 		
-		if( (!(this.currentLinkId == null && this.cachedDestinationLinkId == null)) 
-				&& !this.currentLinkId.equals(this.cachedDestinationLinkId)) {
+		if( (!(this.currentLinkId == null && this.cachedDestinationLinkId == null))) 
+				if( !this.currentLinkId.equals(this.cachedDestinationLinkId)) {
 			log.error("The agent " + this.getPerson().getId() + " has destination link " + this.cachedDestinationLinkId
 					+ ", but arrived on link " + this.currentLinkId + ". Removing the agent from the simulation.");
 			this.state = MobsimAgent.State.ABORT ;

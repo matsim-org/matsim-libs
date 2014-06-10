@@ -2,9 +2,6 @@ package playground.balac.allcsmodestest.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.matsim.core.utils.io.IOUtils;
 
@@ -15,9 +12,9 @@ public class RentalTimesFromMobilityData {
 		// TODO Auto-generated method stub		
 		int[] rentalTimes = new int[24];
 		int count = 0;
-		int count1 = 0;
+		//int count1 = 0;
 		double distance = 0.0;
-		Set<Double> bla = new HashSet<Double>();
+	//	Set<Double> bla = new HashSet<Double>();
 		
 		final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Documents/MobilityData/Fahrten2010_march.txt");
 		String s = readLink.readLine();
