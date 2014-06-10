@@ -20,7 +20,6 @@
 package playground.boescpa.topdad.postprocessing;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
@@ -30,6 +29,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.boescpa.topdad.postprocessing.spatialCuttings.CircleBellevueCutting;
 
 /**
  * Creates "trips" from events. 
@@ -78,6 +79,7 @@ public class MainTripCreator {
 		log.info("Reading events file...done.");
 		
 		log.info("Postprocessing trips...");
+		TripProcessing.setCuttingStrategy(new CircleBellevueCutting(30000));
 		TripProcessing.printTrips(tripHandler, network, args[2]);
 		TripProcessing.analyzeTripsTopdad(tripHandler, network, args[3]);
 		log.info("Postprocessing trips...done.");
