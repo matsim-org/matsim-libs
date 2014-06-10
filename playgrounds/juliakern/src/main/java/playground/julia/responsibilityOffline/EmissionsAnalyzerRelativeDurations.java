@@ -36,16 +36,16 @@ import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.emissions.events.EmissionEventsReader;
+import org.matsim.contrib.emissions.types.ColdPollutant;
+import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
-import playground.vsp.emissions.events.EmissionEventsReader;
-import playground.vsp.emissions.types.ColdPollutant;
-import playground.vsp.emissions.types.WarmPollutant;
-import playground.vsp.emissions.utils.EmissionUtils;
 
 /**
  * This module requires an emissions events file.

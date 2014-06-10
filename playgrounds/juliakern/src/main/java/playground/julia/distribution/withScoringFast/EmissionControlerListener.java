@@ -27,6 +27,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.emissions.*;
+import org.matsim.contrib.emissions.events.EmissionEventsReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -47,8 +49,6 @@ import playground.julia.distribution.GridTools;
 import playground.julia.newInternalization.IntervalHandler;
 import playground.julia.responsibilityOffline.EmCarTrip;
 import playground.julia.spatialAveraging.SimpleWarmEmissionEventHandler;
-import playground.vsp.emissions.events.EmissionEventsReader;
-import playground.vsp.emissions.*;
 
 /**
  * @author benjamin

@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.emissions.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -40,7 +41,6 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
 
-import playground.vsp.emissions.*;
 import playground.julia.distribution.GridTools;
 import playground.julia.distribution.ResponsibilityEvent;
 import playground.julia.distribution.withScoringFast.GeneratedEmissionsHandler;

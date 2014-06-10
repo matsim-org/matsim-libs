@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package playground.agarwalamit.siouxFalls.simulationInputs;
 
+import org.matsim.contrib.emissions.EmissionModule;
+import org.matsim.contrib.emissions.example.EmissionControlerListener;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -34,8 +36,6 @@ import playground.ikaddoura.internalizationCar.MarginalCostPricing;
 import playground.ikaddoura.internalizationCar.TollDisutilityCalculatorFactory;
 import playground.ikaddoura.internalizationCar.TollHandler;
 import playground.ikaddoura.internalizationCar.WelfareAnalysisControlerListener;
-import playground.vsp.emissions.EmissionModule;
-import playground.vsp.emissions.example.EmissionControlerListener;
 
 /**
  * @author amit

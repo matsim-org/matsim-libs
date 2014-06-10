@@ -23,10 +23,10 @@ import java.io.IOException;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 
+import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
-import playground.vsp.emissions.types.WarmPollutant;
 
 /**
  * @author amit

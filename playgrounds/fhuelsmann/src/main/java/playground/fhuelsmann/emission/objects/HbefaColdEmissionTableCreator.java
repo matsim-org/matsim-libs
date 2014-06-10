@@ -26,7 +26,8 @@ import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.TreeMap;
 
-import playground.vsp.emissions.types.ColdPollutant;
+import org.matsim.contrib.emissions.types.ColdPollutant;
+
 
 
 public class HbefaColdEmissionTableCreator {

@@ -22,6 +22,7 @@ package playground.julia.distribution.withScoring;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.contrib.emissions.*;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -39,7 +40,6 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.julia.distribution.ResDisFactory;
-import playground.vsp.emissions.*;
 
 /**
  * @author benjamin

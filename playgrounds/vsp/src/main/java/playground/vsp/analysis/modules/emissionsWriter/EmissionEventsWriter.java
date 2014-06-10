@@ -29,14 +29,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.emissions.ColdEmissionHandler;
+import org.matsim.contrib.emissions.EmissionModule;
+import org.matsim.contrib.emissions.WarmEmissionHandler;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
-import playground.vsp.emissions.ColdEmissionHandler;
-import playground.vsp.emissions.EmissionModule;
-import playground.vsp.emissions.WarmEmissionHandler;
 
 /**
  * This module requires a scenario with emission specific informations set in the VspExperimentalConfigGroup.

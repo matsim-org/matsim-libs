@@ -31,11 +31,11 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.contrib.emissions.events.WarmEmissionEventImpl;
+import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 
-import playground.vsp.emissions.events.WarmEmissionEventImpl;
-import playground.vsp.emissions.types.WarmPollutant;
 import playground.fhuelsmann.emission.objects.HbefaWarmEmissionFactors;
 import playground.fhuelsmann.emission.objects.HbefaWarmEmissionFactorsDetailed;
 import playground.fhuelsmann.emission.objects.HbefaWarmEmissionTableCreator;

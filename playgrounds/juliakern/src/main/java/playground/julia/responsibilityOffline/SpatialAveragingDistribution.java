@@ -27,6 +27,9 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.emissions.events.EmissionEventsReader;
+import org.matsim.contrib.emissions.types.ColdPollutant;
+import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -35,9 +38,6 @@ import playground.julia.distribution.EmActivity;
 import playground.julia.distribution.EmPerCell;
 import playground.julia.distribution.ResponsibilityEvent;
 import playground.julia.distribution.withScoring.IntervalHandler;
-import playground.vsp.emissions.events.EmissionEventsReader;
-import playground.vsp.emissions.types.ColdPollutant;
-import playground.vsp.emissions.types.WarmPollutant;
 
 /**
  * @author benjamin, julia

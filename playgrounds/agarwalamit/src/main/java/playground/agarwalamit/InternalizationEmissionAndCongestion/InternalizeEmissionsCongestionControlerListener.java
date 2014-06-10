@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -40,7 +41,6 @@ import playground.benjamin.internalization.EmissionInternalizationHandler;
 import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
 import playground.ikaddoura.internalizationCar.MarginalCostPricingCarHandler;
 import playground.ikaddoura.internalizationCar.TollHandler;
-import playground.vsp.emissions.EmissionModule;
 
 /**
  * @author amit after Benjamin and Ihab

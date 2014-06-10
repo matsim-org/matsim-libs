@@ -26,13 +26,13 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.emissions.events.WarmEmissionEvent;
+import org.matsim.contrib.emissions.events.WarmEmissionEventImpl;
+import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.benjamin.scenarios.munich.analysis.nectar.*;
-import playground.vsp.emissions.events.WarmEmissionEvent;
-import playground.vsp.emissions.events.WarmEmissionEventImpl;
-import playground.vsp.emissions.types.WarmPollutant;
 
 public class TestEmissionsPerLinkWarmEventHandler {
 

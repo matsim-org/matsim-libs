@@ -22,9 +22,9 @@ package playground.benjamin.internalization;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.emissions.types.ColdPollutant;
+import org.matsim.contrib.emissions.types.WarmPollutant;
 
-import playground.vsp.emissions.types.ColdPollutant;
-import playground.vsp.emissions.types.WarmPollutant;
 
 /**
  * @author benjamin

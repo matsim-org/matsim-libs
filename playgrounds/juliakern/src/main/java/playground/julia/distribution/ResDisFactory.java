@@ -19,6 +19,7 @@
 
 package playground.julia.distribution;
 
+import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
@@ -28,7 +29,6 @@ import org.matsim.core.router.util.TravelTime;
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.julia.distribution.withScoring.EmissionControlerListener;
 import playground.julia.distribution.withScoring.ResDisCalculator;
-import playground.vsp.emissions.EmissionModule;
 
 
 

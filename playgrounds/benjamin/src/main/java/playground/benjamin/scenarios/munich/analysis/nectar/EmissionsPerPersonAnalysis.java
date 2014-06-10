@@ -24,6 +24,8 @@ import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.emissions.utils.EmissionUtils;
+import org.matsim.contrib.emissions.utils.EmissionWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
@@ -31,8 +33,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
-import playground.vsp.emissions.utils.EmissionUtils;
-import playground.vsp.emissions.utils.EmissionWriter;
 
 /**
  * @author benjamin

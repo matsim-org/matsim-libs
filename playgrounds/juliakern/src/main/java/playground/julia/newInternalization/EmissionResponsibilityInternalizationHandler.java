@@ -22,13 +22,13 @@ package playground.julia.newInternalization;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.contrib.emissions.events.ColdEmissionEvent;
+import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
+import org.matsim.contrib.emissions.events.WarmEmissionEvent;
+import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 
-import playground.vsp.emissions.events.ColdEmissionEvent;
-import playground.vsp.emissions.events.ColdEmissionEventHandler;
-import playground.vsp.emissions.events.WarmEmissionEvent;
-import playground.vsp.emissions.events.WarmEmissionEventHandler;
 
 
 /**

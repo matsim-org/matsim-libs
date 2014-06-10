@@ -25,11 +25,10 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.emissions.events.ColdEmissionEvent;
+import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
+import org.matsim.contrib.emissions.types.ColdPollutant;
 
-import playground.vsp.emissions.events.ColdEmissionEvent;
-import playground.vsp.emissions.events.ColdEmissionEventHandler;
-import playground.vsp.emissions.types.ColdPollutant;
-import playground.vsp.emissions.types.ColdPollutant;
 
 /**
  * @author benjamin, julia

@@ -23,6 +23,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -31,7 +32,6 @@ import org.matsim.vehicles.Vehicle;
 
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.ikaddoura.internalizationCar.TollHandler;
-import playground.vsp.emissions.EmissionModule;
 
 /**
  * @author amit after Benjamin and Ihab

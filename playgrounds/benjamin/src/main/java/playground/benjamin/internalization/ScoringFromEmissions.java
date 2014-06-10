@@ -20,13 +20,13 @@
 package playground.benjamin.internalization;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.emissions.events.ColdEmissionEvent;
+import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
+import org.matsim.contrib.emissions.events.WarmEmissionEvent;
+import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-import playground.vsp.emissions.events.ColdEmissionEvent;
-import playground.vsp.emissions.events.ColdEmissionEventHandler;
-import playground.vsp.emissions.events.WarmEmissionEvent;
-import playground.vsp.emissions.events.WarmEmissionEventHandler;
 
 /**
  * @author benjamin

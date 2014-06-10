@@ -26,6 +26,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.emissions.EmissionModule;
+import org.matsim.contrib.emissions.WarmEmissionAnalysisModule;
+import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.util.TravelDisutility;
@@ -33,9 +36,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import playground.vsp.emissions.EmissionModule;
-import playground.vsp.emissions.WarmEmissionAnalysisModule;
-import playground.vsp.emissions.types.WarmPollutant;
 
 /**
  * @author benjamin

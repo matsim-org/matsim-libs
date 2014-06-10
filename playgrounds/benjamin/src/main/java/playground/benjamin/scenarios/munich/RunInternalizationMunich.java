@@ -20,6 +20,7 @@
 package playground.benjamin.scenarios.munich;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
@@ -29,7 +30,6 @@ import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
 import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
-import playground.vsp.emissions.EmissionModule;
 
 /**
  * @author benjamin

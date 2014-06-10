@@ -28,10 +28,10 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.contrib.emissions.events.ColdEmissionEventImpl;
+import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import playground.vsp.emissions.events.ColdEmissionEventImpl;
-import playground.vsp.emissions.types.ColdPollutant;
 import playground.fhuelsmann.emission.objects.HbefaColdEmissionFactor;
 import playground.fhuelsmann.emission.objects.HbefaColdEmissionTableCreator;
 

@@ -21,7 +21,8 @@ package playground.fhuelsmann.emission.objects;
 
 import java.util.HashMap;
 
-import playground.vsp.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.types.WarmPollutant;
+
 
 public class HbefaWarmEmissionFactors {
 

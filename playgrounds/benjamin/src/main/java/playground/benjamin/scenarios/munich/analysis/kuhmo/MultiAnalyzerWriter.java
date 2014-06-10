@@ -30,6 +30,7 @@ import java.util.SortedMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
@@ -37,7 +38,6 @@ import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
-import playground.vsp.emissions.utils.EmissionUtils;
 
 /**
  * @author benjamin
