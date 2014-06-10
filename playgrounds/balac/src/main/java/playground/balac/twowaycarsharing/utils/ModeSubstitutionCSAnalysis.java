@@ -31,7 +31,8 @@ public class ModeSubstitutionCSAnalysis {
 		int[] bla = new int[5];
 		int count = 0;
 		int number = 0;
-		
+		int countWalk = 0;
+		double distance = 0.0;
 		for (Person person: scenario2.getPopulation().getPersons().values()) {
 			int j = 0;
 			for (PlanElement pe:person.getSelectedPlan().getPlanElements()) {
@@ -40,7 +41,7 @@ public class ModeSubstitutionCSAnalysis {
 				 if (pe instanceof Leg) {
 					
 					if (((Leg) pe).getMode().equals("onewaycarsharing")) {
-						String s = null;
+						Leg s = null;
 						int index = person.getSelectedPlan().getPlanElements().indexOf(pe);
 						
 					//	if (((Activity)person.getSelectedPlan().getPlanElements().get(index - 1)).getType().equals("cs_interaction"))
@@ -48,28 +49,27 @@ public class ModeSubstitutionCSAnalysis {
 					//	else
 							s = findMode(person.getId(), j, scenario);
 						
-						if (s.equals("car")) {
+						if (s.getMode().equals("car")) {
 							
 							bla[0]++;
 							count++;
 						}
-						else if (s.equals("bike")) {
+						else if (s.getMode().equals("bike")) {
 							
 							bla[1]++;
 							count++;
 						}
-						else if (s.equals("walk")) {
-							
+						else if (s.getMode().equals("walk")) {
 							bla[2]++;
 							count++;
 						}
-						else if (s.equals("walk_rb") || s.equals("twowaycarsharing")) {
+						else if (s.getMode().equals("walk_rb") || s.getMode().equals("twowaycarsharing")) {
 							
 							bla[3]++;
 							count++;
 							
 						}
-						else if (s.equals("transit_walk") || s.equals("pt")) {
+						else if (s.getMode().equals("transit_walk") || s.getMode().equals("pt")) {
 							
 							bla[4]++;
 							count++;
@@ -77,6 +77,12 @@ public class ModeSubstitutionCSAnalysis {
 						else 
 							number++;
 						
+						
+					}
+					else if (((Leg) pe).getMode().equals("walk")) {
+						
+						countWalk++;
+						distance += ((Leg)pe).getRoute().getDistance();
 						
 					}
 				}
@@ -88,11 +94,12 @@ public class ModeSubstitutionCSAnalysis {
     		System.out.println((double)bla[i]/(double)count * 100.0);
 						
     	}
+		System.out.println(distance/(double)countWalk);
     	System.out.println(count);
     	System.out.println(number);
 	}
 	
-	public String findMode(Id id, int j, ScenarioImpl scenario) {
+	public Leg findMode(Id id, int j, ScenarioImpl scenario) {
 		
 		Person p = scenario.getPopulation().getPersons().get(id);
 		int i = 0;
@@ -103,7 +110,7 @@ public class ModeSubstitutionCSAnalysis {
 				i++;
 				if (i == j) {
 					
-					return ((Leg)p.getSelectedPlan().getPlanElements().get(k + 1)).getMode();
+					return ((Leg)p.getSelectedPlan().getPlanElements().get(k + 1));
 				}
 			}
 			k++;
