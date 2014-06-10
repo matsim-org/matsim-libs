@@ -16,31 +16,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.parking.PC2.scoring;
+package org.matsim.contrib.parking.PC2.simulation;
 
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
+public class ParkingInfrastructureManager {
 
-public class ParkingScoringFunction implements BasicScoring{
-	double score=0;
-	private Plan plan;
-	private ParkingScoreManager parkingScoreManager;
-
-	public ParkingScoringFunction(Plan plan, ParkingScoreManager parkingScoreManager) {
-		super();
-		this.plan = plan;
-		this.parkingScoreManager = parkingScoreManager;
-	}
 	
-	@Override
-	public void finish() {
-		score = parkingScoreManager.getScore(plan.getPerson().getId());
-	}
-
-	@Override
-	public double getScore() {
-		return score;
-	}
-
+	
 }

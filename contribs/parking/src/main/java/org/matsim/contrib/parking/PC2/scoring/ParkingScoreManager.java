@@ -18,29 +18,37 @@
  * *********************************************************************** */
 package org.matsim.contrib.parking.PC2.scoring;
 
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.core.controler.Controler;
 
-public class ParkingScoringFunction implements BasicScoring{
-	double score=0;
-	private Plan plan;
-	private ParkingScoreManager parkingScoreManager;
+public class ParkingScoreManager {
 
-	public ParkingScoringFunction(Plan plan, ParkingScoreManager parkingScoreManager) {
-		super();
-		this.plan = plan;
-		this.parkingScoreManager = parkingScoreManager;
+	private ParkingBetas parkingBetas;
+	private double parkingScoreScalingFactor;
+	private double randomErrorTermScalingFactor;
+	DoubleValueHashMap<Id> scores;
+	
+	public double getScore(Id id) {
+		return scores.get(id);
 	}
 	
-	@Override
-	public void finish() {
-		score = parkingScoreManager.getScore(plan.getPerson().getId());
+	public void addScore(Id id, double incValue) {
+		scores.incrementBy(id, incValue);
+	}
+	
+	
+	public void prepareForNewIteration(){
+		scores=new DoubleValueHashMap<Id>();
 	}
 
-	@Override
-	public double getScore() {
-		return score;
+	public void init(Controler controler) {
+		this.parkingBetas=new ParkingBetas();
+		this.parkingBetas.setParkingWalkBeta(controler.getConfig().getParam("parkingChoice", "parkingWalkBeta"));
+		this.parkingBetas.setParkingCostBeta(controler.getConfig().getParam("parkingChoice", "parkingCostBeta"));
+
+		this.parkingScoreScalingFactor= Double.parseDouble(controler.getConfig().getParam("parkingChoice", "parkingScoreScalingFactor"));
+		this.randomErrorTermScalingFactor= Double.parseDouble(controler.getConfig().getParam("parkingChoice", "randomErrorTermScalingFactor"));
 	}
 
 }

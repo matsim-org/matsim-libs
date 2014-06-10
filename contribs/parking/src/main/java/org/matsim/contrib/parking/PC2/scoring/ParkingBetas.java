@@ -1,0 +1,123 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+package org.matsim.contrib.parking.PC2.scoring;
+
+import java.util.HashMap;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.contrib.parking.lib.utils.expr.Parser;
+import org.matsim.contrib.parking.lib.utils.expr.SyntaxException;
+import org.matsim.core.population.PersonImpl;
+
+public class ParkingBetas {
+
+	private String parkingWalkBeta;
+	private Parser parkingCostBetaParser;
+	private HashMap<Id, Parser> parkingWalkBetaCache;
+	private DoubleValueHashMap<Id> parkingCostBetaCache;
+
+	public ParkingBetas() {
+		parkingWalkBetaCache = new HashMap<Id, Parser>();
+		parkingCostBetaCache = new DoubleValueHashMap<Id>();
+	}
+
+	public void setParkingWalkBeta(String parkingWalkBeta) {
+		if (parkingWalkBeta != null) {
+			this.parkingWalkBeta = parkingWalkBeta;
+		} else {
+			DebugLib.stopSystemAndReportInconsistency();
+		}
+	}
+
+	public void setParkingCostBeta(String parkingCostBeta) {
+		if (parkingCostBeta != null) {
+			this.parkingCostBetaParser = new Parser(parkingCostBeta);
+		} else {
+			DebugLib.stopSystemAndReportInconsistency();
+		}
+	}
+
+	public double getParkingWalkBeta(Person person, double activityDurationInSeconds) {
+		Id personId = person.getId();
+		Parser parser = null;
+		if (!parkingWalkBetaCache.containsKey(personId)) {
+			Parser pTmp = new Parser(parkingWalkBeta);
+			PersonImpl persImpl = (PersonImpl) person;
+
+			int isMale = 1;
+			if (persImpl.getSex() != null) {
+				isMale = !persImpl.getSex().contains("f") ? 1 : 0;
+			}
+
+			pTmp.setVariable("isMale", isMale);
+
+			int age = persImpl.getAge();
+
+			pTmp.setVariable("ageInYears", age);
+			parkingWalkBetaCache.put(personId, pTmp);
+		}
+		parser = parkingWalkBetaCache.get(personId);
+
+		parser.setVariable("activityDurationInSeconds", activityDurationInSeconds);
+
+		double result = 0;
+
+		try {
+			result = parser.parse();
+		} catch (SyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+
+	// TODO: in controller, add income to person
+	public double getParkingCostBeta(Person person) {
+		Id personId = person.getId();
+		if (!parkingCostBetaCache.containsKey(personId)) {
+			Double income = (Double) person.getCustomAttributes().get("parkingChoice.income"); // TODO:
+																								// read
+																								// from
+																								// a
+																								// HashMap
+																								// and
+																								// set
+																								// to
+																								// person
+																								// =>
+																								// tell,
+																								// where
+																								// expected
+			parkingCostBetaParser.setVariable("income", income);
+			try {
+				parkingCostBetaCache.put(personId, parkingCostBetaParser.parse());
+			} catch (SyntaxException e) {
+				e.printStackTrace();
+				DebugLib.stopSystemAndReportInconsistency();
+			}
+		}
+
+		return parkingCostBetaCache.get(personId);
+	}
+
+}
