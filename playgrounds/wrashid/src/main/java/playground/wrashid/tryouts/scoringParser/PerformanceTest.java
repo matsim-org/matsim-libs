@@ -1,8 +1,8 @@
 package playground.wrashid.tryouts.scoringParser;
 
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
-import org.matsim.utils.expr.Parser;
-import org.matsim.utils.expr.SyntaxException;
+import org.matsim.contrib.parking.lib.utils.expr.Parser;
+import org.matsim.contrib.parking.lib.utils.expr.SyntaxException;
 
 public class PerformanceTest {
 
