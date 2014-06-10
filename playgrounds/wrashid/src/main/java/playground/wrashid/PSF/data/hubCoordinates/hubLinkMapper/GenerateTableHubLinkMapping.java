@@ -28,12 +28,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.lib.obj.GenericResult;
-import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
 
 public class GenerateTableHubLinkMapping {

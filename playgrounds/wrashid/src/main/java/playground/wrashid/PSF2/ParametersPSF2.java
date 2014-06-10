@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.core.controler.Controler;
 
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
@@ -33,7 +34,6 @@ import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMainta
 import playground.wrashid.PSF2.vehicle.vehicleFleet.FleetInitializer;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.obj.GeneralLogObject;
-import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 public class ParametersPSF2 {
 

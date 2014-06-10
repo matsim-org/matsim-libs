@@ -24,9 +24,9 @@ import java.util.HashMap;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 
 import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
-import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 public interface FleetInitializer {
 

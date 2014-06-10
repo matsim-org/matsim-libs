@@ -37,11 +37,11 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
-import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 /**
  * 

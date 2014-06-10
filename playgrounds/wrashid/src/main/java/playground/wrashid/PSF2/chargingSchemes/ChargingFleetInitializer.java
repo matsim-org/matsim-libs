@@ -25,13 +25,13 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.FleetInitializer;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
-import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 public class ChargingFleetInitializer implements FleetInitializer {
 

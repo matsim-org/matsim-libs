@@ -37,8 +37,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 
-import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 /**
  * This class assigns one energy consumption value to each trip of a vehicle.

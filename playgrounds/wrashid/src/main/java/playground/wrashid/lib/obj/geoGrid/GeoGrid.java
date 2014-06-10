@@ -6,9 +6,9 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 public class GeoGrid {
 
