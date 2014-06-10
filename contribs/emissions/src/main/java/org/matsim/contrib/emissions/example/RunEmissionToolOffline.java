@@ -115,16 +115,18 @@ public class RunEmissionToolOffline {
 	}
 
 	private void setInputFiles() {
-		VspExperimentalConfigGroup vcg = scenario.getConfig().vspExperimental() ;
-		vcg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
-		vcg.setEmissionVehicleFile(emissionVehicleFile);
-		
-		vcg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
-		vcg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
-		
-		vcg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
-		vcg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
-		vcg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
+	        EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
+        controler.getConfig().addModule(ecg);
+        ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
+        ecg.setEmissionVehicleFile(emissionVehicleFile);
+        
+        ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
+        ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
+        
+        ecg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
+        ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
+        ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
+
 	}
 
 	@SuppressWarnings("deprecation")
