@@ -89,7 +89,7 @@ public class SwitchingJointQSimFactory implements MobsimFactory, IterationStarts
 	public static boolean isPSimIter(
 			final int iteration,
 			final PseudoSimConfigGroup config ) {
-		return iteration % (config.getPeriod() + config.getNPSimIters()) >= config.getPeriod();
+		return iteration % (config.getPeriod() + config.getNPSimIters()) < config.getNPSimIters();
 	}
 }
 
