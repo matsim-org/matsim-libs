@@ -52,8 +52,7 @@ public class ParkingLoader {
 	public static double privateParkingCalibrationFactorZHCity = 1.0;
 	public static double populationScalingFactor = 1.0;
 
-	public static LinkedList<Parking> getParkingsForScenario() {
-		String parkingDataBase = ZHScenarioGlobal.loadStringParam("ParkingLoader.parkingDataBase");
+	public static LinkedList<Parking> getParkingsForScenario(String parkingDataBase) {
 
 		LinkedList<Parking> parkingCollection = getParkingCollectionZHCity(parkingDataBase);
 		String parkingsFile = parkingDataBase + "publicParkingsOutsideZHCity.xml";
@@ -173,7 +172,7 @@ public class ParkingLoader {
 	}
 
 	public static ParkingManagerZH getParkingManagerZH(Network network, TTMatrix ttMatrix) {
-		LinkedList<Parking> parkings = getParkingsForScenario();
+		LinkedList<Parking> parkings = getParkingsForScenario(ZHScenarioGlobal.loadStringParam("ParkingLoader.parkingDataBase"));
 		addIllegalParking(network, parkings);
 		addDummyParking(parkings);
 
