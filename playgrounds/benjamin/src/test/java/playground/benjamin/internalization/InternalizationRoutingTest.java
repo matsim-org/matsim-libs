@@ -250,11 +250,12 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 
 		// define emission tool input files	
 	    EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
-	     
+	    controler.getConfig().addModule(ecg);
 		ecg.setEmissionRoadTypeMappingFile(this.getClassInputDirectory() + "roadTypeMapping.txt");
 
 		ecg.setAverageWarmEmissionFactorsFile(this.getClassInputDirectory() + "EFA_HOT_vehcat_2005average.txt");
 		ecg.setAverageColdEmissionFactorsFile(this.getClassInputDirectory() + "EFA_ColdStart_vehcat_2005average.txt");
+
 
 		// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
 		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
