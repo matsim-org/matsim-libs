@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.router.TripStructureUtils;
 
@@ -73,20 +74,22 @@ public class TravelTimeRetrofittingEventHandler implements PersonDepartureEventH
 			departure.put( person , time );
 		}
 
-		public void endLeg( final Id person , final double time ) {
+		public void endLeg( final Id personId , final double time ) {
+			final Person person = population.getPersons().get( personId );
+			if ( person == null ) return;
 			final Iterator<Leg> it =
 				MapUtils.getArbitraryObject(
-						person,
+						personId,
 						legIterators,
 						new MapUtils.Factory<Iterator<Leg>>() {
 							@Override
 							public Iterator<Leg> create() {
 								return TripStructureUtils.getLegs(
-									population.getPersons().get( person ).getSelectedPlan() ).iterator();
+										person.getSelectedPlan() ).iterator();
 							}
 						});
 			final Leg leg = it.next();
-			final double tt = time - departure.remove( person );
+			final double tt = time - departure.remove( personId );
 			leg.setTravelTime( tt );
 			leg.getRoute().setTravelTime( tt );
 		}
