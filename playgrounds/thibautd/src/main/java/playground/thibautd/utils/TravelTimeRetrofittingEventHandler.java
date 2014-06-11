@@ -58,28 +58,28 @@ public class TravelTimeRetrofittingEventHandler implements PersonDepartureEventH
 
 	@Override
 	public void handleEvent(final PersonArrivalEvent event) {
-		legHandler.endLeg( event.getPersonId() , event.getTime() );
+		legHandler.endLeg( event );
 	}
 
 	@Override
 	public void handleEvent(final PersonDepartureEvent event) {
-		legHandler.startLeg( event.getPersonId() , event.getTime() );
+		legHandler.startLeg( event );
 	}
 
 	private class LegHandler {
 		private final Map<Id, Iterator<Leg>> legIterators = new HashMap<Id, Iterator<Leg>>( population.getPersons().size() );
 		private final Map<Id, Double> departure = new HashMap<Id, Double>();
 
-		public void startLeg( final Id person , final double time ) {
-			departure.put( person , time );
+		public void startLeg( final PersonDepartureEvent event ) {
+			departure.put( event.getPersonId() , event.getTime() );
 		}
 
-		public void endLeg( final Id personId , final double time ) {
-			final Person person = population.getPersons().get( personId );
+		public void endLeg( final PersonArrivalEvent event ) {
+			final Person person = population.getPersons().get( event.getPersonId() );
 			if ( person == null ) return;
 			final Iterator<Leg> it =
 				MapUtils.getArbitraryObject(
-						personId,
+						event.getPersonId(),
 						legIterators,
 						new MapUtils.Factory<Iterator<Leg>>() {
 							@Override
@@ -89,7 +89,10 @@ public class TravelTimeRetrofittingEventHandler implements PersonDepartureEventH
 							}
 						});
 			final Leg leg = it.next();
-			final double tt = time - departure.remove( personId );
+			if ( !leg.getMode().equals( event.getLegMode() ) ) {
+				throw new RuntimeException( "leg "+leg+" does not have mode "+event.getLegMode()+" of event "+event );
+			}
+			final double tt = event.getTime() - departure.remove( event.getPersonId() );
 			leg.setTravelTime( tt );
 			leg.getRoute().setTravelTime( tt );
 		}

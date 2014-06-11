@@ -63,7 +63,7 @@ public class SwitchingJointQSimFactory implements MobsimFactory, IterationStarts
 
 		if ( iteration < repl.getDisableInnovationAfterIter() &&
 				!config.getPsimType().equals( PSimType.none ) &&
-				isPSimIter( iteration , config ) ) {
+				config.isPSimIter( iteration ) ) {
 			switch ( config.getPsimType() ) {
 			case detailled:
 				log.info( "Using detailled pseudo simulation for iteration "+iteration );
@@ -84,12 +84,6 @@ public class SwitchingJointQSimFactory implements MobsimFactory, IterationStarts
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
 		iteration = event.getIteration();
-	}
-
-	public static boolean isPSimIter(
-			final int iteration,
-			final PseudoSimConfigGroup config ) {
-		return iteration % (config.getPeriod() + config.getNPSimIters()) < config.getNPSimIters();
 	}
 }
 

@@ -87,5 +87,10 @@ public class PseudoSimConfigGroup extends ReflectiveModule {
 	public void setDumpEvents(boolean dumpEvents) {
 		this.dumpEvents = dumpEvents;
 	}
+
+	public boolean isPSimIter(
+			final int iteration ) {
+		return iteration % (getPeriod() + getNPSimIters()) < getNPSimIters();
+	}
 }
 

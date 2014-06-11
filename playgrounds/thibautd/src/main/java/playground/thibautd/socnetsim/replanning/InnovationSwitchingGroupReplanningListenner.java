@@ -27,7 +27,6 @@ import playground.thibautd.mobsim.PseudoSimConfigGroup;
 import playground.thibautd.mobsim.PseudoSimConfigGroup.PSimType;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
-import playground.thibautd.socnetsim.qsim.SwitchingJointQSimFactory;
 
 /**
  * @author thibautd
@@ -61,7 +60,7 @@ public class InnovationSwitchingGroupReplanningListenner implements ReplanningLi
 
 		if ( event.getIteration() < repl.getDisableInnovationAfterIter() &&
 				!config.getPsimType().equals( PSimType.none ) &&
-				SwitchingJointQSimFactory.isPSimIter( event.getIteration() , config ) ) {
+				config.isPSimIter( event.getIteration() ) ) {
 			log.info( "performing INNOVATION ONLY iteration (for feeding PSim)" );
 			innovativeStrategyManager.run(
 				event.getIteration(),
