@@ -25,6 +25,8 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
@@ -49,6 +51,9 @@ import org.matsim.core.utils.misc.Time;
  * @author thibautd
  */
 public class VehicularTeleportationEngine implements DepartureHandler, MobsimEngine {
+	private static final Logger log =
+		Logger.getLogger(VehicularTeleportationEngine.class);
+
 	/**
 	 * Includes all agents that have transportation modes unknown to the
 	 * QueueSimulation (i.e. != "car") or have two activities on the same link
@@ -62,6 +67,8 @@ public class VehicularTeleportationEngine implements DepartureHandler, MobsimEng
 	private final VehicleBehavior vehicleBehavior;
 
 	private final ParkedVehicleProvider vehicleProvider;
+
+	private int teleported = 0;
 
 	public VehicularTeleportationEngine(
 			final Collection<String> modes,
@@ -88,6 +95,10 @@ public class VehicularTeleportationEngine implements DepartureHandler, MobsimEng
 					throw new IllegalStateException( "vehicle "+vehicleId+" is not parked anywhere. Cannot teleport it!" );
 				}
 				// "teleport" vehicle before handling 
+				if ( teleported++ < 10 ) {
+					log.warn( "teleporting vehicle "+vehicleId+" from link "+parkLink+" to "+linkId );
+					if ( teleported == 10 ) log.warn( "future occurences of this warning are suppressed" );
+				}
 				final QVehicle veh = vehicleProvider.getVehicle( vehicleId );
 				veh.setCurrentLink( internalInterface.getMobsim().getScenario().getNetwork().getLinks().get( linkId ) );
 				handleDeparture( now , (MobsimDriverAgent) agent );
@@ -183,6 +194,8 @@ public class VehicularTeleportationEngine implements DepartureHandler, MobsimEng
 						agent.getMode()));
 		}
 		teleportationList.clear();
+
+		log.info( teleported+" vehicles had to be teleported to their trip starting point." );
 	}
 
 	@Override
