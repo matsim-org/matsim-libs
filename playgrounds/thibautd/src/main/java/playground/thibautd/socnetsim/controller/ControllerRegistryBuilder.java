@@ -39,8 +39,8 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryInternal;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
@@ -48,7 +48,6 @@ import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.XY2Links;
@@ -57,6 +56,8 @@ import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
+import playground.thibautd.mobsim.DeactivableTravelTimeProvider;
+import playground.thibautd.mobsim.DeactivableTravelTimeProvider.PSimIterationsCriterion;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.scoring.CharyparNagelWithJointModesScoringFunctionFactory;
 import playground.thibautd.socnetsim.population.JointActingTypes;
@@ -88,7 +89,7 @@ public class ControllerRegistryBuilder {
 	// configurable elements
 	// if still null at build time, defaults will be created
 	// lazily. This allows to used other fields at construction
-	private TravelTimeCalculator travelTime = null;
+	private DeactivableTravelTimeProvider travelTime = null;
 	private TravelDisutilityFactory travelDisutilityFactory = null;
 	private ScoringFunctionFactory scoringFunctionFactory = null;
 	private MobsimFactory mobsimFactory = null;
@@ -125,7 +126,7 @@ public class ControllerRegistryBuilder {
 	// /////////////////////////////////////////////////////////////////////////
 	// "with" methods
 	public ControllerRegistryBuilder withTravelTimeCalculator(
-			final TravelTimeCalculator travelTime2) {
+			final DeactivableTravelTimeProvider travelTime2) {
 		if ( this.travelTime != null ) throw new IllegalStateException( "object already set" );
 		this.travelTime = travelTime2;
 		return this;
@@ -310,12 +311,14 @@ public class ControllerRegistryBuilder {
 		return weakPlanLinkIdentifier;
 	}
 
-	public TravelTimeCalculator getTravelTime() {
+	public DeactivableTravelTimeProvider getTravelTime() {
 		if ( travelTime == null ) {
 			this.travelTime =
-				new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(
-						scenario.getNetwork(),
-						scenario.getConfig().travelTimeCalculator());
+				new DeactivableTravelTimeProvider(
+						new PSimIterationsCriterion( scenario.getConfig() ),
+						new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(
+								scenario.getNetwork(),
+								scenario.getConfig().travelTimeCalculator()) );
 			this.events.addHandler(travelTime);	
 		}
 		return travelTime;

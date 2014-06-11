@@ -33,8 +33,8 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
+import playground.thibautd.mobsim.DeactivableTravelTimeProvider;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
@@ -51,7 +51,7 @@ public final class ControllerRegistry {
 
 	private final Scenario scenario;
 	private final EventsManager events;
-	private final TravelTimeCalculator travelTime;
+	private final DeactivableTravelTimeProvider travelTime;
 	private final TravelDisutilityFactory travelDisutilityFactory;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final CalcLegTimes legTimes;
@@ -69,7 +69,7 @@ public final class ControllerRegistry {
 	ControllerRegistry(
 			final Scenario scenario,
 			final EventsManager events,
-			final TravelTimeCalculator travelTime,
+			final DeactivableTravelTimeProvider travelTime,
 			final TravelDisutilityFactory travelDisutilityFactory,
 			final ScoringFunctionFactory scoringFunctionFactory,
 			final CalcLegTimes legTimes,
@@ -131,7 +131,7 @@ public final class ControllerRegistry {
 		return events;
 	}
 
-	public TravelTimeCalculator getTravelTime() {
+	public DeactivableTravelTimeProvider getTravelTime() {
 		return travelTime;
 	}
 

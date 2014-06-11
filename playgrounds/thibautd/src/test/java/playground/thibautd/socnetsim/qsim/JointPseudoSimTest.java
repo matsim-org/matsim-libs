@@ -76,9 +76,9 @@ public class JointPseudoSimTest {
 		final Scenario scenario = createTestScenario();
 
 		final TravelTimeCalculator travelTime =
-			new TravelTimeCalculator(
-					scenario.getNetwork(),
-					scenario.getConfig().travelTimeCalculator());
+				new TravelTimeCalculator(
+						scenario.getNetwork(),
+						scenario.getConfig().travelTimeCalculator());
 
 		final TripRouterFactory defFact =
 				new TripRouterFactoryBuilderWithDefaults().build(
@@ -104,7 +104,7 @@ public class JointPseudoSimTest {
 				new JointQSimFactory(),
 				DUMP_EVENTS ? utils.getOutputDirectory()+"/qSimEvent.xml" : null,
 				new JointPseudoSimFactory(
-					travelTime ),
+							travelTime.getLinkTravelTimes() ),
 				DUMP_EVENTS ? utils.getOutputDirectory()+"/pSimEvent.xml" : null,
 				travelTime,
 				false );

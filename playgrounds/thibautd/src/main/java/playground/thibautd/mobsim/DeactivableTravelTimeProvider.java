@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.mobsim;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -33,8 +35,11 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+
+import playground.thibautd.mobsim.PseudoSimConfigGroup.PSimType;
 
 /**
  * Necessary for "teleporting" QSim: otherwise, the TravelTimeCalculator
@@ -46,6 +51,9 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 public class DeactivableTravelTimeProvider implements LinkEnterEventHandler, LinkLeaveEventHandler, 
 			PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleArrivesAtFacilityEventHandler, TransitDriverStartsEventHandler, 
 			PersonStuckEventHandler {
+	private static final Logger log =
+		Logger.getLogger(DeactivableTravelTimeProvider.class);
+
 	private final ActiveIterationCriterion criterion;
 	private final TravelTimeCalculator delegate;
 
@@ -103,6 +111,10 @@ public class DeactivableTravelTimeProvider implements LinkEnterEventHandler, Lin
 	@Override
 	public void reset(int iteration) {
 		isListenning = criterion.isListenning( iteration );
+
+		log.info( getClass().getSimpleName()+( isListenning ? " WILL" : " will NOT" )+
+				" be listenning to events for iteration "+iteration+" using criterion "+criterion );
+
 		delegate.reset(iteration);
 	}
 
@@ -129,9 +141,22 @@ public class DeactivableTravelTimeProvider implements LinkEnterEventHandler, Lin
 			this.config = config;
 		}
 
+		public PSimIterationsCriterion(
+				final Config config) {
+			this( (PseudoSimConfigGroup) config.getModule( PseudoSimConfigGroup.GROUP_NAME ) );
+		}
+
 		@Override
 		public boolean isListenning(int iteration) {
-			return !config.isPSimIter( iteration );
+			return config.getPsimType().equals( PSimType.none ) ||
+				!config.isPSimIter( iteration );
+		}
+
+		@Override
+		public String toString() {
+			return "[PSimCritertion: psimType="+config.getPsimType()
+				+"; period="+config.getPeriod()
+				+"; nPsimIters="+config.getNPSimIters()+"]";
 		}
 	}
 }

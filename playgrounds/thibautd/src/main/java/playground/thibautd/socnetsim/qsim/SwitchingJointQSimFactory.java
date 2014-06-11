@@ -27,8 +27,7 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-
+import playground.thibautd.mobsim.DeactivableTravelTimeProvider;
 import playground.thibautd.mobsim.PseudoSimConfigGroup;
 import playground.thibautd.mobsim.PseudoSimConfigGroup.PSimType;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
@@ -41,10 +40,10 @@ public class SwitchingJointQSimFactory implements MobsimFactory, IterationStarts
 		Logger.getLogger(SwitchingJointQSimFactory.class);
 
 	private int iteration = Integer.MIN_VALUE;
-	private final TravelTimeCalculator travelTime;
+	private final DeactivableTravelTimeProvider travelTime;
 
 	public SwitchingJointQSimFactory(
-			final TravelTimeCalculator travelTime) {
+			final DeactivableTravelTimeProvider travelTime) {
 		this.travelTime = travelTime;
 	}
 
@@ -67,7 +66,7 @@ public class SwitchingJointQSimFactory implements MobsimFactory, IterationStarts
 			switch ( config.getPsimType() ) {
 			case detailled:
 				log.info( "Using detailled pseudo simulation for iteration "+iteration );
-				return new JointPseudoSimFactory( travelTime ).createMobsim( sc , eventsManager );
+				return new JointPseudoSimFactory( travelTime.getLinkTravelTimes() ).createMobsim( sc , eventsManager );
 			case teleported:
 				log.info( "Using teleported pseudo simulation for iteration "+iteration );
 				return new JointTeleportationSimFactory().createMobsim( sc , eventsManager );
