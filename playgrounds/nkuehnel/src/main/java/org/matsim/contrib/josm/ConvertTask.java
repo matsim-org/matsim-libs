@@ -37,7 +37,7 @@ class ConvertTask extends PleaseWaitRunnable {
 	private NetworkLayer newLayer;
 
 	public ConvertTask() {
-		super("Convert to MATSim network");
+		super("Converting to MATSim Network");
 	}
 
 	@Override

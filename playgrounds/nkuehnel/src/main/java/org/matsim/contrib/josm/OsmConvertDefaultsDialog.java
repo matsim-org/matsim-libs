@@ -69,8 +69,8 @@ class OsmConvertDefaultsDialog extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				OsmConvertDefaults.reset();
+				OsmConvertDefaults.load();
 				fillValues();
-				Main.pref.put("matsim_convertDefaults_keepPaths", false);
 			}
 		});
 	}

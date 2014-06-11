@@ -22,7 +22,6 @@ import static org.openstreetmap.josm.tools.I18n.tr;
  */
 final class Preferences extends DefaultTabPreferenceSetting {
 
-	// Visualization tab
 	private final static JCheckBox renderMatsim = new JCheckBox(
 			"Activate MATSim Renderer");
 	private final static JCheckBox showIds = new JCheckBox("Show Ids");
@@ -32,7 +31,8 @@ final class Preferences extends DefaultTabPreferenceSetting {
 	private final static JCheckBox showInternalIds = new JCheckBox(
 			"Show internal Ids in table");
 
-	private final static JCheckBox cleanNetwork = new JCheckBox("Clean network");
+	private final static JCheckBox cleanNetwork = new JCheckBox("Clean Network");
+	private final static JCheckBox keepPaths = new JCheckBox("Keep Paths");
 
 	protected static String[] coordSystems = { TransformationFactory.WGS84,
 			TransformationFactory.ATLANTIS, TransformationFactory.CH1903_LV03,
@@ -120,6 +120,9 @@ final class Preferences extends DefaultTabPreferenceSetting {
 
 		cleanNetwork.setSelected(Main.pref.getBoolean("matsim_cleanNetwork",
 				true));
+		keepPaths.setSelected(Main.pref.getBoolean("matsim_keepPaths",
+				false));
+		
 		convertingDefaults.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -135,11 +138,13 @@ final class Preferences extends DefaultTabPreferenceSetting {
 				if (pane.getValue() != null) {
 					if (((Integer) pane.getValue()) == JOptionPane.OK_OPTION) {
 						dialog.handleInput();
+						if (Main.main.getActiveLayer() != null) {
+							MATSimPlugin.toggleDialog.activeLayerChange(Main.main.getActiveLayer(), Main.main.getActiveLayer());
+						}
 					}
 				}
 				dlg.dispose();
 			}
-
 		});
 
 		filterActive.setSelected(Main.pref.getBoolean("matsim_filterActive",
@@ -156,14 +161,17 @@ final class Preferences extends DefaultTabPreferenceSetting {
 		cOptions.gridx = 0;
 		cOptions.gridy = 0;
 		pnl.add(cleanNetwork, cOptions);
-
+		
 		cOptions.gridy = 1;
-		pnl.add(convertingDefaults, cOptions);
+		pnl.add(keepPaths, cOptions);
 
 		cOptions.gridy = 2;
-		pnl.add(filterActive, cOptions);
+		pnl.add(convertingDefaults, cOptions);
 
 		cOptions.gridy = 3;
+		pnl.add(filterActive, cOptions);
+
+		cOptions.gridy = 4;
 		pnl.add(hierarchyLabel, cOptions);
 		cOptions.gridx = 1;
 		cOptions.weighty = 1;
@@ -207,6 +215,21 @@ final class Preferences extends DefaultTabPreferenceSetting {
 			Main.pref.put("matsim_cleanNetwork", false);
 		} else {
 			Main.pref.put("matsim_cleanNetwork", true);
+		}
+		if (!keepPaths.isSelected()) {
+			if (Main.pref.put("matsim_keepPaths", false)) {
+				NewConverter.keepPaths = false;
+				if (Main.main.getActiveLayer() != null) {
+					MATSimPlugin.toggleDialog.activeLayerChange(Main.main.getActiveLayer(), Main.main.getActiveLayer());
+				}
+			}
+		} else {
+			if (Main.pref.put("matsim_keepPaths", true)) {
+				NewConverter.keepPaths = true;
+				if (Main.main.getActiveLayer() != null) {
+					MATSimPlugin.toggleDialog.activeLayerChange(Main.main.getActiveLayer(), Main.main.getActiveLayer());
+				}
+			}
 		}
 		if (showInternalIds.isSelected()) {
 			Main.pref.put("matsim_showInternalIds", true);

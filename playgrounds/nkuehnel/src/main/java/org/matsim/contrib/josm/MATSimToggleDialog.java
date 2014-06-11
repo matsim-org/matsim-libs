@@ -1,5 +1,34 @@
 package org.matsim.contrib.josm;
 
+import static org.openstreetmap.josm.tools.I18n.tr;
+
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.WindowConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -17,26 +46,15 @@ import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.WaySegment;
 import org.openstreetmap.josm.gui.MapView.LayerChangeListener;
+import org.openstreetmap.josm.gui.PleaseWaitRunnable;
 import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.gui.util.HighlightHelper;
 import org.openstreetmap.josm.io.FileExporter;
+import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.tools.ImageProvider;
-
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.*;
-import java.util.List;
-
-import static org.openstreetmap.josm.tools.I18n.tr;
+import org.xml.sax.SAXException;
 
 /**
  * The ToggleDialog that shows link information of selected ways
@@ -120,12 +138,9 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 						new MATSimNetworkFileExporter());
 			} else {
 				currentNetwork = NetworkImpl.createNetwork();
-				NewConverter.convertOsmLayer(((OsmDataLayer) newLayer).data,
-						currentNetwork, way2Links, link2Segments);
-				this.osmNetworkListener = new NetworkListener(currentNetwork,
-						way2Links, link2Segments);
-				((OsmDataLayer) newLayer).data
-						.addDataSetListener(this.osmNetworkListener);
+				LayerChangeTask task = new LayerChangeTask((OsmDataLayer) newLayer);
+				task.run();
+				
 				if (oldLayer instanceof NetworkLayer || oldLayer == null) {
 					ExtensionFileFilter.exporters.clear();
 					ExtensionFileFilter.exporters.addAll(this.exporterCopy);
@@ -229,6 +244,11 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 		}
 
 		public void networkChanged() {
+			if (layer != null) {
+				if (!layer.data.selectionEmpty()) {
+					selectionChanged(layer.data.getSelected());
+				}
+			}
 			fireTableDataChanged();
 		}
 
@@ -356,5 +376,38 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 	public void layerRemoved(Layer oldLayer) {
 
 	}
+	
+	
+	private class LayerChangeTask extends PleaseWaitRunnable {
+		
+		private OsmDataLayer newLayer;
+		
+		public LayerChangeTask(OsmDataLayer newLayer) {
+			super("Converting to MATSim Network");
+			this.newLayer = newLayer;
+		}
 
+		@Override
+		protected void cancel() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		protected void finish() {
+		notifyDataChanged(currentNetwork);
+		osmNetworkListener = new NetworkListener(currentNetwork,
+				way2Links, link2Segments);
+		((OsmDataLayer) newLayer).data
+				.addDataSetListener(osmNetworkListener);
+			
+		}
+
+		@Override
+		protected void realRun() throws SAXException, IOException,
+				OsmTransferException {
+			NewConverter.convertOsmLayer(newLayer.data,
+					currentNetwork, way2Links, link2Segments);
+		}
+	}
 }

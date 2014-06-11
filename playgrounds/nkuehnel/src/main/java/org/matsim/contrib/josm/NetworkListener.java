@@ -56,6 +56,7 @@ class NetworkListener implements DataSetListener, Visitor {
 
 	@Override
 	public void nodeMoved(NodeMovedEvent moved) {
+		log.debug("Node(s) moved.");
 		moved.getNode().visitReferrers(this);
 	}
 
@@ -67,30 +68,32 @@ class NetworkListener implements DataSetListener, Visitor {
 	@Override
 	public void primitivesAdded(PrimitivesAddedEvent added) {
 		for (OsmPrimitive primitive : added.getPrimitives()) {
-			log.info("Primitive added. " + primitive.getUniqueId());
+			log.info("Primitive added. "+ primitive.getType() + " " + primitive.getUniqueId());
 			if (primitive instanceof Way) {
-				visit((Way)primitive);
-			} else if (primitive instanceof Node)
-			primitive.visitReferrers(this);
+				visit((Way) primitive);
+			}
 		}
 	}
 
 	@Override
 	public void primitivesRemoved(PrimitivesRemovedEvent primitivesRemoved) {
 		for (OsmPrimitive primitive : primitivesRemoved.getPrimitives()) {
+			log.info("Primitive removed. "+ primitive.getType() + " " + primitive.getUniqueId());
 			if (primitive instanceof org.openstreetmap.josm.data.osm.Node) {
 				String id = String.valueOf(primitive.getUniqueId());
 				if (network.getNodes().containsKey(new IdImpl(id))) {
 					Node node = network.getNodes().get(new IdImpl(id));
-					log.info("Node removed. " + ((NodeImpl) node).getOrigId());
+					log.debug("MATSim Node removed. " + ((NodeImpl) node).getOrigId());
 					network.removeNode(node.getId());
 				}
+				primitive.visitReferrers(this);
 			} else if (primitive instanceof Way) {
 				if (way2Links.containsKey(primitive)) {
 					List<Link> links = way2Links.remove(primitive);
 					for (Link link : links) {
+						System.out.println(link.getFromNode().getId());
 						link2Segments.remove(link);
-						log.info("Link removed. "
+						log.debug("MATSIm Link removed. "
 								+ ((LinkImpl) link).getOrigId());
 						network.removeLink(link.getId());
 					}
@@ -110,10 +113,20 @@ class NetworkListener implements DataSetListener, Visitor {
 
 	@Override
 	public void tagsChanged(TagsChangedEvent changed) {
-		log.debug("Tags changed " + changed.getType());
+		log.debug("Tags changed " + changed.getType() + " "+ changed.getPrimitive().getType() + " " + changed.getPrimitive().getUniqueId());
 		for (OsmPrimitive primitive : changed.getPrimitives()) {
 			if (primitive instanceof Way) {
 				visit((Way) primitive);
+				for (org.openstreetmap.josm.data.osm.Node node : ((Way) primitive)
+						.getNodes()) {
+					if (node.isReferredByWays(2)) {
+						for (OsmPrimitive prim : node.getReferrers()) {
+							if (prim instanceof Way && !prim.equals(primitive)) {
+								visit((Way) prim);
+							}
+						}
+					}
+				}
 			} else if (primitive instanceof org.openstreetmap.josm.data.osm.Node) {
 				primitive.visitReferrers(this);
 			}
@@ -122,6 +135,7 @@ class NetworkListener implements DataSetListener, Visitor {
 
 	@Override
 	public void wayNodesChanged(WayNodesChangedEvent changed) {
+		log.debug("Way Nodes changed " + changed.getType() + " " + changed.getChangedWay().getType() + " " + changed.getChangedWay().getUniqueId());
 		for (org.openstreetmap.josm.data.osm.Node node : changed
 				.getChangedWay().getNodes()) {
 			if (node.isReferredByWays(2)) {
@@ -145,15 +159,17 @@ class NetworkListener implements DataSetListener, Visitor {
 	@Override
 	public void visit(Way way) {
 		List<Link> oldLinks = way2Links.remove(way);
+		MATSimPlugin.toggleDialog.notifyDataChanged(network);
 		if (oldLinks != null) {
 			for (Link link : oldLinks) {
 				Link removedLink = network.removeLink(link.getId());
 				log.debug(removedLink + " removed.");
-				MATSimPlugin.toggleDialog.notifyDataChanged(network);
 			}
 		}
-		NewConverter.convertWay(way, network, way2Links, link2Segments);
-		MATSimPlugin.toggleDialog.notifyDataChanged(network);
+		if (!way.isDeleted()) {
+			NewConverter.convertWay(way, network, way2Links, link2Segments);
+			MATSimPlugin.toggleDialog.notifyDataChanged(network);
+		}
 		log.info("Number of links: " + network.getLinks().size());
 	}
 
