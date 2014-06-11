@@ -174,12 +174,12 @@ public class RunInternalizationTest {
 		scg.addStrategySettings(reRoute);
 
 	// define emission tool input files	
-	      EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
-	        controler.getConfig().addModule(ecg);
+        EmissionsConfigGroup ecg = new EmissionsConfigGroup();
+        controler.getConfig().addModule(ecg);
 
-	        ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
-			ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
-			ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
+        ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
+        ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
+        ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
 		
 	// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
 		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;

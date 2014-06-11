@@ -24,11 +24,11 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -115,8 +115,8 @@ public class RunEmissionToolOffline {
 	}
 
 	private void setInputFiles() {
-	        EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
-        controler.getConfig().addModule(ecg);
+	       EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
+        this.scenario.getConfig().addModule(ecg);
         ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
         ecg.setEmissionVehicleFile(emissionVehicleFile);
         
