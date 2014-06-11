@@ -62,6 +62,7 @@ import playground.ivt.utils.TripModeShares;
 import playground.thibautd.analysis.listeners.LegHistogramListenerWithoutControler;
 import playground.thibautd.config.NonFlatConfigReader;
 import playground.thibautd.mobsim.PseudoSimConfigGroup;
+import playground.thibautd.mobsim.PseudoSimConfigGroup.PSimType;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.scoring.BeingTogetherScoring.LinearOverlapScorer;
 import playground.thibautd.scoring.BeingTogetherScoring.LogOverlapScorer;
@@ -109,6 +110,7 @@ import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 import playground.thibautd.utils.DistanceFillerAlgorithm;
 import playground.thibautd.utils.GenericFactory;
+import playground.thibautd.utils.TravelTimeRetrofittingEventHandler;
 
 /**
  * Groups methods too specific to go in the "frameworky" part of the code,
@@ -587,6 +589,25 @@ public class RunUtils {
 			// XXX not that nice, but we do not have the Controller yet when we build
 			// the SwitchingJointQSimFactory...
 			controller.addControlerListener( (ControlerListener) controllerRegistry.getMobsimFactory() );
+		}
+
+		final PseudoSimConfigGroup pSimConf = (PseudoSimConfigGroup)
+					controllerRegistry.getScenario().getConfig().getModule(
+							PseudoSimConfigGroup.GROUP_NAME );
+
+		if ( pSimConf.getPsimType().equals( PSimType.teleported ) ) {
+			// This is pretty hackish, so do it only if necessary...
+			// Something like this is necessary, otherwise out-of-date
+			// travel times keep being used in pSim (out-of-date including
+			// the freeflow estimations from the first iterations!).
+			// This goes in the direction of the "traditional" pSim,
+			// without the cost of iterating through all links of all routes
+			// (which is the costly part of QSim, much more than what is done
+			// for each link: it is mainly a complexity problem, that pSim does
+			// solve only by allowing more parallelism).
+			controllerRegistry.getEvents().addHandler(
+					new TravelTimeRetrofittingEventHandler(
+						controllerRegistry.getScenario().getPopulation() ) );
 		}
 
 		return controller;
