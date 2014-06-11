@@ -2,6 +2,8 @@ package playground.wrashid.lib.obj;
 
 import java.util.HashMap;
 
+import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
+
 import junit.framework.TestCase;
 
 public class LinkedListValueHashMapTest extends TestCase {
