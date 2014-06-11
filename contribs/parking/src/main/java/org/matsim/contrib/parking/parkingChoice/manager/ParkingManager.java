@@ -103,9 +103,9 @@ public class ParkingManager {
 
 	private void removeAllUnusableParking(Collection<Parking> collection,Id agentId, Id actFacilityId, String actType) {
 		for (Parking parking:collection){
-			if (!parking.isAllowedToUseParking(agentId, actFacilityId, actType)){
-				collection.remove(parking);
-			}
+			//if (!parking.isAllowedToUseParking(agentId, actFacilityId, actType)){
+			//	collection.remove(parking);
+			//}
 		}
 	}
 

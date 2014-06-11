@@ -4,8 +4,6 @@ import java.util.HashMap;
 
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 
-import playground.wrashid.lib.obj.HashMapInverter;
-
 import junit.framework.TestCase;
 
 public class LinkedListValueHashMapTest extends TestCase {

@@ -16,43 +16,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.parking.PC2.simulation;
+package org.matsim.contrib.parking.PC2.infrastructure;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.PC2.infrastructure.PPRestrictedToFacilities;
-import org.matsim.contrib.parking.PC2.infrastructure.PrivateParking;
+import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
-import org.matsim.contrib.parking.parkingChoice.infrastructure.Parking;
-import org.matsim.core.utils.collections.QuadTree;
 
-public class ParkingInfrastructureManager {
+public interface PrivateParking extends Parking{
 
-	// facilityId -> parkings available to users of those facilities
-	private LinkedListValueHashMap<Id, PPRestrictedToFacilities> privateParkingsRestrictedToFacilities;
+	public boolean isAllowedToUseParking(Id personId, Id actFacilityId, String actType);
 	
-	
-	
-	
-	
-	// TODO: make private parking (attached to facility)
-	// + also private parking, which is attached to activity
-	// both should be checked.
-	
-	private QuadTree<Parking> availablePublicParkings;
-	
-	private HashSet<Parking> fullPublicParkings;
-	
-	// allso allow to filter by group the parkings
-	
-	// Allow to reprogramm the decision making process of the agent => provide default module for decision making and new one,
-	// which could also cope with EVs.
-	
-	// provide interface for proper integration.
-	
-	
-	
-	// also loading of data should 
-	
+//	//allow restricting to single person, actType at facility or whole facility.
+//	String restrictionType;
+//	HashSet<Id> facilityIds;
+//	LinkedListValueHashMap<Id> actTypes;
+////Todo three types	
+//	
+//	public boolean isAllowedToUseParking(Id personId, Id actFacilityId, String actType){
+//		if (restrictionType.equalsIgnoreCase("personId")){
+//			
+//		} else if (restrictionType.equalsIgnoreCase("facility")){
+//			return facilityIds.contains(actFacilityId);
+//		}else if (restrictionType.equalsIgnoreCase("actType")){
+//			facilityIds.contains(actFacilityId);
+//		} else {
+//			DebugLib.stopSystemAndReportInconsistency();
+//		}
+//		
+//		return ownerId==agentId;
+//	}
+
 }

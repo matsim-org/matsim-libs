@@ -16,43 +16,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.parking.PC2.simulation;
+package org.matsim.contrib.parking.PC2.infrastructure;
 
 import java.util.HashSet;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.PC2.infrastructure.PPRestrictedToFacilities;
-import org.matsim.contrib.parking.PC2.infrastructure.PrivateParking;
-import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
-import org.matsim.contrib.parking.parkingChoice.infrastructure.Parking;
-import org.matsim.core.utils.collections.QuadTree;
 
-public class ParkingInfrastructureManager {
+public class PPRestrictedToIndividuals extends PublicParking implements PrivateParking {
 
-	// facilityId -> parkings available to users of those facilities
-	private LinkedListValueHashMap<Id, PPRestrictedToFacilities> privateParkingsRestrictedToFacilities;
+	private HashSet<Id> personIds;
+
+	public void PPRestrictedToIndividuals(HashSet<Id> personIds){
+		this.personIds = personIds;
+	}
 	
+	@Override
+	public boolean isAllowedToUseParking(Id personId, Id actFacilityId, String actType) {
+		return personIds.contains(personId);
+	}
+
 	
-	
-	
-	
-	// TODO: make private parking (attached to facility)
-	// + also private parking, which is attached to activity
-	// both should be checked.
-	
-	private QuadTree<Parking> availablePublicParkings;
-	
-	private HashSet<Parking> fullPublicParkings;
-	
-	// allso allow to filter by group the parkings
-	
-	// Allow to reprogramm the decision making process of the agent => provide default module for decision making and new one,
-	// which could also cope with EVs.
-	
-	// provide interface for proper integration.
-	
-	
-	
-	// also loading of data should 
-	
+
 }

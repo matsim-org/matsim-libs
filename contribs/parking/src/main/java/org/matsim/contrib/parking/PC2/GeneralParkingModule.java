@@ -20,21 +20,50 @@ public class GeneralParkingModule implements StartupListener, IterationStartsLis
 	protected Controler controler;
 	private ParkingCostModel parkingCostModel; // TODO: don't overwrite parking cost model from config, if already set.
 	private ParkingScoreManager parkingScoreManager;
+	private ParkingConfig parkingConfig;
 
 	public GeneralParkingModule(Controler controler){
 		this.controler = controler;
+		this.parkingConfig=new ParkingConfig();
 		
 		parkingScoreManager=new ParkingScoreManager();
-		controler.setScoringFunctionFactory(new ParkingScoringFunctionFactory (controler.getScoringFunctionFactory(),parkingScoreManager));
+		
 		controler.addControlerListener(this);
 	}
 	
-	public void setParkingCostModel(ParkingCostModel parkingCostModel){
-		this.parkingCostModel = parkingCostModel;
+	public void factoryIsSetExternally(){
+		parkingConfig.factoryIsSetExternally=true;
 	}
-
+	
+	public void setParkingCostModel(ParkingCostModel parkingCostModel){
+		this.parkingCostModel= parkingCostModel;
+		parkingConfig.costModelSetExternally=true;
+	}
+	
+	public void setupComplete(){
+		if (!parkingConfig.setupComplete){
+			if (!parkingConfig.factoryIsSetExternally){
+				controler.setScoringFunctionFactory(new ParkingScoringFunctionFactory (controler.getScoringFunctionFactory(),parkingScoreManager));
+			}
+			
+			parkingConfig.setupComplete=true;
+		} else {
+			DebugLib.stopSystemAndReportInconsistency();
+		}
+	}
+	
 	@Override
 	public void notifyStartup(StartupEvent event) {
+		parkingConfig.consistencyCheck_setupCompleteInvoked();
+		
+		if (!parkingConfig.costModelSetExternally){
+			if (controler.getConfig().getParam("parkingChoice", "parkingCostModel")!=null){
+				// TODO: try to read model from config file
+			} else {
+				//TODO: assign zero cost model, here 
+			}
+		}
+		
 		parkingScoreManager.init(controler);
 	}
 
