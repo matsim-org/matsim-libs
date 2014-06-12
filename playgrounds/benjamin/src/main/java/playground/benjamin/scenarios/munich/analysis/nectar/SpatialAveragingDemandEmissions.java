@@ -57,10 +57,10 @@ public class SpatialAveragingDemandEmissions {
 	final double scalingFactor = 100.;
 	private final static String runNumber1 = "baseCase";
 	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
-	private final static String runNumber2 = "zone30";
-	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
-//	private final static String runNumber2 = "pricing";
-//	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
+//	private final static String runNumber2 = "zone30";
+//	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
+	private final static String runNumber2 = "pricing";
+	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
 	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
 	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 
@@ -209,9 +209,9 @@ public class SpatialAveragingDemandEmissions {
 			double[][]weightedEmissions = new double[noOfXbins][noOfYbins];
 			
 			for(Id linkId : time2EmissionsTotalFilledAndFiltered.get(endOfTimeInterval).keySet()){
-//				Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
-//				double xLink = linkCoord.getX();
-//				double yLink = linkCoord.getY();
+				Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
+				double xLink = linkCoord.getX();
+				double yLink = linkCoord.getY();
 				Coord fromNodeCoord = this.network.getLinks().get(linkId).getFromNode().getCoord();
 				Coord toNodeCoord = this.network.getLinks().get(linkId).getToNode().getCoord();
 				
@@ -222,8 +222,8 @@ public class SpatialAveragingDemandEmissions {
 				for(int xIndex=0; xIndex<noOfXbins; xIndex++){
 					for (int yIndex=0; yIndex<noOfYbins; yIndex++){
 						Coord cellCentroid = this.sau.findCellCentroid(xIndex, yIndex);
-//						double weightOfLinkForCell = this.sau.calculateWeightOfPointForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
-						double weightOfLinkForCell = this.saue.calculateWeightOfLineForCellV2(fromNodeCoord, toNodeCoord, cellCentroid.getX(), cellCentroid.getY());
+						double weightOfLinkForCell = this.sau.calculateWeightOfPointForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
+//						double weightOfLinkForCell = this.saue.calculateWeightOfLineForCellV2(fromNodeCoord, toNodeCoord, cellCentroid.getX(), cellCentroid.getY());
 						weightedEmissions[xIndex][yIndex] += weightOfLinkForCell * scaledValue;					
 					}
 				}
@@ -240,9 +240,9 @@ public class SpatialAveragingDemandEmissions {
 			double[][]weightedDemand = new double[noOfXbins][noOfYbins];
 			
 			for(Id linkId : time2CountsPerLinkFilledAndFiltered.get(endOfTimeInterval).keySet()){
-//				Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
-//				double xLink = linkCoord.getX();
-//				double yLink = linkCoord.getY();
+				Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
+				double xLink = linkCoord.getX();
+				double yLink = linkCoord.getY();
 				Coord fromNodeCoord = this.network.getLinks().get(linkId).getFromNode().getCoord();
 				Coord toNodeCoord = this.network.getLinks().get(linkId).getToNode().getCoord();
 				double linkLength_km = this.network.getLinks().get(linkId).getLength() / 1000.;
@@ -255,8 +255,8 @@ public class SpatialAveragingDemandEmissions {
 				for(int xIndex=0; xIndex<noOfXbins; xIndex++){
 					for (int yIndex=0; yIndex<noOfYbins; yIndex++){
 						Coord cellCentroid = this.sau.findCellCentroid(xIndex, yIndex);
-//						double weightOfLinkForCell = this.sau.calculateWeightOfPointForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
-						double weightOfLinkForCell = this.saue.calculateWeightOfLineForCellV2(fromNodeCoord, toNodeCoord, cellCentroid.getX(), cellCentroid.getY());
+						double weightOfLinkForCell = this.sau.calculateWeightOfPointForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
+//						double weightOfLinkForCell = this.saue.calculateWeightOfLineForCellV2(fromNodeCoord, toNodeCoord, cellCentroid.getX(), cellCentroid.getY());
 						weightedDemand[xIndex][yIndex] += weightOfLinkForCell * scaledVkm;					
 					}
 				}

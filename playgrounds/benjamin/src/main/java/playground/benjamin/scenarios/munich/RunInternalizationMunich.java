@@ -44,10 +44,10 @@ public class RunInternalizationMunich {
 
 
 	public static void main(String[] args) {
-		//		configFile = "../../detailedEval/internalization/munich1pct/input/config_munich_1pct.xml";
-		//		emissionCostFactor = "1.0";
-		//		emissionEfficiencyFactor = "1.0";
-		//		considerCO2Costs = "true";
+//		configFile = "../../detailedEval/internalization/munich1pct/input/config_munich_1pct.xml";
+//		emissionCostFactor = "1.0";
+//		emissionEfficiencyFactor = "1.0";
+//		considerCO2Costs = "true";
 
 		configFile = args[0];
 		emissionCostFactor = args[1];

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -33,6 +34,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
@@ -76,10 +79,17 @@ public class NetworkMatsim2Shape {
 			new MatsimNetworkReader(scenario).readFile(netFile);
 			net = filterNetwork(network);
 		}
-		new Links2ESRIShape(net, filePath + networkName + outFileType, "DHDN_GK4").write();
+//		new Links2ESRIShape(net, filePath + networkName + outFileType, TransformationFactory.DHDN_GK4).write();
+		new Links2ESRIShape(net, filePath + networkName + outFileType, TransformationFactory.WGS84).write();
+//		new Links2ESRIShape(net, filePath + networkName + outFileType, TransformationFactory.CH1903_LV03_GT).write();
+//		new Links2ESRIShape(net, filePath + networkName + outFileType, TransformationFactory.WGS84_UTM33N).write();
 	}
 
 	private static Network filterNetwork(Network network) {
+//		CoordinateTransformation transform = TransformationFactory.getCoordinateTransformation(TransformationFactory.CH1903_LV03_GT, TransformationFactory.DHDN_GK4);
+		CoordinateTransformation transform = TransformationFactory.getCoordinateTransformation(TransformationFactory.CH1903_LV03_GT, TransformationFactory.WGS84);
+		
+		
 		Network net = NetworkUtils.createNetwork();
 		RoadPricingSchemeImpl rps = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 rpr = new RoadPricingReaderXMLv1(rps);
@@ -90,23 +100,24 @@ public class NetworkMatsim2Shape {
 			if(linkList.contains(linkId)){
 				Id fromId = link.getFromNode().getId();
 				Id toId = link.getToNode().getId();
-//				log.info("fromId " + fromId);
-//				log.info("toId " + toId);
+				Coord fromNodeCoord = link.getFromNode().getCoord();
+				Coord toNodeCoord = link.getToNode().getCoord();
+				Coord fromNodeTransformed = transform.transform(fromNodeCoord);
+				Coord toNodeTransformed = transform.transform(toNodeCoord);
+//				Node newFromNode = net.getFactory().createNode(fromId, fromNodeCoord);
+//				Node newToNode = net.getFactory().createNode(toId, toNodeCoord);
+				Node newFromNode = net.getFactory().createNode(fromId, fromNodeTransformed);
+				Node newToNode = net.getFactory().createNode(toId, toNodeTransformed);
 				if (!net.getNodes().containsKey(fromId)){
-					addNode(net, link.getFromNode());
-//					log.info("NodeIds " + net.getNodes().keySet().toString());
+					net.addNode(newFromNode);
 				}
 				if (!net.getNodes().containsKey(toId)){
-					addNode(net, link.getToNode());
+					net.addNode(newToNode);
 				}
-				net.addLink(link);
+				Link ll = net.getFactory().createLink(link.getId(), newFromNode, newToNode);
+				net.addLink(ll);
 			}
 		}
 		return net;
-	}
-	
-	private static void addNode(Network net, Node n){
-		Node newNode = net.getFactory().createNode(n.getId(), n.getCoord());
-		net.addNode(newNode);
 	}
 }
