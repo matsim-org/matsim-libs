@@ -291,21 +291,27 @@ public final class TripProcessing {
 			return 0;
 		}
 		
-		int travelDistance = 0;
-		if (path.size() > 0) {
-			// if a path was recorded, use the actual path for travel-distance calculation
-			for (Id linkId : path) {
-				travelDistance += network.getLinks().get(linkId).getLength();
-			}
-		} else {
-			// if no path available, use euclidian distance as estimation for travel-distance
-			Coord coordsStartLink = network.getLinks().get(startLink).getCoord();
-			Coord coordsEndLink = network.getLinks().get(endLink).getCoord(); 
-			travelDistance += (long) Math.sqrt(
-					((coordsEndLink.getX() - coordsStartLink.getX())*(coordsEndLink.getX() - coordsStartLink.getX()))
-					+ ((coordsEndLink.getY() - coordsStartLink.getY())*(coordsEndLink.getY() - coordsStartLink.getY()))); 
-		}
-		return travelDistance;
+//		int travelDistance = 0;
+//		if (path.size() > 0) {
+//			// if a path was recorded, use the actual path for travel-distance calculation
+//			for (Id linkId : path) {
+//				travelDistance += network.getLinks().get(linkId).getLength();
+//			}
+//		} else {
+//			// if no path available, use euclidian distance as estimation for travel-distance
+//			Coord coordsStartLink = network.getLinks().get(startLink).getCoord();
+//			Coord coordsEndLink = network.getLinks().get(endLink).getCoord(); 
+//			travelDistance += (int) Math.sqrt(
+//					((coordsEndLink.getX() - coordsStartLink.getX())*(coordsEndLink.getX() - coordsStartLink.getX()))
+//					+ ((coordsEndLink.getY() - coordsStartLink.getY())*(coordsEndLink.getY() - coordsStartLink.getY()))); 
+//		}
+//		return travelDistance;
+		
+		Coord coordsStartLink = network.getLinks().get(startLink).getCoord();
+		Coord coordsEndLink = network.getLinks().get(endLink).getCoord(); 
+		return (int) Math.sqrt(
+				((coordsEndLink.getX() - coordsStartLink.getX())*(coordsEndLink.getX() - coordsStartLink.getX()))
+				+ ((coordsEndLink.getY() - coordsStartLink.getY())*(coordsEndLink.getY() - coordsStartLink.getY())));
 	}
 
 	/**
