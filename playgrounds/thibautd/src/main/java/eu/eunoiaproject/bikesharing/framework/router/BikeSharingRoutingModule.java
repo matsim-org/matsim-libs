@@ -89,7 +89,7 @@ public class BikeSharingRoutingModule implements RoutingModule {
 		trip.add( createWalkLeg( fromFacility , startStation ) );
 		trip.add( createInteraction( startStation ) );
 		trip.add( createBikeSharingLeg( startStation , endStation ) );
-		trip.add( createInteraction( startStation ) );
+		trip.add( createInteraction( endStation ) );
 		trip.add( createWalkLeg( endStation , toFacility ) );
 
 		return trip;
