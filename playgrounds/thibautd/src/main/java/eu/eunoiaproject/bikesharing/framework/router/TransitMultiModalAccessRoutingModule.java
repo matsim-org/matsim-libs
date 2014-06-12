@@ -20,6 +20,7 @@
 package eu.eunoiaproject.bikesharing.framework.router;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -55,11 +57,13 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
+import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.router.TransitTravelDisutility;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
@@ -77,24 +81,48 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 	private final TransitTravelDisutility travelDisutility;
 	private final TravelTime travelTime;
 
-	private final Collection<InitialNodeRouter> routers = new ArrayList<InitialNodeRouter>();
+	private final Collection<InitialNodeRouter> routers;
 
 	private final PreparedTransitSchedule preparedTransitSchedule; 
 
 	private static enum Direction {access, egress;}
 
 	public TransitMultiModalAccessRoutingModule(
+			final Scenario sc,
+			final InitialNodeRouter... routers) {
+		this( new TransitRouterConfig( sc.getConfig() ),
+				sc.getTransitSchedule(),
+				routers);
+	}
+
+	public TransitMultiModalAccessRoutingModule(
+			final TransitRouterConfig config,
+			final TransitSchedule schedule,
+			final InitialNodeRouter... routers) {
+		this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);
+		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(config, preparedTransitSchedule);
+		this.travelTime = transitRouterNetworkTravelTimeAndDisutility;
+		this.config = config;
+		this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
+		this.transitNetwork = TransitRouterNetwork.createFromSchedule(schedule, config.beelineWalkConnectionDistance);
+		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.travelDisutility, this.travelTime);
+		this.routers = Arrays.asList( routers );
+	}
+
+	public TransitMultiModalAccessRoutingModule(
 			final TransitRouterConfig config, 
 			final PreparedTransitSchedule preparedTransitSchedule, 
 			final TransitRouterNetwork routerNetwork, 
 			final TravelTime travelTime, 
-			final TransitTravelDisutility travelDisutility) {
+			final TransitTravelDisutility travelDisutility,
+			final InitialNodeRouter... routers) {
 		this.config = config;
 		this.transitNetwork = routerNetwork;
 		this.travelTime = travelTime;
 		this.travelDisutility = travelDisutility;
 		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.travelDisutility, this.travelTime);
 		this.preparedTransitSchedule = preparedTransitSchedule;
+		this.routers = Arrays.asList( routers );
 	}
 
 	@Override
@@ -103,9 +131,6 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
-		final Coord fromCoord = fromFacility.getCoord();
-		final Coord toCoord = toFacility.getCoord();
-
 		// find possible start stops
 		final PriorityInitialNodeMap fromNodes = new PriorityInitialNodeMap();
 
@@ -115,7 +140,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 					router,
 					fromNodes,
 					person,
-					fromCoord,
+					fromFacility,
 					departureTime);
 		}
 
@@ -128,7 +153,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 					router,
 					toNodes,
 					person,
-					fromCoord,
+					toFacility,
 					departureTime);
 		}
 
@@ -138,14 +163,15 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 				toNodes.getMap(),
 				person);
 
-		if (p == null) {
-			return null;
-		}
 
 		List<? extends PlanElement> bestDirectWay = null;
-		double bestCost = p.travelCost +
-			fromNodes.map.get( p.nodes.get( 0 ) ).initialCost +
-			toNodes.map.get( p.nodes.get( p.nodes.size() - 1 ) ).initialCost;
+		// if no route found, thake the best of the "direct" ways
+		// otherwise, take the best of the pt and the best direct way
+		double bestCost = p == null ?
+				Double.POSITIVE_INFINITY :
+				p.travelCost +
+					fromNodes.map.get( p.nodes.get( 0 ) ).initialCost +
+					toNodes.map.get( p.nodes.get( p.nodes.size() - 1 ) ).initialCost;
 
 		for ( InitialNodeRouter r : routers  ) {
 			final InitialNodeWithSubTrip curr =
@@ -154,14 +180,39 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 						toFacility,
 						departureTime,
 						person );
-			if ( curr.initialCost < bestCost ) {
+			if ( curr.initialCost <= bestCost ) {
 				bestDirectWay = curr.subtrip;
 				bestCost = curr.initialCost;
 			}
 		}
 
+		assert bestDirectWay != null || p != null;
 		return bestDirectWay != null ? bestDirectWay :
-			convertPathToLegList( departureTime, p, fromCoord, toCoord, person ) ;
+			convertPathToTrip(
+					departureTime,
+					p,
+					fromNodes.map.get( p.nodes.get( 0 ) ),
+					toNodes.map.get( p.nodes.get( p.nodes.size() - 1 ) ),
+					person ) ;
+	}
+
+	private List<? extends PlanElement> convertPathToTrip(
+			final double departureTime,
+			final Path p,
+			final InitialNodeWithSubTrip fromInitialNode,
+			final InitialNodeWithSubTrip toInitialNode,
+			final Person person) {
+		final List<PlanElement> trip = new ArrayList<PlanElement>();
+
+		trip.addAll( fromInitialNode.subtrip );
+		// there is no Pt interaction in there...
+		trip.addAll( convertPathToLegList(
+					departureTime,
+					p,
+					person ) );
+		trip.addAll( toInitialNode.subtrip );
+
+		return trip;
 	}
 
 	@Override
@@ -179,27 +230,35 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 			final InitialNodeRouter router,
 			final PriorityInitialNodeMap wrappedNearestNodes,
 			final Person person,
-			final Coord coord,
+			final Facility facility,
 			final double departureTime){
-		Collection<TransitRouterNetworkNode> nearestNodes = this.transitNetwork.getNearestNodes(coord, router.getSearchRadius());
+		Collection<TransitRouterNetworkNode> nearestNodes =
+				this.transitNetwork.getNearestNodes(
+						facility.getCoord(),
+						router.getSearchRadius());
 
 		if (nearestNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
-			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(coord);
-			double distance = CoordUtils.calcDistance(coord, nearestNode.stop.getStopFacility().getCoord());
-			nearestNodes = this.transitNetwork.getNearestNodes(coord, distance + this.config.extensionRadius);
+			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(facility.getCoord());
+			double distance =
+					CoordUtils.calcDistance(
+							facility.getCoord(),
+							nearestNode.stop.getStopFacility().getCoord());
+			nearestNodes =
+					this.transitNetwork.getNearestNodes(
+							facility.getCoord(),
+							distance + this.config.extensionRadius);
 		}
 
 		for (TransitRouterNetworkNode node : nearestNodes) {
-			final Coord stopCoord = node.stop.getStopFacility().getCoord();
 			for ( int i=0; i < router.getDesiredNumberOfCalls(); i++ ) {
 				switch ( direction ) {
 				case access:
 					wrappedNearestNodes.put(
 							node,
 							router.calcRoute(
-								new CoordFacility( coord ),
-								new CoordFacility( stopCoord ),
+								facility,
+								new NodeFacility( node ),
 								departureTime,
 								person) );
 					break;
@@ -207,8 +266,8 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 					wrappedNearestNodes.put(
 							node,
 							router.calcRoute(
-								new CoordFacility( stopCoord ),
-								new CoordFacility( coord ),
+								new NodeFacility( node ),
+								facility,
 								departureTime,
 								person) );
 					break;
@@ -228,29 +287,26 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 	private List<Leg> convertPathToLegList(
 			final double departureTime,
 			final Path p,
-			final Coord fromCoord,
-			final Coord toCoord,
 			final Person person ) {
 		// yy there could be a better name for this method.  kai, apr'10
 
 		// now convert the path back into a series of legs with correct routes
 		double time = departureTime;
 		List<Leg> legs = new ArrayList<Leg>();
-		Leg leg = null;
 
 		TransitLine line = null;
 		TransitRoute route = null;
 		TransitStopFacility accessStop = null;
 		TransitRouteStop transitRouteStart = null;
 		TransitRouterNetworkLink prevLink = null;
-		int transitLegCnt = 0;
+		//int transitLegCnt = 0;
 		for (Link link : p.links) {
 			TransitRouterNetworkLink l = (TransitRouterNetworkLink) link;
 			if (l.getLine() == null) {
 				TransitStopFacility egressStop = l.fromNode.stop.getStopFacility();
 				// it must be one of the "transfer" links. finish the pt leg, if there was one before...
 				if (route != null) {
-					leg = new LegImpl(TransportMode.pt);
+					final Leg leg = new LegImpl(TransportMode.pt);
 					ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
 					leg.setRoute(ptRoute);
 					double arrivalOffset =
@@ -261,13 +317,14 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 					leg.setTravelTime(arrivalTime - time);
 					time = arrivalTime;
 					legs.add(leg);
-					transitLegCnt++;
+					//transitLegCnt++;
 					accessStop = egressStop;
 				}
 				line = null;
 				route = null;
 				transitRouteStart = null;
-			} else {
+			}
+			else {
 				if (l.getRoute() != route) {
 					// the line changed
 					TransitStopFacility egressStop = l.fromNode.stop.getStopFacility();
@@ -276,19 +333,36 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 						transitRouteStart = ((TransitRouterNetworkLink) link).getFromNode().stop;
 						if (accessStop != egressStop) {
 							if (accessStop != null) {
-								leg = new LegImpl(TransportMode.transit_walk);
-								double walkTime = getWalkTime(person, accessStop.getCoord(), egressStop.getCoord()); // CoordUtils.calcDistance(accessStop.getCoord(), egressStop.getCoord()) / this.config.getBeelineWalkSpeed();
+								final Leg leg = new LegImpl(TransportMode.transit_walk);
+								double walkTime = getWalkTime(person, accessStop.getCoord(), egressStop.getCoord());
 								Route walkRoute = new GenericRouteImpl(accessStop.getLinkId(), egressStop.getLinkId());
 								leg.setRoute(walkRoute);
 								leg.setTravelTime(walkTime);
 								time += walkTime;
 								legs.add(leg);
-							} else { // accessStop == null, so it must be the first walk-leg
-								leg = new LegImpl(TransportMode.transit_walk);
-								double walkTime = getWalkTime(person, fromCoord, egressStop.getCoord());
-								leg.setTravelTime(walkTime);
-								time += walkTime;
-								legs.add(leg);
+							}
+							// if accessStop == null, it must be the first walk-leg: handled by "subtrips"
+							else {
+								final TransitStopFacility depStop = ((TransitRouterNetworkNode) p.nodes.get( 0 )).getStop().getStopFacility();
+								if ( !depStop.getLinkId().equals( egressStop.getLinkId() ) ) {
+									// this is possible when several stops are for instance
+									// on the opposite direction links
+									final Leg leg = new LegImpl( TransportMode.transit_walk );
+									final double walkTime =
+										getWalkTime(
+												person,
+												depStop.getCoord(),
+												egressStop.getCoord());
+									final Route walkRoute =
+										new GenericRouteImpl(
+												depStop.getLinkId(),
+												egressStop.getLinkId());
+									leg.setRoute( walkRoute );
+									walkRoute.setTravelTime( walkTime );
+									leg.setTravelTime( walkTime );
+									time += walkTime;
+									legs.add(leg);
+								}
 							}
 						}
 					}
@@ -301,39 +375,29 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 		}
 		if (route != null) {
 			// the last part of the path was with a transit route, so add the pt-leg and final walk-leg
-			leg = new LegImpl(TransportMode.pt);
+			final Leg leg = new LegImpl(TransportMode.pt);
 			TransitStopFacility egressStop = prevLink.toNode.stop.getStopFacility();
 			ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
 			leg.setRoute(ptRoute);
 			double arrivalOffset = ((prevLink).toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ?
 					(prevLink).toNode.stop.getArrivalOffset()
 					: (prevLink).toNode.stop.getDepartureOffset();
-					double arrivalTime = this.preparedTransitSchedule.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
-					leg.setTravelTime(arrivalTime - time);
+			double arrivalTime = this.preparedTransitSchedule.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
+			leg.setTravelTime(arrivalTime - time);
 
-					legs.add(leg);
-					transitLegCnt++;
-					accessStop = egressStop;
-		}
-		if (prevLink != null) {
-			leg = new LegImpl(TransportMode.transit_walk);
-			double walkTime;
-			if (accessStop == null) {
-				walkTime = getWalkTime(person, fromCoord, toCoord);
-			} else {
-				walkTime = getWalkTime(person, accessStop.getCoord(), toCoord);
-			}
-			leg.setTravelTime(walkTime);
 			legs.add(leg);
+			transitLegCnt++;
+			accessStop = egressStop;
 		}
-		if (transitLegCnt == 0) {
-			// it seems, the agent only walked
-			legs.clear();
-			leg = new LegImpl(TransportMode.transit_walk);
-			double walkTime = getWalkTime(person, fromCoord, toCoord);
-			leg.setTravelTime(walkTime);
-			legs.add(leg);
-		}
+
+		//if (transitLegCnt == 0) {
+		//	// it seems, the agent only walked
+		//	legs.clear();
+		//	leg = new LegImpl(TransportMode.transit_walk);
+		//	double walkTime = getWalkTime(person, fromCoord, toCoord);
+		//	leg.setTravelTime(walkTime);
+		//	legs.add(leg);
+		//}
 		return legs;
 	}
 
@@ -478,16 +542,16 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 		}
 	}
 
-	private static class CoordFacility implements Facility {
-		private final Coord coord;
+	private static class NodeFacility implements Facility {
+		private final TransitRouterNetworkNode node;
 
-		public CoordFacility(final Coord coord) {
-			this.coord = coord;
+		public NodeFacility(final TransitRouterNetworkNode node) {
+			this.node = node;
 		}
 
 		@Override
 		public Coord getCoord() {
-			return coord;
+			return node.getStop().getStopFacility().getCoord();
 		}
 
 		@Override
@@ -502,7 +566,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 
 		@Override
 		public Id getLinkId() {
-			throw new UnsupportedOperationException();
+			return node.getStop().getStopFacility().getLinkId();
 		}
 	}
 }
