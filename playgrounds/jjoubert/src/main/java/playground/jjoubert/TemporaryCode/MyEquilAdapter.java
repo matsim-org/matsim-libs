@@ -3,18 +3,13 @@ package playground.jjoubert.TemporaryCode;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 
 public class MyEquilAdapter {
 	private static final Logger log = Logger.getLogger(MyEquilAdapter.class);
@@ -66,7 +61,7 @@ public class MyEquilAdapter {
 
 
 	private void createPlans(String plansfile, int numberOfPlans) {
-		PopulationFactory pf = new PopulationFactoryImpl(sc);
+        PopulationFactory pf = (PopulationFactoryImpl) sc.getPopulation().getFactory();
 		for(int i = 0; i < numberOfPlans; i++){
 			Plan plan = pf.createPlan();
 			Activity h1 = pf.createActivityFromLinkId("home", new IdImpl("1"));

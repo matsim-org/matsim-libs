@@ -21,14 +21,8 @@ package org.matsim.core.population;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
@@ -45,9 +39,8 @@ public class PopulationFactoryImpl implements PopulationFactory {
 
 	PopulationFactoryImpl(final Config config, final Network network ) {
 		this.routeFactory = new ModeRouteFactory();
-
 		String networkRouteType = config.plans().getNetworkRouteType();
-		RouteFactory factory = null;
+		RouteFactory factory;
 		if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {
 			factory = new LinkNetworkRouteFactory();
 		} else if (PlansConfigGroup.NetworkRouteType.CompressedNetworkRoute.equals(networkRouteType)) {
@@ -58,22 +51,15 @@ public class PopulationFactoryImpl implements PopulationFactory {
 		for (String transportMode : config.plansCalcRoute().getNetworkModes()) {
 			this.routeFactory.setRouteFactory(transportMode, factory);
 		}
-
 	}
 
-	@Deprecated // please get the factory from population.getFactory(). kai, feb'14
-	public PopulationFactoryImpl(Scenario scenario) {
-		this( scenario.getConfig(), scenario.getNetwork() ) ;
-	}
-
-	PopulationFactoryImpl(Config config) {
+    PopulationFactoryImpl(Config config) {
 		this( config, null ) ; // the idea is that this allows everything except setting compressed routes. kai, feb'14
 	}
 
-	@Override
+    @Override
 	public Person createPerson(final Id id) {
-		PersonImpl p = new PersonImpl(id);
-		return p;
+        return new PersonImpl(id);
 	}
 
 	@Override
@@ -83,28 +69,12 @@ public class PopulationFactoryImpl implements PopulationFactory {
 
 	@Override
 	public Activity createActivityFromCoord(final String actType, final Coord coord) {
-		ActivityImpl act = new ActivityImpl(actType, coord);
-		return act;
+        return new ActivityImpl(actType, coord);
 	}
-
-//	private Activity createActivityFromFacilityIdAndSetCoordAndLinkId(final String actType, final Id facilityId) {
-//		ActivityImpl act = new ActivityImpl(actType);
-//		act.setFacilityId(facilityId);
-//
-//		final ActivityFacility activityFacility = this.scenario.getActivityFacilities().getFacilities().get( facilityId);
-//		act.setCoord( activityFacility.getCoord() ) ;
-//		act.setLinkId( activityFacility.getLinkId() ) ;
-//		// yyyyyy I am pretty sure that this is something we had decided to avoid: containers should not depend on each other.
-//		// kai, dec'13
-//		
-//		return act;
-//	}
-	// does not seem to be used. kai, feb'14
 
 	@Override
 	public Activity createActivityFromLinkId(final String actType, final Id linkId) {
-		ActivityImpl act = new ActivityImpl(actType, linkId);
-		return act;
+        return new ActivityImpl(actType, linkId);
 	}
 
 	@Override
@@ -114,8 +84,8 @@ public class PopulationFactoryImpl implements PopulationFactory {
 
 	/**
 	 * @param transportMode the transport mode the route should be for
-	 * @param startLink the link where the route starts
-	 * @param endLink the link where the route ends
+	 * @param startLinkId the link where the route starts
+	 * @param endLinkId the link where the route ends
 	 * @return a new Route for the specified mode
 	 *
 	 * @see #setRouteFactory(String, RouteFactory)
@@ -129,8 +99,6 @@ public class PopulationFactoryImpl implements PopulationFactory {
 	 * the existing entry for this <code>mode</code> will be deleted. If <code>mode</code> is <code>null</code>,
 	 * then the default factory is set that is used if no specific RouteFactory for a mode is set.
 	 *
-	 * @param transportMode
-	 * @param factory
 	 */
 	public void setRouteFactory(final String transportMode, final RouteFactory factory) {
 		this.routeFactory.setRouteFactory(transportMode, factory);

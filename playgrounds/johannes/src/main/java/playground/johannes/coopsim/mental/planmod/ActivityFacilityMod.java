@@ -54,7 +54,7 @@ public class ActivityFacilityMod implements PlanModifier {
 	public ActivityFacilityMod(ActivityFacilities facilities, NetworkLegRouter router) {
 		this.facilities = facilities;
 		this.router = router;
-		this.factory = new PopulationFactoryImpl(ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+        this.factory = (PopulationFactoryImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
 	}
 	
 	public void setPlanIndex(int planIndex) {

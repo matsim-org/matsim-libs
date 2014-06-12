@@ -20,7 +20,6 @@
 package org.matsim.core.population;
 
 import junit.framework.Assert;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -41,7 +40,7 @@ public class PopulationFactoryImplTest {
 	public void testConstructor_DefaultNetworkRouteType() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		PopulationFactoryImpl pf = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl pf = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 
 		Id linkId = scenario.createId("1");
 		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.createRoute(TransportMode.car, linkId, linkId).getClass());
@@ -53,7 +52,7 @@ public class PopulationFactoryImplTest {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setNetworkRouteType(PlansConfigGroup.NetworkRouteType.LinkNetworkRoute);
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		PopulationFactoryImpl pf = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl pf = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 
 		Id linkId = scenario.createId("1");
 		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.createRoute(TransportMode.car, linkId, linkId).getClass());
@@ -65,7 +64,7 @@ public class PopulationFactoryImplTest {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setNetworkRouteType(PlansConfigGroup.NetworkRouteType.CompressedNetworkRoute);
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		PopulationFactoryImpl pf = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl pf = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 
 		Id linkId = scenario.createId("1");
 		Assert.assertEquals(CompressedNetworkRouteImpl.class, pf.createRoute(TransportMode.car, linkId, linkId).getClass());

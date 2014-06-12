@@ -19,12 +19,6 @@
  * *********************************************************************** */
 package org.matsim.population.algorithms;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -42,6 +36,8 @@ import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
+
+import java.util.*;
 
 /**
  * Tests specific to the "complex trip" handling (tests in ChooseRandomLegModeForSubtourTest
@@ -442,8 +438,8 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 	}
 
 	private static PopulationFactory createPopulationFactory() {
-		return new PopulationFactoryImpl( ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
-	}
+        return (PopulationFactoryImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
+    }
 	// /////////////////////////////////////////////////////////////////////////
 	// tests
 	// /////////////////////////////////////////////////////////////////////////

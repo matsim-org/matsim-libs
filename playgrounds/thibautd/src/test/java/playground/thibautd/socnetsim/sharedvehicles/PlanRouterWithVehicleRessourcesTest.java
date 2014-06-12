@@ -19,35 +19,25 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.sharedvehicles;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.*;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author thibautd
@@ -56,7 +46,7 @@ public class PlanRouterWithVehicleRessourcesTest {
 
 	@Test
 	public void testVehicleIdsAreKeptIfSomething() throws Exception {
-		final PopulationFactory factory = new PopulationFactoryImpl( ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
+        final PopulationFactory factory = (PopulationFactoryImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
 
 		final Id linkId = new IdImpl( "the_link" );
 		final Id personId = new IdImpl( "somebody" );

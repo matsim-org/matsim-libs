@@ -20,10 +20,6 @@
 
 package org.matsim.core.population;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -35,6 +31,10 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Root class of the population description (previously also called "plans file")
@@ -66,15 +66,15 @@ public final class PopulationImpl implements Population {
 	
 	@Deprecated // use PopulationUtils.createPopulation(...) instead.  kai, feb'14
 	public PopulationImpl(ScenarioImpl sc) {
-		this.pb = new PopulationFactoryImpl( sc ) ;
+        this.pb = new PopulationFactoryImpl(sc.getConfig(), sc.getNetwork());
 	}
 
 	PopulationImpl(Config config) {
-		this.pb = new PopulationFactoryImpl( config ) ;
+		this.pb = new PopulationFactoryImpl(config) ;
 	}
 
 	PopulationImpl(Config config, Network network) {
-		this.pb = new PopulationFactoryImpl( config, network ) ;
+		this.pb = new PopulationFactoryImpl(config, network) ;
 	}
 
 	//////////////////////////////////////////////////////////////////////

@@ -1,18 +1,10 @@
 package usecases.chessboard;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -24,6 +16,9 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PassengerScenarioCreator {
 	
@@ -70,7 +65,7 @@ public class PassengerScenarioCreator {
 	private static List<Person> createPersons(IdImpl homeId, IdImpl workId,Scenario scenario) {
 		LeastCostPathCalculator lcpa = new DijkstraFactory().createPathCalculator(scenario.getNetwork(), 
 				new FreespeedTravelTimeAndDisutility(-1.0, -1.0, -1.0), new FreespeedTravelTimeAndDisutility(-1.0, -1.0, -1.0));
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		List<Person> persons = new ArrayList<Person>();
 		for(int agent=0;agent<nuOfAgentsPerHomeLink;agent++){
 			

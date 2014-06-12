@@ -560,7 +560,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 	private void setPopulation1(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
 		Activity workActLink5 = popFactory.createActivityFromLinkId("work", linkId5);
@@ -616,7 +616,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 private void setPopulation2(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+    PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
 		Activity workActLink5 = popFactory.createActivityFromLinkId("work", linkId5);
@@ -665,7 +665,7 @@ private void setPopulation2(Scenario scenario) {
 	private void setPopulation4(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
 		Activity workActLink5 = popFactory.createActivityFromLinkId("work", linkId5);
@@ -724,7 +724,7 @@ private void setPopulation2(Scenario scenario) {
 	private void setPopulation5(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
 		Activity workActLink5 = popFactory.createActivityFromLinkId("work", linkId5);
@@ -783,7 +783,7 @@ private void setPopulation2(Scenario scenario) {
 private void setPopulation6(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+    PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
 		Activity workActLink5 = popFactory.createActivityFromLinkId("work", linkId5);

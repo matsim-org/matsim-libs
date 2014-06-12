@@ -22,11 +22,6 @@
  */
 package playground.ikaddoura.internalizationPt;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -38,11 +33,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -56,19 +47,18 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
 import org.matsim.vehicles.Vehicles;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class MarginalCostPricingPtHandlerTest  {
 
@@ -1870,7 +1860,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void setPopulationTestInVehicleDelay01(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Coord coord1 = new CoordImpl (500.0 , 0.0);
@@ -2144,7 +2134,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void setPopulationTestInVehicleDelay02(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Coord coord1 = new CoordImpl (500.0 , 0.0);
@@ -2345,7 +2335,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Coord coord1 = new CoordImpl (500.0 , 0.0);
@@ -2659,7 +2649,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void setPopulationTestWaitingDelay01(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Coord coord1 = new CoordImpl (500.0 , 0.0);
@@ -2934,7 +2924,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void setPopulationTestWaitingDelay02(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Coord coord1 = new CoordImpl (500.0 , 0.0);
@@ -3209,7 +3199,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void setPopulationTestWaitingDelay03(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Coord coord1 = new CoordImpl (500.0 , 0.0);
@@ -3495,7 +3485,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void setPopulationTestWaitingDelay03b(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Coord coord1 = new CoordImpl (500.0 , 0.0);
@@ -3781,7 +3771,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void setPopulationTestWaitingDelay04(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Coord coord1 = new CoordImpl (500.0 , 0.0);
@@ -4069,7 +4059,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void setPopulationTestWaitingDelay05(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Coord coord1 = new CoordImpl (499.0 , 0.0);
@@ -4357,7 +4347,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void setPopulationTestWaitingDelay06(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		//The network, coordinates and activities are adjusted here
@@ -4765,7 +4755,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void setPopulationTestCapacityDelay01(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Coord coord1 = new CoordImpl (500.0 , 0.0);
@@ -5075,7 +5065,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void setPopulationTestCapacityDelay02(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Coord coord1 = new CoordImpl (500.0 , 0.0);
@@ -5385,7 +5375,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void setPopulationTestCapacityDelay03(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Coord coord1 = new CoordImpl (500.0 , 0.0);
@@ -5721,7 +5711,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void setPopulationTestCapacityDelay04(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Coord coord1 = new CoordImpl (500.0 , 0.0);
@@ -6044,7 +6034,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void setPopulationTestCapacityDelay05(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Coord coord1 = new CoordImpl (500.0 , 0.0);

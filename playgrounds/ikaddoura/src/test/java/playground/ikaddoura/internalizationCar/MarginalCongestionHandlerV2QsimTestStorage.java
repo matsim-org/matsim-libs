@@ -22,11 +22,6 @@
  */
 package playground.ikaddoura.internalizationCar;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -38,11 +33,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -63,6 +54,11 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author ikaddoura
@@ -300,7 +296,7 @@ public class MarginalCongestionHandlerV2QsimTestStorage {
 	private void setPopulationStorage1a(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
 		Activity lastActLink4 = popFactory.createActivityFromLinkId("work", linkId4);
@@ -429,7 +425,7 @@ public class MarginalCongestionHandlerV2QsimTestStorage {
 	private void setPopulationStorage1b(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
 		Activity lastActLink4 = popFactory.createActivityFromLinkId("work", linkId4);
@@ -568,7 +564,7 @@ public class MarginalCongestionHandlerV2QsimTestStorage {
 	private void setPopulationStorage2a(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
 		Activity lastActLink6 = popFactory.createActivityFromLinkId("work", linkId6);
@@ -707,7 +703,7 @@ public class MarginalCongestionHandlerV2QsimTestStorage {
 	private void setPopulationStorage2b(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
 		Activity lastActLink6 = popFactory.createActivityFromLinkId("work", linkId6);
