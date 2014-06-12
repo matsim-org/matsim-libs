@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.framework.scenario;
 
+import java.util.Map;
+
 import org.matsim.core.config.experimental.ReflectiveModule;
 
 /**
@@ -31,9 +33,20 @@ public class BikeSharingConfigGroup extends ReflectiveModule {
 	private String facilitiesAttributesFile = null;
 	private String facilitiesFile = null;
 	private double searchRadius = 500;
+	private double ptSearchRadius = 5000;
 
 	public BikeSharingConfigGroup() {
 		super( GROUP_NAME );
+	}
+
+	@Override
+	public Map<String, String> getComments() {
+		final Map<String, String> comments = super.getComments();
+
+		comments.put( "searchRadius" , "the radius of the circles, centered on the origin and destination, within which the bike sharing stations will be seached for. In meters." );
+		comments.put( "ptSearchRadius" , "the radius of the circles, centered on the origin and destination, within which the public transport stops to be accessed or egressed by bike sharing will be searched for. In meters." );
+
+		return comments;
 	}
 
 	@StringGetter( "facilitiesAttributesFile" )
@@ -64,6 +77,16 @@ public class BikeSharingConfigGroup extends ReflectiveModule {
 	@StringSetter( "searchRadius" )
 	public void setSearchRadius(double searchRadius) {
 		this.searchRadius = searchRadius;
+	}
+
+	@StringGetter( "ptSearchRadius" )
+	public double getPtSearchRadius() {
+		return this.ptSearchRadius;
+	}
+
+	@StringSetter( "ptSearchRadius" )
+	public void setPtSearchRadius(double ptSearchRadius) {
+		this.ptSearchRadius = ptSearchRadius;
 	}
 }
 

@@ -24,14 +24,17 @@ import java.util.List;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.DefaultTripRouterFactoryImpl;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
+import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule.InitialNodeRouter;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
 
@@ -71,18 +74,50 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 					configGroup.getSearchRadius(),
 					scenario.getConfig().plansCalcRoute()) );
 
+		// XXX should be person-dependent
+		final CharyparNagelScoringParameters scoringParams =
+			new CharyparNagelScoringParameters(
+				scenario.getConfig().planCalcScore() );
+		router.setRoutingModule(
+				TransportMode.pt,
+				new TransitMultiModalAccessRoutingModule(
+						scenario,
+						new InitialNodeRouter(
+							router.getRoutingModule( TransportMode.walk ),
+							scenario.getConfig().transitRouter().getSearchRadius(),
+							1,
+							scoringParams ),
+						new InitialNodeRouter(
+							router.getRoutingModule( BikeSharingConstants.MODE ),
+							configGroup.getPtSearchRadius(),
+							3, // there is randomness: keep the "best" of a few draws
+							scoringParams )
+						) );
+
 		final MainModeIdentifier defaultModeIdentifier = router.getMainModeIdentifier();
 		router.setMainModeIdentifier(
 				new MainModeIdentifier() {
 					@Override
 					public String identifyMainMode(
 							final List<PlanElement> tripElements) {
+						boolean hadBikeSharing = false;
 						for ( PlanElement pe : tripElements ) {
-							if ( pe instanceof Leg &&
-									((Leg) pe).getMode().equals( BikeSharingConstants.MODE ) ) {
-								return BikeSharingConstants.MODE;
+							if ( pe instanceof Leg ) {
+								final Leg l = (Leg) pe;
+								if ( l.getMode().equals( BikeSharingConstants.MODE ) ) {
+									hadBikeSharing = true;
+								}
+								if ( l.getMode().equals( TransportMode.transit_walk ) ) {
+									return TransportMode.pt;
+								}
 							}
 						}
+
+						if ( hadBikeSharing ) {
+							// there were bike sharing legs but no transit walk
+							return BikeSharingConstants.MODE;
+						}
+
 						return defaultModeIdentifier.identifyMainMode( tripElements );
 					}
 				});
