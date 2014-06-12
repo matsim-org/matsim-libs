@@ -5,13 +5,13 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 
 import playground.wrashid.PSF.DataForPSL.FilterOutOnlyActStartAndActEndEvents;
-import playground.wrashid.lib.obj.IntegerValueHashMap;
 
 public class LinkOccupancyStatisticsPrinter implements LinkEnterEventHandler {
 

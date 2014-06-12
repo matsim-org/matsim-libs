@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
 import org.matsim.contrib.parking.lib.obj.network.QuadTreeInitializer;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -61,7 +62,6 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.Desires;
 
-import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;

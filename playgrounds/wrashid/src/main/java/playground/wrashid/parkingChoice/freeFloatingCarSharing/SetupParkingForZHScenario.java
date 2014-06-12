@@ -49,15 +49,8 @@ public class SetupParkingForZHScenario {
 	public static void prepare(ParkingModuleWithFFCarSharingZH parkingModule, Config config){
 		String baseDir = config.getParam("parkingChoice.ZH", "parkingDataDirectory");
 		
-		// TODO: perform scaling here!
-		
-		LinkedList<Parking> parkings = ParkingLoader.getParkingsForScenario(baseDir);
+		LinkedList<Parking> parkings = getParking(config, baseDir);
 	
-		// instead of reading scoring parameters inside the manager, just set the scoring model on the manager,
-		// after setting it up (which can be a separate module).
-		
-		
-		
 		ParkingScoreManager parkingScoreManager = prepareParkingScoreManager(parkingModule);
 		ParkingInfrastructureManager pim=new ParkingInfrastructureManager(parkingScoreManager);
 		
@@ -80,6 +73,7 @@ public class SetupParkingForZHScenario {
 				PrivateParking pp=(PrivateParking) parking;
 				HashSet<Id> hs=new HashSet<Id>();
 				hs.add(pp.getActInfo().getFacilityId());
+				groupName="privateParking";
 				PPRestrictedToFacilities PPRestrictedToFacilitiesTmp=new PPRestrictedToFacilities(parking.getId(),parking.getIntCapacity(),parking.getCoord(),pcm,groupName,hs);
 				ppRestrictedToFacilities.add(PPRestrictedToFacilitiesTmp);
 			}
@@ -90,6 +84,17 @@ public class SetupParkingForZHScenario {
 		
 		parkingModule.setParkingInfrastructurManager(pim);
 		appendScoringFactory(parkingModule);
+	}
+
+	private static LinkedList<Parking> getParking(Config config, String baseDir) {
+		ParkingLoader.garageParkingCalibrationFactor=Double.parseDouble(config.getParam("parkingChoice.ZH", "parkingGroupCapacityScalingFactor_garageParking"));
+		ParkingLoader.parkingsOutsideZHCityScaling =Double.parseDouble(config.getParam("parkingChoice.ZH", "parkingGroupCapacityScalingFactor_publicPOutsideCity"));
+		ParkingLoader.populationScalingFactor =Double.parseDouble(config.getParam("parkingChoice.ZH", "populationScalingFactor"));
+		ParkingLoader.privateParkingCalibrationFactorZHCity  =Double.parseDouble(config.getParam("parkingChoice.ZH", "parkingGroupCapacityScalingFactor_privateParking"));
+		ParkingLoader.streetParkingCalibrationFactor  =Double.parseDouble(config.getParam("parkingChoice.ZH", "parkingGroupCapacityScalingFactor_streetParking"));
+		
+		LinkedList<Parking> parkings = ParkingLoader.getParkingsForScenario(baseDir);
+		return parkings;
 	}
 	
 	public static void appendScoringFactory(ParkingModuleWithFFCarSharingZH parkingModule){

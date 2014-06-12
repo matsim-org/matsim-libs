@@ -11,10 +11,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 
-import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.lib.obj.list.ListElementMarkForRemoval;
 import playground.wrashid.parkingSearch.planLevel.ParkingGeneralLib;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;

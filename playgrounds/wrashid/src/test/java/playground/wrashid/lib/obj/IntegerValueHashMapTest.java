@@ -1,5 +1,7 @@
 package playground.wrashid.lib.obj;
 
+import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
+
 import junit.framework.TestCase;
 
 public class IntegerValueHashMapTest extends TestCase{

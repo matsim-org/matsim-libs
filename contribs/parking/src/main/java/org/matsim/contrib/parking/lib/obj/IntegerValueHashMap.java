@@ -1,11 +1,10 @@
-package playground.wrashid.lib.obj;
+package org.matsim.contrib.parking.lib.obj;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
 
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.CollectionLib;
 
 
 /**

@@ -25,9 +25,9 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.core.controler.Controler;
 
-import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
 
 public class ParkingOccupancyStats {

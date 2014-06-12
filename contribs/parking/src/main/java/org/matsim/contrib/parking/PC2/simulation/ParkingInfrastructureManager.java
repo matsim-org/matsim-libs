@@ -131,7 +131,7 @@ public class ParkingInfrastructureManager {
 		} else {
 			parking= publicParkingGroupQuadTrees.get(groupName).get(destCoordinate.getX(), destCoordinate.getY());
 		}
-		parking.parkVehicle();
+		parkVehicle(parking);
 		return parking;
 	}
 	
@@ -141,11 +141,6 @@ public class ParkingInfrastructureManager {
 		
 		double walkScore = parkingScoreManager.calcWalkScore(destCoordinate, parking.getCoordinate(), personId, parkingDurationInSeconds);
 		parkingScoreManager.addScore(personId, walkScore);
-		
-		if (parking.getAvailableParkingCapacity()==0){
-			publicParkingsQuadTree.remove(parking.getCoordinate().getX(), parking.getCoordinate().getY(), parking);
-			publicParkingGroupQuadTrees.get(parking.getGroupName()).remove(parking.getCoordinate().getX(), parking.getCoordinate().getY(), parking);
-		}
 		
 		return parking;
 	}
@@ -157,12 +152,17 @@ public class ParkingInfrastructureManager {
 	
 	// TODO: make this method abstract
 	// when person/vehicleId is clearly distinct, then I can change this to vehicleId - check, if this is the case now.
-	public void parkVehicle(Coord destCoordinate, double arrivalTime, double parkingDurationInSeconds, Id personId, Id facilityId, String actType){
+	public void parkVehicle(ParkingOperationRequestAttributes parkingOperationRequestAttributes){
+		
+		
+		
+		
+		
 		boolean parkingFound=false;
-		for (PPRestrictedToFacilities pp:privateParkingsRestrictedToFacilities.get(facilityId)){
+		for (PPRestrictedToFacilities pp:privateParkingsRestrictedToFacilities.get(parkingOperationRequestAttributes.facilityId)){
 			if (pp.getAvailableParkingCapacity()>0){
 				pp.parkVehicle();
-				parkedVehicles.put(personId, pp.getId());
+				parkedVehicles.put(parkingOperationRequestAttributes.personId, pp.getId());
 				parkingFound=true;
 			}
 		}
@@ -170,18 +170,18 @@ public class ParkingInfrastructureManager {
 		
 		double distance=300;
 		if (!parkingFound){
-			Collection<Parking> collection = getNonFullParking(getPublicParkingQuadTree().get(destCoordinate.getX(), destCoordinate.getY(), distance));
+			Collection<Parking> collection = getNonFullParking(getPublicParkingQuadTree().get(parkingOperationRequestAttributes.destCoordinate.getX(), parkingOperationRequestAttributes.destCoordinate.getY(), distance));
 			
 			if(!parkingFound){
 				while (collection.size()==0){
 					distance*=2;
-					collection = getNonFullParking(getPublicParkingQuadTree().get(destCoordinate.getX(), destCoordinate.getY(), distance));
+					collection = getNonFullParking(getPublicParkingQuadTree().get(parkingOperationRequestAttributes.destCoordinate.getX(), parkingOperationRequestAttributes.destCoordinate.getY(), distance));
 				}
 				
 				PriorityQueue<SortableMapObject<Parking>> queue=new PriorityQueue<SortableMapObject<Parking>>();
 				
 				for (Parking parking:collection){
-					double score=0.0;parkingScoreManager.calcScore(destCoordinate, arrivalTime, parkingDurationInSeconds, parking, personId);
+					double score=parkingScoreManager.calcScore(parkingOperationRequestAttributes.destCoordinate, parkingOperationRequestAttributes.arrivalTime, parkingOperationRequestAttributes.parkingDurationInSeconds, parking, parkingOperationRequestAttributes.personId);
 					queue.add(new SortableMapObject<Parking>(parking, -1.0*score));
 				}
 				
@@ -189,8 +189,7 @@ public class ParkingInfrastructureManager {
 				
 				SortableMapObject<Parking> poll = queue.poll();
 				Parking parking = poll.getKey();
-				parkedVehicles.put(personId, parking.getId());
-				parkingScoreManager.addScore(personId, poll.getScore());
+				parkedVehicles.put(parkingOperationRequestAttributes.personId, parking.getId());
 				
 				parkVehicle(parking);
 			}
@@ -225,11 +224,14 @@ public class ParkingInfrastructureManager {
 	}
 	
 	// TODO: make this method abstract
-	public void personCarDepartureEvent(Id personId){
-		Id parkingFacilityId=parkedVehicles.get(personId);
+	public void personCarDepartureEvent(ParkingOperationRequestAttributes parkingOperationRequestAttributes){
+		Id parkingFacilityId=parkedVehicles.get(parkingOperationRequestAttributes.personId);
 		Parking parking = allParkings.get(parkingFacilityId);
-		parkedVehicles.remove(personId);
+		parkedVehicles.remove(parkingOperationRequestAttributes.personId);
 		unParkVehicle(parking);
+		
+		double score=parkingScoreManager.calcScore(parkingOperationRequestAttributes.destCoordinate, parkingOperationRequestAttributes.arrivalTime, parkingOperationRequestAttributes.parkingDurationInSeconds, parking, parkingOperationRequestAttributes.personId);
+		parkingScoreManager.addScore(parkingOperationRequestAttributes.personId, score);
 	}
 
 

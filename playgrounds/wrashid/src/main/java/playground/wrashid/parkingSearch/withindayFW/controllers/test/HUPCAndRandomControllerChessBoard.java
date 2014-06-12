@@ -31,6 +31,7 @@ import org.matsim.contrib.multimodal.router.util.BikeTravelTime;
 import org.matsim.contrib.multimodal.router.util.UnknownTravelTime;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.RoutingContext;
@@ -39,7 +40,6 @@ import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingSearch.withindayFW.controllers.WithinDayParkingController;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategyManager;

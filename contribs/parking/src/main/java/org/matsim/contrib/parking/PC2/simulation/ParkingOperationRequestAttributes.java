@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,37 +16,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.contrib.parking.PC2.simulation;
 
-package playground.wrashid.lib.tools.facility;
-
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 
+public class ParkingOperationRequestAttributes {
 
-public class PrintStatisticsAboutFacilities {
-
-	public static void main(String[] args) {
-		String facilitiesPath = "C:/data/parkingSearch/zurich/input/facilities.xml.gz";
-		ActivityFacilities facilities = GeneralLib.readActivityFacilities(facilitiesPath);
-
-		IntegerValueHashMap<String> actTypes=new IntegerValueHashMap<String>();
-
-		for (Id facilityId : facilities.getFacilities().keySet()) {
-			ActivityFacilityImpl facility = (ActivityFacilityImpl) facilities.getFacilities().get(facilityId);
-
-			for (String activityOption : facility.getActivityOptions().keySet()) {
-				actTypes.increment(activityOption);
-			}
-
-		}
-		
-		for (String activityType:actTypes.getKeySet()){
-			System.out.println(activityType + " => " + actTypes.get(activityType));
-		}
-
-	}
+	Coord destCoordinate;
+	double arrivalTime;
+	double parkingDurationInSeconds;
+	Id personId;
+	Id facilityId;
+	String actType;
 
 }

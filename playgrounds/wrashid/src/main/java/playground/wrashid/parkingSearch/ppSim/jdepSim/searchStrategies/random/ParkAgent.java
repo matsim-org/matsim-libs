@@ -28,12 +28,12 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
-import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.Dummy_TakeClosestParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomParkingSearch;

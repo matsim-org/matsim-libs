@@ -45,25 +45,35 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		Parking parking=currentVehicleLocation.get(vehicleId);
 		parkingInfrastructureManager.unParkVehicle(parking);
 		
-		vehicleLocations.remove(coord.getX(), coord.getY(), vehicleId);
+		vehicleLocations.remove(parking.getCoordinate().getX(), parking.getCoordinate().getY(), vehicleId);
 		
 		NetworkImpl network = (NetworkImpl) getControler().getNetwork();
 		
+		double walkScore = parkingInfrastructureManager.getParkingScoreManager().calcWalkScore(coord, parking.getCoordinate(), personId, getAverageActDuration());
 		
-		// TODO: add walk score here for selected parking to person
+		parkingInfrastructureManager.getParkingScoreManager().addScore(personId,walkScore);
 
 		return new ParkingLinkInfo(vehicleId, network.getNearestLink(parking.getCoordinate())
 				.getId());
+	}
+
+
+	private double getAverageActDuration() {
+		double averageActDuration = 135*60;
+		return averageActDuration;
 	}
 
 	@Override
 	public ParkingLinkInfo parkFreeFloatingVehicle(Id vehicleId, Coord destCoord, Id personId) {
 		NetworkImpl network = (NetworkImpl) getControler().getNetwork();
 		
-		// TODO: add walk score here for selected parking to person
-
+		String groupName = getAcceptableParkingGroupName();
 		
-		return new ParkingLinkInfo(vehicleId, network.getNearestLink(destCoord)
+		Parking parking=parkingInfrastructureManager.parkAtClosestPublicParkingNonPersonalVehicle(destCoord, groupName, personId, getAverageActDuration());
+		currentVehicleLocation.put(vehicleId, parking);
+		vehicleLocations.put(parking.getCoordinate().getX(), parking.getCoordinate().getY(), vehicleId);
+		
+		return new ParkingLinkInfo(vehicleId, network.getNearestLink(parking.getCoordinate())
 				.getId());
 	}
 
@@ -71,12 +81,7 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 	public void resetForNewIterationStart() {
 		EnclosingRectangle vehicleLocationsRect = new EnclosingRectangle();
 		
-		boolean restrictFFParkingToStreetParking = Boolean.parseBoolean(getControler().getConfig().getParam("parkingChoice.ZH", "restrictFFParkingToStreetParking"));
-		
-		String groupName=null;
-		if (restrictFFParkingToStreetParking){
-			groupName="streetParking";
-		}
+		String groupName = getAcceptableParkingGroupName();
 		
 		currentVehicleLocation=new HashMap<Id, Parking>();
 		
@@ -92,5 +97,16 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 			Parking parking=currentVehicleLocation.get(parkInfo.getVehicleId());
 			vehicleLocations.put(parking.getCoordinate().getX(), parking.getCoordinate().getY(), parkInfo.getVehicleId());
 		}
+	}
+
+
+	private String getAcceptableParkingGroupName() {
+		boolean restrictFFParkingToStreetParking = Boolean.parseBoolean(getControler().getConfig().getParam("parkingChoice.ZH", "restrictFFParkingToStreetParking"));
+		
+		String groupName=null;
+		if (restrictFFParkingToStreetParking){
+			groupName="streetParking";
+		}
+		return groupName;
 	}
 }

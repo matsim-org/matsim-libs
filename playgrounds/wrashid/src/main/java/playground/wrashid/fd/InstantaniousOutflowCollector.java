@@ -13,8 +13,8 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 
-import playground.wrashid.lib.obj.IntegerValueHashMap;
 
 public class InstantaniousOutflowCollector implements LinkLeaveEventHandler,
 		PersonArrivalEventHandler {
