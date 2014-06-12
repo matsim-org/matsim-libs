@@ -31,16 +31,32 @@ import org.matsim.core.scenario.ScenarioUtils;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilitiesWriter;
 
+import playground.ivt.utils.ArgParser;
+import playground.ivt.utils.ArgParser.Args;
+
 /**
  * @author thibautd
  */
 public class GenerateRandomBikeSharingFacilities {
-	private static final double P_ACCEPT_LINK = 0.01;
-	private static final int MAX_CAPACITY = 100;
 
 	public static void main(final String[] args) {
-		final String networkFile = args[ 0 ];
-		final String outputFacilitiesFile = args[ 1 ];
+		final ArgParser parser = new ArgParser();
+
+		parser.setDefaultValue( "-n" , "--network-file" , null );
+		parser.setDefaultValue( "-o" , "--outputFacilitiesFile" , null );
+
+		parser.setDefaultValue( "-p" , "--p-accept" , "0.01" );
+		parser.setDefaultValue( "-m" , "--max-capacity" , "100" );
+
+		main( parser.parseArgs( args ) );
+	}
+
+	public static void main(final Args args) {
+		final String networkFile = args.getValue( "-n" );
+		final String outputFacilitiesFile = args.getValue( "-o" );
+
+		final double pAcceptLink = args.getDoubleValue( "-p" );
+		final int maxCapacity = args.getIntegerValue( "-m" );
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		new MatsimNetworkReader( sc ).parse( networkFile );
@@ -49,9 +65,9 @@ public class GenerateRandomBikeSharingFacilities {
 
 		final Random r = new Random( 98564 );
 		for ( Link l : sc.getNetwork().getLinks().values() ) {
-			if ( r.nextDouble() > P_ACCEPT_LINK ) continue;
+			if ( r.nextDouble() > pAcceptLink ) continue;
 
-			final int cap = r.nextInt( MAX_CAPACITY );
+			final int cap = r.nextInt( maxCapacity );
 			facilities.addFacility(
 					facilities.getFactory().createBikeSharingFacility(
 						new IdImpl( "bs-"+l.getId() ),
