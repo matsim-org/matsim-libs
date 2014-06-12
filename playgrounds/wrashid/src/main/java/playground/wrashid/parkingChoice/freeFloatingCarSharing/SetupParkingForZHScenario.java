@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
-import org.matsim.contrib.parking.PC2.ParkingModuleWithFFCarSharing;
 import org.matsim.contrib.parking.PC2.infrastructure.PPRestrictedToFacilities;
 import org.matsim.contrib.parking.PC2.infrastructure.PublicParking;
 import org.matsim.contrib.parking.PC2.scoring.ParkingBetas;
@@ -47,7 +46,7 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 
 public class SetupParkingForZHScenario {
 
-	public static void prepare(ParkingModuleWithFFCarSharing parkingModule, Config config){
+	public static void prepare(ParkingModuleWithFFCarSharingZH parkingModule, Config config){
 		String baseDir = config.getParam("parkingChoice.ZH", "parkingDataDirectory");
 		
 		// TODO: perform scaling here!
@@ -93,11 +92,11 @@ public class SetupParkingForZHScenario {
 		appendScoringFactory(parkingModule);
 	}
 	
-	public static void appendScoringFactory(ParkingModuleWithFFCarSharing parkingModule){
+	public static void appendScoringFactory(ParkingModuleWithFFCarSharingZH parkingModule){
 		parkingModule.getControler().setScoringFunctionFactory(new ParkingScoringFunctionFactory (parkingModule.getControler().getScoringFunctionFactory(),parkingModule.getParkingScoreManager()));
 	}
 	
-	public static ParkingScoreManager prepareParkingScoreManager(ParkingModuleWithFFCarSharing parkingModule) {
+	public static ParkingScoreManager prepareParkingScoreManager(ParkingModuleWithFFCarSharingZH parkingModule) {
 		Controler controler=parkingModule.getControler();
 		ParkingScoreManager parkingScoreManager = new ParkingScoreManager(getWalkTravelTime(parkingModule.getControler()));
 		

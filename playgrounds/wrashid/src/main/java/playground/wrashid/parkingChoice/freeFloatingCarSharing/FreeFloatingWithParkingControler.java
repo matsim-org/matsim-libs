@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.parking.PC2.ParkingModuleWithFFCarSharing;
 import org.matsim.contrib.parking.parkingChoice.carsharing.DummyParkingModuleWithFreeFloatingCarSharing;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingCoordInfo;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingModuleWithFreeFloatingCarSharing;
@@ -145,7 +144,7 @@ public class FreeFloatingWithParkingControler extends Controler{
  		    	
  		    }
  		    
- 		   ParkingModuleWithFFCarSharing parkingModule = new ParkingModuleWithFFCarSharing(controler, freefloatingCars);
+ 		   ParkingModuleWithFFCarSharingZH parkingModule = new ParkingModuleWithFFCarSharingZH(controler, freefloatingCars);
  		    //ParkingModuleWithFreeFloatingCarSharing parkingModule = new ParkingModuleWithFFCarSharing();
  		    
  		   SetupParkingForZHScenario.prepare(parkingModule,config);

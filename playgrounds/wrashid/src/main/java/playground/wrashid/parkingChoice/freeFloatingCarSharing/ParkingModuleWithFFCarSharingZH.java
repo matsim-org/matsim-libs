@@ -1,4 +1,4 @@
-package org.matsim.contrib.parking.PC2;
+package playground.wrashid.parkingChoice.freeFloatingCarSharing;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -7,6 +7,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.PC2.GeneralParkingModule;
 import org.matsim.contrib.parking.PC2.infrastructure.Parking;
 import org.matsim.contrib.parking.PC2.infrastructure.PublicParking;
 import org.matsim.contrib.parking.PC2.simulation.ParkingInfrastructureManager;
@@ -21,13 +22,13 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.QuadTree;
 
 //TODO: move this to my playground and rename to Zurich
-public class ParkingModuleWithFFCarSharing extends GeneralParkingModule implements ParkingModuleWithFreeFloatingCarSharing {
+public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implements ParkingModuleWithFreeFloatingCarSharing {
 
 	private Collection<ParkingCoordInfo> initialDesiredVehicleCoordinates;
 	private HashMap<Id, Parking> currentVehicleLocation;
 	private QuadTree<Id> vehicleLocations;
 	
-	public ParkingModuleWithFFCarSharing(Controler controler,Collection<ParkingCoordInfo> initialDesiredVehicleCoordinates) {
+	public ParkingModuleWithFFCarSharingZH(Controler controler,Collection<ParkingCoordInfo> initialDesiredVehicleCoordinates) {
 		super(controler);
 		this.initialDesiredVehicleCoordinates = initialDesiredVehicleCoordinates;
 		//TODO: initialize parkings car to parking
