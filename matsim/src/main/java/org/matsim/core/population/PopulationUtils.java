@@ -47,11 +47,29 @@ public final class PopulationUtils {
 	 * Is a namespace, so don't instantiate:
 	 */
 	private PopulationUtils() {}
-	
+
+    /**
+     *
+     * Creates a new Population container. Population instances need a Config, because they need to know
+     * about the modes of transport.
+     *
+     * @param config the configuration which is used to create the Population.
+     * @return the new Population instance
+     */
 	public static Population createPopulation(Config config) {
 		return createPopulation(config, null);
 	}
 
+    /**
+     *
+     * Creates a new Population container which, depending on
+     * configuration, may make use of the specified Network instance to store routes
+     * more efficiently.
+     *
+     * @param config the configuration which is used to create the Population.
+     * @param network the Network to which Plans in this Population will refer.
+     * @return the new Population instance
+     */
 	public static Population createPopulation(Config config, Network network) {
         ModeRouteFactory routeFactory = new ModeRouteFactory();
         String networkRouteType = config.plans().getNetworkRouteType();
