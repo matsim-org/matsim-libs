@@ -293,7 +293,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		
 		this.state = MobsimAgent.State.LEG;
 		Route route = leg.getRoute();
-		ParkingLinkInfo vehicleLocation = this.parkingModule.getNextFreeFloatingVehicle(this.scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord());		
+		ParkingLinkInfo vehicleLocation = this.parkingModule.getNextFreeFloatingVehicle(this.scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), this.person.getId());		
 		if (vehicleLocation == null || vehicleLocation.getLinkId() == null) {
 			log.warn("Agent with id: " + this.getId().toString() + " was aborted because the freefloating vehicle was not avaialble or the vehicle id was not set up.");
 			this.state = MobsimAgent.State.ABORT ;
@@ -395,7 +395,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		Route route = leg.getRoute();
 
 		//create route for the car part of the freefloating trip
-		ParkingLinkInfo parkingSpot = parkingModule.parkFreeFloatingVehicle(new IdImpl((vehID)), this.scenario.getNetwork().getLinks().get(route.getEndLinkId()).getCoord());
+		ParkingLinkInfo parkingSpot = parkingModule.parkFreeFloatingVehicle(new IdImpl((vehID)), this.scenario.getNetwork().getLinks().get(route.getEndLinkId()).getCoord(), this.person.getId());
 		
 		double travelTime = 0.0;
 		List<Id> ids = new ArrayList<Id>();
