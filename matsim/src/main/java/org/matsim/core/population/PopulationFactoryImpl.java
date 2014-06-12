@@ -21,12 +21,7 @@ package org.matsim.core.population;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
-import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.RouteFactory;
 
@@ -37,25 +32,9 @@ public class PopulationFactoryImpl implements PopulationFactory {
 
 	private final ModeRouteFactory routeFactory;
 
-	PopulationFactoryImpl(final Config config, final Network network ) {
-		this.routeFactory = new ModeRouteFactory();
-		String networkRouteType = config.plans().getNetworkRouteType();
-		RouteFactory factory;
-		if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {
-			factory = new LinkNetworkRouteFactory();
-		} else if (PlansConfigGroup.NetworkRouteType.CompressedNetworkRoute.equals(networkRouteType)) {
-			factory = new CompressedNetworkRouteFactory( network );
-		} else {
-			throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
-		}
-		for (String transportMode : config.plansCalcRoute().getNetworkModes()) {
-			this.routeFactory.setRouteFactory(transportMode, factory);
-		}
-	}
-
-    PopulationFactoryImpl(Config config) {
-		this( config, null ) ; // the idea is that this allows everything except setting compressed routes. kai, feb'14
-	}
+    PopulationFactoryImpl(ModeRouteFactory routeFactory) {
+        this.routeFactory = routeFactory;
+    }
 
     @Override
 	public Person createPerson(final Id id) {

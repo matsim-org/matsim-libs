@@ -1,15 +1,12 @@
 package playground.pieter.singapore.utils.plans;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -28,7 +25,7 @@ public class SelectedCarplansToESRIShape {
 		new MatsimNetworkReader(scenario).readFile(args[1]);
 		new MatsimPopulationReader(scenario).readFile(args[0]);
 		CoordinateReferenceSystem crs = MGC.getCRS(args[2]);
-		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
+		Population pop = scenario.getPopulation();
 		new PlansStripOutTransitPlans().run(pop);
 		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(scenario.getPopulation(), scenario.getNetwork(), crs, args[3]);
 		sp.setOutputSample(0.05);

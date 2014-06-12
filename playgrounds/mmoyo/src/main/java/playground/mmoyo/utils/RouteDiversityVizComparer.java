@@ -20,9 +20,6 @@
 
 package playground.mmoyo.utils;
 
-import java.util.List;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -32,11 +29,13 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
-
 import playground.mmoyo.algorithms.PopulationSecFilter;
 import playground.mmoyo.io.PopSecReader;
+
+import java.util.List;
+import java.util.Set;
 
 public class RouteDiversityVizComparer {
 
@@ -80,7 +79,7 @@ public class RouteDiversityVizComparer {
 		pop=planFragmenter.plans2Persons(pop); //each plan is converted into a person
 		
 		scn= (ScenarioImpl) dataLoader.createScenario();
-		Population newPop = new PopulationImpl(scn);
+        Population newPop = PopulationUtils.createPopulation(scn.getConfig(), scn.getNetwork());
 		for (Person person: pop.getPersons().values()){
 			List<Person> perList= planFragmenter.run(person); //each plan is splitted in trips that are converted to "persons"
 			//System.out.println(person + " " + perList.size());

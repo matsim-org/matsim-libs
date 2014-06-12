@@ -1,27 +1,20 @@
 package playground.mmoyo.analysis.tools;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-
 import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.PlanFragmenter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**finds connections with transfer point that are farther than the destination point **/ 
 public class FindRoundaboutConnections {
 	
 	private Population createDetouredPlan (final ScenarioImpl scenario){
-		Population detouredPopulation = new PopulationImpl(scenario);
+        Population detouredPopulation = PopulationUtils.createPopulation(scenario.getConfig(), scenario.getNetwork());
 
 		Population fragmentedPopulation = new PlanFragmenter().run(scenario.getPopulation());  //fragmented plans! otherwise it analyzes only the first leg
 		

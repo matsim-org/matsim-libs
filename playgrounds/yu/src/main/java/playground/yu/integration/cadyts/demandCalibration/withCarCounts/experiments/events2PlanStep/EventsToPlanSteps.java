@@ -20,22 +20,15 @@
 
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.events2PlanStep;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
+import cadyts.demand.Plan;
+import cadyts.demand.PlanBuilder;
+import cadyts.demand.PlanStep;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -48,12 +41,11 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import cadyts.demand.Plan;
-import cadyts.demand.PlanBuilder;
-import cadyts.demand.PlanStep;
+import java.util.*;
 
 public class EventsToPlanSteps implements PersonDepartureEventHandler,
 		LinkEnterEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
@@ -271,7 +263,7 @@ public class EventsToPlanSteps implements PersonDepartureEventHandler,
 							r.nextDouble() * 50000d)), r.nextInt(1000), r
 					.nextInt(8) * 20, r.nextInt(10) * 200, 1);
 		}
-		Population pop = new PopulationImpl(null);
+        Population pop = PopulationUtils.createPopulation(((ScenarioImpl) null).getConfig(), ((ScenarioImpl) null).getNetwork());
 		for (int i = 0; i < 10; i++) {
 			Person person = new PersonImpl(new IdImpl(i));
 			pop.addPerson(person);

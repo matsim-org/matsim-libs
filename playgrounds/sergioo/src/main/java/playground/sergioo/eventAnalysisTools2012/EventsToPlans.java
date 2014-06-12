@@ -1,16 +1,8 @@
 package playground.sergioo.eventAnalysisTools2012;
 
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.Map.Entry;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
@@ -19,13 +11,17 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToActivities;
-import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
+import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.core.scoring.EventsToLegs.LegHandler;
+
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 public class EventsToPlans implements ActivityHandler, LegHandler {
 
@@ -51,7 +47,7 @@ public class EventsToPlans implements ActivityHandler, LegHandler {
 	}
 	
 	public void writeExperiencedPlans(String iterationFilename) {
-		PopulationImpl population = new PopulationImpl((ScenarioImpl) scenario);
+        Population population = PopulationUtils.createPopulation(((ScenarioImpl) scenario).getConfig(), ((ScenarioImpl) scenario).getNetwork());
 		for (Entry<Id, Plan> entry : agentRecords.entrySet()) {
 			Person person = new PersonImpl(entry.getKey());
 			Plan plan = entry.getValue();

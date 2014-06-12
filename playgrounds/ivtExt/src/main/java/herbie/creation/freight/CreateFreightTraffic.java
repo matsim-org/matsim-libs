@@ -20,19 +20,6 @@
 package herbie.creation.freight;
 
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import java.util.TreeMap;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -44,29 +31,22 @@ import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.OpeningTime;
+import org.matsim.core.facilities.*;
 import org.matsim.core.facilities.OpeningTime.DayType;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.config.ConfigUtils;
-
 import utils.BuildTrees;
+
+import java.io.*;
+import java.text.DecimalFormat;
+import java.util.*;
 
 public class CreateFreightTraffic {
 	
@@ -388,7 +368,7 @@ public class CreateFreightTraffic {
 		
 //		ActTypeConverter actTypeConverter = new ActTypeConverter(false);
 		
-		for (Person p : ((PopulationImpl) sTmp.getPopulation()).getPersons().values()){
+		for (Person p : sTmp.getPopulation().getPersons().values()){
 			for (Plan plan : p.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Activity) {

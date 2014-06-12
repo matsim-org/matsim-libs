@@ -19,15 +19,6 @@
  * *********************************************************************** */
 package playground.johannes.mz2005.io;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -37,18 +28,16 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-
 import playground.johannes.mz2005.validate.ActLegSequence;
 import playground.johannes.mz2005.validate.PlanValidator;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author illenberger
@@ -83,7 +72,8 @@ public class RawDataToPopulation {
 		/*
 		 * generate population
 		 */
-		Population pop = new PopulationImpl((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+        ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        Population pop = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		TripComparator comparator = new TripComparator();
 		for (PersonDataContainer pContainer : persons.values()) {
 			if (pContainer.trips.size() > 0) {

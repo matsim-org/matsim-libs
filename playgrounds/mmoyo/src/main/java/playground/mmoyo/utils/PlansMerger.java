@@ -1,7 +1,5 @@
 package playground.mmoyo.utils;
 
-import java.io.File;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -12,9 +10,11 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.io.File;
 
 /**Reads many populations and merges them adding a index to repeated persons**/ 
 public class PlansMerger {
@@ -58,8 +58,9 @@ public class PlansMerger {
 	/**args are the config files containing the populations to merge, 
 	 * they may have the same persond id's, a suffix is added*/
 	public Population agentAggregator(String[] configs){
-		int popsNum = configs.length; 
-		Population newPopulation = new PopulationImpl((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		int popsNum = configs.length;
+        ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        Population newPopulation = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		Population[] populationArray = loadPopArrayFromConfig (configs);
 		
 		for (Person person : populationArray[0].getPersons().values()) {
@@ -85,7 +86,8 @@ public class PlansMerger {
 
 	/**Assuming that the given populations do not share any agent. If yes, an error is shown and*/
 	public Population diffAgentMerger (String[] popArray){
-		Population newPopulation = new PopulationImpl((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+        ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        Population newPopulation = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		String strError = "The agent is repeated in populations: ";
 
 		Population[] pops =  loadPopArrayfromPopFiles(popArray);

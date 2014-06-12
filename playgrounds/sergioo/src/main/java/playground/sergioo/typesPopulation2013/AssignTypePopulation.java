@@ -1,17 +1,13 @@
 package playground.sergioo.typesPopulation2013;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -21,7 +17,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-
 import playground.sergioo.typesPopulation2013.population.PersonImplPops;
 import playground.sergioo.typesPopulation2013.population.PopulationWriter;
 
@@ -70,7 +65,8 @@ public class AssignTypePopulation {
 		scenario.getConfig().scenario().setUseTransit(true);
 		(new TransitScheduleReader(scenario)).readFile(args[4]);
 		TransitLine line = scenario.getTransitSchedule().getTransitLines().get(new IdImpl(args[5]));
-		Population population = new PopulationImpl((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+        ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        Population population = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		for(Person person:scenario.getPopulation().getPersons().values())
 			if(isRelatedWithLine(person, line))
 				population.addPerson(new PersonImplPops((PersonImpl)person, line.getId()));

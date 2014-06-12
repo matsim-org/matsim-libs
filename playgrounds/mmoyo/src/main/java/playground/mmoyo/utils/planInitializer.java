@@ -24,11 +24,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -45,7 +46,8 @@ public class planInitializer {
 	}
 	
 	public void run (){
-		PopulationImpl initPopulation = new PopulationImpl(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
+        ScenarioImpl sc = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+        Population initPopulation = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		
 		final String SEPARATOR ="_";
 		for (Person person : this.scenario.getPopulation().getPersons().values()){

@@ -20,10 +20,6 @@
 package playground.fhuelsmann.emission.analysis.mobility;
 
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -33,15 +29,18 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
-
 import playground.benjamin.scenarios.munich.analysis.filter.LocationFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class Mobility {
 	
@@ -166,7 +165,7 @@ public class Mobility {
 
 	public Population getRelevantPopulation(Population population, Collection<SimpleFeature> featuresInShape) {
 		ScenarioImpl emptyScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Population filteredPopulation = new PopulationImpl(emptyScenario);
+        Population filteredPopulation = PopulationUtils.createPopulation(emptyScenario.getConfig(), emptyScenario.getNetwork());
 		for(Person person : population.getPersons().values()){
 			PersonFilter personFilter = new PersonFilter();
 			boolean isPersonFreight = personFilter.isPersonFreight(person.getId());

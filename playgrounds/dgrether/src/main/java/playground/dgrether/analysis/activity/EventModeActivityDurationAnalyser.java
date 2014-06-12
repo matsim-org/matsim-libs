@@ -18,12 +18,6 @@
  * *********************************************************************** */
 package playground.dgrether.analysis.activity;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -42,13 +36,13 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.misc.Time;
-
 import playground.dgrether.utils.IntegerCountMap;
+
+import java.util.*;
 
 
 /**
@@ -92,7 +86,7 @@ public class EventModeActivityDurationAnalyser {
 		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);
 		reader.readFile(NETWORK);
 
-		PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
+		Population plans = scenario.getPopulation();
 		MatsimPopulationReader plansParser = new MatsimPopulationReader(scenario);
 		plansParser.readFile(PLANSFILE);
 

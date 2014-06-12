@@ -1,27 +1,23 @@
 package playground.andreas.fggeoinfo;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.andreas.fggeoinfo.ReadBBIDemand.DemandBox;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class BBIextraDemand {
@@ -153,7 +149,8 @@ public class BBIextraDemand {
 	}
 
 	private void writePopulation(String filename) {
-		PopulationImpl pop = new PopulationImpl(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
+        ScenarioImpl sc = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+        Population pop = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		for (Person person : this.personList) {
 			pop.addPerson(person);
 		}

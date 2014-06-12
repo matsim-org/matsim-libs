@@ -20,8 +20,6 @@
 
 package playground.mmoyo.utils.calibration;
 
-import java.io.File;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -29,16 +27,17 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.mmoyo.Validators.PlanValidator;
 import playground.mmoyo.algorithms.PersonClonner;
 import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.FirstPersonsExtractor;
 import playground.mmoyo.utils.PlansMerger;
+
+import java.io.File;
 
 /**creates clones and stay home plans for each person*/
 public class OverDemandPlanCreator {
@@ -58,7 +57,8 @@ public class OverDemandPlanCreator {
 	}
 	
 	public Population run(final int homePlanNum, final int cloneNum) {
-		PopulationImpl outPop = new PopulationImpl(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
+        ScenarioImpl sc = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+        Population outPop = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 
 		if (!planValidator.hasSecqActLeg(this.population)) { 
 			throw new RuntimeException("this may not work, it assumes that the first PlanElement is home!! what about fragmnted plans? or other plans at all?" );

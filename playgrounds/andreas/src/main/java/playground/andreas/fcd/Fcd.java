@@ -19,16 +19,6 @@
 
 package playground.andreas.fcd;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -43,12 +33,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkTransform;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -56,11 +41,13 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.utils.gis.matsim2esri.network.FeatureGenerator;
-import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
-import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
-import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
-import org.matsim.utils.gis.matsim2esri.network.WidthCalculator;
+import org.matsim.utils.gis.matsim2esri.network.*;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 
 public class Fcd {
 	
@@ -142,7 +129,8 @@ public class Fcd {
 	private void writeSimplePlansFromEvents(String plansOutFile) {
 		log.info("Creating plans from fcd events...");
 		int numberOfPlans = 1;
-		Population pop = new PopulationImpl(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
+        ScenarioImpl sc = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+        Population pop = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		
 		FcdEvent lastEvent = null;
 		Person currentPerson = null;
@@ -187,7 +175,8 @@ public class Fcd {
 	private void writeComplexPlansFromEvents(String plansOutFile, NetworkImpl net) {
 		log.info("Creating plans from fcd events...");
 		int numberOfPlans = 1;
-		Population pop = new PopulationImpl(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
+        ScenarioImpl sc = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+        Population pop = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		
 		FcdEvent lastEvent = null;
 		Person currentPerson = null;

@@ -19,14 +19,6 @@
 
 package playground.mzilske.d4d;
 
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
 import org.geotools.data.DataUtilities;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -36,16 +28,12 @@ import org.joda.time.format.DateTimeFormatter;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -58,11 +46,13 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 import playground.mzilske.cdr.CellTower;
 import playground.mzilske.cdr.CellularCoverageLinkToZoneResolver;
 import playground.mzilske.cdr.PopulationFromSightings;
 import playground.mzilske.cdr.Zones;
+
+import java.io.FileNotFoundException;
+import java.util.*;
 
 public class CreatePopulation {
 
@@ -223,8 +213,8 @@ public class CreatePopulation {
 		System.out.println(scenario.getPopulation().getPersons().size());
 		new InitialStatistics("").run(scenario.getPopulation());
 
-		Population cityPopulation = new PopulationImpl(scenario);
-		Population nonCityPopulation = new PopulationImpl(scenario);
+        Population cityPopulation = PopulationUtils.createPopulation(scenario.getConfig(), scenario.getNetwork());
+        Population nonCityPopulation = PopulationUtils.createPopulation(scenario.getConfig(), scenario.getNetwork());
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			Plan plan = person.getSelectedPlan();

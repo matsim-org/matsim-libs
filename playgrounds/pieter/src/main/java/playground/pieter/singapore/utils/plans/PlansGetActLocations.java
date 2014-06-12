@@ -1,10 +1,5 @@
 package playground.pieter.singapore.utils.plans;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -14,14 +9,16 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
+
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Iterator;
 
 public class PlansGetActLocations {
 	public void run(Population plans, DataBaseAdmin dba, String tableName) {
@@ -80,7 +77,7 @@ public class PlansGetActLocations {
 		new MatsimPopulationReader(scenario)
 				.readFile("data/sing2PlansFilteredUnroutedReduced.xml");
 //		.readFile("data/short_plans.xml");
-		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
+		Population pop = scenario.getPopulation();
 		DataBaseAdmin dba = new DataBaseAdmin(new File("data/matsim2.properties"));
 		new PlansGetActLocations().run(pop, dba, "activity_location_results");
 	}

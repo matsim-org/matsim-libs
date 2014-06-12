@@ -19,16 +19,16 @@
 
 package playground.anhorni.PLOC;
 
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 
 public class GeneratePopulation {
 			
 	public GeneratePopulation() {
 	}
 	
-	public void generatePopulation(int populationSize, ExpenditureAssigner expenditureAssigner,  PopulationImpl staticPopulation) {
+	public void generatePopulation(int populationSize, ExpenditureAssigner expenditureAssigner,  Population staticPopulation) {
 		
 		for (int i = 0; i < populationSize; i++) {
 			PersonImpl p = new PersonImpl(new IdImpl(i));

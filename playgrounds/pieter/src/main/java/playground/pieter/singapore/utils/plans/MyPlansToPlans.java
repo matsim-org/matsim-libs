@@ -19,29 +19,17 @@
 
 package playground.pieter.singapore.utils.plans;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
-
-import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
+
+import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * Notes:
@@ -65,7 +53,7 @@ public class MyPlansToPlans {
 		System.out.println(scenario.getPopulation().getPersons().size());
 //		new MatsimFacilitiesReader((ScenarioImpl) scenario).readFile(args[1]);
 //		DataBaseAdmin dba = new DataBaseAdmin(new File("data/hitsdb.properties"));
-		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
+		Population pop = scenario.getPopulation();
 
 		PlansFilterNoRoute pf = new PlansFilterNoRoute();
 		pf.run(pop,args[2],scenario.getNetwork());

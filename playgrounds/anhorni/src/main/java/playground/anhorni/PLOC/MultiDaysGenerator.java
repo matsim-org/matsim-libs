@@ -19,33 +19,33 @@
 
 package playground.anhorni.PLOC;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.core.scenario.ScenarioImpl;
-
 public class MultiDaysGenerator {
 	
 	private Random randomNumberGenerator;
 	private SinglePlanGenerator singlePlanGenerator;
-	private PopulationImpl staticPopulation;
+	private Population staticPopulation;
 	private ScenarioImpl scenarioWriteOut;
 	private NetworkImpl network;
 	private boolean temporalVar;
 		
-	public MultiDaysGenerator(Random randomNumberGenerator, PopulationImpl staticPopulation, ScenarioImpl scenarioWriteOut, 
+	public MultiDaysGenerator(Random randomNumberGenerator, Population staticPopulation, ScenarioImpl scenarioWriteOut,
 			NetworkImpl network, boolean temporalVar, ObjectAttributes personAttributes) {
 		this.randomNumberGenerator = randomNumberGenerator;
 		for (int i = 0; i < 1000; i++) {

@@ -19,11 +19,6 @@
 
 package playground.anhorni.PLOC.analysis.postprocessing;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -31,9 +26,14 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class CompareScenarios {	
 	public String outpath;
@@ -109,7 +109,7 @@ public class CompareScenarios {
 	}
 	
 	private void readPopulation(String populationFilePath) {
-		this.baseScenario.setPopulation(new PopulationImpl(this.baseScenario));
+        this.baseScenario.setPopulation(PopulationUtils.createPopulation(this.baseScenario.getConfig(), this.baseScenario.getNetwork()));
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.baseScenario);
 		populationReader.readFile(populationFilePath);
 	}

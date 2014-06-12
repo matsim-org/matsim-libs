@@ -22,12 +22,9 @@ package org.matsim.core.population;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.config.Config;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -57,27 +54,15 @@ public final class PopulationImpl implements Population {
 
 	private static final Logger log = Logger.getLogger(PopulationImpl.class);
 
-	private final PopulationFactory pb ;
+	private final PopulationFactory populationFactory;
 	
 	private final ObjectAttributes personAttributes = new ObjectAttributes();
-	
 
-	// constructors:
-	
-	@Deprecated // use PopulationUtils.createPopulation(...) instead.  kai, feb'14
-	public PopulationImpl(ScenarioImpl sc) {
-        this.pb = new PopulationFactoryImpl(sc.getConfig(), sc.getNetwork());
-	}
+    PopulationImpl(PopulationFactory populationFactory) {
+        this.populationFactory = populationFactory;
+    }
 
-	PopulationImpl(Config config) {
-		this.pb = new PopulationFactoryImpl(config) ;
-	}
-
-	PopulationImpl(Config config, Network network) {
-		this.pb = new PopulationFactoryImpl(config, network) ;
-	}
-
-	//////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////
 	// add methods
 	//////////////////////////////////////////////////////////////////////
 
@@ -122,17 +107,16 @@ public final class PopulationImpl implements Population {
 
 	public final void runAlgorithms() {
 		if (!this.isStreaming) {
-			for (int i=0; i<this.personAlgos.size(); i++) {
-				PersonAlgorithm algo = this.personAlgos.get(i);
-				log.info("running algorithm " + algo.getClass().getName());
-				Counter cntr = new Counter(" person # ");
-				for (Person person : this.getPersons().values()) {
-					cntr.incCounter();
-					algo.run(person);
-				}
-				cntr.incCounter();
-				log.info("done running algorithm.");
-			}
+            for (PersonAlgorithm algo : this.personAlgos) {
+                log.info("running algorithm " + algo.getClass().getName());
+                Counter cntr = new Counter(" person # ");
+                for (Person person : this.getPersons().values()) {
+                    cntr.incCounter();
+                    algo.run(person);
+                }
+                cntr.incCounter();
+                log.info("done running algorithm.");
+            }
 		} else {
 			log.info("Plans-Streaming is on. Algos were run during parsing");
 		}
@@ -146,11 +130,7 @@ public final class PopulationImpl implements Population {
 		this.personAlgos.clear();
 	}
 
-	public boolean removeAlgorithm(final PersonAlgorithm algo) {
-		return this.personAlgos.remove(algo);
-	}
-
-	public final void addAlgorithm(final PersonAlgorithm algo) {
+    public final void addAlgorithm(final PersonAlgorithm algo) {
 		this.personAlgos.add(algo);
 	}
 
@@ -192,15 +172,10 @@ public final class PopulationImpl implements Population {
 	public void printPlansCount() {
 		log.info(" person # " + this.counter);
 	}
-	
-	public void resetPlansCount() {
-		this.counter = 0;
-		this.nextMsg = 1;
-	}
 
-	@Override
+    @Override
 	public PopulationFactory getFactory() {
-		return this.pb;
+		return this.populationFactory;
 	}
 	
 	private String name ;

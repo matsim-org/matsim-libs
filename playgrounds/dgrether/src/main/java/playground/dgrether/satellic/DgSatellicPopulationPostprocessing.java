@@ -19,22 +19,21 @@
  * *********************************************************************** */
 package playground.dgrether.satellic;
 
-import java.util.Random;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.dgrether.DgPaths;
+
+import java.util.Random;
 
 
 public class DgSatellicPopulationPostprocessing {
@@ -56,7 +55,7 @@ public class DgSatellicPopulationPostprocessing {
     ScenarioLoaderImpl loader = new ScenarioLoaderImpl(sc);
     loader.loadScenario();
     NetworkImpl network = (NetworkImpl) sc.getNetwork();
-    PopulationImpl pop = (PopulationImpl) sc.getPopulation();
+    Population pop = sc.getPopulation();
     Random random = MatsimRandom.getLocalInstance();
     //do the routing
 //    TravelTime travelTimes = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(network, sc.getConfig().travelTimeCalculator());

@@ -97,7 +97,7 @@ public class PopulationMerger {
 		System.out.println("Population merged!");
 	}
 
-	private void addPendlerstatistikInCommuterDemand(String pendlerstatistikInCommutingDemandFile, String networkFile, PopulationImpl mergedPopulation) {
+	private void addPendlerstatistikInCommuterDemand(String pendlerstatistikInCommutingDemandFile, String networkFile, Population mergedPopulation) {
 		Population inCommuterPopulation = PopulationMerger.getPopulation(pendlerstatistikInCommutingDemandFile, networkFile);
 		
 		for(Person person : inCommuterPopulation.getPersons().values()){

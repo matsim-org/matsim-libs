@@ -1,33 +1,26 @@
 package herbie.running.analysis;
 
 import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
-import herbie.running.controler.listeners.LegDistanceDistributionWriter;
 import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis.CrosstabFormat;
-
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import utils.Bins;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 
 public class AnalyseEventFile {
 	
 	private String eventFilePath;
 	private CalcLegTimesKTI standardHandler;
 	private PrintStream out;
-	private PopulationImpl pop;
+	private Population pop;
 	private String configFile = "P:/Projekte/herbie/output/Report/AdditionalAnalysis/configForAnalysis.xml";
 	private String outputfolder;
 	
@@ -77,7 +70,7 @@ public class AnalyseEventFile {
 		Config config = ConfigUtils.loadConfig(configFile);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
-		pop = (PopulationImpl) scenario.getPopulation();		
+		pop = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(config.plans().getInputFile());
 		
 	}

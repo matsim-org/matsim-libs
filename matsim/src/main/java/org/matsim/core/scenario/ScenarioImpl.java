@@ -19,10 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.scenario;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -34,7 +30,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
@@ -44,6 +40,10 @@ import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -74,31 +74,25 @@ public class ScenarioImpl implements Scenario {
 	private Knowledges knowledges;
 
 	protected ScenarioImpl(Config config) {
-		// setting to "default" results in 6 compile errors.  kai, feb'14
 		this.config = config;
-		initContainers();
-	}
+        this.network = NetworkImpl.createNetwork();
+        this.population = PopulationUtils.createPopulation(this.config, this.network);
+        this.facilities = new ActivityFacilitiesImpl();
+        if (this.config.scenario().isUseHouseholds()){
+            this.createHouseholdsContainer();
+        }
+        if (this.config.scenario().isUseVehicles()){
+            this.createVehicleContainer();
+        }
+        if (this.config.scenario().isUseKnowledges()){
+            this.createKnowledges();
+        }
+        if (this.config.scenario().isUseTransit()) {
+            this.createTransitSchedule();
+        }
+    }
 
-	private void initContainers() {
-		this.network = NetworkImpl.createNetwork();
-		this.population = new PopulationImpl(this);
-		this.facilities = new ActivityFacilitiesImpl();
-
-		if (this.config.scenario().isUseHouseholds()){
-			this.createHouseholdsContainer();
-		}
-		if (this.config.scenario().isUseVehicles()){
-			this.createVehicleContainer();
-		}
-		if (this.config.scenario().isUseKnowledges()){
-			this.createKnowledges();
-		}
-		if (this.config.scenario().isUseTransit()) {
-			this.createTransitSchedule();
-		}
-	}
-
-	/**
+    /**
 	 * Creates a vehicle container and stores it, if it does not exist.
 	 * This is necessary only in very special use cases, when one needs
 	 * to create such a container <b>without</b> setting the useVehicles

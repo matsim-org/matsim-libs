@@ -19,28 +19,32 @@
 
 package playground.mmoyo.utils;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PersonAlgorithm;
-
 import playground.mmoyo.io.PopSecReader;
 import playground.mmoyo.io.TXT_IdReader;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**Reads a text file with agents Ids and creates a population object from them. Read sequentially*/ 
 public class PopulationFromIdTxt implements PersonAlgorithm {
 	static DataLoader dataLoader = new DataLoader();
-	private Population newPop = new PopulationImpl((ScenarioImpl) dataLoader.createScenario());
-	PopulationWriter populationWriter;
+	private Population newPop;
+
+    {
+        ScenarioImpl sc = (ScenarioImpl) dataLoader.createScenario();
+        newPop = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
+    }
+
+    PopulationWriter populationWriter;
 	Network net;
 	String outdir;
 	private List<Id> persIds = new ArrayList<Id>();

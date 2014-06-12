@@ -19,10 +19,6 @@
 
 package playground.qiuhan.sa;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -34,13 +30,17 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Q. SUN
@@ -53,7 +53,7 @@ public class MatrixToPopulation {
 
 	private MatrixToPopulation(Scenario scenario) {
 		this.scenario = scenario;
-		pop = new PopulationImpl((ScenarioImpl) scenario);
+        pop = PopulationUtils.createPopulation(((ScenarioImpl) scenario).getConfig(), ((ScenarioImpl) scenario).getNetwork());
 	}
 
 	public MatrixToPopulation(Scenario scenario, Set<String> legModes) {

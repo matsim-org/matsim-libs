@@ -28,8 +28,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
@@ -58,7 +58,8 @@ public class PlanRestricter {
 		PlansFilterByLegMode plansFilter = new PlansFilterByLegMode( TransportMode.pt, PlansFilterByLegMode.FilterType.keepAllPlansWithMode) ;
 		plansFilter.run(population) ;
 
-		PopulationImpl newPopulation = new PopulationImpl(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
+        ScenarioImpl sc = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+        Population newPopulation = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		for (Person person : population.getPersons().values()){
 			String sId = person.getId().toString();
 

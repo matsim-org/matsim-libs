@@ -24,9 +24,9 @@
 package playground.johannes.socialnetworks.ivtsurveys;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
@@ -45,7 +45,7 @@ public class ShrinkPopulation {
 		loader.loadScenario();
 		ScenarioImpl data = loader.getScenario();
 //		loader.loadPopulation();
-		PopulationImpl population = data.getPopulation();
+		Population population = data.getPopulation();
 		double sample = Double.parseDouble(args[2]);
 		PopulationWriter writer = new PopulationWriter(population, data.getNetwork(), sample);
 		writer.writeFile(args[1]);

@@ -1,28 +1,32 @@
 package playground.mmoyo.algorithms;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-
 import playground.mmoyo.io.PopSecReader;
 import playground.mmoyo.utils.DataLoader;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Creates a population only with agent id's specified in a list. Uses sequence reader*/
 public class PopulationSecFilter extends AbstractPersonAlgorithm {
 	private List<Id> strIdList = new ArrayList<Id>();
-	private Population newPop = new PopulationImpl((ScenarioImpl) new DataLoader().createScenario()); 
-	
-	@Override
+	private Population newPop;
+
+    {
+        ScenarioImpl sc = (ScenarioImpl) new DataLoader().createScenario();
+        newPop = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
+    }
+
+    @Override
 	public void run(Person person) {
 		if (strIdList.contains(person.getId())){
 			newPop.addPerson(person);

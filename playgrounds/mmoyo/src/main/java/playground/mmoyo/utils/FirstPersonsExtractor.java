@@ -1,11 +1,5 @@
 package playground.mmoyo.utils;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -13,11 +7,16 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.mmoyo.Validators.PlanValidator;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 /**Gets a population object and returns a sample population with first agents.
  * The difference with FirstPersonExtractorFromFile is that this class receives a population object, not a population file to read.
@@ -28,7 +27,7 @@ public class FirstPersonsExtractor {
 
 	public Population run(final Population pop, int agentNum){
 		ScenarioImpl tempScenario =(ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationImpl outputPopulation = new PopulationImpl(tempScenario);
+        Population outputPopulation = PopulationUtils.createPopulation(tempScenario.getConfig(), tempScenario.getNetwork());
 		
 		if(selectBuslines){
 			String trLineId = "B-M44";

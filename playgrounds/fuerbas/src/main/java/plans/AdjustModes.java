@@ -20,21 +20,17 @@
 
 package plans;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.ArgumentParser;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class AdjustModes {
 	
@@ -72,7 +68,7 @@ public class AdjustModes {
 		Network network = sl.getScenario().getNetwork();
 		this.config = sl.getScenario().getConfig();
 
-		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();	
+		final Population plans = sl.getScenario().getPopulation();
 		
 		logger.info("Processing persons...");
 		Set<Person> toBeRemoved = new HashSet<Person>(); 

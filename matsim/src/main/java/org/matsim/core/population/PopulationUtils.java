@@ -20,36 +20,24 @@
 
 package org.matsim.core.population;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.population.routes.*;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.util.*;
 
 /**
  * @author nagel, ikaddoura
@@ -60,18 +48,32 @@ public final class PopulationUtils {
 	 */
 	private PopulationUtils() {}
 	
-	public static Population createPopulation( Config config ) {
-		return new PopulationImpl( config ) ; 
+	public static Population createPopulation(Config config) {
+		return createPopulation(config, null);
 	}
-	public static Population createPopulation( Config config, Network network ) {
-		// yy here, the "network" lookup could be pushed into the create method: createRoute(...,network) ;
-		return new PopulationImpl( config, network ) ;
+
+	public static Population createPopulation(Config config, Network network) {
+        ModeRouteFactory routeFactory = new ModeRouteFactory();
+        String networkRouteType = config.plans().getNetworkRouteType();
+        RouteFactory factory;
+        if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {
+            factory = new LinkNetworkRouteFactory();
+        } else if (PlansConfigGroup.NetworkRouteType.CompressedNetworkRoute.equals(networkRouteType) && network != null) {
+            factory = new CompressedNetworkRouteFactory(network);
+        } else {
+            throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
+        }
+        for (String transportMode : config.plansCalcRoute().getNetworkModes()) {
+            routeFactory.setRouteFactory(transportMode, factory);
+        }
+        return new PopulationImpl(new PopulationFactoryImpl(routeFactory));
 	}
 	
 	public static Leg unmodifiableLeg( Leg leg ) {
 		return new UnmodifiableLeg( leg ) ;
 	}
-	public static class UnmodifiableLeg implements Leg {
+
+	static class UnmodifiableLeg implements Leg {
 		private final Leg delegate ;
 		public UnmodifiableLeg( Leg leg ) {
 			this.delegate = leg ;
@@ -122,7 +124,8 @@ public final class PopulationUtils {
 	public static Activity unmodifiableActivity( Activity act ) {
 		return new UnmodifiableActivity( act ) ;
 	}
-	public static class UnmodifiableActivity implements Activity {
+
+	static class UnmodifiableActivity implements Activity {
 		private final Activity delegate ;
 		public UnmodifiableActivity( Activity act ) {
 			this.delegate = act ;
@@ -186,16 +189,13 @@ public final class PopulationUtils {
 
 	/**
 	 * The idea of this method is to mirror the concept of Collections.unmodifiableXxx( xxx ) .
-	 * At this point, the protection does not go to the end, i.e. PlanElements themselves can
-	 * still be modified.  kai, nov'10
 	 * <p/>
-	 * @author nagel
 	 */
 	public static Plan unmodifiablePlan(Plan plan) {
 		return new UnmodifiablePlan(plan);
 	}
 
-	public static class UnmodifiablePlan implements Plan {
+	static class UnmodifiablePlan implements Plan {
 		private final Plan delegate;
 		private final List<PlanElement> unmodifiablePlanElements;
 		
@@ -203,12 +203,13 @@ public final class PopulationUtils {
 			this.delegate = plan;
 			List<PlanElement> tmp = new ArrayList<PlanElement>() ;
 			for ( PlanElement pe : plan.getPlanElements() ) {
-				if ( pe instanceof Leg ) {
-					tmp.add( unmodifiableLeg( (Leg) pe ) ) ;
+				if (pe instanceof Activity) {
+                    tmp.add(unmodifiableActivity((Activity) pe));
+                } else if (pe instanceof Leg) {
+					tmp.add(unmodifiableLeg((Leg) pe));
 				}
 			}
-			
-			this.unmodifiablePlanElements = Collections.unmodifiableList(delegate.getPlanElements());
+			this.unmodifiablePlanElements = Collections.unmodifiableList(tmp);
 		}
 
 		@Override
@@ -259,7 +260,6 @@ public final class PopulationUtils {
 	}
 
 	/**
-	 * @param population
 	 * @return sorted map containing containing the persons as values and their ids as keys.
 	 */
 	public static SortedMap<Id, Person> getSortedPersons(final Population population) {
@@ -267,8 +267,7 @@ public final class PopulationUtils {
 	}
 	
 	/**
-	 * Sorts the person in the given population. 
-	 * @param population 
+	 * Sorts the persons in the given population.
 	 */
 	@SuppressWarnings("unchecked")
 	public static void sortPersons(final Population population) {
@@ -282,12 +281,7 @@ public final class PopulationUtils {
 	}
 
 	/**
-	 * Convenience method to compute (expected or planned) activity end time, depending on the different time interpretations.
-	 * <p/>
-	 * Design comments:<ul>
-	 * <li> The whole Config is part of the argument, since it may eventually make sense to move the config parameter from VspExperimental to
-	 * some more regular place.  kai, jan'13
-	 * </ul>
+	 * Computes the (expected or planned) activity end time, depending on the configured time interpretation.
 	 */
 	public static double getActivityEndTime( Activity act, double now, Config config ) {
 		switch ( config.plans().getActivityDurationInterpretation() ) {
@@ -309,10 +303,7 @@ public final class PopulationUtils {
 
 	/**
 	 * A pointer to material in TripStructureUtils
-	 * 
-	 * @param plan
-	 * @param stageActivities
-	 * @return
+	 *
 	 */
 	public static List<Activity> getActivities( Plan plan, StageActivityTypes stageActivities ) {
 		return TripStructureUtils.getActivities(plan, stageActivities ) ;
@@ -320,9 +311,7 @@ public final class PopulationUtils {
 
 	/**
 	 * A pointer to material in TripStructureUtils
-	 * 
-	 * @param plan
-	 * @return
+	 *
 	 */
 	public static List<Leg> getLegs( Plan plan ) {
 		return TripStructureUtils.getLegs( plan ) ;
@@ -333,13 +322,7 @@ public final class PopulationUtils {
 	 * <li>not normalized (for the time being?)
 	 * <li>does not look at times (for the time being?)
 	 * </ul>
-	 * 
-	 * @param legs1
-	 * @param legs2
-	 * @param network
-	 * @param sameModeReward
-	 * @param sameRouteReward
-	 * @return
+	 *
 	 */
 	public static double calculateSimilarity(List<Leg> legs1, List<Leg> legs2, Network network, 
 			double sameModeReward, double sameRouteReward ) {
@@ -363,7 +346,7 @@ public final class PopulationUtils {
 			} else {
 				continue ; // next leg
 			}
-			if ( route1 instanceof NetworkRoute ) {
+			if ( route2 instanceof NetworkRoute ) {
 				nr2 = (NetworkRoute) route2 ;
 			} else {
 				continue ; // next leg
@@ -377,12 +360,6 @@ public final class PopulationUtils {
 	 * Notes:<ul>
 	 * <li> not normalized (for the time being?)
 	 * </ul>
-	 * @param activities1
-	 * @param activities2
-	 * @param sameActivityTypePenalty
-	 * @param sameActivityLocationPenalty
-	 * @param actTimeParameter
-	 * @return
 	 */
 	public static double calculateSimilarity(List<Activity> activities1, List<Activity> activities2, double sameActivityTypePenalty, 
 			double sameActivityLocationPenalty, double actTimeParameter ) {

@@ -19,20 +19,19 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.johannes.coopsim.LoggerUtils;
 import playground.johannes.coopsim.pysical.Trajectory;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author illenberger
@@ -49,7 +48,8 @@ public class PlansWriterTask extends TrajectoryAnalyzerTask {
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
 		LoggerUtils.setVerbose(false);
-		Population population = new PopulationImpl((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+        ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        Population population = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		for(Trajectory t : trajectories) {
 			population.addPerson(t.getPerson());
 		}

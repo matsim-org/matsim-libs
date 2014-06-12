@@ -1,25 +1,16 @@
 package herbie.running.analysis;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.List;
-import java.util.TreeMap;
-
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.io.*;
+import java.util.List;
+import java.util.TreeMap;
 
 public class ReanalyseMZ2005Plans {
 
@@ -32,7 +23,7 @@ public class ReanalyseMZ2005Plans {
 		Config config = ConfigUtils.loadConfig(configFile);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
-		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();		
+		Population pop = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(config.plans().getInputFile());		
 
 		double[] distanceClasses = new double[]{

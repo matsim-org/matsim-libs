@@ -46,7 +46,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -87,7 +86,7 @@ public class TravelTimeHistogram {
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadScenario();
 		ScenarioImpl data = loader.getScenario();
-		PopulationImpl population = data.getPopulation();
+		Population population = data.getPopulation();
 		NetworkLayer network = (NetworkLayer) data.getNetwork();
 		/*
 		 * Make grid...

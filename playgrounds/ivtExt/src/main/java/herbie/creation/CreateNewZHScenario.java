@@ -19,21 +19,10 @@
 
 package herbie.creation;
 
-import java.io.File;
-import java.util.List;
-import java.util.Random;
-import java.util.TreeMap;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
@@ -41,12 +30,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.*;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -54,8 +38,13 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
-
 import utils.BuildTrees;
+
+import java.io.File;
+import java.util.List;
+import java.util.Random;
+import java.util.TreeMap;
+import java.util.Vector;
 
 public class CreateNewZHScenario {
 	private final static Logger log = Logger.getLogger(CreateNewZHScenario.class);
@@ -140,13 +129,13 @@ public class CreateNewZHScenario {
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(sTmp);
 		populationReader.readFile(plansFilePath);
 		
-		this.map2Network((PopulationImpl) sTmp.getPopulation());
+		this.map2Network(sTmp.getPopulation());
 		
 		if (type.equals("cross-border")) {
 			log.info(sTmp.getPopulation().getPersons().size() + " cross-border agents ##########################################");
 			this.convertFromV1toV2(sTmp);
 			this.completeBoderCrossingPlans(sTmp);
-			this.mapActivities2Facilities((PopulationImpl) sTmp.getPopulation());
+			this.mapActivities2Facilities(sTmp.getPopulation());
 			List<Id> persons2remove = this.dilutedZH(sTmp.getPopulation());
 			for (Id personId : persons2remove) {
 				sTmp.getPopulation().getPersons().remove(personId);
@@ -174,7 +163,7 @@ public class CreateNewZHScenario {
 	
 	//TODO: Is this really necessary? Or is this still done automatically?
 	// What happens if we have small differences in facilities->links mapping during simulation?
-	private void mapActivities2Facilities(PopulationImpl population) {
+	private void mapActivities2Facilities(Population population) {
 		log.info("\tMapping facilities .........................");
 		TreeMap<String, QuadTree<ActivityFacility>> trees = new TreeMap<String, QuadTree<ActivityFacility>>();
 		
@@ -206,7 +195,7 @@ public class CreateNewZHScenario {
 	}	
 	// mapping the activities to this.network
 	// the normal plans v2 are already mapped
-	private void map2Network(PopulationImpl population) {	
+	private void map2Network(Population population) {
 		XY2Links mapper = new XY2Links(this.scenario.getNetwork());
 		for (Person p : population.getPersons().values()){
 			mapper.run(p);

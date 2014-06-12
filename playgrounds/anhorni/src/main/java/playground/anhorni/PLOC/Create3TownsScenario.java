@@ -20,6 +20,7 @@
 package playground.anhorni.PLOC;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -27,10 +28,10 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import java.io.File;
 import java.util.Random;
@@ -40,8 +41,8 @@ public class Create3TownsScenario {
 	private final static Logger log = Logger.getLogger(Create3TownsScenario.class);
 	private NetworkImpl network = null;
 	private ScenarioImpl scenarioWriteOut = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	private PopulationImpl staticPopulation = new PopulationImpl(scenarioWriteOut);
-	private Random randomNumberGenerator;
+	private Population staticPopulation = PopulationUtils.createPopulation(scenarioWriteOut.getConfig(), scenarioWriteOut.getNetwork());
+    private Random randomNumberGenerator;
 	public static String outputFolder="src/main/java/playground/anhorni/input/PLOC/3towns/";
 	private static String path = "src/main/java/playground/anhorni/";
 	

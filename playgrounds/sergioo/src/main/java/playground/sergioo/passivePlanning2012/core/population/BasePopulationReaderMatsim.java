@@ -19,11 +19,6 @@
 
 package playground.sergioo.passivePlanning2012.core.population;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Stack;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -31,17 +26,18 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Stack;
 
 /**
  * A reader for plans files of MATSim according to <code>population_v5.dtd</code>.
@@ -125,7 +121,7 @@ public class BasePopulationReaderMatsim extends MatsimXmlParser implements Popul
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (PERSON.equals(name)) {
 			if (this.plans instanceof PopulationImpl) {
-				((PopulationImpl) this.plans).addPerson(this.currperson);
+				this.plans.addPerson(this.currperson);
 			} else {
 				this.plans.addPerson(this.currperson);
 			}

@@ -20,29 +20,23 @@
 
 package playground.mmoyo.utils.calibration;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
-
 import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.NonSelectedPlansRemover;
 import playground.mmoyo.utils.PlanFragmenter;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**Finds agents near a station who do not use that station. Optional by mode: pt, car or pt+car*/ 
 public class FindAgentRejectNearStop {
@@ -62,7 +56,7 @@ public class FindAgentRejectNearStop {
 
 		//Create a new population where persons will be stored 
 		ScenarioImpl tempScenario =(ScenarioImpl) new DataLoader().createScenario();
-		PopulationImpl outputPopulation = new PopulationImpl(tempScenario);
+        Population outputPopulation = PopulationUtils.createPopulation(tempScenario.getConfig(), tempScenario.getNetwork());
 		
 		//create set of nodes coordinates around the station
 		Collection <Node> nearNodes = ((NetworkImpl) scn.getNetwork()).getNearestNodes(stopCoord, this.distance);

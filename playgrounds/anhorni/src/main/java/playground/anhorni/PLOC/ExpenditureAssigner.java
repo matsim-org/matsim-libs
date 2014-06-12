@@ -19,13 +19,13 @@
 
 package playground.anhorni.PLOC;
 
-import java.util.Random;
-
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+
+import java.util.Random;
 
 
 public class ExpenditureAssigner {
@@ -44,7 +44,7 @@ public class ExpenditureAssigner {
 		this.randomNumberGenerator = randomNumberGenerator;	
 	}
 			
-	public void assignExpenditures(PopulationImpl population) {
+	public void assignExpenditures(Population population) {
 		for (Person p :population.getPersons().values()) {
 			this.assignExpenditureGaussian((PersonImpl)p);
 		}

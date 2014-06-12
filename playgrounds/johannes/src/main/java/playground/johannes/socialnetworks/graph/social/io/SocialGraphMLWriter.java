@@ -19,23 +19,21 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.social.io;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.spatial.io.SpatialGraphMLWriter;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * @author illenberger
@@ -102,7 +100,8 @@ public class SocialGraphMLWriter extends SpatialGraphMLWriter {
 	}
 
 	private void writePlansFile(SocialGraph graph, String filename) {
-		Population pop = new PopulationImpl((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+        ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        Population pop = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		for(SocialVertex vertex : graph.getVertices()) {
 			pop.addPerson(vertex.getPerson().getPerson());
 		}

@@ -20,9 +20,6 @@
 
 package org.matsim.withinday.replanning.identifiers.tools;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.basic.v01.IdImpl;
@@ -32,7 +29,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -47,6 +43,9 @@ import org.matsim.withinday.events.ReplanningEvent;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class ActivityReplanningMapTest extends MatsimTestCase {
 
@@ -88,10 +87,7 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		assertEquals(1, arp.getTimeBin(12.0));
 		assertEquals(2, arp.getTimeBin(12.1));
 	}
-	
-	/**
-	 * @author cdobler
-	 */
+
 	public void testScenarioRun() {
 
 		// load config and use ParallelQSim with 2 Threads
@@ -200,8 +196,7 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 								
 				// now reschedule the activity end time of an agent
 				MobsimAgent agent = this.agents.get(new IdImpl("40"));
-				PlanAgent planAgent = (PlanAgent) agent;
-				Activity currentActivity = (Activity) planAgent.getCurrentPlanElement();
+                Activity currentActivity = (Activity) WithinDayAgentUtils.getCurrentPlanElement(agent);
 				currentActivity.setEndTime(e.getSimulationTime() + 60);
 				WithinDayAgentUtils.resetCaches(agent);
 				this.withinDayEngine.getInternalInterface().rescheduleActivityEnd(agent);

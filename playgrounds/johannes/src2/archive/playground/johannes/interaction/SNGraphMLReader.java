@@ -38,7 +38,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.xml.sax.Attributes;
 
@@ -106,7 +105,7 @@ public class SNGraphMLReader extends AbstractGraphMLReader<SimSocialGraph, SimSo
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadPopulation();
 		ScenarioImpl scenario = loader.getScenario();
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 		SNGraphMLReader reader = new SNGraphMLReader(population);
 		SimSocialGraph g = reader.readGraph(socialnetFile);
 		

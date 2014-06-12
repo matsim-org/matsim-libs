@@ -27,10 +27,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PersonAlgorithm;
-
 import playground.mmoyo.io.PopSecReader;
 
 /**
@@ -39,9 +38,14 @@ import playground.mmoyo.io.PopSecReader;
  */
 public class Plan2Person implements PersonAlgorithm{ 
 	final String SEP = "_";
-	private Population newPopulation = new PopulationImpl((ScenarioImpl) new DataLoader().createScenario());
+	private Population newPopulation;
 
-	@Override
+    {
+        ScenarioImpl sc = (ScenarioImpl) new DataLoader().createScenario();
+        newPopulation = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
+    }
+
+    @Override
 	public void run(Person person) {
 		char suffix = 'a';
 		for (Plan plan: person.getPlans()){

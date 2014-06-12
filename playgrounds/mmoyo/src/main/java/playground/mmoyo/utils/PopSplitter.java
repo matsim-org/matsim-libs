@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -22,7 +22,7 @@ class PopSplitter {
 		
 		int i=1;
 		ScenarioImpl tempScenario =(ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationImpl newPopulation = new PopulationImpl(tempScenario);
+        Population newPopulation = PopulationUtils.createPopulation(tempScenario.getConfig(), tempScenario.getNetwork());
 		int size = inputPop.getPersons().size();
 		for (Person person : inputPop.getPersons().values()) {
 			log.info(procesing + i);
@@ -35,7 +35,7 @@ class PopSplitter {
 				log.info(writting + i);
 				
 				tempScenario =(ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-				newPopulation = new PopulationImpl(tempScenario);
+                newPopulation = PopulationUtils.createPopulation(tempScenario.getConfig(), tempScenario.getNetwork());
 			}
 			i++;
 		}

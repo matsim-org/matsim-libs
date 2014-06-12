@@ -19,11 +19,9 @@
 
 package playground.andreas.bvgAna;
 
-import java.util.TreeMap;
-import java.util.TreeSet;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -32,22 +30,12 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
-
-import playground.andreas.bvgAna.level1.AgentId2EnterLeaveVehicleEventHandler;
-import playground.andreas.bvgAna.level1.AgentId2PtTripTravelTimeMap;
-import playground.andreas.bvgAna.level1.PersonEnterLeaveVehicle2ActivityHandler;
-import playground.andreas.bvgAna.level1.StopId2LineId2Pulk;
-import playground.andreas.bvgAna.level1.StopId2PersonEnterLeaveVehicleHandler;
-import playground.andreas.bvgAna.level1.VehDelayAtStopHistogram;
-import playground.andreas.bvgAna.level1.VehId2DelayAtStopMap;
-import playground.andreas.bvgAna.level1.VehId2OccupancyHandler;
-import playground.andreas.bvgAna.level1.VehId2PersonEnterLeaveVehicleMap;
+import playground.andreas.bvgAna.level1.*;
 import playground.andreas.bvgAna.level2.StopId2DelayOfLine24hMap;
 import playground.andreas.bvgAna.level2.StopId2RemainSeatedDataMap;
 import playground.andreas.bvgAna.level2.VehId2AgentIds;
@@ -55,6 +43,9 @@ import playground.andreas.bvgAna.level2.VehId2LoadMap;
 import playground.andreas.bvgAna.level3.AgentId2StopDifferenceMap;
 import playground.andreas.bvgAna.level4.StopId2MissedVehMap;
 import playground.andreas.bvgAna.level4.StopId2MissedVehMapData;
+
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * Simple test class
@@ -91,7 +82,7 @@ public class TestMain {
 		((PopulationFactoryImpl) sc.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 
 		new MatsimNetworkReader(sc).readFile(netFile);
-		final PopulationImpl plans = (PopulationImpl) sc.getPopulation();
+		final Population plans = sc.getPopulation();
 		MatsimPopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(plansFile);
 

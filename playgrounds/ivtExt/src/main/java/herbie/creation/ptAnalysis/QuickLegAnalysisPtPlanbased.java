@@ -2,18 +2,10 @@
 package herbie.creation.ptAnalysis;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -21,7 +13,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -34,6 +25,10 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
 
 public class QuickLegAnalysisPtPlanbased {
 	
@@ -55,7 +50,7 @@ public class QuickLegAnalysisPtPlanbased {
 	private final static Logger log = Logger.getLogger(PtScenarioAdaption.class);
 	private final static String SEPARATOR = "===";
 	private ScenarioImpl scenario;
-	private PopulationImpl pop;
+	private Population pop;
 	private TransitScheduleFactory transitFactory = null;
 	private ArrayList<Double> headways = new ArrayList<Double>();
 	private String scenarioName;
@@ -114,7 +109,7 @@ public class QuickLegAnalysisPtPlanbased {
 		
 		new MatsimNetworkReader(scenario).readFile(NETWORKFILE);
 		
-		pop = (PopulationImpl) scenario.getPopulation();
+		pop = scenario.getPopulation();
 		
 		new MatsimPopulationReader(scenario).readFile(PLANSFILE);
 		

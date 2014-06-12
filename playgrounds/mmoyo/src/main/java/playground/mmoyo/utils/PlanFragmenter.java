@@ -1,27 +1,21 @@
 package playground.mmoyo.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt.PtConstants;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**reads a pt routed population and convert each pt-connection into a plan, each new plan has a index suffix*/
 public class PlanFragmenter {
@@ -31,7 +25,7 @@ public class PlanFragmenter {
 	
 	public Population run(Population population){
 		ScenarioImpl tempScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationImpl newPopulation = new PopulationImpl(tempScenario);
+        Population newPopulation = PopulationUtils.createPopulation(tempScenario.getConfig(), tempScenario.getNetwork());
 		
 		log.info("persons before fragmentation: " + population.getPersons().size());
 		
@@ -91,7 +85,8 @@ public class PlanFragmenter {
 	* converts all plans into new "persons", each with new suffix in Id 
 	*/
 	public Population plans2Persons (Population population){
-		PopulationImpl outputPopulation = new PopulationImpl((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+        ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        Population outputPopulation = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		final String SEP = "_plan";
 		for (Person person : population.getPersons().values() ){
 			int suffix = 1;

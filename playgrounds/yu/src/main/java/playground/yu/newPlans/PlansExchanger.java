@@ -23,9 +23,6 @@
  */
 package playground.yu.newPlans;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -34,9 +31,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author yu
@@ -104,7 +104,7 @@ public class PlansExchanger {
 			Population pop = sc.getPopulation();
 			new MatsimPopulationReader(sc).readFile(oldPopFilenames[i]);
 			oldPops.add(pop);
-			newPops.add(new PopulationImpl(sc));
+            newPops.add(PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork()));
 		}
 
 		for (Id personId : oldPops.get(0).getPersons().keySet()) {

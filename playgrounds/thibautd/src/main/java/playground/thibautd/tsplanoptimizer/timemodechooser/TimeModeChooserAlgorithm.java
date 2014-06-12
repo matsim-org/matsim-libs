@@ -19,28 +19,20 @@
  * *********************************************************************** */
 package playground.thibautd.tsplanoptimizer.timemodechooser;
 
-import static playground.thibautd.tsplanoptimizer.framework.TabuSearchRunner.runTabuSearch;
-
-import java.util.Arrays;
-import java.util.List;
-
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
-import playground.thibautd.tsplanoptimizer.framework.CompositeMoveGenerator;
-import playground.thibautd.tsplanoptimizer.framework.CompositeTabuChecker;
-import playground.thibautd.tsplanoptimizer.framework.EvolutionPlotter;
-import playground.thibautd.tsplanoptimizer.framework.FitnessFunction;
-import playground.thibautd.tsplanoptimizer.framework.ImprovementDelayMonitor;
-import playground.thibautd.tsplanoptimizer.framework.Solution;
-import playground.thibautd.tsplanoptimizer.framework.TabuSearchConfiguration;
+import playground.thibautd.tsplanoptimizer.framework.*;
 import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.EstimatorTripRouterFactory;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static playground.thibautd.tsplanoptimizer.framework.TabuSearchRunner.runTabuSearch;
 
 /**
  * @author thibautd
@@ -144,11 +136,11 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 			final Controler controler ) {
 		return new EstimatorTripRouterFactory(
 				plan,
-				((PopulationImpl) controler.getPopulation()).getFactory(),
+				controler.getPopulation().getFactory(),
 				controler.getNetwork(),
 				controler.getLinkTravelTimes(),
 				controler.getLeastCostPathCalculatorFactory(),
-				((PopulationFactoryImpl) ((PopulationImpl) controler.getPopulation()).getFactory()).getModeRouteFactory(),
+				((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory(),
 				controler.getConfig().scenario().isUseTransit() ?
 					controler.getScenario().getTransitSchedule() :
 					null,

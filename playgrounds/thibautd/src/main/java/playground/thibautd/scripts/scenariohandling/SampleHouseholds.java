@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.scripts.scenariohandling;
 
-import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -29,13 +27,15 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.households.Household;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.households.HouseholdsWriterV10;
+
+import java.util.Random;
 
 /**
  * @author thibautd
@@ -59,7 +59,8 @@ public class SampleHouseholds {
 		new MatsimPopulationReader( sc ).parse( inPopFile );
 
 		final HouseholdsImpl newHouseholds = new HouseholdsImpl();
-		final Population newPopulation = new PopulationImpl( (ScenarioImpl) ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
+        ScenarioImpl sc1 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        final Population newPopulation = PopulationUtils.createPopulation(sc1.getConfig(), sc1.getNetwork());
 
 		final Random random = new Random( 8904567 );
 		int countAcceptedHouseholds = 0;

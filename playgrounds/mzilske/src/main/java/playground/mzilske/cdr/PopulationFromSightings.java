@@ -10,7 +10,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.PlanRouter;
@@ -232,10 +232,10 @@ public class PopulationFromSightings {
 
         });
 
-        Population unfeasiblePeople = new PopulationImpl(scenario);
+        Population unfeasiblePeople = PopulationUtils.createPopulation(scenario.getConfig(), scenario.getNetwork());
 
         for (int i=0; i<0; i++) {
-            unfeasiblePeople = new PopulationImpl(scenario);
+            unfeasiblePeople = PopulationUtils.createPopulation(scenario.getConfig(), scenario.getNetwork());
             for (Person person : scenario.getPopulation().getPersons().values()) {
                 Plan plan = person.getSelectedPlan();
                 if (!isFeasible(plan)) {
@@ -288,7 +288,7 @@ public class PopulationFromSightings {
         }
 
         for (Person person : unfeasiblePeople.getPersons().values()) {
-            ((PopulationImpl) scenario.getPopulation()).getPersons().remove(person.getId());
+            scenario.getPopulation().getPersons().remove(person.getId());
         }
     }
 
