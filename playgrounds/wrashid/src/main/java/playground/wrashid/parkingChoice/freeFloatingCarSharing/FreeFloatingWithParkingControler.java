@@ -145,8 +145,10 @@ public class FreeFloatingWithParkingControler extends Controler{
  		    	
  		    }
  		    
- 		    ParkingModuleWithFreeFloatingCarSharing parkingModule = new ParkingModuleWithFFCarSharing(controler, freefloatingCars);
+ 		   ParkingModuleWithFFCarSharing parkingModule = new ParkingModuleWithFFCarSharing(controler, freefloatingCars);
  		    //ParkingModuleWithFreeFloatingCarSharing parkingModule = new ParkingModuleWithFFCarSharing();
+ 		    
+ 		   SetupParkingForZHScenario.prepare(parkingModule,config);
  		    
  		    controler.setMobsimFactory( new FreeFloatingQsimFactory(sc, controler, 
  		    		parkingModule,  freefloatingCars) );
