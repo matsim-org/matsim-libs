@@ -21,11 +21,19 @@ package org.matsim.contrib.parking.PC2.infrastructure;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.PC2.scoring.ParkingCostModel;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 
 public class PPRestrictedToFacilitiesAndActivities extends PublicParking implements PrivateParking {
 
+
+	public PPRestrictedToFacilitiesAndActivities(Id id, int capacity, Coord coord, ParkingCostModel parkingCostModel,
+			String groupName, LinkedListValueHashMap<Id, String> facilitiesActs) {
+		super(id, capacity, coord, parkingCostModel, groupName);
+		this.facilitiesActs=facilitiesActs;
+	}
 
 	private LinkedListValueHashMap<Id, String> facilitiesActs;
 

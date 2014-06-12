@@ -37,5 +37,4 @@ public interface Parking {
 	public double getCost(Id agentId, double arrivalTime, double parkingDurationInSecond);
 	
 	public Coord getCoordinate();
-
 }

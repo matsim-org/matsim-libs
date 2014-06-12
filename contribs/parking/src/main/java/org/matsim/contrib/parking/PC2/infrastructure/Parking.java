@@ -29,14 +29,16 @@ public interface Parking {
 
 	public int getAvailableParkingCapacity();
 
-	public void parkVehicle(Id agentId);
+	public void parkVehicle();
 
-	public void unparkVehicle(Id agentId);
+	public void unparkVehicle();
 	
 	public double getCost(Id agentId, double arrivalTime, double parkingDurationInSecond);
 	
 	public Coord getCoordinate();
 
-	public String getGroup();
+	public String getGroupName();
+	
+	public void resetAvailability();
 	
 }

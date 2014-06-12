@@ -33,6 +33,15 @@ public class PublicParking implements Parking {
 	private ParkingCostModel parkingCostModel=null;
 	private String groupName;
 	
+	public PublicParking(Id id, int capacity, Coord coord, ParkingCostModel parkingCostModel, String groupName){
+		this.id=id;
+		this.capacity=capacity;
+		resetAvailability();
+		this.coord=coord;
+		this.parkingCostModel=parkingCostModel;
+		this.groupName=groupName;
+	}
+	
 	public Id getId(){
 		return id;
 	}
@@ -57,24 +66,29 @@ public class PublicParking implements Parking {
 		return availableParking;
 	}
 	
-	public void parkVehicle(Id agentId){
+	public void parkVehicle(){
 		if (availableParking>0){
 			availableParking--;
 		} else {
-			DebugLib.stopSystemAndReportInconsistency("trying to park vehicle on full parking - parkingId:" + id + ";agentId:" + agentId);
+			DebugLib.stopSystemAndReportInconsistency("trying to park vehicle on full parking - parkingId:" + id + ";" );
 		}
 	}
 	
-	public void unparkVehicle(Id agentId){
+	public void unparkVehicle(){
 		if (availableParking<capacity){
 			availableParking++;
 		} else {
-			DebugLib.stopSystemAndReportInconsistency("trying to unpark vehicle from empty parking - parkingId:" + id + ";agentId:" + agentId);
+			DebugLib.stopSystemAndReportInconsistency("trying to unpark vehicle from empty parking - parkingId:" + id + "" );
 		}
 	}
 
 	@Override
-	public String getGroup() {
+	public String getGroupName() {
 		return groupName;
+	}
+
+	@Override
+	public void resetAvailability() {
+		this.availableParking=capacity;
 	}
 }

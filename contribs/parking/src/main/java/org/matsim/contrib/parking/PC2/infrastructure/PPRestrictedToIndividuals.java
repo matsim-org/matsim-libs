@@ -22,8 +22,14 @@ import java.util.HashSet;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.PC2.scoring.ParkingCostModel;
 
 public class PPRestrictedToIndividuals extends PublicParking implements PrivateParking {
+
+	public PPRestrictedToIndividuals(Id id, int capacity, Coord coord, ParkingCostModel parkingCostModel, String groupName, HashSet<Id> personIds) {
+		super(id, capacity, coord, parkingCostModel, groupName);
+		this.personIds=personIds;
+	}
 
 	private HashSet<Id> personIds;
 
