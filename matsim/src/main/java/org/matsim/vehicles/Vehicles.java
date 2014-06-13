@@ -46,6 +46,8 @@ public interface Vehicles extends MatsimToplevelContainer {
 
 	public void addVehicleType(final VehicleType type);
 
+	public void removeVehicleType(final Id vehicleTypeId);
+
 	public ObjectAttributes getVehicleAttributes();
 
 }

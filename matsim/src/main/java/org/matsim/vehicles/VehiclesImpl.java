@@ -79,8 +79,8 @@ class VehiclesImpl implements Vehicles {
 		if(this.getVehicles().containsKey(v.getId())){
 			throw new IllegalArgumentException("Vehicle with id = " + v.getId() + " already exists.");
 		}
-		
-		/* Check if the VehicleType associated with the vehicle already exist. 
+
+		/* Check if the VehicleType associated with the vehicle already exist.
 		 * Here only an error message is given. A RuntimeException is thrown
 		 * when the VehicleWriterV1 is called (JWJ, '14). */
 		if(!this.vehicleTypes.containsKey(v.getType().getId())){
@@ -121,6 +121,10 @@ class VehiclesImpl implements Vehicles {
 		this.vehicleTypes.put(type.getId(), type);
 	}
 
+	@Override
+	public void removeVehicleType(Id vehicleTypeId) {
+		this.vehicleTypes.remove(vehicleTypeId);
+	}
 
 	@Override
 	public ObjectAttributes getVehicleAttributes() {
