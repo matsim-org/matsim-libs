@@ -31,7 +31,6 @@ abstract class UtilityChanges {
 	Map<Mode, Map<Attribute,Double>> induziertRV = new HashMap<MultiDimensionalArray.Mode, Map<Attribute,Double>>();
 	Map<Mode, Double> induziertImp = new HashMap<MultiDimensionalArray.Mode, Double>();
 	
-	
 	UtilityChanges() {
 		System.out.println("Setting utility computation method to " + this.getClass() ) ;
 	}
@@ -50,7 +49,7 @@ abstract class UtilityChanges {
 		computeAndPrintResults(economicValues,nullfall,planfall,html, totalHtml) ;
 	}
 	
-	final void computeAndPrintResults( Values economicValues, ScenarioForEvalData nullfall, ScenarioForEvalData planfall, String outFileName ) {
+	final double computeAndPrintResults( Values economicValues, ScenarioForEvalData nullfall, ScenarioForEvalData planfall, String outFileName ) {
 		Html html = new Html(outFileName) ;
 		html.beginHtml() ;
 		html.beginBody() ;
@@ -59,10 +58,10 @@ abstract class UtilityChanges {
 		totalHtml.beginHtml() ;
 		totalHtml.beginBody() ;
 		totalHtml.beginTable() ;
-		computeAndPrintResults(economicValues,nullfall,planfall,html, totalHtml) ;
+		return computeAndPrintResults(economicValues,nullfall,planfall,html, totalHtml) ;
 	}
 
-	final void computeAndPrintResults( Values economicValues, ScenarioForEvalData nullfall, ScenarioForEvalData planfall, Html html, Html totalHtml ) {
+	final double computeAndPrintResults( Values economicValues, ScenarioForEvalData nullfall, ScenarioForEvalData planfall, Html html, Html totalHtml ) {
 		// (GK-GK') * x + 0.5 * (GK-GK') (x'-x) =
 		// 0.5 * (GK-GK') (x+x') = 0.5 * ( GK*x + GK*x' - GK'*x - GK'*x' )
 		double utils = 0. ;
@@ -240,10 +239,12 @@ abstract class UtilityChanges {
 		Utils.writeRoh(html, utilsUserFromRoHOldUsers, utilsUserFromRoHNewUsers, operatorProfit);
 		Utils.endOutput(html);
 		
-		Utils.writeOverallOutputTable(totalHtml, verbleibendRV, verlagertRVAuf, verlagertRVAb, verlagertImpAuf, verlagertImpAb, induziertRV, induziertImp);
+		double sum = Utils.writeOverallOutputTable(totalHtml, verbleibendRV, verlagertRVAuf, verlagertRVAb, verlagertImpAuf, verlagertImpAb, induziertRV, induziertImp);
+		double diff = sum - (utilsUserFromRoHOldUsers + utilsUserFromRoHNewUsers + operatorProfit);
 		Utils.writeOperatorProfit(operatorProfits, totalHtml);
 		Utils.writeRoh(totalHtml, utilsUserFromRoHOldUsers, utilsUserFromRoHNewUsers, operatorProfit);
 		Utils.endOutput(totalHtml);
+		return diff;
 	}
 
 	private static double computeUserBenefitsOldUsers(Attributes econValues, Attributes attributesNullfall, Attributes attributesPlanfall,

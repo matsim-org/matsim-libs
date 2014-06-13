@@ -34,14 +34,17 @@ class Html {
 		endParagraph();
 	}
 	
+	private String fn;
 	final Writer out ;
 	
 	Html( String str ) {
 		out = IOUtils.getBufferedWriter( str+".htm" ) ;
+		this.fn = str;
 	}
 
 	Html() {
-		out = IOUtils.getBufferedWriter("out.htm") ;
+	    this.fn = "out.htm";
+		out = IOUtils.getBufferedWriter(fn) ;
 	}
 
 	void write(String str) {
@@ -132,7 +135,12 @@ class Html {
 	
 	
 
-	void beginBody() {
+	public String getFn()
+    {
+        return fn;
+    }
+
+    void beginBody() {
 		myWrite("<body>\n") ;
 	}
 	void endBody() {

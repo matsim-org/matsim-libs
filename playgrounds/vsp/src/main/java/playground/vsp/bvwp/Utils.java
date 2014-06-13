@@ -342,7 +342,7 @@ class Utils {
 
 		}
 
-		 static void writeOverallOutputTable(Html totalHtml,
+		static double  writeOverallOutputTable(Html totalHtml,
 				Map<Mode, Map<Attribute, Double>> verbleibendRV,
 				Map<Mode, Map<Attribute, Double>> verlagertRVAuf,
 				Map<Mode, Map<Attribute, Double>> verlagertRVAb,
@@ -561,7 +561,7 @@ class Utils {
 				
 				
 				
-			
+			return(totalSum);
 					
 				}
 		 
