@@ -34,12 +34,15 @@ public class ProxyPerson {
 	
 	private Map<String, Object> attributes;
 	
+	private Map<Object, Object> userData;
+	
 	private ProxyPlan plan;
 	
 	public ProxyPerson(String id) {
 		this.id = id;
 		
 		attributes = new HashMap<String, Object>();
+		userData = new HashMap<Object, Object>();
 	}
 	
 	public String getId() {
@@ -64,6 +67,14 @@ public class ProxyPerson {
 	
 	public ProxyPlan getPlan() {
 		return plan;
+	}
+	
+	public Object getUserData(Object key) {
+		return userData.get(key);
+	}
+	
+	public void setUserData(Object key, Object value) {
+		userData.put(key, value);
 	}
 	
 	public ProxyPerson clone() {

@@ -51,8 +51,8 @@ public class XMLParser extends MatsimXmlParser {
 		return persons;
 	}
 	
-	public void addSerializer(AttributeSerializer serializer) {
-		serializers.put(serializer.getKey(), serializer);
+	public void addSerializer(String key, AttributeSerializer serializer) {
+		serializers.put(key, serializer);
 	}
 	
 	/* (non-Javadoc)

@@ -17,40 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.synPop.sim;
+
+import playground.johannes.gsv.synPop.ProxyPerson;
 
 /**
  * @author johannes
  *
  */
-public interface MIDKeys {
+public interface Initializer {
 
-	public static final String HOUSEHOLD_ID = "hhid";
-	
-	public static final String PERSON_ID = "pid";
-	
-	public static final String PERSON_MUNICIPALITY = "polgk";
-	
-	public static final String LEG_START_TIME_HOUR = "st_std";
-	
-	public static final String LEG_START_TIME_MIN = "st_min";
-	
-	public static final String LEG_END_TIME_HOUR = "en_std";
-	
-	public static final String LEG_END_TIME_MIN = "en_min";
-	
-	public static final String LEG_MAIN_TYPE = "w04";
-	
-	public static final String LEG_ORIGIN = "w01";
-	
-	public static final String LEG_DESTINATION = "w13";
-	
-	public static final String LEG_DISTANCE = "wegkm_k";
-	
-	
-//	public static final String PERSON_MUNICIPALITY_LOWER = "inhabLow";
-	
-//	public static final String PERSON_MUNICIPALITY_UPPER = "inhabUp";
-	
-	public static final String PERSON_MUNICIPALITY_CLASS = "inhabClass";
+	public void init(ProxyPerson person);
 }

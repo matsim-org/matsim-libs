@@ -42,8 +42,8 @@ public class XMLWriter extends MatsimXmlWriter {
 
 	private Map<String, AttributeSerializer> serializers = new HashMap<String, AttributeSerializer>();
 
-	public void addSerializer(AttributeSerializer serializer) {
-		serializers.put(serializer.getKey(), serializer);
+	public void addSerializer(String key, AttributeSerializer serializer) {
+		serializers.put(key, serializer);
 	}
 	
 	public void write(String file, Collection<ProxyPerson> persons) {

@@ -23,6 +23,7 @@ import java.util.Collection;
 
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.mid.hamiltonian.PopulationDensity;
 import playground.johannes.gsv.synPop.sim.Hamiltonian;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
@@ -54,30 +55,47 @@ public class HPersonMunicipality implements Hamiltonian {
 	}
 	
 	private double eval(ProxyPerson person) {
-		Double x = (Double) person.getAttribute(CommonKeys.PERSON_HOME_COORD_X);
-		Double y = (Double) person.getAttribute(CommonKeys.PERSON_HOME_COORD_Y);
+//		Double x = (Double) person.getAttribute(CommonKeys.PERSON_HOME_COORD_X);
+//		Double y = (Double) person.getAttribute(CommonKeys.PERSON_HOME_COORD_Y);
 	
-		Point p = geoFactory.createPoint(new Coordinate(x, y));
-		Zone<Double> zone = municipalities.getZone(p);
+//		Point p = geoFactory.createPoint(new Coordinate(x, y));
+//		Point p = (Point) person.getAttribute(CommonKeys.PERSON_HOME_POINT);
+//		Zone<Double> zone = municipalities.getZone(p);
+		Zone<Double> zone = (Zone<Double>) person.getUserData(this);
+		if(zone == null) {
+			Point p = (Point) person.getAttribute(CommonKeys.PERSON_HOME_POINT);
+			zone = municipalities.getZone(p);
+			person.setUserData(this, zone);
+		}
 		
 		if(zone == null)
 //			throw new RuntimeException();
-//			return Double.NEGATIVE_INFINITY;
-			return -1000000;
+			return Double.NEGATIVE_INFINITY;
+//			return 0;
 		
 		double inhabs = zone.getAttribute();
 		
-		int lower = (Integer) person.getAttribute(MIDKeys.PERSON_MUNICIPALITY_LOWER);
-		int upper = (Integer) person.getAttribute(MIDKeys.PERSON_MUNICIPALITY_UPPER);
+		int target = (Integer) person.getAttribute(MIDKeys.PERSON_MUNICIPALITY_CLASS);
+		int cat = PersonMunicipalityClassHandler.getCategorie((int) inhabs);
+//		int lower = (Integer) person.getAttribute(MIDKeys.PERSON_MUNICIPALITY_LOWER);
+//		int upper = (Integer) person.getAttribute(MIDKeys.PERSON_MUNICIPALITY_UPPER);
+//		int lower = PersonMunicipalityClassHandler.getLowerBound(cat);
+//		int upper = PersonMunicipalityClassHandler.getUpperBound(cat);
 		
-		if(inhabs >= lower && inhabs < upper) {
+//		if(inhabs >= lower && inhabs < upper) {
+//		return  Math.abs(target - cat);
+		if(target == cat)
 			return 0;
-		} else {
+		else
+			return -1;
+//		if()
+//			return 0;
+//		} else {
 //			double dlow = Math.abs(inhabs - lower);
 //			double dup = Math.abs(inhabs - upper);
 //			return - Math.min(dlow, dup);
-			return -1;
-		}
+////			return -1;
+//		}
 	}
 
 	/* (non-Javadoc)

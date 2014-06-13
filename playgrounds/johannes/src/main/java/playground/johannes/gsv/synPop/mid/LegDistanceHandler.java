@@ -49,11 +49,6 @@ public class LegDistanceHandler implements LegAttributeHandler, AttributeSeriali
 	}
 
 	@Override
-	public String getKey() {
-		return MIDKeys.LEG_DISTANCE;
-	}
-
-	@Override
 	public String encode(Object value) {
 		return String.valueOf((Double)value);
 	}

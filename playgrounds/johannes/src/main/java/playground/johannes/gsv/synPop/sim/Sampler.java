@@ -19,6 +19,8 @@
 
 package playground.johannes.gsv.synPop.sim;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -34,31 +36,60 @@ public class Sampler {
 	
 	private static final Logger logger = Logger.getLogger(Sampler.class);
 
-	private List<Mutator> mutators;
+	private final List<Mutator> mutators;
 	
-	private Random random;
+	private final List<SamplerListener> listerners;
 	
-	private List<ProxyPerson> persons;
+	private final Random random;
+	
+	private List<ProxyPerson> population;
 	
 	private Hamiltonian hamiltonian;
 	
-	public void run(long burnin, List<ProxyPerson> persons, Hamiltonian hamiltonian, List<Mutator> mutators, Random random) {
-		this.persons = persons;
-		this.hamiltonian = hamiltonian;
-		this.mutators = mutators;
+	private int logInterval = 10000;
+	
+	public Sampler(Random random) {
 		this.random = random;
+		this.mutators = new ArrayList<Mutator>();
+		this.listerners = new ArrayList<SamplerListener>();
+	}
+	
+	public void setHamiltonian(Hamiltonian hamiltonian) {
+		this.hamiltonian = hamiltonian;
+	}
+	
+	public void addMutator(Mutator mutator) {
+		mutators.add(mutator);
+	}
+	
+	public void addListenter(SamplerListener listener) {
+		listerners.add(listener);
+	}
+	
+	public void setLogInterval(int logInterval) {
+		this.logInterval = logInterval;
+	}
+	
+	public Collection<ProxyPerson> getPopulation() {
+		return population;
+	}
+	
+	public void run(Collection<ProxyPerson> population, long burnin) {
+		this.population = new ArrayList<ProxyPerson>(population);
 		
 		int accepts = 0;
-		int loginterval = 1000;
+		
 		long time = System.currentTimeMillis();
 		for(long i = 0; i < burnin; i++) {
 			if(step())
 				accepts++;
 			
-			if(i % loginterval == 0) {
-				double h = hamiltonian.evaluate(persons);
+			
+			
+			if(i % logInterval == 0) {
+				double h = hamiltonian.evaluate(this.population);
 				long t = System.currentTimeMillis() - time;
-				logger.info(String.format("[%s] Accepted %s of %s steps. Hamiltonian: %s, time; %s", i, accepts, loginterval, h, t));
+				logger.info(String.format("[%s] Accepted %s of %s steps. Hamiltonian: %s, time; %s", i, accepts, logInterval, h, t));
 				accepts = 0;
 				time = System.currentTimeMillis();
 			}
@@ -69,26 +100,36 @@ public class Sampler {
 		/*
 		 * create new mutated person
 		 */
-		int idx = random.nextInt(persons.size());
-		ProxyPerson template = persons.get(idx);
+		int idx = random.nextInt(population.size());
+		ProxyPerson template = population.get(idx);
 		ProxyPerson mutation = template.clone();
 		/*
 		 * select mutator
 		 */
+		boolean result;
 		Mutator mutator = mutators.get(random.nextInt(mutators.size()));
-		mutator.mutate(template, mutation);
-		/*
-		 * evaluate
-		 */
-		double H = hamiltonian.evaluate(template, mutation);
-		
-		double p = 1 / (1 + Math.exp(-H));
-		
-		if(p >= random.nextDouble()) {
-			persons.set(idx, mutation);
-			return true;
+		if (mutator.mutate(template, mutation)) {
+			/*
+			 * evaluate
+			 */
+			double H = hamiltonian.evaluate(template, mutation);
+
+			double p = 1 / (1 + Math.exp(-H));
+
+			if (p >= random.nextDouble()) {
+				population.set(idx, mutation);
+				
+				result = true;
+			} else {
+				result = false;
+			}
 		} else {
-			return false;
+			result = false;
 		}
+		
+		for(SamplerListener listener : listerners)
+			listener.afterStep(template, mutation, result);
+		
+		return result;
 	}
 }

@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
  * @author johannes
  *
  */
-public class MutateHomeLocation implements Mutator {
+public class MutateHomeLocation implements Mutator, Initializer {
 
 	private PreparedGeometry bounds;
 	
@@ -67,19 +67,26 @@ public class MutateHomeLocation implements Mutator {
 		double x = 0;
 		double y = 0;
 		
+		Point p = null;
 		while(!hit) {
 			x = env.getMinX() + random.nextDouble() * deltaX;
 			y = env.getMinY() + random.nextDouble() * deltaY;
 			
-			Point p = factory.createPoint(new Coordinate(x, y));
+			p = factory.createPoint(new Coordinate(x, y));
 			hit = bounds.contains(p);
 		}
 		
 		modified.setAttribute(CommonKeys.PERSON_HOME_COORD_X, x);
 		modified.setAttribute(CommonKeys.PERSON_HOME_COORD_Y, y);
+		modified.setAttribute(CommonKeys.PERSON_HOME_POINT, p); //TODO: move?
 		
 		return true;
 
+	}
+
+	@Override
+	public void init(ProxyPerson person) {
+		mutate(null, person);		
 	}
 
 }

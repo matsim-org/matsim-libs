@@ -29,6 +29,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.index.SpatialIndex;
@@ -68,6 +69,7 @@ public class ZoneLayer<T> {
 		
 		this.zones = Collections.unmodifiableSet(zones);
 		quadtree = new Quadtree();
+//		quadtree = new STRtree();
 		for(Zone<T> zone : zones) {
 			quadtree.insert(zone.getGeometry().getEnvelopeInternal(), zone);
 		}
@@ -97,12 +99,19 @@ public class ZoneLayer<T> {
 		if(point.getSRID() != srid)
 			point = transformPoint(point);
 		
-		List<Zone<T>> result = quadtree.query(point.getEnvelopeInternal());
+		Envelope env = point.getEnvelopeInternal();
+		List<Zone<T>> result = quadtree.query(env);
 		List<Zone<T>> zones = new ArrayList<Zone<T>>(result.size());
 		for(Zone<T> z : result) {
-			if(z.getPreparedGeometry().contains(point))
-				zones.add(z);
+			if(z.getGeometry().getEnvelopeInternal().contains(point.getCoordinate())) {
+				if(z.getPreparedGeometry().contains(point)) {
+					zones.add(z);
+					break; // assumes that zones do not overlap!
+				}
+			}
+			
 		}
+		
 		return zones;
 	}
 	

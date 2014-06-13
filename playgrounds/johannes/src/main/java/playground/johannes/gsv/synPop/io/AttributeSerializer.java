@@ -25,8 +25,6 @@ package playground.johannes.gsv.synPop.io;
  */
 public interface AttributeSerializer {
 
-	public String getKey();
-	
 	public String encode(Object value);
 	
 	public Object decode(String value);

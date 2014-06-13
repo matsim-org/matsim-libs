@@ -17,40 +17,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.synPop.io;
 
 /**
  * @author johannes
  *
  */
-public interface MIDKeys {
+public class IntegerSerializer implements AttributeSerializer {
 
-	public static final String HOUSEHOLD_ID = "hhid";
+	private static IntegerSerializer instance;
 	
-	public static final String PERSON_ID = "pid";
+	public static IntegerSerializer instance() {
+		if(instance == null)
+			instance = new IntegerSerializer();
+		return instance;
+	}
 	
-	public static final String PERSON_MUNICIPALITY = "polgk";
-	
-	public static final String LEG_START_TIME_HOUR = "st_std";
-	
-	public static final String LEG_START_TIME_MIN = "st_min";
-	
-	public static final String LEG_END_TIME_HOUR = "en_std";
-	
-	public static final String LEG_END_TIME_MIN = "en_min";
-	
-	public static final String LEG_MAIN_TYPE = "w04";
-	
-	public static final String LEG_ORIGIN = "w01";
-	
-	public static final String LEG_DESTINATION = "w13";
-	
-	public static final String LEG_DISTANCE = "wegkm_k";
-	
-	
-//	public static final String PERSON_MUNICIPALITY_LOWER = "inhabLow";
-	
-//	public static final String PERSON_MUNICIPALITY_UPPER = "inhabUp";
-	
-	public static final String PERSON_MUNICIPALITY_CLASS = "inhabClass";
+	@Override
+	public String encode(Object value) {
+		return String.valueOf(value);
+	}
+
+	@Override
+	public Object decode(String value) {
+		return Integer.parseInt(value);
+	}
+
 }

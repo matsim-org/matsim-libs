@@ -23,6 +23,7 @@ import java.util.Set;
 
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.mid.LegDistanceHandler;
+import playground.johannes.gsv.synPop.mid.MIDKeys;
 
 /**
  * @author johannes
@@ -36,13 +37,13 @@ public class ParserTest {
 	public static void main(String[] args) {
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
-		parser.addSerializer(new LegDistanceHandler());
+		parser.addSerializer(MIDKeys.LEG_DISTANCE, new LegDistanceHandler());
 		parser.parse("/home/johannes/gsv/mid2008/pop.xml");
 		
 		Set<ProxyPerson> persons = parser.getPersons();
 		
 		XMLWriter writer = new XMLWriter();
-		writer.addSerializer(new LegDistanceHandler());
+		writer.addSerializer(MIDKeys.LEG_DISTANCE, new LegDistanceHandler());
 		writer.write("/home/johannes/gsv/mid2008/pop2.xml", persons);
 
 	}

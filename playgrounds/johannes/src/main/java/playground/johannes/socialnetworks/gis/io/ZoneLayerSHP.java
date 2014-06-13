@@ -131,7 +131,8 @@ public class ZoneLayerSHP {
 	public static ZoneLayer<Double> read(String filename, String key) throws IOException {
 		Set<Zone<Double>> zones = new HashSet<Zone<Double>>();
 		for(SimpleFeature feature : FeatureSHP.readFeatures(filename)) {
-			Zone<Double> zone = new Zone<Double>(((Geometry) feature.getDefaultGeometry()).getGeometryN(0));
+			Zone<Double> zone = new Zone<Double>((Geometry) feature.getDefaultGeometry());
+			
 			double val = (Long)feature.getAttribute(key); //FIXME
 			zone.setAttribute(val);
 			zones.add(zone);
