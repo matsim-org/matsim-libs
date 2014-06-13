@@ -123,6 +123,11 @@ class VehiclesImpl implements Vehicles {
 
 	@Override
 	public void removeVehicleType(Id vehicleTypeId) {
+		for (Vehicle veh : this.vehicles.values()) {
+			if (veh.getType().getId().equals(vehicleTypeId)) {
+				throw new IllegalArgumentException("Cannot remove vehicle type as it is used by at least one vehicle.");
+			}
+		}
 		this.vehicleTypes.remove(vehicleTypeId);
 	}
 

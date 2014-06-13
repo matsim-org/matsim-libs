@@ -24,7 +24,7 @@ import org.junit.Test;
 import org.matsim.core.basic.v01.IdImpl;
 
 /**
- * 
+ *
  * @author dgrether
  * @author jwjoubert
  */
@@ -33,7 +33,7 @@ public class VehiclesImplTest {
 	@Test
 	public void testAddVehicle() {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-		
+
 		VehicleType testType = vehicles.getFactory().createVehicleType(new IdImpl("test"));
 		Vehicle v1 = vehicles.getFactory().createVehicle(new IdImpl("v1"), testType);
 
@@ -44,10 +44,10 @@ public class VehiclesImplTest {
 		} catch(IllegalArgumentException e){
 			/* Pass. */
 		}
-		
+
 		vehicles.addVehicleType(testType);
 		vehicles.addVehicle(v1);
-		
+
 		Vehicle v2 = vehicles.getFactory().createVehicle(new IdImpl("v1"), testType);
 		try{
 			vehicles.addVehicle(v2);
@@ -57,7 +57,7 @@ public class VehiclesImplTest {
 		}
 	}
 
-	
+
 	@Test
 	public void testGetVehicles(){
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
@@ -76,7 +76,7 @@ public class VehiclesImplTest {
 		}
 	}
 
-	
+
 	@Test
 	public void testGetVehicleTypes(){
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
@@ -120,6 +120,28 @@ public class VehiclesImplTest {
 		Assert.assertEquals(1, vehicles.getVehicles().size());
 		vehicles.removeVehicle(new IdImpl("v1"));
 		Assert.assertEquals(0, vehicles.getVehicles().size());
+	}
+
+	@Test
+	public void testRemoveVehicleType() {
+		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
+		VehicleType t1 = vehicles.getFactory().createVehicleType(new IdImpl("type1"));
+		vehicles.addVehicleType(t1);
+		Vehicle v1 = vehicles.getFactory().createVehicle(new IdImpl("v1"), t1);
+		vehicles.addVehicle(v1);
+
+		try {
+			vehicles.removeVehicleType(t1.getId());
+			Assert.fail("expected exception, as vehicle type is still in use.");
+		} catch (IllegalArgumentException e) {
+			// pass
+		}
+
+		vehicles.removeVehicle(v1.getId());
+		vehicles.removeVehicleType(t1.getId());
+
+		// also test for non-existant vehicle types
+		vehicles.removeVehicleType(new IdImpl("type2"));
 	}
 
 }
