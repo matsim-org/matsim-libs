@@ -43,7 +43,11 @@ public class RandomPlanSelector<T extends BasicPlan> implements GenericPlanSelec
 		if (person.getPlans().size() == 0) {
 			return null;
 		}
+		
 		int index = (int)(MatsimRandom.getRandom().nextDouble()*person.getPlans().size());
+		// yyyy As far as I can tell, this produces race conditions when running multi-threaded.  I.e. when running the same
+		// setup twice, this function may return different results per thread or per person.  kai, jun'14
+		
 		return person.getPlans().get(index);
 	}
 }
