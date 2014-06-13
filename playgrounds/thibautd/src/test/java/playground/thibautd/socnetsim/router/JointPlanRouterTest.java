@@ -19,29 +19,37 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.router;
 
-import org.junit.Test;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.EmptyStageActivityTypes;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.scenario.ScenarioUtils;
-import playground.thibautd.socnetsim.population.DriverRoute;
-import playground.thibautd.socnetsim.population.JointActingTypes;
-import playground.thibautd.socnetsim.population.PassengerRoute;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.thibautd.socnetsim.population.DriverRoute;
+import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.population.PassengerRoute;
 
 /**
  * @author thibautd
@@ -50,8 +58,8 @@ public class JointPlanRouterTest {
 	@Test
 	public void testDriverIdIsKept() throws Exception {
         final PopulationFactory populationFactory =
-                (PopulationFactoryImpl) ScenarioUtils.createScenario(
-                        ConfigUtils.createConfig()).getPopulation().getFactory();
+                ScenarioUtils.createScenario(
+		        ConfigUtils.createConfig()).getPopulation().getFactory();
 
 		final JointPlanRouter testee =
 			new JointPlanRouter(
@@ -101,8 +109,8 @@ public class JointPlanRouterTest {
 	@Test
 	public void testPassengerIdIsKept() throws Exception {
         final PopulationFactory populationFactory =
-                (PopulationFactoryImpl) ScenarioUtils.createScenario(
-                        ConfigUtils.createConfig()).getPopulation().getFactory();
+                ScenarioUtils.createScenario(
+		        ConfigUtils.createConfig()).getPopulation().getFactory();
 
 		final JointPlanRouter testee =
 			new JointPlanRouter(
