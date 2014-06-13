@@ -19,14 +19,21 @@
  * *********************************************************************** */
 package playground.dgrether;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
@@ -43,7 +50,28 @@ public class DgController {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Controler c = new Controler(args[0]);
+		
+		Config config = ConfigUtils.loadConfig( args[0]) ;
+		
+		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+		PopulationFactory pf = scenario.getPopulation().getFactory() ;
+		
+		Population pop2 = ScenarioUtils.createScenario(config).getPopulation() ; // dummy population, see next ;
+		
+		for ( Person person : scenario.getPopulation().getPersons().values() ) {
+			for ( int ii=0 ; ii<9 ; ii++ ) {
+				Person newPerson = pf.createPerson( new IdImpl( person.getId() + "_" + ii ) ) ;
+				
+				// deepcopy of person into newPerson
+				
+				// Can't we implement Person newPerson = PopulationUtils.deepCopy( person ) ???
+				// (there may be a problem with the routes)
+				
+				pop2.addPerson(newPerson);
+			}
+		}
+		
+		Controler c = new Controler( scenario );
 		c.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		DgSylviaConfig sylviaConfig = new DgSylviaConfig();
 		final DgSylviaControlerListenerFactory signalsFactory = new DgSylviaControlerListenerFactory(sylviaConfig);
