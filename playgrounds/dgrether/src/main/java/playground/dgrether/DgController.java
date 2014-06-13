@@ -19,7 +19,14 @@
  * *********************************************************************** */
 package playground.dgrether;
 
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.replanning.GenericPlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
@@ -43,6 +50,28 @@ public class DgController {
 		signalsFactory.setAlwaysSameMobsimSeed(false);
 		c.setSignalsControllerListenerFactory(signalsFactory);
 		c.setOverwriteFiles(true);
+		
+		if ( false ) {
+			IterationStartsListener strategyWeightsManager = new IterationStartsListener() {
+				@Override
+				public void notifyIterationStarts(IterationStartsEvent event) {
+
+					GenericPlanStrategy<Plan> strategy 
+					= new PlanStrategyImpl(new ExpBetaPlanChanger(Double.NaN) );
+					// (dummy strategy, just to get the type.  Not so great.  Not even sure if it will work. Ask MZ. Kai)
+
+					String subpopulation= null ;
+					// (I think this is just null. Kai)
+
+					double newWeight = 1./event.getIteration() ;
+					// (program function as you want/need)
+
+					event.getControler().getStrategyManager().changeWeightOfStrategy(strategy, subpopulation, newWeight) ;
+				}
+			} ;
+			c.addControlerListener(strategyWeightsManager);
+		}
+		
 		c.run();
 	}
 
