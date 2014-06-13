@@ -24,7 +24,7 @@ public class FreeFloatingVehicleLocationGeneration {
 		Config config = ConfigUtils.createConfig();
 	    config.network().setInputFile("C:/Users/balacm/Desktop/Retailers_10pc/network.xml.gz");
 	    Scenario scenario = ScenarioUtils.loadScenario(config);
-		BufferedWriter output = new BufferedWriter(new FileWriter(new File("C:/Users/balacm/Desktop/vehiclesFF_sameRBStations_3.txt")));
+		BufferedWriter output = new BufferedWriter(new FileWriter(new File("C:/Users/balacm/Desktop/vehiclesFF_sameRBStations_GreterZurich_1.txt")));
 		BufferedReader reader = IOUtils.getBufferedReader(args[0]);
 	    String s = reader.readLine();
 	    s = reader.readLine();
@@ -36,7 +36,7 @@ public class FreeFloatingVehicleLocationGeneration {
 	    	CoordImpl coordStart = new CoordImpl(arr[2], arr[3]);
 			Link l = linkUtils.getClosestLink(coordStart);		    	
 	    	
-			output.write(l.getId() + "\t" + "3");
+			output.write(l.getId() + "\t" + "1");
 	    	output.newLine();
 			
 	    	s = reader.readLine();

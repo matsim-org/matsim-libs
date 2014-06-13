@@ -129,11 +129,17 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	double beelineFactor = 0.0;
 	
 	double walkSpeed = 0.0;
+	
+	private boolean switchToPtIfNoCar = false;  //TODO: pending implementation.
 
 	// ============================================================================================================================
 	// c'tor
 
-	public AllCSModesPersonDriverAgentImpl(final Person person, final Plan plan, final Netsim simulation, final Scenario scenario, final Controler controler, FreeFloatingVehiclesLocation ffvehiclesLocation, OneWayCarsharingRDWithParkingVehicleLocation owvehiclesLocation, TwoWayCSVehicleLocation twvehiclesLocation) {
+	public AllCSModesPersonDriverAgentImpl(final Person person, final Plan plan, 
+			final Netsim simulation, final Scenario scenario, final Controler controler,
+			FreeFloatingVehiclesLocation ffvehiclesLocation, 
+			OneWayCarsharingRDWithParkingVehicleLocation owvehiclesLocation, 
+			TwoWayCSVehicleLocation twvehiclesLocation) {
 		this.person = person;
 		this.simulation = simulation;
 		this.controler = controler;
@@ -142,6 +148,8 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		this.ffvehiclesLocation = ffvehiclesLocation;
 		this.owvehiclesLocation = owvehiclesLocation;
 		this.twvehiclesLocation = twvehiclesLocation;
+		
+		//this.switchToPtIfNoCar = switchToPtIfNoCar;
 		
 		beelineFactor = Double.parseDouble(controler.getConfig().getModule("planscalcroute").getParams().get("beelineDistanceFactor"));
 		walkSpeed = Double.parseDouble(controler.getConfig().getModule("planscalcroute").getParams().get("teleportedModeSpeed_walk"));

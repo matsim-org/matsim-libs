@@ -11,7 +11,9 @@ public class RentalTimesFromMobilityData {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub		
 		int[] rentalTimes = new int[24];
+		int[] startTimes = new int[24];
 		int count = 0;
+		int startCount = 0;
 		//int count1 = 0;
 		double distance = 0.0;
 	//	Set<Double> bla = new HashSet<Double>();
@@ -37,6 +39,8 @@ public class RentalTimesFromMobilityData {
 							String[] arr6 = arr2[1].split(":");
 							
 							int starth = Integer.parseInt(arr5[0]);
+							startTimes[starth]++;
+							startCount++;
 							int startmin = Integer.parseInt(arr5[1]);
 							
 							int endh = Integer.parseInt(arr6[0]);
@@ -63,6 +67,8 @@ public class RentalTimesFromMobilityData {
 			
 			
 		}
+		for (int i = 0; i < startTimes.length; i++) 
+			System.out.println((double)startTimes[i]/(double)startCount * 100.0);
 		System.out.println(distance/count);
 		System.out.println(count);
 		for (int i = 0; i < rentalTimes.length; i++) 

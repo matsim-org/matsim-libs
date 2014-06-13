@@ -24,9 +24,11 @@ public class RentalTimesStatistics {
 		s = readLink.readLine();
 		int count = 0;
 		int count1 = 0;
+		int countZero = 0;
 		double di = 0.0;
 		while(s != null) {
 			String[] arr = s.split("\\s");
+			if (Double.parseDouble(arr[5]) != 0.0) {
 			double time = Double.parseDouble(arr[6]);
 			distance[(int)(time*0.9/130.0)]++;
 			bla.add(Double.parseDouble(arr[0]));
@@ -39,9 +41,11 @@ public class RentalTimesStatistics {
 			if (endTime - startTime < 1800) 
 				count1++;
 			count++;
+			}
 			s = readLink.readLine();		
 			
 		}
+		System.out.println(countZero);
 		System.out.println(di/count);
 		for (int i = 0; i < rentalTimes.length; i++) 
 			System.out.println((double)rentalTimes[i]/(double)count * 100.0);

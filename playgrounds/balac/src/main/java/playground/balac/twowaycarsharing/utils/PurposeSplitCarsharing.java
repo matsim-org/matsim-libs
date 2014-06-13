@@ -54,7 +54,7 @@ public class PurposeSplitCarsharing {
 								
 				if (pe instanceof Leg) {
 					
-					if ( (((Leg) pe).getMode().equals("onewaycarsharing")) || ((Leg) pe).getMode().equals("walk_ow_sb")) {
+					if ( (((Leg) pe).getMode().equals("twowaycarsharing")) || ((Leg) pe).getMode().equals("walk_rb")) {
 						cs = true;
 						
 					}

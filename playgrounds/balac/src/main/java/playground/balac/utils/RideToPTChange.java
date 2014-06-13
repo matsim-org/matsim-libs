@@ -1,7 +1,6 @@
 package playground.balac.utils;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -41,7 +40,7 @@ public class RideToPTChange {
 						((Leg) pe).setMode("pt");
 						GenericRouteImpl route = new GenericRouteImpl(((Leg) pe).getRoute().getStartLinkId(), ((Leg) pe).getRoute().getEndLinkId());
 						route.setDistance(distance);
-						route.setTravelTime(distance*1.3/4.36);
+						route.setTravelTime(distance * 1.3 / 4.36);
 						((Leg) pe).setRoute(route);
 						
 					}
