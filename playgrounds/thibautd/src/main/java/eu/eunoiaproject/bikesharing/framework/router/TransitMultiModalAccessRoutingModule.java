@@ -386,7 +386,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 			leg.setTravelTime(arrivalTime - time);
 
 			legs.add(leg);
-			transitLegCnt++;
+			//transitLegCnt++;
 			accessStop = egressStop;
 		}
 
