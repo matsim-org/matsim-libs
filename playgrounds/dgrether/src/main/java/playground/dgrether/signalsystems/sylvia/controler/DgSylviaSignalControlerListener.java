@@ -27,6 +27,9 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.signalsystems.builder.DefaultSignalModelFactory;
@@ -52,9 +55,15 @@ public class DgSylviaSignalControlerListener implements SignalsControllerListene
 	private SignalSystemsManager signalManager;
 	private DgSensorManager sensorManager;
 	private DgSylviaConfig sylviaConfig;
+	private boolean alwaysSameMobsimSeed = false ;
 	
 	public DgSylviaSignalControlerListener(DgSylviaConfig sylviaConfig) {
 		this.sylviaConfig = sylviaConfig;
+	}
+
+	public DgSylviaSignalControlerListener(DgSylviaConfig sylviaConfig, boolean alwaysSameMobsimSeed ) {
+		this.sylviaConfig = sylviaConfig;
+		this.alwaysSameMobsimSeed = alwaysSameMobsimSeed ;
 	}
 
 
@@ -74,6 +83,16 @@ public class DgSylviaSignalControlerListener implements SignalsControllerListene
 		
 		SignalEngine engine = new QSimSignalEngine(this.signalManager);
 		event.getControler().getMobsimListeners().add(engine);
+		
+		if ( this.alwaysSameMobsimSeed ) {
+			MobsimInitializedListener randomSeedResetter = new MobsimInitializedListener(){
+				@Override
+				public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+					MatsimRandom.reset(0); // make sure it is same random seed every time
+				}
+			};
+			event.getControler().getMobsimListeners().add(randomSeedResetter) ;
+		}
 	}
 
 

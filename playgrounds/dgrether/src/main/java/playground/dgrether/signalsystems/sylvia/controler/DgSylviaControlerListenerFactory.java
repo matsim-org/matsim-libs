@@ -31,14 +31,19 @@ import org.matsim.signalsystems.controler.SignalsControllerListenerFactory;
 public class DgSylviaControlerListenerFactory implements SignalsControllerListenerFactory {
 
 	private DgSylviaConfig sylviaConfig;
+	private boolean alwaysSameMobsimSeed = false ;
 	
+	public void setAlwaysSameMobsimSeed(boolean alwaysSameMobsimSeed) {
+		this.alwaysSameMobsimSeed = alwaysSameMobsimSeed;
+	}
+
 	public DgSylviaControlerListenerFactory(DgSylviaConfig sylviaConfig) {
 		this.sylviaConfig = sylviaConfig;
 	}
 
 	@Override
 	public SignalsControllerListener createSignalsControllerListener() {
-		return new DgSylviaSignalControlerListener(this.sylviaConfig);
+		return new DgSylviaSignalControlerListener(sylviaConfig, this.alwaysSameMobsimSeed) ;
 	}
 
 }

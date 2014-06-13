@@ -39,7 +39,9 @@ public class DgController {
 		Controler c = new Controler(args[0]);
 		c.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		DgSylviaConfig sylviaConfig = new DgSylviaConfig();
-		c.setSignalsControllerListenerFactory(new DgSylviaControlerListenerFactory(sylviaConfig));
+		final DgSylviaControlerListenerFactory signalsFactory = new DgSylviaControlerListenerFactory(sylviaConfig);
+		signalsFactory.setAlwaysSameMobsimSeed(false);
+		c.setSignalsControllerListenerFactory(signalsFactory);
 		c.setOverwriteFiles(true);
 		c.run();
 	}
