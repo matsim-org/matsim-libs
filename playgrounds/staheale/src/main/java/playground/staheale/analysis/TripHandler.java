@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import playground.wrashid.lib.obj.LinkedListValueHashMap;
+import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 
 public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 
