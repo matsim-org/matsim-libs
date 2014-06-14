@@ -1,17 +1,29 @@
 package playground.mzilske.city2000w;
 
-import jsprit.analysis.toolbox.SolutionPlotter;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import jsprit.analysis.toolbox.Plotter;
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
 import jsprit.core.problem.VehicleRoutingProblem;
 import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import jsprit.core.util.Solutions;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
+import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
+import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierControlerListener;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
@@ -33,10 +45,6 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Simple Sim
@@ -237,7 +245,7 @@ public class GridSim {
 				//get best 
 				VehicleRoutingProblemSolution solution = Solutions.bestOf(solutions);
 				
-				SolutionPlotter.plotSolutionAsPNG(vrp, solution, "output/sol_"+System.currentTimeMillis()+".png", "sol");
+				new Plotter(vrp,solution).plot("output/sol_"+System.currentTimeMillis()+".png", "sol");
 				
 				//create carrierPlan from solution
 				CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, solution);
@@ -303,7 +311,7 @@ public class GridSim {
 			//get best 
 			VehicleRoutingProblemSolution solution = Solutions.bestOf(solutions);
 			
-			SolutionPlotter.plotSolutionAsPNG(vrp, solution, "input/freight/sol_"+System.currentTimeMillis()+".png", "sol");
+			new Plotter(vrp, solution).plot("input/freight/sol_"+System.currentTimeMillis()+".png", "sol");
 			
 			//create carrierPlan from solution
 			CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, solution);
