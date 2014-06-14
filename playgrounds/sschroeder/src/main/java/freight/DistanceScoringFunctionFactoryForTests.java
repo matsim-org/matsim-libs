@@ -3,7 +3,6 @@ package freight;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Ignore;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;

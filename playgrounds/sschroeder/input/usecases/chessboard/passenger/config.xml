@@ -8,13 +8,13 @@
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="./input/usecases/chessboard/passenger/passengerPlansV2.xml" />
+		<param name="inputPlansFile" value="./input/usecases/chessboard/passenger/passengerPlans.xml" />
 	</module>
 
 	<module name="controler">
 		<param name="outputDirectory" value="./output" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="25" />
+		<param name="lastIteration" value="100" />
 		<param name="eventsFileFormat" value="xml" />
 		<param name="mobsim" value="queueSimulation" />
 	</module>
@@ -29,7 +29,7 @@
 		<param name="earlyDeparture" value="-0" />
 		<param name="performing" value="+6" />
 		<param name="traveling" value="-6" />
-		<param name="waiting" value="-0" />
+		<param name="waiting" value="-6" />
 		
 		<param name="activityType_0"            value="home" /> <!-- home -->
 		<param name="activityTypicalDuration_0" value="12:00:00" />
@@ -44,13 +44,13 @@
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
 
-		<param name="ModuleProbability_1" value="0.9" />
+		<param name="ModuleProbability_1" value="0.8" />
 		<param name="Module_1" value="ChangeExpBeta" />
 
 		<param name="ModuleProbability_2" value="0.1" />
 		<param name="Module_2" value="ReRoute" />
 
-		<param name="ModuleProbability_3" value="0.0" />
+		<param name="ModuleProbability_3" value="0.1" />
 		<param name="Module_3" value="TimeAllocationMutator" />
 	</module>
 

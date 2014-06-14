@@ -2,7 +2,6 @@ package usecases.chessboard;
 
 import java.util.Collection;
 
-import jsprit.analysis.toolbox.AlgorithmSearchProgressChartListener;
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
 import jsprit.core.problem.VehicleRoutingProblem;
@@ -58,7 +57,7 @@ public class InitialCarrierPlanCreator {
 		new MatsimNetworkReader(scenario).readFile("input/usecases/chessboard/network/grid9x9.xml");
 		
 		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).read("input/usecases/chessboard/freight/carrierPlansWithoutRoutes.xml");
+		new CarrierPlanXmlReaderV2(carriers).read("input/usecases/chessboard/freight/singleCarrierFiveActivitiesWithoutRoutes.xml");
 		
 		CarrierVehicleTypes types = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader(types).read("input/usecases/chessboard/freight/vehicleTypes.xml");
@@ -69,7 +68,7 @@ public class InitialCarrierPlanCreator {
 			carrier.setSelectedPlan(plan);
 		}
 		
-		new CarrierPlanXmlWriterV2(carriers).write("input/usecases/chessboard/freight/carrierPlans.xml");
+		new CarrierPlanXmlWriterV2(carriers).write("input/usecases/chessboard/freight/singleCarrierFiveActivities.xml");
 	}
 
 }

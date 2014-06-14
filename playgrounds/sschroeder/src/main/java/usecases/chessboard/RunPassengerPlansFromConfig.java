@@ -6,8 +6,7 @@ public class RunPassengerPlansFromConfig {
 	
 	public static void main(String[] args) {
 		String configFile = "input/usecases/chessboard/passenger/config.xml" ;
-		Controler controler = new Controler( configFile ) ;		
-		controler.setOverwriteFiles(true) ;
+		Controler controler = new Controler( configFile ) ;	
 		controler.run() ;
 	}
 

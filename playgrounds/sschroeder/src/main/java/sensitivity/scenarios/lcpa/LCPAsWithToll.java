@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -25,14 +24,9 @@ import jsprit.core.util.Solutions;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.InternalLeastCostPathCalculatorListener;
-import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.jsprit.VehicleTypeDependentRoadPricingCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -148,7 +142,7 @@ public class LCPAsWithToll {
 	private static void printLowerBoundOfNuVehicles(VehicleRoutingProblem vrp, int vCap) {
 		int demand=0;
 		for(Job j : vrp.getJobs().values()){
-			demand+=j.getCapacityDemand();
+			demand+=j.getSize().get(0);
 		}
 		System.out.println("lowerBound="+((double)demand/(double)vCap));
 	}

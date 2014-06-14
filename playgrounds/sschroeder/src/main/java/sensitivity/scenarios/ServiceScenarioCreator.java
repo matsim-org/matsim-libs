@@ -279,7 +279,7 @@ public class ServiceScenarioCreator {
 		List<Link> links = getLinks(); 
 		for(int i=0;i<nCustomers;i++){
 			int demand = getDemand();
-			Service.Builder serviceBuilder = Service.Builder.newInstance(""+(i+1), demand);
+			Service.Builder serviceBuilder = Service.Builder.newInstance(""+(i+1)).addSizeDimension(0, demand);
 			Link homeLink = getLink(links);
 			serviceBuilder.setCoord(Coordinate.newInstance(homeLink.getCoord().getX(),homeLink.getCoord().getY()));
 			serviceBuilder.setLocationId(homeLink.getId().toString());

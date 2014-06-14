@@ -6,7 +6,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.PlanStrategyRegistrar;
 
 public class RunPassengerPlansFromScratch {
 	

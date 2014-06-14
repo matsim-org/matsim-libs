@@ -2,7 +2,7 @@
 	<vehicleTypes>
 		<vehicleType id="heavy">
 			<description>null</description>
-			<capacity>10</capacity>
+			<capacity>50</capacity>
 			<costInformation fix="130.0" perMeter="7.7E-4" perSecond="0.0080"/>
 		</vehicleType>
 		<vehicleType id="light">

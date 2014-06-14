@@ -127,7 +127,7 @@ public class Timeslices {
 	private static void printLowerBoundOfNuVehicles(VehicleRoutingProblem vrp, int vCap) {
 		int demand=0;
 		for(Job j : vrp.getJobs().values()){
-			demand+=j.getCapacityDemand();
+			demand+=j.getSize().get(0);
 		}
 		System.out.println("lowerBound="+((double)demand/(double)vCap));
 	}

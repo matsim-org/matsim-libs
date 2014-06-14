@@ -1,7 +1,16 @@
 package usecases.chessboard;
 
+import java.io.File;
+
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
+import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierControlerListener;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
@@ -16,12 +25,11 @@ import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
+
 import usecases.analysis.CarrierScoreStats;
 import usecases.analysis.LegHistogram;
 import usecases.chessboard.CarrierScoringFunctionFactoryImpl.DriversActivityScoring;
 import usecases.chessboard.CarrierScoringFunctionFactoryImpl.DriversLegScoring;
-
-import java.io.File;
 
 public class RunPassengerAlongWithCarriers {
 

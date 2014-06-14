@@ -1,5 +1,8 @@
 package usecases.chessboard;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -12,9 +15,6 @@ import org.matsim.contrib.freight.scoring.FreightActivity;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Defines example carrier scoring function (factory).

@@ -31,12 +31,12 @@ public class RoutingScenarioCreator {
 			.setServiceTime(10*60)
 			.createAndLoad(vrpBuilder);
 		
-		VehicleTypeImpl vType = VehicleTypeImpl.Builder.newInstance("type1", 40).setCostPerDistance(1.0).setFixedCost(100).build();
+		VehicleTypeImpl vType = VehicleTypeImpl.Builder.newInstance("type1").addCapacityDimension(0, 40).setCostPerDistance(1.0).setFixedCost(100).build();
 		Coord vCoord = matsimStuff.getNetwork().getLinks().get(makeId(25594)).getCoord();
 		VehicleImpl v = VehicleImpl.Builder.newInstance("v1")
 				.setEarliestStart(0.0).setLatestArrival(24*3600)
-				.setLocationId("25594")
-				.setLocationCoord(Coordinate.newInstance(vCoord.getX(), vCoord.getY()))
+				.setStartLocationId("25594")
+				.setStartLocationCoordinate(Coordinate.newInstance(vCoord.getX(), vCoord.getY()))
 				.setType(vType)
 				.build();
 		
