@@ -36,7 +36,7 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CloneHistogram {
+class CloneHistogram {
 
     static void cloneHistogram(final Population basePopulation, final Map<Id, Double> travelledDistancePerPerson, RunResource run) {
         final Map<String, Double> expectedNumberOfClones = new HashMap<String, Double>();

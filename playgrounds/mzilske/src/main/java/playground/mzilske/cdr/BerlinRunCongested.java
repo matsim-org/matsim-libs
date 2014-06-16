@@ -33,7 +33,6 @@ public class BerlinRunCongested implements Runnable {
 
 		
 		final Controler controller = new Controler(scenario);
-		controller.setOverwriteFiles(true);
 		controller.run();
 		
 

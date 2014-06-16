@@ -11,9 +11,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.counts.Count;
-import org.matsim.counts.Counts;
-import org.matsim.counts.Volume;
 
 import javax.inject.Inject;
 
@@ -82,18 +79,6 @@ class OneWorkplaceOneStratumUnderestimated implements Provider<Scenario> {
         return scenario;
     }
 
-    private Counts filterCounts(Counts counts) {
-        Counts result = new Counts();
-        for (Count count : counts.getCounts().values()) {
-            Count newCount = result.createAndAddCount(count.getLocId(), count.getCsId());
-            for (Volume volume : count.getVolumes().values()) {
-                newCount.createVolume(volume.getHourOfDayStartingWithOne(), volume.getValue());
-            }
-
-        }
-        return result;
-    }
-
     private Activity createHomeMorning(IdImpl idImpl, double time) {
         Activity act = scenario.getPopulation().getFactory().createActivityFromLinkId("home", idImpl);
         act.setEndTime(time);
@@ -101,8 +86,7 @@ class OneWorkplaceOneStratumUnderestimated implements Provider<Scenario> {
     }
 
     private Leg createDriveLeg() {
-        Leg leg = scenario.getPopulation().getFactory().createLeg(TransportMode.car);
-        return leg;
+        return scenario.getPopulation().getFactory().createLeg(TransportMode.car);
     }
 
     private Activity createWork(IdImpl idImpl) {
@@ -112,8 +96,7 @@ class OneWorkplaceOneStratumUnderestimated implements Provider<Scenario> {
     }
 
     private Activity createHomeEvening(IdImpl idImpl) {
-        Activity act = scenario.getPopulation().getFactory().createActivityFromLinkId("home", idImpl);
-        return act;
+        return scenario.getPopulation().getFactory().createActivityFromLinkId("home", idImpl);
     }
 
 

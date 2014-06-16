@@ -31,7 +31,7 @@ import org.matsim.core.router.util.TravelTime;
 
 import javax.inject.Inject;
 
-public class PSimFactory implements MobsimFactory {
+class PSimFactory implements MobsimFactory {
 
     @Inject
     TravelTime travelTime;

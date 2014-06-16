@@ -21,7 +21,6 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
@@ -207,8 +206,6 @@ class MultiRateRunResource {
         final ScenarioImpl scenario2 = compareMain.createScenarioFromSightings(config);
 
         Controler controler = new Controler(scenario2);
-        controler.setOverwriteFiles(true);
-
         controler.setCreateGraphs(false);
         controler.run();
     }
@@ -259,7 +256,6 @@ class MultiRateRunResource {
         final double flowCapacityFactor = config.qsim().getFlowCapFactor();
         final double storageCapacityFactor = config.qsim().getStorageCapFactor();
         Controler controler = new Controler(scenario);
-        controler.setOverwriteFiles(true);
         if (alternative.equals("sense")) {
             final double travelledKilometersBase = sum(PowerPlans.travelledDistancePerPerson(baseScenario.getPopulation(), baseScenario.getNetwork()).values());
             controler.addControlerListener(new BeforeMobsimListener() {
@@ -313,12 +309,10 @@ class MultiRateRunResource {
         }
 
         Controler controler = new Controler(scenario);
-        controler.setOverwriteFiles(true);
         controler.setCreateGraphs(false);
         controler.run();
     }
 
-    // TODO: Why does the volumeanalyzer measure something different from the routesums?
     public void distances() {
         final String filename = WD + "/distances.txt";
         final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();

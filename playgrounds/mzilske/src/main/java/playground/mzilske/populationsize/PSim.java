@@ -59,7 +59,7 @@ import java.util.concurrent.*;
  *         Extended for transit simulation.
  *
  */
-public class PSim implements Mobsim {
+class PSim implements Mobsim {
 
     private final TravelTime travelTimes;
     Scenario scenario;

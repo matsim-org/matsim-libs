@@ -11,7 +11,6 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
@@ -20,7 +19,6 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
-
 import playground.mzilske.cdranalysis.RunResource;
 import playground.mzilske.gtfs.GtfsConverter;
 
@@ -48,7 +46,7 @@ public class UlmResource {
 
 		new NetworkWriter(scenario.getNetwork()).write(wd + "/network.xml");
 		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(wd + "/transit-schedule.xml");
-		new VehicleWriterV1(((ScenarioImpl) scenario).getVehicles()).writeFile(wd + "/transit-vehicles.xml");		
+		new VehicleWriterV1(scenario.getVehicles()).writeFile(wd + "/transit-vehicles.xml");
 	}
 
 	public void population() {
@@ -60,7 +58,6 @@ public class UlmResource {
 	public void run() {
 		Scenario scenario = loadScenario();
 		Controler controler = new Controler(scenario);
-		controler.setOverwriteFiles(true);
 		controler.run();
 	}
 	
@@ -124,15 +121,14 @@ public class UlmResource {
 		Config config = getConfig();
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
-		new VehicleReaderV1(((ScenarioImpl) scenario).getVehicles()).readFile(config.transit().getVehiclesFile());
+		new VehicleReaderV1(scenario.getVehicles()).readFile(config.transit().getVehiclesFile());
 		new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
 		return scenario;
 	}
 	
 	private Scenario loadScenario() {
 		Config config = getConfig();
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
+        return ScenarioUtils.loadScenario(config);
 	}
 	
 }

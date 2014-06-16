@@ -32,6 +32,7 @@ import playground.mzilske.cdr.CallBehavior;
 import javax.inject.Inject;
 
 class MyCallBehavior implements CallBehavior {
+
     @Inject
     Scenario scenario;
 

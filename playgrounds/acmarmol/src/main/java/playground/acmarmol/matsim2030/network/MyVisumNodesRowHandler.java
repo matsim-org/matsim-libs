@@ -20,15 +20,14 @@
 
 package playground.acmarmol.matsim2030.network;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.mzilske.bvg09.VisumNetworkRowHandler;
+import java.util.Map;
+
 
 public class MyVisumNodesRowHandler implements VisumNetworkRowHandler {
 

@@ -1,6 +1,6 @@
 package playground.mzilske.cdr;
 
-public class MatchDistance {
+class MatchDistance {
 	
 	public static double[] cumul(double[] h) {
 		double[] result = new double[h.length];

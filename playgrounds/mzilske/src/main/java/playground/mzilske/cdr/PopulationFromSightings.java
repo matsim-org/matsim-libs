@@ -1,13 +1,9 @@
 package playground.mzilske.cdr;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -17,7 +13,6 @@ import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner.PersonAlgorithmProvider;
 import org.matsim.population.algorithms.PersonAlgorithm;
@@ -30,13 +25,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 
 
 public class PopulationFromSightings {
 
 
-    private static Random rnd = MatsimRandom.getRandom();
+    private static final int TRY_REDRAW_UNFEASIBLE_LOCATIONS = 0;
 
     public static void createPopulationWithTwoPlansEach(Scenario scenario, LinkToZoneResolver zones, final Map<Id, List<Sighting>> sightings) {
         for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.entrySet()) {
@@ -162,7 +156,7 @@ public class PopulationFromSightings {
                     plan.addLeg(leg);
                     plan.addActivity(activity);
                     TripRouter tripRouter = new TripRouter();
-                    tripRouter.setRoutingModule("unknown", new NetworkRoutingModule(scenario.getPopulation().getFactory(), (NetworkImpl) scenario.getNetwork(), new FreeSpeedTravelTime()));
+                    tripRouter.setRoutingModule("unknown", new NetworkRoutingModule(scenario.getPopulation().getFactory(), scenario.getNetwork(), new FreeSpeedTravelTime()));
                     List<? extends PlanElement> route = tripRouter.calcRoute("unknown", new ActivityWrapperFacility(lastActivity), new ActivityWrapperFacility(activity), sighting.getTime(), null);
                     double travelTime = ((Leg) route.get(0)).getTravelTime();
                     lastActivity.setEndTime(sighting.getTime() - travelTime);
@@ -196,7 +190,7 @@ public class PopulationFromSightings {
                     plan.addLeg(leg);
                     plan.addActivity(activity);
                     TripRouter tripRouter = new TripRouter();
-                    tripRouter.setRoutingModule("unknown", new NetworkRoutingModule(scenario.getPopulation().getFactory(), (NetworkImpl) scenario.getNetwork(), new FreeSpeedTravelTime()));
+                    tripRouter.setRoutingModule("unknown", new NetworkRoutingModule(scenario.getPopulation().getFactory(), scenario.getNetwork(), new FreeSpeedTravelTime()));
                     List<? extends PlanElement> route = tripRouter.calcRoute("unknown", new ActivityWrapperFacility(lastActivity), new ActivityWrapperFacility(activity), sighting.getTime(), null);
                     double travelTime = ((Leg) route.get(0)).getTravelTime();
                     double latestStartTime = sighting.getTime() - travelTime;
@@ -213,8 +207,7 @@ public class PopulationFromSightings {
 
 
     public static Activity createActivityInZone(Scenario scenario, LinkToZoneResolver zones, String zoneId) {
-        Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("sighting", zones.chooseLinkInZone(zoneId));
-        return activity;
+        return scenario.getPopulation().getFactory().createActivityFromLinkId("sighting", zones.chooseLinkInZone(zoneId));
     }
 
 
@@ -226,7 +219,7 @@ public class PopulationFromSightings {
             @Override
             public PersonAlgorithm getPersonAlgorithm() {
                 TripRouter tripRouter = new TripRouter();
-                tripRouter.setRoutingModule("unknown", new NetworkRoutingModule(scenario.getPopulation().getFactory(), (NetworkImpl) scenario.getNetwork(), new FreeSpeedTravelTime()));
+                tripRouter.setRoutingModule("unknown", new NetworkRoutingModule(scenario.getPopulation().getFactory(), scenario.getNetwork(), new FreeSpeedTravelTime()));
                 return new PlanRouter(tripRouter);
             }
 
@@ -234,7 +227,7 @@ public class PopulationFromSightings {
 
         Population unfeasiblePeople = PopulationUtils.createPopulation(scenario.getConfig(), scenario.getNetwork());
 
-        for (int i=0; i<0; i++) {
+        for (int i=0; i < TRY_REDRAW_UNFEASIBLE_LOCATIONS; i++) {
             unfeasiblePeople = PopulationUtils.createPopulation(scenario.getConfig(), scenario.getNetwork());
             for (Person person : scenario.getPopulation().getPersons().values()) {
                 Plan plan = person.getSelectedPlan();
@@ -268,22 +261,11 @@ public class PopulationFromSightings {
                 @Override
                 public PersonAlgorithm getPersonAlgorithm() {
                     TripRouter tripRouter = new TripRouter();
-                    tripRouter.setRoutingModule("car", new NetworkRoutingModule(scenario.getPopulation().getFactory(), (NetworkImpl) scenario.getNetwork(), new FreeSpeedTravelTime()));
+                    tripRouter.setRoutingModule("car", new NetworkRoutingModule(scenario.getPopulation().getFactory(), scenario.getNetwork(), new FreeSpeedTravelTime()));
                     return new PlanRouter(tripRouter);
                 }
 
             });
-
-//			ParallelPersonAlgorithmRunner.run(unfeasiblePeople, 8, new PersonAlgorithmProvider() {
-//				
-//				@Override
-//				public PersonAlgorithm getPersonAlgorithm() {
-//					TripRouter tripRouter = new TripRouter();
-//					tripRouter.setRoutingModule("unknown", new BushwhackingRoutingModule(scenario.getPopulation().getFactory(), (NetworkImpl) scenario.getNetwork()));
-//					return new PlanRouter(tripRouter);
-//				}
-//	
-//			});
 
         }
 
@@ -293,24 +275,12 @@ public class PopulationFromSightings {
     }
 
 
-    private static Point getRandomPointInFeature(Random rnd, Geometry ft) {
-        Point p = null;
-        double x, y;
-        do {
-            x = ft.getEnvelopeInternal().getMinX() + rnd.nextDouble() * (ft.getEnvelopeInternal().getMaxX() - ft.getEnvelopeInternal().getMinX());
-            y = ft.getEnvelopeInternal().getMinY() + rnd.nextDouble() * (ft.getEnvelopeInternal().getMaxY() - ft.getEnvelopeInternal().getMinY());
-            p = MGC.xy2Point(x, y);
-        } while (!ft.contains(p));
-        return p;
-    }
-
     private static boolean isFeasible(Plan plan) {
         double currentTime = 0.0;
         for (PlanElement planElement : plan.getPlanElements()) {
             if (planElement instanceof Leg) {
                 LegImpl leg = (LegImpl) planElement;
-                double arrivalTime = leg.getArrivalTime();
-                currentTime = arrivalTime;
+                currentTime = leg.getArrivalTime();
             } else if (planElement instanceof Activity) {
                 ActivityImpl activity = (ActivityImpl) planElement;
                 double sightingTime = activity.getEndTime();

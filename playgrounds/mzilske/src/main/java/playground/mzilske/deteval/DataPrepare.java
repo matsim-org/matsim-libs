@@ -19,13 +19,9 @@
 
 package playground.mzilske.deteval;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -46,12 +42,12 @@ import org.matsim.visum.VisumNetwork.EdgeType;
 import org.matsim.visum.VisumNetworkReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.mzilske.bvg09.StreamingVisumNetworkReader;
-import playground.mzilske.bvg09.VisumNetworkRowHandler;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
 
 public class DataPrepare {
 

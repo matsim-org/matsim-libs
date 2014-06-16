@@ -4,7 +4,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -37,7 +36,6 @@ public class BerlinRun implements Runnable {
 
 		
 		final Controler controller = new Controler(scenario);
-		controller.setOverwriteFiles(true);
 		controller.run();
 		
 

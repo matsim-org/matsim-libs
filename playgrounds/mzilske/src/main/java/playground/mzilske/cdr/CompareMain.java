@@ -6,11 +6,9 @@ import com.telmomenezes.jfastemd.Signature;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.car.CadytsContext;
@@ -23,15 +21,11 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -41,85 +35,7 @@ import playground.mzilske.d4d.Sighting;
 import javax.inject.Inject;
 import java.util.*;
 
-
-
-//		double varianceScale = 0.1;
-// matsimCalibrator.setVarianceScale(varianceScale);
-// matsimCalibrator.setMinStddev(25.*varianceScale, TYPE.FLOW_VEH_H);
-// matsimCalibrator.setMinStddev(1, TYPE.COUNT_VEH);
-
 public class CompareMain {
-	
-	private String suffix = "";
-
-	public void setSuffix(String suffix) {
-		this.suffix = suffix;
-	}
-
-    public List<Sighting> getSightings() {
-        return callProcess.getSightings();
-    }
-
-    private static final class ZeroScoringFunctionFactory implements
-			ScoringFunctionFactory {
-		@Override
-		public ScoringFunction createNewScoringFunction(Person person) {
-			return new ScoringFunction() {
-
-				@Override
-				public void handleActivity(Activity activity) {
-					// TODO Auto-generated method stub
-					
-				}
-
-				@Override
-				public void handleLeg(Leg leg) {
-					// TODO Auto-generated method stub
-					
-				}
-
-				@Override
-				public void agentStuck(double time) {
-					// TODO Auto-generated method stub
-					
-				}
-
-				@Override
-				public void addMoney(double amount) {
-					// TODO Auto-generated method stub
-					
-				}
-
-				@Override
-				public void finish() {
-					// TODO Auto-generated method stub
-					
-				}
-
-				@Override
-				public double getScore() {
-					return 0;
-				}
-
-				@Override
-				public void handleEvent(Event event) {
-					// TODO Auto-generated method stub
-					
-				}
-				
-			};
-		}
-	}
-
-	static class Result {
-		
-		VolumesAnalyzer volumes;
-		
-		Scenario scenario;
-
-		CadytsContext context;
-		
-	}
 
 	private static class VolumeOnLinkFeature implements Feature {
 
@@ -143,8 +59,7 @@ public class CompareMain {
 
 	private static final int TIME_BIN_SIZE = 60*60;
 	private static final int MAX_TIME = 24 * TIME_BIN_SIZE - 1;
-	private static final int dailyRate = 0;
-	private CallProcessTicker ticker;
+    private CallProcessTicker ticker;
 	private CallProcess callProcess;
 
     public VolumesAnalyzer getGroundTruthVolumes() {
@@ -173,8 +88,7 @@ public class CompareMain {
 		
 		PopulationFromSightings.createPopulationWithEndTimesAtLastSightings(scenario21, linkToZoneResolver, allSightings);
 		PopulationFromSightings.preparePopulation(scenario21, linkToZoneResolver, allSightings);
-		final ScenarioImpl scenario2 = scenario21;
-		return scenario2;
+        return scenario21;
 	}
 
     public Map<Id, List<Sighting>> getSightingsPerPerson() {
@@ -202,8 +116,7 @@ public class CompareMain {
 		Network network = scenario.getNetwork();
 		Signature signature1 = makeSignature(network, groundTruthVolumes);
 		Signature signature2 = makeSignature(network, cdrVolumes);
-		double emd = JFastEMD.distance(signature1, signature2, -1.0);
-		return emd;
+        return JFastEMD.distance(signature1, signature2, -1.0);
 	}
 
 	static double compareTimebins(Scenario scenario, VolumesAnalyzer cdrVolumes, VolumesAnalyzer groundTruthVolumes) {
@@ -313,11 +226,11 @@ public class CompareMain {
 		int n = 0;
 		for (Link link : network.getLinks().values()) {
 			int[] volumesForLink = getVolumesForLink(volumesAnalyzer, link);
-			for (int i=0; i<volumesForLink.length;++i) {
-				if (volumesForLink[i] != 0) {
-					++n;
-				}
-			}
+            for (int aVolumesForLink : volumesForLink) {
+                if (aVolumesForLink != 0) {
+                    ++n;
+                }
+            }
 		}
 		Feature[] features = new Feature[n];
 		double[] weights = new double[n];
@@ -380,7 +293,7 @@ public class CompareMain {
 				allSightings.put(sighting.getAgentId(), sightingsOfPerson);
 
 			}
-			System.out.println(sighting.getCellTowerId().toString());
+			System.out.println(sighting.getCellTowerId());
 
 			sightingsOfPerson.add(sighting);
 		}
@@ -391,7 +304,6 @@ public class CompareMain {
 
 		final CadytsContext context = new CadytsContext(config, counts) ;
 		Controler controler = new Controler(scenario2);
-		controler.setOverwriteFiles(true);
 		controler.addControlerListener(context);
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
@@ -415,9 +327,7 @@ public class CompareMain {
 
     public static double calcCadytsScore(final CadytsContext context, Plan plan) {
 		cadyts.demand.Plan<Link> currentPlanSteps = context.getPlansTranslator().getPlanSteps(plan);
-		double currentPlanCadytsCorrection = context.getCalibrator().calcLinearPlanEffect(currentPlanSteps); // / this.beta;
-		// CadytsPlanUtils.printCadytsPlan(currentPlanSteps);
-		return currentPlanCadytsCorrection;
+        return context.getCalibrator().calcLinearPlanEffect(currentPlanSteps);
 	}
 	
 	public static int[] getVolumesForLink(VolumesAnalyzer volumesAnalyzer1, Link link) {
@@ -432,13 +342,5 @@ public class CompareMain {
         }
         return maybeVolumes;
     }
-
-	public static VolumesAnalyzer calculateVolumes(Network network, String eventsFilename) {
-		VolumesAnalyzer volumesAnalyzer = new VolumesAnalyzer(TIME_BIN_SIZE, MAX_TIME, network);
-		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(volumesAnalyzer);
-		new MatsimEventsReader(events).readFile(eventsFilename);
-		return volumesAnalyzer;
-	}
 
 }

@@ -51,16 +51,10 @@ import java.util.Map;
 
 public class Main {
 
-
     public static void main(String[] args) {
-//        run("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/illustrative/0-counts", new ArrayList<Integer>());
-//        run("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/illustrative/1-counts", Arrays.asList(18));
-//        run("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/illustrative/2-counts", Arrays.asList(10, 18));
-//
         run("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/illustrative/random-zeiten/10-count", Arrays.asList(10));
-          run("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/illustrative/random-zeiten/8-count", Arrays.asList(8));
-          run("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/illustrative/random-zeiten/18-count", Arrays.asList(18));
-
+        run("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/illustrative/random-zeiten/8-count", Arrays.asList(8));
+        run("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/illustrative/random-zeiten/18-count", Arrays.asList(18));
     }
 
     private static void run(final String outputDirectory, List<Integer> countHours) {
@@ -128,7 +122,7 @@ public class Main {
 
     private static Counts filterCounts(Counts allCounts, List<Integer> countHours) {
         Counts someCounts = new Counts();
-        for (Map.Entry<Id, Count> entry: allCounts.getCounts().entrySet()) {
+        for (Map.Entry<Id, Count> entry : allCounts.getCounts().entrySet()) {
             String linkId = entry.getKey().toString();
             if (linkId.equals("1") || linkId.equals("21")) {
                 Count count = someCounts.createAndAddCount(new IdImpl(linkId), "wurst");

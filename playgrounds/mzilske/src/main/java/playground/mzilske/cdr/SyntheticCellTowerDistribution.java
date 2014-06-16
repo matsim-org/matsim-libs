@@ -1,13 +1,13 @@
 package playground.mzilske.cdr;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-public class SyntheticCellTowerDistribution {
+import java.util.HashMap;
+import java.util.Map;
+
+class SyntheticCellTowerDistribution {
 
 	public static Zones naive(Network network) {
 		double minX = Double.POSITIVE_INFINITY;

@@ -14,11 +14,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.vehicles.VehicleWriterV1;
-
 import playground.acmarmol.matsim2030.network.MyVisumNetwork.ModeType;
 import playground.mrieser.pt.converter.Visum2TransitSchedule;
-import playground.mzilske.bvg09.StreamingVisumNetworkReader;
-import playground.mzilske.bvg09.VisumNetworkRowHandler;
 
 
 
