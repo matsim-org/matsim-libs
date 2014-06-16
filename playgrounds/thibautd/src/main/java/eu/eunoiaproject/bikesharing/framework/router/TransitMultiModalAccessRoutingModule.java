@@ -197,19 +197,20 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 
 	private final List<PlanElement> fillWithActivities(
 			final List<Leg> baseTrip ) {
-		List<PlanElement> trip = new ArrayList<PlanElement>();
+		final List<PlanElement> trip = new ArrayList<PlanElement>();
 
 		Coord nextCoord = null;
+		Id nextLinkId = null;
 		for (Leg leg : baseTrip) {
 			if (leg.getRoute() instanceof ExperimentalTransitRoute) {
-				ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) leg.getRoute();
+				final ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) leg.getRoute();
 				tRoute.setTravelTime(leg.getTravelTime());
 				tRoute.setDistance(
 						RouteUtils.calcDistance(
 							tRoute,
 							scenario.getTransitSchedule(),
 							scenario.getNetwork()));
-				ActivityImpl act =
+				final ActivityImpl act =
 					new ActivityImpl(
 							PtConstants.TRANSIT_ACTIVITY_TYPE, 
 							scenario.getTransitSchedule().getFacilities().get(tRoute.getAccessStopId()).getCoord(), 
@@ -219,7 +220,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 				nextCoord = scenario.getTransitSchedule().getFacilities().get(tRoute.getEgressStopId()).getCoord();
 			}
 			else { // walk legs don't have a coord, use the coord from the last egress point
-				ActivityImpl act =
+				final ActivityImpl act =
 					new ActivityImpl(
 							PtConstants.TRANSIT_ACTIVITY_TYPE,
 							nextCoord, 
@@ -227,8 +228,18 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 				act.setMaximumDuration(0.0);
 				trip.add(act);	
 			}
+			nextLinkId = leg.getRoute().getEndLinkId();
 			trip.add(leg);
 		}
+
+		// put an interaction before the egress
+		final ActivityImpl act =
+			new ActivityImpl(
+					PtConstants.TRANSIT_ACTIVITY_TYPE,
+					nextCoord, 
+					nextLinkId );
+		act.setMaximumDuration(0.0);
+		trip.add(act);
 		return trip;
 	}
 
