@@ -38,8 +38,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
@@ -63,7 +65,6 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
@@ -76,6 +77,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 
 	private final TransitRouterNetwork transitNetwork;
 
+	private final Scenario scenario;
 	private final MultiNodeDijkstra dijkstra;
 	private final TransitRouterConfig config;
 	private final TransitTravelDisutility travelDisutility;
@@ -88,40 +90,16 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 	private static enum Direction {access, egress;}
 
 	public TransitMultiModalAccessRoutingModule(
-			final Scenario sc,
+			final Scenario scenario,
 			final InitialNodeRouter... routers) {
-		this( new TransitRouterConfig( sc.getConfig() ),
-				sc.getTransitSchedule(),
-				routers);
-	}
-
-	public TransitMultiModalAccessRoutingModule(
-			final TransitRouterConfig config,
-			final TransitSchedule schedule,
-			final InitialNodeRouter... routers) {
-		this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);
+		this.scenario = scenario;
+		this.config = new TransitRouterConfig( scenario.getConfig() );
+		this.preparedTransitSchedule = new PreparedTransitSchedule( scenario.getTransitSchedule() );
 		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(config, preparedTransitSchedule);
 		this.travelTime = transitRouterNetworkTravelTimeAndDisutility;
-		this.config = config;
 		this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
-		this.transitNetwork = TransitRouterNetwork.createFromSchedule(schedule, config.beelineWalkConnectionDistance);
+		this.transitNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), config.beelineWalkConnectionDistance);
 		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.travelDisutility, this.travelTime);
-		this.routers = Arrays.asList( routers );
-	}
-
-	public TransitMultiModalAccessRoutingModule(
-			final TransitRouterConfig config, 
-			final PreparedTransitSchedule preparedTransitSchedule, 
-			final TransitRouterNetwork routerNetwork, 
-			final TravelTime travelTime, 
-			final TransitTravelDisutility travelDisutility,
-			final InitialNodeRouter... routers) {
-		this.config = config;
-		this.transitNetwork = routerNetwork;
-		this.travelTime = travelTime;
-		this.travelDisutility = travelDisutility;
-		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.travelDisutility, this.travelTime);
-		this.preparedTransitSchedule = preparedTransitSchedule;
 		this.routers = Arrays.asList( routers );
 	}
 
@@ -206,12 +184,51 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 
 		trip.addAll( fromInitialNode.subtrip );
 		// there is no Pt interaction in there...
-		trip.addAll( convertPathToLegList(
-					departureTime,
-					p,
-					person ) );
+		trip.addAll(
+				fillWithActivities(
+					convertPathToLegList(
+						departureTime,
+						p,
+						person ) ) );
 		trip.addAll( toInitialNode.subtrip );
 
+		return trip;
+	}
+
+	private final List<PlanElement> fillWithActivities(
+			final List<Leg> baseTrip ) {
+		List<PlanElement> trip = new ArrayList<PlanElement>();
+
+		Coord nextCoord = null;
+		for (Leg leg : baseTrip) {
+			if (leg.getRoute() instanceof ExperimentalTransitRoute) {
+				ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) leg.getRoute();
+				tRoute.setTravelTime(leg.getTravelTime());
+				tRoute.setDistance(
+						RouteUtils.calcDistance(
+							tRoute,
+							scenario.getTransitSchedule(),
+							scenario.getNetwork()));
+				ActivityImpl act =
+					new ActivityImpl(
+							PtConstants.TRANSIT_ACTIVITY_TYPE, 
+							scenario.getTransitSchedule().getFacilities().get(tRoute.getAccessStopId()).getCoord(), 
+							tRoute.getStartLinkId());
+				act.setMaximumDuration(0.0);
+				trip.add(act);
+				nextCoord = scenario.getTransitSchedule().getFacilities().get(tRoute.getEgressStopId()).getCoord();
+			}
+			else { // walk legs don't have a coord, use the coord from the last egress point
+				ActivityImpl act =
+					new ActivityImpl(
+							PtConstants.TRANSIT_ACTIVITY_TYPE,
+							nextCoord, 
+							leg.getRoute().getStartLinkId());
+				act.setMaximumDuration(0.0);
+				trip.add(act);	
+			}
+			trip.add(leg);
+		}
 		return trip;
 	}
 
