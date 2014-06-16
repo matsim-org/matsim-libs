@@ -35,11 +35,15 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.parking.PC2.infrastructure.Parking;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 
 public class ParkingChoiceSimulation implements PersonDepartureEventHandler, ActivityStartEventHandler, PersonArrivalEventHandler, ActivityEndEventHandler {
 
@@ -47,6 +51,7 @@ public class ParkingChoiceSimulation implements PersonDepartureEventHandler, Act
 	private Controler controler;
 	IntegerValueHashMap<Id> currentPlanElementIndex;
 	HashMap<Id, ParkingOperationRequestAttributes> parkingOperationRequestAttributes;
+	DoubleValueHashMap<Id> firstDepartureTimeOfDay;
 
 	public ParkingChoiceSimulation(Controler controler, ParkingInfrastructureManager parkingInfrastructureManager){
 		this.controler = controler;
@@ -57,6 +62,85 @@ public class ParkingChoiceSimulation implements PersonDepartureEventHandler, Act
 	public void reset(int iteration) {
 		currentPlanElementIndex=new IntegerValueHashMap<Id>();
 		parkingOperationRequestAttributes=new HashMap<Id, ParkingOperationRequestAttributes>();
+		firstDepartureTimeOfDay=new DoubleValueHashMap<Id>();
+		
+		for (Person person:controler.getPopulation().getPersons().values()){
+			if (hasCarLeg(person.getSelectedPlan())){
+				ParkingOperationRequestAttributes parkingAttributes = new ParkingOperationRequestAttributes();
+				
+				ActivityImpl firstActivityOfDayBeforeDepartingWithCar = getFirstActivityOfDayBeforeDepartingWithCar(person.getSelectedPlan());
+				ActivityImpl firstActivityAfterLastCarLegOfDay = getFirstActivityAfterLastCarLegOfDay(person.getSelectedPlan());
+				
+				parkingAttributes.destCoordinate=firstActivityAfterLastCarLegOfDay.getCoord();
+				parkingAttributes.arrivalTime=firstActivityAfterLastCarLegOfDay.getStartTime();
+				parkingAttributes.personId=person.getId();
+				parkingAttributes.facilityId=firstActivityAfterLastCarLegOfDay.getFacilityId();
+				parkingAttributes.actType=firstActivityAfterLastCarLegOfDay.getType();
+				parkingAttributes.parkingDurationInSeconds=GeneralLib.getIntervalDuration(firstActivityAfterLastCarLegOfDay.getStartTime(), firstActivityOfDayBeforeDepartingWithCar.getEndTime());
+				
+				parkingInfrastructureManager.parkVehicle(parkingAttributes);
+			}
+		}
+	}
+	
+	public ActivityImpl getFirstActivityAfterLastCarLegOfDay(Plan plan){
+		List<PlanElement> planElements = plan.getPlanElements();
+		int indexOfLastCarLegOfDay=-1;
+		for (int i=planElements.size()-1;i>=0;i--){
+			if (planElements.get(i) instanceof LegImpl){
+				LegImpl Leg= (LegImpl) planElements.get(i);
+				
+				if (Leg.getMode().equalsIgnoreCase(TransportMode.car)){
+					indexOfLastCarLegOfDay=i;
+					break;
+				}
+				
+			}
+		}
+		
+		for (int i=indexOfLastCarLegOfDay+1;i<planElements.size();i++){
+			if (planElements.get(i) instanceof ActivityImpl){
+				return (ActivityImpl) planElements.get(i);
+			}
+		}
+		return null;
+	}
+	
+	public ActivityImpl getFirstActivityOfDayBeforeDepartingWithCar(Plan plan){
+		List<PlanElement> planElements = plan.getPlanElements();
+		int indexOfFirstCarLegOfDay=-1;
+		for (int i=0;i<planElements.size();i++){
+			if (planElements.get(i) instanceof LegImpl){
+				LegImpl Leg= (LegImpl) planElements.get(i);
+				
+				if (Leg.getMode().equalsIgnoreCase(TransportMode.car)){
+					indexOfFirstCarLegOfDay=i;
+					break;
+				}
+				
+			}
+		}
+		for (int i=indexOfFirstCarLegOfDay-1;i>=0;i--){
+			if (planElements.get(i) instanceof ActivityImpl){
+				return (ActivityImpl) planElements.get(i);
+			}
+		}
+		return null;
+	}
+	
+	public boolean hasCarLeg(Plan plan){
+		List<PlanElement> planElements = plan.getPlanElements();
+		for (int i=0;i<planElements.size();i++){
+			if (planElements.get(i) instanceof LegImpl){
+				LegImpl Leg= (LegImpl) planElements.get(i);
+				
+				if (Leg.getMode().equalsIgnoreCase(TransportMode.car)){
+					return true;
+				}
+				
+			}
+		}
+		return false;
 	}
 	
 
@@ -68,13 +152,39 @@ public class ParkingChoiceSimulation implements PersonDepartureEventHandler, Act
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().equalsIgnoreCase(TransportMode.car)){
+			if (!firstDepartureTimeOfDay.containsKey(event.getPersonId())){
+				firstDepartureTimeOfDay.put(event.getPersonId(),event.getTime());
+			}
+			
+			
 			ParkingOperationRequestAttributes parkingAttributes = parkingOperationRequestAttributes.get(event.getPersonId());
 			parkingAttributes.parkingDurationInSeconds=GeneralLib.getIntervalDuration(parkingAttributes.arrivalTime, event.getTime());
 			
-			parkingInfrastructureManager.personCarDepartureEvent(parkingAttributes);
+			if (isFirstCarDepartureOfDay(event.getPersonId())){
+				parkingInfrastructureManager.personCarDepartureEvent(parkingAttributes);
+			} else {
+				Parking parking = parkingInfrastructureManager.personCarDepartureEvent(parkingAttributes);
+				parkingInfrastructureManager.scoreParkingOperation(parkingAttributes,parking);
+			}
 			
 			
 		}
+	}
+
+	private boolean isFirstCarDepartureOfDay(Id personId) {
+		Person person = controler.getPopulation().getPersons().get(personId);
+		List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
+		for (int i=currentPlanElementIndex.get(personId)-1;i>=0;i--){
+			if (planElements.get(i) instanceof LegImpl){
+				LegImpl Leg= (LegImpl) planElements.get(i);
+				
+				if (Leg.getMode().equalsIgnoreCase(TransportMode.car)){
+					return false;
+				}
+				
+			}
+		}
+		return true;
 	}
 
 	@Override
@@ -88,21 +198,73 @@ public class ParkingChoiceSimulation implements PersonDepartureEventHandler, Act
 		if (event.getLegMode().equalsIgnoreCase(TransportMode.car)){
 			ParkingOperationRequestAttributes parkingAttributes =new ParkingOperationRequestAttributes();
 			Link link = controler.getNetwork().getLinks().get(event.getLinkId());
-			ActivityImpl activity = getNextActivity(personId);
-			// TODO: fix this. 
+			ActivityImpl nextActivity = getNextActivity(personId);
+			
 			parkingAttributes.destCoordinate=link.getCoord();
 			parkingAttributes.arrivalTime=event.getTime();
-			parkingAttributes.parkingDurationInSeconds=GeneralLib.getIntervalDuration(event.getTime(), activity.getEndTime());
 			parkingAttributes.personId=personId;
-			parkingAttributes.facilityId=activity.getFacilityId();
-			parkingAttributes.actType=activity.getType();
+			parkingAttributes.facilityId=nextActivity.getFacilityId();
+			parkingAttributes.actType=nextActivity.getType();
 			
-			parkingInfrastructureManager.parkVehicle(parkingAttributes);
+			if (isLastCarLegOfDay(personId)){
+				parkingAttributes.parkingDurationInSeconds=GeneralLib.getIntervalDuration(event.getTime(), firstDepartureTimeOfDay.get(personId));
+				
+			} else {
+				ActivityImpl activityBeforeNextCarLeg = getActivityBeforeNextCarLeg(personId);
+				parkingAttributes.parkingDurationInSeconds=GeneralLib.getIntervalDuration(event.getTime(), activityBeforeNextCarLeg.getEndTime());
+			}
+			
+			Parking parking = parkingInfrastructureManager.parkVehicle(parkingAttributes);
+			
+			if (isLastCarLegOfDay(personId)){
+				parkingInfrastructureManager.scoreParkingOperation(parkingAttributes,parking);
+			}
+			
 		}
 		
-		
-		
 		currentPlanElementIndex.increment(personId);
+	}
+	
+	// TODO: operation could be made faster through caching.
+	private boolean isLastCarLegOfDay(Id personId){
+		Person person = controler.getPopulation().getPersons().get(personId);
+		List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
+		for (int i=currentPlanElementIndex.get(personId)+1;i<planElements.size();i++){
+			if (planElements.get(i) instanceof LegImpl){
+				LegImpl Leg= (LegImpl) planElements.get(i);
+				
+				if (Leg.getMode().equalsIgnoreCase(TransportMode.car)){
+					return false;
+				}
+				
+			}
+		}
+		return true;
+	}
+	
+	private ActivityImpl getActivityBeforeNextCarLeg(Id personId){
+		Person person = controler.getPopulation().getPersons().get(personId);
+		List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
+		int indexOfNextCarLeg=-1;
+		for (int i=currentPlanElementIndex.get(personId)+1;i<planElements.size();i++){
+			if (planElements.get(i) instanceof LegImpl){
+				LegImpl Leg= (LegImpl) planElements.get(i);
+				
+				if (Leg.getMode().equalsIgnoreCase(TransportMode.car)){
+					indexOfNextCarLeg=i;
+					break;
+				}
+				
+			}
+		}
+		
+		for (int i=indexOfNextCarLeg-1;i>=0;i--){
+			if (planElements.get(i) instanceof ActivityImpl){
+				return (ActivityImpl) planElements.get(i);
+			}
+		}
+		
+		return null;
 	}
 	
 	private ActivityImpl getNextActivity(Id personId){

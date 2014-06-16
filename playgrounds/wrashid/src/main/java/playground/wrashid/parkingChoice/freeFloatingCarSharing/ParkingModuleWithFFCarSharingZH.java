@@ -33,13 +33,15 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		this.initialDesiredVehicleCoordinates = initialDesiredVehicleCoordinates;
 		//TODO: initialize parkings car to parking
 		
+		SetupParkingForZHScenario.prepare(this,controler.getConfig());
+		
 		resetForNewIterationStart();
 	}
 
 	
 	// TODO: we are not considering, that the number of vehicles is too limited, that no vehicle is available
 	@Override
-	public ParkingLinkInfo getNextFreeFloatingVehicle(Coord coord, Id personId) {
+	public ParkingLinkInfo getNextFreeFloatingVehicle(Coord coord, Id personId, double time) {
 		Id vehicleId = vehicleLocations.get(coord.getX(), coord.getY());
 		
 		Parking parking=currentVehicleLocation.get(vehicleId);
@@ -64,7 +66,7 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 	}
 
 	@Override
-	public ParkingLinkInfo parkFreeFloatingVehicle(Id vehicleId, Coord destCoord, Id personId) {
+	public ParkingLinkInfo parkFreeFloatingVehicle(Id vehicleId, Coord destCoord, Id personId, double time) {
 		NetworkImpl network = (NetworkImpl) getControler().getNetwork();
 		
 		String groupName = getAcceptableParkingGroupName();
@@ -86,6 +88,8 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		currentVehicleLocation=new HashMap<Id, Parking>();
 		
 		for (ParkingCoordInfo parkInfo : initialDesiredVehicleCoordinates) {
+			DebugLib.emptyFunctionForSettingBreakPoint();
+			
 			Parking parking=parkingInfrastructureManager.parkAtClosestPublicParkingNonPersonalVehicle(parkInfo.getParkingCoordinate(), groupName);
 			currentVehicleLocation.put(parkInfo.getVehicleId(), parking);
 			vehicleLocationsRect.registerCoord(parking.getCoordinate());

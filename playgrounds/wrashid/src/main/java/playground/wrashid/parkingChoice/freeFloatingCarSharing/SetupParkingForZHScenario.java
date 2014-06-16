@@ -83,6 +83,7 @@ public class SetupParkingForZHScenario {
 		pim.setPrivateParkingRestrictedToFacilities(ppRestrictedToFacilities);
 		
 		parkingModule.setParkingInfrastructurManager(pim);
+		parkingModule.setParkingScoreManager(parkingScoreManager);
 		appendScoringFactory(parkingModule);
 	}
 

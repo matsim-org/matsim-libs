@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.PC2.infrastructure.PPRestrictedToFacilities;
 import org.matsim.contrib.parking.PC2.infrastructure.PrivateParking;
 import org.matsim.contrib.parking.PC2.infrastructure.PublicParking;
+import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.SortableMapObject;
 import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
@@ -66,6 +67,7 @@ public class ParkingInfrastructureManager {
 	public ParkingInfrastructureManager(ParkingScoreManager parkingScoreManager){
 		parkedVehicles=new HashMap<Id, Id>();
 		allParkings=new HashMap<Id, Parking>();
+		privateParkingsRestrictedToFacilities=new LinkedListValueHashMap<Id, PPRestrictedToFacilities>();
 	}
 	
 	
@@ -100,7 +102,7 @@ public class ParkingInfrastructureManager {
 	}
 	
 	public static void addParkingToQuadTree(QuadTree<Parking> quadTree, Parking parking){
-		quadTree.put(parking.getCoordinate().getX(), parking.getCoordinate().getX(), parking);
+		quadTree.put(parking.getCoordinate().getX(), parking.getCoordinate().getY(), parking);
 	}
 
 	public void setPrivateParkingRestrictedToFacilities(LinkedList<PPRestrictedToFacilities> ppRestrictedToFacilities) {
@@ -135,7 +137,6 @@ public class ParkingInfrastructureManager {
 		return parking;
 	}
 	
-	
 	public Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName, Id personId, double parkingDurationInSeconds){
 		Parking parking=parkAtClosestPublicParkingNonPersonalVehicle(destCoordinate, groupName);
 		
@@ -145,25 +146,23 @@ public class ParkingInfrastructureManager {
 		return parking;
 	}
 	
-	public void departureOfNonPersonalVehicle(){
-		
-	}
 	
 	
 	// TODO: make this method abstract
 	// when person/vehicleId is clearly distinct, then I can change this to vehicleId - check, if this is the case now.
-	public void parkVehicle(ParkingOperationRequestAttributes parkingOperationRequestAttributes){
+	public Parking parkVehicle(ParkingOperationRequestAttributes parkingOperationRequestAttributes){
 		
 		
 		
 		
-		
+		Parking selectedParking=null;
 		boolean parkingFound=false;
 		for (PPRestrictedToFacilities pp:privateParkingsRestrictedToFacilities.get(parkingOperationRequestAttributes.facilityId)){
 			if (pp.getAvailableParkingCapacity()>0){
 				pp.parkVehicle();
 				parkedVehicles.put(parkingOperationRequestAttributes.personId, pp.getId());
 				parkingFound=true;
+				selectedParking=pp;
 			}
 		}
 		
@@ -188,17 +187,17 @@ public class ParkingInfrastructureManager {
 				//TODO: should I make MNL only on top 5 here?
 				
 				SortableMapObject<Parking> poll = queue.poll();
-				Parking parking = poll.getKey();
-				parkedVehicles.put(parkingOperationRequestAttributes.personId, parking.getId());
+				selectedParking = poll.getKey();
+				parkedVehicles.put(parkingOperationRequestAttributes.personId, selectedParking.getId());
 				
-				parkVehicle(parking);
+				parkVehicle(selectedParking);
 			}
 			
 			
 		}
 		
 		
-		
+		return selectedParking;
 	}
 
 
@@ -224,12 +223,18 @@ public class ParkingInfrastructureManager {
 	}
 	
 	// TODO: make this method abstract
-	public void personCarDepartureEvent(ParkingOperationRequestAttributes parkingOperationRequestAttributes){
+	public Parking personCarDepartureEvent(ParkingOperationRequestAttributes parkingOperationRequestAttributes){
 		Id parkingFacilityId=parkedVehicles.get(parkingOperationRequestAttributes.personId);
 		Parking parking = allParkings.get(parkingFacilityId);
 		parkedVehicles.remove(parkingOperationRequestAttributes.personId);
 		unParkVehicle(parking);
-		
+		return parking;
+	}
+
+
+
+
+	public void scoreParkingOperation(ParkingOperationRequestAttributes parkingOperationRequestAttributes, Parking parking) {
 		double score=parkingScoreManager.calcScore(parkingOperationRequestAttributes.destCoordinate, parkingOperationRequestAttributes.arrivalTime, parkingOperationRequestAttributes.parkingDurationInSeconds, parking, parkingOperationRequestAttributes.personId);
 		parkingScoreManager.addScore(parkingOperationRequestAttributes.personId, score);
 	}

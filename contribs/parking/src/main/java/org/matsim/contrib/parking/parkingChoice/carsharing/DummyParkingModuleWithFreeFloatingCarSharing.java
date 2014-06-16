@@ -30,7 +30,7 @@ public class DummyParkingModuleWithFreeFloatingCarSharing implements
 	}
 
 	@Override
-	public ParkingLinkInfo getNextFreeFloatingVehicle(Coord coord, Id personId) {
+	public ParkingLinkInfo getNextFreeFloatingVehicle(Coord coord, Id personId, double time) {
 		Id vehicleId = null;
 		if (availableVehicles.size() > 0) {
 			vehicleId = availableVehicles.poll();
@@ -45,7 +45,7 @@ public class DummyParkingModuleWithFreeFloatingCarSharing implements
 	}
 
 	@Override
-	public ParkingLinkInfo parkFreeFloatingVehicle(Id vehicleId, Coord destCoord, Id personId) {
+	public ParkingLinkInfo parkFreeFloatingVehicle(Id vehicleId, Coord destCoord, Id personI, double time) {
 		availableVehicles.add(vehicleId);
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		return new ParkingLinkInfo(vehicleId, network.getNearestLink(destCoord)
