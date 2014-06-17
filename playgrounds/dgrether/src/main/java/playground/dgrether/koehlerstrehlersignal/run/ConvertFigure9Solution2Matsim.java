@@ -43,6 +43,7 @@ import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010Solutio
  * @author dgrether
  *
  */
+@Deprecated
 public class ConvertFigure9Solution2Matsim {
 	private static final String MATSIM_CONFIG = DgPaths.STUDIESDG + "koehlerStrehler2010/config_signals.xml";
 	private static final String SOLUTION_INPUT_FILENAME = DgPaths.STUDIESDG + "koehlerStrehler2010/solution_figure9_from_matsim_population_800_50_50.sol";
