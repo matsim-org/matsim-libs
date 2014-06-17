@@ -40,7 +40,7 @@ public class FastTransitMultiNodeDijkstra extends FastMultiNodeDijkstra {
 	public FastTransitMultiNodeDijkstra(final Network network, final TravelDisutility costFunction,
 			final TravelTime timeFunction, final PreProcessDijkstra preProcessData, 
 			final RoutingNetwork routingNetwork, final FastRouterDelegateFactory fastRouterFactory) {
-		super(network, costFunction, timeFunction, preProcessData, routingNetwork, fastRouterFactory, false);
+		super(routingNetwork, costFunction, timeFunction, preProcessData, fastRouterFactory, false);
 		this.customDataManager = new FastCustomDataManager(network);
 	}
 	
