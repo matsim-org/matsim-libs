@@ -27,8 +27,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
@@ -53,7 +51,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -180,7 +177,6 @@ class MultiRateRunResource {
 
         final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
         scenario.setNetwork(baseScenario.getNetwork());
-//        PopulationFromSightings.createPopulationWithEndTimesAtLastSightings(scenario, linkToZoneResolver, allSightings);
 
         PopulationFromSightings.createPopulationWithRandomEndTimesInPermittedWindow(scenario, linkToZoneResolver, allSightings);
         PopulationFromSightings.preparePopulation(scenario, linkToZoneResolver, allSightings);
@@ -196,112 +192,6 @@ class MultiRateRunResource {
         someCounts.setYear(2012);
         new CountsWriter(someCounts).write(rateDir + "/calibration_counts.xml.gz");
 
-    }
-
-    public void twoRatesRolling(String string) {
-        final int cloneFactor = 10;
-        final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
-        final int rate = Integer.parseInt(string);
-        for (Person person : baseScenario.getPopulation().getPersons().values()) {
-            if (CountWorkers.isWorker(person)) {
-                person.getCustomAttributes().put("phonerate", 50);
-            } else {
-                person.getCustomAttributes().put("phonerate", rate);
-            }
-        }
-        EventsManager events = EventsUtils.createEventsManager();
-        ZoneTracker.LinkToZoneResolver linkToZoneResolver = new ZoneTracker.LinkToZoneResolver() {
-
-            @Override
-            public Id resolveLinkToZone(Id linkId) {
-                return linkId;
-            }
-
-            public IdImpl chooseLinkInZone(String zoneId) {
-                return new IdImpl(zoneId);
-            }
-
-        };
-        final CompareMain compareMain = new CompareMain(baseScenario, events, new CallBehavior() {
-
-            @Override
-            public boolean makeACall(ActivityEndEvent event) {
-                return false;
-            }
-
-            @Override
-            public boolean makeACall(ActivityStartEvent event) {
-                return false;
-            }
-
-            @Override
-            public boolean makeACall(Id id, double time) {
-                Person person = baseScenario.getPopulation().getPersons().get(id);
-                double secondlyProbability = (Integer) person.getCustomAttributes().get("phonerate") / (double) (24*60*60);
-                return Math.random() < secondlyProbability;
-            }
-
-            @Override
-            public boolean makeACallAtMorningAndNight() {
-                return false;
-            }
-
-        }, linkToZoneResolver);
-        new MatsimEventsReader(events).readFile(getBaseRun().getLastIteration().getEventsFileName());
-        compareMain.close();
-
-
-        final Map<Id, List<Sighting>> allSightings = compareMain.getSightingsPerPerson();
-
-
-
-
-        final Config phoneConfig = phoneConfig();
-
-
-        final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(phoneConfig);
-        scenario.setNetwork(baseScenario.getNetwork());
-
-
-
-        PopulationFromSightings.createClonedPopulationWithRandomEndTimesInPermittedWindow(scenario, linkToZoneResolver, allSightings, cloneFactor);
-        PopulationFromSightings.preparePopulation(scenario, linkToZoneResolver, allSightings);
-
-
-        if(cloneFactor == 1) {
-            phoneConfig.controler().setLastIteration(0);
-            phoneConfig.planCalcScore().setWriteExperiencedPlans(true);
-        }
-        phoneConfig.controler().setOutputDirectory(WD + "/rates/rtwo_" + rate + "/" + cloneFactor);
-
-        final Counts allCounts = CompareMain.volumesToCounts(baseScenario.getNetwork(), compareMain.getGroundTruthVolumes());
-        allCounts.setYear(2012);
-        final Counts someCounts = filterCounts(allCounts);
-        someCounts.setYear(2012);
-
-        simulate(cloneFactor, scenario, allCounts, someCounts);
-    }
-
-    private void simulate(final double cloneFactor, final ScenarioImpl scenario, final Counts allCounts, final Counts someCounts) {
-        List<Module> modules = new ArrayList<Module>();
-        modules.add(new ControllerModule());
-        modules.add(new CadytsModule());
-        modules.add(new ClonesModule());
-        modules.add(new AbstractModule() {
-            @Override
-            protected void configure() {
-                bind(Config.class).toInstance(scenario.getConfig());
-                bind(Scenario.class).toInstance(scenario);
-                bind(ScoringFunctionFactory.class).to(CharyparNagelCadytsScoringFunctionFactory.class);
-                bind(Counts.class).annotatedWith(Names.named("allCounts")).toInstance(allCounts);
-                bind(Counts.class).annotatedWith(Names.named("calibrationCounts")).toInstance(someCounts);
-                bind(Double.class).annotatedWith(Names.named("clonefactor")).toInstance(cloneFactor);
-                bind(Boolean.class).annotatedWith(Names.named("alreadyCloned")).toInstance(true);
-            }
-        });
-        Injector injector2 = Guice.createInjector(modules);
-        Controller controler2 = injector2.getInstance(Controller.class);
-        controler2.run();
     }
 
     public void allRates() {
@@ -474,9 +364,6 @@ class MultiRateRunResource {
                 bind(Counts.class).annotatedWith(Names.named("allCounts")).toInstance(allCounts);
                 bind(Counts.class).annotatedWith(Names.named("calibrationCounts")).toInstance(someCounts);
                 bind(Double.class).annotatedWith(Names.named("clonefactor")).toInstance((double) cloneFactor);
-                Multibinder<ControlerListener> controlerListenerBinder = Multibinder.newSetBinder(binder(), ControlerListener.class);
-//                controlerListenerBinder.addBinding().toProvider(MyControlerListenerProvider.class);
-                MapBinder<String, MobsimFactory> mobsimFactoryMapBinder = MapBinder.newMapBinder(binder(), String.class, MobsimFactory.class);
             }
         });
 
@@ -569,18 +456,9 @@ class MultiRateRunResource {
         tmp.setFlowCapFactor(100);
         tmp.setStorageCapFactor(100);
         tmp.setRemoveStuckVehicles(false);
-//        tmp.setStuckTime(10.0);
-
-
-//        config.controler().setMobsim("JDEQSim");
-//        config.setParam("JDEQSim", "squeezeTime", "10.0");
-//        config.setParam("JDEQSim", "flowCapacityFactor", "100");
-//        config.setParam("JDEQSim", "storageCapacityFactor", "100");
-
 
         {
             StrategySettings stratSets = new StrategySettings(new IdImpl(1));
-//            stratSets.setModuleName("ccs");
             stratSets.setModuleName("SelectExpBeta");
 
             stratSets.setProbability(1.0);

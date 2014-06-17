@@ -1,9 +1,14 @@
 package playground.mzilske.cdr;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
 public class CDREquilTest {
+
+    @Rule
+    public MatsimTestUtils utils = new MatsimTestUtils();
 	
 	
 	/*
@@ -19,19 +24,19 @@ public class CDREquilTest {
 	@Test
 	public void testOneWorkplace() {
 		OneWorkplace oneWorkplace = new OneWorkplace();
-		oneWorkplace.run();
-		Assert.assertEquals("All-day squares", 0.0, CompareMain.compareAllDay(oneWorkplace.scenario, oneWorkplace.getCompare().getCdrVolumes(), oneWorkplace.getCompare().getGroundTruthVolumes()), 0.0);
-		Assert.assertEquals("Timebin squares", 0.0, CompareMain.compareTimebins(oneWorkplace.scenario, oneWorkplace.getCompare().getCdrVolumes(), oneWorkplace.getCompare().getGroundTruthVolumes()), 0.0);
-		Assert.assertEquals("EMD", 0.0, oneWorkplace.getCompare().compareEMD(), 0.0);
+		oneWorkplace.run(utils.getOutputDirectory());
+		Assert.assertEquals("All-day squares", 0.0, CompareMain.compareAllDay(oneWorkplace.scenario, oneWorkplace.getCdrVolumes(), oneWorkplace.getCompare().getGroundTruthVolumes()), 0.0);
+		Assert.assertEquals("Timebin squares", 0.0, CompareMain.compareTimebins(oneWorkplace.scenario, oneWorkplace.getCdrVolumes(), oneWorkplace.getCompare().getGroundTruthVolumes()), 0.0);
+		Assert.assertEquals("EMD", 0.0, CompareMain.compareEMD(oneWorkplace.scenario, oneWorkplace.getCdrVolumes(), oneWorkplace.getCompare().getGroundTruthVolumes()), 0.0);
 	}
 	
 	@Test
 	public void testTwoWorkplaces() {
 		TwoWorkplaces twoWorkplaces = new TwoWorkplaces();
-		twoWorkplaces.run();
-		Assert.assertEquals("All-day squares", 0.0, CompareMain.compareAllDay(twoWorkplaces.scenario, twoWorkplaces.getCompare().getCdrVolumes(), twoWorkplaces.getCompare().getGroundTruthVolumes()), 0.0);
-		Assert.assertEquals("Timebin squares", 0.0, CompareMain.compareTimebins(twoWorkplaces.scenario, twoWorkplaces.getCompare().getCdrVolumes(), twoWorkplaces.getCompare().getGroundTruthVolumes()), 0.0);
-		Assert.assertEquals("EMD", 0.0, twoWorkplaces.getCompare().compareEMD(), 0.0);
+		twoWorkplaces.run(utils.getOutputDirectory());
+		Assert.assertEquals("All-day squares", 0.0, CompareMain.compareAllDay(twoWorkplaces.scenario, twoWorkplaces.getCdrVolumes(), twoWorkplaces.getCompare().getGroundTruthVolumes()), 0.0);
+		Assert.assertEquals("Timebin squares", 0.0, CompareMain.compareTimebins(twoWorkplaces.scenario, twoWorkplaces.getCdrVolumes(), twoWorkplaces.getCompare().getGroundTruthVolumes()), 0.0);
+		Assert.assertEquals("EMD", 0.0, CompareMain.compareEMD(twoWorkplaces.scenario, twoWorkplaces.getCdrVolumes(), twoWorkplaces.getCompare().getGroundTruthVolumes()), 0.0);
 	}
 
 }

@@ -1,5 +1,6 @@
 package playground.mzilske.cdr;
 
+import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -14,17 +15,23 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.counts.Counts;
+import playground.mzilske.d4d.Sighting;
+
+import java.util.List;
+import java.util.Map;
 
 class OneWorkplace {
 
 	Scenario scenario;
 	private CompareMain compareMain;
+    private VolumesAnalyzer cdrVolumes;
 
-	public static void main(String[] args) {
-		new OneWorkplace().run();
-	}
+    public VolumesAnalyzer getCdrVolumes() {
+        return cdrVolumes;
+    }
 
-	void run() {
+    void run(String outputDirectory) {
 		int quantity = 1000;
 		Config config = ConfigUtils.createConfig();
 		ActivityParams workParams = new ActivityParams("work");
@@ -33,6 +40,7 @@ class OneWorkplace {
 		ActivityParams homeParams = new ActivityParams("home");
 		homeParams.setTypicalDuration(16*60*60);
 		config.planCalcScore().addActivityParams(homeParams);
+        config.controler().setOutputDirectory(outputDirectory+"/output");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
 		config.planCalcScore().setWriteExperiencedPlans(true);
@@ -56,8 +64,19 @@ class OneWorkplace {
 			population.addPerson(person);
 		}
 		Controler controler = new Controler(scenario);
-		controler.setOverwriteFiles(true);
-		compareMain = new CompareMain(scenario, controler.getEvents(), new CallBehavior() {
+        ZoneTracker.LinkToZoneResolver linkToZoneResolver = new ZoneTracker.LinkToZoneResolver() {
+
+            @Override
+            public Id resolveLinkToZone(Id linkId) {
+                return linkId;
+            }
+
+            public IdImpl chooseLinkInZone(String zoneId) {
+                return new IdImpl(zoneId);
+            }
+
+        };
+        compareMain = new CompareMain(scenario, controler.getEvents(), new CallBehavior() {
 
 			@Override
 			public boolean makeACall(ActivityEndEvent event) {
@@ -81,22 +100,16 @@ class OneWorkplace {
 				return true;
 			}
 
-		}, new ZoneTracker.LinkToZoneResolver() {
-
-			@Override
-			public Id resolveLinkToZone(Id linkId) {
-				return linkId;
-			}
-
-			public IdImpl chooseLinkInZone(String zoneId) {
-				return new IdImpl(zoneId);
-			}
-
-		});
+		}, linkToZoneResolver);
 		controler.run();
-		compareMain.runWithTwoPlansAndCadyts();
-		System.out.printf("%f\t%f\t%f\n", CompareMain.compareAllDay(scenario, compareMain.getCdrVolumes(), compareMain.getGroundTruthVolumes()), CompareMain.compareTimebins(scenario, compareMain.getCdrVolumes(), compareMain.getGroundTruthVolumes()), CompareMain.compareEMDMassPerLink(scenario, compareMain.getCdrVolumes(), compareMain.getGroundTruthVolumes()));
-	}
+        compareMain.close();
+        Map<Id, List<Sighting>> sightings = compareMain.getSightingsPerPerson();
+
+        Counts counts = CompareMain.volumesToCounts(scenario.getNetwork(), compareMain.getGroundTruthVolumes());
+
+        cdrVolumes = CompareMain.runWithTwoPlansAndCadyts(outputDirectory + "/output2", scenario.getNetwork(), linkToZoneResolver, sightings, counts);
+        System.out.printf("%f\t%f\t%f\n", CompareMain.compareAllDay(scenario, cdrVolumes, compareMain.getGroundTruthVolumes()), CompareMain.compareTimebins(scenario, cdrVolumes, compareMain.getGroundTruthVolumes()), CompareMain.compareEMDMassPerLink(scenario, cdrVolumes, compareMain.getGroundTruthVolumes()));
+    }
 
 	private Activity createHomeMorning(IdImpl idImpl) {
 		Activity act = scenario.getPopulation().getFactory().createActivityFromLinkId("home", idImpl);
@@ -105,8 +118,7 @@ class OneWorkplace {
 	}
 
 	private Leg createDriveLeg() {
-		Leg leg = scenario.getPopulation().getFactory().createLeg(TransportMode.car);
-		return leg;
+        return scenario.getPopulation().getFactory().createLeg(TransportMode.car);
 	}
 
 	private Activity createWork(IdImpl idImpl) {
@@ -116,8 +128,7 @@ class OneWorkplace {
 	}
 
 	private Activity createHomeEvening(IdImpl idImpl) {
-		Activity act = scenario.getPopulation().getFactory().createActivityFromLinkId("home", idImpl);
-		return act;
+        return scenario.getPopulation().getFactory().createActivityFromLinkId("home", idImpl);
 	}
 
 	private Id createId(int i) {

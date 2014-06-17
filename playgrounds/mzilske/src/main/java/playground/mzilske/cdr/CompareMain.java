@@ -69,15 +69,6 @@ public class CompareMain {
     private VolumesAnalyzer groundTruthVolumes;
 	private LinkToZoneResolver linkToZoneResolver;
 	private Scenario scenario;
-	private VolumesAnalyzer cdrVolumes;
-
-	public void runWithTwoPlansAndCadyts() {
-		close();
-		List<Sighting> sightings = callProcess.getSightings();
-
-		Counts counts = volumesToCounts(scenario.getNetwork(), groundTruthVolumes);
-		cdrVolumes = runWithTwoPlansAndCadyts(scenario.getNetwork(), linkToZoneResolver, sightings, counts);
-	}
 
     public ScenarioImpl createScenarioFromSightings(Config config) {
 		final ScenarioImpl scenario21 = (ScenarioImpl) ScenarioUtils.createScenario(config);
@@ -112,7 +103,7 @@ public class CompareMain {
 		callProcess.dump();
 	}
 
-	double compareEMD() {
+	static double compareEMD(Scenario scenario, VolumesAnalyzer cdrVolumes, VolumesAnalyzer groundTruthVolumes) {
 		Network network = scenario.getNetwork();
 		Signature signature1 = makeSignature(network, groundTruthVolumes);
 		Signature signature2 = makeSignature(network, cdrVolumes);
@@ -137,9 +128,6 @@ public class CompareMain {
 		return sum;
 	}
 
-    public VolumesAnalyzer getCdrVolumes() {
-        return cdrVolumes;
-    }
 
     static double compareAllDay(Scenario scenario, VolumesAnalyzer cdrVolumes, VolumesAnalyzer groundTruthVolumes) {
 		double sum = 0;
@@ -254,7 +242,7 @@ public class CompareMain {
 		return signature;
 	}
 
-	public static VolumesAnalyzer runWithTwoPlansAndCadyts(Network network, final LinkToZoneResolver linkToZoneResolver, List<Sighting> sightings, Counts counts) {
+	public static VolumesAnalyzer runWithTwoPlansAndCadyts(String outputDirectory, Network network, final LinkToZoneResolver linkToZoneResolver, Map<Id, List<Sighting>> allSightings, Counts counts) {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams sightingParam = new ActivityParams("sighting");
 		// sighting.setOpeningTime(0.0);
@@ -267,6 +255,7 @@ public class CompareMain {
 		config.planCalcScore().setConstantCar(0);
 		config.planCalcScore().setMonetaryDistanceCostRateCar(0);
 		config.planCalcScore().setWriteExperiencedPlans(true);
+        config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(10);
 		QSimConfigGroup tmp = config.qsim();
 		tmp.setFlowCapFactor(100);
@@ -281,23 +270,6 @@ public class CompareMain {
 
 		final ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		scenario2.setNetwork(network);
-
-
-
-		final Map<Id, List<Sighting>> allSightings = new HashMap<Id, List<Sighting>>();
-		for (Sighting sighting : sightings) {
-
-			List<Sighting> sightingsOfPerson = allSightings.get(sighting.getAgentId());
-			if (sightingsOfPerson == null) {
-				sightingsOfPerson = new ArrayList<Sighting>();
-				allSightings.put(sighting.getAgentId(), sightingsOfPerson);
-
-			}
-			System.out.println(sighting.getCellTowerId());
-
-			sightingsOfPerson.add(sighting);
-		}
-
 
 		PopulationFromSightings.createPopulationWithTwoPlansEach(scenario2, linkToZoneResolver, allSightings);
 		PopulationFromSightings.preparePopulation(scenario2, linkToZoneResolver, allSightings);
