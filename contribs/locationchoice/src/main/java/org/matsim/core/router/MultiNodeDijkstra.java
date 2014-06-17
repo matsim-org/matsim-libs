@@ -70,6 +70,22 @@ public class MultiNodeDijkstra extends Dijkstra {
 		return new ImaginaryNode(nodes, coord);
 	}
 	
+	/*
+	 * We have to extend this method from the original Dijkstra. The given input nodes might be
+	 * ImaginaryNodes which contain multiple start / end nodes for the routing process. Those
+	 * nodes should be part of the routing network, therefore we perform the check for each of them.
+	 * 
+	 * Regular nodes are directly passed to the super class.
+	 * 
+	 * cdobler, jun'14
+	 */
+	/*package*/ void checkNodeBelongToNetwork(Node node) {
+		if (node instanceof ImaginaryNode) {
+			ImaginaryNode imaginaryNode = (ImaginaryNode) node;
+			for (InitialNode initialNode : imaginaryNode.initialNodes) super.checkNodeBelongToNetwork(initialNode.node);
+		} else super.checkNodeBelongToNetwork(node);
+	}
+	
 	@Override
 	/*package*/ Node searchLogic(final Node fromNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes) {
 		

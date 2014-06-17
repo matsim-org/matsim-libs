@@ -68,7 +68,7 @@ public class BackwardsFastMultiNodeDijkstraFactory implements LeastCostPathCalcu
 			this.routingNetworks.put(network, routingNetwork);
 		}
 		
-		return new BackwardFastMultiNodeDijkstra(network, travelCosts, travelTimes, 
-				this.preProcessData, routingNetwork, fastRouterFactory, this.searchAllEndNodes);
+		return new BackwardFastMultiNodeDijkstra(routingNetwork, travelCosts, travelTimes, 
+				this.preProcessData, fastRouterFactory, this.searchAllEndNodes);
 	}
 }

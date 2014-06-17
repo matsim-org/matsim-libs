@@ -61,7 +61,7 @@ public class FastMultiNodeDijkstraFactory implements LeastCostPathCalculatorFact
 			this.routingNetworks.put(network, routingNetwork);
 		}
 		
-		return new FastMultiNodeDijkstra(network, travelCosts, travelTimes, 
-				this.preProcessData, routingNetwork, fastRouterFactory, this.searchAllEndNodes);
+		return new FastMultiNodeDijkstra(routingNetwork, travelCosts, travelTimes, 
+				this.preProcessData, fastRouterFactory, this.searchAllEndNodes);
 	}
 }

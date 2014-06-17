@@ -23,7 +23,6 @@ package org.matsim.core.router;
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.NodeData;
@@ -44,10 +43,10 @@ import org.matsim.core.utils.collections.RouterPriorityQueue;
  */
 public class BackwardFastMultiNodeDijkstra extends FastMultiNodeDijkstra {
 	
-	public BackwardFastMultiNodeDijkstra(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction,
-			final PreProcessDijkstra preProcessData, final RoutingNetwork routingNetwork, 
+	public BackwardFastMultiNodeDijkstra(final RoutingNetwork routingNetwork, final TravelDisutility costFunction,
+			final TravelTime timeFunction, final PreProcessDijkstra preProcessData, 
 			final FastRouterDelegateFactory fastRouterFactory, boolean searchAllEndNodes) {
-		super(network, costFunction, timeFunction, preProcessData, routingNetwork, fastRouterFactory, searchAllEndNodes);
+		super(routingNetwork, costFunction, timeFunction, preProcessData, fastRouterFactory, searchAllEndNodes);
 	}
 	
 	@Override

@@ -23,7 +23,6 @@ package org.matsim.core.router;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.DijkstraNodeData;
@@ -55,10 +54,10 @@ public class FastMultiNodeDijkstra extends MultiNodeDijkstra {
 	 * Create the routing network here and clear the nodeData map 
 	 * which is not used by this implementation.
 	 */
-	public FastMultiNodeDijkstra(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction,
-			final PreProcessDijkstra preProcessData, final RoutingNetwork routingNetwork, 
+	public FastMultiNodeDijkstra(final RoutingNetwork routingNetwork, final TravelDisutility costFunction, 
+			final TravelTime timeFunction, final PreProcessDijkstra preProcessData, 
 			final FastRouterDelegateFactory fastRouterFactory, boolean searchAllEndNodes) {
-		super(network, costFunction, timeFunction, preProcessData, searchAllEndNodes);
+		super(routingNetwork, costFunction, timeFunction, preProcessData, searchAllEndNodes);
 		
 		this.routingNetwork = routingNetwork;
 		this.fastRouter = fastRouterFactory.createFastRouterDelegate(this, new DijkstraNodeDataFactory(), routingNetwork);
