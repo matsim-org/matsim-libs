@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.PC2.GeneralParkingModule;
 import org.matsim.contrib.parking.PC2.infrastructure.Parking;
 import org.matsim.contrib.parking.PC2.infrastructure.PublicParking;
+import org.matsim.contrib.parking.PC2.simulation.ParkingChoiceSimulation;
 import org.matsim.contrib.parking.PC2.simulation.ParkingInfrastructureManager;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
@@ -18,6 +19,9 @@ import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingCoordInfo;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingLinkInfo;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingModuleWithFreeFloatingCarSharing;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.QuadTree;
 
@@ -33,27 +37,31 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		this.initialDesiredVehicleCoordinates = initialDesiredVehicleCoordinates;
 		//TODO: initialize parkings car to parking
 		
-		SetupParkingForZHScenario.prepare(this,controler.getConfig());
+		SetupParkingForZHScenario.prepare(this,controler);
 		
-		resetForNewIterationStart();
+		//resetForNewIterationStart();
 	}
 
 	
 	// TODO: we are not considering, that the number of vehicles is too limited, that no vehicle is available
 	@Override
-	public ParkingLinkInfo getNextFreeFloatingVehicle(Coord coord, Id personId, double time) {
+	public ParkingLinkInfo getNextFreeFloatingVehicle(Coord coord, Id personId, double departureTime) {
 		Id vehicleId = vehicleLocations.get(coord.getX(), coord.getY());
 		
 		Parking parking=currentVehicleLocation.get(vehicleId);
-		parkingInfrastructureManager.unParkVehicle(parking);
+		parkingInfrastructureManager.unParkVehicle(parking, departureTime);
 		
 		vehicleLocations.remove(parking.getCoordinate().getX(), parking.getCoordinate().getY(), vehicleId);
 		
 		NetworkImpl network = (NetworkImpl) getControler().getNetwork();
 		
-		double walkScore = parkingInfrastructureManager.getParkingScoreManager().calcWalkScore(coord, parking.getCoordinate(), personId, getAverageActDuration());
+		try{
+			double walkScore = parkingInfrastructureManager.getParkingScoreManager().calcWalkScore(coord, parking.getCoordinate(), personId, getAverageActDuration());
+			parkingInfrastructureManager.getParkingScoreManager().addScore(personId, walkScore);
+		} catch (Error err){
+			DebugLib.emptyFunctionForSettingBreakPoint();
+		}
 		
-		parkingInfrastructureManager.getParkingScoreManager().addScore(personId,walkScore);
 
 		return new ParkingLinkInfo(vehicleId, network.getNearestLink(parking.getCoordinate())
 				.getId());
@@ -66,12 +74,12 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 	}
 
 	@Override
-	public ParkingLinkInfo parkFreeFloatingVehicle(Id vehicleId, Coord destCoord, Id personId, double time) {
+	public ParkingLinkInfo parkFreeFloatingVehicle(Id vehicleId, Coord destCoord, Id personId, double arrivalTime) {
 		NetworkImpl network = (NetworkImpl) getControler().getNetwork();
 		
 		String groupName = getAcceptableParkingGroupName();
 		
-		Parking parking=parkingInfrastructureManager.parkAtClosestPublicParkingNonPersonalVehicle(destCoord, groupName, personId, getAverageActDuration());
+		Parking parking=parkingInfrastructureManager.parkAtClosestPublicParkingNonPersonalVehicle(destCoord, groupName, personId, getAverageActDuration(), arrivalTime);
 		currentVehicleLocation.put(vehicleId, parking);
 		vehicleLocations.put(parking.getCoordinate().getX(), parking.getCoordinate().getY(), vehicleId);
 		
@@ -88,14 +96,13 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		currentVehicleLocation=new HashMap<Id, Parking>();
 		
 		for (ParkingCoordInfo parkInfo : initialDesiredVehicleCoordinates) {
-			DebugLib.emptyFunctionForSettingBreakPoint();
-			
 			Parking parking=parkingInfrastructureManager.parkAtClosestPublicParkingNonPersonalVehicle(parkInfo.getParkingCoordinate(), groupName);
+			parkingInfrastructureManager.logArrivalEventAtTimeZero(parking);
 			currentVehicleLocation.put(parkInfo.getVehicleId(), parking);
 			vehicleLocationsRect.registerCoord(parking.getCoordinate());
 		}
 		
-		vehicleLocations = (new QuadTreeInitializer<Id>()).getQuadTree(vehicleLocationsRect);
+		vehicleLocations = (new QuadTreeInitializer<Id>()).getLinkQuadTree((NetworkImpl) getControler().getNetwork());
 		
 		for (ParkingCoordInfo parkInfo : initialDesiredVehicleCoordinates) {
 			Parking parking=currentVehicleLocation.get(parkInfo.getVehicleId());
@@ -113,4 +120,24 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		}
 		return groupName;
 	}
+	
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		super.notifyIterationStarts(event);
+		//resetForNewIterationStart();
+		// already called by free floating code
+	}
+	
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		super.notifyBeforeMobsim(event);
+		resetForNewIterationStart();
+	}
+	
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		super.notifyStartup(event);
+		getControler().getEvents().addHandler(new ParkingGroupOccupanciesZH(getControler()));
+	}
+	
 }

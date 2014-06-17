@@ -38,14 +38,17 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.PC2.infrastructure.Parking;
+import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 
-public class ParkingChoiceSimulation implements PersonDepartureEventHandler, ActivityStartEventHandler, PersonArrivalEventHandler, ActivityEndEventHandler {
+public class ParkingChoiceSimulation implements PersonDepartureEventHandler, ActivityStartEventHandler, PersonArrivalEventHandler, ActivityEndEventHandler, BeforeMobsimListener {
 
 	private ParkingInfrastructureManager parkingInfrastructureManager;
 	private Controler controler;
@@ -60,27 +63,7 @@ public class ParkingChoiceSimulation implements PersonDepartureEventHandler, Act
 	
 	@Override
 	public void reset(int iteration) {
-		currentPlanElementIndex=new IntegerValueHashMap<Id>();
-		parkingOperationRequestAttributes=new HashMap<Id, ParkingOperationRequestAttributes>();
-		firstDepartureTimeOfDay=new DoubleValueHashMap<Id>();
-		
-		for (Person person:controler.getPopulation().getPersons().values()){
-			if (hasCarLeg(person.getSelectedPlan())){
-				ParkingOperationRequestAttributes parkingAttributes = new ParkingOperationRequestAttributes();
-				
-				ActivityImpl firstActivityOfDayBeforeDepartingWithCar = getFirstActivityOfDayBeforeDepartingWithCar(person.getSelectedPlan());
-				ActivityImpl firstActivityAfterLastCarLegOfDay = getFirstActivityAfterLastCarLegOfDay(person.getSelectedPlan());
-				
-				parkingAttributes.destCoordinate=firstActivityAfterLastCarLegOfDay.getCoord();
-				parkingAttributes.arrivalTime=firstActivityAfterLastCarLegOfDay.getStartTime();
-				parkingAttributes.personId=person.getId();
-				parkingAttributes.facilityId=firstActivityAfterLastCarLegOfDay.getFacilityId();
-				parkingAttributes.actType=firstActivityAfterLastCarLegOfDay.getType();
-				parkingAttributes.parkingDurationInSeconds=GeneralLib.getIntervalDuration(firstActivityAfterLastCarLegOfDay.getStartTime(), firstActivityOfDayBeforeDepartingWithCar.getEndTime());
-				
-				parkingInfrastructureManager.parkVehicle(parkingAttributes);
-			}
-		}
+		DebugLib.emptyFunctionForSettingBreakPoint();
 	}
 	
 	public ActivityImpl getFirstActivityAfterLastCarLegOfDay(Plan plan){
@@ -157,12 +140,21 @@ public class ParkingChoiceSimulation implements PersonDepartureEventHandler, Act
 			}
 			
 			
-			ParkingOperationRequestAttributes parkingAttributes = parkingOperationRequestAttributes.get(event.getPersonId());
-			parkingAttributes.parkingDurationInSeconds=GeneralLib.getIntervalDuration(parkingAttributes.arrivalTime, event.getTime());
-			
 			if (isFirstCarDepartureOfDay(event.getPersonId())){
+				DebugLib.emptyFunctionForSettingBreakPoint();
+				ParkingOperationRequestAttributes parkingAttributes = new ParkingOperationRequestAttributes();
+				parkingAttributes.personId=event.getPersonId();
+				// this is a trick to get the correct departure time
+				parkingAttributes.arrivalTime=0;
+				parkingAttributes.parkingDurationInSeconds=GeneralLib.getIntervalDuration(0, event.getTime());
 				parkingInfrastructureManager.personCarDepartureEvent(parkingAttributes);
 			} else {
+				ParkingOperationRequestAttributes parkingAttributes = parkingOperationRequestAttributes.get(event.getPersonId());
+				parkingAttributes.parkingDurationInSeconds=GeneralLib.getIntervalDuration(parkingAttributes.arrivalTime, event.getTime());
+				if (parkingAttributes.parkingDurationInSeconds==24*3600){
+					parkingAttributes.parkingDurationInSeconds=1; // not zero, because this might lead to NaN
+				}
+				
 				Parking parking = parkingInfrastructureManager.personCarDepartureEvent(parkingAttributes);
 				parkingInfrastructureManager.scoreParkingOperation(parkingAttributes,parking);
 			}
@@ -220,7 +212,11 @@ public class ParkingChoiceSimulation implements PersonDepartureEventHandler, Act
 				parkingInfrastructureManager.scoreParkingOperation(parkingAttributes,parking);
 			}
 			
+			parkingOperationRequestAttributes.put(personId, parkingAttributes);
+			
 		}
+		
+		
 		
 		currentPlanElementIndex.increment(personId);
 	}
@@ -276,6 +272,38 @@ public class ParkingChoiceSimulation implements PersonDepartureEventHandler, Act
 			}
 		}
 		return null;
+	}
+
+	public void prepareForNewIteration() {
+		currentPlanElementIndex=new IntegerValueHashMap<Id>();
+		parkingOperationRequestAttributes=new HashMap<Id, ParkingOperationRequestAttributes>();
+		firstDepartureTimeOfDay=new DoubleValueHashMap<Id>();
+		
+		for (Person person:controler.getPopulation().getPersons().values()){
+			if (hasCarLeg(person.getSelectedPlan())){
+				DebugLib.traceAgent(person.getId());
+				ParkingOperationRequestAttributes parkingAttributes = new ParkingOperationRequestAttributes();
+				
+				ActivityImpl firstActivityOfDayBeforeDepartingWithCar = getFirstActivityOfDayBeforeDepartingWithCar(person.getSelectedPlan());
+				ActivityImpl firstActivityAfterLastCarLegOfDay = getFirstActivityAfterLastCarLegOfDay(person.getSelectedPlan());
+				
+				parkingAttributes.destCoordinate=firstActivityAfterLastCarLegOfDay.getCoord();
+				//parkingAttributes.arrivalTime=firstActivityAfterLastCarLegOfDay.getStartTime();
+				parkingAttributes.arrivalTime=0;
+				
+				parkingAttributes.personId=person.getId();
+				parkingAttributes.facilityId=firstActivityAfterLastCarLegOfDay.getFacilityId();
+				parkingAttributes.actType=firstActivityAfterLastCarLegOfDay.getType();
+				parkingAttributes.parkingDurationInSeconds=GeneralLib.getIntervalDuration(firstActivityAfterLastCarLegOfDay.getStartTime(), firstActivityOfDayBeforeDepartingWithCar.getEndTime());
+				
+				parkingInfrastructureManager.parkVehicle(parkingAttributes);
+			}
+		}
+	}
+
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		DebugLib.emptyFunctionForSettingBreakPoint();
 	}
 	
 }

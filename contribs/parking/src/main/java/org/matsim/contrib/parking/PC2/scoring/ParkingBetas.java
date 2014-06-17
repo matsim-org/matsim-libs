@@ -34,8 +34,10 @@ public class ParkingBetas {
 	private Parser parkingCostBetaParser;
 	private HashMap<Id, Parser> parkingWalkBetaCache;
 	private DoubleValueHashMap<Id> parkingCostBetaCache;
+	private DoubleValueHashMap<Id> income;
 
-	public ParkingBetas() {
+	public ParkingBetas(DoubleValueHashMap<Id> income) {
+		this.income = income;
 		parkingWalkBetaCache = new HashMap<Id, Parser>();
 		parkingCostBetaCache = new DoubleValueHashMap<Id>();
 	}
@@ -95,20 +97,7 @@ public class ParkingBetas {
 	public double getParkingCostBeta(Person person) {
 		Id personId = person.getId();
 		if (!parkingCostBetaCache.containsKey(personId)) {
-			Double income = (Double) person.getCustomAttributes().get("parkingChoice.income"); // TODO:
-																								// read
-																								// from
-																								// a
-																								// HashMap
-																								// and
-																								// set
-																								// to
-																								// person
-																								// =>
-																								// tell,
-																								// where
-																								// expected
-			parkingCostBetaParser.setVariable("income", income);
+			parkingCostBetaParser.setVariable("income", income.get(personId));
 			try {
 				parkingCostBetaCache.put(personId, parkingCostBetaParser.parse());
 			} catch (SyntaxException e) {

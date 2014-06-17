@@ -36,6 +36,7 @@ import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
 import org.matsim.contrib.parking.lib.obj.network.QuadTreeInitializer;
 import org.matsim.contrib.parking.PC2.infrastructure.Parking;
 import org.matsim.contrib.parking.PC2.scoring.ParkingScoreManager;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.QuadTree;
 
 // TODO: make abstract and create algorithm in Zuerich case -> provide protected helper methods already here.
@@ -47,6 +48,7 @@ public class ParkingInfrastructureManager {
 	
 	// personId, parkingFacilityId
 	private HashMap<Id,Id> parkedVehicles;
+	private EventsManager eventsManager;
 	
 	
 	// facilityId -> parkings available to users of that facility
@@ -64,7 +66,9 @@ public class ParkingInfrastructureManager {
 
 	
 	
-	public ParkingInfrastructureManager(ParkingScoreManager parkingScoreManager){
+	public ParkingInfrastructureManager(ParkingScoreManager parkingScoreManager, EventsManager eventsManager){
+		this.parkingScoreManager = parkingScoreManager;
+		this.eventsManager = eventsManager;
 		parkedVehicles=new HashMap<Id, Id>();
 		allParkings=new HashMap<Id, Parking>();
 		privateParkingsRestrictedToFacilities=new LinkedListValueHashMap<Id, PPRestrictedToFacilities>();
@@ -131,17 +135,29 @@ public class ParkingInfrastructureManager {
 		if (groupName==null){
 			parking = publicParkingsQuadTree.get(destCoordinate.getX(), destCoordinate.getY());
 		} else {
-			parking= publicParkingGroupQuadTrees.get(groupName).get(destCoordinate.getX(), destCoordinate.getY());
+			QuadTree<Parking> quadTree = publicParkingGroupQuadTrees.get(groupName);
+			parking= quadTree.get(destCoordinate.getX(), destCoordinate.getY());
+			
+			if (parking==null){
+				DebugLib.stopSystemAndReportInconsistency("not enough parking available for parkingGroupName:" + groupName);
+			}
 		}
 		parkVehicle(parking);
+		
 		return parking;
 	}
 	
-	public Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName, Id personId, double parkingDurationInSeconds){
+	public void logArrivalEventAtTimeZero(Parking parking){
+		eventsManager.processEvent(new ParkingArrivalEvent(0, parking.getId()));
+	}
+	
+	public Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName, Id personId, double parkingDurationInSeconds, double arrivalTime){
 		Parking parking=parkAtClosestPublicParkingNonPersonalVehicle(destCoordinate, groupName);
 		
 		double walkScore = parkingScoreManager.calcWalkScore(destCoordinate, parking.getCoordinate(), personId, parkingDurationInSeconds);
 		parkingScoreManager.addScore(personId, walkScore);
+		
+		eventsManager.processEvent(new ParkingArrivalEvent(arrivalTime, parking.getId()));
 		
 		return parking;
 	}
@@ -196,6 +212,7 @@ public class ParkingInfrastructureManager {
 			
 		}
 		
+		eventsManager.processEvent(new ParkingArrivalEvent(parkingOperationRequestAttributes.arrivalTime, selectedParking.getId()));
 		
 		return selectedParking;
 	}
@@ -227,7 +244,7 @@ public class ParkingInfrastructureManager {
 		Id parkingFacilityId=parkedVehicles.get(parkingOperationRequestAttributes.personId);
 		Parking parking = allParkings.get(parkingFacilityId);
 		parkedVehicles.remove(parkingOperationRequestAttributes.personId);
-		unParkVehicle(parking);
+		unParkVehicle(parking,parkingOperationRequestAttributes.arrivalTime+ parkingOperationRequestAttributes.parkingDurationInSeconds);
 		return parking;
 	}
 
@@ -242,7 +259,11 @@ public class ParkingInfrastructureManager {
 
 
 
-	public void unParkVehicle(Parking parking) {
+	public void unParkVehicle(Parking parking, double departureTime) {
+		if (parking==null){
+			DebugLib.emptyFunctionForSettingBreakPoint();
+		}
+		
 		parking.unparkVehicle();
 		
 		if (parking.getAvailableParkingCapacity()==1){
@@ -251,14 +272,26 @@ public class ParkingInfrastructureManager {
 				addParkingToQuadTree(publicParkingGroupQuadTrees.get(parking.getGroupName()),parking);
 			}
 		}
+		
+		eventsManager.processEvent(new ParkingDepartureEvent(departureTime, parking.getId()));
 	}
 
 	public ParkingScoreManager getParkingScoreManager() {
 		return parkingScoreManager;
 	}
 
-	public void setParkingScoreManager(ParkingScoreManager parkingScoreManager) {
-		this.parkingScoreManager = parkingScoreManager;
+
+
+
+	public EventsManager getEventsManager() {
+		return eventsManager;
+	}
+
+
+
+
+	public void setEventsManager(EventsManager eventsManager) {
+		this.eventsManager = eventsManager;
 	}
 	
 	

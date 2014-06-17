@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
 import org.matsim.contrib.parking.PC2.infrastructure.PPRestrictedToFacilities;
 import org.matsim.contrib.parking.PC2.infrastructure.PublicParking;
@@ -32,10 +33,14 @@ import org.matsim.contrib.parking.PC2.scoring.ParkingCostModel;
 import org.matsim.contrib.parking.PC2.scoring.ParkingScoreManager;
 import org.matsim.contrib.parking.PC2.scoring.ParkingScoringFunctionFactory;
 import org.matsim.contrib.parking.PC2.simulation.ParkingInfrastructureManager;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingModuleWithFreeFloatingCarSharing;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
@@ -46,13 +51,15 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 
 public class SetupParkingForZHScenario {
 
-	public static void prepare(ParkingModuleWithFFCarSharingZH parkingModule, Config config){
+	public static void prepare(ParkingModuleWithFFCarSharingZH parkingModule, Controler controler){
+		Config config = controler.getConfig();
+		
 		String baseDir = config.getParam("parkingChoice.ZH", "parkingDataDirectory");
 		
 		LinkedList<Parking> parkings = getParking(config, baseDir);
 	
 		ParkingScoreManager parkingScoreManager = prepareParkingScoreManager(parkingModule);
-		ParkingInfrastructureManager pim=new ParkingInfrastructureManager(parkingScoreManager);
+		ParkingInfrastructureManager pim=new ParkingInfrastructureManager(parkingScoreManager,  controler.getEvents());
 		
 		ParkingCostModel pcm=new ParkingCostModelZH(config,parkings);
 		LinkedList<PublicParking> publicParkings=new LinkedList<PublicParking>();
@@ -104,9 +111,11 @@ public class SetupParkingForZHScenario {
 	
 	public static ParkingScoreManager prepareParkingScoreManager(ParkingModuleWithFFCarSharingZH parkingModule) {
 		Controler controler=parkingModule.getControler();
-		ParkingScoreManager parkingScoreManager = new ParkingScoreManager(getWalkTravelTime(parkingModule.getControler()));
+		ParkingScoreManager parkingScoreManager = new ParkingScoreManager(getWalkTravelTime(parkingModule.getControler()), parkingModule.getControler());
 		
-		ParkingBetas parkingBetas=new ParkingBetas();
+		
+		
+		ParkingBetas parkingBetas=new ParkingBetas(getHouseHoldIncomeCantonZH(parkingModule.getControler().getPopulation()));
 		parkingBetas.setParkingWalkBeta(controler.getConfig().getParam("parkingChoice.ZH", "parkingWalkBeta"));
 		parkingBetas.setParkingCostBeta(controler.getConfig().getParam("parkingChoice.ZH", "parkingCostBeta"));
 		parkingScoreManager.setParkingBetas(parkingBetas);
@@ -117,6 +126,38 @@ public class SetupParkingForZHScenario {
 		parkingScoreManager.setRandomErrorTermScalingFactor(randomErrorTermScalingFactor);
 		return parkingScoreManager;
 	}
+	
+	// based on: playground.wrashid.parkingSearch.withindayFW.controllers.kti.HUPCControllerKTIzh.getHouseHoldIncomeCantonZH
+	public static DoubleValueHashMap<Id> getHouseHoldIncomeCantonZH(Population population) {
+		DoubleValueHashMap<Id> houseHoldIncome=new DoubleValueHashMap<Id>();
+		
+		for (Id personId : population.getPersons().keySet()) {
+			double rand = MatsimRandom.getRandom().nextDouble();
+			if (rand<0.032) {
+				houseHoldIncome.put(personId, 1000+MatsimRandom.getRandom().nextDouble()*1000);
+			} else if (rand<0.206) {
+				houseHoldIncome.put(personId, 2000+MatsimRandom.getRandom().nextDouble()*2000);
+			} else if (rand<0.471) {
+				houseHoldIncome.put(personId, 4000+MatsimRandom.getRandom().nextDouble()*2000);
+			} else if (rand<0.674) {
+				houseHoldIncome.put(personId, 6000+MatsimRandom.getRandom().nextDouble()*2000);
+			}else if (rand<0.803) {
+				houseHoldIncome.put(personId, 8000+MatsimRandom.getRandom().nextDouble()*2000);
+			}else if (rand<0.885) {
+				houseHoldIncome.put(personId, 10000+MatsimRandom.getRandom().nextDouble()*2000);
+			}else if (rand<0.927) {
+				houseHoldIncome.put(personId, 12000+MatsimRandom.getRandom().nextDouble()*2000);
+			}else if (rand<0.952) {
+				houseHoldIncome.put(personId, 14000+MatsimRandom.getRandom().nextDouble()*2000);
+			} else {
+				houseHoldIncome.put(personId, 16000+MatsimRandom.getRandom().nextDouble()*16000);
+			}
+		}
+		
+		return houseHoldIncome;
+	}
+	
+	
 	
 	private static WalkTravelTime getWalkTravelTime(Controler controler){
 		Map<Id, Double> linkSlopes=new HashMap<Id, Double>();

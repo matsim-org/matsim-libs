@@ -48,8 +48,9 @@ public class ParkingScoreManager {
 	private WalkTravelTime walkTravelTime;
 	
 	
-	public ParkingScoreManager(WalkTravelTime walkTravelTime) {
+	public ParkingScoreManager(WalkTravelTime walkTravelTime, Controler controler) {
 		this.walkTravelTime = walkTravelTime;
+		this.controler = controler;
 	}
 
 
