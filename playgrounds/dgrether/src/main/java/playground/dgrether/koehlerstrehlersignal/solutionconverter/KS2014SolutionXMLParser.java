@@ -14,6 +14,9 @@ import org.xml.sax.Attributes;
 
 /**
  * 
+ * class to read in the optimized btu coordinations
+ * for the format description see the documentation at shared-svn/projects/cottbus/DOC/xml_doc.pdf
+ * 
  * @author tthunig
  *
  */

@@ -21,6 +21,7 @@ package playground.dgrether.koehlerstrehlersignal.run;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
@@ -36,106 +37,187 @@ import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010CrossingSolution;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010Solution2Matsim;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010SolutionTXTParser10;
+import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2014RandomOffsetsXMLParser;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2014SolutionXMLParser;
-
 
 /**
  * @author dgrether
  * @author tthunig
- *
+ * 
  */
 public class ConvertCottbusSolution2Matsim {
 
-	private void convert(String directory, String inputFile){
-//		KS2010SolutionTXTParser10  solutionParser = new KS2010SolutionTXTParser10();
-		KS2014SolutionXMLParser  solutionParser = new KS2014SolutionXMLParser();
-		solutionParser.readFile(directory + inputFile);
-		
-		DgIdPool idPool = DgIdPool.readFromFile(directory + "id_conversions.txt");
-		
-		SignalsData signalsData = loadSignalsData(directory);
+	/*
+	 * flag to determine which solution format is used. if false the solution is
+	 * given as txt file (former version), if true as xml file (standard since
+	 * 2014).
+	 */
+	private static boolean xmlFormat = true;
 
-		List<KS2010CrossingSolution> crossingSolutions = solutionParser.getCrossingSolutions();
+	private void convertOptimalSolution(String directory, String inputFile) {
+		List<KS2010CrossingSolution> crossingSolutions;
+		if (xmlFormat) { // standard format since 2014
+			KS2014SolutionXMLParser solutionParser = new KS2014SolutionXMLParser();
+			solutionParser.readFile(directory + inputFile);
+			crossingSolutions = solutionParser.getCrossingSolutions();
+		} else { // txt format - old format
+			KS2010SolutionTXTParser10 solutionParser = new KS2010SolutionTXTParser10();
+			solutionParser.readFile(directory + inputFile);
+			crossingSolutions = solutionParser.getSolutionCrossings();
+		}
+		SignalsData signalsData = loadSignalsData(directory);
+		DgIdPool idPool = DgIdPool.readFromFile(directory
+				+ "id_conversions.txt");
 
 		convertSignals(crossingSolutions, idPool, signalsData);
-		writeSignalControl(directory, inputFile, signalsData);		
+		writeOptimizedSignalControl(directory, inputFile, signalsData);
+	}
+	
+	private void convertRandomSolution(String directory, String inputFile) {
+		KS2014RandomOffsetsXMLParser solutionParser = new KS2014RandomOffsetsXMLParser();
+		solutionParser.readFile(directory + inputFile);
+		Map<Integer, List<KS2010CrossingSolution>> crossingSolutions = 
+				solutionParser.getRandomOffsets();
+		
+		SignalsData signalsData = loadSignalsData(directory);
+		DgIdPool idPool = DgIdPool.readFromFile(directory
+				+ "id_conversions.txt");
+
+		// convert and write offsets for min random (=0), max random (=1), avg random (=2), med random (=3)
+		for (int i=0; i<4; i++){
+			convertSignals(crossingSolutions.get(i), idPool, signalsData);
+			writeRandomOffsetsSignalControl(directory, inputFile, signalsData, i);
+		}
 	}
 
-	private void convertSignals(List<KS2010CrossingSolution> solutionCrossings,
+	private void convertSignals(List<KS2010CrossingSolution> crossingSolutions,
 			DgIdPool idPool, SignalsData signalsData) {
 		KS2010Solution2Matsim converter = new KS2010Solution2Matsim(idPool);
-		converter.setScale(3); // TODO check this parameter when tool is rerun
-		converter.convertSolution(signalsData.getSignalControlData(), solutionCrossings);
+		// converter.setScale(3); // TODO check this parameter when tool is
+		// rerun
+		converter.convertSolution(signalsData.getSignalControlData(),
+				crossingSolutions);
 
-		// Currently we get two offsets for signal system 13. This is due to different data modelling approaches
+		// Currently we get two offsets for signal system 13. This is due to
+		// different data modelling approaches
 		// at tub / btu that might be resolved in further studies
 		removeSignalSystems(signalsData, new IdImpl("13"));
 	}
 
-	private void removeSignalSystems(SignalsData signalData, Id...ids) {
+	private void removeSignalSystems(SignalsData signalData, Id... ids) {
 		for (Id id : ids) {
 			signalData.getSignalSystemsData().getSignalSystemData().remove(id);
-			signalData.getSignalGroupsData().getSignalGroupDataBySignalSystemId().remove(id);
-			signalData.getSignalControlData().getSignalSystemControllerDataBySystemId().remove(id);
+			signalData.getSignalGroupsData()
+					.getSignalGroupDataBySignalSystemId().remove(id);
+			signalData.getSignalControlData()
+					.getSignalSystemControllerDataBySystemId().remove(id);
 		}
 	}
 
 	private SignalsData loadSignalsData(String directory) {
-		Config config = ConfigUtils.createConfig(); 
-		config.signalSystems().setSignalSystemFile(directory + "output_signal_systems_v2.0.xml.gz");
-		config.signalSystems().setSignalGroupsFile(directory + "output_signal_groups_v2.0.xml.gz");
-		config.signalSystems().setSignalControlFile(directory + "output_signal_control_v2.0.xml.gz");
-		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(config.signalSystems());
+		Config config = ConfigUtils.createConfig();
+		config.signalSystems().setSignalSystemFile(
+				directory + "output_signal_systems_v2.0.xml.gz");
+		config.signalSystems().setSignalGroupsFile(
+				directory + "output_signal_groups_v2.0.xml.gz");
+		config.signalSystems().setSignalControlFile(
+				directory + "output_signal_control_v2.0.xml.gz");
+		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(
+				config.signalSystems());
 		SignalsData signals = signalsLoader.loadSignalsData();
 		return signals;
 	}
 
-	private void writeSignalControl(String directoryPath, String inputFilename, SignalsData signalsData) {
+	private void writeOptimizedSignalControl(String directoryPath, String inputFilename,
+			SignalsData signalsData) {
 		SignalsScenarioWriter writer = new SignalsScenarioWriter();
-		String basefilename = inputFilename.substring(0, inputFilename.lastIndexOf("."));
-		writer.setSignalSystemsOutputFilename(directoryPath + "optimized_signal_systems_" + basefilename + ".xml");
-		writer.setSignalGroupsOutputFilename(directoryPath + "optimized_signal_groups_" + basefilename + ".xml");
-		writer.setSignalControlOutputFilename(directoryPath + "optimized_signal_control_" + basefilename + ".xml");
+		String basefilename = inputFilename.substring(0,
+				inputFilename.lastIndexOf("."));
+		writer.setSignalSystemsOutputFilename(directoryPath
+				+ "optimized_signal_systems_" + basefilename + ".xml");
+		writer.setSignalGroupsOutputFilename(directoryPath
+				+ "optimized_signal_groups_" + basefilename + ".xml");
+		writer.setSignalControlOutputFilename(directoryPath
+				+ "optimized_signal_control_" + basefilename + ".xml");
 		writer.writeSignalsData(signalsData);
 	}
 	
+	/**
+	 * 
+	 * @param currentCoord 0 means min random (i.e. best random), 
+	 * 	1 means max random (i.e. worst random),
+	 * 	2 means avg random, 
+	 * 	3 means med random (i.e. median).
+	 */
+	private void writeRandomOffsetsSignalControl(String directoryPath, String inputFilename,
+			SignalsData signalsData, Integer currentCoord) {
+		
+		String substring = "";
+		switch (currentCoord){
+		case 0: substring = "best"; break;
+		case 1: substring = "worst"; break;
+		case 2: substring = "avg"; break;
+		case 3: substring = "med"; break;
+		}
+		
+		SignalsScenarioWriter writer = new SignalsScenarioWriter();
+		String basefilename = inputFilename.substring(0,
+				inputFilename.lastIndexOf("."));
+		writer.setSignalSystemsOutputFilename(directoryPath
+				+ substring + "Random_signal_systems_" + basefilename + ".xml");
+		writer.setSignalGroupsOutputFilename(directoryPath
+				+ substring + "Random_signal_groups_" + basefilename + ".xml");
+		writer.setSignalControlOutputFilename(directoryPath
+				+ substring + "Random_signal_control_" + basefilename + ".xml");
+		writer.writeSignalsData(signalsData);
+	}
 	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		List<Tuple<String, String>> input= new ArrayList<Tuple<String, String>>();
-//		input.add(new Tuple<String, String>(
-//						DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_50_evening_peak/",
-//						"ksm_50a_sol.txt"
-//						));
-//		input.add(new Tuple<String, String>(
-//				DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_50_morning_peak/",
-//				"ksm_50m_sol.txt"
-//				));
-//		input.add(new Tuple<String, String>(
-//				DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_10_evening_peak/",
-//				"ksm_10a_sol.txt"
-//				));
-//		input.add(new Tuple<String, String>(
-//				DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_10_morning_peak/",
-//				"ksm_10m_sol.txt"
-//		));
+		List<Tuple<String, String>> input = new ArrayList<Tuple<String, String>>();
+		// input.add(new Tuple<String, String>(
+		// DgPaths.REPOS +
+		// "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_50_evening_peak/",
+		// "ksm_50a_sol.txt"
+		// ));
+		// input.add(new Tuple<String, String>(
+		// DgPaths.REPOS +
+		// "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_50_morning_peak/",
+		// "ksm_50m_sol.txt"
+		// ));
+		// input.add(new Tuple<String, String>(
+		// DgPaths.REPOS +
+		// "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_10_evening_peak/",
+		// "ksm_10a_sol.txt"
+		// ));
+		// input.add(new Tuple<String, String>(
+		// DgPaths.REPOS +
+		// "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_10_morning_peak/",
+		// "ksm_10m_sol.txt"
+		// ));
 
-		input.add(new Tuple<String, String>(
-				DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-08-12_minflow_10_evening_peak/",
-				"ksm_10a_sol.txt"
-				));
-		input.add(new Tuple<String, String>(
-				DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-08-12_minflow_10_morning_peak/",
-				"ksm_10m_sol.txt"
-		));
+//		 input.add(new Tuple<String, String>(
+//		 DgPaths.REPOS +
+//		 "shared-svn/projects/cottbus/cb2ks2010/2013-08-12_minflow_10_evening_peak/",
+//		 "ksm_10a_sol.txt"
+//		 ));
+//		 input.add(new Tuple<String, String>(
+//		 DgPaths.REPOS +
+//		 "shared-svn/projects/cottbus/cb2ks2010/2013-08-12_minflow_10_morning_peak/",
+//		 "ksm_10m_sol.txt"
+//		 ));
+//
+//		for (Tuple<String, String> i : input) {
+//			new ConvertCottbusSolution2Matsim().convertOptimalSolution(
+//					i.getFirst(), i.getSecond());
+//		}
 
-		for (Tuple<String, String> i : input){
-			new ConvertCottbusSolution2Matsim().convert(i.getFirst(), i.getSecond());
-		}
-		
+		new ConvertCottbusSolution2Matsim().convertRandomSolution( DgPaths.REPOS
+				+ "shared-svn/projects/cottbus/cb2ks2010/2014-05-30_minflow_50.0_morning_peak_speedFilter15_SP_t/", 
+				"random_ttsp.txt");
 		
 	}
-
+	
 }
