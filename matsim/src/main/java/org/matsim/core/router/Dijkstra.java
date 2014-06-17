@@ -216,11 +216,8 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 		 * caused problems when sub-networks where used.
 		 * cdobler, jun'14
 		 */
-		if (network.getNodes().get( fromNode.getId()) != fromNode ||
-				network.getNodes().get( toNode.getId()) != toNode ) {
-			throw new IllegalArgumentException("The nodes passed as parameters are not part of the network stored by "+
-					getClass().getSimpleName() + ": the validity of the results cannot be guaranteed. Aborting!");
-		}
+		checkNodeBelongToNetwork(fromNode);
+		checkNodeBelongToNetwork(toNode);
 		
 		augmentIterationId(); // this call makes the class not thread-safe
 		this.person = person2;
@@ -245,6 +242,17 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 		}
 	}
 
+	/*
+	 * Move this code to a separate method since it needs to be extended by the MultiNodeDijkstra.
+	 * cdobler, jun'14
+	 */
+	/*package*/ void checkNodeBelongToNetwork(Node node) {
+		if (network.getNodes().get(node.getId()) != node) {
+			throw new IllegalArgumentException("The nodes passed as parameters are not part of the network stored by "+
+					getClass().getSimpleName() + ": the validity of the results cannot be guaranteed. Aborting!");
+		}
+	}
+	
 	/**
 	 * Allow replacing the RouterPriorityQueue.
 	 */
