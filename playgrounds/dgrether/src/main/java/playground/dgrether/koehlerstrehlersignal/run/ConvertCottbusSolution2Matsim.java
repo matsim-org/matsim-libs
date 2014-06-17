@@ -164,11 +164,11 @@ public class ConvertCottbusSolution2Matsim {
 		String basefilename = inputFilename.substring(0,
 				inputFilename.lastIndexOf("."));
 		writer.setSignalSystemsOutputFilename(directoryPath
-				+ substring + "Random_signal_systems_" + basefilename + ".xml");
+				+ "signal_systems_" + substring + "_" + basefilename + ".xml");
 		writer.setSignalGroupsOutputFilename(directoryPath
-				+ substring + "Random_signal_groups_" + basefilename + ".xml");
+				+ "signal_groups_" + substring + "_" + basefilename + ".xml");
 		writer.setSignalControlOutputFilename(directoryPath
-				+ substring + "Random_signal_control_" + basefilename + ".xml");
+				+ "signal_control_" + substring + "_" + basefilename + ".xml");
 		writer.writeSignalsData(signalsData);
 	}
 	
@@ -216,7 +216,7 @@ public class ConvertCottbusSolution2Matsim {
 
 		new ConvertCottbusSolution2Matsim().convertRandomSolution( DgPaths.REPOS
 				+ "shared-svn/projects/cottbus/cb2ks2010/2014-05-30_minflow_50.0_morning_peak_speedFilter15_SP_t/", 
-				"random_ttsp.txt");
+				"random_ttsp.xml");
 		
 	}
 	
