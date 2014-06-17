@@ -67,7 +67,8 @@ public class PerLinkEmissionData {
 		
 		Scenario scenario = loadScenario(networkFile);
 		this.network = scenario.getNetwork();
-		EmissionLinkAnalyzer linkAnalyzer = new EmissionLinkAnalyzer(configFile, emissionEventFile);
+		int noOfTimeBin =1;
+		EmissionLinkAnalyzer linkAnalyzer = new EmissionLinkAnalyzer(configFile, emissionEventFile,noOfTimeBin);
 		linkAnalyzer.init(null);
 		linkAnalyzer.preProcessData();
 		linkAnalyzer.postProcessData();

@@ -55,13 +55,14 @@ public class EmissionLinkAnalyzer extends AbstractAnalyisModule {
 	private Map<Double, Map<Id, Map<ColdPollutant, Double>>> link2ColdEmissions;
 	private Map<Double, Map<Id, SortedMap<String, Double>>> link2TotalEmissions;
 	double simulationEndTime ;
-	 final int noOfTimeBins = 1;
+	 final int noOfTimeBins;
 	 String configFile;
 	
-	public EmissionLinkAnalyzer(String configFile, String emissionEventFile) {
+	public EmissionLinkAnalyzer(String configFile, String emissionEventFile, int noOfTimeBin) {
 		super(EmissionLinkAnalyzer.class.getSimpleName());
 		this.emissionEventsFile = emissionEventFile;
 		this.configFile = configFile;
+		this.noOfTimeBins = noOfTimeBin;
 		
 	}
 	
