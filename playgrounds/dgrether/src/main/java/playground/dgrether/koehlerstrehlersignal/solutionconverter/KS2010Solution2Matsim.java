@@ -62,7 +62,22 @@ public class KS2010Solution2Matsim {
 		return newMap;
 	}
 	
+	/**
+	 * overwrite all offsets in signalControl with the offsets from solutionCrossings.
+	 * since solutionCrossings only contains crossings with nonzero offsets, 
+	 * all offsets are reset to zero first.
+	 * 
+	 * @param signalControl
+	 * @param solutionCrossings
+	 */
 	public void convertSolution(SignalControlData signalControl, List<KS2010CrossingSolution> solutionCrossings){
+		// reset all offsets to zero (solutions are only specified for nonzero offsets)
+		for (SignalSystemControllerData controllerData : signalControl.getSignalSystemControllerDataBySystemId().values()){
+			SignalPlanData plan = controllerData.getSignalPlanData().values().iterator().next();
+			plan.setOffset(0);
+		}
+		
+		// overwrite zero offsets with the ones from solutionCrossings
 		for (KS2010CrossingSolution solution : solutionCrossings) {
 			if (! solution.getProgramIdOffsetMap().containsKey(M2KS2010NetworkConverter.DEFAULT_PROGRAM_ID)) {
 				Id programId = solution.getProgramIdOffsetMap().keySet().iterator().next();
