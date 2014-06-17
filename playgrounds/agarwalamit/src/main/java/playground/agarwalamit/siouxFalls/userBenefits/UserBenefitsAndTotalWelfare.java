@@ -45,9 +45,11 @@ public class UserBenefitsAndTotalWelfare {
 	private final static Logger logger = Logger.getLogger(UserBenefitsAndTotalWelfare.class);
 
 	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/";
-	private static String [] runNumbers = new String [] {"run117", "run118", "run119","run120"};
+	private static String [] runNumbers = new String [] {"run121", "run122", "run123","run124"};
 	private static String [] runCases = new String [] {"baseCase","onlyEmission", "onlyCongestion", "both"};
 	private final static WelfareMeasure welfareMeasure = WelfareMeasure.SELECTED;
+	private static final String outputFolder = "/outputTMMCOff/";
+	
 	public static void main(String[] args) {
 		
 		List<String> absoluteDataToWrite = new ArrayList<String>();
@@ -63,7 +65,7 @@ public class UserBenefitsAndTotalWelfare {
 			monetaryPayments[i] = getMonetaryPayment(runNumbers[i]);
 			absoluteDataToWrite.add(runCases[i]+"\t"+getAllUserBenefits(runNumbers[i],welfareMeasure)+"\t"+monetaryPayments[i]);
 		}
-		writeStrings(clusterPathDesktop+"/outputMCRCOff/analysis/r/rAbsoluteUserBenefits"+welfareMeasure+".txt", absoluteDataToWrite);
+		writeStrings(clusterPathDesktop+outputFolder+"/analysis/r/rAbsoluteUserBenefits"+welfareMeasure+".txt", absoluteDataToWrite);
 
 		String [] xLabel = {"only Emissions", "only Congestion", "Both"};
 		double [] relativeUserLogSum = { Math.pow(10, 4)*(allUserLogSums[1]-allUserLogSums[0]),
@@ -77,15 +79,16 @@ public class UserBenefitsAndTotalWelfare {
 			sumOfTwo[j] = relativeUserLogSum [j]+Math.abs(relativeTollPayments[j]);//toll payments are already negative thus they will be positive for the system
 			relativeDataToWrite.add(runCases[j+1]+"\t"+relativeUserLogSum[j]+"\t"+String.valueOf(-1*relativeTollPayments[j])+"\t"+sumOfTwo[j]); 
 		}
-		writeStrings(clusterPathDesktop+"/outputMCRCOff/analysis/r/rChangeInSystemWelfare"+welfareMeasure+".txt", relativeDataToWrite);
+		writeStrings(clusterPathDesktop+outputFolder+"/analysis/r/rChangeInSystemWelfare"+welfareMeasure+".txt", relativeDataToWrite);
 		
 	}
 
 	private static ScenarioImpl loadScenario(String runNumber) {
-		String configFile = clusterPathDesktop+"/outputMCRCOff/"+runNumber+"/output_config.xml.gz";
+		
+		String configFile = clusterPathDesktop+outputFolder+runNumber+"/output_config.xml.gz";
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.network().setInputFile(clusterPathDesktop+"/input/SiouxFalls_networkWithRoadType.xml.gz");
-		config.plans().setInputFile(clusterPathDesktop+"/outputMCRCOff/"+runNumber+"/output_plans.xml.gz");
+		config.plans().setInputFile(clusterPathDesktop+outputFolder+runNumber+"/output_plans.xml.gz");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		return (ScenarioImpl) scenario;
 	}
@@ -96,7 +99,7 @@ public class UserBenefitsAndTotalWelfare {
 		userBenefitsAnalyzer.init(scenarioImpl, welfareMeasure);
 		userBenefitsAnalyzer.preProcessData();
 		//		userBenefitsAnalyzer.postProcessData();
-		userBenefitsAnalyzer.writeResults(clusterPathDesktop+"/outputMCRCOff/"+runNumber+"/analysis/");
+		userBenefitsAnalyzer.writeResults(clusterPathDesktop+outputFolder+runNumber+"/analysis/");
 		return userBenefitsAnalyzer.getAllUsersLogSum();
 	}
 
@@ -115,10 +118,10 @@ public class UserBenefitsAndTotalWelfare {
 		}
 
 		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(clusterPathDesktop+"/outputMCRCOff/"+runNumber+"/ITERS/it.100/100.events.xml.gz");
+		reader.readFile(clusterPathDesktop+outputFolder+runNumber+"/ITERS/it.100/100.events.xml.gz");
 
 		paymentsAnalyzer.postProcessData();
-		paymentsAnalyzer.writeResults(clusterPathDesktop+"/outputMCRCOff/"+runNumber+"/analysis/");
+		paymentsAnalyzer.writeResults(clusterPathDesktop+outputFolder+runNumber+"/analysis/");
 		return paymentsAnalyzer.getAllUsersAmount();
 	}
 
