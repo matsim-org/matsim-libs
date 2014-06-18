@@ -92,7 +92,7 @@ public class Cottbus2KS2010 {
 		String spCost = "tt";
 		if (!useFreeSpeedTravelTime) spCost = "dist";
 		final String outputDirectory = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/cb2ks2010/2014-06-06_minflow_"+ minCommodityFlow +"_morning_peak_speedFilter"+freeSpeedFilter+"_SP_"+spCost+"/"; //+"_bb"+ cuttingBoundingBoxOffset + "/";
+				+ "shared-svn/projects/cottbus/cb2ks2010/2014-06-18_minflow_"+ minCommodityFlow +"_morning_peak_speedFilter"+freeSpeedFilter+"_SP_"+spCost+"/"; //+"_bb"+ cuttingBoundingBoxOffset + "/";
 		String ksModelOutputFilename = "ks2010_model_";
 		ksModelOutputFilename += Double.toString(minCommodityFlow) + "_"
 				+ Double.toString(startTime) + "_" + Double.toString(cuttingBoundingBoxOffset) + ".xml";

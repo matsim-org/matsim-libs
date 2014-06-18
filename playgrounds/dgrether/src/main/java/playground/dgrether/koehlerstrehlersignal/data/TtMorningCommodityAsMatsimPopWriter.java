@@ -30,18 +30,15 @@ public class TtMorningCommodityAsMatsimPopWriter {
 	private Population population;
 
 	private Network network;
-
-	private DgIdConverter idConverter;
 	
 	private double startTimeSecMorningPeak = 5.5 * 3600.0;
 	private double endTimeSecMorningPeak = 9.5 * 3600.0;
 	private double startTimeSecEveningPeak = 13.5 * 3600.0;
 	private double endTimeSecEveningPeak = 18.5 * 3600.0;
 	
-	public void writeTripPlansFile(Network network, DgIdConverter idConverter, DgCommodities commodities, String outputDirectory, String filename, double startTimeSecMorningPeak, double endTimeSecMorningPeak) {
+	public void writeTripPlansFile(Network network, DgCommodities commodities, String outputDirectory, String filename, double startTimeSecMorningPeak, double endTimeSecMorningPeak) {
 
 		this.network = network;
-		this.idConverter = idConverter;
 		this.population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		
 		this.startTimeSecMorningPeak = startTimeSecMorningPeak;
@@ -52,9 +49,9 @@ public class TtMorningCommodityAsMatsimPopWriter {
 			for (int i=0; i<com.getFlow(); i++){
 				Person person = population.getFactory().createPerson(new IdImpl(com.getId().toString()+i));
 				Plan plan = population.getFactory().createPlan();
-				plan.addActivity(createDummyAct(com, false));
+				plan.addActivity(createDummySourceAct(com));
 				plan.addLeg(population.getFactory().createLeg(TransportMode.car));
-				plan.addActivity(createDummyAct(com, true));
+				plan.addActivity(createDummyDrainAct(com));
 				person.addPlan(plan);
 				population.addPerson(person);
 			}
@@ -68,10 +65,9 @@ public class TtMorningCommodityAsMatsimPopWriter {
 		log.info("plans file of simplified population written to " + outputFile);
 	}
 	
-	public void writeHomeWorkHomePlansFile(Network network, DgIdConverter idConverter, DgCommodities commodities, String outputDirectory, String filename, double startTimeSecMorningPeak, double endTimeSecMorningPeak) {
+	public void writeHomeWorkHomePlansFile(Network network, DgCommodities commodities, String outputDirectory, String filename, double startTimeSecMorningPeak, double endTimeSecMorningPeak) {
 
 		this.network = network;
-		this.idConverter = idConverter;
 		this.population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		
 		this.startTimeSecMorningPeak = startTimeSecMorningPeak;
@@ -115,11 +111,14 @@ public class TtMorningCommodityAsMatsimPopWriter {
 		return source;
 	}
 	
-	private Activity createDummyAct(DgCommodity com, boolean endActivity) {
+	private Activity createDummySourceAct(DgCommodity com) {
 		Activity source = population.getFactory().createActivityFromLinkId("dummy", com.getSourceLinkId());
-		if (!endActivity){
-			source.setEndTime(createEndTime(startTimeSecMorningPeak, endTimeSecMorningPeak));
-		}
+		source.setEndTime(createEndTime(startTimeSecMorningPeak, endTimeSecMorningPeak));
+		return source;
+	}
+	
+	private Activity createDummyDrainAct(DgCommodity com) {
+		Activity source = population.getFactory().createActivityFromLinkId("dummy", com.getDrainLinkId());
 		return source;
 	}
 

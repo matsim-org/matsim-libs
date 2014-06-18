@@ -163,7 +163,6 @@ public class M2KS2010Converter {
 			throw new IllegalStateException("Commodities that can not be routed still exist");
 		}
 		
-		
 		DgNetworkUtils.writeNetwork(newMatsimNetwork, outputDirectory + "matsim_network_ks_model.xml.gz");
 		DgNetworkUtils.writeNetwork2Shape(newMatsimNetwork, crs,  shapeFileDirectory + "matsim_network_ks_model.shp");
 		
@@ -172,8 +171,8 @@ public class M2KS2010Converter {
 		// write ks-model 
 		new KS2010ModelWriter().write(ksNet, commodities, name, description, outputDirectory + filename);
 		
-		// write commodities from the ks-model as matsim population
-		new TtMorningCommodityAsMatsimPopWriter().writeTripPlansFile(this.network, idConverter, commodities, outputDirectory, filename, startTimeSec, endTimeSec);
+		// write commodities from the ks-model as matsim population in the small network
+		new TtMorningCommodityAsMatsimPopWriter().writeTripPlansFile(this.network, commodities, outputDirectory, filename, startTimeSec, endTimeSec);
 		writeStats(ksNet, commodities, totalFlow, removedCommodities);
 		
 		signalsBoundingBox.writeBoundingBox(shapeFileDirectory + "signals_");
