@@ -35,10 +35,10 @@ public class RoundTripTask implements ProxyPlanTask {
 		List<Integer> insertPoints = new ArrayList<Integer>();
 		
 		for(int i = 0; i < plan.getLegs().size(); i++) {
-			ProxyLeg leg = plan.getLegs().get(i);
-			Boolean val = (Boolean) leg.getAttribute(CommonKeys.LEG_ROUNDTRIP); 
+			ProxyObject leg = plan.getLegs().get(i);
+			Boolean val = Boolean.parseBoolean(leg.getAttribute(CommonKeys.LEG_ROUNDTRIP)); 
 			if(val != null && val == true) {
-				ProxyActivity act = plan.getActivities().get(i+1);
+				ProxyObject act = plan.getActivities().get(i+1);
 				String type = (String) act.getAttribute(CommonKeys.ACTIVITY_TYPE);
 				act.setAttribute(CommonKeys.ACTIVITY_TYPE, type + ROUNDTRIP_SUFFIX);
 				
@@ -50,29 +50,33 @@ public class RoundTripTask implements ProxyPlanTask {
 		for(Integer idx : insertPoints) {
 			int i = idx + offset;
 			
-			ProxyLeg toLeg = plan.getLegs().get(i - 2);
-			int toLegStart = (Integer) toLeg.getAttribute(CommonKeys.LEG_START_TIME);
-			int toLegEnd = (Integer) toLeg.getAttribute(CommonKeys.LEG_END_TIME);
+			ProxyObject toLeg = plan.getLegs().get(i - 2);
+			int toLegStart = Integer.parseInt(toLeg.getAttribute(CommonKeys.LEG_START_TIME));
+			int toLegEnd = Integer.parseInt(toLeg.getAttribute(CommonKeys.LEG_END_TIME));
 			int dur = toLegEnd - toLegStart;
-			Double dist = (Double) toLeg.getAttribute(CommonKeys.LEG_DISTANCE);
+			
 			/*
 			 * half the leg duration and distance
 			 */
-			toLeg.setAttribute(CommonKeys.LEG_END_TIME, toLegStart + dur/2 - 1);
-			if(dist != null) toLeg.setAttribute(CommonKeys.LEG_DISTANCE, dist/2.0);
+			toLeg.setAttribute(CommonKeys.LEG_END_TIME, String.valueOf(toLegStart + dur/2 - 1));
+			String distStr = toLeg.getAttribute(CommonKeys.LEG_DISTANCE);
+			if(distStr != null) {
+				double dist = Double.parseDouble(distStr);
+				toLeg.setAttribute(CommonKeys.LEG_DISTANCE, String.valueOf(dist/2.0));
+			}
 			/*
 			 * insert a dummy activity with duration 1 s.
 			 */
-			ProxyActivity act = new ProxyActivity();
+			ProxyObject act = new ProxyObject();
 			String prevType = (String) plan.getActivities().get(i-2).getAttribute(CommonKeys.ACTIVITY_TYPE);
 			act.setAttribute(CommonKeys.ACTIVITY_TYPE, prevType);
 			plan.getActivities().add(i, act);
 			/*
 			 * insert a return leg with half the duration and distance
 			 */
-			ProxyLeg fromLeg = new ProxyLeg();
-			fromLeg.setAttribute(CommonKeys.LEG_START_TIME, toLegStart + dur/2);
-			fromLeg.setAttribute(CommonKeys.LEG_END_TIME, toLegEnd);
+			ProxyObject fromLeg = new ProxyObject();
+			fromLeg.setAttribute(CommonKeys.LEG_START_TIME, String.valueOf(toLegStart + dur/2));
+			fromLeg.setAttribute(CommonKeys.LEG_END_TIME, String.valueOf(toLegEnd));
 			fromLeg.setAttribute(CommonKeys.LEG_DISTANCE, toLeg.getAttribute(CommonKeys.LEG_DISTANCE));
 			plan.getLegs().add(i-1, fromLeg);
 			

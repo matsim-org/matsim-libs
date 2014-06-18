@@ -28,34 +28,34 @@ import java.util.List;
  */
 public class ProxyPlan {
 
-	private List<ProxyActivity> activities = new ArrayList<ProxyActivity>();
+	private List<ProxyObject> activities = new ArrayList<ProxyObject>();
 	
-	private List<ProxyLeg> legs = new ArrayList<ProxyLeg>();
+	private List<ProxyObject> legs = new ArrayList<ProxyObject>();
 	
-	public void addLeg(ProxyLeg leg) {
+	public void addLeg(ProxyObject leg) {
 		legs.add(leg);
 	}
 	
-	public List<ProxyLeg> getLegs() {
+	public List<ProxyObject> getLegs() {
 		return legs;
 	}
 	
-	public void addActivity(ProxyActivity activity) {
+	public void addActivity(ProxyObject activity) {
 		activities.add(activity);
 	}
 	
-	public List<ProxyActivity> getActivities() {
+	public List<ProxyObject> getActivities() {
 		return activities;
 	}
 	
 	public ProxyPlan clone() {
 		ProxyPlan clone = new ProxyPlan();
 		
-		for(ProxyActivity act : activities) {
+		for(ProxyObject act : activities) {
 			clone.addActivity(act.clone());
 		}
 		
-		for(ProxyLeg leg : legs) {
+		for(ProxyObject leg : legs) {
 			clone.addLeg(leg.clone());
 		}
 		

@@ -21,7 +21,7 @@ package playground.johannes.gsv.synPop.mid;
 
 import java.util.Map;
 
-import playground.johannes.gsv.synPop.ProxyLeg;
+import playground.johannes.gsv.synPop.ProxyObject;
 
 /**
  * @author johannes
@@ -29,5 +29,5 @@ import playground.johannes.gsv.synPop.ProxyLeg;
  */
 public interface LegAttributeHandler {
 
-	public void handle(ProxyLeg leg, Map<String, String> attributes);
+	public void handle(ProxyObject leg, Map<String, String> attributes);
 }

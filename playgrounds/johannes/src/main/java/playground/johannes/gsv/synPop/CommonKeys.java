@@ -30,6 +30,8 @@ public interface CommonKeys {
 	public static final String PERSON_HOME_COORD_Y = "personhomecoordy";
 	
 	public static final String PERSON_HOME_POINT = "personHomePoint";
+	
+	public static final String PERSON_WEIGHT = "weight";
 
 	public static final String LEG_START_TIME = "startTime";
 	

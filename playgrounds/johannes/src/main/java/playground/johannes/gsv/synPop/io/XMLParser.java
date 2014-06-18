@@ -25,11 +25,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
-import playground.johannes.gsv.synPop.ProxyActivity;
-import playground.johannes.gsv.synPop.ProxyLeg;
+import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 
@@ -38,6 +38,8 @@ import playground.johannes.gsv.synPop.ProxyPlan;
  *
  */
 public class XMLParser extends MatsimXmlParser {
+	
+	private static final Logger logger = Logger.getLogger(XMLParser.class);
 
 	private Map<String, AttributeSerializer> serializers = new HashMap<String, AttributeSerializer>();;
 	
@@ -74,7 +76,7 @@ public class XMLParser extends MatsimXmlParser {
 		} else if (name.equalsIgnoreCase(Constants.PLAN_TAG)) {
 			plan = new ProxyPlan();
 		} else if (name.equalsIgnoreCase(Constants.ACTIVITY_TAG)) {
-			ProxyActivity act = new ProxyActivity();
+			ProxyObject act = new ProxyObject();
 			for(int i = 0; i < atts.getLength(); i++) {
 				String type = atts.getLocalName(i);
 				act.setAttribute(type, getAttribute(type, atts));
@@ -82,7 +84,7 @@ public class XMLParser extends MatsimXmlParser {
 			plan.addActivity(act);
 			
 		} else if (name.equalsIgnoreCase(Constants.LEG_TAG)) {
-			ProxyLeg leg = new ProxyLeg();
+			ProxyObject leg = new ProxyObject();
 			for(int i = 0; i < atts.getLength(); i++) {
 				String type = atts.getLocalName(i);
 				leg.setAttribute(type, getAttribute(type, atts));
@@ -100,6 +102,9 @@ public class XMLParser extends MatsimXmlParser {
 		if(name.equalsIgnoreCase(Constants.PERSON_TAG)) {
 			persons.add(person);
 			person = null;
+			
+			if(persons.size() % 50000 == 0)
+				logger.info(String.format("Parsed %s persons...", persons.size()));
 		} else if(name.equalsIgnoreCase(Constants.PLAN_TAG)) {
 			person.setPlan(plan);
 			plan = null;
@@ -107,12 +112,12 @@ public class XMLParser extends MatsimXmlParser {
 
 	}
 
-	private Object getAttribute(String key, Attributes atts) {
-		AttributeSerializer serializer = serializers.get(key);
-		if(serializer == null) {
+	private String getAttribute(String key, Attributes atts) {
+//		AttributeSerializer serializer = serializers.get(key);
+//		if(serializer == null) {
 			return atts.getValue(key);
-		} else {
-			return serializer.decode(atts.getValue(key));
-		}
+//		} else {
+//			return serializer.decode(atts.getValue(key));
+//		}
 	}
 }

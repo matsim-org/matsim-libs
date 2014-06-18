@@ -21,24 +21,27 @@ package playground.johannes.gsv.synPop.mid.run;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
+import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.io.DoubleSerializer;
 import playground.johannes.gsv.synPop.io.IntegerSerializer;
 import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
-import playground.johannes.gsv.synPop.mid.HPersonMunicipality;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.hamiltonian.PopulationDensity;
 import playground.johannes.gsv.synPop.sim.CompositeHamiltonian;
 import playground.johannes.gsv.synPop.sim.Initializer;
 import playground.johannes.gsv.synPop.sim.MutateHomeLocation;
+import playground.johannes.gsv.synPop.sim.PopulationWriter;
 import playground.johannes.gsv.synPop.sim.Sampler;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
@@ -56,55 +59,48 @@ public class SetHomeLocations {
 
 	public static final Logger logger = Logger.getLogger(SetHomeLocations.class);
 	
+	private static final String MODULE_NAME = "popGenerator";
+	
 	/**
 	 * @param args
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		long seed = 4711;
-		String popFile = "/home/johannes/gsv/mid2008/pop.xml";
-		String deZoneFile = "/home/johannes/gsv/matsim/studies/netz2030/data/raw/de.nuts0.shp";
+		Config config = new Config();
+		ConfigUtils.loadConfig(config, args[0]);
 		
 		XMLParser parser = new XMLParser();
-//		parser.addSerializer(MIDKeys.PERSON_MUNICIPALITY_LOWER, IntegerSerializer.instance());
-//		parser.addSerializer(MIDKeys.PERSON_MUNICIPALITY_UPPER, IntegerSerializer.instance());
 		parser.addSerializer(MIDKeys.PERSON_MUNICIPALITY_CLASS, IntegerSerializer.instance());
-		
+		parser.addSerializer(CommonKeys.PERSON_WEIGHT, DoubleSerializer.instance());
 		parser.setValidating(false);
 	
 		logger.info("Loading persons...");
-		parser.parse(popFile);
+		parser.parse(config.findParam(MODULE_NAME, "popInputFile"));
 		Set<ProxyPerson> persons = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 		
 		logger.info("Cloning persons...");
-		int fact = 2;
-		Set<ProxyPerson> clones = new HashSet<ProxyPerson>(fact * persons.size());
-		for(ProxyPerson person : persons) {
-			for(int i = 0; i < fact; i++) {
-				clones.add(person.clone());
-			}
-		}
-		
-		persons.addAll(clones);
+		Random random = new XORShiftRandom(Long.parseLong(config.getParam("global", "randomSeed")));
+		persons = PersonCloner.weightedClones(persons, Integer.parseInt(config.getParam(MODULE_NAME, "targetSize")), random);
 		logger.info(String.format("Generated %s persons.", persons.size()));
 		
 		logger.info("Loading GIS data...");
 		/*
 		 * load DE boundaries
 		 */
-		Set<SimpleFeature> features = FeatureSHP.readFeatures(deZoneFile);
+		Set<SimpleFeature> features = FeatureSHP.readFeatures(config.getParam(MODULE_NAME, "deBoundary"));
 		SimpleFeature feature = features.iterator().next();
 		Geometry zoneDE = ((Geometry) feature.getDefaultGeometry()).getGeometryN(0);
 		/*
 		 * load municipality inhabitants
 		 */
-		ZoneLayer<Double> municipalities = ZoneLayerSHP.read("/home/johannes/gsv/mid2008/Gemeinden.gk3.shp", "EWZ");
+//		ZoneLayer<Double> municipalities = ZoneLayerSHP.read(config.findParam(MODULE_NAME, "gemeinden"), "EWZ");
 		/*
 		 * load marktzellen inhabitants
 		 */
 //		ZoneLayer<Double> markzellen = ZoneLayerSHP.read("/home/johannes/gsv/synpop/data/gis/marktzellen/plz8.gk3.shp", "A_GESAMT");
-		ZoneLayer<Double> markzellen = ZoneLayerSHP.read("/home/johannes/gsv/mid2008/Gemeinden.gk3.shp", "EWZ");
+//		ZoneLayer<Double> markzellen = ZoneLayerSHP.read(config.findParam(MODULE_NAME, "marktzellen"), "A_GESAMT");
+		ZoneLayer<Double> markzellen = ZoneLayerSHP.read(config.findParam(MODULE_NAME, "marktzellen"), "EWZ");
 		double sum = 0;
 		for(Zone<Double> zone : markzellen.getZones()) {
 			sum += zone.getAttribute();
@@ -115,7 +111,7 @@ public class SetHomeLocations {
 		logger.info("Done.");
 		
 		logger.info("Setting up sampler...");
-		Random random = new XORShiftRandom(seed);
+		
 		
 		MutateHomeLocation mutator = new MutateHomeLocation(zoneDE, random);
 		
@@ -125,8 +121,14 @@ public class SetHomeLocations {
 		H.addComponent(popDen);
 		
 		Sampler sampler = new Sampler(random);
+		
+		PopulationWriter popWriter = new PopulationWriter(config.getParam(MODULE_NAME, "outputDir"), sampler);
+		popWriter.setDumpInterval(Integer.parseInt(config.getParam(MODULE_NAME, "dumpInterval")));
+		
+		
 		sampler.addMutator(mutator);
 		sampler.addListenter(popDen);
+		sampler.addListenter(popWriter);
 		sampler.setHamiltonian(H);
 		
 		/*
@@ -143,13 +145,10 @@ public class SetHomeLocations {
 		}
 		
 		logger.info("Running sampler...");
-		sampler.run(persons, 10000000);
+		sampler.run(persons, (long) Double.parseDouble(config.getParam(MODULE_NAME, "iterations")));
 		logger.info("Done.");
 		
-		logger.info("Writing persons...");
-		XMLWriter writer = new XMLWriter();
-		writer.write("/home/johannes/gsv/mid2008/pop2.xml", sampler.getPopulation());
-		logger.info("Done.");
+//		popDen.writeZoneData("/home/johannes/gsv/mid2008/popDen.shp");
 	}
 
 }

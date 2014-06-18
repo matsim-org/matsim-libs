@@ -19,6 +19,7 @@
 
 package playground.johannes.gsv.synPop.mid.hamiltonian;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -36,7 +37,10 @@ import playground.johannes.gsv.synPop.sim.SamplerListener;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.sna.util.ProgressLogger;
+import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
 /**
@@ -51,8 +55,11 @@ public class PopulationDensity implements Hamiltonian, Initializer, SamplerListe
 	
 	private ZoneLayer<ZoneData> zones;
 	
+	private GeometryFactory factory = new GeometryFactory();
+	
 	public PopulationDensity(ZoneLayer<Double> inhabitants, int N, Random random) {
 		logger.info("Initializing population density hamiltonian...");
+		double maxFrac = 0;
 		Set<Zone<ZoneData>> newZones = new HashSet<Zone<ZoneData>>(inhabitants.getZones().size());
 		for(Zone<Double> zone : inhabitants.getZones()) {
 			Zone<ZoneData> newZone = new Zone<ZoneData>(zone.getGeometry());
@@ -60,6 +67,8 @@ public class PopulationDensity implements Hamiltonian, Initializer, SamplerListe
 			newZone.getAttribute().targetFraction = zone.getAttribute();
 			
 			newZones.add(newZone);
+			
+			maxFrac = Math.max(maxFrac, newZone.getAttribute().targetFraction);
 		}
 		
 		zones = new ZoneLayer<PopulationDensity.ZoneData>(newZones);
@@ -69,13 +78,16 @@ public class PopulationDensity implements Hamiltonian, Initializer, SamplerListe
 		ProgressLogger.init(N, 2, 10);
 		while(total < N) {
 			Zone<ZoneData> zone = zoneList.get(random.nextInt(zoneList.size()));
-			if(zone.getAttribute().targetFraction > random.nextDouble()) {
+			double p = zone.getAttribute().targetFraction / maxFrac;
+			if(p > random.nextDouble()) {
 				zone.getAttribute().target++;
 				total++;
 				ProgressLogger.step();
 			}
 		}
 		ProgressLogger.termiante();
+		
+//		writeZoneData("/home/johannes/gsv/mid2008/targetPopDen.shp");
 	}
 	
 	@Override
@@ -90,14 +102,18 @@ public class PopulationDensity implements Hamiltonian, Initializer, SamplerListe
 		double gradient1 = gradient(origZone, -1);
 		double gradient2 = gradient(modZone, 1);
 		
-		return gradient1 + gradient2;
+		return -(gradient1 + gradient2);
 	}
 	
 	private Zone<ZoneData> getZone(ProxyPerson person) {
 		Zone<ZoneData> modZone = (Zone<ZoneData>) person.getUserData(this);
 		if(modZone == null) {
-			Point point = (Point) person.getAttribute(CommonKeys.PERSON_HOME_POINT);
-			modZone = zones.getZone(point);
+			double x = Double.parseDouble((String) person.getAttribute(CommonKeys.PERSON_HOME_COORD_X));
+			double y = Double.parseDouble((String) person.getAttribute(CommonKeys.PERSON_HOME_COORD_Y));
+				
+			Point p = factory.createPoint(new Coordinate(x, y));
+			
+			modZone = zones.getZone(p);
 			person.setUserData(this, modZone);
 		}
 		return modZone;
@@ -135,11 +151,17 @@ public class PopulationDensity implements Hamiltonian, Initializer, SamplerListe
 
 	@Override
 	public void init(ProxyPerson person) {
-		Point point = (Point) person.getAttribute(CommonKeys.PERSON_HOME_POINT);
-		Zone<ZoneData> zone = zones.getZone(point);
+		double x = Double.parseDouble((String) person.getAttribute(CommonKeys.PERSON_HOME_COORD_X));
+		double y = Double.parseDouble((String) person.getAttribute(CommonKeys.PERSON_HOME_COORD_Y));
+			
+		Point p = factory.createPoint(new Coordinate(x, y));
+		Zone<ZoneData> zone = zones.getZone(p);
 		if(zone == null) {
 			zone = zones.getZones().iterator().next(); //get a random zone;
-			person.setAttribute(CommonKeys.PERSON_HOME_POINT, zone.getGeometry().getCentroid());
+//			person.setAttribute(CommonKeys.PERSON_HOME_POINT, zone.getGeometry().getCentroid());
+			Coordinate coord = zone.getGeometry().getCentroid().getCoordinate();
+			person.setAttribute(CommonKeys.PERSON_HOME_COORD_X, String.valueOf(coord.x));
+			person.setAttribute(CommonKeys.PERSON_HOME_COORD_Y, String.valueOf(coord.y));
 		}
 		person.setUserData(this, zone);
 		zone.getAttribute().current++;
@@ -165,5 +187,21 @@ public class PopulationDensity implements Hamiltonian, Initializer, SamplerListe
 		
 		private double targetFraction;
 	
+	}
+	
+	public void writeZoneData(String file) {
+		try {
+			Set<Zone<Double>> newZones = new HashSet<Zone<Double>>();
+			for(Zone<ZoneData> zone : zones.getZones()) {
+				Zone<Double> newZone = new Zone<Double>(zone.getGeometry());
+				newZone.setAttribute((double) zone.getAttribute().current/zone.getGeometry().getArea() * 1000000);
+				newZones.add(newZone);
+			}
+			
+			ZoneLayerSHP.write(new ZoneLayer<Double>(newZones), file);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

@@ -28,7 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import playground.johannes.gsv.synPop.ProxyLeg;
+import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 
@@ -97,7 +97,7 @@ public class TXTReader {
 			String id = personIdBuilder(attributes);
 			ProxyPerson person = persons.get(id);
 			
-			ProxyLeg leg = new ProxyLeg();
+			ProxyObject leg = new ProxyObject();
 			for(LegAttributeHandler handler : legAttHandlers)
 				handler.handle(leg, attributes);
 			

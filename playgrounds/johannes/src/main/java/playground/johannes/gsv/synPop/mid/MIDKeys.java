@@ -53,4 +53,6 @@ public interface MIDKeys {
 //	public static final String PERSON_MUNICIPALITY_UPPER = "inhabUp";
 	
 	public static final String PERSON_MUNICIPALITY_CLASS = "inhabClass";
+	
+	public static final String PERSON_WEIGHT = "p_gew";
 }

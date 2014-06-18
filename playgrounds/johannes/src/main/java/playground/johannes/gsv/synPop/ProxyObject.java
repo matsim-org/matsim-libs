@@ -17,45 +17,65 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.synPop;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.io.AttributeSerializer;
+import java.util.Map.Entry;
 
 /**
  * @author johannes
  *
  */
-public class LegDistanceHandler implements LegAttributeHandler, AttributeSerializer {
+public class ProxyObject {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
-	 */
-	@Override
-	public void handle(ProxyObject leg, Map<String, String> attributes) {
-		String att = attributes.get(MIDKeys.LEG_DISTANCE);
+	private Map<String, String> attributes;
+	
+	private Map<String, String> unmodAttribs;
+	
+	private Map<Object, Object> userData;
+	
+	public ProxyObject() {
+		attributes = new HashMap<String, String>(5);
+		unmodAttribs = Collections.unmodifiableMap(attributes);
+	}
+	
+	public Map<String, String> getAttributes() {
+		return unmodAttribs;
+	}
+	
+	public String getAttribute(String key) {
+		return attributes.get(key);
+	}
+	
+	public String setAttribute(String key, String value) {
+		return attributes.put(key, value);
+	}
+	
+	public ProxyObject clone() {
+		ProxyObject clone = new ProxyObject();
 		
-		double d = Double.parseDouble(att);
-		if(d < 9994) {
-			d = d * 1000;
-			leg.setAttribute(CommonKeys.LEG_DISTANCE, String.valueOf(d));
-		} else {
-			leg.setAttribute(CommonKeys.LEG_DISTANCE, null);
+		for(Entry<String, String> entry : attributes.entrySet()) {
+			clone.setAttribute(entry.getKey(), entry.getValue());
 		}
-
+		
+		return clone;
 	}
-
-	@Override
-	public String encode(Object value) {
-		return String.valueOf((Double)value);
+	
+	public Object getUserData(Object key) {
+		initUserData();
+		return userData.get(key);
 	}
-
-	@Override
-	public Object decode(String value) {
-		return (Double)Double.parseDouble(value);
+	
+	public Object setUserData(Object key, Object value) {
+		initUserData();
+		return userData.put(key, value);
 	}
-
+	
+	private void initUserData() {
+		if(userData == null) {
+			userData = new HashMap<Object, Object>(5);
+		}
+	}
 }

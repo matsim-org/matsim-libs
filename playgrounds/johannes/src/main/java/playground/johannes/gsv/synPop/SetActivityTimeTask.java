@@ -31,27 +31,27 @@ public class SetActivityTimeTask implements ProxyPlanTask {
 	@Override
 	public void apply(ProxyPlan plan) {
 		if(plan.getActivities().size() == 1) {
-			ProxyActivity act = plan.getActivities().get(0);
+			ProxyObject act = plan.getActivities().get(0);
 			
-			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, 0);
-			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, 86400);
+			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, "0");
+			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, "86400");
 		} else {
 			
 		
 		for(int i = 0; i < plan.getActivities().size(); i++) {
-			Integer startTime = 0;
-			Integer endTime = 86400;
+			String startTime = "0";
+			String endTime = "86400";
 			
-			ProxyActivity act = plan.getActivities().get(i);
+			ProxyObject act = plan.getActivities().get(i);
 			
 			if(i > 0) {
-				ProxyLeg prev = plan.getLegs().get(i-1);
-				startTime = (Integer) prev.getAttribute(CommonKeys.LEG_END_TIME);
+				ProxyObject prev = plan.getLegs().get(i-1);
+				startTime = prev.getAttribute(CommonKeys.LEG_END_TIME);
 			}
 			
 			if(i < plan.getActivities().size() - 1) {
-				ProxyLeg next = plan.getLegs().get(i);
-				endTime = (Integer) next.getAttribute(CommonKeys.LEG_START_TIME);
+				ProxyObject next = plan.getLegs().get(i);
+				endTime = next.getAttribute(CommonKeys.LEG_START_TIME);
 			}
 			
 			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, startTime);

@@ -32,8 +32,8 @@ public class SetActivityTypeTask implements ProxyPlanTask {
 	@Override
 	public void apply(ProxyPlan plan) {
 		for(int i = 0; i < plan.getLegs().size(); i++) {
-			ProxyLeg leg = plan.getLegs().get(i);
-			ProxyActivity act = plan.getActivities().get(i + 1);
+			ProxyObject leg = plan.getLegs().get(i);
+			ProxyObject act = plan.getActivities().get(i + 1);
 			
 			act.setAttribute(CommonKeys.ACTIVITY_TYPE, leg.getAttribute(CommonKeys.LEG_PURPOSE));
 		}

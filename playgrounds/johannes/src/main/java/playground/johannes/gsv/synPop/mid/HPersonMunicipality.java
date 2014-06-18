@@ -23,7 +23,6 @@ import java.util.Collection;
 
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.mid.hamiltonian.PopulationDensity;
 import playground.johannes.gsv.synPop.sim.Hamiltonian;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
@@ -63,7 +62,11 @@ public class HPersonMunicipality implements Hamiltonian {
 //		Zone<Double> zone = municipalities.getZone(p);
 		Zone<Double> zone = (Zone<Double>) person.getUserData(this);
 		if(zone == null) {
-			Point p = (Point) person.getAttribute(CommonKeys.PERSON_HOME_POINT);
+//			Point p = (Point) person.getAttribute(CommonKeys.PERSON_HOME_POINT);
+			double x = Double.parseDouble((String) person.getAttribute(CommonKeys.PERSON_HOME_COORD_X));
+			double y = Double.parseDouble((String) person.getAttribute(CommonKeys.PERSON_HOME_COORD_Y));
+				
+			Point p = geoFactory.createPoint(new Coordinate(x, y));
 			zone = municipalities.getZone(p);
 			person.setUserData(this, zone);
 		}
@@ -75,7 +78,13 @@ public class HPersonMunicipality implements Hamiltonian {
 		
 		double inhabs = zone.getAttribute();
 		
-		int target = (Integer) person.getAttribute(MIDKeys.PERSON_MUNICIPALITY_CLASS);
+		
+		Integer intObj = (Integer) person.getUserData(MIDKeys.PERSON_MUNICIPALITY_CLASS);
+		if(intObj == null) {
+			intObj = new Integer(person.getAttribute(MIDKeys.PERSON_MUNICIPALITY_CLASS));
+			person.setUserData(MIDKeys.PERSON_MUNICIPALITY_CLASS, intObj);
+		}
+		int target = intObj;
 		int cat = PersonMunicipalityClassHandler.getCategorie((int) inhabs);
 //		int lower = (Integer) person.getAttribute(MIDKeys.PERSON_MUNICIPALITY_LOWER);
 //		int upper = (Integer) person.getAttribute(MIDKeys.PERSON_MUNICIPALITY_UPPER);

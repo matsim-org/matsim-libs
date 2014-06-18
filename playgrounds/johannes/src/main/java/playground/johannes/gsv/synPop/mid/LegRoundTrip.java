@@ -22,7 +22,7 @@ package playground.johannes.gsv.synPop.mid;
 import java.util.Map;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyLeg;
+import playground.johannes.gsv.synPop.ProxyObject;
 
 /**
  * @author johannes
@@ -34,13 +34,13 @@ public class LegRoundTrip implements LegAttributeHandler {
 	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
 	 */
 	@Override
-	public void handle(ProxyLeg leg, Map<String, String> attributes) {
+	public void handle(ProxyObject leg, Map<String, String> attributes) {
 		String val = attributes.get(MIDKeys.LEG_DESTINATION);
 
 		if(val.equalsIgnoreCase("Rundweg")) {
-			leg.setAttribute(CommonKeys.LEG_ROUNDTRIP, true);
+			leg.setAttribute(CommonKeys.LEG_ROUNDTRIP, "true");
 		} else {
-			leg.setAttribute(CommonKeys.LEG_ROUNDTRIP, false);
+			leg.setAttribute(CommonKeys.LEG_ROUNDTRIP, "false");
 		}
 	}
 

@@ -34,37 +34,40 @@ public class FixActivityTimesTask implements ProxyPlanTask {
 	@Override
 	public void apply(ProxyPlan plan) {
 		for(int i = 0; i < plan.getActivities().size(); i++) {
-			ProxyActivity act = plan.getActivities().get(i);
+			ProxyObject act = plan.getActivities().get(i);
 			
 			if(act.getAttribute(CommonKeys.ACTIVITY_START_TIME) == null) {
 				
 				if(i > 0) {
-					ProxyActivity prev = plan.getActivities().get(i - 1);
-					Integer prevEndTime = (Integer) prev.getAttribute(CommonKeys.ACTIVITY_END_TIME);
-					if(prevEndTime != null)
-						act.setAttribute(CommonKeys.ACTIVITY_START_TIME, prevEndTime + MIN_LEG_DURATION);
-					else
+					ProxyObject prev = plan.getActivities().get(i - 1);
+					String timeStr = prev.getAttribute(CommonKeys.ACTIVITY_END_TIME);
+					if(timeStr != null) {
+						int prevEndTime = Integer.parseInt(timeStr); 
+						act.setAttribute(CommonKeys.ACTIVITY_START_TIME, String.valueOf(prevEndTime + MIN_LEG_DURATION));
+					}else
 						throw new RuntimeException("Insufficient information. End time of previous activity not set.");
 					
 				} else {
-					act.setAttribute(CommonKeys.ACTIVITY_START_TIME, 0);
+					act.setAttribute(CommonKeys.ACTIVITY_START_TIME, "0");
 				}
 			}
 			
 			if(act.getAttribute(CommonKeys.ACTIVITY_END_TIME) == null) {
 				
 				if(i < plan.getActivities().size() - 2) {
-					ProxyActivity next = plan.getActivities().get(i + 1);
-					Integer nextStartTime = (Integer) next.getAttribute(CommonKeys.ACTIVITY_START_TIME);
-					if(nextStartTime != null)
-						act.setAttribute(CommonKeys.ACTIVITY_END_TIME, nextStartTime - MIN_LEG_DURATION);
-					else {
+					ProxyObject next = plan.getActivities().get(i + 1);
+					String timeStr = next.getAttribute(CommonKeys.ACTIVITY_START_TIME);
+					
+					if(timeStr != null) {
+						int nextStartTime = Integer.parseInt(timeStr) ;
+						act.setAttribute(CommonKeys.ACTIVITY_END_TIME, String.valueOf(nextStartTime - MIN_LEG_DURATION));
+					} else {
 //						throw new RuntimeException("Insufficient information. Start time of next activity not set.");
-						Integer start = (Integer) act.getAttribute(CommonKeys.ACTIVITY_START_TIME);
-						act.setAttribute(CommonKeys.ACTIVITY_END_TIME, start + MIN_ACT_DURATION);
+						int start = Integer.parseInt(act.getAttribute(CommonKeys.ACTIVITY_START_TIME));
+						act.setAttribute(CommonKeys.ACTIVITY_END_TIME, String.valueOf(start + MIN_ACT_DURATION));
 					}
 				} else {
-					act.setAttribute(CommonKeys.ACTIVITY_END_TIME, 86400);
+					act.setAttribute(CommonKeys.ACTIVITY_END_TIME, "86400");
 				}
 			}
 		}

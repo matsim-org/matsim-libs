@@ -32,6 +32,8 @@ public class ProxyActivity {
 
 	private Map<String, Object> attributes = new HashMap<String, Object>();
 	
+	private Map<Object, Object> userData;
+	
 	public Object setAttribute(String key, Object value) {
 		return attributes.put(key, value);
 	}
@@ -52,5 +54,15 @@ public class ProxyActivity {
 		}
 		
 		return clone;
+	}
+	
+	public void setUserData(Object key, Object value) {
+		
+	}
+	
+	private void initUserData() {
+		if(userData == null) {
+			userData = new HashMap<Object, Object>();
+		}
 	}
 }

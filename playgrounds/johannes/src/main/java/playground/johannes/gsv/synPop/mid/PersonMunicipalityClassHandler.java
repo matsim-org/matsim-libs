@@ -37,27 +37,27 @@ public class PersonMunicipalityClassHandler implements PersonAttributeHandler, A
 		if(val.equalsIgnoreCase("unter 5.000 Einw.")) {
 //			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_LOWER, 0);
 //			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_UPPER, 5000);
-			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_CLASS, 0);
+			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_CLASS, "0");
 		} else if(val.equalsIgnoreCase("5.000 bis unter 20.000 Einw.")) {
 //			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_LOWER, 5000);
 //			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_UPPER, 20000);
-			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_CLASS, 1);
+			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_CLASS, "1");
 		} else if(val.equalsIgnoreCase("20.000 bis unter 50.000 Einw.")) {
 //			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_LOWER, 20000);
 //			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_UPPER, 50000);
-			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_CLASS, 2);
+			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_CLASS, "2");
 		} else if(val.equalsIgnoreCase("50.000 bis unter 100.000 Einw.")) {
 //			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_LOWER, 50000);
 //			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_UPPER, 100000);
-			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_CLASS, 3);
+			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_CLASS, "3");
 		} else if(val.equalsIgnoreCase("100.000 bis unter 500.000 Einw.")) {
 //			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_LOWER, 100000);
 //			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_UPPER, 500000);
-			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_CLASS, 4);
+			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_CLASS, "4");
 		} else if(val.equalsIgnoreCase("500.000 und mehr Einw.")) {
 //			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_LOWER, 500000);
 //			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_UPPER, Integer.MAX_VALUE);
-			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_CLASS, 5);
+			person.setAttribute(MIDKeys.PERSON_MUNICIPALITY_CLASS, "5");
 		}
 	}
 

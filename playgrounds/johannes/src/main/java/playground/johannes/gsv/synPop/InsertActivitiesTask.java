@@ -33,7 +33,7 @@ public class InsertActivitiesTask implements ProxyPlanTask {
 		int nLegs = plan.getLegs().size();
 		
 		for(int i = 0; i < nLegs+1; i++) {
-			ProxyActivity activity = new ProxyActivity();
+			ProxyObject activity = new ProxyObject();
 			plan.addActivity(activity);
 		}
 

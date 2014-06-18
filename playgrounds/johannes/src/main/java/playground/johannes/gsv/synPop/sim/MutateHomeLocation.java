@@ -76,9 +76,9 @@ public class MutateHomeLocation implements Mutator, Initializer {
 			hit = bounds.contains(p);
 		}
 		
-		modified.setAttribute(CommonKeys.PERSON_HOME_COORD_X, x);
-		modified.setAttribute(CommonKeys.PERSON_HOME_COORD_Y, y);
-		modified.setAttribute(CommonKeys.PERSON_HOME_POINT, p); //TODO: move?
+		modified.setAttribute(CommonKeys.PERSON_HOME_COORD_X, String.valueOf(x));
+		modified.setAttribute(CommonKeys.PERSON_HOME_COORD_Y, String.valueOf(y));
+//		modified.setAttribute(CommonKeys.PERSON_HOME_POINT, p); //TODO: move?
 		
 		return true;
 

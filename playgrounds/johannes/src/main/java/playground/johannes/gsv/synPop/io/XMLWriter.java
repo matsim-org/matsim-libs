@@ -29,8 +29,7 @@ import java.util.Map.Entry;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
-import playground.johannes.gsv.synPop.ProxyActivity;
-import playground.johannes.gsv.synPop.ProxyLeg;
+import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 
@@ -82,30 +81,30 @@ public class XMLWriter extends MatsimXmlWriter {
 		writeEndTag(Constants.PLAN_TAG);
 	}
 
-	private void writeActivity(ProxyActivity activity) {
+	private void writeActivity(ProxyObject activity) {
 		writeStartTag(Constants.ACTIVITY_TAG, getAttributes(activity.getAttributes()), true);
 	}
 
-	private void writeLeg(ProxyLeg leg) {
+	private void writeLeg(ProxyObject leg) {
 		writeStartTag(Constants.LEG_TAG, getAttributes(leg.getAttributes()), true);
 	}
 
-	private List<Tuple<String, String>> getAttributes(Map<String, Object> attributes) {
+	private List<Tuple<String, String>> getAttributes(Map<String, String> attributes) {
 		List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>(attributes.size() + 1);
 
-		for (Entry<String, Object> entry : attributes.entrySet()) {
+		for (Entry<String, String> entry : attributes.entrySet()) {
 			String value = null;
 			
-			AttributeSerializer serializer = serializers.get(entry.getKey());
-			if (serializer == null) {
+//			AttributeSerializer serializer = serializers.get(entry.getKey());
+//			if (serializer == null) {
 				
 				if (entry.getValue() != null) {
 					value = entry.getValue().toString();
 				}
 				
-			} else {
-				value = serializer.encode(entry.getValue());
-			}
+//			} else {
+//				value = serializer.encode(entry.getValue());
+//			}
 
 			if(value != null) {
 				atts.add(new Tuple<String, String>(entry.getKey(), value));

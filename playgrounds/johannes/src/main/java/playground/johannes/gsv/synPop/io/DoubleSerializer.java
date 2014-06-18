@@ -17,45 +17,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
-
-import java.util.Map;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.io.AttributeSerializer;
+package playground.johannes.gsv.synPop.io;
 
 /**
  * @author johannes
  *
  */
-public class LegDistanceHandler implements LegAttributeHandler, AttributeSerializer {
+public class DoubleSerializer implements AttributeSerializer {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
-	 */
-	@Override
-	public void handle(ProxyObject leg, Map<String, String> attributes) {
-		String att = attributes.get(MIDKeys.LEG_DISTANCE);
+	private static DoubleSerializer instance;
+	
+	public static DoubleSerializer instance() {
+		if(instance == null)
+			instance = new DoubleSerializer();
 		
-		double d = Double.parseDouble(att);
-		if(d < 9994) {
-			d = d * 1000;
-			leg.setAttribute(CommonKeys.LEG_DISTANCE, String.valueOf(d));
-		} else {
-			leg.setAttribute(CommonKeys.LEG_DISTANCE, null);
-		}
-
+		return instance;
 	}
-
+	
 	@Override
 	public String encode(Object value) {
-		return String.valueOf((Double)value);
+		return String.valueOf(value);
 	}
 
 	@Override
 	public Object decode(String value) {
-		return (Double)Double.parseDouble(value);
+		return new Double(value);
 	}
 
 }

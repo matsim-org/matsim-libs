@@ -31,8 +31,8 @@ public class SetFirstActivityTypeTask implements ProxyPlanTask {
 	@Override
 	public void apply(ProxyPlan plan) {
 		if(plan.getLegs().size() > 0 ) {
-		ProxyLeg firstLeg = plan.getLegs().get(0);
-		ProxyActivity firstAct = plan.getActivities().get(0);
+		ProxyObject firstLeg = plan.getLegs().get(0);
+		ProxyObject firstAct = plan.getActivities().get(0);
 		
 		firstAct.setAttribute(CommonKeys.ACTIVITY_TYPE, firstLeg.getAttribute(CommonKeys.LEG_ORIGIN));
 		}

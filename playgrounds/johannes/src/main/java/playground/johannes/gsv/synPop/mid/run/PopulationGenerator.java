@@ -40,6 +40,7 @@ import playground.johannes.gsv.synPop.mid.LegOriginHandler;
 import playground.johannes.gsv.synPop.mid.LegRoundTrip;
 import playground.johannes.gsv.synPop.mid.LegStartTimeHandler;
 import playground.johannes.gsv.synPop.mid.PersonMunicipalityClassHandler;
+import playground.johannes.gsv.synPop.mid.PersonWeightHandler;
 import playground.johannes.gsv.synPop.mid.TXTReader;
 
 /**
@@ -61,6 +62,7 @@ public class PopulationGenerator {
 		
 		TXTReader reader = new TXTReader();
 		reader.addPersonAttributeHandler(new PersonMunicipalityClassHandler());
+		reader.addPersonAttributeHandler(new PersonWeightHandler());
 		reader.addLegAttributeHandler(new LegMainPurposeHandler());
 		reader.addLegAttributeHandler(new LegOriginHandler());
 		reader.addLegAttributeHandler(new LegRoundTrip());

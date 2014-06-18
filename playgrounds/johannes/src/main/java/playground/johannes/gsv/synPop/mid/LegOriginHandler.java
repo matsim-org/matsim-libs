@@ -22,7 +22,7 @@ package playground.johannes.gsv.synPop.mid;
 import java.util.Map;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyLeg;
+import playground.johannes.gsv.synPop.ProxyObject;
 
 /**
  * @author johannes
@@ -34,7 +34,7 @@ public class LegOriginHandler implements LegAttributeHandler {
 	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
 	 */
 	@Override
-	public void handle(ProxyLeg leg, Map<String, String> attributes) {
+	public void handle(ProxyObject leg, Map<String, String> attributes) {
 		String origin = attributes.get(MIDKeys.LEG_ORIGIN);
 		if(origin.equalsIgnoreCase("zu Hause"))
 			leg.setAttribute(CommonKeys.LEG_ORIGIN, "home");

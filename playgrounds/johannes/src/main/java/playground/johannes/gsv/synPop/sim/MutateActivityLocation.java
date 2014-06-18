@@ -27,7 +27,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyActivity;
+import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
 
 /**
@@ -56,14 +56,14 @@ public class MutateActivityLocation implements Mutator {
 	 */
 	@Override
 	public boolean mutate(ProxyPerson original, ProxyPerson modified) {
-		List<ProxyActivity> activities = modified.getPlan().getActivities();
+		List<ProxyObject> activities = modified.getPlan().getActivities();
 		
-		ProxyActivity act = activities.get(random.nextInt(activities.size()));
+		ProxyObject act = activities.get(random.nextInt(activities.size()));
 		String type = (String) act.getAttribute(CommonKeys.ACTIVITY_TYPE);
 		
 		if(activityType.equalsIgnoreCase(type)) {
 			ActivityFacility facility = facilities.get(random.nextInt(facilities.size()));
-			act.setAttribute(CommonKeys.ACTIVITY_FACILITY, facility);
+//			act.setAttribute(CommonKeys.ACTIVITY_FACILITY, facility);
 			return true;
 		} else {	
 			return false;

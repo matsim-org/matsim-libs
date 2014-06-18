@@ -17,45 +17,49 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.synPop.sim;
 
-import java.util.Map;
+import org.apache.log4j.Logger;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.io.AttributeSerializer;
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.io.XMLWriter;
 
 /**
  * @author johannes
  *
  */
-public class LegDistanceHandler implements LegAttributeHandler, AttributeSerializer {
+public class PopulationWriter implements SamplerListener {
+	
+	private static final Logger logger = Logger.getLogger(PopulationWriter.class);
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
-	 */
+	private Sampler sampler;
+	
+	private String outputDir;
+	
+	private XMLWriter writer;
+	
+	private int dumpInterval = 100000;
+	
+	private int iteration = 0;
+	
+	public PopulationWriter(String outputDir, Sampler sampler) {
+		this.outputDir = outputDir;
+		writer = new XMLWriter();
+		this.sampler = sampler;
+	}
+	
+	public void setDumpInterval(int interval) {
+		dumpInterval = interval;
+	}
+	
 	@Override
-	public void handle(ProxyObject leg, Map<String, String> attributes) {
-		String att = attributes.get(MIDKeys.LEG_DISTANCE);
-		
-		double d = Double.parseDouble(att);
-		if(d < 9994) {
-			d = d * 1000;
-			leg.setAttribute(CommonKeys.LEG_DISTANCE, String.valueOf(d));
-		} else {
-			leg.setAttribute(CommonKeys.LEG_DISTANCE, null);
+	public void afterStep(ProxyPerson original, ProxyPerson mutation, boolean accepted) {
+		iteration++;
+		if(iteration % dumpInterval == 0) {
+			logger.info("Dumping population...");
+			writer.write(String.format("%s/%s.pop.xml", outputDir, iteration), sampler.getPopulation());
 		}
 
-	}
-
-	@Override
-	public String encode(Object value) {
-		return String.valueOf((Double)value);
-	}
-
-	@Override
-	public Object decode(String value) {
-		return (Double)Double.parseDouble(value);
 	}
 
 }
