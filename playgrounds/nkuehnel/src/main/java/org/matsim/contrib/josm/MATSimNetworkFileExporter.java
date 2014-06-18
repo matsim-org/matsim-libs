@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JOptionPane;
-import javax.swing.ProgressMonitor;
 
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.ExtensionFileFilter;
@@ -13,29 +12,59 @@ import org.openstreetmap.josm.data.validation.Severity;
 import org.openstreetmap.josm.data.validation.TestError;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
-import org.openstreetmap.josm.gui.progress.NullProgressMonitor;
 import org.openstreetmap.josm.gui.progress.PleaseWaitProgressMonitor;
 import org.openstreetmap.josm.io.FileExporter;
 import org.openstreetmap.josm.tools.ImageProvider;
 
 /**
- * The FileExporter that handles file output when saving. Runs validation tests
- * in advance.
+ * The FileExporter that handles file output when saving. Runs
+ * {@link MATSimTest} prior to the {@link ExportTask}.
  * 
+ * @author Nico
  * 
  */
 final class MATSimNetworkFileExporter extends FileExporter {
 
+	/**
+	 * Creates a new {@code MATSimNetworkFileExporter}. <br>
+	 * Extension used is {@code .xml}.
+	 */
 	MATSimNetworkFileExporter() {
 		super(new ExtensionFileFilter("xml", "xml",
 				"MATSim Network Files (*.xml)"));
 	}
 
+	/**
+	 * Checks whether the {@code layer} with the given {@code pathname} can be
+	 * saved as MATSim network.
+	 * 
+	 * @param pathname
+	 *            The path to which the network should be written
+	 * @param layer
+	 *            The layer which holds the data
+	 * @return <code>true</code> if the given {@code layer} is a
+	 *         {@link NetworkLayer}. <code>false</code> otherwise
+	 */
 	@Override
 	public boolean acceptFile(File pathname, Layer layer) {
 		return layer instanceof NetworkLayer;
 	}
 
+	/**
+	 * Exports the MATSim network of the given {@code layer} into the given
+	 * {@code file}. <br>
+	 * <br>
+	 * Before exporting a {@link MATSimTest} is run, resulting in a validation
+	 * layer. The export fails if severe errors are found.
+	 * 
+	 * @see ExportTask
+	 * @param file
+	 *            The {@code .xml} network-file to which the network data is
+	 *            stored to
+	 * @param layer
+	 *            The layer which holds the network data (must be a
+	 *            {@link NetworkLayer})
+	 */
 	@Override
 	public void exportData(File file, Layer layer) throws IOException {
 

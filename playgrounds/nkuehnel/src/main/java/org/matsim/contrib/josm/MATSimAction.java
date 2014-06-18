@@ -1,5 +1,19 @@
 package org.matsim.contrib.josm;
 
+import static org.openstreetmap.josm.tools.I18n.tr;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.WindowConstants;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
@@ -15,20 +29,10 @@ import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.tools.Shortcut;
 
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.HashMap;
-import java.util.List;
-
-import static org.openstreetmap.josm.tools.I18n.tr;
-
 /**
  * Adds the MATSim buttons and their functionality to the tools bar.
  * 
- * @author nkuehnel
+ * @author Nico
  * 
  */
 class MATSimAction {
@@ -45,6 +49,13 @@ class MATSimAction {
 		return new ConvertAction();
 	}
 
+	/**
+	 * The ImportAction that handles network imports.
+	 * 
+	 * @author Nico
+	 * 
+	 */
+	@SuppressWarnings("serial")
 	public class ImportAction extends JosmAction {
 
 		public ImportAction() {
@@ -90,6 +101,14 @@ class MATSimAction {
 		}
 	}
 
+	/**
+	 * New Network Action which causes an empty {@link NetworkLayer} to be
+	 * created
+	 * 
+	 * @author Nico
+	 * 
+	 */
+	@SuppressWarnings("serial")
 	public class NewNetworkAction extends JosmAction {
 
 		public NewNetworkAction() {
@@ -107,11 +126,20 @@ class MATSimAction {
 			Scenario scenario = ScenarioUtils.createScenario(config);
 			NetworkLayer layer = new NetworkLayer(dataSet, "new Layer", null,
 					scenario.getNetwork(), TransformationFactory.WGS84,
-					new HashMap<Way, List<Link>>(), new HashMap<Link, List<WaySegment>>());
+					new HashMap<Way, List<Link>>(),
+					new HashMap<Link, List<WaySegment>>());
 			Main.main.addLayer(layer);
 		}
 	}
 
+	/**
+	 * The Convert Action which causes the {@link ConvertTask} to start. Results
+	 * in a new {@link NetworkLayer} which holds the converted data.
+	 * 
+	 * @author Nico
+	 * 
+	 */
+	@SuppressWarnings("serial")
 	public static class ConvertAction extends JosmAction {
 
 		public static JDialog dlg;

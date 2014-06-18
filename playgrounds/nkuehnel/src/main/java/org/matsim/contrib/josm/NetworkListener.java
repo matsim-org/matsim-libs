@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
+import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.osm.Changeset;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Relation;
@@ -52,6 +53,9 @@ class NetworkListener implements DataSetListener, Visitor {
 	@Override
 	public void dataChanged(DataChangedEvent arg0) {
 		log.debug("Data changed. " + arg0.getType());
+		for (AbstractDatasetChangedEvent event: arg0.getEvents()) {
+			event.fire(this);
+		}
 	}
 
 	@Override
@@ -93,7 +97,7 @@ class NetworkListener implements DataSetListener, Visitor {
 					for (Link link : links) {
 						System.out.println(link.getFromNode().getId());
 						link2Segments.remove(link);
-						log.debug("MATSIm Link removed. "
+						log.debug("MATSim Link removed. "
 								+ ((LinkImpl) link).getOrigId());
 						network.removeLink(link.getId());
 					}
@@ -158,6 +162,9 @@ class NetworkListener implements DataSetListener, Visitor {
 
 	@Override
 	public void visit(Way way) {
+		if (Main.main.getCurrentDataSet() != null) {
+			Main.main.getCurrentDataSet().clearHighlightedWaySegments();
+		}
 		List<Link> oldLinks = way2Links.remove(way);
 		MATSimPlugin.toggleDialog.notifyDataChanged(network);
 		if (oldLinks != null) {

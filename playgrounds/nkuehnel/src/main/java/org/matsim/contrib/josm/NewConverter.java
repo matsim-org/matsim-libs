@@ -62,7 +62,7 @@ class NewConverter {
 	public static void convertWay(Way way, Network network,
 			Map<Way, List<Link>> way2Links,
 			Map<Link, List<WaySegment>> link2Segments) {
-		log.setLevel(Level.OFF);
+		log.setLevel(Level.DEBUG);
 		log.info("### Way " + way.getUniqueId() + " (" + way.getNodesCount()
 				+ " nodes) ###");
 		List<Link> links = new ArrayList<Link>();
@@ -291,10 +291,13 @@ class NewConverter {
 								+ ": could not parse MATSim modes tag");
 					}
 				}
+				
+				Double tempLength = null;
 				if (keys.containsKey("length")) {
 					Double temp = parseDoubleIfPossible(keys.get("length"));
 					if (temp != null) {
-						length = temp;
+						tempLength = temp;
+						
 					} else {
 						log.warn("--- Way " + way.getUniqueId()
 								+ ": could not parse MATSim length tag");
@@ -333,6 +336,9 @@ class NewConverter {
 					log.debug("--- Way " + way.getUniqueId()
 							+ ": length between " + fromIdx + " and " + toIdx
 							+ ": " + length);
+					if (tempLength != null) {
+						length = tempLength * length / way.getLength(); 
+					}
 					List<Link> tempLinks = createLink(network, way, nodeFrom,
 							nodeTo, length, increment, oneway, onewayReverse,
 							freespeed, capacity, nofLanes, modes);

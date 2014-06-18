@@ -1,5 +1,11 @@
 package org.matsim.contrib.josm;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -26,21 +32,21 @@ import org.openstreetmap.josm.gui.PleaseWaitRunnable;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.xml.sax.SAXException;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-
 /**
  * The task which is executed after confirming the ImportDialog. Creates a new
  * layer showing the network data.
  * 
- * @author nkuehnel
- * 
+ * @author Nico
  */
 class ImportTask extends PleaseWaitRunnable {
+
+	/**
+	 * The String representing the id tagging-key for nodes.
+	 */
 	public static final String NODE_TAG_ID = "id";
+	/**
+	 * The String representing the id tagging-key for ways.
+	 */
 	public static final String WAY_TAG_ID = "id";
 	private NetworkLayer layer;
 	private String path;
@@ -50,14 +56,18 @@ class ImportTask extends PleaseWaitRunnable {
 	private HashMap<Way, List<Link>> way2Links;
 	private HashMap<Link, List<WaySegment>> link2Segment;
 
+	/**
+	 * Creates a new Import task with the given <code>path</code>.
+	 * 
+	 * @param path
+	 *            The path to be imported from
+	 */
 	public ImportTask(String path) {
 		super("MATSim Import");
 		this.path = path;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see org.openstreetmap.josm.gui.PleaseWaitRunnable#cancel()
 	 */
 	@Override
@@ -65,9 +75,7 @@ class ImportTask extends PleaseWaitRunnable {
 		// TODO Auto-generated method stub
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see org.openstreetmap.josm.gui.PleaseWaitRunnable#finish()
 	 */
 	@Override
@@ -82,9 +90,7 @@ class ImportTask extends PleaseWaitRunnable {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see org.openstreetmap.josm.gui.PleaseWaitRunnable#realRun()
 	 */
 	@Override
@@ -94,8 +100,7 @@ class ImportTask extends PleaseWaitRunnable {
 		this.progressMonitor.setTicks(0);
 
 		dataSet = new DataSet();
-		importSystem = (String) ImportDialog.importSystem
-				.getSelectedItem();
+		importSystem = (String) ImportDialog.importSystem.getSelectedItem();
 		CoordinateTransformation ct = TransformationFactory
 				.getCoordinateTransformation(importSystem,
 						TransformationFactory.WGS84);
@@ -177,7 +182,8 @@ class ImportTask extends PleaseWaitRunnable {
 			((LinkImpl) newLink).setOrigId(link.getId().toString());
 			network.addLink(newLink);
 			way2Links.put(way, Collections.singletonList(newLink));
-			link2Segment.put(newLink, Collections.singletonList(new WaySegment(way, 0)));
+			link2Segment.put(newLink,
+					Collections.singletonList(new WaySegment(way, 0)));
 		}
 
 		this.progressMonitor.setTicks(5);

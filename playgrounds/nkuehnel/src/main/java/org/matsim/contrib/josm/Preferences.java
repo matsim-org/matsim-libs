@@ -139,6 +139,7 @@ final class Preferences extends DefaultTabPreferenceSetting {
 					if (((Integer) pane.getValue()) == JOptionPane.OK_OPTION) {
 						dialog.handleInput();
 						if (Main.main.getActiveLayer() != null) {
+							Main.main.getCurrentDataSet().clearSelection();
 							MATSimPlugin.toggleDialog.activeLayerChange(Main.main.getActiveLayer(), Main.main.getActiveLayer());
 						}
 					}
@@ -220,6 +221,7 @@ final class Preferences extends DefaultTabPreferenceSetting {
 			if (Main.pref.put("matsim_keepPaths", false)) {
 				NewConverter.keepPaths = false;
 				if (Main.main.getActiveLayer() != null) {
+					Main.main.getCurrentDataSet().clearSelection();
 					MATSimPlugin.toggleDialog.activeLayerChange(Main.main.getActiveLayer(), Main.main.getActiveLayer());
 				}
 			}
@@ -227,6 +229,7 @@ final class Preferences extends DefaultTabPreferenceSetting {
 			if (Main.pref.put("matsim_keepPaths", true)) {
 				NewConverter.keepPaths = true;
 				if (Main.main.getActiveLayer() != null) {
+					Main.main.getCurrentDataSet().clearSelection();
 					MATSimPlugin.toggleDialog.activeLayerChange(Main.main.getActiveLayer(), Main.main.getActiveLayer());
 				}
 			}
@@ -247,7 +250,5 @@ final class Preferences extends DefaultTabPreferenceSetting {
 		double offset = ((double) temp) * 0.03;
 		Main.pref.putDouble("matsim_wayOffset", offset);
 		return false;
-
 	}
-
 }

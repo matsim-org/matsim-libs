@@ -2,8 +2,10 @@ package org.matsim.contrib.josm;
 
 import org.matsim.contrib.josm.OsmConvertDefaults.OsmHighwayDefaults;
 import org.openstreetmap.josm.Main;
+import org.openstreetmap.josm.tools.ImageProvider;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -40,7 +42,28 @@ class OsmConvertDefaultsDialog extends JPanel {
 				if (j == 0) {
 					c.gridx = 0;
 					c.gridy = (i + 1);
-					add(new JLabel(tr(OsmConvertDefaults.types[i])), c);
+					String type = OsmConvertDefaults.types[i];
+					
+					ImageIcon icon;
+					try {
+						icon = ImageProvider.get("presets", type);
+					} catch(RuntimeException exception) {
+						if (type.contains("_")) {
+							type = type.substring(0, type.indexOf("_"));
+						}
+						try {
+							icon = ImageProvider.get("presets", type);
+						} catch(RuntimeException exception2) {
+							type = "way_" + type;
+							try {
+								icon = ImageProvider.get("presets", type);
+							} catch(RuntimeException exception3) {
+								icon = null;
+							}
+						}
+					}
+					add(new JLabel(tr(OsmConvertDefaults.types[i]), icon,
+							JLabel.LEFT), c);
 				}
 				c.gridy = (i + 1);
 				c.gridx = (j + 1);

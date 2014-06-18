@@ -1,7 +1,9 @@
-/**
- * 
- */
 package org.matsim.contrib.josm;
+
+import java.io.File;
+import java.io.IOException;
+
+import javax.swing.JOptionPane;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -23,21 +25,21 @@ import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.xml.sax.SAXException;
 
-import javax.swing.*;
-import java.io.File;
-import java.io.IOException;
-
 /**
  * The task which which writes out the network xml file
  * 
- * @author nkuehnel
+ * @author Nico
  * 
  */
 
 class ExportTask extends PleaseWaitRunnable {
 
-    private File file;
-
+	private File file;
+	
+/**
+ * Creates a new Export task with the given export <code>file</code> location
+ * @param file The file to be exported to
+ */
 	public ExportTask(File file) {
 		super("MATSim Export");
 		this.file = file;
@@ -46,18 +48,14 @@ class ExportTask extends PleaseWaitRunnable {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see org.openstreetmap.josm.gui.PleaseWaitRunnable#cancel()
 	 */
 	@Override
 	protected void cancel() {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see org.openstreetmap.josm.gui.PleaseWaitRunnable#finish()
 	 */
 	@Override
@@ -66,9 +64,7 @@ class ExportTask extends PleaseWaitRunnable {
 				"Export finished. File written to: " + file.getPath());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see org.openstreetmap.josm.gui.PleaseWaitRunnable#realRun()
 	 */
 	@Override

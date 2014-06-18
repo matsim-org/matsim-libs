@@ -123,7 +123,7 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 	@Override
 	public void activeLayerChange(Layer oldLayer, Layer newLayer) {
 		DataSet.removeSelectionListener(tableModel);
-		if (osmNetworkListener != null && oldLayer != null) {
+		if (osmNetworkListener != null && oldLayer != null && oldLayer instanceof OsmDataLayer) {
 			((OsmDataLayer) oldLayer).data
 					.removeDataSetListener(osmNetworkListener);
 		}
@@ -164,7 +164,10 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 			table.setModel(new DefaultTableModel());
 			setTitle(tr("Links/Nodes"));
 			networkAttributes.setEnabled(false);
+			way2Links = null;
+			link2Segments = null;
 		}
+		MapRenderer.setWay2Links(way2Links);
 	}
 
 	@Override
@@ -287,6 +290,7 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 		@Override
 		public void selectionChanged(
 				Collection<? extends OsmPrimitive> newSelection) {
+			layer.data.clearHighlightedWaySegments();
 			this.links = new HashMap<Integer, Id>();
 			int i = 0;
 			for (OsmPrimitive primitive : newSelection) {

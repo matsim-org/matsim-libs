@@ -7,31 +7,55 @@ import org.openstreetmap.josm.data.Preferences.PreferenceChangeEvent;
 import org.openstreetmap.josm.data.Preferences.PreferenceChangedListener;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.data.osm.visitor.paint.MapRendererFactory;
 import org.openstreetmap.josm.data.osm.visitor.paint.StyledMapRenderer;
 import org.openstreetmap.josm.gui.NavigatableComponent;
 import org.openstreetmap.josm.gui.layer.Layer;
+import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.gui.mappaint.LabelCompositionStrategy;
 import org.openstreetmap.josm.gui.mappaint.TextElement;
 
 import java.awt.*;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * the MATSim MapRenderer. Draws ways that correspond to an existing MATSim link
- * in a MATSim blue color. Also offers offset for overlapping links as well as
+ * The MATSim MapRenderer. Draws ways that correspond to existing MATSim link(s)
+ * in a MATSim-blue color. Also offers offset for overlapping links as well as
  * the option to show MATSim ids on ways
  * 
+ * @author Nico
  */
 public class MapRenderer extends StyledMapRenderer {
 
+	/**
+	 * Creates a new MapRenderer. Initialized by
+	 * <strong>MapRendererFactory</strong>
+	 * 
+	 * @see StyledMapRenderer
+	 * @see MapRendererFactory
+	 */
 	public MapRenderer(Graphics2D arg0, NavigatableComponent arg1, boolean arg2) {
 		super(arg0, arg1, arg2);
 	}
 
 	/**
-	 * draw way
+	 * Maps links to their corresponding way.
+	 */
+	private static Map<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
+
+	public static void setWay2Links(Map<Way, List<Link>> way2LinksTmp) {
+		way2Links = way2LinksTmp;
+	}
+
+	/**
+	 * Draws a <code>way</code>. Ways that are mapped in <code>way2Links</code>
+	 * and represent MATSim links are drawn in a blue color. If "show Ids" is
+	 * turned on, Ids of the links are drawn on top or below the
+	 * <code>way</code>.
 	 * 
+	 * @see #textOffset(Way)
 	 * @param showOrientation
 	 *            show arrows that indicate the technical orientation of the way
 	 *            (defined by order of nodes)
@@ -41,15 +65,14 @@ public class MapRenderer extends StyledMapRenderer {
 	 * @param onewayReversed
 	 *            for oneway=-1 and similar
 	 */
+	@Override
 	public void drawWay(Way way, Color color, BasicStroke line,
 			BasicStroke dashes, Color dashedColor, float offset,
 			boolean showOrientation, boolean showHeadArrowOnly,
 			boolean showOneway, boolean onewayReversed) {
 
 		Layer layer = Main.main.getActiveLayer();
-		if (layer instanceof NetworkLayer) {
-			Map<Way, List<Link>> way2Links = ((NetworkLayer) layer)
-					.getWay2Links();
+		if (layer instanceof OsmDataLayer) {
 			if (way2Links.containsKey(way)) {
 				if (!way2Links.get(way).isEmpty()) {
 					if (!way.isSelected()) {
@@ -84,6 +107,16 @@ public class MapRenderer extends StyledMapRenderer {
 				showOneway, onewayReversed);
 	}
 
+	/**
+	 * Returns the text <code>offset</code> for the given <code>way</code>.
+	 * <strong>Positive</strong>, if the <code>id</code> of the <code>way</code>
+	 * 's first node is less than it's last node's <code>id</code>.
+	 * <strong>Negative</strong> otherwise.
+	 * 
+	 * @param way
+	 *            The way which offset is to be calculated
+	 * @return The text offset for the given <code>way</code>
+	 */
 	private int textOffset(Way way) {
 		int offset = -15;
 
@@ -93,6 +126,13 @@ public class MapRenderer extends StyledMapRenderer {
 		return offset;
 	}
 
+	/**
+	 * The properties for the text elements used to visualize the Ids of the
+	 * MATSim links.
+	 * 
+	 * @author Nico
+	 * 
+	 */
 	static class Properties extends LabelCompositionStrategy implements
 			PreferenceChangedListener {
 
@@ -122,13 +162,26 @@ public class MapRenderer extends StyledMapRenderer {
 			return INSTANCE;
 		}
 
+		/**
+		 * Composes the MATSim Id text for the OsmPrimitive <code>prim</code>.
+		 * Multiple MATSim Ids are consecutively appended. <br>
+		 * <br>
+		 * Example: <br>
+		 * [{@code Id1}] [{@code Id2}] [{@code Id3}]
+		 * 
+		 * 
+		 * @param prim
+		 *            The given Primitive. Only Ways can represent MATSim
+		 *            link-Ids
+		 * @return The [id]s of the links represented by the given Primitive
+		 *         <code>prim</code> or an empty string if no link is
+		 *         represented.
+		 */
 		@Override
 		public String compose(OsmPrimitive prim) {
-			Layer layer = Main.main.getActiveLayer();
 			StringBuilder sB = new StringBuilder();
-			if (((NetworkLayer) layer).getWay2Links().containsKey(prim)) {
-				for (Link link : ((NetworkLayer) layer).getWay2Links()
-						.get(prim)) {
+			if (way2Links.containsKey(prim)) {
+				for (Link link : way2Links.get(prim)) {
 					sB.append(" [").append(((LinkImpl) link).getOrigId())
 							.append("] ");
 				}

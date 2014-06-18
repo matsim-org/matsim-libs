@@ -1,5 +1,10 @@
 package org.matsim.contrib.josm;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -21,14 +26,10 @@ import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.xml.sax.SAXException;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-
 /**
  * The Task that handles the convert action
  * 
+ * @author Nico
  * 
  */
 
@@ -36,15 +37,26 @@ class ConvertTask extends PleaseWaitRunnable {
 
 	private NetworkLayer newLayer;
 
+	/**
+	 * Creates a new Convert task
+	 * 
+	 * @see PleaseWaitRunnable
+	 */
 	public ConvertTask() {
 		super("Converting to MATSim Network");
 	}
 
+	/**
+	 * @see org.openstreetmap.josm.gui.PleaseWaitRunnable#cancel()
+	 */
 	@Override
 	protected void cancel() {
 		// TODO Auto-generated method stub
 	}
 
+	/**
+	 * @see org.openstreetmap.josm.gui.PleaseWaitRunnable#realRun()
+	 */
 	@Override
 	protected void realRun() throws SAXException, IOException,
 			OsmTransferException {
@@ -58,8 +70,10 @@ class ConvertTask extends PleaseWaitRunnable {
 
 		this.progressMonitor.setTicks(1);
 		this.progressMonitor.setCustomText("converting osm data..");
-		
-		NewConverter.convertOsmLayer(((OsmDataLayer) layer).data, tempNetwork, new HashMap<Way, List<Link>>(), new HashMap<Link, List<WaySegment>>());
+
+		NewConverter.convertOsmLayer(((OsmDataLayer) layer).data, tempNetwork,
+				new HashMap<Way, List<Link>>(),
+				new HashMap<Link, List<WaySegment>>());
 		if (Main.pref.getBoolean("matsim_cleanNetwork")) {
 			this.progressMonitor.setTicks(2);
 			this.progressMonitor.setCustomText("cleaning network..");
@@ -81,15 +95,15 @@ class ConvertTask extends PleaseWaitRunnable {
 			LatLon coor = new LatLon(tmpCoor.getY(), tmpCoor.getX());
 			org.openstreetmap.josm.data.osm.Node nodeOsm = new org.openstreetmap.josm.data.osm.Node(
 					coor);
-			nodeOsm.put(ImportTask.NODE_TAG_ID, ((NodeImpl)node).getOrigId());
+			nodeOsm.put(ImportTask.NODE_TAG_ID, ((NodeImpl) node).getOrigId());
 			node2OsmNode.put(node, nodeOsm);
 			dataSet.addPrimitive(nodeOsm);
 			Node newNode = network.getFactory().createNode(
 					new IdImpl(Long.toString(nodeOsm.getUniqueId())),
 					node.getCoord());
-			((NodeImpl) newNode).setOrigId(((NodeImpl)node).getOrigId());
+			((NodeImpl) newNode).setOrigId(((NodeImpl) node).getOrigId());
 			network.addNode(newNode);
-			
+
 		}
 
 		this.progressMonitor.setTicks(5);
@@ -102,7 +116,7 @@ class ConvertTask extends PleaseWaitRunnable {
 			org.openstreetmap.josm.data.osm.Node toNode = node2OsmNode.get(link
 					.getToNode());
 			way.addNode(toNode);
-			way.put(ImportTask.WAY_TAG_ID, ((LinkImpl)link).getOrigId());
+			way.put(ImportTask.WAY_TAG_ID, ((LinkImpl) link).getOrigId());
 			way.put("freespeed", String.valueOf(link.getFreespeed()));
 			way.put("capacity", String.valueOf(link.getCapacity()));
 			way.put("length", String.valueOf(link.getLength()));
@@ -128,10 +142,11 @@ class ConvertTask extends PleaseWaitRunnable {
 			newLink.setLength(link.getLength());
 			newLink.setNumberOfLanes(link.getNumberOfLanes());
 			newLink.setAllowedModes(link.getAllowedModes());
-			((LinkImpl) newLink).setOrigId(((LinkImpl)link).getOrigId());
+			((LinkImpl) newLink).setOrigId(((LinkImpl) link).getOrigId());
 			network.addLink(newLink);
 			way2Links.put(way, Collections.singletonList(newLink));
-			link2Segment.put(newLink, Collections.singletonList(new WaySegment(way, 0)));
+			link2Segment.put(newLink,
+					Collections.singletonList(new WaySegment(way, 0)));
 		}
 
 		this.progressMonitor.setTicks(6);
@@ -141,6 +156,9 @@ class ConvertTask extends PleaseWaitRunnable {
 				TransformationFactory.WGS84, way2Links, link2Segment);
 	}
 
+	/**
+	 * @see org.openstreetmap.josm.gui.PleaseWaitRunnable#finish()
+	 */
 	@Override
 	protected void finish() {
 		if (newLayer != null) {

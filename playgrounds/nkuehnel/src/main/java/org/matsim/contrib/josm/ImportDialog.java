@@ -1,20 +1,29 @@
 package org.matsim.contrib.josm;
 
-import org.openstreetmap.josm.Main;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
+import org.openstreetmap.josm.Main;
 
 /**
  * the import dialog
  * 
- * @author nkuehnel
+ * @author Nico
  * 
  */
 class ImportDialog extends JPanel {
 	// the JOptionPane that contains this dialog. required for the closeDialog()
 	// method.
 	private JOptionPane optionPane;
+	
+	/**
+	 * Holds the path of the import file
+	 */
 	protected static JLabel path = new JLabel();
 	private JLabel importSystemLabel = new JLabel("origin system:");
 
