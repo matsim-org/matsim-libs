@@ -127,7 +127,7 @@ public class FreeFloatingLegScoringFunction extends org.matsim.core.scoring.func
 		}
 		score += this.params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m * distanceCost / 1000.0D * distance;
 		score += travelTime * this.params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s;
-		score += score += this.params.modeParams.get(TransportMode.pt).constant;
+		score += this.params.modeParams.get(TransportMode.pt).constant;
 
 		return score;
 	}
