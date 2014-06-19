@@ -700,13 +700,13 @@ public class CottbusRuns {
 		ri = new RunInfo();
 		ri.runId = "1968";
 		ri.iteration = 1400;
-		ri.remark = "best random, commodities > 50"; //tt SP, min speed 15
+		ri.remark = "best random"; //tt SP, min speed 15
 		l.add(ri);
 		
 		ri = new RunInfo();
 		ri.runId = "1969";
 		ri.iteration = 1400;
-		ri.remark = "worst random, commodities > 50"; //tt SP, min speed 15
+		ri.remark = "worst random"; //tt SP, min speed 15
 		l.add(ri);
 	}
 	
@@ -722,13 +722,13 @@ public class CottbusRuns {
 		ri = new RunInfo();
 		ri.runId = "1970";
 		ri.iteration = 1400;
-		ri.remark = "best random, commodities > 50"; //tt SP, min speed 15
+		ri.remark = "best random"; //tt SP, min speed 15
 		l.add(ri);
 		
 		ri = new RunInfo();
 		ri.runId = "1971";
 		ri.iteration = 1400;
-		ri.remark = "worst random, commodities > 50"; //tt SP, min speed 15
+		ri.remark = "worst random"; //tt SP, min speed 15
 		l.add(ri);
 	}
 	
