@@ -49,7 +49,7 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		Id vehicleId = vehicleLocations.get(coord.getX(), coord.getY());
 		
 		if (vehicleId==null){
-			DebugLib.stopSystemAndReportInconsistency("no free floating vehicle available");
+			return null;
 		}
 		
 		Parking parking=currentVehicleLocation.get(vehicleId);
