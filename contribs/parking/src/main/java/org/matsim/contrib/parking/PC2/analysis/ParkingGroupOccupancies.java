@@ -77,7 +77,7 @@ public abstract class ParkingGroupOccupancies implements BasicEventHandler {
 				parkingGroupOccupency.decrement(groupName);
 			}
 
-			parkingGroupOccupancySeries.get(groupName).add(event.getTime(), parkingGroupOccupency.get(groupName));
+			parkingGroupOccupancySeries.get(groupName).add(event.getTime() / 3600 , parkingGroupOccupency.get(groupName));
 		}
 	}
 
@@ -125,7 +125,7 @@ public abstract class ParkingGroupOccupancies implements BasicEventHandler {
 
 		private JFreeChart createChart(final XYDataset dataset) {
 
-			final JFreeChart chart = ChartFactory.createXYLineChart(title, "X", "Y", dataset, PlotOrientation.VERTICAL, true, true,
+			final JFreeChart chart = ChartFactory.createXYLineChart(title, "time [h]", "# of parked vehicles", dataset, PlotOrientation.VERTICAL, true, true,
 					false);
 
 			chart.setBackgroundPaint(Color.white);

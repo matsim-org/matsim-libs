@@ -48,6 +48,10 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 	public ParkingLinkInfo getNextFreeFloatingVehicle(Coord coord, Id personId, double departureTime) {
 		Id vehicleId = vehicleLocations.get(coord.getX(), coord.getY());
 		
+		if (vehicleId==null){
+			DebugLib.stopSystemAndReportInconsistency("no free floating vehicle available");
+		}
+		
 		Parking parking=currentVehicleLocation.get(vehicleId);
 		parkingInfrastructureManager.unParkVehicle(parking, departureTime);
 		
