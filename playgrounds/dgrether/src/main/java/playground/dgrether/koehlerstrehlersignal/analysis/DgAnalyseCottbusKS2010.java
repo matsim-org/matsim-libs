@@ -495,7 +495,7 @@ public class DgAnalyseCottbusKS2010 {
 		e.name = "signals_bb";
 //		e.envelope = env;
 		e.network = scSignalsBoundingBox.getNetwork();
-		l.add(e);
+//		l.add(e);
 		
 		
 		String cityNetwork = DgPaths.REPOS  + "shared-svn/projects/cottbus/cottbus_scenario/cottbus_city_network/network_city_wgs84_utm33n.xml.gz";
@@ -518,7 +518,7 @@ public class DgAnalyseCottbusKS2010 {
 		e = new Extent();
 		e.name = "all";
 		e.createPersonDiff = false;
-//		l.add(e);
+		l.add(e);
 		return l;
 	}
 
@@ -559,39 +559,41 @@ public class DgAnalyseCottbusKS2010 {
 	
 	public static List<RunInfo> createRunsIdList(){
 		List<RunInfo> l = new ArrayList<RunInfo>();
-		RunInfo ri = null;
-//		add1740vs1745BaseCaseAnalysis(l);
-//		add1712BaseCaseAnalysis(l);
 		
-//		add1712BaseCaseNoChoice(l);
-
-//		add1712BaseCaseRoutesOnlyRuns(l);
+//		CottbusRuns.addReduceFlowCapacityRunsNoIterations(l);
+//		CottbusRuns.addReduceFlowCapacityRunsIterationsFromScratch(l);
+//		CottbusRuns.addReduceFlowCapacityRunsIterationsRoutesOnlyFromBaseCase(l);
+//		CottbusRuns.addStorageCapacityRuns(l);
+//		CottbusRuns.addFlowStorageCapacityRuns(l);
+		
+//		CottbusRuns.add1740vs1745BaseCaseAnalysis(l);
+		
+//		CottbusRuns.add1712BaseCaseAnalysis(l);
+//		CottbusRuns.add1712BaseCaseNoChoice(l);
+//		CottbusRuns.add1712BaseCaseRoutesOnlyRuns(l);
 //		CottbusRuns.add1712BaseCaseRoutesOnlyRandomRuns(l);
 //		CottbusRuns.add1712BaseCaseRoutesOnlyHighStorageCapRuns(l);
 		
-		CottbusRuns.add1933BaseCaseRoutesOnlyRandomRuns(l);
+//		CottbusRuns.add1933BaseCaseRoutesOnlyRandomRuns(l);
 		
 //		CottbusRuns.add1712BaseCaseRoutesOnlyHighStorageCapRunsOnSimplifiedNetwork(l);
 //		CottbusRuns.add1712BaseCaseRoutesTimesHighStorageCapRunsOnSimplifiedNetwork(l);
 		
-		//		add1930BaseCase(l);
-//		add1712BaseCaseRoutesOnlyRuns5Percent(l);
+//		CottbusRuns.add1930BaseCase(l);
+//		CottbusRuns.add1712BaseCaseRoutesOnlyRuns5Percent(l);
 
-		//		add1712BaseCaseRoutesOnlyRunsBeta20(l);
-		//		add1712BaseCaseRoutesTimesRuns(l);
-
-				//		add1722BaseCaseAnalysis(l);
-
-//				add1722BaseCaseRoutesOnlyRuns(l);
-//				add1722BaseCaseRoutesTimesRuns(l);
-		//		add1726BaseCaseLongRerouteRuns(l);
-		//		add1722BaseCaseButKsModelBasedOn1712Runs(l);
+//		CottbusRuns.add1712BaseCaseRoutesOnlyRunsBeta20(l);
+//		CottbusRuns.add1712BaseCaseRoutesTimesRuns(l);
 		
-//		addReduceFlowCapacityRunsNoIterations(l);
-//		addReduceFlowCapacityRunsIterationsFromScratch(l);
-//		addReduceFlowCapacityRunsIterationsRoutesOnlyFromBaseCase(l);
-//		addStorageCapacityRuns(l);
-//		addFlowStorageCapacityRuns(l);
+//		CottbusRuns.add1722BaseCaseAnalysis(l);
+//		CottbusRuns.add1722BaseCaseRoutesOnlyRuns(l);
+//		CottbusRuns.add1722BaseCaseRoutesTimesRuns(l);
+//		CottbusRuns.add1726BaseCaseLongRerouteRuns(l);
+//		CottbusRuns.add1722BaseCaseButKsModelBasedOn1712Runs(l);
+		
+//		CottbusRuns.add1972BaseCaseRoutesOnlyRandomRuns(l);
+		CottbusRuns.add1973BaseCaseRoutesTimesRandomRuns(l);
+		
 		return l;
 	}
 	
@@ -604,7 +606,7 @@ public class DgAnalyseCottbusKS2010 {
 		String timesString = createTimesString(times);
 		List<Extent> extents = createExtentList();
 		String extentString = createExtentString(extents);
-		String outputFilename = outputDirectory + "2014-05-23_analysis" + runIdsString + "_" +  timesString;
+		String outputFilename = outputDirectory + "2014-06-19_analysis" + runIdsString + "_" +  timesString;
 		System.out.println(outputFilename);
 		DgAnalyseCottbusKS2010 ana = new DgAnalyseCottbusKS2010();
 		ana.setUseInMemoryEvents(false);
