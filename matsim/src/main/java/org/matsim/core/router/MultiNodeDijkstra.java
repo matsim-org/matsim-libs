@@ -37,6 +37,29 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
 
+/**
+ * <p>An extended implementation of the Dijkstra algorithm that supports multiple
+ * start- and/or end nodes.</p>
+ * 
+ * <p>To do so, ImaginaryNodes and IntialNodes are introduced which is required for
+ * backwards compatibility with the default Dijkstra implementation which expects
+ * only single nodes as arguments.</p>
+ * 
+ * <p>Therefore, ImaginaryNodes are introduced. They contain a collection of
+ * InitialNodes that represents the start or end nodes to be used by the algorithm.
+ * Each InitialNode represents a node from the network. In addition, initial time and
+ * costs can be defined, i.e. the time respectively costs to reach that node.<p>
+ * 
+ * <p>By default, only the cheapest path between is calculated, i.e. the routing algorithm
+ * will terminate before all end nodes have been reached. This behaviour can be changed
+ * by setting the searchAllEndNodes parameter to true.</p>
+ * 
+ * @see org.matsim.core.router.Dijkstra
+ * @see org.matsim.core.router.InitialNode
+ * @see org.matsim.core.router.ImaginaryNode
+ * 
+ * @author cdobler
+ */
 public class MultiNodeDijkstra extends Dijkstra {
 	
 	private final static Logger log = Logger.getLogger(MultiNodeDijkstra.class);

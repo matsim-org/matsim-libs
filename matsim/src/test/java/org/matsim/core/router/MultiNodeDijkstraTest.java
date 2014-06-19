@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.FastMultiNodeDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.MultiNodeDijkstraFactory;
@@ -630,7 +631,7 @@ public class MultiNodeDijkstraTest {
 		/*package*/ NetworkImpl network;
 
 		public Fixture() {
-			this.network = NetworkImpl.createNetwork();
+			this.network = (NetworkImpl) NetworkUtils.createNetwork();
 			Node node1 = this.network.createAndAddNode(new IdImpl(1), new CoordImpl(1000,    0));
 			Node node2 = this.network.createAndAddNode(new IdImpl(2), new CoordImpl( 500,    0));
 			Node node3 = this.network.createAndAddNode(new IdImpl(3), new CoordImpl(   0,    0));

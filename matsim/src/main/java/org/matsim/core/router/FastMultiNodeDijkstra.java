@@ -36,12 +36,11 @@ import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * <p>
- * Performance optimized version of the Dijkstra {@link org.matsim.core.router.Dijkstra} 
- * least cost path router which uses its own network to route within.
- * </p>
+ * <p>Performance optimized version of the MultiNodeDijkstra least cost path router 
+ * which uses its own network to route within.</p>
  * 
- * @see org.matsim.core.router.MyDijkstra
+ * @see org.matsim.core.router.MultiNodeDijkstra
+ * @see org.matsim.core.router.FastDijkstra
  * @see org.matsim.core.router.util.RoutingNetwork
  * @author cdobler
  */

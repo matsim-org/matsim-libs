@@ -22,6 +22,12 @@ package org.matsim.core.router;
 
 import org.matsim.api.core.v01.network.Node;
 
+/**
+ * Used by the MultiNodeDijkstra to store initial time and cost. 
+ * 
+ * @see org.matsim.core.router.MultiNodeDijkstra
+ * @author cdobler
+ */
 public class InitialNode {
 	
 	public Node node;

@@ -29,6 +29,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+/**
+ * Used by the MultiNodeDijkstra for backwards compatibility with default Dijkstra. 
+ * 
+ * @see org.matsim.core.router.Dijkstra
+ * @see org.matsim.core.router.MultiNodeDijkstra
+ * @author cdobler
+ */
 public class ImaginaryNode implements Node {
 
 	/*package*/ final Collection<InitialNode> initialNodes;
