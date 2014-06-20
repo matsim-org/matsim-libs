@@ -149,11 +149,6 @@ public class EmissionsAndCongestionsPerTimeBin {
 		}catch (IOException e) {
 			throw new RuntimeException("Data is not written in a file. Reason "+e);
 		}
-
-
-
-
-
 		logger.info("Finished Writing files.");
 	}
 
