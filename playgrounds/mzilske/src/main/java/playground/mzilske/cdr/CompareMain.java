@@ -76,7 +76,7 @@ public class CompareMain {
 		final ScenarioImpl scenario21 = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		scenario21.setNetwork(scenario.getNetwork());
 
-        final Map<Id, List<Sighting>> allSightings = getSightingsPerPerson();
+        final Sightings allSightings = new SightingsImpl(getSightingsPerPerson());
 		
 		
 		PopulationFromSightings.createPopulationWithEndTimesAtLastSightings(scenario21, linkToZoneResolver, allSightings);
@@ -244,7 +244,7 @@ public class CompareMain {
 		return signature;
 	}
 
-	public static VolumesAnalyzer runWithTwoPlansAndCadyts(String outputDirectory, Network network, final LinkToZoneResolver linkToZoneResolver, Map<Id, List<Sighting>> allSightings, Counts counts) {
+	public static VolumesAnalyzer runWithTwoPlansAndCadyts(String outputDirectory, Network network, final LinkToZoneResolver linkToZoneResolver, Sightings allSightings, Counts counts) {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams sightingParam = new ActivityParams("sighting");
 		// sighting.setOpeningTime(0.0);

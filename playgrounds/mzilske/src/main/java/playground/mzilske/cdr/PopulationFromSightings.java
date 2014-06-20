@@ -32,8 +32,8 @@ public class PopulationFromSightings {
 
     private static final int TRY_REDRAW_UNFEASIBLE_LOCATIONS = 0;
 
-    public static void createPopulationWithTwoPlansEach(Scenario scenario, LinkToZoneResolver zones, final Map<Id, List<Sighting>> sightings) {
-        for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.entrySet()) {
+    public static void createPopulationWithTwoPlansEach(Scenario scenario, LinkToZoneResolver zones, final playground.mzilske.cdr.Sightings sightings) {
+        for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.getSightingsPerPerson().entrySet()) {
             Id personId = sightingsPerPerson.getKey();
             List<Sighting> sightingsForThisPerson = sightingsPerPerson.getValue();
             Person person = scenario.getPopulation().getFactory().createPerson(personId);
@@ -47,8 +47,8 @@ public class PopulationFromSightings {
         }
     }
 
-    public static void createPopulationWithEndTimesAtLastSightings(Scenario scenario, LinkToZoneResolver zones, final Map<Id, List<Sighting>> sightings) {
-        for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.entrySet()) {
+    public static void createPopulationWithEndTimesAtLastSightings(Scenario scenario, LinkToZoneResolver zones, final playground.mzilske.cdr.Sightings sightings) {
+        for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.getSightingsPerPerson().entrySet()) {
             Id personId = sightingsPerPerson.getKey();
             List<Sighting> sightingsForThisPerson = sightingsPerPerson.getValue();
             Person person = scenario.getPopulation().getFactory().createPerson(personId);
@@ -60,8 +60,8 @@ public class PopulationFromSightings {
         }
     }
 
-    public static void createPopulationWithRandomEndTimesInPermittedWindow(Scenario scenario, LinkToZoneResolver zones, final Map<Id, List<Sighting>> sightings) {
-        for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.entrySet()) {
+    public static void createPopulationWithRandomEndTimesInPermittedWindow(Scenario scenario, LinkToZoneResolver zones, final playground.mzilske.cdr.Sightings sightings) {
+        for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.getSightingsPerPerson().entrySet()) {
             Id personId = sightingsPerPerson.getKey();
             List<Sighting> sightingsForThisPerson = sightingsPerPerson.getValue();
             Person person = scenario.getPopulation().getFactory().createPerson(personId);
@@ -212,7 +212,7 @@ public class PopulationFromSightings {
 
 
 
-    public static void preparePopulation(final ScenarioImpl scenario, final LinkToZoneResolver linkToZoneResolver2, final Map<Id, List<Sighting>> allSightings) {
+    public static void preparePopulation(final ScenarioImpl scenario, final LinkToZoneResolver linkToZoneResolver2, final playground.mzilske.cdr.Sightings allSightings) {
         ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), 8, new org.matsim.population.algorithms.XY2Links(scenario));
         ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), 8, new PersonAlgorithmProvider() {
 
@@ -241,7 +241,7 @@ public class PopulationFromSightings {
 
                 @Override
                 public void run(Person person) {
-                    Sightings sightingsForThisAgent = new Sightings(allSightings.get(person.getId()));
+                    Sightings sightingsForThisAgent = new Sightings(allSightings.getSightingsPerPerson().get(person.getId()));
                     for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
                         if (planElement instanceof Activity) {
                             Sighting sighting = sightingsForThisAgent.sightings.next();

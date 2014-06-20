@@ -20,30 +20,27 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.populationsize;
+package playground.mzilske.cdr;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.ReplanningContext;
-import playground.mzilske.cdr.PopulationFromSightings;
-import playground.mzilske.cdr.ZoneTracker;
-import playground.mzilske.d4d.Sighting;
 
 import javax.inject.Inject;
-import java.util.List;
-import java.util.Map;
 
 class TrajectoryReRealizer implements PlanStrategyModule {
 
-    private final Map<Id, List<Sighting>> sightings;
+    private Sightings sightings;
     private Scenario scenario;
     private ZoneTracker.LinkToZoneResolver zones;
 
     @Inject
-    public TrajectoryReRealizer(Map<Id, List<Sighting>> sightings, Scenario scenario, ZoneTracker.LinkToZoneResolver zones) {
+    public TrajectoryReRealizer(Sightings sightings, Scenario scenario, ZoneTracker.LinkToZoneResolver zones) {
         this.sightings = sightings;
         this.scenario = scenario;
         this.zones = zones;
@@ -57,9 +54,14 @@ class TrajectoryReRealizer implements PlanStrategyModule {
     @Override
     public void handlePlan(Plan plan) {
         Id personId = plan.getPerson().getId();
-        Plan newPlan = PopulationFromSightings.createPlanWithRandomEndTimesInPermittedWindow(scenario, zones, sightings.get(personId));
+        Plan newPlan = PopulationFromSightings.createPlanWithRandomEndTimesInPermittedWindow(scenario, zones, sightings.getSightingsPerPerson().get(personId));
         plan.getPlanElements().clear();
         ((PlanImpl) plan).copyFrom(newPlan);
+        for (PlanElement pe : plan.getPlanElements()) {
+            if (pe instanceof Leg) {
+                ((Leg) pe).setMode("car");
+            }
+        }
     }
 
     @Override

@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * TrajectoryReRealizerFactory.java
+ *  * SightingsImpl.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -17,31 +17,29 @@
  *  *   (at your option) any later version.                                   *
  *  *   See also COPYING, LICENSE and WARRANTY file                           *
  *  *                                                                         *
- *  * ***********************************************************************
+ *  * *********************************************************************** 
  */
 
-package playground.mzilske.populationsize;
+package playground.mzilske.cdr;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
-import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-import javax.inject.Inject;
+import org.matsim.api.core.v01.Id;
+import playground.mzilske.d4d.Sighting;
 
-class TrajectoryReRealizerFactory implements PlanStrategyFactory {
+import java.util.List;
+import java.util.Map;
 
-    @Inject
-    TrajectoryReRealizer trajectoryReRealizer;
+public class SightingsImpl implements Sightings {
+
+    private Map<Id, List<Sighting>> sightings;
+
+    public SightingsImpl(Map<Id, List<Sighting>> sightings) {
+        this.sightings = sightings;
+    }
 
     @Override
-    public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-        PlanStrategyImpl planStrategy = new PlanStrategyImpl(new RandomPlanSelector<Plan>());
-        planStrategy.addStrategyModule(trajectoryReRealizer);
-        return planStrategy;
+    public Map<Id, List<Sighting>> getSightingsPerPerson() {
+        return sightings;
     }
 
 }

@@ -46,10 +46,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import playground.mzilske.cdr.CellTower;
-import playground.mzilske.cdr.CellularCoverageLinkToZoneResolver;
-import playground.mzilske.cdr.PopulationFromSightings;
-import playground.mzilske.cdr.Zones;
+import playground.mzilske.cdr.*;
 
 import java.io.FileNotFoundException;
 import java.util.*;
@@ -76,7 +73,7 @@ public class CreatePopulation {
 
 
 	public Scenario readScenario(Config config) throws FileNotFoundException  {
-		final Map<Id, List<Sighting>> allSightings = readNetworkAndSightings(config);
+		final SightingsImpl allSightings = new SightingsImpl(readNetworkAndSightings(config));
 		
 		
 		zones.buildCells();

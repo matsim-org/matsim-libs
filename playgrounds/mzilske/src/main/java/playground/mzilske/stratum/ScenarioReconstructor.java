@@ -34,9 +34,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.mzilske.cdr.CompareMain;
-import playground.mzilske.cdr.PopulationFromSightings;
-import playground.mzilske.cdr.ZoneTracker;
+import playground.mzilske.cdr.*;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -62,8 +60,9 @@ class ScenarioReconstructor implements Provider<Scenario> {
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
         scenario.setNetwork(network);
 
-        PopulationFromSightings.createPopulationWithRandomEndTimesInPermittedWindow(scenario, linkToZoneResolver, compareMain.getSightingsPerPerson());
-        PopulationFromSightings.preparePopulation(scenario, linkToZoneResolver, compareMain.getSightingsPerPerson());
+        Sightings sightings = new SightingsImpl(compareMain.getSightingsPerPerson());
+        PopulationFromSightings.createPopulationWithRandomEndTimesInPermittedWindow(scenario, linkToZoneResolver, sightings);
+        PopulationFromSightings.preparePopulation(scenario, linkToZoneResolver, sightings);
 
         for (Person person : scenario.getPopulation().getPersons().values()) {
             person.setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(person));

@@ -70,7 +70,6 @@ import playground.mzilske.cdranalysis.StreamingOutput;
 import playground.mzilske.clones.ClonesModule;
 import playground.mzilske.controller.Controller;
 import playground.mzilske.controller.ControllerModule;
-import playground.mzilske.d4d.Sighting;
 import playground.mzilske.util.IterationSummaryFileControlerListener;
 
 import javax.inject.Inject;
@@ -172,7 +171,7 @@ class MultiRateRunResource {
         compareMain.close();
 
 
-        final Map<Id, List<Sighting>> allSightings = compareMain.getSightingsPerPerson();
+        final Sightings allSightings = new SightingsImpl(compareMain.getSightingsPerPerson());
 
         final Config config = phoneConfig();
         config.controler().setOutputDirectory(WD + "/rates/twotimes_" + rate);
@@ -245,7 +244,7 @@ class MultiRateRunResource {
         compareMain.close();
 
 
-        final Map<Id, List<Sighting>> allSightings = compareMain.getSightingsPerPerson();
+        final Sightings allSightings = new SightingsImpl(compareMain.getSightingsPerPerson());
 
         final Config config = phoneConfig();
         config.controler().setOutputDirectory(WD + "/rates/actevents");
@@ -310,7 +309,7 @@ class MultiRateRunResource {
         compareMain.close();
 
 
-        final Map<Id, List<Sighting>> allSightings = compareMain.getSightingsPerPerson();
+        final Sightings allSightings = new SightingsImpl(compareMain.getSightingsPerPerson());
 
         final Config config = phoneConfig();
         config.controler().setOutputDirectory(WD + "/rates/" + dailyRate);
@@ -362,7 +361,7 @@ class MultiRateRunResource {
             protected void configure() {
                 bind(Config.class).toInstance(scenario.getConfig());
                 bind(Scenario.class).toInstance(scenario);
-                bind(ScoringFunctionFactory.class).to(CharyparNagelCadytsScoringFunctionFactory.class);
+                bind(ScoringFunctionFactory.class).to(CharyparNagelCadytsScoringFunctionFactoryWithClonesPrior.class);
                 bind(Counts.class).annotatedWith(Names.named("allCounts")).toInstance(allCounts);
                 bind(Counts.class).annotatedWith(Names.named("calibrationCounts")).toInstance(someCounts);
                 bind(Double.class).annotatedWith(Names.named("clonefactor")).toInstance((double) cloneFactor);
