@@ -52,6 +52,11 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 			return null;
 		}
 		
+		if (personId==null){
+			DebugLib.stopSystemAndReportInconsistency("personId was null");
+		}
+		
+		
 		Parking parking=currentVehicleLocation.get(vehicleId);
 		parkingInfrastructureManager.unParkVehicle(parking, departureTime);
 		
