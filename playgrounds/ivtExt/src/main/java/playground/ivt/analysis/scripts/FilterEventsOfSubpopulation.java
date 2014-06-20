@@ -24,23 +24,37 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
+import playground.ivt.utils.ArgParser;
+import playground.ivt.utils.ArgParser.Args;
 import playground.ivt.utils.SubpopulationFilteringEventsManager;
 
 /**
  * @author thibautd
  */
-public class FilterEventsOfDefaultSubpopulation {
+public class FilterEventsOfSubpopulation {
 	public static void main(final String[] args) {
-		final String personAttributesFile = args[ 0 ];
-		final String inputEventsFile = args[ 1 ];
-		final String outputEventsFile = args[ 2 ];
+		final ArgParser parser = new ArgParser();
+		parser.setDefaultValue( "-a" , "--person-attributes" , null );
+		parser.setDefaultValue( "-e" , "--input-events" , null );
+		parser.setDefaultValue( "-o" , "--output-events" , null );
+
+		// optionnal: if none, default subpopulation
+		parser.setDefaultValue( "-s" , "--subpopulation-name" , null );
+		main( parser.parseArgs( args ) );
+	}
+
+	public static void main(final Args args) {
+		final String personAttributesFile = args.getValue( "-a" );
+		final String inputEventsFile = args.getValue( "-e" );
+		final String outputEventsFile = args.getValue( "-o" );
+		final String subpopulationName = args.getValue( "-s" );
 
 		final ObjectAttributes atts = new ObjectAttributes();
 		new ObjectAttributesXmlReader( atts ).parse( personAttributesFile );
 
 		final EventWriterXML writer = new EventWriterXML( outputEventsFile );
 		final SubpopulationFilteringEventsManager events =
-			new SubpopulationFilteringEventsManager( atts );
+			new SubpopulationFilteringEventsManager( atts , subpopulationName );
 		events.addHandler( writer );
 
 		new EventsReaderXMLv1( events ).parse( inputEventsFile );
