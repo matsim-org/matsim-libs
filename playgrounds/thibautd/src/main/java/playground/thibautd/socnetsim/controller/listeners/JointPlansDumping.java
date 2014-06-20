@@ -57,9 +57,7 @@ public class JointPlansDumping implements BeforeMobsimListener {
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		if (writePlansInterval <= 0) return;
-		final boolean dump =
-			(event.getIteration() % writePlansInterval== 0)
-				|| (event.getIteration() == (firstIteration + 1));
+		final boolean dump = dump( event.getIteration() );
 		if (!dump) return;
 		log.info("dumping joint plans...");
 		JointPlansXmlWriter.write(
@@ -71,4 +69,8 @@ public class JointPlansDumping implements BeforeMobsimListener {
 		log.info("finished joint plans dump.");
 	}
 
+	protected boolean dump( final int iteration ) {
+		return (iteration % writePlansInterval== 0)
+				|| (iteration == (firstIteration + 1));
+	}
 }

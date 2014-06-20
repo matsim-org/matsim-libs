@@ -22,11 +22,15 @@ package playground.thibautd.socnetsim.controller;
 import java.io.File;
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
+
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.LegTimesListener;
-import org.matsim.core.controler.corelisteners.PlansDumping;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 
@@ -45,6 +49,7 @@ import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
  * @author thibautd
  */
 public final class ImmutableJointController extends AbstractController {
+	private final Logger logger = Logger.getLogger( ImmutableJointController.class );
 	private final ControllerRegistry registry;
 	private final ReplanningListener replanner;
 
@@ -98,20 +103,38 @@ public final class ImmutableJointController extends AbstractController {
 		this.addCoreControlerListener( replanner );
 
 		this.addCoreControlerListener(
-				 new PlansDumping(
-					registry.getScenario(),
-					registry.getScenario().getConfig().controler().getFirstIteration(), 
-					registry.getScenario().getConfig().controler().getWritePlansInterval(),
-					stopwatch,
-					getControlerIO() ));
+				 new BeforeMobsimListener() {
+					@Override
+					public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
+						stopwatch.beginOperation("dump all plans");
+						logger.info("dumping plans...");
+						new PopulationWriter(
+							registry.getScenario().getPopulation(),
+							registry.getScenario().getNetwork() ).write(
+							getControlerIO().getIterationFilename(
+								event.getIteration(),
+								"plans.xml.gz"));
+						logger.info("finished plans dump.");
+						stopwatch.endOperation("dump all plans");
+					}
+				 } );
+
+		final PseudoSimConfigGroup psimConfig = (PseudoSimConfigGroup)
+				registry.getScenario().getConfig().getModule(
+						PseudoSimConfigGroup.GROUP_NAME );
 
 		this.addCoreControlerListener(
 				 new JointPlansDumping(
-					registry.getScenario(),
-					registry.getJointPlans(),
-					registry.getScenario().getConfig().controler().getFirstIteration(), 
-					registry.getScenario().getConfig().controler().getWritePlansInterval(),
-					getControlerIO() ));
+						registry.getScenario(),
+						registry.getJointPlans(),
+						registry.getScenario().getConfig().controler().getFirstIteration(), 
+						registry.getScenario().getConfig().controler().getWritePlansInterval(),
+						getControlerIO() ) {
+					@Override
+					protected boolean dump(final int i) {
+						return psimConfig.isDumpingIter( i );
+					}
+				 });
 
 		this.addCoreControlerListener(
 				new LegTimesListener(
@@ -128,9 +151,7 @@ public final class ImmutableJointController extends AbstractController {
 		final PsimAwareEventsWriter eventsWriter =
 			new PsimAwareEventsWriter(
 					getControlerIO(),
-					(PseudoSimConfigGroup)
-						registry.getScenario().getConfig().getModule(
-							PseudoSimConfigGroup.GROUP_NAME ) );
+					psimConfig );
 		this.addCoreControlerListener( eventsWriter );
 		registry.getEvents().addHandler( eventsWriter );
 
