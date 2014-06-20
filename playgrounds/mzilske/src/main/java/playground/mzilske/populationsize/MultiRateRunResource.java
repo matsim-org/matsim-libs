@@ -361,7 +361,7 @@ class MultiRateRunResource {
             protected void configure() {
                 bind(Config.class).toInstance(scenario.getConfig());
                 bind(Scenario.class).toInstance(scenario);
-                bind(ScoringFunctionFactory.class).to(CharyparNagelCadytsScoringFunctionFactoryWithClonesPrior.class);
+                bind(ScoringFunctionFactory.class).to(CharyparNagelCadytsScoringFunctionFactory.class);
                 bind(Counts.class).annotatedWith(Names.named("allCounts")).toInstance(allCounts);
                 bind(Counts.class).annotatedWith(Names.named("calibrationCounts")).toInstance(someCounts);
                 bind(Double.class).annotatedWith(Names.named("clonefactor")).toInstance((double) cloneFactor);
