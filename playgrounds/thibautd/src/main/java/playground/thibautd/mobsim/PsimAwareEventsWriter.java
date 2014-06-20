@@ -22,15 +22,15 @@ package playground.thibautd.mobsim;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.events.ScoringEvent;
+import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.BasicEventHandler;
 
 /**
  * @author thibautd
  */
-public class PsimAwareEventsWriter implements BasicEventHandler, AfterMobsimListener {
+public class PsimAwareEventsWriter implements BasicEventHandler, ScoringListener {
 	private static final Logger log =
 		Logger.getLogger(PsimAwareEventsWriter.class);
 
@@ -76,7 +76,7 @@ public class PsimAwareEventsWriter implements BasicEventHandler, AfterMobsimList
 	}
 
 	@Override
-	public void notifyAfterMobsim(final AfterMobsimEvent event) {
+	public void notifyScoring(ScoringEvent event) {
 		closeAndNullifyDelegate();
 	}
 
