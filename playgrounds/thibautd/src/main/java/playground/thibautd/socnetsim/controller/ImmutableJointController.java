@@ -102,10 +102,16 @@ public final class ImmutableJointController extends AbstractController {
 		if (replanner == null) throw new NullPointerException();
 		this.addCoreControlerListener( replanner );
 
+		final PseudoSimConfigGroup psimConfig = (PseudoSimConfigGroup)
+				registry.getScenario().getConfig().getModule(
+						PseudoSimConfigGroup.GROUP_NAME );
+
 		this.addCoreControlerListener(
 				 new BeforeMobsimListener() {
 					@Override
 					public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
+						if ( event.getIteration() != registry.getScenario().getConfig().controler().getLastIteration() &&
+							!psimConfig.isDumpingIter( event.getIteration() ) ) return;
 						stopwatch.beginOperation("dump all plans");
 						logger.info("dumping plans...");
 						new PopulationWriter(
@@ -119,10 +125,6 @@ public final class ImmutableJointController extends AbstractController {
 					}
 				 } );
 
-		final PseudoSimConfigGroup psimConfig = (PseudoSimConfigGroup)
-				registry.getScenario().getConfig().getModule(
-						PseudoSimConfigGroup.GROUP_NAME );
-
 		this.addCoreControlerListener(
 				 new JointPlansDumping(
 						registry.getScenario(),
@@ -132,7 +134,8 @@ public final class ImmutableJointController extends AbstractController {
 						getControlerIO() ) {
 					@Override
 					protected boolean dump(final int i) {
-						return psimConfig.isDumpingIter( i );
+						return i == registry.getScenario().getConfig().controler().getLastIteration() ||
+							psimConfig.isDumpingIter( i );
 					}
 				 });
 
@@ -151,6 +154,7 @@ public final class ImmutableJointController extends AbstractController {
 		final PsimAwareEventsWriter eventsWriter =
 			new PsimAwareEventsWriter(
 					getControlerIO(),
+					registry.getScenario().getConfig().controler().getLastIteration(),
 					psimConfig );
 		this.addCoreControlerListener( eventsWriter );
 		registry.getEvents().addHandler( eventsWriter );

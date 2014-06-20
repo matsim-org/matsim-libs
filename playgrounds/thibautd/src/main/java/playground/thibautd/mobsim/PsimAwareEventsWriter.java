@@ -38,11 +38,15 @@ public class PsimAwareEventsWriter implements BasicEventHandler, AfterMobsimList
 	private final OutputDirectoryHierarchy controlerIO;
 	private EventWriterXML delegate = null;
 
+	private final int lastIteration;
+
 	public PsimAwareEventsWriter(
 			final OutputDirectoryHierarchy controlerIO,
+			final int lastIteration,
 			final PseudoSimConfigGroup config ) {
 		this.controlerIO = controlerIO;
 		this.config = config;
+		this.lastIteration = lastIteration;
 	}
 
 	@Override
@@ -52,7 +56,7 @@ public class PsimAwareEventsWriter implements BasicEventHandler, AfterMobsimList
 			log.warn( "was "+getClass().getSimpleName()+" added as a Controler Listenner?" );
 		}
 
-		if ( config.isDumpingIter( iter ) ) {
+		if ( iter == lastIteration || config.isDumpingIter( iter ) ) {
 			this.delegate =
 				new EventWriterXML(
 						controlerIO.getIterationFilename(
