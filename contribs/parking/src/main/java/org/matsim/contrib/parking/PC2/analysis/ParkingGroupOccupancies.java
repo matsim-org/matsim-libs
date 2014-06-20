@@ -96,9 +96,9 @@ public abstract class ParkingGroupOccupancies implements BasicEventHandler {
 	}
 
 	public void savePlot(String fileName) {
-		final LineChart lineChart = new LineChart(xySeriesCollection, "Parking Group Occupancies");
+		final JFreeChart chart = LineChart.createChart(xySeriesCollection, "Parking Group Occupancies");
 		try {
-			ChartUtilities.saveChartAsPNG(new File(fileName), lineChart.getChart(),  800, 600, null, true, 9);
+			ChartUtilities.saveChartAsPNG(new File(fileName), chart,  800, 600, null, true, 9);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -107,7 +107,7 @@ public abstract class ParkingGroupOccupancies implements BasicEventHandler {
 
 	public abstract String getGroupName(Id parkingId);
 
-	private class LineChart extends ApplicationFrame {
+	private static class LineChart extends ApplicationFrame {
 
 		private String title;
 		private JFreeChart chart;
@@ -117,13 +117,13 @@ public abstract class ParkingGroupOccupancies implements BasicEventHandler {
 			super(title);
 			this.title = title;
 
-			setChart(createChart(dataset));
+			setChart(createChart(dataset,title));
 			final ChartPanel chartPanel = new ChartPanel(getChart());
 			chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
 			setContentPane(chartPanel);
 		}
 
-		private JFreeChart createChart(final XYDataset dataset) {
+		public static JFreeChart createChart(final XYDataset dataset, String title) {
 
 			final JFreeChart chart = ChartFactory.createXYLineChart(title, "time [h]", "# of parked vehicles", dataset, PlotOrientation.VERTICAL, true, true,
 					false);
