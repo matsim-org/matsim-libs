@@ -21,6 +21,7 @@ package org.matsim.contrib.transEnergySim.controllers;
 
 import java.util.LinkedList;
 
+import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -29,6 +30,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
@@ -40,7 +42,7 @@ import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 
 public class EventHandlerGroup implements ActivityStartEventHandler, PersonArrivalEventHandler,
-PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, Wait2LinkEventHandler {
+PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, Wait2LinkEventHandler, ActivityEndEventHandler {
 	/**
 	 * All event handlers needed for electric vehicle simulation. Convenience class.
 	 * 
@@ -129,6 +131,15 @@ PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, Perso
 				((Wait2LinkEventHandler) h).handleEvent(event);
 			}
 		}		
+	}
+
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		for (EventHandler h : handler) {
+			if (h instanceof Wait2LinkEventHandler) {
+				((ActivityEndEventHandler) h).handleEvent(event);
+			}
+		}	
 	}
 
 
