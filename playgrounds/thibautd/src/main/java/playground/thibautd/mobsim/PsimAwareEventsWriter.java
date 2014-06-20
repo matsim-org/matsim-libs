@@ -62,7 +62,10 @@ public class PsimAwareEventsWriter implements BasicEventHandler, AfterMobsimList
 						controlerIO.getIterationFilename(
 							iter,
 							"events.xml.gz" ) );
-			delegate.reset( iter );
+			// do not call reset on delegate: it does close the file,
+			// which would then have to be manually re-opened by calling
+			// delegate.init( fileName )...
+			// delegate.reset( iter );
 		}
 	}
 
