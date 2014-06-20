@@ -32,7 +32,9 @@ public class PseudoSimConfigGroup extends ReflectiveModule {
 	private int nPSimIters = 5;
 	private int period = 3;
 	private int nThreads = 1;
-	private boolean dumpEvents = false;
+
+	private int writeEventsAndPlansIntervalInMobsim = 10;
+	private int writeEventsAndPlansIntervalInPSim = 10;
 
 	public PseudoSimConfigGroup() {
 		super( GROUP_NAME );
@@ -78,19 +80,46 @@ public class PseudoSimConfigGroup extends ReflectiveModule {
 		this.nThreads = nThreads;
 	}
 
-	@StringGetter( "dumpEvents" )
-	public boolean isDumpEvents() {
-		return this.dumpEvents;
+	@StringGetter( "writeEventsAndPlansIntervalInMobsim" )
+	public int getWriteEventsAndPlansIntervalInMobsim() {
+		return writeEventsAndPlansIntervalInMobsim;
 	}
 
-	@StringSetter( "dumpEvents" )
-	public void setDumpEvents(boolean dumpEvents) {
-		this.dumpEvents = dumpEvents;
+	@StringSetter( "writeEventsAndPlansIntervalInMobsim" )
+	public void setWriteEventsAndPlansIntervalInMobsim(
+			final int writeEventsAndPlansIntervalInMobsim) {
+		this.writeEventsAndPlansIntervalInMobsim = writeEventsAndPlansIntervalInMobsim;
+	}
+
+	@StringGetter( "writeEventsAndPlansIntervalInPSim" )
+	public int getWriteEventsAndPlansIntervalInPSim() {
+		return writeEventsAndPlansIntervalInPSim;
+	}
+
+	@StringSetter( "writeEventsAndPlansIntervalInPSim" )
+	public void setWriteEventsAndPlansIntervalInPSim(
+			final int writeEventsAndPlansIntervalInPSim) {
+		this.writeEventsAndPlansIntervalInPSim = writeEventsAndPlansIntervalInPSim;
 	}
 
 	public boolean isPSimIter(
 			final int iteration ) {
 		return iteration % (getPeriod() + getNPSimIters()) < getNPSimIters();
+	}
+
+	public boolean isDumpingIter(
+			final int iteration ) {
+		final int cycleNr = iteration - (iteration % (getPeriod() + getNPSimIters()));
+		final int cycleLength = isPSimIter( iteration ) ? getNPSimIters() : getPeriod();
+
+		final int offset = isPSimIter( iteration ) ? 0 : getPeriod();
+		final int positionInCycle = iteration - (cycleNr * (getPeriod() + getNPSimIters())) - offset;
+
+		final int writingPeriod = isPSimIter( iteration ) ?
+			getWriteEventsAndPlansIntervalInPSim() :
+			getWriteEventsAndPlansIntervalInMobsim();
+
+		return (cycleNr * cycleLength + positionInCycle) %  writingPeriod == 0;
 	}
 }
 

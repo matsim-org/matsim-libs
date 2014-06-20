@@ -30,6 +30,8 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 
+import playground.thibautd.mobsim.PseudoSimConfigGroup;
+import playground.thibautd.mobsim.PsimAwareEventsWriter;
 import playground.thibautd.socnetsim.analysis.LocatedTripsWriter;
 import playground.thibautd.socnetsim.controller.listeners.DumpJointDataAtEnd;
 import playground.thibautd.socnetsim.controller.listeners.JointPlansDumping;
@@ -119,9 +121,18 @@ public final class ImmutableJointController extends AbstractController {
 		this.addCoreControlerListener(
 				new EventsHandling(
 						registry.getEvents(),
-						registry.getScenario().getConfig().controler().getWriteEventsInterval(),
+						// registry.getScenario().getConfig().controler().getWriteEventsInterval(),
+						0, // handled by the PSim config group
 						registry.getScenario().getConfig().controler().getEventsFileFormats(),
 						getControlerIO() ));
+		final PsimAwareEventsWriter eventsWriter =
+			new PsimAwareEventsWriter(
+					getControlerIO(),
+					(PseudoSimConfigGroup)
+						registry.getScenario().getConfig().getModule(
+							PseudoSimConfigGroup.GROUP_NAME ) );
+		this.addCoreControlerListener( eventsWriter );
+		registry.getEvents().addHandler( eventsWriter );
 
 		// dump data file immediately, rather than regenerate it by re-reading pop file,
 		// which is rather slow.

@@ -101,7 +101,7 @@ public class GroupReplanningListennerWithPSimLoop implements ReplanningListener 
 			log.info( "### inner loop: start iteration "+event.getIteration()+"."+i );
 
 			final EventWriterXML writer =
-				controlerIO != null && pSimConfig.isDumpEvents() ?
+				controlerIO != null && pSimConfig.getWriteEventsAndPlansIntervalInPSim() != 0 ?
 					new EventWriterXML(
 							controlerIO.getIterationFilename( 
 								event.getIteration(),
