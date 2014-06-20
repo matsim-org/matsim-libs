@@ -138,7 +138,7 @@ public class SubpopulationFilteringEventsManager implements EventsManager {
 
 	private boolean accept(final Id id) {
 		final String subpopPerson = (String) personAtts.getAttribute( id.toString() , attName );
-		return subpop == null ? subpopPerson == null : subpopPerson.equals( subpop );
+		return subpop == null ? subpopPerson == null : subpop.equals( subpopPerson );
 	}
 
 	@Override
