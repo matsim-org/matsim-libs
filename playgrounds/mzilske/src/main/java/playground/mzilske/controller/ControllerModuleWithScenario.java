@@ -24,7 +24,7 @@ package playground.mzilske.controller;
 
 import com.google.inject.AbstractModule;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.config.Config;
 
 public class ControllerModuleWithScenario extends AbstractModule {
     private final Scenario scenario;
@@ -36,6 +36,7 @@ public class ControllerModuleWithScenario extends AbstractModule {
     @Override
     protected void configure() {
         install(new ControllerModule());
+        bind(Config.class).toInstance(scenario.getConfig());
         bind(Scenario.class).toInstance(scenario);
     }
 

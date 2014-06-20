@@ -20,7 +20,7 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.stratum;
+package playground.mzilske.cdr;
 
 import com.google.inject.Provider;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -28,7 +28,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import playground.mzilske.cdr.CompareMain;
 
 import javax.inject.Inject;
 

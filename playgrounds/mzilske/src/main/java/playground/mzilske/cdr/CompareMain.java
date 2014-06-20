@@ -33,8 +33,10 @@ import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
 import playground.mzilske.d4d.Sighting;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.*;
 
+@Singleton
 public class CompareMain {
 
 	private static class VolumeOnLinkFeature implements Feature {

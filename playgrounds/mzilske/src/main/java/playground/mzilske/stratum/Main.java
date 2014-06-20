@@ -23,7 +23,6 @@
 package playground.mzilske.stratum;
 
 import com.google.inject.*;
-import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
@@ -31,12 +30,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 import playground.mzilske.cadyts.CadytsModule;
+import playground.mzilske.cdr.CDRModule;
 import playground.mzilske.cdr.CallBehavior;
 import playground.mzilske.cdr.CompareMain;
 import playground.mzilske.cdr.ZoneTracker;
@@ -68,15 +67,13 @@ public class Main {
 
         Injector injector = Guice.createInjector(
                 new ControllerModule(),
+                new CDRModule(),
                 new CharyparNagelModule(),
                 new AbstractModule() {
                     @Override
                     protected void configure() {
                         bind(Config.class).toProvider(OneWorkplaceOneStratumUnderestimated.ConfigProvider.class).in(Singleton.class);
                         bind(Scenario.class).toProvider(OneWorkplaceOneStratumUnderestimated.class).in(Singleton.class);
-                        bind(CompareMain.class).in(Singleton.class);
-                        Multibinder<ControlerListener> controlerListenerBinder = Multibinder.newSetBinder(binder(), ControlerListener.class);
-                        controlerListenerBinder.addBinding().toProvider(new CallControlerListener());
                     }
                 },
                 phoneModule

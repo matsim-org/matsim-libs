@@ -20,16 +20,14 @@
 
 package org.matsim.core.replanning;
 
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomUnscoredPlanSelector;
+
+import java.util.ArrayList;
 
 /**
  * A strategy defines how an agent can be modified during re-planning.
@@ -50,12 +48,8 @@ public final class PlanStrategyImpl implements PlanStrategy {
 	/**
 	 * Creates a new strategy using the specified planSelector.
 	 *
-	 * @param planSelector
+	 * @param planSelector the PlanSelector to use
 	 */
-	public PlanStrategyImpl(final PlanSelector planSelector) {
-		this.planSelector = planSelector;
-	}
-
 	public PlanStrategyImpl(final GenericPlanSelector<Plan> planSelector) {
 		this.planSelector = planSelector;
 	}
@@ -80,7 +74,7 @@ public final class PlanStrategyImpl implements PlanStrategy {
 		this.counter++;
 		
 		// if there is at least one unscored plan, find that one:
-		Plan plan = new RandomUnscoredPlanSelector<Plan>().selectPlan(((PersonImpl) person));
+		Plan plan = new RandomUnscoredPlanSelector<Plan>().selectPlan(person);
 		
 		// otherwise, find one according to selector (often defined in PlanStrategy ctor):
 		if (plan == null) {
