@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -34,7 +33,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -46,13 +44,13 @@ import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarm
 public class DemandFromEmissionEvents {
 	private final Logger logger = Logger.getLogger(DemandFromEmissionEvents.class);
 
-	private final String runDir = "/Users/aagarwal/Desktop/ils/agarwal/siouxFalls/outputMC/";
-	private final int noOfTimeBins = 1;
+	private final String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMC/";
+	private final int noOfTimeBins = 30;
 	private double simulationEndTime;
-	private String configFile =runDir+"run1"+"/output_config.xml.gz"; 
+	private String configFile =runDir+"run113"+"/output_config.xml"; 
 
-	private static String [] runNumber =  {"run1","run2","run3","run4"};
-	private final String netFile1 = runDir+"run1"+"/output_network.xml.gz";
+	private static String [] runNumber =  {"run115","run116"};
+	private final String netFile1 = runDir+"run113"+"/output_network.xml.gz";
 	private Network network;
 	public static void main(String[] args) {
 		new DemandFromEmissionEvents().writeDemandData();
@@ -63,52 +61,63 @@ public class DemandFromEmissionEvents {
 		network = loadScenario(netFile1).getNetwork();
 
 		this.simulationEndTime = getEndTime(configFile);
+
 		Map<Double, Map<Id, Double>> demandBAU = filterLinks(processEmissionsAndReturnDemand(runNumber[0])); 
-		Map<Double, Map<Id, Double>> demandEI = filterLinks(processEmissionsAndReturnDemand(runNumber[1]));
-		Map<Double, Map<Id, Double>> demandCI = filterLinks(processEmissionsAndReturnDemand(runNumber[2]));
-		Map<Double, Map<Id, Double>> demandECI = filterLinks(processEmissionsAndReturnDemand(runNumber[3]));
+		Map<Double, Map<Id, Double>> demandPolicy = filterLinks(processEmissionsAndReturnDemand(runNumber[1]));
 
-		BufferedWriter writer = IOUtils.getBufferedWriter(runDir+"/analysis/demandPerLinkPerTimeInterval.txt");
-		try {
-			writer.write("time \t linkId \t linkCountBAU \t linkCountEI \t linkCountCI \t linkCountECI \n");
+		writeAbsoluteDemand(runDir+runNumber[0]+"/analysis/emissionVsCongestion/hourlyNetworkDemand.txt", demandBAU);
+		writeAbsoluteDemand(runDir+runNumber[1]+"/analysis/emissionVsCongestion/hourlyNetworkDemand.txt", demandPolicy);
 
-			for(double time :demandBAU.keySet()){
-				for(Id id:demandBAU.get(time).keySet()){
-					writer.write(time+"\t");
-					writer.write(id.toString()+"\t");
-					writer.write(demandBAU.get(time).get(id)+"\t");
-					writer.write(demandEI.get(time).get(id)+"\t");
-					writer.write(demandCI.get(time).get(id)+"\t");
-					writer.write(demandECI.get(time).get(id)+"\t");
-					writer.newLine();
-				}
-				writer.newLine();
-			}
-		} catch (Exception e) {
-			throw new RuntimeException("Data is not written into file. Reason : "+e);
-		}
+//		writeChangeInDemand(runDir+runNumber[1]+"/analysis/emissionVsCongestion/hourlyChangeInNetworkDemandWRTBAU.txt", demandBAU, demandPolicy);
 
-		writer = IOUtils.getBufferedWriter(runDir+"/analysis/changeInDemandPerLinkPerTimeInterval.txt");
-
-		try {
-			writer.write("time \t linkId \t linkCountEI \t linkCountCI \t linkCountECI \n");
-
-			for(double time :demandBAU.keySet()){
-				for(Id id: demandBAU.get(time).keySet()){
-					writer.write(time+"\t");
-					writer.write(id.toString()+"\t");
-					writer.write(percentageChange(demandBAU.get(time).get(id),demandEI.get(time).get(id))+"\t");
-					writer.write(percentageChange(demandBAU.get(time).get(id),demandCI.get(time).get(id))+"\t");
-					writer.write(percentageChange(demandBAU.get(time).get(id),demandECI.get(time).get(id))+"\t");
-					writer.newLine();
-				}
-				writer.newLine();
-			}
-		} catch (Exception e) {
-			throw new RuntimeException("Data is not written into file. Reason : "+e);
-		}
 		logger.info("Writing file(s) is finished.");
 	}
+
+	private void writeAbsoluteDemand(String outputFolder,Map<Double, Map<Id, Double>> linkCountMap ){
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder);
+		try {
+			writer.write("time \t linkCounts  \n");
+
+			for(double time :linkCountMap.keySet()){
+				double hrDemand =0;
+				writer.write(time+"\t");
+				for(Id id:linkCountMap.get(time).keySet()){
+					hrDemand += linkCountMap.get(time).get(id);
+				}
+				writer.write(hrDemand+"\n");
+			}
+			writer.close();
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written into file. Reason : "+e);
+		}
+	}
+
+	private void writeChangeInDemand(String outputFolder,Map<Double, Map<Id, Double>> linkCountMapBAU, Map<Double, Map<Id, Double>> linkCountMapPolicy ){
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder);
+		try {
+			writer.write("time \t %ChangeInlinkCounts  \n");
+
+			for(double time :linkCountMapBAU.keySet()){
+				double hrDemandBAU =0;
+				double hrDemandPolicy=0;
+				writer.write(time+"\t");
+				for(Id id:linkCountMapBAU.get(time).keySet()){
+					hrDemandBAU += linkCountMapBAU.get(time).get(id);
+					double tempPolicyDemand =0;
+					if(linkCountMapPolicy.get(time).get(id)!=null){
+						tempPolicyDemand = linkCountMapPolicy.get(time).get(id);
+					} else tempPolicyDemand =0;
+					hrDemandPolicy += tempPolicyDemand; 
+
+				}
+				writer.write(percentageChange(hrDemandBAU, hrDemandPolicy)+"\n");
+			}
+			writer.close();
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written into file. Reason : "+e);
+		}
+	}
+
 	private Map<Double, Map<Id,  Double>> filterLinks (Map<Double, Map<Id, Double>> time2LinksData) {
 		Map<Double, Map<Id, Double>> time2LinksDataFiltered = new HashMap<Double, Map<Id, Double>>();
 
