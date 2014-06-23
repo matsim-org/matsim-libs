@@ -26,6 +26,7 @@ import java.util.Set;
 
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.sna.util.ProgressLogger;
@@ -95,7 +96,9 @@ public class PopulationDensityTask implements ProxyAnalyzerTask {
 		}
 		
 		try {
-			ZoneLayerSHP.write(new ZoneLayer<Double>(newZones), output);
+			ZoneLayer<Double> layer = new ZoneLayer<Double>(newZones);
+			layer.overwriteCRS(CRSUtils.getCRS(31467));
+			ZoneLayerSHP.write(layer, output);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

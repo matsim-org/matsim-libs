@@ -52,10 +52,9 @@ public class Analyzer {
 		parser.addSerializer(CommonKeys.PERSON_HOME_POINT, new PointSerializer());
 		parser.setValidating(false);
 		
-		parser.parse("/home/johannes/Schreibtisch/10000000.pop.xml"
-				+ "");
+		parser.parse("/home/johannes/Schreibtisch/10000000.pop.xml");
 		
-		Set<SimpleFeature> features = FeatureSHP.readFeatures("/home/johannes/gsv/synpop/data/gis/nuts/Gemeinden.gk3.shp");
+		Set<SimpleFeature> features = FeatureSHP.readFeatures("/home/johannes/gsv/synpop/data/gis/marktzellen/plz8.gk3.shp");
 		Set<Geometry> geometries = new HashSet<Geometry>();
  		for(SimpleFeature feature : features) {
 			geometries.add((Geometry) feature.getDefaultGeometry());
