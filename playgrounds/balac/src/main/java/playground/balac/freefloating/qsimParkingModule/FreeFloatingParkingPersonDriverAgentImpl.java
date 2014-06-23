@@ -432,7 +432,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		LinkNetworkRouteImpl route1 = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", route.getEndLinkId(), parkingSpot.getLinkId());
 		route1.setLinkIds( route.getEndLinkId(), ids,  parkingSpot.getLinkId());
 		route1.setTravelTime( travelTime);
-		route1.setVehicleId(new IdImpl("FF_" + (vehID)));
+		//route1.setVehicleId(new IdImpl("FF_" + (vehID)));
 		carLeg.setRoute(route1);
 		this.cachedDestinationLinkId = parkingSpot.getLinkId();
 
@@ -673,11 +673,11 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		PlanElement currentPlanElement = this.getCurrentPlanElement();
 		NetworkRoute route = (NetworkRoute) ((Leg) currentPlanElement).getRoute(); // if casts fail: illegal state.
 		
-		if (((Leg)currentPlanElement).getMode().equals("freefloating") || ((Leg)currentPlanElement).getMode().equals("freefloatingparking")){
+		if (((Leg)currentPlanElement).getMode().equals("freefloating"))// || ((Leg)currentPlanElement).getMode().equals("freefloatingparking")){
 			
 			return new IdImpl("FF_"+ (vehID));	
 		
-		}
+	//	}
 		else if (route.getVehicleId() != null) {
 			return route.getVehicleId();
 		} else {
