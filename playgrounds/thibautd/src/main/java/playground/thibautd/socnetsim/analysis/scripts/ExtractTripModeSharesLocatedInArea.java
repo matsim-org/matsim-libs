@@ -19,7 +19,16 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.analysis.scripts;
 
-import java.io.IOException;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+
+import playground.ivt.utils.AcceptAllFilter;
+import playground.ivt.utils.ArgParser;
+import playground.ivt.utils.ArgParser.Args;
+import playground.ivt.utils.Filter;
+import playground.ivt.utils.SubpopulationFilter;
 
 import playground.thibautd.socnetsim.analysis.LocatedTripsWriter;
 
@@ -27,12 +36,44 @@ import playground.thibautd.socnetsim.analysis.LocatedTripsWriter;
  * @author thibautd
  */
 public class ExtractTripModeSharesLocatedInArea {
+	public static void main(final String[] args) {
+		final ArgParser parser = new ArgParser();
 
-	public static void main(final String[] args) throws IOException {
-		final String inPopFile = args[ 0 ];
-		final String outRawData = args[ 1 ];
+		parser.setDefaultValue( "-p" , null );
+		parser.setDefaultValue( "-o" , null );
+		// optionnal
+		parser.setDefaultValue( "-a" , null );
+		parser.setDefaultValue( "-s" , null );
+		parser.setDefaultValue( "--att-name" , new PlansConfigGroup().getSubpopulationAttributeName() );
 
-		LocatedTripsWriter.write( inPopFile , outRawData );
+		main( parser.parseArgs( args ) );
+	}
+
+	public static void main(final Args args) {
+		final String inPopFile = args.getValue( "-p" );
+		final String outRawData = args.getValue( "-o" );
+		final String personAttributes = args.getValue( "-a" );
+		final String subpopulation = args.getValue( "-s" );
+		final String attName = args.getValue( "--att-name" );
+
+		final Filter<Person> filter =
+			personAttributes != null ?
+				new SubpopulationFilter(
+						readAttributes( personAttributes ),
+						attName,
+						subpopulation ).getPersonVersion() :
+				new AcceptAllFilter<Person>();
+
+		LocatedTripsWriter.write(
+				filter,
+				inPopFile,
+				outRawData );
+	}
+
+	private static ObjectAttributes readAttributes(final String personAttributes) {
+		final ObjectAttributes atts = new ObjectAttributes();
+		new ObjectAttributesXmlReader( atts ).parse( personAttributes );
+		return atts;
 	}
 }
 

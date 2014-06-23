@@ -34,6 +34,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 
+import playground.ivt.utils.SubpopulationFilter;
 import playground.thibautd.mobsim.PseudoSimConfigGroup;
 import playground.thibautd.mobsim.PsimAwareEventsWriter;
 import playground.thibautd.socnetsim.analysis.LocatedTripsWriter;
@@ -166,8 +167,11 @@ public final class ImmutableJointController extends AbstractController {
 					@Override
 					public void notifyShutdown(final ShutdownEvent event) {
 						LocatedTripsWriter.write(
-							registry.getScenario().getPopulation(),
-							getControlerIO().getOutputFilename( "located_trips.csv.gz" ) );
+								new SubpopulationFilter(
+										registry.getScenario().getPopulation().getPersonAttributes(),
+										null ).getPersonVersion(),
+								registry.getScenario().getPopulation(),
+								getControlerIO().getOutputFilename( "located_trips.csv.gz" ) );
 					}
 				});
 

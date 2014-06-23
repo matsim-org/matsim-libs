@@ -52,6 +52,8 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.PtConstants;
 
+import playground.ivt.utils.Filter;
+
 import playground.thibautd.socnetsim.analysis.scripts.ExtractTripModeSharesLocatedInArea;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 
@@ -86,9 +88,10 @@ public class LocatedTripsWriter {
 			};
 
 	public static void write(
+			final Filter<Person> filter,
 			final Population population,
 			final String outRawData) {
-		final Collection<TripInfo> tripInfos = parseTripInfos( population );
+		final Collection<TripInfo> tripInfos = parseTripInfos( filter , population );
 
 		final Set<String> modes = new HashSet<String>();
 		for ( TripInfo info : tripInfos ) modes.add( info.mode );
@@ -104,9 +107,10 @@ public class LocatedTripsWriter {
 	}
 
 	public static void write(
+			final Filter<Person> filter,
 			final String inPopFile,
 			final String outRawData) {
-		final Collection<TripInfo> tripInfos = parseTripInfos( inPopFile );
+		final Collection<TripInfo> tripInfos = parseTripInfos( filter , inPopFile );
 
 		final Set<String> modes = new HashSet<String>();
 		for ( TripInfo info : tripInfos ) modes.add( info.mode );
@@ -178,21 +182,25 @@ public class LocatedTripsWriter {
 		counter.printCounter();
 	}
 
-	private static Collection<TripInfo> parseTripInfos(final String inPopFile) {
+	private static Collection<TripInfo> parseTripInfos(
+			final Filter<Person> filter,
+			final String inPopFile) {
 		final Collection<TripInfo> infos = new ArrayList<TripInfo>();
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		((PopulationImpl) scenario.getPopulation()).setIsStreaming( true );
-		((PopulationImpl) scenario.getPopulation()).addAlgorithm( new InfoFiller( infos ) );
+		((PopulationImpl) scenario.getPopulation()).addAlgorithm( new InfoFiller( filter , infos ) );
 
 		new MatsimPopulationReader( scenario ).parse( inPopFile );
 		return infos;
 	}
 
-	private static Collection<TripInfo> parseTripInfos(final Population pop) {
+	private static Collection<TripInfo> parseTripInfos(
+			final Filter<Person> filter,
+			final Population pop) {
 		final Collection<TripInfo> infos = new ArrayList<TripInfo>();
 
-		final InfoFiller filler = new InfoFiller( infos );
+		final InfoFiller filler = new InfoFiller( filter , infos );
 		for ( Person p : pop.getPersons().values() ) filler.run( p );
 
 		return infos;
@@ -218,14 +226,19 @@ public class LocatedTripsWriter {
 	}
 
 	private static class InfoFiller implements PersonAlgorithm {
+		private final Filter<Person> filter;
 		private final Collection<TripInfo> infos;
 
-		public InfoFiller( final Collection<TripInfo> infos ) {
+		public InfoFiller(
+				final Filter<Person> filter,
+				final Collection<TripInfo> infos ) {
+			this.filter = filter;
 			this.infos = infos;
 		}
 
 		@Override
 		public void run(final Person person) {
+			if ( !filter.accept( person ) ) return;
 			for ( Trip trip : TripStructureUtils.getTrips( person.getSelectedPlan() , STAGES ) ) {
 				infos.add(
 					new TripInfo(
