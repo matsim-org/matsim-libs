@@ -45,7 +45,7 @@ import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class CalcLegTimesTest {
+public class KNAnalysisEventsHandlerTest {
 
 
     @Rule
@@ -153,11 +153,11 @@ public class CalcLegTimesTest {
 
 	protected void runTest(KNAnalysisEventsHandler calcLegTimes) {
 
-		calcLegTimes.writeStats(utils.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME);
+		calcLegTimes.writeStats(utils.getOutputDirectory() + KNAnalysisEventsHandlerTest.BASE_FILE_NAME);
 
 		// actual test: compare checksums of the files
 		for ( StatType type : StatType.values() ) {
-			final String str = CalcLegTimesTest.BASE_FILE_NAME + type.toString() + ".txt" ;
+			final String str = KNAnalysisEventsHandlerTest.BASE_FILE_NAME + type.toString() + ".txt" ;
 			Logger.getLogger(this.getClass()).info( "comparing " + str );
 			final long expectedChecksum = CRCChecksum.getCRCFromFile(utils.getInputDirectory() + str);
 			final long actualChecksum = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + str);
