@@ -51,10 +51,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  */
 public class SubpopulationFilteringEventsManager implements EventsManager {
 	private final EventsManager delegate = EventsUtils.createEventsManager();
-
-	private final String attName;
-	private final String subpop;
-	private final ObjectAttributes personAtts;
+	private final Filter<Id> filter;
 
 	/**
 	 * Contructs an instance, using the default subpopulation and
@@ -99,46 +96,44 @@ public class SubpopulationFilteringEventsManager implements EventsManager {
 			final ObjectAttributes personAtts,
 			final String attName,
 			final String subpop ) {
-		this.personAtts = personAtts;
-		this.attName = attName;
-		this.subpop = subpop;
+		this( new SubpopulationFilter( personAtts , attName , subpop ) );
+	}
+
+	public SubpopulationFilteringEventsManager(
+			final Filter<Id> filter) {
+		this.filter = filter;
 	}
 
 	@Override
 	public void processEvent(Event event) {
 		if ( event instanceof HasPersonId ) {
 			final Id id = ((HasPersonId) event).getPersonId();
-			if ( !accept( id ) ) return;
+			if ( !filter.accept( id ) ) return;
 		}
 
 		// Those "core" events have a person but do not implement
 		// HasPersonId: handle them specially
 		if ( event instanceof LaneEnterEvent ) {
 			final Id id = ((LaneEnterEvent) event).getPersonId();
-			if ( !accept( id ) ) return;
+			if ( !filter.accept( id ) ) return;
 		}
 		
 		if ( event instanceof LaneLeaveEvent ) {
 			final Id id = ((LaneLeaveEvent) event).getPersonId();
-			if ( !accept( id ) ) return;
+			if ( !filter.accept( id ) ) return;
 		}
 		
 		if ( event instanceof LinkEnterEvent ) {
 			final Id id = ((LinkEnterEvent) event).getPersonId();
-			if ( !accept( id ) ) return;
+			if ( !filter.accept( id ) ) return;
 		}
 		
 		if ( event instanceof LinkLeaveEvent ) {
 			final Id id = ((LinkLeaveEvent) event).getPersonId();
-			if ( !accept( id ) ) return;
+			if ( !filter.accept( id ) ) return;
 		}
 		
 		delegate.processEvent(event);
-	}
-
-	private boolean accept(final Id id) {
-		final String subpopPerson = (String) personAtts.getAttribute( id.toString() , attName );
-		return subpop == null ? subpopPerson == null : subpop.equals( subpopPerson );
 	}
 
 	@Override
