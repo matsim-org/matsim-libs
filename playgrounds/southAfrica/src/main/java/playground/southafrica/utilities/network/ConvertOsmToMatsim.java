@@ -38,12 +38,43 @@ import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
 
 import playground.southafrica.utilities.Header;
 
+/**
+ * Class to convert an OpenStreetMap *.osm file into a MATSim network.
+ * The highway conversion defaults have been set to best represent the 
+ * South African road configuration.
+ * 
+ * @see <a href=http://wiki.openstreetmap.org/wiki/South_African_Tagging_Guidelines>South African tagging guidelines on <i>OpenStreetMap</i></a>
+ * 
+ * @author jwjoubert
+ */
 public class ConvertOsmToMatsim {
 	final private static Logger LOG = Logger.getLogger(ConvertOsmToMatsim.class);
 	
 	/**
-	 * Class to 
-	 * @param args
+	 * Implementation of converting an <i>OpenStreeMap</i> file (with file type
+	 * <code>*.osm</code>) into a MATSim network.
+	 *  
+	 * @param args The following arguments are all required:
+	 * <ol>
+	 * 		<li> <b>inputFile</b> - the path to the <code>*.osm</code> file;
+	 * 		<li> <b>outputFile</b> - path to the MATSim network file, either
+	 * 			 <code>*.xml</code> or <code>*.xml.gz</code>;
+	 * 		<li> <b>shapefileLinks</b> - path to the file where the network 
+	 * 			will be written as ESRI shapefile (this may be '<code>null</code>'
+	 * 			in which case the network will not be written as a shapefile).
+	 * 			Even though it may be '<code>null</code>', the argument must be 
+	 * 			passed.
+	 * 		<li> <b>fullNetwork</b> - a boolean value to indicate if the full
+	 * 			or cleaned up network must be generated. The value '<code>true</code>'
+	 * 			will result in a full network, while '<code>false</code>' 
+	 * 			results in the cleaned up network.
+	 * 		<li> <b>CRS</b> - the projected <i>coordinate reference system</i> 
+	 * 			for the	final network. In the case of South Africa, this should 
+	 * 			typically be 'WGS84_SA_Albers'. This is the standard Albers 
+	 * 			projection with standard parallels 18S and 32S, and the central 
+	 * 			meridian at 24E. See <a href=http://www.spatialreference.org/ref/sr-org/7490/>
+	 * 			SpatialReference.org</a>.
+	 * </ol>
 	 */
 	public static void main(String[] args) {
 		Header.printHeader(ConvertOsmToMatsim.class.toString(), args);
@@ -69,6 +100,7 @@ public class ConvertOsmToMatsim {
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, CRS);
 		OsmNetworkReader onr = new OsmNetworkReader(nw, ct, true);
 		onr.setKeepPaths(fullNetwork);
+		
 		/*
 		 * Configure the highway classification.
 		 */
