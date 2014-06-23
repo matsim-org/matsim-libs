@@ -83,7 +83,7 @@ public class TaxiDemandGenerator
     }
 
 
-    private static String getNextTimeString(String currentHr)
+    public static String getNextTimeString(String currentHr)
     {
         String end = "0000";
         String begin = currentHr.substring(0, 6);

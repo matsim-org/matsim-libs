@@ -31,7 +31,7 @@ public class TaxiStatusToMatrix
 
     public void write()
     {
-        new MatricesWriter(this.matrices).write(folder+"statusMatrix.xml");
+        new MatricesWriter(this.matrices).write(folder+"statusMatrix.xml.gz");
     }
 
 
@@ -42,7 +42,7 @@ public class TaxiStatusToMatrix
     }
     
     
-    
+
     public void read()
     {
         List<File> files = this.listFilesForFolder(new File(folder));
