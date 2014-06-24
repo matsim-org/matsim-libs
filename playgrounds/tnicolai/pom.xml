@@ -11,7 +11,7 @@
   <repositories>
 	<repository>
 		<id>openstreetmap-snapshots</id>
-		<url>http://oss.sonatype.org/content/repositories/openstreetmap-snapshots</url>
+		<url>https://oss.sonatype.org/content/repositories/openstreetmap-snapshots</url>
 	</repository>
   </repositories>
   <dependencies>

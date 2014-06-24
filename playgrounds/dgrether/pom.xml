@@ -57,7 +57,7 @@
 		<repositories>
 				<repository>
 					<id>openstreetmap-snapshots</id>
-					<url>http://oss.sonatype.org/content/repositories/openstreetmap-snapshots</url>
+					<url>https://oss.sonatype.org/content/repositories/openstreetmap-snapshots</url>
 				</repository>
 				<repository>
 						<id>maven2-repository.dev.java.net</id>
