@@ -8,17 +8,6 @@
   <groupId>playground</groupId>
   <artifactId>vsp</artifactId>
   <name>vsp</name>
-  	<repositories>
-		<repository>
-			<id>openstreetmap-snapshots</id>
-			<url>https://oss.sonatype.org/content/repositories/openstreetmap-snapshots</url>
-		</repository>
-		<repository>
-			<id>geotools</id>
-			<name>Geotools repository</name>
-			<url>http://download.osgeo.org/webdav/geotools</url>
-		</repository>
-	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
@@ -32,11 +21,6 @@
             <version>0.6.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
-        <!-- <dependency>
-			<groupId>com.vividsolutions</groupId>
-			<artifactId>jts</artifactId>
-			<version>1.11</version>
-		</dependency>  -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math</artifactId>
