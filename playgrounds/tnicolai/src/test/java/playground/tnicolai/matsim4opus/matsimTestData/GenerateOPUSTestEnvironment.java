@@ -1,7 +1,6 @@
 package playground.tnicolai.matsim4opus.matsimTestData;
 
 import org.apache.log4j.Logger;
-
 import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.io.FileCopy;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
@@ -101,8 +100,7 @@ public class GenerateOPUSTestEnvironment {
 		
 		log.info("Copying UrbanSim data from " + source + " to " + destination);
 		if( !FileCopy.copyTree(source, destination) ){
-			log.error("Error while copying matsim4opus test data.");
-			System.exit(-1);
+			throw new RuntimeException("Error while copying matsim4opus test data.");
 		}
 	}
 	
