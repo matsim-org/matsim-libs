@@ -53,7 +53,7 @@ public class FreeFloatingWithParkingControler extends Controler{
 	  protected void loadControlerListeners() {  
 		  
 	    super.loadControlerListeners();   
-	    this.addControlerListener(new FFListener( this.getConfig().getModule("FreeFloating").getValue("statsFileName")));
+	   // this.addControlerListener(new FFListener( this.getConfig().getModule("FreeFloating").getValue("statsFileName")));
 	  }
 	public static void main(final String[] args) {
 		
