@@ -66,7 +66,7 @@ public class CreateFacilitiesAttributesWithSwissCoordinates {
 			facilities.getFacilityAttributes().putAttribute(
 					f.getId().toString(),
 					"elevation",
-					elevation.getAltitude( f ) );
+					elevation.getAltitude( f.getCoord() ) );
 		}
 
 		new ObjectAttributesXmlWriter( facilities.getFacilityAttributes() ).writeFile( outputFile );

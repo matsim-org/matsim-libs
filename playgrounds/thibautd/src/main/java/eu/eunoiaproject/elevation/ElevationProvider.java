@@ -19,12 +19,10 @@
  * *********************************************************************** */
 package eu.eunoiaproject.elevation;
 
-import org.matsim.core.api.experimental.facilities.Facility;
-
 /**
  * @author thibautd
  */
-public interface ElevationProvider {
-	public double getAltitude( final Facility facility );
+public interface ElevationProvider<T> {
+	public double getAltitude( final T location );
 }
 

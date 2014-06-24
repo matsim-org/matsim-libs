@@ -20,14 +20,13 @@
 package eu.eunoiaproject.elevation;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 
 /**
  * @author thibautd
  */
-public class GridElevationProvider implements ElevationProvider {
+public class GridElevationProvider implements ElevationProvider<Coord> {
 	private final double[][] grid;
 	private final Coord lowerLeftCorner;
 	private final double cellSize;
@@ -63,8 +62,8 @@ public class GridElevationProvider implements ElevationProvider {
 	}
 
 	@Override
-	public double getAltitude(final Facility facility) {
-		final Coord coordInGridSystem = facilityToGridCoordTransformation.transform( facility.getCoord() );
+	public double getAltitude(final Coord coord) {
+		final Coord coordInGridSystem = facilityToGridCoordTransformation.transform( coord );
 
 		final int xOffset = (int) ( ( coordInGridSystem.getX() - lowerLeftCorner.getX() ) / cellSize );
 		final int yOffset = (int) ( ( coordInGridSystem.getY() - lowerLeftCorner.getY() ) / cellSize );
