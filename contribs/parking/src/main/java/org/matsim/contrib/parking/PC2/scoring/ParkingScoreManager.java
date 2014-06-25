@@ -46,6 +46,7 @@ public class ParkingScoreManager {
 	DoubleValueHashMap<Id> scores;
 	Controler controler;
 	private WalkTravelTime walkTravelTime;
+	private RandomErrorTermManager randomErrorTermManager;
 
 	public ParkingScoreManager(WalkTravelTime walkTravelTime, Controler controler) {
 		this.walkTravelTime = walkTravelTime;
@@ -83,10 +84,15 @@ public class ParkingScoreManager {
 		return (parkingCostBeta * parkingCost) * parkingScoreScalingFactor;
 	}
 
-	public double calcScore(Coord destCoord, double arrivalTime, double parkingDurationInSeconds, Parking parking, Id personId) {
+	public double calcScore(Coord destCoord, double arrivalTime, double parkingDurationInSeconds, Parking parking, Id personId, int legIndex) {
 		double walkScore = calcWalkScore(destCoord, parking.getCoordinate(), personId, parkingDurationInSeconds);
 		double costScore = calcCostScore(arrivalTime, parkingDurationInSeconds, parking, personId);
-		return costScore + walkScore;
+		double randomError=0;
+		
+		if (randomErrorTermManager!=null){
+			randomError= randomErrorTermManager.getEpsilonAlternative(parking.getId(),personId,legIndex)*randomErrorTermScalingFactor*parkingScoreScalingFactor;
+		}
+		return costScore + walkScore + randomError;
 	}
 
 	public double getScore(Id id) {
@@ -123,6 +129,10 @@ public class ParkingScoreManager {
 
 	public void setParkingBetas(ParkingBetas parkingBetas) {
 		this.parkingBetas = parkingBetas;
+	}
+
+	public void setRandomErrorTermManger(RandomErrorTermManager randomErrorTermManager) {
+		this.randomErrorTermManager = randomErrorTermManager;
 	}
 
 }

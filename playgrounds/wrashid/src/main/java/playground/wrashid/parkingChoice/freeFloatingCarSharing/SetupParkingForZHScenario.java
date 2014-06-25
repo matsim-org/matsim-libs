@@ -32,6 +32,7 @@ import org.matsim.contrib.parking.PC2.scoring.ParkingBetas;
 import org.matsim.contrib.parking.PC2.scoring.ParkingCostModel;
 import org.matsim.contrib.parking.PC2.scoring.ParkingScoreManager;
 import org.matsim.contrib.parking.PC2.scoring.ParkingScoringFunctionFactory;
+import org.matsim.contrib.parking.PC2.scoring.RandomErrorTermManager;
 import org.matsim.contrib.parking.PC2.simulation.ParkingInfrastructureManager;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingModuleWithFreeFloatingCarSharing;
@@ -58,7 +59,7 @@ public class SetupParkingForZHScenario {
 		
 		LinkedList<Parking> parkings = getParking(config, baseDir);
 	
-		ParkingScoreManager parkingScoreManager = prepareParkingScoreManager(parkingModule);
+		ParkingScoreManager parkingScoreManager = prepareParkingScoreManager(parkingModule, parkings);
 		ParkingInfrastructureManager pim=new ParkingInfrastructureManager(parkingScoreManager,  controler.getEvents());
 		
 		ParkingCostModel pcm=new ParkingCostModelZH(config,parkings);
@@ -109,7 +110,7 @@ public class SetupParkingForZHScenario {
 		parkingModule.getControler().setScoringFunctionFactory(new ParkingScoringFunctionFactory (parkingModule.getControler().getScoringFunctionFactory(),parkingModule.getParkingScoreManager()));
 	}
 	
-	public static ParkingScoreManager prepareParkingScoreManager(ParkingModuleWithFFCarSharingZH parkingModule) {
+	public static ParkingScoreManager prepareParkingScoreManager(ParkingModuleWithFFCarSharingZH parkingModule, LinkedList<Parking> parkings) {
 		Controler controler=parkingModule.getControler();
 		ParkingScoreManager parkingScoreManager = new ParkingScoreManager(getWalkTravelTime(parkingModule.getControler()), parkingModule.getControler());
 		
@@ -124,6 +125,17 @@ public class SetupParkingForZHScenario {
 		parkingScoreManager.setParkingScoreScalingFactor(parkingScoreScalingFactor);
 		double randomErrorTermScalingFactor= Double.parseDouble(controler.getConfig().getParam("parkingChoice.ZH", "randomErrorTermScalingFactor"));
 		parkingScoreManager.setRandomErrorTermScalingFactor(randomErrorTermScalingFactor);
+		
+		String epsilonDistribution=controler.getConfig().findParam("parkingChoice.ZH", "randomErrorTermEpsilonDistribution");
+		if (epsilonDistribution!=null){
+			LinkedList<Id> parkingIds=new LinkedList<Id>();
+			for (Parking parking:parkings){
+				parkingIds.add(parking.getId());
+			}
+			
+			parkingScoreManager.setRandomErrorTermManger(new RandomErrorTermManager(epsilonDistribution, parkingIds, parkingModule.getControler().getPopulation().getPersons().values()));
+		}
+		
 		return parkingScoreManager;
 	}
 	
