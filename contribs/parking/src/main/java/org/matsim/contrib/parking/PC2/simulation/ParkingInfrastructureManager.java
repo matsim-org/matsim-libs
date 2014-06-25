@@ -138,7 +138,7 @@ public class ParkingInfrastructureManager {
 			}
 		}
 
-		availablePublicParkingAtCityCentre();
+		//availablePublicParkingAtCityCentre();
 	}
 
 	protected synchronized QuadTree<Parking> getPublicParkingQuadTree() {
@@ -221,7 +221,7 @@ public class ParkingInfrastructureManager {
 					double score = parkingScoreManager.calcScore(parkingOperationRequestAttributes.destCoordinate,
 							parkingOperationRequestAttributes.arrivalTime,
 							parkingOperationRequestAttributes.parkingDurationInSeconds, parking,
-							parkingOperationRequestAttributes.personId);
+							parkingOperationRequestAttributes.personId, parkingOperationRequestAttributes.legIndex);
 					queue.add(new SortableMapObject<Parking>(parking, -1.0 * score));
 				}
 
@@ -318,7 +318,7 @@ public class ParkingInfrastructureManager {
 	public synchronized void scoreParkingOperation(ParkingOperationRequestAttributes parkingOperationRequestAttributes, Parking parking) {
 		double score = parkingScoreManager.calcScore(parkingOperationRequestAttributes.destCoordinate,
 				parkingOperationRequestAttributes.arrivalTime, parkingOperationRequestAttributes.parkingDurationInSeconds, parking,
-				parkingOperationRequestAttributes.personId);
+				parkingOperationRequestAttributes.personId, parkingOperationRequestAttributes.legIndex);
 		parkingScoreManager.addScore(parkingOperationRequestAttributes.personId, score);
 	}
 

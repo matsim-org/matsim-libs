@@ -29,5 +29,6 @@ public class ParkingOperationRequestAttributes {
 	Id personId;
 	Id facilityId;
 	String actType;
+	int legIndex;
 
 }

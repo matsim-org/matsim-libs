@@ -206,6 +206,8 @@ public class ParkingChoiceSimulation implements PersonDepartureEventHandler, Act
 				parkingAttributes.parkingDurationInSeconds=GeneralLib.getIntervalDuration(event.getTime(), activityBeforeNextCarLeg.getEndTime());
 			}
 			
+			parkingAttributes.legIndex=currentPlanElementIndex.get(personId);
+			
 			Parking parking = parkingInfrastructureManager.parkVehicle(parkingAttributes);
 			
 			if (isLastCarLegOfDay(personId)){
@@ -295,6 +297,8 @@ public class ParkingChoiceSimulation implements PersonDepartureEventHandler, Act
 				parkingAttributes.facilityId=firstActivityAfterLastCarLegOfDay.getFacilityId();
 				parkingAttributes.actType=firstActivityAfterLastCarLegOfDay.getType();
 				parkingAttributes.parkingDurationInSeconds=GeneralLib.getIntervalDuration(firstActivityAfterLastCarLegOfDay.getStartTime(), firstActivityOfDayBeforeDepartingWithCar.getEndTime());
+				
+				parkingAttributes.legIndex=0;
 				
 				parkingInfrastructureManager.parkVehicle(parkingAttributes);
 			}
