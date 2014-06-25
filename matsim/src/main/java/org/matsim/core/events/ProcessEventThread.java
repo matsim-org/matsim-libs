@@ -89,11 +89,11 @@ import org.matsim.core.gbl.Gbl;
 	// the LastEventOfIteration lets the event handler threads know,
 	// that there is no more work, as soon as they have processed this,
 	// they are allowed to go to sleep
-	public void close() {
+	public synchronized void close() {
 		processEvent(new LastEventOfIteration(0.0));
 		eventQueue.addAll( preInputBuffer );
 		preInputBuffer.clear();
-	}
+	} 
 
 	public EventsManager getEvents() {
 		return events;
