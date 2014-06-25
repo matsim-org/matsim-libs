@@ -133,7 +133,9 @@ public class SetupParkingForZHScenario {
 				parkingIds.add(parking.getId());
 			}
 			
-			parkingScoreManager.setRandomErrorTermManger(new RandomErrorTermManager(epsilonDistribution, parkingIds, parkingModule.getControler().getPopulation().getPersons().values()));
+			int seed=Integer.parseInt(controler.getConfig().findParam("parkingChoice.ZH", "randomErrorTerm.seed"));
+			
+			parkingScoreManager.setRandomErrorTermManger(new RandomErrorTermManager(epsilonDistribution, parkingIds, parkingModule.getControler().getPopulation().getPersons().values(),seed));
 		}
 		
 		return parkingScoreManager;

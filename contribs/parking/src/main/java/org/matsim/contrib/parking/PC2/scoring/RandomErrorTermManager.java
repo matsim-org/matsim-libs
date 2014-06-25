@@ -45,16 +45,17 @@ public class RandomErrorTermManager {
 	String epsilonDistribution;
 	
 	public RandomErrorTermManager(String epsilonDistribution,
-			LinkedList<Id> parkingIds, Collection<? extends Person> persons) {
+			LinkedList<Id> parkingIds, Collection<? extends Person> persons, int seed) {
 				this.epsilonDistribution = epsilonDistribution;
 		
-		Random random = MatsimRandom.getRandom();
+		Random random = new Random();
+		random.setSeed(seed);
 		for (Id parkingId:parkingIds){
 			parkingKValue.put(parkingId, random.nextDouble());
 		}
 		
 		for (Person person: persons){
-			parkingKValue.put(person.getId(), random.nextDouble());
+			personKValue.put(person.getId(), random.nextDouble());
 		}
 	}
 
