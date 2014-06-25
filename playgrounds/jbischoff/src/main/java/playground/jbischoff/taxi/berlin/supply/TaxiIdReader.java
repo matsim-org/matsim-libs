@@ -24,6 +24,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 public class TaxiIdReader {
 	
 	private static final Logger log = Logger.getLogger(TaxiIdReader.class);
+	private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private Map<Date,Integer> addToSystem;
 	private Map<Date,Integer> removeFromSystem;
 	private Map<Date,Integer> inSystem;
@@ -31,9 +32,8 @@ public class TaxiIdReader {
 	
 	public static void main(String[] args) throws ParseException {
 //		for (int i = 15; i<22; i++){
-	    SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	    Date start = SDF.parse("2013-02-25 00:00:00");
-	    Date end = SDF.parse("2013-03-03 00:30:00");
+	    Date start = SDF.parse("2013-04-15 00:00:00");
+	    Date end = SDF.parse("2013-04-22 00:30:00");
 		TaxiIdReader tir = new TaxiIdReader(start,end);
 		tir.go();
 //		}
@@ -41,10 +41,11 @@ public class TaxiIdReader {
 	private void go(){
 		
 		TaxiIdParser tip = new TaxiIdParser();
-		this.read("C:/local_jb/data/OD/kw9/rawFCD_20130225-20130304.dat", tip);
+//		this.read("C:/local_jb/data/OD/kw9/rawFCD_20130225-20130304.dat", tip);
+		this.read("C:/local_jb/data/OD/2013/vehicles/rawFCD_20130415-20130422.dat", tip);
 		this.taxiIdData = tip.getTaxiIds();
 		this.analyse();
-		this.write("C:/local_jb/data/OD/kw9/taxisweekly_n.csv");
+		this.write("C:/local_jb/data/OD/2013/vehicles/taxisweekly.csv");
 		
 	}
 	
@@ -54,7 +55,7 @@ public class TaxiIdReader {
 		
 		try {
 			for (Entry<Date,Integer> sec : this.inSystem.entrySet()){
-				bw.append(sec.getKey()+"\t"+sec.getValue()+"\n");
+				bw.append(SDF.format(sec.getKey())+"\t"+sec.getValue()+"\n");
 			}
 			bw.flush();
 			bw.close();

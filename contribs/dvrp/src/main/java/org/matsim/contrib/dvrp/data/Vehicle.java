@@ -43,6 +43,7 @@ public interface Vehicle
 
     double getT1();
 
+    void setT1(double t1);
 
     Schedule<? extends Task> getSchedule();
 

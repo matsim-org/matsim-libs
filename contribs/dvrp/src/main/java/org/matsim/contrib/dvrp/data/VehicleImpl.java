@@ -34,7 +34,7 @@ public class VehicleImpl
 
     // TW for vehicle
     private final double t0;
-    private final double t1;
+    private double t1;
 
     private final Schedule<? extends AbstractTask> schedule;
 
@@ -113,5 +113,12 @@ public class VehicleImpl
     public String toString()
     {
         return "Vehicle_" + id;
+    }
+
+
+    @Override
+    public void setT1(double t1)
+    {
+        this.t1 = t1;   
     }
 }
