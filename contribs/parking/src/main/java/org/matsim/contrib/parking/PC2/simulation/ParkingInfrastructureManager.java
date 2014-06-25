@@ -30,6 +30,7 @@ import org.matsim.contrib.parking.PC2.infrastructure.PPRestrictedToFacilities;
 import org.matsim.contrib.parking.PC2.infrastructure.PrivateParking;
 import org.matsim.contrib.parking.PC2.infrastructure.PublicParking;
 import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.SortableMapObject;
 import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
@@ -38,6 +39,7 @@ import org.matsim.contrib.parking.PC2.infrastructure.Parking;
 import org.matsim.contrib.parking.PC2.scoring.ParkingScoreManager;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 // TODO: make abstract and create algorithm in Zuerich case -> provide protected helper methods already here.
 public class ParkingInfrastructureManager {
@@ -48,6 +50,7 @@ public class ParkingInfrastructureManager {
 
 	// personId, parkingFacilityId
 	private HashMap<Id, Id> parkedVehicles;
+
 	private EventsManager eventsManager;
 
 	// facilityId -> parkings available to users of that facility
@@ -71,12 +74,16 @@ public class ParkingInfrastructureManager {
 		privateParkingsRestrictedToFacilities = new LinkedListValueHashMap<Id, PPRestrictedToFacilities>();
 	}
 
-	public void setPublicParkings(LinkedList<PublicParking> publicParkings) {
+	public synchronized void setPublicParkings(LinkedList<PublicParking> publicParkings) {
 		publicParkingGroupQuadTrees = new HashMap<String, QuadTree<Parking>>();
 		EnclosingRectangle allPublicParkingRect = new EnclosingRectangle();
 		HashMap<String, EnclosingRectangle> groupRects = new HashMap<String, EnclosingRectangle>();
 
 		for (PublicParking parking : publicParkings) {
+			if (parking.getAvailableParkingCapacity()<=0){
+				DebugLib.stopSystemAndReportInconsistency("parking capacity non-positive: " + parking.getId());
+			}
+			
 			allPublicParkingRect.registerCoord(parking.getCoordinate());
 			allParkings.put(parking.getId(), parking);
 
@@ -104,7 +111,7 @@ public class ParkingInfrastructureManager {
 		quadTree.put(parking.getCoordinate().getX(), parking.getCoordinate().getY(), parking);
 	}
 
-	public void setPrivateParkingRestrictedToFacilities(LinkedList<PPRestrictedToFacilities> ppRestrictedToFacilities) {
+	public synchronized void setPrivateParkingRestrictedToFacilities(LinkedList<PPRestrictedToFacilities> ppRestrictedToFacilities) {
 		for (PPRestrictedToFacilities pp : ppRestrictedToFacilities) {
 			for (Id facilityId : pp.getFacilityIds()) {
 				privateParkingsRestrictedToFacilities.put(facilityId, pp);
@@ -113,19 +120,32 @@ public class ParkingInfrastructureManager {
 		}
 	}
 
-	public void reset() {
+	public synchronized void reset() {
 		parkedVehicles.clear();
 
 		for (Id parkingFacilityId : allParkings.keySet()) {
-			allParkings.get(parkingFacilityId).resetAvailability();
+			Parking parking = allParkings.get(parkingFacilityId);
+			if (parking.getAvailableParkingCapacity() == 0) {
+				if (!(parking instanceof PrivateParking)) {
+					addParkingToQuadTree(publicParkingsQuadTree, parking);
+					addParkingToQuadTree(publicParkingGroupQuadTrees.get(parking.getGroupName()), parking);
+				}
+			}
+			parking.resetAvailability();
+			
+			if (parking.getAvailableParkingCapacity()==0){
+				DebugLib.stopSystemAndReportInconsistency();
+			}
 		}
+
+		availablePublicParkingAtCityCentre();
 	}
 
-	protected QuadTree<Parking> getPublicParkingQuadTree() {
+	protected synchronized QuadTree<Parking> getPublicParkingQuadTree() {
 		return publicParkingsQuadTree;
 	}
 
-	public Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName) {
+	public synchronized Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName) {
 		Parking parking = null;
 		if (groupName == null) {
 			parking = publicParkingsQuadTree.get(destCoordinate.getX(), destCoordinate.getY());
@@ -142,11 +162,11 @@ public class ParkingInfrastructureManager {
 		return parking;
 	}
 
-	public void logArrivalEventAtTimeZero(Parking parking) {
+	public synchronized void logArrivalEventAtTimeZero(Parking parking) {
 		eventsManager.processEvent(new ParkingArrivalEvent(0, parking.getId()));
 	}
 
-	public Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName, Id personId,
+	public synchronized Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName, Id personId,
 			double parkingDurationInSeconds, double arrivalTime) {
 		Parking parking = parkAtClosestPublicParkingNonPersonalVehicle(destCoordinate, groupName);
 
@@ -162,7 +182,8 @@ public class ParkingInfrastructureManager {
 	// TODO: make this method abstract
 	// when person/vehicleId is clearly distinct, then I can change this to
 	// vehicleId - check, if this is the case now.
-	public Parking parkVehicle(ParkingOperationRequestAttributes parkingOperationRequestAttributes) {
+	public synchronized Parking parkVehicle(ParkingOperationRequestAttributes parkingOperationRequestAttributes) {
+		// availablePublicParkingAtCityCentre();
 
 		Parking selectedParking = null;
 		boolean parkingFound = false;
@@ -220,16 +241,60 @@ public class ParkingInfrastructureManager {
 		return selectedParking;
 	}
 
-	private void parkVehicle(Parking parking) {
-		parking.parkVehicle();
-		if (parking.getAvailableParkingCapacity() == 0) {
-			publicParkingsQuadTree.remove(parking.getCoordinate().getX(), parking.getCoordinate().getY(), parking);
-			publicParkingGroupQuadTrees.get(parking.getGroupName()).remove(parking.getCoordinate().getX(),
-					parking.getCoordinate().getY(), parking);
+	private synchronized void availablePublicParkingAtCityCentre() {
+		CoordImpl lindenHof = new CoordImpl(683235.0, 247497.0);
+		Collection<Parking> collection2 = getPublicParkingQuadTree().get(lindenHof.getX(), lindenHof.getY(), 1000);
+
+		if (collection2.size() > 0) {
+			DebugLib.emptyFunctionForSettingBreakPoint();
+		}
+
+		printParkingGroupSizes();
+		DebugLib.emptyFunctionForSettingBreakPoint();
+	}
+
+	private synchronized void printParkingGroupSizes() {
+		for (String groupName : publicParkingGroupQuadTrees.keySet()) {
+			System.out.println(groupName + "\t" + publicParkingGroupQuadTrees.get(groupName).size());
 		}
 	}
 
-	public LinkedList<Parking> getNonFullParking(Collection<Parking> parkings) {
+	private synchronized void parkVehicle(Parking parking) {
+		int startAvailability=parking.getAvailableParkingCapacity();
+		
+		parking.parkVehicle();
+		if (parking.getAvailableParkingCapacity() == 0) {
+			boolean wasRemoved=false;
+			wasRemoved=publicParkingsQuadTree.remove(parking.getCoordinate().getX(), parking.getCoordinate().getY(), parking);
+			
+			if (!wasRemoved){
+				DebugLib.stopSystemAndReportInconsistency(parking.getId().toString());
+			}
+			
+			wasRemoved=publicParkingGroupQuadTrees.get(parking.getGroupName()).remove(parking.getCoordinate().getX(),
+					parking.getCoordinate().getY(), parking);
+			
+			if (!wasRemoved){
+				DebugLib.stopSystemAndReportInconsistency(parking.getId().toString());
+			}
+			
+			Collection<Parking> collection = publicParkingsQuadTree.get(parking.getCoordinate().getX(), parking.getCoordinate().getY(), 1);
+			if (collection.size()==1){
+				for (Parking p:collection){
+					if (p.getId().toString().equalsIgnoreCase(parking.getId().toString())){
+						DebugLib.stopSystemAndReportInconsistency();
+					}
+				}
+			}
+		}
+		
+		int endAvailability=parking.getAvailableParkingCapacity();
+
+		DebugLib.assertTrue(startAvailability-1==endAvailability, "not equal");
+		
+	}
+
+	public synchronized LinkedList<Parking> getNonFullParking(Collection<Parking> parkings) {
 		LinkedList<Parking> result = new LinkedList<Parking>();
 
 		for (Parking p : parkings) {
@@ -241,7 +306,7 @@ public class ParkingInfrastructureManager {
 	}
 
 	// TODO: make this method abstract
-	public Parking personCarDepartureEvent(ParkingOperationRequestAttributes parkingOperationRequestAttributes) {
+	public synchronized Parking personCarDepartureEvent(ParkingOperationRequestAttributes parkingOperationRequestAttributes) {
 		Id parkingFacilityId = parkedVehicles.get(parkingOperationRequestAttributes.personId);
 		Parking parking = allParkings.get(parkingFacilityId);
 		parkedVehicles.remove(parkingOperationRequestAttributes.personId);
@@ -250,17 +315,19 @@ public class ParkingInfrastructureManager {
 		return parking;
 	}
 
-	public void scoreParkingOperation(ParkingOperationRequestAttributes parkingOperationRequestAttributes, Parking parking) {
+	public synchronized void scoreParkingOperation(ParkingOperationRequestAttributes parkingOperationRequestAttributes, Parking parking) {
 		double score = parkingScoreManager.calcScore(parkingOperationRequestAttributes.destCoordinate,
 				parkingOperationRequestAttributes.arrivalTime, parkingOperationRequestAttributes.parkingDurationInSeconds, parking,
 				parkingOperationRequestAttributes.personId);
 		parkingScoreManager.addScore(parkingOperationRequestAttributes.personId, score);
 	}
 
-	public void unParkVehicle(Parking parking, double departureTime) {
+	public synchronized void unParkVehicle(Parking parking, double departureTime) {
 		if (parking == null) {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
+		
+		int startAvailability=parking.getAvailableParkingCapacity();
 
 		parking.unparkVehicle();
 
@@ -270,19 +337,23 @@ public class ParkingInfrastructureManager {
 				addParkingToQuadTree(publicParkingGroupQuadTrees.get(parking.getGroupName()), parking);
 			}
 		}
+		
+		int endAvailability=parking.getAvailableParkingCapacity();
+
+		DebugLib.assertTrue(startAvailability+1==endAvailability, "not equal");
 
 		eventsManager.processEvent(new ParkingDepartureEvent(departureTime, parking.getId()));
 	}
 
-	public ParkingScoreManager getParkingScoreManager() {
+	public synchronized ParkingScoreManager getParkingScoreManager() {
 		return parkingScoreManager;
 	}
 
-	public EventsManager getEventsManager() {
+	public synchronized EventsManager getEventsManager() {
 		return eventsManager;
 	}
 
-	public void setEventsManager(EventsManager eventsManager) {
+	public synchronized void setEventsManager(EventsManager eventsManager) {
 		this.eventsManager = eventsManager;
 	}
 

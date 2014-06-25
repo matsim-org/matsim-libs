@@ -46,135 +46,83 @@ public class ParkingScoreManager {
 	DoubleValueHashMap<Id> scores;
 	Controler controler;
 	private WalkTravelTime walkTravelTime;
-	
-	
+
 	public ParkingScoreManager(WalkTravelTime walkTravelTime, Controler controler) {
 		this.walkTravelTime = walkTravelTime;
 		this.controler = controler;
 	}
 
+	public double calcWalkScore(Coord destCoord, Coord parkingCoord, Id personId, double parkingDurationInSeconds) {
+		Map<Id, ? extends Person> persons = controler.getPopulation().getPersons();
+		PersonImpl person = (PersonImpl) persons.get(personId);
 
-
-	public double calcWalkScore(Coord destCoord, Coord parkingCoord, Id personId, double parkingDurationInSeconds){
-		Map<Id,? extends Person> persons = controler.getPopulation().getPersons();
-		PersonImpl person=(PersonImpl) persons.get(personId);
-		
 		double parkingWalkBeta = getParkingBetas().getParkingWalkBeta(person, parkingDurationInSeconds);
-		
-		
-		
+
 		Link link = ((NetworkImpl) controler.getNetwork()).getNearestLink(destCoord);
 		double length = link.getLength();
 		double walkTime = walkTravelTime.getLinkTravelTime(link, 0, person, null);
 		double walkSpeed = length / walkTime;
-		
-		//protected double walkSpeed = 3.0 / 3.6; // [m/s]
-		
-		
+
+		// protected double walkSpeed = 3.0 / 3.6; // [m/s]
+
 		double walkDistance = GeneralLib.getDistance(destCoord, parkingCoord);
 		double walkDurationInSeconds = walkDistance / walkSpeed;
-		
-		double walkingTimeTotalInMinutes=walkDurationInSeconds/60;
-		
-		return (parkingWalkBeta*walkingTimeTotalInMinutes)*parkingScoreScalingFactor;
+
+		double walkingTimeTotalInMinutes = walkDurationInSeconds / 60;
+
+		return (parkingWalkBeta * walkingTimeTotalInMinutes) * parkingScoreScalingFactor;
 	}
 
-	public double calcCostScore(double arrivalTime, double parkingDurationInSeconds, Parking parking, Id personId){
-		Map<Id,? extends Person> persons = controler.getPopulation().getPersons();
-		PersonImpl person=(PersonImpl) persons.get(personId);
+	public double calcCostScore(double arrivalTime, double parkingDurationInSeconds, Parking parking, Id personId) {
+		Map<Id, ? extends Person> persons = controler.getPopulation().getPersons();
+		PersonImpl person = (PersonImpl) persons.get(personId);
 		double parkingCostBeta = getParkingBetas().getParkingCostBeta(person);
-		
-		double parkingCost=parking.getCost(personId, arrivalTime, parkingDurationInSeconds);
-		
-		return (parkingCostBeta*parkingCost)*parkingScoreScalingFactor;
+
+		double parkingCost = parking.getCost(personId, arrivalTime, parkingDurationInSeconds);
+
+		return (parkingCostBeta * parkingCost) * parkingScoreScalingFactor;
 	}
 
-
-	public double calcScore(Coord destCoord, double arrivalTime, double parkingDurationInSeconds, Parking parking, Id personId){
-		double walkScore=calcWalkScore(destCoord, parking.getCoordinate(), personId,parkingDurationInSeconds);
-		double costScore=calcCostScore(arrivalTime, parkingDurationInSeconds, parking, personId);
+	public double calcScore(Coord destCoord, double arrivalTime, double parkingDurationInSeconds, Parking parking, Id personId) {
+		double walkScore = calcWalkScore(destCoord, parking.getCoordinate(), personId, parkingDurationInSeconds);
+		double costScore = calcCostScore(arrivalTime, parkingDurationInSeconds, parking, personId);
 		return costScore + walkScore;
 	}
-	
-	
-	
-	
-	
-	
-	
+
 	public double getScore(Id id) {
 		return scores.get(id);
 	}
-	
-	public void addScore(Id id, double incValue) {
+
+	public synchronized void addScore(Id id, double incValue) {
 		scores.incrementBy(id, incValue);
 	}
-	
-	
-	public void prepareForNewIteration(){
-		scores=new DoubleValueHashMap<Id>();
+
+	public synchronized void prepareForNewIteration() {
+		scores = new DoubleValueHashMap<Id>();
 	}
-
-
-
-
-
-
 
 	public double getParkingScoreScalingFactor() {
 		return parkingScoreScalingFactor;
 	}
 
-
-
-
-
-
-
 	public void setParkingScoreScalingFactor(double parkingScoreScalingFactor) {
 		this.parkingScoreScalingFactor = parkingScoreScalingFactor;
 	}
-
-
-
-
-
-
 
 	public double getRandomErrorTermScalingFactor() {
 		return randomErrorTermScalingFactor;
 	}
 
-
-
-
-
-
-
 	public void setRandomErrorTermScalingFactor(double randomErrorTermScalingFactor) {
 		this.randomErrorTermScalingFactor = randomErrorTermScalingFactor;
 	}
-
-
-
-
-
-
 
 	public ParkingBetas getParkingBetas() {
 		return parkingBetas;
 	}
 
-
-
-
-
-
-
 	public void setParkingBetas(ParkingBetas parkingBetas) {
 		this.parkingBetas = parkingBetas;
 	}
-
-	
 
 }
