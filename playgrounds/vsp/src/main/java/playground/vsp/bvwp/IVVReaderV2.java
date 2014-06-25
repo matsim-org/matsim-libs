@@ -187,7 +187,6 @@ public class IVVReaderV2 {
 		
 		log.info("Dumping Planfall Magdeburg-->Stendal");
 		System.out.println(planfallData.getByODRelation(getODId("1500301", "1509001")));
-		
 		Map<Id,ScenarioForEvalData> nullFallDataByFromId = splitDataByFromId(nullfallData);
 		Map<Id,ScenarioForEvalData> planFallDataByFromId = splitDataByFromId(planfallData);
 		if ( nullFallDataByFromId.size() != planFallDataByFromId.size()){
@@ -439,6 +438,8 @@ public class IVVReaderV2 {
 		private ScenarioForEvalData planfalldata;
 		
         Map<DemandSegment,Double> besetzungsgradeKurz;
+        Map<DemandSegment,Integer> tableLookUp;
+
 	    Map<DemandSegment,Double> besetzungsgradeLang;
 
 		/**
@@ -448,9 +449,22 @@ public class IVVReaderV2 {
 			this.nullfalldata = nullfalldata;
 			this.planfalldata = planfalldata;
 			this.fillBesetzungsgrad();
+			this.fillNullfallMap();
 		}
 
 		
+		
+		    
+		private void fillNullfallMap(){
+		    this.tableLookUp = new HashMap<MultiDimensionalArray.DemandSegment, Integer>();
+		    this.tableLookUp.put(DemandSegment.PV_BERUF, 8);
+		    this.tableLookUp.put(DemandSegment.PV_AUSBILDUNG, 9);
+		    this.tableLookUp.put(DemandSegment.PV_EINKAUF, 10);
+		    this.tableLookUp.put(DemandSegment.PV_COMMERCIAL, 11);
+		    this.tableLookUp.put(DemandSegment.PV_URLAUB, 12);
+		    this.tableLookUp.put(DemandSegment.PV_SONST, 13);
+		    
+		}
 		  private void fillBesetzungsgrad()
 		    {
 		        this.besetzungsgradeKurz = new HashMap<DemandSegment, Double>();
@@ -494,88 +508,98 @@ public class IVVReaderV2 {
 			String from = row[0].trim();
 			String to = row[1].trim();
 			Id odId = getODId(from, to);
-                for (DemandSegment ds : DemandSegment.values()){
-                    if (ds.equals(DemandSegment.GV)) continue;
-                    if (ds.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
-					    
-				    double bsNullfall = getBesetzungsgrad(nullfalldata, ds, odId);
-				    double bsPlanfall = getBesetzungsgrad(planfalldata, ds, odId);
-					
-					setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, ds, Attribute.Produktionskosten_Eu), Double.parseDouble(row[6])/bsNullfall, nullfalldata);
-					setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, ds, Attribute.Produktionskosten_Eu), Double.parseDouble(row[7])/bsPlanfall, planfalldata);
-					
-					setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, ds, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[6])/bsNullfall, nullfalldata);
-                    setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, ds, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[7])/bsPlanfall, planfalldata);
-			
-					
-				}
-//				setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, DemandSegment.PV_BERUF, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[8]), nullfalldata);
-//				setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[9]), nullfalldata);
-//				setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, DemandSegment.PV_EINKAUF, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[10]), nullfalldata);
-//				setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, DemandSegment.PV_COMMERCIAL, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[11]), nullfalldata);
-//				setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, DemandSegment.PV_URLAUB, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[12]), nullfalldata);
-//				setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, DemandSegment.PV_SONST, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[13]), nullfalldata);
+//                for (DemandSegment ds : DemandSegment.values()){
+//                    if (ds.equals(DemandSegment.GV)) continue;
+//                    if (ds.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
+//					    
+//				    double bsNullfall = getBesetzungsgrad(nullfalldata, ds, odId);
+//				    double bsPlanfall = getBesetzungsgrad(planfalldata, ds, odId);
+//				    double produktionskostenNullfall;
+//				    double nutzerkostenNullfall;
+//				    double fixkostenNullfall;
+//				    
+//				    double produktionskostenPlanfall;
+//                    double nutzerkostenPlanfall;
+//                    double fixkostenPlanfall;
+//				    
+//				    if (ds.equals(DemandSegment.PV_COMMERCIAL)){
+//				         produktionskostenNullfall = Double.parseDouble(row[6]); //pro FAHRT
+//				         nutzerkostenNullfall =  Double.parseDouble(row[this.tableLookUp.get(ds)]); //pro PERSON
+//				         fixkostenNullfall = produktionskostenNullfall - (nutzerkostenNullfall*bsNullfall); //pro FAHRT
+//				         
+//				         nutzerkostenNullfall += fixkostenNullfall/bsNullfall; //pro PERSON
+//				         
+//				         
+//				         produktionskostenPlanfall = Double.parseDouble(row[7]); //pro FAHRT
+//                         nutzerkostenPlanfall =  Double.parseDouble(row[this.tableLookUp.get(ds)+6]); //pro PERSON
+//                         fixkostenPlanfall = produktionskostenPlanfall - (nutzerkostenPlanfall*bsPlanfall); //pro FAHRT
+//                         
+//                         nutzerkostenPlanfall += fixkostenPlanfall/bsPlanfall; //pro PERSON
+//                         
+//				         
+//				    }
+//				    else{
+//                        produktionskostenNullfall = Double.parseDouble(row[6]); //pro FAHRT
+//                        nutzerkostenNullfall =  Double.parseDouble(row[this.tableLookUp.get(ds)]); //pro PERSON
+//                        fixkostenNullfall = produktionskostenNullfall - (nutzerkostenNullfall*bsNullfall);
+//                        
+//                        produktionskostenNullfall -= fixkostenNullfall;
+//                        
+//                        produktionskostenPlanfall = Double.parseDouble(row[7]); //pro FAHRT
+//                        nutzerkostenPlanfall =  Double.parseDouble(row[this.tableLookUp.get(ds)+6]); //pro PERSON
+//                        fixkostenPlanfall = produktionskostenPlanfall - (nutzerkostenPlanfall*bsPlanfall);
+//                        
+//                        produktionskostenPlanfall -= fixkostenPlanfall; //pro FAHRT
+//				        
+//				        
+//				    }
+//				    produktionskostenNullfall = produktionskostenNullfall / bsNullfall;
+//				    produktionskostenPlanfall = produktionskostenPlanfall / bsPlanfall;
+//				    
+//				    
+//					setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, ds, Attribute.Produktionskosten_Eu), produktionskostenNullfall, nullfalldata);
+//					setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, ds, Attribute.Produktionskosten_Eu), produktionskostenPlanfall, planfalldata);
+//					
+//					setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, ds, Attribute.Nutzerkosten_Eu), nutzerkostenNullfall, nullfalldata);
+//                    setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, ds, Attribute.Nutzerkosten_Eu), nutzerkostenPlanfall, planfalldata);
 //			
-//				setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, DemandSegment.PV_BERUF, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[14]), planfalldata);
-//				setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[15]), planfalldata);
-//				setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, DemandSegment.PV_EINKAUF, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[16]), planfalldata);
-//				setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, DemandSegment.PV_COMMERCIAL, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[17]), planfalldata);
-//				setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, DemandSegment.PV_URLAUB, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[18]), planfalldata);
-//				setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, DemandSegment.PV_SONST, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[19]), planfalldata);
+//
+//  
+//					
+//				}
+			// VARIANTE ZWEI
+          for (DemandSegment dds : DemandSegment.values()){
+              if (dds.equals(DemandSegment.GV)) continue;
+              if (dds.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
+//              double bsNullfall = getBesetzungsgrad(nullfalldata, dds, odId);
+//              double bsPlanfall = getBesetzungsgrad(planfalldata, dds, odId);
+              setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, dds, Attribute.Produktionskosten_Eu), Double.parseDouble(row[this.tableLookUp.get(dds)]), nullfalldata);
+              setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, dds, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[this.tableLookUp.get(dds)]), nullfalldata);
 
+              setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, dds, Attribute.Produktionskosten_Eu), Double.parseDouble(row[this.tableLookUp.get(dds)+6]), planfalldata);
+              setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, dds, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[this.tableLookUp.get(dds)+6]), planfalldata);
+              
+              
+
+          }
+
+
+                if ((from.equals("1500301"))&&(to.equals("1509001")) ){
+                    for (DemandSegment ds : DemandSegment.values()){
+                        if (ds.equals(DemandSegment.GV)) continue;
+                        if (ds.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
+                        log.info("Nullfall MD-STD");
+                        log.info(ds +" PK: "+ this.nullfalldata.getByODRelation(odId).get(Key.makeKey(Mode.Strasse, ds, Attribute.Produktionskosten_Eu)) +" NK: "+this.nullfalldata.getByODRelation(odId).get(Key.makeKey(Mode.Strasse, ds, Attribute.Nutzerkosten_Eu)));
+                        log.info("Planfall MD-STD");
+                        log.info(ds +" PK: "+ this.planfalldata.getByODRelation(odId).get(Key.makeKey(Mode.Strasse, ds, Attribute.Produktionskosten_Eu)) +" NK: "+this.planfalldata.getByODRelation(odId).get(Key.makeKey(Mode.Strasse, ds, Attribute.Nutzerkosten_Eu)));
+                    }
+//                    System.exit(0); //debug
+                }
 			}
 		
 	}
 	
-//	private static class CostForSomeIdsHandler implements TabularFileHandler{
-//
-//		private final List<Id> odlist;
-//		private ScenarioForEvalData nullfalldata;
-//		private ScenarioForEvalData planfalldata;
-//
-//		/**
-//		 * @param nullfalldata
-//		 */
-//		public CostForSomeIdsHandler(List<Id> odlist, ScenarioForEvalData nullfalldata, ScenarioForEvalData planfalldata ) {
-//			this.nullfalldata = nullfalldata;
-//			this.planfalldata = planfalldata;
-//			this.odlist = odlist;
-//		}
-//
-//		@Override
-//		public void startRow(String[] row) {
-//			if(comment(row)) return;
-//			
-//			String from = row[0].trim();
-//			String to = row[1].trim();
-//			Id currentOdId = getODId(from, to);
-//			if (this.odlist.contains(currentOdId)){
-//				for (DemandSegment ds : DemandSegment.values()){
-//					if (ds.equals(DemandSegment.GV)) continue;
-//					if (ds.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
-//					
-//					setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, ds, Attribute.Produktionskosten_Eu), Double.parseDouble(row[6]), nullfalldata);
-//					setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, ds, Attribute.Produktionskosten_Eu), Double.parseDouble(row[7]), planfalldata);
-//
-//				}
-//				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_BERUF, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[8])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, nullfalldata);
-//				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[9])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, nullfalldata);
-//				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_EINKAUF, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[10])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, nullfalldata);
-//				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_COMMERCIAL, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[11])*IVVReaderV2.BESETZUNGSGRAD_PV_GESCHAEFT, nullfalldata);
-//				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_URLAUB, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[12])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, nullfalldata);
-//				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_SONST, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[13])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, nullfalldata);
-//			
-//				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_BERUF, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[14])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, planfalldata);
-//				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[15])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, planfalldata);
-//				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_EINKAUF, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[16])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, planfalldata);
-//				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_COMMERCIAL, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[17])*IVVReaderV2.BESETZUNGSGRAD_PV_GESCHAEFT, planfalldata);
-//				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_URLAUB, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[18])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, planfalldata);
-//				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_SONST, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[19])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, planfalldata);
-//
-//			}
-//			}
-//		
-//	}
+
 	
 	private static class IndexFromImpendanceFileHandler implements TabularFileHandler{
 
@@ -694,7 +718,8 @@ public class IVVReaderV2 {
 				if (segment.equals(DemandSegment.GV)) continue;
 				if (segment.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
 				Double verl = Double.parseDouble(row[11].trim()) * -1.0 *WERKTAGEPROJAHR * bahnZwecke.get(segment)/totalBahn ;
-				planfalldata.getByODRelation(odId).inc(Key.makeKey(Mode.Bahn, segment, Attribute.XX), verl);
+				planfalldata.getByODRelation(odId).inc(Key.makeKey(Mode.Bahn, segment, Attribute.XX), Math.round(verl));
+				planfalldata.getByODRelation(odId).inc(Key.makeKey(Mode.Strasse, segment, Attribute.XX), -1*Math.round(verl));
 				planfalldata.getByODRelation(odId).put(Key.makeKey(Mode.Bahn, segment, Attribute.Reisezeit_h), Double.parseDouble(row[5].trim())/60.);
 				nullfalldata.getByODRelation(odId).put(Key.makeKey(Mode.Bahn, segment, Attribute.Reisezeit_h), Double.parseDouble(row[5].trim())/60.);
 
@@ -739,8 +764,11 @@ public class IVVReaderV2 {
 			if (includeRail){
 			setValuesForODRelation(odId, Key.makeKey(Mode.Bahn, ds, Attribute.Distanz_km), Double.parseDouble(myRow[4].trim()), data);
 			setValuesForODRelation(odId, Key.makeKey(Mode.Bahn, ds, Attribute.Nutzerkosten_Eu), Double.parseDouble(myRow[4].trim())*BAHNPREISPROKM, data);
+	        setValuesForODRelation(odId, Key.makeKey(Mode.Bahn, ds, Attribute.Produktionskosten_Eu), 0., data);
+
 			setValuesForODRelation(reverseOd, Key.makeKey(Mode.Bahn, ds, Attribute.Distanz_km), Double.parseDouble(myRow[4].trim()), data);
 			setValuesForODRelation(reverseOd, Key.makeKey(Mode.Bahn, ds, Attribute.Nutzerkosten_Eu), Double.parseDouble(myRow[4].trim())*BAHNPREISPROKM, data);
+			setValuesForODRelation(reverseOd, Key.makeKey(Mode.Bahn, ds, Attribute.Produktionskosten_Eu), 0., data);
 
 			}
 			}
@@ -831,6 +859,7 @@ public class IVVReaderV2 {
 		IVVReaderConfigGroup config = new IVVReaderConfigGroup();
 //		String dir = "/Users/jb/tucloud/bvwp/data/P2030_Daten_IVV_20131210/";
 		String dir = "C:/local_jb/testrechnungen_strasse/IVV_NeubauA14/P2030_Daten_IVV_20131210/";
+//		String dir = "C:/local_jb/testrechnungen_strasse/IVV_NeubauA14/MD_only/";
 		config.setDemandMatrixFile(dir + "P2030_2010_BMVBS_ME2_131008.csv");
 		config.setRemainingDemandMatrixFile(dir + "P2030_2010_verbleibend_ME2.csv");
 		config.setNewDemandMatrixFile(dir + "P2030_2010_neuentstanden_ME2.csv");
