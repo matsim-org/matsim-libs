@@ -2,6 +2,8 @@ package playground.southafrica.population.census2011;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -9,15 +11,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
-import org.matsim.households.Households;
-import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsWriterV10;
-import org.matsim.households.Income;
 import org.matsim.households.IncomeImpl;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.southafrica.population.utilities.ComprehensivePopulationReader;
@@ -31,36 +30,42 @@ import playground.southafrica.utilities.Header;
  *
  * @author jwjoubert
  */
-public class ProvincialPopulationExtractor2011 {
-	private final static Logger LOG = Logger.getLogger(ProvincialPopulationExtractor2011.class);
+public class DistrictPopulationExtractor2011 {
+	private final static Logger LOG = Logger.getLogger(DistrictPopulationExtractor2011.class);
 	private final Scenario sc;
-	private Households households;
-	private ObjectAttributes householdAttributes;
-	private ObjectAttributes personAttributes;
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Header.printHeader(ProvincialPopulationExtractor2011.class.toString(), args);
+		Header.printHeader(DistrictPopulationExtractor2011.class.toString(), args);
 		
 		String inputFolder = args[0];
-		String provinceName = args[1];
-		String provinceCode = args[2];
+		String areaName = args[1];
+		
+		/* The remainder of the arguments form a list of district codes. */
+		List<String> districtCodes = new ArrayList<String>();
+		int index = 2;
+		while(index < args.length){
+			districtCodes.add(args[index++]);
+		}
+		if(districtCodes.size() == 0){
+			throw new IllegalArgumentException("At least one district code must be provided as argument.");
+		}
 		
 		/* Before anything else, first check if the output folder already exists. */
 		String path = inputFolder.endsWith("/") ? "" : "/";
-		File outputFolder = new File(inputFolder + path + provinceName + path);
+		File outputFolder = new File(inputFolder + path + areaName + path);
 		if(outputFolder.exists()){
 			throw new RuntimeException("The output folder already exists and will not be overwritten. First delete " + 
 					outputFolder.getAbsolutePath());
 		} 
 		
-		ProvincialPopulationExtractor2011 ppe = new ProvincialPopulationExtractor2011();
-		ppe.extractProvince(inputFolder, provinceCode);
+		DistrictPopulationExtractor2011 ppe = new DistrictPopulationExtractor2011();
+		ppe.extractProvince(inputFolder, districtCodes);
 		
 		try {
-			ppe.writePopulationAndAttributes(inputFolder, provinceName);
+			ppe.writePopulationAndAttributes(inputFolder, areaName);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Must first delete output folder.");
@@ -70,11 +75,9 @@ public class ProvincialPopulationExtractor2011 {
 	}
 	
 	
-	public ProvincialPopulationExtractor2011() {
+	public DistrictPopulationExtractor2011() {
 		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		this.households = new HouseholdsImpl();
-		this.householdAttributes = new ObjectAttributes();
-		this.personAttributes = new ObjectAttributes();
+		((ScenarioImpl)sc).createHouseholdsContainer();
 	}
 	
 	
@@ -86,31 +89,35 @@ public class ProvincialPopulationExtractor2011 {
 	 * @param inputFolder
 	 * @param provinceCode
 	 */
-	public void extractProvince(String inputFolder, String provinceCode){
+	public void extractProvince(String inputFolder, List<String> codes){
 		ComprehensivePopulationReader cr = new ComprehensivePopulationReader();
 		cr.parse(inputFolder);
 		
 		/* Households */
 		LOG.info("Evaluating households in province code(s)...");
 		Counter householdCounter = new Counter("   households evaluated # ");
-		for(Id id : cr.getHouseholds().getHouseholds().keySet()){
-			boolean inProvince = false;
-			String thisHouseholdProvinceCode = (String)cr.getHouseholdAttributes().getAttribute(id.toString(), "provinceCode");
-			if(thisHouseholdProvinceCode.startsWith(provinceCode)){
-				inProvince = true;
+		for(Id id : cr.getScenario().getHouseholds().getHouseholds().keySet()){
+			String thisHouseholdDistrictCode = (String)cr.getScenario().getHouseholds().getHouseholdAttributes().getAttribute(id.toString(), "districtCode");
+			
+			boolean inArea = false;
+			int index = 0;
+			while(!inArea && index < codes.size()){
+				if(thisHouseholdDistrictCode.startsWith(codes.get(index++))){
+					inArea = true;
+				}
 			}
-			if(inProvince){
+			if(inArea){
 				/* Copy the household */
-				Household hh = cr.getHouseholds().getHouseholds().get(id);
-				households.getHouseholds().put(id, hh);
+				Household hh = cr.getScenario().getHouseholds().getHouseholds().get(id);
+				sc.getHouseholds().getHouseholds().put(id, hh);
 				
 				String[] attributes_household = {"householdSize", "population", "housingType", 
 						"mainDwellingType", "municipalCode", "districtCode", "provinceCode"};
 
 				for(String attribute : attributes_household){
-					Object currentAttribute = cr.getHouseholdAttributes().getAttribute(id.toString(), attribute);
+					Object currentAttribute = cr.getScenario().getHouseholds().getHouseholdAttributes().getAttribute(id.toString(), attribute);
 					if(currentAttribute != null){
-						householdAttributes.putAttribute(id.toString(), attribute, currentAttribute);
+						sc.getHouseholds().getHouseholdAttributes().putAttribute(id.toString(), attribute, currentAttribute);
 					}
 				}
 				
@@ -122,9 +129,9 @@ public class ProvincialPopulationExtractor2011 {
 					String[] attributes_person = {"race", "relationship", "school", "income"};
 					
 					for(String attribute : attributes_person){
-						Object currentAttribute = cr.getPersonAttributes().getAttribute(memberId.toString(), attribute);
+						Object currentAttribute = cr.getScenario().getPopulation().getPersonAttributes().getAttribute(memberId.toString(), attribute);
 						if(currentAttribute != null){
-							personAttributes.putAttribute(memberId.toString(), attribute, currentAttribute);
+							sc.getPopulation().getPersonAttributes().putAttribute(memberId.toString(), attribute, currentAttribute);
 						}
 					}
 				}
@@ -170,16 +177,16 @@ public class ProvincialPopulationExtractor2011 {
 		/* Ensure output folder ends with a slash. */
 		outputfolder = outputfolder + (outputfolder.endsWith("/") ? "" : "/");
 		
-		if(this.households == null || this.householdAttributes == null){
+		if(sc.getHouseholds() == null || sc.getHouseholds().getHouseholdAttributes() == null){
 			throw new RuntimeException("Either no households or household attributes to write.");
 		} else{
-			LOG.info("Writing households to file... (" + this.households.getHouseholds().size() + ")");
-			HouseholdsWriterV10 hw = new HouseholdsWriterV10(this.households);
+			LOG.info("Writing households to file... (" + sc.getHouseholds().getHouseholds().size() + ")");
+			HouseholdsWriterV10 hw = new HouseholdsWriterV10(sc.getHouseholds());
 			hw.setPrettyPrint(true);
 			hw.writeFile(outputfolder + "Households.xml");
 
 			LOG.info("Writing household attributes to file...");
-			ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(householdAttributes);
+			ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(sc.getHouseholds().getHouseholdAttributes());
 			/* Set up the income converter */
 			oaw.putAttributeConverter(IncomeImpl.class, new SAIncomeConverter());
 			oaw.setPrettyPrint(true);
@@ -196,15 +203,15 @@ public class ProvincialPopulationExtractor2011 {
 		/* Ensure output folder ends with a slash. */
 		outputfolder = outputfolder + (outputfolder.endsWith("/") ? "" : "/");
 		
-		if(this.sc.getPopulation().getPersons().size() == 0 || this.personAttributes == null){
+		if(sc.getPopulation().getPersons().size() == 0 || sc.getPopulation().getPersonAttributes() == null){
 			throw new RuntimeException("Either no persons or person attributes to write.");
 		} else{
-			LOG.info("Writing population to file... (" + this.sc.getPopulation().getPersons().size() + ")");
-			PopulationWriter pw = new PopulationWriter(this.sc.getPopulation(), this.sc.getNetwork());
+			LOG.info("Writing population to file... (" + sc.getPopulation().getPersons().size() + ")");
+			PopulationWriter pw = new PopulationWriter(sc.getPopulation(), sc.getNetwork());
 			pw.writeV5(outputfolder + "Population.xml");
 
 			LOG.info("Writing person attributes to file...");
-			ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(this.personAttributes);
+			ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes());
 			/* Set up the income converter */
 			oaw.putAttributeConverter(IncomeImpl.class, new SAIncomeConverter());
 			oaw.setPrettyPrint(true);

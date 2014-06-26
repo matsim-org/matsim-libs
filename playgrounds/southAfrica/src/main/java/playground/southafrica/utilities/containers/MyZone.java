@@ -23,11 +23,15 @@ package playground.southafrica.utilities.containers;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class MyZone extends MultiPolygon implements Identifiable{
+	private GeometryFactory gf;
 
 	/**
 	 * 
@@ -43,6 +47,31 @@ public class MyZone extends MultiPolygon implements Identifiable{
 	@Override
 	public Id getId() {
 		return this.id;
+	}
+	
+	public Point sampleRandomInteriorPoint(){
+		Point p = null;
+		
+		Geometry envelope = this.getEnvelope();
+		double c1x = envelope.getCoordinates()[0].x;
+		double c2x = envelope.getCoordinates()[2].x;
+		double c1y = envelope.getCoordinates()[0].y;
+		double c2y = envelope.getCoordinates()[2].y;
+		double minX = Math.min(c1x, c2x);
+		double maxX = Math.max(c1x, c2x);
+		double minY = Math.min(c1y, c2y);
+		double maxY = Math.max(c1y, c2y);
+		
+		while(p == null){
+			double sampleX = minX + Math.random()*(maxX-minX);
+			double sampleY = minY + Math.random()*(maxY-minY);
+			Point pp = this.factory.createPoint(new Coordinate(sampleX, sampleY));
+			if(this.covers(pp)){
+				p = pp;
+			}
+		}
+		
+		return p;
 	}
 	
 }

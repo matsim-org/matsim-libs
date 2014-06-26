@@ -82,12 +82,24 @@ public class MyMultiFeatureReader {
 		Collection<SimpleFeature> features = sfr.getFeatureSet();
 		
 		for (SimpleFeature feature : features) {
-			String name = String.valueOf( feature.getAttribute( idField ) ); 
+			String name = null;
+			
+			Object o = feature.getAttribute(idField);
+			if(o instanceof String){
+				name = (String)o;
+			} else if(o instanceof Double){
+				name = String.valueOf(((Double)o).intValue());
+			} else if(o instanceof Integer){
+				name = String.valueOf((Integer)o);
+			} else{
+				LOG.error("Don't know how to interpret ID field type: " + o.getClass().toString());
+			}
+			
 			Object shape = feature.getDefaultGeometry();
 			if( shape instanceof MultiPolygon ){
 				mp = (MultiPolygon)shape;
 				if( !mp.isSimple() ){
-					LOG.warn("This polygon is NOT simple!" );
+					LOG.warn("This polygon is NOT simple: " + name);
 				}
 				Polygon polygonArray[] = new Polygon[mp.getNumGeometries()];
 				for(int j = 0; j < mp.getNumGeometries(); j++ ){

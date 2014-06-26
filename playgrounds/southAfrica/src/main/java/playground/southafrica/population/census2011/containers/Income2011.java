@@ -175,7 +175,7 @@ public enum Income2011 {
 	 * code is the one used internally by this class. It corresponds with the 
 	 * original census questionnaire codes, but there are differences. If you 
 	 * want to parse the dwelling Income2011 from the actual census code, rather use 
-	 * the method {@link MainDwellingIncome20112011#parseIncome2011FromCensusCode(String)}.
+	 * the method {@link MainDwellingIncome20112011#parseIncomeFromSurveyCode(String)}.
 	 * 
 	 * @param code
 	 * @return

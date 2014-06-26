@@ -4,7 +4,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationReaderMatsimV5;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.households.IncomeImpl;
@@ -12,6 +14,8 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.southafrica.population.census2001.Census2001SampleParser;
+import playground.southafrica.population.census2011.attributeConverters.CoordConverter;
+import playground.southafrica.population.nmbmTravelSurvey.NmbmSurveyParser;
 import playground.southafrica.utilities.Header;
 
 /**
@@ -24,9 +28,6 @@ import playground.southafrica.utilities.Header;
 public class ComprehensivePopulationReader {
 	private static final Logger LOG = Logger.getLogger(Census2001SampleParser.class);
 	private Scenario sc;
-	private HouseholdsImpl households = new HouseholdsImpl();
-	private ObjectAttributes householdAttributes = new ObjectAttributes();
-	private ObjectAttributes personAttributes = new ObjectAttributes();
 
 	public static void main(String[] args) {
 		Header.printHeader(ComprehensivePopulationReader.class.toString(), args);
@@ -52,6 +53,7 @@ public class ComprehensivePopulationReader {
 	 */
 	public ComprehensivePopulationReader() {
 		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		((ScenarioImpl)sc).createHouseholdsContainer();
 	}
 	
 	public void parse(String inputfolder){
@@ -65,41 +67,30 @@ public class ComprehensivePopulationReader {
 		
 		/* Read population attributes. */
 		LOG.info("Reading person attributes...");
-		ObjectAttributesXmlReader oar1 = new ObjectAttributesXmlReader(personAttributes);
+		ObjectAttributesXmlReader oar1 = new ObjectAttributesXmlReader(this.sc.getPopulation().getPersonAttributes());
 		oar1.putAttributeConverter(IncomeImpl.class, new SAIncomeConverter());
 		oar1.parse(inputfolder + "PersonAttributes.xml");
 		
 		/* Read households */
 		LOG.info("Reading households...");
-		HouseholdsReaderV10 hhr = new HouseholdsReaderV10(households);
+		HouseholdsReaderV10 hhr = new HouseholdsReaderV10(this.sc.getHouseholds());
 		hhr.parse(inputfolder + "Households.xml");
 		
 		/* Read household attributes. */ 
 		LOG.info("Reading household attributes...");
-		ObjectAttributesXmlReader oar2 = new ObjectAttributesXmlReader(householdAttributes);
+		ObjectAttributesXmlReader oar2 = new ObjectAttributesXmlReader(this.sc.getHouseholds().getHouseholdAttributes());
 		oar2.putAttributeConverter(IncomeImpl.class, new SAIncomeConverter());
+		oar2.putAttributeConverter(CoordImpl.class, new CoordConverter());
 		oar2.parse(inputfolder + "HouseholdAttributes.xml");
 
 		LOG.info("================================================================");
 		LOG.info("Population size: " + sc.getPopulation().getPersons().size());
-		LOG.info("Number of households: " + households.getHouseholds().size());
+		LOG.info("Number of households: " + sc.getHouseholds().getHouseholds().size());
 		LOG.info("================================================================");
 	}
 
 	public Scenario getScenario() {
 		return sc;
 	}
-	
-	public HouseholdsImpl getHouseholds() {
-		return households;
-	}
-	
-	public ObjectAttributes getHouseholdAttributes() {
-		return householdAttributes;
-	}
-	
-	public ObjectAttributes getPersonAttributes() {
-		return personAttributes;
-	}
-	
+		
 }

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southafrica.population.utilities;
+package playground.southafrica.population.census2001;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -42,7 +42,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.ActivityImpl;
@@ -65,9 +64,9 @@ import org.matsim.households.IncomeImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
-import playground.southafrica.population.census2001.IpfWriter;
 import playground.southafrica.population.census2001.containers.Race;
 import playground.southafrica.population.census2001.containers.Schooling;
+import playground.southafrica.population.utilities.ComprehensivePopulationReader;
 import playground.southafrica.utilities.Header;
 import playground.southafrica.utilities.RandomVariateGenerator;
 import playground.southafrica.utilities.SouthAfricaInflationCorrector;
@@ -149,7 +148,7 @@ public class NmbmQTBuilder {
 		cr.parse(this.inputFolder);
 		
 		this.inputPopulation = cr.getScenario().getPopulation();
-		this.inputHouseholds = cr.getHouseholds();
+		this.inputHouseholds = cr.getScenario().getHouseholds();
 		this.qtMap = new TreeMap<Id, QuadTree<Plan>>();
 		
 		/* Parse the zones for which the population is being generated. */

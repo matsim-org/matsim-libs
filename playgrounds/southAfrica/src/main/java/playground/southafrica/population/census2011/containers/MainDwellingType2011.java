@@ -168,7 +168,7 @@ public enum MainDwellingType2011 {
 	 * @param code
 	 * @return
 	 */
-	public static  MainDwellingType2011 getType(int code){
+	public static  MainDwellingType2011 getMainDwellingType(int code){
 		switch (code) {
 		case 1:
 			return FormalHouse;

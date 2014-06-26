@@ -36,13 +36,13 @@ public class IpfWriter2011 {
 		cr.parse(inputFolder);
 		Population population = cr.getScenario().getPopulation();
 		LOG.info("Number of people in population: " + population.getPersons().size());
-		ObjectAttributes personAttributes = cr.getPersonAttributes();
-		Households households = cr.getHouseholds();
-		ObjectAttributes householdAttributes = cr.getHouseholdAttributes();
+		ObjectAttributes personAttributes = cr.getScenario().getPopulation().getPersonAttributes();
+		Households households = cr.getScenario().getHouseholds();
+		ObjectAttributes householdAttributes = cr.getScenario().getHouseholds().getHouseholdAttributes();
 		
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
 		try{
-			bw.write(String.format("HHNR\tPNR\tHHS\tHT\tMDT\tPOP\tINC\tPNR\tAGE\tGEN\tREL\tEMPL\tSCH\n"));
+			bw.write(String.format("HHNR\tPNR\tHHS\tHT\tMDT\tPOP\tINC\tPNRHH\tAGE\tGEN\tREL\tEMPL\tSCH\n"));
 			int personNumber = 1;
 			for(Id personId : population.getPersons().keySet()){
 				

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southafrica.population.facilities;
+package playground.southafrica.projects.iatbr2012;
 
 import java.util.ArrayList;
 import java.util.HashMap;

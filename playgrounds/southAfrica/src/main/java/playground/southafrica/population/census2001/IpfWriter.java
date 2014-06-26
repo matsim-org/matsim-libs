@@ -34,9 +34,9 @@ public class IpfWriter {
 		cr.parse(inputFolder);
 		Population population = cr.getScenario().getPopulation();
 		LOG.info("Number of people in population: " + population.getPersons().size());
-		ObjectAttributes personAttributes = cr.getPersonAttributes();
-		Households households = cr.getHouseholds();
-		ObjectAttributes householdAttributes = cr.getHouseholdAttributes();
+		ObjectAttributes personAttributes = cr.getScenario().getPopulation().getPersonAttributes();
+		Households households = cr.getScenario().getHouseholds();
+		ObjectAttributes householdAttributes = cr.getScenario().getHouseholds().getHouseholdAttributes();
 		
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
 		try{

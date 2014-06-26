@@ -28,8 +28,8 @@ import org.apache.log4j.Logger;
 /**
  * Class to convert monetary values using the Consumer Price Index (CPI)
  * using the average year-on-year rates as provided by Statistics South 
- * Africa.
- * @author johanwjoubert
+ * Africa. Source: <a href=http://beta2.statssa.gov.za/?page_id=1854&PPN=P0141>CPI History - 1960 Onwards</a>
+ * @author jwjoubert
  */
 public class SouthAfricaInflationCorrector {
 	private final static Logger LOG = Logger.getLogger(SouthAfricaInflationCorrector.class);
@@ -37,37 +37,39 @@ public class SouthAfricaInflationCorrector {
 
 	private static void populateInflationMap(){
 		inflationMap = new TreeMap<Integer, Double>();
-		inflationMap.put(1981, 0.0);
-		inflationMap.put(1982, 0.141);
+		inflationMap.put(1981, 0.152);
+		inflationMap.put(1982, 0.147);
 		inflationMap.put(1983, 0.124);
-		inflationMap.put(1984, 0.120);
+		inflationMap.put(1984, 0.116);
 		inflationMap.put(1985, 0.161);
-		inflationMap.put(1986, 0.192);
-		inflationMap.put(1987, 0.151);
-		inflationMap.put(1988, 0.128);
-		inflationMap.put(1989, 0.149);
-		inflationMap.put(1990, 0.142);
-		inflationMap.put(1991, 0.155);
-		inflationMap.put(1992, 0.137);
-		inflationMap.put(1993, 0.098);
-		inflationMap.put(1994, 0.092);
-		inflationMap.put(1995, 0.086);
-		inflationMap.put(1996, 0.073);
+		inflationMap.put(1986, 0.187);
+		inflationMap.put(1987, 0.161);
+		inflationMap.put(1988, 0.129);
+		inflationMap.put(1989, 0.147);
+		inflationMap.put(1990, 0.144);
+		inflationMap.put(1991, 0.153);
+		inflationMap.put(1992, 0.139);
+		inflationMap.put(1993, 0.097);
+		inflationMap.put(1994, 0.090);
+		inflationMap.put(1995, 0.087);
+		inflationMap.put(1996, 0.074);
 		inflationMap.put(1997, 0.086);
-		inflationMap.put(1998, 0.068);
+		inflationMap.put(1998, 0.069);
 		inflationMap.put(1999, 0.051);
-		inflationMap.put(2000, 0.054);
-		inflationMap.put(2001, 0.058);
-		inflationMap.put(2002, 0.091);
+		inflationMap.put(2000, 0.053);
+		inflationMap.put(2001, 0.057);
+		inflationMap.put(2002, 0.092);
 		inflationMap.put(2003, 0.058);
 		inflationMap.put(2004, 0.014);
 		inflationMap.put(2005, 0.034);
-		inflationMap.put(2006, 0.046);
-		inflationMap.put(2007, 0.072);
+		inflationMap.put(2006, 0.047);
+		inflationMap.put(2007, 0.071);
 		inflationMap.put(2008, 0.115);
 		inflationMap.put(2009, 0.071);
 		inflationMap.put(2010, 0.043);
 		inflationMap.put(2011, 0.050);
+		inflationMap.put(2012, 0.056);
+		inflationMap.put(2013, 0.057);
 	}
 	
 	/**

@@ -165,7 +165,7 @@ public enum School2011 {
 	 * @param code
 	 * @return
 	 */
-	public static School2011 getRelationship(int code){
+	public static School2011 getSchool(int code){
 		switch (code) {
 		case 0:
 			return None;

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southafrica.population.utilities;
+package playground.southafrica.population.nmbmTravelSurvey;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,11 +36,10 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -49,32 +48,34 @@ import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.households.Income;
-import org.matsim.households.Income.IncomePeriod;
-import org.matsim.households.IncomeImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
+import playground.southafrica.population.nmbmTravelSurvey.containers.IncomeTravelSurvey2004;
 import playground.southafrica.utilities.Header;
 import playground.southafrica.utilities.containers.MyZone;
 import playground.southafrica.utilities.gis.MyMultiFeatureReader;
 
+/**
+ * Class to parse the Travel Survey of 2004 for Nelson Mandela Bay into a 
+ * MATSim population of households and persons.
+ * 
+ * @author jwjoubert
+ */
 public class NmbmSurveyParser {
 	private final static Logger LOG = Logger.getLogger(NmbmSurveyParser.class);
 	private Scenario sc;
-	private Households households;
 	private MyMultiFeatureReader zones;
-	private ObjectAttributes householdAttributes;
-	private ObjectAttributes personAttributes;
 	private Map<Id, Integer> locationlessPersons;
 	private Map<String, Integer> locationlessType;
 	private boolean removeNullLocationPersons = true;
-	private QuadTree<Coord> spot5QT;
 
 	/**
 	 * Creates a MATSim population from the 2004 travel survey done for Nelson 
 	 * Mandela Bay Metropolitan (NMBM).
 	 * @param args the following arguments are required:
 	 * <ol>
+	 * 	<li> the shapefile describing the zones used in travel survey;
 	 * 	<li> the household data file extracted from the MySQL database;
 	 * 	<li> the individual travel/trip file extracted from the database; and
 	 * 	<li> the output folder where to write the population files to. 
@@ -91,14 +92,12 @@ public class NmbmSurveyParser {
 		nsp.writeHouseholds(args[3]);
 		nsp.writePopulation(args[3]);
 		
-		/*TODO update JavaDoc */
-		String sacscFile = args[4];
-		
 		Header.printFooter();
 	}
 
 	public NmbmSurveyParser() {
 		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		((ScenarioImpl)sc).createHouseholdsContainer();
 		this.locationlessPersons = new HashMap<Id, Integer>();
 		this.locationlessType = new HashMap<String, Integer>();
 	}
@@ -119,8 +118,6 @@ public class NmbmSurveyParser {
 	 * @param filename
 	 */
 	public void parseHousehold(String filename){
-		this.households = new HouseholdsImpl();
-		this.householdAttributes = new ObjectAttributes();
 		Counter counter = new Counter("  households # ");
 		
 		BufferedReader br = IOUtils.getBufferedReader(filename);
@@ -135,24 +132,20 @@ public class NmbmSurveyParser {
 				Integer numberOfPeople = Integer.parseInt(sa[4]);
 				Integer cars = Integer.parseInt(sa[5]);
 				
-				Double inc = this.getIncome(Integer.parseInt(sa[6]));
-				Income income = null;
-				if(inc != null){
-					income = new IncomeImpl(inc, IncomePeriod.month);
-				}
+				Income income = IncomeTravelSurvey2004.getIncome(IncomeTravelSurvey2004.parseIncomeFromSurveyCode(sa[6]));
 				
 				/* Create the household. */
 				Id id = new IdImpl(String.format("%03d%03d", enu, hhNo));
-				Household hh = this.households.getFactory().createHousehold(id);
+				Household hh = sc.getHouseholds().getFactory().createHousehold(id);
 				hh.setIncome(income);
 				
 				/* Add the household attributes. */
-				this.householdAttributes.putAttribute(id.toString(), "zone", zone);
-				this.householdAttributes.putAttribute(id.toString(), "subzone", subzone);
-				this.householdAttributes.putAttribute(id.toString(), "noOfPeopleInterviewed", numberOfPeople);
-				this.householdAttributes.putAttribute(id.toString(), "numberOfVehicles", cars);
+				sc.getHouseholds().getHouseholdAttributes().putAttribute(id.toString(), "zone", zone);
+				sc.getHouseholds().getHouseholdAttributes().putAttribute(id.toString(), "subzone", subzone);
+				sc.getHouseholds().getHouseholdAttributes().putAttribute(id.toString(), "noOfPeopleInterviewed", numberOfPeople);
+				sc.getHouseholds().getHouseholdAttributes().putAttribute(id.toString(), "numberOfVehicles", cars);
 				
-				this.households.getHouseholds().put(id, hh);
+				sc.getHouseholds().getHouseholds().put(id, hh);
 				counter.incCounter();
 			}
 		} catch (IOException e) {
@@ -192,7 +185,6 @@ public class NmbmSurveyParser {
 	public void parseIndividual(String filename){
 		Population population = this.sc.getPopulation();
 		population.setName("Nelson Mandela 2004 travel survey population");
-		this.personAttributes = new ObjectAttributes();
 		
 		BufferedReader br = IOUtils.getBufferedReader(filename);
 		PersonImpl person = null;
@@ -208,13 +200,16 @@ public class NmbmSurveyParser {
 				int age = Integer.parseInt(sa[4]);
 				boolean isEmployed = this.isEmployed(Integer.parseInt(sa[5]));
 				
-				
 				String hasCar = sa[6].equalsIgnoreCase("Yes") ? "always" : "never";
 				int legNumber = Integer.parseInt(sa[7]);
 				String activityTypeOrigin = getActivityTypeFromCode(Integer.parseInt(sa[8]));
 				String activityTypeDestination = getActivityTypeFromCode(Integer.parseInt(sa[9]));
 				
-				/* Parse the trip start and end time, in seconds from midnight. */
+				/* Parse the trip start and end time, in seconds from midnight.
+				 * FIXME From the raw data it seems this is measured in 
+				 * standard Unix time, and does NOT cater for time zone offset.
+				 * Alternatively, it is just the date that is wrong, hence 
+				 * showing 1899-12-30 throughout. (JWJ, June 2014) */
 				int startTime;
 				int endTime;
 				try{
@@ -233,7 +228,8 @@ public class NmbmSurveyParser {
 				Id personId = new IdImpl(String.format("%03d%03d%03d", enu, hhn, hhPerson));
 				
 				/* ========== Perform some validation. ==========*/
-				/* Warn if kids are working. Change status to unemployed. */
+				/* Warn if kids are working. Change status to unemployed. The 
+				 * message is given for EACH work activity in the chain. */
 				if(age < 12 && isEmployed){
 					LOG.warn("Person " + personId.toString() + " is a minor and working. Changing employment status to unemployed.");
 					isEmployed = false;
@@ -246,14 +242,6 @@ public class NmbmSurveyParser {
 					activityTypeDestination = "w";
 				}
 				
-				/* Identify type of centre. */
-				if(activityTypeOrigin.equalsIgnoreCase("s")){
-					String shopClass = getShopClass(coordFrom);					
-				}
-				
-
-				
-
 				/* Process person if it doesn't yet exist TODO This must be fixed - should not occur. */
 				if(!population.getPersons().containsKey(personId)){
 					if(legNumber == 1){
@@ -263,10 +251,13 @@ public class NmbmSurveyParser {
 							
 							/* Add person to household. */
 							Id hhId = new IdImpl(String.format("%03d%03d", enu, hhn));
-							if(!households.getHouseholds().containsKey(hhId)){
+							if(!sc.getHouseholds().getHouseholds().containsKey(hhId)){
 								LOG.error("Could not find the household " + hhId.toString());
 							}
-							households.getHouseholds().get(hhId).getMemberIds().add(personId);
+							sc.getHouseholds().getHouseholds().get(hhId).getMemberIds().add(personId);
+							
+							/* Link person to household. */
+							population.getPersonAttributes().putAttribute(person.getId().toString(), "householdId", hhId.toString());
 						}
 						
 						/* Create new person. */
@@ -345,6 +336,8 @@ public class NmbmSurveyParser {
 					Activity act = population.getFactory().createActivityFromCoord(activityTypeDestination, coordTo);
 					act.setStartTime(endTime);
 					plan.addActivity(act);
+				} else{
+					LOG.error("This should not occur: a person that doesn't exist in the population.");
 				}
 			}
 		} catch (IOException e) {
@@ -365,38 +358,30 @@ public class NmbmSurveyParser {
 			LOG.info("   " + s + ": " + locationlessType.get(s));
 		}
 		
-		LOG.info("Removing persons with location-less activities from population and households...");
-		LOG.info("  original population size: " + population.getPersons().size());
-		int cleaned = 0;
-		for(Id id : locationlessPersons.keySet()){
-			/* Clean population. */
-			population.getPersons().remove(id);
-			cleaned++;
-			
-			/* Clean population attributes. */
-			this.personAttributes.removeAllAttributes(id.toString());
-			
-			/* Clean households. */
-			for(Id hhid : this.households.getHouseholds().keySet()){
-				List<Id> memberIds = this.households.getHouseholds().get(hhid).getMemberIds();
-				if(memberIds.contains(id)){
-					memberIds.remove(id);
+		if(removeNullLocationPersons){
+			LOG.info("Removing persons with location-less activities from population and households...");
+			LOG.info("  original population size: " + population.getPersons().size());
+			int cleaned = 0;
+			for(Id id : locationlessPersons.keySet()){
+				/* Clean population. */
+				population.getPersons().remove(id);
+				cleaned++;
+				
+				/* Clean population attributes. */
+				sc.getPopulation().getPersonAttributes().removeAllAttributes(id.toString());
+				
+				/* Clean households. */
+				for(Id hhid : sc.getHouseholds().getHouseholds().keySet()){
+					List<Id> memberIds = sc.getHouseholds().getHouseholds().get(hhid).getMemberIds();
+					if(memberIds.contains(id)){
+						memberIds.remove(id);
+					}
 				}
 			}
+			LOG.info("  new population size: " + population.getPersons().size() + " (" + cleaned + " removed)");
 		}
-		LOG.info("  new population size: " + population.getPersons().size() + " (" + cleaned + " removed)");
-		
-		
 	}
-	
-	
-	private String getShopClass(Coord coord){
-		String type = "";
 		
-		
-		return type;
-	}
-	
 	
 	/**
 	 * Selects a random point inside a 5km radius around the previous activity 
@@ -416,6 +401,7 @@ public class NmbmSurveyParser {
 		
 		return new CoordImpl(newX, newY);
 	}
+	
 	
 	/**
 	 * Selects a random point inside a 1000m radius around the previous activity 
@@ -437,23 +423,21 @@ public class NmbmSurveyParser {
 	}
 
 
-
-
 	/**
  	 * Writes the households and their attributes to file.
 	 * @param outputfolder
 	 */
 	public void writeHouseholds(String outputfolder){
-		if(this.households == null || this.householdAttributes == null){
+		if(sc.getHouseholds() == null || sc.getHouseholds().getHouseholdAttributes() == null){
 			LOG.error("Either no households or household attributes to write.");
 		} else{
 			LOG.info("Writing households to file.");
-			HouseholdsWriterV10 hw = new HouseholdsWriterV10(households);
+			HouseholdsWriterV10 hw = new HouseholdsWriterV10(sc.getHouseholds());
 			hw.setPrettyPrint(true);
 			hw.writeFile(outputfolder + "Households.xml");
 
 			LOG.info("Writing household attributes to file.");
-			ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(householdAttributes);
+			ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(sc.getHouseholds().getHouseholdAttributes());
 			oaw.setPrettyPrint(true);
 			oaw.writeFile(outputfolder + "HouseholdAttributes.xml");
 		}
@@ -465,45 +449,20 @@ public class NmbmSurveyParser {
 	 * @param outputfolder
 	 */
 	public void writePopulation(String outputfolder){
-		if(this.sc.getPopulation().getPersons().size() == 0 || this.personAttributes == null){
-			LOG.error("Either no persons or person attributes to write.");
+		if(this.sc.getPopulation().getPersons().size() == 0){
+			LOG.error("No persons or person attributes to write.");
 		} else{
 			LOG.info("Writing population to file.");
-			PopulationWriter pw = new PopulationWriter(this.sc.getPopulation(), this.sc.getNetwork());
+			PopulationWriter pw = new PopulationWriter(sc.getPopulation(), sc.getNetwork());
 			pw.writeV5(outputfolder + "Population.xml");
 
 			LOG.info("Writing person attributes to file.");
-			ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(this.personAttributes);
+			ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes());
 			oaw.setPrettyPrint(true);
 			oaw.writeFile(outputfolder + "PersonAttributes.xml");
 		}
 	}
 
-	private Double getIncome(int code){
-		Double income = null;
-		switch (code) {
-		/* If not specified, then the income remains null. */
-		case 1:
-			income = 0.0; break;
-		case 2:
-			income = (1.0 + 500.0)/2; break;
-		case 3:
-			income = (501.0 + 1500.0)/2; break;
-		case 4:
-			income = (1501.0 + 3500.0)/2; break;
-		case 5:
-			income = (3501.0 + 6000.0)/2; break;
-		case 6:
-			income = (6001.0 + 11000.0)/2; break;
-		case 7:
-			income = (11001.0 + 30000.0)/2; break;
-		case 8:
-			income = (30001.0 + 60000.0)/2; break;
-		default:
-			break;
-		}
-		return income;
-	}
 	
 	private String getMode(int code){
 		String mode = null;
@@ -635,36 +594,6 @@ public class NmbmSurveyParser {
 			throw new RuntimeException("Could not parse shapefile.");
 		}
 	}
-	
-	/**
-	 * Building a {@link QuadTree} from the Spot 5 satellite image facilities.
-	 * @param filename
-	 * @return
-	 */
-	private QuadTree<Coord> buildSpot5QuadTree(String filename){
 
-		/* READ THE SPOT Facilities */
-		MyMultiFeatureReader mfr = new MyMultiFeatureReader();
-		List<Coord> spot5Coords = mfr.readCoords(filename);
-		LOG.info("Number of Spot 5 facilities: " + spot5Coords.size());
-		
-		double xMin = Double.POSITIVE_INFINITY;
-		double xMax = Double.NEGATIVE_INFINITY;
-		double yMin = Double.POSITIVE_INFINITY;
-		double yMax = Double.NEGATIVE_INFINITY;
-		for(Coord c : spot5Coords){
-			xMin = Math.min(xMin, c.getX());
-			xMax = Math.max(xMax, c.getX());
-			yMin = Math.min(yMin, c.getY());
-			yMax = Math.max(yMax, c.getY());
-		}
-		QuadTree<Coord> qt = new QuadTree<Coord>(xMin, yMin, xMax, yMax);
-		for(Coord c : spot5Coords){
-			qt.put(c.getX(), c.getY(), c);
-		}		
-		return qt;
-	}
-
-	
 }
 
