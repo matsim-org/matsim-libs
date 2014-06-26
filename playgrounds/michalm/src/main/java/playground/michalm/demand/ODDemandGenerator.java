@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.matrices.*;
 
 import pl.poznan.put.util.random.*;
@@ -58,9 +59,13 @@ public class ODDemandGenerator
         pf = scenario.getPopulation().getFactory();
     }
 
+    public void generateSinglePeriod(Matrix matrix, String fromActivityType, String toActivityType,
+            String mode, double startTime, double duration, double flowCoeff){
+        generateSinglePeriod(matrix, fromActivityType, toActivityType, mode, startTime, duration, flowCoeff, false);
+    }
 
     public void generateSinglePeriod(Matrix matrix, String fromActivityType, String toActivityType,
-            String mode, double startTime, double duration, double flowCoeff)//TransportMode.car
+            String mode, double startTime, double duration, double flowCoeff, boolean addFakeRoute)//TransportMode.car
     {
         Iterable<Entry> entryIter = MatrixUtils.createEntryIterable(matrix);
 
@@ -76,12 +81,18 @@ public class ODDemandGenerator
                 Activity startAct = activityCreator.createActivity(fromZone, fromActivityType);
                 startAct.setEndTime((int)uniform.nextDouble(startTime, startTime + duration));
                 plan.addActivity(startAct);
-
+                Activity endAct =activityCreator.createActivity(toZone, toActivityType);
                 // leg
-                plan.addLeg(pf.createLeg(mode));
+                Leg leg = pf.createLeg(mode);
+                if (addFakeRoute){
+                    Route r = new GenericRouteImpl(startAct.getLinkId(), endAct.getLinkId());
+                    leg.setRoute(r);
+                }
+                    
+                plan.addLeg(leg);
 
                 // act1
-                plan.addActivity(activityCreator.createActivity(toZone, toActivityType));
+                plan.addActivity(endAct);
 
                 Person person = personCreator.createPerson(plan, fromZone, toZone);
                 person.addPlan(plan);

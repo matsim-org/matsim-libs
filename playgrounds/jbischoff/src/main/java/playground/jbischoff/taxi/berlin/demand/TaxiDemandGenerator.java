@@ -41,11 +41,12 @@ import playground.michalm.zone.Zones;
 
 public class TaxiDemandGenerator
 {
-    private static final String NETWORKFILE = "C:/local_jb/data/scenarios/2014_05_basic_scenario_v3/berlin_brb.xml";
-    private static final String ZONESSHP = "C:/local_jb/data/OD/shp_merged/zones.shp";
-    private static final String ZONESXML = "C:/local_jb/data/OD/shp_merged/zones.xml";
-    private static final String ODMATRIX = "C:/local_jb/data/OD/OD_2013/demandMatrices.xml";
-    private static final String PLANSFILE = "C:/local_jb/data/scenarios/2014_05_basic_scenario_v3/plans4to3.xml";
+    private static final String DATADIR = "C:/local_jb/data/";
+    private static final String NETWORKFILE = DATADIR+"scenarios/2014_05_basic_scenario_v3/berlin_brb.xml";
+    private static final String ZONESSHP = DATADIR+"/shp_merged/zones.shp";
+    private static final String ZONESXML = DATADIR+"/shp_merged/zones.xml";
+    private static final String ODMATRIX = DATADIR+"taxi_berlin/2013/OD/demandMatrices.xml";
+    private static final String PLANSFILE = DATADIR+"scenarios/2014_05_basic_scenario_v3/plans4to3.xml";
     private ODDemandGenerator odd;
     private Map<Id, Zone> zones;
     private Scenario scenario;
@@ -75,7 +76,7 @@ public class TaxiDemandGenerator
         do {
             Matrix matrix = this.matrices.getMatrix(currentHr);
             double startTime = getHour(currentHr)*3600;
-            odd.generateSinglePeriod(matrix, "departure", "arrival", "taxi", startTime, 3600, 1.0);
+            odd.generateSinglePeriod(matrix, "departure", "arrival", "taxi", startTime, 3600, 1.0, true);
             currentHr = getNextTimeString(currentHr);
         }
         
