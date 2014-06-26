@@ -48,7 +48,7 @@ public class IpfWriter2011 {
 				
 				Id householdId = new IdImpl(personId.toString().split("_")[0]);
 
-				/* Only add the person if the income class is known. */
+				/* Only add the person if the household income class is known. */
 				Income2011 income = Income2011.getIncomeEnum(households.getHouseholds().get(householdId).getIncome());
 
 				if(income != Income2011.Unspecified && income != Income2011.NotApplicable){
