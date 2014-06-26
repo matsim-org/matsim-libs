@@ -37,6 +37,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.omg.CORBA.portable.RemarshalException;
 
 import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
 import playground.vsp.bvwp.MultiDimensionalArray.DemandSegment;
@@ -50,10 +51,7 @@ public class IVVReaderV2 {
 
 	private static final Logger log = Logger.getLogger(IVVReaderV2.class);
 	private IVVReaderConfigGroup config;
-	
-//	static final double BESETZUNGSGRAD_PV_PRIVAT = 1.67; // Sonntag 2.1 sonst Woche 	1.6 gemaess BVWP Methodik 2003
-//	static final double BESETZUNGSGRAD_PV_GESCHAEFT = 1.4;
-	
+
 	static final double BAHNPREISPROKM = 0.12; //Expertenmeinung 10 bis 12 Cent Einnahme je KM
 	static final double WERKTAGEPROJAHR = 250;
 	Map<String,Double> diffs = new HashMap<String,Double>();
@@ -87,6 +85,9 @@ public class IVVReaderV2 {
 		read(config.getDemandMatrixFile(), new DemandHandler(nullfallData, odRelations));
 		log.info("Filled with "+nullfallData.getAllRelations().size() + " Od-Relations");
 		
+		
+		
+		
 		log.info("Reading Reseizeitmatrix Nullfall (06, 18): " +config.getTravelTimesBaseMatrixFile());
 		TravelTimeHandler tth =  new TravelTimeHandler(nullfallData,odRelations,true);
 		read(config.getTravelTimesBaseMatrixFile(),tth);
@@ -95,12 +96,16 @@ public class IVVReaderV2 {
 		log.info("Duplicating Nullfall");
 		ScenarioForEvalData planfallData = nullfallData.createDeepCopy();
 
+	    log.info("Reading Verbleibend (01)) "+ config.getNewDemandMatrixFile());
+	        read(config.getRemainingDemandMatrixFile(), new DemandRemainingHandler(odRelations, planfallData));
+		
 		
 		log.info("Reading Reseizeitmatrix Planfall (07): " +config.getTravelTimesStudyMatrixFile());
 		TravelTimeHandler plantt = new TravelTimeHandler(planfallData, odRelations, false);
 		read(config.getTravelTimesStudyMatrixFile(), plantt );
 		log.info("Read "+plantt.getCount()+" relations");
 
+		
 		
 		log.info("Reading Cost Of Production & Operations' file (10-11,12-13,14-15 Sammelfile Nullfall&Planfall ): "+config.getImpedanceMatrixFile() );
 		read(config.getImpedanceMatrixFile(), new CostHandler(nullfallData, planfallData));
@@ -336,16 +341,18 @@ public class IVVReaderV2 {
 		}
 	}
 	
-	@SuppressWarnings("unused")
 	private static class DemandRemainingHandler implements TabularFileHandler{
 
 		private ScenarioForEvalData data;
+        private final List<Id> odRelations;
 
 		/**
 		 * @param data
 		 */
-		public DemandRemainingHandler(ScenarioForEvalData data) {
+		public DemandRemainingHandler(List<Id> odRelations, ScenarioForEvalData data) {
 			this.data = data;
+	        this.odRelations = odRelations;
+
 		}
 
 		@Override
@@ -354,12 +361,14 @@ public class IVVReaderV2 {
 
 			String from = row[0].trim();
 			String to = row[1].trim();
-			setValuesForODRelation(getODId(from, to), Key.makeKey(Mode.Strasse, DemandSegment.PV_BERUF, Attribute.XX),  Double.parseDouble(row[2]),	data);
-			setValuesForODRelation(getODId(from, to), Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.XX),  Double.parseDouble(row[3]),	data);
-			setValuesForODRelation(getODId(from, to), Key.makeKey(Mode.Strasse, DemandSegment.PV_EINKAUF, Attribute.XX),  Double.parseDouble(row[4]),	data);
-			setValuesForODRelation(getODId(from, to), Key.makeKey(Mode.Strasse, DemandSegment.PV_URLAUB, Attribute.XX),  Double.parseDouble(row[5]),	data);
-			setValuesForODRelation(getODId(from, to), Key.makeKey(Mode.Strasse, DemandSegment.PV_SONST, Attribute.XX),  Double.parseDouble(row[6]),	data);
-
+			Id odId = getODId(from, to);
+			if (this.odRelations.contains(odId)){
+            setValuesForODRelation(odId, Key.makeKey(Mode.Strasse, DemandSegment.PV_BERUF, Attribute.XX),  Double.parseDouble(row[2]),	data);
+			setValuesForODRelation(odId, Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.XX),  Double.parseDouble(row[3]),	data);
+			setValuesForODRelation(odId, Key.makeKey(Mode.Strasse, DemandSegment.PV_EINKAUF, Attribute.XX),  Double.parseDouble(row[4]),	data);
+			setValuesForODRelation(odId, Key.makeKey(Mode.Strasse, DemandSegment.PV_URLAUB, Attribute.XX),  Double.parseDouble(row[5]),	data);
+			setValuesForODRelation(odId, Key.makeKey(Mode.Strasse, DemandSegment.PV_SONST, Attribute.XX),  Double.parseDouble(row[6]),	data);
+			 }
 
 		}
 	
