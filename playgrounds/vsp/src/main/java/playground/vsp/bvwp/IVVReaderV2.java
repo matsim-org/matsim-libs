@@ -75,73 +75,6 @@ public class IVVReaderV2 {
 	}
 	
 	void read(){
-
-		
-//	// read(config.getRemainingDemandMatrixFile(), new DemandRemainingHandler(data));
-//	// Dopplung: Entweder 00 - oder verbleibend-Matrix einlesen, 00 macht Aussagen zum Geschäftsreiseverkehr, die verbleibend Matrix nicht...
-
-//		ScenarioForEvalData nullfallData = new ScenarioForEvalData();
-//		ScenarioForEvalData planfallData = new ScenarioForEvalData();
-//		log.info("Reading Cost Of Production & Operations' file (10-11,12-13,14-15 Sammelfile Nullfall&Planfall ): "+config.getImpedanceMatrixFile() );
-//		read(config.getImpedanceMatrixFile(), new CostHandler(nullfallData, planfallData));
-//		log.info("Validating Nullfall:");
-//		checkCosts(nullfallData);
-//		log.info("Validating Planfall:");
-//		checkCosts(planfallData);
-		
-//		Map<Id,List<Id>> allOdRelations = new HashMap<Id,List<Id>>();
-	
-//		Set<Id> allFromIds = new HashSet<Id>();
-//		log.info("Reading all From Ids using Production & Operations' file : "+config.getImpedanceMatrixFile() );
-//		read(config.getImpedanceMatrixFile(), new AllFromIdsFromImpendanceFileHandler(allFromIds));
-//		log.info("Found  "+allFromIds.size() +" From Ids");
-//		int no = 0;
-//		for (Id currentId : allFromIds){
-//			no++;
-//			log.info("Handling from Id: "+currentId);
-//			log.info("Relation "+no);
-//			List<Id> odRelations = new ArrayList<Id>();
-//			log.info("Creating Index using Production & Operations' file : "+config.getImpedanceMatrixFile() );
-//			read(config.getImpedanceMatrixFile(),new GetToIdsForFromIdsFromImpFileHandler(currentId, odRelations ));
-//			log.info("Handling  "+odRelations.size() +" OD-Relations");
-//			ScenarioForEvalData nullfallData = new ScenarioForEvalData();
-//			log.info("Reading demand file (00-Matrix): "+config.getDemandMatrixFile() );
-//			read(config.getDemandMatrixFile(), new DemandHandler(nullfallData, odRelations));
-//			log.info("Filled with "+nullfallData.getAllRelations().size() + " Od-Relations");
-//			
-//			log.info("Reading Reseizeitmatrix Nullfall (06, 18): " +config.getTravelTimesBaseMatrixFile());
-//			TravelTimeHandler tth =  new TravelTimeHandler(nullfallData,odRelations,true);
-//			read(config.getTravelTimesBaseMatrixFile(),tth);
-//			log.info("Read "+tth.getCount()+" relations");
-//			
-//			log.info("Duplicating Nullfall");
-//			ScenarioForEvalData planfallData = nullfallData.createDeepCopy();
-//
-//			
-//			log.info("Reading Reseizeitmatrix Planfall (07): " +config.getTravelTimesStudyMatrixFile());
-//			TravelTimeHandler plantt = new TravelTimeHandler(planfallData, odRelations, false);
-//			read(config.getTravelTimesStudyMatrixFile(), plantt );
-//			log.info("Read "+plantt.getCount()+" relations");
-//
-//				
-//			log.info("Reading Cost Of Production & Operations' file (10-11,12-13,14-15 Sammelfile Nullfall&Planfall ): "+config.getImpedanceMatrixFile() );
-//			read(config.getImpedanceMatrixFile(), new CostForSomeIdsHandler(odRelations, nullfallData, planfallData));
-//			
-//			log.info("Reading Neuentstehend,induziert (02/03) "+ config.getNewDemandMatrixFile());
-//			read(config.getNewDemandMatrixFile(), new DemandNewOrDroppedHandler(odRelations, planfallData));
-//			
-//			
-//			log.info("Reading Entfallend (04) "+ config.getDroppedDemandMatrixFile());
-//			read(config.getDroppedDemandMatrixFile(), new DemandNewOrDroppedHandler(odRelations, planfallData));
-//			
-//			log.info("Reading Verlagert (16-17): " +config.getImpedanceShiftedMatrixFile());
-//			read(config.getImpedanceShiftedMatrixFile(), new ImpedanceShiftedHandler(odRelations, planfallData , nullfallData));
-//			
-//			runBVWP2015(nullfallData, planfallData, currentId.toString());
-//
-//		}
-		
-		
 		List<Id> odRelations = new ArrayList<Id>();
 		log.info("Creating Index using Production & Operations' file : "+config.getImpedanceMatrixFile() );
 		read(config.getImpedanceMatrixFile(), new IndexFromImpendanceFileHandler(odRelations));
@@ -508,65 +441,24 @@ public class IVVReaderV2 {
 			String from = row[0].trim();
 			String to = row[1].trim();
 			Id odId = getODId(from, to);
-//                for (DemandSegment ds : DemandSegment.values()){
-//                    if (ds.equals(DemandSegment.GV)) continue;
-//                    if (ds.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
-//					    
-//				    double bsNullfall = getBesetzungsgrad(nullfalldata, ds, odId);
-//				    double bsPlanfall = getBesetzungsgrad(planfalldata, ds, odId);
-//				    double produktionskostenNullfall;
-//				    double nutzerkostenNullfall;
-//				    double fixkostenNullfall;
-//				    
-//				    double produktionskostenPlanfall;
-//                    double nutzerkostenPlanfall;
-//                    double fixkostenPlanfall;
-//				    
-//				    if (ds.equals(DemandSegment.PV_COMMERCIAL)){
-//				         produktionskostenNullfall = Double.parseDouble(row[6]); //pro FAHRT
-//				         nutzerkostenNullfall =  Double.parseDouble(row[this.tableLookUp.get(ds)]); //pro PERSON
-//				         fixkostenNullfall = produktionskostenNullfall - (nutzerkostenNullfall*bsNullfall); //pro FAHRT
-//				         
-//				         nutzerkostenNullfall += fixkostenNullfall/bsNullfall; //pro PERSON
-//				         
-//				         
-//				         produktionskostenPlanfall = Double.parseDouble(row[7]); //pro FAHRT
-//                         nutzerkostenPlanfall =  Double.parseDouble(row[this.tableLookUp.get(ds)+6]); //pro PERSON
-//                         fixkostenPlanfall = produktionskostenPlanfall - (nutzerkostenPlanfall*bsPlanfall); //pro FAHRT
-//                         
-//                         nutzerkostenPlanfall += fixkostenPlanfall/bsPlanfall; //pro PERSON
-//                         
-//				         
-//				    }
-//				    else{
-//                        produktionskostenNullfall = Double.parseDouble(row[6]); //pro FAHRT
-//                        nutzerkostenNullfall =  Double.parseDouble(row[this.tableLookUp.get(ds)]); //pro PERSON
-//                        fixkostenNullfall = produktionskostenNullfall - (nutzerkostenNullfall*bsNullfall);
-//                        
-//                        produktionskostenNullfall -= fixkostenNullfall;
-//                        
-//                        produktionskostenPlanfall = Double.parseDouble(row[7]); //pro FAHRT
-//                        nutzerkostenPlanfall =  Double.parseDouble(row[this.tableLookUp.get(ds)+6]); //pro PERSON
-//                        fixkostenPlanfall = produktionskostenPlanfall - (nutzerkostenPlanfall*bsPlanfall);
-//                        
-//                        produktionskostenPlanfall -= fixkostenPlanfall; //pro FAHRT
-//				        
-//				        
-//				    }
-//				    produktionskostenNullfall = produktionskostenNullfall / bsNullfall;
-//				    produktionskostenPlanfall = produktionskostenPlanfall / bsPlanfall;
-//				    
-//				    
-//					setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, ds, Attribute.Produktionskosten_Eu), produktionskostenNullfall, nullfalldata);
-//					setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, ds, Attribute.Produktionskosten_Eu), produktionskostenPlanfall, planfalldata);
-//					
-//					setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, ds, Attribute.Nutzerkosten_Eu), nutzerkostenNullfall, nullfalldata);
-//                    setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, ds, Attribute.Nutzerkosten_Eu), nutzerkostenPlanfall, planfalldata);
-//			
+
+			
+			// VARIANTE EINS
+//	          for (DemandSegment dds : DemandSegment.values()){
+//	              if (dds.equals(DemandSegment.GV)) continue;
+//	              if (dds.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
+//	              double bsNullfall = getBesetzungsgrad(nullfalldata, dds, odId);
+//	              double bsPlanfall = getBesetzungsgrad(planfalldata, dds, odId);
+//	              setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, dds, Attribute.Produktionskosten_Eu), Double.parseDouble(row[6])/bsNullfall, nullfalldata);
+//	              setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, dds, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[this.tableLookUp.get(dds)]), nullfalldata);
 //
-//  
-//					
-//				}
+//	              setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, dds, Attribute.Produktionskosten_Eu), Double.parseDouble(row[7])/bsPlanfall, planfalldata);
+//	              setValuesForODRelation(odId,Key.makeKey(Mode.Strasse, dds, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[this.tableLookUp.get(dds)+6]), planfalldata);
+//	              
+//	              
+//
+//	          }
+//			
 			// VARIANTE ZWEI
           for (DemandSegment dds : DemandSegment.values()){
               if (dds.equals(DemandSegment.GV)) continue;
