@@ -112,10 +112,10 @@ public class FileUtils {
 			}
 			
 			/* Generate a random permutation of integers. */
-			List<Integer> permutation = RandomPermutation.getPermutation(fileList.length);
-			while(result.size() < number && !permutation.isEmpty()){
-				result.add(fileList[permutation.get(0)-1]); /* Permutation is from 1... while index is from 0... */
-				permutation.remove(0);
+			int[] permutation = RandomPermutation.getRandomPermutation(fileList.length);
+			int index = 0;
+			while(result.size() < number && index < permutation.length){
+				result.add(fileList[permutation[index++]-1]); /* Permutation is from 1... while index is from 0... */
 			}
 		} else{
 			LOG.warn("The folder contains no relevant files. A null list is returned!");

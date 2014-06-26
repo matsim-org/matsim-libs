@@ -20,29 +20,41 @@
 
 package playground.southafrica.utilities;
 
-import java.util.ArrayList;
-
 import org.matsim.core.gbl.MatsimRandom;
 
+/**
+ * Class to generate a random permutation of integers.
+ *
+ * @author jwjoubert
+ */
 public class RandomPermutation {
 
 	protected RandomPermutation() {
 	}
 	
-	public static ArrayList<Integer> getPermutation(int size){
-		MatsimRandom.reset((long) (Math.random()*1000));
-		ArrayList<Integer> unused = new ArrayList<Integer>();
-		for(int i = 0; i < size; i++){
-			unused.add(Integer.valueOf(i+1));
+	/**
+	 * Implementation to get a random permutation of integers <code>1..n</code>.
+	 *  
+	 * @param n the largest integer in the permutation.
+	 * @return
+	 */
+	public static int[] getRandomPermutation(int n){
+		/* Add the sequential integers to an array. */
+		int[] a = new int[n];
+		for(int i = 0; i < n; i++){
+			a[i] = i;
 		}
-		ArrayList<Integer> solution = new ArrayList<Integer>();
-		for(int j = 0; j < size-1; j++){
-			int pos = MatsimRandom.getRandom().nextInt(unused.size());
-			solution.add(unused.get(pos));
-			unused.remove(pos);
+
+		/* Shuffle each position in the array with a random other position. */
+		int[] b = (int[])a.clone();
+		for(int c = b.length-1; c >= 0; c--){
+			int d = (int)Math.floor(MatsimRandom.getRandom().nextDouble() * (c+1));
+			int tmp = b[d];
+			b[d] = b[c];
+			b[c] = tmp;
 		}
-		solution.add(unused.get(0));		
-		return solution;
+		return b;
 	}
+
 
 }

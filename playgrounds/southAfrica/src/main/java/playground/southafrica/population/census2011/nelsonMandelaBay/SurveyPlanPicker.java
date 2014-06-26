@@ -56,6 +56,7 @@ import playground.southafrica.population.demographics.SaDemographicsIncome;
 import playground.southafrica.population.nmbmTravelSurvey.containers.IncomeTravelSurvey2004;
 import playground.southafrica.population.utilities.ComprehensivePopulationReader;
 import playground.southafrica.utilities.Header;
+import playground.southafrica.utilities.RandomPermutation;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -131,6 +132,7 @@ public class SurveyPlanPicker {
 		double[] extent = {minX, minY, maxX, maxY};
 		this.qtExtent = extent;
 	}
+	
 	
 	/**
 	 * Parses the survey population and builds QuadTrees for different 
@@ -215,7 +217,7 @@ public class SurveyPlanPicker {
 				List<Tuple<Plan, Double>> closestPlans = this.getClosestPlans(home, qt, 20);
 
 				/* Randomly pick any of the closest plans, and make a COPY of it. */
-				Tuple<Plan, Double> randomTuple = closestPlans.get(getRandomPermutation(closestPlans.size())[0]);
+				Tuple<Plan, Double> randomTuple = closestPlans.get( RandomPermutation.getRandomPermutation(closestPlans.size())[0]);
 				PlanImpl plan = new PlanImpl();
 				plan.copyFrom(randomTuple.getFirst());
 			
@@ -398,7 +400,7 @@ public class SurveyPlanPicker {
 			int triesAtCurrentHammingDistance = 0;
 			do{
 				/* Get a random permutation of the Hamming dimensions. */
-				int[] permutation = getRandomPermutation(sa.length);
+				int[] permutation = RandomPermutation.getRandomPermutation(sa.length);
 				
 				/* Make random changes. The number of changes should be the
 				 * same as the current Hamming distance. */
@@ -440,28 +442,5 @@ public class SurveyPlanPicker {
 	}
 	
 	
-	/**
-	 * Implementation to get a random permutation of integers <code>1..n</code>.
-	 *  
-	 * @param n the largest integer in the permutation.
-	 * @return
-	 */
-	private int[] getRandomPermutation(int n){
-		/* Add the sequential integers to an array. */
-		int[] a = new int[n];
-		for(int i = 0; i < n; i++){
-			a[i] = i;
-		}
-
-		/* Shuffle each position in the array with a random other position. */
-		int[] b = (int[])a.clone();
-		for(int c = b.length-1; c >= 0; c--){
-			int d = (int)Math.floor(MatsimRandom.getRandom().nextDouble() * (c+1));
-			int tmp = b[d];
-			b[d] = b[c];
-			b[c] = tmp;
-		}
-		return b;
-	}
 }
 

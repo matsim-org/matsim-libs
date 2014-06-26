@@ -44,11 +44,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
-import org.matsim.households.Households;
-import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.households.Income;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.southafrica.population.nmbmTravelSurvey.containers.IncomeTravelSurvey2004;
