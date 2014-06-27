@@ -25,6 +25,9 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.QuadTree;
 
+import playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis.AverageWalkDistanceStatsZH;
+import playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis.ParkingGroupOccupanciesZH;
+
 //TODO: move this to my playground and rename to Zurich
 public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implements ParkingModuleWithFreeFloatingCarSharing {
 
@@ -147,6 +150,7 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 	public void notifyStartup(StartupEvent event) {
 		super.notifyStartup(event);
 		getControler().getEvents().addHandler(new ParkingGroupOccupanciesZH(getControler()));
+		getControler().getEvents().addHandler(new AverageWalkDistanceStatsZH(getControler().getNetwork(),parkingInfrastructureManager.getAllParkings()));
 	}
 	
 }

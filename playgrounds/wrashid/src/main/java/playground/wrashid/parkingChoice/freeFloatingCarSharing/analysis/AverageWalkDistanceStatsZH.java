@@ -16,45 +16,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.wrashid.parkingChoice.freeFloatingCarSharing;
+package playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis;
+
+import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.PC2.analysis.ParkingGroupOccupancies;
-import org.matsim.core.controler.Controler;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.parking.PC2.analysis.AverageWalkDistanceStats;
+import org.matsim.contrib.parking.PC2.infrastructure.Parking;
 
-public class ParkingGroupOccupanciesZH extends ParkingGroupOccupancies {
-	
-	private Controler controler;
+public class AverageWalkDistanceStatsZH extends AverageWalkDistanceStats {
 
-	public ParkingGroupOccupanciesZH(){
-		reset(0);
+	public AverageWalkDistanceStatsZH(Network network, HashMap<Id, Parking> parking) {
+		super(network, parking);
 	}
-	
-	public ParkingGroupOccupanciesZH(Controler controler){
-		this.controler = controler;
-		reset(0);
+
+	@Override
+	public String getGroupName(Id parkingId) {
+		return ParkingGroupOccupanciesZH.getGroup(parkingId);
 	}
 	
 	@Override
 	public void reset(int iteration) {
 		if (iteration>0){
-			savePlot(controler.getControlerIO().getIterationFilename(iteration-1, "parkingGroupOccupancy.png"));
+			printStatistics();
 		}
 		super.reset(iteration);
-	}
-	
-	
-	@Override
-	public String getGroupName(Id parkingId) {
-		if (parkingId.toString().contains("stp")) {
-			return "streetParking";
-		} else if (parkingId.toString().contains("gp")) {
-			return "garageParking";
-		} else if (parkingId.toString().contains("publicPOutsideCity")) {
-			return "publicPOutsideCity";
-		} else {
-			return "privateParking";
-		}
 	}
 
 }

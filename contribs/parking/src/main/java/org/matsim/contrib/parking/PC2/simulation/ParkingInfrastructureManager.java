@@ -59,7 +59,6 @@ public class ParkingInfrastructureManager {
 	// TODO: later - to improve parformance, a second variable could be added,
 	// where full parking are put.
 	private QuadTree<Parking> publicParkingsQuadTree;
-	private LinkedList<PublicParking> allPublicParkings;
 	private HashMap<String, QuadTree<Parking>> publicParkingGroupQuadTrees;
 
 	// TODO: make private parking (attached to facility)
@@ -70,7 +69,7 @@ public class ParkingInfrastructureManager {
 		this.parkingScoreManager = parkingScoreManager;
 		this.eventsManager = eventsManager;
 		parkedVehicles = new HashMap<Id, Id>();
-		allParkings = new HashMap<Id, Parking>();
+		setAllParkings(new HashMap<Id, Parking>());
 		privateParkingsRestrictedToFacilities = new LinkedListValueHashMap<Id, PPRestrictedToFacilities>();
 	}
 
@@ -85,7 +84,7 @@ public class ParkingInfrastructureManager {
 			}
 			
 			allPublicParkingRect.registerCoord(parking.getCoordinate());
-			allParkings.put(parking.getId(), parking);
+			getAllParkings().put(parking.getId(), parking);
 
 			if (!groupRects.containsKey(parking.getGroupName())) {
 				groupRects.put(parking.getGroupName(), new EnclosingRectangle());
@@ -94,7 +93,6 @@ public class ParkingInfrastructureManager {
 			groupRect.registerCoord(parking.getCoordinate());
 		}
 		this.publicParkingsQuadTree = (new QuadTreeInitializer<Parking>()).getQuadTree(allPublicParkingRect);
-		this.allPublicParkings = publicParkings;
 
 		for (String groupNames : groupRects.keySet()) {
 			publicParkingGroupQuadTrees.put(groupNames,
@@ -115,7 +113,7 @@ public class ParkingInfrastructureManager {
 		for (PPRestrictedToFacilities pp : ppRestrictedToFacilities) {
 			for (Id facilityId : pp.getFacilityIds()) {
 				privateParkingsRestrictedToFacilities.put(facilityId, pp);
-				allParkings.put(pp.getId(), pp);
+				getAllParkings().put(pp.getId(), pp);
 			}
 		}
 	}
@@ -123,8 +121,8 @@ public class ParkingInfrastructureManager {
 	public synchronized void reset() {
 		parkedVehicles.clear();
 
-		for (Id parkingFacilityId : allParkings.keySet()) {
-			Parking parking = allParkings.get(parkingFacilityId);
+		for (Id parkingFacilityId : getAllParkings().keySet()) {
+			Parking parking = getAllParkings().get(parkingFacilityId);
 			if (parking.getAvailableParkingCapacity() == 0) {
 				if (!(parking instanceof PrivateParking)) {
 					addParkingToQuadTree(publicParkingsQuadTree, parking);
@@ -308,7 +306,7 @@ public class ParkingInfrastructureManager {
 	// TODO: make this method abstract
 	public synchronized Parking personCarDepartureEvent(ParkingOperationRequestAttributes parkingOperationRequestAttributes) {
 		Id parkingFacilityId = parkedVehicles.get(parkingOperationRequestAttributes.personId);
-		Parking parking = allParkings.get(parkingFacilityId);
+		Parking parking = getAllParkings().get(parkingFacilityId);
 		parkedVehicles.remove(parkingOperationRequestAttributes.personId);
 		unParkVehicle(parking, parkingOperationRequestAttributes.arrivalTime
 				+ parkingOperationRequestAttributes.parkingDurationInSeconds, parkingOperationRequestAttributes.personId);
@@ -355,6 +353,14 @@ public class ParkingInfrastructureManager {
 
 	public synchronized void setEventsManager(EventsManager eventsManager) {
 		this.eventsManager = eventsManager;
+	}
+
+	public HashMap<Id, Parking> getAllParkings() {
+		return allParkings;
+	}
+
+	public void setAllParkings(HashMap<Id, Parking> allParkings) {
+		this.allParkings = allParkings;
 	}
 
 	// TODO: allso allow to filter by group the parkings

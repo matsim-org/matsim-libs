@@ -16,37 +16,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.wrashid.parkingChoice.freeFloatingCarSharing;
+package playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis;
 
-import java.util.HashMap;
-
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.PC2.analysis.ParkingGroupOccupancies;
-import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.EventsReaderXMLv1;
-import org.matsim.core.events.EventsUtils;
 
-public class ParkingGroupOccupanciesZHGraph {
-
-	public static void main(String[] args) {
-		String eventsFile = "C:/data/FreeFloatingParking/output/ITERS/it.1/run1.1.events.xml.gz";
-
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
-
-		ParkingGroupOccupanciesZH parkingGroupOccupanciesZH = new ParkingGroupOccupanciesZH();
-
-		events.addHandler(parkingGroupOccupanciesZH);
-
-		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(eventsFile);
-		parkingGroupOccupanciesZH.showPlot();
-	}
-
+public class ParkingGroupOccupanciesZH extends ParkingGroupOccupancies {
 	
+	private Controler controler;
+
+	public ParkingGroupOccupanciesZH(){
+		reset(0);
+	}
+	
+	public ParkingGroupOccupanciesZH(Controler controler){
+		this.controler = controler;
+		reset(0);
+	}
+	
+	@Override
+	public void reset(int iteration) {
+		if (iteration>0){
+			savePlot(controler.getControlerIO().getIterationFilename(iteration-1, "parkingGroupOccupancy.png"));
+		}
+		super.reset(iteration);
+	}
+	
+	
+	@Override
+	public String getGroupName(Id parkingId) {
+		return getGroup(parkingId);
+	}
+	
+	public static String getGroup(Id parkingId){
+		if (parkingId.toString().contains("stp")) {
+			return "streetParking";
+		} else if (parkingId.toString().contains("gp")) {
+			return "garageParking";
+		} else if (parkingId.toString().contains("publicPOutsideCity")) {
+			return "publicPOutsideCity";
+		} else {
+			return "privateParking";
+		}
+	}
 
 }
