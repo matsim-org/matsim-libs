@@ -36,7 +36,7 @@ public class WordleGenerator {
 	public static void main(String[] args) {
 		String filename = args[0];
 		
-		List<Tuple<String,Integer>> list = getIE();
+		List<Tuple<String,Integer>> list = getDone();
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
 		try {
 			for(Tuple<String,Integer> t : list){
@@ -57,6 +57,44 @@ public class WordleGenerator {
 			}
 		}
 	}
+	
+	private static List<Tuple<String,Integer>> getDone(){
+		List<Tuple<String,Integer>> list = new ArrayList<Tuple<String,Integer>>();
+		/* Top list */
+		list.add(new Tuple<String,Integer>("recylce", 100));
+		list.add(new Tuple<String,Integer>("reduce", 100));
+		list.add(new Tuple<String,Integer>("reuse", 100));
+		
+		/* Higher list, 20 - 40 */
+		int lower = 25;
+		int upper = 40;
+		list.add(new Tuple<String,Integer>("compost", (int) (lower + Math.random()*(upper - lower))));
+		list.add(new Tuple<String,Integer>("bokashi", (int) (lower + Math.random()*(upper - lower))));
+		list.add(new Tuple<String,Integer>("environment", (int) (lower + Math.random()*(upper - lower))));
+
+		
+		/* Lower list, 1 - 20. */
+		lower = 10;
+		upper = 25;
+		list.add(new Tuple<String,Integer>("plant", (int) (lower + Math.random()*(upper - lower))));
+		list.add(new Tuple<String,Integer>("food scraps", (int) (lower + Math.random()*(upper - lower))));
+		list.add(new Tuple<String,Integer>("garden refuse", (int) (lower + Math.random()*(upper - lower))));
+		list.add(new Tuple<String,Integer>("organisms", (int) (lower + Math.random()*(upper - lower))));
+		list.add(new Tuple<String,Integer>("bacteria", (int) (lower + Math.random()*(upper - lower))));
+		list.add(new Tuple<String,Integer>("organic", (int) (lower + Math.random()*(upper - lower))));
+		list.add(new Tuple<String,Integer>("fermentation", (int) (lower + Math.random()*(upper - lower))));
+		list.add(new Tuple<String,Integer>("biodegradable", (int) (lower + Math.random()*(upper - lower))));
+		list.add(new Tuple<String,Integer>("microorganism", (int) (lower + Math.random()*(upper - lower))));
+		list.add(new Tuple<String,Integer>("leftovers", (int) (lower + Math.random()*(upper - lower))));
+		list.add(new Tuple<String,Integer>("cycle", (int) (lower + Math.random()*(upper - lower))));
+		list.add(new Tuple<String,Integer>("waste", (int) (lower + Math.random()*(upper - lower))));
+		list.add(new Tuple<String,Integer>("carbon", (int) (lower + Math.random()*(upper - lower))));
+		list.add(new Tuple<String,Integer>("greenhouse", (int) (lower + Math.random()*(upper - lower))));
+		
+		return list;
+	}
+	
+	
 	
 	private static List<Tuple<String,Integer>> getBoz(){
 		List<Tuple<String,Integer>> list = new ArrayList<Tuple<String,Integer>>();
