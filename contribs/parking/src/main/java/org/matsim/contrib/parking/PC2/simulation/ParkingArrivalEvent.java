@@ -27,10 +27,12 @@ import org.matsim.contrib.parking.lib.DebugLib;
 public class ParkingArrivalEvent extends Event {
 
 	private Id parkingId;
+	private Id personId;
 	public final static String ATTRIBUTE_PARKING_ID = "parkingId";
+	public final static String ATTRIBUTE_PERSON_ID = "personId";
 	public final static String EVENT_TYPE = "parkingArrivalEvent";
 
-	public ParkingArrivalEvent(double time, Id parkingId) {
+	public ParkingArrivalEvent(double time, Id parkingId, Id personId) {
 		super(time);
 		
 		if (time>110000){
@@ -38,6 +40,7 @@ public class ParkingArrivalEvent extends Event {
 		}
 		
 		this.parkingId = parkingId;
+		this.personId = personId;
 	}
 
 	@Override
@@ -49,6 +52,7 @@ public class ParkingArrivalEvent extends Event {
 	public Map<String, String> getAttributes() {
 		final Map<String, String> attributes = super.getAttributes();
 		attributes.put(ATTRIBUTE_PARKING_ID, parkingId.toString());
+		attributes.put(ATTRIBUTE_PERSON_ID, personId!=null?personId.toString():null);
 		return attributes;
 	}
 

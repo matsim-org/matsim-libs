@@ -163,7 +163,7 @@ public class ParkingInfrastructureManager {
 	}
 
 	public synchronized void logArrivalEventAtTimeZero(Parking parking) {
-		eventsManager.processEvent(new ParkingArrivalEvent(0, parking.getId()));
+		eventsManager.processEvent(new ParkingArrivalEvent(0, parking.getId(),null));
 	}
 
 	public synchronized Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName, Id personId,
@@ -174,7 +174,7 @@ public class ParkingInfrastructureManager {
 				parkingDurationInSeconds);
 		parkingScoreManager.addScore(personId, walkScore);
 
-		eventsManager.processEvent(new ParkingArrivalEvent(arrivalTime, parking.getId()));
+		eventsManager.processEvent(new ParkingArrivalEvent(arrivalTime, parking.getId(),personId));
 
 		return parking;
 	}
@@ -236,7 +236,7 @@ public class ParkingInfrastructureManager {
 
 		}
 
-		eventsManager.processEvent(new ParkingArrivalEvent(parkingOperationRequestAttributes.arrivalTime, selectedParking.getId()));
+		eventsManager.processEvent(new ParkingArrivalEvent(parkingOperationRequestAttributes.arrivalTime, selectedParking.getId(),parkingOperationRequestAttributes.personId));
 
 		return selectedParking;
 	}
@@ -311,7 +311,7 @@ public class ParkingInfrastructureManager {
 		Parking parking = allParkings.get(parkingFacilityId);
 		parkedVehicles.remove(parkingOperationRequestAttributes.personId);
 		unParkVehicle(parking, parkingOperationRequestAttributes.arrivalTime
-				+ parkingOperationRequestAttributes.parkingDurationInSeconds);
+				+ parkingOperationRequestAttributes.parkingDurationInSeconds, parkingOperationRequestAttributes.personId);
 		return parking;
 	}
 
@@ -322,7 +322,7 @@ public class ParkingInfrastructureManager {
 		parkingScoreManager.addScore(parkingOperationRequestAttributes.personId, score);
 	}
 
-	public synchronized void unParkVehicle(Parking parking, double departureTime) {
+	public synchronized void unParkVehicle(Parking parking, double departureTime, Id personId) {
 		if (parking == null) {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
@@ -342,7 +342,7 @@ public class ParkingInfrastructureManager {
 
 		DebugLib.assertTrue(startAvailability+1==endAvailability, "not equal");
 
-		eventsManager.processEvent(new ParkingDepartureEvent(departureTime, parking.getId()));
+		eventsManager.processEvent(new ParkingDepartureEvent(departureTime, parking.getId(),personId));
 	}
 
 	public synchronized ParkingScoreManager getParkingScoreManager() {

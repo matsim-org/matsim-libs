@@ -29,9 +29,11 @@ public class ParkingDepartureEvent extends Event {
 
 	private Id parkingId;
 	public final static String ATTRIBUTE_PARKING_ID = "parkingId";
+	public final static String ATTRIBUTE_PERSON_ID = "personId";
 	public final static String EVENT_TYPE = "parkingDepartureEvent";
+	private Id personId;
 
-	public ParkingDepartureEvent(double time, Id parkingId) {
+	public ParkingDepartureEvent(double time, Id parkingId, Id personId) {
 		super(time);
 		
 		if (time>110000){
@@ -39,6 +41,7 @@ public class ParkingDepartureEvent extends Event {
 		}
 		
 		this.parkingId = parkingId;
+		this.personId = personId;
 	}
 
 	@Override
@@ -50,6 +53,7 @@ public class ParkingDepartureEvent extends Event {
 	public Map<String, String> getAttributes() {
 		final Map<String, String> attributes = super.getAttributes();
 		attributes.put(ATTRIBUTE_PARKING_ID, parkingId.toString());
+		attributes.put(ATTRIBUTE_PERSON_ID, personId!=null?personId.toString():null);
 		return attributes;
 	}
 

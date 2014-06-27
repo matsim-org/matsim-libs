@@ -58,7 +58,7 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		
 		
 		Parking parking=currentVehicleLocation.get(vehicleId);
-		parkingInfrastructureManager.unParkVehicle(parking, departureTime);
+		parkingInfrastructureManager.unParkVehicle(parking, departureTime, personId);
 		
 		vehicleLocations.remove(parking.getCoordinate().getX(), parking.getCoordinate().getY(), vehicleId);
 		
