@@ -86,6 +86,13 @@ public class GtiActivityRelocator {
 		this.cpr = new ComprehensivePopulationReader();
 	}
 	
+	
+	/**
+	 * Finds the extent of a given shapefile by considering the corner points
+	 * of the geometry's envelope.
+	 * 
+	 * @param areaShapefile
+	 */
 	public void setupQuadTreeExtentFromStudyArea(String areaShapefile){
 		ShapeFileReader sfr = new ShapeFileReader();
 		sfr.readFileAndInitialize(areaShapefile);
@@ -109,7 +116,17 @@ public class GtiActivityRelocator {
 	}
 	
 	
-	
+	/**
+	 * An encompassing method to parse all the point features from the 
+	 * GeoTerraImage Building shapefile. An {@link ActivityFacility} is created
+	 * for each building, and added to an appropriate {@link QuadTree}. 
+	 * Residential buildings are separately grouped. This class is responsible
+	 * to categorise all buildings in a way that they will be considered once
+	 * activity's are relocated.
+	 * 
+	 * @param gtiShapefile
+	 * @see <a>GeoTerraImage Buildings product</a>
+	 */
 	public void parseGtiPointsToQuadTrees(String gtiShapefile){
 		LOG.info("Reading GTI point features...");
 		if(qtExtent.length == 0){
@@ -293,6 +310,7 @@ public class GtiActivityRelocator {
 		}
 	}
 
+	
 	/**
 	 * There is not a one-to-one match between the dwelling descriptions and 
 	 * classifications provided in Census 2011, and that which is provided in
@@ -403,6 +421,12 @@ public class GtiActivityRelocator {
 	}
 	
 	
+	/**
+	 * Class to relocate each {@link Activity} of each {@link Person}'s 
+	 * {@link Plan} to an actual facility. 
+	 * 
+	 * @param populationFolder
+	 */
 	public void runGtiActivityRelocator(String populationFolder){
 		cpr.parse(populationFolder);
 		
@@ -497,7 +521,19 @@ public class GtiActivityRelocator {
 	}
 	
 	
-	
+	/**
+	 * The appropriate {@link QuadTree} of GTI buildings is identified, and 
+	 * building is sampled. The sampling occurs as follows: first a shortlist 
+	 * of the 20 nearest facilities (of the correct type) is constructed. 
+	 * Secondly, a facility is randomly sampled from the shortlist.
+	 * 
+	 * @param c the original {@link Coord}inate of the activity;
+	 * @param qt the appropriate {@link QuadTree} containing buildings that can
+	 * accommodate the specific activity type;
+	 * @param number of nearest facilities to consider in the shortlist.
+	 * @return a randomly sampled facility picked from the shortlist of nearest
+	 * facilities.
+	 */
 	private ActivityFacility getGtiFacility(Coord c, QuadTree<ActivityFacility> qt, int number){
 		List<Tuple<ActivityFacility, Double>> list = new ArrayList<Tuple<ActivityFacility,Double>>();
 		List<Tuple<ActivityFacility, Double>> tuples = new ArrayList<Tuple<ActivityFacility,Double>>();
