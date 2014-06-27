@@ -12,8 +12,6 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-
-
 public class AllCSModesScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory {
 	
 	private final Config config;
@@ -38,9 +36,7 @@ public class AllCSModesScoringFunctionFactory extends org.matsim.core.scoring.fu
 	      new CharyparNagelScoringParameters(config.planCalcScore()), 
 	      this.config, 
 	      network));
-		  scoringFunctionSum.addScoringFunction(new DesiresAndOpenTimesActivityScoring(person.getSelectedPlan(), new CharyparNagelScoringParameters(config.planCalcScore()), ((ScenarioImpl) scenario).getActivityFacilities()));
-	    //scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
-		   
+		  scoringFunctionSum.addScoringFunction(new KtiActivtyWithoutPenaltiesScoring(person.getSelectedPlan(), new CharyparNagelScoringParameters(config.planCalcScore()), null, ((ScenarioImpl) scenario).getActivityFacilities()));
 		  scoringFunctionSum.addScoringFunction(new CharyparNagelMoneyScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
 		  scoringFunctionSum.addScoringFunction(new CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
 	    return scoringFunctionSum;

@@ -14,6 +14,7 @@ import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.balac.allcsmodestest.scoring.DesiresAndOpenTimesActivityScoring;
+import playground.balac.allcsmodestest.scoring.KtiActivtyWithoutPenaltiesScoring;
 
 
 public class FreeFloatingScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory {
@@ -39,7 +40,7 @@ public class FreeFloatingScoringFunctionFactory extends org.matsim.core.scoring.
 	      new CharyparNagelScoringParameters(config.planCalcScore()), 
 	      this.config, 
 	      network));
-	    scoringFunctionAccumulator.addScoringFunction(new DesiresAndOpenTimesActivityScoring(person.getSelectedPlan(), new CharyparNagelScoringParameters(config.planCalcScore()), ((ScenarioImpl) scenario).getActivityFacilities()));
+	    scoringFunctionAccumulator.addScoringFunction(new KtiActivtyWithoutPenaltiesScoring(person.getSelectedPlan(), new CharyparNagelScoringParameters(config.planCalcScore()), null, ((ScenarioImpl) scenario).getActivityFacilities()));
 		   
 	    scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
 	    scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(config.planCalcScore())));

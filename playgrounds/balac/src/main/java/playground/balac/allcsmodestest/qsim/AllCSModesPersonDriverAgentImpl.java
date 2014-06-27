@@ -58,7 +58,7 @@ import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacilityImpl
  * Current version includes:
  * -- two-way carsharing with reservation of the vehicle at the end of the activity preceding the rental.
  * -- one-way carsharing with each station having a parking capacity with the reservation system as the one with two-way
- * -- free-floating carsharing with parking at the link of the next activity following free-floating trip, reservation system as the one with tw-way cs.
+ * -- free-floating carsharing with parking at the link of the next activity following free-floating trip, reservation system as the one with two-way cs.
  * 
  * @author balac
  */

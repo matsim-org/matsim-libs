@@ -71,7 +71,7 @@ public class AAMRoutingModule implements RoutingModule {
 		// TODO Create list of legs with moving pathways and walking
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
 
-		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0/3600, +6.0/3600, 0.0);
+		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-0.8/3600, +6.0/3600, 0.0);
 				
 		LeastCostPathCalculator routeAlgo = new Dijkstra(scenario.getNetwork(), freespeed, this.timeObject);
 		

@@ -37,7 +37,7 @@ public class RentalTimesStatistics {
 
 			double endTime = Double.parseDouble(arr[2]);
 			rentalTimes[(int)((endTime - startTime) / 3600)]++;
-			di += Double.parseDouble(arr[5]);
+			di += Double.parseDouble(arr[4]);
 			if (endTime - startTime < 1800) 
 				count1++;
 			count++;

@@ -18,21 +18,21 @@ public class RentalTimesFromMobilityData {
 		double distance = 0.0;
 	//	Set<Double> bla = new HashSet<Double>();
 		
-		final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Documents/MobilityData/Fahrten2010_march.txt");
+		final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Documents/MobilityData/Fahrten_Mobility_Real.txt");
 		String s = readLink.readLine();
 		s = readLink.readLine();
 		while(s != null) {
 			String[] arr = s.split("\t");
-			if (Double.parseDouble(arr[6]) > 0.0) {
-				if (arr[5].startsWith("3") && arr[4].startsWith("3")) {
-				
-					String[] arr1 = arr[4].split("\\s");
-					String[] arr2 = arr[5].split("\\s");
+			if (Double.parseDouble(arr[5]) > 0.0 && Double.parseDouble(arr[5]) < 80.0) {
+				if (arr[3].startsWith("9") && arr[4].startsWith("9")) {
+			
+					String[] arr1 = arr[3].split("\\s");
+					String[] arr2 = arr[4].split("\\s");
 				
 					String[] arr3 = arr1[0].split("/");
 					String[] arr4 = arr2[0].split("/");
 					
-					if (arr3[1].equals(arr4[1]) && Integer.parseInt(arr3[1]) >= 8 && Integer.parseInt(arr3[1]) <= 12 && arr1.length == arr2.length) {
+					if (arr3[1].equals(arr4[1]) && Integer.parseInt(arr3[1]) >= 1 && Integer.parseInt(arr3[1]) <=30 && arr1.length == arr2.length) {
 						if (true) {
 							
 							String[] arr5 = arr1[1].split(":");
@@ -48,7 +48,7 @@ public class RentalTimesFromMobilityData {
 							if (endh >= starth ){//&& !arr[2].equals("Combi") && !arr[2].equals("Transport")) {
 								double rental = starth*60 +startmin - endh*60 - endmin;
 								if (rental < 0) {
-									distance += Double.parseDouble(arr[6]);
+									distance += Double.parseDouble(arr[5]);
 									rentalTimes[(int)((-rental) / 60)]++;
 									count++;
 									//bla.add(Double.parseDouble(arr[2]));
