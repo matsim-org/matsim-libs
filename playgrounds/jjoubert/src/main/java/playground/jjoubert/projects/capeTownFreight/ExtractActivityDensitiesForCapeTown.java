@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -35,31 +34,25 @@ import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
+
+import playground.jjoubert.Utilities.MyShapefileReader;
+import playground.southafrica.freight.digicore.containers.DigicoreActivity;
+import playground.southafrica.freight.digicore.containers.DigicoreChain;
+import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
+import playground.southafrica.freight.digicore.io.DigicoreVehicleReader_v1;
+import playground.southafrica.utilities.FileUtils;
+import playground.southafrica.utilities.Header;
+import playground.southafrica.utilities.grid.GeneralGrid;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-
-import playground.jjoubert.Utilities.MyShapefileReader;
-import playground.southafrica.freight.digicore.containers.DigicoreActivity;
-import playground.southafrica.freight.digicore.containers.DigicoreChain;
-import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
-import playground.southafrica.freight.digicore.io.DigicoreVehicleReader;
-import playground.southafrica.freight.digicore.io.DigicoreVehicleReader_v1;
-import playground.southafrica.freight.digicore.utils.DigicoreUtils;
-import playground.southafrica.utilities.FileUtils;
-import playground.southafrica.utilities.Header;
-import playground.southafrica.utilities.grid.GeneralGrid;
 
 public class ExtractActivityDensitiesForCapeTown {
 	private final static Logger LOG = Logger.getLogger(ExtractActivityDensitiesForCapeTown.class);
@@ -87,7 +80,6 @@ public class ExtractActivityDensitiesForCapeTown {
 		QuadTree<Tuple<String, Point>> grid = gg.getGrid();
 		
 		/* Perform the analysis */
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "WGS84_SA_Albers");
 		Counter counter = new Counter("   vehicles # ");
 		
 		/* Set up the multi-threaded infrastructure. */
@@ -136,19 +128,6 @@ public class ExtractActivityDensitiesForCapeTown {
 		writeCountsToFile(outputFolder + "zoneCounts.csv", zoneCounts);
 		
 		Header.printFooter();
-	}
-	
-	private static boolean checkInQt(QuadTree<Tuple<String, Point>> qt, Coord coord){
-		boolean result = false;
-		double x = coord.getX();
-		double y = coord.getY();
-		if(x >= qt.getMinEasting() &&
-				x <= qt.getMaxEasting() &&
-				y >= qt.getMinNorthing() &&
-				y <= qt.getMaxNorthing()){
-			result = true;
-		}
-		return result;
 	}
 	
 	

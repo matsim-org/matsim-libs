@@ -22,41 +22,21 @@
  */
 package playground.jjoubert.projects.gautengPopulation;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-
+import playground.southafrica.population.freight.InAreaPlanKeeper;
 import playground.southafrica.utilities.Header;
-import playground.southafrica.utilities.gis.MyMultiFeatureReader;
 
 /**
- * @author jwjoubert
- *
+ * Implementing the intra-area class specifically for Gauteng.
  */
 public class RemoveNonGautengCommercial {
-	final private static Logger LOG = Logger.getLogger(RemoveNonGautengCommercial.class);
 
 	/**
 	 * @param args
@@ -64,82 +44,40 @@ public class RemoveNonGautengCommercial {
 	public static void main(String[] args) {
 		Header.printHeader(RemoveNonGautengCommercial.class.toString(), args);
 		
-		String inputFilename = args[0];
-		String inputAttributes = args[1];
+		String inputPlansFile = args[0];
+		String inputAttributesFile = args[1];
 		String shapefile = args[2];
-		String outputFilename = args[3];
-		String outputAttributes = args[4];
-		RemoveNonGautengCommercial.run(inputFilename, inputAttributes, shapefile, outputFilename, outputAttributes);
+		String outputPlansFile = args[3];
+		String outputAttributesFile = args[4];
 		
+		run(inputPlansFile, inputAttributesFile, shapefile, outputPlansFile, outputAttributesFile);
+
 		Header.printFooter();
 	}
 	
-	
-	public static void run(String inputFilename, String inputAttributes, String shapefile, String outputFilename, String outputAttributes){
-		LOG.info("Checking person from " + inputFilename);
-		LOG.info("  :--> do they have any activities in " + shapefile + "?");
-		
+	/**
+	 * Read in a population of persons and their attributes, clean the scenario
+	 * using {@link InAreaPlanKeeper}, and write the resulting population of
+	 * persons and their attributes to file.
+	 * 
+	 * @param inputPlansFile
+	 * @param inputAttributesFile
+	 * @param shapefile
+	 * @param outputPlansFile
+	 * @param outputAttributesFile
+	 */
+	public static void run(String inputPlansFile, String inputAttributesFile,
+			String shapefile, String outputPlansFile, String outputAttributesFile){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc).parse(inputFilename);
-		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).parse(inputAttributes);
+		new MatsimPopulationReader(sc).parse(inputPlansFile);
+		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).parse(inputAttributesFile);
 		
-		MyMultiFeatureReader mfr = new MyMultiFeatureReader();
-		try {
-			mfr.readMultizoneShapefile(shapefile, 8);
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Cannot read shapefile " + shapefile);
-		}
-		Geometry g = mfr.getAllZones().get(0); /* Assuming we only work with the first (True for Gauteng...) */
-		Geometry envelope = g.getEnvelope();
-		GeometryFactory gf = new GeometryFactory();
+		/* Checking inside envelope is good enough, setting 'strictlyInside to false */
+		Scenario cleanScenario = InAreaPlanKeeper.run(sc, shapefile, false);
 		
-		List<Id> listToRemove = new ArrayList<Id>();
-		
-		int numberRemoved = 0;
-		Counter counter = new Counter("  checked # ");
-		
-		LOG.info("Checking " + sc.getPopulation().getPersons().size() + " persons in population...");
-		for(Id id : sc.getPopulation().getPersons().keySet()){
-			Person person = sc.getPopulation().getPersons().get(id);
-			boolean inGauteng = false;
-
-			Iterator<? extends Plan> planIterator = person.getPlans().iterator();
-			while(!inGauteng && planIterator.hasNext()){
-				Plan plan = planIterator.next();
-				Iterator<PlanElement> peIterator = plan.getPlanElements().iterator();
-				while(!inGauteng && peIterator.hasNext()){
-					PlanElement pe = peIterator.next();
-					if(pe instanceof Activity){
-						Activity act = (Activity)pe;
-						Point p = gf.createPoint(new Coordinate(act.getCoord().getX(), act.getCoord().getY()));
-
-						/* Envelope of Gauteng is good enough. */
-						if(envelope.contains(p)){
-							inGauteng = true;
-						}
-					}
-				}
-			}
-
-			if(!inGauteng){
-				listToRemove.add(id);
-			}
-			counter.incCounter();
-		}
-		counter.printCounter();
-
-		/* Remove the person and all its associated attributes. */
-		for(Id id : listToRemove){
-			sc.getPopulation().getPersons().remove(id);
-			sc.getPopulation().getPersonAttributes().removeAllAttributes(id.toString());
-			numberRemoved++;
-		}
-		
-		/* Write the remaining population. */
-		new PopulationWriter(sc.getPopulation(), sc.getNetwork()).write(outputFilename);
-		new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes()).writeFile(outputAttributes);	
-		LOG.info("Number of persons removed: " + numberRemoved);
+		/* Write the output to files. */
+		new PopulationWriter(cleanScenario.getPopulation()).write(outputPlansFile);
+		new ObjectAttributesXmlWriter(cleanScenario.getPopulation().getPersonAttributes()).writeFile(outputAttributesFile);
 	}
-
+	
 }
