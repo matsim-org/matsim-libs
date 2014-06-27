@@ -7,10 +7,8 @@ import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.households.IncomeImpl;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.southafrica.population.census2001.Census2001SampleParser;
@@ -42,10 +40,10 @@ public class ComprehensivePopulationReader {
 	/**
 	 * Class to read a set of four population-related files:
 	 * <ol>
-	 * 		<li> <code>Population.xml</code>
-	 * 		<li> <code>PersonAttributes.xml</code>
-	 * 		<li> <code>Households.xml</code>
-	 * 		<li> <code>HouseholdAttributes.xml</code>
+	 * 		<li> <code>population.xml</code>
+	 * 		<li> <code>personAttributes.xml</code>
+	 * 		<li> <code>households.xml</code>
+	 * 		<li> <code>householdAttributes.xml</code>
 	 * </ol>
 	 * These files are usually the result from census or travel survey data, 
 	 * for example using {@link Census2001SampleParser} or {@link NmbmSurveyParser}.
@@ -63,25 +61,25 @@ public class ComprehensivePopulationReader {
 		/* Read population. */
 		LOG.info("Reading population...");
 		PopulationReaderMatsimV5 pr = new PopulationReaderMatsimV5(this.sc);
-		pr.parse(inputfolder + "Population.xml");
+		pr.parse(inputfolder + "population.xml.gz");
 		
 		/* Read population attributes. */
 		LOG.info("Reading person attributes...");
 		ObjectAttributesXmlReader oar1 = new ObjectAttributesXmlReader(this.sc.getPopulation().getPersonAttributes());
 		oar1.putAttributeConverter(IncomeImpl.class, new SAIncomeConverter());
-		oar1.parse(inputfolder + "PersonAttributes.xml");
+		oar1.parse(inputfolder + "populationAttributes.xml.gz");
 		
 		/* Read households */
 		LOG.info("Reading households...");
 		HouseholdsReaderV10 hhr = new HouseholdsReaderV10(this.sc.getHouseholds());
-		hhr.parse(inputfolder + "Households.xml");
+		hhr.parse(inputfolder + "households.xml.gz");
 		
 		/* Read household attributes. */ 
 		LOG.info("Reading household attributes...");
 		ObjectAttributesXmlReader oar2 = new ObjectAttributesXmlReader(this.sc.getHouseholds().getHouseholdAttributes());
 		oar2.putAttributeConverter(IncomeImpl.class, new SAIncomeConverter());
 		oar2.putAttributeConverter(CoordImpl.class, new CoordConverter());
-		oar2.parse(inputfolder + "HouseholdAttributes.xml");
+		oar2.parse(inputfolder + "householdAttributes.xml.gz");
 
 		LOG.info("================================================================");
 		LOG.info("Population size: " + sc.getPopulation().getPersons().size());

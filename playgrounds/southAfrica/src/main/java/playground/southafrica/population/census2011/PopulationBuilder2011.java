@@ -37,6 +37,7 @@ import playground.southafrica.population.census2011.containers.MainDwellingType2
 import playground.southafrica.population.census2011.containers.PopulationGroup2011;
 import playground.southafrica.population.census2011.containers.Relationship2011;
 import playground.southafrica.population.census2011.containers.School2011;
+import playground.southafrica.projects.treasury2014.StudyAreas;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 import playground.southafrica.utilities.containers.MyZone;
@@ -53,12 +54,33 @@ import com.vividsolutions.jts.geom.Point;
 public class PopulationBuilder2011 {
 	private final static Logger LOG = Logger.getLogger(PopulationBuilder2011.class);
 
+	
 	public static void main(String[] args) {
 		Header.printHeader(PopulationBuilder2011.class.toString(), args);
-		
-		String folder = args[0];
+		run(args);
+		Header.printFooter();
+	}
+
+	
+	/**
+	 * Method to execute the population building, specifically following the
+	 * multi-level iterative proportional fitting (MLIPF) procedure in R for 
+	 * the South African {@link StudyAreas}.
+	 *  
+	 * @param args needs the following arguments:
+	 * <ol>
+	 * 		<li> input folder where the MLIPF zoanl population was written to;
+	 * 		<li> the subplace shapefile corresponding to the subplaces for 
+	 * 			which the population was fitted;
+	 * 		<li> the Id field containing the subplace code; and
+	 * 		<li> the output folder where the population will be written to.
+	 * </ol>
+	 */
+	public static void run(String[] args){
+		String mlipfFolder = args[0];
 		String shapefile = args[1];
 		int idField = Integer.parseInt(args[2]);
+		String outputFolder = args[3];
 		
 		/* Read subplace shapefile. */
 		MyMultiFeatureReader mmfr = new MyMultiFeatureReader();
@@ -68,19 +90,21 @@ public class PopulationBuilder2011 {
 			e.printStackTrace();
 			throw new RuntimeException("Cannot read subplace shapefile from " + shapefile);
 		}
-		List<MyZone> allZones = mmfr.getAllZones();
 		
 		/* Get all the subplace files with synthetic populations. */
-		List<File> files = FileUtils.sampleFiles(new File(folder), Integer.MAX_VALUE, FileUtils.getFileFilter("_persons.dat"));
+		List<File> files = FileUtils.sampleFiles(new File(mlipfFolder), Integer.MAX_VALUE, FileUtils.getFileFilter("_persons.dat"));
 		LOG.info("Total number of subplaces to run: " + files.size());
 		
-		/* Check that for each subplace in synthesized populatiuon, there is a
-		 * shapefile. TODO: Can possibly remove this in the end, I guess. */
+		/* Check that for each subplace in synthesized population, there is a
+		 * shapefile. */
 		LOG.info("Checking that each subplace population has a shapefile associated with it...");
 		for(File file: files){
 			/* Get subplace Id. */
 			Id zoneId = new IdImpl(file.getName().substring(0, file.getName().indexOf("_")));
 			MyZone thisZone = mmfr.getZone(zoneId);
+			if(thisZone == null){
+				LOG.error("Could not find a subplace geometry for zone " + zoneId.toString());
+			}
 		}
 		LOG.info("Done.");
 		
@@ -208,20 +232,17 @@ public class PopulationBuilder2011 {
 		/* Write all to file. */
 		LOG.info("Writing the comprehensive population to file...");
 		PopulationWriter pw = new PopulationWriter(sc.getPopulation());
-		pw.write(folder + (folder.endsWith("/") ? "" : "/") + "population.xml.gz");
+		pw.write(outputFolder + (outputFolder.endsWith("/") ? "" : "/") + "population.xml.gz");
 		ObjectAttributesXmlWriter personWriter = new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes());
-		personWriter.writeFile(folder + (folder.endsWith("/") ? "" : "/") + "populationAttributes.xml.gz");
+		personWriter.writeFile(outputFolder + (outputFolder.endsWith("/") ? "" : "/") + "populationAttributes.xml.gz");
 		HouseholdsWriterV10 hw = new HouseholdsWriterV10(households);
-		hw.writeFile(folder + (folder.endsWith("/") ? "" : "/") + "households.xml.gz");
+		hw.writeFile(outputFolder + (outputFolder.endsWith("/") ? "" : "/") + "households.xml.gz");
 		ObjectAttributesXmlWriter householdsAttributeWriter = new ObjectAttributesXmlWriter(householdAttributes);
 		householdsAttributeWriter.putAttributeConverter(CoordImpl.class, new CoordConverter());
-		householdsAttributeWriter.writeFile(folder + (folder.endsWith("/") ? "" : "/") + "householdAttributes.xml.gz");
-
-		Header.printFooter();
+		householdsAttributeWriter.writeFile(outputFolder + (outputFolder.endsWith("/") ? "" : "/") + "householdAttributes.xml.gz");
+		
+		/* Try and conserve memory. Don't know if it does, though. */
+		sc = null;
 	}
 	
-	
-	
-	
-
 }

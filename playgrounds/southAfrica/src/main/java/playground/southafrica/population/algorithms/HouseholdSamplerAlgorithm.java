@@ -33,7 +33,7 @@ import org.matsim.households.algorithms.HouseholdAlgorithm;
  * Algorithm to sample a fraction of households, and pick <i>all</i> of the 
  * members of the sampled households. This ensures that the household structure
  * remains intact after sampling.
- * @author johanwjoubert
+ * @author jwjoubert
  */
 public class HouseholdSamplerAlgorithm implements HouseholdAlgorithm{
 	private List<Id> membersToRemove;

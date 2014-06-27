@@ -21,42 +21,43 @@
 package playground.southafrica.population;
 
 import java.io.File;
-import java.util.List;
+import java.io.IOException;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.households.Households;
 import org.matsim.households.HouseholdsAlgorithmRunner;
-import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.households.HouseholdsWriterV10;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.southafrica.population.algorithms.HouseholdSamplerAlgorithm;
+import playground.southafrica.population.utilities.ComprehensivePopulationReader;
 import playground.southafrica.utilities.Header;
 
+/**
+ * Class to sample entire households, with its members considered. Provides
+ * methods for the sampling, and writing of sampled households.
+ *
+ * @author jwjoubert
+ * @see HouseholdSamplerAlgorithm
+ */
 public class HouseholdSampler {
 	private final static Logger LOG = Logger.getLogger(HouseholdSampler.class);
-	
-	private final Scenario sc;
-	private HouseholdSamplerAlgorithm algorithm;
-	
-	private Households sampledHouseholds;
-	private Population sampledPopulation;
-	private ObjectAttributes sampledHouseholdAttributes;
-	private ObjectAttributes sampledPopulationAttributes;
+	private final Random rng;
+	private Scenario sc;
 
 	/**
+	 * Implements the household sampler.
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -64,162 +65,156 @@ public class HouseholdSampler {
 		String inputFolder = args[0];
 		String outputFolder = args[1];
 		double fraction = Double.parseDouble(args[2]);
-		String networkFile = args[3];
 		
-		HouseholdSampler hs = new HouseholdSampler();
+		HouseholdSampler hs = new HouseholdSampler(MatsimRandom.getLocalInstance());
 		hs.sampleHouseholds(inputFolder, fraction);
-		hs.writeSample(outputFolder, networkFile);
+		try {
+			hs.writeSample(outputFolder);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("May not overwrite existing files.");
+		}
 		
 		Header.printFooter();
 	}
 	
-	
-	public HouseholdSampler() {	
-		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	/**
+	 * Default constructor. If you want more control over the sampling, 
+	 * consider {@link #HouseholdSampler(Random)} where you can pass a specific
+	 * random number generator.
+	 */
+	public HouseholdSampler(){
+		this.rng = MatsimRandom.getLocalInstance();
 	}
 	
 	
 	/**
+	 * Constructor where you have control over the random number generator 
+	 * used. This may be useful for tests, for example.
+	 *   
+	 * @param random
+	 */
+	public HouseholdSampler(Random random) {	
+		this.rng = random;
+	}
+	
+		
+	/**
 	 * Samples a fraction of the households, using {@link HouseholdSamplerAlgorithm}
-	 * so that the household members are kept intact with the sampled households.
-	 * @param householdFile
-	 * @param populationFile
-	 * @param fraction
+	 * so that the household members are kept intact with the sampled households. 
+	 * The code deliberately does <i>not</i> use the {@link ComprehensivePopulationReader} 
+	 * as it requires too much memory (June 2014: 100% Gauteng sample).
+	 * 
+	 * @param inputFolder where it is assumed a 'comprehensive' population 
+	 * 		resides. That is, at least the following files must be present:
+	 * 		<ul>
+	 * 			<li> <code>population.xml.gz</code>
+	 * 			<li> <code>populationAttributes.xml.gz</code>
+	 * 			<li> <code>households.xml.gz</code>
+	 * 			<li> <code>householdAttributes.xml.gz</code>
+	 * 		</ul>
+	 * 
+	 * @param fraction the fraction of the original population that must be
+	 * 		retained.
 	 */
 	public void sampleHouseholds(String inputFolder, final double fraction){
 		LOG.info("Sampling " + String.format("%.1f%%", fraction*100) + " of households.");
-		LOG.info("Checking for the available files...");
-
-		File hhf = new File(inputFolder + "households.xml.gz");
-		File hhaf = new File(inputFolder + "householdAttributes.xml.gz");
-		File pf = new File(inputFolder + "population.xml.gz");
-		File paf = new File(inputFolder + "populationAttributes.xml.gz");
-		LOG.info("  households: " + hhf.exists());
-		LOG.info("  population: " + pf.exists());
-		LOG.info("  household attributes: " + hhaf.exists());
-		LOG.info("  population attributes: " + paf.exists());
 		
-		/* Sets up the sampling algorithm. */
-		this.algorithm = new HouseholdSamplerAlgorithm(fraction);
-		HouseholdsImpl hhs = new HouseholdsImpl();
+		sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		((ScenarioImpl)sc).createHouseholdsContainer();
+		
+		/* Read just the households. */
+		String householdsFile = inputFolder + (inputFolder.endsWith("/") ? "" : "/") + "households.xml.gz";
+		new HouseholdsReaderV10(sc.getHouseholds()).parse(householdsFile);		
+		LOG.info("  original number of households: " + sc.getHouseholds().getHouseholds().size());
 
-		/* Run the household algorithm. */
-		HouseholdsReaderV10 hr = new HouseholdsReaderV10(hhs);
-		hr.readFile(hhf.getAbsolutePath());		
-		LOG.info("  original number of households: " + hhs.getHouseholds().size());
+		/* Run the sampling algorithm. */
 		HouseholdsAlgorithmRunner algos = new HouseholdsAlgorithmRunner();
-		algos.addAlgorithm(algorithm);
-		algos.runAlgorithms(hhs);
-		
-		/* Check if there are custom attributes with the households */
-		ObjectAttributes hha = null;
-		if(hhaf.exists()){
-			hha = new ObjectAttributes();
-			ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(hha);
-			oar.parse(hhaf.getAbsolutePath());
-		}
+		HouseholdSamplerAlgorithm sampler = new HouseholdSamplerAlgorithm(fraction, rng);
+		algos.addAlgorithm(sampler);
+		algos.runAlgorithms(sc.getHouseholds());
 		
 		/* Remove those households that have not been sampled. */
-		LOG.info("  removing " + this.algorithm.getSampledIds().size() + " households...");
+		LOG.info("  removing " + sampler.getSampledIds().size() + " households...");
 		Counter counter = new Counter("    removed # ");
-		for(Id id : this.algorithm.getSampledIds()){
-			hhs.getHouseholds().remove(id);
-			if(hha != null){
-				hha.removeAllAttributes(id.toString());
-			}
+		for(Id id : sampler.getSampledIds()){
+			sc.getHouseholds().getHouseholds().remove(id);
 			counter.incCounter();
 		}
 		counter.printCounter();
-		LOG.info("  remaining number of households: " + hhs.getHouseholds().size());
+		LOG.info("  remaining number of households: " + sc.getHouseholds().getHouseholds().size());
 		
-		/* Check if there are custom attributes with the population */
-		ObjectAttributes pa = null;
-		if(paf.exists()){
-			pa = new ObjectAttributes();
-			ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(pa);
-			oar.parse(paf.getAbsolutePath());
-		}
-		
-		/* Read the population */
-		MatsimPopulationReader pr = new MatsimPopulationReader(this.sc);
-		pr.readFile(pf.getAbsolutePath());
-		LOG.info("  original number of persons: " + sc.getPopulation().getPersons().size());
-		
-		/* Remove those persons that are not members of the sampled households. */
-		Population pop = this.sc.getPopulation();
-		LOG.info("  removing " + this.algorithm.getSampledMemberIds().size() + " household members...");
+		/* Read and clean the population. */
+		String populationFile = inputFolder + (inputFolder.endsWith("/") ? "" : "/") + "population.xml.gz";
+		new MatsimPopulationReader(sc).parse(populationFile);
 		counter.reset();
-		for(Id id : this.algorithm.getSampledMemberIds()){
-			pop.getPersons().remove(id);
-			if(pa != null){
-				pa.removeAllAttributes(id.toString());
-			}
+		LOG.info("  removing " + sampler.getSampledMemberIds().size() + " household members...");
+		for(Id id : sampler.getSampledMemberIds()){
+			sc.getPopulation().getPersons().remove(id);
 			counter.incCounter();
 		}
 		counter.printCounter();
-		LOG.info("  remaining number of household members: " + pop.getPersons().size());
-		
-		this.sampledHouseholds = hhs;
-		this.sampledHouseholdAttributes = hha;
-		this.sampledPopulation = pop;
-		this.sampledPopulationAttributes = pa;
-	}
-	
-	
-	/**
-	 * Gets the household {@link Id}s of the sampled households.
-	 * @return
-	 * @throws IllegalAccessException if the method {@link #sampleHouseholds(String, double)}
-	 * 		has not been called yet, and no sampling has been done.
-	 */
-	public List<Id> getSampledHouseholdIds() throws IllegalAccessException{
-		if(this.algorithm == null){
-			throw new IllegalAccessException("No sampling algorithm has been created. Firts run sampleHouseholds() method.");
-		}
-		return this.algorithm.getSampledIds();
-	}
+		LOG.info("  remaining number of household members: " + sc.getPopulation().getPersons().size());
 
-	
-	/**
-	 * Gets the household {@link Id}s of the sampled households.
-	 * @return
-	 * @throws IllegalAccessException if the method {@link #sampleHouseholds(String, double)}
-	 * 		has not been called yet, and no sampling has been done.
-	 */
-	public List<Id> getSampledHouseholdMemberIds() throws IllegalAccessException{
-		if(this.algorithm == null){
-			throw new IllegalAccessException("No sampling algorithm has been created. Firts run sampleHouseholds() method.");
+		/* Read and clean the household attributes. */
+		String householdAttributeFile = inputFolder + (inputFolder.endsWith("/") ? "" : "/") + "householdAttributes.xml.gz";
+		new ObjectAttributesXmlReader(sc.getHouseholds().getHouseholdAttributes()).parse(householdAttributeFile);
+		counter.reset();
+		LOG.info("  removing " + sampler.getSampledIds().size() + " household's attributes...");
+		for(Id id : sampler.getSampledIds()){
+			sc.getHouseholds().getHouseholdAttributes().removeAllAttributes(id.toString());
+			counter.incCounter();
 		}
-		return this.algorithm.getSampledMemberIds();
+		counter.printCounter();
+		
+		/* Read and clean the person attributes. */
+		String personAttributeFile = inputFolder + (inputFolder.endsWith("/") ? "" : "/") + "populationAttributes.xml.gz";
+		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).parse(personAttributeFile);
+		counter.reset();
+		LOG.info("  removing " + sampler.getSampledIds().size() + " household members's attributes...");
+		for(Id id : sampler.getSampledMemberIds()){
+			sc.getPopulation().getPersonAttributes().removeAllAttributes(id.toString());
+			counter.incCounter();
+		}
+		counter.printCounter();
+		
+		/* I don't know if it makes a big difference. */
+		sc = null;
 	}
 	
-	
-	public void writeSample(String outputFolder, String networkFile){
+	/**
+	 * Writes the households, their attributes, the population and its 
+	 * attributes to a given folder. <br><br>
+	 *  
+	 * @param outputFolder
+	 * @throws IOException if the output folder contains any files that may be overwritten.
+	 */
+	public void writeSample(String outputFolder) throws IOException{
 		LOG.info("Writing the sample to " + outputFolder);
 		
-		/* First read in the network. */
-		MatsimNetworkReader nr = new MatsimNetworkReader(this.sc);
-		nr.readFile(networkFile);
-		
+		File hhf = new File(outputFolder + "households.xml.gz");
+		File hhaf = new File(outputFolder + "householdAttributes.xml.gz");
+		File pf = new File(outputFolder + "population.xml.gz");
+		File paf = new File(outputFolder + "populationAttributes.xml.gz");
+		if(hhf.exists() || hhaf.exists() || pf.exists() || paf.exists()){
+			throw new IOException("One or more of the output files already exists, and may not be overwritten.");
+		}
+
 		/* Households. */
-		HouseholdsWriterV10 hw = new HouseholdsWriterV10(this.sampledHouseholds);
-		hw.writeFile(outputFolder + "households.xml.gz");
-		
+		HouseholdsWriterV10 hw = new HouseholdsWriterV10(sc.getHouseholds());
+		hw.writeFile(hhf.getAbsolutePath());
+
 		/* Household attributes, if they exist. */
-		if( this.sampledHouseholdAttributes != null){
-			ObjectAttributesXmlWriter haw = new ObjectAttributesXmlWriter(this.sampledHouseholdAttributes);
-			haw.writeFile(outputFolder + "householdAttributes.xml.gz");
-		}
-		
+		ObjectAttributesXmlWriter haw = new ObjectAttributesXmlWriter(sc.getHouseholds().getHouseholdAttributes());
+		haw.writeFile(hhaf.getAbsolutePath());
+
 		/* Population. */
-		PopulationWriter pw = new PopulationWriter(this.sampledPopulation, this.sc.getNetwork());
-		pw.write(outputFolder + "population.xml.gz");
-		
+		PopulationWriter pw = new PopulationWriter(sc.getPopulation());
+		pw.write(pf.getAbsolutePath());
+
 		/* Population attributes, if they exist. */
-		if(this.sampledPopulationAttributes != null){
-			ObjectAttributesXmlWriter paw = new ObjectAttributesXmlWriter(this.sampledPopulationAttributes);
-			paw.writeFile(outputFolder + "populationAttributes.xml.gz");
-		}
+		ObjectAttributesXmlWriter paw = new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes());
+		paw.writeFile(paf.getAbsolutePath());
 	}
 
 }

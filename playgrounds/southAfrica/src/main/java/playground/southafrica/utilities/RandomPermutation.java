@@ -41,8 +41,8 @@ public class RandomPermutation {
 	public static int[] getRandomPermutation(int n){
 		/* Add the sequential integers to an array. */
 		int[] a = new int[n];
-		for(int i = 0; i < n; i++){
-			a[i] = i;
+		for(int i = 1; i <= n; i++){
+			a[i-1] = i;
 		}
 
 		/* Shuffle each position in the array with a random other position. */
