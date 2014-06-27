@@ -96,9 +96,9 @@ public class IVVReaderV2 {
 		log.info("Duplicating Nullfall");
 		ScenarioForEvalData planfallData = nullfallData.createDeepCopy();
 
-	    log.info("Reading Verbleibend (01)) "+ config.getNewDemandMatrixFile());
-	        read(config.getRemainingDemandMatrixFile(), new DemandRemainingHandler(odRelations, planfallData));
-		
+//	    log.info("Reading Verbleibend (01)) "+ config.getRemainingDemandMatrixFile());
+//	    read(config.getRemainingDemandMatrixFile(), new DemandRemainingHandler(odRelations, planfallData));
+//      Verbleibender Verkehr ist für die gegebenen Relationen mit Daten aus Nullfall identisch
 		
 		log.info("Reading Reseizeitmatrix Planfall (07): " +config.getTravelTimesStudyMatrixFile());
 		TravelTimeHandler plantt = new TravelTimeHandler(planfallData, odRelations, false);
@@ -734,7 +734,7 @@ public class IVVReaderV2 {
 		return new IdImpl(from + "---" + to);
 	}
 	
-	private static String getIdForTTfiles(String col){
+	 static String getIdForTTfiles(String col){
 		String s = col.trim();
 		if(s.length() == 5) s = s +"00";
 		return s;
