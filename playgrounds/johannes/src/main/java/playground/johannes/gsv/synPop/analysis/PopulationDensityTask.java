@@ -30,6 +30,7 @@ import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.sna.util.ProgressLogger;
+import playground.johannes.socialnetworks.gis.io.ZoneLayerKMLWriter;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -95,14 +96,15 @@ public class PopulationDensityTask implements ProxyAnalyzerTask {
 			newZones.add(newZone);
 		}
 		
-		try {
+//		try {
 			ZoneLayer<Double> layer = new ZoneLayer<Double>(newZones);
 			layer.overwriteCRS(CRSUtils.getCRS(31467));
-			ZoneLayerSHP.write(layer, output);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//			ZoneLayerSHP.write(layer, output);
+			new ZoneLayerKMLWriter().writeWithColor(layer, output);
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 }

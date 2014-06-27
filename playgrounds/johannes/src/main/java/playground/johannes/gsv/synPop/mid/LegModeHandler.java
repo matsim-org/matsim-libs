@@ -17,58 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.analysis;
+package playground.johannes.gsv.synPop.mid;
 
-import gnu.trove.TObjectDoubleHashMap;
-
-import java.io.IOException;
-import java.util.Collection;
+import java.util.Map;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.gsv.synPop.ProxyObject;
 
 /**
  * @author johannes
  *
  */
-public class ActivityChainTask implements ProxyAnalyzerTask {
-	
-	private String outDir;
+public class LegModeHandler implements LegAttributeHandler {
 
-	public ActivityChainTask(String outputDir) {
-		this.outDir = outputDir;
-	}
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.analysis.ProxyAnalyzerTask#analyze(java.util.Collection)
+	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyObject, java.util.Map)
 	 */
 	@Override
-	public void analyze(Collection<ProxyPerson> persons) {
-//		DescriptiveStatistics stats = new DescriptiveStatistics();
-		TObjectDoubleHashMap<String> chains = new TObjectDoubleHashMap<String>();
-		
-		for(ProxyPerson person : persons) {
-			ProxyPlan trajectory = person.getPlan();
-			StringBuilder builder = new StringBuilder();
-			for(int i = 0; i < trajectory.getActivities().size(); i++) {
-				String type = (String) trajectory.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE);
-				builder.append(type);
-				builder.append("-");
-			}
-			
-			String chain = builder.toString();
-			chains.adjustOrPutValue(chain, 1, 1);
+	public void handle(ProxyObject leg, Map<String, String> attributes) {
+		String mode = attributes.get(MIDKeys.LEG_MODE);
+		if(mode.equalsIgnoreCase("zu Fuß")) {
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_PED);
+		} else if(mode.equalsIgnoreCase("Fahrrad")) {
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_BIKE);
+		} else if(mode.equalsIgnoreCase("MIV (Mitfahrer)")) {
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_RIDE);
+		} else if(mode.equalsIgnoreCase("MIV (Fahrer)")) {
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_CAR);
+		} else if(mode.equalsIgnoreCase("ÖPV")) {
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_PT);
 		}
-		
-		try {
-			TXTWriter.writeMap(chains, "chain", "n", outDir + "/actchains.txt", true);
-				
-//			writeHistograms(stats, new DummyDiscretizer(), "actchain", false);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
 
 	}
 

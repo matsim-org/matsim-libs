@@ -45,24 +45,14 @@ public class HPersonMunicipality implements Hamiltonian {
 		this.municipalities = municipalities;
 	}
 	
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.sim.Hamiltonian#delta(playground.johannes.gsv.synPop.ProxyPerson, playground.johannes.gsv.synPop.ProxyPerson)
-	 */
 	@Override
 	public double evaluate(ProxyPerson original, ProxyPerson modified) {
 		return eval(modified) - eval(original);
 	}
 	
 	private double eval(ProxyPerson person) {
-//		Double x = (Double) person.getAttribute(CommonKeys.PERSON_HOME_COORD_X);
-//		Double y = (Double) person.getAttribute(CommonKeys.PERSON_HOME_COORD_Y);
-	
-//		Point p = geoFactory.createPoint(new Coordinate(x, y));
-//		Point p = (Point) person.getAttribute(CommonKeys.PERSON_HOME_POINT);
-//		Zone<Double> zone = municipalities.getZone(p);
 		Zone<Double> zone = (Zone<Double>) person.getUserData(this);
 		if(zone == null) {
-//			Point p = (Point) person.getAttribute(CommonKeys.PERSON_HOME_POINT);
 			double x = Double.parseDouble((String) person.getAttribute(CommonKeys.PERSON_HOME_COORD_X));
 			double y = Double.parseDouble((String) person.getAttribute(CommonKeys.PERSON_HOME_COORD_Y));
 				
@@ -72,9 +62,7 @@ public class HPersonMunicipality implements Hamiltonian {
 		}
 		
 		if(zone == null)
-//			throw new RuntimeException();
 			return Double.NEGATIVE_INFINITY;
-//			return 0;
 		
 		double inhabs = zone.getAttribute();
 		
@@ -86,30 +74,12 @@ public class HPersonMunicipality implements Hamiltonian {
 		}
 		int target = intObj;
 		int cat = PersonMunicipalityClassHandler.getCategorie((int) inhabs);
-//		int lower = (Integer) person.getAttribute(MIDKeys.PERSON_MUNICIPALITY_LOWER);
-//		int upper = (Integer) person.getAttribute(MIDKeys.PERSON_MUNICIPALITY_UPPER);
-//		int lower = PersonMunicipalityClassHandler.getLowerBound(cat);
-//		int upper = PersonMunicipalityClassHandler.getUpperBound(cat);
-		
-//		if(inhabs >= lower && inhabs < upper) {
-//		return  Math.abs(target - cat);
 		if(target == cat)
 			return 0;
 		else
 			return -1;
-//		if()
-//			return 0;
-//		} else {
-//			double dlow = Math.abs(inhabs - lower);
-//			double dup = Math.abs(inhabs - upper);
-//			return - Math.min(dlow, dup);
-////			return -1;
-//		}
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.sim.Hamiltonian#calculateAll(java.util.Collection)
-	 */
 	@Override
 	public double evaluate(Collection<ProxyPerson> persons) {
 		double sum = 0;

@@ -17,59 +17,61 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.analysis;
+package playground.johannes.gsv.synPop.mid.run;
 
-import gnu.trove.TObjectDoubleHashMap;
-
-import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
 
 import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.DeleteNoLegs;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.gsv.synPop.ProxyPersonTaskComposite;
+import playground.johannes.gsv.synPop.io.XMLParser;
+import playground.johannes.gsv.synPop.io.XMLWriter;
 
 /**
  * @author johannes
  *
  */
-public class ActivityChainTask implements ProxyAnalyzerTask {
+public class PersonFilter {
+
+	private static final Logger logger = Logger.getLogger(PersonFilter.class);
 	
-	private String outDir;
-
-	public ActivityChainTask(String outputDir) {
-		this.outDir = outputDir;
-	}
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.analysis.ProxyAnalyzerTask#analyze(java.util.Collection)
-	 */
-	@Override
-	public void analyze(Collection<ProxyPerson> persons) {
-//		DescriptiveStatistics stats = new DescriptiveStatistics();
-		TObjectDoubleHashMap<String> chains = new TObjectDoubleHashMap<String>();
-		
+	static public Set<ProxyPerson> filter(Collection<ProxyPerson> persons) {
+		Set<ProxyPerson> subset = new HashSet<ProxyPerson>(persons.size());
 		for(ProxyPerson person : persons) {
-			ProxyPlan trajectory = person.getPlan();
-			StringBuilder builder = new StringBuilder();
-			for(int i = 0; i < trajectory.getActivities().size(); i++) {
-				String type = (String) trajectory.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE);
-				builder.append(type);
-				builder.append("-");
+			if(!"true".equalsIgnoreCase(person.getAttribute(CommonKeys.DELETE))) {
+				subset.add(person);
 			}
-			
-			String chain = builder.toString();
-			chains.adjustOrPutValue(chain, 1, 1);
 		}
 		
-		try {
-			TXTWriter.writeMap(chains, "chain", "n", outDir + "/actchains.txt", true);
-				
-//			writeHistograms(stats, new DummyDiscretizer(), "actchain", false);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-
+		return subset;
 	}
-
+	
+	public static void main(String args[]) {
+		XMLParser parser = new XMLParser();
+		parser.setValidating(false);
+		
+		parser.parse("/home/johannes/gsv/mid2008/pop.xml");
+		logger.info(String.format("Loaded %s persons.", parser.getPersons().size()));
+		
+		ProxyPersonTaskComposite tasks = new ProxyPersonTaskComposite();
+		tasks.addComponent(new DeleteNoLegs());
+		
+		logger.info("Running filter...");
+		for(ProxyPerson person : parser.getPersons()) {
+			tasks.apply(person);
+		}
+		
+		Set<ProxyPerson> subset = PersonFilter.filter(parser.getPersons());
+		logger.info(String.format("New population: %s persons.", subset.size()));
+		
+		logger.info("Writing population...");
+		XMLWriter writer = new XMLWriter();
+		writer.write("/home/johannes/gsv/mid2008/pop.mob.xml", subset);
+		logger.info("Done.");
+	}
 }

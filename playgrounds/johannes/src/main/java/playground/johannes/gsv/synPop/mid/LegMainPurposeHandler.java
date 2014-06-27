@@ -52,7 +52,7 @@ public class LegMainPurposeHandler implements LegAttributeHandler {
 		} else if(typeId.equalsIgnoreCase("private Erledigungen")) {
 			leg.setAttribute(CommonKeys.LEG_PURPOSE, "private");
 		} else if(typeId.equalsIgnoreCase("Bringen oder Holen von Personen")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, "droppoff_pickup");
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, "pickdrop");
 		} else if(typeId.equalsIgnoreCase("Freizeitaktivität")) {
 			leg.setAttribute(CommonKeys.LEG_PURPOSE, "leisure");
 		} else if(typeId.equalsIgnoreCase("nach Hause")) {

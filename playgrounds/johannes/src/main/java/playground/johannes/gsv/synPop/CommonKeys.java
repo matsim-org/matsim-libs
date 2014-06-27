@@ -45,6 +45,18 @@ public interface CommonKeys {
 	
 	public static final String LEG_DISTANCE = "distance";
 	
+	public static final String LEG_MODE = "mode";
+	
+	public static final String LEG_MODE_PED = "ped";
+	
+	public static final String LEG_MODE_BIKE = "bike";
+	
+	public static final String LEG_MODE_CAR = "car";
+	
+	public static final String LEG_MODE_RIDE = "ride";
+	
+	public static final String LEG_MODE_PT = "pt";
+	
 	public static final String ACTIVITY_TYPE = "type";
 	
 	public static final String ACTIVITY_START_TIME = "startTime";
@@ -52,4 +64,22 @@ public interface CommonKeys {
 	public static final String ACTIVITY_END_TIME = "endTime";
 	
 	public static final String ACTIVITY_FACILITY = "activityFacility";
+	
+	public static final String DELETE = "delete";
+	
+	public static final String DAY = "day";
+	
+	public static final String MONDAY = "mon";
+	
+	public static final String TUESDAY = "tue";
+	
+	public static final String WEDNESDAY = "wed";
+	
+	public static final String THURSDAY = "thu";
+	
+	public static final String FRIDAY = "fri";
+	
+	public static final String SATURDAY = "sat";
+	
+	public static final String SUNDAY = "sun";
 }

@@ -19,50 +19,23 @@
 
 package playground.johannes.gsv.synPop;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import playground.johannes.sna.util.Composite;
 
 /**
  * @author johannes
  *
  */
-public class ProxyActivity {
+public class ProxyPersonTaskComposite extends Composite<ProxyPersonTask> implements	ProxyPersonTask {
 
-	private Map<String, Object> attributes = new HashMap<String, Object>();
-	
-	private Map<Object, Object> userData;
-	
-	public Object setAttribute(String key, Object value) {
-		return attributes.put(key, value);
-	}
-	
-	public Object getAttribute(String key) {
-		return attributes.get(key);
-	}
-	
-	public Map<String, Object> getAttributes() {
-		return Collections.unmodifiableMap(attributes);
-	}
-	
-	public ProxyActivity clone() {
-		ProxyActivity clone = new ProxyActivity();
-		
-		for(Entry<String, Object> entry : attributes.entrySet()) {
-			clone.setAttribute(entry.getKey(), entry.getValue());
+	/* (non-Javadoc)
+	 * @see playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes.gsv.synPop.ProxyPerson)
+	 */
+	@Override
+	public void apply(ProxyPerson person) {
+		for(ProxyPersonTask task : components) {
+			task.apply(person);
 		}
-		
-		return clone;
+
 	}
-	
-	public void setUserData(Object key, Object value) {
-		
-	}
-	
-	private void initUserData() {
-		if(userData == null) {
-			userData = new HashMap<Object, Object>();
-		}
-	}
+
 }

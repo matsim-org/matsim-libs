@@ -23,6 +23,12 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.johannes.gsv.synPop.CommonKeys;
@@ -52,17 +58,28 @@ public class Analyzer {
 		parser.addSerializer(CommonKeys.PERSON_HOME_POINT, new PointSerializer());
 		parser.setValidating(false);
 		
-		parser.parse("/home/johannes/Schreibtisch/10000000.pop.xml");
+		parser.parse("/home/johannes/gsv/synpop/output/100000000.pop.xml.gz");
+//		parser.parse("/home/johannes/gsv/mid2008/pop.xml");
 		
-		Set<SimpleFeature> features = FeatureSHP.readFeatures("/home/johannes/gsv/synpop/data/gis/marktzellen/plz8.gk3.shp");
+		Set<SimpleFeature> features = FeatureSHP.readFeatures("/home/johannes/gsv/synpop/data/gis/nuts/Gemeinden.gk3.shp");
 		Set<Geometry> geometries = new HashSet<Geometry>();
  		for(SimpleFeature feature : features) {
 			geometries.add((Geometry) feature.getDefaultGeometry());
 		}
-		PopulationDensityTask task = new PopulationDensityTask(geometries, "/home/johannes/gsv/synpop/output/popDen.shp");
 		
-		task.analyze(parser.getPersons());
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
+		facReader.readFile("/home/johannes/gsv/synpop/data/facilities/facilities.ger.work.xml");
+		ActivityFacilities facilities = scenario.getActivityFacilities();
+	
+	
+		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
+//		task.addComponent(new PopulationDensityTask(geometries, "/home/johannes/gsv/synpop/output/popDen.kmz"));
+		task.addComponent(new ActivityDistanceTask(facilities, "/home/johannes/gsv/synpop/output/"));
+//		task.addComponent(new ActivityChainTask("/home/johannes/gsv/synpop/output/"));
 
+		task.analyze(parser.getPersons());
 	}
 
 }

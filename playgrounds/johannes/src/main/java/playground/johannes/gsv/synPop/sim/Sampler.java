@@ -46,7 +46,7 @@ public class Sampler {
 	
 	private Hamiltonian hamiltonian;
 	
-	private int logInterval = 10000;
+	private int logInterval = 100000;
 	
 	public Sampler(Random random) {
 		this.random = random;
@@ -84,13 +84,15 @@ public class Sampler {
 			if(step())
 				accepts++;
 			
-			
+			if(i % 10000 == 0) {
+				logger.info(String.format("[%s] Accepted %s of %s steps.", i, accepts, 10000));
+				accepts = 0;
+			}
 			
 			if(i % logInterval == 0) {
-				double h = hamiltonian.evaluate(this.population);
 				long t = System.currentTimeMillis() - time;
-				logger.info(String.format("[%s] Accepted %s of %s steps. Hamiltonian: %s, time; %s", i, accepts, logInterval, h, t));
-				accepts = 0;
+				double h = hamiltonian.evaluate(this.population);
+				logger.info(String.format("Total hamiltonian score: %s. Time: %s", h, t));
 				time = System.currentTimeMillis();
 			}
 		}

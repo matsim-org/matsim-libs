@@ -80,7 +80,7 @@ public class ZoneLayerSHP {
 		 * Create a FeatureWriter and write the attributes
 		 */
 		FeatureWriter<SimpleFeatureType, SimpleFeature> writer = datastore.getFeatureWriter(Transaction.AUTO_COMMIT);
-		datastore.dispose();
+		
 		for(Zone<T> zone : layer.getZones()) {
 			SimpleFeature feature = writer.next();
 			try {
@@ -93,7 +93,7 @@ public class ZoneLayerSHP {
 			}
 			writer.write();
 		}
-		
+		datastore.dispose();
 		writer.close();
 		/*
 		 * It seems that in some cases the .prj file is not written. This is a

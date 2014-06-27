@@ -20,82 +20,101 @@
 package playground.johannes.gsv.synPop.osm;
 
 import java.util.Collection;
-import java.util.Set;
 
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesFactoryImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.FacilitiesUtils;
 import org.matsim.core.facilities.FacilitiesWriter;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
 
 import playground.johannes.coopsim.util.MatsimCoordUtils;
+import playground.johannes.sna.gis.CRSUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author johannes
- *
+ * 
  */
 public class OSM2Facility {
 
 	private static GeometryFactory factory = new GeometryFactory();
-	
-	public static void createFacilities(ActivityFacilities facilities, ActivityFacilitiesFactory factory, Collection<OSMWay> ways) {
-		
+
+	public static void createFacilities(ActivityFacilities facilities,
+			ActivityFacilitiesFactory factory, Collection<OSMWay> ways, String actOption) {
+
+		MathTransform tranform = null;
+		try {
+			tranform = CRS.findMathTransform(DefaultGeographicCRS.WGS84,
+					CRSUtils.getCRS(31467));
+		} catch (FactoryException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		int cnt = 0;
-		for(OSMWay way : ways) {
+		for (OSMWay way : ways) {
 			try {
-			Geometry geo = convert(way);
-			Coord coord = MatsimCoordUtils.pointToCoord(geo.getCentroid());
-			ActivityFacility facility = factory.createActivityFacility(new IdImpl(String.valueOf(cnt)), coord);
-			ActivityOption option = factory.createActivityOption("shop");
-			facility.addActivityOption(option);
-			facilities.addActivityFacility(facility);
-			cnt++;
+				Geometry geo = convert(way);
+				// Coord coord =
+				// MatsimCoordUtils.pointToCoord(geo.getCentroid());
+				Point p = CRSUtils.transformPoint(geo.getCentroid(), tranform);
+				Coord coord = MatsimCoordUtils.pointToCoord(p);
+				ActivityFacility facility = factory.createActivityFacility(
+						new IdImpl(String.valueOf(cnt)), coord);
+				ActivityOption option = factory.createActivityOption(actOption);
+				facility.addActivityOption(option);
+				facilities.addActivityFacility(facility);
+				cnt++;
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 			}
 		}
-		
-		
+
 	}
-	
+
 	private static Geometry convert(OSMWay way) {
 		Coordinate coords[] = new Coordinate[way.getNodes().size()];
-		for(int i = 0; i < way.getNodes().size(); i++) {
+		for (int i = 0; i < way.getNodes().size(); i++) {
 			OSMNode node = way.getNodes().get(i);
 			coords[i] = new Coordinate(node.getLongitude(), node.getLatitude());
 		}
 		LinearRing ring = factory.createLinearRing(coords);
-		
+
 		Polygon poly = factory.createPolygon(ring, null);
-		
+
 		return poly;
 	}
-	
+
 	public static void main(String args[]) {
+		String type = "shop";
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
-		parser.parse("/home/johannes/gsv/osm/germany-shops2.xml");
-		
+		parser.parse("/home/johannes/gsv/osm/germany-"+type+".osm");
+
 		Collection<OSMWay> ways = parser.getWays().values();
-		
+
 		ActivityFacilitiesFactoryImpl ffactory = new ActivityFacilitiesFactoryImpl();
-		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();
-		createFacilities(facilities, ffactory, ways);
-		
-		System.out.println(String.format("Created %s facilities.", facilities.getFacilities().size()));
-		
+		ActivityFacilities facilities = FacilitiesUtils
+				.createActivityFacilities();
+		createFacilities(facilities, ffactory, ways, type);
+
+		System.out.println(String.format("Created %s facilities.", facilities
+				.getFacilities().size()));
+
 		FacilitiesWriter writer = new FacilitiesWriter(facilities);
-		writer.write("/home/johannes/gsv/osm/facilities.ger.shop.xml");
+		writer.write("/home/johannes/gsv/osm/facilities.ger."+type+".xml");
 	}
 }

@@ -17,59 +17,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.analysis;
+package playground.johannes.gsv.synPop.mid;
 
-import gnu.trove.TObjectDoubleHashMap;
-
-import java.io.IOException;
-import java.util.Collection;
+import java.util.Map;
 
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author johannes
  *
  */
-public class ActivityChainTask implements ProxyAnalyzerTask {
-	
-	private String outDir;
+public class PersonDayHandler implements PersonAttributeHandler {
 
-	public ActivityChainTask(String outputDir) {
-		this.outDir = outputDir;
-	}
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.analysis.ProxyAnalyzerTask#analyze(java.util.Collection)
+	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyObject, java.util.Map)
 	 */
 	@Override
-	public void analyze(Collection<ProxyPerson> persons) {
-//		DescriptiveStatistics stats = new DescriptiveStatistics();
-		TObjectDoubleHashMap<String> chains = new TObjectDoubleHashMap<String>();
-		
-		for(ProxyPerson person : persons) {
-			ProxyPlan trajectory = person.getPlan();
-			StringBuilder builder = new StringBuilder();
-			for(int i = 0; i < trajectory.getActivities().size(); i++) {
-				String type = (String) trajectory.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE);
-				builder.append(type);
-				builder.append("-");
-			}
-			
-			String chain = builder.toString();
-			chains.adjustOrPutValue(chain, 1, 1);
+	public void handle(ProxyPerson person, Map<String, String> attributes) {
+		String day = attributes.get(MIDKeys.SURVEY_DAY);
+		if(day.equalsIgnoreCase("Montag")) {
+			person.setAttribute(CommonKeys.DAY, CommonKeys.MONDAY);
+		} else if(day.equalsIgnoreCase("Dienstag")) {
+			person.setAttribute(CommonKeys.DAY, CommonKeys.TUESDAY);
+		} else if(day.equalsIgnoreCase("Mittwoch")) {
+			person.setAttribute(CommonKeys.DAY, CommonKeys.WEDNESDAY);
+		} else if(day.equalsIgnoreCase("Donnerstag")) {
+			person.setAttribute(CommonKeys.DAY, CommonKeys.THURSDAY);
+		} else if(day.equalsIgnoreCase("Freitag")) {
+			person.setAttribute(CommonKeys.DAY, CommonKeys.FRIDAY);
+		} else if(day.equalsIgnoreCase("Samstag")) {
+			person.setAttribute(CommonKeys.DAY, CommonKeys.SATURDAY);
+		} else if(day.equalsIgnoreCase("Sonntag")) {
+			person.setAttribute(CommonKeys.DAY, CommonKeys.SUNDAY);
 		}
-		
-		try {
-			TXTWriter.writeMap(chains, "chain", "n", outDir + "/actchains.txt", true);
-				
-//			writeHistograms(stats, new DummyDiscretizer(), "actchain", false);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-
 	}
 
 }

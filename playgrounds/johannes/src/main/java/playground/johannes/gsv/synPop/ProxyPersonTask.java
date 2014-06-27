@@ -19,47 +19,11 @@
 
 package playground.johannes.gsv.synPop;
 
-import java.util.Map.Entry;
-
 /**
  * @author johannes
  *
  */
-public class ProxyPerson extends ProxyObject {
+public interface ProxyPersonTask {
 
-	private String id;
-	
-	private ProxyPlan plan;
-	
-	public ProxyPerson(String id) {
-		this.id = id;		
-	}
-	
-	public String getId() {
-		return id;
-	}
-	
-	public void setPlan(ProxyPlan plan) {
-		this.plan = plan;
-	}
-	
-	public ProxyPlan getPlan() {
-		return plan;
-	}
-	
-	public ProxyPerson clone() {
-		return cloneWithNewId(id);
-	}
-	
-	public ProxyPerson cloneWithNewId(String newId) {
-		ProxyPerson clone = new ProxyPerson(newId);
-		
-		for(Entry<String, String> entry : getAttributes().entrySet()) {
-			clone.setAttribute(entry.getKey(), entry.getValue());
-		}
-		
-		clone.setPlan(plan.clone());
-		
-		return clone;
-	}
+	public void apply(ProxyPerson person);
 }

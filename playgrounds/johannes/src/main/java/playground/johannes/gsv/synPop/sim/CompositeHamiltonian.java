@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.sna.util.Composite;
 
@@ -31,6 +33,8 @@ import playground.johannes.sna.util.Composite;
  *
  */
 public class CompositeHamiltonian extends Composite<Hamiltonian> implements Hamiltonian {
+	
+	private static final Logger logger = Logger.getLogger(CompositeHamiltonian.class);
 
 	private List<Double> thetas = new ArrayList<Double>();
 	
@@ -71,10 +75,14 @@ public class CompositeHamiltonian extends Composite<Hamiltonian> implements Hami
 	public double evaluate(Collection<ProxyPerson> persons) {
 		double sum = 0;
 		
+		StringBuilder builder = new StringBuilder();
+		builder.append("Score for hamiltonian terms:");
 		for(Hamiltonian component : components) {
-			sum += component.evaluate(persons);
+			double val = component.evaluate(persons);
+			sum += val;
+			builder.append(String.format("\n\t%s: %s", component.getClass().getCanonicalName(), val));
 		}
-		
+		logger.info(builder.toString());
 		return sum;
 	}
 

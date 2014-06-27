@@ -17,43 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.gsv.synPop.osm;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
+import org.matsim.core.utils.io.OsmNetworkReader;
 
 /**
  * @author johannes
  *
  */
-/*
- * redundant with proxy activity
- */
-public class ProxyLeg {
+public class OSM2Network {
 
-	private Map<String, Object> attributes = new HashMap<String, Object>();
-	
-	public Object setAttribute(String key, Object value) {
-		return attributes.put(key, value);
-	}
-	
-	public Object getAttribute(String key) {
-		return attributes.get(key);
-	}
-	
-	public Map<String, Object> getAttributes() {
-		return Collections.unmodifiableMap(attributes);
-	}
-	
-	public ProxyLeg clone() {
-		ProxyLeg clone = new ProxyLeg();
+	private static final Logger logger = Logger.getLogger(OSM2Network.class);
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Network network = scenario.getNetwork();
 		
-		for(Entry<String, Object> entry : attributes.entrySet()) {
-			clone.setAttribute(entry.getKey(), entry.getValue());
-		}
+		CoordinateTransformation transformation = new GeotoolsTransformation("EPSG:4326", "EPSG:31467");
+		OsmNetworkReader reader = new OsmNetworkReader(network, transformation);
 		
-		return clone;
+		logger.info("Loading OSM file...");
+		reader.setHierarchyLayer(55.1477, 5.864417, 47.26543, 15.05078, 4);
+		reader.setMemoryOptimization(true);
+		reader.parse("/home/johannes/gsv/osm/germany-latest.osm");
+
+		logger.info("Writing network file...");
+		NetworkWriter writer = new NetworkWriter(network);
+		writer.write("/home/johannes/gsv/osm/germany-network.xml");
+		logger.info("Done.");
 	}
+
 }

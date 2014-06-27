@@ -47,12 +47,11 @@ public interface MIDKeys {
 	
 	public static final String LEG_DISTANCE = "wegkm_k";
 	
-	
-//	public static final String PERSON_MUNICIPALITY_LOWER = "inhabLow";
-	
-//	public static final String PERSON_MUNICIPALITY_UPPER = "inhabUp";
+	public static final String LEG_MODE = "hvm";
 	
 	public static final String PERSON_MUNICIPALITY_CLASS = "inhabClass";
 	
 	public static final String PERSON_WEIGHT = "p_gew";
+	
+	public static final String SURVEY_DAY = "stichtag";
 }

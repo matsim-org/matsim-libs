@@ -19,56 +19,22 @@
 
 package playground.johannes.gsv.synPop.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
-
-import java.io.IOException;
 import java.util.Collection;
 
-import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.sna.util.Composite;
 
 /**
  * @author johannes
  *
  */
-public class ActivityChainTask implements ProxyAnalyzerTask {
-	
-	private String outDir;
+public class AnalyzerTaskComposite extends Composite<ProxyAnalyzerTask> implements ProxyAnalyzerTask {
 
-	public ActivityChainTask(String outputDir) {
-		this.outDir = outputDir;
-	}
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.analysis.ProxyAnalyzerTask#analyze(java.util.Collection)
-	 */
 	@Override
 	public void analyze(Collection<ProxyPerson> persons) {
-//		DescriptiveStatistics stats = new DescriptiveStatistics();
-		TObjectDoubleHashMap<String> chains = new TObjectDoubleHashMap<String>();
-		
-		for(ProxyPerson person : persons) {
-			ProxyPlan trajectory = person.getPlan();
-			StringBuilder builder = new StringBuilder();
-			for(int i = 0; i < trajectory.getActivities().size(); i++) {
-				String type = (String) trajectory.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE);
-				builder.append(type);
-				builder.append("-");
-			}
-			
-			String chain = builder.toString();
-			chains.adjustOrPutValue(chain, 1, 1);
+		for(ProxyAnalyzerTask task : components) {
+			task.analyze(persons);
 		}
-		
-		try {
-			TXTWriter.writeMap(chains, "chain", "n", outDir + "/actchains.txt", true);
-				
-//			writeHistograms(stats, new DummyDiscretizer(), "actchain", false);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
 
 	}
 

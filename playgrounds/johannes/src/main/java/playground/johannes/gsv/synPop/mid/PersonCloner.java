@@ -39,6 +39,12 @@ import playground.johannes.sna.util.ProgressLogger;
 public class PersonCloner {
 
 	public static Set<ProxyPerson> weightedClones(Collection<ProxyPerson> persons, int N, Random random) {
+		if(persons.size() == N) {
+			return new HashSet<ProxyPerson>(persons); //TODO weights are left untouched
+		} else if(persons.size() > N) {
+			throw new IllegalArgumentException("Cannot shrink population.");
+		}
+		
 		List<ProxyPerson> templates = new ArrayList<ProxyPerson>(persons);
 		/*
 		 * get max weight
@@ -61,7 +67,12 @@ public class PersonCloner {
 			double w = weights.get(template);
 			double p = w/maxW;
 			if(p > random.nextDouble()) {
-				ProxyPerson clone = template.clone();
+				StringBuilder builder = new StringBuilder();
+				builder.append(template.getId());
+				builder.append("clone");
+				builder.append(clones.size());
+				
+				ProxyPerson clone = template.cloneWithNewId(builder.toString());
 				clone.setAttribute(CommonKeys.PERSON_WEIGHT, "1.0");
 				clones.add(clone);
 				ProgressLogger.step();

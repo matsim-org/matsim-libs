@@ -19,15 +19,15 @@ public class OSMSummary {
 	public static void main(String[] args) throws IOException {
 		OSMParser parser = new OSMParser();
 		parser.setValidating(false);
-		parser.parse("/home/johannes/Downloads/hessen-latest.osm");
+		parser.parse("/home/johannes/gsv/osm/germany-latest.osm");
 		
-		TXTWriter.writeMap(parser.keys, "keys", "counts", "/home/johannes/Downloads/hessen-latest-keys.txt");
+		TXTWriter.writeMap(parser.keys, "keys", "counts", "/home/johannes/gsv/osm/germany-latest-keys.txt");
 		
 		for(Entry<String, TObjectDoubleHashMap<String>> entry : parser.attributes.entrySet()) {
 			String key = entry.getKey();
 			TObjectDoubleHashMap<String> values = entry.getValue();
 			
-			TXTWriter.writeMap(values, "keys", "counts", "/home/johannes/Downloads/" + key +".txt");
+			TXTWriter.writeMap(values, "keys", "counts", "/home/johannes/gsv/osm/" + key +".txt");
 		}
 
 	}

@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class RoundTripTask implements ProxyPlanTask {
 
-	private static final String ROUNDTRIP_SUFFIX = ".roundTrip";
+	private static final String ROUNDTRIP_SUFFIX = "";//":roundTrip";
 	
 	@Override
 	public void apply(ProxyPlan plan) {
@@ -78,6 +78,7 @@ public class RoundTripTask implements ProxyPlanTask {
 			fromLeg.setAttribute(CommonKeys.LEG_START_TIME, String.valueOf(toLegStart + dur/2));
 			fromLeg.setAttribute(CommonKeys.LEG_END_TIME, String.valueOf(toLegEnd));
 			fromLeg.setAttribute(CommonKeys.LEG_DISTANCE, toLeg.getAttribute(CommonKeys.LEG_DISTANCE));
+			fromLeg.setAttribute(CommonKeys.LEG_MODE, toLeg.getAttribute(CommonKeys.LEG_MODE));
 			plan.getLegs().add(i-1, fromLeg);
 			
 			offset += 1;

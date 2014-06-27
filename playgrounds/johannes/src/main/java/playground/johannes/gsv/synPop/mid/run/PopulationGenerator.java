@@ -36,9 +36,11 @@ import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.LegDistanceHandler;
 import playground.johannes.gsv.synPop.mid.LegEndTimeHandler;
 import playground.johannes.gsv.synPop.mid.LegMainPurposeHandler;
+import playground.johannes.gsv.synPop.mid.LegModeHandler;
 import playground.johannes.gsv.synPop.mid.LegOriginHandler;
 import playground.johannes.gsv.synPop.mid.LegRoundTrip;
 import playground.johannes.gsv.synPop.mid.LegStartTimeHandler;
+import playground.johannes.gsv.synPop.mid.PersonDayHandler;
 import playground.johannes.gsv.synPop.mid.PersonMunicipalityClassHandler;
 import playground.johannes.gsv.synPop.mid.PersonWeightHandler;
 import playground.johannes.gsv.synPop.mid.TXTReader;
@@ -63,12 +65,14 @@ public class PopulationGenerator {
 		TXTReader reader = new TXTReader();
 		reader.addPersonAttributeHandler(new PersonMunicipalityClassHandler());
 		reader.addPersonAttributeHandler(new PersonWeightHandler());
+		reader.addPersonAttributeHandler(new PersonDayHandler());
 		reader.addLegAttributeHandler(new LegMainPurposeHandler());
 		reader.addLegAttributeHandler(new LegOriginHandler());
 		reader.addLegAttributeHandler(new LegRoundTrip());
 		reader.addLegAttributeHandler(new LegStartTimeHandler());
 		reader.addLegAttributeHandler(new LegEndTimeHandler());
 		reader.addLegAttributeHandler(new LegDistanceHandler());
+		reader.addLegAttributeHandler(new LegModeHandler());
 		
 		logger.info("Reading persons...");
 		Map<String, ProxyPerson> persons = reader.read(personFile, legFile);
