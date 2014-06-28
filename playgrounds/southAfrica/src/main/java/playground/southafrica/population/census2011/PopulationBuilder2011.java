@@ -117,7 +117,7 @@ public class PopulationBuilder2011 {
 		ObjectAttributes householdAttributes = households.getHouseholdAttributes();
 		
 		/* Now generate the individuals and their households for each of the 
-		 * subplaces for which a population has been synthesized. */
+		 * subplaces for which a population has been synthesised. */
 		LOG.info("Building population per subplace...");
 		Counter counter = new Counter("   subplaces # ");
 		int personId = 0;
@@ -146,7 +146,7 @@ public class PopulationBuilder2011 {
 				while((line=br.readLine()) != null){
 					String[] sa = line.split(" ");
 
-					/* Parse the details from the synthesized population. */
+					/* Parse the details from the synthesised population. */
 					String hhid = sa[0];
 					int housingType = Integer.parseInt(sa[3]);
 					int mainDwellingType = Integer.parseInt(sa[4]);
@@ -186,12 +186,12 @@ public class PopulationBuilder2011 {
 					/* Create the person. */
 					Person person = pf.createPerson(new IdImpl(personId++));
 					
-					/* Set the hardcoded attributes. This will, however, be 
+					/* Set the hard coded attributes. This will, however, be 
 					 * duplicated in the person attributes to be more 
 					 * consistent with the direction of future MATSim work. */
 					((PersonImpl)person).setAge(age);
 					((PersonImpl)person).setSex(Gender2011.getMatsimGender(Gender2011.getGender(gender)));
-					((PersonImpl)person).setEmployed(Boolean.parseBoolean(String.valueOf(employment)));
+					((PersonImpl)person).setEmployed(employment == 1 ? true : false);
 					
 					/* Set person attributes. */
 					personAttributes.putAttribute(person.getId().toString(), "population", PopulationGroup2011.getType(population).toString());
