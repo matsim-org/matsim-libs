@@ -97,7 +97,7 @@ public class SurveyPlanPicker {
 		/* Write the adapted population. Only the people's activity chains have
 		 * been adapted, so we need not write all of the files. */
 		PopulationWriter pw = new PopulationWriter(spp.censusPopulation.getScenario().getPopulation());
-		pw.write(populationFolder + (populationFolder.endsWith("/") ? "" : "/") + "Population_withPlans.xml.gz");
+		pw.write(populationFolder + (populationFolder.endsWith("/") ? "" : "/") + "population_withPlans.xml.gz");
 
 		Header.printFooter();
 	}
