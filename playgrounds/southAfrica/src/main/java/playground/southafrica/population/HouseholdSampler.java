@@ -160,7 +160,9 @@ public class HouseholdSampler {
 
 		/* Read and clean the household attributes. */
 		String householdAttributeFile = inputFolder + (inputFolder.endsWith("/") ? "" : "/") + "householdAttributes.xml.gz";
-		new ObjectAttributesXmlReader(sc.getHouseholds().getHouseholdAttributes()).parse(householdAttributeFile);
+		ObjectAttributesXmlReader hhar = new ObjectAttributesXmlReader(sc.getHouseholds().getHouseholdAttributes());
+		hhar.putAttributeConverter(CoordImpl.class, new CoordConverter());
+		hhar.parse(householdAttributeFile);
 		counter.reset();
 		LOG.info("  removing " + sampler.getSampledIds().size() + " household's attributes...");
 		for(Id id : sampler.getSampledIds()){
@@ -179,9 +181,6 @@ public class HouseholdSampler {
 			counter.incCounter();
 		}
 		counter.printCounter();
-		
-		/* I don't know if it makes a big difference. */
-		sc = null;
 	}
 	
 	/**
@@ -207,9 +206,9 @@ public class HouseholdSampler {
 		hw.writeFile(hhf.getAbsolutePath());
 
 		/* Household attributes, if they exist. */
-		ObjectAttributesXmlWriter haw = new ObjectAttributesXmlWriter(sc.getHouseholds().getHouseholdAttributes());
-		haw.putAttributeConverter(CoordImpl.class, new CoordConverter());
-		haw.writeFile(hhaf.getAbsolutePath());
+		ObjectAttributesXmlWriter hhaw = new ObjectAttributesXmlWriter(sc.getHouseholds().getHouseholdAttributes());
+		hhaw.putAttributeConverter(CoordImpl.class, new CoordConverter());
+		hhaw.writeFile(hhaf.getAbsolutePath());
 
 		/* Population. */
 		PopulationWriter pw = new PopulationWriter(sc.getPopulation());

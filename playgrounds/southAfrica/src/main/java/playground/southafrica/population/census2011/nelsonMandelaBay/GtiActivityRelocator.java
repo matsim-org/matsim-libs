@@ -68,16 +68,16 @@ public class GtiActivityRelocator {
 		GtiActivityRelocator gar = new GtiActivityRelocator();
 		gar.setupQuadTreeExtentFromStudyArea(areaShapefile);
 		gar.parseGtiPointsToQuadTrees(gtiShapefile);
-//		ghl.runGtiHomeRelocator(populationFolder);
+		gar.runGtiActivityRelocator(populationFolder);
 		
 		/* Write population and household attributes to file. These are the
 		 * only two elements that have been edited. */
-//		PopulationWriter pw = new PopulationWriter(ghl.cpr.getScenario().getPopulation());
-//		pw.write(populationFolder + (populationFolder.endsWith("/") ? "" : "/") + "Population_Gti.xml.gz");
-//		
-//		ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(ghl.cpr.getScenario().getHouseholds().getHouseholdAttributes());
-//		oaw.putAttributeConverter(CoordImpl.class, new CoordConverter());
-//		oaw.writeFile(populationFolder + (populationFolder.endsWith("/") ? "" : "/") + "HouseholdAttributes_Gti.xml.gz");
+		PopulationWriter pw = new PopulationWriter(gar.cpr.getScenario().getPopulation());
+		pw.write(populationFolder + (populationFolder.endsWith("/") ? "" : "/") + "Population_Gti.xml.gz");
+		
+		ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(gar.cpr.getScenario().getHouseholds().getHouseholdAttributes());
+		oaw.putAttributeConverter(CoordImpl.class, new CoordConverter());
+		oaw.writeFile(populationFolder + (populationFolder.endsWith("/") ? "" : "/") + "HouseholdAttributes_Gti.xml.gz");
 		
 		Header.printFooter();
 	}
@@ -464,7 +464,7 @@ public class GtiActivityRelocator {
 									facility = getGtiFacility(activity.getCoord(), facilityMap.get(GtiActivities.Work), 20);
 									break;
 								case e1:
-									double age = Double.parseDouble((String) cpr.getScenario().getPopulation().getPersonAttributes().getAttribute(p.getId().toString(), "age"));
+									int age = (Integer) cpr.getScenario().getPopulation().getPersonAttributes().getAttribute(p.getId().toString(), "age");
 									if(age < 6){
 										facility = getGtiFacility(activity.getCoord(), facilityMap.get(GtiActivities.PreSchoolEducation), 20);
 									} else if(age <= 13){
@@ -589,7 +589,7 @@ public class GtiActivityRelocator {
 		}
 		
 		/* Pick a random facility from the list. */
-		return list.get(RandomPermutation.getRandomPermutation(list.size())[0]).getFirst();
+		return list.get(RandomPermutation.getRandomPermutation(list.size())[0]-1).getFirst();
 	}
 	
 }

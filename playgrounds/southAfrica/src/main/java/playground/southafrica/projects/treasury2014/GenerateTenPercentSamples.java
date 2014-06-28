@@ -63,6 +63,7 @@ public class GenerateTenPercentSamples {
 				e.printStackTrace();
 				throw new RuntimeCryptoException("May not overwrite any population files!");
 			}
+			hhs = null;
 			LOG.info("==> done with " + area.getName());
 		}
 	}
