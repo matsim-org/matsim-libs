@@ -22,8 +22,8 @@
  */
 package playground.southafrica.population.freight;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -38,16 +38,16 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.southafrica.utilities.Header;
-import playground.southafrica.utilities.gis.MyMultiFeatureReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
 /**
@@ -109,16 +109,20 @@ public class InAreaPlanKeeper {
 	public static Scenario run(Scenario sc, String shapefile, boolean strictlyInside){	
 		LOG.info("Checking scenario for persons in " + shapefile);
 		
-		MyMultiFeatureReader mfr = new MyMultiFeatureReader();
-		try {
-			mfr.readMultizoneShapefile(shapefile, 8);
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Cannot read shapefile " + shapefile);
+		ShapeFileReader sfr = new ShapeFileReader();
+		sfr.readFileAndInitialize(shapefile);
+		Collection<SimpleFeature> features = sfr.getFeatureSet();
+		if(features.size() > 1){
+			LOG.warn("Multiple features in " + shapefile);
+			LOG.warn("Only using the first feature.");
 		}
-		Geometry geometry = mfr.getAllZones().get(0); /* Assuming we only work with the first (True for Gauteng...) */
-		Geometry envelope = geometry.getEnvelope();
-		GeometryFactory gf = new GeometryFactory();
+		Geometry geomtery = null;
+		Object o = features.iterator().next().getDefaultGeometry();
+		if(o instanceof Geometry){
+			geomtery = (Geometry) o;
+			LOG.info("Shapefile's geomtery type: " + geomtery.getClass().toString());
+		}
+		Geometry envelope = geomtery.getEnvelope();
 		
 		List<Id> listToRemove = new ArrayList<Id>();
 		
@@ -138,13 +142,13 @@ public class InAreaPlanKeeper {
 					PlanElement pe = peIterator.next();
 					if(pe instanceof Activity){
 						Activity act = (Activity)pe;
-						Point p = gf.createPoint(new Coordinate(act.getCoord().getX(), act.getCoord().getY()));
+						Point p = geomtery.getFactory().createPoint(new Coordinate(act.getCoord().getX(), act.getCoord().getY()));
 						
 						/* First filter on envelope only. */
 						if(envelope.covers(p)){
 							/* If required, check geomtery in detail. */
 							if(strictlyInside){
-								if(geometry.covers(p)){
+								if(geomtery.covers(p)){
 									inArea = true;
 								}
 							} else{

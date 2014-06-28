@@ -111,7 +111,6 @@ public class NmbmActivityTypeManipulator extends ActivityTypeManipulator {
 				
 				act.setType( getNewActivityType(act.getType(), estimatedDuration) );
 			}
-			
 		}
 	}
 	

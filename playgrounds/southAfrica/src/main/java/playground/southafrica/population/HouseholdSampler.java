@@ -33,6 +33,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.HouseholdsAlgorithmRunner;
 import org.matsim.households.HouseholdsReaderV10;
@@ -41,6 +42,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.southafrica.population.algorithms.HouseholdSamplerAlgorithm;
+import playground.southafrica.population.census2011.attributeConverters.CoordConverter;
 import playground.southafrica.population.utilities.ComprehensivePopulationReader;
 import playground.southafrica.utilities.Header;
 
@@ -206,6 +208,7 @@ public class HouseholdSampler {
 
 		/* Household attributes, if they exist. */
 		ObjectAttributesXmlWriter haw = new ObjectAttributesXmlWriter(sc.getHouseholds().getHouseholdAttributes());
+		haw.putAttributeConverter(CoordImpl.class, new CoordConverter());
 		haw.writeFile(hhaf.getAbsolutePath());
 
 		/* Population. */
