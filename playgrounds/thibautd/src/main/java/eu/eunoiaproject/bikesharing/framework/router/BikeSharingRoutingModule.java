@@ -31,15 +31,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.utils.geometry.CoordUtils;
-
+import org.matsim.core.router.TripRouter;
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
@@ -61,17 +57,17 @@ public class BikeSharingRoutingModule implements RoutingModule {
 
 	private final Random random;
 	private final BikeSharingFacilities bikeSharingFacilities;
-	private final PlansCalcRouteConfigGroup config;
+	private final TripRouter router;
 	private final double searchRadius;
 
 	public BikeSharingRoutingModule(
 			final Random random,
 			final BikeSharingFacilities bikeSharingFacilities,
 			final double searchRadius,
-			final PlansCalcRouteConfigGroup config ) {
+			final TripRouter router ) {
 		this.random = random;
 		this.bikeSharingFacilities = bikeSharingFacilities;
-		this.config = config;
+		this.router = router;
 		this.searchRadius = searchRadius;
 	}
 
@@ -86,32 +82,68 @@ public class BikeSharingRoutingModule implements RoutingModule {
 
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
 
-		trip.add( createWalkLeg( fromFacility , startStation ) );
+		trip.addAll(
+				createWalkSubtrip(
+					fromFacility,
+					startStation,
+					departureTime,
+					person ) );
 		trip.add( createInteraction( startStation ) );
-		trip.add( createBikeSharingLeg( startStation , endStation ) );
+		trip.addAll(
+				createBikeSharingSubtrip(
+					startStation,
+					endStation,
+					departureTime,
+					person ) );
 		trip.add( createInteraction( endStation ) );
-		trip.add( createWalkLeg( endStation , toFacility ) );
+		trip.addAll(
+				createWalkSubtrip(
+					endStation,
+					toFacility,
+					departureTime,
+					person ) );
 
 		return trip;
 	}
 
-	private PlanElement createBikeSharingLeg(
+	private List<? extends PlanElement> createBikeSharingSubtrip(
+			final BikeSharingFacility startStation,
+			final BikeSharingFacility endStation,
+			final double departureTime,
+			final Person person) {
+		final List<? extends PlanElement> trip =
+			router.calcRoute(
+					TransportMode.bike,
+					startStation,
+					endStation,
+					departureTime,
+					person );
+		
+		if ( trip.size() != 1 ) throw new RuntimeException( "unable to handle complex bike trip "+trip );
+
+		final Leg leg = (Leg) trip.get( 0 );
+		if ( !leg.getMode().equals( TransportMode.bike ) ) throw new RuntimeException( "unexpected mode for "+leg );
+
+		leg.setMode( BikeSharingConstants.MODE );
+		leg.setRoute( convertToBikeSharingRoute( leg.getRoute() , startStation , endStation ) );
+
+		return trip;
+	}
+
+	private static BikeSharingRoute convertToBikeSharingRoute(
+			final Route route,
 			final BikeSharingFacility startStation,
 			final BikeSharingFacility endStation) {
-		final Leg leg = new LegImpl( BikeSharingConstants.MODE );
-		final double dist = CoordUtils.calcDistance(startStation.getCoord(), endStation.getCoord());
+		final BikeSharingRoute bsRoute = new BikeSharingRoute( startStation , endStation );
 
-		final Route route = new BikeSharingRoute( startStation , endStation );
-		final double estimatedNetworkDistance = dist * config.getBeelineDistanceFactor();
+		bsRoute.setDistance( route.getDistance() );
+		bsRoute.setTravelTime( route.getTravelTime() );
 
-		final int travTime = (int) (estimatedNetworkDistance / config.getTeleportedModeSpeeds().get( TransportMode.bike ) );
-		route.setTravelTime(travTime);
-		route.setDistance(estimatedNetworkDistance);
+		// not necessary (comes from stations anyway)
+		//bsRoute.setStartLinkId( route.getStartLinkId() );
+		//bsRoute.setEndLinkId( route.getEndLinkId() );
 
-		leg.setRoute(route);
-		leg.setTravelTime(travTime);
-
-		return leg;
+		return bsRoute;
 	}
 
 	private static PlanElement createInteraction( final Facility facility ) {
@@ -123,23 +155,19 @@ public class BikeSharingRoutingModule implements RoutingModule {
 		return act;
 	}
 
-	private PlanElement createWalkLeg(
+	private List<? extends PlanElement> createWalkSubtrip(
 			final Facility fromFacility,
-			final Facility toFacility) {
-		final Leg leg = new LegImpl( TransportMode.walk );
-		final double dist = CoordUtils.calcDistance(fromFacility.getCoord(), toFacility.getCoord());
-
-		final Route route = new GenericRouteImpl( fromFacility.getLinkId(), toFacility.getLinkId() );
-		final double estimatedNetworkDistance = dist * config.getBeelineDistanceFactor();
-
-		final int travTime = (int) (estimatedNetworkDistance / config.getTeleportedModeSpeeds().get( TransportMode.walk ) );
-		route.setTravelTime(travTime);
-		route.setDistance(estimatedNetworkDistance);
-
-		leg.setRoute(route);
-		leg.setTravelTime(travTime);
-
-		return leg;
+			final Facility toFacility,
+			final double departureTime,
+			final Person person) {
+		final List<? extends PlanElement> trip =
+			router.calcRoute(
+					TransportMode.walk,
+					fromFacility,
+					toFacility,
+					departureTime,
+					person );
+		return trip;
 	}
 
 	private BikeSharingFacility chooseCloseStation(final Facility facility) {

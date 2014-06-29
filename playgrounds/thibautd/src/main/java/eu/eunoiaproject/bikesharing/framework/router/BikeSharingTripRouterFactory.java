@@ -72,7 +72,7 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 					MatsimRandom.getLocalInstance(),
 					(BikeSharingFacilities) scenario.getScenarioElement( BikeSharingFacilities.ELEMENT_NAME ),
 					configGroup.getSearchRadius(),
-					scenario.getConfig().plansCalcRoute()) );
+					router) );
 
 		// XXX should be person-dependent
 		final CharyparNagelScoringParameters scoringParams =
