@@ -54,6 +54,15 @@ public class CollectionUtils {
 		return sample;
 	}
 
+	public static boolean intersects(
+			final Collection<?> c1,
+			final Collection<?> c2) {
+		for ( Object o : c1 ) {
+			if ( c2.contains( o ) ) return true;
+		}
+		return false;
+	}
+
 	public static <T> Set<T> intersect(
 			final Collection<? extends T> c1,
 			final Collection<? extends T> c2) {
