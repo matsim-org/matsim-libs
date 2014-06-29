@@ -85,17 +85,22 @@ public class MyMultiFeatureReader {
 			String name = null;
 			
 			Object o = feature.getAttribute(idField);
-			if(o instanceof String){
-				name = (String)o;
-			} else if(o instanceof Double){
-				name = String.valueOf(((Double)o).intValue());
-			} else if(o instanceof Integer){
-				name = String.valueOf((Integer)o);
-			} else if(o instanceof Long){
-				name = String.valueOf((Long)o);
-			} else{
-				LOG.error("Don't know how to interpret ID field type: " + o.getClass().toString());
-			}
+			name = o.toString();
+			/* Removed the code below (June 2014, JWJ) since it became 
+			 * increasingly more complex to check different class types. Just
+			 * use whatever Id field is given. It is the user's responsibility 
+			 * to check whether it makes sense. */
+//			if(o instanceof String){
+//				name = (String)o;
+//			} else if(o instanceof Double){
+//				name = String.valueOf(((Double)o).intValue());
+//			} else if(o instanceof Integer){
+//				name = String.valueOf((Integer)o);
+//			} else if(o instanceof Long){
+//				name = String.valueOf((Long)o);
+//			} else{
+//				LOG.error("Don't know how to interpret ID field type: " + o.getClass().toString());
+//			}
 			
 			Object shape = feature.getDefaultGeometry();
 			if( shape instanceof MultiPolygon ){
