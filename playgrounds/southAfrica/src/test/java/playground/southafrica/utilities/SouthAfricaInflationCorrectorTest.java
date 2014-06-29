@@ -30,10 +30,10 @@ public class SouthAfricaInflationCorrectorTest extends MatsimTestCase {
 	public void testConvert() {
 		assertEquals("Wrong conversion", 1.0, SouthAfricaInflationCorrector.convert(1, 1981, 1981));
 		assertEquals("Wrong conversion", 1.0, SouthAfricaInflationCorrector.convert(1, 2000, 2000));
-		assertEquals("Wrong conversion", 1.141, SouthAfricaInflationCorrector.convert(1, 1981, 1982));
-		assertEquals("Wrong conversion", 1.282484, Double.parseDouble(String.format("%.6f", SouthAfricaInflationCorrector.convert(1, 1981, 1983))));
-		assertEquals("Wrong conversion", 0.876424, Double.parseDouble(String.format("%.6f", SouthAfricaInflationCorrector.convert(1, 1982, 1981))));
-		assertEquals("Wrong conversion", 0.779737, Double.parseDouble(String.format("%.6f", SouthAfricaInflationCorrector.convert(1, 1983, 1981))));
+		assertEquals("Wrong conversion", 1.147, SouthAfricaInflationCorrector.convert(1, 1981, 1982));
+		assertEquals("Wrong conversion", 1.289228, Double.parseDouble(String.format("%.6f", SouthAfricaInflationCorrector.convert(1, 1981, 1983))));
+		assertEquals("Wrong conversion", 0.871840, Double.parseDouble(String.format("%.6f", SouthAfricaInflationCorrector.convert(1, 1982, 1981))));
+		assertEquals("Wrong conversion", 0.775658, Double.parseDouble(String.format("%.6f", SouthAfricaInflationCorrector.convert(1, 1983, 1981))));
 		try{
 			double d = SouthAfricaInflationCorrector.convert(1, 1970, 1970);
 			fail("Should have caught an IllegalArgumentException.");
