@@ -118,6 +118,8 @@ public class BikeSharingRoutingModule implements RoutingModule {
 		final Activity act = new ActivityImpl( BikeSharingConstants.INTERACTION_TYPE , facility.getCoord() );
 		act.setMaximumDuration( 0 );
 		((ActivityImpl) act).setLinkId( facility.getLinkId() );
+		// XXX This may cause problems if IDs of ActivityFacilities and BikeSharingFacilities overlap...
+		((ActivityImpl) act).setFacilityId( facility.getId() );
 		return act;
 	}
 

@@ -22,6 +22,7 @@ package eu.eunoiaproject.bikesharing.framework.scenario;
 import java.util.Arrays;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
@@ -31,6 +32,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
+
+import playground.thibautd.utils.CollectionUtils;
 
 /**
  * Provides helper methods to load a bike sharing scenario.
@@ -70,11 +73,19 @@ public class BikeSharingScenarioUtils {
 			config.getModule( BikeSharingConfigGroup.GROUP_NAME );
 		new BikeSharingFacilitiesReader( sc ).parse( confGroup.getFacilitiesFile() );
 
+		final BikeSharingFacilities bsFacilities = (BikeSharingFacilities)
+			sc.getScenarioElement( BikeSharingFacilities.ELEMENT_NAME );
 		if ( confGroup.getFacilitiesAttributesFile() != null ) {
-			final BikeSharingFacilities facilities = (BikeSharingFacilities)
-				sc.getScenarioElement( BikeSharingFacilities.ELEMENT_NAME );
-			new ObjectAttributesXmlReader( facilities.getFacilitiesAttributes() ).parse(
+			new ObjectAttributesXmlReader( bsFacilities.getFacilitiesAttributes() ).parse(
 					confGroup.getFacilitiesAttributesFile() );
+		}
+
+		final ActivityFacilities actFacilities = sc.getActivityFacilities();
+		if ( CollectionUtils.intersects(
+					actFacilities.getFacilities().keySet(),
+					bsFacilities.getFacilities().keySet() ) ) {
+			throw new RuntimeException( "ids of bike sharing stations and activity facilities overlap. This will cause problems!"+
+					" Make sure Ids do not overlap, for instance by appending \"bs-\" at the start of all bike sharing facilities." );
 		}
 
 		return sc;
