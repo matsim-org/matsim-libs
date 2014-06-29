@@ -22,9 +22,11 @@ package eu.eunoiaproject.bikesharing.framework.router;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -38,6 +40,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -85,13 +88,23 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 
 	private final Collection<InitialNodeRouter> routers;
 
-	private final PreparedTransitSchedule preparedTransitSchedule; 
+	private final PreparedTransitSchedule preparedTransitSchedule;
+
+	private final Random random = MatsimRandom.getLocalInstance();
+	private final double initialNodeProportion; 
 
 	private static enum Direction {access, egress;}
 
+	/**
+	 * @param initialNodeProportion the proportion of "initial nodes" to pass to the routing algorithm.
+	 * This allows some randomness in the choice of the initial nodes.
+	 */
 	public TransitMultiModalAccessRoutingModule(
+			final double initialNodeProportion,
 			final Scenario scenario,
 			final InitialNodeRouter... routers) {
+		if ( initialNodeProportion <= 0 || initialNodeProportion > 1 ) throw new IllegalArgumentException( ""+initialNodeProportion );
+		this.initialNodeProportion = initialNodeProportion;
 		this.scenario = scenario;
 		this.config = new TransitRouterConfig( scenario.getConfig() );
 		this.preparedTransitSchedule = new PreparedTransitSchedule( scenario.getTransitSchedule() );
@@ -122,6 +135,8 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 					departureTime);
 		}
 
+		prune( fromNodes );
+
 		// find possible end stops
 		final PriorityInitialNodeMap toNodes = new PriorityInitialNodeMap();
 
@@ -134,6 +149,8 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 					toFacility,
 					departureTime);
 		}
+
+		prune( toNodes );
 
 		// find routes between start and end stops
 		final Path p = this.dijkstra.calcLeastCostPath(
@@ -172,6 +189,18 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 					fromNodes.map.get( p.nodes.get( 0 ) ),
 					toNodes.map.get( p.nodes.get( p.nodes.size() - 1 ) ),
 					person ) ;
+	}
+
+	private void prune(final PriorityInitialNodeMap initialNodes) {
+		final Map<Node, InitialNode> map = initialNodes.getMap();
+
+		final int toKeep = (int) Math.max( 1 , initialNodeProportion * map.size() );
+		final List<Node> nodes = new ArrayList<Node>( map.keySet() );
+		Collections.shuffle( nodes , random );
+
+		for ( Node n : nodes.subList( toKeep , nodes.size() ) ) map.remove( n );
+
+		assert map.size() == toKeep : map.size() != toKeep;
 	}
 
 	private List<? extends PlanElement> convertPathToTrip(

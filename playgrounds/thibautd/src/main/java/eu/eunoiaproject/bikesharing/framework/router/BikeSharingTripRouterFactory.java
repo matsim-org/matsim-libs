@@ -81,6 +81,7 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 		router.setRoutingModule(
 				TransportMode.pt,
 				new TransitMultiModalAccessRoutingModule(
+						0.75,
 						scenario,
 						new InitialNodeRouter(
 							router.getRoutingModule( TransportMode.walk ),
