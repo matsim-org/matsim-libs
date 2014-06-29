@@ -91,6 +91,8 @@ public class MyMultiFeatureReader {
 				name = String.valueOf(((Double)o).intValue());
 			} else if(o instanceof Integer){
 				name = String.valueOf((Integer)o);
+			} else if(o instanceof Long){
+				name = String.valueOf((Long)o);
 			} else{
 				LOG.error("Don't know how to interpret ID field type: " + o.getClass().toString());
 			}
@@ -168,7 +170,9 @@ public class MyMultiFeatureReader {
 	 */
 	public List<Coord> readCoords(String shapefile) {
 		List<Coord> list = new ArrayList<Coord>();
-		for(SimpleFeature feature: ShapeFileReader.getAllFeatures(shapefile)){
+		ShapeFileReader sfr = new ShapeFileReader();
+		Collection<SimpleFeature> features = sfr.readFileAndInitialize(shapefile);
+		for(SimpleFeature feature: features){
 			Geometry geo = (Geometry) feature.getDefaultGeometry();
 			if(geo instanceof Point){
 				Point ps = (Point)geo;
