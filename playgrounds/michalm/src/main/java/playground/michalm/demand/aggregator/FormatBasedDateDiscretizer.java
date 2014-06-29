@@ -17,48 +17,52 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.zone.util;
+package playground.michalm.demand.aggregator;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.matrices.*;
+import java.text.*;
+import java.util.Date;
 
-import com.google.common.collect.Iterables;
+import org.apache.commons.lang3.StringUtils;
 
 
-public class MatrixUtils
+public class FormatBasedDateDiscretizer
+    implements DateDiscretizer
 {
-    public static Matrix createDenseMatrix(String id, Iterable<Id> ids, double[][] values)
+    public static final String YMDH = "yy_MM_dd_HH";
+    public static final String YMD = "yy_MM_dd";
+    public static final String H = "HH";
+    public static final String u = "u";
+    public static final String uH = "u_HH";
+
+    private final DateFormat dateFormat;
+
+
+    public FormatBasedDateDiscretizer(String pattern)
     {
-        return createMatrix(id, ids, values, true);
+        this.dateFormat = new SimpleDateFormat(pattern);
     }
 
 
-    public static Matrix createSparseMatrix(String id, Iterable<Id> ids, double[][] values)
+    public FormatBasedDateDiscretizer(DateFormat dateFormat)
     {
-        return createMatrix(id, ids, values, false);
+        this.dateFormat = dateFormat;
     }
 
 
-    public static Matrix createMatrix(String id, Iterable<Id> ids, double[][] values,
-            boolean denseMatrix)
+    @Override
+    public String discretize(Date date)
     {
-        Matrix matrix = new Matrix(id, null);
-        Id[] idArray = Iterables.toArray(ids, Id.class);
+        return dateFormat.format(date);
+    }
 
-        for (int i = 0; i < idArray.length; i++) {
-            for (int j = 0; j < idArray.length; j++) {
-                if (denseMatrix || values[i][j] != 0) {
-                    matrix.createEntry(idArray[i], idArray[j], values[i][j]);
-                }
-            }
+
+    public Date parseDiscretizedDate(String date)
+    {
+        try {
+            return dateFormat.parse(date);
         }
-
-        return matrix;
-    }
-
-
-    public static Iterable<Entry> createEntryIterable(Matrix matrix)
-    {
-        return Iterables.concat(matrix.getFromLocations().values());
+        catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -164,8 +164,8 @@ public class Matrix {
 		return this.toLocs;
 	}
 
-	public final ArrayList<Entry> getFromLocEntries(final Id fromlocationId) {
-		return this.fromLocs.get(fromlocationId);
+	public final ArrayList<Entry> getFromLocEntries(final Id fromLocationId) {
+		return this.fromLocs.get(fromLocationId);
 	}
 
 	public final ArrayList<Entry> getToLocEntries(final Id toLocationId) {

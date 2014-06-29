@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,57 +17,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.zone;
+package playground.michalm.demand.poznan.taxi;
+
+import java.util.Date;
 
 import org.matsim.api.core.v01.*;
 
-import com.vividsolutions.jts.geom.MultiPolygon;
 
-
-public class Zone
-    implements Identifiable
+public class ServedRequest
 {
-    private final Id id;
-    private final String type;
-    private MultiPolygon multiPolygon;
+    public final Id id;
+    public final Date accepted;
+    public final Date assigned;
+    public final Coord from;
+    public final Coord to;
+    public final Id taxiId;
 
 
-    public Zone(Id id, String type)
+    public ServedRequest(Id id, Date accepted, Date assigned, Coord from, Coord to, Id taxiId)
     {
         this.id = id;
-        this.type = type;
-    }
-
-
-    public Zone(Id id, String type, MultiPolygon multiPolygon)
-    {
-        this.id = id;
-        this.type = type;
-        this.multiPolygon = multiPolygon;
-    }
-
-
-    @Override
-    public Id getId()
-    {
-        return id;
-    }
-
-
-    public String getType()
-    {
-        return type;
-    }
-
-
-    public MultiPolygon getMultiPolygon()
-    {
-        return multiPolygon;
-    }
-
-
-    public void setMultiPolygon(MultiPolygon multiPolygon)
-    {
-        this.multiPolygon = multiPolygon;
+        this.accepted = accepted;
+        this.assigned = assigned;
+        this.from = from;
+        this.to = to;
+        this.taxiId = taxiId;
     }
 }

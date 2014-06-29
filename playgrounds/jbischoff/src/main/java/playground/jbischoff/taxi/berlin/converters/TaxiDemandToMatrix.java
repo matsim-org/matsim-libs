@@ -13,6 +13,7 @@ import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.Matrix;
 
+
 public class TaxiDemandToMatrix
 {
 
@@ -23,17 +24,18 @@ public class TaxiDemandToMatrix
     private String folder;
     private List<File> files = new ArrayList<File>();
 
+
     public static void main(String[] args)
     {
-       TaxiDemandToMatrix m = new TaxiDemandToMatrix("C:\\local_jb\\data\\OD\\OD_2013\\");
-       m.read();
-       m.write();
+        TaxiDemandToMatrix m = new TaxiDemandToMatrix("C:\\local_jb\\data\\OD\\OD_2013\\");
+        m.read();
+        m.write();
     }
 
 
     public void write()
     {
-        new MatricesWriter(this.matrices).write(folder+"demandMatrices.xml");
+        new MatricesWriter(this.matrices).write(folder + "demandMatrices.xml");
     }
 
 
@@ -42,72 +44,81 @@ public class TaxiDemandToMatrix
         this.folder = folder;
         this.matrices = new Matrices();
     }
-    
-    
-    
+
+
     public void read()
     {
-    this.listFilesForFolder(new File(folder));
-        for (File f : files){
-            
+        this.listFilesForFolder(new File(folder));
+        for (File f : files) {
+
             String shortName = f.getName().substring(0, f.getName().lastIndexOf(".")).split("_")[1];
-            
-            Matrix currentMatrix =  this.matrices.createMatrix(shortName, null);
+
+            Matrix currentMatrix = this.matrices.createMatrix(shortName, null);
             TaxiDemandParser tsp = new TaxiDemandParser(currentMatrix);
             this.read(f.getAbsolutePath(), tsp);
-          
+
         }
     }
- 
 
-  
 
-    private void listFilesForFolder(final File folder) {
+    private void listFilesForFolder(final File folder)
+    {
         for (final File fileEntry : folder.listFiles()) {
             if (fileEntry.isDirectory()) {
                 listFilesForFolder(fileEntry);
-                }
+            }
             else {
-                if (!fileEntry.getName().endsWith(".dat")) continue;
+                if (!fileEntry.getName().endsWith(".dat"))
+                    continue;
                 System.out.println(fileEntry.getName());
                 files.add(fileEntry);
             }
         }
         System.out.println(files.size());
-       
+
     }
-    
-    
-    private void read(String file, TabularFileHandler handler) {
+
+
+    private void read(String file, TabularFileHandler handler)
+    {
         TabularFileParserConfig config = new TabularFileParserConfig();
-        config.setDelimiterTags(new String[]{"\t"," "});
+        config.setDelimiterTags(new String[] { "\t", " " });
         config.setFileName(file);
-        config.setCommentTags(new String[]{"#"});
+        config.setCommentTags(new String[] { "#" });
         new TabularFileParser().parse(config, handler);
     }
-    
+
 }
-class TaxiDemandParser implements TabularFileHandler{
-    
+
+
+class TaxiDemandParser
+    implements TabularFileHandler
+{
+
     Matrix matrix;
-    
+
+
     public TaxiDemandParser(Matrix matrix)
     {
         this.matrix = matrix;
     }
+
+
     @Override
     public void startRow(String[] row)
-    {       
-            String from = row[0];
-            if (from.equals("null")) return;
-            String to = row[1];
-            if (to.equals("null")) return;
-            
-           Id fromLor = new IdImpl(from);
-           Id toLor = new IdImpl(to);
-           double demand = Double.parseDouble(row[2]);
-           System.out.println(fromLor);
-           this.matrix.createEntry(fromLor, toLor, demand);
-      
+    {
+        String from = row[0];
+        if (from.equals("null"))
+            return;
+        String to = row[1];
+        if (to.equals("null"))
+            return;
+
+        Id fromLor = new IdImpl(from);
+        Id toLor = new IdImpl(to);
+        double demand = Double.parseDouble(row[2]);
+        System.out.println(fromLor);
+        this.matrix.createEntry(fromLor, toLor, demand);
+
     }
-    }
+}

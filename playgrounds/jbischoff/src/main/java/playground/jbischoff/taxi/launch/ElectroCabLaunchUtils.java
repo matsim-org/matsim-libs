@@ -56,6 +56,7 @@ public class ElectroCabLaunchUtils
     private ElectricTaxiChargingHandler ecabhandler;
     private TaxiRankHandler rankhandler;
 
+
     /**
      * Mandatory
      */
@@ -72,24 +73,24 @@ public class ElectroCabLaunchUtils
 
         EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
 
-        
         travelDistanceEvaluator = new TravelDistanceTimeEvaluator(scenario.getNetwork());
         ecabhandler = new ElectricTaxiChargingHandler(events);
         rankhandler = new TaxiRankHandler();
-        HashMap<Id,org.matsim.contrib.transEnergySim.vehicles.api.Vehicle> bevs = new HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle>();
-       	 for (Vehicle v : context.getVrpData().getVehicles()) {
-             	Id aid = v.getId();
-             	rankhandler.addVehicle(v);
-             	if (aid.toString().startsWith("et"))
-             		{
-             	    BatteryElectricVehicleImpl bev = new BatteryElectricVehicleImpl(ecm, 20*1000*3600);
-             	    bevs.put(v.getId(), bev);
-             	    ecabhandler.addVehicle(new ElectricTaxi(bev, v));   
-             		}
-             	
-             }
-      	 System.out.println( context.getVrpData().getVehicles().size() + " taxis in total, of which " + ecabhandler.getVehicles().size()+ " are electric.");
-        
+        HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle> bevs = new HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle>();
+        for (Vehicle v : context.getVrpData().getVehicles()) {
+            Id aid = v.getId();
+            rankhandler.addVehicle(v);
+            if (aid.toString().startsWith("et")) {
+                BatteryElectricVehicleImpl bev = new BatteryElectricVehicleImpl(ecm,
+                        20 * 1000 * 3600);
+                bevs.put(v.getId(), bev);
+                ecabhandler.addVehicle(new ElectricTaxi(bev, v));
+            }
+
+        }
+        System.out.println(context.getVrpData().getVehicles().size() + " taxis in total, of which "
+                + ecabhandler.getVehicles().size() + " are electric.");
+
         for (Vehicle v : context.getVrpData().getVehicles()) {
             travelDistanceEvaluator.addAgent(v.getId());
         }
@@ -109,22 +110,18 @@ public class ElectroCabLaunchUtils
             ecabhandler.addCharger(new Charger(1000, 50, r.getLink().getId()));
         }
 
-        
         events.addHandler(handlerGroup);
 
         optimizer.setEcabhandler(ecabhandler);
         optimizer.createNearestChargerDb();
 
-        
+        ElectricTaxiSimEngine taxiSimEngine = new ElectricTaxiSimEngine(optimizer, ecabhandler);
 
-        ElectricTaxiSimEngine taxiSimEngine = new ElectricTaxiSimEngine(optimizer,
-                ecabhandler);
-        
         qSim.addMobsimEngine(taxiSimEngine);
-		if (qSim.getScenario().getConfig().network().isTimeVariantNetwork()) {
-        qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
+        if (qSim.getScenario().getConfig().network().isTimeVariantNetwork()) {
+            qSim.addMobsimEngine(new NetworkChangeEventsEngine());
         }
-		qSim.getScenario().getConfig().qsim().setEndTime(36*3600);
+        qSim.getScenario().getConfig().qsim().setEndTime(36 * 3600);
         return taxiSimEngine;
     }
 

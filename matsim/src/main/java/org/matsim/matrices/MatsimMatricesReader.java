@@ -23,7 +23,7 @@ package org.matsim.matrices;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -41,7 +41,7 @@ public class MatsimMatricesReader extends MatsimXmlParser {
 
 	private final Matrices matrices;
 	private MatsimXmlParser delegate = null;
-	private final ScenarioImpl scenario;
+	private final Scenario scenario;
 
 	/**
 	 * Creates a new reader for MATSim matrices files.
@@ -49,7 +49,7 @@ public class MatsimMatricesReader extends MatsimXmlParser {
 	 * @param matrices The Matrices-object to store the data in.
 	 * @param scenario The scenario containing the world/layers the matrices reference to.
 	 */
-	public MatsimMatricesReader(final Matrices matrices, final ScenarioImpl scenario) {
+	public MatsimMatricesReader(final Matrices matrices, final Scenario scenario) {
 		this.matrices = matrices;
 		this.scenario = scenario;
 	}

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,57 +17,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.zone;
+package playground.michalm.zone.poznan;
+
+import java.util.*;
 
 import org.matsim.api.core.v01.*;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 
+import playground.michalm.zone.*;
 
-public class Zone
-    implements Identifiable
+
+public class PoznanZones
 {
-    private final Id id;
-    private final String type;
-    private MultiPolygon multiPolygon;
-
-
-    public Zone(Id id, String type)
+    public static Map<Id, Zone> readVisumZones(Scenario scenario)
     {
-        this.id = id;
-        this.type = type;
+        String zonesXmlFile = "d:/eTaxi/Poznan_MATSim/zones.xml";
+        String zonesShpFile = "d:/eTaxi/Poznan_MATSim/GIS/zones.shp";
+        return Zones.readZones(scenario, zonesXmlFile, zonesShpFile);
     }
 
 
-    public Zone(Id id, String type, MultiPolygon multiPolygon)
+    public static Map<Id, Zone> readTaxiZones(Scenario scenario)
     {
-        this.id = id;
-        this.type = type;
-        this.multiPolygon = multiPolygon;
+        String zonesXmlFile = "d:/PP-rad/taxi/poznan-supply/dane/rejony/taxi_zones.xml";
+        String zonesShpFile = "d:/PP-rad/taxi/poznan-supply/dane/rejony/taxi_zones.shp";
+        return Zones.readZones(scenario, zonesXmlFile, zonesShpFile);
     }
-
-
-    @Override
-    public Id getId()
+    
+    
+    public static MultiPolygon readAgglomerationArea()
     {
-        return id;
-    }
+        String agglomerationShpFile = "d:/eTaxi/Poznan_MATSim/GIS/agglomeration.shp";
+        
+        Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(agglomerationShpFile);
+        if (features.size() != 1) {
+            throw new RuntimeException();
+        }
 
-
-    public String getType()
-    {
-        return type;
-    }
-
-
-    public MultiPolygon getMultiPolygon()
-    {
-        return multiPolygon;
-    }
-
-
-    public void setMultiPolygon(MultiPolygon multiPolygon)
-    {
-        this.multiPolygon = multiPolygon;
+        return (MultiPolygon)features.iterator().next().getDefaultGeometry();
     }
 }

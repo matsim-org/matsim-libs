@@ -26,10 +26,10 @@ public abstract class AbstractTask
     implements Task
 {
     // ==== BEGIN: fields managed by ScheduleImpl
-    /*package*/Schedule<? extends AbstractTask> schedule;
-    /*package*/int taskIdx;
+    Schedule<? extends AbstractTask> schedule;
+    int taskIdx;
 
-    /*package*/TaskStatus status;
+    TaskStatus status;
     // ==== END: fields managed by ScheduleImpl
 
     private double beginTime;

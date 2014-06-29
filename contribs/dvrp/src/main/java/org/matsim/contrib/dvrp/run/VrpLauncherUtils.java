@@ -40,7 +40,7 @@ import org.matsim.core.network.*;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.trafficmonitoring.*;
 
 
 public class VrpLauncherUtils
@@ -50,9 +50,9 @@ public class VrpLauncherUtils
 
     public enum TravelTimeSource
     {
-        FREE_FLOW_SPEED("FF", TimeDiscretizer.ALL_DAY), // no eventsFileName
-        EVENTS_24_H("24H", TimeDiscretizer.ALL_DAY), // based on eventsFileName, averaged over a whole day
-        EVENTS_15_MIN("15M", TimeDiscretizer.DEFAULT); // based on eventsFileName, 15-minute time interval
+        FREE_FLOW_SPEED("FF", TimeDiscretizer.CYCLIC_24_HOURS), // no eventsFileName
+        EVENTS_24_H("24H", TimeDiscretizer.CYCLIC_24_HOURS), // based on eventsFileName, averaged over a whole day
+        EVENTS_15_MIN("15M", TimeDiscretizer.CYCLIC_15_MIN); // based on eventsFileName, 15-minute time interval
 
         public final String shortcut;
         public final TimeDiscretizer timeDiscretizer;
@@ -162,7 +162,10 @@ public class VrpLauncherUtils
             case EVENTS_24_H:
                 scenario.getConfig().travelTimeCalculator()
                         .setTraveltimeBinSize(ttimeSource.timeDiscretizer.getTimeInterval());
-                return TravelTimeCalculators.createTravelTimeFromEvents(eventsFileName, scenario);
+                TravelTimeCalculator ttCalculator = TravelTimeCalculators
+                        .createTravelTimeCalculator(scenario);
+                return TravelTimeCalculators.createTravelTimeFromEvents(eventsFileName,
+                        ttCalculator);
 
             default:
                 throw new IllegalArgumentException();

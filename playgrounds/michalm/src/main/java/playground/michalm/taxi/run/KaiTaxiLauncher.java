@@ -29,7 +29,7 @@ import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import playground.michalm.taxi.TaxiRequestCreator;
 
 
-/*package*/class KaiTaxiLauncher
+class KaiTaxiLauncher
 {
     public static void main(String... args)
         throws IOException
@@ -42,7 +42,7 @@ import playground.michalm.taxi.TaxiRequestCreator;
         String file = "/Users/nagel/shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new-40-25/params.in";
         boolean removeNonPassengers = true;
         boolean endActivitiesAtTimeZero = false;
-        TaxiLauncher launcher = new TaxiLauncher(file);
+        TaxiLauncher launcher = new TaxiLauncher(TaxiLauncher.readParams(file));
 
         if (removeNonPassengers) {
             VrpLauncherUtils.removeNonPassengers(TaxiRequestCreator.MODE, launcher.scenario);

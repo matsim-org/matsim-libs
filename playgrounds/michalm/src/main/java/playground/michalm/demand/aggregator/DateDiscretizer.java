@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,57 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.zone;
+package playground.michalm.demand.aggregator;
 
-import org.matsim.api.core.v01.*;
-
-import com.vividsolutions.jts.geom.MultiPolygon;
+import java.util.Date;
 
 
-public class Zone
-    implements Identifiable
+public interface DateDiscretizer
 {
-    private final Id id;
-    private final String type;
-    private MultiPolygon multiPolygon;
-
-
-    public Zone(Id id, String type)
-    {
-        this.id = id;
-        this.type = type;
-    }
-
-
-    public Zone(Id id, String type, MultiPolygon multiPolygon)
-    {
-        this.id = id;
-        this.type = type;
-        this.multiPolygon = multiPolygon;
-    }
-
-
-    @Override
-    public Id getId()
-    {
-        return id;
-    }
-
-
-    public String getType()
-    {
-        return type;
-    }
-
-
-    public MultiPolygon getMultiPolygon()
-    {
-        return multiPolygon;
-    }
-
-
-    public void setMultiPolygon(MultiPolygon multiPolygon)
-    {
-        this.multiPolygon = multiPolygon;
-    }
+    String discretize(Date date);
 }

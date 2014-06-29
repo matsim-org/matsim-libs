@@ -34,134 +34,156 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.michalm.demand.*;
 import playground.michalm.demand.taxi.PersonCreatorWithRandomTaxiMode;
 
+
 /**
- *@author jbischoff
- *
+ * @author jbischoff
  */
 
-public class MielecDemandExtender {
+public class MielecDemandExtender
+{
 
-	private String inputPlansFile = "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\20.plans.xml.gz";
-	private String inputNetFile = "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\network.xml";
+    private String inputPlansFile = "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\20.plans.xml.gz";
+    private String inputNetFile = "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\network.xml";
 
-	private String inputTaxiDemand = "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\taxiCustomers_05_pc.txt";
-	private String outputTaxiDemandDir =  "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\increaseddemand\\taxidemand\\";
-	
-	private TreeSet<Id> customerIds = new TreeSet<Id>();
-	private HashSet<Id> agentIds;
-	private int MAXIMUMDEMANDINPERCENT = 50;
-	/**
-	 * @param args
-	 */
-	
-	public static void main(String[] args) {
-		
-		MielecDemandExtender mde = new MielecDemandExtender();
-		mde.readPlans();
-		mde.readCustomers();
-		mde.fillCustomers();
-	}
-	
-	
-	private void readCustomers() {
+    private String inputTaxiDemand = "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\taxiCustomers_05_pc.txt";
+    private String outputTaxiDemandDir = "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\increaseddemand\\taxidemand\\";
 
-		  List<String> taxiCustomerIds;
-            taxiCustomerIds = PersonCreatorWithRandomTaxiMode.readTaxiCustomerIds(inputTaxiDemand);
-	        for (String s : taxiCustomerIds){
-	        	customerIds.add(new IdImpl(s));
-	        }
-	}
-	
-	private void fillCustomers(){
-		double d = (double)customerIds.size()/(double)agentIds.size();
-		long currentPercentage = Math.round(d*100);
-		Random r = new Random();
-		exportCustomers(currentPercentage);
-		currentPercentage++;
-		for (;currentPercentage<=MAXIMUMDEMANDINPERCENT;currentPercentage++){
-			long amountOfPlans = Math.round((((double)currentPercentage/100.)*agentIds.size()));
-			System.out.println(amountOfPlans);
-			for (long i = customerIds.size(); i<=amountOfPlans;i++){
-				addCustomer(r);
-			}
-			exportCustomers(currentPercentage);
-		}
-	}
-	
-	private void exportCustomers (long percentage){
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outputTaxiDemandDir+"taxiCustomers_"+percentage+".txt")));
-			
-			
-			TreeSet<Integer> ints = new TreeSet<Integer>();
-			
-			
-			for (Id cid : customerIds){
-				ints.add(Integer.parseInt(cid.toString()));
-			}
-			
-			for (Integer i : ints){
-				bw.append(i.toString());
-				bw.newLine();
-			}
-			System.out.println("Wrote "+percentage+" with "+customerIds.size()+" customers");
-			bw.flush();
-			bw.close();
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
-	}
-	private void addCustomer(Random r){
-		
-		do {
-		Id cid = new IdImpl(r.nextInt(agentIds.size()));
-		if (!customerIds.contains(cid)){
-			if(agentIds.contains(cid)){
-			customerIds.add(cid);
-			break;
-		}}
-		
-		} while (true);
-	}
-	
+    private TreeSet<Id> customerIds = new TreeSet<Id>();
+    private HashSet<Id> agentIds;
+    private int MAXIMUMDEMANDINPERCENT = 50;
 
-	private void readPlans() {
-		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc).readFile(inputNetFile);
-		new MatsimPopulationReader(sc).readFile(inputPlansFile);
-		agentIds = new HashSet<Id>();
-		for (Entry<Id, ? extends Person> e : sc.getPopulation().getPersons().entrySet()){
-			if (e.getKey().equals(sc.createId("1398"))) continue;
-			Activity a = (Activity)e.getValue().getSelectedPlan().getPlanElements().get(0);
-			Coord coorda = sc.getNetwork().getLinks().get(a.getLinkId()).getCoord();
-			Activity b = (Activity)e.getValue().getSelectedPlan().getPlanElements().get(2);
-			Coord coordb = sc.getNetwork().getLinks().get(b.getLinkId()).getCoord();
-			if (isInCity(coorda) && isInCity(coordb)) {
-				agentIds.add(e.getKey());
-			}
-			
-		}
-		System.out.println("found "+agentIds.size() +" within city trips");
-//		agentIds = new HashSet<Id>(sc.getPopulation().getPersons().keySet());
-		
-	}
 
-	private boolean isInCity(Coord c){
-		double x = c.getX();
-		double y = c.getY();
-		
-		if (x<-500) return false;
-		if (x>8000) return false;
-		if (y<-8000) return false;
-		if (y>500) return false;
-		
-		return true;
-		
-	}
-	
+    /**
+     * @param args
+     */
+
+    public static void main(String[] args)
+    {
+
+        MielecDemandExtender mde = new MielecDemandExtender();
+        mde.readPlans();
+        mde.readCustomers();
+        mde.fillCustomers();
+    }
+
+
+    private void readCustomers()
+    {
+
+        List<String> taxiCustomerIds;
+        taxiCustomerIds = PersonCreatorWithRandomTaxiMode.readTaxiCustomerIds(inputTaxiDemand);
+        for (String s : taxiCustomerIds) {
+            customerIds.add(new IdImpl(s));
+        }
+    }
+
+
+    private void fillCustomers()
+    {
+        double d = (double)customerIds.size() / (double)agentIds.size();
+        long currentPercentage = Math.round(d * 100);
+        Random r = new Random();
+        exportCustomers(currentPercentage);
+        currentPercentage++;
+        for (; currentPercentage <= MAXIMUMDEMANDINPERCENT; currentPercentage++) {
+            long amountOfPlans = Math
+                    .round( ( ((double)currentPercentage / 100.) * agentIds.size()));
+            System.out.println(amountOfPlans);
+            for (long i = customerIds.size(); i <= amountOfPlans; i++) {
+                addCustomer(r);
+            }
+            exportCustomers(currentPercentage);
+        }
+    }
+
+
+    private void exportCustomers(long percentage)
+    {
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outputTaxiDemandDir
+                    + "taxiCustomers_" + percentage + ".txt")));
+
+            TreeSet<Integer> ints = new TreeSet<Integer>();
+
+            for (Id cid : customerIds) {
+                ints.add(Integer.parseInt(cid.toString()));
+            }
+
+            for (Integer i : ints) {
+                bw.append(i.toString());
+                bw.newLine();
+            }
+            System.out
+                    .println("Wrote " + percentage + " with " + customerIds.size() + " customers");
+            bw.flush();
+            bw.close();
+
+        }
+        catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
+
+
+    private void addCustomer(Random r)
+    {
+
+        do {
+            Id cid = new IdImpl(r.nextInt(agentIds.size()));
+            if (!customerIds.contains(cid)) {
+                if (agentIds.contains(cid)) {
+                    customerIds.add(cid);
+                    break;
+                }
+            }
+
+        }
+        while (true);
+    }
+
+
+    private void readPlans()
+    {
+        Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        new MatsimNetworkReader(sc).readFile(inputNetFile);
+        new MatsimPopulationReader(sc).readFile(inputPlansFile);
+        agentIds = new HashSet<Id>();
+        for (Entry<Id, ? extends Person> e : sc.getPopulation().getPersons().entrySet()) {
+            if (e.getKey().equals(sc.createId("1398")))
+                continue;
+            Activity a = (Activity)e.getValue().getSelectedPlan().getPlanElements().get(0);
+            Coord coorda = sc.getNetwork().getLinks().get(a.getLinkId()).getCoord();
+            Activity b = (Activity)e.getValue().getSelectedPlan().getPlanElements().get(2);
+            Coord coordb = sc.getNetwork().getLinks().get(b.getLinkId()).getCoord();
+            if (isInCity(coorda) && isInCity(coordb)) {
+                agentIds.add(e.getKey());
+            }
+
+        }
+        System.out.println("found " + agentIds.size() + " within city trips");
+        //		agentIds = new HashSet<Id>(sc.getPopulation().getPersons().keySet());
+
+    }
+
+
+    private boolean isInCity(Coord c)
+    {
+        double x = c.getX();
+        double y = c.getY();
+
+        if (x < -500)
+            return false;
+        if (x > 8000)
+            return false;
+        if (y < -8000)
+            return false;
+        if (y > 500)
+            return false;
+
+        return true;
+
+    }
 
 }

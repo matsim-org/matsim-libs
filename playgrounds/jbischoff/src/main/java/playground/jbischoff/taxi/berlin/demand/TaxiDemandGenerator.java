@@ -19,24 +19,17 @@
 
 package playground.jbischoff.taxi.berlin.demand;
 
-import java.io.IOException;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.matrices.Matrices;
-import org.matsim.matrices.Matrix;
-import org.matsim.matrices.MatsimMatricesReader;
+import org.matsim.core.scenario.*;
+import org.matsim.matrices.*;
 
-import playground.michalm.demand.DefaultPersonCreator;
-import playground.michalm.demand.ODDemandGenerator;
-import playground.michalm.zone.Zone;
-import playground.michalm.zone.Zones;
+import playground.michalm.demand.*;
+import playground.michalm.zone.*;
 
 
 public class TaxiDemandGenerator
@@ -60,7 +53,6 @@ public class TaxiDemandGenerator
         tdg.generateDemand("20130416040000", "20130417030000");
         tdg.writeDemand();
     }
-    
 
 
     private void writeDemand()
@@ -69,17 +61,16 @@ public class TaxiDemandGenerator
     }
 
 
-
     private void generateDemand(String start, String end)
     {
         String currentHr = start;
         do {
             Matrix matrix = this.matrices.getMatrix(currentHr);
             double startTime = getHour(currentHr)*3600;
-            odd.generateSinglePeriod(matrix, "departure", "arrival", "taxi", startTime, 3600, 1.0, true);
+            odd.generateSinglePeriod(matrix, "departure", "arrival", "taxi", startTime, 3600, 1.0);
             currentHr = getNextTimeString(currentHr);
         }
-        
+
         while (!currentHr.equals(end));
     }
 
@@ -114,22 +105,14 @@ public class TaxiDemandGenerator
     }
 
 
-     TaxiDemandGenerator()
+    TaxiDemandGenerator()
     {
         scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(scenario).readFile(NETWORKFILE);
         this.matrices = new Matrices();
-        new MatsimMatricesReader(matrices, (ScenarioImpl)scenario).readFile(ODMATRIX);
-
-        try {
-            this.zones = Zones.readZones(scenario, ZONESXML, ZONESSHP);
-
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        this.odd = new ODDemandGenerator(scenario, new BerlinTaxiActivityCreator(scenario),new DefaultPersonCreator(scenario,"p%05d"), zones);
-
+        new MatsimMatricesReader(matrices, scenario).readFile(ODMATRIX);
+        this.zones = Zones.readZones(scenario, ZONESXML, ZONESSHP);
+        this.odd = new ODDemandGenerator(scenario, zones,
+                true, new BerlinTaxiActivityCreator(scenario), new DefaultPersonCreator(scenario, "p%05d"));
     }
-
 }

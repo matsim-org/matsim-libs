@@ -54,7 +54,6 @@ public class BerlinBrandenburgShape2ZoneConverter
             try {
                 geometry = wktReader.read( (ft.getAttribute("the_geom")).toString());
 
-                
                 if (geometry.getGeometryType().equals("MultiPolygon")) {
                     MultiPolygon mp = (MultiPolygon)geometry;
                     this.polMap.put(ft.getAttribute(attrString).toString(), mp);
@@ -72,12 +71,14 @@ public class BerlinBrandenburgShape2ZoneConverter
 
     private void writeZones()
     {
-        Map<Id,Zone> zoneMap = new HashMap<Id, Zone>();
+        Map<Id, Zone> zoneMap = new HashMap<Id, Zone>();
         for (Entry<String, MultiPolygon> e : polMap.entrySet()) {
             Id zoneId = new IdImpl(e.getKey());
-            Zone zone = new Zone(zoneId,zoneId.toString(),e.getValue());
+            Zone zone = new Zone(zoneId, zoneId.toString(), e.getValue());
             zoneMap.put(zoneId, zone);
         }
-        Zones.writeZones(zoneMap, TransformationFactory.DHDN_GK4,"C:/local_jb/data/OD/shp_merged/zones.xml" , "C:/local_jb/data/OD/shp_merged/zones.shp");
+        Zones.writeZones(zoneMap, TransformationFactory.DHDN_GK4,
+                "C:/local_jb/data/OD/shp_merged/zones.xml",
+                "C:/local_jb/data/OD/shp_merged/zones.shp");
     }
 }

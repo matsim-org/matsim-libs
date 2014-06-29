@@ -34,7 +34,7 @@ import playground.michalm.taxi.util.stats.*;
 import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
 
-/*package*/class MultipleTaxiLauncher
+class MultipleTaxiLauncher
 {
     private static final int[] RANDOM_SEEDS = { 463, 467, 479, 487, 491, 499, 503, 509, 521, 523,
             541, 547, 557, 563, 569, 571, 577, 587, 593, 599, 601, 607, 613, 617, 619, 631, 641,
@@ -49,9 +49,9 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
     private PrintWriter pw3;
 
 
-    /*package*/MultipleTaxiLauncher(String paramFile)
+    MultipleTaxiLauncher(String paramFile)
     {
-        launcher = new TaxiLauncher(paramFile);
+        launcher = new TaxiLauncher(TaxiLauncher.readParams(paramFile));
 
         delaySpeedupStats = new TaxiDelaySpeedupStats();
         launcher.delaySpeedupStats = delaySpeedupStats;
@@ -61,7 +61,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
     }
 
 
-    /*package*/void initOutputFiles(String outputFileSuffix)
+    void initOutputFiles(String outputFileSuffix)
     {
         try {
             pw = new PrintWriter(launcher.dir + "stats" + outputFileSuffix);
@@ -78,7 +78,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
     }
 
 
-    /*package*/void closeOutputFiles()
+    void closeOutputFiles()
     {
         pw.close();
         pw2.close();
@@ -86,7 +86,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
     }
 
 
-    /*package*/void run(AlgorithmConfig config, int runs, Boolean destinationKnown,
+    void run(AlgorithmConfig config, int runs, Boolean destinationKnown,
             Boolean onlineVehicleTracker, Boolean advanceRequestSubmission)
     {
         if (runs < 0 || runs > RANDOM_SEEDS.length) {
@@ -186,7 +186,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
     }
 
 
-    /*package*/void run(AlgorithmConfig config, int runs)
+    void run(AlgorithmConfig config, int runs)
     {
         Boolean destinationKnown = false;
         Boolean onlineVehicleTracker = false;
@@ -196,7 +196,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
     }
 
 
-    /*package*/void run(EnumSet<AlgorithmConfig> configs, int runs)
+    void run(EnumSet<AlgorithmConfig> configs, int runs)
     {
         for (AlgorithmConfig cfg : configs) {
             run(cfg, runs);
@@ -204,7 +204,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
     }
 
 
-    /*package*/static final EnumSet<AlgorithmConfig> NOS_TW_xx = EnumSet.of(//
+    static final EnumSet<AlgorithmConfig> NOS_TW_xx = EnumSet.of(//
             //NOS_TW_SL,
             //NOS_TW_TD,
             NOS_TW_FF
@@ -212,7 +212,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
             //NOS_TW_15M
             );
 
-    /*package*/static final EnumSet<AlgorithmConfig> NOS_TP_xx = EnumSet.of(//
+    static final EnumSet<AlgorithmConfig> NOS_TP_xx = EnumSet.of(//
             //NOS_TP_SL,
             //NOS_TP_TD,
             NOS_TP_FF
@@ -220,7 +220,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
             //NOS_TP_15M
             );
 
-    /*package*/static final EnumSet<AlgorithmConfig> NOS_DSE_xx = EnumSet.of(//
+    static final EnumSet<AlgorithmConfig> NOS_DSE_xx = EnumSet.of(//
             //NOS_DSE_SL,
             //NOS_DSE_TD,
             NOS_DSE_FF
@@ -228,31 +228,31 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
             //NOS_DSE_15M
             );
 
-    /*package*/static final EnumSet<AlgorithmConfig> OTS_TW_xx = EnumSet.of(//
+    static final EnumSet<AlgorithmConfig> OTS_TW_xx = EnumSet.of(//
             OTS_TW_FF
             //OTS_TW_24H,
             //OTS_TW_15M,
             );
 
-    /*package*/static final EnumSet<AlgorithmConfig> OTS_TP_xx = EnumSet.of(//
+    static final EnumSet<AlgorithmConfig> OTS_TP_xx = EnumSet.of(//
             OTS_TP_FF
             //OTS_TP_24H,
             //OTS_TP_15M,
             );
 
-    /*package*/static final EnumSet<AlgorithmConfig> RES_TW_xx = EnumSet.of(//
+    static final EnumSet<AlgorithmConfig> RES_TW_xx = EnumSet.of(//
             RES_TW_FF
             //RES_TW_24H,
             //RES_TW_15M,
             );
 
-    /*package*/static final EnumSet<AlgorithmConfig> RES_TP_xx = EnumSet.of(//
+    static final EnumSet<AlgorithmConfig> RES_TP_xx = EnumSet.of(//
             RES_TP_FF
             //RES_TP_24H,
             //RES_TP_15M,
             );
 
-    /*package*/static final EnumSet<AlgorithmConfig> APS_TW_xx = EnumSet.of(//
+    static final EnumSet<AlgorithmConfig> APS_TW_xx = EnumSet.of(//
             //APS_TW_SL,
             //APS_TW_TD,
             APS_TW_FF
@@ -260,7 +260,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
             //APS_TW_15M
             );
 
-    /*package*/static final EnumSet<AlgorithmConfig> APS_TP_xx = EnumSet.of(//
+    static final EnumSet<AlgorithmConfig> APS_TP_xx = EnumSet.of(//
             //APS_TP_SL,
             //APS_TP_TD,
             APS_TP_FF
@@ -268,7 +268,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
             //APS_TP_15M
             );
 
-    /*package*/static final EnumSet<AlgorithmConfig> APS_DSE_xx = EnumSet.of(//
+    static final EnumSet<AlgorithmConfig> APS_DSE_xx = EnumSet.of(//
             //APS_DSE_SL,
             //APS_DSE_TD,
             APS_DSE_FF
@@ -277,7 +277,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
             );
 
 
-    /*package*/static void runAll(int runs, String paramFile)
+    static void runAll(int runs, String paramFile)
     {
         MultipleTaxiLauncher multiLauncher = new MultipleTaxiLauncher(paramFile);
         multiLauncher.initOutputFiles("");

@@ -76,7 +76,7 @@ public class IdleRankVehicleFinder
 
     private boolean hasEnoughCapacityForTask(Vehicle veh)
     {
-        return (getVehicleSoc(veh)>MINIMUMSOCFORDISPATCH);
+        return (getVehicleSoc(veh) > MINIMUMSOCFORDISPATCH);
     }
 
 
@@ -115,7 +115,7 @@ public class IdleRankVehicleFinder
 
         List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles());
         Collections.shuffle(vehicles, rnd);
-        
+
         for (Vehicle veh : vehicles) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
@@ -133,10 +133,10 @@ public class IdleRankVehicleFinder
                     bestVeh = veh;
                     continue;
                 }
-                if (this.IsElectric){
-                if (this.getVehicleSoc(veh) > this.getVehicleSoc(bestVeh)) {
-                    bestVeh = veh;
-                	}
+                if (this.IsElectric) {
+                    if (this.getVehicleSoc(veh) > this.getVehicleSoc(bestVeh)) {
+                        bestVeh = veh;
+                    }
                 }
                 //higher charge, if distance is equal	
             }
@@ -154,8 +154,7 @@ public class IdleRankVehicleFinder
         List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles());
         Collections.shuffle(vehicles, rnd);
 
-        for (Vehicle veh : Iterables.filter(vehicles,
-                TaxiSchedulerUtils.createIsIdle(scheduler))) {
+        for (Vehicle veh : Iterables.filter(vehicles, TaxiSchedulerUtils.createIsIdle(scheduler))) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;
@@ -179,8 +178,7 @@ public class IdleRankVehicleFinder
         List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles());
         Collections.shuffle(vehicles, rnd);
 
-        for (Vehicle veh : Iterables.filter(vehicles,
-                TaxiSchedulerUtils.createIsIdle(scheduler))) {
+        for (Vehicle veh : Iterables.filter(vehicles, TaxiSchedulerUtils.createIsIdle(scheduler))) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;
@@ -214,8 +212,7 @@ public class IdleRankVehicleFinder
         Vehicle bestVeh = null;
         //          double bestDistance = Double.MAX_VALUE;
         double bestDistance = Double.MAX_VALUE / 2;
-        for (Vehicle veh : Iterables.filter(vehicles,
-                TaxiSchedulerUtils.createIsIdle(scheduler))) {
+        for (Vehicle veh : Iterables.filter(vehicles, TaxiSchedulerUtils.createIsIdle(scheduler))) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;
@@ -246,11 +243,11 @@ public class IdleRankVehicleFinder
         LinkTimePair departure = scheduler.getEarliestIdleness(veh);
         Link fromLink;
         if (departure == null) {
-        	return Double.MAX_VALUE;
+            return Double.MAX_VALUE;
         }
-         fromLink = departure.link;
+        fromLink = departure.link;
 
-         // from means here the request's from, to is therefore the taxis destination to pick up customer (just a reminder for myself)
+        // from means here the request's from, to is therefore the taxis destination to pick up customer (just a reminder for myself)
         Link toLink = req.getFromLink();
 
         return DistanceUtils.calculateSquaredDistance(fromLink, toLink);

@@ -54,13 +54,13 @@ public class NOSRankTaxiOptimizer
 {
     private final TaxiOptimizerConfiguration optimConfig;
     private final IdleRankVehicleFinder idleVehicleFinder;
-    private  ElectricTaxiChargingHandler ecabhandler;
+    private ElectricTaxiChargingHandler ecabhandler;
     private final static double NEEDSTOCHARGESOC = 0.2;
-    
+
     private boolean idleRankMode;
 
     //    private final List<Id> shortTimeIdlers;
-    
+
     private Map<Id, Link> nearestChargers;
     private static Logger log = Logger.getLogger(NOSRankTaxiOptimizer.class);
 
@@ -95,9 +95,6 @@ public class NOSRankTaxiOptimizer
     {
         ((RankModeTaxiScheduler)optimConfig.scheduler).rankmode = rankMode;
     }
-
-
-    
 
 
     private static class RankModeTaxiScheduler
@@ -144,8 +141,7 @@ public class NOSRankTaxiOptimizer
             }
         }
     }
-    
-    
+
 
     public void setEcabhandler(ElectricTaxiChargingHandler ecabhandler)
     {
@@ -168,13 +164,13 @@ public class NOSRankTaxiOptimizer
             //                updateIdlers();
             //            	sendIdlingTaxisBackToRank(time);
         }
-        if (this.idleRankMode){
-            if (time % 60. == 5.)
-            {
-            	
+        if (this.idleRankMode) {
+            if (time % 60. == 5.) {
+
                 sendIdlingTaxisBackToRank(time);
-                
-            }}
+
+            }
+        }
     }
 
 
@@ -215,7 +211,8 @@ public class NOSRankTaxiOptimizer
 
         VrpPathWithTravelData path = optimConfig.calculator
                 .calcPath(currentLink, nearestRank, time);
-        if (path.getArrivalTime()>veh.getT1()) return; // no rank return if vehicle is going out of service anyway
+        if (path.getArrivalTime() > veh.getT1())
+            return; // no rank return if vehicle is going out of service anyway
         sched.addTask(new TaxiCruiseDriveTask(path));
         sched.addTask(new TaxiWaitStayTask(path.getArrivalTime(), veh.getT1(), nearestRank));
 
@@ -227,8 +224,7 @@ public class NOSRankTaxiOptimizer
         Link nearestChargerLink = null;
         double bestTravelCost = Double.MAX_VALUE;
         for (Id cid : ecabhandler.getChargers().keySet()) {
-            Link currentLink = optimConfig.context.getScenario().getNetwork().getLinks()
-                    .get(cid);
+            Link currentLink = optimConfig.context.getScenario().getNetwork().getLinks().get(cid);
             //            double currentCost = optimConfig.calculator.calcPath(positionLink, currentLink,     optimConfig.context.getTime()).getTravelCost();
             double currentCost = DistanceUtils.calculateSquaredDistance(positionLink, currentLink);
             if (currentCost < bestTravelCost) {
@@ -243,20 +239,21 @@ public class NOSRankTaxiOptimizer
     public void sendIdlingTaxisBackToRank(double time)
     {
         for (Vehicle veh : optimConfig.context.getVrpData().getVehicles()) {
-        	if (!optimConfig.scheduler.isIdle(veh)) continue;
+            if (!optimConfig.scheduler.isIdle(veh))
+                continue;
             if (veh.getSchedule().getStatus() != ScheduleStatus.STARTED)
                 continue;
             if (! (Schedules.getLastTask(veh.getSchedule()).getTaskIdx() == veh.getSchedule()
                     .getCurrentTask().getTaskIdx()))
                 continue;
-            
+
             if (veh.getSchedule().getCurrentTask().getType().equals(TaskType.STAY)) {
-            	
+
                 TaxiWaitStayTask twst = (TaxiWaitStayTask)veh.getSchedule().getCurrentTask();
                 if (!this.ecabhandler.isAtCharger(twst.getLink().getId())) {
                     if (time - twst.getBeginTime() > 60.) {
-                    	scheduleRankReturn(veh, time);
-                        
+                        scheduleRankReturn(veh, time);
+
                     }
 
                 }
@@ -281,8 +278,10 @@ public class NOSRankTaxiOptimizer
 
     }
 
-    private boolean needsToCharge(Id vid){
-        return (this.ecabhandler.getRelativeTaxiSoC(vid)<=NEEDSTOCHARGESOC);
+
+    private boolean needsToCharge(Id vid)
+    {
+        return (this.ecabhandler.getRelativeTaxiSoC(vid) <= NEEDSTOCHARGESOC);
     }
-    
+
 }

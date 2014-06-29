@@ -23,24 +23,21 @@ import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.contrib.dvrp.run.VrpConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.michalm.demand.poznan.taxi.PoznanServedRequestsReader.ServedRequest;
 import playground.michalm.taxi.TaxiRequestCreator;
 
 
-public class ServedRequestsToCustomerPlansConverter
+public class ServedRequestsBasedDemandGenerator
 {
     private final Scenario scenario;
-    private final NetworkImpl network;
     private final PopulationFactory pf;
 
 
-    public ServedRequestsToCustomerPlansConverter(Scenario scenario)
+    public ServedRequestsBasedDemandGenerator(Scenario scenario)
     {
         this.scenario = scenario;
-        network = (NetworkImpl)scenario.getNetwork();
         pf = scenario.getPopulation().getFactory();
     }
 
@@ -49,7 +46,7 @@ public class ServedRequestsToCustomerPlansConverter
     private Map<Id, Integer> prebookingTimes = new HashMap<Id, Integer>();
 
 
-    public void generatePlansFor(List<ServedRequest> requests, Date timeZero)
+    public void generatePlansFor(Iterable<ServedRequest> requests, Date timeZero)
     {
         for (ServedRequest r : requests) {
             int acceptedTime = getTime(r.accepted, timeZero);
@@ -60,7 +57,7 @@ public class ServedRequestsToCustomerPlansConverter
             Plan plan = pf.createPlan();
 
             // act0
-            Activity startAct = createActivity("dummy", r.from);
+            Activity startAct = pf.createActivityFromCoord("dummy", r.from);
             startAct.setEndTime(pickupTime);
             plan.addActivity(startAct);
 
@@ -68,31 +65,46 @@ public class ServedRequestsToCustomerPlansConverter
             plan.addLeg(pf.createLeg(TaxiRequestCreator.MODE));
 
             // act1
-            plan.addActivity(createActivity("dummy", r.to));
+            plan.addActivity(pf.createActivityFromCoord("dummy", r.to));
 
-            String strId = String.format("taxi_customer_%5d", curentAgentId++);
+            String strId = String.format("taxi_customer_%d", curentAgentId++);
             Person person = pf.createPerson(scenario.createId(strId));
 
             person.addPlan(plan);
             scenario.getPopulation().addPerson(person);
 
-            if (acceptedTime < assignedTime) {//TODO use some threshold here??
+            if (acceptedTime < assignedTime) {//TODO use some threshold here, e.g. 1 minute??
                 prebookingTimes.put(person.getId(), acceptedTime);
             }
         }
     }
 
 
-    private Activity createActivity(String actType, Coord coord)
-    {
-        ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
-        activity.setLinkId(network.getNearestLink(coord).getId());
-        return activity;
-    }
-
-
     private int getTime(Date time, Date timeZero)
     {
         return (int) ( (time.getTime() - timeZero.getTime()) / 1000);
+    }
+
+
+    public void write(String plansFile)
+    {
+        new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(plansFile);
+    }
+
+
+    public static void main(String[] args)
+    {
+        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+
+        Iterable<ServedRequest> requests = PoznanServedRequests.readRequests(scenario, 4);
+        Date zeroDate = ServedRequestsReader.parseDate("09-04-2014 00:00:00");
+        Date fromDate = ServedRequestsReader.parseDate("09-04-2014 04:00:00");
+        Iterable<ServedRequest> filteredRequests = PoznanServedRequests.filterNext24Hours(requests,
+                fromDate);
+        requests = PoznanServedRequests.filterRequestsWithinAgglomeration(requests);
+
+        ServedRequestsBasedDemandGenerator dg = new ServedRequestsBasedDemandGenerator(scenario);
+        dg.generatePlansFor(filteredRequests, zeroDate);
+        dg.write("d:/PP-rad/taxi/poznan-supply/dane/zlecenia_obsluzone/plans_09_04_2014.xml");
     }
 }

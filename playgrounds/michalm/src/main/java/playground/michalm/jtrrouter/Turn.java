@@ -25,13 +25,13 @@ package playground.michalm.jtrrouter;
 public class Turn
 {
     // structure
-    /*package*/final int node;
-    /*package*/final int prev;
-    /*package*/final int[] next;
-    /*package*/final double[] probs;
+    final int node;
+    final int prev;
+    final int[] next;
+    final double[] probs;
 
     // algorithm
-    /*package*/boolean visited;
+    boolean visited;
 
 
     public Turn(int node, int prev, int[] next, double[] probs)

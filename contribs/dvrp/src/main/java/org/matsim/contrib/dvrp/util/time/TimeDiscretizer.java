@@ -21,19 +21,34 @@ package org.matsim.contrib.dvrp.util.time;
 
 public class TimeDiscretizer
 {
-    public static final TimeDiscretizer DEFAULT = new TimeDiscretizer(30 * 4, 15 * 60);
-    public static final TimeDiscretizer ONE_HOUR = new TimeDiscretizer(30, 60 * 60);
-    public static final TimeDiscretizer ALL_DAY = new TimeDiscretizer(1, 30 * 60 * 60);
-    
+    public static final TimeDiscretizer ACYCLIC_1_SEC = new TimeDiscretizer(30, 1, false);//just no discretization
+    public static final TimeDiscretizer ACYCLIC_15_MIN = new TimeDiscretizer(30, 15 * 60, false);
+    public static final TimeDiscretizer ACYCLIC_1_HOUR = new TimeDiscretizer(30, 60 * 60, false);
+    public static final TimeDiscretizer ACYCLIC_30_HOURS = new TimeDiscretizer(30, 30 * 60 * 60,
+            false);
+
+    //useful for routing when running over-night scenarios, such as a 5am-5am taxi simulation
+    public static final TimeDiscretizer CYCLIC_1_SEC = new TimeDiscretizer(24, 1, true);//just no discretization
+    public static final TimeDiscretizer CYCLIC_15_MIN = new TimeDiscretizer(24, 15 * 60, true);
+    public static final TimeDiscretizer CYCLIC_1_HOUR = new TimeDiscretizer(24, 60 * 60, true);
+    public static final TimeDiscretizer CYCLIC_24_HOURS = new TimeDiscretizer(24, 24 * 60 * 60,
+            true);
 
     private final int intervalCount;
     private final int timeInterval;
+    private final boolean cyclic;
 
 
-    public TimeDiscretizer(int intervalCount, int timeInterval)
+    public TimeDiscretizer(int hours, int timeInterval, boolean cyclic)
     {
         this.timeInterval = timeInterval;
-        this.intervalCount = intervalCount;
+        this.cyclic = cyclic;
+
+        if (hours * 3600 % timeInterval != 0) {
+            throw new IllegalArgumentException();
+        }
+
+        intervalCount = hours * 3600 / timeInterval;
     }
 
 
@@ -46,55 +61,15 @@ public class TimeDiscretizer
         int idx = (int)time / timeInterval;
 
         if (idx >= intervalCount) {
-            throw new IllegalArgumentException();
+            if (cyclic) {
+                idx %= intervalCount;
+            }
+            else {
+                throw new IllegalArgumentException();
+            }
         }
 
         return idx;
-    }
-
-
-    public double getTime(int idx)
-    {
-        if (idx >= intervalCount) {
-            throw new IllegalArgumentException();
-        }
-
-        return idx * timeInterval;
-    }
-
-
-    public double interpolate(double[] vals, double time)
-    {
-        int idx0 = (int)time / timeInterval;
-        int idx1 = idx0 + 1;
-
-        if (idx1 >= intervalCount) {
-            throw new IllegalArgumentException();
-        }
-
-        double weight1 = time % timeInterval;
-        double weight0 = timeInterval - weight1;
-
-        double weightedSum = weight0 * vals[idx0] + weight1 * vals[idx1];
-        return weightedSum / timeInterval;
-    }
-
-
-    public double interpolate(int[] vals, double time)
-    {
-        int idx0 = (int)time / timeInterval;
-        int idx1 = idx0 + 1;
-
-        if (idx1 >= intervalCount) {
-            throw new IllegalStateException();
-        }
-
-        double weight1 = time % timeInterval;
-        double weight0 = timeInterval - weight1;
-
-        double weightedSum = weight0 * vals[idx0] + weight1 * vals[idx1];// int -> double
-        return weightedSum / timeInterval;
-
     }
 
 
@@ -107,43 +82,5 @@ public class TimeDiscretizer
     public int getIntervalCount()
     {
         return intervalCount;
-    }
-
-
-    //=============================================================================================
-
-    public interface Interpolator
-    {
-        double interpolate(double time);
-    }
-
-
-    public Interpolator createInterpolator(final int[] values)
-    {
-        if (getIntervalCount() != values.length) {
-            throw new IllegalArgumentException();
-        }
-
-        return new Interpolator() {
-            public double interpolate(double time)
-            {
-                return TimeDiscretizer.this.interpolate(values, time);
-            }
-        };
-    }
-
-
-    public Interpolator createInterpolator(final double[] values)
-    {
-        if (getIntervalCount() != values.length) {
-            throw new IllegalArgumentException();
-        }
-
-        return new Interpolator() {
-            public double interpolate(double time)
-            {
-                return TimeDiscretizer.this.interpolate(values, time);
-            }
-        };
     }
 }

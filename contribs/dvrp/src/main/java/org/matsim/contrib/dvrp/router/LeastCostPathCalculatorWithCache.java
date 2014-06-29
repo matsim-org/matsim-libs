@@ -19,14 +19,14 @@
 
 package org.matsim.contrib.dvrp.router;
 
-import java.util.*;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.vehicles.Vehicle;
+
+import com.google.common.collect.*;
 
 
 public class LeastCostPathCalculatorWithCache
@@ -36,7 +36,7 @@ public class LeastCostPathCalculatorWithCache
 
     private final TimeDiscretizer timeDiscretizer;
 
-    private final Map<Id, Map<Id, Path>>[] pathCache;
+    private final Table<Id, Id, Path>[] pathCache;
 
     private int cacheHits = 0;
     private int cacheMisses = 0;
@@ -49,10 +49,10 @@ public class LeastCostPathCalculatorWithCache
         this.calculator = calculator;
         this.timeDiscretizer = timeDiscretizer;
 
-        pathCache = new Map[timeDiscretizer.getIntervalCount()];
+        pathCache = new Table[timeDiscretizer.getIntervalCount()];
 
         for (int i = 0; i < pathCache.length; i++) {
-            pathCache[i] = new HashMap<Id, Map<Id, Path>>();
+            pathCache[i] = HashBasedTable.create();
         }
     }
 
@@ -61,23 +61,13 @@ public class LeastCostPathCalculatorWithCache
     public Path calcLeastCostPath(Node fromNode, Node toNode, double starttime, Person person,
             Vehicle vehicle)
     {
-        Map<Id, Map<Id, Path>> spCacheSlice = pathCache[timeDiscretizer.getIdx(starttime)];
-
-        Map<Id, Path> spCacheFromNode = spCacheSlice.get(fromNode.getId());
-        Path path = null;
-
-        if (spCacheFromNode == null) {
-            spCacheFromNode = new HashMap<Id, Path>();
-            spCacheSlice.put(fromNode.getId(), spCacheFromNode);
-        }
-        else {
-            path = spCacheFromNode.get(toNode.getId());
-        }
+        Table<Id, Id, Path> spCacheSlice = pathCache[timeDiscretizer.getIdx(starttime)];
+        Path path = spCacheSlice.get(fromNode.getId(), toNode.getId());
 
         if (path == null) {
             cacheMisses++;
             path = calculator.calcLeastCostPath(fromNode, toNode, starttime, person, vehicle);
-            spCacheFromNode.put(toNode.getId(), path);
+            spCacheSlice.put(toNode.getId(), toNode.getId(), path);
         }
         else {
             cacheHits++;

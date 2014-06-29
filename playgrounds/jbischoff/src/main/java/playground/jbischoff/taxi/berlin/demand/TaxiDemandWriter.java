@@ -61,400 +61,446 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
+
 /**
  * @author jbischoff
- * 
  */
 
+public class TaxiDemandWriter
+{
+    private static final Logger log = Logger.getLogger(TaxiDemandWriter.class);
+    private Map<String, Geometry> municipalityMap;
+    private Population population;
+    private NetworkImpl network;
+    private Scenario scenario;
+    private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(
+            "EPSG:25833", TransformationFactory.DHDN_GK4);
+
+    private Random rnd = new Random(17);
+    private final static String DATADIR = "C:/local_jb/data/";
+    private final static String NETWORKFILE = DATADIR + "network/berlin_brb.xml.gz";
+    private final static Id TXLLORID = new IdImpl("12214125");
+    private final static Id SXFLORID = new IdImpl("12061433");
+
+    private final static double SCALEFACTOR = 1.0;
+    static int fromTXL = 0;
+    static int toTXL = 0;
+
+    private Map<Id, Integer> oMap = new HashMap<Id, Integer>();
+    private Map<Id, Integer> dMap = new HashMap<Id, Integer>();
 
 
-public class TaxiDemandWriter {
-	private static final Logger log = Logger.getLogger(TaxiDemandWriter.class);
-	private Map<String, Geometry> municipalityMap;
-	private Population population;
-	private NetworkImpl network;
-	private Scenario scenario;
-	private CoordinateTransformation ct = TransformationFactory
-			.getCoordinateTransformation(
-					"EPSG:25833",
-					TransformationFactory.DHDN_GK4);
+    public static void main(String[] args)
+    {
+        LorShapeReader lsr = new LorShapeReader();
+        lsr.readShapeFile(DATADIR + "OD/shp_merged/Planungsraum.shp", "SCHLUESSEL");
+        lsr.readShapeFile(DATADIR + "OD/shp_merged/gemeinden.shp", "NR");
+        for (int i = 16; i < 17; i++) {
+            TaxiDemandWriter tdw = new TaxiDemandWriter();
+            tdw.setMunicipalityMap(lsr.getShapeMap());
+            tdw.writeDemand(DATADIR + "/OD/201304" + i + "/", "OD_201304" + i);
+            //			tdw.writeODbyZone(DATADIR+"OD/201304"+i+"/od.csv");
+        }
 
-	private Random rnd = new Random(17);
-	private final static String DATADIR = "C:/local_jb/data/";
-	private final static String NETWORKFILE = DATADIR+"network/berlin_brb.xml.gz";
-	private final static Id TXLLORID = new IdImpl("12214125");
-	private final static Id SXFLORID = new IdImpl("12061433");
-	
-	private final static double SCALEFACTOR = 1.0;
-	static int fromTXL = 0;
-	static int toTXL = 0;
-	
-	private Map<Id,Integer> oMap = new HashMap<Id, Integer>();
-	private Map<Id,Integer> dMap = new HashMap<Id, Integer>();
+        //		for (int i = 25; i <29 ; i++){
+        //			TaxiDemandWriter tdw = new TaxiDemandWriter();
+        //			tdw.setMunicipalityMap(lsr.getShapeMap());
+        //			tdw.writeDemand(DATADIR+"OD/kw9/201302"+i+"/", "OD_201302"+i);
+        ////			tdw.writeODbyZone(DATADIR+"OD/201304"+i+"/od.csv");
+        //		}
+        //		
+        //		for (int i = 1; i <4 ; i++){
+        //			TaxiDemandWriter tdw = new TaxiDemandWriter();
+        //			tdw.setMunicipalityMap(lsr.getShapeMap());
+        //			tdw.writeDemand(DATADIR+"OD/kw9/2013030"+i+"/", "OD_2013030"+i);
+        ////			tdw.writeODbyZone(DATADIR+"OD/201304"+i+"/od.csv");
+        //		}
 
-
-
-	public static void main(String[] args) {
-		LorShapeReader lsr = new LorShapeReader();
-		lsr.readShapeFile(DATADIR+"OD/shp_merged/Planungsraum.shp", "SCHLUESSEL");
-		lsr.readShapeFile(DATADIR+"OD/shp_merged/gemeinden.shp", "NR");
-		for (int i = 16; i <17 ; i++){
-			TaxiDemandWriter tdw = new TaxiDemandWriter();
-			tdw.setMunicipalityMap(lsr.getShapeMap());
-			tdw.writeDemand(DATADIR+"/OD/201304"+i+"/", "OD_201304"+i);
-//			tdw.writeODbyZone(DATADIR+"OD/201304"+i+"/od.csv");
-		}
-		
-//		for (int i = 25; i <29 ; i++){
-//			TaxiDemandWriter tdw = new TaxiDemandWriter();
-//			tdw.setMunicipalityMap(lsr.getShapeMap());
-//			tdw.writeDemand(DATADIR+"OD/kw9/201302"+i+"/", "OD_201302"+i);
-////			tdw.writeODbyZone(DATADIR+"OD/201304"+i+"/od.csv");
-//		}
-//		
-//		for (int i = 1; i <4 ; i++){
-//			TaxiDemandWriter tdw = new TaxiDemandWriter();
-//			tdw.setMunicipalityMap(lsr.getShapeMap());
-//			tdw.writeDemand(DATADIR+"OD/kw9/2013030"+i+"/", "OD_2013030"+i);
-////			tdw.writeODbyZone(DATADIR+"OD/201304"+i+"/od.csv");
-//		}
-		
-		
-		System.out.println("trips from TXL "+TaxiDemandWriter.fromTXL);
-		System.out.println("trips to TXL "+TaxiDemandWriter.toTXL);
-	}
-	
-	
-
-	private void writeODbyZone(String outputFileName) {
-		Set<Id> allZones = new TreeSet<Id>();
-		allZones.addAll(this.dMap.keySet());
-		allZones.addAll(this.oMap.keySet());
-		BufferedWriter bw = IOUtils.getBufferedWriter(outputFileName);
-		try {
-		for (Id zoneId : allZones){
-			int o = getFromMapOrReturnZero(this.oMap,zoneId);
-			int d = getFromMapOrReturnZero(dMap, zoneId);
-			String s = zoneId.toString() + "\t" + o + "\t" +d+ "\n";
-				bw.append(s);
-		}
-
-		bw.flush();
-		bw.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
-
-	
+        System.out.println("trips from TXL " + TaxiDemandWriter.fromTXL);
+        System.out.println("trips to TXL " + TaxiDemandWriter.toTXL);
+    }
 
 
-	private int getFromMapOrReturnZero(Map<Id, Integer> odMap, Id zoneId) {
-		int rv = 0;
-		if (odMap.containsKey(zoneId)) rv = odMap.get(zoneId); 
-		return rv;
-	}
+    private void writeODbyZone(String outputFileName)
+    {
+        Set<Id> allZones = new TreeSet<Id>();
+        allZones.addAll(this.dMap.keySet());
+        allZones.addAll(this.oMap.keySet());
+        BufferedWriter bw = IOUtils.getBufferedWriter(outputFileName);
+        try {
+            for (Id zoneId : allZones) {
+                int o = getFromMapOrReturnZero(this.oMap, zoneId);
+                int d = getFromMapOrReturnZero(dMap, zoneId);
+                String s = zoneId.toString() + "\t" + o + "\t" + d + "\n";
+                bw.append(s);
+            }
+
+            bw.flush();
+            bw.close();
+        }
+        catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
 
 
-
-	private void setMunicipalityMap(Map<String, Geometry> municipalityMap) {
-		this.municipalityMap = municipalityMap;
-	}
-	TaxiDemandWriter(){
-	 scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());;
-	 new MatsimNetworkReader(scenario).readFile(NETWORKFILE);	
-	 this.network = (NetworkImpl) scenario.getNetwork();
-	}
+    private int getFromMapOrReturnZero(Map<Id, Integer> odMap, Id zoneId)
+    {
+        int rv = 0;
+        if (odMap.containsKey(zoneId))
+            rv = odMap.get(zoneId);
+        return rv;
+    }
 
 
-
-	private void writeDemand(String dirname, String fileNamePrefix) {
-		
-		
-		population = scenario.getPopulation();
-//		generatePopulation(dirname, fileNamePrefix);
-		generatePopulation4to4();
-		log.info("Population size: " +population.getPersons().size());
-		PopulationWriter populationWriter = new PopulationWriter(
-				scenario.getPopulation(), scenario.getNetwork());
-		populationWriter.write(dirname+fileNamePrefix+"_SCALE_"+SCALEFACTOR+"_"+"plans4to3.xml.gz");
-//		populationWriter.write(dirname+fileNamePrefix+"_SCALE_"+SCALEFACTOR+"_"+"plans.xml.gz");
-
-	}
-
-	private void generatePopulation(String dirname, String fileNamePrefix) {
-		
-		for (int i = 0; i<24; i++){
-			String hrstring = String.format("%02d", i);
-			DemandParser dp = new DemandParser();
-			String currentFileName = dirname+fileNamePrefix+hrstring+"0000.dat";
-			read(currentFileName, dp);
-			generatePlansForZones(i, dp.getDemand());
-			writeODbyZone( dirname+fileNamePrefix+hrstring+"_OD.csv");
-			this.oMap.clear();
-			this.dMap.clear();
-			
-		}
-
-	}
-	private void generatePopulation4to4() {
-		
-		for (int i = 4; i<24; i++){
-			String hrstring = String.format("%02d", i);
-			DemandParser dp = new DemandParser();
-			String currentFileName = DATADIR +"/OD/20130416/OD_20130416"+hrstring+"0000.dat";
-			read(currentFileName, dp);
-			generatePlansForZones(i, dp.getDemand());
-			this.oMap.clear();
-			this.dMap.clear();
-			
-		}
-		for (int i = 0; i<3; i++){
-			String hrstring = String.format("%02d", i);
-			DemandParser dp = new DemandParser();
-			String currentFileName = DATADIR +"/OD/20130417/OD_20130417"+hrstring+"0000.dat";
-			read(currentFileName, dp);
-			generatePlansForZones(i+24, dp.getDemand());
-			this.oMap.clear();
-			this.dMap.clear();
-			
-		}
-
-	}
-	
-	
-
-	private void read(String file, TabularFileHandler handler) {
-		TabularFileParserConfig config = new TabularFileParserConfig();
-		log.info("parsing " + file);
-		config.setDelimiterTags(new String[]{"\t"," "});
-		config.setFileName(file);
-		new TabularFileParser().parse(config, handler);
-		log.info("done. (parsing " + file + ")");
-	}
-	
-	private void generatePlansForZones(int hr, List<TaxiDemandElement> hourlyTaxiDemand) {
-
-		double actualAmount = 0.;
-		double desiredAmount =0.;
-		for (TaxiDemandElement tde : hourlyTaxiDemand){
-			double amount =  tde.getAmount() * SCALEFACTOR;
-			desiredAmount += amount;
-			amount = Math.floor(amount);
-			for (int i = 0; i<amount; i++){
-			Person p;
-			Id pId = scenario.createId("p"+tde.fromId+"_"+tde.toId+"_hr_"+hr+"_nr_"+i);
-			p = generatePerson(tde.fromId, tde.toId,pId, hr);
-			if (p == null ) continue;
-			population.addPerson(p);
-			incMap(oMap,tde.fromId);
-			incMap(dMap,tde.toId);
-			actualAmount++;
-		}
-			
-		}
-		long extraAmount = Math.round(desiredAmount-actualAmount);
-		Collections.sort(hourlyTaxiDemand);
-		for (int i = 0; i<= extraAmount; i++){
-			try{
-			TaxiDemandElement tde = hourlyTaxiDemand.get(i%3);
-			Person p;
-			Id pId = scenario.createId("p"+tde.fromId+"_"+tde.toId+"_hr_"+hr+"_nr_x"+i);
-			p = generatePerson(tde.fromId, tde.toId,pId, hr);
-			if (p == null ) continue;
-			population.addPerson(p);
-			incMap(oMap,tde.fromId);
-			incMap(dMap,tde.toId);}
-			catch 
-			(IndexOutOfBoundsException e) {}
-		}
-	}
-
-	private void incMap(Map<Id, Integer> odMap, Id fromId) {
-		Integer val;
-		if (odMap.containsKey(fromId)) val = odMap.get(fromId) ;
-		else val = 0;
-		val++;
-		odMap.put(fromId, val);
-	}
+    private void setMunicipalityMap(Map<String, Geometry> municipalityMap)
+    {
+        this.municipalityMap = municipalityMap;
+    }
 
 
-
-	private Person generatePerson(Id from, Id to, Id pId, int hr) {
-		Person p;
-		Plan plan;
-		p = population.getFactory().createPerson(pId);
-		plan = generatePlan(from, to, hr);
-		if (plan == null ) return null;
-		p.addPlan(plan);
-		return p;
-	}
-
-	private Plan generatePlan(Id from, Id to, int hr) {
-		Plan plan = population.getFactory().createPlan();
-		Coord fromCoord;
-		Coord toCoord; 
-		if (from.equals(TXLLORID)){
-			
-			fromCoord = new CoordImpl(4588010.58447,5825269.27936);
-			TaxiDemandWriter.fromTXL++;
-		} else {
-		 fromCoord = this.shoot(from);
-		}
-		if (to.equals(TXLLORID)){
-			
-			toCoord = new CoordImpl(4588009.07923,5825207.56463);
-			TaxiDemandWriter.toTXL++;
-			if (from.equals(TXLLORID))
-				{
-				fromCoord = this.shoot(from);
-				toCoord = this.shoot(to);
-				//quite a lot of trips are TXL to TXL
-				}
-				} else {
-			toCoord = this.shoot(to);
-		}
-		
-		if (from.equals(SXFLORID)){
-			
-			fromCoord = new CoordImpl(4603210.22153,5807381.44468);
-			TaxiDemandWriter.fromTXL++;
-		} else {
-		 fromCoord = this.shoot(from);
-		}
-		if (to.equals(SXFLORID)){
-			
-			toCoord = new CoordImpl(4603210.22153,5807381.44468);
-			TaxiDemandWriter.toTXL++;
-			if (from.equals(SXFLORID))
-				{
-				fromCoord = this.shoot(from);
-				toCoord = this.shoot(to);
-				//quite a lot of trips are TXL to TXL
-				}
-				} else {
-			toCoord = this.shoot(to);
-		}
-		
-		
-		
-		
-		if (fromCoord == null) return null;
-		if (toCoord == null) return null;
-		
-		Link fromLink = network.getNearestLinkExactly(fromCoord);
-		Link toLink = network.getNearestLinkExactly(toCoord);
-
-		
-		double activityStart = Math.round(hr * 3600. + rnd.nextDouble() * 3600.);
-//		if (hr == 27 )  activityStart = Math.round(hr * 3600. + rnd.nextDouble() * 1200.);
-		plan.addActivity(this.addActivity("home", 0.0, activityStart, fromLink));
-		plan.addLeg(this.addLeg(activityStart , "taxi", fromLink, toLink));
-		plan.addActivity(this.addActivity("work", toLink));
-
-		return plan;
-	}
-
-	private Activity addActivity(String type, Double start, Double end,
-			Link link) {
-
-		Activity activity = population.getFactory().createActivityFromLinkId(type, link.getId());
-		activity.setStartTime(start);
-		activity.setEndTime(end);
-		return activity;
-	}
-	
-	private Activity addActivity(String type, Link link) {
-
-		Activity activity = population.getFactory().createActivityFromLinkId(type, link.getId());
-		
-		return activity;
-	}
-
-	private Leg addLeg(double departure, String mode, Link fromLink, Link toLink) {
-		Leg leg = population.getFactory().createLeg(mode);
-		leg.setDepartureTime(departure );
-		leg.setRoute(new  LinkNetworkRouteImpl(fromLink.getId(),toLink.getId()));
-		return leg;
-	}
-
-	private Coord shoot(Id zoneId) {
-		Point point;
-//		log.info("Zone" + zoneId);
-			if (this.municipalityMap.containsKey(zoneId.toString())){
-		point = getRandomPointInFeature(this.rnd, this.municipalityMap.get(zoneId.toString()));
-		CoordImpl coordImpl = new CoordImpl(point.getX(), point.getY());
-		return ct.transform(coordImpl);}
-			else {
-				log.error(zoneId.toString() +"does not exist in shapedata");
-				return null;
-			}
-	}
-
-	public static Point getRandomPointInFeature(Random rnd, Geometry g) {
-		Point p = null;
-		double x, y;
-		do {
-			x = g.getEnvelopeInternal().getMinX()
-					+ rnd.nextDouble()
-					* (g.getEnvelopeInternal().getMaxX() - g
-							.getEnvelopeInternal().getMinX());
-			y = g.getEnvelopeInternal().getMinY()
-					+ rnd.nextDouble()
-					* (g.getEnvelopeInternal().getMaxY() - g
-							.getEnvelopeInternal().getMinY());
-			p = MGC.xy2Point(x, y);
-		} while (!g.contains(p));
-		return p;
-	}
+    TaxiDemandWriter()
+    {
+        scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        ;
+        new MatsimNetworkReader(scenario).readFile(NETWORKFILE);
+        this.network = (NetworkImpl)scenario.getNetwork();
+    }
 
 
+    private void writeDemand(String dirname, String fileNamePrefix)
+    {
+
+        population = scenario.getPopulation();
+        //		generatePopulation(dirname, fileNamePrefix);
+        generatePopulation4to4();
+        log.info("Population size: " + population.getPersons().size());
+        PopulationWriter populationWriter = new PopulationWriter(scenario.getPopulation(),
+                scenario.getNetwork());
+        populationWriter.write(dirname + fileNamePrefix + "_SCALE_" + SCALEFACTOR + "_"
+                + "plans4to3.xml.gz");
+        //		populationWriter.write(dirname+fileNamePrefix+"_SCALE_"+SCALEFACTOR+"_"+"plans.xml.gz");
+
+    }
+
+
+    private void generatePopulation(String dirname, String fileNamePrefix)
+    {
+
+        for (int i = 0; i < 24; i++) {
+            String hrstring = String.format("%02d", i);
+            DemandParser dp = new DemandParser();
+            String currentFileName = dirname + fileNamePrefix + hrstring + "0000.dat";
+            read(currentFileName, dp);
+            generatePlansForZones(i, dp.getDemand());
+            writeODbyZone(dirname + fileNamePrefix + hrstring + "_OD.csv");
+            this.oMap.clear();
+            this.dMap.clear();
+
+        }
+
+    }
+
+
+    private void generatePopulation4to4()
+    {
+
+        for (int i = 4; i < 24; i++) {
+            String hrstring = String.format("%02d", i);
+            DemandParser dp = new DemandParser();
+            String currentFileName = DATADIR + "/OD/20130416/OD_20130416" + hrstring + "0000.dat";
+            read(currentFileName, dp);
+            generatePlansForZones(i, dp.getDemand());
+            this.oMap.clear();
+            this.dMap.clear();
+
+        }
+        for (int i = 0; i < 3; i++) {
+            String hrstring = String.format("%02d", i);
+            DemandParser dp = new DemandParser();
+            String currentFileName = DATADIR + "/OD/20130417/OD_20130417" + hrstring + "0000.dat";
+            read(currentFileName, dp);
+            generatePlansForZones(i + 24, dp.getDemand());
+            this.oMap.clear();
+            this.dMap.clear();
+
+        }
+
+    }
+
+
+    private void read(String file, TabularFileHandler handler)
+    {
+        TabularFileParserConfig config = new TabularFileParserConfig();
+        log.info("parsing " + file);
+        config.setDelimiterTags(new String[] { "\t", " " });
+        config.setFileName(file);
+        new TabularFileParser().parse(config, handler);
+        log.info("done. (parsing " + file + ")");
+    }
+
+
+    private void generatePlansForZones(int hr, List<TaxiDemandElement> hourlyTaxiDemand)
+    {
+
+        double actualAmount = 0.;
+        double desiredAmount = 0.;
+        for (TaxiDemandElement tde : hourlyTaxiDemand) {
+            double amount = tde.getAmount() * SCALEFACTOR;
+            desiredAmount += amount;
+            amount = Math.floor(amount);
+            for (int i = 0; i < amount; i++) {
+                Person p;
+                Id pId = scenario.createId("p" + tde.fromId + "_" + tde.toId + "_hr_" + hr + "_nr_"
+                        + i);
+                p = generatePerson(tde.fromId, tde.toId, pId, hr);
+                if (p == null)
+                    continue;
+                population.addPerson(p);
+                incMap(oMap, tde.fromId);
+                incMap(dMap, tde.toId);
+                actualAmount++;
+            }
+
+        }
+        long extraAmount = Math.round(desiredAmount - actualAmount);
+        Collections.sort(hourlyTaxiDemand);
+        for (int i = 0; i <= extraAmount; i++) {
+            try {
+                TaxiDemandElement tde = hourlyTaxiDemand.get(i % 3);
+                Person p;
+                Id pId = scenario.createId("p" + tde.fromId + "_" + tde.toId + "_hr_" + hr
+                        + "_nr_x" + i);
+                p = generatePerson(tde.fromId, tde.toId, pId, hr);
+                if (p == null)
+                    continue;
+                population.addPerson(p);
+                incMap(oMap, tde.fromId);
+                incMap(dMap, tde.toId);
+            }
+            catch (IndexOutOfBoundsException e) {}
+        }
+    }
+
+
+    private void incMap(Map<Id, Integer> odMap, Id fromId)
+    {
+        Integer val;
+        if (odMap.containsKey(fromId))
+            val = odMap.get(fromId);
+        else
+            val = 0;
+        val++;
+        odMap.put(fromId, val);
+    }
+
+
+    private Person generatePerson(Id from, Id to, Id pId, int hr)
+    {
+        Person p;
+        Plan plan;
+        p = population.getFactory().createPerson(pId);
+        plan = generatePlan(from, to, hr);
+        if (plan == null)
+            return null;
+        p.addPlan(plan);
+        return p;
+    }
+
+
+    private Plan generatePlan(Id from, Id to, int hr)
+    {
+        Plan plan = population.getFactory().createPlan();
+        Coord fromCoord;
+        Coord toCoord;
+        if (from.equals(TXLLORID)) {
+
+            fromCoord = new CoordImpl(4588010.58447, 5825269.27936);
+            TaxiDemandWriter.fromTXL++;
+        }
+        else {
+            fromCoord = this.shoot(from);
+        }
+        if (to.equals(TXLLORID)) {
+
+            toCoord = new CoordImpl(4588009.07923, 5825207.56463);
+            TaxiDemandWriter.toTXL++;
+            if (from.equals(TXLLORID)) {
+                fromCoord = this.shoot(from);
+                toCoord = this.shoot(to);
+                //quite a lot of trips are TXL to TXL
+            }
+        }
+        else {
+            toCoord = this.shoot(to);
+        }
+
+        if (from.equals(SXFLORID)) {
+
+            fromCoord = new CoordImpl(4603210.22153, 5807381.44468);
+            TaxiDemandWriter.fromTXL++;
+        }
+        else {
+            fromCoord = this.shoot(from);
+        }
+        if (to.equals(SXFLORID)) {
+
+            toCoord = new CoordImpl(4603210.22153, 5807381.44468);
+            TaxiDemandWriter.toTXL++;
+            if (from.equals(SXFLORID)) {
+                fromCoord = this.shoot(from);
+                toCoord = this.shoot(to);
+                //quite a lot of trips are TXL to TXL
+            }
+        }
+        else {
+            toCoord = this.shoot(to);
+        }
+
+        if (fromCoord == null)
+            return null;
+        if (toCoord == null)
+            return null;
+
+        Link fromLink = network.getNearestLinkExactly(fromCoord);
+        Link toLink = network.getNearestLinkExactly(toCoord);
+
+        double activityStart = Math.round(hr * 3600. + rnd.nextDouble() * 3600.);
+        //		if (hr == 27 )  activityStart = Math.round(hr * 3600. + rnd.nextDouble() * 1200.);
+        plan.addActivity(this.addActivity("home", 0.0, activityStart, fromLink));
+        plan.addLeg(this.addLeg(activityStart, "taxi", fromLink, toLink));
+        plan.addActivity(this.addActivity("work", toLink));
+
+        return plan;
+    }
+
+
+    private Activity addActivity(String type, Double start, Double end, Link link)
+    {
+
+        Activity activity = population.getFactory().createActivityFromLinkId(type, link.getId());
+        activity.setStartTime(start);
+        activity.setEndTime(end);
+        return activity;
+    }
+
+
+    private Activity addActivity(String type, Link link)
+    {
+
+        Activity activity = population.getFactory().createActivityFromLinkId(type, link.getId());
+
+        return activity;
+    }
+
+
+    private Leg addLeg(double departure, String mode, Link fromLink, Link toLink)
+    {
+        Leg leg = population.getFactory().createLeg(mode);
+        leg.setDepartureTime(departure);
+        leg.setRoute(new LinkNetworkRouteImpl(fromLink.getId(), toLink.getId()));
+        return leg;
+    }
+
+
+    private Coord shoot(Id zoneId)
+    {
+        Point point;
+        //		log.info("Zone" + zoneId);
+        if (this.municipalityMap.containsKey(zoneId.toString())) {
+            point = getRandomPointInFeature(this.rnd, this.municipalityMap.get(zoneId.toString()));
+            CoordImpl coordImpl = new CoordImpl(point.getX(), point.getY());
+            return ct.transform(coordImpl);
+        }
+        else {
+            log.error(zoneId.toString() + "does not exist in shapedata");
+            return null;
+        }
+    }
+
+
+    public static Point getRandomPointInFeature(Random rnd, Geometry g)
+    {
+        Point p = null;
+        double x, y;
+        do {
+            x = g.getEnvelopeInternal().getMinX() + rnd.nextDouble()
+                    * (g.getEnvelopeInternal().getMaxX() - g.getEnvelopeInternal().getMinX());
+            y = g.getEnvelopeInternal().getMinY() + rnd.nextDouble()
+                    * (g.getEnvelopeInternal().getMaxY() - g.getEnvelopeInternal().getMinY());
+            p = MGC.xy2Point(x, y);
+        }
+        while (!g.contains(p));
+        return p;
+    }
 
 }
 
-class TaxiDemandElement implements Comparable<TaxiDemandElement> {
-	Id fromId;
-	Id toId;
-	int amount;
 
-	TaxiDemandElement(Id from, Id to, int amount) {
-		this.fromId = from;
-		this.toId = to;
-		this.amount = amount;
-	}
+class TaxiDemandElement
+    implements Comparable<TaxiDemandElement>
+{
+    Id fromId;
+    Id toId;
+    int amount;
 
-	public Id getFromId() {
-		return fromId;
-	}
 
-	public Id getToId() {
-		return toId;
-	}
+    TaxiDemandElement(Id from, Id to, int amount)
+    {
+        this.fromId = from;
+        this.toId = to;
+        this.amount = amount;
+    }
 
-	public int getAmount() {
-		return amount;
-	}
 
-	@Override
-	public int compareTo(TaxiDemandElement arg0) {
-		Integer amo = amount;
-		return amo.compareTo(arg0.getAmount());
-	}
-	
+    public Id getFromId()
+    {
+        return fromId;
+    }
+
+
+    public Id getToId()
+    {
+        return toId;
+    }
+
+
+    public int getAmount()
+    {
+        return amount;
+    }
+
+
+    @Override
+    public int compareTo(TaxiDemandElement arg0)
+    {
+        Integer amo = amount;
+        return amo.compareTo(arg0.getAmount());
+    }
+
 }
-class DemandParser implements TabularFileHandler{
 
-	List<TaxiDemandElement> demand = new ArrayList<TaxiDemandElement>();
-	
-	@Override
-	public void startRow(String[] row) {
-		demand.add(new TaxiDemandElement(new IdImpl(row[0]), new IdImpl(row[1]), Integer.parseInt(row[2])));
-	}
 
-	public List<TaxiDemandElement> getDemand() {
-		return demand;
-	}
-	
-	}
+class DemandParser
+    implements TabularFileHandler
+{
+
+    List<TaxiDemandElement> demand = new ArrayList<TaxiDemandElement>();
+
+
+    @Override
+    public void startRow(String[] row)
+    {
+        demand.add(new TaxiDemandElement(new IdImpl(row[0]), new IdImpl(row[1]), Integer
+                .parseInt(row[2])));
+    }
+
+
+    public List<TaxiDemandElement> getDemand()
+    {
+        return demand;
+    }
+
+}

@@ -40,7 +40,7 @@ public class DefaultActivityCreator
     protected final NetworkImpl network;
     protected final PopulationFactory pf;
 
-    private  GeometryProvider geometryProvider;
+    private GeometryProvider geometryProvider;
     private PointAcceptor pointAcceptor;
 
 

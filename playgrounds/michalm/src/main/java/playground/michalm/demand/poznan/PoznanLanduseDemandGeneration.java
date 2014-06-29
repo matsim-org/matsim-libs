@@ -40,6 +40,7 @@ import pl.poznan.put.util.random.*;
 import playground.michalm.demand.*;
 import playground.michalm.demand.DefaultActivityCreator.GeometryProvider;
 import playground.michalm.demand.DefaultActivityCreator.PointAcceptor;
+import playground.michalm.util.matrices.MatrixUtils;
 import playground.michalm.util.visum.VisumODMatrixReader;
 import playground.michalm.zone.*;
 import playground.michalm.zone.util.*;
@@ -106,7 +107,7 @@ public class PoznanLanduseDemandGeneration
             ActivityType activityType = ActivityType.valueOf(actType);
 
             if (isActivityConstrained(activityType)) {
-                Polygon polygon = selection.select(zone.getId(), activityType);
+                Polygon polygon = selectionTable.select(zone.getId(), activityType);
 
                 if (polygon != null) {
                     return polygon; // randomly selected subzone
@@ -123,7 +124,7 @@ public class PoznanLanduseDemandGeneration
             ActivityType activityType = ActivityType.valueOf(actType);
 
             if (isActivityConstrained(activityType)) {
-                if (selection.contains(zone.getId(), activityType)) {
+                if (selectionTable.contains(zone.getId(), activityType)) {
                     return true;
                 }
 
@@ -155,7 +156,7 @@ public class PoznanLanduseDemandGeneration
     private final EnumSet<ActivityType> constrainedActivities = EnumSet.of(HOME, WORK, EDUCATION,
             SHOPPING);
 
-    private WeightedRandomSelectionByKeyPair<Id, ActivityType, Polygon> selection;
+    private WeightedRandomSelectionTable<Id, ActivityType, Polygon> selectionTable;
 
 
     public void generate(String dirName)
@@ -233,7 +234,7 @@ public class PoznanLanduseDemandGeneration
 
     private void initSelection()
     {
-        selection = WeightedRandomSelectionByKeyPair.createWithArrayTable(
+        selectionTable = WeightedRandomSelectionTable.createWithArrayTable(
                 zoneLanduseValidation.keySet(), constrainedActivities);
 
         for (Entry<Id, ZoneLanduseValidation> e : zoneLanduseValidation.entrySet()) {
@@ -246,7 +247,7 @@ public class PoznanLanduseDemandGeneration
                     Zones.getPolygons(zone);
 
             for (Polygon p : industrialPolygons) {
-                selection.add(zoneId, WORK, p, p.getArea());
+                selectionTable.add(zoneId, WORK, p, p.getArea());
             }
 
             Iterable<Polygon> residentialPolygons = validation.residential ? //
@@ -255,17 +256,17 @@ public class PoznanLanduseDemandGeneration
 
             for (Polygon p : residentialPolygons) {
                 double area = p.getArea();
-                selection.add(zoneId, HOME, p, area);
-                selection.add(zoneId, WORK, p, RESIDENTIAL_TO_INDUSTRIAL_WORK * area);
-                selection.add(zoneId, SHOPPING, p, RESIDENTIAL_TO_SHOP_SHOPPING * area);
+                selectionTable.add(zoneId, HOME, p, area);
+                selectionTable.add(zoneId, WORK, p, RESIDENTIAL_TO_INDUSTRIAL_WORK * area);
+                selectionTable.add(zoneId, SHOPPING, p, RESIDENTIAL_TO_SHOP_SHOPPING * area);
             }
 
             for (Polygon p : schoolByZone.get(zoneId)) {
-                selection.add(zoneId, EDUCATION, p, p.getArea());
+                selectionTable.add(zoneId, EDUCATION, p, p.getArea());
             }
 
             for (Polygon p : shopByZone.get(zoneId)) {
-                selection.add(zoneId, SHOPPING, p, p.getArea());
+                selectionTable.add(zoneId, SHOPPING, p, p.getArea());
             }
         }
     }
@@ -306,7 +307,7 @@ public class PoznanLanduseDemandGeneration
         LanduseLocationGeneratorStrategy strategy = new LanduseLocationGeneratorStrategy();
         ActivityCreator ac = new DefaultActivityCreator(scenario, strategy, strategy);
         PersonCreator pc = new DefaultPersonCreator(scenario);
-        dg = new ODDemandGenerator(scenario, ac, pc, zones);
+        dg = new ODDemandGenerator(scenario, zones, true, ac, pc);
 
         for (ActivityPair ap : ActivityPair.values()) {
             generate(odMatrixFilePrefix, ap);

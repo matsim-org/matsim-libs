@@ -35,8 +35,8 @@ import org.xml.sax.SAXException;
 import pl.poznan.put.util.array2d.*;
 import playground.michalm.demand.*;
 import playground.michalm.demand.taxi.PersonCreatorWithRandomTaxiMode;
+import playground.michalm.util.matrices.MatrixUtils;
 import playground.michalm.zone.*;
-import playground.michalm.zone.util.MatrixUtils;
 
 
 public class MielecSimpleDemandGeneration
@@ -68,7 +68,7 @@ public class MielecSimpleDemandGeneration
         ActivityCreator ac = new DefaultActivityCreator(scenario);
         PersonCreatorWithRandomTaxiMode pc = new PersonCreatorWithRandomTaxiMode(scenario,
                 taxiProbability);
-        ODDemandGenerator dg = new ODDemandGenerator(scenario, ac, pc, zones);
+        ODDemandGenerator dg = new ODDemandGenerator(scenario, zones, true, ac, pc);
 
         double[][] matrix = Array2DReader.getDoubleArray(new File(odMatrixFile), zones.size());
         Matrix afternoonODMatrix = MatrixUtils.createSparseMatrix("afternoon", zones.keySet(),

@@ -40,8 +40,8 @@ public class MATSimPlan
     // </plan>
     // </person>
 
-    /*package*/final int startTime;
-    /*package*/final int endTime;
+    final int startTime;
+    final int endTime;
 
 
     public MATSimPlan(int id, Route route, int startTime, int endTime)

@@ -24,8 +24,8 @@ package playground.michalm.jtrrouter;
  */
 public class Plan
 {
-    /*package*/final int id;
-    /*package*/final Route route;
+    final int id;
+    final Route route;
 
 
     public Plan(int id, Route route)

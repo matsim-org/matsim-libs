@@ -27,13 +27,13 @@ import java.util.List;
  */
 public class Route
 {
-    /*package*/final Flow inFlow;
-    /*package*/final Flow outFlow;
+    final Flow inFlow;
+    final Flow outFlow;
 
-    /*package*/final int nodeCount;
-    /*package*/final String nodes;
+    final int nodeCount;
+    final String nodes;
 
-    /*package*/final double prob;
+    final double prob;
 
 
     public Route(Flow in, Flow out, List<Integer> nodeList, double prob)

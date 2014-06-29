@@ -28,8 +28,8 @@ import playground.michalm.jtrrouter.Flow;
 public class MATSimFlow
     extends Flow
 {
-    /*package*/final int inLink;
-    /*package*/final int outLink;
+    final int inLink;
+    final int outLink;
 
 
     public MATSimFlow(int node, int inLink, int outLink, int next, int count)

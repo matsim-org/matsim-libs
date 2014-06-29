@@ -19,7 +19,6 @@
 
 package playground.michalm.zone;
 
-import java.io.IOException;
 import java.util.*;
 
 import org.geotools.geometry.jts.JTS;
@@ -38,7 +37,6 @@ public class Zones
 {
     public static Map<Id, Zone> readZones(Scenario scenario, String zonesXmlFile,
             String zonesShpFile)
-        throws IOException
     {
         ZoneXmlReader xmlReader = new ZoneXmlReader(scenario);
         xmlReader.parse(zonesXmlFile);

@@ -27,8 +27,8 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.matrices.*;
 
 import pl.poznan.put.util.random.*;
+import playground.michalm.util.matrices.MatrixUtils;
 import playground.michalm.zone.Zone;
-import playground.michalm.zone.util.MatrixUtils;
 
 
 public class ODDemandGenerator
@@ -39,33 +39,31 @@ public class ODDemandGenerator
     private final ActivityCreator activityCreator;
     private final PersonCreator personCreator;
     private final Map<Id, Zone> zones;
+    private final boolean addEmptyRoute;
     private final PopulationFactory pf;
 
 
-    public ODDemandGenerator(Scenario scenario, Map<Id, Zone> zones)
+    public ODDemandGenerator(Scenario scenario, Map<Id, Zone> zones, boolean addEmptyRoute)
     {
-        this(scenario, new DefaultActivityCreator(scenario), new DefaultPersonCreator(scenario),
-                zones);
+        this(scenario, zones, addEmptyRoute, new DefaultActivityCreator(scenario),
+                new DefaultPersonCreator(scenario));
     }
 
 
-    public ODDemandGenerator(Scenario scenario, ActivityCreator activityCreator,
-            PersonCreator personCreator, Map<Id, Zone> zones)
+    public ODDemandGenerator(Scenario scenario, Map<Id, Zone> zones, boolean addEmptyRoute,
+            ActivityCreator activityCreator, PersonCreator personCreator)
     {
         this.scenario = scenario;
+        this.zones = zones;
+        this.addEmptyRoute = addEmptyRoute;
         this.activityCreator = activityCreator;
         this.personCreator = personCreator;
-        this.zones = zones;
         pf = scenario.getPopulation().getFactory();
     }
 
-    public void generateSinglePeriod(Matrix matrix, String fromActivityType, String toActivityType,
-            String mode, double startTime, double duration, double flowCoeff){
-        generateSinglePeriod(matrix, fromActivityType, toActivityType, mode, startTime, duration, flowCoeff, false);
-    }
 
     public void generateSinglePeriod(Matrix matrix, String fromActivityType, String toActivityType,
-            String mode, double startTime, double duration, double flowCoeff, boolean addFakeRoute)//TransportMode.car
+            String mode, double startTime, double duration, double flowCoeff)
     {
         Iterable<Entry> entryIter = MatrixUtils.createEntryIterable(matrix);
 
@@ -80,18 +78,19 @@ public class ODDemandGenerator
                 // act0
                 Activity startAct = activityCreator.createActivity(fromZone, fromActivityType);
                 startAct.setEndTime((int)uniform.nextDouble(startTime, startTime + duration));
-                plan.addActivity(startAct);
-                Activity endAct =activityCreator.createActivity(toZone, toActivityType);
+
+                // act1
+                Activity endAct = activityCreator.createActivity(toZone, toActivityType);
+
                 // leg
                 Leg leg = pf.createLeg(mode);
-                if (addFakeRoute){
+                if (addEmptyRoute) {
                     Route r = new GenericRouteImpl(startAct.getLinkId(), endAct.getLinkId());
                     leg.setRoute(r);
                 }
-                    
-                plan.addLeg(leg);
 
-                // act1
+                plan.addActivity(startAct);
+                plan.addLeg(leg);
                 plan.addActivity(endAct);
 
                 Person person = personCreator.createPerson(plan, fromZone, toZone);

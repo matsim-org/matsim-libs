@@ -34,7 +34,7 @@ import playground.michalm.taxi.optimizer.fifo.*;
 import playground.michalm.taxi.optimizer.mip.MIPTaxiOptimizer;
 
 
-/*package*/enum AlgorithmConfig
+enum AlgorithmConfig
 {
     NOS_TW_SL(NO_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, STRAIGHT_LINE),
 
@@ -110,7 +110,7 @@ import playground.michalm.taxi.optimizer.mip.MIPTaxiOptimizer;
     
     MIP_FF(MIQCP_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME);
 
-    /*package*/static enum AlgorithmType
+    static enum AlgorithmType
     {
         NO_SCHEDULING, //
         ONE_TIME_SCHEDULING, //
@@ -120,13 +120,13 @@ import playground.michalm.taxi.optimizer.mip.MIPTaxiOptimizer;
     }
 
 
-    /*package*/final TravelTimeSource ttimeSource;
-    /*package*/final Goal goal;
-    /*package*/final TravelDisutilitySource tdisSource;
-    /*package*/final AlgorithmType algorithmType;
+    final TravelTimeSource ttimeSource;
+    final Goal goal;
+    final TravelDisutilitySource tdisSource;
+    final AlgorithmType algorithmType;
 
 
-    /*package*/AlgorithmConfig(AlgorithmType algorithmType, Goal goal,
+    AlgorithmConfig(AlgorithmType algorithmType, Goal goal,
             TravelTimeSource ttimeSource, TravelDisutilitySource tdisSource)
     {
         this.ttimeSource = ttimeSource;
@@ -136,7 +136,7 @@ import playground.michalm.taxi.optimizer.mip.MIPTaxiOptimizer;
     }
 
 
-    /*package*/TaxiOptimizer createTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
+    TaxiOptimizer createTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
         switch (algorithmType) {
             case NO_SCHEDULING:

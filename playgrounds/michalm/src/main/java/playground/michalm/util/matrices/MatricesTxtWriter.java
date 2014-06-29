@@ -17,47 +17,63 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.run;
+package playground.michalm.util.matrices;
 
-import java.util.concurrent.*;
+import java.io.*;
+import java.util.Map;
+
+import org.matsim.matrices.*;
+
+import com.google.common.base.*;
 
 
-class MultiThreadTaxiLauncher
+public class MatricesTxtWriter
 {
-    //20 d:\michalm\2014_02\mielec-2-peaks-new-10-25\params.in
-    //d:\PP-rad\taxi\mielec-2-peaks\2014_02\
-    private static final String PATH = "d:\\michalm\\2014_02\\mielec-2-peaks-new-";
-    private static final String FILE = "\\params.in";
-
-    //reverse order of iteration (--> start with bigger tasks)
-    private static final int[] DEMANDS = { 40, 35, 30, 25, 20, 15, 10 };
-    private static final int[] SUPPLIES = { 50, 25 };
-//    private static final int[] DEMANDS = { 10 };
-//    private static final int[] SUPPLIES = { 25 };
-
-    private static final int RUNS = 10;
-
-    //Do not use multithreading for MIP 
-    private static final int THREADS = 11;
+    private final Matrices matrices;
+    private String keyHeader = "key";
+    private Function<String, String> formatter = Functions.identity();
 
 
-    public static void main(String[] args)
+    public MatricesTxtWriter(Matrices matrices)
     {
-        ExecutorService service = Executors.newFixedThreadPool(THREADS);
+        this.matrices = matrices;
+    }
 
-        for (int d : DEMANDS) {
-            for (int s : SUPPLIES) {
-                final String paramFile = PATH + d + "-" + s + FILE;
 
-//                service.execute(new Runnable() {
-//                    public void run()
-                    {
-                        MultipleTaxiLauncher.runAll(RUNS, paramFile);
-                    }
-//                });
+    public void setKeyHeader(String keyHeader)
+    {
+        this.keyHeader = keyHeader;
+    }
+
+
+    public void setKeyFormatter(Function<String, String> formatter)
+    {
+        this.formatter = formatter;
+    }
+
+
+    public void write(String file)
+    {
+        PrintWriter pw;
+
+        try {
+            pw = new PrintWriter(file);
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        pw.println(keyHeader + "\tfrom\tto\tvalue");
+
+        for (Map.Entry<String, Matrix> mapEntry : matrices.getMatrices().entrySet()) {
+            String key = formatter.apply(mapEntry.getKey());
+
+            for (Entry e : MatrixUtils.createEntryIterable(mapEntry.getValue())) {
+                pw.printf("%s\t%s\t%s\t%f\n", key, e.getFromLocation(), e.getToLocation(),
+                        e.getValue());
             }
         }
 
-        service.shutdown();
+        pw.close();
     }
 }

@@ -19,9 +19,9 @@ public class VehicleWriter
     }
 
 
-    public void write(String fileName)
+    public void write(String file)
     {
-        openFile(fileName);
+        openFile(file);
         writeDoctype("vehicles", "http://matsim.org/files/dtd/vehicles_v1.dtd");
         writeStartTag("vehicles", Collections.<Tuple<String, String>>emptyList());
         writeVehicles();

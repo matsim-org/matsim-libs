@@ -33,37 +33,47 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 
 import playground.michalm.taxi.data.TaxiRank;
 
+
 public class TaxiRankHandler
     implements PersonArrivalEventHandler, PersonDepartureEventHandler
 {
-    private Map<Id,Vehicle> vehicles;
-    private Map<Id,TaxiRank> ranks;
-    
+    private Map<Id, Vehicle> vehicles;
+    private Map<Id, TaxiRank> ranks;
+
+
     public TaxiRankHandler()
     {
         this.vehicles = new HashMap<Id, Vehicle>();
         this.ranks = new HashMap<Id, TaxiRank>();
     }
-    
-    
-    
+
+
     @Override
     public void reset(int iteration)
     {
 
     }
-    public void addVehicle(Vehicle veh){
-        this.vehicles.put(veh.getId(),veh);
+
+
+    public void addVehicle(Vehicle veh)
+    {
+        this.vehicles.put(veh.getId(), veh);
     }
-    public void addRank(TaxiRank rank){
+
+
+    public void addRank(TaxiRank rank)
+    {
         this.ranks.put(rank.getLink().getId(), rank);
     }
+
 
     @Override
     public void handleEvent(PersonDepartureEvent event)
     {
-        if (!this.isRankLocation(event.getLinkId())) return;
-        if (!this.isMonitoredVehicle(event.getPersonId())) return;
+        if (!this.isRankLocation(event.getLinkId()))
+            return;
+        if (!this.isMonitoredVehicle(event.getPersonId()))
+            return;
         this.ranks.get(event.getLinkId()).addTaxi(vehicles.get(event.getPersonId()));
     }
 
@@ -71,16 +81,23 @@ public class TaxiRankHandler
     @Override
     public void handleEvent(PersonArrivalEvent event)
     {
-        if (!this.isRankLocation(event.getLinkId())) return;
-        if (!this.isMonitoredVehicle(event.getPersonId())) return;
+        if (!this.isRankLocation(event.getLinkId()))
+            return;
+        if (!this.isMonitoredVehicle(event.getPersonId()))
+            return;
         this.ranks.get(event.getLinkId()).removeTaxi(vehicles.get(event.getPersonId()));
 
-
     }
-    private boolean isMonitoredVehicle(Id vid){
+
+
+    private boolean isMonitoredVehicle(Id vid)
+    {
         return (this.vehicles.containsKey(vid));
     }
-    private boolean isRankLocation(Id linkId){
+
+
+    private boolean isRankLocation(Id linkId)
+    {
         return (this.ranks.containsKey(linkId));
     }
 

@@ -35,8 +35,8 @@ import org.xml.sax.SAXException;
 import pl.poznan.put.util.array2d.Array2DReader;
 import pl.poznan.put.util.random.RandomUtils;
 import playground.michalm.demand.ODDemandGenerator;
+import playground.michalm.util.matrices.MatrixUtils;
 import playground.michalm.zone.*;
-import playground.michalm.zone.util.MatrixUtils;
 
 
 public class PoznanSimpleDemandGeneration
@@ -67,7 +67,7 @@ public class PoznanSimpleDemandGeneration
         new MatsimNetworkReader(scenario).readFile(networkFile);
         Map<Id, Zone> zones = Zones.readZones(scenario, zonesXmlFile, zonesShpFile);
 
-        ODDemandGenerator dg = new ODDemandGenerator(scenario, zones);
+        ODDemandGenerator dg = new ODDemandGenerator(scenario, zones, true);
 
         RandomUtils.reset(randomSeed);
 

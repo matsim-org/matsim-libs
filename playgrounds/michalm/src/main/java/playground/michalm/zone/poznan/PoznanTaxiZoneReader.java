@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.supply.poznan;
+package playground.michalm.zone.poznan;
 
 import java.io.*;
 import java.util.*;
@@ -37,9 +37,10 @@ import com.vividsolutions.jts.geom.*;
 public class PoznanTaxiZoneReader
 {
     private BufferedReader reader;
+    private GeometryFactory geometryFactory = new GeometryFactory();
 
     private final Scenario scenario;
-    private final Map<Id, Zone> zones = new LinkedHashMap<Id, Zone>();
+    private final Map<Id, Zone> zones = new TreeMap<Id, Zone>();
 
 
     public PoznanTaxiZoneReader(Scenario scenario)
@@ -94,17 +95,18 @@ public class PoznanTaxiZoneReader
     private void readZones(Map<String, Coord> coords)
         throws IOException
     {
-        GeometryFactory geometryFactory = new GeometryFactory();
-
         while (true) {
             StringTokenizer st = new StringTokenizer(reader.readLine(), ",");
             String token = st.nextToken();
 
             if (token.equals("KONIEC")) {
-                return;
+                break;
             }
             else if (token.equals("TARYFA")) {
-                continue;// skip this zone
+                continue;// zone I
+            }
+            else if (token.equals("57")) {
+                continue;// obsolete zone
             }
 
             Id zoneId = scenario.createId(token);
@@ -122,6 +124,18 @@ public class PoznanTaxiZoneReader
             MultiPolygon multiPolygon = geometryFactory.createMultiPolygon(polygons);
             zones.put(zoneId, new Zone(zoneId, "taxi_zone", multiPolygon));
         }
+
+        removeInnerFromOuterZone("53", "47");//M1 + Franowo + Szpital Szwajcarska + Browar
+        //removeInnerFromOuterZone("57", "31");//Male Garbary (obsolete zone)
+    }
+
+
+    private void removeInnerFromOuterZone(String innerId, String outerId)
+    {
+        Zone inner = zones.get(scenario.createId(innerId));
+        Zone outer = zones.get(scenario.createId(outerId));
+        Polygon polygon = (Polygon)outer.getMultiPolygon().difference(inner.getMultiPolygon());
+        outer.setMultiPolygon(geometryFactory.createMultiPolygon(new Polygon[] { polygon }));
     }
 
 

@@ -19,14 +19,13 @@
 
 package playground.michalm.zone;
 
-import java.io.IOException;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.MultiPolygon;
 
 
 public class ZoneShpReader
@@ -43,14 +42,12 @@ public class ZoneShpReader
 
 
     public void readZones(String file)
-        throws IOException
     {
         readZones(file, ZoneShpWriter.ID_HEADER);
     }
 
 
     public void readZones(String file, String idHeader)
-        throws IOException
     {
         ShapeFileReader shpReader = new ShapeFileReader();
         Collection<SimpleFeature> features = shpReader.readFileAndInitialize(file);

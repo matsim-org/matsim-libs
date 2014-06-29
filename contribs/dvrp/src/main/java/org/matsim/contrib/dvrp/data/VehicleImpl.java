@@ -119,6 +119,6 @@ public class VehicleImpl
     @Override
     public void setT1(double t1)
     {
-        this.t1 = t1;   
+        this.t1 = t1;
     }
 }

@@ -27,15 +27,15 @@ import java.util.*;
  */
 public class Flow
 {
-    /*package*/final int node;
-    /*package*/final int next;
+    final int node;
+    final int next;
 
-    /*package*/final int[] counts;
+    final int[] counts;
 
-    /*package*/final boolean isInFlow;
-    /*package*/final boolean isOutFlow;
+    final boolean isInFlow;
+    final boolean isOutFlow;
 
-    /*package*/final List<Route> routes;// routes found
+    final List<Route> routes;// routes found
 
 
     public Flow(int node, int next, int[] counts, boolean isInFlow, boolean isOutFlow)

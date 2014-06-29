@@ -28,11 +28,11 @@ import playground.michalm.jtrrouter.Flow;
 public class TransimsFlow
     extends Flow
 {
-    /*package*/final int inParking;
-    /*package*/final int outParking;
+    final int inParking;
+    final int outParking;
 
-    /*package*/final int[] types;
-    /*package*/final int[] subTypes;
+    final int[] types;
+    final int[] subTypes;
 
 
     public TransimsFlow(int node, int inParking, int outParking, int next, int[] types,

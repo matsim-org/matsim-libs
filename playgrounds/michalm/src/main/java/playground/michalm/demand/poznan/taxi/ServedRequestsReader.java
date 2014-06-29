@@ -24,36 +24,14 @@ import java.text.*;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.contrib.dvrp.run.VrpConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.*;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 
-public class PoznanServedRequestsReader
+public class ServedRequestsReader
 {
-    public static class ServedRequest
-    {
-        public final Date accepted;
-        public final Date assigned;
-        public final Coord from;
-        public final Coord to;
-        public final Id taxiId;
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
-
-        public ServedRequest(Date accepted, Date assigned, Coord from, Coord to, Id taxiId)
-        {
-            super();
-            this.accepted = accepted;
-            this.assigned = assigned;
-            this.from = from;
-            this.to = to;
-            this.taxiId = taxiId;
-        }
-    }
-
-
-    private final SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
     private final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(
             TransformationFactory.WGS84, TransformationFactory.WGS84_UTM33N);
 
@@ -63,7 +41,7 @@ public class PoznanServedRequestsReader
     private Scanner scanner;
 
 
-    public PoznanServedRequestsReader(Scenario scenario, List<ServedRequest> requests)
+    public ServedRequestsReader(Scenario scenario, List<ServedRequest> requests)
     {
         this.scenario = scenario;
         this.requests = requests;
@@ -71,21 +49,26 @@ public class PoznanServedRequestsReader
 
 
     public void readFile(String file)
-        throws FileNotFoundException, ParseException
     {
-        scanner = new Scanner(new File(file));
+        try {
+            scanner = new Scanner(new File(file));
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
 
-        // Przyjęte    Wydane  Skąd-dług   Skąd-szer   Dokąd-dług  Dokąd-szer  Id.taxi
+        // ID Przyjęte Wydane Skąd-dług Skąd-szer Dokąd-dług Dokąd-szer Id.taxi
         scanner.nextLine();//skip the header line
 
         while (scanner.hasNext()) {
-            // 01-02-2014 00:00:26 01-02-2014 00:00:22 16.964106   52.401409   16.898370   52.428270   329
+            //2014_02_000001  01-02-2014 00:00:26  01-02-2014 00:00:22  16.964106  52.401409  16.898370  52.428270  329
+            Id id = scenario.createId(scanner.next());
             Date accepted = getNextDate();
             Date assigned = getNextDate();
             Coord from = getNextCoord();
             Coord to = getNextCoord();
             Id taxiId = scenario.createId(scanner.next());
-            requests.add(new ServedRequest(accepted, assigned, from, to, taxiId));
+            requests.add(new ServedRequest(id, accepted, assigned, from, to, taxiId));
         }
 
         scanner.close();
@@ -93,11 +76,10 @@ public class PoznanServedRequestsReader
 
 
     private Date getNextDate()
-        throws ParseException
     {
         String day = scanner.next();
         String time = scanner.next();
-        return sdf.parse(day + " " + time);
+        return parseDate(day + " " + time);
     }
 
 
@@ -109,18 +91,13 @@ public class PoznanServedRequestsReader
     }
 
 
-    public static void main(String[] args)
-        throws FileNotFoundException, ParseException
+    public static Date parseDate(String date)
     {
-        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
-        List<ServedRequest> requests = new ArrayList<ServedRequest>();
-
-        String commonPath = "d:/PP-rad/taxi/poznan-supply/dane/zlecenia_obsluzone/Zlecenia_obsluzone_";
-        String input_2014_02 = commonPath + "2014-02.csv";
-        String input_2014_03 = commonPath + "2014-03.csv";
-        String input_2014_04 = commonPath + "2014-04.csv";
-        new PoznanServedRequestsReader(scenario, requests).readFile(input_2014_02);
-        new PoznanServedRequestsReader(scenario, requests).readFile(input_2014_03);
-        new PoznanServedRequestsReader(scenario, requests).readFile(input_2014_04);
+        try {
+            return DATE_FORMAT.parse(date);
+        }
+        catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

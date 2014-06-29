@@ -75,7 +75,7 @@ public class RandomDynAgentLogic
     }
 
 
-    /*package*/ static <E> E chooseRandomElement(Set<E> set)
+     static <E> E chooseRandomElement(Set<E> set)
     {
         int randomIndex = MatsimRandom.getRandom().nextInt(set.size());
         return Iterators.get(set.iterator(), randomIndex);

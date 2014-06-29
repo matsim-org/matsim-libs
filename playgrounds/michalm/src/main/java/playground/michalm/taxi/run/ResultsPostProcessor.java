@@ -62,7 +62,9 @@ public class ResultsPostProcessor
         private double dropoffDriveT;
         private double pickupT;
         private double dropoffT;
+        @SuppressWarnings("unused")
         private double waitT;
+        @SuppressWarnings("unused")
         private double compT;
 
         // ============
@@ -70,11 +72,14 @@ public class ResultsPostProcessor
         private double T_W;
         private double T_W_95;
         private double T_W_MAX;
+        @SuppressWarnings("unused")
         private double T_D;
+        @SuppressWarnings("unused")
         private double R_W;
         private double T_P;
         private double T_P_95;
         private double T_P_MAX;
+        @SuppressWarnings("unused")
         private double R_P;
         private double R_NI;
 
