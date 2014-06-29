@@ -69,7 +69,7 @@ public class PopulationBuilder2011 {
 	 *  
 	 * @param args needs the following arguments:
 	 * <ol>
-	 * 		<li> input folder where the MLIPF zoanl population was written to;
+	 * 		<li> input folder where the MLIPF zonal population was written to;
 	 * 		<li> the subplace shapefile corresponding to the subplaces for 
 	 * 			which the population was fitted;
 	 * 		<li> the Id field containing the subplace code; and
