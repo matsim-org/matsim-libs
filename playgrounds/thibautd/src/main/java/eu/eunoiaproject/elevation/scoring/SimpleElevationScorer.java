@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package eu.eunoiaproject.elevation.scoring;
 
-import java.util.Collection;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -28,6 +26,7 @@ import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
 import org.matsim.core.scoring.SumScoringFunction.LegScoring;
 
 import eu.eunoiaproject.elevation.ElevationProvider;
+import eu.eunoiaproject.elevation.scoring.SimpleElevationScorerParameters.Params;
 
 /**
  * @author thibautd
@@ -37,27 +36,16 @@ public class SimpleElevationScorer implements LegScoring, ActivityScoring {
 
 	private final ElevationProvider<Id> elevationProvider;
 
-	private final Collection<String> modes;
-	private final double marginalUtilityOfDifferential_m;
+	private final SimpleElevationScorerParameters params;
 
-	private boolean scoreNextArrival = false;
+	private String lastMode = null;
 	private Activity lastAct;
 
 	public SimpleElevationScorer(
-			final SimpleElevationScorerConfigGroup config,
+			final SimpleElevationScorerParameters params,
 			final ElevationProvider<Id> elevationProvider ) {
-		this( config.getMarginalUtilityOfDenivelation_m(),
-				config.getModes(),
-				elevationProvider );
-	}
-
-	public SimpleElevationScorer(
-			final double marginalUtilityOfDifferential_m,
-			final Collection<String> modes,
-			final ElevationProvider<Id> elevationProvider ) {
-		this.marginalUtilityOfDifferential_m = marginalUtilityOfDifferential_m;
+		this.params = params;
 		this.elevationProvider = elevationProvider;
-		this.modes = modes;
 	}
 
 	@Override
@@ -70,29 +58,27 @@ public class SimpleElevationScorer implements LegScoring, ActivityScoring {
 
 	@Override
 	public void handleLeg(final Leg leg) {
-		if ( modes.contains( leg.getMode() ) ) scoreNextArrival = true;
+		lastMode = leg.getMode();
 	}
 
 	@Override
 	public void handleActivity( final Activity act ) {
-		if ( scoreNextArrival ) {
-			scoreNextArrival = false;
+		if ( lastMode != null ) throw new IllegalStateException();
+
+		final Params p = params.getParams( lastMode );
+		if ( p != null ) {
 			final double startAlt = elevationProvider.getAltitude( lastAct.getFacilityId() );
 			final double endAlt = elevationProvider.getAltitude( act.getFacilityId() );
-			this.score += score( startAlt , endAlt );
-		}
-		this.lastAct = act;
-	}
 
-	private double score(
-			final double startAlt,
-			final double endAlt) {
-		return marginalUtilityOfDifferential_m * ( endAlt - startAlt ); 
+			this.score += p.marginalUtilityOfDenivelation_m * ( endAlt - startAlt ); 
+		}
+		this.lastMode = null;
+		this.lastAct = act;
 	}
 
 	@Override
 	public void handleFirstActivity( final Activity act ) {
-		handleActivity( act );
+		this.lastAct = act;
 	}
 
 	@Override
