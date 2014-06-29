@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package eu.eunoiaproject.elevation.scoring;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
@@ -45,12 +44,20 @@ public class SimpleElevationScorer implements LegScoring, ActivityScoring {
 	private Activity lastAct;
 
 	public SimpleElevationScorer(
+			final SimpleElevationScorerConfigGroup config,
+			final ElevationProvider<Id> elevationProvider ) {
+		this( config.getMarginalUtilityOfDenivelation_m(),
+				config.getModes(),
+				elevationProvider );
+	}
+
+	public SimpleElevationScorer(
 			final double marginalUtilityOfDifferential_m,
-			final ElevationProvider<Id> elevationProvider,
-			final String... modes) {
+			final Collection<String> modes,
+			final ElevationProvider<Id> elevationProvider ) {
 		this.marginalUtilityOfDifferential_m = marginalUtilityOfDifferential_m;
 		this.elevationProvider = elevationProvider;
-		this.modes = Arrays.asList( modes );
+		this.modes = modes;
 	}
 
 	@Override
