@@ -71,7 +71,7 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		NetworkImpl network = (NetworkImpl) getControler().getNetwork();
 		
 		try{
-			double walkScore = parkingInfrastructureManager.getParkingScoreManager().calcWalkScore(coord, parking.getCoordinate(), personId, getAverageActDuration());
+			double walkScore = parkingInfrastructureManager.getParkingScoreManager().calcWalkScore(coord, parking, personId, getAverageActDuration());
 			parkingInfrastructureManager.getParkingScoreManager().addScore(personId, walkScore);
 		} catch (Error err){
 			DebugLib.emptyFunctionForSettingBreakPoint();

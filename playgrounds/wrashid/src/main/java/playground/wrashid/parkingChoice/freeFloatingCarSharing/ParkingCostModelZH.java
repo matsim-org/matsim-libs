@@ -42,6 +42,7 @@ public class ParkingCostModelZH implements ParkingCostModel {
 	
 	@Override
 	public double calcParkingCost(double arrivalTimeInSeconds, double durationInSeconds, Id personId, Id parkingFacilityId) {
+		//return 0;
 		return parkingCostCalculator.getParkingCost(parkingFacilityId, arrivalTimeInSeconds, durationInSeconds);
 	}
 
