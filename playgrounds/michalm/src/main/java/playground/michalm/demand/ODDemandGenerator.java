@@ -88,6 +88,8 @@ public class ODDemandGenerator
                     Route r = new GenericRouteImpl(startAct.getLinkId(), endAct.getLinkId());
                     leg.setRoute(r);
                 }
+                leg.setDepartureTime(startAct.getEndTime());     
+
 
                 plan.addActivity(startAct);
                 plan.addLeg(leg);

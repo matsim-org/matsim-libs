@@ -35,13 +35,13 @@ import com.vividsolutions.jts.geom.*;
 public class DefaultActivityCreator
     implements ActivityCreator
 {
-    private final UniformRandom uniform = RandomUtils.getGlobalUniform();
-    private final Scenario scenario;
+    protected final UniformRandom uniform = RandomUtils.getGlobalUniform();
+    protected final Scenario scenario;
     protected final NetworkImpl network;
     protected final PopulationFactory pf;
 
-    private GeometryProvider geometryProvider;
-    private PointAcceptor pointAcceptor;
+    protected  GeometryProvider geometryProvider;
+    protected PointAcceptor pointAcceptor;
 
 
     public DefaultActivityCreator(Scenario scenario)
