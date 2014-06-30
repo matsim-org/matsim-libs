@@ -46,7 +46,6 @@ import eu.eunoiaproject.bikesharing.framework.events.AgentStartsWaitingForBikeEv
 import eu.eunoiaproject.bikesharing.framework.events.AgentStartsWaitingForFreeBikeSlotEvent;
 import eu.eunoiaproject.bikesharing.framework.events.AgentStopsWaitingForBikeEvent;
 import eu.eunoiaproject.bikesharing.framework.events.AgentStopsWaitingForFreeBikeSlotEvent;
-import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingManager.BikeSharingManagerListener;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingRoute;
 
 /**

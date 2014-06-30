@@ -22,7 +22,6 @@ package eu.eunoiaproject.bikesharing.framework.qsim;
 import org.matsim.core.mobsim.qsim.QSim;
 
 import eu.eunoiaproject.bikesharing.framework.events.NewBikeSharingFacilityStateEvent;
-import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingManager.BikeSharingManagerListener;
 
 /**
  * A simple {@link BikeSharingManagerListener}, which generates

@@ -76,7 +76,7 @@ public class BikeSharingWithoutRelocationQsimFactory implements MobsimFactory {
 		// Here is the only modified part.
 		// The rest is just re-organized according to my obsessions.
 		final BikeSharingManager bikeSharingManager =
-			new BikeSharingManager(
+			new BikeSharingManagerImpl(
 					(BikeSharingFacilities) sc.getScenarioElement(
 						BikeSharingFacilities.ELEMENT_NAME ) );
 		final BikeSharingEngine bikeSharingEngine =

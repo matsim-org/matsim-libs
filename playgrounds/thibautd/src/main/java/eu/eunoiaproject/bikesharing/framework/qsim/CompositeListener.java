@@ -19,26 +19,20 @@
 
 package eu.eunoiaproject.bikesharing.framework.qsim;
 
-import java.util.Collection;
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
+import java.util.ArrayList;
+import java.util.List;
 
 
-public interface BikeSharingManager {
+class CompositeListener implements BikeSharingManagerListener {
+	private final List<BikeSharingManagerListener> listeners = new ArrayList<BikeSharingManagerListener>();
 
-	public void addListener(BikeSharingManagerListener l);
+	public void addListener( final BikeSharingManagerListener l ) {
+		listeners.add( l );
+	}
 
-	public Map<Id, ? extends StatefulBikeSharingFacility> getFacilities();
-
-	public Map<Id, ? extends Collection<? extends StatefulBikeSharingFacility>> getFacilitiesAtLinks();
-
-	public void takeBike(Id facility);
-
-	public void takeBikes(Id facility, int amount);
-
-	public void putBike(Id facility);
-
-	public void putBikes(Id facility, int amount);
+	@Override
+	public void handleChange(final StatefulBikeSharingFacility f) {
+		for ( BikeSharingManagerListener l : listeners ) l.handleChange( f );
+	}
 
 }

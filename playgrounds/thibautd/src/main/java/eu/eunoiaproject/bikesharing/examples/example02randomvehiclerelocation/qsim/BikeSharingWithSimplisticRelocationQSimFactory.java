@@ -38,6 +38,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 
 import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingEngine;
+import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingManagerImpl;
 import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingManager;
 import eu.eunoiaproject.bikesharing.framework.qsim.FacilityStateChangeRepeater;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
@@ -76,7 +77,7 @@ public class BikeSharingWithSimplisticRelocationQSimFactory implements MobsimFac
 		// Here is the only modified part.
 		// The rest is just re-organized according to my obsessions.
 		final BikeSharingManager bikeSharingManager =
-			new BikeSharingManager(
+			new BikeSharingManagerImpl(
 					(BikeSharingFacilities) sc.getScenarioElement(
 						BikeSharingFacilities.ELEMENT_NAME ) );
 		final BikeSharingEngine bikeSharingEngine =
