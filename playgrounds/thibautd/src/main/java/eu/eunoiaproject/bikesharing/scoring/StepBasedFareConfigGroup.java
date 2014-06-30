@@ -28,7 +28,7 @@ import org.matsim.core.config.experimental.ReflectiveModule;
  */
 public class StepBasedFareConfigGroup extends ReflectiveModule {
 
-	private static final String GROUP_NAME = "bikeSharingFare";
+	public static final String GROUP_NAME = "bikeSharingFare";
 
 	private double stepDuration_min = 30;
 	private double stepPrice = 2;
