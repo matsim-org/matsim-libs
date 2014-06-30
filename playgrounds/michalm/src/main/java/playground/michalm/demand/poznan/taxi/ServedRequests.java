@@ -76,7 +76,7 @@ public class ServedRequests
     }
 
 
-    public static Predicate<ServedRequest> createBetweenDatesPredicate(final Date fromDate,
+    public static Predicate<? super ServedRequest> createBetweenDatesPredicate(final Date fromDate,
             final Date toDate)
     {
         return new Predicate<ServedRequest>() {

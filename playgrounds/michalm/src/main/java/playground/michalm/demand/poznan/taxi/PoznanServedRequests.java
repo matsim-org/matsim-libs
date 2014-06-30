@@ -61,12 +61,14 @@ public class PoznanServedRequests
         //March - 2-29 (4 full weeks) - exclude: 1, 30-31 (daylight saving time shift)
         //April - 1-14 + 23-29 (3 full weeks), exclude: 15-22, 30 (Easter and May's long weekend)
 
-        @SuppressWarnings("unchecked")
-        Predicate<ServedRequest> predicate = Predicates.not(Predicates.or(
+        //@SuppressWarnings("unchecked")
+        Predicate<? super ServedRequest> orPredicate = Predicates.or(
                 ServedRequests.createBetweenDatesPredicate(midnight("01-03"), midnight("02-03")),
                 ServedRequests.createBetweenDatesPredicate(midnight("30-03"), midnight("01-04")),
                 ServedRequests.createBetweenDatesPredicate(midnight("15-04"), midnight("23-04")),
-                ServedRequests.createBetweenDatesPredicate(midnight("30-04"), midnight("01-05"))));
+                ServedRequests.createBetweenDatesPredicate(midnight("30-04"), midnight("01-05")));
+        
+        Predicate<? super ServedRequest> predicate = Predicates.not(orPredicate);
 
         return Iterables.filter(requests, predicate);
     }
