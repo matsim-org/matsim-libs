@@ -33,9 +33,10 @@ import playground.scnadine.converters.osmPT.Osm2TransitLines;
  *
  * @author boescpa
  */
-public class OSMConvMain {
+public class OSM2PTConvMain {
 
 	public static void main(String[] args) {
+
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().scenario().setUseTransit(true);
 
