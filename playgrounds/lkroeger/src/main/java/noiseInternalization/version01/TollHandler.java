@@ -41,9 +41,9 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.Tuple;
-
-import analysis.shapes.IKGISAnalyzerPostAnalysis;
-import analysis.shapes.IKNetworkPopulationWriter;
+//
+//import analysis.shapes.IKGISAnalyzerPostAnalysis;
+//import analysis.shapes.IKNetworkPopulationWriter;
 
 public class TollHandler implements NoiseEventHandler , NoiseEventAffectedHandler , LinkLeaveEventHandler {
 
@@ -624,7 +624,7 @@ public class TollHandler implements NoiseEventHandler , NoiseEventAffectedHandle
 			e.printStackTrace();
 		}
 		
-		IKNetworkPopulationWriter.exportActivityConnection2DoubleValue(scenario , personId2tollSum , "toll");
+//		IKNetworkPopulationWriter.exportActivityConnection2DoubleValue(scenario , personId2tollSum , "toll");
 		return personId2tollSum;
 	}
 	
@@ -700,7 +700,7 @@ public class TollHandler implements NoiseEventHandler , NoiseEventAffectedHandle
 			e.printStackTrace();
 		}
 		
-		IKNetworkPopulationWriter.exportActivityConnection2DoubleValue(scenario , personId2damageSum , "damage");
+//		IKNetworkPopulationWriter.exportActivityConnection2DoubleValue(scenario , personId2damageSum , "damage");
 		return personId2damageSum;
 	}
 	
@@ -726,7 +726,7 @@ public class TollHandler implements NoiseEventHandler , NoiseEventAffectedHandle
 			e.printStackTrace();
 		}
 		
-		IKNetworkPopulationWriter.exportActivityConnection2DoubleValue(scenario , personId2homeBasedDamageSum , "homeBasedDamage");
+//		IKNetworkPopulationWriter.exportActivityConnection2DoubleValue(scenario , personId2homeBasedDamageSum , "homeBasedDamage");
 		return personId2homeBasedDamageSum;
 	}
 	
@@ -765,7 +765,7 @@ public class TollHandler implements NoiseEventHandler , NoiseEventAffectedHandle
 			e.printStackTrace();
 		}
 		
-		IKNetworkPopulationWriter.exportActivityConnection2DoubleValue(scenario , personId2differenceTollDamage , "differenceTollDamage");
+//		IKNetworkPopulationWriter.exportActivityConnection2DoubleValue(scenario , personId2differenceTollDamage , "differenceTollDamage");
 		return personId2differenceTollDamage;
 	}
 	
