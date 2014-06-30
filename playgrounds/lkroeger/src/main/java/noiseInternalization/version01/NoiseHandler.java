@@ -1216,7 +1216,7 @@ public class NoiseHandler implements LinkLeaveEventHandler , ActivityEndEventHan
 			e.printStackTrace();
 		}
 		
-		analysis.shapes.IKNetworkPopulationWriter.exportReceiverPoints2Shp(receiverPointId2noiseImmission);
+//		analysis.shapes.IKNetworkPopulationWriter.exportReceiverPoints2Shp(receiverPointId2noiseImmission);
 		
 	}
 	
