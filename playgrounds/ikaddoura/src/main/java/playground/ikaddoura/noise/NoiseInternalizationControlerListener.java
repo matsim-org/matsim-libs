@@ -96,32 +96,32 @@ public class NoiseInternalizationControlerListener implements AfterMobsimListene
 		tollHandler.setLinkId2timeBin2avgToll();
 		
 		log.info("Write toll stats");
-		String filenameToll = "tollstats.csv";
+		String filenameToll = "noise_tollstats.csv";
 		tollHandler.writeTollStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + filenameToll);
-		
-		log.info("Write toll stats per hour");
-		String filenameTollPerHour = "tollstatsPerHour.csv";
-		tollHandler.writeTollStatsPerHour(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + filenameTollPerHour);
+//		
+//		log.info("Write toll stats per hour");
+//		String filenameTollPerHour = "noise_tollstatsPerHour.csv";
+//		tollHandler.writeTollStatsPerHour(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + filenameTollPerHour);
 		
 //		log.info("Write toll stats per activity");
-//		String filenameTollPerActivity = "tollstatsPerActivity.csv";
+//		String filenameTollPerActivity = "noise_tollstatsPerActivity.csv";
 //		tollHandler.writeTollStatsPerActivity(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + filenameTollPerActivity);
 //		
 //		log.info("Write toll stats for comparing home-based vs. activity-based");
-//		String filenameTollCompareHomeVsActivityBased = "tollstats_CompareHomeVsActivityBased.csv";
+//		String filenameTollCompareHomeVsActivityBased = "noise_tollstats_CompareHomeVsActivityBased.csv";
 //		tollHandler.writeTollStatsCompareHomeVsActivityBased(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + filenameTollCompareHomeVsActivityBased);
 		
-		log.info("Write noise emission stats");
-		String filenameNoiseEmission = "noiseEmissionStats.csv";
-		noiseHandler.writeNoiseEmissionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + filenameNoiseEmission);
-		
-		log.info("Write noise emission stats per hour");
-		String filenameNoiseEmissionPerHour = "noiseEmissionStatsPerHour.csv";
-		noiseHandler.writeNoiseEmissionStatsPerHour(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + filenameNoiseEmissionPerHour);
-		
-		log.info("Write noise immission stats");
-		String filenameNoiseImmission = "noiseImmissionStats.csv";
-		noiseHandler.writeNoiseImmissionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + filenameNoiseImmission);
+//		log.info("Write noise emission stats");
+//		String filenameNoiseEmission = "noiseEmissionStats.csv";
+//		noiseHandler.writeNoiseEmissionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + filenameNoiseEmission);
+//		
+//		log.info("Write noise emission stats per hour");
+//		String filenameNoiseEmissionPerHour = "noiseEmissionStatsPerHour.csv";
+//		noiseHandler.writeNoiseEmissionStatsPerHour(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + filenameNoiseEmissionPerHour);
+//		
+//		log.info("Write noise immission stats");
+//		String filenameNoiseImmission = "noiseImmissionStats.csv";
+//		noiseHandler.writeNoiseImmissionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + filenameNoiseImmission);
 		
 //		log.info("Write noise immission stats per hour");
 //		String filenameNoiseImmissionPerHour = "noiseImmissionStatsPerHour.csv";

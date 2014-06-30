@@ -194,7 +194,7 @@ public class SpatialInfo {
 				}
 			}
 		}
-		
+				
 //		classify the activityCoords on the basis of the density
 		double xCoordMin = Double.MAX_VALUE;
 		double xCoordMax = Double.MIN_VALUE;
@@ -270,31 +270,31 @@ public class SpatialInfo {
 		}
 	}
 	
-	public double getActivityDensityValue (Scenario scenario , Coord coord) {
-		double radius = 178.41; // one square kilometre/10
-		
-		double densityValue = 0.;
-		
-		double coordX = coord.getX();
-		double coordY = coord.getY();
-		
-		int counter = 0;
-		
-		for(Coord c : allActivityCoords) {	
-			double xValue = c.getX();
-			double yValue = c.getY();
-			
-			if(Math.sqrt((Math.pow(coordX-xValue,2))+(Math.pow(coordY-yValue,2)))<= radius) {
-				counter = counter + 1;
-			}
-			counter = (int) (counter*NoiseConfig.getScaleFactor());
-		}
-		
-		densityValue = counter/10.;
-		// a value of 100 is high (high density of activity locations: 10000/square kilometre)
-		
-		return densityValue;
-	}
+//	public double getActivityDensityValue (Scenario scenario , Coord coord) {
+//		double radius = 178.41; // one square kilometre/10
+//		
+//		double densityValue = 0.;
+//		
+//		double coordX = coord.getX();
+//		double coordY = coord.getY();
+//		
+//		int counter = 1;
+//		
+//		for(Coord c : allActivityCoords) {	
+//			double xValue = c.getX();
+//			double yValue = c.getY();
+//			
+//			if(Math.sqrt((Math.pow(coordX-xValue,2))+(Math.pow(coordY-yValue,2)))<= radius) {
+//				counter = counter + 1;
+//			}
+//			counter = (int) (counter*NoiseConfig.getScaleFactor());
+//		}
+//		
+//		densityValue = counter/10.;
+//		// a value of 100 is high (high density of activity locations: 10000/square kilometre)
+//		
+//		return densityValue;
+//	}
 	
 	private double getStreetWidth (Scenario scenario , Id linkId) {
 		double capacity = scenario.getNetwork().getLinks().get(linkId).getCapacity();

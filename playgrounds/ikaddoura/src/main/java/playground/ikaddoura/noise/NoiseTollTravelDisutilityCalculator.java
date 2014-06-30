@@ -83,7 +83,7 @@ public class NoiseTollTravelDisutilityCalculator implements TravelDisutility{
 		/* The following is an estimate of the tolls that an agent would have to pay if choosing that link in the next
 		iteration based on the tolls of the last iteration. */
 		
-		double linkExpectedToll = this.tollHandler.getAvgToll(link, time);
+		double linkExpectedToll = this.tollHandler.getAvgToll(link.getId(), time);
 //		log.info("-----------> Expected toll on link " + link.getId() + " at " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS) + ": " + linkExpectedToll);
 
 		double linkExpectedTollDisutility = this.marginalUtlOfMoney * (linkExpectedToll);

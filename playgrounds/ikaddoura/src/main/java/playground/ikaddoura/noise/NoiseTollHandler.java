@@ -527,10 +527,10 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 		}
 	}
 	
-	public double getAvgToll(Link link, double time) {
+	public double getAvgToll(Id linkId, double time) {
 		double avgToll = 0.;
-		if (this.linkId2timeBin2avgTollOldValue.containsKey(link.getId())){
-			Map<Double, Double> timeBin2avgToll = this.linkId2timeBin2avgTollOldValue.get(link.getId());
+		if (this.linkId2timeBin2avgTollOldValue.containsKey(linkId)){
+			Map<Double, Double> timeBin2avgToll = this.linkId2timeBin2avgTollOldValue.get(linkId);
 			for (Double timeBin : timeBin2avgToll.keySet()) {
 				if (time < timeBin && time >= timeBin - this.timeBinSize){
 					avgToll = timeBin2avgToll.get(timeBin);

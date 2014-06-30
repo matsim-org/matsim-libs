@@ -108,11 +108,12 @@ public class NoiseImmissionCalculator {
 	public double calculateDreflection (Scenario scenario , Coord coord , Id linkId) {
 		double Dreflection = 0.;	
 		double densityValue = 0.;
-		
-		if(spatialInfo.getActivityCoords2densityValue().containsKey(coord)) {
-			densityValue = spatialInfo.getActivityCoords2densityValue().get(coord);
-		}
-		double streetWidth = spatialInfo.getLinkId2streetWidth().get(linkId);
+//		if(spatialInfo.getActivityCoords2densityValue().containsKey(coord)) {
+//			densityValue = spatialInfo.getActivityCoords2densityValue().get(coord);
+			densityValue = 25.;
+//		}
+		double streetWidth = 12.;
+//		double streetWidth = spatialInfo.getLinkId2streetWidth().get(linkId);
 		
 		Dreflection = densityValue/streetWidth;
 		
