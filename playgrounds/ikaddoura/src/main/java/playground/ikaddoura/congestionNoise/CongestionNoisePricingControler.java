@@ -39,6 +39,7 @@ import playground.ikaddoura.noise.NoiseHandler;
 import playground.ikaddoura.noise.NoiseInternalizationControlerListener;
 import playground.ikaddoura.noise.NoiseTollDisutilityCalculatorFactory;
 import playground.ikaddoura.noise.NoiseTollHandler;
+import playground.ikaddoura.noise.SpatialInfo;
 
 /**
  * @author ikaddoura
@@ -62,7 +63,7 @@ public class CongestionNoisePricingControler {
 			log.info("second argument (rund Id): "+ runId);
 
 		} else {
-			configFile = "../../shared-svn/lars/congestionNoise/config02.xml";
+			configFile = "../../shared-svn/studies/lars/congestionNoise/config02.xml";
 			runId = "noise";
 		}
 		
@@ -85,15 +86,32 @@ public class CongestionNoisePricingControler {
 		} else if(runId.equalsIgnoreCase("noise")) {
 			
 			log.info("Internalization of noise cost is enabled.");
-			NoiseHandler noiseHandler = new NoiseHandler(controler.getScenario());
-			NoiseTollHandler tollHandler = new NoiseTollHandler(controler.getScenario(), controler.getEvents());
+
+			SpatialInfo spatialInfo = new SpatialInfo( (ScenarioImpl) controler.getScenario());
+			
+			NoiseHandler noiseHandler = new NoiseHandler(controler.getScenario(), spatialInfo);
+			NoiseTollHandler tollHandler = new NoiseTollHandler(controler.getScenario(), controler.getEvents(), spatialInfo, noiseHandler);
+			
 			NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(tollHandler);
 			controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
-			controler.addControlerListener(new NoiseInternalizationControlerListener( (ScenarioImpl) controler.getScenario(), noiseHandler , tollHandler ));
+			
+			controler.addControlerListener(new NoiseInternalizationControlerListener( (ScenarioImpl) controler.getScenario(), tollHandler, noiseHandler, spatialInfo ));
 			
 		} else if(runId.equalsIgnoreCase("congestionNoise")) {
+			
 			log.info("Internalization of noise and congestion cost is enabled.");
-			// TODO
+			
+			SpatialInfo spatialInfo = new SpatialInfo( (ScenarioImpl) controler.getScenario());
+			NoiseHandler noiseHandler = new NoiseHandler(controler.getScenario(), spatialInfo);
+			NoiseTollHandler noiseTollHandler = new NoiseTollHandler(controler.getScenario(), controler.getEvents(), spatialInfo, noiseHandler);
+
+			TollHandler congestionTollHandler = new TollHandler(controler.getScenario());
+
+			CongestionNoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new CongestionNoiseTollDisutilityCalculatorFactory(congestionTollHandler, noiseTollHandler);
+			controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+			
+			controler.addControlerListener(new MarginalCostPricing( (ScenarioImpl) controler.getScenario(), congestionTollHandler ));
+			controler.addControlerListener(new NoiseInternalizationControlerListener( (ScenarioImpl) controler.getScenario(), noiseTollHandler, noiseHandler, spatialInfo ));
 			
 		} else if(runId.equalsIgnoreCase("baseCase")) {
 			log.info("Internalization of congestion/noise cost disabled.");
