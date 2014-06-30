@@ -32,13 +32,13 @@ import org.matsim.api.core.v01.Scenario;
 
 public class NoiseImmissionCalculator {
 	
-//	private static final Logger log = Logger.getLogger(NoiseImmissionCalculator.class);
-
-	public NoiseImmissionCalculator(){
-		
+	private SpatialInfo spatialInfo;
+	
+	public NoiseImmissionCalculator(SpatialInfo spatialInfo){
+		this.spatialInfo = spatialInfo;
 	}
 	
-	public static double calculateResultingNoiseImmission (List<Double> noiseImmissions){
+	public double calculateResultingNoiseImmission (List<Double> noiseImmissions){
 		double resultingNoiseImmission = 0.;
 		
 		if(noiseImmissions.size()>0) {
@@ -54,7 +54,7 @@ public class NoiseImmissionCalculator {
 		return resultingNoiseImmission;
 	}
 	
-	public static double calculateShareOfResultingNoiseImmission (double noiseImmission , double resultingNoiseImmission){
+	public double calculateShareOfResultingNoiseImmission (double noiseImmission , double resultingNoiseImmission){
 		double shareOfResultingNoiseImmission = 0.;
 			
 		shareOfResultingNoiseImmission = Math.pow(((Math.pow(10, (0.05*noiseImmission)))/(Math.pow(10, (0.05*resultingNoiseImmission)))), 2);
@@ -76,7 +76,7 @@ public class NoiseImmissionCalculator {
 		return sharesOfResultingNoiseImmission;	
 	}
 	
-	public static double calculateNoiseImmission(Scenario scenario , Id linkId , double distanceToRoad , double NoiseEmission , Coord coord , double coordX , double coordY , double relevantFromNodeCoordX , double relevantFromNodeCoordY , double relevantToNodeCoordX , double relevantToNodeCoordY){
+	public double calculateNoiseImmission(Scenario scenario , Id linkId , double distanceToRoad , double NoiseEmission , Coord coord , double coordX , double coordY , double relevantFromNodeCoordX , double relevantFromNodeCoordY , double relevantToNodeCoordX , double relevantToNodeCoordY){
 		double NoiseImmission = 0.;
 		NoiseImmission = NoiseEmission + calculateDs(distanceToRoad) + GetAngle.getImmissionCorrection(coordX, coordY, relevantFromNodeCoordX, relevantFromNodeCoordY, relevantToNodeCoordX, relevantToNodeCoordY) + calculateDreflection(scenario, coord, linkId) + calculateDbmDz(scenario, distanceToRoad, coord);
 		if(NoiseImmission<0) {
@@ -85,13 +85,13 @@ public class NoiseImmissionCalculator {
 		return NoiseImmission;
 	}
 	
-	public static double calculateNoiseImmission2(Scenario scenario , Id receiverPointId , Id linkId , double noiseEmission){
+	public double calculateNoiseImmission2(Scenario scenario , Id receiverPointId , Id linkId , double noiseEmission){
 		double noiseImmission = 0.;
 		double sumTmp = 0.;
 		
-		for(int i : GetNearestReceiverPoint.receiverPointId2RelevantLinkIds2partOfLinks2distance.get(receiverPointId).get(linkId).keySet()) {
+		for(int i : spatialInfo.getReceiverPointId2RelevantLinkIds2partOfLinks2distance().get(receiverPointId).get(linkId).keySet()) {
 			double noiseImmissionTmp = 0.;
-			noiseImmissionTmp = noiseEmission + calculateDl2(GetNearestReceiverPoint.receiverPoint2RelevantlinkIds2lengthOfPartOfLinks.get(receiverPointId).get(linkId)) - calculateDs2(GetNearestReceiverPoint.receiverPointId2RelevantLinkIds2partOfLinks2distance.get(receiverPointId).get(linkId).get(i));
+			noiseImmissionTmp = noiseEmission + calculateDl2(spatialInfo.getReceiverPoint2RelevantlinkIds2lengthOfPartOfLinks().get(receiverPointId).get(linkId)) - calculateDs2(spatialInfo.getReceiverPointId2RelevantLinkIds2partOfLinks2distance().get(receiverPointId).get(linkId).get(i));
 			sumTmp = sumTmp + Math.pow(10, 0.1*noiseImmissionTmp); 
 		}
 		
@@ -105,20 +105,14 @@ public class NoiseImmissionCalculator {
 	}
 	
 	static int x = 0;
-	public static double calculateDreflection (Scenario scenario , Coord coord , Id linkId) {
-		double Dreflection = 0.;
-		
-		if(!(GetActivityCoords.activityCoords2densityValue.containsKey(coord))) {
-//			System.out.println(coord+"  "+GetActivityCoords.activityCoords2densityValue);
-//			System.out.println("coord: "+coord);
-		}
-		
+	public double calculateDreflection (Scenario scenario , Coord coord , Id linkId) {
+		double Dreflection = 0.;	
 		double densityValue = 0.;
 		
-		if(GetActivityCoords.activityCoords2densityValue.containsKey(coord)) {
-			densityValue = GetActivityCoords.activityCoords2densityValue.get(coord);
+		if(spatialInfo.getActivityCoords2densityValue().containsKey(coord)) {
+			densityValue = spatialInfo.getActivityCoords2densityValue().get(coord);
 		}
-		double streetWidth = GetActivityCoords.linkId2streetWidth.get(linkId);
+		double streetWidth = spatialInfo.getLinkId2streetWidth().get(linkId);
 		
 		Dreflection = densityValue/streetWidth;
 		
@@ -129,7 +123,7 @@ public class NoiseImmissionCalculator {
 		return Dreflection;
 	}
 	
-	public static double calculateDbmDz (Scenario scenario , double distanceToRoad , Coord coord) {
+	public double calculateDbmDz (Scenario scenario , double distanceToRoad , Coord coord) {
 		double DbmDz = 0.;
 		if(distanceToRoad==0.) {
 			distanceToRoad = 0.00000001;
@@ -138,8 +132,8 @@ public class NoiseImmissionCalculator {
 		
 		double densityValue = 0.;
 		
-		if(GetActivityCoords.activityCoords2densityValue.containsKey(coord)) {
-			densityValue = GetActivityCoords.activityCoords2densityValue.get(coord);
+		if(spatialInfo.getActivityCoords2densityValue().containsKey(coord)) {
+			densityValue = spatialInfo.getActivityCoords2densityValue().get(coord);
 		}
 		
 		// D_BM is relevant if there are no buildings which provoke shielding effects
@@ -160,7 +154,7 @@ public class NoiseImmissionCalculator {
 		return DbmDz;
 	}
 	
-	public static double calculateDs (double distanceToRoad){
+	public double calculateDs (double distanceToRoad){
 		double Ds = 0.;
 		
 		Ds = 15.8 - (10 * Math.log10(distanceToRoad)) - (0.0142*(Math.pow(distanceToRoad,0.9)));
@@ -172,7 +166,7 @@ public class NoiseImmissionCalculator {
 		return Ds;
 	}
 	
-	public static double calculateDs2 (double distanceToRoad){
+	public double calculateDs2 (double distanceToRoad){
 		double Ds = 0.;
 		
 		Ds = (20*Math.log10(distanceToRoad)) + (distanceToRoad/200) - 11.2;
@@ -182,7 +176,7 @@ public class NoiseImmissionCalculator {
 		return Ds;
 	}
 	
-	public static double calculateDl2 (double length) {
+	public double calculateDl2 (double length) {
 		double Dl = 0.;
 		
 		Dl = 10*Math.log10(length);

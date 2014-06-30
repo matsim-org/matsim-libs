@@ -23,68 +23,42 @@
 package playground.ikaddoura.noise;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 
-public class NoiseInternalizationControlerListener implements AfterMobsimListener , IterationEndsListener , StartupListener , IterationStartsListener {
+public class NoiseInternalizationControlerListener implements AfterMobsimListener , IterationEndsListener , StartupListener {
 	private static final Logger log = Logger.getLogger(NoiseInternalizationControlerListener.class);
 	
 	private final ScenarioImpl scenario;
 	private NoiseTollHandler tollHandler;
 	private NoiseHandler noiseHandler;
+	private SpatialInfo spatialInfo;
 	
-	public NoiseInternalizationControlerListener (ScenarioImpl scenario , NoiseHandler noiseHandler , NoiseTollHandler tollHandler) {
+	public NoiseInternalizationControlerListener (ScenarioImpl scenario, NoiseTollHandler tollHandler, NoiseHandler noiseHandler, SpatialInfo spatialInfo) {
 		this.scenario = scenario;
-		this.noiseHandler = noiseHandler;
 		this.tollHandler = tollHandler;
+		this.noiseHandler = noiseHandler;
+		this.spatialInfo = spatialInfo;
 	}
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-//		//Bilden des Samples
-//		double sample = 0.25;
-//		Population population2 = null;
-//		for(Id personId : scenario.getPopulation().getPersons().keySet()) {
-//			System.out.println(personId);
-//			//decide if the person will be removed
-//			double random = Math.random();
-//			if(random>sample) {
-////				population2.addPerson(scenario.getPopulation().getPersons().get(personId));	
-//			} else {
-//				//do nothing
-//			}
-//			scenario.setPopulation(population2);
-//		}
-//		for(Id linkId : scenario.getNetwork().getLinks().keySet()) {
-//			double adaptedCapacity = (scenario.getNetwork().getLinks().get(linkId).getCapacity())/(1./sample);
-//			scenario.getNetwork().getLinks().get(linkId).setCapacity(adaptedCapacity);
-//		}
+		// Initialization
+		spatialInfo.setReceiverPoints();
+		spatialInfo.setActivityCoords();
+		spatialInfo.setActivityCoord2NearestReceiverPointId();
+		spatialInfo.setInitialAssignment(); // remove?
+		spatialInfo.setRelevantLinkIds();
 		
-		GetNearestReceiverPoint.getReceiverPoints(scenario);
-		GetActivityCoords.getActivityCoords(scenario);
-		GetNearestReceiverPoint.getReceiverPoints(scenario);//TODO: wieder entfernen
-		GetActivityCoords.getActivityCoord2NearestReceiverPointId(scenario);
-		GetActivityCoords.getInitialAssignment(scenario);
-		GetNearestReceiverPoint.getRelevantLinkIds(scenario);
-		
-//		GetActivityCoords.getActivityCoord2NearestReceiverPointId(scenario);
-		
-		EventsManager eventsManager = event.getControler().getEvents();
-		
-		event.getControler().getEvents().addHandler(noiseHandler);
-		
-		tollHandler = new NoiseTollHandler(scenario, eventsManager);
-		
+		// adding the required handlers
 		event.getControler().getEvents().addHandler(tollHandler);
+		event.getControler().getEvents().addHandler(noiseHandler);		
 	}
 	
 	@Override
@@ -152,12 +126,6 @@ public class NoiseInternalizationControlerListener implements AfterMobsimListene
 //		log.info("Write noise immission stats per hour");
 //		String filenameNoiseImmissionPerHour = "noiseImmissionStatsPerHour.csv";
 //		noiseHandler.writeNoiseImmissionStatsPerHour(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + filenameNoiseImmissionPerHour);
-	}
-
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	

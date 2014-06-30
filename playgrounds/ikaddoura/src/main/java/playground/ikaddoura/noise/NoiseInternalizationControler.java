@@ -62,15 +62,18 @@ public class NoiseInternalizationControler {
 
 	private void runInternalization(String configFile) {
 		Controler controler = new Controler(configFile);
-		EventsManager eventsManager = controler.getEvents(); // TODO: ??
 		
 //		controler.getConfig().getModule("plans").addParam("inputPlansFile", "/Users/Lars/Desktop/noiseInternalization20/output/output_plans.xml.gz");
 		
-		NoiseHandler noiseHandler = new NoiseHandler(controler.getScenario());
-		NoiseTollHandler tollHandler = new NoiseTollHandler(controler.getScenario(), eventsManager);
+		SpatialInfo spatialInfo = new SpatialInfo( (ScenarioImpl) controler.getScenario());
+		
+		NoiseHandler noiseHandler = new NoiseHandler(controler.getScenario(), spatialInfo);
+		NoiseTollHandler tollHandler = new NoiseTollHandler(controler.getScenario(), controler.getEvents(), spatialInfo, noiseHandler);
+		
 		NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(tollHandler);
 		controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
-		controler.addControlerListener(new NoiseInternalizationControlerListener( (ScenarioImpl) controler.getScenario(), noiseHandler , tollHandler ));
+		
+		controler.addControlerListener(new NoiseInternalizationControlerListener( (ScenarioImpl) controler.getScenario(), tollHandler, noiseHandler, spatialInfo ));
 		
 // 		adapt the WelfareAnalysisControlerListener for the noise damage
 		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));

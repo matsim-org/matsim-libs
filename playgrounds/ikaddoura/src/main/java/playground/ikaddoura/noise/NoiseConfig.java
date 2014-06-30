@@ -22,11 +22,14 @@
  */
 package playground.ikaddoura.noise;
 
-public class Configurations {
+public class NoiseConfig {
 	
-	public Configurations(){
-		
+	public static String getRLSMethod() {
+		String RLSMethod = "straights"; // RLS Verfahren Lange Geraden
+//		String RLSMethod = "parts"; // RLS Teilstueckverfahren
+		return RLSMethod;
 	}
+
 	
 	public static double getIntervalLength(){
 		double intervallLength = 3600.0;
@@ -40,8 +43,6 @@ public class Configurations {
 	
 	public static double getScaleFactor(){
 		double scaleFactor = 1.0;
-//		double flowCapacityFactor = 1.00;
-//		double scaleFactor = 1. / flowCapacityFactor;
 		return scaleFactor;
 	}
 }
