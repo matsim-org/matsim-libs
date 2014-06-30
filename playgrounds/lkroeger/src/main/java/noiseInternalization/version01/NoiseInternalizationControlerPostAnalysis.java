@@ -61,7 +61,7 @@ public class NoiseInternalizationControlerPostAnalysis {
 		EventsManager events = EventsUtils.createEventsManager();
 		
 		NoiseHandler noiseHandler = new NoiseHandler(scenario);
-		TollHandler tollHandler = new TollHandler(scenario, events);
+		NoiseTollHandler tollHandler = new NoiseTollHandler(scenario, events);
 		
 		GetNearestReceiverPoint.getReceiverPoints(scenario);
 		GetActivityCoords.getActivityCoords(scenario);

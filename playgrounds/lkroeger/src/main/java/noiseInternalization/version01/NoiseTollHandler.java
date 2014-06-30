@@ -45,9 +45,9 @@ import org.matsim.core.utils.collections.Tuple;
 //import analysis.shapes.IKGISAnalyzerPostAnalysis;
 //import analysis.shapes.IKNetworkPopulationWriter;
 
-public class TollHandler implements NoiseEventHandler , NoiseEventAffectedHandler , LinkLeaveEventHandler {
+public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedHandler , LinkLeaveEventHandler {
 
-	private static final Logger log = Logger.getLogger(TollHandler.class);
+	private static final Logger log = Logger.getLogger(NoiseTollHandler.class);
 	
 	private double timeBinSize = Configurations.getTimeBinSize();
 	
@@ -84,7 +84,7 @@ public class TollHandler implements NoiseEventHandler , NoiseEventAffectedHandle
 	
 	private double vtts_car;
 	
-	public TollHandler (Scenario scenario , EventsManager events) {
+	public NoiseTollHandler (Scenario scenario , EventsManager events) {
 		this.scenario = scenario;
 		this.events = events;
 		

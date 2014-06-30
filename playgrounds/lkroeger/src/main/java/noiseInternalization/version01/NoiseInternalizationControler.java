@@ -67,8 +67,8 @@ public class NoiseInternalizationControler {
 //		controler.getConfig().getModule("plans").addParam("inputPlansFile", "/Users/Lars/Desktop/noiseInternalization20/output/output_plans.xml.gz");
 		
 		NoiseHandler noiseHandler = new NoiseHandler(controler.getScenario());
-		TollHandler tollHandler = new TollHandler(controler.getScenario(), eventsManager);
-		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+		NoiseTollHandler tollHandler = new NoiseTollHandler(controler.getScenario(), eventsManager);
+		NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(tollHandler);
 		controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
 		controler.addControlerListener(new NoiseInternalizationControlerListener( (ScenarioImpl) controler.getScenario(), noiseHandler , tollHandler ));
 		

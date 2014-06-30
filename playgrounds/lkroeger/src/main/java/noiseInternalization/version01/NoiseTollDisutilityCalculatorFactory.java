@@ -30,19 +30,19 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
-public class TollDisutilityCalculatorFactory implements TravelDisutilityFactory  {
+public class NoiseTollDisutilityCalculatorFactory implements TravelDisutilityFactory  {
 	
 //	private static final Logger log = Logger.getLogger(TollDisutilityCalculatorFactory.class);
 
-	private TollHandler tollHandler;
+	private NoiseTollHandler tollHandler;
 
-	public TollDisutilityCalculatorFactory(TollHandler tollHandler) {
+	public NoiseTollDisutilityCalculatorFactory(NoiseTollHandler tollHandler) {
 		this.tollHandler = tollHandler;
 	}
 
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-		final TollTravelDisutilityCalculator ttdc = new TollTravelDisutilityCalculator(timeCalculator, cnScoringGroup, tollHandler);
+		final NoiseTollTravelDisutilityCalculator ttdc = new NoiseTollTravelDisutilityCalculator(timeCalculator, cnScoringGroup, tollHandler);
 
 		return new TravelDisutility(){
 

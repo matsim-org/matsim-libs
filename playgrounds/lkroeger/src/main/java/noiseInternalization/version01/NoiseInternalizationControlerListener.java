@@ -38,10 +38,10 @@ public class NoiseInternalizationControlerListener implements AfterMobsimListene
 	private static final Logger log = Logger.getLogger(NoiseInternalizationControlerListener.class);
 	
 	private final ScenarioImpl scenario;
-	private TollHandler tollHandler;
+	private NoiseTollHandler tollHandler;
 	private NoiseHandler noiseHandler;
 	
-	public NoiseInternalizationControlerListener (ScenarioImpl scenario , NoiseHandler noiseHandler , TollHandler tollHandler) {
+	public NoiseInternalizationControlerListener (ScenarioImpl scenario , NoiseHandler noiseHandler , NoiseTollHandler tollHandler) {
 		this.scenario = scenario;
 		this.noiseHandler = noiseHandler;
 		this.tollHandler = tollHandler;
@@ -82,7 +82,7 @@ public class NoiseInternalizationControlerListener implements AfterMobsimListene
 		
 		event.getControler().getEvents().addHandler(noiseHandler);
 		
-		tollHandler = new TollHandler(scenario, eventsManager);
+		tollHandler = new NoiseTollHandler(scenario, eventsManager);
 		
 		event.getControler().getEvents().addHandler(tollHandler);
 	}

@@ -35,7 +35,7 @@ import org.matsim.vehicles.Vehicle;
  * @author lkroeger
  *
  */
-public class TollTravelDisutilityCalculator implements TravelDisutility{
+public class NoiseTollTravelDisutilityCalculator implements TravelDisutility{
 
 //	private static final Logger log = Logger.getLogger(TollTravelDisutilityCalculator.class);
 
@@ -43,9 +43,9 @@ public class TollTravelDisutilityCalculator implements TravelDisutility{
 	private double marginalUtlOfMoney;
 	private double distanceCostRateCar;
 	private double marginalUtlOfTravelTime;
-	private TollHandler tollHandler;
+	private NoiseTollHandler tollHandler;
 	
-	public TollTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, TollHandler tollHandler) {
+	public NoiseTollTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, NoiseTollHandler tollHandler) {
 		this.timeCalculator = timeCalculator;
 		this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
 		this.distanceCostRateCar = cnScoringGroup.getMonetaryDistanceCostRateCar();
