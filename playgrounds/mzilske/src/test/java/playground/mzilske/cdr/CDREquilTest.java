@@ -17,7 +17,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -32,6 +34,7 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Counts;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.mzilske.cadyts.CadytsModule;
@@ -40,8 +43,7 @@ import playground.mzilske.controller.Controller;
 import playground.mzilske.controller.ControllerModuleWithScenario;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class CDREquilTest {
 
@@ -87,7 +89,20 @@ public class CDREquilTest {
 
     }
 
+
     private static class AnyTimeAtWork implements CallBehavior {
+
+
+        Map<Id, Queue<Double>> callQueues = new HashMap<Id, Queue<Double>>();
+
+        @Inject
+        AnyTimeAtWork(Scenario scenario) {
+            for (Person person : scenario.getPopulation().getPersons().values()) {
+                Id id = person.getId();
+                List<Double> calls = getCalls(scenario, id);
+                callQueues.put(id, new PriorityQueue<Double>(calls));
+            }
+        }
 
         @Override
         public boolean makeACall(ActivityEndEvent event) {
@@ -101,16 +116,35 @@ public class CDREquilTest {
 
         @Override
         public boolean makeACall(Id id, double time) {
-            double dailyRate = 48;
-            double secondlyProbability = dailyRate / (double) (24*60*60);
-            return Math.random() < secondlyProbability;
+            Queue<Double> callQueue = callQueues.get(id);
+            while (callQueue.peek() != null && callQueue.peek() <= time) {
+                // Whoops - I can make at most one call per time step anyway.
+                callQueue.remove();
+                return true;
+            }
+            return false;
         }
 
         @Override
         public boolean makeACallAtMorningAndNight() {
-            return true;
+            return false;
         }
 
+    }
+
+    private static List<Double> getCalls(Scenario scenario, Id id) {
+        List<Double> result = new ArrayList<Double>();
+        double time = 0.0;
+        for (PlanElement planElement : scenario.getPopulation().getPersons().get(id).getSelectedPlan().getPlanElements()) {
+            if (planElement instanceof Activity) {
+                Activity activity = (Activity) planElement;
+                double endTime = activity.getEndTime() != Time.UNDEFINED_TIME ? activity.getEndTime() : 30.0 * 60.0 * 60.0;
+                double callTime = time + (endTime - time) * Math.random();
+                result.add(callTime);
+                time = endTime;
+            }
+        }
+        return result;
     }
 
 
@@ -223,7 +257,6 @@ public class CDREquilTest {
         controller.run();
 
         CompareMain compareMain = injector.getInstance(CompareMain.class);
-        ZoneTracker.LinkToZoneResolver linkToZoneResolver = injector.getInstance(ZoneTracker.LinkToZoneResolver.class);
         final Scenario scenario = injector.getInstance(Scenario.class);
 
         final Sightings sightings = new SightingsImpl(compareMain.getSightingsPerPerson());
@@ -248,13 +281,13 @@ public class CDREquilTest {
         {
             StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(new IdImpl(1));
             stratSets.setModuleName("SelectExpBeta");
-            stratSets.setProbability(0.9);
+            stratSets.setProbability(0.7);
             phoneConfig.strategy().addStrategySettings(stratSets);
         }
         {
             StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(new IdImpl(2));
             stratSets.setModuleName("ReRealize");
-            stratSets.setProbability(0.1);
+            stratSets.setProbability(0.3);
             stratSets.setDisableAfter(90);
             phoneConfig.strategy().addStrategySettings(stratSets);
         }
@@ -262,8 +295,6 @@ public class CDREquilTest {
         final ScenarioImpl phoneScenario = (ScenarioImpl) ScenarioUtils.createScenario(phoneConfig);
         phoneScenario.setNetwork(scenario.getNetwork());
 
-        PopulationFromSightings.createPopulationWithTwoPlansEach(phoneScenario, linkToZoneResolver, sightings);
-        PopulationFromSightings.preparePopulation(phoneScenario, linkToZoneResolver, sightings);
 
         List<Module> modules = new ArrayList<Module>();
         modules.add(new ControllerModuleWithScenario(phoneScenario));
@@ -283,6 +314,7 @@ public class CDREquilTest {
         });
 
         Injector injector2 = Guice.createInjector(modules);
+        PopulationFromSightings.createPopulationWithRandomRealization(phoneScenario, sightings, injector2.getInstance(ZoneTracker.LinkToZoneResolver.class));
         Controller controler2 = injector2.getInstance(Controller.class);
         controler2.run();
 
@@ -293,31 +325,6 @@ public class CDREquilTest {
         Assert.assertEquals("All-day squares", 0.0, CompareMain.compareAllDay(scenario, cdrVolumes, compareMain.getGroundTruthVolumes()), 0.0);
         Assert.assertEquals("Timebin squares", 0.0, CompareMain.compareTimebins(scenario, cdrVolumes, compareMain.getGroundTruthVolumes()), 0.0);
         Assert.assertEquals("EMD", 0.0, CompareMain.compareEMD(scenario, cdrVolumes, compareMain.getGroundTruthVolumes()), 0.0);
-    }
-
-    private Config phoneConfig() {
-        Config config = ConfigUtils.createConfig();
-        PlanCalcScoreConfigGroup.ActivityParams sightingParam = new PlanCalcScoreConfigGroup.ActivityParams("sighting");
-        sightingParam.setTypicalDuration(30.0 * 60);
-        config.planCalcScore().addActivityParams(sightingParam);
-        config.planCalcScore().setTraveling_utils_hr(-6);
-        config.planCalcScore().setPerforming_utils_hr(0);
-        config.planCalcScore().setTravelingOther_utils_hr(-6);
-        config.planCalcScore().setConstantCar(0);
-        config.planCalcScore().setMonetaryDistanceCostRateCar(0);
-        config.planCalcScore().setWriteExperiencedPlans(true);
-        config.controler().setOutputDirectory(utils.getOutputDirectory() + "/output2");
-        config.controler().setLastIteration(10);
-        QSimConfigGroup tmp = config.qsim();
-        tmp.setFlowCapFactor(100);
-        tmp.setStorageCapFactor(100);
-        tmp.setRemoveStuckVehicles(false);
-
-        StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(new IdImpl(1));
-        stratSets.setModuleName("ccc") ;
-        stratSets.setProbability(1.) ;
-        config.strategy().addStrategySettings(stratSets) ;
-        return config;
     }
 
     @Test

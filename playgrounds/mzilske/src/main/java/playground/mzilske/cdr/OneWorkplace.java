@@ -8,7 +8,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -29,11 +28,10 @@ class OneWorkplace {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
 		config.planCalcScore().setWriteExperiencedPlans(true);
-		QSimConfigGroup tmp = config.qsim();
-		tmp.setFlowCapFactor(100);
-		tmp.setStorageCapFactor(100);
-		tmp.setRemoveStuckVehicles(false);
-		tmp.setEndTime(24*60*60);
+        config.qsim().setFlowCapFactor(100);
+		config.qsim().setStorageCapFactor(100);
+		config.qsim().setRemoveStuckVehicles(false);
+		config.qsim().setEndTime(30 * 60 * 60);
 		scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).parse(this.getClass().getResourceAsStream("one-workplace.xml"));
 		Population population = scenario.getPopulation();
@@ -45,13 +43,14 @@ class OneWorkplace {
 			plan.addActivity(createWork(new IdImpl("20")));
 			plan.addLeg(createDriveLeg());
 			plan.addActivity(createHomeEvening(new IdImpl("1")));
+            plan.addActivity(createHomeOvernight(new IdImpl("1")));
 			person.addPlan(plan);
 			population.addPerson(person);
 		}
         return scenario;
     }
 
-	private Activity createHomeMorning(IdImpl idImpl) {
+    private Activity createHomeMorning(IdImpl idImpl) {
 		Activity act = scenario.getPopulation().getFactory().createActivityFromLinkId("home", idImpl);
 		act.setEndTime(9 * 60 * 60);
 		return act;
@@ -68,8 +67,15 @@ class OneWorkplace {
 	}
 
 	private Activity createHomeEvening(IdImpl idImpl) {
-        return scenario.getPopulation().getFactory().createActivityFromLinkId("home", idImpl);
+        Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("home", idImpl);
+        activity.setEndTime(30 * 60 * 60);
+        return activity;
+
 	}
+
+    private Activity createHomeOvernight(IdImpl id) {
+        return scenario.getPopulation().getFactory().createActivityFromLinkId("home", id);
+    }
 
 	private Id createId(int i) {
 		return new IdImpl(Integer.toString(i));

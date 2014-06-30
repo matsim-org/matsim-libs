@@ -292,4 +292,18 @@ public class PopulationFromSightings {
         return true;
     }
 
+    public static void createPopulationWithRandomRealization(ScenarioImpl scenario, playground.mzilske.cdr.Sightings sightings, final LinkToZoneResolver zones) {
+        for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.getSightingsPerPerson().entrySet()) {
+            Id personId = sightingsPerPerson.getKey();
+            Person person = scenario.getPopulation().getFactory().createPerson(personId);
+            Plan plan = PopulationFromSightings.createPlanWithRandomEndTimesInPermittedWindow(scenario, zones, sightings.getSightingsPerPerson().get(personId));
+            for (PlanElement pe : plan.getPlanElements()) {
+                if (pe instanceof Leg) {
+                    ((Leg) pe).setMode("car");
+                }
+            }
+            person.addPlan(plan);
+            scenario.getPopulation().addPerson(person);
+        }
+    }
 }
