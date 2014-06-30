@@ -185,6 +185,9 @@ public class JointTravelingSimulationTest {
 	private void testAgentsArriveTogether( final Fixture fixture ) throws Exception {
 		final Random random = new Random( 1234 );
 
+		// To make the output more readable (otherwise, warning that driver mode
+		// is added as a main mode is logged each time)
+		Logger.getLogger( JointQSimFactory.class ).setLevel( Level.ERROR );
 		for (int i=0; i < 50; i++) {
 			log.info( "random test scenario "+i );
 			final Scenario sc =

@@ -289,7 +289,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 			vehs.add( new IdImpl( i ) );
 		}
 
-		log.info( "created "+vehs.size()+" vehicles" );
+		log.trace( "created "+vehs.size()+" vehicles" );
 
 		return new VehicleRessources() {
 				@Override
@@ -307,7 +307,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 			vehs.add( new IdImpl( i ) );
 		}
 
-		log.info( "created "+vehs.size()+" vehicles" );
+		log.trace( "created "+vehs.size()+" vehicles" );
 
 		return new VehicleRessources() {
 				@Override

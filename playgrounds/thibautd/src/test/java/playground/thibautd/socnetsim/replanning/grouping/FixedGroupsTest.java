@@ -26,6 +26,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -54,6 +56,8 @@ public class FixedGroupsTest {
 
 		Collection<ReplanningGroup> previous = null;
 
+		// avoid spamming the log file
+		Logger.getLogger( FixedGroupsIdentifier.class ).setLevel( Level.ERROR );
 		for (int i=0; i < 100; i++) {
 			final FixedGroupsIdentifier identifier =
 				FixedGroupsIdentifierFileParser.readCliquesFile(
