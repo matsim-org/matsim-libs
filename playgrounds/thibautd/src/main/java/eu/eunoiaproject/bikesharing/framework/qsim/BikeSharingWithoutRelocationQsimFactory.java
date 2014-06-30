@@ -50,6 +50,15 @@ import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
  * @author thibautd
  */
 public class BikeSharingWithoutRelocationQsimFactory implements MobsimFactory {
+	private final boolean systemWiseCapacities;
+
+	public BikeSharingWithoutRelocationQsimFactory() {
+		this( false );
+	}
+
+	public BikeSharingWithoutRelocationQsimFactory(final boolean useSystemWiseCapacities) {
+		this.systemWiseCapacities = useSystemWiseCapacities;
+	}
 
 	@Override
 	public Mobsim createMobsim(
@@ -76,9 +85,13 @@ public class BikeSharingWithoutRelocationQsimFactory implements MobsimFactory {
 		// Here is the only modified part.
 		// The rest is just re-organized according to my obsessions.
 		final BikeSharingManager bikeSharingManager =
-			new BikeSharingManagerImpl(
-					(BikeSharingFacilities) sc.getScenarioElement(
-						BikeSharingFacilities.ELEMENT_NAME ) );
+			systemWiseCapacities ?
+				new GlobalCapacityBikeSharingManager(
+						(BikeSharingFacilities) sc.getScenarioElement(
+							BikeSharingFacilities.ELEMENT_NAME ) ) :
+				new BikeSharingManagerImpl(
+						(BikeSharingFacilities) sc.getScenarioElement(
+							BikeSharingFacilities.ELEMENT_NAME ) );
 		final BikeSharingEngine bikeSharingEngine =
 			new BikeSharingEngine(
 					bikeSharingManager );
