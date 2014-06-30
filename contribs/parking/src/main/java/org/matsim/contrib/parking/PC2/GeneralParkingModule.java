@@ -12,14 +12,16 @@ import org.matsim.contrib.parking.PC2.simulation.ParkingInfrastructureManager;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.PersonImpl;
 
-public class GeneralParkingModule implements StartupListener, IterationStartsListener,BeforeMobsimListener {
+public class GeneralParkingModule implements StartupListener, IterationStartsListener,BeforeMobsimListener, IterationEndsListener {
 
 	private Controler controler;
 	private ParkingCostModel parkingCostModel; // TODO: don't overwrite parking cost model from config, if already set.
@@ -78,5 +80,10 @@ public class GeneralParkingModule implements StartupListener, IterationStartsLis
 		parkingScoreManager.prepareForNewIteration();
 		parkingInfrastructureManager.reset();
 		parkingSimulation.prepareForNewIteration();
+	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		
 	}
 }

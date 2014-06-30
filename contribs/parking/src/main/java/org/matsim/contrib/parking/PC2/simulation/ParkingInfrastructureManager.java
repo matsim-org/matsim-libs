@@ -161,7 +161,7 @@ public class ParkingInfrastructureManager {
 	}
 
 	public synchronized void logArrivalEventAtTimeZero(Parking parking) {
-		eventsManager.processEvent(new ParkingArrivalEvent(0, parking.getId(),null));
+		eventsManager.processEvent(new ParkingArrivalEvent(0, parking.getId(),null,null,0));
 	}
 
 	public synchronized Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName, Id personId,
@@ -172,7 +172,7 @@ public class ParkingInfrastructureManager {
 				parkingDurationInSeconds);
 		parkingScoreManager.addScore(personId, walkScore);
 
-		eventsManager.processEvent(new ParkingArrivalEvent(arrivalTime, parking.getId(),personId));
+		eventsManager.processEvent(new ParkingArrivalEvent(arrivalTime, parking.getId(),personId,destCoordinate,walkScore));
 
 		return parking;
 	}
@@ -183,6 +183,8 @@ public class ParkingInfrastructureManager {
 	public synchronized Parking parkVehicle(ParkingOperationRequestAttributes parkingOperationRequestAttributes) {
 		// availablePublicParkingAtCityCentre();
 
+		double finalScore=0;
+		
 		Parking selectedParking = null;
 		boolean parkingFound = false;
 		for (PPRestrictedToFacilities pp : privateParkingsRestrictedToFacilities.get(parkingOperationRequestAttributes.facilityId)) {
@@ -225,7 +227,9 @@ public class ParkingInfrastructureManager {
 
 				// TODO: should I make MNL only on top 5 here?
 
+				
 				SortableMapObject<Parking> poll = queue.poll();
+				finalScore=poll.getScore();
 				selectedParking = poll.getKey();
 				parkedVehicles.put(parkingOperationRequestAttributes.personId, selectedParking.getId());
 
@@ -234,7 +238,7 @@ public class ParkingInfrastructureManager {
 
 		}
 
-		eventsManager.processEvent(new ParkingArrivalEvent(parkingOperationRequestAttributes.arrivalTime, selectedParking.getId(),parkingOperationRequestAttributes.personId));
+		eventsManager.processEvent(new ParkingArrivalEvent(parkingOperationRequestAttributes.arrivalTime, selectedParking.getId(),parkingOperationRequestAttributes.personId, parkingOperationRequestAttributes.destCoordinate,finalScore));
 
 		return selectedParking;
 	}

@@ -27,8 +27,8 @@ import org.matsim.contrib.parking.PC2.infrastructure.Parking;
 
 public class AverageWalkDistanceStatsZH extends AverageWalkDistanceStats {
 
-	public AverageWalkDistanceStatsZH(Network network, HashMap<Id, Parking> parking) {
-		super(network, parking);
+	public AverageWalkDistanceStatsZH(HashMap<Id, Parking> parking) {
+		super(parking);
 	}
 
 	@Override
@@ -38,9 +38,9 @@ public class AverageWalkDistanceStatsZH extends AverageWalkDistanceStats {
 	
 	@Override
 	public void reset(int iteration) {
-		if (iteration>0){
-			printStatistics();
-		}
+		//if (iteration>0){
+		//	printStatistics();
+		//}
 		super.reset(iteration);
 	}
 

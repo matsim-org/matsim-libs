@@ -20,6 +20,7 @@ import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingLinkInfo;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingModuleWithFreeFloatingCarSharing;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.network.NetworkImpl;
@@ -34,6 +35,8 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 	private Collection<ParkingCoordInfo> initialDesiredVehicleCoordinates;
 	private HashMap<Id, Parking> currentVehicleLocation;
 	private QuadTree<Id> vehicleLocations;
+	private AverageWalkDistanceStatsZH averageWalkDistanceStatsZH;
+	private ParkingGroupOccupanciesZH parkingGroupOccupanciesZH;
 	
 	public ParkingModuleWithFFCarSharingZH(Controler controler,Collection<ParkingCoordInfo> initialDesiredVehicleCoordinates) {
 		super(controler);
@@ -149,8 +152,19 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		super.notifyStartup(event);
-		getControler().getEvents().addHandler(new ParkingGroupOccupanciesZH(getControler()));
-		getControler().getEvents().addHandler(new AverageWalkDistanceStatsZH(getControler().getNetwork(),parkingInfrastructureManager.getAllParkings()));
+		parkingGroupOccupanciesZH = new ParkingGroupOccupanciesZH(getControler());
+		getControler().getEvents().addHandler(parkingGroupOccupanciesZH);
+		averageWalkDistanceStatsZH = new AverageWalkDistanceStatsZH(parkingInfrastructureManager.getAllParkings());
+		getControler().getEvents().addHandler(averageWalkDistanceStatsZH);
+	}
+	
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		super.notifyIterationEnds(event);
+		
+		parkingGroupOccupanciesZH.savePlot(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "parkingGroupOccupancy.png"));
+		averageWalkDistanceStatsZH.printStatistics();
+		
 	}
 	
 }

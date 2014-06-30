@@ -37,9 +37,9 @@ public class ParkingGroupOccupanciesZH extends ParkingGroupOccupancies {
 	
 	@Override
 	public void reset(int iteration) {
-		if (iteration>0){
-			savePlot(controler.getControlerIO().getIterationFilename(iteration-1, "parkingGroupOccupancy.png"));
-		}
+		//if (iteration>0){
+		//	savePlot(controler.getControlerIO().getIterationFilename(iteration-1, "parkingGroupOccupancy.png"));
+		//}
 		super.reset(iteration);
 	}
 	

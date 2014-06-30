@@ -20,9 +20,12 @@ package org.matsim.contrib.parking.PC2.simulation;
 
 import java.util.Map;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 public class ParkingArrivalEvent extends Event {
 
@@ -31,9 +34,17 @@ public class ParkingArrivalEvent extends Event {
 	public final static String ATTRIBUTE_PARKING_ID = "parkingId";
 	public final static String ATTRIBUTE_PERSON_ID = "personId";
 	public final static String EVENT_TYPE = "parkingArrivalEvent";
+	public final static String DEST_COORD_X = "destinationCoordinateX";
+	public final static String DEST_COORD_Y = "destinationCoordinateY";
+	public final static String PARKING_SCORE = "parkingScore";
+	private Coord destCoordinate;
+	private double score;
+	
 
-	public ParkingArrivalEvent(double time, Id parkingId, Id personId) {
+	public ParkingArrivalEvent(double time, Id parkingId, Id personId, Coord destCoordinate, double score) {
 		super(time);
+		this.destCoordinate = destCoordinate;
+		this.score = score;
 		
 		if (time>110000){
 			DebugLib.emptyFunctionForSettingBreakPoint();
@@ -47,13 +58,56 @@ public class ParkingArrivalEvent extends Event {
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
-
+	
 	@Override
 	public Map<String, String> getAttributes() {
 		final Map<String, String> attributes = super.getAttributes();
 		attributes.put(ATTRIBUTE_PARKING_ID, parkingId.toString());
 		attributes.put(ATTRIBUTE_PERSON_ID, personId!=null?personId.toString():null);
+		if (destCoordinate==null){
+			attributes.put(DEST_COORD_X, null);
+			attributes.put(DEST_COORD_Y, null);
+		} else {
+			attributes.put(DEST_COORD_X, Double.toString(destCoordinate.getX()));
+			attributes.put(DEST_COORD_Y, Double.toString(destCoordinate.getY()));
+		}
+		
+		attributes.put(PARKING_SCORE, Double.toString(score));
 		return attributes;
+	}
+	
+	public static Coord getDestCoord(Map<String, String> attributes){
+		String destCoordXString = attributes.get(ParkingArrivalEvent.DEST_COORD_X);
+		String destCoordYString = attributes.get(ParkingArrivalEvent.DEST_COORD_Y);
+		
+		if (destCoordXString==null || destCoordYString==null){
+			return null;
+		} else {
+			return new CoordImpl(Double.parseDouble(destCoordXString),Double.parseDouble(destCoordYString));
+		}
+	}
+	
+	public static double getScore(Map<String, String> attributes){
+		String scoreString = attributes.get(ParkingArrivalEvent.PARKING_SCORE);
+		return Double.parseDouble(scoreString);
+	}
+	
+	public static Id getPersonId(Map<String, String> attributes){
+		String personIdString = attributes.get(ParkingArrivalEvent.ATTRIBUTE_PERSON_ID);
+		if (personIdString==null){
+			return null;
+		} else {
+			return new IdImpl(personIdString);
+		}
+	}
+	
+	public static Id getParkingId(Map<String, String> attributes){
+		String parkingIdString = attributes.get(ParkingArrivalEvent.ATTRIBUTE_PARKING_ID);
+		if (parkingIdString==null){
+			return null;
+		} else {
+			return new IdImpl(parkingIdString);
+		}
 	}
 
 }

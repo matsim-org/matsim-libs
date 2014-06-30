@@ -19,6 +19,7 @@
 package org.matsim.contrib.parking.PC2.analysis;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
@@ -27,8 +28,10 @@ import org.geotools.math.Statistics;
 import org.jfree.data.statistics.MeanAndStandardDeviation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.PC2.infrastructure.Parking;
@@ -36,73 +39,50 @@ import org.matsim.contrib.parking.PC2.simulation.ParkingArrivalEvent;
 import org.matsim.contrib.parking.PC2.simulation.ParkingDepartureEvent;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.list.Lists;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 
 import com.sun.xml.bind.v2.runtime.unmarshaller.UnmarshallingContext.State;
 
-public abstract class AverageWalkDistanceStats implements BasicEventHandler, ActivityStartEventHandler {
+public abstract  class AverageWalkDistanceStats implements BasicEventHandler {
 
 	private static final Logger log = Logger.getLogger(AverageWalkDistanceStats.class);
 
-	private Network network;
 	private HashMap<Id, Parking> parking;
 
-	private HashMap<Id, Coord> agentArrivalLocation;
-	private HashMap<Id, String> agentArrivalParkingGroup;
 	private HashMap<String, LinkedList<Double>> walkDistances;
 
 	@Override
 	public void reset(int iteration) {
-		agentArrivalLocation = new HashMap<Id, Coord>();
-		agentArrivalParkingGroup = new HashMap<Id, String>();
-		walkDistances = new HashMap<String, LinkedList<Double>>();
+		walkDistances=new HashMap<String, LinkedList<Double>>();
 	}
 
-	public AverageWalkDistanceStats(Network network, HashMap<Id, Parking> parking) {
-		this.network = network;
+	public AverageWalkDistanceStats(HashMap<Id, Parking> parking) {
 		this.parking = parking;
 	}
 
 	@Override
 	public void handleEvent(Event event) {
 		if (event.getEventType().equalsIgnoreCase(ParkingArrivalEvent.EVENT_TYPE)
-				|| event.getEventType().equalsIgnoreCase(ParkingDepartureEvent.EVENT_TYPE)) {
-			String personIdString = event.getAttributes().get(ParkingArrivalEvent.ATTRIBUTE_PERSON_ID);
-			if (personIdString != null) {
-				Id personId = new IdImpl(personIdString);
-				Id parkingId = new IdImpl(event.getAttributes().get(ParkingArrivalEvent.ATTRIBUTE_PARKING_ID));
+				) {
+			Id personId=ParkingArrivalEvent.getPersonId(event.getAttributes());
+			if (personId != null) {
+				Id parkingId = ParkingArrivalEvent.getParkingId(event.getAttributes());
 
-				if (event.getEventType().equalsIgnoreCase(ParkingArrivalEvent.EVENT_TYPE)) {
-					agentArrivalLocation.put(personId, parking.get(parkingId).getCoordinate());
-					agentArrivalParkingGroup.put(personId, getGroupName(parkingId));
-				} else if (event.getEventType().equalsIgnoreCase(ParkingDepartureEvent.EVENT_TYPE)) {
-					emptyArrivalVariables(personId);
+				Coord destCoord = ParkingArrivalEvent.getDestCoord(event.getAttributes());
+				
+				double walkDistance = GeneralLib.getDistance(parking.get(parkingId).getCoordinate(),
+						destCoord);
+				
+				if (!walkDistances.containsKey(getGroupName(parkingId))){
+					walkDistances.put(getGroupName(parkingId), new LinkedList<Double>());
 				}
+				
+				walkDistances.get(getGroupName(parkingId)).add(walkDistance);
+				
 			}
-		}
-	}
-
-	private void emptyArrivalVariables(Id personId) {
-		agentArrivalLocation.remove(personId);
-		agentArrivalParkingGroup.remove(personId);
-	}
-
-	@Override
-	public void handleEvent(ActivityStartEvent event) {
-		if (agentArrivalLocation.containsKey(event.getPersonId())) {
-			double walkDistance = GeneralLib.getDistance(agentArrivalLocation.get(event.getPersonId()),
-					network.getLinks().get(event.getLinkId()).getCoord());
-			String groupName = agentArrivalParkingGroup.get(event.getPersonId());
-			
-			if (!walkDistances.containsKey(groupName)){
-				walkDistances.put(groupName, new LinkedList<Double>());
-			}
-			
-			walkDistances.get(groupName).add(walkDistance);
-
-			emptyArrivalVariables(event.getPersonId());
 		}
 	}
 
