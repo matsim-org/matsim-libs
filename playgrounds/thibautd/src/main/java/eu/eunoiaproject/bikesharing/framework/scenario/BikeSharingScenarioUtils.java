@@ -68,7 +68,11 @@ public class BikeSharingScenarioUtils {
 		// to make sure log entries are writen in log file
 		OutputDirectoryLogging.catchLogEntries();
 		final Scenario sc = ScenarioUtils.loadScenario( config );
+		return sc;
+	}
 
+	public static void loadBikeSharingPart( final Scenario sc ) {
+		final Config config = sc.getConfig();
 		final BikeSharingConfigGroup confGroup = (BikeSharingConfigGroup)
 			config.getModule( BikeSharingConfigGroup.GROUP_NAME );
 		new BikeSharingFacilitiesReader( sc ).parse( confGroup.getFacilitiesFile() );
@@ -87,8 +91,6 @@ public class BikeSharingScenarioUtils {
 			throw new RuntimeException( "ids of bike sharing stations and activity facilities overlap. This will cause problems!"+
 					" Make sure Ids do not overlap, for instance by appending \"bs-\" at the start of all bike sharing facilities." );
 		}
-
-		return sc;
 	}
 
 	public static Scenario loadScenario( final String configFile , final Module... modules ) {
