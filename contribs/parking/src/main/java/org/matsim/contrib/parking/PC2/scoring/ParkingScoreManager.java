@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
 import org.matsim.contrib.parking.PC2.infrastructure.Parking;
+import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -53,7 +54,7 @@ public class ParkingScoreManager {
 		this.controler = controler;
 	}
 
-	public double calcWalkScore(Coord destCoord, Coord parkingCoord, Id personId, double parkingDurationInSeconds) {
+	public double calcWalkScore(Coord destCoord, Parking parking, Id personId, double parkingDurationInSeconds) {
 		Map<Id, ? extends Person> persons = controler.getPopulation().getPersons();
 		PersonImpl person = (PersonImpl) persons.get(personId);
 
@@ -66,11 +67,15 @@ public class ParkingScoreManager {
 
 		// protected double walkSpeed = 3.0 / 3.6; // [m/s]
 
-		double walkDistance = GeneralLib.getDistance(destCoord, parkingCoord);
+		double walkDistance = GeneralLib.getDistance(destCoord, parking.getCoordinate());
 		double walkDurationInSeconds = walkDistance / walkSpeed;
 
 		double walkingTimeTotalInMinutes = walkDurationInSeconds / 60;
 
+		if (parking.getId().toString().contains("stp")){
+			DebugLib.emptyFunctionForSettingBreakPoint();
+		}
+		
 		return (parkingWalkBeta * walkingTimeTotalInMinutes) * parkingScoreScalingFactor;
 	}
 
@@ -85,7 +90,7 @@ public class ParkingScoreManager {
 	}
 
 	public double calcScore(Coord destCoord, double arrivalTime, double parkingDurationInSeconds, Parking parking, Id personId, int legIndex) {
-		double walkScore = calcWalkScore(destCoord, parking.getCoordinate(), personId, parkingDurationInSeconds);
+		double walkScore = calcWalkScore(destCoord, parking, personId, parkingDurationInSeconds);
 		double costScore = calcCostScore(arrivalTime, parkingDurationInSeconds, parking, personId);
 		double randomError=0;
 		
