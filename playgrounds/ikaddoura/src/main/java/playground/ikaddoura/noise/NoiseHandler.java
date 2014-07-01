@@ -76,11 +76,12 @@ public class NoiseHandler implements LinkLeaveEventHandler , ActivityEndEventHan
 	private Map<Id, Map<Double,List<LinkLeaveEvent>>> linkId2timeInterval2linkLeaveEventsHdv = new HashMap<Id, Map<Double,List<LinkLeaveEvent>>>();
 		
 	private SpatialInfo spatialInfo;
-	private NoiseImmissionCalculator noiseImmissionCalculator = new NoiseImmissionCalculator(spatialInfo);
+	private NoiseImmissionCalculator noiseImmissionCalculator;
 	
 	public NoiseHandler (Scenario scenario, SpatialInfo spatialInfo) {
 		this.scenario = scenario;
 		this.spatialInfo = spatialInfo;
+		this.noiseImmissionCalculator = new NoiseImmissionCalculator(spatialInfo);
 	}
 	
 	@Override
