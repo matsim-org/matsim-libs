@@ -156,7 +156,8 @@ public class TaxiStatusDataAnalyser
 
     public static void main(String[] args)
     {
-        String dir = "d:/eclipse-vsp/sustainability-w-michal-and-dlr/data/OD/2014/status/";
+//        String dir = "d:/eclipse-vsp/sustainability-w-michal-and-dlr/data/OD/2014/status/";
+        String dir = "c:/local_jb/data/taxi_berlin/2013/status/";
         String statusMatricesFile = dir + "statusMatrix.xml.gz";
 
         String averagesFile = dir + "averages.csv";
@@ -170,8 +171,8 @@ public class TaxiStatusDataAnalyser
 
         Matrices statusMatrices = MatrixUtils.readMatrices(statusMatricesFile);
 
-        //        dumpTaxisInSystem(statusMatrices, "20140407000000", "20140414000000", averagesFile,
-        //                taxisOverTimeFile);
+                dumpTaxisInSystem(statusMatrices, "20130415000000", "20130421235500", averagesFile,
+                        taxisOverTimeFile);
 
         Matrices hourlyMatrices = calculateAveragesByHour(statusMatrices, 7);
         writeMatrices(hourlyMatrices, hourlyStatusMatricesXmlFile, hourlyStatusMatricesTxtFile);

@@ -43,7 +43,7 @@ public class BerlinTaxiVehicleCreatorV3
     private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final Logger log = Logger.getLogger(BerlinTaxiVehicleCreatorV3.class);
 
-    private Map<Date, Integer> taxisOverTime;
+    private Map<Date, Integer> taxisOverTime = new TreeMap<Date,Integer>();
     private double[] taxisOverTimeHourlyAverage;//24h from startDate, e.g. from 4am to 3am
     private WeightedRandomSelection<Id> wrs;
 
@@ -60,10 +60,10 @@ public class BerlinTaxiVehicleCreatorV3
     {
         String dir = "C:/local_jb/data/";
         String taxisOverTimeFile = dir + "taxi_berlin/2013/vehicles/taxisweekly.csv";
-        String statusMatrixFile = dir + "taxi_berlin/2014/status/statusMatrixAvg.xml";
+        String statusMatrixFile = dir + "taxi_berlin/2013/status/statusMatrixAvg.xml";
         String networkFile = dir + "scenarios/2014_05_basic_scenario_v3/berlin_brb.xml";
-        String zoneShpFile = dir + "OD/shp_merged/zones.shp";
-        String zoneXmlFile = dir + "OD/shp_merged/zones.xml";
+        String zoneShpFile = dir + "shp_merged/zones.shp";
+        String zoneXmlFile = dir + "shp_merged/zones.xml";
         String vehicleFile = dir + "scenarios/2014_05_basic_scenario_v3/taxis4to4_EV";
 
         BerlinTaxiVehicleCreatorV3 btv = new BerlinTaxiVehicleCreatorV3();
@@ -142,7 +142,7 @@ public class BerlinTaxiVehicleCreatorV3
     private void prepareMatrices(String statusMatrixFile)
     {
         wrs = new WeightedRandomSelection<Id>();
-        Matrix avestatus = MatrixUtils.readMatrices(statusMatrixFile).getMatrix("ave");
+        Matrix avestatus = MatrixUtils.readMatrices(statusMatrixFile).getMatrix("avg");
 
         for (Map.Entry<Id, ArrayList<Entry>> fromLOR : avestatus.getFromLocations().entrySet()) {
             wrs.add(fromLOR.getKey(), MatrixUtils.calculateTotalValue(fromLOR.getValue()));

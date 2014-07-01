@@ -20,7 +20,7 @@ public class TaxiStatusToMatrix
 
     public static void main(String[] args)
     {
-        TaxiStatusToMatrix m = new TaxiStatusToMatrix("C:\\local_jb\\data\\OD\\status\\");
+        TaxiStatusToMatrix m = new TaxiStatusToMatrix("C:\\local_jb\\data\\taxi_berlin\\2013\\status/");
         m.read();
         m.write();
     }
