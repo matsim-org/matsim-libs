@@ -97,47 +97,53 @@ import playground.michalm.util.RunningVehicleRegister;
 
     /*package*/JbSingleIterOnlineDvrpLauncher()
     {
-        //    	dirName = "Z:\\WinHome\\Docs\\maciejewski\\jbtest\\";
-        //    	dirName = "Z:\\WinHome\\Docs\\svn-checkouts\\jbischoff\\jbmielec\\";
-        //        dirName = "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\";
-        //        netFileName = dirName + "network.xml";
+
+
 
         // michalm - testing config (may be removed...)////////////////////////////////////
 
-        //        dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\joschka\\mielec-2-peaks-new-15-50\\";
-        //        plansFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.plans.xml.gz";
-        //        netFileName = dirName + "..\\mielec-2-peaks-new\\network.xml";
-        //        eventsFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.events.xml.gz";
+//        dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\joschka\\mielec-2-peaks-new-15-50\\";
+//        plansFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.plans.xml.gz";
+//        netFileName = dirName + "..\\mielec-2-peaks-new\\network.xml";
+//        eventsFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.events.xml.gz";
+    	
+//    	   dirName = "/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/2014_02_basic_scenario_v1/";
+//    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v1\\";
+//           plansFileName = dirName + "OD_20130417_SCALE_2.0_plans.xml.gz";
+//           taxisFileName = dirName + "taxis-3000.xml";
 
-        //    	   dirName = "/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/2014_02_basic_scenario_v1/";
-        //    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v1\\";
-        //           plansFileName = dirName + "OD_20130417_SCALE_2.0_plans.xml.gz";
-        //           taxisFileName = dirName + "taxis-3000.xml";
 
-        dirName = "C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v2\\";
-        //    	   dirName = "/Users/jb/tucloud/sim/";
+//    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v2\\";
+    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_05_basic_scenario_v3\\";
 
-        plansFileName = dirName + "1.0plans4to3.xml.gz";
-        //           plansFileName = dirName + "1.5plans4to3.xml.gz";
-        //    	   	plansFileName = dirName + "1.5plans4to3.xml.gz";
+//           plansFileName = dirName + "1.0plans4to3.xml";
+           plansFileName = dirName + "oldplans4to3.xml";
+//           plansFileName = dirName + "1.5plans4to3.xml.gz";
+//    	   	plansFileName = dirName + "1.5plans4to3.xml.gz";
 
-        //           plansFileName = dirName + "2.0plans4to4.xml.gz";
+//           plansFileName = dirName + "2.0plans4to4.xml.gz";
 
-        //           taxisFileName = dirName + "taxis4to4_EV0.5.xml";
-        //           taxisFileName = dirName + "taxis4to4_EV0.6.xml";
-        //           taxisFileName = dirName + "taxis4to4_EV0.7.xml";
-        //           taxisFileName = dirName + "taxis4to4_EV0.8.xml";
-        //           taxisFileName = dirName + "taxis4to4_EV0.9.xml";
-        taxisFileName = dirName + "taxis4to4_EV1.0.xml";
-        //           taxisFileName = dirName + "taxis4to4.xml"; //all conventional
+           
+//           taxisFileName = dirName + "taxis4to4_EV0.5.xml";
+//           taxisFileName = dirName + "taxis4to4_EV0.6.xml";
+//           taxisFileName = dirName + "taxis4to4_EV0.7.xml";
+//           taxisFileName = dirName + "taxis4to4_EV0.8.xml";
+//           taxisFileName = dirName + "taxis4to4_EV0.9.xml";
+//           taxisFileName = dirName + "taxis4to4_EV1.0.xml";
+           taxisFileName = dirName + "taxis4to4_EV0.0.xml";
+//           taxisFileName = dirName + "oldtaxis4to4.xml";
+           
 
-        changeEventsFilename = dirName + "changeevents_min.xml";
-        eventsFileName = dirName + "2kW.15.1000.events.xml.gz";
-        netFileName = dirName + "berlin_brb.xml.gz";
-
+           
+           changeEventsFilename = dirName + "changeevents_min.xml";
+           eventsFileName = dirName +"2kW.15.1000.events.xml.gz" ;
+           netFileName = dirName + "berlin_brb.xml";
+           
         ////////////////////////////////////////////////////////         
 
+   
         electricStatsDir = dirName + "test/";
+
 
         //        plansFileName = dirName + "20.plans.xml.gz";
         //
@@ -162,9 +168,10 @@ import playground.michalm.util.RunningVehicleRegister;
         writeSimEvents = true;
         waitList = new ArrayList<String>();
 
-        //          scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName, dirName+"2kW.15.1000.plans.xml.gz");
-        scenario = VrpLauncherUtils.initTimeVariantScenario(netFileName, plansFileName,
-                changeEventsFilename);
+//          scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName, dirName+"2kW.15.1000.plans.xml.gz");
+        scenario = VrpLauncherUtils.initTimeVariantScenario(netFileName, plansFileName, changeEventsFilename);
+
+        
 
         //        List<String> taxiCustomerIds;
         //        taxiCustomerIds = ODDemandGenerator.readTaxiCustomerIds(taxiCustomersFileName);
@@ -186,7 +193,7 @@ import playground.michalm.util.RunningVehicleRegister;
         File f = new File(electricStatsDir);
         f.mkdirs();
 
-        //        TravelTimeSource ttimeSource = TravelTimeSource.FREE_FLOW_SPEED;
+//        TravelTimeSource ttimeSource = TravelTimeSource.FREE_FLOW_SPEED;
         TravelTimeSource ttimeSource = TravelTimeSource.EVENTS_15_MIN;
 
         TravelDisutilitySource tdisSource = TravelDisutilitySource.TIME;
@@ -212,7 +219,7 @@ import playground.michalm.util.RunningVehicleRegister;
                 travelTime);
 
         LeastCostPathCalculatorWithCache routerWithCache = new LeastCostPathCalculatorWithCache(
-                router, TimeDiscretizer.CYCLIC_15_MIN);
+                router, new TimeDiscretizer(31*4, 15 *60,false));
 
         VrpPathCalculator calculator = new VrpPathCalculatorImpl(routerWithCache, travelTime,
                 travelDisutility);
@@ -262,9 +269,9 @@ import playground.michalm.util.RunningVehicleRegister;
         //        qSim.getScenario().getConfig().simulation().setEndTime(86399);
         qSim.run();
         System.out.println("taxiless agents: ");
-        for (Id id : rvr.getRunningAgentIds()) {
-            System.out.println(id.toString());
-
+        for (Id id : rvr.getRunningAgentIds()){
+        	System.out.println(id.toString());
+        	
         }
         events.finishProcessing();
 
@@ -287,8 +294,7 @@ import playground.michalm.util.RunningVehicleRegister;
     {
         PrintWriter pw = new PrintWriter(System.out);
         pw.println(TaxiStats.HEADER);
-        TaxiStats stats = new TaxiStatsCalculator().calculateStats(context.getVrpData()
-                .getVehicles());
+        TaxiStats stats = new TaxiStatsCalculator().calculateStats(context.getVrpData().getVehicles());
         pw.println(stats);
         pw.flush();
 
@@ -300,15 +306,15 @@ import playground.michalm.util.RunningVehicleRegister;
         // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
         //        ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
 
-        //        try {
-        ////            ChartUtils.saveAsPDF(
-        ////                    ScheduleChartUtils.chartSchedule(context.getVrpData().getVehicles()),
-        ////                    electricStatsDir + "taxiSchedules", 2048, 1546);
-        //        }
-        //        catch (IOException e) {
-        //            // TODO Auto-generated catch block
-        //            e.printStackTrace();
-        //        }
+//        try {
+////            ChartUtils.saveAsPDF(
+////                    ScheduleChartUtils.chartSchedule(context.getVrpData().getVehicles()),
+////                    electricStatsDir + "taxiSchedules", 2048, 1546);
+//        }
+//        catch (IOException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
         if (outHistogram) {
             VrpLauncherUtils.writeHistograms(legHistogram, histogramOutDirName);
         }

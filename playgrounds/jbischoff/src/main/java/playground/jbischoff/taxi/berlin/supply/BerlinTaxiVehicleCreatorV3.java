@@ -19,148 +19,316 @@
 
 package playground.jbischoff.taxi.berlin.supply;
 
-import java.text.*;
-import java.util.*;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Queue;
+import java.util.Random;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.VehicleImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleWriter;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.tabularFileParser.*;
-import org.matsim.matrices.*;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.matrices.Matrices;
+import org.matsim.matrices.Matrix;
+import org.matsim.matrices.MatsimMatricesReader;
 
 import pl.poznan.put.util.random.WeightedRandomSelection;
-import playground.michalm.supply.VehicleGenerator;
-import playground.michalm.util.matrices.MatrixUtils;
-import playground.michalm.zone.*;
+import playground.jbischoff.taxi.berlin.demand.TaxiDemandWriter;
+import playground.michalm.zone.Zone;
+import playground.michalm.zone.Zones;
+
+import com.vividsolutions.jts.geom.Point;
 
 
 public class BerlinTaxiVehicleCreatorV3
 {
+    private static final String DATADIR = "C:/local_jb/data/";
+    private static final String TAXISOVERTIME = DATADIR + "taxi_berlin/2013/vehicles/taxisweekly.csv";
+    private static final String STATUSMATRIX = DATADIR + "taxi_berlin/2014/status/statusMatrixAvg.xml";
     private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private final static double EVSHARE = 0.0;
+    private final static double MAXTIME = 14.0 * 3600;
+
     private static final Logger log = Logger.getLogger(BerlinTaxiVehicleCreatorV3.class);
-
-    private Map<Date, Integer> taxisOverTime;
-    private double[] taxisOverTimeHourlyAverage;//24h from startDate, e.g. from 4am to 3am
-    private WeightedRandomSelection<Id> wrs;
-
-    private Scenario scenario;
+    private static final double PAXPERCAR = 4;
+    private static final Random RND = new Random(42);
+    private static final String NETWORKFILE = DATADIR
+            + "scenarios/2014_05_basic_scenario_v3/berlin_brb.xml";
+    private static final String ZONESSHP = DATADIR + "shp_merged/zones.shp";
+    private static final String ZONESXML = DATADIR + "shp_merged/zones.xml";
+    private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(
+            "EPSG:25833", TransformationFactory.DHDN_GK4);
+    private NetworkImpl network;
     private Map<Id, Zone> zones;
-    private List<Vehicle> vehicles;
+    List<Vehicle> vehicles;
 
-    double evShare;
-    double maxTime;
+    /**
+     * @param args
+     */
+    private Map<Date, Integer> taxisOverTime;
+    private Map<Date, Integer> taxisOverTimeHourlyAverage = new TreeMap<Date, Integer>();
+    private WeightedRandomSelection<Id> wrs;
 
 
     public static void main(String[] args)
         throws ParseException
     {
-        String dir = "C:/local_jb/data/";
-        String taxisOverTimeFile = dir + "taxi_berlin/2013/vehicles/taxisweekly.csv";
-        String statusMatrixFile = dir + "taxi_berlin/2014/status/statusMatrixAvg.xml";
-        String networkFile = dir + "scenarios/2014_05_basic_scenario_v3/berlin_brb.xml";
-        String zoneShpFile = dir + "OD/shp_merged/zones.shp";
-        String zoneXmlFile = dir + "OD/shp_merged/zones.xml";
-        String vehicleFile = dir + "scenarios/2014_05_basic_scenario_v3/taxis4to4_EV";
-
         BerlinTaxiVehicleCreatorV3 btv = new BerlinTaxiVehicleCreatorV3();
-        btv.evShare = 1.0;
-        btv.maxTime = 14.0 * 3600;
-        btv.readTaxisOverTime(taxisOverTimeFile);
-        btv.createAverages(SDF.parse("2013-04-16 04:00:00"), 1);
-        btv.prepareNetwork(networkFile, zoneShpFile, zoneXmlFile);
-        btv.prepareMatrices(statusMatrixFile);
+        btv.readTaxisOverTime(TAXISOVERTIME);
+        btv.createAverages(SDF.parse("2013-04-16 04:00:00"), SDF.parse("2013-04-17 04:00:00"));
+        btv.prepareNetwork();
+        btv.prepareMatrices();
         btv.createVehicles();
-
-        btv.writeVehicles(vehicleFile);// + evShare + ".xml";
+        btv.writeVehicles();
     }
 
 
-    private void prepareNetwork(String networkFile, String zoneShpFile, String zoneXmlFile)
+    private void writeVehicles()
     {
-        scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        new MatsimNetworkReader(scenario).readFile(networkFile);
-        zones = Zones.readZones(scenario, zoneXmlFile, zoneShpFile);
+        new VehicleWriter(vehicles).write(DATADIR
+                + "scenarios/2014_05_basic_scenario_v3/taxis4to4_EV" + EVSHARE + ".xml");
+
     }
 
 
-    private void readTaxisOverTime(String taxisOverTimeFile)
+    private void prepareNetwork()
     {
-        TabularFileParserConfig config = new TabularFileParserConfig();
-        log.info("parsing " + taxisOverTimeFile);
-        config.setDelimiterTags(new String[] { "\t" });
-        config.setFileName(taxisOverTimeFile);
-
-        new TabularFileParser().parse(config, new TabularFileHandler() {
-            @Override
-            public void startRow(String[] row)
-            {
-                try {
-                    taxisOverTime.put(SDF.parse(row[0]), Integer.parseInt(row[1]));
-                }
-                catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-
-        log.info("done. (parsing " + taxisOverTimeFile + ")");
+        Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        new MatsimNetworkReader(sc).readFile(NETWORKFILE);
+        this.network = (NetworkImpl)sc.getNetwork();
+        this.zones = Zones.readZones(sc, ZONESXML, ZONESSHP);
+   
     }
 
 
     @SuppressWarnings("deprecation")
-    private void createAverages(Date start, int days)
+    private void createVehicles()
     {
-        if (start.getMinutes() != 0 || start.getSeconds() != 0) {
-            throw new RuntimeException("Must start with hh:00:00");
+        Queue<Vehicle> vehiclesQueue = new LinkedList<Vehicle>();
+        vehicles = new ArrayList<Vehicle>();
+        Integer startDate = null;
+        Date currentDate;
+        int currentHr = 0;
+        for (Entry<Date, Integer> e : taxisOverTimeHourlyAverage.entrySet()) {
+            currentDate = e.getKey();
+            if (startDate == null) {
+                startDate = currentDate.getDate();
+            }
+            int dayOffset = currentDate.getDate() - startDate;
+            currentHr = currentDate.getHours() + 24 * dayOffset;
+
+            removeOverTimeVehicles(vehiclesQueue, currentHr);
+            int diff = e.getValue() - vehiclesQueue.size();
+            if (diff > 0) {
+                for (int i = 0; i < diff; i++) {
+                    Id lorId = this.wrs.select();
+                    String vehId = "t_" + lorId + "_" + currentHr + "_" + i;
+                    if (RND.nextDouble() < EVSHARE)
+                        vehId = "e" + vehId;
+                    int startTime = currentHr * 3600 + RND.nextInt(3600);
+                    Vehicle veh = createTaxiFromLor(lorId, new IdImpl(vehId), startTime);
+                    vehiclesQueue.add(veh);
+                }
+
+            }
+            else if (diff < 0) {
+                for (int i = 0; i > diff; i--) {
+                    Vehicle veh = vehiclesQueue.poll();
+                    int endTime = currentHr * 3600 + RND.nextInt(3600);
+                    veh.setT1(endTime);
+                    vehicles.add(veh);
+                }
+            }
+
         }
+        for (int i = 0; i < vehiclesQueue.size(); i++) {
+            Vehicle veh = vehiclesQueue.poll();
+            int endTime = currentHr * 3600 + RND.nextInt(3600);
+            veh.setT1(endTime);
+            vehicles.add(veh);
+        }
+    }
 
-        long startTime = start.getTime() / 1000;//in seconds
-        long endTime = startTime + days * 24 * 3600;//in seconds
 
-        taxisOverTimeHourlyAverage = new double[24];
-        int sum = 0;
-        int hour = 0;
+    private void removeOverTimeVehicles(Queue<Vehicle> vehiclesQueue, double currentHr)
+    {
+        boolean lastVehicleOverdue = true;
+        while (lastVehicleOverdue) {
+            Vehicle lastVeh = vehiclesQueue.peek();
+            if (lastVeh == null)
+                return;
+            if ( (lastVeh.getT0() + MAXTIME) < currentHr * 3600) {
 
-        for (long t = startTime; t < endTime; t++) {
-            sum += this.taxisOverTime.get(new Date(t * 1000));//seconds -> milliseconds
-
-            if ( (t + 1) % 3600 == 0) {
-                taxisOverTimeHourlyAverage[hour % 24] += (double)sum / 3600 / days;
-                sum = 0;
-                hour++;
+                log.info(lastVeh.getT0() + MAXTIME + " " + currentHr * 3600 + " " + currentHr);
+                vehiclesQueue.remove(lastVeh);
+                lastVeh.setT1(lastVeh.getT0() + MAXTIME);
+                this.vehicles.add(lastVeh);
+            }
+            else {
+                lastVehicleOverdue = false;
             }
         }
 
-        System.out.println(Arrays.asList(taxisOverTimeHourlyAverage));
     }
 
 
-    private void prepareMatrices(String statusMatrixFile)
+    private Vehicle createTaxiFromLor(Id lorId, Id vid, int t0)
     {
-        wrs = new WeightedRandomSelection<Id>();
-        Matrix avestatus = MatrixUtils.readMatrices(statusMatrixFile).getMatrix("ave");
+        Link link;
+        link = getRandomLinkInLor(lorId);
+        Vehicle v = new VehicleImpl(vid, link, PAXPERCAR, t0, 0);
+        return v;
+    }
 
-        for (Map.Entry<Id, ArrayList<Entry>> fromLOR : avestatus.getFromLocations().entrySet()) {
-            wrs.add(fromLOR.getKey(), MatrixUtils.calculateTotalValue(fromLOR.getValue()));
+
+    private Link getRandomLinkInLor(Id lorId)
+    {
+        log.info(lorId);
+        Id id = lorId;
+        if (lorId.toString().length() == 7)
+            id = new IdImpl("0" + lorId.toString());
+        log.info(id);
+        Point p = TaxiDemandWriter.getRandomPointInFeature(RND, this.zones.get(id)
+                .getMultiPolygon());
+        Coord coord = ct.transform(new CoordImpl(p.getX(), p.getY()));
+        Link link = network.getNearestLinkExactly(coord);
+
+        return link;
+    }
+
+
+    private void prepareMatrices()
+    {
+        Matrices statusMatrix = new Matrices();
+        ScenarioImpl sc = (ScenarioImpl)ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        new MatsimMatricesReader(statusMatrix, sc).readFile(STATUSMATRIX);
+        this.wrs = new WeightedRandomSelection<Id>();
+        Matrix avestatus = statusMatrix.getMatrix("avg");
+
+        for (Entry<Id, ArrayList<org.matsim.matrices.Entry>> fromLOR : avestatus.getFromLocations()
+                .entrySet()) {
+            Id lorId = fromLOR.getKey();
+            double sum = 0;
+            for (org.matsim.matrices.Entry v : fromLOR.getValue()) {
+                sum += v.getValue();
+            }
+            this.wrs.add(lorId, sum);
+        }
+
+    }
+
+
+    private void read(String file, TabularFileHandler handler)
+    {
+        TabularFileParserConfig config = new TabularFileParserConfig();
+        log.info("parsing " + file);
+        config.setDelimiterTags(new String[] { "\t" });
+        config.setFileName(file);
+        new TabularFileParser().parse(config, handler);
+        log.info("done. (parsing " + file + ")");
+    }
+
+
+    @SuppressWarnings("deprecation")
+    private void createAverages(Date start, Date end)
+    {
+        Date currentTime = start;
+        int secs = 0;
+        double sum = 0.;
+        do {
+            sum += this.taxisOverTime.get(currentTime);
+            secs++;
+            if ( (currentTime.getMinutes() == 59) && (currentTime.getSeconds() == 59)) {
+                double average = sum / secs;
+                this.taxisOverTimeHourlyAverage.put(currentTime, (int)Math.round(average));
+                secs = 0;
+                sum = 0;
+            }
+            else {}
+            currentTime = getNextTime(currentTime);
+        }
+        while (end.after(currentTime));
+        System.out.println(this.taxisOverTimeHourlyAverage);
+    }
+
+
+    private Date getNextTime(Date currentTime)
+    {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(currentTime);
+        cal.add(Calendar.SECOND, 1);
+        return cal.getTime();
+    }
+
+
+    private void readTaxisOverTime(String taxisovertime2)
+    {
+        TaxisOverTimeParser topp = new TaxisOverTimeParser();
+        read(TAXISOVERTIME, topp);
+        this.taxisOverTime = topp.getTaxisOverTime();
+
+    }
+
+}
+
+
+class TaxisOverTimeParser
+    implements TabularFileHandler
+{
+
+    private Map<Date, Integer> taxisOverTime;
+    SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+
+    public TaxisOverTimeParser()
+    {
+        this.taxisOverTime = new TreeMap<Date, Integer>();
+    }
+
+
+    @Override
+    public void startRow(String[] row)
+    {
+        try {
+            this.taxisOverTime.put(SDF.parse(row[0]), Integer.parseInt(row[1]));
+        }
+        catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+        catch (ParseException e) {
+            e.printStackTrace();
         }
     }
 
 
-    private void createVehicles()
+    public Map<Date, Integer> getTaxisOverTime()
     {
-        BerlinTaxiCreator btc = new BerlinTaxiCreator(scenario, zones, wrs, evShare);
-        VehicleGenerator vg = new VehicleGenerator(maxTime, maxTime, btc);
-        vg.generateVehicles(taxisOverTimeHourlyAverage, 4 * 3600, 3600);
-        vehicles = vg.getVehicles();
+        return taxisOverTime;
     }
 
-
-    private void writeVehicles(String vehicleFile)
-    {
-        new VehicleWriter(vehicles).write(vehicleFile + evShare + ".xml");
-    }
 }

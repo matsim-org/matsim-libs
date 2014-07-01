@@ -26,10 +26,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.utils.geometry.geotools.MGC;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
+
 
 import playground.michalm.demand.DefaultActivityCreator;
 import playground.michalm.zone.Zone;
-
 
 public class BerlinTaxiActivityCreator
     extends DefaultActivityCreator
@@ -37,54 +42,75 @@ public class BerlinTaxiActivityCreator
 
     private final static Id TXLLORID = new IdImpl("12214125");
     private final static Id SXFLORID = new IdImpl("12061433");
-
-
+    
     public BerlinTaxiActivityCreator(Scenario scenario)
     {
         super(scenario);
     }
-
-
+    
     @Override
     public Activity createActivity(Zone zone, String actType)
     {
         Link link;
-        if (zone.getId().equals(TXLLORID)) {
-            if (actType == "arrival") {
-                link = network.getLinks().get(new IdImpl(-35954));
-                Coord coord = link.getCoord();
-                ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
-                activity.setLinkId(link.getId());
-                return activity;
-            }
-            else {
-                link = network.getLinks().get(new IdImpl(-35695));
-                Coord coord = link.getCoord();
-                ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
-                activity.setLinkId(link.getId());
-                return activity;
+       if (zone.getId().equals(TXLLORID)){
+          if (actType == "arrival"){ 
+              link = network.getLinks().get(new IdImpl(-35954));
+              Coord coord = link.getCoord();
+              ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
+              activity.setLinkId(link.getId());
+              return activity;
+          }
+          else{
+              link = network.getLinks().get(new IdImpl(-35695));
+              Coord coord = link.getCoord();
+              ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
+              activity.setLinkId(link.getId());
+              return activity;
+              
+          }
+       }
+       else if (zone.getId().equals(SXFLORID)){
+           if (actType == "arrival"){ 
+               link = network.getLinks().get(new IdImpl(-35829));
+               Coord coord = link.getCoord();
+               ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
+               activity.setLinkId(link.getId());
+               return activity;
+           }
+           else{
+               link = network.getLinks().get(new IdImpl(-35828));
+               Coord coord = link.getCoord();
+               ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
+               activity.setLinkId(link.getId());
+               return activity;
+               
+           }
+       }
+       else {
+           Geometry geometry = geometryProvider.getGeometry(zone, actType);
+           Envelope envelope = geometry.getEnvelopeInternal();
+           double minX = envelope.getMinX();
+           double maxX = envelope.getMaxX();
+           double minY = envelope.getMinY();
+           double maxY = envelope.getMaxY();
 
-            }
-        }
-        else if (zone.getId().equals(SXFLORID)) {
-            if (actType == "arrival") {
-                link = network.getLinks().get(new IdImpl(-35829));
-                Coord coord = link.getCoord();
-                ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
-                activity.setLinkId(link.getId());
-                return activity;
-            }
-            else {
-                link = network.getLinks().get(new IdImpl(-35828));
-                Coord coord = link.getCoord();
-                ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
-                activity.setLinkId(link.getId());
-                return activity;
+           Point p = null;
 
-            }
-        }
-        else
-            return super.createActivity(zone, actType);
-    }
+           do {
+               double x = uniform.nextDouble(minX, maxX);
+               double y = uniform.nextDouble(minY, maxY);
+               p = MGC.xy2Point(x, y);
+           }
+           while (!geometry.contains(p) || !pointAcceptor.acceptPoint(zone, actType, p));
+
+           Coord coord = scenario.createCoord(p.getX(), p.getY());
+           link = network.getNearestLink(coord);
+
+           ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
+           activity.setLinkId(link.getId());
+           return activity;
+   
+       }
+       }
 
 }
