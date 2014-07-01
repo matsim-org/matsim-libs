@@ -68,6 +68,8 @@ public class KS2010ModelWriter {
 	private static final String GREEN = "green";
 	private static final String OFFSET = "offset";
 	private static final String LENGTH = "length";
+	private static final String XCOORD = "x";
+	private static final String YCOORD = "y";
 
 	// tags for the streets element
 	private static final String STREETS = "streets";
@@ -147,6 +149,8 @@ public class KS2010ModelWriter {
 			for (DgCrossingNode node : crossing.getNodes().values()) {
 				atts.clear();
 				atts.addAttribute("", "", ID, CDATA, node.getId().toString());
+				atts.addAttribute("", "", XCOORD, CDATA, Double.toString(node.getCoordinate().getX()));
+				atts.addAttribute("", "", YCOORD, CDATA, Double.toString(node.getCoordinate().getY()));
 				hd.startElement("", "", NODE, atts);
 				hd.endElement("", "", NODE);
 			}
