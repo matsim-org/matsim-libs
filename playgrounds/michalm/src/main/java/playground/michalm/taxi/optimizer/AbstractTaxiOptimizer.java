@@ -20,7 +20,6 @@
 package playground.michalm.taxi.optimizer;
 
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.schedule.*;
@@ -29,8 +28,6 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
-
-import com.google.common.base.Stopwatch;
 
 
 public abstract class AbstractTaxiOptimizer
@@ -54,20 +51,11 @@ public abstract class AbstractTaxiOptimizer
     protected abstract void scheduleUnplannedRequests();
 
 
-    private double reoptimizationEndTime = -Double.MAX_VALUE;
-
-
     @Override
     public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
     {
-        double now = e.getSimulationTime();
-
-        if (requiresReoptimization && now > reoptimizationEndTime) {
-            Stopwatch sw = Stopwatch.createStarted();
+        if (requiresReoptimization) {
             scheduleUnplannedRequests();
-            sw.stop();
-
-            reoptimizationEndTime = now + sw.elapsed(TimeUnit.SECONDS);
             requiresReoptimization = false;
         }
     }
