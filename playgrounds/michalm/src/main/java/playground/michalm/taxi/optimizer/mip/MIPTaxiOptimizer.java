@@ -73,8 +73,8 @@ public class MIPTaxiOptimizer
         mipProblem.scheduleUnplannedRequests((SortedSet<TaxiRequest>)unplannedRequests);
 
         optimCounter++;
-        if (optimCounter % 100 == 0) {
-            System.err.println(optimCounter);
+        if (optimCounter % 10 == 0) {
+            System.err.println(optimCounter + "; time=" + optimConfig.context.getTime());
         }
 
         lastPlanningHorizon = mipProblem.getPlanningHorizon();

@@ -81,7 +81,7 @@ public class MIPProblem
     private MIPSolution initialSolution;
     private MIPSolution finalSolution;
 
-    static final Mode mode = Mode.ONLINE_5;
+    static final Mode mode = Mode.OFFLINE_INIT_OPTIM;
 
 
     public MIPProblem(TaxiOptimizerConfiguration optimConfig,
@@ -141,9 +141,15 @@ public class MIPProblem
     }
 
 
+    private MIPTaxiStats stats;
+    
     private void findInitialSolution()
     {
         initialSolution = new MIPSolutionFinder(optimConfig, rData, vData).findInitialSolution();
+
+        stats = new MIPTaxiStats(optimConfig.context.getVrpData());
+        stats.calcInitial();
+        
         optimConfig.scheduler.removePlannedRequestsFromAllSchedules();
     }
 
@@ -159,6 +165,17 @@ public class MIPProblem
     {
         new MIPSolutionScheduler(optimConfig, rData, vData).updateSchedules(finalSolution);
         unplannedRequests.removeAll(Arrays.asList(rData.requests));
+        
+        stats.calcSolved();
+        
+        try {
+            PrintWriter pw = new PrintWriter(optimConfig.workingDirectory + "MIP_stats");
+            stats.print(pw);
+            pw.close();
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
 

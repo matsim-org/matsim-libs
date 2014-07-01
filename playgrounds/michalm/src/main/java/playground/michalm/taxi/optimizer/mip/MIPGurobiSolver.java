@@ -33,24 +33,27 @@ public class MIPGurobiSolver
 {
     private static enum Mode
     {
-        OFFLINE(7200, 1, 1), //
-        ONLINE(30, 1, 0);//
+        OFFLINE(7200, true), //
+        ONLINE(60, false);//
 
-        private Mode(double timeLimit, int mipFocus, int output)
+        private Mode(double timeLimit, boolean output)
         {
             this.timeLimit = timeLimit;
-            this.mipFocus = mipFocus;
             this.output = output;
         }
 
 
         private final double timeLimit;
-        private final int mipFocus;
-        private final int output;
+        private final boolean output;
     }
 
 
     private static final double W_MAX = 30 * 60 * 60;//30 hours
+    
+    private static final double TW_MAX = 1.5 * 60 * 60;// 1.5 hours 
+    private static final double TP_MAX = 20 * 60;// 20 minutes
+
+
 
     private final TaxiOptimizerConfiguration optimConfig;
     private final PathTreeBasedTravelTimeCalculator pathTravelTimeCalc;
@@ -63,7 +66,7 @@ public class MIPGurobiSolver
     private GRBVar[][] xVar;//for each request/vehicle pair, (i, j)
     private GRBVar[] wVar; //for each request, i
 
-    private final Mode mode = Mode.ONLINE;
+    private final Mode mode = Mode.OFFLINE;
 
 
     MIPGurobiSolver(TaxiOptimizerConfiguration optimConfig,
@@ -91,13 +94,13 @@ public class MIPGurobiSolver
             env.set(GRB.DoubleParam.TimeLimit, mode.timeLimit);// 2 hours
             //env.set(GRB.DoubleParam.MIPGap, 0.001);//0.1%
 
-            env.set(GRB.IntParam.MIPFocus, mode.mipFocus);//the focus towards finding feasible solutions
+            //env.set(GRB.IntParam.MIPFocus, 1);//the focus towards finding feasible solutions
             //or alternatively: focus towards finding feasible solutions after 1 hour
             //env.set(GRB.DoubleParam.ImproveStartTime, 3600);
 
             //env.set(GRB.IntParam.Threads, 1);//number of threads
 
-            env.set(GRB.IntParam.OutputFlag, mode.output);//no output
+            env.set(GRB.IntParam.OutputFlag, mode.output ? 1 : 0);//output
 
             addXVariables();
             addWVariables();
@@ -118,7 +121,9 @@ public class MIPGurobiSolver
 
             model.optimize();
 
-            model.write(optimConfig.workingDirectory + "gurobi_solution.sol");
+            if (mode.output) {
+                model.write(optimConfig.workingDirectory + "gurobi_solution.sol");
+            }
 
             MIPSolution solution = extractSolution();
 
@@ -151,7 +156,8 @@ public class MIPGurobiSolver
         wVar = new GRBVar[n];
         for (int i = 0; i < n; i++) {
             double e_i = rData.requests[i].getT0();
-            wVar[i] = model.addVar(e_i, W_MAX, 0, GRB.CONTINUOUS, "w_" + i);
+            double l_i = Math.min(e_i + TW_MAX, W_MAX);
+            wVar[i] = model.addVar(e_i, l_i, 0, GRB.CONTINUOUS, "w_" + i);
         }
     }
 
@@ -216,11 +222,38 @@ public class MIPGurobiSolver
 
                 double a_k = departure.time;
                 double t_O_ki = pathTravelTimeCalc.calcTravelTime(departure.link, toLink);
-                expr.addTerm(-a_k - t_O_ki, xVar[k][m + i]);
+
+                if (doExcludeVehToReqDrive(i, a_k, t_O_ki)) {
+                    GRBLinExpr excludeX = new GRBLinExpr();
+                    excludeX.addTerm(1, xVar[k][m + i]);
+                    model.addConstr(excludeX, GRB.EQUAL, 0, "v2r excluded " + k + "," + i);
+                }
+                else {
+                    expr.addTerm(-a_k - t_O_ki, xVar[k][m + i]);
+                }
             }
 
             model.addConstr(expr, GRB.GREATER_EQUAL, 0, "w(v2r)_" + i);
         }
+    }
+
+
+    private boolean doExcludeVehToReqDrive(int i, double a_k, double t_O_ki)
+    {
+        double l_i = rData.requests[i].getT0() + TW_MAX;
+        double earliestArrival_i = a_k + t_O_ki;
+
+        //a_k + t_O_ki  > l_i ==> x[k][m+i] = 0
+        if (earliestArrival_i > l_i) {
+            return true;
+        }
+
+        //t_O_ki > MAX_TP ==> x[k][m+i] = 0
+        if (t_O_ki > TP_MAX) {
+            return true;
+        }
+
+        return false;
     }
 
 
@@ -235,21 +268,48 @@ public class MIPGurobiSolver
             TaxiRequest iReq = rData.requests[i];
 
             double t_i = pathTravelTimeCalc.calcTravelTime(iReq.getFromLink(), iReq.getToLink());
-            double iTotalServeTime = t_P + t_i + t_D;
+            double totalT_i = t_P + t_i + t_D;
 
             for (int j = 0; j < n; j++) {
                 TaxiRequest jReq = rData.requests[j];
                 double t_ij = pathTravelTimeCalc.calcTravelTime(iReq.getToLink(),
                         jReq.getFromLink());
 
-                GRBLinExpr expr = new GRBLinExpr();
-                expr.addTerm(1, wVar[j]);
-                expr.addTerm(-1, wVar[i]);
-                expr.addConstant(W_MAX);
-                expr.addTerm(-iTotalServeTime - t_ij - W_MAX, xVar[m + i][m + j]);
-                model.addConstr(expr, GRB.GREATER_EQUAL, 0, "w(r2r)_" + i + "," + j);
+                if (doExcludeReqToReqDrive(i, j, totalT_i, t_ij)) {
+                    GRBLinExpr excludeX = new GRBLinExpr();
+                    excludeX.addTerm(1, xVar[m + i][m + j]);
+                    model.addConstr(excludeX, GRB.EQUAL, 0, "r2r excluded " + i + "," + j);
+                }
+                else {
+                    GRBLinExpr expr = new GRBLinExpr();
+                    expr.addTerm(1, wVar[j]);
+                    expr.addTerm(-1, wVar[i]);
+                    expr.addConstant(W_MAX);
+                    expr.addTerm(-totalT_i - t_ij - W_MAX, xVar[m + i][m + j]);
+                    model.addConstr(expr, GRB.GREATER_EQUAL, 0, "w(r2r)_" + i + "," + j);
+                }
             }
         }
+    }
+
+
+    private boolean doExcludeReqToReqDrive(int i, int j, double totalT_i, double t_ij)
+    {
+        double e_i = rData.requests[i].getT0();
+        double l_j = rData.requests[j].getT0() + TW_MAX;
+        double earliestArrival_j = e_i + totalT_i + t_ij;
+
+        //e_i + t_P + t_i + t_D + t_ij > l_j ==> x[m+i][m+j] = 0
+        if (earliestArrival_j > l_j) {
+            return true;
+        }
+
+        //t_ij > MAX_TP ==> x[m+i][m+j] = 0
+        if (t_ij > TP_MAX) {
+            return true;
+        }
+
+        return false;
     }
 
 
