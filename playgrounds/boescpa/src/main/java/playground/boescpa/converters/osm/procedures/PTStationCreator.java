@@ -34,8 +34,14 @@ public abstract class PTStationCreator {
 
 	protected final TransitSchedule schedule;
 
-	public PTStationCreator(TransitSchedule schedule) {
+	protected PTStationCreator(TransitSchedule schedule) {
 		this.schedule = schedule;
+	}
+
+	public final void createPTStations(String osmFile, String hafasFile, Network network) {
+		createPTStations(osmFile);
+		complementPTStations(hafasFile);
+		linkStationsToNetwork(network);
 	}
 
 	/**
@@ -45,7 +51,7 @@ public abstract class PTStationCreator {
 	 *
 	 * @param osmFile
 	 */
-	public abstract void createPTStations(String osmFile);
+	protected abstract void createPTStations(String osmFile);
 
 	/**
 	 * Check and complement pt-Stations and lines with HAFAS-knowledge (hafasFile).
@@ -54,7 +60,7 @@ public abstract class PTStationCreator {
 	 *
 	 * @param hafasFile
 	 */
-	public abstract void complementPTStations(String hafasFile);
+	protected abstract void complementPTStations(String hafasFile);
 
 	/**
 	 * Link the pt-stations in the schedule to the closest network links.
@@ -63,6 +69,6 @@ public abstract class PTStationCreator {
 	 *
 	 * @param network
 	 */
-	public abstract void linkStationsToNetwork(Network network);
+	protected abstract void linkStationsToNetwork(Network network);
 
 }
