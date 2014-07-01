@@ -17,51 +17,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.sim;
-
-import java.util.Collection;
+package playground.johannes.gsv.synPop.mid.run;
 
 import org.apache.log4j.Logger;
 
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.gsv.synPop.DeleteLegs;
+import playground.johannes.gsv.synPop.ProxyPersonTaskComposite;
+import playground.johannes.gsv.synPop.io.XMLParser;
 
 /**
  * @author johannes
  *
  */
-public class PopulationWriter implements SamplerListener {
-	
-	private static final Logger logger = Logger.getLogger(PopulationWriter.class);
+public class PlanFilter {
 
-	private Sampler sampler;
-	
-	private String outputDir;
-	
-	private XMLWriter writer;
-	
-	private int dumpInterval = 100000;
-	
-	private long iteration = 0;
-	
-	public PopulationWriter(String outputDir, Sampler sampler) {
-		this.outputDir = outputDir;
-		writer = new XMLWriter();
-		this.sampler = sampler;
-	}
-	
-	public void setDumpInterval(int interval) {
-		dumpInterval = interval;
-	}
-	
-	@Override
-	public void afterStep(Collection<ProxyPerson> population, ProxyPerson original, ProxyPerson mutation, boolean accepted) {
-		iteration++;
-		if(iteration % dumpInterval == 0) {
-			logger.info("Dumping population...");
-			writer.write(String.format("%s/%s.pop.xml.gz", outputDir, iteration), sampler.getPopulation());
-		}
-
+	private static final Logger logger = Logger.getLogger(PlanFilter.class);
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		XMLParser parser = new XMLParser();
+		parser.setValidating(false);
+		
+		parser.parse("/home/johannes/gsv/synpop/output/1400000000.pop.xml.gz");
+		logger.info(String.format("Loaded %s persons.", parser.getPersons().size()));
+		
+		ProxyPersonTaskComposite tasks = new ProxyPersonTaskComposite();
+		tasks.addComponent(new DeleteLegs("car"));
+		
 	}
 
+	
 }

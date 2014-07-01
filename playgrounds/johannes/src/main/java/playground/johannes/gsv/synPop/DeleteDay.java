@@ -17,51 +17,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.sim;
+package playground.johannes.gsv.synPop;
 
-import java.util.Collection;
-
-import org.apache.log4j.Logger;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author johannes
  *
  */
-public class PopulationWriter implements SamplerListener {
-	
-	private static final Logger logger = Logger.getLogger(PopulationWriter.class);
+public class DeleteDay implements ProxyPersonTask {
 
-	private Sampler sampler;
-	
-	private String outputDir;
-	
-	private XMLWriter writer;
-	
-	private int dumpInterval = 100000;
-	
-	private long iteration = 0;
-	
-	public PopulationWriter(String outputDir, Sampler sampler) {
-		this.outputDir = outputDir;
-		writer = new XMLWriter();
-		this.sampler = sampler;
+	private Set<String> days;
+
+	public DeleteDay() {
+		days = new HashSet<String>();
 	}
 	
-	public void setDumpInterval(int interval) {
-		dumpInterval = interval;
+	public void setWeekdays() {
+		days.add(CommonKeys.MONDAY);
+		days.add(CommonKeys.TUESDAY);
+		days.add(CommonKeys.WEDNESDAY);
+		days.add(CommonKeys.THURSDAY);
+		days.add(CommonKeys.FRIDAY);
 	}
 	
 	@Override
-	public void afterStep(Collection<ProxyPerson> population, ProxyPerson original, ProxyPerson mutation, boolean accepted) {
-		iteration++;
-		if(iteration % dumpInterval == 0) {
-			logger.info("Dumping population...");
-			writer.write(String.format("%s/%s.pop.xml.gz", outputDir, iteration), sampler.getPopulation());
+	public void apply(ProxyPerson person) {
+		String day = person.getAttribute(CommonKeys.DAY);
+		boolean found = false;
+		
+		for(String allowed : days) {
+			if(allowed.equalsIgnoreCase(day)) {
+				found = true;
+				break;
+			}
 		}
-
+		
+		if(!found) {
+			person.setAttribute(CommonKeys.DELETE, "true");
+		}
 	}
 
 }

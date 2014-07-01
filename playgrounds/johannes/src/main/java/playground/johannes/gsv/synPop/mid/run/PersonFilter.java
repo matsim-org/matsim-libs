@@ -26,6 +26,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.DeleteDay;
+import playground.johannes.gsv.synPop.DeleteModes;
 import playground.johannes.gsv.synPop.DeleteNoLegs;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTaskComposite;
@@ -55,11 +57,16 @@ public class PersonFilter {
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
 		
-		parser.parse("/home/johannes/gsv/mid2008/pop.xml");
+		parser.parse("/home/johannes/gsv/synpop/output/1400000000.pop.xml.gz");
 		logger.info(String.format("Loaded %s persons.", parser.getPersons().size()));
 		
 		ProxyPersonTaskComposite tasks = new ProxyPersonTaskComposite();
-		tasks.addComponent(new DeleteNoLegs());
+//		tasks.addComponent(new DeleteNoLegs());
+		tasks.addComponent(new DeleteModes("car"));
+		
+		DeleteDay deleteDay = new DeleteDay();
+		deleteDay.setWeekdays();
+		tasks.addComponent(deleteDay);
 		
 		logger.info("Running filter...");
 		for(ProxyPerson person : parser.getPersons()) {
@@ -71,7 +78,7 @@ public class PersonFilter {
 		
 		logger.info("Writing population...");
 		XMLWriter writer = new XMLWriter();
-		writer.write("/home/johannes/gsv/mid2008/pop.mob.xml", subset);
+		writer.write("/home/johannes/gsv/synpop/output/pop.car.xml.gz", subset);
 		logger.info("Done.");
 	}
 }

@@ -58,7 +58,7 @@ public class Analyzer {
 		parser.addSerializer(CommonKeys.PERSON_HOME_POINT, new PointSerializer());
 		parser.setValidating(false);
 		
-		parser.parse("/home/johannes/gsv/synpop/output/100000000.pop.xml.gz");
+		parser.parse("/home/johannes/gsv/synpop/output/1400000000.pop.xml.gz");
 //		parser.parse("/home/johannes/gsv/mid2008/pop.xml");
 		
 		Set<SimpleFeature> features = FeatureSHP.readFeatures("/home/johannes/gsv/synpop/data/gis/nuts/Gemeinden.gk3.shp");
@@ -70,7 +70,7 @@ public class Analyzer {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
-		facReader.readFile("/home/johannes/gsv/synpop/data/facilities/facilities.ger.work.xml");
+		facReader.readFile("/home/johannes/gsv/synpop/data/facilities/facilities.ger.all.xml");
 		ActivityFacilities facilities = scenario.getActivityFacilities();
 	
 	

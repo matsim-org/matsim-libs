@@ -19,47 +19,75 @@
 
 package playground.johannes.gsv.synPop.sim;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collection;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.io.XMLWriter;
 
 /**
  * @author johannes
  *
  */
-public class PopulationWriter implements SamplerListener {
-	
-	private static final Logger logger = Logger.getLogger(PopulationWriter.class);
+public class HamiltonianLogger implements SamplerListener {
 
-	private Sampler sampler;
+	private static final Logger logger = Logger.getLogger(HamiltonianLogger.class);
 	
-	private String outputDir;
+	private final Hamiltonian h;
 	
-	private XMLWriter writer;
+	private final int logInterval;
 	
-	private int dumpInterval = 100000;
+	private long iter;
 	
-	private long iteration = 0;
+	private BufferedWriter writer;
 	
-	public PopulationWriter(String outputDir, Sampler sampler) {
-		this.outputDir = outputDir;
-		writer = new XMLWriter();
-		this.sampler = sampler;
+	private static final String TAB = "\t";
+	
+	public HamiltonianLogger(Hamiltonian h, int logInterval) {
+		this(h, logInterval, null);
 	}
 	
-	public void setDumpInterval(int interval) {
-		dumpInterval = interval;
+	public HamiltonianLogger(Hamiltonian h, int logInterval, String file) {
+		this.h = h;
+		this.logInterval = logInterval;
+		
+		if(file != null) {
+			try {
+				writer = new BufferedWriter(new FileWriter(file));
+				writer.write("iter\ttotal\tavr");
+				writer.newLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	@Override
 	public void afterStep(Collection<ProxyPerson> population, ProxyPerson original, ProxyPerson mutation, boolean accepted) {
-		iteration++;
-		if(iteration % dumpInterval == 0) {
-			logger.info("Dumping population...");
-			writer.write(String.format("%s/%s.pop.xml.gz", outputDir, iteration), sampler.getPopulation());
+		iter++;
+		
+		if(iter % logInterval == 0) {
+			double val = h.evaluate(population);
+			double avr = val/(double)population.size();
+			logger.info(String.format(Locale.US, "Score for %s: avr = %.4f, total = %s.", h.getClass().getSimpleName(), avr, val));
+			
+			if(writer != null) {
+				try {
+					writer.write(String.valueOf(iter));
+					writer.write(TAB);
+					writer.write(String.valueOf(val));
+					writer.write(TAB);
+					writer.write(String.valueOf(avr));
+					writer.newLine();
+					writer.flush();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 
 	}

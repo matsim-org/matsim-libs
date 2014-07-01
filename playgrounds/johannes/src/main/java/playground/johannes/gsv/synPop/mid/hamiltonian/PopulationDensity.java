@@ -28,16 +28,20 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.geotools.resources.CRSUtilities;
 
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.sim.Hamiltonian;
 import playground.johannes.gsv.synPop.sim.Initializer;
 import playground.johannes.gsv.synPop.sim.SamplerListener;
+import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.sna.util.ProgressLogger;
+import playground.johannes.socialnetworks.gis.io.ZoneLayerKMLWriter;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
+import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -137,14 +141,19 @@ public class PopulationDensity implements Hamiltonian, Initializer, SamplerListe
 	@Override
 	public double evaluate(Collection<ProxyPerson> persons) {
 		double sum = 0;
-		for(ProxyPerson person : persons) {
-//			Point point = (Point) person.getAttribute(CommonKeys.PERSON_HOME_POINT);
-//			Zone<ZoneData> zone = zones.getZone(point);
-			
-			Zone<ZoneData> zone = (Zone<ZoneData>) person.getUserData(this);
+		for(Zone<ZoneData> zone : zones.getZones()) {
 			sum -= Math.abs(zone.getAttribute().current - zone.getAttribute().target);
-			
 		}
+		
+		sum = sum/zones.getZones().size();
+//		for(ProxyPerson person : persons) {
+////			Point point = (Point) person.getAttribute(CommonKeys.PERSON_HOME_POINT);
+////			Zone<ZoneData> zone = zones.getZone(point);
+//			
+//			Zone<ZoneData> zone = (Zone<ZoneData>) person.getUserData(this);
+//			sum -= Math.abs(zone.getAttribute().current - zone.getAttribute().target);
+//			
+//		}
 		
 		return sum;
 	}
@@ -169,7 +178,7 @@ public class PopulationDensity implements Hamiltonian, Initializer, SamplerListe
 	}
 
 	@Override
-	public void afterStep(ProxyPerson original, ProxyPerson mutation, boolean accepted) {
+	public void afterStep(Collection<ProxyPerson> population, ProxyPerson original, ProxyPerson mutation, boolean accepted) {
 		if(accepted) {
 			Zone<ZoneData> zone1 = (Zone<ZoneData>) original.getUserData(this);
 			Zone<ZoneData> zone2 = (Zone<ZoneData>) mutation.getUserData(this);
@@ -194,13 +203,19 @@ public class PopulationDensity implements Hamiltonian, Initializer, SamplerListe
 			Set<Zone<Double>> newZones = new HashSet<Zone<Double>>();
 			for(Zone<ZoneData> zone : zones.getZones()) {
 				Zone<Double> newZone = new Zone<Double>(zone.getGeometry());
-				newZone.setAttribute((double) zone.getAttribute().current/zone.getGeometry().getArea() * 1000000);
+//				newZone.setAttribute((double) zone.getAttribute().current/zone.getGeometry().getArea() * 1000000);
+				newZone.setAttribute((double) (zone.getAttribute().target - zone.getAttribute().current));
 				newZones.add(newZone);
 			}
 			
-			ZoneLayerSHP.write(new ZoneLayer<Double>(newZones), file);
+			ZoneLayer<Double> newLayer = new ZoneLayer<Double>(newZones);
+			newLayer.overwriteCRS(CRSUtils.getCRS(31467));
+			ZoneLayerSHP.write(newLayer, file);
+			
+//			ZoneLayerKMLWriter writer =	new ZoneLayerKMLWriter();
+//			writer.writeWithColor(newLayer, file);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+//			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

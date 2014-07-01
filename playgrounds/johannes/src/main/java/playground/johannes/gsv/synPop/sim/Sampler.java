@@ -22,7 +22,10 @@ package playground.johannes.gsv.synPop.sim;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
@@ -46,8 +49,6 @@ public class Sampler {
 	
 	private Hamiltonian hamiltonian;
 	
-	private int logInterval = 100000;
-	
 	public Sampler(Random random) {
 		this.random = random;
 		this.mutators = new ArrayList<Mutator>();
@@ -62,12 +63,8 @@ public class Sampler {
 		mutators.add(mutator);
 	}
 	
-	public void addListenter(SamplerListener listener) {
+	public void addListener(SamplerListener listener) {
 		listerners.add(listener);
-	}
-	
-	public void setLogInterval(int logInterval) {
-		this.logInterval = logInterval;
 	}
 	
 	public Collection<ProxyPerson> getPopulation() {
@@ -77,25 +74,16 @@ public class Sampler {
 	public void run(Collection<ProxyPerson> population, long burnin) {
 		this.population = new ArrayList<ProxyPerson>(population);
 		
-		int accepts = 0;
+		Timer timer = new Timer();
+		Task task = new Task();
+		this.addListener(task);
+		timer.schedule(task, 2000, 2000);
 		
-		long time = System.currentTimeMillis();
 		for(long i = 0; i < burnin; i++) {
-			if(step())
-				accepts++;
-			
-			if(i % 10000 == 0) {
-				logger.info(String.format("[%s] Accepted %s of %s steps.", i, accepts, 10000));
-				accepts = 0;
-			}
-			
-			if(i % logInterval == 0) {
-				long t = System.currentTimeMillis() - time;
-				double h = hamiltonian.evaluate(this.population);
-				logger.info(String.format("Total hamiltonian score: %s. Time: %s", h, t));
-				time = System.currentTimeMillis();
-			}
+			step();
 		}
+		
+		timer.cancel();
 	}
 	
 	public boolean step() {
@@ -130,8 +118,33 @@ public class Sampler {
 		}
 		
 		for(SamplerListener listener : listerners)
-			listener.afterStep(template, mutation, result);
+			listener.afterStep(population, template, mutation, result);
 		
 		return result;
+	}
+	
+	private class Task extends TimerTask implements SamplerListener {
+
+		private long iter;
+		
+		private long accepts;
+		
+		private long iters2;
+		
+		@Override
+		public void run() {
+			logger.info(String.format(Locale.US, "[%s] Accepted %s of %s steps (%.2f %%).", iter, accepts, iters2, accepts/(double)iters2 * 100));
+			accepts = 0;
+			iters2 = 0;
+		}
+
+		@Override
+		public void afterStep(Collection<ProxyPerson> population, ProxyPerson original, ProxyPerson mutation, boolean accepted) {
+			iter++;
+			iters2++;
+			if(accepted)
+				accepts++;
+		}
+		
 	}
 }

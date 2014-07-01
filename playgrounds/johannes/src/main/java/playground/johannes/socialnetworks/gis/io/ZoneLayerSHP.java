@@ -21,14 +21,21 @@ package playground.johannes.socialnetworks.gis.io;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.URL;
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
-import org.geotools.data.FeatureWriter;
+import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.data.shapefile.ShapefileDataStoreFactory;
+import org.geotools.data.simple.SimpleFeatureCollection;
+import org.geotools.data.simple.SimpleFeatureSource;
+import org.geotools.data.simple.SimpleFeatureStore;
+import org.geotools.feature.FeatureCollections;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -38,7 +45,7 @@ import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.MultiPolygon;
 
 /**
  * Utility class to read and write zone layers into shape (.shp) files.
@@ -55,63 +62,63 @@ public class ZoneLayerSHP {
 	 * @param filename the path to the shape file
 	 * @throws IOException
 	 */
-	public static <T> void write(ZoneLayer<T> layer, String filename) throws IOException {
-		/*
-		 * create feature type from zones
-		 */
-		CoordinateReferenceSystem crs = layer.getCRS();
-		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
-		b.setCRS(crs);
-		b.setName("zone");
-		b.add("location", Polygon.class);
-		b.add("value", Double.class);
-		SimpleFeatureType featureType = b.buildFeatureType();
-		
-		/*
-		 * Create a data store
-		 */
-		URL url = new File(filename).toURI().toURL();
-		ShapefileDataStore datastore = new ShapefileDataStore(url);
-		/*
-		 * Retrieve one feature to get the FeatureType for schema creation
-		 */
-		datastore.createSchema(featureType);
-		/*
-		 * Create a FeatureWriter and write the attributes
-		 */
-		FeatureWriter<SimpleFeatureType, SimpleFeature> writer = datastore.getFeatureWriter(Transaction.AUTO_COMMIT);
-		
-		for(Zone<T> zone : layer.getZones()) {
-			SimpleFeature feature = writer.next();
-			try {
-				feature.setAttribute(0, zone.getGeometry());
-				feature.setAttribute(1, zone.getAttribute());
-			} catch (ArrayIndexOutOfBoundsException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			}
-			writer.write();
-		}
-		datastore.dispose();
-		writer.close();
-		/*
-		 * It seems that in some cases the .prj file is not written. This is a
-		 * workaround to manually write the .prj file.
-		 */
-		int idx = filename.lastIndexOf(".");
-		if(idx >= 0) 
-			filename = filename.substring(0,  idx + 1) + "prj";
-		else
-			filename = filename + ".prj";
-		File file = new File(filename);
-		if(!file.exists()) {
-			PrintWriter pwriter = new PrintWriter(new File(filename));
-			String wkt = featureType.getCoordinateReferenceSystem().toWKT();
-			pwriter.write(wkt);
-			pwriter.close();
-		}
-	}
+//	public static <T> void write(ZoneLayer<T> layer, String filename) throws IOException {
+//		/*
+//		 * create feature type from zones
+//		 */
+//		CoordinateReferenceSystem crs = layer.getCRS();
+//		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+//		b.setCRS(crs);
+//		b.setName("zone");
+//		b.add("location", Polygon.class);
+//		b.add("value", Double.class);
+//		SimpleFeatureType featureType = b.buildFeatureType();
+//		
+//		/*
+//		 * Create a data store
+//		 */
+//		URL url = new File(filename).toURI().toURL();
+//		ShapefileDataStore datastore = new ShapefileDataStore(url);
+//		/*
+//		 * Retrieve one feature to get the FeatureType for schema creation
+//		 */
+//		datastore.createSchema(featureType);
+//		/*
+//		 * Create a FeatureWriter and write the attributes
+//		 */
+//		FeatureWriter<SimpleFeatureType, SimpleFeature> writer = datastore.getFeatureWriter(Transaction.AUTO_COMMIT);
+//		
+//		for(Zone<T> zone : layer.getZones()) {
+//			SimpleFeature feature = writer.next();
+//			try {
+//				feature.setAttribute(0, zone.getGeometry());
+//				feature.setAttribute(1, zone.getAttribute());
+//			} catch (ArrayIndexOutOfBoundsException e) {
+//				e.printStackTrace();
+//			} catch (IllegalArgumentException e) {
+//				e.printStackTrace();
+//			}
+//			writer.write();
+//		}
+////		datastore.dispose();
+//		writer.close();
+//		/*
+//		 * It seems that in some cases the .prj file is not written. This is a
+//		 * workaround to manually write the .prj file.
+//		 */
+//		int idx = filename.lastIndexOf(".");
+//		if(idx >= 0) 
+//			filename = filename.substring(0,  idx + 1) + "prj";
+//		else
+//			filename = filename + ".prj";
+//		File file = new File(filename);
+//		if(!file.exists()) {
+//			PrintWriter pwriter = new PrintWriter(new File(filename));
+//			String wkt = featureType.getCoordinateReferenceSystem().toWKT();
+//			pwriter.write(wkt);
+//			pwriter.close();
+//		}
+//	}
 
 	/**
 	 * Reads a zone layer from a shape file. The shape file should be a
@@ -141,5 +148,58 @@ public class ZoneLayerSHP {
 		}
 		
 		return new ZoneLayer<Double>(zones);
+	}
+	
+	public static <T> void write(ZoneLayer<T> layer, String filename) throws IOException {
+		CoordinateReferenceSystem crs = layer.getCRS();
+		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
+		typeBuilder.setCRS(crs);
+		typeBuilder.setName("zone");
+		typeBuilder.add("the_geom", MultiPolygon.class);
+		typeBuilder.add("value", Double.class);
+		SimpleFeatureType featureType = typeBuilder.buildFeatureType();
+        
+		SimpleFeatureCollection collection = FeatureCollections.newCollection();
+        SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(featureType);
+
+        for(Zone<T> zone : layer.getZones()) {
+        	featureBuilder.add(zone.getGeometry());
+        	featureBuilder.add(zone.getAttribute());
+        	SimpleFeature feature = featureBuilder.buildFeature(null);
+        	collection.add(feature);
+        }
+
+        File newFile = new File(filename);
+
+        ShapefileDataStoreFactory dataStoreFactory = new ShapefileDataStoreFactory();
+
+        Map<String, Serializable> params = new HashMap<String, Serializable>();
+        params.put("url", newFile.toURI().toURL());
+        params.put("create spatial index", Boolean.TRUE);
+
+        ShapefileDataStore newDataStore = (ShapefileDataStore) dataStoreFactory.createNewDataStore(params);
+        newDataStore.createSchema(featureType);
+
+//        newDataStore.forceSchemaCRS(layer.getCRS());
+		
+        Transaction transaction = new DefaultTransaction("create");
+
+		String typeName = newDataStore.getTypeNames()[0];
+		SimpleFeatureSource featureSource = newDataStore.getFeatureSource(typeName);
+
+		SimpleFeatureStore featureStore = (SimpleFeatureStore) featureSource;
+
+		featureStore.setTransaction(transaction);
+		try {
+			featureStore.addFeatures(collection);
+			transaction.commit();
+
+		} catch (Exception problem) {
+			problem.printStackTrace();
+			transaction.rollback();
+
+		} finally {
+			transaction.close();
+		}
 	}
 }

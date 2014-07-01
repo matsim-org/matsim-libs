@@ -26,8 +26,12 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.johannes.gsv.synPop.CommonKeys;
@@ -38,11 +42,11 @@ import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.mid.HPersonMunicipality;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
-import playground.johannes.gsv.synPop.mid.PersonMunicipalityClassHandler;
 import playground.johannes.gsv.synPop.mid.hamiltonian.PopulationDensity;
 import playground.johannes.gsv.synPop.sim.CompositeHamiltonian;
-import playground.johannes.gsv.synPop.sim.HamiltonianLogger;
+import playground.johannes.gsv.synPop.sim.HActivityLocation;
 import playground.johannes.gsv.synPop.sim.Initializer;
+import playground.johannes.gsv.synPop.sim.MutateActivityLocation;
 import playground.johannes.gsv.synPop.sim.MutateHomeLocation;
 import playground.johannes.gsv.synPop.sim.PopulationWriter;
 import playground.johannes.gsv.synPop.sim.Sampler;
@@ -58,9 +62,9 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author johannes
  *
  */
-public class SetHomeLocations {
+public class SetActivityLocations {
 
-	public static final Logger logger = Logger.getLogger(SetHomeLocations.class);
+	public static final Logger logger = Logger.getLogger(SetActivityLocations.class);
 	
 	private static final String MODULE_NAME = "popGenerator";
 	
@@ -114,66 +118,87 @@ public class SetHomeLocations {
 		/*
 		 * load facilities
 		 */
-//		Scenario scenario = ScenarioUtils.createScenario(config);
-//		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
-//		facReader.readFile(config.getParam(MODULE_NAME, "facilities"));
-//		ActivityFacilities facilities = scenario.getActivityFacilities();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
+		facReader.readFile(config.getParam(MODULE_NAME, "facilities"));
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 		
 		logger.info("Done.");
 		
 		logger.info("Setting up sampler...");
 		
-		MutateHomeLocation mutator = new MutateHomeLocation(zoneDE, random);
+//		MutateHomeLocation mutator = new MutateHomeLocation(zoneDE, random);
 		
-		
+		MutateActivityLocation workActMutator = new MutateActivityLocation(facilities, random, "work");
+		MutateActivityLocation shopActMutator = new MutateActivityLocation(facilities, random, "shop");
+		MutateActivityLocation eduActMutator = new MutateActivityLocation(facilities, random, "edu");
+		MutateActivityLocation leisureActMutator = new MutateActivityLocation(facilities, random, "leisure");
+		MutateActivityLocation privateActMutator = new MutateActivityLocation(facilities, random, "private");
+		MutateActivityLocation pickActMutator = new MutateActivityLocation(facilities, random, "pickdrop");
+		MutateActivityLocation miscActMutator = new MutateActivityLocation(facilities, random, "misc");
+		MutateActivityLocation unknownActMutator = new MutateActivityLocation(facilities, random, "unknown");
+		MutateActivityLocation outoftownActMutator = new MutateActivityLocation(facilities, random, "outoftown");
+		MutateActivityLocation intownActMutator = new MutateActivityLocation(facilities, random, "intown");
 		
 		CompositeHamiltonian H = new CompositeHamiltonian();
-		HPersonMunicipality municp = new HPersonMunicipality(municipalities);
-		H.addComponent(municp);
+//		H.addComponent(new HPersonMunicipality(municipalities));
+//		
+//		PopulationDensity popDen = new PopulationDensity(markzellen, persons.size(), random);
+//		H.addComponent(popDen);
 		
-		PopulationDensity popDen = new PopulationDensity(markzellen, persons.size(), random);
-		H.addComponent(popDen);
+		HActivityLocation actLoc = new HActivityLocation(facilities, null);
+		H.addComponent(actLoc);
 		
 		Sampler sampler = new Sampler(random);
 		
-		String outputDir = config.getParam(MODULE_NAME, "outputDir");
-		PopulationWriter popWriter = new PopulationWriter(outputDir, sampler);
+		PopulationWriter popWriter = new PopulationWriter(config.getParam(MODULE_NAME, "outputDir"), sampler);
 		popWriter.setDumpInterval(Integer.parseInt(config.getParam(MODULE_NAME, "dumpInterval")));
 		
 		
-		
-		sampler.addMutator(mutator);		
-		
-		sampler.addListener(popDen);
+//		sampler.addMutator(mutator);
+		sampler.addMutator(workActMutator);
+		sampler.addMutator(shopActMutator);
+		sampler.addMutator(eduActMutator);
+		sampler.addMutator(leisureActMutator);
+		sampler.addMutator(privateActMutator);
+		sampler.addMutator(pickActMutator);
+		sampler.addMutator(miscActMutator);
+		sampler.addMutator(unknownActMutator);
+		sampler.addMutator(outoftownActMutator);
+		sampler.addMutator(intownActMutator);
+//		sampler.addListenter(popDen);
 		sampler.addListener(popWriter);
-		/*
-		 * add loggers
-		 */
-		int logInterval = 100000;
-		sampler.addListener(new HamiltonianLogger(popDen, logInterval, outputDir + "/popDen.log"));
-		sampler.addListener(new HamiltonianLogger(municp, logInterval, outputDir + "/municip.log"));
-		
 		sampler.setHamiltonian(H);
+		
 		
 		/*
 		 * initialize persons
 		 */
 		logger.info("Initializing persons...");
 		List<Initializer> initializers = new ArrayList<Initializer>();
-		initializers.add(mutator);
-		initializers.add(popDen);
-		
+//		initializers.add(mutator);
+//		initializers.add(popDen);
+		initializers.add(workActMutator);
+		initializers.add(shopActMutator);
+		initializers.add(eduActMutator);
+		initializers.add(leisureActMutator);
+		initializers.add(privateActMutator);
+		initializers.add(pickActMutator);
+		initializers.add(miscActMutator);
+		initializers.add(outoftownActMutator);
+		initializers.add(unknownActMutator);
+		initializers.add(intownActMutator);
 		for(Initializer initializer : initializers) {
 			for(ProxyPerson person : persons) {
 				initializer.init(person);
 			}
 		}
 		
-		popDen.writeZoneData("/home/johannes/gsv/synpop/output/zones-start.shp");
 		logger.info("Running sampler...");
 		sampler.run(persons, (long) Double.parseDouble(config.getParam(MODULE_NAME, "iterations")));
 		logger.info("Done.");
-		popDen.writeZoneData("/home/johannes/gsv/synpop/output/zones-end.shp");
+		
+//		popDen.writeZoneData("/home/johannes/gsv/mid2008/popDen.shp");
 	}
 	
 	

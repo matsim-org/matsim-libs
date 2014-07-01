@@ -17,51 +17,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.sim;
-
-import java.util.Collection;
-
-import org.apache.log4j.Logger;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+package playground.johannes.gsv.synPop;
 
 /**
  * @author johannes
  *
  */
-public class PopulationWriter implements SamplerListener {
-	
-	private static final Logger logger = Logger.getLogger(PopulationWriter.class);
+public class DeleteModes implements ProxyPersonTask {
 
-	private Sampler sampler;
+	private final String mode;
 	
-	private String outputDir;
-	
-	private XMLWriter writer;
-	
-	private int dumpInterval = 100000;
-	
-	private long iteration = 0;
-	
-	public PopulationWriter(String outputDir, Sampler sampler) {
-		this.outputDir = outputDir;
-		writer = new XMLWriter();
-		this.sampler = sampler;
-	}
-	
-	public void setDumpInterval(int interval) {
-		dumpInterval = interval;
+	public DeleteModes(String mode) {
+		this.mode = mode;
 	}
 	
 	@Override
-	public void afterStep(Collection<ProxyPerson> population, ProxyPerson original, ProxyPerson mutation, boolean accepted) {
-		iteration++;
-		if(iteration % dumpInterval == 0) {
-			logger.info("Dumping population...");
-			writer.write(String.format("%s/%s.pop.xml.gz", outputDir, iteration), sampler.getPopulation());
+	public void apply(ProxyPerson person) {
+		boolean found = false;
+		
+		ProxyPlan plan = person.getPlan();
+		for(ProxyObject leg : plan.getLegs()) {
+			if(mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
+				found = true;
+				break;
+			}
 		}
 
+		if(!found)
+			person.setAttribute(CommonKeys.DELETE, "true");
 	}
 
 }

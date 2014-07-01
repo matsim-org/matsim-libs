@@ -23,6 +23,8 @@ import gnu.trove.TDoubleDoubleHashMap;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -65,14 +67,37 @@ public class ActivityDistanceTask implements ProxyAnalyzerTask {
 	
 	@Override
 	public void analyze(Collection<ProxyPerson> persons) {
-		DescriptiveStatistics stats = statistics(persons, "work");
-		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(1000), false);
-		try {
-			TXTWriter.writeMap(hist, "d", "n", outputDir + "d.work.txt");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		Set<String> types = new HashSet<String>();
+		for(ProxyPerson person : persons) {
+			ProxyPlan plan = person.getPlan();
+			for(ProxyObject act : plan.getActivities()) {
+				types.add(act.getAttribute(CommonKeys.ACTIVITY_TYPE));
+			}
 		}
+		
+		types.remove("home");
+		
+		for (String type : types) {
+			DescriptiveStatistics stats = statistics(persons, type);
+			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(1000), false);
+			try {
+				TXTWriter.writeMap(hist, "d", "n", outputDir + "d."+type+".txt");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		
+		
+//		DescriptiveStatistics stats = statistics(persons, null);
+//		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(1000), false);
+//		try {
+//			TXTWriter.writeMap(hist, "d", "n", outputDir + "d.all.txt");
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 	private DescriptiveStatistics statistics(Collection<ProxyPerson> persons, String purpose) {

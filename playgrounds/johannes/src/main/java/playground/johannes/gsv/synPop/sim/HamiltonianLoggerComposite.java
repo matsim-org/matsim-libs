@@ -21,47 +21,21 @@ package playground.johannes.gsv.synPop.sim;
 
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
-
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.sna.util.Composite;
 
 /**
  * @author johannes
  *
  */
-public class PopulationWriter implements SamplerListener {
-	
-	private static final Logger logger = Logger.getLogger(PopulationWriter.class);
+public class HamiltonianLoggerComposite extends Composite<HamiltonianLogger> implements	SamplerListener {
 
-	private Sampler sampler;
-	
-	private String outputDir;
-	
-	private XMLWriter writer;
-	
-	private int dumpInterval = 100000;
-	
-	private long iteration = 0;
-	
-	public PopulationWriter(String outputDir, Sampler sampler) {
-		this.outputDir = outputDir;
-		writer = new XMLWriter();
-		this.sampler = sampler;
-	}
-	
-	public void setDumpInterval(int interval) {
-		dumpInterval = interval;
-	}
-	
 	@Override
-	public void afterStep(Collection<ProxyPerson> population, ProxyPerson original, ProxyPerson mutation, boolean accepted) {
-		iteration++;
-		if(iteration % dumpInterval == 0) {
-			logger.info("Dumping population...");
-			writer.write(String.format("%s/%s.pop.xml.gz", outputDir, iteration), sampler.getPopulation());
+	public void afterStep(Collection<ProxyPerson> population,
+			ProxyPerson original, ProxyPerson mutation, boolean accepted) {
+		for(HamiltonianLogger logger : components) {
+			logger.afterStep(population, original, mutation, accepted);
 		}
-
 	}
 
 }

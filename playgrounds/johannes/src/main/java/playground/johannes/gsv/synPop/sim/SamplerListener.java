@@ -19,6 +19,8 @@
 
 package playground.johannes.gsv.synPop.sim;
 
+import java.util.Collection;
+
 import playground.johannes.gsv.synPop.ProxyPerson;
 
 /**
@@ -27,5 +29,5 @@ import playground.johannes.gsv.synPop.ProxyPerson;
  */
 public interface SamplerListener {
 
-	public void afterStep(ProxyPerson original, ProxyPerson mutation, boolean accepted);
+	public void afterStep(Collection<ProxyPerson> population, ProxyPerson original, ProxyPerson mutation, boolean accepted);
 }
