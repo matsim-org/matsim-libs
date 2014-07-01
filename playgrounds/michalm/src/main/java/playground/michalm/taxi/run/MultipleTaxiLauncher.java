@@ -24,7 +24,6 @@ import static playground.michalm.taxi.run.AlgorithmConfig.*;
 import java.io.*;
 import java.util.EnumSet;
 
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.core.gbl.MatsimRandom;
@@ -98,20 +97,6 @@ class MultipleTaxiLauncher
         launcher.onlineVehicleTracker = onlineVehicleTracker;
         launcher.advanceRequestSubmission = advanceRequestSubmission;
 
-        SummaryStatistics taxiPickupDriveTime = new SummaryStatistics();
-        SummaryStatistics percentile95TaxiPickupDriveTime = new SummaryStatistics();
-        SummaryStatistics maxTaxiPickupDriveTime = new SummaryStatistics();
-        SummaryStatistics taxiDropoffDriveTime = new SummaryStatistics();
-        SummaryStatistics taxiPickupTime = new SummaryStatistics();
-        SummaryStatistics taxiDropoffTime = new SummaryStatistics();
-        SummaryStatistics taxiCruiseTime = new SummaryStatistics();
-        SummaryStatistics taxiWaitTime = new SummaryStatistics();
-        SummaryStatistics taxiOverTime = new SummaryStatistics();
-        SummaryStatistics passengerWaitTime = new SummaryStatistics();
-        SummaryStatistics maxPassengerWaitTime = new SummaryStatistics();
-        SummaryStatistics percentile95PassengerWaitTime = new SummaryStatistics();
-        SummaryStatistics computationTime = new SummaryStatistics();
-
         launcher.clearVrpPathCalculator();
 
         //warmup
@@ -125,6 +110,7 @@ class MultipleTaxiLauncher
 
         ///========================
 
+        MultipleRunStats multipleRunStats = new MultipleRunStats();
         launcher.initVrpPathCalculator();//the same for all runs
 
         for (int i = 0; i < runs; i++) {
@@ -135,42 +121,13 @@ class MultipleTaxiLauncher
                     .calculateStats(launcher.context.getVrpData().getVehicles());
             long t1 = System.currentTimeMillis();
 
-            taxiPickupDriveTime.addValue(evaluation.getPickupDriveTime());
-            percentile95TaxiPickupDriveTime.addValue(evaluation.getPickupDriveTimeStats()
-                    .getPercentile(95));
-            maxTaxiPickupDriveTime.addValue(evaluation.getMaxPickupDriveTime());
-            taxiDropoffDriveTime.addValue(evaluation.getDropoffDriveTime());
-            taxiPickupTime.addValue(evaluation.getPickupTime());
-            taxiDropoffTime.addValue(evaluation.getDropoffTime());
-            taxiCruiseTime.addValue(evaluation.getCruiseTime());
-            taxiWaitTime.addValue(evaluation.getWaitTime());
-            taxiOverTime.addValue(evaluation.getOverTime());
-            passengerWaitTime.addValue(evaluation.getPassengerWaitTime());
-            percentile95PassengerWaitTime.addValue(evaluation.getPassengerWaitTimeStats()
-                    .getPercentile(95));
-            maxPassengerWaitTime.addValue(evaluation.getMaxPassengerWaitTime());
-            computationTime.addValue(0.001 * (t1 - t0));
+            multipleRunStats.updateStats(evaluation, t1 - t0);
         }
 
         VrpData data = launcher.context.getVrpData();
         String cfg = launcher.algorithmConfig.name();
 
-        pw.printf(
-                "%20s\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
-                cfg,//
-                data.getRequests().size(),//
-                data.getVehicles().size(),//
-                passengerWaitTime.getMean(),//
-                percentile95PassengerWaitTime.getMean(), //
-                maxPassengerWaitTime.getMean(),//
-                taxiPickupDriveTime.getMean(),//
-                percentile95TaxiPickupDriveTime.getMean(), //
-                maxTaxiPickupDriveTime.getMean(),//
-                taxiDropoffDriveTime.getMean(),//
-                taxiPickupTime.getMean(),//
-                taxiDropoffTime.getMean(),//
-                taxiWaitTime.getMean(),//
-                computationTime.getMean());
+        multipleRunStats.printStats(pw, cfg, data);
 
         delaySpeedupStats.printStats(pw2, launcher.algorithmConfig.name());
         delaySpeedupStats.clearStats();
@@ -207,73 +164,73 @@ class MultipleTaxiLauncher
     static final EnumSet<AlgorithmConfig> NOS_TW_xx = EnumSet.of(//
             //NOS_TW_SL,
             //NOS_TW_TD,
-            NOS_TW_FF
+            //NOS_TW_FF
             //NOS_TW_24H,
-            //NOS_TW_15M
+            NOS_TW_15M
             );
 
     static final EnumSet<AlgorithmConfig> NOS_TP_xx = EnumSet.of(//
             //NOS_TP_SL,
             //NOS_TP_TD,
-            NOS_TP_FF
+            //NOS_TP_FF
             //NOS_TP_24H,
-            //NOS_TP_15M
+            NOS_TP_15M
             );
 
     static final EnumSet<AlgorithmConfig> NOS_DSE_xx = EnumSet.of(//
             //NOS_DSE_SL,
             //NOS_DSE_TD,
-            NOS_DSE_FF
+            //NOS_DSE_FF
             //NOS_DSE_24H,
-            //NOS_DSE_15M
+            NOS_DSE_15M
             );
 
     static final EnumSet<AlgorithmConfig> OTS_TW_xx = EnumSet.of(//
-            OTS_TW_FF
+            //OTS_TW_FF
             //OTS_TW_24H,
-            //OTS_TW_15M,
+            OTS_TW_15M
             );
 
     static final EnumSet<AlgorithmConfig> OTS_TP_xx = EnumSet.of(//
-            OTS_TP_FF
+            //OTS_TP_FF
             //OTS_TP_24H,
-            //OTS_TP_15M,
+            OTS_TP_15M
             );
 
     static final EnumSet<AlgorithmConfig> RES_TW_xx = EnumSet.of(//
-            RES_TW_FF
+            //RES_TW_FF
             //RES_TW_24H,
-            //RES_TW_15M,
+            RES_TW_15M
             );
 
     static final EnumSet<AlgorithmConfig> RES_TP_xx = EnumSet.of(//
-            RES_TP_FF
+            //RES_TP_FF
             //RES_TP_24H,
-            //RES_TP_15M,
+            RES_TP_15M
             );
 
     static final EnumSet<AlgorithmConfig> APS_TW_xx = EnumSet.of(//
             //APS_TW_SL,
             //APS_TW_TD,
-            APS_TW_FF
+            //APS_TW_FF
             //APS_TW_24H,
-            //APS_TW_15M
+            APS_TW_15M
             );
 
     static final EnumSet<AlgorithmConfig> APS_TP_xx = EnumSet.of(//
             //APS_TP_SL,
             //APS_TP_TD,
-            APS_TP_FF
+            //APS_TP_FF
             //APS_TP_24H,
-            //APS_TP_15M
+            APS_TP_15M
             );
 
     static final EnumSet<AlgorithmConfig> APS_DSE_xx = EnumSet.of(//
             //APS_DSE_SL,
             //APS_DSE_TD,
-            APS_DSE_FF
+            //APS_DSE_FF
             //APS_DSE_24H,
-            //APS_DSE_15M
+            APS_DSE_15M
             );
 
 
@@ -282,22 +239,22 @@ class MultipleTaxiLauncher
         MultipleTaxiLauncher multiLauncher = new MultipleTaxiLauncher(paramFile);
         multiLauncher.initOutputFiles("");
 
-        //        multiLauncher.run(NOS_TW_xx, runs);
-        //        multiLauncher.run(NOS_TP_xx, runs);
-        //        multiLauncher.run(NOS_DSE_xx, runs);
-        //
-        //        multiLauncher.run(OTS_TW_xx, runs);
-        //        multiLauncher.run(OTS_TP_xx, runs);
-        //        
-        //        multiLauncher.run(RES_TW_xx, runs);
-        //        multiLauncher.run(RES_TP_xx, runs);
-        //        
-        //        multiLauncher.run(APS_TW_xx, runs);
-        //        multiLauncher.run(APS_TP_xx, runs);
-        //        multiLauncher.run(APS_DSE_xx, runs);
+        multiLauncher.run(NOS_TW_xx, runs);
+        multiLauncher.run(NOS_TP_xx, runs);
+        multiLauncher.run(NOS_DSE_xx, runs);
+
+        multiLauncher.run(OTS_TW_xx, runs);
+        multiLauncher.run(OTS_TP_xx, runs);
+
+        multiLauncher.run(RES_TW_xx, runs);
+        multiLauncher.run(RES_TP_xx, runs);
+
+        multiLauncher.run(APS_TW_xx, runs);
+        multiLauncher.run(APS_TP_xx, runs);
+        multiLauncher.run(APS_DSE_xx, runs);
 
         //multiLauncher.run(NOS_DSE_FF, runs, true, true, true);
-        multiLauncher.run(MIP_FF, runs, true, true, false);
+        //multiLauncher.run(MIP_FF, runs, true, true, false);
 
         multiLauncher.closeOutputFiles();
     }

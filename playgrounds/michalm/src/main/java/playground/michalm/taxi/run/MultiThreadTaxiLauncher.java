@@ -35,7 +35,7 @@ class MultiThreadTaxiLauncher
 //    private static final int[] DEMANDS = { 10 };
 //    private static final int[] SUPPLIES = { 25 };
 
-    private static final int RUNS = 10;
+    private static final int RUNS = 20;
 
     //Do not use multithreading for MIP 
     private static final int THREADS = 11;
@@ -49,12 +49,12 @@ class MultiThreadTaxiLauncher
             for (int s : SUPPLIES) {
                 final String paramFile = PATH + d + "-" + s + FILE;
 
-//                service.execute(new Runnable() {
-//                    public void run()
+                service.execute(new Runnable() {
+                    public void run()
                     {
                         MultipleTaxiLauncher.runAll(RUNS, paramFile);
                     }
-//                });
+                });
             }
         }
 
