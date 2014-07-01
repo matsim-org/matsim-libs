@@ -33,11 +33,15 @@ import org.matsim.api.core.v01.network.Network;
 public abstract class MultimodalNetworkCreator {
 
 	protected final Network network;
-	protected final String osmFile;
 
-	public MultimodalNetworkCreator(Network network, String osmFile) {
+	protected MultimodalNetworkCreator(Network network) {
 		this.network = network;
-		this.osmFile = osmFile;
+	}
+
+	public final void createMultimodalNetwork(String osmFile) {
+		Network carNetwork = createStreetNetwork(osmFile);
+		Network ptNetwork = createPTNetwork(osmFile);
+		mergePTwithCarNetwork(ptNetwork, carNetwork);
 	}
 
 	/**
@@ -45,14 +49,14 @@ public abstract class MultimodalNetworkCreator {
 	 *
 	 * @return standard car network
 	 */
-	public abstract Network createStreetNetwork();
+	protected abstract Network createStreetNetwork(String osmFile);
 
 	/**
 	 * Create a standard pt network from the given osmFile based on experimental OSM converters.
 	 *
 	 * @return standard pt network
 	 */
-	public abstract Network createPTNetwork();
+	protected abstract Network createPTNetwork(String osmFile);
 
 	/**
 	 * Merge the two special networks to a new network. Thereby makes sure that the allowed modes
@@ -63,6 +67,6 @@ public abstract class MultimodalNetworkCreator {
 	 * @param ptNetwork
 	 * @param carNetwork
 	 */
-	public abstract void mergePTwithCarNetwork(Network ptNetwork, Network carNetwork);
+	protected abstract void mergePTwithCarNetwork(Network ptNetwork, Network carNetwork);
 
 }
