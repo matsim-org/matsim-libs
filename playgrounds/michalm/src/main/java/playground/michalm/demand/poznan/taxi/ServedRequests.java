@@ -61,8 +61,8 @@ public class ServedRequests
         WeekDay wd = WeekDay.getWeekDay(request.assigned);
         return Arrays.asList(weekDays).contains(wd);
     }
-    
-    
+
+
     public static Predicate<ServedRequest> createWithinAreaPredicate(MultiPolygon area)
     {
         final PreparedPolygonContains ppc = new PreparedPolygonContains(new PreparedPolygon(area));
@@ -76,7 +76,7 @@ public class ServedRequests
     }
 
 
-    public static Predicate<? super ServedRequest> createBetweenDatesPredicate(final Date fromDate,
+    public static Predicate<ServedRequest> createBetweenDatesPredicate(final Date fromDate,
             final Date toDate)
     {
         return new Predicate<ServedRequest>() {
