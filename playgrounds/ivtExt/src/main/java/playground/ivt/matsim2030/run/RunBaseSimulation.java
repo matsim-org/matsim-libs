@@ -65,6 +65,7 @@ public class RunBaseSimulation {
 					scenario ) );
 
 		Matsim2030Utils.initializeScoring( controler );
+		Matsim2030Utils.loadControlerListeners( controler );
 		
 		// Code from Alex called Controler.setCreateGraphs( true ), but
 		// it sets a config option, and config options should be set from config, not code.
