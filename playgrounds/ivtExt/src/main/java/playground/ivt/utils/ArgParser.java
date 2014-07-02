@@ -78,6 +78,16 @@ public class ArgParser {
 		if ( old != null ) throw new IllegalStateException( name );
 	}
 
+	public void setDefaultMultipleValue(
+			final String longName,
+			final String shortName,
+			final List<String> v ) {
+		checkLock();
+		final Id id = switchFactory.addSwitch( longName , shortName );
+		final List<String> old = defaultMultipleValues.put( id , v );
+		if ( old != null ) throw new IllegalStateException( longName+" "+shortName );
+	}
+
 	public void addSwitch( final String... names ) {
 		checkLock();
 		switches.add( switchFactory.addSwitch( names ) );
