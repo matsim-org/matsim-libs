@@ -21,6 +21,7 @@
 
 package playground.boescpa.converters.osm.procedures;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
@@ -32,6 +33,8 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  */
 public abstract class PTStationCreator {
 
+	protected static Logger log = Logger.getLogger(PTStationCreator.class);
+
 	protected final TransitSchedule schedule;
 
 	protected PTStationCreator(TransitSchedule schedule) {
@@ -39,9 +42,11 @@ public abstract class PTStationCreator {
 	}
 
 	public final void createPTStations(String osmFile, String hafasFile, Network network) {
+		log.info("Creating PT stations...");
 		createPTStations(osmFile);
 		complementPTStations(hafasFile);
 		linkStationsToNetwork(network);
+		log.info("Creating PT stations... done.");
 	}
 
 	/**

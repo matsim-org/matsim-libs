@@ -21,6 +21,7 @@
 
 package playground.boescpa.converters.osm.procedures;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 
 /**
@@ -32,6 +33,8 @@ import org.matsim.api.core.v01.network.Network;
  */
 public abstract class MultimodalNetworkCreator {
 
+	protected static Logger log = Logger.getLogger(MultimodalNetworkCreator.class);
+
 	protected final Network network;
 
 	protected MultimodalNetworkCreator(Network network) {
@@ -39,9 +42,11 @@ public abstract class MultimodalNetworkCreator {
 	}
 
 	public final void createMultimodalNetwork(String osmFile) {
+		log.info("Creating multimodal network...");
 		Network carNetwork = createStreetNetwork(osmFile);
 		Network ptNetwork = createPTNetwork(osmFile);
 		mergePTwithCarNetwork(ptNetwork, carNetwork);
+		log.info("Creating multimodal network... done.");
 	}
 
 	/**
