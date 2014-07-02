@@ -39,7 +39,7 @@ final class MATSimNetworkFileExporter extends FileExporter {
 	 * saved as MATSim network.
 	 * 
 	 * @param pathname
-	 *            The path to which the network should be written
+	 *            The path to which the network should be written to
 	 * @param layer
 	 *            The layer which holds the data
 	 * @return <code>true</code> if the given {@code layer} is a

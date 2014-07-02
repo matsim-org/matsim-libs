@@ -5,7 +5,6 @@ import java.awt.GridBagLayout;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.openstreetmap.josm.Main;
@@ -16,10 +15,10 @@ import org.openstreetmap.josm.Main;
  * @author Nico
  * 
  */
+@SuppressWarnings("serial")
 class ImportDialog extends JPanel {
 	// the JOptionPane that contains this dialog. required for the closeDialog()
 	// method.
-	private JOptionPane optionPane;
 	
 	/**
 	 * Holds the path of the import file
@@ -27,6 +26,7 @@ class ImportDialog extends JPanel {
 	protected static JLabel path = new JLabel();
 	private JLabel importSystemLabel = new JLabel("origin system:");
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected final static JComboBox importSystem = new JComboBox(
 			Preferences.coordSystems);
 
@@ -53,9 +53,4 @@ class ImportDialog extends JPanel {
 		add(importSystem, c);
 
 	}
-
-	public void setOptionPane(JOptionPane optionPane) {
-		this.optionPane = optionPane;
-	}
-
 }

@@ -31,11 +31,14 @@ import org.xml.sax.SAXException;
 /**
  * This is the main class for the MATSim plugin.
  * 
- * @author nkuehnel
+ * @see Plugin
+ * 
+ * @author Nico
  * 
  */
 public class MATSimPlugin extends Plugin implements PreferenceChangedListener {
 	private MATSimAction MATSimAction;
+	
 	protected static MATSimToggleDialog toggleDialog;
 	private static boolean matsimRenderer = Main.pref.getBoolean(
 			"matsim_renderer", false);
@@ -103,6 +106,9 @@ public class MATSimPlugin extends Plugin implements PreferenceChangedListener {
 
 	/**
 	 * Called when the JOSM map frame is created or destroyed.
+	 * 
+	 * @param oldFrame The old MapFrame. Null if a new one is created.
+	 * @param newFrame The new MapFrame. Null if the current is destroyed.
 	 */
 	@Override
 	public void mapFrameInitialized(MapFrame oldFrame, MapFrame newFrame) {
@@ -113,13 +119,12 @@ public class MATSimPlugin extends Plugin implements PreferenceChangedListener {
 		}
 	}
 
-	
-	
 	@Override
 	public PreferenceSetting getPreferenceSetting() {
 		return new Preferences.Factory().createPreferenceSetting();
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void preferenceChanged(PreferenceChangeEvent e) {
 		if (e.getKey().equalsIgnoreCase("matsim_renderer")) {

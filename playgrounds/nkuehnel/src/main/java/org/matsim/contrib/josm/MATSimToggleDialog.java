@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,8 +60,10 @@ import org.xml.sax.SAXException;
 /**
  * The ToggleDialog that shows link information of selected ways
  * 
- * 
+ * @author Nico
  */
+
+@SuppressWarnings("serial")
 class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 		PreferenceChangedListener {
 	private JTable table;
@@ -68,6 +71,8 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 	private MATSimTableModel tableModel;
 	private JButton networkAttributes = new JButton(new ImageProvider(
 			"dialogs", "edit").setWidth(16).get());
+	private JButton manualConvert = new JButton(new ImageProvider(
+			"restart").setWidth(16).get());
 	private List<FileExporter> exporterCopy = new ArrayList<FileExporter>();
 	private Network currentNetwork;
 	private Map<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
@@ -111,7 +116,25 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 				dlg.dispose();
 			}
 		});
-		this.titleBar.add(networkAttributes);
+		this.titleBar.add(networkAttributes, this.titleBar.getComponentCount()-3);
+		
+		
+		manualConvert.setToolTipText(tr("convert layer from scratch"));
+		manualConvert.setBorder(BorderFactory.createEmptyBorder());
+		manualConvert.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Layer layer = Main.main.getActiveLayer();
+				if (layer instanceof OsmDataLayer) {
+					currentNetwork = NetworkImpl.createNetwork();
+					way2Links = new HashMap<Way, List<Link>>();
+					link2Segments = new HashMap<Link, List<WaySegment>>();
+					LayerChangeTask task = new LayerChangeTask((OsmDataLayer) layer);
+					task.run();
+				}
+			}
+		});
+		this.titleBar.add(manualConvert, this.titleBar.getComponentCount()-3);
 	}
 
 	public void notifyDataChanged(Network network) {
@@ -122,8 +145,10 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 
 	@Override
 	public void activeLayerChange(Layer oldLayer, Layer newLayer) {
+		System.out.println("test");
 		DataSet.removeSelectionListener(tableModel);
 		if (osmNetworkListener != null && oldLayer != null && oldLayer instanceof OsmDataLayer) {
+			((OsmDataLayer) oldLayer).data.clearSelection();
 			((OsmDataLayer) oldLayer).data
 					.removeDataSetListener(osmNetworkListener);
 		}
@@ -136,8 +161,12 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 				ExtensionFileFilter.exporters.clear();
 				ExtensionFileFilter.exporters.add(0,
 						new MATSimNetworkFileExporter());
+				this.manualConvert.setEnabled(false);
 			} else {
+				this.manualConvert.setEnabled(true);
 				currentNetwork = NetworkImpl.createNetwork();
+				way2Links = new HashMap<Way, List<Link>>();
+				link2Segments = new HashMap<Link, List<WaySegment>>();
 				LayerChangeTask task = new LayerChangeTask((OsmDataLayer) newLayer);
 				task.run();
 				
@@ -410,7 +439,7 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 		@Override
 		protected void realRun() throws SAXException, IOException,
 				OsmTransferException {
-			NewConverter.convertOsmLayer(newLayer.data,
+			NewConverter.convertOsmLayer(newLayer,
 					currentNetwork, way2Links, link2Segments);
 		}
 	}

@@ -19,7 +19,6 @@ import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
-import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.WaySegment;
 import org.openstreetmap.josm.data.validation.Severity;
@@ -30,28 +29,58 @@ import org.openstreetmap.josm.gui.progress.ProgressMonitor;
 /**
  * The Test which is used for the validation of MATSim content.
  * 
+ * @author Nico
  * 
  */
 class MATSimTest extends Test {
 
+	/**
+	 * Maps ways (the links, respectively) to their id. Ways whose links share
+	 * the same id are added up in a list.
+	 */
 	Map<String, ArrayList<Way>> linkIds;
+	/**
+	 * Maps nodes to their id. Nodes that share the same id are added up in a
+	 * list.
+	 */
 	Map<String, ArrayList<Node>> nodeIds;
 	NetworkLayer layer;
 	Network network;
 
+	/**
+	 * Identifies the link id to be fixed from a specific error.
+	 */
 	Map<TestError, String> links2Fix;
+	/**
+	 * Identifies the node id to be fixed from a specific error.
+	 */
 	Map<TestError, String> nodes2Fix;
 
-
+	/**
+	 * Integer code for duplicated link id error.
+	 */
 	protected final static int DUPLICATE_LINK_ID = 3001;
+	/**
+	 * Integer code for duplicated node id error.
+	 */
 	protected final static int DUPLICATE_NODE_ID = 3002;
+	/**
+	 * Integer code for doubtful link attribute(s).
+	 */
 	protected final static int DOUBTFUL_LINK_ATTRIBUTE = 3003;
 
+	/**
+	 * Creates a new {@code MATSimTest}.
+	 */
 	public MATSimTest() {
 		super(tr("MATSimValidation"),
 				tr("Validates MATSim-related network data"));
 	}
 
+	/**
+	 * Starts the test. Initializes the mappings of {@link #nodeIds} and
+	 * {@link #linkIds}.
+	 */
 	@Override
 	public void startTest(ProgressMonitor monitor) {
 		super.startTest(monitor);
@@ -60,11 +89,13 @@ class MATSimTest extends Test {
 		if (Main.main.getActiveLayer() instanceof NetworkLayer) {
 			layer = (NetworkLayer) Main.main.getActiveLayer();
 			this.network = ((NetworkLayer) layer).getMatsimNetwork();
-			monitor.setTicksCount(layer.data.getNodes().size()
-					+ layer.data.getWays().size());
 		}
 	}
 
+	/**
+	 * Visits a way and stores the Ids of the represented links. Also checks
+	 * links for {@link #doubtfulAttributes(Link)}.
+	 */
 	@Override
 	public void visit(Way w) {
 		if (this.network != null) {
@@ -86,6 +117,15 @@ class MATSimTest extends Test {
 		}
 	}
 
+	/**
+	 * Checks whether a {@code link} has doubtful link attributes (freespeed,
+	 * capacity, length or number of lanes set to 0.)
+	 * 
+	 * @param link
+	 *            the {@code link} to be checked
+	 * @return <code>true</code> if the {@code link} contains doubtful link
+	 *         attributes. <code>false</code> otherwise
+	 */
 	private boolean doubtfulAttributes(Link link) {
 		if (link.getFreespeed() == 0 || link.getCapacity() == 0
 				|| link.getLength() == 0 || link.getNumberOfLanes() == 0) {
@@ -94,6 +134,9 @@ class MATSimTest extends Test {
 		return false;
 	}
 
+	/**
+	 * Visits a node and stores it's Id.
+	 */
 	@Override
 	public void visit(Node n) {
 		if (this.network != null) {
@@ -109,6 +152,9 @@ class MATSimTest extends Test {
 		}
 	}
 
+	/**
+	 * Ends the test. Errors and warnings are created in this method.
+	 */
 	@Override
 	public void endTest() {
 
@@ -126,7 +172,8 @@ class MATSimTest extends Test {
 					}
 				}
 
-				String msg = "Duplicated Id " + (entry.getKey() + " not allowed.");
+				String msg = "Duplicated Id "
+						+ (entry.getKey() + " not allowed.");
 				TestError error = new TestError(this, Severity.ERROR, msg,
 						DUPLICATE_LINK_ID, entry.getValue(), segments);
 				errors.add(error);
@@ -137,7 +184,8 @@ class MATSimTest extends Test {
 		for (Entry<String, ArrayList<Node>> entry : nodeIds.entrySet()) {
 			if (entry.getValue().size() > 1) {
 
-				String msg = "Duplicated Id " +  (entry.getKey() + " not allowed.");
+				String msg = "Duplicated Id "
+						+ (entry.getKey() + " not allowed.");
 				TestError error = new TestError(this, Severity.ERROR, msg,
 						DUPLICATE_NODE_ID, entry.getValue(), entry.getValue());
 				errors.add(error);
@@ -151,10 +199,10 @@ class MATSimTest extends Test {
 
 	@Override
 	public boolean isFixable(TestError testError) {
-		 if (testError.getCode() == DUPLICATE_LINK_ID
-		 || testError.getCode() == DUPLICATE_NODE_ID) {
-		 return true;
-		 }
+		if (testError.getCode() == DUPLICATE_LINK_ID
+				|| testError.getCode() == DUPLICATE_NODE_ID) {
+			return true;
+		}
 		return false;
 	}
 

@@ -84,7 +84,6 @@ class MATSimAction {
 				ImportDialog dialog = new ImportDialog();
 				JOptionPane pane = new JOptionPane(dialog,
 						JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
-				dialog.setOptionPane(pane);
 				JDialog dlg = pane.createDialog(Main.parent, tr("Import"));
 				dlg.setAlwaysOnTop(true);
 				dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

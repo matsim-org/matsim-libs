@@ -1,5 +1,6 @@
 package org.matsim.contrib.josm;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.openstreetmap.josm.Main;
@@ -83,12 +84,23 @@ public class MapRenderer extends StyledMapRenderer {
 											textOffset(way),
 											Properties.MATSIMCOLOR, 0.f, null));
 						}
-						super.drawWay(way, Properties.MATSIMCOLOR, line,
-								dashes, dashedColor, Properties.wayOffset * -1,
-								showOrientation, showHeadArrowOnly, !way
-										.hasTag("highway", OsmConvertDefaults
-												.getDefaults().keySet()),
-								onewayReversed);
+						if(way.hasTag("modes", TransportMode.pt)) {
+							float[] dashPhase = {9.f};
+							BasicStroke trainDashes = new BasicStroke(2, 0, 1, 10.f, dashPhase, 9.f);
+							super.drawWay(way, Properties.MATSIMCOLOR, line,
+									trainDashes, Color.white, Properties.wayOffset * -1,
+									showOrientation, showHeadArrowOnly, !way
+											.hasTag("highway", OsmConvertDefaults
+													.getDefaults().keySet()),
+									onewayReversed);
+						} else {
+							super.drawWay(way, Properties.MATSIMCOLOR, line,
+									dashes, dashedColor, Properties.wayOffset * -1,
+									showOrientation, showHeadArrowOnly, !way
+											.hasTag("highway", OsmConvertDefaults
+													.getDefaults().keySet()),
+									onewayReversed);
+						}
 						return;
 					} else {
 						if (Properties.showIds) {
@@ -147,6 +159,7 @@ public class MapRenderer extends StyledMapRenderer {
 			Main.pref.addPreferenceChangeListener(INSTANCE);
 		}
 
+		@SuppressWarnings("rawtypes")
 		@Override
 		public void preferenceChanged(PreferenceChangeEvent e) {
 			if (e.getKey().equalsIgnoreCase("matsim_showIds")) {

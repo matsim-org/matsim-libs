@@ -71,7 +71,7 @@ class ConvertTask extends PleaseWaitRunnable {
 		this.progressMonitor.setTicks(1);
 		this.progressMonitor.setCustomText("converting osm data..");
 
-		NewConverter.convertOsmLayer(((OsmDataLayer) layer).data, tempNetwork,
+		NewConverter.convertOsmLayer(((OsmDataLayer) layer), tempNetwork,
 				new HashMap<Way, List<Link>>(),
 				new HashMap<Link, List<WaySegment>>());
 		if (Main.pref.getBoolean("matsim_cleanNetwork")) {
