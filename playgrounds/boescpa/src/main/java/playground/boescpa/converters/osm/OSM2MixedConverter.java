@@ -36,8 +36,6 @@ import playground.boescpa.converters.osm.procedures.*;
 public class OSM2MixedConverter {
 
 	private static Logger log = Logger.getLogger(OSM2MixedConverter.class);
-	// TODO-boescpa write loggings...
-	// log.info("Reading network xml file...");
 
 	private final Network network;
 	private final TransitSchedule schedule;
@@ -64,6 +62,8 @@ public class OSM2MixedConverter {
 	 * Converts a given OSM network to a multimodal MATSim network with the help of a HAFAS schedule.
 	 */
 	public void convertOSM2MultimodalNetwork() {
+		log.info("Conversion from OSM to multimodal MATSim network...");
+
 		/*
 		 * Create the standard car network based on established OSM converter.
 		 * Create pt-network from OSM for pt-means which use street network.
@@ -93,8 +93,9 @@ public class OSM2MixedConverter {
 		 * have successfully run before this method was called.
 		 */
 		ptLinesCreator.createPTLines(hafasFile, network);
-	}
 
+		log.info("Conversion from OSM to multimodal MATSim network... done.");
+	}
 
 	/**
 	 * Writes the network and the schedule to the specified files.
@@ -103,7 +104,10 @@ public class OSM2MixedConverter {
 	 * @param outputSchedule			A string specifying the target schedule file.
 	 */
 	public void writeOutput(String outputMultimodalNetwork, String outputSchedule) {
+		log.info("Writing multimodal Network to " + outputMultimodalNetwork + "...");
 		new NetworkWriter(network).write(outputMultimodalNetwork);
+		log.info("Writing multimodal Schedule to " + outputSchedule + "...");
 		new TransitScheduleWriter(schedule).writeFile(outputSchedule);
+		log.info("Writing of Network and Schedule done.");
 	}
 }
