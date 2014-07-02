@@ -81,9 +81,9 @@ public class CongestionNoiseTollTravelDisutilityCalculator implements TravelDisu
 		/* The following is an estimate of the tolls that an agent would have to pay if choosing that link in the next
 		iteration i based on the tolls in iteration i-1 and i-2 */
 		
-		double linkExpectedTollNewValue = this.tollHandler.getAvgToll(link.getId(), time) + this.noiseTollHandler.getAvgToll(link.getId(), time);
-		log.info("congestion: " + this.tollHandler.getAvgToll(link.getId(), time));
-		log.info("noise: " + this.noiseTollHandler.getAvgToll(link.getId(), time));
+		double linkExpectedTollNewValue = this.tollHandler.getAvgToll(link.getId(), time) + ( this.noiseTollHandler.getAvgToll(link.getId(), time) * (-1) );
+//		log.info("congestion: " + this.tollHandler.getAvgToll(link.getId(), time));
+//		log.info("noise: " + this.noiseTollHandler.getAvgToll(link.getId(), time));
 		
 //		if (linkExpectedTollNewValue != 0 || linkExpectedTollOldValue != 0) {
 //			log.info("-----------> Person " + person.getId() + ": Expected toll (new value) on link " + link.getId() + " at " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS) + ": " + linkExpectedTollNewValue);

@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.utils.misc.Time;
 
 //
 //import analysis.shapes.IKGISAnalyzerPostAnalysis;
@@ -403,7 +404,7 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 							} else {
 								avgToll = 0.;
 							}
-//						log.info("linkId: " + linkId + " // timeBin: " + Time.writeTime(timeBin, Time.TIMEFORMAT_HHMMSS) + " // toll sum: " + tollSum + " // leaving agents: " + leavingAgents + " // avg toll: " + avgToll);
+//						log.info("(noise) linkId: " + linkId + " // timeBin: " + Time.writeTime(timeBin, Time.TIMEFORMAT_HHMMSS) + " // toll sum: " + tollSum + " // leaving agents: " + leavingAgents + " // avg toll: " + avgToll);
 					}
 					timeBin2avgToll.put(timeBin, avgToll);
 				}

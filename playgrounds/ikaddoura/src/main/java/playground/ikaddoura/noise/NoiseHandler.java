@@ -77,11 +77,20 @@ public class NoiseHandler implements LinkLeaveEventHandler , ActivityEndEventHan
 		
 	private SpatialInfo spatialInfo;
 	private NoiseImmissionCalculator noiseImmissionCalculator;
+	private double annualCostRate;
 	
-	public NoiseHandler (Scenario scenario, SpatialInfo spatialInfo) {
+	public NoiseHandler (Scenario scenario, SpatialInfo spatialInfo, double annualCostRate) {
 		this.scenario = scenario;
 		this.spatialInfo = spatialInfo;
 		this.noiseImmissionCalculator = new NoiseImmissionCalculator(spatialInfo);
+		
+		if (annualCostRate == 0.) {
+			log.warn("Annual cost rate is zero. Setting the annual cost rate by the EWS value: (85.0/(1.95583))*(Math.pow(1.02, (2014-1995))).");
+			this.annualCostRate = (85.0/(1.95583))*(Math.pow(1.02, (2014-1995)));
+
+		} else {
+			this.annualCostRate = annualCostRate;
+		}
 	}
 	
 	@Override
@@ -448,8 +457,8 @@ public class NoiseHandler implements LinkLeaveEventHandler , ActivityEndEventHan
 						affectedAgentUnits = receiverPointId2timeInterval2affectedAgentUnits.get(receiverPointId).get(timeInterval);
 					} 	
 				}
-				double damageCost = ComputationFormulae.calculateDamageCosts(noiseImmission,affectedAgentUnits,timeInterval);
-				double damageCostPerAffectedAgentUnit = ComputationFormulae.calculateDamageCosts(noiseImmission,1.,timeInterval);
+				double damageCost = calculateDamageCosts(noiseImmission,affectedAgentUnits,timeInterval);
+				double damageCostPerAffectedAgentUnit = calculateDamageCosts(noiseImmission,1.,timeInterval);
 				if(receiverPointId2timeInterval2damageCost.containsKey(receiverPointId)) {
 					Map<Double,Double> timeInterval2damageCost = receiverPointId2timeInterval2damageCost.get(receiverPointId);
 					Map<Double,Double> timeInterval2damageCostPerAffectedAgentUnit = receiverPointId2timeInterval2damageCostPerAffectedAgentUnit.get(receiverPointId);
@@ -622,6 +631,51 @@ public class NoiseHandler implements LinkLeaveEventHandler , ActivityEndEventHan
 		} else { 
 			// do nothing
 		}
+	}
+	
+	private double calculateDamageCosts(double noiseImmission, double affectedAgentUnits , double timeInterval) {
+		String dayOrNight = "NIGHT";
+		if(timeInterval>6*3600 && timeInterval<=22*3600) {
+			dayOrNight = "DAY";
+		}
+		
+		double lautheitsgewicht = calculateLautheitsgewicht(noiseImmission, dayOrNight);  
+		
+		double laermEinwohnerGleichwert = lautheitsgewicht*affectedAgentUnits;
+		
+		double damageCosts = 0.;
+		if(dayOrNight == "DAY"){
+			damageCosts = (annualCostRate*laermEinwohnerGleichwert/(365))*(1.0/24.0);
+		}else if(dayOrNight == "NIGHT"){
+			damageCosts = (annualCostRate*laermEinwohnerGleichwert/(365))*(1.0/24.0);
+		}else{
+			throw new RuntimeException("Neither day nor night!");
+		}
+		return damageCosts;	
+	}
+
+	private double calculateLautheitsgewicht (double noiseImmission , String dayOrNight){
+		double lautheitsgewicht = 0;
+		
+		// TODO: Case differentiation for time intervals which overlap the boundaries
+		// TODO: investigate, if a fluid boundary instead of a hard boundary can improve the welfare
+		
+		if(dayOrNight == "DAY"){
+			if(noiseImmission<50){
+			}else{
+				lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 50));
+			}
+		}else if(dayOrNight == "NIGHT"){
+			if(noiseImmission<40){
+			}else{
+				lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 40));
+			}
+		}else{
+			throw new RuntimeException("Neither day nor night!");
+		}
+		
+		return lautheitsgewicht;
+		
 	}
 
 	public void writeNoiseEmissionStats(String fileName) {

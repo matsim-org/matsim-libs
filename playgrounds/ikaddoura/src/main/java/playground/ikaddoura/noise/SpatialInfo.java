@@ -125,7 +125,7 @@ public class SpatialInfo {
 			}
 		}
 		
-		System.out.println(receiverPointId2Coord.toString());
+//		System.out.println(receiverPointId2Coord.toString());
 		
 		// Alternative approach: Use the spatial distribution of the activity location to define the receiver points instead of regular grid.
 //		for(Coord newCoord : GetActivityCoords.allActivityCoords) {

@@ -51,6 +51,7 @@ public class CongestionNoisePricingControler {
 	
 	static String configFile;
 	static String runId; // congestion, noise, baseCase, congestionNoise
+	static double annualCostRate;
 			
 	public static void main(String[] args) throws IOException {
 				
@@ -61,10 +62,14 @@ public class CongestionNoisePricingControler {
 			
 			runId = args[1];
 			log.info("second argument (rund Id): "+ runId);
+			
+			annualCostRate = Double.valueOf(args[2]);
+			log.info("third argument (annual cost rate): "+ annualCostRate);	
 
 		} else {
 			configFile = "../../shared-svn/studies/lars/congestionNoise/config02.xml";
-			runId = "noise";
+			runId = "congestionNoise";
+			annualCostRate = (85.0/(1.95583))*(Math.pow(1.02, (2014-1995)));
 		}
 		
 		CongestionNoisePricingControler main = new CongestionNoisePricingControler();
@@ -89,7 +94,7 @@ public class CongestionNoisePricingControler {
 
 			SpatialInfo spatialInfo = new SpatialInfo( (ScenarioImpl) controler.getScenario());
 			
-			NoiseHandler noiseHandler = new NoiseHandler(controler.getScenario(), spatialInfo);
+			NoiseHandler noiseHandler = new NoiseHandler(controler.getScenario(), spatialInfo, annualCostRate);
 			NoiseTollHandler tollHandler = new NoiseTollHandler(controler.getScenario(), controler.getEvents(), spatialInfo, noiseHandler);
 			
 			NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(tollHandler);
@@ -102,7 +107,8 @@ public class CongestionNoisePricingControler {
 			log.info("Internalization of noise and congestion cost is enabled.");
 			
 			SpatialInfo spatialInfo = new SpatialInfo( (ScenarioImpl) controler.getScenario());
-			NoiseHandler noiseHandler = new NoiseHandler(controler.getScenario(), spatialInfo);
+			NoiseHandler noiseHandler = new NoiseHandler(controler.getScenario(), spatialInfo, annualCostRate);
+			
 			NoiseTollHandler noiseTollHandler = new NoiseTollHandler(controler.getScenario(), controler.getEvents(), spatialInfo, noiseHandler);
 
 			TollHandler congestionTollHandler = new TollHandler(controler.getScenario());

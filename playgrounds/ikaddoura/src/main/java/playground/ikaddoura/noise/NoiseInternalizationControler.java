@@ -24,7 +24,6 @@ package playground.ikaddoura.noise;
 
 import java.io.IOException;
 
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
@@ -35,6 +34,7 @@ public class NoiseInternalizationControler {
 //	private static final Logger log = Logger.getLogger(NoiseInternalizationControler.class);
 	
 	static String configFile = null;
+	double annualCostRate = (85.0/(1.95583))*(Math.pow(1.02, (2014-1995)));
 
 	public static void main(String[] args) throws IOException {
 		
@@ -67,7 +67,7 @@ public class NoiseInternalizationControler {
 		
 		SpatialInfo spatialInfo = new SpatialInfo( (ScenarioImpl) controler.getScenario());
 		
-		NoiseHandler noiseHandler = new NoiseHandler(controler.getScenario(), spatialInfo);
+		NoiseHandler noiseHandler = new NoiseHandler(controler.getScenario(), spatialInfo, this.annualCostRate);
 		NoiseTollHandler tollHandler = new NoiseTollHandler(controler.getScenario(), controler.getEvents(), spatialInfo, noiseHandler);
 		
 		NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(tollHandler);
