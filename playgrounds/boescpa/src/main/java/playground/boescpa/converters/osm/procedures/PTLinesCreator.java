@@ -40,6 +40,14 @@ public abstract class PTLinesCreator {
 		this.schedule = schedule;
 	}
 
+	/**
+	 * Create all pt-lines of all types using the street network and using the created pt-stations.
+	 * Create routes for the pt-lines.
+	 * Write schedule from HAFAS-knowledge.
+	 *
+	 * @param hafasFile
+	 * @param network
+	 */
 	public void createPTLines(String hafasFile, Network network) {
 		log.info("Creating PT lines...");
 		createPTLines(hafasFile);

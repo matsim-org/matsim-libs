@@ -41,6 +41,15 @@ public abstract class PTStationCreator {
 		this.schedule = schedule;
 	}
 
+	/**
+	 * Create pt-Stations from OSM network.
+	 * Check and complement pt stations with HAFAS-knowledge.
+	 * Link pt stations to the network.
+	 *
+	 * @param osmFile
+	 * @param hafasFile
+	 * @param network
+	 */
 	public final void createPTStations(String osmFile, String hafasFile, Network network) {
 		log.info("Creating PT stations...");
 		createPTStations(osmFile);

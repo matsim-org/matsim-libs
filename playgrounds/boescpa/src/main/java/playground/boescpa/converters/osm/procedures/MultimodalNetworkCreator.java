@@ -41,6 +41,13 @@ public abstract class MultimodalNetworkCreator {
 		this.network = network;
 	}
 
+	/**
+	 * Create the standard car network based on established OSM converter.
+	 * Create pt-network from OSM for those pt-means which use street network.
+	 * Merge the two networks.
+	 *
+	 * @param osmFile
+	 */
 	public final void createMultimodalNetwork(String osmFile) {
 		log.info("Creating multimodal network...");
 		Network carNetwork = createStreetNetwork(osmFile);
@@ -57,7 +64,8 @@ public abstract class MultimodalNetworkCreator {
 	protected abstract Network createStreetNetwork(String osmFile);
 
 	/**
-	 * Create a standard pt network from the given osmFile based on experimental OSM converters.
+	 * Create a standard pt network from the given osmFile based on experimental OSM converters
+	 * for those pt-means which use street network.
 	 *
 	 * @return standard pt network
 	 */

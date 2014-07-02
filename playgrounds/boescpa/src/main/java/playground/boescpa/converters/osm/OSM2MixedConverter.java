@@ -63,37 +63,9 @@ public class OSM2MixedConverter {
 	 */
 	public void convertOSM2MultimodalNetwork() {
 		log.info("Conversion from OSM to multimodal MATSim network...");
-
-		/*
-		 * Create the standard car network based on established OSM converter.
-		 * Create pt-network from OSM for pt-means which use street network.
-		 * Merge the two networks.
-		 */
 		multimodalNetworkCreator.createMultimodalNetwork(osmFile);
-
-		/*
-		 * Create pt-Stations from OSM network.
-		 * Check and complement pt stations with HAFAS-knowledge.
-		 * Link pt stations to the network.
-		 *
-		 * Assumes that
-		 * 	this.createMultimodalNetwork()
-		 * has successfully been run before.
-		 */
 		ptStationCreator.createPTStations(osmFile, hafasFile, network);
-
-		/*
-		 * Create all pt-lines of all types using the street network and using the created pt-stations.
-		 * Create routes for the pt-lines.
-		 * Write schedule from HAFAS-knowledge.
-		 * <p/>
-		 * Assumes that
-		 * this.createMultimodalNetwork() and
-		 * this.createPTStations()
-		 * have successfully run before this method was called.
-		 */
 		ptLinesCreator.createPTLines(hafasFile, network);
-
 		log.info("Conversion from OSM to multimodal MATSim network... done.");
 	}
 
