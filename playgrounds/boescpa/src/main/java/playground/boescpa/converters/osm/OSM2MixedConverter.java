@@ -61,40 +61,40 @@ public class OSM2MixedConverter {
 	}
 
 	/**
-	 * Create the standard car network based on established OSM converter.
-	 * Create pt-network from OSM for pt-means which use street network.
-	 * Merge the two networks.
+	 * Converts a given OSM network to a multimodal MATSim network with the help of a HAFAS schedule.
 	 */
-	public void createMultimodalNetwork() {
+	public void convertOSM2MultimodalNetwork() {
+		/*
+		 * Create the standard car network based on established OSM converter.
+		 * Create pt-network from OSM for pt-means which use street network.
+		 * Merge the two networks.
+		 */
 		multimodalNetworkCreator.createMultimodalNetwork(osmFile);
-	}
 
-	/**
-	 * Create pt-Stations from OSM network.
-	 * Check and complement pt stations with HAFAS-knowledge.
-	 * Link pt stations to the network.
-	 *
-	 * Assumes that
-	 * 	this.createMultimodalNetwork()
-	 * has successfully been run before.
-	 */
-	public void createPTStations() {
+		/*
+		 * Create pt-Stations from OSM network.
+		 * Check and complement pt stations with HAFAS-knowledge.
+		 * Link pt stations to the network.
+		 *
+		 * Assumes that
+		 * 	this.createMultimodalNetwork()
+		 * has successfully been run before.
+		 */
 		ptStationCreator.createPTStations(osmFile, hafasFile, network);
-	}
 
-	/**
-	 * Create all pt-lines of all types using the street network and using the created pt-stations.
-	 * Create routes for the pt-lines.
-	 * Write schedule from HAFAS-knowledge.
-	 *
-	 * Assumes that
-	 * 	this.createMultimodalNetwork() and
-	 * 	this.createPTStations()
-	 * have successfully run before this method was called.
-	 */
-	public void createPTLines() {
+		/*
+		 * Create all pt-lines of all types using the street network and using the created pt-stations.
+		 * Create routes for the pt-lines.
+		 * Write schedule from HAFAS-knowledge.
+		 * <p/>
+		 * Assumes that
+		 * this.createMultimodalNetwork() and
+		 * this.createPTStations()
+		 * have successfully run before this method was called.
+		 */
 		ptLinesCreator.createPTLines(hafasFile, network);
 	}
+
 
 	/**
 	 * Writes the network and the schedule to the specified files.

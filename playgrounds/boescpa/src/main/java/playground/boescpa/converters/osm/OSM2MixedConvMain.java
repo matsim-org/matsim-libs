@@ -50,11 +50,7 @@ public class OSM2MixedConvMain {
 
 		// **************** Convert ****************
 		OSM2MixedConverter converter = new OSM2MixedConverter(network, schedule, osmFile, hafasFile);
-
-		converter.createMultimodalNetwork();
-		converter.createPTStations();
-		converter.createPTLines();
-
+		converter.convertOSM2MultimodalNetwork();
 		converter.writeOutput(outputMultimodalNetwork, outputSchedule);
 	}
 
