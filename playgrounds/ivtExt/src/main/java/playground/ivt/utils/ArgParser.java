@@ -41,22 +41,6 @@ public class ArgParser {
 
 	private boolean locked = false;
 
-	// for backward compatibility only...
-	private String[] args;
-	public ArgParser() {
-		this( null );
-	}
-	
-	@Deprecated
-	public  ArgParser( final String... args ) {
-		this.args = args;
-	}
-	
-	@Deprecated
-	public Args args() {
-		return parseArgs( args );
-	}
-	
 	public void setDefaultValue( final String longName, final String shortName, final String v ) {
 		checkLock();
 		final Id id = switchFactory.addSwitch( longName , shortName );

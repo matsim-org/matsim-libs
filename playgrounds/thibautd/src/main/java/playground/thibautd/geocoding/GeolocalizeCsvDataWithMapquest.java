@@ -72,19 +72,21 @@ public class GeolocalizeCsvDataWithMapquest {
 	private static final char QUOTE = '"';
 
 	public static void main(final String[] args) {
-		main( new ArgParser( args ) );
+		final ArgParser parser = new ArgParser();
+		
+		parser.setDefaultValue( "-i" , null );
+		parser.setDefaultValue( "-o" , null );
+		parser.setDefaultValue( "-r" , null );
+		parser.setDefaultValue( "-k" , null );
+		
+		main( parser.parseArgs( args ) );
 	}
 
-	private static void main(final ArgParser argParser) {
-		argParser.setDefaultValue( "-i" , null );
-		argParser.setDefaultValue( "-o" , null );
-		argParser.setDefaultValue( "-r" , null );
-		argParser.setDefaultValue( "-k" , null );
-
-		final String inFile = argParser.args().getValue( "-i" );
-		final String outFile = argParser.args().getValue( "-o" );
-		final String rejectFile = argParser.args().getValue( "-r" );
-		final String key = argParser.args().getValue( "-k" );
+	private static void main(final ArgParser.Args args) {
+		final String inFile = args.getValue( "-i" );
+		final String outFile = args.getValue( "-o" );
+		final String rejectFile = args.getValue( "-r" );
+		final String key = args.getValue( "-k" );
 		
 		final Iterator<Address> addressProvider = new CsvParser( inFile );
 		final CsvWriter successWriter = new CsvWriter( outFile );

@@ -50,36 +50,20 @@ public class DiluteSocialNetworkedPopulation {
 		area_all_alters;
 	}
 
-	private static void main(final ArgParser args) throws IOException {
-		args.setDefaultValue( "--xcenter" , "683518.0" );
-		args.setDefaultValue( "--ycenter" , "246836.0" );
-
-		args.setDefaultValue( "--radius" , "30000" );
-
-		args.setDefaultValue( "--dilution-type" , "area_only" );
-
-		args.setDefaultValue( "--netfile" , null ); // unused.
-		args.setDefaultValue( "--inpopfile" , null );
-		args.setDefaultValue( "--insocnet" , null );
-		args.setDefaultValue( "--outdir" , null );
+	private static void main(final ArgParser.Args args) throws IOException {
 
 		final Coord center =
 			new CoordImpl(
-					Double.parseDouble(
-						args.args().getValue( "--xcenter" ) ),
-					Double.parseDouble(
-						args.args().getValue( "--ycenter" ) ) );
+					args.getDoubleValue( "--xcenter" ),
+					args.getDoubleValue( "--ycenter" ) );
 
-		final double radius =
-			Double.parseDouble(
-					args.args().getValue(
-						"--radius" ) );
+		final double radius = args.getDoubleValue( "--radius" );
 
-		final DilutionType dilutionType = args.args().getEnumValue( "--dilution-type" , DilutionType.class );
+		final DilutionType dilutionType = args.getEnumValue( "--dilution-type" , DilutionType.class );
 
-		final String inpopfile = args.args().getValue( "--inpopfile" );
-		final String insocnet = args.args().getValue( "--insocnet" );
-		final String outdir = args.args().getValue( "--outdir" );
+		final String inpopfile = args.getValue( "--inpopfile" );
+		final String insocnet = args.getValue( "--insocnet" );
+		final String outdir = args.getValue( "--outdir" );
 
 		MoreIOUtils.initOut( outdir );
 
@@ -130,7 +114,21 @@ public class DiluteSocialNetworkedPopulation {
 	}
 
 	public static void main(final String[] args) throws IOException {
-		main( new ArgParser( args ) );
+		final ArgParser parser = new ArgParser();
+		
+		parser.setDefaultValue( "--xcenter" , "683518.0" );
+		parser.setDefaultValue( "--ycenter" , "246836.0" );
+
+		parser.setDefaultValue( "--radius" , "30000" );
+
+		parser.setDefaultValue( "--dilution-type" , "area_only" );
+
+		parser.setDefaultValue( "--netfile" , null ); // unused.
+		parser.setDefaultValue( "--inpopfile" , null );
+		parser.setDefaultValue( "--insocnet" , null );
+		parser.setDefaultValue( "--outdir" , null );
+		
+		main( parser.parseArgs( args ) );
 	}
 }
 

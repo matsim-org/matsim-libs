@@ -32,22 +32,25 @@ import playground.thibautd.utils.MoreIOUtils;
  * @author thibautd
  */
 public class ExecutePlans {
-	public static void main(final String[] argParser) {
-		main( new ArgParser( argParser ) );
+	public static void main(final String[] args) {
+		final ArgParser argParser = new ArgParser();
+		
+		argParser.setDefaultValue( "--folder-for-input" , "-f" , null );
+		argParser.setDefaultValue( "--output-folder" , "-o" , null );
+		argParser.setDefaultValue( "--simulation-type" , "-t" , ""+SimulationType.households );
+		
+		main( argParser.parseArgs( args ) );
 	}
 
 	private static enum SimulationType {
 		households, socialnet;
 	}
 
-	private static void main(final ArgParser argParser) {
-		argParser.setDefaultValue( "--folder-for-input" , "-f" , null );
-		argParser.setDefaultValue( "--output-folder" , "-o" , null );
-		argParser.setDefaultValue( "--simulation-type" , "-t" , ""+SimulationType.households );
+	private static void main(final ArgParser.Args args) {
 
-		final String folder = argParser.args().getValue( "-f" );
-		final String output = argParser.args().getValue( "-o" );
-		final SimulationType simType = argParser.args().getEnumValue( "-t" , SimulationType.class );
+		final String folder = args.getValue( "-f" );
+		final String output = args.getValue( "-o" );
+		final SimulationType simType = args.getEnumValue( "-t" , SimulationType.class );
 
 		MoreIOUtils.checkDirectory( output );
 
