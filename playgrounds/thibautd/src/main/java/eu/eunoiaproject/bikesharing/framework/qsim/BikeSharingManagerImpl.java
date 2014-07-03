@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -55,10 +56,21 @@ public class BikeSharingManagerImpl implements BikeSharingManager {
 			new LinkedHashMap<Id, List<MutableStatefulBikeSharingFacility>>();
 		this.facilitiesAtLinks = Collections.unmodifiableMap( linkMap );
 
-
+		// this is used when sampling bikes. As the number of bikes per stations
+		// is rather small, rounding by below for all stations results in a dramatic
+		// loss in capacity: for instance, with 100 stations with 15 bikes, sampling
+		// 10% results in an overall number of bikes of 100, instead of the ideal 150.
+		// To cope with this, numbers are rounded up or down randomly, with a probability
+		// proportional to their decimal part.
+		// The RNG is always initialized with the same seed, so that number of bikes
+		// and capacity of stations is stable between iterations.
+		final Random random = new Random( 1234 );
 		for ( BikeSharingFacility f : input.getFacilities().values() ) {
 			final MutableStatefulBikeSharingFacility facility =
-				new MutableStatefulBikeSharingFacility( config , f );
+				new MutableStatefulBikeSharingFacility(
+						random.nextDouble(),
+						config,
+						f );
 			map.put( f.getId() , facility );
 			MapUtils.getList(
 					f.getLinkId(),
@@ -114,12 +126,35 @@ class MutableStatefulBikeSharingFacility implements StatefulBikeSharingFacility 
 	private final int capacity;
 
 	public MutableStatefulBikeSharingFacility(
+			final double random,
 			final BikeSharingConfigGroup config,
 			final BikeSharingFacility facility) {
 		this.facility = facility;
-		this.numberOfBikes = (int) (config.getInitialBikesRate() * facility.getInitialNumberOfBikes());
-		this.capacity = (int) (config.getCapacityRate() * facility.getCapacity());
+		this.numberOfBikes =
+			round(
+				facility.getInitialNumberOfBikes(),
+				config.getInitialBikesRate(),
+				random );
+		this.capacity =
+			round(
+				facility.getCapacity(),
+				config.getCapacityRate(),
+				random );
 		if ( numberOfBikes < 0 ) throw new IllegalArgumentException( "negative initial number of bikes "+numberOfBikes );
+	}
+
+	private static int round(
+			final int value,
+			final double rate,
+			final double random) {
+		if ( rate == 1 ) return value;
+		
+		final double rated = rate * value;
+	
+		final int integral = (int) rated;
+		final double decimal = rated - integral;
+
+		return random < decimal ? integral : integral + 1;
 	}
 
 	@Override
