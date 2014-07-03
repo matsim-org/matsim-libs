@@ -27,6 +27,11 @@ package playground.ikaddoura.noise;
 //
 // L_m,e ist der Mittelungspegel im Abstand von 25m von der Achse der Schallausbreitung
 
+/**
+ * @author lkroeger
+ *
+ */
+
 public class Emissionspegel {
 	
 	public static double calculateEmissionspegel(int M , double p , double vCar , double vLorry) {

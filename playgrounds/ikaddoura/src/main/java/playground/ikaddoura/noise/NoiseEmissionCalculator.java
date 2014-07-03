@@ -22,16 +22,21 @@
  */
 package playground.ikaddoura.noise;
 
-//Der Beurteilungspegel L_r ist bei Straßenverkehrsgeräuschen dem Mittelungspegel L_m gleich.
+//Der Beurteilungspegel L_r ist bei Straßenverkehrsgeräuschen gleich dem Mittelungspegel L_m.
 //L_r = L_m = 10 * lg(( 1 / T_r ) * (Integral)_T_r(10^(0,1*1(t))dt))
 //
 //L_m,e ist der Mittelungspegel im Abstand von 25m von der Achse der Schallausbreitung
+
+/**
+ * @author lkroeger
+ *
+ */
 
 public class NoiseEmissionCalculator {
 	
 public static double calculateEmissionspegel(int M , double p , double vCar , double vLorry) {
 		
-		// M ... Verkehrsstärke
+		// M ... Verkehrsstaerke
 		// p ... Lkw-Anteil
 		
 		double Emissionspegel = 0.0;

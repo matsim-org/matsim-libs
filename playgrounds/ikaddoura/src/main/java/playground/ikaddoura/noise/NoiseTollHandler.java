@@ -40,10 +40,13 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.misc.Time;
-
-//
 //import analysis.shapes.IKGISAnalyzerPostAnalysis;
 //import analysis.shapes.IKNetworkPopulationWriter;
+
+/**
+ * @author lkroeger
+ *
+ */
 
 public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedHandler , LinkLeaveEventHandler {
 

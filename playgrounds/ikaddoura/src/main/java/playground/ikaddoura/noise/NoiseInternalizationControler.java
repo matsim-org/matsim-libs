@@ -30,6 +30,11 @@ import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.ikaddoura.internalizationCar.WelfareAnalysisControlerListener;
 
+/**
+ * @author lkroeger
+ *
+ */
+
 public class NoiseInternalizationControler {
 //	private static final Logger log = Logger.getLogger(NoiseInternalizationControler.class);
 	

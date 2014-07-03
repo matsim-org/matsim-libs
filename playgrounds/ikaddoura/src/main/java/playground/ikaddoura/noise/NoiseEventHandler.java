@@ -24,6 +24,11 @@ package playground.ikaddoura.noise;
 
 import org.matsim.core.events.handler.EventHandler;
 
+/**
+ * @author lkroeger
+ *
+ */
+
 public interface NoiseEventHandler extends EventHandler{
 	public void handleEvent (NoiseEvent event);
 }

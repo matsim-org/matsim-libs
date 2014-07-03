@@ -30,11 +30,11 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
-
 /**
  * @author lkroeger
  *
  */
+
 public class NoiseTollTravelDisutilityCalculator implements TravelDisutility{
 
 //	private static final Logger log = Logger.getLogger(TollTravelDisutilityCalculator.class);

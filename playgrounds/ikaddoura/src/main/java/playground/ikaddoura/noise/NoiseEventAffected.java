@@ -25,6 +25,11 @@ package playground.ikaddoura.noise;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 
+/**
+ * @author lkroeger
+ *
+ */
+
 public final class NoiseEventAffected extends Event {
 
 	public final static String EVENT_TYPE = "noiseEventAffected";

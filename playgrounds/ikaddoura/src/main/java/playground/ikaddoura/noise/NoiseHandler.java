@@ -43,6 +43,11 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 
+/**
+ * @author lkroeger
+ *
+ */
+
 public class NoiseHandler implements LinkLeaveEventHandler , ActivityEndEventHandler , ActivityStartEventHandler {
 
 	private static final Logger log = Logger.getLogger(NoiseHandler.class);

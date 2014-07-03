@@ -25,6 +25,11 @@ package playground.ikaddoura.noise;
 import org.matsim.api.core.v01.Id;
 import org.w3c.dom.events.Event;
 
+/**
+ * @author lkroeger
+ *
+ */
+
 public interface NoiseEvent_Interface extends Event {
 
 	public final static String EVENT_TYPE = "noiseEvent";

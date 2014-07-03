@@ -24,6 +24,11 @@ package playground.ikaddoura.noise;
 
 //import org.apache.log4j.Logger;
 
+/**
+ * @author lkroeger
+ *
+ */
+
 public class GetAngle {
 	
 //	private static final Logger log = Logger.getLogger(GetAngle.class);

@@ -22,6 +22,11 @@
  */
 package playground.ikaddoura.noise;
 
+/**
+ * @author lkroeger
+ *
+ */
+
 public class NoiseConfig {
 	
 	public static String getRLSMethod() {

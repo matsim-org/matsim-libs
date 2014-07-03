@@ -31,6 +31,11 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 
+/**
+ * @author lkroeger
+ *
+ */
+
 public class NoiseInternalizationControlerListener implements AfterMobsimListener , IterationEndsListener , StartupListener {
 	private static final Logger log = Logger.getLogger(NoiseInternalizationControlerListener.class);
 	
