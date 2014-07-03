@@ -24,7 +24,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -53,8 +56,11 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.PtConstants;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
+import playground.ivt.utils.AcceptAllFilter;
 import playground.ivt.utils.ArgParser;
+import playground.ivt.utils.SubpopulationFilter;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
 
@@ -62,6 +68,9 @@ import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
  * @author thibautd
  */
 public class ExtractTripModeShares20kmFromBellevue {
+	private static final Logger log =
+		Logger.getLogger(ExtractTripModeShares20kmFromBellevue.class);
+
 	private static final Coord BELLEVUE_COORD = new CoordImpl( 683518 , 246836 );
 	private static final double radius = 20000;
 	private static final StageActivityTypes STAGES =
@@ -91,21 +100,35 @@ public class ExtractTripModeShares20kmFromBellevue {
 	private static final Filter FILTER = true ? new ODFilter() : new HomeCoordFilter();
 
 	public static void main(final String[] args) throws IOException {
-		main( new ArgParser( args ) );
+		final ArgParser parser = new ArgParser();
+
+		parser.setDefaultValue( "-p" , null );
+		parser.setDefaultValue( "-o" , null );
+		parser.setDefaultValue( "-f" , null );
+		parser.setDefaultValue( "-n" , null );
+		parser.setDefaultValue( "-a" , null );
+		parser.setDefaultValue( "-s" , null );
+
+		main( parser.parseArgs( args ) );
 	}
 
-	private static void main(final ArgParser args) throws IOException {
-		args.setDefaultValue( "-p" , null );
-		args.setDefaultValue( "-o" , null );
-		args.setDefaultValue( "-f" , null );
-		args.setDefaultValue( "-n" , null );
-
-		final String plansFile = args.args().getValue( "-p" );
-		final String outputFile = args.args().getValue( "-o" );
+	private static void main(final ArgParser.Args args) throws IOException {
+		final String plansFile = args.getValue( "-p" );
+		final String outputFile = args.getValue( "-o" );
 		// for V4 or distance computation: optional
-		final String networkFile = args.args().getValue( "-n" );
+		final String networkFile = args.getValue( "-n" );
 		// useful for V4 only: optional
-		final String facilitiesFile = args.args().getValue( "-f" );
+		final String facilitiesFile = args.getValue( "-f" );
+
+		final String attributesFile = args.getValue( "-a" );
+		final String subpopulation = args.getValue( "-s" );
+
+		if ( attributesFile != null ) {
+			log.info( "reading subpopulation attribute from "+attributesFile+", using subpopulation "+subpopulation );
+		}
+		else {
+			log.info( "not filtering subpopulations." );
+		}
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		if ( facilitiesFile != null ) new MatsimFacilitiesReader( scenario ).parse( facilitiesFile );
@@ -113,13 +136,23 @@ public class ExtractTripModeShares20kmFromBellevue {
 
 		final PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
 
+		if ( attributesFile != null ) {
+			new ObjectAttributesXmlReader( pop.getPersonAttributes() ).parse( attributesFile );
+		}
+
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outputFile );
 		writer.write( "agentId\tmain_mode\ttotal_dist" );
 
 		pop.setIsStreaming( true );
 		pop.addAlgorithm( new PersonAlgorithm() {
+			final playground.ivt.utils.Filter<Id> personFilter = attributesFile != null ?
+					new SubpopulationFilter(
+						pop.getPersonAttributes(),
+						subpopulation ) :
+					new AcceptAllFilter<Id>();
 			@Override
-			public void run(Person person) {
+			public void run(final Person person) {
+				if ( !personFilter.accept( person.getId() ) ) return;
 				final Plan plan = person.getSelectedPlan();
 				if ( !FILTER.acceptPlan( plan ) ) return;
 				for ( Trip trip : TripStructureUtils.getTrips( plan , STAGES ) ) {
