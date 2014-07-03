@@ -26,16 +26,13 @@ import org.matsim.core.config.experimental.ReflectiveModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
 
+import playground.ivt.matsim2030.Matsim2030Utils;
+import playground.thibautd.eunoia.scoring.Matsim2010BikeSharingScoringFunctionFactory;
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingWithoutRelocationQsimFactory;
-import eu.eunoiaproject.bikesharing.framework.router.BikeSharingTripRouterFactory;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingScenarioUtils;
 import eu.eunoiaproject.bikesharing.scoring.StepBasedFareConfigGroup;
 import eu.eunoiaproject.elevation.scoring.SimpleElevationScorerParameters;
-
-import playground.ivt.matsim2030.Matsim2030Utils;
-
-import playground.thibautd.eunoia.scoring.Matsim2010BikeSharingScoringFunctionFactory;
 
 /**
  * @author thibautd
@@ -64,7 +61,10 @@ public class RunZurichBikeSharingSimulation {
 		// I expect pretty nasty stuff to silently happen.
 		// Matsim2030Utils.initializeLocationChoice( controler );
 
-		controler.setTripRouterFactory( new BikeSharingTripRouterFactory( sc ) );
+		controler.setTripRouterFactory(
+				BikeSharingScenarioUtils.createTripRouterFactoryAndConfigureRouteFactories(
+					controler.getTravelDisutilityFactory(),
+					controler.getScenario() ) );
 
 		switch ( relocationGroup.getStrategy() ) {
 		case noRelocation:
@@ -115,6 +115,9 @@ public class RunZurichBikeSharingSimulation {
 	private static class DenivelationScoringConfigGroup extends ReflectiveModule {
 		public static final String GROUP_NAME = "denivelationScoring";
 
+		/**
+		 * not sure it actually makes sense / is possible to get this from other models...
+		 */
 		private double bikeMarginalUtilityOfDenivelation_m = 0;
 		private double walkMarginalUtilityOfDenivelation_m = 0;
 

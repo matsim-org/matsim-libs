@@ -20,20 +20,38 @@
 package eu.eunoiaproject.bikesharing.framework.scenario;
 
 import java.util.Arrays;
+import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
+import org.matsim.contrib.multimodal.router.DefaultDelegateFactory;
+import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
+import org.matsim.contrib.multimodal.router.TransitTripRouterFactory;
+import org.matsim.contrib.multimodal.router.util.LinkSlopesReader;
+import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteFactory;
+import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.util.FastDijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
-import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
-
 import playground.thibautd.utils.CollectionUtils;
+
+import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
+import eu.eunoiaproject.bikesharing.framework.router.BikeSharingTripRouterFactory;
 
 /**
  * Provides helper methods to load a bike sharing scenario.
@@ -95,6 +113,78 @@ public class BikeSharingScenarioUtils {
 
 	public static Scenario loadScenario( final String configFile , final Module... modules ) {
 		return loadScenario( loadConfig( configFile , modules) );
+	}
+
+	public static TripRouterFactory createTripRouterFactoryAndConfigureRouteFactories(
+			final TravelDisutilityFactory disutilityFactory,
+			final Scenario scenario) {
+		final MultiModalConfigGroup multimodalConfigGroup = (MultiModalConfigGroup)
+			scenario.getConfig().getModule(
+					MultiModalConfigGroup.GROUP_NAME );
+
+		if ( !multimodalConfigGroup.isMultiModalSimulationEnabled() ) {
+			return new BikeSharingTripRouterFactory( scenario );
+		}
+
+		final Map<Id, Double> linkSlopes =
+			new LinkSlopesReader().getLinkSlopes(
+					multimodalConfigGroup,
+					scenario.getNetwork());
+		final MultiModalTravelTimeFactory multiModalTravelTimeFactory =
+			new MultiModalTravelTimeFactory(
+					scenario.getConfig(),
+					linkSlopes );
+	
+		/*
+		 * Cannot get the factory from the controler, therefore create a new one as the controler does. 
+		 */
+		final TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
+		final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory =
+			builder.createDefaultLeastCostPathCalculatorFactory(
+					scenario );
+		final TransitRouterFactory transitRouterFactory =
+				scenario.getConfig().scenario().isUseTransit() ?
+					builder.createDefaultTransitRouter(
+							scenario ) :
+					null;
+		
+		/*
+		 * Use a ...
+		 * - defaultDelegateFactory for the QNetsim modes
+		 * - multiModalTripRouterFactory for the multi-modal modes
+		 * - transitTripRouterFactory for transit trips
+		 * 
+		 * Note that a FastDijkstraFactory is used for the multiModalTripRouterFactory
+		 * since ...
+		 * - only "fast" router implementations handle sub-networks correct
+		 * - AStarLandmarks uses link speed information instead of agent speeds
+		 */
+		final TripRouterFactory defaultDelegateFactory =
+			new DefaultDelegateFactory(
+					scenario,
+					leastCostPathCalculatorFactory);
+		final TripRouterFactory multiModalTripRouterFactory =
+			new MultimodalTripRouterFactory(
+					scenario,
+					multiModalTravelTimeFactory.createTravelTimes(), 
+					disutilityFactory,
+					defaultDelegateFactory,
+					new FastDijkstraFactory());
+		final TripRouterFactory transitTripRouterFactory =
+			new TransitTripRouterFactory(
+					scenario,
+					multiModalTripRouterFactory, 
+					transitRouterFactory);
+
+		// ensure that NetworkRoutes are created for legs using one of the simulated modes
+		final ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
+		for (String mode : org.matsim.core.utils.collections.CollectionUtils.stringToSet( multimodalConfigGroup.getSimulatedModes() )) {
+			routeFactory.setRouteFactory(mode, new LinkNetworkRouteFactory());
+		}
+
+		return new BikeSharingTripRouterFactory(
+				transitTripRouterFactory,
+				scenario );
 	}
 }
 
