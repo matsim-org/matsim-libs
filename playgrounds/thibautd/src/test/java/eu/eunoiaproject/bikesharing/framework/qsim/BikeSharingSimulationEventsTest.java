@@ -49,6 +49,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingWithoutRelocationQsimFactory;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingRoute;
@@ -66,6 +67,7 @@ public class BikeSharingSimulationEventsTest {
 
 	private static EventCounter runSimulationAndCountEvents() {
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		scenario.getConfig().addModule( new BikeSharingConfigGroup() );
 
 		final Id linkId = new IdImpl( "link" );
 		final Id stationId = new IdImpl( "station" );
