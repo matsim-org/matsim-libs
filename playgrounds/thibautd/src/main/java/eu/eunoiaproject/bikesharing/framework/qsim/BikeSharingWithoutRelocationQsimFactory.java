@@ -38,6 +38,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
 
 /**
@@ -87,9 +88,13 @@ public class BikeSharingWithoutRelocationQsimFactory implements MobsimFactory {
 		final BikeSharingManager bikeSharingManager =
 			systemWiseCapacities ?
 				new GlobalCapacityBikeSharingManager(
+						(BikeSharingConfigGroup) sc.getConfig().getModule(
+								BikeSharingConfigGroup.GROUP_NAME ),
 						(BikeSharingFacilities) sc.getScenarioElement(
 							BikeSharingFacilities.ELEMENT_NAME ) ) :
 				new BikeSharingManagerImpl(
+						(BikeSharingConfigGroup) sc.getConfig().getModule(
+								BikeSharingConfigGroup.GROUP_NAME ),
 						(BikeSharingFacilities) sc.getScenarioElement(
 							BikeSharingFacilities.ELEMENT_NAME ) );
 		final BikeSharingEngine bikeSharingEngine =

@@ -28,6 +28,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
 
@@ -43,7 +44,9 @@ public class BikeSharingManagerImpl implements BikeSharingManager {
 	private final Map<Id, List<MutableStatefulBikeSharingFacility>> facilitiesAtLinks;
 	private final CompositeListener listener = new CompositeListener();
 
-	public BikeSharingManagerImpl( final BikeSharingFacilities input ) {
+	public BikeSharingManagerImpl(
+			final BikeSharingConfigGroup config,
+			final BikeSharingFacilities input ) {
 		final Map<Id, MutableStatefulBikeSharingFacility> map =
 			new LinkedHashMap<Id, MutableStatefulBikeSharingFacility>();
 		this.facilities = Collections.unmodifiableMap( map );
@@ -55,7 +58,7 @@ public class BikeSharingManagerImpl implements BikeSharingManager {
 
 		for ( BikeSharingFacility f : input.getFacilities().values() ) {
 			final MutableStatefulBikeSharingFacility facility =
-				new MutableStatefulBikeSharingFacility( f );
+				new MutableStatefulBikeSharingFacility( config , f );
 			map.put( f.getId() , facility );
 			MapUtils.getList(
 					f.getLinkId(),
@@ -108,11 +111,14 @@ class MutableStatefulBikeSharingFacility implements StatefulBikeSharingFacility 
 	private final BikeSharingFacility facility;
 
 	private int numberOfBikes;
+	private final int capacity;
 
 	public MutableStatefulBikeSharingFacility(
+			final BikeSharingConfigGroup config,
 			final BikeSharingFacility facility) {
 		this.facility = facility;
-		this.numberOfBikes = facility.getInitialNumberOfBikes();
+		this.numberOfBikes = (int) (config.getInitialBikesRate() * facility.getInitialNumberOfBikes());
+		this.capacity = (int) (config.getCapacityRate() * facility.getCapacity());
 		if ( numberOfBikes < 0 ) throw new IllegalArgumentException( "negative initial number of bikes "+numberOfBikes );
 	}
 
@@ -154,7 +160,7 @@ class MutableStatefulBikeSharingFacility implements StatefulBikeSharingFacility 
 
 	@Override
 	public int getCapacity() {
-		return facility.getCapacity();
+		return capacity;
 	}
 
 	@Override

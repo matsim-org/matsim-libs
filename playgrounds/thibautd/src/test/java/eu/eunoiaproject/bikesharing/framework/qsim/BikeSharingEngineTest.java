@@ -46,6 +46,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingEngine;
 import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingManagerImpl;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingRoute;
@@ -102,6 +103,7 @@ public class BikeSharingEngineTest {
 		// create engine
 		final BikeSharingManager manager =
 			new BikeSharingManagerImpl(
+					new BikeSharingConfigGroup(),
 					facilities );
 		final BikeSharingEngine engine =
 			new BikeSharingEngine(

@@ -34,6 +34,9 @@ public class BikeSharingConfigGroup extends ReflectiveModule {
 	private String facilitiesFile = null;
 	private double searchRadius = 500;
 	private double ptSearchRadius = 5000;
+	
+	private double initialBikesRate = 1;
+	private double capacityRate = 1;
 
 	public BikeSharingConfigGroup() {
 		super( GROUP_NAME );
@@ -87,6 +90,28 @@ public class BikeSharingConfigGroup extends ReflectiveModule {
 	@StringSetter( "ptSearchRadius" )
 	public void setPtSearchRadius(double ptSearchRadius) {
 		this.ptSearchRadius = ptSearchRadius;
+	}
+
+	@StringGetter( "initialBikesRate" )
+	public double getInitialBikesRate() {
+		return initialBikesRate;
+	}
+
+	@StringSetter( "initialBikesRate" )
+	public void setInitialBikesRate(double initialBikesRate) {
+		if ( initialBikesRate < 0 || initialBikesRate > 1 ) throw new IllegalArgumentException( ""+initialBikesRate );
+		this.initialBikesRate = initialBikesRate;
+	}
+
+	@StringGetter( "capacityRate" )
+	public double getCapacityRate() {
+		return capacityRate;
+	}
+
+	@StringSetter( "capacityRate" )
+	public void setCapacityRate(double capacityRate) {
+		if ( capacityRate < 0 || capacityRate > 1 ) throw new IllegalArgumentException( ""+capacityRate );
+		this.capacityRate = capacityRate;
 	}
 }
 

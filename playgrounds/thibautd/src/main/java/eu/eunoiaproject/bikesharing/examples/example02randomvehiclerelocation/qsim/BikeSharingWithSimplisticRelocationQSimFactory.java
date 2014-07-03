@@ -41,6 +41,7 @@ import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingEngine;
 import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingManagerImpl;
 import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingManager;
 import eu.eunoiaproject.bikesharing.framework.qsim.FacilityStateChangeRepeater;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
 
 /**
@@ -78,6 +79,8 @@ public class BikeSharingWithSimplisticRelocationQSimFactory implements MobsimFac
 		// The rest is just re-organized according to my obsessions.
 		final BikeSharingManager bikeSharingManager =
 			new BikeSharingManagerImpl(
+					(BikeSharingConfigGroup) sc.getConfig().getModule(
+							BikeSharingConfigGroup.GROUP_NAME ),
 					(BikeSharingFacilities) sc.getScenarioElement(
 						BikeSharingFacilities.ELEMENT_NAME ) );
 		final BikeSharingEngine bikeSharingEngine =

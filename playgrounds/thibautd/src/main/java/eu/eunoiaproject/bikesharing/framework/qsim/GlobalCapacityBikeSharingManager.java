@@ -28,6 +28,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
 
@@ -49,7 +50,9 @@ public class GlobalCapacityBikeSharingManager implements BikeSharingManager {
 	private int capacity = 0;
 	private int bikesAtStations = 0;
 
-	public GlobalCapacityBikeSharingManager( final BikeSharingFacilities input ) {
+	public GlobalCapacityBikeSharingManager(
+			final BikeSharingConfigGroup config,
+			final BikeSharingFacilities input ) {
 		final Map<Id, DummyStatefulBikeSharingFacility> map =
 			new LinkedHashMap<Id, DummyStatefulBikeSharingFacility>();
 		this.facilities = Collections.unmodifiableMap( map );
@@ -68,6 +71,12 @@ public class GlobalCapacityBikeSharingManager implements BikeSharingManager {
 					linkMap ).add(
 						facility );
 		}
+
+		// XXX this is not equivalent to the number of bikes in the "detailed"
+		// version!
+		// However, this does look better (less rounding error)...
+		this.capacity *= config.getCapacityRate();
+		this.bikesAtStations *= config.getInitialBikesRate();
 	}
 
 	@Override
