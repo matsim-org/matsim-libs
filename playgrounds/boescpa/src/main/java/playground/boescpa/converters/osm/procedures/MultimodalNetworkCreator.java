@@ -57,15 +57,14 @@ public abstract class MultimodalNetworkCreator {
 	}
 
 	/**
-	 * Create a standard car network from the given osmFile based on established OSM converters.
+	 * Create a standard car network from the given osmFile.
 	 *
 	 * @return standard car network
 	 */
 	protected abstract Network createStreetNetwork(String osmFile);
 
 	/**
-	 * Create a standard pt network from the given osmFile based on experimental OSM converters
-	 * for those pt-means which use street network.
+	 * Create a standard pt network from the given osmFile for those pt-means which use street network.
 	 *
 	 * @return standard pt network
 	 */
