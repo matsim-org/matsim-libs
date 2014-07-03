@@ -35,6 +35,10 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.MatsimRandom;
@@ -353,14 +357,31 @@ public class Matsim2030Utils {
 				new LegDistanceDistributionWriter(
 					LEG_DISTANCE_DISTRIBUTION_FILE_NAME,
 					controler.getScenario().getNetwork()));
-		final TripRouter router = controler.getTripRouterFactory().instantiateAndConfigureTripRouter();
 		controler.addControlerListener(
-				new TripModeShares(
-					25, // write interval. TODO: pass by config
-					controler.getControlerIO(),
-					controler.getScenario(),
-					router.getMainModeIdentifier(),
-					router.getStageActivityTypes() ) );
+				new IterationStartsListener() {
+					boolean wasInit = false;
+					@Override
+					public void notifyIterationStarts(IterationStartsEvent event) {
+						if ( wasInit ) return;
+						wasInit = true;
+
+						// This is awful, but this is the only way to make sure
+						// all the elements of the Controler are initialized...
+						// We need to do it at the first iteration, because we need
+						// to be able to initialize the trip router, which requires
+						// the TravelTimeCalculator to be initialized, which is done
+						// at "prepareForSim", ie AFTER the startup event has been fired.
+						// What a mess.
+						final TripRouter router = controler.getTripRouterFactory().instantiateAndConfigureTripRouter();
+						controler.addControlerListener(
+							new TripModeShares(
+								25, // write interval. TODO: pass by config
+								controler.getControlerIO(),
+								controler.getScenario(),
+								router.getMainModeIdentifier(),
+								router.getStageActivityTypes() ) );
+					}
+				} );
 	}
 
 	public static void createEmptyDirectoryOrFailIfExists(final String directory) {
