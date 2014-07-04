@@ -19,13 +19,24 @@
  * *********************************************************************** */
 package playground.thibautd.scripts.scenariohandling;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.tools.MultiModalNetworkCreator;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.CollectionUtils;
+
+import playground.ivt.matsim2030.Matsim2030Utils;
 
 /**
  * @author thibautd
@@ -42,7 +53,34 @@ public class GenerateMultimodalNetworkFromSpeeds {
 		conf.setCreateMultiModalNetwork( true );
 		new MultiModalNetworkCreator( conf ).run( sc.getNetwork() );
 
+		// only keep the biggest connected component for non-vehicular modes.
+		// Otherwise, small clusters of low speed links, such as gas stations
+		// on the highway, pose problems.
+		final Set<String> nvModes = 
+				CollectionUtils.stringToSet( 
+					conf.getSimulatedModes() );
+		final Network subnet =
+			Matsim2030Utils.filterLinksWithAllModes(
+				sc.getNetwork(),
+				nvModes );
+
+		final Set<Id> biggestCluster = new NetworkCleaner().searchBiggestCluster( subnet ).keySet();
+		for ( Node n : sc.getNetwork().getNodes().values() ) {
+			if ( !biggestCluster.remove( n.getId() ) ) {
+				for ( Link l : n.getInLinks().values() ) removeModes( l , nvModes );
+				for ( Link l : n.getOutLinks().values() ) removeModes( l , nvModes );
+			}
+		}
+
 		new NetworkWriter( sc.getNetwork() ).write( outputNetwork );
+	}
+
+	private static void removeModes(
+			final Link l,
+			final Set<String> nvModes) {
+		final Set<String> modes = new HashSet<String>( l.getAllowedModes() );
+		modes.removeAll( nvModes );
+		if ( l.getAllowedModes().size() != modes.size() ) l.setAllowedModes( modes );
 	}
 }
 
