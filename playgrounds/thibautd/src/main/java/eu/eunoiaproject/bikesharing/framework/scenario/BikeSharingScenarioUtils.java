@@ -25,12 +25,8 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
-import org.matsim.contrib.multimodal.router.DefaultDelegateFactory;
-import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
-import org.matsim.contrib.multimodal.router.TransitTripRouterFactory;
 import org.matsim.contrib.multimodal.router.util.LinkSlopesReader;
 import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
-import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -39,19 +35,16 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.RouteFactory;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.util.FastDijkstraFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.thibautd.router.multimodal.AccessEgressMultimodalTripRouterFactory;
 import playground.thibautd.router.multimodal.AccessEgressNetworkBasedTeleportationRouteFactory;
 import playground.thibautd.utils.CollectionUtils;
-
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.framework.router.BikeSharingTripRouterFactory;
 
