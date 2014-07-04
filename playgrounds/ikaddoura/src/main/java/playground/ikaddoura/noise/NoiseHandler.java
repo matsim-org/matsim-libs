@@ -101,6 +101,8 @@ public class NoiseHandler implements LinkLeaveEventHandler , ActivityEndEventHan
 	@Override
 	public void reset(int iteration) {
 		
+		receiverPointId2ListOfHomeAgents.clear();
+		receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType.clear();
 		receiverPointId2personId2actNumber2activityStartAndActivityEnd.clear();
 		personId2actNumber2receiverPointId2activityStartAndActivityEnd.clear();
 		personId2actNumber2actType.clear();
@@ -117,6 +119,7 @@ public class NoiseHandler implements LinkLeaveEventHandler , ActivityEndEventHan
 		hdvVehicles.clear();
 		linkId2linkLeaveEvents.clear();
 		linkId2linkLeaveEventsCar.clear();
+		linkId2linkLeaveEventsHdv.clear();
 		linkId2linkLeaveEvents.clear();
 		linkId2timeInterval2linkLeaveEvents.clear();
 		linkId2timeInterval2linkLeaveEventsCar.clear();
