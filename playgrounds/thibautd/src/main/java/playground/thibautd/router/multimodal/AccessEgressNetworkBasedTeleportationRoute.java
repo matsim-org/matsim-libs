@@ -145,7 +145,7 @@ public class AccessEgressNetworkBasedTeleportationRoute implements GenericRoute 
 
 		json.put( "links" , new JSONArray( CollectionUtils.toString( links ) ) );
 
-		return json.toString( 4 );
+		return json.toString( );
 	}
 
 	@Override
@@ -187,6 +187,7 @@ public class AccessEgressNetworkBasedTeleportationRoute implements GenericRoute 
 				getStartLinkId(),
 				getRouteDescription(),
 				getEndLinkId() );
+		clone.setDistance( getDistance() );
 
 		return clone;
 	}
