@@ -34,7 +34,9 @@ import org.matsim.core.config.Module;
 public class TravelTimeCalculatorConfigGroup extends Module {
 
 	public static final String GROUPNAME = "travelTimeCalculator";
-
+	
+	public static enum TravelTimeCalculatorType {TravelTimeCalculatorArray,TravelTimeCalculatorHashMap} ;
+	
 	private static final String TRAVEL_TIME_CALCULATOR = "travelTimeCalculator";
 	private static final String TRAVEL_TIME_BIN_SIZE = "travelTimeBinSize";
 	private static final String TRAVEL_TIME_AGGREGATOR = "travelTimeAggregator";
@@ -46,7 +48,7 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 	private static final String ANALYZEDMODES = "analyzedModes";
 	private static final String FILTERMODES = "filterModes";
 
-	private String travelTimeCalculator = "TravelTimeCalculatorArray";
+	private TravelTimeCalculatorType travelTimeCalculator = TravelTimeCalculatorType.TravelTimeCalculatorArray;
 	private String travelTimeAggregator = "optimistic";
 	private String travelTimeGetter = "average";
 	private int traveltimeBinSize = 15 * 60; // use a default of 15min time-bins for analyzing the travel times
@@ -64,7 +66,7 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 	@Override
 	public String getValue(final String key){
 		if (TRAVEL_TIME_CALCULATOR.equals(key)) {
-			return getTravelTimeCalculatorType();
+			return getTravelTimeCalculatorType().toString();
 		} else if (TRAVEL_TIME_AGGREGATOR.equals(key)) {
 			return getTravelTimeAggregatorType();
 		} else if (TRAVEL_TIME_GETTER.equals(key)) {
@@ -135,14 +137,20 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 		map.put(ANALYZEDMODES, "Transport modes that will be respected by the travel time collector. 'car' is default, which " +
 				"includes also bussed from the pt simulation module. Use this parameter in combination with 'filterModes' = true!");
 		map.put(FILTERMODES, "If true, link travel times from legs performed on modes not included in the 'analyzedModes' parameter are ignored.");
+		// === 
+		String str = null ;
+		for ( TravelTimeCalculatorType type : TravelTimeCalculatorType.values() ) {
+			str += type.toString() + " " ;
+		}
+		map.put( TRAVEL_TIME_CALCULATOR, "possible values: " + str ) ;
 		return map;
 	}
 
 	public void setTravelTimeCalculatorType(final String travelTimeCalculator){
-		this.travelTimeCalculator = travelTimeCalculator;
+		this.travelTimeCalculator = TravelTimeCalculatorType.valueOf( travelTimeCalculator ) ;
 	}
 
-	public String getTravelTimeCalculatorType(){
+	public TravelTimeCalculatorType getTravelTimeCalculatorType(){
 		return this.travelTimeCalculator;
 	}
 

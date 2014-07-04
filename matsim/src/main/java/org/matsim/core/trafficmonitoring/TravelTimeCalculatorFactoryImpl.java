@@ -23,6 +23,7 @@ package org.matsim.core.trafficmonitoring;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
+import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeCalculatorType;
 
 /**
  * @author dgrether
@@ -37,11 +38,22 @@ public class TravelTimeCalculatorFactoryImpl implements TravelTimeCalculatorFact
 		TravelTimeCalculator calculator = new TravelTimeCalculator(network, group);
 		
 		// set travelTimeData factory
-		if ("TravelTimeCalculatorArray".equals(group.getTravelTimeCalculatorType())) {
+//		if ("TravelTimeCalculatorArray".equals(group.getTravelTimeCalculatorType())) {
+//			calculator.setTravelTimeDataFactory(new TravelTimeDataArrayFactory(network, calculator.numSlots));
+//		} else if ("TravelTimeCalculatorHashMap".equals(group.getTravelTimeCalculatorType())) {
+//			calculator.setTravelTimeDataFactory(new TravelTimeDataHashMapFactory(network));
+//		} else {
+//			throw new RuntimeException(group.getTravelTimeCalculatorType() + " is unknown!");
+//		}
+		
+		switch ( group.getTravelTimeCalculatorType() ) {
+		case TravelTimeCalculatorArray:
 			calculator.setTravelTimeDataFactory(new TravelTimeDataArrayFactory(network, calculator.numSlots));
-		} else if ("TravelTimeCalculatorHashMap".equals(group.getTravelTimeCalculatorType())) {
+			break;
+		case TravelTimeCalculatorHashMap:
 			calculator.setTravelTimeDataFactory(new TravelTimeDataHashMapFactory(network));
-		} else {
+			break;
+		default:
 			throw new RuntimeException(group.getTravelTimeCalculatorType() + " is unknown!");
 		}
 		
