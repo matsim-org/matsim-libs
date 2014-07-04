@@ -43,6 +43,8 @@ public class PlanStrategyRegistrar {
 	// (1) I think there should be constants rather than Strings, because these Strings are used elsewhere in the code. kai, may'13
 	// (2) I think enums are better than Strings, since it allows to iterate through the registry.  kai, may'13
 	// (3) "Names" could be refactored into something else if appropriate. kai, may'13
+	// yyyy "non-innovative" strategies could actually be detected automatically by not having a "StrategyModule".  Cf. 
+	// the test for the "firstModule" in GenericPlanStrategyImpl.  Not possible via the interface, though.
 	
 	private PlanStrategyFactoryRegister register = new PlanStrategyFactoryRegister();
 
