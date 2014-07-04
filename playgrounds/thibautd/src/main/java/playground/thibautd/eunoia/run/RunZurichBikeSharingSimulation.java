@@ -21,6 +21,7 @@ package playground.thibautd.eunoia.run;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.experimental.ReflectiveModule;
 import org.matsim.core.controler.Controler;
@@ -48,6 +49,7 @@ public class RunZurichBikeSharingSimulation {
 		config.addModule( new StepBasedFareConfigGroup() );
 		final DenivelationScoringConfigGroup denivelationScoringGroup = new DenivelationScoringConfigGroup();
 		config.addModule( denivelationScoringGroup );
+		config.addModule( new MultiModalConfigGroup() );
 
 		final RelocationConfigGroup relocationGroup = new RelocationConfigGroup();
 		config.addModule( relocationGroup );
