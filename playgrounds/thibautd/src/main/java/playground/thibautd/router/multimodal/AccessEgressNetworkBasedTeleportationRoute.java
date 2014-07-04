@@ -30,6 +30,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.IdFactory;
 import org.matsim.core.population.routes.GenericRoute;
 
+import playground.thibautd.utils.CollectionUtils;
+
 /**
  * @author thibautd
  */
@@ -141,9 +143,9 @@ public class AccessEgressNetworkBasedTeleportationRoute implements GenericRoute 
 		json.put( "egressTime" , getEgressTime() );
 		json.put( "onLinksTime" , getLinkTime() );
 
-		json.put( "links" , new JSONArray( links ) );
+		json.put( "links" , new JSONArray( CollectionUtils.toString( links ) ) );
 
-		return json.toString();
+		return json.toString( 4 );
 	}
 
 	@Override
