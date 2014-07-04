@@ -19,10 +19,14 @@
  * *********************************************************************** */
 package playground.ivt.matsim2030.generation;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
@@ -53,6 +57,8 @@ public class ScenarioMergingConfigGroup extends ReflectiveModule {
 
 	private String thinnedTransitRouterNetworkFile = null;
 
+	private Set<String> modesOfFacilityLinks = Collections.singleton( TransportMode.car );
+
 	public ScenarioMergingConfigGroup( ) {
 		super( GROUP_NAME );
 	}
@@ -69,6 +75,7 @@ public class ScenarioMergingConfigGroup extends ReflectiveModule {
 		comments.put( "thinnedTransitRouterNetworkFile" , "the file containing the pre-processed transit router network. This is a performance pre-processing, which is by no means mandatory." );
 
 		comments.put( "samplingRate" , "the proportion of the subpopulation to retain: those files are 100pct samples, the filtering is done at import. One can of course also create sample files and set this parameter to 1." );
+		comments.put( "modesOfFacilityLinks" , "facilities will only be links to links having *ALL* of those modes allowed. Setting this to something else than only car makes sense for \"multimodal\" routing." );
 
 		return comments;
 	}
@@ -214,6 +221,26 @@ public class ScenarioMergingConfigGroup extends ReflectiveModule {
 		this.thinnedTransitRouterNetworkFile = thinnedTransitRouterNetworkFile;
 	}
 
+	public Set<String> getModesOfFacilityLinks() {
+		return this.modesOfFacilityLinks;
+	}
 
+	@StringGetter( "modesOfFacilityLinks" )
+	private String getModesOfFacilityLinksAsString() {
+		return CollectionUtils.setToString( getModesOfFacilityLinks() );
+	}
+
+	public void setModesOfFacilityLinks(
+			final Set<String> modesOfFacilityLinks) {
+		this.modesOfFacilityLinks = modesOfFacilityLinks;
+	}
+
+	@StringSetter( "modesOfFacilityLinks" )
+	private void setModesOfFacilityLinksAsString(
+			final String modesOfFacilityLinks) {
+		setModesOfFacilityLinks(
+				CollectionUtils.stringToSet(
+					modesOfFacilityLinks ) );
+	}
 }
 

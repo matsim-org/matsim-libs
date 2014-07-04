@@ -31,6 +31,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -164,7 +166,7 @@ public class Matsim2030Utils {
 
 		// do it BEFORE importing the PT part of the network.
 		log.info( "connecting activities, links and facilities" );
-		connectFacilitiesWithLinks( scenario );
+		connectFacilitiesWithLinks( mergingGroup , scenario );
 
 		if ( mergingGroup.getPtSubnetworkFile() != null ) {
 			log.info( "reading pt network from "+mergingGroup.getPtSubnetworkFile() );
@@ -248,7 +250,9 @@ public class Matsim2030Utils {
 				( ((double) acceptCount) / inputCount )+")" );
 	}
 
-	private static void connectFacilitiesWithLinks( final Scenario sc ) {
+	private static void connectFacilitiesWithLinks(
+			final ScenarioMergingConfigGroup mergingGroup,
+			final Scenario sc ) {
 		final StageActivityTypes stages = new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE );
 		// ignore facilities, as otherwise the following happens:
 		// - if there is a facility, the activity link id is set to the one of the facility
@@ -256,7 +260,12 @@ public class Matsim2030Utils {
 		// - if the activity has no link, a new one is computed
 		// This caused problems when I had routes in the population: activities were
 		// moved to a close link, and routes became wrong.
-		final PersonAlgorithm xy2Links = new XY2Links( sc.getNetwork() , null );
+		final PersonAlgorithm xy2Links =
+			new XY2Links(
+					filterLinksWithAllModes(
+						sc.getNetwork(),
+						mergingGroup.getModesOfFacilityLinks() ),
+					null );
 
 		// first: if there are links indicated in the activities, use them
 		for ( Person person : sc.getPopulation().getPersons().values() ) {
@@ -290,6 +299,44 @@ public class Matsim2030Utils {
 		}
 
 		// now hopefully everything is nice and consistent...
+	}
+
+	private static Network filterLinksWithAllModes(final Network fullNetwork, final Set<String> modes) {
+		final Network subNetwork = NetworkImpl.createNetwork();
+		final NetworkFactory factory = subNetwork.getFactory();
+
+		for (Link link : fullNetwork.getLinks().values()) {
+			if ( link.getAllowedModes().containsAll( modes ) ) {
+				final Id fromId = link.getFromNode().getId();
+				final Id toId = link.getToNode().getId();
+
+				Node fromNode2 = subNetwork.getNodes().get(fromId);
+				Node toNode2 = subNetwork.getNodes().get(toId);
+
+				if (fromNode2 == null) {
+					fromNode2 = factory.createNode(fromId, link.getFromNode().getCoord());
+					subNetwork.addNode(fromNode2);
+					if (fromId == toId) {
+						toNode2 = fromNode2;
+					}
+				}
+
+				if (toNode2 == null) {
+					toNode2 = factory.createNode(toId, link.getToNode().getCoord());
+					subNetwork.addNode(toNode2);
+				}
+
+				final Link link2 = factory.createLink(link.getId(), fromNode2, toNode2);
+				link2.setAllowedModes( link.getAllowedModes() );
+				link2.setCapacity(link.getCapacity());
+				link2.setFreespeed(link.getFreespeed());
+				link2.setLength(link.getLength());
+				link2.setNumberOfLanes(link.getNumberOfLanes());
+				subNetwork.addLink(link2);
+			}
+		}
+
+		return subNetwork;
 	}
 
 	public static void initializeLocationChoice( final Controler controler ) {
