@@ -30,15 +30,13 @@ import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
 import org.matsim.contrib.multimodal.router.TransitTripRouterFactory;
 import org.matsim.contrib.multimodal.router.util.LinkSlopesReader;
 import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
+import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
@@ -126,6 +124,8 @@ public class BikeSharingScenarioUtils {
 			return new BikeSharingTripRouterFactory( scenario );
 		}
 
+		PrepareMultiModalScenario.run( scenario );
+
 		final Map<Id, Double> linkSlopes =
 			new LinkSlopesReader().getLinkSlopes(
 					multimodalConfigGroup,
@@ -176,11 +176,6 @@ public class BikeSharingScenarioUtils {
 					multiModalTripRouterFactory, 
 					transitRouterFactory);
 
-		// ensure that NetworkRoutes are created for legs using one of the simulated modes
-		final ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
-		for (String mode : org.matsim.core.utils.collections.CollectionUtils.stringToSet( multimodalConfigGroup.getSimulatedModes() )) {
-			routeFactory.setRouteFactory(mode, new LinkNetworkRouteFactory());
-		}
 
 		return new BikeSharingTripRouterFactory(
 				transitTripRouterFactory,
