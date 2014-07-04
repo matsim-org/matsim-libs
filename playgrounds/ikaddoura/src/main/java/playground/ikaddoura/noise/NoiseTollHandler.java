@@ -105,6 +105,9 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 	@Override
 	public void reset(int iteration) {
 		
+		personId2homeReceiverPointId.clear();
+		noiseEventsAffected.clear();
+		
 		linkId2timeBin2tollSum.clear();
 		linkId2timeBin2leavingAgents.clear();
 		
