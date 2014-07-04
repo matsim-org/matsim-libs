@@ -158,5 +158,12 @@ public class CollectionUtils {
 		if ( remove ) it.remove();
 		return elem;
 	}
+
+	public static List<String> toString(
+			final List<? extends Object> list) {
+		final List<String> strings = new ArrayList<String>( list.size() );
+		for ( Object o : list ) strings.add( o.toString() );
+		return strings;
+	}
 }
 
