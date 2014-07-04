@@ -301,7 +301,7 @@ public class Matsim2030Utils {
 		// now hopefully everything is nice and consistent...
 	}
 
-	private static Network filterLinksWithAllModes(final Network fullNetwork, final Set<String> modes) {
+	public static Network filterLinksWithAllModes(final Network fullNetwork, final Set<String> modes) {
 		final Network subNetwork = NetworkImpl.createNetwork();
 		final NetworkFactory factory = subNetwork.getFactory();
 
