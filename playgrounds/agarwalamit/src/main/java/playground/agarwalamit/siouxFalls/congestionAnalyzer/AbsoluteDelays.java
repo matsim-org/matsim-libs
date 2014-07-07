@@ -39,10 +39,10 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
 public class AbsoluteDelays {
 
 	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/";
-	private static String [] runNumber =  {"run121","run122","run123","run124"};
+	private static String [] runNumber =  {"run201","run202","run203","run204"};
 	public static void main(String[] args) {
 		
-		BufferedWriter writer =IOUtils.getBufferedWriter(clusterPathDesktop+"/outputTMMCOff/analysis/r/rAbsoluteDelaysExecutedPlans.txt");
+		BufferedWriter writer =IOUtils.getBufferedWriter(clusterPathDesktop+"/outputMC/analysis500Its/r/rAbsoluteDelays.txt");
 		
 		double [] delays = new double [runNumber.length];
 		
@@ -68,7 +68,7 @@ public class AbsoluteDelays {
 		eventManager.addHandler(congestionHandlerImplV3);
 
 		MatsimEventsReader eventsReader = new MatsimEventsReader(eventManager);
-		String inputEventsFile = clusterPathDesktop+"/outputTMMCOff/"+runNumber+"/ITERS/it.100/100.events.xml.gz";
+		String inputEventsFile = clusterPathDesktop+"/outputMC/"+runNumber+"/ITERS/it.500/500.events.xml.gz";
 		eventsReader.readFile(inputEventsFile);
 
 		return congestionHandlerImplV3.getTotalDelay()/3600;
