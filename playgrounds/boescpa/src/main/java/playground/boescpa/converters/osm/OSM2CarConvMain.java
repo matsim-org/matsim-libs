@@ -27,7 +27,7 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
-import playground.boescpa.converters.osm.procedures.OsmNetworkReaderWithPT;
+import playground.boescpa.converters.osm.tools.OsmNetworkReaderWithPT;
 
 /**
  * Runs OSM-Converters...
@@ -39,12 +39,10 @@ public class OSM2CarConvMain {
 	public static void main(String[] args) {
 		Network network = NetworkUtils.createNetwork();
 
-		//OsmNetworkReader osmReader =
-		//		new OsmNetworkReader(network, TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03"), false);
-		OsmNetworkReaderWithPT osmReader =
-				new OsmNetworkReaderWithPT(network, TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03"), false);
-		osmReader.setKeepPaths(false);
-		osmReader.setMemoryOptimization(true);
+		OsmNetworkReader osmReader =
+				new OsmNetworkReader(network, TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03"), false);
+		osmReader.setKeepPaths(true);
+		osmReader.setMemoryOptimization(false);
 
 		osmReader.setHighwayDefaults(1, "motorway",      2, 120.0/3.6, 1.0, 2000, true);
 		osmReader.setHighwayDefaults(1, "motorway_link", 1,  80.0/3.6, 1.0, 1500, true);
