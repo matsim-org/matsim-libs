@@ -111,9 +111,11 @@ public class AccessEgressNetworkBasedTeleportationRoute implements GenericRoute 
 
 		final JSONObject json = new JSONObject( new JSONTokener( routeDescription ) );
 		
-		setAccessTime( json.getDouble( "accessTime" ) );
-		setEgressTime( json.getDouble( "egressTime" ) );
-		setLinkTime( json.getDouble( "onLinksTime" ) );
+		// do not use the json getDouble(), because we use the java string representation,
+		// which allows non-finite values to be written
+		setAccessTime( Double.parseDouble( (String) json.get( "accessTime" ) ) ); 
+		setEgressTime( Double.parseDouble( (String) json.get( "egressTime" ) ) );
+		setLinkTime( Double.parseDouble( (String) json.get( "onLinksTime" ) ) );
 
 		final JSONArray linksArray = json.getJSONArray( "links" );
 
@@ -139,9 +141,9 @@ public class AccessEgressNetworkBasedTeleportationRoute implements GenericRoute 
 	public String getRouteDescription() {
 		final JSONObject json = new JSONObject( );
 		
-		json.put( "accessTime" , getAccessTime() );
-		json.put( "egressTime" , getEgressTime() );
-		json.put( "onLinksTime" , getLinkTime() );
+		json.put( "accessTime" , ""+getAccessTime() );
+		json.put( "egressTime" , ""+getEgressTime() );
+		json.put( "onLinksTime" , ""+getLinkTime() );
 
 		json.put( "links" , new JSONArray( CollectionUtils.toString( links ) ) );
 

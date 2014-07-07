@@ -55,8 +55,9 @@ public class AccessEgressNetworkBasedTeleportationRouteTest {
 		route.setStartLinkId( idFactory.createId( "bouh" ) );
 		route.setEndLinkId( idFactory.createId( "bwa" ) );
 		route.setDistance( 12364 );
-		route.setAccessTime( 46 );
-		route.setEgressTime( 9846 );
+		// test with special values --- JSON is restrictive on numbers
+		route.setAccessTime( Double.NaN );
+		route.setEgressTime( Double.POSITIVE_INFINITY );
 		route.setLinkTime( 4638309 );
 		int i = 0;
 		route.setLinks( Arrays.asList(
