@@ -46,11 +46,11 @@ import playground.agarwalamit.siouxFalls.emissionAnalyzer.PerLinkEmissionData;
 public class EmissionsAndCongestionsPerTimeBin {
 
 	private Logger logger = Logger.getLogger(PerLinkEmissionData.class);
-	private static String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/run112/";
+	private static String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMC/run203/";
 	private static String networkFile =outputDir+ "/output_network.xml.gz";
 	private static String configFile = outputDir+"/output_config.xml";
-	private static String emissionEventFile = outputDir+"/ITERS/it.100/100.emission.events.xml.gz";
-	private static String eventsFile = outputDir+"/ITERS/it.100/100.events.xml.gz";
+	private static String emissionEventFile = outputDir+"/ITERS/it.500/500.emission.events.xml.gz";
+	private static String eventsFile = outputDir+"/ITERS/it.500/500.events.xml.gz";
 	EmissionUtils emissionUtils;
 
 	Network network;
@@ -63,7 +63,7 @@ public class EmissionsAndCongestionsPerTimeBin {
 
 	private void run()  {
 
-		BufferedWriter writer1 = IOUtils.getBufferedWriter(outputDir+"/analysis/emissionVsCongestion/100.hourlyDelaysAndEmissionsPerLink.txt");
+		BufferedWriter writer1 = IOUtils.getBufferedWriter(outputDir+"/analysis/emissionVsCongestion/500.hourlyDelaysAndEmissionsPerLink.txt");
 
 		Scenario scenario = loadScenario(networkFile);
 		this.network = scenario.getNetwork();
@@ -111,7 +111,7 @@ public class EmissionsAndCongestionsPerTimeBin {
 		}
 
 		//writing network delays and emissions per time bin
-		BufferedWriter writer2= IOUtils.getBufferedWriter(outputDir+"/analysis/emissionVsCongestion/100.hourlyNetworkDelaysAndEmissions.txt");
+		BufferedWriter writer2= IOUtils.getBufferedWriter(outputDir+"/analysis/emissionVsCongestion/500.hourlyNetworkDelaysAndEmissions.txt");
 
 		try{
 			writer2.write("time"+"\t"+"delays_sec"+"\t"+"CO"+"\t"+"CO2_Total"+"\t"+"FC"+"\t"+"HC"+"\t"+"NMHC"+"\t"+"NO2"+"\t"+"NOX"+"\t"+"PM"+"\t"+"SO2"+"\n");
