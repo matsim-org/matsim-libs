@@ -54,8 +54,8 @@ public class VerifyResults {
 	private static final double marginalUtlOfTravelTime = marginal_Utl_traveling_car_sec+marginal_Utl_performing_sec;
 	private static final double vtts_car = marginalUtlOfTravelTime/marginal_Utl_money;
 
-	private final  static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputTMMCOff/run";
-	private  final static String [] runNr = {"121","122", "123","124"};//{"1","2","3","4"};
+	private final  static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/run";
+	private  final static String [] runNr = {"33"};//{"201","202", "203","204"};//{"1","2","3","4"};
 
 	private  static Scenario scenario ;
 
@@ -65,10 +65,10 @@ public class VerifyResults {
 	public static void main(String[] args) {
 
 		for(int i=0;i<runNr.length;i++){
-			String emissionsEventsFile = runDir+runNr[i]+"/ITERS/it.100/100.emission.events.xml.gz";
+			String emissionsEventsFile = runDir+runNr[i]+"/ITERS/it.500/500.emission.events.xml.gz";
 			String networkFile = runDir+runNr[i]+"/output_network.xml.gz";
 			String plansFile = runDir+runNr[i]+"/output_plans.xml.gz";
-			String eventsFile=runDir+runNr[i]+"/ITERS/it.100/100.events.xml.gz";
+			String eventsFile=runDir+runNr[i]+"/ITERS/it.500/500.events.xml.gz";
 			scenario =  loadScenario(networkFile, plansFile);
 			calculateEmissionCosts(emissionsEventsFile, scenario,runNr[i]);
 			calculateDelaysCosts(eventsFile,scenario,runNr[i]);

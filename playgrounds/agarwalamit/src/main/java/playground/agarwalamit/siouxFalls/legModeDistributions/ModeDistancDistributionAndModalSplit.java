@@ -31,11 +31,11 @@ import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistan
 public class ModeDistancDistributionAndModalSplit {
 
 	private final static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMC/";//outputModalSplitSetUp
-	private final static String run = "/run101/";
-	private final static String [] runs = {"run33"};//{"run105","run106","run107","run108"};
+//	private final static String run = "/run201/";
+	private final static String [] runs = {"run201","run202","run203","run204"};
 	//	private  String initialPlanFile = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/input/SiouxFalls_population_probably_v3.xml";
 	//	private  String initialPlanFile = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/run33/output_plans.xml.gz";
-	private static String finalPlanFileLocation = runDir+run+"/ITERS/";
+//	private static String finalPlanFileLocation = runDir+run+"/ITERS/";
 
 	public static void main(String[] args) {
 		ModeDistancDistributionAndModalSplit ms= new ModeDistancDistributionAndModalSplit();
@@ -48,28 +48,33 @@ public class ModeDistancDistributionAndModalSplit {
 
 		for(String str:runs){
 			String finalPlanFile = runDir+str+"/output_plans.xml.gz";
-			ms.runRouteskDistance(str, finalPlanFile);
+			ms.runRoutesDistance(str, finalPlanFile);
+			ms.runBeelineDistance(str, finalPlanFile);
 		}
-
 	}
-
+	
+	/**
+	 * It will write legModeShare and beeline distance distribution	
+	 */
 	private void runBeelineDistance(String runNr,String finalPlanFile){
 		Scenario sc = loadScenario(finalPlanFile);
 		LegModeDistanceDistribution	lmdd = new LegModeDistanceDistribution();
 		lmdd.init(sc);
 		lmdd.preProcessData();
 		lmdd.postProcessData();
-		lmdd.writeResults(runDir+run+"/analysis/legModeDistributions/"+runNr+".");
+		lmdd.writeResults(runDir+runNr+"/analysis/legModeDistributions/"+runNr+".");
 	}
-
-	private void runRouteskDistance(String runNr,String finalPlanFile){
+	/**
+	 * It will route distance distribution	
+	 */
+	private void runRoutesDistance(String runNr,String finalPlanFile){
 		Scenario sc = loadScenario(finalPlanFile);
 		LegModeRouteDistanceDistributionHandler	lmdfed = new LegModeRouteDistanceDistributionHandler();
 		lmdfed.init(sc);
 		lmdfed.preProcessData();
 		lmdfed.postProcessData();
-		lmdfed.writeResults(runDir+"/analysis/legModeDistributions/"+runNr+".");
-		lmdfed.writeResults(runDir+"/analysisExecutedPlans/legModeDistributions/"+runNr+".");
+		lmdfed.writeResults(runDir+"/analysis500Its/legModeDistributions/"+runNr+".");
+//		lmdfed.writeResults(runDir+"/analysisExecutedPlans/legModeDistributions/"+runNr+".");
 	}
 
 	private Scenario loadScenario(String planFile) {
