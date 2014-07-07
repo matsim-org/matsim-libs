@@ -47,10 +47,10 @@ public class DemandFromEmissionEvents {
 	private final String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/";
 	private final int noOfTimeBins = 30;
 	private double simulationEndTime;
-	private String configFile =runDir+"run109"+"/output_config.xml"; 
+	private String configFile =runDir+"run207"+"/output_config.xml"; 
 
-	private static String [] runNumber =  {"run111","run111"};
-	private final String netFile1 = runDir+"run109"+"/output_network.xml.gz";
+	private static String [] runNumber =  {"run207","run208"};
+	private final String netFile1 = runDir+"run207"+"/output_network.xml.gz";
 	private Network network;
 	public static void main(String[] args) {
 		new DemandFromEmissionEvents().writeDemandData();
@@ -139,7 +139,7 @@ public class DemandFromEmissionEvents {
 		return time2LinksDataFiltered;
 	}
 	private Map<Double, Map<Id, Double>> processEmissionsAndReturnDemand(String runNumber){
-		String emissionFileBAU = runDir+runNumber+"/ITERS/it.100/100.emission.events.xml.gz";
+		String emissionFileBAU = runDir+runNumber+"/ITERS/it.500/500.emission.events.xml.gz";
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);

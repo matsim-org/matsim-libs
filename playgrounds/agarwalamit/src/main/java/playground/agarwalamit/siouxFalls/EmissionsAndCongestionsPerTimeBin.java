@@ -46,7 +46,7 @@ import playground.agarwalamit.siouxFalls.emissionAnalyzer.PerLinkEmissionData;
 public class EmissionsAndCongestionsPerTimeBin {
 
 	private Logger logger = Logger.getLogger(PerLinkEmissionData.class);
-	private static String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMC/run203/";
+	private static String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMC/run204/";
 	private static String networkFile =outputDir+ "/output_network.xml.gz";
 	private static String configFile = outputDir+"/output_config.xml";
 	private static String emissionEventFile = outputDir+"/ITERS/it.500/500.emission.events.xml.gz";
