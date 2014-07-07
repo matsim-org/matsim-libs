@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 
 /**
- * Creates a multimodal network from an osmFile.
+ * Abstract contract for the creation of a multimodal network from an osmFile.
  * Hereby "multimodal" is understood in the sense of
  * 	"private and public transport modes that use the street network".
  *
@@ -42,43 +42,12 @@ public abstract class MultimodalNetworkCreator {
 	}
 
 	/**
-	 * Create the standard car network based on established OSM converter.
-	 * Create pt-network from OSM for those pt-means which use street network.
-	 * Merge the two networks.
+	 * Creates a multimodal network from the provided osmFile.
+	 * Hereby "multimodal" is understood in the sense of
+	 *	"private and public transport modes that use the street network".
 	 *
 	 * @param osmFile
 	 */
-	public final void createMultimodalNetwork(String osmFile) {
-		log.info("Creating multimodal network...");
-		Network carNetwork = createStreetNetwork(osmFile);
-		Network ptNetwork = createPTNetwork(osmFile);
-		mergePTwithCarNetwork(ptNetwork, carNetwork);
-		log.info("Creating multimodal network... done.");
-	}
-
-	/**
-	 * Create a standard car network from the given osmFile.
-	 *
-	 * @return standard car network
-	 */
-	protected abstract Network createStreetNetwork(String osmFile);
-
-	/**
-	 * Create a standard pt network from the given osmFile for those pt-means which use street network.
-	 *
-	 * @return standard pt network
-	 */
-	protected abstract Network createPTNetwork(String osmFile);
-
-	/**
-	 * Merge the two special networks to a new network. Thereby makes sure that the allowed modes
-	 * for each link are merged and not replaced or substituted.
-	 *
-	 * The resulting, merged network is written into this.network.
-	 *
-	 * @param ptNetwork
-	 * @param carNetwork
-	 */
-	protected abstract void mergePTwithCarNetwork(Network ptNetwork, Network carNetwork);
+	public abstract void createMultimodalNetwork(String osmFile);
 
 }

@@ -40,22 +40,22 @@ public class OSM2MixedConverter {
 	private final Network network;
 	private final TransitSchedule schedule;
 	private final String osmFile;
-	private final String hafasFile;
-	// TODO-boescpa implement observer for osmFile and hafasFile so that it hasn't to be read x-times...
+	private final String scheduleFile;
+	// TODO-boescpa implement observer for osmFile and scheduleFile so that it hasn't to be read x-times...
 
 	private final MultimodalNetworkCreator multimodalNetworkCreator;
-	private final PTStationCreator ptStationCreator;
-	private final PTLinesCreator ptLinesCreator;
+	private final PTScheduleCreator ptScheduleCreator;
+	private final PTLineRouter ptLineRouter;
 
-	public OSM2MixedConverter(Network network, TransitSchedule schedule, String osmFile, String hafasFile) {
+	public OSM2MixedConverter(Network network, TransitSchedule schedule, String osmFile, String scheduleFile) {
 		this.network = network;
 		this.schedule = schedule;
 		this.osmFile = osmFile;
-		this.hafasFile = hafasFile;
+		this.scheduleFile = scheduleFile;
 
 		this.multimodalNetworkCreator = new MultimodalNetworkCreatorDefault(network);
-		this.ptStationCreator = new PTStationCreatorDefault(schedule);
-		this.ptLinesCreator = new PTLinesCreatorDefault(schedule);
+		this.ptScheduleCreator = new PTScheduleCreatorDefault(schedule);
+		this.ptLineRouter = new PTLineRouterDefault(schedule);
 	}
 
 	/**
@@ -64,8 +64,8 @@ public class OSM2MixedConverter {
 	public void convertOSM2MultimodalNetwork() {
 		log.info("Conversion from OSM to multimodal MATSim network...");
 		multimodalNetworkCreator.createMultimodalNetwork(osmFile);
-		ptStationCreator.createPTStations(osmFile, hafasFile, network);
-		ptLinesCreator.createPTLines(hafasFile, network);
+		ptScheduleCreator.createSchedule(osmFile, scheduleFile, network);
+		ptLineRouter.routePTLines(network);
 		log.info("Conversion from OSM to multimodal MATSim network... done.");
 	}
 

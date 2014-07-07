@@ -26,63 +26,31 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
- * Provides the contract to create pt stations from an OSM network, which are corrected by
- * a given HAFAS-file and linked to a given network.
+ * Provides the contract to create pt lines (stops and scheduled times, no routes) from an OSM network,
+ * which are corrected by a given schedule-file.
+ * The stops are linked to a given network.
  *
  * @author boescpa
  */
-public abstract class PTStationCreator {
+public abstract class PTScheduleCreator {
 
-	protected static Logger log = Logger.getLogger(PTStationCreator.class);
+	protected static Logger log = Logger.getLogger(PTScheduleCreator.class);
 
 	protected final TransitSchedule schedule;
 
-	protected PTStationCreator(TransitSchedule schedule) {
+	protected PTScheduleCreator(TransitSchedule schedule) {
 		this.schedule = schedule;
 	}
 
 	/**
-	 * Create pt-Stations from OSM network.
-	 * Check and complement pt stations with HAFAS-knowledge.
-	 * Link pt stations to the network.
+	 * This method creates pt lines (stops and scheduled times, no routes) from the OSM network,
+	 * which are corrected by the given schedule-file.
+	 * The stops are linked to the given network.
 	 *
 	 * @param osmFile
-	 * @param hafasFile
+	 * @param scheduleFile
 	 * @param network
 	 */
-	public final void createPTStations(String osmFile, String hafasFile, Network network) {
-		log.info("Creating PT stations...");
-		createPTStations(osmFile);
-		complementPTStations(hafasFile);
-		linkStationsToNetwork(network);
-		log.info("Creating PT stations... done.");
-	}
-
-	/**
-	 * Create pt stops from the given osmFile based on experimental OSM converters.
-	 *
-	 * Writes the resulting schedule into this.schedule.
-	 *
-	 * @param osmFile
-	 */
-	protected abstract void createPTStations(String osmFile);
-
-	/**
-	 * Check and complement pt-Stations and lines with HAFAS-knowledge (hafasFile).
-	 *
-	 * Writes the resulting schedule into this.schedule.
-	 *
-	 * @param hafasFile
-	 */
-	protected abstract void complementPTStations(String hafasFile);
-
-	/**
-	 * Link the pt-stations in the schedule to the closest network links.
-	 *
-	 * Writes the resulting schedule into this.schedule.
-	 *
-	 * @param network
-	 */
-	protected abstract void linkStationsToNetwork(Network network);
+	public abstract void createSchedule(String osmFile, String scheduleFile, Network network);
 
 }

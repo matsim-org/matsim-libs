@@ -26,64 +26,33 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
- * Provides the contract for an implementation of a pt-lines creation.
+ * Provides the contract for an implementation of pt-lines routing.
  *
  * @author boescpa
  */
-public abstract class PTLinesCreator {
+public abstract class PTLineRouter {
 
-	protected static Logger log = Logger.getLogger(PTLinesCreator.class);
+	protected static Logger log = Logger.getLogger(PTLineRouter.class);
 
 	protected final TransitSchedule schedule;
 
-	protected PTLinesCreator(TransitSchedule schedule) {
+	/**
+	 * The provided schedule is expected to already contain for each line
+	 * 	- the stops in the sequence they will be served.
+	 * 	- the scheduled times.
+	 * The routes will be newly routed. Any former routes will be overwritten.
+	 * Changes are done on the schedule provided here.
+	 *
+	 * @param schedule which will be newly routed.
+	 */
+	protected PTLineRouter(TransitSchedule schedule) {
 		this.schedule = schedule;
 	}
 
 	/**
-	 * Create all pt-lines of all types using the street network and using the created pt-stations.
-	 * Create routes for the pt-lines.
-	 * Write schedule from HAFAS-knowledge.
+	 * Based on the stops in this.schedule und given the provided network, the lines will be routed.
 	 *
-	 * @param hafasFile
-	 * @param network
+	 * @param network is a multimodal network (see MultimodalNetworkCreator)
 	 */
-	public void createPTLines(String hafasFile, Network network) {
-		log.info("Creating PT lines...");
-		createPTLines(hafasFile);
-		createPTRoutes(network);
-		writeScheduleForPTLines(hafasFile);
-		log.info("Creating PT lines... done.");
-	}
-
-	/**
-	 * Create all pt-lines of all types of public transport using the street network
-	 * and using the created pt-stations. Creation is based on HAFAS-knowledge.
-	 *
-	 * Writes the resulting schedule into this.schedule.
-	 *
-	 * @param hafasFile
-	 */
-	protected abstract void createPTLines(String hafasFile);
-
-	/**
-	 * By applying a routing algorithm (e.g. shortest path or OSM-extraction) route from station to
-	 * station for each pt-line.
-	 *
-	 * Writes the resulting schedule into this.schedule.
-	 *
-	 * @param network
-	 */
-	protected abstract void createPTRoutes(Network network);
-
-	/**
-	 * Based on the schedules in the hafasFile, write the full day schedules for each pt-line.
-	 *
-	 * Writes the resulting schedule into this.schedule.
-	 *
-	 * @param hafasFile
-	 */
-	protected abstract void writeScheduleForPTLines(String hafasFile);
-
-
+	public abstract void routePTLines(Network network);
 }
