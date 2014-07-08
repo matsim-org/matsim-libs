@@ -74,11 +74,11 @@ ShutdownListener, ScoringListener, AfterMobsimListener{
 	Double yMin = 0.0;
 	Double yMax = 12500.0;
 	
-	Integer noOfXCells = 16;
-	Integer noOfYCells = 12;
+	Integer noOfXCells = 32;
+	Integer noOfYCells = 20;
 
 	Double timeBinSize;
-	Integer noOfTimeBins =3;
+	Integer noOfTimeBins =1;
 	Map<Id, Integer> links2xcells;
 	Map<Id, Integer> links2ycells;
 

@@ -35,7 +35,8 @@ public class ResponsibilityScoringFunction implements ScoringFunction {
 	//double rScore = 0.0;
 	EmissionControlerListener ecl;
 	// total time in all bins / number of bins
-	private Double averageDurationOfTimeBin = 36*60*60/16/12.;
+//	private Double averageDurationOfTimeBin = 36*60*60/16/12.;
+	private Double averageDurationOfTimeBin = 24*60*60/32/20.;
 	
 	public ResponsibilityScoringFunction(Plan plan, ScoringFunction scoringFunction, EmissionControlerListener ecl){
 		this.plan=plan;
