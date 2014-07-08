@@ -93,6 +93,7 @@
 		<module>signals</module>
 		<module>locationchoice</module>
 		<module>matsim4urbansim</module>
+		<module>minibus</module>
 		<module>networkEditor</module>
 		<module>otfvis</module>
 		<module>matrixbasedptrouter</module>
