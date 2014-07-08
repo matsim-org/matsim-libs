@@ -315,7 +315,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 							node,
 							router.calcRoute(
 								facility,
-								new NodeFacility( node ),
+								node.getStop().getStopFacility(),
 								departureTime,
 								person) );
 					break;
@@ -323,7 +323,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 					wrappedNearestNodes.put(
 							node,
 							router.calcRoute(
-								new NodeFacility( node ),
+								node.getStop().getStopFacility(),
 								facility,
 								departureTime,
 								person) );
@@ -596,34 +596,6 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 		 */
 		public double getSearchRadius() {
 			return searchRadius;
-		}
-	}
-
-	private static class NodeFacility implements Facility {
-		private final TransitRouterNetworkNode node;
-
-		public NodeFacility(final TransitRouterNetworkNode node) {
-			this.node = node;
-		}
-
-		@Override
-		public Coord getCoord() {
-			return node.getStop().getStopFacility().getCoord();
-		}
-
-		@Override
-		public Id getId() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Map<String, Object> getCustomAttributes() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Id getLinkId() {
-			return node.getStop().getStopFacility().getLinkId();
 		}
 	}
 }
