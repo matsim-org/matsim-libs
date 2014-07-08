@@ -24,10 +24,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 
 /**
- * Design comments:<ul>
- * <li>DriverAgent extending PassengerAgent feels a bit odd.  However, in the code there are quite a few snippets that treat the 
- * driver as a passenger, thus having the interface in the same way seems to make sense.  kai, feb'13
- * </ul>
  * 
  * @author nagel
  *
