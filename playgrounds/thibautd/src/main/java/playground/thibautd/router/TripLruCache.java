@@ -28,6 +28,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -41,6 +43,9 @@ import org.matsim.core.population.LegImpl;
  * @author thibautd
  */
 public class TripLruCache {
+	private static final Logger log =
+		Logger.getLogger(TripLruCache.class);
+
 	public static enum LocationType {coord, link, facility;}
 	private final boolean considerPerson;
 	private final LocationType locationType;
@@ -80,11 +85,17 @@ public class TripLruCache {
 	}
 
 	private void processQueue() {
+		int c = 0;
 		for ( SoftEntry e = (SoftEntry) queue.poll();
 				e != null;
 				e = (SoftEntry) queue.poll() ) {
+			c++;
 			assert !lru.containsKey( e.key );
 			softRefsMap.remove( e.key );
+		}
+
+		if ( c > 0 && log.isTraceEnabled() ) {
+			log.trace( this+": processed "+c+" GC'd references" );
 		}
 	}
 
@@ -93,7 +104,7 @@ public class TripLruCache {
 
 		// first get element from lru, to generate an access
 		final List<? extends PlanElement> t = lru.get( departure );
-		if ( t != null ) return t;
+		if ( t != null ) return clone( t );
 
 		// was not in the LRU: check if it is in the soft references
 		final SoftEntry sr = softRefsMap.get( departure );

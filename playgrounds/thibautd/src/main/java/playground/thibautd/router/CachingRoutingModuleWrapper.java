@@ -19,7 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.router;
 
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.List;
+
+import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -34,8 +37,14 @@ import playground.thibautd.router.TripLruCache.LocationType;
  * @author thibautd
  */
 public class CachingRoutingModuleWrapper implements RoutingModule {
+	private static final Logger log =
+		Logger.getLogger(CachingRoutingModuleWrapper.class);
+
 	private final TripLruCache cache;
 	private RoutingModule wrapped;
+
+	private final static AtomicLong routeCount = new AtomicLong( 0 );
+	private final static AtomicLong calcCount = new AtomicLong( 0 );
 
 	public CachingRoutingModuleWrapper(
 			final boolean considerPerson,
@@ -52,10 +61,13 @@ public class CachingRoutingModuleWrapper implements RoutingModule {
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
+		routeCount.incrementAndGet();
 		final Departure departure = cache.createDeparture( person , fromFacility , toFacility );
 		final List<? extends PlanElement> cached = cache.get( departure );
 		
 		if ( cached != null ) return cached;
+
+		calcCount.incrementAndGet();
 		final List<? extends PlanElement> trip =
 				wrapped.calcRoute(fromFacility, toFacility, departureTime,
 				person);
@@ -68,6 +80,14 @@ public class CachingRoutingModuleWrapper implements RoutingModule {
 	@Override
 	public StageActivityTypes getStageActivityTypes() {
 		return wrapped.getStageActivityTypes();
+	}
+
+	public static void logStats() {
+		log.info( "CachingRoutingModuleWrapper stats:" );
+		log.info( routeCount.get()+" route computations" );
+		final long cached = routeCount.get() - calcCount.get();
+		final double percentage = ((double) cached) / routeCount.get();
+		log.info( cached+" ("+(100 * percentage)+"%) obtained from cache" );
 	}
 }
 

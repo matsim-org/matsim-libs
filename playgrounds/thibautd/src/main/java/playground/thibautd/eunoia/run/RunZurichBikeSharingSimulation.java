@@ -19,12 +19,17 @@
  * *********************************************************************** */
 package playground.thibautd.eunoia.run;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.experimental.ReflectiveModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.OutputDirectoryLogging;
 
 import playground.ivt.matsim2030.Matsim2030Utils;
@@ -35,6 +40,9 @@ import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingScenarioUtils;
 import eu.eunoiaproject.bikesharing.scoring.StepBasedFareConfigGroup;
 import eu.eunoiaproject.elevation.scoring.SimpleElevationScorerParameters;
 
+import playground.thibautd.router.CachingRoutingModuleWrapper;
+import playground.thibautd.router.TripLruCache;
+
 /**
  * @author thibautd
  */
@@ -43,6 +51,7 @@ public class RunZurichBikeSharingSimulation {
 		final String configFile = args[ 0 ];
 
 		OutputDirectoryLogging.catchLogEntries();
+		Logger.getLogger( TripLruCache.class ).setLevel( Level.INFO );
 
 		final Config config = BikeSharingScenarioUtils.loadConfig( configFile );
 		Matsim2030Utils.addDefaultGroups( config );
@@ -58,6 +67,14 @@ public class RunZurichBikeSharingSimulation {
 		BikeSharingScenarioUtils.loadBikeSharingPart( sc );
 
 		final Controler controler = new Controler( sc );
+
+		controler.addControlerListener(
+				new ShutdownListener() {
+					@Override
+					public void notifyShutdown(final ShutdownEvent event) {
+						CachingRoutingModuleWrapper.logStats();
+					}
+				});
 
 		// Not sure how well (or bad) this would interact with Bike Sharing...
 		// I expect pretty nasty stuff to silently happen.
