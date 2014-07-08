@@ -40,6 +40,8 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 
+import playground.thibautd.router.CachingRoutingModuleWrapper;
+
 /**
  * @author thibautd
  */
@@ -99,13 +101,22 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 			final double crowFlySpeed = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get( mode );
 			instance.setRoutingModule(
 					mode,
-					new AccessEgressNetworkBasedTeleportationRoutingModule(
-							mode,
-							scenario,
-							subNetwork,
-							crowFlyDistanceFactor,
-							crowFlySpeed,
-							routeAlgo) ); 
+					// cache routes person-based: this is used not only for standard
+					// walk/bike routing, but also in transit access/egress.
+					// In the case of accessing PT stops by bike sharing, a lot of ressources
+					// are wasted computing over and over again how to access the close bike sharing stations
+					// by foot and how to travel from station to station by bike.
+					new CachingRoutingModuleWrapper(
+						true,
+						CachingRoutingModuleWrapper.LocationType.facility,
+						20,
+						new AccessEgressNetworkBasedTeleportationRoutingModule(
+								mode,
+								scenario,
+								subNetwork,
+								crowFlyDistanceFactor,
+								crowFlySpeed,
+								routeAlgo) ) ); 
 		}
 
 		return instance;
