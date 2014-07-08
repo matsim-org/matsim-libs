@@ -41,6 +41,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 
 import playground.thibautd.router.CachingRoutingModuleWrapper;
+import playground.thibautd.router.TripLruCache.LocationType;
 
 /**
  * @author thibautd
@@ -108,8 +109,8 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 					// by foot and how to travel from station to station by bike.
 					new CachingRoutingModuleWrapper(
 						true,
-						CachingRoutingModuleWrapper.LocationType.facility,
-						20,
+						LocationType.facility,
+						100,
 						new AccessEgressNetworkBasedTeleportationRoutingModule(
 								mode,
 								scenario,
