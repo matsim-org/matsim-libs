@@ -34,6 +34,9 @@ public class LruCache<K,V> {
 	private static final Logger log =
 		Logger.getLogger(LruCache.class);
 
+	private static final long SIZE_LOG_PERIOD = 1000;
+	private long addCount = 0;
+
 	private final Cloner<V> cloner;
 
 	/**
@@ -120,6 +123,11 @@ public class LruCache<K,V> {
 
 	public void put( final K key , final V value ) {
 		processQueue();
+
+		if ( addCount++ % SIZE_LOG_PERIOD == 0 && log.isTraceEnabled() ) {
+			log.trace( "size of cache (with "+lru.size()+" in lru): "+softRefsMap.size() );
+		}
+
 		final V clone = cloner.clone( value );
 		lru.put( key , clone );
 		softRefsMap.put( key , new SoftEntry( key , clone ) );
