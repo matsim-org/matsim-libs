@@ -65,6 +65,8 @@ public class MultimodalNetworkCreatorFromNetworkReader extends MultimodalNetwork
 		osmReader.setRailwayDefaults("light_rail",	  1,  80.0/3.6, 1.0,  100);*/
 
 		osmReader.parse(osmFile);
-		new NetworkCleaner().run(this.network);
+
+		// TODO-boescpa NetworkCleaner interferes with the network creation!
+		//new NetworkCleaner().run(this.network);
 	}
 }
