@@ -29,24 +29,37 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  *
  * @author boescpa
  */
-public class PTLinesCreatorDefault extends PTLinesCreator {
+public class PTLineRouterDefault extends PTLineRouter {
 
-	public PTLinesCreatorDefault(TransitSchedule schedule) {
+	public PTLineRouterDefault(TransitSchedule schedule) {
 		super(schedule);
 	}
 
 	@Override
-	public void createPTLines(String hafasFile) {
-
+	public void routePTLines(Network network) {
+		log.info("Creating PT lines...");
+		createPTRoutes(network);
+		log.info("Creating PT lines... done.");
 	}
 
-	@Override
-	public void createPTRoutes(Network network) {
+	/**
+	 * By applying a routing algorithm (e.g. shortest path or OSM-extraction) route from station to
+	 * station for each pt-line.
+	 *
+	 * Writes the resulting schedule into this.schedule.
+	 *
+	 * @param network
+	 */
+	private void createPTRoutes(Network network) {
+		log.info("Creating pt routes...");
 
+		// TODO-boescpa Implement createPTRoutes...
+		// work with this.schedule...
+
+		// By applying a routing algorithm (e.g. shortest path or OSM-extraction) route from station to
+		// station for each pt-line.
+
+		log.info("Creating pt routes... done.");
 	}
 
-	@Override
-	public void writeScheduleForPTLines(String hafasFile) {
-
-	}
 }
