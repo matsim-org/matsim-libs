@@ -25,7 +25,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import playground.thibautd.mobsim.QVehicleProvider;
+import playground.thibautd.pseudoqsim.QVehicleProvider;
 
 class PassengerUnboardingAgentFactory implements AgentFactory, MobsimEngine {
 	private final AgentFactory delegate;

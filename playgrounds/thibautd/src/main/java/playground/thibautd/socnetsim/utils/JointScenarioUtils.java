@@ -34,15 +34,15 @@ import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
-
 import playground.thibautd.config.NonFlatConfigReader;
-import playground.thibautd.mobsim.PseudoSimConfigGroup;
+import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
+import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.PlanLinkConfigGroup;
+import playground.thibautd.socnetsim.SocialNetworkConfigGroup;
 import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.cliques.config.JointTimeModeChooserConfigGroup;
 import playground.thibautd.socnetsim.cliques.config.JointTripInsertorConfigGroup;
 import playground.thibautd.socnetsim.cliques.config.JointTripsMutatorConfigGroup;
-import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
-import playground.thibautd.socnetsim.PlanLinkConfigGroup;
 import playground.thibautd.socnetsim.population.DriverRouteFactory;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlans;
@@ -51,7 +51,6 @@ import playground.thibautd.socnetsim.population.JointPlansXmlReader;
 import playground.thibautd.socnetsim.population.PassengerRouteFactory;
 import playground.thibautd.socnetsim.replanning.modules.prismiclocationchoice.PrismicLocationChoiceConfigGroup;
 import playground.thibautd.socnetsim.replanning.modules.randomlocationchoice.RandomJointLocationChoiceConfigGroup;
-import playground.thibautd.socnetsim.SocialNetworkConfigGroup;
 import playground.thibautd.utils.DesiresConverter;
 
 /**

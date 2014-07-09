@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.mobsim.pseudoqsimengine;
+package playground.thibautd.pseudoqsim.pseudoqsimengine;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Collection;
@@ -51,7 +51,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.thibautd.mobsim.QVehicleProvider;
+import playground.thibautd.pseudoqsim.QVehicleProvider;
 
 /**
  * An engine aimed at replacing the QnetsimEngine for a "PSim" like behavior.

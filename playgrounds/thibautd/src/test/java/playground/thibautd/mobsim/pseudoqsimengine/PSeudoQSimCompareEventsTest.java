@@ -25,15 +25,14 @@ import java.util.Random;
 
 import org.junit.Rule;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -41,12 +40,12 @@ import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -60,10 +59,12 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.Vehicles;
+
 import playground.thibautd.mobsim.CompareEventsUtils;
-import playground.thibautd.mobsim.PseudoSimConfigGroup;
+import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
+import playground.thibautd.pseudoqsim.pseudoqsimengine.QSimWithPseudoEngineFactory;
 import playground.thibautd.scripts.scenariohandling.CreateGridNetworkWithDimensions;
 
 /**
@@ -107,7 +108,6 @@ public class PSeudoQSimCompareEventsTest {
 		final PseudoSimConfigGroup conf = new PseudoSimConfigGroup();
 		conf.setNThreads( nThreads );
 		scenario.getConfig().addModule( conf );
-
 		final TravelTimeCalculator travelTime =
 			new TravelTimeCalculator(
 					scenario.getNetwork(),

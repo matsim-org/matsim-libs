@@ -20,13 +20,13 @@
 package playground.thibautd.socnetsim.replanning;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
-import playground.thibautd.mobsim.PseudoSimConfigGroup;
-import playground.thibautd.mobsim.PseudoSimConfigGroup.PSimType;
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+
+import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
+import playground.thibautd.pseudoqsim.PseudoSimConfigGroup.PSimType;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.controller.ControllerRegistry;
 
 /**
  * @author thibautd

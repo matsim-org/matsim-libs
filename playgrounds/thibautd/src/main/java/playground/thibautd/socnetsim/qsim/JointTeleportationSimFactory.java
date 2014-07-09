@@ -34,10 +34,11 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
-import playground.thibautd.mobsim.ParkedVehicleProvider;
-import playground.thibautd.mobsim.PopulationAgentSourceForTeleportedVehicles;
-import playground.thibautd.mobsim.VehicularTeleportationEngine;
-import playground.thibautd.mobsim.VehicularTeleportationEngine.VehicleBehavior;
+
+import playground.thibautd.pseudoqsim.ParkedVehicleProvider;
+import playground.thibautd.pseudoqsim.PopulationAgentSourceForTeleportedVehicles;
+import playground.thibautd.pseudoqsim.VehicularTeleportationEngine;
+import playground.thibautd.pseudoqsim.VehicularTeleportationEngine.VehicleBehavior;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 
 /**

@@ -31,12 +31,10 @@ import playground.thibautd.socnetsim.replanning.removers.MinimumSumSelectorFacto
 import playground.thibautd.socnetsim.replanning.removers.MinimumWeightedSumSelectorFactory;
 import playground.thibautd.socnetsim.replanning.removers.ParetoMinSelectorFactory;
 import playground.thibautd.socnetsim.replanning.removers.WhoIsTheBossMinSelectorFactory;
+import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.LeastAverageWeightJointPlanPruningConflictSolver;
 import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.LeastPointedPlanPruningConflictSolver;
-import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.strategies.ActivityInGroupLocationChoiceFactory;
-import playground.thibautd.socnetsim.replanning.strategies.JointPrismLocationChoiceStrategyFactory;
-import playground.thibautd.socnetsim.replanning.strategies.JointTripMutatorFactory;
 import playground.thibautd.socnetsim.replanning.strategies.CoalitionExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.CoalitionRandomFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupActivitySequenceMutator;
@@ -52,6 +50,8 @@ import playground.thibautd.socnetsim.replanning.strategies.GroupTimeAllocationMu
 import playground.thibautd.socnetsim.replanning.strategies.GroupTourVehicleAllocationFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupWeightedSelectExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupWhoIsTheBossSelectExpBetaFactory;
+import playground.thibautd.socnetsim.replanning.strategies.JointPrismLocationChoiceStrategyFactory;
+import playground.thibautd.socnetsim.replanning.strategies.JointTripMutatorFactory;
 import playground.thibautd.socnetsim.replanning.strategies.ParetoExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.RandomGroupPlanSelectorStrategyFactory;
 import playground.thibautd.socnetsim.replanning.strategies.RandomJointLocationChoiceStrategyFactory;

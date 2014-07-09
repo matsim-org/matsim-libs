@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * NetsimWrappingQVehicleProvider.java
+ * QVehicleProvider.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,26 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.mobsim;
+package playground.thibautd.pseudoqsim;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
 /**
  * @author thibautd
  */
-public class NetsimWrappingQVehicleProvider implements QVehicleProvider {
-	private final QNetsimEngine netsim;
-
-	public NetsimWrappingQVehicleProvider(
-			final QNetsimEngine netsim) {
-		this.netsim = netsim;
-	}
-
-	@Override
-	public QVehicle getVehicle(final Id id) {
-		return netsim.getVehicles().get( id );
-	}
+public interface QVehicleProvider {
+	public QVehicle getVehicle( Id vehicleId );
 }
 

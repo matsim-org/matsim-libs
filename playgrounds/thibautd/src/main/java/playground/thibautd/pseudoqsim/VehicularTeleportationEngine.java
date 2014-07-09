@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.mobsim;
+package playground.thibautd.pseudoqsim;
 
 import java.util.Collection;
 import java.util.HashSet;

@@ -21,22 +21,21 @@ package playground.thibautd.socnetsim.run;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryLogging;
 
 import playground.thibautd.config.NonFlatConfigWriter;
+import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.SocialNetworkConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
-import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkReader;
-import playground.thibautd.socnetsim.replanning.grouping.DynamicGroupIdentifier;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
+import playground.thibautd.socnetsim.replanning.grouping.DynamicGroupIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
-import playground.thibautd.socnetsim.SocialNetworkConfigGroup;
 
 /**
  * @author thibautd

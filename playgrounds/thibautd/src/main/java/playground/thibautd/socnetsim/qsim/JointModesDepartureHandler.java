@@ -25,7 +25,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -38,8 +37,8 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 
-import playground.thibautd.mobsim.NetsimWrappingQVehicleProvider;
-import playground.thibautd.mobsim.QVehicleProvider;
+import playground.thibautd.pseudoqsim.NetsimWrappingQVehicleProvider;
+import playground.thibautd.pseudoqsim.QVehicleProvider;
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.PassengerRoute;

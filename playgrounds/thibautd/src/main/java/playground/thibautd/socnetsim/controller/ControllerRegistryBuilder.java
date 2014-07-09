@@ -56,8 +56,8 @@ import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import playground.thibautd.mobsim.DeactivableTravelTimeProvider;
-import playground.thibautd.mobsim.DeactivableTravelTimeProvider.PSimIterationsCriterion;
+import playground.thibautd.pseudoqsim.DeactivableTravelTimeProvider;
+import playground.thibautd.pseudoqsim.DeactivableTravelTimeProvider.PSimIterationsCriterion;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.scoring.CharyparNagelWithJointModesScoringFunctionFactory;
 import playground.thibautd.socnetsim.population.JointActingTypes;

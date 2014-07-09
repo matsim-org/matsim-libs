@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.mobsim.pseudoqsimengine;
+package playground.thibautd.pseudoqsim.pseudoqsimengine;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -39,8 +39,8 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.thibautd.mobsim.NetsimWrappingQVehicleProvider;
-import playground.thibautd.mobsim.PseudoSimConfigGroup;
+import playground.thibautd.pseudoqsim.NetsimWrappingQVehicleProvider;
+import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
 
 /**
  * @author thibautd

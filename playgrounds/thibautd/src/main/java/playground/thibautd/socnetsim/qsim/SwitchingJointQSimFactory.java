@@ -20,16 +20,16 @@
 package playground.thibautd.socnetsim.qsim;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import playground.thibautd.mobsim.DeactivableTravelTimeProvider;
-import playground.thibautd.mobsim.PseudoSimConfigGroup;
-import playground.thibautd.mobsim.PseudoSimConfigGroup.PSimType;
+
+import playground.thibautd.pseudoqsim.DeactivableTravelTimeProvider;
+import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
+import playground.thibautd.pseudoqsim.PseudoSimConfigGroup.PSimType;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 
 /**

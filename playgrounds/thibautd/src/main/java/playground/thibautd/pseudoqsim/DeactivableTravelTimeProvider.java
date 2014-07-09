@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.mobsim;
+package playground.thibautd.pseudoqsim;
 
 import org.apache.log4j.Logger;
 
@@ -39,7 +39,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
-import playground.thibautd.mobsim.PseudoSimConfigGroup.PSimType;
+import playground.thibautd.pseudoqsim.PseudoSimConfigGroup.PSimType;
 
 /**
  * Necessary for "teleporting" QSim: otherwise, the TravelTimeCalculator

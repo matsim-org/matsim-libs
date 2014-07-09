@@ -34,7 +34,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
-import playground.thibautd.mobsim.DeactivableTravelTimeProvider;
+import playground.thibautd.pseudoqsim.DeactivableTravelTimeProvider;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.GenericStrategyModule;

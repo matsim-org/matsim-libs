@@ -23,7 +23,6 @@ import java.io.File;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.corelisteners.EventsHandling;
@@ -35,8 +34,8 @@ import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 
 import playground.ivt.utils.SubpopulationFilter;
-import playground.thibautd.mobsim.PseudoSimConfigGroup;
-import playground.thibautd.mobsim.PsimAwareEventsWriter;
+import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
+import playground.thibautd.pseudoqsim.PsimAwareEventsWriter;
 import playground.thibautd.socnetsim.analysis.LocatedTripsWriter;
 import playground.thibautd.socnetsim.controller.listeners.DumpJointDataAtEnd;
 import playground.thibautd.socnetsim.controller.listeners.JointPlansDumping;
