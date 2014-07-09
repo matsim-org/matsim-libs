@@ -42,7 +42,7 @@ import eu.eunoiaproject.elevation.scoring.SimpleElevationScorerParameters;
 
 import playground.thibautd.router.CachingRoutingModuleWrapper;
 import playground.thibautd.router.multimodal.CachingLeastCostPathAlgorithmWrapper;
-import playground.thibautd.router.TripLruCache;
+import playground.thibautd.utils.LruCache;
 
 /**
  * @author thibautd
@@ -52,7 +52,7 @@ public class RunZurichBikeSharingSimulation {
 		final String configFile = args[ 0 ];
 
 		OutputDirectoryLogging.catchLogEntries();
-		Logger.getLogger( TripLruCache.class ).setLevel( Level.INFO );
+		Logger.getLogger( LruCache.class ).setLevel( Level.TRACE );
 
 		final Config config = BikeSharingScenarioUtils.loadConfig( configFile );
 		Matsim2030Utils.addDefaultGroups( config );
