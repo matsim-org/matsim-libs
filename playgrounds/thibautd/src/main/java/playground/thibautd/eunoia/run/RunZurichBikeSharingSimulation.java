@@ -41,6 +41,7 @@ import eu.eunoiaproject.bikesharing.scoring.StepBasedFareConfigGroup;
 import eu.eunoiaproject.elevation.scoring.SimpleElevationScorerParameters;
 
 import playground.thibautd.router.CachingRoutingModuleWrapper;
+import playground.thibautd.router.multimodal.CachingLeastCostPathAlgorithmWrapper;
 import playground.thibautd.router.TripLruCache;
 
 /**
@@ -73,6 +74,7 @@ public class RunZurichBikeSharingSimulation {
 					@Override
 					public void notifyShutdown(final ShutdownEvent event) {
 						CachingRoutingModuleWrapper.logStats();
+						CachingLeastCostPathAlgorithmWrapper.logStats();
 					}
 				});
 

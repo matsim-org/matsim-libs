@@ -40,9 +40,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 
-import playground.thibautd.router.CachingRoutingModuleWrapper;
-import playground.thibautd.router.TripLruCache.LocationType;
-
 /**
  * @author thibautd
  */
@@ -97,27 +94,25 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 			 * has not been created for the modes used here.
 			 */
 			final TravelDisutility travelDisutility = this.travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());		
-			final LeastCostPathCalculator routeAlgo = this.leastCostPathCalculatorFactory.createPathCalculator(subNetwork, travelDisutility, travelTime);
+			final LeastCostPathCalculator routeAlgo =
+				new CachingLeastCostPathAlgorithmWrapper(
+						travelTime,
+						travelDisutility,
+						this.leastCostPathCalculatorFactory.createPathCalculator(
+								subNetwork,
+								travelDisutility,
+								travelTime) );
 			final double crowFlyDistanceFactor = scenario.getConfig().plansCalcRoute().getBeelineDistanceFactor();
 			final double crowFlySpeed = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get( mode );
 			instance.setRoutingModule(
 					mode,
-					// cache routes person-based: this is used not only for standard
-					// walk/bike routing, but also in transit access/egress.
-					// In the case of accessing PT stops by bike sharing, a lot of ressources
-					// are wasted computing over and over again how to access the close bike sharing stations
-					// by foot and how to travel from station to station by bike.
-					new CachingRoutingModuleWrapper(
-						true,
-						LocationType.facility,
-						100,
-						new AccessEgressNetworkBasedTeleportationRoutingModule(
-								mode,
-								scenario,
-								subNetwork,
-								crowFlyDistanceFactor,
-								crowFlySpeed,
-								routeAlgo) ) ); 
+					new AccessEgressNetworkBasedTeleportationRoutingModule(
+							mode,
+							scenario,
+							subNetwork,
+							crowFlyDistanceFactor,
+							crowFlySpeed,
+							routeAlgo) ); 
 		}
 
 		return instance;
