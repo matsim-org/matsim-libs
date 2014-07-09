@@ -19,16 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.router;
 
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.SoftReference;
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -39,34 +31,17 @@ import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 
+import playground.thibautd.utils.LruCache;
+
 /**
  * @author thibautd
  */
 public class TripLruCache {
-	private static final Logger log =
-		Logger.getLogger(TripLruCache.class);
-
 	public static enum LocationType {coord, link, facility;}
 	private final boolean considerPerson;
 	private final LocationType locationType;
 
-	/**
-	 * The cache works this way:
-	 * - it stores at least cacheSize elements in an LRU cache 
-	 * - mappings are also remembered in a map of softreferences.
-	 *
-	 * The idea is the following: the "real" cache is the softrefs map,
-	 * which keeps objects as long as their key is in the lru; the lru
-	 * is here to prevent the most recently used elements to be garbage collected.
-	 *
-	 * So this is a LRU which keeps elements as long as the garbage collector is
-	 * happy with that --- the meaning of "the garbage collector being happy with
-	 * that" being JVM dependent...
-	 */
-	private final Map<Departure, List<? extends PlanElement>> lru;
-	private final Map<Departure, SoftEntry> softRefsMap =
-		new HashMap<Departure, SoftEntry>();
-	private final ReferenceQueue<List<? extends PlanElement>> queue = new ReferenceQueue<List<? extends PlanElement>>();
+	private final LruCache<Departure, List<? extends PlanElement>> cache;
 
 	public TripLruCache(
 			final boolean considerPerson,
@@ -74,58 +49,23 @@ public class TripLruCache {
 			final int cacheSize) {
 		this.considerPerson = considerPerson;
 		this.locationType = locationType;
-		this.lru =
-			new LinkedHashMap<Departure, List<? extends PlanElement>>( (int) (1.6 * cacheSize) , 0.75f , true ) {
-				private static final long serialVersionUID = 1L;
-				@Override
-				protected boolean removeEldestEntry(final Map.Entry<Departure, List<? extends PlanElement>> eldest) {
-					return size() >= cacheSize;
-				}
-			};
-	}
-
-	private void processQueue() {
-		int c = 0;
-		for ( SoftEntry e = (SoftEntry) queue.poll();
-				e != null;
-				e = (SoftEntry) queue.poll() ) {
-			c++;
-			assert !lru.containsKey( e.key );
-			softRefsMap.remove( e.key );
-		}
-
-		if ( c > 0 && log.isTraceEnabled() ) {
-			log.trace( this+": processed "+c+" GC'd references" );
-		}
+		this.cache = new LruCache<Departure, List<? extends PlanElement>>(
+				new LruCache.Cloner<List<? extends PlanElement>>() {
+					@Override
+					public List<? extends PlanElement> clone(
+							List<? extends PlanElement> cloned) {
+						return TripLruCache.clone( cloned );
+					}
+				},
+				cacheSize );
 	}
 
 	public List<? extends PlanElement> get( final Departure departure ) {
-		processQueue();
-
-		// first get element from lru, to generate an access
-		final List<? extends PlanElement> t = lru.get( departure );
-		if ( t != null ) return clone( t );
-
-		// was not in the LRU: check if it is in the soft references
-		final SoftEntry sr = softRefsMap.get( departure );
-		if ( sr == null ) return null;
-
-		final List<? extends PlanElement> trip = sr.get();
-
-		if ( trip == null ) {
-			// it seems the GC was triggered while we were having fun here...
-			processQueue();
-		}
-
-		return clone( trip );
+		return cache.get( departure );
 	}
 
 	public void put( final Departure departure , final List<? extends PlanElement> trip ) {
-		processQueue();
-		final List<? extends PlanElement> clone = clone( trip );
-		lru.put( departure , clone );
-		softRefsMap.put( departure , new SoftEntry( departure , clone ) );
-		processQueue();
+		cache.put( departure , trip );
 	}
 
 	/**
@@ -227,17 +167,6 @@ public class TripLruCache {
 			}
 
 			return h;
-		}
-	}
-
-	private class SoftEntry extends SoftReference<List<? extends PlanElement>> {
-		private final Departure key;
-
-		public SoftEntry(
-				final Departure key,
-				final List<? extends PlanElement> value) {
-			super( value, queue );
-			this.key = key;
 		}
 	}
 }
