@@ -41,12 +41,12 @@ public class NonFlatModule extends Module {
 	/**
 	 * Override if parameter sets of a certain type need a special implementation
 	 */
-	protected Module createParameterSet(final String type) {
-		return new Module( type );
+	protected NonFlatModule createParameterSet(final String type) {
+		return new NonFlatModule( type );
 	}
 
-	protected Module createAndAddParameterSet(final String type) {
-		final Module m = createParameterSet( type );
+	protected NonFlatModule createAndAddParameterSet(final String type) {
+		final NonFlatModule m = createParameterSet( type );
 		addParameterSet( type , m );
 		return m;
 	}

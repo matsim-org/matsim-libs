@@ -25,6 +25,7 @@ import org.matsim.core.config.Module;
 import org.matsim.core.config.experimental.ReflectiveModule.StringGetter;
 import org.matsim.core.config.experimental.ReflectiveModule.StringSetter;
 
+import playground.thibautd.config.NonFlatModule;
 import playground.thibautd.config.ReflectiveNonFlatModule;
 
 /**
@@ -106,7 +107,7 @@ public class GroupReplanningConfigGroup extends ReflectiveNonFlatModule {
 	}
 
 	@Override
-	protected Module createParameterSet(final String type) {
+	protected NonFlatModule createParameterSet(final String type) {
 		if ( type.equals( StrategyParameterSet.SET_NAME ) ) {
 			return new StrategyParameterSet();
 		}
