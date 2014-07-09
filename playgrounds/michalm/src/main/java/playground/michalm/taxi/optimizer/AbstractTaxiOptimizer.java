@@ -76,11 +76,11 @@ public abstract class AbstractTaxiOptimizer
         Schedule<TaxiTask> taxiSchedule = (Schedule<TaxiTask>)schedule;
 
         optimConfig.scheduler.updateBeforeNextTask(taxiSchedule);
-        TaxiTask nextTask = taxiSchedule.nextTask();
+        TaxiTask newCurrentTask = taxiSchedule.nextTask();
 
         if (!optimConfig.scheduler.getParams().destinationKnown) {
-            if (nextTask != null // schedule != COMPLETED
-                    && nextTask.getTaxiTaskType() == TaxiTaskType.DROPOFF_DRIVE) {
+            if (newCurrentTask != null // schedule != COMPLETED
+                    && newCurrentTask.getTaxiTaskType() == TaxiTaskType.DROPOFF_DRIVE) {
                 requiresReoptimization = true;
             }
         }

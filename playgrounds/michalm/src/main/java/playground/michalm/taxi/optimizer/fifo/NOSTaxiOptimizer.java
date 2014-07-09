@@ -181,12 +181,11 @@ public class NOSTaxiOptimizer
         Schedule<TaxiTask> taxiSchedule = (Schedule<TaxiTask>)schedule;
 
         optimConfig.scheduler.updateBeforeNextTask(taxiSchedule);
-        taxiSchedule.nextTask();
+        TaxiTask newCurrentTask = taxiSchedule.nextTask();
 
-        if (taxiSchedule.getStatus() == ScheduleStatus.STARTED) {
-            if (taxiSchedule.getCurrentTask().getTaxiTaskType() == TaxiTaskType.WAIT_STAY) {
-                requiresReoptimization = true;
-            }
+        if (newCurrentTask != null // schedule != COMPLETED
+                && newCurrentTask.getTaxiTaskType() == TaxiTaskType.WAIT_STAY) {
+            requiresReoptimization = true;
         }
     }
 
