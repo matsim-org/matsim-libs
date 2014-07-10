@@ -45,8 +45,8 @@ import org.opengis.feature.simple.SimpleFeature;
  */
 public class shapeFileToNetworkDelhi {
 
-	private final static String networkShapeFile = "./input/delhi/delhiNetwork.shp";
-	private static String matsimNetwork = "./input/delhi/matsimNetwork.xml";
+	private final static String networkShapeFile = "./input/sarojini/abc.shp";
+	private static String matsimNetwork = "./input/sarojini/matsimNetwork.xml";
 	final static CoordinateTransformation ct =TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,"EPSG:24378");
 	private static Map<Coord, String> coordId = new HashMap<Coord, String>();
 
