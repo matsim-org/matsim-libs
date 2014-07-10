@@ -167,11 +167,9 @@ public class WarmEmissionAnalysisModule {
 		}
 		warmEmissions = calculateWarmEmissions(personId, travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple);
 		
-//		logger.debug("Original warm emissions: " + warmEmissions);
 		// a basic apporach to introduce emission reduced cars:
 		if(emissionEfficiencyFactor != null){
 			warmEmissions = rescaleWarmEmissions(warmEmissions);
-//			logger.debug("Original warm emissions have been rescaled to: " + warmEmissions);
 		}
 		return warmEmissions;
 	}
@@ -270,26 +268,9 @@ public class WarmEmissionAnalysisModule {
 			
 			if(averageSpeed_kmh <= 0.0){
 				throw new RuntimeException("Average speed has been calculated to 0.0 or a negative value. Aborting...");
-//				averageSpeedNegativeCnt++;
-//				if(averageSpeedNegativeCnt <= maxWarnCnt){					
-//					logger.warn("Average speed has been calculated to 0.0 or a negative value...");
-//					logger.warn("This indicates that linkLength from network is 0.0 or negative OR travel time from handler is negative.");
-//					logger.warn("Please check consistency of your scenario!");
-//					logger.info("Setting average speed for emission calculation to free flow speed...");
-//					if(averageSpeedNegativeCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-//				}
-//				averageSpeed_kmh = freeFlowSpeed_kmh;
 			}
 			if ((averageSpeed_kmh - freeFlowSpeed_kmh) > 1.0){
 				throw new RuntimeException("Average speed has been calculated to be greater than free flow speed; this might produce negative warm emissions. Aborting...");
-//				averageSpeedTooHighCnt++;
-//				if(averageSpeedTooHighCnt <= maxWarnCnt){
-//					logger.warn("Average speed (" + averageSpeed_kmh + " kmh) has been calculated to be greater than free flow speed (" + freeFlowSpeed_kmh + " kmh)...");
-//					logger.warn("Please check consistency of your scenario!");
-//					logger.info("Setting average speed for emission calculation to free flow speed...");
-//					if(averageSpeedTooHighCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-//				}
-//				averageSpeed_kmh = freeFlowSpeed_kmh;
 			}
 			/* NOTE: the following comparision does not make sense since HBEFA assumes free flow speeds to be different from speed limits.
 			 * For instance, for RUR/MW/80/Freeflow HBEFA assumes a free flow speed of 82.80 kmh.
@@ -378,17 +359,14 @@ public class WarmEmissionAnalysisModule {
 	}
 
 	public double getKmCounter() {
-//		return BkNumberUtils.roundDouble((kmCounter / WarmPollutant.values().length), 3);
 		return kmCounter / WarmPollutant.values().length;
 	}
 
 	public double getFreeFlowKmCounter() {
-//		return BkNumberUtils.roundDouble((freeFlowKmCounter / WarmPollutant.values().length), 3);
 		return freeFlowKmCounter / WarmPollutant.values().length;
 	}
 
 	public double getStopGoKmCounter() {
-//		return BkNumberUtils.roundDouble((stopGoKmCounter / WarmPollutant.values().length), 3);
 		return stopGoKmCounter / WarmPollutant.values().length;
 	}
 

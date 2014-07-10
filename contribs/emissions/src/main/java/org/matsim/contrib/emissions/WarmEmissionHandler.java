@@ -57,8 +57,10 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 	WarmEmissionAnalysisModule warmEmissionAnalysisModule;
 	
 	int linkLeaveCnt = 0;
-	int linkLeaveWarnCnt = 0;
-	final int maxLinkLeaveWarnCnt = 3;
+	int linkLeaveFirstActWarnCnt = 0;
+	final int maxLinkLeaveFirstActWarnCnt = 3;
+	int linkLeaveSomeActWarnCnt = 0;
+	final int maxLinkLeaveSomeActWarnCnt =3;
 
 	Map<Id, Tuple<Id, Double>> linkenter = new HashMap<Id, Tuple<Id, Double>>();
 	Map<Id, Tuple<Id, Double>> agentarrival = new HashMap<Id, Tuple<Id, Double>>();
@@ -78,7 +80,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 	@Override
 	public void reset(int iteration) {
 		linkLeaveCnt = 0;
-		linkLeaveWarnCnt = 0;
+		linkLeaveFirstActWarnCnt = 0;
 		
 		linkenter.clear();
 		agentarrival.clear();
@@ -131,73 +133,68 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 			throw new RuntimeException(e);
 		}
 
-		if(!this.linkenter.containsKey(event.getPersonId())){
-			if(linkLeaveWarnCnt < maxLinkLeaveWarnCnt){
-				logger.warn("Person " + personId + " is leaving link " + linkId + " without having entered. " +
-				"Thus, no emissions are calculated for this link leave event.");
-				if (linkLeaveWarnCnt == maxLinkLeaveWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+		if(!this.linkenter.containsKey(personId)){
+			if(linkLeaveFirstActWarnCnt < maxLinkLeaveFirstActWarnCnt){
+				logger.info("Person " + personId + " is ending its first activity of the day and leaving link " + linkId + " without having entered.");
+				logger.info("This is because of the MATSim logic that there is no link enter event for the link of the first activity");
+				logger.info("Thus, no emissions are calculated for this link leave event.");
+				if (linkLeaveFirstActWarnCnt == maxLinkLeaveFirstActWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
 			}
-			linkLeaveWarnCnt++;
+			linkLeaveFirstActWarnCnt++;
 			return;
-		}
-		
-		double enterTime = this.linkenter.get(personId).getSecond();
-		double travelTime;
-		if(!this.agentarrival.containsKey(personId) || !this.agentdeparture.containsKey(personId)){
-			travelTime = leaveTime - enterTime;
-		}
-		else if(!this.agentarrival.get(personId).getFirst().equals(event.getLinkId())
-				|| !this.agentdeparture.get(personId).getFirst().equals(event.getLinkId())){
-
-			travelTime = leaveTime - enterTime;
+		} else if (!this.linkenter.get(personId).getFirst().equals(linkId)){
+			if(linkLeaveSomeActWarnCnt < maxLinkLeaveSomeActWarnCnt){
+				logger.warn("Person " + personId + " is ending an activity other than the first and leaving link " + linkId + " without having entered.");
+				logger.warn("This indicates that there is some inconsistency in vehicle use; please check your inital plans file for consistency.");
+				logger.warn("Thus, no emissions are calculated neither for this link leave event nor for the last link that was entered.");
+				if (linkLeaveSomeActWarnCnt == maxLinkLeaveSomeActWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+			}
+			linkLeaveSomeActWarnCnt++;
+			return;
 		} else {
-		double arrivalTime = this.agentarrival.get(personId).getSecond();		
-		double departureTime = this.agentdeparture.get(personId).getSecond();	
-		travelTime = leaveTime - enterTime - departureTime + arrivalTime;	
-		}
-		
-		Id vehicleId = personId;
-		String vehicleInformation;
-		if(!this.emissionVehicles.getVehicles().containsKey(vehicleId)){
-			throw new RuntimeException("No vehicle defined for person " + personId + ". " +
-					"Please make sure that requirements for emission vehicles in " + 
-					VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
-		}
-		Vehicle vehicle = this.emissionVehicles.getVehicles().get(vehicleId);
-		VehicleType vehicleType = vehicle.getType();
-		vehicleInformation = vehicleType.getId().toString();
+			double enterTime = this.linkenter.get(personId).getSecond();
+			double travelTime;
+			if(!this.agentarrival.containsKey(personId) || !this.agentdeparture.containsKey(personId)){
+				travelTime = leaveTime - enterTime;
+			}
+			else if(!this.agentarrival.get(personId).getFirst().equals(event.getLinkId())
+					|| !this.agentdeparture.get(personId).getFirst().equals(event.getLinkId())){
 
-//// ===
-//// TODO: remove this after debugging
-//		double linkLength_km = linkLength / 1000;
-//		double travelTime_h = travelTime / 3600;
-//		double freeFlowSpeed_kmh_double = (freeVelocity * 3.6);
-//		double averageSpeed_kmh_double = (linkLength_km / travelTime_h);
-//		int freeFlowSpeed_kmh_int = (int) Math.round(freeFlowSpeed_kmh_double);
-//		int averageSpeed_kmh_int = (int) Math.round(averageSpeed_kmh_double);
-//
-//		if (averageSpeed_kmh_int > freeFlowSpeed_kmh_int){
-//			logger.info("enterTime | personId | linkId  | linkLength_km | averageSpeed_kmh_double ; averageSpeed_kmh_int | freeFlowSpeed_kmh_double ; freeFlowSpeed_kmh_int");
-//			logger.info(enterTime + " | " + personId + " | " + linkId + " | " + linkLength_km + " | " + averageSpeed_kmh_double + "; "  + averageSpeed_kmh_int + " | " + freeFlowSpeed_kmh_double + "; " + freeFlowSpeed_kmh_int);
-//			throw new RuntimeException("Average speed is higher than free flow speed; this would produce negative warm emissions. Aborting...");
-//		}
-		
-		Map<WarmPollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
-				personId,
-				roadType,
-				freeVelocity,
-				linkLength,
-				travelTime,
-				vehicleInformation);
-		
-		warmEmissionAnalysisModule.throwWarmEmissionEvent(leaveTime, linkId, vehicleId, warmEmissions);
+				travelTime = leaveTime - enterTime;
+			} else {
+				double arrivalTime = this.agentarrival.get(personId).getSecond();		
+				double departureTime = this.agentdeparture.get(personId).getSecond();	
+				travelTime = leaveTime - enterTime - departureTime + arrivalTime;	
+			}
+
+			Id vehicleId = personId;
+			String vehicleInformation;
+			if(!this.emissionVehicles.getVehicles().containsKey(vehicleId)){
+				throw new RuntimeException("No vehicle defined for person " + personId + ". " +
+						"Please make sure that requirements for emission vehicles in " + 
+						VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
+			}
+			Vehicle vehicle = this.emissionVehicles.getVehicles().get(vehicleId);
+			VehicleType vehicleType = vehicle.getType();
+			vehicleInformation = vehicleType.getId().toString();
+
+			Map<WarmPollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
+					personId,
+					roadType,
+					freeVelocity,
+					linkLength,
+					travelTime,
+					vehicleInformation);
+
+			warmEmissionAnalysisModule.throwWarmEmissionEvent(leaveTime, linkId, vehicleId, warmEmissions);
+		}
 	}
 
 	public int getLinkLeaveCnt() {
 		return linkLeaveCnt;
 	}
 	public int getLinkLeaveWarnCnt() {
-		return linkLeaveWarnCnt;
+		return linkLeaveFirstActWarnCnt;
 	}
 
 	public WarmEmissionAnalysisModule getWarmEmissionAnalysisModule(){
