@@ -67,7 +67,7 @@ public class LeastCostPathCalculatorWithCache
         if (path == null) {
             cacheMisses++;
             path = calculator.calcLeastCostPath(fromNode, toNode, starttime, person, vehicle);
-            spCacheSlice.put(toNode.getId(), toNode.getId(), path);
+            spCacheSlice.put(fromNode.getId(), toNode.getId(), path);
         }
         else {
             cacheHits++;
