@@ -38,8 +38,27 @@ public class PTLineRouterDefault extends PTLineRouter {
 	@Override
 	public void routePTLines(Network network) {
 		log.info("Creating PT lines...");
+		linkStationsToNetwork(network);
 		createPTRoutes(network);
 		log.info("Creating PT lines... done.");
+	}
+
+	/**
+	 * Link the pt-stations in the schedule to the closest network links.
+	 *
+	 * Writes the resulting schedule into this.schedule.
+	 *
+	 * @param network
+	 */
+	private void linkStationsToNetwork(Network network) {
+		log.info("Linking pt stations to network...");
+
+		// TODO-boescpa Implement linkStationsToNetwork...
+		// get pt stations from this.schedule...
+
+		// Link the pt-stations in the schedule to the closest network links.
+
+		log.info("Linking pt stations to network... done.");
 	}
 
 	/**

@@ -37,72 +37,15 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 
 	@Override
 	public final void createSchedule(String osmFile, String hafasFile, Network network) {
-		log.info("Creating PT stations...");
-		createPTStations(osmFile);
-		complementPTStations(hafasFile);
-		linkStationsToNetwork(network);
+		log.info("Creating the schedule...");
 		createPTLines(hafasFile);
-		writeScheduleForPTLines(hafasFile);
-		log.info("Creating PT stations... done.");
+		complementPTStations(osmFile);
+		log.info("Creating the schedule... done.");
 	}
 
 	/**
-	 * Create pt stops from the given osmFile based on experimental OSM converters.
-	 *
-	 * Writes the resulting schedule into this.schedule.
-	 *
-	 * @param osmFile
-	 */
-	private void createPTStations(String osmFile) {
-		log.info("Creating pt stations from osmFile...");
-
-		// TODO-boescpa Implement createSchedule...
-		// write stations into this.schedule...
-
-		// Create pt stops from the given osmFile based on experimental OSM converters.
-
-		log.info("Creating pt stations from osmFile... done.");
-	}
-
-	/**
-	 * Check and complement pt-Stations and lines with HAFAS-knowledge (hafasFile).
-	 *
-	 * Writes the resulting schedule into this.schedule.
-	 *
-	 * @param hafasFile
-	 */
-	private void complementPTStations(String hafasFile) {
-		log.info("Complementing pt stations based on HAFAS file...");
-
-		// TODO-boescpa Implement complementPTStations...
-		// work with this.schedule...
-
-		// Check and complement pt-Stations and lines with HAFAS-knowledge (hafasFile).
-
-		log.info("Complementing pt stations based on HAFAS file... done.");
-	}
-
-	/**
-	 * Link the pt-stations in the schedule to the closest network links.
-	 *
-	 * Writes the resulting schedule into this.schedule.
-	 *
-	 * @param network
-	 */
-	private void linkStationsToNetwork(Network network) {
-		log.info("Linking pt stations to network...");
-
-		// TODO-boescpa Implement linkStationsToNetwork...
-		// get pt stations from this.schedule...
-
-		// Link the pt-stations in the schedule to the closest network links.
-
-		log.info("Linking pt stations to network... done.");
-	}
-
-	/**
-	 * Create all pt-lines of all types of public transport using the street network
-	 * and using the created pt-stations. Creation is based on HAFAS-knowledge.
+	 * Create all pt-lines (stops, schedule, but no routes) of all types of public transport
+	 * using the HAFAS-schedule.
 	 *
 	 * Writes the resulting schedule into this.schedule.
 	 *
@@ -111,30 +54,31 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 	private void createPTLines(String hafasFile) {
 		log.info("Creating pt lines from HAFAS file...");
 
-		// TODO-boescpa Implement routePTLines...
+		// TODO-boescpa Implement createPTLines...
 		// work with this.schedule...
 
-		// Create all pt-lines of all types of public transport using the street network
-		// and using the created pt-stations. Creation is based on HAFAS-knowledge.
+		// 1. Create all lines from HAFAS-Schedule
+		//		1. Stops
+		//		2. Schedule
+		// 2. Collect all Stops from created lines
+		// 3. Write all Stops into schedule
 
 		log.info("Creating pt lines from HAFAS file... done.");
 	}
 
 	/**
-	 * Based on the schedules in the hafasFile, write the full day schedules for each pt-line.
+	 * Check and correct pt-Station-coordinates with osm-knowledge.
 	 *
 	 * Writes the resulting schedule into this.schedule.
 	 *
-	 * @param hafasFile
+	 * @param osmFile
 	 */
-	private void writeScheduleForPTLines(String hafasFile) {
-		log.info("Writing schedule for pt lines based on HAFAS file...");
+	private void complementPTStations(String osmFile) {
+		log.info("Correcting pt station coordinates based on OSM...");
 
-		// TODO-boescpa Implement writeScheduleForPTLines...
+		// TODO-boescpa Implement complementPTStations...
 		// work with this.schedule...
 
-		// Based on the schedules in the hafasFile, write the full day schedules for each pt-line.
-
-		log.info("Writing schedule for pt lines based on HAFAS file... done.");
+		log.info("Correcting pt station coordinates based on OSM... done.");
 	}
 }
