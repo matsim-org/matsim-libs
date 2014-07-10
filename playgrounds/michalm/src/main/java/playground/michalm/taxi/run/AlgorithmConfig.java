@@ -108,7 +108,7 @@ enum AlgorithmConfig
 
     APS_DSE_15M(AP_SCHEDULING, DEMAND_SUPPLY_EQUIL, EVENTS_15_MIN, TIME),
     
-    MIP_FF(MIQCP_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME);
+    MIP_FF(MIP_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME);
 
     static enum AlgorithmType
     {
@@ -116,7 +116,7 @@ enum AlgorithmConfig
         ONE_TIME_SCHEDULING, //
         RE_SCHEDULING, //
         AP_SCHEDULING, //
-        MIQCP_SCHEDULING;
+        MIP_SCHEDULING;
     }
 
 
@@ -151,7 +151,7 @@ enum AlgorithmConfig
             case AP_SCHEDULING:
                 return new APSTaxiOptimizer(optimConfig);
                 
-            case MIQCP_SCHEDULING:
+            case MIP_SCHEDULING:
                 return new MIPTaxiOptimizer(optimConfig);
 
             default:

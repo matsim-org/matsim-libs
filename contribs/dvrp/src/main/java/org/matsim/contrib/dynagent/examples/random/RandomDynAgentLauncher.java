@@ -38,12 +38,13 @@ public class RandomDynAgentLauncher
     private final Scenario scenario;
 
 
-    public RandomDynAgentLauncher()
+    public RandomDynAgentLauncher(boolean otfVis)
     {
+        this.otfVis = otfVis;
+
         dir = "./src/main/resources/";
         netFile = dir + "grid_network.xml";
 
-        otfVis = true;//or false -- turning ON/OFF visualization
         agentCount = 100;
 
         scenario = ScenarioUtils.createScenario(DynConfigUtils.createConfig());
@@ -70,7 +71,6 @@ public class RandomDynAgentLauncher
 
     public static void main(String[] args)
     {
-        RandomDynAgentLauncher launcher = new RandomDynAgentLauncher();
-        launcher.go();
+        new RandomDynAgentLauncher(true).go();
     }
 }

@@ -1,0 +1,25 @@
+netFileName            network.xml
+plansFileName          20.plans.xml.gz
+eventsFileName         ------
+
+taxiCustomersFileName  taxiCustomers_40_pc.txt
+taxisFileName          taxis-25.xml
+ranksFileName          taxi_ranks-0.xml
+
+algorithmConfig        NOS_DSE_SL
+
+destinationKnown       !true
+onlineVehicleTracker   true
+advanceRequestSubmission !true
+pickupDuration         120
+dropoffDuration        60
+
+otfVis                 !true
+
+vrpOutFiles            !true
+vrpOutDirName          vrp_output
+
+outHistogram           !true
+histogramOutDirName    histograms
+
+writeSimEvents         !true

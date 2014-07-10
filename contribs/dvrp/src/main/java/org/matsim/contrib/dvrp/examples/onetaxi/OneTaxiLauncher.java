@@ -47,15 +47,14 @@ public class OneTaxiLauncher
     private final Scenario scenario;
 
 
-    public OneTaxiLauncher()
+    public OneTaxiLauncher(boolean otfVis)
     {
+        this.otfVis = otfVis;
+
         dir = "./src/main/resources/";
         netFile = dir + "grid_network.xml";
         plansFile = dir + "one_taxi/one_taxi_population.xml";
         vehiclesFile = dir + "one_taxi/one_taxi_vehicles.xml";
-
-        otfVis = true;//or false -- turning ON/OFF visualization
-
         scenario = VrpLauncherUtils.initScenario(netFile, plansFile);
     }
 
@@ -101,7 +100,6 @@ public class OneTaxiLauncher
     public static void main(String... args)
         throws IOException
     {
-        OneTaxiLauncher launcher = new OneTaxiLauncher();
-        launcher.go();
+        new OneTaxiLauncher(true).go();
     }
 }
