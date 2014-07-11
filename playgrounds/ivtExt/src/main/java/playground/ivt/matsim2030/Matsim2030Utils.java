@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.ivt.matsim2030;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -80,6 +81,7 @@ import playground.ivt.matsim2030.generation.ScenarioMergingConfigGroup;
 import playground.ivt.matsim2030.router.TransitRouterNetworkReader;
 import playground.ivt.matsim2030.router.TransitRouterWithThinnedNetworkFactory;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
+import playground.ivt.utils.MapUtils;
 import playground.ivt.utils.TripModeShares;
 
 /**
@@ -124,6 +126,8 @@ public class Matsim2030Utils {
 			diluteScenario( scenario , mergingGroup.getDilutionCenter() , mergingGroup.getDilutionRadiusM() );
 		}
 
+		logPopulationStats( scenario );
+
 		return scenario;
 	}
 
@@ -164,6 +168,8 @@ public class Matsim2030Utils {
 			new MatsimFacilitiesReader( scenario ).readFile( mergingGroup.getFreightFacilitiesFile() );
 		}
 
+		logPopulationStats( scenario );
+
 		// do it BEFORE importing the PT part of the network.
 		log.info( "connecting activities, links and facilities" );
 		connectFacilitiesWithLinks( mergingGroup , scenario );
@@ -173,6 +179,34 @@ public class Matsim2030Utils {
 			new MatsimNetworkReader( scenario ).readFile( mergingGroup.getPtSubnetworkFile() );
 		}
 
+	}
+
+	private static void logPopulationStats(final Scenario scenario) {
+		final Map<String, AtomicInteger> popcounts = new HashMap<String, AtomicInteger>();
+
+		final String attribute = scenario.getConfig().plans().getSubpopulationAttributeName();
+		final MapUtils.Factory<AtomicInteger> factory =
+			new MapUtils.Factory<AtomicInteger>() {
+				@Override
+				public AtomicInteger create() {
+					return new AtomicInteger( 0 );
+				}
+			};
+		for ( Person p : scenario.getPopulation().getPersons().values() ) {
+			MapUtils.getArbitraryObject(
+					(String)
+					scenario.getPopulation().getPersonAttributes().getAttribute(
+						p.getId().toString(),
+						attribute ),
+					popcounts,
+					factory ).incrementAndGet();
+		}
+
+		log.info( "~~~~~~~~~~~~~~~~~~~ Population statistics:" );
+		log.info( scenario.getPopulation().getPersons().size()+" persons in total in population" );
+		for ( Map.Entry<String, AtomicInteger> e : popcounts.entrySet() ) {
+			log.info( e.getValue().intValue()+" persons in subpopulation "+e.getKey() );
+		}
 	}
 
 	private static void diluteScenario(
@@ -210,8 +244,10 @@ public class Matsim2030Utils {
 		final int initialSize = scenario.getPopulation().getPersons().size();
 		while ( it.hasNext() ) {
 			final Id current = it.next();
-			if ( !idsToKeep.contains( current ) ) it.remove();
-			scenario.getPopulation().getPersonAttributes().removeAllAttributes( current.toString() );
+			if ( !idsToKeep.contains( current ) ) {
+				it.remove();
+				scenario.getPopulation().getPersonAttributes().removeAllAttributes( current.toString() );
+			}
 		}
 		assert scenario.getPopulation().getPersons().size() == idsToKeep.size();
 		final int finalSize = scenario.getPopulation().getPersons().size();
