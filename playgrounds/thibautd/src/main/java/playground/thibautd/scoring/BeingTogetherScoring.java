@@ -41,8 +41,8 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 
-import playground.thibautd.utils.MapUtils;
-import playground.thibautd.utils.MapUtils.Factory;
+import playground.ivt.utils.MapUtils;
+import playground.ivt.utils.MapUtils.Factory;
 
 /**
  * @author thibautd

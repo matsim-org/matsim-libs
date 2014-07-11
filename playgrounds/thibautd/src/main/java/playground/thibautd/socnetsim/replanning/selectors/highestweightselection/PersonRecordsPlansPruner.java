@@ -27,7 +27,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.thibautd.utils.MapUtils;
+import playground.ivt.utils.MapUtils;
 
 /**
  * Class responsible of deleting inplausible plans to reduce the search space

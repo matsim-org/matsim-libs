@@ -46,11 +46,11 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.utils.misc.Time;
 
+import playground.ivt.utils.MapUtils;
 import playground.thibautd.scoring.BeingTogetherScoring.Filter;
 import playground.thibautd.scoring.BeingTogetherScoring.PersonOverlapScorer;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.utils.GenericFactory;
-import playground.thibautd.utils.MapUtils;
 
 /**
  * @author thibautd

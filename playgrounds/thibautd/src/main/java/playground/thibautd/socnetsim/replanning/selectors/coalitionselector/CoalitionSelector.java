@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 
+import playground.ivt.utils.MapUtils;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
@@ -36,7 +37,6 @@ import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.ScoreWeight;
 import playground.thibautd.socnetsim.replanning.selectors.WeightCalculator;
-import playground.thibautd.utils.MapUtils;
 
 /**
  * Selects a combination of plans without "blocking coalition",

@@ -39,9 +39,9 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
+import playground.ivt.utils.MapUtils;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.population.SocialNetwork;
-import playground.thibautd.utils.MapUtils;
 
 /**
  * @author thibautd

@@ -41,11 +41,11 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.ivt.utils.MapUtils;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.utils.CollectionUtils;
-import playground.thibautd.utils.MapUtils;
 import playground.thibautd.utils.QuadTreeRebuilder;
 
 /**

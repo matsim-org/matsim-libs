@@ -41,6 +41,8 @@ import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
 import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.core.scoring.EventsToLegs.LegHandler;
 
+import playground.ivt.utils.MapUtils;
+
 /**
  * @author thibautd
  */

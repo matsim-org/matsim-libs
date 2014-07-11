@@ -43,6 +43,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 
+import playground.ivt.utils.MapUtils;
 import playground.thibautd.socnetsim.cliques.config.JointTripInsertorConfigGroup;
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
@@ -54,7 +55,6 @@ import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
 import playground.thibautd.socnetsim.utils.JointPlanUtils;
 import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTravelStructure;
 import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTrip;
-import playground.thibautd.utils.MapUtils;
 
 /**
  * An algorithm which creates joint trips from nothing,

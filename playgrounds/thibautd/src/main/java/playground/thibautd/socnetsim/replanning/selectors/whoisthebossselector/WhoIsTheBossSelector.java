@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 
+import playground.ivt.utils.MapUtils;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
@@ -44,7 +45,6 @@ import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.WeightCalculator;
-import playground.thibautd.utils.MapUtils;
 
 /**
  * Attempt at a selector without joint utility.

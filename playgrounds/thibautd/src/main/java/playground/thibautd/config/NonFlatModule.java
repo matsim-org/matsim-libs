@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.matsim.core.config.Module;
 
-import playground.thibautd.utils.MapUtils;
+import playground.ivt.utils.MapUtils;
 
 /**
  * @author thibautd

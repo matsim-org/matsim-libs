@@ -33,10 +33,10 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import playground.ivt.utils.MapUtils;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.utils.MapUtils;
 
 /**
  * Implements the group-level replanning logic.

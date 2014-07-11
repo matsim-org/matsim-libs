@@ -33,12 +33,12 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 
+import playground.ivt.utils.MapUtils;
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.PassengerRoute;
 import playground.thibautd.utils.Couple;
-import playground.thibautd.utils.MapUtils;
 
 /**
  * @author thibautd

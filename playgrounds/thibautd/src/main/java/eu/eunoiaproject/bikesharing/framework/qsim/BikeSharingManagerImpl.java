@@ -33,7 +33,7 @@ import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
 
-import playground.thibautd.utils.MapUtils;
+import playground.ivt.utils.MapUtils;
 
 /**
  * Class responsible for adding and removing bikes from bike sharing facilities,

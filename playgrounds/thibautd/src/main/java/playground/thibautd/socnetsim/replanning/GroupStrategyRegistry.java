@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import playground.thibautd.utils.MapUtils;
+import playground.ivt.utils.MapUtils;
 
 /**
  * @author thibautd

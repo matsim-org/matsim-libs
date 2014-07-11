@@ -33,6 +33,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.router.TripStructureUtils;
 
+import playground.ivt.utils.MapUtils;
+
 /**
  * "Retrofits" travel time from events in the plans.
  * This is considered pretty bad practice, but it is the best way to get an efficient
