@@ -118,7 +118,7 @@ public class shapeFileToNetworkDelhi {
 
 				// following parameters are necessary for simulation, I just used some data to show how it works.
 				double linkLength = (Double) sf.getAttribute("LENGTH");
-				double capacity = (1800*(Double) sf.getAttribute("WIDTH"))/3.5;;
+				double capacity = 1800;//(1800*(Double) sf.getAttribute("WIDTH"))/3.5;;
 				double numberOfLanes = 2;
 				double freeSpeed = 60/3.6;
 
