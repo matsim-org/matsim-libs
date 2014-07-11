@@ -1,3 +1,21 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.agarwalamit.patnaIndia;
 
 import java.io.BufferedReader;
@@ -30,7 +48,9 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
-
+/**
+ * @author amit
+ */
 public class createPlans4Patna {
 
 	private static final Logger logger = Logger.getLogger(createPlans4Patna.class);
@@ -42,7 +62,7 @@ public class createPlans4Patna {
 
 	public static void main (String []args) throws IOException {
 
-		
+
 		String zoneFile = "../../patnaIndiaSim/input/wardFile/Wards.shp";		
 		String planFile1 = "../../patnaIndiaSim/input/Urban_PlanFile.CSV";
 		String planFile2 = "../../patnaIndiaSim/input/27TO42zones.CSV";
@@ -62,12 +82,12 @@ public class createPlans4Patna {
 		logger.info("Writing Plan file is finished.");
 
 	}
-// TODO [AA] what are these suppressWarnings? 
+	// TODO [AA] what are these suppressWarnings? 
 	@SuppressWarnings({ "unchecked", "unused", "resource", "deprecation", "rawtypes" })
-	public static void filesReader (String planFile, String zoneFile, Scenario scenario, int startId) throws IOException 	{
+	private static void filesReader (String planFile, String zoneFile, Scenario scenario, int startId) throws IOException 	{
 
 		FeatureSource featureSource = ShapeFileReader.readDataFile(zoneFile);
-//		TODO [AA] Look into error
+		//		TODO [AA] Look into error
 		/*
 		 * Oct 11, 2013 4:04:22 PM org.geotools.referencing.factory.DeferredAuthorityFactory disposeBackingStore
 INFO: Disposing class org.geotools.referencing.factory.epsg.ThreadedHsqlEpsgFactory backing store
@@ -112,7 +132,7 @@ Oct 11, 2013 4:04:22 PM org.geotools.data.shapefile.ShpFiles logCurrentLockers
 			if (! fromZoneId.equals(toZoneId))	{														
 
 				while (iterator.hasNext()){
-					
+
 					SimpleFeature feature = iterator.next();
 					int Id = (Integer) feature.getAttribute("ID1");
 					String zoneId  = String.valueOf(Id);
@@ -151,37 +171,37 @@ Oct 11, 2013 4:04:22 PM org.geotools.data.shapefile.ShpFiles logCurrentLockers
 					workZoneCoordTransform= ct.transform(toZoneCoord);
 				}
 			}
-//			for (int j=0; j<1; j++){ //run with 1% sample
-				Person person = factory.createPerson(scenario.createId(Integer.toString(startId++)));
-				System.out.println(person.getId().toString());
-				population.addPerson(person);
-				Plan plan = factory.createPlan();
-				person.addPlan(plan);
+			//			for (int j=0; j<1; j++){ //run with 1% sample
+			Person person = factory.createPerson(scenario.createId(Integer.toString(startId++)));
+			System.out.println(person.getId().toString());
+			population.addPerson(person);
+			Plan plan = factory.createPlan();
+			person.addPlan(plan);
 
-				String travelMode = parts [8];
-				int modeTravel = Integer.parseInt(travelMode);
+			String travelMode = parts [8];
+			int modeTravel = Integer.parseInt(travelMode);
 
-				switch (modeTravel) {
-				case 1:	 travelMode = "pt";	break;								// Bus
-				case 2:	 travelMode = "pt";	break;								// Mini Bus
-				case 3:  travelMode = "car";	break;
-				case 4:  travelMode = "motorbike";	break;							// all 2 W motorized 
-				case 5:  travelMode = "pt";	break;								// Motor driven 3W
-				case 6 : travelMode = "bike";	break;						//bicycle
-				case 7 : travelMode = "pt";	break;								// train
-				case 8 : travelMode = "walk";	break;
-				case 9 : travelMode = "bike";	break;						//CycleRickshaw
-				case 9999 : travelMode = randomModeSlum();	break;				// 480 such trips are found in which mode was not available so chosing a random mode 
-				case 999999 : travelMode = randomModeUrban(); break; 			// for zones 27 to 42
-				}
-				createActivities(scenario, plan, random, workZoneCoordTransform, homeZoneCoordTransform, travelMode, tripPurpose);
-//			}
+			switch (modeTravel) {
+			case 1:	 travelMode = "pt";	break;								// Bus
+			case 2:	 travelMode = "pt";	break;								// Mini Bus
+			case 3:  travelMode = "car";	break;
+			case 4:  travelMode = "motorbike";	break;							// all 2 W motorized 
+			case 5:  travelMode = "pt";	break;								// Motor driven 3W
+			case 6 : travelMode = "bike";	break;						//bicycle
+			case 7 : travelMode = "pt";	break;								// train
+			case 8 : travelMode = "walk";	break;
+			case 9 : travelMode = "bike";	break;						//CycleRickshaw
+			case 9999 : travelMode = randomModeSlum();	break;				// 480 such trips are found in which mode was not available so chosing a random mode 
+			case 999999 : travelMode = randomModeUrban(); break; 			// for zones 27 to 42
+			}
+			createActivities(scenario, plan, random, workZoneCoordTransform, homeZoneCoordTransform, travelMode, tripPurpose);
+			//			}
 			line = bufferedReader.readLine();
 			iterator = featureSource.getFeatures().iterator();
 		}
 	}
 
-	public static void createActivities (Scenario scenario,Plan plan, Random random, Coord toZoneFeatureCoord, Coord fromZoneFeatureCoord, String mode, String tripPurpose) {
+	private static void createActivities (Scenario scenario,Plan plan, Random random, Coord toZoneFeatureCoord, Coord fromZoneFeatureCoord, String mode, String tripPurpose) {
 
 		Random random2 = new Random();
 		Population population = scenario.getPopulation();
@@ -194,28 +214,28 @@ Oct 11, 2013 4:04:22 PM org.geotools.data.shapefile.ShpFiles logCurrentLockers
 		double homeleaveTime=0, workLeaveTime =0;
 		switch (tPurpose) {
 		// t1 is related to t to make sure that no one leaves from work before leaving home.
-//		case 1 : {homeleaveTime = 8*3600+random2.nextInt(91)*60; workLeaveTime =homeleaveTime+9*3600; break; }  //working hours between 8 to 9:30 and work Duration is 9 hours
-//		case 2 : {homeleaveTime = 6.5*3600+random2.nextInt(121)*60;workLeaveTime=homeleaveTime+8*3600;break;}  // educational hours between 6:30 to 8:30 hours
-//		case 3 : {homeleaveTime= 10*3600+random2.nextInt(121)*60; workLeaveTime = homeleaveTime+(7+random2.nextInt(3))*3600; break;}  // social duration between 7 to 9 hours
-//		case 4 : {homeleaveTime = 7*3600+random2.nextInt(301)*60; workLeaveTime= homeleaveTime+(4+random2.nextInt(7))*3600; break;} // other hours between 4 to 10 hours, also starting time between 8 to 1pm and random end time can shift it to at most 2 pm
-//		case 9999 : {homeleaveTime = 7*3600+random2.nextInt(301)*60; workLeaveTime= homeleaveTime+(4+random2.nextInt(7))*3600; break;} // not given time
-		
-		
-//		case 1 : {homeleaveTime = 8.5*3600+random2.nextInt(91)*60; workLeaveTime =homeleaveTime+9*3600; break; }  //working hours between 8 to 9:30 and work Duration is 9 hours
-//		case 2 : {homeleaveTime = 7.5*3600+random2.nextInt(121)*60;workLeaveTime=homeleaveTime+8*3600;break;}  // educational hours between 6:30 to 8:30 hours
-//		case 3 : {homeleaveTime= 10*3600+random2.nextInt(121)*60; workLeaveTime = homeleaveTime+(7+random2.nextInt(3))*3600; break;}  // social duration between 7 to 9 hours
-//		case 4 : {homeleaveTime = 7.5*3600+random2.nextInt(301)*60; workLeaveTime= homeleaveTime+(4+random2.nextInt(7))*3600; break;} // other hours between 4 to 10 hours, also starting time between 8 to 1pm and random end time can shift it to at most 2 pm
-//		case 9999 : {homeleaveTime = 8*3600+random2.nextInt(301)*60; workLeaveTime= homeleaveTime+(4+random2.nextInt(7))*3600; break;} // not given time
-		
+		//		case 1 : {homeleaveTime = 8*3600+random2.nextInt(91)*60; workLeaveTime =homeleaveTime+9*3600; break; }  //working hours between 8 to 9:30 and work Duration is 9 hours
+		//		case 2 : {homeleaveTime = 6.5*3600+random2.nextInt(121)*60;workLeaveTime=homeleaveTime+8*3600;break;}  // educational hours between 6:30 to 8:30 hours
+		//		case 3 : {homeleaveTime= 10*3600+random2.nextInt(121)*60; workLeaveTime = homeleaveTime+(7+random2.nextInt(3))*3600; break;}  // social duration between 7 to 9 hours
+		//		case 4 : {homeleaveTime = 7*3600+random2.nextInt(301)*60; workLeaveTime= homeleaveTime+(4+random2.nextInt(7))*3600; break;} // other hours between 4 to 10 hours, also starting time between 8 to 1pm and random end time can shift it to at most 2 pm
+		//		case 9999 : {homeleaveTime = 7*3600+random2.nextInt(301)*60; workLeaveTime= homeleaveTime+(4+random2.nextInt(7))*3600; break;} // not given time
+
+
+		//		case 1 : {homeleaveTime = 8.5*3600+random2.nextInt(91)*60; workLeaveTime =homeleaveTime+9*3600; break; }  //working hours between 8 to 9:30 and work Duration is 9 hours
+		//		case 2 : {homeleaveTime = 7.5*3600+random2.nextInt(121)*60;workLeaveTime=homeleaveTime+8*3600;break;}  // educational hours between 6:30 to 8:30 hours
+		//		case 3 : {homeleaveTime= 10*3600+random2.nextInt(121)*60; workLeaveTime = homeleaveTime+(7+random2.nextInt(3))*3600; break;}  // social duration between 7 to 9 hours
+		//		case 4 : {homeleaveTime = 7.5*3600+random2.nextInt(301)*60; workLeaveTime= homeleaveTime+(4+random2.nextInt(7))*3600; break;} // other hours between 4 to 10 hours, also starting time between 8 to 1pm and random end time can shift it to at most 2 pm
+		//		case 9999 : {homeleaveTime = 8*3600+random2.nextInt(301)*60; workLeaveTime= homeleaveTime+(4+random2.nextInt(7))*3600; break;} // not given time
+
 		case 1 : {homeleaveTime = 8*3600+random2.nextInt(91)*60; workLeaveTime =homeleaveTime+8*3600; break; }  //working hours between 8 to 9:30 and work Duration is 9 hours
 		case 2 : {homeleaveTime = 7*3600+random2.nextInt(121)*60;workLeaveTime=homeleaveTime+7*3600;break;}  // educational hours between 6:30 to 8:30 hours
 		case 3 : {homeleaveTime= 10*3600+random2.nextInt(121)*60; workLeaveTime = homeleaveTime+5*3600; break;}  // social duration between 7 to 9 hours
 		case 4 : {homeleaveTime = 7.5*3600+random2.nextInt(301)*60; workLeaveTime= homeleaveTime+7*3600; break;} // other hours between 4 to 10 hours, also starting time between 8 to 1pm and random end time can shift it to at most 2 pm
 		case 9999 : {homeleaveTime = 8*3600+random2.nextInt(301)*60; workLeaveTime= homeleaveTime+7*3600; break;} // not given time
-		
+
 		}
 		homeAct.setEndTime(homeleaveTime); 								
-//		homeAct.setEndTime(8*3600);
+		//		homeAct.setEndTime(8*3600);
 		plan.addActivity(homeAct);
 
 		Leg leg = populationFactory.createLeg(mode);
@@ -223,7 +243,7 @@ Oct 11, 2013 4:04:22 PM org.geotools.data.shapefile.ShpFiles logCurrentLockers
 
 		Activity workAct = populationFactory.createActivityFromCoord("work", toZoneFeatureCoord);
 		workAct.setEndTime(workLeaveTime); 
-//		workAct.setEndTime(18*3600);
+		//		workAct.setEndTime(18*3600);
 		plan.addActivity(workAct);
 		plan.addLeg(populationFactory.createLeg(mode));
 
@@ -231,7 +251,7 @@ Oct 11, 2013 4:04:22 PM org.geotools.data.shapefile.ShpFiles logCurrentLockers
 		plan.addActivity(homeActII);
 	}
 
-	public static Point getRandomPointsFromWard (SimpleFeature feature, Random random) {
+	private static Point getRandomPointsFromWard (SimpleFeature feature, Random random) {
 		Point p = null;
 		double x,y;
 		do {
@@ -242,7 +262,7 @@ Oct 11, 2013 4:04:22 PM org.geotools.data.shapefile.ShpFiles logCurrentLockers
 		return p;
 	}
 	// this method is for slum population as 480 plans don't have information about travel mode so one random mode is assigned out of these four modes. 
-	public static String randomModeSlum () {
+	private static String randomModeSlum () {
 		//		share of each vehicle is given in table 5-13 page 91 in CMP Patna
 		//		pt - 15, car -0, 2W - 7, Bicycle -39 and walk 39
 		Random rnd = new Random();
@@ -255,7 +275,7 @@ Oct 11, 2013 4:04:22 PM org.geotools.data.shapefile.ShpFiles logCurrentLockers
 		return travelMode;
 	}
 
-	public static String randomModeUrban () {
+	private static String randomModeUrban () {
 		//		share of each vehicle is given in table 5-13 page 91 in CMP Patna
 		//		pt - 23, car -5, 2W - 25, Bicycle -33 and walk 14
 		Random rnd = new Random();

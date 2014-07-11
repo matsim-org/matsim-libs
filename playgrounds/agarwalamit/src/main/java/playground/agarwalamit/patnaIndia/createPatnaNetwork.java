@@ -1,3 +1,21 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.agarwalamit.patnaIndia;
 
 
@@ -26,7 +44,9 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 import playground.andreas.utils.net.NetworkSimplifier;
-
+/**
+ * @author amit
+ */
 
 public class createPatnaNetwork {       
 	private static final Logger logger = Logger.getLogger(createPatnaNetwork.class);
@@ -153,7 +173,7 @@ public class createPatnaNetwork {
 		new NetworkWriter(network).write("./patnaOutput/network.xml");
 	}    
 
-	public static double capacityOfLink (String roadwidth) {
+	private static double capacityOfLink (String roadwidth) {
 		double linkCapacity =0;
 		double w = Double.parseDouble(roadwidth);
 		double capacityCarrigway = -2184-22.6*Math.pow(w, 2)+857.4*w;  
