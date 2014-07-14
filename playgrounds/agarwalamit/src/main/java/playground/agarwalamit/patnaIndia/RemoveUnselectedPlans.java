@@ -35,9 +35,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class RemoveUnselectedPlans {
 
 	public static void main(String[] args) {
-		String clusterPath="/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/";
-		String inputPlans = clusterPath+"/outputMCOff/run33/output_plans.xml.gz";
-		String outputPlans = clusterPath+"/outputMCOff/selectedPlansOnly_plans.xml";
+		String clusterPath="/Users/aagarwal/Desktop/ils4/agarwal/munich/";
+		String inputPlans = clusterPath+"/output/1pct/baseCase2/output_plans.xml.gz";
+		String outputPlans = clusterPath+"/input/selectedPlansOnly.xml";
 
 		Config config = ConfigUtils.createConfig();
 		config.plans().setInputFile(inputPlans);
