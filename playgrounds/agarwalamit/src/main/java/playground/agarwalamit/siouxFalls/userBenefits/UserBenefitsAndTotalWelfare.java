@@ -45,7 +45,7 @@ public class UserBenefitsAndTotalWelfare {
 	private final static Logger logger = Logger.getLogger(UserBenefitsAndTotalWelfare.class);
 
 	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/";
-	private static String [] runNumbers = new String [] {"run201", "run202", "run203","run204"};
+	private static String [] runNumbers = new String [] {"run201", "run202", "run203", "run204"};
 	private static String [] runCases = new String [] {"baseCase","onlyEmission", "onlyCongestion", "both"};
 	private final static WelfareMeasure welfareMeasure = WelfareMeasure.SELECTED;
 	private static final String outputFolder = "/outputMC/";
@@ -65,7 +65,7 @@ public class UserBenefitsAndTotalWelfare {
 			monetaryPayments[i] = getMonetaryPayment(runNumbers[i]);
 			absoluteDataToWrite.add(runCases[i]+"\t"+getAllUserBenefits(runNumbers[i],welfareMeasure)+"\t"+monetaryPayments[i]);
 		}
-		writeStrings(clusterPathDesktop+outputFolder+"/analysis500Its/r/rAbsoluteUserBenefits"+welfareMeasure+".txt", absoluteDataToWrite);
+		writeStrings(clusterPathDesktop+outputFolder+"/analysis/r/rAbsoluteUserBenefits"+welfareMeasure+".txt", absoluteDataToWrite);
 
 		String [] xLabel = {"only Emissions", "only Congestion", "Both"};
 		double [] relativeUserLogSum = { Math.pow(10, 4)*(allUserLogSums[1]-allUserLogSums[0]),
@@ -79,8 +79,7 @@ public class UserBenefitsAndTotalWelfare {
 			sumOfTwo[j] = relativeUserLogSum [j]+Math.abs(relativeTollPayments[j]);//toll payments are already negative thus they will be positive for the system
 			relativeDataToWrite.add(runCases[j+1]+"\t"+relativeUserLogSum[j]+"\t"+String.valueOf(-1*relativeTollPayments[j])+"\t"+sumOfTwo[j]); 
 		}
-		writeStrings(clusterPathDesktop+outputFolder+"/analysis500Its/r/rChangeInSystemWelfare"+welfareMeasure+".txt", relativeDataToWrite);
-		
+		writeStrings(clusterPathDesktop+outputFolder+"/analysis/r/rChangeInSystemWelfare"+welfareMeasure+".txt", relativeDataToWrite);
 	}
 
 	private static ScenarioImpl loadScenario(String runNumber) {

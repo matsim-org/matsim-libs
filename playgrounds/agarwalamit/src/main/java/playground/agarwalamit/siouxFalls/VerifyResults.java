@@ -54,8 +54,8 @@ public class VerifyResults {
 	private static final double marginalUtlOfTravelTime = marginal_Utl_traveling_car_sec+marginal_Utl_performing_sec;
 	private static final double vtts_car = marginalUtlOfTravelTime/marginal_Utl_money;
 
-	private final  static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/run";
-	private  final static String [] runNr = {"33"};//{"201","202", "203","204"};//{"1","2","3","4"};
+	private final  static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/10Pct/";
+	private  final static String [] runNr = {"BAU","EI","CI"};//{"201","202", "203","204"};//{"1","2","3","4"};
 
 	private  static Scenario scenario ;
 
