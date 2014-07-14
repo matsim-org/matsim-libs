@@ -39,10 +39,11 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
 public class AbsoluteDelays {
 
 	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/";
-	private static String [] runNumber =  {"run201","run202","run203","run204"};
+	private static String [] runNumber =  {"BAU","EI","CI"};//{"run201","run202","run203","run204"};
+
 	public static void main(String[] args) {
 		
-		BufferedWriter writer =IOUtils.getBufferedWriter(clusterPathDesktop+"/outputMC/analysis500Its/r/rAbsoluteDelays.txt");
+		BufferedWriter writer =IOUtils.getBufferedWriter(clusterPathDesktop+"/10Pct/analysis/r/rAbsoluteDelays.txt");
 		
 		double [] delays = new double [runNumber.length];
 		
@@ -52,7 +53,10 @@ public class AbsoluteDelays {
 		
 		try {
 			writer.write("BAU \t EI \t CI \t ECI \n");
-			writer.write(delays[0]+"\t"+delays[1]+"\t"+delays[2]+"\t"+delays[3]+"\n");
+			for(double d:delays){
+			writer.write(d+"\t");
+			}
+			writer.newLine();
 			writer.close();
 		} catch (IOException e) {
 			throw new RuntimeException("Data is not written into File. Reason : "+e);
@@ -68,7 +72,8 @@ public class AbsoluteDelays {
 		eventManager.addHandler(congestionHandlerImplV3);
 
 		MatsimEventsReader eventsReader = new MatsimEventsReader(eventManager);
-		String inputEventsFile = clusterPathDesktop+"/outputMC/"+runNumber+"/ITERS/it.500/500.events.xml.gz";
+		String eventFileLocation = "/10Pct/"+runNumber+"/ITERS/it.500/500.events.xml.gz";
+		String inputEventsFile = clusterPathDesktop+eventFileLocation;
 		eventsReader.readFile(inputEventsFile);
 
 		return congestionHandlerImplV3.getTotalDelay()/3600;
