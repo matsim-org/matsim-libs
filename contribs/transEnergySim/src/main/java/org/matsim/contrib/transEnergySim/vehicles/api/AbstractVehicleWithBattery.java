@@ -37,6 +37,7 @@ public abstract class AbstractVehicleWithBattery extends AbstractVehicle {
 	 * be used, as this might reduce the life time of the battery.
 	 */
 	protected double usableBatteryCapacityInJoules;
+	private boolean ignoreOverCharging = false;
 
 	/**
 	 * state of charge
@@ -69,11 +70,13 @@ public abstract class AbstractVehicleWithBattery extends AbstractVehicle {
 	 * @param energyChargeInJoule
 	 */
 	public void chargeBattery(double energyChargeInJoule) {
-		socInJoules += energyChargeInJoule;
-
-		if (!MathLib.equals(socInJoules, getUsableBatteryCapacityInJoules(), GeneralLib.EPSILON * 100)
-				&& socInJoules > getUsableBatteryCapacityInJoules()) {
-			DebugLib.stopSystemAndReportInconsistency("the car has been overcharged" + socInJoules + " but MC" + getUsableBatteryCapacityInJoules());
+		if (!ignoreOverCharging) {
+			socInJoules += energyChargeInJoule;
+			if (!MathLib.equals(socInJoules, getUsableBatteryCapacityInJoules(), GeneralLib.EPSILON * 100)
+					&& socInJoules > getUsableBatteryCapacityInJoules()) {
+				DebugLib.stopSystemAndReportInconsistency("the car has been overcharged" + socInJoules + " but MC"
+						+ getUsableBatteryCapacityInJoules());
+			}
 		}
 	}
 
@@ -84,6 +87,10 @@ public abstract class AbstractVehicleWithBattery extends AbstractVehicle {
 	@Override
 	public void reset() {
 		socInJoules = usableBatteryCapacityInJoules;
+	}
+
+	public void ignoreOverCharging(boolean ignoreOverCharging) {
+		this.ignoreOverCharging=ignoreOverCharging;
 	}
 
 }
