@@ -51,6 +51,9 @@ public class TollPerKmHandler implements PersonMoneyEventHandler,
 	Network network;
 	private boolean considerOnlyMunich = true;
 	Collection<SimpleFeature> featuresInVisBoundary;
+	private HashMap<Id, List<Double>> personId2ListOfTollPerKm;
+	private HashMap<Id, List<Double>> personId2ListOfToll;
+	private HashMap<Id, List<Double>> personId2ListOfKm;
 	
 	public TollPerKmHandler(Network network, String visBoundaryShapeFile){
 		this.personId2linkLeaveEvents = new HashMap<Id, List<LinkLeaveEvent>>();
@@ -87,47 +90,66 @@ public class TollPerKmHandler implements PersonMoneyEventHandler,
 		personId2personMoneyEvent.get(personId).add(event);
 	}
 
-	public Map<Id, List<Double>> getPersonId2ListOfTollPerKM() {
-		Map<Id, List<Double>> personId2ListOfTollPerKm = new HashMap<Id, List<Double>>();
+	public void calculateAverages(){
+		
+		personId2ListOfTollPerKm = new HashMap<Id, List<Double>>();
+		personId2ListOfToll = new HashMap<Id, List<Double>>();
+		personId2ListOfKm = new HashMap<Id, List<Double>>();
+		HashMap<Id, List<LinkLeaveEvent>> relevantPersonId2linkLeaveEvents = new HashMap<Id, List<LinkLeaveEvent>>();
 		
 		//if(considerOnlyMunich ){
 			System.out.println("-------------------------cleaning");
 			for(Id personId: personId2linkLeaveEvents.keySet()){
 				List<LinkLeaveEvent> eventsInBoundary = new ArrayList<LinkLeaveEvent>();
+				
 				for(LinkLeaveEvent lle: personId2linkLeaveEvents.get(personId)){
 					Coord lleCoord = network.getLinks().get(lle.getLinkId()).getCoord();
 					if(isInVisBoundary(lleCoord)){
 						eventsInBoundary.add(lle);
 					}
 				}
-				System.out.println(personId.toString() + " had " + personId2linkLeaveEvents.get(personId).size() + " lle events and now has" +
-						eventsInBoundary.size() + " lle events");
 				personId2linkLeaveEvents.put(personId, eventsInBoundary);
+				relevantPersonId2linkLeaveEvents.put(personId, eventsInBoundary);
+				
 			}	
 			
 		//}
 		
+		personId2linkLeaveEvents = relevantPersonId2linkLeaveEvents;
+			
 		for(Id personId : personId2personMoneyEvent.keySet()){
 			List<Double> tollsperkm = new ArrayList<Double>();
+			List<Double> tolls = new ArrayList<Double>();
+			List<Double> kms = new ArrayList<Double>();
+			
 			// calculate toll per km
 			for(PersonMoneyEvent pme: personId2personMoneyEvent.get(personId)){
 				
-				LinkLeaveEvent corrEvent = findCorrespondingLinkLeaveEvent(pme, personId2linkLeaveEvents.get(personId));
+				LinkLeaveEvent corrEvent = findCorrespondingLinkLeaveEvent(pme, relevantPersonId2linkLeaveEvents.get(personId));
 				if(corrEvent!=null){
 				Double tollAmount = - pme.getAmount();
 				Double linkLength = network.getLinks().get(corrEvent.getLinkId()).getLength();
 				Double tollPerKm = new Double(tollAmount/linkLength*1000.); // per kilometer (*1000) in EUR 
 				tollsperkm.add(tollPerKm);
+				tolls.add(tollAmount);
+				kms.add(linkLength/1000.);
 				}
 			}
 			personId2ListOfTollPerKm.put(personId, tollsperkm);
+			personId2ListOfKm.put(personId, kms);
+			personId2ListOfToll.put(personId, tolls);
 		}
-		return personId2ListOfTollPerKm;
+		
 		
 	}
+	public Map<Id, List<Double>> getPersonId2ListOfTollPerKM() {
+		return personId2ListOfTollPerKm;
+		}
+	
 	private LinkLeaveEvent findCorrespondingLinkLeaveEvent(
 			PersonMoneyEvent pme, List<LinkLeaveEvent> set) {
 		if (set!=null) {
+			if(!set.isEmpty()){
 			Double moneyTime = pme.getTime();
 			LinkLeaveEvent lle = set.get(0);
 			for (LinkLeaveEvent potential : set) {
@@ -136,7 +158,11 @@ public class TollPerKmHandler implements PersonMoneyEventHandler,
 					lle = potential;
 				}
 			}
-			return lle;
+			
+			if(Math.abs(lle.getTime()-moneyTime )<2.){
+				return lle;
+			}
+		}
 		}
 		return null;
 	}
@@ -152,5 +178,11 @@ public class TollPerKmHandler implements PersonMoneyEventHandler,
 			}
 		}
 		return isInMunichShape;
+	}
+	public Map<Id, List<Double>> getPersonId2ListOfToll() {
+		return personId2ListOfToll;
+	}
+	public Map<Id, List<Double>> getPersonId2ListOfKm() {
+		return personId2ListOfKm;
 	}
 }

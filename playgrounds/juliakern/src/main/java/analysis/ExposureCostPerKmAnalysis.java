@@ -137,90 +137,119 @@ public class ExposureCostPerKmAnalysis {
 		this.outputDir= runDirectoryStub + cases[0] + "/";
 	}
 
-//	private void run() {
-//		
-//		System.out.println("---- starting up");
-//		
-//		for(String caseName : cases){
-//			
-//			String runDirectory = runDirectoryStub + caseName + "/";
-//			
-//			//mobilTUM
-//			netFile = runDirectory + caseName + ".output_network.xml.gz";
-//			configFile = runDirectory + caseName + ".output_config.xml.gz";
-//			
-//			//exposure
-//			netFile = runDirectory +  "output_network.xml.gz";
-//			configFile = runDirectory + caseName + ".output_config.xml.gz";
-//			
-////			if(caseName.equals(cases[0])){
-////				plansFile = runDirectory + "ITERS/it." + initialIterationNo + "/" + caseName + "." +  initialIterationNo + ".plans.xml.gz";
-////				eventsFile = runDirectory + "ITERS/it." + initialIterationNo + "/" + caseName + "." +  initialIterationNo + ".events.xml.gz";
-////				emissionEventsFile = runDirectory + "ITERS/it." + initialIterationNo + "/" + caseName + "." + initialIterationNo +  ".emission.events.xml.gz";
-////			} else {
-//				plansFile = runDirectory + "ITERS/it." + finalIterationNo + "/" +  finalIterationNo + ".plans.xml.gz";
-//				eventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" +  finalIterationNo + ".events.xml.gz";
-//				emissionEventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/"  +  finalIterationNo +  ".emission.events.xml.gz";
-////			}
-//			
-//			//latsis
-////			netFile = runDirectory + "output_network.xml.gz";
-////			configFile = runDirectory + "output_config.xml.gz";
-////			plansFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".plans.xml.gz";
-////			eventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".events.xml.gz";
-////			emissionEventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".emission.events.xml.gz";
-//			
-////			calculateUserWelfareAndTollRevenueStatisticsByUserGroup(netFile, configFile, plansFile, eventsFile, caseName);
-////			calculateDistanceTimeStatisticsByUserGroup(netFile, eventsFile, caseName);
-////			calculateEmissionStatisticsByUserGroup(emissionEventsFile, caseName);
-//				System.out.println("---- starting toll per km by usre group");
-//			calculateTollPerKmByUserGroup(netFile, eventsFile, caseName);
-//		}
-//		
-////		calculateDistanceTimeStatisticsByUserGroupDifferences(case2personId2carDistance);
-//	}
+	private void run() {
+		
+		System.out.println("---- starting up");
+		
+		for(String caseName : cases){
+			
+			String runDirectory = runDirectoryStub + caseName + "/";
+			
+			//mobilTUM
+			netFile = runDirectory + caseName + ".output_network.xml.gz";
+			configFile = runDirectory + caseName + ".output_config.xml.gz";
+			
+			//exposure
+			netFile = runDirectory +  "output_network.xml.gz";
+			configFile = runDirectory + caseName + ".output_config.xml.gz";
+			
+//			if(caseName.equals(cases[0])){
+//				plansFile = runDirectory + "ITERS/it." + initialIterationNo + "/" + caseName + "." +  initialIterationNo + ".plans.xml.gz";
+//				eventsFile = runDirectory + "ITERS/it." + initialIterationNo + "/" + caseName + "." +  initialIterationNo + ".events.xml.gz";
+//				emissionEventsFile = runDirectory + "ITERS/it." + initialIterationNo + "/" + caseName + "." + initialIterationNo +  ".emission.events.xml.gz";
+//			} else {
+				plansFile = runDirectory + "ITERS/it." + finalIterationNo + "/" +  finalIterationNo + ".plans.xml.gz";
+				eventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" +  finalIterationNo + ".events.xml.gz";
+				emissionEventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/"  +  finalIterationNo +  ".emission.events.xml.gz";
+//			}
+			
+			//latsis
+//			netFile = runDirectory + "output_network.xml.gz";
+//			configFile = runDirectory + "output_config.xml.gz";
+//			plansFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".plans.xml.gz";
+//			eventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".events.xml.gz";
+//			emissionEventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".emission.events.xml.gz";
+			
+//			calculateUserWelfareAndTollRevenueStatisticsByUserGroup(netFile, configFile, plansFile, eventsFile, caseName);
+//			calculateDistanceTimeStatisticsByUserGroup(netFile, eventsFile, caseName);
+//			calculateEmissionStatisticsByUserGroup(emissionEventsFile, caseName);
+				System.out.println("---- starting toll per km by usre group");
+			calculateTollPerKmByUserGroup(netFile, eventsFile, caseName);
+		}
+		
+//		calculateDistanceTimeStatisticsByUserGroupDifferences(case2personId2carDistance);
+	}
 
-//	private void calculateTollPerKmByUserGroup(String networkFile, String eventFile, String caseName) {
-//		
-//		System.out.println("---- starting up b ");
-//		Scenario scenario = loadScenario(networkFile, plansFile);
-//		Population pop = scenario.getPopulation();
-//
-//		EventsManager eventsManager = EventsUtils.createEventsManager();
-//		EventsReaderXMLv1 eventsReader = new EventsReaderXMLv1(eventsManager);
-//		TollPerKmHandler tollperKmHandler = new TollPerKmHandler(scenario.getNetwork(), munichShapeFile);
-//		eventsManager.addHandler(tollperKmHandler);
-//		eventsReader.parse(eventsFile);
-//		
-//		// combine link leave events with money events to paid toll per km 
-//		System.out.println("----- get person id 2 list ");
-//		Map<Id, List<Double>> personId2tpk = tollperKmHandler.getPersonId2ListOfTollPerKM();
-//		
-//		// put into different lists for each user group
-//		Set<UserGroup> userGroups = userGroupUtils.getUserGroups(pop);
-//		//userGroupUtils.personFilter.isPersonIdFromUserGroup(personId, userGroup);
-//		Map<UserGroup, List<Double>> usergroup2listOfcostPerKm = new HashMap<UserGroup, List<Double>>();
-//		for(UserGroup ug: userGroups){
-//			usergroup2listOfcostPerKm.put(ug, new ArrayList<Double>());
-//		}
-//		for(Id personId: personId2tpk.keySet()){
-//			UserGroup currUg = null;
-//			for(UserGroup ug: userGroups){
-//				if(userGroupUtils.personFilter.isPersonIdFromUserGroup(personId, ug)){
-//					currUg = ug;
-//					break;
-//				}
-//			}
-//			if (currUg != null) {
-//				for (Double tollPerKm : personId2tpk.get(personId)) {
-//					usergroup2listOfcostPerKm.get(currUg).add(tollPerKm);
-//				}
-//			}
-//		}
-//		// write into 1? 4? files?
-//		AnalysisWriter aw = new AnalysisWriter();
-//		aw.writeCostPerKmInformation(usergroup2listOfcostPerKm, outputDir + "analysis/inMunich" + caseName);
-//	}
+	private void calculateTollPerKmByUserGroup(String networkFile, String eventFile, String caseName) {
+		
+		System.out.println("---- starting up b ");
+		Scenario scenario = loadScenario(networkFile, plansFile);
+		Population pop = scenario.getPopulation();
+
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		EventsReaderXMLv1 eventsReader = new EventsReaderXMLv1(eventsManager);
+		TollPerKmHandler tollperKmHandler = new TollPerKmHandler(scenario.getNetwork(), munichShapeFile);
+		eventsManager.addHandler(tollperKmHandler);
+		eventsReader.parse(eventsFile);
+		
+		// combine link leave events with money events to paid toll per km 
+		System.out.println("----- get person id 2 list ");
+		tollperKmHandler.calculateAverages();
+		Map<Id, List<Double>> personId2tpk = tollperKmHandler.getPersonId2ListOfTollPerKM();
+		Map<Id, List<Double>> personId2toll = tollperKmHandler.getPersonId2ListOfToll();
+		Map<Id, List<Double>> personId2km = tollperKmHandler.getPersonId2ListOfKm();
+		
+		// put into different lists for each user group
+		Set<UserGroup> userGroups = userGroupUtils.getUserGroups(pop);
+		//userGroupUtils.personFilter.isPersonIdFromUserGroup(personId, userGroup);
+		Map<UserGroup, List<Double>> usergroup2listOfcostPerKm = new HashMap<UserGroup, List<Double>>();
+		Map<UserGroup, List<Double>> usergroup2listOfToll = new HashMap<UserGroup, List<Double>>();
+		Map<UserGroup, List<Double>> usergroup2listOfKm = new HashMap<UserGroup, List<Double>>();
+		
+		for(UserGroup ug: userGroups){
+			usergroup2listOfcostPerKm.put(ug, new ArrayList<Double>());
+			usergroup2listOfKm.put(ug, new ArrayList<Double>());
+			usergroup2listOfToll.put(ug, new ArrayList<Double>());
+		}
+		
+		for(Id personId: personId2tpk.keySet()){
+			UserGroup currUg = null;
+			for(UserGroup ug: userGroups){
+				if(userGroupUtils.personFilter.isPersonIdFromUserGroup(personId, ug)){
+					currUg = ug;
+					break;
+				}
+			}
+			if (currUg != null) {
+				for (Double tollPerKm : personId2tpk.get(personId)) {
+					usergroup2listOfcostPerKm.get(currUg).add(tollPerKm);
+				}
+				for(Double toll: personId2toll.get(personId)){
+					usergroup2listOfToll.get(currUg).add(toll);
+				}
+				for(Double km: personId2km.get(personId)){
+					usergroup2listOfKm.get(currUg).add(km);
+				}
+			}
+		}
+		// write into 1? 4? files?
+		AnalysisWriter aw = new AnalysisWriter();
+		aw.writeCostPerKmInformation(usergroup2listOfcostPerKm, outputDir + "analysis/inMunich" + caseName);
+		
+		//TODO calc total km, total paid tolls, toll/km
+		
+		for(UserGroup ug: userGroups){
+			// total tolls
+			Double ttolls = 0.0, tkm=0.0; 
+			for(Double toll: usergroup2listOfToll.get(ug)){
+				ttolls += toll;
+			}
+			for(Double km: usergroup2listOfKm.get(ug)){
+				tkm+= km;
+			}
+			logger.info(caseName + " User group " + ug.toString() + " paid tolls [Euro] " + ttolls + " total distance [km] " + tkm + " average toll/distance [EuroCt/km] " + (ttolls/tkm*100));
+		}
+	}
 
 //	private void calculateDistanceTimeStatisticsByUserGroupDifferences(Map<String, Map<Id, Double>> case2personId2carDistance) {
 //		
@@ -331,17 +360,17 @@ public class ExposureCostPerKmAnalysis {
 //		writer.writeAvgTTInformation(mode2personId2TravelTime, userGroup2mode2noOfTrips);
 //	}
 
-//	private Scenario loadScenario(String netFile, String plansFile) {
-//		Config config = ConfigUtils.createConfig();
-//		config.network().setInputFile(netFile);
-//		config.plans().setInputFile(plansFile);
-//		Scenario scenario = ScenarioUtils.loadScenario(config);
-//		return scenario;
-//	}
+	private Scenario loadScenario(String netFile, String plansFile) {
+		Config config = ConfigUtils.createConfig();
+		config.network().setInputFile(netFile);
+		config.plans().setInputFile(plansFile);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		return scenario;
+	}
 
 	public static void main(String[] args) {
 		logger.info("----- starting main");
-		//ExposureCostPerKmAnalysis ma = new ExposureCostPerKmAnalysis();
-		//ma.run();
+		ExposureCostPerKmAnalysis ma = new ExposureCostPerKmAnalysis();
+		ma.run();
 	}
 }

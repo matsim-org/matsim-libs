@@ -126,7 +126,7 @@ public class ResponsibilityUtils {
 				if (epb.getXbin().equals(xBin) && epb.getYbin().equals(yBin)) {					
 					String location = "x = " + epb.getXbin().toString()	+ ", y = " + epb.getYbin();
 					ResponsibilityEvent ree = new ResponsibilityEventImpl(epb.getPersonId(), exposedPersonId, startTime, endTime, epb.getConcentration(), location);
-					System.out.println("epb conc" + epb.getConcentration());
+					System.out.println("epb conc" + epb.getConcentration() + "x " + epb.getXbin() + "y" + epb.getYbin());
 					rEvents.add(ree);
 				}
 			}

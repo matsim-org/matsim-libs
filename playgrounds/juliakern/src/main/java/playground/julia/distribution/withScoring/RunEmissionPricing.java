@@ -26,6 +26,7 @@ import org.matsim.contrib.emissions.*;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.NetworkConfigGroup;
@@ -69,6 +70,8 @@ public class RunEmissionPricing {
 	static String outputPath = "../../detailedEval/emissions/testScenario/output/";
 	
 	public static void main(String[] args) {
+		
+		
 		Config config = new Config();
 		config.addCoreModules();
 		Controler controler = new Controler(config);

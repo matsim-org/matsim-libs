@@ -137,7 +137,7 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 			}
 			emissionPerCell.get(endOfTimeIntervall).addAll(arrayEpb);
 			System.out.println("link " + linkId.toString() +  "warm emission amounts " + event.getWarmEmissions().toString());
-			System.out.println("toll in euro " + value);
+			System.out.println("toll (undistributed, not weighted) in euro " + value);
 		}
 	}
 

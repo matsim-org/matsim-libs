@@ -63,6 +63,7 @@ public class ResponsibilityUtils {
 				}
 			}
 			avgDurations = avgDurations/noOfXCells/noOfYCells;
+			System.out.println("average durations " + avgDurations);
 			
 			ArrayList<EmPerCell> emissionsOfCurrentInterval = emissionsPerCell.get(endOfTimeInterval);
 			// em per cell has already price as value and therefore no pollutant type
@@ -88,6 +89,7 @@ public class ResponsibilityUtils {
 					}}
 				}
 				
+				System.out.println("unscaled emission costs (in eur?) " + epc.getConcentration());
 				if(person2costs.containsKey(personId)){
 					Double oldValue = person2costs.get(personId);
 					person2costs.put(personId, epc.getConcentration()*exposureDuration+oldValue);

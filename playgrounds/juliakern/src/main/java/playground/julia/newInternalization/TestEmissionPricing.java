@@ -91,11 +91,11 @@ public class TestEmissionPricing {
 
 	private static Map<Id, Integer> links2xCells;
 
-	private static Integer noOfXCells = 16;
+	private static Integer noOfXCells = 32;
 
 	private static Map<Id, Integer> links2yCells;
 
-	private static Integer noOfYCells = 12;
+	private static Integer noOfYCells = 20;
 
 	private static ResponsibilityGridTools rgt;
 
@@ -103,9 +103,7 @@ public class TestEmissionPricing {
 
 	private static int noOfTimeBins = 24;
 	
-	private static int numberOfIterations = 30;
-
-	private static double epsilon = Double.MIN_NORMAL;
+	private static int numberOfIterations = 21;
 	
 	public static void main(String[] args) {
 		
@@ -113,8 +111,9 @@ public class TestEmissionPricing {
 		
 		Config config = new Config();
 		config.addCoreModules();
-		config.setParam("strategy", "maxAgentPlanMemorySize", "11");
+		config.setParam("strategy", "maxAgentPlanMemorySize", "10");
 		Controler controler = new Controler(config);
+		config.setParam("controler", "writeEventsInterval", "1");
 		
 		
 	// controler settings	
@@ -135,7 +134,7 @@ public class TestEmissionPricing {
 	// qsimConfigGroup
 		QSimConfigGroup qcg = controler.getConfig().qsim();
 		qcg.setStartTime(0 * 3600.);
-		qcg.setEndTime(30 * 3600.);
+		qcg.setEndTime(24 * 3600.);
 		qcg.setFlowCapFactor(0.1);
 		qcg.setStorageCapFactor(0.3);
 //		qcg.setFlowCapFactor(0.01);
@@ -167,26 +166,52 @@ public class TestEmissionPricing {
 		for(String activity : activities){
 			ActivityParams params = new ActivityParams(activity);
 			if(activity.equals("home")){
-				params.setTypicalDuration(12*3600);
+				params.setTypicalDuration(6*3600);
 			}else{
-				params.setTypicalDuration(8 * 3600);
+				if(activity.equals("work")){
+					params.setTypicalDuration(9*3600);
+				}else{
+					params.setTypicalDuration(8 * 3600);
+				}
 			}
 			pcs.addActivityParams(params);
 		}
 		
+		pcs.setMonetaryDistanceCostRateCar(new Double("-3.0E-4"));
+		
+		pcs.setMarginalUtilityOfMoney(0.0789942);
+		pcs.setTraveling_utils_hr(0.0);
+		pcs.setLateArrival_utils_hr(0.0);
+		pcs.setPerforming_utils_hr(0.96);
+		
+		logger.info("mrg util of money " + pcs.getMarginalUtilityOfMoney() + " = 0.0789942?");
+
 		
 
 	// strategy
+//		StrategyConfigGroup scg = controler.getConfig().strategy();
+//		StrategySettings strategySettings = new StrategySettings(new IdImpl("1"));
+//		strategySettings.setModuleName("BestScore");
+//		strategySettings.setProbability(0.01);
+//		scg.addStrategySettings(strategySettings);
+//		StrategySettings strategySettingsR = new StrategySettings(new IdImpl("2"));
+//		strategySettingsR.setModuleName("ReRoute");
+//		strategySettingsR.setProbability(1.0);
+//		strategySettingsR.setDisableAfter(10);
+//		scg.addStrategySettings(strategySettingsR);
+		
 		StrategyConfigGroup scg = controler.getConfig().strategy();
-		StrategySettings strategySettings = new StrategySettings(new IdImpl("1"));
-		strategySettings.setModuleName("BestScore");
-		strategySettings.setProbability(0.01);
-		scg.addStrategySettings(strategySettings);
-		StrategySettings strategySettingsR = new StrategySettings(new IdImpl("2"));
+
+		StrategySettings strategySettingsR = new StrategySettings(new IdImpl("1"));
 		strategySettingsR.setModuleName("ReRoute");
-		strategySettingsR.setProbability(1.0);
+		strategySettingsR.setProbability(0.999);
 		strategySettingsR.setDisableAfter(10);
 		scg.addStrategySettings(strategySettingsR);
+		
+		StrategySettings strategySettings = new StrategySettings(new IdImpl("2"));
+		strategySettings.setModuleName("ChangeExpBeta");
+		strategySettings.setProbability(0.001);
+		scg.addStrategySettings(strategySettings);
 		
 	// network
 		Scenario scenario = controler.getScenario();
@@ -277,7 +302,7 @@ public class TestEmissionPricing {
 		}
 		
 		
-//		// check links
+		// check links
 //		for(Id linkId: scenario.getNetwork().getLinks().keySet()){
 //			logger.info("link id " + linkId.toString() + " cell " + links2xCells.get(linkId) + " , " + links2yCells.get(linkId));
 //		}
@@ -292,43 +317,36 @@ public class TestEmissionPricing {
 		Node node3 = network.createAndAddNode(scenario.createId("3"), scenario.createCoord(4500.0, 10000.0));
 		Node node4 = network.createAndAddNode(scenario.createId("4"), scenario.createCoord(17500.0, 10000.0));
 		Node node5 = network.createAndAddNode(scenario.createId("5"), scenario.createCoord(19999.0, 10000.0));
-		Node node6 = network.createAndAddNode(scenario.createId("6"), scenario.createCoord(19999.0, 1.0));
-		Node node7 = network.createAndAddNode(scenario.createId("7"), scenario.createCoord(1.0, 1.0));
+		Node node6 = network.createAndAddNode(scenario.createId("6"), scenario.createCoord(19999.0, 1500.0));
+		Node node7 = network.createAndAddNode(scenario.createId("7"), scenario.createCoord(1.0, 1500.0));
 		Node node8 = network.createAndAddNode(scenario.createId("8"), scenario.createCoord(12500.0,  12499.0));
 		Node node9 = network.createAndAddNode(scenario.createId("9"), scenario.createCoord(12500.0, 7500.0));
-		Node homeNode = network.createAndAddNode(scenario.createId("homeNode"), scenario.createCoord(1.0, 2.0));
-		Node workNode = network.createAndAddNode(scenario.createId("workNode"), scenario.createCoord(19999.0, 2.0));
 
 
-		network.createAndAddLink(scenario.createId("12"), node1, node2, 1000, 30.00, 3600, 1, null, "22");
-		network.createAndAddLink(scenario.createId("23"), node2, node3, 2000, 30.00, 3600, 1, null, "22");
-		network.createAndAddLink(scenario.createId("45"), node4, node5, 2000, 30.00, 3600, 1, null, "22");
-		network.createAndAddLink(scenario.createId("56"), node5, node6, 1000, 30.00, 3600, 1, null, "22");
-		network.createAndAddLink(scenario.createId("67"), node6, node7, 1000, 30.00, 3600, 1, null, "22");
-		network.createAndAddLink(scenario.createId("71"), node7, node1, 1000, 30.00, 3600, 1, null, "22");
+		network.createAndAddLink(scenario.createId("12"), node1, node2, 1000, 60.00, 3600, 1, null, "22");
+		network.createAndAddLink(scenario.createId("23"), node2, node3, 2000, 60.00, 3600, 1, null, "22");
+		network.createAndAddLink(scenario.createId("45"), node4, node5, 2000, 60.00, 3600, 1, null, "22");
+		network.createAndAddLink(scenario.createId("56"), node5, node6, 1000, 60.00, 3600, 1, null, "22");
+		network.createAndAddLink(scenario.createId("67"), node6, node7, 1000, 60.00, 3600, 1, null, "22");
+		network.createAndAddLink(scenario.createId("71"), node7, node1, 1000, 60.00, 3600, 1, null, "22");
 		
 		// two similar path from node 3 to node 4 - north: route via node 8, south: route via node 9
-		network.createAndAddLink(scenario.createId("38"), node3, node8, 5150, 30.00, 3600, 1, null, "22");
-		network.createAndAddLink(scenario.createId("39"), node3, node9, 5000, 30.00, 3600, 1, null, "22"); // 34.50km/h => nearly same score
-		network.createAndAddLink(scenario.createId("84"), node8, node4, 5000, 30.00, 3600, 1, null, "22");
-		network.createAndAddLink(scenario.createId("94"), node9, node4, 5000, 30.00, 3600, 1, null, "22");
+		network.createAndAddLink(scenario.createId("38"), node3, node8, 5000, 60.00, 3600, 1, null, "22");
+		network.createAndAddLink(scenario.createId("39"), node3, node9, 5000, 60.00, 3600, 1, null, "22");
+		network.createAndAddLink(scenario.createId("84"), node8, node4, 5000, 60.00, 3600, 1, null, "22");
+		network.createAndAddLink(scenario.createId("94"), node9, node4, 4999, 60.00, 3600, 1, null, "22");
 		
-		// two small links for work and home
-		network.createAndAddLink(scenario.createId("home7"), homeNode, node7, epsilon , 30.00, 3600, 1, null, "22");
-		network.createAndAddLink(scenario.createId("7home"), node7, homeNode, epsilon, 30.00, 3600, 1, null, "22");
-		network.createAndAddLink(scenario.createId("work6"), workNode, node6, epsilon, 30.00, 3600, 1, null, "22");
-		network.createAndAddLink(scenario.createId("6work"), node6, workNode, epsilon, 30.00, 3600, 1, null, "22");
 		
 		for(Integer i=0; i<5; i++){ // x
 			for(Integer j=0; j<4; j++){
 				String idpart = i.toString()+j.toString();
 
-				double xCoord = 9250. + i*1250;
-				double yCoord = 5200. + j*1041;
+				double xCoord = 6563. + (i+1)*625;
+				double yCoord = 7188. + (j-1)*625;
 				
 				// add a link for each person
 				Node nodeA = network.createAndAddNode(scenario.createId("node_"+idpart+"A"), scenario.createCoord(xCoord, yCoord));
-				Node nodeB = network.createAndAddNode(scenario.createId("node_"+idpart+"B"), scenario.createCoord(xCoord, yCoord+10.));
+				Node nodeB = network.createAndAddNode(scenario.createId("node_"+idpart+"B"), scenario.createCoord(xCoord, yCoord+1.));
 				network.createAndAddLink(scenario.createId("link_p"+idpart), nodeA, nodeB, 10, 30.0, 3600, 1);
 
 			}
@@ -345,15 +363,15 @@ public class TestEmissionPricing {
 				
 				Person person = pFactory.createPerson(scenario.createId("passive_"+idpart)); //new PersonImpl (new IdImpl(i));
 
-				double xCoord = 9250. + i*1250;
-				double yCoord = 5200. + j*1041;
+				double xCoord = 6563. + (i+1)*625;
+				double yCoord = 7188. + (j-1)*625;
 				Plan plan = pFactory.createPlan(); //person.createAndAddPlan(true);
 				
 				Coord coord = new CoordImpl(xCoord, yCoord);
 				Activity home = pFactory.createActivityFromCoord("home", coord );
-				home.setEndTime(6 * 3600);
+				home.setEndTime(1.0);
 				Leg leg = pFactory.createLeg(TransportMode.walk);
-				Coord coord2 = new CoordImpl(xCoord, yCoord+10.);
+				Coord coord2 = new CoordImpl(xCoord, yCoord+1.);
 				Activity home2 = pFactory.createActivityFromCoord("home", coord2);
 
 				plan.addActivity(home);
@@ -370,21 +388,26 @@ public class TestEmissionPricing {
 		Person person = pFactory.createPerson(scenario.createId("567417.1#12424"));
 		Plan plan = pFactory.createPlan();
 
-	Activity home = pFactory.createActivityFromLinkId("home", scenario.createId("home7"));
-		home.setEndTime(6 * 3600 + 10);
+		Coord homeCoords = new CoordImpl(1.0, 10000.0);
+		Activity home = pFactory.createActivityFromCoord("home", homeCoords);
+		//Activity home = pFactory.createActivityFromLinkId("home", scenario.createId("12"));
+		home.setEndTime(6 * 3600);
 		plan.addActivity(home);
 
 		Leg leg1 = pFactory.createLeg(TransportMode.car);
 		plan.addLeg(leg1);
 
-		Activity work = pFactory.createActivityFromLinkId("work", scenario.createId("6work"));
-		work.setEndTime(16 * 3600 + 10);
+		Coord workCoords = new CoordImpl(19999.0, 10000.0);
+		Activity work = pFactory.createActivityFromCoord("work" , workCoords);
+//		Activity work = pFactory.createActivityFromLinkId("work", scenario.createId("45"));
+		work.setEndTime(home.getEndTime() + 600 + 8 * 3600);
 		plan.addActivity(work);
 
 		Leg leg2 = pFactory.createLeg(TransportMode.car);
 		plan.addLeg(leg2);
 
-		home = pFactory.createActivityFromLinkId("home", scenario.createId("12"));
+		home = pFactory.createActivityFromCoord("home", homeCoords);
+//		home = pFactory.createActivityFromLinkId("home", scenario.createId("12"));
 		plan.addActivity(home);
 
 		person.addPlan(plan);

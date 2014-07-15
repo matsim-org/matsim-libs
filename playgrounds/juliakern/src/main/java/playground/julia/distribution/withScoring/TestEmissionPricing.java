@@ -37,6 +37,8 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigReaderMatsimV1;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -78,15 +80,22 @@ public class TestEmissionPricing {
 
 	private static Logger logger;
 	
+	static String configFile = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_baseCase_ctd/output_config_for_test.xml";
+	
+	
 	public static void main(String[] args) {
-		
+		Config config = new Config();
+//		ConfigReaderMatsimV1 crm = new ConfigReaderMatsimV1(config);
+//		crm.readFile(configFile);
+//		MatsimConfigReader mcr = new MatsimConfigReader(config);
+//		mcr.readFile(configFile);
 		logger = Logger.getLogger(TestEmissionPricing.class);
 		
-		Config config = new Config();
+		//Config config = new Config();
 		config.addCoreModules();
 		config.setParam("strategy", "maxAgentPlanMemorySize", "11");
 		Controler controler = new Controler(config);
-		
+		config.setParam("controler", "writeEventsInterval", "1");
 		
 	// controler settings	
 		controler.setOverwriteFiles(true);
@@ -156,6 +165,7 @@ public class TestEmissionPricing {
 		pcs.setTraveling_utils_hr(0.0);
 		pcs.setLateArrival_utils_hr(0.0);
 		pcs.setPerforming_utils_hr(0.96);
+		
 		logger.info("mrg util of money " + pcs.getMarginalUtilityOfMoney() + " = 0.0789942?");
 
 	// strategy
@@ -199,6 +209,9 @@ public class TestEmissionPricing {
 		controler.addControlerListener(ecl);
 		controler.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(config, controler.getNetwork(), ecl));
 		//controler.setTravelDisutilityFactory(new ResDisFactory(ecl, ecl.emissionModule, new EmissionCostModule(1.0)));
+		
+		config.checkConsistency();
+		logger.info("checked consitency");
 		
 		controler.run();
 		

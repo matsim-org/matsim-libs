@@ -85,6 +85,7 @@ public class ResponsibilityScoringFunction implements ScoringFunction {
 			}
 		}
 		System.out.println("score without emissions" +delegate.getScore());
+		System.out.println("money amount" + amount);
 		delegate.addMoney(-amount);System.out.println("score with emission costs" + delegate.getScore());
 		delegate.finish();
 		
