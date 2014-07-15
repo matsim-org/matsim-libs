@@ -24,6 +24,9 @@ public class BoardAlightVehicleTransitStopHandler implements TransitStopHandler 
 	private static final double NON_UNIFORM_DOOR_OPERATION = 1.0;
 	private static final double ACC_DEC_DELAY = 8.0;
 	
+	//Attributes
+	private TransitStopFacility lastHandledStop = null;
+	
 	//Methods
 	@Override
 	public double handleTransitStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers, List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler, MobsimVehicle vehicle) {
@@ -44,12 +47,15 @@ public class BoardAlightVehicleTransitStopHandler implements TransitStopHandler 
 		double stopTime = 0;
 		if ((cntAccess > 0) || (cntEgress > 0)) {
 			stopTime = getStopTimeParallel(leavingPassengers.size(), enteringPassengers.size(), vehicle);
+			if (this.lastHandledStop != stop)
+				stopTime += openDoorsDuration+closeDoorsDuration+ACC_DEC_DELAY;
 			for (PTPassengerAgent passenger : leavingPassengers)
 				handler.handlePassengerLeaving(passenger, vehicle, stop.getLinkId(), now);
 			for (PTPassengerAgent passenger : enteringPassengers)
 				handler.handlePassengerEntering(passenger, vehicle, stop.getId(), now);
 		}
-		return stopTime+(stopTime==0?0:(openDoorsDuration+closeDoorsDuration+ACC_DEC_DELAY));
+		lastHandledStop = stop;
+		return stopTime;
 	}
 	private double getStopTimeParallel(double leaving, double entering, MobsimVehicle vehicle) {
 		double beta1 = ((TransitVehicle)vehicle).getVehicle().getType().getAccessTime();
