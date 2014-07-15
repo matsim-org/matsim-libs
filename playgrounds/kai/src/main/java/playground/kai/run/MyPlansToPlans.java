@@ -41,8 +41,8 @@ class MyPlansToPlans {
 	static void run(final String[] args) {
 		
 		Config config = ConfigUtils.createConfig() ;
-		config.plans().setInputFile( "/Users/nagel/shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new/output/ITERS/it.20/20.plans.xml.gz");
-		config.network().setInputFile("/Users/nagel/shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new/network.xml");
+		config.plans().setInputFile( "/Users/nagel/kairuns/tampa/inputs/plans.xml.gz") ;
+		config.network().setInputFile( "/Users/nagel/kairuns/tampa/inputs/tbrpmcarbus.xml.gz") ;
 
 		Scenario sc = ScenarioUtils.loadScenario(config) ;
 		
@@ -63,11 +63,12 @@ class MyPlansToPlans {
 			Plan plan = person.getSelectedPlan() ;
 			List<Leg> legs = PopulationUtils.getLegs(plan) ;
 			boolean accept = true ;
-			for ( Leg leg : legs ) {
-				if ( leg.getMode().equals( TransportMode.car ) ) {
-					accept = false ;
-				}
-			}
+//			for ( Leg leg : legs ) {
+//				if ( leg.getMode().equals( TransportMode.car ) ) {
+//					accept = false ;
+//				}
+//			}
+			if ( Math.random() < 0.99 ) accept = false ;
 			if ( accept ) {
 				System.out.println("adding person...");
 				newPop.addPerson(person);

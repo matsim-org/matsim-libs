@@ -42,7 +42,7 @@ import org.matsim.core.utils.misc.ArgumentParser;
  */
 public class KNNetworkSimplifier {
 	
-	private void printUsage() {
+	private static void printUsage() {
 		System.out.println();
 		System.out.println("KNNetworkSimplifier");
 		System.out.println("Reads a network-file and \"simplifies\" it. Need to read the source code to figure out what it is doing ...");
@@ -63,7 +63,7 @@ public class KNNetworkSimplifier {
 	 * @param inputNetworkFile filename of the network to be handled
 	 * @param outputNetworkFile filename where to write the cleaned network to
 	 */
-	public void run(final String inputNetworkFile, final String outputNetworkFile) {
+	public static void run(final String inputNetworkFile, final String outputNetworkFile) {
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
