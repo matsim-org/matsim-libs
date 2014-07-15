@@ -56,6 +56,7 @@ public class PersonImpl implements Person {
 
 	private Customizable customizableDelegate;
 
+	@Deprecated // please try to use the factory: pop.getFactory().create...
 	public PersonImpl(final Id id) {
 		this.id = id;
 	}
@@ -123,30 +124,37 @@ public class PersonImpl implements Person {
 		this.id = id;
 	}
 
+	@Deprecated // use PersonAttributes
 	public final String getSex() {
 		return this.sex;
 	}
 
+	@Deprecated // use PersonAttributes
 	public final int getAge() {
 		return this.age;
 	}
 
+	@Deprecated // use PersonAttributes
 	public final String getLicense() {
 		return this.hasLicense;
 	}
 
+	@Deprecated // use PersonAttributes
 	public final boolean hasLicense() {
 		return ("yes".equals(this.hasLicense)) || ("true".equals(this.hasLicense));
 	}
 
+	@Deprecated // use PersonAttributes
 	public final String getCarAvail() {
 		return this.carAvail;
 	}
 
+	@Deprecated // use PersonAttributes
 	public final Boolean isEmployed() {
 		return this.isEmployed;
 	}
 
+	@Deprecated // use PersonAttributes
 	public void setAge(final int age) {
 		if ((age < 0) && (age != Integer.MIN_VALUE)) {
 			throw new NumberFormatException("A person's age has to be an integer >= 0.");
@@ -154,22 +162,27 @@ public class PersonImpl implements Person {
 		this.age = age;
 	}
 
+	@Deprecated // use PersonAttributes
 	public final void setSex(final String sex) {
 		this.sex = (sex == null) ? null : sex.intern();
 	}
 
+	@Deprecated // use PersonAttributes
 	public final void setLicence(final String licence) {
 		this.hasLicense = (licence == null) ? null : licence.intern();
 	}
 
+	@Deprecated // use PersonAttributes
 	public final void setCarAvail(final String carAvail) {
 		this.carAvail = (carAvail == null) ? null : carAvail.intern();
 	}
 
+	@Deprecated // use PersonAttributes
 	public final void setEmployed(final Boolean employed) {
 		this.isEmployed = employed;
 	}
 
+	@Deprecated // use PersonAttributes
 	public final Desires createDesires(final String desc) {
 		if (this.desires == null) {
 			this.desires = new Desires(desc);
@@ -178,6 +191,7 @@ public class PersonImpl implements Person {
 	}
 
 
+	@Deprecated // use PersonAttributes
 	public final void addTravelcard(final String type) {
 		if (this.travelcards == null) {
 			this.travelcards = new TreeSet<String>();
@@ -190,11 +204,13 @@ public class PersonImpl implements Person {
 	}
 
 
+	@Deprecated // use PersonAttributes
 	public final TreeSet<String> getTravelcards() {
 		return this.travelcards;
 	}
 
 
+	@Deprecated // use PersonAttributes
 	public final Desires getDesires() {
 		return this.desires;
 	}
@@ -216,6 +232,7 @@ public class PersonImpl implements Person {
 	  return b.toString();
 	}
 
+	@Override
 	public boolean removePlan(final Plan plan) {
 		boolean result = this.getPlans().remove(plan);
 		if ((this.getSelectedPlan() == plan) && result) {
