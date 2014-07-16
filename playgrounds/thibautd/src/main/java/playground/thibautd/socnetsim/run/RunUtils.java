@@ -652,6 +652,12 @@ public class RunUtils {
 						strategyManager));
 		controller.addControlerListener( annealingSelectorFactory );
 
+		if ( controllerRegistry.getMobsimFactory() instanceof ControlerListener ) {
+			// XXX not that nice, but we do not have the Controller yet when we build
+			// the SwitchingJointQSimFactory...
+			controller.addControlerListener( (ControlerListener) controllerRegistry.getMobsimFactory() );
+		}
+
 		strategyManager.setStopWatch( controller.stopwatch );
 
 		if ( !(config.getModule( StrategyAnalysisConfigGroup.GROUP_NAME ) instanceof StrategyAnalysisConfigGroup) ) {
