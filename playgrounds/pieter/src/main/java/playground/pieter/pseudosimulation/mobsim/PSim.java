@@ -131,7 +131,7 @@ public class PSim implements Mobsim {
 
 		plans.addAll(controler.getPlansForPseudoSimulation());
 
-		Logger.getLogger(this.getClass()).error("Executing " + plans.size() + " plans in mental simulation.");
+		Logger.getLogger(this.getClass()).error("Executing " + plans.size() + " plans in pseudosimulation.");
 
 		Network network = scenario.getNetwork();
 
