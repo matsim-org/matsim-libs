@@ -280,11 +280,31 @@ public abstract class ReflectiveModule extends Module {
 			setter.invoke( this , Short.parseShort( value ) );
 		}
 		else if ( type.isEnum() ) {
-			setter.invoke(
-					this,
-					Enum.valueOf(
-						type.asSubclass( Enum.class ),
-						value ) );
+			try {
+				setter.invoke(
+						this,
+						Enum.valueOf(
+							type.asSubclass( Enum.class ),
+							value ) );
+			}
+			catch (IllegalArgumentException e) {
+				// happens when the string does not correspond to any enum values.
+				// Surprisingly, the default error message does not print the possible
+				// values: do it here, so that the user gets an idea of what went wrong
+				final StringBuilder comment =
+					new StringBuilder(
+							"Error trying to set value "+value+
+							" for type "+type.getName()+
+							": possible values are " );
+
+				final Object[] consts = type.getEnumConstants();
+				for ( int i = 0; i < consts.length; i++ ) {
+					comment.append( consts[ i ].toString() );
+					if ( i < consts.length - 1 ) comment.append( ", " );
+				}
+
+				throw new IllegalArgumentException( comment.toString() , e );
+			}
 		}
 		else {
 			throw new RuntimeException( "no method to handle type "+type );
