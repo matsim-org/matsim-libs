@@ -64,7 +64,7 @@ public class AbsoluteDelays {
 		
 	}
 
-	public static double totalDelayInHoursFromEventsFile(String runNumber) {
+	private static double totalDelayInHoursFromEventsFile(String runNumber) {
 		EventsManager eventManager = EventsUtils.createEventsManager();
 		ScenarioImpl sc = loadScenario(runNumber);
 		MarginalCongestionHandlerImplV3 congestionHandlerImplV3= new MarginalCongestionHandlerImplV3(eventManager, sc);

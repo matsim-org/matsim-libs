@@ -41,29 +41,35 @@ import org.matsim.vehicles.Vehicles;
  */
 public class EmissionVehicleGeneration {
 
+
+	private final String outputVehicleFile;
+	private Scenario scenario;
+
+	public EmissionVehicleGeneration(Scenario scenario, String outputVehicleFile) {
+		this.outputVehicleFile = outputVehicleFile;
+		this.scenario = scenario;
+	}
+
 	private static final Logger log = Logger.getLogger(EmissionVehicleGeneration.class);
-
-	private final String populationFile = "./input/baseCase/SiouxFalls_population_probably_v3.xml";//"./input/output_plans.xml";
-	private final String outputVehicleFile = "./input/emissionFiles/SiouxFalls_emissionVehicles.xml"; 
-
-	//	private final String simplifiedNetworkFile = "./input/output_simplifiedNetwork.xml"; 
-	private final String networkWithRoadType = "./input/baseCase/SiouxFalls_networkWithRoadType.xml.gz";//"./input/output_networkWithRoadType.xml.gz";
-	Scenario scenario;
 
 	public static void main(String[] args) {
 		//		NetworkSimplifier networkSimplifier = new NetworkSimplifier();
 		//		networkSimplifier.getSimplifiedNetwork("./input/output_networkWithRoadType.xml.gz", "./input/output_simplifiedNetwork.xml");
-
-		EmissionVehicleGeneration evg = new EmissionVehicleGeneration();
-		evg.run();
-	}
-
-	private void run() {
+		String outputVehicleFile = "./input/emissionFiles/SiouxFalls_emissionVehicles.xml"; 
+		String populationFile = "./input/baseCase/SiouxFalls_population_probably_v3.xml";//"./input/output_plans.xml";
+		String networkWithRoadType = "./input/baseCase/SiouxFalls_networkWithRoadType.xml.gz";//"./input/output_networkWithRoadType.xml.gz";
+		
 		Config config = ConfigUtils.createConfig();
 		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkWithRoadType);
-		this.scenario = ScenarioUtils.loadScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		
+		
+		EmissionVehicleGeneration evg = new EmissionVehicleGeneration(scenario, outputVehicleFile);
+		evg.run();
+	}
 
+	public void run() {
 		Vehicles outputVehicles = VehicleUtils.createVehiclesContainer();
 
 		HbefaVehicleCategory vehicleCategory;
