@@ -24,6 +24,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
@@ -53,6 +55,9 @@ import playground.ivt.utils.SubpopulationFilteringEventsManager;
  * @author thibautd
  */
 public class CreateLegHistogramForSubpopulation {
+	private static final Logger log =
+		Logger.getLogger(CreateLegHistogramForSubpopulation.class);
+
 	public static void main(final String[] args) {
 		final ArgParser parser = new ArgParser();
 		parser.setDefaultValue( "-a" , "--person-attributes" , null );
@@ -167,7 +172,7 @@ public class CreateLegHistogramForSubpopulation {
 		private boolean acceptPerson( final Id personId ) {
 			// reject transit drivers
 			// XXX not nice...
-			return !personId.toString().startsWith( "tr_" );
+			return !personId.toString().startsWith( "pt_" );
 		}
 
 		private boolean acceptLink( final Id linkId ) {
