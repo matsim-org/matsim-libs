@@ -134,38 +134,64 @@ public class RunZurichBikeSharingSimulation {
 	 * a very specific config group or use the underscore approach...
 	 */
 	private static class DenivelationScoringConfigGroup extends ReflectiveModule {
-		public static final String GROUP_NAME = "denivelationScoring";
+		public final static String GROUP_NAME = "denivelationScoring";
 
 		/**
 		 * not sure it actually makes sense / is possible to get this from other models...
 		 */
-		private double bikeMarginalUtilityOfDenivelation_m = 0;
-		private double walkMarginalUtilityOfDenivelation_m = 0;
+		private double bikeMarginalUtilityOfUphillDenivelation_m = 0;
+		private double walkMarginalUtilityOfUphillDenivelation_m = 0;
+		
+		private double bikeMarginalUtilityOfDownhillDenivelation_m = 0;
+		private double walkMarginalUtilityOfDownhillDenivelation_m = 0;
 
 		public DenivelationScoringConfigGroup() {
 			super( GROUP_NAME );
 		}
 
-		@StringGetter( "bikeMarginalUtilityOfDenivelation_m" )
-		public double getBikeMarginalUtilityOfDenivelation_m() {
-			return this.bikeMarginalUtilityOfDenivelation_m;
+
+		@StringGetter( "bikeMarginalUtilityOfUphillDenivelation_m" )
+		public double getBikeMarginalUtilityOfUphillDenivelation_m() {
+			return bikeMarginalUtilityOfUphillDenivelation_m;
 		}
 
-		@StringSetter( "bikeMarginalUtilityOfDenivelation_m" )
-		public void setBikeMarginalUtilityOfDenivelation_m(
-				final double bikeMarginalUtilityOfDenivelation_m) {
-			this.bikeMarginalUtilityOfDenivelation_m = bikeMarginalUtilityOfDenivelation_m;
+		@StringSetter( "bikeMarginalUtilityOfUphillDenivelation_m" )
+		public void setBikeMarginalUtilityOfUphillDenivelation_m(
+				double bikeMarginalUtilityOfUphillDenivelation_m) {
+			this.bikeMarginalUtilityOfUphillDenivelation_m = bikeMarginalUtilityOfUphillDenivelation_m;
 		}
 
-		@StringGetter( "walkMarginalUtilityOfDenivelation_m" )
-		public double getWalkMarginalUtilityOfDenivelation_m() {
-			return this.walkMarginalUtilityOfDenivelation_m;
+		@StringGetter( "walkMarginalUtilityOfUphillDenivelation_m" )
+		public double getWalkMarginalUtilityOfUphillDenivelation_m() {
+			return walkMarginalUtilityOfUphillDenivelation_m;
 		}
 
-		@StringSetter( "walkMarginalUtilityOfDenivelation_m" )
-		public void setWalkMarginalUtilityOfDenivelation_m(
-				final double walkMarginalUtilityOfDenivelation_m) {
-			this.walkMarginalUtilityOfDenivelation_m = walkMarginalUtilityOfDenivelation_m;
+		@StringSetter( "walkMarginalUtilityOfUphillDenivelation_m" )
+		public void setWalkMarginalUtilityOfUphillDenivelation_m(
+				double walkMarginalUtilityOfUphillDenivelation_m) {
+			this.walkMarginalUtilityOfUphillDenivelation_m = walkMarginalUtilityOfUphillDenivelation_m;
+		}
+
+		@StringGetter( "bikeMarginalUtilityOfDownhillDenivelation_m" )
+		public double getBikeMarginalUtilityOfDownhillDenivelation_m() {
+			return bikeMarginalUtilityOfDownhillDenivelation_m;
+		}
+
+		@StringSetter( "bikeMarginalUtilityOfDownhillDenivelation_m" )
+		public void setBikeMarginalUtilityOfDownhillDenivelation_m(
+				double bikeMarginalUtilityOfDownhillDenivelation_m) {
+			this.bikeMarginalUtilityOfDownhillDenivelation_m = bikeMarginalUtilityOfDownhillDenivelation_m;
+		}
+
+		@StringGetter( "walkMarginalUtilityOfDownhillDenivelation_m" )
+		public double getWalkMarginalUtilityOfDownhillDenivelation_m() {
+			return walkMarginalUtilityOfDownhillDenivelation_m;
+		}
+
+		@StringSetter( "walkMarginalUtilityOfDownhillDenivelation_m" )
+		public void setWalkMarginalUtilityOfDownhillDenivelation_m(
+				double walkMarginalUtilityOfDownhillDenivelation_m) {
+			this.walkMarginalUtilityOfDownhillDenivelation_m = walkMarginalUtilityOfDownhillDenivelation_m;
 		}
 
 		public SimpleElevationScorerParameters getParameters() {
@@ -173,14 +199,17 @@ public class RunZurichBikeSharingSimulation {
 
 			params.addParams(
 					TransportMode.bike,
-					getBikeMarginalUtilityOfDenivelation_m() );
+					getBikeMarginalUtilityOfUphillDenivelation_m(),
+					getBikeMarginalUtilityOfDownhillDenivelation_m() );
 			params.addParams(
 					BikeSharingConstants.MODE,
-					getBikeMarginalUtilityOfDenivelation_m() );
+					getBikeMarginalUtilityOfUphillDenivelation_m(),
+					getBikeMarginalUtilityOfDownhillDenivelation_m() );
 
 			params.addParams(
 					TransportMode.walk,
-					getWalkMarginalUtilityOfDenivelation_m() );
+					getWalkMarginalUtilityOfUphillDenivelation_m(),
+					getWalkMarginalUtilityOfDownhillDenivelation_m() );
 
 			return params;
 		}

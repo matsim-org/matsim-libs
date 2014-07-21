@@ -70,7 +70,11 @@ public class SimpleElevationScorer implements LegScoring, ActivityScoring {
 			final double startAlt = elevationProvider.getAltitude( lastAct.getFacilityId() );
 			final double endAlt = elevationProvider.getAltitude( act.getFacilityId() );
 
-			this.score += p.marginalUtilityOfDenivelation_m * ( endAlt - startAlt ); 
+			final double dennivelation = endAlt - startAlt;
+			this.score += (dennivelation > 0 ?
+						p.marginalUtilityOfUphillDenivelation_m :
+						p.marginalUtilityOfDownhillDenivelation_m )
+					* Math.abs( dennivelation );
 		}
 		this.lastMode = null;
 		this.lastAct = act;

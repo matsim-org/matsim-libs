@@ -36,23 +36,28 @@ public class SimpleElevationScorerParameters implements MatsimParameters {
 
 	public void addParams(
 			final String mode,
-			final double marginalUtilityOfDenivelation_m) {
+			final double marginalUtilityOfUphillDenivelation_m,
+			final double marginalUtilityOfDownhillDenivelation_m) {
 		this.params.put(
 				mode,
 				new Params(
 					mode,
-					marginalUtilityOfDenivelation_m ) );
+					marginalUtilityOfUphillDenivelation_m,
+					marginalUtilityOfDownhillDenivelation_m) );
 	}
 
 	public static class Params {
 		public final String mode;
-		public final double marginalUtilityOfDenivelation_m;
+		public final double marginalUtilityOfUphillDenivelation_m;
+		public final double marginalUtilityOfDownhillDenivelation_m;
 
 		private Params(
 				final String mode,
-				final double marginalUtilityOfDenivelation_m) {
+				final double marginalUtilityOfUphillDenivelation_m,
+				final double marginalUtilityOfDownhillDenivelation_m) {
 			this.mode = mode;
-			this.marginalUtilityOfDenivelation_m = marginalUtilityOfDenivelation_m;
+			this.marginalUtilityOfUphillDenivelation_m = marginalUtilityOfUphillDenivelation_m;
+			this.marginalUtilityOfDownhillDenivelation_m = marginalUtilityOfDownhillDenivelation_m;
 		}
 	}
 }
