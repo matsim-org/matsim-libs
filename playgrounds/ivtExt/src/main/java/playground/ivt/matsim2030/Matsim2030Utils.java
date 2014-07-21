@@ -110,11 +110,17 @@ public class Matsim2030Utils {
 	}
 
 	public static Scenario loadScenario( final Config config ) {
-		final Scenario scenario = ScenarioUtils.loadScenario( config );
+		final Scenario sc = ScenarioUtils.createScenario( config );
+		loadScenario( sc );
+		return sc;
+	}
+
+	public static Scenario loadScenario( final Scenario scenario ) {
+		ScenarioUtils.loadScenario( scenario );
 		enrichScenario( scenario );
 
 		final ScenarioMergingConfigGroup mergingGroup = (ScenarioMergingConfigGroup)
-			config.getModule( ScenarioMergingConfigGroup.GROUP_NAME );
+			scenario.getConfig().getModule( ScenarioMergingConfigGroup.GROUP_NAME );
 
 		// now that coordinates are allocated, we can "dilute" the scenario.
 		// Note that if no routes are defined in the population(s), straight lines will be used,

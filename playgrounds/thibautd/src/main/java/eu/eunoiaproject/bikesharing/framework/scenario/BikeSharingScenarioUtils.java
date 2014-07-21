@@ -80,7 +80,9 @@ public class BikeSharingScenarioUtils {
 	public static Scenario loadScenario( final Config config ) {
 		// to make sure log entries are writen in log file
 		OutputDirectoryLogging.catchLogEntries();
-		final Scenario sc = ScenarioUtils.loadScenario( config );
+		final Scenario sc = ScenarioUtils.createScenario( config );
+		configurePopulationFactory( sc );
+		ScenarioUtils.loadScenario( sc );
 		return sc;
 	}
 
@@ -108,6 +110,17 @@ public class BikeSharingScenarioUtils {
 
 	public static Scenario loadScenario( final String configFile , final Module... modules ) {
 		return loadScenario( loadConfig( configFile , modules) );
+	}
+
+	public static void configurePopulationFactory( final Scenario scenario ) {
+		final MultiModalConfigGroup multimodalConfigGroup = (MultiModalConfigGroup)
+			scenario.getConfig().getModule(
+					MultiModalConfigGroup.GROUP_NAME );
+
+		final RouteFactory factory = new AccessEgressNetworkBasedTeleportationRouteFactory( scenario );
+		for (String mode : org.matsim.core.utils.collections.CollectionUtils.stringToArray(multimodalConfigGroup.getSimulatedModes())) {
+			((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory(mode, factory);
+		}
 	}
 
 	public static TripRouterFactory createTripRouterFactoryAndConfigureRouteFactories(

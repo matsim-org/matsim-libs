@@ -31,6 +31,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ivt.matsim2030.Matsim2030Utils;
 import playground.thibautd.eunoia.scoring.Matsim2010BikeSharingScoringFunctionFactory;
@@ -77,7 +78,9 @@ public class RunZurichBikeSharingSimulation {
 		final RelocationConfigGroup relocationGroup = new RelocationConfigGroup();
 		config.addModule( relocationGroup );
 
-		final Scenario sc = Matsim2030Utils.loadScenario( config );
+		final Scenario sc = ScenarioUtils.createScenario( config );
+		BikeSharingScenarioUtils.configurePopulationFactory( sc );
+		Matsim2030Utils.loadScenario( sc );
 		BikeSharingScenarioUtils.loadBikeSharingPart( sc );
 
 		final Controler controler = new Controler( sc );
