@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.eunoia.run;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Scenario;
@@ -32,6 +34,7 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.ivt.matsim2030.Matsim2030Utils;
 import playground.thibautd.eunoia.scoring.Matsim2010BikeSharingScoringFunctionFactory;
@@ -63,6 +66,8 @@ public class RunZurichBikeSharingSimulation {
 		final DenivelationScoringConfigGroup denivelationScoringGroup = new DenivelationScoringConfigGroup();
 		config.addModule( denivelationScoringGroup );
 		config.addModule( new MultiModalConfigGroup() );
+
+		failIfExists( config.controler().getOutputDirectory() );
 
 		if ( !config.planCalcScore().getModes().containsKey( BikeSharingConstants.MODE ) ) {
 			log.warn( "adding the disutility of bike sharing programmatically!" );
@@ -120,6 +125,13 @@ public class RunZurichBikeSharingSimulation {
 					denivelationScoringGroup.getParameters() ) );
 
 		controler.run();
+	}
+
+	private static void failIfExists(final String outdir) {
+		final File file = new File( outdir +"/" );
+		if ( file.exists() && file.list().length > 0 ) {
+			throw new UncheckedIOException( "Directory "+outdir+" exists and is not empty!" );
+		}
 	}
 
 	private static class RelocationConfigGroup extends ReflectiveModule {
