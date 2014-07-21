@@ -571,6 +571,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 					if ( time == Time.UNDEFINED_TIME ) throw new RuntimeException( pe+" has not travel time" );
 					// XXX no distance!
 					cost += scoringParams.modeParams.get( leg.getMode() ).marginalUtilityOfTraveling_s * time;
+					cost += scoringParams.modeParams.get( leg.getMode() ).constant;
 				}
 			}
 
