@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -48,6 +49,9 @@ import playground.thibautd.utils.LruCache;
  * @author thibautd
  */
 public class RunZurichBikeSharingSimulation {
+	private static final Logger log =
+		Logger.getLogger(RunZurichBikeSharingSimulation.class);
+
 	public static void main(final String[] args) {
 		final String configFile = args[ 0 ];
 
@@ -60,6 +64,17 @@ public class RunZurichBikeSharingSimulation {
 		final DenivelationScoringConfigGroup denivelationScoringGroup = new DenivelationScoringConfigGroup();
 		config.addModule( denivelationScoringGroup );
 		config.addModule( new MultiModalConfigGroup() );
+
+		if ( !config.planCalcScore().getModes().containsKey( BikeSharingConstants.MODE ) ) {
+			log.warn( "adding the disutility of bike sharing programmatically!" );
+			final ModeParams bikesharing = config.planCalcScore().getOrCreateModeParams( BikeSharingConstants.MODE );
+			final ModeParams bike = config.planCalcScore().getOrCreateModeParams( TransportMode.bike );
+
+			bikesharing.setConstant( bike.getConstant() );
+			bikesharing.setMarginalUtilityOfDistance( bike.getMarginalUtilityOfDistance() );
+			bikesharing.setMarginalUtilityOfTraveling( bike.getMarginalUtilityOfTraveling() );
+			bikesharing.setMonetaryDistanceCostRate( bike.getMonetaryDistanceCostRate() );
+		}
 
 		final RelocationConfigGroup relocationGroup = new RelocationConfigGroup();
 		config.addModule( relocationGroup );
