@@ -44,11 +44,14 @@ import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 public class UserBenefitsAndTotalWelfare {
 	private final static Logger logger = Logger.getLogger(UserBenefitsAndTotalWelfare.class);
 
-	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/";
-	private static String [] runNumbers = new String [] {"run201", "run202", "run203", "run204"};
+	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/munich/";
+	private final static String networkFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
+	private final static String inputConfigFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/config_munich_1pct_baseCaseCtd.xml";
+
+	private static String [] runNumbers = new String [] {"baseCaseCtd", "ei", "ci", "eci"};
 	private static String [] runCases = new String [] {"baseCase","onlyEmission", "onlyCongestion", "both"};
 	private final static WelfareMeasure welfareMeasure = WelfareMeasure.SELECTED;
-	private static final String outputFolder = "/outputMC/";
+	private static final String outputFolder = "/output/1pct/";
 	
 	public static void main(String[] args) {
 		
@@ -83,16 +86,18 @@ public class UserBenefitsAndTotalWelfare {
 	}
 
 	private static ScenarioImpl loadScenario(String runNumber) {
-		
-		String configFile = clusterPathDesktop+outputFolder+runNumber+"/output_config.xml";
-		Config config = ConfigUtils.loadConfig(configFile);
-		config.network().setInputFile(clusterPathDesktop+"/input/SiouxFalls_networkWithRoadType.xml.gz");
-		config.plans().setInputFile(clusterPathDesktop+outputFolder+runNumber+"/output_plans.xml.gz");
+		Config config = ConfigUtils.loadConfig(inputConfigFile);
+		config.network().setInputFile(networkFile);
+		int lastIteration = (int) config.controler().getLastIteration();
+//		config.network().setInputFile(clusterPathDesktop+"/input/SiouxFalls_networkWithRoadType.xml.gz");
+		config.plans().setInputFile(clusterPathDesktop+outputFolder+runNumber+"/ITERS/it."+lastIteration+"/"+lastIteration+".plans.xml.gz");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		return (ScenarioImpl) scenario;
 	}
 
 	public static double getAllUserBenefits(String runNumber, WelfareMeasure welfareMeasure){
+		
+		
 		ScenarioImpl scenarioImpl = loadScenario(runNumber);
 		UserBenefitsAnalyzerAA userBenefitsAnalyzer = new UserBenefitsAnalyzerAA();
 		userBenefitsAnalyzer.init(scenarioImpl, welfareMeasure);
@@ -115,9 +120,10 @@ public class UserBenefitsAndTotalWelfare {
 		for(EventHandler eh : handler){
 			events.addHandler(eh);
 		}
-
+	
+		int lastIteration = (int) scenarioImpl.getConfig().controler().getLastIteration();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(clusterPathDesktop+outputFolder+runNumber+"/ITERS/it.500/500.events.xml.gz");
+		reader.readFile(clusterPathDesktop+outputFolder+runNumber+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz");
 
 		paymentsAnalyzer.postProcessData();
 		paymentsAnalyzer.writeResults(clusterPathDesktop+outputFolder+runNumber+"/analysis/");

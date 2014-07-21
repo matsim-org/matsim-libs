@@ -38,17 +38,18 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
  */
 public class AbsoluteDelays {
 
-	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/";
-	private static String [] runNumber =  {"BAU","EI","CI"};//{"run201","run202","run203","run204"};
+	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
+	private static String [] runCase =  {"baseCaseCtd","ei","ci","eci"};//{"run201","run202","run203","run204"};
+	private final static String networkFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
 
 	public static void main(String[] args) {
 		
-		BufferedWriter writer =IOUtils.getBufferedWriter(clusterPathDesktop+"/10Pct/analysis/r/rAbsoluteDelays.txt");
+		BufferedWriter writer =IOUtils.getBufferedWriter(clusterPathDesktop+"/analysis/r/rAbsoluteDelays.txt");
 		
-		double [] delays = new double [runNumber.length];
+		double [] delays = new double [runCase.length];
 		
 		for (int i=0; i<delays.length;i++){
-			delays[i] = totalDelayInHoursFromEventsFile(runNumber[i]);
+			delays[i] = totalDelayInHoursFromEventsFile(runCase[i]);
 		}
 		
 		try {
@@ -67,12 +68,13 @@ public class AbsoluteDelays {
 	private static double totalDelayInHoursFromEventsFile(String runNumber) {
 		EventsManager eventManager = EventsUtils.createEventsManager();
 		ScenarioImpl sc = loadScenario(runNumber);
+		int lastIteration = (int) sc.getConfig().controler().getLastIteration();
 		MarginalCongestionHandlerImplV3 congestionHandlerImplV3= new MarginalCongestionHandlerImplV3(eventManager, sc);
 
 		eventManager.addHandler(congestionHandlerImplV3);
 
 		MatsimEventsReader eventsReader = new MatsimEventsReader(eventManager);
-		String eventFileLocation = "/10Pct/"+runNumber+"/ITERS/it.500/500.events.xml.gz";
+		String eventFileLocation = runNumber+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
 		String inputEventsFile = clusterPathDesktop+eventFileLocation;
 		eventsReader.readFile(inputEventsFile);
 
@@ -81,7 +83,7 @@ public class AbsoluteDelays {
 	
 	private static ScenarioImpl loadScenario(String runNumber) {
 		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(clusterPathDesktop+"/input/SiouxFalls_networkWithRoadType.xml.gz");
+		config.network().setInputFile(networkFile); //clusterPathDesktop+"/input/SiouxFalls_networkWithRoadType.xml.gz"
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		return (ScenarioImpl) scenario;
 	}

@@ -30,9 +30,9 @@ import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistan
  */
 public class ModeDistancDistributionAndModalSplit {
 
-	private final static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMC/";//outputModalSplitSetUp
+	private final static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";//outputModalSplitSetUp
 //	private final static String run = "/run201/";
-	private final static String [] runs = {"run201","run202","run203","run204"};
+	private final static String [] runs = {"baseCaseCtd","ei","ci","eci"};
 	//	private  String initialPlanFile = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/input/SiouxFalls_population_probably_v3.xml";
 	//	private  String initialPlanFile = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/run33/output_plans.xml.gz";
 //	private static String finalPlanFileLocation = runDir+run+"/ITERS/";
@@ -47,7 +47,7 @@ public class ModeDistancDistributionAndModalSplit {
 		//		}
 
 		for(String str:runs){
-			String finalPlanFile = runDir+str+"/output_plans.xml.gz";
+			String finalPlanFile = runDir+str+"/ITERS/it.1500/1500.plans.xml.gz";
 			ms.runRoutesDistance(str, finalPlanFile);
 			ms.runBeelineDistance(str, finalPlanFile);
 		}
@@ -73,7 +73,7 @@ public class ModeDistancDistributionAndModalSplit {
 		lmdfed.init(sc);
 		lmdfed.preProcessData();
 		lmdfed.postProcessData();
-		lmdfed.writeResults(runDir+"/analysis500Its/legModeDistributions/"+runNr+".");
+		lmdfed.writeResults(runDir+"/analysis/legModeDistributions/"+runNr+".");
 //		lmdfed.writeResults(runDir+"/analysisExecutedPlans/legModeDistributions/"+runNr+".");
 	}
 

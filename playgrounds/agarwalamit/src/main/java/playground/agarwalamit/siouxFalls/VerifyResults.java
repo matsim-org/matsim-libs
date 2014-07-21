@@ -47,15 +47,18 @@ public class VerifyResults {
 	private static  final double EURO_PER_GRAMM_SO2 = 11000. / (1000. * 1000.);
 	private static  final double EURO_PER_GRAMM_PM2_5_EXHAUST = 384500. / (1000. * 1000.);
 	private static final double EURO_PER_GRAMM_CO2 = 70. / (1000. * 1000.);
-	
-	private static final double marginal_Utl_money=0.062;
+
+	private static final double marginal_Utl_money=0.0789942;//0.062 //(for SiouxFalls =0.062 and for Munich =0.0789942);
 	private static final double marginal_Utl_performing_sec=0.96/3600;
 	private static final double marginal_Utl_traveling_car_sec=-0.0/3600;
 	private static final double marginalUtlOfTravelTime = marginal_Utl_traveling_car_sec+marginal_Utl_performing_sec;
 	private static final double vtts_car = marginalUtlOfTravelTime/marginal_Utl_money;
 
-	private final  static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/10Pct/";
-	private  final static String [] runNr = {"BAU","EI","CI"};//{"201","202", "203","204"};//{"1","2","3","4"};
+	private final  static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
+	private final static String networkFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
+	private final static String inputConfigFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/config_munich_1pct_baseCaseCtd.xml";
+
+	private  final static String [] runNr = {"baseCaseCtd","ci","eci"};//{"201","202", "203","204"};//{"1","2","3","4"};
 
 	private  static Scenario scenario ;
 
@@ -64,12 +67,18 @@ public class VerifyResults {
 
 	public static void main(String[] args) {
 
+		Config config = ConfigUtils.loadConfig(inputConfigFile);
+		config.network().setInputFile(networkFile);
+
 		for(int i=0;i<runNr.length;i++){
-			String emissionsEventsFile = runDir+runNr[i]+"/ITERS/it.500/500.emission.events.xml.gz";
-			String networkFile = runDir+runNr[i]+"/output_network.xml.gz";
-			String plansFile = runDir+runNr[i]+"/output_plans.xml.gz";
-			String eventsFile=runDir+runNr[i]+"/ITERS/it.500/500.events.xml.gz";
-			scenario =  loadScenario(networkFile, plansFile);
+
+			int lastItenation = (int) getLastIteration(config);
+			String emissionsEventsFile = runDir+runNr[i]+"/ITERS/it."+lastItenation+"/"+lastItenation+".emission.events.xml.gz";
+			String plansFile = runDir+runNr[i]+"/ITERS/it."+lastItenation+"/"+lastItenation+".plans.xml.gz";
+			config.plans().setInputFile(plansFile);
+			scenario = ScenarioUtils.loadScenario(config);
+			String eventsFile=runDir+runNr[i]+"/ITERS/it."+lastItenation+"/"+lastItenation+".events.xml.gz";
+
 			calculateEmissionCosts(emissionsEventsFile, scenario,runNr[i]);
 			calculateDelaysCosts(eventsFile,scenario,runNr[i]);
 			calculateUserBenefits(scenario, runNr[i]);
@@ -111,7 +120,7 @@ public class VerifyResults {
 					} else ; //do nothing
 				}
 				else ; //do nothing
-			writer.newLine();
+				writer.newLine();
 			}
 			writer.write("Emission cost factor is "+"\t"+emissionCostFacotr+"\t"+"and total cost of emissions is "+"\t"+emissionCostFacotr*totalEmissionCost);
 			writer.close();
@@ -134,7 +143,7 @@ public class VerifyResults {
 			throw new RuntimeException("Data is not written in file. Reason: "+ e);
 		}
 	}
-	
+
 	public static void calculateUserBenefits(Scenario scenario, String runNr){
 		Population population = scenario.getPopulation();
 		double totalUtils=0;
@@ -151,11 +160,7 @@ public class VerifyResults {
 		}
 	}
 
-	private static Scenario loadScenario(String netFile, String plansFile) {
-		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(netFile);
-		config.plans().setInputFile(plansFile);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
+	private static double getLastIteration (Config config){
+		return config.controler().getLastIteration();
 	}
 }
