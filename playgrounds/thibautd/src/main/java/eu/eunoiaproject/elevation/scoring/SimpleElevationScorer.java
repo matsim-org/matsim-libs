@@ -63,7 +63,7 @@ public class SimpleElevationScorer implements LegScoring, ActivityScoring {
 
 	@Override
 	public void handleActivity( final Activity act ) {
-		if ( lastMode != null ) throw new IllegalStateException();
+		if ( lastMode == null ) throw new IllegalStateException();
 
 		final Params p = params.getParams( lastMode );
 		if ( p != null ) {
