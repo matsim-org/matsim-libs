@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.eunoia.run;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Scenario;
@@ -43,7 +42,6 @@ import eu.eunoiaproject.elevation.scoring.SimpleElevationScorerParameters;
 
 import playground.thibautd.router.CachingRoutingModuleWrapper;
 import playground.thibautd.router.multimodal.CachingLeastCostPathAlgorithmWrapper;
-import playground.thibautd.utils.LruCache;
 
 /**
  * @author thibautd
@@ -56,7 +54,7 @@ public class RunZurichBikeSharingSimulation {
 		final String configFile = args[ 0 ];
 
 		OutputDirectoryLogging.catchLogEntries();
-		Logger.getLogger( LruCache.class ).setLevel( Level.TRACE );
+		// Logger.getLogger( LruCache.class ).setLevel( Level.TRACE );
 
 		final Config config = BikeSharingScenarioUtils.loadConfig( configFile );
 		Matsim2030Utils.addDefaultGroups( config );
