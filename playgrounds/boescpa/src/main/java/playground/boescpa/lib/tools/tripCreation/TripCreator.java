@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.boescpa.topdad.postprocessing;
+package playground.boescpa.lib.tools.tripCreation;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
@@ -30,8 +30,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.boescpa.topdad.postprocessing.spatialCuttings.CircleBellevueCutting;
-
 /**
  * Creates "trips" from events. 
  * 
@@ -40,14 +38,26 @@ import playground.boescpa.topdad.postprocessing.spatialCuttings.CircleBellevueCu
  * IMPORTANT: This is a further developed version of staheale's class 'Events2Trips'.
  * 
  */
-public class MainTripCreator {
+public class TripCreator {
 	
-	private static Logger log = Logger.getLogger(MainTripCreator.class);
-	
-	public static void main(String[] args) {
-		
-		String eventsFile = args[0]; // Path to an events-File, e.g. "run.combined.150.events.xml.gz"
-		String networkFile = args[1]; // Path to the network-File used for the simulation resulting in the above events-File, e.g. "multimodalNetwork2030final.xml.gz"
+	private static Logger log = Logger.getLogger(TripCreator.class);
+
+	private final String eventsFile; // Path to an events-File, e.g. "run.combined.150.events.xml.gz"
+	private final String networkFile; // Path to the network-File used for the simulation resulting in the above events-File, e.g. "multimodalNetwork2030final.xml.gz"
+	private TripProcessor tripProcessor;
+
+	public TripCreator(String eventsFile, String networkFile, TripProcessor tripProcessor) {
+		this.eventsFile = eventsFile;
+		this.networkFile = networkFile;
+		this.tripProcessor = tripProcessor;
+	}
+
+	public void setTripProcessor(TripProcessor tripProcessor) {
+		this.tripProcessor = tripProcessor;
+	}
+
+	public void createTrips() {
+
 		EventsManager events = EventsUtils.createEventsManager();
 		
 		ScenarioImpl  scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -79,11 +89,8 @@ public class MainTripCreator {
 		log.info("Reading events file...done.");
 		
 		log.info("Postprocessing trips...");
-		TripProcessing.setCuttingStrategy(new CircleBellevueCutting(Integer.valueOf(args[4])));
-		TripProcessing.printTrips(tripHandler, network, args[2]);
-		TripProcessing.analyzeTripsTopdad(tripHandler, network, args[3]);
+		tripProcessor.analyzeTrips(tripHandler, network);
+		tripProcessor.printTrips(tripHandler, network);
 		log.info("Postprocessing trips...done.");
-		
 	}
-	
 }

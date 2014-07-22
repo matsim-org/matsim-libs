@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.boescpa.topdad;
+package playground.boescpa.lib.obj;
 
 import static org.junit.Assert.*;
 
@@ -28,7 +28,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import playground.boescpa.topdad.postprocessing.BoxedHashMap;
+import playground.boescpa.lib.obj.BoxedHashMap;
 
 public class TestBoxedHashMap {
 	
