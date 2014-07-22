@@ -36,7 +36,7 @@ public class SocialCostControllerV2 {
 		 */
 		//controler.setScoringFunctionFactory(new TimeAndMoneyDependentScoringFunctionFactory());
 
-		InitializerV2 initializer = new InitializerV2();
+		InitializerV2 initializer = new InitializerV2(0.1);
 		controler.addControlerListener(initializer);
 		controler.setOverwriteFiles(true);
 		controler.run();
@@ -60,13 +60,20 @@ public class SocialCostControllerV2 {
 	 */
 	public static class InitializerV2 implements IterationStartsListener {
 
+		private final double blendFactor;
+		
+		public InitializerV2(double blendFactor){
+			this.blendFactor = blendFactor;			
+		}
+		
+		
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
 			if(event.getIteration()==0){
 				Controler controler = event.getControler();
 
 				// initialize the social costs calculator
-				SocialCostCalculatorV2 scc = new SocialCostCalculatorV2(controler.getNetwork(), controler.getEvents(), controler.getLinkTravelTimes(), controler);
+				SocialCostCalculatorV2 scc = new SocialCostCalculatorV2(controler.getNetwork(), controler.getEvents(), controler.getLinkTravelTimes(), controler, blendFactor);
 				
 				controler.addControlerListener(scc);
 				controler.getEvents().addHandler(scc);

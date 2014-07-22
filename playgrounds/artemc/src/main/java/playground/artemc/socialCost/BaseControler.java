@@ -10,6 +10,10 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 
+import playground.artemc.annealing.SimpleAnnealer;
+import playground.artemc.scoreAnalyzer.DisaggregatedCharyparNagelScoringFunctionFactory;
+import playground.artemc.scoreAnalyzer.DisaggregatedScoreAnalyzer;
+
 
 public class BaseControler {
 
@@ -30,6 +34,10 @@ private static final Logger log = Logger.getLogger(BaseControler.class);
 		controler.addControlerListener(initializer);
 		
 		// Additional analysis
+		ScenarioImpl scnearioImpl = (ScenarioImpl) controler.getScenario();
+		controler.setScoringFunctionFactory(new DisaggregatedCharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getNetwork()));
+		controler.addControlerListener(new DisaggregatedScoreAnalyzer(scnearioImpl));
+		controler.addControlerListener(new SimpleAnnealer());
 		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
 		controler.setOverwriteFiles(true);
 		controler.run();
@@ -39,6 +47,8 @@ private static final Logger log = Logger.getLogger(BaseControler.class);
 
 		@Override
 		public void notifyStartup(StartupEvent event) {
+
+			
 			Controler controler = event.getControler();
 			// create a plot containing the mean travel times
 			Set<String> transportModes = new HashSet<String>();

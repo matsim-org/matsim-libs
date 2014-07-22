@@ -86,14 +86,14 @@ public class SocialCostCalculatorV2 implements TravelDisutility,
 	
 	double marginalUtilityOfMoney;
 	double opportunityCostOfCarTravel; 
-	
+
 
 	/*
 	 * Blur the Social Cost to speed up the relaxation process. Values between
 	 * 0.0 and 1.0 are valid. 0.0 means the old value will be kept, 1.0 means
 	 * the old value will be totally overwritten.
 	 */
-	private final double blendFactor = 0.1;
+	private final double blendFactor;
 
 	/*
 	 * This is a lookup table because currently the TransportMode of a Leg
@@ -122,21 +122,22 @@ public class SocialCostCalculatorV2 implements TravelDisutility,
 	private List<Double> quantil25PctNormalizedSocialCosts = new ArrayList<Double>();
 	private List<Double> quantil75PctNormalizedSocialCosts = new ArrayList<Double>();
 	
-	public SocialCostCalculatorV2(final Network network, EventsManager events, TravelTime travelTime, Controler controler) {
-		this(network, 15 * 60, 30 * 3600, events, travelTime, controler); // default timeslot-duration: 15 minutes
+	public SocialCostCalculatorV2(final Network network, EventsManager events, TravelTime travelTime, Controler controler, double blendFactor) {
+		this(network, 15 * 60, 30 * 3600, events, travelTime, controler, blendFactor); // default timeslot-duration: 15 minutes
 	}
 
-	public SocialCostCalculatorV2(final Network network, final int timeslice, EventsManager events, TravelTime travelTime, Controler controler) {
-		this(network, timeslice, 30 * 3600, events, travelTime, controler); // default: 30 hours at most
+	public SocialCostCalculatorV2(final Network network, final int timeslice, EventsManager events, TravelTime travelTime, Controler controler, double blendFactor) {
+		this(network, timeslice, 30 * 3600, events, travelTime, controler, blendFactor); // default: 30 hours at most
 	}
 
-	public SocialCostCalculatorV2(Network network, int timeslice, int maxTime, EventsManager events, TravelTime travelTime, Controler controler) {
+	public SocialCostCalculatorV2(Network network, int timeslice, int maxTime, EventsManager events, TravelTime travelTime, Controler controler, double blendFactor) {
 		this.travelTimeBinSize = timeslice;
 		this.numSlots = (maxTime / this.travelTimeBinSize) + 1;
 		this.network = network;
 		this.events = events;
 		this.travelTime = travelTime;
 		this.controler = controler;
+		this.blendFactor = blendFactor;
 		
 		this.marginalUtilityOfMoney = controler.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 		this.opportunityCostOfCarTravel = - controler.getConfig().planCalcScore().getTraveling_utils_hr() + controler.getConfig().planCalcScore().getPerforming_utils_hr();

@@ -1,4 +1,4 @@
-package playground.artemc.dataBase;
+package playground.artemc.utils;
 
 /**
  * @author Sergio Ordóñez

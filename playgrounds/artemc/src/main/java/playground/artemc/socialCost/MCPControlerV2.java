@@ -15,17 +15,20 @@ public class MCPControlerV2 {
 private static final Logger log = Logger.getLogger(MCPControlerV2.class);
 	
 	static String configFile;
+	static double sccBlendFactor;
 	
 	public static void main(String[] args) {
 		
 		configFile = args[0];
+		sccBlendFactor = Double.parseDouble(args[1]);
+		
 		MCPControlerV2 runner = new MCPControlerV2();
 		runner.runInternalizationFlows(configFile);
 	}
 	
 	private void runInternalizationFlows(String configFile) {
 		Controler controler = new Controler(configFile);
-		InitializerV2 initializer = new InitializerV2();
+		InitializerV2 initializer = new InitializerV2(sccBlendFactor);
 		controler.addControlerListener(initializer);
 		
 		// Additional analysis

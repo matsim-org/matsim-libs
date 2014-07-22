@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TimeAndMoneyDependentScoringFunction.java
+ * TimeAndMoneyDependentScoringFunctionFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,22 +18,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.artemc.socialCost;
+package playground.artemc.socialCost.scoring;
 
-import org.matsim.core.scoring.functions.OnlyTravelTimeDependentScoringFunction;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
-/**
- * Also the scoring function has to take social costs into account. Otherwise
- * scoring and routing would not be consistent.
- * Since social costs are (so far) measured in time, also added money should be
- * measured in seconds.
- * 
- * @author cdobler
- */
-public class TimeAndMoneyDependentScoringFunction extends OnlyTravelTimeDependentScoringFunction {
+
+public class TimeAndMoneyDependentScoringFunctionFactory implements ScoringFunctionFactory {
 
 	@Override
-	public void addMoney(final double amount) {
-		score += amount;
+	public ScoringFunction createNewScoringFunction(Person person) {
+		return new TimeAndMoneyDependentScoringFunction();
 	}
+
 }

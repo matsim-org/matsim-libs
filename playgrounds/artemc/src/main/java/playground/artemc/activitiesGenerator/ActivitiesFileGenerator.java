@@ -14,8 +14,9 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
-import playground.artemc.dataBase.DataBaseAdmin;
-import playground.artemc.dataBase.NoConnectionException;
+import playground.artemc.utils.DataBaseAdmin;
+import playground.artemc.utils.NoConnectionException;
+
 
 public class ActivitiesFileGenerator extends MatsimXmlWriter{
 

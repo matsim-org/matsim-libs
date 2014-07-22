@@ -36,7 +36,7 @@ public class SocialCostController {
 		 */
 		//controler.setScoringFunctionFactory(new TimeAndMoneyDependentScoringFunctionFactory());
 
-		Initializer initializer = new Initializer();
+		Initializer initializer = new Initializer(0.1);
 		controler.addControlerListener(initializer);
 		controler.setOverwriteFiles(true);
 		controler.run();
@@ -58,15 +58,21 @@ public class SocialCostController {
 	/*
 	 * Initialize the necessary components for the social cost calculation.
 	 */
-	public static class Initializer implements IterationStartsListener {
-
+	public static class Initializer implements IterationStartsListener{
+		
+		private final double blendFactor;
+		
+		public Initializer(double blendFactor){
+			this.blendFactor = blendFactor;			
+		}
+		
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
 			if(event.getIteration()==0){
 				Controler controler = event.getControler();
 
 				// initialize the social costs calculator
-				SocialCostCalculator scc = new SocialCostCalculator(controler.getNetwork(), controler.getEvents(), controler.getLinkTravelTimes(), controler);
+				SocialCostCalculator scc = new SocialCostCalculator(controler.getNetwork(), controler.getEvents(), controler.getLinkTravelTimes(), controler, blendFactor);
 				
 				controler.addControlerListener(scc);
 				controler.getEvents().addHandler(scc);
@@ -78,6 +84,8 @@ public class SocialCostController {
 				// create a plot containing the mean travel times
 				Set<String> transportModes = new HashSet<String>();
 				transportModes.add(TransportMode.car);
+				transportModes.add(TransportMode.pt);
+				transportModes.add(TransportMode.walk);
 				MeanTravelTimeCalculator mttc = new MeanTravelTimeCalculator(controler.getScenario(), transportModes);
 				controler.addControlerListener(mttc);
 				controler.getEvents().addHandler(mttc);

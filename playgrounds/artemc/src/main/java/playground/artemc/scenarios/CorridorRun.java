@@ -38,13 +38,17 @@ import playground.artemc.transitRouterEventsBased.vehicleOccupancy.VehicleOccupa
 import playground.artemc.transitRouterEventsBased.waitTimes.WaitTimeStuckCalculator;
 
 
-public class CorridorController {
+public class CorridorRun {
+	
 	
 	private static HashMap<Id, Double> factorMap = new HashMap<Id, Double>();
-
+	private static String input;
+	private static String output;
+	
 	public static void main(String[] args){
 
-		String path = args[0];
+		input = args[0];
+		output = args[1];
 
 		Controler controler = null;
 		Scenario scenario = initSampleScenario();
@@ -56,7 +60,7 @@ public class CorridorController {
 
 		ObjectAttributes incomes = new ObjectAttributes();
 		ObjectAttributesXmlReader incomesReader = new ObjectAttributesXmlReader(incomes);
-		incomesReader.parse(path + "/income_1000.xml");
+		incomesReader.parse(input+"income.xml");
 
 
 		HashMap<Id, Integer> incomeMap = new HashMap<Id, Integer>();
@@ -110,8 +114,14 @@ public class CorridorController {
 
 	private static Scenario initSampleScenario() {
 
-		Config config = ConfigUtils.loadConfig("C:/Work/localRun/config_corridor.xml");
-		//		config.controler().setOutputDirectory("C:/Workspace/roadpricingSingapore/output_Corridor/corridor_test");
+		Config config = ConfigUtils.loadConfig(input+"config.xml");
+		config.controler().setOutputDirectory(output);
+		config.network().setInputFile(input+"network.xml");
+		config.plans().setInputFile(input+"population.xml");
+		config.transit().setTransitScheduleFile(input+"transitSchedule.xml");
+		config.transit().setVehiclesFile(input+"vehicles.xml");
+		config.controler().setOutputDirectory(output);
+		
 		//		config.controler().setLastIteration(10);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 

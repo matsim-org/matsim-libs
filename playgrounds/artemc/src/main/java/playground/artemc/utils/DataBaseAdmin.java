@@ -1,4 +1,4 @@
-package playground.artemc.dataBase;
+package playground.artemc.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
+
 
 /**
  * @author Sergio Ordóñez
@@ -21,6 +22,12 @@ public class DataBaseAdmin {
 	 */
 	private Connection connection;
 	
+	public Connection getConnection() {
+		return connection;
+	}
+	public void setConnection(Connection connection) {
+		this.connection = connection;
+	}
 	//Methods
 	/**
 	 * Constructs a database administrator without a connection
