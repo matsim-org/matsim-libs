@@ -67,14 +67,19 @@ public class SimpleElevationScorer implements LegScoring, ActivityScoring {
 
 		final Params p = params.getParams( lastMode );
 		if ( p != null ) {
-			final double startAlt = elevationProvider.getAltitude( lastAct.getFacilityId() );
-			final double endAlt = elevationProvider.getAltitude( act.getFacilityId() );
-
-			final double dennivelation = endAlt - startAlt;
-			this.score += (dennivelation > 0 ?
-						p.marginalUtilityOfUphillDenivelation_m :
-						p.marginalUtilityOfDownhillDenivelation_m )
-					* Math.abs( dennivelation );
+			try {
+				final double startAlt = elevationProvider.getAltitude( lastAct.getFacilityId() );
+				final double endAlt = elevationProvider.getAltitude( act.getFacilityId() );
+	
+				final double dennivelation = endAlt - startAlt;
+				this.score += (dennivelation > 0 ?
+							p.marginalUtilityOfUphillDenivelation_m :
+							p.marginalUtilityOfDownhillDenivelation_m )
+						* Math.abs( dennivelation );
+			}
+			catch ( IllegalStateException e ) {
+				throw new RuntimeException( "problem while scoring mode "+lastMode , e );
+			}
 		}
 		this.lastMode = null;
 		this.lastAct = act;

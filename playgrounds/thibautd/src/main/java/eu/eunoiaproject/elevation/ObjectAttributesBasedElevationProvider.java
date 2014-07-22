@@ -57,7 +57,7 @@ public class ObjectAttributesBasedElevationProvider implements ElevationProvider
 	 */
 	@Override
 	public double getAltitude(final Id id) {
-		final FailingDouble val = new FailingDouble();
+		final FailingDouble val = new FailingDouble( id );
 		for ( ObjectAttributes atts : attributes ) {
 			val.set( (Double) atts.getAttribute( id.toString() , attName ) );
 		}
@@ -65,18 +65,23 @@ public class ObjectAttributesBasedElevationProvider implements ElevationProvider
 	}
 
 	private static class FailingDouble {
+		private final Id locationId;
 		private boolean wasSet;
 		private double value = Double.NaN;
+		
+		public FailingDouble( final Id locationId ) {
+			this.locationId = locationId;
+		}
 
 		public void set( final Double v ) {
 			if ( v == null ) return;
-			if ( wasSet ) throw new IllegalStateException( "already a value" );
+			if ( wasSet ) throw new IllegalStateException( "value found in several containers for ID "+locationId );
 			wasSet = true;
 			value = v;
 		}
 
 		public double get() {
-			if ( !wasSet ) throw new IllegalStateException( "no value" );
+			if ( !wasSet ) throw new IllegalStateException( "no value found for ID "+locationId );
 			return value;
 		}
 	}
