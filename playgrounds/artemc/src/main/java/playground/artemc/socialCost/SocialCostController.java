@@ -66,6 +66,10 @@ public class SocialCostController {
 			this.blendFactor = blendFactor;			
 		}
 		
+		public Initializer(){
+			this.blendFactor = 0.1 ;			
+		}
+		
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
 			if(event.getIteration()==0){
