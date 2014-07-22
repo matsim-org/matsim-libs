@@ -135,12 +135,12 @@ public class ZoneCompleteness {
 	public static void getZoneCompleteness(int numberOfThreads, String sourceFolder, QuadTree<Tuple<Id, Polygon>> qt, double hexWidth, Id[] idList) {
 
 
-		//		double[] radii = {1, 5, 10, 15, 20, 25, 30, 35, 40};
-		//		int[] pmins = {1, 5, 10, 15, 20, 25};
+				double[] radii = {1, 5, 10, 15, 20, 25, 30, 35, 40};
+				int[] pmins = {1, 5, 10, 15, 20, 25};
 
 		//For testing purposes
-		double[] radii = {5};
-		int[] pmins = {2};
+//		double[] radii = {15};
+//		int[] pmins = {15};
 
 		/*
 		 * For each zone, get a list of DigicoreActivities and put all in a 
