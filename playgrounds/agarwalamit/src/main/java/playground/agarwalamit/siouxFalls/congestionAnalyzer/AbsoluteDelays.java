@@ -68,7 +68,7 @@ public class AbsoluteDelays {
 	private static double totalDelayInHoursFromEventsFile(String runNumber) {
 		EventsManager eventManager = EventsUtils.createEventsManager();
 		ScenarioImpl sc = loadScenario(runNumber);
-		int lastIteration = (int) sc.getConfig().controler().getLastIteration();
+		int lastIteration = 1500;
 		MarginalCongestionHandlerImplV3 congestionHandlerImplV3= new MarginalCongestionHandlerImplV3(eventManager, sc);
 
 		eventManager.addHandler(congestionHandlerImplV3);
