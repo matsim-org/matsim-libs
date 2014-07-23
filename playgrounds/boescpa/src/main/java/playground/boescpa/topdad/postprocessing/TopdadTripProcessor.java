@@ -66,7 +66,7 @@ public class TopdadTripProcessor extends TripProcessor {
 	 * @return HashMap with (String, key) mode and (Double[], value) [time,distance] per mode
 	 */
 	@Override
-	public HashMap<String, Double[]> analyzeTrips(TripHandler tripData, Network network) {
+	public HashMap<String, Object> analyzeTrips(TripHandler tripData, Network network) {
 		HashMap<String, Double> timeMode = new HashMap<String, Double>();
 		HashMap<String, Long> distMode = new HashMap<String, Long>();
 
@@ -135,7 +135,7 @@ public class TopdadTripProcessor extends TripProcessor {
 		}
 
 		log.info("Analyzing trips for topdad...done.");
-		HashMap<String, Double[]> result = new HashMap<String, Double[]>();
+		HashMap<String, Object> result = new HashMap<String, Object>();
 		for (String mode : distMode.keySet()) {
 			Double[] val = {timeMode.get(mode), (double)distMode.get(mode)};
 			result.put(mode, val);

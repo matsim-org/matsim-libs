@@ -233,5 +233,5 @@ public abstract class TripProcessor {
 		return endTime - startTime;
 	}
 
-	public abstract HashMap<String, Double[]> analyzeTrips(TripHandler tripHandler, Network network);
+	public abstract HashMap<String, Object> analyzeTrips(TripHandler tripHandler, Network network);
 }

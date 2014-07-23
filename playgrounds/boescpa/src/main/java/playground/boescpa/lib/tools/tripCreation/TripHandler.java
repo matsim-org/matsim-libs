@@ -218,7 +218,6 @@ public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEv
 		purpose.put(event.getPersonId(), "stuck");
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		ArrayList<LinkedList<Id>> al = path.getValues(event.getPersonId());
