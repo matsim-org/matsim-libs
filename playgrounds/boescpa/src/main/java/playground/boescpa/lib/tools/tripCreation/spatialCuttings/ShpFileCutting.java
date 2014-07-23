@@ -41,6 +41,8 @@ import java.util.Set;
  */
 public class ShpFileCutting implements SpatialCuttingStrategy {
 
+	// TODO-boescpa Write tests...
+
 	private static final GeometryFactory factory = new GeometryFactory();
 	private Geometry area = null;
 

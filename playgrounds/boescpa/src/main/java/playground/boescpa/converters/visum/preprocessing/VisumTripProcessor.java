@@ -38,6 +38,8 @@ import java.util.Iterator;
  */
 public class VisumTripProcessor extends TripProcessor {
 
+	// TODO-boescpa Write tests...
+
 	public VisumTripProcessor(String tripFile, SpatialCuttingStrategy cuttingStrategy) {
 		super(tripFile, cuttingStrategy);
 	}
