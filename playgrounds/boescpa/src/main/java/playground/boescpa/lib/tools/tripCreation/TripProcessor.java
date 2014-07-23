@@ -90,7 +90,7 @@ public abstract class TripProcessor {
 	 */
 	public void printTrips(TripHandler tripHandler, Network network) {
 		try {
-			final String header="agentId\tstartTime\tstartLink\tstartXCoord\tstartYCoord\tendTime\tendLink\tendXCoord\tendYCoord\tmode\tpurpose\ttime\tdistance";
+			final String header="agentId\tstartTime\tstartLink\tstartXCoord\tstartYCoord\tendTime\tendLink\tendXCoord\tendYCoord\tmode\tpurpose\tduration\tdistance";
 			final BufferedWriter out = IOUtils.getBufferedWriter(outputFile);
 			int incognitoPersonId = 0;
 			out.write(header);
