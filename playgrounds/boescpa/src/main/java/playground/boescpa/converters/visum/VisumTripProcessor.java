@@ -23,14 +23,13 @@ package playground.boescpa.converters.visum;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.utils.io.IOUtils;
 import playground.boescpa.lib.tools.tripCreation.TripHandler;
 import playground.boescpa.lib.tools.tripCreation.TripProcessor;
 import playground.boescpa.lib.tools.tripCreation.spatialCuttings.SpatialCuttingStrategy;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Extends the abstract TripProcessor with a visum-specific implementation.

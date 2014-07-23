@@ -23,7 +23,6 @@ package playground.boescpa.converters.visum;
 
 import playground.boescpa.lib.tools.tripCreation.TripCreator;
 import playground.boescpa.lib.tools.tripCreation.TripProcessor;
-import playground.boescpa.lib.tools.tripCreation.spatialCuttings.CircleBellevueCutting;
 import playground.boescpa.lib.tools.tripCreation.spatialCuttings.ShpFileCutting;
 import playground.boescpa.lib.tools.tripCreation.spatialCuttings.SpatialCuttingStrategy;
 
