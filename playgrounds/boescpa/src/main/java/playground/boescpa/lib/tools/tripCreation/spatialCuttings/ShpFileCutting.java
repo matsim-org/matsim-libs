@@ -19,8 +19,17 @@
 
 package playground.boescpa.lib.tools.tripCreation.spatialCuttings;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Spatial cutting strategy for trip processing.
@@ -31,17 +40,41 @@ import org.matsim.api.core.v01.network.Network;
  * @author pboesch
  */
 public class ShpFileCutting implements SpatialCuttingStrategy {
-	
-	private final String shpFile;
-	
+
+	private static final GeometryFactory factory = new GeometryFactory();
+	private Geometry area = null;
+
 	public ShpFileCutting(String cuttingShpFile) {
-		this.shpFile = cuttingShpFile;
+		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
+		features.addAll(ShapeFileReader.getAllFeatures(cuttingShpFile));
+		for (SimpleFeature feature : features) {
+			if (this.area == null) {
+				this.area = (Geometry) feature.getDefaultGeometry();
+			} else {
+				this.area = this.area.union((Geometry) feature.getDefaultGeometry());
+			}
+		}
 	}
 
 	@Override
 	public boolean spatiallyConsideringTrip(Network network, Id startLink, Id endLink) {
-		// TODO implement cut with an shp-File... [endLink could be null!!!]
-		return false;
+		boolean contains = false;
+
+		// Check startLink
+		double startXCoord = network.getLinks().get(startLink).getCoord().getX();
+		double startYCoord = network.getLinks().get(startLink).getCoord().getY();
+		Point start = factory.createPoint(new Coordinate(startXCoord, startYCoord));
+		contains = area.contains(start);
+
+		// Check endLink
+		if (!contains && endLink != null) {
+			double endXCoord = network.getLinks().get(endLink).getCoord().getX();
+			double endYCoord = network.getLinks().get(endLink).getCoord().getY();
+			Point end = factory.createPoint(new Coordinate(endXCoord, endYCoord));
+			contains = area.contains(end);
+		}
+
+		return contains;
 	}
 
 }
