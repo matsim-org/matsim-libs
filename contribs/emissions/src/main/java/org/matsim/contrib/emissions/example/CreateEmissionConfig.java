@@ -36,18 +36,16 @@ import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
-
+/**
+ * 
+ * create a config file with necessary input files for the {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup}
+ * TODO set link
+ *
+ *
+ */
 public class CreateEmissionConfig {
 
-	/**
-	 * @param args
-	 * 
-	 * create a config file with necessary input files for the EmissionConfigGroup
-	 * TODO set link
-	 *
-	 * OR add emission config group to an existing config file
-	 *
-	 */
+
 		static String inputPath = "./src/main/input/";
 		static String networkFile = inputPath + "sample_network.xml";
 		static String plansFile = inputPath + "sample_population.xml";
