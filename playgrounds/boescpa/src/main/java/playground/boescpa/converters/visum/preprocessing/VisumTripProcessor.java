@@ -19,7 +19,7 @@
  * *********************************************************************** *
  */
 
-package playground.boescpa.converters.visum;
+package playground.boescpa.converters.visum.preprocessing;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;

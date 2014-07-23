@@ -19,7 +19,7 @@
  * *********************************************************************** *
  */
 
-package playground.boescpa.converters.visum;
+package playground.boescpa.converters.visum.preprocessing;
 
 import playground.boescpa.lib.tools.tripCreation.TripCreator;
 import playground.boescpa.lib.tools.tripCreation.TripProcessor;
