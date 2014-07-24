@@ -86,8 +86,8 @@ public class TestingPricing4SamplePopulation {
 			log.info("Running sample Population "+d+".");
 			String outputDir = outputFolder+"/f="+d+"/";
 			String samplePlansFile = outputDir+"/plans"+d+".xml";
-			SamplingPlans samplePlans = new SamplingPlans(d,samplePlansFile);
-			samplePlans.run();
+//			SamplingPlans samplePlans = new SamplingPlans(d,samplePlansFile);
+//			samplePlans.run();
 			config.plans().setInputFile(samplePlansFile);
 			config.qsim().setFlowCapFactor(d);
 			config.qsim().setStorageCapFactor(3*d);
