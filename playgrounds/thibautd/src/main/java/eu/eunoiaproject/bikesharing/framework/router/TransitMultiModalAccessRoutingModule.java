@@ -124,6 +124,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 			final Person person) {
 		// find possible start stops
 		final PriorityInitialNodeMap fromNodes = new PriorityInitialNodeMap();
+		final double tripLength = CoordUtils.calcDistance( fromFacility.getCoord() , toFacility.getCoord() );
 
 		for ( InitialNodeRouter router : routers ) {
 			locateWrappedNearestTransitNodes(
@@ -132,7 +133,8 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 					fromNodes,
 					person,
 					fromFacility,
-					departureTime);
+					departureTime,
+					tripLength);
 		}
 
 		prune( fromNodes );
@@ -147,7 +149,8 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 					toNodes,
 					person,
 					toFacility,
-					departureTime);
+					departureTime,
+					tripLength);
 		}
 
 		prune( toNodes );
@@ -288,11 +291,14 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 			final PriorityInitialNodeMap wrappedNearestNodes,
 			final Person person,
 			final Facility facility,
-			final double departureTime){
+			final double departureTime,
+			final double tripLength){
 		Collection<TransitRouterNetworkNode> nearestNodes =
 				this.transitNetwork.getNearestNodes(
 						facility.getCoord(),
-						router.getSearchRadius());
+						Math.min(
+							router.getSearchRadius(),
+							tripLength ) );
 
 		if (nearestNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
