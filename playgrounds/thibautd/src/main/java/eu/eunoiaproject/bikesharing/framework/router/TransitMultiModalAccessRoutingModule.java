@@ -78,17 +78,13 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 
-	private final TransitRouterNetwork transitNetwork;
-
-	private final Scenario scenario;
 	private final MultiNodeDijkstra dijkstra;
-	private final TransitRouterConfig config;
 	private final TransitTravelDisutility travelDisutility;
 	private final TravelTime travelTime;
 
 	private final Collection<InitialNodeRouter> routers;
 
-	private final PreparedTransitSchedule preparedTransitSchedule;
+	private final RoutingData data;
 
 	private final Random random = MatsimRandom.getLocalInstance();
 	private final double initialNodeProportion; 
@@ -101,18 +97,15 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 	 */
 	public TransitMultiModalAccessRoutingModule(
 			final double initialNodeProportion,
-			final Scenario scenario,
+			final RoutingData data,
 			final InitialNodeRouter... routers) {
 		if ( initialNodeProportion <= 0 || initialNodeProportion > 1 ) throw new IllegalArgumentException( ""+initialNodeProportion );
 		this.initialNodeProportion = initialNodeProportion;
-		this.scenario = scenario;
-		this.config = new TransitRouterConfig( scenario.getConfig() );
-		this.preparedTransitSchedule = new PreparedTransitSchedule( scenario.getTransitSchedule() );
-		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(config, preparedTransitSchedule);
+		this.data = data;
+		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(data.config, data.preparedTransitSchedule);
 		this.travelTime = transitRouterNetworkTravelTimeAndDisutility;
 		this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
-		this.transitNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), config.beelineWalkConnectionDistance);
-		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.travelDisutility, this.travelTime);
+		this.dijkstra = new MultiNodeDijkstra(data.transitNetwork, this.travelDisutility, this.travelTime);
 		this.routers = Arrays.asList( routers );
 	}
 
@@ -240,16 +233,16 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 				tRoute.setDistance(
 						RouteUtils.calcDistance(
 							tRoute,
-							scenario.getTransitSchedule(),
-							scenario.getNetwork()));
+							data.scenario.getTransitSchedule(),
+							data.scenario.getNetwork()));
 				final ActivityImpl act =
 					new ActivityImpl(
 							PtConstants.TRANSIT_ACTIVITY_TYPE, 
-							scenario.getTransitSchedule().getFacilities().get(tRoute.getAccessStopId()).getCoord(), 
+							data.scenario.getTransitSchedule().getFacilities().get(tRoute.getAccessStopId()).getCoord(), 
 							tRoute.getStartLinkId());
 				act.setMaximumDuration(0.0);
 				trip.add(act);
-				nextCoord = scenario.getTransitSchedule().getFacilities().get(tRoute.getEgressStopId()).getCoord();
+				nextCoord = data.scenario.getTransitSchedule().getFacilities().get(tRoute.getEgressStopId()).getCoord();
 			}
 			else { // walk legs don't have a coord, use the coord from the last egress point
 				final ActivityImpl act =
@@ -294,7 +287,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 			final double departureTime,
 			final double tripLength){
 		Collection<TransitRouterNetworkNode> nearestNodes =
-				this.transitNetwork.getNearestNodes(
+				data.transitNetwork.getNearestNodes(
 						facility.getCoord(),
 						Math.min(
 							router.getSearchRadius(),
@@ -302,15 +295,15 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 
 		if (nearestNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
-			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(facility.getCoord());
+			TransitRouterNetworkNode nearestNode = data.transitNetwork.getNearestNode(facility.getCoord());
 			double distance =
 					CoordUtils.calcDistance(
 							facility.getCoord(),
 							nearestNode.stop.getStopFacility().getCoord());
 			nearestNodes =
-					this.transitNetwork.getNearestNodes(
+					data.transitNetwork.getNearestNodes(
 							facility.getCoord(),
-							distance + this.config.extensionRadius);
+							distance + data.config.extensionRadius);
 		}
 
 		for (TransitRouterNetworkNode node : nearestNodes) {
@@ -376,7 +369,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 						(((TransitRouterNetworkLink) link).getFromNode().stop.getArrivalOffset() != Time.UNDEFINED_TIME) ?
 							((TransitRouterNetworkLink) link).fromNode.stop.getArrivalOffset() :
 							((TransitRouterNetworkLink) link).fromNode.stop.getDepartureOffset();
-					double arrivalTime = this.preparedTransitSchedule.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
+					double arrivalTime = data.preparedTransitSchedule.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
 					leg.setTravelTime(arrivalTime - time);
 					time = arrivalTime;
 					legs.add(leg);
@@ -445,7 +438,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 			double arrivalOffset = ((prevLink).toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ?
 					(prevLink).toNode.stop.getArrivalOffset()
 					: (prevLink).toNode.stop.getDepartureOffset();
-			double arrivalTime = this.preparedTransitSchedule.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
+			double arrivalTime = data.preparedTransitSchedule.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
 			leg.setTravelTime(arrivalTime - time);
 
 			legs.add(leg);
@@ -465,11 +458,11 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 	}
 
 	public TransitRouterNetwork getTransitRouterNetwork() {
-		return this.transitNetwork;
+		return data.transitNetwork;
 	}
 
 	protected TransitRouterNetwork getTransitNetwork() {
-		return transitNetwork;
+		return data.transitNetwork;
 	}
 
 	protected MultiNodeDijkstra getDijkstra() {
@@ -477,7 +470,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 	}
 
 	protected TransitRouterConfig getConfig() {
-		return config;
+		return data.config;
 	}
 
 	private static class PriorityInitialNodeMap {
@@ -604,6 +597,21 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 		 */
 		public double getSearchRadius() {
 			return searchRadius;
+		}
+	}
+
+	public static class RoutingData {
+		private final Scenario scenario;
+		private final TransitRouterNetwork transitNetwork;
+		private final PreparedTransitSchedule preparedTransitSchedule;
+		private final TransitRouterConfig config;
+
+		public RoutingData(
+				final Scenario scenario ) {
+			this.scenario = scenario;
+			this.preparedTransitSchedule = new PreparedTransitSchedule( scenario.getTransitSchedule() );
+			this.config = new TransitRouterConfig( scenario.getConfig() );
+			this.transitNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), config.beelineWalkConnectionDistance);
 		}
 	}
 }

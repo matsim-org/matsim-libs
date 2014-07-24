@@ -47,11 +47,14 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 	private final TripRouterFactory delegate;
 	private final Scenario scenario;
 
+	private final TransitMultiModalAccessRoutingModule.RoutingData data;
+
 	public BikeSharingTripRouterFactory(
 			final TripRouterFactory delegate,
 			final Scenario scenario ) {
 		this.delegate = delegate;
 		this.scenario = scenario;
+		this.data = new TransitMultiModalAccessRoutingModule.RoutingData( scenario );
 	}
 
 	public BikeSharingTripRouterFactory(
@@ -82,7 +85,7 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 				TransportMode.pt,
 				new TransitMultiModalAccessRoutingModule(
 						0.75,
-						scenario,
+						data,
 						new InitialNodeRouter(
 							router.getRoutingModule( TransportMode.walk ),
 							scenario.getConfig().transitRouter().getSearchRadius(),
