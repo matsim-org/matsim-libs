@@ -30,7 +30,7 @@ public abstract class TableWriter {
 	String tableName;
 	int modfactor = 1;
 	int lineCounter = 0;
-	int batchSize = 2000;
+	int batchSize = 1000;
 	int pushBackSize = 200000;
 	StringBuilder sb = new StringBuilder();
 	List<PostgresqlColumnDefinition> columns;

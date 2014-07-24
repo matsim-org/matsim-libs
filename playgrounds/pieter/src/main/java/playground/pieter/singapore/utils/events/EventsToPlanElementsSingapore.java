@@ -890,24 +890,24 @@ public class EventsToPlanElementsSingapore implements TransitDriverStartsEventHa
 		// list
 		String update = "		UPDATE " + tripTableName
 				+ " SET boarding_stop = matsim_to_transitstops_lookup.stop_id "
-				+ " FROM " + schemaName + ".matsim_to_transitstops_lookup "
+				+ " FROM m_calibration.matsim_to_transitstops_lookup "
 				+ " WHERE boarding_stop = matsim_stop ";
 		dba.executeUpdate(update);
 		update = "		UPDATE "
 				+ tripTableName
 				+ " SET alighting_stop = matsim_to_transitstops_lookup.stop_id "
-				+ " FROM " + schemaName + ".matsim_to_transitstops_lookup "
+				+ " FROM m_calibration.matsim_to_transitstops_lookup "
 				+ " WHERE alighting_stop = matsim_stop ";
 		dba.executeUpdate(update);
 		update = "		UPDATE " + journeyTableName
 				+ " SET first_boarding_stop = matsim_to_transitstops_lookup.stop_id "
-				+ " FROM " + schemaName + ".matsim_to_transitstops_lookup "
+				+ " FROM m_calibration.matsim_to_transitstops_lookup "
 				+ " WHERE first_boarding_stop = matsim_stop ";
 		dba.executeUpdate(update);
 		update = "		UPDATE "
 				+ journeyTableName
 				+ " SET last_alighting_stop = matsim_to_transitstops_lookup.stop_id "
-				+ " FROM " + schemaName + ".matsim_to_transitstops_lookup "
+				+ " FROM m_calibration.matsim_to_transitstops_lookup "
 				+ " WHERE last_alighting_stop = matsim_stop ";
 		dba.executeUpdate(update);
 
