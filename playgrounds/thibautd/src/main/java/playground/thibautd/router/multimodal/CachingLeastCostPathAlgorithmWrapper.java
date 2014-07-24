@@ -97,7 +97,12 @@ public class CachingLeastCostPathAlgorithmWrapper implements LeastCostPathCalcul
 
 		cache.put( od , routed );
 
-		return routed;
+		// we need to adapt, because it is not required that the routing algorithm
+		// uses the same travel disutility as the one used for "personnalization".
+		// In particular, AccessEgressMultimodalTripRouterFactory initializes the
+		// router with a non-personnalizable version of the disutility, which allows
+		// to use preprocessing based speedup techniques (A*).
+		return adapt( routed , starttime , person , vehicle );
 	}
 
 	private Path adapt(

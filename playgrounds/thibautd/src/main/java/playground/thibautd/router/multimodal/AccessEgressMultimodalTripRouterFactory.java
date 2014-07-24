@@ -26,19 +26,25 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author thibautd
@@ -51,21 +57,19 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 	private final TravelDisutilityFactory travelDisutilityFactory;
 	private final Map<String, TravelTime> multimodalTravelTimes;
 	private final TripRouterFactory delegateFactory;
-	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	
 	private final Map<String, Network> multimodalSubNetworks = new HashMap<String, Network>();
+	private final Map<String, LeastCostPathCalculatorFactory> multimodalFactories = new HashMap<String, LeastCostPathCalculatorFactory>();
 	
 	public AccessEgressMultimodalTripRouterFactory(
 			final Scenario scenario,
 			final Map<String, TravelTime> multimodalTravelTimes,
 			final TravelDisutilityFactory travelDisutilityFactory,
-			final TripRouterFactory delegateFactory, 
-			final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory) {
+			final TripRouterFactory delegateFactory) {
 		this.scenario = scenario;
 		this.multimodalTravelTimes = multimodalTravelTimes;
 		this.travelDisutilityFactory = travelDisutilityFactory;
 		this.delegateFactory = delegateFactory;
-		this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
 	}
 	
 	@Override
@@ -93,14 +97,54 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 			 * We cannot use the travel disutility object from the routingContext since it
 			 * has not been created for the modes used here.
 			 */
-			final TravelDisutility travelDisutility = this.travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());		
+
+			final TravelDisutility travelDisutility =
+							travelDisutilityFactory.createTravelDisutility(
+									travelTime,
+									scenario.getConfig().planCalcScore());
+			final TravelDisutility nonPersonnalizableDisutility =
+					new TravelDisutility() {
+						private final Person dummy = new PersonImpl( new IdImpl( "dummy" ) );
+						@Override
+						public double getLinkTravelDisutility(
+								final Link link,
+								final double time,
+								final Person person,
+								final Vehicle vehicle) {
+							return travelDisutility.getLinkTravelDisutility(
+									link,
+									time,
+									// This is fine with the caching approach,
+									// and is necessary for the AStar heuristic
+									// to be valid
+									dummy,
+									vehicle );
+						}
+
+						@Override
+						public double getLinkMinimumTravelDisutility(final Link link) {
+							// default uses freespeed, which is worthless for slow modes.
+							// This here is fine with Christoph Dobler's Walk and Bike
+							// disutilities, as they are not travel time dependent and
+							// we anyway do not use the person in routing but as a post-processing.
+							// But this remains awful (basically, the problem is
+							// how to pre-process when one has personnalizable
+							// travel times?)
+							return travelDisutility.getLinkTravelDisutility( link , 0 , dummy , null );
+						}
+					};
+			// we use the "non-personnalizable" version for routing,
+			// and the personnalizable only for path adaptation
 			final LeastCostPathCalculator routeAlgo =
 				new CachingLeastCostPathAlgorithmWrapper(
 						travelTime,
 						travelDisutility,
-						this.leastCostPathCalculatorFactory.createPathCalculator(
+						getLeastCostPathCalulatorFactory(
+							mode,
+							subNetwork,
+							nonPersonnalizableDisutility ).createPathCalculator(
 								subNetwork,
-								travelDisutility,
+								nonPersonnalizableDisutility,
 								travelTime) );
 			final double crowFlyDistanceFactor = scenario.getConfig().plansCalcRoute().getBeelineDistanceFactor();
 			final double crowFlySpeed = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get( mode );
@@ -116,6 +160,22 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 		}
 
 		return instance;
+	}
+
+	private LeastCostPathCalculatorFactory getLeastCostPathCalulatorFactory(
+			final String mode,
+			final Network subNetwork,
+			final TravelDisutility travelDisutility) {
+		if ( multimodalFactories.containsKey( mode ) ) return multimodalFactories.get( mode );
+
+		// TODO: make implementation configurable
+		final LeastCostPathCalculatorFactory factory =
+			new FastAStarLandmarksFactory(
+					subNetwork,
+					travelDisutility );
+
+		multimodalFactories.put( mode , factory );
+		return factory;
 	}
 
 	private Network getSubnetwork(final Network network,final String mode) {

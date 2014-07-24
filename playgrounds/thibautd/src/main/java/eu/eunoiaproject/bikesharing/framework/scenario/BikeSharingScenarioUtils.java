@@ -36,9 +36,7 @@ import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
@@ -150,20 +148,11 @@ public class BikeSharingScenarioUtils {
 					scenario.getConfig(),
 					linkSlopes );
 	
-		/*
-		 * Cannot get the factory from the controler, therefore create a new one as the controler does. 
-		 */
-		final TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
-		final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory =
-			builder.createDefaultLeastCostPathCalculatorFactory(
-					scenario );
-
 		return new AccessEgressMultimodalTripRouterFactory(
 				scenario,
 				multiModalTravelTimeFactory.createTravelTimes(),
 				disutilityFactory,
-				new BikeSharingTripRouterFactory( scenario ),
-				leastCostPathCalculatorFactory );
+				new BikeSharingTripRouterFactory( scenario ) );
 	}
 }
 
