@@ -173,6 +173,9 @@ public class RunZurichBikeSharingSimulation {
 		private double bikeMarginalUtilityOfDownhillDenivelation_m = 0;
 		private double walkMarginalUtilityOfDownhillDenivelation_m = 0;
 
+		// quick fix facing crashes due to activities without facility Id.
+		private boolean scoreDenivelation = false;
+
 		public DenivelationScoringConfigGroup() {
 			super( GROUP_NAME );
 		}
@@ -222,22 +225,35 @@ public class RunZurichBikeSharingSimulation {
 			this.walkMarginalUtilityOfDownhillDenivelation_m = walkMarginalUtilityOfDownhillDenivelation_m;
 		}
 
+		@StringGetter( "scoreDenivelation" )
+		public boolean getScoreDenivelation() {
+			return scoreDenivelation;
+		}
+
+		@StringSetter( "scoreDenivelation" )
+		public void setScoreDenivelation(boolean scoreDenivelation) {
+			this.scoreDenivelation = scoreDenivelation;
+		}
+
+
 		public SimpleElevationScorerParameters getParameters() {
 			final SimpleElevationScorerParameters params = new SimpleElevationScorerParameters();
 
-			params.addParams(
-					TransportMode.bike,
-					getBikeMarginalUtilityOfUphillDenivelation_m(),
-					getBikeMarginalUtilityOfDownhillDenivelation_m() );
-			params.addParams(
-					BikeSharingConstants.MODE,
-					getBikeMarginalUtilityOfUphillDenivelation_m(),
-					getBikeMarginalUtilityOfDownhillDenivelation_m() );
+			if ( scoreDenivelation ) {
+				params.addParams(
+						TransportMode.bike,
+						getBikeMarginalUtilityOfUphillDenivelation_m(),
+						getBikeMarginalUtilityOfDownhillDenivelation_m() );
+				params.addParams(
+						BikeSharingConstants.MODE,
+						getBikeMarginalUtilityOfUphillDenivelation_m(),
+						getBikeMarginalUtilityOfDownhillDenivelation_m() );
 
-			params.addParams(
-					TransportMode.walk,
-					getWalkMarginalUtilityOfUphillDenivelation_m(),
-					getWalkMarginalUtilityOfDownhillDenivelation_m() );
+				params.addParams(
+						TransportMode.walk,
+						getWalkMarginalUtilityOfUphillDenivelation_m(),
+						getWalkMarginalUtilityOfDownhillDenivelation_m() );
+			}
 
 			return params;
 		}
