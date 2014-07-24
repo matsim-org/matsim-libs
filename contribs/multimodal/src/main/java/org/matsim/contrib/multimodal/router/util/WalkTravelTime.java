@@ -231,6 +231,7 @@ public class WalkTravelTime implements TravelTime {
 			this.personCache.set(person);
 			this.personFactorCache.set(personFactor);
 			this.personWalkSpeedCache.set(this.referenceWalkSpeed * personFactor);
+			return;
 		}
 		
 		double scatterFactor = 1.0;
