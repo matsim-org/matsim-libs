@@ -42,6 +42,7 @@ import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
  */
 public class VerifyResults {
 	/*Values taken from IMPACT (Maibach et al.(2008))*/
+	private static final Logger log = Logger.getLogger(VerifyResults.class);
 	private static final double EURO_PER_GRAMM_NOX = 9600. / (1000. * 1000.);
 	private static final double EURO_PER_GRAMM_NMVOC = 1700. / (1000. * 1000.);
 	private static  final double EURO_PER_GRAMM_SO2 = 11000. / (1000. * 1000.);
@@ -58,7 +59,7 @@ public class VerifyResults {
 	private final static String networkFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
 	private final static String inputConfigFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/config_munich_1pct_baseCaseCtd.xml";
 
-	private  final static String [] runNr = {"baseCaseCtd","ci","eci"};//{"201","202", "203","204"};//{"1","2","3","4"};
+	private  final static String [] runNr = {"baseCaseCtd","ei","ci","eci"};//{"201","202", "203","204"};//{"1","2","3","4"};
 
 	private  static Scenario scenario ;
 
@@ -79,8 +80,8 @@ public class VerifyResults {
 			scenario = ScenarioUtils.loadScenario(config);
 			String eventsFile=runDir+runNr[i]+"/ITERS/it."+lastItenation+"/"+lastItenation+".events.xml.gz";
 
-			calculateEmissionCosts(emissionsEventsFile, scenario,runNr[i]);
-			calculateDelaysCosts(eventsFile,scenario,runNr[i]);
+//			calculateEmissionCosts(emissionsEventsFile, scenario,runNr[i]);
+//			calculateDelaysCosts(eventsFile,scenario,runNr[i]);
 			calculateUserBenefits(scenario, runNr[i]);
 		}
 		Logger.getLogger(VerifyResults.class).info("Writing files is finsished.");
@@ -149,6 +150,10 @@ public class VerifyResults {
 		double totalUtils=0;
 		for(Person p : population.getPersons().values()){
 			double personScore = p.getSelectedPlan().getScore();
+			if(personScore<0) {
+				log.warn("Utility for person "+p.getId()+" is negative and this ignoring this in user benefit callculation.");
+				personScore=0;
+			}
 			totalUtils+=personScore;
 		}
 		BufferedWriter writer = IOUtils.getBufferedWriter(runDir+runNr+"/analysis/verifyUserBenefits.txt");

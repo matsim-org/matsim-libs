@@ -45,6 +45,12 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author amit
  */
 public class SamplingPlans {
+
+	public SamplingPlans(double samplingRatio, String outputPlansDirectory) {
+		this.samplingRatio = samplingRatio;
+		this.outputPlans = outputPlansDirectory;
+	}
+
 	private final Logger log = Logger.getLogger(SamplingPlans.class);
 	final CoordinateReferenceSystem targetCRS =	 MGC.getCRS("EPSG:3459");
 	private final double xMin =	673506.73;
@@ -53,21 +59,25 @@ public class SamplingPlans {
 	private final double yMax = 4857392.75;
 	private final int noOfXbins = 30;
 	private final int noOfYbins = 30;
-	private final double samplingRatio = 0.1;
+	private final double samplingRatio;
 	private SortedMap<String, Population>  binToPopulation;
 	private final String clusterPath = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/";
 	private final String inputPlans  = clusterPath+"/outputMC/selectedPlansOnly_plans.xml";
 	//	private final String networkFile = clusterPath+"/input/SiouxFalls_networkWithRoadType.xml.gz";
-	private final String outputPlans = "./input/plans10Pct.xml";
+	private final String outputPlans;
 	private double totalNoOfPersons ;
 	private Population initialPopulation;
 	private Population samplePopulation;
 
 	public static void main(String[] args) {
-		SamplingPlans sp = new SamplingPlans();
-		sp.readInputPlansAndCreateSubPopulation();
-		sp.getAndWriteRandomPlansFromSubPopulation();
-		sp.compareModeShare();
+		SamplingPlans sp = new SamplingPlans(0.1,"./input/plans10Pct.xml");
+		sp.run();
+	}
+
+	public void run(){
+		readInputPlansAndCreateSubPopulation();
+		getAndWriteRandomPlansFromSubPopulation();
+		compareModeShare();
 	}
 
 	private void getAndWriteRandomPlansFromSubPopulation(){

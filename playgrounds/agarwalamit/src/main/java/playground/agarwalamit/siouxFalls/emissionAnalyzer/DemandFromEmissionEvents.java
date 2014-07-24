@@ -44,14 +44,15 @@ import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarm
 public class DemandFromEmissionEvents {
 	private final Logger logger = Logger.getLogger(DemandFromEmissionEvents.class);
 
-	private final String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/";
+	private final String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
 	private final int noOfTimeBins = 30;
 	private double simulationEndTime;
-	private String configFile =runDir+"run207"+"/output_config.xml"; 
+	private String configFile ="/Users/aagarwal/Desktop/ils4/agarwal/munich/input/config_munich_1pct_baseCaseCtd.xml";
 
-	private static String [] runNumber =  {"run207","run208"};
-	private final String netFile1 = runDir+"run207"+"/output_network.xml.gz";
+	private static String [] runNumber =  {"baseCaseCtd","ei"};
+	private final String netFile1 = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
 	private Network network;
+
 	public static void main(String[] args) {
 		new DemandFromEmissionEvents().writeDemandData();
 	}
@@ -63,12 +64,12 @@ public class DemandFromEmissionEvents {
 		this.simulationEndTime = getEndTime(configFile);
 
 		Map<Double, Map<Id, Double>> demandBAU = filterLinks(processEmissionsAndReturnDemand(runNumber[0])); 
-		Map<Double, Map<Id, Double>> demandPolicy = filterLinks(processEmissionsAndReturnDemand(runNumber[1]));
+		//		Map<Double, Map<Id, Double>> demandPolicy = filterLinks(processEmissionsAndReturnDemand(runNumber[1]));
 
 		writeAbsoluteDemand(runDir+runNumber[0]+"/analysis/emissionVsCongestion/hourlyNetworkDemand.txt", demandBAU);
-		writeAbsoluteDemand(runDir+runNumber[1]+"/analysis/emissionVsCongestion/hourlyNetworkDemand.txt", demandPolicy);
+		//		writeAbsoluteDemand(runDir+runNumber[1]+"/analysis/emissionVsCongestion/hourlyNetworkDemand.txt", demandPolicy);
 
-//		writeChangeInDemand(runDir+runNumber[1]+"/analysis/emissionVsCongestion/hourlyChangeInNetworkDemandWRTBAU.txt", demandBAU, demandPolicy);
+		//		writeChangeInDemand(runDir+runNumber[1]+"/analysis/emissionVsCongestion/hourlyChangeInNetworkDemandWRTBAU.txt", demandBAU, demandPolicy);
 
 		logger.info("Writing file(s) is finished.");
 	}
@@ -139,7 +140,7 @@ public class DemandFromEmissionEvents {
 		return time2LinksDataFiltered;
 	}
 	private Map<Double, Map<Id, Double>> processEmissionsAndReturnDemand(String runNumber){
-		String emissionFileBAU = runDir+runNumber+"/ITERS/it.500/500.emission.events.xml.gz";
+		String emissionFileBAU = runDir+runNumber+"/ITERS/it.1500/1500.emission.events.xml.gz";
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);

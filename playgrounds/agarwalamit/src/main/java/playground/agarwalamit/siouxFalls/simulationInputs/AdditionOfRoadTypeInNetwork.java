@@ -32,7 +32,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 /**
- * This is used when there were no way to identify the road category of sioux falls. 
+ * This was used when there were no way to identify the road category of old Sioux falls network. 
  * @author amit
  *
  */

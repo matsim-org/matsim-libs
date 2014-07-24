@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -53,7 +54,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalyisModule {
 	private EmissionsPerLinkColdEventHandler coldHandler;
 	private Map<Double, Map<Id, Map<WarmPollutant, Double>>> link2WarmEmissions;
 	private Map<Double, Map<Id, Map<ColdPollutant, Double>>> link2ColdEmissions;
-	private Map<Double, Map<Id, SortedMap<String, Double>>> link2TotalEmissions;
+	private SortedMap<Double, Map<Id, SortedMap<String, Double>>> link2TotalEmissions;
 	double simulationEndTime ;
 	 final int noOfTimeBins;
 	 String configFile;
@@ -109,11 +110,11 @@ public class EmissionLinkAnalyzer extends AbstractAnalyisModule {
 		logger.info("Aggregating emissions for " + (int) (endTime / 3600 / noOfTimeBins) + " hour time bins.");
 		return endTime;
 	}
-	private Map<Double, Map<Id, SortedMap<String, Double>>> sumUpEmissionsPerTimeInterval(
+	private SortedMap<Double, Map<Id, SortedMap<String, Double>>> sumUpEmissionsPerTimeInterval(
 			Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2warmEmissionsTotal,
 			Map<Double, Map<Id, Map<ColdPollutant, Double>>> time2coldEmissionsTotal) {
 	
-		Map<Double, Map<Id, SortedMap<String, Double>>> time2totalEmissions = new HashMap<Double, Map<Id, SortedMap<String, Double>>>();
+		SortedMap<Double, Map<Id, SortedMap<String, Double>>> time2totalEmissions = new TreeMap<Double, Map<Id, SortedMap<String, Double>>>();
 	
 		for(double endOfTimeInterval: time2warmEmissionsTotal.keySet()){
 			Map<Id, Map<WarmPollutant, Double>> warmEmissions = time2warmEmissionsTotal.get(endOfTimeInterval);
@@ -133,7 +134,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalyisModule {
 		return time2totalEmissions;
 	}
 	
-	public Map<Double, Map<Id, SortedMap<String, Double>>> getLink2TotalEmissions() {
+	public SortedMap<Double, Map<Id, SortedMap<String, Double>>> getLink2TotalEmissions() {
 		return this.link2TotalEmissions;
 	}
 

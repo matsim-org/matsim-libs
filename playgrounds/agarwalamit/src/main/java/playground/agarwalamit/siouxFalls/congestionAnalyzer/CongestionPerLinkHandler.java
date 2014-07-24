@@ -47,11 +47,10 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler, LinkLeav
 	private double totalDelay;
 
 	private final double timeBinSize;
-	
+
 	public CongestionPerLinkHandler(int noOfTimeBins, double simulationEndTime, Scenario scenario){
 
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
-
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			this.linkId2PersonIdLinkEnterTime.put(link.getId(), new HashMap<Id, Double>());
 			Double freeSpeedLinkTravelTime = Double.valueOf(Math.floor(link.getLength()/link.getFreespeed())+1);
@@ -92,7 +91,7 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler, LinkLeav
 
 		Map<Id, Double> personId2LinkEnterTime = this.linkId2PersonIdLinkEnterTime.get(linkId);
 		double derivedLinkEnterTime = event.getTime()+1-this.linkId2FreeSpeedLinkTravelTime.get(linkId);
-		personId2LinkEnterTime.put(personId, Double.valueOf(derivedLinkEnterTime));
+		personId2LinkEnterTime.put(personId, derivedLinkEnterTime);
 		this.linkId2PersonIdLinkEnterTime.put(linkId, personId2LinkEnterTime);
 	}
 
@@ -132,12 +131,14 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler, LinkLeav
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Double time = Double.valueOf(event.getTime());
+		double time = event.getTime();
 		Id linkId = event.getLinkId();
 		Id personId = event.getPersonId();
+
 		if(this.linkId2PersonIdLinkEnterTime.get(linkId).containsKey(personId)){
 			// Person is already on the link. Cannot happen.
-			throw new RuntimeException();
+			logger.warn("Person "+personId+" is entering on link "+linkId+" two times without leaving from the same. Link leave times are "+time+" and "+this.linkId2PersonIdLinkEnterTime.get(linkId).get(personId));
+//			throw new RuntimeException();
 		} 
 
 		Map<Id, Double> personId2LinkEnterTime = this.linkId2PersonIdLinkEnterTime.get(linkId);
