@@ -18,7 +18,10 @@
  * *********************************************************************** */
 package playground.agarwalamit.siouxFalls;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -40,6 +43,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.postgresql.core.Field;
 
 /**
  * @author amit
@@ -70,8 +74,18 @@ public class SamplingPlans {
 	private Population samplePopulation;
 
 	public static void main(String[] args) {
-		SamplingPlans sp = new SamplingPlans(0.1,"./input/plans10Pct.xml");
-		sp.run();
+		double [] samplePopulation = {0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+		for(double d:samplePopulation){
+			String outputFolder = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/flowCapTest/";
+			String outputDir = outputFolder+"/f="+d+"/";
+			new File(outputDir).mkdir();
+			String samplePlansFile = outputDir+"/plans"+d+".xml";
+			SamplingPlans samplePlans = new SamplingPlans(d,samplePlansFile);
+			samplePlans.run();
+			
+		}
+//		SamplingPlans sp = new SamplingPlans(0.03,"./input/plans0.03.xml");
+//		sp.run();
 	}
 
 	public void run(){
@@ -86,22 +100,17 @@ public class SamplingPlans {
 		this.samplePopulation = sc.getPopulation();
 		for(String str:this.binToPopulation.keySet()){
 			double noOfPersons = this.binToPopulation.get(str).getPersons().size();
-			double requiredPersons = Math.ceil(this.samplingRatio*noOfPersons);
-
-			for(int i=0;i<requiredPersons;i++){
-
-				int index =(int) (MatsimRandom.getRandom().nextDouble()*requiredPersons);
-				Iterator<Id> personIds = this.binToPopulation.get(str).getPersons().keySet().iterator();
-				for(int j=0 ;j<this.binToPopulation.get(str).getPersons().size();j++){
-					Id id = personIds.next();
-					if(index==j){
-						Person p = this.binToPopulation.get(str).getPersons().get(id);
-						if(this.samplePopulation.getPersons().get(p.getId())!=null) 
-							requiredPersons++; // to exclude the adding same person again without decreasing required number of persons.
-						else this.samplePopulation.addPerson(p);
-						break;
-					}
-				}
+			if(noOfPersons!=0){
+				double requiredPersons = Math.ceil(this.samplingRatio*noOfPersons);
+				double addedPersons =0;
+				List<Id> personIds = new ArrayList<Id>(this.binToPopulation.get(str).getPersons().keySet());
+				do{
+					Id id = personIds.get(MatsimRandom.getRandom().nextInt(personIds.size()));
+					Person p = this.binToPopulation.get(str).getPersons().get(id);
+					this.samplePopulation.addPerson(p);
+					personIds.remove(id);
+					addedPersons++;
+				} while (addedPersons!=requiredPersons);
 			}
 		}
 		double finalSamplingRatio = this.samplePopulation.getPersons().size()/this.totalNoOfPersons;
