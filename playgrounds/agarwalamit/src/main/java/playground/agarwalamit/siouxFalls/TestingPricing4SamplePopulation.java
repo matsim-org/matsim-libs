@@ -19,6 +19,7 @@
 package playground.agarwalamit.siouxFalls;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -85,6 +86,7 @@ public class TestingPricing4SamplePopulation {
 		for(double d:samplePopulation){
 			log.info("Running sample Population "+d+".");
 			String outputDir = outputFolder+"/f"+d+"/";
+			new File(outputDir).mkdir();
 			String samplePlansFile = outputDir+"/plans"+d+".xml";
 			SamplingPlans samplePlans = new SamplingPlans(d,samplePlansFile);
 			samplePlans.run();
