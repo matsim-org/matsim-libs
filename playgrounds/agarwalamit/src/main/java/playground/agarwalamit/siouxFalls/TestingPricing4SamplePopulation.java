@@ -100,7 +100,7 @@ public class TestingPricing4SamplePopulation {
 			emissionModule.createEmissionHandler();
 			
 			controler.setOverwriteFiles(true);
-			controler.setCreateGraphs(true);
+			controler.setCreateGraphs(true);				
 			controler.setDumpDataAtEnd(true);
 			controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
 
