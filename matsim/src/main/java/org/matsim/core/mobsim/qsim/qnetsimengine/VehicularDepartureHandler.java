@@ -79,9 +79,12 @@ class VehicularDepartureHandler implements DepartureHandler {
 			if (vehicleBehavior == VehicleBehavior.TELEPORT) {
 				vehicle = qNetsimEngine.getVehicles().get(vehicleId);
 				if ( vehicle==null ) {
-					log.warn("could not find requested vehicle in simulation.  Note that, with AgentSource and if the agent starts on a leg, the "
+					// log a maximum of information, to help the user identifying the cause of the problem
+					final String msg = "could not find requested vehicle "+vehicleId+" in simulation for agent "+agent+" with id "+agent.getId()+" on link "+agent.getCurrentLinkId()+" at time "+now+".";
+					log.error( msg );
+					log.error( "Note that, with AgentSource and if the agent starts on a leg, the "
 							+ "vehicle needs to be inserted BEFORE the agent!") ;
-					throw new RuntimeException("could not find requested vehicle in simulation; aborting ...") ;
+					throw new RuntimeException( msg+" aborting ...") ;
 				}
 				teleportVehicleTo(vehicle, linkId);
 
@@ -95,7 +98,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 				// While we are waiting for our car
 				qlink.registerDriverAgentWaitingForCar(agent);
 			} else {
-				throw new RuntimeException("vehicle " + vehicleId + " not available for agent " + agent.getId() + " on link " + linkId);
+				throw new RuntimeException("vehicle " + vehicleId + " not available for agent " + agent.getId() + " on link " + linkId + " at time "+ now);
 			}
 		} else {
 			vehicle.setDriver(agent);
