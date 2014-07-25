@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.framework.router;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
@@ -81,22 +83,27 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 		final CharyparNagelScoringParameters scoringParams =
 			new CharyparNagelScoringParameters(
 				scenario.getConfig().planCalcScore() );
+		final Collection<InitialNodeRouter> initialNodeRouters = new ArrayList<InitialNodeRouter>( 2 );
+		initialNodeRouters.add( 
+				new InitialNodeRouter(
+					router.getRoutingModule( TransportMode.walk ),
+					scenario.getConfig().transitRouter().getSearchRadius(),
+					1,
+					scoringParams ) );
+		if ( contains( scenario.getConfig().subtourModeChoice().getModes() , BikeSharingConstants.MODE ) ) {
+			initialNodeRouters.add(
+					new InitialNodeRouter(
+						router.getRoutingModule( BikeSharingConstants.MODE ),
+						configGroup.getPtSearchRadius(),
+						3, // there is randomness: keep the "best" of a few draws
+						scoringParams ) );
+		}
 		router.setRoutingModule(
 				TransportMode.pt,
 				new TransitMultiModalAccessRoutingModule(
 						0.75,
 						data,
-						new InitialNodeRouter(
-							router.getRoutingModule( TransportMode.walk ),
-							scenario.getConfig().transitRouter().getSearchRadius(),
-							1,
-							scoringParams ),
-						new InitialNodeRouter(
-							router.getRoutingModule( BikeSharingConstants.MODE ),
-							configGroup.getPtSearchRadius(),
-							3, // there is randomness: keep the "best" of a few draws
-							scoringParams )
-						) );
+						initialNodeRouters ) );
 
 		final MainModeIdentifier defaultModeIdentifier = router.getMainModeIdentifier();
 		router.setMainModeIdentifier(
@@ -127,5 +134,12 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 				});
 
 		return router;
+	}
+
+	private boolean contains(
+			final String[] modes,
+			final String mode) {
+		for ( String m : modes ) if ( mode.equals( m ) ) return true;
+		return false;
 	}
 }

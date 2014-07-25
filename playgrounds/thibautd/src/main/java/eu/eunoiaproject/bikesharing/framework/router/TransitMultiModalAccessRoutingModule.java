@@ -99,6 +99,13 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 			final double initialNodeProportion,
 			final RoutingData data,
 			final InitialNodeRouter... routers) {
+		this( initialNodeProportion , data , Arrays.asList( routers ) );
+	}
+
+	public TransitMultiModalAccessRoutingModule(
+			final double initialNodeProportion,
+			final RoutingData data,
+			final Collection<InitialNodeRouter> routers) {
 		if ( initialNodeProportion <= 0 || initialNodeProportion > 1 ) throw new IllegalArgumentException( ""+initialNodeProportion );
 		this.initialNodeProportion = initialNodeProportion;
 		this.data = data;
@@ -106,7 +113,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 		this.travelTime = transitRouterNetworkTravelTimeAndDisutility;
 		this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
 		this.dijkstra = new MultiNodeDijkstra(data.transitNetwork, this.travelDisutility, this.travelTime);
-		this.routers = Arrays.asList( routers );
+		this.routers = routers;
 	}
 
 	@Override
