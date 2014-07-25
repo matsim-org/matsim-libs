@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -50,9 +49,6 @@ import org.matsim.vehicles.Vehicle;
  * @author thibautd
  */
 public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactory {
-	private static final Logger log =
-		Logger.getLogger(AccessEgressMultimodalTripRouterFactory.class);
-
 	private final Scenario scenario;
 	private final TravelDisutilityFactory travelDisutilityFactory;
 	private final Map<String, TravelTime> multimodalTravelTimes;
@@ -81,10 +77,6 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
         final MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
         final Set<String> simulatedModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
 		for (String mode : simulatedModes) {
-
-			if (instance.getRegisteredModes().contains(mode)) {
-				log.warn("A routing algorithm for " + mode + " is already registered. It is replaced!");
-			}
 			
 			final TravelTime travelTime = this.multimodalTravelTimes.get(mode);
 			if (travelTime == null) {
