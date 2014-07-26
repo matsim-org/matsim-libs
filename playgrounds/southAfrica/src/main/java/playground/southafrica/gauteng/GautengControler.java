@@ -1,31 +1,32 @@
 package playground.southafrica.gauteng;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
+import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingScheme;
-
 import playground.southafrica.gauteng.roadpricingscheme.GautengRoadPricingScheme;
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactorOLD;
-import playground.southafrica.gauteng.roadpricingscheme.TollFactorI;
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollVehicleType;
+import playground.southafrica.gauteng.roadpricingscheme.TollFactorI;
 import playground.southafrica.gauteng.routing.PersonSpecificTravelDisutilityInclTollFactory;
 import playground.southafrica.gauteng.scoring.GautengScoringFunctionFactory;
 import playground.southafrica.gauteng.scoring.GenerationOfMoneyEvents;
 import playground.southafrica.gauteng.utilityofmoney.GautengUtilityOfMoney;
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
 import playground.southafrica.utilities.Header;
+
+import java.util.HashMap;
+import java.util.Map;
 
 class PersonHouseholdMapping {
 	/** name to use to add an instance as a scenario element*/
@@ -98,7 +99,7 @@ class GautengControler {
 		
 		/* Allow for the road pricing filename to be passed as an argument. */
 		if ( tollFilename!=null && tollFilename.length()>0 ) {
-			controler.getConfig().roadpricing().setTollLinksFile(tollFilename);
+            ConfigUtils.addOrGetModule(controler.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(tollFilename);
 		}
 		
 		/* Set number of threads. */
@@ -134,8 +135,8 @@ class GautengControler {
 			}}) ;
 		
 		// CONSTRUCT VEH-DEP ROAD PRICING SCHEME:
-		RoadPricingScheme vehDepScheme = 
-			new GautengRoadPricingScheme( sc.getConfig().roadpricing().getTollLinksFile() , sc.getNetwork() , sc.getPopulation(), tollFactor );
+        RoadPricingScheme vehDepScheme =
+			new GautengRoadPricingScheme( ConfigUtils.addOrGetModule(sc.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).getTollLinksFile() , sc.getNetwork() , sc.getPopulation(), tollFactor );
 
 		// CONSTRUCT UTILITY OF MONEY:
 		

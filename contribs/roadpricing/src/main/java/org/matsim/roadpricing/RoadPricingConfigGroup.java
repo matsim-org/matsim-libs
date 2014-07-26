@@ -18,11 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.config.groups;
-
-import java.util.TreeMap;
+package org.matsim.roadpricing;
 
 import org.matsim.core.config.Module;
+
+import java.util.TreeMap;
 
 public class RoadPricingConfigGroup extends Module {
 

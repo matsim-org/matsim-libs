@@ -21,6 +21,7 @@
 package playground.jjoubert.roadpricing.senozon;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -35,11 +36,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.roadpricing.CalcAverageTolledTripLength;
-import org.matsim.roadpricing.RoadPricingReaderXMLv1;
-import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.RoadPricingSchemeImpl;
-
+import org.matsim.roadpricing.*;
 import playground.jjoubert.roadpricing.senozon.routing.SanralTravelDisutilityIncludingToll;
 import playground.jjoubert.roadpricing.senozon.scoring.SanralCalcPaidToll;
 
@@ -66,7 +63,7 @@ public class SanralRoadPricing implements StartupListener, AfterMobsimListener, 
 		this.scheme = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(this.scheme);
 		try {
-			rpReader.parse(controler.getConfig().roadpricing().getTollLinksFile());
+            rpReader.parse(ConfigUtils.addOrGetModule(controler.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).getTollLinksFile());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

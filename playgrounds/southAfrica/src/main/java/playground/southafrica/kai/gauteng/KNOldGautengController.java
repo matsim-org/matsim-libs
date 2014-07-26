@@ -1,12 +1,8 @@
 package playground.southafrica.kai.gauteng;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
+import difflib.Delta;
+import difflib.DiffUtils;
+import difflib.Patch;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,21 +23,16 @@ import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.controler.PlanStrategyRegistrar.Names;
 import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
-
+import org.matsim.vehicles.*;
 import playground.southafrica.gauteng.roadpricingscheme.GautengRoadPricingScheme;
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactorOLD;
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollVehicleType;
@@ -51,9 +42,13 @@ import playground.southafrica.gauteng.scoring.GenerationOfMoneyEvents;
 import playground.southafrica.gauteng.utilityofmoney.GautengUtilityOfMoney;
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
 import playground.southafrica.utilities.Header;
-import difflib.Delta;
-import difflib.DiffUtils;
-import difflib.Patch;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -97,7 +92,7 @@ public class KNOldGautengController {
 				// === equil test scenario start ===
 				config.network().setInputFile("../../../matsim/trunk/examples/equil/network.xml");
 				config.plans().setInputFile("../../../matsim/trunk/examples/equil/plans2000.xml.gz" ) ;
-				config.roadpricing().setTollLinksFile("../../../matsim/trunk/examples/equil/toll.xml" ) ;
+                ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile("../../../matsim/trunk/examples/equil/toll.xml") ;
 				config.counts().setCountsFileName(null) ;
 				{
 					ActivityParams params = new ActivityParams("w") ;
@@ -120,8 +115,8 @@ public class KNOldGautengController {
 				config.plans().setInputFile(SANRAL2010 + "plans/car-com-bus-taxi-ext_plans_2009_1pct-with-routesV0.xml.gz") ;
 //				config.plans().setInputFile("/Users/nagel/shared-svn/projects/freight/studies/gauteng-kairuns/runs/2013-11-30-14h50/output_plans.xml.gz") ;
 
-				
-				config.roadpricing().setTollLinksFile(SANRAL2010 + "toll/gauteng_toll_joint_weekday_02.xml" );
+
+                ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(SANRAL2010 + "toll/gauteng_toll_joint_weekday_02.xml");
 				sampleFactor = 0.01 ;
 				config.counts().setCountsFileName("/Users/nagel/ie-calvin/MATSim-SA/trunk/data/sanral2010/counts/2007/Counts_Wednesday_Total.xml.gz");
 				config.counts().setCountsScaleFactor(100);
@@ -254,11 +249,11 @@ public class KNOldGautengController {
 		switch( ccc ) {
 		case equil:
 			RoadPricingSchemeImpl schemeImpl = new RoadPricingSchemeImpl() ;
-			new RoadPricingReaderXMLv1(schemeImpl).parse( config.roadpricing().getTollLinksFile() );
+            new RoadPricingReaderXMLv1(schemeImpl).parse( ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).getTollLinksFile() );
 			scheme = schemeImpl ;
 			break;
 		case gauteng:
-			scheme = new GautengRoadPricingScheme( config.roadpricing().getTollLinksFile(), scenario.getNetwork() , scenario.getPopulation(), tollFactor );
+            scheme = new GautengRoadPricingScheme( ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).getTollLinksFile(), scenario.getNetwork() , scenario.getPopulation(), tollFactor );
 			break;
 		default:
 			break;

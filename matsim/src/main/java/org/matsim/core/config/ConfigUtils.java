@@ -19,13 +19,13 @@
 
 package org.matsim.core.config;
 
-import java.io.File;
-import java.util.Iterator;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.utils.io.UncheckedIOException;
+
+import java.io.File;
+import java.util.Iterator;
 
 /**
  * @author mrieser
@@ -100,7 +100,6 @@ public abstract class ConfigUtils {
 		config.facilities().setInputFile(getAbsolutePath(prefix, config.facilities().getInputFile()));
 		config.counts().setCountsFileName(getAbsolutePath(prefix, config.counts().getCountsFileName()));
 		config.households().setInputFile(getAbsolutePath(prefix, config.households().getInputFile()));
-		config.roadpricing().setTollLinksFile(getAbsolutePath(prefix, config.roadpricing().getTollLinksFile()));
 	}
 
 	private static String getAbsolutePath(final String prefix, final String path) {

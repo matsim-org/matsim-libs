@@ -19,13 +19,6 @@
 
 package playground.anhorni.surprice.analysis;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.analysis.Bins;
 import org.matsim.api.core.v01.Id;
@@ -42,14 +35,21 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-
 import playground.anhorni.surprice.Surprice;
 import playground.anhorni.utils.Utils;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.TreeMap;
 
 public class Analyzer {
 	private ScenarioImpl scenario = null; 
@@ -190,8 +190,8 @@ public class Analyzer {
 		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl(); //(RoadPricingSchemeImpl)this.scenario.getScenarioElement(RoadPricingScheme.class);
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);		
 		try {
-			log.info("parsing " + config.roadpricing().getTollLinksFile());
-			rpReader.parse(config.roadpricing().getTollLinksFile());
+            log.info("parsing " + ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).getTollLinksFile());
+            rpReader.parse(ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).getTollLinksFile());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}		

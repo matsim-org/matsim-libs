@@ -1,7 +1,8 @@
 package playground.tobiqui.master;
-import java.io.IOException;
 
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+
+import java.io.IOException;
 
 /**
  * 
@@ -20,8 +21,8 @@ public class Test {
 	public static void main(String[] args) throws IOException {
 		TqMatsimPlansParser plansReader = new TqMatsimPlansParser(TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				"EPSG:3395"));
-		String input = "D:/MA/workspace/master/output/siouxfalls-2014/ITERS/it.3000/3000.plans.xml.gz";				// XML plans input file
-		String output = "D:/MA/workspace/master/output/siouxfalls-2014/3000_Siouxfalls_PT_SUMO.rou.xml";			// XML SUMO routes file
+		String input = "/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/berlin/regimes/uncongested/output-berlin/2kW.15.output_plans.xml.gz";
+		String output = "/Users/michaelzilske/wurst/sumo.xml";
 		plansReader.parse(input);
 		
 //		System.out.println(plansReader.routes.toString());

@@ -18,15 +18,11 @@
  * *********************************************************************** */
 package playground.kai.usecases.ownroadpricing;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.RoadPricingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -38,12 +34,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.roadpricing.CalcPaidToll;
+import org.matsim.roadpricing.*;
 import org.matsim.roadpricing.MarginalUtilityOfMoneyLookup;
-import org.matsim.roadpricing.RoadPricingReaderXMLv1;
-import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.RoadPricingSchemeImpl;
-import org.matsim.roadpricing.TravelDisutilityIncludingToll;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author nagel

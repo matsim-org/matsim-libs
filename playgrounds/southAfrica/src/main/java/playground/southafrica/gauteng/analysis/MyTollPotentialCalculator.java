@@ -20,14 +20,6 @@
 
 package playground.southafrica.gauteng.analysis;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -43,12 +35,20 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
-
 import playground.southafrica.gauteng.roadpricingscheme.GautengRoadPricingScheme;
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor;
 import playground.southafrica.utilities.Header;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class MyTollPotentialCalculator {
 	private final static Logger log = Logger.getLogger(MyTollPotentialCalculator.class);
@@ -86,12 +86,12 @@ public class MyTollPotentialCalculator {
 		List<Id> linkList = mtpc.readLinkIdsFromRoadPricingScheme(linksFilename);
 		mtpc.readNetwork(networkFilename);
 		mtpc.readPopulation(populationFilename);
-		
-		mtpc.getScenario().getConfig().roadpricing().setTollLinksFile(linksFilename);
+
+        ConfigUtils.addOrGetModule(mtpc.getScenario().getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(linksFilename);
 		
 		/* Read the baseline file and perform some analysis. */
 		log.info("-------------------------------------------------------------------------------");
-		String tollLinksFileName = mtpc.getScenario().getConfig().roadpricing().getTollLinksFile() ;
+        String tollLinksFileName = ConfigUtils.addOrGetModule(mtpc.getScenario().getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).getTollLinksFile() ;
 		GautengRoadPricingScheme scheme = new GautengRoadPricingScheme(tollLinksFileName, mtpc.getScenario().getNetwork(), 
 				mtpc.getScenario().getPopulation(), new SanralTollFactor());
 		mtpc.processEventsFile(baseFilename, linkList, breakList, scheme);

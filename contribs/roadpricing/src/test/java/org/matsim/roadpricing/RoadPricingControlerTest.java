@@ -22,7 +22,7 @@ package org.matsim.roadpricing;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.RoadPricingConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.util.TravelDisutility;
@@ -62,9 +62,8 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		config.controler().setLastIteration(0);
 		config.controler().setWritePlansInterval(0);
 		config.scenario().setUseRoadpricing(true);
-		
-//		config.roadpricing().setTollLinksFile(getInputDirectory() + "distanceToll.xml");
-		RoadPricingConfigGroup rpConfig = (RoadPricingConfigGroup) config.getModule(RoadPricingConfigGroup.GROUP_NAME) ;
+
+		RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class) ;
 		rpConfig.setTollLinksFile(getInputDirectory() + "distanceToll.xml") ;
 		
 		Controler controler = new Controler(config);
@@ -74,8 +73,8 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
 		PlanAlgorithm router = new PlanRouter(
-		controler.getTripRouterFactory().instantiateAndConfigureTripRouter(),
-		controler.getScenario().getActivityFacilities()
+		    controler.getTripRouterFactory().instantiateAndConfigureTripRouter(),
+		    controler.getScenario().getActivityFacilities()
 		);
 		assertFalse("Distance toll must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
 		TravelDisutility travelCosts = controler.createTravelDisutilityCalculator();
@@ -87,7 +86,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		config.controler().setLastIteration(0);
 		config.controler().setWritePlansInterval(0);
 		config.scenario().setUseRoadpricing(true);
-		config.roadpricing().setTollLinksFile(getInputDirectory() + "cordonToll.xml");
+        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(getInputDirectory() + "cordonToll.xml");
 		Controler controler = new Controler(config);
 		controler.addControlerListener(new RoadPricing());
 		controler.setCreateGraphs(false);
@@ -102,27 +101,6 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		TravelDisutility travelCosts = controler.createTravelDisutilityCalculator();
 		assertTrue("Cordon toll must use TollTravelCostCalculator.", travelCosts instanceof TravelDisutilityIncludingToll);
 	}
-
-	public void testAreaToll() {
-		Config config = loadConfig("test/scenarios/equil/config.xml");
-		config.controler().setLastIteration(0);
-		config.controler().setWritePlansInterval(0);
-		config.scenario().setUseRoadpricing(true);
-		config.roadpricing().setTollLinksFile(getInputDirectory() + "areaToll.xml");
-//		Controler controler = new AreaTollControler(config);
-//		controler.addControlerListener(new RoadPricing());
-//		controler.setCreateGraphs(false);
-//		controler.setDumpDataAtEnd(false);
-//		controler.getConfig().controler().setWriteEventsInterval(0);
-//		controler.run();
-//		PlanAlgorithm router = controler.createRoutingAlgorithm();
-//		assertTrue("Area toll should use area-toll router.", router instanceof PlansCalcAreaTollRoute);
-//		TravelDisutility travelCosts = controler.createTravelCostCalculator();
-//		assertFalse("Area toll must not use TollTravelCostCalculator.", travelCosts instanceof TravelDisutilityIncludingToll);
-		// commenting out the above since the constructor fails.  The constructor fails since overwriting createRoutingAlgorithm is
-		// no longer enough.  kai, apr'13
-	}
-
 
 	/** Tests that paid tolls end up in the score. */
 	public void testTollScores() {
@@ -141,7 +119,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 
 		// now run toll case
 		config.scenario().setUseRoadpricing(true);
-		config.roadpricing().setTollLinksFile(getInputDirectory() + "distanceToll.xml");
+        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(getInputDirectory() + "distanceToll.xml");
 		config.controler().setOutputDirectory(getOutputDirectory() + "/tollcase/");
 		Controler controler2 = new Controler(config);
 		controler2.addControlerListener(new RoadPricing());

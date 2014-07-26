@@ -18,9 +18,6 @@
  * *********************************************************************** */
 package playground.kai.run;
 
-import java.util.Arrays;
-import java.util.Formatter;
-
 import org.joda.time.DateTime;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.analysis.kai.KNAnalysisEventsHandler;
@@ -30,6 +27,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.roadpricing.RoadPricingConfigGroup;
+
+import java.util.Arrays;
+import java.util.Formatter;
 
 /**
  * @author nagel
@@ -70,7 +71,7 @@ public class KNEventsAnalyzer {
 		config.network().setInputFile( networkFilename );
 		config.plans().setInputFile( populationFilename );
 		config.plans().setInputPersonAttributeFile( popAttrFilename );
-		config.roadpricing().setTollLinksFile(tollFilename);
+        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(tollFilename);
 
 		// ===
 		

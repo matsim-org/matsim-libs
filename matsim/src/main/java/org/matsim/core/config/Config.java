@@ -20,38 +20,17 @@
 
 package org.matsim.core.config;
 
+import org.apache.log4j.Logger;
+import org.matsim.core.config.consistency.ConfigConsistencyChecker;
+import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
+import org.matsim.core.config.groups.*;
+import org.matsim.pt.config.TransitConfigGroup;
+import org.matsim.pt.config.TransitRouterConfigGroup;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.apache.log4j.Logger;
-import org.matsim.core.config.consistency.ConfigConsistencyChecker;
-import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.CountsConfigGroup;
-import org.matsim.core.config.groups.FacilitiesConfigGroup;
-import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.config.groups.HouseholdsConfigGroup;
-import org.matsim.core.config.groups.LinkStatsConfigGroup;
-import org.matsim.core.config.groups.LocationChoiceConfigGroup;
-import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PtCountsConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.RoadPricingConfigGroup;
-import org.matsim.core.config.groups.ScenarioConfigGroup;
-import org.matsim.core.config.groups.SignalSystemsConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
-import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
-import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.pt.config.TransitConfigGroup;
-import org.matsim.pt.config.TransitRouterConfigGroup;
 
 /**
  * Stores all configuration settings specified in a configuration file and
@@ -86,7 +65,6 @@ public class Config {
 	private PlansCalcRouteConfigGroup plansCalcRoute = null;
 	private PlansConfigGroup plans = null;
 	private QSimConfigGroup qSimConfigGroup = null;
-	private RoadPricingConfigGroup roadpricing = null;
 	private ScenarioConfigGroup scenarioConfigGroup = null;
 	private SignalSystemsConfigGroup signalSystemConfigGroup = null;
 	private StrategyConfigGroup strategy = null;
@@ -154,9 +132,6 @@ public class Config {
 
 		this.strategy = new StrategyConfigGroup();
 		this.modules.put(StrategyConfigGroup.GROUP_NAME, this.strategy);
-
-		this.roadpricing = new RoadPricingConfigGroup();
-		this.modules.put(RoadPricingConfigGroup.GROUP_NAME, this.roadpricing);
 
 		this.locationchoice = new LocationChoiceConfigGroup();
 		this.modules.put(LocationChoiceConfigGroup.GROUP_NAME, this.locationchoice);
@@ -433,11 +408,7 @@ public class Config {
 		return this.facilities;
 	}
 
-	public final RoadPricingConfigGroup roadpricing() {
-		return this.roadpricing;
-	}
-
-	public final StrategyConfigGroup strategy() {
+    public final StrategyConfigGroup strategy() {
 		return this.strategy;
 	}
 
