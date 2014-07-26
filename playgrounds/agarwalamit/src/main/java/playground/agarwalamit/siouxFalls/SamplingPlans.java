@@ -74,10 +74,11 @@ public class SamplingPlans {
 	private Population samplePopulation;
 
 	public static void main(String[] args) {
-		double [] samplePopulation = {0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+		
+		double [] samplePopulation = { 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4,0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 		for(double d:samplePopulation){
 			String outputFolder = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/flowCapTest/";
-			String outputDir = outputFolder+"/f"+d+"/";
+			String outputDir = outputFolder+"/f="+d+"/";
 			new File(outputDir).mkdir();
 			String samplePlansFile = outputDir+"/plans"+d+".xml";
 			SamplingPlans samplePlans = new SamplingPlans(d,samplePlansFile);

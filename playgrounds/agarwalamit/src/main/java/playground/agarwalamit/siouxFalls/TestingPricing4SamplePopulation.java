@@ -88,11 +88,11 @@ public class TestingPricing4SamplePopulation {
 			String outputDir = outputFolder+"/f"+d+"/";
 			new File(outputDir).mkdir();
 			String samplePlansFile = outputDir+"/plans"+d+".xml";
-			SamplingPlans samplePlans = new SamplingPlans(d,samplePlansFile);
-			samplePlans.run();
+//			SamplingPlans samplePlans = new SamplingPlans(d,samplePlansFile);
+//			samplePlans.run();
 			config.plans().setInputFile(samplePlansFile);
 			config.qsim().setFlowCapFactor(d);
-			config.qsim().setStorageCapFactor(3*d);
+			config.qsim().setStorageCapFactor(d);
 			config.controler().setOutputDirectory(outputDir);
 			Controler controler = new Controler(config);
 			
