@@ -468,12 +468,6 @@ public class Config {
 		return this.subtourModeChoice;
 	}
 
-	@Deprecated
-	// yyyyyy could you please add a comment what should be used instead?  thanks ... kai, oct'13
-	public void setQSimConfigGroup(final QSimConfigGroup qSimConfigGroup) {
-		this.qSimConfigGroup = qSimConfigGroup;
-	}
-
 	// other:
 
 	public void addConfigConsistencyChecker(final ConfigConsistencyChecker checker) {

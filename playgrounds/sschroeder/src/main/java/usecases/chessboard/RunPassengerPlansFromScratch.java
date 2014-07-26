@@ -3,7 +3,6 @@ package usecases.chessboard;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 
@@ -26,7 +25,6 @@ public class RunPassengerPlansFromScratch {
 		config.controler().setLastIteration(2);
 		config.network().setInputFile(NETWORK_FILENAME);
 		config.plans().setInputFile(PLANS_FILENAME);
-		config.setQSimConfigGroup(new QSimConfigGroup());
 		
 		StrategySettings bestScore = new StrategySettings(new IdImpl("1"));
 		bestScore.setModuleName("BestScore");
