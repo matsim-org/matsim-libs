@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.Scenario;
@@ -61,7 +63,7 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 	
 	private final Map<String, Network> multimodalSubNetworks = new HashMap<String, Network>();
 	private final Map<String, LeastCostPathCalculatorFactory> multimodalFactories = new HashMap<String, LeastCostPathCalculatorFactory>();
-	private final Map<String, SoftCache<Tuple<Node, Node>, Path>> caches = new HashMap<String, SoftCache<Tuple<Node, Node>, Path>>();
+	private final ConcurrentMap<String, SoftCache<Tuple<Node, Node>, Path>> caches = new ConcurrentHashMap<String, SoftCache<Tuple<Node, Node>, Path>>();
 	
 	public AccessEgressMultimodalTripRouterFactory(
 			final Scenario scenario,
@@ -161,15 +163,8 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 		return instance;
 	}
 
-	private synchronized SoftCache<Tuple<Node, Node>, Path> getCache(final String mode) {
-		SoftCache<Tuple<Node, Node>, Path> cache = caches.get( mode );
-
-		if ( cache == null ) {
-			cache = new SoftCache<Tuple<Node, Node>, Path>( );
-			caches.put( mode , cache );
-		}
-
-		return cache;
+	private SoftCache<Tuple<Node, Node>, Path> getCache(final String mode) {
+		return caches.putIfAbsent( mode , new SoftCache<Tuple<Node, Node>, Path>() );
 	}
 
 	private LeastCostPathCalculatorFactory getLeastCostPathCalulatorFactory(
