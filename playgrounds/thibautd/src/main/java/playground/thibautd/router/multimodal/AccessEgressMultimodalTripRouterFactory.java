@@ -50,6 +50,8 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
+import playground.ivt.utils.MapUtils;
+
 import playground.thibautd.utils.SoftCache;
 
 /**
@@ -164,7 +166,16 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 	}
 
 	private SoftCache<Tuple<Node, Node>, Path> getCache(final String mode) {
-		return caches.putIfAbsent( mode , new SoftCache<Tuple<Node, Node>, Path>() );
+		return MapUtils.getArbitraryObject(
+				mode,
+				caches,
+				new MapUtils.Factory<SoftCache<Tuple<Node, Node>, Path>>() {
+					@Override
+					public SoftCache<Tuple<Node, Node>, Path> create() {
+						return new SoftCache<Tuple<Node, Node>, Path>();
+					}
+				}
+				);
 	}
 
 	private LeastCostPathCalculatorFactory getLeastCostPathCalulatorFactory(
