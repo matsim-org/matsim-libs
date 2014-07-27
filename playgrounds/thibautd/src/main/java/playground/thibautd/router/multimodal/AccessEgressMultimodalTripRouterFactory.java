@@ -165,7 +165,7 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 		LruCache<Tuple<Node, Node>, Path> cache = caches.get( mode );
 
 		if ( cache == null ) {
-			cache = new LruCache<Tuple<Node, Node>, Path>( 1000 );
+			cache = new LruCache<Tuple<Node, Node>, Path>( );
 			caches.put( mode , cache );
 		}
 

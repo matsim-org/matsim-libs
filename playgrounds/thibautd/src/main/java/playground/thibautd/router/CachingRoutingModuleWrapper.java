@@ -49,9 +49,8 @@ public class CachingRoutingModuleWrapper implements RoutingModule {
 	public CachingRoutingModuleWrapper(
 			final boolean considerPerson,
 			final LocationType locationType,
-			final int cacheSize,
 			final RoutingModule wrapped) {
-		this.cache = new TripLruCache( considerPerson, locationType, cacheSize );
+		this.cache = new TripLruCache( considerPerson, locationType );
 		this.wrapped = wrapped;
 	}
 

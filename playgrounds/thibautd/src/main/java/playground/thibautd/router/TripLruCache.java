@@ -45,8 +45,7 @@ public class TripLruCache {
 
 	public TripLruCache(
 			final boolean considerPerson,
-			final LocationType locationType,
-			final int cacheSize) {
+			final LocationType locationType) {
 		this.considerPerson = considerPerson;
 		this.locationType = locationType;
 		this.cache = new LruCache<Departure, List<? extends PlanElement>>(
@@ -56,8 +55,7 @@ public class TripLruCache {
 							List<? extends PlanElement> cloned) {
 						return TripLruCache.clone( cloned );
 					}
-				},
-				cacheSize );
+				});
 	}
 
 	public List<? extends PlanElement> get( final Departure departure ) {
