@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -39,11 +40,15 @@ import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
+
+import playground.thibautd.utils.LruCache;
 
 /**
  * @author thibautd
@@ -56,6 +61,7 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 	
 	private final Map<String, Network> multimodalSubNetworks = new HashMap<String, Network>();
 	private final Map<String, LeastCostPathCalculatorFactory> multimodalFactories = new HashMap<String, LeastCostPathCalculatorFactory>();
+	private final Map<String, LruCache<Tuple<Node, Node>, Path>> caches = new HashMap<String, LruCache<Tuple<Node, Node>, Path>>();
 	
 	public AccessEgressMultimodalTripRouterFactory(
 			final Scenario scenario,
@@ -129,6 +135,7 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 			// and the personnalizable only for path adaptation
 			final LeastCostPathCalculator routeAlgo =
 				new CachingLeastCostPathAlgorithmWrapper(
+						getCache( mode ),
 						travelTime,
 						travelDisutility,
 						getLeastCostPathCalulatorFactory(
@@ -152,6 +159,17 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 		}
 
 		return instance;
+	}
+
+	private synchronized LruCache<Tuple<Node, Node>, Path> getCache(final String mode) {
+		LruCache<Tuple<Node, Node>, Path> cache = caches.get( mode );
+
+		if ( cache == null ) {
+			cache = new LruCache<Tuple<Node, Node>, Path>( 1000 );
+			caches.put( mode , cache );
+		}
+
+		return cache;
 	}
 
 	private LeastCostPathCalculatorFactory getLeastCostPathCalulatorFactory(
