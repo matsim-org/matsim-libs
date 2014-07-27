@@ -50,7 +50,7 @@ public class CachingLeastCostPathAlgorithmWrapper implements LeastCostPathCalcul
 	private final TravelDisutility travelDisutility;
 	private final LeastCostPathCalculator delegate;
 
-	private final LruCache<Tuple<Node, Node>, Path> cache = new LruCache<Tuple<Node, Node>, Path>();
+	private final LruCache<Tuple<Node, Node>, Path> cache;
 	
 	private static final AtomicLong computationCount = new AtomicLong( 0 );
 	private static final AtomicLong cachedCount = new AtomicLong( 0 );
@@ -58,6 +58,7 @@ public class CachingLeastCostPathAlgorithmWrapper implements LeastCostPathCalcul
 	public <T extends TravelTime & TravelDisutility> CachingLeastCostPathAlgorithmWrapper(
 			final T cost,
 			final LeastCostPathCalculator delegate) {
+		this.cache = new LruCache<Tuple<Node, Node>, Path>();
 		this.travelTime = cost;
 		this.travelDisutility = cost;
 		this.delegate = delegate;
@@ -67,6 +68,18 @@ public class CachingLeastCostPathAlgorithmWrapper implements LeastCostPathCalcul
 			final TravelTime travelTime,
 			final TravelDisutility travelDisutility,
 			final LeastCostPathCalculator delegate) {
+		this.cache = new LruCache<Tuple<Node, Node>, Path>();
+		this.travelTime = travelTime;
+		this.travelDisutility = travelDisutility;
+		this.delegate = delegate;
+	}
+
+	public CachingLeastCostPathAlgorithmWrapper(
+			final LruCache<Tuple<Node, Node>, Path> cache,
+			final TravelTime travelTime,
+			final TravelDisutility travelDisutility,
+			final LeastCostPathCalculator delegate) {
+		this.cache = cache;
 		this.travelTime = travelTime;
 		this.travelDisutility = travelDisutility;
 		this.delegate = delegate;

@@ -55,6 +55,13 @@ public class CachingRoutingModuleWrapper implements RoutingModule {
 		this.wrapped = wrapped;
 	}
 
+	public CachingRoutingModuleWrapper(
+			final TripLruCache cache,
+			final RoutingModule wrapped) {
+		this.cache = cache;
+		this.wrapped = wrapped;
+	}
+
 	@Override
 	public List<? extends PlanElement> calcRoute(
 			final Facility fromFacility,
