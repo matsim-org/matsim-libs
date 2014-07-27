@@ -29,16 +29,16 @@ import org.apache.log4j.Logger;
 /**
  * @author thibautd
  */
-public class LruCache<K,V> {
+public class SoftCache<K,V> {
 	private static final Logger log =
-		Logger.getLogger(LruCache.class);
+		Logger.getLogger(SoftCache.class);
 
 	private final Cloner<V> cloner;
 
 	private final ConcurrentMap<K, SoftEntry> softRefsMap = new ConcurrentHashMap<K, SoftEntry>();
 	private final ReferenceQueue<V> queue = new ReferenceQueue<V>();
 
-	public LruCache() {
+	public SoftCache() {
 		this( new Cloner<V>() {
 				@Override
 				public V clone(V cloned) {
@@ -47,7 +47,7 @@ public class LruCache<K,V> {
 			} );
 	}
 
-	public LruCache(
+	public SoftCache(
 			final Cloner<V> cloner ) {
 		this.cloner = cloner;
 	}

@@ -31,29 +31,29 @@ import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 
-import playground.thibautd.utils.LruCache;
+import playground.thibautd.utils.SoftCache;
 
 /**
  * @author thibautd
  */
-public class TripLruCache {
+public class TripSoftCache {
 	public static enum LocationType {coord, link, facility;}
 	private final boolean considerPerson;
 	private final LocationType locationType;
 
-	private final LruCache<Departure, List<? extends PlanElement>> cache;
+	private final SoftCache<Departure, List<? extends PlanElement>> cache;
 
-	public TripLruCache(
+	public TripSoftCache(
 			final boolean considerPerson,
 			final LocationType locationType) {
 		this.considerPerson = considerPerson;
 		this.locationType = locationType;
-		this.cache = new LruCache<Departure, List<? extends PlanElement>>(
-				new LruCache.Cloner<List<? extends PlanElement>>() {
+		this.cache = new SoftCache<Departure, List<? extends PlanElement>>(
+				new SoftCache.Cloner<List<? extends PlanElement>>() {
 					@Override
 					public List<? extends PlanElement> clone(
 							List<? extends PlanElement> cloned) {
-						return TripLruCache.clone( cloned );
+						return TripSoftCache.clone( cloned );
 					}
 				});
 	}

@@ -48,7 +48,7 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
-import playground.thibautd.utils.LruCache;
+import playground.thibautd.utils.SoftCache;
 
 /**
  * @author thibautd
@@ -61,7 +61,7 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 	
 	private final Map<String, Network> multimodalSubNetworks = new HashMap<String, Network>();
 	private final Map<String, LeastCostPathCalculatorFactory> multimodalFactories = new HashMap<String, LeastCostPathCalculatorFactory>();
-	private final Map<String, LruCache<Tuple<Node, Node>, Path>> caches = new HashMap<String, LruCache<Tuple<Node, Node>, Path>>();
+	private final Map<String, SoftCache<Tuple<Node, Node>, Path>> caches = new HashMap<String, SoftCache<Tuple<Node, Node>, Path>>();
 	
 	public AccessEgressMultimodalTripRouterFactory(
 			final Scenario scenario,
@@ -161,11 +161,11 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 		return instance;
 	}
 
-	private synchronized LruCache<Tuple<Node, Node>, Path> getCache(final String mode) {
-		LruCache<Tuple<Node, Node>, Path> cache = caches.get( mode );
+	private synchronized SoftCache<Tuple<Node, Node>, Path> getCache(final String mode) {
+		SoftCache<Tuple<Node, Node>, Path> cache = caches.get( mode );
 
 		if ( cache == null ) {
-			cache = new LruCache<Tuple<Node, Node>, Path>( );
+			cache = new SoftCache<Tuple<Node, Node>, Path>( );
 			caches.put( mode , cache );
 		}
 

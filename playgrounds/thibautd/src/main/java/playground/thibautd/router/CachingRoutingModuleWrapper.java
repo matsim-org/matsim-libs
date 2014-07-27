@@ -30,8 +30,8 @@ import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 
-import playground.thibautd.router.TripLruCache.Departure;
-import playground.thibautd.router.TripLruCache.LocationType;
+import playground.thibautd.router.TripSoftCache.Departure;
+import playground.thibautd.router.TripSoftCache.LocationType;
 
 /**
  * @author thibautd
@@ -40,7 +40,7 @@ public class CachingRoutingModuleWrapper implements RoutingModule {
 	private static final Logger log =
 		Logger.getLogger(CachingRoutingModuleWrapper.class);
 
-	private final TripLruCache cache;
+	private final TripSoftCache cache;
 	private RoutingModule wrapped;
 
 	private final static AtomicLong routeCount = new AtomicLong( 0 );
@@ -50,12 +50,12 @@ public class CachingRoutingModuleWrapper implements RoutingModule {
 			final boolean considerPerson,
 			final LocationType locationType,
 			final RoutingModule wrapped) {
-		this.cache = new TripLruCache( considerPerson, locationType );
+		this.cache = new TripSoftCache( considerPerson, locationType );
 		this.wrapped = wrapped;
 	}
 
 	public CachingRoutingModuleWrapper(
-			final TripLruCache cache,
+			final TripSoftCache cache,
 			final RoutingModule wrapped) {
 		this.cache = cache;
 		this.wrapped = wrapped;
