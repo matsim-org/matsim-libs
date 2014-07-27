@@ -116,6 +116,7 @@ public class LruCache<K,V> {
 		if ( value == null ) {
 			// it seems the GC was triggered while we were having fun here...
 			processQueue();
+			return null;
 		}
 
 		return cloner.clone( value );
@@ -129,8 +130,11 @@ public class LruCache<K,V> {
 		}
 
 		final V clone = cloner.clone( value );
-		lru.put( key , clone );
-		softRefsMap.put( key , new SoftEntry( key , clone ) );
+		// make sure that equal keys correpond to the same object.
+		synchronized ( key ) {
+			lru.put( key , clone );
+			softRefsMap.put( key , new SoftEntry( key , clone ) );
+		}
 		processQueue();
 	}
 
