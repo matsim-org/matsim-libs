@@ -79,7 +79,7 @@ public class LruCache<K,V> {
 				private static final long serialVersionUID = 1L;
 				@Override
 				protected boolean removeEldestEntry(final Map.Entry<K, V> eldest) {
-					return size() >= cacheSize;
+					return size() > cacheSize;
 				}
 			};
 		this.cloner = cloner;
