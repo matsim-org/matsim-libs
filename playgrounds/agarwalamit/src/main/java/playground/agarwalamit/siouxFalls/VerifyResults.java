@@ -59,7 +59,7 @@ public class VerifyResults {
 	private final static String networkFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
 	private final static String inputConfigFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/config_munich_1pct_baseCaseCtd.xml";
 
-	private  final static String [] runNr = {"baseCaseCtd","ei","ci","eci"};//{"201","202", "203","204"};//{"1","2","3","4"};
+	private  final static String [] runNr = {"ei2"};//{"baseCaseCtd","ei","ci","eci"};//{"201","202", "203","204"};
 
 	private  static Scenario scenario ;
 
@@ -80,8 +80,8 @@ public class VerifyResults {
 			scenario = ScenarioUtils.loadScenario(config);
 			String eventsFile=runDir+runNr[i]+"/ITERS/it."+lastItenation+"/"+lastItenation+".events.xml.gz";
 
-//			calculateEmissionCosts(emissionsEventsFile, scenario,runNr[i]);
-//			calculateDelaysCosts(eventsFile,scenario,runNr[i]);
+			calculateEmissionCosts(emissionsEventsFile, scenario,runNr[i]);
+			calculateDelaysCosts(eventsFile,scenario,runNr[i]);
 			calculateUserBenefits(scenario, runNr[i]);
 		}
 		Logger.getLogger(VerifyResults.class).info("Writing files is finsished.");

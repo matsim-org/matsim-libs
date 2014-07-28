@@ -63,7 +63,7 @@ public class EmissionsAndCongestionsPerTimeBin {
 	private void run()  {
 
 		Scenario scenario = loadScenario(networkFile);
-		String emissionEventFile = outputDir+runCase+"/ITERS/it."+lastIteration+"/out.xml";//"/"+lastIteration+".emission.events.xml.gz";
+		String emissionEventFile = outputDir+runCase+"/ITERS/it."+lastIteration+"/"+lastIteration+".emission.events.xml.gz";
 		String eventsFile = outputDir+runCase+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
 		this.network = scenario.getNetwork();
 		EmissionLinkAnalyzer eLinkAnalyzer = new EmissionLinkAnalyzer(configFile, emissionEventFile,noOfTimeBin);
