@@ -138,7 +138,7 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler, LinkLeav
 		if(this.linkId2PersonIdLinkEnterTime.get(linkId).containsKey(personId)){
 			// Person is already on the link. Cannot happen.
 			logger.warn("Person "+personId+" is entering on link "+linkId+" two times without leaving from the same. Link leave times are "+time+" and "+this.linkId2PersonIdLinkEnterTime.get(linkId).get(personId));
-//			throw new RuntimeException();
+			throw new RuntimeException();
 		} 
 
 		Map<Id, Double> personId2LinkEnterTime = this.linkId2PersonIdLinkEnterTime.get(linkId);

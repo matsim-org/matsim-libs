@@ -38,8 +38,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
-import playground.ikaddoura.internalizationCar.WelfareAnalysisControlerListener;
+import playground.agarwalamit.siouxFalls.congestionAnalyzer.MarginalCongestionHandlerImplV3;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 
 /**
@@ -66,13 +65,13 @@ public class TestingPricing4SamplePopulation {
 	public static void main(String[] args) {
 		
 		String outputFolder = args[0];
-		double [] samplePopulation = {0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+		double [] samplePopulation = {0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};//, 
 		
 		String configFile = args[1];
 		String emissionEfficiencyFactor ="1.0";
 		Config config = ConfigUtils.loadConfig(configFile);
 		
-		EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
+		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setAverageColdEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_ColdStart_vehcat_2005average.txt");
 		ecg.setAverageWarmEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_HOT_vehcat_2005average.txt");
 		ecg.setEmissionRoadTypeMappingFile("../../siouxFalls/input/SiouxFalls_roadTypeMapping.txt");
@@ -80,7 +79,7 @@ public class TestingPricing4SamplePopulation {
 		ecg.setUsingDetailedEmissionCalculation(false);
 		config.addModule(ecg);
 		
-		SortedMap<Double, Double> flowCap2DelaysCosts = new TreeMap<Double, Double>();
+		SortedMap<Double, double[]> flowCap2DelaysCosts = new TreeMap<Double, double[]>();
 		SortedMap<Double, Double > flowCap2EmissionsCosts = new TreeMap<Double, Double>();
 		
 		for(double d:samplePopulation){
@@ -92,7 +91,7 @@ public class TestingPricing4SamplePopulation {
 //			samplePlans.run();
 			config.plans().setInputFile(samplePlansFile);
 			config.qsim().setFlowCapFactor(d);
-			config.qsim().setStorageCapFactor(d);
+			config.qsim().setStorageCapFactor(3d);
 			config.controler().setOutputDirectory(outputDir);
 			Controler controler = new Controler(config);
 			
@@ -104,11 +103,10 @@ public class TestingPricing4SamplePopulation {
 			controler.setOverwriteFiles(true);
 			controler.setCreateGraphs(true);				
 			controler.setDumpDataAtEnd(true);
-			controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
 
 			controler.addControlerListener(new EmissionControlerListener());
 			controler.run();
-			double delaysCosts = getDelaysFromEvents(outputDir,(ScenarioImpl) controler.getScenario());
+			double[] delaysCosts = getDelaysFromEvents(outputDir,(ScenarioImpl) controler.getScenario());
 			double emissionsCosts = getTotalEmissionsCostsFromEmissionsEvents(outputDir, (ScenarioImpl) controler.getScenario());
 			
 			flowCap2DelaysCosts.put(d, delaysCosts);
@@ -118,9 +116,9 @@ public class TestingPricing4SamplePopulation {
 		
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/flowCapFactorVsEmissionsAndDelaysCosts.txt");
 		try {
-			writer.write("flowCapacityFactor \t emissionsCosts \t delays \n");
+			writer.write("flowCapacityFactor \t emissionsCosts \t flowCapDelays \t storageCapDelays \n");
 			for(double d:samplePopulation){
-				writer.write(d+"\t"+flowCap2EmissionsCosts.get(d)+"\t"+flowCap2DelaysCosts.get(d)+"\n");
+				writer.write(d+"\t"+flowCap2EmissionsCosts.get(d)+"\t"+flowCap2DelaysCosts.get(d)[0]+"\t"+flowCap2DelaysCosts.get(d)[1]+"\n");
 			}
 			writer.close();
 		} catch (Exception e) {
@@ -130,7 +128,7 @@ public class TestingPricing4SamplePopulation {
 
 	}
 	private static double getTotalEmissionsCostsFromEmissionsEvents(String outputDir, Scenario scenario){
-		EmissionsAnalyzer analyzer	= new EmissionsAnalyzer(outputDir+"ITERS/it.100/100.emission.events.xml.gz");
+		EmissionsAnalyzer analyzer	= new EmissionsAnalyzer(outputDir+"ITERS/it.0/0.emission.events.xml.gz");
 		analyzer.init((ScenarioImpl) scenario);
 		analyzer.preProcessData();
 		analyzer.postProcessData();
@@ -160,17 +158,18 @@ public class TestingPricing4SamplePopulation {
 		}
 		return emissionCostFacotr*totalEmissionCost;
 	}
-	private static double getDelaysFromEvents(String outputDir, ScenarioImpl sc){
+	private static double[] getDelaysFromEvents(String outputDir, ScenarioImpl sc){
 		EventsManager eventManager = EventsUtils.createEventsManager();
 		MarginalCongestionHandlerImplV3 congestionHandlerImplV3= new MarginalCongestionHandlerImplV3(eventManager, sc);
 
 		eventManager.addHandler(congestionHandlerImplV3);
 
 		MatsimEventsReader eventsReader = new MatsimEventsReader(eventManager);
-		String inputEventsFile = outputDir+"/ITERS/it.100/100.events.xml.gz";
+		String inputEventsFile = outputDir+"/ITERS/it.0/0.events.xml.gz";
 		eventsReader.readFile(inputEventsFile);
-
-		return congestionHandlerImplV3.getTotalDelay()*vtts_car;
+		double flowAndStorageDelays [] = {congestionHandlerImplV3.getTotalInternalizedDelay()*vtts_car,congestionHandlerImplV3.getDelaysFromStorageCapacity()*vtts_car};
+		return flowAndStorageDelays;
+		
 	}
 
 }
