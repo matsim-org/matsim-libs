@@ -27,6 +27,12 @@ import java.util.concurrent.ConcurrentMap;
 import org.apache.log4j.Logger;
 
 /**
+ * A cache that keeps entries as long as the Virtual Maching is happy
+ * with it, using SoftReferences.
+ * It is designed to be usable from multiple threads with minimal locking
+ * using a ConcurentHashMap internally.
+ * At construction, a daemon thread is started to handle cleaning of the GC'd
+ * entries, which gets stopped at most 5 seconds after the cache instance is finalized.
  * @author thibautd
  */
 public class SoftCache<K,V> {
@@ -37,6 +43,11 @@ public class SoftCache<K,V> {
 
 	private final QueueCleaner<K, V> cleaner = new QueueCleaner<K, V>();
 
+	/**
+	 * Initializes an instance which does not clone objects when they are added
+	 * or returned. This should be used only when <tt>V</tt> objects are immutable
+	 * or no reference to them is kept.
+	 */
 	public SoftCache() {
 		this( new Cloner<V>() {
 				@Override
@@ -46,6 +57,11 @@ public class SoftCache<K,V> {
 			} );
 	}
 
+	/**
+	 * Initializes an instance which clones objects when they are added or returned.
+	 * @param cloner an object which clones cached objects before adding them to the cache
+	 * and before returning them, to ensure the abscence of side effects if needed.
+	 */
 	public SoftCache(
 			final Cloner<V> cloner ) {
 		this.cloner = cloner;
@@ -76,8 +92,9 @@ public class SoftCache<K,V> {
 	}
 
 	@Override
-	public void finalize() {
+	public void finalize() throws Throwable {
 		cleaner.run = false;
+		super.finalize();
 	}
 
 	private static class SoftEntry<K, V> extends SoftReference<V> {
@@ -115,7 +132,7 @@ public class SoftCache<K,V> {
 						softRefsMap.remove( e.key );
 					}
 					else if ( last > 0 && log.isTraceEnabled() ) {
-						log.trace( this+": processed "+last+" GC'd references" );
+						log.trace( this+": processed "+last+" GC'd references. "+softRefsMap.size()+" entries remain in cache." );
 						last = 0;
 					}
 				}
