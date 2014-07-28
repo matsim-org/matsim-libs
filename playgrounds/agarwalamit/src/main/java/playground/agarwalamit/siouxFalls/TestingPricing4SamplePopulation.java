@@ -65,6 +65,7 @@ public class TestingPricing4SamplePopulation {
 	public static void main(String[] args) {
 		
 		String outputFolder = args[0];
+		
 		double [] samplePopulation = {0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};//, 
 		
 		String configFile = args[1];
@@ -91,8 +92,10 @@ public class TestingPricing4SamplePopulation {
 //			samplePlans.run();
 			config.plans().setInputFile(samplePlansFile);
 			config.qsim().setFlowCapFactor(d);
-			config.qsim().setStorageCapFactor(3d);
+			double strCapCoeff = Double.valueOf(args[2]);
+			config.qsim().setStorageCapFactor(strCapCoeff*d);
 			config.controler().setOutputDirectory(outputDir);
+			config.controler().setLastIteration(500);
 			Controler controler = new Controler(config);
 			
 			EmissionModule emissionModule = new EmissionModule(ScenarioUtils.loadScenario(config));
@@ -128,7 +131,7 @@ public class TestingPricing4SamplePopulation {
 
 	}
 	private static double getTotalEmissionsCostsFromEmissionsEvents(String outputDir, Scenario scenario){
-		EmissionsAnalyzer analyzer	= new EmissionsAnalyzer(outputDir+"ITERS/it.0/0.emission.events.xml.gz");
+		EmissionsAnalyzer analyzer	= new EmissionsAnalyzer(outputDir+"ITERS/it.500/500.emission.events.xml.gz");
 		analyzer.init((ScenarioImpl) scenario);
 		analyzer.preProcessData();
 		analyzer.postProcessData();
@@ -165,7 +168,7 @@ public class TestingPricing4SamplePopulation {
 		eventManager.addHandler(congestionHandlerImplV3);
 
 		MatsimEventsReader eventsReader = new MatsimEventsReader(eventManager);
-		String inputEventsFile = outputDir+"/ITERS/it.0/0.events.xml.gz";
+		String inputEventsFile = outputDir+"/ITERS/it.500/500.events.xml.gz";
 		eventsReader.readFile(inputEventsFile);
 		double flowAndStorageDelays [] = {congestionHandlerImplV3.getTotalInternalizedDelay()*vtts_car,congestionHandlerImplV3.getDelaysFromStorageCapacity()*vtts_car};
 		return flowAndStorageDelays;
