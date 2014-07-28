@@ -12,6 +12,7 @@ import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
 import jsprit.core.problem.VehicleRoutingProblem;
 import jsprit.core.problem.VehicleRoutingProblem.FleetSize;
 import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import jsprit.core.problem.vehicle.Vehicle;
 import jsprit.core.util.Solutions;
 
 import org.apache.log4j.Logger;
@@ -21,6 +22,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierImpl;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
@@ -112,8 +114,8 @@ public class MyCarrierPlanGenerator {
 			MyCarrierPlanGenerator mcpg = new MyCarrierPlanGenerator();
 			Carriers carriers = new Carriers();
 			/* Create carrier and assign carrier capabilities to carrier */
-			//		carrier = CarrierImpl.newInstance(new IdImpl("MyCarrier"));
-			new CarrierPlanXmlReaderV2(carriers).read(carrierInput);
+			carriers.addCarrier(CarrierImpl.newInstance(new IdImpl("MyCarrier")));
+//			new CarrierPlanXmlReaderV2(carriers).read(carrierInput);
 
 			CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
 			new CarrierVehicleTypeReader(carrierVehicleTypes).read(vehicleTypesFile);
@@ -122,16 +124,17 @@ public class MyCarrierPlanGenerator {
 
 			Carrier carrier = carriers.getCarriers().get(new IdImpl("MyCarrier"));
 
-			//		mcpg.buildAndWriteVehicleTypes(vehicleTypeOutputFile, true);
+//					mcpg.buildAndWriteVehicleTypes(vehicleTypeOutputFile, true);
 
-			//		MyCarrierCapabilityGenerator mccg = new MyCarrierCapabilityGenerator();
-			//		carrier.setCarrierCapabilities(mccg.createVehicles(carrierVehicleTypes, depotLink, scenario.getNetwork()));
+					MyCarrierCapabilityGenerator mccg = new MyCarrierCapabilityGenerator();
+//					carrier.setCarrierCapabilities(mccg.createVehicles(carrierVehicleTypes, depotLink, scenario.getNetwork()));
+					carrier.setCarrierCapabilities(mccg.createVehicles(carrierVehicleTypes, depotLink));
 
 
 			/* Parse shipments/demand and add to carrier 
 			 * -for now these will be services until we figure out how to use shipments
 			 */
-			int day = Integer.parseInt(demandInputFile.getName().substring(demandInputFile.getName().indexOf(".")-1,demandInputFile.getName().indexOf(".")));
+//			int day = Integer.parseInt(demandInputFile.getName().substring(demandInputFile.getName().indexOf(".")-1,demandInputFile.getName().indexOf(".")));
 
 			List<CarrierService> services = mcpg.parseDemand(demandInputFile.getAbsolutePath(), network, carrier);
 			carrier.getServices().addAll(services);
@@ -155,8 +158,10 @@ public class MyCarrierPlanGenerator {
 
 	public void createInitialPlans(Carrier carrier, Network network, String initialPlanAlgorithm, CarrierVehicleTypes vehicleTypes){
 		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
-		vrpBuilder.setFleetSize(FleetSize.FINITE);
-//				vrpBuilder.addPenaltyVehicles(10000, 100000);
+//		vrpBuilder.setFleetSize(FleetSize.valueOf( carrier.getCarrierCapabilities().getFleetSize().name() ));
+		
+		
+				vrpBuilder.addPenaltyVehicles(10000, 100000);
 		NetworkBasedTransportCosts.Builder costsBuilder = NetworkBasedTransportCosts.Builder.newInstance(network, vehicleTypes.getVehicleTypes().values());
 		costsBuilder.setTimeSliceWidth(1800);
 		NetworkBasedTransportCosts costs = costsBuilder.build();
