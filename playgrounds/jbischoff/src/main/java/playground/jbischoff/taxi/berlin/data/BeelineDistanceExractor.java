@@ -28,10 +28,14 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.util.DistanceUtils;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
 
 import com.vividsolutions.jts.geom.Point;
@@ -66,9 +70,7 @@ public class BeelineDistanceExractor
         bde.extractAndWriteTable("C:/local_jb/data/shp_merged/zonedistances.txt");
     }
 
-
-
-
+   
     private void extractAndWriteTable(String filename)
     {
         Writer writer = IOUtils.getBufferedWriter(filename);
@@ -85,11 +87,7 @@ public class BeelineDistanceExractor
              
                 writer.append(zoneID.toString());
                 for (Id secondZoneId : this.zones.keySet()){
-                    Point p = this.zones.get(zoneID).getMultiPolygon().getCentroid();
-                    Coord z1 = new CoordImpl(p.getX(),p.getY());
-                    Point p2 = this.zones.get(secondZoneId).getMultiPolygon().getCentroid();
-                    Coord z2 = new CoordImpl(p2.getX(),p2.getY());
-                    double dist = DistanceUtils.calculateDistance(z1,z2) / 1000;
+                    double dist = calcDistance(zoneID, secondZoneId);
                     
                     writer.append("\t"+f.format(dist));
                 }
@@ -101,6 +99,23 @@ public class BeelineDistanceExractor
         catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+
+
+
+    public double calcDistance(Id zoneID, Id secondZoneId)
+    {
+        Point p = this.zones.get(zoneID).getMultiPolygon().getCentroid();
+        Coord z1 = new CoordImpl(p.getX(),p.getY());
+        Point p2 = this.zones.get(secondZoneId).getMultiPolygon().getCentroid();
+        Coord z2 = new CoordImpl(p2.getX(),p2.getY());
+        double dist = DistanceUtils.calculateDistance(z1,z2) / 1000;
+        return dist;
+    }
+    
+    public Coord getZoneCentroid(Id zoneID){
+        return MGC.point2Coord(this.zones.get(zoneID).getMultiPolygon().getCentroid());
     }
 
 }

@@ -33,7 +33,9 @@ public class TaxiIdReader {
 	public static void main(String[] args) throws ParseException {
 //		for (int i = 15; i<22; i++){
 	    Date start = SDF.parse("2013-04-15 00:00:00");
+//	    Date start = SDF.parse("2014-04-07 00:00:00");
 	    Date end = SDF.parse("2013-04-22 00:30:00");
+//	    Date end = SDF.parse("2014-04-14 00:30:00");
 		TaxiIdReader tir = new TaxiIdReader(start,end);
 		tir.go();
 //		}
@@ -42,10 +44,11 @@ public class TaxiIdReader {
 		
 		TaxiIdParser tip = new TaxiIdParser();
 //		this.read("C:/local_jb/data/OD/kw9/rawFCD_20130225-20130304.dat", tip);
-		this.read("C:/local_jb/data/OD/2013/vehicles/rawFCD_20130415-20130422.dat", tip);
+		this.read("C:/local_jb/data/taxi_berlin/2013/vehicles/rawFCD_20130415-20130422.dat", tip);
+//		this.read("C:/local_jb/data/taxi_berlin/2014/vehicles/status_congegrated.dat", tip);
 		this.taxiIdData = tip.getTaxiIds();
 		this.analyse();
-		this.write("C:/local_jb/data/OD/2013/vehicles/taxisweekly.csv");
+		this.write("C:/local_jb/data/taxi_berlin/2013/vehicles/taxisweekly.csv");
 		
 	}
 	
@@ -55,7 +58,10 @@ public class TaxiIdReader {
 		
 		try {
 			for (Entry<Date,Integer> sec : this.inSystem.entrySet()){
-				bw.append(SDF.format(sec.getKey())+"\t"+sec.getValue()+"\n");
+			    if (sec.getKey().getHours() == 23 && sec.getKey().getMinutes() == 59) continue;
+			    if (sec.getKey().getHours() == 0 && sec.getKey().getMinutes() == 0) continue;
+				// something weird happens in those two seconds, therefore we are filtering them out.
+			    bw.append(SDF.format(sec.getKey())+"\t"+sec.getValue()+"\n");
 			}
 			bw.flush();
 			bw.close();
