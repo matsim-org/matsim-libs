@@ -19,10 +19,7 @@
 
 package playground.boescpa.lib.tools.tripCreation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -58,11 +55,11 @@ public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEv
 	BoxedHashMap<Id,Id> endLink;
 	BoxedHashMap<Id,Double> endTime;
 
-	List<Id> ptTripList;
+	HashSet<Id> ptTripList;
 	HashMap<Id,Id> ptStageEndLinkId;
 	HashMap<Id,Double> ptStageEndTime;
-	List<Id> transitWalkList;
-	List<Id> endInitialisedList;
+	HashSet<Id> transitWalkList;
+	HashSet<Id> endInitialisedList;
 
 	public BoxedHashMap<Id, Id> getStartLink() {
 		return startLink;
@@ -103,9 +100,9 @@ public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEv
 		endTime = new BoxedHashMap<Id, Double>();
 		ptStageEndLinkId = new HashMap<Id, Id>();
 		ptStageEndTime = new HashMap<Id, Double>();
-		ptTripList = new ArrayList<Id>();
-		transitWalkList = new ArrayList<Id>();
-		endInitialisedList = new ArrayList<Id>();
+		ptTripList = new HashSet<Id>();
+		transitWalkList = new HashSet<Id>();
+		endInitialisedList = new HashSet<Id>();
 	}
 
 	@Override

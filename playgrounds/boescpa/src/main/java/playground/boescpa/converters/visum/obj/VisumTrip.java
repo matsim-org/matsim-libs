@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.boescpa.lib.tools.tripReader.Trip;
+import playground.gregor.sim2d_v4.run.Vis;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -41,8 +42,28 @@ public class VisumTrip extends Trip {
 
 	// TODO-boescpa Write tests...
 
+	private static Scenario scenarioUtils = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
 	public VisumTrip(Id agentId, double startTime, Id startLinkId, double startXCoord, double startYCoord, double endTime, Id endLinkId, double endXCoord, double endYCoord, String mode, String purpose, double duration, long distance) {
 		super(agentId, startTime, startLinkId, startXCoord, startYCoord, endTime, endLinkId, endXCoord, endYCoord, mode, purpose, duration, distance);
+	}
+
+	public VisumTrip(String[] tripLine) {
+		this(
+				scenarioUtils.createId(tripLine[1]), //agentId
+				Double.parseDouble(tripLine[2]), // startTime
+				scenarioUtils.createId(tripLine[3]), // startLinkId
+				Double.parseDouble(tripLine[4]), // startXCoord
+				Double.parseDouble(tripLine[5]), // startYCoord
+				Double.parseDouble(tripLine[6]), // endTime
+				scenarioUtils.createId(tripLine[7]), // endLinkId
+				Double.parseDouble(tripLine[8]), // endXCoord
+				Double.parseDouble(tripLine[9]), // endYCoord
+				tripLine[10], // mode
+				tripLine[11], // purpose
+				Double.parseDouble(tripLine[12]), // duration
+				Long.parseLong(tripLine[13]) // distance
+		);
 	}
 
 	public boolean isModeType(String mode) {

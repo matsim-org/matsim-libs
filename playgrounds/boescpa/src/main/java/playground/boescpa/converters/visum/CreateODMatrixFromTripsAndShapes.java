@@ -51,7 +51,7 @@ public class CreateODMatrixFromTripsAndShapes {
 		log.info("Reading trip file...");
 		HashMap<Long, Trip> tempTripCollection = Trip.createTripCollection(sourceTripFile);
 		for (Long tripId : tempTripCollection.keySet()) {
-			tripCollection.put(tripId, (VisumTrip) tempTripCollection.get(tripId));
+			tripCollection.put(tripId, new VisumTrip(tempTripCollection.get(tripId).toString().split("\t")));
 		}
 		log.info("Reading trip file...done.");
 		

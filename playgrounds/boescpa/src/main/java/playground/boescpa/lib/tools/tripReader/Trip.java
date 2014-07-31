@@ -112,19 +112,19 @@ public class Trip {
 			while (newLine != null) {
 				String[] tripLine = newLine.split("\t");
 				Trip trip = new Trip(
-						scenarioUtils.createId(tripLine[1]), //agentId
-						Double.parseDouble(tripLine[2]), // startTime
-						scenarioUtils.createId(tripLine[3]), // startLinkId
-						Double.parseDouble(tripLine[4]), // startXCoord
-						Double.parseDouble(tripLine[5]), // startYCoord
-						Double.parseDouble(tripLine[6]), // endTime
-						scenarioUtils.createId(tripLine[7]), // endLinkId
-						Double.parseDouble(tripLine[8]), // endXCoord
-						Double.parseDouble(tripLine[9]), // endYCoord
-						tripLine[10], // mode
-						tripLine[11], // purpose
-						Double.parseDouble(tripLine[12]), // duration
-						Long.parseLong(tripLine[13])); // distance
+						scenarioUtils.createId(tripLine[0]), //agentId
+						Double.parseDouble(tripLine[1]), // startTime
+						scenarioUtils.createId(tripLine[2]), // startLinkId
+						Double.parseDouble(tripLine[3]), // startXCoord
+						Double.parseDouble(tripLine[4]), // startYCoord
+						Double.parseDouble(tripLine[5]), // endTime
+						scenarioUtils.createId(tripLine[6]), // endLinkId
+						Double.parseDouble(tripLine[7]), // endXCoord
+						Double.parseDouble(tripLine[8]), // endYCoord
+						tripLine[9], // mode
+						tripLine[10], // purpose
+						Double.parseDouble(tripLine[11]), // duration
+						Long.parseLong(tripLine[12])); // distance
 				tripCollection.put(trip.tripId, trip);
 				newLine = readsLines.readLine();
 			}
