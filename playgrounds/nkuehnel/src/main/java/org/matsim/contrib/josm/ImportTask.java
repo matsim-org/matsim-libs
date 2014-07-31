@@ -51,7 +51,7 @@ class ImportTask extends PleaseWaitRunnable {
 	private NetworkLayer layer;
 	private String path;
 	private DataSet dataSet;
-	private Network network;
+	private Scenario scenario;
 	private String importSystem;
 	private HashMap<Way, List<Link>> way2Links;
 	private HashMap<Link, List<WaySegment>> link2Segment;
@@ -83,7 +83,7 @@ class ImportTask extends PleaseWaitRunnable {
 		// layer = null happens if Exception happens during import,
 		// as Exceptions are handled only after this method is called.
 		layer = new NetworkLayer(dataSet, ImportDialog.path.getText(),
-				new File(path), network, importSystem, way2Links, link2Segment);
+				new File(path), scenario, importSystem, way2Links, link2Segment);
 		if (layer != null) {
 			Main.main.addLayer(layer);
 			Main.map.mapView.setActiveLayer(layer);
@@ -108,18 +108,18 @@ class ImportTask extends PleaseWaitRunnable {
 		this.progressMonitor.setTicks(1);
 		this.progressMonitor.setCustomText("creating scenario..");
 		Config config = ConfigUtils.createConfig();
-		Scenario scenario = ScenarioUtils.createScenario(config);
+		Scenario tempScenario = ScenarioUtils.createScenario(config);
 		this.progressMonitor.setTicks(2);
 		this.progressMonitor.setCustomText("reading network xml..");
-		new MatsimNetworkReader(scenario).readFile(path);
-		network = NetworkImpl.createNetwork();
+		new MatsimNetworkReader(tempScenario).readFile(path);
+		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		way2Links = new HashMap<Way, List<Link>>();
 		link2Segment = new HashMap<Link, List<WaySegment>>();
 		HashMap<Node, org.openstreetmap.josm.data.osm.Node> node2OsmNode = new HashMap<Node, org.openstreetmap.josm.data.osm.Node>();
 		this.progressMonitor.setTicks(3);
 		this.progressMonitor.setCustomText("creating nodes..");
-		for (Node node : scenario.getNetwork().getNodes().values()) {
+		for (Node node : tempScenario.getNetwork().getNodes().values()) {
 			Coord tmpCoor = node.getCoord();
 			LatLon coor;
 
@@ -135,16 +135,16 @@ class ImportTask extends PleaseWaitRunnable {
 			nodeOsm.put(NODE_TAG_ID, node.getId().toString());
 			node2OsmNode.put(node, nodeOsm);
 			dataSet.addPrimitive(nodeOsm);
-			Node newNode = network.getFactory().createNode(
+			Node newNode = scenario.getNetwork().getFactory().createNode(
 					new IdImpl(Long.toString(nodeOsm.getUniqueId())),
 					node.getCoord());
 			((NodeImpl) newNode).setOrigId(node.getId().toString());
-			network.addNode(newNode);
+			scenario.getNetwork().addNode(newNode);
 		}
 
 		this.progressMonitor.setTicks(4);
 		this.progressMonitor.setCustomText("creating ways..");
-		for (Link link : scenario.getNetwork().getLinks().values()) {
+		for (Link link : tempScenario.getNetwork().getLinks().values()) {
 			Way way = new Way();
 			org.openstreetmap.josm.data.osm.Node fromNode = node2OsmNode
 					.get(link.getFromNode());
@@ -168,11 +168,11 @@ class ImportTask extends PleaseWaitRunnable {
 			way.put("modes", modes.toString());
 
 			dataSet.addPrimitive(way);
-			Link newLink = network.getFactory().createLink(
+			Link newLink = scenario.getNetwork().getFactory().createLink(
 					new IdImpl(Long.toString(way.getUniqueId())),
-					network.getNodes().get(
+					scenario.getNetwork().getNodes().get(
 							new IdImpl(Long.toString(fromNode.getUniqueId()))),
-					network.getNodes().get(
+					scenario.getNetwork().getNodes().get(
 							new IdImpl(Long.toString(toNode.getUniqueId()))));
 			newLink.setFreespeed(link.getFreespeed());
 			newLink.setCapacity(link.getCapacity());
@@ -180,7 +180,7 @@ class ImportTask extends PleaseWaitRunnable {
 			newLink.setNumberOfLanes(link.getNumberOfLanes());
 			newLink.setAllowedModes(link.getAllowedModes());
 			((LinkImpl) newLink).setOrigId(link.getId().toString());
-			network.addLink(newLink);
+			scenario.getNetwork().addLink(newLink);
 			way2Links.put(way, Collections.singletonList(newLink));
 			link2Segment.put(newLink,
 					Collections.singletonList(new WaySegment(way, 0)));

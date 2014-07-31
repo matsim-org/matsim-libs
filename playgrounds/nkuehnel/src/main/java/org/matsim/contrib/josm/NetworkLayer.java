@@ -1,5 +1,6 @@
 package org.matsim.contrib.josm;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.openstreetmap.josm.Main;
@@ -16,6 +17,7 @@ import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.ImageProvider;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.io.File;
 import java.util.*;
@@ -31,7 +33,7 @@ import static org.openstreetmap.josm.tools.I18n.trn;
  * 
  */
 class NetworkLayer extends OsmDataLayer {
-	private Network matsimNetwork;
+	private Scenario matsimScenario;
 	private String coordSystem;
 
 	private Map<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
@@ -42,17 +44,17 @@ class NetworkLayer extends OsmDataLayer {
 	}
 
 	public NetworkLayer(DataSet data, String name, File associatedFile,
-			Network network, String coordSystem,
+			Scenario scenario, String coordSystem,
 			HashMap<Way, List<Link>> way2Links,
 			Map<Link, List<WaySegment>> link2Segment) {
 		super(data, name, associatedFile);
-		this.matsimNetwork = network;
+		this.matsimScenario = scenario;
 		this.coordSystem = coordSystem;
 		this.way2Links = way2Links;
 		this.link2Segment = link2Segment;
 		NetworkListener listener;
 		try {
-			listener = new NetworkListener(network, way2Links, link2Segment);
+			listener = new NetworkListener(scenario.getNetwork(), way2Links, link2Segment);
 		} catch (IllegalArgumentException e) {
 			JOptionPane
 					.showMessageDialog(
@@ -74,8 +76,8 @@ class NetworkLayer extends OsmDataLayer {
 		return link2Segment;
 	}
 
-	public Network getMatsimNetwork() {
-		return matsimNetwork;
+	public Scenario getMatsimScenario() {
+		return matsimScenario;
 	}
 
 	@Override
@@ -164,9 +166,9 @@ class NetworkLayer extends OsmDataLayer {
 		p.add(new JLabel(tr("API version: {0}",
 				(data.getVersion() != null) ? data.getVersion() : tr("unset"))),
 				GBC.eop().insets(15, 0, 0, 0));
-		p.add(new JLabel(this.matsimNetwork.getLinks().size() + " MATSim links"),
+		p.add(new JLabel(this.matsimScenario.getNetwork().getLinks().size() + " MATSim links"),
 				GBC.eop().insets(15, 0, 0, 0));
-		p.add(new JLabel(this.matsimNetwork.getNodes().size() + " MATSim nodes"),
+		p.add(new JLabel(this.matsimScenario.getNetwork().getNodes().size() + " MATSim nodes"),
 				GBC.eop().insets(15, 0, 0, 0));
 
 		return p;

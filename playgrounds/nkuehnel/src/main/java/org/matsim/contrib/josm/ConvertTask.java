@@ -6,14 +6,18 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.coor.LatLon;
@@ -65,19 +69,24 @@ class ConvertTask extends PleaseWaitRunnable {
 
 		Layer layer = Main.main.getActiveLayer();
 
-		Network tempNetwork = NetworkImpl.createNetwork();
-		Network network = NetworkImpl.createNetwork();
+		Scenario tempScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		tempScenario.getConfig().scenario().setUseTransit(true);
+		tempScenario.getConfig().scenario().setUseVehicles(true);
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Network network = scenario.getNetwork();
+		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().scenario().setUseVehicles(true);
 
 		this.progressMonitor.setTicks(1);
 		this.progressMonitor.setCustomText("converting osm data..");
 
-		NewConverter.convertOsmLayer(((OsmDataLayer) layer), tempNetwork,
+		NewConverter.convertOsmLayer(((OsmDataLayer) layer), tempScenario,
 				new HashMap<Way, List<Link>>(),
 				new HashMap<Link, List<WaySegment>>());
 		if (Main.pref.getBoolean("matsim_cleanNetwork")) {
 			this.progressMonitor.setTicks(2);
 			this.progressMonitor.setCustomText("cleaning network..");
-			new NetworkCleaner().run(tempNetwork);
+			new NetworkCleaner().run(tempScenario.getNetwork());
 		}
 
 		this.progressMonitor.setTicks(3);
@@ -90,7 +99,7 @@ class ConvertTask extends PleaseWaitRunnable {
 		this.progressMonitor.setTicks(4);
 		this.progressMonitor.setCustomText("loading nodes..");
 
-		for (Node node : tempNetwork.getNodes().values()) {
+		for (Node node : tempScenario.getNetwork().getNodes().values()) {
 			Coord tmpCoor = node.getCoord();
 			LatLon coor = new LatLon(tmpCoor.getY(), tmpCoor.getX());
 			org.openstreetmap.josm.data.osm.Node nodeOsm = new org.openstreetmap.josm.data.osm.Node(
@@ -108,7 +117,7 @@ class ConvertTask extends PleaseWaitRunnable {
 
 		this.progressMonitor.setTicks(5);
 		this.progressMonitor.setCustomText("loading ways..");
-		for (Link link : tempNetwork.getLinks().values()) {
+		for (Link link : tempScenario.getNetwork().getLinks().values()) {
 			Way way = new Way();
 			org.openstreetmap.josm.data.osm.Node fromNode = node2OsmNode
 					.get(link.getFromNode());
@@ -152,7 +161,7 @@ class ConvertTask extends PleaseWaitRunnable {
 		this.progressMonitor.setTicks(6);
 		this.progressMonitor.setCustomText("creating layer..");
 
-		newLayer = new NetworkLayer(dataSet, null, null, network,
+		newLayer = new NetworkLayer(dataSet, null, null, scenario,
 				TransformationFactory.WGS84, way2Links, link2Segment);
 	}
 

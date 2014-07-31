@@ -124,7 +124,7 @@ class MATSimAction {
 			Config config = ConfigUtils.createConfig();
 			Scenario scenario = ScenarioUtils.createScenario(config);
 			NetworkLayer layer = new NetworkLayer(dataSet, "new Layer", null,
-					scenario.getNetwork(), TransformationFactory.WGS84,
+					scenario, TransformationFactory.WGS84,
 					new HashMap<Way, List<Link>>(),
 					new HashMap<Link, List<WaySegment>>());
 			Main.main.addLayer(layer);
