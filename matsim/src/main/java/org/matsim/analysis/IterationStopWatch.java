@@ -20,25 +20,18 @@
 
 package org.matsim.analysis;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Stack;
-
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.matsim.core.controler.AbstractController;
 import org.matsim.core.utils.charts.StackedBarChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * This class provides a mechanism similar to a stop watch, allowing to measure the duration of operations and
@@ -116,7 +109,7 @@ public class IterationStopWatch {
 	 *
 	 * @param iteration
 	 */
-	public void setCurrentIteration(final int iteration) {
+	public void beginIteration(final int iteration) {
 		this.iteration = Integer.valueOf(iteration);
 		if (this.iterations.get(this.iteration) == null) {
 			this.currentIterationValues = new HashMap<String, Long>();
@@ -127,6 +120,7 @@ public class IterationStopWatch {
 			this.currentIterationChildren = new HashMap<String, List<String>>();
 			this.children.put(this.iteration, this.currentIterationChildren);
 		}
+        this.beginOperation(AbstractController.OPERATION_ITERATION);
 	}
 
 	/**
@@ -171,6 +165,10 @@ public class IterationStopWatch {
 		
 		this.currentMeasuredOperations.pop();
 	}
+
+    public void endIteration() {
+        this.endOperation(AbstractController.OPERATION_ITERATION);
+    }
 
 	/**
 	 * Tells the stop watch that a special event happened, for which the time should be remembered.

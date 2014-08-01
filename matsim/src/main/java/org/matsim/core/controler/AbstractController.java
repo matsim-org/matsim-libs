@@ -19,10 +19,6 @@
 
 package org.matsim.core.controler;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.Thread.UncaughtExceptionHandler;
-
 import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
@@ -31,248 +27,287 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public abstract class AbstractController {
 
-	private static Logger log = Logger.getLogger(AbstractController.class);
+    class UnexpectedShutdownException extends Exception {
+    }
 
-	private OutputDirectoryHierarchy controlerIO;
+    private static Logger log = Logger.getLogger(AbstractController.class);
 
-	/**
-	 * This was  public in the design that I found. kai, jul'12
-	 */
-	public final IterationStopWatch stopwatch = new IterationStopWatch();
+    private OutputDirectoryHierarchy controlerIO;
 
-	/*
-	 * Strings used to identify the operations in the IterationStopWatch.
-	 */
-	public static final String OPERATION_ITERATION = "iteration";
-	public static final String OPERATION_MOBSIM = "mobsim";
-	public static final String OPERATION_REPLANNING = "replanning";
-	public static final String OPERATION_SCORING = "scoring" ;
+    /**
+     * This was  public in the design that I found. kai, jul'12
+     */
+    public final IterationStopWatch stopwatch = new IterationStopWatch();
 
-	public static final String OPERATION_ITERATION_STARTS_LISTENERS = "iterationStartsListeners";
-	public static final String OPERATION_BEFORE_MOBSIM_LISTENERS = "beforeMobsimListeners";
-	public static final String OPERATION_AFTER_MOBSIM_LISTENERS = "afterMobsimListeners";
-	public static final String OPERATION_ITERATION_ENDS_LISTENERS = "iterationEndsListeners";
-	
-	/**
-	 * This is deliberately not even protected.  kai, jul'12
-	 */
-	ControlerListenerManager controlerListenerManager;
+    /*
+     * Strings used to identify the operations in the IterationStopWatch.
+     */
+    public static final String OPERATION_ITERATION = "iteration";
 
-	// for tests
-	protected volatile Throwable uncaughtException;
+    /**
+     * This is deliberately not even protected.  kai, jul'12
+     */
+    ControlerListenerManager controlerListenerManager;
 
-	private Thread shutdownHook = new Thread() {
-		@SuppressWarnings("synthetic-access")
-		@Override
-		public void run() {
-			shutdown(true);
-		}
-	};
+    // for tests
+    protected volatile Throwable uncaughtException;
 
-	@Deprecated
-	/*package*/ Integer thisIteration = null;
+    private AtomicBoolean unexpectedShutdown = new AtomicBoolean(false);
+
+    @Deprecated
+    /*package*/ Integer thisIteration = null;
 
 
-	protected AbstractController() {
-		OutputDirectoryLogging.catchLogEntries();
-		Gbl.printSystemInfo();
-		Gbl.printBuildInfo();
-		log.info("Used Controler-Class: " + this.getClass().getCanonicalName());
+    protected AbstractController() {
+        OutputDirectoryLogging.catchLogEntries();
+        Gbl.printSystemInfo();
+        Gbl.printBuildInfo();
+        log.info("Used Controler-Class: " + this.getClass().getCanonicalName());
 
-		// make sure we know about any exceptions that lead to abortion of the
-		// program
-		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-			@SuppressWarnings("synthetic-access")
-			@Override
-			public void uncaughtException(Thread t, Throwable e) {
-				log.error("Getting uncaught Exception in Thread " + t.getName(), e);
-				uncaughtException = e;
-			}
-		});
-		if (this instanceof Controler) {
-			// Extrawurst for Controler
-			this.controlerListenerManager = new ControlerListenerManager((Controler) this);
-		} else {
-			this.controlerListenerManager = new ControlerListenerManager(null);
-		}
-		Runtime.getRuntime().addShutdownHook(this.shutdownHook);
-	}
+        if (this instanceof Controler) {
+            // Extrawurst for Controler
+            this.controlerListenerManager = new ControlerListenerManager((Controler) this);
+        } else {
+            this.controlerListenerManager = new ControlerListenerManager(null);
+        }
+    }
 
 
-	private void resetRandomNumbers(long seed, int iteration) {
-		MatsimRandom.reset(seed + iteration);
-		MatsimRandom.getRandom().nextDouble(); // draw one because of strange
-		// "not-randomness" is the first
-		// draw...
-		// Fixme [kn] this should really be ten thousand draws instead of just
-		// one
-	}
+    private void resetRandomNumbers(long seed, int iteration) {
+        MatsimRandom.reset(seed + iteration);
+        MatsimRandom.getRandom().nextDouble(); // draw one because of strange
+        // "not-randomness" is the first
+        // draw...
+        // Fixme [kn] this should really be ten thousand draws instead of just
+        // one
+    }
 
-	protected final void setupOutputDirectory(final String outputDirectory, String runId, final boolean overwriteFiles) {
-		this.controlerIO = new OutputDirectoryHierarchy(outputDirectory, runId, overwriteFiles); // output dir needs to be before logging
-		OutputDirectoryLogging.initLogging(this.getControlerIO()); // logging needs to be early
-	}
+    protected final void setupOutputDirectory(final String outputDirectory, String runId, final boolean overwriteFiles) {
+        this.controlerIO = new OutputDirectoryHierarchy(outputDirectory, runId, overwriteFiles); // output dir needs to be before logging
+        OutputDirectoryLogging.initLogging(this.getControlerIO()); // logging needs to be early
+    }
 
-	protected final void run(Config config) {
-		loadCoreListeners();
-		this.controlerListenerManager.fireControlerStartupEvent();
-		checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start" ) ;
-		prepareForSim();
-		doIterations(config.controler().getFirstIteration(), config.global().getRandomSeed(), config.controler().isCreateGraphs());
-		shutdown(false);
-	}
+    protected final void run(Config config) {
+        // Memorize the last uncaught Exception on another Thread,
+        // because we want to log that again on shutdown.
+        Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                logMemorizeAndRequestShutdown(t, e);
+            }
+        });
+        final Thread controllerThread = Thread.currentThread();
+        Thread shutdownHook = new Thread() {
+            public void run() {
+                log.error("received unexpected shutdown request.");
+                // Request shutdown from the controllerThread.
+                unexpectedShutdown.set(true);
+                try {
+                    // Wait until it has shut down.
+                    controllerThread.join();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                // The JVM will exit when this method returns.
+            }
+        };
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
+        try {
+            loadCoreListeners();
+            this.controlerListenerManager.fireControlerStartupEvent();
+            checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start");
+            prepareForSim();
+            doIterations(config);
+        } catch (UnexpectedShutdownException e) {
+            // Doesn't matter. Just shut down.
+        } catch (RuntimeException e) {
+            // Don't let it fall through to the UncaughtExceptionHandler. We want to first log the Exception,
+            // then shut down.
+            logMemorizeAndRequestShutdown(Thread.currentThread(), e);
+        } finally {
+            shutdown();
+            Runtime.getRuntime().removeShutdownHook(shutdownHook);
+        }
+    }
 
-	final void shutdown(final boolean unexpected) {
-		if (unexpected) {
-			log.error("S H U T D O W N   ---   received unexpected shutdown request.");
-		} else {
-			log.info("S H U T D O W N   ---   start regular shutdown.");
-		}
-		if (this.uncaughtException != null) {
-			log.error(
-					"Shutdown probably caused by the following Exception.", this.uncaughtException);
-		}
-		this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
-		try {
-			Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
-		} catch (IllegalStateException e) {
-			log.info("Cannot remove shutdown hook. " + e.getMessage());
-		}
-		this.shutdownHook = null; // important for test cases to free the memory
-		if (unexpected) {
-			log.error("ERROR --- MATSim terminated with some error. Please check the output or the logfile with warnings and errors for hints.");
-			log.error("ERROR --- results should not be used for further analysis.");
-			log.error("S H U T D O W N   ---   unexpected shutdown request completed. ");
-		} else {
-			log.info("S H U T D O W N   ---   regular shutdown completed.");
-		}
-		OutputDirectoryLogging.closeOutputDirLogging();
-	}
+    private void logMemorizeAndRequestShutdown(Thread t, Throwable e) {
+        log.error("Getting uncaught Exception in Thread " + t.getName(), e);
+        uncaughtException = e;
+        // We want to shut down when any Thread dies with an Exception.
+        unexpectedShutdown.set(true);
+    }
 
-	protected abstract void loadCoreListeners();
+    protected abstract void loadCoreListeners();
 
-	protected abstract void runMobSim(int iteration);
+    protected abstract void runMobSim(int iteration);
 
-	protected abstract void prepareForSim();
+    protected abstract void prepareForSim();
 
-	/**
-	 * Stopping criterion for iterations.  Design thoughts:<ul>
-	 * <li> AbstractController only controls process, not content.  Stopping iterations controls process based on content.
-	 * All such coupling methods are abstract; thus this one has to be abstract, too.
-	 * <li> One can see this confirmed in the KnSimplifiedControler use case, where the function is delegated to a static
-	 * method in the SimplifiedControllerUtils class ... as with all other abstract methods.
-	 * </ul>
-	 */
-	protected abstract boolean continueIterations(int iteration);
+    /**
+     * Stopping criterion for iterations.  Design thoughts:<ul>
+     * <li> AbstractController only controls process, not content.  Stopping iterations controls process based on content.
+     * All such coupling methods are abstract; thus this one has to be abstract, too.
+     * <li> One can see this confirmed in the KnSimplifiedControler use case, where the function is delegated to a static
+     * method in the SimplifiedControllerUtils class ... as with all other abstract methods.
+     * </ul>
+     */
+    protected abstract boolean continueIterations(int iteration);
 
-	private void doIterations(int firstIteration, long rndSeed, boolean createOutputGraphs) {
+    private void doIterations(Config config) throws UnexpectedShutdownException {
+        for (int iteration = config.controler().getFirstIteration(); continueIterations(iteration); iteration++) {
+            iteration(config, iteration);
+        }
+    }
 
-		String divider = "###################################################";
-		String marker = "### ";
+    private void shutdown() {
+        log.info("S H U T D O W N   ---   start shutdown.");
+        this.controlerListenerManager.fireControlerShutdownEvent(unexpectedShutdown.get());
+        if (this.uncaughtException != null) {
+            log.error("Shutdown possibly caused by the following Exception:", this.uncaughtException);
+        }
+        if (this.unexpectedShutdown.get()) {
+            log.error("ERROR --- MATSim unexpectedly terminated. Please check the output or the logfile with warnings and errors for hints.");
+            log.error("ERROR --- results should not be used for further analysis.");
+        }
+        log.info("S H U T D O W N   ---   shutdown completed.");
+        OutputDirectoryLogging.closeOutputDirLogging();
+    }
 
-		for (int iteration = firstIteration; continueIterations(iteration) ; iteration++ ) {
+    private void iteration(final Config config, final int iteration) throws UnexpectedShutdownException {
+        final String divider = "###################################################";
+        final String marker = "### ";
+        this.thisIteration = iteration;
+        this.stopwatch.beginIteration(iteration);
 
-			// setting the other iteration counter to the same value:
-			this.thisIteration = iteration ;
-			// (this other iteration counter may have its own ++ !?!?)
+        log.info(divider);
+        log.info(marker + "ITERATION " + iteration + " BEGINS");
+        this.getControlerIO().createIterationDirectory(iteration);
+        resetRandomNumbers(config.global().getRandomSeed(), iteration);
 
-			this.stopwatch.setCurrentIteration(iteration) ;
+        iterationStep("iterationStartsListeners", new Runnable() {
+            @Override
+            public void run() {
+                controlerListenerManager.fireControlerIterationStartsEvent(iteration);
+            }
+        });
 
-			log.info(divider);
-			log.info(marker + "ITERATION " + iteration + " BEGINS");
-//			this.stopwatch.setCurrentIteration(iteration);
-			this.stopwatch.beginOperation(OPERATION_ITERATION);
-			this.getControlerIO().createIterationDirectory(iteration);
-			resetRandomNumbers(rndSeed, iteration);
+        if (iteration > config.controler().getFirstIteration()) {
+            iterationStep("replanning", new Runnable() {
+                @Override
+                public void run() {
+                    controlerListenerManager.fireControlerReplanningEvent(iteration);
+                }
+            });
+        }
 
-			this.stopwatch.beginOperation(OPERATION_ITERATION_STARTS_LISTENERS) ;
-			this.controlerListenerManager.fireControlerIterationStartsEvent(iteration);
-			this.stopwatch.endOperation(OPERATION_ITERATION_STARTS_LISTENERS) ;
+        iterationStep("beforeMobsimListeners", new Runnable() {
+            @Override
+            public void run() {
+                controlerListenerManager.fireControlerBeforeMobsimEvent(iteration);
+            }
+        });
 
-			if (iteration > firstIteration) {
-				this.stopwatch.beginOperation(OPERATION_REPLANNING);
-				this.controlerListenerManager.fireControlerReplanningEvent(iteration);
-				this.stopwatch.endOperation(OPERATION_REPLANNING);
-			}
+        iterationStep("mobsim", new Runnable() {
+            @Override
+            public void run() {
+                resetRandomNumbers(config.global().getRandomSeed(), iteration);
+                runMobSim(iteration);
+            }
+        });
 
-			this.stopwatch.beginOperation(OPERATION_BEFORE_MOBSIM_LISTENERS);
-			this.controlerListenerManager.fireControlerBeforeMobsimEvent(iteration);
-			this.stopwatch.endOperation(OPERATION_BEFORE_MOBSIM_LISTENERS);
+        iterationStep("afterMobsimListeners", new Runnable() {
+            @Override
+            public void run() {
+                log.info(marker + "ITERATION " + iteration + " fires after mobsim event");
+                controlerListenerManager.fireControlerAfterMobsimEvent(iteration);
+            }
+        });
 
-			this.stopwatch.beginOperation(OPERATION_MOBSIM);
-			resetRandomNumbers(rndSeed, iteration);
-			runMobSim(iteration);
-			this.stopwatch.endOperation(OPERATION_MOBSIM);
-	
-			this.stopwatch.beginOperation(OPERATION_AFTER_MOBSIM_LISTENERS) ;
-			log.info(marker + "ITERATION " + iteration + " fires after mobsim event");
-			this.controlerListenerManager.fireControlerAfterMobsimEvent(iteration);
-			this.stopwatch.endOperation(OPERATION_AFTER_MOBSIM_LISTENERS) ;
+        iterationStep("scoring", new Runnable() {
+            @Override
+            public void run() {
+                log.info(marker + "ITERATION " + iteration + " fires scoring event");
+                controlerListenerManager.fireControlerScoringEvent(iteration);
+            }
+        });
 
-			this.stopwatch.beginOperation(OPERATION_SCORING);
-			log.info(marker + "ITERATION " + iteration + " fires scoring event");
-			this.controlerListenerManager.fireControlerScoringEvent(iteration);
-			this.stopwatch.endOperation(OPERATION_SCORING);
-			
-			this.stopwatch.beginOperation(OPERATION_ITERATION_ENDS_LISTENERS) ;
-			log.info(marker + "ITERATION " + iteration + " fires iteration end event");
-			this.controlerListenerManager.fireControlerIterationEndsEvent(iteration);
-			this.stopwatch.endOperation(OPERATION_ITERATION_ENDS_LISTENERS) ;
+        iterationStep("iterationEndsListeners", new Runnable() {
+            @Override
+            public void run() {
+                log.info(marker + "ITERATION " + iteration + " fires iteration end event");
+                controlerListenerManager.fireControlerIterationEndsEvent(iteration);
+            }
+        });
 
-			this.stopwatch.endOperation(OPERATION_ITERATION);
-			this.stopwatch.writeTextFile(this.getControlerIO().getOutputFilename("stopwatch"));
-			if (createOutputGraphs) this.stopwatch.writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch"));
-			log.info(marker + "ITERATION " + iteration + " ENDS");
-			log.info(divider);
-		}
-	}
+        this.stopwatch.endIteration();
+        this.stopwatch.writeTextFile(this.getControlerIO().getOutputFilename("stopwatch"));
+        if (config.controler().isCreateGraphs()) {
+            this.stopwatch.writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch"));
+        }
+        log.info(marker + "ITERATION " + iteration + " ENDS");
+        log.info(divider);
+    }
 
-
-	/**
-	 * Design decisions:
-	 * <ul>
-	 * <li>I extracted this method since it is now called <i>twice</i>: once
-	 * directly after reading, and once before the iterations start. The second
-	 * call seems more important, but I wanted to leave the first one there in
-	 * case the program fails before that config dump. Might be put into the
-	 * "unexpected shutdown hook" instead. kai, dec'10
-	 * </ul>
-	 * @param config TODO
-	 * @param message
-	 *            the message that is written just before the config dump
-	 */
-	protected static final void checkConfigConsistencyAndWriteToLog(Config config,
-			final String message) {
-				log.info(message);
-				String newline = System.getProperty("line.separator");// use native line endings for logfile
-				StringWriter writer = new StringWriter();
-				new ConfigWriter(config).writeStream(new PrintWriter(writer), newline);
-				log.info(newline + newline + writer.getBuffer().toString());
-				log.info("Complete config dump done.");
-				log.info("Checking consistency of config...");
-				config.checkConsistency();
-				log.info("Checking consistency of config done.");
-			}
-
-	/**
-	 * Design comments:<ul>
-	 * <li> This is such that ControlerListenerManager does not need to be exposed.  One may decide otherwise ...  kai, jul'12
-	 * </ul>
-	 */
-	public final void addControlerListener( ControlerListener l ) {
-		this.controlerListenerManager.addControlerListener(l) ;
-	}
-
-	protected final void addCoreControlerListener( ControlerListener l ) {
-		this.controlerListenerManager.addCoreControlerListener(l) ;
-	}
+    private void iterationStep(String iterationStepName, Runnable iterationStep) throws UnexpectedShutdownException {
+        this.stopwatch.beginOperation(iterationStepName);
+        iterationStep.run();
+        this.stopwatch.endOperation(iterationStepName);
+        if (this.unexpectedShutdown.get()) {
+            throw new UnexpectedShutdownException();
+        }
+    }
 
 
-	public final OutputDirectoryHierarchy getControlerIO() {
-		return controlerIO;
-	}
+    /**
+     * Design decisions:
+     * <ul>
+     * <li>I extracted this method since it is now called <i>twice</i>: once
+     * directly after reading, and once before the iterations start. The second
+     * call seems more important, but I wanted to leave the first one there in
+     * case the program fails before that config dump. Might be put into the
+     * "unexpected shutdown hook" instead. kai, dec'10
+     * </ul>
+     *
+     * @param config  TODO
+     * @param message the message that is written just before the config dump
+     */
+    protected static final void checkConfigConsistencyAndWriteToLog(Config config,
+                                                                    final String message) {
+        log.info(message);
+        String newline = System.getProperty("line.separator");// use native line endings for logfile
+        StringWriter writer = new StringWriter();
+        new ConfigWriter(config).writeStream(new PrintWriter(writer), newline);
+        log.info(newline + newline + writer.getBuffer().toString());
+        log.info("Complete config dump done.");
+        log.info("Checking consistency of config...");
+        config.checkConsistency();
+        log.info("Checking consistency of config done.");
+    }
+
+    /**
+     * Design comments:<ul>
+     * <li> This is such that ControlerListenerManager does not need to be exposed.  One may decide otherwise ...  kai, jul'12
+     * </ul>
+     */
+    public final void addControlerListener(ControlerListener l) {
+        this.controlerListenerManager.addControlerListener(l);
+    }
+
+    protected final void addCoreControlerListener(ControlerListener l) {
+        this.controlerListenerManager.addCoreControlerListener(l);
+    }
+
+
+    public final OutputDirectoryHierarchy getControlerIO() {
+        return controlerIO;
+    }
 
 
 }

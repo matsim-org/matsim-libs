@@ -125,12 +125,8 @@ public class ControlerMobsimIntegrationTest {
 		c.setCreateGraphs(false);
 		c.setDumpDataAtEnd(false);
 		c.getConfig().controler().setWriteEventsInterval(0);
-		try {
-			c.run();
-			Assert.fail("expected exception, but there was none.");
-		} catch (IllegalArgumentException e) {
-			log.info("catched expected exception.", e);
-		}
+		c.run();
+        Assert.assertNotNull("expected exception, but there was none.", c.uncaughtException);
 	}
 
 	private static class FakeControler extends Controler {
