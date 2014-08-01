@@ -95,11 +95,10 @@ public abstract class AbstractController {
     }
 
     protected final void run(Config config) {
-        // Memorize the last uncaught Exception on another Thread,
-        // because we want to log that again on shutdown.
         Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
+                // We want to shut down when any Thread dies with an Exception.
                 logMemorizeAndRequestShutdown(t, e);
             }
         });
@@ -140,7 +139,6 @@ public abstract class AbstractController {
     private void logMemorizeAndRequestShutdown(Thread t, Throwable e) {
         log.error("Getting uncaught Exception in Thread " + t.getName(), e);
         uncaughtException = e;
-        // We want to shut down when any Thread dies with an Exception.
         unexpectedShutdown.set(true);
     }
 
@@ -180,14 +178,15 @@ public abstract class AbstractController {
         OutputDirectoryLogging.closeOutputDirLogging();
     }
 
+    final String DIVIDER = "###################################################";
+    final String MARKER = "### ";
+
     private void iteration(final Config config, final int iteration) throws UnexpectedShutdownException {
-        final String divider = "###################################################";
-        final String marker = "### ";
         this.thisIteration = iteration;
         this.stopwatch.beginIteration(iteration);
 
-        log.info(divider);
-        log.info(marker + "ITERATION " + iteration + " BEGINS");
+        log.info(DIVIDER);
+        log.info(MARKER + "ITERATION " + iteration + " BEGINS");
         this.getControlerIO().createIterationDirectory(iteration);
         resetRandomNumbers(config.global().getRandomSeed(), iteration);
 
@@ -207,33 +206,12 @@ public abstract class AbstractController {
             });
         }
 
-        iterationStep("beforeMobsimListeners", new Runnable() {
-            @Override
-            public void run() {
-                controlerListenerManager.fireControlerBeforeMobsimEvent(iteration);
-            }
-        });
-
-        iterationStep("mobsim", new Runnable() {
-            @Override
-            public void run() {
-                resetRandomNumbers(config.global().getRandomSeed(), iteration);
-                runMobSim(iteration);
-            }
-        });
-
-        iterationStep("afterMobsimListeners", new Runnable() {
-            @Override
-            public void run() {
-                log.info(marker + "ITERATION " + iteration + " fires after mobsim event");
-                controlerListenerManager.fireControlerAfterMobsimEvent(iteration);
-            }
-        });
+        mobsim(config, iteration);
 
         iterationStep("scoring", new Runnable() {
             @Override
             public void run() {
-                log.info(marker + "ITERATION " + iteration + " fires scoring event");
+                log.info(MARKER + "ITERATION " + iteration + " fires scoring event");
                 controlerListenerManager.fireControlerScoringEvent(iteration);
             }
         });
@@ -241,7 +219,7 @@ public abstract class AbstractController {
         iterationStep("iterationEndsListeners", new Runnable() {
             @Override
             public void run() {
-                log.info(marker + "ITERATION " + iteration + " fires iteration end event");
+                log.info(MARKER + "ITERATION " + iteration + " fires iteration end event");
                 controlerListenerManager.fireControlerIterationEndsEvent(iteration);
             }
         });
@@ -251,8 +229,40 @@ public abstract class AbstractController {
         if (config.controler().isCreateGraphs()) {
             this.stopwatch.writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch"));
         }
-        log.info(marker + "ITERATION " + iteration + " ENDS");
-        log.info(divider);
+        log.info(MARKER + "ITERATION " + iteration + " ENDS");
+        log.info(DIVIDER);
+    }
+
+    private void mobsim(final Config config, final int iteration) throws UnexpectedShutdownException {
+        // ControlerListeners may create managed resources in
+        // beforeMobsim which need to be cleaned up in afterMobsim.
+        // Hence the finally block.
+        // For instance, ParallelEventsManagerImpl leaves Threads waiting if we don't do this
+        // and an Exception occurs in the Mobsim.
+        try {
+            iterationStep("beforeMobsimListeners", new Runnable() {
+                @Override
+                public void run() {
+                    controlerListenerManager.fireControlerBeforeMobsimEvent(iteration);
+                }
+            });
+
+            iterationStep("mobsim", new Runnable() {
+                @Override
+                public void run() {
+                    resetRandomNumbers(config.global().getRandomSeed(), iteration);
+                    runMobSim(iteration);
+                }
+            });
+        } finally {
+            iterationStep("afterMobsimListeners", new Runnable() {
+                @Override
+                public void run() {
+                    log.info(MARKER + "ITERATION " + iteration + " fires after mobsim event");
+                    controlerListenerManager.fireControlerAfterMobsimEvent(iteration);
+                }
+            });
+        }
     }
 
     private void iterationStep(String iterationStepName, Runnable iterationStep) throws UnexpectedShutdownException {
