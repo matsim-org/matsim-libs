@@ -11,6 +11,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 
+import playground.agarwalamit.patnaIndia.mixedTraffic.VehiclesConfigGroup;
+
 public class WriteConfig {
 	/**
 	 * @param args
@@ -31,10 +33,18 @@ public class WriteConfig {
 		config.counts().setOutputFormat("all");
 		config.counts().setWriteCountsInterval(100);
 		config.counts().setCountsScaleFactor(94.52); 
-		config.controler().setOutputDirectory("./patnaOutput/modeChoice/run9/");
+		config.controler().setOutputDirectory("./patnaOutput/");
+
+		//===
+		VehiclesConfigGroup vehiclesCnfGrp = new VehiclesConfigGroup("vehicles");
+		vehiclesCnfGrp.setInputFile("./patnaoutput/vehiclesPatna.xml");
+		vehiclesCnfGrp.setMainModes(mainModes);
+		config.addModule(vehiclesCnfGrp);
+		//===
+
 
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(200);
+		config.controler().setLastIteration(0);
 		config.controler().setMobsim("qsim");
 		config.controler().setWriteEventsInterval(100);
 		config.controler().setWritePlansInterval(100);
@@ -138,6 +148,6 @@ public class WriteConfig {
 		//		config.plansCalcRoute().setTeleportedModeSpeed("car", 20/3.6);
 		//		config.plansCalcRoute().setTeleportedModeSpeed("bike",10/3.6);
 
-		new ConfigWriter(config).write(config.controler().getOutputDirectory()+"/configCarMotorbikeBike.xml");
+		new ConfigWriter(config).write(config.controler().getOutputDirectory()+"/configMixTrfc.xml");
 	}
 }

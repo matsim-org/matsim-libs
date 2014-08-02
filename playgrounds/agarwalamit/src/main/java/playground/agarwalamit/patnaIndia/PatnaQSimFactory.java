@@ -24,8 +24,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -40,8 +42,10 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 
 /**
  * The MobsimFactory is necessary so that something can be passed to the controler which instantiates this.
@@ -93,26 +97,36 @@ public class PatnaQSimFactory implements MobsimFactory {
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
 
 		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
+		
+		//===
+		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
+		VehicleReaderV1 reader = new VehicleReaderV1(vehicles);
+		reader.readFile("./patnaOutput/vehiclesPatna.xml");
+		vehicles.getVehicleTypes();
+		for(Id id:vehicles.getVehicleTypes().keySet()){
+			modeVehicleTypes.put(id.toString(), vehicles.getVehicleTypes().get(id));
+		}
+		//===
 
-		VehicleType car = VehicleUtils.getFactory().createVehicleType(new IdImpl("car"));
-		car.setMaximumVelocity(60.0/3.6);
-		car.setPcuEquivalents(1.0);
-		modeVehicleTypes.put("car", car);
-
-		VehicleType motorcycle = VehicleUtils.getFactory().createVehicleType(new IdImpl("motorbike"));
-		motorcycle.setMaximumVelocity(60.0/3.6);
-		motorcycle.setPcuEquivalents(0.25);
-		modeVehicleTypes.put("motorbike", motorcycle);
-
-		VehicleType bicycle = VehicleUtils.getFactory().createVehicleType(new IdImpl("bike"));
-		bicycle.setMaximumVelocity(15.0/3.6);
-		bicycle.setPcuEquivalents(0.25);
-		modeVehicleTypes.put("bike", bicycle);
-
-		VehicleType walk = VehicleUtils.getFactory().createVehicleType(new IdImpl("walk"));
-		walk.setMaximumVelocity(1.5);
-		walk.setPcuEquivalents(0.10);  			// assumed pcu for walks is 0.1
-		modeVehicleTypes.put("walk", walk);
+//		VehicleType car = VehicleUtils.getFactory().createVehicleType(new IdImpl("car"));
+//		car.setMaximumVelocity(60.0/3.6);
+//		car.setPcuEquivalents(1.0);
+//		modeVehicleTypes.put("car", car);
+//
+//		VehicleType motorcycle = VehicleUtils.getFactory().createVehicleType(new IdImpl("motorbike"));
+//		motorcycle.setMaximumVelocity(60.0/3.6);
+//		motorcycle.setPcuEquivalents(0.25);
+//		modeVehicleTypes.put("motorbike", motorcycle);
+//
+//		VehicleType bicycle = VehicleUtils.getFactory().createVehicleType(new IdImpl("bike"));
+//		bicycle.setMaximumVelocity(15.0/3.6);
+//		bicycle.setPcuEquivalents(0.25);
+//		modeVehicleTypes.put("bike", bicycle);
+//
+//		VehicleType walk = VehicleUtils.getFactory().createVehicleType(new IdImpl("walk"));
+//		walk.setMaximumVelocity(1.5);
+//		walk.setPcuEquivalents(0.10);  			// assumed pcu for walks is 0.1
+//		modeVehicleTypes.put("walk", walk);
 
 		agentSource.setModeVehicleTypes(modeVehicleTypes);
 

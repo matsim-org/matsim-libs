@@ -129,4 +129,20 @@ public class EmissionUtilsExtended {
 		}
 		return outWarmEmiss;
 	}
+	public Map<WarmPollutant, Double> addTwoWarmEmissionsMap (Map<WarmPollutant, Double> warmEmission1,Map<WarmPollutant, Double> warmEmission2){
+		Map<WarmPollutant, Double> warmEmissionOut = new HashMap<WarmPollutant, Double>();
+		
+		for(WarmPollutant wm : warmEmission1.keySet()){
+			warmEmissionOut.put(wm, warmEmission1.get(wm)+warmEmission2.get(wm));
+		}
+		return warmEmissionOut;
+	}
+	public Map<WarmPollutant, Double> subtractTwoWarmEmissionsMap (Map<WarmPollutant, Double> warmEmissionBigger,Map<WarmPollutant, Double> warmEmissionSmaller){
+		Map<WarmPollutant, Double> warmEmissionOut = new HashMap<WarmPollutant, Double>();
+		
+		for(WarmPollutant wm : warmEmissionBigger.keySet()){
+			warmEmissionOut.put(wm, warmEmissionBigger.get(wm)-warmEmissionSmaller.get(wm));
+		}
+		return warmEmissionOut;
+	}
 }
