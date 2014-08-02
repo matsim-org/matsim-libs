@@ -203,6 +203,7 @@ public class Controler extends AbstractController {
 	}
 
 	private Controler(final String configFileName, final Config config, final Scenario scenario) {
+        this.controlerListenerManager.setControler(this);
         if (scenario != null) {
 			this.scenarioLoaded = true;
 			this.scenarioData = (ScenarioImpl) scenario;
@@ -791,7 +792,7 @@ public class Controler extends AbstractController {
 	 * @deprecated the danger represented by this method seems too great compared to
 	 * the small convenience it brings: it will thus be removed soon.
 	 * If you are sure that you want to get rid of previous results, call
-	 * {@link IOUtils.deleteDirectory( String )} on your output directory.
+	 * {@link org.matsim.core.utils.io.IOUtils#deleteDirectory(java.io.File)} on your output directory.
 	 * If you want to write stuff to the output directory before lanching the controler,
 	 * you might (i) write this stuff to another directory, or (ii) put your
 	 * IO code in a StartupListenner, to get it executed after the controler

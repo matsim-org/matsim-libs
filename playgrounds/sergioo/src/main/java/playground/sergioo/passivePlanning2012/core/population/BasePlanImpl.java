@@ -1,16 +1,6 @@
 package playground.sergioo.passivePlanning2012.core.population;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -22,11 +12,12 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
 import playground.sergioo.passivePlanning2012.api.population.BasePlan;
 import playground.sergioo.passivePlanning2012.api.population.EmptyTime;
 import playground.sergioo.passivePlanning2012.api.population.FloatActivity;
 import playground.sergioo.singapore2012.transitLocationChoice.TransitActsRemover;
+
+import java.util.*;
 
 public class BasePlanImpl implements BasePlan {
 
@@ -174,7 +165,18 @@ public class BasePlanImpl implements BasePlan {
 	public void addActivity(Activity act) {
 		planElements.add(act);
 	}
-	@Override
+
+    @Override
+    public String getType() {
+        return null;
+    }
+
+    @Override
+    public void setType(String type) {
+
+    }
+
+    @Override
 	public boolean isSelected() {
 		return this.getPerson().getSelectedPlan() == this;
 	}

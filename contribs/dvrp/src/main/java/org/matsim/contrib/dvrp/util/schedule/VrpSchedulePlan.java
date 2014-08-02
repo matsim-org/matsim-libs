@@ -19,18 +19,30 @@
 
 package org.matsim.contrib.dvrp.util.schedule;
 
-import java.util.*;
-
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.router.*;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.router.VrpPath;
+import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.schedule.DriveTask;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.core.population.*;
+import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 
 public class VrpSchedulePlan
@@ -202,6 +214,16 @@ public class VrpSchedulePlan
     public void addActivity(Activity act)
     {
         throw new UnsupportedOperationException("This plan is read-only");
+    }
+
+    @Override
+    public String getType() {
+        return null;
+    }
+
+    @Override
+    public void setType(String type) {
+
     }
 
 

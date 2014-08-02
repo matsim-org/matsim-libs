@@ -19,21 +19,17 @@
  * *********************************************************************** */
 package playground.thibautd.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * methods for easy adatpation of code in the time TripRouter
@@ -96,11 +92,6 @@ public class RoutingUtils {
 		private Person person = null;
 		private List<PlanElement> elements = null;
 
-		//public void clear() {
-		//	person = null;
-		//	elements = null;
-		//}
-
 		@Override
 		public Person getPerson() {
 			return person;
@@ -135,7 +126,17 @@ public class RoutingUtils {
 			throw new UnsupportedOperationException();
 		}
 
-		@Override
+        @Override
+        public String getType() {
+            return null;
+        }
+
+        @Override
+        public void setType(String type) {
+
+        }
+
+        @Override
 		public boolean isSelected() {
 			throw new UnsupportedOperationException();
 		}

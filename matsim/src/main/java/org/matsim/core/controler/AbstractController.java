@@ -70,13 +70,7 @@ public abstract class AbstractController {
         Gbl.printSystemInfo();
         Gbl.printBuildInfo();
         log.info("Used Controler-Class: " + this.getClass().getCanonicalName());
-
-        if (this instanceof Controler) {
-            // Extrawurst for Controler
-            this.controlerListenerManager = new ControlerListenerManager((Controler) this);
-        } else {
-            this.controlerListenerManager = new ControlerListenerManager(null);
-        }
+        this.controlerListenerManager = new ControlerListenerManager();
     }
 
 

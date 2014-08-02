@@ -235,7 +235,17 @@ public final class PopulationUtils {
 			throw new UnsupportedOperationException() ;
 		}
 
-		@Override
+        @Override
+        public String getType() {
+            return delegate.getType();
+        }
+
+        @Override
+        public void setType(String type) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
 		public void addLeg(Leg leg) {
 			throw new UnsupportedOperationException() ;
 		}

@@ -20,21 +20,17 @@
 
 package org.matsim.core.population;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class PlanImpl implements Plan {
 
@@ -203,14 +199,12 @@ public class PlanImpl implements Plan {
 		this.score = score;
 	}
 
-	/**
-	 * yy Since this now has a defined useage (last plan of given "type" is never removed), this may be elevated into the
-	 * api.  Might be called "label" instead of "type", though???  kai, mar'11
-	 */
+    @Override
 	public String getType() {
 		return this.type;
 	}
 
+    @Override
 	public void setType(final String type) {
 		this.type = type;
 	}
@@ -265,13 +259,8 @@ public class PlanImpl implements Plan {
 	 * @param in a plan who's data will be loaded into this plan
 	 **/
 	public void copyFrom(final Plan in) {
-		// TODO should be re-implemented making use of Cloneable
-		// Bloch ("effective Java") strongly advises _against_ the use of cloneable.  kai, jul'10
 		setScore(in.getScore());
-		if (in instanceof PlanImpl) {
-			this.setType(((PlanImpl) in).getType());
-		}
-//		setPerson(in.getPerson()); // do not copy person, but keep the person we're assigned to
+		this.setType(in.getType());
 		for (PlanElement pe : in.getPlanElements()) {
 			if (pe instanceof Activity) {
 				//no need to cast to ActivityImpl here

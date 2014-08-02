@@ -16,7 +16,7 @@ public class ControlerListenerManagerTest {
 
 	@Test
 	public void testAddControlerListener_ClassHierarchy() {
-		ControlerListenerManager m = new ControlerListenerManager(null);
+		ControlerListenerManager m = new ControlerListenerManager();
 		CountingControlerListener ccl = new CountingControlerListener();
 		ExtendedControlerListener ecl = new ExtendedControlerListener();
 		m.addControlerListener(ccl);
@@ -53,7 +53,7 @@ public class ControlerListenerManagerTest {
 
 	@Test
 	public void testAddCoreControlerListener_ClassHierarchy() {
-		ControlerListenerManager m = new ControlerListenerManager(null);
+		ControlerListenerManager m = new ControlerListenerManager();
 		CountingControlerListener ccl = new CountingControlerListener();
 		ExtendedControlerListener ecl = new ExtendedControlerListener();
 		m.addCoreControlerListener(ccl);
