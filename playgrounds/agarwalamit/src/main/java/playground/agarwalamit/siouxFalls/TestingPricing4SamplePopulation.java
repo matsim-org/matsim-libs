@@ -38,7 +38,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.marginalTesting.MarginalCongestionHandlerImplV3AA;
+//import playground.agarwalamit.marginalTesting.MarginalCongestionHandlerImplV3AA;
 import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 
@@ -164,19 +164,19 @@ public class TestingPricing4SamplePopulation {
 		}
 		return emissionCostFacotr*totalEmissionCost;
 	}
-	private static double[] getDelaysFromEvents(String outputDir, ScenarioImpl sc){
-		EventsManager eventManager = EventsUtils.createEventsManager();
-		MarginalCongestionHandlerImplV3AA congestionHandlerImplV3= new MarginalCongestionHandlerImplV3AA(eventManager, sc);
-
-		eventManager.addHandler(congestionHandlerImplV3);
-
-		MatsimEventsReader eventsReader = new MatsimEventsReader(eventManager);
-		String inputEventsFile = outputDir+"/ITERS/it.500/500.events.xml.gz";
-		eventsReader.readFile(inputEventsFile);
-		double flowAndStorageDelays [] = {congestionHandlerImplV3.getTotalInternalizedDelay()*vtts_car,congestionHandlerImplV3.getDelaysFromStorageCapacity()*vtts_car};
-		return flowAndStorageDelays;
-		
-	}
+//	private static double[] getDelaysFromEvents(String outputDir, ScenarioImpl sc){
+//		EventsManager eventManager = EventsUtils.createEventsManager();
+//		MarginalCongestionHandlerImplV3AA congestionHandlerImplV3= new MarginalCongestionHandlerImplV3AA(eventManager, sc);
+//
+//		eventManager.addHandler(congestionHandlerImplV3);
+//
+//		MatsimEventsReader eventsReader = new MatsimEventsReader(eventManager);
+//		String inputEventsFile = outputDir+"/ITERS/it.500/500.events.xml.gz";
+//		eventsReader.readFile(inputEventsFile);
+//		double flowAndStorageDelays [] = {congestionHandlerImplV3.getTotalInternalizedDelay()*vtts_car,congestionHandlerImplV3.getDelaysFromStorageCapacity()*vtts_car};
+//		return flowAndStorageDelays;
+//		
+//	}
 	private static double getDelaysFromEventsDefaultHandler(String outputDir, ScenarioImpl sc){
 		EventsManager eventManager = EventsUtils.createEventsManager();
 		MarginalCongestionHandlerImplV3 congestionHandlerImplV3= new MarginalCongestionHandlerImplV3(eventManager, sc);
