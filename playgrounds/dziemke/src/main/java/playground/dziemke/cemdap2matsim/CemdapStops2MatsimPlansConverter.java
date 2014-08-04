@@ -52,7 +52,8 @@ public class CemdapStops2MatsimPlansConverter {
 	private static boolean addStayHomePlan = true;
 	
 	// Input and output
-	private static String outputDirectory = "D:/Workspace/container/demand/input/cemdap2matsim/24n/";
+	//private static String outputDirectory = "D:/Workspace/container/demand/input/cemdap2matsim/24n/";
+	private static String outputDirectory = "D:/Workspace/container/demand/input/cemdap2matsim/test/";
 	private static String tazShapeFile = "D:/Workspace/container/demand/input/shapefiles/gemeindenLOR_DHDN_GK4.shp";
 	private static String networkFile = "D:/Workspace/container/demand/input/iv_counts/network-base_ext.xml";
 	
