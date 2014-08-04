@@ -48,28 +48,55 @@ public class SrVTripAnalyzer {
 		// Parameters
 		boolean useWeights = true;			//wt
 		boolean onlyCar = false;			//car
-		boolean onlyCarAndCarPool = false;	//carp
+		boolean onlyCarAndCarPool = true;	//carp
 //		double distanceFilter = 100000;		//dist
 		boolean distanceFilter = true;		//dist
+		double minDistance = 0;
 		double maxDistance = 100;
-		
-		int maxBinDuration = 120;
-	    int binWidthDuration = 5;
+			    
+//	    int maxBinDuration = 120;
+//	    int binWidthDuration = 5;
+//	    
+//	    int maxBinTime = 23;
+//	    int binWidthTime = 1;
+//	    
+//	    int maxBinDistance = 60;
+//	    int binWidthDistance = 5;
+//	    	    
+//	    int maxBinSpeed = 60;
+//	    int binWidthSpeed = 5;
+	    
+	    int maxBinDuration = 120;
+	    int binWidthDuration = 1;
 	    
 	    int maxBinTime = 23;
 	    int binWidthTime = 1;
-		
-		int maxBinDistance = 60;
-	    int binWidthDistance = 5;
 	    
+	    int maxBinDistance = 60;
+	    int binWidthDistance = 1;
+	    	    
 	    int maxBinSpeed = 60;
-	    int binWidthSpeed = 5;
+	    int binWidthSpeed = 1;
 	    
 	    
 		// Input and output files
+	    // As opposed to "TripAnalyzer", the ending of the directory (e.g. "wt") needs to be manually adjusted!
 		String inputFile = "D:/Workspace/container/srv/input/W2008_Berlin_Weekday.dat";
-		String outputDirectory = "D:/Workspace/container/srv/output/wd_all_wt/";
-
+		//String outputDirectory = "D:/Workspace/container/srv/output/wd_all_wt/";
+//		String outputDirectory = "D:/Workspace/container/srv/output/wd_all_dist_wt/";
+		
+		//--------------------------------------------------------------------------------------------------------------
+		String outputDirectory = "D:/Workspace/container/srv/output/wd_carp";
+		
+		if (distanceFilter == true) {
+			outputDirectory = outputDirectory + "_dist";
+		}
+		
+		outputDirectory = outputDirectory + "_wt";
+		outputDirectory = outputDirectory + "_new";
+		outputDirectory = outputDirectory + "/";
+		//--------------------------------------------------------------------------------------------------------------
+		
 		
 		// parse the input file
 		log.info("Parsing " + inputFile + ".");		
@@ -154,9 +181,12 @@ public class SrVTripAnalyzer {
 		    // distance filter
 		    double tripDistanceBeeline = trip.getDistanceBeeline();
 		    if (distanceFilter == true && tripDistanceBeeline >= maxDistance) {
-//		    if (tripDistanceBeeline >= distanceFilter) {
 		    	considerTrip = false;
 		    }
+		    
+//		    if (distanceFilter == true && tripDistanceBeeline <= minDistance) {
+//			    considerTrip = false;
+//			}
 		    
 		    
 		    if (considerTrip == true) {		    		
@@ -312,6 +342,13 @@ public class SrVTripAnalyzer {
 	    writer.writeToFileIntegerKey(averageTripSpeedProvidedMap, outputDirectory + "averageTripSpeedProvided.txt", binWidthSpeed, aggregateWeightTripSpeedProvided, averageOfAverageTripSpeedsProvided);
 	    
 	    
+	    //----------------------------------------------------------------------------------------------------------------------
+	    writer.writeToFileIntegerKeyCumulative(tripDurationMap, outputDirectory + "tripDurationCumulative.txt", binWidthDuration, aggregateWeightTripDuration, averageTime);
+	    writer.writeToFileIntegerKeyCumulative(tripDistanceBeelineMap, outputDirectory + "tripDistanceBeelineCumulative.txt", binWidthDistance, aggregateWeightTripDistanceBeeline, averageTripDistanceBeeline);
+	    writer.writeToFileIntegerKeyCumulative(averageTripSpeedBeelineMap, outputDirectory + "averageTripSpeedBeelineCumulative.txt", binWidthSpeed, aggregateWeightTripSpeedBeeline, averageOfAverageTripSpeedsBeeline);
+	    //----------------------------------------------------------------------------------------------------------------------
+	    
+	    
 	    // write a routed distance vs. beeline distance comparison file
 	    writer.writeComparisonFile(distanceRoutedMap, distanceBeelineMap, outputDirectory + "beeline.txt", tripCounter);
 
@@ -324,24 +361,42 @@ public class SrVTripAnalyzer {
 	private static void addToMapIntegerKey(Map <Integer, Double> map, double inputValue,
 			int binWidth, int limitOfLastBin, double weight) {
 		double inputValueBin = inputValue / binWidth;
-		int floorOfLastBin = limitOfLastBin / binWidth;
-		// Math.floor returns next lower integer number (but as a double value)
-		int floorOfValue = (int)Math.floor(inputValueBin);
-		if (floorOfValue < 0) {
+//		int floorOfLastBin = limitOfLastBin / binWidth;
+//		// Math.floor returns next lower integer number (but as a double value)
+//		int floorOfValue = (int)Math.floor(inputValueBin);
+//		if (floorOfValue < 0) {
+//			System.err.println("Lower end of bin may not be smaller than zero!");
+//		}
+//		
+//		if (floorOfValue >= floorOfLastBin) {
+//			floorOfValue = floorOfLastBin;
+//		}
+//		
+//		if (!map.containsKey(floorOfValue)) {
+//			map.put(floorOfValue, weight);
+//		} else {
+//			double value = map.get(floorOfValue);
+//			value = value + weight;
+//			map.put(floorOfValue, value);
+//		}
+		
+		// Math.ceil returns the higher integer number (but as a double value)
+		int ceilOfValue = (int)Math.ceil(inputValueBin);
+		if (ceilOfValue < 0) {
 			System.err.println("Lower end of bin may not be smaller than zero!");
 		}
 		
-		if (floorOfValue >= floorOfLastBin) {
-			floorOfValue = floorOfLastBin;
-		}
-		
-		if (!map.containsKey(floorOfValue)) {
-			map.put(floorOfValue, weight);
+//		if (ceilOfValue >= floorOfLastBin) {
+//			ceilOfValue = floorOfLastBin;
+//		}
+				
+		if (!map.containsKey(ceilOfValue)) {
+			map.put(ceilOfValue, weight);
 		} else {
-			double value = map.get(floorOfValue);
+			double value = map.get(ceilOfValue);
 			value = value + weight;
-			map.put(floorOfValue, value);
-		}
+			map.put(ceilOfValue, value);
+		}			
 	}
 	
 	
