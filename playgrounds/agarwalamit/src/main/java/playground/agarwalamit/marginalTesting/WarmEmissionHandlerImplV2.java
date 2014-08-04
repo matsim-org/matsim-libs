@@ -22,20 +22,21 @@ package playground.agarwalamit.marginalTesting;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
@@ -44,12 +45,16 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
@@ -71,7 +76,7 @@ LinkLeaveEventHandler,
 TransitDriverStartsEventHandler,
 PersonArrivalEventHandler, 
 PersonDepartureEventHandler,
-ActivityEndEventHandler,
+ActivityStartEventHandler,
 PersonStuckEventHandler{
 	private static final Logger log = Logger.getLogger(WarmEmissionHandlerImplV2.class);
 
@@ -109,6 +114,7 @@ PersonStuckEventHandler{
 	double delayNotInternalized_roundingErrors = 0.0;
 	double delayNotInternalized_spillbackNoCausingAgent = 0.0;
 	private final Map<Id, Double> agentId2storageDelay = new HashMap<Id, Double>();
+	private final Map<Id, Id> agentId2CausingLink = new HashMap<Id, Id>();
 	private final EmissionUtilsExtended eu = new EmissionUtilsExtended();
 	private final Map<Id, Map<WarmPollutant, Double>> personId2StorageEmission = new HashMap<Id, Map<WarmPollutant,Double>>();
 	//===
@@ -183,7 +189,7 @@ PersonStuckEventHandler{
 	}
 
 	@Override
-	public void handleEvent(ActivityEndEvent event) {
+	public void handleEvent(ActivityStartEvent event) { // TODO [AA] I think, it should be activity Start event not end event.
 
 		if (this.agentId2storageDelay.get(event.getPersonId()) == null) {
 			// skip that person
@@ -232,7 +238,8 @@ PersonStuckEventHandler{
 				collectLinkInfos(event.getLinkId());
 			}
 
-			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());	
+			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+			linkInfo.getEnteringAgents().add(event.getPersonId());
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getVehicleId(), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
 			linkInfo.getPersonId2linkEnterTime().put(event.getVehicleId(), event.getTime());
 		}	
@@ -340,15 +347,15 @@ PersonStuckEventHandler{
 				// Clear tracking of persons leaving that link previously.
 				double lastLeavingFromThatLink = getLastLeavingTime(linkInfo.getPersonId2linkLeaveTime());
 				double earliestLeaveTime = lastLeavingFromThatLink + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
-			
+
 				if (event.getTime() > Math.floor(earliestLeaveTime)+1 ){// Flow congestion has disappeared on that link.
-			
+
 					// Deleting the information of agents previously leaving that link.
 					linkInfo.getLeavingAgents().clear();
 					linkInfo.getPersonId2linkLeaveTime().clear();
 				}
 			}
-			
+
 			calculateCongestion(event,stopAndGoWarmEmission);
 
 			linkInfo.getLeavingAgents().add(event.getVehicleId());
@@ -357,6 +364,9 @@ PersonStuckEventHandler{
 			linkInfo.setLastLeavingAgent(event.getVehicleId());
 			linkInfo.getPersonId2freeSpeedLeaveTime().remove(event.getVehicleId());
 		}//===
+
+
+
 	}
 
 	public int getLinkLeaveCnt() {
@@ -391,7 +401,7 @@ PersonStuckEventHandler{
 		double delayToPayFor = totalDelay;
 		for (Id id : reverseList){
 			if (delayToPayFor > linkInfo.getMarginalDelayPerLeavingVehicle_sec()) {
-				Map<WarmPollutant, Double> emissionCorrespondingToDelays = new HashMap<WarmPollutant, Double>();;
+				Map<WarmPollutant, Double> emissionCorrespondingToDelays = new HashMap<WarmPollutant, Double>();
 				if (event.getVehicleId().toString().equals(id.toString())) {
 					//						log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
 				} else {
@@ -428,8 +438,67 @@ PersonStuckEventHandler{
 			if (this.allowForStorageCapacityConstraint) {
 				if (this.calculateStorageCapacityConstraints) {
 					// Saving the delay resulting from the storage capacity constraint for later when reaching the bottleneck link.
-					this.agentId2storageDelay.put(event.getVehicleId(), delayToPayFor);
-					personId2StorageEmission.put(event.getVehicleId(), emissionsToPayFor);
+
+					if(reverseList.isEmpty()){
+						this.agentId2storageDelay.put(event.getVehicleId(), delayToPayFor);
+						this.agentId2CausingLink.put(event.getVehicleId(), getNextLinkInRoute(event));
+						personId2StorageEmission.put(event.getVehicleId(), emissionsToPayFor);
+					} else {
+						for(Id id:reverseList){
+							if(!this.agentId2CausingLink.containsKey(id)){
+								this.agentId2storageDelay.put(event.getVehicleId(), delayToPayFor);
+								this.agentId2CausingLink.put(event.getVehicleId(), getNextLinkInRoute(event));
+								personId2StorageEmission.put(event.getVehicleId(), emissionsToPayFor);
+								break;
+							} else { //
+								Id nextLinkForPerson = getNextLinkInRoute(event);
+								if(nextLinkForPerson.equals(this.agentId2CausingLink.get(id))) {
+									this.agentId2storageDelay.put(event.getVehicleId(), delayToPayFor);
+									this.agentId2CausingLink.put(event.getVehicleId(), this.agentId2CausingLink.get(id));
+									personId2StorageEmission.put(event.getVehicleId(), emissionsToPayFor);
+									return;
+								} else {
+									// repeat the charging steps.
+									LinkCongestionInfo linkInfo2 = linkId2congestionInfo.get(this.agentId2CausingLink.get(id));
+									List<Id> linkIdList = new ArrayList<Id>(); 
+									linkIdList = linkInfo2.getEnteringAgents();
+									Collections.reverse(linkIdList);
+									Iterator< Id> linkIdListIterator = linkIdList.iterator();
+									do{
+										Id newId = linkIdListIterator.next();
+									if (delayToPayFor > linkInfo2.getMarginalDelayPerLeavingVehicle_sec()) {
+										Map<WarmPollutant, Double> emissionCorrespondingToDelays = new HashMap<WarmPollutant, Double>();;
+										if (event.getVehicleId().toString().equals(newId.toString())) {
+											//						log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
+										} else {
+											// using the time when the causing agent entered the link
+											this.totalInternalizedDelay = this.totalInternalizedDelay + linkInfo2.getMarginalDelayPerLeavingVehicle_sec();
+											emissionCorrespondingToDelays = getDelaysEquivalentEmissions(linkInfo2.getMarginalDelayPerLeavingVehicle_sec()/delayToPayFor, emissionsToPayFor);
+											warmEmissionAnalysisModule.throwWarmEmissionEvent(event.getTime(), event.getLinkId(), event.getVehicleId(), emissionCorrespondingToDelays);
+										}
+										delayToPayFor = delayToPayFor - linkInfo2.getMarginalDelayPerLeavingVehicle_sec();
+										emissionsToPayFor = eu.subtractTwoWarmEmissionsMap(emissionsToPayFor, emissionCorrespondingToDelays);
+									} else if(delayToPayFor > 0){
+										if (event.getVehicleId().toString().equals(newId.toString())) {
+											//							log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
+										} else {
+											// using the time when the causing agent entered the link
+											this.totalInternalizedDelay = this.totalInternalizedDelay + delayToPayFor;
+											warmEmissionAnalysisModule.throwWarmEmissionEvent(event.getTime(), event.getLinkId(), event.getVehicleId(), emissionsToPayFor);
+										}
+										delayToPayFor = 0.;
+										emissionsToPayFor = new HashMap<WarmPollutant, Double>();
+									}
+
+								}while(linkIdListIterator.hasNext() && delayToPayFor>0);
+								}
+								if(delayToPayFor>0.) {
+									log.error("'Delays to pay for' is still more than zero. It means, delays due to storage capacity is not internalized correctly. Check!!!");
+								}
+
+							}
+						}
+					}
 				} else {
 					this.delay_storageCapacity+=delayToPayFor;
 					this.delayNotInternalized_storageCapacity += delayToPayFor;
@@ -441,6 +510,29 @@ PersonStuckEventHandler{
 						"; this delay and corresponding emissions are not carried over further. Aborting...");
 			}
 		}
+	}
+
+	private Id getNextLinkInRoute(LinkLeaveEvent event){
+		List<PlanElement> planElements = scenario.getPopulation().getPersons().get(event.getPersonId()).getSelectedPlan().getPlanElements();
+		List<Id> linkIds = new ArrayList<Id>();
+		for(PlanElement pe :planElements){
+			if(pe instanceof Leg){
+				Leg leg = (Leg)pe; // TODO [AA] check here if following route is for required activity only ??
+				NetworkRoute nRoute = ((NetworkRoute)((Leg)pe).getRoute()); 
+				linkIds.add(nRoute.getStartLinkId());
+				linkIds.addAll(nRoute.getLinkIds());
+				linkIds.add(nRoute.getEndLinkId());
+			}
+		}
+		Id nextLinkInRoute =  new IdImpl("NA") ;
+		Iterator<Id> it = linkIds.iterator();
+		do{
+			if (it.next().equals(event.getLinkId())) {
+				nextLinkInRoute = it.next();
+				break;
+			}
+		} while(it.hasNext());
+		return nextLinkInRoute;
 	}
 
 	private void collectLinkInfos(Id linkId) {
@@ -489,6 +581,7 @@ PersonStuckEventHandler{
 			totalDelayWithDelaysOnPreviousLinks = delayOnThisLink + this.agentId2storageDelay.get(event.getVehicleId());
 			emissionsWithDelaysOnPreviousLinks = eu.addTwoWarmEmissionsMap(stopAndGoWarmEmissionOnThisLink, personId2StorageEmission.get(event.getVehicleId()));
 			this.agentId2storageDelay.put(event.getVehicleId(), 0.);
+			this.agentId2CausingLink.put(event.getVehicleId(), null);
 			personId2StorageEmission.put(event.getVehicleId(), new HashMap<WarmPollutant, Double>());
 		}
 
