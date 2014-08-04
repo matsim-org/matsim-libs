@@ -30,30 +30,45 @@ public class TripAnalyzer {
 	public static void main(String[] args) {
 	    // Parameters
 		boolean onlyInterior = false;		//int
-		boolean onlyBerlinBased = false;		//ber
-		boolean distanceFilter = false;		//dist
-		double maxDistance = 1000000;
+		boolean onlyBerlinBased = true;		//ber
+		boolean distanceFilter = true;		//dist
+		double maxDistance = 100;
+		double minDistance = 0;
 		Integer planningAreaId = 11000000;
 		
-		String runId = "run_142";
+		String runId = "run_145";
 		//String runId = "run_20";
 	    String usedIteration = "150";
+	    //String usedIteration = "100";
+	    
+//	    int maxBinDuration = 120;
+//	    int binWidthDuration = 5;
+//	    
+//	    int maxBinTime = 23;
+//	    int binWidthTime = 1;
+//	    
+//	    int maxBinDistance = 60;
+//	    int binWidthDistance = 5;
+//	    	    
+//	    int maxBinSpeed = 60;
+//	    int binWidthSpeed = 5;
 	    
 	    int maxBinDuration = 120;
-	    int binWidthDuration = 5;
+	    int binWidthDuration = 1;
 	    
 	    int maxBinTime = 23;
 	    int binWidthTime = 1;
 	    
 	    int maxBinDistance = 60;
-	    int binWidthDistance = 5;
+	    int binWidthDistance = 1;
 	    	    
 	    int maxBinSpeed = 60;
-	    int binWidthSpeed = 5;
+	    int binWidthSpeed = 1;
 	    
 	    
 	    // Input and output files
-	    String networkFile = "D:/Workspace/container/demand/input/iv_counts/network.xml";  
+	    //String networkFile = "D:/Workspace/container/demand/input/iv_counts/network.xml";
+	    String networkFile = "D:/Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 	    //String eventsFile = "D:/Workspace/container/demand/output/beeline/" + runId + "/ITERS/it." + usedIteration + "/" 
 		//		+ runId + "." + usedIteration + ".events.xml.gz";
 	    String eventsFile = "D:/Workspace/container/demand/output/" + runId + "/ITERS/it." + usedIteration + "/" 
@@ -80,6 +95,10 @@ public class TripAnalyzer {
 		if (distanceFilter == true) {
 			outputDirectory = outputDirectory + "_dist";
 		}
+		
+		//--------------------------------------------------------------------------------------------------------------
+		outputDirectory = outputDirectory + "_new";
+		//--------------------------------------------------------------------------------------------------------------
 	    	        
 
 		// Create an EventsManager instance (MATSim infrastructure)
@@ -130,9 +149,11 @@ public class TripAnalyzer {
 	    
 		Map <Integer, Double> averageTripSpeedRoutedMap = new TreeMap <Integer, Double>();
 	    double aggregateOfAverageTripSpeedsRouted = 0.;
+	    //TODO
 	    
 	    Map <Integer, Double> averageTripSpeedBeelineMap = new TreeMap <Integer, Double>();
 	    double aggregateOfAverageTripSpeedsBeeline = 0.;
+	    double tripCounterSpeedBeeline = 0.;
 
 	    int numberOfTripsWithNoCalculableSpeed = 0;
 	    
@@ -188,6 +209,10 @@ public class TripAnalyzer {
 	    		if (distanceFilter == true && tripDistanceBeeline >= maxDistance) {
 	    			considerTrip = false;
 	    		}
+	    		
+//	    		if (distanceFilter == true && tripDistanceBeeline <= minDistance) {
+//	    			considerTrip = false;
+//	    		}
 	    		
 	    		
 	    		if (considerTrip == true) {
@@ -250,7 +275,8 @@ public class TripAnalyzer {
 			    		double averageTripSpeedBeeline = tripDistanceBeeline / tripDurationInHours;
 			    		//addToMapIntegerKey(averageTripSpeedBeelineMap, averageTripSpeedBeeline, 5, 60);
 			    		addToMapIntegerKey(averageTripSpeedBeelineMap, averageTripSpeedBeeline, binWidthSpeed, maxBinSpeed);
-			    		aggregateOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline + averageTripSpeedBeeline;		    		
+			    		aggregateOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline + averageTripSpeedBeeline;
+			    		tripCounterSpeedBeeline = tripCounterSpeedBeeline + 1.;
 		    		} else {
 		    			numberOfTripsWithNoCalculableSpeed++;
 		    		}
@@ -268,7 +294,8 @@ public class TripAnalyzer {
 	    double averageTripDistanceRouted = aggregateTripDistanceRouted / tripCounter;
 	    double averageTripDistanceBeeline = aggregateTripDistanceBeeline / tripCounter;
 	    double averageOfAverageTripSpeedsRouted = aggregateOfAverageTripSpeedsRouted / tripCounter;
-	    double averageOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline / tripCounter;
+	    //double averageOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline / tripCounter;
+	    double averageOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline / tripCounterSpeedBeeline;
 	    
 	    
 	    // write results to files
@@ -280,7 +307,15 @@ public class TripAnalyzer {
 	    writer.writeToFileIntegerKey(tripDistanceRoutedMap, outputDirectory + "/tripDistanceRouted.txt", binWidthDistance, tripCounter, averageTripDistanceRouted);
 	    writer.writeToFileIntegerKey(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeeline.txt", binWidthDistance, tripCounter, averageTripDistanceBeeline);
 	    writer.writeToFileIntegerKey(averageTripSpeedRoutedMap, outputDirectory + "/averageTripSpeedRouted.txt", binWidthSpeed, tripCounter, averageOfAverageTripSpeedsRouted);
-	    writer.writeToFileIntegerKey(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeeline.txt", binWidthSpeed, tripCounter, averageOfAverageTripSpeedsBeeline);
+	    //writer.writeToFileIntegerKey(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeeline.txt", binWidthSpeed, tripCounter, averageOfAverageTripSpeedsBeeline);
+	    writer.writeToFileIntegerKey(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeeline.txt", binWidthSpeed, tripCounterSpeedBeeline, averageOfAverageTripSpeedsBeeline);
+	    
+	    
+	    //------------------------------------------------------------------------------------------------------------
+	    writer.writeToFileIntegerKeyCumulative(tripDurationMap, outputDirectory + "/tripDurationCumulative.txt", binWidthDuration, tripCounter, averageTripDuration);
+	    writer.writeToFileIntegerKeyCumulative(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeelineCumulative.txt", binWidthDistance, tripCounter, averageTripDistanceBeeline);
+	    writer.writeToFileIntegerKeyCumulative(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeelineCumulative.txt", binWidthSpeed, tripCounterSpeedBeeline, averageOfAverageTripSpeedsBeeline);
+	    //------------------------------------------------------------------------------------------------------------
 	    
 	    
 	    // write a routed distance vs. beeline distance comparison file
@@ -308,23 +343,41 @@ public class TripAnalyzer {
 			int binWidth, int limitOfLastBin) {
 		double inputValueBin = inputValue / binWidth;
 		int floorOfLastBin = limitOfLastBin / binWidth;
-		// Math.floor returns next lower integer number (but as a double value)
-		int floorOfValue = (int)Math.floor(inputValueBin);
-		if (floorOfValue < 0) {
+//		// Math.floor returns next lower integer number (but as a double value)
+//		int floorOfValue = (int)Math.floor(inputValueBin);
+//		if (floorOfValue < 0) {
+//			System.err.println("Lower end of bin may not be smaller than zero!");
+//		}
+//		
+//		if (floorOfValue >= floorOfLastBin) {
+//			floorOfValue = floorOfLastBin;
+//		}
+//		
+//		if (!map.containsKey(floorOfValue)) {
+//			map.put(floorOfValue, 1.);
+//		} else {
+//			double value = map.get(floorOfValue);
+//			value++;
+//			map.put(floorOfValue, value);
+//		}
+		
+		// Math.ceil returns the higher integer number (but as a double value)
+		int ceilOfValue = (int)Math.ceil(inputValueBin);
+		if (ceilOfValue < 0) {
 			System.err.println("Lower end of bin may not be smaller than zero!");
 		}
-		
-		if (floorOfValue >= floorOfLastBin) {
-			floorOfValue = floorOfLastBin;
-		}
-		
-		if (!map.containsKey(floorOfValue)) {
-			map.put(floorOfValue, 1.);
+				
+//		if (ceilOfValue >= floorOfLastBin) {
+//			ceilOfValue = floorOfLastBin;
+//		}
+						
+		if (!map.containsKey(ceilOfValue)) {
+			map.put(ceilOfValue, 1.);
 		} else {
-			double value = map.get(floorOfValue);
+			double value = map.get(ceilOfValue);
 			value++;
-			map.put(floorOfValue, value);
-		}
+			map.put(ceilOfValue, value);
+		}			
 	}
 	
 	

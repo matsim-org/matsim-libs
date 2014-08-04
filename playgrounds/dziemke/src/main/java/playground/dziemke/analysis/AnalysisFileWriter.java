@@ -36,6 +36,7 @@ public class AnalysisFileWriter {
 			double countDifference = Math.abs(writeCounter - aggregateWeight);
     		if (countDifference >1.) {
     			System.err.println("Weighted number of trips in " + outputFile + " is not equal to aggregate weight!");
+    			System.err.println("writeCounter: " + writeCounter + "; aggregateWeight: " + aggregateWeight);
     		}
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
@@ -53,6 +54,54 @@ public class AnalysisFileWriter {
         }
 		System.out.println("Analysis file " + outputFile + " written.");
 	}
+	
+	
+	//-----------------------------------------------------------------------------------------------------------------------
+	public void writeToFileIntegerKeyCumulative(Map<Integer, Double> map, String outputFile, int binWidth, double aggregateWeight, double average) {
+		BufferedWriter bufferedWriter = null;
+		
+		try {
+            File output = new File(outputFile);
+    		FileWriter fileWriter = new FileWriter(output);
+    		bufferedWriter = new BufferedWriter(fileWriter);
+    		
+    		double writeCounter = 0.;
+    		double cumulativeValue = 0.;
+    		
+    		for (int key : map.keySet()) {
+    			int binCaption = key * binWidth;
+    			double value = map.get(key);
+    			cumulativeValue = cumulativeValue + value;
+    			bufferedWriter.write(binCaption + "+" + "\t" + cumulativeValue + "\t" + cumulativeValue/aggregateWeight);
+    			writeCounter = writeCounter + value;
+    			bufferedWriter.newLine();
+    		}
+    		bufferedWriter.write("Average = " + average);
+			bufferedWriter.newLine();
+			bufferedWriter.write("Sum = " + writeCounter);
+    		
+			double countDifference = Math.abs(writeCounter - aggregateWeight);
+    		if (countDifference >1.) {
+    			System.err.println("Weighted number of trips in " + outputFile + " is not equal to aggregate weight!");
+    			System.err.println("writeCounter: " + writeCounter + "; aggregateWeight: " + aggregateWeight);
+    		}
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                if (bufferedWriter != null) {
+                    bufferedWriter.flush();
+                    bufferedWriter.close();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+		System.out.println("Analysis file " + outputFile + " written.");
+	}
+	//-----------------------------------------------------------------------------------------------------------------------
 	
 	
 	// file writer for data that has a string (e.g. an activity name) as key
@@ -77,6 +126,7 @@ public class AnalysisFileWriter {
     		double countDifference = Math.abs(writeCounter - aggregateWeight);
     		if (countDifference >1.) {
     			System.err.println("Weighted number of trips in " + outputFile + " is not equal to aggregate weight!");
+    			System.err.println("writeCounter: " + writeCounter + "; aggregateWeight: " + aggregateWeight);
     		}
 	    } catch (FileNotFoundException ex) {
 	        ex.printStackTrace();
