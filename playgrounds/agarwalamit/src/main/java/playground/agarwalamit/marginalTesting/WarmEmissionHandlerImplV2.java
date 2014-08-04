@@ -461,7 +461,7 @@ PersonStuckEventHandler{
 									// repeat the charging steps.
 									LinkCongestionInfo linkInfo2 = linkId2congestionInfo.get(this.agentId2CausingLink.get(id));
 									List<Id> linkIdList = new ArrayList<Id>(); 
-									linkIdList = linkInfo2.getEnteringAgents();
+									linkIdList.addAll(linkInfo2.getEnteringAgents());
 									Collections.reverse(linkIdList);
 									Iterator< Id> linkIdListIterator = linkIdList.iterator();
 									do{
