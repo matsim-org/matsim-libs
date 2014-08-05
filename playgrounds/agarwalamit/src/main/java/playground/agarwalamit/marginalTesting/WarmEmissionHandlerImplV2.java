@@ -67,7 +67,6 @@ import playground.agarwalamit.siouxFalls.emissionAnalyzer.EmissionUtilsExtended;
 
 /**
  * @author amit
- *
  */
 public class WarmEmissionHandlerImplV2 implements 
 LinkEnterEventHandler, 
@@ -189,7 +188,9 @@ PersonStuckEventHandler{
 	}
 
 	@Override
-	public void handleEvent(ActivityStartEvent event) { // TODO [AA] I think, it should be activity Start event not end event.
+	public void handleEvent(ActivityStartEvent event) { 
+		// TODO [AA] I think, it should be activity Start event not end event.
+		//Now, I do not even need this.
 
 		if (this.agentId2storageDelay.get(event.getPersonId()) == null) {
 			// skip that person
@@ -214,7 +215,6 @@ PersonStuckEventHandler{
 				// no one entered or left this link before
 				collectLinkInfos(event.getLinkId());
 			}
-
 			LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
 			linkInfo.getPersonId2linkEnterTime().put(event.getPersonId(), event.getTime());
@@ -433,9 +433,13 @@ PersonStuckEventHandler{
 
 		double delayToPayFor =this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(event.getVehicleId()); 
 		if(delayToPayFor>0) {
-			for (Id id : reverseList){
-				chargingForDelaysAndThrowingEvents(linkInfo.getMarginalDelayPerLeavingVehicle_sec(), event, id);
+			Iterator< Id> personIdListIterator = reverseList.iterator();
+			while (personIdListIterator.hasNext() && delayToPayFor>0){
+				Id chargedPersonId = personIdListIterator.next();
+				chargingForDelaysAndThrowingEvents(linkInfo.getMarginalDelayPerLeavingVehicle_sec(), event, chargedPersonId);
+				delayToPayFor = this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(event.getVehicleId());
 			}
+			//while(personIdListIterator.hasNext() && delayToPayFor>0);
 		} else if(delayToPayFor==0) return;
 		else throw new RuntimeException("Delays can not be negative, do a consistency check.");
 
@@ -468,15 +472,9 @@ PersonStuckEventHandler{
 						}while(personIdListIterator.hasNext() && delayToPayFor>0);
 
 					} else {
-						for(Id id:reverseList){
-							if(!this.agentId2CausingLink.containsKey(id)){ // causing link for person is not stored yet. or if last left person is not a causing agent
-								//								this.agentId2storageDelay.put(event.getVehicleId(), delayToPayFor);
-								//								this.agentId2CausingLink.put(event.getVehicleId(), getNextLinkInRoute(event));
-								//								personId2StorageEmission.put(event.getVehicleId(), emissionsToPayFor);
-								throw new RuntimeException("I do not understand what's going on here or why do I need this? Need to recheck.");
-								//								break;
-
-							} else { 
+						for(Id id:reverseList){ 
+							// iterate until causing link is identified.
+							if(this.agentId2CausingLink.containsKey(id)){ 
 								Id causingLinkId = this.agentId2CausingLink.get(id);
 								LinkCongestionInfoExtended linkInfoForCausingLink = linkId2congestionInfo.get(causingLinkId);
 								List<Id> personIdToBeChargedList = new ArrayList<Id>(linkInfoForCausingLink.getEnteringAgents()); 
