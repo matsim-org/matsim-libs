@@ -63,11 +63,10 @@ import org.matsim.vehicles.Vehicles;
 
 import playground.agarwalamit.marginalTesting.WarmEmissionAnalysisModuleImplV2.WarmEmissionAnalysisModuleParameter;
 import playground.agarwalamit.siouxFalls.emissionAnalyzer.EmissionUtilsExtended;
-import playground.ikaddoura.internalizationCar.LinkCongestionInfo;
 
 
 /**
- * @author amit after benjamin, ihab
+ * @author amit
  *
  */
 public class WarmEmissionHandlerImplV2 implements 
@@ -106,7 +105,7 @@ PersonStuckEventHandler{
 	ScenarioImpl scenario;
 	EventsManager emissionEventsManager;
 	final List<Id> ptVehicleIDs = new ArrayList<Id>();
-	final Map<Id, LinkCongestionInfo> linkId2congestionInfo = new HashMap<Id, LinkCongestionInfo>();
+	final Map<Id, LinkCongestionInfoExtended> linkId2congestionInfo = new HashMap<Id, LinkCongestionInfoExtended>();
 
 	double totalInternalizedDelay = 0.0;
 	double totalDelay = 0.0;
@@ -170,7 +169,8 @@ PersonStuckEventHandler{
 
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
-		log.warn("An agent is stucking. No garantee for right calculation of external congestion effects: " + event.toString());
+		log.warn("An agent is stucking. No garantee for right calculation of external congestion effects "
+				+ "because there are no linkLeaveEvents for stucked agents.: " + event.toString());
 	}
 
 	@Override
@@ -215,7 +215,7 @@ PersonStuckEventHandler{
 				collectLinkInfos(event.getLinkId());
 			}
 
-			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+			LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
 			linkInfo.getPersonId2linkEnterTime().put(event.getPersonId(), event.getTime());
 		}
@@ -238,7 +238,7 @@ PersonStuckEventHandler{
 				collectLinkInfos(event.getLinkId());
 			}
 
-			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+			LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 			linkInfo.getEnteringAgents().add(event.getPersonId());
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getVehicleId(), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
 			linkInfo.getPersonId2linkEnterTime().put(event.getVehicleId(), event.getTime());
@@ -320,8 +320,6 @@ PersonStuckEventHandler{
 					linkLength,
 					travelTime,
 					vehicleInformation);
-			log.info("Warm emissions have two parts, 1) own emissions 2) emissions caused by other users and therefore others should be charged for emissions 2).");
-			// here throw two warm emissions events 1)for freeFlowWarmEmission 2) for stopAndGoWarmEmission
 			Map<WarmPollutant, Double> freeFlowWarmEmission = new HashMap<WarmPollutant, Double>(); // Agent, itself will pay for these emissions
 
 
@@ -335,14 +333,13 @@ PersonStuckEventHandler{
 		if (this.ptVehicleIDs.contains(event.getVehicleId())){
 			log.warn("Public transport mode. Mixed traffic is not tested.");
 
-		} else {
-			// car!
+		} else { // car!
 			if (this.linkId2congestionInfo.get(event.getLinkId()) == null){
 				// no one left this link before
 				collectLinkInfos(event.getLinkId());
 			}
 
-			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+			LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 			if (linkInfo.getLeavingAgents().size() != 0) {
 				// Clear tracking of persons leaving that link previously.
 				double lastLeavingFromThatLink = getLastLeavingTime(linkInfo.getPersonId2linkLeaveTime());
@@ -364,138 +361,137 @@ PersonStuckEventHandler{
 			linkInfo.setLastLeavingAgent(event.getVehicleId());
 			linkInfo.getPersonId2freeSpeedLeaveTime().remove(event.getVehicleId());
 		}//===
-
-
-
 	}
 
-	public int getLinkLeaveCnt() {
-		return linkLeaveCnt;
-	}
-	public int getLinkLeaveWarnCnt() {
-		return linkLeaveFirstActWarnCnt;
-	}
+	private void calculateCongestion(LinkLeaveEvent event, Map<WarmPollutant, Double> stopAndGoWarmEmissionOnThisLink) {
 
-	public WarmEmissionAnalysisModuleImplV2 getWarmEmissionAnalysisModule(){
-		return warmEmissionAnalysisModule;
-	}
+		LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+		double delayOnThisLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
+		linkInfo.getPersonId2DelaysToPayFor().put(event.getVehicleId(), delayOnThisLink);
+		linkInfo.getPersonId2WarmEmissionsToPayFor().put(event.getVehicleId(), stopAndGoWarmEmissionOnThisLink);
+		this.totalDelay = this.totalDelay + delayOnThisLink;
 
-	private Map<WarmPollutant, Double> getDelaysEquivalentEmissions(double delaysRatio, Map<WarmPollutant, Double> emissionsIn){
-		Map<WarmPollutant, Double> emissionsOut = new HashMap<WarmPollutant, Double>();
+		// Check if this (affected) agent was previously delayed without internalizing the delay.
+		double totalDelayWithDelaysOnPreviousLinks = 0.;
+		Map<WarmPollutant, Double> emissionsWithDelaysOnPreviousLinks = new HashMap<WarmPollutant, Double>();
 
-		for(WarmPollutant wm : emissionsIn.keySet()){
-			emissionsOut.put(wm, delaysRatio*emissionsIn.get(wm));
+		if (this.agentId2storageDelay.get(event.getVehicleId()) == null) {
+			totalDelayWithDelaysOnPreviousLinks = delayOnThisLink;
+			emissionsWithDelaysOnPreviousLinks = stopAndGoWarmEmissionOnThisLink;
+		} else {
+			//			totalDelayWithDelaysOnPreviousLinks = delayOnThisLink + this.agentId2storageDelay.get(event.getVehicleId());
+			//			emissionsWithDelaysOnPreviousLinks = eu.addTwoWarmEmissionsMap(stopAndGoWarmEmissionOnThisLink, personId2StorageEmission.get(event.getVehicleId()));
+			//			this.agentId2storageDelay.put(event.getVehicleId(), 0.);
+			//			this.agentId2CausingLink.put(event.getVehicleId(), null);
+			//			personId2StorageEmission.put(event.getVehicleId(), new HashMap<WarmPollutant, Double>());
+			throw new RuntimeException("Storage delays are charged at the same moment; they are not stored any more.");
 		}
-		return emissionsOut;
+
+		throwWarmEmissionEventDueToFlowAndStorageCapacityDelays(emissionsWithDelaysOnPreviousLinks, event, totalDelayWithDelaysOnPreviousLinks);
 	}
 
-	private void throwWarmEmissionEventAndStoreEmissionsDueToSpillBack(Map<WarmPollutant, Double> totalEmissions, LinkLeaveEvent event, double totalDelay){
-		Map<WarmPollutant, Double> emissionsToPayFor = totalEmissions;
-		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+	private void chargingForDelaysAndThrowingEvents(double marginalDelaysPerLeavingVehicle, LinkLeaveEvent event, Id personToBeCharged){
+
+		LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+		double delayToPayFor = linkInfo.getPersonId2DelaysToPayFor().get(event.getVehicleId());
+		Map<WarmPollutant, Double> emissionsToPayFor = linkInfo.getPersonId2WarmEmissionsToPayFor().get(event.getVehicleId());
+
+		if (delayToPayFor > marginalDelaysPerLeavingVehicle) {
+			Map<WarmPollutant, Double> emissionCorrespondingToDelays = new HashMap<WarmPollutant, Double>();
+			if (event.getVehicleId().toString().equals(personToBeCharged.toString())) {
+				throw new RuntimeException("The causing agent and the affected agent are the same (" + personToBeCharged.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
+			} else {
+				// using the time when the causing agent entered the link
+				this.totalInternalizedDelay = this.totalInternalizedDelay + marginalDelaysPerLeavingVehicle;
+				emissionCorrespondingToDelays = getDelaysEquivalentEmissions(marginalDelaysPerLeavingVehicle/delayToPayFor, emissionsToPayFor);
+				warmEmissionAnalysisModule.throwWarmEmissionEvent(event.getTime(), event.getLinkId(), personToBeCharged, emissionCorrespondingToDelays);
+			}
+			delayToPayFor = delayToPayFor - marginalDelaysPerLeavingVehicle;
+			emissionsToPayFor = eu.subtractTwoWarmEmissionsMap(emissionsToPayFor, emissionCorrespondingToDelays);
+		} else if(delayToPayFor > 0){
+			if (event.getVehicleId().toString().equals(personToBeCharged.toString())) {
+				throw new RuntimeException("The causing agent and the affected agent are the same (" + personToBeCharged.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
+			} else {
+				// using the time when the causing agent entered the link
+				this.totalInternalizedDelay = this.totalInternalizedDelay + delayToPayFor;
+				warmEmissionAnalysisModule.throwWarmEmissionEvent(event.getTime(), event.getLinkId(), personToBeCharged, emissionsToPayFor);
+			}
+			delayToPayFor = 0.;
+			emissionsToPayFor = new HashMap<WarmPollutant, Double>();
+		}
+		linkInfo.getPersonId2DelaysToPayFor().put(event.getVehicleId(), delayToPayFor);
+		linkInfo.getPersonId2WarmEmissionsToPayFor().put(event.getVehicleId(), emissionsToPayFor);
+	}
+
+	private void throwWarmEmissionEventDueToFlowAndStorageCapacityDelays(Map<WarmPollutant, Double> currentEmissions, LinkLeaveEvent event, double currentDelay){
+		LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 
 		// Search for agents causing the delay on that link and throw delayEffects for the causing agents.
 		List<Id> reverseList = new ArrayList<Id>();
 		reverseList.addAll(linkInfo.getLeavingAgents());
 		Collections.reverse(reverseList);
 
-		double delayToPayFor = totalDelay;
-		for (Id id : reverseList){
-			if (delayToPayFor > linkInfo.getMarginalDelayPerLeavingVehicle_sec()) {
-				Map<WarmPollutant, Double> emissionCorrespondingToDelays = new HashMap<WarmPollutant, Double>();
-				if (event.getVehicleId().toString().equals(id.toString())) {
-					//						log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
-				} else {
-					// using the time when the causing agent entered the link
-					this.totalInternalizedDelay = this.totalInternalizedDelay + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
-					emissionCorrespondingToDelays = getDelaysEquivalentEmissions(linkInfo.getMarginalDelayPerLeavingVehicle_sec()/delayToPayFor, emissionsToPayFor);
-					warmEmissionAnalysisModule.throwWarmEmissionEvent(event.getTime(), event.getLinkId(), event.getVehicleId(), emissionCorrespondingToDelays);
-				}
-				delayToPayFor = delayToPayFor - linkInfo.getMarginalDelayPerLeavingVehicle_sec();
-				emissionsToPayFor = eu.subtractTwoWarmEmissionsMap(emissionsToPayFor, emissionCorrespondingToDelays);
-
-			} else if(delayToPayFor > 0){
-				if (event.getVehicleId().toString().equals(id.toString())) {
-					//							log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
-				} else {
-					// using the time when the causing agent entered the link
-					this.totalInternalizedDelay = this.totalInternalizedDelay + delayToPayFor;
-					warmEmissionAnalysisModule.throwWarmEmissionEvent(event.getTime(), event.getLinkId(), event.getVehicleId(), emissionsToPayFor);
-				}
-				delayToPayFor = 0.;
-				emissionsToPayFor = new HashMap<WarmPollutant, Double>();
+		double delayToPayFor =this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(event.getVehicleId()); 
+		if(delayToPayFor>0) {
+			for (Id id : reverseList){
+				chargingForDelaysAndThrowingEvents(linkInfo.getMarginalDelayPerLeavingVehicle_sec(), event, id);
 			}
-		}
-
-		if (delayToPayFor <0) {
-			throw new RuntimeException("The delay resulting from the storage capacity is below 0. (" + delayToPayFor + ") Aborting...");
 		} else if(delayToPayFor==0) return;
-		else if (delayToPayFor<= 1.){
+		else throw new RuntimeException("Delays can not be negative, do a consistency check.");
+
+		//spill back or/and rounding delays are left
+		delayToPayFor= this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(event.getVehicleId());
+		if(delayToPayFor==0) return; 
+		else if (delayToPayFor<0.) throw new RuntimeException("The delay resulting from the storage capacity is below 0. (" + delayToPayFor + ") Aborting...");
+		else if (delayToPayFor>0 && delayToPayFor<1){ // roundingError delays
 			// The remaining delay of up to 1 sec may result from rounding errors. The delay caused by the flow capacity sometimes varies by 1 sec.
 			// Setting the remaining delay to 0 sec.
 			this.delayNotInternalized_roundingErrors += delayToPayFor;
 			delayToPayFor = 0.;
-		} else {	
+			delayToPayFor = this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().put(event.getVehicleId(),delayToPayFor);
+			log.warn(delayToPayFor + " seconds are not internalized assuming these delays due to rounding errors. Do check for emissions at this stage.");
+		}  else {
 			if (this.allowForStorageCapacityConstraint) {
 				if (this.calculateStorageCapacityConstraints) {
-					// Saving the delay resulting from the storage capacity constraint for later when reaching the bottleneck link.
+					if(reverseList.isEmpty()){ 
+						//						this.agentId2storageDelay.put(event.getVehicleId(), delayToPayFor);
+						Id causingLinkId = getNextLinkInRoute(event);
+						this.agentId2CausingLink.put(event.getVehicleId(), causingLinkId);
+						LinkCongestionInfoExtended linkInfoForNextLinkInRoute = linkId2congestionInfo.get(causingLinkId);
+						List<Id> personToBeChargedList = new ArrayList<Id>(linkInfoForNextLinkInRoute.getEnteringAgents()); 
+						Collections.reverse(personToBeChargedList);
+						Iterator< Id> personIdListIterator = personToBeChargedList.iterator();
+						do{
+							Id chargedPersonId = personIdListIterator.next();
+							chargingForDelaysAndThrowingEvents(linkInfoForNextLinkInRoute.getMarginalDelayPerLeavingVehicle_sec(), event, chargedPersonId);
+							delayToPayFor = this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(event.getVehicleId());
+						}while(personIdListIterator.hasNext() && delayToPayFor>0);
 
-					if(reverseList.isEmpty()){
-						this.agentId2storageDelay.put(event.getVehicleId(), delayToPayFor);
-						this.agentId2CausingLink.put(event.getVehicleId(), getNextLinkInRoute(event));
-						personId2StorageEmission.put(event.getVehicleId(), emissionsToPayFor);
 					} else {
 						for(Id id:reverseList){
-							if(!this.agentId2CausingLink.containsKey(id)){
-								this.agentId2storageDelay.put(event.getVehicleId(), delayToPayFor);
-								this.agentId2CausingLink.put(event.getVehicleId(), getNextLinkInRoute(event));
-								personId2StorageEmission.put(event.getVehicleId(), emissionsToPayFor);
-								break;
-							} else { //
-								Id nextLinkForPerson = getNextLinkInRoute(event);
-								if(nextLinkForPerson.equals(this.agentId2CausingLink.get(id))) {
-									this.agentId2storageDelay.put(event.getVehicleId(), delayToPayFor);
-									this.agentId2CausingLink.put(event.getVehicleId(), this.agentId2CausingLink.get(id));
-									personId2StorageEmission.put(event.getVehicleId(), emissionsToPayFor);
-									return;
-								} else {
-									// repeat the charging steps.
-									LinkCongestionInfo linkInfo2 = linkId2congestionInfo.get(this.agentId2CausingLink.get(id));
-									List<Id> linkIdList = new ArrayList<Id>(); 
-									linkIdList.addAll(linkInfo2.getEnteringAgents());
-									Collections.reverse(linkIdList);
-									Iterator< Id> linkIdListIterator = linkIdList.iterator();
-									do{
-										Id newId = linkIdListIterator.next();
-									if (delayToPayFor > linkInfo2.getMarginalDelayPerLeavingVehicle_sec()) {
-										Map<WarmPollutant, Double> emissionCorrespondingToDelays = new HashMap<WarmPollutant, Double>();;
-										if (event.getVehicleId().toString().equals(newId.toString())) {
-											//						log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
-										} else {
-											// using the time when the causing agent entered the link
-											this.totalInternalizedDelay = this.totalInternalizedDelay + linkInfo2.getMarginalDelayPerLeavingVehicle_sec();
-											emissionCorrespondingToDelays = getDelaysEquivalentEmissions(linkInfo2.getMarginalDelayPerLeavingVehicle_sec()/delayToPayFor, emissionsToPayFor);
-											warmEmissionAnalysisModule.throwWarmEmissionEvent(event.getTime(), event.getLinkId(), event.getVehicleId(), emissionCorrespondingToDelays);
-										}
-										delayToPayFor = delayToPayFor - linkInfo2.getMarginalDelayPerLeavingVehicle_sec();
-										emissionsToPayFor = eu.subtractTwoWarmEmissionsMap(emissionsToPayFor, emissionCorrespondingToDelays);
-									} else if(delayToPayFor > 0){
-										if (event.getVehicleId().toString().equals(newId.toString())) {
-											//							log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
-										} else {
-											// using the time when the causing agent entered the link
-											this.totalInternalizedDelay = this.totalInternalizedDelay + delayToPayFor;
-											warmEmissionAnalysisModule.throwWarmEmissionEvent(event.getTime(), event.getLinkId(), event.getVehicleId(), emissionsToPayFor);
-										}
-										delayToPayFor = 0.;
-										emissionsToPayFor = new HashMap<WarmPollutant, Double>();
-									}
+							if(!this.agentId2CausingLink.containsKey(id)){ // causing link for person is not stored yet. or if last left person is not a causing agent
+								//								this.agentId2storageDelay.put(event.getVehicleId(), delayToPayFor);
+								//								this.agentId2CausingLink.put(event.getVehicleId(), getNextLinkInRoute(event));
+								//								personId2StorageEmission.put(event.getVehicleId(), emissionsToPayFor);
+								throw new RuntimeException("I do not understand what's going on here or why do I need this? Need to recheck.");
+								//								break;
 
-								}while(linkIdListIterator.hasNext() && delayToPayFor>0);
-								}
+							} else { 
+								Id causingLinkId = this.agentId2CausingLink.get(id);
+								LinkCongestionInfoExtended linkInfoForCausingLink = linkId2congestionInfo.get(causingLinkId);
+								List<Id> personIdToBeChargedList = new ArrayList<Id>(linkInfoForCausingLink.getEnteringAgents()); 
+								Collections.reverse(personIdToBeChargedList);
+								Iterator< Id> personIdListIterator = personIdToBeChargedList.iterator();
+								do{
+									Id personCharged = personIdListIterator.next();
+									chargingForDelaysAndThrowingEvents(linkInfoForCausingLink.getMarginalDelayPerLeavingVehicle_sec(), event, personCharged);
+									delayToPayFor = this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(event.getVehicleId());
+								}while(personIdListIterator.hasNext() && delayToPayFor>0);
+
+								delayToPayFor = this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(event.getVehicleId());
 								if(delayToPayFor>0.) {
-									log.error("'Delays to pay for' is still more than zero. It means, delays due to storage capacity is not internalized correctly. Check!!!");
+									log.error("'Delays to pay for is still more than zero. It means, delays due to storage capacity is not internalized correctly. Check!!!");
 								}
-
 							}
 						}
 					}
@@ -513,11 +509,12 @@ PersonStuckEventHandler{
 	}
 
 	private Id getNextLinkInRoute(LinkLeaveEvent event){
+		log.warn("Check that return link is for the same activity as desired.");
 		List<PlanElement> planElements = scenario.getPopulation().getPersons().get(event.getPersonId()).getSelectedPlan().getPlanElements();
 		List<Id> linkIds = new ArrayList<Id>();
 		for(PlanElement pe :planElements){
 			if(pe instanceof Leg){
-				Leg leg = (Leg)pe; // TODO [AA] check here if following route is for required activity only ??
+				// TODO [AA] check here if following route is for required activity only ??
 				NetworkRoute nRoute = ((NetworkRoute)((Leg)pe).getRoute()); 
 				linkIds.add(nRoute.getStartLinkId());
 				linkIds.addAll(nRoute.getLinkIds());
@@ -536,7 +533,7 @@ PersonStuckEventHandler{
 	}
 
 	private void collectLinkInfos(Id linkId) {
-		LinkCongestionInfo linkInfo = new LinkCongestionInfo();	
+		LinkCongestionInfoExtended linkInfo = new LinkCongestionInfoExtended();	
 
 		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 		Link link = network.getLinks().get(linkId);
@@ -564,27 +561,35 @@ PersonStuckEventHandler{
 		return lastLeavingFromThatLink;
 	}
 
-	private void calculateCongestion(LinkLeaveEvent event, Map<WarmPollutant, Double> stopAndGoWarmEmissionOnThisLink) {
+	public double getTotalDelaysInSecs(){
+		log.info("\n total delays =  "+ this.totalDelay+
+				"\n  delays not internalized rounding errors =  "+ this.delayNotInternalized_roundingErrors+
+				"\n delays not internalized no causing agents =  "+ this.delayNotInternalized_spillbackNoCausingAgent+
+				"\n delays not internalized storage capacity =  "+ this.delayNotInternalized_storageCapacity+
+				"\n delays  storage capacity =  "+ this.delay_storageCapacity+
+				"\n total storage delays =  "+ this.totalStorageDelay+
+				"\n total internalized delays =  "+ this.totalInternalizedDelay
+				);
+		return this.totalDelay;
+	}
 
-		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-		double delayOnThisLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
-		this.totalDelay = this.totalDelay + delayOnThisLink;
+	public int getLinkLeaveCnt() {
+		return linkLeaveCnt;
+	}
+	public int getLinkLeaveWarnCnt() {
+		return linkLeaveFirstActWarnCnt;
+	}
 
-		// Check if this (affected) agent was previously delayed without internalizing the delay.
-		double totalDelayWithDelaysOnPreviousLinks = 0.;
-		Map<WarmPollutant, Double> emissionsWithDelaysOnPreviousLinks = new HashMap<WarmPollutant, Double>();
+	public WarmEmissionAnalysisModuleImplV2 getWarmEmissionAnalysisModule(){
+		return warmEmissionAnalysisModule;
+	}
 
-		if (this.agentId2storageDelay.get(event.getVehicleId()) == null) {
-			totalDelayWithDelaysOnPreviousLinks = delayOnThisLink;
-			emissionsWithDelaysOnPreviousLinks = stopAndGoWarmEmissionOnThisLink;
-		} else {
-			totalDelayWithDelaysOnPreviousLinks = delayOnThisLink + this.agentId2storageDelay.get(event.getVehicleId());
-			emissionsWithDelaysOnPreviousLinks = eu.addTwoWarmEmissionsMap(stopAndGoWarmEmissionOnThisLink, personId2StorageEmission.get(event.getVehicleId()));
-			this.agentId2storageDelay.put(event.getVehicleId(), 0.);
-			this.agentId2CausingLink.put(event.getVehicleId(), null);
-			personId2StorageEmission.put(event.getVehicleId(), new HashMap<WarmPollutant, Double>());
+	private Map<WarmPollutant, Double> getDelaysEquivalentEmissions(double delaysRatio, Map<WarmPollutant, Double> emissionsIn){
+		Map<WarmPollutant, Double> emissionsOut = new HashMap<WarmPollutant, Double>();
+
+		for(WarmPollutant wm : emissionsIn.keySet()){
+			emissionsOut.put(wm, delaysRatio*emissionsIn.get(wm));
 		}
-
-		throwWarmEmissionEventAndStoreEmissionsDueToSpillBack(emissionsWithDelaysOnPreviousLinks, event, totalDelayWithDelaysOnPreviousLinks);
+		return emissionsOut;
 	}
 }

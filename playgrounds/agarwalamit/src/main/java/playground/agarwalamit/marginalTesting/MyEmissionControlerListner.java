@@ -81,5 +81,6 @@ public class MyEmissionControlerListner  implements StartupListener, IterationSt
 		logger.info("closing emission events file...");
 		emissionEventWriter.closeFile();
 		emissionModule.writeEmissionInformation(emissionEventOutputFile);
+logger.info("Total Delays in hours is "+emissionModule.getTotalDelaysInHours());
 	}
 }

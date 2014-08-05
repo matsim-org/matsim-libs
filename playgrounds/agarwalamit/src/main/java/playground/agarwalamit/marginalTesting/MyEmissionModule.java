@@ -420,6 +420,10 @@ public class MyEmissionModule {
 		return emissionVehicles;
 	}
 
+	public double getTotalDelaysInHours(){
+		return this.warmEmissionHandler.getTotalDelaysInSecs()/3600;
+	}
+	
 	public Double getEmissionEfficiencyFactor() {
 		return emissionEfficiencyFactor;
 	}
