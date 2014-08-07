@@ -19,20 +19,27 @@
 
 package playground.jbischoff.taxi.berlin.demand;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
@@ -65,8 +72,8 @@ public class Demand2ShpWriter
     {
         Demand2ShpWriter dsw = new Demand2ShpWriter();
         dsw.accumulate();
-        dsw.writeShape("C:/local_jb/data/taxi_berlin/2013/OD/demandLines.shp");
-
+//        dsw.writeShape("C:/local_jb/data/taxi_berlin/2013/OD/demandLines.shp");
+        dsw.extractSym("C:/local_jb/data/taxi_berlin/2013/OD/symdemand.txt");
     }
 
 
@@ -111,6 +118,33 @@ public class Demand2ShpWriter
 
     }
 
+    private void extractSym(String filename){
+        Writer writer = IOUtils.getBufferedWriter(filename);
+        Set<Id> handledRelations = new HashSet<Id>();
+        Matrix matrix = accmat.getMatrix("accmat");
+
+        try{
+        for (ArrayList<Entry> l : matrix.getFromLocations().values()) {
+            for (Entry e : l) {
+            Id out = new IdImpl(e.getFromLocation().toString()+e.getToLocation().toString());
+            Id in = new IdImpl(e.getToLocation().toString()+e.getFromLocation().toString());
+            if (handledRelations.contains(in)) continue; 
+            if (handledRelations.contains(out)) continue; 
+            double back = 0;
+          try{back = matrix.getEntry(e.getToLocation(), e.getFromLocation()).getValue();}
+          catch (NullPointerException b) {}
+            writer.write(e.getFromLocation().toString()+"\t"+e.getToLocation().toString()+"\t"+Math.floor(e.getValue())+"\t"+Math.floor(back)+"\n");
+            handledRelations.add(in);
+            handledRelations.add(out);
+            }
+        }
+        writer.flush();
+        writer.close();
+        }
+        catch (IOException e ){
+            e.printStackTrace();
+        }
+    }
 
     public Demand2ShpWriter()
     {

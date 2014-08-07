@@ -8,9 +8,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.matrices.Entry;
@@ -29,8 +33,8 @@ public class BerlinTaxiDemandEvaluator
     private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final SimpleDateFormat filenameformat = new SimpleDateFormat("yyyyMMddHHmmss");
 
-   static String fileprefix = "C:\\local_jb\\data\\taxi_berlin\\2013\\OD\\";
-//   static String fileprefix = "C:\\local_jb\\data\\taxi_berlin\\2014\\OD\\";
+//   static String fileprefix = "C:\\local_jb\\data\\taxi_berlin\\2013\\OD\\";
+   static String fileprefix = "C:\\local_jb\\data\\taxi_berlin\\2014\\OD\\";
 
 
     /**
@@ -40,14 +44,29 @@ public class BerlinTaxiDemandEvaluator
     public static void main(String[] args) throws ParseException
     {
         BerlinTaxiDemandEvaluator bte = new BerlinTaxiDemandEvaluator();
-        Date start = filenameformat.parse("20130415000000");
-//        Date start = filenameformat.parse("20140407000000");
-        Date end = filenameformat.parse("20130421230000");
-//        Date end = filenameformat.parse("20140413230000");
+//        Date start = filenameformat.parse("20130415000000");
+        Date start = filenameformat.parse("20140407000000");
+//        Date end = filenameformat.parse("20130421230000");
+        Date end = filenameformat.parse("20140413230000");
         bte.read(fileprefix+"demandMatrices.xml",start, end);
-        bte.write(fileprefix+"demandWeekly.csv");
+        Id alex = new IdImpl("01011303");
+        Id friedrichshain = new IdImpl("02040701");
+        Id zoo = new IdImpl("04030931");
+        Id txl = new IdImpl("12214125");
+        
+        bte.analyse(fileprefix+"demandMatrices.xml", start, end, bte.initZones());
+        
+//        bte.read(fileprefix+"demandMatrices.xml",start, end, alex,friedrichshain);
+//        bte.read(fileprefix+"demandMatrices.xml",start, end, friedrichshain, alex);
+//        bte.read(fileprefix+"demandMatrices.xml",start, end, zoo, alex);
+//        bte.read(fileprefix+"demandMatrices.xml",start, end,  alex, zoo);
+//        bte.read(fileprefix+"demandMatrices.xml",start, end,  txl);
+//        
+//        bte.write(fileprefix+"demandWeekly.csv");
 
     }
+    
+    
 
 
     private void write(String outputFileName)
@@ -67,7 +86,45 @@ public class BerlinTaxiDemandEvaluator
             e1.printStackTrace();
         }
     }
+    
+    private List<String> initZones(){
+        List<String> zones = new ArrayList<String>();
+        zones.add("0101");
+        zones.add("0102");
+        zones.add("0103");
+        zones.add("0201");
+        zones.add("0202");
+        zones.add("0203");
+        zones.add("0204");
+        zones.add("0205");
+        zones.add("0801");
+        zones.add("0704");
+        zones.add("0701");
+        zones.add("0702");
+        zones.add("0405");
+        zones.add("0403");
+        zones.add("0306");
+        zones.add("0307");
+        return zones;
+        
+    }
 
+    private void write(String outputFileName,Map<Date,Integer> values)
+    {
+
+        try {
+            BufferedWriter bw = IOUtils.getBufferedWriter(outputFileName);
+            for (java.util.Map.Entry<Date, Integer> e : values.entrySet()) {
+                bw.append(SDF.format(e.getKey()) + "\t"+e.getValue()+"\n");
+            }
+            bw.flush();
+            bw.close();
+        }
+
+        catch (IOException e1) {
+            e1.printStackTrace();
+        }
+    }
 
     private void read(String filename, Date start, Date end)
     {
@@ -90,6 +147,107 @@ public class BerlinTaxiDemandEvaluator
         }
         while (currentHr.before(end));
         
+        
+    }
+    
+    private void read(String filename, Date start, Date end, Id fromZone, Id toZone)
+    {
+        Map<Date,Integer> amount = new TreeMap<Date, Integer>();
+        Matrices matrices = MatrixUtils.readMatrices(filename);
+        Date currentHr = start;
+        do {
+            Matrix currentMatrix = matrices.getMatrix(filenameformat.format(currentHr));
+            double value = 0.;
+            try{
+            value = currentMatrix.getEntry(fromZone, toZone).getValue();
+            }
+            catch (NullPointerException e) {
+                
+            }
+            currentHr = getNextTime(currentHr);
+            amount.put(currentHr, (int) value);
+        }
+        while (currentHr.before(end));
+        String outfile = fileprefix+fromZone.toString()+"_"+toZone.toString()+".txt";
+        write(outfile,amount);
+    }
+    
+    private void analyse(String filename, Date start, Date end, List<String> zonesPrefixes)
+    {
+        Matrices matrices = MatrixUtils.readMatrices(filename);
+        BeelineDistanceExractor bde = new BeelineDistanceExractor();
+        Date currentHr = start;
+        double from = 0.;
+        double to = 0.;
+        double inner = 0.;
+        double other = 0.;
+        do {
+            Matrix currentMatrix = matrices.getMatrix(filenameformat.format(currentHr));
+            for (ArrayList<Entry> l :currentMatrix.getFromLocations().values()){
+                for (Entry e: l){
+                    String fromZ = e.getFromLocation().toString().substring(0, 4);
+                    
+                    String toZ = e.getToLocation().toString().substring(0,4);
+                    if (zonesPrefixes.contains(fromZ) && zonesPrefixes.contains(toZ)){
+                        inner+=e.getValue();
+                        continue;
+                    }
+                    else if (zonesPrefixes.contains(fromZ)){
+                        from += e.getValue();
+                        continue;
+                    }
+                    else if (zonesPrefixes.contains(toZ)){
+                        to += e.getValue();
+                        continue;
+                    }
+                    else {
+                        other += e.getValue();
+                    }
+                }
+            }
+            currentHr = getNextTime(currentHr);
+        }
+        while (currentHr.before(end));
+        
+        System.out.println("Trips within marked zones: \t"+ inner);
+        System.out.println("Trips from marked zones: \t"+ from);
+        System.out.println("Trips to marked zones: \t"+ to);
+        System.out.println("Trips out of marked zones: \t"+ other);
+        
+    }
+    
+
+    private void read(String filename, Date start, Date end, Id zone)
+    {
+        Map<Date,Integer> fromAmount = new TreeMap<Date, Integer>();
+        Map<Date,Integer> toAmount = new TreeMap<Date, Integer>();
+        Matrices matrices = MatrixUtils.readMatrices(filename);
+        Date currentHr = start;
+        do {
+            Matrix currentMatrix = matrices.getMatrix(filenameformat.format(currentHr));
+            double fromValue=0.;
+            double toValue=0.;
+            try{
+            for(Entry e: currentMatrix.getFromLocEntries(zone)){
+                fromValue+=e.getValue();
+            }
+            for(Entry e: currentMatrix.getToLocEntries(zone)){
+                toValue+=e.getValue();
+            }
+            }
+            catch (NullPointerException e)
+            {
+                System.err.println(currentHr + " no Demand?");
+            }
+            fromAmount.put(currentHr, (int) fromValue);
+            toAmount.put(currentHr, (int) toValue);
+            currentHr = getNextTime(currentHr);
+        }
+        while (currentHr.before(end));
+        String outfileFrom = fileprefix+zone.toString()+"_from.txt";
+        String outfileTo = fileprefix+zone.toString()+"_to.txt";
+        write(outfileFrom,fromAmount);
+        write(outfileTo,toAmount);
     }
     
     private Date getNextTime(Date currentTime)
