@@ -22,7 +22,6 @@
 package playground.boescpa.converters.vissim.tools;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 import playground.boescpa.converters.vissim.ConvEvents2Anm;
 
 import java.util.HashMap;
@@ -35,7 +34,7 @@ import java.util.HashMap;
  */
 public class DefaultAnmConverter implements ConvEvents2Anm.AnmConverter {
 	@Override
-	public HashMap<Id, Long[]> convertRoutes(Network matchedNetwork, String path2AnmFile) {
+	public HashMap<Id, Long[]> convertRoutes(HashMap<Id, Long[]> keyAmNetwork, String path2AnmFile) {
 		return null;
 	}
 

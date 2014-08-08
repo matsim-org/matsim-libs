@@ -22,20 +22,19 @@
 package playground.boescpa.converters.vissim.tools;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 import playground.boescpa.converters.vissim.ConvEvents2Anm;
 
 import java.util.HashMap;
 
 /**
- * WHAT IS IT FOR?
- * WHAT DOES IT?
+ * Maps the trips of a given events-file onto the given network
+ * (network expected in the form of nodes representing a square grid).
  *
  * @author boescpa
  */
 public class DefaultEventsConverter implements ConvEvents2Anm.EventsConverter {
 	@Override
-	public HashMap<Id, Long[]> convertEvents(Network matchedNetwork, String path2EventsFile) {
+	public HashMap<Id, Long[]> convertEvents(HashMap<Id, Long[]> keyMsNetwork, String path2EventsFile) {
 		return null;
 	}
 }

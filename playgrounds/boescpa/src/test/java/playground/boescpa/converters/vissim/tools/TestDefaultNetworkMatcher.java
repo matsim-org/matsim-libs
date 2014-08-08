@@ -32,8 +32,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import playground.boescpa.converters.vissim.ConvEvents2Anm;
 
 /**
- * WHAT IS IT FOR?
- * WHAT DOES IT?
+ * Tests the methods of the class DefaultNetworkMatcher.
  *
  * @author boescpa
  */
@@ -60,7 +59,7 @@ public class TestDefaultNetworkMatcher {
 
 	@Test
 	public void testMatchNetworks() {
-		Network network = defaultNetworkMatcher1.matchNetworks("", "");
+		Network network = defaultNetworkMatcher1.createMutualBaseGrid("");
 		Assert.assertTrue(network.getNodes().size() == 12);
 		Node minNode = network.getNodes().get(new IdImpl(1));
 		Node maxNode = network.getNodes().get(new IdImpl(network.getNodes().size()));
@@ -72,7 +71,7 @@ public class TestDefaultNetworkMatcher {
 
 	@Test
 	public void testBoundingBoxOfZones() {
-		Network network = defaultNetworkMatcher2.matchNetworks("", utils.getClassInputDirectory() + "TestDefaultNetworkMatcher_DummySHP.shp");
+		Network network = defaultNetworkMatcher2.createMutualBaseGrid(utils.getClassInputDirectory() + "TestDefaultNetworkMatcher_DummySHP.shp");
 		Assert.assertTrue(network.getNodes().size() == 17094);
 		Node minNode = network.getNodes().get(new IdImpl(1));
 		Node maxNode = network.getNodes().get(new IdImpl(network.getNodes().size()));

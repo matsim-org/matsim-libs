@@ -58,15 +58,18 @@ public class ConvEvents2Anm {
 	}
 
 	public void convert(String[] args) {
-		String path2MATSimNetwork = args[0];
-		String path2VissimNetwork = args[1];
-		String path2EventsFile = args[2];
-		String path2AnmFile = args[3];
-		String path2NewAnmFile = args[4];
+		String path2VissimZoneShp = args[0];
+		String path2MATSimNetwork = args[1];
+		String path2VissimNetworkNodes = args[2];
+		String path2EventsFile = args[3];
+		String path2AnmFile = args[4];
+		String path2NewAnmFile = args[5];
 
-		Network matchedNetwork = this.networkMatcher.matchNetworks(path2MATSimNetwork, path2VissimNetwork);
-		HashMap<Id, Long[]> msTrips = this.eventsConverter.convertEvents(matchedNetwork, path2EventsFile);
-		HashMap<Id, Long[]> amTrips = this.anmConverter.convertRoutes(matchedNetwork, path2AnmFile);
+		Network mutualBaseGrid = this.networkMatcher.createMutualBaseGrid(path2VissimZoneShp);
+		HashMap<Id, Long[]> keyMsNetwork = this.networkMatcher.mapMsNetwork(path2MATSimNetwork, mutualBaseGrid);
+		HashMap<Id, Long[]> keyAmNetwork = this.networkMatcher.mapAmNetwork(path2VissimNetworkNodes, mutualBaseGrid);
+		HashMap<Id, Long[]> msTrips = this.eventsConverter.convertEvents(keyMsNetwork, path2EventsFile);
+		HashMap<Id, Long[]> amTrips = this.anmConverter.convertRoutes(keyAmNetwork, path2AnmFile);
 		HashMap<Id, Integer> demandPerAnmTrip = this.tripMatcher.matchTrips(msTrips, amTrips);
 		this.anmConverter.writeAnmRoutes(demandPerAnmTrip, path2AnmFile, path2NewAnmFile);
 	}
@@ -74,13 +77,30 @@ public class ConvEvents2Anm {
 	public interface NetworkMatcher {
 
 		/**
-		 * Match networks (<-> find mutual network representation).
+		 * Create mutual base grid.
+		 *
+		 * @param path2VissimZoneShp
+		 * @return A new data set (nodes) which represents both input networks jointly.
+		 */
+		public Network createMutualBaseGrid(String path2VissimZoneShp);
+
+		/**
+		 * Creates a key that maps the provided Matsim network (links) to the mutual base grid.
 		 *
 		 * @param path2MATSimNetwork
-		 * @param path2VissimNetwork
-		 * @return A new gis data set (nodes, links) which represents both input networks jointly.
+		 * @param mutualBaseGrid
+		 * @return The key that matches the network (links) to the base grid.
 		 */
-		public Network matchNetworks(String path2MATSimNetwork, String path2VissimNetwork);
+		HashMap<Id,Long[]> mapMsNetwork(String path2MATSimNetwork, Network mutualBaseGrid);
+
+		/**
+		 * Creates a key that maps the provided Vissim network (links) to the mutual base grid.
+		 *
+		 * @param path2VissimNetworkLinks
+		 * @param mutualBaseGrid
+		 * @return The key that matches the network (links) to the base grid.
+		 */
+		HashMap<Id,Long[]> mapAmNetwork(String path2VissimNetworkLinks, Network mutualBaseGrid);
 	}
 
 	public interface EventsConverter {
@@ -88,12 +108,12 @@ public class ConvEvents2Anm {
 		/**
 		 * Convert MATSim-Events to trips in matched network
 		 *
-		 * @param matchedNetwork
+		 * @param keyMsNetwork
 		 * @param path2EventsFile
 		 * @return A HashMap which represents each trip (derived from events, assigned a trip Id) in the form of
 		 * 			an id-array (Long[]) representing a sequence of elements of the matched network.
 		 */
-		public HashMap<Id,Long[]> convertEvents(Network matchedNetwork, String path2EventsFile);
+		public HashMap<Id,Long[]> convertEvents(HashMap<Id, Long[]> keyMsNetwork, String path2EventsFile);
 	}
 
 	public interface AnmConverter {
@@ -101,12 +121,12 @@ public class ConvEvents2Anm {
 		/**
 		 * Convert ANM-Routes to trips in matched network
 		 *
-		 * @param matchedNetwork
+		 * @param keyAmNetwork
 		 * @param path2AnmFile
 		 * @return A HashMap which represents each trip (derived from AnmRoutes, assigned the AnmRoute Id) in the form
 		 * 			of an id-array (Long[]) representing a sequence of elements of the matched network.
 		 */
-		public HashMap<Id,Long[]> convertRoutes(Network matchedNetwork, String path2AnmFile);
+		public HashMap<Id,Long[]> convertRoutes(HashMap<Id, Long[]> keyAmNetwork, String path2AnmFile);
 
 		/**
 		 * Rewrite ANMRoutes file with new demand numbers for each ANM-Route

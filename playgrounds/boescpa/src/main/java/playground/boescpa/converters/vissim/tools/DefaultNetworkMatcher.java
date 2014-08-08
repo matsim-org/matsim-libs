@@ -23,6 +23,7 @@ package playground.boescpa.converters.vissim.tools;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
@@ -32,6 +33,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.boescpa.converters.vissim.ConvEvents2Anm;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -59,12 +61,11 @@ public class DefaultNetworkMatcher implements ConvEvents2Anm.NetworkMatcher {
 	 * 	[CH1903/LV03-Coordinates expected]
 	 * Creates nodes covering this area. Each node represents a square cell.
 	 *
-	 * @param NotUsed Not used here...
 	 * @param path2ZonesFile Shp-File with the zones to consider as the area.
 	 * @return Square-Grid covering the squares.
 	 */
 	@Override
-	public final Network matchNetworks(String NotUsed, String path2ZonesFile) {
+	public Network createMutualBaseGrid(String path2ZonesFile) {
 
 		Network mutualRepresentation = NetworkUtils.createNetwork();
 		NetworkFactoryImpl networkFactory = new NetworkFactoryImpl(mutualRepresentation);
@@ -119,5 +120,15 @@ public class DefaultNetworkMatcher implements ConvEvents2Anm.NetworkMatcher {
 			}
 		}
 		return boundings;
+	}
+
+	@Override
+	public HashMap<Id, Long[]> mapMsNetwork(String path2MATSimNetwork, Network matchedNetwork) {
+		return null;
+	}
+
+	@Override
+	public HashMap<Id, Long[]> mapAmNetwork(String path2VissimNetworkLinks, Network mutualBaseGrid) {
+		return null;
 	}
 }
