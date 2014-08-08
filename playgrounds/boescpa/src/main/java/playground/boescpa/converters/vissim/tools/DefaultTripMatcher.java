@@ -34,7 +34,6 @@ import java.util.HashMap;
  */
 public class DefaultTripMatcher implements ConvEvents2Anm.TripMatcher {
 	@Override
-	public HashMap<Id, Integer> matchTrips(HashMap<Id, Long[]> msTrips, HashMap<Id, Long[]> amTrips) {
-		 return null;
+	public HashMap<Id, Integer> matchTrips(HashMap<Id, Long[]> msTrips, HashMap<Id, Long[]> amTrips) { return null;
 	}
 }
