@@ -23,6 +23,7 @@ package playground.boescpa.converters.vissim;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import playground.boescpa.converters.vissim.tools.*;
 
 import java.util.HashMap;
 
@@ -52,9 +53,8 @@ public class ConvEvents2Anm {
 	}
 
 	public static ConvEvents2Anm createDefaultConvEvents2Anm() {
-		return null;
-		//return new ConvEvents2Anm(new DefaultNetworkMatcher(), new DefaultEventsConverter(),
-		//new DefaultAnmConverter(), new DefaultTripMatcher());
+		return new ConvEvents2Anm(new DefaultNetworkMatcher(), new DefaultEventsConverter(),
+		new DefaultAnmConverter(), new DefaultTripMatcher());
 	}
 
 	public void convert(String[] args) {
