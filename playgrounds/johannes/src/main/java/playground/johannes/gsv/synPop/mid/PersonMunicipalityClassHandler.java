@@ -101,7 +101,7 @@ public class PersonMunicipalityClassHandler implements PersonAttributeHandler, A
 		return categories[cat][1];
 	}
 	
-	public static int getCategorie(int inhabs) {
+	public static int getCategory(int inhabs) {
 		if(categories == null)
 			initCategories();
 		

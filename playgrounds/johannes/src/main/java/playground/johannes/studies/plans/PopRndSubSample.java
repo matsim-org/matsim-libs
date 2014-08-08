@@ -44,12 +44,12 @@ public class PopRndSubSample {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String input = args[0];
-//		String input = "/Users/jillenberger/Work/socialnets/data/schweiz/complete/plans/plans.0.001.xml";
-		String output = args[1];
-//		String output = "/Users/jillenberger/Work/socialnets/data/schweiz/complete/plans/plans.n500.xml";
-		int numSamples = Integer.parseInt(args[2]);
-//		int numSamples = 500;
+//		String input = args[0];
+		String input = "/home/johannes/gsv/ger/data/plans.routed.xml.gz";
+//		String output = args[1];
+		String output = "/home/johannes/gsv/ger/data/plans.routed.sub.xml.gz";
+//		int numSamples = Integer.parseInt(args[2]);
+		int numSamples = 10000;
 		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);

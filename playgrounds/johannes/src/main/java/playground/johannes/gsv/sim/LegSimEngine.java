@@ -22,6 +22,9 @@
  */
 package playground.johannes.gsv.sim;
 
+import java.util.LinkedList;
+
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 
@@ -31,6 +34,6 @@ import org.matsim.api.core.v01.population.Person;
  */
 public interface LegSimEngine {
 
-	public double simulate(Person person, Leg leg, double departureTime);
+	public double simulate(Person person, Leg leg, double departureTime, LinkedList<Event> eventList);
 	
 }

@@ -28,20 +28,19 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.resources.CRSUtilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.sim.Hamiltonian;
 import playground.johannes.gsv.synPop.sim.Initializer;
+import playground.johannes.gsv.synPop.sim.MutateActivityLocation;
 import playground.johannes.gsv.synPop.sim.SamplerListener;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.sna.util.ProgressLogger;
-import playground.johannes.socialnetworks.gis.io.ZoneLayerKMLWriter;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
-import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -91,7 +90,7 @@ public class PopulationDensity implements Hamiltonian, Initializer, SamplerListe
 		}
 		ProgressLogger.termiante();
 		
-//		writeZoneData("/home/johannes/gsv/mid2008/targetPopDen.shp");
+//		writeZoneData("/home/johannes/gsv/synpop/output/targetPopDen.shp");
 	}
 	
 	@Override
@@ -114,6 +113,9 @@ public class PopulationDensity implements Hamiltonian, Initializer, SamplerListe
 		if(modZone == null) {
 			double x = Double.parseDouble((String) person.getAttribute(CommonKeys.PERSON_HOME_COORD_X));
 			double y = Double.parseDouble((String) person.getAttribute(CommonKeys.PERSON_HOME_COORD_Y));
+//			ActivityFacility facility = (ActivityFacility) person.getUserData(MutateActivityLocation.USER_DATA_KEY);	
+//			double x = facility.getCoord().getX();
+//			double y = facility.getCoord().getY();
 				
 			Point p = factory.createPoint(new Coordinate(x, y));
 			
@@ -162,7 +164,10 @@ public class PopulationDensity implements Hamiltonian, Initializer, SamplerListe
 	public void init(ProxyPerson person) {
 		double x = Double.parseDouble((String) person.getAttribute(CommonKeys.PERSON_HOME_COORD_X));
 		double y = Double.parseDouble((String) person.getAttribute(CommonKeys.PERSON_HOME_COORD_Y));
-			
+//		ActivityFacility facility = (ActivityFacility) person.getUserData(MutateActivityLocation.USER_DATA_KEY);	
+//		double x = facility.getCoord().getX();
+//		double y = facility.getCoord().getY();
+		
 		Point p = factory.createPoint(new Coordinate(x, y));
 		Zone<ZoneData> zone = zones.getZone(p);
 		if(zone == null) {
@@ -204,7 +209,8 @@ public class PopulationDensity implements Hamiltonian, Initializer, SamplerListe
 			for(Zone<ZoneData> zone : zones.getZones()) {
 				Zone<Double> newZone = new Zone<Double>(zone.getGeometry());
 //				newZone.setAttribute((double) zone.getAttribute().current/zone.getGeometry().getArea() * 1000000);
-				newZone.setAttribute((double) (zone.getAttribute().target - zone.getAttribute().current));
+				newZone.setAttribute((double) (zone.getAttribute().target));
+//				newZone.setAttribute((double) (zone.getAttribute().target - zone.getAttribute().current));
 				newZones.add(newZone);
 			}
 			

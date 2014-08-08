@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -31,6 +32,8 @@ import org.xml.sax.Attributes;
  *
  */
 public class XMLParser extends MatsimXmlParser {
+	
+	private static final Logger logger = Logger.getLogger(XMLParser.class);
 
 	private static final String NODE_TAG = "node";
 	
@@ -58,6 +61,8 @@ public class XMLParser extends MatsimXmlParser {
 	
 	private OSMWay activeWay;
 	
+	private OSMNode activeNode;
+	
 	public Map<String, OSMNode> getNodes() {
 		return nodes;
 	}
@@ -78,23 +83,33 @@ public class XMLParser extends MatsimXmlParser {
 			node.setLongitude(x);
 			node.setLatitude(y);
 			
+			activeNode = node;
+			
 			nodes.put(node.getId(), node);
-			/*
-			 * node tags are currently ignored
-			 */
+			
 		} else if(name.equalsIgnoreCase(WAY_TAG)) {
 			OSMWay way = new OSMWay(atts.getValue(ID_KEY));
 			activeWay = way;
 		} else if(name.equalsIgnoreCase(ND_TAG)) {
 			if(activeWay != null) {
 				OSMNode node = nodes.get(atts.getValue(REF_KEY));
-				activeWay.addNode(node);
+				if(node == null) {
+					logger.warn(String.format("Node with id=%s not found.", atts.getValue(REF_KEY)));
+				} else {
+					activeWay.addNode(node);
+					node.setNodeOfWay(true);
+				}
 			}
 		} else if(name.equalsIgnoreCase(TAG_TAG)) {
 			if(activeWay != null) {
 				String key = atts.getValue(KEY_KEY);
 				String val = atts.getValue(VALUE_KEY);
 				activeWay.addTag(key, val);
+				
+			} else if(activeNode != null) {
+				String key = atts.getValue(KEY_KEY);
+				String val = atts.getValue(VALUE_KEY);
+				activeNode.addTag(key, val);
 			}
 		}
 
@@ -108,6 +123,8 @@ public class XMLParser extends MatsimXmlParser {
 		if(name.equalsIgnoreCase(WAY_TAG)) {
 			ways.put(activeWay.getId(), activeWay);
 			activeWay = null;
+		} else if(name.equalsIgnoreCase(NODE_TAG)) {
+			activeNode = null;
 		}
 
 	}

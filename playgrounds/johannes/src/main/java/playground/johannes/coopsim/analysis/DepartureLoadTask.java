@@ -31,10 +31,8 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 
 import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.sna.math.Discretizer;
 import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.util.TXTWriter;
 
 /**
@@ -43,8 +41,6 @@ import playground.johannes.sna.util.TXTWriter;
  */
 public class DepartureLoadTask extends TrajectoryAnalyzerTask {
 
-	private Discretizer discretizer = new LinearDiscretizer(900.0);
-	
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
 		Set<String> purposes = new HashSet<String>();
@@ -62,7 +58,6 @@ public class DepartureLoadTask extends TrajectoryAnalyzerTask {
 	}
 
 	private void analyze(Set<Trajectory> trajectories, String type) {
-//		TDoubleDoubleHashMap load = new TDoubleDoubleHashMap();
 		TDoubleArrayList samples = new TDoubleArrayList(trajectories.size());
 		
 		for(Trajectory t : trajectories) {
@@ -70,7 +65,6 @@ public class DepartureLoadTask extends TrajectoryAnalyzerTask {
 				Activity act = (Activity) t.getElements().get(i + 1);
 				if(type == null || act.getType().equals(type)) {
 					double time = t.getTransitions().get(i);
-//					load.adjustOrPutValue(discretizer.discretize(time), 1, 1);
 					samples.add(time);
 				}
 			}
@@ -80,8 +74,11 @@ public class DepartureLoadTask extends TrajectoryAnalyzerTask {
 			if(type == null)
 				type = "all";
 			
-			TDoubleDoubleHashMap load = Histogram.createHistogram(samples.toNativeArray(), FixedSampleSizeDiscretizer.create(samples.toNativeArray(), 50, 50), true);
-			TXTWriter.writeMap(load, "time", "n", String.format("%1$s/depload.%2$s.txt", getOutputDirectory(), type));
+			if(!samples.isEmpty()) {
+				TDoubleDoubleHashMap load = Histogram.createHistogram(samples.toNativeArray(), FixedSampleSizeDiscretizer.create(samples.toNativeArray(), 50, 50), true);
+				TXTWriter.writeMap(load, "time", "n", String.format("%1$s/depload.%2$s.txt", getOutputDirectory(), type));
+			}
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

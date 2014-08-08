@@ -20,15 +20,15 @@
 package playground.johannes.gsv.sim;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -42,13 +42,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.johannes.socialnetworks.utils.CollectionUtils;
 
@@ -68,13 +62,11 @@ public class ParallelPseudoSim {
 	
 	private final ExecutorService executor;
 	
-	private final TransitSchedule schedule;
+	private final Map<String, LegSimEngine> legSimEngines;
 	
-	private final Config config;
+	private final LegSimEngine defaultLegSimEngine;
 	
-	public ParallelPseudoSim(int numThreads, Config config, TransitSchedule schedule) {
-		this.config = config;
-		this.schedule = schedule;
+	public ParallelPseudoSim(int numThreads) {
 		
 		executor = Executors.newFixedThreadPool(numThreads);
 		
@@ -83,16 +75,13 @@ public class ParallelPseudoSim {
 			threads[i] = new SimThread();
 		
 		futures = new Future[numThreads];
+		
+		legSimEngines = new HashMap<String, LegSimEngine>();
+		defaultLegSimEngine = new DefaultLegSimEngine();
 	}
-	
-//	public void init() {
-//		this.plans = plans;
-//		this.network = network;
-//		this.linkTravelTimes = linkTravelTimes;
-//		this.eventsManager = eventManager;
-//	}
-	
+		
 	public void run(Collection<Plan> plans, Network network, TravelTime linkTravelTimes, EventsManager eventManager) {
+		legSimEngines.put(TransportMode.car, new CarLegSimEngine(network, linkTravelTimes));
 		/*
 		 * split collection in approx even segments
 		 */
@@ -102,7 +91,7 @@ public class ParallelPseudoSim {
 		 * submit tasks
 		 */
 		for(int i = 0; i < segments.length; i++) {
-			threads[i].init(segments[i], network, linkTravelTimes, eventManager, config);
+			threads[i].init(segments[i], network, linkTravelTimes, eventManager);
 			futures[i] = executor.submit(threads[i]);
 		}
 		/*
@@ -123,36 +112,18 @@ public class ParallelPseudoSim {
 		
 		private Collection<Plan> plans;
 		
-		private TravelTime linkTravelTimes;
-		
 		private EventsManager eventManager;
 		
-		private Network network;
-		
-		private TransitRouterNetworkTravelTimeAndDisutility transitTravelTime;
-		
-		private PreparedTransitSchedule preparedSchedule = new PreparedTransitSchedule(null);
-		
-		private Queue<Event> eventQueue;
-		
-		private RailSimEngine railSimEngine;
-		
-		public void init(Collection<Plan> plans, Network network, TravelTime linkTravelTimes, EventsManager eventManager, Config config) {
+		private LinkedList<Event> eventList;
+	
+		public void init(Collection<Plan> plans, Network network, TravelTime linkTravelTimes, EventsManager eventManager) {
 			this.plans = plans;
-			this.network = network;
-			this.linkTravelTimes = linkTravelTimes;
 			this.eventManager = eventManager;
-			TransitRouterConfig trConfig = new TransitRouterConfig(config);
-			transitTravelTime = new TransitRouterNetworkTravelTimeAndDisutility(trConfig, preparedSchedule);
-			
-			
 		}
 
 		@Override
 		public void run() {
-			eventQueue = new LinkedList<Event>();
-			railSimEngine = new RailSimEngine(eventQueue, schedule, network);
-			
+			eventList = new LinkedList<Event>();
 			for (Plan plan : plans) {
 				List<PlanElement> elements = plan.getPlanElements();
 
@@ -173,16 +144,12 @@ public class ParallelPseudoSim {
 						Leg leg = (Leg) elements.get(idx - 1);
 						double travelTime = Double.NaN;
 						
-						if(leg.getMode().equals(TransportMode.car)) {
-							NetworkRoute route = (NetworkRoute) leg.getRoute();
-							travelTime = calcCarTravelTime(route, prevEndTime, linkTravelTimes, network);
-						} else if (leg.getMode().equals(TransportMode.transit_walk)) {
-							travelTime = calcTransitWalkTime(plan.getPerson(), (Activity)elements.get(idx - 2), act);
-						} else if (leg.getMode().equals(TransportMode.pt)) {
-//							ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
-							travelTime = calcPTTravelTime(leg, actEndTime, plan.getPerson());
+						LegSimEngine engine = legSimEngines.get(leg.getMode());
+						if(engine == null) {
+							engine = defaultLegSimEngine;
 						}
 						
+						travelTime = engine.simulate(plan.getPerson(), leg, actEndTime, eventList);
 						travelTime = Math.max(MIN_LEG_DURATION, travelTime);
 						double arrivalTime = travelTime + prevEndTime;
 						/*
@@ -201,10 +168,12 @@ public class ParallelPseudoSim {
 						 */
 						PersonArrivalEvent arrivalEvent = new PersonArrivalEvent(arrivalTime, plan.getPerson().getId(),
 								act.getLinkId(), leg.getMode());
-						eventQueue.add(arrivalEvent);
+//						eventManager.processEvent(arrivalEvent);
+						eventList.add(arrivalEvent);
 						ActivityStartEvent startEvent = new ActivityStartEvent(arrivalTime, plan.getPerson().getId(),
 								act.getLinkId(), act.getFacilityId(), act.getType());
-						eventQueue.add(startEvent);
+//						eventManager.processEvent(startEvent);
+						eventList.add(startEvent);
 					}
 
 					if (idx < elements.size() - 1) {
@@ -214,63 +183,22 @@ public class ParallelPseudoSim {
 						 */
 						ActivityEndEvent endEvent = new ActivityEndEvent(actEndTime, plan.getPerson().getId(),
 								act.getLinkId(), act.getFacilityId(), act.getType());
-						eventQueue.add(endEvent);
+//						eventManager.processEvent(endEvent);
+						eventList.add(endEvent);
 						Leg leg = (Leg) elements.get(idx + 1);
-						PersonDepartureEvent deparutreEvent = new PersonDepartureEvent(actEndTime, plan.getPerson()
+						PersonDepartureEvent departureEvent = new PersonDepartureEvent(actEndTime, plan.getPerson()
 								.getId(), act.getLinkId(), leg.getMode());
-						eventQueue.add(deparutreEvent);
+//						eventManager.processEvent(deparutreEvent);
+						eventList.add(departureEvent);
 					}
 
 					prevEndTime = actEndTime;
 				}
 			}
-
-			for (Event event : eventQueue) {
-				try{
-				eventManager.processEvent(event);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
 			
-		}
-		
-		private double calcCarTravelTime(NetworkRoute route, double startTime, TravelTime travelTime, Network network) {
-			double tt = 0;
-			if (route.getStartLinkId() != route.getEndLinkId()) {
-
-				List<Id> ids = route.getLinkIds();
-				for (int i = 0; i < ids.size(); i++) {
-					tt += travelTime.getLinkTravelTime(network.getLinks().get(ids.get(i)), startTime, null, null);
-					tt++;// 1 sec for each node
-				}
-				tt += travelTime.getLinkTravelTime(network.getLinks().get(route.getEndLinkId()), startTime, null, null);
+			for(Event event : eventList) {
+				eventManager.processEvent(event);
 			}
-
-			return tt;
-		}
-		
-		private double calcTransitWalkTime(Person person, Activity startAct, Activity endAct) {
-			 return transitTravelTime.getTravelTime(person, startAct.getCoord(), endAct.getCoord());
-		}
-		
-		private double calcPTTravelTime(Leg leg, double depTime, Person person) {
-//			TransitLine line = schedule.getTransitLines().get(route.getLineId());
-//			TransitRoute troute = line.getRoutes().get(route.getRouteId());
-//			NetworkRoute nroute = troute.getRoute();
-//			
-//			TransitRouteStop accessStop = troute.getStop(schedule.getFacilities().get(route.getAccessStopId()));
-//			double time = preparedSchedule.getNextDepartureTime(troute, accessStop, depTime);
-//			int stopIdx = troute.getStops().indexOf(accessStop);
-//			
-//			List<Id> linkIds = nroute.getLinkIds();
-//			for(int i = 0; i < linkIds.size(); i++) {
-//				eventQueue.add(new LinkEnterEvent(time, person.getId(), linkIds.get(i), null));
-//				time += transitTravelTime.getLinkTravelTime(network.getLinks().get(linkIds.get(i)), depTime, person, null);
-//				eventQueue.add(new LinkLeaveEvent(time, person.getId(), linkIds.get(i), null));
-//			}
-//			return route.getTravelTime();//TODO
-			return railSimEngine.simulate(person, leg, depTime);
 		}
 	}
 
@@ -278,5 +206,14 @@ public class ParallelPseudoSim {
 	public void finalize() throws Throwable {
 		super.finalize();
 		executor.shutdown();
+	}
+	
+	private static class DefaultLegSimEngine implements LegSimEngine {
+
+		@Override
+		public double simulate(Person person, Leg leg, double departureTime, LinkedList<Event> eventList) {
+			return leg.getRoute().getTravelTime(); //TODO replace
+		}
+		
 	}
 }

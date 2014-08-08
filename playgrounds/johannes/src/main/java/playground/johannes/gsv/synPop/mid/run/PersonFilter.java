@@ -57,16 +57,16 @@ public class PersonFilter {
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
 		
-		parser.parse("/home/johannes/gsv/synpop/output/1400000000.pop.xml.gz");
+		parser.parse("/home/johannes/gsv/mid2008/pop.xml");
 		logger.info(String.format("Loaded %s persons.", parser.getPersons().size()));
 		
 		ProxyPersonTaskComposite tasks = new ProxyPersonTaskComposite();
 //		tasks.addComponent(new DeleteNoLegs());
 		tasks.addComponent(new DeleteModes("car"));
 		
-		DeleteDay deleteDay = new DeleteDay();
-		deleteDay.setWeekdays();
-		tasks.addComponent(deleteDay);
+//		DeleteDay deleteDay = new DeleteDay();
+//		deleteDay.setWeekdays();
+//		tasks.addComponent(deleteDay);
 		
 		logger.info("Running filter...");
 		for(ProxyPerson person : parser.getPersons()) {
@@ -78,7 +78,7 @@ public class PersonFilter {
 		
 		logger.info("Writing population...");
 		XMLWriter writer = new XMLWriter();
-		writer.write("/home/johannes/gsv/synpop/output/pop.car.xml.gz", subset);
+		writer.write("/home/johannes/gsv/mid2008/pop.car.xml", subset);
 		logger.info("Done.");
 	}
 }

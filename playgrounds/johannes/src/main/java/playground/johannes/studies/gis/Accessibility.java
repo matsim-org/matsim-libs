@@ -123,7 +123,7 @@ public class Accessibility {
 		ZoneLayer<Double> startZones;
 		logger.info("Initializing start zones...");
 		if(useOriginZones) {
-			startZones= ZoneLayerSHP.read(zonesFile);
+			startZones= ZoneLayerSHP.read(zonesFile, null);
 			startZones.overwriteCRS(CRSUtils.getCRS(21781));
 			startZones = createZoneStartLayer(startZones);		
 		} else {
@@ -133,7 +133,9 @@ public class Accessibility {
 		logger.info("Initializing target zones...");
 		ZoneLayer<Set<Point>> targetZones;
 		if(useTargetZones) {
-			targetZones = ZoneLayerSHP.read(zonesFile);
+			targetZones = null;//ZoneLayerSHP.read(zonesFile);
+			System.err.println("Code needs update.");
+			System.exit(-1);
 			targetZones.overwriteCRS(CRSUtils.getCRS(21781));
 			targetZones = createZoneTargetLayer(targetZones, points);
 		} else {

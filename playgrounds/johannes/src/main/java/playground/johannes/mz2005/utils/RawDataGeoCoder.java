@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.johannes.mz2005.utils;
 
-import geo.google.datamodel.GeoCoordinate;
 import gnu.trove.TObjectIntHashMap;
 
 import java.io.BufferedReader;
@@ -34,6 +33,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleGeoCoder;
 import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleLocationLookup.RequestLimitException;
+
+import com.google.code.geocoder.model.LatLng;
 
 /**
  * @author illenberger
@@ -181,9 +182,9 @@ public class RawDataGeoCoder {
 		if(query.isEmpty())
 			c = null;
 		else {
-			GeoCoordinate coord = googleLookup.requestCoordinate(builder.toString());
+			LatLng coord = googleLookup.requestCoordinate(builder.toString());
 			if(coord != null)
-				c = new CoordImpl(coord.getLongitude(), coord.getLatitude());
+				c = new CoordImpl(coord.getLng().doubleValue(), coord.getLat().doubleValue());
 		}
 		
 		if(c == null) {

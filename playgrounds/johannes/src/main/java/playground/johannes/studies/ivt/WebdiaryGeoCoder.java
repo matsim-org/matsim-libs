@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.johannes.studies.ivt;
 
-import geo.google.datamodel.GeoCoordinate;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -28,6 +26,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleGeoCoder;
+
+import com.google.code.geocoder.model.LatLng;
 
 /**
  * @author illenberger
@@ -40,7 +40,7 @@ public class WebdiaryGeoCoder {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		GoogleGeoCoder geoCoder = new GoogleGeoCoder(200);
+		GoogleGeoCoder geoCoder = new GoogleGeoCoder();
 		BufferedReader reader = new BufferedReader(new FileReader("/Users/jillenberger/Work/socialnets/data/ivt2009/webdiary/webdiary_analysis_activitytype.csv"));
 		BufferedWriter writer = new BufferedWriter(new FileWriter("/Users/jillenberger/Work/socialnets/data/ivt2009/webdiary/webdiary.xy.csv"));
 		
@@ -77,13 +77,13 @@ public class WebdiaryGeoCoder {
 			String query = builder.toString();
 			query = query.replace("\"", "");
 			
-			GeoCoordinate coord = geoCoder.requestCoordinate(query);
+			LatLng coord = geoCoder.requestCoordinate(query);
 			if(coord != null) {
 				writer.write(line);
 				writer.write(";");
-				writer.write(Double.toString(coord.getLatitude()));
+				writer.write(Double.toString(coord.getLat().doubleValue()));
 				writer.write(";");
-				writer.write(Double.toString(coord.getLongitude()));
+				writer.write(Double.toString(coord.getLng().doubleValue()));
 				writer.newLine();
 			}
 			

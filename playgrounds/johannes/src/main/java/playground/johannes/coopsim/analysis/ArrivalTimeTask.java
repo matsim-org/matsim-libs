@@ -44,16 +44,20 @@ public class ArrivalTimeTask extends TrajectoryAnalyzerTask {
 			}
 		}
 		
+		purposes.add(null);
+		
 		for(String purpose : purposes) {
 			ArrivalTime startTime = new ArrivalTime(purpose);
 			DescriptiveStatistics stats = startTime.statistics(trajectories, true);
+		
+			if(purpose == null)
+				purpose = "all";
 			
 			String key = "t_arr_" + purpose;
 			results.put(key, stats);
 			
 			try {
 				writeHistograms(stats, key, 100, 50);
-//				writeHistograms(stats, new LinearDiscretizer(3600), key, false);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
-import geo.google.datamodel.GeoCoordinate;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -29,11 +27,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 
 import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleGeoCoder;
-import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleLocationLookup;
 
+import com.google.code.geocoder.model.LatLng;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
@@ -75,7 +72,7 @@ public class EgoTableReader {
 	}
 	
 	public EgoTableReader(List<String> files) throws IOException {
-		lookup = new GoogleGeoCoder(500);
+		lookup = new GoogleGeoCoder();
 		
 		egos = new HashMap<String, Record>();
 		for(String file : files) {
@@ -166,7 +163,7 @@ public class EgoTableReader {
 		/*
 		 * try obtaining coordinates
 		 */
-		GeoCoordinate c = lookup.requestCoordinate(builder.toString());
+		LatLng c = lookup.requestCoordinate(builder.toString());
 //		Coord c = lookup.locationToCoord(builder.toString());
 //		if (lookup.getLastErrorCode() == 620) {
 //			while (lookup.getLastErrorCode() == 620) {
@@ -183,7 +180,7 @@ public class EgoTableReader {
 		
 		if(c != null) {
 //			return geoFactory.createPoint(new Coordinate(0,0));
-			return geoFactory.createPoint(new Coordinate(c.getLongitude(), c.getLatitude()));
+			return geoFactory.createPoint(new Coordinate(c.getLng().doubleValue(), c.getLat().doubleValue()));
 		} else {
 			return null;
 		}

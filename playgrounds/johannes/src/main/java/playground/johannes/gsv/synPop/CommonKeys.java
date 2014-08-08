@@ -47,7 +47,7 @@ public interface CommonKeys {
 	
 	public static final String LEG_MODE = "mode";
 	
-	public static final String LEG_MODE_PED = "ped";
+	public static final String LEG_MODE_PED = "walk";
 	
 	public static final String LEG_MODE_BIKE = "bike";
 	

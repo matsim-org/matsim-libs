@@ -107,7 +107,9 @@ public class DensityPlot {
 		if(GEOMETRY.equals("grid")) {
 			sampleLayer = ZoneUtils.createGridLayer(RESOLUTION, boundary);
 		} else {
-			sampleLayer = ZoneLayerSHP.read(zoneFile);
+//			sampleLayer = ZoneLayerSHP.read(zoneFile);
+			System.err.println("Code needs update.");
+			System.exit(-1);
 		}
 		sampleLayer.overwriteCRS(CRSUtils.getCRS(21781));
 		ZoneUtils.fillZoneLayer(sampleLayer, (Set)graph.getVertices());
@@ -116,8 +118,11 @@ public class DensityPlot {
 		if(MODE.equals("density") || MODE.equals("weighted")) {
 			if(GEOMETRY.equals("grid"))
 				popLayer = ZoneUtils.createGridLayer(RESOLUTION, boundary);
-			else
-				popLayer = ZoneLayerSHP.read(zoneFile);
+			else {
+//				popLayer = ZoneLayerSHP.read(zoneFile);
+				System.err.println("Code needs update.");
+				System.exit(-1);
+			}
 			popLayer.overwriteCRS(CRSUtils.getCRS(21781));
 			ZoneUtils.fillZoneLayer(popLayer, (Set)popGraph.getVertices());
 			
@@ -132,8 +137,11 @@ public class DensityPlot {
 		ZoneLayer<Double> layer = null;
 		if(GEOMETRY.equals("grid"))
 			layer = ZoneUtils.createGridLayer(RESOLUTION, boundary);
-		else
-			layer = ZoneLayerSHP.read(zoneFile);
+		else {
+//			layer = ZoneLayerSHP.read(zoneFile);
+			System.err.println("Code needs update.");
+			System.exit(-1);
+		}
 		layer.overwriteCRS(CRSUtils.getCRS(21781));
 		for(Zone<Double> zone : layer.getZones()) {
 			double rho = 0;

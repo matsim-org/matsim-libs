@@ -19,54 +19,76 @@
 
 package playground.johannes.gsv.synPop.analysis;
 
-import gnu.trove.TDoubleDoubleHashMap;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
+
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author johannes
  *
  */
-public class ActivityDistanceTask implements ProxyAnalyzerTask {
+public class ActivityDistanceTask extends AnalyzerTask {
 
-	private GeometryFactory geoFactory = new GeometryFactory();
+	public final static String KEY = "d.act";
 	
 	private final ActivityFacilities facilities;
 	
-	private final String outputDir;
-	
 	private final DistanceCalculator calc = CartesianDistanceCalculator.getInstance();
 	
-	public ActivityDistanceTask(ActivityFacilities facilities, String outputDir) {
+	public ActivityDistanceTask(ActivityFacilities facilities) {
 		this.facilities = facilities;
-		this.outputDir = outputDir;
 	}
 	
+	private DescriptiveStatistics statistics(Collection<ProxyPerson> persons, String purpose) {
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		
+		for(ProxyPerson person : persons) {
+			ProxyPlan plan = person.getPlan();
+			
+			for(int i = 1; i < plan.getActivities().size(); i++) {
+				
+				ProxyObject thisAct = plan.getActivities().get(i);
+			
+				if (purpose == null	|| purpose.equalsIgnoreCase(thisAct.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+					ProxyObject prevAct = plan.getActivities().get(i - 1);
+					Id prevId = new IdImpl(prevAct.getAttribute(CommonKeys.ACTIVITY_FACILITY));
+					ActivityFacility prevFac = facilities.getFacilities().get(prevId);
+
+					Id thisId = new IdImpl(thisAct.getAttribute(CommonKeys.ACTIVITY_FACILITY));
+					ActivityFacility thisFac = facilities.getFacilities().get(thisId);
+
+					Point p1 = MatsimCoordUtils.coordToPoint(prevFac.getCoord());
+					Point p2 = MatsimCoordUtils.coordToPoint(thisFac.getCoord());
+
+					double d = calc.distance(p1, p2);
+					stats.addValue(d);
+				}
+			}
+		}
+		
+		return stats;
+	}
+
 	@Override
-	public void analyze(Collection<ProxyPerson> persons) {
+	public void analyze(Collection<ProxyPerson> persons, Map<String, DescriptiveStatistics> results) {
 		Set<String> types = new HashSet<String>();
 		for(ProxyPerson person : persons) {
 			ProxyPlan plan = person.getPlan();
@@ -75,52 +97,24 @@ public class ActivityDistanceTask implements ProxyAnalyzerTask {
 			}
 		}
 		
-		types.remove("home");
+		types.add(null);
 		
 		for (String type : types) {
 			DescriptiveStatistics stats = statistics(persons, type);
-			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(1000), false);
-			try {
-				TXTWriter.writeMap(hist, "d", "n", outputDir + "d."+type+".txt");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-		
-		
-//		DescriptiveStatistics stats = statistics(persons, null);
-//		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(1000), false);
-//		try {
-//			TXTWriter.writeMap(hist, "d", "n", outputDir + "d.all.txt");
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-	}
-
-	private DescriptiveStatistics statistics(Collection<ProxyPerson> persons, String purpose) {
-		DescriptiveStatistics stats = new DescriptiveStatistics();
-		
-		for(ProxyPerson person : persons) {
-			ProxyPlan plan = person.getPlan();
 			
-			double x = Double.parseDouble((String) person.getAttribute(CommonKeys.PERSON_HOME_COORD_X));
-			double y = Double.parseDouble((String) person.getAttribute(CommonKeys.PERSON_HOME_COORD_Y));
-				
-			Point p = geoFactory.createPoint(new Coordinate(x, y));
+			if(type == null)
+				type = "all";
 			
-			for(ProxyObject act : plan.getActivities()) {
-				if(purpose == null || purpose.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
-					String id = act.getAttribute(CommonKeys.ACTIVITY_FACILITY);
-					ActivityFacility facilitiy = facilities.getFacilities().get(new IdImpl(id));
-					double d = calc.distance(p, MatsimCoordUtils.coordToPoint(facilitiy.getCoord()));
-					stats.addValue(d);
+			String key = String.format("%s.%s", KEY, type);
+			results.put(key, stats);
+			
+			if(outputDirectoryNotNull()) {
+				try {
+					writeHistograms(stats, key, 100, 100);
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 		}
-		
-		return stats;
 	}
 }

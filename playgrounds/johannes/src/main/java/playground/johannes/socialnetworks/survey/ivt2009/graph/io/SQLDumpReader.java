@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
-import geo.google.datamodel.GeoCoordinate;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -32,10 +30,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
@@ -117,7 +115,7 @@ public class SQLDumpReader {
 	private Map<String, String> countries;
 	
 	public SQLDumpReader(List<String> files) throws IOException {
-		geoCoder = new GoogleGeoCoder(500);
+		geoCoder = new GoogleGeoCoder();
 		rawData = new HashMap<String, Map<String,String>>();
 		
 		for(String file : files) {

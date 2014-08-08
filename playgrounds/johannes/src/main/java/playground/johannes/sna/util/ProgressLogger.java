@@ -48,14 +48,15 @@ public class ProgressLogger {
 	
 	public static void step() {
 		counter++;
-		if(counter % majorTickVal == 0) {
+		if(counter == maxVal) {
+			System.out.print(NumberFormat.getPercentInstance().format(counter/(double)maxVal));
+			System.out.print("\n");
+		} else if(counter % majorTickVal == 0) {
 			System.out.print(NumberFormat.getPercentInstance().format(counter/(double)maxVal));
 		} else if(counter % minorTickVal == 0) {
 			System.out.print(DOT);
 		}
-		if(counter == maxVal) {
-			System.out.println();
-		}
+		
 	}
 	
 	public static void termiante() {

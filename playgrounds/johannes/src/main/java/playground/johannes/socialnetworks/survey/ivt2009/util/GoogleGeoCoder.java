@@ -19,18 +19,21 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.util;
 
-import geo.google.GeoAddressStandardizer;
-import geo.google.GeoException;
-import geo.google.datamodel.GeoCoordinate;
-import geo.google.datamodel.GeoStatusCode;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleLocationLookup.RequestLimitException;
+import com.google.code.geocoder.AdvancedGeoCoder;
+import com.google.code.geocoder.Geocoder;
+import com.google.code.geocoder.GeocoderRequestBuilder;
+import com.google.code.geocoder.model.GeocodeResponse;
+import com.google.code.geocoder.model.GeocoderRequest;
+import com.google.code.geocoder.model.GeocoderStatus;
+import com.google.code.geocoder.model.LatLng;
 
 /**
  * @author illenberger
@@ -40,61 +43,70 @@ public class GoogleGeoCoder {
 	
 	private static final Logger logger = Logger.getLogger(GoogleGeoCoder.class);
 	
-	private static final long START_INTERVAL = 5800;
+	private final Geocoder geocoder;
 	
-	private static final long MAX_INTERVAL = 6000;
+	private final long sleepInterval;
 	
-	private static final long STEP_INTERVAL = 100;
-
-	private GeoAddressStandardizer standardizer = new GeoAddressStandardizer("");
-
 	private HashMapCash cache = new HashMapCash();
 
 	public GoogleGeoCoder() {
-		standardizer.setRateLimitInterval(START_INTERVAL);
+		this(null, 0, 0);
 	}
 	
-	public GoogleGeoCoder(long intervall) {
-		standardizer.setRateLimitInterval(intervall);
+	public GoogleGeoCoder(String proxy, int port, long sleep) {
+		HttpClient httpClient = new HttpClient(new MultiThreadedHttpConnectionManager());
+		if(proxy != null) {
+			httpClient.getHostConfiguration().setProxy(proxy, port);
+		}
+		geocoder = new AdvancedGeoCoder(httpClient);
+		
+		this.sleepInterval = sleep;
 	}
-	
-	public GeoCoordinate requestCoordinate(String query) {
+
+	public LatLng requestCoordinate(String query) {
 		Level level = Logger.getRootLogger().getLevel();
 		Logger.getRootLogger().setLevel(Level.INFO);
 		
-		GeoCoordinate coord = cache.get(query);
-		if (coord == null) {
+		GeocodeResponse response = cache.get(query);
+		if (response == null) {
 			try {
-				coord = standardizer.standardizeToGeoCoordinate(query);
-				if(coord != null)
-					cache.put(query, coord);
-				
-			} catch (GeoException e) {
-				logger.warn(String.format("%1$s: %2$s", e.getStatus().getCode(), e.getStatus().getDescription()));
-				
-				if(e.getStatus().getCode() == GeoStatusCode.G_GEO_TOO_MANY_QUERIES.getCode()) {
-					standardizer.setRateLimitInterval(standardizer.getRateLimitInterval() + STEP_INTERVAL);
-					logger.warn(String.format("Increasing request intervall (%1$s ms).", standardizer.getRateLimitInterval()));
-				
-					if(standardizer.getRateLimitInterval() > MAX_INTERVAL) {
-						throw new RequestLimitException();
-					}
+				Thread.sleep(sleepInterval);
+				GeocoderRequest geocoderRequest = new GeocoderRequestBuilder().setAddress(query).setLanguage("de").getGeocoderRequest();
+				response = geocoder.geocode(geocoderRequest);
+				if(response.getStatus() == GeocoderStatus.OK) {
+					cache.put(query, response);
+				} else if(response.getStatus() == GeocoderStatus.ZERO_RESULTS){
+					logger.warn(String.format("No results for query \"%s\" found.", query));
+				} else {
+					logger.warn(String.format("Request failed with error \"%s\".", response.getStatus().name()));
 				}
+				
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		
 		Logger.getRootLogger().setLevel(level);
 		
-		return coord;
+		if(response != null) {
+			if(!response.getResults().isEmpty()) {
+				LatLng c = response.getResults().get(0).getGeometry().getLocation();
+				return c;//new CoordImpl(c.getLng().doubleValue(), c.getLat().doubleValue());
+			} else { // should not happen
+				logger.warn(String.format("No results for query \"%s\" found.", query));
+			}
+		}
+		
+		return null;
 	}
 
-	private static class HashMapCash extends LinkedHashMap<String, GeoCoordinate> {
+	private static class HashMapCash extends LinkedHashMap<String, GeocodeResponse> {
 
 		private static final long serialVersionUID = 1L;
 
 		private static final int MAX_ENTRIES = 100;
 
-		protected boolean removeEldestEntry(Map.Entry<String, GeoCoordinate> eldest) {
+		protected boolean removeEldestEntry(Map.Entry<String, GeocodeResponse> eldest) {
 			return size() > MAX_ENTRIES;
 		}
 	}

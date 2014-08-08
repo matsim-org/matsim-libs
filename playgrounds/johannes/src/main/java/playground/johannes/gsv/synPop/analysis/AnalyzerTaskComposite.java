@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * TrajectoryAnalyzerTaskComposite.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,24 +17,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package playground.johannes.gsv.synPop.analysis;
 
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
 
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.sna.util.Composite;
 
 /**
- * @author johannes
+ * @author illenberger
  *
  */
-public class AnalyzerTaskComposite extends Composite<ProxyAnalyzerTask> implements ProxyAnalyzerTask {
+public class AnalyzerTaskComposite extends AnalyzerTask {
 
+	private static final Logger logger = Logger.getLogger(AnalyzerTaskComposite.class);
+	
+	private List<AnalyzerTask> tasks;
+	
+	public AnalyzerTaskComposite() {
+		tasks = new LinkedList<AnalyzerTask>();
+	}
+	
+	public void addTask(AnalyzerTask task) {
+		tasks.add(task);
+	}
+	
+	public void setOutputDirectory(String output) {
+		for(AnalyzerTask task : tasks) {
+			task.setOutputDirectory(output);
+		}
+	}
+	
 	@Override
-	public void analyze(Collection<ProxyPerson> persons) {
-		for(ProxyAnalyzerTask task : components) {
-			task.analyze(persons);
+	public void analyze(Collection<ProxyPerson> person, Map<String, DescriptiveStatistics> results) {
+		for(AnalyzerTask task : tasks) {
+			logger.debug(String.format("Running task %1$s...", task.getClass().getSimpleName()));
+			task.analyze(person, results);
 		}
 
 	}

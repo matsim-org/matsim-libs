@@ -22,37 +22,35 @@ package playground.johannes.gsv.synPop.mid.run;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.opengis.feature.simple.SimpleFeature;
+import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.io.DoubleSerializer;
-import playground.johannes.gsv.synPop.io.IntegerSerializer;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.mid.HPersonMunicipality;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
-import playground.johannes.gsv.synPop.mid.PersonMunicipalityClassHandler;
+import playground.johannes.gsv.synPop.mid.hamiltonian.PersonState;
 import playground.johannes.gsv.synPop.mid.hamiltonian.PopulationDensity;
 import playground.johannes.gsv.synPop.sim.CompositeHamiltonian;
+import playground.johannes.gsv.synPop.sim.HFacilityCapacity;
 import playground.johannes.gsv.synPop.sim.HamiltonianLogger;
 import playground.johannes.gsv.synPop.sim.Initializer;
-import playground.johannes.gsv.synPop.sim.MutateHomeLocation;
+import playground.johannes.gsv.synPop.sim.MutateHomeActLocation;
 import playground.johannes.gsv.synPop.sim.PopulationWriter;
 import playground.johannes.gsv.synPop.sim.Sampler;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author johannes
@@ -73,8 +71,6 @@ public class SetHomeLocations {
 		ConfigUtils.loadConfig(config, args[0]);
 		
 		XMLParser parser = new XMLParser();
-		parser.addSerializer(MIDKeys.PERSON_MUNICIPALITY_CLASS, IntegerSerializer.instance());
-		parser.addSerializer(CommonKeys.PERSON_WEIGHT, DoubleSerializer.instance());
 		parser.setValidating(false);
 	
 		logger.info("Loading persons...");
@@ -88,51 +84,45 @@ public class SetHomeLocations {
 		logger.info(String.format("Generated %s persons.", persons.size()));
 		
 		logger.info("Loading GIS data...");
-		/*
-		 * load DE boundaries
-		 */
-		Set<SimpleFeature> features = FeatureSHP.readFeatures(config.getParam(MODULE_NAME, "deBoundary"));
-		SimpleFeature feature = features.iterator().next();
-		Geometry zoneDE = ((Geometry) feature.getDefaultGeometry()).getGeometryN(0);
-		/*
-		 * load municipality inhabitants
-		 */
-		ZoneLayer<Double> municipalities = ZoneLayerSHP.read(config.findParam(MODULE_NAME, "gemeinden"), "EWZ");
-		/*
-		 * load marktzellen inhabitants
-		 */
-//		ZoneLayer<Double> markzellen = ZoneLayerSHP.read("/home/johannes/gsv/synpop/data/gis/marktzellen/plz8.gk3.shp", "A_GESAMT");
-//		ZoneLayer<Double> markzellen = ZoneLayerSHP.read(config.findParam(MODULE_NAME, "marktzellen"), "A_GESAMT");
-		ZoneLayer<Double> markzellen = ZoneLayerSHP.read(config.findParam(MODULE_NAME, "marktzellen"), "EWZ");
+	
+		ZoneLayer<Double> municipalities = ZoneLayerSHP.read(config.findParam(MODULE_NAME, "popGemd"), "EWZ");
+		ZoneLayer<Double> popZone = ZoneLayerSHP.read(config.findParam(MODULE_NAME, "popNuts3"), "value");
+		
 		double sum = 0;
-		for(Zone<Double> zone : markzellen.getZones()) {
+		for(Zone<Double> zone : popZone.getZones()) {
 			sum += zone.getAttribute();
 		}
-		for(Zone<Double> zone : markzellen.getZones()) {
+		for(Zone<Double> zone : popZone.getZones()) {
 			zone.setAttribute(zone.getAttribute()/sum);
 		}
+		
+		ZoneLayer<Map<String, Object>> nuts1 = ZoneLayerSHP.read(config.findParam(MODULE_NAME, "nuts1"));
 		/*
 		 * load facilities
 		 */
-//		Scenario scenario = ScenarioUtils.createScenario(config);
-//		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
-//		facReader.readFile(config.getParam(MODULE_NAME, "facilities"));
-//		ActivityFacilities facilities = scenario.getActivityFacilities();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
+		facReader.readFile(config.getParam(MODULE_NAME, "facilities"));
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 		
 		logger.info("Done.");
 		
 		logger.info("Setting up sampler...");
 		
-		MutateHomeLocation mutator = new MutateHomeLocation(zoneDE, random);
-		
-		
+		MutateHomeActLocation mutator = new MutateHomeActLocation(facilities, random);
 		
 		CompositeHamiltonian H = new CompositeHamiltonian();
 		HPersonMunicipality municp = new HPersonMunicipality(municipalities);
-		H.addComponent(municp);
+		H.addComponent(municp, 5);
 		
-		PopulationDensity popDen = new PopulationDensity(markzellen, persons.size(), random);
+		PopulationDensity popDen = new PopulationDensity(popZone, persons.size(), random);
 		H.addComponent(popDen);
+		
+		HFacilityCapacity cap = new HFacilityCapacity("home", facilities);
+		H.addComponent(cap, 0.0001);
+		
+		PersonState state = new PersonState(nuts1);
+		H.addComponent(state, 10);
 		
 		Sampler sampler = new Sampler(random);
 		
@@ -149,9 +139,11 @@ public class SetHomeLocations {
 		/*
 		 * add loggers
 		 */
-		int logInterval = 100000;
+		int logInterval = 1000000;
 		sampler.addListener(new HamiltonianLogger(popDen, logInterval, outputDir + "/popDen.log"));
 		sampler.addListener(new HamiltonianLogger(municp, logInterval, outputDir + "/municip.log"));
+		sampler.addListener(new HamiltonianLogger(cap, logInterval, outputDir + "/capacity.log"));
+		sampler.addListener(new HamiltonianLogger(state, logInterval, outputDir + "/state.log"));
 		
 		sampler.setHamiltonian(H);
 		
@@ -169,11 +161,11 @@ public class SetHomeLocations {
 			}
 		}
 		
-		popDen.writeZoneData("/home/johannes/gsv/synpop/output/zones-start.shp");
+		popDen.writeZoneData(outputDir + "zones-start.shp");
 		logger.info("Running sampler...");
 		sampler.run(persons, (long) Double.parseDouble(config.getParam(MODULE_NAME, "iterations")));
 		logger.info("Done.");
-		popDen.writeZoneData("/home/johannes/gsv/synpop/output/zones-end.shp");
+		popDen.writeZoneData(outputDir + "zones-end.shp");
 	}
 	
 	

@@ -79,6 +79,9 @@ public class RoundTripTask implements ProxyPlanTask {
 			fromLeg.setAttribute(CommonKeys.LEG_END_TIME, String.valueOf(toLegEnd));
 			fromLeg.setAttribute(CommonKeys.LEG_DISTANCE, toLeg.getAttribute(CommonKeys.LEG_DISTANCE));
 			fromLeg.setAttribute(CommonKeys.LEG_MODE, toLeg.getAttribute(CommonKeys.LEG_MODE));
+			
+			ProxyObject nextAct = plan.getActivities().get(i);
+			fromLeg.setAttribute(CommonKeys.LEG_PURPOSE, nextAct.getAttribute(CommonKeys.ACTIVITY_TYPE));
 			plan.getLegs().add(i-1, fromLeg);
 			
 			offset += 1;

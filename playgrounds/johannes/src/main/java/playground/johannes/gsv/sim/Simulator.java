@@ -24,37 +24,49 @@ package playground.johannes.gsv.sim;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.contrib.cadyts.car.CadytsContext;
+import org.matsim.contrib.cadyts.general.CadytsScoring;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
+import playground.johannes.coopsim.analysis.ArrivalTimeTask;
+import playground.johannes.coopsim.analysis.DepartureLoadTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.analysis.TripDistanceTask;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
-import playground.johannes.gsv.analysis.KMLRailCountsWriter;
-import playground.johannes.gsv.analysis.LineSwitchTask;
-import playground.johannes.gsv.analysis.ModeShareTask;
-import playground.johannes.gsv.analysis.PKmAnalyzer;
-import playground.johannes.gsv.analysis.RailCounts;
-import playground.johannes.gsv.analysis.TransitLineAttributes;
+import playground.johannes.gsv.analysis.ScoreTask;
+import playground.johannes.gsv.analysis.SpeedFactorTask;
+import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 /**
  * @author johannes
@@ -67,51 +79,134 @@ public class Simulator {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		// TODO Auto-generated method stub
 		Controler controler = new Controler(args);
 		controler.setOverwriteFiles(true);
-//		generateFacilities(controler);
+		controler.setDumpDataAtEnd(false);
 		controler.setMobsimFactory(new MobsimConnectorFactory());
+		controler.addControlerListener(new ControllerSetup());
+		/*
+		 * setup mutation module
+		 */
+		Random random = new XORShiftRandom(controler.getConfig().global().getRandomSeed());
 		
-		TrajectoryAnalyzerTaskComposite task = new TrajectoryAnalyzerTaskComposite();
-		task.addTask(new TripDistanceTask(controler.getFacilities()));
-		task.addTask(new ModeShareTask());
-		task.addTask(new LineSwitchTask());
+		StrategySettings settings = new StrategySettings(new IdImpl(1));
+		settings.setModuleName("activityLocations");
+		settings.setProbability(1.0);
+		int numThreads = controler.getConfig().global().getNumberOfThreads();
+		controler.addPlanStrategyFactory("activityLocations", new ActivityLocationStrategyFactory(random, numThreads, "home"));
 		
-		TransitLineAttributes attribs = TransitLineAttributes.createFromFile(controler.getConfig().getParam("gsv", "transitLineAttributes"));
-		
-		AnalyzerListiner listener = new AnalyzerListiner();
-		listener.lineAttribs = attribs;
-//		listener.builder = builder;
-		listener.task = task;
-		listener.controler = controler;
-		
-		controler.addControlerListener(listener);
-		
-//		PKmAnalyzer pkm = new PKmAnalyzer(TransitLineAttributes.createFromFile("/home/johannes/gsv/matsim/studies/netz2030/data/transitLineAttributes.xml"));
-		PKmAnalyzer pkm = new PKmAnalyzer(attribs);
-		controler.addControlerListener(pkm);
 		controler.run();
 		
 	}
+	
+	private static class ControllerSetup implements StartupListener {
 
-	private static void generateFacilities(Controler controler) {
-		Population pop = controler.getScenario().getPopulation();
-		ActivityFacilities facilities = controler.getFacilities();
-		
-		for(Person person : pop.getPersons().values()) {
-			for(Plan plan : person.getPlans()) {
-				for(int i = 0; i < plan.getPlanElements().size(); i+=2) {
-					Activity act = (Activity) plan.getPlanElements().get(i);
-					Id id = new IdImpl("autofacility_"+ i +"_" + person.getId().toString());
-					ActivityFacilityImpl fac = ((ActivityFacilitiesImpl)facilities).createAndAddFacility(id, act.getCoord());
-					fac.createActivityOption(act.getType());
-					
-					((ActivityImpl)act).setFacilityId(id);
-				}
-
+		@Override
+		public void notifyStartup(StartupEvent event) {
+			Controler controler = event.getControler();
+			Config config = event.getControler().getConfig();
+			/*
+			 * connect facilities to links
+			 */
+			NetworkImpl network = (NetworkImpl) controler.getNetwork();
+			for(ActivityFacility facility : controler.getScenario().getActivityFacilities().getFacilities().values()) {
+				Coord coord = facility.getCoord();
+				Link link = network.getNearestLinkExactly(coord);
+				((ActivityFacilityImpl)facility).setLinkId(link.getId());
 			}
+			/*
+			 * setup scoring and cadyts integration
+			 */
+			boolean disableCadyts = Boolean.parseBoolean(config.getModule("gsv").getValue("disableCadyts"));
+			if(!disableCadyts) {
+			CadytsContext context = new CadytsContext(controler.getScenario().getConfig());
+			controler.setScoringFunctionFactory(new ScoringFactory(context, controler.getConfig(), controler.getNetwork()));
+			
+			controler.addControlerListener(context);
+			Logger.getRootLogger().setLevel(org.apache.log4j.Level.FATAL);
+			context.notifyStartup(event);
+			Logger.getRootLogger().setLevel(org.apache.log4j.Level.DEBUG);
+			controler.addControlerListener(new CadytsRegistration(context));
+			}
+			/*
+			 * setup analysis modules
+			 */
+			DTVAnalyzer dtv = new DTVAnalyzer(controler.getNetwork(), controler, controler.getEvents(), config.findParam("gsv", "countsfile"));
+			controler.addControlerListener(dtv);
+			
+			TrajectoryAnalyzerTaskComposite task = new TrajectoryAnalyzerTaskComposite();
+			task.addTask(new TripDistanceTask(controler.getFacilities()));
+			task.addTask(new SpeedFactorTask(controler.getFacilities()));
+			task.addTask(new ScoreTask());
+			task.addTask(new ArrivalTimeTask());
+			task.addTask(new DepartureLoadTask());
+			
+			AnalyzerListiner listener = new AnalyzerListiner();
+			listener.task = task;
+			listener.controler = controler;
+			listener.notifyStartup(event);
+			
+			controler.addControlerListener(listener);
+			/*
+			 * replace travel time calculator
+			 */
+			
 		}
+		
+	}
+
+	private static class CadytsRegistration implements BeforeMobsimListener {
+
+		private CadytsContext context;
+		
+		public CadytsRegistration(CadytsContext context) {
+			this.context = context;
+		}
+		
+		@Override
+		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+			Population population = event.getControler().getPopulation();
+			for(Person person : population.getPersons().values()) {
+				context.getCalibrator().addToDemand(context.getPlansTranslator().getPlanSteps(person.getSelectedPlan()));
+			}
+			
+		}
+		
+	}
+	
+	private static class ScoringFactory implements ScoringFunctionFactory {
+
+		private ScoringFunction function;
+		
+		private CadytsContext context;
+		
+		private Config config;
+		
+		private Network network;
+		
+		public ScoringFactory(CadytsContext context, Config config, Network network) {
+			this.context = context;
+			this.config = config;
+		}
+		
+		@Override
+		public ScoringFunction createNewScoringFunction(Person person) {
+			if(function == null) {
+				CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());
+				SumScoringFunction sum = new SumScoringFunction();
+				sum.addScoringFunction(new CharyparNagelLegScoring(params, network));
+				sum.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
+			
+				CadytsScoring scoringFunction = new CadytsScoring(person.getSelectedPlan(), config, context);
+//				final double cadytsScoringWeight = 10.0;
+//				//final double cadytsScoringWeight = 0.0;
+//				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
+				sum.addScoringFunction(scoringFunction );
+			}
+			
+			return function;
+		}
+		
 	}
 	
 	private static class AnalyzerListiner implements IterationEndsListener, IterationStartsListener, StartupListener {
@@ -122,83 +217,57 @@ public class Simulator {
 		
 		private TrajectoryEventsBuilder builder;
 		
-//		private RailCounts simCounts;
-		
-		private RailCountsCollector countsCollector;
-		
-		private TransitLineAttributes lineAttribs;
-		
-		private RailCounts obsCounts;
-		
-//		private VolumesAnalyzer volAnalyzer;
-		
-//		private TObjectDoubleHashMap<Link> counts;
-		
-		/* (non-Javadoc)
-		 * @see org.matsim.core.controler.listener.IterationEndsListener#notifyIterationEnds(org.matsim.core.controler.events.IterationEndsEvent)
-		 */
 		@Override
 		public void notifyIterationEnds(IterationEndsEvent event) {
 			try {
 				TrajectoryAnalyzer.analyze(builder.trajectories(), task, controler.getControlerIO().getIterationPath(event.getIteration()));
-				
-//				KMLCountsDiffPlot kmlplot = new KMLCountsDiffPlot();
-				KMLRailCountsWriter railCountsWriter = new KMLRailCountsWriter();
-				String file = controler.getControlerIO().getIterationPath(event.getIteration()) + "/counts.kmz";
-//				kmlplot.write(volAnalyzer, counts, 1.0, file, controler.getNetwork());
-				RailCounts simCounts = countsCollector.getRailCounts();
-				
-				railCountsWriter.write(simCounts, obsCounts, event.getControler().getNetwork(), event.getControler().getScenario().getTransitSchedule(), lineAttribs, file, 5);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
 		}
 
-		/* (non-Javadoc)
-		 * @see org.matsim.core.controler.listener.IterationStartsListener#notifyIterationStarts(org.matsim.core.controler.events.IterationStartsEvent)
-		 */
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
 			builder.reset(event.getIteration());
 		}
 
-		/* (non-Javadoc)
-		 * @see org.matsim.core.controler.listener.StartupListener#notifyStartup(org.matsim.core.controler.events.StartupEvent)
-		 */
 		@Override
 		public void notifyStartup(StartupEvent event) {
-			generateFacilities(controler);
 			
 			Set<Person> person = new HashSet<Person>(controler.getPopulation().getPersons().values());
 			builder = new TrajectoryEventsBuilder(person);
 			controler.getEvents().addHandler(builder);
-			
-			countsCollector = new RailCountsCollector(lineAttribs);
-			controler.getEvents().addHandler(countsCollector);
-//			volAnalyzer = new VolumesAnalyzer(Integer.MAX_VALUE, Integer.MAX_VALUE, controler.getNetwork());
-//			controler.getEvents().addHandler(volAnalyzer);
-			
-			String file = event.getControler().getConfig().getParam("gsv", "counts");
-			obsCounts = RailCounts.createFromFile(file, lineAttribs, event.getControler().getNetwork(), event.getControler().getScenario().getTransitSchedule());
-			
-//			Map<String, TableHandler> tableHandlers = new HashMap<String, NetFileReader.TableHandler>();
-//			LineRouteCountsHandler countsHandler = new LineRouteCountsHandler(controler.getNetwork());
-//			tableHandlers.put("LINIENROUTENELEMENT", countsHandler);
-//			NetFileReader netReader = new NetFileReader(tableHandlers);
-//			NetFileReader.FIELD_SEPARATOR = "\t";
-//			
-//			try {
-//				netReader.read(event.getControler().getConfig().getParam("gsv", "counts"));
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-////			counts = countsHandler.getCounts();
-//			
-//			NetFileReader.FIELD_SEPARATOR = ";";
 		}
-		
 	}
+	
+//	private class DummyTravelTimeCalculatorFactory implements TravelTimeCalculatorFactory {
+//
+//		/* (non-Javadoc)
+//		 * @see org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory#createTravelTimeCalculator(org.matsim.api.core.v01.network.Network, org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup)
+//		 */
+//		@Override
+//		public TravelTimeCalculator createTravelTimeCalculator(Network network,
+//				TravelTimeCalculatorConfigGroup group) {
+//			// TODO Auto-generated method stub
+//			return null;
+//		}
+//		
+//	}
+//	
+//	private static class DummyTravelTimeCalculator extends TravelTimeCalculator {
+//
+//		/**
+//		 * @param network
+//		 * @param timeslice
+//		 * @param maxTime
+//		 * @param ttconfigGroup
+//		 */
+//		public DummyTravelTimeCalculator(Network network, int timeslice,
+//				int maxTime, TravelTimeCalculatorConfigGroup ttconfigGroup) {
+//			super(network, timeslice, maxTime, ttconfigGroup);
+//			// TODO Auto-generated constructor stub
+//		}
+//		
+//	}
 }

@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Transaction;
@@ -37,6 +38,7 @@ import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -128,22 +130,31 @@ public class ZoneLayerSHP {
 	 * @return a zone layer initialized with the features read from the shape file.
 	 * @throws IOException
 	 */
-	public static <T> ZoneLayer<T> read(String filename) throws IOException {
-		Set<Zone<T>> zones = new HashSet<Zone<T>>();
+	public static ZoneLayer<Map<String, Object>> read(String filename) throws IOException {
+		Set<Zone<Map<String, Object>>> zones = new HashSet<Zone<Map<String, Object>>>();
 		for(SimpleFeature feature : FeatureSHP.readFeatures(filename)) {
-			zones.add(new Zone<T>(((Geometry) feature.getDefaultGeometry()).getGeometryN(0)));
+			Zone<Map<String, Object>> zone = new Zone<Map<String, Object>>((Geometry) feature.getDefaultGeometry());
+			Map<String, Object> map = new HashMap<String, Object>(feature.getAttributeCount());
+			for(Property prop : feature.getProperties()) {
+				map.put(prop.getName().getLocalPart(), prop.getValue());
+			}
+			zone.setAttribute(map);
+			zones.add(zone);
 		}
 		
-		return new ZoneLayer<T>(zones);
+		return new ZoneLayer<Map<String, Object>>(zones);
 	}
 	
 	public static ZoneLayer<Double> read(String filename, String key) throws IOException {
 		Set<Zone<Double>> zones = new HashSet<Zone<Double>>();
 		for(SimpleFeature feature : FeatureSHP.readFeatures(filename)) {
 			Zone<Double> zone = new Zone<Double>((Geometry) feature.getDefaultGeometry());
-			
-			double val = (Long)feature.getAttribute(key); //FIXME
-			zone.setAttribute(val);
+//			feature.getFeatureType().
+			Object obj = feature.getAttribute(key);
+			if (obj != null) {
+				double val = Double.parseDouble(obj.toString()); // FIXME
+				zone.setAttribute(val);
+			}
 			zones.add(zone);
 		}
 		
@@ -202,4 +213,57 @@ public class ZoneLayerSHP {
 			transaction.close();
 		}
 	}
+	
+//	public static void writeWithAttributes(ZoneLayer<Map<String, Object>> layer, String filename) throws IOException {
+//		CoordinateReferenceSystem crs = layer.getCRS();
+//		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
+//		typeBuilder.setCRS(crs);
+//		typeBuilder.setName("zone");
+//		typeBuilder.add("the_geom", MultiPolygon.class);
+//		typeBuilder.add("value", Double.class);
+//		SimpleFeatureType featureType = typeBuilder.buildFeatureType();
+//        
+//		SimpleFeatureCollection collection = FeatureCollections.newCollection();
+//        SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(featureType);
+//
+//        for(Zone<T> zone : layer.getZones()) {
+//        	featureBuilder.add(zone.getGeometry());
+//        	featureBuilder.add(zone.getAttribute());
+//        	SimpleFeature feature = featureBuilder.buildFeature(null);
+//        	collection.add(feature);
+//        }
+//
+//        File newFile = new File(filename);
+//
+//        ShapefileDataStoreFactory dataStoreFactory = new ShapefileDataStoreFactory();
+//
+//        Map<String, Serializable> params = new HashMap<String, Serializable>();
+//        params.put("url", newFile.toURI().toURL());
+//        params.put("create spatial index", Boolean.TRUE);
+//
+//        ShapefileDataStore newDataStore = (ShapefileDataStore) dataStoreFactory.createNewDataStore(params);
+//        newDataStore.createSchema(featureType);
+//
+////        newDataStore.forceSchemaCRS(layer.getCRS());
+//		
+//        Transaction transaction = new DefaultTransaction("create");
+//
+//		String typeName = newDataStore.getTypeNames()[0];
+//		SimpleFeatureSource featureSource = newDataStore.getFeatureSource(typeName);
+//
+//		SimpleFeatureStore featureStore = (SimpleFeatureStore) featureSource;
+//
+//		featureStore.setTransaction(transaction);
+//		try {
+//			featureStore.addFeatures(collection);
+//			transaction.commit();
+//
+//		} catch (Exception problem) {
+//			problem.printStackTrace();
+//			transaction.rollback();
+//
+//		} finally {
+//			transaction.close();
+//		}
+//	}
 }

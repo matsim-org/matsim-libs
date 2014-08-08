@@ -53,10 +53,10 @@ public class MobsimConnector implements Mobsim {
 	private final TravelTime roadTravelTimes;
 	
 	public MobsimConnector(Scenario scenario, EventsManager eventsManager) {
-		sim = new ParallelPseudoSim(2, scenario.getConfig(), scenario.getTransitSchedule()); //TODO
+		sim = new ParallelPseudoSim(scenario.getConfig().global().getNumberOfThreads());
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
-		roadTravelTimes = new TravelTimeCalculator(2);
+		roadTravelTimes = new TravelTimeCalculator(1);
 	}
 	
 	/* (non-Javadoc)

@@ -20,7 +20,6 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Scenario;
@@ -29,17 +28,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.opengis.feature.simple.SimpleFeature;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.io.DoubleSerializer;
-import playground.johannes.gsv.synPop.io.IntegerSerializer;
-import playground.johannes.gsv.synPop.io.PointSerializer;
+import playground.johannes.coopsim.analysis.ArrivalTimeTask;
+import playground.johannes.coopsim.analysis.DepartureLoadTask;
+import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
+import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
+import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author johannes
@@ -52,34 +47,44 @@ public class Analyzer {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
+		String output = "/home/johannes/gsv/synpop/output/";
+		String personFile = "/home/johannes/gsv/synpop/output/7900000000.pop.xml.gz";
+		
 		XMLParser parser = new XMLParser();
-		parser.addSerializer(MIDKeys.PERSON_MUNICIPALITY_CLASS, IntegerSerializer.instance());
-		parser.addSerializer(CommonKeys.PERSON_WEIGHT, DoubleSerializer.instance());
-		parser.addSerializer(CommonKeys.PERSON_HOME_POINT, new PointSerializer());
 		parser.setValidating(false);
 		
-		parser.parse("/home/johannes/gsv/synpop/output/1400000000.pop.xml.gz");
-//		parser.parse("/home/johannes/gsv/mid2008/pop.xml");
+		parser.parse(personFile);
+
 		
-		Set<SimpleFeature> features = FeatureSHP.readFeatures("/home/johannes/gsv/synpop/data/gis/nuts/Gemeinden.gk3.shp");
-		Set<Geometry> geometries = new HashSet<Geometry>();
- 		for(SimpleFeature feature : features) {
-			geometries.add((Geometry) feature.getDefaultGeometry());
-		}
-		
+//		Set<SimpleFeature> features = FeatureSHP.readFeatures("/home/johannes/gsv/synpop/data/gis/nuts/Gemeinden.gk3.shp");
+//		Set<Geometry> geometries = new HashSet<Geometry>();
+// 		for(SimpleFeature feature : features) {
+//			geometries.add((Geometry) feature.getDefaultGeometry());
+//		}
+//		
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
-		facReader.readFile("/home/johannes/gsv/synpop/data/facilities/facilities.ger.all.xml");
+		facReader.readFile("/home/johannes/gsv/osm/facilities.all.xml");
 		ActivityFacilities facilities = scenario.getActivityFacilities();
 	
 	
 		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
-//		task.addComponent(new PopulationDensityTask(geometries, "/home/johannes/gsv/synpop/output/popDen.kmz"));
-		task.addComponent(new ActivityDistanceTask(facilities, "/home/johannes/gsv/synpop/output/"));
-//		task.addComponent(new ActivityChainTask("/home/johannes/gsv/synpop/output/"));
+//		task.addTask(new ActivityChainTask());
+//		task.addTask(new LegTargetDistanceTask());
+//		task.addTask(new ActivityDistanceTask(facilities));
+//		task.addTask(new SpeedFactorAnalyzer());
+		
+		task.setOutputDirectory(output);
+		ProxyAnalyzer.analyze(parser.getPersons(), task, output);
+		
+		Set<Trajectory> trajectories = TrajectoryProxyBuilder.buildTrajectories(parser.getPersons());
+		TrajectoryAnalyzerTaskComposite task2 = new TrajectoryAnalyzerTaskComposite();
+		task2.addTask(new ArrivalTimeTask());
+		task2.addTask(new DepartureLoadTask());
+		
+		TrajectoryAnalyzer.analyze(trajectories, task2, output);
 
-		task.analyze(parser.getPersons());
 	}
 
 }

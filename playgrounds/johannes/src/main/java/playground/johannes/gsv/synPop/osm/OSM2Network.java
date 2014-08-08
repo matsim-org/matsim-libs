@@ -47,13 +47,13 @@ public class OSM2Network {
 		OsmNetworkReader reader = new OsmNetworkReader(network, transformation);
 		
 		logger.info("Loading OSM file...");
-		reader.setHierarchyLayer(55.1477, 5.864417, 47.26543, 15.05078, 4);
+		reader.setHierarchyLayer(55.1477, 5.864417, 47.26543, 15.05078, 5);
 		reader.setMemoryOptimization(true);
 		reader.parse("/home/johannes/gsv/osm/germany-latest.osm");
 
 		logger.info("Writing network file...");
 		NetworkWriter writer = new NetworkWriter(network);
-		writer.write("/home/johannes/gsv/osm/germany-network.xml");
+		writer.write("/home/johannes/gsv/osm/germany-network-cat5.xml");
 		logger.info("Done.");
 	}
 

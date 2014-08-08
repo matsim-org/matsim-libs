@@ -42,7 +42,7 @@ public class TripDistanceMean extends AbstractTrajectoryProperty {
 
 	private final String purpose;
 	
-	private String ignorePurpose = "pt interaction";
+	private String ignorePurpose = "pt interaction"; //FIXME
 	
 	private final DistanceCalculator calculator;
 	

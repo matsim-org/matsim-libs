@@ -19,66 +19,34 @@
 
 package playground.johannes.gsv.synPop.analysis;
 
-import gnu.trove.TDoubleDoubleHashMap;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
 
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author johannes
  *
  */
-public class LegDistanceTask implements ProxyAnalyzerTask {
-
-	String outDir = "/home/johannes/gsv/mid2008/";
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.analysis.ProxyAnalyzerTask#analyze(java.util.Collection)
-	 */
-	@Override
-	public void analyze(Collection<ProxyPerson> persons) {
-		Set<String> purposes = new HashSet<String>();
-		for(ProxyPerson person : persons) {
-			ProxyPlan plan = person.getPlan();
-			for(int i = 0; i < plan.getActivities().size(); i++) {
-				purposes.add((String) plan.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE));
-			}
-		}
-
-		for(String purpose : purposes) {
-			DescriptiveStatistics stats = statistics(persons, purpose);
-			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(1000), false);
-			try {
-				TXTWriter.writeMap(hist, "d", "n", outDir + "d."+purpose+".txt");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-		DescriptiveStatistics stats = statistics(persons, null);
-		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(1000), false);
-		try {
-			TXTWriter.writeMap(hist, "d", "n", outDir + "d.all.txt");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+public class LegTargetDistanceTask extends AnalyzerTask {
 	
+	private static final Logger logger = Logger.getLogger(LegTargetDistanceTask.class);
+	
+	public static final String KEY = "d.target";
+
 	private DescriptiveStatistics statistics(Collection<ProxyPerson> persons, String purpose) {
 		DescriptiveStatistics stats = new DescriptiveStatistics();
+		
+		int cntNoVal = 0;
 		
 		for(ProxyPerson person : persons) {
 			ProxyPlan plan = person.getPlan();
@@ -88,11 +56,48 @@ public class LegDistanceTask implements ProxyAnalyzerTask {
 					if(distStr != null) {
 						double d = Double.parseDouble(distStr);
 						stats.addValue(d);
+					} else {
+						cntNoVal++;
 					}
 				}
 			}
 		}
 		
+		if(cntNoVal > 0) {
+			logger.warn(String.format("No value specified for %s trips of purpose %s.", cntNoVal, purpose));
+		}
 		return stats;
+	}
+
+	@Override
+	public void analyze(Collection<ProxyPerson> persons, Map<String, DescriptiveStatistics> results) {
+		Set<String> purposes = new HashSet<String>();
+		for(ProxyPerson person : persons) {
+			ProxyPlan plan = person.getPlan();
+			for(int i = 0; i < plan.getActivities().size(); i++) {
+				purposes.add((String) plan.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE));
+			}
+		}
+
+		purposes.add(null);
+		
+		for(String purpose : purposes) {
+			DescriptiveStatistics stats = statistics(persons, purpose);
+			
+			if(purpose == null)
+				purpose = "all";
+			
+			String key = String.format("%s.%s", KEY, purpose);
+			results.put(key, stats);
+			
+			if(outputDirectoryNotNull()) {
+				try {
+					writeHistograms(stats, key, 100, 100);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			
+		}
 	}
 }

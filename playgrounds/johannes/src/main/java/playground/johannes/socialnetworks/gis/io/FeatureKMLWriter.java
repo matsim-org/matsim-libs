@@ -216,7 +216,7 @@ public class FeatureKMLWriter {
 	}
 
 	public static void main(String args[]) throws IOException {
-		ZoneLayer<Object> zoneLayer = ZoneLayerSHP.read("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1G08.shp");
+		ZoneLayer<?> zoneLayer = ZoneLayerSHP.read("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1G08.shp");
 		zoneLayer.overwriteCRS(CRSUtils.getCRS(21781));
 		
 		FeatureKMLWriter writer = new FeatureKMLWriter();

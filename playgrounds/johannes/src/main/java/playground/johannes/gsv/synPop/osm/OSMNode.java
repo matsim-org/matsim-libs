@@ -19,6 +19,9 @@
 
 package playground.johannes.gsv.synPop.osm;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author johannes
  *
@@ -30,6 +33,10 @@ public class OSMNode {
 	private double longitude;
 	
 	private double latitude;
+	
+	private Map<String, String> tags;
+	
+	private boolean nodeOfWay = false; //TODO can a node be associated to multiple ways?
 	
 	public OSMNode(String id) {
 		this.id = id;
@@ -55,7 +62,22 @@ public class OSMNode {
 		this.latitude = latitude;
 	}
 
-
+	public void addTag(String key, String value) {
+		if(tags == null)
+			tags = new HashMap<String, String>();
+		
+		tags.put(key, value);
+	}
 	
+	public Map<String, String> tags() {
+		return tags;
+	}
 	
+	public void setNodeOfWay(boolean flag) {
+		nodeOfWay = flag;
+	}
+	
+	public boolean isNodeOfWay() {
+		return nodeOfWay;
+	}
 }

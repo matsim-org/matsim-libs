@@ -61,8 +61,8 @@ public class CompositeHamiltonian extends Composite<Hamiltonian> implements Hami
 	public double evaluate(ProxyPerson original, ProxyPerson modified) {
 		double sum = 0;
 		
-		for(Hamiltonian component : components) {
-			sum += component.evaluate(original, modified);
+		for(int i = 0; i < components.size(); i++) {
+			sum += thetas.get(i) * components.get(i).evaluate(original, modified);
 		}
 		
 		return sum;

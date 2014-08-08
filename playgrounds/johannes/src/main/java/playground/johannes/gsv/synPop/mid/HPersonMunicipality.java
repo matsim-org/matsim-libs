@@ -21,6 +21,8 @@ package playground.johannes.gsv.synPop.mid;
 
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
+
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.sim.Hamiltonian;
@@ -36,6 +38,8 @@ import com.vividsolutions.jts.geom.Point;
  *
  */
 public class HPersonMunicipality implements Hamiltonian {
+	
+	private static final Logger logger = Logger.getLogger(HPersonMunicipality.class);
 
 	private ZoneLayer<Double> municipalities;
 	
@@ -55,7 +59,10 @@ public class HPersonMunicipality implements Hamiltonian {
 		if(zone == null) {
 			double x = Double.parseDouble((String) person.getAttribute(CommonKeys.PERSON_HOME_COORD_X));
 			double y = Double.parseDouble((String) person.getAttribute(CommonKeys.PERSON_HOME_COORD_Y));
-				
+//			ActivityFacility facility = (ActivityFacility) person.getUserData(MutateActivityLocation.USER_DATA_KEY);	
+//			double x = facility.getCoord().getX();
+//			double y = facility.getCoord().getY();
+			
 			Point p = geoFactory.createPoint(new Coordinate(x, y));
 			zone = municipalities.getZone(p);
 			person.setUserData(this, zone);
@@ -73,7 +80,7 @@ public class HPersonMunicipality implements Hamiltonian {
 			person.setUserData(MIDKeys.PERSON_MUNICIPALITY_CLASS, intObj);
 		}
 		int target = intObj;
-		int cat = PersonMunicipalityClassHandler.getCategorie((int) inhabs);
+		int cat = PersonMunicipalityClassHandler.getCategory((int) inhabs);
 		if(target == cat)
 			return 0;
 		else
@@ -83,10 +90,19 @@ public class HPersonMunicipality implements Hamiltonian {
 	@Override
 	public double evaluate(Collection<ProxyPerson> persons) {
 		double sum = 0;
+		int cntInf = 0;
 		for(ProxyPerson person : persons) {
-			sum += eval(person);
+			double val = eval(person);
+			if(Double.isInfinite(val)) {
+				cntInf++;
+			} else {
+				sum += val;
+			}
 		}
 		
+		if(cntInf > 0) {
+			logger.debug(String.format("%s persons can not be assigned to a municipality.", cntInf));
+		}
 		return sum;
 	}
 

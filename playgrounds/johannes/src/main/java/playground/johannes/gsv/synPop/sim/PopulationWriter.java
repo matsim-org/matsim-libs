@@ -59,7 +59,7 @@ public class PopulationWriter implements SamplerListener {
 		iteration++;
 		if(iteration % dumpInterval == 0) {
 			logger.info("Dumping population...");
-			writer.write(String.format("%s/%s.pop.xml.gz", outputDir, iteration), sampler.getPopulation());
+			writer.write(String.format("%s/%s.pop.xml.gz", outputDir, iteration), sampler.getPopulationCopy());
 		}
 
 	}

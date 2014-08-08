@@ -23,6 +23,7 @@
 package playground.johannes.gsv.sim;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
@@ -68,7 +69,7 @@ public class RailSimEngine implements LegSimEngine {
 	 * @see playground.johannes.gsv.sim.LegSimEngine#simulate(org.matsim.api.core.v01.population.Leg)
 	 */
 	@Override
-	public double simulate(Person person, Leg leg, double departureTime) {
+	public double simulate(Person person, Leg leg, double departureTime, LinkedList<Event> eventList) {
 		ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
 		TransitLine line = schedule.getTransitLines().get(route.getLineId());
 		TransitRoute troute = line.getRoutes().get(route.getRouteId());

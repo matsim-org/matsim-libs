@@ -20,9 +20,13 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.TObjectIntHashMap;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
+
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
@@ -33,26 +37,25 @@ import playground.johannes.sna.util.TXTWriter;
  * @author johannes
  *
  */
-public class ActivityChainTask implements ProxyAnalyzerTask {
-	
-	private String outDir;
+public class ActivityChainTask extends AnalyzerTask {
 
-	public ActivityChainTask(String outputDir) {
-		this.outDir = outputDir;
-	}
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.analysis.ProxyAnalyzerTask#analyze(java.util.Collection)
-	 */
+	public static final String KEY = "n.act";
+	
 	@Override
-	public void analyze(Collection<ProxyPerson> persons) {
-//		DescriptiveStatistics stats = new DescriptiveStatistics();
+	public void analyze(Collection<ProxyPerson> persons, Map<String, DescriptiveStatistics> results) {
 		TObjectDoubleHashMap<String> chains = new TObjectDoubleHashMap<String>();
 		
+		TObjectIntHashMap<String> typeCount = new TObjectIntHashMap<String>();
+		
 		for(ProxyPerson person : persons) {
-			ProxyPlan trajectory = person.getPlan();
+			ProxyPlan plan = person.getPlan();
+			
 			StringBuilder builder = new StringBuilder();
-			for(int i = 0; i < trajectory.getActivities().size(); i++) {
-				String type = (String) trajectory.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE);
+			for(int i = 0; i < plan.getActivities().size(); i++) {
+				String type = (String) plan.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE);
+				
+				typeCount.adjustOrPutValue(type, 1, 1);
+				
 				builder.append(type);
 				builder.append("-");
 			}
@@ -61,15 +64,19 @@ public class ActivityChainTask implements ProxyAnalyzerTask {
 			chains.adjustOrPutValue(chain, 1, 1);
 		}
 		
-		try {
-			TXTWriter.writeMap(chains, "chain", "n", outDir + "/actchains.txt", true);
-				
-//			writeHistograms(stats, new DummyDiscretizer(), "actchain", false);
-		} catch (IOException e) {
-			e.printStackTrace();
+		for(Object key : typeCount.keys()) {
+			DescriptiveStatistics stats = new DescriptiveStatistics();
+			stats.addValue(typeCount.get((String) key));
+			results.put(String.format("%s.%s", KEY, key), stats);
 		}
-		
 
+		if (outputDirectoryNotNull()) {
+			try {
+				TXTWriter.writeMap(chains, "chain", "n", getOutputDirectory() + "/actchains.txt", true);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 }
