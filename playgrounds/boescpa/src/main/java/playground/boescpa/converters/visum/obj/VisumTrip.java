@@ -26,12 +26,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.boescpa.lib.tools.tripReader.Trip;
-import playground.gregor.sim2d_v4.run.Vis;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashMap;
 
 /**
  * Provides a representation of visum trips.

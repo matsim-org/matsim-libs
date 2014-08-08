@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.boescpa.converters.visum.obj.Zone;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

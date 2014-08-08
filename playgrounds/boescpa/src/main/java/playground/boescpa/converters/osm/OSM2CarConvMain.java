@@ -27,7 +27,6 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
-import playground.boescpa.converters.osm.tools.OsmNetworkReaderWithPT;
 
 /**
  * Runs OSM-Converters...

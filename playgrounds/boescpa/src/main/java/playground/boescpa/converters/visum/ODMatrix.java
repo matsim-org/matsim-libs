@@ -26,7 +26,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.boescpa.converters.visum.obj.VisumTrip;
 import playground.boescpa.converters.visum.obj.Zone;
-import playground.boescpa.lib.tools.tripReader.Trip;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
