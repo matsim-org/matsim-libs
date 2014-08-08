@@ -37,6 +37,7 @@ public class LinkCongestionInfoExtended extends LinkCongestionInfo{
 	private Map<Id, Double> personId2DelaysToPayFor = new HashMap<Id, Double>();
 	private Map<Id,Map<WarmPollutant, Double>> personId2WarmEmissionsToPayFor = new HashMap<Id, Map<WarmPollutant,Double>>();
 	private Map<Id, Id> personId2CausingLinkId = new HashMap<Id, Id>();
+	private double storageCapacityCars;
 	
 	public List<Id> getEnteringAgents() {
 		return enteringAgents;
@@ -52,5 +53,13 @@ public class LinkCongestionInfoExtended extends LinkCongestionInfo{
 	
 	public Map<Id, Id> getPersonId2CausingLinkId(){
 		return personId2CausingLinkId;
+	}
+	
+	public double getStorageCapacityCars() {
+		return storageCapacityCars;
+	}
+	
+	public void setStorageCapacityCars(double storageCapacityCars) {
+		this.storageCapacityCars = storageCapacityCars;
 	}
 }
