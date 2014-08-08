@@ -1,20 +1,9 @@
-package playground.mzilske.cdranalysis;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.PrintWriter;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+package playground.mzilske.ant2014;
 
 import org.matsim.core.utils.io.UncheckedIOException;
+
+import java.io.*;
+import java.util.concurrent.*;
 
 public class FileIO {
 

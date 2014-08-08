@@ -26,13 +26,11 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.PlanStrategyFactoryRegister;
-import org.matsim.core.controler.PlanStrategyRegistrar;
+import org.matsim.core.controler.*;
 import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
 import org.matsim.core.replanning.modules.ExternalModule;
-import org.matsim.core.replanning.selectors.*;
+import org.matsim.core.replanning.selectors.GenericPlanSelector;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -55,10 +53,12 @@ public final class StrategyManagerConfigLoader {
 	public static void load(final Controler controler, final StrategyManager manager) {
 		PlanStrategyRegistrar planStrategyFactoryRegistrar = new PlanStrategyRegistrar();
 		PlanStrategyFactoryRegister planStrategyFactoryRegister = planStrategyFactoryRegistrar.getFactoryRegister();
-		load(controler.getScenario(), controler.getControlerIO(), controler.getEvents(), manager, planStrategyFactoryRegister);
+        PlanSelectorRegistrar planSelectorRegistrar = new PlanSelectorRegistrar();
+        PlanSelectorFactoryRegister planSelectorFactoryRegister = planSelectorRegistrar.getFactoryRegister();
+		load(controler.getScenario(), controler.getControlerIO(), controler.getEvents(), manager, planStrategyFactoryRegister, planSelectorFactoryRegister);
 	}
 
-	public static void load(Scenario scenario, OutputDirectoryHierarchy controlerIO, EventsManager events, final StrategyManager manager, PlanStrategyFactoryRegister planStrategyFactoryRegister) {
+	public static void load(Scenario scenario, OutputDirectoryHierarchy controlerIO, EventsManager events, final StrategyManager manager, PlanStrategyFactoryRegister planStrategyFactoryRegister, PlanSelectorFactoryRegister planSelectorFactoryRegister) {
 		Config config = scenario.getConfig();
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 		
@@ -121,21 +121,7 @@ public final class StrategyManagerConfigLoader {
 		if ( name != null ) {
 			// yyyy ``manager'' has a default setting.  I do not want to override this here except when it is configured.
 			// Presumably, this is not the desired approach and the default should be in the config file?  kai, feb'12
-			GenericPlanSelector<Plan> planSelector = null ;
-			if ( name.equals("WorstPlanSelector") ) { 
-				planSelector = new WorstPlanForRemovalSelector();
-			} else if ( name.equals("SelectRandom") ) {
-				planSelector = new RandomPlanSelector();
-			} else if ( name.equals("SelectExpBeta") ) {
-				planSelector = new ExpBetaPlanSelector( - config.planCalcScore().getBrainExpBeta());
-			} else if ( name.equals("ChangeExpBeta") ) {
-				planSelector = new ExpBetaPlanChanger( - config.planCalcScore().getBrainExpBeta());
-			} else if ( name.equals("PathSizeLogitSelector") ) {
-				planSelector = new PathSizeLogitSelector(config.planCalcScore().getPathSizeLogitBeta(), -config.planCalcScore().getBrainExpBeta(), 
-						scenario.getNetwork());
-			} else {
-				throw new RuntimeException("Unknown 'plan selector for removal'.");
-			}
+			GenericPlanSelector<Plan> planSelector = planSelectorFactoryRegister.getInstance(name).createPlanSelector(scenario);
 			manager.setPlanSelectorForRemoval(planSelector) ;
 		}
 	}

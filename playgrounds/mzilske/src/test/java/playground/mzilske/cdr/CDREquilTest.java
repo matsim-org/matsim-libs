@@ -50,19 +50,6 @@ public class CDREquilTest {
     @Rule
     public MatsimTestUtils utils = new MatsimTestUtils();
 
-    private static class LinkIsZone implements ZoneTracker.LinkToZoneResolver {
-
-        @Override
-        public Id resolveLinkToZone(Id linkId) {
-            return linkId;
-        }
-
-        public IdImpl chooseLinkInZone(String zoneId) {
-            return new IdImpl(zoneId);
-        }
-
-    }
-
     private static class AtStartOrEnd implements CallBehavior {
 
         @Override

@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * ExperimentResource.java
+ *  * CreateODDemand.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,30 +20,32 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.populationsize;
+package playground.mzilske.sensors;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import com.google.inject.Provider;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.StartupListener;
 
+import javax.inject.Inject;
 
-class ExperimentResource {
+class ODDemandControlerListener implements Provider<ControlerListener> {
 
-	private final String wd;
+    @Inject
+    SightingsPopulation sightingsPopulation;
 
-	public ExperimentResource(String wd) {
-		this.wd = wd;
-	}
+    @Inject
+    Scenario scenario;
 
-	public Collection<String> getRegimes() {
-		final Set<String> REGIMES = new HashSet<String>();
-		REGIMES.add("uncongested");
-		REGIMES.add("congested");
-		return REGIMES;
-	}
-
-	public RegimeResource getRegime(String regime) {
-		return new RegimeResource(wd + "regimes/" + regime, regime);
-	}
+    @Override
+    public ControlerListener get() {
+        return new StartupListener() {
+            @Override
+            public void notifyStartup(StartupEvent event) {
+                sightingsPopulation.insertPersons(scenario);
+            }
+        };
+    }
 
 }

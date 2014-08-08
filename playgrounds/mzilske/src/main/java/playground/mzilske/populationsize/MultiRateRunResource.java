@@ -22,12 +22,10 @@
 
 package playground.mzilske.populationsize;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
@@ -35,8 +33,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -46,14 +42,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -61,20 +52,15 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
 import org.matsim.counts.CountsWriter;
+import playground.mzilske.ant2014.FileIO;
+import playground.mzilske.ant2014.IterationResource;
+import playground.mzilske.ant2014.StreamingOutput;
 import playground.mzilske.cadyts.CadytsModule;
 import playground.mzilske.cdr.*;
-import playground.mzilske.cdranalysis.FileIO;
-import playground.mzilske.cdranalysis.IterationResource;
-import playground.mzilske.cdranalysis.Reading;
-import playground.mzilske.cdranalysis.StreamingOutput;
 import playground.mzilske.clones.ClonesModule;
 import playground.mzilske.controller.Controller;
 import playground.mzilske.controller.ControllerModule;
-import playground.mzilske.util.IterationSummaryFileControlerListener;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -86,12 +72,9 @@ class MultiRateRunResource {
 
     private String regime;
 
-    private String alternative;
-
-    public MultiRateRunResource(String wd, String regime, String alternative) {
+    public MultiRateRunResource(String wd, String regime) {
         this.WD = wd;
         this.regime = regime;
-        this.alternative = alternative;
     }
 
     final static int TIME_BIN_SIZE = 60*60;
@@ -101,22 +84,11 @@ class MultiRateRunResource {
         final List<String> RATES = new ArrayList<String>();
         RATES.add("0");
         RATES.add("5");
-        RATES.add("50");
         return RATES;
     }
 
     private RunResource getBaseRun() {
         return new RegimeResource(WD + "/../..", regime).getBaseRun();
-    }
-
-    public void rate(String string) {
-        Scenario scenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
-        if (string.equals("actevents")) {
-            runPhoneOnActivityStartEnd(scenario);
-        } else {
-            int rate = Integer.parseInt(string);
-            runRate(scenario, rate);
-        }
     }
 
     public void twoRates(String string) {
@@ -174,7 +146,7 @@ class MultiRateRunResource {
         final Sightings allSightings = new SightingsImpl(compareMain.getSightingsPerPerson());
 
         final Config config = phoneConfig();
-        config.controler().setOutputDirectory(WD + "/rates/twotimes_" + rate);
+        config.controler().setOutputDirectory(WD + "/rates/" + rate);
 
         final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
         scenario.setNetwork(baseScenario.getNetwork());
@@ -182,7 +154,7 @@ class MultiRateRunResource {
         PopulationFromSightings.createPopulationWithRandomEndTimesInPermittedWindow(scenario, linkToZoneResolver, allSightings);
         PopulationFromSightings.preparePopulation(scenario, linkToZoneResolver, allSightings);
 
-        String rateDir = WD + "/rates/twotimes_" + rate;
+        String rateDir = WD + "/rates/" + rate;
         new File(rateDir).mkdirs();
 
         new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(rateDir + "/input_population.xml.gz");
@@ -192,144 +164,6 @@ class MultiRateRunResource {
         final Counts someCounts = filterCounts(allCounts);
         someCounts.setYear(2012);
         new CountsWriter(someCounts).write(rateDir + "/calibration_counts.xml.gz");
-
-    }
-
-    public void allRates() {
-        for (String rate : getRates()) {
-            rate(rate);
-        }
-    }
-
-
-    private void runPhoneOnActivityStartEnd(Scenario baseScenario) {
-        EventsManager events = EventsUtils.createEventsManager();
-        ZoneTracker.LinkToZoneResolver linkToZoneResolver = new ZoneTracker.LinkToZoneResolver() {
-
-            @Override
-            public Id resolveLinkToZone(Id linkId) {
-                return linkId;
-            }
-
-            public IdImpl chooseLinkInZone(String zoneId) {
-                return new IdImpl(zoneId);
-            }
-
-        };
-        CompareMain compareMain = new CompareMain(baseScenario, events, new CallBehavior() {
-
-            @Override
-            public boolean makeACall(ActivityEndEvent event) {
-                return true;
-            }
-
-            @Override
-            public boolean makeACall(ActivityStartEvent event) {
-                return true;
-            }
-
-            @Override
-            public boolean makeACall(Id id, double time) {
-                return false;
-            }
-
-            @Override
-            public boolean makeACallAtMorningAndNight() {
-                return true;
-            }
-
-        }, linkToZoneResolver);
-        new MatsimEventsReader(events).readFile(getBaseRun().getLastIteration().getEventsFileName());
-
-        compareMain.close();
-
-
-        final Sightings allSightings = new SightingsImpl(compareMain.getSightingsPerPerson());
-
-        final Config config = phoneConfig();
-        config.controler().setOutputDirectory(WD + "/rates/actevents");
-
-        final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-        scenario.setNetwork(baseScenario.getNetwork());
-        PopulationFromSightings.createPopulationWithEndTimesAtLastSightings(scenario, linkToZoneResolver, allSightings);
-        PopulationFromSightings.preparePopulation(scenario, linkToZoneResolver, allSightings);
-
-        String rateDir = WD + "/rates/actevents";
-        new File(rateDir).mkdirs();
-
-        new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(rateDir + "/input_population.xml.gz");
-        final Counts allCounts = CompareMain.volumesToCounts(baseScenario.getNetwork(), compareMain.getGroundTruthVolumes());
-        allCounts.setYear(2012);
-        new CountsWriter(allCounts).write(rateDir + "/all_counts.xml.gz");
-        final Counts someCounts = filterCounts(allCounts);
-        someCounts.setYear(2012);
-        new CountsWriter(someCounts).write(rateDir + "/calibration_counts.xml.gz");
-
-    }
-
-    private void runRate(final Scenario baseScenario, final int dailyRate) {
-        EventsManager events = EventsUtils.createEventsManager();
-        ZoneTracker.LinkToZoneResolver linkToZoneResolver = new ZoneTracker.LinkToZoneResolver() {
-
-            @Override
-            public Id resolveLinkToZone(Id linkId) {
-                return linkId;
-            }
-
-            public IdImpl chooseLinkInZone(String zoneId) {
-                return new IdImpl(zoneId);
-            }
-
-        };
-        final CompareMain compareMain = new CompareMain(baseScenario, events, new CallBehavior() {
-
-            @Override
-            public boolean makeACall(ActivityEndEvent event) {
-                return false;
-            }
-
-            @Override
-            public boolean makeACall(ActivityStartEvent event) {
-                return false;
-            }
-
-            @Override
-            public boolean makeACall(Id id, double time) {
-                double secondlyProbability = dailyRate / (double) (24*60*60);
-                return Math.random() < secondlyProbability;
-            }
-
-            @Override
-            public boolean makeACallAtMorningAndNight() {
-                return false;
-            }
-
-        }, linkToZoneResolver);
-        new MatsimEventsReader(events).readFile(getBaseRun().getLastIteration().getEventsFileName());
-        compareMain.close();
-
-
-        final Sightings allSightings = new SightingsImpl(compareMain.getSightingsPerPerson());
-
-        final Config config = phoneConfig();
-        config.controler().setOutputDirectory(WD + "/rates/" + dailyRate);
-
-        final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-        scenario.setNetwork(baseScenario.getNetwork());
-        PopulationFromSightings.createPopulationWithEndTimesAtLastSightings(scenario, linkToZoneResolver, allSightings);
-        PopulationFromSightings.preparePopulation(scenario, linkToZoneResolver, allSightings);
-
-        String rateDir = WD + "/rates/" + dailyRate;
-        new File(rateDir).mkdirs();
-
-        new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(rateDir + "/input_population.xml.gz");
-        final Counts allCounts = CompareMain.volumesToCounts(baseScenario.getNetwork(), compareMain.getGroundTruthVolumes());
-        allCounts.setYear(2012);
-        new CountsWriter(allCounts).write(rateDir + "/all_counts.xml.gz");
-        final Counts someCounts = filterCounts(allCounts);
-        someCounts.setYear(2012);
-        new CountsWriter(someCounts).write(rateDir + "/calibration_counts.xml.gz");
-
 
     }
 
@@ -365,64 +199,13 @@ class MultiRateRunResource {
                 bind(Counts.class).annotatedWith(Names.named("allCounts")).toInstance(allCounts);
                 bind(Counts.class).annotatedWith(Names.named("calibrationCounts")).toInstance(someCounts);
                 bind(Double.class).annotatedWith(Names.named("clonefactor")).toInstance((double) cloneFactor);
-                MapBinder<String, PlanStrategyFactory> planStrategyFactoryBinder
-                        = MapBinder.newMapBinder(binder(), String.class, PlanStrategyFactory.class);
-                planStrategyFactoryBinder.addBinding("ReRealize").to(TrajectoryReRealizerFactory.class);
+                bind(Boolean.class).annotatedWith(Names.named("alreadyCloned")).toInstance(false);
             }
         });
 
         Injector injector2 = Guice.createInjector(modules);
         Controller controler2 = injector2.getInstance(Controller.class);
         controler2.run();
-    }
-
-
-    static class MyControlerListenerProvider implements Provider<ControlerListener> {
-
-        @Inject Scenario scenario;
-        @Inject OutputDirectoryHierarchy controlerIO;
-        @Override
-        public ControlerListener get() {
-            return new IterationSummaryFileControlerListener(controlerIO,
-                    ImmutableMap.<String, IterationSummaryFileControlerListener.Writer>of(
-                            "clone-stats.txt",
-                            new IterationSummaryFileControlerListener.Writer() {
-                                @Override
-                                public StreamingOutput notifyStartup(StartupEvent event) {
-                                    return new StreamingOutput() {
-                                        @Override
-                                        public void write(PrintWriter pw) throws IOException {
-                                            pw.printf("iteration\tnonemptyplans\tnonemptyplanswithoutoffset\n");
-                                        }
-                                    };
-                                }
-
-                                @Override
-                                public StreamingOutput notifyIterationEnds(final IterationEndsEvent event) {
-                                    return new StreamingOutput() {
-                                        @Override
-                                        public void write(PrintWriter pw) throws IOException {
-                                            int nNonEmptySelectedPlans = 0;
-                                            int nNonEmptySelectedPlansWithoutOffset = 0;
-                                            Population plans = scenario.getPopulation();
-                                            for (Person person : plans.getPersons().values()) {
-                                                Plan plan = person.getSelectedPlan();
-                                                if (plan.getPlanElements().size() > 1) {
-                                                    nNonEmptySelectedPlans++;
-                                                    if (plan.getScore() != null && plan.getScore() == 0.0) {
-                                                        nNonEmptySelectedPlansWithoutOffset++;
-                                                    }
-                                                }
-
-                                            }
-                                            pw.printf("%d\t%d\t%d\n", event.getIteration(), nNonEmptySelectedPlans, nNonEmptySelectedPlansWithoutOffset);
-                                            pw.flush();
-                                        }
-                                    };
-                                }
-                            }
-                    ));
-        }
     }
 
     private Counts filterCounts(Counts allCounts) {
@@ -471,13 +254,6 @@ class MultiRateRunResource {
         {
             StrategySettings stratSets = new StrategySettings(new IdImpl(2));
             stratSets.setModuleName("SelectRandom");
-            stratSets.setProbability(0.1);
-            stratSets.setDisableAfter(30);
-            config.strategy().addStrategySettings(stratSets);
-        }
-        {
-            StrategySettings stratSets = new StrategySettings(new IdImpl(2));
-            stratSets.setModuleName("ReRealize");
             stratSets.setProbability(0.1);
             stratSets.setDisableAfter(30);
             config.strategy().addStrategySettings(stratSets);
@@ -549,30 +325,6 @@ class MultiRateRunResource {
         return result / num;
     }
 
-    public void distances2() {
-        final String filename = WD + "/distances2.txt";
-        final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
-        final double baseKm = sum(PowerPlans.travelledDistancePerPerson(baseScenario.getPopulation(), baseScenario.getNetwork()).values());
-        FileIO.writeToFile(filename, new StreamingOutput() {
-            @Override
-            public void write(PrintWriter pw) throws IOException {
-                pw.printf("regime\tcallrate\troutesum\trouterate\n");
-                pw.printf("%s\t%s\t%f\t%f\n",
-                        regime, "base", baseKm, baseKm/baseKm);
-                for (String rate : getRates()) {
-                    Collection<String> cloneFactors = getCloneFactors(rate);
-                    for (String cloneFactor : cloneFactors) {
-                        Scenario scenario = getRateRun(rate, cloneFactor).getOutputScenario();
-                        double km = sum(PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), baseScenario.getNetwork()).values());
-                        pw.printf("%s\t%s\t%f\t%f\n",
-                                regime, rate, km, km / baseKm);
-                        pw.flush();
-                    }
-                }
-            }
-        });
-    }
-
     public void persodisthisto() {
         final String filename = WD + "/perso-dist-histo.txt";
         final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
@@ -634,61 +386,6 @@ class MultiRateRunResource {
             return new int[maxSlotIndex + 1];
         }
         return maybeVolumes;
-    }
-
-
-    private double sum(Collection<Double> values) {
-        double result = 0.0;
-        for (double summand : values) {
-            result += summand;
-        }
-        return result;
-    }
-
-
-
-    private static Double zeroForNull(Double maybeDouble) {
-        if (maybeDouble == null) {
-            return 0.0;
-        }
-        return maybeDouble;
-    }
-
-    public void putPersonKilometers(final BufferedReader personKilometers) {
-        final String filename = WD + "/person-kilometers.txt";
-        FileIO.writeToFile(filename, new StreamingOutput() {
-            @Override
-            public void write(final PrintWriter pw) throws IOException {
-                FileIO.readFromInput(personKilometers, new Reading() {
-                    @Override
-                    public void read(BufferedReader br) throws IOException {
-                        String line = br.readLine();
-                        while (br != null) {
-                            pw.println(line);
-                        }
-                    }
-                });
-            }
-        });
-    }
-
-    public StreamingOutput getPersonKilometers() {
-        final String filename = WD + "/person-kilometers.txt";
-        return new StreamingOutput() {
-            @Override
-            public void write(final PrintWriter pw) throws IOException {
-                FileIO.readFromFile(filename, new Reading() {
-                    @Override
-                    public void read(BufferedReader br) throws IOException {
-                        String line = br.readLine();
-                        while (line != null) {
-                            pw.println(line);
-                            line = br.readLine();
-                        }
-                    }
-                });
-            }
-        };
     }
 
 }

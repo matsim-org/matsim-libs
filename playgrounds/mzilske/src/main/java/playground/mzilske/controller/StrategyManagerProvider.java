@@ -25,9 +25,7 @@ package playground.mzilske.controller;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.PlanStrategyFactoryRegister;
-import org.matsim.core.controler.PlanStrategyRegistrar;
+import org.matsim.core.controler.*;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
@@ -53,8 +51,10 @@ class StrategyManagerProvider implements Provider<StrategyManager> {
         for (Map.Entry<String, PlanStrategyFactory> entry : planStrategyFactories.entrySet()) {
             planStrategyFactoryRegister.register(entry.getKey(), entry.getValue());
         }
+        PlanSelectorRegistrar planSelectorRegistrar = new PlanSelectorRegistrar();
+        PlanSelectorFactoryRegister planSelectorFactoryRegister = planSelectorRegistrar.getFactoryRegister();
         StrategyManager manager = new StrategyManager();
-        StrategyManagerConfigLoader.load(scenario, controlerIO, events, manager, planStrategyFactoryRegister);
+        StrategyManagerConfigLoader.load(scenario, controlerIO, events, manager, planStrategyFactoryRegister, planSelectorFactoryRegister);
         return manager;
     }
 

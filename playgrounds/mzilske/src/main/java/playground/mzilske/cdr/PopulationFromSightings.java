@@ -68,9 +68,6 @@ public class PopulationFromSightings {
             Plan plan1 = createPlanWithRandomEndTimesInPermittedWindow(scenario, zones,
                     sightingsForThisPerson);
             person.addPlan(plan1);
-            Plan plan2 = scenario.getPopulation().getFactory().createPlan();
-            person.addPlan(plan2);
-            person.setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(person));
             scenario.getPopulation().addPerson(person);
         }
     }
@@ -292,7 +289,7 @@ public class PopulationFromSightings {
         return true;
     }
 
-    public static void createPopulationWithRandomRealization(ScenarioImpl scenario, playground.mzilske.cdr.Sightings sightings, final LinkToZoneResolver zones) {
+    public static void createPopulationWithRandomRealization(Scenario scenario, playground.mzilske.cdr.Sightings sightings, final LinkToZoneResolver zones) {
         for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.getSightingsPerPerson().entrySet()) {
             Id personId = sightingsPerPerson.getKey();
             Person person = scenario.getPopulation().getFactory().createPerson(personId);

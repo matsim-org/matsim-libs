@@ -27,7 +27,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
-import playground.mzilske.cdranalysis.StreamingOutput;
+import playground.mzilske.ant2014.StreamingOutput;
 import playground.mzilske.util.IterationSummaryFileControlerListener;
 
 import java.io.IOException;

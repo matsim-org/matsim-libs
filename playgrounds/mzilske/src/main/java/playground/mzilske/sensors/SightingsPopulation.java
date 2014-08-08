@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * ExperimentResource.java
+ *  * SightingsPopulation.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,30 +20,27 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.populationsize;
+package playground.mzilske.sensors;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import org.matsim.api.core.v01.Scenario;
+import playground.mzilske.cdr.PopulationFromSightings;
+import playground.mzilske.cdr.Sightings;
+import playground.mzilske.cdr.ZoneTracker;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-class ExperimentResource {
+@Singleton
+public class SightingsPopulation {
 
-	private final String wd;
+    @Inject
+    Sightings sightings;
 
-	public ExperimentResource(String wd) {
-		this.wd = wd;
-	}
+    @Inject
+    ZoneTracker.LinkToZoneResolver linkToZoneResolver;
 
-	public Collection<String> getRegimes() {
-		final Set<String> REGIMES = new HashSet<String>();
-		REGIMES.add("uncongested");
-		REGIMES.add("congested");
-		return REGIMES;
-	}
-
-	public RegimeResource getRegime(String regime) {
-		return new RegimeResource(wd + "regimes/" + regime, regime);
-	}
+    public void insertPersons(Scenario scenario) {
+        PopulationFromSightings.createPopulationWithRandomRealization(scenario, sightings, linkToZoneResolver);
+    }
 
 }

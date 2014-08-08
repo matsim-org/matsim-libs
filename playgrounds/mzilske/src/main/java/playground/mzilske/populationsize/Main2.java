@@ -28,7 +28,14 @@ public class Main2 {
 		final ExperimentResource experiment = new ExperimentResource("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/berlin/");
 		final RegimeResource uncongested = experiment.getRegime("uncongested");
 
-        uncongested.getMultiRateRun("cadyts").persodisthisto();
+//        uncongested.getMultiRateRun("wurst").twoRates("5");
+//        uncongested.getMultiRateRun("wurst").simulateRate("5", 10);
+
+//        uncongested.getMultiRateRun("wurst").twoRates("0");
+//        uncongested.getMultiRateRun("wurst").simulateRate("0", 10);
+
+
+        uncongested.getMultiRateRun("wurst").persodisthisto();
 //        Scenario baseScenario = uncongested.getBaseRun().getOutputScenario();
 //        Population basePopulation = baseScenario.getPopulation();
 
@@ -43,12 +50,10 @@ public class Main2 {
 
 //        uncongested.getMultiRateRun("cadyts").twoRates("5");
 
-//        uncongested.getMultiRateRun("cadyts").twoRates("50");
 
 //        uncongested.getMultiRateRun("cadyts").twoRates("0");
 
 
-//        uncongested.getMultiRateRun("cadyts").simulateRate("two_5_6", 5);
 //        uncongested.getMultiRateRun("cadyts").twoRates("5");
 
 //        uncongested.getMultiRateRun("cadyts").simulateRate("two_0", 5);

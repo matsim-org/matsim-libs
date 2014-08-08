@@ -51,9 +51,9 @@ import java.util.Map;
 public class Main {
 
     public static void main(String[] args) {
-        run("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/illustrative/random-zeiten/10-count", Arrays.asList(10));
-        run("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/illustrative/random-zeiten/8-count", Arrays.asList(8));
-        run("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/illustrative/random-zeiten/18-count", Arrays.asList(18));
+        // run("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/illustrative/random-zeiten/10-count", Arrays.asList(10));
+        run("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/illustrative/wurst/8-count", Arrays.asList(8));
+        run("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/illustrative/wurst/18-count", Arrays.asList(18));
     }
 
     private static void run(final String outputDirectory, List<Integer> countHours) {
@@ -101,6 +101,7 @@ public class Main {
                         bind(VolumesAnalyzer.class).annotatedWith(Names.named("groundTruthVolumes")).toInstance(groundTruthVolumes);
                         bind(CompareMain.class).toInstance(compareMain);
                         bind(Double.class).annotatedWith(Names.named("clonefactor")).toInstance(2.0);
+                        bind(Boolean.class).annotatedWith(Names.named("alreadyCloned")).toInstance(false);
                         bind(Double.class).annotatedWith(Names.named("cadytsweight")).toInstance(1.0);
                         bind(Config.class).toProvider(ScenarioReconstructor.ConfigProvider.class).in(Singleton.class);
                         bind(Scenario.class).toProvider(ScenarioReconstructor.class).in(Singleton.class);

@@ -19,7 +19,7 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
-import playground.mzilske.cdranalysis.RunResource;
+import playground.mzilske.ant2014.RunResource;
 import playground.mzilske.gtfs.GtfsConverter;
 
 public class UlmResource {

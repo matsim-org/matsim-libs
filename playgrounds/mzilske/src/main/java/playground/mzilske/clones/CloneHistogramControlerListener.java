@@ -31,7 +31,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-import playground.mzilske.cdranalysis.StreamingOutput;
+import playground.mzilske.ant2014.StreamingOutput;
 import playground.mzilske.util.IterationSummaryFileControlerListener;
 
 import javax.inject.Inject;

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd">
+<network>
+
+<!-- ====================================================================== -->
+
+	<nodes>
+		<node id="-24" x="10.24069985215305" y="53.75140456134265" />
+		<node id="-25" x="9.946310837779926" y="53.750653374253744" />
+		<node id="-35" x="10.01283232892196" y="53.70040453897019" />
+		<node id="-36" x="10.01257824699034" y="53.75095385070117" />
+		<node id="-39" x="10.06094409923229" y="53.80063230424725" />
+		<node id="-43" x="10.160591361799634" y="53.80138259736547" />
+		<node id="-45" x="10.201665901292758" y="53.75200550134259" />
+		<node id="-48" x="10.203444474814084" y="53.70364375499725" />
+		<node id="-5" x="9.947894335590812" y="53.80018212193237" />
+		<node id="-8" x="10.237201711331581" y="53.8016827108538" />
+	</nodes>
+
+<!-- ====================================================================== -->
+
+	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
+		<link id="1" from="-5" to="-39" length="7433.1547954903135" freespeed="20.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="10" from="-45" to="-48" length="5383.936906853645" freespeed="20.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="2" from="-25" to="-36" length="4362.338713652884" freespeed="20.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="3" from="-39" to="-43" length="6552.214187848593" freespeed="20.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="4" from="-43" to="-8" length="5037.081697199785" freespeed="20.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="5" from="-36" to="-39" length="6379.3966157055675" freespeed="20.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="6" from="-43" to="-45" length="6124.058099190753" freespeed="20.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="7" from="-45" to="-24" length="2570.3183411034" freespeed="20.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="8" from="-36" to="-45" length="12447.496700670234" freespeed="20.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="9" from="-35" to="-36" length="5626.163286432014" freespeed="20.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="car" />
+	</links>
+
+<!-- ====================================================================== -->
+
+</network>

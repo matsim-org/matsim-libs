@@ -41,7 +41,7 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
-import playground.mzilske.cdranalysis.StreamingOutput;
+import playground.mzilske.ant2014.StreamingOutput;
 import playground.mzilske.util.IterationSummaryFileControlerListener;
 
 import javax.inject.Inject;

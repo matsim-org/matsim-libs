@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * ExperimentResource.java
+ *  * LinkIsZone.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,30 +20,20 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.populationsize;
+package playground.mzilske.cdr;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 
+public class LinkIsZone implements ZoneTracker.LinkToZoneResolver {
 
-class ExperimentResource {
+    @Override
+    public Id resolveLinkToZone(Id linkId) {
+        return linkId;
+    }
 
-	private final String wd;
-
-	public ExperimentResource(String wd) {
-		this.wd = wd;
-	}
-
-	public Collection<String> getRegimes() {
-		final Set<String> REGIMES = new HashSet<String>();
-		REGIMES.add("uncongested");
-		REGIMES.add("congested");
-		return REGIMES;
-	}
-
-	public RegimeResource getRegime(String regime) {
-		return new RegimeResource(wd + "regimes/" + regime, regime);
-	}
+    public IdImpl chooseLinkInZone(String zoneId) {
+        return new IdImpl(zoneId);
+    }
 
 }

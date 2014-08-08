@@ -27,9 +27,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import playground.mzilske.ant2014.FileIO;
+import playground.mzilske.ant2014.StreamingOutput;
 import playground.mzilske.cdr.PowerPlans;
-import playground.mzilske.cdranalysis.FileIO;
-import playground.mzilske.cdranalysis.StreamingOutput;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -46,7 +46,7 @@ class RegimeResource {
 	}
 
 	public MultiRateRunResource getMultiRateRun(String alternative) {
-		return new MultiRateRunResource(WD + "/alternatives/" + alternative, regime, alternative);
+		return new MultiRateRunResource(WD + "/alternatives/" + alternative, regime);
 	}
 
     public void durationsSimulated() {

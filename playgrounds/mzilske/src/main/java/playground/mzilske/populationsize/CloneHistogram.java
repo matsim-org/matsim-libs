@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-import playground.mzilske.cdranalysis.StreamingOutput;
+import playground.mzilske.ant2014.StreamingOutput;
 
 import java.io.IOException;
 import java.io.PrintWriter;

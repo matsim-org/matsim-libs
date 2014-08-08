@@ -26,6 +26,7 @@ import org.apache.log4j.PatternLayout;
 import org.matsim.analysis.*;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -48,6 +49,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.replanning.selectors.PlanSelectorFactory;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -157,6 +159,7 @@ public class Controler extends AbstractController {
 	private MobsimFactoryRegister mobsimFactoryRegister;
 	private SnapshotWriterFactoryRegister snapshotWriterRegister;
 	private PlanStrategyFactoryRegister planStrategyFactoryRegister;
+    private PlanSelectorFactoryRegister planSelectorFactoryRegister;
 
 	protected boolean dumpDataAtEnd = true;
 	private boolean overwriteFiles = false;
@@ -232,9 +235,10 @@ public class Controler extends AbstractController {
 		this.mobsimFactoryRegister = mobsimRegistrar.getFactoryRegister();
 		SnapshotWriterRegistrar snapshotWriterRegistrar = new SnapshotWriterRegistrar();
 		this.snapshotWriterRegister = snapshotWriterRegistrar.getFactoryRegister();
-		
 		PlanStrategyRegistrar planStrategyFactoryRegistrar = new PlanStrategyRegistrar();
 		this.planStrategyFactoryRegister = planStrategyFactoryRegistrar.getFactoryRegister();
+        PlanSelectorRegistrar planSelectorRegistrar = new PlanSelectorRegistrar();
+        this.planSelectorFactoryRegister = planSelectorRegistrar.getFactoryRegister();
 		
 		this.events = EventsUtils.createEventsManager(this.config);
 
@@ -483,7 +487,7 @@ public class Controler extends AbstractController {
 		// yyyy cannot make this final: overridden at about 40 locations.  kai, jan'2013
 		// now about 20 locations.  kai, may'2013
 		StrategyManager manager = new StrategyManager();
-		StrategyManagerConfigLoader.load(getScenario(), getControlerIO(), getEvents(), manager, this.planStrategyFactoryRegister);
+		StrategyManagerConfigLoader.load(getScenario(), getControlerIO(), getEvents(), manager, this.planStrategyFactoryRegister, this.planSelectorFactoryRegister);
 		return manager;
 	}
 
@@ -568,8 +572,6 @@ public class Controler extends AbstractController {
 	}
 
 	public final TripRouterFactoryInternal getTripRouterFactory() {
-		// I think this could just be createTripRouter(). Not sure
-		// if the indirection is necessary. People just want to get a TripRouter. michaz
 		return new TripRouterFactoryInternal() {
 
 			@Override
@@ -667,10 +669,6 @@ public class Controler extends AbstractController {
                 "(3) talk to developers list.");
 	}
 
-	// Not sure if necessary. Perhaps try to unwind, directly calling
-	// createTravelDisutilityCalculator instead? michaz
-	// or the other way round: provide the factory, but not createTravelDisutilityCalculator.  To me, providing the factory seems more
-	// lightweight, since otherwise people will once more pass the Controler around just to have access to the create method. kai, dec'13
 	public final TravelDisutilityFactory getTravelDisutilityFactory() {
 		return this.travelCostCalculatorFactory;
 	}
@@ -703,7 +701,6 @@ public class Controler extends AbstractController {
 
 	/**
 	 * It should be possible to add or remove MobsimListeners between iterations, no problem.
-	 * @return
 	 */
 	public final List<MobsimListener> getMobsimListeners() {
 		return this.simulationListeners;
@@ -728,14 +725,6 @@ public class Controler extends AbstractController {
 		this.thisMobsimFactory = mobsimFactory;
 	}
 
-	/**
-	 * Sets a new {@link org.matsim.core.scoring.ScoringFunctionFactory} to use.
-	 * <strong>Note:</strong> This will reset all scores calculated so far! Only
-	 * call this before any events are generated in an iteration.
-	 *
-	 * @param factory
-	 *            The new ScoringFunctionFactory to be used.
-	 */
 	public final void setScoringFunctionFactory(
 			final ScoringFunctionFactory factory) {
 		this.scoringFunctionFactory = factory;
@@ -858,6 +847,10 @@ public class Controler extends AbstractController {
 	public final void addPlanStrategyFactory(final String planStrategyFactoryName, final PlanStrategyFactory planStrategyFactory) {
 		this.planStrategyFactoryRegister.register(planStrategyFactoryName, planStrategyFactory);
 	}
+
+    public final void addPlanSelectorFactory(final String planSelectorFactoryName, final PlanSelectorFactory<? extends BasicPlan> planSelectorFactory) {
+        this.planSelectorFactoryRegister.register(planSelectorFactoryName, planSelectorFactory);
+    }
 
 	public final void setSignalsControllerListenerFactory(
 			final SignalsControllerListenerFactory signalsFactory) {
