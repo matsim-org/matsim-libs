@@ -17,50 +17,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.gsv.synPop.mid;
+
+import java.util.Map;
+
+import playground.johannes.gsv.synPop.ProxyObject;
 
 /**
  * @author johannes
  *
  */
-public class SetActivityTimeTask implements ProxyPlanTask {
+public class LegSortedIdHandler implements LegAttributeHandler {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.gsv.synPop.ProxyPlan)
-	 */
 	@Override
-	public void apply(ProxyPlan plan) {
-		if(plan.getActivities().size() == 1) {
-			ProxyObject act = plan.getActivities().get(0);
-			
-			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, "0");
-			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, "86400");
-		} else {
-			
-		
-		for(int i = 0; i < plan.getActivities().size(); i++) {
-			String startTime = "0";
-			String endTime = "86400";
-			
-			ProxyObject act = plan.getActivities().get(i);
-			
-			if(i > 0) {
-				ProxyObject prev = plan.getLegs().get(i-1);
-				startTime = prev.getAttribute(CommonKeys.LEG_END_TIME);
-			}
-			
-			if(i < plan.getActivities().size() - 1) {
-				ProxyObject next = plan.getLegs().get(i);
-				endTime = next.getAttribute(CommonKeys.LEG_START_TIME);
-			}
-			
-//			if(Double.parseDouble(endTime) < Double.parseDouble(startTime))
-//				throw new RuntimeException();
-			
-			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, startTime);
-			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, endTime);
-		}
-		}
+	public void handle(ProxyObject leg, Map<String, String> attributes) {
+		String sid = attributes.get("wsid");
+		leg.setAttribute(MIDKeys.LEG_INDEX, sid);
 	}
 
 }

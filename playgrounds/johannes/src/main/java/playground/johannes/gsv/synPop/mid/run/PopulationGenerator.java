@@ -39,11 +39,13 @@ import playground.johannes.gsv.synPop.mid.LegMainPurposeHandler;
 import playground.johannes.gsv.synPop.mid.LegModeHandler;
 import playground.johannes.gsv.synPop.mid.LegOriginHandler;
 import playground.johannes.gsv.synPop.mid.LegRoundTrip;
+import playground.johannes.gsv.synPop.mid.LegSortedIdHandler;
 import playground.johannes.gsv.synPop.mid.LegStartTimeHandler;
 import playground.johannes.gsv.synPop.mid.PersonDayHandler;
 import playground.johannes.gsv.synPop.mid.PersonMunicipalityClassHandler;
 import playground.johannes.gsv.synPop.mid.PersonStateHandler;
 import playground.johannes.gsv.synPop.mid.PersonWeightHandler;
+import playground.johannes.gsv.synPop.mid.SortLegsTask;
 import playground.johannes.gsv.synPop.mid.TXTReader;
 
 /**
@@ -69,6 +71,7 @@ public class PopulationGenerator {
 		reader.addPersonAttributeHandler(new PersonDayHandler());
 		reader.addPersonAttributeHandler(new PersonStateHandler());
 		
+		reader.addLegAttributeHandler(new LegSortedIdHandler());
 		reader.addLegAttributeHandler(new LegMainPurposeHandler());
 		reader.addLegAttributeHandler(new LegOriginHandler());
 		reader.addLegAttributeHandler(new LegRoundTrip());
@@ -83,6 +86,7 @@ public class PopulationGenerator {
 		logger.info(String.format("Read %s persons.", persons.size()));
 		
 		ProxyPlanTaskComposite composite = new ProxyPlanTaskComposite();
+		composite.addComponent(new SortLegsTask());
 		composite.addComponent(new InsertActivitiesTask());
 		composite.addComponent(new SetActivityTypeTask());
 		composite.addComponent(new SetFirstActivityTypeTask());

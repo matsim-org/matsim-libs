@@ -47,8 +47,8 @@ public class Analyzer {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String output = "/home/johannes/gsv/synpop/output/";
-		String personFile = "/home/johannes/gsv/synpop/output/7900000000.pop.xml.gz";
+		String output = "/home/johannes/gsv/mid2008/analysis/";
+		String personFile = "/home/johannes/gsv/mid2008/pop.xml";
 		
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);

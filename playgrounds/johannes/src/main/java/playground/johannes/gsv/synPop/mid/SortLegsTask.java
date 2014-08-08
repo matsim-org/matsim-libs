@@ -17,50 +17,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.gsv.synPop.mid;
+
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.gsv.synPop.ProxyPlanTask;
 
 /**
  * @author johannes
  *
  */
-public class SetActivityTimeTask implements ProxyPlanTask {
+public class SortLegsTask implements ProxyPlanTask {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.gsv.synPop.ProxyPlan)
-	 */
 	@Override
 	public void apply(ProxyPlan plan) {
-		if(plan.getActivities().size() == 1) {
-			ProxyObject act = plan.getActivities().get(0);
-			
-			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, "0");
-			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, "86400");
-		} else {
-			
+		SortedMap<Integer, ProxyObject> map = new TreeMap<Integer, ProxyObject>();
 		
-		for(int i = 0; i < plan.getActivities().size(); i++) {
-			String startTime = "0";
-			String endTime = "86400";
-			
-			ProxyObject act = plan.getActivities().get(i);
-			
-			if(i > 0) {
-				ProxyObject prev = plan.getLegs().get(i-1);
-				startTime = prev.getAttribute(CommonKeys.LEG_END_TIME);
-			}
-			
-			if(i < plan.getActivities().size() - 1) {
-				ProxyObject next = plan.getLegs().get(i);
-				endTime = next.getAttribute(CommonKeys.LEG_START_TIME);
-			}
-			
-//			if(Double.parseDouble(endTime) < Double.parseDouble(startTime))
-//				throw new RuntimeException();
-			
-			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, startTime);
-			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, endTime);
+		for(ProxyObject leg : plan.getLegs()) {
+			Integer idx = Integer.parseInt(leg.getAttribute(MIDKeys.LEG_INDEX));
+			map.put(idx, leg);
 		}
+		
+		plan.getLegs().clear();
+		for(Entry<Integer, ProxyObject> entry : map.entrySet()) {
+			plan.addLeg(entry.getValue());
 		}
 	}
-
 }

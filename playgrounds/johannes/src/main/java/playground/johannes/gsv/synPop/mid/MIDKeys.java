@@ -56,4 +56,6 @@ public interface MIDKeys {
 	public static final String SURVEY_DAY = "stichtag";
 	
 	public static final String PERSON_STATE = "state";
+	
+	public static final String LEG_INDEX = "index";
 }
