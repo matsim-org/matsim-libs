@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.siouxFalls.emissionAnalyzer;
+package playground.agarwalamit.analysis.emission;
 
 import java.util.HashMap;
 import java.util.LinkedList;
