@@ -33,11 +33,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Plan;
 
-import playground.johannes.coopsim.pysical.ParallelPseudoSim.SimThread;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.sna.snowball.sim.SamplerTest;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
 
 /**
