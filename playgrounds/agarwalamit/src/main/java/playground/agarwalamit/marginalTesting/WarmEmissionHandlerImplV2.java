@@ -44,6 +44,7 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.emissions.types.WarmPollutant;
@@ -159,9 +160,9 @@ PersonStuckEventHandler{
 		this.delayNotInternalized_roundingErrors = 0.0;
 		this.delayNotInternalized_spillbackNoCausingAgent = 0.0;
 		//===
-		for(Link link:network.getLinks().values()){
-			linkIds2PersonEnterList.put(link.getId(), new ArrayList<Id>());
-		}
+//		for(Link link:network.getLinks().values()){
+//			linkIds2PersonEnterList.put(link.getId(), new ArrayList<Id>());
+//		}
 	}
 
 	@Override
@@ -220,20 +221,19 @@ PersonStuckEventHandler{
 			}
 
 			LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-//			checkAndModifyLinkEnterAgentList(event);
-			List<Id> linkEnterList = linkIds2PersonEnterList.get(event.getLinkId());
-			linkEnterList.add(event.getVehicleId());
-//			linkIds2PersonEnterList.put(event.getVehicleId(), linkEnterList);
+			checkAndModifyLinkEnterAgentList(event);
+//			this.linkId2congestionInfo.get(event.getLinkId()).getEnteringAgents().add(event.getVehicleId());
+			
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getVehicleId(), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
 			linkInfo.getPersonId2linkEnterTime().put(event.getVehicleId(), event.getTime());
 		}	
 		//===
 	}
-	private Map<Id, List<Id>> linkIds2PersonEnterList = new HashMap<Id, List<Id>>();
 
 	private void checkAndModifyLinkEnterAgentList(LinkEnterEvent event){
 		LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-		List<Id> linkEnterList = linkIds2PersonEnterList.get(event.getLinkId()); 
+		List<Id> linkEnterList = linkInfo.getEnteringAgents(); 
+		
 		double maxVehiclesOnLink = linkInfo.getStorageCapacityCars();
 		double noVehicleOnLinkNow = linkEnterList.size();
 
@@ -243,7 +243,7 @@ PersonStuckEventHandler{
 			linkEnterList.remove(0);
 			linkEnterList.add(event.getVehicleId());
 		} 
-		if(linkEnterList.size()>maxVehiclesOnLink) {
+		if(linkEnterList.size() > maxVehiclesOnLink+1) {
 			throw new RuntimeException ("Number of vehicle on the link is more than allowed. Aborting!!!");
 		}
 	}
@@ -351,7 +351,6 @@ PersonStuckEventHandler{
 
 					// Deleting the information of agents previously leaving that link.
 					linkInfo.getLeavingAgents().clear();
-					linkInfo.getEnteringAgents().clear();
 					linkInfo.getPersonId2linkLeaveTime().clear();
 				}
 			}
@@ -450,8 +449,8 @@ PersonStuckEventHandler{
 				if (this.calculateStorageCapacityConstraints) {
 					Id furtherChargingLinkId = new IdImpl("NA");
 					if(reverseList.isEmpty()){ 
-						Id causingLinkId = getNextLinkInRoute(event.getPersonId(),event.getLinkId());
-						linkInfo.getPersonId2CausingLinkId().put(event.getVehicleId(), causingLinkId);
+						Id causingLinkId = getNextLinkInRoute(event.getPersonId(),event.getLinkId(), event.getTime());
+						linkInfo.getPersonId2CausingLinkId().put(event.getVehicleId(), causingLinkId); 
 						furtherChargingLinkId = getCausedPersonsListAndChargeThem(causingLinkId, event);
 					} else {
 						for(Id id:reverseList){ 
@@ -486,33 +485,48 @@ PersonStuckEventHandler{
 	}
 
 	private Id getCausedPersonsListAndChargeThem(Id causingLinkId, LinkLeaveEvent event){
-		Id chargeFurtherPersonsOnLinkId= new IdImpl("NA");
+		Id chargeFurtherPersonsOnLinkId= new IdImpl("NA"); 
 		double delayToPayFor = this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(event.getVehicleId());
 		LinkCongestionInfoExtended linkInfoForCausingLink = linkId2congestionInfo.get(causingLinkId);
-
+		
 		if(linkInfoForCausingLink==null && delayToPayFor==1){ 
 			log.warn("A person is leaving link with delay of 1 sec and there is no flow or storage capacity restriction. This could cause because of QSim. Setting delays to zero again.");
 			this.delayNotInternalized_roundingErrors +=delayToPayFor;
 			delayToPayFor = 0.;
 			this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().put(event.getVehicleId(),0.);
-		} else if(linkIds2PersonEnterList.get(causingLinkId)!=null) {
-			List<Id> personIdToBeChargedList = new ArrayList<Id>(linkIds2PersonEnterList.get(causingLinkId)); 
+		} else if (linkInfoForCausingLink==null){
+			this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().put(event.getVehicleId(),0.);
+			log.error("Delay to pay for is "+delayToPayFor+". Setting it to zero. Don't understand reason behind this.");
+		} else if(linkInfoForCausingLink.getEnteringAgents()!=null) {
+			
+			List<Id> reverseList = new ArrayList<Id>(linkInfoForCausingLink.getLeavingAgents());
+			Collections.reverse(reverseList);
+			Iterator<Id> pIdIt = reverseList.iterator();
+			
+			while(pIdIt.hasNext()&&delayToPayFor>0.){ // again charged for flow cap of link
+				Id chargedPersonId = pIdIt.next();
+				chargingForDelaysAndThrowingEvents(linkInfoForCausingLink.getMarginalDelayPerLeavingVehicle_sec(), event, chargedPersonId);
+				delayToPayFor = this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(event.getVehicleId());
+			}
+			
+			List<Id> personIdToBeChargedList = new ArrayList<Id>(linkInfoForCausingLink.getEnteringAgents()); 
 			Collections.reverse(personIdToBeChargedList);
 			Iterator< Id> personIdListIterator = personIdToBeChargedList.iterator();
 			while(personIdListIterator.hasNext() && delayToPayFor>0){
 				Id personCharged = personIdListIterator.next();
 				chargingForDelaysAndThrowingEvents(linkInfoForCausingLink.getMarginalDelayPerLeavingVehicle_sec(), event, personCharged);
 				delayToPayFor = this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(event.getVehicleId());
-				chargeFurtherPersonsOnLinkId = getNextLinkInRoute(personCharged, causingLinkId);
-			}
+				chargeFurtherPersonsOnLinkId = getNextLinkInRoute(personCharged, causingLinkId, event.getTime());
+			} 
 		}
 		return chargeFurtherPersonsOnLinkId;
 	}
 
-	private Id getNextLinkInRoute(Id personId, Id linkId){
+	private Id getNextLinkInRoute(Id personId, Id linkId, double time){
 		List<PlanElement> planElements = scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements();
 
 		Map<NetworkRoute, List<Id>> nRoutesAndLinkIds = new LinkedHashMap<NetworkRoute, List<Id>>(); // save all routes and links in each route
+		List<Double> activityEndTimes = new ArrayList<Double>();
 		for(PlanElement pe :planElements){
 			if(pe instanceof Leg){
 				NetworkRoute nRoute = ((NetworkRoute)((Leg)pe).getRoute()); 
@@ -522,28 +536,63 @@ PersonStuckEventHandler{
 				linkIds.add(nRoute.getEndLinkId());
 				nRoutesAndLinkIds.put(nRoute, linkIds);
 			}
+			if(pe instanceof Activity){
+				double actEndTime = ((Activity)pe).getEndTime();
+				activityEndTimes.add(actEndTime);
+			}
 		}
 
 		Id nextLinkInRoute =  new IdImpl("NA");
-		for(NetworkRoute nr : nRoutesAndLinkIds.keySet()){
-			List<Id> linkIds = nRoutesAndLinkIds.get(nr);
+		List<Id> nextLinksInRoutes = new ArrayList<Id>();
+		
+		for(NetworkRoute nr:nRoutesAndLinkIds.keySet()){
+			List<Id>linkIds = nRoutesAndLinkIds.get(nr);
 			Iterator<Id> it = linkIds.iterator();
 			do{
-				if (it.next().equals(linkId)) {
-					if(it.hasNext()){ // hasNext() is used again to check if this is the destination link in network route
-						if(nextLinkInRoute.equals(new IdImpl("NA"))){
-							nextLinkInRoute = it.next();
-							break;
-						} else {
-							System.out.println("Error");
-							throw new RuntimeException("There is a situation where, person "+ personId+" leaving on link "+linkId+
-									" and it have two next links. They are - "+nextLinkInRoute+" and "+ it.next()+". This situation may arise when a people is using same link in same direction for "
-									+ "two different trips to different activities.");
-						}
-					}
+				if(it.next().equals(linkId)&&it.hasNext()){
+					nextLinksInRoutes.add(it.next());
+					break;
 				}
-			} while(it.hasNext());
+			}while(it.hasNext());
 		}
+		
+		if(nextLinksInRoutes.size()==0) throw new RuntimeException("There is no next link in the route of person "+personId+". Check!!!");
+		else if(nextLinksInRoutes.size()==1) nextLinkInRoute = nextLinksInRoutes.get(0);
+		else {
+			for(int i=0; i < (activityEndTimes.size()-1);i++){
+				if(activityEndTimes.get(i)<time && activityEndTimes.get(i+1)>0){
+					nextLinkInRoute =  nextLinksInRoutes.get(i);
+					break;
+				} else {
+					throw new RuntimeException("There are more than one links which come next to link"+linkId+" for perosn "+personId+
+							". To check activity end times are used but condition is not satisfied. Aborting... ");
+				}
+			}
+		}
+		
+//		for(NetworkRoute nr : nRoutesAndLinkIds.keySet()){
+//			List<Id> linkIds = nRoutesAndLinkIds.get(nr);
+//			Iterator<Id> it = linkIds.iterator();
+//			do{
+//				if (it.next().equals(linkId)) {
+//					if(it.hasNext()){ // hasNext() is used again to check if this is the destination link in network route
+//						if(nextLinkInRoute.equals(new IdImpl("NA"))){
+//							nextLinkInRoute = it.next();
+//							break;
+//						} else {
+//							log.warn("There is a situation where, person "+ personId+" leaving on link "+linkId+
+//									" and it have two next links. They are - "+nextLinkInRoute+" and "+ it.next()+
+//									". This situation may arise when a people is using same link in same direction for "
+//									+ "two different trips to different activities. Therefore, checking the actEndTimes of the activites.");
+//							System.out.println("Error");
+//							throw new RuntimeException("There is a situation where, person "+ personId+" leaving on link "+linkId+
+//									" and it have two next links. They are - "+nextLinkInRoute+" and "+ it.next()+". This situation may arise when a people is using same link in same direction for "
+//									+ "two different trips to different activities.");
+//						}
+//					}
+//				}
+//			} while(it.hasNext());
+//		}
 		return nextLinkInRoute;
 	}
 
