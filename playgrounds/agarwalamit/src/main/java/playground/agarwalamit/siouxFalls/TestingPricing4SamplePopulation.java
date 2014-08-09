@@ -25,8 +25,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.contrib.emissions.example.EmissionControlerListener;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -38,6 +36,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.marginalTesting.MyEmissionControlerListner;
+import playground.agarwalamit.marginalTesting.StraightTrackExperiment;
 //import playground.agarwalamit.marginalTesting.MarginalCongestionHandlerImplV3AA;
 import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
@@ -67,7 +67,7 @@ public class TestingPricing4SamplePopulation {
 		
 		String outputFolder = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/flowCapTest500ItsStrCap3x/";//args[0]; 
 		
-		double [] samplePopulation = {0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};//, 
+		double [] samplePopulation = {/*0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0*/0.02};//, 
 		
 		String configFile = outputFolder+"/input/SiouxFalls_config_run10Pct.xml";//args[1];
 		String emissionEfficiencyFactor ="1.0";
@@ -100,21 +100,21 @@ public class TestingPricing4SamplePopulation {
 			config.controler().setLastIteration(500);
 			Controler controler = new Controler(config);
 			
-			EmissionModule emissionModule = new EmissionModule(ScenarioUtils.loadScenario(config));
-			emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
-			emissionModule.createLookupTables();
-			emissionModule.createEmissionHandler();
+//			EmissionModule emissionModule = new EmissionModule(ScenarioUtils.loadScenario(config));
+//			emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
+//			emissionModule.createLookupTables();
+//			emissionModule.createEmissionHandler();
 			
 			controler.setOverwriteFiles(true);
 			controler.setCreateGraphs(true);				
-			controler.setDumpDataAtEnd(true);
+			controler.setDumpDataAtEnd(false);
 
-			controler.addControlerListener(new EmissionControlerListener());
-//			controler.run();
+			controler.addControlerListener(new MyEmissionControlerListner());
+			controler.run();
 			double delaysCosts = getDelaysFromEventsDefaultHandler(outputDir,(ScenarioImpl) ScenarioUtils.loadScenario(config));
 //			double[] delaysCosts = getDelaysFromEvents(outputDir,(ScenarioImpl) controler.getScenario());
 			double emissionsCosts = getTotalEmissionsCostsFromEmissionsEvents(outputDir, (ScenarioImpl) controler.getScenario());
-			
+
 			flowCap2DelaysCosts.put(d, delaysCosts);
 			flowCap2EmissionsCosts.put(d,emissionsCosts);
 			log.info("Run for sample population "+d+" is finished. :-) :-) :-)");
