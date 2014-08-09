@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.qStartPosition;
+package playground.agarwalamit.patnaIndia.mixedTraffic.qStartPosition;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

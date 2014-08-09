@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.qStartPosition;
+package playground.agarwalamit.patnaIndia.mixedTraffic.qStartPosition;
 
 import org.matsim.api.core.v01.network.Link;
 
