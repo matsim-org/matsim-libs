@@ -35,8 +35,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.siouxFalls.congestionAnalyzer.CongestionLinkAnalyzer;
-import playground.agarwalamit.siouxFalls.emissionAnalyzer.EmissionLinkAnalyzer;
+import playground.agarwalamit.analysis.congestion.CongestionLinkAnalyzer;
+import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
 import playground.agarwalamit.siouxFalls.emissionAnalyzer.PerLinkEmissionData;
 
 /**

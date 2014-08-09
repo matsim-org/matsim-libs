@@ -39,6 +39,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
+import playground.agarwalamit.analysis.emission.EmissionUtilsExtended;
+
 
 /**
  * @author amit
