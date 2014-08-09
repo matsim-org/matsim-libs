@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.siouxFalls.congestionAnalyzer;
+package analysis.congestion;
 
 import java.util.HashMap;
 import java.util.Map;
