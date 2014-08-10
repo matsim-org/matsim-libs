@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -32,25 +31,20 @@ import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
 
-
-
 /**
- * @author amit after Benjamin
+ * @author amit
  *
  */
-public class EmissionUtilsExtended {
-	private final Logger logger = Logger.getLogger(EmissionUtilsExtended.class);
-	EmissionUtils emissionUtils = new EmissionUtils(); 
-
+public class EmissionUtilsExtended extends EmissionUtils{
+	
+	
 	public  Map<Id, SortedMap<String, Double>> convertPerPersonColdEmissions2String (Population pop, Map<Id, Map<ColdPollutant, Double>> coldEmiss) {
 		Map<Id, SortedMap<String, Double>> outColdEmiss = new HashMap<Id, SortedMap<String,Double>>() ;
 		for(Person person : pop.getPersons().values()) {
 			Id personId = person.getId();
 			if (coldEmiss.containsKey(personId)) {
-				outColdEmiss.put(personId, emissionUtils.convertColdPollutantMap2String(coldEmiss.get(personId)));
-			} else {
-				// do nothing
-			}
+				outColdEmiss.put(personId, convertColdPollutantMap2String(coldEmiss.get(personId)));
+			} 
 		}
 		return outColdEmiss;
 	}
@@ -60,9 +54,7 @@ public class EmissionUtilsExtended {
 		for(Person person : pop.getPersons().values()) {
 			Id personId = person.getId();
 			if (warmEmiss.containsKey(personId)) {
-				outWarmEmiss.put(personId, emissionUtils.convertWarmPollutantMap2String(warmEmiss.get(personId)));
-			} else {
-				// do nothing
+				outWarmEmiss.put(personId, convertWarmPollutantMap2String(warmEmiss.get(personId)));
 			}
 		}
 		return outWarmEmiss;
@@ -110,9 +102,9 @@ public class EmissionUtilsExtended {
 		for(double t:coldEmiss.keySet()) {
 			Map<Id, SortedMap<String, Double>>	 tempMap = new HashMap<Id, SortedMap<String,Double>>();
 			for(Id id : coldEmiss.get(t).keySet()){
-				tempMap.put(id,	emissionUtils.convertColdPollutantMap2String(coldEmiss.get(t).get(id)));
+				tempMap.put(id,	convertColdPollutantMap2String(coldEmiss.get(t).get(id)));
 			}
-			outColdEmiss.put(t, emissionUtils.setNonCalculatedEmissionsForNetwork(net, tempMap));
+			outColdEmiss.put(t,setNonCalculatedEmissionsForNetwork(net, tempMap));
 		}
 		return outColdEmiss;
 	}
@@ -123,9 +115,9 @@ public class EmissionUtilsExtended {
 		for(double t:warmEmiss.keySet()) {
 			Map<Id, SortedMap<String, Double>>	 tempMap = new HashMap<Id, SortedMap<String,Double>>();
 			for(Id id : warmEmiss.get(t).keySet()){
-				tempMap.put(id,	emissionUtils.convertWarmPollutantMap2String(warmEmiss.get(t).get(id)));
+				tempMap.put(id,	convertWarmPollutantMap2String(warmEmiss.get(t).get(id)));
 			}
-			outWarmEmiss.put(t, emissionUtils.setNonCalculatedEmissionsForNetwork(net, tempMap));
+			outWarmEmiss.put(t, setNonCalculatedEmissionsForNetwork(net, tempMap));
 		}
 		return outWarmEmiss;
 	}
