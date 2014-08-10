@@ -24,6 +24,7 @@ import gnu.trove.TObjectDoubleHashMap;
 import java.util.Set;
 
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 
 import playground.johannes.coopsim.pysical.Trajectory;
 
@@ -33,10 +34,18 @@ import playground.johannes.coopsim.pysical.Trajectory;
  */
 public class TripDuration extends AbstractTrajectoryProperty {
 
-	private final String purpose;
+	private final String whitelist;
+	
+	private final boolean useMode;
 	
 	public TripDuration(String purpose) {
-		this.purpose = purpose;
+		this.whitelist = purpose;
+		useMode = false;
+	}
+	
+	public TripDuration(String whitelist, boolean useMode) {
+		this.whitelist = whitelist;
+		this.useMode = useMode;
 	}
 	
 	@Override
@@ -49,7 +58,19 @@ public class TripDuration extends AbstractTrajectoryProperty {
 			for(int i = 1; i < trajectory.getElements().size() - 1; i += 2) {
 				Activity act = (Activity)trajectory.getElements().get(i+1);
 				
-				if(purpose == null || act.getType().equals(purpose)) {
+				boolean match = false;
+				if (useMode) {
+					Leg leg = (Leg) trajectory.getElements().get(i);
+					if (whitelist == null || leg.getMode().equalsIgnoreCase(whitelist)) {
+						match = true;
+					}
+				} else {
+					if (whitelist == null || act.getType().equals(whitelist)) {
+						match = true;
+					}
+				}
+				
+				if(match) {
 					double dur = trajectory.getTransitions().get(i + 1) - trajectory.getTransitions().get(i);
 					dur_sum += dur;
 					cnt++;

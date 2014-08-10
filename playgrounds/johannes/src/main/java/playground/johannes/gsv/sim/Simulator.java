@@ -64,6 +64,7 @@ import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.analysis.TripDistanceTask;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
+import playground.johannes.gsv.analysis.PkmTask;
 import playground.johannes.gsv.analysis.ScoreTask;
 import playground.johannes.gsv.analysis.SpeedFactorTask;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
@@ -140,6 +141,7 @@ public class Simulator {
 			task.addTask(new ScoreTask());
 			task.addTask(new ArrivalTimeTask());
 			task.addTask(new DepartureLoadTask());
+			task.addTask(new PkmTask(controler.getFacilities()));
 			
 			AnalyzerListiner listener = new AnalyzerListiner();
 			listener.task = task;

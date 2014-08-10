@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
@@ -56,17 +57,17 @@ public class SpeedFactorTask extends TrajectoryAnalyzerTask {
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
 		Set<String> modes = new HashSet<String>();
-//		for(Trajectory t : trajectories) {
-//			for(int i = 1; i < t.getElements().size(); i += 2) {
-//				modes.add(((Leg)t.getElements().get(i)).getMode());
-//			}
-//		}
+		for(Trajectory t : trajectories) {
+			for(int i = 1; i < t.getElements().size(); i += 2) {
+				modes.add(((Leg)t.getElements().get(i)).getMode());
+			}
+		}
 		
 		modes.add(null);
 		
 		for(String mode : modes) {
-			TObjectDoubleHashMap<Trajectory> distances = new TripDistanceMean(mode, facilities).values(trajectories);
-			TObjectDoubleHashMap<Trajectory> durations = new TripDuration(mode).values(trajectories);
+			TObjectDoubleHashMap<Trajectory> distances = new TripDistanceMean(mode, facilities, true).values(trajectories);
+			TObjectDoubleHashMap<Trajectory> durations = new TripDuration(mode, true).values(trajectories);
 			
 			TDoubleArrayList distArray = new TDoubleArrayList(distances.size());
 			TDoubleArrayList durArray = new TDoubleArrayList(durations.size());

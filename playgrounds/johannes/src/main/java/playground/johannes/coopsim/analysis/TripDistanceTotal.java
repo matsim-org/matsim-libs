@@ -39,7 +39,7 @@ import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
  * @author illenberger
  *
  */
-public class TripDistanceMean extends AbstractTrajectoryProperty {
+public class TripDistanceTotal extends AbstractTrajectoryProperty {
 
 	private final String whitelist;
 
@@ -51,27 +51,27 @@ public class TripDistanceMean extends AbstractTrajectoryProperty {
 
 	private final ActivityFacilities facilities;
 
-	public TripDistanceMean(String whitelist, ActivityFacilities facilities) {
+	public TripDistanceTotal(String whitelist, ActivityFacilities facilities) {
 		this(whitelist, facilities, OrthodromicDistanceCalculator.getInstance());
 	}
 	
-	public TripDistanceMean(String whitelist, ActivityFacilities facilities, boolean useMode) {
+	public TripDistanceTotal(String whitelist, ActivityFacilities facilities, boolean useMode) {
 		this(whitelist, facilities, OrthodromicDistanceCalculator.getInstance());
 		this.useMode = useMode;
 	}
 
-	public TripDistanceMean(String whitelist, ActivityFacilities facilities, DistanceCalculator calculator) {
+	public TripDistanceTotal(String whitelist, ActivityFacilities facilities, DistanceCalculator calculator) {
 		this(whitelist, facilities, calculator, null);
 	}
 
-	public TripDistanceMean(String whitelist, ActivityFacilities facilities, DistanceCalculator calculator, String ignore) {
+	public TripDistanceTotal(String whitelist, ActivityFacilities facilities, DistanceCalculator calculator, String ignore) {
 		this.whitelist = whitelist;
 		this.facilities = facilities;
 		this.calculator = calculator;
 		// this.ignorePurpose = ignore;
 	}
 
-	public TripDistanceMean(String whitelist, ActivityFacilities facilities, DistanceCalculator calculator, boolean useMode) {
+	public TripDistanceTotal(String whitelist, ActivityFacilities facilities, DistanceCalculator calculator, boolean useMode) {
 		this(whitelist, facilities, calculator);
 		this.useMode = useMode;
 	}
@@ -82,7 +82,7 @@ public class TripDistanceMean extends AbstractTrajectoryProperty {
 
 		for (Trajectory trajectory : trajectories) {
 			double d_sum = 0;
-			int cnt = 0;
+//			int cnt = 0;
 			for (int i = 2; i < trajectory.getElements().size(); i += 2) {
 				Activity destination = (Activity) trajectory.getElements().get(i);
 
@@ -124,7 +124,7 @@ public class TripDistanceMean extends AbstractTrajectoryProperty {
 						try {
 							double d = calculator.distance(MatsimCoordUtils.coordToPoint(source), MatsimCoordUtils.coordToPoint(dest));
 							d_sum += d;
-							cnt++;
+//							cnt++;
 
 						} catch (IllegalArgumentException e) {
 							e.printStackTrace();
@@ -133,10 +133,10 @@ public class TripDistanceMean extends AbstractTrajectoryProperty {
 					}
 				}
 			}
-			if (cnt > 0) {
-				double d_mean = d_sum / (double) cnt;
-				values.adjustOrPutValue(trajectory, d_mean, d_mean);
-			}
+//			if (cnt > 0) {
+//				double d_mean = d_sum / (double) cnt;
+				values.adjustOrPutValue(trajectory, d_sum, d_sum);
+//			}
 		}
 
 		return values;
