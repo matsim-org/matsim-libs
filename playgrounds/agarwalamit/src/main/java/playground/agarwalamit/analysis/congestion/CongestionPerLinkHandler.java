@@ -136,10 +136,13 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler, LinkLeav
 		Id personId = event.getPersonId();
 
 		if(this.linkId2PersonIdLinkEnterTime.get(linkId).containsKey(personId)){
-			// Person is already on the link. Cannot happen.
-			logger.warn("Person "+personId+" is entering on link "+linkId+" two times without leaving from the same. Link leave times are "+time+" and "+this.linkId2PersonIdLinkEnterTime.get(linkId).get(personId));
-			throw new RuntimeException();
-		} 
+//			logger.info("Person "+personId+" is entering on link "+linkId+" two times without leaving from the same. Link enter times are "+
+//					this.linkId2PersonIdLinkEnterTime.get(linkId).get(personId)+" and "+time+ "\n Reason might be :"+
+//							" \n There is at least one teleport activity departing on a link ( and thus derived link enter time)"
+//							+ " and later person is entering the link with main mode."+
+//					"\n Replacing the old value. ");
+//			throw new RuntimeException();
+		}
 
 		Map<Id, Double> personId2LinkEnterTime = this.linkId2PersonIdLinkEnterTime.get(linkId);
 		personId2LinkEnterTime.put(personId, time);

@@ -39,7 +39,8 @@ import org.matsim.api.core.v01.population.Person;
 /**
  * @author amit
  */
-public class CongestionPerPersonHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler {
+public class CongestionPerPersonHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, 
+PersonDepartureEventHandler, PersonArrivalEventHandler {
 	private final Logger logger = Logger.getLogger(CongestionPerPersonHandler.class);
 
 	private Map<Double, Map<Id, Double>> personId2DelaysPerTimeBin = new HashMap<Double, Map<Id, Double>>();
@@ -91,8 +92,7 @@ public class CongestionPerPersonHandler implements LinkEnterEventHandler, LinkLe
 		Id linkId = event.getLinkId();
 		Id personId = event.getPersonId();
 		if(this.linkId2PersonIdLinkEnterTime.get(linkId).containsKey(personId)){
-			// Person is already on the link. Cannot happen.
-			throw new RuntimeException();
+			throw new RuntimeException("Person is alread on link. Can not depart from the same link without leaving the link.");
 		} 
 
 		Map<Id, Double> personId2LinkEnterTime = this.linkId2PersonIdLinkEnterTime.get(linkId);
@@ -109,7 +109,6 @@ public class CongestionPerPersonHandler implements LinkEnterEventHandler, LinkLe
 		endOfTimeInterval = Math.ceil(time/this.timeBinSize)*this.timeBinSize;
 		if(endOfTimeInterval<=0.0)endOfTimeInterval=this.timeBinSize;
 
-
 		Id linkId = event.getLinkId();
 		Id personId = event.getPersonId();
 
@@ -119,6 +118,7 @@ public class CongestionPerPersonHandler implements LinkEnterEventHandler, LinkLe
 		double currentDelay =	actualTravelTime-freeSpeedTime;
 
 		Map<Id, Double> delayForPerson = this.personId2DelaysPerTimeBin.get(endOfTimeInterval);
+		
 		Map<Id, Double> countTotal = this.time2linkIdLeaveCount.get(endOfTimeInterval);
 
 		double delaySoFar = delayForPerson.get(personId);
@@ -141,11 +141,15 @@ public class CongestionPerPersonHandler implements LinkEnterEventHandler, LinkLe
 		Id linkId = event.getLinkId();
 		Id personId = event.getPersonId();
 
-		if(this.linkId2PersonIdLinkEnterTime.get(linkId).containsKey(personId)){
-			// Person is already on the link. Cannot happen.
-			logger.warn("Person "+personId+" is entering on link "+linkId+" two times without leaving from the same. Link leave times are "+time+" and "+this.linkId2PersonIdLinkEnterTime.get(linkId).get(personId));
-			throw new RuntimeException();
-		} 
+//		if(this.linkId2PersonIdLinkEnterTime.get(linkId).containsKey(personId)){
+//			// Person is already on the link. Cannot happen.
+//			logger.info("Person "+personId+" is entering on link "+linkId+" two times without leaving from the same. Link enter times are "+
+//			this.linkId2PersonIdLinkEnterTime.get(linkId).get(personId)+" and "+time+ "\n Reason might be :"+
+//					" \n There is at least one teleport activity departing on a link ( and thus derived link enter time)"
+//					+ " and later person is entering the link with main mode."+
+//			"\n Replacing the old value. ");
+////			throw new RuntimeException();
+//		}
 
 		Map<Id, Double> personId2LinkEnterTime = this.linkId2PersonIdLinkEnterTime.get(linkId);
 		personId2LinkEnterTime.put(personId, time);
