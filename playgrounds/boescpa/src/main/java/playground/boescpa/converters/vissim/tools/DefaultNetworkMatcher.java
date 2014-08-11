@@ -21,9 +21,9 @@
 
 package playground.boescpa.converters.vissim.tools;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -131,43 +131,48 @@ public class DefaultNetworkMatcher implements ConvEvents2Anm.NetworkMatcher {
 		// follow all links and check which "zones" of mutual base grid are passed
 		for (Link link : network.getLinks().values()) {
 			List<Id> passedZones = new LinkedList<Id>();
-			Coordinate start = new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
-			Coordinate end = new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
+			Coord start = new CoordImpl(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
+			Coord end = new CoordImpl(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
 			double[] deltas = calculateDeltas(start, end);
-			Id presentSmallest = null;
-			for (int i = 0; i < (int)deltas[2]; i++) {
-				presentSmallest = null;
+			for (int i = 0; i <= (int)deltas[2]; i++) {
+				Id presentSmallest = null;
 				double presentSmallestDist = gridcellsize;
 				for (Node zone : mutualBaseGrid.getNodes().values()) {
-					Double dist = CoordUtils.calcDistance(zone.getCoord(), new CoordImpl(i * deltas[0], i * deltas[1]));
+					Double dist = CoordUtils.calcDistance(zone.getCoord(),
+							new CoordImpl(start.getX() + (i * deltas[0]), start.getY() + (i * deltas[1])));
 					if (dist < presentSmallestDist) {
 						presentSmallestDist = dist;
 						presentSmallest = zone.getId();
 					}
+					if (dist < gridcellsize/2) {
+						break;
+					}
+				}
+				if (presentSmallest != null) {
+					if (passedZones.isEmpty()) {
+						passedZones.add(presentSmallest);
+					} else if (passedZones.get(passedZones.size() - 1) != presentSmallest) {
+						passedZones.add(presentSmallest);
+					}
+				} else {
+					throw new NullPointerException("For a coordinate no closest zone was found.");
 				}
 			}
-			if (presentSmallest != null) {
-				if (passedZones.isEmpty()) {
-					passedZones.add(presentSmallest);
-				} else if (passedZones.get(passedZones.size() - 1) != presentSmallest) {
-					passedZones.add(presentSmallest);
-				}
-			} // todo-boescpa What if null? If no zone was found?
-			mapKey.put(link.getId(), passedZones.toArray(new Id[]{}));
+			mapKey.put(link.getId(), passedZones.toArray(new Id[passedZones.size()]));
 		}
 		return mapKey;
 	}
 
-	private double[] calculateDeltas(Coordinate start, Coordinate end) {
+	private double[] calculateDeltas(Coord start, Coord end) {
 		double factor = 1;
 		double[] delta = new double[3];
 		do {
 			factor *= 10;
-			delta[0] = Math.abs((start.x - end.x)/factor);
-			delta[1] = Math.abs((start.y - end.y)/factor);
+			delta[0] = Math.abs((end.getX() - start.getX())/factor);
+			delta[1] = Math.abs((end.getY() - start.getY())/factor);
 		} while (delta[0] >= (gridcellsize/10) && delta[1] >= (gridcellsize/10));
-		delta[0] = (start.x - end.x)/factor;
-		delta[1] = (start.y - end.y)/factor;
+		delta[0] = (end.getX() - start.getX())/factor;
+		delta[1] = (end.getY() - start.getY())/factor;
 		delta[2] = factor;
 		return delta;
 	}
