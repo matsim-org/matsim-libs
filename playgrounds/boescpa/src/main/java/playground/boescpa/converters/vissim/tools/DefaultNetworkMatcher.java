@@ -21,10 +21,14 @@
 
 package playground.boescpa.converters.vissim.tools;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
+import com.vividsolutions.jts.util.GeometricShapeFactory;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -32,10 +36,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.boescpa.converters.vissim.ConvEvents2Anm;
+import playground.wrashid.msimoni.analyses.*;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Creates a square grid around considered area. The grid is represented by nodes in the network.
@@ -123,7 +126,80 @@ public class DefaultNetworkMatcher implements ConvEvents2Anm.NetworkMatcher {
 	}
 
 	@Override
-	public HashMap<Id, Long[]> mapMsNetwork(String path2MATSimNetwork, Network matchedNetwork) {
+	public HashMap<Id, Id[]> mapMsNetwork(String path2MATSimNetwork, Network mutualBaseGrid, String path2VissimZoneShp) {
+		Network network = readAndCutMsNetwork(path2MATSimNetwork, path2VissimZoneShp);
+		Map<Id, Geometry> zones = prepareMutualBaseGrid(mutualBaseGrid);
+		HashMap<Id, Id[]> mapKey = new HashMap<Id, Id[]>();
+		// follow all links and check which "zones" of mutual base grid are passed
+		for (Link link : network.getLinks().values()) {
+			List<Id> passedZones = new LinkedList<Id>();
+			Coordinate start = new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
+			Coordinate end = new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
+			double[] deltas = calculateDeltas(start, end);
+			for (int i = 0; i < (int)deltas[2]; i++) {
+				Point point = new Point(new CoordinateArraySequence(new Coordinate[]{new Coordinate(i * deltas[0], i * deltas[1])}), new GeometryFactory());
+				for (Id zoneId : zones.keySet()) {
+					Geometry zone = zones.get(zoneId);
+					if (zone.contains(point)) {
+						if (passedZones.get(passedZones.size()-1) != zoneId) {
+							passedZones.add(zoneId);
+						}
+						break;
+					}
+				}
+			}
+			/*Geometry vividLink = new LineString(new CoordinateArraySequence(new Coordinate[]{start, end}), new GeometryFactory());
+			for (Id zoneId : zones.keySet()) {
+				Geometry zone = zones.get(zoneId);
+				if (vividLink.crosses(zone)) {
+					passedZones.add(Long.parseLong(zoneId.toString()));
+				}
+			}*/
+			mapKey.put(link.getId(), passedZones.toArray(new Id[]{}));
+		}
+		return mapKey;
+	}
+
+	private double[] calculateDeltas(Coordinate start, Coordinate end) {
+		double factor = 1;
+		double[] delta = new double[3];
+		do {
+			factor *= 10;
+			delta[0] = Math.abs((start.x - end.x)/factor);
+			delta[1] = Math.abs((start.y - end.y)/factor);
+		} while (delta[0] >= (gridcellsize/10) && delta[1] >= (gridcellsize/10));
+		delta[0] = (start.x - end.x)/factor;
+		delta[1] = (start.y - end.y)/factor;
+		delta[2] = factor;
+		return delta;
+	}
+
+	/**
+	 * Creates a square around each node.
+	 *
+	 * @param mutualBaseGrid
+	 * @return Zones derived from the mutualBaseGrid.
+	 */
+	private Map<Id, Geometry> prepareMutualBaseGrid(Network mutualBaseGrid) {
+		Map<Id, Geometry> zones = new HashMap<Id, Geometry>();
+		GeometricShapeFactory factory = new GeometricShapeFactory();
+		factory.setHeight(gridcellsize);
+		factory.setWidth(gridcellsize);
+		for (Node node : mutualBaseGrid.getNodes().values()) {
+			factory.setCentre(new Coordinate(node.getCoord().getX(), node.getCoord().getY()));
+			zones.put(node.getId(), factory.createRectangle());
+		}
+		return zones;
+	}
+
+	/**
+	 * Read network and cut it to zones.
+	 *
+	 * @param path2MATSimNetwork
+	 * @param path2VissimZoneShp
+	 * @return
+	 */
+	protected Network readAndCutMsNetwork(String path2MATSimNetwork, String path2VissimZoneShp) {
 		return null;
 	}
 
