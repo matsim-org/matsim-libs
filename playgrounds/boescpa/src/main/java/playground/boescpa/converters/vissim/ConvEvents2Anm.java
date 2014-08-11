@@ -69,7 +69,7 @@ public class ConvEvents2Anm {
 
 		Network mutualBaseGrid = this.baseGridCreator.createMutualBaseGrid(path2VissimZoneShp);
 		HashMap<Id, Id[]> keyMsNetwork = this.networkMatcher.mapMsNetwork(path2MATSimNetwork, mutualBaseGrid, path2VissimZoneShp);
-		HashMap<Id, Long[]> keyAmNetwork = this.networkMatcher.mapAmNetwork(path2VissimNetworkNodes, mutualBaseGrid);
+		HashMap<Id, Id[]> keyAmNetwork = this.networkMatcher.mapAmNetwork(path2VissimNetworkNodes, mutualBaseGrid);
 		HashMap<Id, Long[]> msTrips = this.eventsConverter.convertEvents(keyMsNetwork, path2EventsFile, path2VissimZoneShp);
 		HashMap<Id, Long[]> amTrips = this.anmConverter.convertRoutes(keyAmNetwork, path2AnmFile);
 		HashMap<Id, Integer> demandPerAnmTrip = this.tripMatcher.matchTrips(msTrips, amTrips);
@@ -94,12 +94,12 @@ public class ConvEvents2Anm {
 		 * Creates a key that maps the provided matsim network (links) to the mutual base grid.
 		 * If the matsim network is larger than the zones provided the network is cut.
 		 *
-		 * @param path2MATSimNetwork
+		 * @param path2MATSimNetworkConfig	A matsim config which specifies the network to be used.
 		 * @param mutualBaseGrid
 		 * @param path2VissimZoneShp
 		 * @return The key that matches the network (links) to the base grid.
 		 */
-		HashMap<Id,Id[]> mapMsNetwork(String path2MATSimNetwork, Network mutualBaseGrid, String path2VissimZoneShp);
+		HashMap<Id,Id[]> mapMsNetwork(String path2MATSimNetworkConfig, Network mutualBaseGrid, String path2VissimZoneShp);
 
 		/**
 		 * Creates a key that maps the provided Vissim network (links) to the mutual base grid.
@@ -108,7 +108,7 @@ public class ConvEvents2Anm {
 		 * @param mutualBaseGrid
 		 * @return The key that matches the network (links) to the base grid.
 		 */
-		HashMap<Id,Long[]> mapAmNetwork(String path2VissimNetworkLinks, Network mutualBaseGrid);
+		HashMap<Id,Id[]> mapAmNetwork(String path2VissimNetworkLinks, Network mutualBaseGrid);
 	}
 
 	public interface EventsConverter {
@@ -135,7 +135,7 @@ public class ConvEvents2Anm {
 		 * @return A HashMap which represents each trip (derived from AnmRoutes, assigned the AnmRoute Id) in the form
 		 * 			of an id-array (Long[]) representing a sequence of elements of the matched network.
 		 */
-		public HashMap<Id,Long[]> convertRoutes(HashMap<Id, Long[]> keyAmNetwork, String path2AnmFile);
+		public HashMap<Id,Long[]> convertRoutes(HashMap<Id, Id[]> keyAmNetwork, String path2AnmFile);
 
 		/**
 		 * Rewrite ANMRoutes file with new demand numbers for each ANM-Route

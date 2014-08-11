@@ -34,7 +34,7 @@ import java.util.HashMap;
  */
 public class DefaultAnmConverter implements ConvEvents2Anm.AnmConverter {
 	@Override
-	public HashMap<Id, Long[]> convertRoutes(HashMap<Id, Long[]> keyAmNetwork, String path2AnmFile) {
+	public HashMap<Id, Long[]> convertRoutes(HashMap<Id, Id[]> keyAmNetwork, String path2AnmFile) {
 		return null;
 	}
 

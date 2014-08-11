@@ -21,55 +21,91 @@
 
 package playground.boescpa.converters.vissim.tools;
 
+import com.vividsolutions.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 import playground.boescpa.converters.vissim.ConvEvents2Anm;
+import playground.christoph.evacuation.analysis.CoordAnalyzer;
+import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
- * Creates a square grid around considered area. The grid is represented by nodes in the network.
+ * Provides methods that create a key map from a given network to a given mutual base grid.
  *
  * @author boescpa
  */
 public class DefaultNetworkMatcher implements ConvEvents2Anm.NetworkMatcher {
 
-
-
 	/**
 	 * Creates a key-map that maps a MATSimNetwork to a provided mutualBaseGrid (also MATSim-Network-Format).
+	 * As a side-job, when the MATSim-network is read in, the network is cut to the zones provided.
 	 *
-	 * @param path2MATSimNetwork
+	 * @param path2MATSimNetworkConfig	A matsim config which specifies the network to be used.
 	 * @param mutualBaseGrid
 	 * @param path2VissimZoneShp
-	 * @return
+	 * @return A key map that maps the matsim network to the mutual base grid.
 	 */
 	@Override
-	public HashMap<Id, Id[]> mapMsNetwork(String path2MATSimNetwork, Network mutualBaseGrid, String path2VissimZoneShp) {
-		Network network = readAndCutMsNetwork(path2MATSimNetwork, path2VissimZoneShp);
+	public HashMap<Id, Id[]> mapMsNetwork(String path2MATSimNetworkConfig, Network mutualBaseGrid, String path2VissimZoneShp) {
+		Network network = readAndCutMsNetwork(path2MATSimNetworkConfig, path2VissimZoneShp);
 		return getKeyMap(mutualBaseGrid, network);
 	}
 
 	/**
-	 * Read network MATSim-Network and cut it to zones.
+	 * Read matsim network and cut it to zones.
 	 *
-	 * @param path2MATSimNetwork
+	 * @param path2MATSimNetworkConfig	A matsim config which specifies the network to be used.
 	 * @param path2VissimZoneShp
-	 * @return
+	 * @return The prepared matsim network.
 	 */
-	protected Network readAndCutMsNetwork(String path2MATSimNetwork, String path2VissimZoneShp) {
-		return null;
+	protected Network readAndCutMsNetwork(String path2MATSimNetworkConfig, String path2VissimZoneShp) {
+		// Read network
+		Config config = ConfigUtils.loadConfig(path2MATSimNetworkConfig);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Network network = scenario.getNetwork();
+		// Prepare zones and identifier.
+		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
+		features.addAll(ShapeFileReader.getAllFeatures(path2VissimZoneShp));
+		SHPFileUtil util = new SHPFileUtil();
+		Geometry cuttingArea = util.mergeGeometries(features);
+		CoordAnalyzer coordAnalyzer = new CoordAnalyzer(cuttingArea);
+		// Identify links not in zones.
+		Set<Link> linkSet2Remove = new HashSet<Link>();
+		for (Link link : network.getLinks().values()) {
+			if (!coordAnalyzer.isLinkAffected(link)) {
+				linkSet2Remove.add(link);
+			}
+		}
+		// Remove links not in zones.
+		for (Link link : linkSet2Remove) {
+			network.removeLink(link.getId());
+		}
+		return network;
 	}
 
+	/**
+	 * Creates a key-map that maps a Vissum-Network to a provided mutualBaseGrid (also MATSim-Network-Format).
+	 *
+	 * @param path2VissimNetworkLinks
+	 * @param mutualBaseGrid
+	 * @return
+	 */
 	@Override
-	public HashMap<Id, Long[]> mapAmNetwork(String path2VissimNetworkLinks, Network mutualBaseGrid) {
+	public HashMap<Id, Id[]> mapAmNetwork(String path2VissimNetworkLinks, Network mutualBaseGrid) {
 		return null;
 	}
 
@@ -83,8 +119,7 @@ public class DefaultNetworkMatcher implements ConvEvents2Anm.NetworkMatcher {
 			Coord end = new CoordImpl(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
 			double[] deltas = calculateDeltas(start, end);
 			for (int i = 0; i <= (int)deltas[2]; i++) {
-				Id presentSmallest = null;
-				presentSmallest = findZone(mutualBaseGrid, start, deltas, i, presentSmallest);
+				Id presentSmallest = findZone(mutualBaseGrid, start, deltas, i);
 				if (presentSmallest != null) {
 					if (passedZones.isEmpty()) {
 						passedZones.add(presentSmallest);
@@ -100,8 +135,9 @@ public class DefaultNetworkMatcher implements ConvEvents2Anm.NetworkMatcher {
 		return mapKey;
 	}
 
-	private Id findZone(Network mutualBaseGrid, Coord start, double[] deltas, int i, Id presentSmallest) {
+	private Id findZone(Network mutualBaseGrid, Coord start, double[] deltas, int i) {
 		int gridcellsize = DefaultBaseGridCreator.getGridcellsize();
+		Id presentSmallest = null;
 		double presentSmallestDist = gridcellsize;
 		for (Node zone : mutualBaseGrid.getNodes().values()) {
 			Double dist = CoordUtils.calcDistance(zone.getCoord(),
