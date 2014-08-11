@@ -51,7 +51,8 @@ public class UserBenefitsAnalyzerAA extends AbstractAnalyisModule{
 	
 	private double allUsersLogSum;
 	private int personWithNoValidPlanCnt;
-	private Map<Id, Double> personId2Logsum;
+	private Map<Id, Double> personId2UserWelfare;
+	private Map<Id, Double> personId2MonetarizedUserWelfare;
 	private WelfareMeasure welfareMeasure;
 	
 	public UserBenefitsAnalyzerAA() {
@@ -76,7 +77,8 @@ public class UserBenefitsAnalyzerAA extends AbstractAnalyisModule{
 		this.allUsersLogSum = this.userWelfareCalculator.calculateUtility_money(this.scenario.getPopulation());
 		this.personWithNoValidPlanCnt = this.userWelfareCalculator.getPersonsWithoutValidPlanCnt();
 		log.warn("users with no valid plan (all scores ``== null'' or ``<= 0.0''): " + personWithNoValidPlanCnt);
-		this.personId2Logsum = this.userWelfareCalculator.getPersonId2MonetizedUtility();
+		this.personId2MonetarizedUserWelfare = this.userWelfareCalculator.getPersonId2MonetizedUtility();
+		this.personId2UserWelfare = this.userWelfareCalculator.getPersonId2Utility();
 	}
 
 	@Override
@@ -100,8 +102,8 @@ public class UserBenefitsAnalyzerAA extends AbstractAnalyisModule{
 			bw.write("userID \t monetary user logsum");
 			bw.newLine();
 			
-			for (Id id : this.personId2Logsum.keySet()){
-				String row = id + "\t" + this.personId2Logsum.get(id);
+			for (Id id : this.personId2UserWelfare.keySet()){
+				String row = id + "\t" + this.personId2UserWelfare.get(id);
 				bw.write(row);
 				bw.newLine();
 			}
@@ -118,8 +120,12 @@ public class UserBenefitsAnalyzerAA extends AbstractAnalyisModule{
 		return allUsersLogSum;
 	}
 
-	public Map<Id, Double> getPersonId2Logsum() {
-		return personId2Logsum;
+	public Map<Id, Double> getPersonId2UserWelfare_utils() {
+		return personId2UserWelfare;
+	}
+	
+	public Map<Id, Double> getPersonId2MonetarizedUserWelfare(){
+		return personId2MonetarizedUserWelfare;
 	}
 }
 
