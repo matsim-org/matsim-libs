@@ -22,7 +22,6 @@
 package playground.boescpa.converters.vissim.tools;
 
 import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 import com.vividsolutions.jts.util.GeometricShapeFactory;
 import org.matsim.api.core.v01.Id;
@@ -36,7 +35,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.boescpa.converters.vissim.ConvEvents2Anm;
-import playground.wrashid.msimoni.analyses.*;
 
 import java.util.*;
 
@@ -148,13 +146,6 @@ public class DefaultNetworkMatcher implements ConvEvents2Anm.NetworkMatcher {
 					}
 				}
 			}
-			/*Geometry vividLink = new LineString(new CoordinateArraySequence(new Coordinate[]{start, end}), new GeometryFactory());
-			for (Id zoneId : zones.keySet()) {
-				Geometry zone = zones.get(zoneId);
-				if (vividLink.crosses(zone)) {
-					passedZones.add(Long.parseLong(zoneId.toString()));
-				}
-			}*/
 			mapKey.put(link.getId(), passedZones.toArray(new Id[]{}));
 		}
 		return mapKey;
