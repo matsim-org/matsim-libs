@@ -34,7 +34,7 @@ import java.util.HashMap;
  */
 public class DefaultEventsConverter implements ConvEvents2Anm.EventsConverter {
 	@Override
-	public HashMap<Id, Long[]> convertEvents(HashMap<Id, Long[]> keyMsNetwork, String path2EventsFile) {
+	public HashMap<Id, Long[]> convertEvents(HashMap<Id, Id[]> keyMsNetwork, String path2EventsFile, String path2VissimZoneShp) {
 		return null;
 	}
 }

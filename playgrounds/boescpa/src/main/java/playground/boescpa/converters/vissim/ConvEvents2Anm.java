@@ -66,9 +66,9 @@ public class ConvEvents2Anm {
 		String path2NewAnmFile = args[5];
 
 		Network mutualBaseGrid = this.networkMatcher.createMutualBaseGrid(path2VissimZoneShp);
-		HashMap<Id, Long[]> keyMsNetwork = this.networkMatcher.mapMsNetwork(path2MATSimNetwork, mutualBaseGrid);
+		HashMap<Id, Id[]> keyMsNetwork = this.networkMatcher.mapMsNetwork(path2MATSimNetwork, mutualBaseGrid, path2VissimZoneShp);
 		HashMap<Id, Long[]> keyAmNetwork = this.networkMatcher.mapAmNetwork(path2VissimNetworkNodes, mutualBaseGrid);
-		HashMap<Id, Long[]> msTrips = this.eventsConverter.convertEvents(keyMsNetwork, path2EventsFile);
+		HashMap<Id, Long[]> msTrips = this.eventsConverter.convertEvents(keyMsNetwork, path2EventsFile, path2VissimZoneShp);
 		HashMap<Id, Long[]> amTrips = this.anmConverter.convertRoutes(keyAmNetwork, path2AnmFile);
 		HashMap<Id, Integer> demandPerAnmTrip = this.tripMatcher.matchTrips(msTrips, amTrips);
 		this.anmConverter.writeAnmRoutes(demandPerAnmTrip, path2AnmFile, path2NewAnmFile);
@@ -85,13 +85,15 @@ public class ConvEvents2Anm {
 		public Network createMutualBaseGrid(String path2VissimZoneShp);
 
 		/**
-		 * Creates a key that maps the provided Matsim network (links) to the mutual base grid.
+		 * Creates a key that maps the provided matsim network (links) to the mutual base grid.
+		 * If the matsim network is larger than the zones provided the network is cut.
 		 *
 		 * @param path2MATSimNetwork
 		 * @param mutualBaseGrid
+		 * @param path2VissimZoneShp
 		 * @return The key that matches the network (links) to the base grid.
 		 */
-		HashMap<Id,Long[]> mapMsNetwork(String path2MATSimNetwork, Network mutualBaseGrid);
+		HashMap<Id,Id[]> mapMsNetwork(String path2MATSimNetwork, Network mutualBaseGrid, String path2VissimZoneShp);
 
 		/**
 		 * Creates a key that maps the provided Vissim network (links) to the mutual base grid.
@@ -106,14 +108,15 @@ public class ConvEvents2Anm {
 	public interface EventsConverter {
 
 		/**
-		 * Convert MATSim-Events to trips in matched network
+		 * Convert MATSim-Events to trips in matched network (in the matched zone).
 		 *
 		 * @param keyMsNetwork
 		 * @param path2EventsFile
+		 * @param path2VissimZoneShp
 		 * @return A HashMap which represents each trip (derived from events, assigned a trip Id) in the form of
 		 * 			an id-array (Long[]) representing a sequence of elements of the matched network.
 		 */
-		public HashMap<Id,Long[]> convertEvents(HashMap<Id, Long[]> keyMsNetwork, String path2EventsFile);
+		public HashMap<Id,Long[]> convertEvents(HashMap<Id, Id[]> keyMsNetwork, String path2EventsFile, String path2VissimZoneShp);
 	}
 
 	public interface AnmConverter {
