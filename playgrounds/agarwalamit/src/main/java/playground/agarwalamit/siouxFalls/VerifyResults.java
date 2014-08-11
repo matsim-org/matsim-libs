@@ -34,6 +34,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.emission.EmissionCostFactors;
 import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 
@@ -43,11 +44,6 @@ import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 public class VerifyResults {
 	/*Values taken from IMPACT (Maibach et al.(2008))*/
 	private static final Logger log = Logger.getLogger(VerifyResults.class);
-	private static final double EURO_PER_GRAMM_NOX = 9600. / (1000. * 1000.);
-	private static final double EURO_PER_GRAMM_NMVOC = 1700. / (1000. * 1000.);
-	private static  final double EURO_PER_GRAMM_SO2 = 11000. / (1000. * 1000.);
-	private static  final double EURO_PER_GRAMM_PM2_5_EXHAUST = 384500. / (1000. * 1000.);
-	private static final double EURO_PER_GRAMM_CO2 = 70. / (1000. * 1000.);
 
 	private static final double marginal_Utl_money=0.0789942;//0.062 //(for SiouxFalls =0.062 and for Munich =0.0789942);
 	private static final double marginal_Utl_performing_sec=0.96/3600;
@@ -59,7 +55,7 @@ public class VerifyResults {
 	private final static String networkFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
 	private final static String inputConfigFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/config_munich_1pct_baseCaseCtd.xml";
 
-	private  final static String [] runNr = {"ei2"};//{"baseCaseCtd","ei","ci","eci"};//{"201","202", "203","204"};
+	private  final static String [] runNr = {"baseCaseCtd","ei","ci","eci"};//{"201","202", "203","204"};
 
 	private  static Scenario scenario ;
 
@@ -96,32 +92,41 @@ public class VerifyResults {
 		double totalEmissionCost =0;
 		BufferedWriter writer = IOUtils.getBufferedWriter(runDir+runNr+"/analysis/verifyTotalEmissionCost.txt");
 		try {
-			for(String str:totalEmissions.keySet()){
-				if(str.equals("NOX")) {
-					double noxCosts = totalEmissions.get(str) * EURO_PER_GRAMM_NOX;
-					writer.write("NOX emissions in gm  are = "+"\t"+totalEmissions.get(str).toString()+"\t"+". Total NOX emission cost is "+noxCosts);
-					totalEmissionCost += noxCosts;
-				} else if(str.equals("NMHC")) {
-					double nmhcCosts =totalEmissions.get(str) * EURO_PER_GRAMM_NMVOC;
-					writer.write("NMHC emissions in gm  are = "+"\t"+totalEmissions.get(str).toString()+"\t"+". Total NMHC emission cost is "+nmhcCosts);
-					totalEmissionCost += nmhcCosts;
-				} else if(str.equals("SO2")) {
-					double so2Costs = totalEmissions.get(str) * EURO_PER_GRAMM_SO2;
-					writer.write("SO2 emissions in gm  are = "+"\t"+totalEmissions.get(str).toString()+"\t"+". Total SO2 emission cost is "+so2Costs);
-					totalEmissionCost += so2Costs;
-				} else if(str.equals("PM")) {
-					double pmCosts = totalEmissions.get(str) * EURO_PER_GRAMM_PM2_5_EXHAUST;
-					writer.write("PM emissions in gm  are = "+"\t"+totalEmissions.get(str).toString()+"\t"+". Total PM emission cost is "+pmCosts);
-					totalEmissionCost += pmCosts;
-				} else if(str.equals("CO2_TOTAL")){
-					if(considerCO2Costs) {
-						double co2Costs = totalEmissions.get(str) * EURO_PER_GRAMM_CO2;
-						writer.write("CO2 emissions in gm  are = "+"\t"+totalEmissions.get(str).toString()+"\t"+". Total CO2 emission cost is "+co2Costs);
-						totalEmissionCost += co2Costs;
-					} else ; //do nothing
+//			for(String str:totalEmissions.keySet()){
+			for(EmissionCostFactors ecf:EmissionCostFactors.values()) {
+				String str = ecf.toString();
+				if(str.equals("CO2_TOTAL") && !considerCO2Costs){
+					// do not include CO2_TOTAL costs.
+				} else {
+					double emissionsCosts = ecf.getCostFactor() * totalEmissions.get(str);
+					totalEmissionCost += emissionsCosts;
+					writer.write(str+" emissions in gm  are = "+"\t"+totalEmissions.get(str).toString()+"\t"+". Total NOX emission cost is "+emissionsCosts);
+					writer.newLine();
+
+					//				if(str.equals("NOX")) {
+					//					double noxCosts = totalEmissions.get(str) * EURO_PER_GRAMM_NOX;
+					//					writer.write("NOX emissions in gm  are = "+"\t"+totalEmissions.get(str).toString()+"\t"+". Total NOX emission cost is "+noxCosts);
+					//					totalEmissionCost += noxCosts;
+					//				} else if(str.equals("NMHC")) {
+					//					double nmhcCosts =totalEmissions.get(str) * EURO_PER_GRAMM_NMVOC;
+					//					writer.write("NMHC emissions in gm  are = "+"\t"+totalEmissions.get(str).toString()+"\t"+". Total NMHC emission cost is "+nmhcCosts);
+					//					totalEmissionCost += nmhcCosts;
+					//				} else if(str.equals("SO2")) {
+					//					double so2Costs = totalEmissions.get(str) * EURO_PER_GRAMM_SO2;
+					//					writer.write("SO2 emissions in gm  are = "+"\t"+totalEmissions.get(str).toString()+"\t"+". Total SO2 emission cost is "+so2Costs);
+					//					totalEmissionCost += so2Costs;
+					//				} else if(str.equals("PM")) {
+					//					double pmCosts = totalEmissions.get(str) * EURO_PER_GRAMM_PM2_5_EXHAUST;
+					//					writer.write("PM emissions in gm  are = "+"\t"+totalEmissions.get(str).toString()+"\t"+". Total PM emission cost is "+pmCosts);
+					//					totalEmissionCost += pmCosts;
+					//				} else if(str.equals("CO2_TOTAL")){
+					//					if(considerCO2Costs) {
+					//						double co2Costs = totalEmissions.get(str) * EURO_PER_GRAMM_CO2;
+					//						writer.write("CO2 emissions in gm  are = "+"\t"+totalEmissions.get(str).toString()+"\t"+". Total CO2 emission cost is "+co2Costs);
+					//						totalEmissionCost += co2Costs;
+					//					} else ; //do nothing
+					//				}
 				}
-				else ; //do nothing
-				writer.newLine();
 			}
 			writer.write("Emission cost factor is "+"\t"+emissionCostFacotr+"\t"+"and total cost of emissions is "+"\t"+emissionCostFacotr*totalEmissionCost);
 			writer.close();

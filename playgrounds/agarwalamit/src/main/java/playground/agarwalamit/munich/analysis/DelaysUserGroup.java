@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -43,19 +42,26 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  */
 public class DelaysUserGroup {
 
+	private static final double marginal_Utl_money=0.0789942;//0.062 //(for SiouxFalls =0.062 and for Munich =0.0789942);
+	private static final double marginal_Utl_performing_sec=0.96/3600;
+	private static final double marginal_Utl_traveling_car_sec=-0.0/3600;
+	private static final double marginalUtlOfTravelTime = marginal_Utl_traveling_car_sec+marginal_Utl_performing_sec;
+	private static final double vtts_car = marginalUtlOfTravelTime/marginal_Utl_money;
+	
+	
 	public DelaysUserGroup() {
 		userGroupToDelays  = new HashMap<UserGroup, Double>();
 		for (UserGroup ug:UserGroup.values()) {
 			this.userGroupToDelays.put(ug, 0.0);
 		}
-		scenario = loadScenario(populationFile, networkFile);
+		scenario = loadScenario(populationFile, networkFile, configFile);
 		userGrpToPopulation = new HashMap<UserGroup, Population>();
-		lastIteration = getLastIteration(configFile);
+		lastIteration = scenario.getConfig().controler().getLastIteration();
 	}
 
 	private int lastIteration;
 	private Logger logger = Logger.getLogger(DelaysUserGroup.class);
-	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/baseCaseCtd/";/*"./output/run2/";*/
+	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/ci/";/*"./output/run2/";*/
 	private  String populationFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
 	private  String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
 	private  String configFile = outputDir+"/output_config.xml";//"/config.xml";//
@@ -87,9 +93,9 @@ public class DelaysUserGroup {
 		
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try{
-			writer.write("userGroup \t delay(in seconds) \n");
+			writer.write("userGroup \t delaySeconds \t delaysMoney \n");
 			for(UserGroup ug:this.userGroupToDelays.keySet()){
-				writer.write(ug+"\t"+this.userGroupToDelays.get(ug)+"\n");
+				writer.write(ug+"\t"+this.userGroupToDelays.get(ug)+"\t"+this.userGroupToDelays.get(ug)*vtts_car+"\n");
 			}
 			writer.close();
 		} catch (Exception e){
@@ -99,8 +105,11 @@ public class DelaysUserGroup {
 	}
 	
 
-	private Scenario loadScenario(String populationFile, String networkFile) {
-		Config config = ConfigUtils.createConfig();
+	private Scenario loadScenario(String populationFile, String networkFile, String configFile) {
+		Config config = new Config();
+		config.addCoreModules();
+		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		configReader.readFile(configFile);
 		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -135,13 +144,5 @@ public class DelaysUserGroup {
 				userGroupToDelays.put(ug, newDelays);
 			}
 		}
-	}
-	private static Integer getLastIteration(String configFile) {
-		Config config = new Config();
-		config.addCoreModules();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
-		configReader.readFile(configFile);
-		Integer lastIt = config.controler().getLastIteration();
-		return lastIt;
 	}
 }

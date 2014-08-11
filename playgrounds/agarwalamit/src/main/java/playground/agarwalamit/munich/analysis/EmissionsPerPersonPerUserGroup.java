@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -52,7 +51,7 @@ public class EmissionsPerPersonPerUserGroup {
 private final Logger logger = Logger.getLogger(EmissionsPerPersonPerUserGroup.class);
 	
 public EmissionsPerPersonPerUserGroup() {
-		scenario = loadScenario(networkFile, populationFile);
+		scenario = loadScenario(networkFile, populationFile, configFile);
 		
 		for(UserGroup ug:UserGroup.values()){
 			SortedMap<String, Double> pollutantToValue = new TreeMap<String, Double>();
@@ -61,7 +60,7 @@ public EmissionsPerPersonPerUserGroup() {
 			}
 			userGroupToEmissions.put(ug, pollutantToValue);
 		}
-		lastIteration = getLastIteration(configFile);
+		lastIteration = scenario.getConfig().controler().getLastIteration();
 	}
 	
 	private  int lastIteration;
@@ -99,15 +98,20 @@ public EmissionsPerPersonPerUserGroup() {
 	private void writeTotalEmissionsCostsPerUserGroup(String outputFile){
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try{
-			writer.write("userGroup \t emissionType \t emissionsCosts(mU)  \n");
+			writer.write("userGroup \t");
+			for(EmissionCostFactors ecf:EmissionCostFactors.values()){
+				writer.write(ecf.toString()+"\t");
+			}
+			writer.write("total \n");
 			for(UserGroup ug:this.userGroupToEmissions.keySet()){
 				double totalEmissionCost =0. ;
+				writer.write(ug+"\t");
 				for(EmissionCostFactors ecf:EmissionCostFactors.values()){
 					double ec = this.userGroupToEmissions.get(ug).get(ecf.toString()) * ecf.getCostFactor();
-					writer.write(ug+"\t"+ecf+"\t"+ec+"\n");
+					writer.write(ec+"\t");
 					totalEmissionCost += ec;
 				}
-				writer.write(ug+"\t"+"total \t"+totalEmissionCost+"\n");
+				writer.write(+totalEmissionCost+"\n");
 			}
 			writer.close();
 		} catch (Exception e){
@@ -120,11 +124,17 @@ public EmissionsPerPersonPerUserGroup() {
 
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try{
-			writer.write("userGroup \t pollutantType \t pollutantValue  \n");
+			writer.write("userGroup \t");
+			for(String str:this.userGroupToEmissions.get(UserGroup.URBAN).keySet()){
+				writer.write(str+"\t");
+			}
+			writer.newLine();
 			for(UserGroup ug:this.userGroupToEmissions.keySet()){
+				writer.write(ug+"\t");
 				for(String str:this.userGroupToEmissions.get(ug).keySet()){
-					writer.write(ug+"\t"+str+"\t"+this.userGroupToEmissions.get(ug).get(str)+"\n");
+					writer.write(this.userGroupToEmissions.get(ug).get(str)+"\t");
 				}
+				writer.newLine();
 			}
 			writer.close();
 		} catch (Exception e){
@@ -147,21 +157,15 @@ public EmissionsPerPersonPerUserGroup() {
 		}
 	}
 
-	private static Scenario loadScenario(String netFile, String plansFile) {
-		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(netFile);
-		config.plans().setInputFile(plansFile);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
-	}
-
-	private static Integer getLastIteration(String configFile) {
+	private static Scenario loadScenario(String netFile, String plansFile, String configFile) {
 		Config config = new Config();
 		config.addCoreModules();
 		MatsimConfigReader configReader = new MatsimConfigReader(config);
 		configReader.readFile(configFile);
-		Integer lastIt = config.controler().getLastIteration();
-		return lastIt;
+		config.network().setInputFile(netFile);
+		config.plans().setInputFile(plansFile);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		return scenario;
 	}
 
 	private Map<UserGroup, Population> getPopulationPerUserGroup(){
