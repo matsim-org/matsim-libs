@@ -34,13 +34,15 @@ import java.util.HashMap;
  */
 public class ConvEvents2Anm {
 
+	private final BaseGridCreator baseGridCreator;
 	private final NetworkMatcher networkMatcher;
 	private final EventsConverter eventsConverter;
 	private final AnmConverter anmConverter;
 	private final TripMatcher tripMatcher;
 
-	public ConvEvents2Anm(NetworkMatcher networkMatcher, EventsConverter eventsConverter,
+	public ConvEvents2Anm(BaseGridCreator baseGridCreator, NetworkMatcher networkMatcher, EventsConverter eventsConverter,
 						  AnmConverter anmConverter, TripMatcher tripMatcher) {
+		this.baseGridCreator = baseGridCreator;
 		this.networkMatcher = networkMatcher;
 		this.eventsConverter = eventsConverter;
 		this.anmConverter = anmConverter;
@@ -53,7 +55,7 @@ public class ConvEvents2Anm {
 	}
 
 	public static ConvEvents2Anm createDefaultConvEvents2Anm() {
-		return new ConvEvents2Anm(new DefaultNetworkMatcher(), new DefaultEventsConverter(),
+		return new ConvEvents2Anm(new DefaultBaseGridCreator(), new DefaultNetworkMatcher(), new DefaultEventsConverter(),
 		new DefaultAnmConverter(), new DefaultTripMatcher());
 	}
 
@@ -65,7 +67,7 @@ public class ConvEvents2Anm {
 		String path2AnmFile = args[4];
 		String path2NewAnmFile = args[5];
 
-		Network mutualBaseGrid = this.networkMatcher.createMutualBaseGrid(path2VissimZoneShp);
+		Network mutualBaseGrid = this.baseGridCreator.createMutualBaseGrid(path2VissimZoneShp);
 		HashMap<Id, Id[]> keyMsNetwork = this.networkMatcher.mapMsNetwork(path2MATSimNetwork, mutualBaseGrid, path2VissimZoneShp);
 		HashMap<Id, Long[]> keyAmNetwork = this.networkMatcher.mapAmNetwork(path2VissimNetworkNodes, mutualBaseGrid);
 		HashMap<Id, Long[]> msTrips = this.eventsConverter.convertEvents(keyMsNetwork, path2EventsFile, path2VissimZoneShp);
@@ -74,7 +76,7 @@ public class ConvEvents2Anm {
 		this.anmConverter.writeAnmRoutes(demandPerAnmTrip, path2AnmFile, path2NewAnmFile);
 	}
 
-	public interface NetworkMatcher {
+	public interface BaseGridCreator {
 
 		/**
 		 * Create mutual base grid.
@@ -83,6 +85,10 @@ public class ConvEvents2Anm {
 		 * @return A new data set (nodes) which represents both input networks jointly.
 		 */
 		public Network createMutualBaseGrid(String path2VissimZoneShp);
+
+	}
+
+	public interface NetworkMatcher {
 
 		/**
 		 * Creates a key that maps the provided matsim network (links) to the mutual base grid.

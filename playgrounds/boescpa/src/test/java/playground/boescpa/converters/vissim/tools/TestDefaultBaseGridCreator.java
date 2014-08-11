@@ -25,35 +25,31 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.boescpa.converters.vissim.ConvEvents2Anm;
 
-import java.util.HashMap;
-
 /**
- * Tests the methods of the class DefaultNetworkMatcher.
+ * WHAT IS IT FOR?
+ * WHAT DOES IT?
  *
  * @author boescpa
  */
-public class TestDefaultNetworkMatcher extends DefaultNetworkMatcher {
+public class TestDefaultBaseGridCreator {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private ConvEvents2Anm.BaseGridCreator baseGridCreator;
-	private ConvEvents2Anm.NetworkMatcher defaultNetworkMatcher;
+	private ConvEvents2Anm.BaseGridCreator baseGridCreator1;
+	private ConvEvents2Anm.BaseGridCreator baseGridCreator2;
 
 	@Before
 	public void prepare() {
 		DefaultBaseGridCreator.setGridcellsize(100);
 
-		this.baseGridCreator = new DefaultBaseGridCreator() {
+		this.baseGridCreator1 = new DefaultBaseGridCreator() {
 			@Override
 			protected final Long[] boundingBoxOfZones(String path2ZonesFile) {
 				Long[] boundings = {0l, 201l, 0l, 200l};
@@ -61,37 +57,30 @@ public class TestDefaultNetworkMatcher extends DefaultNetworkMatcher {
 			}
 		};
 
-		this.defaultNetworkMatcher = new DefaultNetworkMatcher() {
-			@Override
-			protected  final Network readAndCutMsNetwork(String path2MATSimNetwork, String path2VissimZoneShp) {
-				Network network = NetworkUtils.createNetwork();
-				NetworkFactoryImpl networkFactory = new NetworkFactoryImpl(network);
-				network.addNode(networkFactory.createNode(new IdImpl(1), new CoordImpl(10, 30)));
-				network.addNode(networkFactory.createNode(new IdImpl(2), new CoordImpl(110, 130)));
-				network.addLink(networkFactory.createLink(new IdImpl(101),
-						network.getNodes().get(new IdImpl(1)), network.getNodes().get(new IdImpl(2))));
-				network.addLink(networkFactory.createLink(new IdImpl(102),
-						network.getNodes().get(new IdImpl(2)), network.getNodes().get(new IdImpl(1))));
-				return network;
-			}
-		};
-
-
+		this.baseGridCreator2 = new DefaultBaseGridCreator();
 	}
 
 	@Test
-	public void testMapMsNetwork() {
-		Network mutualBase = baseGridCreator.createMutualBaseGrid("");
-		HashMap<Id, Id[]> msKeys = defaultNetworkMatcher.mapMsNetwork("", mutualBase, "");
-		Id[] keysLink101 = msKeys.get(new IdImpl(101l));
-		Id[] keysLink102 = msKeys.get(new IdImpl(102l));
-		Assert.assertEquals(keysLink101.length, 3);
-		Assert.assertEquals(keysLink101[0], new IdImpl(1l));
-		Assert.assertEquals(keysLink101[1], new IdImpl(5l));
-		Assert.assertEquals(keysLink101[2], new IdImpl(6l));
-		Assert.assertEquals(keysLink102.length, 3);
-		Assert.assertEquals(keysLink102[0], new IdImpl(6l));
-		Assert.assertEquals(keysLink102[1], new IdImpl(5l));
-		Assert.assertEquals(keysLink102[2], new IdImpl(1l));
+	public void testMatchNetworks() {
+		Network network = baseGridCreator1.createMutualBaseGrid("");
+		Assert.assertTrue(network.getNodes().size() == 12);
+		Node minNode = network.getNodes().get(new IdImpl(1));
+		Node maxNode = network.getNodes().get(new IdImpl(network.getNodes().size()));
+		Assert.assertEquals(minNode.getCoord().getX(),0.0);
+		Assert.assertEquals(minNode.getCoord().getY(),0.0);
+		Assert.assertEquals(maxNode.getCoord().getX(),201.0, DefaultBaseGridCreator.getGridcellsize() - 1);
+		Assert.assertEquals(maxNode.getCoord().getY(),200.0, DefaultBaseGridCreator.getGridcellsize() - 1);
+	}
+
+	@Test
+	public void testBoundingBoxOfZones() {
+		Network network = baseGridCreator2.createMutualBaseGrid(utils.getClassInputDirectory() + "TestDefaultNetworkMatcher_DummySHP.shp");
+		Assert.assertTrue(network.getNodes().size() == 17094);
+		Node minNode = network.getNodes().get(new IdImpl(1));
+		Node maxNode = network.getNodes().get(new IdImpl(network.getNodes().size()));
+		Assert.assertEquals(minNode.getCoord().getX(),675666.0);
+		Assert.assertEquals(minNode.getCoord().getY(),242315.0);
+		Assert.assertEquals(maxNode.getCoord().getX(),690908.0, DefaultBaseGridCreator.getGridcellsize() - 1);
+		Assert.assertEquals(maxNode.getCoord().getY(),253296.0, DefaultBaseGridCreator.getGridcellsize() - 1);
 	}
 }

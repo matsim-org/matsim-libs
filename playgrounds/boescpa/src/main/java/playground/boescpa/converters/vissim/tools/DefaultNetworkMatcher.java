@@ -21,23 +21,18 @@
 
 package playground.boescpa.converters.vissim.tools;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.opengis.feature.simple.SimpleFeature;
 import playground.boescpa.converters.vissim.ConvEvents2Anm;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Creates a square grid around considered area. The grid is represented by nodes in the network.
@@ -46,87 +41,40 @@ import java.util.*;
  */
 public class DefaultNetworkMatcher implements ConvEvents2Anm.NetworkMatcher {
 
-	/**
-	 * Side length [m] of one square of the grid.
-	 * Default value: 100
-	 */
-	private static int gridcellsize = 100;
-	public static void setGridcellsize(int newSize) {
-		gridcellsize = newSize;
-	}
-	public static int getGridcellsize() {
-		return gridcellsize;
-	}
+
 
 	/**
-	 * Finds the most western, the most northern, the most eastern and the most southern point of the zones given.
-	 * 	[CH1903/LV03-Coordinates expected]
-	 * Creates nodes covering this area. Each node represents a square cell.
+	 * Creates a key-map that maps a MATSimNetwork to a provided mutualBaseGrid (also MATSim-Network-Format).
 	 *
-	 * @param path2ZonesFile Shp-File with the zones to consider as the area.
-	 * @return Square-Grid covering the squares.
+	 * @param path2MATSimNetwork
+	 * @param mutualBaseGrid
+	 * @param path2VissimZoneShp
+	 * @return
 	 */
-	@Override
-	public Network createMutualBaseGrid(String path2ZonesFile) {
-
-		Network mutualRepresentation = NetworkUtils.createNetwork();
-		NetworkFactoryImpl networkFactory = new NetworkFactoryImpl(mutualRepresentation);
-		Long[] sides = boundingBoxOfZones(path2ZonesFile);
-
-		long maxLongitude = sides[1];
-		long maxLatitude = sides[3];
-		long cellId = 1;
-
-		long latitude = sides[2];
-		do {
-			long longitude = sides[0];
-			do {
-				mutualRepresentation.addNode(networkFactory.createNode(new IdImpl(cellId++), new CoordImpl(longitude, latitude)));
-				longitude += gridcellsize;
-			} while (longitude < (maxLongitude + gridcellsize));
-			latitude += gridcellsize;
-		} while (latitude < (maxLatitude + gridcellsize));
-
-		return mutualRepresentation;
-	}
-
-	/**
-	 * Unites the provided zones and finds the bounding box of the zones.
-	 *
-	 * @param path2ZonesFile
-	 * @return The Long-Array has four values:
-	 *	Long[0] = min longitude of shp-file
-	 *	Long[1] = max longitude of shp-file
-	 *	Long[2] = min latitude of shp-file
-	 *	Long[3] = max latitude of shp-file
-	 */
-	protected Long[] boundingBoxOfZones(String path2ZonesFile) {
-		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
-		features.addAll(ShapeFileReader.getAllFeatures(path2ZonesFile));
-		Long[] boundings = new Long[4];
-		boolean first = true;
-		for (SimpleFeature feature : features) {
-			Geometry geometry = (Geometry) feature.getDefaultGeometry();
-			Envelope boundingBox = geometry.getEnvelopeInternal();
-			if (first) {
-				boundings[0] = (long) boundingBox.getMinX();
-				boundings[1] = (long) boundingBox.getMaxX();
-				boundings[2] = (long) boundingBox.getMinY();
-				boundings[3] = (long) boundingBox.getMaxY();
-				first = false;
-			} else {
-				if (boundings[0] > (long) boundingBox.getMinX()) boundings[0] = (long) boundingBox.getMinX();
-				if (boundings[1] < (long) boundingBox.getMaxX()) boundings[1] = (long) boundingBox.getMaxX();
-				if (boundings[2] > (long) boundingBox.getMinY()) boundings[2] = (long) boundingBox.getMinY();
-				if (boundings[3] < (long) boundingBox.getMaxY()) boundings[3] = (long) boundingBox.getMaxY();
-			}
-		}
-		return boundings;
-	}
-
 	@Override
 	public HashMap<Id, Id[]> mapMsNetwork(String path2MATSimNetwork, Network mutualBaseGrid, String path2VissimZoneShp) {
 		Network network = readAndCutMsNetwork(path2MATSimNetwork, path2VissimZoneShp);
+		return getKeyMap(mutualBaseGrid, network);
+	}
+
+	/**
+	 * Read network MATSim-Network and cut it to zones.
+	 *
+	 * @param path2MATSimNetwork
+	 * @param path2VissimZoneShp
+	 * @return
+	 */
+	protected Network readAndCutMsNetwork(String path2MATSimNetwork, String path2VissimZoneShp) {
+		return null;
+	}
+
+	@Override
+	public HashMap<Id, Long[]> mapAmNetwork(String path2VissimNetworkLinks, Network mutualBaseGrid) {
+		return null;
+	}
+
+
+	private HashMap<Id, Id[]> getKeyMap(Network mutualBaseGrid, Network network) {
 		HashMap<Id, Id[]> mapKey = new HashMap<Id, Id[]>();
 		// follow all links and check which "zones" of mutual base grid are passed
 		for (Link link : network.getLinks().values()) {
@@ -136,18 +84,7 @@ public class DefaultNetworkMatcher implements ConvEvents2Anm.NetworkMatcher {
 			double[] deltas = calculateDeltas(start, end);
 			for (int i = 0; i <= (int)deltas[2]; i++) {
 				Id presentSmallest = null;
-				double presentSmallestDist = gridcellsize;
-				for (Node zone : mutualBaseGrid.getNodes().values()) {
-					Double dist = CoordUtils.calcDistance(zone.getCoord(),
-							new CoordImpl(start.getX() + (i * deltas[0]), start.getY() + (i * deltas[1])));
-					if (dist < presentSmallestDist) {
-						presentSmallestDist = dist;
-						presentSmallest = zone.getId();
-					}
-					if (dist < gridcellsize/2) {
-						break;
-					}
-				}
+				presentSmallest = findZone(mutualBaseGrid, start, deltas, i, presentSmallest);
 				if (presentSmallest != null) {
 					if (passedZones.isEmpty()) {
 						passedZones.add(presentSmallest);
@@ -163,7 +100,25 @@ public class DefaultNetworkMatcher implements ConvEvents2Anm.NetworkMatcher {
 		return mapKey;
 	}
 
+	private Id findZone(Network mutualBaseGrid, Coord start, double[] deltas, int i, Id presentSmallest) {
+		int gridcellsize = DefaultBaseGridCreator.getGridcellsize();
+		double presentSmallestDist = gridcellsize;
+		for (Node zone : mutualBaseGrid.getNodes().values()) {
+			Double dist = CoordUtils.calcDistance(zone.getCoord(),
+					new CoordImpl(start.getX() + (i * deltas[0]), start.getY() + (i * deltas[1])));
+			if (dist < presentSmallestDist) {
+				presentSmallestDist = dist;
+				presentSmallest = zone.getId();
+			}
+			if (dist < gridcellsize/2) {
+				break;
+			}
+		}
+		return presentSmallest;
+	}
+
 	private double[] calculateDeltas(Coord start, Coord end) {
+		int gridcellsize = DefaultBaseGridCreator.getGridcellsize();
 		double factor = 1;
 		double[] delta = new double[3];
 		do {
@@ -175,21 +130,5 @@ public class DefaultNetworkMatcher implements ConvEvents2Anm.NetworkMatcher {
 		delta[1] = (end.getY() - start.getY())/factor;
 		delta[2] = factor;
 		return delta;
-	}
-
-	/**
-	 * Read network and cut it to zones.
-	 *
-	 * @param path2MATSimNetwork
-	 * @param path2VissimZoneShp
-	 * @return
-	 */
-	protected Network readAndCutMsNetwork(String path2MATSimNetwork, String path2VissimZoneShp) {
-		return null;
-	}
-
-	@Override
-	public HashMap<Id, Long[]> mapAmNetwork(String path2VissimNetworkLinks, Network mutualBaseGrid) {
-		return null;
 	}
 }
