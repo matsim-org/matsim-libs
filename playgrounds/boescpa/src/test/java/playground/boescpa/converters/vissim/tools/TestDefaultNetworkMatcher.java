@@ -36,13 +36,14 @@ import playground.boescpa.converters.vissim.ConvEvents2Anm;
  *
  * @author boescpa
  */
-public class TestDefaultNetworkMatcher {
+public class TestDefaultNetworkMatcher extends DefaultNetworkMatcher {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private ConvEvents2Anm.NetworkMatcher defaultNetworkMatcher1;
 	private ConvEvents2Anm.NetworkMatcher defaultNetworkMatcher2;
+
 
 	@Before
 	public void prepare() {

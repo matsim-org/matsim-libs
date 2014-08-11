@@ -21,9 +21,9 @@
 
 package playground.boescpa.converters.vissim.tools;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
-import com.vividsolutions.jts.util.GeometricShapeFactory;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -32,6 +32,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.boescpa.converters.vissim.ConvEvents2Anm;
@@ -126,7 +127,6 @@ public class DefaultNetworkMatcher implements ConvEvents2Anm.NetworkMatcher {
 	@Override
 	public HashMap<Id, Id[]> mapMsNetwork(String path2MATSimNetwork, Network mutualBaseGrid, String path2VissimZoneShp) {
 		Network network = readAndCutMsNetwork(path2MATSimNetwork, path2VissimZoneShp);
-		Map<Id, Geometry> zones = prepareMutualBaseGrid(mutualBaseGrid);
 		HashMap<Id, Id[]> mapKey = new HashMap<Id, Id[]>();
 		// follow all links and check which "zones" of mutual base grid are passed
 		for (Link link : network.getLinks().values()) {
@@ -134,18 +134,25 @@ public class DefaultNetworkMatcher implements ConvEvents2Anm.NetworkMatcher {
 			Coordinate start = new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
 			Coordinate end = new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
 			double[] deltas = calculateDeltas(start, end);
+			Id presentSmallest = null;
 			for (int i = 0; i < (int)deltas[2]; i++) {
-				Point point = new Point(new CoordinateArraySequence(new Coordinate[]{new Coordinate(i * deltas[0], i * deltas[1])}), new GeometryFactory());
-				for (Id zoneId : zones.keySet()) {
-					Geometry zone = zones.get(zoneId);
-					if (zone.contains(point)) {
-						if (passedZones.get(passedZones.size()-1) != zoneId) {
-							passedZones.add(zoneId);
-						}
-						break;
+				presentSmallest = null;
+				double presentSmallestDist = gridcellsize;
+				for (Node zone : mutualBaseGrid.getNodes().values()) {
+					Double dist = CoordUtils.calcDistance(zone.getCoord(), new CoordImpl(i * deltas[0], i * deltas[1]));
+					if (dist < presentSmallestDist) {
+						presentSmallestDist = dist;
+						presentSmallest = zone.getId();
 					}
 				}
 			}
+			if (presentSmallest != null) {
+				if (passedZones.isEmpty()) {
+					passedZones.add(presentSmallest);
+				} else if (passedZones.get(passedZones.size() - 1) != presentSmallest) {
+					passedZones.add(presentSmallest);
+				}
+			} // todo-boescpa What if null? If no zone was found?
 			mapKey.put(link.getId(), passedZones.toArray(new Id[]{}));
 		}
 		return mapKey;
@@ -163,24 +170,6 @@ public class DefaultNetworkMatcher implements ConvEvents2Anm.NetworkMatcher {
 		delta[1] = (start.y - end.y)/factor;
 		delta[2] = factor;
 		return delta;
-	}
-
-	/**
-	 * Creates a square around each node.
-	 *
-	 * @param mutualBaseGrid
-	 * @return Zones derived from the mutualBaseGrid.
-	 */
-	private Map<Id, Geometry> prepareMutualBaseGrid(Network mutualBaseGrid) {
-		Map<Id, Geometry> zones = new HashMap<Id, Geometry>();
-		GeometricShapeFactory factory = new GeometricShapeFactory();
-		factory.setHeight(gridcellsize);
-		factory.setWidth(gridcellsize);
-		for (Node node : mutualBaseGrid.getNodes().values()) {
-			factory.setCentre(new Coordinate(node.getCoord().getX(), node.getCoord().getY()));
-			zones.put(node.getId(), factory.createRectangle());
-		}
-		return zones;
 	}
 
 	/**
