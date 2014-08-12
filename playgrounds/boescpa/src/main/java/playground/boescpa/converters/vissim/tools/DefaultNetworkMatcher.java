@@ -184,7 +184,7 @@ public class DefaultNetworkMatcher implements ConvEvents2Anm.NetworkMatcher {
 	private Id findZone(Network mutualBaseGrid, Coord start, double[] deltas, int i) {
 		int gridcellsize = DefaultBaseGridCreator.getGridcellsize();
 		Id presentSmallest = null;
-		double presentSmallestDist = gridcellsize;
+		double presentSmallestDist = Double.MAX_VALUE;
 		for (Node zone : mutualBaseGrid.getNodes().values()) {
 			Double dist = CoordUtils.calcDistance(zone.getCoord(),
 					new CoordImpl(start.getX() + (i * deltas[0]), start.getY() + (i * deltas[1])));
