@@ -118,7 +118,7 @@ public class DefaultNetworkMatcher implements ConvEvents2Anm.NetworkMatcher {
 	 * @param path2VissimNetworkAnm Path to a Visum-Anm-File
 	 * @return
 	 */
-	private Network parseAndTransformAmNetwork(String path2VissimNetworkAnm) {
+	protected Network parseAndTransformAmNetwork(String path2VissimNetworkAnm) {
 		final Network network = NetworkUtils.createNetwork();
 		final NetworkFactory networkFactory = new NetworkFactoryImpl(network);
 		final Set<SimpleAnmParser.AnmLink> links = new HashSet<SimpleAnmParser.AnmLink>();
