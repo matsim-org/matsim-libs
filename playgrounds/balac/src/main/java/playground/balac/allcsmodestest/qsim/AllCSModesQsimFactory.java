@@ -193,9 +193,11 @@ public class AllCSModesQsimFactory implements MobsimFactory{
 		
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
+		
 		FreeFloatingVehiclesLocation ffvehiclesLocationqt = null;
 		OneWayCarsharingRDWithParkingVehicleLocation owvehiclesLocationqt = null;
 		TwoWayCSVehicleLocation twvehiclesLocationqt = null;
+		
 		AgentFactory agentFactory = null;
 		if (sc.getConfig().scenario().isUseTransit()) {
 			agentFactory = new TransitAgentFactory(qSim);

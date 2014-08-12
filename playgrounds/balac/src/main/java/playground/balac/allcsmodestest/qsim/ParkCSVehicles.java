@@ -4,10 +4,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -26,6 +28,9 @@ public class ParkCSVehicles implements AgentSource {
 	private FreeFloatingVehiclesLocation ffvehiclesLocationqt;
 	private OneWayCarsharingRDWithParkingVehicleLocation owvehiclesLocationqt;
 	private TwoWayCSVehicleLocation twvehiclesLocationqt;
+	
+	private final static Logger log = Logger.getLogger(ParkCSVehicles.class);
+	
 	public ParkCSVehicles(Population population, AgentFactory agentFactory, QSim qsim,
 			FreeFloatingVehiclesLocation ffvehiclesLocationqt, OneWayCarsharingRDWithParkingVehicleLocation owvehiclesLocationqt, TwoWayCSVehicleLocation twvehiclesLocationqt) {
 		this.qsim = qsim;  
@@ -42,6 +47,7 @@ public class ParkCSVehicles implements AgentSource {
 	@Override
 	public void insertAgentsIntoMobsim() {
 		// TODO Auto-generated method stub
+		int counterTW = 0;
 		if (ffvehiclesLocationqt != null)
 		for (FreeFloatingStation ffstation: ffvehiclesLocationqt.getQuadTree().values()) {
 			
@@ -61,15 +67,18 @@ public class ParkCSVehicles implements AgentSource {
 				
 			}
 		
-		if (twvehiclesLocationqt != null)
+		if (twvehiclesLocationqt != null) {
 			for (TwoWayCSStation twstation: twvehiclesLocationqt.getQuadTree().values()) {
 				
 				for (String id : twstation.getIDs()) {
+					
 					qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("TW_"+id), modeVehicleTypes.get("twowaycarsharing")), twstation.getLink().getId());
-
+					counterTW++;
 				}
 				
 			}
+			log.info("Parked " + counterTW + " twowaycarsharing vehicles.");
+		}
 		
 	}
 

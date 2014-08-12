@@ -928,7 +928,12 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		
 		}
 		else if (((Leg)currentPlanElement).getMode().equals("twowaycarsharing")){
-			
+			if (twVehId == null) {
+				
+				log.info("Twowaycarsahring vehicle ID is null for person with id " + this.getId() +" , returning person id as vehicle id and continuing! ");
+				return this.getId();
+			}
+				
 			return new IdImpl("TW_"+ (twVehId));	
 		
 		}

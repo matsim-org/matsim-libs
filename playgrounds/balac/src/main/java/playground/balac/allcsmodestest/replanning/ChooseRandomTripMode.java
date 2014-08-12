@@ -45,7 +45,7 @@ public class ChooseRandomTripMode implements PlanAlgorithm {
 			if (l.getMode().equals( "car" ) || l.getMode().equals( "bike" ) || l.getMode().equals("twowaycarsharing"))
 				return;
 		
-		if (p.hasLicense() &&  (p.getTravelcards() != null  && p.getTravelcards().contains("ch-HT-mobility")))
+		if (p.hasLicense() &&  (p.getTravelcards() != null)  && p.getTravelcards().contains("ch-HT-mobility"))
 			//don't change the trips between the same links
 			if (!t.get(rndIdx).getOriginActivity().getLinkId().toString().equals(t.get(rndIdx).getDestinationActivity().getLinkId().toString()))
 				setRandomTripMode(t.get(rndIdx), plan);
