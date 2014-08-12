@@ -42,31 +42,43 @@ public class DgNetworkShrinker {
 	private Set<Id> signalizedNodes;
 
 	/**
-	 * reduce the network size: delete all edges
-	 * 1. outside the envelope
-	 * 2. with freespeed <= given value in m/s (freeSpeedFilter), that are not on a shortest path (according to travel time or distance respectively) between signalized nodes.
+	 * reduce the network size: delete all edges outside the envelope
 	 * 
 	 * @param net the original network
-	 * @param envelope
-	 * @param networkCrs
-	 * @param freeSpeedFilter the minimal free speed value for the interior link filter in m/s
-	 * @param useFreeSpeedTravelTime a flag for dijkstras cost function:
-	 * if true, dijkstra will use the free speed travel time, if false, dijkstra will use the travel distance as cost function 
-	 * @return the small network
+	 * @param envelope all edges outside this envelope will be removed
+	 * @return the filtered network
 	 */
-	public Network createSmallNetwork(Network net, Envelope envelope, CoordinateReferenceSystem networkCrs, double freeSpeedFilter, boolean useFreeSpeedTravelTime) {
+	public Network filterLinksOutsideEnvelope(Network net, Envelope envelope) {
 		
 		NetworkFilterManager filterManager = new NetworkFilterManager(net);
 		
 		//bounding box filter - deletes all edges outside the envelope
 		filterManager.addLinkFilter(new EnvelopeLinkStartEndFilter(envelope));
 		
+		Network newNetwork = filterManager.applyFilters();
+		return newNetwork;		
+	}
+	
+	/**
+	 * reduce the network size: delete all edges with freespeed <= given value in m/s (freeSpeedFilter), 
+	 * that are not on a shortest path (according to travel time or distance respectively) between signalized nodes.
+	 * 
+	 * @param net the original network
+	 * @param freeSpeedFilter the minimal free speed value for the interior link filter in m/s
+	 * @param useFreeSpeedTravelTime a flag for dijkstras cost function:
+	 * if true, dijkstra will use the free speed travel time, if false, dijkstra will use the travel distance as cost function 
+	 * @return the filtered network
+	 */
+	public Network filterInteriorLinks(Network net, double freeSpeedFilter, boolean useFreeSpeedTravelTime){
+		
+		NetworkFilterManager filterManager = new NetworkFilterManager(net);
+		
 		//interior link filter - deletes all edges that are not on a shortest path (according to travel time) between signalized nodes
 		Set<Id> shortestPathLinkIds = new TtSignalizedNodeShortestPath().calcShortestPathLinkIdsBetweenSignalizedNodes(net, signalizedNodes, useFreeSpeedTravelTime);
 		filterManager.addLinkFilter(new SignalizedNodesSpeedFilter(this.signalizedNodes, shortestPathLinkIds, freeSpeedFilter));
-		
+				
 		Network newNetwork = filterManager.applyFilters();
-		return newNetwork;		
+		return newNetwork;
 	}
 
 	public void setSignalizedNodes(Set<Id> signalizedNodes) {

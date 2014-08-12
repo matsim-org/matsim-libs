@@ -53,6 +53,7 @@ public class NetLanesSignalsShrinker {
 	
 	private static final Logger log = Logger.getLogger(NetLanesSignalsShrinker.class);
 	
+	private static final String bbNetworkFilename = "network_bb_allLinks.xml.gz";
 	private static final String smallNetworkFilename = "network_small.xml.gz";
 	private static final String simplifiedNetworkFilename = "network_small_simplified.xml.gz";
 	private static final String simplifiedLanesFilename = "lanes_network_small.xml.gz";
@@ -102,8 +103,12 @@ public class NetLanesSignalsShrinker {
 		// reduce the network size to the bounding box and filter interior links
 		DgNetworkShrinker netShrinker = new DgNetworkShrinker();
 		netShrinker.setSignalizedNodes(signalizedNodes);
-		Network smallNetwork = netShrinker.createSmallNetwork(fullScenario.getNetwork(), cuttingBoundingBoxEnvelope, crs, freeSpeedFilter, useFreeSpeedTravelTime);
 		
+		Network bbNetwork = netShrinker.filterLinksOutsideEnvelope(fullScenario.getNetwork(), cuttingBoundingBoxEnvelope);
+		DgNetworkUtils.writeNetwork(bbNetwork, outputDirectory +  bbNetworkFilename);
+		DgNetworkUtils.writeNetwork2Shape(bbNetwork, crs, shapeFileDirectory + "network_bb_allLinks");
+		
+		Network smallNetwork = netShrinker.filterInteriorLinks(bbNetwork, freeSpeedFilter, useFreeSpeedTravelTime);
 		DgNetworkUtils.writeNetwork(smallNetwork, outputDirectory +  smallNetworkFilename);
 		DgNetworkUtils.writeNetwork2Shape(smallNetwork, crs, shapeFileDirectory + "network_small");
 		
