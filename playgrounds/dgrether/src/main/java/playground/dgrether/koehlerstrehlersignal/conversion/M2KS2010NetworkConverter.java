@@ -327,7 +327,7 @@ public class M2KS2010NetworkConverter {
 		Coord end = new CoordImpl(scaledLinkEnd.x, scaledLinkEnd.y);
 		return new Tuple<Coord, Coord>(start, end);
 	}
-	
+
 	private double calculateEuclideanLinkLength(Point2D.Double deltaLink) {
 		return Math.sqrt(Math.pow(deltaLink.x, 2) + Math.pow(deltaLink.y, 2));
 	}

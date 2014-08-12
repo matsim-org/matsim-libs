@@ -44,7 +44,7 @@ public class TtMorningCommodityAsMatsimPopWriter {
 		this.startTimeSecMorningPeak = startTimeSecMorningPeak;
 		this.endTimeSecMorningPeak = endTimeSecMorningPeak;
 		
-		// create a person for each flow unit of each commodity (source-drain pairs) in the morning peak as single dummy-dummy trips
+		// create a person for each flow unit of each commodity (source-drain pairs) in the morning peak as single dummy-dummy trip
 		for (DgCommodity com : commodities.getCommodities().values()){
 			for (int i=0; i<com.getFlow(); i++){
 				Person person = population.getFactory().createPerson(new IdImpl(com.getId().toString()+i));

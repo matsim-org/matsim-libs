@@ -219,8 +219,8 @@ public class ConvertCottbusSolution2Matsim {
 //				"random_ttsp.xml");
 		
 		new ConvertCottbusSolution2Matsim().convertOptimalSolution( DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/cb2ks2010/2014-05-30_minflow_50.0_morning_peak_speedFilter15_SP_t/", 
-				"optimized_ttsp_sol2.xml");
+				+ "shared-svn/projects/cottbus/cb2ks2010/2014-06-27_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_bb5000.0/", 
+				"cottbus_umland_optimized.xml");
 		
 	}
 	
