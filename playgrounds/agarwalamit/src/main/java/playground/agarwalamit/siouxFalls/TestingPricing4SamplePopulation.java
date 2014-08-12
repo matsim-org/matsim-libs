@@ -36,9 +36,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.emission.EmissionCostFactors;
 import playground.agarwalamit.marginalTesting.MyEmissionControlerListner;
-import playground.agarwalamit.marginalTesting.StraightTrackExperiment;
-//import playground.agarwalamit.marginalTesting.MarginalCongestionHandlerImplV3AA;
 import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 
@@ -48,14 +47,8 @@ import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 public class TestingPricing4SamplePopulation {
 	
 	private static final Logger log = Logger.getLogger(TestingPricing4SamplePopulation.class);
-	private static final double EURO_PER_GRAMM_NOX = 9600. / (1000. * 1000.);
-	private static final double EURO_PER_GRAMM_NMVOC = 1700. / (1000. * 1000.);
-	private static  final double EURO_PER_GRAMM_SO2 = 11000. / (1000. * 1000.);
-	private static  final double EURO_PER_GRAMM_PM2_5_EXHAUST = 384500. / (1000. * 1000.);
-	private static final double EURO_PER_GRAMM_CO2 = 70. / (1000. * 1000.);
 	private static final boolean considerCO2Costs=true;
 	private static final double emissionCostFacotr=1.0;
-
 
 	private static final double marginal_Utl_money=0.062;
 	private static final double marginal_Utl_performing_sec=0.96/3600;
@@ -67,7 +60,7 @@ public class TestingPricing4SamplePopulation {
 		
 		String outputFolder = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/flowCapTest500ItsStrCap3x/";//args[0]; 
 		
-		double [] samplePopulation = {/*0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0*/0.02};//, 
+		double [] samplePopulation = {/*0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0*/0.5};//, 
 		
 		String configFile = outputFolder+"/input/SiouxFalls_config_run10Pct.xml";//args[1];
 		String emissionEfficiencyFactor ="1.0";
@@ -142,25 +135,32 @@ public class TestingPricing4SamplePopulation {
 		double totalEmissionCost =0;
 
 		for(String str:totalEmissions.keySet()){
-			if(str.equals("NOX")) {
-				double noxCosts = totalEmissions.get(str) * EURO_PER_GRAMM_NOX;
-				totalEmissionCost += noxCosts;
-			} else if(str.equals("NMHC")) {
-				double nmhcCosts =totalEmissions.get(str) * EURO_PER_GRAMM_NMVOC;
-				totalEmissionCost += nmhcCosts;
-			} else if(str.equals("SO2")) {
-				double so2Costs = totalEmissions.get(str) * EURO_PER_GRAMM_SO2;
-				totalEmissionCost += so2Costs;
-			} else if(str.equals("PM")) {
-				double pmCosts = totalEmissions.get(str) * EURO_PER_GRAMM_PM2_5_EXHAUST;
-				totalEmissionCost += pmCosts;
-			} else if(str.equals("CO2_TOTAL")){
-				if(considerCO2Costs) {
-					double co2Costs = totalEmissions.get(str) * EURO_PER_GRAMM_CO2;
-					totalEmissionCost += co2Costs;
-				} else ; //do nothing
+			if(str.equals("CO2_TOTAL") && !considerCO2Costs){
+				// do not include CO2_TOTAL costs.
+			} else {
+			double emissionsCosts = EmissionCostFactors.valueOf(str).getCostFactor() * totalEmissions.get(str);
+			totalEmissionCost += emissionsCosts;
 			}
-			else ; //do nothing
+			
+			
+//			if(str.equals("NOX")) {
+//				double noxCosts = totalEmissions.get(str) * EURO_PER_GRAMM_NOX;
+//				totalEmissionCost += noxCosts;
+//			} else if(str.equals("NMHC")) {
+//				double nmhcCosts =totalEmissions.get(str) * EURO_PER_GRAMM_NMVOC;
+//				totalEmissionCost += nmhcCosts;
+//			} else if(str.equals("SO2")) {
+//				double so2Costs = totalEmissions.get(str) * EURO_PER_GRAMM_SO2;
+//				totalEmissionCost += so2Costs;
+//			} else if(str.equals("PM")) {
+//				double pmCosts = totalEmissions.get(str) * EURO_PER_GRAMM_PM2_5_EXHAUST;
+//				totalEmissionCost += pmCosts;
+//			} else if(str.equals("CO2_TOTAL")){
+//				if(considerCO2Costs) {
+//					double co2Costs = totalEmissions.get(str) * EURO_PER_GRAMM_CO2;
+//					totalEmissionCost += co2Costs;
+//				} else ; //do nothing
+//			}
 		}
 		return emissionCostFacotr*totalEmissionCost;
 	}
