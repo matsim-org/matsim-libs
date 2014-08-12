@@ -45,7 +45,6 @@ import playground.boescpa.converters.vissim.ConvEvents2Anm;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
