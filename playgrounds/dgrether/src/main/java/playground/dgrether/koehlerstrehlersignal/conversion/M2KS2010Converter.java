@@ -163,6 +163,7 @@ public class M2KS2010Converter {
 			throw new IllegalStateException("Commodities that can not be routed still exist");
 		}
 		
+		log.warn("To use the information of ks model link costs (i.e. link travel time) in the matsim network shapefile (with freespeed and link length format), we use a default freespeed of 1 m/s and set the link length to the link cost.");
 		DgNetworkUtils.writeNetwork(newMatsimNetwork, outputDirectory + "matsim_network_ks_model.xml.gz");
 		DgNetworkUtils.writeNetwork2Shape(newMatsimNetwork, crs,  shapeFileDirectory + "matsim_network_ks_model.shp");
 		
@@ -173,6 +174,7 @@ public class M2KS2010Converter {
 		
 		// write commodities from the ks-model as matsim population in the small network
 		new TtMorningCommodityAsMatsimPopWriter().writeTripPlansFile(this.network, commodities, outputDirectory, filename, startTimeSec, endTimeSec);
+		
 		writeStats(ksNet, commodities, totalFlow, removedCommodities);
 		
 		signalsBoundingBox.writeBoundingBox(shapeFileDirectory + "signals_");

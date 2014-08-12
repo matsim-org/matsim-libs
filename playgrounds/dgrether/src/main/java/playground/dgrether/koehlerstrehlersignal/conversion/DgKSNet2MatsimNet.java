@@ -71,6 +71,11 @@ public class DgKSNet2MatsimNet  {
 			net.addNode(to);
 		}
 		Link link = net.getFactory().createLink(street.getId(), from, to);
+		link.setCapacity(street.getCapacity());
+		// warning: street contains link cost instead of link length and freespeed
+		// to do not loose this information in the shapefile, we use a default freespeed of 1 m/s and set the link length to the link cost.
+		link.setFreespeed(1.0); // default of 1 m/s to get correct link cost
+		link.setLength(street.getCost());
 		net.addLink(link);
 	}
 	
