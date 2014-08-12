@@ -708,6 +708,24 @@ public class CottbusRuns {
 		ri.iteration = 1400;
 		ri.remark = "worst random"; //tt SP, min speed 15
 		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = "1976";
+		ri.iteration = 1400;
+		ri.remark = "avg random"; //tt SP, min speed 15
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = "1977";
+		ri.iteration = 1400;
+		ri.remark = "median random"; //tt SP, min speed 15
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = "1974";
+		ri.iteration = 1400;
+		ri.remark = "optimized"; //tt SP, min speed 15
+		l.add(ri);
 	}
 	
 	public static void add1973BaseCaseRoutesTimesRandomRuns(List<RunInfo> l) {
@@ -729,6 +747,120 @@ public class CottbusRuns {
 		ri.runId = "1971";
 		ri.iteration = 1400;
 		ri.remark = "worst random"; //tt SP, min speed 15
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = "1978";
+		ri.iteration = 1400;
+		ri.remark = "avg random"; //tt SP, min speed 15
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = "1979";
+		ri.iteration = 1400;
+		ri.remark = "median random"; //tt SP, min speed 15
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = "1975";
+		ri.iteration = 1400;
+		ri.remark = "optimized"; //tt SP, min speed 15
+		l.add(ri);
+	}
+
+	public static void add1987BaseCaseRoutesOnlyRandomRuns(List<RunInfo> l) {
+		RunInfo ri = null;
+		ri = new RunInfo();
+		ri.runId = "1987";
+		ri.iteration = 1400;
+		ri.baseCase = true;
+		ri.remark = "base case";
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = "1983";
+		ri.iteration = 1400;
+		ri.remark = "best random"; //tt SP, min speed 15
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = "1984";
+		ri.iteration = 1400;
+		ri.remark = "worst random"; //tt SP, min speed 15
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = "1985";
+		ri.iteration = 1400;
+		ri.remark = "avg random"; //tt SP, min speed 15
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = "1986";
+		ri.iteration = 1400;
+		ri.remark = "median random"; //tt SP, min speed 15
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = "1980";
+		ri.iteration = 1400;
+		ri.remark = "optimized"; //tt SP, min speed 15
+		l.add(ri);
+	}
+
+	public static void addBaseCaseAndOptIt1400Runs(List<RunInfo> l, int baseCaseRunId, int optRunId) {
+		RunInfo ri = null;
+		ri = new RunInfo();
+		ri.runId = Integer.toString(baseCaseRunId);
+		ri.iteration = 1400;
+		ri.baseCase = true;
+		ri.remark = "base case";
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = Integer.toString(optRunId);
+		ri.iteration = 1400;
+		ri.remark = "optimized";
+		l.add(ri);
+	}
+	
+	public static void addBaseCaseOptAndRandomIt1400Runs(List<RunInfo> l, int baseCaseRunId, int optRunId, int bestRandomId, int worstRandomId, int avgRandomId, int medRandomId) {
+		RunInfo ri = null;
+		ri = new RunInfo();
+		ri.runId = Integer.toString(baseCaseRunId);
+		ri.iteration = 1400;
+		ri.baseCase = true;
+		ri.remark = "base case";
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = Integer.toString(optRunId);
+		ri.iteration = 1400;
+		ri.remark = "optimized";
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = Integer.toString(bestRandomId);
+		ri.iteration = 1400;
+		ri.remark = "best random";
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = Integer.toString(worstRandomId);
+		ri.iteration = 1400;
+		ri.remark = "worst random";
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = Integer.toString(avgRandomId);
+		ri.iteration = 1400;
+		ri.remark = "avg random";
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = Integer.toString(medRandomId);
+		ri.iteration = 1400;
+		ri.remark = "median random";
 		l.add(ri);
 	}
 	
