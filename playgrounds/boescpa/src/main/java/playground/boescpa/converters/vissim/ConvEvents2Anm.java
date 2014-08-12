@@ -62,14 +62,14 @@ public class ConvEvents2Anm {
 	public void convert(String[] args) {
 		String path2VissimZoneShp = args[0];
 		String path2MATSimNetwork = args[1];
-		String path2VissimNetworkNodes = args[2];
+		String path2VissimNetworkAnm = args[2];
 		String path2EventsFile = args[3];
 		String path2AnmFile = args[4];
 		String path2NewAnmFile = args[5];
 
 		Network mutualBaseGrid = this.baseGridCreator.createMutualBaseGrid(path2VissimZoneShp);
 		HashMap<Id, Id[]> keyMsNetwork = this.networkMatcher.mapMsNetwork(path2MATSimNetwork, mutualBaseGrid, path2VissimZoneShp);
-		HashMap<Id, Id[]> keyAmNetwork = this.networkMatcher.mapAmNetwork(path2VissimNetworkNodes, mutualBaseGrid);
+		HashMap<Id, Id[]> keyAmNetwork = this.networkMatcher.mapAmNetwork(path2VissimNetworkAnm, mutualBaseGrid);
 		HashMap<Id, Long[]> msTrips = this.eventsConverter.convertEvents(keyMsNetwork, path2EventsFile, path2VissimZoneShp);
 		HashMap<Id, Long[]> amTrips = this.anmConverter.convertRoutes(keyAmNetwork, path2AnmFile);
 		HashMap<Id, Integer> demandPerAnmTrip = this.tripMatcher.matchTrips(msTrips, amTrips);
@@ -102,13 +102,13 @@ public class ConvEvents2Anm {
 		HashMap<Id,Id[]> mapMsNetwork(String path2MATSimNetworkConfig, Network mutualBaseGrid, String path2VissimZoneShp);
 
 		/**
-		 * Creates a key that maps the provided Vissim network (links) to the mutual base grid.
+		 * Creates a key that maps the provided Vissim/Visum network (its links) to the mutual base grid.
 		 *
-		 * @param path2VissimNetworkLinks
-		 * @param mutualBaseGrid
+		 * @param path2VissimNetworkAnm	Visum-Anm-Format
+		 * @param mutualBaseGrid	MATSim-Network-Format
 		 * @return The key that matches the network (links) to the base grid.
 		 */
-		HashMap<Id,Id[]> mapAmNetwork(String path2VissimNetworkLinks, Network mutualBaseGrid);
+		HashMap<Id,Id[]> mapAmNetwork(String path2VissimNetworkAnm, Network mutualBaseGrid);
 	}
 
 	public interface EventsConverter {

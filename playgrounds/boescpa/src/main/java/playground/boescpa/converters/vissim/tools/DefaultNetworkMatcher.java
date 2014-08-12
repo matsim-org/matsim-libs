@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -36,6 +37,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.MatsimXmlParser;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.boescpa.converters.vissim.ConvEvents2Anm;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
@@ -98,17 +100,52 @@ public class DefaultNetworkMatcher implements ConvEvents2Anm.NetworkMatcher {
 	}
 
 	/**
-	 * Creates a key-map that maps a Vissum-Network to a provided mutualBaseGrid (also MATSim-Network-Format).
+	 * Creates a key-map that maps a Vissum-Network to a provided mutualBaseGrid (provided in the MATSim-Network-Format).
 	 *
-	 * @param path2VissimNetworkLinks
-	 * @param mutualBaseGrid
-	 * @return
+	 * @param path2VissimNetworkAnm	Visum-Anm-Format
+	 * @param mutualBaseGrid		MATSim-Network-Format
+	 * @return	A key map that maps the vissum network to the mutual base grid.
 	 */
 	@Override
-	public HashMap<Id, Id[]> mapAmNetwork(String path2VissimNetworkLinks, Network mutualBaseGrid) {
-		return null;
+	public HashMap<Id, Id[]> mapAmNetwork(String path2VissimNetworkAnm, Network mutualBaseGrid) {
+		Network network = parseAndTransformAmNetwork(path2VissimNetworkAnm);
+		return getKeyMap(mutualBaseGrid, network);
 	}
 
+	/**
+	 * Parses the provided Visum-Anm-File (xml-format) and transform the network into a matsim network.
+	 *
+	 * @param path2VissimNetworkAnm Path to a Visum-Anm-File
+	 * @return
+	 */
+	private Network parseAndTransformAmNetwork(String path2VissimNetworkAnm) {
+		final Network network = NetworkUtils.createNetwork();
+		final NetworkFactory networkFactory = new NetworkFactoryImpl(network);
+		final Set<SimpleAnmParser.AnmLink> links = new HashSet<SimpleAnmParser.AnmLink>();
+
+		// parse anm-file:
+		MatsimXmlParser xmlParser = new SimpleAnmParser(new NodeAndLinkParser() {
+			@Override
+			public void handleLink(SimpleAnmParser.AnmLink anmLink) {
+				links.add(anmLink);
+			}
+			@Override
+			public void handleNode(SimpleAnmParser.AnmNode anmNode) {
+				network.addNode(networkFactory.createNode(anmNode.id, anmNode.coord));
+			}
+		});
+		xmlParser.parse(path2VissimNetworkAnm);
+
+		// create links:
+		for (SimpleAnmParser.AnmLink link : links) {
+			Node fromNode = network.getNodes().get(link.fromNode);
+			Node toNode = network.getNodes().get(link.toNode);
+			network.addLink(networkFactory.createLink(link.id, fromNode, toNode));
+		}
+
+		return network;
+	}
+	private interface NodeAndLinkParser extends SimpleAnmParser.AnmNodeHandler, SimpleAnmParser.AnmLinkHandler {}
 
 	private HashMap<Id, Id[]> getKeyMap(Network mutualBaseGrid, Network network) {
 		HashMap<Id, Id[]> mapKey = new HashMap<Id, Id[]>();

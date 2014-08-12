@@ -44,7 +44,7 @@ public class PrepareNetworks {
 	public static void main(String[] args) {
 		String path2VissimZoneShp = args[0];
 		String path2MATSimNetwork = args[1];
-		String path2VissimNetworkNodes = args[2];
+		String path2VissimNetworkAnm = args[2];
 		String path2WriteKeyMapMatsim = args[3];
 		String path2WriteKeyMapVissim = args[4];
 
@@ -53,7 +53,7 @@ public class PrepareNetworks {
 
 		ConvEvents2Anm.NetworkMatcher networkMatcher = new DefaultNetworkMatcher();
 		HashMap<Id, Id[]> keyMsNetwork = networkMatcher.mapMsNetwork(path2MATSimNetwork, mutualBaseGrid, path2VissimZoneShp);
-		HashMap<Id, Id[]> keyAmNetwork = networkMatcher.mapAmNetwork(path2VissimNetworkNodes, mutualBaseGrid);
+		HashMap<Id, Id[]> keyAmNetwork = networkMatcher.mapAmNetwork(path2VissimNetworkAnm, mutualBaseGrid);
 
 		writeKeyMaps(keyMsNetwork, path2WriteKeyMapMatsim);
 		writeKeyMaps(keyAmNetwork, path2WriteKeyMapVissim);
