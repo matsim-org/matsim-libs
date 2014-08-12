@@ -54,7 +54,7 @@ public class FreeFloatingLegScoringFunction extends org.matsim.core.scoring.func
 			
 			travelTime = arrivalTime - departureTime;
 			tmpScore += Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("constantFreeFloating"));
-			tmpScore += travelTime * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("travelingFreeFloating"));
+			tmpScore += travelTime * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("travelingFreeFloating")) / 3600.0;
 		}
 		
 		else if (TransportMode.pt.equals(leg.getMode()))
@@ -79,7 +79,7 @@ public class FreeFloatingLegScoringFunction extends org.matsim.core.scoring.func
 		{
 			tmpScore += this.params.modeParams.get(TransportMode.bike).constant;
 
-			tmpScore += travelTime * this.params.modeParams.get(TransportMode.bike).marginalUtilityOfTraveling_s / 3600.0D;
+			tmpScore += travelTime * this.params.modeParams.get(TransportMode.bike).marginalUtilityOfTraveling_s;
 		}
 		else if (TransportMode.ride.equals(leg.getMode()))
 		{
