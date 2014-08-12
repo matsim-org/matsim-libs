@@ -80,6 +80,22 @@
           />          
         </LINKPOLY>
       </LINK>
+      <LINK
+        ID = "2A"
+        FROMNODENO = "2"
+        TONODENO = "3"
+        LINKTYPENO = "1"
+        SPEED = "1.0000"
+        NUMLANES = "1"
+        REVERSELINK = "">
+        <LINKPOLY>
+          <POINT
+            INDEX = "1"
+            XCOORD = "2.5"
+            YCOORD = "2.5"
+          />          
+        </LINKPOLY>
+      </LINK>
 	</LINKS>
     <PTSTOPS    />    
     <PTLINES    />    

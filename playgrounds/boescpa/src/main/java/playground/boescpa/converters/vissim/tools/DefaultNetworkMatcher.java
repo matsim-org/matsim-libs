@@ -22,6 +22,7 @@
 package playground.boescpa.converters.vissim.tools;
 
 import com.vividsolutions.jts.geom.Geometry;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -39,10 +40,12 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.opengis.feature.simple.SimpleFeature;
+
 import playground.boescpa.converters.vissim.ConvEvents2Anm;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -122,7 +125,7 @@ public class DefaultNetworkMatcher implements ConvEvents2Anm.NetworkMatcher {
 		final Network network = NetworkUtils.createNetwork();
 		final NetworkFactory networkFactory = new NetworkFactoryImpl(network);
 		final Set<SimpleAnmParser.AnmLink> links = new HashSet<SimpleAnmParser.AnmLink>();
-
+		
 		// parse anm-file:
 		MatsimXmlParser xmlParser = new SimpleAnmParser(new NodeAndLinkParser() {
 			@Override
@@ -137,11 +140,18 @@ public class DefaultNetworkMatcher implements ConvEvents2Anm.NetworkMatcher {
 		xmlParser.parse(path2VissimNetworkAnm);
 
 		// create links:
+		int countErrLinks = 0;
 		for (SimpleAnmParser.AnmLink link : links) {
-			Node fromNode = network.getNodes().get(link.fromNode);
-			Node toNode = network.getNodes().get(link.toNode);
-			network.addLink(networkFactory.createLink(link.id, fromNode, toNode));
+			try {
+				Node fromNode = network.getNodes().get(link.fromNode);
+				Node toNode = network.getNodes().get(link.toNode);
+				network.addLink(networkFactory.createLink(link.id, fromNode, toNode));
+			} catch (NullPointerException e) {
+				System.out.println("Link " + link.id.toString() + " lacks one or both nodes.");
+				countErrLinks++;
+			}
 		}
+		System.out.print("\n" + countErrLinks + " links found with one or both nodes lacking.\nThey were dropped.\n");
 
 		return network;
 	}

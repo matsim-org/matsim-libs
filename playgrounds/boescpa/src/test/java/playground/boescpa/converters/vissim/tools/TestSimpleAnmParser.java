@@ -39,17 +39,16 @@ public class TestSimpleAnmParser extends DefaultNetworkMatcher{
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private String anmFile = "";
+	private Network network = null;
 
 	@Before
 	public void prepare() {
-		anmFile = utils.getClassInputDirectory() + "anmDummy.anm";
+		String anmFile = utils.getClassInputDirectory() + "anmDummy.anm";
+		this.network = parseAndTransformAmNetwork(anmFile);
 	}
 
 	@Test
 	public void testParser() {
-		Network network = parseAndTransformAmNetwork(anmFile);
-
 		// Test nodes:
 		Assert.assertEquals(network.getNodes().size(), 2);
 		Assert.assertEquals(network.getNodes().get(new IdImpl(1l)).getCoord().getX(), 1.1);
@@ -59,5 +58,6 @@ public class TestSimpleAnmParser extends DefaultNetworkMatcher{
 		Assert.assertEquals(network.getLinks().size(), 1);
 		Assert.assertEquals(network.getLinks().get(new IdImpl("1A")).getFromNode().getId().toString(),"1");
 		Assert.assertEquals(network.getLinks().get(new IdImpl("1A")).getToNode().getId().toString(),"2");
+		Assert.assertNull(network.getLinks().get(new IdImpl("2A")));
 	}
 }
