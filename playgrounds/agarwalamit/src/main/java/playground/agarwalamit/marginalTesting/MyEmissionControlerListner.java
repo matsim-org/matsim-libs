@@ -22,9 +22,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
@@ -34,7 +36,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 /**
  * @author amit
  */
-public class MyEmissionControlerListner  implements StartupListener, IterationStartsListener, ShutdownListener {
+public class MyEmissionControlerListner  implements StartupListener, IterationStartsListener, ShutdownListener, IterationEndsListener {
 	private static final Logger logger = Logger.getLogger(MyEmissionControlerListner.class);
 
 	Controler controler;
@@ -81,6 +83,11 @@ public class MyEmissionControlerListner  implements StartupListener, IterationSt
 		logger.info("closing emission events file...");
 		emissionEventWriter.closeFile();
 		emissionModule.writeEmissionInformation(emissionEventOutputFile);
-logger.info("Total Delays in hours is "+emissionModule.getTotalDelaysInHours());
+	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		logger.info("\n \n \t \t Total Delays in hours is "+emissionModule.getTotalDelaysInHours()+"\n \n");
+		
 	}
 }
