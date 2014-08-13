@@ -105,12 +105,12 @@ public class ConvEvents2Anm {
 		 * Creates a key that maps the provided matsim network (links) to the mutual base grid.
 		 * If the matsim network is larger than the zones provided the network is cut.
 		 *
-		 * @param path2MATSimNetworkConfig	A matsim config which specifies the network to be used.
+		 * @param path2MATSimNetwork
 		 * @param mutualBaseGrid
 		 * @param path2VissimZoneShp
 		 * @return The key that matches the network (links) to the base grid.
 		 */
-		HashMap<Id,Id[]> mapMsNetwork(String path2MATSimNetworkConfig, Network mutualBaseGrid, String path2VissimZoneShp);
+		HashMap<Id,Id[]> mapMsNetwork(String path2MATSimNetwork, Network mutualBaseGrid, String path2VissimZoneShp);
 
 		/**
 		 * Creates a key that maps the provided Vissim/Visum network (its links) to the mutual base grid.

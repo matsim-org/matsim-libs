@@ -22,25 +22,23 @@
 package playground.boescpa.converters.vissim.tools;
 
 import com.vividsolutions.jts.geom.Geometry;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.opengis.feature.simple.SimpleFeature;
-
 import playground.boescpa.converters.vissim.ConvEvents2Anm;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
@@ -58,28 +56,29 @@ public class DefaultNetworkMatcher implements ConvEvents2Anm.NetworkMatcher {
 	 * Creates a key-map that maps a MATSimNetwork to a provided mutualBaseGrid (also MATSim-Network-Format).
 	 * As a side-job, when the MATSim-network is read in, the network is cut to the zones provided.
 	 *
-	 * @param path2MATSimNetworkConfig	A matsim config which specifies the network to be used.
+	 * @param path2MATSimNetwork	A matsim config which specifies the network to be used.
 	 * @param mutualBaseGrid
 	 * @param path2VissimZoneShp
 	 * @return A key map that maps the matsim network to the mutual base grid.
 	 */
 	@Override
-	public HashMap<Id, Id[]> mapMsNetwork(String path2MATSimNetworkConfig, Network mutualBaseGrid, String path2VissimZoneShp) {
-		Network network = readAndCutMsNetwork(path2MATSimNetworkConfig, path2VissimZoneShp);
+	public HashMap<Id, Id[]> mapMsNetwork(String path2MATSimNetwork, Network mutualBaseGrid, String path2VissimZoneShp) {
+		Network network = readAndCutMsNetwork(path2MATSimNetwork, path2VissimZoneShp);
 		return getKeyMap(mutualBaseGrid, network);
 	}
 
 	/**
 	 * Read matsim network and cut it to zones.
 	 *
-	 * @param path2MATSimNetworkConfig	A matsim config which specifies the network to be used.
+	 * @param path2MATSimNetwork
 	 * @param path2VissimZoneShp
 	 * @return The prepared matsim network.
 	 */
-	protected Network readAndCutMsNetwork(String path2MATSimNetworkConfig, String path2VissimZoneShp) {
+	protected Network readAndCutMsNetwork(String path2MATSimNetwork, String path2VissimZoneShp) {
 		// Read network
-		Config config = ConfigUtils.loadConfig(path2MATSimNetworkConfig);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MatsimNetworkReader NetworkReader = new MatsimNetworkReader(scenario);
+		NetworkReader.readFile(path2MATSimNetwork);
 		Network network = scenario.getNetwork();
 		// Prepare zones and identifier.
 		Set<SimpleFeature> features = new HashSet<SimpleFeature>();

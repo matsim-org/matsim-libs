@@ -63,7 +63,7 @@ public class TestDefaultNetworkMatcher {
 
 		this.defaultNetworkMatcher = new DefaultNetworkMatcher() {
 			@Override
-			protected  final Network readAndCutMsNetwork(String path2MATSimNetworkConfig, String path2VissimZoneShp) {
+			protected  final Network readAndCutMsNetwork(String path2MATSimNetwork, String path2VissimZoneShp) {
 				Network network = NetworkUtils.createNetwork();
 				NetworkFactoryImpl networkFactory = new NetworkFactoryImpl(network);
 				network.addNode(networkFactory.createNode(new IdImpl(1), new CoordImpl(10, 30)));
