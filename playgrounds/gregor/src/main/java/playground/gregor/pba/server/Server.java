@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CAVehicle.java
+ * Server.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,67 +18,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.casim.simulation.physics;
+package playground.gregor.pba.server;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import java.net.InetSocketAddress;
 
-public class CAVehicle extends CAAgent {
+import org.java_websocket.WebSocket;
+import org.java_websocket.handshake.ClientHandshake;
+import org.java_websocket.server.WebSocketServer;
 
-	private final MobsimDriverAgent agent;
-	private final Id initialLinkId;
-	private CALink currentLink;
+public class Server extends WebSocketServer {
 
-	public CAVehicle(Id id, MobsimDriverAgent agent, Id linkId, CALink current) {
-		super(id);
-		this.agent = agent;
-		this.initialLinkId = linkId;
-		this.currentLink = current;
+	public Server(InetSocketAddress address) {
+		super(address);
 	}
 
 	@Override
-	Id getNextLinkId() {
-		return this.agent.chooseNextLinkId();
+	public void onClose(WebSocket arg0, int arg1, String arg2, boolean arg3) {
+		System.err.println(arg1);
+
 	}
 
 	@Override
-	void moveOverNode(CALink nextLink, double time) {
-		this.agent.notifyMoveOverNode(nextLink.getLink().getId());
-		this.currentLink = nextLink;
+	public void onError(WebSocket arg0, Exception arg1) {
+		System.err.println(arg1);
 
-	}
-	
-	/*package*/ Id getInitialLinkId() {
-		return this.initialLinkId;
 	}
 
 	@Override
-	CALink getCurrentLink() {
-		return this.currentLink;
+	public void onMessage(WebSocket arg0, String arg1) {
+		System.err.println(arg1);
+
 	}
 
 	@Override
-	public double getZ() {
-		// TODO Auto-generated method stub
-		return 0;
+	public void onOpen(WebSocket arg0, ClientHandshake arg1) {
+		System.err.println(arg1);
+
 	}
 
-	@Override
-	public double getD() {
-		// TODO Auto-generated method stub
-		return 0;
+	public static void main(String [] args) {
+		InetSocketAddress addr = new InetSocketAddress(8088);
+		Server s = new Server(addr);
+		Thread t = new Thread(s);
+		t.start();
 	}
-
-	@Override
-	public CANetworkEntity getCurrentCANetworkEntity() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void moveToNode(CANode n) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

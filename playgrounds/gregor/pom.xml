@@ -58,22 +58,22 @@
 			<groupId>processing</groupId>
 			<artifactId>core</artifactId>
 			<scope>system</scope>
-			<version>2.0.1</version>
-			<systemPath>${basedir}/lib/processing-2.0.1/core.jar</systemPath>
+			<version>2.2.1</version>
+			<systemPath>${basedir}/lib/processing-2.2.1/core.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>processing</groupId>
 			<artifactId>pdf</artifactId>
 			<scope>system</scope>
-			<version>2.0.1</version>
-			<systemPath>${basedir}/lib/processing-2.0.1/pdf.jar</systemPath>
+			<version>2.2.1</version>
+			<systemPath>${basedir}/lib/processing-2.2.1/pdf.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>processing</groupId>
 			<artifactId>itext</artifactId>
 			<scope>system</scope>
-			<version>2.0.1</version>
-			<systemPath>${basedir}/lib/processing-2.0.1/itext.jar</systemPath>
+			<version>2.2.1</version>
+			<systemPath>${basedir}/lib/processing-2.2.1/itext.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>gicentre</groupId>
@@ -122,6 +122,12 @@
 			<version>0.6.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.java-websocket</groupId>
+			<artifactId>Java-WebSocket</artifactId>
+			<version>1.3.0</version>
+		</dependency>
+
 		<!-- <dependency> <groupId>org.jogamp.jocl</groupId> <artifactId>jocl-main</artifactId> 
 			<scope>system</scope> <version>2.0</version> <systemPath>${basedir}/lib/jogamp-2.0/jogamp-all-platforms/jar/jocl.jar</systemPath> 
 			</dependency> -->

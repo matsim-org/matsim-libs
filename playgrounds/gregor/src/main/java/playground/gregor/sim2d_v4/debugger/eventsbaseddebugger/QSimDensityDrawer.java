@@ -70,7 +70,7 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, PersonDep
 			width = (float)(l.getNumberOfLanes() * 3.5);
 			isCar = true;
 		} else {
-			width = (float)(l.getNumberOfLanes() * 0.71);
+			width = (float)(l.getCapacity());
 		}
 		
 		double dx = l.getToNode().getCoord().getX() - l.getFromNode().getCoord().getX();

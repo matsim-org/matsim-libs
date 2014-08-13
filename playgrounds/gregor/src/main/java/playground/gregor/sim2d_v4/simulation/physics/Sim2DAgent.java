@@ -83,6 +83,20 @@ public class Sim2DAgent implements VoronoiCenter, TwoDObject {
 
 	private PhysicalSim2DSection currentPSec;
 	
+	
+	//Dummy
+	public Sim2DAgent(Id id) {
+		this.id = id;
+		this.r = 0.2;
+		this.veh = null;
+		this.driver = null;
+		this.sc = null;
+		this.ls = null;
+		this.pEnv = null;
+		this.vu = null;
+	}
+	
+	
 	public Sim2DAgent(Scenario sc, QVehicle veh, double spawnX, double spawnY, LinkSwitcher ls, PhysicalSim2DEnvironment pEnv) {
 		this.r = MatsimRandom.getRandom().nextDouble()*.1 + 0.25;//.25;//.19;//MatsimRandom.getRandom().nextDouble()*.1 + 0.25; //radius//.25; //0.19; //MatsimRandom.getRandom().nextDouble()*.1 + 0.25; //radius
 		this.pos[0] = spawnX;

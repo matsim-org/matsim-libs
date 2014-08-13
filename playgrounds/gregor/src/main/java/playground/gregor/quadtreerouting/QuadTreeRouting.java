@@ -37,7 +37,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.gregor.sim2d_v4.cgal.DefaultTwoDObject;
 import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.cgal.LinearQuadTreeLD;
 import playground.gregor.sim2d_v4.cgal.LinearQuadTreeLD.Quad;
@@ -85,20 +84,22 @@ public class QuadTreeRouting {
 		EventBasedVisDebuggerEngine vis = new EventBasedVisDebuggerEngine(sc);
 		em.addHandler(vis);
 
+
 		//routing algorithm - for now standard Dijkstra could be replaced by A*  in future
 		Dijkstra d = new Dijkstra(env);
 
 		//dummy data
 		int number = 20;
 		for (double time = 0; time <= 1000; time++ ){
-			List<XYVxVyEventImpl>  events = createDummyData(number,time);
+			List<XYVxVyEventImpl>  events = createDummyData(MatsimRandom.getRandom().nextInt(21),time);
 
 			List<TwoDObject> objs = new ArrayList<TwoDObject>();
 			for (XYVxVyEventImpl e : events) {
 				em.processEvent(e); //needed for visualization
-				objs.add(new DefaultTwoDObject(e.getX(), e.getY()));
+				objs.add(e);
 			}
 
+			System.out.println("");
 			LinearQuadTreeLD quad = new LinearQuadTreeLD(objs, env, em);
 			
 			//routing

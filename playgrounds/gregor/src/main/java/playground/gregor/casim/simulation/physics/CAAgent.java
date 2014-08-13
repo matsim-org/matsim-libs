@@ -29,6 +29,9 @@ public abstract class CAAgent {
 //	private final CANetwork net;
 //	private CALink l;
 	private final Id id;
+	private CAEvent currentEvent;
+	private double cumWaitTime;
+	
 	
 	public CAAgent(Id id) {
 //		this.net = net;
@@ -74,6 +77,35 @@ public abstract class CAAgent {
 	public Id getId() {
 		return this.id;
 	}
+
+	public abstract double getZ();
+
+	public abstract double getD();
 	
+	public abstract CANetworkEntity getCurrentCANetworkEntity();
 	
+	public abstract void moveToNode(CANode n);
+
+	public void setCurrentEvent(CAEvent event) {
+		if (this.currentEvent != null) {
+			this.currentEvent.setObsolete();
+		}
+		this.currentEvent = event;
+	}
+	
+	@Override
+	public String toString() {
+		return "agent: " + getId() + " next event:" + this.currentEvent;
+	}
+	
+	public double getCumWaitTime() {
+		double ret = this.cumWaitTime;
+		this.cumWaitTime = 0;
+		return ret;
+	}
+
+	public void setCumWaitTime(double tFree) {
+		this.cumWaitTime = tFree;
+		
+	}
 }

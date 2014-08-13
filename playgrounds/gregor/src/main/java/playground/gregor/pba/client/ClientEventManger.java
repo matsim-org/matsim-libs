@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CAVehicle.java
+ * ClientEventManger.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,67 +18,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.casim.simulation.physics;
+package playground.gregor.pba.client;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import java.net.URI;
 
-public class CAVehicle extends CAAgent {
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
+import org.matsim.core.api.experimental.events.EventsManager;
 
-	private final MobsimDriverAgent agent;
-	private final Id initialLinkId;
-	private CALink currentLink;
+public class ClientEventManger extends WebSocketClient{
 
-	public CAVehicle(Id id, MobsimDriverAgent agent, Id linkId, CALink current) {
-		super(id);
-		this.agent = agent;
-		this.initialLinkId = linkId;
-		this.currentLink = current;
+	private final EventsManager em;
+
+	public ClientEventManger(URI serverURI, EventsManager e) {
+		
+		super(serverURI);
+		this.em = e;
 	}
 
 	@Override
-	Id getNextLinkId() {
-		return this.agent.chooseNextLinkId();
-	}
-
-	@Override
-	void moveOverNode(CALink nextLink, double time) {
-		this.agent.notifyMoveOverNode(nextLink.getLink().getId());
-		this.currentLink = nextLink;
-
-	}
-	
-	/*package*/ Id getInitialLinkId() {
-		return this.initialLinkId;
-	}
-
-	@Override
-	CALink getCurrentLink() {
-		return this.currentLink;
-	}
-
-	@Override
-	public double getZ() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public double getD() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public CANetworkEntity getCurrentCANetworkEntity() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void moveToNode(CANode n) {
-		// TODO Auto-generated method stub
+	public void onClose(int arg0, String arg1, boolean arg2) {
+		System.err.println();	
 		
 	}
+
+	@Override
+	public void onError(Exception arg0) {
+		System.err.println();	
+		
+	}
+
+	@Override
+	public void onMessage(String arg0) {
+		System.err.println();	
+		
+	}
+
+	@Override
+	public void onOpen(ServerHandshake arg0) {
+		System.err.println();		
+	}
+	
+	
 
 }

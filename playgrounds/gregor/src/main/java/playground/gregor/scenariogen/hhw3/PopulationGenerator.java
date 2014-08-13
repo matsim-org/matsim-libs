@@ -174,7 +174,7 @@ public class PopulationGenerator {
 				plan.addActivity(act1);
 			}
 		}
-		System.out.println(carss);
+		System.out.println(tp);
 		new PopulationWriter(pop, sc.getNetwork()).write(conf.plans().getInputFile());
 		createNetworkChangeEvents(sc);
 		new ConfigWriter(conf).write(config);

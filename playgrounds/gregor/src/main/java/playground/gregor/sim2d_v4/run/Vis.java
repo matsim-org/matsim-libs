@@ -31,7 +31,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
-import playground.gregor.sim2d_v4.events.EventsReaderXMLv1ExtendedSim2DVersion;
+import playground.gregor.sim2d_v4.experimental.HermesTrajectoryToEventsParser;
+import playground.gregor.sim2d_v4.experimental.QuadTreePath;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
@@ -103,7 +104,8 @@ public class Vis {
 //		controller.getEvents().addHandler(fa2);
 //		controller.getEvents().addHandler(fa3);
 		if (args[2].equals("true")) {
-			
+			QuadTreePath qtp = new QuadTreePath(e);
+			e.addHandler(qtp);
 //			VDPath vdp = new VDPath(controller.getEvents());
 //			controller.getEvents().addHandler(vdp);
 //			
@@ -171,8 +173,10 @@ public class Vis {
 //		controller.getEvents().addHandler(vdt);
 //		controller.addControlerListener(vdt);
 
-		EventsReaderXMLv1ExtendedSim2DVersion reader = new EventsReaderXMLv1ExtendedSim2DVersion(e);
-		reader.parse("/Users/laemmel/devel/hhw3/vis/0.events.xml");
+//		EventsReaderXMLv1ExtendedSim2DVersion reader = new EventsReaderXMLv1ExtendedSim2DVersion(e);
+//		reader.parse("/Users/laemmel/devel/hhw3/vis/0.events.xml");
+		HermesTrajectoryToEventsParser h = new HermesTrajectoryToEventsParser(e);
+		h.parse("/Users/laemmel/devel/tjunction/KO/ko-240-240-240/ko-240-240-240_combined_MB.txt");
 		
 //		controller.setCreateGraphs(false);
 //		controller.setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());

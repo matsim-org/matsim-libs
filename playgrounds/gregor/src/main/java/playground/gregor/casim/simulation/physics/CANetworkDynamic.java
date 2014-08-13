@@ -30,32 +30,35 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.gbl.Gbl;
 
-import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
 import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
 
 
-public class CANetwork {
+public class CANetworkDynamic {
 
 
 	public static double RHO = 1;
-	
-	
-//	//Floetteroed Laemmel parameters
-//	public static final double RHO_HAT = 6.661;
-//	public static final double V_HAT = 1.29;
-//
-//	public static final double ALPHA = 0;
-//	public static final double BETA = 0.12;
-//	public static final double GAMMA = 1.38;
 
-	
-	private static final Logger log = Logger.getLogger(CANetwork.class);
+
+	//Floetteroed Laemmel parameters
+	public static final double RHO_HAT = 6.69;
+	public static final double V_HAT = 1.27;
+	//	public static final double RHO_HAT = 5.09;
+	//	public static final double V_HAT = 1.26;
+
+	public static final double ALPHA = 0;
+	public static final double BETA = 0.39;
+	public static final double GAMMA = 1.43;
+
+	public static final double PED_WIDTH = 0.61;
+
+	private static final Logger log = Logger.getLogger(CANetworkDynamic.class);
 
 	private final PriorityQueue<CAEvent> events = new PriorityQueue<CAEvent>();
 	private final Network net;
 
-	private final Map<Id,CANodeStatic> caNodes = new HashMap<Id,CANodeStatic>();
+	private final Map<Id,CANode> caNodes = new HashMap<Id,CANode>();
 	private final Map<Id,CALink> caLinks = new HashMap<Id,CALink>();
 	private final EventsManager em;
 
@@ -63,7 +66,10 @@ public class CANetwork {
 
 	private final long eventCnt = 0;
 
-	public CANetwork(Network net, EventsManager em) {
+
+	private static int EXP_WARN_CNT;
+
+	public CANetworkDynamic(Network net, EventsManager em) {
 		this.net = net;
 		this.em = em;
 		init();
@@ -71,12 +77,12 @@ public class CANetwork {
 
 	private void init() {
 		for (Node n : this.net.getNodes().values()) {
-			CANodeStatic caNode = new CANodeStatic(n, this);
+			CANodeDynamic caNode = new CANodeDynamic(n, this);
 			this.caNodes.put(n.getId(), caNode);
 		}
 		for (Link l : this.net.getLinks().values()) {
-			CANodeStatic us = this.caNodes.get(l.getFromNode().getId());
-			CANodeStatic ds = this.caNodes.get(l.getToNode().getId());
+			CANodeDynamic us = (CANodeDynamic) this.caNodes.get(l.getFromNode().getId());
+			CANodeDynamic ds = (CANodeDynamic) this.caNodes.get(l.getToNode().getId());
 			Link rev = null;
 			for (Link ll : l.getToNode().getOutLinks().values()) {
 				if (ll.getToNode() == l.getFromNode()) {
@@ -90,7 +96,7 @@ public class CANetwork {
 					continue;
 				}
 			}
-			CALink caL = new CALinkStatic(l,rev, ds, us, this);
+			CALink caL = new CALinkDynamic(l,rev, ds, us, this);
 			us.addLink(caL);
 			ds.addLink(caL);
 			this.caLinks.put(l.getId(), caL);
@@ -98,11 +104,17 @@ public class CANetwork {
 	}
 
 	public void runUntil(double time) {
-		
+
 		while (this.events.size() > 0 && this.events.peek().getEventExcexutionTime() < time) {
 			CAEvent e = this.events.poll();
-			if (e.getCAEventType() != CAEventType.TTE && e.getCANetworkEntity() instanceof CALinkStatic && e.getCANetworkEntity() != e.getCAAgent().getCurrentLink()){
-				log.info("dropping inconsisten event");
+//			System.out.println(e.getCAAgent() + " " + e);
+			if (e.isObsolete()){
+				if (EXP_WARN_CNT++ < 10 ) {
+					log.info("dropping obsolete event: " + e);
+					if (EXP_WARN_CNT == 10) {
+						log.info(Gbl.FUTURE_SUPPRESSED);
+					}
+				}
 				continue;
 			}
 
@@ -120,6 +132,26 @@ public class CANetwork {
 		this.globalTime = this.events.peek().getEventExcexutionTime();
 		while (this.events.size() > 0) {
 			CAEvent e = this.events.poll();
+			if (e.isObsolete()){
+				if (EXP_WARN_CNT++ < 10 ) {
+					log.info("dropping obsolete event: " + e);
+					if (EXP_WARN_CNT == 10) {
+						log.info(Gbl.FUTURE_SUPPRESSED);
+					}
+				}
+				continue;
+			}
+//			if (e.getCAAgent().getId().toString().equals("-3895") || e.getCAAgent().getId().toString().equals("1923")) {
+//				System.out.println("got you!!!");
+//			}
+//			
+//			if (e.toString().equals("time:25.721895573043653 a:a:1917 TTA")) {
+//				System.out.println("got you!!!");
+//			}	
+			//			System.out.println(e);
+			//			if (Double.isNaN(e.getEventExcexutionTime())){
+			//				System.out.println("got you!!!");
+			//			}
 			//			if ((e.getCAAgent().getId().toString().equals("-1") || e.getCAAgent().getId().toString().equals("492"))&& this.globalTime >= 22.){
 			//				System.out.println("--> " + e);
 			//				checkBlockingOnLink();
@@ -131,66 +163,44 @@ public class CANetwork {
 			//				System.out.println("DEBUG");
 			//				
 			//			}
+			//			256.356023511673
 
-			if (e.getCANetworkEntity() instanceof CALinkStatic && e.getCANetworkEntity() != ((CASimpleAgent)e.getCAAgent()).getCurrentLink()){
-				log.info("dropping inconsisten event");
+			if (e.isObsolete()){
+				log.info("dropping obsolete event: " + e);
 				continue;
 			}
 
-			e.getCANetworkEntity().handleEvent(e);
 
+			//			System.out.println(e.getEventExcexutionTime());
+			//			if (e.getEventExcexutionTime() <= ((CASimpleDynamicAgent)e.getCAAgent()).getLastEnterTime() ) {
+			//				log.info("dropping inconsisten event");
+			//				continue;
+			//			}
+//			CALink l = this.getCALink(new IdImpl("2"));
+//			boolean aThereBefore = false;
+//			if (l.getParticles()[162] != null && l.getParticles()[162].getId().toString().equals("-3895")) {
+//				aThereBefore = true;
+//			}
+			e.getCANetworkEntity().handleEvent(e);
+			
+//			//DEBUG
+//			if (aThereBefore && l.getParticles()[162] == null) {
+//				System.out.println("got you!!!");
+//			}
+			
+			
 			//			checkConsitency();
 
 			//			System.out.println(e);
 
-//						if (e.getEventExcexutionTime() > this.globalTime+0.04) {
-//							
-//							draw();
-//							this.globalTime = e.getEventExcexutionTime();
-//						}
-		}
-	}
+			if (CASimDynamicExperiment_ZhangJ2012a.VIS && e.getEventExcexutionTime() > this.globalTime+0.04) {
 
-	private void checkBlockingOnLink() {
-
-		System.out.println("DEBUG");
-		for (CALink l : this.caLinks.values()) {
-			for (int i = 1; i < l.getNumOfCells()-1; i++) {
-				CAAgent p = l.getParticles()[i];
-				if (p != null) {
-					boolean isBlocking = false;
-					int nextIdx = p.getPos()+p.getDir();
-					if (l.getParticles()[nextIdx] == null) {
-						isBlocking = true;
-						for (CAEvent e : this.events) {
-							if (e.getCAAgent() == p && e.getCAEventType() == CAEventType.TTA){
-								isBlocking = false;
-								break;
-							}
-						}
-					}
-					if (isBlocking) {
-						System.out.println("BLOCKER");
-					}
-				}
+				draw();
+				this.globalTime = e.getEventExcexutionTime();
 			}
 		}
 	}
 
-	private void checkConsitency() {
-		System.out.println("DEBUG");
-		for (CALink l : this.caLinks.values()) {
-			for (int i = 0; i < l.getNumOfCells(); i++) {
-				CAAgent p = l.getParticles()[i];
-				if (p != null) {
-					if (p.getPos() != i) {
-						throw new RuntimeException();
-					}
-				}
-			}
-		}
-
-	}
 
 	private void draw() {
 		for (CALink l : this.caLinks.values()) {
@@ -212,13 +222,15 @@ public class CANetwork {
 						ddx = -1;
 					};
 					XYVxVyEventImpl e = new XYVxVyEventImpl(l.getParticles()[i].getId(), x, y, ddx, ddy, this.globalTime);
+					
 					this.em.processEvent(e);
+//					System.out.println(l.getParticles()[i]);
 				}
 				x+=dx;
 				y+=dy;
 			}
 		}
-		for (CANodeStatic n : this.caNodes.values()) {
+		for (CANode n : this.caNodes.values()) {
 			if (n.peekForAgent() != null) {
 				double x = n.getNode().getCoord().getX();
 				double y = n.getNode().getCoord().getY();
@@ -251,6 +263,25 @@ public class CANetwork {
 		//			System.out.println("<-- " + event);
 		//		}
 
+		//		if (event.getEventExcexutionTime() <= ((CASimpleDynamicAgent)event.getCAAgent()).getLastEnterTime()) {
+		//			throw new RuntimeException("a");
+		//		}
+
+//		if (event.toString().equals("time:25.783212202329086 a:a:1923 SWAP")) {
+//			System.out.println("got you!!!");
+//		}
+		if (event.toString().equals("time:13.547189434599161 type:TTA obsolete:false")) {
+			System.out.println("got you!!!");
+		}		
+		
+//		CANetworkEntity e = event.getCANetworkEntity();
+//		if (e instanceof CALinkDynamic) {
+//			if (((CALinkDynamic) e).getParticles()[event.getCAAgent().getPos()] != event.getCAAgent() && event.getEventExcexutionTime() > 2){
+//				System.out.println("got you!!!");
+//			}
+//		}
+
+		event.getCAAgent().setCurrentEvent(event);
 		this.events.add(event);
 	}
 

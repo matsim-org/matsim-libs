@@ -27,6 +27,8 @@ import org.matsim.api.core.v01.network.Link;
 
 public class CASimpleAgent extends CAAgent {
 
+	static  double Z = 0;
+	static  double D = 0;
 	private final List<Link> links;
 	private int next;
 	private final Id id;
@@ -42,6 +44,7 @@ public class CASimpleAgent extends CAAgent {
 
 	@Override
 	Id getNextLinkId() {
+		
 		return this.links.get(this.next).getId();
 	}
 
@@ -53,8 +56,9 @@ public class CASimpleAgent extends CAAgent {
 //		}
 		this.link = link;
 		this.next++;
+//		System.out.println(link.getLink().getId() + " " + this.links.get(this.next).getId());
 		if (this.next == this.links.size()) {
-			this.next = 2;
+			this.next = 4;
 		}
 //		System.out.println(this.next);
 	}
@@ -68,5 +72,27 @@ public class CASimpleAgent extends CAAgent {
 	@Override
 	public CALink getCurrentLink() {
 		return this.link;
+	}
+
+	@Override
+	public double getZ() {
+		return Z;
+	}
+
+	@Override
+	public double getD() {
+		return D;
+	}
+
+	@Override
+	public CANetworkEntity getCurrentCANetworkEntity() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void moveToNode(CANode n) {
+		// TODO Auto-generated method stub
+		
 	}
 }

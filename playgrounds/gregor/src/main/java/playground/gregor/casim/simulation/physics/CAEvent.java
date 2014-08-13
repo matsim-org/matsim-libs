@@ -30,12 +30,15 @@ public class CAEvent implements Comparable<CAEvent>{
 	private final CANetworkEntity entity;
 	private final CAEventType type;
 	public long cnt;
+	private final AgentState validState;
+	private boolean isObsolete = false;
 
 	public CAEvent(double time, CAAgent agent, CANetworkEntity entity, CAEventType type){
 		this.time = time;
 		this.agent = agent;
 		this.entity = entity;
 		this.type = type;
+		this.validState = new AgentState(agent.getCurrentCANetworkEntity(),agent.getPos(),agent.getDir());
 	}
 	
 	
@@ -50,8 +53,10 @@ public class CAEvent implements Comparable<CAEvent>{
 			return -1;
 		} else if (this.getEventExcexutionTime() > o.getEventExcexutionTime()) {
 			return 1;
+		} else if (this.getEventExcexutionTime() == o.getEventExcexutionTime()) {
+			return 0;
 		}
-		return 0;
+		throw new RuntimeException("Invalid event excecution time!");
 	}
 
 	public double getEventExcexutionTime() {
@@ -66,8 +71,45 @@ public class CAEvent implements Comparable<CAEvent>{
 		return this.entity;
 	}
 	
+//	public boolean isValid() {
+//		if (this.agent.getCurrentCANetworkEntity() != this.validState.e) {
+//			return false;
+//		}
+//		if (this.validState.e instanceof CANode) {
+//			return true;
+//		}
+//		if (this.agent.getPos() != this.validState.pos) {
+//			return false;
+//		}
+//		if (this.agent.getDir() != this.validState.dir) {
+//			return false;
+//		}
+//		return true;
+//	}
+	
 	@Override
 	public String toString() {
-		return "time:" + this.time + " a:" + this.agent + " " + this.type;
+		return "time:" + this.time + " type:" + this.type + " obsolete:" + isObsolete();
+	}
+	
+	public class AgentState{
+		CANetworkEntity e;
+		int pos;
+		int dir;
+		public AgentState(CANetworkEntity e, int pos,
+				int dir) {
+			this.e = e;
+			this.pos = pos;
+			this.dir = dir;
+		}
+	}
+
+	public void setObsolete() {
+		this.isObsolete  = true;
+		
+	}
+	
+	public boolean isObsolete() {
+		return this.isObsolete;
 	}
 }

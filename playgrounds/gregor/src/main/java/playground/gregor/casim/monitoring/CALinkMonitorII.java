@@ -20,6 +20,8 @@
 
 package playground.gregor.casim.monitoring;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,14 +34,18 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.gbl.MatsimRandom;
 
 import playground.gregor.casim.events.CASimAgentConstructEvent;
 import playground.gregor.casim.events.CASimAgentConstructEventHandler;
+import playground.gregor.casim.simulation.physics.CAAgent;
+import playground.gregor.casim.simulation.physics.CALinkDynamic;
 import playground.gregor.casim.simulation.physics.CASimpleAgent;
+import playground.gregor.casim.simulation.physics.CASimpleDynamicAgent;
 
-public class CALinkMonitor implements LinkEnterEventHandler,
-		LinkLeaveEventHandler, CASimAgentConstructEventHandler {
-	
+public class CALinkMonitorII implements LinkEnterEventHandler,
+LinkLeaveEventHandler, CASimAgentConstructEventHandler {
+
 	private  long warmup = 0;
 	private  long warmdown = 2000;
 	int dsCnt;
@@ -49,9 +55,9 @@ public class CALinkMonitor implements LinkEnterEventHandler,
 	long left;
 	private final Id ds;
 	private final Id us;
-	
+
 	private final Map<Id,AgentInfo> onLink = new HashMap<Id,AgentInfo>();
-	
+
 	private final List<Measure> measures = new ArrayList<Measure>();
 	private final List<Measure> tmpM = new ArrayList<Measure>(); 
 	private Measure current = new Measure();
@@ -60,11 +66,14 @@ public class CALinkMonitor implements LinkEnterEventHandler,
 	private double rhoMSA = 0;
 	private double msaCnt = 0;
 	private boolean startet = false;
-	
-	
-	
-	
-	public CALinkMonitor(Id ds, Id us, Link link) {
+
+	double sampleSize = 1;//0.2;
+
+
+	private final List<AgentMeasure> ams = new ArrayList<AgentMeasure>();
+	private CALinkDynamic caL;
+
+	public CALinkMonitorII(Id ds, Id us, Link link) {
 		this.us = us;
 		this.ds = ds;
 		this.link = link;
@@ -89,18 +98,18 @@ public class CALinkMonitor implements LinkEnterEventHandler,
 	}
 
 	public void save() {
-//		if ()
+		//		if ()
 		this.measures.add(this.current);
-//		this.measures.addAll(this.tmpM);
+		//		this.measures.addAll(this.tmpM);
 	}
-	
+
 	public double getCurrentRho() {
 		return this.current.rho;
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		
+
 		AgentInfo ai;
 		boolean isUs = false;
 		if (event.getLinkId() == this.ds){
@@ -111,7 +120,7 @@ public class CALinkMonitor implements LinkEnterEventHandler,
 			this.left++;
 			this.dsCnt--;
 			this.dsLeft++;
-			
+
 		} else if (event.getLinkId() == this.us){
 			isUs = true;
 			ai = this.onLink.remove(event.getVehicleId());
@@ -129,51 +138,72 @@ public class CALinkMonitor implements LinkEnterEventHandler,
 		double l = this.link.getLength();
 		double w = this.link.getCapacity();
 		double rho = (this.dsCnt+this.usCnt)/(w*l);
-		
-//		System.out.println(speed + "  " + rho);
+
+		//		System.out.println(speed + "  " + rho);
 
 		double flow = ((this.left-ai.left-1)/time)/this.link.getCapacity();///this.caLink.getLink().getCapacity();
 		double flowComp = rho * speed;
-		rho = flow/speed;
+		//		rho = flow/speed;
+
+		double cellSize = this.caL.getCellLength();
+		int from = (int) (0.5+3/cellSize);
+		int to = (int) (0.5+5/cellSize);
 		
-		
+		for (int i = from; i <= to; i++) {
+
+			if (MatsimRandom.getRandom().nextDouble() < this.sampleSize) {
+				CAAgent part = this.caL.getParticles()[i];
+				if (part != null) {
+					CASimpleDynamicAgent da = (CASimpleDynamicAgent) part;
+					AgentMeasure am = new AgentMeasure();
+					am.v = da.getV();
+					am.rho = da.getMyDirectionRho();
+					am.flow = am.v*am.rho;
+					this.ams.add(am);
+					
+				}
+
+			}
+		}
+
+
 		this.rho40 = (1.-(1./40.))*this.rho40 + rho/40.;
-//		if (this.msaCnt == 0) {
-//			this.rhoMSA = rho;
-//			this.msaCnt = 1;
-//		} else {
-//			this.rhoMSA = this.msaCnt/(this.msaCnt+1)*this.rhoMSA + 1./(this.msaCnt+1.) * rho;
-//			this.msaCnt++;
-//		}
+		//		if (this.msaCnt == 0) {
+		//			this.rhoMSA = rho;
+		//			this.msaCnt = 1;
+		//		} else {
+		//			this.rhoMSA = this.msaCnt/(this.msaCnt+1)*this.rhoMSA + 1./(this.msaCnt+1.) * rho;
+		//			this.msaCnt++;
+		//		}
 		this.rhoMSA = this.msaCnt/(this.msaCnt+1.)*this.rhoMSA + 1./(this.msaCnt+1.) * rho;
 		this.msaCnt++;
-		
+
 		double diff40 = Math.abs(this.rho40-rho);
-		
-//		if (!this.startet & this.rho40 >= 4 & diff40 < 0.05) {
-//			this.warmup = this.left;
-//			this.warmdown = this.warmup+20;
-//			this.startet = true;
-//		} else if (!this.startet & this.rho40 >= 3 & diff40 < 0.05) {
-//			this.warmup = this.left;
-//			this.warmdown = this.warmup+50;
-//			this.startet = false;
-//		}
-//		double diff = Math.abs(this.rho10 - this.rhoMSA);
+
+		//		if (!this.startet & this.rho40 >= 4 & diff40 < 0.05) {
+		//			this.warmup = this.left;
+		//			this.warmdown = this.warmup+20;
+		//			this.startet = true;
+		//		} else if (!this.startet & this.rho40 >= 3 & diff40 < 0.05) {
+		//			this.warmup = this.left;
+		//			this.warmdown = this.warmup+50;
+		//			this.startet = false;
+		//		}
+		//		double diff = Math.abs(this.rho10 - this.rhoMSA);
 		if (this.left < this.warmup || this.left > this.warmdown ) {
 			return;
 		}
 		this.startet = true;
-		
-//		System.out.println(event);
-		
+
+		//		System.out.println(event);
+
 		Measure m = new Measure();
 		m.flow = flow;
 		m.rho = rho;
 		m.flowComp = flowComp;
 		m.speed = speed;
 		this.tmpM.add(m);
-		
+
 		if (this.current.cnt == 0) {
 			this.current.flow = flow;
 			this.current.rho = rho;
@@ -191,7 +221,7 @@ public class CALinkMonitor implements LinkEnterEventHandler,
 			double usRho = (this.usCnt)/(this.link.getLength()*this.link.getCapacity());
 			double usFlow = ((this.usLeft-ai.usLeft-1)/time)/this.link.getCapacity();///this.caLink.getLink().getCapacity();
 			double usFlowComp = usRho * speed;
-			
+
 			if (this.current.usCnt == 0) {
 				this.current.usFlow = usFlow;
 				this.current.usRho = usRho;
@@ -205,12 +235,12 @@ public class CALinkMonitor implements LinkEnterEventHandler,
 				this.current.usSpeed = this.current.usCnt/(this.current.usCnt+1.) * this.current.usSpeed + 1./(this.current.usCnt+1.)*speed;
 				this.current.usCnt++;				
 			}
-			
+
 		} else {
 			double dsRho = (this.dsCnt)/(this.link.getLength()*this.link.getCapacity());
 			double dsFlow = ((this.dsLeft-ai.dsLeft-1)/time)/this.link.getCapacity();///this.caLink.getLink().getCapacity();
 			double dsFlowComp = dsRho * speed;
-			
+
 			if (this.current.dsCnt == 0) {
 				this.current.dsFlow = dsFlow;
 				this.current.dsRho = dsRho;
@@ -224,23 +254,23 @@ public class CALinkMonitor implements LinkEnterEventHandler,
 				this.current.dsSpeed = this.current.dsCnt/(this.current.dsCnt+1.) * this.current.dsSpeed + 1./(this.current.dsCnt+1.)*speed;
 				this.current.dsCnt++;				
 			}
-			
+
 		}
-		
-//		System.out.println("dsCnt:" + this.dsCnt +" usCnt:" + this.usCnt + " total:" + (this.dsCnt+this.usCnt) + " speed:" + speed + " flow:" + flow + " rho:" + rho + " flowComp:" + flowComp);
+
+		//		System.out.println("dsCnt:" + this.dsCnt +" usCnt:" + this.usCnt + " total:" + (this.dsCnt+this.usCnt) + " speed:" + speed + " flow:" + flow + " rho:" + rho + " flowComp:" + flowComp);
 	}
-	
-	
+
+
 	@Override
 	public void handleEvent(CASimAgentConstructEvent e) {
 		CASimpleAgent a = (CASimpleAgent) e.getCAAgent();
-		
+
 		if (a.getCurrentLink().getLink().getId() != this.ds) {
 			return;
 		}
-		
-		
-		
+
+
+
 		if (a.getDir() == 1) {
 			AgentInfo ai = new AgentInfo();
 			ai.e = e;
@@ -275,9 +305,9 @@ public class CALinkMonitor implements LinkEnterEventHandler,
 			this.onLink.put(event.getVehicleId(), ai);
 			this.usCnt++;
 		}
-//		System.out.println("dsCnt:" + this.dsCnt +" usCnt:" + this.usCnt + " total:" + (this.dsCnt+this.usCnt));
+		//		System.out.println("dsCnt:" + this.dsCnt +" usCnt:" + this.usCnt + " total:" + (this.dsCnt+this.usCnt));
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
@@ -287,12 +317,29 @@ public class CALinkMonitor implements LinkEnterEventHandler,
 		this.measures.clear();
 		return buf.toString();
 	}
-	
+
+	public void writeAMS(BufferedWriter bf) throws IOException {
+		for (AgentMeasure a : this.ams) {
+			bf.append(Double.toString(a.rho));
+			bf.append(' ');
+			bf.append(Double.toString(a.flow));
+			bf.append(' ');
+			bf.append(Double.toString(a.v));
+			bf.append('\n');
+		}
+	}
+
 	private static final class AgentInfo {
 		public long dsLeft;
 		public long usLeft;
 		long left;
 		Event e;
+	}
+
+	private static final class AgentMeasure {
+		double v;
+		double rho;
+		double flow;
 	}
 
 	private static final class Measure {
@@ -313,6 +360,10 @@ public class CALinkMonitor implements LinkEnterEventHandler,
 		double dsFlowComp;
 	}
 
-	
+
+	public void setCALinkDynamic(CALinkDynamic l) {
+		this.caL = l;
+	}
+
 
 }

@@ -75,7 +75,7 @@ public class EventBasedVisDebuggerEngine implements CASimAgentConstructEventHand
 
 	private long lastUpdate = -1;
 	private final double dT;
-	private final Control keyControl;
+	private final  Control keyControl;
 
 	private final List<ClockedVisDebuggerAdditionalDrawer> drawers = new ArrayList<ClockedVisDebuggerAdditionalDrawer>();
 	private int nrAgents;
@@ -87,6 +87,7 @@ public class EventBasedVisDebuggerEngine implements CASimAgentConstructEventHand
 		this.sc = sc;
 		this.dT = ((Sim2DScenario) sc.getScenarioElement(Sim2DScenario.ELEMENT_NAME)).getSim2DConfig().getTimeStepSize();
 		this.vis = new EventsBasedVisDebugger(sc,this.fs);
+
 		this.keyControl = new Control(this.vis.zoomer,90,this.fs);
 		this.vis.addKeyControl(this.keyControl);
 		init();
@@ -187,6 +188,8 @@ public class EventBasedVisDebuggerEngine implements CASimAgentConstructEventHand
 
 			}
 		}
+		
+
 
 	}
 
@@ -237,7 +240,7 @@ public class EventBasedVisDebuggerEngine implements CASimAgentConstructEventHand
 				if (event.getAgent() != null) {
 					this.vis.addText(event.getX(),event.getY(), event.getAgent().toString(), 200);
 				} else {
-		this.vis.addText(event.getX(),event.getY(), event.getPersonId().toString(), 90);
+		this.vis.addText(event.getX(),event.getY(), event.getPersonId().toString(), 200);
 //		this.vis.addText(event.getX(),event.getY(), event.getAgent().toString(), 50);
 				}
 

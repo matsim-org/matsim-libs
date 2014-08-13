@@ -106,6 +106,21 @@ public class Dijkstra {
 //		double rnd =computeKey(k1,k2);
 //		length += 1./(1000.*rnd);
 		
+		double cx = (q.getEnvelope().getMaxX()+q.getEnvelope().getMinX())/2;
+		double cy = (q.getEnvelope().getMaxY()+q.getEnvelope().getMinY())/2;
+		
+		if (cy < -2.4) {
+			return 1000;
+		} else if (cy < 0) {
+			if (cx < -5 || cx > 4) {
+				return 1000;
+			}
+		} else if (cy > 4){
+			return 1000;
+		} else if (cx < -2.4 || cx > 0) {
+			return 100000;
+		}
+		
 		double density = (q.getColor()+1)/q.getEnvelope().getArea();//-.25;
 		if (q.getEnvelope().getWidth() >= 1 && q.getColor() == 0) {
 			density = 0.00001;

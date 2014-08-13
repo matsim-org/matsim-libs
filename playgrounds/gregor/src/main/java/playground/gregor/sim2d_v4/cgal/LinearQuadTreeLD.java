@@ -79,6 +79,9 @@ public class LinearQuadTreeLD {
 
 	private static final double MIN_QUAD_SIZE = 2; 
 	
+	private final int [] occ = new int [MAX_DEPTH];
+	private int quadsCnt = 0;
+	
 	//	public List<>
 	public LinearQuadTreeLD(List<TwoDObject> obj, Envelope e, EventsManager em) {
 //		addObjs(e.getMinX(),e.getMinY(),obj);
@@ -99,6 +102,8 @@ public class LinearQuadTreeLD {
 		while (qq.peek() != null) {
 			Quad quad = qq.poll();
 			if (quad.getColor() <= 1 || quad.getLevel() == MAX_DEPTH){ //leaf (== BLACK or WHITE)
+				this.quadsCnt++;
+				this.occ[quad.getLevel()]++;
 				continue;
 			}
 			
@@ -115,7 +120,18 @@ public class LinearQuadTreeLD {
 		for (Quad q : this.quads.values()) {
 			q.debug();
 		}
-
+		double entropy = 0;
+		for (int i = 0; i < MAX_DEPTH; i++) {
+			if (this.occ[i] == 0) {
+				continue;
+			}
+			double pi = (double)this.occ[i]/this.quadsCnt;
+			
+			entropy -= this.occ[i]*pi*Math.log(pi)/Math.log(2);
+			
+		}
+		System.out.println(entropy/this.quadsCnt);
+		
 	}
 
 	private void addObjs(double minX, double minY, List<TwoDObject> obj) {
