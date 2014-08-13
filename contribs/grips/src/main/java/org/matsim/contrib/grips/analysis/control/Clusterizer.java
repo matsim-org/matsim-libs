@@ -51,7 +51,7 @@ public class Clusterizer {
 			}
 		});
 
-		int m = (data.size() / n) > 0 ? (data.size() / n) : 1;
+		int m = (data.size() / (n-1)) > 0 ? (data.size() / (n-1)) : 1;
 		int i = 0;
 
 		for (Tuple<Id, Double> element : data) {
@@ -62,7 +62,7 @@ public class Clusterizer {
 		}
 
 		while (clusters.size() < n)
-			clusters.add(clusters.get(clusters.size() - 1));
+			clusters.add(data.get(data.size() - 1));
 
 		return clusters;
 	}
