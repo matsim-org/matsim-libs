@@ -51,14 +51,16 @@ import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Set;
 
 public class CadytsModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        Multibinder <ControlerListener> controlerListenerBinder = Multibinder.newSetBinder(binder(), ControlerListener.class);
+        Multibinder<ControlerListener> controlerListenerBinder = Multibinder.newSetBinder(binder(), ControlerListener.class);
         controlerListenerBinder.addBinding().to(CadytsControlerListener.class);
         controlerListenerBinder.addBinding().toProvider(MyControlerListenerProvider.class);
+        Multibinder<MeasurementLoader<Link>> measurementLoaderBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<MeasurementLoader<Link>>(){});
         bind(new TypeLiteral<AnalyticalCalibrator<Link>>(){}).toProvider(CalibratorProvider.class).in(Singleton.class);
         bind(new TypeLiteral<PlansTranslator<Link>>(){}).to(PlanToPlanStepBasedOnEvents.class).in(Singleton.class);
     }
@@ -67,15 +69,21 @@ public class CadytsModule extends AbstractModule {
 
         @Inject Scenario scenario;
         @Inject @Named("calibrationCounts") Counts counts;
+        @Inject Set<MeasurementLoader<Link>> measurementLoaders;
 
         @Override
         public AnalyticalCalibrator<Link> get() {
-            return CadytsBuilder.buildCalibrator(scenario.getConfig(), this.counts, new LookUp<Link>() {
+            LookUp<Link> linkLookUp = new LookUp<Link>() {
                 @Override
                 public Link lookUp(Id id) {
                     return scenario.getNetwork().getLinks().get(id);
                 }
-            });
+            };
+            AnalyticalCalibrator<Link> linkAnalyticalCalibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), this.counts, linkLookUp);
+            for (MeasurementLoader<Link> measurementLoader : measurementLoaders) {
+                measurementLoader.load(linkAnalyticalCalibrator);
+            }
+            return linkAnalyticalCalibrator;
         }
     }
 

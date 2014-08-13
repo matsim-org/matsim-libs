@@ -59,7 +59,7 @@ public final class CadytsBuilder {
 		}
 		
 		if (occupCounts.getCounts().size() == 0) {
-			throw new RuntimeException("CadytsPt requires counts-data.");
+			log.warn("Counts container is empty.");
 		}
 		
 		AnalyticalCalibrator<T> matsimCalibrator = new AnalyticalCalibrator<T>(
@@ -142,9 +142,10 @@ public final class CadytsBuilder {
 				timeBinIndex++ ;
 			}
 		}
-		if ( numberOfAddedMeasurements==0 ) {
-			throw new RuntimeException("no measurement was added; cadyts will not work.  Throwing runtime exception ... ") ;
-		}
+
+        if ( numberOfAddedMeasurements==0 ) {
+			log.warn("No measurements were added.");
+        }
 		
 		return matsimCalibrator;
 	}

@@ -33,6 +33,7 @@ public class ClonesModule extends AbstractModule {
         Multibinder<ControlerListener> controlerListenerBinder = Multibinder.newSetBinder(binder(), ControlerListener.class);
         controlerListenerBinder.addBinding().toProvider(ClonesControlerListener.class);
         controlerListenerBinder.addBinding().toProvider(CloneHistogramControlerListener.class);
+
     }
 
 }

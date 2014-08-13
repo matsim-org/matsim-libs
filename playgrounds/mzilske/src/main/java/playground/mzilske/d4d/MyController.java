@@ -1,10 +1,7 @@
 package playground.mzilske.d4d;
 
-import java.io.FileNotFoundException;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.ScoreStatsControlerListener;
 import org.matsim.api.core.v01.Coord;
@@ -21,11 +18,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractController;
-import org.matsim.core.controler.corelisteners.EventsHandling;
-import org.matsim.core.controler.corelisteners.LegTimesListener;
-import org.matsim.core.controler.corelisteners.PlansDumping;
-import org.matsim.core.controler.corelisteners.PlansReplanning;
-import org.matsim.core.controler.corelisteners.PlansScoring;
+import org.matsim.core.controler.corelisteners.*;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
@@ -67,9 +60,12 @@ import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+import playground.mzilske.cdr.Sighting;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import java.io.FileNotFoundException;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class MyController extends AbstractController {
 

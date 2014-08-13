@@ -23,7 +23,6 @@
 package playground.mzilske.cdr;
 
 import org.matsim.api.core.v01.Id;
-import playground.mzilske.d4d.Sighting;
 
 import java.util.List;
 import java.util.Map;

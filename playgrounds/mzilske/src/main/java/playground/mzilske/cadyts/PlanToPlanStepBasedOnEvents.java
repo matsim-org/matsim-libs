@@ -89,7 +89,7 @@ class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEve
     @Override
     public void handleEvent(LinkLeaveEvent event) {
         if (!driverAgents.containsKey(event.getPersonId())) return;
-        if (!counts.getCounts().keySet().contains(event.getLinkId())) return;
+     //   if (!counts.getCounts().keySet().contains(event.getLinkId())) return;
         PlanBuilder<Link> planBuilder = driverAgents.get(event.getPersonId());
         Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
         planBuilder.addTurn(link, (int) event.getTime());

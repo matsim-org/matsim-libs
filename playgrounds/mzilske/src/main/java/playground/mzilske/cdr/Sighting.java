@@ -1,10 +1,10 @@
-package playground.mzilske.d4d;
-
-import java.util.Comparator;
-import java.util.Date;
+package playground.mzilske.cdr;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+
+import java.util.Comparator;
+import java.util.Date;
 
 public class Sighting extends Event {
 

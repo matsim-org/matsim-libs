@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * ODSightings.java
+ *  * CreateODDemand.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,47 +20,42 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.sensors;
+package playground.mzilske.matrices;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.matrices.Entry;
-import org.matsim.matrices.Matrix;
+import com.google.inject.Provider;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.StartupListener;
+import playground.mzilske.cdr.PopulationFromSightings;
 import playground.mzilske.cdr.Sightings;
-import playground.mzilske.cdr.SightingsImpl;
-import playground.mzilske.d4d.Sighting;
+import playground.mzilske.cdr.ZoneTracker;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.*;
 
-class ODSightings implements Provider<Sightings> {
+class MatrixDemandControlerListener implements Provider<ControlerListener> {
 
     @Inject
-    Matrix matrix;
+    Sightings sightings;
 
-    long startTime = 9 * 60 * 60;
-    long endTime = 10 * 60 * 60;
+    @Inject
+    TimedMatrices timedMatrices;
+
+    @Inject
+    Scenario scenario;
+
+    @Inject
+    ZoneTracker.LinkToZoneResolver linkToZoneResolver;
 
     @Override
-    public Sightings get() {
-        Map<Id, List<Sighting>> sightings = new HashMap<Id, List<Sighting>>();
-        for (Collection<Entry> entries : matrix.getFromLocations().values()) {
-            for (Entry entry : entries) {
-                for (int i = 0; i < entry.getValue(); i++) {
-                    Id personId = personId(entry, i);
-                    sightings.put(personId, Arrays.asList(
-                                    new Sighting(personId, startTime, entry.getFromLocation().toString()),
-                                    new Sighting(personId, endTime, entry.getToLocation().toString()))
-                    );
-                }
-            }
-        }
-        return new SightingsImpl(sightings);
-    }
-
-    private Id personId(Entry entry, int i) {
-        return new IdImpl(entry.getFromLocation().toString() + "_" + entry.getToLocation().toString() + "_" +i);
+    public ControlerListener get() {
+        return new StartupListener() {
+            @Override
+            public void notifyStartup(StartupEvent event) {
+                MatricesToSightings.insertSightingsForMatrices(timedMatrices, sightings);
+                PopulationFromSightings.createPopulationWithRandomRealization(scenario, sightings, linkToZoneResolver);
+             }
+        };
     }
 
 }

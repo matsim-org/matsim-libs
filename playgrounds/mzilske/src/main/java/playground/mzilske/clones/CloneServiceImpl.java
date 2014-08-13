@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * SightingsImpl.java
+ *  * CloneServiceImpl.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -17,36 +17,25 @@
  *  *   (at your option) any later version.                                   *
  *  *   See also COPYING, LICENSE and WARRANTY file                           *
  *  *                                                                         *
- *  * *********************************************************************** 
+ *  * ***********************************************************************
  */
 
-package playground.mzilske.cdr;
-
+package playground.mzilske.clones;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 
-import javax.inject.Singleton;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-@Singleton
-public class SightingsImpl implements Sightings {
-
-    private Map<Id, List<Sighting>> sightings = new HashMap<Id, List<Sighting>>();
-
-
-    public SightingsImpl() {
-
-    }
-
-    public SightingsImpl(Map<Id, List<Sighting>> sightings) {
-        this.sightings = sightings;
-    }
+class CloneServiceImpl implements CloneService {
 
     @Override
-    public Map<Id, List<Sighting>> getSightingsPerPerson() {
-        return sightings;
+    public Id resolveParentId(Id cloneId) {
+        String id = cloneId.toString();
+        String originalId;
+        if (id.startsWith("I"))
+            originalId = id.substring(id.indexOf("_") + 1);
+        else
+            originalId = id;
+        return new IdImpl(originalId);
     }
 
 }

@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * SightingsImpl.java
+ *  * MatricesModule.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -17,36 +17,26 @@
  *  *   (at your option) any later version.                                   *
  *  *   See also COPYING, LICENSE and WARRANTY file                           *
  *  *                                                                         *
- *  * *********************************************************************** 
+ *  * ***********************************************************************
  */
 
-package playground.mzilske.cdr;
+package playground.mzilske.matrices;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.Multibinder;
+import org.matsim.core.controler.listener.ControlerListener;
+import playground.mzilske.cdr.LinkIsZone;
+import playground.mzilske.cdr.Sightings;
+import playground.mzilske.cdr.SightingsImpl;
+import playground.mzilske.cdr.ZoneTracker;
 
-import org.matsim.api.core.v01.Id;
-
-import javax.inject.Singleton;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-@Singleton
-public class SightingsImpl implements Sightings {
-
-    private Map<Id, List<Sighting>> sightings = new HashMap<Id, List<Sighting>>();
-
-
-    public SightingsImpl() {
-
-    }
-
-    public SightingsImpl(Map<Id, List<Sighting>> sightings) {
-        this.sightings = sightings;
-    }
-
+public class MatricesModule extends AbstractModule {
     @Override
-    public Map<Id, List<Sighting>> getSightingsPerPerson() {
-        return sightings;
+    protected void configure() {
+        bind(Sightings.class).to(SightingsImpl.class);
+        bind(ZoneTracker.LinkToZoneResolver.class).to(LinkIsZone.class);
+        Multibinder<ControlerListener> controlerListenerBinder = Multibinder.newSetBinder(binder(), ControlerListener.class);
+        controlerListenerBinder.addBinding().toProvider(MatrixDemandControlerListener.class);
+        controlerListenerBinder.addBinding().to(MatricesUpdater.class);
     }
-
 }

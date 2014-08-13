@@ -101,7 +101,6 @@ public class Main {
                         bind(VolumesAnalyzer.class).annotatedWith(Names.named("groundTruthVolumes")).toInstance(groundTruthVolumes);
                         bind(CompareMain.class).toInstance(compareMain);
                         bind(Double.class).annotatedWith(Names.named("clonefactor")).toInstance(2.0);
-                        bind(Boolean.class).annotatedWith(Names.named("alreadyCloned")).toInstance(false);
                         bind(Double.class).annotatedWith(Names.named("cadytsweight")).toInstance(1.0);
                         bind(Config.class).toProvider(ScenarioReconstructor.ConfigProvider.class).in(Singleton.class);
                         bind(Scenario.class).toProvider(ScenarioReconstructor.class).in(Singleton.class);

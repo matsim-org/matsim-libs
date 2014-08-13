@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * CreateODDemand.java
+ *  * MeasurementLoader.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,32 +20,12 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.sensors;
+package playground.mzilske.cadyts;
 
-import com.google.inject.Provider;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.controler.listener.StartupListener;
+import cadyts.calibrators.Calibrator;
 
-import javax.inject.Inject;
+public interface MeasurementLoader<T> {
 
-class ODDemandControlerListener implements Provider<ControlerListener> {
-
-    @Inject
-    SightingsPopulation sightingsPopulation;
-
-    @Inject
-    Scenario scenario;
-
-    @Override
-    public ControlerListener get() {
-        return new StartupListener() {
-            @Override
-            public void notifyStartup(StartupEvent event) {
-                sightingsPopulation.insertPersons(scenario);
-            }
-        };
-    }
+    public void load(Calibrator<T> calibrator);
 
 }

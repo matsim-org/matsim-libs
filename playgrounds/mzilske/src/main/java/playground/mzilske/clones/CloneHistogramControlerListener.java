@@ -23,6 +23,7 @@
 package playground.mzilske.clones;
 
 import com.google.common.collect.ImmutableMap;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -49,6 +50,9 @@ class CloneHistogramControlerListener implements Provider<ControlerListener> {
     @Inject
     OutputDirectoryHierarchy controlerIO;
 
+    @Inject
+    CloneService cloneService;
+
     @Override
     public ControlerListener get() {
         return new IterationSummaryFileControlerListener(controlerIO,
@@ -69,22 +73,15 @@ class CloneHistogramControlerListener implements Provider<ControlerListener> {
                             public StreamingOutput notifyIterationEnds(final IterationEndsEvent event) {
                                 final Map<String, Double> expectedNumberOfClones = new HashMap<String, Double>();
                                 for (Person person : scenario.getPopulation().getPersons().values()) {
-                                    String id = person.getId().toString();
-                                    String originalId;
-                                    if (id.startsWith("I"))
-                                        originalId = id.substring(id.indexOf("_") + 1);
-                                    else
-                                        originalId = id;
-                                    if (person.getPlans().size() > 2)
-                                        throw new RuntimeException("Don't know about this kind of Person.");
+                                    Id originalId = cloneService.resolveParentId(person.getId());
                                     for (Plan plan : person.getPlans()) {
                                         if (plan.getPlanElements().size() > 1) {
                                             double selectionProbability = ExpBetaPlanSelector.getSelectionProbability(new ExpBetaPlanSelector<Plan>(1.0), person, plan);
                                             Double previous = expectedNumberOfClones.get(originalId);
                                             if (previous == null)
-                                                expectedNumberOfClones.put(originalId, selectionProbability);
+                                                expectedNumberOfClones.put(originalId.toString(), selectionProbability);
                                             else
-                                                expectedNumberOfClones.put(originalId, previous + selectionProbability);
+                                                expectedNumberOfClones.put(originalId.toString(), previous + selectionProbability);
 
                                         }
                                     }

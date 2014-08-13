@@ -199,7 +199,6 @@ class MultiRateRunResource {
                 bind(Counts.class).annotatedWith(Names.named("allCounts")).toInstance(allCounts);
                 bind(Counts.class).annotatedWith(Names.named("calibrationCounts")).toInstance(someCounts);
                 bind(Double.class).annotatedWith(Names.named("clonefactor")).toInstance((double) cloneFactor);
-                bind(Boolean.class).annotatedWith(Names.named("alreadyCloned")).toInstance(false);
             }
         });
 

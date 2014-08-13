@@ -20,14 +20,15 @@
 
 package playground.mzilske.d4d;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import playground.mzilske.cdr.Sighting;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 /**
  * @author dgrether

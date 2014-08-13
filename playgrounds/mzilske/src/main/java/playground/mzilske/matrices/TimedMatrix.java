@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * SightingsImpl.java
+ *  * TimedMatrix.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -17,36 +17,39 @@
  *  *   (at your option) any later version.                                   *
  *  *   See also COPYING, LICENSE and WARRANTY file                           *
  *  *                                                                         *
- *  * *********************************************************************** 
+ *  * ***********************************************************************
  */
 
-package playground.mzilske.cdr;
+package playground.mzilske.matrices;
 
+import org.matsim.matrices.Matrix;
 
-import org.matsim.api.core.v01.Id;
+public class TimedMatrix {
 
-import javax.inject.Singleton;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+    private Matrix matrix = new Matrix("wurst", "pups");
 
-@Singleton
-public class SightingsImpl implements Sightings {
+    private double startTime;
 
-    private Map<Id, List<Sighting>> sightings = new HashMap<Id, List<Sighting>>();
+    private double endTime;
 
-
-    public SightingsImpl() {
-
+    public Matrix getMatrix() {
+        return matrix;
     }
 
-    public SightingsImpl(Map<Id, List<Sighting>> sightings) {
-        this.sightings = sightings;
+    public double getStartTime() {
+        return startTime;
     }
 
-    @Override
-    public Map<Id, List<Sighting>> getSightingsPerPerson() {
-        return sightings;
+    public void setStartTime(double startTime) {
+        this.startTime = startTime;
+    }
+
+    public double getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(double endTime) {
+        this.endTime = endTime;
     }
 
 }

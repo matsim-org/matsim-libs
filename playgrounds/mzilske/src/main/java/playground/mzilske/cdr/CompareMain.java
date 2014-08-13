@@ -30,7 +30,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
-import playground.mzilske.d4d.Sighting;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

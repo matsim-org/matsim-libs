@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.ReplanningContext;
+import playground.mzilske.clones.CloneService;
 
 import javax.inject.Inject;
 
@@ -38,6 +39,9 @@ class TrajectoryReRealizer implements PlanStrategyModule {
     private Sightings sightings;
     private Scenario scenario;
     private ZoneTracker.LinkToZoneResolver zones;
+
+    @Inject
+    CloneService cloneService;
 
     @Inject
     public TrajectoryReRealizer(Sightings sightings, Scenario scenario, ZoneTracker.LinkToZoneResolver zones) {
@@ -54,7 +58,8 @@ class TrajectoryReRealizer implements PlanStrategyModule {
     @Override
     public void handlePlan(Plan plan) {
         Id personId = plan.getPerson().getId();
-        Plan newPlan = PopulationFromSightings.createPlanWithRandomEndTimesInPermittedWindow(scenario, zones, sightings.getSightingsPerPerson().get(personId));
+        Id originalPersonId = cloneService.resolveParentId(personId);
+        Plan newPlan = PopulationFromSightings.createPlanWithRandomEndTimesInPermittedWindow(scenario, zones, sightings.getSightingsPerPerson().get(originalPersonId));
         plan.getPlanElements().clear();
         ((PlanImpl) plan).copyFrom(newPlan);
         for (PlanElement pe : plan.getPlanElements()) {

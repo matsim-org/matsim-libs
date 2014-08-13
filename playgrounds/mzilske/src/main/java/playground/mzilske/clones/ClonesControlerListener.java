@@ -42,9 +42,6 @@ class ClonesControlerListener implements Provider<ControlerListener> {
     @Inject @com.google.inject.name.Named("clonefactor")
     double clonefactor;
 
-    @Inject @com.google.inject.name.Named("alreadyCloned")
-    boolean alreadyCloned;
-
     @Inject
     Scenario scenario;
 
@@ -53,14 +50,11 @@ class ClonesControlerListener implements Provider<ControlerListener> {
         return new StartupListener() {
             @Override
             public void notifyStartup(StartupEvent event) {
-
-                if (alreadyCloned)
-                    return;
-
                 // clonefactor == 1 will leave everything as is, without stay-at-home-plans.
                 if (clonefactor > 1) {
                     for (Person person : scenario.getPopulation().getPersons().values()) {
                         Plan plan2 = scenario.getPopulation().getFactory().createPlan();
+                        plan2.setType("emptyClonePlan");
                         person.addPlan(plan2);
                         person.setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(person));
                     }

@@ -1,5 +1,7 @@
 package playground.mzilske.d4d;
 
+import playground.mzilske.cdr.Sighting;
+
 import java.util.Iterator;
 import java.util.List;
 

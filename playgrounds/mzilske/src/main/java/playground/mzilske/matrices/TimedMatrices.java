@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * SightingsImpl.java
+ *  * Matrices.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -17,36 +17,15 @@
  *  *   (at your option) any later version.                                   *
  *  *   See also COPYING, LICENSE and WARRANTY file                           *
  *  *                                                                         *
- *  * *********************************************************************** 
+ *  * ***********************************************************************
  */
 
-package playground.mzilske.cdr;
+package playground.mzilske.matrices;
 
+import java.util.Set;
 
-import org.matsim.api.core.v01.Id;
+public interface TimedMatrices {
 
-import javax.inject.Singleton;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-@Singleton
-public class SightingsImpl implements Sightings {
-
-    private Map<Id, List<Sighting>> sightings = new HashMap<Id, List<Sighting>>();
-
-
-    public SightingsImpl() {
-
-    }
-
-    public SightingsImpl(Map<Id, List<Sighting>> sightings) {
-        this.sightings = sightings;
-    }
-
-    @Override
-    public Map<Id, List<Sighting>> getSightingsPerPerson() {
-        return sightings;
-    }
+    public Set<TimedMatrix> getMatrices();
 
 }

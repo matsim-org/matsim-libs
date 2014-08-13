@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * SightingsPopulation.java
+ *  * CloneService.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,27 +20,14 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.sensors;
+package playground.mzilske.clones;
 
-import org.matsim.api.core.v01.Scenario;
-import playground.mzilske.cdr.PopulationFromSightings;
-import playground.mzilske.cdr.Sightings;
-import playground.mzilske.cdr.ZoneTracker;
+import com.google.inject.ImplementedBy;
+import org.matsim.api.core.v01.Id;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+@ImplementedBy(CloneServiceImpl.class)
+public interface CloneService {
 
-@Singleton
-public class SightingsPopulation {
-
-    @Inject
-    Sightings sightings;
-
-    @Inject
-    ZoneTracker.LinkToZoneResolver linkToZoneResolver;
-
-    public void insertPersons(Scenario scenario) {
-        PopulationFromSightings.createPopulationWithRandomRealization(scenario, sightings, linkToZoneResolver);
-    }
+    public Id resolveParentId(Id cloneId);
 
 }

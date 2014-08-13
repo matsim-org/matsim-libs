@@ -18,7 +18,6 @@ import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner.PersonAlgo
 import org.matsim.population.algorithms.PersonAlgorithm;
 import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
 import playground.mzilske.d4d.NetworkRoutingModule;
-import playground.mzilske.d4d.Sighting;
 import playground.mzilske.d4d.Sightings;
 
 import java.util.HashMap;
