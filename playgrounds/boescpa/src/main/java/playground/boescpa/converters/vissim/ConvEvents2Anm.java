@@ -36,16 +36,14 @@ public class ConvEvents2Anm {
 
 	private final BaseGridCreator baseGridCreator;
 	private final NetworkMatcher networkMatcher;
-	private final EventsConverter eventsConverter;
-	private final AnmConverter anmConverter;
+	private final RouteConverter routeConverter;
 	private final TripMatcher tripMatcher;
 
-	public ConvEvents2Anm(BaseGridCreator baseGridCreator, NetworkMatcher networkMatcher, EventsConverter eventsConverter,
-						  AnmConverter anmConverter, TripMatcher tripMatcher) {
+	public ConvEvents2Anm(BaseGridCreator baseGridCreator, NetworkMatcher networkMatcher,
+						  RouteConverter routeConverter, TripMatcher tripMatcher) {
 		this.baseGridCreator = baseGridCreator;
 		this.networkMatcher = networkMatcher;
-		this.eventsConverter = eventsConverter;
-		this.anmConverter = anmConverter;
+		this.routeConverter = routeConverter;
 		this.tripMatcher = tripMatcher;
 	}
 
@@ -55,8 +53,8 @@ public class ConvEvents2Anm {
 	}
 
 	public static ConvEvents2Anm createDefaultConvEvents2Anm() {
-		return new ConvEvents2Anm(new DefaultBaseGridCreator(), new DefaultNetworkMatcher(), new DefaultEventsConverter(),
-		new DefaultAnmConverter(), new DefaultTripMatcher());
+		return new ConvEvents2Anm(new DefaultBaseGridCreator(), new DefaultNetworkMatcher(),
+				new DefaultRouteConverter(), new DefaultTripMatcher());
 	}
 
 	public void convert(String[] args) {
@@ -64,17 +62,30 @@ public class ConvEvents2Anm {
 		String path2MATSimNetwork = args[1];
 		String path2VissimNetworkAnm = args[2];
 		String path2EventsFile = args[3];
-		String path2AnmFile = args[4];
+		String path2AnmroutesFile = args[4];
 		String path2NewAnmFile = args[5];
 
 		Network mutualBaseGrid = this.baseGridCreator.createMutualBaseGrid(path2VissimZoneShp);
 		HashMap<Id, Id[]> keyMsNetwork = this.networkMatcher.mapMsNetwork(path2MATSimNetwork, mutualBaseGrid, path2VissimZoneShp);
 		HashMap<Id, Id[]> keyAmNetwork = this.networkMatcher.mapAmNetwork(path2VissimNetworkAnm, mutualBaseGrid);
-		HashMap<Id, Long[]> msTrips = this.eventsConverter.convertEvents(keyMsNetwork, path2EventsFile, path2VissimZoneShp);
-		HashMap<Id, Long[]> amTrips = this.anmConverter.convertRoutes(keyAmNetwork, path2AnmFile);
+		HashMap<Id, Long[]> msTrips = this.routeConverter.convertEvents(keyMsNetwork, path2EventsFile, path2VissimZoneShp);
+		HashMap<Id, Long[]> amTrips = this.routeConverter.convertRoutes(keyAmNetwork, path2AnmroutesFile);
 		HashMap<Id, Integer> demandPerAnmTrip = this.tripMatcher.matchTrips(msTrips, amTrips);
-		this.anmConverter.writeAnmRoutes(demandPerAnmTrip, path2AnmFile, path2NewAnmFile);
+		writeAnmRoutes(demandPerAnmTrip, path2AnmroutesFile, path2NewAnmFile);
 	}
+
+	/**
+	 * Rewrite ANMRoutes file with new demand numbers for each ANM-Route
+	 *
+	 * @param demandPerAnmTrip
+	 * @param path2AnmFile
+	 * @param path2NewAnmFile At the specified location a new ANMRoutes-File will be created. It is an exact copy
+	 *                        of the given AnmFile except for the demands stated at the routes. These are the new
+	 *                        demands given in demandPerAnmTrip.
+	 */
+	public void writeAnmRoutes(HashMap<Id, Integer> demandPerAnmTrip, String path2AnmFile, String path2NewAnmFile) {
+
+	};
 
 	public interface BaseGridCreator {
 
@@ -111,7 +122,7 @@ public class ConvEvents2Anm {
 		HashMap<Id,Id[]> mapAmNetwork(String path2VissimNetworkAnm, Network mutualBaseGrid);
 	}
 
-	public interface EventsConverter {
+	public interface RouteConverter {
 
 		/**
 		 * Convert MATSim-Events to trips in matched network (in the matched zone).
@@ -123,9 +134,6 @@ public class ConvEvents2Anm {
 		 * 			an id-array (Long[]) representing a sequence of elements of the matched network.
 		 */
 		public HashMap<Id,Long[]> convertEvents(HashMap<Id, Id[]> keyMsNetwork, String path2EventsFile, String path2VissimZoneShp);
-	}
-
-	public interface AnmConverter {
 
 		/**
 		 * Convert ANM-Routes to trips in matched network
@@ -136,17 +144,6 @@ public class ConvEvents2Anm {
 		 * 			of an id-array (Long[]) representing a sequence of elements of the matched network.
 		 */
 		public HashMap<Id,Long[]> convertRoutes(HashMap<Id, Id[]> keyAmNetwork, String path2AnmFile);
-
-		/**
-		 * Rewrite ANMRoutes file with new demand numbers for each ANM-Route
-		 *
-		 * @param demandPerAnmTrip
-		 * @param path2AnmFile
-		 * @param path2NewAnmFile At the specified location a new ANMRoutes-File will be created. It is an exact copy
-		 *                        of the given AnmFile except for the demands stated at the routes. These are the new
-		 *                        demands given in demandPerAnmTrip.
-		 */
-		public void writeAnmRoutes(HashMap<Id, Integer> demandPerAnmTrip, String path2AnmFile, String path2NewAnmFile);
 	}
 
 	public interface TripMatcher {
