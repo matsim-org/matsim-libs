@@ -7,6 +7,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PermissibleModesCalculatorImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -26,7 +27,9 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * 
  * If the plan initially violates this constraint, this module may (!) repair it. 
  * 
- * @author michaz
+ * Added parameters used to evaulate scores of pt and walk legs when changing subtours to PT.
+ * 
+ * @author balac
  * 
  */
 public class SubTourModeChoiceCS extends AbstractMultithreadedModule {
@@ -34,22 +37,38 @@ public class SubTourModeChoiceCS extends AbstractMultithreadedModule {
 	
 	private final String[] chainBasedModes;
 	private final String[] modes;
-	
+	private final CharyparNagelScoringParameters params;
+	private final double beeLineFactor;
+	private final double walkSpeed;
+	private final double ptSpeed;
 	public SubTourModeChoiceCS(final Config config) {
 		this( config.global().getNumberOfThreads(),
 				config.subtourModeChoice().getModes(),
 				config.subtourModeChoice().getChainBasedModes(),
-				config.subtourModeChoice().considerCarAvailability());
+				config.subtourModeChoice().considerCarAvailability(),
+				new CharyparNagelScoringParameters(config.planCalcScore()),
+				Double.parseDouble(config.getModule("planscalcroute").getParams().get("beelineDistanceFactor")),
+				Double.parseDouble(config.getModule("planscalcroute").getParams().get("teleportedModeSpeed_walk")),
+				Double.parseDouble(config.getModule("planscalcroute").getParams().get("teleportedModeSpeed_pt"))
+		);
 	}
 
 	public SubTourModeChoiceCS(
 			final int numberOfThreads,
 			final String[] modes,
 			final String[] chainBasedModes,
-			final boolean considerCarAvailability) {
+			final boolean considerCarAvailability,
+			final CharyparNagelScoringParameters params,
+			double beeLineFactor,
+			double walkSpeed,
+			double ptSpeed) {
 		super(numberOfThreads);
 		this.modes = modes.clone();
 		this.chainBasedModes = chainBasedModes.clone();
+		this.params = params;
+		this.beeLineFactor = beeLineFactor;
+		this.walkSpeed = walkSpeed;
+		this.ptSpeed = ptSpeed;
 		this.permissibleModesCalculator =
 			new PermissibleModesCalculatorImpl(
 					this.modes,
@@ -70,7 +89,12 @@ public class SubTourModeChoiceCS extends AbstractMultithreadedModule {
 						this.permissibleModesCalculator,
 						this.modes,
 						this.chainBasedModes,
-						MatsimRandom.getLocalInstance());
+						MatsimRandom.getLocalInstance(),
+						this.params,
+						this.beeLineFactor,
+						this.walkSpeed,
+						this.ptSpeed
+						);
 		chooseRandomLegMode.setAnchorSubtoursAtFacilitiesInsteadOfLinks( false );
 		return chooseRandomLegMode;
 	}

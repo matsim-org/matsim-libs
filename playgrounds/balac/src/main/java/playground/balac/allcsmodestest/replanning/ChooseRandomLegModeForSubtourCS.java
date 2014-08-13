@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.LegImpl;
@@ -23,6 +24,8 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -30,8 +33,9 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * Changes the transportation mode of one random non-empty subtour in a plan to a randomly chosen
  * different mode given a list of possible modes, considering that the means of transport
  * follows the law of mass conservation.
+ * When changing the subtour to PT each trip can be changed to either walk or pt leg based on the score a person would get in order to increase it.
  *
- * @author michaz
+ * @author balac
  * @see SubtourModeChoice
  */
 public class ChooseRandomLegModeForSubtourCS implements PlanAlgorithm {
@@ -63,18 +67,33 @@ public class ChooseRandomLegModeForSubtourCS implements PlanAlgorithm {
 
 	private boolean anchorAtFacilities = false;
 	
+	private CharyparNagelScoringParameters params;
+	
+	private final double beeLineFactor;
+	private final double walkSpeed;
+	private final double ptSpeed;
+	
 	public ChooseRandomLegModeForSubtourCS(
 			final StageActivityTypes stageActivityTypes,
 			final MainModeIdentifier mainModeIdentifier,
 			final PermissibleModesCalculator permissibleModesCalculator,
 			final String[] modes,
 			final String[] chainBasedModes,
-			final Random rng) {
+			final Random rng,
+			CharyparNagelScoringParameters params,
+			double beeLineFactor,
+			double walkSpeed,
+			double ptSpeed) {
 		this.stageActivityTypes = stageActivityTypes;
 		this.mainModeIdentifier = mainModeIdentifier;
 		this.permissibleModesCalculator = permissibleModesCalculator;
 		this.modes = Arrays.asList(modes);
 		this.chainBasedModes = Arrays.asList(chainBasedModes);
+		this.params = params;
+		this.beeLineFactor = beeLineFactor;
+		this.walkSpeed = walkSpeed;
+		this.ptSpeed = ptSpeed;
+		
 		String[] x = new String[1];
 		x[0] = "walk";
 		this.singleTripSubtourModes = Arrays.asList(x);
@@ -282,21 +301,72 @@ public class ChooseRandomLegModeForSubtourCS implements PlanAlgorithm {
 				subtour.getTrips().get( 0 ).getTripElements() );
 	}
 
-	private static void applyChange(
+	private void applyChange(
 			final Candidate whatToDo,
 			final Plan plan) {
-		for (Trip trip : whatToDo.subtour.getTrips()) {
-			TripRouter.insertTrip(
-					plan,
-					trip.getOriginActivity(),
-					Collections.singletonList( new LegImpl( whatToDo.newTransportMode ) ),
-					trip.getDestinationActivity());
+		
+		if (whatToDo.newTransportMode.equals("pt")) {
+			for (Trip trip : whatToDo.subtour.getTrips()) {				
+				
+				if (scorePTLeg(trip.getOriginActivity(), trip.getDestinationActivity()) > 
+					scoreWalkLeg(trip.getOriginActivity(), trip.getDestinationActivity())) {
+					TripRouter.insertTrip(
+						plan,
+						trip.getOriginActivity(),
+						Collections.singletonList( new LegImpl( "pt" ) ),
+						trip.getDestinationActivity());
+				}
+				else {
+					TripRouter.insertTrip(
+							plan,
+							trip.getOriginActivity(),
+							Collections.singletonList( new LegImpl( "walk" ) ),
+							trip.getDestinationActivity());
+				}
+			}
+			
+		}
+		else {
+		
+			for (Trip trip : whatToDo.subtour.getTrips()) {
+				TripRouter.insertTrip(
+						plan,
+						trip.getOriginActivity(),
+						Collections.singletonList( new LegImpl( whatToDo.newTransportMode ) ),
+						trip.getDestinationActivity());
+			}
 		}
 	}
 
 	public void setAnchorSubtoursAtFacilitiesInsteadOfLinks(
 			final boolean anchorAtFacilities) {
 		this.anchorAtFacilities = anchorAtFacilities;
+	}
+	
+	private double scorePTLeg(Activity originActivity, Activity destinationActivity) {
+		double score = 0.0D;
+
+		double travelTime = CoordUtils.calcDistance(originActivity.getCoord(), destinationActivity.getCoord()) * this.beeLineFactor/ this.ptSpeed;
+				
+		score += travelTime * this.params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s;
+		score += this.params.modeParams.get(TransportMode.pt).constant;
+
+		return score;
+		
+		
+	}
+	
+	private double scoreWalkLeg(Activity originActivity, Activity destinationActivity) {
+		double score = 0.0D;
+
+		double travelTime = CoordUtils.calcDistance(originActivity.getCoord(), destinationActivity.getCoord()) * this.beeLineFactor / this.walkSpeed;
+				
+		score += travelTime * this.params.modeParams.get(TransportMode.walk).marginalUtilityOfTraveling_s;
+		score += this.params.modeParams.get(TransportMode.walk).constant;
+
+		return score;
+		
+		
 	}
 
 }
