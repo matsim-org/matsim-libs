@@ -68,7 +68,7 @@ public class ConvEvents2Anm {
 		Network mutualBaseGrid = this.baseGridCreator.createMutualBaseGrid(path2VissimZoneShp);
 		HashMap<Id, Id[]> keyMsNetwork = this.networkMatcher.mapMsNetwork(path2MATSimNetwork, mutualBaseGrid, path2VissimZoneShp);
 		HashMap<Id, Id[]> keyAmNetwork = this.networkMatcher.mapAmNetwork(path2VissimNetworkAnm, mutualBaseGrid);
-		HashMap<Id, Long[]> msTrips = this.routeConverter.convertEvents(keyMsNetwork, path2EventsFile, path2VissimZoneShp);
+		HashMap<Id, Long[]> msTrips = this.routeConverter.convertEvents(keyMsNetwork, path2EventsFile, path2MATSimNetwork, path2VissimZoneShp);
 		HashMap<Id, Long[]> amTrips = this.routeConverter.convertRoutes(keyAmNetwork, path2AnmroutesFile);
 		HashMap<Id, Integer> demandPerAnmTrip = this.tripMatcher.matchTrips(msTrips, amTrips);
 		writeAnmRoutes(demandPerAnmTrip, path2AnmroutesFile, path2NewAnmFile);
@@ -133,7 +133,7 @@ public class ConvEvents2Anm {
 		 * @return A HashMap which represents each trip (derived from events, assigned a trip Id) in the form of
 		 * 			an id-array (Long[]) representing a sequence of elements of the matched network.
 		 */
-		public HashMap<Id,Long[]> convertEvents(HashMap<Id, Id[]> keyMsNetwork, String path2EventsFile, String path2VissimZoneShp);
+		public HashMap<Id,Long[]> convertEvents(HashMap<Id, Id[]> keyMsNetwork, String path2EventsFile, String path2MATSimNetwork, String path2VissimZoneShp);
 
 		/**
 		 * Convert ANM-Routes to trips in matched network
