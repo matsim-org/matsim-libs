@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsReaderXMLv1;
@@ -76,7 +77,8 @@ public class MsRouteConverter extends AbstractRouteConverter {
 				if (geographicEventAnalyzer.eventInArea(event)) {
 					Trip currentTrip = currentTrips.get(event.getPersonId());
 					if (currentTrip == null) {
-						currentTrip = new Trip(event.getTime());
+						Id tripId = new IdImpl(event.getPersonId().toString() + "_" + String.valueOf(event.getTime()));
+						currentTrip = new Trip(tripId, event.getTime());
 						currentTrips.put(event.getPersonId(),currentTrip);
 					}
 					currentTrip.links.add(event.getLinkId());
