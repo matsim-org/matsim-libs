@@ -19,34 +19,45 @@
  * *********************************************************************** *
  */
 
-package playground.boescpa.converters.vissim;
+package playground.boescpa.converters.vissim.tools;
 
 import org.matsim.api.core.v01.Id;
-import playground.boescpa.converters.vissim.tools.AbstractRouteConverter;
-import playground.boescpa.converters.vissim.tools.MsRouteConverter;
+import playground.boescpa.converters.vissim.ConvEvents2Anm;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
- * WHAT IS IT FOR?
- * WHAT DOES IT?
+ * Maps the trips of a given events-file onto the given network
+ * (network expected in the form of nodes representing a square grid).
  *
  * @author boescpa
  */
-public class MapRoutes {
+public abstract class AbstractRouteConverter implements ConvEvents2Anm.RouteConverter {
 
-	public static void main(String[] args) {
-		String path2MsKeyMap = args[0];
-		String path2AmKeyMap = args[1];
-		String path2EventsFile = args[2];
-		String path2MsNetwork = args[3];
-		String path2VissimZoneShp = args[4];
-
-		HashMap<Id, Id[]> msKeyMap = PrepareNetworks.readKeyMaps(path2MsKeyMap);
-		//HashMap<Id, Id[]> amKeyMap = PrepareNetworks.readKeyMaps(path2AmKeyMap);
-
-		ConvEvents2Anm.RouteConverter routeConverter = new MsRouteConverter();
-		HashMap<Id, Long[]> msRoutes = routeConverter.convert(msKeyMap, path2EventsFile, path2MsNetwork, path2VissimZoneShp);
+	@Override
+	public HashMap<Id, Long[]> convert(HashMap<Id, Id[]> networkKey, String path2RouteFile, String path2OrigNetwork, String path2VissimZoneShp) {
+		List<Trip> trips = routes2Trips(path2RouteFile, path2OrigNetwork, path2VissimZoneShp);
+		return trips2Routes(trips, networkKey);
 	}
 
+	protected abstract List<Trip> routes2Trips(String path2RouteFile, String path2OrigNetwork, String path2VissimZoneShp);
+
+	private HashMap<Id, Long[]> trips2Routes(List<Trip> trips, HashMap<Id, Id[]> keyMsNetwork) {
+		// Transform all trips into a set of trips (start times, end times, array of keys) with the keyNetwork.
+		return null;
+	}
+
+	final class Trip {
+		final double startTime;
+		double endTime;
+		final List<Id> links;
+
+		Trip(double startTime) {
+			this.startTime = startTime;
+			this.endTime = 0;
+			this.links = new ArrayList<Id>();
+		}
+	}
 }

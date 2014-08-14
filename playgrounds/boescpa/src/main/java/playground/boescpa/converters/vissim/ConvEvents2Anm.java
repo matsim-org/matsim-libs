@@ -37,15 +37,17 @@ public class ConvEvents2Anm {
 	private final BaseGridCreator baseGridCreator;
 	private final NetworkMapper matsimNetworkMapper;
 	private final NetworkMapper anmNetworkMapper;
-	private final RouteConverter routeConverter;
+	private final RouteConverter matsimRouteConverter;
+	private final RouteConverter anmRouteConverter;
 	private final TripMatcher tripMatcher;
 
 	public ConvEvents2Anm(BaseGridCreator baseGridCreator, NetworkMapper matsimNetworkMapper, NetworkMapper anmNetworkMapper,
-						  RouteConverter routeConverter, TripMatcher tripMatcher) {
+						  RouteConverter matsimRouteConverter, RouteConverter anmRouteConverter, TripMatcher tripMatcher) {
 		this.baseGridCreator = baseGridCreator;
 		this.matsimNetworkMapper = matsimNetworkMapper;
 		this.anmNetworkMapper = anmNetworkMapper;
-		this.routeConverter = routeConverter;
+		this.matsimRouteConverter = matsimRouteConverter;
+		this.anmRouteConverter = anmRouteConverter;
 		this.tripMatcher = tripMatcher;
 	}
 
@@ -56,7 +58,7 @@ public class ConvEvents2Anm {
 
 	public static ConvEvents2Anm createDefaultConvEvents2Anm() {
 		return new ConvEvents2Anm(new playground.boescpa.converters.vissim.tools.BaseGridCreator(), new MsNetworkMapper(), new AmNetworkMapper(),
-				new playground.boescpa.converters.vissim.tools.RouteConverter(), new playground.boescpa.converters.vissim.tools.TripMatcher());
+				new MsRouteConverter(), new AmRouteConverter(), new playground.boescpa.converters.vissim.tools.TripMatcher());
 	}
 
 	public void convert(String[] args) {
@@ -70,8 +72,8 @@ public class ConvEvents2Anm {
 		Network mutualBaseGrid = this.baseGridCreator.createMutualBaseGrid(path2VissimZoneShp);
 		HashMap<Id, Id[]> keyMsNetwork = this.matsimNetworkMapper.mapNetwork(path2MATSimNetwork, mutualBaseGrid, path2VissimZoneShp);
 		HashMap<Id, Id[]> keyAmNetwork = this.anmNetworkMapper.mapNetwork(path2VissimNetworkAnm, mutualBaseGrid, "");
-		HashMap<Id, Long[]> msTrips = this.routeConverter.convertEvents(keyMsNetwork, path2EventsFile, path2MATSimNetwork, path2VissimZoneShp);
-		HashMap<Id, Long[]> amTrips = this.routeConverter.convertRoutes(keyAmNetwork, path2AnmroutesFile);
+		HashMap<Id, Long[]> msTrips = this.matsimRouteConverter.convert(keyMsNetwork, path2EventsFile, path2MATSimNetwork, path2VissimZoneShp);
+		HashMap<Id, Long[]> amTrips = this.anmRouteConverter.convert(keyAmNetwork, path2AnmroutesFile, "", "");
 		HashMap<Id, Integer> demandPerAnmTrip = this.tripMatcher.matchTrips(msTrips, amTrips);
 		writeAnmRoutes(demandPerAnmTrip, path2AnmroutesFile, path2NewAnmFile);
 	}
@@ -119,25 +121,15 @@ public class ConvEvents2Anm {
 	public interface RouteConverter {
 
 		/**
-		 * Convert MATSim-Events to trips in matched network (in the matched zone).
+		 * Convert routes (in the form of events or anmroutes) to trips in on the common base grid.
 		 *
-		 * @param keyMsNetwork
-		 * @param path2EventsFile
+		 * @param networkKey	Key that matches the original network to the common base grid.
+		 * @param path2RouteFile	Path to a file that provides the routes (eg. as matsim events or as anmroutes).
+		 * @param path2OrigNetwork	The original network the routes were created on.
 		 * @param path2VissimZoneShp
-		 * @return A HashMap which represents each trip (derived from events, assigned a trip Id) in the form of
-		 * 			an id-array (Long[]) representing a sequence of elements of the matched network.
+		 * @return
 		 */
-		public HashMap<Id,Long[]> convertEvents(HashMap<Id, Id[]> keyMsNetwork, String path2EventsFile, String path2MATSimNetwork, String path2VissimZoneShp);
-
-		/**
-		 * Convert ANM-Routes to trips in matched network
-		 *
-		 * @param keyAmNetwork
-		 * @param path2AnmFile
-		 * @return A HashMap which represents each trip (derived from AnmRoutes, assigned the AnmRoute Id) in the form
-		 * 			of an id-array (Long[]) representing a sequence of elements of the matched network.
-		 */
-		public HashMap<Id,Long[]> convertRoutes(HashMap<Id, Id[]> keyAmNetwork, String path2AnmFile);
+		public HashMap<Id, Long[]> convert(HashMap<Id, Id[]> networkKey, String path2RouteFile, String path2OrigNetwork, String path2VissimZoneShp);
 	}
 
 	public interface TripMatcher {

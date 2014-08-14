@@ -39,27 +39,17 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
-import playground.boescpa.converters.vissim.ConvEvents2Anm;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 
 import java.util.*;
 
 /**
- * Maps the trips of a given events-file onto the given network
- * (network expected in the form of nodes representing a square grid).
+ * Provides a matsim-events specific implementation of RouteConverter.
  *
  * @author boescpa
  */
-public class RouteConverter implements ConvEvents2Anm.RouteConverter {
-
-	private interface RouteConverterEventHandler extends LinkLeaveEventHandler, PersonArrivalEventHandler {};
-
-	@Override
-	public HashMap<Id, Long[]> convertEvents(HashMap<Id, Id[]> keyMsNetwork, String path2EventsFile, String path2MATSimNetwork, String path2VissimZoneShp) {
-		List<Trip> trips = events2Trips(path2EventsFile, path2MATSimNetwork, path2VissimZoneShp);
-		return trips2Routes(trips, keyMsNetwork);
-	}
+public class MsRouteConverter extends AbstractRouteConverter {
 
 	/**
 	 * Go trough events and look at all linkleaveevents in area and mode car (and all arrivalevents).
@@ -74,7 +64,8 @@ public class RouteConverter implements ConvEvents2Anm.RouteConverter {
 	 * @param path2VissimZoneShp
 	 * @return
 	 */
-	private List<Trip> events2Trips(String path2EventsFile, String path2MATSimNetwork, String path2VissimZoneShp) {
+	@Override
+	public List<Trip> routes2Trips(String path2EventsFile, String path2MATSimNetwork, String path2VissimZoneShp) {
 		final List<Trip> trips = new ArrayList<Trip>();
 		final Map<Id,Trip> currentTrips = new HashMap<Id,Trip>();
 		final GeographicEventAnalyzer geographicEventAnalyzer = new GeographicEventAnalyzer(path2MATSimNetwork, path2VissimZoneShp);
@@ -119,34 +110,9 @@ public class RouteConverter implements ConvEvents2Anm.RouteConverter {
 		return trips;
 	}
 
-	@Override
-	public HashMap<Id, Long[]> convertRoutes(HashMap<Id, Id[]> keyAmNetwork, String path2AnmroutesFile) {
-		List<Trip> trips = anmroutes2Trips(path2AnmroutesFile);
-		return trips2Routes(trips, keyAmNetwork);
-	}
+	private interface RouteConverterEventHandler extends LinkLeaveEventHandler, PersonArrivalEventHandler {};
 
-	private List<Trip> anmroutes2Trips(String path2AnmroutesFile) {
-		return null;
-	}
-
-	private HashMap<Id, Long[]> trips2Routes(List<Trip> trips, HashMap<Id, Id[]> keyMsNetwork) {
-		// Transform all trips into a set of trips (start times, end times, array of keys) with the keyNetwork.
-		return null;
-	}
-
-	private class Trip {
-		final double startTime;
-		double endTime;
-		final List<Id> links;
-
-		Trip(double startTime) {
-			this.startTime = startTime;
-			this.endTime = 0;
-			this.links = new ArrayList<Id>();
-		}
-	}
-
-	private class GeographicEventAnalyzer {
+	private final class GeographicEventAnalyzer {
 		private final CoordAnalyzer coordAnalyzer;
 		private final Network network;
 		private GeographicEventAnalyzer(String path2MATSimNetwork, String path2VissimZoneShp) {

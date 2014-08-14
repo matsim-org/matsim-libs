@@ -19,34 +19,19 @@
  * *********************************************************************** *
  */
 
-package playground.boescpa.converters.vissim;
+package playground.boescpa.converters.vissim.tools;
 
-import org.matsim.api.core.v01.Id;
-import playground.boescpa.converters.vissim.tools.AbstractRouteConverter;
-import playground.boescpa.converters.vissim.tools.MsRouteConverter;
-
-import java.util.HashMap;
+import java.util.List;
 
 /**
- * WHAT IS IT FOR?
- * WHAT DOES IT?
+ * Provides a visum-anmroutes specific implementation of RouteConverter.
  *
  * @author boescpa
  */
-public class MapRoutes {
+public class AmRouteConverter extends AbstractRouteConverter {
 
-	public static void main(String[] args) {
-		String path2MsKeyMap = args[0];
-		String path2AmKeyMap = args[1];
-		String path2EventsFile = args[2];
-		String path2MsNetwork = args[3];
-		String path2VissimZoneShp = args[4];
-
-		HashMap<Id, Id[]> msKeyMap = PrepareNetworks.readKeyMaps(path2MsKeyMap);
-		//HashMap<Id, Id[]> amKeyMap = PrepareNetworks.readKeyMaps(path2AmKeyMap);
-
-		ConvEvents2Anm.RouteConverter routeConverter = new MsRouteConverter();
-		HashMap<Id, Long[]> msRoutes = routeConverter.convert(msKeyMap, path2EventsFile, path2MsNetwork, path2VissimZoneShp);
+	@Override
+	protected List<Trip> routes2Trips(String path2AnmroutesFile, String notUsed, String notUsedToo) {
+		return null;
 	}
-
 }
