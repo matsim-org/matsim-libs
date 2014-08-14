@@ -27,7 +27,8 @@ public class TestHeader {
 
 	public static void main(String[] args) {
 		LOG.info("My first log message.");
-
+		
+		LOG.warn("Oops, something changed.");
 	}
 
 }
