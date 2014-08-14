@@ -23,7 +23,6 @@ package playground.boescpa.converters.vissim.tools;
 
 import com.vividsolutions.jts.geom.Geometry;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
@@ -31,7 +30,6 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsReaderXMLv1;
@@ -53,7 +51,7 @@ import java.util.*;
  *
  * @author boescpa
  */
-public class DefaultRouteConverter implements ConvEvents2Anm.RouteConverter {
+public class RouteConverter implements ConvEvents2Anm.RouteConverter {
 
 	private interface RouteConverterEventHandler extends LinkLeaveEventHandler, PersonArrivalEventHandler {};
 
@@ -79,9 +77,8 @@ public class DefaultRouteConverter implements ConvEvents2Anm.RouteConverter {
 	private List<Trip> events2Trips(String path2EventsFile, String path2MATSimNetwork, String path2VissimZoneShp) {
 		final List<Trip> trips = new ArrayList<Trip>();
 		final Map<Id,Trip> currentTrips = new HashMap<Id,Trip>();
-		final EventsManager events = EventsUtils.createEventsManager();
 		final GeographicEventAnalyzer geographicEventAnalyzer = new GeographicEventAnalyzer(path2MATSimNetwork, path2VissimZoneShp);
-
+		final EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new RouteConverterEventHandler() {
 			@Override
 			public void handleEvent(LinkLeaveEvent event) {
@@ -150,10 +147,8 @@ public class DefaultRouteConverter implements ConvEvents2Anm.RouteConverter {
 	}
 
 	private class GeographicEventAnalyzer {
-
 		private final CoordAnalyzer coordAnalyzer;
 		private final Network network;
-
 		private GeographicEventAnalyzer(String path2MATSimNetwork, String path2VissimZoneShp) {
 			// read network
 			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -167,7 +162,6 @@ public class DefaultRouteConverter implements ConvEvents2Anm.RouteConverter {
 			Geometry cuttingArea = util.mergeGeometries(features);
 			this.coordAnalyzer = new CoordAnalyzer(cuttingArea);
 		}
-
 		private boolean eventInArea(LinkLeaveEvent event) {
 			Link link = network.getLinks().get(event.getLinkId());
 			return coordAnalyzer.isLinkAffected(link);
