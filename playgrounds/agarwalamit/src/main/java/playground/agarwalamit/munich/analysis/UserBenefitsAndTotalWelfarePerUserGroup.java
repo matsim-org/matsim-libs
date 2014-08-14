@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -60,7 +62,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 	private  String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
 	private  String configFile = outputDir+"/output_config.xml";//"/config.xml";//
 
-	private Map<UserGroup, Population> userGrpToPopulation = new HashMap<UserGroup, Population>();
+	private SortedMap<UserGroup, Population> userGrpToPopulation = new TreeMap<UserGroup, Population>();
 	private Map<Id, Double> personId2UserWelfare_utils = new HashMap<Id,Double>();
 	private Map<Id, Double> personId2MonetarizedUserWelfare= new HashMap<Id,Double>();
 	private Map<Id, Double> personId2MonetaryPayments = new HashMap<Id,Double>();
@@ -79,12 +81,12 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		getPopulationPerUserGroup();
 		getAllUserBenefits((ScenarioImpl)scenario);
 		getMonetaryPayment((ScenarioImpl)scenario);
-		Map<UserGroup, Double> userGroupToUserWelfare_utils = getParametersPerUserGroup(personId2UserWelfare_utils);
-		Map<UserGroup, Double> userGroupToUserWelfare_money = getParametersPerUserGroup(personId2MonetarizedUserWelfare);
-		Map<UserGroup, Double> userGroupToTotalPayment = getParametersPerUserGroup(personId2MonetaryPayments);
+		SortedMap<UserGroup, Double> userGroupToUserWelfare_utils = getParametersPerUserGroup(personId2UserWelfare_utils);
+		SortedMap<UserGroup, Double> userGroupToUserWelfare_money = getParametersPerUserGroup(personId2MonetarizedUserWelfare);
+		SortedMap<UserGroup, Double> userGroupToTotalPayment = getParametersPerUserGroup(personId2MonetaryPayments);
 
-
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputDir+"/analysis/userGrpWelfareAndTollPayments.txt");
+		String outputFile = outputDir+"/analysis/userGrpWelfareAndTollPayments.txt";
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try {
 			writer.write("UserGroup \t userWelfareUtils \t userWelfareMoney \t tollPayments \n");
 			for(UserGroup ug : userGroupToTotalPayment.keySet()){
@@ -94,10 +96,11 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		} catch (IOException e) {
 			throw new RuntimeException("Data is not written into a File. Reason : "+e);
 		}
+		logger.info("Finished Writing data to file "+outputFile);		
 	}
 
-	private Map<UserGroup, Double> getParametersPerUserGroup(Map<Id, Double> inputMap){
-		Map<UserGroup, Double> outMap = new HashMap<UserGroup, Double>();
+	private SortedMap<UserGroup, Double> getParametersPerUserGroup(Map<Id, Double> inputMap){
+		SortedMap<UserGroup, Double> outMap = new TreeMap<UserGroup, Double>();
 
 		for(UserGroup ug : UserGroup.values()){
 			outMap.put(ug, 0.0);
@@ -123,7 +126,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		return scenario;
 	}
 
-	public void getAllUserBenefits(ScenarioImpl scenarioImpl){
+	private void getAllUserBenefits(ScenarioImpl scenarioImpl){
 		logger.info("User welfare will be calculated using welfare measure as "+wm.toString());
 		UserBenefitsAnalyzerAA userBenefitsAnalyzer = new UserBenefitsAnalyzerAA();
 		userBenefitsAnalyzer.init(scenarioImpl, wm);
@@ -134,7 +137,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		personId2MonetarizedUserWelfare = userBenefitsAnalyzer.getPersonId2MonetarizedUserWelfare();
 	}
 
-	public void getMonetaryPayment(ScenarioImpl scenarioImpl){
+	private void getMonetaryPayment(ScenarioImpl scenarioImpl){
 		MonetaryPaymentsAnalyzer paymentsAnalyzer = new MonetaryPaymentsAnalyzer();
 		paymentsAnalyzer.init(scenarioImpl);
 		paymentsAnalyzer.preProcessData();
@@ -154,7 +157,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		personId2MonetaryPayments = paymentsAnalyzer.getPersonId2amount();
 	}
 
-	private Map<UserGroup, Population> getPopulationPerUserGroup(){
+	private SortedMap<UserGroup, Population> getPopulationPerUserGroup(){
 		PersonFilter pf = new PersonFilter();
 		for(UserGroup ug : UserGroup.values()){
 			userGrpToPopulation.put(ug, pf.getPopulation(scenario.getPopulation(), ug));

@@ -68,8 +68,8 @@ public EmissionsPerPersonPerUserGroup() {
 	private  String populationFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
 	private  String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
 	private  String configFile = outputDir+"/output_config.xml";
-	private Map<UserGroup, SortedMap<String, Double>> userGroupToEmissions = new HashMap<UserGroup, SortedMap<String,Double>>();
-	private Map<UserGroup, Population> userGrpToPopulation = new HashMap<UserGroup, Population>();
+	private SortedMap<UserGroup, SortedMap<String, Double>> userGroupToEmissions = new TreeMap<UserGroup, SortedMap<String,Double>>();
+	private SortedMap<UserGroup, Population> userGrpToPopulation = new TreeMap<UserGroup, Population>();
 	private Scenario scenario;
 	private Map<Id, SortedMap<String, Double>> emissionsPerPerson = new HashMap<Id, SortedMap<String,Double>>();
 	
@@ -117,7 +117,7 @@ public EmissionsPerPersonPerUserGroup() {
 		} catch (Exception e){
 			throw new RuntimeException("Data is not written in the file. Reason - "+e);
 		}
-		logger.info("Finished Writing files to file "+outputFile);		
+		logger.info("Finished Writing data to file "+outputFile);		
 	}
 	
 	private void writeTotalEmissionsPerUserGroup(String outputFile) {
@@ -168,7 +168,7 @@ public EmissionsPerPersonPerUserGroup() {
 		return scenario;
 	}
 
-	private Map<UserGroup, Population> getPopulationPerUserGroup(){
+	private SortedMap<UserGroup, Population> getPopulationPerUserGroup(){
 		PersonFilter pf = new PersonFilter();
 		for(UserGroup ug : UserGroup.values()){
 			userGrpToPopulation.put(ug, pf.getPopulation(scenario.getPopulation(), ug));

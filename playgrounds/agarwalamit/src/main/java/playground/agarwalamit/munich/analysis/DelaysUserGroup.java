@@ -22,6 +22,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -50,12 +52,12 @@ public class DelaysUserGroup {
 	
 	
 	public DelaysUserGroup() {
-		userGroupToDelays  = new HashMap<UserGroup, Double>();
+		userGroupToDelays  = new TreeMap<UserGroup, Double>();
 		for (UserGroup ug:UserGroup.values()) {
 			this.userGroupToDelays.put(ug, 0.0);
 		}
 		scenario = loadScenario(populationFile, networkFile, configFile);
-		userGrpToPopulation = new HashMap<UserGroup, Population>();
+		userGrpToPopulation = new TreeMap<UserGroup, Population>();
 		lastIteration = scenario.getConfig().controler().getLastIteration();
 	}
 
@@ -65,8 +67,8 @@ public class DelaysUserGroup {
 	private  String populationFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
 	private  String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
 	private  String configFile = outputDir+"/output_config.xml";//"/config.xml";//
-	private Map<UserGroup, Double> userGroupToDelays;
-	private Map<UserGroup, Population> userGrpToPopulation;
+	private SortedMap<UserGroup, Double> userGroupToDelays;
+	private SortedMap<UserGroup, Population> userGrpToPopulation;
 	private Map<Double, Map<Id, Double>> time2linkIdDelays = new HashMap<Double, Map<Id,Double>>();
 	Scenario scenario;
 
@@ -101,7 +103,7 @@ public class DelaysUserGroup {
 		} catch (Exception e){
 			throw new RuntimeException("Data is not written in the file. Reason - "+e);
 		}
-		logger.info("Finished Writing files to file "+outputFile);
+		logger.info("Finished Writing data to file "+outputFile);
 	}
 	
 
@@ -116,7 +118,7 @@ public class DelaysUserGroup {
 		return scenario;
 	}
 
-	private Map<UserGroup, Population> getPopulationPerUserGroup(){
+	private SortedMap<UserGroup, Population> getPopulationPerUserGroup(){
 		PersonFilter pf = new PersonFilter();
 		for(UserGroup ug : UserGroup.values()){
 			userGrpToPopulation.put(ug, pf.getPopulation(scenario.getPopulation(), ug));
