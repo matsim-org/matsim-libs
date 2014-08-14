@@ -51,7 +51,7 @@ public class MovingPathwaysTripRouterFactory implements TripRouterFactory{
 				new CharyparNagelScoringParameters(
 					scenario.getConfig().planCalcScore() );
 		
-		
+	/*	
 		router.setRoutingModule(TransportMode.pt,
 				new TransitMultiModalAccessRoutingModule(
 						scenario,
@@ -63,7 +63,7 @@ public class MovingPathwaysTripRouterFactory implements TripRouterFactory{
 						
 						) );
 		
-		
+		*/
 		final MainModeIdentifier defaultModeIdentifier = router.getMainModeIdentifier();
 		router.setMainModeIdentifier(
 				new MainModeIdentifier() {

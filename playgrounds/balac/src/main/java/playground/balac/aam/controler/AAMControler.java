@@ -28,7 +28,7 @@ public class AAMControler extends Controler{
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-    	final Config config = ConfigUtils.loadConfig(args[0]);
+		final Config config = ConfigUtils.loadConfig(args[0]);
 
 		
 		final Scenario sc = ScenarioUtils.loadScenario(config);
@@ -37,11 +37,10 @@ public class AAMControler extends Controler{
 		final AAMControler controler = new AAMControler( sc );
 		
 		controler.setTripRouterFactory( new MovingPathwaysTripRouterFactory( sc ) );
-		
-		
-		 controler.init(config, sc.getNetwork(), sc);		
+				
+		controler.init(config, sc.getNetwork(), sc);		
 			
-			controler.run();
+		controler.run();
 	}
 
 }

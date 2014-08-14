@@ -71,7 +71,7 @@ public class AAMRoutingModule implements RoutingModule {
 		// TODO Create list of legs with moving pathways and walking
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
 
-		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-0.8/3600, +6.0/3600, 0.0);
+		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0/3600, +6.0/3600, 0.0);
 				
 		LeastCostPathCalculator routeAlgo = new Dijkstra(scenario.getNetwork(), freespeed, this.timeObject);
 		
@@ -171,6 +171,113 @@ public class AAMRoutingModule implements RoutingModule {
 		return trip;
 		
 	}
+	
+	public List<? extends PlanElement> calcRouteFromTLink(Id fromLinkId,
+			Id toLinkId, double departureTime, Person person) {
+		// TODO Create list of legs with moving pathways and walking
+		final List<PlanElement> trip = new ArrayList<PlanElement>();
+
+		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-0.8/3600, +6.0/3600, 0.0);
+				
+		LeastCostPathCalculator routeAlgo = new Dijkstra(scenario.getNetwork(), freespeed, this.timeObject);
+		
+		Path path = routeAlgo.calcLeastCostPath(scenario.getNetwork().getLinks().get(fromLinkId).getToNode(),
+				scenario.getNetwork().getLinks().get(toLinkId).getFromNode(), departureTime, person, null);
+		double travelTime = 0.0;
+		double distance = 0.0;
+		
+		boolean walk = false;
+		
+		boolean pathway = false;
+		
+		Id startLinkId = fromLinkId;
+		
+		Id endLinkId = null;
+	
+		path.links.add(0, scenario.getNetwork().getLinks().get(fromLinkId));
+		path.links.add(scenario.getNetwork().getLinks().get(toLinkId));
+		
+		for (Link l : path.links) {
+			
+			if (!pathwayLinks.contains(l.getId()) && pathway) {
+				
+				GenericRouteImpl route = new GenericRouteImpl(startLinkId, endLinkId);
+				
+				route.setTravelTime(travelTime);
+				route.setDistance(distance);
+				final Leg leg = new LegImpl( "movingpathways" );
+				leg.setRoute(route);
+				trip.add( leg );
+				
+				walk = true;
+				pathway = false;
+				distance = l.getLength();
+				startLinkId = l.getId();
+				endLinkId = l.getId();
+								
+			}
+			else if (!pathwayLinks.contains(l.getId()) && !pathway) {
+				
+				distance += l.getLength();				
+				endLinkId = l.getId();
+				walk = true;
+				
+				if (l.getId().toString().equals(toLinkId.toString())) {
+					GenericRouteImpl route = new GenericRouteImpl(startLinkId, endLinkId);
+					
+					route.setTravelTime(distance / Double.parseDouble(scenario.getConfig().getModule("planscalcroute").getParams().get("teleportedModeSpeed_walk")));
+					route.setDistance(distance);
+					final Leg leg = new LegImpl( "walk" );
+					leg.setRoute(route);
+					trip.add( leg );
+					
+				}
+				
+			}
+			else if (pathwayLinks.contains(l.getId()) && !walk) {
+				
+				distance += l.getLength();
+				travelTime += l.getLength()/linkSpeeds.get(l.getId());
+				endLinkId = l.getId();
+				pathway = true;
+				
+				if (l.getId().toString().equals(toLinkId.toString())) {
+					GenericRouteImpl route = new GenericRouteImpl(startLinkId, endLinkId);
+					
+					route.setTravelTime(travelTime);
+					route.setDistance(distance);
+					final Leg leg = new LegImpl( "movingpathways" );
+					leg.setRoute(route);
+					trip.add( leg );
+					
+				}
+				
+			}
+			else if (pathwayLinks.contains(l.getId()) && walk) {
+				
+				GenericRouteImpl route = new GenericRouteImpl(startLinkId, endLinkId);
+				
+				route.setTravelTime(distance / Double.parseDouble(scenario.getConfig().getModule("planscalcroute").getParams().get("teleportedModeSpeed_walk")));
+				route.setDistance(distance);
+				final Leg leg = new LegImpl( "walk" );
+				leg.setRoute(route);
+				trip.add( leg );
+				
+				walk = false;
+				pathway = true;
+				distance = l.getLength();
+				travelTime = l.getLength()/linkSpeeds.get(l.getId());
+				startLinkId = l.getId();
+				endLinkId = l.getId();
+								
+			}
+			
+		}	
+		
+		return trip;
+		
+	}
+	
 
 	@Override
 	public StageActivityTypes getStageActivityTypes() {
