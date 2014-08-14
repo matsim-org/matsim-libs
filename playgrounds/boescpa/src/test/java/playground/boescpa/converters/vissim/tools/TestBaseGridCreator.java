@@ -74,7 +74,7 @@ public class TestBaseGridCreator {
 
 	@Test
 	public void testBoundingBoxOfZones() {
-		Network network = baseGridCreator2.createMutualBaseGrid(utils.getClassInputDirectory() + "TestDefaultNetworkMatcher_DummySHP.shp");
+		Network network = baseGridCreator2.createMutualBaseGrid(utils.getClassInputDirectory() + "TestNetworkMatcher_DummySHP.shp");
 		Assert.assertTrue(network.getNodes().size() == 17094);
 		Node minNode = network.getNodes().get(new IdImpl(1));
 		Node maxNode = network.getNodes().get(new IdImpl(network.getNodes().size()));
