@@ -32,7 +32,7 @@ import java.util.HashMap;
  *
  * @author boescpa
  */
-public class DefaultTripMatcher implements ConvEvents2Anm.TripMatcher {
+public class TripMatcher implements ConvEvents2Anm.TripMatcher {
 	@Override
 	public HashMap<Id, Integer> matchTrips(HashMap<Id, Long[]> msTrips, HashMap<Id, Long[]> amTrips) { return null; }
 }

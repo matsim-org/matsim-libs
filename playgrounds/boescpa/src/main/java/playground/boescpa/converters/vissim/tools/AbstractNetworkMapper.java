@@ -90,7 +90,7 @@ public abstract class AbstractNetworkMapper implements ConvEvents2Anm.NetworkMap
 	}
 
 	private Id findZone(Network mutualBaseGrid, Coord start, double[] deltas, int i) {
-		int gridcellsize = DefaultBaseGridCreator.getGridcellsize();
+		int gridcellsize = BaseGridCreator.getGridcellsize();
 		Id presentSmallest = null;
 		double presentSmallestDist = Double.MAX_VALUE;
 		for (Node zone : mutualBaseGrid.getNodes().values()) {
@@ -108,7 +108,7 @@ public abstract class AbstractNetworkMapper implements ConvEvents2Anm.NetworkMap
 	}
 
 	private double[] calculateDeltas(Coord start, Coord end) {
-		int gridcellsize = DefaultBaseGridCreator.getGridcellsize();
+		int gridcellsize = BaseGridCreator.getGridcellsize();
 		double factor = 1;
 		double[] delta = new double[3];
 		do {

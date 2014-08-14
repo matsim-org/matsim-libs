@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import playground.boescpa.converters.vissim.tools.AmNetworkMapper;
-import playground.boescpa.converters.vissim.tools.DefaultBaseGridCreator;
+import playground.boescpa.converters.vissim.tools.BaseGridCreator;
 import playground.boescpa.converters.vissim.tools.MsNetworkMapper;
 
 import java.io.BufferedReader;
@@ -49,7 +49,7 @@ public class PrepareNetworks {
 		String path2WriteKeyMapMatsim = args[3];
 		String path2WriteKeyMapVissim = args[4];
 
-		ConvEvents2Anm.BaseGridCreator baseGridCreator = new DefaultBaseGridCreator();
+		ConvEvents2Anm.BaseGridCreator baseGridCreator = new BaseGridCreator();
 		Network mutualBaseGrid = baseGridCreator.createMutualBaseGrid(path2VissimZoneShp);
 
 		ConvEvents2Anm.NetworkMapper msNetworkMapper = new MsNetworkMapper();

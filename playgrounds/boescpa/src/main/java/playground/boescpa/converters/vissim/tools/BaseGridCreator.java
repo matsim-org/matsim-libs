@@ -40,7 +40,7 @@ import java.util.Set;
  *
  * @author boescpa
  */
-public class DefaultBaseGridCreator implements ConvEvents2Anm.BaseGridCreator {
+public class BaseGridCreator implements ConvEvents2Anm.BaseGridCreator {
 	/**
 	 * Side length [m] of one square of the grid.
 	 * Default value: 100
