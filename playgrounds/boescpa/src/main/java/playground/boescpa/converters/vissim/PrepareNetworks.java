@@ -25,8 +25,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
+import playground.boescpa.converters.vissim.tools.AmNetworkMapper;
 import playground.boescpa.converters.vissim.tools.DefaultBaseGridCreator;
-import playground.boescpa.converters.vissim.tools.DefaultNetworkMatcher;
+import playground.boescpa.converters.vissim.tools.MsNetworkMapper;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -51,9 +52,10 @@ public class PrepareNetworks {
 		ConvEvents2Anm.BaseGridCreator baseGridCreator = new DefaultBaseGridCreator();
 		Network mutualBaseGrid = baseGridCreator.createMutualBaseGrid(path2VissimZoneShp);
 
-		ConvEvents2Anm.NetworkMatcher networkMatcher = new DefaultNetworkMatcher();
-		HashMap<Id, Id[]> keyMsNetwork = networkMatcher.mapMsNetwork(path2MATSimNetwork, mutualBaseGrid, path2VissimZoneShp);
-		HashMap<Id, Id[]> keyAmNetwork = networkMatcher.mapAmNetwork(path2VissimNetworkAnm, mutualBaseGrid);
+		ConvEvents2Anm.NetworkMapper msNetworkMapper = new MsNetworkMapper();
+		ConvEvents2Anm.NetworkMapper amNetworkMapper = new AmNetworkMapper();
+		HashMap<Id, Id[]> keyMsNetwork = msNetworkMapper.mapNetwork(path2MATSimNetwork, mutualBaseGrid, path2VissimZoneShp);
+		HashMap<Id, Id[]> keyAmNetwork = amNetworkMapper.mapNetwork(path2VissimNetworkAnm, mutualBaseGrid, "");
 
 		writeKeyMaps(keyMsNetwork, path2WriteKeyMapMatsim);
 		writeKeyMaps(keyAmNetwork, path2WriteKeyMapVissim);
@@ -86,7 +88,7 @@ public class PrepareNetworks {
 			String line = in.readLine();
 			while (line != null) {
 				String[] keys = line.split(", ");
-				Id linkId = new IdImpl(Long.parseLong(keys[0]));
+				Id linkId = new IdImpl(keys[0]);
 				Id[] zoneId = new Id[keys.length-1];
 				for (int i = 1; i < keys.length; i++) {
 					zoneId[i-1] = new IdImpl(Long.parseLong(keys[i]));

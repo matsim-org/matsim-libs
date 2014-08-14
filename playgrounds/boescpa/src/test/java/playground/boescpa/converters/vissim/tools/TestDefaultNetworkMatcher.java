@@ -47,7 +47,7 @@ public class TestDefaultNetworkMatcher {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private ConvEvents2Anm.BaseGridCreator baseGridCreator;
-	private ConvEvents2Anm.NetworkMatcher defaultNetworkMatcher;
+	private ConvEvents2Anm.NetworkMapper defaultNetworkMapper;
 
 	@Before
 	public void prepare() {
@@ -61,9 +61,9 @@ public class TestDefaultNetworkMatcher {
 			}
 		};
 
-		this.defaultNetworkMatcher = new DefaultNetworkMatcher() {
+		this.defaultNetworkMapper = new AbstractNetworkMapper() {
 			@Override
-			protected  final Network readAndCutMsNetwork(String path2MATSimNetwork, String path2VissimZoneShp) {
+			protected Network providePreparedNetwork(String path2Network, String path2VissimZoneShp) {
 				Network network = NetworkUtils.createNetwork();
 				NetworkFactoryImpl networkFactory = new NetworkFactoryImpl(network);
 				network.addNode(networkFactory.createNode(new IdImpl(1), new CoordImpl(10, 30)));
@@ -74,13 +74,14 @@ public class TestDefaultNetworkMatcher {
 						network.getNodes().get(new IdImpl(2)), network.getNodes().get(new IdImpl(1))));
 				return network;
 			}
+
 		};
 	}
 
 	@Test
 	public void testMapMsNetwork() {
 		Network mutualBase = baseGridCreator.createMutualBaseGrid("");
-		HashMap<Id, Id[]> msKeys = defaultNetworkMatcher.mapMsNetwork("", mutualBase, "");
+		HashMap<Id, Id[]> msKeys = defaultNetworkMapper.mapNetwork("", mutualBase, "");
 		Id[] keysLink101 = msKeys.get(new IdImpl(101l));
 		Id[] keysLink102 = msKeys.get(new IdImpl(102l));
 		Assert.assertEquals(keysLink101.length, 3);

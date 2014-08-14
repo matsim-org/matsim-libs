@@ -34,7 +34,7 @@ import org.matsim.testcases.MatsimTestUtils;
  *
  * @author boescpa
  */
-public class TestSimpleAnmParser extends DefaultNetworkMatcher{
+public class TestSimpleAnmParser extends AmNetworkMapper {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -44,7 +44,7 @@ public class TestSimpleAnmParser extends DefaultNetworkMatcher{
 	@Before
 	public void prepare() {
 		String anmFile = utils.getClassInputDirectory() + "anmDummy.anm";
-		this.network = parseAndTransformAmNetwork(anmFile);
+		this.network = providePreparedNetwork(anmFile,"");
 	}
 
 	@Test
