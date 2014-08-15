@@ -17,25 +17,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ndekoker.test;
+package playground.ndekoker.ndkplay;
 
-import org.apache.log4j.Logger;
+import javax.swing.*;
 
-import playground.southafrica.utilities.Header;
-
-
-public class TestHeader {
-	private final static Logger LOG = Logger.getLogger(TestHeader.class);
+class TestSAPG {
 
 	public static void main(String[] args) {
-		Header.printHeader(TestHeader.class.toString(), args);
 		
-		LOG.info("First line...");
-		LOG.info("My first log message.");
+		JFrame myWindow;
+		myWindow = new JFrame();
+		myWindow.setSize(200,100);
+		myWindow.setTitle("Just Getting Java Going");
+		myWindow.setVisible(true);
 		
-		LOG.warn("Oops, something changed.");
-		
-		Header.printFooter();
 	}
-
 }
