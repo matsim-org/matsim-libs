@@ -32,8 +32,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * WHAT IS IT FOR?
- * WHAT DOES IT?
+ * Provides a visum-anm specific implementation of NetworkMapper.
  *
  * @author boescpa
  */
@@ -43,17 +42,17 @@ public class AmNetworkMapper extends AbstractNetworkMapper {
 	 * Parses the provided Visum-Anm-File (xml-format) and transform the network into a matsim network.
 	 *
 	 * @param path2VissimNetworkAnm Path to a Visum-Anm-File
-	 * @param path2VissimZoneShp	Not used here
+	 * @param notUsed	Not used here, might be provided as emtpy string
 	 * @return
 	 */
 	@Override
-	protected Network providePreparedNetwork(String path2VissimNetworkAnm, String path2VissimZoneShp) {
+	protected Network providePreparedNetwork(String path2VissimNetworkAnm, String notUsed) {
 		final Network network = NetworkUtils.createNetwork();
 		final NetworkFactory networkFactory = new NetworkFactoryImpl(network);
 		final Set<SimpleAnmParser.AnmLink> links = new HashSet<SimpleAnmParser.AnmLink>();
 
 		// parse anm-file:
-		MatsimXmlParser xmlParser = new SimpleAnmParser(new NodeAndLinkParser() {
+		MatsimXmlParser xmlParser = new SimpleAnmParser(new NodeAndLinkHandler() {
 			@Override
 			public void handleLink(SimpleAnmParser.AnmLink anmLink) {
 				links.add(anmLink);
@@ -77,10 +76,10 @@ public class AmNetworkMapper extends AbstractNetworkMapper {
 				countErrLinks++;
 			}
 		}
-		System.out.print("\n" + countErrLinks + " links found with one or both nodes lacking.\nThey were dropped.\n");
+		System.out.print(countErrLinks + " links found (and dropped) with one or both nodes lacking.\n");
 
 		return network;
 	}
 
-	private interface NodeAndLinkParser extends SimpleAnmParser.AnmNodeHandler, SimpleAnmParser.AnmLinkHandler {}
+	private interface NodeAndLinkHandler extends SimpleAnmParser.AnmNodeHandler, SimpleAnmParser.AnmLinkHandler {}
 }

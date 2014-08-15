@@ -23,6 +23,7 @@ package playground.boescpa.converters.vissim;
 
 import org.matsim.api.core.v01.Id;
 import playground.boescpa.converters.vissim.tools.AbstractRouteConverter;
+import playground.boescpa.converters.vissim.tools.AmRouteConverter;
 import playground.boescpa.converters.vissim.tools.MsRouteConverter;
 
 import java.util.HashMap;
@@ -41,12 +42,16 @@ public class MapRoutes {
 		String path2EventsFile = args[2];
 		String path2MsNetwork = args[3];
 		String path2VissimZoneShp = args[4];
+		String path2AnmroutesFile = args[5];
+		String path2VissimNetworkAnm = args[6];
 
-		HashMap<Id, Id[]> msKeyMap = PrepareNetworks.readKeyMaps(path2MsKeyMap);
-		//HashMap<Id, Id[]> amKeyMap = PrepareNetworks.readKeyMaps(path2AmKeyMap);
+		//HashMap<Id, Id[]> msKeyMap = PrepareNetworks.readKeyMaps(path2MsKeyMap);
+		HashMap<Id, Id[]> amKeyMap = PrepareNetworks.readKeyMaps(path2AmKeyMap);
 
-		ConvEvents2Anm.RouteConverter routeConverter = new MsRouteConverter();
-		HashMap<Id, Long[]> msRoutes = routeConverter.convert(msKeyMap, path2EventsFile, path2MsNetwork, path2VissimZoneShp);
+		//ConvEvents2Anm.RouteConverter msRouteConverter = new MsRouteConverter();
+		//HashMap<Id, Long[]> msRoutes = msRouteConverter.convert(msKeyMap, path2EventsFile, path2MsNetwork, path2VissimZoneShp);
+		ConvEvents2Anm.RouteConverter amRouteConverter = new AmRouteConverter();
+		HashMap<Id, Long[]> amRoutes = amRouteConverter.convert(amKeyMap, path2AnmroutesFile, path2VissimNetworkAnm, path2VissimZoneShp);
 	}
 
 }

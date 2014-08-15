@@ -88,6 +88,10 @@ public class SimpleAnmParser extends MatsimXmlParser {
 			this.linkHandler.handleLink(this.currentLink);
 			this.currentLink = null;
 			this.linkCounter.incCounter();
+		} else if ("NODES".equals(name)) {
+			nodeCounter.printCounter();
+		} else if ("LINKS".equals(name)) {
+			linkCounter.printCounter();
 		}
 	}
 
