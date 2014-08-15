@@ -42,6 +42,8 @@ import java.util.HashMap;
  */
 public class PrepareNetworks {
 
+	private static final String delimiter = ", ";
+
 	public static void main(String[] args) {
 		String path2VissimZoneShp = args[0];
 		String path2MATSimNetwork = args[1];
@@ -69,7 +71,7 @@ public class PrepareNetworks {
 			for (Id linkId : keyNetwork.keySet()) {
 				String line = linkId.toString();
 				for (Id zoneId : keyNetwork.get(linkId)) {
-					line = line + ", " + zoneId.toString();
+					line = line + delimiter + zoneId.toString();
 				}
 				out.write(line); out.newLine();
 			}
@@ -87,7 +89,7 @@ public class PrepareNetworks {
 			in.readLine(); // header
 			String line = in.readLine();
 			while (line != null) {
-				String[] keys = line.split(", ");
+				String[] keys = line.split(delimiter);
 				Id linkId = new IdImpl(keys[0]);
 				Id[] zoneId = new Id[keys.length-1];
 				for (int i = 1; i < keys.length; i++) {
