@@ -18,15 +18,9 @@
  * *********************************************************************** */
 package playground.agarwalamit.analysis.legModeHandler;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -38,7 +32,6 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
  */
 public class LegModeTravelTimeHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
-	private final Logger logger = Logger.getLogger(LegModeTravelTimeHandler.class);
 	private Map<String, Map<Id, Double>> mode2PersonId2TravelTime;
 
 	public LegModeTravelTimeHandler() {
@@ -95,59 +88,5 @@ public class LegModeTravelTimeHandler implements PersonDepartureEventHandler, Pe
 
 	public Map<String, Map<Id, Double>> getLegMode2PersonId2TravelTime(){
 		return this.mode2PersonId2TravelTime;
-	}
-
-	public SortedMap<String,Double> getTravelMode2MeanTime(){
-		return calculateTravelMode2MeanTravelTime();
-	}
-	
-	public SortedMap<String,Double> getTravelMode2MedianTime(){
-		return calculateTravelMode2MedianTravelTime();
-	}
-
-	private SortedMap<String, Double> calculateTravelMode2MeanTravelTime(){	
-		logger.info("Calculating mean(average) travel time for all travel modes.");
-		SortedMap<String, Double> mode2Mean = new TreeMap<String, Double>();
-		List<Double> allTravelTimes = new ArrayList<Double>();
-		for(String mode : mode2PersonId2TravelTime.keySet()){
-			List<Double> travelTimes = new ArrayList<Double>();
-			travelTimes.addAll(mode2PersonId2TravelTime.get(mode).values());
-			allTravelTimes.addAll(mode2PersonId2TravelTime.get(mode).values());
-			mode2Mean.put(mode, calculateMean(travelTimes));
-		}
-		mode2Mean.put("allModes", calculateMean(allTravelTimes));
-		return mode2Mean;
-	}
-	
-	private SortedMap<String, Double> calculateTravelMode2MedianTravelTime(){
-		logger.info("Calculating median travel time for all travel modes.");
-		SortedMap<String, Double> mode2Median = new TreeMap<String, Double>();
-		List<Double> allTravelTimes = new ArrayList<Double>();
-		for(String mode : mode2PersonId2TravelTime.keySet()){
-			List<Double> travelTimes = new ArrayList<Double>();
-			travelTimes.addAll(mode2PersonId2TravelTime.get(mode).values());
-			allTravelTimes.addAll(mode2PersonId2TravelTime.get(mode).values());
-			mode2Median.put(mode, calculateMedian(travelTimes));
-		}
-		mode2Median.put("allModes", calculateMedian(allTravelTimes));
-		return mode2Median;
-	}
-	
-	private double calculateMedian(List<Double> inputList){
-		Collections.sort(inputList);
-		int middle = inputList.size()/2;
-	    if (inputList.size()%2 == 1) {
-	        return inputList.get(middle);
-	    } else {
-	        return (inputList.get(middle-1) + inputList.get(middle)) / 2.0;
-	    }
-	}
-	
-	private double calculateMean(List<Double> inputList){
-		double sum = 0;
-		for(double d:inputList){
-			sum +=d;
-		}
-		return sum/inputList.size();
 	}
 }
