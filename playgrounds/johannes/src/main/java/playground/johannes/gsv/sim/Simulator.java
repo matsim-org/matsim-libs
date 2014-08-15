@@ -29,9 +29,11 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
@@ -50,6 +52,9 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
+import org.matsim.core.replanning.selectors.GenericPlanSelector;
+import org.matsim.core.replanning.selectors.PlanSelectorFactory;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -96,7 +101,24 @@ public class Simulator {
 		int numThreads = controler.getConfig().global().getNumberOfThreads();
 		controler.addPlanStrategyFactory("activityLocations", new ActivityLocationStrategyFactory(random, numThreads, "home"));
 		
+		controler.addPlanSelectorFactory("mySelector", new SelectorFactory());
 		controler.run();
+		
+	}
+	
+	private static class SelectorFactory implements PlanSelectorFactory<Plan> {
+
+		private ExpBetaPlanSelector<Plan> instance;
+		/* (non-Javadoc)
+		 * @see org.matsim.core.replanning.selectors.PlanSelectorFactory#createPlanSelector(org.matsim.api.core.v01.Scenario)
+		 */
+		@Override
+		public GenericPlanSelector<Plan> createPlanSelector(Scenario scenario) {
+			if(instance == null)
+				instance = new ExpBetaPlanSelector<Plan>(1.0);
+			
+			return instance;
+		}
 		
 	}
 	

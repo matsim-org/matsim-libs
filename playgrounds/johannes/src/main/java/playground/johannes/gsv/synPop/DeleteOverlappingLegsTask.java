@@ -17,38 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.synPop;
 
-import java.util.Map;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
 
 /**
  * @author johannes
  *
  */
-public class LegEndTimeHandler implements LegAttributeHandler {
+public class DeleteOverlappingLegsTask implements ProxyPersonTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
+	 * @see playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes.gsv.synPop.ProxyPerson)
 	 */
 	@Override
-	public void handle(ProxyObject leg, Map<String, String> attributes) {
-		String hour = attributes.get(MIDKeys.LEG_END_TIME_HOUR);
-		String min = attributes.get(MIDKeys.LEG_END_TIME_MIN);
-		String nextDay = attributes.get(MIDKeys.END_NEXT_DAY);
-		
-		if(hour.equalsIgnoreCase("301") || min.equalsIgnoreCase("301"))
-			return;
-		
-		int time = Integer.parseInt(min) * 60 + Integer.parseInt(hour) * 60 * 60;
-
-		if(nextDay != null && nextDay.equalsIgnoreCase("Folgetag")) {
-			time += 86400;
+	public void apply(ProxyPerson person) {
+		/*
+		 * Check for overlapping legs.
+		 */
+		double prevEnd = 0;
+		for(ProxyObject leg : person.getPlan().getLegs()) {
+			String startStr = leg.getAttribute(CommonKeys.LEG_START_TIME);
+			if(startStr != null) {
+				double start = Double.parseDouble(startStr);
+				if(start < prevEnd) {
+					person.setAttribute(CommonKeys.DELETE, "true");
+					return;
+				}
+			}
+			String endStr = leg.getAttribute(CommonKeys.LEG_END_TIME);
+			if(endStr != null) {
+				prevEnd = Double.parseDouble(endStr);
+			} else {
+				if(startStr == null) {
+					person.setAttribute(CommonKeys.DELETE, "true"); // redundant with DeleteMissingTimesTask
+					return;
+				}
+				prevEnd = Double.parseDouble(startStr) + 1;
+			}	
 		}
-		
-		leg.setAttribute(CommonKeys.LEG_END_TIME, String.valueOf(time));
 
 	}
 

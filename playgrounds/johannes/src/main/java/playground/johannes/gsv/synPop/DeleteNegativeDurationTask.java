@@ -17,38 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
-
-import java.util.Map;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+package playground.johannes.gsv.synPop;
 
 /**
  * @author johannes
  *
  */
-public class LegEndTimeHandler implements LegAttributeHandler {
+public class DeleteNegativeDurationTask implements ProxyPersonTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
+	 * @see playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes.gsv.synPop.ProxyPerson)
 	 */
 	@Override
-	public void handle(ProxyObject leg, Map<String, String> attributes) {
-		String hour = attributes.get(MIDKeys.LEG_END_TIME_HOUR);
-		String min = attributes.get(MIDKeys.LEG_END_TIME_MIN);
-		String nextDay = attributes.get(MIDKeys.END_NEXT_DAY);
-		
-		if(hour.equalsIgnoreCase("301") || min.equalsIgnoreCase("301"))
-			return;
-		
-		int time = Integer.parseInt(min) * 60 + Integer.parseInt(hour) * 60 * 60;
-
-		if(nextDay != null && nextDay.equalsIgnoreCase("Folgetag")) {
-			time += 86400;
+	public void apply(ProxyPerson person) {
+		for(ProxyObject leg : person.getPlan().getLegs()) {
+			String start = leg.getAttribute(CommonKeys.LEG_START_TIME);
+			String end = leg.getAttribute(CommonKeys.LEG_END_TIME);
+			
+			if(start != null && end != null) {
+				int s = Integer.parseInt(start);
+				int e = Integer.parseInt(end);
+				
+				if(s > e) {
+					person.setAttribute(CommonKeys.DELETE, "true");
+					return;
+				}
+			}
 		}
-		
-		leg.setAttribute(CommonKeys.LEG_END_TIME, String.valueOf(time));
 
 	}
 

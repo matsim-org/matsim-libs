@@ -20,13 +20,17 @@
 package playground.johannes.gsv.synPop.mid.run;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
 
+import playground.johannes.gsv.synPop.DeleteMissingTimesTask;
+import playground.johannes.gsv.synPop.DeleteNegativeDurationTask;
+import playground.johannes.gsv.synPop.DeleteOverlappingLegsTask;
 import playground.johannes.gsv.synPop.FixActivityTimesTask;
 import playground.johannes.gsv.synPop.InsertActivitiesTask;
 import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.ProxyPersonTaskComposite;
 import playground.johannes.gsv.synPop.ProxyPlanTaskComposite;
 import playground.johannes.gsv.synPop.RoundTripTask;
 import playground.johannes.gsv.synPop.SetActivityTimeTask;
@@ -43,6 +47,7 @@ import playground.johannes.gsv.synPop.mid.LegRoundTrip;
 import playground.johannes.gsv.synPop.mid.LegSortedIdHandler;
 import playground.johannes.gsv.synPop.mid.LegStartTimeHandler;
 import playground.johannes.gsv.synPop.mid.PersonDayHandler;
+import playground.johannes.gsv.synPop.mid.PersonMonthHandler;
 import playground.johannes.gsv.synPop.mid.PersonMunicipalityClassHandler;
 import playground.johannes.gsv.synPop.mid.PersonStateHandler;
 import playground.johannes.gsv.synPop.mid.PersonWeightHandler;
@@ -64,12 +69,15 @@ public class PopulationGenerator {
 		String personFile = "/home/johannes/gsv/mid2008/MiD2008_PUF_Personen.txt";
 		String legFile = "/home/johannes/gsv/mid2008/MiD2008_PUF_Wege.txt";
 		String outFile = "/home/johannes/gsv/mid2008/pop.xml";
-		
+		/*
+		 * setup text parser
+		 */
 		TXTReader reader = new TXTReader();
 		reader.addPersonAttributeHandler(new PersonMunicipalityClassHandler());
 		reader.addPersonAttributeHandler(new PersonWeightHandler());
 		reader.addPersonAttributeHandler(new PersonDayHandler());
 		reader.addPersonAttributeHandler(new PersonStateHandler());
+		reader.addPersonAttributeHandler(new PersonMonthHandler());
 		
 		reader.addLegAttributeHandler(new LegSortedIdHandler());
 		reader.addLegAttributeHandler(new LegMainPurposeHandler());
@@ -79,14 +87,34 @@ public class PopulationGenerator {
 		reader.addLegAttributeHandler(new LegEndTimeHandler());
 		reader.addLegAttributeHandler(new LegDistanceHandler());
 		reader.addLegAttributeHandler(new LegModeHandler());
-		
-		
+		/*
+		 * read files
+		 */
 		logger.info("Reading persons...");
-		Map<String, ProxyPerson> persons = reader.read(personFile, legFile);
+		Collection<ProxyPerson> persons = reader.read(personFile, legFile).values();
 		logger.info(String.format("Read %s persons.", persons.size()));
-		
+		/*
+		 * sort legs
+		 */
 		ProxyPlanTaskComposite composite = new ProxyPlanTaskComposite();
 		composite.addComponent(new SortLegsTimeTask());
+		logger.info("Sorting legs...");
+		ProxyTaskRunner.run(composite, persons);
+		/*
+		 * filter legs		
+		 */
+		ProxyPersonTaskComposite pComposite = new ProxyPersonTaskComposite();
+		pComposite.addComponent(new DeleteNegativeDurationTask());
+		pComposite.addComponent(new DeleteMissingTimesTask());
+		pComposite.addComponent(new DeleteOverlappingLegsTask());
+		
+		logger.info("Filtering legs...");
+		persons = ProxyTaskRunner.runAndDelete(pComposite, persons);
+		logger.info(String.format("After filter: %s persons.", persons.size()));
+		/*
+		 * generate activities
+		 */
+		composite = new ProxyPlanTaskComposite();
 		composite.addComponent(new InsertActivitiesTask());
 		composite.addComponent(new SetActivityTypeTask());
 		composite.addComponent(new SetFirstActivityTypeTask());
@@ -95,14 +123,12 @@ public class PopulationGenerator {
 		composite.addComponent(new FixActivityTimesTask());
 		
 		logger.info("Applying person tasks...");
-		for(ProxyPerson person : persons.values()) {
-			composite.apply(person.getPlan());
-		}
+		ProxyTaskRunner.run(composite, persons);
 		logger.info("Done.");
 		
 		logger.info("Writing persons...");
 		XMLWriter writer = new XMLWriter();
-		writer.write(outFile, persons.values());
+		writer.write(outFile, persons);
 		logger.info("Done.");
 	}
 

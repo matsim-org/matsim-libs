@@ -17,39 +17,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.synPop.sim2;
 
-import java.util.Map;
+import java.util.Random;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.sna.util.Composite;
 
 /**
  * @author johannes
  *
  */
-public class LegEndTimeHandler implements LegAttributeHandler {
+public class MutatorComposite extends Composite<Mutator> implements Mutator {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
-	 */
+	private final Random random;
+	
+	private Mutator active;
+	
+	public MutatorComposite(Random random) {
+		this.random = random;
+	}
+	
 	@Override
-	public void handle(ProxyObject leg, Map<String, String> attributes) {
-		String hour = attributes.get(MIDKeys.LEG_END_TIME_HOUR);
-		String min = attributes.get(MIDKeys.LEG_END_TIME_MIN);
-		String nextDay = attributes.get(MIDKeys.END_NEXT_DAY);
-		
-		if(hour.equalsIgnoreCase("301") || min.equalsIgnoreCase("301"))
-			return;
-		
-		int time = Integer.parseInt(min) * 60 + Integer.parseInt(hour) * 60 * 60;
+	public boolean modify(ProxyPerson person) {
+		active = components.get(random.nextInt(components.size()));
+		return active.modify(person);
+	}
 
-		if(nextDay != null && nextDay.equalsIgnoreCase("Folgetag")) {
-			time += 86400;
-		}
-		
-		leg.setAttribute(CommonKeys.LEG_END_TIME, String.valueOf(time));
-
+	@Override
+	public void revert(ProxyPerson person) {
+		active.revert(person);
+		active = null;
 	}
 
 }

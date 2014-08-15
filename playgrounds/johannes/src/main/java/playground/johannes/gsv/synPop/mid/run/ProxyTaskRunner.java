@@ -17,39 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.synPop.mid.run;
 
-import java.util.Map;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.ProxyPersonTask;
+import playground.johannes.gsv.synPop.ProxyPlanTask;
 
 /**
  * @author johannes
  *
  */
-public class LegEndTimeHandler implements LegAttributeHandler {
+public class ProxyTaskRunner {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
-	 */
-	@Override
-	public void handle(ProxyObject leg, Map<String, String> attributes) {
-		String hour = attributes.get(MIDKeys.LEG_END_TIME_HOUR);
-		String min = attributes.get(MIDKeys.LEG_END_TIME_MIN);
-		String nextDay = attributes.get(MIDKeys.END_NEXT_DAY);
+	public static void run(ProxyPersonTask task, Collection<ProxyPerson> persons) {
+		for(ProxyPerson person : persons)
+			task.apply(person);
+	}
+	
+	public static void run(ProxyPlanTask task, Collection<ProxyPerson> persons) {
+		for(ProxyPerson person : persons)
+			task.apply(person.getPlan());
+	}
+	
+	public static Set<ProxyPerson> runAndDelete(ProxyPersonTask task, Collection<ProxyPerson> persons) {
+		Set<ProxyPerson> newPersons = new HashSet<ProxyPerson>(persons.size());
 		
-		if(hour.equalsIgnoreCase("301") || min.equalsIgnoreCase("301"))
-			return;
+		run(task, persons);
 		
-		int time = Integer.parseInt(min) * 60 + Integer.parseInt(hour) * 60 * 60;
-
-		if(nextDay != null && nextDay.equalsIgnoreCase("Folgetag")) {
-			time += 86400;
+		for(ProxyPerson person : persons) {
+			if(!"true".equalsIgnoreCase(person.getAttribute(CommonKeys.DELETE))) {
+				newPersons.add(person);
+			}
 		}
 		
-		leg.setAttribute(CommonKeys.LEG_END_TIME, String.valueOf(time));
-
+		return newPersons;
 	}
-
 }

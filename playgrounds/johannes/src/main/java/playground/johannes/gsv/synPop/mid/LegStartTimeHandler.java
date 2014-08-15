@@ -37,12 +37,17 @@ public class LegStartTimeHandler implements LegAttributeHandler {
 	public void handle(ProxyObject leg, Map<String, String> attributes) {
 		String hour = attributes.get(MIDKeys.LEG_START_TIME_HOUR);
 		String min = attributes.get(MIDKeys.LEG_START_TIME_MIN);
+		String nextDay = attributes.get(MIDKeys.START_NEXT_DAY);
 		
 		if(hour.equalsIgnoreCase("301") || min.equalsIgnoreCase("301"))
 			return;
 		
 		int time = Integer.parseInt(min) * 60 + Integer.parseInt(hour) * 60 * 60;
 
+		if(nextDay != null && nextDay.equalsIgnoreCase("Folgetag")) {
+			time += 86400;
+		}
+		
 		leg.setAttribute(CommonKeys.LEG_START_TIME, String.valueOf(time));
 	}
 

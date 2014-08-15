@@ -47,6 +47,15 @@ public class SetActivityTimeTask implements ProxyPlanTask {
 			if(i > 0) {
 				ProxyObject prev = plan.getLegs().get(i-1);
 				startTime = prev.getAttribute(CommonKeys.LEG_END_TIME);
+				
+				if(startTime != null) {
+					/*
+					 * set end time to 86400 or later if specified
+					 */
+					int start = Integer.parseInt(startTime);
+					int end = Math.max(start + 1, 86400);
+					endTime = String.valueOf(end);
+				}
 			}
 			
 			if(i < plan.getActivities().size() - 1) {

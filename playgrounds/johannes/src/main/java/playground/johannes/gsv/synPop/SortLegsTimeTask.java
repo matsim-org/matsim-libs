@@ -28,7 +28,7 @@ public class SortLegsTimeTask implements ProxyPlanTask {
 				map.put(time, leg);
 				
 			} else {
-				logger.warn("Missing leg end and start time. Cannot sort legs.");
+				logger.debug("Missing leg end and start time. Cannot sort legs.");
 				return;
 			}
 		}
@@ -41,7 +41,7 @@ public class SortLegsTimeTask implements ProxyPlanTask {
 			if(startStr != null) {
 				double start = Double.parseDouble(startStr);
 				if(start < prevEnd) {
-					logger.warn("Overlapping legs. Cannot sort legs.");
+					logger.debug("Overlapping legs. Cannot sort legs.");
 					return;
 				}
 			}

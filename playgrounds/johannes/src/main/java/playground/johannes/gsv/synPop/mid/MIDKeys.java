@@ -58,4 +58,34 @@ public interface MIDKeys {
 	public static final String PERSON_STATE = "state";
 	
 	public static final String LEG_INDEX = "index";
+	
+	public static final String START_NEXT_DAY = "st_dat";
+	
+	public static final String END_NEXT_DAY = "en_dat";
+	
+	public static final String PERSON_MONTH = "month";
+	
+	public static final String JANUARY = "jan";
+	
+	public static final String FEBRUARY = "feb";
+	
+	public static final String MARCH = "mar";
+	
+	public static final String APRIL = "apr";
+	
+	public static final String MAY = "may";
+	
+	public static final String JUNE = "jun";
+	
+	public static final String JULY = "jul";
+	
+	public static final String AUGUST = "aug";
+	
+	public static final String SEPTEMBER = "sep";
+	
+	public static final String OCTOBER = "oct";
+	
+	public static final String NOVEMBER = "nov";
+	
+	public static final String DECEMBER = "dec";
 }

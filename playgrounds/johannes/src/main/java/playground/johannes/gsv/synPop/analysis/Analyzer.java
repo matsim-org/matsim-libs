@@ -35,6 +35,7 @@ import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.gsv.synPop.io.XMLParser;
+import playground.johannes.gsv.synPop.mid.analysis.SeasonsTask;
 
 /**
  * @author johannes
@@ -47,8 +48,10 @@ public class Analyzer {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String output = "/home/johannes/gsv/mid2008/analysis/";
-		String personFile = "/home/johannes/gsv/mid2008/pop.xml";
+//		String output = "/home/johannes/gsv/mid2008/analysis/";
+		String output = "/home/johannes/sge/prj/synpop/run/67/output/analysis/";
+//		String personFile = "/home/johannes/gsv/mid2008/pop.xml";
+		String personFile = "/home/johannes/sge/prj/synpop/run/67/output/10000000000.pop.xml.gz";
 		
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
@@ -71,12 +74,13 @@ public class Analyzer {
 	
 		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
 //		task.addTask(new ActivityChainTask());
-//		task.addTask(new LegTargetDistanceTask());
-//		task.addTask(new ActivityDistanceTask(facilities));
-//		task.addTask(new SpeedFactorAnalyzer());
+		task.addTask(new LegTargetDistanceTask());
+		task.addTask(new ActivityDistanceTask(facilities));
+		task.addTask(new SpeedFactorAnalyzer());
+		task.addTask(new SeasonsTask());
 		
 		task.setOutputDirectory(output);
-		ProxyAnalyzer.analyze(parser.getPersons(), task, output);
+		ProxyAnalyzer.analyze(parser.getPersons(), task, output + "proxy/");
 		
 		Set<Trajectory> trajectories = TrajectoryProxyBuilder.buildTrajectories(parser.getPersons());
 		TrajectoryAnalyzerTaskComposite task2 = new TrajectoryAnalyzerTaskComposite();
