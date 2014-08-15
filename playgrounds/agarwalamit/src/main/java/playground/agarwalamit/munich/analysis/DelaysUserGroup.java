@@ -63,7 +63,7 @@ public class DelaysUserGroup {
 
 	private int lastIteration;
 	private Logger logger = Logger.getLogger(DelaysUserGroup.class);
-	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/ci/";/*"./output/run2/";*/
+	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/ei/";/*"./output/run2/";*/
 	private  String populationFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
 	private  String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
 	private  String configFile = outputDir+"/output_config.xml";//"/config.xml";//
