@@ -82,19 +82,21 @@ public class CreateVehiclesForPatna {
 		vehicles.addVehicleType(walk);
 		vehicles.addVehicleType(pt);
 		
-		for(Person p : scenario.getPopulation().getPersons().values()){
-			PlanElement element = p.getSelectedPlan().getPlanElements().get(1);
-			String travelMode =  ((Leg) element).getMode();
-
-			if(!modesType.containsKey(travelMode)){
-				throw new RuntimeException("Vehicle Type is not defined. Define"+ travelMode+ "vehicle Type.");	
-			}
-
-			VehicleType vType = modesType.get(travelMode);
-			Vehicle veh =  VehicleUtils.getFactory().createVehicle(p.getId(), vType);
-			vehicles.addVehicle(veh);
-		}
-
+		// I think, following lines are not necessary.
+//		for(Person p : scenario.getPopulation().getPersons().values()){
+//			for(PlanElement pe:p.getSelectedPlan().getPlanElements()) {
+//				if(pe instanceof Leg ){
+//					String travelMode =  ((Leg) pe).getMode();
+//					if(!modesType.containsKey(travelMode)){
+//						throw new RuntimeException("Vehicle Type is not defined. Define"+ travelMode+ "vehicle Type.");	
+//					}
+//
+//					VehicleType vType = modesType.get(travelMode);
+//					Vehicle veh =  VehicleUtils.getFactory().createVehicle(p.getId(), vType);
+//					vehicles.addVehicle(veh);
+//				}
+//			}
+//		}
 		new VehicleWriterV1(vehicles).writeFile("./patnaoutput/vehiclesPatna.xml");
 	}
 }

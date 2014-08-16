@@ -47,7 +47,6 @@ public class VehiclesConfigGroup extends Module {
 	}
 
 	public static final String GROUP_NAME = "vehicles";
-
 	private static final String INPUT_FILE= "inputVehiclesFile";
 	private static final String TRAVEL_MODES = "travelModes";
 
