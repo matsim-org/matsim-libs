@@ -60,7 +60,7 @@ public class TestZoneBoundary {
 		String swissMunicipalityZones = "/Users/thomas/Documents/SVN_Studies/tnicolai/ersa/data/zones/G1G08.shp";
 		String swissCountryZone = "/Users/thomas/Documents/SVN_Studies/tnicolai/ersa/data/zones/G1L08.shp";
 
-		try {
+//		try {
 //			Geometry swissExample1 = FeatureSHP.readFeatures(psrcSHPFile).iterator().next().getDefaultGeometry();
 //			Geometry swissExample2 = FeatureSHP.readFeatures(psrcSHPFile).iterator().next().getDefaultGeometry();
 //
@@ -81,22 +81,22 @@ public class TestZoneBoundary {
 			Coordinate[] cordinate = boundary.getCoordinates();
 
 
-			startZones= ZoneLayerSHP.read(psrcSHPFile);
-			throw new RuntimeException("does not work any more, see code") ;
-			startZones.overwriteCRS(CRSUtils.getCRS(21781));
-			startZones = createGridLayer(resolution, boundary);
+//			startZones= ZoneLayerSHP.read(psrcSHPFile);
+			throw new RuntimeException("This code refers to playground code that does not exist anymore") ;
+//			startZones.overwriteCRS(CRSUtils.getCRS(21781));
+//			startZones = createGridLayer(resolution, boundary);
+//
+//
+//			int i = 0;
+//			for(Zone zone: startZones.getZones()){
+//				System.out.println(zone.getAttribute());
+//				i++;
+//			}
+//			System.out.println("number of zones = " + i);
 
-
-			int i = 0;
-			for(Zone zone: startZones.getZones()){
-				System.out.println(zone.getAttribute());
-				i++;
-			}
-			System.out.println("number of zones = " + i);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 
 	}
 
