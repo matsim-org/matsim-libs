@@ -24,11 +24,9 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.agarwalamit.analysis.ModalShareGenerator;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
@@ -46,7 +44,7 @@ public class ModalSplitUserGroup {
 	private void run(){
 		ModalShareGenerator msg = new ModalShareGenerator();
 		PersonFilter pf = new PersonFilter();
-		Scenario sc = loadScenario(networkFile, populationFile);
+		Scenario sc = LoadMyScenarios.loadScenario(networkFile, populationFile);
 		
 		SortedMap<String, double[]> modalSplit = msg.getModalShareFromPlans(sc.getPopulation());
 		
@@ -94,19 +92,10 @@ public class ModalSplitUserGroup {
 		} catch (Exception e) {
 			throw new RuntimeException("Data can not be written to file. Reason - "+e);
 		}
-		
-		
 	}
 	
 	public static void main(String[] args) {
 		ModalSplitUserGroup msUG = new ModalSplitUserGroup();
 		msUG.run();
-	}
-	private Scenario loadScenario(String netFile, String plansFile) {
-		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(netFile);
-		config.plans().setInputFile(plansFile);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
 	}
 }

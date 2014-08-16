@@ -29,11 +29,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.agarwalamit.analysis.congestion.CongestionPersonAnalyzer;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
@@ -56,7 +54,7 @@ public class DelaysUserGroup {
 		for (UserGroup ug:UserGroup.values()) {
 			this.userGroupToDelays.put(ug, 0.0);
 		}
-		scenario = loadScenario(populationFile, networkFile, configFile);
+		scenario = LoadMyScenarios.loadScenario(populationFile, networkFile, configFile);
 		userGrpToPopulation = new TreeMap<UserGroup, Population>();
 		lastIteration = scenario.getConfig().controler().getLastIteration();
 	}
@@ -104,18 +102,6 @@ public class DelaysUserGroup {
 			throw new RuntimeException("Data is not written in the file. Reason - "+e);
 		}
 		logger.info("Finished Writing data to file "+outputFile);
-	}
-	
-
-	private Scenario loadScenario(String populationFile, String networkFile, String configFile) {
-		Config config = new Config();
-		config.addCoreModules();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
-		configReader.readFile(configFile);
-		config.plans().setInputFile(populationFile);
-		config.network().setInputFile(networkFile);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
 	}
 
 	private SortedMap<UserGroup, Population> getPopulationPerUserGroup(){

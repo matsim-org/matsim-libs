@@ -31,15 +31,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.agarwalamit.siouxFalls.userBenefits.UserBenefitsAnalyzerAA;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
@@ -76,7 +74,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 	}
 
 	private void run(){
-		scenario = loadScenario(populationFile, networkFile,configFile);
+		scenario = LoadMyScenarios.loadScenario(populationFile, networkFile,configFile);
 		lastIteration = scenario.getConfig().controler().getLastIteration();
 		getPopulationPerUserGroup();
 		getAllUserBenefits((ScenarioImpl)scenario);
@@ -113,17 +111,6 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 			outMap.put(ug, newValue);
 		}
 		return outMap;
-	}
-
-	private Scenario loadScenario(String populationFile, String networkFile, String configFile) {
-		Config config = new Config();
-		config.addCoreModules();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
-		configReader.readFile(configFile);
-		config.plans().setInputFile(populationFile);
-		config.network().setInputFile(networkFile);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
 	}
 
 	private void getAllUserBenefits(ScenarioImpl scenarioImpl){

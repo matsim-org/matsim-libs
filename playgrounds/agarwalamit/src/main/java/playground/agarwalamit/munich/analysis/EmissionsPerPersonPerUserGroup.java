@@ -31,12 +31,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.agarwalamit.analysis.emission.EmissionCostFactors;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
@@ -51,7 +49,7 @@ public class EmissionsPerPersonPerUserGroup {
 private final Logger logger = Logger.getLogger(EmissionsPerPersonPerUserGroup.class);
 	
 public EmissionsPerPersonPerUserGroup() {
-		scenario = loadScenario(networkFile, populationFile, configFile);
+		scenario = LoadMyScenarios.loadScenario(networkFile, populationFile, configFile);
 		
 		for(UserGroup ug:UserGroup.values()){
 			SortedMap<String, Double> pollutantToValue = new TreeMap<String, Double>();
@@ -155,17 +153,6 @@ public EmissionsPerPersonPerUserGroup() {
 			}
 			userGroupToEmissions.put(ug, emissionsNewValue);
 		}
-	}
-
-	private static Scenario loadScenario(String netFile, String plansFile, String configFile) {
-		Config config = new Config();
-		config.addCoreModules();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
-		configReader.readFile(configFile);
-		config.network().setInputFile(netFile);
-		config.plans().setInputFile(plansFile);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
 	}
 
 	private SortedMap<UserGroup, Population> getPopulationPerUserGroup(){
