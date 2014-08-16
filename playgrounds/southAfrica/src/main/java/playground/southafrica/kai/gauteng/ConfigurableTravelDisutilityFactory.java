@@ -201,6 +201,8 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 						}
 					}
 					Cost cost = localScheme.getLinkCostInfo(link.getId(), time, person.getId(), vehicleId ) ;
+					// yyyy I (kn) think we should re-run the abmtrans paper with getLinkCostInfo( link.getId(), time, null, null ) .  kai, jul'14
+					
 					if ( cost != null ) {
 						/* This needed to be introduced after the GautengRoadPricingScheme started to return null instead of
 						 * Cost objects with amount=0.  kai, apr'12

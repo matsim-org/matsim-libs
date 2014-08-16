@@ -232,6 +232,8 @@ class TaxiLauncher
                 TaxiRequestCreator.MODE, new TaxiRequestCreator(), optimizer, context, qSim);
 
         if (advanceRequestSubmission) {
+        	// yy to my ears, this is not completely clear.  I don't think that it enables advance request submission
+        	// for arbitrary times, but rather requests all trips before the simulation starts.  Doesn't it?  kai, jul'14 
             qSim.addQueueSimulationListeners(new BeforeSimulationTripPrebooker(passengerEngine));
         }
 

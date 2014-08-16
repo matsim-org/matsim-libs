@@ -188,7 +188,7 @@ class AssignmentEmulatingQLane extends QLaneInternalI {
 //		return (this.flowcap_accumulate < 1.0) // still accumulating, thus active 
 //		|| (!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) ;
 		return (!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) ;
-		// yyyy ????
+		// yyyy ????  Could always return "true"; would be slow but correct.  kai, jul'14
 	}
 
 	@Override
@@ -273,12 +273,16 @@ class AssignmentEmulatingQLane extends QLaneInternalI {
 		this.vehEnterTimeMap.put( veh.getId(), now ) ;
 		
 		double linkTravelTime = this.length / this.network.simEngine.getLinkSpeedCalculator().getMaximumVelocity(veh, this.qLink.link, now);
+		// yyyyyy needs to be replaced by density-dependent travel time. kai, jul'14
+		System.exit(-1) ;
+		
 		double earliestExitTime = now + linkTravelTime;
 
 		earliestExitTime +=  veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime());
 		// (yy this is what makes it pass the tests but I don't see why this is correct. kai, jun'13)
 		// (I now think that this is some fractional leftover from an earlier lane. kai, sep'13)
 		// (I also think it is never triggered for regular lanes since there the numbers are integerized (see below). kai, sep'13)
+		// yyyy this may have changed in the main code; check before continuing here. kai, jul'14
 
 		if ( this.endsAtMetersFromLinkEnd == 0.0 ) {
 //			/* It's a QLane that is directly connected to a QNode,
