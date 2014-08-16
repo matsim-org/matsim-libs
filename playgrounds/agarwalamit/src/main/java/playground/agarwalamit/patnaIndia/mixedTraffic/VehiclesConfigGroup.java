@@ -20,13 +20,20 @@ package playground.agarwalamit.patnaIndia.mixedTraffic;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.collections.CollectionUtils;
+import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 
 
 /**
@@ -34,7 +41,7 @@ import org.matsim.core.utils.collections.CollectionUtils;
  */
 public class VehiclesConfigGroup extends Module {
 
-	public VehiclesConfigGroup(String name) {
+	public VehiclesConfigGroup() {
 		super(GROUP_NAME);
 	}
 
@@ -43,6 +50,7 @@ public class VehiclesConfigGroup extends Module {
 	private static final String INPUT_FILE= "inputVehiclesFile";
 	private static final String TRAVEL_MODES = "travelModes";
 
+	private HashMap<String, VehicleType> modes2VehicleTypes = new LinkedHashMap<String, VehicleType>();
 	private String inputFile = null;
 	private Collection<String> travelModes = Arrays.asList(TransportMode.car);;
 
@@ -103,11 +111,27 @@ public class VehiclesConfigGroup extends Module {
 	}
 
 	public Collection<String>  getMainModes(){
-		return this.travelModes;
+		return this.modes2VehicleTypes.keySet();
 	}
 
 	public void setMainModes(final Collection<String> modes){
 		this.travelModes = modes;
 	}
 
+	public HashMap<String, VehicleType> getMode2VehicleType(){
+		if(this.inputFile!=null){
+			Vehicles vehicles = VehicleUtils.createVehiclesContainer();
+			VehicleReaderV1 reader = new VehicleReaderV1(vehicles);
+			reader.readFile(this.inputFile);
+			vehicles.getVehicleTypes();
+			for(Id id:vehicles.getVehicleTypes().keySet()){
+				modes2VehicleTypes.put(id.toString(), vehicles.getVehicleTypes().get(id));
+			}
+		} else {
+			for(String mode:this.travelModes) {
+				modes2VehicleTypes.put(mode, VehicleUtils.getDefaultVehicleType());
+			}
+		}
+		return this.modes2VehicleTypes; 
+	}
 }
