@@ -155,8 +155,8 @@ class WagonSimAgent implements MobsimDriverAgent, MobsimPassengerAgent, PTPassen
 	}
 
 	@Override
-	public void abort(double now) {
-		this.delegate.abort(now);
+	public void setStateToAbort(double now) {
+		this.delegate.setStateToAbort(now);
 	}
 
 	@Override

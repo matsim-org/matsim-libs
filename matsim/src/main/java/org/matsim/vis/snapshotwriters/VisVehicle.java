@@ -19,6 +19,5 @@ public interface VisVehicle extends Identifiable {
 	public Vehicle getVehicle();
 
 	MobsimDriverAgent getDriver() ;
-	// yy presumably, this should return DriverAgent
 
 }

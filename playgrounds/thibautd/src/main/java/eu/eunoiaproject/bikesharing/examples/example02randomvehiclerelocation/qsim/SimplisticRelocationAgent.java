@@ -141,7 +141,7 @@ public class SimplisticRelocationAgent implements MobsimDriverAgent /*MobsimAgen
 	}
 
 	@Override
-	public void abort(double now) {
+	public void setStateToAbort(double now) {
 		log.warn( "ABORTING bike sharing relocator "+getId() );
 		this.state = State.ABORT;
 	}

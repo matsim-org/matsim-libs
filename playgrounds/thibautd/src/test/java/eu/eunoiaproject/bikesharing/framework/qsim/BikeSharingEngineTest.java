@@ -289,7 +289,7 @@ public class BikeSharingEngineTest {
 		}
 
 		@Override
-		public void abort(double now) {
+		public void setStateToAbort(double now) {
 		}
 
 		@Override

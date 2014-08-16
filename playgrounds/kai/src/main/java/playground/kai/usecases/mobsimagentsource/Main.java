@@ -129,7 +129,7 @@ public class Main {
 		}
 
 		@Override
-		public void abort(double now) {
+		public void setStateToAbort(double now) {
 			// TODO Auto-generated method stub
 			throw new UnsupportedOperationException() ;
 		}

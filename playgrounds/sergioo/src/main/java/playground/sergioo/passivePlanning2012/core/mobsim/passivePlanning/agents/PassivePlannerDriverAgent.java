@@ -75,7 +75,7 @@ public class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePers
 		planner.setPlanElementIndex(planner.getPlanElementIndex()+1);
 		if(planner.getPlanElementIndex()>=basePerson.getSelectedPlan().getPlanElements().size()) {
 			log.error("Agent "+getId()+" has not more elements after the activity "+prevAct.getType()+" at "+now+" seconds.");
-			abort(now);
+			setStateToAbort(now);
 			return;
 		}
 		if(getCurrentPlanElement() instanceof EmptyTime) {
@@ -93,7 +93,7 @@ public class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePers
 		planner.setPlanElementIndex(planner.getPlanElementIndex()+1);
 		if(planner.getPlanElementIndex()>=basePerson.getSelectedPlan().getPlanElements().size()) {
 			log.error("Agent "+getId()+" has not more elements after the leg "+prevLeg.getMode()+" at "+now+" seconds.");
-			abort(now);
+			setStateToAbort(now);
 			return;
 		}
 		advancePlan(now);
@@ -117,7 +117,7 @@ public class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePers
 		Route route = leg.getRoute();
 		if (route == null) {
 			log.error("The agent " + getId() + " has no route in its leg.  Setting agent state to ABORT (but continuing the mobsim).");
-			abort(now);
+			setStateToAbort(now);
 		}
 		else
 			this.currentLinkIdIndex = 0;
@@ -147,7 +147,7 @@ public class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePers
 		return basePerson.getSelectedPlan().getPlanElements().get(planner.getPlanElementIndex()+1);
 	}
 	@Override
-	public void abort(double now) {
+	public void setStateToAbort(double now) {
 		state = State.ABORT;
 	}
 	@Override

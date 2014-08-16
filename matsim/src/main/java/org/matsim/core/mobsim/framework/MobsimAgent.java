@@ -84,7 +84,7 @@ public interface MobsimAgent extends NetworkAgent, Identifiable {
 	 * With respect to "recovery": Possible states (may'14) are LEG and ACTIVITY.  I cannot say what the consistency requirements here are
 	 * (e.g. if the agent can only start an activity on the link from where the abort is called).
 	 */
-	public void abort(final double now) ;
+	public void setStateToAbort(final double now) ;
 
 	/**
 	 * This returns the expected travel time of a leg that was just started.  There is no crystal-clear design requirement for this;

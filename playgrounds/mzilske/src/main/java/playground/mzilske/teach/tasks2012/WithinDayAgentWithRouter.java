@@ -42,8 +42,8 @@ public class WithinDayAgentWithRouter {
 			delegate.endLegAndComputeNextState(now);
 		}
 
-		public final void abort(double now) {
-			delegate.abort(now);
+		public final void setStateToAbort(double now) {
+			delegate.setStateToAbort(now);
 		}
 
 		public boolean equals(Object obj) {

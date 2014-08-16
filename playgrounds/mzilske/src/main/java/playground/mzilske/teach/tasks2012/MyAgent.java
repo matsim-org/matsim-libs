@@ -195,8 +195,8 @@ public class MyAgent implements MobsimDriverAgent {
 	}
 
 	@Override
-	public void abort(double now) {
-		delegate.abort(now);
+	public void setStateToAbort(double now) {
+		delegate.setStateToAbort(now);
 	}
 	
 	private void initializeLeg(Leg leg) {			

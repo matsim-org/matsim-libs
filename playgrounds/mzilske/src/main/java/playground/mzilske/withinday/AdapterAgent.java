@@ -296,7 +296,7 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, MobsimBeforeSim
 	}
 	
 	@Override
-	public void abort(double now) {
+	public void setStateToAbort(double now) {
 		this.state = MobsimAgent.State.ABORT ;
 		// yy this is not necessarily the most meaningful implementation.  It is, however, consistent with what happened before ...
 		// which was that the Mobsim ejected the agent from the simulation without asking.  kai, feb'12

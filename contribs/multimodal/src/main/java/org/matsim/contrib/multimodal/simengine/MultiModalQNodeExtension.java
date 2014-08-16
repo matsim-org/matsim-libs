@@ -144,7 +144,7 @@ public class MultiModalQNodeExtension {
 					+ " currentLink=" + currentLink.getId().toString()
 					+ ". The agent is removed from the simulation.");
 			
-			mobsimAgent.abort(now);
+			mobsimAgent.setStateToAbort(now);
 			this.simEngine.internalInterface.arrangeNextAgentState(mobsimAgent);
 		}
 		return true;

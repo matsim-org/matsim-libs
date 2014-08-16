@@ -67,9 +67,9 @@ public class DynAgentWithPlan
 
 
     @Override
-    public void abort(double now)
+    public void setStateToAbort(double now)
     {
-        dynAgent.abort(now);
+        dynAgent.setStateToAbort(now);
     }
 
 

@@ -221,8 +221,8 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 	}
 
 	@Override
-	public void abort(final double now) {
-		delegate.abort(now);
+	public void setStateToAbort(final double now) {
+		delegate.setStateToAbort(now);
 	}
 
 	@Override

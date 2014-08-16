@@ -116,7 +116,7 @@ public class DynAgent
 
 
     @Override
-    public void abort(double now)
+    public void setStateToAbort(double now)
     {
         this.state = MobsimAgent.State.ABORT;
     }

@@ -115,7 +115,7 @@ class MyAgent implements MobsimDriverAgent {
 	}
 
 	@Override
-	public void abort(double now) {
+	public void setStateToAbort(double now) {
 		this.state = State.ABORT ;
 		log.info( "calling abort; setting state to: " + this.state ) ;
 	}

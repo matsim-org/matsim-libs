@@ -53,7 +53,7 @@ public interface MobsimVehicle extends VisVehicle{
 	public boolean removePassenger(final PassengerAgent passenger);
 
 	/**
-	 * @return an immutable Collection of all passengers in this vehicle
+	 * @return an immutable Collection of all passengers in this vehicle.  Should <i> not </i> include the driver
 	 */
 	public Collection<? extends PassengerAgent> getPassengers();
 

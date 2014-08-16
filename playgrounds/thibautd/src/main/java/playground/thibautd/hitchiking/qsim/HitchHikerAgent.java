@@ -217,8 +217,8 @@ public class HitchHikerAgent implements MobsimDriverPassengerAgent , HasPerson {
 	}
 
 	@Override
-	public void abort(double now) {
-		delegate.abort(now);
+	public void setStateToAbort(double now) {
+		delegate.setStateToAbort(now);
 	}
 
 	@Override

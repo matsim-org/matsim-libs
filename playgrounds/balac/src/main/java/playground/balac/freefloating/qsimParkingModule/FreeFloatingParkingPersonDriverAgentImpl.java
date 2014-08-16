@@ -156,7 +156,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 	}
 
 	@Override
-	public final void abort(final double now) {
+	public final void setStateToAbort(final double now) {
 		this.state = MobsimAgent.State.ABORT ;
 	}
 

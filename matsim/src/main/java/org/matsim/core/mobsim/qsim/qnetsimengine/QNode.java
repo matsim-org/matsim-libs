@@ -32,7 +32,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimComparator;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.PassengerAgent;
 
 /**
  * Represents a node in the QSimulation.
@@ -273,13 +276,29 @@ public class QNode implements NetsimNode {
 
 	}
 
+	private static int wrnCnt = 0 ;
 	private void moveVehicleFromInlinkToAbort(final QVehicle veh, final QInternalI fromLane, final double now) {
 		fromLane.popFirstVehicle();
-		veh.getDriver().abort(now) ;
+		
+		// first treat the passengers:
+		for ( PassengerAgent pp : veh.getPassengers() ) {
+			if ( pp instanceof MobsimAgent ) {
+				((MobsimAgent)pp).setStateToAbort(now);
+				network.simEngine.internalInterface.arrangeNextAgentState((MobsimAgent)pp) ;
+			} else if ( wrnCnt < 1 ) {
+				wrnCnt++ ; 
+				log.warn("encountering PassengerAgent that cannot be cast into a MobsimAgent; cannot say if this is a problem" ) ;
+				log.warn(Gbl.ONLYONCE) ;
+			}
+		}
+
+		// now treat the driver:
+		veh.getDriver().setStateToAbort(now) ;
 		network.simEngine.internalInterface.arrangeNextAgentState(veh.getDriver()) ;
+	
 	}
 
-	private void moveVehicleFromInlinkToOutlink(final QVehicle veh, final QInternalI fromLane, QLinkInternalI nextQueueLink) {
+	private static void moveVehicleFromInlinkToOutlink(final QVehicle veh, final QInternalI fromLane, QLinkInternalI nextQueueLink) {
 		fromLane.popFirstVehicle();
 		veh.getDriver().notifyMoveOverNode(nextQueueLink.getLink().getId());
 		nextQueueLink.addFromUpstream(veh);

@@ -257,7 +257,7 @@ public class QNode implements NetsimNode {
 
 	private void moveVehicleFromInlinkToAbort(final QVehicle veh, final PTQLink fromLane, final double now) {
 		fromLane.popFirstVehicle();
-		veh.getDriver().abort(now) ;
+		veh.getDriver().setStateToAbort(now) ;
 		network.simEngine.internalInterface.arrangeNextAgentState(veh.getDriver()) ;
 	}
 

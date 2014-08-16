@@ -88,7 +88,7 @@ class MyMobsimAgent implements MobsimDriverAgent {
 	}
 
 	@Override
-	public void abort(double now) {
+	public void setStateToAbort(double now) {
 		try {
 			this.janusAgent.waitUntilTermination();
 		} catch (InterruptedException e) {

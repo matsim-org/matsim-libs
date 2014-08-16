@@ -82,6 +82,7 @@ public class TestZoneBoundary {
 
 
 			startZones= ZoneLayerSHP.read(psrcSHPFile);
+			throw new RuntimeException("does not work any more, see code") ;
 			startZones.overwriteCRS(CRSUtils.getCRS(21781));
 			startZones = createGridLayer(resolution, boundary);
 

@@ -76,7 +76,7 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 	}
 	
 	@Override
-	public void abort(final double now){
+	public void setStateToAbort(final double now){
 	}
 
 	@Override
