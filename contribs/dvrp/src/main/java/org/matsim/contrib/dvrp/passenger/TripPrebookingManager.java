@@ -67,6 +67,9 @@ public class TripPrebookingManager
 
     public void scheduleTripPrebooking(double submissionTime, MobsimPassengerAgent passenger,
             Leg leg)
+    // yy I don't think that this is called from anywhere right now.  This is consistent with the statement that
+    // call-head is currently not investigated; the only thing that is investigated is call-before-day-starts
+    // (as benchmark).  kai, jul'14
     {
         PrebookingEntry prebooking = new PrebookingEntry(submissionTime, passenger, leg);
         prebookingQueue.add(prebooking);
@@ -88,6 +91,11 @@ public class TripPrebookingManager
     }
 
 
+    /**
+     * Goes through the prebookingQueue and submits all prebooking requests which are due "now"
+     * 
+     * @param now
+     */
     private void prebookTrips(double now)
     {
         while (prebookingQueue.peek().submissionTime <= now) {

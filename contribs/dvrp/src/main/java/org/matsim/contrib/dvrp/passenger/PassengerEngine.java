@@ -89,6 +89,15 @@ public class PassengerEngine
     {}
 
 
+    /**
+     * This is to register an advance booking.  The method is called when, in reality, the request is made.
+     * 
+     * @param now -- time when trip is booked
+     * @param passenger
+     * @param leg -- contains information about the departure time. yyyy Michal, Joschka, note that in MATSim leg departure times may
+     * be meaningless; the only thing that truly matters is the activity end time.  Is your code defensive against that? kai, jul'14
+     * @return
+     */
     public boolean prebookTrip(double now, MobsimPassengerAgent passenger, Leg leg)
     {
         if (!leg.getMode().equals(mode)) {
