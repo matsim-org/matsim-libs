@@ -36,7 +36,7 @@ public class WriteConfig {
 		config.controler().setOutputDirectory("./patnaOutput/");
 
 		//===
-		VehiclesConfigGroup vehiclesCnfGrp = new VehiclesConfigGroup("vehicles");
+		VehiclesConfigGroup vehiclesCnfGrp = new VehiclesConfigGroup();
 		vehiclesCnfGrp.setInputFile("./patnaoutput/vehiclesPatna.xml");
 		vehiclesCnfGrp.setMainModes(mainModes);
 		config.addModule(vehiclesCnfGrp);

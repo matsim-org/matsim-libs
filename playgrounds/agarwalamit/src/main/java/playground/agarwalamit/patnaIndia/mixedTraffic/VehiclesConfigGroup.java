@@ -43,6 +43,7 @@ public class VehiclesConfigGroup extends Module {
 
 	public VehiclesConfigGroup() {
 		super(GROUP_NAME);
+		this.modes2VehicleTypes.put(TransportMode.car, VehicleUtils.getDefaultVehicleType());
 	}
 
 	public static final String GROUP_NAME = "vehicles";
