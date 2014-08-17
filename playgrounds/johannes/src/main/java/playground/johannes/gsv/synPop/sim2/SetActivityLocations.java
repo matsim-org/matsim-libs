@@ -95,14 +95,13 @@ public class SetActivityLocations {
 		
 		
 		ActivityLocationMutator mutator = new ActivityLocationMutator(facilities, random, "home");
-//		CompositeHamiltonian H = new CompositeHamiltonian();
+		ActivityLocationMutatorFactory factory = new ActivityLocationMutatorFactory(facilities, "home", random);
 		
-		ActivityLocationHamiltonian actLoc = new ActivityLocationHamiltonian(facilities);
-//		HFacilityCapacity cap = new HFacilityCapacity(null, facilities);
-//		H.addComponent(actLoc, 100000);
-//		H.addComponent(cap);
+		HamiltonianComposite h = new HamiltonianComposite();
+		h.addComponent(new ActivityLocationHamiltonian(facilities));
+		h.addComponent(new HFacilityCapacity(null, facilities));
 		
-		Sampler sampler = new Sampler(random);
+		Sampler sampler = new Sampler(persons, h, factory, random);
 		
 		String outputDir = config.getParam(MODULE_NAME, "outputDir");
 //		PopulationWriter popWriter = new PopulationWriter(outputDir, sampler);
@@ -111,7 +110,7 @@ public class SetActivityLocations {
 		
 //		sampler.addMutator(mutator);
 //		sampler.addListener(popWriter);
-		sampler.setHamiltonian(actLoc);
+//		sampler.setHamiltonian(actLoc);
 		
 		
 		/*
@@ -138,7 +137,7 @@ public class SetActivityLocations {
 		
 		logger.info("Running sampler...");
 		
-		sampler.run(persons, (long) Double.parseDouble(config.getParam(MODULE_NAME, "iterations")));
+//		sampler.run(persons, (long) Double.parseDouble(config.getParam(MODULE_NAME, "iterations")));
 		logger.info("Done.");
 		
 //		popDen.writeZoneData("/home/johannes/gsv/mid2008/popDen.shp");

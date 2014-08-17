@@ -21,18 +21,8 @@ package playground.johannes.gsv.synPop.sim2;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import org.apache.log4j.Logger;
 
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
@@ -44,154 +34,70 @@ import playground.johannes.socialnetworks.utils.XORShiftRandom;
  */
 public class Sampler {
 	
-	private static final Logger logger = Logger.getLogger(Sampler.class);
-
-	private MutatorFactory mutatorFactory;
+	private final Collection<ProxyPerson> population;
 	
-	private SamplerListener listerners;
+	private final Hamiltonian hamiltonian;
+	
+	private final MutatorFactory mutatorFactory;
 	
 	private final Random random;
 	
-	private List<ProxyPerson> population;
+	private SamplerListener listener;
 	
-	private Hamiltonian hamiltonian;
-	
-	private final int numThreads = 1;
-	
-	private List<ProxyPerson>[] segments;
-	
-	private ExecutorService executor;
-	
-	private SampleThread[] threads;
-	
-	private long microSteps;
-	
-	public Sampler(Random random) {
-		this.random = random;
-//		this.mutators = new ArrayList<Mutator>();
-//		this.listerners = new ArrayList<SamplerListener>();
-	}
-	
-	public void setHamiltonian(Hamiltonian hamiltonian) {
+	public Sampler(Collection<ProxyPerson> population, Hamiltonian hamiltonian, MutatorFactory factory, Random random) {
+		this.population = population;
 		this.hamiltonian = hamiltonian;
-	}
-	
-	public int getNumThreads() {
-		return numThreads;
-	}
-//	public void addMutator(Mutator mutator) {
-//		mutators.add(mutator);
-//	}
-//	
-//	public void addListener(SamplerListener listener) {
-//		listerners.add(listener);
-//	}
-	
-	/*
-	 * This doesn't work correctly in parallel environments since the population
-	 * may change during creation of the hash set.
-	 */
-	public Collection<ProxyPerson> getPopulationCopy() {
-		return new HashSet<ProxyPerson>(population);
-	}
-	
-	public void run(Collection<ProxyPerson> population, long burnin) {
-		this.population = new ArrayList<ProxyPerson>(population);
+		this.mutatorFactory = factory;
+		this.random = random;
 		
-		executor = Executors.newFixedThreadPool(numThreads);
-		
+		listener = new DefaultListener();
+	}
+	
+	
+	public void setSamplerListener(SamplerListener listener) {
+		this.listener = listener;
+	}
+	
+	public void run(long iters, int numThreads) {
 		/*
 		 * split collection in approx even segments
 		 */
 		int n = Math.min(population.size(), numThreads);
-		segments = CollectionUtils.split(population, n);
+		List<ProxyPerson>[] segments = CollectionUtils.split(population, n);
 		/*
 		 * create threads
 		 */
-		threads = new SampleThread[numThreads];
+		Thread[] threads = new Thread[numThreads];
 		for(int i = 0; i < numThreads; i++) {
 			Mutator thisMutator = mutatorFactory.newInstance();
 			Random thisRandom = new XORShiftRandom(random.nextLong());
-			threads[i] = new SampleThread(segments[i], hamiltonian, thisMutator, microSteps, thisRandom);
-		}
-		
-		
-		Timer timer = new Timer();
-		Task task = new Task();
-//		this.addListener(task);
-		timer.schedule(task, 2000, 2000);
-		
-		for(long i = 0; i < burnin; i += (numThreads * microSteps)) {
-			step();
-		}
-		
-		timer.cancel();
-	}
-	
-	public void step() {
-		Future<?>[] futures = new Future[numThreads];
-		/*
-		 * submit tasks
-		 */
-		for(int i = 0; i < numThreads; i++) {
-			futures[i] = executor.submit(threads[i]);
+			threads[i] = new Thread(new SampleThread(segments[i], thisMutator, iters, thisRandom));
+			threads[i].start();
 		}
 		/*
 		 * wait for threads
 		 */
-		for(int i = 0; i < segments.length; i++) {
+		for(int i = 0; i < numThreads; i++) {
 			try {
-				futures[i].get();
+				threads[i].join();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
 			}
-		}
-		
-		
-		listerners.afterStep(population, null);
-		
-		
-	}
-	
-	public void pause() {
-		for(SampleThread thread : threads) {
-			thread.suspend();
-		}
-		
-		for(SampleThread thread : threads) {
-			while(!thread.isSuspended()); // TODO: is this the right way?
-		}
-	}
-	
-	public void resume() {
-		for(SampleThread thread : threads) {
-			thread.resume();
 		}
 	}
 	
 	private class SampleThread implements Runnable {
 
-		private List<ProxyPerson> population;
+		private final List<ProxyPerson> population;
 		
-		private Hamiltonian hamiltonian;
-		
-		private Mutator mutator;
+		private final Mutator mutator;
 		
 		private final Random random;
 		
-		private long acceptedSteps;
-		
 		private final long iterations;
 		
-		private boolean suspendFlag;
-		
-		private boolean suspended;
-		
-		public SampleThread(List<ProxyPerson> population, Hamiltonian hamiltonian, Mutator mutator, long iterations, Random random) {
+		public SampleThread(List<ProxyPerson> population, Mutator mutator, long iterations, Random random) {
 			this.population = population;
-			this.hamiltonian = hamiltonian;
 			this.mutator = mutator;
 			this.iterations = iterations;
 			this.random = random;
@@ -213,9 +119,8 @@ public class Sampler {
 			/*
 			 * select mutator
 			 */
-			
 			double H_before = hamiltonian.evaluate(person);
-			
+			boolean accepted = false;
 			if (mutator.modify(person)) {
 				/*
 				 * evaluate
@@ -225,65 +130,75 @@ public class Sampler {
 				double p = 1 / (1 + Math.exp(H_after - H_before));
 
 				if (p >= random.nextDouble()) {
-					acceptedSteps++;
+					accepted = true;
 				} else {
 					mutator.revert(person);
 				}
 			}
 			
-			listerners.afterStep(population, person);
-			
-			synchronized(this) {
-				while(suspendFlag) {
-					try {
-						suspended = true;
-						wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
+			listener.afterStep(Sampler.this.population, person, accepted);
 		}
-		
-		public long getAcceptedSteps() {
-			return acceptedSteps;
-		}
-		
-		public void suspend() {
-			suspendFlag = true;
-		}
-		
-		public synchronized void resume() {
-			suspendFlag = false;
-			notify();
-		}
-		
-		public boolean isSuspended() {
-			return suspended;
-		}
+
 	}
 	
-	private class Task extends TimerTask implements SamplerListener {
+	public static void main(String args[]) {
+		List<ProxyPerson> population = new ArrayList<ProxyPerson>(1000);
+		for(int i = 0; i < 1000; i++) {
+			population.add(new ProxyPerson(String.valueOf(i)));
+		}
+		
+//		Sampler sampler = new Sampler(new XORShiftRandom());
+//		sampler.setHamiltonian(new DummyHamiltonian());
+//		sampler.setMutatorFactory(new DummyMutatorFactory());
+//		sampler.setSamplerListener(new BlockingSamplerListener(new DefaultListener(), sampler, 10));
+//		
+//		sampler.run(population, 200);
+	}
+	
+	private static class DummyHamiltonian implements Hamiltonian {
 
-		private long iter;
-		
-		private long accepts;
-		
-		private long iters2;
-		
 		@Override
-		public void run() {
-			logger.info(String.format(Locale.US, "[%s] Accepted %s of %s steps (%.2f %%).", iter, accepts, iters2, accepts/(double)iters2 * 100));
-			accepts = 0;
-			iters2 = 0;
+		public double evaluate(ProxyPerson person) {
+			try {
+				Thread.sleep(5);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return 0;
+		}
+		
+	}
+	
+	private static class DummyMutator implements Mutator {
+
+		@Override
+		public boolean modify(ProxyPerson person) {
+			return true;
 		}
 
 		@Override
-		public void afterStep(Collection<ProxyPerson> population, ProxyPerson original) {
-			iter++;
-			iters2++;
-//			if(accepted)
-//				accepts++;
+		public void revert(ProxyPerson person) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
+	
+	private static class DummyMutatorFactory implements MutatorFactory {
+
+		@Override
+		public Mutator newInstance() {
+			return new DummyMutator();
+		}
+		
+	}
+	
+	private static class DefaultListener implements SamplerListener {
+
+		@Override
+		public void afterStep(Collection<ProxyPerson> population, ProxyPerson person, boolean accepted) {
+			// does nothing
 		}
 		
 	}

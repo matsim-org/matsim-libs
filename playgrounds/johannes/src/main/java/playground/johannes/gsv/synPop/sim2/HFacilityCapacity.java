@@ -19,46 +19,56 @@
 
 package playground.johannes.gsv.synPop.sim2;
 
-import java.util.Collection;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.facilities.ActivityOption;
 
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.sim.MutateActivityLocation;
 
 /**
  * @author johannes
  *
  */
-public class BlockingSamplerListener implements SamplerListener {
+public class HFacilityCapacity implements Hamiltonian {
 
-	private long iterCounter;
+	private final String whitelist;
 	
-	private final long interval;
+	private final ActivityFacilities facilities;
 	
-	private final Sampler sampler;
-	
-	private final SamplerListener delegate;
-	
-	public BlockingSamplerListener(SamplerListener delegate, Sampler sampler, int interval) {
-		this.delegate = delegate;
-		this.sampler = sampler;
-		this.interval = interval;
+	public HFacilityCapacity(String whitelist, ActivityFacilities facilities) {
+		this.whitelist = whitelist;
+		this.facilities = facilities;
 	}
 	
 	@Override
-	public synchronized void afterStep(Collection<ProxyPerson> population, ProxyPerson person, boolean accept) {
-		iterCounter++;
-		if((iterCounter ) % interval == 0) {
-//			sampler.pause();
-			System.out.println(Thread.currentThread().getName() + ": Wait for working");
-//			sampler.waitWorking();
-			System.out.println("Calling delegate afterstep");
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	public double evaluate(ProxyPerson person) {
+		double sum = 0;
+		
+		for(int i = 0; i < person.getPlan().getActivities().size(); i++) {
+			ProxyObject act = person.getPlan().getActivities().get(i);
+			String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
+			
+			if(whitelist == null || whitelist.equalsIgnoreCase(type)) {
+				
+				ActivityFacility facility = (ActivityFacility) act.getUserData(MutateActivityLocation.USER_DATA_KEY);
+				
+				if(facility == null) {
+					facility = facilities.getFacilities().get(new IdImpl(act.getAttribute(CommonKeys.ACTIVITY_FACILITY)));
+					act.setUserData(MutateActivityLocation.USER_DATA_KEY, facility);
+				}
+				
+				
+				ActivityOption option = facility.getActivityOptions().get(type);
+				
+				sum += option.getCapacity();
 			}
-			delegate.afterStep(population, person, accept);
-//			sampler.resume();
 		}
+		 
+		return sum;
 	}
+
 }
