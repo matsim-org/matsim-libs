@@ -24,6 +24,7 @@ package playground.ikaddoura.noise;
 
 import java.io.IOException;
 
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
@@ -43,11 +44,7 @@ public class NoiseInternalizationControler {
 
 	public static void main(String[] args) throws IOException {
 		
-//		configFile = "C:/MA_Noise/Zwischenpraesentation/VergleichHomogeneous/input/config.xml";
-//		configFile = "C:/MA_Noise/Zwischenpraesentation/Testszenarien/input/config03Day.xml";
-		configFile = "/Users/Lars/workspace2/baseCaseCtd_8_250/configXInternalization.xml";
-//		configFile = "/Users/Lars/Desktop/NoiseInternalization20/SiouxFalls/input/config.xml";
-//		configFile = "/Users/Lars/Desktop/NoiseInternalization20/TestCity/input/config.xml";
+		configFile = "/Users/Lars/Desktop/VERSUCH/configB.xml";
 		
 		NoiseInternalizationControler noiseInternalizationControler = new NoiseInternalizationControler();
 		
@@ -67,18 +64,20 @@ public class NoiseInternalizationControler {
 
 	private void runInternalization(String configFile) {
 		Controler controler = new Controler(configFile);
+		EventsManager events = controler.getEvents();
 		
 //		controler.getConfig().getModule("plans").addParam("inputPlansFile", "/Users/Lars/Desktop/noiseInternalization20/output/output_plans.xml.gz");
 		
 		SpatialInfo spatialInfo = new SpatialInfo( (ScenarioImpl) controler.getScenario());
 		
-		NoiseHandler noiseHandler = new NoiseHandler(controler.getScenario(), spatialInfo, this.annualCostRate);
-		NoiseTollHandler tollHandler = new NoiseTollHandler(controler.getScenario(), controler.getEvents(), spatialInfo, noiseHandler);
+		NoiseTollHandler tollHandler = new NoiseTollHandler(controler.getScenario(), controler.getEvents(), spatialInfo, 0.);
+		NoiseCostPricingHandler pricingHandler = new NoiseCostPricingHandler(events);
 		
 		NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(tollHandler);
 		controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
 		
-		controler.addControlerListener(new NoiseInternalizationControlerListener( (ScenarioImpl) controler.getScenario(), tollHandler, noiseHandler, spatialInfo ));
+		controler.addControlerListener(new NoiseInternalizationControlerListener( (ScenarioImpl) controler.getScenario(), tollHandler, pricingHandler, spatialInfo ));
+//		controler.addControlerListener(new NoiseInternalizationControlerListenerWithoutPricing( (ScenarioImpl) controler.getScenario(), tollHandler, noiseHandler, spatialInfo ));
 		
 // 		adapt the WelfareAnalysisControlerListener for the noise damage
 		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));

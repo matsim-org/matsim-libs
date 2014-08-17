@@ -22,6 +22,8 @@
  */
 package playground.ikaddoura.noise;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 
@@ -38,18 +40,21 @@ public final class NoiseEvent extends Event {
 	public final static String ATTRIBUTE_VEHICLE_ID = "vehicleId";
 	public final static String ATTRIBUTE_AGENT_ID = "agentId";
 	public final static String ATTRIBUTE_AMOUNT_DOUBLE = "amount";
+	public final static String ATTRIBUTE_CARORHDV_ENUM = "carOrHdv";
 	
 	private final Id agentId;
 	private final Id vehicleId;
 	private double amount;
 	private final Id linkId;
+	private CarOrHdv carOrHdv;
 	
-	public NoiseEvent(double time , Id agentId , Id vehicleId , double amount , Id linkId) {
+	public NoiseEvent(double time , Id agentId , Id vehicleId , double amount , Id linkId , CarOrHdv carOrHdv) {
 		super(time);
 		this.agentId = agentId;
 		this.vehicleId = vehicleId;
 		this.amount = amount;
 		this.linkId = linkId;
+		this.carOrHdv = carOrHdv;
 	}
 	
 //	public double getTime() {
@@ -76,9 +81,32 @@ public final class NoiseEvent extends Event {
 		this.amount = amount;
 	}
 	
+	public void setCarOrHdv(CarOrHdv carOrHdv) {
+		this.carOrHdv = carOrHdv;
+	}
+	
+	public CarOrHdv getCarOrHdv() {
+		return carOrHdv;
+	}
+	
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attrs = super.getAttributes();
+		attrs.put(ATTRIBUTE_AGENT_ID, this.agentId.toString());
+		attrs.put(ATTRIBUTE_VEHICLE_ID, this.vehicleId.toString());
+		attrs.put(ATTRIBUTE_AMOUNT_DOUBLE, Double.toString(this.amount));
+		attrs.put(ATTRIBUTE_LINK_ID , this.linkId.toString());
+		attrs.put(ATTRIBUTE_CARORHDV_ENUM, this.carOrHdv.toString());
+		return attrs;
+	}
+
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
+	}
+	
+	public enum CarOrHdv {
+		car , hdv
 	}
 
 }

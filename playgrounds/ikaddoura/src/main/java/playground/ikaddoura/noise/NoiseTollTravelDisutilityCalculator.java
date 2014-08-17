@@ -37,7 +37,7 @@ import org.matsim.vehicles.Vehicle;
 
 public class NoiseTollTravelDisutilityCalculator implements TravelDisutility{
 
-//	private static final Logger log = Logger.getLogger(TollTravelDisutilityCalculator.class);
+//	private static final Logger log = Logger.getLogger(NoiseTollTravelDisutilityCalculator.class);
 
 	private TravelTime timeCalculator;
 	private double marginalUtlOfMoney;
@@ -78,13 +78,28 @@ public class NoiseTollTravelDisutilityCalculator implements TravelDisutility{
 		return linkTravelDisutility;
 	}
 
+	int carCounter = 0;
+	int hdvCounter = 0;
+	
 	private double calculateExpectedTollDisutility(Link link, double time, Person person) {
 
 		/* The following is an estimate of the tolls that an agent would have to pay if choosing that link in the next
 		iteration based on the tolls of the last iteration. */
 		
-		double linkExpectedToll = this.tollHandler.getAvgToll(link.getId(), time);
-//		log.info("-----------> Expected toll on link " + link.getId() + " at " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS) + ": " + linkExpectedToll);
+		double linkExpectedToll = 0.;
+		boolean isHdvVehicle = false;
+		if(tollHandler.getHdvVehicles().contains(person.getId())) {
+			// hdv vehicle
+			linkExpectedToll = this.tollHandler.getAvgTollHdv(link.getId(), time);
+			isHdvVehicle = true;
+			hdvCounter++;
+		} else {
+			// car
+			linkExpectedToll = this.tollHandler.getAvgTollCar(link.getId(), time);
+			carCounter++;
+		}
+		
+//		log.info("-----------> Expected toll on link " + link.getId() + " at " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS) + ": " + linkExpectedToll + "; hdvVehicle: " + isHdvVehicle + "; car vs. hdv: " + carCounter + " vs. " + hdvCounter);
 
 		double linkExpectedTollDisutility = this.marginalUtlOfMoney * (linkExpectedToll);
 	

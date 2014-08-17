@@ -37,6 +37,8 @@ import org.matsim.api.core.v01.Scenario;
 
 public class NoiseImmissionCalculator {
 	
+//	private static final Logger log = Logger.getLogger(NoiseImmissionCalculator.class);
+	
 	private SpatialInfo spatialInfo;
 	
 	public NoiseImmissionCalculator(SpatialInfo spatialInfo){
@@ -56,6 +58,8 @@ public class NoiseImmissionCalculator {
 				resultingNoiseImmission = 0.;
 			}
 		}
+//		log.info("resultingNoiseImmission: "+resultingNoiseImmission);
+		
 		return resultingNoiseImmission;
 	}
 	
@@ -81,9 +85,15 @@ public class NoiseImmissionCalculator {
 		return sharesOfResultingNoiseImmission;	
 	}
 	
-	public double calculateNoiseImmission(Scenario scenario , Id linkId , double distanceToRoad , double NoiseEmission , Coord coord , double coordX , double coordY , double relevantFromNodeCoordX , double relevantFromNodeCoordY , double relevantToNodeCoordX , double relevantToNodeCoordY){
+	public double calculateNoiseImmission(Scenario scenario , Id linkId , double NoiseEmission , Coord coord){
 		double NoiseImmission = 0.;
-		NoiseImmission = NoiseEmission + calculateDs(distanceToRoad) + GetAngle.getImmissionCorrection(coordX, coordY, relevantFromNodeCoordX, relevantFromNodeCoordY, relevantToNodeCoordX, relevantToNodeCoordY) + calculateDreflection(scenario, coord, linkId) + calculateDbmDz(scenario, distanceToRoad, coord);
+		
+		Id receiverPointId = spatialInfo.getCoord2receiverPointId().get(coord);
+		NoiseImmission = NoiseEmission
+				+ spatialInfo.getReceiverPointId2RelevantLinkIds2Ds().get(receiverPointId).get(linkId)
+				+ spatialInfo.getReceiverPointId2RelevantLinkIds2AngleImmissionCorrection().get(receiverPointId).get(linkId)
+				+ spatialInfo.getReceiverPointId2RelevantLinkIds2Drefl().get(receiverPointId).get(linkId)
+				+ spatialInfo.getReceiverPointId2RelevantLinkIds2DbmDz().get(receiverPointId).get(linkId);
 		if(NoiseImmission<0) {
 			NoiseImmission = 0.;
 		}
@@ -109,67 +119,66 @@ public class NoiseImmissionCalculator {
 		return noiseImmission;
 	}
 	
-	static int x = 0;
-	public double calculateDreflection (Scenario scenario , Coord coord , Id linkId) {
-		double Dreflection = 0.;	
-		double densityValue = 0.;
-		if(spatialInfo.getActivityCoords2densityValue().containsKey(coord)) {
-			densityValue = spatialInfo.getActivityCoords2densityValue().get(coord);
-		}
-		
-		double streetWidth = spatialInfo.getLinkId2streetWidth().get(linkId);
-		
-		Dreflection = densityValue/streetWidth;
-		
-		if(Dreflection>3.2) {
-			Dreflection = 3.2;
-		}
-		
-		return Dreflection;
-	}
+//	public double calculateDreflection (Scenario scenario , Coord coord , Id linkId) {
+//		double Dreflection = 0.;	
+//		double densityValue = 0.;
+//		if(spatialInfo.getActivityCoords2densityValue().containsKey(coord)) {
+//			densityValue = spatialInfo.getActivityCoords2densityValue().get(coord);
+//		}
+//		
+//		double streetWidth = spatialInfo.getLinkId2streetWidth().get(linkId);
+//		
+//		Dreflection = densityValue/streetWidth;
+//		
+//		if(Dreflection>3.2) {
+//			Dreflection = 3.2;
+//		}
+//		
+//		return Dreflection;
+//	}
 	
-	public double calculateDbmDz (Scenario scenario , double distanceToRoad , Coord coord) {
-		double DbmDz = 0.;
-		if(distanceToRoad==0.) {
-			distanceToRoad = 0.00000001;
-			// dividing by zero is not possible
-		}
-		
-		double densityValue = 0.;
-		
-		if(spatialInfo.getActivityCoords2densityValue().containsKey(coord)) {
-			densityValue = spatialInfo.getActivityCoords2densityValue().get(coord);
-		}
-		
-		// D_BM is relevant if there are no buildings which provoke shielding effects
-		// The height is chosen to be dependent from the activity locations density
-//		double Dbm = -4.8* Math.exp((-1)*(Math.pow((10*(densityValue*0.01)/distanceToRoad)*(8.5+(100/distanceToRoad)),1.3)));
-		double Dbm = -4.8* Math.exp((-1)*(Math.pow((((2+(densityValue*0.1)/distanceToRoad)*(8.5+(100/distanceToRoad)))),1.3)));
-		
-		double Dz = 0.;
-		double z = (distanceToRoad/3)*(densityValue*0.01)/100;
-		z = z - 1./30.;
-		Dz = -10*Math.log10(3+60*z);
-		
-		if((Math.abs(Dbm))>(Math.abs(Dz))) {
-			DbmDz = Dbm;
-		} else {
-			DbmDz = Dz;	
-		}
-		return DbmDz;
-	}
+//	public double calculateDbmDz (Scenario scenario , double distanceToRoad , Coord coord) {
+//		double DbmDz = 0.;
+//		if(distanceToRoad==0.) {
+//			distanceToRoad = 0.00000001;
+//			// dividing by zero is not possible
+//		}
+//		
+//		double densityValue = 0.;
+//		
+//		if(spatialInfo.getActivityCoords2densityValue().containsKey(coord)) {
+//			densityValue = spatialInfo.getActivityCoords2densityValue().get(coord);
+//		}
+//		
+//		// D_BM is relevant if there are no buildings which provoke shielding effects
+//		// The height is chosen to be dependent from the activity locations density
+////		double Dbm = -4.8* Math.exp((-1)*(Math.pow((10*(densityValue*0.01)/distanceToRoad)*(8.5+(100/distanceToRoad)),1.3)));
+//		double Dbm = -4.8* Math.exp((-1)*(Math.pow((((2+(densityValue*0.1)/distanceToRoad)*(8.5+(100/distanceToRoad)))),1.3)));
+//		
+//		double Dz = 0.;
+//		double z = (distanceToRoad/3)*(densityValue*0.01)/100;
+//		z = z - 1./30.;
+//		Dz = -10*Math.log10(3+60*z);
+//		
+//		if((Math.abs(Dbm))>(Math.abs(Dz))) {
+//			DbmDz = Dbm;
+//		} else {
+//			DbmDz = Dz;	
+//		}
+//		return DbmDz;
+//	}
 	
-	public double calculateDs (double distanceToRoad){
-		double Ds = 0.;
-		
-		Ds = 15.8 - (10 * Math.log10(distanceToRoad)) - (0.0142*(Math.pow(distanceToRoad,0.9)));
-//		Ds = 15.8 - (12*(distanceToRoad/400)) - (10 * Math.log10(distanceToRoad)) - (0.0142*(Math.pow(distanceToRoad,0.9)));
-//		Ds = 15.8 + 2 - (12*(distanceToRoad/400)) - (10 * Math.log10(distanceToRoad)) - (0.0142*(Math.pow(distanceToRoad,0.9)));
-		
-		// TODO: Gebaeudemodell approximieren;
-		
-		return Ds;
-	}
+//	public double calculateDs (double distanceToRoad){
+//		double Ds = 0.;
+//		
+//		Ds = 15.8 - (10 * Math.log10(distanceToRoad)) - (0.0142*(Math.pow(distanceToRoad,0.9)));
+////		Ds = 15.8 - (12*(distanceToRoad/400)) - (10 * Math.log10(distanceToRoad)) - (0.0142*(Math.pow(distanceToRoad,0.9)));
+////		Ds = 15.8 + 2 - (12*(distanceToRoad/400)) - (10 * Math.log10(distanceToRoad)) - (0.0142*(Math.pow(distanceToRoad,0.9)));
+//		
+//		// TODO: Gebaeudemodell approximieren;
+//		
+//		return Ds;
+//	}
 	
 	public double calculateDs2 (double distanceToRoad){
 		double Ds = 0.;

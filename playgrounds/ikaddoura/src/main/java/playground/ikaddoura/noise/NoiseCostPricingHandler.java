@@ -22,50 +22,49 @@
  */
 package playground.ikaddoura.noise;
 
-// Der Beurteilungspegel L_r ist bei Straßenverkehrsgeräuschen gleich dem Mittelungspegel L_m.
-// L_r = L_m = 10 * lg(( 1 / T_r ) * (Integral)_T_r(10^(0,1*1(t))dt))
-//
-// L_m,e ist der Mittelungspegel im Abstand von 25m von der Achse der Schallausbreitung
+import java.util.ArrayList;
+import java.util.List;
+
+//import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
+
 
 /**
+ * 
  * @author lkroeger
  *
  */
+public class NoiseCostPricingHandler implements NoiseEventHandler {
 
-public class Emissionspegel {
-	
-	public static double calculateEmissionspegel(int M , double p , double vCar , double vLorry) {
-		
-		// M ... traffic volume
-		// p ... share of hdv
-		
-		double Emissionspegel = 0.0;
-		
-		double Mittelungspegel = 37.3 + 10* Math.log10(M * (1 + (0.082 * p)));
-		
-		Emissionspegel = Mittelungspegel + calculateGeschwindigkeitskorrekturDv(vCar, vLorry, p);
-		// The other correction factors are calculated for the immission later on.
-		
-		return Emissionspegel;
-		
-	}
-	
-	public static double calculateGeschwindigkeitskorrekturDv (double vCar , double vLorry , double p) {
-		// basically the speed is 100 km/h
-		// p ... share of hdv
-		
-		double GeschwindigkeitskorrekturDv = 0.0;
-		
-		double LCar = 27.7 + (10 * Math.log10(1.0 + Math.pow(0.02 * vCar, 3.0)));
-		
-		double LLorry = 23.1 + (12.5 * Math.log10(vLorry));
-		
-		double D = LCar - LLorry; 
-		
-		GeschwindigkeitskorrekturDv = LCar - 37.3 + 10* Math.log10((100.0 + (Math.pow(10.0, (0.1 * D)) - 1) * p ) / (100 + 8.23 * p));
-		
-		return GeschwindigkeitskorrekturDv;
-		
+//	private final static Logger log = Logger.getLogger(NoiseCostPricingHandler.class);
+
+	private final EventsManager events;
+	private List<PersonMoneyEvent> moneyEvents = new ArrayList<PersonMoneyEvent>();
+	private double amountSum = 0.;
+
+	public NoiseCostPricingHandler(EventsManager events) {
+		this.events = events;
 	}
 
+	@Override
+	public void reset(int iteration) {
+		moneyEvents.clear();
+		this.amountSum = 0.;
+	}
+
+	public double getAmountSum() {
+		return amountSum;
+	}
+
+	@Override
+	public void handleEvent(NoiseEvent event) {
+		double amount = event.getAmount() *(-1);
+		PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), event.getVehicleId(), amount);
+		this.events.processEvent(moneyEvent);
+		moneyEvents.add(moneyEvent);
+		
+		amountSum = amountSum + amount;
+	}
+	
 }

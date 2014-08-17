@@ -17,9 +17,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package playground.ikaddoura.noise;
 
 /**
@@ -37,6 +34,8 @@ public class NoiseConfig {
 
 	
 	public static double getIntervalLength(){
+		// 7200. should be a multiple of the interval length,
+		// otherwise the calculation of the day and night values is not correct
 		double intervallLength = 3600.0;
 		return intervallLength;
 	}
