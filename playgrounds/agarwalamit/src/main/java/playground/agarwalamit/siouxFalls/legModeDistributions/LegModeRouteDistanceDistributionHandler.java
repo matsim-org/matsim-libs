@@ -21,6 +21,7 @@ package playground.agarwalamit.siouxFalls.legModeDistributions;
 
 import java.io.BufferedWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -50,7 +52,8 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  * Provides leg mode distance distribution, distances are calculated from routes of selected plans 
  * unlike playground.vsp.analysis.modules.legModeDistanceDistribution where beeline distance is calculated
  *
- * @author amit after aneumann, benjamin, ihab
+ * Also returns mode2PersonId2RouteDistances.
+ * @author amit
  */
 public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModule{
 	private final static Logger log = Logger.getLogger(LegModeRouteDistanceDistributionHandler.class);
@@ -60,6 +63,7 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 	private final SortedSet<String> usedModes;
 
 	private SortedMap<String, Map<Integer, Integer>> mode2DistanceClass2LegCount;
+	private SortedMap<String, Map<Id, List<Double>>> mode2PersonId2dist;
 
 	public LegModeRouteDistanceDistributionHandler(){
 		super(LegModeRouteDistanceDistributionHandler.class.getSimpleName());
@@ -67,12 +71,17 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 
 		this.distanceClasses = new ArrayList<Integer>();
 		this.usedModes = new TreeSet<String>();
+		this.mode2PersonId2dist = new TreeMap<String, Map<Id,List<Double>>>();
 	}
 
 	public void init(Scenario sc){
 		this.scenario = sc;
 		initializeDistanceClasses(this.scenario.getPopulation());
 		initializeUsedModes(this.scenario.getPopulation());
+
+		for(String mode:this.usedModes){
+			mode2PersonId2dist.put(mode, new HashMap<Id, List<Double>>());
+		}
 	}
 
 	@Override
@@ -119,7 +128,7 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 
 	@Override
 	public void writeResults(String outputFolder) {
-
+		
 		String outFile = outputFolder + "legModeRouteDistanceDistribution.txt";
 		try{
 			BufferedWriter writer1 = IOUtils.getBufferedWriter(outFile);
@@ -172,7 +181,7 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 								if(distance > this.distanceClasses.get(i) && distance <= this.distanceClasses.get(i + 1)){
 									noOfLegs++;
 								} 
-							}
+							}	
 						}
 					}
 				}
@@ -183,6 +192,30 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 		return mode2DistanceClassNoOfLegs;
 	}
 
+	private void calculateMode2PersonId2Distances(Population pop) {
+		for(Person person : pop.getPersons().values()){
+			PlanImpl plan = (PlanImpl) person.getSelectedPlan();
+			List<PlanElement> planElements = plan.getPlanElements();
+			for(PlanElement pe : planElements){
+				if(pe instanceof Leg){
+					Leg leg = (Leg)pe;
+					Route route = ((Route)((Leg)pe).getRoute());
+					double distance = route.getDistance();
+					Map<Id, List<Double>> personId2dist = mode2PersonId2dist.get(leg.getMode());
+					if(personId2dist.containsKey(person.getId())){
+						List<Double> dists = personId2dist.get(person.getId());
+						dists.add(distance);
+						personId2dist.put(person.getId(), dists);
+					} else {
+						List<Double> dists = new ArrayList<Double>();
+						dists.add(distance);
+						personId2dist.put(person.getId(), dists);
+					}
+				}
+			}
+		}
+	}
+
 	private double getLongestDistance(Population pop){
 		double longestDistance = 0.0;
 		for(Person person : pop.getPersons().values()){
@@ -190,14 +223,8 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 			List<PlanElement> planElements = plan.getPlanElements();
 			for(PlanElement pe : planElements){
 				if(pe instanceof Leg ){
-
 					Route route = ((Route)((Leg)pe).getRoute());
 					double distance = route.getDistance();
-
-					//					if (route instanceof NetworkRoute) {
-					//						distance = RouteUtils.calcDistance((NetworkRoute) route, net);
-					//					} else distance = route.getDistance();
-
 					if(distance > longestDistance){
 						longestDistance = distance;
 					}
@@ -207,6 +234,7 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 		log.info("The longest distance is found to be: " + longestDistance);
 		return longestDistance;
 	}
+
 	private void initializeDistanceClasses(Population pop) {
 		double longestDistance = getLongestDistance(pop);
 		int endOfDistanceClass = 0;
@@ -235,5 +263,10 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 
 	public SortedMap<String, Map<Integer, Integer>> getMode2DistanceClass2LegCount() {
 		return this.mode2DistanceClass2LegCount;
+	}
+
+	public SortedMap<String, Map<Id, List<Double>>> getMode2PersonId2RouteDistance(){
+		calculateMode2PersonId2Distances(scenario.getPopulation());
+		return this.mode2PersonId2dist;
 	}
 }
