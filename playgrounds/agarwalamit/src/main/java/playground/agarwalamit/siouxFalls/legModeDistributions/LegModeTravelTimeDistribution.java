@@ -96,7 +96,7 @@ public class LegModeTravelTimeDistribution extends AbstractAnalyisModule {
 
 	@Override
 	public void postProcessData() {
-		this.mode2PersonId2TravelTime = this.lmth.getLegMode2PersonId2TravelTime();
+		this.mode2PersonId2TravelTime = this.lmth.getLegMode2PersonId2TotalTravelTime();
 		initializeTravelTimeClasses();
 		getTravelModes();
 		calculateMode2TravelTimeClases2LegCount();
