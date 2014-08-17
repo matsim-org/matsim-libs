@@ -62,7 +62,7 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 	private final List<Integer> distanceClasses;
 	private final SortedSet<String> usedModes;
 
-	private SortedMap<String, Map<Integer, Integer>> mode2DistanceClass2LegCount;
+	private SortedMap<String, SortedMap<Integer, Integer>> mode2DistanceClass2LegCount ;
 	private SortedMap<String, Map<Id, List<Double>>> mode2PersonId2dist;
 
 	public LegModeRouteDistanceDistributionHandler(){
@@ -72,6 +72,7 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 		this.distanceClasses = new ArrayList<Integer>();
 		this.usedModes = new TreeSet<String>();
 		this.mode2PersonId2dist = new TreeMap<String, Map<Id,List<Double>>>();
+		this.mode2DistanceClass2LegCount = new TreeMap<String, SortedMap<Integer,Integer>>();
 	}
 
 	public void init(Scenario sc){
@@ -81,6 +82,11 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 
 		for(String mode:this.usedModes){
 			mode2PersonId2dist.put(mode, new HashMap<Id, List<Double>>());
+			SortedMap<Integer, Integer> distClass2Legs = new TreeMap<Integer, Integer>();
+			for(int i: this.distanceClasses){
+				distClass2Legs.put(i, 0);
+			}
+			mode2DistanceClass2LegCount.put(mode, distClass2Legs);
 		}
 	}
 
@@ -123,7 +129,8 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 
 	@Override
 	public void postProcessData() {
-		this.mode2DistanceClass2LegCount = calculateMode2DistanceClass2LegCount(this.scenario.getPopulation());
+		calculateMode2DistanceClass2LegCount();
+		calculateMode2PersonId2Distances();
 	}
 
 	@Override
@@ -150,7 +157,7 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 				writer1.write(totalLegsInDistanceClass.toString());
 				writer1.write("\n");
 			}
-			writer1.close(); //Close the output stream
+			writer1.close();
 
 			log.info("Finished writing output to " + outFile);
 
@@ -159,40 +166,8 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 		}
 	}
 
-	private SortedMap<String, Map<Integer, Integer>> calculateMode2DistanceClass2LegCount(Population pop) {
-		SortedMap<String, Map<Integer, Integer>> mode2DistanceClassNoOfLegs = new TreeMap<String, Map<Integer, Integer>>();
-
-		for(String mode : this.usedModes){
-			SortedMap<Integer, Integer> distanceClass2NoOfLegs = new TreeMap<Integer, Integer>();
-			for(int i = 0; i < this.distanceClasses.size() - 1 ; i++){
-				Integer noOfLegs = 0;
-				for(Person person : pop.getPersons().values()){
-					PlanImpl plan = (PlanImpl) person.getSelectedPlan();
-					List<PlanElement> planElements = plan.getPlanElements();
-					for(PlanElement pe : planElements){
-						if(pe instanceof Leg){
-							Leg leg = (Leg)pe;
-							Route route = ((Route)((Leg)pe).getRoute());
-							double distance = route.getDistance();
-							//							if (route instanceof NetworkRoute) {
-							//								distance = RouteUtils.calcDistance((NetworkRoute) route, net);
-							//							} else distance = route.getDistance();
-							if(leg.getMode().equals(mode)){
-								if(distance > this.distanceClasses.get(i) && distance <= this.distanceClasses.get(i + 1)){
-									noOfLegs++;
-								} 
-							}	
-						}
-					}
-				}
-				distanceClass2NoOfLegs.put(this.distanceClasses.get(i + 1), noOfLegs);
-			}
-			mode2DistanceClassNoOfLegs.put(mode, distanceClass2NoOfLegs);
-		}
-		return mode2DistanceClassNoOfLegs;
-	}
-
-	private void calculateMode2PersonId2Distances(Population pop) {
+	private void calculateMode2DistanceClass2LegCount() {
+		Population pop = this.scenario.getPopulation();
 		for(Person person : pop.getPersons().values()){
 			PlanImpl plan = (PlanImpl) person.getSelectedPlan();
 			List<PlanElement> planElements = plan.getPlanElements();
@@ -201,7 +176,30 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 					Leg leg = (Leg)pe;
 					Route route = ((Route)((Leg)pe).getRoute());
 					double distance = route.getDistance();
-					Map<Id, List<Double>> personId2dist = mode2PersonId2dist.get(leg.getMode());
+					for(int i=0;i<this.distanceClasses.size()-1;i++){
+						if(distance > this.distanceClasses.get(i) && distance <= this.distanceClasses.get(i + 1)){
+							SortedMap<Integer, Integer> distanceClass2NoOfLegs = mode2DistanceClass2LegCount.get(leg.getMode());	
+							int oldLeg = distanceClass2NoOfLegs.get(this.distanceClasses.get(i+1));
+							int newLeg = oldLeg+1;
+							distanceClass2NoOfLegs.put(this.distanceClasses.get(i+1), newLeg);
+						} 
+					}
+				}
+			}
+		}
+	}
+
+	private void calculateMode2PersonId2Distances() {
+		Population pop = this.scenario.getPopulation();
+		for(Person person : pop.getPersons().values()){
+			PlanImpl plan = (PlanImpl) person.getSelectedPlan();
+			List<PlanElement> planElements = plan.getPlanElements();
+			for(PlanElement pe : planElements){
+				if(pe instanceof Leg){
+					Leg leg = (Leg)pe;
+					Route route = ((Route)((Leg)pe).getRoute());
+					double distance = route.getDistance();
+					Map<Id, List<Double>> personId2dist = this.mode2PersonId2dist.get(leg.getMode());
 					if(personId2dist.containsKey(person.getId())){
 						List<Double> dists = personId2dist.get(person.getId());
 						dists.add(distance);
@@ -261,12 +259,11 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 		log.info("The following transport modes are considered: " + this.usedModes);
 	}
 
-	public SortedMap<String, Map<Integer, Integer>> getMode2DistanceClass2LegCount() {
+	public SortedMap<String, SortedMap<Integer, Integer>> getMode2DistanceClass2LegCount() {
 		return this.mode2DistanceClass2LegCount;
 	}
 
 	public SortedMap<String, Map<Id, List<Double>>> getMode2PersonId2RouteDistance(){
-		calculateMode2PersonId2Distances(scenario.getPopulation());
 		return this.mode2PersonId2dist;
 	}
 }
