@@ -23,6 +23,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.agarwalamit.analysis.legModeHandler.LegModeRouteDistanceDistributionHandler;
 import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
 
 /**

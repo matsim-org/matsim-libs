@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.siouxFalls.legModeDistributions;
+package playground.agarwalamit.analysis.legModeHandler;
 
 import java.io.BufferedWriter;
 import java.util.ArrayList;
