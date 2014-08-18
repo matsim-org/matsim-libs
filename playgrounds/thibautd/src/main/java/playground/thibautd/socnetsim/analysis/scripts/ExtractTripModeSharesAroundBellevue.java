@@ -58,6 +58,10 @@ import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
+import eu.eunoiaproject.bikesharing.framework.router.BikeSharingModeIdentifier;
+import eu.eunoiaproject.bikesharing.framework.router.MainModeIdentifierForMultiModalAccessPt;
+import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule;
+
 import playground.ivt.utils.AcceptAllFilter;
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.SubpopulationFilter;
@@ -67,20 +71,25 @@ import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
 /**
  * @author thibautd
  */
-public class ExtractTripModeShares20kmFromBellevue {
+public class ExtractTripModeSharesAroundBellevue {
 	private static final Logger log =
-		Logger.getLogger(ExtractTripModeShares20kmFromBellevue.class);
+		Logger.getLogger(ExtractTripModeSharesAroundBellevue.class);
 
 	private static final Coord BELLEVUE_COORD = new CoordImpl( 683518 , 246836 );
-	private static final double radius = 20000;
 	private static final StageActivityTypes STAGES =
 		new StageActivityTypesImpl(
 				Arrays.asList(
+					TransitMultiModalAccessRoutingModule.DEPARTURE_ACTIVITY_TYPE,
 					PtConstants.TRANSIT_ACTIVITY_TYPE,
 					JointActingTypes.INTERACTION ) );
 	private static final MainModeIdentifier MODE_IDENTIFIER = 
 		new MainModeIdentifier() {
-			final MainModeIdentifier delegate = new JointMainModeIdentifier( new MainModeIdentifierImpl() );
+			// Beurk...
+			final MainModeIdentifier delegate =
+				new MainModeIdentifierForMultiModalAccessPt(
+					new BikeSharingModeIdentifier(
+						new JointMainModeIdentifier(
+								new MainModeIdentifierImpl() ) ) );
 
 			@Override
 			public String identifyMainMode(final List<PlanElement> tripElements) {
@@ -96,18 +105,20 @@ public class ExtractTripModeShares20kmFromBellevue {
 	private static final double CROW_FLY_FACTOR = 1;
 	private static final boolean USE_NET_DIST = false;
 
-	// TODO pass this as argument
-	private static final Filter FILTER = true ? new ODFilter() : new HomeCoordFilter();
+	private static enum Filtering {od, homeCoord;}
 
 	public static void main(final String[] args) throws IOException {
 		final ArgParser parser = new ArgParser();
 
-		parser.setDefaultValue( "-p" , null );
-		parser.setDefaultValue( "-o" , null );
-		parser.setDefaultValue( "-f" , null );
-		parser.setDefaultValue( "-n" , null );
-		parser.setDefaultValue( "-a" , null );
-		parser.setDefaultValue( "-s" , null );
+		parser.setDefaultValue( "-p" , "--plans-file" , null );
+		parser.setDefaultValue( "-f" , "--facilities-file" , null );
+		parser.setDefaultValue( "-n" , "--network-file" , null );
+		parser.setDefaultValue( "-a" , "--attributes-file" , null );
+		parser.setDefaultValue( "-s" , "--subpopulation" , null );
+		parser.setDefaultValue( "-r" , "--radius_km" , "20" );
+		parser.setDefaultValue( "-filter" , "--filtering-method" , Filtering.od.toString() );
+
+		parser.setDefaultValue( "-o" , "--output-file" , null );
 
 		main( parser.parseArgs( args ) );
 	}
@@ -122,6 +133,12 @@ public class ExtractTripModeShares20kmFromBellevue {
 
 		final String attributesFile = args.getValue( "-a" );
 		final String subpopulation = args.getValue( "-s" );
+
+		final double radius_m = args.getDoubleValue( "-r" ) * 1000;
+		final Filter filter =
+			getFilter(
+					args.getEnumValue( "-filter" , Filtering.class ),
+					radius_m );
 
 		if ( attributesFile != null ) {
 			log.info( "reading subpopulation attribute from "+attributesFile+", using subpopulation "+subpopulation );
@@ -154,9 +171,9 @@ public class ExtractTripModeShares20kmFromBellevue {
 			public void run(final Person person) {
 				if ( !personFilter.accept( person.getId() ) ) return;
 				final Plan plan = person.getSelectedPlan();
-				if ( !FILTER.acceptPlan( plan ) ) return;
+				if ( !filter.acceptPlan( plan ) ) return;
 				for ( Trip trip : TripStructureUtils.getTrips( plan , STAGES ) ) {
-					if ( !FILTER.acceptTrip( trip ) ) continue;
+					if ( !filter.acceptTrip( trip ) ) continue;
 					final String mode = MODE_IDENTIFIER.identifyMainMode( trip.getTripElements() );
 					try {
 						writer.newLine();
@@ -171,6 +188,21 @@ public class ExtractTripModeShares20kmFromBellevue {
 		new MatsimPopulationReader( scenario ).parse( plansFile );
 
 		writer.close();
+	}
+
+	private static Filter getFilter(
+			final Filtering filteringType,
+			final double radius_m ) {
+		switch ( filteringType ) {
+		case homeCoord:
+			log.info( "filtering based on home coordinates, using a radius of "+radius_m+" meters" );
+			return new HomeCoordFilter( radius_m );
+		case od:
+			log.info( "filtering based on trip ODs, using a radius of "+radius_m+" meters" );
+			return new ODFilter( radius_m ) ;
+		default:
+			throw new IllegalArgumentException( filteringType+"?" );
+		}
 	}
 
 	private static double calcDist(final Trip trip, final Network network) {
@@ -200,6 +232,12 @@ public class ExtractTripModeShares20kmFromBellevue {
 	}
 
 	private static class HomeCoordFilter implements Filter {
+		private final double radius;
+
+		public HomeCoordFilter(final double radius_m) {
+			this.radius = radius_m;
+		}
+
 		@Override
 		public boolean acceptPlan(final Plan plan) {
 			final Activity act = getHomeActivity( plan );
@@ -219,6 +257,12 @@ public class ExtractTripModeShares20kmFromBellevue {
 	}
 
 	private static class ODFilter implements Filter {
+		private final double radius;
+
+		public ODFilter(final double radius_m) {
+			this.radius = radius_m;
+		}
+
 		@Override
 		public boolean acceptPlan(final Plan plan) {
 			return true;
