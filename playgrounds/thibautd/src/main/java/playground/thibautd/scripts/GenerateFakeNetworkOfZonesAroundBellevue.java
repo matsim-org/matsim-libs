@@ -36,7 +36,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 public class GenerateFakeNetworkOfZonesAroundBellevue {
 	private static final double BELLEVUE_X = 683518;
 	private static final double BELLEVUE_Y = 246836;
-	private static final double[] radii = new double[]{ 20000 , 30000 };
+	private static final double[] radii = new double[]{ 10000 , 15000 , 20000 , 30000 };
 	private static final double stepDeg = 2;
 
 	public static void main(final String[] args) {
