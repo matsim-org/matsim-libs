@@ -176,6 +176,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 		for ( InitialNodeRouter r : routers  ) {
 			final InitialNodeWithSubTrip curr =
 				r.calcRoute(
+						null, // not associated with any node
 						fromFacility,
 						toFacility,
 						departureTime,
@@ -225,6 +226,8 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 				fillWithActivities(
 					convertPathToLegList(
 						departureTime,
+						fromInitialNode.node.getStop().getStopFacility(),
+						toInitialNode.node.getStop().getStopFacility(),
 						p,
 						person ) ) );
 		trip.addAll( toInitialNode.subtrip );
@@ -336,6 +339,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 					wrappedNearestNodes.put(
 							node,
 							router.calcRoute(
+								node,
 								facility,
 								node.getStop().getStopFacility(),
 								departureTime,
@@ -345,6 +349,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 					wrappedNearestNodes.put(
 							node,
 							router.calcRoute(
+								node,
 								node.getStop().getStopFacility(),
 								facility,
 								departureTime,
@@ -365,6 +370,8 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 
 	private List<Leg> convertPathToLegList(
 			final double departureTime,
+			final Facility fromFacility,
+			final Facility toFacility,
 			final Path p,
 			final Person person ) {
 		// yy there could be a better name for this method.  kai, apr'10
@@ -378,7 +385,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 		TransitStopFacility accessStop = null;
 		TransitRouteStop transitRouteStart = null;
 		TransitRouterNetworkLink prevLink = null;
-		//int transitLegCnt = 0;
+		int transitLegCnt = 0;
 		for (Link link : p.links) {
 			TransitRouterNetworkLink l = (TransitRouterNetworkLink) link;
 			if (l.getLine() == null) {
@@ -396,7 +403,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 					leg.setTravelTime(arrivalTime - time);
 					time = arrivalTime;
 					legs.add(leg);
-					//transitLegCnt++;
+					transitLegCnt++;
 					accessStop = egressStop;
 				}
 				line = null;
@@ -465,18 +472,28 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 			leg.setTravelTime(arrivalTime - time);
 
 			legs.add(leg);
-			//transitLegCnt++;
+			transitLegCnt++;
 			accessStop = egressStop;
 		}
 
-		//if (transitLegCnt == 0) {
-		//	// it seems, the agent only walked
-		//	legs.clear();
-		//	leg = new LegImpl(TransportMode.transit_walk);
-		//	double walkTime = getWalkTime(person, fromCoord, toCoord);
-		//	leg.setTravelTime(walkTime);
-		//	legs.add(leg);
-		//}
+		if (transitLegCnt == 0) {
+			// it seems, the agent only walked
+			legs.clear();
+			Leg leg = new LegImpl(TransportMode.transit_walk);
+			// XXX problematic, but consistent with how it is computed in routing...
+			double walkTime = getWalkTime(person, fromFacility.getCoord(), toFacility.getCoord());
+
+			final Route walkRoute =
+				new GenericRouteImpl(
+						fromFacility.getLinkId(),
+						toFacility.getLinkId());
+			walkRoute.setTravelTime( walkTime );
+
+			leg.setRoute( walkRoute );
+			leg.setTravelTime(walkTime);
+
+			legs.add(leg);
+		}
 		return legs;
 	}
 
@@ -520,13 +537,16 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 	}
 
 	public static class InitialNodeWithSubTrip extends InitialNode {
+		public final TransitRouterNetworkNode node;
 		public final List<? extends PlanElement> subtrip;
 
 		public InitialNodeWithSubTrip(
+				final TransitRouterNetworkNode node,
 				final double initialCost,
 				final double initialTime,
 				final List<? extends PlanElement> subtrip) {
 			super(initialCost, initialTime);
+			this.node = node;
 			this.subtrip = subtrip;
 		}
 	}
@@ -550,6 +570,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 		}
 
 		public InitialNodeWithSubTrip calcRoute(
+				final TransitRouterNetworkNode node,
 				final Facility from,
 				final Facility to,
 				final double dep,
@@ -557,7 +578,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 			final List<? extends PlanElement> trip = delegate.calcRoute( from , to , dep , pers );
 			final double duration = calcDuration( trip );
 			final double cost = calcCost( trip );
-			return new InitialNodeWithSubTrip( cost , dep + duration , trip );
+			return new InitialNodeWithSubTrip( node , cost , dep + duration , trip );
 		}
 
 
