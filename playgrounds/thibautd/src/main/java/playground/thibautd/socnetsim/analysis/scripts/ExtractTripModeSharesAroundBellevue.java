@@ -58,6 +58,7 @@ import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
+import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.framework.router.BikeSharingModeIdentifier;
 import eu.eunoiaproject.bikesharing.framework.router.MainModeIdentifierForMultiModalAccessPt;
 import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule;
@@ -80,6 +81,7 @@ public class ExtractTripModeSharesAroundBellevue {
 		new StageActivityTypesImpl(
 				Arrays.asList(
 					TransitMultiModalAccessRoutingModule.DEPARTURE_ACTIVITY_TYPE,
+					BikeSharingConstants.INTERACTION_TYPE,
 					PtConstants.TRANSIT_ACTIVITY_TYPE,
 					JointActingTypes.INTERACTION ) );
 	private static final MainModeIdentifier MODE_IDENTIFIER = 
