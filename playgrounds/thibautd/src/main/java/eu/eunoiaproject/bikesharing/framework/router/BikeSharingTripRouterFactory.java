@@ -21,15 +21,11 @@ package eu.eunoiaproject.bikesharing.framework.router;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.DefaultTripRouterFactoryImpl;
-import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
@@ -105,33 +101,10 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 						data,
 						initialNodeRouters ) );
 
-		final MainModeIdentifier defaultModeIdentifier = router.getMainModeIdentifier();
 		router.setMainModeIdentifier(
-				new MainModeIdentifier() {
-					@Override
-					public String identifyMainMode(
-							final List<PlanElement> tripElements) {
-						boolean hadBikeSharing = false;
-						for ( PlanElement pe : tripElements ) {
-							if ( pe instanceof Leg ) {
-								final Leg l = (Leg) pe;
-								if ( l.getMode().equals( BikeSharingConstants.MODE ) ) {
-									hadBikeSharing = true;
-								}
-								if ( l.getMode().equals( TransportMode.transit_walk ) ) {
-									return TransportMode.pt;
-								}
-							}
-						}
-
-						if ( hadBikeSharing ) {
-							// there were bike sharing legs but no transit walk
-							return BikeSharingConstants.MODE;
-						}
-
-						return defaultModeIdentifier.identifyMainMode( tripElements );
-					}
-				});
+				new MainModeIdentifierForMultiModalAccessPt(
+					new BikeSharingModeIdentifier(
+						router.getMainModeIdentifier() )) );
 
 		return router;
 	}
