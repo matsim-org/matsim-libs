@@ -39,6 +39,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 public class ScenarioMergingConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME = "scenarioMerging";
 
+	private boolean performMerging = true;
+
 	private double samplingRate = 0.1;
 
 	private Coord dilutionCenter = new CoordImpl(683518.0,246836.0);
@@ -67,6 +69,8 @@ public class ScenarioMergingConfigGroup extends ReflectiveModule {
 	public Map<String, String> getComments() {
 		final Map<String, String> comments = super.getComments();
 
+		comments.put( "performMerging" , "if set to false, merging process will be skipped (meaning that the files defined here will be). Useful to re-read an output for re-start." );
+
 		comments.put( "freightPopulationId" , "the ID to use to define the replanning modules for the freight subpopulation. May be the same as for crossborder if convenient." );
 		comments.put( "crossBorderPopulationId" , "the ID to use to define the replanning modules for the crossborder subpopulation. May be the same as for freight, if convenient." );
 
@@ -78,6 +82,16 @@ public class ScenarioMergingConfigGroup extends ReflectiveModule {
 		comments.put( "modesOfFacilityLinks" , "facilities will only be links to links having *ALL* of those modes allowed. Setting this to something else than only car makes sense for \"multimodal\" routing." );
 
 		return comments;
+	}
+
+	@StringGetter( "performMerging" )
+	public boolean isPerformMerging() {
+		return this.performMerging;
+	}
+
+	@StringSetter( "performMerging" )
+	public void setPerformMerging(final boolean performMerging) {
+		this.performMerging = performMerging;
 	}
 
 	@StringGetter( "samplingRate" )

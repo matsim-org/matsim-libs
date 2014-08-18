@@ -119,8 +119,19 @@ public class Matsim2030Utils {
 		ScenarioUtils.loadScenario( scenario );
 		enrichScenario( scenario );
 
+		logPopulationStats( scenario );
+
+		return scenario;
+	}
+
+	public static void diluteScenario( final Scenario scenario ) {
 		final ScenarioMergingConfigGroup mergingGroup = (ScenarioMergingConfigGroup)
 			scenario.getConfig().getModule( ScenarioMergingConfigGroup.GROUP_NAME );
+
+		if ( !mergingGroup.isPerformMerging() ) {
+			log.warn( "skipping dilution!" );
+			return;
+		}
 
 		// now that coordinates are allocated, we can "dilute" the scenario.
 		// Note that if no routes are defined in the population(s), straight lines will be used,
@@ -131,16 +142,17 @@ public class Matsim2030Utils {
 			log.info( "performing \"dilution\"" );
 			diluteScenario( scenario , mergingGroup.getDilutionCenter() , mergingGroup.getDilutionRadiusM() );
 		}
-
-		logPopulationStats( scenario );
-
-		return scenario;
 	}
 
 	public static void enrichScenario( final Scenario scenario ) {
 		final Config config = scenario.getConfig();
 		final ScenarioMergingConfigGroup mergingGroup = (ScenarioMergingConfigGroup)
 			config.getModule( ScenarioMergingConfigGroup.GROUP_NAME );
+
+		if ( !mergingGroup.isPerformMerging() ) {
+			log.warn( "skipping scenario merging!" );
+			return;
+		}
 
 		final Random random = MatsimRandom.getLocalInstance();
 
