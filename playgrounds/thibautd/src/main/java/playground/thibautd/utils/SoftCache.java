@@ -33,6 +33,18 @@ import org.apache.log4j.Logger;
  * using a ConcurentHashMap internally.
  * At construction, a daemon thread is started to handle cleaning of the GC'd
  * entries, which gets stopped at most 5 seconds after the cache instance is finalized.
+ * <br>
+ * Note that the GC often only partially cleans the cache.
+ * This blog post gives an idea of which references are kept:
+ * http://jeremymanson.blogspot.ch/2009/07/how-hotspot-decides-to-clear_07.html
+ * (in short, the JVM is actually uses some kind of LRU heuristic,
+ * defined as a minimum time to keep a reference after it is last accessed.
+ * This time depends on the free heap space: the bigger the space, the longer the
+ * time)
+ * <br>
+ * To log some statistics about cleared references, set the log level to TRACE
+ * for this class.
+ *
  * @author thibautd
  */
 public class SoftCache<K,V> {
