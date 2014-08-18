@@ -30,6 +30,7 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.pt.PtConstants;
 
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
+import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
 import eu.eunoiaproject.bikesharing.scoring.StepBasedFare;
 import eu.eunoiaproject.bikesharing.scoring.StepBasedFareConfigGroup;
@@ -56,6 +57,7 @@ public class Matsim2010BikeSharingScoringFunctionFactory implements ScoringFunct
 			new MATSim2010ScoringFunctionFactory(
 					scenario,
 					new StageActivityTypesImpl(
+						TransitMultiModalAccessRoutingModule.DEPARTURE_ACTIVITY_TYPE,
 						PtConstants.TRANSIT_ACTIVITY_TYPE,
 						BikeSharingConstants.INTERACTION_TYPE ) ); 	
 		this.config = scenario.getConfig();

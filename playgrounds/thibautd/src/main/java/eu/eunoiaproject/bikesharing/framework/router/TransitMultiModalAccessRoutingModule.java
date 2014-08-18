@@ -91,6 +91,8 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 
 	private static enum Direction {access, egress;}
 
+	public static final String DEPARTURE_ACTIVITY_TYPE = "multimodalTransitDeparture";
+
 	/**
 	 * @param initialNodeProportion the proportion of "initial nodes" to pass to the routing algorithm.
 	 * This allows some randomness in the choice of the initial nodes.
@@ -188,6 +190,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 		return bestDirectWay != null ? bestDirectWay :
 			convertPathToTrip(
 					departureTime,
+					fromFacility,
 					p,
 					fromNodes.map.get( p.nodes.get( 0 ) ),
 					toNodes.map.get( p.nodes.get( p.nodes.size() - 1 ) ),
@@ -208,12 +211,14 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 
 	private List<? extends PlanElement> convertPathToTrip(
 			final double departureTime,
+			final Facility fromFacility,
 			final Path p,
 			final InitialNodeWithSubTrip fromInitialNode,
 			final InitialNodeWithSubTrip toInitialNode,
 			final Person person) {
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
 
+		trip.add( createDeparture( fromFacility ) );
 		trip.addAll( fromInitialNode.subtrip );
 		// there is no Pt interaction in there...
 		trip.addAll(
@@ -225,6 +230,16 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 		trip.addAll( toInitialNode.subtrip );
 
 		return trip;
+	}
+
+	private static PlanElement createDeparture(final Facility fromFacility) {
+		final ActivityImpl dep = 
+			new ActivityImpl(
+					DEPARTURE_ACTIVITY_TYPE,
+					fromFacility.getCoord(),
+					fromFacility.getLinkId() );
+		dep.setMaximumDuration( 0d );
+		return dep;
 	}
 
 	private final List<PlanElement> fillWithActivities(
@@ -280,6 +295,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 		final CompositeStageActivityTypes stages =
 			new CompositeStageActivityTypes(
 					new StageActivityTypesImpl(
+						DEPARTURE_ACTIVITY_TYPE,
 						PtConstants.TRANSIT_ACTIVITY_TYPE ) );
 		for ( InitialNodeRouter r : routers ) stages.addActivityTypes( r.getStageActivities() );
 		return stages;
