@@ -50,6 +50,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.ikaddoura.noise.NoiseEvent.CarOrHdv;
+import playground.ikaddoura.noise.NoiseConfig;
 
 /**
  * @author lkroeger
@@ -127,8 +128,9 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 	private Map<Id, Map<Double,List<LinkLeaveEvent>>> linkId2timeInterval2linkLeaveEventsCar = new HashMap<Id, Map<Double,List<LinkLeaveEvent>>>();
 	private Map<Id, Map<Double,List<LinkLeaveEvent>>> linkId2timeInterval2linkLeaveEventsHdv = new HashMap<Id, Map<Double,List<LinkLeaveEvent>>>();
 	
-	private double totalToll = 0;
-	private double totalTollAffected = 0;
+	private double totalToll = 0.;
+	private double totalTollAffected = 0.;
+	private double totalTollAffectedAgentBasedCalculation = 0.;
 	
 	private Map<Integer,Double> iteration2tollSum = new HashMap<Integer, Double>();
 	private Map<Integer,Double> iteration2tollSumCar = new HashMap<Integer, Double>();
@@ -223,10 +225,12 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 		linkId2timeInterval2linkLeaveEventsCar.clear();
 		linkId2timeInterval2linkLeaveEventsHdv.clear();
 
+		log.info("totalTollAffectedAgentBasedCalculation: "+totalTollAffectedAgentBasedCalculation);
+		totalTollAffectedAgentBasedCalculation = 0.;
 		log.info("totalToll in previous iteration: "+totalToll);
-		totalToll = 0;
+		totalToll = 0.;
 		log.info("totalTollAffected in previous iteration: "+totalTollAffected);
-		totalTollAffected = 0;
+		totalTollAffected = 0.;
 	}
 	
 	public void setHdvVehicles() {
@@ -609,6 +613,86 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 			receiverPointId2timeInterval2noiseImmission.put(coordId, timeInterval2noiseImmission);
 		}
 	}
+	
+	public void calculatePersonId2Lden() {
+		for(Id personId : scenario.getPopulation().getPersons().keySet()) {
+			Map<Integer,Map<Id,Tuple<Double,Double>>> actNumber2receiverPointId2actStartAndActEnd = new HashMap<Integer, Map<Id,Tuple<Double,Double>>>();
+			actNumber2receiverPointId2actStartAndActEnd = personId2actNumber2receiverPointId2activityStartAndActivityEnd.get(personId);
+			Map<Id,Map<Double,Tuple<Double,Double>>> receiverPointId2timeInterval2durationOfStayAndNoiseImmission = new HashMap<Id, Map<Double,Tuple<Double,Double>>>();
+			
+			for(int actNumber : actNumber2receiverPointId2actStartAndActEnd.keySet()) {
+				Id receiverPointId = null;
+				for(Id id : actNumber2receiverPointId2actStartAndActEnd.get(actNumber).keySet()) {
+					// only one key
+					receiverPointId = id;
+				}
+				Map<Double,Double> timeInterval2noiseImmission = receiverPointId2timeInterval2noiseImmission.get(receiverPointId);
+				double actStart = actNumber2receiverPointId2actStartAndActEnd.get(actNumber).get(receiverPointId).getFirst();
+				double actEnd = actNumber2receiverPointId2actStartAndActEnd.get(actNumber).get(receiverPointId).getSecond();
+				Map<Double,Tuple<Double,Double>> timeInterval2durationOfStayAndNoiseImmission = new HashMap<Double, Tuple<Double,Double>>();
+				for(double timeInterval = NoiseConfig.getIntervalLength() ; timeInterval<=24*3600 ; timeInterval = timeInterval + NoiseConfig.getIntervalLength()) {
+					if(!(actStart>timeInterval)) {
+						if(actEnd>timeInterval) {
+							double factor = (timeInterval - actStart)/NoiseConfig.getIntervalLength();
+							timeInterval2durationOfStayAndNoiseImmission.put(timeInterval, new Tuple<Double,Double>(factor, timeInterval2noiseImmission.get(timeInterval)));
+						} else {
+							double factor = (actEnd - actStart)/NoiseConfig.getIntervalLength();
+							timeInterval2durationOfStayAndNoiseImmission.put(timeInterval, new Tuple<Double,Double>(factor, timeInterval2noiseImmission.get(timeInterval)));
+						}
+					} else if (actEnd>timeInterval) {
+						double factor = 1.;
+						timeInterval2durationOfStayAndNoiseImmission.put(timeInterval, new Tuple<Double,Double>(factor, timeInterval2noiseImmission.get(timeInterval)));
+					} else if (actEnd<timeInterval) {
+						double factor = ((timeInterval-actEnd)-(timeInterval-NoiseConfig.getIntervalLength()))/NoiseConfig.getIntervalLength();
+						timeInterval2durationOfStayAndNoiseImmission.put(timeInterval, new Tuple<Double,Double>(factor, timeInterval2noiseImmission.get(timeInterval)));
+					}
+				}
+				if(receiverPointId2timeInterval2durationOfStayAndNoiseImmission.containsKey(receiverPointId)) {
+					Map<Double,Tuple<Double,Double>> timeInterval2durationOfStayAndNoiseImmissionBefore = receiverPointId2timeInterval2durationOfStayAndNoiseImmission.get(receiverPointId);
+					for(double timeInterval : timeInterval2durationOfStayAndNoiseImmission.keySet()) {
+						if(timeInterval2durationOfStayAndNoiseImmissionBefore.containsKey(timeInterval)) {
+							double newFactor = (timeInterval2durationOfStayAndNoiseImmissionBefore.get(timeInterval).getFirst()) + (timeInterval2durationOfStayAndNoiseImmission.get(timeInterval).getFirst());
+							Tuple<Double,Double> newTuple = new Tuple<Double, Double>(newFactor, timeInterval2durationOfStayAndNoiseImmissionBefore.get(timeInterval).getSecond());
+							timeInterval2durationOfStayAndNoiseImmissionBefore.put(timeInterval, newTuple);
+						} else {
+							timeInterval2durationOfStayAndNoiseImmissionBefore.put(timeInterval, timeInterval2durationOfStayAndNoiseImmission.get(timeInterval));
+						}
+					}
+					receiverPointId2timeInterval2durationOfStayAndNoiseImmission.put(receiverPointId, timeInterval2durationOfStayAndNoiseImmissionBefore);
+				} else {
+					receiverPointId2timeInterval2durationOfStayAndNoiseImmission.put(receiverPointId, timeInterval2durationOfStayAndNoiseImmission);
+				}
+			}
+			
+			List<Tuple<Double,Double>> listTmp = new ArrayList<Tuple<Double,Double>>();
+			double n = 0;
+			double sum = 0;
+			for(Id receiverPointId : receiverPointId2timeInterval2durationOfStayAndNoiseImmission.keySet()) {
+				for(double timeInterval : receiverPointId2timeInterval2durationOfStayAndNoiseImmission.get(receiverPointId).keySet()) {
+					listTmp.add(receiverPointId2timeInterval2durationOfStayAndNoiseImmission.get(receiverPointId).get(timeInterval));
+					double factor = receiverPointId2timeInterval2durationOfStayAndNoiseImmission.get(receiverPointId).get(timeInterval).getFirst();
+					double immission = receiverPointId2timeInterval2durationOfStayAndNoiseImmission.get(receiverPointId).get(timeInterval).getSecond();
+					if(timeInterval<=6*3600) {
+						immission = immission + 10;
+					} else if(timeInterval>6*3600 && timeInterval<=22*3600) {
+					} else if(timeInterval>18*3600 && timeInterval<=22*3600) {
+						immission = immission + 5;
+					} else if(timeInterval>22*3600 && timeInterval<=24*3600) {
+						immission = immission + 10;
+					}
+					n = n + factor;
+					sum = sum + (factor*(Math.pow(10,0.1*immission)));
+				}
+			}
+			double Lden = 10 * Math.log10((1./n)*(sum));
+			
+			double tabularCostPerYear = calculateCostPerYearCorrespondingToLdenValue(Lden);
+			double costPerDay = tabularCostPerYear/365.;
+			double costPerAgent = (n/24.)*costPerDay;
+			
+			totalTollAffectedAgentBasedCalculation = totalTollAffectedAgentBasedCalculation + costPerAgent;
+		}
+	}
 
 	public void calculateDurationOfStay() {
 		for(Id receiverPointId : receiverPointId2personId2actNumber2activityStartAndActivityEnd.keySet()) {
@@ -835,6 +919,18 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 				}
 			}
 		}
+	}
+	
+	private double calculateCostPerYearCorrespondingToLdenValue (double Lden) {
+		double damageCosts = 0.;
+		
+		// dayOrNight must be "DAY" because the noiseImmission values are already adapted above
+		double lautheitsgewicht = calculateLautheitsgewicht(Lden, "DAY");
+		// Calculation for each agent separately, therefore no calculation aof affectedAgentUnits
+		
+		damageCosts = annualCostRate * lautheitsgewicht;
+		
+		return damageCosts;	
 	}
 	
 	private double calculateDamageCosts(double noiseImmission, double affectedAgentUnits , double timeInterval) {
@@ -1938,47 +2034,58 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 			}
 			
 			for (Id linkId : this.linkId2timeInterval2noiseEmission.keySet()){
-				double avgNoise = 0;
-				double avgNoiseDay = 0;
-				double avgNoiseNight = 0;
-				double avgNoisePeak = 0;
-				double avgNoiseOffPeak = 0;
+				double avgNoise = 0.;
+				double avgNoiseDay = 0.;
+				double avgNoiseNight = 0.;
+				double avgNoisePeak = 0.;
+				double avgNoiseOffPeak = 0.;
 				
-				double sumAvgNoise = 0;
-				double sumAvgNoiseDay = 0;
-				double sumAvgNoiseNight = 0;
-				double sumAvgNoisePeak = 0;
-				double sumAvgNoiseOffPeak = 0;
+				double sumAvgNoise = 0.;
+				int counterAvgNoise = 0;
+				double sumAvgNoiseDay = 0.;
+				int counterAvgNoiseDay = 0;
+				double sumAvgNoiseNight = 0.;
+				int counterAvgNoiseNight = 0;
+				double sumAvgNoisePeak = 0.;
+				int counterAvgNoisePeak = 0;
+				double sumAvgNoiseOffPeak = 0.;
+				int counterAvgNoiseOffPeak = 0;
 				
 				for(double timeInterval : linkId2timeInterval2noiseEmission.get(linkId).keySet()) {
 					double noiseValue = linkId2timeInterval2noiseEmission.get(linkId).get(timeInterval);
+					double termToAdd = Math.pow(10., noiseValue/10.);
 					
 					if(timeInterval<24*3600) {
-						sumAvgNoise = sumAvgNoise + noiseValue;
+						sumAvgNoise = sumAvgNoise + termToAdd;
+						counterAvgNoise++;
 					}
 					
 					if(day.contains(timeInterval)) {
-					sumAvgNoiseDay = sumAvgNoiseDay + noiseValue;
+						sumAvgNoiseDay = sumAvgNoiseDay + termToAdd;
+						counterAvgNoiseDay++;
 					}
 					
 					if(night.contains(timeInterval)) {
-					sumAvgNoiseNight = sumAvgNoiseNight + noiseValue;
+						sumAvgNoiseNight = sumAvgNoiseNight + termToAdd;
+						counterAvgNoiseNight++;
 					}
 				
 					if(peak.contains(timeInterval)) {
-					sumAvgNoisePeak = sumAvgNoisePeak + noiseValue;
+						sumAvgNoisePeak = sumAvgNoisePeak + termToAdd;
+						counterAvgNoisePeak++;
 					}
 					
 					if(offPeak.contains(timeInterval)) {
-					sumAvgNoiseOffPeak = sumAvgNoiseOffPeak + noiseValue;
+						sumAvgNoiseOffPeak = sumAvgNoiseOffPeak + termToAdd;
+						counterAvgNoiseOffPeak++;
 					}	
 				}
 				
-				avgNoise = sumAvgNoise / (day.size() + night.size());
-				avgNoiseDay = sumAvgNoiseDay / day.size();
-				avgNoiseNight = sumAvgNoiseNight / night.size();
-				avgNoisePeak = sumAvgNoisePeak / peak.size();
-				avgNoiseOffPeak = sumAvgNoiseOffPeak / offPeak.size();
+				avgNoise = 10 * Math.log10(sumAvgNoise / (counterAvgNoise));
+				avgNoiseDay = 10 * Math.log10(sumAvgNoiseDay / counterAvgNoiseDay);
+				avgNoiseNight = 10 * Math.log10(sumAvgNoiseNight / counterAvgNoiseNight);
+				avgNoisePeak = 10 * Math.log10(sumAvgNoisePeak / counterAvgNoisePeak);
+				avgNoiseOffPeak = 10 * Math.log10(sumAvgNoiseOffPeak / counterAvgNoiseOffPeak);
 				
 				linkId2noiseEmissionDay.put(linkId, avgNoiseDay);
 				
@@ -2072,42 +2179,53 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 				double avgNoisePeak = 0;
 				double avgNoiseOffPeak = 0;
 				
-				double sumAvgNoise = 0;
-				double sumAvgNoiseDay = 0;
-				double sumAvgNoiseNight = 0;
-				double sumAvgNoisePeak = 0;
-				double sumAvgNoiseOffPeak = 0;
+				double sumAvgNoise = 0.;
+				int counterAvgNoise = 0;
+				double sumAvgNoiseDay = 0.;
+				int counterAvgNoiseDay = 0;
+				double sumAvgNoiseNight = 0.;
+				int counterAvgNoiseNight = 0;
+				double sumAvgNoisePeak = 0.;
+				int counterAvgNoisePeak = 0;
+				double sumAvgNoiseOffPeak = 0.;
+				int counterAvgNoiseOffPeak = 0;
 				
 				for(double timeInterval : receiverPointId2timeInterval2noiseImmission.get(receiverPointId).keySet()) {
 					double noiseValue = receiverPointId2timeInterval2noiseImmission.get(receiverPointId).get(timeInterval);
+					double termToAdd = Math.pow(10., noiseValue/10.);
 					
 					if(timeInterval<24*3600) {
-						sumAvgNoise = sumAvgNoise + noiseValue;
+						sumAvgNoise = sumAvgNoise + termToAdd;
+						counterAvgNoise++;
 					}
 					
 					if(day.contains(timeInterval)) {
-					sumAvgNoiseDay = sumAvgNoiseDay + noiseValue;
+						sumAvgNoiseDay = sumAvgNoiseDay + termToAdd;
+						counterAvgNoiseDay++;
 					}
 					
 					if(night.contains(timeInterval)) {
-					sumAvgNoiseNight = sumAvgNoiseNight + noiseValue;
+						sumAvgNoiseNight = sumAvgNoiseNight + termToAdd;
+						counterAvgNoiseNight++;
 					}
 				
 					if(peak.contains(timeInterval)) {
-					sumAvgNoisePeak = sumAvgNoisePeak + noiseValue;
+						sumAvgNoisePeak = sumAvgNoisePeak + termToAdd;
+						counterAvgNoisePeak++;
 					}
 					
 					if(offPeak.contains(timeInterval)) {
-					sumAvgNoiseOffPeak = sumAvgNoiseOffPeak + noiseValue;
+						sumAvgNoiseOffPeak = sumAvgNoiseOffPeak + termToAdd;
+						counterAvgNoiseOffPeak++;
 					}	
 				}
 				
-				avgNoise = sumAvgNoise / (day.size() + night.size());
-				avgNoiseDay = sumAvgNoiseDay / day.size();
+				avgNoise = 10 * Math.log10(sumAvgNoise / (counterAvgNoise));
+				avgNoiseDay = 10 * Math.log10(sumAvgNoiseDay / counterAvgNoiseDay);
+				avgNoiseNight = 10 * Math.log10(sumAvgNoiseNight / counterAvgNoiseNight);
+				avgNoisePeak = 10 * Math.log10(sumAvgNoisePeak / counterAvgNoisePeak);
+				avgNoiseOffPeak = 10 * Math.log10(sumAvgNoiseOffPeak / counterAvgNoiseOffPeak);
 				receiverPointId2noiseImmission.put(receiverPointId,avgNoiseDay);
-				avgNoiseNight = sumAvgNoiseNight / night.size();
-				avgNoisePeak = sumAvgNoisePeak / peak.size();
-				avgNoiseOffPeak = sumAvgNoiseOffPeak / offPeak.size();
 				
 				bw.write(receiverPointId + ";" + avgNoise + ";" + avgNoiseDay+";"+avgNoiseNight+";"+avgNoisePeak+";"+avgNoiseOffPeak);
 				bw.newLine();
