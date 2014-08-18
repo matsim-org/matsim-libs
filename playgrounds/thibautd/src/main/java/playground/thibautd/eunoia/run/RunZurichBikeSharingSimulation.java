@@ -126,6 +126,8 @@ public class RunZurichBikeSharingSimulation {
 					sc,
 					denivelationScoringGroup.getParameters() ) );
 
+		Matsim2030Utils.loadControlerListeners( controler );
+
 		controler.run();
 	}
 
