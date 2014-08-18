@@ -107,7 +107,7 @@ public class UserGroupUtilsExtended {
 		return mode2Median;
 	}
 
-	private double calculateMedian(List<Double> inputList){
+	public double calculateMedian(List<Double> inputList){
 		if(inputList.size()==0){
 			return 0.;
 		} else {
@@ -121,7 +121,7 @@ public class UserGroupUtilsExtended {
 		}
 	}
 
-	private double calculateMean(List<Double> inputList){
+	public double calculateMean(List<Double> inputList){
 		if(inputList.size()==0){
 			return 0.;
 		} else {

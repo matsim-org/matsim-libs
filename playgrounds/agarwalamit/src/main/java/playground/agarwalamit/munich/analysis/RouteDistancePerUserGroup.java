@@ -47,7 +47,7 @@ public class RouteDistancePerUserGroup {
 	}
 
 	private Logger logger = Logger.getLogger(RouteDistancePerUserGroup.class);
-	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/ei/";/*"./output/run2/";*/
+	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/eci/";/*"./output/run2/";*/
 	private  String populationFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
 	private  String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
 	private Scenario sc;
@@ -55,6 +55,7 @@ public class RouteDistancePerUserGroup {
 	private SortedMap<UserGroup, SortedMap<String, Double>> usrGrp2Mode2MeanDistance = new TreeMap<UserGroup, SortedMap<String,Double>>();
 	private SortedMap<UserGroup, SortedMap<String, Double>> usrGrp2Mode2MedianDistance = new TreeMap<UserGroup, SortedMap<String,Double>>();
 	private SortedMap<String, Map<Id, List<Double>>> mode2PersonId2RouteDist;
+	private SortedMap<String, Map<Id, Double>> mode2PersonId2TotalRouteDist;
 
 	public static void main(String[] args) {
 		RouteDistancePerUserGroup routeDistUG = new RouteDistancePerUserGroup();
@@ -68,6 +69,7 @@ public class RouteDistancePerUserGroup {
 		lmdfed.postProcessData();
 		lmdfed.writeResults(outputDir+"/analysis/");
 		mode2PersonId2RouteDist = lmdfed.getMode2PersonId2RouteDistance();
+		mode2PersonId2TotalRouteDist = lmdfed.getMode2PersonId2TotalRouteDistance();
 		getUserGroupDistanceMeanAndMeadian();
 		writeResults(outputDir+"/analysis/");
 	}
@@ -75,7 +77,7 @@ public class RouteDistancePerUserGroup {
 	public void writeResults(String outputFolder) {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/usrGrp2TravelMode2MeanAndMedianRouteDistance.txt");
 		try {
-			writer.write("UserGroup \t travelMode \t MeanTravelTime \t MedianTravelTime \n");
+			writer.write("UserGroup \t travelMode \t MeanRouteDistance \t MedianRouteDistance \n");
 			for(UserGroup ug:usrGrp2Mode2MeanDistance.keySet()){
 				for(String travelMode:usrGrp2Mode2MeanDistance.get(ug).keySet()){
 					writer.write(ug+"\t"+travelMode+"\t"+usrGrp2Mode2MeanDistance.get(ug).get(travelMode)+"\t"+usrGrp2Mode2MedianDistance.get(ug).get(travelMode)+"\n");
@@ -94,6 +96,8 @@ public class RouteDistancePerUserGroup {
 			Population pop = pf.getPopulation(sc.getPopulation(), ug);
 			usrGrp2Mode2MeanDistance.put(ug, this.usrGrpExtended.calculateTravelMode2MeanFromLists(mode2PersonId2RouteDist, pop));
 			usrGrp2Mode2MedianDistance.put(ug, this.usrGrpExtended.calculateTravelMode2MedianFromLists(mode2PersonId2RouteDist, pop));
+//			usrGrp2Mode2MeanDistance.put(ug, this.usrGrpExtended.calculateTravelMode2Mean(mode2PersonId2TotalRouteDist, pop));
+//			usrGrp2Mode2MedianDistance.put(ug, this.usrGrpExtended.calculateTravelMode2Median(mode2PersonId2TotalRouteDist, pop));
 		}
 	}
 }

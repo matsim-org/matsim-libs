@@ -22,6 +22,7 @@ package playground.agarwalamit.analysis.legModeHandler;
 import java.io.BufferedWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -265,5 +266,20 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 
 	public SortedMap<String, Map<Id, List<Double>>> getMode2PersonId2RouteDistance(){
 		return this.mode2PersonId2dist;
+	}
+	public SortedMap<String, Map<Id, Double>> getMode2PersonId2TotalRouteDistance(){
+		SortedMap<String, Map<Id, Double>> mode2PersonId2TotalRouteDist = new TreeMap<String, Map<Id,Double>>();
+		for(String str:this.mode2PersonId2dist.keySet()){
+			Map<Id, Double> personIdeRouteDist = new HashMap<Id, Double>();
+			for(Id id:this.mode2PersonId2dist.get(str).keySet()){
+				double sum=0;
+				for(double d:this.mode2PersonId2dist.get(str).get(id)){
+					sum +=d;
+				}
+				personIdeRouteDist.put(id, sum);
+			}
+			mode2PersonId2TotalRouteDist.put(str, personIdeRouteDist);
+		}
+		return mode2PersonId2TotalRouteDist;
 	}
 }
