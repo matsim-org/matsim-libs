@@ -81,7 +81,7 @@ class ScenarioZielnetzBahn2 {
 				}			
 				{
 					// commercial passenger traffic:
-					DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+					DemandSegment segm = DemandSegment.PV_GESCHAEFT ;
 					nullfallForOD.put(makeKey(mode, segm, Attribute.XX), verbleibend_strasse_comm ) ;
 					nullfallForOD.put(makeKey(mode, segm, Attribute.Reisezeit_h), 2.5 ) ;
 					nullfallForOD.put(makeKey(mode, segm, Attribute.Nutzerkosten_Eu), distance*0.1) ;
@@ -103,7 +103,7 @@ class ScenarioZielnetzBahn2 {
 				}			
 				{
 					// commercial passenger traffic:
-					DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+					DemandSegment segm = DemandSegment.PV_GESCHAEFT ;
 					nullfallForOD.put(makeKey(mode, segm, Attribute.XX), verbleibend_bahn_comm ) ; 
 					nullfallForOD.put(makeKey(mode, segm, Attribute.Reisezeit_h), 3. ) ;
 					nullfallForOD.put(makeKey(mode, segm, Attribute.Nutzerkosten_Eu), distance*0.1) ;
@@ -165,7 +165,7 @@ class ScenarioZielnetzBahn2 {
 		}
 		{
 			// modify the travel times for the rail mode:
-			DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+			DemandSegment segm = DemandSegment.PV_GESCHAEFT ;
 			planfallValuesForOD.inc( makeKey( Mode.Strasse, segm, Attribute.Reisezeit_h), -0.13 ) ; // ausgedacht
 			
 			// modify some demand (presumably as a result):

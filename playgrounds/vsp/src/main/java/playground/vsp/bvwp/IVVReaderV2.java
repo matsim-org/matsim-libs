@@ -132,14 +132,46 @@ public class IVVReaderV2 {
 		throw new IllegalStateException();
 		}
 		for (Id fromId : nullFallDataByFromId.keySet()){
-			runBVWP2015(nullFallDataByFromId.get(fromId),planFallDataByFromId.get(fromId), fromId.toString());
+//			runBVWP2015(nullFallDataByFromId.get(fromId),planFallDataByFromId.get(fromId), fromId.toString());
 		}
-		
-		runBVWP2015(nullfallData, planfallData, "all_out");
+		analyse(nullfallData, planfallData);
+//		runBVWP2015(nullfallData, planfallData, "all_out");
 		log.info("fertig.");
-		writeDiffs();
+//		writeDiffs();
 	}
-	void writeDiffs(){
+	private void analyse(ScenarioForEvalData nullfallData, ScenarioForEvalData planfallData)
+    {
+	    log.info("Analysiere Widerstandsunterschiede bei gleicher Nutzerzahl");
+	    int x = 0;
+	    for (Id odId : planfallData.getAllRelations()){
+	        double diffXX = 0.0;
+	        for (DemandSegment ds : DemandSegment.values()){
+	            double xxPlan = planfallData.getByODRelation(odId).getAttributes(Mode.Strasse, ds).getByEntry(Attribute.XX);
+	            double xxNull= nullfallData.getByODRelation(odId).getAttributes(Mode.Strasse, ds).getByEntry(Attribute.XX);
+	            if (xxPlan!=xxNull) diffXX += Math.abs(xxPlan-xxNull);
+	        }
+	        if (diffXX == 0.0){
+	            double diffKM = 0.0;
+	            double diffHr = 0.0;
+	            double dPlan = planfallData.getByODRelation(odId).getAttributes(Mode.Strasse, DemandSegment.PV_BERUF).getByEntry(Attribute.Distanz_km);
+	            double dNull = nullfallData.getByODRelation(odId).getAttributes(Mode.Strasse, DemandSegment.PV_BERUF).getByEntry(Attribute.Distanz_km);
+	            double tPlan = planfallData.getByODRelation(odId).getAttributes(Mode.Strasse, DemandSegment.PV_BERUF).getByEntry(Attribute.Reisezeit_h);
+	            double tNull = nullfallData.getByODRelation(odId).getAttributes(Mode.Strasse, DemandSegment.PV_BERUF).getByEntry(Attribute.Reisezeit_h);
+	            diffKM = dPlan-dNull;
+	            diffHr = tPlan-tNull;
+	            if (diffHr!=0.0 || diffKM !=0.0){
+	                log.info(odId.toString() +": Difference in distance: "+diffKM + " Difference in hrs: "+diffHr+", but XXDiff = 0 ");
+	                x++;
+	            }
+	        }
+	        
+	    }
+	    log.info("Widerstandsunterschiede bei gleicher Nutzerzahl treten in "+x+" Fällen auf.");
+
+    }
+
+
+    void writeDiffs(){
 	    Writer writer = IOUtils.getBufferedWriter("difs.txt");
 	    
 	    try {
@@ -293,7 +325,7 @@ public class IVVReaderV2 {
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_BERUF, Attribute.XX),Double.parseDouble(row[2].trim())	, data);
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_AUSBILDUNG, Attribute.XX),Double.parseDouble(row[3].trim())	, data);
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_EINKAUF, Attribute.XX),Double.parseDouble(row[4].trim())	, data);
-			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_COMMERCIAL, Attribute.XX),Double.parseDouble(row[5].trim())	, data);
+			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_GESCHAEFT, Attribute.XX),Double.parseDouble(row[5].trim())	, data);
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_URLAUB, Attribute.XX),Double.parseDouble(row[6].trim())	, data);
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_SONST, Attribute.XX),Double.parseDouble(row[7].trim())	, data);
 			
@@ -301,7 +333,7 @@ public class IVVReaderV2 {
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_BERUF, Attribute.XX),Double.parseDouble(row[8].trim())	, data);
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_AUSBILDUNG, Attribute.XX),Double.parseDouble(row[9].trim())	, data);
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_EINKAUF, Attribute.XX),Double.parseDouble(row[10].trim())	, data);
-			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_COMMERCIAL, Attribute.XX),Double.parseDouble(row[11].trim())	, data);
+			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_GESCHAEFT, Attribute.XX),Double.parseDouble(row[11].trim())	, data);
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_URLAUB, Attribute.XX),Double.parseDouble(row[12].trim())	, data);
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_SONST, Attribute.XX),Double.parseDouble(row[13].trim())	, data);
 			}
@@ -402,7 +434,7 @@ public class IVVReaderV2 {
 		    this.tableLookUp.put(DemandSegment.PV_BERUF, 8);
 		    this.tableLookUp.put(DemandSegment.PV_AUSBILDUNG, 9);
 		    this.tableLookUp.put(DemandSegment.PV_EINKAUF, 10);
-		    this.tableLookUp.put(DemandSegment.PV_COMMERCIAL, 11);
+		    this.tableLookUp.put(DemandSegment.PV_GESCHAEFT, 11);
 		    this.tableLookUp.put(DemandSegment.PV_URLAUB, 12);
 		    this.tableLookUp.put(DemandSegment.PV_SONST, 13);
 		    
@@ -418,8 +450,8 @@ public class IVVReaderV2 {
 		        this.besetzungsgradeKurz.put(DemandSegment.PV_AUSBILDUNG, 1.7);
 		        this.besetzungsgradeLang.put(DemandSegment.PV_AUSBILDUNG, 1.3);
 		        
-		        this.besetzungsgradeKurz.put(DemandSegment.PV_COMMERCIAL, 1.0);
-		        this.besetzungsgradeLang.put(DemandSegment.PV_COMMERCIAL, 1.1);
+		        this.besetzungsgradeKurz.put(DemandSegment.PV_GESCHAEFT, 1.0);
+		        this.besetzungsgradeLang.put(DemandSegment.PV_GESCHAEFT, 1.1);
 		        
 		        this.besetzungsgradeKurz.put(DemandSegment.PV_EINKAUF, 1.3);
 		        this.besetzungsgradeLang.put(DemandSegment.PV_EINKAUF, 1.8);
@@ -427,7 +459,7 @@ public class IVVReaderV2 {
 		        this.besetzungsgradeKurz.put(DemandSegment.PV_SONST, 1.6);
 		        this.besetzungsgradeLang.put(DemandSegment.PV_SONST, 2.0);
 		        
-		        this.besetzungsgradeKurz.put(DemandSegment.PV_URLAUB, 1.3);
+		        this.besetzungsgradeKurz.put(DemandSegment.PV_URLAUB, 1.6);
 		        this.besetzungsgradeLang.put(DemandSegment.PV_URLAUB, 2.3);
 		        
 		        

@@ -236,13 +236,13 @@ abstract class UtilityChanges {
 		
 
 		Utils.writeOperatorProfit(operatorProfits, html);
-		Utils.writeRoh(html, utilsUserFromRoHOldUsers, utilsUserFromRoHNewUsers, operatorProfit);
+		Utils.writeRoh(html, utilsUserFromRoHOldUsers, utilsUserFromRoHNewUsers, operatorProfits);
 		Utils.endOutput(html);
 		
 		double sum = Utils.writeOverallOutputTable(totalHtml, verbleibendRV, verlagertRVAuf, verlagertRVAb, verlagertImpAuf, verlagertImpAb, induziertRV, induziertImp);
 		double diff = sum - (utilsUserFromRoHOldUsers + utilsUserFromRoHNewUsers + operatorProfit);
 		Utils.writeOperatorProfit(operatorProfits, totalHtml);
-		Utils.writeRoh(totalHtml, utilsUserFromRoHOldUsers, utilsUserFromRoHNewUsers, operatorProfit);
+		Utils.writeRoh(totalHtml, utilsUserFromRoHOldUsers, utilsUserFromRoHNewUsers, operatorProfits);
 		Utils.endOutput(totalHtml);
 		return diff;
 	}

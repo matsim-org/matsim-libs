@@ -101,7 +101,12 @@ class Utils {
 		html.endTableRow() ;
 	}
 
-	static void writeRoh(Html html, double utilsUserFromRoHOldUsers, double utilsUserFromRoHNewUsers, double operatorProfit) {
+	static void writeRoh(Html html, double utilsUserFromRoHOldUsers, double utilsUserFromRoHNewUsers,Map<Mode,Double> operatorProfitGains) {
+	    double operatorProfit = 0.;
+	    for (Double d : operatorProfitGains.values()){
+	        operatorProfit+=d;
+	    }
+	    
 		System.out.printf("RoH: utl gain old users: %16.1e ; utl gain new users: %16.1e ; operator profit gain: %16.1e ; sum: %16.1e\n", 
 				utilsUserFromRoHOldUsers, utilsUserFromRoHNewUsers, operatorProfit, utilsUserFromRoHOldUsers+utilsUserFromRoHNewUsers+operatorProfit ) ; 
 	

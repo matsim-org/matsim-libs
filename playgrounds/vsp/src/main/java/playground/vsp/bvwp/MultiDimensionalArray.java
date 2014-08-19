@@ -20,7 +20,7 @@ public class MultiDimensionalArray {
 	 * Galileo).  kai/benjamin, sep'12
 	 *</ul>
 	 */
-	enum DemandSegment { GV, PV_NON_COMMERCIAL, PV_COMMERCIAL, PV_BERUF, PV_AUSBILDUNG, PV_EINKAUF, PV_URLAUB, PV_SONST }
+	enum DemandSegment { GV, PV_NON_COMMERCIAL, PV_GESCHAEFT, PV_BERUF, PV_AUSBILDUNG, PV_EINKAUF, PV_URLAUB, PV_SONST }
 
 	enum Mode { Strasse, Bahn }
 	

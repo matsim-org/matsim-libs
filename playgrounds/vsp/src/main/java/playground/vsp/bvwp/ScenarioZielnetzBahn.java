@@ -30,7 +30,7 @@ class ScenarioZielnetzBahn {
 					Mode mode = Mode.Bahn ;
 					{
 						// commercial passenger traffic:
-						DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+						DemandSegment segm = DemandSegment.PV_GESCHAEFT ;
 						final double distance = 580. ; 
 
 						nullfallForInduced.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
@@ -55,7 +55,7 @@ class ScenarioZielnetzBahn {
 					Mode mode = Mode.Strasse ; // we need a fake road!
 					{
 						// commercial passenger traffic:
-						DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+						DemandSegment segm = DemandSegment.PV_GESCHAEFT ;
 						final double distance = 580. ; 
 
 						nullfallForInduced.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
@@ -86,7 +86,7 @@ class ScenarioZielnetzBahn {
 			{
 				Mode mode = Mode.Bahn ;
 				{
-					DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+					DemandSegment segm = DemandSegment.PV_GESCHAEFT ;
 					final double distance = 315. ;
 
 					nullfallForSwitched.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
@@ -107,7 +107,7 @@ class ScenarioZielnetzBahn {
 			{	
 				Mode mode = Mode.Strasse ;
 				{
-					DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+					DemandSegment segm = DemandSegment.PV_GESCHAEFT ;
 					final double distance = 315. ;
 
 					nullfallForSwitched.put(makeKey(mode, segm, Attribute.XX), 2.5*1000.*1000. ) ; 
@@ -132,7 +132,7 @@ class ScenarioZielnetzBahn {
 			{
 				Mode mode = Mode.Bahn ;
 				{
-					DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+					DemandSegment segm = DemandSegment.PV_GESCHAEFT ;
 					final double distance =  374. ;  // 13788. / 36.8 ;
 					final double ttime = distance * 0.15 ;
 
@@ -155,7 +155,7 @@ class ScenarioZielnetzBahn {
 			{
 				Mode mode = Mode.Strasse ;
 				{
-					DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+					DemandSegment segm = DemandSegment.PV_GESCHAEFT ;
 					final double distance =  374. ;  // 13788. / 36.8 ;
 					final double ttime = distance * 0.15 ;
 
@@ -190,7 +190,7 @@ class ScenarioZielnetzBahn {
 			Assert.assertNotNull(planfallValuesForOD) ;
 			{
 				// modify the travel times for the rail mode:
-				DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+				DemandSegment segm = DemandSegment.PV_GESCHAEFT ;
 				planfallValuesForOD.inc( makeKey( Mode.Bahn, segm, Attribute.Reisezeit_h), -0.75 ) ; 
 				// (we need both the base case and the measure case here to be able to compute the "half" improvement!!!)
 
@@ -216,7 +216,7 @@ class ScenarioZielnetzBahn {
 				double xx_verlagert = 2.5 * 1000. * 1000. ;
 
 				// modify the travel times for the rail mode:
-				DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+				DemandSegment segm = DemandSegment.PV_GESCHAEFT ;
 				final Key key = makeKey( Mode.Bahn, segm, Attribute.Reisezeit_h);
 				System.err.flush(); 
 				System.out.println( planfallValuesForOD.get(key).toString() )  ;
@@ -246,7 +246,7 @@ class ScenarioZielnetzBahn {
 			Assert.assertNotNull(planfallValuesForOD) ;
 			{
 				// modify the travel times for the rail mode:
-				DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+				DemandSegment segm = DemandSegment.PV_GESCHAEFT ;
 				planfallValuesForOD.inc( makeKey( Mode.Bahn, segm, Attribute.Reisezeit_h), -0.18 ) ; 
 
 				// no demand modif ("verbleibend")
