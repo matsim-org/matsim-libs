@@ -153,10 +153,10 @@ public class IVVReaderV2 {
 	        if (diffXX == 0.0){
 	            double diffKM = 0.0;
 	            double diffHr = 0.0;
-	            double dPlan = planfallData.getByODRelation(odId).getAttributes(Mode.Strasse, DemandSegment.PV_BERUF).getByEntry(Attribute.Distanz_km);
-	            double dNull = nullfallData.getByODRelation(odId).getAttributes(Mode.Strasse, DemandSegment.PV_BERUF).getByEntry(Attribute.Distanz_km);
-	            double tPlan = planfallData.getByODRelation(odId).getAttributes(Mode.Strasse, DemandSegment.PV_BERUF).getByEntry(Attribute.Reisezeit_h);
-	            double tNull = nullfallData.getByODRelation(odId).getAttributes(Mode.Strasse, DemandSegment.PV_BERUF).getByEntry(Attribute.Reisezeit_h);
+	            double dPlan = planfallData.getByODRelation(odId).getAttributes(Mode.Strasse, DemandSegment.PV_ARBEIT).getByEntry(Attribute.Distanz_km);
+	            double dNull = nullfallData.getByODRelation(odId).getAttributes(Mode.Strasse, DemandSegment.PV_ARBEIT).getByEntry(Attribute.Distanz_km);
+	            double tPlan = planfallData.getByODRelation(odId).getAttributes(Mode.Strasse, DemandSegment.PV_ARBEIT).getByEntry(Attribute.Reisezeit_h);
+	            double tNull = nullfallData.getByODRelation(odId).getAttributes(Mode.Strasse, DemandSegment.PV_ARBEIT).getByEntry(Attribute.Reisezeit_h);
 	            diffKM = dPlan-dNull;
 	            diffHr = tPlan-tNull;
 	            if (diffHr!=0.0 || diffKM !=0.0){
@@ -322,7 +322,7 @@ public class IVVReaderV2 {
 			
 			Mode mode = Mode.Bahn;
 			
-			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_BERUF, Attribute.XX),Double.parseDouble(row[2].trim())	, data);
+			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_ARBEIT, Attribute.XX),Double.parseDouble(row[2].trim())	, data);
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_AUSBILDUNG, Attribute.XX),Double.parseDouble(row[3].trim())	, data);
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_EINKAUF, Attribute.XX),Double.parseDouble(row[4].trim())	, data);
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_GESCHAEFT, Attribute.XX),Double.parseDouble(row[5].trim())	, data);
@@ -330,7 +330,7 @@ public class IVVReaderV2 {
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_SONST, Attribute.XX),Double.parseDouble(row[7].trim())	, data);
 			
 			mode = Mode.Strasse;
-			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_BERUF, Attribute.XX),Double.parseDouble(row[8].trim())	, data);
+			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_ARBEIT, Attribute.XX),Double.parseDouble(row[8].trim())	, data);
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_AUSBILDUNG, Attribute.XX),Double.parseDouble(row[9].trim())	, data);
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_EINKAUF, Attribute.XX),Double.parseDouble(row[10].trim())	, data);
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_GESCHAEFT, Attribute.XX),Double.parseDouble(row[11].trim())	, data);
@@ -363,7 +363,7 @@ public class IVVReaderV2 {
 			String to = row[1].trim();
 			Id odid = getODId(from, to);
 			if (this.odRelations.contains(odid)){
-			data.getByODRelation(odid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_BERUF, Attribute.XX), Double.parseDouble(row[2].trim()));
+			data.getByODRelation(odid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_ARBEIT, Attribute.XX), Double.parseDouble(row[2].trim()));
 			data.getByODRelation(odid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.XX), Double.parseDouble(row[3].trim()));
 			data.getByODRelation(odid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_EINKAUF, Attribute.XX), Double.parseDouble(row[4].trim()));
 			data.getByODRelation(odid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_URLAUB, Attribute.XX), Double.parseDouble(row[5].trim()));
@@ -395,7 +395,7 @@ public class IVVReaderV2 {
 			String to = row[1].trim();
 			Id odId = getODId(from, to);
 			if (this.odRelations.contains(odId)){
-            setValuesForODRelation(odId, Key.makeKey(Mode.Strasse, DemandSegment.PV_BERUF, Attribute.XX),  Double.parseDouble(row[2]),	data);
+            setValuesForODRelation(odId, Key.makeKey(Mode.Strasse, DemandSegment.PV_ARBEIT, Attribute.XX),  Double.parseDouble(row[2]),	data);
 			setValuesForODRelation(odId, Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.XX),  Double.parseDouble(row[3]),	data);
 			setValuesForODRelation(odId, Key.makeKey(Mode.Strasse, DemandSegment.PV_EINKAUF, Attribute.XX),  Double.parseDouble(row[4]),	data);
 			setValuesForODRelation(odId, Key.makeKey(Mode.Strasse, DemandSegment.PV_URLAUB, Attribute.XX),  Double.parseDouble(row[5]),	data);
@@ -431,7 +431,7 @@ public class IVVReaderV2 {
 		    
 		private void fillNullfallMap(){
 		    this.tableLookUp = new HashMap<MultiDimensionalArray.DemandSegment, Integer>();
-		    this.tableLookUp.put(DemandSegment.PV_BERUF, 8);
+		    this.tableLookUp.put(DemandSegment.PV_ARBEIT, 8);
 		    this.tableLookUp.put(DemandSegment.PV_AUSBILDUNG, 9);
 		    this.tableLookUp.put(DemandSegment.PV_EINKAUF, 10);
 		    this.tableLookUp.put(DemandSegment.PV_GESCHAEFT, 11);
@@ -444,8 +444,8 @@ public class IVVReaderV2 {
 		        this.besetzungsgradeKurz = new HashMap<DemandSegment, Double>();
 		        this.besetzungsgradeLang = new HashMap<DemandSegment, Double>();
 		        
-		        this.besetzungsgradeKurz.put(DemandSegment.PV_BERUF, 1.1);
-		        this.besetzungsgradeLang.put(DemandSegment.PV_BERUF, 1.1);
+		        this.besetzungsgradeKurz.put(DemandSegment.PV_ARBEIT, 1.1);
+		        this.besetzungsgradeLang.put(DemandSegment.PV_ARBEIT, 1.1);
 
 		        this.besetzungsgradeKurz.put(DemandSegment.PV_AUSBILDUNG, 1.7);
 		        this.besetzungsgradeLang.put(DemandSegment.PV_AUSBILDUNG, 1.3);
