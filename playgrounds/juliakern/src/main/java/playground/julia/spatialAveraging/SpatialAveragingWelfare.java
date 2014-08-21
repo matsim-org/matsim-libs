@@ -110,8 +110,11 @@ public class SpatialAveragingWelfare {
 
 	private boolean substractAverageValue = false; // personal value
 
+	private SpatialAveragingWriter saWriter;
+
 	private void run() throws IOException{
 		this.sau = new SpatialAveragingUtils(xMin, xMax, yMin, yMax, noOfXbins, noOfYbins, smoothingRadius_m, munichShapeFile, null);
+		this.saWriter = new SpatialAveragingWriter(xMin, xMax, yMin, yMax, noOfXbins, noOfYbins, smoothingRadius_m, munichShapeFile, null);
 		this.lf = new LocationFilter();
 		
 		Scenario scenario = loadScenario(netFile1);
@@ -188,8 +191,8 @@ public class SpatialAveragingWelfare {
 		
 		double [][] averageUserBenefitsBaseCase = calculateAverage(normalizedUserBenefitsBaseCase, normalizedWeightsBaseCase);
 		
-		this.sau.writeRoutput(normalizedUserBenefitsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "UserBenefits.txt");
-		this.sau.writeRoutput(averageUserBenefitsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "UserBenefitsAverage.txt");
+		this.saWriter.writeRoutput(normalizedUserBenefitsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "UserBenefits.txt");
+		this.saWriter.writeRoutput(averageUserBenefitsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "UserBenefitsAverage.txt");
 //		this.sau.writeRoutput(normalizedWeightsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "NormalizedWeightsBaseCase.txt");
 		
 		if(compareToBaseCase){
@@ -228,8 +231,8 @@ public class SpatialAveragingWelfare {
 				outNormalizedAverageDifferences = outputPath + "UserBenefitsAverageDifferences.PersonalRefund.txt";		
 			}
 			
-			this.sau.writeRoutput(normalizedUserBenefitDifferences, outNormalizedDifferences);
-			this.sau.writeRoutput(normalizedAverageUserBenefitDifferences, outNormalizedAverageDifferences);
+			this.saWriter.writeRoutput(normalizedUserBenefitDifferences, outNormalizedDifferences);
+			this.saWriter.writeRoutput(normalizedAverageUserBenefitDifferences, outNormalizedAverageDifferences);
 			//	this.sau.writeRoutput(normalizedWeightsDifferences, outPathStub + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".Routput_" + "WeightsDifferences.txt"); // should be zero
 		}
 	}

@@ -113,8 +113,11 @@ public class CopyOfSpatialAveragingNOXbyHomeLocation {
 
 	private String outputPathForR = "../../runs-svn/detEval/emissionInternalization/output/output_baseCase_ctd_newCode/analysis/";
 
+	private SpatialAveragingWriter saWriter;
+
 	private void run() throws IOException{
 		this.sau = new SpatialAveragingUtils(xMin, xMax, yMin, yMax, noOfXbins, noOfYbins, smoothingRadius_m, munichShapeFile, null);
+		this.saWriter = new SpatialAveragingWriter(xMin, xMax, yMin, yMax, noOfXbins, noOfYbins, smoothingRadius_m, munichShapeFile, null);
 		this.lf = new LocationFilter();
 		
 		Scenario scenario = loadScenario(netFile1);
@@ -158,9 +161,9 @@ public class CopyOfSpatialAveragingNOXbyHomeLocation {
 		double [][] normalizedNoxAmountBaseCase = this.sau.normalizeArray(noxAmountBaseCase);
 		double [][] averageNOXAmountPerPerson = calculateAverage(noxAmountBaseCase, populationDensity);
 		
-		this.sau.writeRoutput(normalizedDensity, outputPathForR +"populationDensity.txt");
-		this.sau.writeRoutput(normalizedNoxAmountBaseCase, outputPathForR+"totalNOXAmountByHomeLocation.txt");
-		this.sau.writeRoutput(averageNOXAmountPerPerson, outputPathForR+"averageNOXamountPerPersonByHomeLocation.txt");
+		this.saWriter.writeRoutput(normalizedDensity, outputPathForR +"populationDensity.txt");
+		this.saWriter.writeRoutput(normalizedNoxAmountBaseCase, outputPathForR+"totalNOXAmountByHomeLocation.txt");
+		this.saWriter.writeRoutput(averageNOXAmountPerPerson, outputPathForR+"averageNOXamountPerPersonByHomeLocation.txt");
 		
 		if(compareToBaseCase){
 			Scenario scenario2 = loadScenario(netFile1);
@@ -207,8 +210,8 @@ public class CopyOfSpatialAveragingNOXbyHomeLocation {
 			double [][] normalizedNoxDifferences = calculateDifferences(normalizedNoxAmountPolicy, normalizedNoxAmountBaseCase);
 			double [][] normalizedAvgDifferences = calculateDifferences(averageNOXAmountPerPersonPolicy, averageNOXAmountPerPerson);
 			
-			this.sau.writeRoutput(normalizedNoxDifferences, outputPathForR + runNumber2 + "_-_" + runNumber1 + "differencesNOXAmountByHomeLocation.txt");
-			this.sau.writeRoutput(normalizedAvgDifferences, outputPathForR + runNumber2 + "_-_" + runNumber1 + "differencesAverageNOXAmountByHomeLocation.txt");
+			this.saWriter.writeRoutput(normalizedNoxDifferences, outputPathForR + runNumber2 + "_-_" + runNumber1 + "differencesNOXAmountByHomeLocation.txt");
+			this.saWriter.writeRoutput(normalizedAvgDifferences, outputPathForR + runNumber2 + "_-_" + runNumber1 + "differencesAverageNOXAmountByHomeLocation.txt");
 //			double [][] weightsPolicyCase = calculateWeights(personId2Utility2, pop2);
 //			double [][] normalizedWeightsPolicyCase = this.sau.normalizeArray(weightsPolicyCase);
 //			

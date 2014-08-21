@@ -113,6 +113,8 @@ public class SpatialAveragingTollPayments {
 
 	String outPathStub = runDirectory1 + "analysis/spatialAveraging/";
 
+	private SpatialAveragingWriter saWriter;
+
 	private void run() throws IOException{
 		this.sau = new SpatialAveragingUtils(xMin, xMax, yMin, yMax, noOfXbins, noOfYbins, smoothingRadius_m, munichShapeFile, null);
 		this.lf = new LocationFilter();
@@ -178,8 +180,9 @@ public class SpatialAveragingTollPayments {
 		
 		double [][] averageUserTollPaymentsBaseCase = calculateAverage(normalizedUserTollPayments, normalizedWeightsBaseCase);
 		
-		this.sau.writeRoutput(normalizedUserTollPayments, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "PaidTollsByHomeLocation.txt");
-		this.sau.writeRoutput(averageUserTollPaymentsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "PaidTollsPerPersonByHomeLocationAverage.txt");
+		this.saWriter = new SpatialAveragingWriter(xMin, xMax, yMin, yMax, noOfXbins, noOfYbins, smoothingRadius_m, munichShapeFile, null);
+		this.saWriter.writeRoutput(normalizedUserTollPayments, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "PaidTollsByHomeLocation.txt");
+		this.saWriter.writeRoutput(averageUserTollPaymentsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "PaidTollsPerPersonByHomeLocationAverage.txt");
 		//this.sau.writeRoutput(normalizedWeightsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "NormalizedWeightsBaseCase.txt");
 		
 		

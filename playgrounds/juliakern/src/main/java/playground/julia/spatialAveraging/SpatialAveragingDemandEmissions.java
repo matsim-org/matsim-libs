@@ -21,13 +21,9 @@ package playground.julia.spatialAveraging;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
-import java.util.SortedSet;
 
-import org.apache.commons.math.MathException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -44,13 +40,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.benjamin.scenarios.munich.analysis.filter.LocationFilter;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkColdEventHandler;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
+
 
 /**
  * @author benjamin
@@ -123,16 +118,16 @@ public class SpatialAveragingDemandEmissions {
 	
 	final double smoothingRadius_m = 500.;
 	
-//	final String pollutant2analyze = WarmPollutant.NO2.toString();
 	final String pollutant2analyze = WarmPollutant.NOX.toString();
 	final boolean compareToBaseCase = true;
-//	final boolean compareToBaseCase = false;
+	final boolean useLineMethod = true;
+	private boolean writeRoutput = true;
+	private boolean writeGisOutput = false;
 	
 	SpatialAveragingUtils sau;
 	SpatialAveragingUtilsExtended saue;
-	LocationFilter lf;
+	SpatialAveragingWriter saWriter;
 	double simulationEndTime;
-	SortedSet<String> listOfPollutants;
 	Network network;
 	
 	EmissionUtils emissionUtils = new EmissionUtils();
@@ -140,13 +135,9 @@ public class SpatialAveragingDemandEmissions {
 	EmissionsPerLinkColdEventHandler coldHandler;
 	String outPathStub;
 
-	private boolean writeRoutput = true;
-
-	private boolean writeGisOutput = false;
-	
-	Map<Double, double[][]> time2NormalizedWeightedEmissionsBaseCase = null;
-	Map<Double, double[][]> time2NormalizedWeightedDemandBaseCase = null;
-	Map<Double, double[][]> time2SpecificEmissionsBaseCase = null;
+	Map<Double, double[][]> time2NormalizedWeightedEmissionsBaseCase = new HashMap<Double, double[][]>();
+	Map<Double, double[][]> time2NormalizedWeightedDemandBaseCase = new HashMap<Double, double[][]>();
+	Map<Double, double[][]> time2SpecificEmissionsBaseCase = new HashMap<Double, double[][]>();
 	
 	/*
 	 * process first emission file: calculate weighted emissions per cell
@@ -169,32 +160,26 @@ public class SpatialAveragingDemandEmissions {
 	private void runBaseCase() throws IOException{
 		
 		/*
-		 * 1. initialize some tools
+		 * 1. initialize scenario, spatial averaging utils
 		 */
 		initialize();
 		
 		// delete after testing ...
-		
-		compareLinkLength(); 
-		
-		// ...
+		//compareLinkLength(); 
 	
 		/*
 		 * 2. parse emission file and store overall emission amounts by time bins 
 		 */
 		
-		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered1 = null; 
-		Map<Double, Map<Id, Double>> time2CountsPerLink1 = null;
-		Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered1 = null;
+		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered1 = new HashMap<Double, Map<Id,Map<String,Double>>>(); 
+		Map<Double, Map<Id, Double>> time2CountsPerLink1 = new HashMap<Double, Map<Id,Double>>();
+		Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered1 = new HashMap<Double, Map<Id,Double>>();
 		
 		parseAndProcessEmissions(emissionFile1, time2EmissionsTotalFilledAndFiltered1, time2CountsPerLink1, time2CountsPerLinkFilledAndFiltered1);
 
 		/*
 		 * 3. calculate weighted emissions per cell, weighted demand per cell
 		 */
-//		time2NormalizedWeightedEmissionsBaseCase = null;
-//		time2NormalizedWeightedDemandBaseCase = null;
-//		time2SpecificEmissionsBaseCase = null;
 		
 		calculateWeightedEmissionsAndDemands(time2NormalizedWeightedEmissionsBaseCase, time2NormalizedWeightedDemandBaseCase, time2SpecificEmissionsBaseCase, time2EmissionsTotalFilledAndFiltered1, time2CountsPerLinkFilledAndFiltered1);
 		
@@ -211,18 +196,18 @@ public class SpatialAveragingDemandEmissions {
 		 * 1. parse emission file and store overall emission amounts by time bins 
 		 */
 		
-		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFilteredCompareCase = null; 
-		Map<Double, Map<Id, Double>> time2CountsPerLinkCompareCase = null;
-		Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFilteredCompareCase = null;
+		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFilteredCompareCase = new HashMap<Double, Map<Id,Map<String,Double>>>(); 
+		Map<Double, Map<Id, Double>> time2CountsPerLinkCompareCase = new HashMap<Double, Map<Id,Double>>();
+		Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFilteredCompareCase = new HashMap<Double, Map<Id,Double>>();
 		
 		parseAndProcessEmissions(emissionFile, time2EmissionsTotalFilledAndFilteredCompareCase, time2CountsPerLinkCompareCase, time2CountsPerLinkFilledAndFilteredCompareCase);
 
 		/*
 		 * 2. calculate weighted emissions per cell, weighted demand per cell
 		 */
-		Map<Double, double[][]> time2NormalizedWeightedEmissionsCompareCase = null;
-		Map<Double, double[][]> time2NormalizedWeightedDemandCompareCase = null;
-		Map<Double, double[][]> time2SpecificEmissionsCompareCase = null;
+		Map<Double, double[][]> time2NormalizedWeightedEmissionsCompareCase = new HashMap<Double, double[][]>();
+		Map<Double, double[][]> time2NormalizedWeightedDemandCompareCase = new HashMap<Double, double[][]>();
+		Map<Double, double[][]> time2SpecificEmissionsCompareCase = new HashMap<Double, double[][]>();
 		
 		calculateWeightedEmissionsAndDemands(time2NormalizedWeightedEmissionsCompareCase, time2NormalizedWeightedDemandCompareCase, time2SpecificEmissionsCompareCase, time2EmissionsTotalFilledAndFilteredCompareCase, time2CountsPerLinkFilledAndFilteredCompareCase);
 		
@@ -243,12 +228,19 @@ public class SpatialAveragingDemandEmissions {
 	private void initialize() {
 		this.sau = new SpatialAveragingUtils(xMin, xMax, yMin, yMax, noOfXbins, noOfYbins, smoothingRadius_m, munichShapeFile, targetCRS);
 		this.saue = new SpatialAveragingUtilsExtended(smoothingRadius_m);
-		this.lf = new LocationFilter();
+		this.saWriter = new SpatialAveragingWriter(xMin, xMax, yMin, yMax, noOfXbins, noOfYbins, smoothingRadius_m, munichShapeFile, targetCRS);
 		
 		this.simulationEndTime = getEndTime(configFile1);
-		this.listOfPollutants = emissionUtils.getListOfPollutants();
 		this.network = loadScenario(netFile1).getNetwork();		
 		outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber1 + "." + lastIteration1;
+	}
+
+	private void parseAndProcessEmissions(String emissionFile, Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered, Map<Double, Map<Id, Double>> time2CountsPerLink, Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered){
+		time2EmissionsTotalFilledAndFiltered = processEmissions(emissionFile);
+		time2CountsPerLink = this.warmHandler.getTime2linkIdLeaveCount();
+		time2CountsPerLinkFilledAndFiltered = setNonCalculatedCountsAndFilter(time2CountsPerLink);
+		this.warmHandler.reset(0);
+		this.coldHandler.reset(0);
 	}
 	
 	private void calculateWeightedEmissionsAndDemands(
@@ -262,26 +254,18 @@ public class SpatialAveragingDemandEmissions {
 		time2NormalizedWeightedDemand1 = fillAndNormalizeWeightedDemandValues(time2CountsPerLinkFilledAndFiltered1);
 		time2SpecificEmissions1 = calculateSpecificEmissionsPerBin(time2NormalizedWeightedEmissions1, time2NormalizedWeightedDemand1);		
 	}
-
-	private void parseAndProcessEmissions(String emissionFile, Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered, Map<Double, Map<Id, Double>> time2CountsPerLink, Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered){
-		time2EmissionsTotalFilledAndFiltered = processEmissions(emissionFile);
-		time2CountsPerLink = this.warmHandler.getTime2linkIdLeaveCount();
-		time2CountsPerLinkFilledAndFiltered = setNonCalculatedCountsAndFilter(time2CountsPerLink);
-		this.warmHandler.reset(0);
-		this.coldHandler.reset(0);
-	}
 	
 	private void writeOutput(Map<Double, double[][]> time2NormalizedWeightedEmissions, Map<Double, double[][]> time2NormalizedWeightedDemand, Map<Double, double[][]> time2SpecificEmissions) throws IOException{
 		for(double endOfTimeInterval: time2NormalizedWeightedEmissions.keySet()){
 			if(writeRoutput){
-				this.sau.writeRoutput(time2NormalizedWeightedEmissions.get(endOfTimeInterval), outPathStub + ".Routput." + pollutant2analyze.toString() + ".g." + endOfTimeInterval + ".txt");
-				this.sau.writeRoutput(time2NormalizedWeightedDemand.get(endOfTimeInterval), outPathStub + ".Routput.Demand.vkm." + endOfTimeInterval + ".txt");
-				this.sau.writeRoutput(time2SpecificEmissions.get(endOfTimeInterval), outPathStub+ ".Routput." + pollutant2analyze + ".gPerVkm." + endOfTimeInterval + ".txt");
+				this.saWriter.writeRoutput(time2NormalizedWeightedEmissions.get(endOfTimeInterval), outPathStub + ".Routput." + pollutant2analyze.toString() + ".g." + endOfTimeInterval + ".txt");
+				this.saWriter.writeRoutput(time2NormalizedWeightedDemand.get(endOfTimeInterval), outPathStub + ".Routput.Demand.vkm." + endOfTimeInterval + ".txt");
+				this.saWriter.writeRoutput(time2SpecificEmissions.get(endOfTimeInterval), outPathStub+ ".Routput." + pollutant2analyze + ".gPerVkm." + endOfTimeInterval + ".txt");
 			}
 			if(writeGisOutput){
-				this.sau.writeGISoutput(time2NormalizedWeightedEmissions, outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".g.movie.shp");
-				this.sau.writeGISoutput(time2NormalizedWeightedDemand, outPathStub + ".GISoutput.Demand.vkm.movie.shp");
-				this.sau.writeGISoutput(time2SpecificEmissions, outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".gPerVkm.movie.shp");
+				this.saWriter.writeGISoutput(time2NormalizedWeightedEmissions, outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".g.movie.shp");
+				this.saWriter.writeGISoutput(time2NormalizedWeightedDemand, outPathStub + ".GISoutput.Demand.vkm.movie.shp");
+				this.saWriter.writeGISoutput(time2SpecificEmissions, outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".gPerVkm.movie.shp");
 			}
 		}
 	}
@@ -340,12 +324,24 @@ public class SpatialAveragingDemandEmissions {
 				double value = time2EmissionsTotalFilledAndFiltered.get(endOfTimeInterval).get(linkId).get(this.pollutant2analyze);
 				double scaledValue = this.scalingFactor * value;
 				
-				// TODO: maybe calculate the following once and look it up here?
+				/* maybe calculate the following once and look it up here?
+				 * suggest rather not to:
+				 * for one time bin this is calculated only once since emissions are aggregated per link
+				 * otherwise for each link a 160x120 array of double is stored
+				 * 
+				 * nearly 18,000 nodes, 40,000 links
+				 * 19,200 cells
+				 * 
+				 */
 				for(int xIndex=0; xIndex<noOfXbins; xIndex++){
 					for (int yIndex=0; yIndex<noOfYbins; yIndex++){
 						Coord cellCentroid = this.sau.findCellCentroid(xIndex, yIndex);
-//						double weightOfLinkForCell = this.sau.calculateWeightOfPointForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
-						double weightOfLinkForCell = this.saue.calculateWeightOfLineForCellV2(fromNodeCoord, toNodeCoord, cellCentroid.getX(), cellCentroid.getY());
+						double weightOfLinkForCell =0.0;
+						if(!useLineMethod){
+							 weightOfLinkForCell = this.sau.calculateWeightOfPointForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
+						}else{
+							 weightOfLinkForCell = this.saue.calculateWeightOfLineForCellV2(fromNodeCoord, toNodeCoord, cellCentroid.getX(), cellCentroid.getY());
+						}
 						weightedEmissions[xIndex][yIndex] += weightOfLinkForCell * scaledValue;					
 					}
 				}
@@ -373,12 +369,16 @@ public class SpatialAveragingDemandEmissions {
 				double vkm = count * linkLength_km;
 				double scaledVkm = this.scalingFactor * vkm;
 				
-				// TODO: maybe calculate the following once and look it up here?
+				// maybe calculate the following once and look it up here? see above
 				for(int xIndex=0; xIndex<noOfXbins; xIndex++){
 					for (int yIndex=0; yIndex<noOfYbins; yIndex++){
 						Coord cellCentroid = this.sau.findCellCentroid(xIndex, yIndex);
-//						double weightOfLinkForCell = this.sau.calculateWeightOfPointForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
-						double weightOfLinkForCell = this.saue.calculateWeightOfLineForCellV2(fromNodeCoord, toNodeCoord, cellCentroid.getX(), cellCentroid.getY());
+						double weightOfLinkForCell =0.0;
+						if(!useLineMethod){
+							weightOfLinkForCell = this.sau.calculateWeightOfPointForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
+						}else{
+							weightOfLinkForCell = this.saue.calculateWeightOfLineForCellV2(fromNodeCoord, toNodeCoord, cellCentroid.getX(), cellCentroid.getY());
+						}
 						weightedDemand[xIndex][yIndex] += weightOfLinkForCell * scaledVkm;					
 					}
 				}

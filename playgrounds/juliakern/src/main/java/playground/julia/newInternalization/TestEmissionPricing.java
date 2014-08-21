@@ -111,7 +111,7 @@ public class TestEmissionPricing {
 		
 		Config config = new Config();
 		config.addCoreModules();
-		config.setParam("strategy", "maxAgentPlanMemorySize", "10");
+		config.setParam("strategy", "maxAgentPlanMemorySize", "2");
 		Controler controler = new Controler(config);
 		config.setParam("controler", "writeEventsInterval", "1");
 		

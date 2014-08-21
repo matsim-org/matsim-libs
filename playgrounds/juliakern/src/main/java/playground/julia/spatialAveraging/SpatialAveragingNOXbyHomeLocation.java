@@ -109,8 +109,11 @@ public class SpatialAveragingNOXbyHomeLocation {
 
 	private String outputPathForR = "../../runs-svn/detEval/emissionInternalization/output/output_baseCase_ctd_newCode/analysis/";
 
+	private SpatialAveragingWriter saWriter;
+
 	private void run() throws IOException{
 		this.sau = new SpatialAveragingUtils(xMin, xMax, yMin, yMax, noOfXbins, noOfYbins, smoothingRadius_m, munichShapeFile, null);
+		this.saWriter = new SpatialAveragingWriter(xMin, xMax, yMin, yMax, noOfXbins, noOfYbins, smoothingRadius_m, munichShapeFile, null);
 		this.lf = new LocationFilter();
 		
 		Scenario scenario = loadScenario(netFile1);
@@ -172,11 +175,11 @@ public class SpatialAveragingNOXbyHomeLocation {
 		double [][] paidEmissionCosts = fillAmount(personId2paidToll, pop);
 		double [][] averageEmissionCosts = calculateAverage(paidEmissionCosts, populationDensity);
 		
-		this.sau.writeRoutput(populationDensity, outputPathForR +"populationDensity.txt");
-		this.sau.writeRoutput(noxAmountBaseCase, outputPathForR+"totalNOXAmount.txt");
-		this.sau.writeRoutput(averageNOXAmountPerPerson, outputPathForR+"averageNOXamountPerPerson.txt");
-		this.sau.writeRoutput(paidEmissionCosts, outputPathForR+"emissionCostsbyHomeLocation.txt");
-		this.sau.writeRoutput(averageEmissionCosts, outputPathForR+"averageEmissionCostsByHomeLocation.txt");
+		this.saWriter.writeRoutput(populationDensity, outputPathForR +"populationDensity.txt");
+		this.saWriter.writeRoutput(noxAmountBaseCase, outputPathForR+"totalNOXAmount.txt");
+		this.saWriter.writeRoutput(averageNOXAmountPerPerson, outputPathForR+"averageNOXamountPerPerson.txt");
+		this.saWriter.writeRoutput(paidEmissionCosts, outputPathForR+"emissionCostsbyHomeLocation.txt");
+		this.saWriter.writeRoutput(averageEmissionCosts, outputPathForR+"averageEmissionCostsByHomeLocation.txt");
 		
 		//double [][] weightsBaseCase = calculateWeights(personId2Utility, pop);
 //		double [][] normalizedWeightsBaseCase = this.sau.normalizeArray(weightsBaseCase);
