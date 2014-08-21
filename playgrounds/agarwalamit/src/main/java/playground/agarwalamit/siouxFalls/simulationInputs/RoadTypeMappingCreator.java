@@ -70,10 +70,10 @@ public class RoadTypeMappingCreator {
 			} else {
 				throw new RuntimeException("Road Category "+linkIdentifier+" is not defined.");
 			}
-			link.setCapacity(link.getCapacity()*0.8);
+			link.setCapacity(link.getCapacity()*0.5);
 			network.addLink(link); // This will give warning for duplicat of link in network which can be ignored as same link is added with type of linkImpl.
 		}
-		new NetworkWriter(network).write("./input/baseCase/SiouxFalls_networkWithRoadType0.9Capacity.xml.gz");
+		new NetworkWriter(network).write("./input/baseCase/SiouxFalls_networkWithRoadType0.5Capacity.xml.gz");
 		writeRoadTypeMappingFile();
 	}
 
