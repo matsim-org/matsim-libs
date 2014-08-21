@@ -99,7 +99,3 @@ package org.matsim.contrib.emissions;
  * <br/> <br/>
  * 
  */
-
-class EmissionPackageInfo{
-	
-}
