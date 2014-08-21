@@ -30,16 +30,18 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
 /**
- * @author benjamin
+ * @author benjamin, julia
+ * 
+ * Use the config file as created by the 
+ * {@link org.matsim.contrib.emissions.example.CreateEmissionConfig CreateEmissionConfig} to calculate 
+ * emissions based on the link leave events of an events file. Results are written into an emission event file. 
  *
  */
 public class RunEmissionToolOfflineExample {
-	private static final Logger logger = Logger.getLogger(RunEmissionToolOfflineExample.class);
 	
 	final static String runDirectory = "./output/";
 	static String configFile = runDirectory + "output_config.xml.gz";

@@ -26,11 +26,16 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
-
 /**
- * @author benjamin
+ * @author benjamin, julia
+ * 
+ * After creating a config file with 
+ * {@link org.matsim.contrib.emissions.example.CreateEmissionConfig CreateEmissionConfig}
+ * this class runs a simulation and calculates emissions online. 
+ * Results are written into distinct xml-files including emission event files for some iterations (as specified by the config). 
  *
  */
+
 public class RunEmissionToolOnlineExample {
 	
 	private static String configFile = "./output/config.xml";
