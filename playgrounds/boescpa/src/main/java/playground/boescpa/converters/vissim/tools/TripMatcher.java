@@ -43,12 +43,13 @@ public class TripMatcher implements ConvEvents2Anm.TripMatcher {
 	private final static int SlopeScore = 100;
 	private final static int MSEScore = 100;
 
-	private int matchesWithHighScores;
-
 	@Override
 	public HashMap<Id, Integer> matchTrips(HashMap<Id, Long[]> msTrips, HashMap<Id, Long[]> amTrips) {
 
-		this.matchesWithHighScores = 0;
+		int matchesWithHighScores = 0;
+		int matchesWithVeryHighScores = 0;
+		int progressCounter = 0;
+		int progressChecker = 2;
 
 		HashMap<Id, Integer> countsPerAnmTrip = new HashMap<Id, Integer>();
 		for (Id amTrip : amTrips.keySet()) {
@@ -56,6 +57,7 @@ public class TripMatcher implements ConvEvents2Anm.TripMatcher {
 		}
 
 		for (Id msTrip : msTrips.keySet()) {
+			progressCounter++;
 			Long[] msTripZones = msTrips.get(msTrip);
 
 			Id bestMatchingAmTrip = null;
@@ -106,14 +108,24 @@ public class TripMatcher implements ConvEvents2Anm.TripMatcher {
 
 			countsPerAnmTrip.put(bestMatchingAmTrip, (countsPerAnmTrip.get(bestMatchingAmTrip) + 1));
 
-			log.info("Best match with score " + bestMatchScore);
 			if (bestMatchScore >= 0.9*TenPrctScore) {
-				this.matchesWithHighScores++;
+				matchesWithHighScores++;
+				if (bestMatchScore >= 0.99*TenPrctScore) {
+					matchesWithVeryHighScores++;
+				}
+			}
+
+			// log progress:
+			if (progressCounter >= progressChecker) {
+				log.info(progressChecker + " trips matched.");
+				progressChecker *= 2;
 			}
 		}
 
-		log.info("Of total " + msTrips.size() + " trips, " + this.matchesWithHighScores + " were matched with a high score above " +
+		log.info("Of total " + msTrips.size() + " trips, " + matchesWithHighScores + " were matched with a high score above " +
 				0.9*TenPrctScore + " points.");
+		log.info("Of total " + msTrips.size() + " trips, " + matchesWithVeryHighScores + " were matched with a very high score above " +
+				0.99*TenPrctScore + " points.");
 
 		return countsPerAnmTrip;
 	}
