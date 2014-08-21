@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
@@ -821,7 +822,13 @@ public class RunUtils {
 
 		if ( typicalDuration != null ) return typicalDuration.doubleValue();
 
-		return scenario.getConfig().planCalcScore().getActivityParams( type ).getTypicalDuration();
+		final ActivityParams params = scenario.getConfig().planCalcScore().getActivityParams( type );
+		
+		if ( params == null ) {
+			throw new RuntimeException( "could not find typical duration for Person "+person.getId()+" for type "+type );
+		}
+		
+		return params.getTypicalDuration();
 	}
 }
 
