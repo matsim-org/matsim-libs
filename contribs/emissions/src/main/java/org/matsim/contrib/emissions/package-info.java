@@ -2,7 +2,6 @@ package org.matsim.contrib.emissions;
 
 /**
  * 
- * @author benjamin, julia
  * 
  * This package provides a tool for exhaust emission calculation based on
  * the ``Handbook on Emission Factors for Road Transport'' (HBEFA), version 3.1 (see <a href="http://www.hbefa.net">http://www.hbefa.net</a>).
@@ -98,4 +97,5 @@ package org.matsim.contrib.emissions;
  * The cold/warm emission factor keys are mapped to the values of cold/warm emissions, the cold/warm emission factors.
  * <br/> <br/>
  * 
+ *  * @author benjamin, julia
  */
