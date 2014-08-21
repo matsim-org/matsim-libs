@@ -1,5 +1,3 @@
-package org.matsim.contrib.emissions;
-
 /**
  * 
  * 
@@ -99,3 +97,5 @@ package org.matsim.contrib.emissions;
  * 
  *  * @author benjamin, julia
  */
+
+package org.matsim.contrib.emissions;
