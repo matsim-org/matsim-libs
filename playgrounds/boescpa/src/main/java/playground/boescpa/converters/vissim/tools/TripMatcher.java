@@ -22,6 +22,7 @@
 package playground.boescpa.converters.vissim.tools;
 
 import org.apache.commons.math.stat.regression.SimpleRegression;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import playground.boescpa.converters.vissim.ConvEvents2Anm;
 
@@ -33,14 +34,21 @@ import java.util.HashMap;
  * @author boescpa
  */
 public class TripMatcher implements ConvEvents2Anm.TripMatcher {
+
+	private final static Logger log = Logger.getLogger(TripMatcher.class);
+
 	private final static int TenPrctScore = 10000;
 	private final static int LengthScore = 1;
 	private final static int InterceptScore = 10;
 	private final static int SlopeScore = 100;
 	private final static int MSEScore = 100;
 
+	private int matchesWithHighScores;
+
 	@Override
 	public HashMap<Id, Integer> matchTrips(HashMap<Id, Long[]> msTrips, HashMap<Id, Long[]> amTrips) {
+
+		this.matchesWithHighScores = 0;
 
 		HashMap<Id, Integer> countsPerAnmTrip = new HashMap<Id, Integer>();
 		for (Id amTrip : amTrips.keySet()) {
@@ -97,7 +105,15 @@ public class TripMatcher implements ConvEvents2Anm.TripMatcher {
 			}
 
 			countsPerAnmTrip.put(bestMatchingAmTrip, (countsPerAnmTrip.get(bestMatchingAmTrip) + 1));
+
+			log.info("Best match with score " + bestMatchScore);
+			if (bestMatchScore >= 0.9*TenPrctScore) {
+				this.matchesWithHighScores++;
+			}
 		}
+
+		log.info("Of total " + msTrips.size() + " trips, " + this.matchesWithHighScores + " were matched with a high score above " +
+				0.9*TenPrctScore + " points.");
 
 		return countsPerAnmTrip;
 	}
