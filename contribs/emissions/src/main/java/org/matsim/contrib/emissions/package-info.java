@@ -16,12 +16,12 @@ package org.matsim.contrib.emissions;
  * <li> {@link org.matsim.contrib.emissions.example.RunEmissionToolOfflineExample RunEmissionToolOfflineExample}: Produces an emission events file based on a standard MATSim eventsfile. </li>
  * </ul>
  * The online example as well as the offline example use a config file as created by {@link org.matsim.contrib.emissions.example.CreateEmissionConfig CreateEmissionConfig}. 
- * An example config and the associated files can be found at ???????????????.
+ * An example config and the associated files can be found at the test input directory.
  * The example config file allows you to directly run the online example.
  * Please note that the emission values given by the sample files do not resemble the actual data from HBEFA due to copyright restrictions. 
  *  
  * 
- * In all cases you will have to specify several input files. See the above classes as examples and the following section for details.
+ * To set up your own simulation cases you will have to specify several input files. See the above classes as examples and the following section for details.
  *
  * <h2>Input files</h2>
  * Required files are:
