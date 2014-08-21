@@ -31,8 +31,7 @@ import playground.boescpa.converters.vissim.ConvEvents2Anm;
 import java.util.HashMap;
 
 /**
- * WHAT IS IT FOR?
- * WHAT DOES IT?
+ * Provides tests for TripMatcher.
  *
  * @author boescpa
  */
