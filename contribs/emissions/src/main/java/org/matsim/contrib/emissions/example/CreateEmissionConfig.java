@@ -64,8 +64,8 @@ public class CreateEmissionConfig {
 		static String detailedWarmEmissionFactorsFile = inputPath + "sample_EFA_HOT_SubSegm_2005detailed.txt";
 		static String detailedColdEmissionFactorsFile = inputPath + "sample_EFA_ColdStart_SubSegm_2005detailed.txt";
 		
-		static String outputPath = "./output/";
-		static String configFile = outputPath + "config.xml";
+		static String outputPath = "./test/output/";
+		static String configFilePath = inputPath + "config.xml";
 		
 		static int numberOfIterations = 21;
 		
@@ -159,7 +159,7 @@ public class CreateEmissionConfig {
 			
 	   // write config     
 	        ConfigWriter cw = new ConfigWriter(config);
-			cw.write(configFile);
+			cw.write(configFilePath);
 			
 
 

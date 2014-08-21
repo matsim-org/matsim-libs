@@ -43,7 +43,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class RunEmissionToolOfflineExample {
 	
-	final static String runDirectory = "./output/";
+	final static String runDirectory = "./test/output/";
 	static String configFile = runDirectory + "output_config.xml.gz";
 	final static Integer lastIteration = getLastIteration(configFile);
 	
