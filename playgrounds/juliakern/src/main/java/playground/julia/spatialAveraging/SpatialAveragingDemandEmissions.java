@@ -120,7 +120,7 @@ public class SpatialAveragingDemandEmissions {
 	
 	final String pollutant2analyze = WarmPollutant.NOX.toString();
 	final boolean compareToBaseCase = true;
-	final boolean useLineMethod = true;
+	final boolean useLineMethod = false;
 	private boolean writeRoutput = true;
 	private boolean writeGisOutput = false;
 	
@@ -138,6 +138,14 @@ public class SpatialAveragingDemandEmissions {
 	Map<Double, double[][]> time2NormalizedWeightedEmissionsBaseCase = new HashMap<Double, double[][]>();
 	Map<Double, double[][]> time2NormalizedWeightedDemandBaseCase = new HashMap<Double, double[][]>();
 	Map<Double, double[][]> time2SpecificEmissionsBaseCase = new HashMap<Double, double[][]>();
+
+	Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered;
+	Map<Double, Map<Id, Double>> time2CountsPerLink;
+	Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered;
+
+	private Map<Double, double[][]> time2NormalizedWeightedDemand;
+	private Map<Double, double[][]> time2NormalizedWeightedEmissions;
+	private Map<Double, double[][]> time2SpecificEmissions;
 	
 	/*
 	 * process first emission file: calculate weighted emissions per cell
@@ -171,17 +179,23 @@ public class SpatialAveragingDemandEmissions {
 		 * 2. parse emission file and store overall emission amounts by time bins 
 		 */
 		
-		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered1 = new HashMap<Double, Map<Id,Map<String,Double>>>(); 
-		Map<Double, Map<Id, Double>> time2CountsPerLink1 = new HashMap<Double, Map<Id,Double>>();
-		Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered1 = new HashMap<Double, Map<Id,Double>>();
+		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFilteredBaseCase = new HashMap<Double, Map<Id,Map<String,Double>>>(); 
+		Map<Double, Map<Id, Double>> time2CountsPerLinkBaseCase = new HashMap<Double, Map<Id,Double>>();
+		Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFilteredBaseCase = new HashMap<Double, Map<Id,Double>>();
 		
-		parseAndProcessEmissions(emissionFile1, time2EmissionsTotalFilledAndFiltered1, time2CountsPerLink1, time2CountsPerLinkFilledAndFiltered1);
-
+		parseAndProcessEmissions(emissionFile1);
+		time2EmissionsTotalFilledAndFilteredBaseCase = this.time2EmissionsTotalFilledAndFiltered;
+		time2CountsPerLinkBaseCase = this.time2CountsPerLink;
+		time2CountsPerLinkFilledAndFilteredBaseCase = this.time2CountsPerLinkFilledAndFiltered;
+		
 		/*
 		 * 3. calculate weighted emissions per cell, weighted demand per cell
 		 */
 		
-		calculateWeightedEmissionsAndDemands(time2NormalizedWeightedEmissionsBaseCase, time2NormalizedWeightedDemandBaseCase, time2SpecificEmissionsBaseCase, time2EmissionsTotalFilledAndFiltered1, time2CountsPerLinkFilledAndFiltered1);
+		calculateWeightedEmissionsAndDemands( time2EmissionsTotalFilledAndFilteredBaseCase, time2CountsPerLinkFilledAndFilteredBaseCase);
+		time2NormalizedWeightedDemandBaseCase = this.time2NormalizedWeightedDemand;
+		time2NormalizedWeightedEmissionsBaseCase = this.time2NormalizedWeightedEmissions;
+		time2SpecificEmissionsBaseCase = this.time2SpecificEmissions;
 		
 		/*
 		 * 4. write output
@@ -200,8 +214,12 @@ public class SpatialAveragingDemandEmissions {
 		Map<Double, Map<Id, Double>> time2CountsPerLinkCompareCase = new HashMap<Double, Map<Id,Double>>();
 		Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFilteredCompareCase = new HashMap<Double, Map<Id,Double>>();
 		
-		parseAndProcessEmissions(emissionFile, time2EmissionsTotalFilledAndFilteredCompareCase, time2CountsPerLinkCompareCase, time2CountsPerLinkFilledAndFilteredCompareCase);
-
+		//parseAndProcessEmissions(emissionFile, time2EmissionsTotalFilledAndFilteredCompareCase, time2CountsPerLinkCompareCase, time2CountsPerLinkFilledAndFilteredCompareCase);
+		parseAndProcessEmissions(emissionFile);
+		time2EmissionsTotalFilledAndFilteredCompareCase = this.time2EmissionsTotalFilledAndFiltered;
+		time2CountsPerLinkCompareCase = this.time2CountsPerLink;
+		time2CountsPerLinkFilledAndFilteredCompareCase = this.time2CountsPerLinkFilledAndFiltered;
+		
 		/*
 		 * 2. calculate weighted emissions per cell, weighted demand per cell
 		 */
@@ -209,7 +227,11 @@ public class SpatialAveragingDemandEmissions {
 		Map<Double, double[][]> time2NormalizedWeightedDemandCompareCase = new HashMap<Double, double[][]>();
 		Map<Double, double[][]> time2SpecificEmissionsCompareCase = new HashMap<Double, double[][]>();
 		
-		calculateWeightedEmissionsAndDemands(time2NormalizedWeightedEmissionsCompareCase, time2NormalizedWeightedDemandCompareCase, time2SpecificEmissionsCompareCase, time2EmissionsTotalFilledAndFilteredCompareCase, time2CountsPerLinkFilledAndFilteredCompareCase);
+		//calculateWeightedEmissionsAndDemands(time2NormalizedWeightedEmissionsCompareCase, time2NormalizedWeightedDemandCompareCase, time2SpecificEmissionsCompareCase, time2EmissionsTotalFilledAndFilteredCompareCase, time2CountsPerLinkFilledAndFilteredCompareCase);
+		calculateWeightedEmissionsAndDemands(time2EmissionsTotalFilledAndFilteredCompareCase, time2CountsPerLinkFilledAndFilteredCompareCase);
+		time2NormalizedWeightedEmissionsCompareCase = this.time2NormalizedWeightedEmissions;
+		time2NormalizedWeightedDemandCompareCase = this.time2NormalizedWeightedDemand;
+		time2SpecificEmissionsCompareCase = this.time2SpecificEmissions;
 		
 		/*
 		 * 3. calculate differences to base case
@@ -235,29 +257,28 @@ public class SpatialAveragingDemandEmissions {
 		outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber1 + "." + lastIteration1;
 	}
 
-	private void parseAndProcessEmissions(String emissionFile, Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered, Map<Double, Map<Id, Double>> time2CountsPerLink, Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered){
-		time2EmissionsTotalFilledAndFiltered = processEmissions(emissionFile);
-		time2CountsPerLink = this.warmHandler.getTime2linkIdLeaveCount();
-		time2CountsPerLinkFilledAndFiltered = setNonCalculatedCountsAndFilter(time2CountsPerLink);
+	private void parseAndProcessEmissions(String emissionFile){
+		this.time2EmissionsTotalFilledAndFiltered = processEmissions(emissionFile);
+		this.time2CountsPerLink = warmHandler.getTime2linkIdLeaveCount();
+		this.time2CountsPerLinkFilledAndFiltered = setNonCalculatedCountsAndFilter(this.time2CountsPerLink);
+		//TODO 
 		this.warmHandler.reset(0);
 		this.coldHandler.reset(0);
 	}
 	
-	private void calculateWeightedEmissionsAndDemands(
-			Map<Double, double[][]> time2NormalizedWeightedEmissions1,
-			Map<Double, double[][]> time2NormalizedWeightedDemand1,
-			Map<Double, double[][]> time2SpecificEmissions1, 
-			Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered1, 
+	private void calculateWeightedEmissionsAndDemands(Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered1, 
 			Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered1) {
 		
-		time2NormalizedWeightedEmissions1 = fillAndNormalizeWeightedEmissionValues(time2EmissionsTotalFilledAndFiltered1);
-		time2NormalizedWeightedDemand1 = fillAndNormalizeWeightedDemandValues(time2CountsPerLinkFilledAndFiltered1);
-		time2SpecificEmissions1 = calculateSpecificEmissionsPerBin(time2NormalizedWeightedEmissions1, time2NormalizedWeightedDemand1);		
+		this.time2NormalizedWeightedEmissions = fillAndNormalizeWeightedEmissionValues(time2EmissionsTotalFilledAndFiltered1);
+		this.time2NormalizedWeightedDemand = fillAndNormalizeWeightedDemandValues(time2CountsPerLinkFilledAndFiltered1);
+		this.time2SpecificEmissions = calculateSpecificEmissionsPerBin(time2NormalizedWeightedEmissions, time2NormalizedWeightedDemand);		
 	}
 	
 	private void writeOutput(Map<Double, double[][]> time2NormalizedWeightedEmissions, Map<Double, double[][]> time2NormalizedWeightedDemand, Map<Double, double[][]> time2SpecificEmissions) throws IOException{
+		logger.info("start writing r output to " + outPathStub + ".Routput...");
 		for(double endOfTimeInterval: time2NormalizedWeightedEmissions.keySet()){
 			if(writeRoutput){
+				logger.info("start writing r output to " + outPathStub + ".Routput...");
 				this.saWriter.writeRoutput(time2NormalizedWeightedEmissions.get(endOfTimeInterval), outPathStub + ".Routput." + pollutant2analyze.toString() + ".g." + endOfTimeInterval + ".txt");
 				this.saWriter.writeRoutput(time2NormalizedWeightedDemand.get(endOfTimeInterval), outPathStub + ".Routput.Demand.vkm." + endOfTimeInterval + ".txt");
 				this.saWriter.writeRoutput(time2SpecificEmissions.get(endOfTimeInterval), outPathStub+ ".Routput." + pollutant2analyze + ".gPerVkm." + endOfTimeInterval + ".txt");
@@ -268,6 +289,7 @@ public class SpatialAveragingDemandEmissions {
 				this.saWriter.writeGISoutput(time2SpecificEmissions, outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".gPerVkm.movie.shp");
 			}
 		}
+		logger.info("Done writing output.");
 	}
 	
 	private Map<Double, double[][]> fillAndNormalizeWeightedDemandValues(
