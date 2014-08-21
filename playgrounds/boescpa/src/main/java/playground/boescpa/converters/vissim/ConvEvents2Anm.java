@@ -75,6 +75,9 @@ public class ConvEvents2Anm {
 		HashMap<Id, Long[]> msTrips = this.matsimRouteConverter.convert(keyMsNetwork, path2EventsFile, path2MATSimNetwork, path2VissimZoneShp);
 		HashMap<Id, Long[]> amTrips = this.anmRouteConverter.convert(keyAmNetwork, path2AnmroutesFile, "", "");
 		HashMap<Id, Integer> demandPerAnmTrip = this.tripMatcher.matchTrips(msTrips, amTrips);
+
+		// todo-boescpa Deal with start times of trips...
+
 		writeAnmRoutes(demandPerAnmTrip, path2AnmroutesFile, path2NewAnmFile);
 	}
 
