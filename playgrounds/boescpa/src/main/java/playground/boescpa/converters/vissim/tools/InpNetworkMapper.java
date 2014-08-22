@@ -30,13 +30,9 @@ import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.utils.objectattributes.attributeconverters.DoubleConverter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -134,21 +130,7 @@ public class InpNetworkMapper extends AbstractNetworkMapper {
 			System.out.println("Reading of " + path2VissimNetworkInp + " failed.");
 			e.printStackTrace();
 		}
-/*
-		// create links:
-		int countErrLinks = 0;
-		for (SimpleAnmParser.AnmLink link : links) {
-			try {
-				Node fromNode = network.getNodes().get(link.fromNode);
-				Node toNode = network.getNodes().get(link.toNode);
-				network.addLink(networkFactory.createLink(link.id, fromNode, toNode));
-			} catch (NullPointerException e) {
-				System.out.println("Link " + link.id.toString() + " lacks one or both nodes.");
-				countErrLinks++;
-			}
-		}
-		System.out.print(countErrLinks + " links found (and dropped) with one or both nodes lacking.\n");
-*/
+
 		return network;
 	}
 
