@@ -39,11 +39,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
@@ -77,6 +79,7 @@ LinkEnterEventHandler,
 LinkLeaveEventHandler,
 TransitDriverStartsEventHandler,
 PersonDepartureEventHandler,
+PersonArrivalEventHandler,
 PersonStuckEventHandler {
 
 	final static Logger log = Logger.getLogger(MarginalCongestionHandlerImplV4.class);
@@ -130,7 +133,7 @@ PersonStuckEventHandler {
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
 		log.warn("An agent is stucking. No garantee for right calculation of external congestion effects "
-				+ "because there are no linkLeaveEvents for stucked agents.: " + event.toString());
+				+ "because there are no linkLeaveEvents for stucked agents.: \n" + event.toString());
 	}
 
 	@Override
@@ -142,6 +145,13 @@ PersonStuckEventHandler {
 			LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
 			linkInfo.getPersonId2linkEnterTime().put(event.getPersonId(), event.getTime());
+			linkInfo.getEnteringAgents().add(event.getPersonId());
+		}
+	}
+	@Override
+	public void handleEvent(PersonArrivalEvent event) {
+		if (event.getLegMode().toString().equals(TransportMode.car.toString())){
+			this.linkId2congestionInfo.get(event.getLinkId()).getEnteringAgents().remove(event.getPersonId());
 		}
 	}
 
@@ -229,8 +239,7 @@ PersonStuckEventHandler {
 //			linkInfo.getPersonId2WarmEmissionsToPayFor().put(event.getVehicleId(), stopAndGoWarmEmissionOnThisLink);
 			this.totalDelay = this.totalDelay + delayOnThisLink;
 
-			List<Id> leavingAgentsList = new ArrayList<Id>();
-			leavingAgentsList.addAll(linkInfo.getLeavingAgents());
+			List<Id> leavingAgentsList = new ArrayList<Id>(linkInfo.getLeavingAgents());
 			Collections.reverse(leavingAgentsList);
 
 			if(!leavingAgentsList.isEmpty()){ // flow cap delays
@@ -289,7 +298,7 @@ PersonStuckEventHandler {
 		Id spillBackCausingLink  = identifySpillBackCausingLink(personOnThisLink, personInFrontOfQ);
 
 		LinkCongestionInfoExtended spillBackCausingLinkInfo = this.linkId2congestionInfo.get(spillBackCausingLink);
-		List<Id> personsEnteredOnSpillBackCausingLink = spillBackCausingLinkInfo.getEnteringAgents();
+		List<Id> personsEnteredOnSpillBackCausingLink = new ArrayList<Id>(spillBackCausingLinkInfo.getEnteringAgents()); 
 		personId2LinkId[0] = personsEnteredOnSpillBackCausingLink.get(0);
 		personId2LinkId[1] = spillBackCausingLink;
 		Collections.reverse(personsEnteredOnSpillBackCausingLink);
@@ -306,7 +315,7 @@ PersonStuckEventHandler {
 		}
 
 		if(delayToPayFor>0){
-			List<Id> personsLeftSpillBackCausingLink = spillBackCausingLinkInfo.getLeavingAgents();
+			List<Id> personsLeftSpillBackCausingLink = new ArrayList<Id>(spillBackCausingLinkInfo.getLeavingAgents());
 			Collections.reverse(personsLeftSpillBackCausingLink);
 			Iterator<Id> prsnLftSpillBakCauinLinkItrtr = personsLeftSpillBackCausingLink.iterator();
 
@@ -331,11 +340,12 @@ PersonStuckEventHandler {
 		if(linkInfo.getPersonId2CausingLinkId().containsKey(thisPerson)){//leaving agents list was empty
 			spillBackCausingLink = linkInfo.getPersonId2CausingLinkId().get(thisPerson);
 		} else {
-			List<Id> personLeavingList = linkInfo.getLeavingAgents();
+			List<Id> personLeavingList = new ArrayList<Id>(linkInfo.getLeavingAgents());
 			Collections.reverse(personLeavingList);
 			for(Id id:personLeavingList){
 				if(linkInfo.getPersonId2CausingLinkId().containsKey(id)){
 					spillBackCausingLink = linkInfo.getPersonId2CausingLinkId().get(id);
+					break;
 				}
 			}
 			if (spillBackCausingLink.equals(new IdImpl("NA"))) throw new RuntimeException("Spill back causing link is not identified. Somethign went wrong.");
