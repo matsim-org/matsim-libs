@@ -1,8 +1,13 @@
 /**
  * This package provides a tool for exhaust emission calculation based on
  * the ``Handbook on Emission Factors for Road Transport'' (HBEFA), version 3.1 (see <a href="http://www.hbefa.net">http://www.hbefa.net</a>).
- *  
- * 
+ *  <p>
+ *  When publishing results connected to the use of the emission package make sure to cite the following two articles:
+ *  <ul>
+ *  <li> Hülsmann, F.; Gerike, R.; Kickhöfer, B.; Nagel, K. & Luz, R. Towards a multi-agent based modeling approach for air pollutants in urban regions Proceedings of the Conference on ``Luftqualität an Straßen'', FGSV Verlag GmbH, 2011, 144-166 </li>
+ *  <li> Kickhöfer, B.; Hülsmann, F.; Gerike, R. & Nagel, K. Vanoutrive, T. & Verhetsel, A. (Eds.) Rising car user costs: comparing aggregated and geo-spatial impacts on travel demand and air pollutant emissions Smart Transport Networks: Decision Making, Sustainability and Market structure, Edward Elgar Publishing Ltd, 2013, 180-207 </li>
+ *  </ul>
+ * <p>
  * <h2>Usage</h2>
  * Execute {@link org.matsim.contrib.emissions.example.CreateEmissionConfig CreateEmissionConfig} and {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample RunEmissionToolOnlineExample} or {@link org.matsim.contrib.emissions.example.RunEmissionToolOfflineExample RunEmissionToolOfflineExample} from the example package.
  * <ul>
@@ -14,8 +19,7 @@
  * An example config and the associated files can be found at the test input directory.
  * The example config file allows you to directly run the online example.
  * Please note that the emission values given by the sample files do not resemble the actual data from HBEFA due to copyright restrictions. 
- *  
- * 
+ *  <p>
  * To set up your own simulation cases you will have to specify several input files. See the above classes as examples and the following section for details.
  *
  * <h2>Input files</h2>
