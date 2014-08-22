@@ -61,9 +61,9 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		Config config = loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setLastIteration(0);
 		config.controler().setWritePlansInterval(0);
-		config.scenario().setUseRoadpricing(true);
+        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
 
-		RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class) ;
+        RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class) ;
 		rpConfig.setTollLinksFile(getInputDirectory() + "distanceToll.xml") ;
 		
 		Controler controler = new Controler(config);
@@ -85,7 +85,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		Config config = loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setLastIteration(0);
 		config.controler().setWritePlansInterval(0);
-		config.scenario().setUseRoadpricing(true);
+        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
         ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(getInputDirectory() + "cordonToll.xml");
 		Controler controler = new Controler(config);
 		controler.addControlerListener(new RoadPricing());
@@ -118,7 +118,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		double scoreBasecase = controler1.getPopulation().getPersons().get(new IdImpl("1")).getPlans().get(0).getScore().doubleValue();
 
 		// now run toll case
-		config.scenario().setUseRoadpricing(true);
+        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
         ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(getInputDirectory() + "distanceToll.xml");
 		config.controler().setOutputDirectory(getOutputDirectory() + "/tollcase/");
 		Controler controler2 = new Controler(config);

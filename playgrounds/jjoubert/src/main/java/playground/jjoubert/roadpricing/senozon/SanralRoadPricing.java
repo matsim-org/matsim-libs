@@ -56,7 +56,7 @@ public class SanralRoadPricing implements StartupListener, AfterMobsimListener, 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 		final Controler controler = event.getControler();
-		if (controler.getConfig().scenario().isUseRoadpricing()) {
+        if (ConfigUtils.addOrGetModule(controler.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUseRoadpricing()) {
 			throw new RuntimeException("roadpricing must not be enabled in config.scenario in order to use special road pricing features!");
 		}
 		// read the road pricing scheme from file

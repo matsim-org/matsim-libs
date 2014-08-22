@@ -305,7 +305,7 @@ public class GautengControler_subpopulations {
 	private static void setUpRoadPricingAndScoring(double baseValueOfTime, double valueOfTimeMultiplier, final Scenario sc,
 			final Controler controler) {
 		// ROAD PRICING:
-		if (sc.getConfig().scenario().isUseRoadpricing()) {
+        if (ConfigUtils.addOrGetModule(sc.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUseRoadpricing()) {
 			throw new RuntimeException(
 					"roadpricing must NOT be enabled in config.scenario in order to use special "
 							+ "road pricing features.  aborting ...");

@@ -178,7 +178,7 @@ public class KNOldGautengController {
 	}
 
 	private void run () {
-		if (config.scenario().isUseRoadpricing()) {
+        if (ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUseRoadpricing()) {
 			throw new RuntimeException("roadpricing must NOT be enabled in config.scenario in order to use special " +
 					"road pricing features.  aborting ...");
 		}

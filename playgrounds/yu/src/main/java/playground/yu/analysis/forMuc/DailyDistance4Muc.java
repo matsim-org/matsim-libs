@@ -34,10 +34,10 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
-
 import playground.yu.analysis.CalcRouteDistance;
 import playground.yu.analysis.DailyDistance;
 import playground.yu.utils.charts.PieChart;
@@ -785,9 +785,9 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseRoadpricing(true);
+        ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
 
-		new MatsimNetworkReader(scenario).readFile(netFilename);
+        new MatsimNetworkReader(scenario).readFile(netFilename);
 		RoadPricingSchemeImpl toll = (RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(toll);
 		tollReader.parse(tollFilename);

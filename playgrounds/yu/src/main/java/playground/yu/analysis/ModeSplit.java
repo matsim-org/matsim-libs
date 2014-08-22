@@ -20,11 +20,7 @@
 package playground.yu.analysis;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -34,10 +30,10 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
-
 import playground.yu.utils.TollTools;
 import playground.yu.utils.charts.PieChart;
 import playground.yu.utils.io.SimpleWriter;
@@ -180,9 +176,9 @@ public class ModeSplit extends AbstractPersonAlgorithm implements
 		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		scenario.getConfig().scenario().setUseRoadpricing(true);
+        ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
 
-		RoadPricingSchemeImpl tollScheme = (RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
+        RoadPricingSchemeImpl tollScheme = (RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(tollScheme);
 		tollReader.parse(tollFilename);
 

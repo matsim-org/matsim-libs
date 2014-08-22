@@ -11,7 +11,7 @@ import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.roadpricing.RoadPricing;
-
+import org.matsim.roadpricing.RoadPricingConfigGroup;
 import playground.ivt.kticompatibility.KtiLikeActivitiesScoringFunctionFactory;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.kticompatibility.KtiPtConfigGroup;
@@ -51,7 +51,7 @@ public class KTIScenarioWithRoadPricing {
 					config.planCalcScore(),
 					scenario) );
 
-		if ( config.scenario().isUseRoadpricing() ) {
+        if (ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUseRoadpricing()) {
 			log.info( "adding the roadpricing listenner." );
 			controler.addControlerListener( new RoadPricing() );
 		}

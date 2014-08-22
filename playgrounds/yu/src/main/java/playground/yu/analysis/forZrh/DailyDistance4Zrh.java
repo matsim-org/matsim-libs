@@ -39,10 +39,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
-
 import playground.yu.analysis.DailyDistance;
 import playground.yu.utils.charts.PieChart;
 import playground.yu.utils.container.CollectionMath;
@@ -485,8 +485,8 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		scenario.getConfig().scenario().setUseRoadpricing(true);
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1((RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
+        ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
+        RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1((RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
 		tollReader.parse(tollFilename);
 
 		Population population = scenario.getPopulation();

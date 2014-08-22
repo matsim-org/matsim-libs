@@ -109,9 +109,9 @@ class GautengControler {
 		final Scenario sc = controler.getScenario();
 		
 //		constructPersonHhMappingAndInsertIntoScenario(sc);
-		
-		
-		if (sc.getConfig().scenario().isUseRoadpricing()) {
+
+
+        if (ConfigUtils.addOrGetModule(controler.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUseRoadpricing()) {
 			throw new RuntimeException("roadpricing must NOT be enabled in config.scenario in order to use special " +
 					"road pricing features.  aborting ...");
 		}

@@ -27,13 +27,7 @@ package org.matsim.contrib.matsim4urbansim.run;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
@@ -67,6 +61,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricing;
+import org.matsim.roadpricing.RoadPricingConfigGroup;
 
 
 /**
@@ -280,7 +275,7 @@ public class MATSim4UrbanSimParcel{
 	void runControler( ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels,ActivityFacilitiesImpl opportunities){
 		
 		Controler controler = new Controler(scenario);
-		if (scenario.getConfig().scenario().isUseRoadpricing()) {
+        if (ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUseRoadpricing()) {
 			controler.addControlerListener(new RoadPricing());
 			// yyyy this is a quick fix in order to make the SustainCity case studies work.  The more longterm goal is to
 			// remove those "configuration" flags completely from the config.  However, then some other mechanism needs to be found 

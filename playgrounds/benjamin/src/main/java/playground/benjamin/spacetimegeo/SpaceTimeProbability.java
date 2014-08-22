@@ -210,9 +210,9 @@ public class SpaceTimeProbability {
 		
 		// scenarioConfigGroup
 		ScenarioConfigGroup sccg = config.scenario();
-		sccg.setUseRoadpricing(true);
+        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
 
-		// roadPricingConfigGroup
+        // roadPricingConfigGroup
         RoadPricingConfigGroup rpc = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
 		rpc.setTollLinksFile(this.tollLinksFile);
 		

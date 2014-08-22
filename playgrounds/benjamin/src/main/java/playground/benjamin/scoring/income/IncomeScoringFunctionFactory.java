@@ -22,6 +22,7 @@ package playground.benjamin.scoring.income;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -30,12 +31,9 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.households.Income;
-import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.households.Income.IncomePeriod;
-
-import playground.benjamin.scoring.income.ScoringFromDailyIncome;
-import playground.benjamin.scoring.income.ScoringFromLeg;
-import playground.benjamin.scoring.income.ScoringFromToll;
+import org.matsim.households.PersonHouseholdMapping;
+import org.matsim.roadpricing.RoadPricingConfigGroup;
 
 /**
  * @author dgrether
@@ -75,7 +73,7 @@ public class IncomeScoringFunctionFactory implements ScoringFunctionFactory {
 		scoringFunctionAccumulator.addScoringFunction(new ScoringFromLeg(person.getSelectedPlan(), params, this.network, householdIncomePerDay ));
 
 		//utility spend for traveling (toll costs) if there is a toll
-		if(config.scenario().isUseRoadpricing()){
+        if(ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUseRoadpricing()){
 			scoringFunctionAccumulator.addScoringFunction(new ScoringFromToll(params, householdIncomePerDay));
 		}
 		

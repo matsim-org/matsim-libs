@@ -19,16 +19,13 @@
  * *********************************************************************** */
 package playground.vsptelematics.roadpricing;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -37,11 +34,15 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.roadpricing.RoadPricing;
+import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
-
 import playground.vsptelematics.common.IncidentGenerator;
 import playground.vsptelematics.ha1.RouteTTObserver;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 
 /**
@@ -71,7 +72,7 @@ public class Controller {
 				final RouteTTObserver observer = new RouteTTObserver(con.getControlerIO().getOutputFilename("routeTravelTimes.txt"));
 				con.addControlerListener(observer);
 				con.getEvents().addHandler(observer);
-				if (con.getConfig().scenario().isUseRoadpricing()) {
+                if (ConfigUtils.addOrGetModule(event.getControler().getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUseRoadpricing()) {
 					con.addControlerListener(new TollBehaviour());
 				}
 				if (con.getScenario().getConfig().network().isTimeVariantNetwork()){

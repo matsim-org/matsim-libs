@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package org.matsim.core.config.groups;
 
+import org.matsim.core.config.Module;
+
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.matsim.core.config.Module;
 
 /**
  * @author dgrether
@@ -34,7 +34,6 @@ public class ScenarioConfigGroup extends Module {
 
 	private static final String USE_LANES = "useLanes";
 	private static final String USE_SIGNALSYSTMES = "useSignalsystems";
-	private static final String USE_ROADPRICING = "useRoadpricing";
 	private static final String USE_VEHICLES = "useVehicles";
 	private static final String USE_HOUSEHOLDS = "useHouseholds";
 	private static final String USE_KNOWLEDGE = "useKnowledge";
@@ -42,7 +41,6 @@ public class ScenarioConfigGroup extends Module {
 
 	private boolean useLanes = false;
 	private boolean useSignalSystems = false;
-	private boolean useRoadpricing = false;
 	private boolean useHouseholds = false;
 	private boolean useVehicles = false;
 	private boolean useKnowledge = true;
@@ -60,9 +58,6 @@ public class ScenarioConfigGroup extends Module {
 		}
 		else if (USE_SIGNALSYSTMES.equalsIgnoreCase(key)){
 			this.useSignalSystems = Boolean.parseBoolean(value.trim());
-		}
-		else if (USE_ROADPRICING.equalsIgnoreCase(key)){
-			this.useRoadpricing = Boolean.parseBoolean(value.trim());
 		}
 		else if (USE_VEHICLES.equalsIgnoreCase(key)){
 			this.useVehicles = Boolean.parseBoolean(value.trim());
@@ -86,7 +81,6 @@ public class ScenarioConfigGroup extends Module {
 		Map<String,String> map = super.getComments();
 		map.put(USE_LANES, "Set this parameter to true if lanes should be used, false if not.");
 		map.put(USE_SIGNALSYSTMES, "Set this parameter to true if signal systems should be used, false if not.");
-		map.put(USE_ROADPRICING, "Set this parameter to true if roadpricing should be used, false if not.");
 		map.put(USE_KNOWLEDGE, "Set this parameter to true if knowledge should be used, false if not.");
 		map.put(USE_HOUSEHOLDS, "Set this parameter to true if households should be used, false if not.");
 		map.put(USE_VEHICLES, "Set this parameter to true if vehicles should be used, false if not.");
@@ -101,9 +95,6 @@ public class ScenarioConfigGroup extends Module {
 		}
 		else if (USE_SIGNALSYSTMES.equalsIgnoreCase(key)){
 			return Boolean.toString(this.isUseSignalSystems());
-		}
-		else if (USE_ROADPRICING.equalsIgnoreCase(key)){
-			return Boolean.toString(this.isUseRoadpricing());
 		}
 		else if (USE_KNOWLEDGE.equalsIgnoreCase(key)){
 			return Boolean.toString(this.isUseKnowledges());
@@ -127,7 +118,6 @@ public class ScenarioConfigGroup extends Module {
 		TreeMap<String, String> m = new TreeMap<String, String>();
 		m.put(USE_LANES, getValue(USE_LANES));
 		m.put(USE_SIGNALSYSTMES, getValue(USE_SIGNALSYSTMES));
-		m.put(USE_ROADPRICING, getValue(USE_ROADPRICING));
 		m.put(USE_VEHICLES, this.getValue(USE_VEHICLES));
 		m.put(USE_HOUSEHOLDS, this.getValue(USE_HOUSEHOLDS));
 		m.put(USE_KNOWLEDGE, this.getValue(USE_KNOWLEDGE));
@@ -151,15 +141,7 @@ public class ScenarioConfigGroup extends Module {
 		this.useSignalSystems = useSignalSystems;
 	}
 
-	public boolean isUseRoadpricing() {
-		return this.useRoadpricing;
-	}
-
-	public void setUseRoadpricing(final boolean useRoadpricing) {
-		this.useRoadpricing = useRoadpricing;
-	}
-
-	public boolean isUseKnowledges() {
+    public boolean isUseKnowledges() {
 		return this.useKnowledge;
 	}
 

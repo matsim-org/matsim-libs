@@ -20,8 +20,6 @@
 
 package org.matsim.roadpricing;
 
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -41,6 +39,8 @@ import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
+
+import java.util.Map;
 
 /**
  * Tests that {@link CalcPaidToll} calculates the correct tolls
@@ -192,8 +192,8 @@ public class CalcPaidTollTest extends MatsimTestCase {
 	private Population runTollSimulation(final String tollFile, final String tollType, final PlanCalcScoreConfigGroup config) {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Fixture.createNetwork1(scenario);
-		scenario.getConfig().scenario().setUseRoadpricing(true);
-		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
+        ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
+        RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 		scenario.addScenarioElement( RoadPricingScheme.ELEMENT_NAME , scheme);
 		RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(scheme);
 		reader.parse(tollFile);

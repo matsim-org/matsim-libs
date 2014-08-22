@@ -23,21 +23,12 @@
  */
 package playground.yu.analysis;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -52,12 +43,20 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.xml.sax.SAXException;
-
 import playground.yu.utils.io.SimpleWriter;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author ychen
@@ -387,19 +386,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 
 	}
 
-	/**
-	 * @param arg0
-	 *            networkFilename;
-	 * @param arg1
-	 *            eventsFilename;
-	 * @param arg2
-	 *            roadpricingFilename;
-	 * @param arg3
-	 *            outpath;
-	 * @throws IOException
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 */
+
 	public static void run_roadpricing(String[] args) throws SAXException,
 			ParserConfigurationException, IOException {
 		Gbl.startMeasurement();
@@ -416,8 +403,8 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 
 		EventsManager events = EventsUtils.createEventsManager();
 
-		scenario.getConfig().scenario().setUseRoadpricing(true);
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
+        ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
+        RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
 				(RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
 		tollReader.parse(roadPricingFilename);
 		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(network,
