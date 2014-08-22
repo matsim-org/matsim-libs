@@ -17,54 +17,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.sim2;
+package playground.johannes.gsv.synPop.invermo;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.sna.util.Composite;
+import playground.johannes.gsv.synPop.ProxyObject;
 
 /**
  * @author johannes
  *
  */
-public class HamiltonianComposite extends Composite<Hamiltonian> implements Hamiltonian {
+public class HouseholdStationHandler implements AttributeHandler<ProxyObject> {
 
-	private List<Double> thetas = new ArrayList<Double>();
-	
-	public void addComponent(Hamiltonian h) {
-		super.addComponent(h);
-		thetas.add(1.0);
-	}
-	
-	public void addComponent(Hamiltonian h, double theta) {
-		super.addComponent(h);
-		thetas.add(theta);
-	}
-	
-	public void removeComponent(Hamiltonian h) {
-		int idx = components.indexOf(h);
-		super.removeComponent(h);
-		thetas.remove(idx);
-	}
-
-	/*
-	 * TODO: hide access?
-	 */
-	public List<Hamiltonian> getComponents() {
-		return components;
-	}
-	
 	@Override
-	public double evaluate(ProxyPerson person) {
-		double sum = 0;
-		
-		for(int i = 0; i < components.size(); i++) {
-			sum += thetas.get(i) * components.get(i).evaluate(person);
+	public void handleAttribute(ProxyObject household, Map<String, String> attributes) {
+		String val = attributes.get(ColumnKeys.STATION_NAME);
+		if(ColumnKeys.validate(val)) {
+			household.setAttribute(InvermoKeys.STATION_NAME, val);
 		}
 		
-		return sum;
+		val = attributes.get(ColumnKeys.STATION_DIST);
+		if(ColumnKeys.validate(val)) {
+			double dist = Double.parseDouble(val);
+			household.setAttribute(InvermoKeys.STATION_DIST, String.valueOf(dist));
+		}
+		
+		val = attributes.get("wohnplz");
+		System.out.println(attributes.get("wohnplz") + " " + attributes.get("wohnort"));
+		
 	}
 
 }

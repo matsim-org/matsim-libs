@@ -17,54 +17,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.sim2;
+package playground.johannes.gsv.synPop.invermo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.sna.util.Composite;
+import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.gsv.synPop.ProxyPlan;
 
 /**
  * @author johannes
- *
+ * 
  */
-public class HamiltonianComposite extends Composite<Hamiltonian> implements Hamiltonian {
+public class LegHandlerAdaptor implements AttributeHandler<ProxyPlan> {
 
-	private List<Double> thetas = new ArrayList<Double>();
-	
-	public void addComponent(Hamiltonian h) {
-		super.addComponent(h);
-		thetas.add(1.0);
-	}
-	
-	public void addComponent(Hamiltonian h, double theta) {
-		super.addComponent(h);
-		thetas.add(theta);
-	}
-	
-	public void removeComponent(Hamiltonian h) {
-		int idx = components.indexOf(h);
-		super.removeComponent(h);
-		thetas.remove(idx);
+	private List<LegAttributeHandler> delegates = new ArrayList<LegAttributeHandler>();
+
+	public void addHandler(LegAttributeHandler handler) {
+		delegates.add(handler);
 	}
 
-	/*
-	 * TODO: hide access?
-	 */
-	public List<Hamiltonian> getComponents() {
-		return components;
-	}
-	
 	@Override
-	public double evaluate(ProxyPerson person) {
-		double sum = 0;
-		
-		for(int i = 0; i < components.size(); i++) {
-			sum += thetas.get(i) * components.get(i).evaluate(person);
+	public void handleAttribute(ProxyPlan plan, Map<String, String> attributes) {
+		for (Entry<String, String> entry : attributes.entrySet()) {
+			if (!entry.getValue().equalsIgnoreCase("nan")) {
+				String key = entry.getKey();
+				int dotIdx = key.indexOf(".");
+				key = key.substring(dotIdx + 1);
+				if (key.startsWith("e")) {
+					int idx = Character.getNumericValue(key.charAt(1));
+					idx = idx - 1;
+					while (idx > plan.getLegs().size() - 1) {
+						plan.addLeg(new ProxyObject());
+					}
+
+					for (LegAttributeHandler legHandler : delegates)
+						legHandler.handle(plan.getLegs().get(idx), idx, key, entry.getValue());
+				}
+			}
 		}
-		
-		return sum;
+
 	}
 
 }

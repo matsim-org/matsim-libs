@@ -48,10 +48,10 @@ public class Analyzer {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-//		String output = "/home/johannes/gsv/mid2008/analysis/";
-		String output = "/home/johannes/sge/prj/synpop/run/67/output/analysis/";
-//		String personFile = "/home/johannes/gsv/mid2008/pop.xml";
-		String personFile = "/home/johannes/sge/prj/synpop/run/67/output/10000000000.pop.xml.gz";
+		String output = "/home/johannes/gsv/mid2008/analysis/";
+//		String output = "/home/johannes/gsv/synpop/output/";
+		String personFile = "/home/johannes/gsv/mid2008/pop.car.wkday.xml";
+//		String personFile = "/home/johannes/gsv/synpop/output/30000000.pop.xml.gz";
 		
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
@@ -75,7 +75,7 @@ public class Analyzer {
 		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
 //		task.addTask(new ActivityChainTask());
 		task.addTask(new LegTargetDistanceTask());
-		task.addTask(new ActivityDistanceTask(facilities));
+//		task.addTask(new ActivityDistanceTask(facilities));
 		task.addTask(new SpeedFactorAnalyzer());
 		task.addTask(new SeasonsTask());
 		

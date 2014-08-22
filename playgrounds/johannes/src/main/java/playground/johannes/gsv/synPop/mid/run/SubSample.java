@@ -17,54 +17,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.sim2;
+package playground.johannes.gsv.synPop.mid.run;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
+import org.apache.log4j.Logger;
+
+import playground.johannes.gsv.synPop.DeleteRandom;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.sna.util.Composite;
+import playground.johannes.gsv.synPop.ProxyPersonTaskComposite;
+import playground.johannes.gsv.synPop.io.XMLParser;
+import playground.johannes.gsv.synPop.io.XMLWriter;
 
 /**
  * @author johannes
  *
  */
-public class HamiltonianComposite extends Composite<Hamiltonian> implements Hamiltonian {
+public class SubSample {
 
-	private List<Double> thetas = new ArrayList<Double>();
-	
-	public void addComponent(Hamiltonian h) {
-		super.addComponent(h);
-		thetas.add(1.0);
-	}
-	
-	public void addComponent(Hamiltonian h, double theta) {
-		super.addComponent(h);
-		thetas.add(theta);
-	}
-	
-	public void removeComponent(Hamiltonian h) {
-		int idx = components.indexOf(h);
-		super.removeComponent(h);
-		thetas.remove(idx);
-	}
-
-	/*
-	 * TODO: hide access?
+	private static final Logger logger = Logger.getLogger(SubSample.class);
+	/**
+	 * @param args
 	 */
-	public List<Hamiltonian> getComponents() {
-		return components;
-	}
-	
-	@Override
-	public double evaluate(ProxyPerson person) {
-		double sum = 0;
+	public static void main(String[] args) {
+		XMLParser parser = new XMLParser();
+		parser.setValidating(false);
 		
-		for(int i = 0; i < components.size(); i++) {
-			sum += thetas.get(i) * components.get(i).evaluate(person);
-		}
+		parser.parse("/home/johannes/gsv/synpop/data/3800000000.pop.xml.gz");
+		logger.info(String.format("Loaded %s persons.", parser.getPersons().size()));
 		
-		return sum;
+		ProxyPersonTaskComposite tasks = new ProxyPersonTaskComposite();
+		tasks.addComponent(new DeleteRandom(0.9));
+		
+		Collection<ProxyPerson> subset = ProxyTaskRunner.runAndDelete(tasks, parser.getPersons());
+		logger.info(String.format("New population: %s persons.", subset.size()));
+		
+		logger.info("Writing population...");
+		XMLWriter writer = new XMLWriter();
+		writer.write("/home/johannes/gsv/synpop/data/100K.pop.xml.gz", subset);
+		logger.info("Done.");
+		
 	}
 
 }

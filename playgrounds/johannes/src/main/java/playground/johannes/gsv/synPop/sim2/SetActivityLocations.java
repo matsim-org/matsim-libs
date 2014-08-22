@@ -92,33 +92,37 @@ public class SetActivityLocations {
 		logger.info("Done.");
 		
 		logger.info("Setting up sampler...");
+		int numThreads = Integer.parseInt(config.findParam(MODULE_NAME, "numThreads"));
+		int logInterval = (int) Double.parseDouble(config.getParam(MODULE_NAME, "logInterval"));
+		int dumpInterval = (int) Double.parseDouble(config.getParam(MODULE_NAME, "dumpInterval"));
+		String outputDir = config.getParam(MODULE_NAME, "outputDir");
+		long iters = (long) Double.parseDouble(config.getParam(MODULE_NAME, "iterations"));
 		
-		
-		ActivityLocationMutator mutator = new ActivityLocationMutator(facilities, random, "home");
 		ActivityLocationMutatorFactory factory = new ActivityLocationMutatorFactory(facilities, "home", random);
 		
 		HamiltonianComposite h = new HamiltonianComposite();
-		h.addComponent(new ActivityLocationHamiltonian(facilities));
-		h.addComponent(new HFacilityCapacity(null, facilities));
+		h.addComponent(new ActivityLocationHamiltonian(facilities), 0.01);
+//		h.addComponent(new HFacilityCapacity(null, facilities), 0.00001);
 		
 		Sampler sampler = new Sampler(persons, h, factory, random);
 		
-		String outputDir = config.getParam(MODULE_NAME, "outputDir");
-//		PopulationWriter popWriter = new PopulationWriter(outputDir, sampler);
-//		popWriter.setDumpInterval(Integer.parseInt(config.getParam(MODULE_NAME, "dumpInterval")));
+		PopulationWriter popWriter = new PopulationWriter(outputDir);
+		popWriter.setDumpInterval(1);
 		
+		SamplerListenerComposite listeners = new SamplerListenerComposite();
+		listeners.addComponent(new BlockingSamplerListener(popWriter, dumpInterval));
 		
-//		sampler.addMutator(mutator);
-//		sampler.addListener(popWriter);
-//		sampler.setHamiltonian(actLoc);
-		
-		
+		for(Hamiltonian hamil : h.getComponents()) {
+			listeners.addComponent(new HamiltonianLogger(hamil, logInterval, outputDir + "/" + hamil.getClass().getSimpleName() + ".txt"));
+		}
+		listeners.addComponent(new SamplerLogger());
+		listeners.addComponent(new BlockingSamplerListener(new AnalyzerListener(facilities, outputDir), logInterval));
+		sampler.setSamplerListener(listeners);
 		/*
 		 * initialize persons
 		 */
 		logger.info("Initializing persons...");
 		List<Initializer> initializers = new ArrayList<Initializer>();
-//		initializers.add(mutator);
 		
 		ZoneLayer<Double> gemeinden = ZoneLayerSHP.read(config.findParam(MODULE_NAME, "popNuts3"), "EWZ");
 		initializers.add(new ActivityLocationInitializer(facilities, gemeinden, "home", random));
@@ -129,18 +133,11 @@ public class SetActivityLocations {
 			}
 		}
 		
-		int numThreads = 1;//Integer.parseInt(config.findParam(MODULE_NAME, "threads"));
-		
-		int logInterval = 10000000 * numThreads;
-//		sampler.addListener(new HamiltonianLogger(actLoc, logInterval, outputDir + "/dist.log"));
-//		sampler.addListener(new HamiltonianLogger(cap, logInterval, outputDir + "/cap.log"));
-		
 		logger.info("Running sampler...");
 		
-//		sampler.run(persons, (long) Double.parseDouble(config.getParam(MODULE_NAME, "iterations")));
+		sampler.run(iters, numThreads);
 		logger.info("Done.");
 		
-//		popDen.writeZoneData("/home/johannes/gsv/mid2008/popDen.shp");
 	}
 	
 	

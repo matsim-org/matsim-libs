@@ -36,20 +36,18 @@ public class ProxyObject {
 	
 	private Map<Object, Object> userData;
 	
-	public ProxyObject() {
-		attributes = new HashMap<String, String>(5);
-		unmodAttribs = Collections.unmodifiableMap(attributes);
-	}
-	
 	public Map<String, String> getAttributes() {
+		initAttriutes();
 		return unmodAttribs;
 	}
 	
 	public String getAttribute(String key) {
+		initAttriutes();
 		return attributes.get(key);
 	}
 	
 	public String setAttribute(String key, String value) {
+		initAttriutes();
 		return attributes.put(key, value);
 	}
 	
@@ -71,6 +69,13 @@ public class ProxyObject {
 	public Object setUserData(Object key, Object value) {
 		initUserData();
 		return userData.put(key, value);
+	}
+	
+	private void initAttriutes() {
+		if(attributes == null) {
+			attributes = new HashMap<String, String>(5);
+			unmodAttribs = Collections.unmodifiableMap(attributes);
+		}
 	}
 	
 	private void initUserData() {

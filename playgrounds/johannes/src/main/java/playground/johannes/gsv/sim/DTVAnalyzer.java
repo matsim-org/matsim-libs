@@ -29,7 +29,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
@@ -38,19 +40,24 @@ import org.matsim.counts.CountsReaderMatsimV1;
  * @author johannes
  *
  */
-public class DTVAnalyzer implements IterationEndsListener {
+public class DTVAnalyzer implements IterationEndsListener, IterationStartsListener {
 
 	private final Counts obsCounts;
 	
 	private VolumesAnalyzer simCounts;
 	
 	public DTVAnalyzer(Network network, Controler controler, EventsManager events, String countsfile) {
-//		simCounts = controler.getVolumes();//new VolumesAnalyzer(30*60*60, 30*60*60, network);
-//		events.addHandler(simCounts);
-		
 		obsCounts = new Counts();
 		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(obsCounts);
 		reader.parse(countsfile);
+	}
+	/* (non-Javadoc)
+	 * @see org.matsim.core.controler.listener.IterationStartsListener#notifyIterationStarts(org.matsim.core.controler.events.IterationStartsEvent)
+	 */
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		simCounts = new VolumesAnalyzer(30*60*60, 30*60*60, event.getControler().getNetwork());
+		event.getControler().getEvents().addHandler(simCounts);
 	}
 	/* (non-Javadoc)
 	 * @see org.matsim.core.controler.listener.IterationEndsListener#notifyIterationEnds(org.matsim.core.controler.events.IterationEndsEvent)
@@ -58,7 +65,7 @@ public class DTVAnalyzer implements IterationEndsListener {
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		String outdir = event.getControler().getControlerIO().getIterationPath(event.getIteration());
-		simCounts = event.getControler().getVolumes();
+//		simCounts = event.getControler().getVolumes();
 		
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(outdir + "/counts.txt"));

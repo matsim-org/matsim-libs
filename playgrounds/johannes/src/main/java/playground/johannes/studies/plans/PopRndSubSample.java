@@ -45,7 +45,7 @@ public class PopRndSubSample {
 	 */
 	public static void main(String[] args) {
 //		String input = args[0];
-		String input = "/home/johannes/gsv/ger/data/plans.routed.xml.gz";
+		String input = "/home/johannes/sge/prj/matsim/run/106/output/plans.routed.xml.gz";
 //		String output = args[1];
 		String output = "/home/johannes/gsv/ger/data/plans.routed.sub.xml.gz";
 //		int numSamples = Integer.parseInt(args[2]);

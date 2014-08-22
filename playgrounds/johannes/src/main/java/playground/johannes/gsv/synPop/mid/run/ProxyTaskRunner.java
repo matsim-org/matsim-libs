@@ -26,6 +26,7 @@ import java.util.Set;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
+import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
 
 /**
@@ -40,8 +41,10 @@ public class ProxyTaskRunner {
 	}
 	
 	public static void run(ProxyPlanTask task, Collection<ProxyPerson> persons) {
-		for(ProxyPerson person : persons)
-			task.apply(person.getPlan());
+		for(ProxyPerson person : persons) {
+			for(ProxyPlan plan : person.getPlans())
+				task.apply(plan);
+		}
 	}
 	
 	public static Set<ProxyPerson> runAndDelete(ProxyPersonTask task, Collection<ProxyPerson> persons) {

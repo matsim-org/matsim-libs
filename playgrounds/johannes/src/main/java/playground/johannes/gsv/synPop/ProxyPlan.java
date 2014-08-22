@@ -21,12 +21,13 @@ package playground.johannes.gsv.synPop;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * @author johannes
  *
  */
-public class ProxyPlan {
+public class ProxyPlan extends ProxyObject {
 
 	private List<ProxyObject> activities = new ArrayList<ProxyObject>();
 	
@@ -50,6 +51,10 @@ public class ProxyPlan {
 	
 	public ProxyPlan clone() {
 		ProxyPlan clone = new ProxyPlan();
+		
+		for(Entry<String, String> entry : getAttributes().entrySet()) {
+			clone.setAttribute(entry.getKey(), entry.getValue());
+		}
 		
 		for(ProxyObject act : activities) {
 			clone.addActivity(act.clone());

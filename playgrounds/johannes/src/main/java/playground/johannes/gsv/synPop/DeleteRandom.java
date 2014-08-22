@@ -17,54 +17,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.sim2;
+package playground.johannes.gsv.synPop;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Random;
 
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.sna.util.Composite;
+import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 /**
  * @author johannes
  *
  */
-public class HamiltonianComposite extends Composite<Hamiltonian> implements Hamiltonian {
+public class DeleteRandom implements ProxyPersonTask {
 
-	private List<Double> thetas = new ArrayList<Double>();
+	private final Random random;
 	
-	public void addComponent(Hamiltonian h) {
-		super.addComponent(h);
-		thetas.add(1.0);
+	private final double proba;
+	
+	public DeleteRandom(double proba) {
+		this.random = new XORShiftRandom();
+		this.proba = proba;
 	}
 	
-	public void addComponent(Hamiltonian h, double theta) {
-		super.addComponent(h);
-		thetas.add(theta);
+	public DeleteRandom(double proba, Random random) {
+		this.random = random;
+		this.proba = proba;
 	}
-	
-	public void removeComponent(Hamiltonian h) {
-		int idx = components.indexOf(h);
-		super.removeComponent(h);
-		thetas.remove(idx);
-	}
-
-	/*
-	 * TODO: hide access?
-	 */
-	public List<Hamiltonian> getComponents() {
-		return components;
-	}
-	
 	@Override
-	public double evaluate(ProxyPerson person) {
-		double sum = 0;
-		
-		for(int i = 0; i < components.size(); i++) {
-			sum += thetas.get(i) * components.get(i).evaluate(person);
+	public void apply(ProxyPerson person) {
+		if(proba > random.nextDouble()) {
+			person.setAttribute(CommonKeys.DELETE, "true");
 		}
-		
-		return sum;
+
 	}
 
 }

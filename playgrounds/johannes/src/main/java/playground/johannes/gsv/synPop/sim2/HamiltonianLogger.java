@@ -25,10 +25,11 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Locale;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.sim.SamplerListener;
+import playground.johannes.gsv.synPop.sim2.SamplerListener;
 
 /**
  * @author johannes
@@ -59,7 +60,7 @@ public class HamiltonianLogger implements SamplerListener {
 		if(file != null) {
 			try {
 				writer = new BufferedWriter(new FileWriter(file));
-				writer.write("iter\ttotal\tavr");
+				writer.write("iter\ttotal\tavr\tmed\tmin\tmax");
 				writer.newLine();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -68,21 +69,47 @@ public class HamiltonianLogger implements SamplerListener {
 	}
 	
 	@Override
-	public void afterStep(Collection<ProxyPerson> population, ProxyPerson original, ProxyPerson mutation, boolean accepted) {
+	public void afterStep(Collection<ProxyPerson> population, ProxyPerson original, boolean accepted) {
 		iter++;
 		
 		if(iter % logInterval == 0) {
-			double val = 0;//h.evaluate(population);
-			double avr = val/(double)population.size();
-			logger.info(String.format(Locale.US, "Score for %s: avr = %.4f, total = %s.", h.getClass().getSimpleName(), avr, val));
+			double[] values = new double[population.size()];
+			int i = 0;
+			for(ProxyPerson person : population) {
+				values[i] = h.evaluate(person);
+				i++;
+			}
+			DescriptiveStatistics stats = new DescriptiveStatistics(values);
+			double sum = stats.getSum();
+			double avr = stats.getMean();
+			double med = stats.getPercentile(50);
+			double max = stats.getMax();
+			double min = stats.getMin();
+			
+			StringBuilder builder = new StringBuilder();
+			builder.append("Statistics for ");
+			builder.append(h.getClass().getSimpleName());
+			builder.append(String.format(Locale.US, ": Sum = %.4f, ", sum));
+			builder.append(String.format(Locale.US, ": Avr = %.4f, ", avr));
+			builder.append(String.format(Locale.US, ": Med = %.4f, ", med));
+			builder.append(String.format(Locale.US, ": Max = %.4f, ", max));
+			builder.append(String.format(Locale.US, ": Min = %.4f", min));
+			
+			logger.info(builder.toString());
 			
 			if(writer != null) {
 				try {
 					writer.write(String.valueOf(iter));
 					writer.write(TAB);
-					writer.write(String.valueOf(val));
+					writer.write(String.valueOf(sum));
 					writer.write(TAB);
 					writer.write(String.valueOf(avr));
+					writer.write(TAB);
+					writer.write(String.valueOf(med));
+					writer.write(TAB);
+					writer.write(String.valueOf(min));
+					writer.write(TAB);
+					writer.write(String.valueOf(max));
 					writer.newLine();
 					writer.flush();
 				} catch (IOException e) {

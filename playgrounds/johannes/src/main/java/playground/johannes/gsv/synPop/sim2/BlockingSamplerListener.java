@@ -29,36 +29,30 @@ import playground.johannes.gsv.synPop.ProxyPerson;
  */
 public class BlockingSamplerListener implements SamplerListener {
 
-	private long iterCounter;
+	private long iters;
 	
 	private final long interval;
 	
-	private final Sampler sampler;
+	private long next;
 	
 	private final SamplerListener delegate;
 	
-	public BlockingSamplerListener(SamplerListener delegate, Sampler sampler, int interval) {
+	public BlockingSamplerListener(SamplerListener delegate, long interval) {
 		this.delegate = delegate;
-		this.sampler = sampler;
 		this.interval = interval;
+		this.next = interval;
 	}
 	
 	@Override
-	public synchronized void afterStep(Collection<ProxyPerson> population, ProxyPerson person, boolean accept) {
-		iterCounter++;
-		if((iterCounter ) % interval == 0) {
-//			sampler.pause();
-			System.out.println(Thread.currentThread().getName() + ": Wait for working");
-//			sampler.waitWorking();
-			System.out.println("Calling delegate afterstep");
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	public void afterStep(Collection<ProxyPerson> population, ProxyPerson person, boolean accept) {
+		iters++;
+		if(iters >= next) {
+			synchronized(this) {
+				if(iters >= next) {
+					delegate.afterStep(population, person, accept);
+					next += interval;
+				}
 			}
-			delegate.afterStep(population, person, accept);
-//			sampler.resume();
 		}
 	}
 }

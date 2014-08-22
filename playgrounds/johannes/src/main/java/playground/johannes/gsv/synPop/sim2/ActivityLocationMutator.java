@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.ActStartEventTest;
 import org.matsim.core.facilities.ActivityOption;
 
 import playground.johannes.gsv.misc.QuadTree;
@@ -44,6 +45,8 @@ import playground.johannes.gsv.synPop.sim.RandomFacilities;
  *
  */
 public class ActivityLocationMutator implements Mutator {
+	
+	private static final Object IGNORE_KEY = new Object();
 
 private final String blacklist;
 	
@@ -65,7 +68,7 @@ private final String blacklist;
 		this.random = random;
 		this.blacklist = type;
 		this.facilities = facilities;
-		this.rndFacilities = new RandomFacilities(facilities, random);
+		this.rndFacilities = RandomFacilities.getInstance(facilities, random);
 		
 		double minx = Double.MAX_VALUE;
 		double miny = Double.MAX_VALUE;
@@ -98,35 +101,68 @@ private final String blacklist;
 		List<ProxyObject> activities = person.getPlan().getActivities();
 		
 		int idx = random.nextInt(activities.size());
-		ProxyObject act = activities.get(idx);
-		String type = (String) act.getAttribute(CommonKeys.ACTIVITY_TYPE);
+//		if(idx == 0 || idx == activities.size() - 1)
+//			return false;
 		
-		if(blacklist == null || !blacklist.equalsIgnoreCase(type)) {
+		ProxyObject act = activities.get(idx);
+		
+		String type = null;
+		Boolean ignore = (Boolean) act.getUserData(IGNORE_KEY);
+		if(ignore == null) {
+			type = (String) act.getAttribute(CommonKeys.ACTIVITY_TYPE);
+			if(blacklist == null || !blacklist.equalsIgnoreCase(type)) {
+				ignore = false;
+			} else {
+				ignore = true;
+			}
+			act.setUserData(IGNORE_KEY, ignore);
+		}
+			
+		if(!ignore) {
+			if(type == null)
+				type = (String) act.getAttribute(CommonKeys.ACTIVITY_TYPE);
+			
 			currentAct = act;
 			currentFacility = (ActivityFacility) act.getUserData(MutateActivityLocation.USER_DATA_KEY);
 			
 			ActivityFacility facility = null;
-//			if(idx > 0) {
-//				ProxyObject leg = person.getPlan().getLegs().get(idx - 1);
-//				String value = leg.getAttribute(MIDKeys.LEG_DISTANCE);
-//				if(value != null) {
-//					ProxyObject prev = activities.get(idx - 1);
-//					ActivityFacility fac = (ActivityFacility) prev.getUserData(MutateActivityLocation.USER_DATA_KEY);
-//					if(fac == null) {
-//						fac = facilities.getFacilities().get(new IdImpl(prev.getAttribute(CommonKeys.ACTIVITY_FACILITY)));
-//						prev.setUserData(MutateActivityLocation.USER_DATA_KEY, fac);
-//					}
-//					double dist = Double.parseDouble(value);
-//					QuadTree<ActivityFacility> quadTree = quadTrees.get(act.getAttribute(CommonKeys.ACTIVITY_TYPE));
-//					List<ActivityFacility> list = new ArrayList<ActivityFacility>(quadTree.get(fac.getCoord().getX(), fac.getCoord().getY(), dist - mutationRange, dist + mutationRange));
-//					
-//					facility = list.get(random.nextInt(list.size()));
-//				} else {
-//					facility = rndFacilities.randomFacility(type);
-//				}
-//			} else {
+			if(idx > 0 && idx < person.getPlan().getActivities().size() - 1) {
+				ProxyObject prev = person.getPlan().getActivities().get(idx - 1);
+				ProxyObject next = person.getPlan().getActivities().get(idx + 1);
+				
+				ActivityFacility prevFac = (ActivityFacility) prev.getUserData(MutateActivityLocation.USER_DATA_KEY);
+				if(prevFac == null) {
+					prevFac = facilities.getFacilities().get(new IdImpl(prev.getAttribute(CommonKeys.ACTIVITY_FACILITY)));
+					prev.setUserData(MutateActivityLocation.USER_DATA_KEY, prevFac);
+				
+				}
+				
+				ActivityFacility nextFac = (ActivityFacility) next.getUserData(MutateActivityLocation.USER_DATA_KEY);
+				if(nextFac == null) {
+					nextFac = facilities.getFacilities().get(new IdImpl(next.getAttribute(CommonKeys.ACTIVITY_FACILITY)));
+					next.setUserData(MutateActivityLocation.USER_DATA_KEY, nextFac);
+				
+				}
+				
+				if(prevFac.equals(nextFac)) {
+					ProxyObject leg = person.getPlan().getLegs().get(idx - 1);
+					String value = leg.getAttribute(MIDKeys.LEG_DISTANCE);
+					if(value != null) {
+						double dist = Double.parseDouble(value);
+						QuadTree<ActivityFacility> quadTree = quadTrees.get(act.getAttribute(CommonKeys.ACTIVITY_TYPE));
+						List<ActivityFacility> list = new ArrayList<ActivityFacility>(quadTree.get(prevFac.getCoord().getX(), prevFac.getCoord().getY(), dist - mutationRange, dist + mutationRange));
+						
+						facility = list.get(random.nextInt(list.size()));
+					} else {
+						facility = rndFacilities.randomFacility(type);
+					}
+				} else {
+					facility = rndFacilities.randomFacility(type);
+				}
+				
+			} else {
 				facility = rndFacilities.randomFacility(type);
-//			}
+			}
 			act.setAttribute(CommonKeys.ACTIVITY_FACILITY, facility.getId().toString());
 			act.setUserData(MutateActivityLocation.USER_DATA_KEY, facility);
 			return true;

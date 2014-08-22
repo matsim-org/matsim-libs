@@ -17,54 +17,55 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.sim2;
+package playground.johannes.gsv.synPop.mid;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.sna.util.Composite;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author johannes
  *
  */
-public class HamiltonianComposite extends Composite<Hamiltonian> implements Hamiltonian {
+public abstract class RowHandler {
 
-	private List<Double> thetas = new ArrayList<Double>();
+	private String separator = "\t";
 	
-	public void addComponent(Hamiltonian h) {
-		super.addComponent(h);
-		thetas.add(1.0);
+	private int offset = 1;
+	
+	protected abstract void handleRow(Map<String, String> attributes);
+	
+	public void setSeparator(String separator) {
+		this.separator = separator;
 	}
 	
-	public void addComponent(Hamiltonian h, double theta) {
-		super.addComponent(h);
-		thetas.add(theta);
+	public void setColumnOffset(int offset) {
+		this.offset = offset;
 	}
 	
-	public void removeComponent(Hamiltonian h) {
-		int idx = components.indexOf(h);
-		super.removeComponent(h);
-		thetas.remove(idx);
-	}
-
-	/*
-	 * TODO: hide access?
-	 */
-	public List<Hamiltonian> getComponents() {
-		return components;
-	}
-	
-	@Override
-	public double evaluate(ProxyPerson person) {
-		double sum = 0;
+	public void read(String file) throws IOException {
+		BufferedReader reader = new BufferedReader(new FileReader(file));
 		
-		for(int i = 0; i < components.size(); i++) {
-			sum += thetas.get(i) * components.get(i).evaluate(person);
+		String line = reader.readLine();
+		String keys[] = line.split(separator, -1);
+		Map<String, String> attributes = new HashMap<String, String>(keys.length);
+		
+		int lineCount = 1;
+		while((line = reader.readLine()) != null) {
+			String tokens[] = line.split(separator, -1);
+			
+			if(tokens.length - offset > keys.length) // -1 because rows are numbered
+				throw new RuntimeException(String.format("Line %s has more fields (%s) than available keys (%s).", lineCount, tokens.length, keys.length));
+			
+			for(int i = offset; i < tokens.length; i++) {
+				attributes.put(keys[i - offset], tokens[i]);
+			}
+	
+			handleRow(attributes);
 		}
 		
-		return sum;
+		reader.close();
 	}
-
 }

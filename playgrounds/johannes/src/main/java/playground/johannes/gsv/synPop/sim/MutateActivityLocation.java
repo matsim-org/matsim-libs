@@ -43,7 +43,7 @@ import playground.johannes.gsv.synPop.mid.MIDKeys;
  */
 public class MutateActivityLocation implements Mutator, Initializer {
 
-	public static final String USER_DATA_KEY = MutateActivityLocation.class.getCanonicalName();
+	public static final Object  USER_DATA_KEY = new Object();//MutateActivityLocation.class.getCanonicalName();
 	
 	private final String blacklist;
 	

@@ -19,52 +19,63 @@
 
 package playground.johannes.gsv.synPop.sim2;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import org.apache.log4j.Logger;
 
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.sna.util.Composite;
+import playground.johannes.gsv.synPop.sim2.SamplerListener;
+
 
 /**
  * @author johannes
  *
  */
-public class HamiltonianComposite extends Composite<Hamiltonian> implements Hamiltonian {
+public class SamplerLogger implements SamplerListener {
 
-	private List<Double> thetas = new ArrayList<Double>();
+	private final Logger logger = Logger.getLogger(SamplerLogger.class);
 	
-	public void addComponent(Hamiltonian h) {
-		super.addComponent(h);
-		thetas.add(1.0);
-	}
+	private Timer timer;
 	
-	public void addComponent(Hamiltonian h, double theta) {
-		super.addComponent(h);
-		thetas.add(theta);
-	}
-	
-	public void removeComponent(Hamiltonian h) {
-		int idx = components.indexOf(h);
-		super.removeComponent(h);
-		thetas.remove(idx);
-	}
-
-	/*
-	 * TODO: hide access?
-	 */
-	public List<Hamiltonian> getComponents() {
-		return components;
-	}
+	private Task task = new Task();
 	
 	@Override
-	public double evaluate(ProxyPerson person) {
-		double sum = 0;
-		
-		for(int i = 0; i < components.size(); i++) {
-			sum += thetas.get(i) * components.get(i).evaluate(person);
+	public void afterStep(Collection<ProxyPerson> population, ProxyPerson person, boolean accpeted) {
+		if(timer == null) {
+			timer = new Timer();
+			timer.schedule(task, 2000, 2000);
 		}
 		
-		return sum;
+		task.afterStep(population, person, accpeted);
+
+	}
+	
+	private class Task extends TimerTask implements SamplerListener {
+
+		private long iter;
+		
+		private long accepts;
+		
+		private long iters2;
+		
+		@Override
+		public void run() {
+			logger.info(String.format(Locale.US, "[%s] Accepted %s of %s steps (%.2f %%).", iter, accepts, iters2, accepts/(double)iters2 * 100));
+			accepts = 0;
+			iters2 = 0;
+		}
+
+		@Override
+		public void afterStep(Collection<ProxyPerson> population, ProxyPerson original, boolean accepted) {
+			iter++;
+			iters2++;
+			if(accepted)
+				accepts++;
+		}
+		
 	}
 
 }

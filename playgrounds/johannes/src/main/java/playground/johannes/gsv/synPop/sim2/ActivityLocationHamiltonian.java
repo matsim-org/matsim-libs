@@ -19,8 +19,6 @@
 
 package playground.johannes.gsv.synPop.sim2;
 
-import java.util.Collection;
-
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
@@ -40,6 +38,8 @@ import com.vividsolutions.jts.geom.Point;
  *
  */
 public class ActivityLocationHamiltonian implements Hamiltonian {
+	
+	private final double detourFactor = 1.3;
 
 	private static final Object TARGET_DISTANCE_KEY = new Object();
 
@@ -68,31 +68,31 @@ public class ActivityLocationHamiltonian implements Hamiltonian {
 //	}
 
 //	@Override
-	public double evaluate(Collection<ProxyPerson> persons) {
-		double sum = 0;
-		
-		for(ProxyPerson person : persons) {
-			int cnt = 0;
-			double personSum = 0;
-			for(int i = 1; i < person.getPlan().getActivities().size(); i++) {
-
-				ProxyObject prevAct = person.getPlan().getActivities().get(i - 1);
-				ProxyObject act = person.getPlan().getActivities().get(i);
-				
-				String targetDistStr = person.getPlan().getLegs().get(i - 1).getAttribute(CommonKeys.LEG_DISTANCE);
-				if(targetDistStr != null) {
-					double targetDistance = Double.parseDouble(targetDistStr);
-				
-					personSum += Math.abs(distance(prevAct, act) - targetDistance);
-					cnt++;
-				}
-			}
-			if(cnt > 0)
-				sum += personSum/(double)cnt;
-		}
-		
-		return sum;
-	}
+//	public double evaluate(Collection<ProxyPerson> persons) {
+//		double sum = 0;
+//		
+//		for(ProxyPerson person : persons) {
+//			int cnt = 0;
+//			double personSum = 0;
+//			for(int i = 1; i < person.getPlan().getActivities().size(); i++) {
+//
+//				ProxyObject prevAct = person.getPlan().getActivities().get(i - 1);
+//				ProxyObject act = person.getPlan().getActivities().get(i);
+//				
+//				String targetDistStr = person.getPlan().getLegs().get(i - 1).getAttribute(CommonKeys.LEG_DISTANCE);
+//				if(targetDistStr != null) {
+//					double targetDistance = Double.parseDouble(targetDistStr);
+//				
+//					personSum += Math.abs(distance(prevAct, act) - targetDistance);
+//					cnt++;
+//				}
+//			}
+//			if(cnt > 0)
+//				sum += personSum/(double)cnt;
+//		}
+//		
+//		return sum;
+//	}
 	
 	public double evaluate(ProxyPerson person) {
 		double totaldelta = 0;
@@ -111,7 +111,9 @@ public class ActivityLocationHamiltonian implements Hamiltonian {
 				ProxyObject prev = person.getPlan().getActivities().get(i - 1);
 				ProxyObject next = person.getPlan().getActivities().get(i);
 				
-				double delta = Math.abs(distance(prev, next) - targetDistance);
+				double dist = distance(prev, next);
+				dist = dist * detourFactor;
+				double delta = Math.abs( - targetDistance);
 				totaldelta += delta;
 			}
 		}

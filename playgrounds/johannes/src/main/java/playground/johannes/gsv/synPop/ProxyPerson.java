@@ -19,6 +19,8 @@
 
 package playground.johannes.gsv.synPop;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 
 /**
@@ -29,7 +31,9 @@ public class ProxyPerson extends ProxyObject {
 
 	private String id;
 	
-	private ProxyPlan plan;
+//	private ProxyPlan plan;
+	
+	private List<ProxyPlan> plans = new ArrayList<ProxyPlan>();
 	
 	public ProxyPerson(String id) {
 		this.id = id;		
@@ -40,11 +44,24 @@ public class ProxyPerson extends ProxyObject {
 	}
 	
 	public void setPlan(ProxyPlan plan) {
-		this.plan = plan;
+//		this.plan = plan;
+		if(plans.isEmpty())
+			plans.add(plan);
+		else
+			plans.set(0, plan);
+	}
+	
+	public void addPlan(ProxyPlan plan) {
+		plans.add(plan);
 	}
 	
 	public ProxyPlan getPlan() {
-		return plan;
+//		return plan;
+		return plans.get(0);
+	}
+	
+	public List<ProxyPlan> getPlans() {
+		return plans;
 	}
 	
 	public ProxyPerson clone() {
@@ -58,7 +75,9 @@ public class ProxyPerson extends ProxyObject {
 			clone.setAttribute(entry.getKey(), entry.getValue());
 		}
 		
-		clone.setPlan(plan.clone());
+//		clone.setPlan(plan.clone());
+		for(ProxyPlan plan : plans)
+			clone.addPlan(plan.clone());
 		
 		return clone;
 	}

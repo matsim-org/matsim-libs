@@ -65,7 +65,8 @@ public class XMLWriter extends MatsimXmlWriter {
 		atts.add(new Tuple<String, String>(Constants.ID_KEY, person.getId()));
 		
 		writeStartTag(Constants.PERSON_TAG, atts);
-		writePlan(person.getPlan());
+		for(ProxyPlan plan : person.getPlans())
+			writePlan(plan);
 		writeEndTag(Constants.PERSON_TAG);
 
 	}

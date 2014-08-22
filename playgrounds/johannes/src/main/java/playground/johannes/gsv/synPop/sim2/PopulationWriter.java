@@ -19,52 +19,48 @@
 
 package playground.johannes.gsv.synPop.sim2;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+
+import org.apache.log4j.Logger;
 
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.sna.util.Composite;
+import playground.johannes.gsv.synPop.io.XMLWriter;
 
 /**
  * @author johannes
  *
  */
-public class HamiltonianComposite extends Composite<Hamiltonian> implements Hamiltonian {
+public class PopulationWriter implements SamplerListener {
+	
+	private static final Logger logger = Logger.getLogger(PopulationWriter.class);
 
-	private List<Double> thetas = new ArrayList<Double>();
+	private String outputDir;
 	
-	public void addComponent(Hamiltonian h) {
-		super.addComponent(h);
-		thetas.add(1.0);
+	private XMLWriter writer;
+	
+	private int dumpInterval = 100000;
+	
+	private long iteration = 0;
+	
+	public PopulationWriter(String outputDir) {
+		this.outputDir = outputDir;
+		writer = new XMLWriter();
+		
 	}
 	
-	public void addComponent(Hamiltonian h, double theta) {
-		super.addComponent(h);
-		thetas.add(theta);
-	}
-	
-	public void removeComponent(Hamiltonian h) {
-		int idx = components.indexOf(h);
-		super.removeComponent(h);
-		thetas.remove(idx);
-	}
-
-	/*
-	 * TODO: hide access?
-	 */
-	public List<Hamiltonian> getComponents() {
-		return components;
+	public void setDumpInterval(int interval) {
+		dumpInterval = interval;
 	}
 	
 	@Override
-	public double evaluate(ProxyPerson person) {
-		double sum = 0;
-		
-		for(int i = 0; i < components.size(); i++) {
-			sum += thetas.get(i) * components.get(i).evaluate(person);
+	public void afterStep(Collection<ProxyPerson> population, ProxyPerson original, boolean accepted) {
+		iteration++;
+		if(iteration % dumpInterval == 0) {
+			logger.info("Dumping population...");
+			writer.write(String.format("%s/%s.pop.xml.gz", outputDir, iteration), population);
+			logger.info("Done.");
 		}
-		
-		return sum;
+
 	}
 
 }

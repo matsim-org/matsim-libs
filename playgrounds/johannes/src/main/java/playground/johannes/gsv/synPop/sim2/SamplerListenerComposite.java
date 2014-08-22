@@ -19,8 +19,7 @@
 
 package playground.johannes.gsv.synPop.sim2;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.sna.util.Composite;
@@ -29,42 +28,14 @@ import playground.johannes.sna.util.Composite;
  * @author johannes
  *
  */
-public class HamiltonianComposite extends Composite<Hamiltonian> implements Hamiltonian {
+public class SamplerListenerComposite extends Composite<SamplerListener> implements SamplerListener {
 
-	private List<Double> thetas = new ArrayList<Double>();
-	
-	public void addComponent(Hamiltonian h) {
-		super.addComponent(h);
-		thetas.add(1.0);
-	}
-	
-	public void addComponent(Hamiltonian h, double theta) {
-		super.addComponent(h);
-		thetas.add(theta);
-	}
-	
-	public void removeComponent(Hamiltonian h) {
-		int idx = components.indexOf(h);
-		super.removeComponent(h);
-		thetas.remove(idx);
-	}
-
-	/*
-	 * TODO: hide access?
-	 */
-	public List<Hamiltonian> getComponents() {
-		return components;
-	}
-	
 	@Override
-	public double evaluate(ProxyPerson person) {
-		double sum = 0;
-		
-		for(int i = 0; i < components.size(); i++) {
-			sum += thetas.get(i) * components.get(i).evaluate(person);
+	public void afterStep(Collection<ProxyPerson> population, ProxyPerson person, boolean accpeted) {
+		for(SamplerListener listener : components) {
+			listener.afterStep(population, person, accpeted);
 		}
-		
-		return sum;
+
 	}
 
 }

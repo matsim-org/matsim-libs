@@ -37,6 +37,15 @@ import org.matsim.core.facilities.ActivityOption;
  */
 public class RandomFacilities {
 
+	private static RandomFacilities instance;
+	
+	public static synchronized RandomFacilities getInstance(ActivityFacilities facilities, Random random) {
+		if(instance == null)
+			instance = new RandomFacilities(facilities, random);
+		
+		return instance;
+	}
+	
 	private final Map<String, List<ActivityFacility>> facilitiesMap;
 	
 	private final Random random;

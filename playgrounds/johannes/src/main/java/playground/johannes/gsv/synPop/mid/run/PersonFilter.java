@@ -64,9 +64,9 @@ public class PersonFilter {
 //		tasks.addComponent(new DeleteNoLegs());
 		tasks.addComponent(new DeleteModes("car"));
 		
-//		DeleteDay deleteDay = new DeleteDay();
-//		deleteDay.setWeekdays();
-//		tasks.addComponent(deleteDay);
+		DeleteDay deleteDay = new DeleteDay();
+		deleteDay.setWeekdays();
+		tasks.addComponent(deleteDay);
 		
 		logger.info("Running filter...");
 		for(ProxyPerson person : parser.getPersons()) {
@@ -78,7 +78,7 @@ public class PersonFilter {
 		
 		logger.info("Writing population...");
 		XMLWriter writer = new XMLWriter();
-		writer.write("/home/johannes/gsv/mid2008/pop.car.xml", subset);
+		writer.write("/home/johannes/gsv/mid2008/pop.car.wkday.xml", subset);
 		logger.info("Done.");
 	}
 }

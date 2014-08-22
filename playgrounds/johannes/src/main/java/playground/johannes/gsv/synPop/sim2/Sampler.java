@@ -19,7 +19,6 @@
 
 package playground.johannes.gsv.synPop.sim2;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
@@ -33,6 +32,8 @@ import playground.johannes.socialnetworks.utils.XORShiftRandom;
  *
  */
 public class Sampler {
+	
+	private final static Object H_KEY = new Object();
 	
 	private final Collection<ProxyPerson> population;
 	
@@ -119,79 +120,34 @@ public class Sampler {
 			/*
 			 * select mutator
 			 */
-			double H_before = hamiltonian.evaluate(person);
+			Double H_before = (Double) person.getUserData(H_KEY);
+			if(H_before == null) {
+				H_before = hamiltonian.evaluate(person);
+			}
+//			double H_before = hamiltonian.evaluate(person);
 			boolean accepted = false;
 			if (mutator.modify(person)) {
 				/*
 				 * evaluate
 				 */
 				double H_after = hamiltonian.evaluate(person);
-
+//				System.out.println(String.valueOf(H_after - H_before));
 				double p = 1 / (1 + Math.exp(H_after - H_before));
 
 				if (p >= random.nextDouble()) {
 					accepted = true;
+					person.setUserData(H_KEY, H_after);
 				} else {
 					mutator.revert(person);
+					person.setUserData(H_KEY, H_before);
 				}
+			} else {
+				person.setUserData(H_KEY, H_before);
 			}
 			
 			listener.afterStep(Sampler.this.population, person, accepted);
 		}
 
-	}
-	
-	public static void main(String args[]) {
-		List<ProxyPerson> population = new ArrayList<ProxyPerson>(1000);
-		for(int i = 0; i < 1000; i++) {
-			population.add(new ProxyPerson(String.valueOf(i)));
-		}
-		
-//		Sampler sampler = new Sampler(new XORShiftRandom());
-//		sampler.setHamiltonian(new DummyHamiltonian());
-//		sampler.setMutatorFactory(new DummyMutatorFactory());
-//		sampler.setSamplerListener(new BlockingSamplerListener(new DefaultListener(), sampler, 10));
-//		
-//		sampler.run(population, 200);
-	}
-	
-	private static class DummyHamiltonian implements Hamiltonian {
-
-		@Override
-		public double evaluate(ProxyPerson person) {
-			try {
-				Thread.sleep(5);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return 0;
-		}
-		
-	}
-	
-	private static class DummyMutator implements Mutator {
-
-		@Override
-		public boolean modify(ProxyPerson person) {
-			return true;
-		}
-
-		@Override
-		public void revert(ProxyPerson person) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-	}
-	
-	private static class DummyMutatorFactory implements MutatorFactory {
-
-		@Override
-		public Mutator newInstance() {
-			return new DummyMutator();
-		}
-		
 	}
 	
 	private static class DefaultListener implements SamplerListener {

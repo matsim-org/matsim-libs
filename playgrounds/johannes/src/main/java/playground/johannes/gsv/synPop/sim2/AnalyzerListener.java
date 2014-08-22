@@ -19,52 +19,51 @@
 
 package playground.johannes.gsv.synPop.sim2;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Set;
 
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+
+import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
+import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
+import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.sna.util.Composite;
+import playground.johannes.gsv.synPop.analysis.TrajectoryProxyBuilder;
 
 /**
  * @author johannes
  *
  */
-public class HamiltonianComposite extends Composite<Hamiltonian> implements Hamiltonian {
+public class AnalyzerListener implements SamplerListener {
 
-	private List<Double> thetas = new ArrayList<Double>();
+	private final TrajectoryAnalyzerTaskComposite task;
 	
-	public void addComponent(Hamiltonian h) {
-		super.addComponent(h);
-		thetas.add(1.0);
-	}
+	private final String rootDir;
 	
-	public void addComponent(Hamiltonian h, double theta) {
-		super.addComponent(h);
-		thetas.add(theta);
-	}
+	private long iters;
 	
-	public void removeComponent(Hamiltonian h) {
-		int idx = components.indexOf(h);
-		super.removeComponent(h);
-		thetas.remove(idx);
-	}
-
-	/*
-	 * TODO: hide access?
-	 */
-	public List<Hamiltonian> getComponents() {
-		return components;
+	public AnalyzerListener(ActivityFacilities facilities, String rootDir) {
+		this.rootDir = rootDir;
+		task = new TrajectoryAnalyzerTaskComposite();
+		task.addTask(new FacilityOccupancyTask(facilities));
+	
 	}
 	
 	@Override
-	public double evaluate(ProxyPerson person) {
-		double sum = 0;
+	public void afterStep(Collection<ProxyPerson> population, ProxyPerson person, boolean accpeted) {
+		iters++;
 		
-		for(int i = 0; i < components.size(); i++) {
-			sum += thetas.get(i) * components.get(i).evaluate(person);
+		Set<Trajectory> trajectories = TrajectoryProxyBuilder.buildTrajectories(population);
+		String output = String.format("%s/%s", rootDir, String.valueOf(iters));
+		File file = new File(output);
+		file.mkdirs();
+		try {
+			TrajectoryAnalyzer.analyze(trajectories, task, file.getAbsolutePath());
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		
-		return sum;
 	}
 
 }

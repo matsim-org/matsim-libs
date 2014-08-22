@@ -68,7 +68,7 @@ public class HFacilityCapacity implements Hamiltonian {
 			}
 		}
 		 
-		return sum;
+		return -sum;
 	}
 
 }

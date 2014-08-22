@@ -17,54 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.sim2;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.sna.util.Composite;
+package playground.johannes.gsv.synPop.invermo;
 
 /**
  * @author johannes
  *
  */
-public class HamiltonianComposite extends Composite<Hamiltonian> implements Hamiltonian {
+public class ColumnKeys {
 
-	private List<Double> thetas = new ArrayList<Double>();
+	public static final String HOUSEHOLD_ID = "ID";
 	
-	public void addComponent(Hamiltonian h) {
-		super.addComponent(h);
-		thetas.add(1.0);
-	}
+	public static final String PERSON_ID = "persnr";
 	
-	public void addComponent(Hamiltonian h, double theta) {
-		super.addComponent(h);
-		thetas.add(theta);
-	}
+	public static final String STATION_NAME = "hhbhfname";
 	
-	public void removeComponent(Hamiltonian h) {
-		int idx = components.indexOf(h);
-		super.removeComponent(h);
-		thetas.remove(idx);
-	}
-
-	/*
-	 * TODO: hide access?
-	 */
-	public List<Hamiltonian> getComponents() {
-		return components;
-	}
+	public static final String STATION_DIST = "hhbhfkm";
 	
-	@Override
-	public double evaluate(ProxyPerson person) {
-		double sum = 0;
-		
-		for(int i = 0; i < components.size(); i++) {
-			sum += thetas.get(i) * components.get(i).evaluate(person);
-		}
-		
-		return sum;
+	public static final String HOME_TOWN = "wohnort";
+	
+	public static final String HOME_ZIPCODE = "wohnplz";
+	
+	public static final String NA = "nan";
+	
+	public static boolean validate(String value) {
+		return (value != null && !value.equalsIgnoreCase(NA));
 	}
-
 }

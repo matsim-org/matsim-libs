@@ -25,9 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import net.opengis.kml._2.BalloonStyleType;
-
-import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
