@@ -155,7 +155,8 @@ PersonStuckEventHandler {
 				collectLinkInfos(event.getLinkId());
 			}
 			LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-			checkAndModifyLinkEnterAgentList(event);	
+			linkInfo.getEnteringAgents().add(event.getVehicleId());
+//			checkAndModifyLinkEnterAgentList(event);	
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getVehicleId(), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
 			linkInfo.getPersonId2linkEnterTime().put(event.getVehicleId(), event.getTime());
 		}	
@@ -182,8 +183,9 @@ PersonStuckEventHandler {
 					linkInfo.getPersonId2linkLeaveTime().clear();
 				}
 			}
-			startDelayProcessing(event,new HashMap<WarmPollutant, Double>());
-
+			startDelayProcessing(event);
+			
+			linkInfo.getEnteringAgents().remove(event.getVehicleId());
 			linkInfo.getLeavingAgents().add(event.getVehicleId());
 			linkInfo.getPersonId2linkLeaveTime().put(event.getVehicleId(), event.getTime());
 			linkInfo.setLastLeavingAgent(event.getVehicleId());
@@ -191,26 +193,32 @@ PersonStuckEventHandler {
 		}
 	}
 
-	private void checkAndModifyLinkEnterAgentList(LinkEnterEvent event){
-		LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-		List<Id> linkEnterList = linkInfo.getEnteringAgents(); 
-
-		double maxVehiclesOnLink = linkInfo.getStorageCapacityCars();
-		double noVehicleOnLinkNow = linkEnterList.size();
-
-		if(noVehicleOnLinkNow < maxVehiclesOnLink) {
-			linkEnterList.add(event.getVehicleId());
-		} else if (noVehicleOnLinkNow == (int) maxVehiclesOnLink){
-			linkEnterList.remove(0);
-			linkEnterList.add(event.getVehicleId());
-		} 
-
-		if(linkEnterList.size() > maxVehiclesOnLink+1) {
-			throw new RuntimeException ("Number of vehicle on the link is more than allowed. Aborting!!!");
-		}
-	}
+//	private void checkAndModifyLinkEnterAgentList(LinkEnterEvent event){
+//		LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+//		List<Id> linkEnterList = linkInfo.getEnteringAgents(); 
+//
+//		double maxVehiclesOnLink = linkInfo.getStorageCapacityCars();
+//		double noVehicleOnLinkNow = linkEnterList.size();
+//
+//		if(noVehicleOnLinkNow < maxVehiclesOnLink) {
+//			linkEnterList.add(event.getVehicleId());
+//		} else if (noVehicleOnLinkNow == (int) maxVehiclesOnLink){
+//			linkEnterList.remove(0);
+//			linkEnterList.add(event.getVehicleId());
+//		} 
+//
+//		if(linkEnterList.size() > maxVehiclesOnLink+1) {
+//			throw new RuntimeException ("Number of vehicle on the link is more than allowed. Aborting!!!");
+//		}
+//	}
 	
-	private void startDelayProcessing(LinkLeaveEvent event, Map<WarmPollutant, Double> stopAndGoWarmEmissionOnThisLink) {
+	/**
+	 * @param event
+	 * @param stopAndGoWarmEmissionOnThisLink
+	 * This method first charge for flow storage delays  
+	 * and then if spill back delays are present, process them.
+	 */
+	private void startDelayProcessing(LinkLeaveEvent event) {
 		Id delayedPerson = event.getPersonId();
 		LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		double delayOnThisLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(delayedPerson);
@@ -219,7 +227,7 @@ PersonStuckEventHandler {
 		else if(delayOnThisLink<0) throw new RuntimeException("Delays can not be negative, do a consistency check.");
 		else {
 			linkInfo.getPersonId2DelaysToPayFor().put(event.getVehicleId(), delayOnThisLink);
-			linkInfo.getPersonId2WarmEmissionsToPayFor().put(event.getVehicleId(), stopAndGoWarmEmissionOnThisLink);
+//			linkInfo.getPersonId2WarmEmissionsToPayFor().put(event.getVehicleId(), stopAndGoWarmEmissionOnThisLink);
 			this.totalDelay = this.totalDelay + delayOnThisLink;
 
 			List<Id> leavingAgentsList = new ArrayList<Id>();
@@ -342,7 +350,7 @@ PersonStuckEventHandler {
 		Map<WarmPollutant, Double> emissionsToPayFor = linkInfo.getPersonId2WarmEmissionsToPayFor().get(event.getVehicleId());
 
 		if (delayToPayFor > marginalDelaysPerLeavingVehicle) {
-			Map<WarmPollutant, Double> emissionCorrespondingToDelays = new HashMap<WarmPollutant, Double>();
+//			Map<WarmPollutant, Double> emissionCorrespondingToDelays = new HashMap<WarmPollutant, Double>();
 			if (event.getVehicleId().toString().equals(personToBeCharged.toString())) {
 				System.out.println("\n \n \t \t Error \n \n");
 				log.error("Causing agent and affected agents "+personToBeCharged.toString()+" are same. Delays at this point is "+delayToPayFor+" sec.");
