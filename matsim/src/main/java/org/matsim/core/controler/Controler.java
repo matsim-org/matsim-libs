@@ -212,8 +212,6 @@ public class Controler extends AbstractController {
 			this.scenarioData = (ScenarioImpl) scenario;
 			this.config = scenario.getConfig();
 			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
-			checkConfigConsistencyAndWriteToLog(this.config,"Complete config dump directly after reading/getting the config file.  " +
-					"See later for config dump after setup.");
 		} else {
 			if (configFileName == null) {
 				if (config == null) {
@@ -224,8 +222,6 @@ public class Controler extends AbstractController {
 				this.config = ConfigUtils.loadConfig(configFileName);
 			}
 			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
-			checkConfigConsistencyAndWriteToLog(this.config,"Complete config dump directly after reading/getting the config file.  " +
-					"See later for config dump after setup.");
 			this.scenarioData = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
 		}
 		this.network = this.scenarioData.getNetwork();

@@ -183,7 +183,13 @@ public class Config {
 		for (ConfigConsistencyChecker c : this.consistencyCheckers) {
 			c.checkConsistency(this);
 		}
-
+//        for (Module m : this.modules.values()) {
+//            if (m.getClass() == Module.class) {
+//                throw new RuntimeException("Config group " + m.getName() + " is present, but has never been read." +
+//                        "This is probably an error: You may be expecting functionality which is not available." +
+//                        "Maybe you need to add something to the Controler?");
+//            }
+//        }
 	}
 
 	// ////////////////////////////////////////////////////////////////////

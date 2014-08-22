@@ -20,118 +20,54 @@
 
 package org.matsim.roadpricing;
 
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Tests the integration of the roadpricing-package into the Controler.
  *
  * @author mrieser
  */
-public class RoadPricingControlerTest extends MatsimTestCase {
-	
-	/**
-	 * Make sure that the road-pricing classes are not loaded when no road pricing is simulated.
-	 */
-	public void testBaseCase() {
-		Config config = loadConfig("test/scenarios/equil/config.xml");
-		config.controler().setLastIteration(0);
-		config.controler().setWritePlansInterval(0);
-		Controler controler = new Controler(config);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.run();
-		PlanAlgorithm router = new PlanRouter(
-		controler.getTripRouterFactory().instantiateAndConfigureTripRouter(),
-		controler.getScenario().getActivityFacilities()
-		);
-		assertFalse("BaseCase must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
-		TravelDisutility travelCosts = controler.createTravelDisutilityCalculator();
-		assertFalse("BaseCase must not use TollTravelCostCalculator.", travelCosts instanceof TravelDisutilityIncludingToll);
-	}
+public class RoadPricingControlerTest {
 
-	public void testDistanceToll() {
-		Config config = loadConfig("test/scenarios/equil/config.xml");
-		config.controler().setLastIteration(0);
-		config.controler().setWritePlansInterval(0);
-        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
+    @Rule
+    public MatsimTestUtils utils = new MatsimTestUtils();
 
-        RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class) ;
-		rpConfig.setTollLinksFile(getInputDirectory() + "distanceToll.xml") ;
-		
-		Controler controler = new Controler(config);
-		controler.addControlerListener(new RoadPricing());
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.run();
-		PlanAlgorithm router = new PlanRouter(
-		    controler.getTripRouterFactory().instantiateAndConfigureTripRouter(),
-		    controler.getScenario().getActivityFacilities()
-		);
-		assertFalse("Distance toll must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
-		TravelDisutility travelCosts = controler.createTravelDisutilityCalculator();
-		assertTrue("Distance toll must use TollTravelCostCalculator.", travelCosts instanceof TravelDisutilityIncludingToll);
-	}
-
-	public void testCordonToll() {
-		Config config = loadConfig("test/scenarios/equil/config.xml");
-		config.controler().setLastIteration(0);
-		config.controler().setWritePlansInterval(0);
-        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
-        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(getInputDirectory() + "cordonToll.xml");
-		Controler controler = new Controler(config);
-		controler.addControlerListener(new RoadPricing());
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.run();
-		PlanAlgorithm router = new PlanRouter(
-		controler.getTripRouterFactory().instantiateAndConfigureTripRouter(),
-		controler.getScenario().getActivityFacilities()
-		);
-		assertFalse("Cordon toll must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
-		TravelDisutility travelCosts = controler.createTravelDisutilityCalculator();
-		assertTrue("Cordon toll must use TollTravelCostCalculator.", travelCosts instanceof TravelDisutilityIncludingToll);
-	}
-
-	/** Tests that paid tolls end up in the score. */
-	public void testTollScores() {
+    @Test
+	public void testPaidTollsEndUpInScores() {
 		// first run basecase
-		Config config = loadConfig("test/scenarios/equil/config.xml");
+		Config config = utils.loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setLastIteration(0);
 		config.plans().setInputFile("test/scenarios/equil/plans1.xml");
-		config.controler().setOutputDirectory(getOutputDirectory() + "/basecase/");
+		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/basecase/");
 		config.controler().setWritePlansInterval(0);
 		Controler controler1 = new Controler(config);
 		controler1.setCreateGraphs(false);
 		controler1.setDumpDataAtEnd(false);
 		controler1.getConfig().controler().setWriteEventsInterval(0);
 		controler1.run();
-		double scoreBasecase = controler1.getPopulation().getPersons().get(new IdImpl("1")).getPlans().get(0).getScore().doubleValue();
+		double scoreBasecase = controler1.getPopulation().getPersons().get(new IdImpl("1")).getPlans().get(0).getScore();
 
 		// now run toll case
         ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
-        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(getInputDirectory() + "distanceToll.xml");
-		config.controler().setOutputDirectory(getOutputDirectory() + "/tollcase/");
+        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(utils.getInputDirectory() + "distanceToll.xml");
+		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/tollcase/");
 		Controler controler2 = new Controler(config);
 		controler2.addControlerListener(new RoadPricing());
 		controler2.setCreateGraphs(false);
 		controler2.setDumpDataAtEnd(false);
 		controler2.getConfig().controler().setWriteEventsInterval(0);
 		controler2.run();
-		double scoreTollcase = controler2.getPopulation().getPersons().get(new IdImpl("1")).getPlans().get(0).getScore().doubleValue();
+		double scoreTollcase = controler2.getPopulation().getPersons().get(new IdImpl("1")).getPlans().get(0).getScore();
 
 		// there should be a score difference
-		assertEquals(3.0, scoreBasecase - scoreTollcase, EPSILON); // toll amount: 10000*0.00020 + 5000*0.00020
+		Assert.assertEquals(3.0, scoreBasecase - scoreTollcase, MatsimTestUtils.EPSILON); // toll amount: 10000*0.00020 + 5000*0.00020
 	}
-
 
 }

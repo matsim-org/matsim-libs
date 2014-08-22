@@ -21,6 +21,7 @@
 package org.matsim.roadpricing;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -57,61 +58,68 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 	private CalcAverageTolledTripLength cattl = null;
 
 	final static private Logger log = Logger.getLogger(RoadPricing.class);
-	
-	public RoadPricing() {
+    private RoadPricingConfigGroup rpConfig;
+
+    public RoadPricing() {
 		Gbl.printBuildInfo("RoadPricing", "/org.matsim.contrib/roadpricing/revision.txt");
 	}
 	
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 		final Controler controler = event.getControler();
-		// read the road pricing scheme from file
-		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(this.scheme);
-		try {
-			RoadPricingConfigGroup rpConfig = (RoadPricingConfigGroup) controler.getConfig().getModule(RoadPricingConfigGroup.GROUP_NAME) ;
-			rpReader.parse(rpConfig.getTollLinksFile());
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		
-		event.getControler().getScenario().addScenarioElement(
-				RoadPricingScheme.ELEMENT_NAME,
-				scheme);
+        rpConfig = ConfigUtils.addOrGetModule(controler.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+        if (rpConfig.isUseRoadpricing()) {
+            String tollLinksFile = rpConfig.getTollLinksFile();
 
-		// add the events handler to calculate the tolls paid by agents
-		this.tollCalc = new CalcPaidToll(controler.getNetwork(), this.scheme);
-		controler.getEvents().addHandler(this.tollCalc);
+            if (tollLinksFile != null) {
+                RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(this.scheme);
+                rpReader.parse(tollLinksFile);
+            }
 
-		// replace the travelCostCalculator with a toll-dependent one if required
-		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()) || RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType())) {
-			final TravelDisutilityFactory previousTravelCostCalculatorFactory = controler.getTravelDisutilityFactory();
-			// area-toll requires a regular TravelCost, no toll-specific one.
 
-			TravelDisutilityFactory travelCostCalculatorFactory = new TravelDisutilityFactory() {
-				@Override
-				public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-					return new TravelDisutilityIncludingToll(previousTravelCostCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup), 
-							RoadPricing.this.scheme, controler.getConfig() );
-				}
-			};
-			controler.setTravelDisutilityFactory(travelCostCalculatorFactory);
-		}
+            event.getControler().getScenario().addScenarioElement(
+                    RoadPricingScheme.ELEMENT_NAME,
+                    scheme);
 
-		this.cattl = new CalcAverageTolledTripLength(controler.getNetwork(), this.scheme);
-		controler.getEvents().addHandler(this.cattl);
+            // add the events handler to calculate the tolls paid by agents
+            this.tollCalc = new CalcPaidToll(controler.getNetwork(), this.scheme);
+            controler.getEvents().addHandler(this.tollCalc);
+
+            // replace the travelCostCalculator with a toll-dependent one if required
+            if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()) || RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType())) {
+                final TravelDisutilityFactory previousTravelCostCalculatorFactory = controler.getTravelDisutilityFactory();
+                // area-toll requires a regular TravelCost, no toll-specific one.
+
+                TravelDisutilityFactory travelCostCalculatorFactory = new TravelDisutilityFactory() {
+                    @Override
+                    public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+                        return new TravelDisutilityIncludingToll(previousTravelCostCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup),
+                                RoadPricing.this.scheme, controler.getConfig() );
+                    }
+                };
+                controler.setTravelDisutilityFactory(travelCostCalculatorFactory);
+            }
+
+            this.cattl = new CalcAverageTolledTripLength(controler.getNetwork(), this.scheme);
+            controler.getEvents().addHandler(this.cattl);
+        }
 	}
 
 	@Override
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
-		// evaluate the final tolls paid by the agents and add them to their scores
-		this.tollCalc.sendMoneyEvents(Time.MIDNIGHT, event.getControler().getEvents());
+        if (rpConfig.isUseRoadpricing()) {
+            // evaluate the final tolls paid by the agents and add them to their scores
+            this.tollCalc.sendMoneyEvents(Time.MIDNIGHT, event.getControler().getEvents());
+        }
 	}
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		log.info("The sum of all paid tolls : " + this.tollCalc.getAllAgentsToll() + " Euro.");
-		log.info("The number of people who paid toll : " + this.tollCalc.getDraweesNr());
-		log.info("The average paid trip length : " + this.cattl.getAverageTripLength() + " m.");
+        if (rpConfig.isUseRoadpricing()) {
+            log.info("The sum of all paid tolls : " + this.tollCalc.getAllAgentsToll() + " Euro.");
+            log.info("The number of people who paid toll : " + this.tollCalc.getDraweesNr());
+            log.info("The average paid trip length : " + this.cattl.getAverageTripLength() + " m.");
+        }
 	}
 
 	public RoadPricingScheme getRoadPricingScheme() {
@@ -129,4 +137,5 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 	public double getAvgPaidTripLength() {
 		return this.cattl.getAverageTripLength();
 	}
+
 }

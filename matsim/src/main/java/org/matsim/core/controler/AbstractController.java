@@ -127,6 +127,16 @@ public abstract class AbstractController {
         } finally {
             shutdown();
             Runtime.getRuntime().removeShutdownHook(shutdownHook);
+            // Propagate Exception in case Controler.run is called by someone who wants to catch
+            // it. It is probably not strictly correct to wrap the exception here.
+            // But otherwise, this method would have to declare "throws Throwable".
+            // In theory, a run method for test cases would probably need to
+            // be different from the run method of the "MATSim platform" which
+            // takes control of the JVM by installing hooks and exception
+            // handlers.
+            if (uncaughtException != null) {
+                throw new RuntimeException(uncaughtException);
+            }
         }
     }
 
@@ -277,6 +287,11 @@ public abstract class AbstractController {
      * call seems more important, but I wanted to leave the first one there in
      * case the program fails before that config dump. Might be put into the
      * "unexpected shutdown hook" instead. kai, dec'10
+     *
+     * Removed the first call for now, because I am now also checking for
+     * consistency with loaded controler modules. If still desired, we can
+     * put it in the shutdown hook.. michaz aug'14
+     *
      * </ul>
      *
      * @param config  TODO
