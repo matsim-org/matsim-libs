@@ -44,14 +44,16 @@ public class MatchTrips {
 		String path2MsRoutes = args[0];
 		String path2AmRoutes = args[1];
 		String path2WriteDemands = args[2];
+		String path2InpRoutes = args[3];
 
 		// Read trips
 		HashMap<Id, Long[]> msTrips = MapRoutes.readRoutes(path2MsRoutes);
-		HashMap<Id, Long[]> amTrips = MapRoutes.readRoutes(path2AmRoutes);
+		//HashMap<Id, Long[]> amTrips = MapRoutes.readRoutes(path2AmRoutes);
+		HashMap<Id, Long[]> inpTrips = MapRoutes.readRoutes(path2InpRoutes);
 
 		// Match trips
 		ConvEvents2Anm.TripMatcher tripMatcher = new TripMatcher();
-		HashMap<Id, Integer> results = tripMatcher.matchTrips(msTrips, amTrips);
+		HashMap<Id, Integer> results = tripMatcher.matchTrips(msTrips, inpTrips);
 
 		writeTripDemands(results, path2WriteDemands);
 	}
