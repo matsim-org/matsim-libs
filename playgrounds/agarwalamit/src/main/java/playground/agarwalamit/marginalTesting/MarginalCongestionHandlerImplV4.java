@@ -214,7 +214,6 @@ PersonStuckEventHandler {
 	
 	/**
 	 * @param event
-	 * @param stopAndGoWarmEmissionOnThisLink
 	 * This method first charge for flow storage delays  
 	 * and then if spill back delays are present, process them.
 	 */
