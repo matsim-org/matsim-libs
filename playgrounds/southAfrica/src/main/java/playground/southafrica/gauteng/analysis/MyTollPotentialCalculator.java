@@ -20,6 +20,14 @@
 
 package playground.southafrica.gauteng.analysis;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,17 +46,9 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
-import playground.southafrica.gauteng.roadpricingscheme.GautengRoadPricingScheme;
-import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor;
-import playground.southafrica.utilities.Header;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import playground.southafrica.gauteng.roadpricingscheme.GautengRoadPricingScheme;
+import playground.southafrica.utilities.Header;
 
 public class MyTollPotentialCalculator {
 	private final static Logger log = Logger.getLogger(MyTollPotentialCalculator.class);
@@ -92,8 +92,14 @@ public class MyTollPotentialCalculator {
 		/* Read the baseline file and perform some analysis. */
 		log.info("-------------------------------------------------------------------------------");
         String tollLinksFileName = ConfigUtils.addOrGetModule(mtpc.getScenario().getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).getTollLinksFile() ;
-		GautengRoadPricingScheme scheme = new GautengRoadPricingScheme(tollLinksFileName, mtpc.getScenario().getNetwork(), 
-				mtpc.getScenario().getPopulation(), new SanralTollFactor());
+        
+        
+//		GautengRoadPricingScheme scheme = new GautengRoadPricingScheme(tollLinksFileName, mtpc.getScenario().getNetwork(), 
+//				mtpc.getScenario().getPopulation(), new SanralTollFactor());
+        GautengRoadPricingScheme scheme = null ;
+        System.err.println("SanralTollFactor does no longer exist; only exists with subpopulations.  Aborting ...");
+        System.exit(-1) ;
+		
 		mtpc.processEventsFile(baseFilename, linkList, breakList, scheme);
 		mtpc.writeMaps(outputFolder);
 		

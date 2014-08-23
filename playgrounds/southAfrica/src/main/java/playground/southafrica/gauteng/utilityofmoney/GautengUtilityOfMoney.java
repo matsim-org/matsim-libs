@@ -10,10 +10,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.vehicles.VehicleType;
 
 import playground.southafrica.gauteng.roadpricingscheme.TollFactorI;
-import playground.southafrica.gauteng.roadpricingscheme.SanralTollVehicleType;
 
 /**
  * Calculates the utility of money from a given Value of Time (VoT). 
@@ -52,17 +50,6 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 		this.commercialMultiplier = valueOfTimeMultiplier ;
 		
 		this.tollFactor = tollFactor ;
-
-		/* Old */
-		log.info("-----  Using SanralTollVehicleType  -----");
-		for ( SanralTollVehicleType vehType : SanralTollVehicleType.values() ) {
-			log.info( String.format("%30s: mUTTS: %5.2f/hr; mVTTS: %5.0f ZAR/hr; mUoM: %5.3f/ZAR", 
-					vehType.toString(), getUtilityOfTravelTime_hr(), getValueOfTime_hr_OLD(vehType), 
-					getUtilityOfMoneyFromValueOfTime( getValueOfTime_hr_OLD(vehType)) ) ) ;
-		}
-		// (I found (the previous verison of) these logging statements _above_ setting this.baseValueOfTime etc.  In consequence, I would think that they
-		// were giving wrong information.  Originally, the values came from the config file only or were
-		// hard-coded.  kai, nov'13)
 		
 		/* New (28/01/2014). Take a random person from each subpopulation */
 		Map<String, Id> map = new TreeMap<String, Id>();
@@ -141,47 +128,6 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 		// "performing" is normally positive
 		// "traveling" is normally negative
 		return utilityOfTravelTime_hr;
-	}
-
-	@Deprecated
-	private double getValueOfTime_hr_OLD(SanralTollVehicleType vehicleType) {
-		double valueOfTime_hr = baseValueOfTime_h ;
-		switch( vehicleType ) {
-		case privateClassAWithTag:
-		case privateClassAWithoutTag:
-			break ;
-		case commercialClassBWithTag:
-		case commercialClassBWithoutTag:
-		case busWithTag:
-		case busWithoutTag:
-			//			valueOfTime_hr = baseValueOfTime_h*0.5*commercialMultiplier ; 
-			// yy if someone sets the commercial multiplier to less than two, this may not work as intended. kai, nov'13
-			valueOfTime_hr = baseValueOfTime_h * Math.sqrt( commercialMultiplier ) ;
-			break;
-		case commercialClassCWithTag:
-		case commercialClassCWithoutTag:
-			valueOfTime_hr = baseValueOfTime_h*commercialMultiplier ; 
-			break ;
-		case commercialClassAWithTag:
-		case commercialClassAWithoutTag:
-		case taxiWithTag:
-		case taxiWithoutTag:
-		case extWithTag:
-		case extWithoutTag:
-			valueOfTime_hr = baseValueOfTime_h;
-			break ;
-		default:
-			throw new RuntimeException("vehicle type not implemented") ;
-		}
-//		if ( wrncnt<1 ) {
-//			wrncnt++ ;
-//			Logger.getLogger(this.getClass()).warn("Johan, commercialClassAWith/WithoutTag were not explicitly given a value of time.  I now added them "
-//					+ "under the vehicle types which are getting the base value of time ... which is what they must have gotten implicitly in previous runs. "
-//					+ "Could you please modify if necessary, and in any case remove this warning when things are ok.  Thanks, kai, nov'13");
-//		}
-//		 I think we had talked about this in dec'13. kai
-		
-		return valueOfTime_hr;
 	}
 
 }
