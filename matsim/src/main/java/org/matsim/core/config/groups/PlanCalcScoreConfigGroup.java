@@ -324,7 +324,8 @@ public final Map<String, String> getComments() {
 			+ "This caused durations to evolve to zero once they were below zeroUtilityDuration, causing problems.  Only use this switch if you need to be "
 			+ "backwards compatible with some old results.  (changed nov'13)") ;
 	map.put(PERFORMING,"[utils/hr] marginal utility of doing an activity.  normally positive.  also the opportunity cost of " +
-			"time if agent is doing nothing.");
+			"time if agent is doing nothing.  MATSim separates the resource value of time from the direct (dis)utility of travel time, see, e.g., "
+			+ "Boerjesson and Eliasson, TR-A 59 (2014) 144-158.");
 	map.put(LATE_ARRIVAL, "[utils/hr] utility for arriving late (i.e. after the latest start time).  normally negative") ;
 	map.put(EARLY_DEPARTURE, "[utils/hr] utility for departing early (i.e. before the earliest end time).  Normally negative.  Probably " +
 			"implemented correctly, but not tested." );
