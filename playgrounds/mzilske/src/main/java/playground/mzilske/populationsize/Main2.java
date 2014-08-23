@@ -24,6 +24,10 @@ package playground.mzilske.populationsize;
 
 public class Main2 {
 
+
+    // Vorsicht, das ist derzeit nicht genau das, was im Paper steht.
+    // Im Paper (siehe eingecheckter run) habe ich jeden clone mit anderer realisierung des CDR
+    // erzeugt. Das hier ist derzeit, dass alle Clone die gleiche Realisierung haben.
 	public static void main(String[] args) {
 		final ExperimentResource experiment = new ExperimentResource("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/berlin/");
 		final RegimeResource uncongested = experiment.getRegime("uncongested");
