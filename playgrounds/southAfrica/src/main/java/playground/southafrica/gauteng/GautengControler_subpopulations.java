@@ -203,13 +203,10 @@ public class GautengControler_subpopulations {
 		config.controler().setWriteSnapshotsInterval(0);
 		
 		if ( user==User.kai ) {
-			config.parallelEventHandling().setNumberOfThreads(1); // even "1" is slowing down my laptop quite a lot
+			config.parallelEventHandling().setNumberOfThreads(4); // even "1" is slowing down my laptop quite a lot
 		} else if(user == User.johan){
 			config.parallelEventHandling().setNumberOfThreads(1); 
 		}
-
-//		config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration );
-		// is now default.
 
 		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspExperimentalConfigGroup.ABORT ) ;
@@ -228,10 +225,8 @@ public class GautengControler_subpopulations {
 		// ===========================================
 
 		final Scenario sc = ScenarioUtils.loadScenario(config);
-//		config.scenario().setUseVehicles(true); // _after_ scenario loading. :-(
-		//yyyy should now be possible to replace by:
+
 		((ScenarioImpl)sc).createVehicleContainer() ;
-		// but needs to be tested. kai, feb'14
 		
 		/* CREATE VEHICLES. */
 		createVehiclePerPerson(sc);
@@ -311,28 +306,7 @@ public class GautengControler_subpopulations {
 							+ "road pricing features.  aborting ...");
 		}
 
-		final TollFactorI tollFactor = new SanralTollFactor_Subpopulation(sc);
-
-		// SOME STATISTICS:
-		controler.addControlerListener(new StartupListener() {
-			@Override
-			public void notifyStartup(StartupEvent event) {
-				Map<SanralTollVehicleType, Double> cnt = new HashMap<SanralTollVehicleType, Double>();
-				for (Person person : sc.getPopulation().getPersons().values()) {
-					SanralTollVehicleType type = tollFactor.typeOf(person
-							.getId());
-					if (cnt.get(type) == null) {
-						cnt.put(type, 0.);
-					}
-					cnt.put(type, 1. + cnt.get(type));
-				}
-				for (SanralTollVehicleType type : SanralTollVehicleType
-						.values()) {
-					LOG.info(String.format("type: %30s; cnt: %8.0f",
-							type.toString(), cnt.get(type)));
-				}
-			}
-		});
+		final  SanralTollFactor_Subpopulation tollFactor = new SanralTollFactor_Subpopulation(sc);
 
 		// CONSTRUCT VEH-DEP ROAD PRICING SCHEME:
         RoadPricingScheme vehDepScheme = new GautengRoadPricingScheme(ConfigUtils.addOrGetModule(sc
@@ -349,7 +323,7 @@ public class GautengControler_subpopulations {
 		// class):
 		// insert into scoring:
 		controler.addControlerListener(new GenerationOfMoneyEvents(
-				sc.getNetwork(), sc.getPopulation(), vehDepScheme, tollFactor
+				sc.getNetwork(), sc.getPopulation(), vehDepScheme
 				));
 
 		controler.setScoringFunctionFactory(new GautengScoringFunctionFactory(

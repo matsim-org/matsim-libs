@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 
+@Deprecated
 public  class SanralTollFactorOLD implements TollFactorI {
 	private final  int carStartId = 0;
 	private final  int carEndId = 157517;
@@ -35,7 +36,7 @@ public  class SanralTollFactorOLD implements TollFactorI {
 	private final  int extStartId = 4000000;
 	private final  int extEndId = 4020181;
 	
-    @Override
+	@Deprecated
 	public  SanralTollVehicleType typeOf ( Id idObj ) {
 		long id = Long.parseLong(idObj.toString());
 

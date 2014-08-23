@@ -21,6 +21,7 @@ package playground.southafrica.gauteng.roadpricingscheme;
 
 import org.matsim.api.core.v01.Id;
 
+@Deprecated
 public class SanralTollFactor implements TollFactorI {
 	private final  int carStartId = 0;
 	private final  int carEndId = 157517;
@@ -37,10 +38,7 @@ public class SanralTollFactor implements TollFactorI {
 	private final  int extStartId = 4000000;
 	private final  int extEndId = 4020181;
 	
-	/* (non-Javadoc)
-	 * @see playground.southafrica.gauteng.roadpricingscheme.TollFactorI#typeOf(org.matsim.api.core.v01.Id)
-	 */
-    @Override
+	@Deprecated
 	public  SanralTollVehicleType typeOf ( Id idObj ) {
 		long id = Long.parseLong(idObj.toString());
 
@@ -117,6 +115,7 @@ public class SanralTollFactor implements TollFactorI {
 	
 	
 	@Override
+	@Deprecated
 	public double getTollFactor(Id personId, final Id vehicleId, final Id linkId, final double time){		
 		double timeDiscount = getTimeDiscount(time);
 		double tagDiscount = 0.00;
@@ -177,6 +176,7 @@ public class SanralTollFactor implements TollFactorI {
 		
 	}
 	
+	@Deprecated
 	private  double getTimeDiscount(double time){
 		/* First get the real time of day. */
 		double timeOfDay = time;
@@ -204,6 +204,7 @@ public class SanralTollFactor implements TollFactorI {
 	 * @param linkId
 	 * @return
 	 */
+	@Deprecated
 	private static boolean getDiscountEligibility(Id linkId){
 		if(NoDiscountLinks.getList().contains(linkId)){
 			return false;

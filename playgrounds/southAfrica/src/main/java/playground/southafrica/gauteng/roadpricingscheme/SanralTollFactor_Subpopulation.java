@@ -37,8 +37,8 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 	private Scenario sc;
 	
 	public static enum TollVehicleType { A1, A2, B, C} ;
-	public static enum SubPopType{ PRIVATE, COMMERCIAL, TAXI, BUS, EXT } ; 
-	
+	public static enum SubPopType{ PRIVATE, COMMERCIAL, TAXI, BUS, EXT } ;
+	// yyyy: maybe try to switch to some String-based registry; but I need to be able to iterate over those types for analysis. kai, aug'14
 	
 	public SanralTollFactor_Subpopulation(Scenario scenario) {
 		this.sc = scenario;
@@ -159,76 +159,6 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 		}
 	}
 	
-	private Map<Id,SanralTollVehicleType> tollVehicleTypes = new HashMap<Id,SanralTollVehicleType>() ; 
-
-	/**
-	 * Checks the subpopulation attributes and assigns the vehicle type 
-	 * accordingly.
-	 */
-	@Override
-	public SanralTollVehicleType typeOf(Id personId) {
-		if ( tollVehicleTypes.get(personId) != null ) {
-			return tollVehicleTypes.get(personId) ;
-		}
-		
-		Assert.assertNotNull(this.sc);
-		Assert.assertNotNull(this.sc.getPopulation());
-		Assert.assertNotNull(this.sc.getPopulation().getPersonAttributes());
-		Assert.assertNotNull( personId ) ;
-		Assert.assertNotNull( sc.getConfig() );
-		Assert.assertNotNull( sc.getConfig().plans() );
-
-		/* Check subpopulation. */
-		SubPopType popType = getSubPopTypeFromPersonID(personId);
-		
-		/* Check vehicle type. */
-		TollVehicleType vehicleType = getTollVehicleTypeFromPersonID(personId);
-		
-		/* Check availability of eTag. */
-		Boolean tag = hasETag(personId);
-	
-		/* Identify correct vehicle type. */
-		switch( popType) {
-		case PRIVATE: {
-			final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.privateClassAWithTag : SanralTollVehicleType.privateClassAWithoutTag;
-			tollVehicleTypes.put( personId, tvType ) ;
-			return tvType; }
-		case COMMERCIAL: 
-			switch (vehicleType ) {
-			case A2: {
-				final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.commercialClassAWithTag : SanralTollVehicleType.commercialClassAWithoutTag;
-				tollVehicleTypes.put( personId, tvType ) ;
-				return tvType; } 
-			case B: {
-				final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.commercialClassBWithTag : SanralTollVehicleType.commercialClassBWithoutTag;
-				tollVehicleTypes.put( personId, tvType ) ;
-				return tvType; }
-			case C: {
-				final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.commercialClassCWithTag : SanralTollVehicleType.commercialClassCWithoutTag;
-				tollVehicleTypes.put( personId, tvType ) ;
-				return tvType; }
-			case A1:
-			default:
-				throw new RuntimeException("Unknown vehicle type " + vehicleType);
-			}
-		case BUS: {
-			final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.busWithTag : SanralTollVehicleType.busWithoutTag;
-			tollVehicleTypes.put( personId, tvType ) ;
-			return tvType; }
-		case TAXI: {
-			final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.taxiWithTag : SanralTollVehicleType.taxiWithoutTag;
-			tollVehicleTypes.put( personId, tvType ) ;
-			return tvType; }
-		case EXT: {
-			final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.extWithTag : SanralTollVehicleType.extWithoutTag;
-			tollVehicleTypes.put( personId, tvType ) ;
-			return tvType; }
-		default:
-			throw new RuntimeException("Unknown subpopulation type " + popType);
-		}
-	}
-
-
 	public SubPopType getSubPopTypeFromPersonID(Id personId) {
 		Object o1 = this.sc.getPopulation().getPersonAttributes().getAttribute(personId.toString(), sc.getConfig().plans().getSubpopulationAttributeName());
 		String subpopulation;
@@ -237,7 +167,8 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 		} else{
 			throw new RuntimeException("Expected a subppulation description of type `String', but it was `" + o1.getClass().toString() + "'. Returning NULL");
 		}
-		return SubPopType.valueOf( subpopulation ) ;
+		return SubPopType.valueOf( subpopulation.toUpperCase() ) ; 
+		// yyyyyy: "private" is not possible as enum, and so everything is converted to uppercase internally.  Not good.  kai, aug'14
 	}
 
 

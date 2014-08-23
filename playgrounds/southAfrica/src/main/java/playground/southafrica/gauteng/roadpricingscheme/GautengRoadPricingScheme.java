@@ -91,6 +91,11 @@ public class GautengRoadPricingScheme implements RoadPricingScheme {
 		final double tollFactorVal = tollFactor.getTollFactor(personId, vehicleId, linkId, time);
 		return new Cost( baseToll.startTime, baseToll.endTime, baseToll.amount * tollFactorVal );
 	}
+	
+	@Override
+	public Cost getTypicalLinkCostInfo( Id linkId, double time ) {
+		return this.getLinkCostInfo( linkId, time, null, null ) ;
+	}
 
 	@Override
 	public Set<Id> getTolledLinkIds() {

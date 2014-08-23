@@ -52,6 +52,7 @@ class PersonHouseholdMapping {
  * </ul>
  *
  */
+@Deprecated
 class GautengControler {
 	static Logger log = Logger.getLogger(GautengControler.class) ;
 	
@@ -116,7 +117,7 @@ class GautengControler {
 					"road pricing features.  aborting ...");
 		}
 
-		final TollFactorI tollFactor = new SanralTollFactorOLD() ;
+		final SanralTollFactorOLD tollFactor = new SanralTollFactorOLD() ;
 
 		controler.addControlerListener( new StartupListener() {
 			@Override
@@ -145,7 +146,7 @@ class GautengControler {
 		// INSTALL ROAD PRICING (in the longer run, re-merge with RoadPricing class):
 		// insert into scoring:
 		controler.addControlerListener(
-				new GenerationOfMoneyEvents( sc.getNetwork(), sc.getPopulation(), vehDepScheme, tollFactor) 
+				new GenerationOfMoneyEvents( sc.getNetwork(), sc.getPopulation(), vehDepScheme) 
 		) ;
 		
 		

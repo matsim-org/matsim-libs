@@ -1,5 +1,6 @@
 package playground.southafrica.gauteng.roadpricingscheme;
 
+@Deprecated
 public enum SanralTollVehicleType { privateClassAWithTag, privateClassAWithoutTag,  
 commercialClassAWithTag, commercialClassAWithoutTag,
 commercialClassBWithTag, commercialClassBWithoutTag,

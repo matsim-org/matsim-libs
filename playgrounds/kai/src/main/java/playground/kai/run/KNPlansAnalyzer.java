@@ -21,6 +21,7 @@ package playground.kai.run;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
@@ -37,6 +38,7 @@ import playground.southafrica.gauteng.roadpricingscheme.TollFactorI;
  * @author nagel
  *
  */
+@Deprecated // uses deprecated SanralTollVehicleType
 public class KNPlansAnalyzer {
 
 	public static void main(String[] args) {
@@ -56,7 +58,11 @@ public class KNPlansAnalyzer {
 			cnt.put( stype, 0. ) ;
 		}
 		for ( Person person : scenario.getPopulation().getPersons().values() ) {
-			SanralTollVehicleType type = tollFactor.typeOf(person.getId()) ;
+//			SanralTollVehicleType type = tollFactor.typeOf(person.getId()) ;
+			SanralTollVehicleType type = null ; 
+			Logger.getLogger(KNPlansAnalyzer.class).fatal("does not work; check code") ;
+			System.exit(-1) ;
+
 			SimplifiedType stype = GautengTollStatistics.simplifiedTypeOf( type ) ;
 			scoreSum.put( stype, scoreSum.get(stype) + person.getSelectedPlan().getScore() ) ;
 			cnt.put( stype,  cnt.get(stype) + 1. ) ;

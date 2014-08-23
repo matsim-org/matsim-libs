@@ -189,7 +189,7 @@ public class KNOldGautengController {
 		
 		config.scenario().setUseVehicles(true);
 		
-		TollFactorI tollFactor = new SanralTollFactorOLD() ;
+		SanralTollFactorOLD tollFactor = new SanralTollFactorOLD() ;
 		
 		Map<SanralTollVehicleType,Double> cnt = new HashMap<SanralTollVehicleType,Double>() ;
 		for ( Person person : scenario.getPopulation().getPersons().values() ) {
@@ -266,7 +266,7 @@ public class KNOldGautengController {
 
 		// INSTALL ROAD PRICING (in the longer run, re-merge with RoadPricing class):
 		// insert into scoring:
-		controler.addControlerListener( new GenerationOfMoneyEvents( scenario.getNetwork(), scenario.getPopulation(), scheme, tollFactor) ) ;
+		controler.addControlerListener( new GenerationOfMoneyEvents( scenario.getNetwork(), scenario.getPopulation(), scheme) ) ;
 		controler.setScoringFunctionFactory( scoringFunctionFactory );
 
 		double mUTTS_hr = config.planCalcScore().getPerforming_utils_hr() - config.planCalcScore().getTraveling_utils_hr() ;

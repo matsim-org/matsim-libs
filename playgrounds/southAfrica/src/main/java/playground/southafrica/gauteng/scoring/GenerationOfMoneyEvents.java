@@ -18,9 +18,6 @@ import org.matsim.roadpricing.CalcAverageTolledTripLength;
 import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingScheme;
 
-import playground.southafrica.gauteng.GautengTollStatistics;
-import playground.southafrica.gauteng.roadpricingscheme.TollFactorI;
-
 /**
  * @author nagel
  *
@@ -31,12 +28,12 @@ public class GenerationOfMoneyEvents implements StartupListener, AfterMobsimList
 
 	final CalcPaidToll calcPaidToll ;
 	final CalcAverageTolledTripLength cattl ;
-	final GautengTollStatistics gautengTollStatistics ;
+//	final GautengTollStatistics gautengTollStatistics ;
 	
-	public GenerationOfMoneyEvents( Network network, Population population, RoadPricingScheme vehDepScheme, TollFactorI tollFactor ) {
+	public GenerationOfMoneyEvents( Network network, Population population, RoadPricingScheme vehDepScheme ) {
 		calcPaidToll = new CalcPaidToll(network, vehDepScheme) ;
 		cattl = new CalcAverageTolledTripLength(network, vehDepScheme );
-		gautengTollStatistics = new GautengTollStatistics(tollFactor) ;
+//		gautengTollStatistics = new GautengTollStatistics(tollFactor) ;
 	}
 
 	@Override
@@ -48,7 +45,7 @@ public class GenerationOfMoneyEvents implements StartupListener, AfterMobsimList
 
 		// analysis:
 		controler.getEvents().addHandler(cattl);
-		controler.getEvents().addHandler(gautengTollStatistics) ;
+//		controler.getEvents().addHandler(gautengTollStatistics) ;
 
 	}
 
@@ -67,8 +64,8 @@ public class GenerationOfMoneyEvents implements StartupListener, AfterMobsimList
 		log.info("The number of people who paid toll : " + calcPaidToll.getDraweesNr());
 		log.info("The average paid trip length       : " + cattl.getAverageTripLength() + " m.");
 
-		int iteration = event.getIteration() ;
-		gautengTollStatistics.printTollInfo(event.getControler().getControlerIO().getIterationFilename(iteration, "")) ;
+//		int iteration = event.getIteration() ;
+//		gautengTollStatistics.printTollInfo(event.getControler().getControlerIO().getIterationFilename(iteration, "")) ;
 	}
 
 

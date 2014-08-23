@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
@@ -21,6 +22,7 @@ import playground.southafrica.gauteng.roadpricingscheme.SanralTollVehicleType;
  * @author nagel
  *
  */
+@Deprecated // uses SanralTollVehicleType
 public class GautengTollStatistics implements EventHandler, PersonMoneyEventHandler {
 
 	private Map<Id,Double> personMoneyMap = new HashMap<Id,Double>() ;
@@ -31,11 +33,13 @@ public class GautengTollStatistics implements EventHandler, PersonMoneyEventHand
 
 	private final TollFactorI tollFactor ;
 
+	@Deprecated // uses SanralTollVehicleType
 	public GautengTollStatistics( TollFactorI tollFactor ) {
 		this.tollFactor = tollFactor ;
 	}
 	
 	@Override
+	@Deprecated // uses SanralTollVehicleType
 	public void reset(int iteration) {
 //		Logger.getLogger(this.getClass()).warn("calling reset ...") ;
 		personMoneyMap.clear() ;
@@ -45,6 +49,7 @@ public class GautengTollStatistics implements EventHandler, PersonMoneyEventHand
 	}
 
 	@Override
+	@Deprecated // uses SanralTollVehicleType
 	public void handleEvent(PersonMoneyEvent event) {
 		if ( event.getAmount()==0. ) {
 			return ;
@@ -64,12 +69,15 @@ public class GautengTollStatistics implements EventHandler, PersonMoneyEventHand
 		personCountMap.put(personId,currentCount) ;
 	}
 		
+	@Deprecated // uses SanralTollVehicleType
 	static int moneyToBin( double amount ) {
 		return (int)(amount/5.) ;
 	}
 
+	@Deprecated // uses SanralTollVehicleType
 	public enum SimplifiedType {privateCar, commercialVehicle, otherVehicle } ;  
 
+	@Deprecated // uses SanralTollVehicleType
 	class TwoWayTable<K,L,V> {
 		Map<String,Double> values = new HashMap<String,Double>() ;
 		String createKey( K kk, L ll ) {
@@ -86,6 +94,7 @@ public class GautengTollStatistics implements EventHandler, PersonMoneyEventHand
 		}
 	}
 
+	@Deprecated // uses SanralTollVehicleType
 	public void printTollInfo(String directoryname) {
 		TwoWayTable<SimplifiedType,Integer,Double> countsTable = new TwoWayTable<SimplifiedType,Integer,Double>() ;
 		TwoWayTable<SimplifiedType,Integer,Double> moneyTable = new TwoWayTable<SimplifiedType,Integer,Double>() ;
@@ -97,7 +106,12 @@ public class GautengTollStatistics implements EventHandler, PersonMoneyEventHand
 			}
 			Integer idx = moneyToBin( amount ) ;
 //			System.err.println( " person: " + personId + " money: " + amount ) ;
-			SanralTollVehicleType agentType = tollFactor.typeOf(personId) ;
+//			SanralTollVehicleType agentType = tollFactor.typeOf(personId) ;
+			SanralTollVehicleType agentType = null ;
+			Logger.getLogger(this.getClass()).fatal("SanralTollVehicleType no longer supported; need other solution if this functionality is needed.  kai, aug'14") ;
+			System.exit(-1) ;
+			
+			
 			SimplifiedType sType = simplifiedTypeOf(agentType);
 
 			if ( sType != null ) { 

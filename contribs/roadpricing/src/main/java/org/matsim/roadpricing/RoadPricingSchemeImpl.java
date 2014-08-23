@@ -177,7 +177,11 @@ public class RoadPricingSchemeImpl implements RoadPricingScheme {
 		}
 		return null;
 	}
-
+	
+	@Override
+	public Cost getTypicalLinkCostInfo( Id linkId, double time ) {
+		return this.getLinkCostInfo( linkId, time, null, null ) ;
+	}
 
 	private void buildCache() {
 		this.costCache = new Cost[this.costs.size()];

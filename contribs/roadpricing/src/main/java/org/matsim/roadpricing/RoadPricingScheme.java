@@ -92,5 +92,11 @@ public interface RoadPricingScheme {
 	 * or there is no toll at the specified time for the link.
 	 */
 	public Cost getLinkCostInfo(final Id linkId, final double time, Id personId, Id vehicleId);
+	
+	/**
+	 * This is essentially to enforce that getLinkCostInfo( linkId, time, null, null ) is there ... to allow mental modules to work on
+	 * "approximate" numbers.
+	 */
+	public Cost getTypicalLinkCostInfo( final Id linkId, final double time ) ;
 
 }

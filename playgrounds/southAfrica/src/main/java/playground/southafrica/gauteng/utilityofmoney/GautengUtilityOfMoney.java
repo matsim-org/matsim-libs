@@ -87,8 +87,9 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 		double valueOfTime_hr ;
 		String subpopulation = (String)sc.getPopulation().getPersonAttributes().getAttribute(personId.toString(), sc.getConfig().plans().getSubpopulationAttributeName());
 		if ( subpopulation==null ) { // OLD
-			SanralTollVehicleType vehicleType = tollFactor.typeOf(personId);
-			valueOfTime_hr = getValueOfTime_hr_OLD( vehicleType ) ; 
+//			SanralTollVehicleType vehicleType = tollFactor.typeOf(personId);
+//			valueOfTime_hr = getValueOfTime_hr_OLD( vehicleType ) ;
+			throw new RuntimeException("Gauteng utility of money no longer works with the old setup.");
 		} else { // NEW
 			valueOfTime_hr = getValueOfTime_hr(personId); 
 		}

@@ -23,13 +23,13 @@ public class KNGautengController {
 				, GAUTENG_PATH + "toll/gauteng_toll_weekday_Existing_20131211.xml" // toll
 //				, GAUTENG_PATH + "toll/gauteng_toll_weekday_Combined_20131211.xml" // toll
 
-				, "55" // base VoT
-				, "8" // VoT multiplier
-				, "1" // number of threads
+				, "20" // base VoT
+				, "3" // VoT multiplier
+				, "4" // number of threads
 				, User.kai.toString()
 				, "./output"
 				, GAUTENG_PATH + "counts/2009/Counts_Thursday_Total.xml.gz"
-				,"/Users/nagel/gauteng-kairuns/additional_config.xml.gz"
+				,"/Users/nagel/kairuns/gauteng/additional_config.xml"
 				} ;
 		GautengControler_subpopulations.main(args2);
 	}
