@@ -43,7 +43,12 @@ public class RunEmissionToolOnlineExample {
 	
 	public static void main(String[] args) {
 		
-		Config config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
+		Config config ;
+		if ( args.length==0 ) {
+			config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
+		} else {
+			config = ConfigUtils.loadConfig( args[0], new EmissionsConfigGroup());
+		}
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		
