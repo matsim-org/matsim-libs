@@ -55,4 +55,15 @@ public class LoadMyScenarios {
 		return scenario;
 	}
 	
+	/**
+	 * Returns last iterations (int) by reading input config file only.
+	 */
+	public static int getLastIteration(String configFile) {
+		Config config = new Config();
+		config.addCoreModules();
+		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		configReader.readFile(configFile);
+		return config.controler().getLastIteration();
+	}
+	
 }

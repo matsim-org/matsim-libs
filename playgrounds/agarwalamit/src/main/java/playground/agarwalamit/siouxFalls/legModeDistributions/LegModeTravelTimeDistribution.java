@@ -28,14 +28,12 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.agarwalamit.analysis.legModeHandler.LegModeTravelTimeHandler;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
@@ -64,20 +62,20 @@ public class LegModeTravelTimeDistribution extends AbstractAnalyisModule {
 
 	public static void main(String[] args) {
 		String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/";
-		String [] runs = {"run33"};
-		//		String [] runs = {"run113","run114","run115","run116"};
+//		String [] runs = {"run33"};
+				String [] runs = {"run33","run205","run206","run207","run208"};
 
 		for(String run:runs){
 		
-			String configFile = runDir+run+"/output_config.xml.gz";
-			int lastItr = (int)getLastIteration(configFile);
+			String configFile = runDir+run+"/output_config.xml";
+			int lastItr = LoadMyScenarios.getLastIteration(configFile);
 			String eventsFile = runDir+run+"/ITERS/it."+lastItr+"/"+lastItr+".events.xml.gz";
 			
 			LegModeTravelTimeDistribution lmttd = new LegModeTravelTimeDistribution(eventsFile);
 			lmttd.preProcessData();
 			lmttd.postProcessData();
-			lmttd.writeResults(runDir+"/analysis/legModeDistributions/"+run);
-			lmttd.writeResults(runDir+"/analysisExecutedPlans/legModeDistributions/"+run);
+			lmttd.writeResults(runDir+"/analysis500Its/legModeDistributions/"+run);
+//			lmttd.writeResults(runDir+"/analysisExecutedPlans/legModeDistributions/"+run);
 		}
 	}
 
@@ -170,11 +168,5 @@ public class LegModeTravelTimeDistribution extends AbstractAnalyisModule {
 	}
 	private void getTravelModes(){
 		this.travelModes.addAll(this.mode2PersonId2TravelTime.keySet());
-	}
-	private static double getLastIteration(String configFile){
-		Config config = ConfigUtils.createConfig();
-		MatsimConfigReader reader= new MatsimConfigReader(config);
-		reader.readFile(configFile);
-		return config.controler().getLastIteration();
 	}
 }
