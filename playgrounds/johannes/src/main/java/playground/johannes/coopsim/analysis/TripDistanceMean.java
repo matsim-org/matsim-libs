@@ -41,39 +41,89 @@ import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
  */
 public class TripDistanceMean extends AbstractTrajectoryProperty {
 
-	private final String whitelist;
+//	private final String whitelist;
 
-	private boolean useMode = false;
+//	private boolean useMode = false;
 
 	private String ignorePurpose = "pt interaction"; // FIXME
 
 	private final DistanceCalculator calculator;
 
 	private final ActivityFacilities facilities;
+	
+	private PlanElementCondition<Leg> condition = DefaultCondition.getInstance();
 
+	public TripDistanceMean(ActivityFacilities facilities) {
+		this.facilities = facilities;
+		this.calculator = OrthodromicDistanceCalculator.getInstance();
+	}
+	
+	public TripDistanceMean(ActivityFacilities facilities, DistanceCalculator calculator) {
+		this.facilities = facilities;
+		this.calculator = calculator;
+	}
+	
+	public TripDistanceMean(ActivityFacilities facilities, PlanElementCondition<Leg> condition) {
+		this.facilities = facilities;
+		this.condition = condition;
+		this.calculator = OrthodromicDistanceCalculator.getInstance();
+	}
+	
+	public TripDistanceMean(ActivityFacilities facilities, PlanElementCondition<Leg> condition, DistanceCalculator calculator) {
+		this.facilities = facilities;
+		this.condition = condition;
+		this.calculator = calculator;
+	}
+	
+	public void setCondition(PlanElementCondition<Leg> condition) {
+		this.condition = condition;
+	}
+	/**
+	 * @deprecated
+	 */
 	public TripDistanceMean(String whitelist, ActivityFacilities facilities) {
 		this(whitelist, facilities, OrthodromicDistanceCalculator.getInstance());
 	}
 	
+	/**
+	 * @deprecated
+	 */
 	public TripDistanceMean(String whitelist, ActivityFacilities facilities, boolean useMode) {
 		this(whitelist, facilities, OrthodromicDistanceCalculator.getInstance());
-		this.useMode = useMode;
+		if(useMode) {
+			condition = new LegModeCondition(whitelist);
+		} else {
+			condition = new LegPurposeCondition(whitelist);
+		}
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public TripDistanceMean(String whitelist, ActivityFacilities facilities, DistanceCalculator calculator) {
 		this(whitelist, facilities, calculator, null);
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public TripDistanceMean(String whitelist, ActivityFacilities facilities, DistanceCalculator calculator, String ignore) {
-		this.whitelist = whitelist;
+//		this.whitelist = whitelist;
 		this.facilities = facilities;
 		this.calculator = calculator;
 		// this.ignorePurpose = ignore;
+		condition = new LegPurposeCondition(whitelist);
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public TripDistanceMean(String whitelist, ActivityFacilities facilities, DistanceCalculator calculator, boolean useMode) {
 		this(whitelist, facilities, calculator);
-		this.useMode = useMode;
+		if(useMode)
+			condition = new LegModeCondition(whitelist);
+		else
+			condition = new LegPurposeCondition(whitelist);
 	}
 
 	@Override
@@ -84,24 +134,27 @@ public class TripDistanceMean extends AbstractTrajectoryProperty {
 			double d_sum = 0;
 			int cnt = 0;
 			for (int i = 2; i < trajectory.getElements().size(); i += 2) {
+				if(condition.test(trajectory, (Leg) trajectory.getElements().get(i-1), i-1)) {
+					
+//				}
 				Activity destination = (Activity) trajectory.getElements().get(i);
-
-				boolean match = false;
-
-				if (useMode) {
-					Leg leg = (Leg) trajectory.getElements().get(i - 1);
-					if (whitelist == null || leg.getMode().equalsIgnoreCase(whitelist)) {
-						match = true;
-					}
-				} else {
-					if (!destination.getType().equals(ignorePurpose)) {
-						if (whitelist == null || destination.getType().equals(whitelist)) {
-							match = true;
-						}
-					}
-				}
-
-				if (match) {
+//
+//				boolean match = false;
+//
+//				if (useMode) {
+//					Leg leg = (Leg) trajectory.getElements().get(i - 1);
+//					if (whitelist == null || leg.getMode().equalsIgnoreCase(whitelist)) {
+//						match = true;
+//					}
+//				} else {
+//					if (!destination.getType().equals(ignorePurpose)) {
+//						if (whitelist == null || destination.getType().equals(whitelist)) {
+//							match = true;
+//						}
+//					}
+//				}
+//
+//				if (match) {
 					Id id = destination.getFacilityId();
 					Coord dest = facilities.getFacilities().get(id).getCoord();
 

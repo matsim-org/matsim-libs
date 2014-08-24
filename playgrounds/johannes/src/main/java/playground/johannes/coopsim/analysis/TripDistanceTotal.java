@@ -41,41 +41,75 @@ import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
  */
 public class TripDistanceTotal extends AbstractTrajectoryProperty {
 
-	private final String whitelist;
-
-	private boolean useMode = false;
+//	private String whitelist;
+//
+//	private boolean useMode = false;
 
 	private String ignorePurpose = "pt interaction"; // FIXME
 
 	private final DistanceCalculator calculator;
 
 	private final ActivityFacilities facilities;
+	
+	private PlanElementCondition<Leg> condition = DefaultCondition.getInstance();
 
+	public TripDistanceTotal(ActivityFacilities facilities) {
+		this.facilities = facilities;
+		this.calculator = OrthodromicDistanceCalculator.getInstance();
+	}
+	/**
+	 * @deprecated
+	 */
 	public TripDistanceTotal(String whitelist, ActivityFacilities facilities) {
 		this(whitelist, facilities, OrthodromicDistanceCalculator.getInstance());
+		condition = new LegPurposeCondition(whitelist);
 	}
 	
+	/**
+	 * @deprecated
+	 */
 	public TripDistanceTotal(String whitelist, ActivityFacilities facilities, boolean useMode) {
 		this(whitelist, facilities, OrthodromicDistanceCalculator.getInstance());
-		this.useMode = useMode;
+		if(useMode)
+			condition = new LegModeCondition(whitelist);
+		else
+			condition = new LegPurposeCondition(whitelist);
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public TripDistanceTotal(String whitelist, ActivityFacilities facilities, DistanceCalculator calculator) {
 		this(whitelist, facilities, calculator, null);
 	}
 
+	/**
+	 * 
+	 * @deprecated
+	 */
 	public TripDistanceTotal(String whitelist, ActivityFacilities facilities, DistanceCalculator calculator, String ignore) {
-		this.whitelist = whitelist;
 		this.facilities = facilities;
 		this.calculator = calculator;
 		// this.ignorePurpose = ignore;
+		condition = new LegPurposeCondition(whitelist);
 	}
 
+	/**
+	 * 
+	 * @deprecated
+	 */
 	public TripDistanceTotal(String whitelist, ActivityFacilities facilities, DistanceCalculator calculator, boolean useMode) {
 		this(whitelist, facilities, calculator);
-		this.useMode = useMode;
+		if(useMode)
+			condition = new LegModeCondition(whitelist);
+		else
+			condition = new LegPurposeCondition(whitelist);
 	}
 
+	public void setCondition(PlanElementCondition<Leg> condition) {
+		this.condition = condition;
+	}
+	
 	@Override
 	public TObjectDoubleHashMap<Trajectory> values(Set<? extends Trajectory> trajectories) {
 		TObjectDoubleHashMap<Trajectory> values = new TObjectDoubleHashMap<Trajectory>(trajectories.size());
@@ -84,24 +118,25 @@ public class TripDistanceTotal extends AbstractTrajectoryProperty {
 			double d_sum = 0;
 //			int cnt = 0;
 			for (int i = 2; i < trajectory.getElements().size(); i += 2) {
-				Activity destination = (Activity) trajectory.getElements().get(i);
+				if(condition.test(trajectory, (Leg) trajectory.getElements().get(i-1), i - 1)) {
+					Activity destination = (Activity) trajectory.getElements().get(i);
 
-				boolean match = false;
-
-				if (useMode) {
-					Leg leg = (Leg) trajectory.getElements().get(i - 1);
-					if (whitelist == null || leg.getMode().equalsIgnoreCase(whitelist)) {
-						match = true;
-					}
-				} else {
-					if (!destination.getType().equals(ignorePurpose)) {
-						if (whitelist == null || destination.getType().equals(whitelist)) {
-							match = true;
-						}
-					}
-				}
-
-				if (match) {
+//				boolean match = false;
+//
+//				if (useMode) {
+//					Leg leg = (Leg) trajectory.getElements().get(i - 1);
+//					if (whitelist == null || leg.getMode().equalsIgnoreCase(whitelist)) {
+//						match = true;
+//					}
+//				} else {
+//					if (!destination.getType().equals(ignorePurpose)) {
+//						if (whitelist == null || destination.getType().equals(whitelist)) {
+//							match = true;
+//						}
+//					}
+//				}
+//
+//				if (match) {
 					Id id = destination.getFacilityId();
 					Coord dest = facilities.getFacilities().get(id).getCoord();
 

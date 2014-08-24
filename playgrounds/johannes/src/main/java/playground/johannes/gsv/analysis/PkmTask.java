@@ -11,7 +11,9 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 
+import playground.johannes.coopsim.analysis.LegModeCondition;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
+import playground.johannes.coopsim.analysis.TrajectoryUtils;
 import playground.johannes.coopsim.analysis.TripDistanceTotal;
 import playground.johannes.coopsim.pysical.Trajectory;
 
@@ -25,18 +27,14 @@ public class PkmTask extends TrajectoryAnalyzerTask {
 	
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
-		Set<String> modes = new HashSet<String>();
-		for(Trajectory t : trajectories) {
-			for(int i = 1; i < t.getElements().size(); i += 2) {
-				Leg leg = (Leg) t.getElements().get(i);
-				modes.add(leg.getMode());
-			}
-		}
-
+		Set<String> modes = TrajectoryUtils.getModes(trajectories);
 		modes.add(null);
 		
+		TripDistanceTotal dist = new TripDistanceTotal(facilities);
 		for(String mode : modes) {
-			TripDistanceTotal dist = new TripDistanceTotal(mode, facilities, true);
+			if(mode != null) {
+				dist.setCondition(new LegModeCondition(mode));
+			}
 			TObjectDoubleHashMap<Trajectory> dists = dist.values(trajectories);
 			TObjectDoubleIterator<Trajectory> it = dists.iterator();
 			double sum = 0;

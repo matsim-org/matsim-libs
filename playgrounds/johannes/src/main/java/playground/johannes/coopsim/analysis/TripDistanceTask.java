@@ -56,17 +56,14 @@ public class TripDistanceTask extends TrajectoryAnalyzerTask {
 	
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
-		Set<String> purposes = new HashSet<String>();
-		for(Trajectory t : trajectories) {
-			for(int i = 0; i < t.getElements().size(); i += 2) {
-				purposes.add(((Activity)t.getElements().get(i)).getType());
-			}
-		}
-		
+		Set<String> purposes = TrajectoryUtils.getTypes(trajectories);
 		purposes.add(null);
 		
+		TripDistanceMean tripDistance = new TripDistanceMean(facilities, calculator);
 		for(String purpose : purposes) {
-			TripDistanceMean tripDistance = new TripDistanceMean(purpose, facilities, calculator);
+			if(purpose != null) {
+				tripDistance.setCondition(new LegPurposeCondition(purpose));
+			}
 			DescriptiveStatistics stats = tripDistance.statistics(trajectories, true);
 			
 			if(purpose == null)
@@ -75,20 +72,32 @@ public class TripDistanceTask extends TrajectoryAnalyzerTask {
 			results.put(key, stats);
 			try {
 				writeHistograms(stats, key, 50, 50);
-				
-				double[] values = stats.getValues();
-				LinearDiscretizer lin = new LinearDiscretizer(250.0);
-				DescriptiveStatistics linStats = new DescriptiveStatistics();
-				for(double d : values)
-					linStats.addValue(lin.discretize(d));
-				
-//				TrajectoryAnalyzerTask.overwriteStratification(50, 1);
-				writeHistograms(linStats, key + ".lin", 50, 50);
+//				writeHistograms(stats, new LinearDiscretizer(250), key, false);
+//				double[] values = stats.getValues();
+//				LinearDiscretizer lin = new LinearDiscretizer(250.0);
+//				DescriptiveStatistics linStats = new DescriptiveStatistics();
+//				for(double d : values)
+//					linStats.addValue(lin.discretize(d));
+//				
+////				TrajectoryAnalyzerTask.overwriteStratification(50, 1);
+//				writeHistograms(linStats, key + ".lin", 50, 50);
 //				TrajectoryAnalyzerTask.overwriteStratification(30, 1);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
+		}
+		
+		Set<String> modes = TrajectoryUtils.getModes(trajectories);
+		for(String mode : modes) {
+			tripDistance.setCondition(new LegModeCondition(mode));
+			DescriptiveStatistics stats = tripDistance.statistics(trajectories, true);
+			String key = "d_trip_" + mode;
+			results.put(key, stats);
+			try {
+				writeHistograms(stats, key, 50, 50);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
