@@ -8,7 +8,7 @@
  *  <li> Kickh&oumlfer, B.; H&uumllsmann, F.; Gerike, R. & Nagel, K. (2013). <i>Rising car user costs: comparing aggregated and geo-spatial impacts on travel demand and air pollutant emissions.</i> Smart Transport Networks: Decision Making, Sustainability and Market structure, Ed. by T. Vanoutrive and A. Verhetsel. NECTAR Series on Transportation and Communications Networks Research. Edward Elgar Publishing Ltd, pp. 180-207. ISBN: 978-1-78254-832-4.</li>
  *  </ul>
  * <p>
- * The probably most detailed documentation of this package can be found in Benjamin's dissertation, available <a href="http://www.hbefa.net">here</a>).
+ * The probably most detailed documentation of this package can be found in Benjamin's dissertation, available <a href="http://opus4.kobv.de/opus4-tuberlin/frontdoor/index/index/docId/5348">here</a>).
  * <p>
  * <h2>Usage</h2>
  * Execute {@link org.matsim.contrib.emissions.example.CreateEmissionConfig CreateEmissionConfig} and {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample RunEmissionToolOnlineExample} or {@link org.matsim.contrib.emissions.example.RunEmissionToolOfflineExample RunEmissionToolOfflineExample} from the example package.
