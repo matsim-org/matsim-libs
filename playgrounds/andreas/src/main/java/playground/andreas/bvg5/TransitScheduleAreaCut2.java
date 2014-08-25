@@ -139,11 +139,11 @@ public class TransitScheduleAreaCut2 {
 		TransitScheduleFactory factory = this.newSchedule.getFactory();
 		
 		//copy the vehicles
-		for ( Vehicle v : this.vehicles.getVehicles().values() ) {
-			this.newVehicles.addVehicle( v );
-		}
 		for ( VehicleType t : this.vehicles.getVehicleTypes().values() ) {
 			this.newVehicles.addVehicleType( t );
+		}
+		for ( Vehicle v : this.vehicles.getVehicles().values() ) {
+			this.newVehicles.addVehicle( v );
 		}
 		//add all TransitStopFacilities to the new schedule
 		for(TransitStopFacility facility : this.schedule.getFacilities().values()){
