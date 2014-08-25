@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.StageActivityTypes;
@@ -35,6 +36,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.ivt.kticompatibility.KtiLikeActivitiesScoringFunctionFactory;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
+import playground.ivt.matsim2030.scoring.DestinationEspilonScoring;
 import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction;
 import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
 import playground.thibautd.socnetsim.population.JointActingTypes;
@@ -151,7 +153,27 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 		//			plan.getPerson().getId(),
 		//			socialNetwork.getAlters( plan.getPerson().getId() ) ) );
 
+		if ( group.isUseLocationChoiceEpsilons() ) {
+			scoringFunctionAccumulator.addScoringFunction(
+					new DestinationEspilonScoring(
+						person,
+						getOrCreateDestinationChoiceContext(
+							scenario ) ) );
+		}
+
 		return scoringFunctionAccumulator;
+	}
+
+	private static synchronized DestinationChoiceBestResponseContext getOrCreateDestinationChoiceContext(
+			final Scenario scenario) {
+		if ( scenario.getScenarioElement( DestinationChoiceBestResponseContext.ELEMENT_NAME ) != null ) {
+			return (DestinationChoiceBestResponseContext) scenario.getScenarioElement( DestinationChoiceBestResponseContext.ELEMENT_NAME );
+		}
+
+		final DestinationChoiceBestResponseContext context = new DestinationChoiceBestResponseContext( scenario );
+		context.init();
+		scenario.addScenarioElement( DestinationChoiceBestResponseContext.ELEMENT_NAME , context );
+		return context;
 	}
 }
 

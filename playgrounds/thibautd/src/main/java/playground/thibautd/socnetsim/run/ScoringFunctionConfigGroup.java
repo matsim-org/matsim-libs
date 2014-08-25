@@ -39,6 +39,7 @@ public class ScoringFunctionConfigGroup extends ReflectiveModule {
 	private double constantPassenger = 0;
 	private String activityTypeForContactInDesires = "leisure";
 	private String internalizationNetworkFile = null;
+	private boolean useLocationChoiceEpsilons = false;
 
 	static enum TogetherScoringForm {
 		linear,
@@ -120,6 +121,16 @@ public class ScoringFunctionConfigGroup extends ReflectiveModule {
 	public void setMarginalUtilityOfBeingPassenger_h(
 			double marginalUtilityOfBeingPassenger_h) {
 		this.marginalUtilityOfBeingPassenger_h = marginalUtilityOfBeingPassenger_h;
+	}
+
+	@StringGetter( "useLocationChoiceEpsilons" )
+	public boolean isUseLocationChoiceEpsilons() {
+		return this.useLocationChoiceEpsilons;
+	}
+
+	@StringSetter( "useLocationChoiceEpsilons" )
+	public void setUseLocationChoiceEpsilons(final boolean useLocationChoiceEpsilons) {
+		this.useLocationChoiceEpsilons = useLocationChoiceEpsilons;
 	}
 
 	@StringGetter( "togetherScoringForm" )
