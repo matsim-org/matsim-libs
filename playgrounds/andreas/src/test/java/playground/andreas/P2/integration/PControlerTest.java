@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
@@ -50,7 +51,7 @@ import playground.andreas.bvgScoringFunction.BvgScoringFunctionFactory;
  * 
  * @author aneumann
  */
-public class PControlerTest extends MatsimTestCase implements TabularFileHandler{
+@Ignore("See MATSIM-266") public class PControlerTest extends MatsimTestCase implements TabularFileHandler{
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
