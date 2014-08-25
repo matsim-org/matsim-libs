@@ -77,7 +77,7 @@ public class PScenarioHelper {
 		TransitSchedule sched = CreatePStops.createPStops(sC.getNetwork(), pC);
 		RandomStopProvider randomStopProvider = new RandomStopProvider(pC, sC.getPopulation(), sched, null);
 		
-		PRouteProvider rP = new ComplexCircleScheduleProvider(sched, sC.getNetwork(), randomStopProvider, 0, pC.getPlanningSpeedFactor(), pC.getMode());
+		PRouteProvider rP = new ComplexCircleScheduleProvider(sched, sC.getNetwork(), randomStopProvider, 0, pC.getPlanningSpeedFactor(), pC.getVehicleMaximumVelocity(), pC.getMode());
 		
 		ArrayList<String> parameter = new ArrayList<String>();
 		parameter.add("900");
@@ -348,7 +348,7 @@ public class PScenarioHelper {
 		PConfigGroup conf = new PConfigGroup();
 		TransitSchedule sched = CreateStopsForAllCarLinks.createStopsForAllCarLinks(sc.getNetwork(), conf);
 		RandomStopProvider randomStopProvider = new RandomStopProvider(conf, sc.getPopulation(), sched, null);
-		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, 10, conf.getPlanningSpeedFactor(), conf.getMode());
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, 10, conf.getVehicleMaximumVelocity(), conf.getPlanningSpeedFactor(), conf.getMode());
 	
 		Cooperative coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise(), conf.getGridSize()));
 		coop.init(prov, new Route2111to2333(sched, conf.getPIdentifier()), 0, 0.0);
@@ -363,7 +363,7 @@ public class PScenarioHelper {
 		PConfigGroup conf = new PConfigGroup();
 		TransitSchedule sched = CreateStopsForAllCarLinks.createStopsForAllCarLinks(sc.getNetwork(), conf);
 		RandomStopProvider randomStopProvider = new RandomStopProvider(conf, sc.getPopulation(), sched, null);
-		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, 10, conf.getPlanningSpeedFactor(), conf.getMode());
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, 10, conf.getVehicleMaximumVelocity(), conf.getPlanningSpeedFactor(), conf.getMode());
 	
 		Cooperative coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise(), conf.getGridSize()));
 		coop.init(prov, new Route2333to2111(sched, conf.getPIdentifier()), 0, 0.0);
@@ -378,7 +378,7 @@ public class PScenarioHelper {
 		PConfigGroup conf = new PConfigGroup();
 		TransitSchedule sched = CreateStopsForAllCarLinks.createStopsForAllCarLinks(sc.getNetwork(), conf);
 		RandomStopProvider randomStopProvider = new RandomStopProvider(conf, sc.getPopulation(), sched, null);
-		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, 10, conf.getPlanningSpeedFactor(), conf.getMode());
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, 10, conf.getVehicleMaximumVelocity(), conf.getPlanningSpeedFactor(), conf.getMode());
 		Cooperative coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise(), conf.getGridSize()));
 		coop.init(prov, new Route2414to3444(sched, conf.getPIdentifier()), 0, 0.0);
 		
@@ -392,7 +392,7 @@ public class PScenarioHelper {
 		PConfigGroup conf = new PConfigGroup();
 		TransitSchedule sched = CreateStopsForAllCarLinks.createStopsForAllCarLinks(sc.getNetwork(), conf);
 		RandomStopProvider randomStopProvider = new RandomStopProvider(conf, sc.getPopulation(), sched, null);
-		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, 10, conf.getPlanningSpeedFactor(), conf.getMode());
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, 10, conf.getVehicleMaximumVelocity(), conf.getPlanningSpeedFactor(), conf.getMode());
 		Cooperative coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise(), conf.getGridSize()));
 		coop.init(prov, new Route2111to1314to4443(sched, conf.getPIdentifier()), 0, 0.0);
 		

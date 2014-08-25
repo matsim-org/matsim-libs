@@ -68,13 +68,15 @@ public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 	private TransitSchedule scheduleWithStopsOnly;
 	private RandomStopProvider randomStopProvider;
 	private String transportMode;
+	private double vehicleMaximumVelocity;
 	
-	public SimpleBackAndForthScheduleProvider(String pIdentifier, TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, int iteration, String transportMode) {
+	public SimpleBackAndForthScheduleProvider(String pIdentifier, TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, int iteration, double vehicleMaximumVelocity, String transportMode) {
 		this.pIdentifier = pIdentifier;
 		this.net = network;
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
 		this.randomStopProvider = randomStopProvider;
 		this.transportMode = transportMode;
+		this.vehicleMaximumVelocity = vehicleMaximumVelocity;
 	}
 	
 	@Override
@@ -154,7 +156,7 @@ public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 		
 		// additional stops
 		for (Link link : path.links) {
-			startTime += link.getLength() / link.getFreespeed();
+			startTime += link.getLength() / Math.min(this.vehicleMaximumVelocity, link.getFreespeed());
 			if(this.scheduleWithStopsOnly.getFacilities().get(new IdImpl(this.pIdentifier + link.getId())) == null){
 				continue;
 			}
@@ -163,7 +165,7 @@ public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 		}
 		
 		// last stop
-		startTime += this.net.getLinks().get(endStop.getLinkId()).getLength() / this.net.getLinks().get(endStop.getLinkId()).getFreespeed();
+		startTime += this.net.getLinks().get(endStop.getLinkId()).getLength() / Math.min(this.vehicleMaximumVelocity, this.net.getLinks().get(endStop.getLinkId()).getFreespeed());
 		routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(endStop, startTime, startTime);
 		stops.add(routeStop);
 		

@@ -64,6 +64,7 @@ public class PConfigGroup extends Module{
 	private static final String NUMBER_OF_COOPERATIVES = "numberOfCooperatives";
 	private static final String PAX_PER_VEHICLE = "paxPerVehicle";
 	private static final String PCE = "passengerCarEquivalents";
+	private static final String VEHICLE_MAXIMUM_VELOCITY = "vehicleMaximumVelocity";
 	private static final String DELAY_PER_BOARDING_PASSENGER = "delayPerBoardingPassenger";
 	private static final String DELAY_PER_ALIGHTING_PASSENGER = "delayPerAlightingPassenger";
 	private static final String NUMBER_OF_ITERATIONS_FOR_PROSPECTING = "numberOfIterationsForProspecting";
@@ -113,6 +114,7 @@ public class PConfigGroup extends Module{
 	private int numberOfCooperatives = 1;
 	private int paxPerVehicle = 10;
 	private double passengerCarEquivalents = 1.0;
+	private double vehicleMaximumVelocity = Double.POSITIVE_INFINITY;
 	private double delayPerBoardingPassenger = 2.0;
 	private double delayPerAlightingPassenger = 1.0;
 	private int numberOfIterationsForProspecting = 0;
@@ -184,6 +186,8 @@ public class PConfigGroup extends Module{
 			this.paxPerVehicle = Integer.parseInt(value);
 		} else if (PCE.equals(key)) {
 			this.passengerCarEquivalents = Double.parseDouble(value);
+		} else if (VEHICLE_MAXIMUM_VELOCITY.equals(key)) {
+			this.vehicleMaximumVelocity = Double.parseDouble(value);
 		} else if (DELAY_PER_BOARDING_PASSENGER.equals(key)) {
 			this.delayPerBoardingPassenger = Double.parseDouble(value);
 		} else if (DELAY_PER_ALIGHTING_PASSENGER.equals(key)) {
@@ -281,6 +285,7 @@ public class PConfigGroup extends Module{
 		map.put(DELAY_PER_BOARDING_PASSENGER, Double.toString(this.delayPerBoardingPassenger));
 		map.put(DELAY_PER_ALIGHTING_PASSENGER, Double.toString(this.delayPerAlightingPassenger));
 		map.put(PCE, Double.toString(this.passengerCarEquivalents));
+		map.put(VEHICLE_MAXIMUM_VELOCITY, Double.toString(this.vehicleMaximumVelocity));
 		map.put(COST_PER_VEHICLE_AND_DAY, Double.toString(this.costPerVehicleAndDay));
 		map.put(COST_PER_KILOMETER, Double.toString(this.costPerKilometer));
 		map.put(COST_PER_HOUR, Double.toString(this.costPerHour));
@@ -335,6 +340,7 @@ public class PConfigGroup extends Module{
 		map.put(INITIAL_BUDGET, "The budget a new cooperative is initialized with");
 		map.put(PAX_PER_VEHICLE, "number of passengers per vehicle");
 		map.put(PCE, "Passenger car equilvalents of one paratransit vehicle");
+		map.put(VEHICLE_MAXIMUM_VELOCITY, "Maximum velocity of minibuses. Default is Double.POSITIVE_INFINITY.");
 		map.put(DELAY_PER_BOARDING_PASSENGER, "The amount of time a vehicle is delayed by one single boarding passenger in seconds.");
 		map.put(DELAY_PER_ALIGHTING_PASSENGER, "The amount of time a vehicle is delayed by one single alighting passenger in seconds.");
 		map.put(COST_PER_VEHICLE_AND_DAY, "cost per vehicle and day - will prevent companies from operating only short periods of a day");
@@ -421,6 +427,10 @@ public class PConfigGroup extends Module{
 	
 	public double getPassengerCarEquivalents() {
 		return this.passengerCarEquivalents;
+	}
+	
+	public double getVehicleMaximumVelocity() {
+		return this.vehicleMaximumVelocity;
 	}
 	
 	public double getDelayPerBoardingPassenger() {

@@ -65,10 +65,11 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 	private TransitSchedule scheduleWithStopsOnly;
 	private RandomStopProvider randomStopProvider;
 	private LinkedHashMap<Id, TransitStopFacility> linkId2StopFacilityMap;
+	private double vehicleMaximumVelocity;
 	private double planningSpeedFactor;
 	private String transportMode;
 	
-	public ComplexCircleScheduleProvider(TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, int iteration, double planningSpeedFactor, final String transportMode) {
+	public ComplexCircleScheduleProvider(TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, int iteration, double vehicleMaximumVelocity, double planningSpeedFactor, final String transportMode) {
 		this.net = network;
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
 		FreespeedTravelTimeAndDisutility tC = new FreespeedTravelTimeAndDisutility(-6.0, 0.0, 0.0);
@@ -91,6 +92,7 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 		}
 		
 		this.randomStopProvider = randomStopProvider;
+		this.vehicleMaximumVelocity = vehicleMaximumVelocity;
 		this.planningSpeedFactor = planningSpeedFactor;
 		this.transportMode = transportMode;
 	}
@@ -174,7 +176,7 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 		
 		// additional stops
 		for (Link link : links) {
-			runningTime += link.getLength() / (link.getFreespeed() * this.planningSpeedFactor);
+			runningTime += link.getLength() / (Math.min(this.vehicleMaximumVelocity, link.getFreespeed()) * this.planningSpeedFactor);
 			if(this.linkId2StopFacilityMap.get(link.getId()) == null){
 				continue;
 			}
@@ -183,7 +185,7 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 		}
 		
 		// last stop
-		runningTime += this.net.getLinks().get(tempStopsToBeServed.get(0).getLinkId()).getLength() / (this.net.getLinks().get(tempStopsToBeServed.get(0).getLinkId()).getFreespeed() * this.planningSpeedFactor);
+		runningTime += this.net.getLinks().get(tempStopsToBeServed.get(0).getLinkId()).getLength() / (Math.min(this.vehicleMaximumVelocity, this.net.getLinks().get(tempStopsToBeServed.get(0).getLinkId()).getFreespeed()) * this.planningSpeedFactor);
 		routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(tempStopsToBeServed.get(0), runningTime, runningTime);
 		stops.add(routeStop);
 		

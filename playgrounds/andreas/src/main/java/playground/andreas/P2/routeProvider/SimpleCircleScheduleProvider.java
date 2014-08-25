@@ -67,8 +67,9 @@ public class SimpleCircleScheduleProvider implements PRouteProvider {
 	private RandomStopProvider randomStopProvider;
 	private String transportMode;
 	private LeastCostPathCalculator routingAlgo;
+	private double vehicleMaximumVelocity;
 	
-	public SimpleCircleScheduleProvider(String pIdentifier, TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, int iteration, final String transportMode) {
+	public SimpleCircleScheduleProvider(String pIdentifier, TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, int iteration, double vehicleMaximumVelocity, final String transportMode) {
 		this.pIdentifier = pIdentifier;
 		this.net = network;
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
@@ -82,6 +83,8 @@ public class SimpleCircleScheduleProvider implements PRouteProvider {
 				add(TransportMode.car);
 			}};
 		((Dijkstra)this.routingAlgo).setModeRestriction(modes);
+		
+		this.vehicleMaximumVelocity = vehicleMaximumVelocity;
 	}
 
 	@Override
@@ -154,7 +157,7 @@ public class SimpleCircleScheduleProvider implements PRouteProvider {
 		
 		// additional stops
 		for (Link link : completeLinkList) {
-			runningTime += link.getLength() / link.getFreespeed();
+			runningTime += link.getLength() / Math.min(this.vehicleMaximumVelocity, link.getFreespeed());
 			if(this.scheduleWithStopsOnly.getFacilities().get(new IdImpl(this.pIdentifier + link.getId())) == null){
 				continue;
 			}
@@ -163,7 +166,7 @@ public class SimpleCircleScheduleProvider implements PRouteProvider {
 		}
 		
 		// last stop
-		runningTime += this.net.getLinks().get(startStop.getLinkId()).getLength() / this.net.getLinks().get(startStop.getLinkId()).getFreespeed();
+		runningTime += this.net.getLinks().get(startStop.getLinkId()).getLength() / Math.min(this.vehicleMaximumVelocity, this.net.getLinks().get(startStop.getLinkId()).getFreespeed());
 		routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(startStop, runningTime, runningTime);
 		stops.add(routeStop);
 		

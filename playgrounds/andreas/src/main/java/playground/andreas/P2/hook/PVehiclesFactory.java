@@ -64,6 +64,7 @@ public class PVehiclesFactory {
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehType.setCapacity(capacity);
 		vehType.setPcuEquivalents(this.pConfig.getPassengerCarEquivalents());
+		vehType.setMaximumVelocity(this.pConfig.getVehicleMaximumVelocity());
 		vehType.setAccessTime(this.pConfig.getDelayPerBoardingPassenger());
 		vehType.setEgressTime(this.pConfig.getDelayPerAlightingPassenger());
 		vehicles.addVehicleType( vehType);
@@ -71,8 +72,10 @@ public class PVehiclesFactory {
 		for (TransitLine line : pTransitSchedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (Departure departure : route.getDepartures().values()) {
-					Vehicle vehicle = vehFactory.createVehicle(departure.getVehicleId(), vehType);
-					vehicles.addVehicle( vehicle);
+					if (!vehicles.getVehicles().keySet().contains(departure.getVehicleId())) {
+						Vehicle vehicle = vehFactory.createVehicle(departure.getVehicleId(), vehType);
+						vehicles.addVehicle( vehicle);
+					}
 				}
 			}
 		}

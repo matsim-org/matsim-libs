@@ -55,7 +55,7 @@ public class SimpleCircleScheduleProviderTest {
 		
 		TransitSchedule tS = CreateStopsForAllCarLinks.createStopsForAllCarLinks(scenario.getNetwork(), pC);
 		
-		SimpleCircleScheduleProvider prov = new SimpleCircleScheduleProvider(pC.getPIdentifier(), tS, scenario.getNetwork(), null, 10, pC.getMode());
+		SimpleCircleScheduleProvider prov = new SimpleCircleScheduleProvider(pC.getPIdentifier(), tS, scenario.getNetwork(), null, 10, pC.getVehicleMaximumVelocity(), pC.getMode());
 		
 		Id lineId = new IdImpl("line1");
 		Id routeId = new IdImpl("route1");
@@ -112,7 +112,7 @@ public class SimpleCircleScheduleProviderTest {
 		PConfigGroup pC = new PConfigGroup();
 		RandomStopProvider randomStopProvider = new RandomStopProvider(pC, scenario.getPopulation(), scenario.getTransitSchedule(), null);
 		
-		SimpleCircleScheduleProvider prov = new SimpleCircleScheduleProvider(pC.getPIdentifier(), scenario.getTransitSchedule(), scenario.getNetwork(), randomStopProvider, 10, pC.getMode());
+		SimpleCircleScheduleProvider prov = new SimpleCircleScheduleProvider(pC.getPIdentifier(), scenario.getTransitSchedule(), scenario.getNetwork(), randomStopProvider, 10, pC.getVehicleMaximumVelocity(), pC.getMode());
 		
 		for (int i = 0; i < 5; i++) {
 			TransitStopFacility stop1 = prov.getRandomTransitStop(0);
@@ -129,7 +129,7 @@ public class SimpleCircleScheduleProviderTest {
 		
 		Id lineId = new IdImpl("1");
 		
-		SimpleCircleScheduleProvider prov = new SimpleCircleScheduleProvider(pC.getPIdentifier(), scenario.getTransitSchedule(), scenario.getNetwork(), null, 10, pC.getMode());
+		SimpleCircleScheduleProvider prov = new SimpleCircleScheduleProvider(pC.getPIdentifier(), scenario.getTransitSchedule(), scenario.getNetwork(), null, 10, pC.getVehicleMaximumVelocity(), pC.getMode());
 		TransitLine line = prov.createEmptyLine(lineId);
 		
 		Assert.assertEquals("Transit line ids have to be the same", lineId, line.getId());
