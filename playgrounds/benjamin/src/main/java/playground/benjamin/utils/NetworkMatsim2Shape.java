@@ -79,15 +79,15 @@ public class NetworkMatsim2Shape {
 			new MatsimNetworkReader(scenario).readFile(netFile);
 			net = filterNetwork(network);
 		}
-//		new Links2ESRIShape(net, filePath + networkName + outFileType, TransformationFactory.DHDN_GK4).write();
-		new Links2ESRIShape(net, filePath + networkName + outFileType, TransformationFactory.WGS84).write();
+//		new Links2ESRIShape(net, filePath + networkName + outFileType, TransformationFactory.WGS84).write();
 //		new Links2ESRIShape(net, filePath + networkName + outFileType, TransformationFactory.CH1903_LV03_GT).write();
-//		new Links2ESRIShape(net, filePath + networkName + outFileType, TransformationFactory.WGS84_UTM33N).write();
+		new Links2ESRIShape(net, filePath + networkName + outFileType, TransformationFactory.DHDN_GK4).write();
+//		new Links2ESRIShape(net, filePath + networkName + outFileType, "WGS84_UTM32T").write();
 	}
 
 	private static Network filterNetwork(Network network) {
-//		CoordinateTransformation transform = TransformationFactory.getCoordinateTransformation(TransformationFactory.CH1903_LV03_GT, TransformationFactory.DHDN_GK4);
-		CoordinateTransformation transform = TransformationFactory.getCoordinateTransformation(TransformationFactory.CH1903_LV03_GT, TransformationFactory.WGS84);
+		CoordinateTransformation transform = TransformationFactory.getCoordinateTransformation(TransformationFactory.CH1903_LV03_GT, TransformationFactory.DHDN_GK4);
+//		CoordinateTransformation transform = TransformationFactory.getCoordinateTransformation(TransformationFactory.CH1903_LV03_GT, "WGS84_UTM32T");
 		
 		
 		Network net = NetworkUtils.createNetwork();
