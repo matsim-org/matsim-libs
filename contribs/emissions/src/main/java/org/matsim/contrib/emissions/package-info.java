@@ -2,11 +2,13 @@
  * This package provides a tool for exhaust emission calculation based on
  * the ``Handbook on Emission Factors for Road Transport'' (HBEFA), version 3.1 (see <a href="http://www.hbefa.net">http://www.hbefa.net</a>).
  *  <p>
- *  When publishing results connected to the use of the emission package make sure to cite the following two articles:
+ *  When publishing results connected to the use of this emission package make sure to cite the following two articles:
  *  <ul>
- *  <li> Hülsmann, F.; Gerike, R.; Kickhöfer, B.; Nagel, K. & Luz, R. Towards a multi-agent based modeling approach for air pollutants in urban regions Proceedings of the Conference on ``Luftqualität an Straßen'', FGSV Verlag GmbH, 2011, 144-166 </li>
- *  <li> Kickhöfer, B.; Hülsmann, F.; Gerike, R. & Nagel, K. Vanoutrive, T. & Verhetsel, A. (Eds.) Rising car user costs: comparing aggregated and geo-spatial impacts on travel demand and air pollutant emissions Smart Transport Networks: Decision Making, Sustainability and Market structure, Edward Elgar Publishing Ltd, 2013, 180-207 </li>
+ *  <li> H&uumllsmann, F.; Gerike, R.; Kickh&oumlfer, B.; Nagel, K. & Luz, R. (2011). <i>Towards a multi-agent based modeling approach for air pollutants in urban regions.</i> Proceedings of the Conference on ``Luftqualit&aumlt an Stra&szligen'', FGSV Verlag GmbH, pp. 144-166. ISBN: 978-3-941790-77-3.</li>
+ *  <li> Kickh&oumlfer, B.; H&uumllsmann, F.; Gerike, R. & Nagel, K. (2013). <i>Rising car user costs: comparing aggregated and geo-spatial impacts on travel demand and air pollutant emissions.</i> Smart Transport Networks: Decision Making, Sustainability and Market structure, Ed. by T. Vanoutrive and A. Verhetsel. NECTAR Series on Transportation and Communications Networks Research. Edward Elgar Publishing Ltd, pp. 180-207. ISBN: 978-1-78254-832-4.</li>
  *  </ul>
+ * <p>
+ * The probably most detailed documentation of this package can be found in Benjamin's dissertation, available <a href="http://www.hbefa.net">here</a>).
  * <p>
  * <h2>Usage</h2>
  * Execute {@link org.matsim.contrib.emissions.example.CreateEmissionConfig CreateEmissionConfig} and {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample RunEmissionToolOnlineExample} or {@link org.matsim.contrib.emissions.example.RunEmissionToolOfflineExample RunEmissionToolOfflineExample} from the example package.
@@ -18,7 +20,8 @@
  * The online example as well as the offline example use a config file as created by {@link org.matsim.contrib.emissions.example.CreateEmissionConfig CreateEmissionConfig}. 
  * An example config and the associated files can be found at the test input directory.
  * The example config file allows you to directly run the online example.
- * Please note that the emission values given by the sample files do not resemble the actual data from HBEFA due to copyright restrictions. 
+ * <p>
+ * Please note that the emission values given by the sample files are NOT actual data from HBEFA due to copyright restrictions. A guide on how to export the necessary files from the HBEFA Microsoft Access database will be available soon.
  *  <p>
  * To set up your own simulation cases you will have to specify several input files. See the above classes as examples and the following section for details.
  *
@@ -35,7 +38,7 @@
  *  for every person (who is allowed to choose a vehicle in the simulation):
  *  <ul>
  *  <li> REQUIRED: Vehicle type Id must start with the respective HbefaVehicleCategory followed by ";"
- *  <li> OPTIONAL: If detailed emission calculation is switched on, vehicle type Id should additionally contain
+ *  <li> OPTIONAL: If detailed emission calculation is switched on, the vehicle type Id should additionally contain
  *  HbefaVehicleAttributes ("Technology;SizeClasse;EmConcept"), corresponding to the strings in detailedWarmEmissionFactorsFile (see below) </li>
  * </ul>
  * <li>averageFleetWarmEmissionFactorsFile: This file can be exported from Hbefa 3.1. 
@@ -49,7 +52,7 @@
  * or see the {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup} for a detailed description. </li>
  * </ul>
  *
- * Optional: To use detailed emission calculation set isUsingDetailedEmissionCalculation to <code>true</code> in the
+ * Optional: If you want to use vehicle specific emission calculations, set isUsingDetailedEmissionCalculation to <code>true</code> in the
  * {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample RunEmissionToolOnlineExample} or 
  * {@link org.matsim.contrib.emissions.example.RunEmissionToolOfflineExample RunEmissionToolOfflineExample} class. 
  * Define the input paths for
@@ -68,7 +71,6 @@
  *  All emission factor files represent tables from Hbefa 3.1, which are read columnwise. 
  *  Their column headers need to match the parser definition 
  *  in the respective method of the {@link org.matsim.contrib.emissions.EmissionModule EmissionModule}.
- *  Variable detailed vehicle types and traffic situations definitions are mapped to emission values and types. 
  *
  * <h2>Model description</h2>
  * 
