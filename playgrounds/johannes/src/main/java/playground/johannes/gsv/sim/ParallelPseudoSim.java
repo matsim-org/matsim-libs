@@ -106,6 +106,8 @@ public class ParallelPseudoSim {
 				e.printStackTrace();
 			}
 		}
+		
+		executor.shutdown();
 	}
 	
 	public class SimThread implements Runnable {

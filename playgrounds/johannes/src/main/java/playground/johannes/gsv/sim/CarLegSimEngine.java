@@ -67,7 +67,7 @@ public class CarLegSimEngine implements LegSimEngine {
 				eventList.add(new LinkEnterEvent(departureTime + tt, person.getId(), link.getId(), null));
 				tt += travelTime.getLinkTravelTime(link, departureTime + tt, null, null);
 //				events.processEvent(new LinkLeaveEvent(departureTime + tt, person.getId(), link.getId(), null));
-				eventList.add(new LinkEnterEvent(departureTime + tt, person.getId(), link.getId(), null));
+				eventList.add(new LinkLeaveEvent(departureTime + tt, person.getId(), link.getId(), null));
 				tt++;// 1 sec for each node
 			}
 			

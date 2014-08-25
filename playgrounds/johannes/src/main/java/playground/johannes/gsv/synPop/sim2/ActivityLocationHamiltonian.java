@@ -113,7 +113,7 @@ public class ActivityLocationHamiltonian implements Hamiltonian {
 				
 				double dist = distance(prev, next);
 				dist = dist * detourFactor;
-				double delta = Math.abs( - targetDistance);
+				double delta = Math.abs(dist - targetDistance);
 				totaldelta += delta;
 			}
 		}
