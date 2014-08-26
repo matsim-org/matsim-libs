@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import playground.boescpa.converters.vissim.ConvEvents2Anm;
 
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * Implements ConvEvents2Anm.TripMatcher with a simple linear regression as the similarity measure.
@@ -37,11 +37,14 @@ public class TripMatcher implements ConvEvents2Anm.TripMatcher {
 
 	private final static Logger log = Logger.getLogger(TripMatcher.class);
 
-	private final static int TenPrctScore = 10000;
-	private final static int LengthScore = 1;
-	private final static int InterceptScore = 10;
-	private final static int SlopeScore = 100;
-	private final static int MSEScore = 100;
+	private final static int TEN_PRCT_SCORE = 10000;
+
+	private final static int LENGTH_SCORE = 1;
+	private final static int INTERCEPT_SCORE = 100;
+	private final static int SLOPE_SCORE = 100;
+	private final static int MSE_SCORE = 100;
+
+	private final static int NEG_OFFSET_IF_NOT_FOUNG = 1;
 
 	@Override
 	public HashMap<Id, Integer> matchTrips(HashMap<Id, Long[]> msTrips, HashMap<Id, Long[]> amTrips) {
@@ -55,6 +58,7 @@ public class TripMatcher implements ConvEvents2Anm.TripMatcher {
 		for (Id amTrip : amTrips.keySet()) {
 			countsPerAnmTrip.put(amTrip, 0);
 		}
+		List<Id> amTripsKeySet = new ArrayList<Id>(amTrips.keySet());
 
 		for (Id msTrip : msTrips.keySet()) {
 			progressCounter++;
@@ -63,7 +67,9 @@ public class TripMatcher implements ConvEvents2Anm.TripMatcher {
 			Id bestMatchingAmTrip = null;
 			int bestMatchScore = Integer.MIN_VALUE;
 
-			for (Id amTrip : amTrips.keySet()) {
+			// Shuffle key set:
+			Collections.shuffle(amTripsKeySet);
+			for (Id amTrip : amTripsKeySet) {
 				Long[] amTripZones = amTrips.get(amTrip);
 
 				// Linear regression between the to trips:
@@ -77,7 +83,8 @@ public class TripMatcher implements ConvEvents2Anm.TripMatcher {
 						}
 					}
 					if (foundNone) {
-						simpleRegression.addData(i,0);
+						int yPos = -(msTripZones.length - i) - NEG_OFFSET_IF_NOT_FOUNG;
+						simpleRegression.addData(i, yPos);
 					}
 				}
 
@@ -86,19 +93,19 @@ public class TripMatcher implements ConvEvents2Anm.TripMatcher {
 
 				// Criterion 1.1: Difference in length of trips not greater than 10%.
 				if (((double)Math.abs(msTripZones.length - amTripZones.length))/((double)msTripZones.length) <= 0.1) {
-					matchScore += TenPrctScore;
+					matchScore += TEN_PRCT_SCORE;
 				}
 				// Criterion 1.2: The smaller the difference in length, the better.
-				matchScore -= (Math.abs(msTripZones.length - amTripZones.length)*LengthScore);
+				matchScore -= (Math.abs(msTripZones.length - amTripZones.length)* LENGTH_SCORE);
 
 				// Criterion 2: The closer the intercept to zero, the better.
-				matchScore -= (int) (Math.abs(simpleRegression.getIntercept())*InterceptScore);
+				matchScore -= (int) (Math.abs(simpleRegression.getIntercept())* INTERCEPT_SCORE);
 
 				// Criterion 3: The closer the slope to one, the better.
-				matchScore -= (int) (Math.abs(1 - simpleRegression.getSlope())*SlopeScore);
+				matchScore -= (int) (Math.abs(1 - simpleRegression.getSlope())* SLOPE_SCORE);
 
 				// Criterion 4: The smaller the mean square error of the regression, the better.
-				matchScore -= (int) (Math.abs(simpleRegression.getMeanSquareError())*MSEScore);
+				matchScore -= (int) (Math.abs(simpleRegression.getMeanSquareError())* MSE_SCORE);
 
 				if (matchScore > bestMatchScore) {
 					bestMatchScore = matchScore;
@@ -108,9 +115,9 @@ public class TripMatcher implements ConvEvents2Anm.TripMatcher {
 
 			countsPerAnmTrip.put(bestMatchingAmTrip, (countsPerAnmTrip.get(bestMatchingAmTrip) + 1));
 
-			if (bestMatchScore >= 0.9*TenPrctScore) {
+			if (bestMatchScore >= 0.9* TEN_PRCT_SCORE) {
 				matchesWithHighScores++;
-				if (bestMatchScore >= 0.99*TenPrctScore) {
+				if (bestMatchScore >= 0.99* TEN_PRCT_SCORE) {
 					matchesWithVeryHighScores++;
 				}
 			}
@@ -123,9 +130,9 @@ public class TripMatcher implements ConvEvents2Anm.TripMatcher {
 		}
 
 		log.info("Of total " + msTrips.size() + " trips, " + matchesWithHighScores + " were matched with a high score above " +
-				0.9*TenPrctScore + " points.");
+				0.9* TEN_PRCT_SCORE + " points.");
 		log.info("Of total " + msTrips.size() + " trips, " + matchesWithVeryHighScores + " were matched with a very high score above " +
-				0.99*TenPrctScore + " points.");
+				0.99* TEN_PRCT_SCORE + " points.");
 
 		return countsPerAnmTrip;
 	}
