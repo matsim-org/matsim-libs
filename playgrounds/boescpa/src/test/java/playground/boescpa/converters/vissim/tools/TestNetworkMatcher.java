@@ -32,7 +32,7 @@ import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
-import playground.boescpa.converters.vissim.ConvEvents2Anm;
+import playground.boescpa.converters.vissim.ConvEvents;
 
 import java.util.HashMap;
 
@@ -46,8 +46,8 @@ public class TestNetworkMatcher {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private ConvEvents2Anm.BaseGridCreator baseGridCreator;
-	private ConvEvents2Anm.NetworkMapper defaultNetworkMapper;
+	private ConvEvents.BaseGridCreator baseGridCreator;
+	private ConvEvents.NetworkMapper defaultNetworkMapper;
 
 	@Before
 	public void prepare() {

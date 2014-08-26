@@ -22,7 +22,7 @@
 package playground.boescpa.converters.vissim.tools;
 
 import org.matsim.api.core.v01.Id;
-import playground.boescpa.converters.vissim.ConvEvents2Anm;
+import playground.boescpa.converters.vissim.ConvEvents;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +33,7 @@ import java.util.List;
  *
  * @author boescpa
  */
-public abstract class AbstractRouteConverter implements ConvEvents2Anm.RouteConverter {
+public abstract class AbstractRouteConverter implements ConvEvents.RouteConverter {
 
 	@Override
 	public HashMap<Id, Long[]> convert(HashMap<Id, Id[]> networkKey, String path2RouteFile, String path2OrigNetwork, String path2VissimZoneShp) {

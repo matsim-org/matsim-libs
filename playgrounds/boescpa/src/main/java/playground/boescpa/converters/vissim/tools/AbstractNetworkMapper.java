@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import playground.boescpa.converters.vissim.ConvEvents2Anm;
+import playground.boescpa.converters.vissim.ConvEvents;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -39,7 +39,7 @@ import java.util.List;
  *
  * @author boescpa
  */
-public abstract class AbstractNetworkMapper implements ConvEvents2Anm.NetworkMapper {
+public abstract class AbstractNetworkMapper implements ConvEvents.NetworkMapper {
 
 	/**
 	 * Creates a key-map that maps a Network to a provided mutualBaseGrid (provided in the MATSim-Network-Format).

@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
-import playground.boescpa.converters.vissim.ConvEvents2Anm;
+import playground.boescpa.converters.vissim.ConvEvents;
 
 /**
  * WHAT IS IT FOR?
@@ -42,8 +42,8 @@ public class TestBaseGridCreator {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private ConvEvents2Anm.BaseGridCreator baseGridCreator1;
-	private ConvEvents2Anm.BaseGridCreator baseGridCreator2;
+	private ConvEvents.BaseGridCreator baseGridCreator1;
+	private ConvEvents.BaseGridCreator baseGridCreator2;
 
 	@Before
 	public void prepare() {

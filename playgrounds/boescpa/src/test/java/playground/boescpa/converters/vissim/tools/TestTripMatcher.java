@@ -26,7 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import playground.boescpa.converters.vissim.ConvEvents2Anm;
+import playground.boescpa.converters.vissim.ConvEvents;
 
 import java.util.HashMap;
 
@@ -37,7 +37,7 @@ import java.util.HashMap;
  */
 public class TestTripMatcher {
 
-	ConvEvents2Anm.TripMatcher tripMatcher = new TripMatcher();
+	ConvEvents.TripMatcher tripMatcher = new TripMatcher();
 	HashMap<Id, Long[]> msTrips = null;
 	HashMap<Id, Long[]> amTrips = null;
 

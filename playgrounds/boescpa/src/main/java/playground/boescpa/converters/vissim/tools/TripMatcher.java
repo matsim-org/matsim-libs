@@ -24,7 +24,7 @@ package playground.boescpa.converters.vissim.tools;
 import org.apache.commons.math.stat.regression.SimpleRegression;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import playground.boescpa.converters.vissim.ConvEvents2Anm;
+import playground.boescpa.converters.vissim.ConvEvents;
 
 import java.util.*;
 
@@ -33,7 +33,7 @@ import java.util.*;
  *
  * @author boescpa
  */
-public class TripMatcher implements ConvEvents2Anm.TripMatcher {
+public class TripMatcher implements ConvEvents.TripMatcher {
 
 	private final static Logger log = Logger.getLogger(TripMatcher.class);
 

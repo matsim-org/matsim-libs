@@ -52,7 +52,7 @@ public class MatchTrips {
 		HashMap<Id, Long[]> inpTrips = MapRoutes.readRoutes(path2InpRoutes);
 
 		// Match trips
-		ConvEvents2Anm.TripMatcher tripMatcher = new TripMatcher();
+		ConvEvents.TripMatcher tripMatcher = new TripMatcher();
 		HashMap<Id, Integer> results = tripMatcher.matchTrips(msTrips, inpTrips);
 
 		writeTripDemands(results, path2WriteDemands);

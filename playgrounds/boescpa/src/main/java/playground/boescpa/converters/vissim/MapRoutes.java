@@ -24,9 +24,7 @@ package playground.boescpa.converters.vissim;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
-import playground.boescpa.converters.vissim.tools.AmRouteConverter;
 import playground.boescpa.converters.vissim.tools.InpRouteConverter;
-import playground.boescpa.converters.vissim.tools.MsRouteConverter;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -76,7 +74,7 @@ public class MapRoutes {
 
 		// Create visim routes:
 		HashMap<Id, Id[]> inpKeyMap = PrepareNetworks.readKeyMaps(path2InpKeyMap);
-		ConvEvents2Anm.RouteConverter inpRouteConverter = new InpRouteConverter();
+		ConvEvents.RouteConverter inpRouteConverter = new InpRouteConverter();
 		HashMap<Id, Long[]> inpRoutes = inpRouteConverter.convert(inpKeyMap, path2InpFile, "", "");
 		writeRoutes(inpRoutes, path2WriteInpRoutes);
 	}

@@ -26,7 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import playground.boescpa.converters.vissim.ConvEvents2Anm;
+import playground.boescpa.converters.vissim.ConvEvents;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +39,7 @@ import java.util.List;
  */
 public class TestRouteConverter {
 
-	ConvEvents2Anm.RouteConverter routeConverter;
+	ConvEvents.RouteConverter routeConverter;
 	HashMap<Id, Id[]> networkKey = new HashMap<Id, Id[]>();
 
 	@Before

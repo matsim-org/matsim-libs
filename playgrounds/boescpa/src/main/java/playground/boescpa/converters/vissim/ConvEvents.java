@@ -23,7 +23,6 @@ package playground.boescpa.converters.vissim;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import playground.boescpa.converters.vissim.tools.*;
 
 import java.util.HashMap;
 
@@ -32,7 +31,7 @@ import java.util.HashMap;
  *
  * @author boescpa
  */
-public class ConvEvents2Anm {
+public abstract class ConvEvents {
 
 	private final BaseGridCreator baseGridCreator;
 	private final NetworkMapper matsimNetworkMapper;
@@ -41,8 +40,8 @@ public class ConvEvents2Anm {
 	private final RouteConverter anmRouteConverter;
 	private final TripMatcher tripMatcher;
 
-	public ConvEvents2Anm(BaseGridCreator baseGridCreator, NetworkMapper matsimNetworkMapper, NetworkMapper anmNetworkMapper,
-						  RouteConverter matsimRouteConverter, RouteConverter anmRouteConverter, TripMatcher tripMatcher) {
+	public ConvEvents(BaseGridCreator baseGridCreator, NetworkMapper matsimNetworkMapper, NetworkMapper anmNetworkMapper,
+					  RouteConverter matsimRouteConverter, RouteConverter anmRouteConverter, TripMatcher tripMatcher) {
 		this.baseGridCreator = baseGridCreator;
 		this.matsimNetworkMapper = matsimNetworkMapper;
 		this.anmNetworkMapper = anmNetworkMapper;
@@ -51,6 +50,7 @@ public class ConvEvents2Anm {
 		this.tripMatcher = tripMatcher;
 	}
 
+	/*
 	public static void main(String[] args) {
 		ConvEvents2Anm convEvents2Anm = createDefaultConvEvents2Anm();
 		convEvents2Anm.convert(args);
@@ -60,39 +60,38 @@ public class ConvEvents2Anm {
 		return new ConvEvents2Anm(new playground.boescpa.converters.vissim.tools.BaseGridCreator(), new MsNetworkMapper(), new AmNetworkMapper(),
 				new MsRouteConverter(), new AmRouteConverter(), new playground.boescpa.converters.vissim.tools.TripMatcher());
 	}
+	*/
 
 	public void convert(String[] args) {
 		String path2VissimZoneShp = args[0];
 		String path2MATSimNetwork = args[1];
-		String path2VissimNetworkAnm = args[2];
+		String path2VissimNetwork = args[2];
 		String path2EventsFile = args[3];
-		String path2AnmroutesFile = args[4];
-		String path2NewAnmFile = args[5];
+		String path2VissimRoutesFile = args[4];
+		String path2NewVissimRoutesFile = args[5];
 
 		Network mutualBaseGrid = this.baseGridCreator.createMutualBaseGrid(path2VissimZoneShp);
 		HashMap<Id, Id[]> keyMsNetwork = this.matsimNetworkMapper.mapNetwork(path2MATSimNetwork, mutualBaseGrid, path2VissimZoneShp);
-		HashMap<Id, Id[]> keyAmNetwork = this.anmNetworkMapper.mapNetwork(path2VissimNetworkAnm, mutualBaseGrid, "");
+		HashMap<Id, Id[]> keyAmNetwork = this.anmNetworkMapper.mapNetwork(path2VissimNetwork, mutualBaseGrid, "");
 		HashMap<Id, Long[]> msTrips = this.matsimRouteConverter.convert(keyMsNetwork, path2EventsFile, path2MATSimNetwork, path2VissimZoneShp);
-		HashMap<Id, Long[]> amTrips = this.anmRouteConverter.convert(keyAmNetwork, path2AnmroutesFile, "", "");
+		HashMap<Id, Long[]> amTrips = this.anmRouteConverter.convert(keyAmNetwork, path2VissimRoutesFile, "", "");
 		HashMap<Id, Integer> demandPerAnmTrip = this.tripMatcher.matchTrips(msTrips, amTrips);
 
 		// todo-boescpa Deal with start times of trips...
 
-		writeAnmRoutes(demandPerAnmTrip, path2AnmroutesFile, path2NewAnmFile);
+		writeAnmRoutes(demandPerAnmTrip, path2VissimRoutesFile, path2NewVissimRoutesFile);
 	}
 
 	/**
-	 * Rewrite ANMRoutes file with new demand numbers for each ANM-Route
+	 * Rewrite Vissim file with new demand numbers for each ANM-Route
 	 *
-	 * @param demandPerAnmTrip
-	 * @param path2AnmFile
-	 * @param path2NewAnmFile At the specified location a new ANMRoutes-File will be created. It is an exact copy
-	 *                        of the given AnmFile except for the demands stated at the routes. These are the new
-	 *                        demands given in demandPerAnmTrip.
+	 * @param demandPerVissimTrip
+	 * @param path2VissimRoutesFile
+	 * @param path2NewVissimRoutesFile At the specified location a new VissimRoutes-File will be created. It is an exact copy
+	 *                        of the given VissimFile except for the demands stated at the routes. These are the new
+	 *                        demands given in demandPerVissimTrip.
 	 */
-	public void writeAnmRoutes(HashMap<Id, Integer> demandPerAnmTrip, String path2AnmFile, String path2NewAnmFile) {
-
-	};
+	public abstract void writeAnmRoutes(HashMap<Id, Integer> demandPerVissimTrip, String path2VissimRoutesFile, String path2NewVissimRoutesFile);
 
 	public interface BaseGridCreator {
 

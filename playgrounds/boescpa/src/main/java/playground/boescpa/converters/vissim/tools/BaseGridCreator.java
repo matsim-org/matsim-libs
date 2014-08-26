@@ -30,7 +30,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
-import playground.boescpa.converters.vissim.ConvEvents2Anm;
+import playground.boescpa.converters.vissim.ConvEvents;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -40,7 +40,7 @@ import java.util.Set;
  *
  * @author boescpa
  */
-public class BaseGridCreator implements ConvEvents2Anm.BaseGridCreator {
+public class BaseGridCreator implements ConvEvents.BaseGridCreator {
 	/**
 	 * Side length [m] of one square of the grid.
 	 * Default value: 100
