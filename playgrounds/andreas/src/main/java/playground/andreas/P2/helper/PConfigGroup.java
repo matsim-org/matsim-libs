@@ -124,7 +124,7 @@ public class PConfigGroup extends Module{
 	private double costPerHour = 0.0;
 	private boolean startWith24Hours = false;
 	private double minOperationTime = 6 * 3600;
-	private double minInitialStopDistance = 0.0;
+	private double minInitialStopDistance = 1.0;
 	private double earningsPerBoardingPassenger = 0.0;
 	private double earningsPerKilometerAndPassenger = 0.50;
 	private double pricePerVehicleBought = 1000.0;
@@ -352,7 +352,7 @@ public class PConfigGroup extends Module{
 		map.put(PRICE_PER_VEHICLE_SOLD, "price of one vehicle sold");
 		map.put(START_WITH_24_HOURS, "Initial plan will start operating 0-24 hours");
 		map.put(MIN_OPERATION_TIME, "min time of operation of each cooperative in seconds");
-		map.put(MIN_INITIAL_STOP_DISTANCE, "min distance the two initial stops of a new operator's first route should be apart. Default is zero.");
+		map.put(MIN_INITIAL_STOP_DISTANCE, "min distance the two initial stops of a new operator's first route should be apart. Default is 1.0. Set to 0.0 to allow for the same stop being picked as start and end stop.");
 		map.put(USEFRANCHISE, "Will use a franchise system if set to true");
 		map.put(WRITESTATS_INTERVAL, "number of iterations statistics will be plotted. Set to zero to turn this feature off. Set to infinity to turn off the plots, but write the statistics file anyway");
 		map.put(LOGCOOPS, "will log coops individually if set to true");
