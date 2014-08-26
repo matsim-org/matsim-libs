@@ -43,12 +43,14 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -56,6 +58,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -80,13 +83,15 @@ LinkLeaveEventHandler,
 TransitDriverStartsEventHandler,
 PersonDepartureEventHandler,
 PersonArrivalEventHandler,
-PersonStuckEventHandler {
+PersonStuckEventHandler
+{
 
 	final static Logger log = Logger.getLogger(MarginalCongestionHandlerImplV4.class);
 	final ScenarioImpl scenario;
 	final EventsManager events;
 	final List<Id> ptVehicleIDs = new ArrayList<Id>();
 	final Map<Id, LinkCongestionInfoExtended> linkId2congestionInfo = new HashMap<Id, LinkCongestionInfoExtended>();
+	private int roundingErrorWarnCount =0;
 
 	double totalInternalizedDelay = 0.0;
 	double totalDelay = 0.0;
@@ -260,15 +265,20 @@ PersonStuckEventHandler {
 			double delayToPayFor=this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(delayedPerson);
 
 			if(delayToPayFor == 0) return;
-			if(delayToPayFor > 0 && delayToPayFor < 1){
-				log.warn(delayToPayFor + " seconds are not internalized assuming these delays due to rounding errors. Do check for emissions at this stage.");
-				log.info("Emissions to pay for at this point are "+this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2WarmEmissionsToPayFor().get(delayedPerson).toString());
+			if(delayToPayFor > 0 && delayToPayFor <=1){
+				if(roundingErrorWarnCount<=5){
+					roundingErrorWarnCount++;
+					log.warn(delayToPayFor + " seconds are not internalized assuming these delays due to rounding errors. \n "
+							+ "\n Do check for emissions at this stage.");
+					if(roundingErrorWarnCount==5) log.warn(Gbl.FUTURE_SUPPRESSED);
+				}
+//				log.info("Emissions to pay for at this point are "+this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2WarmEmissionsToPayFor().get(delayedPerson).toString());
 				delayToPayFor=0;
 				this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().put(delayedPerson, 0.0);
 				this.delayNotInternalized_roundingErrors +=delayToPayFor;
 				return;
 			} else {
-				log.info("Person have spill back delays. Internalizing such delays.");
+//				log.info("Person have spill back delays. Internalizing such delays.");
 				Id personInFrontOfQ = event.getPersonId();
 				Id personOnThisLink = event.getLinkId();
 				do{
