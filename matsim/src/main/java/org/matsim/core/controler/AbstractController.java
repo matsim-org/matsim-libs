@@ -89,6 +89,7 @@ public abstract class AbstractController {
     }
 
     protected final void run(Config config) {
+        UncaughtExceptionHandler previousDefaultUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
@@ -127,6 +128,7 @@ public abstract class AbstractController {
         } finally {
             shutdown();
             Runtime.getRuntime().removeShutdownHook(shutdownHook);
+            Thread.setDefaultUncaughtExceptionHandler(previousDefaultUncaughtExceptionHandler);
             // Propagate Exception in case Controler.run is called by someone who wants to catch
             // it. It is probably not strictly correct to wrap the exception here.
             // But otherwise, this method would have to declare "throws Throwable".
