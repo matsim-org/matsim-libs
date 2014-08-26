@@ -74,7 +74,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 	}
 
 	private void run(){
-		scenario = LoadMyScenarios.loadScenario(populationFile, networkFile,configFile);
+		scenario = LoadMyScenarios.loadScenarioFromNetworkPlansAndConfig(populationFile, networkFile,configFile);
 		lastIteration = scenario.getConfig().controler().getLastIteration();
 		getPopulationPerUserGroup();
 		getAllUserBenefits((ScenarioImpl)scenario);

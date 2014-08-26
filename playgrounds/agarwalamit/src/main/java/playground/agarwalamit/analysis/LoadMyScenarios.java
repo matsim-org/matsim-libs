@@ -21,6 +21,7 @@ package playground.agarwalamit.analysis;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -32,7 +33,7 @@ public class LoadMyScenarios {
 	/**
 	 * Returns scenario by reading input config file and inserting location of plans and network file.
 	 */
-	public static Scenario loadScenario(String populationFile, String networkFile, String configFile) {
+	public static Scenario loadScenarioFromNetworkPlansAndConfig(String populationFile, String networkFile, String configFile) {
 		Config config = new Config();
 		config.addCoreModules();
 		MatsimConfigReader configReader = new MatsimConfigReader(config);
@@ -46,7 +47,7 @@ public class LoadMyScenarios {
 	/**
 	 * Returns scenario by creating new config and inserting location of plans and network file.
 	 */
-	public static Scenario loadScenario(String populationFile, String networkFile) {
+	public static Scenario loadScenarioFromNetworkAndPlans(String populationFile, String networkFile) {
 		Config config = new Config();
 		config.addCoreModules();
 		config.plans().setInputFile(populationFile);
@@ -54,6 +55,20 @@ public class LoadMyScenarios {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		return scenario;
 	}
+	
+	/**
+	 * Returns scenario by reading input config file and network file.
+	 */
+	public static Scenario loadScenarioFromNetworkAndConfig(String networkFile, String configFile) {
+		Config config = new Config();
+		config.addCoreModules();
+		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		configReader.readFile(configFile);
+		config.network().setInputFile(networkFile);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		return scenario;
+	}
+	
 	
 	/**
 	 * Returns last iterations (int) by reading input config file only.
@@ -64,6 +79,17 @@ public class LoadMyScenarios {
 		MatsimConfigReader configReader = new MatsimConfigReader(config);
 		configReader.readFile(configFile);
 		return config.controler().getLastIteration();
+	}
+
+	/**
+	 * Returns scenario containing only network file location.
+	 */
+	public static Scenario loadScenarioFromNetwork(String networkFile) {
+		Config config = new Config();
+		config.addCoreModules();
+		config.network().setInputFile(networkFile);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		return scenario;
 	}
 	
 }

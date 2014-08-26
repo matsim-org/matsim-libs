@@ -49,7 +49,7 @@ public class EmissionsPerPersonPerUserGroup {
 private final Logger logger = Logger.getLogger(EmissionsPerPersonPerUserGroup.class);
 	
 public EmissionsPerPersonPerUserGroup() {
-		scenario = LoadMyScenarios.loadScenario(networkFile, populationFile, configFile);
+		scenario = LoadMyScenarios.loadScenarioFromNetworkPlansAndConfig(networkFile, populationFile, configFile);
 		
 		for(UserGroup ug:UserGroup.values()){
 			SortedMap<String, Double> pollutantToValue = new TreeMap<String, Double>();

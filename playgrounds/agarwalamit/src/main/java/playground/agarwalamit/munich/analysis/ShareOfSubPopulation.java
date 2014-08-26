@@ -42,7 +42,7 @@ public class ShareOfSubPopulation {
 
 	public static void main(String[] args) {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputDir+"/output/1pct/analysis/subPopulationShare.txt");
-		Scenario sc = LoadMyScenarios.loadScenario(populationFile, networkFile);
+		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndPlans(populationFile, networkFile);
 		PersonFilter pf = new PersonFilter();
 		Population wholePop = sc.getPopulation();
 		try {

@@ -54,7 +54,7 @@ public class DelaysUserGroup {
 		for (UserGroup ug:UserGroup.values()) {
 			this.userGroupToDelays.put(ug, 0.0);
 		}
-		scenario = LoadMyScenarios.loadScenario(populationFile, networkFile, configFile);
+		scenario = LoadMyScenarios.loadScenarioFromNetworkPlansAndConfig(populationFile, networkFile, configFile);
 		userGrpToPopulation = new TreeMap<UserGroup, Population>();
 		lastIteration = scenario.getConfig().controler().getLastIteration();
 	}

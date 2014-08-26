@@ -48,7 +48,7 @@ public class TravelTimePerUserGroup extends AbstractAnalyisModule {
 	public TravelTimePerUserGroup() {
 		super(TravelTimePerUserGroup.class.getSimpleName());
 		this.travelTimeHandler = new LegModeTravelTimeHandler();
-		sc = LoadMyScenarios.loadScenario(populationFile, networkFile, configFile);
+		sc = LoadMyScenarios.loadScenarioFromNetworkPlansAndConfig(populationFile, networkFile, configFile);
 		lastIteration = sc.getConfig().controler().getLastIteration();
 		this.eventsFile = 	outputDir+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
 		this.usrGrpExtended = new UserGroupUtilsExtended();
