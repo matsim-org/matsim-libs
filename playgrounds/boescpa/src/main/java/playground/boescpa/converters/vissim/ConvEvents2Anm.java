@@ -58,7 +58,7 @@ public class ConvEvents2Anm extends ConvEvents {
 	}
 
 	@Override
-	public void writeAnmRoutes(HashMap<Id, Integer> demandPerVissimTrip, String path2VissimRoutesFile, String path2NewVissimRoutesFile) {
+	public void writeAnmRoutes(HashMap<Id, Integer> demandPerVissimTrip, String path2AnmRoutesFile, String path2NewAnmRoutesFile) {
 		// todo-boescpa Write export method...
 	}
 }
