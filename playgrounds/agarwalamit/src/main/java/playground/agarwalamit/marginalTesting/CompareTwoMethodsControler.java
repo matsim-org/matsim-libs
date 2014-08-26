@@ -20,7 +20,6 @@ package playground.agarwalamit.marginalTesting;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
@@ -36,7 +35,14 @@ import playground.ikaddoura.internalizationCar.WelfareAnalysisControlerListener;
 public class CompareTwoMethodsControler {
 
 	public static void main(String[] args) {
-
+//		args = new String [4];
+//		args[0] = "false";
+//		args[1] = "true";
+//		args[2] = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/input/SiouxFalls_config_runMC.xml";
+//		args[3] = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/comparePricing/implV4/";
+//		String networkFile = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/input/SiouxFalls_networkWithRoadType.xml.gz";
+//		String plansFile = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMC/selectedPlansOnly_plans.xml";
+		
 		boolean existingMethod = Boolean.valueOf(args [0]);
 		boolean newMethod = Boolean.valueOf(args [1]);
 
@@ -45,12 +51,17 @@ public class CompareTwoMethodsControler {
 
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.controler().setOutputDirectory(args[3]);
-
-		//===vsp defaults
-		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
-		config.timeAllocationMutator().setMutationRange(7200.);
-		config.timeAllocationMutator().setAffectingDuration(false);
-		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.ABORT);
+		
+//		config.network().setInputFile(networkFile);
+//		config.plans().setInputFile(plansFile);
+		
+		
+		
+//		//===vsp defaults
+//		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
+//		config.timeAllocationMutator().setMutationRange(7200.);
+//		config.timeAllocationMutator().setAffectingDuration(false);
+//		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.ABORT);
 
 		Controler controler = new Controler(config);
 
