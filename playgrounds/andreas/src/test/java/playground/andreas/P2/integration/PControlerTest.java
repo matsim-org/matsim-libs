@@ -121,23 +121,23 @@ import playground.andreas.bvgScoringFunction.BvgScoringFunctionFactory;
 		assertEquals("There a less than the expected number of " + (numberOfIterations + 2) + " lines in " + filenameOfpStats, 12, this.pStatsResults.size());
 		
 		// Check first iteration
-//		assertEquals("Number of +coops first iteration", "1" , this.pStatsResults.get(1)[2]);
-//		assertEquals("Number of +routes first iteration", "1" , this.pStatsResults.get(1)[4]);
-//		assertEquals("Number of +pax first iteration", "3920" , this.pStatsResults.get(1)[6]);
-//		assertEquals("Number of +veh first iteration", "3" , this.pStatsResults.get(1)[8]);
-//		assertEquals("Number of +budget first iteration", "53.56866666665829", this.pStatsResults.get(1)[10]);
+		assertEquals("Number of +coops (first iteration)", "1" , this.pStatsResults.get(1)[2]);
+		assertEquals("Number of +routes (first iteration)", "1" , this.pStatsResults.get(1)[4]);
+		assertEquals("Number of +pax (first iteration)", "4304" , this.pStatsResults.get(1)[6]);
+		assertEquals("Number of +veh (first iteration)", "3" , this.pStatsResults.get(1)[8]);
+		assertEquals("Number of +budget (first iteration)", "91.96588888887833", this.pStatsResults.get(1)[10]);
 		
-//		assertEquals("Number of coops last iteration", "4" , this.pStatsResults.get(11)[1]);
-//		assertEquals("Number of routes last iteration", "5" , this.pStatsResults.get(11)[3]);
-//		assertEquals("Number of pax last iteration", "7966" , this.pStatsResults.get(11)[5]);
-//		assertEquals("Number of veh last iteration", "13" , this.pStatsResults.get(11)[7]);
-//		assertEquals("Number of budget last iteration", "13.865444444420742", this.pStatsResults.get(11)[9]);
+		assertEquals("Number of coops (last iteration)", "3" , this.pStatsResults.get(11)[1]);
+		assertEquals("Number of routes (last iteration)", "4" , this.pStatsResults.get(11)[3]);
+		assertEquals("Number of pax (last iteration)", "7933" , this.pStatsResults.get(11)[5]);
+		assertEquals("Number of veh (last iteration)", "12" , this.pStatsResults.get(11)[7]);
+		assertEquals("Number of budget (last iteration)", "-2.935740740783333", this.pStatsResults.get(11)[9]);
 		
-//		assertEquals("Number of +coops last iteration", "3" , this.pStatsResults.get(11)[2]);
-//		assertEquals("Number of +routes last iteration", "3" , this.pStatsResults.get(11)[4]);
-//		assertEquals("Number of +pax last iteration", "7423" , this.pStatsResults.get(11)[6]);
-//		assertEquals("Number of +veh last iteration", "11" , this.pStatsResults.get(11)[8]);
-//		assertEquals("Number of +budget last iteration", "0.9849259258942169", this.pStatsResults.get(11)[10]);
+		assertEquals("Number of +coops (last iteration)", "2" , this.pStatsResults.get(11)[2]);
+		assertEquals("Number of +routes (last iteration)", "3" , this.pStatsResults.get(11)[4]);
+		assertEquals("Number of +pax (last iteration)", "7782" , this.pStatsResults.get(11)[6]);
+		assertEquals("Number of +veh (last iteration)", "9" , this.pStatsResults.get(11)[8]);
+		assertEquals("Number of +budget (last iteration)", "9.182166666602782", this.pStatsResults.get(11)[10]);
 	}
 
 	@Override
