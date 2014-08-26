@@ -50,18 +50,6 @@ public abstract class ConvEvents {
 		this.tripMatcher = tripMatcher;
 	}
 
-	/*
-	public static void main(String[] args) {
-		ConvEvents2Anm convEvents2Anm = createDefaultConvEvents2Anm();
-		convEvents2Anm.convert(args);
-	}
-
-	public static ConvEvents2Anm createDefaultConvEvents2Anm() {
-		return new ConvEvents2Anm(new playground.boescpa.converters.vissim.tools.BaseGridCreator(), new MsNetworkMapper(), new AmNetworkMapper(),
-				new MsRouteConverter(), new AmRouteConverter(), new playground.boescpa.converters.vissim.tools.TripMatcher());
-	}
-	*/
-
 	public void convert(String[] args) {
 		String path2VissimZoneShp = args[0];
 		String path2MATSimNetwork = args[1];
@@ -83,7 +71,7 @@ public abstract class ConvEvents {
 	}
 
 	/**
-	 * Rewrite Vissim file with new demand numbers for each ANM-Route
+	 * Rewrite Vissim file with new demand numbers for each Vissim-Route
 	 *
 	 * @param demandPerVissimTrip
 	 * @param path2VissimRoutesFile
