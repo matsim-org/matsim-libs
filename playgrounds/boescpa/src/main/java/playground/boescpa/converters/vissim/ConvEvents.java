@@ -35,18 +35,27 @@ public abstract class ConvEvents {
 
 	private final BaseGridCreator baseGridCreator;
 	private final NetworkMapper matsimNetworkMapper;
-	private final NetworkMapper anmNetworkMapper;
+	private final NetworkMapper vissimNetworkMapper;
 	private final RouteConverter matsimRouteConverter;
-	private final RouteConverter anmRouteConverter;
+	private final RouteConverter vissimRouteConverter;
 	private final TripMatcher tripMatcher;
 
-	public ConvEvents(BaseGridCreator baseGridCreator, NetworkMapper matsimNetworkMapper, NetworkMapper anmNetworkMapper,
-					  RouteConverter matsimRouteConverter, RouteConverter anmRouteConverter, TripMatcher tripMatcher) {
+	public ConvEvents() {
+		this.baseGridCreator = null;
+		this.matsimNetworkMapper = null;
+		this.vissimNetworkMapper = null;
+		this.matsimRouteConverter = null;
+		this.vissimRouteConverter = null;
+		this.tripMatcher = null;
+	}
+
+	public ConvEvents(BaseGridCreator baseGridCreator, NetworkMapper matsimNetworkMapper, NetworkMapper vissimNetworkMapper,
+					  RouteConverter matsimRouteConverter, RouteConverter vissimRouteConverter, TripMatcher tripMatcher) {
 		this.baseGridCreator = baseGridCreator;
 		this.matsimNetworkMapper = matsimNetworkMapper;
-		this.anmNetworkMapper = anmNetworkMapper;
+		this.vissimNetworkMapper = vissimNetworkMapper;
 		this.matsimRouteConverter = matsimRouteConverter;
-		this.anmRouteConverter = anmRouteConverter;
+		this.vissimRouteConverter = vissimRouteConverter;
 		this.tripMatcher = tripMatcher;
 	}
 
@@ -60,14 +69,14 @@ public abstract class ConvEvents {
 
 		Network mutualBaseGrid = this.baseGridCreator.createMutualBaseGrid(path2VissimZoneShp);
 		HashMap<Id, Id[]> keyMsNetwork = this.matsimNetworkMapper.mapNetwork(path2MATSimNetwork, mutualBaseGrid, path2VissimZoneShp);
-		HashMap<Id, Id[]> keyAmNetwork = this.anmNetworkMapper.mapNetwork(path2VissimNetwork, mutualBaseGrid, "");
+		HashMap<Id, Id[]> keyAmNetwork = this.vissimNetworkMapper.mapNetwork(path2VissimNetwork, mutualBaseGrid, "");
 		HashMap<Id, Long[]> msTrips = this.matsimRouteConverter.convert(keyMsNetwork, path2EventsFile, path2MATSimNetwork, path2VissimZoneShp);
-		HashMap<Id, Long[]> amTrips = this.anmRouteConverter.convert(keyAmNetwork, path2VissimRoutesFile, "", "");
+		HashMap<Id, Long[]> amTrips = this.vissimRouteConverter.convert(keyAmNetwork, path2VissimRoutesFile, "", "");
 		HashMap<Id, Integer> demandPerAnmTrip = this.tripMatcher.matchTrips(msTrips, amTrips);
 
 		// todo-boescpa Deal with start times of trips...
 
-		writeAnmRoutes(demandPerAnmTrip, path2VissimRoutesFile, path2NewVissimRoutesFile);
+		writeRoutes(demandPerAnmTrip, path2VissimRoutesFile, path2NewVissimRoutesFile);
 	}
 
 	/**
@@ -79,7 +88,7 @@ public abstract class ConvEvents {
 	 *                        of the given VissimFile except for the demands stated at the routes. These are the new
 	 *                        demands given in demandPerVissimTrip.
 	 */
-	public abstract void writeAnmRoutes(HashMap<Id, Integer> demandPerVissimTrip, String path2VissimRoutesFile, String path2NewVissimRoutesFile);
+	public abstract void writeRoutes(HashMap<Id, Integer> demandPerVissimTrip, String path2VissimRoutesFile, String path2NewVissimRoutesFile);
 
 	public interface BaseGridCreator {
 
