@@ -115,7 +115,7 @@ public class ControlerMobsimIntegrationTest {
 		Assert.assertEquals(1, mf.callCount);
 	}
 
-	@Test
+	@Test(expected = RuntimeException.class)
 	public void testRunMobsim_missingMobsimFactory() {
 		Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		cfg.controler().setLastIteration(0);
