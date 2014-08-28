@@ -25,12 +25,16 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import playground.boescpa.converters.vissim.ConvEvents;
+import playground.boescpa.converters.vissim.ConvEvents2Anm;
+import playground.boescpa.converters.vissim.tools.AmRouteConverter;
 import playground.boescpa.converters.vissim.tools.InpRouteConverter;
+import playground.boescpa.converters.vissim.tools.MsRouteConverter;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Creates routes from the matsim and the visum/vissim world and produces common representations of those.
@@ -57,27 +61,32 @@ public class MapRoutes {
 		String path2InpFile = args[10];
 		String path2WriteInpRoutes = args[11];
 
-		/*
+
 		// Create matsim routes:
 		HashMap<Id, Id[]> msKeyMap = PrepareNetworks.readKeyMaps(path2MsKeyMap);
 		ConvEvents2Anm.RouteConverter msRouteConverter = new MsRouteConverter();
-		HashMap<Id, Long[]> msRoutes = msRouteConverter.convert(msKeyMap, path2EventsFile, path2MsNetwork, path2VissimZoneShp);
-		writeRoutes(msRoutes, path2WriteMsRoutes);
-		*/
+		List<HashMap<Id, Long[]>> msRoutes = msRouteConverter.convert(msKeyMap, path2EventsFile, path2MsNetwork, path2VissimZoneShp);
+		for (int i = 0; i < msRoutes.size(); i++) {
+			writeRoutes(msRoutes.get(i), ConvEvents.insertVersNumInFilepath(path2WriteMsRoutes, i));
+		}
 
 		/*
 		// Create visum routes:
 		HashMap<Id, Id[]> amKeyMap = PrepareNetworks.readKeyMaps(path2AmKeyMap);
 		ConvEvents2Anm.RouteConverter amRouteConverter = new AmRouteConverter();
-		HashMap<Id, Long[]> amRoutes = amRouteConverter.convert(amKeyMap, path2AnmroutesFile, path2VissimNetworkAnm, path2VissimZoneShp);
-		writeRoutes(amRoutes, path2WriteAmRoutes);
+		List<HashMap<Id, Long[]>> amRoutes = amRouteConverter.convert(amKeyMap, path2AnmroutesFile, path2VissimNetworkAnm, path2VissimZoneShp);
+		for (int i = 0; i < amRoutes.size(); i++) {
+			writeRoutes(amRoutes.get(i), ConvEvents.insertVersNumInFilepath(path2WriteAmRoutes, i));
+		}
 		*/
 
 		// Create visim routes:
 		HashMap<Id, Id[]> inpKeyMap = PrepareNetworks.readKeyMaps(path2InpKeyMap);
 		ConvEvents.RouteConverter inpRouteConverter = new InpRouteConverter();
-		HashMap<Id, Long[]> inpRoutes = inpRouteConverter.convert(inpKeyMap, path2InpFile, "", "");
-		writeRoutes(inpRoutes, path2WriteInpRoutes);
+		List<HashMap<Id, Long[]>> inpRoutes = inpRouteConverter.convert(inpKeyMap, path2InpFile, "", "");
+		for (int i = 0; i < inpRoutes.size(); i++) {
+			writeRoutes(inpRoutes.get(i), ConvEvents.insertVersNumInFilepath(path2WriteInpRoutes, i));
+		}
 	}
 
 	public static void writeRoutes(HashMap<Id, Long[]> routes, String path2WriteRoutes) {

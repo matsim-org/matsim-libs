@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Provides the environment to convert MATSim-Events to an ANMRoutes file importable in VISSIM.
@@ -70,13 +71,28 @@ public abstract class ConvEvents {
 		Network mutualBaseGrid = this.baseGridCreator.createMutualBaseGrid(path2VissimZoneShp);
 		HashMap<Id, Id[]> keyMsNetwork = this.matsimNetworkMapper.mapNetwork(path2MATSimNetwork, mutualBaseGrid, path2VissimZoneShp);
 		HashMap<Id, Id[]> keyAmNetwork = this.vissimNetworkMapper.mapNetwork(path2VissimNetwork, mutualBaseGrid, "");
-		HashMap<Id, Long[]> msTrips = this.matsimRouteConverter.convert(keyMsNetwork, path2EventsFile, path2MATSimNetwork, path2VissimZoneShp);
-		HashMap<Id, Long[]> amTrips = this.vissimRouteConverter.convert(keyAmNetwork, path2VissimRoutesFile, "", "");
-		HashMap<Id, Integer> demandPerAnmTrip = this.tripMatcher.matchTrips(msTrips, amTrips);
+		List<HashMap<Id, Long[]>> msTripsCol = this.matsimRouteConverter.convert(keyMsNetwork, path2EventsFile, path2MATSimNetwork, path2VissimZoneShp);
+		List<HashMap<Id, Long[]>> amTripsCol = this.vissimRouteConverter.convert(keyAmNetwork, path2VissimRoutesFile, "", "");
 
-		// todo-boescpa Deal with start times of trips...
+		int hourCounter = 0;
+		for (HashMap<Id, Long[]> msTrips : msTripsCol) {
+			for (HashMap<Id, Long[]> amTrips : amTripsCol) {
+				hourCounter++;
+				HashMap<Id, Integer> demandPerAnmTrip = this.tripMatcher.matchTrips(msTrips, amTrips);
+				String newPath2NewVissimRoutesFile = insertVersNumInFilepath(path2NewVissimRoutesFile, hourCounter);
+				writeRoutes(demandPerAnmTrip, path2VissimRoutesFile, newPath2NewVissimRoutesFile);
+			}
+		}
+	}
 
-		writeRoutes(demandPerAnmTrip, path2VissimRoutesFile, path2NewVissimRoutesFile);
+	public static String insertVersNumInFilepath(String path2File, int versNum) {
+		String[] subPath = path2File.split("\\.");
+		String newPath = "";
+		for (int i = 0; i < subPath.length - 1; i++) {
+			newPath = newPath + subPath[i];
+		}
+		newPath = newPath + String.valueOf(versNum) + "." + subPath[subPath.length - 1];
+		return newPath;
 	}
 
 	/**
@@ -120,15 +136,16 @@ public abstract class ConvEvents {
 	public interface RouteConverter {
 
 		/**
-		 * Convert routes (in the form of events or anmroutes) to trips in on the common base grid.
+		 * Convert given routes to trips on the common base grid.
 		 *
 		 * @param networkKey	Key that matches the original network to the common base grid.
 		 * @param path2RouteFile	Path to a file that provides the routes (eg. as matsim events or as anmroutes).
 		 * @param path2OrigNetwork	The original network the routes were created on.
 		 * @param path2VissimZoneShp
-		 * @return
+		 * @return	List of trip collections. Each entry of the list represents one hour simulation time. If there is
+		 * 			only one entry, no time was provided for the trips (e.g. the case for vissim trips).
 		 */
-		public HashMap<Id, Long[]> convert(HashMap<Id, Id[]> networkKey, String path2RouteFile, String path2OrigNetwork, String path2VissimZoneShp);
+		public List<HashMap<Id, Long[]>> convert(HashMap<Id, Id[]> networkKey, String path2RouteFile, String path2OrigNetwork, String path2VissimZoneShp);
 	}
 
 	public interface TripMatcher {

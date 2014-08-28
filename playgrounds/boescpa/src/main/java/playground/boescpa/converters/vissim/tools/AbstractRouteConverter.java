@@ -36,37 +36,54 @@ import java.util.List;
 public abstract class AbstractRouteConverter implements ConvEvents.RouteConverter {
 
 	@Override
-	public HashMap<Id, Long[]> convert(HashMap<Id, Id[]> networkKey, String path2RouteFile, String path2OrigNetwork, String path2VissimZoneShp) {
+	public List<HashMap<Id, Long[]>> convert(HashMap<Id, Id[]> networkKey, String path2RouteFile, String path2OrigNetwork, String path2VissimZoneShp) {
 		List<Trip> trips = routes2Trips(path2RouteFile, path2OrigNetwork, path2VissimZoneShp);
 		return trips2SimpleRoutes(trips, networkKey);
 	}
 
 	protected abstract List<Trip> routes2Trips(String path2RouteFile, String path2OrigNetwork, String path2VissimZoneShp);
 
-	private HashMap<Id, Long[]> trips2SimpleRoutes(List<Trip> trips, HashMap<Id, Id[]> keyMsNetwork) {
-		HashMap<Id, Long[]> simpleRoutes = new HashMap<Id, Long[]>();
+	private List<HashMap<Id, Long[]>> trips2SimpleRoutes(List<Trip> trips, HashMap<Id, Id[]> keyMsNetwork) {
+		List<HashMap<Id, Long[]>> routes = new ArrayList<HashMap<Id, Long[]>>();
 
-		for (Trip trip : trips) {
-			ArrayList<Long> keyValsTrip = new ArrayList<Long>();
-			for (Id link : trip.links) {
-				Id[] keyValsLink = keyMsNetwork.get(link);
-				// Jeweils ersten Wert von keyValsLink mit aktuell letzem Wert von keyValsTrip vergleichen und nur
-				// hinzufügen, wenn unterschiedlich.
-				int startIteration = 0;
-				if (keyValsTrip.size() > 0) {
-					if (keyValsTrip.get(keyValsTrip.size()-1) == Long.parseLong(keyValsLink[0].toString())) {
-						startIteration = 1;
+		final int lastStartTime = (int)Math.floor(findLastStartTime(trips));
+		for (int i = 0; i <= lastStartTime; i++) {
+			HashMap<Id, Long[]> simpleRoutes = new HashMap<Id, Long[]>();
+			routes.add(simpleRoutes);
+			for (Trip trip : trips) {
+				if (trip.startTime < i+1 && trip.endTime >= i) {
+					ArrayList<Long> keyValsTrip = new ArrayList<Long>();
+					for (Id link : trip.links) {
+						Id[] keyValsLink = keyMsNetwork.get(link);
+						// Each time compare first value of keyValsLink with presently last value of keyValsTrip.
+						// Adding only if actually different.
+						int startIteration = 0;
+						if (keyValsTrip.size() > 0) {
+							if (keyValsTrip.get(keyValsTrip.size() - 1) == Long.parseLong(keyValsLink[0].toString())) {
+								startIteration = 1;
+							}
+						}
+						// From the second value add all.
+						for (int j = startIteration; j < keyValsLink.length; j++) {
+							keyValsTrip.add(Long.parseLong(keyValsLink[j].toString()));
+						}
 					}
-				}
-				// Ab zweitem Wert alle hinzufügen.
-				for (int i = startIteration; i < keyValsLink.length; i++) {
-					keyValsTrip.add(Long.parseLong(keyValsLink[i].toString()));
+					simpleRoutes.put(trip.tripId, keyValsTrip.toArray(new Long[keyValsTrip.size()]));
 				}
 			}
-			simpleRoutes.put(trip.tripId, keyValsTrip.toArray(new Long[keyValsTrip.size()]));
 		}
 
-		return simpleRoutes;
+		return routes;
+	}
+
+	private double findLastStartTime(List<Trip> trips) {
+		double lastStartTime = 0;
+		for (Trip trip : trips) {
+			if (trip.startTime > lastStartTime) {
+				lastStartTime = trip.startTime;
+			}
+		}
+		return lastStartTime;
 	}
 
 	final class Trip {
