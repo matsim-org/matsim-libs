@@ -49,11 +49,11 @@ public class TestRouteConverter {
 			@Override
 			protected List<Trip> routes2Trips(String path2RouteFile, String path2OrigNetwork, String path2VissimZoneShp) {
 				List<Trip> trips = new ArrayList<Trip>();
-				Trip trip1 = new Trip(new IdImpl("t100"), 100.0);
+				Trip trip1 = new Trip(new IdImpl("t100"), 0.0);
 				trip1.links.add(new IdImpl(1l));
 				trip1.links.add(new IdImpl(2l));
 				trips.add(trip1);
-				Trip trip2 = new Trip(new IdImpl("t200"), 200.0);
+				Trip trip2 = new Trip(new IdImpl("t200"), 0.0);
 				trip2.links.add(new IdImpl(2l));
 				trip2.links.add(new IdImpl(3l));
 				trips.add(trip2);
@@ -68,7 +68,8 @@ public class TestRouteConverter {
 
 	@Test
 	public void testTrips2SimpleRoutes() {
-		HashMap<Id, Long[]> simpleRoutes = this.routeConverter.convert(this.networkKey, "", "", "");
+		List<HashMap<Id, Long[]>> simpleRoutesColl = this.routeConverter.convert(this.networkKey, "", "", "");
+		HashMap<Id, Long[]> simpleRoutes = simpleRoutesColl.get(0);
 		Long[] trip1 = simpleRoutes.get(new IdImpl("t100"));
 		Long[] trip2 = simpleRoutes.get(new IdImpl("t200"));
 		Assert.assertEquals(trip1.length, 6);
