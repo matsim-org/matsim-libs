@@ -61,7 +61,6 @@ public class MapRoutes {
 		String path2InpFile = args[10];
 		String path2WriteInpRoutes = args[11];
 
-
 		// Create matsim routes:
 		HashMap<Id, Id[]> msKeyMap = PrepareNetworks.readKeyMaps(path2MsKeyMap);
 		ConvEvents2Anm.RouteConverter msRouteConverter = new MsRouteConverter();

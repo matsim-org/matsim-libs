@@ -91,7 +91,7 @@ public abstract class ConvEvents {
 		for (int i = 0; i < subPath.length - 1; i++) {
 			newPath = newPath + subPath[i];
 		}
-		newPath = newPath + String.valueOf(versNum) + "." + subPath[subPath.length - 1];
+		newPath = newPath + "_" + String.valueOf(versNum) + "." + subPath[subPath.length - 1];
 		return newPath;
 	}
 

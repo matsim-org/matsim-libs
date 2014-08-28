@@ -22,8 +22,12 @@
 package playground.boescpa.converters.vissim.tools;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import playground.boescpa.converters.vissim.ConvEvents;
 
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +55,7 @@ public abstract class AbstractRouteConverter implements ConvEvents.RouteConverte
 			HashMap<Id, Long[]> simpleRoutes = new HashMap<Id, Long[]>();
 			routes.add(simpleRoutes);
 			for (Trip trip : trips) {
-				if (trip.startTime < i+1 && trip.endTime >= i) {
+				if (trip.startTime < ((i+1)*3600) && trip.endTime >= (i*3600)) {
 					ArrayList<Long> keyValsTrip = new ArrayList<Long>();
 					for (Id link : trip.links) {
 						Id[] keyValsLink = keyMsNetwork.get(link);
@@ -83,7 +87,7 @@ public abstract class AbstractRouteConverter implements ConvEvents.RouteConverte
 				lastStartTime = trip.startTime;
 			}
 		}
-		return lastStartTime;
+		return lastStartTime/3600;
 	}
 
 	final class Trip {
@@ -92,11 +96,35 @@ public abstract class AbstractRouteConverter implements ConvEvents.RouteConverte
 		double endTime;
 		final List<Id> links;
 
+		public final static String delimiter = ", ";
+
 		Trip(Id tripId, double startTime) {
 			this.tripId = tripId;
 			this.startTime = startTime;
 			this.endTime = 0;
 			this.links = new ArrayList<Id>();
+		}
+
+		public Trip(String s) {
+			String[] vals = s.split(delimiter);
+			this.tripId = new IdImpl(vals[0]);
+			this.startTime = Double.valueOf(vals[1]);
+			this.endTime = Double.valueOf(vals[2]);
+			this.links = new ArrayList<Id>();
+			for (int i = 3; i < vals.length; i++) {
+				this.links.add(new IdImpl(vals[i]));
+			}
+		}
+
+		@Override
+		public String toString() {
+			String desc = tripId.toString() + delimiter;
+			desc = desc + String.valueOf(startTime) + delimiter + String.valueOf(endTime) + delimiter;
+			for (int i = 0; i < links.size() - 1; i++) {
+				desc = desc + links.get(i).toString() + delimiter;
+			}
+			desc = desc + links.get(links.size()-1);
+			return desc;
 		}
 	}
 }
