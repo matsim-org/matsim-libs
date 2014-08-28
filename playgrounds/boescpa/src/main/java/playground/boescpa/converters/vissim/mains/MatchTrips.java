@@ -47,16 +47,18 @@ public class MatchTrips {
 		String path2WriteDemands = args[2];
 		String path2InpRoutes = args[3];
 
-		// Read trips
-		HashMap<Id, Long[]> msTrips = MapRoutes.readRoutes(path2MsRoutes);
-		//HashMap<Id, Long[]> amTrips = MapRoutes.readRoutes(path2AmRoutes);
-		HashMap<Id, Long[]> inpTrips = MapRoutes.readRoutes(path2InpRoutes);
+		for (int i = 0; i < 31; i++) {
+			// Read trips
+			HashMap<Id, Long[]> msTrips = MapRoutes.readRoutes(ConvEvents.insertVersNumInFilepath(path2MsRoutes,i));
+			//HashMap<Id, Long[]> amTrips = MapRoutes.readRoutes(path2AmRoutes);
+			HashMap<Id, Long[]> inpTrips = MapRoutes.readRoutes(path2InpRoutes);
 
-		// Match trips
-		ConvEvents.TripMatcher tripMatcher = new TripMatcher();
-		HashMap<Id, Integer> results = tripMatcher.matchTrips(msTrips, inpTrips);
+			// Match trips
+			ConvEvents.TripMatcher tripMatcher = new TripMatcher();
+			HashMap<Id, Integer> results = tripMatcher.matchTrips(msTrips, inpTrips);
 
-		writeTripDemands(results, path2WriteDemands);
+			writeTripDemands(results, ConvEvents.insertVersNumInFilepath(path2WriteDemands,i));
+		}
 	}
 
 	private static void writeTripDemands(HashMap<Id, Integer> results, String path2WriteDemands) {
