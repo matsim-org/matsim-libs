@@ -22,6 +22,7 @@
 package playground.boescpa.converters.vissim.mains;
 
 import org.matsim.api.core.v01.Id;
+import playground.boescpa.converters.vissim.ConvEvents;
 import playground.boescpa.converters.vissim.ConvEvents2Inp;
 
 import java.util.HashMap;
@@ -38,9 +39,11 @@ public class ConvEventsInp {
 		String path2InpFile = args[1];
 		String path2NewInpFile = args[2];
 
-		HashMap<Id, Integer> tripDemands = MatchTrips.readTripDemands(path2DemandFile);
-		ConvEvents2Inp convEvents = new ConvEvents2Inp();
-		convEvents.writeRoutes(tripDemands, path2InpFile, path2NewInpFile);
+		for (int i = 0; i < 31; i++) {
+			HashMap<Id, Integer> tripDemands = MatchTrips.readTripDemands(ConvEvents.insertVersNumInFilepath(path2DemandFile,i));
+			ConvEvents2Inp convEvents = new ConvEvents2Inp();
+			convEvents.writeRoutes(tripDemands, path2InpFile, ConvEvents.insertVersNumInFilepath(path2NewInpFile,1));
+		}
 	}
 
 }
