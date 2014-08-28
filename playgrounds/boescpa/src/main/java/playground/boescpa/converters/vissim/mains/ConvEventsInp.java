@@ -42,7 +42,7 @@ public class ConvEventsInp {
 		for (int i = 0; i < 31; i++) {
 			HashMap<Id, Integer> tripDemands = MatchTrips.readTripDemands(ConvEvents.insertVersNumInFilepath(path2DemandFile,i));
 			ConvEvents2Inp convEvents = new ConvEvents2Inp();
-			convEvents.writeRoutes(tripDemands, path2InpFile, ConvEvents.insertVersNumInFilepath(path2NewInpFile,1));
+			convEvents.writeRoutes(tripDemands, path2InpFile, ConvEvents.insertVersNumInFilepath(path2NewInpFile,i));
 		}
 	}
 
