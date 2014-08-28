@@ -39,10 +39,15 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.*;
 
 /**
@@ -71,6 +76,7 @@ public class MsRouteConverter extends AbstractRouteConverter {
 		final Map<Id,Trip> currentTrips = new HashMap<Id,Trip>();
 		final GeographicEventAnalyzer geographicEventAnalyzer = new GeographicEventAnalyzer(path2MATSimNetwork, path2VissimZoneShp);
 		final EventsManager events = EventsUtils.createEventsManager();
+		final BufferedWriter out = IOUtils.getBufferedWriter(path2EventsFile + "_onlyTrips.txt");
 		events.addHandler(new RouteConverterEventHandler() {
 			@Override
 			public void handleEvent(LinkLeaveEvent event) {
@@ -90,7 +96,12 @@ public class MsRouteConverter extends AbstractRouteConverter {
 				Trip currentTrip = currentTrips.get(event.getPersonId());
 				if (currentTrip != null) {
 					if (event.getLegMode().matches("car")) {
-						trips.add(currentTrip);
+						try {
+							out.write(currentTrip.toString());
+							out.newLine();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
 					}
 					currentTrips.remove(event.getPersonId());
 				}
@@ -108,6 +119,18 @@ public class MsRouteConverter extends AbstractRouteConverter {
 		}
 		else {
 			throw new IllegalArgumentException("Given events-file not of known format.");
+		}
+		try {
+			out.close();
+			BufferedReader in = IOUtils.getBufferedReader(path2EventsFile + "_onlyTrips.txt");
+			String line = in.readLine();
+			while (line != null) {
+				trips.add(new Trip(line));
+				line = in.readLine();
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		return trips;
 	}
