@@ -54,7 +54,7 @@ import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarm
 public class SpatialAveragingDemandEmissions {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingDemandEmissions.class);
 
-	final double scalingFactor = 100.;
+	final double scalingFactor = 100.; //100
 	private final static String runNumber1 = "baseCase";
 	private final static String runDirectory1 = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_baseCase_ctd/";
 	private final static String runNumber2 = "zone30";
@@ -70,8 +70,11 @@ public class SpatialAveragingDemandEmissions {
 	private final static Integer lastIteration1 = getLastIteration(configFile1);
 	private static String configFile2 = runDirectory1 + "output_config.xml.gz";
 	private final static Integer lastIteration2 = getLastIteration(configFile2);
-	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
-	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + lastIteration2 + ".emission.events.xml.gz";	
+//	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
+	private final String emissionFile1 = "./input/warmEmissionEvent.xml";
+//	private final String emissionFile1 = "./input/1500.emission.events.xml";
+	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + lastIteration2 + ".emission.events.xml.gz";
+	
 
 //	final double scalingFactor = 100.;
 //	private final static String runNumber1 = "baseCase";
@@ -111,16 +114,16 @@ public class SpatialAveragingDemandEmissions {
 	final double xMax = 4479483.33;
 	final double yMin = 5324955.00;
 	final double yMax = 5345696.81;
-	final int noOfXbins = 160;
-	final int noOfYbins = 120;
+	final int noOfXbins = 16; //160
+	final int noOfYbins = 12; //120
 	
 	final int noOfTimeBins = 1;
 	
 	final double smoothingRadius_m = 500.;
 	
-	final String pollutant2analyze = WarmPollutant.NOX.toString();
-	final boolean compareToBaseCase = true;
-	final boolean useLineMethod = false;
+	final String pollutant2analyze = WarmPollutant.NO2.toString();
+	final boolean compareToBaseCase = false;
+	final boolean useLineMethod = true;
 	private boolean writeRoutput = true;
 	private boolean writeGisOutput = false;
 	
@@ -262,8 +265,8 @@ public class SpatialAveragingDemandEmissions {
 		this.time2CountsPerLink = warmHandler.getTime2linkIdLeaveCount();
 		this.time2CountsPerLinkFilledAndFiltered = setNonCalculatedCountsAndFilter(this.time2CountsPerLink);
 		//TODO 
-		this.warmHandler.reset(0);
-		this.coldHandler.reset(0);
+//		this.warmHandler.reset(0);
+//		this.coldHandler.reset(0);
 	}
 	
 	private void calculateWeightedEmissionsAndDemands(Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered1, 
@@ -344,6 +347,9 @@ public class SpatialAveragingDemandEmissions {
 				Coord toNodeCoord = this.network.getLinks().get(linkId).getToNode().getCoord();
 				
 				double value = time2EmissionsTotalFilledAndFiltered.get(endOfTimeInterval).get(linkId).get(this.pollutant2analyze);
+				if(value>0.0){
+					System.out.println("emission value --- " + value);
+				}
 				double scaledValue = this.scalingFactor * value;
 				
 				/* maybe calculate the following once and look it up here?
@@ -541,6 +547,10 @@ public class SpatialAveragingDemandEmissions {
 		emissionReader.parse(emissionFile);
 		
 		Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2WarmEmissionsTotal1 = this.warmHandler.getWarmEmissionsPerLinkAndTimeInterval();
+		System.out.println("number of links with warm emissions");
+		for(Double et: time2WarmEmissionsTotal1.keySet()){
+			System.out.println(time2WarmEmissionsTotal1.get(et).size());
+		}
 		Map<Double, Map<Id, Map<ColdPollutant, Double>>> time2ColdEmissionsTotal1 = this.coldHandler.getColdEmissionsPerLinkAndTimeInterval();
 		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal1 = sumUpEmissionsPerTimeInterval(time2WarmEmissionsTotal1, time2ColdEmissionsTotal1);
 		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled1 = setNonCalculatedEmissions(time2EmissionsTotal1);

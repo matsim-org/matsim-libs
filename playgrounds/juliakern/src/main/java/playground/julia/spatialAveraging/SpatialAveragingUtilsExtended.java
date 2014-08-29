@@ -76,7 +76,10 @@ public class SpatialAveragingUtilsExtended {
 			throw new RuntimeException("Error function is not defined for " + upperLimit + " or " + lowerLimit + "; Exception: " + e);
 		}
 		double  weight = constantC *(integrationUpperLimit-integrationLowerLimit);
-		
+		if(weight==0.0){
+			System.out.println("constant C " + constantC + " upper lim " +integrationUpperLimit + " lower lim " +integrationLowerLimit );
+			System.out.println(constantB + " upper lim " + upperLimit + " lower limit " + lowerLimit);
+		}
 		if(weight<0.0) {
 			logger.warn("Weight is negative, please check. Weight = "+weight);
 		}
