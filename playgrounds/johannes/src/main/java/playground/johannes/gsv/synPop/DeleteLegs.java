@@ -34,16 +34,16 @@ public class DeleteLegs implements ProxyPersonTask {
 	@Override
 	public void apply(ProxyPerson person) {
 		ProxyPlan plan = person.getPlan();
-		ProxyPlan newPlan = new ProxyPlan();
-		
-		newPlan.addActivity(plan.getActivities().get(0));
 		
 		for(int i = 0; i < plan.getLegs().size(); i++) {
 			ProxyObject leg = plan.getLegs().get(i);
 			
 			if(mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
-				newPlan.addLeg(leg);
-				newPlan.addActivity(plan.getActivities().get(i+1));
+				ProxyObject prevAct = plan.getActivities().get(i);
+				for(int k = i+1; k < plan.getActivities().size(); k++) {
+					ProxyObject nextAct = plan.getActivities().get(k);
+					
+				}
 			}
 		}
 

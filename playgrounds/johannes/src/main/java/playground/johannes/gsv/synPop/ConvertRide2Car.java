@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DummyDiscretizer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,49 +16,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.sna.math;
+
+package playground.johannes.gsv.synPop;
+
+import org.matsim.api.core.v01.TransportMode;
 
 /**
- * A dummy discretizer that does no descretization at all.
- * 
- * @author jillenberger
- * 
+ * @author johannes
+ *
  */
-public class DummyDiscretizer implements Discretizer {
+public class ConvertRide2Car implements ProxyPlanTask {
 
-	private static DummyDiscretizer instance;
-	
-	public static DummyDiscretizer getInstance() {
-		if(instance == null)
-			instance = new DummyDiscretizer();
-		
-		return instance;
-	}
-	
-	/**
-	 * @throws {@link UnsupportedOperationException}
-	 */
 	@Override
-	public double binWidth(double value) {
-		throw new UnsupportedOperationException(
-				"It is no obvious what to return here. Probably you want to use a linear discretizer with bin width 1.0");
-	}
+	public void apply(ProxyPlan plan) {
+		for(ProxyObject leg : plan.getLegs()) {
+			if(TransportMode.ride.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
+				leg.setAttribute(CommonKeys.LEG_MODE, TransportMode.car);
+			}
+		}
 
-	/**
-	 * @return <tt>value</tt>
-	 */
-	@Override
-	public double discretize(double value) {
-		return value;
-	}
-
-	/**
-	 * @throws {@link UnsupportedOperationException}
-	 */
-	@Override
-	public double index(double value) {
-		throw new UnsupportedOperationException(
-				"It is no obvious what to return here. Probably you want to use a linear discretizer with bin width 1.0");
 	}
 
 }

@@ -141,6 +141,8 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan> {
 		}
 		
 		ProgressLogger.termiante();
+		
+		
 	}
 
 	private final synchronized TripRouter pollTripRoute() {
@@ -158,6 +160,10 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan> {
 	private final void releaseTripRouter(TripRouter router) {
 //		System.out.println("Releasing trip router...");
 		routers.add(router);
+	}
+	
+	protected void finalize() {
+		executor.shutdown();
 	}
 	
 	private class Task implements Runnable {

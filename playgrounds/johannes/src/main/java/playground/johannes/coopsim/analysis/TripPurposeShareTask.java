@@ -39,6 +39,11 @@ import playground.johannes.sna.util.TXTWriter;
  */
 public class TripPurposeShareTask extends TrajectoryAnalyzerTask {
 
+	private boolean ignoreSameFacility = false;
+	
+	public void setIgnoreSameFacility(boolean ignore) {
+		this.ignoreSameFacility = ignore;
+	}
 	/* (non-Javadoc)
 	 * @see playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask#analyze(java.util.Set, java.util.Map)
 	 */
@@ -50,8 +55,14 @@ public class TripPurposeShareTask extends TrajectoryAnalyzerTask {
 			for(int i = 1; i < t.getElements().size(); i += 2) {
 				Activity prev = (Activity) t.getElements().get(i - 1);
 				Activity next = (Activity) t.getElements().get(i + 1);
-				
-				if(!prev.getFacilityId().equals(next.getFacilityId())) {
+	
+				boolean ignore = false;
+				if(ignoreSameFacility) {
+					if(prev.getFacilityId().equals(next.getFacilityId())) {
+						ignore = true;
+					}
+				}
+				if(!ignore) {
 					hist.adjustOrPutValue(next.getType(), 1, 1);
 				}
 			}

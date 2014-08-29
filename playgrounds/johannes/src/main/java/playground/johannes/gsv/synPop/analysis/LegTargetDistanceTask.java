@@ -35,35 +35,43 @@ import playground.johannes.gsv.synPop.ProxyPlan;
 
 /**
  * @author johannes
- *
+ * 
  */
 public class LegTargetDistanceTask extends AnalyzerTask {
-	
-	private static final Logger logger = Logger.getLogger(LegTargetDistanceTask.class);
-	
-	public static final String KEY = "d.target";
 
-	private DescriptiveStatistics statistics(Collection<ProxyPerson> persons, String purpose) {
+	private static final Logger logger = Logger.getLogger(LegTargetDistanceTask.class);
+
+	public static final String KEY = "d.target";
+	
+	private final String modeFilter;
+	
+	public LegTargetDistanceTask(String mode) {
+		this.modeFilter = mode;
+	}
+
+	private DescriptiveStatistics statistics(Collection<ProxyPerson> persons, String purpose, String mode) {
 		DescriptiveStatistics stats = new DescriptiveStatistics();
-		
+
 		int cntNoVal = 0;
-		
-		for(ProxyPerson person : persons) {
+
+		for (ProxyPerson person : persons) {
 			ProxyPlan plan = person.getPlan();
-			for(ProxyObject leg : plan.getLegs()) {
-				if(purpose == null || ((String)leg.getAttribute(CommonKeys.LEG_PURPOSE)).equalsIgnoreCase(purpose)) {
-					String distStr = leg.getAttribute(CommonKeys.LEG_DISTANCE);
-					if(distStr != null) {
-						double d = Double.parseDouble(distStr);
-						stats.addValue(d);
-					} else {
-						cntNoVal++;
+			for (ProxyObject leg : plan.getLegs()) {
+				if (mode == null || mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
+					if (purpose == null || ((String) leg.getAttribute(CommonKeys.LEG_PURPOSE)).equalsIgnoreCase(purpose)) {
+						String distStr = leg.getAttribute(CommonKeys.LEG_DISTANCE);
+						if (distStr != null) {
+							double d = Double.parseDouble(distStr);
+							stats.addValue(d);
+						} else {
+							cntNoVal++;
+						}
 					}
 				}
 			}
 		}
-		
-		if(cntNoVal > 0) {
+
+		if (cntNoVal > 0) {
 			logger.warn(String.format("No value specified for %s trips of purpose %s.", cntNoVal, purpose));
 		}
 		return stats;
@@ -72,32 +80,32 @@ public class LegTargetDistanceTask extends AnalyzerTask {
 	@Override
 	public void analyze(Collection<ProxyPerson> persons, Map<String, DescriptiveStatistics> results) {
 		Set<String> purposes = new HashSet<String>();
-		for(ProxyPerson person : persons) {
+		for (ProxyPerson person : persons) {
 			ProxyPlan plan = person.getPlan();
-			for(int i = 0; i < plan.getActivities().size(); i++) {
+			for (int i = 0; i < plan.getActivities().size(); i++) {
 				purposes.add((String) plan.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE));
 			}
 		}
 
 		purposes.add(null);
-		
-		for(String purpose : purposes) {
-			DescriptiveStatistics stats = statistics(persons, purpose);
-			
-			if(purpose == null)
+
+		for (String purpose : purposes) {
+			DescriptiveStatistics stats = statistics(persons, purpose, modeFilter);
+
+			if (purpose == null)
 				purpose = "all";
-			
+
 			String key = String.format("%s.%s", KEY, purpose);
 			results.put(key, stats);
-			
-			if(outputDirectoryNotNull()) {
+
+			if (outputDirectoryNotNull()) {
 				try {
-					writeHistograms(stats, key, 100, 100);
+					writeHistograms(stats, key, 2000, 50);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-			
+
 		}
 	}
 }

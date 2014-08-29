@@ -106,6 +106,8 @@ public class InitRoutes {
 			}
 		}
 		
+		executor.shutdown();
+		
 		PopulationWriter writer = new PopulationWriter(pop);
 		writer.write(args[2]);
 		

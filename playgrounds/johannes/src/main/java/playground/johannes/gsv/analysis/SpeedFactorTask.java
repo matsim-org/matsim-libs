@@ -33,6 +33,8 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 
+import playground.johannes.coopsim.analysis.DefaultCondition;
+import playground.johannes.coopsim.analysis.LegModeCondition;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TripDistanceMean;
 import playground.johannes.coopsim.analysis.TripDuration;
@@ -65,9 +67,19 @@ public class SpeedFactorTask extends TrajectoryAnalyzerTask {
 		
 		modes.add(null);
 		
+		TripDistanceMean dist = new TripDistanceMean(facilities);
+		TripDuration durs = new TripDuration();
 		for(String mode : modes) {
-			TObjectDoubleHashMap<Trajectory> distances = new TripDistanceMean(mode, facilities, true).values(trajectories);
-			TObjectDoubleHashMap<Trajectory> durations = new TripDuration(mode, true).values(trajectories);
+			if(mode == null) {
+				dist.setCondition(DefaultCondition.getInstance());
+				durs.setCondition(DefaultCondition.getInstance());
+			} else {
+				LegModeCondition condition = new LegModeCondition(mode);
+				dist.setCondition(condition);
+				durs.setCondition(condition);
+			}
+			TObjectDoubleHashMap<Trajectory> distances = dist.values(trajectories);
+			TObjectDoubleHashMap<Trajectory> durations = durs.values(trajectories);
 			
 			TDoubleArrayList distArray = new TDoubleArrayList(distances.size());
 			TDoubleArrayList durArray = new TDoubleArrayList(durations.size());

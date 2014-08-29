@@ -19,69 +19,43 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ConvertRide2Car;
-import playground.johannes.gsv.synPop.DeleteDay;
-import playground.johannes.gsv.synPop.DeleteModes;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPersonTaskComposite;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.gsv.synPop.mid.PersonCloner;
+import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 /**
  * @author johannes
  *
  */
-public class PersonFilter {
+public class ClonePopulation {
 
-	private static final Logger logger = Logger.getLogger(PersonFilter.class);
-	
-	static public Set<ProxyPerson> filter(Collection<ProxyPerson> persons) {
-		Set<ProxyPerson> subset = new HashSet<ProxyPerson>(persons.size());
-		for(ProxyPerson person : persons) {
-			if(!"true".equalsIgnoreCase(person.getAttribute(CommonKeys.DELETE))) {
-				subset.add(person);
-			}
-		}
-		
-		return subset;
-	}
-	
-	public static void main(String args[]) {
+	public static final Logger logger = Logger.getLogger(ClonePopulation.class);
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
+	
+		logger.info("Loading persons...");
+		parser.parse("/home/johannes/gsv/mid2008/pop/pop.xml");
+		Set<ProxyPerson> persons = parser.getPersons();
+		logger.info(String.format("Loaded %s persons.", persons.size()));
 		
-		parser.parse("/home/johannes/gsv/mid2008/pop/pop.200K.xml");
-		logger.info(String.format("Loaded %s persons.", parser.getPersons().size()));
+		logger.info("Cloning persons...");
+		Random random = new XORShiftRandom();
+		persons = PersonCloner.weightedClones(persons, 200000, random);
+		logger.info(String.format("Generated %s persons.", persons.size()));
 
-		logger.info("Converting ride legs to car legs.");
-		ProxyTaskRunner.run(new ConvertRide2Car(), parser.getPersons());
-		
-		ProxyPersonTaskComposite tasks = new ProxyPersonTaskComposite();
-//		tasks.addComponent(new DeleteNoLegs());
-		tasks.addComponent(new DeleteModes("car"));
-		
-		DeleteDay deleteDay = new DeleteDay();
-		deleteDay.setWeekdays();
-		tasks.addComponent(deleteDay);
-		
-		logger.info("Running filter...");
-		for(ProxyPerson person : parser.getPersons()) {
-			tasks.apply(person);
-		}
-		
-		Set<ProxyPerson> subset = PersonFilter.filter(parser.getPersons());
-		logger.info(String.format("New population: %s persons.", subset.size()));
-		
-		logger.info("Writing population...");
 		XMLWriter writer = new XMLWriter();
-		writer.write("/home/johannes/gsv/mid2008/pop/pop.car.wkday.200K.xml", subset);
-		logger.info("Done.");
+		writer.write("/home/johannes/gsv/mid2008/pop/pop.200K.xml", persons);
 	}
+
 }

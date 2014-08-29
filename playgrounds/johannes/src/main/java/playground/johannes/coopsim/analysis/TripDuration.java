@@ -23,7 +23,6 @@ import gnu.trove.TObjectDoubleHashMap;
 
 import java.util.Set;
 
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 
 import playground.johannes.coopsim.pysical.Trajectory;
@@ -34,18 +33,18 @@ import playground.johannes.coopsim.pysical.Trajectory;
  */
 public class TripDuration extends AbstractTrajectoryProperty {
 
-	private final String whitelist;
+	private PlanElementCondition<Leg> condition;
 	
-	private final boolean useMode;
-	
-	public TripDuration(String purpose) {
-		this.whitelist = purpose;
-		useMode = false;
+	public TripDuration() {
+		condition = DefaultCondition.getInstance();
 	}
 	
-	public TripDuration(String whitelist, boolean useMode) {
-		this.whitelist = whitelist;
-		this.useMode = useMode;
+	public TripDuration(PlanElementCondition<Leg> condition) {
+		setCondition(condition);
+	}
+	
+	public void setCondition(PlanElementCondition<Leg> condition) {
+		this.condition = condition;
 	}
 	
 	@Override
@@ -56,21 +55,9 @@ public class TripDuration extends AbstractTrajectoryProperty {
 			double dur_sum = 0;
 			double cnt = 0;
 			for(int i = 1; i < trajectory.getElements().size() - 1; i += 2) {
-				Activity act = (Activity)trajectory.getElements().get(i+1);
-				
-				boolean match = false;
-				if (useMode) {
-					Leg leg = (Leg) trajectory.getElements().get(i);
-					if (whitelist == null || leg.getMode().equalsIgnoreCase(whitelist)) {
-						match = true;
-					}
-				} else {
-					if (whitelist == null || act.getType().equals(whitelist)) {
-						match = true;
-					}
-				}
-				
-				if(match) {
+//				Activity act = (Activity)trajectory.getElements().get(i+1);
+				Leg leg = (Leg) trajectory.getElements().get(i);
+				if(condition.test(trajectory, leg, i)) {
 					double dur = trajectory.getTransitions().get(i + 1) - trajectory.getTransitions().get(i);
 					dur_sum += dur;
 					cnt++;

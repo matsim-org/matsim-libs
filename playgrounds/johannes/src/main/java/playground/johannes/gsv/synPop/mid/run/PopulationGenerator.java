@@ -66,9 +66,9 @@ public class PopulationGenerator {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String personFile = "/home/johannes/gsv/mid2008/MiD2008_PUF_Personen.txt";
-		String legFile = "/home/johannes/gsv/mid2008/MiD2008_PUF_Wege.txt";
-		String outFile = "/home/johannes/gsv/mid2008/pop.xml";
+		String personFile = "/home/johannes/gsv/mid2008/raw/MiD2008_PUF_Personen.txt";
+		String legFile = "/home/johannes/gsv/mid2008/raw/MiD2008_PUF_Wege.txt";
+		String outFile = "/home/johannes/gsv/mid2008/pop/pop.xml";
 		/*
 		 * setup text parser
 		 */

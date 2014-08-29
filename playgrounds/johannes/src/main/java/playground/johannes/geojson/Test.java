@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DummyDiscretizer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,49 +16,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.sna.math;
+
+package playground.johannes.geojson;
+
+import org.geotools.geometry.jts.JTSFactoryFinder;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 
 /**
- * A dummy discretizer that does no descretization at all.
- * 
- * @author jillenberger
- * 
+ * @author johannes
+ *
  */
-public class DummyDiscretizer implements Discretizer {
+public class Test {
 
-	private static DummyDiscretizer instance;
-	
-	public static DummyDiscretizer getInstance() {
-		if(instance == null)
-			instance = new DummyDiscretizer();
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		GeometryFactory factory = JTSFactoryFinder.getGeometryFactory(null);
 		
-		return instance;
-	}
-	
-	/**
-	 * @throws {@link UnsupportedOperationException}
-	 */
-	@Override
-	public double binWidth(double value) {
-		throw new UnsupportedOperationException(
-				"It is no obvious what to return here. Probably you want to use a linear discretizer with bin width 1.0");
-	}
+		Point p = factory.createPoint(new Coordinate(0, 0));
+		
+		String str = new GeoJson().toJson(p);
+		
+		System.out.println(str);
 
-	/**
-	 * @return <tt>value</tt>
-	 */
-	@Override
-	public double discretize(double value) {
-		return value;
-	}
-
-	/**
-	 * @throws {@link UnsupportedOperationException}
-	 */
-	@Override
-	public double index(double value) {
-		throw new UnsupportedOperationException(
-				"It is no obvious what to return here. Probably you want to use a linear discretizer with bin width 1.0");
 	}
 
 }

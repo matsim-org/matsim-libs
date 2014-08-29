@@ -22,12 +22,14 @@ package playground.johannes.coopsim.analysis;
 import gnu.trove.TDoubleDoubleHashMap;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.sna.util.TXTWriter;
@@ -37,47 +39,50 @@ import playground.johannes.sna.util.TXTWriter;
  *
  */
 public class LegLoadTask extends TrajectoryAnalyzerTask {
+	
+	private static final Logger logger = Logger.getLogger(LegLoadTask.class);
+	
 
 	private final double resolution = 60;
 	
+	private boolean ignoreSameFacility = false;
+	
+	public void setIgnoreSameFacilite(boolean flag) {
+		this.ignoreSameFacility = flag;
+	}
+	
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
-		Set<String> purposes = new HashSet<String>();
-		for(Trajectory t : trajectories) {
-			for(int i = 0; i < t.getElements().size(); i += 2) {
-				purposes.add(((Activity)t.getElements().get(i)).getType());
-			}
-		}
+		Map<String, ? extends PlanElementCondition<Leg>> conditions = Conditions.getLegConditions(trajectories);
 		
-		for(String purpose : purposes) {
-			TDoubleDoubleHashMap load = legLoad(trajectories, purpose);
+		for(Entry<String, ? extends PlanElementCondition<Leg>> entry : conditions.entrySet()) {
+			TDoubleDoubleHashMap load = legLoad(trajectories, entry.getValue());
 			try {
-				TXTWriter.writeMap(load, "t", "freq", String.format("%1$s/legload.%2$s.txt", getOutputDirectory(), purpose));
+				TXTWriter.writeMap(load, "t", "freq", String.format("%1$s/legload.%2$s.txt", getOutputDirectory(), entry.getKey()));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-
-		TDoubleDoubleHashMap load = legLoad(trajectories, null);
-		try {
-			TXTWriter.writeMap(load, "t", "freq", String.format("%1$s/legload.all.txt", getOutputDirectory()));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		
 	}
 
-	private TDoubleDoubleHashMap legLoad(Set<Trajectory> trajectories, String type) {
+	private TDoubleDoubleHashMap legLoad(Set<Trajectory> trajectories, PlanElementCondition<Leg> condition) {
 		TDoubleDoubleHashMap loadMap = new TDoubleDoubleHashMap();
 		int cnt = 0;
-		for(Trajectory trajectory : trajectories) {
-			for(int i = 1; i < trajectory.getElements().size() - 1; i += 2) {
+		for (Trajectory trajectory : trajectories) {
+			for (int i = 1; i < trajectory.getElements().size() - 1; i += 2) {
 				Activity prev = (Activity) trajectory.getElements().get(i - 1);
 				Activity next = (Activity) trajectory.getElements().get(i + 1);
-				if(type == null || next.getType().equals(type)) {
-//					Leg leg = (Leg) trajectory.getElements().get(i);
-//					if (!leg.getMode().equals("car")) {
-					
-					if(!prev.getFacilityId().equals(next.getFacilityId())) {
+//				if (type == null || next.getType().equals(type)) {
+				if(condition.test(trajectory, (Leg) trajectory.getElements().get(i), i)) {
+					boolean ignore = false;
+
+					if (ignoreSameFacility) {
+						if (prev.getFacilityId().equals(next.getFacilityId())) {
+							ignore = true;
+						}
+					}
+					if (!ignore) {
 						int start = (int) (trajectory.getTransitions().get(i) / resolution);
 						int end = (int) (trajectory.getTransitions().get(i + 1) / resolution);
 						for (int time = start; time < end; time++) {
@@ -86,12 +91,15 @@ public class LegLoadTask extends TrajectoryAnalyzerTask {
 					} else {
 						cnt++;
 					}
-//					}
+
 				}
 			}
 		}
 		
-		System.err.println(cnt + " trips between same facilities.");
+		if(cnt > 0) {
+			logger.warn(String.format("%s trips between same facilities.", cnt));
+		}
+		
 		return loadMap;
 	}
 }

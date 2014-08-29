@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TripDurationTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,44 +16,66 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package playground.johannes.coopsim.analysis;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Leg;
 
 import playground.johannes.coopsim.pysical.Trajectory;
+import playground.johannes.sna.math.DummyDiscretizer;
 
 /**
- * @author illenberger
- *
+ * @author johannes
+ * 
  */
-public class TripDurationTask extends TrajectoryAnalyzerTask {
+public class LegFrequencyTask extends TrajectoryAnalyzerTask {
+	
+	public static final String KEY = "leg.n";
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask#analyze(java.util.Set, java.util.Map)
-	 */
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
-		Map<String, PlanElementConditionComposite<Leg>> conditions = Conditions.getLegConditions(trajectories);
+		Set<String> modes = TrajectoryUtils.getModes(trajectories);
+		modes.add(null);
 		
-		TripDuration duration = new TripDuration();
-		for(Entry<String, PlanElementConditionComposite<Leg>> entry : conditions.entrySet()) {
-			duration.setCondition(entry.getValue());
-			DescriptiveStatistics stats = duration.statistics(trajectories, true);
+		for (String mode : modes) {
+			PlanElementCondition<Leg> condition;
+			if (mode != null) {
+				condition = new LegModeCondition(mode);
+			} else {
+				condition = DefaultCondition.getInstance();
+			}
+
+			DescriptiveStatistics stats = new DescriptiveStatistics();
+			for (Trajectory t : trajectories) {
+				int cnt = 0;
+				for (int i = 1; i < t.getElements().size(); i += 2) {
+					if(condition.test(t, (Leg) t.getElements().get(i), i)) {
+						cnt++;
+					}
+				}
+				stats.addValue(cnt);
+			}
 			
-			String key = "t.trip." + entry.getKey();
+			String key;
+			if(mode == null)
+				 key = String.format("%s.all", KEY, mode);
+			else
+				 key = String.format("%s.%s", KEY, mode);
+			
 			results.put(key, stats);
 			
-			try {
-//				writeHistograms(stats, new LinearDiscretizer(60.0), key, false);
-				writeHistograms(stats, key, 100, 50);
-			} catch (IOException e) {
-				e.printStackTrace();
+			if(outputDirectoryNotNull()) {
+				try {
+					writeHistograms(stats, DummyDiscretizer.getInstance(), key, false);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 

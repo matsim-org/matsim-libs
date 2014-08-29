@@ -14,7 +14,7 @@ public class LegModeCondition implements PlanElementCondition<Leg> {
 	
 	@Override
 	public boolean test(Trajectory t, Leg element, int idx) {
-		return element.getMode().equalsIgnoreCase(mode);
+		return mode.equalsIgnoreCase(element.getMode());
 	}
 
 }

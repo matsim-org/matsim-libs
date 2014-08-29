@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TripDurationTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,47 +16,58 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package playground.johannes.coopsim.analysis;
 
-import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Leg;
 
 import playground.johannes.coopsim.pysical.Trajectory;
 
 /**
- * @author illenberger
+ * @author johannes
  *
  */
-public class TripDurationTask extends TrajectoryAnalyzerTask {
+public class Conditions {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask#analyze(java.util.Set, java.util.Map)
-	 */
-	@Override
-	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
-		Map<String, PlanElementConditionComposite<Leg>> conditions = Conditions.getLegConditions(trajectories);
+	public static Map<String, PlanElementConditionComposite<Leg>> getLegConditions(Collection<Trajectory> trajectories) {
+		Set<String> modes = TrajectoryUtils.getModes(trajectories);
+		Set<String> purposes = TrajectoryUtils.getTypes(trajectories);
 		
-		TripDuration duration = new TripDuration();
-		for(Entry<String, PlanElementConditionComposite<Leg>> entry : conditions.entrySet()) {
-			duration.setCondition(entry.getValue());
-			DescriptiveStatistics stats = duration.statistics(trajectories, true);
-			
-			String key = "t.trip." + entry.getKey();
-			results.put(key, stats);
-			
-			try {
-//				writeHistograms(stats, new LinearDiscretizer(60.0), key, false);
-				writeHistograms(stats, key, 100, 50);
-			} catch (IOException e) {
-				e.printStackTrace();
+		modes.add(null);
+		purposes.add(null);
+		
+		Map<String, PlanElementConditionComposite<Leg>> conditions = new HashMap<String, PlanElementConditionComposite<Leg>>();
+		
+		for(String mode : modes) {
+			for(String purpose : purposes) {
+				PlanElementConditionComposite<Leg> composite = new PlanElementConditionComposite<Leg>();
+				if(mode == null)
+					composite.addComponent(DefaultCondition.getInstance());
+				else
+					composite.addComponent(new LegModeCondition(mode));
+				
+				if(purpose == null)
+					composite.addComponent(DefaultCondition.getInstance());
+				else
+					composite.addComponent(new LegPurposeCondition(purpose));
+				
+				String modeStr = mode;
+				if(modeStr == null)
+					modeStr = "all";
+				
+				String purposeStr = purpose;
+				if(purposeStr == null)
+					purposeStr = "all";
+				
+				conditions.put(String.format("%s.%s", modeStr, purposeStr), composite);
 			}
 		}
-
+		
+		return conditions;
 	}
-
 }

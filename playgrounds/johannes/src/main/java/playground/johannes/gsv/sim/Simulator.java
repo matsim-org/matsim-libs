@@ -62,13 +62,21 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
+import playground.johannes.coopsim.analysis.ActivityDurationTask;
+import playground.johannes.coopsim.analysis.ActivityLoadTask;
+import playground.johannes.coopsim.analysis.ArrivalLoadTask;
 import playground.johannes.coopsim.analysis.ArrivalTimeTask;
 import playground.johannes.coopsim.analysis.DepartureLoadTask;
+import playground.johannes.coopsim.analysis.LegFrequencyTask;
+import playground.johannes.coopsim.analysis.LegLoadTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.analysis.TripDistanceTask;
+import playground.johannes.coopsim.analysis.TripDurationTask;
+import playground.johannes.coopsim.analysis.TripPurposeShareTask;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
+import playground.johannes.gsv.analysis.ModeShareTask;
 import playground.johannes.gsv.analysis.PkmTask;
 import playground.johannes.gsv.analysis.ScoreTask;
 import playground.johannes.gsv.analysis.SpeedFactorTask;
@@ -88,7 +96,7 @@ public class Simulator {
 		Controler controler = new Controler(args);
 		controler.setOverwriteFiles(true);
 		controler.setDumpDataAtEnd(false);
-//		controler.setMobsimFactory(new MobsimConnectorFactory());
+		controler.setMobsimFactory(new MobsimConnectorFactory());
 		controler.addControlerListener(new ControllerSetup());
 		/*
 		 * setup mutation module
@@ -134,7 +142,8 @@ public class Simulator {
 			NetworkImpl network = (NetworkImpl) controler.getNetwork();
 			for(ActivityFacility facility : controler.getScenario().getActivityFacilities().getFacilities().values()) {
 				Coord coord = facility.getCoord();
-				Link link = network.getNearestLinkExactly(coord);
+//				Link link = network.getNearestLinkExactly(coord);
+				Link link = network.getNearestLink(coord);
 				((ActivityFacilityImpl)facility).setLinkId(link.getId());
 			}
 			/*
@@ -154,16 +163,27 @@ public class Simulator {
 			/*
 			 * setup analysis modules
 			 */
-			DTVAnalyzer dtv = new DTVAnalyzer(controler.getNetwork(), controler, controler.getEvents(), config.findParam("gsv", "countsfile"));
+			LinkOccupancyCalculator calculator = new LinkOccupancyCalculator(controler.getPopulation());
+			controler.getEvents().addHandler(calculator);
+			String countsFile = config.findParam("gsv", "countsfile");
+			double factor = Double.parseDouble(config.findParam("counts", "countsScaleFactor"));
+			DTVAnalyzer dtv = new DTVAnalyzer(controler.getNetwork(), controler, controler.getEvents(), countsFile, calculator, factor);
 			controler.addControlerListener(dtv);
 			
 			TrajectoryAnalyzerTaskComposite task = new TrajectoryAnalyzerTaskComposite();
 			task.addTask(new TripDistanceTask(controler.getFacilities()));
 			task.addTask(new SpeedFactorTask(controler.getFacilities()));
 			task.addTask(new ScoreTask());
-			task.addTask(new ArrivalTimeTask());
+			task.addTask(new ArrivalLoadTask());
 			task.addTask(new DepartureLoadTask());
 			task.addTask(new PkmTask(controler.getFacilities()));
+//			task.addTask(new ModeShareTask());
+			task.addTask(new ActivityDurationTask());
+			task.addTask(new ActivityLoadTask());
+			task.addTask(new LegLoadTask());
+			task.addTask(new TripDurationTask());
+			task.addTask(new TripPurposeShareTask());
+//			task.addTask(new LegFrequencyTask());
 			
 			AnalyzerListiner listener = new AnalyzerListiner();
 			listener.task = task;

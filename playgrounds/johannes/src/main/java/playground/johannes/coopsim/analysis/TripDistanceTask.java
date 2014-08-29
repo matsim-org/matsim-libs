@@ -20,84 +20,78 @@
 package playground.johannes.coopsim.analysis;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 
 import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
 
-
 /**
  * @author illenberger
- *
+ * 
  */
 public class TripDistanceTask extends TrajectoryAnalyzerTask {
 
 	private final ActivityFacilities facilities;
-	
+
 	private final DistanceCalculator calculator;
-	
+
 	public TripDistanceTask(ActivityFacilities facilities) {
 		this.facilities = facilities;
 		calculator = OrthodromicDistanceCalculator.getInstance();
 	}
-	
+
 	public TripDistanceTask(ActivityFacilities facilities, DistanceCalculator calculator) {
 		this.facilities = facilities;
 		this.calculator = calculator;
 	}
-	
+
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
-		Set<String> purposes = TrajectoryUtils.getTypes(trajectories);
-		purposes.add(null);
-		
+		Map<String, PlanElementConditionComposite<Leg>> map = Conditions.getLegConditions(trajectories);
+//		Set<String> purposes = TrajectoryUtils.getTypes(trajectories);
+//		purposes.add(null);
+//
+//		Set<String> modes = TrajectoryUtils.getModes(trajectories);
+//		modes.add(null);
+//
 		TripDistanceMean tripDistance = new TripDistanceMean(facilities, calculator);
-		for(String purpose : purposes) {
-			if(purpose != null) {
-				tripDistance.setCondition(new LegPurposeCondition(purpose));
-			}
-			DescriptiveStatistics stats = tripDistance.statistics(trajectories, true);
-			
-			if(purpose == null)
-				purpose = "all";
-			String key = "d_trip_" + purpose;
-			results.put(key, stats);
-			try {
-				writeHistograms(stats, key, 50, 50);
-//				writeHistograms(stats, new LinearDiscretizer(250), key, false);
-//				double[] values = stats.getValues();
-//				LinearDiscretizer lin = new LinearDiscretizer(250.0);
-//				DescriptiveStatistics linStats = new DescriptiveStatistics();
-//				for(double d : values)
-//					linStats.addValue(lin.discretize(d));
-//				
-////				TrajectoryAnalyzerTask.overwriteStratification(50, 1);
-//				writeHistograms(linStats, key + ".lin", 50, 50);
-//				TrajectoryAnalyzerTask.overwriteStratification(30, 1);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		Set<String> modes = TrajectoryUtils.getModes(trajectories);
-		for(String mode : modes) {
-			tripDistance.setCondition(new LegModeCondition(mode));
-			DescriptiveStatistics stats = tripDistance.statistics(trajectories, true);
-			String key = "d_trip_" + mode;
-			results.put(key, stats);
-			try {
-				writeHistograms(stats, key, 50, 50);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+//		for (String mode : modes) {
+//			PlanElementConditionComposite<Leg> condition = new PlanElementConditionComposite<Leg>();
+//			if (mode == null) {
+//				condition.addComponent(DefaultCondition.getInstance());
+//			} else {
+//				condition.addComponent(new LegModeCondition(mode));
+//			}
+//			for (String purpose : purposes) {
+//				if (purpose != null) {
+//					condition.addComponent(new LegPurposeCondition(purpose));
+//				}
+		for(Entry<String, PlanElementConditionComposite<Leg>> entry : map.entrySet()) {
+				tripDistance.setCondition(entry.getValue());
+				DescriptiveStatistics stats = tripDistance.statistics(trajectories, true);
+
+//				if(mode == null) {
+//					mode = "all";
+//				}
+//				if (purpose == null)
+//					purpose = "all";
+//				String key = String.format("d.trip.%s.%s", mode, purpose);
+				String key = String.format("d.trip.%s", entry.getKey());
+				results.put(key, stats);
+				try {
+					writeHistograms(stats, key, 100, 50);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+//			}
+
 		}
 	}
 
