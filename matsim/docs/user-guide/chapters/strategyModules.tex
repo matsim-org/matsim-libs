@@ -1,11 +1,19 @@
 \NextFile{StrategyModules.html}
 \chapter{Strategy Modules}
 
+\bigskip
+
+\begin{chapter-intro}
+Strategies describe how agent plans' are modified and are thus an important
+part of MATSim's evolutionary optimization algorithm. 
+\end{chapter-intro}
+
+
 \section{Introduction}
 \label{sec:introduction}
 
 
-These are modules that can be used via the syntax
+Strategy Modules can be configured in the configuration file via the following syntax:
 \begin{lstlisting}{language=XML}
 <module name="strategy" >
     <param name="ModuleProbability_1" value="0.1" />
@@ -15,8 +23,9 @@ These are modules that can be used via the syntax
 </module>
 \end{lstlisting}
 
-
-Strategy modules are numbered. Also, each  module is given a weight which determines the probability by which the  course of action represented by the module is taken. In this example,  each person stands a chance of 1/2 that their transport mode is changed,  and a chance of 1/2 that their time allocation is changed. (The  weights are renormalized so that they add up to one.)
+In the configuration file, strategy modules are numbered. Also, each module is given a weight 
+which determines the probability by which the course of action represented by the module is taken. 
+In this example, each person stands a chance of 1/2 that their transport mode is changed,  and a chance of 1/2 that their time allocation is changed. (The  weights are renormalized so that they add up to one.)
 
 A strategy module is, in the code, always a combination of a plan  selector and zero or more strategy module elements. There are two cases,  which are handled differently:
 \begin{itemize}
