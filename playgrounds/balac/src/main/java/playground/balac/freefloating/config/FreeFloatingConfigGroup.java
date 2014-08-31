@@ -39,6 +39,12 @@ public class FreeFloatingConfigGroup extends ReflectiveModule {
 	private boolean useFeeFreeFloating = false;
 	
 	private String statsFileName = null;
+	
+	private String specialTimeStart = null; //in seconds
+	
+	private String specialTimeEnd = null;  //in seconds
+	
+	private String specialTimeFee = null;
 
 	
 	public FreeFloatingConfigGroup() {
@@ -113,6 +119,36 @@ public class FreeFloatingConfigGroup extends ReflectiveModule {
 	@StringSetter( "useFreeFloating" )
 	public void setUseFeeFreeFloating(final boolean useFeeFreeFloating) {
 		this.useFeeFreeFloating = useFeeFreeFloating;
+	}
+	
+	@StringGetter( "specialTimeStart" )
+	public String specialTimeStart() {
+		return this.specialTimeStart;
+	}
+
+	@StringSetter( "specialTimeStart" )
+	public void setSpecialTimeStart(final String specialTimeStart) {
+		this.specialTimeStart = specialTimeStart;
+	}
+	
+	@StringGetter( "specialTimeEnd" )
+	public String specialTimeEnd() {
+		return this.specialTimeEnd;
+	}
+
+	@StringSetter( "specialTimeEnd" )
+	public void setSpecialTimeEnd(final String specialTimeEnd) {
+		this.specialTimeEnd = specialTimeEnd;
+	}
+	
+	@StringGetter( "specialTimeFee" )
+	public String specialTimeFee() {
+		return this.specialTimeFee;
+	}
+
+	@StringSetter( "specialTimeFee" )
+	public void setSpecialTimeFee(final String specialTimeFee) {
+		this.specialTimeFee = specialTimeFee;
 	}
 	
 }

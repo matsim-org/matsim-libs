@@ -14,7 +14,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 
-public class AllModesLegScoringFunction extends org.matsim.core.scoring.functions.CharyparNagelLegScoring {
+public class CarsharingWithTaxiLegScoringFunction extends org.matsim.core.scoring.functions.CharyparNagelLegScoring {
 
 	private PlanImpl plan;
 	
@@ -31,7 +31,7 @@ public class AllModesLegScoringFunction extends org.matsim.core.scoring.function
 	private double distancetw = 0.0;
 	
 	
-	public AllModesLegScoringFunction(PlanImpl plan, CharyparNagelScoringParameters params, Config config,  Network network)
+	public CarsharingWithTaxiLegScoringFunction(PlanImpl plan, CharyparNagelScoringParameters params, Config config,  Network network)
 	{
 		super(params, network);
 		this.plan = plan;		
@@ -265,6 +265,14 @@ public class AllModesLegScoringFunction extends org.matsim.core.scoring.function
 
 			tmpScore += getRideScore(dist, travelTime);
 		}
+		else if (leg.getMode().equals("taxi")) {
+			
+			double distance = leg.getRoute().getDistance();
+			tmpScore += distance * Double.parseDouble(this.config.getModule("Taxiservice").getParams().get("distanceFeeTaxiservice"));
+			tmpScore += travelTime *  Double.parseDouble(this.config.getModule("Taxiservice").getParams().get("travelingTaxiservice"));
+			tmpScore += travelTime *  Double.parseDouble(this.config.getModule("Taxiservice").getParams().get("timeFeeTaxiservice"));
+			tmpScore +=  Double.parseDouble(this.config.getModule("Taxiservice").getParams().get("constantTaxiservice"));
+		}
 		else
 		{
 			
@@ -295,13 +303,13 @@ public class AllModesLegScoringFunction extends org.matsim.core.scoring.function
 
 		double distanceCost = 0.0D;
 		TreeSet<String> travelCards = ((PersonImpl)this.plan.getPerson()).getTravelcards();
-		/*if (travelCards == null || travelCards.contains("ch-HT-mobility"))
+		if (travelCards == null || travelCards.contains("ch-HT-mobility"))
 			distanceCost = this.params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m;
 		else if (travelCards.contains("unknown"))
 			distanceCost = this.params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m;
 		else {
 			throw new RuntimeException("Person " + this.plan.getPerson().getId() + " has an invalid travelcard. This should never happen.");
-		}*/
+		}
 		score += this.params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m * distanceCost / 1000.0D * distance;
 		score += travelTime * this.params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s;
 		score += this.params.modeParams.get(TransportMode.pt).constant;

@@ -25,13 +25,14 @@ import playground.balac.freefloating.config.FreeFloatingConfigGroup;
 import playground.balac.freefloating.router.FreeFloatingRoutingModule;
 import playground.balac.onewaycarsharingredisgned.config.OneWayCarsharingRDConfigGroup;
 import playground.balac.onewaycarsharingredisgned.router.OneWayCarsharingRDRoutingModule;
+import playground.balac.taxiservice.config.TaxiserviceConfigGroup;
+import playground.balac.taxiservice.router.TaxiserviceRoutingModule;
 import playground.balac.twowaycarsharingredisigned.config.TwoWayCSConfigGroup;
 import playground.balac.twowaycarsharingredisigned.router.TwoWayCSRoutingModule;
 
-public class AllCSModesTestControler extends Controler{
-	
-	
-	public AllCSModesTestControler(Scenario scenario) {
+public class CarsharingWithTaxiControler extends Controler{
+
+	public CarsharingWithTaxiControler(Scenario scenario) {
 		super(scenario);
 	}
 
@@ -56,8 +57,8 @@ public class AllCSModesTestControler extends Controler{
 	public static void main(final String[] args) {
 		
     	final Config config = ConfigUtils.loadConfig(args[0]);
-    	OneWayCarsharingRDConfigGroup configGroup = new OneWayCarsharingRDConfigGroup();
-    	config.addModule(configGroup);
+    	OneWayCarsharingRDConfigGroup configGroupow = new OneWayCarsharingRDConfigGroup();
+    	config.addModule(configGroupow);
     	
     	FreeFloatingConfigGroup configGroupff = new FreeFloatingConfigGroup();
     	config.addModule(configGroupff);
@@ -68,10 +69,13 @@ public class AllCSModesTestControler extends Controler{
     	AllCSModesConfigGroup configGroupAll = new AllCSModesConfigGroup();
     	config.addModule(configGroupAll);
     	
+    	TaxiserviceConfigGroup configGrouptaxi = new TaxiserviceConfigGroup();
+    	config.addModule(configGrouptaxi);
+    	
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 		
 		
-		final AllCSModesTestControler controler = new AllCSModesTestControler( sc );
+		final CarsharingWithTaxiControler controler = new CarsharingWithTaxiControler( sc );
 		
 		try {
 			controler.setMobsimFactory( new AllCSModesQsimFactory(sc, controler) );
@@ -101,6 +105,10 @@ public class AllCSModesTestControler extends Controler{
 								"onewaycarsharing",
 								new OneWayCarsharingRDRoutingModule());
 						
+						router.setRoutingModule(
+								"taxiservice",
+								new TaxiserviceRoutingModule(controler));
+						
 						// we still need to provide a way to identify our trips
 						// as being twowaycarsharing trips.
 						// This is for instance used at re-routing.
@@ -120,6 +128,9 @@ public class AllCSModesTestControler extends Controler{
 											}
 											else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "freefloating" ) ) {
 												return "freefloating";
+											}
+											else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "taxi" ) ) {
+												return "taxi";
 											}
 										}
 										// if the trip doesn't contain a onewaycarsharing leg,

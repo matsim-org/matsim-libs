@@ -56,7 +56,7 @@ public class RentalTimesStatistics {
 		}
 		
 		System.out.println(countZero);
-		System.out.println(di/4993.0);
+		System.out.println(di/count);
 		System.out.println(time1/count);
 		for (int i = 0; i < rentalTimes.length; i++) 
 			System.out.println((double)rentalTimes[i]/(double)count * 100.0);

@@ -32,7 +32,7 @@ public class AllCSModesScoringFunctionFactory extends org.matsim.core.scoring.fu
 		  SumScoringFunction scoringFunctionSum = new SumScoringFunction();
 	    
 		  scoringFunctionSum.addScoringFunction(
-	      new AllModesLegScoringFunction((PlanImpl)person.getSelectedPlan(), 
+	      new CarsharingWithTaxiLegScoringFunction((PlanImpl)person.getSelectedPlan(), 
 	      new CharyparNagelScoringParameters(config.planCalcScore()), 
 	      this.config, 
 	      network));

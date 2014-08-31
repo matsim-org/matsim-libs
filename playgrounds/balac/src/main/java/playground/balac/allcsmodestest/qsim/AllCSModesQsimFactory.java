@@ -84,20 +84,22 @@ public class AllCSModesQsimFactory implements MobsimFactory{
 		if (configGroupff.useFeeFreeFloating()) {
 		 reader = IOUtils.getBufferedReader(configGroupff.getvehiclelocations());
 		    s = reader.readLine();
+		    s = reader.readLine();
 		    int i = 1;
 		    while(s != null) {
 		    	
 		    	String[] arr = s.split("\t", -1);
-		    
-		    	Link l = controler.getNetwork().getLinks().get(new IdImpl(arr[0]));
+			    
+		    	CoordImpl coordStart = new CoordImpl(arr[2], arr[3]);
+				Link l = linkUtils.getClosestLink(coordStart);		    	
+				ArrayList<String> vehIDs = new ArrayList<String>();
 		    	
-		    	ArrayList<String> vehIDs = new ArrayList<String>();
-		    	
-		    	for (int k = 0; k < Integer.parseInt(arr[1]); k++) {
+		    	for (int k = 0; k < Integer.parseInt(arr[6]); k++) {
 		    		vehIDs.add(Integer.toString(i));
 		    		i++;
 		    	}
-		    	FreeFloatingStation f = new FreeFloatingStation(l, Integer.parseInt(arr[1]), vehIDs);
+		    	
+		    	FreeFloatingStation f = new FreeFloatingStation(l, Integer.parseInt(arr[6]), vehIDs);
 		    	
 		    	ffvehiclesLocation.add(f);
 		    	s = reader.readLine();

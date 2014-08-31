@@ -30,20 +30,20 @@ public class OneWayCarsharingRDRoutingModule implements RoutingModule{
 			Facility toFacility, double departureTime, Person person) {
 		
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
-		final Leg leg = new LegImpl( "walk_ow_sb" );
-		GenericRouteImpl route = new GenericRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
-		leg.setRoute(route);
-		trip.add( leg );
+		final Leg startWalkLeg = new LegImpl( "walk_ow_sb" );
+		GenericRouteImpl startWalkRoute = new GenericRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
+		startWalkLeg.setRoute(startWalkRoute);
+		trip.add( startWalkLeg );
 		
-		final Leg leg1 = new LegImpl( "onewaycarsharing" );
-		LinkNetworkRouteImpl route1 = new LinkNetworkRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
-		leg1.setRoute(route1);
-		trip.add( leg1 );	
+		final Leg csLeg = new LegImpl( "onewaycarsharing" );
+		LinkNetworkRouteImpl csRoute = new LinkNetworkRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
+		csLeg.setRoute(csRoute);
+		trip.add( csLeg );	
 		
-		final Leg leg2 = new LegImpl( "walk_ow_sb" );
-		GenericRouteImpl route2 = new GenericRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
-		leg2.setRoute(route2);
-		trip.add( leg2 );
+		final Leg endWalkLeg = new LegImpl( "walk_ow_sb" );
+		GenericRouteImpl endWalkRoute = new GenericRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
+		endWalkLeg.setRoute(endWalkRoute);
+		trip.add( endWalkLeg );
 		
 		return trip;
 	}
