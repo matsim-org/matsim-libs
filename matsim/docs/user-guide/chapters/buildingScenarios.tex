@@ -277,7 +277,7 @@ label=lst:BuildingScenarios:minimalPopulationXml]
 		</plan>
 	</person>
 	<person id="2">
-		\ldots
+		...
 	</person>
 </population>
 \end{xml-file}
@@ -424,7 +424,28 @@ If run, this validator will print out a list of errors or warnings, if any are
 found, or show a message that the schedule appears to be valid.
 
 \subsection{Counts}
-\begin{xml-file}[caption=An example of a counts.xml]
+
+MATSim provides funtionality to compare traffic volumes from your simulation to
+real world values. The \emph{Counts} infrastructure allows to compare the 
+traffic volumes on links on an hourly basis. Listing~\ref{lst:BuildingScenarios:counts.xml}
+shows an example of a \emph{counts.xml} input file required to do traffic
+count comparisons. It starts with a header containing general descriptive 
+information about the counts, including a year to describe how current the 
+data is. Next, for each link having real world counts data, the hourly volumes
+can be specified. The network-link is referenced by the \emph{loc\_id} 
+attribute, in the example, it's link {\tt 2}. The attribute \emph{cs\_id}
+(counting station identifier) can be used to store an arbitrary description
+of the counting station. Most often it is used to note the original real
+word counting station to simplify future data comparison. The hourly volumes,
+specified by the hour of the day (counting starts with hour "1") and its value,
+are optional: That is, not for every hour a value must be given. If for a
+counting station data is only available for certain hours of the day (e.g. only
+during peak hours) it is possible to omit the other hours from the XML listing.  
+
+\todo{MR: Where are the config-options explained?}
+
+\begin{xml-file}[caption=An example of a counts.xml,
+label=lst:BuildingScenarios:counts.xml]
 <?xml version="1.0" encoding="UTF-8"?>
 <counts xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
         xsi:noNamespaceSchemaLocation="http://matsim.org/files/dtd/counts_v1.xsd" 
@@ -458,11 +479,43 @@ found, or show a message that the schedule appears to be valid.
 </counts>
 \end{xml-file}
 
-\todo{MR}
-
 \section{Units and Conventions Used}
 \label{sec:BuildingScenarios:Units}
-\todo{MR: id: any string, but please no white spaces and commas, coordinate system, mostly meter, seconds}
+
+\subsection{Units}
+MATSim tries to make as few assumptions about actual units as is possible,
+but at some locations it cannot be done without any. In general, MATSim expects
+similar values (e.g. all distances) to be in the same unit wherever they are
+used. In the following, the most important (expected) units are listed in a 
+short overview.
+
+\paragraph{Distance} Distance units are most prominently used in links' length.
+They should be specified in the same unit that the coordinate system uses. This
+allows MATSim to use simple triangulation, e.g. with the nodes' coordinates,
+to calculate beeline distances. As most of the typically used, projected 
+coordinate systems (see Sec.~\ref{sec:BuildingScenarios:CoordinateSystems})
+use meters as unit of distance, this is the most common used unit of distance
+in MATSim.
+
+\paragraph{Time} While MATSim supports an \emph{hour:minute:second} notation
+in several places, internally it uses \emph{seconds} as the default time unit.
+This implies that for example link speeds must be specified in distance per 
+second, typically \emph{m/s}.
+
+One noteable exception from this rule are scoring parameters, where MATSim
+expects values per hour. This is due to the fact that most behavioral parameters
+like value of time are typically estimated per minute or hour, and that the 
+corresponding values for seconds are very small and thus errorprone to be
+configured.
+
+
+\subsection{Conventions}
+
+MATSim makes heavy uses of identifiers, short \emph{Id}s. This Ids can be
+arbitrary strings, with the following exceptions: Ids should not contain
+any spaces (incl. tabs, new lines, etc) or commas, as those characters
+are typically used for separating different Ids from each other in Id lists.
+
 
 \section{Coordinate Systems}
 \label{sec:BuildingScenarios:CoordinateSystems}
@@ -527,57 +580,51 @@ This allows MATSim to work with your coordinates and convert them whenever
 needed.
 
 
-old stuff from here
-================
+\section{A Minimum Example}
 
-Given these two data items, you can already start building your own
-scenario.The "\href{http://www.matsim.org/docs/tutorials/learningIn3days}{Learning MATSim in 3 days}"-Tutorial gives you an introduction on how to build your own scenario.
-
-\subsubsection{Import from VISUM}
-
-See \href{http://matsim.org/javadoc/org/matsim/visum/package-summary.html}{here for javadoc}, and \href{http://matsim.org/xref/org/matsim/visum/package-summary.html}{here for code}.
-
-\subsubsection{Programming}
-
-In many cases, using pre-configured software is not possible because  there are just too many possibilities of how input could look like.  Although matsim is not there yet, these should be api-only use cases,  i.e. they should only use the "stable" api. Therefore, the  following are under the api-users section of the documentation:
-\begin{itemize}
-	\item Additional information about network generation is \href{http://matsim.org/node/588}{here}.
-	\item additional information about initial demand generation is \href{http://matsim.org/node/340}{here}.
-\end{itemize}
-
-\subsubsection{Information concerning specific scenarios}
-
-% The following sections contains various information for building a scenario that presumably goes beyond what is in the tutorial.
+\todo{MR} 
 
 
-% \section{Using MATSim for Switzerland}
-% 
-% \subsubsection{General remarks}
-% 
-% This is material that was in the tutorial "Learning MATSim in 3 days". We moved it to here, but did not check the content.
-% 
-% A. Horni: Shortly, there will be a working paper describing the usage of MATSim for Switzerland., 02.05.2011
-% 
-% \subsubsection{Some data sources}
-% \begin{itemize}
-% 	\item Microcensus (BfS):\\ \href{http://www.bfs.admin.ch/bfs/portal/de/index/themen/11/07/01/02/01.html}{www.bfs.admin.ch/bfs/portal/de/index/themen/11/07/01/02/01.html}
-% 	\item Census (BfS):\\ \href{http://www.bfs.admin.ch/bfs/portal/en/index/infothek/erhebungen__quellen/blank/blank/vz/uebersicht.html}{www.bfs.admin.ch/bfs/portal/en/index/infothek/erhebungen\_\_quellen/blank/blank/vz/uebersicht.html}
-% 	\item ASTRA traffic counts:\\ \href{http://www.astra.admin.ch/verkehrsdaten/00299/00303/index.html?lang=en}{www.astra.admin.ch/verkehrsdaten/00299/00303/index.html}
-% 	\item Business census (BfS):\\ \href{http://www.bfs.admin.ch/bfs/portal/en/index/infothek/erhebungen__quellen/blank/blank/bz/01.html}{www.bfs.admin.ch/bfs/portal/en/index/infothek/erhebungen\_\_quellen/blank/blank/bz/01.html}
-% 	\item Border crossing traffic (IVT, BfS):\\ \href{http://www.bfs.admin.ch/bfs/portal/de/index/themen/11/07/04/blank/01/01.html}{www.bfs.admin.ch/bfs/portal/de/index/themen/11/07/04/blank/01/01.html}
-% \end{itemize}
+\section{Reusing Existing Data}
 
+Data from other modelling tools like PTV Visum or EMME can be partially reused.
+Converting the network topology is often possible with little work. For Visum,
+\href{http://matsim.org/javadoc/org/matsim/visum/package-summary.html}{some code
+exists} that converts the network into MATSim's format. But note that this only
+converts the network topology (location of nodes, and links with a limited set
+of attributes). Due to the different working of other modelling tools (e.g. the 
+use of capacity constraint functions to describe links), attributes might be 
+differently interpreted by MATSim (e.g. link capacities are hard limits in MATSim, 
+vs. part of a CPR function in other tools), leading to manual edits being needed 
+after the initial conversion. \todo{MR: check CPR and capacity constraints}
 
-%%\vfill\eject
-%%\section{Using MATSim from Urbansim (for the PSRC region)}
-
-%%Deprecated (and soon to be removed). See \href{http://matsim.org/extensions/matsim4urbansim}{here} instead.
+Reusing demand data is typically more complex. If you have the output of an 
+agent-based and activity-based demand generation process, you might convert
+the data agent by agent to the MATSim format. If only aggregated data
+in the form of origin-destination matrices, or attraction matrices, is available,
+a simple conversion to complex agent plans is not possible and the demand must be 
+regenerated using other data sources.
 
 
 
-%%\sout{Check  out the opus source tree from www.urbansim.org . (The source tree  is the tree containing directories such as opus\_core or opus\_gui.)}
 
-%%\sout{In this source tree, there should be a directory opus\_matsim .}
-
-%%\sout{There is documentation in opus\_matsim/docs .}
-
+%% 
+%% ================
+%% old stuff from here
+%% 
+%% 
+%% Given these two data items, you can already start building your own
+%% scenario.The "\href{http://www.matsim.org/docs/tutorials/learningIn3days}{Learning MATSim in 3 days}"-Tutorial gives you an introduction on how to build your own scenario.
+%% 
+%% 
+%% \subsubsection{Programming}
+%% 
+%% In many cases, using pre-configured software is not possible because  there are just too many possibilities of how input could look like.  Although matsim is not there yet, these should be api-only use cases,  i.e. they should only use the "stable" api. Therefore, the  following are under the api-users section of the documentation:
+%% \begin{itemize}
+%% 	\item Additional information about network generation is \href{http://matsim.org/node/588}{here}.
+%% 	\item additional information about initial demand generation is \href{http://matsim.org/node/340}{here}.
+%% \end{itemize}
+%% 
+%% \subsubsection{Information concerning specific scenarios}
+%% 
+%% 
