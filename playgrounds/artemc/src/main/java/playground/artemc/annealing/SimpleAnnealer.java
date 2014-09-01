@@ -196,8 +196,8 @@ ControlerListener {
 						// selector-only strategy
 						) {
 					// change the weight of the next selector strategy as recorded
-					newWeight = (1-proportion) * weight/totalSelectorWeights;
-
+					//newWeight = (1-proportion) * weight/totalSelectorWeights;
+					newWeight = weight;
 				} else {
 					newWeight = proportion * weight/(totalWeights-totalSelectorWeights);
 				}

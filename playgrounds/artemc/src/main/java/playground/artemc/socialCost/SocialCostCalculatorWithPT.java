@@ -20,6 +20,7 @@
 
 package playground.artemc.socialCost;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -70,12 +71,12 @@ import org.matsim.vehicles.Vehicle;
  * 
  */
 public class SocialCostCalculatorWithPT implements TravelDisutility,
-		IterationStartsListener, IterationEndsListener, AfterMobsimListener,
-		PersonDepartureEventHandler, PersonArrivalEventHandler,
-		LinkEnterEventHandler, LinkLeaveEventHandler {
+IterationStartsListener, IterationEndsListener, AfterMobsimListener,
+PersonDepartureEventHandler, PersonArrivalEventHandler,
+LinkEnterEventHandler, LinkLeaveEventHandler {
 
 	private static Logger log = Logger.getLogger(SocialCostCalculatorWithPT.class);
-	
+
 	private int travelTimeBinSize;
 	private int numSlots;
 	private Network network;
@@ -84,19 +85,20 @@ public class SocialCostCalculatorWithPT implements TravelDisutility,
 	private TravelTime travelTime;
 	private double endTime = 48 * 3600;
 	private VehicleOccupancyObserver vehicleObserver;
-	
+
 	private Map<Id, int[]> linkPassengers; 
-	
+
 	double marginalUtilityOfMoney;
 	double opportunityCostOfCarTravel; 
-	
+	double opportunityCostOfPTTravel;
+
 
 	/*
 	 * Blur the Social Cost to speed up the relaxation process. Values between
 	 * 0.0 and 1.0 are valid. 0.0 means the old value will be kept, 1.0 means
 	 * the old value will be totally overwritten.
 	 */
-	private final double blendFactor = 0.1;
+	private double blendFactor = 0.1;
 
 	/*
 	 * This is a lookup table because currently the TransportMode of a Leg
@@ -109,15 +111,15 @@ public class SocialCostCalculatorWithPT implements TravelDisutility,
 	private Map<Id, LinkTrip> activeTrips; // LinkId
 	private List<LinkTrip> performedTrips;
 
-	 
-	
+
+
 	/*
 	 * only for Analysis
 	 */
 	private Map<Id, LegTrip> activeLegs; // AgentId
 
 	private List<LegTrip> performedLegs;
-	
+
 	private List<Double> meanSocialCosts = new ArrayList<Double>();
 	private List<Double> medianSocialCosts = new ArrayList<Double>();
 	private List<Double> quantil25PctSocialCosts = new ArrayList<Double>();
@@ -127,16 +129,16 @@ public class SocialCostCalculatorWithPT implements TravelDisutility,
 	private List<Double> medianNormalizedSocialCosts = new ArrayList<Double>();
 	private List<Double> quantil25PctNormalizedSocialCosts = new ArrayList<Double>();
 	private List<Double> quantil75PctNormalizedSocialCosts = new ArrayList<Double>();
-	
-	public SocialCostCalculatorWithPT(final Network network, EventsManager events, TravelTime travelTime, Controler controler, VehicleOccupancyObserver vehicleObserver) {
-		this(network, 15 * 60, 30 * 3600, events, travelTime, controler, vehicleObserver); // default timeslot-duration: 15 minutes
+
+	public SocialCostCalculatorWithPT(final Network network, EventsManager events, TravelTime travelTime, Controler controler, VehicleOccupancyObserver vehicleObserver, double bf) {
+		this(network, 5 * 60, 30 * 3600, events, travelTime, controler, vehicleObserver, bf); // default timeslot-duration: 15 minutes
 	}
 
-	public SocialCostCalculatorWithPT(final Network network, final int timeslice, EventsManager events, TravelTime travelTime, Controler controler, VehicleOccupancyObserver vehicleObserver) {
-		this(network, timeslice, 30 * 3600, events, travelTime, controler, vehicleObserver); // default: 30 hours at most
+	public SocialCostCalculatorWithPT(final Network network, final int timeslice, EventsManager events, TravelTime travelTime, Controler controler, VehicleOccupancyObserver vehicleObserver, double bf) {
+		this(network, timeslice, 30 * 3600, events, travelTime, controler, vehicleObserver, bf); // default: 30 hours at most
 	}
 
-	public SocialCostCalculatorWithPT(Network network, int timeslice, int maxTime, EventsManager events, TravelTime travelTime, Controler controler, VehicleOccupancyObserver vehicleObserver) {
+	public SocialCostCalculatorWithPT(Network network, int timeslice, int maxTime, EventsManager events, TravelTime travelTime, Controler controler, VehicleOccupancyObserver vehicleObserver, double bf) {
 		this.travelTimeBinSize = timeslice;
 		this.numSlots = (maxTime / this.travelTimeBinSize) + 1;
 		this.network = network;
@@ -144,11 +146,12 @@ public class SocialCostCalculatorWithPT implements TravelDisutility,
 		this.travelTime = travelTime;
 		this.controler = controler;
 		this.vehicleObserver = vehicleObserver;
-		
-		
+		this.blendFactor = bf;
+
+
 		this.marginalUtilityOfMoney = controler.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 		this.opportunityCostOfCarTravel = - controler.getConfig().planCalcScore().getTraveling_utils_hr() + controler.getConfig().planCalcScore().getPerforming_utils_hr();
-
+		this.opportunityCostOfPTTravel = - controler.getConfig().planCalcScore().getTravelingPt_utils_hr() + controler.getConfig().planCalcScore().getPerforming_utils_hr();
 		init();
 	}
 
@@ -163,6 +166,7 @@ public class SocialCostCalculatorWithPT implements TravelDisutility,
 			SocialCostsData scd = new SocialCostsData();
 			scd.link = link;
 			scd.socialCosts = new double[this.numSlots];
+			scd.socialCostsPT = new double[this.numSlots];
 			scd.freeSpeedTravelTime = travelTime.getLinkTravelTime(link, 0.0, null, null);
 
 			/*
@@ -195,7 +199,7 @@ public class SocialCostCalculatorWithPT implements TravelDisutility,
 		double linkTravelDisutility = calcSocCosts(link.getId(), time) * this.marginalUtilityOfMoney;
 		return linkTravelDisutility;
 	}
-	
+
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
 		throw new UnsupportedOperationException();
@@ -220,6 +224,15 @@ public class SocialCostCalculatorWithPT implements TravelDisutility,
 
 		activeTrips.put(event.getPersonId(), linkTrip);
 		
+		if(vehicleObserver.getVehicleOccupancy().containsKey(event.getVehicleId())){
+			if(!linkPassengers.containsKey(event.getLinkId()))
+				linkPassengers.put(event.getLinkId(), new int[numSlots]);
+
+			int timeSlice = getTimeSlotIndex(event.getTime());
+			linkPassengers.get(event.getLinkId())[timeSlice] =  linkPassengers.get(event.getLinkId())[timeSlice] + vehicleObserver.getVehicleOccupancy().get(event.getVehicleId());
+
+		};
+
 		/*
 		 * Analysis
 		 */
@@ -237,7 +250,7 @@ public class SocialCostCalculatorWithPT implements TravelDisutility,
 		 * Return, if the Agent is on a Leg which does not create congestion.
 		 */
 		if (!activeAgents.contains(event.getPersonId())) return;
-		
+
 		LinkTrip linkTrip = activeTrips.get(event.getPersonId());
 
 		if (linkTrip == null) {
@@ -247,16 +260,7 @@ public class SocialCostCalculatorWithPT implements TravelDisutility,
 
 		linkTrip.leaveTime = event.getTime();
 		performedTrips.add(linkTrip);
-		
-		if(vehicleObserver.getVehicleOccupancy().containsKey(event.getVehicleId())){
-			if(!linkPassengers.containsKey(event.getLinkId()))
-				linkPassengers.put(event.getLinkId(), new int[numSlots]);
-			
-			int timeSlice = getTimeSlotIndex(event.getTime());
-			linkPassengers.get(event.getLinkId())[timeSlice] =  linkPassengers.get(event.getLinkId())[timeSlice] + vehicleObserver.getVehicleOccupancy().get(event.getVehicleId());
-		  
-		};
-		
+
 	}
 
 	@Override
@@ -294,17 +298,17 @@ public class SocialCostCalculatorWithPT implements TravelDisutility,
 		 */
 		boolean wasActive = activeAgents.remove(event.getPersonId());
 		if(!wasActive) return;
-		
+
 		LinkTrip linkTrip = activeTrips.remove(event.getPersonId());
-		
+
 		if (linkTrip == null) {
 			log.error("LinkTrip was not found!");
 			return;
 		}
-		
+
 		linkTrip.leaveTime = event.getTime();
 		performedTrips.add(linkTrip);
-		
+
 		/*
 		 * Analysis
 		 */
@@ -335,7 +339,7 @@ public class SocialCostCalculatorWithPT implements TravelDisutility,
 		calcSocCosts();
 
 		calcStatistics();
-		
+
 		calcLegStatistics();
 	}
 
@@ -363,14 +367,16 @@ public class SocialCostCalculatorWithPT implements TravelDisutility,
 	private double calcSocCosts(Id link_id, double enterTime) {
 
 		double socialCosts = 0.0;
+		double socialCostsPT = 0.0;
+		
 		int enterIndex = getTimeSlotIndex(enterTime);
 
 		// if it is the last time slot
 		if (enterIndex == numSlots - 1) {
 			socialCosts = socialCostsMap.get(link_id).socialCosts[enterIndex];
+			socialCostsPT = socialCostsMap.get(link_id).socialCostsPT[enterIndex];
 		} else {
 			double beginEnterSlot = enterIndex * travelTimeBinSize;
-
 			/*
 			 * if linkTrip.enterTime == beginEnterSlot -> fraction = 1.0 if
 			 * linkTrip.enterTime == endEnterSlot -> fraction = 0.0
@@ -380,11 +386,41 @@ public class SocialCostCalculatorWithPT implements TravelDisutility,
 			socialCosts = fraction * socialCostsMap.get(link_id).socialCosts[enterIndex]
 					+ (1 - fraction) * socialCostsMap.get(link_id).socialCosts[enterIndex + 1];
 			
-		}
-		
-		socialCosts = (opportunityCostOfCarTravel * socialCosts / 3600) / marginalUtilityOfMoney;	
+			socialCostsPT = fraction * socialCostsMap.get(link_id).socialCostsPT[enterIndex]
+					+ (1 - fraction) * socialCostsMap.get(link_id).socialCostsPT[enterIndex + 1];
 
+		}
+
+		socialCosts = (opportunityCostOfCarTravel * socialCosts / 3600) / marginalUtilityOfMoney;	
+		socialCostsPT = (opportunityCostOfPTTravel * socialCostsPT / 3600) / marginalUtilityOfMoney;	
+
+		socialCosts = socialCosts + socialCostsPT;
 		return socialCosts;
+	}
+	
+	private double calcSocCostsFromPT(Id link_id, double enterTime) {
+
+		double socialCostsPT = 0.0;
+		int enterIndex = getTimeSlotIndex(enterTime);
+
+		// if it is the last time slot
+		if (enterIndex == numSlots - 1) {
+			socialCostsPT = socialCostsMap.get(link_id).socialCostsPT[enterIndex];
+		} else {
+			double beginEnterSlot = enterIndex * travelTimeBinSize;
+			/*
+			 * if linkTrip.enterTime == beginEnterSlot -> fraction = 1.0 if
+			 * linkTrip.enterTime == endEnterSlot -> fraction = 0.0
+			 */
+			double fraction = 1 - ((enterTime - beginEnterSlot) / travelTimeBinSize);
+			
+			socialCostsPT = fraction * socialCostsMap.get(link_id).socialCostsPT[enterIndex]
+					+ (1 - fraction) * socialCostsMap.get(link_id).socialCostsPT[enterIndex + 1];
+
+		}
+		socialCostsPT = (opportunityCostOfPTTravel * socialCostsPT / 3600) / marginalUtilityOfMoney;	
+
+		return socialCostsPT;
 	}
 
 	private void calcSocCosts() {
@@ -392,10 +428,10 @@ public class SocialCostCalculatorWithPT implements TravelDisutility,
 
 		for (LinkTrip linkTrip : performedTrips) {
 
-			double socialCosts = calcSocCosts(linkTrip.link_id, linkTrip.enterTime);
+			double socialCosts = calcSocCosts(linkTrip.link_id, linkTrip.enterTime);			
 			// convert from seconds to CHF (currently defined as 6 CHF/hour)
-//			socialCosts = socialCosts / 600;
-			
+			//			socialCosts = socialCosts / 600;
+
 			if (socialCosts <= 0.0) continue;	
 			PersonMoneyEvent e = new PersonMoneyEvent(0.5 * (linkTrip.enterTime + linkTrip.leaveTime), linkTrip.person_id, -socialCosts);
 			this.events.processEvent(e);
@@ -408,61 +444,65 @@ public class SocialCostCalculatorWithPT implements TravelDisutility,
 	private void calcStatistics() {
 
 		// Get a DescriptiveStatistics instance
-		DescriptiveStatistics stats = new DescriptiveStatistics();		
-		DescriptiveStatistics statsNormalized = new DescriptiveStatistics();
-		
+		DescriptiveStatistics tripStats = new DescriptiveStatistics();		
+		DescriptiveStatistics tripStatsNormalized = new DescriptiveStatistics();
+
 		// Add the data from the array
 		for (LegTrip legTrip : performedLegs) {
-			double costs = 0.0;
+			double distance = 0.0;
+			double cost = 0.0;
 			for (LinkTrip linkTrip : legTrip.linkTrips) {
 				double socialCosts = calcSocCosts(linkTrip.link_id, linkTrip.enterTime);
-				if (socialCosts > 0.0) costs = costs + socialCosts;
+				if (socialCosts > 0.0) cost = cost + socialCosts;
+				distance = legTrip.distance + network.getLinks().get(linkTrip.link_id).getLength();
 			}
-			stats.addValue(costs);
+	
+			legTrip.distance = distance;
+			legTrip.cost = cost;
 			
+			tripStats.addValue(cost);
+
 			/*
-			 * Normalize a legs social cost by dividing them by the leg travel time.
-			 * As a result we get something like social costs per travelled second.
-			 * Another option would be doing this on link level instead of leg level.
+			 * Normalize a legs social cost by dividing them by the leg travel time or leg distance.
 			 */
-			double legTravelTime = legTrip.arrivalTime - legTrip.departureTime;
-			if (costs > 0.0 && legTravelTime > 0.0) statsNormalized.addValue(costs / legTravelTime);
+			//double legTravelTime = legTrip.arrivalTime - legTrip.departureTime;
+			if (cost > 0.0 && legTrip.distance > 0.0) tripStatsNormalized.addValue(cost / legTrip.distance);
 		}
 
 		// Compute some statistics
-		double sum = stats.getSum();
-		double mean = stats.getMean();
-		double std = stats.getStandardDeviation();
-		double median = stats.getPercentile(50);
-		double quantile25 = stats.getPercentile(25);
-		double quantile75 = stats.getPercentile(75);
-		
-		double sumNormalized = statsNormalized.getSum();
-		double meanNormalized = statsNormalized.getMean();
-		double stdNormalized = statsNormalized.getStandardDeviation();
-		double medianNormalized = statsNormalized.getPercentile(50);
-		double quantile25Normalized = statsNormalized.getPercentile(25);
-		double quantile75Normalized = statsNormalized.getPercentile(75);
-		
+		double sum = tripStats.getSum();
+		double mean = tripStats.getMean();
+		double std = tripStats.getStandardDeviation();
+		double median = tripStats.getPercentile(50);
+		double quantile25 = tripStats.getPercentile(25);
+		double quantile75 = tripStats.getPercentile(75);
+
+		double sumNormalized = tripStatsNormalized.getSum();
+		double meanNormalized = tripStatsNormalized.getMean();
+		double stdNormalized = tripStatsNormalized.getStandardDeviation();
+		double medianNormalized = tripStatsNormalized.getPercentile(50);
+		double quantile25Normalized = tripStatsNormalized.getPercentile(25);
+		double quantile75Normalized = tripStatsNormalized.getPercentile(75);
+
 		log.info("Sum of all leg costs: " + sum);
 		log.info("Mean leg costs: " + mean);
 		log.info("Standard deviation: " + std);
 		log.info("Median leg costs: " + median);
 		log.info("25% quantile leg costs: " + quantile25);
 		log.info("75% quantile leg costs: " + quantile75);
-		
+
 		log.info("Normalized sum of all leg costs: " + sumNormalized);
 		log.info("Normalized mean leg costs: " + meanNormalized);
 		log.info("Normalized standard deviation: " + stdNormalized);
 		log.info("Normalized median leg costs: " + medianNormalized);
 		log.info("Normalized 25% quantile leg costs: " + quantile25Normalized);
 		log.info("Normalized 75% quantile leg costs: " + quantile75Normalized);
-		
+
 		meanSocialCosts.add(mean);
 		medianSocialCosts.add(median);
 		quantil25PctSocialCosts.add(quantile25);
 		quantil75PctSocialCosts.add(quantile75);
-		
+
 		meanNormalizedSocialCosts.add(meanNormalized);
 		medianNormalizedSocialCosts.add(medianNormalized);
 		quantil25PctNormalizedSocialCosts.add(quantile25Normalized);
@@ -472,19 +512,19 @@ public class SocialCostCalculatorWithPT implements TravelDisutility,
 	private void calcLegStatistics() {
 		double totalDistance = 0.0;
 		double totalTravelTime = 0.0;
-		
+
 		for (LegTrip legTrip : performedLegs) {
 			for (LinkTrip linkTrip : legTrip.linkTrips) {
 				totalDistance = totalDistance + network.getLinks().get(linkTrip.link_id).getLength();
 			}
 			totalTravelTime = totalTravelTime + (legTrip.arrivalTime - legTrip.departureTime);
 		}
-		
+
 		log.info("Total Legs: " + performedLegs.size());
 		log.info("Total Distance: " + totalDistance);
 		log.info("Total Travel Time: " + totalTravelTime);
 	}
-	
+
 	private void writeSocialCostsPlot(IterationEndsEvent event) {
 
 		// We have a data set for each iteration. We start counting by 0, therefore we add 1.
@@ -505,71 +545,164 @@ public class SocialCostCalculatorWithPT implements TravelDisutility,
 			quantil25Data[i] = quantil25PctSocialCosts.get(i);
 			quantil75Data[i] = quantil75PctSocialCosts.get(i);
 		}
-		
+
 		fileName = event.getControler().getControlerIO().getOutputFilename("socialCosts");
 		writer.writeGraphic(fileName + ".png", "social costs (per leg)", meanData, medianData, quantil25Data, quantil75Data);
 		writer.writeTable(fileName + ".txt", meanData, medianData, quantil25Data, quantil75Data);
-		
+
 		for (int i = 0; i < dataLength; i++) {
 			meanData[i] = meanNormalizedSocialCosts.get(i);
 			medianData[i] = medianNormalizedSocialCosts.get(i);
 			quantil25Data[i] = quantil25PctNormalizedSocialCosts.get(i);
 			quantil75Data[i] = quantil75PctNormalizedSocialCosts.get(i);
 		}
-		
+
 		fileName = event.getControler().getControlerIO().getOutputFilename("normalizedSocialCosts");
 		writer.writeGraphic(fileName + ".png", "social costs (per leg, normalized)", meanData, medianData, quantil25Data, quantil75Data);
 		writer.writeTable(fileName + ".txt", meanData, medianData, quantil25Data, quantil75Data);
+		
+		//Write link toll statistics
+		String filenameLinkStats = this.controler.getControlerIO().getIterationFilename(event.getIteration(), "linkTollStats.txt");
+		String[] linkTableColumns = new String[this.numSlots+1];
+		linkTableColumns[0] = "LinkId";
+		for(int i=1;i<=numSlots;i++){
+			linkTableColumns[i] = Integer.toString((i-1)*this.travelTimeBinSize);
+		}
+
+		try{
+			IterationTableWriter linkTable = new IterationTableWriter(filenameLinkStats,linkTableColumns);
+			String[] linkTollData = new String[this.numSlots+1];
+			for (SocialCostsData data : this.socialCostsMap.values()) 
+			{
+				linkTollData[0] = data.link.getId().toString();
+				for (int k = 0; k < this.numSlots; k++) 
+				{
+					linkTollData[k+1] = Double.toString(calcSocCosts(data.link.getId(), k*this.travelTimeBinSize));
+				}
+				linkTable.addData(linkTollData);
+			}
+			
+			linkTable.finish();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+		
+		//Write trip statistics
+		String tripTableColumns[] = {"tripID","startTime","duration","distance","tollFromPT","tollTotal"};
+		HashMap<Id,Integer> personTrips = new HashMap<Id,Integer>();		
+		try {
+			String filename = this.controler.getControlerIO().getIterationFilename(event.getIteration(), "tripStats.txt");
+			IterationTableWriter tripTable = new IterationTableWriter(filename,tripTableColumns);
+			Double tripDistance;
+			Double tripDuration;
+			Double cost;
+			Double costPT;
+			String[] dataLine = new String[6];
+			for (LegTrip legTrip : performedLegs) {
+
+				if(personTrips.containsKey(legTrip.person_id)){
+					personTrips.put(legTrip.person_id, personTrips.get(legTrip.person_id)+1);
+				}
+				else{
+					personTrips.put(legTrip.person_id, 1);
+				}
+				
+				costPT = 0.0;
+				for (LinkTrip linkTrip : legTrip.linkTrips) {
+					double scPT = calcSocCostsFromPT(linkTrip.link_id, linkTrip.enterTime);
+					if(scPT<0) scPT=0.0;
+					costPT = costPT + scPT;
+				}
+				tripDuration = legTrip.arrivalTime - legTrip.departureTime;
+
+				dataLine[0] = legTrip.person_id.toString()+"_"+personTrips.get(legTrip.person_id);
+				dataLine[1] = String.valueOf(legTrip.departureTime);
+				dataLine[2] = String.valueOf(tripDuration);
+				dataLine[3] = String.valueOf(legTrip.distance);
+				dataLine[4] = String.valueOf(costPT);
+				dataLine[5] = String.valueOf(legTrip.cost);
+				tripTable.addData(dataLine);
+			}
+			tripTable.finish();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+		
 	}
 
 	private void updateSocCosts(int iteration) {
+		log.info("Updating social cost for interation: "+iteration+" Total slots: "+this.numSlots);
 		for (SocialCostsData data : this.socialCostsMap.values()) {
 			int ke = this.numSlots; // ke = K
 
 			// for k = K-1 .. 0
+			double socialCostPT =0.0;
 			for (int k = this.numSlots - 1; k >= 0; k--) {
 				/*
 				 * if ta(k) = tfree then ke = k We have to use "<=" because we
 				 * use a PseudoFreeSpeedTravelTime!
 				 */
-				if (travelTime.getLinkTravelTime(data.link, k * travelTimeBinSize, null, null) <= data.pseudoFreeSpeedTravelTime) ke = k;
+				if (travelTime.getLinkTravelTime(data.link, k * travelTimeBinSize, null, null) <= data.pseudoFreeSpeedTravelTime) 
+				{
+					ke = k;
+					socialCostPT = 0.0;
+				}else{
+					if(linkPassengers.containsKey(data.link.getId())){
 
-				double estimatedLinkExitTime = travelTime.getLinkTravelTime(data.link, k * travelTimeBinSize, null, null);
-				
+//											log.info("TimeSlot: "+k
+//													+" LinkPassengersSize: "+linkPassengers.size()
+//													+" LinkId: "+data.link.getId()
+//													+" LinkCapacity: "+data.link.getCapacity()
+//													+" LinkTimeSlots: "+linkPassengers.get(data.link.getId()).length
+//													+" LinkPassengers: "+(double)linkPassengers.get(data.link.getId())[k]);
 
-				
-				// Ca(k) = max(0, (ke - k)*T - tfree)
-				double socialCost = ((ke - k) * travelTimeBinSize - estimatedLinkExitTime);
-				
-				if(linkPassengers.containsKey(data.link.getId())){
-					
-//					log.info("TimeSlot: "+k
-//							+" LinkPassengersSize: "+linkPassengers.size()
-//							+" LinkId: "+data.link.getId()
-//							+" LinkCapacity: "+data.link.getCapacity()
-//							+" LinkTimeSlots: "+linkPassengers.get(data.link.getId()).length
-//							+" LinkPassengers: "+(double)linkPassengers.get(data.link.getId())[k]);
-
-					double socialCostPT = 3600.0 / (double)data.link.getCapacity()*(double)linkPassengers.get(data.link.getId())[k];
-					socialCost = socialCost + socialCostPT; 
-					
-					log.info("SocialCost: "+socialCost+"SocialCost PT: "+socialCostPT);
+						socialCostPT = socialCostPT + ( 3600.0 / (double)data.link.getCapacity())*(double)linkPassengers.get(data.link.getId())[k];
+					}
 				}
-						
+
+				double estimatedLinkTravelTime = travelTime.getLinkTravelTime(data.link, k * travelTimeBinSize, null, null);
+
+				// Ca(k) = max(0, (ke - k)*T - tfree)
+				double socialCost = ((ke - k) * travelTimeBinSize - estimatedLinkTravelTime);
 
 				if (socialCost < 0.0) socialCost = 0.0;
-				// data.socialCosts[k] = socialCost;
+				if (socialCostPT < 0.0) socialCostPT = 0.0;
 				
+				if(socialCost!=0.0 && socialCostPT!=0.0){
+					log.info(k+","+data.link.getId().toString()+"   SocialCost: "+socialCost+"SocialCost PT: "+socialCostPT);
+				}
+
 				// If it is the first iteration, there is no old value, therefore use this iterations value. 
 				double oldValue;
 				if (iteration == 0) oldValue = socialCost;
 				else oldValue = data.socialCosts[k];
-				
 				double blendedOldValue = (1 - blendFactor) * oldValue;
 				double blendedNewValue = blendFactor * socialCost;
 
 				data.socialCosts[k] = blendedOldValue + blendedNewValue;
+				
+				
+				//Social cost for PT passenger delay
+				if (socialCostPT < 0.0) socialCostPT = 0.0;
+				// data.socialCosts[k] = socialCost;
+
+				// If it is the first iteration, there is no old value, therefore use this iterations value. 
+				double oldValuePT;
+				if (iteration == 0) oldValuePT = socialCostPT;
+				else oldValuePT = data.socialCostsPT[k];
+
+				double blendedOldValuePT = (1 - blendFactor) * oldValuePT;
+				double blendedNewValuePT = blendFactor * socialCost;
+
+				data.socialCostsPT[k] = blendedOldValuePT + blendedNewValuePT;
+		
 			}
+			
+			SavitzkyGolayFilter sgf = new SavitzkyGolayFilter(5,data.socialCosts, true);
+			data.socialCosts = sgf.appllyFilter();
+			
+			//SavitzkyGolayFilter sgf2 = new SavitzkyGolayFilter(5,data.socialCostsPT, true);
+			//data.socialCostsPT = sgf2.appllyFilter();
 		}
 	}
 
@@ -585,6 +718,7 @@ public class SocialCostCalculatorWithPT implements TravelDisutility,
 	private static class SocialCostsData {
 		Link link;
 		double[] socialCosts;
+		double[] socialCostsPT;
 		double freeSpeedTravelTime; // TODO: make this time-dependent
 		double pseudoFreeSpeedTravelTime; // TODO: make this time-dependent
 	}
@@ -601,6 +735,8 @@ public class SocialCostCalculatorWithPT implements TravelDisutility,
 		double departureTime;
 		double arrivalTime;
 		List<LinkTrip> linkTrips = new ArrayList<LinkTrip>();
+		double cost;
+		double distance;
 	}
 
 }

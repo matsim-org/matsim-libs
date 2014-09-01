@@ -76,7 +76,7 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 	private Map<Integer, Double> it2ptLegs = new TreeMap<Integer, Double>();
 	private Map<Integer, Double> it2walkLegs = new TreeMap<Integer, Double>();
 	private Map<Integer, Double> it2transitWalkLegs = new TreeMap<Integer, Double>();
-
+	private Map<Integer, Double> it2busLegs = new TreeMap<Integer, Double>();
 
 	
 	public WelfareAnalysisControlerListener(ScenarioImpl scenario){
@@ -115,7 +115,8 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 		this.it2ptLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getPtLegs());
 		this.it2walkLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getWalkLegs());
 		this.it2transitWalkLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getTransitWalkLegs());
-						
+		this.it2busLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getBusLegs());
+		
 		String fileName = this.scenario.getConfig().controler().getOutputDirectory() + "/welfareAnalysis.csv";
 		File file = new File(fileName);
 			
@@ -163,6 +164,7 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 		writeGraph("ptTrips", "Number of Pt Trips", it2ptLegs);
 		writeGraph("walkTrips", "Number of Walk Trips", it2walkLegs);
 		writeGraph("transitWalkTrips", "Number of Transit Walk Leg", it2transitWalkLegs);
+		writeGraph("busVehicleTrips", "Number of Bus Vehicle Trips", it2busLegs);
 
 		writeGraphSum("welfare_logsum", "Monetary Units", it2userBenefits_logsum, it2tollSum);
 		writeGraphSum("welfare_selected", "Monetary Units", it2userBenefits_selected, it2tollSum);

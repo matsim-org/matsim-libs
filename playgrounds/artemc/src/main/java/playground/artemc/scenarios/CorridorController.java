@@ -49,8 +49,7 @@ public class CorridorController {
 		Controler controler = null;
 		Scenario scenario = initSampleScenario();
 		controler = new Controler(scenario);
-
-
+		
 		Initializer initializer = new Initializer();
 		controler.addControlerListener(initializer);
 

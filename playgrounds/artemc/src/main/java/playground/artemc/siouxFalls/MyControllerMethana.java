@@ -4,24 +4,36 @@ package playground.artemc.siouxFalls;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
 
 
 
 public class MyControllerMethana {
-
-	private static final String[] SURVEY_FILES = {"./input/distanceByModeSurvey.csv", "./input/travelTimeByModeSurvey.csv"};
+	
+	private static String input;
+	private static String output;
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args){
 		
-		Controler controler = new Controler(args);
+		input = args[0];
+		output = args[1];
+
+		Controler controler = null;
+		Scenario scenario = initSampleScenario();
+		controler = new Controler(scenario);
+
 		
 		/*
 		 * Scoring also has to take the social costs into account.
@@ -51,6 +63,22 @@ public class MyControllerMethana {
 //		return scenario;
 //	}
 	
+	
+	private static Scenario initSampleScenario() {
+
+		Config config = ConfigUtils.loadConfig(input+"config.xml");
+		config.controler().setOutputDirectory(output);
+		config.network().setInputFile(input+"network.xml");
+		config.plans().setInputFile(input+"population.xml");
+		config.transit().setTransitScheduleFile(input+"transitSchedule.xml");
+		config.transit().setVehiclesFile(input+"vehicles.xml");
+		config.controler().setOutputDirectory(output);
+		
+		//		config.controler().setLastIteration(10);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		return scenario;
+	}
 	
 	private static class Initializer implements StartupListener {
 

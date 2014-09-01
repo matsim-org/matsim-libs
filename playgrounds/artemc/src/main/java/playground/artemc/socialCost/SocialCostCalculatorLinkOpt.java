@@ -31,6 +31,7 @@ import java.util.Set;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -56,10 +57,10 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
-
 /**
- * TODO Analysis: - performed Trips (Duration and Distance) - Trip Duration vs.
- * Trip Distance (Mean and Distribution)
+ * TODO Analysis:
+ * - performed Trips (Duration and Distance)
+ * - Trip Duration vs. Trip Distance (Mean and Distribution)
  * 
  * Please note that this code is very experimental, therefore have a critical
  * look at the results and check whether they are feasible or not. If you think
@@ -69,10 +70,12 @@ import org.matsim.vehicles.Vehicle;
  * @author achakirov
  * 
  */
-public class SocialCostCalculatorV2 implements TravelDisutility, IterationStartsListener, IterationEndsListener,
-AfterMobsimListener, PersonDepartureEventHandler, PersonArrivalEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
+public class SocialCostCalculatorLinkOpt implements TravelDisutility,
+IterationStartsListener, IterationEndsListener, AfterMobsimListener,
+PersonDepartureEventHandler, PersonArrivalEventHandler,
+LinkEnterEventHandler, LinkLeaveEventHandler {
 
-	private static Logger log = Logger.getLogger(SocialCostCalculatorV2.class);
+	private static Logger log = Logger.getLogger(SocialCostCalculator.class);
 
 	private int travelTimeBinSize;
 	private int numSlots;
@@ -83,25 +86,23 @@ AfterMobsimListener, PersonDepartureEventHandler, PersonArrivalEventHandler, Lin
 	private double endTime = 48 * 3600;
 
 	double marginalUtilityOfMoney;
-	double opportunityCostOfCarTravel;
+	double opportunityCostOfCarTravel; 
+
 
 	/*
 	 * Blur the Social Cost to speed up the relaxation process. Values between
 	 * 0.0 and 1.0 are valid. 0.0 means the old value will be kept, 1.0 means
 	 * the old value will be totally overwritten.
 	 */
-	private final double blendFactor;
+	private final double blendFactor;;
 
 	/*
-	 * This is a lookup table because currently the TransportMode of a Leg is
-	 * only included in the DepartureEvents but not in the LinkEnter/LinkLeave
-	 * Events.
+	 * This is a lookup table because currently the TransportMode of a Leg
+	 * is only included in the DepartureEvents but not in the
+	 * LinkEnter/LinkLeave Events.
 	 */
-	private Set<String> transportModes; // TransportModes which create
-	// congestion and therefore have to be
-	// respected
-	private Set<Id> activeAgents; // AgentId - Agents that perform a Leg with a
-	// TransportMode contained in transportModes
+	private Set<String> transportModes; // TransportModes which create congestion and therefore have to be respected
+	private Set<Id> activeAgents; // AgentId - Agents that perform a Leg with a TransportMode contained in transportModes
 	private Map<Id, SocialCostsData> socialCostsMap; // LinkId
 	private Map<Id, LinkTrip> activeTrips; // LinkId
 	private List<LinkTrip> performedTrips;
@@ -122,25 +123,15 @@ AfterMobsimListener, PersonDepartureEventHandler, PersonArrivalEventHandler, Lin
 	private List<Double> quantil25PctNormalizedSocialCosts = new ArrayList<Double>();
 	private List<Double> quantil75PctNormalizedSocialCosts = new ArrayList<Double>();
 
-	public SocialCostCalculatorV2(final Network network, EventsManager events, TravelTime travelTime, Controler controler,
-			double blendFactor) {
-		this(network, 5 * 60, 30 * 3600, events, travelTime, controler, blendFactor); // default
-		// timeslot-duration:
-		// 15
-		// minutes
+	public SocialCostCalculatorLinkOpt(final Network network, EventsManager events, TravelTime travelTime, Controler controler, double blendFactor) {
+		this(network, 5 * 60, 30 * 3600, events, travelTime, controler, blendFactor); // default timeslot-duration: 15 minutes
 	}
 
-	public SocialCostCalculatorV2(final Network network, final int timeslice, EventsManager events, TravelTime travelTime,
-			Controler controler, double blendFactor) {
-		this(network, timeslice, 30 * 3600, events, travelTime, controler, blendFactor); // default:
-		// 30
-		// hours
-		// at
-		// most
+	public SocialCostCalculatorLinkOpt(final Network network, final int timeslice, EventsManager events, TravelTime travelTime, Controler controler, double blendFactor) {
+		this(network, timeslice, 30 * 3600, events, travelTime, controler, blendFactor); // default: 30 hours at most
 	}
 
-	public SocialCostCalculatorV2(Network network, int timeslice, int maxTime, EventsManager events, TravelTime travelTime,
-			Controler controler, double blendFactor) {
+	public SocialCostCalculatorLinkOpt(Network network, int timeslice, int maxTime, EventsManager events, TravelTime travelTime, Controler controler, double blendFactor) {
 		this.travelTimeBinSize = timeslice;
 		this.numSlots = (maxTime / this.travelTimeBinSize) + 1;
 		this.network = network;
@@ -150,8 +141,7 @@ AfterMobsimListener, PersonDepartureEventHandler, PersonArrivalEventHandler, Lin
 		this.blendFactor = blendFactor;
 
 		this.marginalUtilityOfMoney = controler.getConfig().planCalcScore().getMarginalUtilityOfMoney();
-		this.opportunityCostOfCarTravel = -controler.getConfig().planCalcScore().getTraveling_utils_hr()
-				+ controler.getConfig().planCalcScore().getPerforming_utils_hr();
+		this.opportunityCostOfCarTravel = - controler.getConfig().planCalcScore().getTraveling_utils_hr() + controler.getConfig().planCalcScore().getPerforming_utils_hr();
 
 		init();
 	}
@@ -166,6 +156,7 @@ AfterMobsimListener, PersonDepartureEventHandler, PersonArrivalEventHandler, Lin
 			SocialCostsData scd = new SocialCostsData();
 			scd.link = link;
 			scd.socialCosts = new double[this.numSlots];
+			scd.delays = new double[this.numSlots];
 			scd.freeSpeedTravelTime = travelTime.getLinkTravelTime(link, 0.0, null, null);
 
 			/*
@@ -173,12 +164,12 @@ AfterMobsimListener, PersonDepartureEventHandler, PersonArrivalEventHandler, Lin
 			 * Link at FreeSpeed but has to wait one second before it can leave
 			 * the Link. The Algorithm would detect this as congestion, which is
 			 * not true. Therefore we increase the "FreeSpeedTravelTime" and
-			 * assume that each Trip over a Link was traveled with FreeSpeed as
-			 * long as its TravelTime was shorter than this
+			 * assume that each Trip over a Link was traveled with FreeSpeed
+			 * as long as its TravelTime was shorter than this
 			 * PseudoFreeSpeedTravelTime.
 			 */
 			double pseudoFreeSpeedTravelTime = scd.freeSpeedTravelTime;
-			double pseudoFactor = Math.max(pseudoFreeSpeedTravelTime * 1.01, 2.0); 
+			double pseudoFactor = Math.max(pseudoFreeSpeedTravelTime * 1.01, 2.0); // 1%, but at least 2 seconds
 			pseudoFreeSpeedTravelTime = pseudoFreeSpeedTravelTime + pseudoFactor;
 
 			scd.pseudoFreeSpeedTravelTime = pseudoFreeSpeedTravelTime;
@@ -214,8 +205,7 @@ AfterMobsimListener, PersonDepartureEventHandler, PersonArrivalEventHandler, Lin
 		/*
 		 * Return, if the Agent is on a Leg which does not create congestion.
 		 */
-		if (!activeAgents.contains(event.getPersonId()))
-			return;
+		if (!activeAgents.contains(event.getPersonId())) return;
 
 		LinkTrip linkTrip = new LinkTrip();
 		linkTrip.person_id = event.getPersonId();
@@ -260,8 +250,9 @@ AfterMobsimListener, PersonDepartureEventHandler, PersonArrivalEventHandler, Lin
 		 * bike), it is ignored.
 		 */
 		String transportMode = event.getLegMode();
-		if (!transportModes.contains(transportMode))
-			return;
+		if (!transportModes.contains(transportMode)) return;
+		if(event.getPersonId().toString().startsWith("pt")) return;
+
 
 		LinkTrip linkTrip = new LinkTrip();
 		linkTrip.person_id = event.getPersonId();
@@ -283,12 +274,12 @@ AfterMobsimListener, PersonDepartureEventHandler, PersonArrivalEventHandler, Lin
 	@Override
 	public void handleEvent(final PersonArrivalEvent event) {
 		/*
-		 * Try to remove the Agent from the Active Set. If he was not active,
-		 * the performed Leg created no congestion and therefore there is no
-		 * LinkTrip object.
+		 * Try to remove the Agent from the Active Set. If he was not
+		 * active, the performed Leg created no congestion and therefore
+		 * there is no LinkTrip object.
 		 */
 		boolean wasActive = activeAgents.remove(event.getPersonId());
-		if (!wasActive) return;
+		if(!wasActive) return;
 
 		LinkTrip linkTrip = activeTrips.remove(event.getPersonId());
 
@@ -340,7 +331,7 @@ AfterMobsimListener, PersonDepartureEventHandler, PersonArrivalEventHandler, Lin
 	}
 
 	@Override
-	public void reset(final int iteration) {
+	public void reset(final int iteration) {		
 		activeAgents.clear();
 		activeTrips.clear();
 		performedTrips.clear();
@@ -350,8 +341,7 @@ AfterMobsimListener, PersonDepartureEventHandler, PersonArrivalEventHandler, Lin
 
 	private int getTimeSlotIndex(final double time) {
 		int slice = ((int) time) / travelTimeBinSize;
-		if (slice >= numSlots)
-			slice = numSlots - 1;
+		if (slice >= numSlots) slice = numSlots - 1;
 		return slice;
 	}
 
@@ -372,12 +362,12 @@ AfterMobsimListener, PersonDepartureEventHandler, PersonArrivalEventHandler, Lin
 			 */
 			double fraction = 1 - ((enterTime - beginEnterSlot) / travelTimeBinSize);
 
-			socialCosts = fraction * socialCostsMap.get(link_id).socialCosts[enterIndex] + (1 - fraction)
-					* socialCostsMap.get(link_id).socialCosts[enterIndex + 1];
+			socialCosts = fraction * socialCostsMap.get(link_id).socialCosts[enterIndex]
+					+ (1 - fraction) * socialCostsMap.get(link_id).socialCosts[enterIndex + 1];
 
 		}
 
-		socialCosts = (opportunityCostOfCarTravel * socialCosts / 3600) / marginalUtilityOfMoney;
+		socialCosts = (opportunityCostOfCarTravel * socialCosts / 3600) / marginalUtilityOfMoney;	
 
 		return socialCosts;
 	}
@@ -389,12 +379,10 @@ AfterMobsimListener, PersonDepartureEventHandler, PersonArrivalEventHandler, Lin
 
 			double socialCosts = calcSocCosts(linkTrip.link_id, linkTrip.enterTime);
 			// convert from seconds to CHF (currently defined as 6 CHF/hour)
-			// socialCosts = socialCosts / 600;
+			//			socialCosts = socialCosts / 600;
 
-			if (socialCosts <= 0.0)
-				continue;
-			PersonMoneyEvent e = new PersonMoneyEvent(0.5 * (linkTrip.enterTime + linkTrip.leaveTime), linkTrip.person_id,
-					-socialCosts);
+			if (socialCosts <= 0.0) continue;	
+			PersonMoneyEvent e = new PersonMoneyEvent(0.5 * (linkTrip.enterTime + linkTrip.leaveTime), linkTrip.person_id, -socialCosts);
 			this.events.processEvent(e);
 			totalSocialCosts = totalSocialCosts + socialCosts;
 		}
@@ -417,10 +405,10 @@ AfterMobsimListener, PersonDepartureEventHandler, PersonArrivalEventHandler, Lin
 				if (socialCosts > 0.0) cost = cost + socialCosts;
 				distance = legTrip.distance + network.getLinks().get(linkTrip.link_id).getLength();
 			}
-	
+
 			legTrip.distance = distance;
 			legTrip.cost = cost;
-			
+
 			tripStats.addValue(cost);
 
 			/*
@@ -508,8 +496,9 @@ AfterMobsimListener, PersonDepartureEventHandler, PersonArrivalEventHandler, Lin
 		}
 
 		fileName = event.getControler().getControlerIO().getOutputFilename("socialCosts");
-		writer.writeGraphic(fileName + ".png", "social costs (per leg)", meanData, medianData, quantil25Data, quantil75Data);
+		writer.writeGraphic(fileName + ".png", "social costs (money units per leg)", meanData, medianData, quantil25Data, quantil75Data);
 		writer.writeTable(fileName + ".txt", meanData, medianData, quantil25Data, quantil75Data);
+
 
 		for (int i = 0; i < dataLength; i++) {
 			meanData[i] = meanNormalizedSocialCosts.get(i);
@@ -519,98 +508,107 @@ AfterMobsimListener, PersonDepartureEventHandler, PersonArrivalEventHandler, Lin
 		}
 
 		fileName = event.getControler().getControlerIO().getOutputFilename("normalizedSocialCosts");
-		writer.writeGraphic(fileName + ".png", "social costs (per leg, normalized)", meanData, medianData, quantil25Data,quantil75Data);
+		writer.writeGraphic(fileName + ".png", "social costs (per leg, normalized)", meanData, medianData, quantil25Data, quantil75Data);
 		writer.writeTable(fileName + ".txt", meanData, medianData, quantil25Data, quantil75Data);
-		
+
 		//Write link toll statistics
-				String filenameLinkStats = this.controler.getControlerIO().getIterationFilename(event.getIteration(), "linkTollStats.txt");
-				String[] linkTableColumns = new String[this.numSlots+1];
-				linkTableColumns[0] = "LinkId";
-				for(int i=1;i<=numSlots;i++){
-					linkTableColumns[i] = Integer.toString((i-1)*this.travelTimeBinSize);
+		String filenameLinkStats = this.controler.getControlerIO().getIterationFilename(event.getIteration(), "linkTollStats.txt");
+		String[] linkTableColumns = new String[this.numSlots+1];
+		linkTableColumns[0] = "LinkId";
+		for(int i=1;i<=numSlots;i++){
+			linkTableColumns[i] = Integer.toString((i-1)*this.travelTimeBinSize);
+		}
+
+		try{
+			IterationTableWriter linkTable = new IterationTableWriter(filenameLinkStats,linkTableColumns);
+			String[] linkTollData = new String[this.numSlots+1];
+			for (SocialCostsData data : this.socialCostsMap.values()) 
+			{
+				linkTollData[0] = data.link.getId().toString();
+				for (int k = 0; k < this.numSlots; k++) 
+				{
+					linkTollData[k+1] = Double.toString(calcSocCosts(data.link.getId(), k*this.travelTimeBinSize));
+				}
+				linkTable.addData(linkTollData);
+			}
+
+			linkTable.finish();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+
+		//Write trip statistics
+		String tripTableColumns[] = {"tripID","startTime","duration","distance","toll"};
+		HashMap<Id,Integer> personTrips = new HashMap<Id,Integer>();		
+		try {
+			String filenameTripStats = this.controler.getControlerIO().getIterationFilename(event.getIteration(), "tripStats.txt");
+			IterationTableWriter tripTable = new IterationTableWriter(filenameTripStats,tripTableColumns);
+			Double tripDistance;
+			Double tripDuration;
+			Double cost;
+
+			String[] dataLine = new String[5];
+			for (LegTrip legTrip : performedLegs) {
+
+				if(personTrips.containsKey(legTrip.person_id)){
+					personTrips.put(legTrip.person_id, personTrips.get(legTrip.person_id)+1);
+				}
+				else{
+					personTrips.put(legTrip.person_id, 1);
 				}
 
-				try{
-					IterationTableWriter linkTable = new IterationTableWriter(filenameLinkStats,linkTableColumns);
-					String[] linkTollData = new String[this.numSlots+1];
-					for (SocialCostsData data : this.socialCostsMap.values()) 
-					{
-						linkTollData[0] = data.link.getId().toString();
-						for (int k = 0; k < this.numSlots; k++) 
-						{
-							linkTollData[k+1] = Double.toString(calcSocCosts(data.link.getId(), k*this.travelTimeBinSize));
-						}
-						linkTable.addData(linkTollData);
-					}
-					
-					linkTable.finish();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}	
+				tripDuration = legTrip.arrivalTime - legTrip.departureTime;
 
-				//Write trip statistics
-				String tripTableColumns[] = {"tripID","startTime","duration","distance","toll"};
-				HashMap<Id,Integer> personTrips = new HashMap<Id,Integer>();		
-				try {
-					String filenameTripStats = this.controler.getControlerIO().getIterationFilename(event.getIteration(), "tripStats.txt");
-					IterationTableWriter tripTable = new IterationTableWriter(filenameTripStats,tripTableColumns);
-					Double tripDistance;
-					Double tripDuration;
-					Double cost;
-					
-					String[] dataLine = new String[5];
-					for (LegTrip legTrip : performedLegs) {
-
-						if(personTrips.containsKey(legTrip.person_id)){
-							personTrips.put(legTrip.person_id, personTrips.get(legTrip.person_id)+1);
-						}
-						else{
-							personTrips.put(legTrip.person_id, 1);
-						}
-
-						tripDuration = legTrip.arrivalTime - legTrip.departureTime;
-
-						dataLine[0] = legTrip.person_id.toString()+"_"+personTrips.get(legTrip.person_id);
-						dataLine[1] = String.valueOf(legTrip.departureTime);
-						dataLine[2] = String.valueOf(tripDuration);
-						dataLine[3] = String.valueOf(legTrip.distance);
-						dataLine[4] = String.valueOf(legTrip.cost);
-						tripTable.addData(dataLine);
-					}
-					tripTable.finish();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}		
+				dataLine[0] = legTrip.person_id.toString()+"_"+personTrips.get(legTrip.person_id);
+				dataLine[1] = String.valueOf(legTrip.departureTime);
+				dataLine[2] = String.valueOf(tripDuration);
+				dataLine[3] = String.valueOf(legTrip.distance);
+				dataLine[4] = String.valueOf(legTrip.cost);
+				tripTable.addData(dataLine);
+			}
+			tripTable.finish();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
 	}
 
 	private void updateSocCosts(int iteration) {
-		for (SocialCostsData data : this.socialCostsMap.values()) {
-			int ke = this.numSlots; // ke = K
+		int globalInnovationDisableAfter = (int) ((controler.getConfig().controler().getLastIteration() - controler.getConfig().controler().getFirstIteration()) 
+				* controler.getConfig().strategy().getFractionOfIterationsToDisableInnovation() + controler.getConfig().controler().getFirstIteration());
+		if(iteration < (globalInnovationDisableAfter - 100)){
 
-			// for k = K-1 .. 0
-			for (int k = this.numSlots - 1; k >= 0; k--) {
-				/*
-				 * if ta(k) = tfree then ke = k We have to use "<=" because we
-				 * use a PseudoFreeSpeedTravelTime!
-				 */
-				if (travelTime.getLinkTravelTime(data.link, k * travelTimeBinSize, null, null) <= data.pseudoFreeSpeedTravelTime) ke = k;
+			for (SocialCostsData data : this.socialCostsMap.values()) {
+				int ke = this.numSlots; // ke = K
 
-				// Ca(k) = max(0, (ke - k)*T - tfree)
-				double socialCost = (ke - k) * travelTimeBinSize - travelTime.getLinkTravelTime(data.link, k * travelTimeBinSize, null, null);
-				if (socialCost < 0.0) socialCost = 0.0;
-				// data.socialCosts[k] = socialCost;
+				// for k = K-1 .. 0
+				for (int k = this.numSlots - 1; k >= 0; k--) {
 
-				// If it is the first iteration, there is no old value, therefore use this iterations value.
-				double oldValue;
-				if (iteration == 0) oldValue = socialCost;
-				else oldValue = data.socialCosts[k];
-				double blendedOldValue = (1 - blendFactor) * oldValue;
-				double blendedNewValue = blendFactor * socialCost;
-				data.socialCosts[k] = blendedOldValue + blendedNewValue;
+					// If it is the first iteration, there is no old value, therefore use this iterations value. 
+					if (iteration == 0){
+						data.socialCosts[k]=0.0;
+						data.delays[k]=0.0;
+					}
+
+					double currentDelay = travelTime.getLinkTravelTime(data.link, k * travelTimeBinSize, null, null) - data.pseudoFreeSpeedTravelTime;
+					double difference = data.delays[k] - currentDelay;				
+
+
+					if(currentDelay > 0 && difference <= data.delays[k]*0.2){
+						data.socialCosts[k] = data.socialCosts[k] + 0.5*currentDelay;
+					}
+
+					if(currentDelay <= 0 && data.delays[k]<=0){
+						data.socialCosts[k] =  data.socialCosts[k] - 10;
+					}
+
+					if(data.socialCosts[k]<0) data.socialCosts[k]=0.0;
+
+					data.delays[k] = currentDelay;
+				}
+
+				//SavitzkyGolayFilter sgf = new SavitzkyGolayFilter(5,data.socialCosts, true);
+				//data.socialCosts = sgf.appllyFilter();
 			}
-
-			//SavitzkyGolayFilter sgf = new SavitzkyGolayFilter(5,data.socialCosts, true);
-			//data.socialCosts = sgf.appllyFilter();
 		}
 	}
 
@@ -626,6 +624,7 @@ AfterMobsimListener, PersonDepartureEventHandler, PersonArrivalEventHandler, Lin
 	private static class SocialCostsData {
 		Link link;
 		double[] socialCosts;
+		double[] delays;
 		double freeSpeedTravelTime; // TODO: make this time-dependent
 		double pseudoFreeSpeedTravelTime; // TODO: make this time-dependent
 	}

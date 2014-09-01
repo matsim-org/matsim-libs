@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
@@ -40,7 +41,7 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
  *
  */
 public class TripAnalysisHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler{
-	
+
 	private final static Logger log = Logger.getLogger(TripAnalysisHandler.class);
 
 	private Map<Id, Double> personId2departureTime = new HashMap<Id, Double>();
@@ -51,7 +52,8 @@ public class TripAnalysisHandler implements PersonDepartureEventHandler, PersonA
 	private int ptLegs = 0;
 	private int walkLegs = 0;
 	private int transitWalkLegs = 0;
-	
+	private int busLegs=0;
+
 	@Override
 	public void reset(int iteration) {
 		this.personId2departureTime.clear();
@@ -62,31 +64,39 @@ public class TripAnalysisHandler implements PersonDepartureEventHandler, PersonA
 		this.ptLegs = 0;
 		this.walkLegs = 0;
 		this.transitWalkLegs = 0;
+		this.busLegs = 0;
+
 	}
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		double travelTime = event.getTime() - this.personId2departureTime.get(event.getPersonId());
-		
+
 		totalTravelTimeAllModes = totalTravelTimeAllModes + travelTime;
-		
+
 		if (event.getLegMode().toString().equals(TransportMode.car)) {
-			totalTravelTimeCarMode = totalTravelTimeCarMode + travelTime;
-			this.carLegs++;
-			
+
+			if(!event.getPersonId().toString().startsWith("pt")){
+				totalTravelTimeCarMode = totalTravelTimeCarMode + travelTime;
+				this.carLegs++;
+			}
+			else{
+				this.busLegs++;
+			}
+
 		} else if (event.getLegMode().toString().equals(TransportMode.pt)) {
 			this.ptLegs++;
-	
+
 		} else if (event.getLegMode().toString().equals(TransportMode.walk)) {
 			this.walkLegs++;
-			
+
 		} else if (event.getLegMode().toString().equals(TransportMode.transit_walk)) {
 			this.transitWalkLegs++;
-		
+
 		} else {
 			log.warn("Unknown mode. This analysis only allows for 'car', 'pt' and 'walk'. For the simulated public transport, e.g. 'transit_walk' this analysis has to be revised.");
 		}
-	
+
 	}
 
 	@Override
@@ -98,7 +108,7 @@ public class TripAnalysisHandler implements PersonDepartureEventHandler, PersonA
 	public void handleEvent(PersonStuckEvent event) {
 		agentStuckEvents++;
 	}
-
+	
 	public double getTotalTravelTimeAllModes() {
 		return totalTravelTimeAllModes;
 	}
@@ -106,7 +116,7 @@ public class TripAnalysisHandler implements PersonDepartureEventHandler, PersonA
 	public double getTotalTravelTimeCarMode() {
 		return totalTravelTimeCarMode;
 	}
-	
+
 	public int getAgentStuckEvents() {
 		return agentStuckEvents;
 	}
@@ -122,9 +132,13 @@ public class TripAnalysisHandler implements PersonDepartureEventHandler, PersonA
 	public int getWalkLegs() {
 		return walkLegs;
 	}
-	
+
 	public int getTransitWalkLegs() {
 		return transitWalkLegs;
+	}
+
+	public int getBusLegs() {
+		return busLegs;
 	}
 	
 }

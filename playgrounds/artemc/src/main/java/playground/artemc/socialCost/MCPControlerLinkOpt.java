@@ -11,36 +11,37 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.artemc.annealing.SimpleAnnealer;
 import playground.artemc.scoreAnalyzer.DisaggregatedCharyparNagelScoringFunctionFactory;
 import playground.artemc.scoreAnalyzer.DisaggregatedScoreAnalyzer;
-import playground.artemc.socialCost.SocialCostControllerV2.InitializerV2;
+import playground.artemc.socialCost.SocialCostControlerLinkOpt.InitializerLinkOpt;
+import playground.artemc.socialCost.SocialCostController.Initializer;
 
 
-public class MCPControlerV2 {
+public class MCPControlerLinkOpt{
 
-private static final Logger log = Logger.getLogger(MCPControlerV2.class);
+private static final Logger log = Logger.getLogger(MCPControler.class);
 	
-static String configFile;
-static double sccBlendFactor;
-
-private static String input;
-private static String output;
-
-public static void main(String[] args) {
+	static String configFile;
+	static double sccBlendFactor;
+	
+	private static String input;
+	private static String output;
+	
+	public static void main(String[] args) {
+			
+		input = args[0];
+		output = args[1];
+		sccBlendFactor = Double.parseDouble(args[2]);
 		
-	input = args[0];
-	output = args[1];
-	sccBlendFactor = Double.parseDouble(args[2]);
-	
-	MCPControlerV2 runner = new MCPControlerV2();
-	runner.runInternalizationFlows();
-}
+		MCPControlerLinkOpt runner = new MCPControlerLinkOpt();
+		runner.runInternalizationFlows();
+	}
 	
 	private void runInternalizationFlows() {
 		
 		Controler controler = null;
 		Scenario scenario = initSampleScenario();
 		controler = new Controler(scenario);
-		
-		InitializerV2 initializer = new InitializerV2(sccBlendFactor);
+	
+		InitializerLinkOpt initializer = new InitializerLinkOpt(sccBlendFactor);
 		controler.addControlerListener(initializer);
 		
 		// Additional analysis
@@ -55,6 +56,7 @@ public static void main(String[] args) {
 		controler.run();
 	}
 	
+
 	private static Scenario initSampleScenario() {
 
 		Config config = ConfigUtils.loadConfig(input+"config.xml");

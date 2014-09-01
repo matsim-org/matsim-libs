@@ -19,7 +19,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 
-public class SocialCostControllerWithPT {
+public class SocialCostControlerLinkOpt {
 
 
 	public static void main(String[] args) {
@@ -36,7 +36,7 @@ public class SocialCostControllerWithPT {
 		 */
 		//controler.setScoringFunctionFactory(new TimeAndMoneyDependentScoringFunctionFactory());
 
-		InitializerPT initializer = new InitializerPT();
+		InitializerLinkOpt initializer = new InitializerLinkOpt(0.1);
 		controler.addControlerListener(initializer);
 		controler.setOverwriteFiles(true);
 		controler.run();
@@ -47,9 +47,9 @@ public class SocialCostControllerWithPT {
 
 		Config config = ConfigUtils.loadConfig("H:/Work_Extern/SiouxFalls_Simulations/runInputs/config_PT_flowTollV2_local.xml");
 		config.controler().setOutputDirectory("H:/Work_Extern/SiouxFalls_Simulations/PT_flowTollV2/");
-		config.controler().setLastIteration(10);
-		config.controler().setWritePlansInterval(10);
-		config.controler().setWriteEventsInterval(10);
+		config.controler().setLastIteration(1);
+		config.controler().setWritePlansInterval(1);
+		config.controler().setWriteEventsInterval(1);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		return scenario;
@@ -58,33 +58,28 @@ public class SocialCostControllerWithPT {
 	/*
 	 * Initialize the necessary components for the social cost calculation.
 	 */
-	public static class InitializerPT implements IterationStartsListener {
+	public static class InitializerLinkOpt implements IterationStartsListener{
 		
 		private final double blendFactor;
 		
-		public InitializerPT(double blendFactor){
+		public InitializerLinkOpt(double blendFactor){
 			this.blendFactor = blendFactor;			
 		}
 		
-		public InitializerPT(){
+		public InitializerLinkOpt(){
 			this.blendFactor = 0.1 ;			
 		}
 		
-
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
 			if(event.getIteration()==0){
 				Controler controler = event.getControler();
 
-				VehicleOccupancyObserver vehicleObserver = new VehicleOccupancyObserver();
-				
 				// initialize the social costs calculator
-				SocialCostCalculatorWithPT scc = new SocialCostCalculatorWithPT(controler.getNetwork(), controler.getEvents(), controler.getLinkTravelTimes(), controler, vehicleObserver, blendFactor);
+				SocialCostCalculatorLinkOpt scc = new SocialCostCalculatorLinkOpt(controler.getNetwork(), controler.getEvents(), controler.getLinkTravelTimes(), controler, blendFactor);
 				
 				controler.addControlerListener(scc);
 				controler.getEvents().addHandler(scc);
-			
-				controler.getEvents().addHandler(vehicleObserver);
 
 				// initialize the social costs disutility calculator
 				SocialCostTravelDisutilityFactory factory = new SocialCostTravelDisutilityFactory(scc);
@@ -105,12 +100,12 @@ public class SocialCostControllerWithPT {
 	private static class SocialCostTravelDisutility implements TravelDisutility {
 
 		private final TravelTime travelTime;
-		private final SocialCostCalculatorWithPT scc;
+		private final SocialCostCalculatorLinkOpt scc;
 		private final double marginalCostOfDistance;
 		private final double marginalCostOfTime;
 
 
-		public SocialCostTravelDisutility(TravelTime travelTime, SocialCostCalculatorWithPT scc, PlanCalcScoreConfigGroup cnScoringGroup) {
+		public SocialCostTravelDisutility(TravelTime travelTime, SocialCostCalculatorLinkOpt scc, PlanCalcScoreConfigGroup cnScoringGroup) {
 			this.travelTime = travelTime;
 			this.scc = scc;
 			this.marginalCostOfTime = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
@@ -135,9 +130,9 @@ public class SocialCostControllerWithPT {
 
 	private static class SocialCostTravelDisutilityFactory implements TravelDisutilityFactory {
 
-		private final SocialCostCalculatorWithPT scc;
+		private final SocialCostCalculatorLinkOpt scc;
 
-		public SocialCostTravelDisutilityFactory(SocialCostCalculatorWithPT scc) {
+		public SocialCostTravelDisutilityFactory(SocialCostCalculatorLinkOpt scc) {
 			this.scc = scc;
 		}
 
