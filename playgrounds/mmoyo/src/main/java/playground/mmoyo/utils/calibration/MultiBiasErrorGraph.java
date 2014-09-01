@@ -24,7 +24,7 @@ import org.matsim.counts.algorithms.graphs.CountsGraph;
 import playground.mmoyo.io.MRE_reader;
 
 /** reads a number of biasErrorGraphDataOccupancy files and creates a single plot*/
-public class MultiBiasErrorGraph extends CountsGraph{
+public final class MultiBiasErrorGraph extends CountsGraph{
 	private List<Tuple<String,double[]>> mreDblFileList;   //stores multiple mre values and their descriptions
 	
 	public MultiBiasErrorGraph(final List<Tuple<String,String>> mreFileList){

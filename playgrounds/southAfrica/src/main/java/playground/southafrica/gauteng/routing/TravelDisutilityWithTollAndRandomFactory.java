@@ -22,12 +22,10 @@ package playground.southafrica.gauteng.routing;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
@@ -41,29 +39,15 @@ import org.matsim.vehicles.Vehicle;
  * @author kn after bkick after dgrether
  *
  */
-public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFactory {
-	private static final Logger log = Logger.getLogger(ConfigurableTravelDisutilityFactory.class ) ;
+public class TravelDisutilityWithTollAndRandomFactory implements TravelDisutilityFactory {
+	private static final Logger log = Logger.getLogger(TravelDisutilityWithTollAndRandomFactory.class ) ;
 
-	private static int wrnCnt = 0;
+//	private static int wrnCnt = 0;
 
 	private RoadPricingScheme scheme = null ;
 	private double sigma = 0. ;
 
-	public void setRandomness( double val ) {
-		this.sigma = val ;
-	}
-
-	/**
-	 * Obviously, this is for setting a road pricing scheme.  If a road pricing scheme is set, it will be considered.  Otherwise,
-	 * tolls are assumed to be zero everywhere.
-	 * 
-	 * @param scheme
-	 */
-	public void setRoadPricingScheme( RoadPricingScheme scheme ) {
-		this.scheme = scheme ;
-	}
-
-	public ConfigurableTravelDisutilityFactory( Scenario scenario ) {
+	public TravelDisutilityWithTollAndRandomFactory( Scenario scenario ) {
 	}
 
 	private static int infoCnt = 0 ;
@@ -121,20 +105,20 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 				// apply toll if applicable:
 				if ( localScheme != null ) {
 					double toll_usually_positive = 0. ;
-					Id vehicleId = null ;
-					if ( vehicle != null ) {
-						vehicleId  = vehicle.getId() ;
-					} else{
-						vehicleId = person.getId() ;
-						if ( wrnCnt<1 ) {
-							wrnCnt++ ;
-							Logger.getLogger(this.getClass()).warn( "still taking vehicle id from driver id (presumably during routing)") ;
-							Logger.getLogger(this.getClass()).warn( Gbl.ONLYONCE ) ;
-						}
-					}
-					Cost cost = localScheme.getLinkCostInfo(link.getId(), time, person.getId(), vehicleId ) ;
+//					Id vehicleId = null ;
+//					if ( vehicle != null ) {
+//						vehicleId  = vehicle.getId() ;
+//					} else{
+//						vehicleId = person.getId() ;
+//						if ( wrnCnt<1 ) {
+//							wrnCnt++ ;
+//							Logger.getLogger(this.getClass()).warn( "still taking vehicle id from driver id (presumably during routing)") ;
+//							Logger.getLogger(this.getClass()).warn( Gbl.ONLYONCE ) ;
+//						}
+//					}
+//					Cost cost = localScheme.getLinkCostInfo(link.getId(), time, person.getId(), vehicleId ) ;
 					// yyyy I (kn) think we should re-run the abmtrans paper with getLinkCostInfo( link.getId(), time, null, null ) .  kai, jul'14
-//					Cost cost = localScheme.getTypicalLinkCostInfo(link.getId(), time) ;
+					Cost cost = localScheme.getTypicalLinkCostInfo(link.getId(), time) ;
 					
 					if ( cost != null ) {
 						/* This needed to be introduced after the GautengRoadPricingScheme started to return null instead of
@@ -164,5 +148,27 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 			}
 		};
 	}
+	
+	/**
+	 * This sets the width parameter of the randomness; 0 (default) means no randomness.  This varies the utility of money with 
+	 * respect to toll (not even with respect to distance).
+	 * 
+	 * @param val
+	 */
+	public void setRandomness( double val ) {
+		this.sigma = val ;
+	}
+
+	/**
+	 * Obviously, this is for setting a road pricing scheme.  If a road pricing scheme is set, it will be considered.  Otherwise,
+	 * tolls are assumed to be zero everywhere.
+	 * 
+	 * @param scheme
+	 */
+	public void setRoadPricingScheme( RoadPricingScheme scheme ) {
+		this.scheme = scheme ;
+	}
+
+
 
 }

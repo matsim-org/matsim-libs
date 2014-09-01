@@ -9,31 +9,37 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.CalcAverageTolledTripLength;
 import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingWriterXMLv1;
 
 /**
  * @author nagel
  *
  */
-public class GenerationOfMoneyEvents implements StartupListener, AfterMobsimListener, IterationEndsListener
+public class GenerationOfMoneyEvents implements StartupListener, AfterMobsimListener, IterationEndsListener, ShutdownListener
 {
 	private static final Logger log = Logger.getLogger(GenerationOfMoneyEvents.class);
 
-	final CalcPaidToll calcPaidToll ;
-	final CalcAverageTolledTripLength cattl ;
+	private final CalcPaidToll calcPaidToll ;
+	private final CalcAverageTolledTripLength cattl ;
 //	final GautengTollStatistics gautengTollStatistics ;
+
+	private final RoadPricingScheme vehDepScheme;
 	
 	public GenerationOfMoneyEvents( Network network, Population population, RoadPricingScheme vehDepScheme ) {
 		calcPaidToll = new CalcPaidToll(network, vehDepScheme) ;
 		cattl = new CalcAverageTolledTripLength(network, vehDepScheme );
 //		gautengTollStatistics = new GautengTollStatistics(tollFactor) ;
+		this.vehDepScheme = vehDepScheme ;
 	}
 
 	@Override
@@ -68,6 +74,10 @@ public class GenerationOfMoneyEvents implements StartupListener, AfterMobsimList
 //		gautengTollStatistics.printTollInfo(event.getControler().getControlerIO().getIterationFilename(iteration, "")) ;
 	}
 
-
+	@Override
+	public void notifyShutdown(ShutdownEvent event) {
+		String filename = event.getControler().getControlerIO().getOutputFilename("output_toll.xml.gz") ;
+		new RoadPricingWriterXMLv1(this.vehDepScheme).writeFile(filename);
+	}
 
 }

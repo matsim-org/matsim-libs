@@ -20,6 +20,8 @@
 
 package playground.southafrica.gauteng.roadpricingscheme;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -72,7 +74,7 @@ public class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme {
 	
 	@Override
 	public Cost getTypicalLinkCostInfo( Id linkId, double time ) {
-		return this.getLinkCostInfo( linkId, time, null, null ) ;
+		return delegate.getTypicalLinkCostInfo(linkId, time) ;
 	}
 
 	@Override
@@ -88,6 +90,16 @@ public class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme {
 	@Override
 	public String getType() {
 		return delegate.getType();
+	}
+
+	@Override
+	public Iterable<Cost> getTypicalCosts() {
+		return delegate.getTypicalCosts() ;
+	}
+
+	@Override
+	public Map<Id, List<Cost>> getTypicalCostsForLink() {
+		return delegate.getTypicalCostsForLink() ;
 	}
 
 }
