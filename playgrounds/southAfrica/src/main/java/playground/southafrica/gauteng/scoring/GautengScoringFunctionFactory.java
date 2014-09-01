@@ -33,6 +33,7 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import playground.southafrica.gauteng.utilityofmoney.GautengUtilityOfMoney;
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
 
 /**
@@ -48,10 +49,10 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 	private final String subPopulationAttributeName;
 	final ObjectAttributes personAttributes ;
 
-	public GautengScoringFunctionFactory(Scenario scenario, UtilityOfMoneyI utlOfMon) {
+	public GautengScoringFunctionFactory(Scenario scenario, double baseValueOfTime, double valueOfTimeMultiplier) {
 		this.scenario = scenario ;
 		this.params = new CharyparNagelScoringParameters(scenario.getConfig().planCalcScore());
-		this.utlOfMon = utlOfMon ;
+		this.utlOfMon = new GautengUtilityOfMoney( scenario, baseValueOfTime, valueOfTimeMultiplier) ;
 		this.subPopulationAttributeName = scenario.getConfig().plans().getSubpopulationAttributeName() ;
 		this.personAttributes = this.scenario.getPopulation().getPersonAttributes();
 	}

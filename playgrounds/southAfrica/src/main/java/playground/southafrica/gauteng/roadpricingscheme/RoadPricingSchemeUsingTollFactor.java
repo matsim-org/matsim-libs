@@ -41,9 +41,6 @@ public class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme {
 	private final TollFactorI tollFactor ;
 	
 	public RoadPricingSchemeUsingTollFactor( String tollLinksFileName, TollFactorI tollFactor ) {
-//		log.warn("for me, using this as cordon toll did not work; using it as new scheme `link' " +
-//				"toll for the time being.  needs to be debugged?!?!  kai, mar'12") ;
-		// it is, in reality, a link toll, not a cordon toll.  Marcel had implemented it as cordon toll since link toll at that point did not exist.  kai, jan'14
 		
 		// read the road pricing scheme from file
 		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();

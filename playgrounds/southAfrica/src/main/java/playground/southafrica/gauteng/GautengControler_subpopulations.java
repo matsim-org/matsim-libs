@@ -95,8 +95,6 @@ import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor_Subpopu
 import playground.southafrica.gauteng.routing.ConfigurableTravelDisutilityFactory;
 import playground.southafrica.gauteng.scoring.GautengScoringFunctionFactory;
 import playground.southafrica.gauteng.scoring.GenerationOfMoneyEvents;
-import playground.southafrica.gauteng.utilityofmoney.GautengUtilityOfMoney;
-import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
 import playground.southafrica.utilities.Header;
 import playground.vsp.planselectors.DiversityGeneratingPlansRemover;
 import playground.vsp.planselectors.DiversityGeneratingPlansRemover.Builder;
@@ -179,7 +177,7 @@ public class GautengControler_subpopulations {
 
 		GautengUtils.assignSubpopulationStrategies(config);
 
-		config.planCalcScore().setBrainExpBeta(1.0);
+//		config.planCalcScore().setBrainExpBeta(1.0); // is now default
 		config.controler().setWritePlansInterval(100);
 
 		config.timeAllocationMutator().setMutationRange(7200.);
@@ -192,22 +190,22 @@ public class GautengControler_subpopulations {
 		
 		final double sampleFactor = 0.01 ;
 
-		config.counts().setCountsScaleFactor(1./sampleFactor);
 
 		config.qsim().setFlowCapFactor(sampleFactor);
 //		config.qsim().setStorageCapFactor(Math.pow(sampleFactor, -0.25)); // interpolates between 0.03 @ 0.01 and 1 @ 1
 		// yyyyyy was wrong!! Corrected version is
 		config.qsim().setStorageCapFactor(sampleFactor * Math.pow(sampleFactor, -0.25)); // interpolates between 0.03 @ 0.01 and 1 @ 1
 
+		config.counts().setCountsScaleFactor(1./sampleFactor);
 		config.counts().setOutputFormat("all");
 
 		config.qsim().setEndTime(36.*3600.);
 
 		config.qsim().setStuckTime(10.);
-		config.qsim().setRemoveStuckVehicles(false);
+//		config.qsim().setRemoveStuckVehicles(false); // this is now default
 
-		config.qsim().setSnapshotPeriod(72.*3600.); 
-		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
+//		config.qsim().setSnapshotPeriod(72.*3600.); 
+		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true); // test.  I don't think that this is needed. kai, aug'14
 
 		config.controler().setWriteSnapshotsInterval(0);
 		
@@ -290,7 +288,7 @@ public class GautengControler_subpopulations {
 				event.getControler().getStrategyManager().setPlanSelectorForRemoval(remover);
 			}
 		});
-		// needs to be tested.  But in current runs, all plans of an agent are exactly identical at end of 1000it.  kai, mar'13
+		// yyyy needs to be tested.  But in current runs, all plans of an agent are exactly identical at end of 1000it.  kai, mar'13
 		
 		// the following is how (in principle) the vehicles are inserted into the mobsim.  Needs to be tested.
 //		controler.setMobsimFactory(new MobsimWithVehicleInsertion());
@@ -309,23 +307,17 @@ public class GautengControler_subpopulations {
 	private static void setUpRoadPricingAndScoring(double baseValueOfTime, double valueOfTimeMultiplier, final Scenario sc,
 			final Controler controler) {
 		// ROAD PRICING:
-        if (ConfigUtils.addOrGetModule(sc.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUseRoadpricing()) {
+        final RoadPricingConfigGroup roadPricingConfig = ConfigUtils.addOrGetModule(sc.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+		if (roadPricingConfig.isUseRoadpricing()) {
 			throw new RuntimeException(
 					"roadpricing must NOT be enabled in config.scenario in order to use special "
 							+ "road pricing features.  aborting ...");
 		}
 
-		final  SanralTollFactor_Subpopulation tollFactor = new SanralTollFactor_Subpopulation(sc);
-
 		// CONSTRUCT VEH-DEP ROAD PRICING SCHEME:
-        RoadPricingScheme vehDepScheme = new RoadPricingSchemeUsingTollFactor(ConfigUtils.addOrGetModule(sc
-                .getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).getTollLinksFile(), tollFactor);
-
-		// CONSTRUCT UTILITY OF MONEY:
-
-		UtilityOfMoneyI personSpecificUtilityOfMoney = new GautengUtilityOfMoney(
-				sc, sc.getConfig().planCalcScore(),
-				baseValueOfTime, valueOfTimeMultiplier, tollFactor);
+        RoadPricingScheme vehDepScheme = new RoadPricingSchemeUsingTollFactor(
+        		roadPricingConfig.getTollLinksFile(), new SanralTollFactor_Subpopulation(sc)
+        		);
 
 		// INSTALL ROAD PRICING (in the longer run, re-merge with RoadPricing
 		// class):
@@ -334,16 +326,12 @@ public class GautengControler_subpopulations {
 				sc.getNetwork(), sc.getPopulation(), vehDepScheme
 				));
 
-		controler.setScoringFunctionFactory(new GautengScoringFunctionFactory(
-				sc, personSpecificUtilityOfMoney
-				));
+		controler.setScoringFunctionFactory(new GautengScoringFunctionFactory( sc, baseValueOfTime, valueOfTimeMultiplier ) );
 
 		
 		final ConfigurableTravelDisutilityFactory travelDisutilityFactory = new ConfigurableTravelDisutilityFactory( sc );
 		// ---
-		travelDisutilityFactory.setRoadPricingScheme( vehDepScheme ); // including toll. Needed for all experiments
-//		travelDisutilityFactory.setUom(personSpecificUtilityOfMoney); 
-//		travelDisutilityFactory.setScoringFunctionFactory(scoringFunctionFactory); // including auto-sensing.  Not needed for abmtrans paper
+		travelDisutilityFactory.setRoadPricingScheme( vehDepScheme ); 
 		travelDisutilityFactory.setRandomness(3);
 		// ---
 		controler.setTravelDisutilityFactory( travelDisutilityFactory );

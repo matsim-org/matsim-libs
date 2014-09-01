@@ -11,8 +11,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 
-import playground.southafrica.gauteng.roadpricingscheme.TollFactorI;
-
 /**
  * Calculates the utility of money from a given Value of Time (VoT). 
  * @author nagel
@@ -21,35 +19,27 @@ import playground.southafrica.gauteng.roadpricingscheme.TollFactorI;
 public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 	
 	private final Logger log = Logger.getLogger(GautengUtilityOfMoney.class);
-	private PlanCalcScoreConfigGroup planCalcScore;
 	private final double baseValueOfTime_h;
 	private final double commercialMultiplier;
 	private final Scenario sc;
 	
-	private final TollFactorI tollFactor ;
-
 	/**
 	 * Class to calculate the marginal utility of money (beta_money) for 
 	 * different vehicle types given the value of time (VoT).  
 	 * @param scenario TODO
-	 * @param cnScoringGroup
 	 * @param baseValueOfTime_h expressed in Currency/hr that is currently (March 
 	 * 2012) used for private cars, taxis and external traffic. 
 	 * @param valueOfTimeMultiplier to inflate the base VoT for heavy commercial 
 	 * vehicles. A multiplier of <i>half</i> this value is used for busses and
 	 * smaller commercial vehicles.
-	 * @param tollFactor TODO
 	 */
-	public GautengUtilityOfMoney(Scenario scenario, final PlanCalcScoreConfigGroup cnScoringGroup, double baseValueOfTime_h, double valueOfTimeMultiplier, TollFactorI tollFactor ) {
+	public GautengUtilityOfMoney(Scenario scenario, double baseValueOfTime_h, double valueOfTimeMultiplier ) {
 		this.sc = scenario;
-		this.planCalcScore = cnScoringGroup ;
 		log.warn("Value of Time (VoT) used as base: " + baseValueOfTime_h) ;
 		log.warn("Value of Time multiplier: " + valueOfTimeMultiplier) ;
 		
 		this.baseValueOfTime_h = baseValueOfTime_h ;
 		this.commercialMultiplier = valueOfTimeMultiplier ;
-		
-		this.tollFactor = tollFactor ;
 		
 		/* New (28/01/2014). Take a random person from each subpopulation */
 		Map<String, Id> map = new TreeMap<String, Id>();
@@ -123,8 +113,8 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 	}
 
 	private double getUtilityOfTravelTime_hr() {
-		final double utilityOfTravelTime_hr = 
-			this.planCalcScore.getPerforming_utils_hr() - this.planCalcScore.getTraveling_utils_hr() ;
+		final PlanCalcScoreConfigGroup planCalcScoreConfig = this.sc.getConfig().planCalcScore();
+		final double utilityOfTravelTime_hr = planCalcScoreConfig.getPerforming_utils_hr() - planCalcScoreConfig.getTraveling_utils_hr() ;
 		// "performing" is normally positive
 		// "traveling" is normally negative
 		return utilityOfTravelTime_hr;

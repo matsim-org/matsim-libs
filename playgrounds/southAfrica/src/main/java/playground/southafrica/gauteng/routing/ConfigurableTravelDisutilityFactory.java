@@ -31,7 +31,6 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.vehicles.Vehicle;
@@ -45,36 +44,13 @@ import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
 public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFactory {
 	private static final Logger log = Logger.getLogger(ConfigurableTravelDisutilityFactory.class ) ;
 
-	private final Scenario scenario;
-	
 	private static int wrnCnt = 0;
 
-	private UtilityOfMoneyI uom = null ;
-	private UtilityOfDistanceI uod = null ;
-	private UtilityOfTtimeI uott = null ;
-
-	private ScoringFunctionFactory scoringFunctionFactory = null ;
 	private RoadPricingScheme scheme = null ;
 	private double sigma = 0. ;
 
-	private UtilityOfTtimeI externalUott;
-
-	private UtilityOfDistanceI externalUod;
-
-	private UtilityOfMoneyI externalUom;
-
 	public void setRandomness( double val ) {
 		this.sigma = val ;
-	}
-
-	/**
-	 * Obviously, this is for setting a scoring function factory.  If set, and the effective marginal utilities container is <i>not</i> set,
-	 * then this is used to auto-sense the marginal utilities.
-	 * 
-	 * @param scoringFunctionFactory
-	 */
-	public void setScoringFunctionFactory( ScoringFunctionFactory scoringFunctionFactory ) {
-		this.scoringFunctionFactory = scoringFunctionFactory ;
 	}
 
 	/**
@@ -88,65 +64,25 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 	}
 
 	public ConfigurableTravelDisutilityFactory( Scenario scenario ) {
-		this.scenario = scenario ;
 	}
 
+	private static int infoCnt = 0 ;
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, final PlanCalcScoreConfigGroup cnScoringGroup) {
-		log.warn( "calling createTravelDisutility" ) ;
-		EffectiveMarginalUtilitiesContainer muc = null ;
-		if ( (this.externalUom==null || this.externalUod==null || this.externalUott==null ) && this.scoringFunctionFactory != null ) { 
-			 muc = TravelDisutilityUtils.createAutoSensingMarginalUtilitiesContainer(scenario, scoringFunctionFactory);
+		infoCnt++ ;
+		if ( infoCnt<10 ) {
+			log.warn( "calling createTravelDisutility" ) ;
 		}
-		if ( this.externalUom==null && this.uom!=null ) {
-			this.uom = muc ; // works because muc fulfills _all_ the interfaces.  Maybe not so nice.
-			log.warn( "using autosensing marginal utility of money") ;
-		} else if ( this.externalUom!=null ){
-			this.uom = this.externalUom ;
-			log.warn( " using external marginal utility of money" ) ;
-		}
-		if ( this.externalUom==null && this.uom!=null ) {
-			this.uod=muc ;
-			log.warn( "using autosensing marginal utility of distance") ;
-		} else if ( this.externalUod!=null ){
-			this.uod = this.externalUod ;
-			log.warn( " using external marginal utility of distance" ) ;
-		}
-		if ( this.externalUom==null && this.uom!=null ) {
-			this.uott=muc ;
-			log.warn( "using autosensing marginal utility of ttime") ;
-		} else if ( this.externalUott!=null ){
-			this.uott = this.externalUott ;
-			log.warn( " using external marginal utility of ttime" ) ;
-		}
-		// yyyy the above is all not well tested. kai, dec'13
 
-		final UtilityOfMoneyI localUom = this.uom ; // (generating final variable for anonymous class)
-
-		TravelDisutility tmp ;
-		if ( this.uott==null && this.uod==null ) {
-			tmp = new TravelTimeAndDistanceBasedTravelDisutility(timeCalculator, cnScoringGroup) ;
-			log.warn("using normal (non-person-based) base travel disutility (i.e. no time pressure) (UoM included later)") ;
-		} else {
-			tmp = new PersonIndividualTimeDistanceDisutility(timeCalculator, this.uott, this.uod ) ;
-			log.warn("using person individual travel disutility (i.e. including time pressure) (UoM included later)") ;
-		}
-		final TravelDisutility delegate = tmp ; // (generating final variable for anonymous class)
-
+		final TravelDisutility delegate = new TravelTimeAndDistanceBasedTravelDisutility(timeCalculator, cnScoringGroup) ;
 
 		final double normalization = 1./Math.exp( this.sigma*this.sigma/2 );
-		log.warn(" sigma: " + this.sigma + "; resulting normalization: " + normalization ) ;
-		
-		// generating final variables for anonymous class:
-		final RoadPricingScheme localScheme = this.scheme ;
-
-		int cnt = 0 ;
-
-		if ( localUom!=null ) {
-			log.warn("will use person-specific UoM");
+		if ( infoCnt<10 ) {
+			log.warn(" sigma: " + this.sigma + "; resulting normalization: " + normalization ) ;
 		}
-
+		
 		// anonymous class:
+		final RoadPricingScheme localScheme = this.scheme ; // (generating final variable for anonymous class)
 		return new TravelDisutility() {
 			private Person prevPerson = null ;
 			private double utilityOfMoney_normally_positive = 0. ;
@@ -154,11 +90,7 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 			public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 				if ( person != prevPerson ) {
 					prevPerson = person ;
-					if ( localUom!=null ) {
-						this.utilityOfMoney_normally_positive = localUom.getMarginalUtilityOfMoney( person.getId() ) ;
-					} else {
-						this.utilityOfMoney_normally_positive = cnScoringGroup.getMarginalUtilityOfMoney() ;
-					}
+					this.utilityOfMoney_normally_positive = cnScoringGroup.getMarginalUtilityOfMoney() ;
 
 					// randomize if applicable:
 					if ( sigma != 0. ) {
@@ -175,8 +107,6 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 						 * </ul>
 						 * kai, jan'14
 						 */
-
-
 						
 						this.utilityOfMoney_normally_positive *= logNormal ;
 						// yy the expectation value of this should be tested ...
@@ -202,6 +132,7 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 					}
 					Cost cost = localScheme.getLinkCostInfo(link.getId(), time, person.getId(), vehicleId ) ;
 					// yyyy I (kn) think we should re-run the abmtrans paper with getLinkCostInfo( link.getId(), time, null, null ) .  kai, jul'14
+//					Cost cost = localScheme.getTypicalLinkCostInfo(link.getId(), time) ;
 					
 					if ( cost != null ) {
 						/* This needed to be introduced after the GautengRoadPricingScheme started to return null instead of
@@ -212,10 +143,6 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 						} else if ( localScheme.getType().equalsIgnoreCase(RoadPricingScheme.TOLL_TYPE_LINK ) ) {
 							toll_usually_positive = cost.amount ;
 						} else {
-							/* I guess we can/should take out this exception since `cordon' should now be working? - JWJ Apr '12 */
-							/* This still does not work for cordon, and I currently think it never will.  Marcel's cordon toll
-							 * is different from other software packages, and so I don't want to mirror the
-							 * computation here, especially since we do not need it.  kai, apr'12 */
 							throw new RuntimeException("not set up for toll type: " + localScheme.getType() + ". aborting ...") ;
 						}
 
@@ -234,18 +161,6 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 				return delegate.getLinkMinimumTravelDisutility(link) ;
 			}
 		};
-	}
-
-	public void setUom(UtilityOfMoneyI uom) {
-		this.externalUom = uom;
-	}
-
-	public void setUod(UtilityOfDistanceI uod) {
-		this.externalUod = uod;
-	}
-
-	public void setUott(UtilityOfTtimeI uott) {
-		this.externalUott = uott;
 	}
 
 }
