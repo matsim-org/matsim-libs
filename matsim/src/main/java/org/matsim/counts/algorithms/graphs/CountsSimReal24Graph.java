@@ -48,7 +48,7 @@ import org.matsim.counts.algorithms.CountSimComparisonLinkFilter;
 import org.matsim.counts.algorithms.graphs.helper.Comp;
 import org.matsim.counts.algorithms.graphs.helper.MyComparator;
 
-public class CountsSimReal24Graph extends CountsGraph{
+public final class CountsSimReal24Graph extends CountsGraph{
 
 	/* 
 	 * TODO: Min. value of scale is set to 100.0 at the moment

@@ -46,7 +46,7 @@ import org.matsim.counts.algorithms.graphs.CountsGraph;
  * @author yu
  * 
  */
-public class PtBiasErrorGraph extends CountsGraph {
+public final class PtBiasErrorGraph extends CountsGraph {
 	private ComparisonErrorStatsCalculator errorStats;
 	private String chartTitle;
 

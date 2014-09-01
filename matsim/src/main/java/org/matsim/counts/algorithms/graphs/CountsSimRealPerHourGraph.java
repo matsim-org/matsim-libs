@@ -46,7 +46,7 @@ import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.algorithms.graphs.helper.Comp;
 import org.matsim.counts.algorithms.graphs.helper.MyComparator;
 
-public class CountsSimRealPerHourGraph extends CountsGraph{
+public final class CountsSimRealPerHourGraph extends CountsGraph{
 	/**
 	 * The time at which the data was measured.
 	 * A value in 1..24, 1 for 0 a.m. to 1 a.m., 2 for 1 a.m. to 2 a.m. ...

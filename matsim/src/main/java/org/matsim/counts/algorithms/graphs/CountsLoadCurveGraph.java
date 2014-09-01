@@ -49,7 +49,7 @@ import org.matsim.counts.CountSimComparison;
 
 
 
-public class CountsLoadCurveGraph extends CountsGraph {
+public final class CountsLoadCurveGraph extends CountsGraph {
 
 	private final DefaultCategoryDataset dataset0;
 	// TRRE: private final DefaultCategoryDataset dataset1;

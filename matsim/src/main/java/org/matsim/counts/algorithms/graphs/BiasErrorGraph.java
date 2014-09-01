@@ -38,7 +38,7 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.matsim.counts.ComparisonErrorStatsCalculator;
 import org.matsim.counts.CountSimComparison;
 
-public class BiasErrorGraph extends CountsGraph {
+public final class BiasErrorGraph extends CountsGraph {
 
 	private ComparisonErrorStatsCalculator errorStats;
 	

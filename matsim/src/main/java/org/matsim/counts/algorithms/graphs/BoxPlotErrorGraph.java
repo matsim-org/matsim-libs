@@ -36,7 +36,7 @@ import org.jfree.chart.renderer.category.BoxAndWhiskerRenderer;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 import org.matsim.counts.CountSimComparison;
 
-public class BoxPlotErrorGraph extends CountsGraph {
+public final class BoxPlotErrorGraph extends CountsGraph {
 
 	public BoxPlotErrorGraph(final List<CountSimComparison> ccl, final int iteration, final String filename,
 			final String chartTitle) {

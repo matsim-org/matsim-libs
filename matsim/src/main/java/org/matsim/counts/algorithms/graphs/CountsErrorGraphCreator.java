@@ -28,23 +28,30 @@ import org.matsim.counts.algorithms.graphs.helper.MyURL;
 
 public class CountsErrorGraphCreator extends CountsGraphsCreator {
 
-	
+
 	public CountsErrorGraphCreator(final String sectionTitle) {
 		super(sectionTitle);
 	}
-	
-	
+
+
 	@Override
 	public List<CountsGraph> createGraphs(final List<CountSimComparison> ccl, final int iteration) {	
 
 		List<CountsGraph> graphList=new Vector<CountsGraph>();
-
-		String fileName="errors";
-		BoxPlotErrorGraph ep=new BoxPlotErrorGraph(ccl, iteration, fileName, fileName);
-		ep.createChart(0);
-		graphList.add(ep);
-		this.section.addURL(new MyURL(fileName+".html", "errors"));
-
+		{
+			String fileName="errors";
+			BoxPlotErrorGraph ep=new BoxPlotErrorGraph(ccl, iteration, fileName, fileName);
+			ep.createChart(0);
+			graphList.add(ep);
+			this.section.addURL(new MyURL(fileName+".html", "errors"));
+		}
+		{
+			String fileName="biasErrors";
+			BiasErrorGraph ep=new BiasErrorGraph(ccl, iteration, fileName, fileName);
+			ep.createChart(0);
+			graphList.add(ep);
+			this.section.addURL(new MyURL(fileName+".html", "biasErrors"));
+		}
 		return graphList;
 	}
 }
