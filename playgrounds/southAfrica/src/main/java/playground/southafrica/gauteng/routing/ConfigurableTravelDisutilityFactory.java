@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.southafrica.gauteng.routing;
 
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -34,8 +36,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.vehicles.Vehicle;
-
-import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
 
 /**
  * @author kn after bkick after dgrether
@@ -73,6 +73,8 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 		if ( infoCnt<10 ) {
 			log.warn( "calling createTravelDisutility" ) ;
 		}
+		
+		final Random random = MatsimRandom.getLocalInstance() ;
 
 		final TravelDisutility delegate = new TravelTimeAndDistanceBasedTravelDisutility(timeCalculator, cnScoringGroup) ;
 
@@ -94,7 +96,7 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 
 					// randomize if applicable:
 					if ( sigma != 0. ) {
-						double logNormal = Math.exp( sigma * MatsimRandom.getRandom().nextGaussian() ) ;
+						double logNormal = Math.exp( sigma * random.nextGaussian() ) ;
 						logNormal *= normalization ;
 						// this should be a log-normal distribution with sigma as the "width" parameter.   Instead of figuring out the "location"
 						// parameter mu, I rather just normalize (which should be the same, see next). kai, nov'13

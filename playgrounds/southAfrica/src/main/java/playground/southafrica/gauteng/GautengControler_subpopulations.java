@@ -210,7 +210,7 @@ public class GautengControler_subpopulations {
 		config.controler().setWriteSnapshotsInterval(0);
 		
 		if ( user==User.kai ) {
-			config.parallelEventHandling().setNumberOfThreads(4); 
+			config.parallelEventHandling().setNumberOfThreads(1); // I don't think that it helps to have more than one here.  
 		} else if(user == User.johan){
 			config.parallelEventHandling().setNumberOfThreads(1); 
 		}
