@@ -35,7 +35,7 @@ final class EquiDistAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBu
 	
 	@Override
 	public double calculateVehicleSpacing(double linkLength, double numberOfVehiclesOnLink,
-			double storageCapacity, double bufferStorageCapacity) {
+			double overallStorageCapacity) {
 		return linkLength / numberOfVehiclesOnLink;
 	}
 

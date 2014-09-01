@@ -54,7 +54,7 @@ interface AgentSnapshotInfoBuilder {
 	void positionAgentOnLink(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord, double lengthOfCurve, double eucledianLength, QVehicle veh, 
 			double distanceFromFromNode,	Integer lane, double speedValueBetweenZeroAndOne);
 	
-	double calculateVehicleSpacing(double linkLength, double numberOfVehiclesOnLink, double storageCapacity, double bufferStorageCapacity);
+	double calculateVehicleSpacing(double linkLength, double numberOfVehiclesOnLink, double overallStorageCapacity);
 
 //	double calculateDistanceOnVectorFromFromNode( double length, double spacing,
 //			 double lastDistanceFromFromNode, double now, double freespeedTraveltime, double travelTime);

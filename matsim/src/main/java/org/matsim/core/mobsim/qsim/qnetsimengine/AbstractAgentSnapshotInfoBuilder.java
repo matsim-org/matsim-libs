@@ -34,8 +34,12 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
@@ -160,6 +164,33 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 
 		positions.add(pos);
 	}
+	
+	public void positionVehiclesAlongLine(Collection<AgentSnapshotInfo> positions,
+			double now, Collection<MobsimVehicle> vehs, double curvedLength, double storageCapacity, 
+			double euklideanDistance, Coord upstreamCoord, Coord downstreamCoord, double inverseFlowCapPerTS, 
+			double freeSpeed, int numberOfLanesAsInt)
+	{
+		double spacing = this.calculateVehicleSpacing( curvedLength, vehs.size(), storageCapacity );
+		double freespeedTraveltime = curvedLength / freeSpeed ;
+
+		double lastDistanceFromFromNode = Double.NaN;
+
+		for ( MobsimVehicle mveh : vehs ) {
+			QVehicle veh = (QVehicle) mveh ;
+			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
+			double distanceFromFromNode = this.calculateDistanceOnVectorFromFromNode2(curvedLength, spacing,
+					lastDistanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
+			Integer lane = this.guessLane(veh, numberOfLanesAsInt );
+			double speedValue = this.calcSpeedValueBetweenZeroAndOne(veh,
+					inverseFlowCapPerTS, now, freeSpeed);
+			this.positionAgentOnLink(positions, upstreamCoord, downstreamCoord,
+						curvedLength, euklideanDistance, veh,
+						distanceFromFromNode, lane, speedValue);
+			lastDistanceFromFromNode = distanceFromFromNode;
+		}
+	}
+
+
 
 	public void positionQItem(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord, 
 			double lengthOfCurve, double euclideanLength, QItem veh, 

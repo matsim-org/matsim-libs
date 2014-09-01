@@ -40,11 +40,11 @@ public class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuil
 
 	@Override
 	public double calculateVehicleSpacing(double linkLength, double numberOfVehiclesOnLink,
-			double storageCapacity, double bufferStorageCapacity) {
+			double overallStorageCapacity) {
 	// the length of a vehicle in visualization
 
 		double vehLen = Math.min( 
-		linkLength / (storageCapacity + bufferStorageCapacity), // number of ``cells''
+		linkLength / (overallStorageCapacity), // number of ``cells''
 		linkLength / (numberOfVehiclesOnLink) ); // the link may be more than ``full'' because of forward squeezing of stuck vehicles
 		
 		return vehLen;
