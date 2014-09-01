@@ -21,10 +21,6 @@ In many situations, it should be sufficient to just read Sec.~\ref{sec:quickstar
 
 \vfill\eject
 
-\section{Illustration}
-
-Synthetic travelers normally receive rewards (positive utility) for performing activities, and penalties (negative utility) for traveling.
-
 \begin{figure}[h]
 \centerline{%
 \includegraphics[width=0.6\hsize]{figures/scoringFunction/scoring-example-wo-marginal}
@@ -32,6 +28,10 @@ Synthetic travelers normally receive rewards (positive utility) for performing a
 \caption{Example of scoring function.}
 \label{fig:scoring-example-wo-marginal}
 \end{figure}
+
+\section{Illustration}
+
+Synthetic travelers normally receive rewards (positive utility) for performing activities, and penalties (negative utility) for traveling.
 
 Fig.~\ref{fig:scoring-example-wo-marginal} provides an example of a typical scoring function.  
 %
@@ -145,7 +145,7 @@ The first effect is described marginally by
 \[
 - \frac{\partial}{\partial t_{trav}} V^{leg} = - \beta_{trav,mode} \ ,
 \]
-the minus steps from the fact that we are \emph{reducing} the travel time.
+the minus stems from the fact that we are \emph{reducing} the travel time.
 
 The second effect is described marginally by
 \[
@@ -161,9 +161,9 @@ The marginal utility of travel time savings needs to consider both:
 \[
 mUTTS 
 %
-= \left( \beta_{perf} \cdot \frac{t_{typ,i}}{t_{perf}} - \beta_{trav,mode} \right)
+= \left( - \beta_{trav,mode} + \beta_{perf} \cdot \frac{t_{typ,i}}{t_{perf}} \right)
 %
-\approx \beta_{perf} - \beta_{trav,mode} \ .
+\approx - \beta_{trav,mode} + \beta_{perf} \ .
 \]
 In consequence, $\beta_{trav,mode}$ \myemph{is only an offset to the marginal utility of time as a resource}.  If travelling is considered more pleasant than ``doing nothing'', it may actually be positive.  Even when it is positive, the overall marginal utility of travel time ($= -mUTTS$) can still remain negative.
 

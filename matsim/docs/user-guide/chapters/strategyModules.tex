@@ -51,7 +51,7 @@ It is not clear which combinations of these modules can be used  together. Depen
 
 \subsection{BestScore.  Status: works}
 
-Pure plan selecting (i.e. non-innovative) strategy module.
+Pure plan selecting (i.e.\ non-innovative) strategy module.
 
 Will select the plan with the highest score. The score will be updated after execution of the mobsim.
 
@@ -59,7 +59,18 @@ Disadvantage: Will never try again plans that obtained a bad score  from a fluct
 
 \subsection{ChangeExpBeta. Status: works. RECOMMENDED!}
 
+Choice model between plans that \emph{converges} to a logit distribution.
+
+The scores $S_i$ are taken as utilities; the betaBrain parameter from the  config file is taken as the scale parameter. As equation:
+\[
+p_i = \frac{\exp( \beta_{brain} * S_i)}{\sum_j \exp( \beta_{brain} * S_j )} \ .
+\]
+
 \subsection{KeepLastSelected. Status: works}
+
+Pure plan selecting (i.e.\ non-innovative) strategy module.
+
+Will keep the selected plan selected.  This may be necessary since \emph{every} person will have to undergo plans selection.
 
 \subsection{SelectExpBeta. Status: works}
 
@@ -70,7 +81,11 @@ The scores $S_i$ are taken as utilities; the betaBrain parameter from the  confi
 p_i = \frac{\exp( \beta_{brain} * S_i)}{\sum_j \exp( \beta_{brain} * S_j )} \ .
 \]
 
-\subsection{SelectRandom}
+\subsection{SelectRandom.  Status: works}
+
+Pure plan selecting (i.e.\ non-innovative) strategy module.
+
+Will select a random plan.
 
 \vfill\eject
 \section{Innovative modules}
