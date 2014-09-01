@@ -29,9 +29,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.roadpricing.RoadPricingSchemeUsingTollFactor;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
-
-import playground.southafrica.gauteng.roadpricingscheme.RoadPricingSchemeUsingTollFactor;
 
 
 public class MyTollPotentialEventHandler implements LinkEnterEventHandler{

@@ -368,7 +368,7 @@ class AssignmentEmulatingQLane extends QLaneInternalI {
 
 		@Override
 		public final Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
-			AgentSnapshotInfoBuilder snapshotInfoBuilder = AssignmentEmulatingQLane.this.network.simEngine.getAgentSnapshotInfoBuilder();
+			AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = AssignmentEmulatingQLane.this.network.simEngine.getAgentSnapshotInfoBuilder();
 
 			double numberOfVehiclesDriving = AssignmentEmulatingQLane.this.buffer.size() + AssignmentEmulatingQLane.this.vehQueue.size();
 			if (numberOfVehiclesDriving > 0) {
@@ -394,7 +394,7 @@ class AssignmentEmulatingQLane extends QLaneInternalI {
 		}
 
 		 double createAndAddVehiclePositionAndReturnDistance(final Collection<AgentSnapshotInfo> positions,
-				AgentSnapshotInfoBuilder snapshotInfoBuilder, double now, double lastDistanceFromFromNode, Link link,
+				AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder, double now, double lastDistanceFromFromNode, Link link,
 				double spacing, double freespeedTraveltime, QVehicle veh)
 		{
 			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
@@ -407,12 +407,12 @@ class AssignmentEmulatingQLane extends QLaneInternalI {
 					/ ( veh.getEarliestLinkExitTime() - AssignmentEmulatingQLane.this.vehEnterTimeMap.get(veh.getId()) ) ;
 			if ( speedValue>1. ) { speedValue=1. ; }
 			if (this.otfLink != null){
-				snapshotInfoBuilder.createAndAddVehiclePosition(positions, this.otfLink.getLinkStartCoord(), this.otfLink.getLinkEndCoord(), 
+				snapshotInfoBuilder.positionAgentOnLink(positions, this.otfLink.getLinkStartCoord(), this.otfLink.getLinkEndCoord(), 
 						AssignmentEmulatingQLane.this.length, this.otfLink.getEuklideanDistance(), veh, 
 						lastDistanceFromFromNode, lane, speedValue);
 			}
 			else {
-				snapshotInfoBuilder.createAndAddVehiclePosition(positions, link.getFromNode().getCoord(), link.getToNode().getCoord(), 
+				snapshotInfoBuilder.positionAgentOnLink(positions, link.getFromNode().getCoord(), link.getToNode().getCoord(), 
 						AssignmentEmulatingQLane.this.length, ((LinkImpl)link).getEuklideanDistance() , veh, lastDistanceFromFromNode, lane, speedValue);
 			}
 			return lastDistanceFromFromNode;

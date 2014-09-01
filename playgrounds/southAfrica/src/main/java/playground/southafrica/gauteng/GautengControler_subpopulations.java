@@ -84,15 +84,15 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeUsingTollFactor;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 
-import playground.southafrica.gauteng.roadpricingscheme.RoadPricingSchemeUsingTollFactor;
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor_Subpopulation;
-import playground.southafrica.gauteng.routing.TravelDisutilityWithTollAndRandomFactory;
+import playground.southafrica.gauteng.routing.RandomizingTravelDisutilityWithTollFactory;
 import playground.southafrica.gauteng.scoring.GautengScoringFunctionFactory;
 import playground.southafrica.gauteng.scoring.GenerationOfMoneyEvents;
 import playground.southafrica.utilities.Header;
@@ -211,6 +211,7 @@ public class GautengControler_subpopulations {
 		
 		if ( user==User.kai ) {
 			config.parallelEventHandling().setNumberOfThreads(1); // I don't think that it helps to have more than one here.  
+			config.qsim().setNumberOfThreads(6);
 		} else if(user == User.johan){
 			config.parallelEventHandling().setNumberOfThreads(1); 
 		}
@@ -281,10 +282,6 @@ public class GautengControler_subpopulations {
 		controler.addPlanSelectorFactory(planSelectorFactoryName, builder );
 		// yyyy needs to be tested.  But in current runs, all plans of an agent are exactly identical at end of 1000it.  kai, mar'13
 		
-		
-		// the following is how (in principle) the vehicles are inserted into the mobsim.  Needs to be tested.
-//		controler.setMobsimFactory(new MobsimWithVehicleInsertion());
-
 		// ADDITIONAL ANALYSIS:
 		controler.addControlerListener(new KaiAnalysisListener());
 
@@ -299,7 +296,9 @@ public class GautengControler_subpopulations {
 	private static void setUpRoadPricingAndScoring(double baseValueOfTime, double valueOfTimeMultiplier, final Scenario sc,
 			final Controler controler) {
 		// ROAD PRICING:
-        final RoadPricingConfigGroup roadPricingConfig = ConfigUtils.addOrGetModule(sc.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+        final RoadPricingConfigGroup roadPricingConfig = ConfigUtils.addOrGetModule(
+        		sc.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class
+        		);
 		if (roadPricingConfig.isUseRoadpricing()) {
 			throw new RuntimeException(
 					"roadpricing must NOT be enabled in config.scenario in order to use special "
@@ -318,10 +317,13 @@ public class GautengControler_subpopulations {
 				sc.getNetwork(), sc.getPopulation(), sanralTollScheme
 				));
 
-		controler.setScoringFunctionFactory(new GautengScoringFunctionFactory( sc, baseValueOfTime, valueOfTimeMultiplier ) );
+		controler.setScoringFunctionFactory(new GautengScoringFunctionFactory( 
+				sc, baseValueOfTime, valueOfTimeMultiplier 
+				) );
 
 		
-		final TravelDisutilityWithTollAndRandomFactory travelDisutilityFactory = new TravelDisutilityWithTollAndRandomFactory( sc );
+		final RandomizingTravelDisutilityWithTollFactory travelDisutilityFactory = 
+				new RandomizingTravelDisutilityWithTollFactory( sc );
 		// ---
 		travelDisutilityFactory.setRoadPricingScheme( sanralTollScheme ); 
 		travelDisutilityFactory.setRandomness(3);
@@ -461,97 +463,5 @@ public class GautengControler_subpopulations {
 		@Override
 		public void finishReplanning() {}
 	}
-
-	/**
-	 * This mobsim factory is a verbatim copy of the standard QSimFactory, plus vehicle type insertion near its end.
-	 * Currently (mar'14), there is no more elegant way of doing this, although we are working on this. kai, mar'14
-	 * 
-	 * @author nagel
-	 */
-	private static final class MobsimWithVehicleInsertion implements MobsimFactory {
-		@Override
-		public Mobsim createMobsim(final Scenario sc, EventsManager eventsManager) {
-			QSimConfigGroup conf = sc.getConfig().qsim();
-			if (conf == null) {
-				throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
-			}
-			if (conf.getNumberOfThreads() > 1) {
-				/*
-				 * The SimStepParallelEventsManagerImpl can handle events from multiple threads.
-				 * The (Parallel)EventsMangerImpl cannot, therefore it has to be wrapped into a
-				 * SynchronizedEventsManagerImpl.
-				 */
-				if (!(eventsManager instanceof SimStepParallelEventsManagerImpl)) {
-					eventsManager = new SynchronizedEventsManagerImpl(eventsManager);				
-				}
-			}
-
-			final QSim qSim = new QSim(sc, eventsManager);
-
-			ActivityEngine activityEngine = new ActivityEngine();
-			qSim.addMobsimEngine(activityEngine);
-			qSim.addActivityHandler(activityEngine);
-
-			QNetsimEngineFactory netsimEngFactory;
-			if (conf.getNumberOfThreads() > 1) {
-				netsimEngFactory = new ParallelQNetsimEngineFactory();
-				LOG.info("Using parallel QSim with " + conf.getNumberOfThreads() + " threads.");
-			} else {
-				netsimEngFactory = new DefaultQNetsimEngineFactory();
-			}
-			QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
-			qSim.addMobsimEngine(netsimEngine);
-			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-			
-			TeleportationEngine teleportationEngine = new TeleportationEngine();
-			qSim.addMobsimEngine(teleportationEngine);
-
-			AgentFactory af;
-			if (sc.getConfig().scenario().isUseTransit()) {
-				af = new TransitAgentFactory(qSim);
-				TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-				transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-				qSim.addDepartureHandler(transitEngine);
-				qSim.addAgentSource(transitEngine);
-				qSim.addMobsimEngine(transitEngine);
-			} else {
-				af = new DefaultAgentFactory(qSim);
-			}
-			if (sc.getConfig().network().isTimeVariantNetwork()) {
-				qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
-			}
-			
-			PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), af, qSim);
-			agentSource.setInsertVehicles(false); // We insert them ourselves!
-			
-			qSim.addAgentSource(agentSource);
-			
-			qSim.addAgentSource(new AgentSource() {
-				@Override
-				public void insertAgentsIntoMobsim() {
-					Population population = sc.getPopulation() ;
-					for (Person p : population.getPersons().values()) {
-						Plan plan = p.getSelectedPlan();
-						Set<String> seenModes = new HashSet<String>();
-						for (PlanElement planElement : plan.getPlanElements()) {
-							if (planElement instanceof Leg) {
-								Leg leg = (Leg) planElement;
-								if (sc.getConfig().qsim().getMainModes().contains(leg.getMode())) { // only simulated modes get vehicles
-									if (!seenModes.contains(leg.getMode())) { // create one vehicle per simulated mode, put it at beginning of first leg where needed
-										Id vehId = (Id) population.getPersonAttributes().getAttribute( p.getId().toString(), VEH_ID ) ;
-										Vehicle vehicle = sc.getVehicles().getVehicles().get( vehId ) ;
-										qSim.createAndParkVehicleOnLink(vehicle, PopulationAgentSource.findVehicleLink(p));
-										seenModes.add(leg.getMode());
-									}
-								}
-							}
-						}
-					}
-				}
-			});
-			return qSim;
-		}
-	}
-
 
 }

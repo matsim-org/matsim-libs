@@ -39,15 +39,15 @@ import org.matsim.vehicles.Vehicle;
  * @author kn after bkick after dgrether
  *
  */
-public class TravelDisutilityWithTollAndRandomFactory implements TravelDisutilityFactory {
-	private static final Logger log = Logger.getLogger(TravelDisutilityWithTollAndRandomFactory.class ) ;
+public class RandomizingTravelDisutilityWithTollFactory implements TravelDisutilityFactory {
+	private static final Logger log = Logger.getLogger(RandomizingTravelDisutilityWithTollFactory.class ) ;
 
 //	private static int wrnCnt = 0;
 
 	private RoadPricingScheme scheme = null ;
 	private double sigma = 0. ;
 
-	public TravelDisutilityWithTollAndRandomFactory( Scenario scenario ) {
+	public RandomizingTravelDisutilityWithTollFactory( Scenario scenario ) {
 	}
 
 	private static int infoCnt = 0 ;

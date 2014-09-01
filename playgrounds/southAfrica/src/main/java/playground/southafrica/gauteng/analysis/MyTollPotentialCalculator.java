@@ -46,8 +46,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
+import org.matsim.roadpricing.RoadPricingSchemeUsingTollFactor;
 
-import playground.southafrica.gauteng.roadpricingscheme.RoadPricingSchemeUsingTollFactor;
 import playground.southafrica.utilities.Header;
 
 public class MyTollPotentialCalculator {

@@ -23,9 +23,9 @@ public class KNGautengController {
 				, GAUTENG_PATH + "toll/gauteng_toll_weekday_Existing_20131211.xml" // toll
 //				, GAUTENG_PATH + "toll/gauteng_toll_weekday_Combined_20131211.xml" // toll
 
-				, "20" // base VoT
+				, "55" // base VoT
 				, "3" // VoT multiplier
-				, "4" // number of threads
+				, "6" // number of threads
 				, User.kai.toString()
 				, "./output"
 				, GAUTENG_PATH + "counts/2009/Counts_Thursday_Total.xml.gz"
