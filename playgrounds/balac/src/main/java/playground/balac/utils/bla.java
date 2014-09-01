@@ -28,7 +28,7 @@ public class bla {
 		networkReader.readFile(args[0]);
 		populationReader.readFile(args[1]);
 		
-final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/travelTimesCar_test2.txt");
+final BufferedWriter outLink = IOUtils.getBufferedWriter("P:/_TEMP/sschmutz/routing_matsim/20140428_stage_car/output/details/outputStatistics_ettapen_7.txt");
 
 		
 		for(Person per: sc.getPopulation().getPersons().values()) {

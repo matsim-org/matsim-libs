@@ -56,13 +56,20 @@ public class PTTravelTimes {
 	public static void main(String[] args) throws IOException {
 		
 		Config config = ConfigUtils.createConfig();
-		config.global().setNumberOfThreads(8);	// for parallel population reading
-		config.network().setInputFile("/data/matsim/cdobler/2030/network.xml.gz");
-		//config.plans().setInputFile("/data/matsim/cdobler/2030/60.plans_without_pt_routes.xml.gz");
-//		config.plans().setInputFile("/data/matsim/cdobler/2030/plans_test.xml");
-		config.facilities().setInputFile("/data/matsim/cdobler/2030/facilities.xml.gz");
-		config.transit().setTransitScheduleFile("/data/matsim/cdobler/2030/schedule.20120117.ch-edited.xml.gz");
-		config.transit().setVehiclesFile("/data/matsim/cdobler/2030/transitVehicles.ch.xml.gz");
+		config.global().setNumberOfThreads(16);	// for parallel population reading
+	//	config.network().setInputFile("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/network.xml.gz");
+	//	config.plans().setInputFile("/data/matsim/cdobler/2030/60.plans_without_pt_routes.xml.gz");
+	//	config.plans().setInputFile("/data/matsim/cdobler/2030/plans_test.xml");
+	//	config.facilities().setInputFile("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/facilities.xml.gz");
+	//	config.transit().setTransitScheduleFile("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/schedule.20120117.ch-edited.xml.gz");
+	//	config.transit().setVehiclesFile("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/transitVehicles.ch.xml.gz");
+		
+		config.network().setInputFile("./network_multimodal.xml.gz");
+
+	    config.facilities().setInputFile("./facilities.xml.gz");
+	    config.transit().setTransitScheduleFile("./schedule.20120117.ch-edited.xml.gz");
+	    config.transit().setVehiclesFile("./transitVehicles.ch.xml.gz");
+		
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 		config.scenario().setUseKnowledge(true);
@@ -70,17 +77,21 @@ public class PTTravelTimes {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		TransitRouterNetwork routerNetwork = new TransitRouterNetwork();
-		new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("/data/matsim/cdobler/2030/transitRouterNetwork_thinned.xml.gz");
-		
+	    new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("./transitRouterNetwork_thinned.xml.gz");
+
+	//	new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/transitRouterNetwork_thinned.xml.gz");
+		//config.planCalcScore().setUtilityOfLineSwitch(0.0);
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(config.planCalcScore(),
 				config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 		
-//		transitRouterFactory = new FastTransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, routerNetwork);
+	//	transitRouterFactory = new FastTransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, routerNetwork);
 		transitRouterFactory = new TransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, routerNetwork);
+		 BufferedReader readLink = IOUtils.getBufferedReader("./coord_"+args[0] +".txt");
+
+		    BufferedWriter outLink = IOUtils.getBufferedWriter("./travelTimesPT_"+args[0] +".txt");
+	//	final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/coord_"+args[0]+".txt");
 		
-		final BufferedReader readLink = IOUtils.getBufferedReader("/Network/Servers/ivt.ethz.ch/Volumes/ivt-home/balacm/MATSim/input/PTTravelTimes/coord_"+args[0]+".txt");
-		
-		final BufferedWriter outLink = IOUtils.getBufferedWriter("/Network/Servers/ivt.ethz.ch/Volumes/ivt-home/balacm/MATSim/input/PTTravelTimes/travelTimesPT_"+args[0]+".txt");
+	//final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/travelTimesPT_"+args[0]+".txt");
 
 		
 		
@@ -89,20 +100,20 @@ public class PTTravelTimes {
 		int i = 0;
 		while(s != null) {
 			String[] arr = s.split("\\s");
-			CoordImpl coordStart = new CoordImpl(arr[8], arr[7]);
+			CoordImpl coordStart = new CoordImpl(arr[4], arr[5]);
 			Link lStart = MyLinkUtils.getClosestLink(scenario.getNetwork(), coordStart);
-			CoordImpl coordEnd = new CoordImpl(arr[10], arr[9]);
+			CoordImpl coordEnd = new CoordImpl(arr[6], arr[7]);
 			Link lEnd = MyLinkUtils.getClosestLink(scenario.getNetwork(), coordEnd);
 			
-			PersonImpl person = new PersonImpl(new IdImpl(Integer.toString(i)));
-			i++;
+			PersonImpl person = new PersonImpl(new IdImpl(arr[0]));
+		//	i++;
 			PlanImpl plan = (PlanImpl) scenario.getPopulation().getFactory().createPlan();
 			ActivityImpl act = new ActivityImpl("home", lStart.getId());
 			act.setCoord(coordStart);
-			String[] arr2 = arr[6].split(":");
-			double h = Double.parseDouble(arr2[0]);
-			double m = Double.parseDouble(arr2[1]);
-			act.setEndTime(h * 3600 + m * 60);
+			//String[] arr2 = arr[6].split(":");
+			//double h = Double.parseDouble(arr2[0]);
+			double m = Double.parseDouble(arr[3]);
+			act.setEndTime(m * 60);
 			plan.addActivity(act);
 			
 			LegImpl leg = new LegImpl("pt");
@@ -132,7 +143,7 @@ public class PTTravelTimes {
 	//	}
 		
 		// create pt routes
-		int numThreads = 16;
+		int numThreads = 24;
 		ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), numThreads, new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 			@Override
 			public AbstractPersonAlgorithm getPersonAlgorithm() {
@@ -171,7 +182,9 @@ public class PTTravelTimes {
 		
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), 
 //				((ScenarioImpl) scenario).getKnowledges()).writeFileV4("/data/matsim/cdobler/2030/60.plans_with_pt_routes.xml.gz");
-				((ScenarioImpl) scenario).getKnowledges()).writeFileV4("/Network/Servers/ivt.ethz.ch/Volumes/ivt-home/balacm/MATSim/input/PTTravelTimes/plans_with_pt_routes_single_plan_"+args[0]+".xml.gz");
+		//		((ScenarioImpl) scenario).getKnowledges()).writeFileV4("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/plans_with_pt_routes_single_plan_"+args[0]+".xml.gz");
+			      ((ScenarioImpl)scenario).getKnowledges()).writeFileV4("./plans_with_pt_routes_"+args[0]+".xml.gz");
+
 	}
 		
 private static final PersonAlgorithm createRoutingAlgorithm(Scenario scenario) {

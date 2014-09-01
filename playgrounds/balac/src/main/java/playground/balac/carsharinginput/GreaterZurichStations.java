@@ -47,7 +47,7 @@ public class GreaterZurichStations {
 		int count = 0;
 		
 		//used to count members in the area
-		/*while (s != null) {
+		while (s != null) {
 			
 			String[] arr = s.split("\t");
 
@@ -68,7 +68,7 @@ public class GreaterZurichStations {
 		}
         ShapeFileWriter.writeGeometries(featuresMovedIncrease, "C:/Users/balacm/Desktop/SHP_files/Zurich Members_part1.shp");
 
-		System.out.println(count);*/
+		System.out.println(count);
 		
 		while (s != null) {
 			

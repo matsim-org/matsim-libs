@@ -49,7 +49,7 @@ public class RideToPTChange {
 			}
 		}
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(outputFilePath + "/plansCarSharing_greaterzurich_noride.xml");		
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(outputFilePath + "/plansCarSharing_25%_noride.xml");		
 		
 	}
 	

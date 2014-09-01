@@ -303,13 +303,7 @@ public class CarsharingWithTaxiLegScoringFunction extends org.matsim.core.scorin
 
 		double distanceCost = 0.0D;
 		TreeSet<String> travelCards = ((PersonImpl)this.plan.getPerson()).getTravelcards();
-		if (travelCards == null || travelCards.contains("ch-HT-mobility"))
-			distanceCost = this.params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m;
-		else if (travelCards.contains("unknown"))
-			distanceCost = this.params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m;
-		else {
-			throw new RuntimeException("Person " + this.plan.getPerson().getId() + " has an invalid travelcard. This should never happen.");
-		}
+		
 		score += this.params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m * distanceCost / 1000.0D * distance;
 		score += travelTime * this.params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s;
 		score += this.params.modeParams.get(TransportMode.pt).constant;

@@ -28,7 +28,7 @@ public class FreeLinksSHP {
 
     public static void main(String[] args) throws Exception {
    
-		final BufferedReader readLinkRetailers = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/CarSharing/free_links_c.txt");
+		final BufferedReader readLinkRetailers = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/test.txt");
 
         Config config = ConfigUtils.createConfig();
         config.network().setInputFile("C:/Users/balacm/Desktop/Retailers_10pc/network.xml.gz");
@@ -71,7 +71,7 @@ public class FreeLinksSHP {
         		features.add(ft);
         	}
         }   
-        ShapeFileWriter.writeGeometries(features, "C:/Users/balacm/Desktop/SHP_files/carsharing_stations_free_c.shp");
+        ShapeFileWriter.writeGeometries(features, "C:/Users/balacm/Desktop/SHP_files/test_carsharing_4.shp");
         
       
     }

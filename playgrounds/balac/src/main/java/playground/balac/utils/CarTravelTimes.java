@@ -75,10 +75,10 @@ public class CarTravelTimes {
 
 	public void run(final String[] args) throws IOException {
 		
-		String rootPathOut = "/Network/Servers/ivt.ethz.ch/Volumes/ivt-home/balacm/MATSim/input/CarTravelTimes/";
+		String rootPathOut = args[2];
 		//String rootPathOut = "C:/Users/balacm/Desktop/";
 
-		String rootPath = "/Network/Servers/ivt.ethz.ch/Volumes/ivt-home/balacm/MATSim/input/CarTravelTimes/";
+		String rootPath = args[2];
 		//String rootPath = "C:/Users/balacm/Desktop/CarSharing/run34/ITERS/it.1/";
 
 		String eventsFile = rootPath + "out.events_new.txt.gz";
@@ -118,16 +118,16 @@ public class CarTravelTimes {
 
 		// add algorithm to write out the plans
 		plans.addAlgorithm(plansWriter);
-		final BufferedReader readLink = IOUtils.getBufferedReader("/Network/Servers/ivt.ethz.ch/Volumes/ivt-home/balacm/MATSim/input/coord_" + args[1]+ ".txt");
+		final BufferedReader readLink = IOUtils.getBufferedReader(args[3]);
 
 		//final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/coordinates.txt");
 		String s = readLink.readLine();
 		s = readLink.readLine();
 		while(s != null) {
-			String[] arr = s.split("\\s");
-			CoordImpl coordStart = new CoordImpl(arr[4], arr[5]);
+			String[] arr = s.split("\\t");
+			CoordImpl coordStart = new CoordImpl(arr[3], arr[4]);
 			Link lStart = MyLinkUtils.getClosestLink(network, coordStart);
-			CoordImpl coordEnd = new CoordImpl(arr[6], arr[7]);
+			CoordImpl coordEnd = new CoordImpl(arr[5], arr[6]);
 			Link lEnd = MyLinkUtils.getClosestLink(network, coordEnd);
 			
 			PersonImpl person = new PersonImpl(new IdImpl(arr[0]));
@@ -139,7 +139,7 @@ public class CarTravelTimes {
 			//double h = Double.parseDouble(arr2[0]);
 			//double m = Double.parseDouble(arr2[1]);
 			//act.setEndTime(h * 3600 + m * 60);
-			act.setEndTime(Double.parseDouble(arr[2]));
+			act.setEndTime(60.0 * Double.parseDouble(arr[2]));
 			plan.addActivity(act);
 			
 			LegImpl leg = new LegImpl("car");
@@ -162,7 +162,7 @@ public class CarTravelTimes {
 			
 		}
 		
-		final BufferedWriter outLink = IOUtils.getBufferedWriter("/Network/Servers/ivt.ethz.ch/Volumes/ivt-home/balacm/MATSim/input/travelTimesCar_" + args[1]+ ".txt");
+		final BufferedWriter outLink = IOUtils.getBufferedWriter(args[2] +"/travelTimes_" + args[1]+ ".txt");
 
 		
 		for(Person per: sc.getPopulation().getPersons().values()) {

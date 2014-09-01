@@ -38,12 +38,17 @@ public class PTTravelTimesFromEvents {
     	
     	
     	HashMap<Id, ArrayList<playground.balac.utils.PTTravelTimesFromEvents.Purpose.TripInfo>> results = purpose.results();
-		final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/InputPt/StatisticsPt_part2.txt");
+		final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/InputPt/StatisticsPt.txt");
 		
 		
 		for(ArrayList<playground.balac.utils.PTTravelTimesFromEvents.Purpose.TripInfo> a: results.values()) {
-			
-			int numberOfTransfers = -1 + (a.size() - 1) / 2;
+			int count = 0;
+			for (int i = 0; i < a.size(); i++)
+				if (a.get(i).description.equals("pt"))
+					count++;
+			int numberOfTransfers = -1 + count;
+			if (a.get(0).personId.toString().equals("30256"))
+				System.out.println();
 			outLink.write(a.get(0).personId.toString() + " ");
 			outLink.write(Integer.toString(numberOfTransfers) + " ");
 			double firstWaitingTIme = 0.0;
@@ -73,21 +78,28 @@ public class PTTravelTimesFromEvents {
 			}
 			
 			
-			if (a.size() >= 5) {
-				int i = 1;
+			if (a.size() >= 3) {
 				double time1 = 0.0;
 				double transferTime = 0.0;
 				for (playground.balac.utils.PTTravelTimesFromEvents.Purpose.TripInfo t: a) {
 				
-					if (i % 2 != 0)
+				
+					if (t.description.equals("pt")) {
+						
+						if (time1 == 0.0) {
+							
+							time1 = t.endTime;
+						}
+						else {
+							transferTime += t.startTime - time1;
+							time1 = t.endTime;
+						}
+						
+					}
 					
-						time1 = t.endTime;
-					else
-						transferTime += (t.startTime - time1);
 					
-					i++;
 				}
-				outLink.write(Double.toString(transferTime));
+				outLink.write(Double.toString(transferTime + firstWaitingTIme));
 			}
 			else {
 				outLink.write(Double.toString(firstWaitingTIme));

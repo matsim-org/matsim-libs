@@ -1,5 +1,8 @@
 package playground.balac.twowaycarsharing.utils;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -8,6 +11,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -32,9 +36,18 @@ public class ModeSubstitutionCSAnalysis {
 		int count = 0;
 		int number = 0;
 		int countWalk = 0;
+		int countHasCar = 0;
+		int countBoth = 0;
+		int countBoth2 = 0;
+		double travTime = 0.0;
+		double distanceCar = 0.0;
+		Set<Id> hasCar = new TreeSet<Id>();
+		
 		double distance = 0.0;
 		for (Person person: scenario2.getPopulation().getPersons().values()) {
 			int j = 0;
+			boolean hadow = false;
+			boolean hadcar = false;
 			for (PlanElement pe:person.getSelectedPlan().getPlanElements()) {
 				if (pe instanceof Activity && !((Activity) pe).getType().equals("cs_interaction") && !((Activity) pe).getType().equals("pt interaction"))
 					j++;
@@ -42,8 +55,11 @@ public class ModeSubstitutionCSAnalysis {
 					
 					if (((Leg) pe).getMode().equals("onewaycarsharing")) {
 						Leg s = null;
+						hadow = true;
 						
 						s = findMode(person.getId(), j, scenario);
+						if (!(((PersonImpl)person).getCarAvail()).equals("never"))
+							hasCar.add(person.getId());
 						
 						if (s.getMode().equals("car")) {
 							
@@ -81,8 +97,18 @@ public class ModeSubstitutionCSAnalysis {
 						distance += ((Leg)pe).getRoute().getDistance();
 						
 					}
+					else if (((Leg) pe).getMode().equals("car")) {
+						
+						travTime += ((Leg) pe).getTravelTime();
+						distanceCar += ((Leg) pe).getRoute().getDistance();
+						hadcar = true;
+						
+					}
 				}
 			}
+			
+			if (hadcar && hadow)
+				countBoth++;
 			
 		}
 		
@@ -93,6 +119,10 @@ public class ModeSubstitutionCSAnalysis {
 		System.out.println(distance/(double)countWalk);
     	System.out.println(count);
     	System.out.println(number);
+    	System.out.println(hasCar.size());
+    	System.out.println(countBoth);
+    	System.out.println(distanceCar/travTime);
+    	
 	}
 	
 	public Leg findMode(Id id, int j, ScenarioImpl scenario) {

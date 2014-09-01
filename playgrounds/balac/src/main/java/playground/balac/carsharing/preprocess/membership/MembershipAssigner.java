@@ -51,10 +51,10 @@ public class MembershipAssigner
   private int counter;
   private SupplySideModel membershipModel;
   private ArrayList<PersonImpl> personsWithLicense = new ArrayList<PersonImpl>();
-  private String stationfilePath = "C:/Users/balacm/Documents/MobilityData/Stations_GreaterZurich.txt";
+  //private String stationfilePath = "C:/Users/balacm/Desktop/Stations_GreaterZurich_2x.txt";
   //private String newfilePath = "C:/Users/balacm/Documents/MobilityData/Stations_GreaterZurich.txt";
 
- //private String stationfilePath = "/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/balacm/MATSim/input/CarSharing/GreaterZurich/Stations_GreaterZurich.txt";
+  private String stationfilePath = "/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/balacm/MATSim/input/FreeFloatingTransportation2014/CS_Stations.txt";
 
   protected ArrayList<Integer> initialSolution = new ArrayList<Integer>();
   private ArrayList<LinkImpl> availableLinks = new ArrayList< LinkImpl>();

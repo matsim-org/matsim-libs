@@ -54,7 +54,7 @@ public class ChooseRandomTripModeWithTaxi implements PlanAlgorithm {
 	private void setRandomTripMode(final Trip trip, final Plan plan) {		
 		
 		//carsharing is the new trip
-		int temp = rng.nextInt();
+		int temp = rng.nextInt(6);
 		
 		if (((PersonImpl) plan.getPerson()).hasLicense() && 
 				(((PersonImpl) plan.getPerson()).getTravelcards() != null)  && 
