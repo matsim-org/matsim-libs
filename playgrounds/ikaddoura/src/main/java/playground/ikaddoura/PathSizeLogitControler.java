@@ -75,7 +75,6 @@ public class PathSizeLogitControler {
 		Controler controler = new Controler(configFile);
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(false);
-		final Network network = controler.getNetwork();
 		
 		if (pathSizeLogit){
 			
@@ -85,15 +84,20 @@ public class PathSizeLogitControler {
 			builder.setSameModePenalty(0.);
 			builder.setSameRoutePenalty(0.);
 			builder.setActTimeParameter(actTimeParam);
+
+			// this is the new syntax; not yet extensively tested: kai, aug'14
+			controler.addPlanSelectorFactory("divGenPlansRemover", builder ) ;
+			controler.getConfig().strategy().setPlanSelectorForRemoval("divGenPlansRemover");
 			
-			final AbstractPlanSelector remover = builder.createPlanSelector(scenario) ;
-			
-			controler.addControlerListener(new StartupListener(){
-				@Override
-				public void notifyStartup(StartupEvent event) {
-					event.getControler().getStrategyManager().setPlanSelectorForRemoval(remover);
-				}
-			});
+//			final AbstractPlanSelector remover = builder.createPlanSelector(controler.getScenario()) ;
+//			
+//			controler.addControlerListener(new StartupListener(){
+//				@Override
+//				public void notifyStartup(StartupEvent event) {
+//					event.getControler().getStrategyManager().setPlanSelectorForRemoval(remover);
+//				}
+//			});
+
 		}
 		
 		controler.run();
