@@ -21,6 +21,7 @@ package playground.mrieser.core.ids;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * @author mrieser / Senozon AG
@@ -40,6 +41,9 @@ public class NewUseCases {
 		NewId<Link> linkId1again = NewId.create("1", Link.class);
 
 		NewId<Person> personId1 = NewId.create("1", Person.class);
+		
+		NewId<TransitStopFacility> stopId1 = NewId.create("1", TransitStopFacility.class);
+		// check type hierarchy, Identifiable
 		
 		if (linkId1 == linkId2) {
 			System.err.println("linkId1 and linkId2 are the same");

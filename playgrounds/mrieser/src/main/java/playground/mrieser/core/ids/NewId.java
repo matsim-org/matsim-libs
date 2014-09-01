@@ -89,7 +89,14 @@ public abstract class NewId<T> implements Comparable<NewId<T>> {
 	// default implementation of compareTo
 	@Override
 	public int compareTo(NewId<T> o) {
-		return this.toString().compareTo(o.toString());
+		int res = this.toString().compareTo(o.toString());
+		if (res == 0) {
+			if (equals(o)) {
+				return 0;
+			}
+			throw new IllegalArgumentException("The ids are equal but of different types.");
+		}
+		return res;
 	}
 	
 	// default implementation of equals
@@ -152,13 +159,13 @@ public abstract class NewId<T> implements Comparable<NewId<T>> {
 			return Integer.toString(this.id);
 		}
 		
-		@Override
-		public int compareTo(NewId<T> o) {
-			if (o instanceof NewIdInteger) {
-				return ((NewIdInteger<T>) o).id - this.id; 
-			}
-			return super.compareTo(o);
-		}
+//		@Override
+//		public int compareTo(NewId<T> o) {
+//			if (o instanceof NewIdInteger) {
+//				return ((NewIdInteger<T>) o).id - this.id; 
+//			}
+//			return super.compareTo(o);
+//		}
 	}	
 
 }
