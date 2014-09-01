@@ -57,8 +57,9 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 
 	private final static Logger log = Logger.getLogger(KNAnalysisEventsHandler.class);
 
-	public static final String MONEY = "money";
+	public static final String PAYMENTS = "payments";
 	public static final String TRAV_TIME = "travTime" ;
+	public static final String SUBPOPULATION = "subpopulation" ; // subpopulationAttributeName
 
 	private Scenario scenario = null ;
 	private Population population = null;
@@ -92,7 +93,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		this.scenario = scenario ;
 		this.population = scenario.getPopulation() ;
 
-        final String tollLinksFileName = ConfigUtils.addOrGetModule(this.scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).getTollLinksFile();
+		final String tollLinksFileName = ConfigUtils.addOrGetModule(this.scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).getTollLinksFile();
 		if ( tollLinksFileName != null && !tollLinksFileName.equals("") ) {
 			RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 			RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
@@ -182,9 +183,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		Person person = this.population.getPersons().get(event.getPersonId());
 		if (depTime != null && person != null) {
 			double travTime = event.getTime() - depTime;
-			if ( person.getId().toString().equals("car_0") ) {
-				System.err.println( " travTime: " + travTime );
-			}
+
 			controlStatisticsSum += travTime ;
 			controlStatisticsCnt ++ ;
 
@@ -205,17 +204,6 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 
 			// register the leg by mode:
 			legTypes.add("zz_mode_" + leg.getMode()) ;
-
-			//			// register the leg by vehicle type:
-			//			// yy this, as maybe some other things, should really be anchored to the vehicle arrival.
-			//			if ( this.scenario.getVehicles()!=null ) {
-			//				Id vehId = (Id) this.population.getPersonAttributes().getAttribute( person.getId().toString(), "TransportModeToVehicleIdMap" ) ;
-			//				if ( vehId != null ) {
-			//					Vehicles vehs = this.scenario.getVehicles() ;
-			//					VehicleType type = this.scenario.getVehicles().getVehicles().get(vehId).getType();
-			//					legTypes.add("yy_vehType_"+type) ;
-			//				}
-			//			}
 
 			// register the leg by subpop type:
 			legTypes.add( this.getSubpopName(person) ) ;
@@ -325,12 +313,12 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 			this.statsContainer.get(type).clear() ;
 			this.sumsContainer.get(type).clear() ;
 		}
-		
+
 		for ( Person person : this.scenario.getPopulation().getPersons().values() ) {
 			ObjectAttributes attribs = this.scenario.getPopulation().getPersonAttributes() ;
 			attribs.putAttribute( person.getId().toString(), TRAV_TIME, 0. ) ;
-			if ( attribs.getAttribute( person.getId().toString(), MONEY) != null ) {
-				attribs.putAttribute( person.getId().toString(), MONEY, 0. ) ;
+			if ( attribs.getAttribute( person.getId().toString(), PAYMENTS) != null ) {
+				attribs.putAttribute( person.getId().toString(), PAYMENTS, 0. ) ;
 			}
 		}
 		// (yy not sure if I like the above; might be better to just use a local data structure. kai, may'14)
@@ -348,14 +336,14 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		Person person = pop.getPersons().get( event.getPersonId() ) ;
 		legTypes.add( this.getSubpopName(person)) ;
 
-		double item = event.getAmount() ;
+		double item = - event.getAmount() ;
 
 		this.addItemToAllRegisteredTypes(legTypes, StatType.payments, item);
 		// (this is not additive by person, but it is additive by legType.  So if a person has multiple money events, they
 		// are added up in the legType category.  kai, feb'14)
 
 
-		add(person, item, MONEY);
+		add(person, item, PAYMENTS);
 	}
 
 	private void add(Person person, double val, final String attributeName) {
@@ -366,28 +354,23 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 			newVal += oldVal ;
 		}
 		pAttribs.putAttribute( person.getId().toString(), attributeName, newVal ) ; 
-		if ( person.getId().toString().equals("car_0") ) {
-			System.err.println( " oldVal: " + oldVal + "; val: " + val + "; newVal: " + newVal );
-		}
 	}
 
 	public void writeStats(final String filenameTmp) {
 		final Population pop = this.scenario.getPopulation();
 
-		// analyze Population:
+		// score statistics:
 		for ( Person person : pop.getPersons().values() ) {
-			// this defines to which legTypes this leg should belong for the statistical averaging:
-			List<String> legTypes = new ArrayList<String>() ;
-			// (yy "leg" is a misnomer here)
+			// this defines to which categories this person should belong for the statistical averaging:
+			List<String> categories = new ArrayList<String>() ;
 
-			legTypes.add( this.getSubpopName(person) ) ;
+			categories.add( this.getSubpopName(person) ) ;
 
 			// register the leg for the overall average:
-			legTypes.add("zzzzzzz_all") ;
+			categories.add("zzzzzzz_all") ;
 
 			Double item = person.getSelectedPlan().getScore() ;
-
-			this.addItemToAllRegisteredTypes(legTypes, StatType.scores, item);
+			this.addItemToAllRegisteredTypes(categories, StatType.scores, item);
 		}
 
 		// write population attributes:
@@ -397,13 +380,64 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		for ( StatType type : StatType.values() ) {
 			String filename = filenameTmp + type.toString() + ".txt" ;
 			BufferedWriter legStatsFile = IOUtils.getBufferedWriter(filename);
-			writeStats(type, legStatsFile );
+			writeStatsHorizontal(type, legStatsFile );
 			try {
 				legStatsFile.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+
+		// toll analysis:
+		double maxPayment = Double.NEGATIVE_INFINITY ;
+		Set<String> subPopTypes = new HashSet<String>() ;
+		for ( Person person : pop.getPersons().values() ) {
+			Double payment = (Double) pop.getPersonAttributes().getAttribute( person.getId().toString(), PAYMENTS ) ;
+			if ( payment==null ) continue ;
+			if ( payment > maxPayment ) {
+				maxPayment = payment ;
+			}
+			String subPopType = (String) pop.getPersonAttributes().getAttribute( person.getId().toString(), SUBPOPULATION ) ;
+			subPopTypes.add(subPopType) ;
+		}
+
+		final int nBins = 100 ;
+		final double binSize = maxPayment/nBins ; // not so great for commercial vs. private
+
+		Map<String,double[]> sum = new HashMap<String,double[]>();
+		Map<String,double[]> cnt = new HashMap<String,double[]>();
+		for ( String subPopType : subPopTypes ) {
+			sum.put( subPopType, new double[nBins+1] ) ;
+			cnt.put( subPopType, new double[nBins+1] ) ;
+		}
+
+		for ( Person person : pop.getPersons().values() ) {
+			String subPopType = (String) pop.getPersonAttributes().getAttribute( person.getId().toString(), SUBPOPULATION ) ;
+			Double payment = (Double) pop.getPersonAttributes().getAttribute( person.getId().toString(), PAYMENTS ) ;
+			if (payment==null) continue ;
+			int bin = (int) (payment/binSize) ;
+			sum.get(subPopType)[bin] += payment ;
+			cnt.get(subPopType)[bin] ++ ;
+		}
+
+		try {
+			for ( String subPopType : subPopTypes ) {
+				double sum2 = 0. ;
+				final String filename = filenameTmp + "payment_" + subPopType.toString() + ".txt" ;
+				BufferedWriter out = IOUtils.getBufferedWriter(filename) ;
+				out.write( 0 + "\t" + 0 + "\n" ) ;
+				for ( int ii=0 ; ii<cnt.get(subPopType).length ; ii++ ) {
+					if ( cnt.get(subPopType)[ii] > 0 ) {
+						sum2 += sum.get(subPopType)[ii] ;
+						out.write( sum.get(subPopType)[ii]/cnt.get(subPopType)[ii] + "\t" + sum2 + "\n") ;
+					}
+				}
+				out.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 
 		// write link statistics:
 		for ( Entry<Id, Double> entry : this.linkCnts.entrySet() ) {
@@ -435,9 +469,8 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 	public static final String CNT = "cnt" ;
 	public static final String TTIME_SUM = "ttimeSum" ;
 
-	private void writeStats(StatType statType, final java.io.Writer out ) throws UncheckedIOException {
+	private void writeStatsHorizontal(StatType statType, final java.io.Writer out ) throws UncheckedIOException {
 		try {
-
 			boolean first = true;
 			for (Map.Entry<String, int[]> entry : this.statsContainer.get(statType).entrySet()) {
 				String legType = entry.getKey();
@@ -447,14 +480,10 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 				if (first) {
 					first = false;
 					out.write(statType.toString());
-					//					System.out.print( "counts.length: " + counts.length ) ;
 					for (int i = 0; i < counts.length; i++) {
 						out.write("\t" + this.dataBoundaries.get(statType)[i] + "+" ) ;
 					}
 					out.write("\t|\t average \t|\t cnt \t | \t sum\n");
-					//					Logger.getLogger(this.getClass()).warn("Writing a file that is often called `tripXXX.txt', " +
-					//							"and which explicitly talks about `trips'.  It uses, however, _legs_ as unit of analysis. " +
-					//					"This makes a difference with intermodal trips.  kai, jul'11");
 				}
 
 				// data:
@@ -475,7 +504,6 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 				out.write("no legs, therefore no data") ;
 				out.write("\n");
 			}
-
 
 			switch( statType ) {
 			case durations:
@@ -543,14 +571,14 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		// do we need to do anything here?
 	}
 
-	private static int cnt = 0 ;
+	private static int wrnCnt = 0 ;
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		Double result = vehicleEnterTimes.remove( event.getVehicleId() ) ;
 		if ( result == null ) {
-			if ( cnt==0 ) {
-				cnt++ ;
-//				throw new RuntimeException("vehicle arrival for vehicle that never entered link.  teleportation?") ;
+			if ( wrnCnt==0 ) {
+				wrnCnt++ ;
+				//				throw new RuntimeException("vehicle arrival for vehicle that never entered link.  teleportation?") ;
 				Logger.getLogger(this.getClass()).warn("vehicle arrival for vehicle that never entered link.  I think this can happen with departures "
 						+ "that have empty routes, i.e. go to a location on the same link. kai, may'14");
 				Logger.getLogger(this.getClass()).warn( Gbl.ONLYONCE ) ;
