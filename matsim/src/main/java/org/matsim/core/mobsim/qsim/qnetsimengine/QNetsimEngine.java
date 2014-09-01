@@ -76,7 +76,7 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 
 	private final QSim qsim;
 
-	private final AgentSnapshotInfoBuilder positionInfoBuilder;
+	private final AbstractAgentSnapshotInfoBuilder positionInfoBuilder;
 
 	private final double stucktimeCache;
 	private final DepartureHandler dpHandler;
@@ -174,7 +174,7 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 		qlink.addParkedVehicle(veh);
 	}
 
-	private AgentSnapshotInfoBuilder createAgentSnapshotInfoBuilder(Scenario scenario){
+	private AbstractAgentSnapshotInfoBuilder createAgentSnapshotInfoBuilder(Scenario scenario){
 		String  snapshotStyle = scenario.getConfig().qsim().getSnapshotStyle();
 		if ("queue".equalsIgnoreCase(snapshotStyle)){
 			return new QueueAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
@@ -184,7 +184,8 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 		}
 		else if ("withHolesExperimental".equalsIgnoreCase(snapshotStyle)){
 			log.warn("The snapshot style \"withHolesExperimental\" is no longer supported, using \"queue\" instead. ");
-			return new QueueAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
+//			return new QueueAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
+			return new WithHolesAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
 		}
 		else {
 			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported. Using equiDist");
@@ -303,7 +304,7 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 		return this.qsim;
 	}
 
-	AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder(){
+	AbstractAgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder(){
 		return this.positionInfoBuilder;
 	}
 

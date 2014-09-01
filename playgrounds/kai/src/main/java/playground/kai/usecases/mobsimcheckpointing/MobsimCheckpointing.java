@@ -60,7 +60,7 @@ public class MobsimCheckpointing {
 				
 				for ( NetsimLink ll :  qsim.getNetsimNetwork().getNetsimLinks().values() ) {
 					ll.getAllNonParkedVehicles() ;
-					ll.getAllVehicles() ;
+					ll.getAllDrivingVehicles() ;
 				}
 
 				for ( MobsimAgent ag : qsim.getAgents() ) {

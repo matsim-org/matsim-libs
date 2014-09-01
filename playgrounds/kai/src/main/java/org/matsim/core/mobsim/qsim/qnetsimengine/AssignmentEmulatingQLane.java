@@ -218,7 +218,7 @@ class AssignmentEmulatingQLane extends QLaneInternalI {
 	}
 
 	@Override
-	public final Collection<MobsimVehicle> getAllVehicles() {
+	public final Collection<MobsimVehicle> getAllDrivingVehicles() {
 		Collection<MobsimVehicle> vehicles = new ArrayList<MobsimVehicle>();
 		vehicles.addAll(vehQueue);
 		vehicles.addAll(buffer);

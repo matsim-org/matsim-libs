@@ -61,7 +61,7 @@ public class MobsimDataProvider implements MobsimInitializedListener {
 		// collect all vehicles
 		this.vehicles.clear();
 		for (NetsimLink netsimLink : netsimNetwork.getNetsimLinks().values()) {
-			for (MobsimVehicle mobsimVehicle : netsimLink.getAllVehicles()) {
+			for (MobsimVehicle mobsimVehicle : netsimLink.getAllDrivingVehicles()) {
 				this.vehicles.put(mobsimVehicle.getId(), mobsimVehicle);
 			}
 		}

@@ -51,8 +51,8 @@ public class Sim2DQTransitionLink extends QLinkInternalI{
 	}
 
 	@Override
-	public Collection<MobsimVehicle> getAllVehicles() {
-		return this.ql.getAllVehicles();
+	public Collection<MobsimVehicle> getAllDrivingVehicles() {
+		return this.ql.getAllDrivingVehicles();
 	}
 
 	@Override

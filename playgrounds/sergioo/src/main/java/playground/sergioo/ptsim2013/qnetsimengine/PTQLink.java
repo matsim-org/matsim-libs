@@ -857,7 +857,7 @@ public class PTQLink implements NetsimLink {
 	}
 
 	@Override
-	public final Collection<MobsimVehicle> getAllVehicles() {
+	public final Collection<MobsimVehicle> getAllDrivingVehicles() {
 		Collection<MobsimVehicle> vehicles = this.getAllNonParkedVehicles();
 		vehicles.addAll(this.parkedVehicles.values());
 		return vehicles;

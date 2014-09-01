@@ -225,7 +225,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		Collection<MobsimVehicle> vehicles = new ArrayList<MobsimVehicle>();
 		vehicles.addAll(this.transitQLink.getTransitVehicleStopQueue());
 		vehicles.addAll(this.waitingList);
-		vehicles.addAll( road.getAllVehicles() ) ;
+		vehicles.addAll( road.getAllDrivingVehicles() ) ;
 		return vehicles;
 	}
 
@@ -332,7 +332,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 		@Override
 		public Collection<AgentSnapshotInfo> addAgentSnapshotInfo( Collection<AgentSnapshotInfo> positions) {
-			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.network.simEngine.getAgentSnapshotInfoBuilder();
+			AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.network.simEngine.getAgentSnapshotInfoBuilder();
 
 			VisData roadVisData = road.getVisData() ;
 			if (visLink != null) {

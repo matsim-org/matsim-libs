@@ -61,7 +61,7 @@ public class SnapshotWriterQuadTree extends OTFServerQuadTree {
 				}
 
 				@Override
-				public Collection<? extends VisVehicle> getAllVehicles() {
+				public Collection<? extends VisVehicle> getAllDrivingVehicles() {
 					return Collections.emptyList();
 				}
 				

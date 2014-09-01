@@ -101,7 +101,7 @@ public class QLinkTest extends MatsimTestCase {
 
 	/**
 	 * Tests that vehicles driving on a link are found with {@link NetsimLink#getVehicle(Id)}
-	 * and {@link NetsimLink#getAllVehicles()}.
+	 * and {@link NetsimLink#getAllDrivingVehicles()}.
 	 *
 	 * @author mrieser
 	 */
@@ -126,22 +126,22 @@ public class QLinkTest extends MatsimTestCase {
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
 		assertNull(f.qlink1.getVehicle(id1));
-		assertEquals(0, f.qlink1.getAllVehicles().size());
+		assertEquals(0, f.qlink1.getAllDrivingVehicles().size());
 
 		// add a vehicle, it should be now in the vehicle queue
 		f.qlink1.addFromUpstream(veh);
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(1, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
 		assertEquals("vehicle not found on link.", veh, f.qlink1.getVehicle(id1));
-		assertEquals(1, f.qlink1.getAllVehicles().size());
+		assertEquals(1, f.qlink1.getAllDrivingVehicles().size());
 
 		// time step 1, vehicle should be now in the buffer
 		f.qlink1.doSimStep(1.0);
 		assertFalse(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
 		assertEquals("vehicle not found in buffer.", veh, f.qlink1.getVehicle(id1));
-		assertEquals(1, f.qlink1.getAllVehicles().size());
-		assertEquals(veh, f.qlink1.getAllVehicles().iterator().next());
+		assertEquals(1, f.qlink1.getAllDrivingVehicles().size());
+		assertEquals(veh, f.qlink1.getAllDrivingVehicles().iterator().next());
 
 		// time step 2, vehicle leaves link
 		f.qlink1.doSimStep(2.0);
@@ -149,12 +149,12 @@ public class QLinkTest extends MatsimTestCase {
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
 		assertNull("vehicle should not be on link anymore.", f.qlink1.getVehicle(id1));
-		assertEquals(0, f.qlink1.getAllVehicles().size());
+		assertEquals(0, f.qlink1.getAllDrivingVehicles().size());
 	}
 
 	/**
 	 * Tests that vehicles parked on a link are found with {@link NetsimLink#getVehicle(Id)}
-	 * and {@link NetsimLink#getAllVehicles()}.
+	 * and {@link NetsimLink#getAllDrivingVehicles()}.
 	 *
 	 * @author mrieser
 	 */
@@ -170,25 +170,25 @@ public class QLinkTest extends MatsimTestCase {
 		// start test, check initial conditions
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
-		assertEquals(0, f.qlink1.getAllVehicles().size());
+		assertEquals(0, f.qlink1.getAllDrivingVehicles().size());
 
 		f.qlink1.addParkedVehicle(veh);
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
 		assertEquals("vehicle not found in parking list.", veh, f.qlink1.getVehicle(id1));
-		assertEquals(1, f.qlink1.getAllVehicles().size());
-		assertEquals(veh, f.qlink1.getAllVehicles().iterator().next());
+		assertEquals(1, f.qlink1.getAllDrivingVehicles().size());
+		assertEquals(veh, f.qlink1.getAllDrivingVehicles().iterator().next());
 
 		assertEquals("removed wrong vehicle.", veh, f.qlink1.removeParkedVehicle(veh.getId()));
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
 		assertNull("vehicle not found in parking list.", f.qlink1.getVehicle(id1));
-		assertEquals(0, f.qlink1.getAllVehicles().size());
+		assertEquals(0, f.qlink1.getAllDrivingVehicles().size());
 	}
 
 	/**
 	 * Tests that vehicles departing on a link are found with {@link NetsimLink#getVehicle(Id)}
-	 * and {@link NetsimLink#getAllVehicles()}.
+	 * and {@link NetsimLink#getAllDrivingVehicles()}.
 	 *
 	 * @author mrieser
 	 */
@@ -216,29 +216,29 @@ public class QLinkTest extends MatsimTestCase {
 		// start test, check initial conditions
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
-		assertEquals(1, f.qlink1.getAllVehicles().size());
+		assertEquals(1, f.qlink1.getAllDrivingVehicles().size());
 
 		driver.endActivityAndComputeNextState(0);
 		f.queueNetwork.simEngine.internalInterface.arrangeNextAgentState(driver) ;
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
 		assertEquals("vehicle not found in waiting list.", veh, f.qlink1.getVehicle(id1));
-		assertEquals(1, f.qlink1.getAllVehicles().size());
-		assertEquals(veh, f.qlink1.getAllVehicles().iterator().next());
+		assertEquals(1, f.qlink1.getAllDrivingVehicles().size());
+		assertEquals(veh, f.qlink1.getAllDrivingVehicles().iterator().next());
 
 		// time step 1, vehicle should be now in the buffer
 		f.qlink1.doSimStep(1.0);
 		assertFalse(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
 		assertEquals("vehicle not found in buffer.", veh, f.qlink1.getVehicle(id1));
-		assertEquals(1, f.qlink1.getAllVehicles().size());
+		assertEquals(1, f.qlink1.getAllDrivingVehicles().size());
 
 		// vehicle leaves link
 		assertEquals(veh, f.qlink1.popFirstVehicle());
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
 		assertNull("vehicle should not be on link anymore.", f.qlink1.getVehicle(id1));
-		assertEquals(0, f.qlink1.getAllVehicles().size());
+		assertEquals(0, f.qlink1.getAllDrivingVehicles().size());
 	}
 
 	/**

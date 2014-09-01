@@ -38,7 +38,7 @@ abstract class QInternalI {
 	
 	abstract void clearVehicles() ;
 	
-	abstract Collection<MobsimVehicle> getAllVehicles() ;
+	abstract Collection<MobsimVehicle> getAllDrivingVehicles() ;
 	
 	abstract void addFromUpstream(final QVehicle veh);
 	

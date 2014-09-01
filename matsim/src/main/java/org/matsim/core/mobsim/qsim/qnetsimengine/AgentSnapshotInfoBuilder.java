@@ -51,7 +51,7 @@ interface AgentSnapshotInfoBuilder {
 	 * start and the end coordinate of the curve. 
 	 * @param positions The Collection in that the AgentSnapshotInfo instances are inserted.
 	 */
-	void createAndAddVehiclePosition(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord, double lengthOfCurve, double eucledianLength, QVehicle veh, 
+	void positionAgentOnLink(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord, double lengthOfCurve, double eucledianLength, QVehicle veh, 
 			double distanceFromFromNode,	Integer lane, double speedValueBetweenZeroAndOne);
 	
 	double calculateVehicleSpacing(double linkLength, double numberOfVehiclesOnLink, double storageCapacity, double bufferStorageCapacity);

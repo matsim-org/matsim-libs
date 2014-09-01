@@ -991,11 +991,11 @@ public class QSimTest {
 		sim.getSimTimer().setTime(102.0);
 		sim.doSimStep(102.0); // agent should be moved to qlink3
 
-		Collection<MobsimVehicle> vehicles = qlink3.getAllVehicles();
+		Collection<MobsimVehicle> vehicles = qlink3.getAllDrivingVehicles();
 		Assert.assertEquals(1, vehicles.size());
 		Assert.assertEquals(id2, vehicles.toArray(new MobsimVehicle[1])[0].getVehicle().getId());
 		// vehicle 1 should still stay on qlink2
-		vehicles = qlink2.getAllVehicles();
+		vehicles = qlink2.getAllDrivingVehicles();
 		Assert.assertEquals(1, vehicles.size());
 		Assert.assertEquals(id1, vehicles.toArray(new MobsimVehicle[1])[0].getVehicle().getId());
 	}

@@ -30,6 +30,10 @@ import org.matsim.core.utils.geometry.CoordUtils;
  * @author nagel
  *
  */
+/**
+ * @author nagel
+ *
+ */
 public class AgentSnapshotInfoFactory {
 
 	private static final double TWO_PI = 2.0 * Math.PI;
@@ -43,6 +47,7 @@ public class AgentSnapshotInfoFactory {
 
 	// creators based on x/y
 
+	@SuppressWarnings("static-method")
 	public AgentSnapshotInfo createAgentSnapshotInfo(Id agentId, double easting, double northing, double elevation, double azimuth) {
 		PositionInfo info = new PositionInfo() ;
 		info.setId( agentId ) ;
@@ -52,7 +57,21 @@ public class AgentSnapshotInfoFactory {
 		return info ;
 	}
 
-	// static creators based on link
+	
+	/**
+	 * Generate snapshot info based on Link. 
+	 * 
+	 *  Comments:<ul>
+	 *  <li>One could argue that this method should not know about Links at all,
+	 * but it shortens code at several places, and since Link is a standard interface, I see no reason to not provide this
+	 * as a service.
+	 * </ul>
+	 * @param agentId
+	 * @param link
+	 * @param distanceOnLink
+	 * @param lane
+	 * @return
+	 */
 	public AgentSnapshotInfo createAgentSnapshotInfo(Id agentId, Link link, double distanceOnLink, int lane) {
 		PositionInfo info = new PositionInfo() ;
 		info.setId(agentId) ;
@@ -69,7 +88,7 @@ public class AgentSnapshotInfoFactory {
 	}
 	
 	/**
-	 * Static creator based on Coord
+	 *  creator based on Coord
 	 * @param curveLength lengths are usually different (usually longer) than the euclidean distances between the startCoord and endCoord
 	 */
 	public AgentSnapshotInfo createAgentSnapshotInfo(Id agentId, Coord startCoord, Coord endCoord, double distanceOnLink, 

@@ -13,7 +13,7 @@ public interface VisLink {
 
 	Link getLink() ;
 	
-	Collection<? extends VisVehicle> getAllVehicles() ;
+	Collection<? extends VisVehicle> getAllDrivingVehicles() ;
 	
 	VisData getVisData() ;
 }

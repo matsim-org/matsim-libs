@@ -82,7 +82,7 @@ public class QueueLinkTest extends MatsimTestCase {
 
 	/**
 	 * Tests that vehicles driving on a link are found with {@link QueueLink#getVehicle(Id)}
-	 * and {@link QueueLink#getAllVehicles()}.
+	 * and {@link QueueLink#getAllDrivingVehicles()}.
 	 *
 	 * @author mrieser
 	 */
@@ -107,22 +107,22 @@ public class QueueLinkTest extends MatsimTestCase {
 		assertTrue(f.qlink1.bufferIsEmpty());
 		assertEquals(0, f.qlink1.vehOnLinkCount());
 		assertNull(f.qlink1.getVehicle(id1));
-		assertEquals(0, f.qlink1.getAllVehicles().size());
+		assertEquals(0, f.qlink1.getAllDrivingVehicles().size());
 
 		// add a vehicle, it should be now in the vehicle queue
 		f.qlink1.addFromIntersection(veh, 0.0);
 		assertTrue(f.qlink1.bufferIsEmpty());
 		assertEquals(1, f.qlink1.vehOnLinkCount());
 		assertEquals("vehicle not found on link.", veh, f.qlink1.getVehicle(id1));
-		assertEquals(1, f.qlink1.getAllVehicles().size());
+		assertEquals(1, f.qlink1.getAllDrivingVehicles().size());
 
 		// time step 1, vehicle should be now in the buffer
 		f.qlink1.moveLink(1.0);
 		assertFalse(f.qlink1.bufferIsEmpty());
 		assertEquals(0, f.qlink1.vehOnLinkCount());
 		assertEquals("vehicle not found in buffer.", veh, f.qlink1.getVehicle(id1));
-		assertEquals(1, f.qlink1.getAllVehicles().size());
-		assertEquals(veh, f.qlink1.getAllVehicles().iterator().next());
+		assertEquals(1, f.qlink1.getAllDrivingVehicles().size());
+		assertEquals(veh, f.qlink1.getAllDrivingVehicles().iterator().next());
 
 		// time step 2, vehicle leaves link
 		f.qlink1.moveLink(2.0);
@@ -130,13 +130,13 @@ public class QueueLinkTest extends MatsimTestCase {
 		assertTrue(f.qlink1.bufferIsEmpty());
 		assertEquals(0, f.qlink1.vehOnLinkCount());
 		assertNull("vehicle should not be on link anymore.", f.qlink1.getVehicle(id1));
-		assertEquals(0, f.qlink1.getAllVehicles().size());
+		assertEquals(0, f.qlink1.getAllDrivingVehicles().size());
 	}
 
 
 	/**
 	 * Tests that vehicles departing on a link are found with {@link QueueLink#getVehicle(Id)}
-	 * and {@link QueueLink#getAllVehicles()}.
+	 * and {@link QueueLink#getAllDrivingVehicles()}.
 	 *
 	 * @author mrieser
 	 */
@@ -163,28 +163,28 @@ public class QueueLinkTest extends MatsimTestCase {
 		// start test, check initial conditions
 		assertTrue(f.qlink1.bufferIsEmpty());
 		assertEquals(0, f.qlink1.vehOnLinkCount());
-		assertEquals(0, f.qlink1.getAllVehicles().size());
+		assertEquals(0, f.qlink1.getAllDrivingVehicles().size());
 
 		f.qlink1.addDepartingVehicle(veh);
 		assertTrue(f.qlink1.bufferIsEmpty());
 		assertEquals(0, f.qlink1.vehOnLinkCount());
 		assertEquals("vehicle not found in waiting list.", veh, f.qlink1.getVehicle(id1));
-		assertEquals(1, f.qlink1.getAllVehicles().size());
-		assertEquals(veh, f.qlink1.getAllVehicles().iterator().next());
+		assertEquals(1, f.qlink1.getAllDrivingVehicles().size());
+		assertEquals(veh, f.qlink1.getAllDrivingVehicles().iterator().next());
 
 		// time step 1, vehicle should be now in the buffer
 		f.qlink1.moveLink(1.0);
 		assertFalse(f.qlink1.bufferIsEmpty());
 		assertEquals(0, f.qlink1.vehOnLinkCount());
 		assertEquals("vehicle not found in buffer.", veh, f.qlink1.getVehicle(id1));
-		assertEquals(1, f.qlink1.getAllVehicles().size());
+		assertEquals(1, f.qlink1.getAllDrivingVehicles().size());
 
 		// vehicle leaves link
 		assertEquals(veh, f.qlink1.popFirstFromBuffer());
 		assertTrue(f.qlink1.bufferIsEmpty());
 		assertEquals(0, f.qlink1.vehOnLinkCount());
 		assertNull("vehicle should not be on link anymore.", f.qlink1.getVehicle(id1));
-		assertEquals(0, f.qlink1.getAllVehicles().size());
+		assertEquals(0, f.qlink1.getAllDrivingVehicles().size());
 	}
 
 	/**

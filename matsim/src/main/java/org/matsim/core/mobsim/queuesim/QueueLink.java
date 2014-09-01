@@ -445,7 +445,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	}
 
 	@Override
-	public Collection<VisVehicle> getAllVehicles() {
+	public Collection<VisVehicle> getAllDrivingVehicles() {
 		Collection<VisVehicle> vehicles = this.getAllNonParkedVehicles();
 		return vehicles;
 	}

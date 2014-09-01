@@ -305,9 +305,9 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 	}
 
 	@Override
-	public Collection<MobsimVehicle> getAllVehicles() {
+	public Collection<MobsimVehicle> getAllDrivingVehicles() {
 		if (!this.transferToSim2D) {
-			return this.qLinkDelegate.getAllVehicles();
+			return this.qLinkDelegate.getAllDrivingVehicles();
 		} else {
 
 			throw new UnsupportedOperationException() ;

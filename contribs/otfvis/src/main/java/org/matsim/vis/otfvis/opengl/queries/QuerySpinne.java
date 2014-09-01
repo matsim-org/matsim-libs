@@ -248,7 +248,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 	private List<Plan> getPersonsNOW() {
 		List<Plan> actPersons = new ArrayList<Plan>();
 		VisLink link = simulationView.getVisNetwork().getVisLinks().get(this.queryLinkId);
-		Collection<? extends VisVehicle> vehs = link.getAllVehicles();
+		Collection<? extends VisVehicle> vehs = link.getAllDrivingVehicles();
 		for( VisVehicle veh : vehs) {
 			if ( veh.getDriver() instanceof PlanAgent ) {
 				Plan plan = ((PlanAgent)veh.getDriver()).getCurrentPlan() ;

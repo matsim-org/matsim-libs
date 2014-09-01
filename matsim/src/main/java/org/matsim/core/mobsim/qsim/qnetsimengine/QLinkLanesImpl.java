@@ -402,7 +402,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	public final Collection<MobsimVehicle> getAllNonParkedVehicles() {
 		Collection<MobsimVehicle> ret = new ArrayList<MobsimVehicle>(this.waitingList);
 		for  (QLaneInternalI lane : this.laneQueues.values()){
-			ret.addAll(lane.getAllVehicles());
+			ret.addAll(lane.getAllDrivingVehicles());
 		}
 		return ret;
 	}
@@ -480,7 +480,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		
 		@Override
 		public Collection<AgentSnapshotInfo> addAgentSnapshotInfo( final Collection<AgentSnapshotInfo> positions) {
-			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkLanesImpl.this.network.simEngine.getAgentSnapshotInfoBuilder();
+			AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkLanesImpl.this.network.simEngine.getAgentSnapshotInfoBuilder();
 
 			if (visLink != null){
 				for (QLaneInternalI  ql : QLinkLanesImpl.this.laneQueues.values()){
