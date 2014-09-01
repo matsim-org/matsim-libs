@@ -100,7 +100,11 @@ public class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
     if (cost.startTime != Time.UNDEFINED_TIME) {
       this.writer.write("start_time=\"" + Time.writeTime(cost.startTime) + "\" ");
     }
-    if (cost.endTime != Time.UNDEFINED_TIME) {
+    if (cost.endTime != Time.UNDEFINED_TIME 
+    		&& cost.endTime != Double.POSITIVE_INFINITY
+    		// The toll reader converts undefined time to POSITIVE_INFINITY since otherwise it does not make sense.
+    		// This, however, means that we need to deal with this here as well.  kai, aug'14
+    		) {
       this.writer.write("end_time=\"" + Time.writeTime(cost.endTime) + "\" ");
     }
     this.writer.write("amount=\"" + cost.amount + "\" />\n");
