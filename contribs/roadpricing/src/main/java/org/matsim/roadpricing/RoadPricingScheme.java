@@ -20,6 +20,8 @@
 
 package org.matsim.roadpricing;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -98,5 +100,11 @@ public interface RoadPricingScheme {
 	 * "approximate" numbers.
 	 */
 	public Cost getTypicalLinkCostInfo( final Id linkId, final double time ) ;
+
+	Iterable<Cost> getTypicalCosts();
+	// yy seems to me that this is not needed; getting Map<Id, List<Cost>> should be enough.  Has something to do with cache and
+	// access speeds.
+
+	Map<Id, List<Cost>> getTypicalCostsForLink();
 
 }

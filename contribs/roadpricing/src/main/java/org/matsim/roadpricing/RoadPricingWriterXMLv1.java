@@ -36,9 +36,9 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
  */
 public class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 
-	private final RoadPricingSchemeImpl scheme;
+	private final RoadPricingScheme scheme;
 
-	public RoadPricingWriterXMLv1(final RoadPricingSchemeImpl scheme) {
+	public RoadPricingWriterXMLv1(final RoadPricingScheme scheme) {
 		this.scheme = scheme;
 	}
 
@@ -59,8 +59,8 @@ public class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 	
 			// links
 			this.writer.write("\t<links>\n");
-			for (Id linkId : this.scheme.getCostsForLink().keySet()) {
-			  List<Cost> cs = this.scheme.getCostsForLink().get(linkId);
+			for (Id linkId : this.scheme.getTypicalCostsForLink().keySet()) {
+			  List<Cost> cs = this.scheme.getTypicalCostsForLink().get(linkId);
 			  this.writer.write("\t\t<link id=\"" + linkId.toString() + "\"");
 			  if (cs == null) {
 			    this.writer.write("/>\n");
@@ -84,7 +84,7 @@ public class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 				this.writer.write("\t<!-- [monetary unit] / [travelling across a tolled link] -->\n");
 			}
 	
-			for (RoadPricingSchemeImpl.Cost cost : this.scheme.getCosts()) {
+			for (RoadPricingSchemeImpl.Cost cost : this.scheme.getTypicalCosts()) {
 			  this.writeCost(cost);
 			}
 	

@@ -136,12 +136,12 @@ public class RoadPricingSchemeImpl implements RoadPricingScheme {
 	public Set<Id> getTolledLinkIds() {
 		return this.linkIds.keySet();
 	}
-
-	public Map<Id, List<Cost>> getCostsForLink(){
+	@Override
+	public Map<Id, List<Cost>> getTypicalCostsForLink(){
 		return this.linkIds;
 	}
-
-	public Iterable<Cost> getCosts() {
+	@Override
+	public Iterable<Cost> getTypicalCosts() {
 		return this.costs;
 	}
 
