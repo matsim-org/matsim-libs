@@ -109,7 +109,7 @@ public class GautengControler_subpopulations {
 
 	static final String RE_ROUTE_AND_SET_VEHICLE = "ReRouteAndSetVehicle";
 	public static final String VEH_ID = "TransportModeToVehicleIdMap" ;
-
+	final static String planSelectorFactoryName = "DiversityGeneratingPlansRemover";
 
 	public static enum User { johan, kai } ;
 	private static User user = User.johan ;
@@ -176,6 +176,7 @@ public class GautengControler_subpopulations {
 		// yy is the mobsim really assigning the vehicles from the vehicles file?
 
 		GautengUtils.assignSubpopulationStrategies(config);
+		config.strategy().setPlanSelectorForRemoval(planSelectorFactoryName);
 
 //		config.planCalcScore().setBrainExpBeta(1.0); // is now default
 		config.controler().setWritePlansInterval(100);
@@ -271,23 +272,15 @@ public class GautengControler_subpopulations {
 		setUpRoadPricingAndScoring(baseValueOfTime, valueOfTimeMultiplier, sc, controler);
 		
 		// PLANS REMOVAL
-		controler.addControlerListener(new StartupListener(){
-			@Override
-			public void notifyStartup(StartupEvent event) {
-				
-				Builder builder = new DiversityGeneratingPlansRemover.Builder() ;
-				builder.setActTypeWeight(5.);
-				builder.setLocationWeight(5.);
-				builder.setSameModePenalty(5.);
-				builder.setSameRoutePenalty(5.);
-				builder.setActTimeParameter(0.);
-				
-				final AbstractPlanSelector remover = builder.build(sc.getNetwork()) ;
-				
-				event.getControler().getStrategyManager().setPlanSelectorForRemoval(remover);
-			}
-		});
+		Builder builder = new DiversityGeneratingPlansRemover.Builder() ;
+		builder.setActTypeWeight(5.);
+		builder.setLocationWeight(5.);
+		builder.setSameModePenalty(5.);
+		builder.setSameRoutePenalty(5.);
+		builder.setActTimeParameter(0.);
+		controler.addPlanSelectorFactory(planSelectorFactoryName, builder );
 		// yyyy needs to be tested.  But in current runs, all plans of an agent are exactly identical at end of 1000it.  kai, mar'13
+		
 		
 		// the following is how (in principle) the vehicles are inserted into the mobsim.  Needs to be tested.
 //		controler.setMobsimFactory(new MobsimWithVehicleInsertion());

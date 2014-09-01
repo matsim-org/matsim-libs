@@ -861,8 +861,12 @@ public class Controler extends AbstractController {
 	/**
 	 * @return Returns the {@link org.matsim.core.replanning.StrategyManager}
 	 *         used for the replanning of plans.
+	 * @deprecated -- try to use controler.addPlanStrategyFactory or controler.addPlanSelectoryFactory.
+	 * There are cases when this does not work, which is in particular necessary if you need to re-configure the StrategyManager
+	 * during the iterations, <i>and</i> you cannot do this before the iterations start.  In such cases, using this
+	 * method may be ok. kai/mzilske, aug'14
 	 */
-	@Deprecated // use addPlanStrategyFactory instead. kai, jan'13
+	@Deprecated // see javadoc above
 	public final StrategyManager getStrategyManager() {
 		return this.strategyManager;
 	}

@@ -86,7 +86,7 @@ public class PathSizeLogitControler {
 			builder.setSameRoutePenalty(0.);
 			builder.setActTimeParameter(actTimeParam);
 			
-			final AbstractPlanSelector remover = builder.build(network) ;
+			final AbstractPlanSelector remover = builder.createPlanSelector(scenario) ;
 			
 			controler.addControlerListener(new StartupListener(){
 				@Override

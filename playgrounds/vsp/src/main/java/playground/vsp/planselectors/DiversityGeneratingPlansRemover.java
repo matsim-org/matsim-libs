@@ -23,12 +23,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.selectors.AbstractPlanSelector;
+import org.matsim.core.replanning.selectors.GenericPlanSelector;
+import org.matsim.core.replanning.selectors.PlanSelectorFactory;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.pt.PtConstants;
@@ -53,7 +56,7 @@ import org.matsim.pt.PtConstants;
  */
 public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector {
 	
-	public static final class Builder {
+	public static final class Builder implements PlanSelectorFactory<Plan> {
 		private double actTypeWeight = 1.;
 		private double locationWeight = 1.;
 		private double actTimeParameter = 1.;
@@ -86,10 +89,10 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 		public final void setStageActivityTypes( StageActivityTypes val) {
 			this.stageActivities = val;
 		}
-		
-		public final DiversityGeneratingPlansRemover build( Network network ) {
+		@Override
+		public final DiversityGeneratingPlansRemover createPlanSelector( Scenario scenario ) {
 			return new DiversityGeneratingPlansRemover(
-					network,
+					scenario.getNetwork(),
 					this.actTypeWeight,
 					this.locationWeight,
 					this.actTimeParameter,
