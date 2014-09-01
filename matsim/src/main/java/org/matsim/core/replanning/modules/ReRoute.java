@@ -23,7 +23,6 @@ package org.matsim.core.replanning.modules;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
