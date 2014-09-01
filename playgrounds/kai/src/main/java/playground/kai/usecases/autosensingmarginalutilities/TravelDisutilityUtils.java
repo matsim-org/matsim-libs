@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.southafrica.gauteng.routing;
+package playground.kai.usecases.autosensingmarginalutilities;
 
 import java.util.ArrayList;
 import java.util.List;

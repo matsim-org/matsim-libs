@@ -18,6 +18,9 @@
  * *********************************************************************** */
 package playground.kai.run;
 
+import java.util.Arrays;
+import java.util.Formatter;
+
 import org.joda.time.DateTime;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.analysis.kai.KNAnalysisEventsHandler;
@@ -28,9 +31,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
-
-import java.util.Arrays;
-import java.util.Formatter;
 
 /**
  * @author nagel
@@ -45,6 +45,11 @@ public class KNEventsAnalyzer {
 		Formatter formatter = new Formatter() ;
 		String minute = formatter.format( "%02d", date.getMinuteOfHour() ).toString() ;
 		formatter.close();
+		
+		if ( args.length < 3 ) {
+			System.out.println("Usage: cmd eventsFile popFile netFile [popAttrFile] [tollFile]. Aborting ..." ) ;
+			System.exit(-1);
+		}
 		
 		String eventsFilename = args[0] ;
 		String populationFilename = args[1] ;

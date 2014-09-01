@@ -54,7 +54,7 @@ import org.matsim.core.utils.io.IOUtils;
 public class KNPopCompare {
 
 	// statistics types:
-	private static enum StatType { ttime1, ttime2, ttimeDiff, money1, money2, moneyDiff } ;
+	private static enum StatType { ttime1, ttime2, ttimeDiff, payments1, payments2, paymentsDiff } ;
 	// container that contains the statistics containers:
 	final Map<StatType,DataMap<String>> sumsContainer = new TreeMap<StatType,DataMap<String>>() ;
 	final Map<StatType,DataMap<String>> cntsContainer = new TreeMap<StatType,DataMap<String>>() ;
@@ -134,20 +134,20 @@ public class KNPopCompare {
 				}
 				List<String> popTypes = new ArrayList<String>() ;
 				{ // process money differences:
-					Double money1 = (Double) pop1.getPersonAttributes().getAttribute(person1.getId().toString(), KNAnalysisEventsHandler.MONEY ) ;
-					if ( money1==null ) {
-						money1 = 0. ;
+					Double payments1 = (Double) pop1.getPersonAttributes().getAttribute(person1.getId().toString(), KNAnalysisEventsHandler.PAYMENTS ) ;
+					if ( payments1==null ) {
+						payments1 = 0. ;
 					}
-					Double money2 = (Double) pop2.getPersonAttributes().getAttribute(person1.getId().toString(), KNAnalysisEventsHandler.MONEY ) ;
-					if ( money2==null ) {
-						money2 = 0. ;
+					Double payments2 = (Double) pop2.getPersonAttributes().getAttribute(person1.getId().toString(), KNAnalysisEventsHandler.PAYMENTS ) ;
+					if ( payments2==null ) {
+						payments2 = 0. ;
 					}
-					final double deltaMoney = money2 - money1;
+					final double deltaPayments = payments2 - payments1;
 
-					person1.getCustomAttributes().put( "deltaMoney", deltaMoney ) ;
+					person1.getCustomAttributes().put( "deltaMoney", deltaPayments ) ;
 					
 					ActivityFacility fac = ff.createActivityFacility(person1.getId(), coord) ;
-					fac.getCustomAttributes().put(GridUtils.WEIGHT, deltaMoney ) ; 
+					fac.getCustomAttributes().put(GridUtils.WEIGHT, deltaPayments ) ; 
 					homesWithMoneyDifferences.addActivityFacility(fac);
 
 					// to which subPopType does the agent belong?
@@ -157,15 +157,15 @@ public class KNPopCompare {
 					final String subpopName = KNAnalysisEventsHandler.getSubpopName( person1.getId(), pop1.getPersonAttributes(), subpopAttrName);
 					popTypes.add( "yy_" + subpopName ) ;
 
-					if ( money2!=0.) { // is a toll payer
+					if ( payments2!=0.) { // is a toll payer
 						popTypes.add( subpopName + "_tollPayer" ) ;
 					} else {
 						popTypes.add( subpopName + "_nonPayer") ;
 					}
 					
-					addItemToStatsContainer( StatType.money1, popTypes, money1 );
-					addItemToStatsContainer( StatType.money2, popTypes, money2 );
-					addItemToStatsContainer( StatType.moneyDiff, popTypes, deltaMoney );
+					addItemToStatsContainer( StatType.payments1, popTypes, payments1 );
+					addItemToStatsContainer( StatType.payments2, popTypes, payments2 );
+					addItemToStatsContainer( StatType.paymentsDiff, popTypes, deltaPayments );
 
 				}
 				{ // process travtime differences:

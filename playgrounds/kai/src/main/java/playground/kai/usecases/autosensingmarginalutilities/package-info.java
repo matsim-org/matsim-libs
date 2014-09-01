@@ -16,17 +16,8 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.southafrica.gauteng.routing;
-
-import org.matsim.api.core.v01.Id;
-
 /**
  * @author nagel
  *
  */
-public interface UtilityOfDistanceI {
-	double getMarginalUtilityOfDistance( Id personId ) ;
-	// yyyy just "person" is probably not enough.  "vehicle"?  kai, nov'13
-
-	double getMarginalUtilityOfDistanceMAX();
-}
+package playground.kai.usecases.autosensingmarginalutilities;

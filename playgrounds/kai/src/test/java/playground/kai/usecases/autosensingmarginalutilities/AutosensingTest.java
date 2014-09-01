@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.southafrica.gauteng.routing;
+package playground.kai.usecases.autosensingmarginalutilities;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -42,6 +42,8 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
+import playground.kai.usecases.autosensingmarginalutilities.TravelDisutilityUtils;
+
 /**
  * @author nagel
  *
@@ -50,6 +52,7 @@ public class AutosensingTest {
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
     
+	@SuppressWarnings("static-method")
 	@Test
 	public final void testOne() {
 		// === CONFIG: ===
