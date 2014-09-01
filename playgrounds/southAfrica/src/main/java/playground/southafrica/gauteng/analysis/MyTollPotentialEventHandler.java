@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 
-import playground.southafrica.gauteng.roadpricingscheme.GautengRoadPricingScheme;
+import playground.southafrica.gauteng.roadpricingscheme.RoadPricingSchemeUsingTollFactor;
 
 
 public class MyTollPotentialEventHandler implements LinkEnterEventHandler{
@@ -41,9 +41,9 @@ public class MyTollPotentialEventHandler implements LinkEnterEventHandler{
 	private List<Id> linkIds;
 	private List<Map<Id,Double>> valueMaps;
 	private List<Map<Id,Integer>> countMaps;
-	private GautengRoadPricingScheme scheme;
+	private RoadPricingSchemeUsingTollFactor scheme;
 
-	public MyTollPotentialEventHandler(List<Id> linkIds, List<Id> breaks, GautengRoadPricingScheme scheme) {
+	public MyTollPotentialEventHandler(List<Id> linkIds, List<Id> breaks, RoadPricingSchemeUsingTollFactor scheme) {
 		this.linkIds = linkIds;
 		this.breaks = breaks;
 		valueMaps = new ArrayList<Map<Id,Double>>(breaks.size());

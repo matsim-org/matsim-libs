@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.southafrica.kai.gauteng;
+package playground.southafrica.gauteng.routing;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -96,7 +96,7 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 		log.warn( "calling createTravelDisutility" ) ;
 		EffectiveMarginalUtilitiesContainer muc = null ;
 		if ( (this.externalUom==null || this.externalUod==null || this.externalUott==null ) && this.scoringFunctionFactory != null ) { 
-			 muc = RouterUtils.createAutoSensingMarginalUtilitiesContainer(scenario, scoringFunctionFactory);
+			 muc = TravelDisutilityUtils.createAutoSensingMarginalUtilitiesContainer(scenario, scoringFunctionFactory);
 		}
 		if ( this.externalUom==null && this.uom!=null ) {
 			this.uom = muc ; // works because muc fulfills _all_ the interfaces.  Maybe not so nice.

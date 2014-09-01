@@ -33,7 +33,6 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
-import playground.southafrica.gauteng.roadpricingscheme.TagPenetration;
 import playground.southafrica.utilities.Header;
 
 /**

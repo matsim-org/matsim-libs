@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.southafrica.kai.gauteng;
+package playground.southafrica.gauteng.routing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,11 +43,13 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  * @author nagel
  *
  */
-public class RouterUtils {
-	private static Logger log = Logger.getLogger( RouterUtils.class );
+class TravelDisutilityUtils {
+	private TravelDisutilityUtils(){} // do not instantiate
+	
+	private static Logger log = Logger.getLogger( TravelDisutilityUtils.class );
 	
 	private static int cnt = 0 ;
-	public static EffectiveMarginalUtilitiesContainer createAutoSensingMarginalUtilitiesContainer( Scenario scenario, ScoringFunctionFactory scoringFunctionFactory ) {
+	static EffectiveMarginalUtilitiesContainer createAutoSensingMarginalUtilitiesContainer( Scenario scenario, ScoringFunctionFactory scoringFunctionFactory ) {
 		// yy one might want to make the following replaceable. kai, oct'13
 		log.warn("running ..."); 
 		

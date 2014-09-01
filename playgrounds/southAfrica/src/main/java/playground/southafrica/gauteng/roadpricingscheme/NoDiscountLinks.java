@@ -26,8 +26,10 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
-public abstract class NoDiscountLinks {
-	public static List<Id> getList(){
+final class NoDiscountLinks {
+	private NoDiscountLinks(){} // do not instantiate
+		
+	static List<Id> getList(){
 		List<Id> list = new ArrayList<Id>();
 		list.add(new IdImpl(120271));
 		list.add(new IdImpl(230322));

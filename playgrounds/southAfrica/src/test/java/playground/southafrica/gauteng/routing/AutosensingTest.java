@@ -42,9 +42,6 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.southafrica.kai.gauteng.EffectiveMarginalUtilitiesContainer;
-import playground.southafrica.kai.gauteng.RouterUtils;
-
 /**
  * @author nagel
  *
@@ -101,7 +98,7 @@ public class AutosensingTest {
 		// === CONTROLER INFRASTRUCTURE (without actually running the controler): ===
 //		TravelTime tt = new FreeSpeedTravelTime() ;
 		ScoringFunctionFactory scoringFunctionFactory = ControlerDefaults.createDefaultScoringFunctionFactory(scenario) ;
-		EffectiveMarginalUtilitiesContainer muc = RouterUtils.createAutoSensingMarginalUtilitiesContainer(scenario, scoringFunctionFactory) ;
+		EffectiveMarginalUtilitiesContainer muc = TravelDisutilityUtils.createAutoSensingMarginalUtilitiesContainer(scenario, scoringFunctionFactory) ;
 		
 		Assert.assertEquals(-12.0/3600., muc.getEffectiveMarginalUtilityOfTtime(person.getId()), 0.01/3600. ) ;
 		Assert.assertTrue(muc.getEffectiveMarginalUtilityOfTtime(person.getId()) < 0. );

@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.southafrica.kai.gauteng;
+package playground.southafrica.gauteng.routing;
 
 import org.matsim.api.core.v01.Id;
 
@@ -24,8 +24,9 @@ import org.matsim.api.core.v01.Id;
  * @author nagel
  *
  */
-public interface UtilityOfTtimeI {
-	double getEffectiveMarginalUtilityOfTtime( Id personId ) ;
+public interface UtilityOfDistanceI {
+	double getMarginalUtilityOfDistance( Id personId ) ;
+	// yyyy just "person" is probably not enough.  "vehicle"?  kai, nov'13
 
-	double getEffectiveMarginalUtilityOfTtimeMAX();
+	double getMarginalUtilityOfDistanceMAX();
 }

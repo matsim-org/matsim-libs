@@ -47,7 +47,7 @@ import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
-import playground.southafrica.gauteng.roadpricingscheme.GautengRoadPricingScheme;
+import playground.southafrica.gauteng.roadpricingscheme.RoadPricingSchemeUsingTollFactor;
 import playground.southafrica.utilities.Header;
 
 public class MyTollPotentialCalculator {
@@ -96,7 +96,7 @@ public class MyTollPotentialCalculator {
         
 //		GautengRoadPricingScheme scheme = new GautengRoadPricingScheme(tollLinksFileName, mtpc.getScenario().getNetwork(), 
 //				mtpc.getScenario().getPopulation(), new SanralTollFactor());
-        GautengRoadPricingScheme scheme = null ;
+        RoadPricingSchemeUsingTollFactor scheme = null ;
         System.err.println("SanralTollFactor does no longer exist; only exists with subpopulations.  Aborting ...");
         System.exit(-1) ;
 		
@@ -208,7 +208,7 @@ public class MyTollPotentialCalculator {
 	 * 		the	<i>number</i> of times that agent entered observed links.
 	 * @see MyTollPotentialEventHandler
 	 */
-	public void processEventsFile(String eventsFile, List<Id> linkList, List<Id> breakList, GautengRoadPricingScheme scheme){
+	public void processEventsFile(String eventsFile, List<Id> linkList, List<Id> breakList, RoadPricingSchemeUsingTollFactor scheme){
 		log.info("Processing events from " + eventsFile);
 		EventsManager em = EventsUtils.createEventsManager();
 		MyTollPotentialEventHandler eh = new MyTollPotentialEventHandler(linkList, breakList, scheme);

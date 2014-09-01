@@ -90,13 +90,13 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 
-import playground.southafrica.gauteng.roadpricingscheme.GautengRoadPricingScheme;
+import playground.southafrica.gauteng.roadpricingscheme.RoadPricingSchemeUsingTollFactor;
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor_Subpopulation;
+import playground.southafrica.gauteng.routing.ConfigurableTravelDisutilityFactory;
 import playground.southafrica.gauteng.scoring.GautengScoringFunctionFactory;
 import playground.southafrica.gauteng.scoring.GenerationOfMoneyEvents;
 import playground.southafrica.gauteng.utilityofmoney.GautengUtilityOfMoney;
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
-import playground.southafrica.kai.gauteng.ConfigurableTravelDisutilityFactory;
 import playground.southafrica.utilities.Header;
 import playground.vsp.planselectors.DiversityGeneratingPlansRemover;
 import playground.vsp.planselectors.DiversityGeneratingPlansRemover.Builder;
@@ -212,7 +212,7 @@ public class GautengControler_subpopulations {
 		config.controler().setWriteSnapshotsInterval(0);
 		
 		if ( user==User.kai ) {
-			config.parallelEventHandling().setNumberOfThreads(4); // even "1" is slowing down my laptop quite a lot
+			config.parallelEventHandling().setNumberOfThreads(4); 
 		} else if(user == User.johan){
 			config.parallelEventHandling().setNumberOfThreads(1); 
 		}
@@ -318,9 +318,8 @@ public class GautengControler_subpopulations {
 		final  SanralTollFactor_Subpopulation tollFactor = new SanralTollFactor_Subpopulation(sc);
 
 		// CONSTRUCT VEH-DEP ROAD PRICING SCHEME:
-        RoadPricingScheme vehDepScheme = new GautengRoadPricingScheme(ConfigUtils.addOrGetModule(sc
-                .getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).getTollLinksFile(), sc.getNetwork(),
-				sc.getPopulation(), tollFactor);
+        RoadPricingScheme vehDepScheme = new RoadPricingSchemeUsingTollFactor(ConfigUtils.addOrGetModule(sc
+                .getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).getTollLinksFile(), tollFactor);
 
 		// CONSTRUCT UTILITY OF MONEY:
 

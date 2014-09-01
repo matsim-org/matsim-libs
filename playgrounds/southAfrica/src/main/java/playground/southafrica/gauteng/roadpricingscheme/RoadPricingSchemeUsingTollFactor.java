@@ -24,8 +24,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
@@ -35,17 +33,14 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
  * @author nagel
  *
  */
-public class GautengRoadPricingScheme implements RoadPricingScheme {
-	private static final Logger log = Logger.getLogger( GautengRoadPricingScheme.class ) ;
+public class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme {
+	@SuppressWarnings("unused")
+	private static final Logger log = Logger.getLogger( RoadPricingSchemeUsingTollFactor.class ) ;
 
 	private RoadPricingScheme delegate = null ;
-	private Network network;
-	private Population population ;
 	private final TollFactorI tollFactor ;
 	
-	public GautengRoadPricingScheme( String tollLinksFileName, Network network, Population population, TollFactorI tollFactor ) {
-		this.network = network ;
-		this.population = population ; 
+	public RoadPricingSchemeUsingTollFactor( String tollLinksFileName, TollFactorI tollFactor ) {
 //		log.warn("for me, using this as cordon toll did not work; using it as new scheme `link' " +
 //				"toll for the time being.  needs to be debugged?!?!  kai, mar'12") ;
 		// it is, in reality, a link toll, not a cordon toll.  Marcel had implemented it as cordon toll since link toll at that point did not exist.  kai, jan'14
@@ -60,21 +55,7 @@ public class GautengRoadPricingScheme implements RoadPricingScheme {
 		}
 		this.delegate = scheme ;
 		this.tollFactor = tollFactor ;
-		
-//		final Cost[] costArray = scheme.getCostArray();
-//		for ( int ii=0 ; ii< costArray.length ; ii++ ) {
-//			log.warn( costArray[ii].toString() ) ;
-//		}
-//		
-//		Map<Id, List<Cost>> costsForLink = scheme.getCostsForLink() ;
-//		for ( Entry<Id, List<Cost>> entry : costsForLink.entrySet() ) {
-//			Id id = entry.getKey() ;
-//			List<Cost> costs = entry.getValue() ;
-//			for ( Cost cost : costs ) {
-//				log.warn( "id: " + id.toString() + "; cost: " + cost.toString() ) ;
-//			}
-//		}
-		
+				
 	}
 
 	@Override

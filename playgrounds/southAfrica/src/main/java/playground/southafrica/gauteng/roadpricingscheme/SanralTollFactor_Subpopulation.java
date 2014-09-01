@@ -19,11 +19,7 @@
 
 package playground.southafrica.gauteng.roadpricingscheme;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
-import org.junit.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.vehicles.VehicleType;
@@ -36,14 +32,9 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 
 	private Scenario sc;
 	
-	public static enum TollVehicleType { A1, A2, B, C} ;
-	public static enum SubPopType{ PRIVATE, COMMERCIAL, TAXI, BUS, EXT } ;
-	// yyyy: maybe try to switch to some String-based registry; but I need to be able to iterate over those types for analysis. kai, aug'14
-	
 	public SanralTollFactor_Subpopulation(Scenario scenario) {
 		this.sc = scenario;
 	}
-	
 	
 	@Override
 	public double getTollFactor(Id personId, final Id vehicleId, final Id linkId, final double time){		
@@ -81,7 +72,7 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 
 
 	@SuppressWarnings("static-method") // may become truly non-static later. kai, mar'14
-	public boolean isPt(final Id vehicleId) {
+	private boolean isPt(final Id vehicleId) {
 		return vehicleId.toString().startsWith("bus") || 
 		   vehicleId.toString().startsWith("taxi");
 	}
@@ -159,20 +150,7 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 		}
 	}
 	
-	public SubPopType getSubPopTypeFromPersonID(Id personId) {
-		Object o1 = this.sc.getPopulation().getPersonAttributes().getAttribute(personId.toString(), sc.getConfig().plans().getSubpopulationAttributeName());
-		String subpopulation;
-		if(o1 instanceof String){
-			subpopulation = (String)o1;
-		} else{
-			throw new RuntimeException("Expected a subppulation description of type `String', but it was `" + o1.getClass().toString() + "'. Returning NULL");
-		}
-		return SubPopType.valueOf( subpopulation.toUpperCase() ) ; 
-		// yyyyyy: "private" is not possible as enum, and so everything is converted to uppercase internally.  Not good.  kai, aug'14
-	}
-
-
-	public Boolean hasETag(Id personId) {
+	private Boolean hasETag(Id personId) {
 		Object o3 = this.sc.getPopulation().getPersonAttributes().getAttribute(personId.toString(), E_TAG_ATTRIBUTE_NAME);
 		Boolean tag = false;
 		if(o3 instanceof Boolean){
@@ -183,18 +161,5 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 		return tag;
 	}
 
-
-	private TollVehicleType getTollVehicleTypeFromPersonID(Id personId) {
-		// yyyyyy based on personId, not good!
-		
-		Object o2 = this.sc.getPopulation().getPersonAttributes().getAttribute(personId.toString(), VEH_TOLL_CLASS_ATTRIB_NAME);
-		String vehicleType;
-		if(o2 instanceof String){
-			vehicleType = (String)o2;
-		} else{
-			throw new RuntimeException("Expected a vehicle type description of type `String', but it was `" + o2.getClass().toString() + "'. Returning NULL");
-		}
-		return TollVehicleType.valueOf(vehicleType);
-	}
 
 }
