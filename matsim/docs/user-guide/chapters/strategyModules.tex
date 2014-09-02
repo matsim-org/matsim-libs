@@ -52,9 +52,9 @@ It is not clear which combinations of these modules can be used  together. Depen
 \section{Selectors}
 \label{sec:selectors}
 
-\subsection{BestScore.  Status: works}
+Selectors are pure plan selecting (i.e.\ non-innovative) strategy module.
 
-Pure plan selecting (i.e.\ non-innovative) strategy module.
+\subsection{BestScore.  Status: works}
 
 Will select the plan with the highest score. The score will be updated after execution of the mobsim.
 
@@ -101,7 +101,7 @@ Note that innovative modules first copy a plan and then modify it, i.e.\ they in
 
 \subsection{ReRoute.  Status: nearly indispensable}
 
-\textbf{Maintainer:} Marcel Rieser
+\maintainers{Marcel Rieser, Thibaut Dubernet}
 
 All routes of a plan are recomputed.
 
@@ -151,7 +151,7 @@ The usage of the module is configured in the ``strategy'' section.
 
 \subsection{ChangeSingleLegMode. Status: works}
 
-\textbf{Maintainer:} Marcel Rieser
+\maintainers{Marcel Rieser}
 
 This replanning module randomly picks one of the plans of a person and changes the mode of transport of \textbf{one single leg}. The leg is picked randomly. For changing the mode of transport for all legs use \verb$ChangeLegMode$ (Sec.~\ref{sec:changeLegMode}). In contrast to \verb$ChangeLegMode$,  \verb$ChangeSingleLegMode$ allows for multiple modes in one plan. By default,  the supported modes are driving a car and using public transport. Also,  this module is able to (optionally) respect car-availability.
 
@@ -177,7 +177,7 @@ By default, the simulation will handle legs with modes different from  ``car'' b
 \subsection{ChangeLegMode. Status: works}
 \label{sec:changeLegMode}
 
-\textbf{Maintainer:} Michael Zilske
+\maintainers{Michael Zilske}
 
 This replanning module randomly picks one of the plans of a person  and changes its mode of transport. By default, the supported modes  are driving a car and using public transport. Only one mode of transport  per plan is supported. For using different modes for sub-tours on a  single day see the "SubtourModeChoice" module. Also, this module is able  to (optionally) respect car-availability.
 
@@ -219,7 +219,7 @@ M. Rieser, D. Grether, K. Nagel;\textbf{Adding mode choice to a multi-agent tran
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{SubtourModeChoice. Status: probably works}
 
-\textbf{Maintainer:} Michael Zilske
+\maintainers{Michael Zilske}
 
 In contrast to "ChangeLegMode", which changes \emph{all} legs of a plan to a different mode, this module changes the modes of sub-tours separately.
 

@@ -293,7 +293,7 @@ Any number of threads larger than $1$ triggers the use of the parallel version.
 \authorsOfCode{Dominik Grether}
 
 Make sure you read
-\\ \url{http://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2012/12-03/} 
+\\ \small{\url{http://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2012/12-03/}}
 \\
 before you use the lanes module to understand effects on the queue model.
 
@@ -507,9 +507,9 @@ Waraich,  R., D. Charypar, M. Balmer and K.W. Axhausen (2009) Performance  impro
 \umbruch
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{"simulation". Status: should work}
+\section{``simulation''. Status: deprecated as of sep/2014}
 
-This  was essentially the production of the queue simulation until Nov/2010.  The "qsim" was then forked out for further development. Unfortunately,  this fork was done somewhat too late, so "simulation" is not exactly the  stable version that was used over many years, but something that is  already somewhat modified, and was not used very much after that.  (Please let us know if you have problems.)
+\sout{This  was essentially the production of the queue simulation until Nov/2010.  The "qsim" was then forked out for further development. Unfortunately,  this fork was done somewhat too late, so "simulation" is not exactly the  stable version that was used over many years, but something that is  already somewhat modified, and was not used very much after that.  (Please let us know if you have problems.)}
 
 \sout{Note that you will get a "simulation" section in the log file even if  you have selected a different mobsim (such as qsim or jdqsim).}
 
@@ -517,6 +517,11 @@ This  was essentially the production of the queue simulation until Nov/2010.  Th
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{External mobsim.  Status: unknown}
+
+\authorsOfCode{Marcel Rieser}
+%\maintainers{C. Dobler, IVT}
+\authorsOfDoc{Kai Nagel}
+
 
 There used to be an option to start an external mobsim. This still seems to be there but the syntax is a bit awkward:
 \begin{lstlisting}
@@ -564,7 +569,7 @@ Maintainers are mentioned as far as possible, but they are \emph{not} responsibl
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{"global". Status: indispensable}
 
-\textbf{"Maintainer":} Marcel Rieser
+\maintainers{Marcel Rieser}
 
 "Global" information. Arguably should be merged with "controler" section.
 
@@ -573,11 +578,11 @@ Maintainers are mentioned as far as possible, but they are \emph{not} responsibl
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{"controler". Status: indispensable}
 
-\subsubsection{\textbf{Maintenance and Questions}}
+\authorsOfCode{Marcel Rieser}
+\maintainers{Marcel Rieser}
+\authorsOfDoc{Marcel Rieser}
 
-Marcel Rieser, Senozon AG (rieser\_at\_senozon.com)
-
-\subsubsection{\textbf{Javadoc}}
+\subsubsection{Javadoc}
 
 \href{http://www.matsim.org/javadoc/org/matsim/core/controler/package-summary.html}{www.matsim.org/javadoc/org/matsim/core/controler/package-summary.html}
 
@@ -588,7 +593,7 @@ Marcel Rieser, Senozon AG (rieser\_at\_senozon.com)
 \href{http://www.matsim.org/javadoc/org/matsim/core/controler/package-summary.html#controler_parameters}{www.matsim.org/javadoc/org/matsim/core/controler/package-summary.html\#controler\_parameters}
 
 
-\subsubsection{\textbf{\textbf{In Brief}}}
+\subsubsection{In Brief}
 
 Central module to run matsim. Specifies, for example, the number of iterations.
 
@@ -641,7 +646,8 @@ Central module to run matsim. Specifies, for example, the number of iterations.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{"parallelEventHandling". Status: works for ivt and vsp}
 
-\textbf{Maintainer:} Rashid Waraich
+\authorsOfCode{Rashid Waraich}
+\maintainers{Rashid Waraich}
 
 see details \href{http://matsim.org/node/238}{here}.
 
@@ -650,7 +656,7 @@ see details \href{http://matsim.org/node/238}{here}.
 \umbruch
 \section{"planCalcScore". Status: nearly indispensible}
 
-\textbf{Maintainer:} Marcel Rieser
+\maintainers{Marcel Rieser}
 
 This module contains the definitions for the utility function.
 
@@ -660,36 +666,10 @@ There is also some description in the "scoring function" section of the document
 
 \umbruch
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%\section{"roadpricing".  Status: works for vsp}
-
-%%\textbf{Maintainer:} Michael Zilske
-
-%%The roadpricing module provides functionality to simulate different road-pricing scenarios in MATSim.
-
-%%Documentation can be found at:
-%%\begin{itemize}
-%%	\item \href{http://ci.matsim.org:8080/job/MATSim_contrib_M2/org.matsim.contrib$roadpricing/javadoc/?}{http://ci.matsim.org:8080/job/MATSim\_contrib\_M2/org.matsim.contrib\$roadpricing/javadoc/?}
-%%\end{itemize}
-
-%%Publications using this module:
-%%\begin{itemize}
-%%	\item \href{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2007/07-14/}{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2007/07-14/}
-%%	\item \href{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2008/08-01/}{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2008/08-01/}
-%%	\item \href{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2008/08-08/}{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2008/08-08/}
-%%	\item \href{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2010/10-03/}{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2010/10-03/}
-%%\end{itemize}
-
-
-%%\umbruch
-
-% roadpricing is no longer core but now a contrib.  kai, oct'13
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{"strategy". Status: indispensable}
 
-\textbf{Maintainer:} Marcel Rieser ("core")
+\maintainers{Marcel Rieser}
 
 See \href{http://matsim.org/node/478}{here}.
 
@@ -698,7 +678,7 @@ See \href{http://matsim.org/node/478}{here}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{"travelTimeCalculator". Status: nearly indispensable}
 
-\textbf{Maintainer:} Marcel Rieser ("core")
+\maintainers{Marcel Rieser}
 
 "router" and "travelTimeCalculator" are separate in matsim, so that  they can be configured separately. They refer to each other,  though.
 
@@ -707,30 +687,32 @@ See \href{http://matsim.org/node/478}{here}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{"vspExperimental". Status: used by VSP}
 
-This  section defines switches that are used at VSP or when collaborating  with VSP. There are experimental and may we withdrawn without  notice.
+\authorsOfCode{Kai Nagel}
+\maintainers{Kai Nagel}
+\authorsOfDoc{Kai Nagel}
 
-\subsubsection{vsp defaults}
+This  section defines switches that are used at VSP or when collaborating  with VSP. There are experimental and may we withdrawn without notice.
 
-I (kn) am in the process of defining some defaults that everybody at VSP should be using. These can be switched on by:
-\begin{lstlisting}
-<module name="vspExperimental" >
-   <param name="vspDefaultsCheckingLevel" value="abort" />
-   ...
-</module>
+%%Of particular interest are some defaults that everybody at VSP should be using. These can be switched on by:
+%%\begin{lstlisting}
+%%<module name="vspExperimental" >
+%%   <param name="vspDefaultsCheckingLevel" value="abort" />
+%%   ...
+%%</module>
 
-\end{lstlisting}
+%%\end{lstlisting}
 
-This will make the code abort when these defaults are violated.
+%%This will make the code abort when these defaults are violated.
 
-The number of vsp defaults will grow over time. This may have  the effect that some config file that used to be working for you in the  past may not work any more after an svn update. I will try to  communicate such changes, but will sometimes fail to do so. In any  case, if you encounter an abort because of a vsp defaults violation,  please
-\begin{itemize}
-	\item check what is causing the problem, and
-	\item enter the relevant config setting into all config files that you use.
-\end{itemize}
+%%The number of VSP defaults will grow over time. This may have  the effect that some config file that used to be working for you in the  past may not work any more after an svn update. I will try to  communicate such changes, but will sometimes fail to do so. In any  case, if you encounter an abort because of a vsp defaults violation,  please
+%%\begin{itemize}
+%%	\item check what is causing the problem, and
+%%	\item enter the relevant config setting into all config files that you use.
+%%\end{itemize}
 
-If you think that you cannot live with these settings, please talk to me.
+%%If you think that you cannot live with these settings, please talk to me.
 
-Since those settings involve all aspects of matsim, they may often be irrelevant to you. Please set them anyways.
+%%Since those settings involve all aspects of matsim, they may often be irrelevant to you. Please set them anyways.
 
 \umbruch
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
