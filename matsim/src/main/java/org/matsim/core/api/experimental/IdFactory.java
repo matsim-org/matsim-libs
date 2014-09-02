@@ -24,7 +24,9 @@ import org.matsim.core.api.internal.MatsimFactory;
 
 /**
  * @author mrieser
+ * @deprecated use {@link Id#create(String, Class)} instead
  */
+@Deprecated
 public interface IdFactory extends MatsimFactory {
 
 	public Id createId(final String id);

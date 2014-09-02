@@ -25,6 +25,10 @@ import java.io.Serializable;
 import org.matsim.api.core.v01.Id;
 
 
+/**
+ * @deprecated Use {@link Id#create(String, Class)} instead.
+ */
+@Deprecated
 public class IdImpl extends Id implements Serializable {
 
 	private static final long serialVersionUID = 1L;
