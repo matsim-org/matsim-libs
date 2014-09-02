@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.roadpricing;
+package org.matsim.contrib.roadpricing;
 
 import java.io.File;
 import java.io.IOException;

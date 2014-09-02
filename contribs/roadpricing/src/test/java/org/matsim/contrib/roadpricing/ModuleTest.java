@@ -20,7 +20,7 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.roadpricing;
+package org.matsim.contrib.roadpricing;
 
 import org.junit.Ignore;
 import org.junit.Rule;
