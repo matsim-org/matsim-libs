@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -15,6 +14,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingUtilities;
@@ -23,7 +24,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.ExeRunner;
 
 /**
  * @author mrieser / Senozon AG
@@ -38,6 +38,8 @@ public class Gui extends JFrame {
 	
 	private JButton btnStartMatsim;
 	private JProgressBar progressBar;
+	private JTextArea textArea;
+	private JScrollPane scrollPane;
 
 	public Gui() {
 		setTitle("MATSim");
@@ -169,25 +171,33 @@ public class Gui extends JFrame {
 				}
 			}
 		});
+		
+		textArea = new JTextArea();
+		textArea.setWrapStyleWord(true);
+		textArea.setTabSize(4);
+		textArea.setEditable(false);
+		scrollPane = new JScrollPane(textArea);
+//		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(lblJavaLocation)
-						.addComponent(lblConfigurationFile)
-						.addComponent(lblOutputDirectory)
-						.addGroup(groupLayout.createSequentialGroup()
+					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+						.addComponent(scrollPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 697, Short.MAX_VALUE)
+						.addComponent(lblJavaLocation, Alignment.LEADING)
+						.addComponent(lblConfigurationFile, Alignment.LEADING)
+						.addComponent(lblOutputDirectory, Alignment.LEADING)
+						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
 							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 								.addComponent(lblYouAreRunning)
 								.addComponent(lblYouAreUsing)
 								.addComponent(lblMemory)
 								.addComponent(btnStartMatsim))
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-								.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
+							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+								.addGroup(groupLayout.createSequentialGroup()
 									.addComponent(txtRam, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(lblMb))
@@ -242,7 +252,9 @@ public class Gui extends JFrame {
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addComponent(btnStartMatsim)
 						.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(176, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
+					.addContainerGap())
 		);
 
 		getContentPane().setLayout(groupLayout);
@@ -266,8 +278,8 @@ public class Gui extends JFrame {
 						"org.matsim.run.Controler",
 						txtConfigfilename.getText()
 				};
-				System.out.println(Arrays.toString(cmdArgs));
-				int exitcode = ExeRunner.run(cmdArgs, "matsim.log", Integer.MAX_VALUE, new File(txtConfigfilename.getText()).getParent());
+				Gui.this.textArea.setText("");
+				int exitcode = ExeRunner.run(cmdArgs, Gui.this.textArea, new File(txtConfigfilename.getText()).getParent());
 				
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
@@ -282,8 +294,6 @@ public class Gui extends JFrame {
 				}
 			}
 		}).start();
-		
-		
 		
 	}
 	
