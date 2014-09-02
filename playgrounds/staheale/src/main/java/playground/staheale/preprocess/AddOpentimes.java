@@ -80,13 +80,13 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		this.shopsOf2005 = scenario.getActivityFacilities();
 		this.shopsOf2005.setName("shopsOf2005");
 		log.info("shopsOf2005 size: " +shopsOf2005.getFacilities().size());
-		TreeMap<Id,ActivityFacility> shoppingFacilities = this.shopsOf2005.getFacilitiesForActivityType("shop");
+		TreeMap<Id<ActivityFacility>, ActivityFacility> shoppingFacilities = this.shopsOf2005.getFacilitiesForActivityType("shop");
 		this.shoppingQuadTree = this.buildShopsQuadTree(shoppingFacilities);
 		log.info(" shoppingQuadTree size: " +this.shoppingQuadTree.size());
 		
 	}
 	
-	private QuadTree<ActivityFacility> buildShopsQuadTree(TreeMap<Id,ActivityFacility> shoppingFacilities) {
+	private QuadTree<ActivityFacility> buildShopsQuadTree(TreeMap<Id<ActivityFacility>, ActivityFacility> shoppingFacilities) {
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;

@@ -214,7 +214,7 @@ public class AccessibilityCalculator {
 		this.transitNetwork = transitNetwork;
 		
 		/* Build QuadTree of facilities. */
-		Map<Id, ? extends ActivityFacility> facilities = sc.getActivityFacilities().getFacilities();
+		Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities = sc.getActivityFacilities().getFacilities();
 		double minX = Double.POSITIVE_INFINITY;
 		double maxX = Double.NEGATIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;

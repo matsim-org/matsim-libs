@@ -62,7 +62,7 @@ public class MergeFacilities {
 		ActivityFacilities homeFacilities = scenarioHome.getActivityFacilities();
 		log.info("Number of home facilities: " +homeFacilities.getFacilities().size());
 
-		TreeMap<Id, ActivityFacility> ActHomeFacilities = ((ActivityFacilitiesImpl) homeFacilities).getFacilitiesForActivityType("home");
+		TreeMap<Id<ActivityFacility>, ActivityFacility> ActHomeFacilities = ((ActivityFacilitiesImpl) homeFacilities).getFacilitiesForActivityType("home");
 		log.info("Number of facilities of activity type home: " +ActHomeFacilities.size());
 
 		//------------------initial home facility file is zero------

@@ -33,7 +33,7 @@ import others.sergioo.util.dataBase.NoConnectionException;
 
 public class PlanFindLegDistances {
 	ScenarioImpl scenario;
-	Map<Id, ? extends ActivityFacility> facilities;
+	Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities;
 	NetworkImpl network;
 	ModeRouteFactory routeFactory;
 	DataBaseAdmin dba;

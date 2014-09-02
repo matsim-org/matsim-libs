@@ -88,11 +88,11 @@ public class SetSecondaryLocation  {
 		//build quadTrees
 
 
-		TreeMap<Id,ActivityFacility> leisureFacilities = facilities.getFacilitiesForActivityType("leisure");
+		TreeMap<Id<ActivityFacility>, ActivityFacility> leisureFacilities = facilities.getFacilitiesForActivityType("leisure");
 		log.info("Leisure facilities: " +leisureFacilities.size());
-		TreeMap<Id,ActivityFacility> educationFacilities = facilities.getFacilitiesForActivityType("education");
+		TreeMap<Id<ActivityFacility>, ActivityFacility> educationFacilities = facilities.getFacilitiesForActivityType("education");
 		log.info("Education facilities: " +educationFacilities.size());
-		TreeMap<Id,ActivityFacility> shopFacilities = facilities.getFacilitiesForActivityType("shop");
+		TreeMap<Id<ActivityFacility>, ActivityFacility> shopFacilities = facilities.getFacilitiesForActivityType("shop");
 		log.info("Shop facilities: " +shopFacilities.size());
 
 
@@ -223,7 +223,7 @@ public class SetSecondaryLocation  {
 	//////////////////////////////////////////////////////////////////////
 	//build methods
 
-	private QuadTree<ActivityFacilityImpl> buildLeisureQuadTree(TreeMap<Id,ActivityFacility> leisureFacilities) {
+	private QuadTree<ActivityFacilityImpl> buildLeisureQuadTree(TreeMap<Id<ActivityFacility>, ActivityFacility> leisureFacilities) {
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
@@ -248,7 +248,7 @@ public class SetSecondaryLocation  {
 		return leisureQuadTree;
 	}
 
-	private QuadTree<ActivityFacilityImpl> buildEducationQuadTree(TreeMap<Id,ActivityFacility> educationFacilities) {
+	private QuadTree<ActivityFacilityImpl> buildEducationQuadTree(TreeMap<Id<ActivityFacility>, ActivityFacility> educationFacilities) {
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
@@ -273,7 +273,7 @@ public class SetSecondaryLocation  {
 		return educationQuadTree;
 	}
 
-	private QuadTree<ActivityFacilityImpl> buildShopQuadTree(TreeMap<Id, ActivityFacility> shopFacilities) {
+	private QuadTree<ActivityFacilityImpl> buildShopQuadTree(TreeMap<Id<ActivityFacility>, ActivityFacility> shopFacilities) {
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;

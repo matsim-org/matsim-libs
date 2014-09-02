@@ -95,7 +95,7 @@ public class FacilitiesFromPopulationTest {
 		
 		Assert.assertEquals(3, f.scenario.getActivityFacilities().getFacilities().size());
 		
-		Map<Id, ? extends ActivityFacility> ffs = f.scenario.getActivityFacilities().getFacilities();
+		Map<Id<ActivityFacility>, ? extends ActivityFacility> ffs = f.scenario.getActivityFacilities().getFacilities();
 		Assert.assertEquals(7*3600, ffs.get(f.scenario.createId("ab")).getActivityOptions().get("work").getOpeningTimes());
 		Assert.assertEquals(19*3600, ffs.get(f.scenario.createId("ab")).getActivityOptions().get("work").getOpeningTimes());
 		
@@ -126,7 +126,7 @@ public class FacilitiesFromPopulationTest {
 		
 		Assert.assertEquals(13, f.scenario.getActivityFacilities().getFacilities().size());
 
-		Map<Id, ? extends ActivityFacility> ffs = f.scenario.getActivityFacilities().getFacilities();
+		Map<Id<ActivityFacility>, ? extends ActivityFacility> ffs = f.scenario.getActivityFacilities().getFacilities();
 		Assert.assertEquals("ab", ffs.get(f.scenario.createId("0")).getLinkId().toString()); // home of agent 1
 		Assert.assertEquals("bc", ffs.get(f.scenario.createId("1")).getLinkId().toString()); // work of agent 1-3
 		Assert.assertEquals("ab", ffs.get(f.scenario.createId("2")).getLinkId().toString()); // home of agent 2

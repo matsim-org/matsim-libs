@@ -291,10 +291,10 @@ public class InputDataCollection implements Serializable {
 //			only look at work activities
 			if(!activityType.startsWith("w_"))
 				continue;
-			TreeMap<Id, ? extends ActivityFacility> facilities = ((ActivityFacilitiesImpl) this.scenario
+			TreeMap<Id<ActivityFacility>, ? extends ActivityFacility> facilities = ((ActivityFacilitiesImpl) this.scenario
 					.getActivityFacilities()).getFacilitiesForActivityType(
 							activityType);
-			for (Entry<Id, ? extends ActivityFacility> e : facilities.entrySet()) {
+			for (Entry<Id<ActivityFacility>, ? extends ActivityFacility> e : facilities.entrySet()) {
 				String currid = e.getKey().toString();
 				double currcap = e.getValue().getActivityOptions().get(activityType).getCapacity();
 //				TODO: check spatial join of facilities to subdgps
@@ -327,7 +327,7 @@ public class InputDataCollection implements Serializable {
 	
 	
 	private void addSecondaryActivityTypes() {
-		for (Entry<Id, ? extends ActivityFacility> facilityset : this.scenario
+		for (Entry<Id<ActivityFacility>, ? extends ActivityFacility> facilityset : this.scenario
 				.getActivityFacilities().getFacilities().entrySet()) {
 			// get the land use for each facility
 			ActivityFacilityImpl facility = (ActivityFacilityImpl) facilityset
@@ -379,16 +379,16 @@ public class InputDataCollection implements Serializable {
 	private void createLocationSamplers() {
 		inputLog.info("Creating weighted samplers for each activity type,\n indexing the relevant facility ids and their capacity for the particular activity.");
 		for (String activityType : this.mainActivityTypes) {
-			TreeMap<Id, ActivityFacility> facilities = ((ActivityFacilitiesImpl) this.scenario
+			TreeMap<Id<ActivityFacility>, ActivityFacility> facilities = ((ActivityFacilitiesImpl) this.scenario
 					.getActivityFacilities()).getFacilitiesForActivityType(
 							activityType);
-			Iterator<Entry<Id, ActivityFacility>> fi = facilities.entrySet()
+			Iterator<Entry<Id<ActivityFacility>, ActivityFacility>> fi = facilities.entrySet()
 					.iterator();
 			String[] ids = new String[facilities.entrySet().size()];
 			double[] caps = new double[facilities.entrySet().size()];
 			int i = 0;
 			while (fi.hasNext()) {
-				Entry<Id, ActivityFacility> e = fi.next();
+				Entry<Id<ActivityFacility>, ActivityFacility> e = fi.next();
 				ids[i] = e.getKey().toString();
 				caps[i] = e.getValue().getActivityOptions().get(activityType)
 						.getCapacity();
