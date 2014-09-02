@@ -21,11 +21,12 @@ package org.matsim.core.mobsim.jdeqsim;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -33,7 +34,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.mobsim.qsim.agents.ActivityDurationUtils;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * The micro-simulation internal handler for ending a leg.
@@ -102,7 +102,9 @@ public class EndLegMessage extends EventMessage {
 		// schedule enter link event
 		// only, if car leg and is not empty
 		if (vehicle.getCurrentLeg().getMode().equals(TransportMode.car) && (vehicle.getCurrentLinkRoute()!=null && vehicle.getCurrentLinkRoute().length!=0)){
-			event = new LinkEnterEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLinkId(), vehicle.getOwnerPerson().getId());
+			event = new LinkEnterEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), 
+					vehicle.getCurrentLinkId(), 
+					Id.create(vehicle.getOwnerPerson().getId().toString(), org.matsim.vehicles.Vehicle.class));
 
 			SimulationParameters.getProcessEventThread().processEvent(event);
 		}

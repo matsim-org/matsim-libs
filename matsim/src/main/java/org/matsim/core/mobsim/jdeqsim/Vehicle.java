@@ -43,9 +43,9 @@ public class Vehicle extends SimUnit {
 	private Person ownerPerson = null;
 	private Leg currentLeg = null;
 	private int legIndex;
-	private Id currentLinkId = null;
+	private Id<Link> currentLinkId = null;
 	private int linkIndex;
-	private Id[] currentLinkRoute = null;
+	private Id<Link>[] currentLinkRoute = null;
 	private final ActivityDurationInterpretation activityEndTimeInterpretation;
 
 	public Vehicle(Scheduler scheduler, Person ownerPerson, ActivityDurationInterpretation activityDurationInterpretation) {
@@ -147,7 +147,7 @@ public class Vehicle extends SimUnit {
 		}
 	}
 
-	protected Id[] getCurrentLinkRoute() {
+	protected Id<Link>[] getCurrentLinkRoute() {
 		return currentLinkRoute;
 	}
 
@@ -167,7 +167,7 @@ public class Vehicle extends SimUnit {
 		return legIndex;
 	}
 
-	public Id getCurrentLinkId() {
+	public Id<Link> getCurrentLinkId() {
 		return currentLinkId;
 	}
 
@@ -175,7 +175,7 @@ public class Vehicle extends SimUnit {
 		return linkIndex;
 	}
 
-	public void setCurrentLinkId(Id currentLinkId) {
+	public void setCurrentLinkId(Id<Link> currentLinkId) {
 		this.currentLinkId = currentLinkId;
 	}
 
@@ -246,7 +246,7 @@ public class Vehicle extends SimUnit {
 
 	public void scheduleLeavePreviousRoadMessage(double scheduleTime) {
 		Road previousRoad = null;
-		Id previousLinkId = null;
+		Id<Link> previousLinkId = null;
 		/*
 		 * we need to handle the first road in a leg specially, because the load
 		 * to be left is accessed over the last act performed instead of the leg
