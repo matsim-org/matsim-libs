@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package org.matsim.core.controler;
 
-import org.apache.log4j.Logger;
-
 import java.io.File;
+
+import org.apache.log4j.Logger;
 /**
  * 
  * Represents the directory hierarchy where the MATSim output goes in.
@@ -176,7 +176,7 @@ public class OutputDirectoryHierarchy {
 			if (!outputDir.mkdirs()) {
 				throw new RuntimeException(
 						"The output directory path " + outputPath
-						+ " could not be created. Check pathname and permissions!");
+						+ " could not be created. Check pathname and permissions! Full path: " + new File(outputPath).getAbsolutePath());
 			}
 		}
 	
