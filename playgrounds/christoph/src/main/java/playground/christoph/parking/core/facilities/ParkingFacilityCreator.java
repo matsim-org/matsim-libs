@@ -20,6 +20,7 @@
 
 package playground.christoph.parking.core.facilities;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
@@ -44,7 +45,7 @@ public class ParkingFacilityCreator {
 		ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(link.getId());
 		
 		if (facility == null) {
-			facility = factory.createActivityFacility(link.getId(), link.getCoord());
+			facility = factory.createActivityFacility(Id.create(link.getId().toString(), ActivityFacility.class), link.getCoord());
 			((ActivityFacilityImpl) facility).setLinkId(link.getId());
 			scenario.getActivityFacilities().addActivityFacility(facility);
 		}

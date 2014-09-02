@@ -38,6 +38,7 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifie
 import playground.christoph.parking.ParkingTypes;
 import playground.christoph.parking.core.interfaces.ParkingCostCalculator;
 import playground.christoph.parking.core.mobsim.InsertParkingActivities;
+import playground.christoph.parking.core.mobsim.ParkingFacility;
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 
@@ -124,7 +125,7 @@ public class ParkingSearchIdentifier extends DuringLegIdentifier {
 		// check for all parking types that the agent is willing to use
 		// TODO: calculate costs and compare...
 		for (String parkingType : getAgentsParkingTypes(agent)) {
-			List<Id> facilityIds = parkingInfrastructure.getFreeParkingFacilitiesOnLink(linkId, parkingType);
+			List<Id<ParkingFacility>> facilityIds = parkingInfrastructure.getFreeParkingFacilitiesOnLink(linkId, parkingType);
 			
 			if (facilityIds != null) {
 				// we have to check all facilities since they might have different costs

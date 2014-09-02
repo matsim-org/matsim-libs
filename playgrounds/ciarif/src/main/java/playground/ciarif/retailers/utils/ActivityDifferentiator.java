@@ -32,7 +32,7 @@ public class ActivityDifferentiator {
 		private int numberOfShopActs;
 		private final Scenario scenario;
 		private ArrayList<Id> groceryFacilities = new ArrayList<Id>();
-		private TreeMap<Id,ActivityFacility> shopFacilities = new TreeMap<Id,ActivityFacility>();
+		private TreeMap<Id<ActivityFacility>, ActivityFacility> shopFacilities = new TreeMap<Id<ActivityFacility>, ActivityFacility>();
 		//private final String retailersFacilitiesPath = "../../matsim/input/triangle/Retailers.txt";
 		private final String retailersFacilitiesPath = "/data/matsim/ciarif/input/zurich_10pc/retailersWithoutRepeatedLinks_MaxAct.txt";
 
@@ -40,7 +40,7 @@ public class ActivityDifferentiator {
 				
 		public ActivityDifferentiator(Scenario scenario) {
 			this.scenario = scenario;
-			this.shopFacilities= this.scenario.getActivityFacilities().getFacilitiesForActivityType("shop");
+			this.shopFacilities = this.scenario.getActivityFacilities().getFacilitiesForActivityType("shop");
 		}
 
 		public void run() {

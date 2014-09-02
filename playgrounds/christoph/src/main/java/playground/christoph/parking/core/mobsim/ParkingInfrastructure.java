@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
@@ -57,7 +58,7 @@ public class ParkingInfrastructure {
 //	private final QuadTree<ActivityFacility> fullParkingFacilitiesWithFreeWaitingCapacity;
 //	private final QuadTree<ActivityFacility> availableParkingFacilities;
 	private final Map<String, QuadTree<ActivityFacility>> availableParkingFacilities;
-	private final Map<Id, Map<String, List<Id>>> parkingFacilitiesOnLinkMapping; // <LinkId, Map<ParkingType, List<FacilityId>>>
+	private final Map<Id<Link>, Map<String, List<Id<ParkingFacility>>>> parkingFacilitiesOnLinkMapping; // <LinkId, Map<ParkingType, List<FacilityId>>>
 	protected final Map<Id, ParkingFacility> parkingFacilities;
 	private final ParkingCostCalculator parkingCostCalculator;
 	private final Set<Id> parkingFacilitiesWithWaitingAgents;
@@ -71,11 +72,11 @@ public class ParkingInfrastructure {
 		this.parkingTypes = new TreeSet<String>(parkingTypes);
 		
 		this.parkingFacilitiesWithWaitingAgents = new HashSet<Id>();
-		this.parkingFacilitiesOnLinkMapping = new HashMap<Id, Map<String, List<Id>>>();
+		this.parkingFacilitiesOnLinkMapping = new HashMap<Id<Link>, Map<String, List<Id<ParkingFacility>>>>();
 				
 		// create ParkingFacility objects and add facilities to the facilitiesOnLinkMapping
 		for (String parkingType : this.parkingTypes) {
-			Map<Id, ActivityFacility> parkingFacilitiesForType = this.scenario.getActivityFacilities().getFacilitiesForActivityType(parkingType);
+			Map<Id<ActivityFacility>, ActivityFacility> parkingFacilitiesForType = this.scenario.getActivityFacilities().getFacilitiesForActivityType(parkingType);
 			
 			for (ActivityFacility facility : parkingFacilitiesForType.values()) {
 				Id facilityId = facility.getId();
@@ -184,17 +185,17 @@ public class ParkingInfrastructure {
 		}
 	}
 
-	private void assignFacilityToLink(Id linkId, Id facilityId, String parkingType) {
+	private void assignFacilityToLink(Id<Link> linkId, Id<ParkingFacility> facilityId, String parkingType) {
 		
-		Map<String, List<Id>> map = this.parkingFacilitiesOnLinkMapping.get(linkId);
+		Map<String, List<Id<ParkingFacility>>> map = this.parkingFacilitiesOnLinkMapping.get(linkId);
 		if (map == null) {
-			map = new HashMap<String, List<Id>>();
+			map = new HashMap<String, List<Id<ParkingFacility>>>();
 			this.parkingFacilitiesOnLinkMapping.put(linkId, map);
 		}
 		
-		List<Id> list = map.get(parkingType);
+		List<Id<ParkingFacility>> list = map.get(parkingType);
 		if (list == null) {
-			list = new ArrayList<Id>();
+			list = new ArrayList<Id<ParkingFacility>>();
 			map.put(parkingType, list);
 		}
 		
@@ -368,23 +369,23 @@ public class ParkingInfrastructure {
 				activityFacility.getCoord().getY(), activityFacility);
 	}
 
-	public List<Id> getParkingsOnLink(Id linkId, String parkingType) {
+	public List<Id<ParkingFacility>> getParkingsOnLink(Id<Link> linkId, String parkingType) {
 		
-		Map<String, List<Id>> map = this.parkingFacilitiesOnLinkMapping.get(linkId);
+		Map<String, List<Id<ParkingFacility>>> map = this.parkingFacilitiesOnLinkMapping.get(linkId);
 		if (map == null) return null;
 		else return map.get(parkingType);
 	}
 
-	public List<Id> getFreeParkingFacilitiesOnLink(Id linkId, String parkingType) {
+	public List<Id<ParkingFacility>> getFreeParkingFacilitiesOnLink(Id<Link> linkId, String parkingType) {
 
-		List<Id> parkings = new ArrayList<Id>();
+		List<Id<ParkingFacility>> parkings = new ArrayList<Id<ParkingFacility>>();
 
-		List<Id> list = getParkingsOnLink(linkId, parkingType);
+		List<Id<ParkingFacility>> list = getParkingsOnLink(linkId, parkingType);
 
 		// if no parkings are available on the link, return an empty list
 		if (list == null) return parkings;
 
-		for (Id parkingId : list) {
+		for (Id<ParkingFacility> parkingId : list) {
 			ParkingFacility parkingFacility = this.parkingFacilities.get(parkingId);
 
 			// check parking type
@@ -398,11 +399,11 @@ public class ParkingInfrastructure {
 		return parkings;
 	}
 
-	public List<Id> getFreeWaitingFacilitiesOnLink(Id linkId, String parkingType) {
+	public List<Id<ParkingFacility>> getFreeWaitingFacilitiesOnLink(Id<Link> linkId, String parkingType) {
 
-		List<Id> parkings = new ArrayList<Id>();
+		List<Id<ParkingFacility>> parkings = new ArrayList<Id<ParkingFacility>>();
 
-		List<Id> list = getParkingsOnLink(linkId, parkingType);
+		List<Id<ParkingFacility>> list = getParkingsOnLink(linkId, parkingType);
 
 		// if no parkings are available on the link, return an empty list
 		if (list == null) return parkings;

@@ -13,10 +13,10 @@ public class AssignFacility {
 
 	private final static Logger log = Logger.getLogger(ActivityDifferentiator.class);
 	private ActivityImpl act;
-	private Map<Id, ActivityFacility> facilities;
+	private Map<Id<ActivityFacility>, ActivityFacility> facilities;
 
 	public AssignFacility(ActivityImpl act,
-			Map<Id, ActivityFacility> map) {
+			Map<Id<ActivityFacility>, ActivityFacility> map) {
 		
 		this.act = act;
 		this.facilities = map;
