@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.julia.spatialAveraging;
+package playground.julia.newSpatialAveraging;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -66,28 +66,28 @@ public class SpatialAveragingWriter {
 		this.targetCRS = targetCRS;
 	}
 	
-	public void writeRoutput(double[][] results, String outputPathForR) {
+	public void writeRoutput(Double[][] doubles, String outputPathForR) {
 		try {
 			BufferedWriter buffW = new BufferedWriter(new FileWriter(outputPathForR));
 			String valueString = new String();
 			valueString = "\t";
 
 			//x-coordinates as first row
-			for(int xIndex = 0; xIndex < results.length; xIndex++){
+			for(int xIndex = 0; xIndex < doubles.length; xIndex++){
 				valueString += findBinCenterX(xIndex) + "\t";
 			}
 			buffW.write(valueString);
 			buffW.newLine();
 			valueString = new String();
 
-			for(int yIndex = 0; yIndex < results[0].length; yIndex++){
+			for(int yIndex = 0; yIndex < doubles[0].length; yIndex++){
 				//y-coordinates as first column
 				valueString += findBinCenterY(yIndex) + "\t";
 				//table contents
-				for(int xIndex = 0; xIndex < results.length; xIndex++){ 
+				for(int xIndex = 0; xIndex < doubles.length; xIndex++){ 
 					Coord cellCentroid = findCellCentroid(xIndex, yIndex);
 					if(isInVisBoundary(cellCentroid)){
-						valueString += Double.toString(results[xIndex][yIndex]) + "\t"; 
+						valueString += Double.toString(doubles[xIndex][yIndex]) + "\t"; 
 					} else {
 						valueString += "NA" + "\t";
 					}
@@ -103,7 +103,7 @@ public class SpatialAveragingWriter {
 		logger.info("Finished writing output for R to " + outputPathForR);
 	}
 
-	void writeGISoutput(Map<Double, double[][]> time2results, String outputPathForGIS) throws IOException {
+	void writeGISoutput(Double[][] doubles, String outputPathForGIS, Double endTimeOfInterval) throws IOException {
 		
 		PointFeatureFactory factory = new PointFeatureFactory.Builder()
 		.setCrs(this.targetCRS)
@@ -113,21 +113,21 @@ public class SpatialAveragingWriter {
 		.create();
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		
-		for(Double endOfTimeInterval : time2results.keySet()){
+		
 //			if(endOfTimeInterval < Time.MIDNIGHT){ // time manager in QGIS does not accept time beyond midnight...
 				for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
 					for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
 						Coord cellCentroid = findCellCentroid(xIndex, yIndex);
 						if(isInVisBoundary(cellCentroid)){
-							String dateTimeString = convertSeconds2dateTimeFormat(endOfTimeInterval);
-							double result = time2results.get(endOfTimeInterval)[xIndex][yIndex];
+							String dateTimeString = convertSeconds2dateTimeFormat(endTimeOfInterval);
+							double result = doubles[xIndex][yIndex];
 							SimpleFeature feature = factory.createPoint(new Coordinate(cellCentroid.getX(), cellCentroid.getY()), new Object[] {dateTimeString, result}, null);
 							features.add(feature);
 						}
 					}
 				}
 //			}
-		}
+		
 		ShapeFileWriter.writeGeometries(features, outputPathForGIS);
 		logger.info("Finished writing output for GIS to " + outputPathForGIS);
 	}

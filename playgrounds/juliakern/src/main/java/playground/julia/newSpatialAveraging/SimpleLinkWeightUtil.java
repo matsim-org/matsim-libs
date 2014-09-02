@@ -17,45 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.julia.spatialAveraging;
+package playground.julia.newSpatialAveraging;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-public class Cell {
-	
-	public Cell(int x, int y, Coord cellCentroid) {
-		this.xCell=x;
-		this.yCell=y;
-		this.cellCentroid=cellCentroid;
-		this.weight=0.0;
-		this.weightedValue=0.0;
+
+public class SimpleLinkWeightUtil implements LinkWeightUtil {
+
+	public SimpleLinkWeightUtil(double xMin, double xMax, double yMin,
+			double yMax, int noOfXbins, int noOfYbins,
+			double smoothingRadius_m, String munichShapeFile,
+			CoordinateReferenceSystem targetCRS) {
+		// TODO Auto-generated constructor stub
 	}
-	private int xCell;
-	private int yCell;
-	private Coord cellCentroid;
-	private Double weightedValue;
-	private Double weight;
-	
-	public Coord getCentroid() {
-		return cellCentroid;
+
+	@Override
+	public Double getWeightFromLink(Link link, Coord cellCentroid) {
+		// TODO Auto-generated method stub
+		return null;
 	}
-	public Double getWeightedValue() {
-		return this.weightedValue;
+
+	@Override
+	public Double getNormalizationFactor() {
+		// TODO Auto-generated method stub
+		return null;
 	}
-	public Double getWeight() {
-		return this.weight;
-	}
-	public void addWeight(Double weight) {
-		this.weight+= weight;
-	}
-	public void addWeightedValue(Double weightedValue) {
-		this.weightedValue+=weightedValue;
-		
-	}
-	public Double getAverageValue() {
-		if(weight>0.0)return weightedValue/weight;
-		return 0.0;
-	}
-	
 
 }

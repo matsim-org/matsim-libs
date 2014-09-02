@@ -17,11 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.julia.spatialAveraging;
+package playground.julia.newSpatialAveraging;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordImpl;
+
 
 public class SpatialGrid {
 
@@ -92,5 +93,13 @@ public class SpatialGrid {
 			}
 		}
 		return table;
+	}
+
+	public void multiplyAllCells(Double normalizationFactor) {
+		for(int i=0; i<numberOfCellsX; i++){
+			for(int j=0; j<numberOfCellsY; j++){
+				grid[i][j].multiplyAllValues(normalizationFactor);
+			}
+		}	
 	}
 }

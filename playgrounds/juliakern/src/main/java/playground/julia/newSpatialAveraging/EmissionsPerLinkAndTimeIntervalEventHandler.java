@@ -17,13 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.julia.spatialAveraging;
+package playground.julia.newSpatialAveraging;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
+import java.util.Map;
 
-public interface LinkWeightUtil {
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.emissions.events.ColdEmissionEvent;
+import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
+import org.matsim.contrib.emissions.events.WarmEmissionEvent;
+import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 
-	Double getWeightFromLink(Link link, Coord cellCentroid);
+public class EmissionsPerLinkAndTimeIntervalEventHandler implements ColdEmissionEventHandler, WarmEmissionEventHandler{
+
+	public EmissionsPerLinkAndTimeIntervalEventHandler(
+			double simulationEndTime, int noOfTimeBins, String pollutant2analyze) {
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public void reset(int iteration) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleEvent(WarmEmissionEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleEvent(ColdEmissionEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public Map<Integer, Map<Id, Double>> getTimeIntervals2EmissionsPerLink() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
