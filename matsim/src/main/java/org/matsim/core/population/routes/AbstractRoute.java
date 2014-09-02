@@ -21,6 +21,7 @@
 package org.matsim.core.population.routes;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.utils.misc.Time;
 
@@ -35,10 +36,10 @@ public abstract class AbstractRoute implements Route {
 
 	private double travTime = Time.UNDEFINED_TIME;
 
-	private Id startLinkId = null;
-	private Id endLinkId = null;
+	private Id<Link> startLinkId = null;
+	private Id<Link> endLinkId = null;
 
-	public AbstractRoute(final Id startLinkId, final Id endLinkId) {
+	public AbstractRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		this.startLinkId = startLinkId;
 		this.endLinkId = endLinkId;
 	}
@@ -64,22 +65,22 @@ public abstract class AbstractRoute implements Route {
 	}
 
 	@Override
-	public void setEndLinkId(final Id linkId) {
+	public void setEndLinkId(final Id<Link> linkId) {
 		this.endLinkId = linkId;
 	}
 
 	@Override
-	public void setStartLinkId(final Id linkId) {
+	public void setStartLinkId(final Id<Link> linkId) {
 		this.startLinkId = linkId;
 	}
 
 	@Override
-	public Id getStartLinkId() {
+	public Id<Link> getStartLinkId() {
 		return this.startLinkId;
 	}
 
 	@Override
-	public Id getEndLinkId() {
+	public Id<Link> getEndLinkId() {
 		return this.endLinkId;
 	}
 

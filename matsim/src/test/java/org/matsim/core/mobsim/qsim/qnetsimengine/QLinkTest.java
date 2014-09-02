@@ -403,7 +403,7 @@ public class QLinkTest extends MatsimTestCase {
 			plan.addActivity(act);
 			Leg leg = new LegImpl("car");
 			NetworkRoute route = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
-			List<Id> links = new ArrayList<Id>();
+			List<Id<Link>> links = new ArrayList<Id<Link>>();
 			links.add(link3.getId()); // let the person(s) drive around in circles to generate a traffic jam
 			links.add(link3.getId());
 			links.add(link3.getId());

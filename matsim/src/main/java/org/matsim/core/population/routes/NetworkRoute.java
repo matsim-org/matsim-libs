@@ -23,6 +23,7 @@ package org.matsim.core.population.routes;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
 
 
@@ -34,7 +35,7 @@ import org.matsim.api.core.v01.population.Route;
  */
 public interface NetworkRoute extends Route {
 
-	public void setLinkIds(final Id startLinkId, final List<Id> linkIds, final Id endLinkId);
+	public void setLinkIds(final Id<Link> startLinkId, final List<Id<Link>> linkIds, final Id<Link> endLinkId);
 
 	/**Design thoughts:<ul>
 	 * <li> It this general cost or monetary cost?  kai/benjamin, jun'11
@@ -54,7 +55,7 @@ public interface NetworkRoute extends Route {
 	 * included in the list (note that they are in getStartLinkId() and getEndLinkId() of the Route super-interface).
 	 * @return a list containing the link ids the agents plans to travel along
 	 */
-	public List<Id> getLinkIds();
+	public List<Id<Link>> getLinkIds();
 
 	/**
 	 * This method returns a new Route object with the subroute of this, using fromLinkId as the
@@ -64,7 +65,7 @@ public interface NetworkRoute extends Route {
 	 * @param toLinkId
 	 * @return subroute of this route starting at fromLinkId and ending at toLinkId
 	 */
-	public NetworkRoute getSubRoute(final Id fromLinkId, final Id toLinkId);
+	public NetworkRoute getSubRoute(final Id<Link> fromLinkId, final Id<Link> toLinkId);
 
 	/**
 	 * Sets the id of the vehicle that should be used to drive along this route.

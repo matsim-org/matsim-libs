@@ -55,7 +55,7 @@ public class TransitSheduleToNetwork {
 		for(TransitLine line:scenario.getTransitSchedule().getTransitLines().values())
 			for(TransitRoute route:line.getRoutes().values()) {
 				Id sId = null, id;
-				List<Id> ids = new ArrayList<Id>();
+				List<Id<Link>> ids = new ArrayList<Id<Link>>();
 				double length = scenario.getNetwork().getLinks().get(route.getRoute().getStartLinkId()).getLength();
 				int linkPos = 0;
 				for(int s=0; s<route.getStops().size()-1; s++) {

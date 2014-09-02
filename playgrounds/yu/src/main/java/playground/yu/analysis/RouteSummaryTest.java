@@ -34,11 +34,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -47,7 +49,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
@@ -164,7 +165,7 @@ public class RouteSummaryTest {
 							if (!r.getStartLinkId().equals(r.getEndLinkId())) {
 								LinkedList<Id> tmpRouteLinkList = new LinkedList<Id>();
 								tmpRouteLinkList.addFirst(previousActLinkId);
-								List<Id> origRouteLinkIds = r.getLinkIds();
+								List<Id<Link>> origRouteLinkIds = r.getLinkIds();
 								for (int i = 0; i < origRouteLinkIds.size(); i++) {
 									tmpRouteLinkList.add(origRouteLinkIds.get(i));
 								}

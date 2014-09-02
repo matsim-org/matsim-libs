@@ -40,7 +40,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -102,7 +101,7 @@ public class ScheduleVehiclesGenerator {
 
 	public void createSchedule() throws IOException {
 		
-		Scenario scen = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
+		Scenario scen = ScenarioUtils.createScenario(ConfigUtils.createConfig());	
 		Config config = scen.getConfig();
 		config.network().setInputFile(this.networkFile);
 		ScenarioUtils.loadScenario(scen);		
@@ -111,7 +110,7 @@ public class ScheduleVehiclesGenerator {
 		scen.getConfig().scenario().setUseTransit(true);
 		scen.getConfig().scenario().setUseVehicles(true);
 		
-		Map<Id,List<Id>> routeID2linkIDs = getIDs(network);
+		Map<Id,List<Id<Link>>> routeID2linkIDs = getIDs(network);
 		
 		Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities = getStopLinkIDs(routeID2linkIDs, network);
 			
@@ -124,10 +123,10 @@ public class ScheduleVehiclesGenerator {
 		setDepartures(routeId2transitRoute);
 	}
 
-	private Map<Id,List<Id>> getIDs(Network network) {
-		Map<Id, List<Id>> routeID2linkIDs = new HashMap<Id, List<Id>>();
-		List<Id> linkIDsRoute1 = new LinkedList<Id>();
-		List<Id> linkIDsRoute2 = new LinkedList<Id>();
+	private Map<Id,List<Id<Link>>> getIDs(Network network) {
+		Map<Id, List<Id<Link>>> routeID2linkIDs = new HashMap<Id, List<Id<Link>>>();
+		List<Id<Link>> linkIDsRoute1 = new LinkedList<Id<Link>>();
+		List<Id<Link>> linkIDsRoute2 = new LinkedList<Id<Link>>();
 		
 		// one direction
 		int fromNodeIdRoute1 = 0;
@@ -160,7 +159,7 @@ public class ScheduleVehiclesGenerator {
 			}
 		}
 
-		List<Id> linkIDsRoute2rightOrder = turnArround(linkIDsRoute2);
+		List<Id<Link>> linkIDsRoute2rightOrder = turnArround(linkIDsRoute2);
 
 		linkIDsRoute1.add(0, linkIDsRoute2rightOrder.get(linkIDsRoute2rightOrder.size()-1));
 		linkIDsRoute2rightOrder.add(0, linkIDsRoute1.get(linkIDsRoute1.size()-1));
@@ -169,7 +168,7 @@ public class ScheduleVehiclesGenerator {
 		return routeID2linkIDs;
 	}
 
-	private Map<Id,List<TransitStopFacility>> getStopLinkIDs(Map<Id, List<Id>> routeID2linkIDs, Network network) {
+	private Map<Id,List<TransitStopFacility>> getStopLinkIDs(Map<Id, List<Id<Link>>> routeID2linkIDs, Network network) {
 		Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities = new HashMap<Id, List<TransitStopFacility>>();
 			
 		for (Id routeID : routeID2linkIDs.keySet()){
@@ -193,9 +192,9 @@ public class ScheduleVehiclesGenerator {
 		return routeId2transitStopFacilities;
 	}
 	
-	private Map<Id, NetworkRoute> getRouteId2NetworkRoute(Map<Id, List<Id>> routeID2linkIDs) {
+	private Map<Id, NetworkRoute> getRouteId2NetworkRoute(Map<Id, List<Id<Link>>> routeID2linkIDs) {
 		Map<Id, NetworkRoute> routeId2NetworkRoute = new HashMap<Id, NetworkRoute>();
-		for (Id routeId : routeID2linkIDs.keySet()){
+		for (Id<Link> routeId : routeID2linkIDs.keySet()){
 			NetworkRoute netRoute = new LinkNetworkRouteImpl(routeID2linkIDs.get(routeId).get(0), routeID2linkIDs.get(routeId).get(routeID2linkIDs.get(routeId).size()-1));	// Start-Link, End-Link	
 			netRoute.setLinkIds(routeID2linkIDs.get(routeId).get(0), getMiddleRouteLinkIDs(routeID2linkIDs.get(routeId)), routeID2linkIDs.get(routeId).get(routeID2linkIDs.get(routeId).size()-1)); // Start-link, link-Ids als List, End-link
 			routeId2NetworkRoute.put(routeId, netRoute);
@@ -466,8 +465,8 @@ public class ScheduleVehiclesGenerator {
 		}
 	}
 	
-	private List<Id> turnArround(List<Id> myList) {
-		List<Id> turnedArroundList = new ArrayList<Id>();
+	private List<Id<Link>> turnArround(List<Id<Link>> myList) {
+		List<Id<Link>> turnedArroundList = new ArrayList<Id<Link>>();
 		for (int n=(myList.size()-1); n>=0; n=n-1){
 			turnedArroundList.add(myList.get(n));
 		}
@@ -510,10 +509,10 @@ public class ScheduleVehiclesGenerator {
 		vehicleWriter.writeFile(vehicleFile);
 	}
 
-	private List<Id> getMiddleRouteLinkIDs(List<Id> linkIDsRoute) {
-		List<Id> routeLinkIDs = new ArrayList<Id>();
+	private List<Id<Link>> getMiddleRouteLinkIDs(List<Id<Link>> linkIDsRoute) {
+		List<Id<Link>> routeLinkIDs = new ArrayList<Id<Link>>();
 		int nr = 0;
-		for(Id id : linkIDsRoute){
+		for(Id<Link> id : linkIDsRoute){
 			if (nr>=1 & nr <= (linkIDsRoute.size()-2)){ // die Links zwischen dem Start- und Endlink
 				routeLinkIDs.add(id);
 			}

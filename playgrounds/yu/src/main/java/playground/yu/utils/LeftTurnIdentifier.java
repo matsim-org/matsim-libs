@@ -75,7 +75,7 @@ public class LeftTurnIdentifier {
 			// throw new RuntimeException(
 			// "This Route is a GenericRoute with LegMode \"car\", I don't know why!!!");
 			// }
-			List<Id> linkIds = ((NetworkRoute) route).getLinkIds();
+			List<Id<Link>> linkIds = ((NetworkRoute) route).getLinkIds();
 			if (startLinkId.equals(endLinkId) && linkIds.size() == 0) {
 				return 0;
 			}

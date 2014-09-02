@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -229,7 +228,7 @@ public class UCSBptNetworkParser {
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 			NetworkRoute networkRoute = new LinkNetworkRouteImpl(null,null);
 			Id routeStartLinkId = null;
-			List<Id> routeLinkIds = new ArrayList<Id>();
+			List<Id<Link>> routeLinkIds = new ArrayList<Id<Link>>();
 			Id routeEndLinkId = null;
 			for (int i=0; i<dists.size(); i++) {
 				int dist = dists.get(i);

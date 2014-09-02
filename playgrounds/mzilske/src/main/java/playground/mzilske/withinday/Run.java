@@ -2,7 +2,9 @@ package playground.mzilske.withinday;
 
 import java.util.Arrays;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -90,7 +92,15 @@ public class Run {
 		Leg leg = scenario.getPopulation().getFactory().createLeg("car");
 		// GenericRouteImpl route = new GenericRouteImpl(scenario.createId("i(1,1)"), scenario.createId("i(8,8)"));
 		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(scenario.createId("i(1,1)"), scenario.createId("i(8,1)"));
-		route.setLinkIds(scenario.createId("i(1,1)"), Arrays.asList(scenario.createId("i(2,1)"), scenario.createId("i(3,1)"),scenario.createId("i(4,1)"), scenario.createId("i(5,1)"),scenario.createId("i(6,1)"), scenario.createId("i(7,1)")), scenario.createId("i(8,1)"));
+		route.setLinkIds(Id.create("i(1,1)", Link.class), 
+				Arrays.asList(
+						Id.create("i(2,1)", Link.class), 
+						Id.create("i(3,1)", Link.class),
+						Id.create("i(4,1)", Link.class), 
+						Id.create("i(5,1)", Link.class),
+						Id.create("i(6,1)", Link.class), 
+						Id.create("i(7,1)", Link.class)), 
+						Id.create("i(8,1)", Link.class));
 		leg.setTravelTime(3600);
 		leg.setRoute(route);
 		plan.addLeg(leg);

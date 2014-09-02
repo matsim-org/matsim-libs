@@ -79,7 +79,7 @@ public class CreatePseudoNetwork {
 
 		for (TransitLine tLine : this.schedule.getTransitLines().values()) {
 			for (TransitRoute tRoute : tLine.getRoutes().values()) {
-				ArrayList<Id> routeLinks = new ArrayList<Id>();
+				ArrayList<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
 				TransitRouteStop prevStop = null;
 				for (TransitRouteStop stop : tRoute.getStops()) {
 					Link link = getNetworkLink(prevStop, stop);

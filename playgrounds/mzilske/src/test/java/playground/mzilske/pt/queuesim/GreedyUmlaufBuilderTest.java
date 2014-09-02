@@ -106,7 +106,7 @@ public class GreedyUmlaufBuilderTest {
 
 		TransitLine tLine2 = builder.createTransitLine(this.ids[2]);
 		NetworkRoute networkRoute = new LinkNetworkRouteImpl(link2.getId(), link12.getId());
-		ArrayList<Id> linkIdList = new ArrayList<Id>(6);
+		ArrayList<Id<Link>> linkIdList = new ArrayList<Id<Link>>(6);
 		Collections.addAll(linkIdList, link4.getId(), link6.getId(), link7.getId(), link8.getId(), link9.getId(), link10.getId());
 		networkRoute.setLinkIds(link2.getId(), linkIdList, link12.getId());
 		ArrayList<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>(4);
@@ -121,7 +121,7 @@ public class GreedyUmlaufBuilderTest {
 		tRoute2.addDeparture(builder.createDeparture(this.ids[3], Time.parseTime("07:22:00")));
 
 		networkRoute = new LinkNetworkRouteImpl(link17.getId(), link19.getId());
-		linkIdList = new ArrayList<Id>(6);
+		linkIdList = new ArrayList<Id<Link>>(6);
 		Collections.addAll(linkIdList, link18.getId(), link14.getId(), link15.getId(), link16.getId());
 		networkRoute.setLinkIds(link17.getId(), linkIdList, link19.getId());
 		stopList = new ArrayList<TransitRouteStop>(4);

@@ -34,21 +34,21 @@ import org.matsim.api.core.v01.network.Link;
  */
 public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute, Cloneable {
 
-	private ArrayList<Id> route = new ArrayList<Id>();
-	private List<Id> safeRoute = Collections.unmodifiableList(this.route);
+	private ArrayList<Id<Link>> route = new ArrayList<Id<Link>>();
+	private List<Id<Link>> safeRoute = Collections.unmodifiableList(this.route);
 	private double travelCost = Double.NaN;
 	private Id vehicleId = null;
 
-	public LinkNetworkRouteImpl(final Id startLinkId, final Id endLinkId) {
+	public LinkNetworkRouteImpl(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		super(startLinkId, endLinkId);
 	}
 	
-	public LinkNetworkRouteImpl(final Id startLinkId, final List<Id> linkIds, final Id endLinkId) {
+	public LinkNetworkRouteImpl(final Id<Link> startLinkId, final List<Id<Link>> linkIds, final Id<Link> endLinkId) {
 		super(startLinkId, endLinkId);
 		setLinkIds(startLinkId, linkIds, endLinkId);
 	}
 	
-	public LinkNetworkRouteImpl(final Id startLinkId, final Id[] linkIds, final Id endLinkId) {
+	public LinkNetworkRouteImpl(final Id<Link> startLinkId, final Id<Link>[] linkIds, final Id<Link> endLinkId) {
 		super(startLinkId, endLinkId);
         Collections.addAll(this.route, linkIds);
 		this.route.trimToSize();
@@ -57,19 +57,19 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute,
 	@Override
 	public LinkNetworkRouteImpl clone() {
 		LinkNetworkRouteImpl cloned = (LinkNetworkRouteImpl) super.clone();
-		ArrayList<Id> tmp = cloned.route;
-		cloned.route = new ArrayList<Id>(tmp); // deep copy of route
+		ArrayList<Id<Link>> tmp = cloned.route;
+		cloned.route = new ArrayList<Id<Link>>(tmp); // deep copy of route
 		cloned.safeRoute = Collections.unmodifiableList(cloned.route);
 		return cloned;
 	}
 
 	@Override
-	public List<Id> getLinkIds() {
+	public List<Id<Link>> getLinkIds() {
 		return this.safeRoute;
 	}
 
 	@Override
-	public NetworkRoute getSubRoute(Id fromLinkId, Id toLinkId) {
+	public NetworkRoute getSubRoute(Id<Link> fromLinkId, Id<Link> toLinkId) {
 		/**
 		 * the index where the link after fromLinkId can be found in the route:
 		 * fromIndex==0 --> fromLinkId == startLinkId,
@@ -135,7 +135,7 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute,
 	}
 
 	@Override
-	public void setLinkIds(final Id startLinkId, final List<Id> srcRoute, final Id endLinkId) {
+	public void setLinkIds(final Id<Link> startLinkId, final List<Id<Link>> srcRoute, final Id<Link> endLinkId) {
 		this.route.clear();
 		setStartLinkId(startLinkId);
 		setEndLinkId(endLinkId);

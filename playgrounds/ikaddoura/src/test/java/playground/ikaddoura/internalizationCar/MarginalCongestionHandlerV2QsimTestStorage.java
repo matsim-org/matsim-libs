@@ -22,6 +22,11 @@
  */
 package playground.ikaddoura.internalizationCar;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -33,7 +38,11 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -54,11 +63,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author ikaddoura
@@ -303,7 +307,7 @@ public class MarginalCongestionHandlerV2QsimTestStorage {
 	
 		// leg: 1,2,3,4
 		Leg leg_1_4 = popFactory.createLeg("car");
-		List<Id> linkIds4 = new ArrayList<Id>();
+		List<Id<Link>> linkIds4 = new ArrayList<Id<Link>>();
 		linkIds4.add(linkId2);
 		linkIds4.add(linkId3);
 		NetworkRoute route4 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -433,7 +437,7 @@ public class MarginalCongestionHandlerV2QsimTestStorage {
 	
 		// leg: 1,2,3,4
 		Leg leg_1_4 = popFactory.createLeg("car");
-		List<Id> linkIds4 = new ArrayList<Id>();
+		List<Id<Link>> linkIds4 = new ArrayList<Id<Link>>();
 		linkIds4.add(linkId2);
 		linkIds4.add(linkId3);
 		NetworkRoute route4 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -442,7 +446,7 @@ public class MarginalCongestionHandlerV2QsimTestStorage {
 
 		// leg: 1,2,5,6
 		Leg leg_1_6 = popFactory.createLeg("car");
-		List<Id> linkIds6 = new ArrayList<Id>();
+		List<Id<Link>> linkIds6 = new ArrayList<Id<Link>>();
 		linkIds6.add(linkId2);
 		linkIds6.add(linkId5);
 		NetworkRoute route6 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
@@ -571,7 +575,7 @@ public class MarginalCongestionHandlerV2QsimTestStorage {
 	
 		// leg: 1,2,5,6
 		Leg leg_1_6 = popFactory.createLeg("car");
-		List<Id> linkIds6a = new ArrayList<Id>();
+		List<Id<Link>> linkIds6a = new ArrayList<Id<Link>>();
 		linkIds6a.add(linkId2);
 		linkIds6a.add(linkId5);
 		NetworkRoute route6a = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
@@ -710,7 +714,7 @@ public class MarginalCongestionHandlerV2QsimTestStorage {
 	
 		// leg: 1,2,5,6
 		Leg leg_1_6 = popFactory.createLeg("car");
-		List<Id> linkIds6a = new ArrayList<Id>();
+		List<Id<Link>> linkIds6a = new ArrayList<Id<Link>>();
 		linkIds6a.add(linkId2);
 		linkIds6a.add(linkId5);
 		NetworkRoute route6a = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
@@ -719,7 +723,7 @@ public class MarginalCongestionHandlerV2QsimTestStorage {
 
 		// leg: 3,4,5,6
 		Leg leg_3_6 = popFactory.createLeg("car");
-		List<Id> linkIds6b = new ArrayList<Id>();
+		List<Id<Link>> linkIds6b = new ArrayList<Id<Link>>();
 		linkIds6b.add(linkId4);
 		linkIds6b.add(linkId5);
 		NetworkRoute route6b = (NetworkRoute) routeFactory.createRoute(linkId3, linkId6);
@@ -859,7 +863,7 @@ public class MarginalCongestionHandlerV2QsimTestStorage {
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(100.0);
-		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+		Scenario scenario = (ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);
@@ -967,7 +971,7 @@ public class MarginalCongestionHandlerV2QsimTestStorage {
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(100.0);
-		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+		Scenario scenario = (ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);

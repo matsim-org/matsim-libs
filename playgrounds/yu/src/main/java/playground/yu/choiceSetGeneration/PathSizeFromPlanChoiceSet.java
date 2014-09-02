@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -49,7 +50,7 @@ import playground.yu.utils.math.SimpleStatistics;
 public class PathSizeFromPlanChoiceSet {
 	public static class Path {
 		/* container 4 leg Link IDs */
-		private List<List<Id>> legs;
+		private List<List<Id<Link>>> legs;
 		private List<String> legModeChain = new ArrayList<String>();
 		/* container 4 leg linear distances */
 		private List<Double> legLinearDistanceChain = new ArrayList<Double>();
@@ -61,7 +62,7 @@ public class PathSizeFromPlanChoiceSet {
 		 * @param plan
 		 */
 		public Path(Plan plan) {
-			legs = new ArrayList<List<Id>>();
+			legs = new ArrayList<List<Id<Link>>>();
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
@@ -80,7 +81,7 @@ public class PathSizeFromPlanChoiceSet {
 			if (leg.getMode().equals(TransportMode.car)) {
 				legs.add(((NetworkRoute) leg.getRoute()).getLinkIds());
 			} else/* non-car */{
-				legs.add(new ArrayList<Id>());
+				legs.add(new ArrayList<Id<Link>>());
 			}
 		}
 
@@ -92,7 +93,7 @@ public class PathSizeFromPlanChoiceSet {
 			return legs.size();
 		}
 
-		public List<Id> getLegLinkIds(int legIndex) {
+		public List<Id<Link>> getLegLinkIds(int legIndex) {
 			return legs.get(legIndex);
 		}
 

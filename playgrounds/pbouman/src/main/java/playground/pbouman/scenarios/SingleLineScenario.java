@@ -147,7 +147,7 @@ public class SingleLineScenario
 		
 		TransitLine line1 = sFac.createTransitLine(scen.createId("Line1"));
 		
-		List<Id> routeIds1 = new LinkedList<Id>();
+		List<Id<Link>> routeIds1 = new LinkedList<Id<Link>>();
 		routeIds1.add(ua.getId());
 		routeIds1.add(ab.getId());
 		routeIds1.add(bv.getId());

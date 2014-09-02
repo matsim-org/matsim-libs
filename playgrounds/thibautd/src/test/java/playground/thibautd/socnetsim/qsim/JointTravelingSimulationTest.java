@@ -30,18 +30,19 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -55,10 +56,10 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.algorithms.EventWriter;
-import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.algorithms.EventWriter;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -104,15 +105,15 @@ public class JointTravelingSimulationTest {
 
 	private static final int N_LAPS = 5;
 
-	private static final Id ORIGIN_LINK = new IdImpl( "origin" );
-	private static final Id TO_PU_LINK = new IdImpl( "toPu" );
-	private static final Id PU_LINK = new IdImpl( "pu" );
-	private static final Id TRAVEL_LINK_1 = new IdImpl( 1 );
-	private static final Id TRAVEL_LINK_2 = new IdImpl( 2 );
-	private static final Id DO_LINK = new IdImpl( "do" );
-	private static final Id TO_DESTINATION_LINK = new IdImpl( "to_destination" );
-	private static final Id DESTINATION_LINK = new IdImpl( "destination" );
-	private static final Id RETURN_LINK = new IdImpl( "return" );
+	private static final Id<Link> ORIGIN_LINK = Id.create("origin", Link.class);
+	private static final Id<Link> TO_PU_LINK = Id.create("toPu", Link.class);
+	private static final Id<Link> PU_LINK = Id.create("pu", Link.class);
+	private static final Id<Link> TRAVEL_LINK_1 = Id.create(1, Link.class);
+	private static final Id<Link> TRAVEL_LINK_2 = Id.create(2, Link.class);
+	private static final Id<Link> DO_LINK = Id.create("do", Link.class);
+	private static final Id<Link> TO_DESTINATION_LINK = Id.create("to_destination", Link.class);
+	private static final Id<Link> DESTINATION_LINK = Id.create("destination", Link.class);
+	private static final Id<Link> RETURN_LINK = Id.create("return", Link.class);
 
 	private static final String ORIGIN_ACT = "chill";
 	private static final String DESTINATION_ACT = "stress";
@@ -367,7 +368,7 @@ public class JointTravelingSimulationTest {
 						PU_LINK,
 						DESTINATION_LINK,
 						Arrays.asList( TO_PU_LINK ),
-						Collections.<Id> emptyList(),
+						Collections.<Id<Link>> emptyList(),
 						Arrays.asList(
 							TRAVEL_LINK_1,
 							TRAVEL_LINK_2,
@@ -404,10 +405,10 @@ public class JointTravelingSimulationTest {
 							ORIGIN_LINK,
 							ORIGIN_LINK,
 							ORIGIN_LINK,
-							Collections.<Id> emptyList(),
-							Collections.<Id> emptyList(),
-							Collections.<Id> emptyList(),
-							Collections.<Id> emptyList());
+							Collections.<Id<Link>> emptyList(),
+							Collections.<Id<Link>> emptyList(),
+							Collections.<Id<Link>> emptyList(),
+							Collections.<Id<Link>> emptyList());
 			default:
 				throw new RuntimeException( routeType.toString() );
 		}
@@ -599,25 +600,25 @@ public class JointTravelingSimulationTest {
 
 	private static class Fixture {
 		final private boolean insertDummyActivities;
-		final private Id originLink;
-		final private Id puLink;
-		final private Id doLink;
-		final private Id destinationLink;
-		final private List<Id> toPuRoute;
-		final private List<Id> puToDoRoute;
-		final private List<Id> doToDestRoute;
-		final private List<Id> destToOrigRoute;
+		final private Id<Link> originLink;
+		final private Id<Link> puLink;
+		final private Id<Link> doLink;
+		final private Id<Link> destinationLink;
+		final private List<Id<Link>> toPuRoute;
+		final private List<Id<Link>> puToDoRoute;
+		final private List<Id<Link>> doToDestRoute;
+		final private List<Id<Link>> destToOrigRoute;
 
 		public Fixture(
 				final boolean insertDummyActivities,
-				final Id originLink,
-				final Id puLink,
-				final Id doLink,
-				final Id destinationLink,
-				final List<Id> toPuRoute,
-				final List<Id> puToDoRoute,
-				final List<Id> doToDestRoute,
-				final List<Id> destToOrigRoute) {
+				final Id<Link> originLink,
+				final Id<Link> puLink,
+				final Id<Link> doLink,
+				final Id<Link> destinationLink,
+				final List<Id<Link>> toPuRoute,
+				final List<Id<Link>> puToDoRoute,
+				final List<Id<Link>> doToDestRoute,
+				final List<Id<Link>> destToOrigRoute) {
 			this.insertDummyActivities = insertDummyActivities;
 			this.originLink = originLink;
 			this.puLink = puLink;

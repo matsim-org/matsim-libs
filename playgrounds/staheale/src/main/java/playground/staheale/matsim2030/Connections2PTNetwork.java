@@ -20,7 +20,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -130,7 +129,7 @@ public class Connections2PTNetwork {
 			double x = Double.parseDouble(bezirkXAchse);
 			double y = Double.parseDouble(bezirkYAchse);
 			Coord coords = sc.createCoord(x, y);
-			Node bezirkNode = (NodeImpl) factory.createNode(bezirkNodeId, coords);
+			Node bezirkNode = factory.createNode(bezirkNodeId, coords);
 			PTnetwork.addNode(bezirkNode);
 
 			bezirkList.add(Arrays.asList(bezirkNummer+knotenNummer,stadtnummer));	
@@ -190,7 +189,7 @@ public class Connections2PTNetwork {
 //				PTscheduleAnbindungen.addStopFacility(bezirkStop);
 				log.info("stop facility " +bezirkStop+ " added to schedule");
 
-				List<Id> routeLinkIds1 = Arrays.asList(newLink1.getId());
+				List<Id<Link>> routeLinkIds1 = Arrays.asList(newLink1.getId());
 				TransitRouteStop route1stop1 = scheduleFactory.createTransitRouteStop(bezirkStop, 0, 0);
 				TransitRouteStop route1stop2 = scheduleFactory.createTransitRouteStop(newNodeStop, 300, 300);			
 				List<TransitRouteStop> route1Stops = Arrays.asList(route1stop1, route1stop2);
@@ -218,7 +217,7 @@ public class Connections2PTNetwork {
 
 
 				// opposite direction
-				List<Id> routeLinkIds2 = Arrays.asList(newLink2.getId());
+				List<Id<Link>> routeLinkIds2 = Arrays.asList(newLink2.getId());
 				TransitRouteStop route2stop1 = scheduleFactory.createTransitRouteStop(newNodeStop, 0, 0);
 				TransitRouteStop route2stop2 = scheduleFactory.createTransitRouteStop(bezirkStop, 300, 300);			
 				List<TransitRouteStop> route2Stops = Arrays.asList(route2stop1, route2stop2);
@@ -312,7 +311,7 @@ public class Connections2PTNetwork {
 					PTschedule.addStopFacility(newddStop2);
 					log.info("stop facility " +newddStop2+ " added to schedule");
 
-					List<Id> newRouteLinkIds1 = Arrays.asList(nLink1.getId());
+					List<Id<Link>> newRouteLinkIds1 = Arrays.asList(nLink1.getId());
 					double speed = 20/3.6; // assumption: pt speed is 20 km/h
 					double travelTime = Math.round(dist/speed);
 					TransitRouteStop currentRoute1stop1 = scheduleFactory.createTransitRouteStop(newddStop1, 0, 0);
@@ -339,7 +338,7 @@ public class Connections2PTNetwork {
 					PTschedule.addTransitLine(nLine);
 					//log.info("new line " +nLine.getId()+ " added to schedule");
 
-					List<Id> newRouteLinkIds2 = Arrays.asList(nLink2.getId());
+					List<Id<Link>> newRouteLinkIds2 = Arrays.asList(nLink2.getId());
 					TransitRouteStop currentRoute2stop1 = scheduleFactory.createTransitRouteStop(newddStop2, 0, 0);
 					TransitRouteStop currentRoute2stop2 = scheduleFactory.createTransitRouteStop(newddStop1, travelTime, travelTime);			
 					List<TransitRouteStop> currentRoute2Stops = Arrays.asList(currentRoute2stop1, currentRoute2stop2);

@@ -28,7 +28,6 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.junit.Assert;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -554,7 +553,7 @@ public class QueueSimulationTest extends TestCase {
 		Leg l1 = plan.createAndAddLeg(TransportMode.car);
 		l1.setTravelTime(10);
 		NetworkRoute netRoute = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link1.getId());
-		List<Id> routeLinks = new ArrayList<Id>();
+		List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
 		Collections.addAll(routeLinks, f.link2.getId(), f.link3.getId(), link4.getId());
 		netRoute.setLinkIds(f.link1.getId(), routeLinks, f.link1.getId());
 		l1.setRoute(netRoute);
@@ -614,7 +613,7 @@ public class QueueSimulationTest extends TestCase {
 		Leg l1 = plan.createAndAddLeg(TransportMode.car);
 		l1.setTravelTime(10);
 		NetworkRoute netRoute = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
-		List<Id> routeLinks = new ArrayList<Id>();
+		List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
 		Collections.addAll(routeLinks, f.link2.getId(), f.link3.getId(), link4.getId(), f.link1.getId(), f.link2.getId());
 		netRoute.setLinkIds(f.link1.getId(), routeLinks, f.link3.getId());
 		l1.setRoute(netRoute);
@@ -782,7 +781,7 @@ public class QueueSimulationTest extends TestCase {
 		a1.setEndTime(8*3600);
 		Leg leg = plan.createAndAddLeg(TransportMode.car);
 		NetworkRoute route = new LinkNetworkRouteImpl(f.link1.getId(), link5.getId());
-		route.setLinkIds(new IdImpl(startLinkId), NetworkUtils.getLinkIds(linkIds, f.scenario), new IdImpl(endLinkId));
+		route.setLinkIds(new IdImpl(startLinkId), NetworkUtils.getLinkIds(linkIds), new IdImpl(endLinkId));
 		leg.setRoute(route);
 		ActivityImpl a2 = plan.createAndAddActivity("w", link5.getId());
 		a2.setEndTime(9*3600);
@@ -1009,8 +1008,8 @@ public class QueueSimulationTest extends TestCase {
 		final Link link2;
 		final Link link3;
 		final Population plans;
-		final ArrayList<Id> linkIdsNone;
-		final ArrayList<Id> linkIds2;
+		final ArrayList<Id<Link>> linkIdsNone;
+		final ArrayList<Id<Link>> linkIds2;
 
 		public Fixture() {
 			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -1052,9 +1051,9 @@ public class QueueSimulationTest extends TestCase {
 			/* build plans */
 			this.plans = scenario.getPopulation();
 
-			this.linkIdsNone = new ArrayList<Id>(0);
+			this.linkIdsNone = new ArrayList<Id<Link>>(0);
 
-			this.linkIds2 = new ArrayList<Id>(1);
+			this.linkIds2 = new ArrayList<Id<Link>>(1);
 			this.linkIds2.add(this.link2.getId());
 		}
 

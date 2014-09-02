@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -76,7 +77,7 @@ public class AgentEventMessage extends Message {
 
 		if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
 
-			List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
+			List<Id<Link>> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
 
 			boolean endOfLegReached = getCurrentLinkIndex() == linkIds.size() - 1;
 
@@ -138,8 +139,8 @@ public class AgentEventMessage extends Message {
 	public void processEndOfLegCarMode_processEvents(Leg leg, ActivityImpl nextAct) {
 		Event event;
 
-		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
-		Id currentLinkId = null;
+		List<Id<Link>> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
+		Id<Link> currentLinkId = null;
 		if (getCurrentLinkIndex() == -1) {
 			currentLinkId = ((LinkNetworkRouteImpl) leg.getRoute()).getStartLinkId();
 		} else {
@@ -149,7 +150,7 @@ public class AgentEventMessage extends Message {
 		event = new LinkLeaveEvent(getMessageArrivalTime(), getPerson().getId(), currentLinkId, getPerson().getId());
 		eventsManager.processEvent(event);
 
-		Id endLinkId = leg.getRoute().getEndLinkId();
+		Id<Link> endLinkId = leg.getRoute().getEndLinkId();
 		event = new LinkEnterEvent(getMessageArrivalTime(), getPerson().getId(), endLinkId, getPerson().getId());
 		eventsManager.processEvent(event);
 

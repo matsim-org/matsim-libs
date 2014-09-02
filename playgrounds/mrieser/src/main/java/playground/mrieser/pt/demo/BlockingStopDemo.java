@@ -140,7 +140,7 @@ public class BlockingStopDemo {
 		Link startLink = this.scenario.getNetwork().getLinks().get(this.ids[0]);
 		Link endLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks-1]);
 		NetworkRoute networkRoute = (NetworkRoute) ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, startLink.getId(), endLink.getId());
-		ArrayList<Id> linkIdList = new ArrayList<Id>(nOfLinks);
+		ArrayList<Id<Link>> linkIdList = new ArrayList<Id<Link>>(nOfLinks);
 		for (int i = 1; i < nOfLinks-1; i++) {
 			linkIdList.add(this.ids[i]);
 		}
@@ -167,7 +167,7 @@ public class BlockingStopDemo {
 		startLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks]);
 		endLink = this.scenario.getNetwork().getLinks().get(this.ids[2*nOfLinks-1]);
 		networkRoute = (NetworkRoute) ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, startLink.getId(), endLink.getId());
-		linkIdList = new ArrayList<Id>(nOfLinks);
+		linkIdList = new ArrayList<Id<Link>>(nOfLinks);
 		for (int i = nOfLinks+1; i < (2*nOfLinks - 1); i++) {
 			linkIdList.add(this.ids[i]);
 		}
@@ -197,6 +197,7 @@ public class BlockingStopDemo {
 		capacity.setSeats(Integer.valueOf(101));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
+		vehicles.addVehicleType(vehicleType);
 		Id id = new IdImpl("tr_1");
 		vehicles.addVehicle( vb.createVehicle(id, vehicleType));
 		id = new IdImpl("tr_2");
@@ -252,8 +253,8 @@ public class BlockingStopDemo {
 		// car-drivers
 		NetworkRoute carRoute1 = (NetworkRoute) ((PopulationFactoryImpl) population.getFactory()).createRoute(TransportMode.car, this.ids[0], this.ids[nOfLinks-1]);
 		NetworkRoute carRoute2 = (NetworkRoute) ((PopulationFactoryImpl) population.getFactory()).createRoute(TransportMode.car, this.ids[nOfLinks], this.ids[2*nOfLinks-1]);
-		List<Id> linkIds1 = new ArrayList<Id>(nOfLinks-2);
-		List<Id> linkIds2 = new ArrayList<Id>(nOfLinks-2);
+		List<Id<Link>> linkIds1 = new ArrayList<Id<Link>>(nOfLinks-2);
+		List<Id<Link>> linkIds2 = new ArrayList<Id<Link>>(nOfLinks-2);
 		for (int i = 1; i<nOfLinks-1; i++) {
 			linkIds1.add(this.ids[i]);
 			linkIds2.add(this.ids[i+nOfLinks]);
@@ -324,7 +325,7 @@ public class BlockingStopDemo {
 		for (int time = 7*3600; time < (7*3600 + 15*60); time += 120) {
 			System.out.print(Time.writeTime(time));
 			for (int i = 13; i < 26; i++) {
-				System.out.print("\t" + ttc.getLinkTravelTimes().getLinkTravelTime(network.getLinks().get(this.ids[i]), (double) time, null, null));
+				System.out.print("\t" + ttc.getLinkTravelTimes().getLinkTravelTime(network.getLinks().get(this.ids[i]), time, null, null));
 			}
 			System.out.println();
 		}
@@ -336,7 +337,7 @@ public class BlockingStopDemo {
 		for (int time = 7*3600; time < (7*3600 + 15*60); time += 120) {
 			System.out.print(Time.writeTime(time));
 			for (int i = 0; i < 13; i++) {
-				System.out.print("\t" + ttc.getLinkTravelTimes().getLinkTravelTime(network.getLinks().get(this.ids[i]), (double) time, null, null));
+				System.out.print("\t" + ttc.getLinkTravelTimes().getLinkTravelTime(network.getLinks().get(this.ids[i]), time, null, null));
 			}
 			System.out.println();
 		}

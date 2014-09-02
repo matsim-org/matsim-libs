@@ -31,7 +31,7 @@ import org.matsim.core.utils.misc.Time;
  * the context.
  * (This becomes clear if you think about a nodeId/linkId given by person.)
  */
-public interface Link extends BasicLocation {
+public interface Link extends BasicLocation<Link> {
 
 
 	/**

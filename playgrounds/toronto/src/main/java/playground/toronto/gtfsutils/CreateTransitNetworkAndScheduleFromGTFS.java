@@ -15,7 +15,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -144,7 +143,7 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 				if (services.contains(trip.getService())){ //filter by specified service period
 					
 					ArrayList<TransitRouteStop> routeStops = new ArrayList<TransitRouteStop>(); //List of stops
-					ArrayList<Id> itinerary = new ArrayList<Id>(); //List of links
+					ArrayList<Id<Link>> itinerary = new ArrayList<Id<Link>>(); //List of links
 					Id routeId = new IdImpl(tpEntry.getKey());
 					
 					//Prepare first stop in trip
@@ -251,8 +250,8 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 								if (interval == 0)
 									continue; // skip frequencies with no intervael.
 								
-								double currentTime = (double)(f.getStartTime().getTime() / 1000.0);
-								double endTime = (double)(f.getEndTime().getTime() / 1000.0);
+								double currentTime = f.getStartTime().getTime() / 1000.0;
+								double endTime = f.getEndTime().getTime() / 1000.0;
 								
 								while (currentTime < endTime){									
 									tRoute.addDeparture(schedFact.createDeparture(new IdImpl(currentDepartureId++), currentTime));

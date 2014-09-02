@@ -78,7 +78,7 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 		Id startLink = route.getStartLinkId();
-		List<Id> links = new ArrayList<Id>(route.getLinkIds()); // create a copy
+		List<Id<Link>> links = new ArrayList<Id<Link>>(route.getLinkIds()); // create a copy
 																// that can be
 																// modified
 		Id endLink = route.getEndLinkId();

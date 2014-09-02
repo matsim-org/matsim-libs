@@ -258,7 +258,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		
 		
 //		allLinks = allLinks.subList(0, allLinks.size()-2);
-		List<Id> allLinksIds = new ArrayList<Id>();
+		List<Id<Link>> allLinksIds = new ArrayList<Id<Link>>();
 		Set<String> modes  = new HashSet<String>();
 		modes.add("bus");
 		for (Link link : allLinks) {

@@ -20,7 +20,6 @@
 
 package playground.mzilske.d4d;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,16 +36,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
@@ -194,7 +187,7 @@ public class WriteActsInSpace {
 		Double travTime = leg.getTravelTime();
 		Double dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network);
 
-		List<Id> linkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();
+		List<Id<Link>> linkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();
 		Coordinate [] coords = new Coordinate[linkIds.size() + 1];
 		for (int i = 0; i < linkIds.size(); i++) {
 			Link link = this.network.getLinks().get(linkIds.get(i));

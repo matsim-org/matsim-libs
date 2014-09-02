@@ -34,6 +34,7 @@ import javax.xml.stream.events.XMLEvent;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -268,7 +269,7 @@ public class AltPopulationReaderMatsimV5 implements PopulationReader {
 		Route currRoute;
 		if ("links".equals(routeType)) {
 			LinkNetworkRouteImpl linkNetworkRoute = new LinkNetworkRouteImpl(null, null);
-			List<Id> linkIds = NetworkUtils.getLinkIds(routeDescription, this.scenario);
+			List<Id<Link>> linkIds = NetworkUtils.getLinkIds(routeDescription);
 			Id startLinkId = linkIds.get(0);
 			Id endLinkId = linkIds.get(linkIds.size()-1);
 			if (linkIds.size() > 0) {

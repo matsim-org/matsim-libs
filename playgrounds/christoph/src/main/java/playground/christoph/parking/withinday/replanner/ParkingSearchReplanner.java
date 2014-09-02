@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -212,7 +213,7 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 
 		int length = route.getLinkIds().size();
 		if (length >= routeIndex) {
-			List<Id> linkIds = new ArrayList<Id>(route.getLinkIds().subList(0, routeIndex - 1));
+			List<Id<Link>> linkIds = new ArrayList<Id<Link>>(route.getLinkIds().subList(0, routeIndex - 1));
 			route.setLinkIds(route.getStartLinkId(), linkIds, route.getLinkIds().get(routeIndex - 1));
 		}
 	}

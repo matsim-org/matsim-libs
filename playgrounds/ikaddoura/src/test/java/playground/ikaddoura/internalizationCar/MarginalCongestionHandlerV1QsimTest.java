@@ -22,6 +22,11 @@
  */
 package playground.ikaddoura.internalizationCar;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,7 +35,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -51,12 +60,8 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import playground.ikaddoura.internalizationCar.old.MarginalCongestionHandlerV1;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import playground.ikaddoura.internalizationCar.old.MarginalCongestionHandlerV1;
 
 /**
  * @author ikaddoura
@@ -224,14 +229,14 @@ public class MarginalCongestionHandlerV1QsimTest {
 		
 		// leg: 3,4
 		Leg leg_3_4 = popFactory.createLeg("car");
-		List<Id> linkIds1 = new ArrayList<Id>();
+		List<Id<Link>> linkIds1 = new ArrayList<Id<Link>>();
 		NetworkRoute route1 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId4);
 		route1.setLinkIds(linkId3, linkIds1, linkId4);
 		leg_3_4.setRoute(route1);
 		
 		// leg: 2,3,4
 		Leg leg_2_4 = popFactory.createLeg("car");
-		List<Id> linkIds2 = new ArrayList<Id>();
+		List<Id<Link>> linkIds2 = new ArrayList<Id<Link>>();
 		linkIds2.add(linkId3);
 		NetworkRoute route2 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId4);
 		route2.setLinkIds(linkId2, linkIds2, linkId4);
@@ -239,7 +244,7 @@ public class MarginalCongestionHandlerV1QsimTest {
 		
 		// leg: 1,2,3
 		Leg leg_1_3 = popFactory.createLeg("car");
-		List<Id> linkIds3 = new ArrayList<Id>();
+		List<Id<Link>> linkIds3 = new ArrayList<Id<Link>>();
 		linkIds3.add(linkId2);
 		NetworkRoute route3 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route3.setLinkIds(linkId1, linkIds3, linkId3);
@@ -307,7 +312,7 @@ public class MarginalCongestionHandlerV1QsimTest {
 		
 		// leg: 1,2,3
 		Leg leg_1_3 = popFactory.createLeg("car");
-		List<Id> linkIds3 = new ArrayList<Id>();
+		List<Id<Link>> linkIds3 = new ArrayList<Id<Link>>();
 		linkIds3.add(linkId2);
 		NetworkRoute route3 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route3.setLinkIds(linkId1, linkIds3, linkId3);
@@ -361,7 +366,7 @@ public class MarginalCongestionHandlerV1QsimTest {
 		
 		// leg: 1,2,3
 		Leg leg_1_3 = popFactory.createLeg("car");
-		List<Id> linkIds3 = new ArrayList<Id>();
+		List<Id<Link>> linkIds3 = new ArrayList<Id<Link>>();
 		linkIds3.add(linkId2);
 		NetworkRoute route3 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route3.setLinkIds(linkId1, linkIds3, linkId3);
@@ -402,7 +407,7 @@ public class MarginalCongestionHandlerV1QsimTest {
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setStorageCapFactor(1.0);
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
-		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+		Scenario scenario = (ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);
@@ -474,7 +479,7 @@ public class MarginalCongestionHandlerV1QsimTest {
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setStorageCapFactor(1.0);
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
-		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+		Scenario scenario = (ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);

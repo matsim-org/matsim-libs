@@ -138,8 +138,8 @@ public class TimeAndSpaceTourRouter {
 		return route;
 	}
 	
-	private List<Id> getLinkIds(List<Link> links) {
-		List<Id> linkIds = new ArrayList<Id>();
+	private List<Id<Link>> getLinkIds(List<Link> links) {
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		for(Link l : links){
 			linkIds.add(l.getId());
 		}

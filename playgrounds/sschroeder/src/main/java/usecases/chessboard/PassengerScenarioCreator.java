@@ -1,10 +1,18 @@
 package usecases.chessboard;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -16,9 +24,6 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class PassengerScenarioCreator {
 	
@@ -102,8 +107,8 @@ public class PassengerScenarioCreator {
 		return persons;
 	}
 
-	private static List<Id> getLinkIds(Path path1) {
-		List<Id> links = new ArrayList<Id>();
+	private static List<Id<Link>> getLinkIds(Path path1) {
+		List<Id<Link>> links = new ArrayList<Id<Link>>();
 		for(Link l : path1.links){ links.add(l.getId()); }
 		return links;
 	}

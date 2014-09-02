@@ -22,6 +22,11 @@
  */
 package playground.ikaddoura.internalizationCar;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,7 +38,11 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -51,14 +60,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author ikaddoura, lkroeger
@@ -145,7 +148,7 @@ public class QsimTestTravelTime {
 		Activity workActLink5 = popFactory.createActivityFromLinkId("work", linkId5);
 		
 		Leg leg_0_5 = popFactory.createLeg("car");
-		List<Id> linkIds_0_5 = new ArrayList<Id>();
+		List<Id<Link>> linkIds_0_5 = new ArrayList<Id<Link>>();
 		linkIds_0_5.add(linkId2);
 		linkIds_0_5.add(linkId3);
 		linkIds_0_5.add(linkId4);
@@ -180,7 +183,7 @@ public class QsimTestTravelTime {
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(3600.0);
-		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+		Scenario scenario = (ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);

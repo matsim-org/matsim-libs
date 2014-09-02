@@ -124,7 +124,7 @@ public class ControlerTest {
 		plan1.addLeg(leg1);
 		NetworkRoute route1 = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
 		leg1.setRoute(route1);
-		ArrayList<Id> linkIds = new ArrayList<Id>();
+		ArrayList<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		linkIds.add(f.link2.getId());
 		route1.setLinkIds(f.link1.getId(), linkIds, f.link3.getId());
 		plan1.addActivity(factory.createActivityFromLinkId("h", f.link3.getId()));

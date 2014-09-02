@@ -21,7 +21,6 @@
 package playground.wrashid.parkingSearch.ppSim;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -40,7 +39,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
@@ -50,14 +48,9 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.wrashid.msimoni.analyses.InFlowInfoAcuumulatorWithPt;
-import playground.wrashid.msimoni.analyses.MainDensityAnalysisWithPtV2;
-import playground.wrashid.msimoni.analyses.OutFlowInfoAccumulatorWithPt;
 
 public class MiniScenarioMultiRun {
 
@@ -139,7 +132,7 @@ public class MiniScenarioMultiRun {
 
 		PopulationFactory factory = scenario.getPopulation().getFactory();
 
-		List<Id> linkIds = new ArrayList<Id>();
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		for (int i = 0; i < 10; i++) {
 			linkIds.add(scenario.createId("l0"));
 			linkIds.add(scenario.createId("l1"));
@@ -148,7 +141,7 @@ public class MiniScenarioMultiRun {
 		}
 		NetworkRoute route = (NetworkRoute) new LinkNetworkRouteFactory()
 				.createRoute(scenario.createId("l3"), scenario.createId("l0"));
-		route.setLinkIds(scenario.createId("l3"), linkIds,
+		route.setLinkIds(Id.create("13", Link.class), linkIds,
 				scenario.createId("l0"));
 
 		Random random = MatsimRandom.getLocalInstance();

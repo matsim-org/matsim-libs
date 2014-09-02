@@ -22,6 +22,11 @@
  */
 package playground.ikaddoura.internalizationCar;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -31,7 +36,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -52,11 +61,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author ikaddoura
@@ -604,7 +608,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 			
 		// leg: 1,2,3
 		Leg leg_1_3 = popFactory.createLeg("car");
-		List<Id> linkIds3 = new ArrayList<Id>();
+		List<Id<Link>> linkIds3 = new ArrayList<Id<Link>>();
 		linkIds3.add(linkId2);
 		NetworkRoute route3 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route3.setLinkIds(linkId1, linkIds3, linkId3);
@@ -658,7 +662,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 		
 		// leg: 1,2,3
 		Leg leg_1_3 = popFactory.createLeg("car");
-		List<Id> linkIds3 = new ArrayList<Id>();
+		List<Id<Link>> linkIds3 = new ArrayList<Id<Link>>();
 		linkIds3.add(linkId2);
 		NetworkRoute route3 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route3.setLinkIds(linkId1, linkIds3, linkId3);
@@ -713,14 +717,14 @@ public class MarginalCongestionHandlerV2QsimTest {
 		
 		// leg: 3,4
 		Leg leg_3_4 = popFactory.createLeg("car");
-		List<Id> linkIds1 = new ArrayList<Id>();
+		List<Id<Link>> linkIds1 = new ArrayList<Id<Link>>();
 		NetworkRoute route1 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId4);
 		route1.setLinkIds(linkId3, linkIds1, linkId4);
 		leg_3_4.setRoute(route1);
 		
 		// leg: 2,3,4
 		Leg leg_2_4 = popFactory.createLeg("car");
-		List<Id> linkIds2 = new ArrayList<Id>();
+		List<Id<Link>> linkIds2 = new ArrayList<Id<Link>>();
 		linkIds2.add(linkId3);
 		NetworkRoute route2 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId4);
 		route2.setLinkIds(linkId2, linkIds2, linkId4);
@@ -728,7 +732,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 		
 		// leg: 1,2,3
 		Leg leg_1_3 = popFactory.createLeg("car");
-		List<Id> linkIds3 = new ArrayList<Id>();
+		List<Id<Link>> linkIds3 = new ArrayList<Id<Link>>();
 		linkIds3.add(linkId2);
 		NetworkRoute route3 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route3.setLinkIds(linkId1, linkIds3, linkId3);
@@ -799,7 +803,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 	
 		// leg: 1,2,3,4
 		Leg leg_1_4 = popFactory.createLeg("car");
-		List<Id> linkIds4 = new ArrayList<Id>();
+		List<Id<Link>> linkIds4 = new ArrayList<Id<Link>>();
 		linkIds4.add(linkId2);
 		linkIds4.add(linkId3);
 		NetworkRoute route4 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -808,7 +812,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 
 		// leg: 1,2,3
 		Leg leg_1_3 = popFactory.createLeg("car");
-		List<Id> linkIds3 = new ArrayList<Id>();
+		List<Id<Link>> linkIds3 = new ArrayList<Id<Link>>();
 		linkIds3.add(linkId2);
 		NetworkRoute route3 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route3.setLinkIds(linkId1, linkIds3, linkId3);
@@ -851,7 +855,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 	
 		// leg: 1,2,3,4
 		Leg leg_1_4 = popFactory.createLeg("car");
-		List<Id> linkIds4 = new ArrayList<Id>();
+		List<Id<Link>> linkIds4 = new ArrayList<Id<Link>>();
 		linkIds4.add(linkId2);
 		linkIds4.add(linkId3);
 		NetworkRoute route4 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -860,7 +864,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 
 		// leg: 3,4
 		Leg leg_3_4 = popFactory.createLeg("car");
-		List<Id> linkIds34 = new ArrayList<Id>();
+		List<Id<Link>> linkIds34 = new ArrayList<Id<Link>>();
 		NetworkRoute route34 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId4);
 		route34.setLinkIds(linkId3, linkIds34, linkId4);
 		leg_3_4.setRoute(route34);		
@@ -925,7 +929,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 	
 		// leg: 1,2,3,4
 		Leg leg_1_4 = popFactory.createLeg("car");
-		List<Id> linkIds4 = new ArrayList<Id>();
+		List<Id<Link>> linkIds4 = new ArrayList<Id<Link>>();
 		linkIds4.add(linkId2);
 		linkIds4.add(linkId3);
 		NetworkRoute route4 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -934,7 +938,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 
 		// leg: 3,4
 		Leg leg_3_4 = popFactory.createLeg("car");
-		List<Id> linkIds34 = new ArrayList<Id>();
+		List<Id<Link>> linkIds34 = new ArrayList<Id<Link>>();
 		NetworkRoute route34 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId4);
 		route34.setLinkIds(linkId3, linkIds34, linkId4);
 		leg_3_4.setRoute(route34);		
@@ -1024,7 +1028,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 		
 		// leg: 1,2,3,4
 		Leg leg_1_4 = popFactory.createLeg("car");
-		List<Id> linkIds4 = new ArrayList<Id>();
+		List<Id<Link>> linkIds4 = new ArrayList<Id<Link>>();
 		linkIds4.add(linkId2);
 		linkIds4.add(linkId3);
 		NetworkRoute route4 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -1115,7 +1119,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 		
 		// leg: 1,2,3,4
 		Leg leg_1_4 = popFactory.createLeg("car");
-		List<Id> linkIds4 = new ArrayList<Id>();
+		List<Id<Link>> linkIds4 = new ArrayList<Id<Link>>();
 		linkIds4.add(linkId2);
 		linkIds4.add(linkId3);
 		NetworkRoute route4 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -1207,7 +1211,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 		
 		// leg: 1,2,3,4
 		Leg leg_1_4 = popFactory.createLeg("car");
-		List<Id> linkIds4 = new ArrayList<Id>();
+		List<Id<Link>> linkIds4 = new ArrayList<Id<Link>>();
 		linkIds4.add(linkId2);
 		linkIds4.add(linkId3);
 		NetworkRoute route4 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -1216,7 +1220,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 
 		// leg: 1,2,3
 		Leg leg_1_3 = popFactory.createLeg("car");
-		List<Id> linkIds3 = new ArrayList<Id>();
+		List<Id<Link>> linkIds3 = new ArrayList<Id<Link>>();
 		linkIds3.add(linkId2);
 		NetworkRoute route3 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route3.setLinkIds(linkId1, linkIds3, linkId3);
@@ -1318,7 +1322,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 	
 		// leg: 1,2,3,4
 		Leg leg_1_4 = popFactory.createLeg("car");
-		List<Id> linkIds4 = new ArrayList<Id>();
+		List<Id<Link>> linkIds4 = new ArrayList<Id<Link>>();
 		linkIds4.add(linkId2);
 		linkIds4.add(linkId3);
 		NetworkRoute route4 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -1327,7 +1331,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 
 		// leg: 2,4
 		Leg leg_2_4 = popFactory.createLeg("car");
-		List<Id> linkIds24 = new ArrayList<Id>();
+		List<Id<Link>> linkIds24 = new ArrayList<Id<Link>>();
 		linkIds24.add(linkId3);
 		NetworkRoute route24 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId4);
 		route24.setLinkIds(linkId2, linkIds24, linkId4);
@@ -1408,7 +1412,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(100.0);
-		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+		Scenario scenario = (ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);
@@ -1513,7 +1517,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(100.0);
-		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+		Scenario scenario = (ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);
@@ -1587,7 +1591,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(100.0);
-		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+		Scenario scenario = (ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);
@@ -1670,7 +1674,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(100.0);
-		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+		Scenario scenario = (ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);

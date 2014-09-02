@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
@@ -99,7 +100,7 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 	
     private Scenario scenario;
 	private Map<Id, LegImpl> legs = new HashMap<Id, LegImpl>();
-    private Map<Id, List<Id>> routes = new HashMap<Id, List<Id>>();
+    private Map<Id, List<Id<Link>>> routes = new HashMap<Id, List<Id<Link>>>();
     private Map<Id, TeleportationArrivalEvent> routelessTravels = new HashMap<Id, TeleportationArrivalEvent>();
     private Map<Id, PendingTransitTravel> transitTravels = new HashMap<Id, PendingTransitTravel>();
     private Map<Id, LineAndRoute> transitVehicle2currentRoute = new HashMap<Id, LineAndRoute>();
@@ -113,7 +114,7 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 	    LegImpl leg = new LegImpl(event.getLegMode());
 	    leg.setDepartureTime(event.getTime());
 	    legs.put(event.getPersonId(), leg);
-	    List<Id> route = new ArrayList<Id>();
+	    List<Id<Link>> route = new ArrayList<Id<Link>>();
 	    route.add(event.getLinkId());
 	    routes.put(event.getPersonId(), route);
 	}
@@ -141,7 +142,7 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 
 	@Override
     public void handleEvent(LinkEnterEvent event) {
-        List<Id> route = routes.get(event.getPersonId());
+        List<Id<Link>> route = routes.get(event.getPersonId());
         route.add(event.getLinkId());
     }
 
@@ -156,7 +157,7 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 	    leg.setArrivalTime(event.getTime());
 	    double travelTime = leg.getArrivalTime() - leg.getDepartureTime();
 	    leg.setTravelTime(travelTime);
-	    List<Id> route = routes.remove(event.getPersonId());
+	    List<Id<Link>> route = routes.remove(event.getPersonId());
 	    assert route.size() >= 1;
 	    PendingTransitTravel pendingTransitTravel;
 	    if (route.size() > 1) {

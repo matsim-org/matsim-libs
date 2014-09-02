@@ -98,7 +98,7 @@ public class PScenarioHelper {
 		final TransitLine line;
 		final TransitRoute route;		
 		
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		network = scenario.getNetwork();
@@ -302,8 +302,8 @@ public class PScenarioHelper {
 		
 		line = sf.createTransitLine(new IdImpl("Blue Line"));
 		NetworkRoute netRoute = new LinkNetworkRouteImpl(new IdImpl("11"), new IdImpl("11"));
-		List<Id> linkIds = new ArrayList<Id>();
-		Collections.addAll(linkIds, new IdImpl("12"), new IdImpl("23"), new IdImpl("33"), new IdImpl("32"), new IdImpl("21"));
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+		Collections.addAll(linkIds, Id.create("12", Link.class), Id.create("23", Link.class), Id.create("33", Link.class), Id.create("32", Link.class), Id.create("21", Link.class));
 		netRoute.setLinkIds(new IdImpl("11"), linkIds,  new IdImpl("11"));
 		route = sf.createTransitRoute( new IdImpl("1to3to1"), netRoute, stops, "train");
 

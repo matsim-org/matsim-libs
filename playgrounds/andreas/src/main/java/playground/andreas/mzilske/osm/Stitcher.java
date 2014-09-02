@@ -110,7 +110,7 @@ public class Stitcher {
 		addBackwardLinks(way);
 	}
 
-	public List<Id> getForwardRoute() {
+	public List<Id<Link>> getForwardRoute() {
 		return route(forwardStops, forwardStopLinks, forwardTravelTimes);
 	}
 
@@ -122,11 +122,11 @@ public class Stitcher {
 		return backwardStopLinks;
 	}
 
-	private List<Id> route(List<Id> stopNodes, List<Id> outStopLinks, List<Double> outTravelTimes) {
+	private List<Id<Link>> route(List<Id> stopNodes, List<Id> outStopLinks, List<Double> outTravelTimes) {
 		if (stopNodes.isEmpty()) {
 			return Collections.emptyList();
 		}
-		List<Id> links = new ArrayList<Id>();
+		List<Id<Link>> links = new ArrayList<Id<Link>>();
 		FreespeedTravelTimeAndDisutility cost = new FreespeedTravelTimeAndDisutility(-1, 0, 0);
 		Dijkstra router = new Dijkstra(networkForThisRoute, cost, cost);
 		Iterator<Id> i = stopNodes.iterator();
@@ -159,7 +159,7 @@ public class Stitcher {
 		return links;
 	}
 
-	public List<Id> getBackwardRoute() {
+	public List<Id<Link>> getBackwardRoute() {
 		return route(backwardStops, backwardStopLinks, backwardTravelTimes);
 	}
 

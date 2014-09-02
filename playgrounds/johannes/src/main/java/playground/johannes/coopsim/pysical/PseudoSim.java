@@ -29,9 +29,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -134,7 +135,7 @@ public class PseudoSim {
 		double tt = 0;
 		if (route.getStartLinkId() != route.getEndLinkId()) {
 
-			List<Id> ids = route.getLinkIds();
+			List<Id<Link>> ids = route.getLinkIds();
 			for (int i = 0; i < ids.size(); i++) {
 				tt += travelTime.getLinkTravelTime(network.getLinks().get(ids.get(i)), startTime, null, null);
 				tt++;// 1 sec for each node

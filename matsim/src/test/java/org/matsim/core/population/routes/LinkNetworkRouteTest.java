@@ -53,7 +53,7 @@ public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 		Link link4 = new FakeLink(id4);
 		Link link5 = new FakeLink(id5);
 		LinkNetworkRouteImpl route1 = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId());
-		ArrayList<Id> srcRoute = new ArrayList<Id>();
+		ArrayList<Id<Link>> srcRoute = new ArrayList<Id<Link>>();
 		srcRoute.add(link3.getId());
 		srcRoute.add(link4.getId());
 		route1.setLinkIds(startLink.getId(), srcRoute, endLink.getId());

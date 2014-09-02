@@ -38,6 +38,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -122,7 +123,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		nRoute = new LinkNetworkRouteImpl( new IdImpl( 43 ) , new IdImpl( 23 ) );
 		nRoute.setLinkIds(
 				new IdImpl( 43 ) ,
-				Arrays.asList( (Id) new IdImpl( 34 ) , new IdImpl( 42 ) , new IdImpl( 23 ) , new IdImpl( 34 ) , new IdImpl( 42 ) ) ,
+				Arrays.asList( Id.create(34, Link.class) , Id.create( 42, Link.class ) , Id.create( 23, Link.class ) , Id.create( 34, Link.class ) , Id.create( 42, Link.class ) ) ,
 				new IdImpl( 23 ) );
 		l.setRoute( nRoute );
 		l.setDepartureTime( 123 );

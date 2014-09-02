@@ -55,7 +55,7 @@ public class CalcAverageTripLengthTest {
 		Activity act1 = pf.createActivityFromLinkId("h", l1.getId());
 		Leg leg = pf.createLeg(TransportMode.car);
 		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(l1.getId(), l3.getId());
-		ArrayList<Id> linkIds = new ArrayList<Id>();
+		ArrayList<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		linkIds.add(l2.getId());
 		route.setLinkIds(l1.getId(), linkIds, l3.getId());
 		leg.setRoute(route);
@@ -111,7 +111,7 @@ public class CalcAverageTripLengthTest {
 		Activity act1 = pf.createActivityFromLinkId("h", l1.getId());
 		Leg leg = pf.createLeg(TransportMode.car);
 		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(l1.getId(), l2.getId());
-		route.setLinkIds(l1.getId(), new ArrayList<Id>(0), l2.getId());
+		route.setLinkIds(l1.getId(), new ArrayList<Id<Link>>(0), l2.getId());
 		leg.setRoute(route);
 		Activity act2 = pf.createActivityFromLinkId("w", l2.getId());
 		plan.addActivity(act1);
@@ -143,7 +143,7 @@ public class CalcAverageTripLengthTest {
 		Activity act1 = pf.createActivityFromLinkId("h", l1.getId());
 		Leg leg = pf.createLeg(TransportMode.car);
 		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(l1.getId(), l1.getId());
-		route.setLinkIds(l1.getId(), new ArrayList<Id>(0), l1.getId());
+		route.setLinkIds(l1.getId(), new ArrayList<Id<Link>>(0), l1.getId());
 		leg.setRoute(route);
 		Activity act2 = pf.createActivityFromLinkId("w", l1.getId());
 		plan.addActivity(act1);

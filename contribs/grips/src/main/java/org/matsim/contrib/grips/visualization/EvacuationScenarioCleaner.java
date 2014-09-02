@@ -137,7 +137,7 @@ public class EvacuationScenarioCleaner {
 
 	private Id handle(LegImpl l) {
 
-		Id endLinkId;
+		Id<Link> endLinkId;
 		
 		String m = l.getMode();
 		if (!m.equals("car")) {
@@ -149,8 +149,8 @@ public class EvacuationScenarioCleaner {
 		
 		if (r instanceof LinkNetworkRouteImpl) {
 			LinkNetworkRouteImpl rr = (LinkNetworkRouteImpl)r;
-			List<Id> ll = rr.getLinkIds();
-			ArrayList<Id> nll = new ArrayList<Id>(ll.subList(0, ll.size()-1));
+			List<Id<Link>> ll = rr.getLinkIds();
+			ArrayList<Id<Link>> nll = new ArrayList<Id<Link>>(ll.subList(0, ll.size()-1));
 			endLinkId = ll.get(ll.size()-1);
 			rr.setLinkIds(rr.getStartLinkId(), nll, endLinkId);
 			

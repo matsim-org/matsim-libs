@@ -64,17 +64,17 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 
 	private double activityEndTime = Time.UNDEFINED_TIME;
 
-	private Id currentLinkId = null;
+	private Id<Link> currentLinkId = null;
 
 	int currentPlanElementIndex = 0;
 
 	private final Plan plan;
 
-	private transient Id cachedDestinationLinkId;
+	private transient Id<Link> cachedDestinationLinkId;
 
 	private Leg currentLeg;
 
-	private List<Id> cachedRouteLinkIds = null;
+	private List<Id<Link>> cachedRouteLinkIds = null;
 
 	int currentLinkIdIndex;
 
@@ -342,7 +342,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		//create route for the car part of the freefloating trip
 		
 		double travelTime = 0.0;
-		List<Id> ids = new ArrayList<Id>();
+		List<Id<Link>> ids = new ArrayList<Id<Link>>();
 		
 		TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
 		
@@ -402,7 +402,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 				this.person.getId(), now);
 		
 		double travelTime = 0.0;
-		List<Id> ids = new ArrayList<Id>();
+		List<Id<Link>> ids = new ArrayList<Id<Link>>();
 		
 		TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
 		

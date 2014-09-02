@@ -222,7 +222,7 @@ public class PrepareInitialRoutes {
 					Link fromLink = this.network.getLinks().get(fromFacility.getLinkId());
 					Node toNode = fromLink.getToNode();
 					
-					List<Id> links = new ArrayList<Id>();
+					List<Id<Link>> links = new ArrayList<Id<Link>>();
 					// add the first possible outlink to the list
 					for (Link link : toNode.getOutLinks().values()) {
 						links.add(link.getId());

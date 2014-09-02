@@ -102,7 +102,6 @@ import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
-import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 
@@ -178,7 +177,7 @@ public class TransitQueueSimulationTest {
         stop4.setLinkId(link2.getId());
 
         NetworkRoute route = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
-        ArrayList<Id> links = new ArrayList<Id>(0);
+        ArrayList<Id<Link>> links = new ArrayList<Id<Link>>(0);
         route.setLinkIds(link1.getId(), links, link2.getId());
 
         { // line 1, 1 route, 2 departures
@@ -455,7 +454,7 @@ public class TransitQueueSimulationTest {
         stop4.setLinkId(link5.getId()); // one stop on the last link of the network route, as that one may be specially handled
 
         NetworkRoute route = new LinkNetworkRouteImpl(link1.getId(), link5.getId());
-        ArrayList<Id> links = new ArrayList<Id>();
+        ArrayList<Id<Link>> links = new ArrayList<Id<Link>>();
         Collections.addAll(links, link2.getId(), link3.getId(), link4.getId());
         route.setLinkIds(link1.getId(), links, link5.getId());
 

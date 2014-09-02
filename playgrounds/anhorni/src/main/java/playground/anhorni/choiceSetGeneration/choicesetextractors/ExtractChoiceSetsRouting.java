@@ -139,13 +139,13 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		 */
 		double totalTravelDist = 0.0;
 
-		Iterator<Id> routeLinkBefore_it = ((NetworkRoute) legBefore.getRoute()).getLinkIds().iterator();
+		Iterator<Id<Link>> routeLinkBefore_it = ((NetworkRoute) legBefore.getRoute()).getLinkIds().iterator();
 		while (routeLinkBefore_it.hasNext()) {
 			Id lId = routeLinkBefore_it.next();
 			totalTravelDist += network.getLinks().get(lId).getLength();
 		}
 
-		Iterator<Id> routeLinkAfter_it = ((NetworkRoute) legAfter.getRoute()).getLinkIds().iterator();
+		Iterator<Id<Link>> routeLinkAfter_it = ((NetworkRoute) legAfter.getRoute()).getLinkIds().iterator();
 		while (routeLinkAfter_it.hasNext()) {
 			Id lId = routeLinkAfter_it.next();
 			totalTravelDist += network.getLinks().get(lId).getLength();

@@ -45,14 +45,12 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
-import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -135,7 +133,7 @@ public class MiniScenario {
 		
 		PopulationFactory factory = scenario.getPopulation().getFactory();
 		
-		List<Id> linkIds = new ArrayList<Id>();
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		for (int i = 0; i < 1000; i++) {
 			linkIds.add(scenario.createId("l0"));
 			linkIds.add(scenario.createId("l1"));

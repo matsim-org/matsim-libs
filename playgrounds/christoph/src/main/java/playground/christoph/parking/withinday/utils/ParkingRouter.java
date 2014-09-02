@@ -133,7 +133,7 @@ public class ParkingRouter {
 		
 		List<InitialNode> initialToNodes = new ArrayList<InitialNode>();
 		Map<Node, Integer> nodeIndices = new HashMap<Node, Integer>();
-		List<Id> routeLinkIds = new ArrayList<Id>();
+		List<Id<Link>> routeLinkIds = new ArrayList<Id<Link>>();
 		
 		// if the route does not start and end on the same link and is not a round-trip
 		if (!route.getStartLinkId().equals(route.getEndLinkId()) || route.getLinkIds().size() != 0) {
@@ -181,7 +181,7 @@ public class ParkingRouter {
 		/*
 		 * Merge old and new route.
 		 */
-		List<Id> linkIds = new ArrayList<Id>();
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		
 		// new links
 		for (Link link : path.links) linkIds.add(link.getId());
@@ -242,7 +242,7 @@ public class ParkingRouter {
 		
 		List<InitialNode> initialFromNodes = new ArrayList<InitialNode>();
 		Map<Node, Integer> nodeIndices = new HashMap<Node, Integer>();
-		List<Id> routeLinkIds = new ArrayList<Id>();
+		List<Id<Link>> routeLinkIds = new ArrayList<Id<Link>>();
 
 		// if the route does not start and end on the same link and is not a round-trip
 		if (!route.getStartLinkId().equals(route.getEndLinkId()) || route.getLinkIds().size() != 0) {
@@ -297,7 +297,7 @@ public class ParkingRouter {
 		/*
 		 * Merge old and new route.
 		 */
-		List<Id> linkIds = new ArrayList<Id>();
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		
 		// existing links
 		Node firstNode = path.nodes.get(0);
@@ -365,7 +365,7 @@ public class ParkingRouter {
 		if (routeLinkIds.size() + 1 <= 2 * nodesToCheck) {
 			Path path = dijkstra.calcLeastCostPath(startNode, endNode, time, person, vehicle);
 			
-			List<Id> linkIds = new ArrayList<Id>();
+			List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 			for (Link link : path.links) linkIds.add(link.getId());
 			
 			route.setLinkIds(startLinkId, linkIds, endLinkId);
@@ -409,7 +409,7 @@ public class ParkingRouter {
 		
 		Path path = dijkstra.calcLeastCostPath(startNode, endNode, time, person, vehicle);
 		
-		List<Id> mergedLinks = new ArrayList<Id>();
+		List<Id<Link>> mergedLinks = new ArrayList<Id<Link>>();
 		mergedLinks.addAll(route.getLinkIds());
 		/*
 		 * If the route starts and ends on the same link and is not a round trip, do not add the end link

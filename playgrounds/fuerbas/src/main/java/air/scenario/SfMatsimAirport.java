@@ -50,8 +50,8 @@ public class SfMatsimAirport {
 	public Id id, incomingFlightsNodeId, outgoingFlightsNodeId;
 	private Id transitStopFacilityId;
 
-	private List<Id> departureLinkIdList = new ArrayList<Id>();
-	private List<Id> arrivalLinkIdList = new ArrayList<Id>();
+	private List<Id<Link>> departureLinkIdList = new ArrayList<Id<Link>>();
+	private List<Id<Link>> arrivalLinkIdList = new ArrayList<Id<Link>>();
 
 	private double taxiOutboundTime = (taxiwayLength / taxiwayFreespeed)
 			+ (runwayLength / runwayFreespeed); // time for take-off
@@ -270,11 +270,11 @@ public class SfMatsimAirport {
 		return this.transitStopFacilityId;
 	}
 
-	public List<Id> getDepartureLinkIdList() {
+	public List<Id<Link>> getDepartureLinkIdList() {
 		return departureLinkIdList;
 	}
 
-	public List<Id> getArrivalLinkIdList() {
+	public List<Id<Link>> getArrivalLinkIdList() {
 		return arrivalLinkIdList;
 	}
 

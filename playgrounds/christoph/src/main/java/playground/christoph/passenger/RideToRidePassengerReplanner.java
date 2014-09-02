@@ -171,7 +171,7 @@ public class RideToRidePassengerReplanner extends WithinDayInitialReplanner {
 		Leg rideLeg = context.rideLeg;
 		Leg carLeg = context.carLeg;
 		NetworkRoute route = (NetworkRoute) carLeg.getRoute();
-		List<Id> linkIds = new ArrayList<Id>();
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		linkIds.add(route.getStartLinkId());
 		linkIds.addAll(route.getLinkIds());
 		if (linkIds.size() > 1 || !route.getStartLinkId().equals(route.getEndLinkId())) linkIds.add(route.getEndLinkId());
@@ -226,16 +226,16 @@ public class RideToRidePassengerReplanner extends WithinDayInitialReplanner {
 
 	}
 	
-	private Route createRouteAndSetLinks(List<Id> linkIds, Id fromLinkId, Id toLinkId) {
+	private Route createRouteAndSetLinks(List<Id<Link>> linkIds, Id fromLinkId, Id toLinkId) {
 		
 		NetworkRoute networkRoute = (NetworkRoute) carRouteFactory.createRoute(fromLinkId, toLinkId);
 		if (!fromLinkId.equals(toLinkId)) {
-			List<Id> subLinkIds = new ArrayList<Id>();
+			List<Id<Link>> subLinkIds = new ArrayList<Id<Link>>();
 			int fromIndex = linkIds.indexOf(fromLinkId);
 			int toIndex = linkIds.indexOf(toLinkId);
 			
 			if (toIndex == -1) {
-				for (Id linkId : linkIds) System.out.print(linkId.toString() + " ");
+				for (Id<Link> linkId : linkIds) System.out.print(linkId.toString() + " ");
 				System.out.println("");
 				System.out.println(fromLinkId.toString());
 				System.out.println(toLinkId.toString());

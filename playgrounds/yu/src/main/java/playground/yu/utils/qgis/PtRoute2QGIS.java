@@ -235,7 +235,7 @@ public class PtRoute2QGIS extends MATSimNet2QGIS {
 
 		private double getPtRouteWidth(TransitRoute ptRoute) {
 			NetworkRoute route = ptRoute.getRoute();
-			List<Id> linkIds = route.getLinkIds();
+			List<Id<Link>> linkIds = route.getLinkIds();
 			int size = linkIds.size();
 
 			double[] widths = new double[size + 2], lengths = new double[size + 2];

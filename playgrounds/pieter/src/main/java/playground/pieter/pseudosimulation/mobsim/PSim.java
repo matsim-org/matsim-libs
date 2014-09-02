@@ -22,33 +22,30 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.TransitRouteImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -58,8 +55,8 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.pieter.pseudosimulation.controler.PSimControler;
 import playground.pieter.pseudosimulation.trafficinfo.PSimTravelTimeCalculator;
 import playground.pieter.pseudosimulation.util.CollectionUtils;
-import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.*;
-import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.*;
+import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeCalculator;
+import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeStuckCalculator;
 
 /**
  * @author illenberger 
@@ -125,6 +122,7 @@ public class PSim implements Mobsim {
 		}
 	}
 
+	@Override
 	public void run() {
 
 		Collection<Plan> plans = new LinkedHashSet<Plan>();
@@ -365,7 +363,7 @@ public class PSim implements Mobsim {
 				eventQueue.add(wait2Link);
 				eventQueue.add(linkLeaveEvent);
 				double linkLeaveTime = linkEnterTime;
-				List<Id> ids = route.getLinkIds();
+				List<Id<Link>> ids = route.getLinkIds();
 				for (int i = 0; i < ids.size(); i++) {
 					Id link = ids.get(i);
 					linkEnterTime = linkLeaveTime;
@@ -393,7 +391,7 @@ public class PSim implements Mobsim {
 			double tt = 0;
 			if (route.getStartLinkId() != route.getEndLinkId()) {
 
-				List<Id> ids = route.getLinkIds();
+				List<Id<Link>> ids = route.getLinkIds();
 				for (int i = 0; i < ids.size(); i++) {
 					tt += travelTime.getLinkTravelTime(network.getLinks().get(ids.get(i)), startTime, null, null);
 					tt++;// 1 sec for each node

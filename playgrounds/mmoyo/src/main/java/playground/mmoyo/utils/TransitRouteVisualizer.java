@@ -47,7 +47,7 @@ public class TransitRouteVisualizer {
 		NetworkImpl routeNet = (NetworkImpl) ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getNetwork();
 
 		//add also start and end links that normally are not include in transitRoute.getRoute().getLinkIds()!! 
-		List<Id> linkList = transitRoute.getRoute().getLinkIds();
+		List<Id<Link>> linkList = transitRoute.getRoute().getLinkIds();
 		linkList.add(0, transitRoute.getRoute().getStartLinkId());
 		linkList.add(transitRoute.getRoute().getEndLinkId());
 		

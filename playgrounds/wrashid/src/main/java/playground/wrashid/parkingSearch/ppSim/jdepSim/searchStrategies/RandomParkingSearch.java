@@ -23,37 +23,25 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentEventMessage;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.Message;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteTaskDuringSim;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteThreadDuringSim;
@@ -100,6 +88,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		resetForNewIteration();
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -116,7 +105,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
 			Id personId = aem.getPerson().getId();
 
-			List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
+			List<Id<Link>> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
 
 			LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) leg.getRoute();
 			boolean endOfLegReached = aem.getCurrentLinkIndex() == linkIds.size() - 1;
@@ -363,7 +352,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 		Link nextLink = getNextLink(link, aem);
 
-		ArrayList<Id> newRoute = new ArrayList<Id>();
+		ArrayList<Id<Link>> newRoute = new ArrayList<Id<Link>>();
 		newRoute.addAll(route.getLinkIds());
 		newRoute.add(link.getId());
 		route.setLinkIds(route.getStartLinkId(), newRoute, nextLink.getId());
@@ -728,7 +717,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
 		LinkNetworkRouteImpl route = ((LinkNetworkRouteImpl) leg.getRoute());
 
-		List<Id> linkIds = new LinkedList<Id>();
+		List<Id<Link>> linkIds = new LinkedList<Id<Link>>();
 		for (int i = 0; i <= aem.getCurrentLinkIndex(); i++) {
 			linkIds.add(route.getLinkIds().get(i));
 		}
@@ -748,6 +737,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		return groupName;
 	}
 
+	@Override
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
 	}

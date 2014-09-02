@@ -245,7 +245,7 @@ public class SocialDecisionMaker2 implements StartTimeDecisionMaker, EndTimeDeci
 	}
 	private NetworkRoute getFullNetworkRoute(List<Link> bestPath, Id startLinkId, Id endLinkId, double time) {
 		NetworkRoute networkRoute = new LinkNetworkRouteImpl(startLinkId, endLinkId);
-		List<Id> links = new ArrayList<Id>();
+		List<Id<Link>> links = new ArrayList<Id<Link>>();
 		Link startLink = scenario.getNetwork().getLinks().get(startLinkId);
 		Link endLink = scenario.getNetwork().getLinks().get(endLinkId);
 		Node prevNode = startLink.getToNode(), currNode = null;

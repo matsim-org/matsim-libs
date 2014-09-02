@@ -25,6 +25,7 @@ import java.util.ListIterator;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -98,9 +99,9 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	}
 
 	@Override
-	public final Id chooseNextLinkId() {
+	public final Id<Link> chooseNextLinkId() {
 		NetworkRoute netR = getCarRoute();
-		List<Id> linkIds = netR.getLinkIds();
+		List<Id<Link>> linkIds = netR.getLinkIds();
 		if (this.nextLinkIndex < linkIds.size()) {
 			return linkIds.get(this.nextLinkIndex);
 		}
@@ -125,7 +126,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	}
 
 	@Override
-	public final Id getCurrentLinkId() {
+	public final Id<Link> getCurrentLinkId() {
 		int currentLinkIndex = this.nextLinkIndex - 1;
 		if (currentLinkIndex < 0) {
 			return getCarRoute().getStartLinkId();
@@ -344,12 +345,12 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 		}
 
 		@Override
-		public List<Id> getLinkIds() {
+		public List<Id<Link>> getLinkIds() {
 			return this.delegate.getLinkIds();
 		}
 
 		@Override
-		public NetworkRoute getSubRoute(final Id fromLinkId, final Id toLinkId) {
+		public NetworkRoute getSubRoute(final Id<Link> fromLinkId, final Id<Link> toLinkId) {
 			return this.delegate.getSubRoute(fromLinkId, toLinkId);
 		}
 
@@ -364,7 +365,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 		}
 
 		@Override
-		public void setLinkIds(final Id startLinkId, final List<Id> srcRoute, final Id endLinkId) {
+		public void setLinkIds(final Id<Link> startLinkId, final List<Id<Link>> srcRoute, final Id<Link> endLinkId) {
 			throw new UnsupportedOperationException("read only route.");
 		}
 

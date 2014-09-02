@@ -16,7 +16,6 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.pt.transitSchedule.TransitScheduleImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
@@ -39,7 +38,7 @@ public class BuslaneGenerator_fullPriority {
 		new TransitScheduleReader(scenario).readFile(transitSchedulePath);
 		TransitSchedule transitSchedule = scenario.getTransitSchedule();
 
-		List<Id> busLinksList = new LinkedList();
+		List<Id<Link>> busLinksList = new LinkedList<Id<Link>>();
 
 		Set<String> allowedModesPT = new HashSet<String>();
 		allowedModesPT.add("pt");

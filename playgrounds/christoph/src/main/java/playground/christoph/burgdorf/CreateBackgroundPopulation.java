@@ -250,7 +250,7 @@ public class CreateBackgroundPopulation {
 		// fix bad routes
 		String routeString;
 		String[] links;
-		List<Id> linkIds;
+		List<Id<Link>> linkIds;
 		NetworkRoute networkRoute;
 			
 		routeString = "17560000130806FT_17560000126838FT";
@@ -260,7 +260,7 @@ public class CreateBackgroundPopulation {
 				"17560001368986TF", "17560001786482TF", "17560001862499FT", "17560000125722FT", "17560001812124FT", "17560002102719FT",
 				"17560001838515FT", "17560001984994FT", "17560001984995FT", "17560001812144FT", "17560001834645FT", "17560000126288FT",
 				"17560002102725FT", "17560002102726FT", "17560001368914FT", "17560001368915FT", "17560001846187FT"};
-		linkIds = new ArrayList<Id>();
+		linkIds = new ArrayList<Id<Link>>();
 		for (String link : links) linkIds.add(scenario.createId(link));
 		networkRoute = (NetworkRoute) routes.get(routeString);
 		networkRoute.setLinkIds(networkRoute.getStartLinkId(), linkIds, networkRoute.getEndLinkId());
@@ -374,7 +374,7 @@ public class CreateBackgroundPopulation {
 		// fix bad intersection routes
 		String routeString;
 		String[] links;
-		List<Id> linkIds;
+		List<Id<Link>> linkIds;
 		NetworkRoute networkRoute;
 		
 		routeString = "17560000130806FT_17560001247396FT";
@@ -385,7 +385,7 @@ public class CreateBackgroundPopulation {
 				"17560000122386FT", "17560000122387FT", "17560000122400FT", "17560000122416FT", "17560001862503FT", "17560000122384FT",
 				"17560000122625FT", "17560000122410FT", "17560000122622FT", "17560000122674TF", "17560000122657TF", "17560000127847TF",
 				"17560001808872TF", "17560000124049TF", "17560001809109FT", "17560000127772FT", "17560000123464FT", "17560000128169FT"};
-		linkIds = new ArrayList<Id>();
+		linkIds = new ArrayList<Id<Link>>();
 		for (String link : links) linkIds.add(scenario.createId(link));
 		networkRoute = (NetworkRoute) routes.get(routeString);
 		networkRoute.setLinkIds(networkRoute.getStartLinkId(), linkIds, networkRoute.getEndLinkId());
@@ -398,7 +398,7 @@ public class CreateBackgroundPopulation {
 				"17560000125722FT", "17560001812124FT", "17560002102719FT", "17560001838515FT", "17560001984994FT", "17560001984995FT",
 				"17560001812144FT", "17560001834645FT", "17560000126288FT", "17560002102725FT", "17560002102726FT", "17560001368914FT",
 				"17560001368915FT", "17560001846187FT"};
-		linkIds = new ArrayList<Id>();
+		linkIds = new ArrayList<Id<Link>>();
 		for (String link : links) linkIds.add(scenario.createId(link));
 		networkRoute = (NetworkRoute) routes.get(routeString);
 		networkRoute.setLinkIds(networkRoute.getStartLinkId(), linkIds, networkRoute.getEndLinkId());
@@ -411,7 +411,7 @@ public class CreateBackgroundPopulation {
 				"17560000122383FT", "17560000122625FT", "17560000122410FT", "17560000122622FT", "17560000122674TF", "17560000122657TF",
 				"17560000127847TF", "17560001808872TF", "17560000124049TF", "17560001809109FT", "17560000127772FT", "17560000123464FT",
 				"17560000128169FT"};
-		linkIds = new ArrayList<Id>();
+		linkIds = new ArrayList<Id<Link>>();
 		for (String link : links) linkIds.add(scenario.createId(link));
 		networkRoute = (NetworkRoute) routes.get(routeString);
 		networkRoute.setLinkIds(networkRoute.getStartLinkId(), linkIds, networkRoute.getEndLinkId());

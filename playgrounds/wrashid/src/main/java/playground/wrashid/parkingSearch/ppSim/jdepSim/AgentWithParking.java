@@ -18,8 +18,6 @@
  * *********************************************************************** */
 package playground.wrashid.parkingSearch.ppSim.jdepSim;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
@@ -29,8 +27,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.population.ActivityImpl;
@@ -39,9 +35,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteTaskDuringSim;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingMemory;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.ParkingEventDetails;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingManagerZH;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
@@ -209,7 +202,7 @@ public class AgentWithParking extends AgentEventMessage {
 
 	public Id getCurrentLinkId() {
 		Leg leg = (LegImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
-		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
+		List<Id<Link>> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
 
 		if (getCurrentLinkIndex() == -1) {
 			return ((LinkNetworkRouteImpl) leg.getRoute()).getStartLinkId();
@@ -220,7 +213,7 @@ public class AgentWithParking extends AgentEventMessage {
 
 	public Link getNextLink() {
 		Leg leg = (LegImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
-		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
+		List<Id<Link>> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
 		Id nextLinkId;
 		if (!endOfLegReached()) {
 			nextLinkId = linkIds.get(getCurrentLinkIndex() + 1);
@@ -232,7 +225,7 @@ public class AgentWithParking extends AgentEventMessage {
 
 	public boolean endOfLegReached() {
 		Leg leg = (LegImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
-		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
+		List<Id<Link>> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
 		return getCurrentLinkIndex() == linkIds.size() - 1;
 	}
 }

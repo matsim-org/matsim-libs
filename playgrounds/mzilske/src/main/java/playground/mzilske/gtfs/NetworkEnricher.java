@@ -39,7 +39,7 @@ class NetworkEnricher {
 	}
 
 	Map<Id, NetworkRoute> replaceLinks(Map<Id, List<Coord>> shapedLinks, Map<Id,NetworkRoute> netRoutes) {
-		Map<Id,List<Id>> replacedLinks = new HashMap<Id,List<Id>>();
+		Map<Id,List<Id<Link>>> replacedLinks = new HashMap<Id,List<Id<Link>>>();
 		Map<Id,List<Id>> fromNodes = new HashMap<Id,List<Id>>();
 		Map<Coord,Node> existingNodes = new HashMap<Coord,Node>();
 		// Copy Nodes from original Network to new Network
@@ -51,7 +51,7 @@ class NetworkEnricher {
 		for(Id linkId: inputNet.getLinks().keySet()){
 			Link link = inputNet.getLinks().get(linkId);
 			if(shapedLinks.containsKey(linkId)){				
-				List<Id> newLinks = new ArrayList<Id>();
+				List<Id<Link>> newLinks = new ArrayList<Id<Link>>();
 				Node n1 = sc.getNetwork().getNodes().get(link.getFromNode().getId());
 				Node n2;
 				int shapeCounter = 1;
@@ -154,7 +154,7 @@ class NetworkEnricher {
 		// ReplaceLinks in Netroute
 		for(Id id: netRoutes.keySet()){
 			NetworkRoute route = netRoutes.get(id);
-			LinkedList<Id> routeIds = new LinkedList<Id>();
+			LinkedList<Id<Link>> routeIds = new LinkedList<Id<Link>>();
 			for(Id routedLinkId: route.getLinkIds()){
 				if(replacedLinks.containsKey(routedLinkId)){
 					routeIds.addAll(replacedLinks.get(routedLinkId));

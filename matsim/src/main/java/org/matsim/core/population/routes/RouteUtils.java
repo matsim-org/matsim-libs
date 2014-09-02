@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -47,7 +46,7 @@ public class RouteUtils {
 	 * @return
 	 */
 	public static List<Node> getNodes(final NetworkRoute route, final Network network) {
-		List<Id> linkIds = route.getLinkIds();
+		List<Id<Link>> linkIds = route.getLinkIds();
 		List<Node> nodes = new ArrayList<Node>(linkIds.size() + 1);
 		if ((linkIds.size() > 0)) {
 			nodes.add(network.getLinks().get(linkIds.get(0)).getFromNode());
@@ -150,9 +149,9 @@ public class RouteUtils {
 	}
 	
 
-	public static NetworkRoute createNetworkRoute(List<Id> routeLinkIds, final Network network) {
+	public static NetworkRoute createNetworkRoute(List<Id<Link>> routeLinkIds, final Network network) {
 		Id startLinkId = routeLinkIds.get(0);
-		List<Id> linksBetween = (routeLinkIds.size() > 2) ? routeLinkIds.subList(1, routeLinkIds.size() - 1) : new ArrayList<Id>(0);
+		List<Id<Link>> linksBetween = (routeLinkIds.size() > 2) ? routeLinkIds.subList(1, routeLinkIds.size() - 1) : new ArrayList<Id<Link>>(0);
 		Id endLinkId = routeLinkIds.get(routeLinkIds.size() - 1);
 		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
 		route.setLinkIds(startLinkId, linksBetween, endLinkId);

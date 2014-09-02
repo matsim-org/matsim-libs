@@ -122,7 +122,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 
 		// now add route info to the schedule
 		NetworkRoute route = new LinkNetworkRouteImpl(l1.getId(), l4.getId());
-		List<Id> links = new ArrayList<Id>(2);
+		List<Id<Link>> links = new ArrayList<Id<Link>>(2);
 		links.add(l2.getId());
 		links.add(l3.getId());
 		route.setLinkIds(l1.getId(), links, l4.getId());
@@ -183,8 +183,8 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 					assertNotNull("bad network route, must not be null.", netRouteA);
 					assertEquals("wrong start link.", netRouteE.getStartLinkId(), netRouteA.getStartLinkId());
 					assertEquals("wrong end link.", netRouteE.getEndLinkId(), netRouteA.getEndLinkId());
-					List<Id> linkIdsE = netRouteE.getLinkIds();
-					List<Id> linkIdsA = netRouteA.getLinkIds();
+					List<Id<Link>> linkIdsE = netRouteE.getLinkIds();
+					List<Id<Link>> linkIdsA = netRouteA.getLinkIds();
 					for (int i = 0, n = linkIdsE.size(); i < n; i++) {
 						assertEquals("wrong link in network route", linkIdsE.get(i), linkIdsA.get(i));
 					}

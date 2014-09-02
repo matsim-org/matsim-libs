@@ -22,6 +22,11 @@
  */
 package playground.ikaddoura.internalizationPt;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -33,7 +38,11 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -47,18 +56,19 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
 import org.matsim.vehicles.Vehicles;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class MarginalCostPricingPtHandlerTest  {
 
@@ -1877,20 +1887,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		Activity lastActLink6 = popFactory.createActivityFromCoord("w", coord6);
 		
 		Leg leg_1_2 = popFactory.createLeg("pt");
-		List<Id> linkIds12 = new ArrayList<Id>();
+		List<Id<Link>> linkIds12 = new ArrayList<Id<Link>>();
 		NetworkRoute route12 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId2);
 		route12.setLinkIds(linkId1, linkIds12, linkId2);
 		leg_1_2.setRoute(route12);
 		
 		Leg leg_1_3 = popFactory.createLeg("pt");
-		List<Id> linkIds13 = new ArrayList<Id>();
+		List<Id<Link>> linkIds13 = new ArrayList<Id<Link>>();
 		linkIds13.add(linkId2);
 		NetworkRoute route13 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route13.setLinkIds(linkId1, linkIds13, linkId3);
 		leg_1_3.setRoute(route13);
 		
 		Leg leg_1_4 = popFactory.createLeg("pt");
-		List<Id> linkIds14 = new ArrayList<Id>();
+		List<Id<Link>> linkIds14 = new ArrayList<Id<Link>>();
 		linkIds14.add(linkId2);
 		linkIds14.add(linkId3);
 		NetworkRoute route14 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -1898,7 +1908,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_4.setRoute(route14);
 		
 		Leg leg_1_5 = popFactory.createLeg("pt");
-		List<Id> linkIds15 = new ArrayList<Id>();
+		List<Id<Link>> linkIds15 = new ArrayList<Id<Link>>();
 		linkIds15.add(linkId2);
 		linkIds15.add(linkId3);
 		linkIds15.add(linkId4);
@@ -1907,7 +1917,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_5.setRoute(route15);
 		
 		Leg leg_1_6 = popFactory.createLeg("pt");
-		List<Id> linkIds16 = new ArrayList<Id>();
+		List<Id<Link>> linkIds16 = new ArrayList<Id<Link>>();
 		linkIds16.add(linkId2);
 		linkIds16.add(linkId3);
 		linkIds16.add(linkId4);
@@ -1917,20 +1927,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_6.setRoute(route16);
 		
 		Leg leg_2_3 = popFactory.createLeg("pt");
-		List<Id> linkIds23 = new ArrayList<Id>();
+		List<Id<Link>> linkIds23 = new ArrayList<Id<Link>>();
 		NetworkRoute route23 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId3);
 		route23.setLinkIds(linkId2, linkIds23, linkId3);
 		leg_2_3.setRoute(route23);
 		
 		Leg leg_2_4 = popFactory.createLeg("pt");
-		List<Id> linkIds24 = new ArrayList<Id>();
+		List<Id<Link>> linkIds24 = new ArrayList<Id<Link>>();
 		linkIds24.add(linkId3);
 		NetworkRoute route24 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId4);
 		route24.setLinkIds(linkId2, linkIds24, linkId4);
 		leg_2_4.setRoute(route24);
 		
 		Leg leg_2_5 = popFactory.createLeg("pt");
-		List<Id> linkIds25 = new ArrayList<Id>();
+		List<Id<Link>> linkIds25 = new ArrayList<Id<Link>>();
 		linkIds25.add(linkId3);
 		linkIds25.add(linkId4);
 		NetworkRoute route25 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId5);
@@ -1938,7 +1948,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_5.setRoute(route25);
 		
 		Leg leg_2_6 = popFactory.createLeg("pt");
-		List<Id> linkIds26 = new ArrayList<Id>();
+		List<Id<Link>> linkIds26 = new ArrayList<Id<Link>>();
 		linkIds26.add(linkId3);
 		linkIds26.add(linkId4);
 		linkIds26.add(linkId5);
@@ -1947,20 +1957,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_6.setRoute(route26);
 		
 		Leg leg_3_4 = popFactory.createLeg("pt");
-		List<Id> linkIds34 = new ArrayList<Id>();
+		List<Id<Link>> linkIds34 = new ArrayList<Id<Link>>();
 		NetworkRoute route34 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId4);
 		route34.setLinkIds(linkId3, linkIds34, linkId4);
 		leg_3_4.setRoute(route34);
 		
 		Leg leg_3_5 = popFactory.createLeg("pt");
-		List<Id> linkIds35 = new ArrayList<Id>();
+		List<Id<Link>> linkIds35 = new ArrayList<Id<Link>>();
 		linkIds35.add(linkId4);
 		NetworkRoute route35 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId5);
 		route35.setLinkIds(linkId3, linkIds35, linkId5);
 		leg_3_5.setRoute(route35);
 		
 		Leg leg_3_6 = popFactory.createLeg("pt");
-		List<Id> linkIds36 = new ArrayList<Id>();
+		List<Id<Link>> linkIds36 = new ArrayList<Id<Link>>();
 		linkIds36.add(linkId4);
 		linkIds36.add(linkId5);
 		NetworkRoute route36 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId6);
@@ -1968,20 +1978,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_3_6.setRoute(route36);
 		
 		Leg leg_4_5 = popFactory.createLeg("pt");
-		List<Id> linkIds45 = new ArrayList<Id>();
+		List<Id<Link>> linkIds45 = new ArrayList<Id<Link>>();
 		NetworkRoute route45 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId5);
 		route45.setLinkIds(linkId4, linkIds45, linkId5);
 		leg_4_5.setRoute(route45);
 		
 		Leg leg_4_6 = popFactory.createLeg("pt");
-		List<Id> linkIds46 = new ArrayList<Id>();
+		List<Id<Link>> linkIds46 = new ArrayList<Id<Link>>();
 		linkIds46.add(linkId5);
 		NetworkRoute route46 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId6);
 		route46.setLinkIds(linkId4, linkIds46, linkId6);
 		leg_4_6.setRoute(route46);
 		
 		Leg leg_5_6 = popFactory.createLeg("pt");
-		List<Id> linkIds56 = new ArrayList<Id>();
+		List<Id<Link>> linkIds56 = new ArrayList<Id<Link>>();
 		NetworkRoute route56 = (NetworkRoute) routeFactory.createRoute(linkId5, linkId6);
 		route56.setLinkIds(linkId5, linkIds56, linkId6);
 		leg_5_6.setRoute(route56);
@@ -2050,13 +2060,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id> lineIds = new ArrayList<Id>();
+		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
 		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
-		List<Id> LinkIds = new ArrayList<Id>();
+		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
 		LinkIds.add(linkId2);
 		LinkIds.add(linkId3);
 		LinkIds.add(linkId4);
@@ -2151,7 +2161,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		Activity lastActLink6 = popFactory.createActivityFromCoord("w", coord6);
 			
 		Leg leg_1_6 = popFactory.createLeg("pt");
-		List<Id> linkIds16 = new ArrayList<Id>();
+		List<Id<Link>> linkIds16 = new ArrayList<Id<Link>>();
 		linkIds16.add(linkId2);
 		linkIds16.add(linkId3);
 		linkIds16.add(linkId4);
@@ -2161,13 +2171,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_6.setRoute(route16);
 		
 		Leg leg_3_4 = popFactory.createLeg("pt");
-		List<Id> linkIds34 = new ArrayList<Id>();
+		List<Id<Link>> linkIds34 = new ArrayList<Id<Link>>();
 		NetworkRoute route34 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId4);
 		route34.setLinkIds(linkId3, linkIds34, linkId4);
 		leg_3_4.setRoute(route34);
 
 		Leg leg_2_3 = popFactory.createLeg("pt");
-		List<Id> linkIds23 = new ArrayList<Id>();
+		List<Id<Link>> linkIds23 = new ArrayList<Id<Link>>();
 		NetworkRoute route23 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId3);
 		route23.setLinkIds(linkId2, linkIds23, linkId3);
 		leg_2_3.setRoute(route23);
@@ -2249,13 +2259,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id> lineIds = new ArrayList<Id>();
+		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
 		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
-		List<Id> LinkIds = new ArrayList<Id>();
+		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
 		LinkIds.add(linkId2);
 		LinkIds.add(linkId3);
 		LinkIds.add(linkId4);
@@ -2352,20 +2362,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		Activity lastActLink6 = popFactory.createActivityFromCoord("w", coord6);
 		
 		Leg leg_1_2 = popFactory.createLeg("pt");
-		List<Id> linkIds12 = new ArrayList<Id>();
+		List<Id<Link>> linkIds12 = new ArrayList<Id<Link>>();
 		NetworkRoute route12 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId2);
 		route12.setLinkIds(linkId1, linkIds12, linkId2);
 		leg_1_2.setRoute(route12);
 		
 		Leg leg_1_3 = popFactory.createLeg("pt");
-		List<Id> linkIds13 = new ArrayList<Id>();
+		List<Id<Link>> linkIds13 = new ArrayList<Id<Link>>();
 		linkIds13.add(linkId2);
 		NetworkRoute route13 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route13.setLinkIds(linkId1, linkIds13, linkId3);
 		leg_1_3.setRoute(route13);
 		
 		Leg leg_1_4 = popFactory.createLeg("pt");
-		List<Id> linkIds14 = new ArrayList<Id>();
+		List<Id<Link>> linkIds14 = new ArrayList<Id<Link>>();
 		linkIds14.add(linkId2);
 		linkIds14.add(linkId3);
 		NetworkRoute route14 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -2373,7 +2383,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_4.setRoute(route14);
 		
 		Leg leg_1_5 = popFactory.createLeg("pt");
-		List<Id> linkIds15 = new ArrayList<Id>();
+		List<Id<Link>> linkIds15 = new ArrayList<Id<Link>>();
 		linkIds15.add(linkId2);
 		linkIds15.add(linkId3);
 		linkIds15.add(linkId4);
@@ -2382,7 +2392,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_5.setRoute(route15);
 		
 		Leg leg_1_6 = popFactory.createLeg("pt");
-		List<Id> linkIds16 = new ArrayList<Id>();
+		List<Id<Link>> linkIds16 = new ArrayList<Id<Link>>();
 		linkIds16.add(linkId2);
 		linkIds16.add(linkId3);
 		linkIds16.add(linkId4);
@@ -2392,20 +2402,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_6.setRoute(route16);
 		
 		Leg leg_2_3 = popFactory.createLeg("pt");
-		List<Id> linkIds23 = new ArrayList<Id>();
+		List<Id<Link>> linkIds23 = new ArrayList<Id<Link>>();
 		NetworkRoute route23 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId3);
 		route23.setLinkIds(linkId2, linkIds23, linkId3);
 		leg_2_3.setRoute(route23);
 		
 		Leg leg_2_4 = popFactory.createLeg("pt");
-		List<Id> linkIds24 = new ArrayList<Id>();
+		List<Id<Link>> linkIds24 = new ArrayList<Id<Link>>();
 		linkIds24.add(linkId3);
 		NetworkRoute route24 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId4);
 		route24.setLinkIds(linkId2, linkIds24, linkId4);
 		leg_2_4.setRoute(route24);
 		
 		Leg leg_2_5 = popFactory.createLeg("pt");
-		List<Id> linkIds25 = new ArrayList<Id>();
+		List<Id<Link>> linkIds25 = new ArrayList<Id<Link>>();
 		linkIds25.add(linkId3);
 		linkIds25.add(linkId4);
 		NetworkRoute route25 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId5);
@@ -2413,7 +2423,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_5.setRoute(route25);
 		
 		Leg leg_2_6 = popFactory.createLeg("pt");
-		List<Id> linkIds26 = new ArrayList<Id>();
+		List<Id<Link>> linkIds26 = new ArrayList<Id<Link>>();
 		linkIds26.add(linkId3);
 		linkIds26.add(linkId4);
 		linkIds26.add(linkId5);
@@ -2422,20 +2432,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_6.setRoute(route26);
 		
 		Leg leg_3_4 = popFactory.createLeg("pt");
-		List<Id> linkIds34 = new ArrayList<Id>();
+		List<Id<Link>> linkIds34 = new ArrayList<Id<Link>>();
 		NetworkRoute route34 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId4);
 		route34.setLinkIds(linkId3, linkIds34, linkId4);
 		leg_3_4.setRoute(route34);
 		
 		Leg leg_3_5 = popFactory.createLeg("pt");
-		List<Id> linkIds35 = new ArrayList<Id>();
+		List<Id<Link>> linkIds35 = new ArrayList<Id<Link>>();
 		linkIds35.add(linkId4);
 		NetworkRoute route35 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId5);
 		route35.setLinkIds(linkId3, linkIds35, linkId5);
 		leg_3_5.setRoute(route35);
 		
 		Leg leg_3_6 = popFactory.createLeg("pt");
-		List<Id> linkIds36 = new ArrayList<Id>();
+		List<Id<Link>> linkIds36 = new ArrayList<Id<Link>>();
 		linkIds36.add(linkId4);
 		linkIds36.add(linkId5);
 		NetworkRoute route36 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId6);
@@ -2443,20 +2453,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_3_6.setRoute(route36);
 		
 		Leg leg_4_5 = popFactory.createLeg("pt");
-		List<Id> linkIds45 = new ArrayList<Id>();
+		List<Id<Link>> linkIds45 = new ArrayList<Id<Link>>();
 		NetworkRoute route45 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId5);
 		route45.setLinkIds(linkId4, linkIds45, linkId5);
 		leg_4_5.setRoute(route45);
 		
 		Leg leg_4_6 = popFactory.createLeg("pt");
-		List<Id> linkIds46 = new ArrayList<Id>();
+		List<Id<Link>> linkIds46 = new ArrayList<Id<Link>>();
 		linkIds46.add(linkId5);
 		NetworkRoute route46 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId6);
 		route46.setLinkIds(linkId4, linkIds46, linkId6);
 		leg_4_6.setRoute(route46);
 		
 		Leg leg_5_6 = popFactory.createLeg("pt");
-		List<Id> linkIds56 = new ArrayList<Id>();
+		List<Id<Link>> linkIds56 = new ArrayList<Id<Link>>();
 		NetworkRoute route56 = (NetworkRoute) routeFactory.createRoute(linkId5, linkId6);
 		route56.setLinkIds(linkId5, linkIds56, linkId6);
 		leg_5_6.setRoute(route56);
@@ -2564,13 +2574,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id> lineIds = new ArrayList<Id>();
+		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
 		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
-		List<Id> LinkIds = new ArrayList<Id>();
+		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
 		LinkIds.add(linkId2);
 		LinkIds.add(linkId3);
 		LinkIds.add(linkId4);
@@ -2666,20 +2676,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		Activity lastActLink6 = popFactory.createActivityFromCoord("w", coord6);
 		
 		Leg leg_1_2 = popFactory.createLeg("pt");
-		List<Id> linkIds12 = new ArrayList<Id>();
+		List<Id<Link>> linkIds12 = new ArrayList<Id<Link>>();
 		NetworkRoute route12 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId2);
 		route12.setLinkIds(linkId1, linkIds12, linkId2);
 		leg_1_2.setRoute(route12);
 		
 		Leg leg_1_3 = popFactory.createLeg("pt");
-		List<Id> linkIds13 = new ArrayList<Id>();
+		List<Id<Link>> linkIds13 = new ArrayList<Id<Link>>();
 		linkIds13.add(linkId2);
 		NetworkRoute route13 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route13.setLinkIds(linkId1, linkIds13, linkId3);
 		leg_1_3.setRoute(route13);
 		
 		Leg leg_1_4 = popFactory.createLeg("pt");
-		List<Id> linkIds14 = new ArrayList<Id>();
+		List<Id<Link>> linkIds14 = new ArrayList<Id<Link>>();
 		linkIds14.add(linkId2);
 		linkIds14.add(linkId3);
 		NetworkRoute route14 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -2687,7 +2697,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_4.setRoute(route14);
 		
 		Leg leg_1_5 = popFactory.createLeg("pt");
-		List<Id> linkIds15 = new ArrayList<Id>();
+		List<Id<Link>> linkIds15 = new ArrayList<Id<Link>>();
 		linkIds15.add(linkId2);
 		linkIds15.add(linkId3);
 		linkIds15.add(linkId4);
@@ -2696,7 +2706,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_5.setRoute(route15);
 		
 		Leg leg_1_6 = popFactory.createLeg("pt");
-		List<Id> linkIds16 = new ArrayList<Id>();
+		List<Id<Link>> linkIds16 = new ArrayList<Id<Link>>();
 		linkIds16.add(linkId2);
 		linkIds16.add(linkId3);
 		linkIds16.add(linkId4);
@@ -2706,20 +2716,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_6.setRoute(route16);
 		
 		Leg leg_2_3 = popFactory.createLeg("pt");
-		List<Id> linkIds23 = new ArrayList<Id>();
+		List<Id<Link>> linkIds23 = new ArrayList<Id<Link>>();
 		NetworkRoute route23 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId3);
 		route23.setLinkIds(linkId2, linkIds23, linkId3);
 		leg_2_3.setRoute(route23);
 		
 		Leg leg_2_4 = popFactory.createLeg("pt");
-		List<Id> linkIds24 = new ArrayList<Id>();
+		List<Id<Link>> linkIds24 = new ArrayList<Id<Link>>();
 		linkIds24.add(linkId3);
 		NetworkRoute route24 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId4);
 		route24.setLinkIds(linkId2, linkIds24, linkId4);
 		leg_2_4.setRoute(route24);
 		
 		Leg leg_2_5 = popFactory.createLeg("pt");
-		List<Id> linkIds25 = new ArrayList<Id>();
+		List<Id<Link>> linkIds25 = new ArrayList<Id<Link>>();
 		linkIds25.add(linkId3);
 		linkIds25.add(linkId4);
 		NetworkRoute route25 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId5);
@@ -2727,7 +2737,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_5.setRoute(route25);
 		
 		Leg leg_2_6 = popFactory.createLeg("pt");
-		List<Id> linkIds26 = new ArrayList<Id>();
+		List<Id<Link>> linkIds26 = new ArrayList<Id<Link>>();
 		linkIds26.add(linkId3);
 		linkIds26.add(linkId4);
 		linkIds26.add(linkId5);
@@ -2736,20 +2746,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_6.setRoute(route26);
 		
 		Leg leg_3_4 = popFactory.createLeg("pt");
-		List<Id> linkIds34 = new ArrayList<Id>();
+		List<Id<Link>> linkIds34 = new ArrayList<Id<Link>>();
 		NetworkRoute route34 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId4);
 		route34.setLinkIds(linkId3, linkIds34, linkId4);
 		leg_3_4.setRoute(route34);
 		
 		Leg leg_3_5 = popFactory.createLeg("pt");
-		List<Id> linkIds35 = new ArrayList<Id>();
+		List<Id<Link>> linkIds35 = new ArrayList<Id<Link>>();
 		linkIds35.add(linkId4);
 		NetworkRoute route35 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId5);
 		route35.setLinkIds(linkId3, linkIds35, linkId5);
 		leg_3_5.setRoute(route35);
 		
 		Leg leg_3_6 = popFactory.createLeg("pt");
-		List<Id> linkIds36 = new ArrayList<Id>();
+		List<Id<Link>> linkIds36 = new ArrayList<Id<Link>>();
 		linkIds36.add(linkId4);
 		linkIds36.add(linkId5);
 		NetworkRoute route36 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId6);
@@ -2757,20 +2767,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_3_6.setRoute(route36);
 		
 		Leg leg_4_5 = popFactory.createLeg("pt");
-		List<Id> linkIds45 = new ArrayList<Id>();
+		List<Id<Link>> linkIds45 = new ArrayList<Id<Link>>();
 		NetworkRoute route45 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId5);
 		route45.setLinkIds(linkId4, linkIds45, linkId5);
 		leg_4_5.setRoute(route45);
 		
 		Leg leg_4_6 = popFactory.createLeg("pt");
-		List<Id> linkIds46 = new ArrayList<Id>();
+		List<Id<Link>> linkIds46 = new ArrayList<Id<Link>>();
 		linkIds46.add(linkId5);
 		NetworkRoute route46 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId6);
 		route46.setLinkIds(linkId4, linkIds46, linkId6);
 		leg_4_6.setRoute(route46);
 		
 		Leg leg_5_6 = popFactory.createLeg("pt");
-		List<Id> linkIds56 = new ArrayList<Id>();
+		List<Id<Link>> linkIds56 = new ArrayList<Id<Link>>();
 		NetworkRoute route56 = (NetworkRoute) routeFactory.createRoute(linkId5, linkId6);
 		route56.setLinkIds(linkId5, linkIds56, linkId6);
 		leg_5_6.setRoute(route56);
@@ -2839,13 +2849,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id> lineIds = new ArrayList<Id>();
+		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
 		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
-		List<Id> LinkIds = new ArrayList<Id>();
+		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
 		LinkIds.add(linkId2);
 		LinkIds.add(linkId3);
 		LinkIds.add(linkId4);
@@ -2941,20 +2951,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		Activity lastActLink6 = popFactory.createActivityFromCoord("w", coord6);
 		
 		Leg leg_1_2 = popFactory.createLeg("pt");
-		List<Id> linkIds12 = new ArrayList<Id>();
+		List<Id<Link>> linkIds12 = new ArrayList<Id<Link>>();
 		NetworkRoute route12 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId2);
 		route12.setLinkIds(linkId1, linkIds12, linkId2);
 		leg_1_2.setRoute(route12);
 		
 		Leg leg_1_3 = popFactory.createLeg("pt");
-		List<Id> linkIds13 = new ArrayList<Id>();
+		List<Id<Link>> linkIds13 = new ArrayList<Id<Link>>();
 		linkIds13.add(linkId2);
 		NetworkRoute route13 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route13.setLinkIds(linkId1, linkIds13, linkId3);
 		leg_1_3.setRoute(route13);
 		
 		Leg leg_1_4 = popFactory.createLeg("pt");
-		List<Id> linkIds14 = new ArrayList<Id>();
+		List<Id<Link>> linkIds14 = new ArrayList<Id<Link>>();
 		linkIds14.add(linkId2);
 		linkIds14.add(linkId3);
 		NetworkRoute route14 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -2962,7 +2972,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_4.setRoute(route14);
 		
 		Leg leg_1_5 = popFactory.createLeg("pt");
-		List<Id> linkIds15 = new ArrayList<Id>();
+		List<Id<Link>> linkIds15 = new ArrayList<Id<Link>>();
 		linkIds15.add(linkId2);
 		linkIds15.add(linkId3);
 		linkIds15.add(linkId4);
@@ -2971,7 +2981,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_5.setRoute(route15);
 		
 		Leg leg_1_6 = popFactory.createLeg("pt");
-		List<Id> linkIds16 = new ArrayList<Id>();
+		List<Id<Link>> linkIds16 = new ArrayList<Id<Link>>();
 		linkIds16.add(linkId2);
 		linkIds16.add(linkId3);
 		linkIds16.add(linkId4);
@@ -2981,20 +2991,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_6.setRoute(route16);
 		
 		Leg leg_2_3 = popFactory.createLeg("pt");
-		List<Id> linkIds23 = new ArrayList<Id>();
+		List<Id<Link>> linkIds23 = new ArrayList<Id<Link>>();
 		NetworkRoute route23 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId3);
 		route23.setLinkIds(linkId2, linkIds23, linkId3);
 		leg_2_3.setRoute(route23);
 		
 		Leg leg_2_4 = popFactory.createLeg("pt");
-		List<Id> linkIds24 = new ArrayList<Id>();
+		List<Id<Link>> linkIds24 = new ArrayList<Id<Link>>();
 		linkIds24.add(linkId3);
 		NetworkRoute route24 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId4);
 		route24.setLinkIds(linkId2, linkIds24, linkId4);
 		leg_2_4.setRoute(route24);
 		
 		Leg leg_2_5 = popFactory.createLeg("pt");
-		List<Id> linkIds25 = new ArrayList<Id>();
+		List<Id<Link>> linkIds25 = new ArrayList<Id<Link>>();
 		linkIds25.add(linkId3);
 		linkIds25.add(linkId4);
 		NetworkRoute route25 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId5);
@@ -3002,7 +3012,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_5.setRoute(route25);
 		
 		Leg leg_2_6 = popFactory.createLeg("pt");
-		List<Id> linkIds26 = new ArrayList<Id>();
+		List<Id<Link>> linkIds26 = new ArrayList<Id<Link>>();
 		linkIds26.add(linkId3);
 		linkIds26.add(linkId4);
 		linkIds26.add(linkId5);
@@ -3011,20 +3021,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_6.setRoute(route26);
 		
 		Leg leg_3_4 = popFactory.createLeg("pt");
-		List<Id> linkIds34 = new ArrayList<Id>();
+		List<Id<Link>> linkIds34 = new ArrayList<Id<Link>>();
 		NetworkRoute route34 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId4);
 		route34.setLinkIds(linkId3, linkIds34, linkId4);
 		leg_3_4.setRoute(route34);
 		
 		Leg leg_3_5 = popFactory.createLeg("pt");
-		List<Id> linkIds35 = new ArrayList<Id>();
+		List<Id<Link>> linkIds35 = new ArrayList<Id<Link>>();
 		linkIds35.add(linkId4);
 		NetworkRoute route35 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId5);
 		route35.setLinkIds(linkId3, linkIds35, linkId5);
 		leg_3_5.setRoute(route35);
 		
 		Leg leg_3_6 = popFactory.createLeg("pt");
-		List<Id> linkIds36 = new ArrayList<Id>();
+		List<Id<Link>> linkIds36 = new ArrayList<Id<Link>>();
 		linkIds36.add(linkId4);
 		linkIds36.add(linkId5);
 		NetworkRoute route36 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId6);
@@ -3032,20 +3042,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_3_6.setRoute(route36);
 		
 		Leg leg_4_5 = popFactory.createLeg("pt");
-		List<Id> linkIds45 = new ArrayList<Id>();
+		List<Id<Link>> linkIds45 = new ArrayList<Id<Link>>();
 		NetworkRoute route45 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId5);
 		route45.setLinkIds(linkId4, linkIds45, linkId5);
 		leg_4_5.setRoute(route45);
 		
 		Leg leg_4_6 = popFactory.createLeg("pt");
-		List<Id> linkIds46 = new ArrayList<Id>();
+		List<Id<Link>> linkIds46 = new ArrayList<Id<Link>>();
 		linkIds46.add(linkId5);
 		NetworkRoute route46 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId6);
 		route46.setLinkIds(linkId4, linkIds46, linkId6);
 		leg_4_6.setRoute(route46);
 		
 		Leg leg_5_6 = popFactory.createLeg("pt");
-		List<Id> linkIds56 = new ArrayList<Id>();
+		List<Id<Link>> linkIds56 = new ArrayList<Id<Link>>();
 		NetworkRoute route56 = (NetworkRoute) routeFactory.createRoute(linkId5, linkId6);
 		route56.setLinkIds(linkId5, linkIds56, linkId6);
 		leg_5_6.setRoute(route56);
@@ -3114,13 +3124,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id> lineIds = new ArrayList<Id>();
+		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
 		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
-		List<Id> LinkIds = new ArrayList<Id>();
+		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
 		LinkIds.add(linkId2);
 		LinkIds.add(linkId3);
 		LinkIds.add(linkId4);
@@ -3216,20 +3226,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		Activity lastActLink6 = popFactory.createActivityFromCoord("w", coord6);
 		
 		Leg leg_1_2 = popFactory.createLeg("pt");
-		List<Id> linkIds12 = new ArrayList<Id>();
+		List<Id<Link>> linkIds12 = new ArrayList<Id<Link>>();
 		NetworkRoute route12 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId2);
 		route12.setLinkIds(linkId1, linkIds12, linkId2);
 		leg_1_2.setRoute(route12);
 		
 		Leg leg_1_3 = popFactory.createLeg("pt");
-		List<Id> linkIds13 = new ArrayList<Id>();
+		List<Id<Link>> linkIds13 = new ArrayList<Id<Link>>();
 		linkIds13.add(linkId2);
 		NetworkRoute route13 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route13.setLinkIds(linkId1, linkIds13, linkId3);
 		leg_1_3.setRoute(route13);
 		
 		Leg leg_1_4 = popFactory.createLeg("pt");
-		List<Id> linkIds14 = new ArrayList<Id>();
+		List<Id<Link>> linkIds14 = new ArrayList<Id<Link>>();
 		linkIds14.add(linkId2);
 		linkIds14.add(linkId3);
 		NetworkRoute route14 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -3237,7 +3247,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_4.setRoute(route14);
 		
 		Leg leg_1_5 = popFactory.createLeg("pt");
-		List<Id> linkIds15 = new ArrayList<Id>();
+		List<Id<Link>> linkIds15 = new ArrayList<Id<Link>>();
 		linkIds15.add(linkId2);
 		linkIds15.add(linkId3);
 		linkIds15.add(linkId4);
@@ -3246,7 +3256,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_5.setRoute(route15);
 		
 		Leg leg_1_6 = popFactory.createLeg("pt");
-		List<Id> linkIds16 = new ArrayList<Id>();
+		List<Id<Link>> linkIds16 = new ArrayList<Id<Link>>();
 		linkIds16.add(linkId2);
 		linkIds16.add(linkId3);
 		linkIds16.add(linkId4);
@@ -3256,20 +3266,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_6.setRoute(route16);
 		
 		Leg leg_2_3 = popFactory.createLeg("pt");
-		List<Id> linkIds23 = new ArrayList<Id>();
+		List<Id<Link>> linkIds23 = new ArrayList<Id<Link>>();
 		NetworkRoute route23 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId3);
 		route23.setLinkIds(linkId2, linkIds23, linkId3);
 		leg_2_3.setRoute(route23);
 		
 		Leg leg_2_4 = popFactory.createLeg("pt");
-		List<Id> linkIds24 = new ArrayList<Id>();
+		List<Id<Link>> linkIds24 = new ArrayList<Id<Link>>();
 		linkIds24.add(linkId3);
 		NetworkRoute route24 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId4);
 		route24.setLinkIds(linkId2, linkIds24, linkId4);
 		leg_2_4.setRoute(route24);
 		
 		Leg leg_2_5 = popFactory.createLeg("pt");
-		List<Id> linkIds25 = new ArrayList<Id>();
+		List<Id<Link>> linkIds25 = new ArrayList<Id<Link>>();
 		linkIds25.add(linkId3);
 		linkIds25.add(linkId4);
 		NetworkRoute route25 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId5);
@@ -3277,7 +3287,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_5.setRoute(route25);
 		
 		Leg leg_2_6 = popFactory.createLeg("pt");
-		List<Id> linkIds26 = new ArrayList<Id>();
+		List<Id<Link>> linkIds26 = new ArrayList<Id<Link>>();
 		linkIds26.add(linkId3);
 		linkIds26.add(linkId4);
 		linkIds26.add(linkId5);
@@ -3286,20 +3296,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_6.setRoute(route26);
 		
 		Leg leg_3_4 = popFactory.createLeg("pt");
-		List<Id> linkIds34 = new ArrayList<Id>();
+		List<Id<Link>> linkIds34 = new ArrayList<Id<Link>>();
 		NetworkRoute route34 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId4);
 		route34.setLinkIds(linkId3, linkIds34, linkId4);
 		leg_3_4.setRoute(route34);
 		
 		Leg leg_3_5 = popFactory.createLeg("pt");
-		List<Id> linkIds35 = new ArrayList<Id>();
+		List<Id<Link>> linkIds35 = new ArrayList<Id<Link>>();
 		linkIds35.add(linkId4);
 		NetworkRoute route35 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId5);
 		route35.setLinkIds(linkId3, linkIds35, linkId5);
 		leg_3_5.setRoute(route35);
 		
 		Leg leg_3_6 = popFactory.createLeg("pt");
-		List<Id> linkIds36 = new ArrayList<Id>();
+		List<Id<Link>> linkIds36 = new ArrayList<Id<Link>>();
 		linkIds36.add(linkId4);
 		linkIds36.add(linkId5);
 		NetworkRoute route36 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId6);
@@ -3307,20 +3317,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_3_6.setRoute(route36);
 		
 		Leg leg_4_5 = popFactory.createLeg("pt");
-		List<Id> linkIds45 = new ArrayList<Id>();
+		List<Id<Link>> linkIds45 = new ArrayList<Id<Link>>();
 		NetworkRoute route45 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId5);
 		route45.setLinkIds(linkId4, linkIds45, linkId5);
 		leg_4_5.setRoute(route45);
 		
 		Leg leg_4_6 = popFactory.createLeg("pt");
-		List<Id> linkIds46 = new ArrayList<Id>();
+		List<Id<Link>> linkIds46 = new ArrayList<Id<Link>>();
 		linkIds46.add(linkId5);
 		NetworkRoute route46 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId6);
 		route46.setLinkIds(linkId4, linkIds46, linkId6);
 		leg_4_6.setRoute(route46);
 		
 		Leg leg_5_6 = popFactory.createLeg("pt");
-		List<Id> linkIds56 = new ArrayList<Id>();
+		List<Id<Link>> linkIds56 = new ArrayList<Id<Link>>();
 		NetworkRoute route56 = (NetworkRoute) routeFactory.createRoute(linkId5, linkId6);
 		route56.setLinkIds(linkId5, linkIds56, linkId6);
 		leg_5_6.setRoute(route56);
@@ -3389,13 +3399,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id> lineIds = new ArrayList<Id>();
+		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
 		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
-		List<Id> LinkIds = new ArrayList<Id>();
+		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
 		LinkIds.add(linkId2);
 		LinkIds.add(linkId3);
 		LinkIds.add(linkId4);
@@ -3502,20 +3512,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		Activity lastActLink6 = popFactory.createActivityFromCoord("w", coord6);
 		
 		Leg leg_1_2 = popFactory.createLeg("pt");
-		List<Id> linkIds12 = new ArrayList<Id>();
+		List<Id<Link>> linkIds12 = new ArrayList<Id<Link>>();
 		NetworkRoute route12 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId2);
 		route12.setLinkIds(linkId1, linkIds12, linkId2);
 		leg_1_2.setRoute(route12);
 		
 		Leg leg_1_3 = popFactory.createLeg("pt");
-		List<Id> linkIds13 = new ArrayList<Id>();
+		List<Id<Link>> linkIds13 = new ArrayList<Id<Link>>();
 		linkIds13.add(linkId2);
 		NetworkRoute route13 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route13.setLinkIds(linkId1, linkIds13, linkId3);
 		leg_1_3.setRoute(route13);
 		
 		Leg leg_1_4 = popFactory.createLeg("pt");
-		List<Id> linkIds14 = new ArrayList<Id>();
+		List<Id<Link>> linkIds14 = new ArrayList<Id<Link>>();
 		linkIds14.add(linkId2);
 		linkIds14.add(linkId3);
 		NetworkRoute route14 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -3523,7 +3533,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_4.setRoute(route14);
 		
 		Leg leg_1_5 = popFactory.createLeg("pt");
-		List<Id> linkIds15 = new ArrayList<Id>();
+		List<Id<Link>> linkIds15 = new ArrayList<Id<Link>>();
 		linkIds15.add(linkId2);
 		linkIds15.add(linkId3);
 		linkIds15.add(linkId4);
@@ -3532,7 +3542,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_5.setRoute(route15);
 		
 		Leg leg_1_6 = popFactory.createLeg("pt");
-		List<Id> linkIds16 = new ArrayList<Id>();
+		List<Id<Link>> linkIds16 = new ArrayList<Id<Link>>();
 		linkIds16.add(linkId2);
 		linkIds16.add(linkId3);
 		linkIds16.add(linkId4);
@@ -3542,20 +3552,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_6.setRoute(route16);
 		
 		Leg leg_2_3 = popFactory.createLeg("pt");
-		List<Id> linkIds23 = new ArrayList<Id>();
+		List<Id<Link>> linkIds23 = new ArrayList<Id<Link>>();
 		NetworkRoute route23 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId3);
 		route23.setLinkIds(linkId2, linkIds23, linkId3);
 		leg_2_3.setRoute(route23);
 		
 		Leg leg_2_4 = popFactory.createLeg("pt");
-		List<Id> linkIds24 = new ArrayList<Id>();
+		List<Id<Link>> linkIds24 = new ArrayList<Id<Link>>();
 		linkIds24.add(linkId3);
 		NetworkRoute route24 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId4);
 		route24.setLinkIds(linkId2, linkIds24, linkId4);
 		leg_2_4.setRoute(route24);
 		
 		Leg leg_2_5 = popFactory.createLeg("pt");
-		List<Id> linkIds25 = new ArrayList<Id>();
+		List<Id<Link>> linkIds25 = new ArrayList<Id<Link>>();
 		linkIds25.add(linkId3);
 		linkIds25.add(linkId4);
 		NetworkRoute route25 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId5);
@@ -3563,7 +3573,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_5.setRoute(route25);
 		
 		Leg leg_2_6 = popFactory.createLeg("pt");
-		List<Id> linkIds26 = new ArrayList<Id>();
+		List<Id<Link>> linkIds26 = new ArrayList<Id<Link>>();
 		linkIds26.add(linkId3);
 		linkIds26.add(linkId4);
 		linkIds26.add(linkId5);
@@ -3572,20 +3582,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_6.setRoute(route26);
 		
 		Leg leg_3_4 = popFactory.createLeg("pt");
-		List<Id> linkIds34 = new ArrayList<Id>();
+		List<Id<Link>> linkIds34 = new ArrayList<Id<Link>>();
 		NetworkRoute route34 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId4);
 		route34.setLinkIds(linkId3, linkIds34, linkId4);
 		leg_3_4.setRoute(route34);
 		
 		Leg leg_3_5 = popFactory.createLeg("pt");
-		List<Id> linkIds35 = new ArrayList<Id>();
+		List<Id<Link>> linkIds35 = new ArrayList<Id<Link>>();
 		linkIds35.add(linkId4);
 		NetworkRoute route35 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId5);
 		route35.setLinkIds(linkId3, linkIds35, linkId5);
 		leg_3_5.setRoute(route35);
 		
 		Leg leg_3_6 = popFactory.createLeg("pt");
-		List<Id> linkIds36 = new ArrayList<Id>();
+		List<Id<Link>> linkIds36 = new ArrayList<Id<Link>>();
 		linkIds36.add(linkId4);
 		linkIds36.add(linkId5);
 		NetworkRoute route36 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId6);
@@ -3593,20 +3603,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_3_6.setRoute(route36);
 		
 		Leg leg_4_5 = popFactory.createLeg("pt");
-		List<Id> linkIds45 = new ArrayList<Id>();
+		List<Id<Link>> linkIds45 = new ArrayList<Id<Link>>();
 		NetworkRoute route45 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId5);
 		route45.setLinkIds(linkId4, linkIds45, linkId5);
 		leg_4_5.setRoute(route45);
 		
 		Leg leg_4_6 = popFactory.createLeg("pt");
-		List<Id> linkIds46 = new ArrayList<Id>();
+		List<Id<Link>> linkIds46 = new ArrayList<Id<Link>>();
 		linkIds46.add(linkId5);
 		NetworkRoute route46 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId6);
 		route46.setLinkIds(linkId4, linkIds46, linkId6);
 		leg_4_6.setRoute(route46);
 		
 		Leg leg_5_6 = popFactory.createLeg("pt");
-		List<Id> linkIds56 = new ArrayList<Id>();
+		List<Id<Link>> linkIds56 = new ArrayList<Id<Link>>();
 		NetworkRoute route56 = (NetworkRoute) routeFactory.createRoute(linkId5, linkId6);
 		route56.setLinkIds(linkId5, linkIds56, linkId6);
 		leg_5_6.setRoute(route56);
@@ -3675,13 +3685,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id> lineIds = new ArrayList<Id>();
+		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
 		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
-		List<Id> LinkIds = new ArrayList<Id>();
+		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
 		LinkIds.add(linkId2);
 		LinkIds.add(linkId3);
 		LinkIds.add(linkId4);
@@ -3788,20 +3798,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		Activity lastActLink6 = popFactory.createActivityFromCoord("w", coord6);
 		
 		Leg leg_1_2 = popFactory.createLeg("pt");
-		List<Id> linkIds12 = new ArrayList<Id>();
+		List<Id<Link>> linkIds12 = new ArrayList<Id<Link>>();
 		NetworkRoute route12 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId2);
 		route12.setLinkIds(linkId1, linkIds12, linkId2);
 		leg_1_2.setRoute(route12);
 		
 		Leg leg_1_3 = popFactory.createLeg("pt");
-		List<Id> linkIds13 = new ArrayList<Id>();
+		List<Id<Link>> linkIds13 = new ArrayList<Id<Link>>();
 		linkIds13.add(linkId2);
 		NetworkRoute route13 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route13.setLinkIds(linkId1, linkIds13, linkId3);
 		leg_1_3.setRoute(route13);
 		
 		Leg leg_1_4 = popFactory.createLeg("pt");
-		List<Id> linkIds14 = new ArrayList<Id>();
+		List<Id<Link>> linkIds14 = new ArrayList<Id<Link>>();
 		linkIds14.add(linkId2);
 		linkIds14.add(linkId3);
 		NetworkRoute route14 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -3809,7 +3819,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_4.setRoute(route14);
 		
 		Leg leg_1_5 = popFactory.createLeg("pt");
-		List<Id> linkIds15 = new ArrayList<Id>();
+		List<Id<Link>> linkIds15 = new ArrayList<Id<Link>>();
 		linkIds15.add(linkId2);
 		linkIds15.add(linkId3);
 		linkIds15.add(linkId4);
@@ -3818,7 +3828,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_5.setRoute(route15);
 		
 		Leg leg_1_6 = popFactory.createLeg("pt");
-		List<Id> linkIds16 = new ArrayList<Id>();
+		List<Id<Link>> linkIds16 = new ArrayList<Id<Link>>();
 		linkIds16.add(linkId2);
 		linkIds16.add(linkId3);
 		linkIds16.add(linkId4);
@@ -3828,20 +3838,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_6.setRoute(route16);
 		
 		Leg leg_2_3 = popFactory.createLeg("pt");
-		List<Id> linkIds23 = new ArrayList<Id>();
+		List<Id<Link>> linkIds23 = new ArrayList<Id<Link>>();
 		NetworkRoute route23 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId3);
 		route23.setLinkIds(linkId2, linkIds23, linkId3);
 		leg_2_3.setRoute(route23);
 		
 		Leg leg_2_4 = popFactory.createLeg("pt");
-		List<Id> linkIds24 = new ArrayList<Id>();
+		List<Id<Link>> linkIds24 = new ArrayList<Id<Link>>();
 		linkIds24.add(linkId3);
 		NetworkRoute route24 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId4);
 		route24.setLinkIds(linkId2, linkIds24, linkId4);
 		leg_2_4.setRoute(route24);
 		
 		Leg leg_2_5 = popFactory.createLeg("pt");
-		List<Id> linkIds25 = new ArrayList<Id>();
+		List<Id<Link>> linkIds25 = new ArrayList<Id<Link>>();
 		linkIds25.add(linkId3);
 		linkIds25.add(linkId4);
 		NetworkRoute route25 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId5);
@@ -3849,7 +3859,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_5.setRoute(route25);
 		
 		Leg leg_2_6 = popFactory.createLeg("pt");
-		List<Id> linkIds26 = new ArrayList<Id>();
+		List<Id<Link>> linkIds26 = new ArrayList<Id<Link>>();
 		linkIds26.add(linkId3);
 		linkIds26.add(linkId4);
 		linkIds26.add(linkId5);
@@ -3858,20 +3868,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_6.setRoute(route26);
 		
 		Leg leg_3_4 = popFactory.createLeg("pt");
-		List<Id> linkIds34 = new ArrayList<Id>();
+		List<Id<Link>> linkIds34 = new ArrayList<Id<Link>>();
 		NetworkRoute route34 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId4);
 		route34.setLinkIds(linkId3, linkIds34, linkId4);
 		leg_3_4.setRoute(route34);
 		
 		Leg leg_3_5 = popFactory.createLeg("pt");
-		List<Id> linkIds35 = new ArrayList<Id>();
+		List<Id<Link>> linkIds35 = new ArrayList<Id<Link>>();
 		linkIds35.add(linkId4);
 		NetworkRoute route35 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId5);
 		route35.setLinkIds(linkId3, linkIds35, linkId5);
 		leg_3_5.setRoute(route35);
 		
 		Leg leg_3_6 = popFactory.createLeg("pt");
-		List<Id> linkIds36 = new ArrayList<Id>();
+		List<Id<Link>> linkIds36 = new ArrayList<Id<Link>>();
 		linkIds36.add(linkId4);
 		linkIds36.add(linkId5);
 		NetworkRoute route36 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId6);
@@ -3879,20 +3889,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_3_6.setRoute(route36);
 		
 		Leg leg_4_5 = popFactory.createLeg("pt");
-		List<Id> linkIds45 = new ArrayList<Id>();
+		List<Id<Link>> linkIds45 = new ArrayList<Id<Link>>();
 		NetworkRoute route45 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId5);
 		route45.setLinkIds(linkId4, linkIds45, linkId5);
 		leg_4_5.setRoute(route45);
 		
 		Leg leg_4_6 = popFactory.createLeg("pt");
-		List<Id> linkIds46 = new ArrayList<Id>();
+		List<Id<Link>> linkIds46 = new ArrayList<Id<Link>>();
 		linkIds46.add(linkId5);
 		NetworkRoute route46 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId6);
 		route46.setLinkIds(linkId4, linkIds46, linkId6);
 		leg_4_6.setRoute(route46);
 		
 		Leg leg_5_6 = popFactory.createLeg("pt");
-		List<Id> linkIds56 = new ArrayList<Id>();
+		List<Id<Link>> linkIds56 = new ArrayList<Id<Link>>();
 		NetworkRoute route56 = (NetworkRoute) routeFactory.createRoute(linkId5, linkId6);
 		route56.setLinkIds(linkId5, linkIds56, linkId6);
 		leg_5_6.setRoute(route56);
@@ -3974,13 +3984,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id> lineIds = new ArrayList<Id>();
+		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
 		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
-		List<Id> LinkIds = new ArrayList<Id>();
+		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
 		LinkIds.add(linkId2);
 		LinkIds.add(linkId3);
 		LinkIds.add(linkId4);
@@ -4076,20 +4086,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		Activity lastActLink6 = popFactory.createActivityFromCoord("w", coord6);
 		
 		Leg leg_1_2 = popFactory.createLeg("pt");
-		List<Id> linkIds12 = new ArrayList<Id>();
+		List<Id<Link>> linkIds12 = new ArrayList<Id<Link>>();
 		NetworkRoute route12 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId2);
 		route12.setLinkIds(linkId1, linkIds12, linkId2);
 		leg_1_2.setRoute(route12);
 		
 		Leg leg_1_3 = popFactory.createLeg("pt");
-		List<Id> linkIds13 = new ArrayList<Id>();
+		List<Id<Link>> linkIds13 = new ArrayList<Id<Link>>();
 		linkIds13.add(linkId2);
 		NetworkRoute route13 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route13.setLinkIds(linkId1, linkIds13, linkId3);
 		leg_1_3.setRoute(route13);
 		
 		Leg leg_1_4 = popFactory.createLeg("pt");
-		List<Id> linkIds14 = new ArrayList<Id>();
+		List<Id<Link>> linkIds14 = new ArrayList<Id<Link>>();
 		linkIds14.add(linkId2);
 		linkIds14.add(linkId3);
 		NetworkRoute route14 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -4097,7 +4107,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_4.setRoute(route14);
 		
 		Leg leg_1_5 = popFactory.createLeg("pt");
-		List<Id> linkIds15 = new ArrayList<Id>();
+		List<Id<Link>> linkIds15 = new ArrayList<Id<Link>>();
 		linkIds15.add(linkId2);
 		linkIds15.add(linkId3);
 		linkIds15.add(linkId4);
@@ -4106,7 +4116,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_5.setRoute(route15);
 		
 		Leg leg_1_6 = popFactory.createLeg("pt");
-		List<Id> linkIds16 = new ArrayList<Id>();
+		List<Id<Link>> linkIds16 = new ArrayList<Id<Link>>();
 		linkIds16.add(linkId2);
 		linkIds16.add(linkId3);
 		linkIds16.add(linkId4);
@@ -4116,20 +4126,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_6.setRoute(route16);
 		
 		Leg leg_2_3 = popFactory.createLeg("pt");
-		List<Id> linkIds23 = new ArrayList<Id>();
+		List<Id<Link>> linkIds23 = new ArrayList<Id<Link>>();
 		NetworkRoute route23 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId3);
 		route23.setLinkIds(linkId2, linkIds23, linkId3);
 		leg_2_3.setRoute(route23);
 		
 		Leg leg_2_4 = popFactory.createLeg("pt");
-		List<Id> linkIds24 = new ArrayList<Id>();
+		List<Id<Link>> linkIds24 = new ArrayList<Id<Link>>();
 		linkIds24.add(linkId3);
 		NetworkRoute route24 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId4);
 		route24.setLinkIds(linkId2, linkIds24, linkId4);
 		leg_2_4.setRoute(route24);
 		
 		Leg leg_2_5 = popFactory.createLeg("pt");
-		List<Id> linkIds25 = new ArrayList<Id>();
+		List<Id<Link>> linkIds25 = new ArrayList<Id<Link>>();
 		linkIds25.add(linkId3);
 		linkIds25.add(linkId4);
 		NetworkRoute route25 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId5);
@@ -4137,7 +4147,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_5.setRoute(route25);
 		
 		Leg leg_2_6 = popFactory.createLeg("pt");
-		List<Id> linkIds26 = new ArrayList<Id>();
+		List<Id<Link>> linkIds26 = new ArrayList<Id<Link>>();
 		linkIds26.add(linkId3);
 		linkIds26.add(linkId4);
 		linkIds26.add(linkId5);
@@ -4146,20 +4156,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_6.setRoute(route26);
 		
 		Leg leg_3_4 = popFactory.createLeg("pt");
-		List<Id> linkIds34 = new ArrayList<Id>();
+		List<Id<Link>> linkIds34 = new ArrayList<Id<Link>>();
 		NetworkRoute route34 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId4);
 		route34.setLinkIds(linkId3, linkIds34, linkId4);
 		leg_3_4.setRoute(route34);
 		
 		Leg leg_3_5 = popFactory.createLeg("pt");
-		List<Id> linkIds35 = new ArrayList<Id>();
+		List<Id<Link>> linkIds35 = new ArrayList<Id<Link>>();
 		linkIds35.add(linkId4);
 		NetworkRoute route35 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId5);
 		route35.setLinkIds(linkId3, linkIds35, linkId5);
 		leg_3_5.setRoute(route35);
 		
 		Leg leg_3_6 = popFactory.createLeg("pt");
-		List<Id> linkIds36 = new ArrayList<Id>();
+		List<Id<Link>> linkIds36 = new ArrayList<Id<Link>>();
 		linkIds36.add(linkId4);
 		linkIds36.add(linkId5);
 		NetworkRoute route36 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId6);
@@ -4167,20 +4177,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_3_6.setRoute(route36);
 		
 		Leg leg_4_5 = popFactory.createLeg("pt");
-		List<Id> linkIds45 = new ArrayList<Id>();
+		List<Id<Link>> linkIds45 = new ArrayList<Id<Link>>();
 		NetworkRoute route45 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId5);
 		route45.setLinkIds(linkId4, linkIds45, linkId5);
 		leg_4_5.setRoute(route45);
 		
 		Leg leg_4_6 = popFactory.createLeg("pt");
-		List<Id> linkIds46 = new ArrayList<Id>();
+		List<Id<Link>> linkIds46 = new ArrayList<Id<Link>>();
 		linkIds46.add(linkId5);
 		NetworkRoute route46 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId6);
 		route46.setLinkIds(linkId4, linkIds46, linkId6);
 		leg_4_6.setRoute(route46);
 		
 		Leg leg_5_6 = popFactory.createLeg("pt");
-		List<Id> linkIds56 = new ArrayList<Id>();
+		List<Id<Link>> linkIds56 = new ArrayList<Id<Link>>();
 		NetworkRoute route56 = (NetworkRoute) routeFactory.createRoute(linkId5, linkId6);
 		route56.setLinkIds(linkId5, linkIds56, linkId6);
 		leg_5_6.setRoute(route56);
@@ -4262,13 +4272,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id> lineIds = new ArrayList<Id>();
+		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
 		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
-		List<Id> LinkIds = new ArrayList<Id>();
+		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
 		LinkIds.add(linkId2);
 		LinkIds.add(linkId3);
 		LinkIds.add(linkId4);
@@ -4379,20 +4389,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		Activity lastActLink5back = popFactory.createActivityFromCoord("w", coord5back);
 		
 		Leg leg_1_2 = popFactory.createLeg("pt");
-		List<Id> linkIds12 = new ArrayList<Id>();
+		List<Id<Link>> linkIds12 = new ArrayList<Id<Link>>();
 		NetworkRoute route12 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId2);
 		route12.setLinkIds(linkId1, linkIds12, linkId2);
 		leg_1_2.setRoute(route12);
 		
 		Leg leg_1_3 = popFactory.createLeg("pt");
-		List<Id> linkIds13 = new ArrayList<Id>();
+		List<Id<Link>> linkIds13 = new ArrayList<Id<Link>>();
 		linkIds13.add(linkId2);
 		NetworkRoute route13 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route13.setLinkIds(linkId1, linkIds13, linkId3);
 		leg_1_3.setRoute(route13);
 		
 		Leg leg_1_4 = popFactory.createLeg("pt");
-		List<Id> linkIds14 = new ArrayList<Id>();
+		List<Id<Link>> linkIds14 = new ArrayList<Id<Link>>();
 		linkIds14.add(linkId2);
 		linkIds14.add(linkId3);
 		NetworkRoute route14 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -4400,7 +4410,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_4.setRoute(route14);
 		
 		Leg leg_1_5 = popFactory.createLeg("pt");
-		List<Id> linkIds15 = new ArrayList<Id>();
+		List<Id<Link>> linkIds15 = new ArrayList<Id<Link>>();
 		linkIds15.add(linkId2);
 		linkIds15.add(linkId3);
 		linkIds15.add(linkId4);
@@ -4409,7 +4419,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_5.setRoute(route15);
 		
 		Leg leg_1_6 = popFactory.createLeg("pt");
-		List<Id> linkIds16 = new ArrayList<Id>();
+		List<Id<Link>> linkIds16 = new ArrayList<Id<Link>>();
 		linkIds16.add(linkId2);
 		linkIds16.add(linkId3);
 		linkIds16.add(linkId4);
@@ -4419,20 +4429,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_6.setRoute(route16);
 		
 		Leg leg_2_3 = popFactory.createLeg("pt");
-		List<Id> linkIds23 = new ArrayList<Id>();
+		List<Id<Link>> linkIds23 = new ArrayList<Id<Link>>();
 		NetworkRoute route23 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId3);
 		route23.setLinkIds(linkId2, linkIds23, linkId3);
 		leg_2_3.setRoute(route23);
 		
 		Leg leg_2_4 = popFactory.createLeg("pt");
-		List<Id> linkIds24 = new ArrayList<Id>();
+		List<Id<Link>> linkIds24 = new ArrayList<Id<Link>>();
 		linkIds24.add(linkId3);
 		NetworkRoute route24 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId4);
 		route24.setLinkIds(linkId2, linkIds24, linkId4);
 		leg_2_4.setRoute(route24);
 		
 		Leg leg_2_5 = popFactory.createLeg("pt");
-		List<Id> linkIds25 = new ArrayList<Id>();
+		List<Id<Link>> linkIds25 = new ArrayList<Id<Link>>();
 		linkIds25.add(linkId3);
 		linkIds25.add(linkId4);
 		NetworkRoute route25 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId5);
@@ -4440,7 +4450,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_5.setRoute(route25);
 		
 		Leg leg_2_6 = popFactory.createLeg("pt");
-		List<Id> linkIds26 = new ArrayList<Id>();
+		List<Id<Link>> linkIds26 = new ArrayList<Id<Link>>();
 		linkIds26.add(linkId3);
 		linkIds26.add(linkId4);
 		linkIds26.add(linkId5);
@@ -4449,20 +4459,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_6.setRoute(route26);
 		
 		Leg leg_3_4 = popFactory.createLeg("pt");
-		List<Id> linkIds34 = new ArrayList<Id>();
+		List<Id<Link>> linkIds34 = new ArrayList<Id<Link>>();
 		NetworkRoute route34 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId4);
 		route34.setLinkIds(linkId3, linkIds34, linkId4);
 		leg_3_4.setRoute(route34);
 		
 		Leg leg_3_5 = popFactory.createLeg("pt");
-		List<Id> linkIds35 = new ArrayList<Id>();
+		List<Id<Link>> linkIds35 = new ArrayList<Id<Link>>();
 		linkIds35.add(linkId4);
 		NetworkRoute route35 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId5);
 		route35.setLinkIds(linkId3, linkIds35, linkId5);
 		leg_3_5.setRoute(route35);
 		
 		Leg leg_3_6 = popFactory.createLeg("pt");
-		List<Id> linkIds36 = new ArrayList<Id>();
+		List<Id<Link>> linkIds36 = new ArrayList<Id<Link>>();
 		linkIds36.add(linkId4);
 		linkIds36.add(linkId5);
 		NetworkRoute route36 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId6);
@@ -4470,26 +4480,26 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_3_6.setRoute(route36);
 		
 		Leg leg_4_5 = popFactory.createLeg("pt");
-		List<Id> linkIds45 = new ArrayList<Id>();
+		List<Id<Link>> linkIds45 = new ArrayList<Id<Link>>();
 		NetworkRoute route45 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId5);
 		route45.setLinkIds(linkId4, linkIds45, linkId5);
 		leg_4_5.setRoute(route45);
 		
 		Leg leg_4_6 = popFactory.createLeg("pt");
-		List<Id> linkIds46 = new ArrayList<Id>();
+		List<Id<Link>> linkIds46 = new ArrayList<Id<Link>>();
 		linkIds46.add(linkId5);
 		NetworkRoute route46 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId6);
 		route46.setLinkIds(linkId4, linkIds46, linkId6);
 		leg_4_6.setRoute(route46);
 		
 		Leg leg_5_6 = popFactory.createLeg("pt");
-		List<Id> linkIds56 = new ArrayList<Id>();
+		List<Id<Link>> linkIds56 = new ArrayList<Id<Link>>();
 		NetworkRoute route56 = (NetworkRoute) routeFactory.createRoute(linkId5, linkId6);
 		route56.setLinkIds(linkId5, linkIds56, linkId6);
 		leg_5_6.setRoute(route56);
 		
 		Leg leg_5_2 = popFactory.createLeg("pt");
-		List<Id> linkIds710 = new ArrayList<Id>();
+		List<Id<Link>> linkIds710 = new ArrayList<Id<Link>>();
 		linkIds710.add(linkId8);
 		linkIds710.add(linkId9);
 		NetworkRoute route52 = (NetworkRoute) routeFactory.createRoute(linkId7, linkId10);
@@ -4608,7 +4618,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId7);
-		List<Id> LinkIds1 = new ArrayList<Id>();
+		List<Id<Link>> LinkIds1 = new ArrayList<Id<Link>>();
 		LinkIds1.add(linkId2);
 		LinkIds1.add(linkId3);
 		LinkIds1.add(linkId4);
@@ -4619,7 +4629,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		Id Route2 = new IdImpl("Route2Id");
 		NetworkRoute NetworkRoute2 = null;
 		NetworkRoute2 = (NetworkRoute) routeFactory.createRoute(linkId7, linkId1);
-		List<Id> LinkIds2 = new ArrayList<Id>();
+		List<Id<Link>> LinkIds2 = new ArrayList<Id<Link>>();
 		LinkIds2.add(linkId8);
 		LinkIds2.add(linkId9);
 		LinkIds2.add(linkId10);
@@ -4772,20 +4782,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		Activity lastActLink6 = popFactory.createActivityFromCoord("w", coord6);
 		
 		Leg leg_1_2 = popFactory.createLeg("pt");
-		List<Id> linkIds12 = new ArrayList<Id>();
+		List<Id<Link>> linkIds12 = new ArrayList<Id<Link>>();
 		NetworkRoute route12 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId2);
 		route12.setLinkIds(linkId1, linkIds12, linkId2);
 		leg_1_2.setRoute(route12);
 		
 		Leg leg_1_3 = popFactory.createLeg("pt");
-		List<Id> linkIds13 = new ArrayList<Id>();
+		List<Id<Link>> linkIds13 = new ArrayList<Id<Link>>();
 		linkIds13.add(linkId2);
 		NetworkRoute route13 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route13.setLinkIds(linkId1, linkIds13, linkId3);
 		leg_1_3.setRoute(route13);
 		
 		Leg leg_1_4 = popFactory.createLeg("pt");
-		List<Id> linkIds14 = new ArrayList<Id>();
+		List<Id<Link>> linkIds14 = new ArrayList<Id<Link>>();
 		linkIds14.add(linkId2);
 		linkIds14.add(linkId3);
 		NetworkRoute route14 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -4793,7 +4803,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_4.setRoute(route14);
 		
 		Leg leg_1_5 = popFactory.createLeg("pt");
-		List<Id> linkIds15 = new ArrayList<Id>();
+		List<Id<Link>> linkIds15 = new ArrayList<Id<Link>>();
 		linkIds15.add(linkId2);
 		linkIds15.add(linkId3);
 		linkIds15.add(linkId4);
@@ -4802,7 +4812,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_5.setRoute(route15);
 		
 		Leg leg_1_6 = popFactory.createLeg("pt");
-		List<Id> linkIds16 = new ArrayList<Id>();
+		List<Id<Link>> linkIds16 = new ArrayList<Id<Link>>();
 		linkIds16.add(linkId2);
 		linkIds16.add(linkId3);
 		linkIds16.add(linkId4);
@@ -4812,20 +4822,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_6.setRoute(route16);
 		
 		Leg leg_2_3 = popFactory.createLeg("pt");
-		List<Id> linkIds23 = new ArrayList<Id>();
+		List<Id<Link>> linkIds23 = new ArrayList<Id<Link>>();
 		NetworkRoute route23 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId3);
 		route23.setLinkIds(linkId2, linkIds23, linkId3);
 		leg_2_3.setRoute(route23);
 		
 		Leg leg_2_4 = popFactory.createLeg("pt");
-		List<Id> linkIds24 = new ArrayList<Id>();
+		List<Id<Link>> linkIds24 = new ArrayList<Id<Link>>();
 		linkIds24.add(linkId3);
 		NetworkRoute route24 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId4);
 		route24.setLinkIds(linkId2, linkIds24, linkId4);
 		leg_2_4.setRoute(route24);
 		
 		Leg leg_2_5 = popFactory.createLeg("pt");
-		List<Id> linkIds25 = new ArrayList<Id>();
+		List<Id<Link>> linkIds25 = new ArrayList<Id<Link>>();
 		linkIds25.add(linkId3);
 		linkIds25.add(linkId4);
 		NetworkRoute route25 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId5);
@@ -4833,7 +4843,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_5.setRoute(route25);
 		
 		Leg leg_2_6 = popFactory.createLeg("pt");
-		List<Id> linkIds26 = new ArrayList<Id>();
+		List<Id<Link>> linkIds26 = new ArrayList<Id<Link>>();
 		linkIds26.add(linkId3);
 		linkIds26.add(linkId4);
 		linkIds26.add(linkId5);
@@ -4842,20 +4852,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_6.setRoute(route26);
 		
 		Leg leg_3_4 = popFactory.createLeg("pt");
-		List<Id> linkIds34 = new ArrayList<Id>();
+		List<Id<Link>> linkIds34 = new ArrayList<Id<Link>>();
 		NetworkRoute route34 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId4);
 		route34.setLinkIds(linkId3, linkIds34, linkId4);
 		leg_3_4.setRoute(route34);
 		
 		Leg leg_3_5 = popFactory.createLeg("pt");
-		List<Id> linkIds35 = new ArrayList<Id>();
+		List<Id<Link>> linkIds35 = new ArrayList<Id<Link>>();
 		linkIds35.add(linkId4);
 		NetworkRoute route35 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId5);
 		route35.setLinkIds(linkId3, linkIds35, linkId5);
 		leg_3_5.setRoute(route35);
 		
 		Leg leg_3_6 = popFactory.createLeg("pt");
-		List<Id> linkIds36 = new ArrayList<Id>();
+		List<Id<Link>> linkIds36 = new ArrayList<Id<Link>>();
 		linkIds36.add(linkId4);
 		linkIds36.add(linkId5);
 		NetworkRoute route36 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId6);
@@ -4863,20 +4873,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_3_6.setRoute(route36);
 		
 		Leg leg_4_5 = popFactory.createLeg("pt");
-		List<Id> linkIds45 = new ArrayList<Id>();
+		List<Id<Link>> linkIds45 = new ArrayList<Id<Link>>();
 		NetworkRoute route45 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId5);
 		route45.setLinkIds(linkId4, linkIds45, linkId5);
 		leg_4_5.setRoute(route45);
 		
 		Leg leg_4_6 = popFactory.createLeg("pt");
-		List<Id> linkIds46 = new ArrayList<Id>();
+		List<Id<Link>> linkIds46 = new ArrayList<Id<Link>>();
 		linkIds46.add(linkId5);
 		NetworkRoute route46 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId6);
 		route46.setLinkIds(linkId4, linkIds46, linkId6);
 		leg_4_6.setRoute(route46);
 		
 		Leg leg_5_6 = popFactory.createLeg("pt");
-		List<Id> linkIds56 = new ArrayList<Id>();
+		List<Id<Link>> linkIds56 = new ArrayList<Id<Link>>();
 		NetworkRoute route56 = (NetworkRoute) routeFactory.createRoute(linkId5, linkId6);
 		route56.setLinkIds(linkId5, linkIds56, linkId6);
 		leg_5_6.setRoute(route56);
@@ -4958,13 +4968,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id> lineIds = new ArrayList<Id>();
+		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
 		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
-		List<Id> LinkIds = new ArrayList<Id>();
+		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
 		LinkIds.add(linkId2);
 		LinkIds.add(linkId3);
 		LinkIds.add(linkId4);
@@ -5082,20 +5092,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		Activity lastActLink6 = popFactory.createActivityFromCoord("w", coord6);
 		
 		Leg leg_1_2 = popFactory.createLeg("pt");
-		List<Id> linkIds12 = new ArrayList<Id>();
+		List<Id<Link>> linkIds12 = new ArrayList<Id<Link>>();
 		NetworkRoute route12 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId2);
 		route12.setLinkIds(linkId1, linkIds12, linkId2);
 		leg_1_2.setRoute(route12);
 		
 		Leg leg_1_3 = popFactory.createLeg("pt");
-		List<Id> linkIds13 = new ArrayList<Id>();
+		List<Id<Link>> linkIds13 = new ArrayList<Id<Link>>();
 		linkIds13.add(linkId2);
 		NetworkRoute route13 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route13.setLinkIds(linkId1, linkIds13, linkId3);
 		leg_1_3.setRoute(route13);
 		
 		Leg leg_1_4 = popFactory.createLeg("pt");
-		List<Id> linkIds14 = new ArrayList<Id>();
+		List<Id<Link>> linkIds14 = new ArrayList<Id<Link>>();
 		linkIds14.add(linkId2);
 		linkIds14.add(linkId3);
 		NetworkRoute route14 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -5103,7 +5113,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_4.setRoute(route14);
 		
 		Leg leg_1_5 = popFactory.createLeg("pt");
-		List<Id> linkIds15 = new ArrayList<Id>();
+		List<Id<Link>> linkIds15 = new ArrayList<Id<Link>>();
 		linkIds15.add(linkId2);
 		linkIds15.add(linkId3);
 		linkIds15.add(linkId4);
@@ -5112,7 +5122,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_5.setRoute(route15);
 		
 		Leg leg_1_6 = popFactory.createLeg("pt");
-		List<Id> linkIds16 = new ArrayList<Id>();
+		List<Id<Link>> linkIds16 = new ArrayList<Id<Link>>();
 		linkIds16.add(linkId2);
 		linkIds16.add(linkId3);
 		linkIds16.add(linkId4);
@@ -5122,20 +5132,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_6.setRoute(route16);
 		
 		Leg leg_2_3 = popFactory.createLeg("pt");
-		List<Id> linkIds23 = new ArrayList<Id>();
+		List<Id<Link>> linkIds23 = new ArrayList<Id<Link>>();
 		NetworkRoute route23 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId3);
 		route23.setLinkIds(linkId2, linkIds23, linkId3);
 		leg_2_3.setRoute(route23);
 		
 		Leg leg_2_4 = popFactory.createLeg("pt");
-		List<Id> linkIds24 = new ArrayList<Id>();
+		List<Id<Link>> linkIds24 = new ArrayList<Id<Link>>();
 		linkIds24.add(linkId3);
 		NetworkRoute route24 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId4);
 		route24.setLinkIds(linkId2, linkIds24, linkId4);
 		leg_2_4.setRoute(route24);
 		
 		Leg leg_2_5 = popFactory.createLeg("pt");
-		List<Id> linkIds25 = new ArrayList<Id>();
+		List<Id<Link>> linkIds25 = new ArrayList<Id<Link>>();
 		linkIds25.add(linkId3);
 		linkIds25.add(linkId4);
 		NetworkRoute route25 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId5);
@@ -5143,7 +5153,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_5.setRoute(route25);
 		
 		Leg leg_2_6 = popFactory.createLeg("pt");
-		List<Id> linkIds26 = new ArrayList<Id>();
+		List<Id<Link>> linkIds26 = new ArrayList<Id<Link>>();
 		linkIds26.add(linkId3);
 		linkIds26.add(linkId4);
 		linkIds26.add(linkId5);
@@ -5152,20 +5162,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_6.setRoute(route26);
 		
 		Leg leg_3_4 = popFactory.createLeg("pt");
-		List<Id> linkIds34 = new ArrayList<Id>();
+		List<Id<Link>> linkIds34 = new ArrayList<Id<Link>>();
 		NetworkRoute route34 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId4);
 		route34.setLinkIds(linkId3, linkIds34, linkId4);
 		leg_3_4.setRoute(route34);
 		
 		Leg leg_3_5 = popFactory.createLeg("pt");
-		List<Id> linkIds35 = new ArrayList<Id>();
+		List<Id<Link>> linkIds35 = new ArrayList<Id<Link>>();
 		linkIds35.add(linkId4);
 		NetworkRoute route35 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId5);
 		route35.setLinkIds(linkId3, linkIds35, linkId5);
 		leg_3_5.setRoute(route35);
 		
 		Leg leg_3_6 = popFactory.createLeg("pt");
-		List<Id> linkIds36 = new ArrayList<Id>();
+		List<Id<Link>> linkIds36 = new ArrayList<Id<Link>>();
 		linkIds36.add(linkId4);
 		linkIds36.add(linkId5);
 		NetworkRoute route36 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId6);
@@ -5173,20 +5183,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_3_6.setRoute(route36);
 		
 		Leg leg_4_5 = popFactory.createLeg("pt");
-		List<Id> linkIds45 = new ArrayList<Id>();
+		List<Id<Link>> linkIds45 = new ArrayList<Id<Link>>();
 		NetworkRoute route45 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId5);
 		route45.setLinkIds(linkId4, linkIds45, linkId5);
 		leg_4_5.setRoute(route45);
 		
 		Leg leg_4_6 = popFactory.createLeg("pt");
-		List<Id> linkIds46 = new ArrayList<Id>();
+		List<Id<Link>> linkIds46 = new ArrayList<Id<Link>>();
 		linkIds46.add(linkId5);
 		NetworkRoute route46 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId6);
 		route46.setLinkIds(linkId4, linkIds46, linkId6);
 		leg_4_6.setRoute(route46);
 		
 		Leg leg_5_6 = popFactory.createLeg("pt");
-		List<Id> linkIds56 = new ArrayList<Id>();
+		List<Id<Link>> linkIds56 = new ArrayList<Id<Link>>();
 		NetworkRoute route56 = (NetworkRoute) routeFactory.createRoute(linkId5, linkId6);
 		route56.setLinkIds(linkId5, linkIds56, linkId6);
 		leg_5_6.setRoute(route56);
@@ -5268,13 +5278,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id> lineIds = new ArrayList<Id>();
+		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
 		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
-		List<Id> LinkIds = new ArrayList<Id>();
+		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
 		LinkIds.add(linkId2);
 		LinkIds.add(linkId3);
 		LinkIds.add(linkId4);
@@ -5392,20 +5402,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		Activity lastActLink6 = popFactory.createActivityFromCoord("w", coord6);
 		
 		Leg leg_1_2 = popFactory.createLeg("pt");
-		List<Id> linkIds12 = new ArrayList<Id>();
+		List<Id<Link>> linkIds12 = new ArrayList<Id<Link>>();
 		NetworkRoute route12 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId2);
 		route12.setLinkIds(linkId1, linkIds12, linkId2);
 		leg_1_2.setRoute(route12);
 		
 		Leg leg_1_3 = popFactory.createLeg("pt");
-		List<Id> linkIds13 = new ArrayList<Id>();
+		List<Id<Link>> linkIds13 = new ArrayList<Id<Link>>();
 		linkIds13.add(linkId2);
 		NetworkRoute route13 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route13.setLinkIds(linkId1, linkIds13, linkId3);
 		leg_1_3.setRoute(route13);
 		
 		Leg leg_1_4 = popFactory.createLeg("pt");
-		List<Id> linkIds14 = new ArrayList<Id>();
+		List<Id<Link>> linkIds14 = new ArrayList<Id<Link>>();
 		linkIds14.add(linkId2);
 		linkIds14.add(linkId3);
 		NetworkRoute route14 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -5413,7 +5423,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_4.setRoute(route14);
 		
 		Leg leg_1_5 = popFactory.createLeg("pt");
-		List<Id> linkIds15 = new ArrayList<Id>();
+		List<Id<Link>> linkIds15 = new ArrayList<Id<Link>>();
 		linkIds15.add(linkId2);
 		linkIds15.add(linkId3);
 		linkIds15.add(linkId4);
@@ -5422,7 +5432,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_5.setRoute(route15);
 		
 		Leg leg_1_6 = popFactory.createLeg("pt");
-		List<Id> linkIds16 = new ArrayList<Id>();
+		List<Id<Link>> linkIds16 = new ArrayList<Id<Link>>();
 		linkIds16.add(linkId2);
 		linkIds16.add(linkId3);
 		linkIds16.add(linkId4);
@@ -5432,20 +5442,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_6.setRoute(route16);
 		
 		Leg leg_2_3 = popFactory.createLeg("pt");
-		List<Id> linkIds23 = new ArrayList<Id>();
+		List<Id<Link>> linkIds23 = new ArrayList<Id<Link>>();
 		NetworkRoute route23 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId3);
 		route23.setLinkIds(linkId2, linkIds23, linkId3);
 		leg_2_3.setRoute(route23);
 		
 		Leg leg_2_4 = popFactory.createLeg("pt");
-		List<Id> linkIds24 = new ArrayList<Id>();
+		List<Id<Link>> linkIds24 = new ArrayList<Id<Link>>();
 		linkIds24.add(linkId3);
 		NetworkRoute route24 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId4);
 		route24.setLinkIds(linkId2, linkIds24, linkId4);
 		leg_2_4.setRoute(route24);
 		
 		Leg leg_2_5 = popFactory.createLeg("pt");
-		List<Id> linkIds25 = new ArrayList<Id>();
+		List<Id<Link>> linkIds25 = new ArrayList<Id<Link>>();
 		linkIds25.add(linkId3);
 		linkIds25.add(linkId4);
 		NetworkRoute route25 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId5);
@@ -5453,7 +5463,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_5.setRoute(route25);
 		
 		Leg leg_2_6 = popFactory.createLeg("pt");
-		List<Id> linkIds26 = new ArrayList<Id>();
+		List<Id<Link>> linkIds26 = new ArrayList<Id<Link>>();
 		linkIds26.add(linkId3);
 		linkIds26.add(linkId4);
 		linkIds26.add(linkId5);
@@ -5462,20 +5472,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_6.setRoute(route26);
 		
 		Leg leg_3_4 = popFactory.createLeg("pt");
-		List<Id> linkIds34 = new ArrayList<Id>();
+		List<Id<Link>> linkIds34 = new ArrayList<Id<Link>>();
 		NetworkRoute route34 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId4);
 		route34.setLinkIds(linkId3, linkIds34, linkId4);
 		leg_3_4.setRoute(route34);
 		
 		Leg leg_3_5 = popFactory.createLeg("pt");
-		List<Id> linkIds35 = new ArrayList<Id>();
+		List<Id<Link>> linkIds35 = new ArrayList<Id<Link>>();
 		linkIds35.add(linkId4);
 		NetworkRoute route35 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId5);
 		route35.setLinkIds(linkId3, linkIds35, linkId5);
 		leg_3_5.setRoute(route35);
 		
 		Leg leg_3_6 = popFactory.createLeg("pt");
-		List<Id> linkIds36 = new ArrayList<Id>();
+		List<Id<Link>> linkIds36 = new ArrayList<Id<Link>>();
 		linkIds36.add(linkId4);
 		linkIds36.add(linkId5);
 		NetworkRoute route36 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId6);
@@ -5483,20 +5493,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_3_6.setRoute(route36);
 		
 		Leg leg_4_5 = popFactory.createLeg("pt");
-		List<Id> linkIds45 = new ArrayList<Id>();
+		List<Id<Link>> linkIds45 = new ArrayList<Id<Link>>();
 		NetworkRoute route45 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId5);
 		route45.setLinkIds(linkId4, linkIds45, linkId5);
 		leg_4_5.setRoute(route45);
 		
 		Leg leg_4_6 = popFactory.createLeg("pt");
-		List<Id> linkIds46 = new ArrayList<Id>();
+		List<Id<Link>> linkIds46 = new ArrayList<Id<Link>>();
 		linkIds46.add(linkId5);
 		NetworkRoute route46 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId6);
 		route46.setLinkIds(linkId4, linkIds46, linkId6);
 		leg_4_6.setRoute(route46);
 		
 		Leg leg_5_6 = popFactory.createLeg("pt");
-		List<Id> linkIds56 = new ArrayList<Id>();
+		List<Id<Link>> linkIds56 = new ArrayList<Id<Link>>();
 		NetworkRoute route56 = (NetworkRoute) routeFactory.createRoute(linkId5, linkId6);
 		route56.setLinkIds(linkId5, linkIds56, linkId6);
 		leg_5_6.setRoute(route56);
@@ -5604,13 +5614,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id> lineIds = new ArrayList<Id>();
+		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
 		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
-		List<Id> LinkIds = new ArrayList<Id>();
+		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
 		LinkIds.add(linkId2);
 		LinkIds.add(linkId3);
 		LinkIds.add(linkId4);
@@ -5728,20 +5738,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		Activity lastActLink6 = popFactory.createActivityFromCoord("w", coord6);
 		
 		Leg leg_1_2 = popFactory.createLeg("pt");
-		List<Id> linkIds12 = new ArrayList<Id>();
+		List<Id<Link>> linkIds12 = new ArrayList<Id<Link>>();
 		NetworkRoute route12 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId2);
 		route12.setLinkIds(linkId1, linkIds12, linkId2);
 		leg_1_2.setRoute(route12);
 		
 		Leg leg_1_3 = popFactory.createLeg("pt");
-		List<Id> linkIds13 = new ArrayList<Id>();
+		List<Id<Link>> linkIds13 = new ArrayList<Id<Link>>();
 		linkIds13.add(linkId2);
 		NetworkRoute route13 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route13.setLinkIds(linkId1, linkIds13, linkId3);
 		leg_1_3.setRoute(route13);
 		
 		Leg leg_1_4 = popFactory.createLeg("pt");
-		List<Id> linkIds14 = new ArrayList<Id>();
+		List<Id<Link>> linkIds14 = new ArrayList<Id<Link>>();
 		linkIds14.add(linkId2);
 		linkIds14.add(linkId3);
 		NetworkRoute route14 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -5749,7 +5759,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_4.setRoute(route14);
 		
 		Leg leg_1_5 = popFactory.createLeg("pt");
-		List<Id> linkIds15 = new ArrayList<Id>();
+		List<Id<Link>> linkIds15 = new ArrayList<Id<Link>>();
 		linkIds15.add(linkId2);
 		linkIds15.add(linkId3);
 		linkIds15.add(linkId4);
@@ -5758,7 +5768,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_5.setRoute(route15);
 		
 		Leg leg_1_6 = popFactory.createLeg("pt");
-		List<Id> linkIds16 = new ArrayList<Id>();
+		List<Id<Link>> linkIds16 = new ArrayList<Id<Link>>();
 		linkIds16.add(linkId2);
 		linkIds16.add(linkId3);
 		linkIds16.add(linkId4);
@@ -5768,20 +5778,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_6.setRoute(route16);
 		
 		Leg leg_2_3 = popFactory.createLeg("pt");
-		List<Id> linkIds23 = new ArrayList<Id>();
+		List<Id<Link>> linkIds23 = new ArrayList<Id<Link>>();
 		NetworkRoute route23 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId3);
 		route23.setLinkIds(linkId2, linkIds23, linkId3);
 		leg_2_3.setRoute(route23);
 		
 		Leg leg_2_4 = popFactory.createLeg("pt");
-		List<Id> linkIds24 = new ArrayList<Id>();
+		List<Id<Link>> linkIds24 = new ArrayList<Id<Link>>();
 		linkIds24.add(linkId3);
 		NetworkRoute route24 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId4);
 		route24.setLinkIds(linkId2, linkIds24, linkId4);
 		leg_2_4.setRoute(route24);
 		
 		Leg leg_2_5 = popFactory.createLeg("pt");
-		List<Id> linkIds25 = new ArrayList<Id>();
+		List<Id<Link>> linkIds25 = new ArrayList<Id<Link>>();
 		linkIds25.add(linkId3);
 		linkIds25.add(linkId4);
 		NetworkRoute route25 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId5);
@@ -5789,7 +5799,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_5.setRoute(route25);
 		
 		Leg leg_2_6 = popFactory.createLeg("pt");
-		List<Id> linkIds26 = new ArrayList<Id>();
+		List<Id<Link>> linkIds26 = new ArrayList<Id<Link>>();
 		linkIds26.add(linkId3);
 		linkIds26.add(linkId4);
 		linkIds26.add(linkId5);
@@ -5798,20 +5808,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_6.setRoute(route26);
 		
 		Leg leg_3_4 = popFactory.createLeg("pt");
-		List<Id> linkIds34 = new ArrayList<Id>();
+		List<Id<Link>> linkIds34 = new ArrayList<Id<Link>>();
 		NetworkRoute route34 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId4);
 		route34.setLinkIds(linkId3, linkIds34, linkId4);
 		leg_3_4.setRoute(route34);
 		
 		Leg leg_3_5 = popFactory.createLeg("pt");
-		List<Id> linkIds35 = new ArrayList<Id>();
+		List<Id<Link>> linkIds35 = new ArrayList<Id<Link>>();
 		linkIds35.add(linkId4);
 		NetworkRoute route35 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId5);
 		route35.setLinkIds(linkId3, linkIds35, linkId5);
 		leg_3_5.setRoute(route35);
 		
 		Leg leg_3_6 = popFactory.createLeg("pt");
-		List<Id> linkIds36 = new ArrayList<Id>();
+		List<Id<Link>> linkIds36 = new ArrayList<Id<Link>>();
 		linkIds36.add(linkId4);
 		linkIds36.add(linkId5);
 		NetworkRoute route36 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId6);
@@ -5819,20 +5829,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_3_6.setRoute(route36);
 		
 		Leg leg_4_5 = popFactory.createLeg("pt");
-		List<Id> linkIds45 = new ArrayList<Id>();
+		List<Id<Link>> linkIds45 = new ArrayList<Id<Link>>();
 		NetworkRoute route45 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId5);
 		route45.setLinkIds(linkId4, linkIds45, linkId5);
 		leg_4_5.setRoute(route45);
 		
 		Leg leg_4_6 = popFactory.createLeg("pt");
-		List<Id> linkIds46 = new ArrayList<Id>();
+		List<Id<Link>> linkIds46 = new ArrayList<Id<Link>>();
 		linkIds46.add(linkId5);
 		NetworkRoute route46 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId6);
 		route46.setLinkIds(linkId4, linkIds46, linkId6);
 		leg_4_6.setRoute(route46);
 		
 		Leg leg_5_6 = popFactory.createLeg("pt");
-		List<Id> linkIds56 = new ArrayList<Id>();
+		List<Id<Link>> linkIds56 = new ArrayList<Id<Link>>();
 		NetworkRoute route56 = (NetworkRoute) routeFactory.createRoute(linkId5, linkId6);
 		route56.setLinkIds(linkId5, linkIds56, linkId6);
 		leg_5_6.setRoute(route56);
@@ -5927,13 +5937,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id> lineIds = new ArrayList<Id>();
+		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
 		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
-		List<Id> LinkIds = new ArrayList<Id>();
+		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
 		LinkIds.add(linkId2);
 		LinkIds.add(linkId3);
 		LinkIds.add(linkId4);
@@ -6051,20 +6061,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		Activity lastActLink6 = popFactory.createActivityFromCoord("w", coord6);
 		
 		Leg leg_1_2 = popFactory.createLeg("pt");
-		List<Id> linkIds12 = new ArrayList<Id>();
+		List<Id<Link>> linkIds12 = new ArrayList<Id<Link>>();
 		NetworkRoute route12 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId2);
 		route12.setLinkIds(linkId1, linkIds12, linkId2);
 		leg_1_2.setRoute(route12);
 		
 		Leg leg_1_3 = popFactory.createLeg("pt");
-		List<Id> linkIds13 = new ArrayList<Id>();
+		List<Id<Link>> linkIds13 = new ArrayList<Id<Link>>();
 		linkIds13.add(linkId2);
 		NetworkRoute route13 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route13.setLinkIds(linkId1, linkIds13, linkId3);
 		leg_1_3.setRoute(route13);
 		
 		Leg leg_1_4 = popFactory.createLeg("pt");
-		List<Id> linkIds14 = new ArrayList<Id>();
+		List<Id<Link>> linkIds14 = new ArrayList<Id<Link>>();
 		linkIds14.add(linkId2);
 		linkIds14.add(linkId3);
 		NetworkRoute route14 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId4);
@@ -6072,7 +6082,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_4.setRoute(route14);
 		
 		Leg leg_1_5 = popFactory.createLeg("pt");
-		List<Id> linkIds15 = new ArrayList<Id>();
+		List<Id<Link>> linkIds15 = new ArrayList<Id<Link>>();
 		linkIds15.add(linkId2);
 		linkIds15.add(linkId3);
 		linkIds15.add(linkId4);
@@ -6081,7 +6091,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_5.setRoute(route15);
 		
 		Leg leg_1_6 = popFactory.createLeg("pt");
-		List<Id> linkIds16 = new ArrayList<Id>();
+		List<Id<Link>> linkIds16 = new ArrayList<Id<Link>>();
 		linkIds16.add(linkId2);
 		linkIds16.add(linkId3);
 		linkIds16.add(linkId4);
@@ -6091,20 +6101,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_1_6.setRoute(route16);
 		
 		Leg leg_2_3 = popFactory.createLeg("pt");
-		List<Id> linkIds23 = new ArrayList<Id>();
+		List<Id<Link>> linkIds23 = new ArrayList<Id<Link>>();
 		NetworkRoute route23 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId3);
 		route23.setLinkIds(linkId2, linkIds23, linkId3);
 		leg_2_3.setRoute(route23);
 		
 		Leg leg_2_4 = popFactory.createLeg("pt");
-		List<Id> linkIds24 = new ArrayList<Id>();
+		List<Id<Link>> linkIds24 = new ArrayList<Id<Link>>();
 		linkIds24.add(linkId3);
 		NetworkRoute route24 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId4);
 		route24.setLinkIds(linkId2, linkIds24, linkId4);
 		leg_2_4.setRoute(route24);
 		
 		Leg leg_2_5 = popFactory.createLeg("pt");
-		List<Id> linkIds25 = new ArrayList<Id>();
+		List<Id<Link>> linkIds25 = new ArrayList<Id<Link>>();
 		linkIds25.add(linkId3);
 		linkIds25.add(linkId4);
 		NetworkRoute route25 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId5);
@@ -6112,7 +6122,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_5.setRoute(route25);
 		
 		Leg leg_2_6 = popFactory.createLeg("pt");
-		List<Id> linkIds26 = new ArrayList<Id>();
+		List<Id<Link>> linkIds26 = new ArrayList<Id<Link>>();
 		linkIds26.add(linkId3);
 		linkIds26.add(linkId4);
 		linkIds26.add(linkId5);
@@ -6121,20 +6131,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_2_6.setRoute(route26);
 		
 		Leg leg_3_4 = popFactory.createLeg("pt");
-		List<Id> linkIds34 = new ArrayList<Id>();
+		List<Id<Link>> linkIds34 = new ArrayList<Id<Link>>();
 		NetworkRoute route34 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId4);
 		route34.setLinkIds(linkId3, linkIds34, linkId4);
 		leg_3_4.setRoute(route34);
 		
 		Leg leg_3_5 = popFactory.createLeg("pt");
-		List<Id> linkIds35 = new ArrayList<Id>();
+		List<Id<Link>> linkIds35 = new ArrayList<Id<Link>>();
 		linkIds35.add(linkId4);
 		NetworkRoute route35 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId5);
 		route35.setLinkIds(linkId3, linkIds35, linkId5);
 		leg_3_5.setRoute(route35);
 		
 		Leg leg_3_6 = popFactory.createLeg("pt");
-		List<Id> linkIds36 = new ArrayList<Id>();
+		List<Id<Link>> linkIds36 = new ArrayList<Id<Link>>();
 		linkIds36.add(linkId4);
 		linkIds36.add(linkId5);
 		NetworkRoute route36 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId6);
@@ -6142,20 +6152,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		leg_3_6.setRoute(route36);
 		
 		Leg leg_4_5 = popFactory.createLeg("pt");
-		List<Id> linkIds45 = new ArrayList<Id>();
+		List<Id<Link>> linkIds45 = new ArrayList<Id<Link>>();
 		NetworkRoute route45 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId5);
 		route45.setLinkIds(linkId4, linkIds45, linkId5);
 		leg_4_5.setRoute(route45);
 		
 		Leg leg_4_6 = popFactory.createLeg("pt");
-		List<Id> linkIds46 = new ArrayList<Id>();
+		List<Id<Link>> linkIds46 = new ArrayList<Id<Link>>();
 		linkIds46.add(linkId5);
 		NetworkRoute route46 = (NetworkRoute) routeFactory.createRoute(linkId4, linkId6);
 		route46.setLinkIds(linkId4, linkIds46, linkId6);
 		leg_4_6.setRoute(route46);
 		
 		Leg leg_5_6 = popFactory.createLeg("pt");
-		List<Id> linkIds56 = new ArrayList<Id>();
+		List<Id<Link>> linkIds56 = new ArrayList<Id<Link>>();
 		NetworkRoute route56 = (NetworkRoute) routeFactory.createRoute(linkId5, linkId6);
 		route56.setLinkIds(linkId5, linkIds56, linkId6);
 		leg_5_6.setRoute(route56);
@@ -6263,13 +6273,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id> lineIds = new ArrayList<Id>();
+		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
 		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
-		List<Id> LinkIds = new ArrayList<Id>();
+		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
 		LinkIds.add(linkId2);
 		LinkIds.add(linkId3);
 		LinkIds.add(linkId4);

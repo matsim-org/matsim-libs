@@ -28,6 +28,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -86,7 +87,7 @@ public class PopulationWriterHandlerImplV5Test {
 		plan.addActivity(pb.createActivityFromLinkId("h", idFrom));
 		Leg leg = pb.createLeg(TransportMode.car);
 		NetworkRoute route = new LinkNetworkRouteImpl(idFrom, idTo);
-		List<Id> routeLinkIds = NetworkUtils.getLinkIds(linkIds, scenario);
+		List<Id<Link>> routeLinkIds = NetworkUtils.getLinkIds(linkIds);
 		route.setLinkIds(idFrom, routeLinkIds, idTo);
 		leg.setRoute(route);
 		plan.addLeg(leg);

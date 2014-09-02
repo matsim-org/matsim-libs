@@ -279,12 +279,12 @@ public class TransitNetworkSink implements Sink {
 			
 			
 			
-			List<Id> linkIdsH = stitcher.getForwardRoute();
-			List<Id> linkIdsR = stitcher.getBackwardRoute();
+			List<Id<Link>> linkIdsH = stitcher.getForwardRoute();
+			List<Id<Link>> linkIdsR = stitcher.getBackwardRoute();
 			
 			if (linkIdsH.size() >= 2) {
 				NetworkRoute networkRouteH = createNetworkRoute(linkIdsH);
-				List<Id> stopLinkIdsH = stitcher.getForwardStopLinks();
+				List<Id<Link>> stopLinkIdsH = stitcher.getForwardStopLinks();
 				List<Double> forwardTravelTimes = stitcher.getForwardTravelTimes();
 				assert (stopLinkIdsH.size() == stopsH.size() - 1);
 				List<TransitRouteStop> stops = enterStopLinkIds(stopsH, stopLinkIdsH, forwardTravelTimes, line.getId() + "H", network.getLinks().get(linkIdsH.get(0)).getFromNode());
@@ -294,7 +294,7 @@ public class TransitNetworkSink implements Sink {
 
 			if (linkIdsR.size() >= 2) {
 				NetworkRoute networkRouteR = createNetworkRoute(linkIdsR);
-				List<Id> stopLinkIdsR = stitcher.getBackwardStopLinks();
+				List<Id<Link>> stopLinkIdsR = stitcher.getBackwardStopLinks();
 				List<Double> backwardTravelTimes = stitcher.getBackwardTravelTimes();
 				assert (stopLinkIdsR.size() == stopsR.size() - 1);
 				List<TransitRouteStop> stops = enterStopLinkIds(stopsR, stopLinkIdsR, backwardTravelTimes, line.getId() + "R", network.getLinks().get(linkIdsR.get(0)).getFromNode());
@@ -310,11 +310,11 @@ public class TransitNetworkSink implements Sink {
 		wayReader.release();
 	}
 
-	private List<TransitRouteStop> enterStopLinkIds(List<Node> stopNodes, List<Id> stopLinkIdsH, List<Double> travelTimes, String routeRef, org.matsim.api.core.v01.network.Node node) {
+	private List<TransitRouteStop> enterStopLinkIds(List<Node> stopNodes, List<Id<Link>> stopLinkIdsH, List<Double> travelTimes, String routeRef, org.matsim.api.core.v01.network.Node node) {
 		System.out.println(stopNodes.size() + "__" + stopLinkIdsH.size());
 		int stopNo = 0;
 		List<TransitRouteStop> transitRouteStops = new ArrayList<TransitRouteStop>();
-		Iterator<Id> i = stopLinkIdsH.iterator();
+		Iterator<Id<Link>> i = stopLinkIdsH.iterator();
 		Iterator<Node> j = stopNodes.iterator();
 		Iterator<Double> k = travelTimes.iterator();
 		Node firstStopNode = j.next();
@@ -365,8 +365,8 @@ public class TransitNetworkSink implements Sink {
 		return new IdImpl(ref + "_" + stopName + "_" + stopNo);
 	}
 
-	private NetworkRoute createNetworkRoute(List<Id> plinkIds) {
-		LinkedList<Id> linkIds = new LinkedList<Id>(plinkIds);
+	private NetworkRoute createNetworkRoute(List<Id<Link>> plinkIds) {
+		LinkedList<Id<Link>> linkIds = new LinkedList<Id<Link>>(plinkIds);
 		NetworkRoute networkRouteH = new LinkNetworkRouteImpl(linkIds.getFirst(), linkIds.getLast());
 		Id first = linkIds.removeFirst();
 		Id last = linkIds.removeLast();

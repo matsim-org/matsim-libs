@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -402,7 +401,7 @@ public class StopFacilityGenerator {
 			}
 		}
 
-		List<Id> newRouteLinkIds = new ArrayList<Id>();
+		List<Id<Link>> newRouteLinkIds = new ArrayList<Id<Link>>();
 		for(Link link:links){
 			newRouteLinkIds.add(link.getId());		
 		}

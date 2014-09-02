@@ -86,7 +86,7 @@ public class TransitDriverTest {
 	public void testInitializationNetworkRoute() {
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
-		ArrayList<Id> linkIds = new ArrayList<Id>();
+		ArrayList<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 
 		NetworkImpl network = NetworkImpl.createNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));
@@ -117,8 +117,8 @@ public class TransitDriverTest {
 		driver.endActivityAndComputeNextState(0.0);
 		assertTrue(driver.getCurrentLeg().getRoute() instanceof NetworkRoute);
 		NetworkRoute netRoute = (NetworkRoute) driver.getCurrentLeg().getRoute();
-		List<Id> expectedLinkIds = route.getLinkIds();
-		List<Id> actualLinkIds = netRoute.getLinkIds();
+		List<Id<Link>> expectedLinkIds = route.getLinkIds();
+		List<Id<Link>> actualLinkIds = netRoute.getLinkIds();
 		assertEquals(expectedLinkIds.size(), actualLinkIds.size());
 		for (int i = 0, n = expectedLinkIds.size(); i < n; i++) {
 			assertEquals(expectedLinkIds.get(i), actualLinkIds.get(i));

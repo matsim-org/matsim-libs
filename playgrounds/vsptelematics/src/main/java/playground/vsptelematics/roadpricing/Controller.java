@@ -19,8 +19,13 @@
  * *********************************************************************** */
 package playground.vsptelematics.roadpricing;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -37,12 +42,9 @@ import org.matsim.roadpricing.RoadPricing;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
+
 import playground.vsptelematics.common.IncidentGenerator;
 import playground.vsptelematics.ha1.RouteTTObserver;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 
 /**
@@ -96,8 +98,8 @@ public class Controller {
 		private Id id3 = new IdImpl("3");
 		private Id id4 = new IdImpl("4");
 		private Id id5 = new IdImpl("5");
-		private List<Id> route1Ids = new ArrayList<Id>();
-		private List<Id> route2Ids = new ArrayList<Id>();
+		private List<Id<Link>> route1Ids = new ArrayList<Id<Link>>();
+		private List<Id<Link>> route2Ids = new ArrayList<Id<Link>>();
 		private Random votRandom = MatsimRandom.getLocalInstance();
 		private Random logitRandom = MatsimRandom.getLocalInstance();
 		

@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -73,7 +74,7 @@ public class BlowUp {
 							leg2.setDepartureTime(leg.getDepartureTime());
 							leg2.setTravelTime(leg.getTravelTime());
 							LinkNetworkRouteImpl r = (LinkNetworkRouteImpl) leg.getRoute();
-							List<Id>ids = new ArrayList<Id>();
+							List<Id<Link>>ids = new ArrayList<Id<Link>>();
 							ids.add(new IdImpl(r.getStartLinkId().toString()));
 							for (Id id : r.getLinkIds()) {
 								ids.add(new IdImpl(id.toString()));

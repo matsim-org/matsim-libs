@@ -200,7 +200,7 @@ public class PrepareInitialRoutesTest {
 		Id startLinkId = scenario.createId("l0");
 		Id endLinkId = scenario.createId("l4");
 		NetworkRoute route = (NetworkRoute) routeFactory.createRoute(startLinkId, endLinkId);
-		List<Id> linkIds = new ArrayList<Id>();
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		linkIds.add(scenario.createId("l1"));
 		linkIds.add(scenario.createId("l2"));
 		linkIds.add(scenario.createId("l3"));

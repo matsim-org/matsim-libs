@@ -133,7 +133,7 @@ public class RunDemo {
 			from.setStartTime(0.0);
 			from.setEndTime(8.0*3600 + Math.round(MatsimRandom.getRandom().nextDouble() * 600));
 			Leg leg = populationFactory.createLeg(TransportMode.walk);
-			List<Id> linkIds = new ArrayList<Id>();
+			List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 			linkIds.add(scenario.createId("l1"));
 			linkIds.add(scenario.createId("l2"));
 			Route route = new LinkNetworkRouteImpl(scenario.createId("l0"), linkIds, scenario.createId("l3"));

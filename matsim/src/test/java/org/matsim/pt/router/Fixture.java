@@ -251,7 +251,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 		this.schedule.addTransitLine(this.redLine);
 		{ // route from left to right
 			NetworkRoute netRoute = new LinkNetworkRouteImpl(this.links[2].getId(), this.links[6].getId());
-			List<Id> routeLinks = new ArrayList<Id>();
+			List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
 			Collections.addAll(routeLinks, this.links[3].getId(), this.links[4].getId(), this.links[5].getId());
 			netRoute.setLinkIds(this.links[2].getId(), routeLinks, this.links[6].getId());
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
@@ -267,7 +267,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 		}
 		{ // route from right to left
 			NetworkRoute netRoute = new LinkNetworkRouteImpl(this.links[11].getId(), this.links[15].getId());
-			List<Id> routeLinks = new ArrayList<Id>();
+			List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
 			Collections.addAll(routeLinks, this.links[12].getId(), this.links[13].getId(), this.links[14].getId());
 			netRoute.setLinkIds(this.links[11].getId(), routeLinks, this.links[15].getId());
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
@@ -288,7 +288,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 		this.schedule.addTransitLine(this.blueLine);
 		{ // route from left to right
 			NetworkRoute netRoute = new LinkNetworkRouteImpl(this.links[0].getId(), this.links[8].getId());
-			List<Id> routeLinks = new ArrayList<Id>();
+			List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
 			Collections.addAll(routeLinks, this.links[1].getId(), this.links[2].getId(), this.links[3].getId(), this.links[4].getId(), this.links[5].getId(), this.links[6].getId(), this.links[7].getId());
 			netRoute.setLinkIds(this.links[0].getId(), routeLinks, this.links[8].getId());
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
@@ -341,7 +341,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 		}
 		{ // route from right to left
 			NetworkRoute netRoute = new LinkNetworkRouteImpl(this.links[9].getId(), this.links[17].getId());
-			List<Id> routeLinks = new ArrayList<Id>();
+			List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
 			Collections.addAll(routeLinks, this.links[10].getId(), this.links[11].getId(), this.links[12].getId(), this.links[13].getId(), this.links[14].getId(), this.links[15].getId(), this.links[16].getId());
 			netRoute.setLinkIds(this.links[9].getId(), routeLinks, this.links[17].getId());
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
@@ -399,7 +399,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 		this.schedule.addTransitLine(this.greenLine);
 		{ // route in circle in clockwise
 			NetworkRoute netRoute = new LinkNetworkRouteImpl(this.links[25].getId(), this.links[25].getId());
-			List<Id> routeLinks = new ArrayList<Id>();
+			List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
 			Collections.addAll(routeLinks, this.links[20].getId(), this.links[21].getId(), this.links[22].getId(), this.links[23].getId(), this.links[24].getId());
 			netRoute.setLinkIds(this.links[25].getId(), routeLinks, this.links[25].getId());
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();

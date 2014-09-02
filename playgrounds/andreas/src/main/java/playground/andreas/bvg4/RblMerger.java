@@ -555,7 +555,7 @@ public class RblMerger {
 					Id startLinkId = null;
 					Id lastLinkId = null;
 					
-					List<Id> links = new LinkedList<Id>();
+					List<Id<Link>> links = new LinkedList<Id<Link>>();
 					
 					// for each stop
 					for (TransitRouteStop stop : timeBin2TransitRouteStopsListEntry.getValue()) {

@@ -26,6 +26,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -122,7 +123,7 @@ public class CurrentLegInitialReplanner extends WithinDayDuringLegReplanner {
 			
 			// new Route for current Leg
 //			new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, time);
-			List<Id> newLinkIds = new ArrayList<Id>(route.getLinkIds().subList(0, route.getLinkIds().size() - 2));
+			List<Id<Link>> newLinkIds = new ArrayList<Id<Link>>(route.getLinkIds().subList(0, route.getLinkIds().size() - 2));
 			route.setLinkIds(route.getStartLinkId(), newLinkIds, endLinkId);
 			
 			// Finally reset the cached Values of the PersonAgent - they may have changed!

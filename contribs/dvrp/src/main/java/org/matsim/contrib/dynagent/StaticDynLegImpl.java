@@ -22,6 +22,7 @@ package org.matsim.contrib.dynagent;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.NetworkRoute;
 
 
@@ -55,7 +56,7 @@ public class StaticDynLegImpl
             return route.getStartLinkId();
         }
 
-        List<Id> linkIds = route.getLinkIds();
+        List<Id<Link>> linkIds = route.getLinkIds();
 
         if (currentLinkIdx == linkIds.size()) {
             return route.getEndLinkId();
@@ -68,7 +69,7 @@ public class StaticDynLegImpl
     @Override
     public Id getNextLinkId()
     {
-        List<Id> linkIds = route.getLinkIds();
+        List<Id<Link>> linkIds = route.getLinkIds();
 
         if (currentLinkIdx == linkIds.size()) {
             return null;

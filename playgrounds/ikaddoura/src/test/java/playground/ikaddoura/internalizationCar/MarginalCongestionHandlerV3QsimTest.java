@@ -22,6 +22,13 @@
  */
 package playground.ikaddoura.internalizationCar;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -34,7 +41,11 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -58,8 +69,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.util.*;
 
 /**
  * @author ikaddoura , lkroeger
@@ -291,10 +300,10 @@ public class MarginalCongestionHandlerV3QsimTest {
 		controler.run();
 			
 		{ // controlling and showing the conditions of the test:
-			Assert.assertEquals("entering agents in timeBin1.", 3.0, (double)enterCounter.get(timeBin1), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("entering agents in timeBin2.", 3.0, (double)enterCounter.get(timeBin2), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("leaving agents in timeBin1.", 1.0, (double)leaveCounter.get(timeBin1), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("leaving agents in timeBin1.", 5.0, (double)leaveCounter.get(timeBin2), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("entering agents in timeBin1.", 3.0, enterCounter.get(timeBin1), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("entering agents in timeBin2.", 3.0, enterCounter.get(timeBin2), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("leaving agents in timeBin1.", 1.0, leaveCounter.get(timeBin1), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("leaving agents in timeBin1.", 5.0, leaveCounter.get(timeBin2), MatsimTestUtils.EPSILON);
 		}
 			
 		// for both time-bins ("28800-29700" and "29700-30600")
@@ -567,7 +576,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 		
 		// leg: 1,2,3,4,5
 		Leg leg_1_5 = popFactory.createLeg("car");
-		List<Id> linkIds234 = new ArrayList<Id>();
+		List<Id<Link>> linkIds234 = new ArrayList<Id<Link>>();
 		linkIds234.add(linkId2);
 		linkIds234.add(linkId3);
 		linkIds234.add(linkId4);
@@ -623,7 +632,7 @@ private void setPopulation2(Scenario scenario) {
 		
 		// leg: 1,2,3,4,5
 		Leg leg_1_5 = popFactory.createLeg("car");
-		List<Id> linkIds234 = new ArrayList<Id>();
+		List<Id<Link>> linkIds234 = new ArrayList<Id<Link>>();
 		linkIds234.add(linkId2);
 		linkIds234.add(linkId3);
 		linkIds234.add(linkId4);
@@ -672,7 +681,7 @@ private void setPopulation2(Scenario scenario) {
 		
 		// leg: 1,2,3,4,5
 		Leg leg_1_5 = popFactory.createLeg("car");
-		List<Id> linkIds234 = new ArrayList<Id>();
+		List<Id<Link>> linkIds234 = new ArrayList<Id<Link>>();
 		linkIds234.add(linkId2);
 		linkIds234.add(linkId3);
 		linkIds234.add(linkId4);
@@ -702,7 +711,7 @@ private void setPopulation2(Scenario scenario) {
 		
 		// leg: 1,2,3,4,5
 		Leg leg_2_5 = popFactory.createLeg("car");
-		List<Id> linkIds34 = new ArrayList<Id>();
+		List<Id<Link>> linkIds34 = new ArrayList<Id<Link>>();
 		linkIds34.add(linkId3);
 		linkIds34.add(linkId4);
 		NetworkRoute route2_5 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId5);
@@ -731,7 +740,7 @@ private void setPopulation2(Scenario scenario) {
 		
 		// leg: 1,2,3,4,5
 		Leg leg_1_5 = popFactory.createLeg("car");
-		List<Id> linkIds234 = new ArrayList<Id>();
+		List<Id<Link>> linkIds234 = new ArrayList<Id<Link>>();
 		linkIds234.add(linkId2);
 		linkIds234.add(linkId3);
 		linkIds234.add(linkId4);
@@ -761,7 +770,7 @@ private void setPopulation2(Scenario scenario) {
 		
 		// leg: 1,2,3,4,5
 		Leg leg_2_5 = popFactory.createLeg("car");
-		List<Id> linkIds34 = new ArrayList<Id>();
+		List<Id<Link>> linkIds34 = new ArrayList<Id<Link>>();
 		linkIds34.add(linkId3);
 		linkIds34.add(linkId4);
 		NetworkRoute route2_5 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId5);
@@ -790,7 +799,7 @@ private void setPopulation6(Scenario scenario) {
 		
 		// leg: 1,2,3,4,5
 		Leg leg_1_5 = popFactory.createLeg("car");
-		List<Id> linkIds234 = new ArrayList<Id>();
+		List<Id<Link>> linkIds234 = new ArrayList<Id<Link>>();
 		linkIds234.add(linkId2);
 		linkIds234.add(linkId3);
 		linkIds234.add(linkId4);
@@ -820,7 +829,7 @@ private void setPopulation6(Scenario scenario) {
 		
 		// leg: 1,2,3,4,5
 		Leg leg_2_5 = popFactory.createLeg("car");
-		List<Id> linkIds34 = new ArrayList<Id>();
+		List<Id<Link>> linkIds34 = new ArrayList<Id<Link>>();
 		linkIds34.add(linkId3);
 		linkIds34.add(linkId4);
 		NetworkRoute route2_5 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId5);
@@ -850,7 +859,7 @@ private void setPopulation6(Scenario scenario) {
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(3600.0);
-		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+		Scenario scenario = (ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);
@@ -937,7 +946,7 @@ private void setPopulation6(Scenario scenario) {
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		qSimConfigGroup.setRemoveStuckVehicles(false);
 		qSimConfigGroup.setStuckTime(6.0);
-		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+		Scenario scenario = (ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);
@@ -1023,7 +1032,7 @@ private void setPopulation6(Scenario scenario) {
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(3600.0);
-		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+		Scenario scenario = (ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);
@@ -1111,7 +1120,7 @@ private void setPopulation6(Scenario scenario) {
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(3600.0);
-		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+		Scenario scenario = (ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);
@@ -1184,7 +1193,7 @@ private void setPopulation6(Scenario scenario) {
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(false);
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(3600.0);
-		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+		Scenario scenario = (ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);
@@ -1270,7 +1279,7 @@ private void setPopulation6(Scenario scenario) {
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(3600.0);
-		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+		Scenario scenario = (ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);

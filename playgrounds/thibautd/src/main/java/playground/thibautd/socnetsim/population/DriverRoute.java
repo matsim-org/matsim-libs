@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -81,9 +82,9 @@ public class DriverRoute implements GenericRoute , NetworkRoute {
 
 	@Override
 	public void setLinkIds(
-			final Id startLinkId,
-			final List<Id> linkIds,
-			final Id endLinkId) {
+			final Id<Link> startLinkId,
+			final List<Id<Link>> linkIds,
+			final Id<Link> endLinkId) {
 		netRoute.setLinkIds(startLinkId, linkIds, endLinkId);
 	}
 
@@ -98,7 +99,7 @@ public class DriverRoute implements GenericRoute , NetworkRoute {
 	}
 
 	@Override
-	public List<Id> getLinkIds() {
+	public List<Id<Link>> getLinkIds() {
 		return netRoute.getLinkIds();
 	}
 
@@ -114,8 +115,8 @@ public class DriverRoute implements GenericRoute , NetworkRoute {
 
 	@Override
 	public NetworkRoute getSubRoute(
-			final Id fromLinkId,
-			final Id toLinkId) {
+			final Id<Link> fromLinkId,
+			final Id<Link> toLinkId) {
 		return netRoute.getSubRoute(fromLinkId, toLinkId);
 	}
 
@@ -135,22 +136,22 @@ public class DriverRoute implements GenericRoute , NetworkRoute {
 	}
 
 	@Override
-	public Id getStartLinkId() {
+	public Id<Link> getStartLinkId() {
 		return netRoute.getStartLinkId();
 	}
 
 	@Override
-	public Id getEndLinkId() {
+	public Id<Link> getEndLinkId() {
 		return netRoute.getEndLinkId();
 	}
 
 	@Override
-	public void setStartLinkId(final Id linkId) {
+	public void setStartLinkId(final Id<Link> linkId) {
 		netRoute.setStartLinkId(linkId);
 	}
 
 	@Override
-	public void setEndLinkId(final Id linkId) {
+	public void setEndLinkId(final Id<Link> linkId) {
 		netRoute.setEndLinkId(linkId);
 	}
 
@@ -165,9 +166,9 @@ public class DriverRoute implements GenericRoute , NetworkRoute {
 
 	@Override
 	public void setRouteDescription(
-			final Id startLinkId,
+			final Id<Link> startLinkId,
 			final String routeDescription,
-			final Id endLinkId) {
+			final Id<Link> endLinkId) {
 		String[] info = routeDescription.trim().split( " " );
 		String[] ps = info[0].split( "," );
 
@@ -175,7 +176,7 @@ public class DriverRoute implements GenericRoute , NetworkRoute {
 			passengers.add( new IdImpl( p ) );
 		}
 
-		List<Id> ls = new ArrayList<Id>();
+		List<Id<Link>> ls = new ArrayList<Id<Link>>();
 		for (int i=1; i < info.length; i++) {
 			ls.add( new IdImpl( info[i] ) );
 		}

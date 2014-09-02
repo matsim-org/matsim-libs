@@ -9,6 +9,7 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -230,7 +231,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 	private void finishLeg(Id toLocation) {
 		LinkNetworkRouteImpl route = null;
 		if (previousRouteContent != null) {
-			List<Id> linkIds = NetworkUtils.getLinkIds(previousRouteContent);
+			List<Id<Link>> linkIds = NetworkUtils.getLinkIds(previousRouteContent);
 			route = new LinkNetworkRouteImpl(previousActLoc, toLocation);
 			if (!linkIds.isEmpty()) {
 				route.setLinkIds(previousActLoc, linkIds, toLocation);

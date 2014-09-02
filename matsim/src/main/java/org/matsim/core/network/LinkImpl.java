@@ -50,7 +50,7 @@ public class LinkImpl implements Link {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private Id id;
+	private Id<Link> id;
 
 	protected Node from = null;
 	protected Node to = null;
@@ -90,7 +90,7 @@ public class LinkImpl implements Link {
 		DEFAULT_ALLOWED_MODES = HashSetCache.get(set);
 	}
 
-	protected LinkImpl(final Id id, final Node from, final Node to, final Network network, final double length, final double freespeed, final double capacity, final double lanes) {
+	protected LinkImpl(final Id<Link> id, final Node from, final Node to, final Network network, final double length, final double freespeed, final double capacity, final double lanes) {
 		this.id = id;
 		this.network = network;
 		this.from = from;
@@ -360,7 +360,7 @@ public class LinkImpl implements Link {
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Link> getId() {
 		return id;
 	}
 

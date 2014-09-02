@@ -114,7 +114,7 @@ public class EditPartialRoute {
 			if (!oldOriginLink.getId().equals(newOriginLink.getId())) {
 				double distanceOldNewOriginal = GeneralLib.getDistance(oldOriginLink.getCoord(), newOriginLink.getCoord());
 
-				truncateRouteStart((NetworkRoute) oldRoute, distanceOldNewOriginal * 2);
+				truncateRouteStart(oldRoute, distanceOldNewOriginal * 2);
 			}
 
 			if (getRouteSize(oldRoute) == 0) {
@@ -133,7 +133,7 @@ public class EditPartialRoute {
 				double distanceOldNewOriginal = GeneralLib.getDistance(oldDestinationLink.getCoord(),
 						newDestinationLink.getCoord());
 
-				truncateRouteEnd((NetworkRoute) oldRoute, distanceOldNewOriginal * 2);
+				truncateRouteEnd(oldRoute, distanceOldNewOriginal * 2);
 			}
 
 			if (getRouteSize(oldRoute) == 0) {
@@ -145,12 +145,12 @@ public class EditPartialRoute {
 			} else {
 				if (!oldRoute.getStartLinkId().equals(newOriginLink.getId())) {
 					NetworkRoute startRoute = getRoute(newOriginLink, getLink(oldRoute.getStartLinkId()));
-					joinRoutes(startRoute, (NetworkRoute) oldRoute, (NetworkRoute) oldRoute);
+					joinRoutes(startRoute, oldRoute, oldRoute);
 				}
 
 				if (!oldRoute.getEndLinkId().equals(newDestinationLink.getId())) {
 					NetworkRoute endRoute = getRoute(getLink(oldRoute.getEndLinkId()), newDestinationLink);
-					joinRoutes((NetworkRoute) oldRoute, endRoute, (NetworkRoute) oldRoute);
+					joinRoutes(oldRoute, endRoute, oldRoute);
 				}
 			}
 
@@ -169,8 +169,8 @@ public class EditPartialRoute {
 		newRoute = leg.getRoute();
 		if (oldRoute != null && oldRoute != newRoute) {
 			if (oldRoute instanceof NetworkRoute && newRoute instanceof NetworkRoute) {
-				List<Id> linkIds = ((NetworkRoute) newRoute).getLinkIds();
-				((NetworkRoute) oldRoute).setLinkIds(newRoute.getStartLinkId(), linkIds, newRoute.getEndLinkId());
+				List<Id<Link>> linkIds = ((NetworkRoute) newRoute).getLinkIds();
+				oldRoute.setLinkIds(newRoute.getStartLinkId(), linkIds, newRoute.getEndLinkId());
 				leg.setRoute(oldRoute);
 			}
 		}
@@ -252,7 +252,7 @@ public class EditPartialRoute {
 	private void joinRoutes(NetworkRoute routeStart, NetworkRoute routeEnd, NetworkRoute targetRoute) {
 		if (routeStart.getEndLinkId().equals(routeEnd.getStartLinkId())) {
 
-			LinkedList<Id> linkIds = new LinkedList<Id>();
+			LinkedList<Id<Link>> linkIds = new LinkedList<Id<Link>>();
 
 			linkIds.addAll(routeStart.getLinkIds());
 
@@ -330,11 +330,11 @@ public class EditPartialRoute {
 		Link oldDestinationLink = getLink(oldRoute.getEndLinkId());
 		Link newDestinationLink = getLink(toActivity.getLinkId());
 
-		List<Id> routeLinkIds = getRouteLinkIds(oldRoute);
+		List<Id<Link>> routeLinkIds = getRouteLinkIds(oldRoute);
 		
 		//routeShouldEndAtCurrentLink
 		if (routeLinkIds.get(currentLinkIndex).equals(newDestinationLink.getId())){
-			List<Id> subList = routeLinkIds.subList(1, currentLinkIndex);
+			List<Id<Link>> subList = routeLinkIds.subList(1, currentLinkIndex);
 			
 			oldRoute.setLinkIds(routeLinkIds.get(0), subList, routeLinkIds.get(currentLinkIndex));
 			
@@ -346,10 +346,10 @@ public class EditPartialRoute {
 		if (!oldDestinationLink.getId().equals(newDestinationLink.getId())) {
 			double distanceOldNewOriginal = GeneralLib.getDistance(oldDestinationLink.getCoord(), newDestinationLink.getCoord());
 
-			truncateRouteEndCurrentRoute((NetworkRoute) oldRoute, distanceOldNewOriginal * 2, currentLinkIndex);
+			truncateRouteEndCurrentRoute(oldRoute, distanceOldNewOriginal * 2, currentLinkIndex);
 			
 			NetworkRoute endRoute = getRoute(getLink(oldRoute.getEndLinkId()), newDestinationLink);
-			joinRoutes((NetworkRoute) oldRoute, endRoute, (NetworkRoute) oldRoute);
+			joinRoutes(oldRoute, endRoute, oldRoute);
 		} 
 		
 
@@ -365,7 +365,7 @@ public class EditPartialRoute {
 		int cutIndex = -1;
 
 		double sumSize = 0;
-		List<Id> linkIds = getRouteLinkIds(networkRoute);
+		List<Id<Link>> linkIds = getRouteLinkIds(networkRoute);
 		for (int i = linkIds.size() - 1; i >= currentLinkIndex; i--) {
 			Id linkId = linkIds.get(i);
 			Link link = this.sc.getNetwork().getLinks().get(linkId);
@@ -378,7 +378,7 @@ public class EditPartialRoute {
 		}
 
 		//NetworkRoute subRoute = null;
-		List<Id> subRouteList=null;
+		List<Id<Link>> subRouteList=null;
 		
 		if (cutIndex == -1 || cutIndex<currentLinkIndex) {
 			subRouteList = getSubRoute(linkIds,0,currentLinkIndex+1);
@@ -401,12 +401,12 @@ public class EditPartialRoute {
 		
 	}
 	
-	public List<Id> getSubRoute(List<Id> linkIds, int startIndex, int endIndex){
+	public List<Id<Link>> getSubRoute(List<Id<Link>> linkIds, int startIndex, int endIndex){
 		return linkIds.subList(startIndex, endIndex);
 	}
 	
-	private List<Id> getRouteLinkIds(Route route) {
-		List<Id> linkIds = new ArrayList<Id>();
+	private List<Id<Link>> getRouteLinkIds(Route route) {
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 
 		if (route instanceof NetworkRoute) {
 			NetworkRoute networkRoute = (NetworkRoute) route;

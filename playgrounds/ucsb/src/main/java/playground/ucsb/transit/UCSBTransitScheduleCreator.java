@@ -44,7 +44,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -137,7 +136,7 @@ public class UCSBTransitScheduleCreator {
 			for (PtRoute ptRoute : ptLine.ptRoutes) {
 				ptRouteNr++;
 				List<TransitRouteStop> transitRouteStops = new ArrayList<TransitRouteStop>();
-				List<Id> linkIds = new ArrayList<Id>();
+				List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 				Link startLink = null; Link endLink = null;
 				PtPoint prevPtPoint = null; Node prevNode = null;
 				for (PtPoint ptPoint : ptRoute.ptPoints.values()) {
@@ -176,8 +175,8 @@ public class UCSBTransitScheduleCreator {
 						link.setCapacity(DEFAULT_CAP);
 						int segmentDistance = (ptPoint.dist-prevPtPoint.dist)*100; // feet
 						int segmentTime = ptPoint.timeOffset-prevPtPoint.timeOffset; // sec
-						link.setFreespeed(Math.ceil(FEET2METER*((double)segmentDistance)/((double)segmentTime))); // m/s
-						link.setLength(FEET2METER*((double)segmentDistance));
+						link.setFreespeed(Math.ceil(FEET2METER*(segmentDistance)/(segmentTime))); // m/s
+						link.setLength(FEET2METER*(segmentDistance));
 						link.setNumberOfLanes(DEFAULT_LANES);
 						endLink = link;
 						linkIds.add(link.getId());

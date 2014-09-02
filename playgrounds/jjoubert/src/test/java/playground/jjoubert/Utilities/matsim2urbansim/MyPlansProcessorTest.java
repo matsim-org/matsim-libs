@@ -39,16 +39,15 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 public class MyPlansProcessorTest extends MatsimTestCase{
@@ -97,7 +96,7 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		zones = mzr.getZoneList();
 
 		// Set up scenario.
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		//=====================================================================
 		// Network.
@@ -147,7 +146,7 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		Leg l1 = new LegImpl(TransportMode.car);
 		Link homeLink = n.getLinks().get(new IdImpl("12"));
 		Link workLink = n.getLinks().get(new IdImpl("43"));
-		List<Id> hwLinks = new ArrayList<Id>();
+		List<Id<Link>> hwLinks = new ArrayList<Id<Link>>();
 		hwLinks.add(n.getLinks().get(new IdImpl("24")).getId());
 		NetworkRoute nr1 = new LinkNetworkRouteImpl(homeLink.getId(), workLink.getId());
 		nr1.setLinkIds(homeLink.getId(), hwLinks, workLink.getId());
@@ -186,7 +185,7 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		l1 = new LegImpl(TransportMode.car);
 		homeLink = n.getLinks().get(new IdImpl("12"));
 		workLink = n.getLinks().get(new IdImpl("43"));
-		hwLinks = new ArrayList<Id>();
+		hwLinks = new ArrayList<Id<Link>>();
 		hwLinks.add(n.getLinks().get(new IdImpl("24")).getId());
 		nr1 = new LinkNetworkRouteImpl(homeLink.getId(), workLink.getId());
 		nr1.setLinkIds(homeLink.getId(), hwLinks, workLink.getId());

@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.Identifiable;
  * the context.
  * (This becomes clear if you think about a nodeId/linkId given by person.)
  */
-public interface Node extends BasicLocation, Identifiable {
+public interface Node extends BasicLocation<Node>, Identifiable<Node> {
 
 	/**
 	 * Adds a non-<code>null</code> link to this node's set of ingoing links.

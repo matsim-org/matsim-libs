@@ -197,7 +197,7 @@ public class ElFarolTrainScenario
 		
 		TransitLine line = sFac.createTransitLine(scen.createId("Line1"));
 		
-		List<Id> routeIds = Arrays.asList(
+		List<Id<Link>> routeIds = Arrays.asList(
 				ac.getId(),
 				cb.getId(),
 				bc.getId(),

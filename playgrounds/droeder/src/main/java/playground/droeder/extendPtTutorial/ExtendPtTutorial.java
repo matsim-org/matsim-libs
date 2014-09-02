@@ -76,7 +76,7 @@ class ExtendPtTutorial {
 		new TransitScheduleReader(sc).readFile(DIR + "transitschedule.xml");
 		new VehicleReaderV1(((ScenarioImpl) sc).getVehicles()).readFile(DIR + "transitVehicles.xml");
 		
-		List<Id> links = new ArrayList<Id>(){/**
+		List<Id<Link>> links = new ArrayList<Id<Link>>(){/**
 			 * 
 			 */
 			private static final long serialVersionUID = 1L;

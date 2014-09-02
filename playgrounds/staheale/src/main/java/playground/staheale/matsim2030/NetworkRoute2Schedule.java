@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -14,10 +12,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -34,7 +30,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class NetworkRoute2Schedule {
 
 	private static Logger log = Logger.getLogger(NetworkRoute2Schedule.class);
-	List<Id> newRouteLinkIds = new ArrayList<Id>();
+	List<Id<Link>> newRouteLinkIds = new ArrayList<Id<Link>>();
 	String oldStartTransitRouteId = null;
 	String oldEndTransitRouteId = null;
 	Id oldId = null;

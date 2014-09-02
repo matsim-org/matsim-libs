@@ -25,19 +25,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.Dummy_TakeClosestParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomParkingSearch;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 
 public class ParkAgent extends RandomParkingSearch {
 
@@ -71,6 +65,7 @@ public class ParkAgent extends RandomParkingSearch {
 		super.maxSearchDuration=maxSeachDur;
 	}
 
+	@Override
 	public void resetForNewIteration() {
 		super.resetForNewIteration();
 		attributes = new HashMap<Id, ParkAgent.ParkAgentAttributes>();
@@ -226,7 +221,7 @@ public class ParkAgent extends RandomParkingSearch {
 
 		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
 
-		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
+		List<Id<Link>> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
 		Link nextLink = getNextLink(aem);
 
 		boolean countCapacity = false;

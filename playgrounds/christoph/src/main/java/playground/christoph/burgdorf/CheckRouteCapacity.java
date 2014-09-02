@@ -27,6 +27,7 @@ import java.util.Random;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -90,8 +91,8 @@ public class CheckRouteCapacity {
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 		Random random = MatsimRandom.getLocalInstance();
 		
-		List<Id> routeIdsKriegstetten = new ArrayList<Id>();
-		List<Id> routeIdsSchoenbuehl = new ArrayList<Id>();
+		List<Id<Link>> routeIdsKriegstetten = new ArrayList<Id<Link>>();
+		List<Id<Link>> routeIdsSchoenbuehl = new ArrayList<Id<Link>>();
 		
 		if (toBurgdorf) {
 			for (String id : BurgdorfRoutes.alternativeFromZurich) routeIdsKriegstetten.add(scenario.createId(id));

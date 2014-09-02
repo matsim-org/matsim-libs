@@ -22,6 +22,9 @@
 
 package org.matsim.vis.otfvis.checklists;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -46,13 +49,15 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-
-import java.util.ArrayList;
-import java.util.Collections;
 
 /**
  * Simplified version of TwoLinesDemo.java by mrieser
@@ -167,7 +172,7 @@ public class T6_Transit {
 
 		TransitLine tLine1 = builder.createTransitLine(this.ids[1]);
 		NetworkRoute networkRoute = new LinkNetworkRouteImpl(link1.getId(), link13.getId());
-		ArrayList<Id> linkIdList = new ArrayList<Id>(6);
+		ArrayList<Id<Link>> linkIdList = new ArrayList<Id<Link>>(6);
 		Collections.addAll(linkIdList, link3.getId(), link5.getId(), link7.getId(), link8.getId(), link9.getId(), link11.getId());
 		networkRoute.setLinkIds(link1.getId(), linkIdList, link13.getId());
 		ArrayList<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>(4);
@@ -189,7 +194,7 @@ public class T6_Transit {
 
 		TransitLine tLine2 = builder.createTransitLine(this.ids[2]);
 		networkRoute = new LinkNetworkRouteImpl(link2.getId(), link12.getId());
-		linkIdList = new ArrayList<Id>(6);
+		linkIdList = new ArrayList<Id<Link>>(6);
 		Collections.addAll(linkIdList, link4.getId(), link6.getId(), link7.getId(), link8.getId(), link9.getId(), link10.getId());
 		networkRoute.setLinkIds(link2.getId(), linkIdList, link12.getId());
 		stopList = new ArrayList<TransitRouteStop>(4);

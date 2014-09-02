@@ -49,9 +49,9 @@ public class Stitcher {
 
 	private LinkedList<Id> backwardStops = new LinkedList<Id>();
 
-	private LinkedList<Id> forwardStopLinks = new LinkedList<Id>();
+	private LinkedList<Id<Link>> forwardStopLinks = new LinkedList<Id<Link>>();
 
-	private LinkedList<Id> backwardStopLinks = new LinkedList<Id>();
+	private LinkedList<Id<Link>> backwardStopLinks = new LinkedList<Id<Link>>();
 
 	private List<Double> forwardTravelTimes = new LinkedList<Double>();
 
@@ -110,23 +110,23 @@ public class Stitcher {
 		addBackwardLinks(way);
 	}
 
-	public List<Id> getForwardRoute() {
+	public List<Id<Link>> getForwardRoute() {
 		return route(forwardStops, forwardStopLinks, forwardTravelTimes);
 	}
 
-	public List<Id> getForwardStopLinks() {
+	public List<Id<Link>> getForwardStopLinks() {
 		return forwardStopLinks;
 	}
 
-	public List<Id> getBackwardStopLinks() {
+	public List<Id<Link>> getBackwardStopLinks() {
 		return backwardStopLinks;
 	}
 
-	private List<Id> route(List<Id> stopNodes, List<Id> outStopLinks, List<Double> outTravelTimes) {
+	private List<Id<Link>> route(List<Id> stopNodes, List<Id<Link>> outStopLinks, List<Double> outTravelTimes) {
 		if (stopNodes.isEmpty()) {
 			return Collections.emptyList();
 		}
-		List<Id> links = new ArrayList<Id>();
+		List<Id<Link>> links = new ArrayList<Id<Link>>();
 		FreespeedTravelTimeAndDisutility cost = new FreespeedTravelTimeAndDisutility(-1, 0, 0);
 		Dijkstra router = new Dijkstra(networkForThisRoute, cost, cost);
 		Iterator<Id> i = stopNodes.iterator();
@@ -159,7 +159,7 @@ public class Stitcher {
 		return links;
 	}
 
-	public List<Id> getBackwardRoute() {
+	public List<Id<Link>> getBackwardRoute() {
 		return route(backwardStops, backwardStopLinks, backwardTravelTimes);
 	}
 

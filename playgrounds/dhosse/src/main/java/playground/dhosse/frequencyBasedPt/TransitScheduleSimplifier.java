@@ -629,7 +629,7 @@ public class TransitScheduleSimplifier{
 		linkIds.addAll(route.getLinkIds());
 		linkIds.add(route.getEndLinkId());
 		
-		List<Id> newLinkIds = new ArrayList<Id>();
+		List<Id<Link>> newLinkIds = new ArrayList<Id<Link>>();
 		boolean on = false;
 		List<Id> mustHave = new ArrayList<Id>();
 		
@@ -787,9 +787,9 @@ public class TransitScheduleSimplifier{
 				
 				for(Departure departure : transitRoute.getDepartures().values()){
 				
-					String departureId = (String) (mergedTransitRoute.getDepartures().size() < 10 ?
+					String departureId = mergedTransitRoute.getDepartures().size() < 10 ?
 							"0"+Integer.toString(mergedTransitRoute.getDepartures().size()) :
-							Integer.toString(mergedTransitRoute.getDepartures().size()));
+							Integer.toString(mergedTransitRoute.getDepartures().size());
 					
 					Departure dep = factory.createDeparture(new IdImpl(departureId),
 							departure.getDepartureTime() + transitRoute.getStop(startTransitRouteStop.getStopFacility()).getDepartureOffset());
@@ -814,9 +814,9 @@ public class TransitScheduleSimplifier{
 			
 				for(Departure departure : transitRoute.getDepartures().values()){
 				
-					String departureId = (String) (mergedTransitRoute.getDepartures().size() < 10 ?
+					String departureId = mergedTransitRoute.getDepartures().size() < 10 ?
 							"0"+Integer.toString(mergedTransitRoute.getDepartures().size()) :
-							Integer.toString(mergedTransitRoute.getDepartures().size()));
+							Integer.toString(mergedTransitRoute.getDepartures().size());
 					
 					Departure dep = factory.createDeparture(new IdImpl(departureId),
 							departure.getDepartureTime() + transitRoute.getStop(routeProfile.get(0)).getDepartureOffset());

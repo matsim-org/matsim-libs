@@ -183,6 +183,7 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 		private final Id id = new IdImpl("p02");
 		
 		// Agents that do not match the filter criteria are removed from the set.
+		@Override
 		public void applyAgentFilter(Set<Id> set, double time) {
 			Iterator<Id> iter = set.iterator();
 			while (iter.hasNext()) {
@@ -192,6 +193,7 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 		}
 
 		// Returns true if the agent matches the filter criteria, otherwise returns false.
+		@Override
 		public boolean applyAgentFilter(Id id, double time) {
 			if (id.equals(this.id)) return true;
 			return false;
@@ -227,7 +229,7 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 			
 			Id startLinkId = scenario.createId("l0");
 			Id endLinkId = scenario.createId("l2");
-			List<Id> linkIds = new ArrayList<Id>();
+			List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 			linkIds.add(scenario.createId("l3"));
 			linkIds.add(scenario.createId("l4"));
 			linkIds.add(scenario.createId("l5"));
@@ -323,7 +325,7 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 		Id startLinkId = scenario.createId("l0");
 		Id endLinkId = scenario.createId("l2");
 		NetworkRoute route = (NetworkRoute) routeFactory.createRoute(startLinkId, endLinkId);
-		List<Id> linkIds = new ArrayList<Id>();
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		linkIds.add(scenario.createId("l1"));
 		route.setLinkIds(startLinkId, linkIds, endLinkId);
 		leg.setRoute(route);

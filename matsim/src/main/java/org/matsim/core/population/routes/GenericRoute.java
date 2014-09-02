@@ -21,6 +21,7 @@
 package org.matsim.core.population.routes;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
 
 /**
@@ -30,7 +31,7 @@ import org.matsim.api.core.v01.population.Route;
  */
 public interface GenericRoute extends Route {
 
-	public void setRouteDescription(final Id startLinkId, final String routeDescription, final Id endLinkId);
+	public void setRouteDescription(final Id<Link> startLinkId, final String routeDescription, final Id<Link> endLinkId);
 
 	public String getRouteDescription();
 

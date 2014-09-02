@@ -37,7 +37,7 @@ public class DistanceCalculations {
 
 	public static double getLegDistance(NetworkRoute route, Network network)
 	{
-		List<Id> ids = route.getLinkIds();
+		List<Id<Link>> ids = route.getLinkIds();
 		
 		double distance = 0.0;
 		

@@ -47,7 +47,6 @@ import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.tools.MultiModalNetworkCreator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
@@ -199,7 +198,7 @@ public class CreateMarathonPopulation {
 			nodeIds.add(id);
 		}
 		
-		List<Id> linkIds = new ArrayList<Id>();
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		for (int i = 0; i < nodeIds.size() - 1; i++) {
 			Id fromId = nodeIds.get(i);
 			Id toId = nodeIds.get(i + 1);

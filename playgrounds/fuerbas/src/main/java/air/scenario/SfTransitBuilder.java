@@ -32,6 +32,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -88,7 +89,7 @@ public class SfTransitBuilder {
 		
 		Vehicles veh = VehicleUtils.createVehiclesContainer();
 				
-		Map<Id, List<Id>> linkListMap = new HashMap<Id, List<Id>>(); 
+		Map<Id, List<Id<Link>>> linkListMap = new HashMap<Id, List<Id<Link>>>(); 
 		Map<Id, List<TransitRouteStop>> stopListMap = new HashMap<Id, List<TransitRouteStop>>();
 		Map<Id, NetworkRoute> netRouteMap = new HashMap<Id, NetworkRoute>();
 		Map<Id, TransitRoute> transRouteMap = new HashMap<Id, TransitRoute>();
@@ -114,7 +115,7 @@ public class SfTransitBuilder {
 			Id flightNumber = new IdImpl(lineEntries[2]);	//flight number
 			Id vehTypeId = new IdImpl(lineEntries[5]+"_"+lineEntries[6]+"_"+flightNumber);	//IATA aircraft code + seats avail
 			int aircraftCapacity = Integer.parseInt(lineEntries[6]);
-			List<Id> linkList = new ArrayList<Id>();	//evtl in Map mit Route als key verpacken
+			List<Id<Link>> linkList = new ArrayList<Id<Link>>();	//evtl in Map mit Route als key verpacken
 			List<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>();	//evtl in Map mit Route als key verpacken
 			
 			//nur ausführen, wenn stopListMap noch keinen entspechenden key enthält

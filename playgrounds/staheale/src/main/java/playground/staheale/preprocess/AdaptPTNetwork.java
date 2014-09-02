@@ -19,15 +19,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.network.algorithms.NetworkMergeDoubleLinks;
-import org.matsim.core.network.algorithms.NetworkMergeDoubleLinks.MergeType;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -168,7 +164,7 @@ public class AdaptPTNetwork {
 				// add route stop to route profile list if previous route stop has different coordinates
 				List<TransitRouteStop> routeStops = new ArrayList<TransitRouteStop>();
 
-				List<Id> newRouteLinkIds = new ArrayList<Id>();
+				List<Id<Link>> newRouteLinkIds = new ArrayList<Id<Link>>();
 
 				Id startLinkId = route.getRoute().getStartLinkId();
 				startNode = this.network.getLinks().get(startLinkId).getFromNode();

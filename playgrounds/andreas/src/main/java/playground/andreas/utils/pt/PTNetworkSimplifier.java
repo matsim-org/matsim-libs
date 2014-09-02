@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
@@ -282,7 +281,7 @@ public class PTNetworkSimplifier {
 
 				if(transitRoute.getRoute().getLinkIds().contains(inLink.getId()) || transitRoute.getRoute().getLinkIds().contains(inLink.getId())){
 
-					LinkedList<Id> routeLinkIds = new LinkedList<Id>();
+					LinkedList<Id<Link>> routeLinkIds = new LinkedList<Id<Link>>();
 					routeLinkIds.add(transitRoute.getRoute().getStartLinkId());
 					for (Id id : transitRoute.getRoute().getLinkIds()) {
 						routeLinkIds.add(id);

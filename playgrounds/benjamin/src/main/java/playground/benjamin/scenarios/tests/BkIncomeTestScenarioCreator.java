@@ -26,6 +26,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -89,7 +90,7 @@ public class BkIncomeTestScenarioCreator {
 			Leg leg1Car = builder.createLeg(TransportMode.car);
 			LinkNetworkRouteImpl routeCar = new LinkNetworkRouteImpl(id1, id4);
 			//this would be so nice
-			List<Id> linkidsCar = new ArrayList<Id>();
+			List<Id<Link>> linkidsCar = new ArrayList<Id<Link>>();
 			linkidsCar.add(id2);
 			linkidsCar.add(id3);
 			routeCar.setLinkIds(id1, linkidsCar, id4);
@@ -105,7 +106,7 @@ public class BkIncomeTestScenarioCreator {
 			Leg leg2Car = builder.createLeg(TransportMode.car);
 			routeCar = new LinkNetworkRouteImpl(id4, id1);
 			//in a beautiful world we would do...
-			linkidsCar = new ArrayList<Id>();
+			linkidsCar = new ArrayList<Id<Link>>();
 			linkidsCar.add(id5);
 			linkidsCar.add(id6);
 			linkidsCar.add(id7);

@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -94,7 +95,7 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 		Leg currentLeg = WithinDayAgentUtils.getModifiableCurrentLeg(withinDayAgent);
 		NetworkRoute currentRoute = (NetworkRoute) currentLeg.getRoute();
 		Id currentVehicleId = currentRoute.getVehicleId();
-		List<Id> subRoute;
+		List<Id<Link>> subRoute;
 		
 		/*
 		 * Create new pickup activity.
@@ -125,7 +126,7 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 		Leg carLeg = scenario.getPopulation().getFactory().createLeg(TransportMode.car);
 //		carLeg.setDepartureTime(departureTime);
 		carLeg.setDepartureTime(this.time + duration);
-		subRoute = new ArrayList<Id>();
+		subRoute = new ArrayList<Id<Link>>();
 		/*
 		 * If the driver is not already at the end link of its current route, copy the
 		 * so far not passed parts of the route to the new route.
@@ -155,7 +156,7 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 		 * End agent's current leg at the current link.
 		 * Check whether the agent is already on the routes last link.
 		 */
-		subRoute = new ArrayList<Id>();
+		subRoute = new ArrayList<Id<Link>>();
 		if (currentLinkId.equals(currentRoute.getEndLinkId())) {
 			subRoute.addAll(currentRoute.getLinkIds());	
 		} else {
@@ -224,7 +225,7 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 		 * End agent's current leg at the current link.
 		 */
 		NetworkRoute route = (NetworkRoute) currentLeg.getRoute();
-		List<Id> subRoute = new ArrayList<Id>(route.getLinkIds().subList(0, currentLinkIndex));
+		List<Id<Link>> subRoute = new ArrayList<Id<Link>>(route.getLinkIds().subList(0, currentLinkIndex));
 		route.setLinkIds(route.getStartLinkId(), subRoute, currentLinkId);
 		currentLeg.setTravelTime(this.time - currentLeg.getDepartureTime());	
 		

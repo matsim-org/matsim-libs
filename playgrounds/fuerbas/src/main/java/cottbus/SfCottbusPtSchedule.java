@@ -31,6 +31,7 @@ import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -38,7 +39,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
@@ -53,7 +53,6 @@ import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
 
 /**
  * @author fuerbas
@@ -82,7 +81,7 @@ public class SfCottbusPtSchedule {
 	
 	
 	public SfCottbusPtSchedule() {
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.config = this.scenario.getConfig();
 		
 		this.LINES = ptdir+"lines\\lines_congregated.csv";
@@ -100,7 +99,7 @@ public class SfCottbusPtSchedule {
 	public static void main(String[] args) throws Exception {
 
 		SfCottbusPtSchedule cottbus = new SfCottbusPtSchedule();
-		Scenario scen = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
+		Scenario scen = ScenarioUtils.createScenario(ConfigUtils.createConfig());	
 		Config config = scen.getConfig();
 		config.network().setInputFile(cottbus.NETWORK);
 		ScenarioUtils.loadScenario(scen);		
@@ -394,7 +393,7 @@ public class SfCottbusPtSchedule {
 		Id origin = new IdImpl(links[0]);
 		Id destination = new IdImpl(links[length-1]);
 		NetworkRoute netRoute = new LinkNetworkRouteImpl(origin, destination);
-		List<Id> linkList = new ArrayList<Id>();
+		List<Id<Link>> linkList = new ArrayList<Id<Link>>();
 		for(int index = 1; index<length-1; index++) {
 				linkList.add(new IdImpl(links[index]));
 			}

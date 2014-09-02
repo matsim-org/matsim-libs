@@ -23,13 +23,14 @@ package org.matsim.core.population.routes;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
 
 public class CompressedNetworkRouteFactory implements RouteFactory {
 
-	private Map<Id, Id> subsequentLinks = null;
+	private Map<Id<Link>, Id<Link>> subsequentLinks = null;
 	private final Network network;
 	/**
 	 * Uses {@link SubsequentLinksAnalyzer} to get the map of subsequent links,
@@ -42,7 +43,7 @@ public class CompressedNetworkRouteFactory implements RouteFactory {
 	}
 
 	@Override
-	public Route createRoute(final Id startLinkId, final Id endLinkId) {
+	public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		if ( network==null ) {
 			throw new RuntimeException( "need to set Network in Population in order to be able to create compressed routes") ;
 		}

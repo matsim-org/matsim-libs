@@ -21,26 +21,20 @@ package playground.pieter.singapore.utils.events;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
@@ -52,9 +46,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.log4j.Logger;
-import org.cyberneko.html.HTMLScanner.PlaybackInputStream;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -68,8 +59,6 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
@@ -81,19 +70,14 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.withinday.trafficmonitoring.LinkEnteredProvider;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
-import playground.pieter.pseudosimulation.mobsim.PSim.SimThread;
 import playground.pieter.pseudosimulation.util.CollectionUtils;
 
 public class CepasToEventsMultithreaded_1 {
@@ -169,6 +153,7 @@ public class CepasToEventsMultithreaded_1 {
 			return sb.toString();
 		}
 
+		@Override
 		public String toString() {
 			StringBuffer sb = new StringBuffer(
 					"vehId\tstopIdNotInRoute\ttransactionCount\tdwellEventCount\tdwellEventsDropped\tdwellEventTransactionsDropped\tfastTransactionDropped\tinterpolatedDwells\n");
@@ -204,6 +189,7 @@ public class CepasToEventsMultithreaded_1 {
 
 		// Note: this comparator imposes orderings that are inconsistent with
 		// equals.
+		@Override
 		public int compare(Id a, Id b) {
 			if (base.get(a) >= base.get(b)) {
 				return 1;
@@ -232,6 +218,7 @@ public class CepasToEventsMultithreaded_1 {
 		 */
 		HashMap<Integer, CepasRoute> routes = new HashMap<Integer, CepasToEventsMultithreaded_1.CepasRoute>();
 
+		@Override
 		public String toString() {
 			return (routes.values().toString());
 		}
@@ -262,6 +249,7 @@ public class CepasToEventsMultithreaded_1 {
 		CepasLine line;
 		HashMap<Id, CepasVehicle> vehicles = new HashMap<Id, CepasToEventsMultithreaded_1.CepasVehicle>();
 
+		@Override
 		public String toString() {
 			return (line.lineId.toString() + " : " + direction + " : " + vehicles.keySet() + "\n");
 		}
@@ -281,7 +269,7 @@ public class CepasToEventsMultithreaded_1 {
 			public CepasVehicleDwellEventCluster(List<CepasVehicleDwellEvent> orderedDwellEvents) {
 				super();
 				for (CepasVehicleDwellEvent de : orderedDwellEvents) {
-					this.orderedDwellEvents.put((int) de.arrivalTime, de);
+					this.orderedDwellEvents.put(de.arrivalTime, de);
 				}
 			}
 
@@ -357,7 +345,7 @@ public class CepasToEventsMultithreaded_1 {
 						for (double distance : travelDistancesBetweenStops) {
 							timeWeights.add(distance / totalTravelDistanceBetweenStops);
 						}
-						int dwellTime = (int) origDwellEvent.departureTime;
+						int dwellTime = origDwellEvent.departureTime;
 						// recall that the first stop is the origin; we
 						// already have a dwell event for that
 						for (Id stop : stopsToVisit) {
@@ -504,7 +492,7 @@ public class CepasToEventsMultithreaded_1 {
 					this.arrivalTime = (int) targetCluster.get(0).time;
 					this.departureTime = (int) targetCluster.get(targetCluster.size() - 1).time;
 					if (getDwellTime() < minDwellTime) {
-						int avgtime = (int) ((arrivalTime + departureTime) / 2);
+						int avgtime = (arrivalTime + departureTime) / 2;
 						arrivalTime = avgtime - minDwellTime / 2;
 						departureTime = avgtime + minDwellTime / 2;
 					}
@@ -664,7 +652,7 @@ public class CepasToEventsMultithreaded_1 {
 				dwellEvents.add(dwellEvent);
 				dwellEvent.findTrueDwellTime();
 				for (CepasVehicleDwellEvent stopEvent1 : dwellEvents) {
-					this.orderedDwellEvents.put((int) stopEvent1.arrivalTime, stopEvent1);
+					this.orderedDwellEvents.put(stopEvent1.arrivalTime, stopEvent1);
 				}
 				errorTracker.dwellEventsCount(vehicleId, orderedDwellEvents.size());
 
@@ -1362,7 +1350,7 @@ public class CepasToEventsMultithreaded_1 {
 						Event linkEnter = null;
 
 						this.eventQueue.addLast(linkLeave);
-						List<Id> linkIds = subRoute.getLinkIds();
+						List<Id<Link>> linkIds = subRoute.getLinkIds();
 						for (int i = 0; i < linkIds.size(); i++) {
 							linkEnter = new LinkEnterEvent(lastTime += 0.001, driverId, linkIds.get(i), busRegNum);
 							linkLeave = new LinkLeaveEvent(

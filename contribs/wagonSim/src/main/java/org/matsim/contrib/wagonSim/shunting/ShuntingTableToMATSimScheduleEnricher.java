@@ -82,7 +82,7 @@ public class ShuntingTableToMATSimScheduleEnricher {
 			
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				
-				List<Id> routeLinkIds = new ArrayList<Id>();
+				List<Id<Link>> routeLinkIds = new ArrayList<Id<Link>>();
 				routeLinkIds.add(transitRoute.getRoute().getStartLinkId());
 				routeLinkIds.addAll(transitRoute.getRoute().getLinkIds());
 				routeLinkIds.add(transitRoute.getRoute().getEndLinkId());

@@ -160,7 +160,10 @@ public class AccessEgressDemoSimple {
 		Link endLinkA = this.scenario.getNetwork().getLinks().get(new IdImpl("1314"));
 		NetworkRoute networkRouteA = (NetworkRoute) ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, startLinkA.getId(), endLinkA.getId());
 		
-		ArrayList<Id> linkListA = new ArrayList<Id>(); linkListA.add(new IdImpl("1011")); linkListA.add(new IdImpl("1112")); linkListA.add(new IdImpl("1213"));
+		ArrayList<Id<Link>> linkListA = new ArrayList<Id<Link>>(); 
+		linkListA.add(Id.create("1011", Link.class)); 
+		linkListA.add(Id.create("1112", Link.class)); 
+		linkListA.add(Id.create("1213", Link.class));
 		
 		networkRouteA.setLinkIds(startLinkA.getId(), linkListA, endLinkA.getId());
 		TransitRoute tRouteA = builder.createTransitRoute(new IdImpl("A"), networkRouteA, stopListA, "bus");
@@ -177,7 +180,10 @@ public class AccessEgressDemoSimple {
 		Link endLinkB = this.scenario.getNetwork().getLinks().get(new IdImpl("2324"));
 		NetworkRoute networkRouteB = (NetworkRoute) ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, startLinkB.getId(), endLinkB.getId());
 		
-		ArrayList<Id> linkListB = new ArrayList<Id>(); linkListB.add(new IdImpl("2021")); linkListB.add(new IdImpl("2122")); linkListB.add(new IdImpl("2223"));
+		ArrayList<Id<Link>> linkListB = new ArrayList<Id<Link>>();
+		linkListB.add(Id.create("2021", Link.class));
+		linkListB.add(Id.create("2122", Link.class));
+		linkListB.add(Id.create("2223", Link.class));
 		
 		networkRouteB.setLinkIds(startLinkB.getId(), linkListB, endLinkB.getId());
 		TransitRoute tRouteB = builder.createTransitRoute(new IdImpl("B"), networkRouteB, stopListB, "bus");

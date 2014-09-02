@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -113,7 +114,7 @@ public class TransitScheduleAreaCut {
 		// There is no setter - need to deep copy the whole route
 //		route.setStops(stopsToKeep);
 		
-		LinkedList<Id> linkIds = new LinkedList<Id>();
+		LinkedList<Id<Link>> linkIds = new LinkedList<Id<Link>>();
 		Id endLinkId = null;
 		for (Id linkId : route.getRoute().getLinkIds()) {
 			linkIds.add(linkId);

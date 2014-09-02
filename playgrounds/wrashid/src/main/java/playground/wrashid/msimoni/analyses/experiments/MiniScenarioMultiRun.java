@@ -148,7 +148,7 @@ public class MiniScenarioMultiRun {
 
 		PopulationFactory factory = scenario.getPopulation().getFactory();
 
-		List<Id> linkIds = new ArrayList<Id>();
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		for (int i = 0; i < 1000; i++) {
 			linkIds.add(scenario.createId("l0"));
 			linkIds.add(scenario.createId("l1"));

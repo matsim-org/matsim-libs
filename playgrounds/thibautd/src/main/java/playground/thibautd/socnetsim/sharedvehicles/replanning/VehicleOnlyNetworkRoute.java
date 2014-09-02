@@ -22,6 +22,7 @@ package playground.thibautd.socnetsim.sharedvehicles.replanning;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.NetworkRoute;
 
 /**
@@ -71,27 +72,27 @@ class VehicleOnlyNetworkRoute implements NetworkRoute {
 	}
 
 	@Override
-	public Id getStartLinkId() {
+	public Id<Link> getStartLinkId() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Id getEndLinkId() {
+	public Id<Link> getEndLinkId() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public void setStartLinkId(Id linkId) {
+	public void setStartLinkId(Id<Link> linkId) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public void setEndLinkId(Id linkId) {
+	public void setEndLinkId(Id<Link> linkId) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public void setLinkIds(Id startLinkId, List<Id> linkIds, Id endLinkId) {
+	public void setLinkIds(Id<Link> startLinkId, List<Id<Link>> linkIds, Id<Link> endLinkId) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -107,12 +108,12 @@ class VehicleOnlyNetworkRoute implements NetworkRoute {
 	}
 
 	@Override
-	public List<Id> getLinkIds() {
+	public List<Id<Link>> getLinkIds() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public NetworkRoute getSubRoute(Id fromLinkId, Id toLinkId) {
+	public NetworkRoute getSubRoute(Id<Link> fromLinkId, Id<Link> toLinkId) {
 		throw new UnsupportedOperationException();
 	}
 

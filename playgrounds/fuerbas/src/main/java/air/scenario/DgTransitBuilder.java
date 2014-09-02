@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -98,7 +99,7 @@ public class DgTransitBuilder {
 			NetworkRoute route = new LinkNetworkRouteImpl(fromId, toId);
 			SfMatsimAirport fromAirport = airportMap.get(fromId);
 			SfMatsimAirport toAirport = airportMap.get(toId);
-			List<Id> routeLinkIds = new ArrayList<Id>();
+			List<Id<Link>> routeLinkIds = new ArrayList<Id<Link>>();
 			routeLinkIds.addAll(fromAirport.getDepartureLinkIdList());
 			routeLinkIds.add(id);
 			routeLinkIds.addAll(toAirport.getArrivalLinkIdList());

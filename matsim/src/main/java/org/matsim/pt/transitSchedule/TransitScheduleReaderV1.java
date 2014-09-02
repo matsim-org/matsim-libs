@@ -29,6 +29,7 @@ import java.util.Stack;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.IdFactory;
 import org.matsim.core.api.internal.MatsimSomeReader;
@@ -222,15 +223,15 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 	}
 
 	private static class TempRoute {
-		/*package*/ List<Id> linkIds = new ArrayList<Id>();
-		/*package*/ Id firstLinkId = null;
-		/*package*/ Id lastLinkId = null;
+		/*package*/ List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+		/*package*/ Id<Link> firstLinkId = null;
+		/*package*/ Id<Link> lastLinkId = null;
 
 		protected TempRoute() {
 			// public constructor for private inner class
 		}
 
-		protected void addLink(final Id linkId) {
+		protected void addLink(final Id<Link> linkId) {
 			if (this.firstLinkId == null) {
 				this.firstLinkId = linkId;
 			} else if (this.lastLinkId == null) {

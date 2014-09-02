@@ -95,7 +95,7 @@ public class RenameId {
 							leg2.setDepartureTime(leg.getDepartureTime());
 							leg2.setTravelTime(leg.getTravelTime());
 							LinkNetworkRouteImpl r = (LinkNetworkRouteImpl) leg.getRoute();
-							List<Id>ids = new ArrayList<Id>();
+							List<Id<Link>>ids = new ArrayList<Id<Link>>();
 							ids.add(new IdImpl("car"+r.getStartLinkId().toString()));
 							for (Id id : r.getLinkIds()) {
 								ids.add(new IdImpl("car"+id.toString()));

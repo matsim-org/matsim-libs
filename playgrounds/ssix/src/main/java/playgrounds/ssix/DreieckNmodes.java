@@ -118,50 +118,62 @@ public class DreieckNmodes {
 			this.goHome = false;//false at start, modified when all data is extracted.
 			}
 
+		@Override
 		public final void endActivityAndComputeNextState(double now) {
 			delegate.endActivityAndComputeNextState(now);
 		}
 
+		@Override
 		public final void endLegAndComputeNextState(double now) {
 			delegate.endLegAndComputeNextState(now);
 		}
 
+		@Override
 		public final void setStateToAbort(double now) {
 			delegate.setStateToAbort(now);
 		}
 
+		@Override
 		public boolean equals(Object obj) {
 			return delegate.equals(obj);
 		}
 
+		@Override
 		public final double getActivityEndTime() {
 			return delegate.getActivityEndTime();
 		}
 
+		@Override
 		public final Id getCurrentLinkId() {
 			return delegate.getCurrentLinkId();
 		}
 
+		@Override
 		public final Double getExpectedTravelTime() {
 			return delegate.getExpectedTravelTime();
 		}
 
+		@Override
 		public final String getMode() {
 			return delegate.getMode();
 		}
 
+		@Override
 		public final Id getDestinationLinkId() {
 			return delegate.getDestinationLinkId();
 		}
 
+		@Override
 		public final Id getId() {
 			return delegate.getId();
 		}
 
+		@Override
 		public State getState() {
 			return delegate.getState();
 		}
 
+		@Override
 		public final void notifyArrivalOnLinkByNonNetworkMode(Id linkId) {
 			delegate.notifyArrivalOnLinkByNonNetworkMode(linkId);
 		}
@@ -170,8 +182,8 @@ public class DreieckNmodes {
 		public Id chooseNextLinkId() {
 			if (DreieckNmodes.funfunfun.isPermanent()){ goHome = true; }
 			
-			Id forcedLeftTurnLinkId = new IdImpl((long)(3*DreieckNmodes.subdivisionFactor - 1));
-			Id forcedStraightForwardLinkId = new IdImpl((long)(DreieckNmodes.subdivisionFactor - 1));
+			Id forcedLeftTurnLinkId = new IdImpl(3*DreieckNmodes.subdivisionFactor - 1);
+			Id forcedStraightForwardLinkId = new IdImpl(DreieckNmodes.subdivisionFactor - 1);
 			
 			if (!(delegate.getCurrentLinkId().equals(forcedLeftTurnLinkId))){ // not 3n-1
 				if (!(delegate.getCurrentLinkId().equals(forcedStraightForwardLinkId))){ //not 3n-1 and not n-1
@@ -180,14 +192,14 @@ public class DreieckNmodes {
 					if (!(goHome)){ //n-1 but not goHome
 						return delegate.chooseNextLinkId();
 					} else { //n-1 and goHome
-						Id afterGoingStraightForwardLinkId = new IdImpl((long)(3*DreieckNmodes.subdivisionFactor));
+						Id afterGoingStraightForwardLinkId = new IdImpl(3*DreieckNmodes.subdivisionFactor);
 						delegate.setCachedNextLinkId(afterGoingStraightForwardLinkId);
 						delegate.setCurrentLinkIdIndex(3*DreieckNmodes.subdivisionFactor);//This does work quite well so far and allows to end simulation.
 						return afterGoingStraightForwardLinkId;
 					}
 				}
 			} else { //3n-1
-				Id afterLeftTurnLinkId = new IdImpl((long)(0));
+				Id afterLeftTurnLinkId = new IdImpl((0));
 				delegate.setCachedNextLinkId(afterLeftTurnLinkId);
 				delegate.setCurrentLinkIdIndex(0);
 				return afterLeftTurnLinkId;
@@ -439,7 +451,7 @@ public class DreieckNmodes {
 				}
 			}
 			Coord coord = scenario.createCoord(x, y);
-			Id id = new IdImpl((long)i);
+			Id id = new IdImpl(i);
 			
 			Node node = scenario.getNetwork().getFactory().createNode(id, coord);
 			network.addNode(node);	
@@ -449,7 +461,7 @@ public class DreieckNmodes {
 			double x = DreieckNmodes.length - (DreieckNmodes.length/(2*DreieckNmodes.subdivisionFactor))*(i+1);
 			double y = Math.sqrt(3.)*(DreieckNmodes.length-x);
 			Coord coord = scenario.createCoord(x, y);
-			Id id = new IdImpl((long)(DreieckNmodes.subdivisionFactor+i+1));
+			Id id = new IdImpl(DreieckNmodes.subdivisionFactor+i+1);
 			
 			Node node = scenario.getNetwork().getFactory().createNode(id, coord);
 			network.addNode(node);
@@ -459,7 +471,7 @@ public class DreieckNmodes {
 			double x = DreieckNmodes.length/2 - (DreieckNmodes.length/(2*DreieckNmodes.subdivisionFactor))*(i+1);
 			double y = Math.sqrt(3.)*x;
 			Coord coord = scenario.createCoord(x, y);
-			Id id = new IdImpl((long)(2*DreieckNmodes.subdivisionFactor+i+1));
+			Id id = new IdImpl(2*DreieckNmodes.subdivisionFactor+i+1);
 			
 			Node node = scenario.getNetwork().getFactory().createNode(id, coord);
 			network.addNode(node);
@@ -477,10 +489,10 @@ public class DreieckNmodes {
 		//LINKS
 		//all triangle links
 		for (int i = 0; i<3*DreieckNmodes.subdivisionFactor; i++){
-			Id idFrom = new IdImpl((long)i);
+			Id idFrom = new IdImpl(i);
 			Id idTo;
 			if (i != 3*DreieckNmodes.subdivisionFactor-1)
-				idTo = new IdImpl((long)(i+1));
+				idTo = new IdImpl(i+1);
 			else
 				idTo = new IdImpl(0);
 			Node from = network.getNodes().get(idFrom);
@@ -549,7 +561,7 @@ public class DreieckNmodes {
 			//Handy route definition for making the agents stay on the track
 			final Id startLinkId = new IdImpl(-1);
 			final Id endLinkId = new IdImpl(3*subdivisionFactor);
-			List<Id> routeDescription = new ArrayList<Id>();
+			List<Id<Link>> routeDescription = new ArrayList<Id<Link>>();
 			for (long k=0; k<3*subdivisionFactor;k++){
 				routeDescription.add(new IdImpl(k));
 			}

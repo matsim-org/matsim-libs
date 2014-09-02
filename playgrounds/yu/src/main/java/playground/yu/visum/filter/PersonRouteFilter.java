@@ -21,6 +21,7 @@ package playground.yu.visum.filter;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
@@ -87,9 +88,9 @@ public class PersonRouteFilter extends PersonFilterA {
 						LegImpl leg = (LegImpl) obj;
 						NetworkRoute route = (NetworkRoute) leg.getRoute();
 						if (route != null) {
-							List<Id> linkIds = route.getLinkIds();
+							List<Id<Link>> linkIds = route.getLinkIds();
 							if (linkIds != null) {
-								for (Id linkId : linkIds) {
+								for (Id<Link> linkId : linkIds) {
 									if (criterionLinkIds.contains(linkId)) {
 										return false;
 									}

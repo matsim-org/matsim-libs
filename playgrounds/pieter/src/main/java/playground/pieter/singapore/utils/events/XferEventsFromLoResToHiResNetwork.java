@@ -313,7 +313,7 @@ public class XferEventsFromLoResToHiResNetwork{
 				Event linkEnter = null;
 
 				hiResEvents.addLast(linkLeave);
-				List<Id> linkIds = subRoute.getLinkIds();
+				List<Id<Link>> linkIds = subRoute.getLinkIds();
 				for (int i = 0; i < linkIds.size(); i++) {
 					linkEnter = new LinkEnterEvent(lastTime += 0.001, driverId, linkIds.get(i), vehId);
 					linkLeave = new LinkLeaveEvent(

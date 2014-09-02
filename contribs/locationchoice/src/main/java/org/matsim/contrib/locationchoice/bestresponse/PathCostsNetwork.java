@@ -36,7 +36,7 @@ public class PathCostsNetwork extends PathCosts {
 	}
 
 	public void createRoute(List<Link> linksAllIncluded, double traveltime) {
-		List<Id> linkIds = new ArrayList<Id>(); 
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>(); 
 		for (int i = 1; i < linksAllIncluded.size() - 2; i++) {
 			linkIds.add(linksAllIncluded.get(i).getId());
 		}

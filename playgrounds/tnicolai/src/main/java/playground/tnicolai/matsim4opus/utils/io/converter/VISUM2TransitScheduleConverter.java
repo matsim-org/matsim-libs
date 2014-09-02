@@ -35,6 +35,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -459,7 +460,7 @@ public class VISUM2TransitScheduleConverter {
 //		for(Link l: path.links)
 //			linkIds.add(l.getId());
 		
-		List<Id> linkIds = new ArrayList<Id>();
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		linkIds.add(new IdImpl(origin.getId() +""+ destination.getId()));
 		
 		NetworkRoute route = new LinkNetworkRouteImpl(origin.getLinkId(), destination.getLinkId());

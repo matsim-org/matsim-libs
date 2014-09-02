@@ -26,6 +26,7 @@ package playground.yu.choiceSetGeneration;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.routes.NetworkRoute;
 
@@ -62,8 +63,7 @@ public class PathSizeFrom2Routes {
 	}
 
 	protected void compareRoute() {
-		List<Id> currentLinkIds = currentRoute.getLinkIds(), referenceLinkIds = referenceRoute
-				.getLinkIds();
+		List<Id<Link>> currentLinkIds = currentRoute.getLinkIds(), referenceLinkIds = referenceRoute.getLinkIds();
 		if (currentLinkIds == null) {
 			throw new RuntimeException("currentRoute of vehicle (ID:\t"
 					+ currentRoute.getVehicleId() + ") has NULL linkIds!!");

@@ -32,28 +32,21 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.ParallelEventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
-import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -61,7 +54,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.wrashid.fd.DensityInfoCollectorDualSim;
 import playground.wrashid.fd.MainFundamentalDiagram;
 import playground.wrashid.fd.OutFlowInfoCollectorDualSim;
-import playground.wrashid.msimoni.analyses.MiniScenario;
 import playground.wrashid.msimoni.analyses.experiments.MiniScenarioMultiRun;
 
 public class MiniScenarioDualSim {
@@ -92,7 +84,7 @@ public class MiniScenarioDualSim {
 		
 		PopulationFactory factory = scenario.getPopulation().getFactory();
 		
-		List<Id> linkIds = new ArrayList<Id>();
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		for (int i = 0; i < 1000; i++) {
 			linkIds.add(scenario.createId("l0"));
 			linkIds.add(scenario.createId("l1"));

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -28,7 +29,7 @@ public class ApplyToTransitSchedule {
 	
 	public void applyEdits(final List<NetworkEdit> edits) {
 		log.info("build replacement map, this may take a while…");
-		Map<Id, List<Id>> replacements = buildReplacementMap(edits);
+		Map<Id<Link>, List<Id<Link>>> replacements = buildReplacementMap(edits);
 		
 		log.info("apply to routes");
 		applyToRoutes(replacements);
@@ -39,7 +40,7 @@ public class ApplyToTransitSchedule {
 		log.info("finished");
 	}
 	
-	private void applyToRoutes(final Map<Id, List<Id>> replacements) {
+	private void applyToRoutes(final Map<Id<Link>, List<Id<Link>>> replacements) {
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
 			for (TransitRoute transitRoute : line.getRoutes().values()) {
 				NetworkRoute route = transitRoute.getRoute();
@@ -48,9 +49,9 @@ public class ApplyToTransitSchedule {
 		}
 	}
 
-	private void applyToStops(final Map<Id, List<Id>> replacements) {
+	private void applyToStops(final Map<Id<Link>, List<Id<Link>>> replacements) {
 		for (TransitStopFacility stop : this.schedule.getFacilities().values()) {
-			List<Id> r = replacements.get(stop.getLinkId());
+			List<Id<Link>> r = replacements.get(stop.getLinkId());
 			if ((r != null) && !r.isEmpty()) {
 				stop.setLinkId(r.get(r.size() - 1));
 			}
@@ -98,25 +99,25 @@ public class ApplyToTransitSchedule {
 		}
 	}
 	
-	private Map<Id, List<Id>> buildReplacementMap(final List<NetworkEdit> edits) {
-		Map<Id, List<Id>> replacements = new HashMap<Id, List<Id>>();
+	private Map<Id<Link>, List<Id<Link>>> buildReplacementMap(final List<NetworkEdit> edits) {
+		Map<Id<Link>, List<Id<Link>>> replacements = new HashMap<Id<Link>, List<Id<Link>>>();
 
 		// collect all links
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				NetworkRoute r = route.getRoute();
 				{
-					ArrayList<Id> list = new ArrayList<Id>();
+					ArrayList<Id<Link>> list = new ArrayList<Id<Link>>();
 					list.add(r.getStartLinkId());
 					replacements.put(r.getStartLinkId(), list);
 				}
-				for (Id id : r.getLinkIds()) {
-					ArrayList<Id> list = new ArrayList<Id>();
+				for (Id<Link> id : r.getLinkIds()) {
+					ArrayList<Id<Link>> list = new ArrayList<Id<Link>>();
 					list.add(id);
 					replacements.put(id, list);
 				}
 				{
-					ArrayList<Id> list = new ArrayList<Id>();
+					ArrayList<Id<Link>> list = new ArrayList<Id<Link>>();
 					list.add(r.getEndLinkId());
 					replacements.put(r.getEndLinkId(), list);
 				}
@@ -135,12 +136,12 @@ public class ApplyToTransitSchedule {
 				if (r.getReplacementLinkIds().size() == 1 && r.getLinkId().equals(r.getReplacementLinkIds().get(0))) {
 					// ignore
 				} else {
-					Map<Id, List<Id>> edited = new HashMap<Id, List<Id>>();
-					for (Map.Entry<Id, List<Id>> e : replacements.entrySet()) {
-						Id linkId = e.getKey();
+					Map<Id<Link>, List<Id<Link>>> edited = new HashMap<Id<Link>, List<Id<Link>>>();
+					for (Map.Entry<Id<Link>, List<Id<Link>>> e : replacements.entrySet()) {
+						Id<Link> linkId = e.getKey();
 						if (e.getValue().contains(r.getLinkId())) {
-							List<Id> mergedIds = new ArrayList<Id>();
-							for (Id id : e.getValue()) {
+							List<Id<Link>> mergedIds = new ArrayList<Id<Link>>();
+							for (Id<Link> id : e.getValue()) {
 								if (id.equals(r.getLinkId())) {
 									mergedIds.addAll(r.getReplacementLinkIds());
 								} else {
@@ -160,15 +161,15 @@ public class ApplyToTransitSchedule {
 		return replacements;
 	}
 	
-	private void replaceLinksInRoute(final NetworkRoute route, final Map<Id, List<Id>> replacements) {
+	private void replaceLinksInRoute(final NetworkRoute route, final Map<Id<Link>, List<Id<Link>>> replacements) {
 		List<Id> allLinkIds = new ArrayList<Id>();
 		allLinkIds.add(route.getStartLinkId());
 		allLinkIds.addAll(route.getLinkIds());
 		allLinkIds.add(route.getEndLinkId());
 		
-		List<Id> newLinkIds = new ArrayList<Id>();
-		for (Id id : allLinkIds) {
-			List<Id> r = replacements.get(id);
+		List<Id<Link>> newLinkIds = new ArrayList<Id<Link>>();
+		for (Id<Link> id : allLinkIds) {
+			List<Id<Link>> r = replacements.get(id);
 			if (r.isEmpty()) {
 				newLinkIds.add(id);
 			} else {

@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.IdFactory;
 import org.matsim.core.basic.v01.IdImpl;
 
 /**
@@ -165,51 +164,25 @@ public class NetworkUtils {
 	 *
 	 * @param links
 	 * @return
-	 * 
-	 * @deprecated use the version which passes an {@link IdFactory}, otherwise you might end up wasting tons of memory
 	 */
-	@Deprecated // use the version which passes an {@link IdFactory}, otherwise you might end up wasting tons of memory
-	public static List<Id> getLinkIds(final String links) {
+	public static List<Id<Link>> getLinkIds(final String links) {
 		if (links == null) {
-			return new ArrayList<Id>(0);
+			return new ArrayList<Id<Link>>(0);
 		}
 		String trimmed = links.trim();
 		if (trimmed.length() == 0) {
-			return new ArrayList<Id>(0);
+			return new ArrayList<Id<Link>>(0);
 		}
 		String[] parts = trimmed.split("[ \t\n]+");
-		final List<Id> linkIdsList = new ArrayList<Id>(parts.length);
+		final List<Id<Link>> linkIdsList = new ArrayList<Id<Link>>(parts.length);
 
 		for (String id : parts) {
-			linkIdsList.add(new IdImpl(id));
+			linkIdsList.add(Id.create(id, Link.class));
 		}
 		return linkIdsList;
 	}
 
-	/**
-	 * Splits the given string at whitespace (one or more space, tab, newline) into single pieces, which are interpreted as ids.
-	 *
-	 * @param links
-	 * @return
-	 */
-	public static List<Id> getLinkIds(final String links, final IdFactory idFactory) {
-		if (links == null) {
-			return new ArrayList<Id>(0);
-		}
-		String trimmed = links.trim();
-		if (trimmed.length() == 0) {
-			return new ArrayList<Id>(0);
-		}
-		String[] parts = trimmed.split("[ \t\n]+");
-		final List<Id> linkIdsList = new ArrayList<Id>(parts.length);
-		
-		for (String id : parts) {
-			linkIdsList.add(idFactory.createId(id));
-		}
-		return linkIdsList;
-	}
-
-	public static List<Link> getLinks(final Network network, final List<Id> linkIds) {
+	public static List<Link> getLinks(final Network network, final List<Id<Link>> linkIds) {
 		List<Link> links = new ArrayList<Link>();
 		for (Id linkId : linkIds) {
 			Link link = network.getLinks().get(linkId);
@@ -221,8 +194,8 @@ public class NetworkUtils {
 		return links;
 	}
 
-	public static List<Id> getLinkIds(final List<Link> links) {
-		List<Id> linkIds = new ArrayList<Id>();
+	public static List<Id<Link>> getLinkIds(final List<Link> links) {
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		if (links != null) {
 			for (Link link : links) {
 				linkIds.add(link.getId());

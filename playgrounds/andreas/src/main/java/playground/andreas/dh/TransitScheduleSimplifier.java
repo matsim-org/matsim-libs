@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -319,7 +320,7 @@ public class TransitScheduleSimplifier{
 	 */
 	private static NetworkRoute computeNetworkRoute(Network network, TransitRoute transitRoute) {
 		
-		List<Id> routeLinkIds = new ArrayList<Id>();
+		List<Id<Link>> routeLinkIds = new ArrayList<Id<Link>>();
 		double startOffset = Double.MAX_VALUE;
 		double endOffset = Double.MIN_VALUE;
 		TransitRouteStop start = null;
@@ -424,7 +425,7 @@ public class TransitScheduleSimplifier{
 		//until all transit route stops have been visited...
 		while(checkedTransitRouteStops.size() < maxStops){
 			
-			List<Id> routeLinkIds = new ArrayList<Id>();
+			List<Id<Link>> routeLinkIds = new ArrayList<Id<Link>>();
 			
 			//check transit route
 			currentTransitRoute = transitRoutes.get(uncheckedTransitRoutes.remove());
@@ -483,7 +484,7 @@ public class TransitScheduleSimplifier{
 						
 						Id lastLinkId = routeLinkIds.get(routeLinkIds.size()-1);
 						
-						List<Id> linkIds = currentTransitRoute.getRoute().getLinkIds();
+						List<Id<Link>> linkIds = currentTransitRoute.getRoute().getLinkIds();
 						
 						int lastLinkIndex = linkIds.contains(lastLinkId) ? linkIds.indexOf(lastLinkId)+1 : 0;
 						int nextLinkIndex = linkIds.contains(nextLinkId) ? linkIds.indexOf(nextLinkId) : 0;
@@ -580,9 +581,9 @@ public class TransitScheduleSimplifier{
 				
 				for(Departure departure : transitRoute.getDepartures().values()){
 				
-					String departureId = (String) (mergedTransitRoute.getDepartures().size() < 10 ?
+					String departureId = mergedTransitRoute.getDepartures().size() < 10 ?
 							"0"+Integer.toString(mergedTransitRoute.getDepartures().size()) :
-							Integer.toString(mergedTransitRoute.getDepartures().size()));
+							Integer.toString(mergedTransitRoute.getDepartures().size());
 					
 					Departure dep = factory.createDeparture(new IdImpl(departureId),
 							departure.getDepartureTime() + transitRoute.getStop(startTransitRouteStop.getStopFacility()).getDepartureOffset());

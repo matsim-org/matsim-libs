@@ -105,7 +105,7 @@ public class RunDemo {
 		from.setStartTime(0.0);
 		from.setEndTime(8.0*3600);
 		Leg leg = populationFactory.createLeg(TransportMode.car);
-		List<Id> linkIds = new ArrayList<Id>();
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		linkIds.add(scenario.createId("l1"));
 		Route route = new LinkNetworkRouteImpl(scenario.createId("l0"), linkIds, scenario.createId("l2"));
 		leg.setRoute(route);

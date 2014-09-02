@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -229,7 +230,7 @@ public class SingleCrossingScenario {
 		Population pop = scenario.getPopulation();
 		PopulationFactory fac = pop.getFactory();
 		//N -> S
-		List<Id> routeIds = new ArrayList<Id>();
+		List<Id<Link>> routeIds = new ArrayList<Id<Link>>();
 //		routeIds.add(linkN1N2Id);
 		routeIds.add(linkN2N3Id);
 		routeIds.add(linkN3CId);
@@ -253,7 +254,7 @@ public class SingleCrossingScenario {
 		}
 		
 		//S -> N
-		routeIds = new ArrayList<Id>();
+		routeIds = new ArrayList<Id<Link>>();
 		routeIds.add(linkS2S3Id);
 		routeIds.add(linkS3CId);
 		routeIds.add(linkCN3Id);
@@ -279,7 +280,7 @@ public class SingleCrossingScenario {
 		
 		//E->W
 		frequency = 3600.0 / (maxFlowWEPerHour * lambdaWestEast);
-		routeIds = new ArrayList<Id>();
+		routeIds = new ArrayList<Id<Link>>();
 		routeIds.add(linkE2E3Id);
 		routeIds.add(linkE3CId);
 		routeIds.add(linkCW3Id);
@@ -303,7 +304,7 @@ public class SingleCrossingScenario {
 
 
 		//W -> E
-		routeIds = new ArrayList<Id>();
+		routeIds = new ArrayList<Id<Link>>();
 		routeIds.add(linkW2W3Id);
 		routeIds.add(linkW3CId);
 		routeIds.add(linkCE3Id);

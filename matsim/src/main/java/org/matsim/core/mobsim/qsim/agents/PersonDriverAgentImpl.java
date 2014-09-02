@@ -86,11 +86,11 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	 */
 	private Plan plan;
 
-	private transient Id cachedDestinationLinkId;
+	private transient Id<Link> cachedDestinationLinkId;
 
 	private Leg currentLeg;
 
-	private List<Id> cachedRouteLinkIds = null;
+	private List<Id<Link>> cachedRouteLinkIds = null;
 
 	int currentLinkIdIndex;
 

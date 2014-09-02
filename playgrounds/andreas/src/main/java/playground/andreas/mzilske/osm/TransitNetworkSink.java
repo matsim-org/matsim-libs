@@ -279,8 +279,8 @@ public class TransitNetworkSink implements Sink {
 			
 			
 			
-			List<Id> linkIdsH = stitcher.getForwardRoute();
-			List<Id> linkIdsR = stitcher.getBackwardRoute();
+			List<Id<Link>> linkIdsH = stitcher.getForwardRoute();
+			List<Id<Link>> linkIdsR = stitcher.getBackwardRoute();
 			
 			if (linkIdsH.size() >= 2) {
 				NetworkRoute networkRouteH = createNetworkRoute(linkIdsH);
@@ -365,11 +365,11 @@ public class TransitNetworkSink implements Sink {
 		return new IdImpl(ref + "_" + stopName + "_" + stopNo);
 	}
 
-	private NetworkRoute createNetworkRoute(List<Id> plinkIds) {
-		LinkedList<Id> linkIds = new LinkedList<Id>(plinkIds);
+	private NetworkRoute createNetworkRoute(List<Id<Link>> plinkIds) {
+		LinkedList<Id<Link>> linkIds = new LinkedList<Id<Link>>(plinkIds);
 		NetworkRoute networkRouteH = new LinkNetworkRouteImpl(linkIds.getFirst(), linkIds.getLast());
-		Id first = linkIds.removeFirst();
-		Id last = linkIds.removeLast();
+		Id<Link> first = linkIds.removeFirst();
+		Id<Link> last = linkIds.removeLast();
 		networkRouteH.setLinkIds(first, linkIds, last);
 		return networkRouteH;
 	}

@@ -20,6 +20,10 @@
 
 package org.matsim.contrib.multimodal.pt;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -40,15 +44,17 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Network:
@@ -171,7 +177,7 @@ import java.util.List;
 		this.schedule.addTransitLine(this.blueLine);
 		{ // route from left to right
 			NetworkRoute netRoute = new LinkNetworkRouteImpl(this.links[0].getId(), this.links[2].getId());
-			List<Id> routeLinks = new ArrayList<Id>();
+			List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
 			Collections.addAll(routeLinks, this.links[1].getId());
 			netRoute.setLinkIds(this.links[0].getId(), routeLinks, this.links[2].getId());
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();

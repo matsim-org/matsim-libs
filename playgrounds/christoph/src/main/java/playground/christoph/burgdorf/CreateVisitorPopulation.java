@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -93,17 +94,17 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 	public static int[] to4Departures = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 83, 833, 83, 83, 33, 0, 0, 0, 0, 0, 0, 0, 0};
 	public static int[] to5Departures = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 84, 834, 84, 84, 34, 0, 0, 0, 0, 0, 0, 0, 0};
 
-	private List<Id> routeFrom1ToParkings;
-	private List<Id> routeFrom2ToParkings;
-	private List<Id> routeFrom3ToParkings;
-	private List<Id> routeFrom4ToParkings;
-	private List<Id> routeFrom5ToParkings;
+	private List<Id<Link>> routeFrom1ToParkings;
+	private List<Id<Link>> routeFrom2ToParkings;
+	private List<Id<Link>> routeFrom3ToParkings;
+	private List<Id<Link>> routeFrom4ToParkings;
+	private List<Id<Link>> routeFrom5ToParkings;
 	
-	private List<Id> routeFromParkingsTo1;
-	private List<Id> routeFromParkingsTo2;
-	private List<Id> routeFromParkingsTo3;
-	private List<Id> routeFromParkingsTo4;
-	private List<Id> routeFromParkingsTo5;
+	private List<Id<Link>> routeFromParkingsTo1;
+	private List<Id<Link>> routeFromParkingsTo2;
+	private List<Id<Link>> routeFromParkingsTo3;
+	private List<Id<Link>> routeFromParkingsTo4;
+	private List<Id<Link>> routeFromParkingsTo5;
 	
 	private int visitorCounter = 0;
 	
@@ -139,7 +140,7 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 		/*
 		 * to parking routes
 		 */
-		routeFrom1ToParkings = new ArrayList<Id>();
+		routeFrom1ToParkings = new ArrayList<Id<Link>>();
 		if (!this.viaKriegstetten) {
 			for (String id : from1) routeFrom1ToParkings.add(scenario.createId(id));
 			for (String id : highwayFromZurich) routeFrom1ToParkings.add(scenario.createId(id));
@@ -149,7 +150,7 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 		}
 		checkRouteValidity(scenario, routeFrom1ToParkings);
 	
-		routeFrom2ToParkings = new ArrayList<Id>();
+		routeFrom2ToParkings = new ArrayList<Id<Link>>();
 		if (!this.viaKriegstetten) {
 			for (String id : from2) routeFrom2ToParkings.add(scenario.createId(id));
 			for (String id : highwayFromZurich) routeFrom2ToParkings.add(scenario.createId(id));			
@@ -159,7 +160,7 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 		}
 		checkRouteValidity(scenario, routeFrom2ToParkings);
 		
-		routeFrom3ToParkings = new ArrayList<Id>();
+		routeFrom3ToParkings = new ArrayList<Id<Link>>();
 		if (!this.viaSchoenbuehl) {
 			for (String id : from3) routeFrom3ToParkings.add(scenario.createId(id));
 			for (String id : highwayFromBern) routeFrom3ToParkings.add(scenario.createId(id));			
@@ -169,7 +170,7 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 		}
 		checkRouteValidity(scenario, routeFrom3ToParkings);
 		
-		routeFrom4ToParkings = new ArrayList<Id>();
+		routeFrom4ToParkings = new ArrayList<Id<Link>>();
 		if (!this.viaSchoenbuehl) {
 			for (String id : from4) routeFrom4ToParkings.add(scenario.createId(id));
 			for (String id : highwayFromBern) routeFrom4ToParkings.add(scenario.createId(id));
@@ -179,7 +180,7 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 		}
 		checkRouteValidity(scenario, routeFrom4ToParkings);
 		
-		routeFrom5ToParkings = new ArrayList<Id>();
+		routeFrom5ToParkings = new ArrayList<Id<Link>>();
 		if (!this.viaSchoenbuehl) {
 			for (String id : from5) routeFrom5ToParkings.add(scenario.createId(id));
 			for (String id : highwayFromBern) routeFrom5ToParkings.add(scenario.createId(id));
@@ -192,7 +193,7 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 		/*
 		 * from parking routes
 		 */
-		routeFromParkingsTo1 = new ArrayList<Id>();
+		routeFromParkingsTo1 = new ArrayList<Id<Link>>();
 		if (!this.viaKriegstetten) {
 			for (String id : parkingToHighwayToZurich) routeFromParkingsTo1.add(scenario.createId(id));
 			for (String id : to1) routeFromParkingsTo1.add(scenario.createId(id));
@@ -203,7 +204,7 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 		}
 		checkRouteValidity(scenario, routeFromParkingsTo1);
 
-		routeFromParkingsTo2 = new ArrayList<Id>();
+		routeFromParkingsTo2 = new ArrayList<Id<Link>>();
 		if (!this.viaKriegstetten) {
 			for (String id : parkingToHighwayToZurich) routeFromParkingsTo2.add(scenario.createId(id));
 			for (String id : to2) routeFromParkingsTo2.add(scenario.createId(id));
@@ -214,7 +215,7 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 		}
 		checkRouteValidity(scenario, routeFromParkingsTo2);
 
-		routeFromParkingsTo3 = new ArrayList<Id>();
+		routeFromParkingsTo3 = new ArrayList<Id<Link>>();
 		if (!this.viaSchoenbuehl) {
 			for (String id : parkingToHighwayToBern) routeFromParkingsTo3.add(scenario.createId(id));
 			for (String id : to3) routeFromParkingsTo3.add(scenario.createId(id));			
@@ -224,7 +225,7 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 		}
 		checkRouteValidity(scenario, routeFromParkingsTo3);
 		
-		routeFromParkingsTo4 = new ArrayList<Id>();
+		routeFromParkingsTo4 = new ArrayList<Id<Link>>();
 		if (!this.viaSchoenbuehl) {
 			for (String id : parkingToHighwayToBern) routeFromParkingsTo4.add(scenario.createId(id));
 			for (String id : to4) routeFromParkingsTo4.add(scenario.createId(id));			
@@ -234,7 +235,7 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 		}
 		checkRouteValidity(scenario, routeFromParkingsTo4);
 		
-		routeFromParkingsTo5 = new ArrayList<Id>();
+		routeFromParkingsTo5 = new ArrayList<Id<Link>>();
 		if (!this.viaSchoenbuehl) {
 			for (String id : parkingToHighwayToBern) routeFromParkingsTo5.add(scenario.createId(id));
 			for (String id : to5) routeFromParkingsTo5.add(scenario.createId(id));			
@@ -254,7 +255,7 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 		createToRoutePopulation(scenario, 5, from5Departures, routeFrom5ToParkings);
 	}
 	
-	private void createToRoutePopulation(Scenario scenario, int from, int[] fromDepartures, List<Id> routeFromToParkings) {
+	private void createToRoutePopulation(Scenario scenario, int from, int[] fromDepartures, List<Id<Link>> routeFromToParkings) {
 		
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
@@ -307,7 +308,7 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 		createFromRoutePopulation(scenario, 5, to5Departures, routeFromParkingsTo5, toBernParkings);
 	}
 	
-	private void createFromRoutePopulation(Scenario scenario, int to, int[] fromDepartures, List<Id> routeFromToParkings,
+	private void createFromRoutePopulation(Scenario scenario, int to, int[] fromDepartures, List<Id<Link>> routeFromToParkings,
 			List<Id> possibleParkings) {
 		
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
@@ -317,9 +318,9 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 		for (int departures : fromDepartures) {
 			for (int hourCounter = 0; hourCounter < departures; hourCounter++) {
 				Id parkingId = possibleParkings.get(MatsimRandom.getRandom().nextInt(possibleParkings.size()));
-				List<Id> fromParkingSubRoute = ParkingInfrastructure.fromParkingSubRoutes.get(parkingId);
+				List<Id<Link>> fromParkingSubRoute = ParkingInfrastructure.fromParkingSubRoutes.get(parkingId);
 				
-				List<Id> routeLinkIds = new ArrayList<Id>();
+				List<Id<Link>> routeLinkIds = new ArrayList<Id<Link>>();
 				routeLinkIds.addAll(fromParkingSubRoute);
 				routeLinkIds.addAll(routeFromToParkings);
 				

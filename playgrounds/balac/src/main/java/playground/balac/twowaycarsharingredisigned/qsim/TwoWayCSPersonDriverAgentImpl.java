@@ -68,17 +68,17 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 
 	private double activityEndTime = Time.UNDEFINED_TIME;
 
-	private Id currentLinkId = null;
+	private Id<Link> currentLinkId = null;
 
 	int currentPlanElementIndex = 0;
 
 	private final Plan plan;
 
-	private transient Id cachedDestinationLinkId;
+	private transient Id<Link> cachedDestinationLinkId;
 
 	private Leg currentLeg;
 
-	private List<Id> cachedRouteLinkIds = null;
+	private List<Id<Link>> cachedRouteLinkIds = null;
 
 	int currentLinkIdIndex;
 
@@ -363,7 +363,7 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		//create route for the car part of the twowaycarsharing trip
 		
 		double travelTime = 0.0;
-		List<Id> ids = new ArrayList<Id>();
+		List<Id<Link>> ids = new ArrayList<Id<Link>>();
 		
 		TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
 		
@@ -416,7 +416,7 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		//create route for the car part of the twowaycarsharing trip
 		
 		double travelTime = 0.0;
-		List<Id> ids = new ArrayList<Id>();
+		List<Id<Link>> ids = new ArrayList<Id<Link>>();
 		
 		TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
 		
@@ -465,7 +465,7 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		//create route for the car part of the twowaycarsharing trip
 		
 		double travelTime = 0.0;
-		List<Id> ids = new ArrayList<Id>();
+		List<Id<Link>> ids = new ArrayList<Id<Link>>();
 		
 		TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
 		

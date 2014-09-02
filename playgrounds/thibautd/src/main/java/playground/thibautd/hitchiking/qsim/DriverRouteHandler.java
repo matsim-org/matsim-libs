@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -72,7 +73,7 @@ public class DriverRouteHandler implements HitchHikingHandler {
 
 	private Collection<MobsimAgent> passengers = null;
 	private Id currentDestination;
-	private Iterator<Id> routeToNextDest;
+	private Iterator<Id<Link>> routeToNextDest;
 	private Id currentIdInRoute;
 	private Id nextIdInRoute;
 

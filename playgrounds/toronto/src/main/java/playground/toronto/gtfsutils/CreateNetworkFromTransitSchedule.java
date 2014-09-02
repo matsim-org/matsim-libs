@@ -68,7 +68,7 @@ public class CreateNetworkFromTransitSchedule {
 
 		for (TransitLine tLine : this.schedule.getTransitLines().values()) {
 			for (TransitRoute tRoute : tLine.getRoutes().values()) {
-				ArrayList<Id> routeLinks = new ArrayList<Id>();
+				ArrayList<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
 				//TransitRouteStop prevStop = null; 
 				TransitRouteStop prevStop =  tRoute.getStops().get(0);
 				for (int i = 1; i < tRoute.getStops().size();i++) {

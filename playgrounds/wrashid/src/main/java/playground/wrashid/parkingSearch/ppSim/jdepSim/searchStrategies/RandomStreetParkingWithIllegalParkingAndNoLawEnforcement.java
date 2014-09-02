@@ -19,21 +19,16 @@
 package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies;
 
 import java.util.List;
-import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
-import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingActivityAttributes;
 
 public class RandomStreetParkingWithIllegalParkingAndNoLawEnforcement extends RandomParkingSearch {
 
@@ -47,7 +42,7 @@ public class RandomStreetParkingWithIllegalParkingAndNoLawEnforcement extends Ra
 		Id personId = aem.getPerson().getId();
 		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
 
-		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
+		List<Id<Link>> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
 		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) leg.getRoute();
 
 		boolean endOfLegReached = aem.getCurrentLinkIndex() == linkIds.size() - 1;

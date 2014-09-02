@@ -24,7 +24,7 @@ package org.matsim.api.core.v01;
 /**
  * @author dgrether
  */
-public interface BasicLocation extends Identifiable {
+public interface BasicLocation<T> extends Identifiable<T> {
 
 	public Coord getCoord();
 

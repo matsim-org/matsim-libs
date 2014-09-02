@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -64,7 +65,7 @@ public class CreateTestTransit {
 		TransitLine transitLine = factory.createTransitLine(new IdImpl(1));
 		
 		//hinrichtung
-		List<Id> routeLinkIds = new ArrayList<Id>();
+		List<Id<Link>> routeLinkIds = new ArrayList<Id<Link>>();
 		routeLinkIds.add(new IdImpl(1));
 		routeLinkIds.add(new IdImpl(3));
 		routeLinkIds.add(new IdImpl(5));

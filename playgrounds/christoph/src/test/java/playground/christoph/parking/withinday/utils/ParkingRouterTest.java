@@ -571,7 +571,7 @@ public class ParkingRouterTest extends MatsimTestCase {
 	private NetworkRoute createRoute(Scenario scenario) {
 		
 		NetworkRoute route = new LinkNetworkRouteImpl(scenario.createId("l0"), scenario.createId("l4"));
-		List<Id> routeLinkIds = new ArrayList<Id>();
+		List<Id<Link>> routeLinkIds = new ArrayList<Id<Link>>();
 		routeLinkIds.add(scenario.createId("l1"));
 		routeLinkIds.add(scenario.createId("l2"));
 		routeLinkIds.add(scenario.createId("l3"));

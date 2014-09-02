@@ -59,7 +59,7 @@ public class CarLegSimEngine implements LegSimEngine {
 		if (route.getStartLinkId() != route.getEndLinkId()) {
 			Link link;
 		
-			List<Id> ids = route.getLinkIds();
+			List<Id<Link>> ids = route.getLinkIds();
 			for (int i = 0; i < ids.size(); i++) {
 				link = network.getLinks().get(ids.get(i));
 				

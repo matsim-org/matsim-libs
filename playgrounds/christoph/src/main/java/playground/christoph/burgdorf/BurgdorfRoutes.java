@@ -381,11 +381,11 @@ public class BurgdorfRoutes {
 	public static String burgdorfToBernUpstream = "17560001383090FT";
 	public static String burgdorfToZurichUpstream = "17560002014773FT";
 	
-	public static void checkRouteValidity(Scenario scenario, List<Id> linkIds) {
+	public static void checkRouteValidity(Scenario scenario, List<Id<Link>> linkIds) {
 				
 		for (int i = 0; i < linkIds.size() - 1; i++) {
-			Id fromId = linkIds.get(i);
-			Id toId = linkIds.get(i + 1);
+			Id<Link> fromId = linkIds.get(i);
+			Id<Link> toId = linkIds.get(i + 1);
 			
 			Link fromLink = scenario.getNetwork().getLinks().get(fromId);
 			Link toLink = scenario.getNetwork().getLinks().get(toId);

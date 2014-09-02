@@ -51,7 +51,7 @@ public class SubsequentLinksAnalyzer {
 	private final Network network;
 
 	/** Stores the logical subsequent link (value) for a given link (key). */
-	private final TreeMap<Id, Id> subsequentLinks = new TreeMap<Id, Id>();
+	private final TreeMap<Id<Link>, Id<Link>> subsequentLinks = new TreeMap<Id<Link>, Id<Link>>();
 
 	public SubsequentLinksAnalyzer(final Network network) {
 		this.network = network;
@@ -61,7 +61,7 @@ public class SubsequentLinksAnalyzer {
 	/**
 	 * @return a map, giving for each link (key in map) the computed subsequent link (value in map).
 	 */
-	public Map<Id, Id> getSubsequentLinks() {
+	public Map<Id<Link>, Id<Link>> getSubsequentLinks() {
 		return this.subsequentLinks;
 	}
 

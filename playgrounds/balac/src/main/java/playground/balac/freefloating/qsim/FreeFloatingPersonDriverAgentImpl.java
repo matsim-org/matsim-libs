@@ -72,7 +72,7 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 
 	private Leg currentLeg;
 
-	private List<Id> cachedRouteLinkIds = null;
+	private List<Id<Link>> cachedRouteLinkIds = null;
 
 	int currentLinkIdIndex;
 
@@ -332,7 +332,7 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 		//create route for the car part of the freefloating trip
 		
 		double travelTime = 0.0;
-		List<Id> ids = new ArrayList<Id>();
+		List<Id<Link>> ids = new ArrayList<Id<Link>>();
 		
 		TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
 		

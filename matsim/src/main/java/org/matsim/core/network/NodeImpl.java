@@ -49,7 +49,7 @@ public class NodeImpl implements Node {
 	protected transient  Map<Id, Link> outlinks = new IdentifiableArrayMap<Link>();
 
 	protected Coord coord;
-	protected final Id id;
+	protected final Id<Node> id;
 
 	private final static Logger log = Logger.getLogger(NodeImpl.class);
 
@@ -57,11 +57,11 @@ public class NodeImpl implements Node {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	protected NodeImpl(final Id id, final Coord coord) {
+	protected NodeImpl(final Id<Node> id, final Coord coord) {
 		this(id, coord, null);
 	}
 
-	protected NodeImpl(final Id id, final Coord coord, final String type) {
+	protected NodeImpl(final Id<Node> id, final Coord coord, final String type) {
 		this(id);
 		this.coord = coord;
 		this.type = type == null ? null : type.intern();
@@ -71,7 +71,7 @@ public class NodeImpl implements Node {
 	// interface methods
 	//////////////////////////////////////////////////////////////////////
 
-	public NodeImpl(Id id) {
+	public NodeImpl(Id<Node> id) {
 		this.id = id;
 		this.coord = null;
 	}
@@ -199,7 +199,7 @@ public class NodeImpl implements Node {
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Node> getId() {
 		return this.id;
 	}
 

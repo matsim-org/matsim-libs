@@ -505,7 +505,7 @@ public class GtfsConverter {
 		int tripIdIndex = stopTimesSource.getContentIndex("trip_id");
 		int stopIdIndex = stopTimesSource.getContentIndex("stop_id");
 		String[] firstEntry = stopTimesSource.getContent().get(0);			
-		LinkedList<Id> route = new LinkedList<Id>();
+		LinkedList<Id<Link>> route = new LinkedList<Id<Link>>();
 		String currentTrip = firstEntry[tripIdIndex];
 		String startStation = firstEntry[stopIdIndex];
 		for(String[] entries: stopTimesSource.getContent()) {
@@ -530,7 +530,7 @@ public class GtfsConverter {
 				tripRoutes.put(new IdImpl(currentTrip), netRoute);
 				// Start new Route
 				currentTrip = entries[tripIdIndex];
-				route = new LinkedList<Id>();
+				route = new LinkedList<Id<Link>>();
 				route.add(ts.getFacilities().get(new IdImpl(entries[stopIdIndex])).getLinkId());
 				startStation = entries[stopIdIndex];
 			}

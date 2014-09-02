@@ -102,7 +102,7 @@ public class ScheduleNetworkMatcher {
 					idx++;
 				}
 				
-				List<Id> linkIds = new ArrayList<Id>(items.size());
+				List<Id<Link>> linkIds = new ArrayList<Id<Link>>(items.size());
 				
 				for(int i = 1; i < items.size(); i++) {
 					Node from = network.getNodes().get(idGenerator.generateId(items.get(i-1).nodeId.toString()));

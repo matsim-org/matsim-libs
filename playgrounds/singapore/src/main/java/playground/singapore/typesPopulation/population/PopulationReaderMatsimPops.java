@@ -19,13 +19,25 @@
 
 package playground.singapore.typesPopulation.population;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Stack;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.*;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -33,11 +45,6 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Stack;
 
 /**
  * A reader for plans files of MATSim according to <code>population_v5.dtd</code>.
@@ -242,7 +249,7 @@ public class PopulationReaderMatsimPops extends MatsimXmlParser implements Popul
 			if (this.currRoute instanceof GenericRoute) {
 				((GenericRoute) this.currRoute).setRouteDescription(startLinkId, this.routeDescription.trim(), endLinkId);
 			} else if (this.currRoute instanceof NetworkRoute) {
-				List<Id> linkIds = NetworkUtils.getLinkIds(this.routeDescription, this.scenario);
+				List<Id<Link>> linkIds = NetworkUtils.getLinkIds(this.routeDescription);
 				if (linkIds.size() > 0) {
 					linkIds.remove(0);
 				}

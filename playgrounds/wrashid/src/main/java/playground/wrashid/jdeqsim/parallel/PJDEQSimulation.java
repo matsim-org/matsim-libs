@@ -119,7 +119,7 @@ public class PJDEQSimulation extends JDEQSimulation {
 				if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
 					if (leg.getRoute() instanceof NetworkRoute) {
-						List<Id> linkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();
+						List<Id<Link>> linkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();
 						Id[] currentLinkRoute = linkIds.toArray(new Id[linkIds.size()]);
 
 						for (Id linkId : currentLinkRoute) {

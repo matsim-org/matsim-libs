@@ -109,10 +109,7 @@ public class BusLineAllocator {
 	 * <ptRouteId,List<ptLinkId,Path_Links(shouldn't be pt linkId, but there
 	 * also is exception))>>
 	 */
-	private final Map<Id, List<Tuple<Id, List<Id>/* path */>>> paths = new HashMap<Id, List<Tuple<Id, List<Id>/*
-																											 * Path.
-																											 * links
-																											 */>>>();
+	private final Map<Id, List<Tuple<Id, List<Id<Link>>>>> paths = new HashMap<Id, List<Tuple<Id, List<Id<Link>>>>>();
 	/*
 	 * <ptRouteId,List<ptLinkId:next_ptLinkId,Path(linkIds (shouldn't be pt
 	 * linkIds))>>
@@ -167,16 +164,15 @@ public class BusLineAllocator {
 		for (Entry<Id, List<Tuple<Link, Tuple<Coord, Coord>>>> routeLinkCoordPair : this.coordPairs
 				.entrySet()) {
 			this.tmpPtRouteId = routeLinkCoordPair.getKey();
-			List<Tuple<Id, List<Id>/* path */>> ptLinkIdPaths = this.paths
+			List<Tuple<Id, List<Id<Link>>/* path */>> ptLinkIdPaths = this.paths
 					.get(this.tmpPtRouteId);
 			if (ptLinkIdPaths == null)
-				ptLinkIdPaths = new ArrayList<Tuple<Id, List<Id>/* Path. links */>>();
+				ptLinkIdPaths = new ArrayList<Tuple<Id, List<Id<Link>>/* Path. links */>>();
 
 			for (Tuple<Link, Tuple<Coord, Coord>> linkCoordPair : routeLinkCoordPair
 					.getValue()) {
 				this.tmpPtLink = linkCoordPair.getFirst();
-				List<Id>/* path */pathLinks = allocateRouteLink(linkCoordPair
-						.getSecond()/* coordPair */);
+				List<Id<Link>>pathLinks = allocateRouteLink(linkCoordPair.getSecond());
 				// TODO empty check
 				if (!pathLinks.isEmpty())/*
 										 * think? How to handle the median link,
@@ -184,7 +180,7 @@ public class BusLineAllocator {
 										 * and toNode(carNet)? It's not problem
 										 * more.
 										 */{
-					ptLinkIdPaths.add(new Tuple<Id, List<Id>/* path */>(
+					ptLinkIdPaths.add(new Tuple<Id, List<Id<Link>>>(
 							this.tmpPtLink.getId(), pathLinks));
 				}
 				/*
@@ -295,16 +291,16 @@ public class BusLineAllocator {
 		// Map<Id, List<Tuple<Id, List<Id>>>> tmpPaths = new HashMap<Id,
 		// List<Tuple<Id, List<Id>>>>();
 		// tmpPaths.putAll(paths);
-		for (Entry<Id, List<Tuple<Id, List<Id>/* path */>>> routeId_ptLinkIdpathPairs : this.paths
+		for (Entry<Id, List<Tuple<Id, List<Id<Link>>/* path */>>> routeId_ptLinkIdpathPairs : this.paths
 				.entrySet()) {
-			List<Tuple<Id, List<Id>/* path */>> ptLinkId_PathPairs = routeId_ptLinkIdpathPairs
+			List<Tuple<Id, List<Id<Link>>/* path */>> ptLinkId_PathPairs = routeId_ptLinkIdpathPairs
 					.getValue();
 
 			for (int i = 0; i < ptLinkId_PathPairs.size() - 1; i++) {
-				Tuple<Id, List<Id>/* path */> ptLinkId_pathPairA = ptLinkId_PathPairs
+				Tuple<Id, List<Id<Link>>/* path */> ptLinkId_pathPairA = ptLinkId_PathPairs
 						.get(i), ptLinkId_pathPairB = ptLinkId_PathPairs
 						.get(i + 1);
-				List<Id> pathA = ptLinkId_pathPairA.getSecond(), pathB = ptLinkId_pathPairB
+				List<Id<Link>> pathA = ptLinkId_pathPairA.getSecond(), pathB = ptLinkId_pathPairB
 						.getSecond();
 
 				// compare PahtA and pathB
@@ -331,8 +327,8 @@ public class BusLineAllocator {
 
 	}
 
-	private static List<Id> links2Ids(List<Link> links) {
-		List<Id> ids = new ArrayList<Id>();
+	private static List<Id<Link>> links2Ids(List<Link> links) {
+		List<Id<Link>> ids = new ArrayList<Id<Link>>();
 		for (Link link : links) {
 			ids.add(link.getId());
 		}
@@ -560,14 +556,14 @@ public class BusLineAllocator {
 		}
 	}
 
-	private List<Id>/* path */allocateRouteLink(Tuple<Coord, Coord> coordPair) {
+	private List<Id<Link>>allocateRouteLink(Tuple<Coord, Coord> coordPair) {
 		Coord coordA = coordPair.getFirst(), coordB = coordPair.getSecond();
 		Node nodeA = this.carNet.getNearestNode(coordA);
 		Node nodeB = this.carNet.getNearestNode(coordB);
 		boolean AoutOfRange = CoordUtils.calcDistance(coordA, nodeA.getCoord()) > 100;
 		boolean BoutOfRange = CoordUtils.calcDistance(coordB, nodeB.getCoord()) > 100;
 
-		List<Id> pathLinks = new ArrayList<Id>();
+		List<Id<Link>> pathLinks = new ArrayList<Id<Link>>();
 
 		if (!nodeA.equals(nodeB)) {
 			Path path = this.dijkstra.calcLeastCostPath(nodeA, nodeB, 0, null, null);
@@ -636,9 +632,9 @@ public class BusLineAllocator {
 	private void output() {
 		SimpleWriter writer = new SimpleWriter(this.outputFile);
 		writer.writeln("ptRouteId\t:\tptlinkId\t:\tlinks");
-		for (Entry<Id, List<Tuple<Id, List<Id>/* path */>>> routeLinkPathEntry : this.paths
+		for (Entry<Id, List<Tuple<Id, List<Id<Link>>/* path */>>> routeLinkPathEntry : this.paths
 				.entrySet()) {
-			for (Tuple<Id, List<Id>/* path */> linkPathPair : routeLinkPathEntry
+			for (Tuple<Id, List<Id<Link>>/* path */> linkPathPair : routeLinkPathEntry
 					.getValue()) {
 				StringBuffer line = new StringBuffer(routeLinkPathEntry
 						.getKey()
@@ -672,9 +668,9 @@ public class BusLineAllocator {
 		System.out.println(">>>>> >>>>> eliminateRedundancy ENDS!!!");
 
 		writer.writeln("ptRouteId\t:\tptlinkId\t:\tlinks");
-		for (Entry<Id, List<Tuple<Id, List<Id>/* path */>>> routeLinkPathEntry : this.paths
+		for (Entry<Id, List<Tuple<Id, List<Id<Link>>/* path */>>> routeLinkPathEntry : this.paths
 				.entrySet()) {
-			for (Tuple<Id, List<Id>/* path */> linkPathPair : routeLinkPathEntry
+			for (Tuple<Id, List<Id<Link>>/* path */> linkPathPair : routeLinkPathEntry
 					.getValue()) {
 				StringBuffer line = new StringBuffer(routeLinkPathEntry
 						.getKey()
@@ -701,11 +697,11 @@ public class BusLineAllocator {
 	}
 
 	private void generateNewSchedule(String newTransitScheduleFilename) {
-		Map<Id, List<Id>/* path */> ptLinkIdPaths = convertResult();
+		Map<Id, List<Id<Link>>/* path */> ptLinkIdPaths = convertResult();
 		/*-------------------STOPS---------------------------*/
 		for (TransitStopFacility stop : this.schedule.getFacilities().values()) {
 			Id stopLinkId = stop.getLinkId();
-			List<Id>/* path */path = ptLinkIdPaths.get(stopLinkId);
+			List<Id<Link>>/* path */path = ptLinkIdPaths.get(stopLinkId);
 			if (path != null) {
 				if (path.size() > 0)
 					/*------with carNet-----*/
@@ -729,16 +725,16 @@ public class BusLineAllocator {
 		new TransitScheduleWriter(this.schedule).writeFile(newTransitScheduleFilename);
 	}
 
-	private Map<Id, List<Id>/* path */> convertResult() {
-		Map<Id, List<Id>/* path */> ptLinkIdPathMap = new HashMap<Id, List<Id>/*
+	private Map<Id, List<Id<Link>>/* path */> convertResult() {
+		Map<Id, List<Id<Link>>/* path */> ptLinkIdPathMap = new HashMap<Id, List<Id<Link>>/*
 																			 * Path.
 																			 * links
 																			 */>();
-		for (List<Tuple<Id, List<Id>/* path */>> ptLinkIdPathPairs : this.paths
+		for (List<Tuple<Id, List<Id<Link>>/* path */>> ptLinkIdPathPairs : this.paths
 				.values())
-			for (Tuple<Id, List<Id>/* path */> idPathPair : ptLinkIdPathPairs) {
+			for (Tuple<Id, List<Id<Link>>/* path */> idPathPair : ptLinkIdPathPairs) {
 				Id id = idPathPair.getFirst();
-				List<Id> path = ptLinkIdPathMap.get(id);
+				List<Id<Link>> path = ptLinkIdPathMap.get(id);
 				if (path == null)
 					path = idPathPair.getSecond();
 				else if (path.size() < idPathPair.getSecond().size())
@@ -759,19 +755,17 @@ public class BusLineAllocator {
 	 */
 	private Map<Id, NetworkRoute> convertResult2() {
 		Map<Id, NetworkRoute> routes = new HashMap<Id, NetworkRoute>();
-		for (Entry<Id, List<Tuple<Id, List<Id>/* path */>>> routeId_linkPathPair : this.paths
+		for (Entry<Id, List<Tuple<Id, List<Id<Link>>/* path */>>> routeId_linkPathPair : this.paths
 				.entrySet()) {
-			List<Tuple<Id, List<Id>/* path */>> linkId_Paths = routeId_linkPathPair
-					.getValue();
+			List<Tuple<Id, List<Id<Link>>/* path */>> linkId_Paths = routeId_linkPathPair.getValue();
 			Link startLink = null, endLink = null;
-			LinkedList<Id>/* path */routeLinks = new LinkedList<Id>/*
+			LinkedList<Id<Link>>/* path */routeLinks = new LinkedList<Id<Link>>/*
 																 * Path. links
 																 */();
 			int size = linkId_Paths.size();
 			for (int i = 0; i < size; i++) {
-				Tuple<Id, List<Id>/* path */> linkId_PathPair = linkId_Paths
-						.get(i);
-				List<Id>/* path */linkIds = linkId_PathPair.getSecond();
+				Tuple<Id, List<Id<Link>>/* path */> linkId_PathPair = linkId_Paths.get(i);
+				List<Id<Link>>/* path */linkIds = linkId_PathPair.getSecond();
 				routeLinks.addAll(linkIds);
 
 			}

@@ -101,7 +101,7 @@ public class SelectedPlans2ESRIShapeChanged extends
 		Double travTime = leg.getTravelTime();
 		Double dist = leg.getRoute().getDistance();
 
-		List<Id> linkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();
+		List<Id<Link>> linkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();
 		Coordinate[] coords = new Coordinate[linkIds.size() + 1];
 		for (int i = 0; i < linkIds.size(); i++) {
 			Link link = this.network.getLinks().get(linkIds.get(i));

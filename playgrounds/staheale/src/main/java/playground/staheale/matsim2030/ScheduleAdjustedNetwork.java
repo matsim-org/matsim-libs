@@ -37,7 +37,7 @@ public class ScheduleAdjustedNetwork {
 
 	private static Logger log = Logger.getLogger(NetworkRoute2Schedule.class);
 	
-	List<Id> newRouteLinkIds = new ArrayList<Id>();
+	List<Id<Link>> newRouteLinkIds = new ArrayList<Id<Link>>();
 	int nId = 0;
 	int newId = 1;
 	int newCountId = 1;

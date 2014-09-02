@@ -19,13 +19,18 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.population.routes.NetworkRoute;
-
-import java.util.List;
 
 /**
  * Represents a vehicle.
@@ -135,7 +140,7 @@ public class Vehicle extends SimUnit {
 	public void setCurrentLeg(Leg currentLeg) {
 		this.currentLeg = currentLeg;
 		if (currentLeg.getRoute() instanceof NetworkRoute) {
-			List<Id> linkIds = ((NetworkRoute) currentLeg.getRoute()).getLinkIds();
+			List<Id<Link>> linkIds = ((NetworkRoute) currentLeg.getRoute()).getLinkIds();
 			currentLinkRoute = linkIds.toArray(new Id[linkIds.size()]);
 		} else {
 			currentLinkRoute = null;

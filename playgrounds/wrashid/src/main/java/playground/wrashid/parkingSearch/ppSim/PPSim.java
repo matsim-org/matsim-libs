@@ -7,11 +7,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -20,7 +20,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.misc.Time;
@@ -113,7 +112,7 @@ public class PPSim implements Mobsim{
 			Event event = new PersonDepartureEvent(time, personId, leg.getRoute().getStartLinkId() , leg.getMode());
 			eventsManager.processEvent(event);
 			
-			List<Id> linkIds = ((LinkNetworkRouteImpl)leg.getRoute()).getLinkIds();
+			List<Id<Link>> linkIds = ((LinkNetworkRouteImpl)leg.getRoute()).getLinkIds();
 			
 			if (linkIds.size()>2){
 				event=new Wait2LinkEvent(time,personId,leg.getRoute().getStartLinkId(),personId);

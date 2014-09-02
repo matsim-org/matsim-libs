@@ -133,7 +133,7 @@ public class PTLinesGenerator {
 		TransitRouteStop safeStop = this.fac.createTransitRouteStop(safeFacility, 0, 0);
 		stops.add(safeStop);
 
-		List<Id> linkIds = new ArrayList<Id>();
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		Set<String> modes = new HashSet<String>();
 		modes.add("bus");
 

@@ -4,8 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -26,8 +24,6 @@ import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.pt.utils.CreatePseudoNetwork;
 
 import playground.toronto.demand.util.TableReader;
 
@@ -88,7 +84,7 @@ public class CreateScheduleToMatchPseudoNetwork{
 			//for each route of a line
 			for (TransitRoute tRoute : tLine.getRoutes().values()){
 				//reset the links for the route
-				ArrayList<Id> routeLinks = new ArrayList<Id>();
+				ArrayList<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
 				TransitRouteStop prevStop =  tRoute.getStops().get(0);
 				for (int i = 1; i < tRoute.getStops().size();i++) {
 					TransitRouteStop stop = tRoute.getStops().get(i);

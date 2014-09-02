@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -63,12 +64,12 @@ public class ParkingReplanner extends WithinDayDuringLegReplanner {
 		int currentLegIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 
 		Id parkingId = ParkingInfrastructure.selectedParkings.get(withinDayAgent.getId());
-		List<Id> parkingSubRoute = ParkingInfrastructure.toParkingSubRoutes.get(parkingId);
+		List<Id<Link>> parkingSubRoute = ParkingInfrastructure.toParkingSubRoutes.get(parkingId);
 		
 		Leg currentLeg = (Leg) executedPlan.getPlanElements().get(currentLegIndex);
 		NetworkRoute route = (NetworkRoute) currentLeg.getRoute(); 
 		
-		List<Id> routeLinkIds = new ArrayList<Id>();
+		List<Id<Link>> routeLinkIds = new ArrayList<Id<Link>>();
 		routeLinkIds.add(route.getStartLinkId());
 		routeLinkIds.addAll(route.getLinkIds());
 		routeLinkIds.add(route.getEndLinkId());

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -253,7 +254,7 @@ public class Tour {
 		 * @return NetworkRoute
 		 * @see NetworkRoute
 		 */
-		public NetworkRoute createRoute(Id startLinkId, List<Id> linkIds, Id endLinkId) {
+		public NetworkRoute createRoute(Id<Link> startLinkId, List<Id<Link>> linkIds, Id<Link> endLinkId) {
 			LinkNetworkRouteImpl linkNetworkRouteImpl = new LinkNetworkRouteImpl(startLinkId, endLinkId);
 			if (linkIds != null && !linkIds.isEmpty()) {
 				linkNetworkRouteImpl.setLinkIds(startLinkId, linkIds, endLinkId);

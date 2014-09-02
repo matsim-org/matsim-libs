@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -34,11 +35,11 @@ public class NetworkEditsReader {
 				} else if (parts[0].equals("NEW_LINK")) {
 					edits.add(new AddLink(new IdImpl(parts[1]), new IdImpl(parts[2]), new IdImpl(parts[3])));
 				} else if (parts[0].equals("REPLACE_LINK")) {
-					List<Id> ids = new ArrayList<Id>();
+					List<Id<Link>> ids = new ArrayList<Id<Link>>();
 					for (String part : parts[2].split(",")) {
-						ids.add(new IdImpl(part));
+						ids.add(Id.create(part, Link.class));
 					}
-					edits.add(new ReplaceLink(new IdImpl(parts[1]), ids));
+					edits.add(new ReplaceLink(Id.create(parts[1], Link.class), ids));
 				} else {
 					log.error("Unknown network edit instruction: " + parts[0]); 
 				}

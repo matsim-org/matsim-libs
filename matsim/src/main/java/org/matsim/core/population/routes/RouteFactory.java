@@ -21,6 +21,7 @@
 package org.matsim.core.population.routes;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.internal.MatsimFactory;
 
@@ -32,5 +33,5 @@ import org.matsim.core.api.internal.MatsimFactory;
  * @author mrieser
  */
 public interface RouteFactory extends MatsimFactory {
-	public Route createRoute(Id startLinkId, Id endLinkId);
+	public Route createRoute(Id<Link> startLinkId, Id<Link> endLinkId);
 }

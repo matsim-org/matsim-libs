@@ -53,8 +53,8 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 
 	private final static Logger log = Logger.getLogger(CompressedNetworkRouteImpl.class);
 
-	private ArrayList<Id> route = new ArrayList<Id>(0);
-	private final Map<Id, Id> subsequentLinks;
+	private ArrayList<Id<Link>> route = new ArrayList<Id<Link>>(0);
+	private final Map<Id<Link>, Id<Link>> subsequentLinks;
 	private double travelCost = Double.NaN;
 	/** number of links in uncompressed route */
 	private int uncompressedLength = -1;
@@ -63,7 +63,7 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 	private Id vehicleId = null;
 	private final Network network;
 
-	public CompressedNetworkRouteImpl(final Id startLinkId, final Id endLinkId, Network network, final Map<Id, Id> subsequentLinks) {
+	public CompressedNetworkRouteImpl(final Id<Link> startLinkId, final Id<Link> endLinkId, Network network, final Map<Id<Link>, Id<Link>> subsequentLinks) {
 		super(startLinkId, endLinkId);
 		this.network = network;
 		this.subsequentLinks = subsequentLinks;
@@ -72,30 +72,30 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 	@Override
 	public CompressedNetworkRouteImpl clone() {
 		CompressedNetworkRouteImpl cloned = (CompressedNetworkRouteImpl) super.clone();
-		ArrayList<Id> tmpRoute = cloned.route;
-		cloned.route = new ArrayList<Id>(tmpRoute); // deep copy
+		ArrayList<Id<Link>> tmpRoute = cloned.route;
+		cloned.route = new ArrayList<Id<Link>>(tmpRoute); // deep copy
 		return cloned;
 	}
 
 	@Override
-	public List<Id> getLinkIds() {
+	public List<Id<Link>> getLinkIds() {
 		if (this.uncompressedLength < 0) { // it seems the route never got initialized correctly
-			return new ArrayList<Id>(0);
+			return new ArrayList<Id<Link>>(0);
 		}
-		ArrayList<Id> links = new ArrayList<Id>(this.uncompressedLength);
+		ArrayList<Id<Link>> links = new ArrayList<Id<Link>>(this.uncompressedLength);
 		if (this.modCount != this.routeModCountState) {
 			log.error("Route was modified after storing it! modCount=" + this.modCount + " routeModCount=" + this.routeModCountState);
 			return links;
 		}
-		Id previousLinkId = getStartLinkId();
-		Id endLinkId = getEndLinkId();
+		Id<Link> previousLinkId = getStartLinkId();
+		Id<Link> endLinkId = getEndLinkId();
 		if ((previousLinkId == null) || (endLinkId == null)) {
 			return links;
 		}
 		if (previousLinkId.equals(endLinkId)) {
 			return links;
 		}
-		for (Id linkId : this.route) {
+		for (Id<Link> linkId : this.route) {
 			getLinksTillLink(links, linkId, previousLinkId);
 			links.add(linkId);
 			previousLinkId = linkId;
@@ -105,8 +105,8 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 		return links;
 	}
 
-	private void getLinksTillLink(final List<Id> links, final Id nextLinkId, final Id startLinkId) {
-		Id linkId = startLinkId;
+	private void getLinksTillLink(final List<Id<Link>> links, final Id<Link> nextLinkId, final Id<Link> startLinkId) {
+		Id<Link> linkId = startLinkId;
 		Link nextLink = this.network.getLinks().get(nextLinkId);
 		while (true) { // loop until we hit "return;"
 			Link link = this.network.getLinks().get(linkId);
@@ -119,26 +119,26 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 	}
 
 	@Override
-	public void setEndLinkId(final Id linkId) {
+	public void setEndLinkId(final Id<Link> linkId) {
 		this.modCount++;
 		super.setEndLinkId(linkId);
 	}
 
 	@Override
-	public void setStartLinkId(final Id linkId) {
+	public void setStartLinkId(final Id<Link> linkId) {
 		this.modCount++;
 		super.setStartLinkId(linkId);
 	}
 
 	@Override
-	public NetworkRoute getSubRoute(Id fromLinkId, Id toLinkId) {
-		List<Id> newLinkIds = new ArrayList<Id>(10);
+	public NetworkRoute getSubRoute(Id<Link> fromLinkId, Id<Link> toLinkId) {
+		List<Id<Link>> newLinkIds = new ArrayList<Id<Link>>(10);
 		boolean foundFromLink = fromLinkId.equals(this.getStartLinkId());
 		boolean collectLinks = foundFromLink;
 		boolean equalFromTo = fromLinkId.equals(toLinkId);
 
 		if (!foundFromLink || !equalFromTo) {
-			for (Id linkId : getLinkIds()) {
+			for (Id<Link> linkId : getLinkIds()) {
 				if (linkId.equals(toLinkId)) {
 					collectLinks = false;
 					if (equalFromTo) {
@@ -188,7 +188,7 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 	}
 
 	@Override
-	public void setLinkIds(final Id startLinkId, final List<Id> srcRoute, final Id endLinkId) {
+	public void setLinkIds(final Id<Link> startLinkId, final List<Id<Link>> srcRoute, final Id<Link> endLinkId) {
 		this.route.clear();
 		setStartLinkId(startLinkId);
 		setEndLinkId(endLinkId);
@@ -197,8 +197,8 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 			this.uncompressedLength = 0;
 			return;
 		}
-		Id previousLinkId = startLinkId;
-		for (Id linkId : srcRoute) {
+		Id<Link> previousLinkId = startLinkId;
+		for (Id<Link> linkId : srcRoute) {
 			if (!this.subsequentLinks.get(previousLinkId).equals(linkId)) {
 				this.route.add(linkId);
 			}

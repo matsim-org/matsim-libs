@@ -19,12 +19,22 @@
 
 package org.matsim.contrib.dvrp.util.schedule;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.VrpPath;
 import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
@@ -38,11 +48,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 
 public class VrpSchedulePlan
@@ -64,7 +69,7 @@ public class VrpSchedulePlan
         this.vehicle = vehicle;
 
         actsLegs = new ArrayList<PlanElement>();
-        unmodifiableActsLegs = (List<PlanElement>)Collections.unmodifiableList(actsLegs);
+        unmodifiableActsLegs = Collections.unmodifiableList(actsLegs);
 
         populFactory = scenario.getPopulation().getFactory();
         network = scenario.getNetwork();
@@ -123,7 +128,7 @@ public class VrpSchedulePlan
         if (length > 1) {// means: fromLink != toLink
 
             // all except the first and last ones (== fromLink and toLink)
-            ArrayList<Id> linkIdList = new ArrayList<Id>(length - 1);
+            ArrayList<Id<Link>> linkIdList = new ArrayList<Id<Link>>(length - 1);
 
             for (int i = 1; i < length - 1; i++) {
                 linkIdList.add(path.getLink(i).getId());

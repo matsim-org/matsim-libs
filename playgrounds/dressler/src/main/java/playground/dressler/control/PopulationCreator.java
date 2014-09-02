@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -21,7 +22,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 
 import playground.dressler.ea_flow.PathStep;
 import playground.dressler.ea_flow.StepEdge;
@@ -224,7 +224,7 @@ public class PopulationCreator {
 										
 						route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
 
-						List<Id> routeLinkIds = new ArrayList<Id>();					
+						List<Id<Link>> routeLinkIds = new ArrayList<Id<Link>>();
 						for (int j = startindex; j < endindex ; j++) {
 								routeLinkIds.add(ids.get(j));
 						}

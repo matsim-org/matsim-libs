@@ -64,9 +64,9 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 		
-		Id startLink = route.getStartLinkId();
-		List<Id> links = null;
-		Id endLink = route.getEndLinkId();
+		Id<Link> startLink = route.getStartLinkId();
+		List<Id<Link>> links = null;
+		Id<Link> endLink = route.getEndLinkId();
 			
 		// check whether the car is at the route's start link
 		if (routeIndex == 0) {
@@ -74,7 +74,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 			// if the route ends at the same link
 			if (startLink.equals(endLink)) {
 				Link l = randomNextLink(currentLink, agent, time);
-				links  = new ArrayList<Id>(route.getLinkIds()); // create a copy that can be modified
+				links  = new ArrayList<Id<Link>>(route.getLinkIds()); // create a copy that can be modified
 				links.add(l.getId());
 				
 				log.warn("Car trip ends as the same link as it started - this should not happen since " + 
@@ -85,7 +85,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		}
 		// end link
 		else if (routeIndex == route.getLinkIds().size() + 1) {
-			links  = new ArrayList<Id>(route.getLinkIds()); // create a copy that can be modified
+			links  = new ArrayList<Id<Link>>(route.getLinkIds()); // create a copy that can be modified
 			links.add(endLink);
 			endLink = randomNextLink(currentLink, agent, time).getId();
 		}

@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -274,7 +275,7 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 		stops.add(s1);
 		stops.add(s2);
 		
-		NetworkRoute networkRoute = new LinkNetworkRouteImpl(new IdImpl("l1"), new ArrayList<Id>(), new IdImpl("l2")); 
+		NetworkRoute networkRoute = new LinkNetworkRouteImpl(new IdImpl("l1"), new ArrayList<Id<Link>>(), new IdImpl("l2")); 
 		TransitRoute route = schedFactory.createTransitRoute(sc.createId("wagonRoute"), networkRoute, stops, TransportMode.pt);
 		Departure d = schedFactory.createDeparture(sc.createId("d1"), 100);
 		d.setVehicleId(sc.createId("v1"));

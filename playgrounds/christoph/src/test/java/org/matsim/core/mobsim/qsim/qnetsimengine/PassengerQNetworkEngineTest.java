@@ -1148,7 +1148,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		a1.setEndTime(activityEndTime);
 		plan.addActivity(a1);
 		Leg l1 = population.getFactory().createLeg(PassengerDepartureHandler.driverMode);
-		List<Id> route1 = new ArrayList<Id>();
+		List<Id<Link>> route1 = new ArrayList<Id<Link>>();
 		route1.add(new IdImpl("0to1"));
 		route1.add(new IdImpl("1to2"));
 		route1.add(new IdImpl("2to3"));
@@ -1172,7 +1172,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		a1.setEndTime(activityEndTime);
 		plan.addActivity(a1);
 		Leg l1 = population.getFactory().createLeg(PassengerDepartureHandler.driverMode);
-		List<Id> route1 = new ArrayList<Id>();
+		List<Id<Link>> route1 = new ArrayList<Id<Link>>();
 		route1.add(new IdImpl("0to1"));
 		route1.add(new IdImpl("1to2"));
 		NetworkRoute r1 = RouteUtils.createNetworkRoute(route1, network);
@@ -1195,7 +1195,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		a1.setEndTime(activityEndTime);
 		plan.addActivity(a1);
 		Leg l1 = population.getFactory().createLeg(PassengerDepartureHandler.driverMode);
-		List<Id> route1 = new ArrayList<Id>();
+		List<Id<Link>> route1 = new ArrayList<Id<Link>>();
 		route1.add(new IdImpl("1to2"));
 		route1.add(new IdImpl("2to3"));
 		NetworkRoute r1 = RouteUtils.createNetworkRoute(route1, network);
@@ -1218,7 +1218,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		a1.setEndTime(activityEndTime);
 		plan.addActivity(a1);
 		Leg l1 = population.getFactory().createLeg(PassengerDepartureHandler.driverMode);
-		List<Id> route1 = new ArrayList<Id>();
+		List<Id<Link>> route1 = new ArrayList<Id<Link>>();
 		route1.add(new IdImpl("0to1"));
 		route1.add(new IdImpl("1to2"));
 		NetworkRoute r1 = RouteUtils.createNetworkRoute(route1, network);
@@ -1229,7 +1229,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		a2.setEndTime(activityEndTime);
 		plan.addActivity(a2);
 		Leg l2 = population.getFactory().createLeg(PassengerDepartureHandler.passengerMode);
-		List<Id> route = new ArrayList<Id>();
+		List<Id<Link>> route = new ArrayList<Id<Link>>();
 		route.add(new IdImpl("1to2"));
 		route.add(new IdImpl("2to3"));
 		NetworkRoute r2 = RouteUtils.createNetworkRoute(route, network);
@@ -1252,7 +1252,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		a1.setEndTime(activityEndTime);
 		plan.addActivity(a1);
 		Leg l1 = population.getFactory().createLeg(PassengerDepartureHandler.driverMode);
-		List<Id> route1 = new ArrayList<Id>();
+		List<Id<Link>> route1 = new ArrayList<Id<Link>>();
 		route1.add(new IdImpl("0to1"));
 		route1.add(new IdImpl("1to2"));
 		NetworkRoute r1 = RouteUtils.createNetworkRoute(route1, network);
@@ -1263,7 +1263,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		a2.setEndTime(stopEndTime);
 		plan.addActivity(a2);
 		Leg l2 = population.getFactory().createLeg(PassengerDepartureHandler.driverMode);
-		List<Id> route2 = new ArrayList<Id>();
+		List<Id<Link>> route2 = new ArrayList<Id<Link>>();
 		route2.add(new IdImpl("1to2"));
 		route2.add(new IdImpl("2to3"));
 		NetworkRoute r2 = RouteUtils.createNetworkRoute(route2, network);
@@ -1286,7 +1286,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		a1.setEndTime(activityEndTime);
 		plan.addActivity(a1);
 		Leg l1 = population.getFactory().createLeg(PassengerDepartureHandler.driverMode);
-		List<Id> route1 = new ArrayList<Id>();
+		List<Id<Link>> route1 = new ArrayList<Id<Link>>();
 		route1.add(new IdImpl("0to1"));
 		route1.add(new IdImpl("1to2"));
 		NetworkRoute r1 = RouteUtils.createNetworkRoute(route1, network);
@@ -1297,7 +1297,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		a2.setEndTime(stopEndTime);
 		plan.addActivity(a2);
 		Leg l2 = population.getFactory().createLeg(PassengerDepartureHandler.driverMode);
-		List<Id> route2 = new ArrayList<Id>();
+		List<Id<Link>> route2 = new ArrayList<Id<Link>>();
 		route2.add(new IdImpl("1to2"));
 		NetworkRoute r2 = RouteUtils.createNetworkRoute(route2, network);
 		r2.setVehicleId(new IdImpl("v1"));
@@ -1307,7 +1307,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		a3.setEndTime(stopEndTime + 1.0);
 		plan.addActivity(a3);		
 		Leg l3 = population.getFactory().createLeg(PassengerDepartureHandler.driverMode);
-		List<Id> route3 = new ArrayList<Id>();
+		List<Id<Link>> route3 = new ArrayList<Id<Link>>();
 		route3.add(new IdImpl("1to2"));
 		route3.add(new IdImpl("2to3"));
 		NetworkRoute r3 = RouteUtils.createNetworkRoute(route3, network);
@@ -1330,7 +1330,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		a1.setEndTime(activityEndTime);
 		plan.addActivity(a1);
 		Leg l = population.getFactory().createLeg(PassengerDepartureHandler.passengerMode);
-		List<Id> route = new ArrayList<Id>();
+		List<Id<Link>> route = new ArrayList<Id<Link>>();
 		route.add(new IdImpl("0to1"));
 		route.add(new IdImpl("1to2"));
 		route.add(new IdImpl("2to3"));
@@ -1354,7 +1354,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		a1.setEndTime(departureTime);
 		plan.addActivity(a1);
 		Leg l = population.getFactory().createLeg(PassengerDepartureHandler.passengerMode);
-		List<Id> route = new ArrayList<Id>();
+		List<Id<Link>> route = new ArrayList<Id<Link>>();
 		route.add(new IdImpl("0to1"));
 		route.add(new IdImpl("1to2"));
 		NetworkRoute r = RouteUtils.createNetworkRoute(route, network);
@@ -1377,7 +1377,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		a1.setEndTime(activityEndTime);
 		plan.addActivity(a1);
 		Leg l = population.getFactory().createLeg(PassengerDepartureHandler.passengerMode);
-		List<Id> route = new ArrayList<Id>();
+		List<Id<Link>> route = new ArrayList<Id<Link>>();
 		route.add(new IdImpl("1to2"));
 		NetworkRoute r = RouteUtils.createNetworkRoute(route, network);
 		r.setVehicleId(new IdImpl("v1"));
@@ -1387,7 +1387,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		a2.setEndTime(activityEndTime + 600.0);
 		plan.addActivity(a2);
 		Leg l2 = population.getFactory().createLeg(TransportMode.walk);
-		List<Id> route2 = new ArrayList<Id>();
+		List<Id<Link>> route2 = new ArrayList<Id<Link>>();
 		route2.add(new IdImpl("1to2"));
 		route2.add(new IdImpl("2to3"));
 		NetworkRoute r2 = RouteUtils.createNetworkRoute(route2, network);
@@ -1410,7 +1410,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		a1.setEndTime(activityEndTime);
 		plan.addActivity(a1);
 		Leg l = population.getFactory().createLeg(PassengerDepartureHandler.passengerMode);
-		List<Id> route = new ArrayList<Id>();
+		List<Id<Link>> route = new ArrayList<Id<Link>>();
 		route.add(new IdImpl("1to2"));
 		route.add(new IdImpl("2to3"));
 		NetworkRoute r = RouteUtils.createNetworkRoute(route, network);

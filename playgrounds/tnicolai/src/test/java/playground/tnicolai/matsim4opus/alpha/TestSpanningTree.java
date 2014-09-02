@@ -82,7 +82,7 @@ public class TestSpanningTree {
 		
 		// create a link list out of that ...
 		List<Link> linkList = RouteUtils.getLinksFromNodeIds(network, nodeList);
-		List<Id> linkIdList = new ArrayList<Id>();
+		List<Id<Link>> linkIdList = new ArrayList<Id<Link>>();
 		
 		System.out.println();
 		for(Link link: linkList){

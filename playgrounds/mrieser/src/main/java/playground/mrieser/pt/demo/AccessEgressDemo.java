@@ -127,7 +127,7 @@ public class AccessEgressDemo {
 		Link startLink = this.scenario.getNetwork().getLinks().get(this.ids[0]);
 		Link endLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks - 1]);
 		NetworkRoute networkRoute = (NetworkRoute) ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, startLink.getId(), endLink.getId());
-		ArrayList<Id> linkList = new ArrayList<Id>(nOfLinks - 2);
+		ArrayList<Id<Link>> linkList = new ArrayList<Id<Link>>(nOfLinks - 2);
 		for (int i = 1; i < nOfLinks -1; i++) {
 			linkList.add(this.ids[i]);
 		}

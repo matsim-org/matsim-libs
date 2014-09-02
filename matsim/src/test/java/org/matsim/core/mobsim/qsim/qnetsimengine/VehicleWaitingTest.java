@@ -155,7 +155,7 @@ public class VehicleWaitingTest {
 				final NetworkRoute secondRoute =
 					new LinkNetworkRouteImpl(
 							link3.getId(),
-							Collections.<Id>emptyList(),
+							Collections.<Id<Link>>emptyList(),
 							link1.getId());
 
 				secondRoute.setVehicleId( personId1 ); // QSim creates a vehicle per person, with the ids of the persons

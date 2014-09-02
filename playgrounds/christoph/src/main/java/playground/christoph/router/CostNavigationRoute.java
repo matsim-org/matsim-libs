@@ -214,13 +214,13 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 		NetworkRoute oldRoute = (NetworkRoute) route;
 
 		// The linkIds of the new Route
-		List<Id> linkIds = new ArrayList<Id>();
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		
 		/*
 		 *  Get the Id of the current Link.
 		 *  Create a List that contains all links of a route, including the Start- and EndLinks.
 		 */
-		List<Id> allLinkIds = getRouteLinkIds(oldRoute);
+		List<Id<Link>> allLinkIds = getRouteLinkIds(oldRoute);
 
 		/*
 		 * Get those Links which have already been passed.
@@ -249,8 +249,8 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 		return true;
 	}
 
-	private List<Id> getRouteLinkIds(Route route) {
-		List<Id> linkIds = new ArrayList<Id>();
+	private List<Id<Link>> getRouteLinkIds(Route route) {
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 
 		if (route instanceof NetworkRoute) {
 			NetworkRoute networkRoute = (NetworkRoute) route;

@@ -19,6 +19,7 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -70,7 +71,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 		private Activity currentActivity;
 
-		private List<Id> currentRoute;
+		private List<Id<Link>> currentRoute;
 
 		private final Id driverId;
 
@@ -117,7 +118,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			LegImpl leg = new LegImpl(event.getLegMode());
 			leg.setDepartureTime(event.getTime());
 			currentLeg = leg;
-			currentRoute = new ArrayList<Id>();
+			currentRoute = new ArrayList<Id<Link>>();
 		}
 
 		public void handleEvent(LinkEnterEvent event) {
@@ -320,6 +321,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		carrier.getSelectedPlan().setScore(scoringFunction.getScore());
 	}
 
+	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		getDriver(event.getPersonId()).handleEvent(event);
 	}

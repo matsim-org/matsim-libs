@@ -21,6 +21,7 @@
 package org.matsim.api.core.v01.population;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimPopulationObject;
 
 /**
@@ -37,13 +38,13 @@ public interface Route extends MatsimPopulationObject {
 
 	public void setTravelTime(final double travelTime);
 
-	public Id getStartLinkId();
+	public Id<Link> getStartLinkId();
 
-	public Id getEndLinkId();
+	public Id<Link> getEndLinkId();
 
-	public void setStartLinkId(final Id linkId);
+	public void setStartLinkId(final Id<Link> linkId);
 
-	public void setEndLinkId(final Id linkId);
+	public void setEndLinkId(final Id<Link> linkId);
 
 	/** make the clone method public, but do NOT implement Cloneable
 	 * so that implementations can decide on their own if they support

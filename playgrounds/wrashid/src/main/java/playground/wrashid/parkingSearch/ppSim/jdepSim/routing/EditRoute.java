@@ -63,7 +63,7 @@ public class EditRoute {
 		Path calcLeastCostPath = routingAlgo.calcLeastCostPath(network.getLinks().get(startLinkId).getToNode(), network.getLinks().get(endLinkId).getToNode(), time, null, null);
 		List<Link> links=calcLeastCostPath.links;
 		
-		List<Id> linkIds=new LinkedList<Id>();
+		List<Id<Link>> linkIds=new LinkedList<Id<Link>>();
 		for (Link link:links){
 			linkIds.add(link.getId());
 		}
@@ -77,12 +77,12 @@ public class EditRoute {
 		Path calcLeastCostPath = routingAlgo.calcLeastCostPath(network.getLinks().get(startLinkId).getToNode(), middleNode, time, null, null);
 		List<Link> links=calcLeastCostPath.links;
 		
-		List<Id> linkIds=new LinkedList<Id>();
+		List<Id<Link>> linkIds=new LinkedList<Id<Link>>();
 		for (Link link:links){
 			linkIds.add(link.getId());
 		}
 		
-		for (Id linkId:lastPartOfRoute.getLinkIds()){
+		for (Id<Link> linkId:lastPartOfRoute.getLinkIds()){
 			linkIds.add(linkId);
 		}
 		
@@ -96,8 +96,8 @@ public class EditRoute {
 		Node middleNode = network.getLinks().get(firstPartOfRoute.getEndLinkId()).getToNode();
 		Path calcLeastCostPath = routingAlgo.calcLeastCostPath(middleNode, network.getLinks().get(newTargetLinkId).getFromNode(), time, null, null);
 		
-		List<Id> linkIds=new LinkedList<Id>();
-		for (Id linkId:firstPartOfRoute.getLinkIds()){
+		List<Id<Link>> linkIds=new LinkedList<Id<Link>>();
+		for (Id<Link> linkId:firstPartOfRoute.getLinkIds()){
 			linkIds.add(linkId);
 		}
 		

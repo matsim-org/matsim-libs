@@ -403,7 +403,7 @@ public class GTFS2MATSimTransitSchedule {
 								isService = true;
 						if(isService) {
 							NetworkRoute networkRoute = new LinkNetworkRouteImpl(trip.getValue().getLinks().get(0).getId(), trip.getValue().getLinks().get(trip.getValue().getLinks().size()-1).getId());
-							List<Id> intermediate = new ArrayList<Id>();
+							List<Id<Link>> intermediate = new ArrayList<Id<Link>>();
 							for(Link link:trip.getValue().getLinks())
 								intermediate.add(link.getId());
 							intermediate.remove(0);

@@ -170,7 +170,7 @@ public class TwoLinesDemo {
 
 		TransitLine tLine1 = builder.createTransitLine(this.ids[1]);
 		NetworkRoute networkRoute = new LinkNetworkRouteImpl(link1.getId(), link13.getId());
-		ArrayList<Id> linkIdList = new ArrayList<Id>(6);
+		ArrayList<Id<Link>> linkIdList = new ArrayList<Id<Link>>(6);
 		Collections.addAll(linkIdList, link3.getId(), link5.getId(), link7.getId(), link8.getId(), link9.getId(), link11.getId());
 		networkRoute.setLinkIds(link1.getId(), linkIdList, link13.getId());
 		ArrayList<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>(4);
@@ -192,7 +192,7 @@ public class TwoLinesDemo {
 
 		TransitLine tLine2 = builder.createTransitLine(this.ids[2]);
 		networkRoute = new LinkNetworkRouteImpl(link2.getId(), link12.getId());
-		linkIdList = new ArrayList<Id>(6);
+		linkIdList = new ArrayList<Id<Link>>(6);
 		Collections.addAll(linkIdList, link4.getId(), link6.getId(), link7.getId(), link8.getId(), link9.getId(), link10.getId());
 		networkRoute.setLinkIds(link2.getId(), linkIdList, link12.getId());
 		stopList = new ArrayList<TransitRouteStop>(4);

@@ -129,7 +129,7 @@ public class StuckAgentTest {
 		RouteFactory routeFactory = new LinkNetworkRouteFactory();
 		Route route0 = routeFactory.createRoute(scenario.createId("l0"), scenario.createId("l3"));	// missing l1 & l2
 		Route route1 = routeFactory.createRoute(scenario.createId("l0"), scenario.createId("l3"));	// missing l2
-		List<Id> linkIds = new ArrayList<Id>();
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		linkIds.add(scenario.createId("l0"));
 		((NetworkRoute) route1).setLinkIds(scenario.createId("l0"), linkIds, scenario.createId("l3"));
 

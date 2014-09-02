@@ -266,7 +266,7 @@ public class PSeudoQSimCompareEventsTest {
 					null,
 					null );
 
-			final List<Id> ids = new ArrayList<Id>();
+			final List<Id<Link>> ids = new ArrayList<Id<Link>>();
 			for ( Link l : path.links ) ids.add( l.getId() );
 			final NetworkRoute route =
 					new LinkNetworkRouteImpl(

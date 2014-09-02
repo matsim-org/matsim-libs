@@ -137,7 +137,7 @@ public class LogicIntoPlainTranslator {
 		List<LegImpl> plainLegList = new ArrayList<LegImpl>();
 		for(LegImpl logicLeg : logicLegList){
 			NetworkRoute logicNetworkRoute= (NetworkRoute)logicLeg.getRoute();
-			List<Id> plainLinkList = new ArrayList<Id>();
+			List<Id<Link>> plainLinkList = new ArrayList<Id<Link>>();
 
 			for (Link link: NetworkUtils.getLinks(this.plainNet, logicNetworkRoute.getLinkIds())) {
 				//if (link.getType().equals(ptValues.STANDARD))

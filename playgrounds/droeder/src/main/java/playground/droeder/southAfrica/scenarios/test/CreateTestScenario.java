@@ -263,7 +263,7 @@ class CreateTestScenario {
 		NetworkRoute route = new LinkNetworkRouteImpl(sc.createId("A-A"), sc.createId("A-A"));
 		
 		@SuppressWarnings("serial")
-		List<Id> linkIds = new ArrayList<Id>(){{
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>(){{
 			add(new IdImpl("A-B1"));
 			add(new IdImpl("B1-C"));
 			add(new IdImpl("C-C"));
@@ -351,7 +351,7 @@ class CreateTestScenario {
 		NetworkRoute route = new LinkNetworkRouteImpl(sc.createId("B2-A"), sc.createId("B2-A"));
 		
 		@SuppressWarnings("serial")
-		List<Id> linkIds = new ArrayList<Id>(){{
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>(){{
 			add(new IdImpl("A-B2"));
 			add(new IdImpl("B2-C"));
 			add(new IdImpl("C-B2"));

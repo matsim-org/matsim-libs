@@ -43,8 +43,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
-import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
 import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
+import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 
@@ -169,7 +169,7 @@ public class MixedLaneTestFixture {
 		plan.addActivity(act);
 		Leg leg = pb.createLeg(TransportMode.car);
 		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(id0, id2);
-		List<Id> routeList = new ArrayList<Id>();
+		List<Id<Link>> routeList = new ArrayList<Id<Link>>();
 		routeList.add(id1);
 		route.setLinkIds(id0, routeList, id2);
 		leg.setRoute(route);
@@ -206,7 +206,7 @@ public class MixedLaneTestFixture {
 		plan.addActivity(act);
 		Leg leg = pb.createLeg(TransportMode.car);
 		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(id1, id2);
-		List<Id> routeList = new ArrayList<Id>();
+		List<Id<Link>> routeList = new ArrayList<Id<Link>>();
 //		routeList.add(id1);
 		route.setLinkIds(id1, routeList, id2);
 		leg.setRoute(route);

@@ -89,7 +89,7 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 					}
 				}
 				else if (leg.getRoute() instanceof NetworkRoute) {
-					List<Id> linkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();
+					List<Id<Link>> linkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();
 					if (linkIds.size() == 0) {
 						if (judgeByBeeline((Activity) plan.getPlanElements().get(i-1), (Activity) plan.getPlanElements().get(i+1))) {
 							return true;

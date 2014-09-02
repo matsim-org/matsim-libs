@@ -76,7 +76,7 @@ public class OneWayCSRDWithParkingPersonDriverAgentImpl implements MobsimDriverA
 
 	private Leg currentLeg;
 
-	private List<Id> cachedRouteLinkIds = null;
+	private List<Id<Link>> cachedRouteLinkIds = null;
 
 	int currentLinkIdIndex;
 
@@ -348,7 +348,7 @@ public class OneWayCSRDWithParkingPersonDriverAgentImpl implements MobsimDriverA
 		//create route for the car part of the onewaycarsharing trip
 		
 		double travelTime = 0.0;
-		List<Id> ids = new ArrayList<Id>();
+		List<Id<Link>> ids = new ArrayList<Id<Link>>();
 		
 		TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
 		

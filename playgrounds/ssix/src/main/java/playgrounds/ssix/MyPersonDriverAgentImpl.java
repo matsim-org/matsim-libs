@@ -88,7 +88,7 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPasseng
 
 	private Leg currentLeg;
 
-	private List<Id> cachedRouteLinkIds = null;
+	private List<Id<Link>> cachedRouteLinkIds = null;
 
 	int currentLinkIdIndex;
 

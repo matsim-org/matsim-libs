@@ -27,6 +27,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -157,9 +158,9 @@ public class InvertedNetworkLegRouter implements LegRouter {
 		// remove first and last as their ids are, due to inversion, from and to link id of the route
 		nodes.remove(0);
 		nodes.remove(nodes.size() - 1);
-		List<Id> linkIds = new ArrayList<Id>();
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		for (Node n : nodes) {
-			linkIds.add(n.getId());
+			linkIds.add(Id.create(n.getId().toString(), Link.class));
 		}
 		route.setLinkIds(fromLinkId, linkIds, toLinkId);
 		route.setTravelTime((int) path.travelTime);

@@ -109,8 +109,8 @@ public class Route2GoogleMap extends X2GoogleMap {
 				coords.add(startLink.getToNode().getCoord());
 			}
 
-			List<Id> linkIds = ((NetworkRoute) route).getLinkIds();
-			for (Id linkId : linkIds) {
+			List<Id<Link>> linkIds = ((NetworkRoute) route).getLinkIds();
+			for (Id<Link> linkId : linkIds) {
 				coords.add(links.get(linkId).getToNode().getCoord());
 			}
 			coords.add(endLink.getToNode().getCoord());
@@ -128,6 +128,7 @@ public class Route2GoogleMap extends X2GoogleMap {
 		return this.createPath(coords, null, this.weight);
 	}
 
+	@Override
 	public String getGoogleMapURL() {
 		return DEFAULT_URL_PREFIX + this.getStartMarkers()
 				+ this.getEndMarkers() + this.getPureRoutePath()

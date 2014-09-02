@@ -21,6 +21,15 @@
 
 package playground.boescpa.converters.osm.tools;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -32,10 +41,18 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.pt.transitSchedule.api.*;
-import playground.scnadine.converters.osmCore.*;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import java.util.*;
+import playground.scnadine.converters.osmCore.OsmNodeHandler;
+import playground.scnadine.converters.osmCore.OsmParser;
+import playground.scnadine.converters.osmCore.OsmRelationHandler;
+import playground.scnadine.converters.osmCore.OsmWayHandler;
+import playground.scnadine.converters.osmCore.TagFilter;
 
 /**
  * This is a simplified version of playground.scnadine.converters.osmPT.Osm2TransitLines.
@@ -401,7 +418,7 @@ public class Osm2TransitSimplified {
 					List<OsmParser.OsmNode> relationStops = new ArrayList<OsmParser.OsmNode>();
 					Map<Long, OsmParser.OsmWay> relationWays = new HashMap<Long, OsmParser.OsmWay>();
 					List<Long> sortedWays = new LinkedList<Long>();
-					List<Id> sortedLinks = new LinkedList<Id>();
+					List<Id<Link>> sortedLinks = new LinkedList<Id<Link>>();
 
 					for (OsmParser.OsmRelationMember member : relation.members) {
 
@@ -560,7 +577,7 @@ public class Osm2TransitSimplified {
 			return sortedStops;
 		}
 
-		private void sortWays(List<Long> sortedWays, List<Id> sortedLinks, List<Long> unsortedWays, Map<Long, OsmParser.OsmWay> relationWays) {
+		private void sortWays(List<Long> sortedWays, List<Id<Link>> sortedLinks, List<Long> unsortedWays, Map<Long, OsmParser.OsmWay> relationWays) {
 
 			log.info("unsorted ways = "+unsortedWays);
 
@@ -714,7 +731,7 @@ public class Osm2TransitSimplified {
 		// helper methods
 		// /////////////////////////////////////////////////////
 
-		private void developWays(List<Long> sortedWays, List<Id> sortedLinks, Map<Long, OsmParser.OsmWay> relationWays, List<Long> loopWays, Map<Long, List<Long>> loopWayNodes, HashMap<Long, List<Long>> unprocessedNodesAndConnectedWays, long startNodeId) {
+		private void developWays(List<Long> sortedWays, List<Id<Link>> sortedLinks, Map<Long, OsmParser.OsmWay> relationWays, List<Long> loopWays, Map<Long, List<Long>> loopWayNodes, HashMap<Long, List<Long>> unprocessedNodesAndConnectedWays, long startNodeId) {
 
 			//TODO: dealing with links that are used twice, e.g. Bus 185: Zürich, Wollishofen => Adliswil, Bahnhof or Bus 811: Uster, Bahnhof - Rundkurs via Uster, Haberweid
 			//TODO: dealing with "forward" and "backward" links
@@ -790,7 +807,7 @@ public class Osm2TransitSimplified {
 			}
 		}
 
-		private void insertLoop(List<Long> sortedWays, List<Id> sortedLinks, Map<Long, OsmParser.OsmWay> relationWays, Map<Long, List<Long>> loopWayNodes, HashMap<Long, List<Long>> unprocessedNodesAndConnectedWays, List<Long> loopNodes, List<Long> forkNodes, long nodeId) {
+		private void insertLoop(List<Long> sortedWays, List<Id<Link>> sortedLinks, Map<Long, OsmParser.OsmWay> relationWays, Map<Long, List<Long>> loopWayNodes, HashMap<Long, List<Long>> unprocessedNodesAndConnectedWays, List<Long> loopNodes, List<Long> forkNodes, long nodeId) {
 
 			System.out.println("Insert loop links at node "+nodeId+"...");
 			List<Long> sortedLinksBefore = new ArrayList<Long>(sortedWays);
@@ -824,7 +841,7 @@ public class Osm2TransitSimplified {
 			System.out.println("------");
 		}
 
-		private void developFork(List<Long> sortedWays, List<Id> sortedLinks, Map<Long, OsmParser.OsmWay> relationWays, Map<Long, List<Long>> loopWayNodes, HashMap<Long, List<Long>> unprocessedNodesAndConnectedWays, List<Long> loopNodes, List<Long> forkNodes, long nodeId) {
+		private void developFork(List<Long> sortedWays, List<Id<Link>> sortedLinks, Map<Long, OsmParser.OsmWay> relationWays, Map<Long, List<Long>> loopWayNodes, HashMap<Long, List<Long>> unprocessedNodesAndConnectedWays, List<Long> loopNodes, List<Long> forkNodes, long nodeId) {
 
 			System.out.println("Develop fork at node "+nodeId+"...");
 			forkNodes.remove(nodeId);
@@ -875,7 +892,7 @@ public class Osm2TransitSimplified {
 			//stop if there are no more connected ways or if the developed ways merges with the existing "after" ways
 			//TODO: integrate loopsWays (!), new forks (?), new loops(?) => or check them of earlier (i.e. restructure how the lists "loopNodes" and "forkNodes" are filled
 			List<Long>sortedNewWaysAfterFork = new ArrayList<Long>();
-			List<Id>sortedNewLinksAfterFork = new ArrayList<Id>();
+			List<Id<Link>>sortedNewLinksAfterFork = new ArrayList<Id<Link>>();
 			while (unprocessedNodesAndConnectedWays.containsKey(nodeId) && !forkNodes.contains(nodeId)) {
 				nodeId = developWay(sortedNewWaysAfterFork, sortedNewLinksAfterFork, relationWays, loopWayNodes, unprocessedNodesAndConnectedWays, loopNodes, forkNodes, nodeId);
 			}
@@ -922,7 +939,7 @@ public class Osm2TransitSimplified {
 
 		}
 
-		private long developWay(List<Long> sortedWays, List<Id> sortedLinks, Map<Long, OsmParser.OsmWay> relationWays, Map<Long, List<Long>> loopWayNodes, HashMap<Long, List<Long>> unprocessedNodesAndConnectedWays, List<Long> loopNodes, List<Long> forkNodes, long nodeId) {
+		private long developWay(List<Long> sortedWays, List<Id<Link>> sortedLinks, Map<Long, OsmParser.OsmWay> relationWays, Map<Long, List<Long>> loopWayNodes, HashMap<Long, List<Long>> unprocessedNodesAndConnectedWays, List<Long> loopNodes, List<Long> forkNodes, long nodeId) {
 
 			List<Long> connectedWays = unprocessedNodesAndConnectedWays.get(nodeId);
 			OsmParser.OsmWay way = relationWays.get(connectedWays.get(0));
@@ -970,7 +987,7 @@ public class Osm2TransitSimplified {
 			return nodeId;
 		}
 
-		private long developLoopWay(List<Long> sortedWays, List<Id> sortedLinks, Map<Long, OsmParser.OsmWay> relationWays, Map<Long, List<Long>> loopWayNodes, HashMap<Long, List<Long>> unprocessedNodesAndConnectedWays, long nodeId) {
+		private long developLoopWay(List<Long> sortedWays, List<Id<Link>> sortedLinks, Map<Long, OsmParser.OsmWay> relationWays, Map<Long, List<Long>> loopWayNodes, HashMap<Long, List<Long>> unprocessedNodesAndConnectedWays, long nodeId) {
 
 			List<Long> connectedLoopWays = loopWayNodes.get(nodeId);
 			System.out.println("connected loop ways = "+connectedLoopWays);
@@ -1017,7 +1034,7 @@ public class Osm2TransitSimplified {
 			return nodeId;
 		}
 
-		private long developClosestNeighbour(List<Id> sortedLinks, HashMap<Long, List<Long>> unprocessedNodesAndConnectedWays, long nodeId) {
+		private long developClosestNeighbour(List<Id<Link>> sortedLinks, HashMap<Long, List<Long>> unprocessedNodesAndConnectedWays, long nodeId) {
 
 			System.out.println("Develop closest neighbour for node "+nodeId+"...");
 

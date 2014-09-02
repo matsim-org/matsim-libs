@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -31,7 +32,7 @@ public class TaxiserviceRoutingModule implements RoutingModule {
 	public List<? extends PlanElement> calcRoute(Facility fromFacility,
 			Facility toFacility, double departureTime, Person person) {
 		double travelTime = 0.0;
-		List<Id> ids = new ArrayList<Id>();
+		List<Id<Link>> ids = new ArrayList<Id<Link>>();
 		
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 		

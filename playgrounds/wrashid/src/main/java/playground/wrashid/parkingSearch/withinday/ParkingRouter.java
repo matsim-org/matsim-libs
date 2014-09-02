@@ -110,7 +110,7 @@ public class ParkingRouter {
 		/*
 		 * Merge old and new route.
 		 */
-		List<Id> linkIds = new ArrayList<Id>();
+		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		
 		// new links
 		for (Link link : path.links) linkIds.add(link.getId());

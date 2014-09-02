@@ -37,7 +37,6 @@ import org.matsim.contrib.grips.model.config.GripsConfigModule;
 import org.matsim.contrib.grips.model.events.InfoEvent;
 import org.matsim.contrib.grips.scenariogenerator.ScenarioGenerator;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -263,7 +262,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		
 		
 //		allLinks = allLinks.subList(0, allLinks.size()-2);
-		List<Id> allLinksIds = new ArrayList<Id>();
+		List<Id<Link>> allLinksIds = new ArrayList<Id<Link>>();
 		Set<String> modes  = new HashSet<String>();
 		modes.add("bus");
 		for (Link link : allLinks) {
