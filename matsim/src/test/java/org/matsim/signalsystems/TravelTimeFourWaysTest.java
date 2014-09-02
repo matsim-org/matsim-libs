@@ -43,6 +43,7 @@ import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 /**
  * @author aneumann
@@ -112,7 +113,7 @@ public class TravelTimeFourWaysTest {
 		sim.addQueueSimulationListeners(signalEngine);
 		sim.run();
 		eventsXmlWriter.closeFile();
-		Assert.assertEquals("different events files", CRCChecksum.getCRCFromFile(this.testUtils.getInputDirectory() + EVENTSFILE), CRCChecksum.getCRCFromFile(eventsOut));
+        Assert.assertEquals("different events files", EventsFileComparator.compare(this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut), 0);
 	}
 
 	@Test

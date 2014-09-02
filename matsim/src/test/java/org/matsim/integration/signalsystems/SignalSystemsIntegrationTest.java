@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package org.matsim.integration.signalsystems;
 
-import java.io.File;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -33,11 +31,12 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+
+import java.io.File;
 
 
 /**
@@ -78,9 +77,7 @@ public class SignalSystemsIntegrationTest {
 			//iteration 0 
 			String iterationOutput = controlerOutputDir + "ITERS/it.0/";
 			
-			Assert.assertEquals("different events files after iteration 0 ", 
-					CRCChecksum.getCRCFromFile(inputDirectory + "0.events.xml.gz"), 
-					CRCChecksum.getCRCFromFile(iterationOutput + "0.events.xml.gz"));
+			Assert.assertEquals("different events files after iteration 0 ", EventsFileComparator.compare(inputDirectory + "0.events.xml.gz", iterationOutput + "0.events.xml.gz"),0);
 
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimNetworkReader(expectedPopulation).readFile(c.getConfig().network().getInputFile());
@@ -152,8 +149,8 @@ public class SignalSystemsIntegrationTest {
 			String iterationOutput = controlerOutputDir + "ITERS/it.0/";
 			
 			Assert.assertEquals("different events files after iteration 0 ", 
-					CRCChecksum.getCRCFromFile(inputDirectory + "0.events.xml.gz"), 
-					CRCChecksum.getCRCFromFile(iterationOutput + "0.events.xml.gz"));
+					EventsFileComparator.compare(inputDirectory + "0.events.xml.gz", iterationOutput + "0.events.xml.gz"),
+                    0);
 
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimNetworkReader(expectedPopulation).readFile(c.getConfig().network().getInputFile());

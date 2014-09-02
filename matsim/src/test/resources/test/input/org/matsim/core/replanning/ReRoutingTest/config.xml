@@ -20,10 +20,9 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="1" />
     	<param name="routingAlgorithmType" value="AStarLandmarks" />
-    	<param name="mobsim" value="queueSimulation" />
 	</module>
 
-	<module name="simulation">
+	<module name="qsim">
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="12:00:00" />
 

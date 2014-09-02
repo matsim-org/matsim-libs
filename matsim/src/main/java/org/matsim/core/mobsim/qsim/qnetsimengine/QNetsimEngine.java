@@ -20,13 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -45,6 +38,10 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.VehicularDepartureHandler.Vehic
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 
+import java.util.*;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
  *
@@ -52,7 +49,61 @@ import org.matsim.lanes.data.v20.LaneDefinitions20;
  * @author dgrether
  * @author dstrippgen
  */
-public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
+public class QNetsimEngine implements MobsimEngine {
+
+    /*
+     * We do the load balancing between the Threads using some kind
+     * of round robin.
+     *
+     * Additionally we should check from time to time whether the load
+     * is really still balanced. This is not guaranteed due to the fact
+     * that some Links get deactivated while others don't. If the number
+     * of Links is high enough statistically the difference should not
+     * be to significant.
+     */
+	/*package*/ static class LinkReActivator implements Runnable {
+        private final QSimEngineRunner[] runners;
+
+        public LinkReActivator(QSimEngineRunner[] threads) {
+            this.runners = threads;
+        }
+
+        @Override
+        public void run() {
+			/*
+			 * Each Thread contains a List of Links to activate.
+			 */
+            for (QSimEngineRunner runner : this.runners) {
+				/*
+				 * We do not redistribute the Links - they will be processed
+				 * by the same thread during the whole simulation.
+				 */
+                runner.activateLinks();
+            }
+        }
+    }
+
+    /*package*/ static class NodeReActivator implements Runnable {
+        private final QSimEngineRunner[] runners;
+
+        public NodeReActivator(QSimEngineRunner[] runners) {
+            this.runners = runners;
+        }
+
+        @Override
+        public void run() {
+			/*
+			 * Each Thread contains a List of Links to activate.
+			 */
+            for (QSimEngineRunner runner : this.runners) {
+				/*
+				 * We do not redistribute the Nodes - they will be processed
+				 * by the same thread during the whole simulation.
+				 */
+                runner.activateNodes();
+            }
+        }
+    }
 
 	private static final Logger log = Logger.getLogger(QNetsimEngine.class);
 
@@ -60,17 +111,6 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 
 	/*package*/   QNetwork network;
 
-	/** This is the collection of links that have to be moved in the simulation */
-	/*package*/  List<QLinkInternalI> simLinksList = new ArrayList<QLinkInternalI>();
-
-	/** This is the collection of nodes that have to be moved in the simulation */
-	/*package*/  List<QNode> simNodesList = null;
-
-	/** This is the collection of links that have to be activated in the current time step */
-	/*package*/  ArrayList<QLinkInternalI> simActivateLinks = new ArrayList<QLinkInternalI>();
-
-	/** This is the collection of nodes that have to be activated in the current time step */
-	/*package*/  ArrayList<QNode> simActivateNodes = new ArrayList<QNode>();
 
 	private final Map<Id, QVehicle> vehicles = new HashMap<Id, QVehicle>();
 
@@ -83,7 +123,17 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 
 	private double infoTime = 0;
 
+    private final int numOfThreads;
+
 	private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator();
+
+
+    private QSimEngineRunner[] engines;
+
+    private CyclicBarrier startBarrier;
+    private CyclicBarrier endBarrier;
+
+    private final Set<QLinkInternalI> linksToActivateInitially = new HashSet<QLinkInternalI>();
 
 	/*package*/ InternalInterface internalInterface = null ;
 	@Override
@@ -162,6 +212,9 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 		network.initialize(this);
 
 		this.positionInfoBuilder = this.createAgentSnapshotInfoBuilder( sim.getScenario() );
+
+
+        this.numOfThreads = this.getMobsim().getScenario().getConfig().qsim().getNumberOfThreads();
 	}
 
 	public void addParkedVehicle(MobsimVehicle veh, Id startLinkId) {
@@ -195,17 +248,40 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 
 	@Override
 	public void onPrepareSim() {
-		simNodesList = new ArrayList<QNode>();
 		this.infoTime = 
 				Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime() / INFO_PERIOD) * INFO_PERIOD; 
 		/*
 		 * infoTime may be < simStartTime, this ensures to print out the
 		 * info at the very first timestep already 
 		 */
+
+        initQSimEngineThreads();
 	}
 
 	@Override
 	public void afterSim() {
+
+        /*
+		 * Calling the afterSim Method of the QSimEngineThreads
+		 * will set their simulationRunning flag to false.
+		 */
+        for (QSimEngineRunner engine : this.engines) {
+            engine.afterSim();
+        }
+
+		/*
+		 * Triggering the startBarrier of the QSimEngineThreads.
+		 * They will check whether the Simulation is still running.
+		 * It is not, so the Threads will stop running.
+		 */
+        try {
+            this.startBarrier.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (BrokenBarrierException e) {
+            throw new RuntimeException(e);
+        }
+
 		/* Reset vehicles on ALL links. We cannot iterate only over the active links
 		 * (this.simLinksArray), because there may be links that have vehicles only
 		 * in the buffer (such links are *not* active, as the buffer gets emptied
@@ -222,38 +298,40 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 	 */
 	@Override
 	public void doSimStep(final double time) {
-		moveNodes(time);
-		moveLinks(time);
-		printSimLog(time);
+        run(time);
+
+        this.printSimLog(time);
 	}
 
-	private void moveNodes(final double time) {
-		reactivateNodes();
-		ListIterator<QNode> simNodes = this.simNodesList.listIterator();
-		QNode node;
 
-		while (simNodes.hasNext()) {
-			node = simNodes.next();
-			node.doSimStep(time);
+    /*
+     * The Threads are waiting at the startBarrier.
+     * We trigger them by reaching this Barrier. Now the
+     * Threads will start moving the Nodes and Links. We wait
+     * until all of them reach the endBarrier to move
+     * on. We should not have any Problems with Race Conditions
+     * because even if the Threads would be faster than this
+     * Thread, means the reach the endBarrier before
+     * this Method does, it should work anyway.
+     */
+    private void run(double time) {
 
-			if (!node.isActive()) simNodes.remove();
-		}
-	}
+        try {
+            // set current Time
+            for (QSimEngineRunner engine : this.engines) {
+                engine.setTime(time);
+            }
 
-	private void moveLinks(final double time) {
-		reactivateLinks();
-		ListIterator<QLinkInternalI> simLinks = this.simLinksList.listIterator();
-		QLinkInternalI link;
-		boolean isActive;
+            this.startBarrier.await();
 
-		while (simLinks.hasNext()) {
-			link = simLinks.next();
-			isActive = link.doSimStep(time);
-			if (!isActive) {
-				simLinks.remove();
-			}
-		}
-	}
+            this.endBarrier.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (BrokenBarrierException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 	/*package*/ void printSimLog(double time) {
 		if (time >= this.infoTime) {
@@ -266,39 +344,28 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 		}
 	}
 
-	@Override
-	protected void activateLink(final QLinkInternalI link) {
-		this.simActivateLinks.add(link);
-	}
+    public int getNumberOfSimulatedLinks() {
 
-	private void reactivateLinks() {
-		if (!this.simActivateLinks.isEmpty()) {
-			this.simLinksList.addAll(this.simActivateLinks);
-			this.simActivateLinks.clear();
-		}
-	}
+        int numLinks = 0;
 
-	@Override
-	protected void activateNode(QNode node) {
-		this.simActivateNodes.add(node);
-	}
+        for (QSimEngineRunner engine : this.engines) {
+            numLinks = numLinks + engine.getNumberOfSimulatedLinks();
+        }
 
-	private void reactivateNodes() {
-		if (!this.simActivateNodes.isEmpty()) {
-			this.simNodesList.addAll(this.simActivateNodes);
-			this.simActivateNodes.clear();
-		}
-	}
+        return numLinks;
+    }
 
-	@Override
-	public int getNumberOfSimulatedNodes() {
-		return this.simNodesList.size();
-	}
+    public int getNumberOfSimulatedNodes() {
 
-	@Override
-	public int getNumberOfSimulatedLinks() {
-		return this.simLinksList.size();
-	}
+        int numNodes = 0;
+
+        for (QSimEngineRunner engine : this.engines) {
+            numNodes = numNodes + engine.getNumberOfSimulatedNodes();
+        }
+
+        return numNodes;
+    }
+
 
 	QSim getMobsim() {
 		return this.qsim;
@@ -357,5 +424,87 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 	public LinkSpeedCalculator getLinkSpeedCalculator() {
 		return this.linkSpeedCalculator;
 	}
+
+    private void initQSimEngineThreads() {
+
+        Thread[] threads = new Thread[this.numOfThreads];
+        this.engines = new QSimEngineRunner[this.numOfThreads] ;
+        LinkReActivator linkReActivator = new LinkReActivator(this.engines);
+        NodeReActivator nodeReActivator = new NodeReActivator(this.engines);
+
+        this.startBarrier = new CyclicBarrier(this.numOfThreads + 1);
+        CyclicBarrier separationBarrier = new CyclicBarrier(this.numOfThreads, linkReActivator);
+        //		this.endBarrier = new CyclicBarrier(numOfThreads + 1);
+        this.endBarrier = new CyclicBarrier(this.numOfThreads + 1, nodeReActivator);
+
+        // setup threads
+        for (int i = 0; i < this.numOfThreads; i++) {
+            QSimEngineRunner engine = new QSimEngineRunner(this.startBarrier, separationBarrier,
+                    this.endBarrier);
+            Thread thread = new Thread(engine);
+            thread.setName("QSimEngineThread" + i);
+
+            thread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
+            threads[i] = thread;
+            this.engines[i] = engine;
+
+            thread.start();
+        }
+
+		/*
+		 *  Assign every Link and Node to an Activator. By doing so, the
+		 *  activateNode(...) and activateLink(...) methods in this class
+		 *  should become obsolete.
+		 */
+        assignNetElementActivators();
+    }
+
+    /*
+	 * Within the MoveThreads Links are only activated when a Vehicle is moved
+	 * over a Node which is processed by that Thread. So we can assign each QLink
+	 * to the Thread that handles its InNode.
+	 */
+    private void assignNetElementActivators() {
+
+        // only for statistics
+        int nodes[] = new int[this.engines.length];
+        int links[] = new int[this.engines.length];
+
+        int roundRobin = 0;
+        for (QNode node : network.getNetsimNodes().values()) {
+            int i = roundRobin % this.numOfThreads;
+            node.setNetElementActivator(this.engines[i]);
+            nodes[i]++;
+
+            // set activator for out links
+            for (Link outLink : node.getNode().getOutLinks().values()) {
+                AbstractQLink qLink = (AbstractQLink) network.getNetsimLink(outLink.getId());
+                // (must be of this type to work.  kai, feb'12)
+
+                // removing qsim as "person in the middle".  not fully sure if this is the same in the parallel impl.  kai, oct'10
+                qLink.setNetElementActivator(this.engines[i]);
+
+				/*
+				 * If the QLink contains agents that end their activity in the first time
+				 * step, the link should be activated.
+				 */
+                if (linksToActivateInitially.remove(qLink)) {
+                    this.engines[i].activateLink(qLink);
+                }
+
+                links[i]++;
+
+            }
+
+            roundRobin++;
+        }
+
+        // print some statistics
+        for (int i = 0; i < this.engines.length; i++) {
+            log.info("Assigned " + nodes[i] + " nodes and " + links[i] + " links to QSimEngineRunner #" + i);
+        }
+
+        this.linksToActivateInitially.clear();
+    }
 
 }

@@ -19,19 +19,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -43,6 +30,8 @@ import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+
+import java.util.*;
 
 /**
  * QLinkInternalI is the interface; this here is an abstract class that contains implementation
@@ -85,9 +74,6 @@ abstract class AbstractQLink extends QLinkInternalI {
 	 */
 	/*package*/ final Queue<QVehicle> waitingList = new LinkedList<QVehicle>();
 
-	/**
-	 * This is often the simEngine, but not when it is a parallel simulation.
-	 */
 	NetElementActivator netElementActivator;
 
 	/*package*/ final boolean insertingWaitingVehiclesBeforeDrivingVehicles;
@@ -104,7 +90,6 @@ abstract class AbstractQLink extends QLinkInternalI {
 	AbstractQLink(Link link, QNetwork network) {
 		this.link = link ;
 		this.network = network;
-		this.netElementActivator = network.simEngine;
 		this.insertingWaitingVehiclesBeforeDrivingVehicles =
 				network.simEngine.getMobsim().getScenario().getConfig().qsim().isInsertingWaitingVehiclesBeforeDrivingVehicles() ;
 	}

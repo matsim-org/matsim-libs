@@ -31,8 +31,8 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 
 public class EquilTest extends MatsimTestCase {
@@ -62,8 +62,6 @@ public class EquilTest extends MatsimTestCase {
 
 		writer.closeFile();
 
-		final long checksum1 = CRCChecksum.getCRCFromFile(referenceFileName);
-		long checksum2 = CRCChecksum.getCRCFromFile(eventsFileName);
-		assertEquals("different event files.", checksum1, checksum2);
+		assertEquals("different event files.", EventsFileComparator.compare(referenceFileName, eventsFileName), 0);
 	}
 }

@@ -32,7 +32,7 @@ public class ParallelQNetsimEngineFactory implements QNetsimEngineFactory {
 
 	@Override
 	public QNetsimEngine createQSimEngine(Netsim sim) {
-		return new ParallelQNetsimEngine( (QSim) sim);
+		return new QNetsimEngine( (QSim) sim);
 	}
 
 }

@@ -20,21 +20,20 @@
 
 package org.matsim.core.replanning;
 
-import java.util.EnumSet;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
+
+import java.util.EnumSet;
 
 public class ReRoutingTest extends MatsimTestCase {
 
@@ -43,9 +42,9 @@ public class ReRoutingTest extends MatsimTestCase {
 	
 	private Scenario loadScenario() {
 		Config config = loadConfig(getClassInputDirectory() + "config.xml");
-		((SimulationConfigGroup) config.getModule("simulation")).setTimeStepSize(10.0);
-		((SimulationConfigGroup) config.getModule("simulation")).setStuckTime(100.0);
-		((SimulationConfigGroup) config.getModule("simulation")).setRemoveStuckVehicles(true);
+		config.qsim().setTimeStepSize(10.0);
+        config.qsim().setStuckTime(100.0);
+        config.qsim().setRemoveStuckVehicles(true);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt));
 
 		/*

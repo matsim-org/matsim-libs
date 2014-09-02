@@ -19,19 +19,12 @@
 
 package org.matsim.integration.population;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -44,14 +37,12 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Tests that a simple simulation can be run with plans where
@@ -66,7 +57,6 @@ public class NonAlternativingPlanElementsIntegrationTest {
 	@Test
 	public void test_Controler_QueueSimulation_Timechoice_acts() {
 		Config config = this.utils.loadConfig("test/scenarios/equil/config.xml");
-		config.controler().setMobsim("queueSimulation");
 		config.controler().setLastIteration(10);
 		config.strategy().addParam("Module_2", "TimeAllocationMutator");
 		config.strategy().addParam("ModuleProbability_2", "1.0");
@@ -90,7 +80,6 @@ public class NonAlternativingPlanElementsIntegrationTest {
 	@Test
 	public void test_Controler_QueueSimulation_Timechoice_legs() {
 		Config config = this.utils.loadConfig("test/scenarios/equil/config.xml");
-		config.controler().setMobsim("queueSimulation");
 		config.controler().setLastIteration(10);
 		config.strategy().addParam("Module_2", "TimeAllocationMutator");
 		config.strategy().addParam("ModuleProbability_2", "1.0");

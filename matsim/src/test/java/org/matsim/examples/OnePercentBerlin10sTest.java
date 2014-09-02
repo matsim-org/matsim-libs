@@ -24,15 +24,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
@@ -47,46 +44,6 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 public class OnePercentBerlin10sTest extends MatsimTestCase {
 
 	private static final Logger log = Logger.getLogger(OnePercentBerlin10sTest.class);
-
-	public void testOnePercent10s() {
-		Config config = loadConfig(null);
-		String netFileName = "test/scenarios/berlin/network.xml";
-		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
-		String eventsFileName = getOutputDirectory() + "events.txt.gz";
-		String referenceEventsFileName = getInputDirectory() + "events.txt.gz";
-
-		MatsimRandom.reset(7411L);
-
-		config.addModule( new SimulationConfigGroup() );
-		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setTimeStepSize(10.0);
-		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setFlowCapFactor(0.01);
-		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setStorageCapFactor(0.04);
-		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setRemoveStuckVehicles(false);
-		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setStuckTime(10.0);
-		config.planCalcScore().setLearningRate(1.0);
-		
-		config.plans().setActivityDurationInterpretation( ActivityDurationInterpretation.minOfDurationAndEndTime );
-		
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		
-		new MatsimNetworkReader(scenario).readFile(netFileName);
-		new MatsimPopulationReader(scenario).readFile(popFileName);
-
-		EventsManager events = EventsUtils.createEventsManager();
-		EventWriterTXT writer = new EventWriterTXT(eventsFileName);
-		events.addHandler(writer);
-
-		Mobsim sim = new QSimFactory().createMobsim(scenario, events);
-		log.info("START testOnePercent10s SIM");
-		sim.run();
-		log.info("STOP testOnePercent10s SIM");
-
-		writer.closeFile();
-
-		assertTrue("different event files", EventsFileComparator.compare(referenceEventsFileName, eventsFileName) == 
-			EventsFileComparator.CODE_FILES_ARE_EQUAL);
-		
-	}
 
 	public void testOnePercent10sQSim() {
 		Config config = loadConfig(null);

@@ -255,7 +255,8 @@ public class QLinkTest extends MatsimTestCase {
 		Link link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 1.0, 1.0, 1.0, 1.0);
 		QSim qsim = (QSim) new QSimFactory().createMobsim(scenario, (EventsUtils.createEventsManager()));
 		NetsimNetwork queueNetwork = qsim.getNetsimNetwork();
-		QLinkImpl qlink = (QLinkImpl) queueNetwork.getNetsimLink(new IdImpl("1"));
+		dummify((QNetwork) queueNetwork);
+        QLinkImpl qlink = (QLinkImpl) queueNetwork.getNetsimLink(new IdImpl("1"));
 
 		QVehicle v1 = new QVehicle(new VehicleImpl(new IdImpl("1"), new VehicleTypeImpl(new IdImpl("defaultVehicleType"))));
 		PersonImpl p = new PersonImpl(new IdImpl("1"));
@@ -457,12 +458,43 @@ public class QLinkTest extends MatsimTestCase {
 			this.link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 10 * 7.5, 2.0 * 7.5, 3600.0, 1.0);
 			sim = (QSim) new QSimFactory().createMobsim(scenario, (EventsUtils.createEventsManager()));
 			this.queueNetwork = (QNetwork) sim.getNetsimNetwork();
-			this.qlink1 = (QLinkImpl) this.queueNetwork.getNetsimLink(new IdImpl("1"));
-			this.qlink2 = (QLinkImpl) this.queueNetwork.getNetsimLink(new IdImpl("2"));
 
+            this.qlink1 = (QLinkImpl) this.queueNetwork.getNetsimLink(new IdImpl("1"));
+            this.qlink2 = (QLinkImpl) this.queueNetwork.getNetsimLink(new IdImpl("2"));
+            dummify(this.queueNetwork);
 			this.basicVehicle = new VehicleImpl(new IdImpl("1"), new VehicleTypeImpl(new IdImpl("defaultVehicleType")));
 		}
 
 	}
+
+    private static void dummify(QNetwork network) {
+        NetElementActivator netElementActivator = new NetElementActivator() {
+            @Override
+            protected void activateNode(QNode node) {
+
+            }
+
+            @Override
+            int getNumberOfSimulatedNodes() {
+                return 0;
+            }
+
+            @Override
+            protected void activateLink(QLinkInternalI link) {
+
+            }
+
+            @Override
+            int getNumberOfSimulatedLinks() {
+                return 0;
+            }
+        };
+        for (QNode node : network.getNetsimNodes().values()) {
+            node.setNetElementActivator(netElementActivator);
+        }
+        for (QLinkInternalI link : network.getNetsimLinks().values()) {
+            ((QLinkImpl) link).setNetElementActivator(netElementActivator);
+        }
+    }
 
 }

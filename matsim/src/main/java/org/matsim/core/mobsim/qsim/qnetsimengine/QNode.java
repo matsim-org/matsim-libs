@@ -20,13 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -36,6 +29,9 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
+
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * Represents a node in the QSimulation.
@@ -65,8 +61,7 @@ public class QNode implements NetsimNode {
 
 	public QNode(final Node n, final QNetwork network) {
 		this.node = n;
-		this.network = network; 
-		this.activator = network.simEngine;	// by default (single threaded QSim)
+		this.network = network;
 		int nofInLinks = this.node.getInLinks().size();
 		this.inLinksArrayCache = new QLinkInternalI[nofInLinks];
 		this.tempLinks = new QLinkInternalI[nofInLinks];
