@@ -180,7 +180,7 @@ public class CreatePopulation {
 		return facQuadTree;
 	}
 
-	private QuadTree<ActivityFacility> builFacQuadTree(String type, Map<Id, ? extends ActivityFacility> facilities_of_type) {
+	private QuadTree<ActivityFacility> builFacQuadTree(String type, Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities_of_type) {
 		log.info(" building " + type + " facility quad tree");
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;

@@ -163,7 +163,7 @@ public class TripAcceptanceProba extends TrajectoryAnalyzerTask {
 	private List<ActivityFacility> filterFacilities(ActivityFacilities facilities, String type) {
 		List<ActivityFacility> facList = new ArrayList<ActivityFacility>(facilities.getFacilities().size());
 		
-		for(Entry<Id, ? extends ActivityFacility> entry : facilities.getFacilities().entrySet()) {
+		for(Entry<Id<ActivityFacility>, ? extends ActivityFacility> entry : facilities.getFacilities().entrySet()) {
 			ActivityFacility facility = entry.getValue();
 			for(ActivityOption option : facility.getActivityOptions().values()) {
 				if(type == null || option.getType().equals(type)) {

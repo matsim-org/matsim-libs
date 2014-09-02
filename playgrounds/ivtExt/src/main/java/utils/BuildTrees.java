@@ -49,7 +49,7 @@ public class BuildTrees {
 	}
 	
 	public QuadTree<ActivityFacility> createActivitiesTree(String [] activityTypes, String mainType, Scenario scenario) {
-		Map<Id,ActivityFacility> facilities_of_type = new TreeMap<Id, ActivityFacility>();
+		Map<Id<ActivityFacility>, ActivityFacility> facilities_of_type = new TreeMap<Id<ActivityFacility>, ActivityFacility>();
 			
 		for (String activityType : activityTypes) {
 			facilities_of_type.putAll(((ScenarioImpl)scenario).getActivityFacilities().getFacilitiesForActivityType(activityType));
@@ -57,7 +57,7 @@ public class BuildTrees {
 		return this.builFacQuadTree(mainType, facilities_of_type);
 	}
 	
-	private QuadTree<ActivityFacility> builFacQuadTree(String type, Map<Id, ? extends ActivityFacility> facilities_of_type) {
+	private QuadTree<ActivityFacility> builFacQuadTree(String type, Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities_of_type) {
 		Gbl.startMeasurement();
 		log.info(" building " + type + " facility quad tree");
 		double minx = Double.POSITIVE_INFINITY;
