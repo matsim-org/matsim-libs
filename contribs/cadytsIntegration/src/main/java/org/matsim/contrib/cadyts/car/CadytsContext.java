@@ -181,15 +181,31 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		@Override
 		public double getSimValue(final Link link, final int startTime_s, final int endTime_s, final TYPE type) { // stopFacility or link
 
-			int hour = startTime_s / 3600;
 			Id linkId = link.getId();
 			double[] values = volumesAnalyzer.getVolumesPerHourForLink(linkId);
 			
 			if (values == null) {
 				return 0;
 			}
+			
+			int startHour = startTime_s / 3600;
+			int endHour = (endTime_s-3600)/3600 ;
+			if (endHour < startHour) {
+				throw new RuntimeException("this should not happen; check code") ;
+			}
+			double sum = 0. ;
+			for ( int ii=startHour; ii<=endHour; ii++ ) {
+				sum += values[startHour] ;
+			}
+			switch(type){
+			case COUNT_VEH:
+				return sum * this.countsScaleFactor ;
+			case FLOW_VEH_H:
+				return 3600*sum / (endTime_s - startTime_s) * this.countsScaleFactor ;
+			default:
+				throw new RuntimeException("count type not implemented") ;
+			}
 
-			return values[hour] * this.countsScaleFactor;
 		}
 
 		@Override
