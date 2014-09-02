@@ -18,19 +18,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.roadpricing;
+package org.matsim.contrib.roadpricing;
 
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
+import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 
 /**
  * Calculates the distance of a trip which occurred on tolled links.
@@ -39,6 +39,9 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
  * @author mrieser
  */
 public class CalcAverageTolledTripLength implements LinkEnterEventHandler, PersonArrivalEventHandler {
+	// public is currently needed. kai, sep'13
+	
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(CalcAverageTolledTripLength.class);
 
 	private double sumLength = 0.0;
@@ -50,6 +53,7 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Perso
 	private static Double zero = Double.valueOf(0.0);
 
 	public CalcAverageTolledTripLength(final Network network, final RoadPricingScheme scheme) {
+		// public is currently needed. kai, sep'13
 		this.scheme = scheme;
 		this.network = network;
 		this.agentDistance = new TreeMap<Id, Double>();
@@ -110,6 +114,8 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Perso
 	}
 
 	public double getAverageTripLength() {
+		// public is currently needed. kai, sep'13
+
 		if (this.cntTrips == 0) return 0;
 //		log.warn("NOTE: The result of this calculation has been changed from 'av over all trips' to 'av over tolled trips'.  kai/benjamin, apr'10") ;
 		// commenting this out.  kai, mar'12

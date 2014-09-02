@@ -25,6 +25,7 @@ package org.matsim.roadpricing;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.contrib.roadpricing.RoadPricing;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;

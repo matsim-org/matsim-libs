@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.roadpricing;
+package org.matsim.contrib.roadpricing;
 
 import java.util.List;
 import java.util.Map;
@@ -26,13 +26,15 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
+import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 
 /**
  * @author nagel
  *
  */
 public class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme {
+	// needs to be public. kai, sep'14
+	
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger( RoadPricingSchemeUsingTollFactor.class ) ;
 

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.roadpricing;
+package org.matsim.contrib.roadpricing;
 
 import java.util.Stack;
 
@@ -34,6 +34,7 @@ import org.xml.sax.Attributes;
  * @author mrieser
  */
 public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
+	// currently needs to be public. kai, sep'14
 
 	private final static String TAG_ROADPRICING = "roadpricing";
 	private final static String TAG_DESCRIPTION = "description";

@@ -25,10 +25,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
+import org.matsim.contrib.roadpricing.RoadPricing;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.roadpricing.RoadPricing;
 
 import playground.telaviv.config.TelAvivConfig;
 import playground.telaviv.core.mobsim.qsim.TTAQSimFactory;

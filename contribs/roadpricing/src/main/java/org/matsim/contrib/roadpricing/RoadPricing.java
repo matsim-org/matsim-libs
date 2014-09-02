@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.roadpricing;
+package org.matsim.contrib.roadpricing;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigUtils;
@@ -52,7 +52,8 @@ import org.matsim.core.utils.misc.Time;
  * @author mrieser
  */
 public class RoadPricing implements StartupListener, AfterMobsimListener, IterationEndsListener {
-
+	// public is needed (for obvious reasons: this is the entry point). kai, sep'14
+	
 	private final RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 	private CalcPaidToll tollCalc = null;
 	private CalcAverageTolledTripLength cattl = null;
@@ -61,6 +62,7 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
     private RoadPricingConfigGroup rpConfig;
 
     public RoadPricing() {
+    	// public is needed (for obvious reasons: this is the entry point). kai, sep'14
 		Gbl.printBuildInfo("RoadPricing", "/org.matsim.contrib/roadpricing/revision.txt");
 	}
 	
@@ -68,7 +70,7 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 	public void notifyStartup(final StartupEvent event) {
 		final Controler controler = event.getControler();
         rpConfig = ConfigUtils.addOrGetModule(controler.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
-        if (rpConfig.isUseRoadpricing()) {
+        if (rpConfig.isUsingRoadpricing()) {
             String tollLinksFile = rpConfig.getTollLinksFile();
 
             if (tollLinksFile != null) {
@@ -107,7 +109,7 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 
 	@Override
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
-        if (rpConfig.isUseRoadpricing()) {
+        if (rpConfig.isUsingRoadpricing()) {
             // evaluate the final tolls paid by the agents and add them to their scores
             this.tollCalc.sendMoneyEvents(Time.MIDNIGHT, event.getControler().getEvents());
         }
@@ -115,7 +117,7 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-        if (rpConfig.isUseRoadpricing()) {
+        if (rpConfig.isUsingRoadpricing()) {
             log.info("The sum of all paid tolls : " + this.tollCalc.getAllAgentsToll() + " Euro.");
             log.info("The number of people who paid toll : " + this.tollCalc.getDraweesNr());
             log.info("The average paid trip length : " + this.cattl.getAverageTripLength() + " m.");
@@ -123,18 +125,26 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 	}
 
 	public RoadPricingScheme getRoadPricingScheme() {
+		// public currently not needed, but seems to make sense. kai, sep'14
+		
 		return this.scheme;
 	}
 
 	public double getAllAgentsToll() {
+		// public currently not needed, but seems to make sense. kai, sep'14
+
 		return this.tollCalc.getAllAgentsToll();
 	}
 
 	public int getDraweesNr() {
+		// public currently not needed, but seems to make sense. kai, sep'14
+
 		return this.tollCalc.getDraweesNr();
 	}
 
 	public double getAvgPaidTripLength() {
+		// public currently not needed, but seems to make sense. kai, sep'14
+
 		return this.cattl.getAverageTripLength();
 	}
 

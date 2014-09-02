@@ -18,22 +18,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.roadpricing;
+package org.matsim.contrib.roadpricing;
 
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 
 /**
  * Calculates the toll agents pay during a simulation by analyzing events. Add an instance of this class as an EventHandler.
@@ -45,6 +45,8 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
  * @author mrieser
  */
 public class CalcPaidToll implements LinkEnterEventHandler, Wait2LinkEventHandler {
+	// public is currently needed. kai, sep'13
+
 	Logger log = Logger.getLogger( CalcPaidToll.class ) ;
 
 	static class AgentTollInfo {
@@ -65,6 +67,8 @@ public class CalcPaidToll implements LinkEnterEventHandler, Wait2LinkEventHandle
 	 * </ul>
 	 */
 	public CalcPaidToll(final Network network, final RoadPricingScheme scheme) {
+		// public is currently needed. kai, sep'13
+
 		super();
 		this.network = network;
 		this.scheme = scheme;
@@ -122,6 +126,8 @@ public class CalcPaidToll implements LinkEnterEventHandler, Wait2LinkEventHandle
 	 * @param events the {@link EventsManager} collection, the generated events are sent to for processing
 	 */
 	public void sendMoneyEvents(final double time, final EventsManager events) {
+		// public is currently needed. kai, sep'13
+
 		for (Map.Entry<Id, AgentTollInfo> entries : this.agents.entrySet()) {
 			events.processEvent(new PersonMoneyEvent(time, entries.getKey(), -entries.getValue().toll));
 		}
@@ -140,7 +146,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, Wait2LinkEventHandle
 	 * @param agentId
 	 * @return The toll paid by the specified agent, 0.0 if no toll was paid.
 	 */
-	public double getAgentToll(final Id agentId) {
+	double getAgentToll(final Id agentId) {
 		AgentTollInfo info = this.agents.get(agentId);
 		if (info == null) {
 			return 0.0;
@@ -152,6 +158,8 @@ public class CalcPaidToll implements LinkEnterEventHandler, Wait2LinkEventHandle
 	 * @return The toll paid by all the agents.
 	 */
 	public double getAllAgentsToll() {
+		// public is currently needed. kai, sep'13
+
 		double tolls = 0;
 		for (AgentTollInfo ai : this.agents.values()) {
 			tolls += (ai == null) ? 0.0 : ai.toll;
@@ -163,6 +171,8 @@ public class CalcPaidToll implements LinkEnterEventHandler, Wait2LinkEventHandle
 	 * @return The Number of all the Drawees.
 	 */
 	public int getDraweesNr() {
+		// public is currently needed. kai, sep'13
+
 		int dwCnt = 0;
 		for (AgentTollInfo ai : this.agents.values()) {
 			if ((ai != null) && (ai.toll > 0.0)) {

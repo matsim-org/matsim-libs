@@ -29,6 +29,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.roadpricing.RoadPricing;
+import org.matsim.contrib.roadpricing.RoadPricingConfigGroup;
+import org.matsim.contrib.roadpricing.RoadPricingScheme;
+import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -38,10 +42,6 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.roadpricing.RoadPricing;
-import org.matsim.roadpricing.RoadPricingConfigGroup;
-import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.vsptelematics.common.IncidentGenerator;
 import playground.vsptelematics.ha1.RouteTTObserver;
@@ -74,7 +74,7 @@ public class Controller {
 				final RouteTTObserver observer = new RouteTTObserver(con.getControlerIO().getOutputFilename("routeTravelTimes.txt"));
 				con.addControlerListener(observer);
 				con.getEvents().addHandler(observer);
-                if (ConfigUtils.addOrGetModule(event.getControler().getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUseRoadpricing()) {
+                if (ConfigUtils.addOrGetModule(event.getControler().getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUsingRoadpricing()) {
 					con.addControlerListener(new TollBehaviour());
 				}
 				if (con.getScenario().getConfig().network().isTimeVariantNetwork()){

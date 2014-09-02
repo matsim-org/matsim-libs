@@ -1,7 +1,7 @@
 package playground.wrashid.msimoni.roadpricing;
 
+import org.matsim.contrib.roadpricing.RoadPricing;
 import org.matsim.core.controler.Controler;
-import org.matsim.roadpricing.RoadPricing;
 
 public class Main {
 

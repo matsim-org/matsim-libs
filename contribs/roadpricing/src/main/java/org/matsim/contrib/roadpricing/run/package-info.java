@@ -16,18 +16,8 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.roadpricing;
-
-import org.matsim.api.core.v01.population.Person;
-
-
-
 /**
  * @author nagel
  *
  */
-public interface MarginalUtilityOfMoneyLookup {
-	
-	public double getMarginalUtilityOfMoney(Person person) ;
-
-}
+package org.matsim.contrib.roadpricing.run;

@@ -168,9 +168,9 @@
  * If you plan to use the provided road pricing functionality outside of the Controler, please
  * carefully read the following remarks to correctly setup your road pricing scenario:
  * <ul>
- *   <li>When using a distance or cordon toll scheme, use {@link org.matsim.roadpricing.TravelDisutilityIncludingToll}
+ *   <li>When using a distance or cordon toll scheme, use {@link org.matsim.contrib.roadpricing.TravelDisutilityIncludingToll}
  *    as {@link org.matsim.core.router.util.TravelDisutility}-object for routers.</li>
- *   <li>When using an area toll, make sure you use {@link org.matsim.roadpricing.PlansCalcAreaTollRoute} as
+ *   <li>When using an area toll, make sure you use {@link org.matsim.contrib.roadpricing.PlansCalcAreaTollRoute} as
  *    routing algorithm, together with a non-toll TravelCost.</li>
  * </ul>
  * The {@link org.matsim.core.controler.Controler} takes care of all of these details, so you only have to care about
@@ -188,4 +188,4 @@
  *
  * @author mrieser
  */
-package org.matsim.roadpricing;
+package org.matsim.contrib.roadpricing;

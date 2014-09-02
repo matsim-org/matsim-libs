@@ -22,7 +22,7 @@ package playground.southafrica.gauteng.roadpricingscheme;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.roadpricing.TollFactorI;
+import org.matsim.contrib.roadpricing.TollFactorI;
 import org.matsim.vehicles.VehicleType;
 
 public class SanralTollFactor_Subpopulation implements TollFactorI {

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.roadpricing;
+package org.matsim.contrib.roadpricing;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
@@ -38,7 +38,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  *
  * @author mrieser
  */
-public class PlansCalcAreaTollRoute implements PlanAlgorithm {
+class PlansCalcAreaTollRoute implements PlanAlgorithm {
 
 	private final RoadPricingSchemeImpl scheme;
 	private final TravelTime timeCalculator;
@@ -53,7 +53,7 @@ public class PlansCalcAreaTollRoute implements PlanAlgorithm {
 	 * @param scheme
 	 * @param config TODO
 	 */
-	public PlansCalcAreaTollRoute(PlansCalcRouteConfigGroup configGroup, final Network network, final TravelDisutility costCalculator, final TravelTime timeCalculator,
+	 PlansCalcAreaTollRoute(PlansCalcRouteConfigGroup configGroup, final Network network, final TravelDisutility costCalculator, final TravelTime timeCalculator,
 			LeastCostPathCalculatorFactory factory, final ModeRouteFactory routeFactory, final RoadPricingSchemeImpl scheme, Config config) {
 		//super(configGroup, network, costCalculator, timeCalculator, factory, routeFactory);
 		this.scheme = scheme;

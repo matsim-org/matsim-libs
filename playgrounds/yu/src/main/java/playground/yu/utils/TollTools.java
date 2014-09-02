@@ -20,7 +20,7 @@
 package playground.yu.utils;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.contrib.roadpricing.RoadPricingScheme;
 
 /**
  * @author yu

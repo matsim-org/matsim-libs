@@ -21,6 +21,7 @@
 package playground.jjoubert.roadpricing.senozon;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
@@ -36,7 +37,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.roadpricing.*;
+
 import playground.jjoubert.roadpricing.senozon.routing.SanralTravelDisutilityIncludingToll;
 import playground.jjoubert.roadpricing.senozon.scoring.SanralCalcPaidToll;
 
@@ -56,7 +57,7 @@ public class SanralRoadPricing implements StartupListener, AfterMobsimListener, 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 		final Controler controler = event.getControler();
-        if (ConfigUtils.addOrGetModule(controler.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUseRoadpricing()) {
+        if (ConfigUtils.addOrGetModule(controler.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUsingRoadpricing()) {
 			throw new RuntimeException("roadpricing must not be enabled in config.scenario in order to use special road pricing features!");
 		}
 		// read the road pricing scheme from file

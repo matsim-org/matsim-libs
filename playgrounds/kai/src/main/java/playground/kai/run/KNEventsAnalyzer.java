@@ -24,13 +24,13 @@ import java.util.Formatter;
 import org.joda.time.DateTime;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.analysis.kai.KNAnalysisEventsHandler;
+import org.matsim.contrib.roadpricing.RoadPricingConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.roadpricing.RoadPricingConfigGroup;
 
 /**
  * @author nagel

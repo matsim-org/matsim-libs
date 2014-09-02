@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.roadpricing;
+package org.matsim.contrib.roadpricing;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
-import org.apache.log4j.Logger;
 
 /**
  * A road pricing scheme (sometimes also called toll scheme) contains the type of the toll, a list of the
@@ -37,6 +37,8 @@ import org.apache.log4j.Logger;
  * @author mrieser
  */
 public class RoadPricingSchemeImpl implements RoadPricingScheme {
+	// currently needs to be public. kai, sep'14
+	
 	private static Logger log = Logger.getLogger( RoadPricingSchemeImpl.class ) ;
 
 	private Map<Id, List<Cost>> linkIds = null;

@@ -1,4 +1,4 @@
-package org.matsim.roadpricing;
+package org.matsim.contrib.roadpricing;
 
 import org.matsim.api.core.v01.Id;
 

@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,29 +16,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.roadpricing;
+package org.matsim.contrib.roadpricing;
 
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.roadpricing.RoadPricingScheme;
+import org.matsim.api.core.v01.population.Person;
+
+
 
 /**
- * @author dgrether
+ * @author nagel
+ *
  */
-public class RoadPricingUtilities {
-
-	public static boolean hasActInTollArea(Plan plan1,
-			RoadPricingScheme roadPricingScheme) {
-		for (PlanElement pe : plan1.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe;
-				if (roadPricingScheme.getTolledLinkIds().contains(act.getLinkId())){
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+public interface MarginalUtilityOfMoneyLookup {
+	
+	public double getMarginalUtilityOfMoney(Person person) ;
 
 }

@@ -32,8 +32,8 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.roadpricing.RoadPricingScheme;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.roadpricing.RoadPricingScheme;
 
 /**
  * @author yu

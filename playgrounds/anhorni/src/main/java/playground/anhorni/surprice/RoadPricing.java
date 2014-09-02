@@ -20,6 +20,7 @@
 package playground.anhorni.surprice;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -29,7 +30,6 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.roadpricing.*;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 

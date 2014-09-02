@@ -166,6 +166,8 @@ from} attributes (see links with id {\tt 2} and {\tt 3} in the example given in
 Listing~\ref{lst:BuildingScenarios:networkXml}).
 Thus, the network can be seen as a directed graph.
 
+\configOptionsNote{network}
+
 \subsection{Demand}
 
 The travel demand for MATSim is described by the agents' day plans. The full set
@@ -282,6 +284,8 @@ label=lst:BuildingScenarios:minimalPopulationXml]
 </population>
 \end{xml-file}
 
+\configOptionsNote{plans}
+
 \subsection{Public Transport}
 
 To simulate public transport in MATSim, two additional input files are
@@ -295,7 +299,7 @@ In a first part, vehicle types have to be described, specifying how many
 passengers such a vehicle can transport (Note that the term "vehicle" can refer
 to multiple vehicles in reality, e.g. a train with several wagons should be specified as
 one long vehicle with a high number of seats). In the second part, actual
-vehicles have to listed. Each vehicle has an identifier and is of a previously
+vehicles have to be listed. Each vehicle has an identifier and is of a previously
 specified vehicle type. Listing~\ref{lst:BuildingScenarios:ptVehicles.xml} shows
 an example of a such a file, describing one vehicle type and two vehicles of
 that type.
@@ -442,7 +446,7 @@ are optional: That is, not for every hour a value must be given. If for a
 counting station data is only available for certain hours of the day (e.g. only
 during peak hours) it is possible to omit the other hours from the XML listing.  
 
-\todo{MR: Where are the config-options explained?}
+\configOptionsNote{counts}
 
 \begin{xml-file}[caption=An example of a counts.xml,
 label=lst:BuildingScenarios:counts.xml]
