@@ -26,10 +26,7 @@ package org.matsim.api.core.v01;
  * 
  * Note that Ids should not contain any whitespace characters (spaces, tabs, newlines, ...), 
  * as this may lead to problems when Ids are written to file and read back in. 
- * 
- * This is essentially a c++ typedef, except that
- * typedefs don't exist in Java.
  */
-public interface Id extends Comparable<Id> {
+public abstract class Id implements Comparable<Id> {
 
 }

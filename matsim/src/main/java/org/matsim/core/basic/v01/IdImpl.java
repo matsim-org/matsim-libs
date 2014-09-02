@@ -25,7 +25,7 @@ import java.io.Serializable;
 import org.matsim.api.core.v01.Id;
 
 
-public class IdImpl implements Id, Serializable {
+public class IdImpl extends Id implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
