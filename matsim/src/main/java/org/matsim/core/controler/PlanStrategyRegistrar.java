@@ -27,11 +27,11 @@ public class PlanStrategyRegistrar {
 	public static enum Selector { KeepLastSelected, BestScore, ChangeExpBeta, SelectExpBeta, SelectRandom, SelectPathSizeLogit } 
 	public static enum Names { ReRoute, TimeAllocationMutator, ChangeLegMode } 
 	// yy Using enums here is against the design: This is default input to a registry, which is by default extensible, and enums
-	// are not extensible.  Using enums was triggered since I (kn) needed to have an exhaustive list of non-innovative modules
-	// (the Names).  A much better
-	// solution would be to take this from the PlanStrategy directly, by checking if it has a registered strategy module.
-	// What remains, is the question is string constants might be better than just typed strings, for re-use in "config in java".
+	// are not extensible.
 	// kai, aug'14 after discussion with mz
+
+    // The names could be public constants in the factory classes, and then referenced here. Like with config groups.
+    // mz
 
 	private PlanStrategyFactoryRegister register = new PlanStrategyFactoryRegister();
 
