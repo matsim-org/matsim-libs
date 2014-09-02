@@ -28,6 +28,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -128,7 +129,7 @@ public class KNPopCompare {
 					
 					person1.getCustomAttributes().put( "deltaScore", deltaScore ) ;
 
-					ActivityFacility fac = ff.createActivityFacility(person1.getId(), coord) ;
+					ActivityFacility fac = ff.createActivityFacility(Id.create(person1.getId().toString(), ActivityFacility.class), coord);
 					fac.getCustomAttributes().put(GridUtils.WEIGHT, deltaScore ) ;
 					homesWithScoreDifferences.addActivityFacility(fac);
 				}
@@ -146,7 +147,7 @@ public class KNPopCompare {
 
 					person1.getCustomAttributes().put( "deltaMoney", deltaPayments ) ;
 					
-					ActivityFacility fac = ff.createActivityFacility(person1.getId(), coord) ;
+					ActivityFacility fac = ff.createActivityFacility(Id.create(person1.getId().toString(), ActivityFacility.class), coord) ;
 					fac.getCustomAttributes().put(GridUtils.WEIGHT, deltaPayments ) ; 
 					homesWithMoneyDifferences.addActivityFacility(fac);
 
@@ -181,7 +182,7 @@ public class KNPopCompare {
 
 					person1.getCustomAttributes().put( "deltaTtime", deltaTtime ) ;
 					
-					ActivityFacility fac = ff.createActivityFacility(person1.getId(), coord) ;
+					ActivityFacility fac = ff.createActivityFacility(Id.create(person1.getId().toString(), ActivityFacility.class), coord) ;
 					fac.getCustomAttributes().put(GridUtils.WEIGHT, deltaTtime ) ;
 					homesWithTtimeDifferences.addActivityFacility(fac);
 					
