@@ -66,9 +66,9 @@ public class IdImpl extends Id implements Serializable {
 		 * test trying to duplicate the above inconsistency, and could not 
 		 * recreate it anymore.
 		 */
-		if (!(other instanceof IdImpl)) return false;
+		if (!(other instanceof Id)) return false;
 		if (other == this) return true;
-		return this.id.equals(((IdImpl)other).id);
+		return this.id.equals(((Id)other).toString());
 	}
 
 	@Override

@@ -67,18 +67,22 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	@Override
 	public int compareTo(Id<T> o) throws IllegalArgumentException {
 		int res = this.toString().compareTo(o.toString());
-		if (res == 0) {
-			if (equals(o)) {
-				return 0;
-			}
-			throw new IllegalArgumentException("The ids are equal but of different types.");
-		}
+//		if (res == 0) {   // FIXME temporary relax the check until the Id migration has taken place
+//			if (equals(o)) {
+//				return 0;
+//			}
+//			throw new IllegalArgumentException("The ids are equal but of different types.");
+//		}
 		return res;
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		return this == obj;
+		if (obj instanceof Id) {
+			return this.compareTo((Id) obj) == 0;
+		}
+		return false;
+//		return this == obj; // FIXME temporary relax the check until the Id migration has taken place
 		// all other objects have to be different by definition, as long as the cache is correctly implemented
 	}
 

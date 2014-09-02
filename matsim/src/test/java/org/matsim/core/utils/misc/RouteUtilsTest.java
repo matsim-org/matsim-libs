@@ -144,13 +144,13 @@ public class RouteUtilsTest {
 
 		List<Node> nodes = RouteUtils.getNodes(route, f.network);
 		Assert.assertEquals(7, nodes.size());
-		Assert.assertEquals(f.linkIds[4], nodes.get(0).getId());
-		Assert.assertEquals(f.linkIds[5], nodes.get(1).getId());
-		Assert.assertEquals(f.linkIds[6], nodes.get(2).getId());
-		Assert.assertEquals(f.linkIds[0], nodes.get(3).getId());
-		Assert.assertEquals(f.linkIds[1], nodes.get(4).getId());
-		Assert.assertEquals(f.linkIds[2], nodes.get(5).getId());
-		Assert.assertEquals(f.linkIds[3], nodes.get(6).getId());
+		Assert.assertEquals(f.nodeIds[4], nodes.get(0).getId());
+		Assert.assertEquals(f.nodeIds[5], nodes.get(1).getId());
+		Assert.assertEquals(f.nodeIds[6], nodes.get(2).getId());
+		Assert.assertEquals(f.nodeIds[0], nodes.get(3).getId());
+		Assert.assertEquals(f.nodeIds[1], nodes.get(4).getId());
+		Assert.assertEquals(f.nodeIds[2], nodes.get(5).getId());
+		Assert.assertEquals(f.nodeIds[3], nodes.get(6).getId());
 	}
 
 	@Test

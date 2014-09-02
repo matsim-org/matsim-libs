@@ -20,19 +20,23 @@
 
 package org.matsim.counts.algorithms;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.counts.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import org.matsim.counts.Count;
+import org.matsim.counts.CountSimComparison;
+import org.matsim.counts.CountSimComparisonImpl;
+import org.matsim.counts.Counts;
+import org.matsim.counts.Volume;
 
 /**
  * This algorithm can be used to obtain a List of CountSimComparison objects from the
@@ -155,7 +159,7 @@ public class CountsComparisonAlgorithm {
 	 * @param nodeId
 	 */
 	public void setDistanceFilter(final Double distance, final String nodeId) {
-		final Coord centerCoord = network.getNodes().get(new IdImpl(nodeId)).getCoord();
+		final Coord centerCoord = network.getNodes().get(Id.create(nodeId, Node.class)).getCoord();
 		this.distanceFilter = new DistanceFilter() {
 
 			@Override
@@ -173,7 +177,7 @@ public class CountsComparisonAlgorithm {
 	}
 	
 	public void setCountCoordUsingDistanceFilter(final Double distance, final String nodeId) {
-		final Coord centerCoord = network.getNodes().get(new IdImpl(nodeId)).getCoord();
+		final Coord centerCoord = network.getNodes().get(Id.create(nodeId, Node.class)).getCoord();
 		this.distanceFilter = new CountsComparisonAlgorithm.DistanceFilter() {
 			
 			@Override
