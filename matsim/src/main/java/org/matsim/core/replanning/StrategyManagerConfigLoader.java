@@ -27,7 +27,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.*;
-import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
 import org.matsim.core.replanning.modules.ExternalModule;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -94,15 +93,7 @@ public final class StrategyManagerConfigLoader {
 			int maxIter = settings.getDisableAfter();
 			// --- begin new ---
 			if ( maxIter > globalInnovationDisableAfter || maxIter==-1 ) {
-				boolean innovative = true ;
-				for ( Selector sel : Selector.values() ) {
-					System.out.flush();
-					if ( moduleName.equals( sel.toString() ) ) {
-						innovative = false ;
-						break ;
-					}
-				}
-				if ( innovative ) {
+				if (!PlanStrategies.isOnlySelector(strategy)) {
 					maxIter = globalInnovationDisableAfter ;
 				}
 			}
