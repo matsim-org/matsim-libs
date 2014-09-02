@@ -7,6 +7,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -16,8 +17,6 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
-
-import playground.mzilske.d4d.AltPopulationReaderMatsimV5;
 import playground.mzilske.otp.OTPTripRouterFactory;
 
 
@@ -58,7 +57,7 @@ public class Run {
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		new VehicleReaderV1(((ScenarioImpl) scenario).getVehicles()).readFile(config.transit().getVehiclesFile());
 		new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
-		new AltPopulationReaderMatsimV5(scenario).readFile(config.plans().getInputFile());
+		new PopulationReaderMatsimV5(scenario).readFile(config.plans().getInputFile());
 		
 		
 		Controler controler = new Controler(scenario);

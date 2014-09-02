@@ -22,16 +22,11 @@
 
 package playground.mzilske.populationsize;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.google.inject.name.Names;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -39,7 +34,6 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -50,35 +44,27 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
 import org.matsim.counts.CountsWriter;
-
 import playground.mzilske.ant2014.FileIO;
 import playground.mzilske.ant2014.IterationResource;
 import playground.mzilske.ant2014.StreamingOutput;
 import playground.mzilske.cadyts.CadytsModule;
-import playground.mzilske.cdr.CallBehavior;
-import playground.mzilske.cdr.CompareMain;
-import playground.mzilske.cdr.PopulationFromSightings;
-import playground.mzilske.cdr.PowerPlans;
-import playground.mzilske.cdr.Sightings;
-import playground.mzilske.cdr.SightingsImpl;
-import playground.mzilske.cdr.ZoneTracker;
+import playground.mzilske.cdr.*;
 import playground.mzilske.clones.ClonesModule;
 import playground.mzilske.controller.Controller;
 import playground.mzilske.controller.ControllerModule;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.name.Names;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.*;
 
 class MultiRateRunResource {
 
@@ -166,13 +152,14 @@ class MultiRateRunResource {
         final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
         scenario.setNetwork(baseScenario.getNetwork());
 
-        PopulationFromSightings.createPopulationWithRandomEndTimesInPermittedWindow(scenario, linkToZoneResolver, allSightings);
-        PopulationFromSightings.preparePopulation(scenario, linkToZoneResolver, allSightings);
+        // PopulationFromSightings.createPopulationWithRandomEndTimesInPermittedWindow(scenario, linkToZoneResolver, allSightings);
+        // PopulationFromSightings.preparePopulation(scenario, linkToZoneResolver, allSightings);
 
         String rateDir = WD + "/rates/" + rate;
         new File(rateDir).mkdirs();
 
-        new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(rateDir + "/input_population.xml.gz");
+        // new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(rateDir + "/input_population.xml.gz");
+        new SightingsWriter(allSightings).write(rateDir + "/sightings.txt");
         final Counts allCounts = CompareMain.volumesToCounts(baseScenario.getNetwork(), compareMain.getGroundTruthVolumes());
         allCounts.setYear(2012);
         new CountsWriter(allCounts).write(rateDir + "/all_counts.xml.gz");
@@ -194,7 +181,26 @@ class MultiRateRunResource {
         Scenario baseScenario = getBaseRun().getConfigAndNetwork();
         final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
         scenario.setNetwork(baseScenario.getNetwork());
-        new MatsimPopulationReader(scenario).readFile(WD + "/rates/" + rate + "/input_population.xml.gz");
+
+        // new MatsimPopulationReader(scenario).readFile(WD + "/rates/" + rate + "/input_population.xml.gz");
+        Sightings allSightings = new SightingsImpl(new HashMap<Id, List<Sighting>>());
+        new SightingsReader(allSightings).read(IOUtils.getInputStream(WD + "/rates/" + rate + "/sightings.txt"));
+        ZoneTracker.LinkToZoneResolver linkToZoneResolver = new ZoneTracker.LinkToZoneResolver() {
+
+            @Override
+            public Id resolveLinkToZone(Id linkId) {
+                return linkId;
+            }
+
+            public IdImpl chooseLinkInZone(String zoneId) {
+                return new IdImpl(zoneId);
+            }
+
+        };
+        PopulationFromSightings.createPopulationWithRandomEndTimesInPermittedWindow(scenario, linkToZoneResolver, allSightings);
+        PopulationFromSightings.preparePopulation(scenario, linkToZoneResolver, allSightings);
+
+
         final Counts allCounts = new Counts();
         new CountsReaderMatsimV1(allCounts).parse(WD + "/rates/" + rate + "/all_counts.xml.gz");
         final Counts someCounts = new Counts();

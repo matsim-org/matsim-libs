@@ -32,17 +32,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.roadpricing.CalcPaidToll;
-import org.matsim.roadpricing.RoadPricingConfigGroup;
-import org.matsim.roadpricing.RoadPricingReaderXMLv1;
-import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 import java.util.Map;
@@ -216,7 +211,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		EventsToScore scoring = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(config, scenario.getNetwork()));
 		events.addHandler(scoring);
 
-		Mobsim sim = new QueueSimulation(scenario, events);
+		Mobsim sim = new QSimFactory().createMobsim(scenario, events);
 		sim.run();
 
 		paidToll.sendMoneyEvents(Time.MIDNIGHT, events);

@@ -1,18 +1,8 @@
 package playground.mzilske.cdr;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -26,10 +16,14 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner.PersonAlgorithmProvider;
 import org.matsim.population.algorithms.PersonAlgorithm;
-
 import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
 import playground.mzilske.d4d.NetworkRoutingModule;
-import playground.mzilske.d4d.Sightings;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 
 public class PopulationFromSightings {
@@ -243,10 +237,10 @@ public class PopulationFromSightings {
 
                 @Override
                 public void run(Person person) {
-                    Sightings sightingsForThisAgent = new Sightings(allSightings.getSightingsPerPerson().get(person.getId()));
+                    Iterator<Sighting> sightingsForThisAgent = allSightings.getSightingsPerPerson().get(person.getId()).iterator();
                     for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
                         if (planElement instanceof Activity) {
-                            Sighting sighting = sightingsForThisAgent.sightings.next();
+                            Sighting sighting = sightingsForThisAgent.next();
                             ActivityImpl activity = (ActivityImpl) planElement;
                             activity.setLinkId(linkToZoneResolver2.chooseLinkInZone(sighting.getCellTowerId()));
                         }

@@ -20,9 +20,6 @@
 
 package playground.mzilske.d4d;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -32,13 +29,16 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Simplifies a given network, by merging links.
  *
  * @author aneumann
  *
  */
-public class NetworkSimplifier {
+class NetworkSimplifier {
 
 	private static final Logger log = Logger.getLogger(NetworkSimplifier.class);
 	private boolean mergeLinkStats = false;

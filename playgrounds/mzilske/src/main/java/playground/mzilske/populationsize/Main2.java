@@ -33,13 +33,13 @@ public class Main2 {
 		final RegimeResource uncongested = experiment.getRegime("uncongested");
 
 //        uncongested.getMultiRateRun("wurst").twoRates("5");
-//        uncongested.getMultiRateRun("wurst").simulateRate("5", 10);
+        uncongested.getMultiRateRun("wurst").simulateRate("0", 3);
 
 //        uncongested.getMultiRateRun("wurst").twoRates("0");
 //        uncongested.getMultiRateRun("wurst").simulateRate("0", 10);
 
 
-        uncongested.getMultiRateRun("wurst").persodisthisto();
+//        uncongested.getMultiRateRun("wurst").persodisthisto();
 //        Scenario baseScenario = uncongested.getBaseRun().getOutputScenario();
 //        Population basePopulation = baseScenario.getPopulation();
 

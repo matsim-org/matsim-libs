@@ -1,17 +1,16 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.qsim.QSim;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.qsim.QSim;
 
 public class MyParallelQNetsimEngine extends QNetsimEngine {
 	// yy I think we could consider moving the node-based rnd num gen also into the sequential version. kai, jun'10
@@ -92,27 +91,6 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	/*
-	 * We have to call this method synchronized because it is used by
-	 * parallel Threads to move the Nodes.
-	 * Maybe each Thread could have its own list and the Links can be collected
-	 * from the main Thread to avoid this?
-	 *
-	 * Should not be called anymore from the parallel Threads because we use
-	 * them as LinkActivators.
-	 */
-	@Override
-	protected synchronized void activateLink(final QLinkInternalI link) {
-		log.warn("Links should be activated by a QSimEngineRunner and not by the ParallelQNetsimEngine!");
-		super.activateLink(link);
-	}
-
-	@Override
-	protected synchronized void activateNode(final QNode node) {
-		log.warn("Nodes should be activated by a QSimEngineRunner and not by the ParallelQNetsimEngine!");
-		super.activateNode(node);
 	}
 
 	@Override

@@ -1,15 +1,11 @@
 package playground.mzilske.d4d;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 
-public class PlanUtils {
+class PlanUtils {
 
 	static void insertLinkIdsIntoGenericRoutes(Plan plan) {
 		forward(plan);
