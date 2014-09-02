@@ -107,7 +107,7 @@ public class FacilitiesCombine {
 			}
 		}
 
-		Map<Id, ? extends ActivityFacility> fs = facilities.getFacilities();
+		Map<Id<ActivityFacility>, ? extends ActivityFacility> fs = facilities.getFacilities();
 		fs.clear();
 
 		Iterator<TreeMap<Double,ActivityFacilityImpl>> t_it = facs.values().iterator();

@@ -31,7 +31,7 @@ import org.matsim.core.facilities.ActivityOption;
  */
 public interface ActivityFacilitiesFactory extends MatsimFactory {
 
-	public ActivityFacility createActivityFacility(Id id, Coord coord);
+	public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Coord coord);
 
 	public ActivityOption createActivityOption(String type);
 

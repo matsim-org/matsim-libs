@@ -46,10 +46,10 @@ public class FacilitiesScenarioCut {
 	public void run(ActivityFacilitiesImpl facilities) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 
-		TreeSet<Id> fid_set = new TreeSet<Id>();
-		Iterator<Id> fid_it = facilities.getFacilities().keySet().iterator();
+		TreeSet<Id<ActivityFacility>> fid_set = new TreeSet<Id<ActivityFacility>>();
+		Iterator<Id<ActivityFacility>> fid_it = facilities.getFacilities().keySet().iterator();
 		while (fid_it.hasNext()) {
-			Id fid = fid_it.next();
+			Id<ActivityFacility> fid = fid_it.next();
 			ActivityFacility f = facilities.getFacilities().get(fid);
 			Coord coord = f.getCoord();
 			double x = coord.getX();
@@ -62,7 +62,7 @@ public class FacilitiesScenarioCut {
 		System.out.println("      Number of facilities to be cut = " + fid_set.size() + "...");
 		fid_it = fid_set.iterator();
 		while (fid_it.hasNext()) {
-			Id fid = fid_it.next();
+			Id<ActivityFacility> fid = fid_it.next();
 			facilities.getFacilities().remove(fid);
 		}
 

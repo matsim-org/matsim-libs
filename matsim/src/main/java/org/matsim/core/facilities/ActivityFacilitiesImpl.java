@@ -49,7 +49,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities {
 	private static final Logger log = Logger.getLogger(ActivityFacilitiesImpl.class);
 	private final ActivityFacilitiesFactory factory ;
 
-	private final Map<Id, ActivityFacility> facilities = new LinkedHashMap<Id, ActivityFacility>();
+	private final Map<Id<ActivityFacility>, ActivityFacility> facilities = new LinkedHashMap<Id<ActivityFacility>, ActivityFacility>();
 
 	private String name;
 
@@ -74,7 +74,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final ActivityFacilityImpl createAndAddFacility(final Id id, final Coord center) {
+	public final ActivityFacilityImpl createAndAddFacility(final Id<ActivityFacility> id, final Coord center) {
 		if (this.facilities.containsKey(id)) {
 			throw new IllegalArgumentException("Facility with id=" + id + " already exists.");
 		}
@@ -97,13 +97,13 @@ public class ActivityFacilitiesImpl implements ActivityFacilities {
 	}
 
 	@Override
-	public final Map<Id, ? extends ActivityFacility> getFacilities() {
+	public final Map<Id<ActivityFacility>, ? extends ActivityFacility> getFacilities() {
 		return this.facilities;
 	}
 
 	@Override
-	public final TreeMap<Id, ActivityFacility> getFacilitiesForActivityType(final String act_type) {
-		TreeMap<Id,ActivityFacility> facs = new TreeMap<Id, ActivityFacility>();
+	public final TreeMap<Id<ActivityFacility>, ActivityFacility> getFacilitiesForActivityType(final String act_type) {
+		TreeMap<Id<ActivityFacility>, ActivityFacility> facs = new TreeMap<Id<ActivityFacility>, ActivityFacility>();
 		Iterator<ActivityFacility> iter = this.facilities.values().iterator();
 		while (iter.hasNext()){
 			ActivityFacility f = iter.next();

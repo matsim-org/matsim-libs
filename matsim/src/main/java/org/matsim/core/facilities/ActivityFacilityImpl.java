@@ -25,6 +25,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.utils.customize.Customizable;
@@ -43,11 +44,11 @@ public class ActivityFacilityImpl implements ActivityFacility {
 
 	private Coord coord;
 
-	private Id id;
+	private Id<ActivityFacility> id;
 
-	private Id linkId;
+	private Id<Link> linkId;
 
-	protected ActivityFacilityImpl(final Id id, final Coord center) {
+	protected ActivityFacilityImpl(final Id<ActivityFacility> id, final Coord center) {
 		this.id = id;
 		this.coord = center;
 	}
@@ -95,11 +96,11 @@ public class ActivityFacilityImpl implements ActivityFacility {
 	}
 
 	@Override
-	public Id getLinkId() {
+	public Id<Link> getLinkId() {
 		return this.linkId;
 	}
 
-	public void setLinkId(Id linkId) {
+	public void setLinkId(Id<Link> linkId) {
 		this.linkId = linkId;
 	}
 
@@ -115,7 +116,7 @@ public class ActivityFacilityImpl implements ActivityFacility {
 	}
 
 	@Override
-	public Id getId() {
+	public Id<ActivityFacility> getId() {
 		return this.id;
 	}
 

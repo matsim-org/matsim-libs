@@ -23,6 +23,7 @@ package org.matsim.core.api.experimental.facilities;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.utils.customize.Customizable;
 
 /**
@@ -30,8 +31,8 @@ import org.matsim.utils.customize.Customizable;
  *
  * @author nagel
  */
-public interface Facility extends BasicLocation, Identifiable, Customizable {
+public interface Facility<T extends Facility<?>> extends BasicLocation<T>, Identifiable<T>, Customizable {
 
-	public Id getLinkId();
+	public Id<Link> getLinkId();
 
 }
