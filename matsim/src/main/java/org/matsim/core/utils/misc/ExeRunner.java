@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 
@@ -55,6 +56,10 @@ public abstract class ExeRunner {
 		return run(cmd, stdoutFileName, timeout, null);
 	}
 
+	public static int run(final String[] cmdArgs, final String stdoutFileName, final int timeout) {
+		return run(cmdArgs, stdoutFileName, timeout, null);
+	}
+
 	/**
 	 * Runs an executable and waits until the executable finishes or until
 	 * a certain amount of time has passed (timeout).
@@ -68,7 +73,15 @@ public abstract class ExeRunner {
 	 */
 	public static int run(final String cmd, final String stdoutFileName, final int timeout, final String workingDirectory) {
 		final ExternalExecutor myExecutor = new ExternalExecutor(cmd, stdoutFileName, workingDirectory);
+		return waitForFinish(myExecutor, timeout);
+	}
 
+	public static int run(final String[] cmdArgs, final String stdoutFileName, final int timeout, final String workingDirectory) {
+		final ExternalExecutor myExecutor = new ExternalExecutor(cmdArgs, stdoutFileName, workingDirectory);
+		return waitForFinish(myExecutor, timeout);
+	}
+	
+	public static int waitForFinish(final ExternalExecutor myExecutor, final int timeout) {
 		synchronized (myExecutor) {
 			try {
 				long timeoutMillis = 1000L * timeout;
@@ -92,12 +105,13 @@ public abstract class ExeRunner {
 				log.info("ExeRunner.run() got interrupted while waiting for timeout", e);
 			}
 		}
-
+		
 		return myExecutor.erg;
 	}
 
 	private static class ExternalExecutor extends Thread {
 		final String cmd;
+		final String[] cmdArgs;
 		final String stdoutFileName;
 		final String stderrFileName;
 		final String workingDirectory;
@@ -108,14 +122,36 @@ public abstract class ExeRunner {
 
 		public ExternalExecutor (final String cmd, final String stdoutFileName, final String workingDirectory) {
 			this.cmd = cmd;
+			this.cmdArgs = null;
 			this.stdoutFileName = stdoutFileName;
 			this.workingDirectory = workingDirectory;
-			if (stdoutFileName.endsWith(".log")) {
-				this.stderrFileName = stdoutFileName.substring(0, stdoutFileName.length() - 4) + ".err";
+			if (stdoutFileName != null) {
+				if (stdoutFileName.endsWith(".log")) {
+					this.stderrFileName = stdoutFileName.substring(0, stdoutFileName.length() - 4) + ".err";
+				} else {
+					this.stderrFileName = stdoutFileName + ".err";
+				}
 			} else {
-				this.stderrFileName = stdoutFileName + ".err";
+				this.stderrFileName = null;
 			}
 		}
+		
+		public ExternalExecutor (final String[] cmdArgs, final String stdoutFileName, final String workingDirectory) {
+			this.cmdArgs = cmdArgs;
+			this.cmd = null;
+			this.stdoutFileName = stdoutFileName;
+			this.workingDirectory = workingDirectory;
+			if (stdoutFileName != null) {
+				if (stdoutFileName.endsWith(".log")) {
+					this.stderrFileName = stdoutFileName.substring(0, stdoutFileName.length() - 4) + ".err";
+				} else {
+					this.stderrFileName = stdoutFileName + ".err";
+				}
+			} else {
+				this.stderrFileName = null;
+			}
+		}
+		
 		public void killProcess() {
 			if (this.p != null) {
 				this.p.destroy();
@@ -126,19 +162,41 @@ public abstract class ExeRunner {
 		public void run()  {
 			try {
 				if (this.workingDirectory == null) {
-					this.p = Runtime.getRuntime().exec(this.cmd);
+					if (this.cmd != null) {
+						this.p = Runtime.getRuntime().exec(this.cmd);
+					} else if (this.cmdArgs != null) {
+						this.p = Runtime.getRuntime().exec(this.cmdArgs);
+					}
 				} else {
-					this.p = Runtime.getRuntime().exec(this.cmd, null, new File(this.workingDirectory));
+					if (this.cmd != null) {
+						this.p = Runtime.getRuntime().exec(this.cmd, null, new File(this.workingDirectory));
+					} else if (this.cmdArgs != null) {
+						this.p = Runtime.getRuntime().exec(this.cmdArgs, null, new File(this.workingDirectory));
+					}
 				}
+				
 				BufferedReader in = new BufferedReader(new InputStreamReader(this.p.getInputStream()));
 				BufferedReader err = new BufferedReader(new InputStreamReader(this.p.getErrorStream()));
-				BufferedWriter writerIn = new BufferedWriter(new FileWriter(this.stdoutFileName));
-				BufferedWriter writerErr = new BufferedWriter(new FileWriter(this.stderrFileName));
-				StreamHandler outputHandler = new StreamHandler(in, writerIn);
-				StreamHandler errorHandler = new StreamHandler(err, writerErr);
-				outputHandler.start();
-				errorHandler.start();
-				log.info("Starting external exe with command: " + this.cmd);
+				
+				BufferedWriter writerIn = null;
+				StreamHandler outputHandler = null;
+				if (this.stdoutFileName != null) {
+					writerIn = new BufferedWriter(new FileWriter(this.stdoutFileName));
+					outputHandler = new StreamHandler(in, writerIn);
+					outputHandler.start();
+				} else {
+					new BlackHoleStreamHandler(in).start();
+				}
+				BufferedWriter writerErr = null;
+				StreamHandler errorHandler = null;
+				if (this.stderrFileName != null) {
+					writerErr = new BufferedWriter(new FileWriter(this.stderrFileName));
+					errorHandler = new StreamHandler(err, writerErr);
+					errorHandler.start();
+				} else {
+					new BlackHoleStreamHandler(err).start();
+				}
+				log.info("Starting external exe with command: " + (this.cmd != null ? this.cmd : Arrays.toString(this.cmdArgs)));
 				log.info("Output of the externel exe is written to: " + this.stdoutFileName);
 				boolean processRunning = true;
 				while (processRunning && !this.timeout) {
@@ -156,25 +214,51 @@ public abstract class ExeRunner {
 					log.info("Timeout reached, killing process...");
 					killProcess();
 				}
-				try {
-					outputHandler.join();
-				} catch (InterruptedException e) {
-					log.info("got interrupted while waiting for outputHandler to die.", e);
+				if (outputHandler != null) {
+					try {
+						outputHandler.join();
+					} catch (InterruptedException e) {
+						log.info("got interrupted while waiting for outputHandler to die.", e);
+					}
 				}
-				try {
-					errorHandler.join();
-				} catch (InterruptedException e) {
-					log.info("got interrupted while waiting for errorHandler to die.", e);
+				if (errorHandler != null) {
+					try {
+						errorHandler.join();
+					} catch (InterruptedException e) {
+						log.info("got interrupted while waiting for errorHandler to die.", e);
+					}
 				}
-				writerIn.flush();
-				writerIn.close();
-
-				writerErr.flush();
-				writerErr.close();
-
+				if (writerIn != null) {
+					writerIn.flush();
+					writerIn.close();
+				}
+				if (writerErr != null) {
+					writerErr.flush();
+					writerErr.close();
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 				this.erg = -2;
+			}
+		}
+	}
+	
+	static class BlackHoleStreamHandler extends Thread {
+		private final BufferedReader in;
+		
+		public BlackHoleStreamHandler(final BufferedReader in) {
+			this.in = in;
+		}
+		
+		@Override
+		public void run() {
+			try {
+				String line = null;
+				while ((line = this.in.readLine()) != null) {
+				}
+			} catch (IOException e) {
+				log.info("StreamHandler got interrupted");
+				e.printStackTrace();
 			}
 		}
 	}
