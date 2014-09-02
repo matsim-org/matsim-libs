@@ -54,6 +54,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.households.Household;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
@@ -461,7 +462,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		 * Then add all vehicles that are used by agents to return to
 		 * the home facility.
 		 */
-		Set<Id> availableVehicles = new HashSet<Id>();
+		Set<Id<Vehicle>> availableVehicles = new HashSet<Id<Vehicle>>();
 		availableVehicles.addAll(this.modeAvailabilityChecker.getAvailableCars(household, hdd.getHomeFacilityId()));
 		for (Id personId : household.getMemberIds()) {
 			PersonDecisionData pdd = this.decisionDataProvider.getPersonDecisionData(personId);

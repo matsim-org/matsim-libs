@@ -49,6 +49,7 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.withinday.utils.EditRoutes;
 
 import playground.christoph.evacuation.mobsim.LegModeChecker;
@@ -62,7 +63,7 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 	private final Counter assignedVehiclesCounter;
 	private final Counter removedCarLegsCounter;
 	private final Counter addedCarLegsCounter;
-	private final Map<Id, Id> mapping;	// <AgentId, VehicleId>
+	private final Map<Id<Person>, Id<Vehicle>> mapping;	// <AgentId, VehicleId>
 	private final LegModeChecker legModeChecker;
 	private final EditRoutes editRoutes;
 	
@@ -73,7 +74,7 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 		this.assignedVehiclesCounter = new Counter("Assigned vehicles: ");
 		this.removedCarLegsCounter = new Counter("Legs with mode changed from car to another mode: ");
 		this.addedCarLegsCounter = new Counter("Legs with mode changed from another mode to car: ");
-		this.mapping = new HashMap<Id, Id>();
+		this.mapping = new HashMap<Id<Person>, Id<Vehicle>>();
 		
 		this.legModeChecker = new LegModeChecker(tripRouter, scenario.getNetwork());
 		this.editRoutes = new EditRoutes();
@@ -90,7 +91,7 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 		// get a household's persons and check whether they require a car
     	List<Person> persons = new ArrayList<Person>();
     	Queue<Person> vehicleRequiringPersons = new PriorityQueue<Person>(10, new CarLegsComparator(scenario.getNetwork()));
-    	for (Id personId : household.getMemberIds()) {
+    	for (Id<Person> personId : household.getMemberIds()) {
     		Person p = scenario.getPopulation().getPersons().get(personId);
     		persons.add(p);
     		mapping.put(p.getId(), null);
@@ -99,7 +100,7 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
     		if (requiresVehicle) vehicleRequiringPersons.add(p);
     	}
     	
-    	List<Id> vehicleIds = household.getVehicleIds();
+    	List<Id<Vehicle>> vehicleIds = household.getVehicleIds();
     	
     	/*
     	 * If the household requires more vehicles than available, change

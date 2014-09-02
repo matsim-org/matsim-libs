@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.internal.MatsimComparator;
@@ -97,7 +98,7 @@ public class ModeAvailabilityChecker {
 	 * @param facilityId Id of the facility where the household is located
 	 * @return
 	 */
-	public List<Id> getAvailableCars(Id householdId, Id facilityId) {
+	public List<Id<Vehicle>> getAvailableCars(Id<Household> householdId, Id<ActivityFacility> facilityId) {
 		Household household = ((ScenarioImpl) scenario).getHouseholds().getHouseholds().get(householdId);
 		return getAvailableCars(household, facilityId);
 	}
@@ -108,14 +109,14 @@ public class ModeAvailabilityChecker {
 	 * @param facilityId Id of the facility where the household is located
 	 * @return
 	 */
-	public List<Id> getAvailableCars(Household household, Id facilityId) {
+	public List<Id<Vehicle>> getAvailableCars(Household household, Id<ActivityFacility> facilityId) {
 		ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(facilityId);
 		
-		List<Id> vehicles = household.getVehicleIds();
+		List<Id<Vehicle>> vehicles = household.getVehicleIds();
 				
-		List<Id> availableVehicles = new ArrayList<Id>();
+		List<Id<Vehicle>> availableVehicles = new ArrayList<Id<Vehicle>>();
 		
-		for (Id vehicleId : vehicles) {
+		for (Id<Vehicle> vehicleId : vehicles) {
 			MobsimVehicle vehicle = this.mobsimDataProvider.getVehicle(vehicleId);
 			
 			// if the driver is null, the vehicle is parked 
@@ -194,9 +195,9 @@ public class ModeAvailabilityChecker {
 		else return TransportMode.walk;
 	}
 			
-	private Queue<Vehicle> getVehiclesQueue(List<Id> vehicleIds) {
+	private Queue<Vehicle> getVehiclesQueue(List<Id<Vehicle>> vehicleIds) {
 		Queue<Vehicle> queue = new PriorityQueue<Vehicle>(2, new VehicleSeatsComparator());
-		for (Id id : vehicleIds) {
+		for (Id<Vehicle> id : vehicleIds) {
 			Vehicle vehicle = vehicles.getVehicles().get(id);
 			queue.add(vehicle);
 		}
@@ -206,8 +207,8 @@ public class ModeAvailabilityChecker {
 	/*
 	 * For decisions on household level. 
 	 */
-	public HouseholdModeAssignment getHouseholdModeAssignment(Household household, Id facilityId) {
-		List<Id> availableVehicleIds = this.getAvailableCars(household, facilityId);
+	public HouseholdModeAssignment getHouseholdModeAssignment(Household household, Id<ActivityFacility> facilityId) {
+		List<Id<Vehicle>> availableVehicleIds = this.getAvailableCars(household, facilityId);
 		Queue<Vehicle> availableVehicles = getVehiclesQueue(availableVehicleIds);
 		return getHouseholdModeAssignment(household.getMemberIds(), availableVehicles, facilityId);
 	}
@@ -215,17 +216,18 @@ public class ModeAvailabilityChecker {
 	/*
 	 * For decisions on non-household or only part-household level.
 	 */
-	public HouseholdModeAssignment getHouseholdModeAssignment(Collection<Id> personIds, Collection<Id> vehicleIds, Id facilityId) {
+	public HouseholdModeAssignment getHouseholdModeAssignment(Collection<Id<Person>> personIds, 
+			Collection<Id<Vehicle>> vehicleIds, Id<ActivityFacility> facilityId) {
 		
 		Queue<Vehicle> queue = new PriorityQueue<Vehicle>(2, new VehicleSeatsComparator());
-		for (Id id : vehicleIds) {
+		for (Id<Vehicle> id : vehicleIds) {
 			Vehicle vehicle = vehicles.getVehicles().get(id);
 			queue.add(vehicle);
 		}
 		return this.getHouseholdModeAssignment(personIds, queue, facilityId);
 	}
 	
-	private HouseholdModeAssignment getHouseholdModeAssignment(Collection<Id> personIds, Queue<Vehicle> availableVehicles, Id facilityId) {	
+	private HouseholdModeAssignment getHouseholdModeAssignment(Collection<Id<Person>> personIds, Queue<Vehicle> availableVehicles, Id facilityId) {	
 		HouseholdModeAssignment assignment = new HouseholdModeAssignment();
 		
 		Queue<Id> possibleDrivers = new PriorityQueue<Id>(4, walkSpeedComparator);

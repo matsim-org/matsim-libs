@@ -26,6 +26,7 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -149,9 +150,9 @@ public class CreateCensusSample {
 				}
 				
 			} else {
-				Iterator<Id> personIter = household.getMemberIds().iterator();
+				Iterator<Id<Person>> personIter = household.getMemberIds().iterator();
 				while (personIter.hasNext()) {
-					Id personId = personIter.next();					
+					Id<Person> personId = personIter.next();					
 					
 					double r = random.nextDouble();
 					

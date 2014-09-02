@@ -72,10 +72,10 @@ public class CreateCensusV2Households {
 	private final String separator = "\t";
 	private final Charset charset = Charset.forName("UTF-8");
 
-	private Map<Id, CensusData> censusDataMap;	// PersonId, Census Entry
-	private Map<Id, Integer> householdHHTPMap;	// HouseholdId, HHTP Code
-	private Map<Id, List<Id>> buildingHouseholdMap;	// BuildingId, List of households assigned to that building
-	private Map<Id, List<Id>> municipalityHouseholdMap;	// MuncipalityId, List of households assigned to that municipality
+	private Map<Id<Person>, CensusData> censusDataMap;	// PersonId, Census Entry
+	private Map<Id<Household>, Integer> householdHHTPMap;	// HouseholdId, HHTP Code
+	private Map<Id, List<Id<Household>>> buildingHouseholdMap;	// BuildingId, List of households assigned to that building
+	private Map<Id, List<Id<Household>>> municipalityHouseholdMap;	// MuncipalityId, List of households assigned to that municipality
 
 	private final ObjectAttributes householdAttributes;
 
@@ -145,10 +145,10 @@ public class CreateCensusV2Households {
 		boolean isGZ = censusFile.toLowerCase().endsWith(".gz");
 		boolean isZip = censusFile.toLowerCase().endsWith(".zip");
 
-		this.censusDataMap = new HashMap<Id, CensusData>();
-		this.householdHHTPMap = new HashMap<Id, Integer>();
-		this.buildingHouseholdMap = new HashMap<Id, List<Id>>();
-		this.municipalityHouseholdMap = new HashMap<Id, List<Id>>();
+		this.censusDataMap = new HashMap<Id<Person>, CensusData>();
+		this.householdHHTPMap = new HashMap<Id<Household>, Integer>();
+		this.buildingHouseholdMap = new HashMap<Id, List<Id<Household>>>();
+		this.municipalityHouseholdMap = new HashMap<Id, List<Id<Household>>>();
 
 		FileInputStream fis = null;
 		GZIPInputStream gzis = null;
@@ -248,9 +248,9 @@ public class CreateCensusV2Households {
 
 	    	// Add the household to the list of households located in the building
 	    	Id buildingId = this.scenario.createId(String.valueOf(censusData.GEBAEUDE_ID));
-	    	List<Id> list = this.buildingHouseholdMap.get(buildingId);
+	    	List<Id<Household>> list = this.buildingHouseholdMap.get(buildingId);
 	    	if (list == null) {
-	    		list = new ArrayList<Id>();
+	    		list = new ArrayList<Id<Household>>();
 	    		this.buildingHouseholdMap.put(buildingId, list);
 	    	}
 	    	list.add(householdId);
@@ -259,7 +259,7 @@ public class CreateCensusV2Households {
 	    	Id muncipalityId = this.scenario.createId(String.valueOf(censusData.ZGDE));
 	    	list = this.municipalityHouseholdMap.get(muncipalityId);
 	    	if (list == null) {
-	    		list = new ArrayList<Id>();
+	    		list = new ArrayList<Id<Household>>();
 	    		this.municipalityHouseholdMap.put(muncipalityId, list);
 	    	}
 	    	list.add(householdId);
@@ -361,8 +361,8 @@ public class CreateCensusV2Households {
 	private void writeHouseHoldObjectAttributes(String objectAttributesFile) {
 		// add an entry for the municipality where the household is located
 		log.info("Adding municipality information to household object attributes...");
-		for (Entry<Id, List<Id>> entry : this.municipalityHouseholdMap.entrySet()) {
-			List<Id> householdIds = entry.getValue();
+		for (Entry<Id, List<Id<Household>>> entry : this.municipalityHouseholdMap.entrySet()) {
+			List<Id<Household>> householdIds = entry.getValue();
 			for (Id id : householdIds) {
 				this.householdAttributes.putAttribute(id.toString(), "municipality", Integer.valueOf(entry.getKey().toString()));
 			}
@@ -371,7 +371,7 @@ public class CreateCensusV2Households {
 
 		// and an entry for the HHTP code of the household
 		log.info("Adding HTTP codes to households...");
-		for (Entry<Id, Integer> entry : this.householdHHTPMap.entrySet()) {
+		for (Entry<Id<Household>, Integer> entry : this.householdHHTPMap.entrySet()) {
 			this.householdAttributes.putAttribute(entry.getKey().toString(), "HHTP", entry.getValue());
 		}
 		log.info("done.");
@@ -510,7 +510,7 @@ public class CreateCensusV2Households {
 			int HHTP = this.householdHHTPMap.get(household.getId());
 
 			if (HHTP == 9802) {
-				Iterator<Id> iter = household.getMemberIds().iterator();
+				Iterator<Id<Person>> iter = household.getMemberIds().iterator();
 				while (iter.hasNext()) {
 					Id personId = iter.next();
 
@@ -529,7 +529,7 @@ public class CreateCensusV2Households {
 				}
 
 			} else if (HHTP == 9803) {
-				Iterator<Id> iter = household.getMemberIds().iterator();
+				Iterator<Id<Person>> iter = household.getMemberIds().iterator();
 				while (iter.hasNext()) {
 					Id personId = iter.next();
 
@@ -547,7 +547,7 @@ public class CreateCensusV2Households {
 					}
 				}
 			} else if (HHTP == 9804) {
-				Iterator<Id> iter = household.getMemberIds().iterator();
+				Iterator<Id<Person>> iter = household.getMemberIds().iterator();
 				while (iter.hasNext()) {
 					Id personId = iter.next();
 
@@ -595,9 +595,9 @@ public class CreateCensusV2Households {
 		 * can be assigned to: households with more than one member (> 2000) and non
 		 * collective households (< 9000).
 		 */
-		List<Id> householdsInMuncipality = this.municipalityHouseholdMap.get(municipalityId);
-		List<Id> useableHouseholds = new ArrayList<Id>();
-		for (Id id : householdsInMuncipality) {
+		List<Id<Household>> householdsInMuncipality = this.municipalityHouseholdMap.get(municipalityId);
+		List<Id<Household>> useableHouseholds = new ArrayList<Id<Household>>();
+		for (Id<Household> id : householdsInMuncipality) {
 			/*
 			 * If there is no corresponding entry in the households data.
 			 * This will occur, if a sample population is used.
@@ -634,9 +634,9 @@ public class CreateCensusV2Households {
 		 * can be assigned to: households with more than one member (> 2000) and non
 		 * collective households (< 9000).
 		 */
-		List<Id> householdsInBuilding = this.buildingHouseholdMap.get(buildingId);
-		List<Id> useableHouseholds = new ArrayList<Id>();
-		for (Id id : householdsInBuilding) {
+		List<Id<Household>> householdsInBuilding = this.buildingHouseholdMap.get(buildingId);
+		List<Id<Household>> useableHouseholds = new ArrayList<Id<Household>>();
+		for (Id<Household> id : householdsInBuilding) {
 			/*
 			 * If there is no corresponding entry in the households data.
 			 * This will occur, if a sample population is used.

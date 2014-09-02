@@ -19,17 +19,20 @@
 
 package playground.christoph.population;
 
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.population.algorithms.PersonAlgorithm;
 
 /*
  * Dumps all plans of the Plansfile except the selected one.
@@ -37,38 +40,37 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class PlansDumping {
 
-	private static String configFileName = "../matsim/mysimulations/kt-zurich/config.xml";
-	private static String networkFile = "../matsim/mysimulations/kt-zurich/input/network.xml";
-	private static String populationFile = "../matsim/mysimulations/kt-zurich/input/plans.xml.gz";
-	private static String populationOutFile = "../matsim/mysimulations/kt-zurich/input/out_plans.xml.gz";
-	private static final String dtdFileName = null;
+//	private static String configFileName = "../matsim/mysimulations/kt-zurich/config.xml";
+//	private static String networkFile = "../matsim/mysimulations/kt-zurich/input/network.xml";
+	private static String populationFile = "C:/Users/Christoph/Desktop/Valora Kundenpotentiale/0001/20140417/2013.ch071.10pct.output_plans_selected.xml.gz";
+	private static String populationOutFile = "C:/Users/Christoph/Desktop/Valora Kundenpotentiale/0001/20140417/2013.ch071.10pct.output_plans_selected_no_routes.xml.gz";
 
-	private static final String separator = System.getProperty("file.separator");
-
-	public static void main(String[] args)
-	{
-		configFileName = configFileName.replace("/", separator);
-		networkFile = networkFile.replace("/", separator);
-		populationFile = populationFile.replace("/", separator);
-
-		Config config = new Config();
-		config.addCoreModules();
-		new MatsimConfigReader(config).readFile(configFileName, dtdFileName);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-
-		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(networkFile);
-
-		Population population = scenario.getPopulation();
-		new MatsimPopulationReader(scenario).readFile(populationFile);
-
-		for (Person person : population.getPersons().values())
-		{
-			((PersonImpl) person).removeUnselectedPlans();
-			person.getSelectedPlan().setScore(null);
-		}
-
-		new PopulationWriter(population, network).write(populationOutFile);
+	public static void main(String[] args) {
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		
+		PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
+		plans.setIsStreaming(true);
+		plans.addAlgorithm(new PersonAlgorithm() {
+			@Override
+			public void run(Person person) {
+				((PersonImpl) person).removeUnselectedPlans();
+				Plan plan = person.getSelectedPlan();
+				for (PlanElement planElement : plan.getPlanElements()) {
+					if (planElement instanceof Leg) {
+						Leg leg = (Leg) planElement;
+						leg.setRoute(null);
+					}
+				}
+			}
+		});
+		PopulationWriter populationWriter = new PopulationWriter(plans);
+		populationWriter.startStreaming(populationOutFile);
+		plans.addAlgorithm(populationWriter);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
+		plansReader.readFile(populationFile);
+		populationWriter.closeStreaming();
+		
 		System.out.println("Done");
 	}
 

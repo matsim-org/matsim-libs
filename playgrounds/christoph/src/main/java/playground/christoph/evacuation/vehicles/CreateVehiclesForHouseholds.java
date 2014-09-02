@@ -62,7 +62,7 @@ public class CreateVehiclesForHouseholds {
 		
 		int numVehicles = info.getNumVehicles();
 		String idString = household.getId().toString();
-		List<Id> vehicleIds = household.getVehicleIds();
+		List<Id<Vehicle>> vehicleIds = household.getVehicleIds();
 		if (numVehicles > 0) {
 			Vehicle veh = vehicles.getFactory().createVehicle(scenario.createId(idString + "_veh1"), VehicleUtils.getDefaultVehicleType());
 			VehicleCapacity cap = VehicleUtils.getFactory().createVehicleCapacity();

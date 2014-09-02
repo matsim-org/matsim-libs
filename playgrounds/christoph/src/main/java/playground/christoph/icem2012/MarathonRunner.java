@@ -498,7 +498,7 @@ public final class MarathonRunner implements StartupListener,
 		HouseholdsFactory factory = households.getFactory();
 		
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			Household household = factory.createHousehold(person.getId());
+			Household household = factory.createHousehold(Id.create(person.getId().toString(), Household.class));
 			household.getMemberIds().add(person.getId());
 			households.getHouseholds().put(household.getId(), household);
 		}
