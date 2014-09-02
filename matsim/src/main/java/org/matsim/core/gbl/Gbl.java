@@ -64,16 +64,16 @@ public abstract class Gbl {
 		log.info("CPU cores: " + Runtime.getRuntime().availableProcessors());
 		log.info("max. Memory: " + Runtime.getRuntime().maxMemory() / 1024.0 / 1024.0 + "MB (" + Runtime.getRuntime().maxMemory() + "B)");
 	}
-
-	public static final void printBuildInfo() {
-		printBuildInfo("MATSim", "/revision.txt");
+	
+	public static final String getBuildInfoString() {
+		return getBuildInfoString("MATSim", "/revision.txt");
 	}
 	
 	/** 
 	 * Prints some information about the current build/revision of this code.
 	 * Currently, this will only work with the Nightly-Build-Jars.
 	 */
-	public static final void printBuildInfo(String component, String resourceFilename) {
+	public static final String getBuildInfoString(String component, String resourceFilename) {
 		String revision = null;
 		String date = null;
 		URL url = Gbl.class.getResource(resourceFilename);
@@ -92,13 +92,22 @@ public abstract class Gbl {
 				}
 			}
 			if (revision == null) {
-				log.info(component + "-Build: unknown");
+				return component + "-Build: unknown";
 			} else {
-				log.info(component + "-Build: " + revision + " (" + date + ")");
+				return component + "-Build: " + revision + " (" + date + ")";
 			}
 		} else {
-			log.info(component + "-Build: unknown");
+			return component + "-Build: unknown";
 		}
+	}
+	
+	public static final void printBuildInfo() {
+		printBuildInfo("MATSim", "/revision.txt");
+	}
+
+	public static final void printBuildInfo(String component, String resourceFilename) {
+		String infoString = getBuildInfoString(component, resourceFilename);
+		log.info(infoString);
 	}
 
 	//////////////////////////////////////////////////////////////////////
