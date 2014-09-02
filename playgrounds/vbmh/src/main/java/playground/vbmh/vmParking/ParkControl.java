@@ -158,7 +158,7 @@ public class ParkControl {
 		
 		// FACILITY UND KOORDINATEN LADEN
 		IdImpl facilityid = new IdImpl(event.getAttributes().get("facility"));
-		Map<Id, ? extends ActivityFacility> facilitymap = controller.getFacilities().getFacilities();
+		Map<Id<ActivityFacility>, ? extends ActivityFacility> facilitymap = controller.getFacilities().getFacilities();
 		ActivityFacility facility = facilitymap.get(facilityid);
 		this.cordinate = facility.getCoord();
 		

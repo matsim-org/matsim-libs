@@ -95,7 +95,7 @@ public class CreateDemoParking {
 		
 		// P R I V A T E --------------------------------------------
 		
-		Map<Id, ? extends ActivityFacility> facility_map = scenario.getActivityFacilities().getFacilities();
+		Map<Id<ActivityFacility>, ? extends ActivityFacility> facility_map = scenario.getActivityFacilities().getFacilities();
 	
 		for (Facility facility : facility_map.values()){
 			ActivityFacilityImpl actfacility = (ActivityFacilityImpl) facility;
