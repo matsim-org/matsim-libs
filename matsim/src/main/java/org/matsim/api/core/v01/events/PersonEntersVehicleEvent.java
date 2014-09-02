@@ -23,7 +23,9 @@ package org.matsim.api.core.v01.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author mrieser
@@ -33,13 +35,27 @@ public class PersonEntersVehicleEvent extends Event implements HasPersonId {
 	public static final String EVENT_TYPE = "PersonEntersVehicle";
 	public static final String ATTRIBUTE_PERSON = "person";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
-	private final Id vehicleId;
-	private final Id personId;
 
-	/*package*/ public PersonEntersVehicleEvent(final double time, final Id personId, final Id vehicleId) {
+	private final Id<Person> personId;
+	private final Id<Vehicle> vehicleId;
+
+	/*package*/ public PersonEntersVehicleEvent(final double time, final Id<Person> personId, final Id<Vehicle> vehicleId) {
 		super(time);
 		this.personId = personId;
 		this.vehicleId = vehicleId;
+	}
+	
+	public Id<Vehicle> getVehicleId() {
+		return this.vehicleId;
+	}
+	
+	public Id<Person> getPersonId() {
+		return this.personId;
+	}	
+	
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
 	}
 
 	@Override
@@ -49,18 +65,4 @@ public class PersonEntersVehicleEvent extends Event implements HasPersonId {
 		attrs.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
 		return attrs;
 	}
-
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
-
-	public Id getVehicleId() {
-		return this.vehicleId;
-	}
-
-	public Id getPersonId() {
-		return this.personId;
-	}
-	
 }

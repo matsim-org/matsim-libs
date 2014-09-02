@@ -23,26 +23,46 @@ package org.matsim.api.core.v01.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
 
 public class PersonStuckEvent extends Event implements HasPersonId {
 
 	public static final String EVENT_TYPE = "stuckAndAbort";
+	
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_LEGMODE = "legMode";
 	public static final String ATTRIBUTE_PERSON = "person";
 
-	private final Id personId;
-	private final Id linkId;
+	private final Id<Person> personId;
+	private final Id<Link> linkId;
 	private final String legMode;
 
-	public PersonStuckEvent(final double time, final Id agentId, final Id linkId, final String legMode) {
+	public PersonStuckEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, final String legMode) {
 		super(time);
 		this.personId = agentId;
 		this.linkId = linkId;
 		this.legMode = legMode;
 	}
+	
+	public Id<Person> getPersonId() {
+		return this.personId;
+	}
+	
+	public Id<Link> getLinkId() {
+		return this.linkId;
+	}
 
+	public String getLegMode() {
+		return this.legMode;
+	}
+	
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
+	}
+	
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
@@ -55,22 +75,4 @@ public class PersonStuckEvent extends Event implements HasPersonId {
 		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
 		return attr;
 	}
-
-	public String getLegMode() {
-		return this.legMode;
-	}
-
-	public Id getLinkId() {
-		return this.linkId;
-	}
-
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
-
-	public Id getPersonId() {
-		return this.personId;
-	}
-
 }

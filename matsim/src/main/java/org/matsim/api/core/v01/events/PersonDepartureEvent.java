@@ -23,6 +23,8 @@ package org.matsim.api.core.v01.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
 
 public class PersonDepartureEvent extends Event implements HasPersonId {
@@ -33,16 +35,31 @@ public class PersonDepartureEvent extends Event implements HasPersonId {
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_LEGMODE = "legMode";
 
-	private final Id linkId;
+	private final Id<Person> personId;
+	private final Id<Link> linkId;
 	private final String legMode;
 
-	private final Id personId;
-
-	public PersonDepartureEvent(final double time, final Id agentId, final Id linkId, final String legMode) {
+	public PersonDepartureEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, final String legMode) {
 		super(time);
 		this.linkId = linkId;
 		this.legMode = legMode;
 		this.personId = agentId;
+	}
+	
+	public Id<Person> getPersonId() {
+		return this.personId;
+	}
+	
+	public Id<Link> getLinkId() {
+		return this.linkId;
+	}
+	
+	public String getLegMode() {
+		return this.legMode;
+	}
+	
+	public String getEventType() {
+		return EVENT_TYPE;
 	}
 
 	@Override
@@ -55,21 +72,4 @@ public class PersonDepartureEvent extends Event implements HasPersonId {
 		}
 		return attr;
 	}
-
-	public Id getPersonId() {
-		return this.personId;
-	}
-
-	public String getLegMode() {
-		return this.legMode;
-	}
-
-	public Id getLinkId() {
-		return this.linkId;
-	}
-
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
-
 }

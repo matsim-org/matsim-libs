@@ -23,6 +23,9 @@ package org.matsim.api.core.v01.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Design considerations: <ul>
@@ -35,10 +38,15 @@ import org.matsim.api.core.v01.Id;
 public class LinkLeaveEvent extends Event {
 
 	public static final String EVENT_TYPE = "left link";
+	public static final String ATTRIBUTE_PERSON = "person";
+	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
-	private final Id vehicleId;
+	
+	private final Id<Person> personId;
+	private final Id<Link> linkId;
+	private final Id<Vehicle> vehicleId;
 
-	public LinkLeaveEvent(final double time, final Id agentId, final Id linkId, Id vehicleId) {
+	public LinkLeaveEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, Id<Vehicle> vehicleId) {
 		super(time);
 		this.personId = agentId;
 		this.linkId = linkId;
@@ -50,10 +58,19 @@ public class LinkLeaveEvent extends Event {
 		return EVENT_TYPE;
 	}
 
-	public Id getVehicleId() {
-		return vehicleId;
+	@Deprecated
+	public Id<Person> getPersonId() {
+		return this.personId;
 	}
 
+	public Id<Link> getLinkId() {
+		return this.linkId;
+	}
+
+	public Id<Vehicle> getVehicleId() {
+		return vehicleId;
+	}
+	
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
@@ -64,23 +81,4 @@ public class LinkLeaveEvent extends Event {
 		}
 		return attr;
 	}
-	
-
-	public static final String ATTRIBUTE_LINK = "link";
-
-	private final Id linkId;
-
-	public Id getLinkId() {
-		return this.linkId;
-	}
-
-	public static final String ATTRIBUTE_PERSON = "person";
-
-	private final Id personId;
-
-	@Deprecated
-	public Id getPersonId() {
-		return this.personId;
-	}
-	
 }

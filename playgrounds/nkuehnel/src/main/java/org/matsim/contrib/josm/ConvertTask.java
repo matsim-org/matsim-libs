@@ -225,7 +225,7 @@ class ConvertTask extends PleaseWaitRunnable {
 						linkId2Way.get(route.getRoute().getStartLinkId()));
 				relation.addMember(start);
 
-				List<Id> links = new ArrayList<Id>();
+				List<Id<Link>> links = new ArrayList<Id<Link>>();
 				for (Id linkId : route.getRoute().getLinkIds()) {
 					RelationMember member = new RelationMember("stop_link",
 							linkId2Way.get(linkId));

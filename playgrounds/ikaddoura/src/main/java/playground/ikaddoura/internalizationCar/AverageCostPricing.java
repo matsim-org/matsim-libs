@@ -28,13 +28,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-
 import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
-
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 
@@ -83,7 +79,7 @@ public class AverageCostPricing implements StartupListener, AfterMobsimListener 
 		
 		for (LinkEnterEvent enterEvent : this.tollHandler.getLinkEnterEvents()) {
 			double amount = tollHandler.getAvgToll(enterEvent.getLinkId(), enterEvent.getTime());
-			PersonMoneyEvent moneyEvent = new PersonMoneyEvent(enterEvent.getTime(), enterEvent.getVehicleId(), amount);
+			PersonMoneyEvent moneyEvent = new PersonMoneyEvent(enterEvent.getTime(), enterEvent.getPersonId(), amount);
 			events.processEvent(moneyEvent);
 		}
 	}

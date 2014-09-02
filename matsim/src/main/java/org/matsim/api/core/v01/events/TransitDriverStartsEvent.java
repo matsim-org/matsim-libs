@@ -22,6 +22,11 @@ package org.matsim.api.core.v01.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author mrieser
@@ -34,13 +39,14 @@ public class TransitDriverStartsEvent extends Event {
 	public static final String ATTRIBUTE_TRANSIT_LINE_ID = "transitLineId";
 	public static final String ATTRIBUTE_TRANSIT_ROUTE_ID = "transitRouteId";
 	public static final String ATTRIBUTE_DEPARTURE_ID = "departureId";
-	private final Id driverId;
-	private final Id vehicleId;
-	private final Id transitRouteId;
-	private final Id transitLineId;
-	private final Id departureId;
+	private final Id<Person> driverId;
+	private final Id<Vehicle> vehicleId;
+	private final Id<TransitRoute> transitRouteId;
+	private final Id<TransitLine> transitLineId;
+	private final Id<Departure> departureId;
 
-	public TransitDriverStartsEvent(final double time, final Id driverId, final Id vehicleId, final Id transitLineId, final Id transitRouteId, final Id departureId) {
+	public TransitDriverStartsEvent(final double time, final Id<Person> driverId, final Id<Vehicle> vehicleId, 
+			final Id<TransitLine> transitLineId, final Id<TransitRoute> transitRouteId, final Id<Departure> departureId) {
 		super(time);
 		this.driverId = driverId;
 		this.vehicleId = vehicleId;
@@ -48,7 +54,32 @@ public class TransitDriverStartsEvent extends Event {
 		this.transitLineId = transitLineId;
 		this.departureId = departureId;
 	}
+	
+	public Id<Person> getDriverId() {
+		return driverId;
+	}
+	
+	public Id<Vehicle> getVehicleId() {
+		return vehicleId;
+	}
+	
+	public Id<TransitRoute> getTransitRouteId() {
+		return transitRouteId;
+	}
+	
+	public Id<TransitLine> getTransitLineId() {
+		return transitLineId;
+	}
+	
+	public Id<Departure> getDepartureId() {
+		return departureId;
+	}
 
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
+	}
+	
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> atts = super.getAttributes();
@@ -59,30 +90,4 @@ public class TransitDriverStartsEvent extends Event {
 		atts.put(ATTRIBUTE_DEPARTURE_ID, this.getDepartureId().toString());
 		return atts;
 	}
-
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
-
-	public Id getDriverId() {
-		return driverId;
-	}
-
-	public Id getVehicleId() {
-		return vehicleId;
-	}
-
-	public Id getTransitRouteId() {
-		return transitRouteId;
-	}
-
-	public Id getTransitLineId() {
-		return transitLineId;
-	}
-
-	public Id getDepartureId() {
-		return departureId;
-	}
-
 }

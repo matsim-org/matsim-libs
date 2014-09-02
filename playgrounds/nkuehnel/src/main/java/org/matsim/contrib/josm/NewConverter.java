@@ -387,7 +387,7 @@ class NewConverter {
 	}
 
 	private static void checkNode(Network network, Node node) {
-		Id nodeId = new IdImpl(node.getUniqueId());
+		Id<Node> nodeId = new IdImpl(node.getUniqueId());
 		if (!node.isIncomplete()) {
 			if (!network.getNodes().containsKey(nodeId)) {
 				double lat = node.getCoor().lat();
@@ -417,7 +417,7 @@ class NewConverter {
 	}
 
 	private static void checkStopFacility(Scenario scenario, Node node,
-			List<TransitStopFacility> stops, Id stopId) {
+			List<TransitStopFacility> stops, Id<TransitStopFacility> stopId) {
 
 		int i = 0;
 		while (scenario.getTransitSchedule().getFacilities()
@@ -442,14 +442,14 @@ class NewConverter {
 	}
 
 	public static void convertTransitRouteOsm(Relation relation, Scenario scenario, Map<Relation, TransitRoute> relation2Route) {
-		List<Id> links = new ArrayList<Id>();
+		List<Id<Link>> links = new ArrayList<Id<Link>>();
 		List<TransitStopFacility> stops = new ArrayList<TransitStopFacility>();
 
 		for (RelationMember member : relation.getMembers()) {
 
 			if (member.isNode() && !member.getMember().isIncomplete()) {
 				checkNode(scenario.getNetwork(), member.getNode());
-				Id stopId = new IdImpl(relation.getUniqueId() + "_"
+				Id<TransitStopFacility> stopId = new IdImpl(relation.getUniqueId() + "_"
 						+ member.getUniqueId());
 				checkStopFacility(scenario, member.getNode(), stops, stopId);
 			}
@@ -504,7 +504,7 @@ class NewConverter {
 	
 	public static void convertTransitRouteMatsim(Relation relation, Scenario scenario, Map<Way, List<Link>> way2Links, Map<Relation, TransitRoute> relation2Route) {
 		// TODO Auto-generated method stub
-		List<Id> links = new ArrayList<Id>();
+		List<Id<Link>> links = new ArrayList<Id<Link>>();
 		List<TransitStopFacility> stops = new ArrayList<TransitStopFacility>();
 		
 		for (RelationMember member : relation.getMembers()) {
@@ -514,7 +514,7 @@ class NewConverter {
 						links.add(link.getId());
 					}
 					if (member.getWay().hasKey("stopId")) {
-						Id stopId = (new IdImpl(member.getWay().get("stopId")));
+						Id<TransitStopFacility> stopId = (new IdImpl(member.getWay().get("stopId")));
 						if(scenario.getTransitSchedule().getFacilities().containsKey(stopId)) {
 							for (TransitStopFacility removeStop: stops) {
 								scenario.getTransitSchedule().removeStopFacility(removeStop);
@@ -544,8 +544,8 @@ class NewConverter {
 		if (links.size()<3) {
 			return;
 		}
-		Id firstLinkId = links.remove(0);
-		Id lastLinkId = links.remove(links.size()-1);
+		Id<Link> firstLinkId = links.remove(0);
+		Id<Link> lastLinkId = links.remove(links.size()-1);
 		
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory builder = schedule.getFactory();
@@ -591,9 +591,9 @@ class NewConverter {
 		relation2Route.put(relation, tRoute);
 	}
 
-	private static List<Id> createBeeLineRoute(Relation relation,
+	private static List<Id<Link>> createBeeLineRoute(Relation relation,
 			Scenario scenario, List<TransitStopFacility> stops) {
-		List<Id> links = new ArrayList<Id>();
+		List<Id<Link>> links = new ArrayList<Id<Link>>();
 		int increment = 0;
 		TransitStopFacility previous = null;
 
@@ -660,8 +660,8 @@ class NewConverter {
 		// only create link, if both nodes were found, node could be null, since
 		// nodes outside a layer were dropped
 		List<Link> links = new ArrayList<Link>();
-		Id fromId = new IdImpl(fromNode.getUniqueId());
-		Id toId = new IdImpl(toNode.getUniqueId());
+		Id<Node> fromId = new IdImpl(fromNode.getUniqueId());
+		Id<Node> toId = new IdImpl(toNode.getUniqueId());
 		if (network.getNodes().get(fromId) != null
 				&& network.getNodes().get(toId) != null) {
 

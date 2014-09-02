@@ -23,6 +23,7 @@ package org.matsim.api.core.v01.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
 
 /**
@@ -38,7 +39,9 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 	public static final String ATTRIBUTE_AMOUNT = "amount";
 
 	public static final String EVENT_TYPE = "personMoney";
+	public static final String ATTRIBUTE_PERSON = "person";
 
+	private final Id<Person> personId;
 	private final double amount;
 
 	/**
@@ -50,17 +53,25 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 	 * @param agentId
 	 * @param amount
 	 */
-	public PersonMoneyEvent(final double time, final Id agentId, final double amount) {
+	public PersonMoneyEvent(final double time, final Id<Person> agentId, final double amount) {
 		super(time);
 		this.personId = agentId;
 		this.amount = amount;
+	}
+
+	public Id<Person> getPersonId() {
+		return this.personId;
+	}
+	
+	public double getAmount() {
+		return this.amount;
 	}
 
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
-
+	
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
@@ -68,17 +79,4 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
 		return attr;
 	}
-
-	public double getAmount() {
-		return this.amount;
-	}
-	
-	public static final String ATTRIBUTE_PERSON = "person";
-
-	private final Id personId;
-
-	public Id getPersonId() {
-		return this.personId;
-	}
-
 }
