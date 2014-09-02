@@ -234,7 +234,6 @@ public class StrategyManager implements MatsimManager {
 	 *
 	 * @see #setMaxPlansPerAgent(int)
 	 */
-	@Deprecated // try to use addPlanSelectoryFactory instead. kai/mzilske, aug'14
 	public final void setPlanSelectorForRemoval(final GenericPlanSelector<Plan> planSelector) {
 		delegate.setPlanSelectorForRemoval(planSelector);
 	}
