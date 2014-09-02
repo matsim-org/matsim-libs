@@ -19,6 +19,7 @@
 
 package org.matsim.core.replanning;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 
 /**
@@ -27,7 +28,7 @@ import org.matsim.api.core.v01.population.Plan;
  * </ul>
  *
  */
-public interface PlanStrategy extends GenericPlanStrategy<Plan> {
+public interface PlanStrategy extends GenericPlanStrategy<Plan, Person> {
 
 
 }

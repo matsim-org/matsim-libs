@@ -23,6 +23,7 @@ package playground.balac.aam.replanning;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.PlanStrategy;
@@ -39,7 +40,7 @@ public class SubtourModeChoiceStrategy implements PlanStrategy {
 	private final PlanStrategyImpl strategy;
 
 	public SubtourModeChoiceStrategy(final Scenario scenario) {
-		this.strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan>() );
+		this.strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() );
 
 		//addStrategyModule( new TripsToLegsModule(controler.getConfig() ) );   
 		SubTourModeChoiceAAM smc = new SubTourModeChoiceAAM(scenario);
@@ -59,7 +60,7 @@ public class SubtourModeChoiceStrategy implements PlanStrategy {
 	}
 
 	@Override
-	public void run(final HasPlansAndId<Plan> person) {
+	public void run(final HasPlansAndId<Plan, Person> person) {
 		strategy.run(person);
 	}
 

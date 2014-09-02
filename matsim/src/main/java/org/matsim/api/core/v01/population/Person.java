@@ -20,13 +20,12 @@
 package org.matsim.api.core.v01.population;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
 import org.matsim.utils.customize.Customizable;
 
 /**
  * @author dgrether
  */
-public interface Person extends Identifiable, Customizable, HasPlansAndId<Plan>{
+public interface Person extends Customizable, HasPlansAndId<Plan, Person>{
 
 ////	public List<? extends Plan> getPlans();
 //	public List<Plan> getPlans();

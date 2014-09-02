@@ -15,7 +15,6 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
 import playground.sergioo.typesPopulation2013.population.PersonImplPops;
@@ -26,7 +25,7 @@ public class StrategyManagerPops extends StrategyManager {
 	private final Map<Id, ArrayList<Double>> weights = new HashMap<Id, ArrayList<Double>>();
 	private Map<Id, Double> totalWeights = new HashMap<Id, Double>();
 	private Map<Id, Integer> maxPlansPerAgent = new HashMap<Id, Integer>();
-	private Map<Id, GenericPlanSelector<Plan>> removalPlanSelector = new HashMap<Id, GenericPlanSelector<Plan>>();
+	private Map<Id, GenericPlanSelector<Plan, Person>> removalPlanSelector = new HashMap<Id, GenericPlanSelector<Plan, Person>>();
 	private final TreeMap<Integer, Map<String, Map<PlanStrategy, Double>>> changeRequests = new TreeMap<Integer, Map<String, Map<PlanStrategy, Double>>>();
 	/**
 	 * chooses a (weight-influenced) random strategy
@@ -174,7 +173,7 @@ public class StrategyManagerPops extends StrategyManager {
 	 *
 	 * @see #setMaxPlansPerAgent(int)
 	 */
-	public final void setPlanSelectorForRemoval(final GenericPlanSelector<Plan> planSelector, Id populationId) {
+	public final void setPlanSelectorForRemoval(final GenericPlanSelector<Plan, Person> planSelector, Id populationId) {
 		Logger.getLogger(this.getClass()).info("setting PlanSelectorForRemoval to " + planSelector.getClass() ) ;
 		this.removalPlanSelector.put(populationId, planSelector);
 	}

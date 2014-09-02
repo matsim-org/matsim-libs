@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.GenericPlanStrategy;
-import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
@@ -78,7 +77,7 @@ public class TransitStrategyManager extends StrategyManager {
 	}
 	
 	@Override
-	public GenericPlanStrategy<Plan> chooseStrategy(
+	public GenericPlanStrategy<Plan, Person> chooseStrategy(
 			final Person person,
 			final String subpopulation) {	
 		

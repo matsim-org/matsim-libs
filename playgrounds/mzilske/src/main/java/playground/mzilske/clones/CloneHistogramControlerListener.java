@@ -22,7 +22,14 @@
 
 package playground.mzilske.clones;
 
-import com.google.common.collect.ImmutableMap;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -32,15 +39,11 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
+
 import playground.mzilske.ant2014.StreamingOutput;
 import playground.mzilske.util.IterationSummaryFileControlerListener;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
+import com.google.common.collect.ImmutableMap;
 
 class CloneHistogramControlerListener implements Provider<ControlerListener> {
 
@@ -76,7 +79,7 @@ class CloneHistogramControlerListener implements Provider<ControlerListener> {
                                     Id originalId = cloneService.resolveParentId(person.getId());
                                     for (Plan plan : person.getPlans()) {
                                         if (plan.getPlanElements().size() > 1) {
-                                            double selectionProbability = ExpBetaPlanSelector.getSelectionProbability(new ExpBetaPlanSelector<Plan>(1.0), person, plan);
+                                            double selectionProbability = ExpBetaPlanSelector.getSelectionProbability(new ExpBetaPlanSelector<Plan, Person>(1.0), person, plan);
                                             Double previous = expectedNumberOfClones.get(originalId);
                                             if (previous == null)
                                                 expectedNumberOfClones.put(originalId.toString(), selectionProbability);

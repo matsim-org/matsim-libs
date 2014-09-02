@@ -20,6 +20,7 @@
 
 package org.matsim.core.replanning.selectors;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
@@ -33,8 +34,8 @@ import org.matsim.core.population.PlanImpl;
 public class KeepSelectedTest extends AbstractPlanSelectorTest {
 
 	@Override
-	protected KeepSelected<Plan> getPlanSelector() {
-		return new KeepSelected<Plan>();
+	protected KeepSelected<Plan, Person> getPlanSelector() {
+		return new KeepSelected<Plan, Person>();
 	}
 
 	/**

@@ -24,13 +24,13 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomUnscoredPlanSelector;
 
 /**
@@ -42,7 +42,7 @@ import org.matsim.core.replanning.selectors.RandomUnscoredPlanSelector;
  */
 public final class PlanStrategyImpl_work implements PlanStrategy {
 
-	private GenericPlanSelector<Plan> planSelector = null;
+	private GenericPlanSelector<Plan, Person> planSelector = null;
 	private PlanStrategyModule firstModule = null;
 	private final ArrayList<PlanStrategyModule> modules = new ArrayList<PlanStrategyModule>();
 	private final ArrayList<Plan> plans = new ArrayList<Plan>();
@@ -54,7 +54,7 @@ public final class PlanStrategyImpl_work implements PlanStrategy {
 	 *
 	 * @param planSelector
 	 */
-	public PlanStrategyImpl_work(final GenericPlanSelector<Plan> planSelector) {
+	public PlanStrategyImpl_work(final GenericPlanSelector<Plan, Person> planSelector) {
 		this.planSelector = planSelector;
 	}
 
@@ -74,12 +74,12 @@ public final class PlanStrategyImpl_work implements PlanStrategy {
 	}
 	
 	@Override
-	public void run(final HasPlansAndId<Plan> person) {
+	public void run(final HasPlansAndId<Plan, Person> person) {
 		
 		this.counter++;
 		
 		// if there is at least one unscored plan, find that one:
-		Plan plan = new RandomUnscoredPlanSelector<Plan>().selectPlan(((PersonImpl) person));
+		Plan plan = new RandomUnscoredPlanSelector<Plan, Person>().selectPlan((person));
 		
 		// otherwise, find one according to selector (often defined in PlanStrategy ctor):
 		if (plan == null) {
@@ -163,7 +163,7 @@ public final class PlanStrategyImpl_work implements PlanStrategy {
 		return name.toString();
 	}
 
-	public GenericPlanSelector<Plan> getPlanSelector() {
+	public GenericPlanSelector<Plan, Person> getPlanSelector() {
 		return planSelector;
 	}
 	

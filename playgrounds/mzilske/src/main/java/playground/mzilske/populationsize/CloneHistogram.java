@@ -22,6 +22,11 @@
 
 package playground.mzilske.populationsize;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -29,12 +34,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-import playground.mzilske.ant2014.StreamingOutput;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
+import playground.mzilske.ant2014.StreamingOutput;
 
 class CloneHistogram {
 
@@ -55,7 +56,7 @@ class CloneHistogram {
             if (person.getPlans().size() != 2) throw new RuntimeException("Don't know about this kind of Person.");
             for (Plan plan : person.getPlans()) {
                 if (plan.getPlanElements().size() > 1) {
-                    double selectionProbability = ExpBetaPlanSelector.getSelectionProbability(new ExpBetaPlanSelector<Plan>(1.0), person, plan);
+                    double selectionProbability = ExpBetaPlanSelector.getSelectionProbability(new ExpBetaPlanSelector<Plan, Person>(1.0), person, plan);
                     Double previous = expectedNumberOfClones.get(originalId);
                     if (previous == null)
                         expectedNumberOfClones.put(originalId, selectionProbability);

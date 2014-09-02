@@ -1,7 +1,16 @@
 package usecases.chessboard;
 
+import java.io.File;
+
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
+import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierControlerListener;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
@@ -18,13 +27,12 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
+
 import usecases.analysis.CarrierScoreStats;
 import usecases.analysis.LegHistogram;
 import usecases.chessboard.CarrierScoringFunctionFactoryImpl.DriversLegScoring;
 import usecases.chessboard.replanning.ReRouter;
 import usecases.chessboard.replanning.TimeAllocationMutator;
-
-import java.io.File;
 
 public class RunChessboard {
 	
@@ -119,27 +127,27 @@ public class RunChessboard {
 	        return new CarrierPlanStrategyManagerFactory() {
 
 	            @Override
-	            public GenericStrategyManager<CarrierPlan> createStrategyManager() {
+	            public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {
 
 	            	TravelDisutility travelDisutility = TravelDisutilities.createBaseDisutility(types, controler.getLinkTravelTimes());
 					final LeastCostPathCalculator router = controler.getLeastCostPathCalculatorFactory().createPathCalculator(controler.getScenario().getNetwork(), 
 							travelDisutility, controler.getLinkTravelTimes()) ;
 					
-					final GenericStrategyManager<CarrierPlan> strategyManager = new GenericStrategyManager<CarrierPlan>() ;
+					final GenericStrategyManager<CarrierPlan, Carrier> strategyManager = new GenericStrategyManager<CarrierPlan, Carrier>() ;
 					strategyManager.setMaxPlansPerAgent(5);
 					{
-						GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new ExpBetaPlanChanger<CarrierPlan>(1.) ) ;
+						GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<CarrierPlan, Carrier>( new ExpBetaPlanChanger<CarrierPlan, Carrier>(1.) ) ;
 //						strategy.addStrategyModule(new ReRouter(router, controler.getNetwork(), controler.getLinkTravelTimes(), .1));
 						strategyManager.addStrategy( strategy, null, .7 ) ;
 						
 					}
 					{
-						GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new ExpBetaPlanChanger<CarrierPlan>(1.) ) ;
+						GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<CarrierPlan, Carrier>( new ExpBetaPlanChanger<CarrierPlan, Carrier>(1.) ) ;
 						strategy.addStrategyModule(new ReRouter(router, controler.getNetwork(), controler.getLinkTravelTimes(), 1.));
 						strategyManager.addStrategy( strategy, null, 0.15) ;
 					}
 					{
-						GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new KeepSelected<CarrierPlan>() ) ;
+						GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<CarrierPlan, Carrier>( new KeepSelected<CarrierPlan, Carrier>() ) ;
 						strategy.addStrategyModule(new TimeAllocationMutator(1.));
 						strategy.addStrategyModule(new ReRouter(router, controler.getNetwork(), controler.getLinkTravelTimes(), 1.));
 						strategyManager.addStrategy( strategy, null, 0.15) ;

@@ -24,17 +24,19 @@
 package playground.yu.replanning.selectors;
 
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
+
 import playground.yu.utils.DebugTools;
 
 /**
  * @author yu
  * 
  */
-public class ExpBetaPlanSelector_Probs extends ExpBetaPlanSelector<Plan> {
+public class ExpBetaPlanSelector_Probs extends ExpBetaPlanSelector<Plan, Person> {
 
 	/**
 	 * @param charyparNagelScoringConfigGroup
@@ -50,7 +52,8 @@ public class ExpBetaPlanSelector_Probs extends ExpBetaPlanSelector<Plan> {
 	 * .selectPlan(Person person)}, with output, that reforms choice probability
 	 * (weights)
 	 */
-	public Plan selectPlan(final HasPlansAndId<Plan> person) {
+	@Override
+	public Plan selectPlan(final HasPlansAndId<Plan, Person> person) {
 
 		// Build the weights of all plans
 		// - first find the max. score of all plans of this person

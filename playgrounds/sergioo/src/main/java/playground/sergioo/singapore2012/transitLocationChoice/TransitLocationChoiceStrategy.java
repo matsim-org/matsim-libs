@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.contrib.locationchoice.DestinationChoice;
@@ -56,7 +57,7 @@ public class TransitLocationChoiceStrategy implements PlanStrategy {
 	}
 
 	@Override
-	public void run(HasPlansAndId<Plan> person) {
+	public void run(HasPlansAndId<Plan, Person> person) {
 		delegate.run(person);
 	}
 

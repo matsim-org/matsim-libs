@@ -84,7 +84,7 @@ public class DgController {
 				@Override
 				public void notifyIterationStarts(IterationStartsEvent event) {
 
-					GenericPlanStrategy<Plan> strategy 
+					GenericPlanStrategy<Plan, Person> strategy 
 					= new PlanStrategyImpl(new ExpBetaPlanChanger(Double.NaN) );
 					// (dummy strategy, just to get the type.  Not so great.  Not even sure if it will work. Ask MZ. Kai)
 

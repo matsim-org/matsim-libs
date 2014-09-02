@@ -21,6 +21,7 @@
 package org.matsim.core.replanning.selectors;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -50,8 +51,8 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 	}
 
 	@Override
-	protected ExpBetaPlanSelector<Plan> getPlanSelector() {
-		return new ExpBetaPlanSelector<Plan>(this.config.planCalcScore());
+	protected ExpBetaPlanSelector<Plan, Person> getPlanSelector() {
+		return new ExpBetaPlanSelector<Plan, Person>(this.config.planCalcScore());
 	}
 
 	/**
@@ -72,7 +73,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 		PlanImpl plan5 = person.createAndAddPlan(false);// weight: 1
 		plan5.setScore(100.0);
 		
-		ExpBetaPlanSelector<Plan> selector = new ExpBetaPlanSelector<Plan>(this.config.planCalcScore());
+		ExpBetaPlanSelector<Plan, Person> selector = new ExpBetaPlanSelector<Plan, Person>(this.config.planCalcScore());
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;
@@ -131,7 +132,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 
 		
 		
-		ExpBetaPlanSelector<Plan> selector = new ExpBetaPlanSelector<Plan>(this.config.planCalcScore());
+		ExpBetaPlanSelector<Plan, Person> selector = new ExpBetaPlanSelector<Plan, Person>(this.config.planCalcScore());
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;

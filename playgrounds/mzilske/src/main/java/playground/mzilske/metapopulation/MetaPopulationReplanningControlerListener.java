@@ -22,6 +22,8 @@
 
 package playground.mzilske.metapopulation;
 
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
@@ -37,11 +39,9 @@ import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 
-import javax.inject.Inject;
-
 class MetaPopulationReplanningControlerListener implements ReplanningListener {
 
-    private final GenericStrategyManager<MetaPopulationPlan> strategyManager;
+    private final GenericStrategyManager<MetaPopulationPlan, Person> strategyManager;
     private MetaPopulations metaPopulations;
 
     private Scenario scenario;
@@ -50,16 +50,16 @@ class MetaPopulationReplanningControlerListener implements ReplanningListener {
     MetaPopulationReplanningControlerListener(MetaPopulations metaPopulations, Scenario scenario) {
         this.metaPopulations = metaPopulations;
         this.scenario = scenario;
-        this.strategyManager = new GenericStrategyManager<MetaPopulationPlan>();
+        this.strategyManager = new GenericStrategyManager<MetaPopulationPlan, Person>();
         this.strategyManager.setMaxPlansPerAgent(5);
-        final ExpBetaPlanSelector<MetaPopulationPlan> metaPopulationPlanExpBetaPlanSelector = new ExpBetaPlanSelector<MetaPopulationPlan>(1.0);
-        GenericPlanStrategyImpl<MetaPopulationPlan> select = new GenericPlanStrategyImpl<MetaPopulationPlan>(metaPopulationPlanExpBetaPlanSelector);
+        final ExpBetaPlanSelector<MetaPopulationPlan, Person> metaPopulationPlanExpBetaPlanSelector = new ExpBetaPlanSelector<MetaPopulationPlan, Person>(1.0);
+        GenericPlanStrategyImpl<MetaPopulationPlan, Person> select = new GenericPlanStrategyImpl<MetaPopulationPlan, Person>(metaPopulationPlanExpBetaPlanSelector);
         this.strategyManager.addStrategy(select, null, 0.5);
-        GenericPlanStrategy<MetaPopulationPlan> replan = new GenericPlanStrategy<MetaPopulationPlan>() {
+        GenericPlanStrategy<MetaPopulationPlan, Person> replan = new GenericPlanStrategy<MetaPopulationPlan, Person>() {
             ReplanningContext replanningContext;
 
             @Override
-            public void run(HasPlansAndId<MetaPopulationPlan> metaPopulation) {
+            public void run(HasPlansAndId<MetaPopulationPlan, Person> metaPopulation) {
                 MetaPopulationPlan selectedPlan = metaPopulation.getSelectedPlan();
                 Person person = new PersonImpl(new IdImpl("wurst"));
                 PlanImpl p0 = new PlanImpl();
@@ -69,7 +69,7 @@ class MetaPopulationReplanningControlerListener implements ReplanningListener {
                 p1.setScore(selectedPlan.getScore());
                 person.addPlan(p1);
 
-                double newScaleFactor = selectedPlan.getScaleFactor() * (ExpBetaPlanSelector.getSelectionProbability(new ExpBetaPlanSelector<Plan>(1.0), person, p1) / 0.5);
+                double newScaleFactor = selectedPlan.getScaleFactor() * (ExpBetaPlanSelector.getSelectionProbability(new ExpBetaPlanSelector<Plan, Person>(1.0), person, p1) / 0.5);
                 if (replanningContext.getIteration() < 25) {
                     newScaleFactor += Math.random() * 0.1 - 0.05;
                 }

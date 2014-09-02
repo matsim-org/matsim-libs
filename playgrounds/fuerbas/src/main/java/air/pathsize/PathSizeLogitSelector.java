@@ -72,7 +72,7 @@ public final class PathSizeLogitSelector implements PlanSelector {
 	}
 	
 	@Override
-	public Plan selectPlan(final HasPlansAndId<Plan> person) {
+	public Plan selectPlan(final HasPlansAndId<Plan, Person> person) {
 		double maxScore = checkPlansScoreAndGetMaxScore(person);
 		List<PSLPlanData> planDatasets = createPlanIdList(person.getPlans());
 		Map<String, List<PSLPlanData>> plansByMainMode = sortPlansByMainMode(planDatasets);
@@ -170,7 +170,7 @@ public final class PathSizeLogitSelector implements PlanSelector {
 		return l;
 	}
 
-	private double checkPlansScoreAndGetMaxScore(final HasPlansAndId<Plan> person) {
+	private double checkPlansScoreAndGetMaxScore(final HasPlansAndId<Plan, Person> person) {
 		double maxScore = Double.NEGATIVE_INFINITY;
 		for (Plan plan : person.getPlans()){
 			if (plan.getScore() == null || 

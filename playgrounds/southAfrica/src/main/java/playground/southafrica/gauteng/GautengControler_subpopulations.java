@@ -23,8 +23,6 @@
 package playground.southafrica.gauteng;
 
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,8 +30,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -43,34 +39,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.SimStepParallelEventsManagerImpl;
-import org.matsim.core.events.SynchronizedEventsManagerImpl;
-import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
-import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
-import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
-import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.PlanStrategy;
@@ -78,7 +52,6 @@ import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.selectors.AbstractPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -262,7 +235,7 @@ public class GautengControler_subpopulations {
 		controler.addPlanStrategyFactory(RE_ROUTE_AND_SET_VEHICLE, new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(final Scenario scenario, EventsManager eventsManager) {
-				PlanStrategyImpl planStrategy = new PlanStrategyImpl( new RandomPlanSelector<Plan>() ) ; 
+				PlanStrategyImpl planStrategy = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() ) ; 
 				planStrategy.addStrategyModule( new ReRoute( scenario ) ); 
 				planStrategy.addStrategyModule( new SetVehicleInAllNetworkRoutes(scenario));
 				return planStrategy ;

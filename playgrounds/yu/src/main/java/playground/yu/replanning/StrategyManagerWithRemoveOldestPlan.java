@@ -45,7 +45,7 @@ public class StrategyManagerWithRemoveOldestPlan extends StrategyManager {
 	public static class OldestPlanForRemovalSelector implements PlanSelector {
 
 		@Override
-		public Plan selectPlan(HasPlansAndId<Plan> person) {
+		public Plan selectPlan(HasPlansAndId<Plan, Person> person) {
 			HashMap<String, Integer> typeCounts = new HashMap<String, Integer>();
 
 			List<? extends Plan> plans = person.getPlans();

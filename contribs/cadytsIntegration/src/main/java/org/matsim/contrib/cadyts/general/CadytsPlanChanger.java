@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
@@ -48,7 +47,7 @@ public class CadytsPlanChanger<T> implements PlanSelector {
 	}
 	
 	@Override
-	public Plan selectPlan(final HasPlansAndId<Plan> person) {
+	public Plan selectPlan(final HasPlansAndId<Plan, Person> person) {
 		final Plan currentPlan = person.getSelectedPlan();
 		if (person.getPlans().size() <= 1 || currentPlan.getScore() == null) {
 			return currentPlan;
@@ -57,7 +56,7 @@ public class CadytsPlanChanger<T> implements PlanSelector {
 		// random plan:
 		Plan otherPlan = null;
 		do {
-			otherPlan = new RandomPlanSelector<Plan>().selectPlan(((PersonImpl) person));
+			otherPlan = new RandomPlanSelector<Plan, Person>().selectPlan((person));
 		} while (otherPlan == currentPlan);
 
 		if (otherPlan.getScore() == null) {

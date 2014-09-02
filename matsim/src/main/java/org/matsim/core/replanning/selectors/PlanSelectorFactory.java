@@ -25,8 +25,8 @@ package org.matsim.core.replanning.selectors;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.BasicPlan;
 
-public interface PlanSelectorFactory<T extends BasicPlan> {
+public interface PlanSelectorFactory<T extends BasicPlan, I> {
 
-    public GenericPlanSelector<T> createPlanSelector(Scenario scenario);
+    public GenericPlanSelector<T, I> createPlanSelector(Scenario scenario);
 
 }

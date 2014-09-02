@@ -165,7 +165,7 @@ public class RunNationalFreight {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario,
 					EventsManager eventsManager) {
-				PlanStrategyImpl strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan>() );
+				PlanStrategyImpl strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() );
 				strategy.addStrategyModule(new NewDigicorePlanStrategyModule());
 				return strategy;
 			}

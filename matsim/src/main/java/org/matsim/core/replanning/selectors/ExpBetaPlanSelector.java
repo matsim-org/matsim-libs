@@ -20,14 +20,14 @@
 
 package org.matsim.core.replanning.selectors;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Selects one of the existing plans of the person based on the
@@ -35,7 +35,7 @@ import java.util.Map;
  *
  * @author mrieser
  */
-public class ExpBetaPlanSelector<T extends BasicPlan> implements GenericPlanSelector<T>{
+public class ExpBetaPlanSelector<T extends BasicPlan, I> implements GenericPlanSelector<T, I>{
 
 	protected static final double MIN_WEIGHT = Double.MIN_VALUE;
 	protected final double beta;
@@ -52,7 +52,7 @@ public class ExpBetaPlanSelector<T extends BasicPlan> implements GenericPlanSele
 	 * @return a random plan from the person, random but according to its weight.
 	 */
 	@Override
-	public T selectPlan(final HasPlansAndId<T> person) {
+	public T selectPlan(final HasPlansAndId<T, I> person) {
 
 		// get the weights of all plans
 		Map<T, Double> weights = this.calcWeights(person);
@@ -103,7 +103,7 @@ public class ExpBetaPlanSelector<T extends BasicPlan> implements GenericPlanSele
 	 *
 	 * @return a map containing the weights of all plans
 	 */
-	Map<T, Double> calcWeights(final HasPlansAndId<T> person) {
+	Map<T, Double> calcWeights(final HasPlansAndId<T, ?> person) {
 
 		// - first find the max. score of all plans of this person
 		double maxScore = Double.NEGATIVE_INFINITY;
@@ -129,7 +129,7 @@ public class ExpBetaPlanSelector<T extends BasicPlan> implements GenericPlanSele
     /**
      * @return the probability that this expBetaPlanSelector will select this plan for this person.
      */
-	public static <T extends BasicPlan> double getSelectionProbability(ExpBetaPlanSelector<T> expBetaPlanSelector, HasPlansAndId<T> person, final T plan) {
+	public static <T extends BasicPlan, I> double getSelectionProbability(ExpBetaPlanSelector<T, I> expBetaPlanSelector, HasPlansAndId<T, ?> person, final T plan) {
 		Map<T, Double> weights = expBetaPlanSelector.calcWeights(person);
 		double thisWeight = weights.get(plan);
 

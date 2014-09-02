@@ -55,7 +55,7 @@ import playground.johannes.sna.util.ProgressLogger;
  * @author johannes
  *
  */
-public class ActivityLocationStrategy implements GenericPlanStrategy<Plan> {
+public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Person> {
 	
 //	private static final Logger logger = Logger.getLogger(ActivityLocationStrategy.class);
 
@@ -86,7 +86,7 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan> {
 	}
 	
 	@Override
-	public void run(HasPlansAndId<Plan> person) {
+	public void run(HasPlansAndId<Plan, Person> person) {
 		Task task = new Task((Person) person);
 		Future<?> future = executor.submit(task);
 		futures.add(future);
@@ -162,6 +162,7 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan> {
 		routers.add(router);
 	}
 	
+	@Override
 	protected void finalize() {
 		executor.shutdown();
 	}
@@ -209,7 +210,7 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan> {
 					ActivityFacility target = newFac;
 					// does this always instantiate a new trip router?
 					Leg toLeg = (Leg) plan.getPlanElements().get(idx-1);
-					List<? extends PlanElement> stages = router.calcRoute(toLeg.getMode(), source, target, prev.getEndTime(), (Person) person);
+					List<? extends PlanElement> stages = router.calcRoute(toLeg.getMode(), source, target, prev.getEndTime(), person);
 					if(stages.size() > 1) {
 						throw new UnsupportedOperationException();
 					}
@@ -223,7 +224,7 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan> {
 					ActivityFacility target = facilities.getFacilities().get(next.getFacilityId());
 					ActivityFacility source = newFac;
 					Leg fromLeg = (Leg) plan.getPlanElements().get(idx+1);
-					List<? extends PlanElement> stages = router.calcRoute(fromLeg.getMode(), source, target, act.getEndTime(), (Person) person);
+					List<? extends PlanElement> stages = router.calcRoute(fromLeg.getMode(), source, target, act.getEndTime(), person);
 					if(stages.size() > 1) {
 						throw new UnsupportedOperationException();
 					}

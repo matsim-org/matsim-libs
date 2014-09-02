@@ -65,9 +65,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import playground.johannes.coopsim.analysis.ActivityDurationTask;
 import playground.johannes.coopsim.analysis.ActivityLoadTask;
 import playground.johannes.coopsim.analysis.ArrivalLoadTask;
-import playground.johannes.coopsim.analysis.ArrivalTimeTask;
 import playground.johannes.coopsim.analysis.DepartureLoadTask;
-import playground.johannes.coopsim.analysis.LegFrequencyTask;
 import playground.johannes.coopsim.analysis.LegLoadTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
@@ -76,7 +74,6 @@ import playground.johannes.coopsim.analysis.TripDistanceTask;
 import playground.johannes.coopsim.analysis.TripDurationTask;
 import playground.johannes.coopsim.analysis.TripPurposeShareTask;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
-import playground.johannes.gsv.analysis.ModeShareTask;
 import playground.johannes.gsv.analysis.PkmTask;
 import playground.johannes.gsv.analysis.ScoreTask;
 import playground.johannes.gsv.analysis.SpeedFactorTask;
@@ -114,16 +111,16 @@ public class Simulator {
 		
 	}
 	
-	private static class SelectorFactory implements PlanSelectorFactory<Plan> {
+	private static class SelectorFactory implements PlanSelectorFactory<Plan, Person> {
 
-		private ExpBetaPlanSelector<Plan> instance;
+		private ExpBetaPlanSelector<Plan, Person> instance;
 		/* (non-Javadoc)
 		 * @see org.matsim.core.replanning.selectors.PlanSelectorFactory#createPlanSelector(org.matsim.api.core.v01.Scenario)
 		 */
 		@Override
-		public GenericPlanSelector<Plan> createPlanSelector(Scenario scenario) {
+		public GenericPlanSelector<Plan, Person> createPlanSelector(Scenario scenario) {
 			if(instance == null)
-				instance = new ExpBetaPlanSelector<Plan>(1.0);
+				instance = new ExpBetaPlanSelector<Plan, Person>(1.0);
 			
 			return instance;
 		}

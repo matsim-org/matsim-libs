@@ -22,6 +22,10 @@
 
 package playground.mzilske.stratum;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -34,11 +38,12 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.mzilske.cdr.*;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
+import playground.mzilske.cdr.CompareMain;
+import playground.mzilske.cdr.PopulationFromSightings;
+import playground.mzilske.cdr.Sightings;
+import playground.mzilske.cdr.SightingsImpl;
+import playground.mzilske.cdr.ZoneTracker;
 
 class ScenarioReconstructor implements Provider<Scenario> {
 
@@ -56,7 +61,8 @@ class ScenarioReconstructor implements Provider<Scenario> {
 
 
 
-    public Scenario get() {
+    @Override
+		public Scenario get() {
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
         scenario.setNetwork(network);
 
@@ -65,7 +71,7 @@ class ScenarioReconstructor implements Provider<Scenario> {
         PopulationFromSightings.preparePopulation(scenario, linkToZoneResolver, sightings);
 
         for (Person person : scenario.getPopulation().getPersons().values()) {
-            person.setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(person));
+            person.setSelectedPlan(new RandomPlanSelector<Plan, Person>().selectPlan(person));
         }
         return scenario;
     }
@@ -75,7 +81,8 @@ class ScenarioReconstructor implements Provider<Scenario> {
         @Inject @Named("outputDirectory")
         String outputDirectory;
 
-        public Config get() {
+        @Override
+				public Config get() {
             final Config config = ConfigUtils.createConfig();
             CadytsConfigGroup cadyts = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
             cadyts.setVarianceScale(0.00000000001);

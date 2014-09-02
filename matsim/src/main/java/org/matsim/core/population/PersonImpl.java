@@ -42,7 +42,7 @@ public class PersonImpl implements Person {
 	private final static Logger log = Logger.getLogger(PersonImpl.class);
 
 	protected List<Plan> plans = new ArrayList<Plan>(6);
-	protected Id id;
+	protected Id<Person> id;
 	private String sex;
 	private int age = Integer.MIN_VALUE;
 	private String hasLicense;
@@ -57,7 +57,7 @@ public class PersonImpl implements Person {
 	private Customizable customizableDelegate;
 
 	@Deprecated // please try to use the factory: pop.getFactory().create...
-	public PersonImpl(final Id id) {
+	public PersonImpl(final Id<Person> id) {
 		this.id = id;
 	}
 
@@ -115,7 +115,7 @@ public class PersonImpl implements Person {
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Person> getId() {
 		return this.id;
 	}
 
@@ -236,7 +236,7 @@ public class PersonImpl implements Person {
 	public boolean removePlan(final Plan plan) {
 		boolean result = this.getPlans().remove(plan);
 		if ((this.getSelectedPlan() == plan) && result) {
-			this.setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(this));
+			this.setSelectedPlan(new RandomPlanSelector<Plan, Person>().selectPlan(this));
 		}
 		return result;
 	}

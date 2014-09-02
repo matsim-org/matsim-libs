@@ -20,6 +20,7 @@
 package playground.mzilske.teach;
 
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
@@ -27,7 +28,6 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.KeepSelected;
-import org.matsim.core.replanning.selectors.PlanSelector;
 
 
 public class ChangeActivityTimesStrategy implements PlanStrategy {
@@ -72,7 +72,7 @@ public class ChangeActivityTimesStrategy implements PlanStrategy {
 	}
 
 	@Override
-	public void run(HasPlansAndId<Plan> person) {
+	public void run(HasPlansAndId<Plan, Person> person) {
 		planStrategyDelegate.run(person);
 	}
 

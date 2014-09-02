@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
-import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -152,11 +152,11 @@ ControlerListener {
 
 		//List<GenericPlanStrategy<Plan>> strategies = stratMan.getStrategiesOfDefaultSubpopulation();
 
-		List<GenericPlanStrategy<Plan>> strategies = stratMan.getStrategies(null);
+		List<GenericPlanStrategy<Plan, Person>> strategies = stratMan.getStrategies(null);
 
 		double totalWeights = 0.0;
 		double totalSelectorWeights = 0.0;
-		for (GenericPlanStrategy<Plan> strategy : strategies) {
+		for (GenericPlanStrategy<Plan, Person> strategy : strategies) {
 			// first read off the weights of the strategies and classify them
 			String strategyName = strategy.toString().toLowerCase();
 
@@ -181,7 +181,7 @@ ControlerListener {
 		//				/ ((totalWeights - totalSelectorWeights) / totalWeights);
 		String outputToWrite = "\t" + event.getIteration() + "\t" + currentIter
 				+ "\t" + proportion;
-		for (GenericPlanStrategy<Plan> strategy : strategies) {
+		for (GenericPlanStrategy<Plan, Person> strategy : strategies) {
 			// first read off the weights of the strategies and classify them
 			String strategyName = strategy.toString().toLowerCase();
 			//	double weight = stratMan.getWeightsOfDefaultSubpopulation().get(
@@ -255,7 +255,7 @@ ControlerListener {
 		return innovationStop;
 	}
 
-	private void writeReplanningRates(List<GenericPlanStrategy<Plan>> strategies) {
+	private void writeReplanningRates(List<GenericPlanStrategy<Plan, Person>> strategies) {
 
 		String fileName = config.controler().getOutputDirectory() + "/replanningRates.csv";
 		File file = new File(fileName);
@@ -265,7 +265,7 @@ ControlerListener {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 
 			String header = "it";
-			for (GenericPlanStrategy<Plan> strategy : strategies) {
+			for (GenericPlanStrategy<Plan, Person> strategy : strategies) {
 				header = header + "\t"+strategy.toString().toLowerCase();
 			}
 			bw.write(header);

@@ -20,6 +20,7 @@
 package playground.yu.replanning;
 
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
@@ -66,6 +67,7 @@ public class ReRouteSelected implements PlanStrategy {
 		planStrategyDelegate.addStrategyModule(module);
 	}
 
+	@Override
 	public void finish() {
 		planStrategyDelegate.finish();
 	}
@@ -74,14 +76,17 @@ public class ReRouteSelected implements PlanStrategy {
 		return planStrategyDelegate.getNumberOfStrategyModules();
 	}
 
+	@Override
 	public void init(ReplanningContext replanningContext) {
 		planStrategyDelegate.init(replanningContext);
 	}
 
-	public void run(HasPlansAndId<Plan> person) {
+	@Override
+	public void run(HasPlansAndId<Plan, Person> person) {
 		planStrategyDelegate.run(person);
 	}
 
+	@Override
 	public String toString() {
 		return planStrategyDelegate.toString();
 	}

@@ -20,12 +20,13 @@
 
 package org.matsim.core.replanning.selectors;
 
-import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PlanImpl;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.PlanImpl;
 
 /**
  * <p>Selects the worst plan of a person (most likely for removal), but respects
@@ -38,12 +39,12 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author mrieser
  */
-public class WorstPlanForRemovalSelector implements GenericPlanSelector<Plan> {
+public class WorstPlanForRemovalSelector implements GenericPlanSelector<Plan, Person> {
 
 	private static final String UNDEFINED_TYPE = "undefined";
 
 	@Override
-	public Plan selectPlan(HasPlansAndId<Plan> person) {
+	public Plan selectPlan(HasPlansAndId<Plan, Person> person) {
 
 		// hashmap that returns "Integer" count for given plans type:
 		Map<String, Integer> typeCounts = new ConcurrentHashMap<String, Integer>();

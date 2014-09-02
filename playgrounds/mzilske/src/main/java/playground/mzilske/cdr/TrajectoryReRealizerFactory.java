@@ -22,7 +22,10 @@
 
 package playground.mzilske.cdr;
 
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
@@ -31,8 +34,6 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-import javax.inject.Inject;
-
 public class TrajectoryReRealizerFactory implements PlanStrategyFactory {
 
     @Inject
@@ -40,7 +41,7 @@ public class TrajectoryReRealizerFactory implements PlanStrategyFactory {
 
     @Override
     public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-        PlanStrategyImpl planStrategy = new PlanStrategyImpl(new RandomPlanSelector<Plan>());
+        PlanStrategyImpl planStrategy = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
         planStrategy.addStrategyModule(trajectoryReRealizer);
         planStrategy.addStrategyModule(new ReRoute(scenario));
         return planStrategy;

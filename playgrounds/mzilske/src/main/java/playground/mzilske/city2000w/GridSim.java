@@ -189,14 +189,14 @@ public class GridSim {
 //		CarrierReplanningStrategy vra = defineAndCreateVehicleRoutingAlgorithm(scenario.getNetwork(),vehicleTypes);
 //		strategyManager.addStrategy(vra, 1.0);
 		
-		final GenericStrategyManager<CarrierPlan> strategyManager = new GenericStrategyManager<CarrierPlan>() ;
-		GenericPlanStrategy<CarrierPlan> vra = defineAndCreateVehicleRoutingAlgorithm( scenario.getNetwork(), vehicleTypes ) ;
+		final GenericStrategyManager<CarrierPlan, Carrier> strategyManager = new GenericStrategyManager<CarrierPlan, Carrier>() ;
+		GenericPlanStrategy<CarrierPlan, Carrier> vra = defineAndCreateVehicleRoutingAlgorithm( scenario.getNetwork(), vehicleTypes ) ;
 		strategyManager.addStrategy( vra, null, 1.0 ) ;
 		
 		CarrierPlanStrategyManagerFactory strategyManagerFactory = new CarrierPlanStrategyManagerFactory() {
 			
 			@Override
-			public GenericStrategyManager<CarrierPlan> createStrategyManager() {
+			public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {
 				return strategyManager;
 			}
 		};
@@ -211,8 +211,8 @@ public class GridSim {
 		matsimController.run();
 	}
 
-	private static GenericPlanStrategy<CarrierPlan> defineAndCreateVehicleRoutingAlgorithm(final Network network, final CarrierVehicleTypes vehicleTypes) {
-		GenericPlanStrategyImpl<CarrierPlan> vra = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ; 
+	private static GenericPlanStrategy<CarrierPlan, Carrier> defineAndCreateVehicleRoutingAlgorithm(final Network network, final CarrierVehicleTypes vehicleTypes) {
+		GenericPlanStrategyImpl<CarrierPlan, Carrier> vra = new GenericPlanStrategyImpl<CarrierPlan, Carrier>( new BestPlanSelector<CarrierPlan, Carrier>() ) ; 
 		
 		GenericPlanStrategyModule<CarrierPlan> vraModule = new GenericPlanStrategyModule<CarrierPlan>() {
 			

@@ -31,12 +31,12 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
  *
  * @author mrieser
  */
-public class GenericWorstPlanForRemovalSelector<T extends BasicPlan> implements GenericPlanSelector<T> {
+public class GenericWorstPlanForRemovalSelector<T extends BasicPlan, I> implements GenericPlanSelector<T, I> {
 
     private static final String UNDEFINED_TYPE = "undefined";
 
     @Override
-    public T selectPlan(HasPlansAndId<T> person) {
+    public T selectPlan(HasPlansAndId<T, I> person) {
 
         T worst = null;
         double worstScore = Double.POSITIVE_INFINITY;

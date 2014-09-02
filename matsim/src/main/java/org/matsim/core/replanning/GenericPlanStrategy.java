@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
  * @author nagel
  *
  */
-public interface GenericPlanStrategy<T extends BasicPlan> {
+public interface GenericPlanStrategy<T extends BasicPlan, I> {
 	/**
 	 * Adds a person to this strategy to be handled. It is not required that
 	 * the person is immediately handled during this method-call (e.g. when using
@@ -35,7 +35,7 @@ public interface GenericPlanStrategy<T extends BasicPlan> {
 	 * @param person
 	 * @see #finish()
 	 */
-	public void run(final HasPlansAndId<T> person);
+	public void run(final HasPlansAndId<T, I> person);
 
 	/**
 	 * Tells this strategy to initialize its modules. Called before a bunch of

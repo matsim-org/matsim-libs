@@ -31,9 +31,9 @@ import org.matsim.core.replanning.selectors.RandomUnscoredPlanSelector;
  * @author nagel
  *
  */
-public class GenericPlanStrategyImpl<T extends BasicPlan> implements GenericPlanStrategy<T> {
+public class GenericPlanStrategyImpl<T extends BasicPlan, I> implements GenericPlanStrategy<T, I> {
 
-	private GenericPlanSelector<T> planSelector = null;
+	private GenericPlanSelector<T, I> planSelector = null;
 	private GenericPlanStrategyModule<T> firstModule = null;
 	private final ArrayList<GenericPlanStrategyModule<T>> modules = new ArrayList<GenericPlanStrategyModule<T>>();
 	private final ArrayList<T> plans = new ArrayList<T>();
@@ -46,7 +46,7 @@ public class GenericPlanStrategyImpl<T extends BasicPlan> implements GenericPlan
 	 *
 	 * @param planSelector
 	 */
-	public GenericPlanStrategyImpl(final GenericPlanSelector<T> planSelector) {
+	public GenericPlanStrategyImpl(final GenericPlanSelector<T, I> planSelector) {
 		this.planSelector = planSelector;
 	}
 
@@ -66,12 +66,12 @@ public class GenericPlanStrategyImpl<T extends BasicPlan> implements GenericPlan
 	}
 	
 	@Override
-	public void run(final HasPlansAndId<T> person) {
+	public void run(final HasPlansAndId<T, I> person) {
 		this.counter++;
 		
 		// if there is at least one unscored plan, find that one:
 //		T plan = ((PersonImpl) person).getRandomUnscoredPlan();
-		T plan = new RandomUnscoredPlanSelector<T>().selectPlan(person) ;
+		T plan = new RandomUnscoredPlanSelector<T, I>().selectPlan(person) ;
 		
 		// otherwise, find one according to selector (often defined in PlanStrategy ctor):
 		if (plan == null) {
@@ -147,7 +147,7 @@ public class GenericPlanStrategyImpl<T extends BasicPlan> implements GenericPlan
 		return name.toString();
 	}
 
-	public GenericPlanSelector<T> getPlanSelector() {
+	public GenericPlanSelector<T, I> getPlanSelector() {
 		return planSelector;
 	}
 	

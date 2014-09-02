@@ -20,6 +20,7 @@
 
 package org.matsim.core.replanning.selectors;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
@@ -32,7 +33,7 @@ import org.matsim.core.population.PersonImpl;
 public class BestPlanSelectorTest extends AbstractPlanSelectorTest {
 
 	@Override
-	protected GenericPlanSelector<Plan> getPlanSelector() {
+	protected GenericPlanSelector<Plan, Person> getPlanSelector() {
 		return new BestPlanSelector();
 	}
 
@@ -56,7 +57,7 @@ public class BestPlanSelectorTest extends AbstractPlanSelectorTest {
 		plan = person.createAndAddPlan(false);
 		plan.setScore(-20.0);
 
-		GenericPlanSelector<Plan> selector = new BestPlanSelector<Plan>();
+		GenericPlanSelector<Plan, Person> selector = new BestPlanSelector<Plan, Person>();
 
 		plan = selector.selectPlan(person);
 		assertEquals(40.0, plan.getScore().doubleValue(), 0.0);

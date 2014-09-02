@@ -525,7 +525,7 @@ public class MultiModalDemo {
 					person.addPlan(plan);
 					if (legMode.equals(initialLegMode)) ((PersonImpl) person).setSelectedPlan(plan);
 				}
-				if (initialLegMode.equals(randomMode)) ((PersonImpl) person).setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(((PersonImpl) person)));				
+				if (initialLegMode.equals(randomMode)) ((PersonImpl) person).setSelectedPlan(new RandomPlanSelector<Plan, Person>().selectPlan((person)));				
 			} else {
 				if (initialLegMode.equals(randomMode)) {
 					String[] modes = CollectionUtils.stringToArray(legModes);
@@ -588,7 +588,7 @@ public class MultiModalDemo {
 			if(((PersonImpl) person).getSex().equals("m")) males++;
 			else females++;
 			
-			Leg leg = (Leg) new BestPlanSelector<Plan>().selectPlan(((PersonImpl) person)).getPlanElements().get(1);
+			Leg leg = (Leg) new BestPlanSelector<Plan, Person>().selectPlan((person)).getPlanElements().get(1);
 			if (leg.getMode().equals(TransportMode.car)) car++;
 			else nonCar++;
 			
@@ -694,7 +694,7 @@ public class MultiModalDemo {
 			travelTimes.put(TransportMode.bike, bikeTravelTime);
 			travelTimes.put(TransportMode.walk, walkTravelTime);
 			
-			for (GenericPlanStrategy<Plan> planStrategy : this.strategyManager.getStrategiesOfDefaultSubpopulation()) {
+			for (GenericPlanStrategy<Plan, Person> planStrategy : this.strategyManager.getStrategiesOfDefaultSubpopulation()) {
 				if (planStrategy instanceof ChooseBestLegModePlanStrategy) {
 					((ChooseBestLegModePlanStrategy) planStrategy).setWaitToLinkCalculator(waitToLinkCalculator);
 					((ChooseBestLegModePlanStrategy) planStrategy).setTravelTimes(travelTimes);

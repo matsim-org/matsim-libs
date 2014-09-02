@@ -20,6 +20,7 @@
 package playground.pieter.pseudosimulation.replanning.selectors;
 
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
@@ -29,10 +30,10 @@ import playground.pieter.pseudosimulation.replanning.PSimPlanStrategyTranslation
  * @author fouriep
  * Plan selector for PSim. See {@link PSimPlanStrategyTranslationAndRegistration}.
  */
-public class PSimRandomPlanSelector extends RandomPlanSelector<Plan> {
+public class PSimRandomPlanSelector extends RandomPlanSelector<Plan, Person> {
 
 	@Override
-	public Plan selectPlan(HasPlansAndId<Plan> person) {
+	public Plan selectPlan(HasPlansAndId<Plan, Person> person) {
 		if (MobSimSwitcher.isQSimIteration)
 			return super.selectPlan(person);
 		else

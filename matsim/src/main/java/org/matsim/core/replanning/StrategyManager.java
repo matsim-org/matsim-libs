@@ -20,14 +20,14 @@
 
 package org.matsim.core.replanning;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
-
-import java.util.List;
 
 /**
  * Manages and applies strategies to agents for re-planning.
@@ -37,13 +37,13 @@ import java.util.List;
  */
 public class StrategyManager implements MatsimManager {
 
-	protected final GenericStrategyManager<Plan> delegate;
+	protected final GenericStrategyManager<Plan, Person> delegate;
 
 	public StrategyManager() {
-		this.delegate = new GenericStrategyManager<Plan>();
+		this.delegate = new GenericStrategyManager<Plan, Person>();
 	}
 
-	public StrategyManager(GenericStrategyManager<Plan> delegate) {
+	public StrategyManager(GenericStrategyManager<Plan, Person> delegate) {
 		this.delegate = delegate;
 	}
 
@@ -100,7 +100,7 @@ public class StrategyManager implements MatsimManager {
 
 	@Deprecated
 	public final boolean changeWeightOfStrategyForDefaultSubpopulation(
-			final GenericPlanStrategy<Plan> strategy,
+			final GenericPlanStrategy<Plan, Person> strategy,
 			final double newWeight) {
 		return changeWeightOfStrategy( strategy , null , newWeight );
 	}
@@ -114,7 +114,7 @@ public class StrategyManager implements MatsimManager {
 	 * 		be changed successfully, false otherwise.
 	 */
 	public final boolean changeWeightOfStrategy(
-			final GenericPlanStrategy<Plan> strategy,
+			final GenericPlanStrategy<Plan, Person> strategy,
 			final String subpopulation,
 			final double newWeight) {
 		return delegate.changeWeightOfStrategy(strategy, subpopulation, newWeight) ;
@@ -163,8 +163,8 @@ public class StrategyManager implements MatsimManager {
 	 * @param person The person for which the strategy should be chosen
 	 * @return the chosen strategy
 	 */
-	public GenericPlanStrategy<Plan> chooseStrategy(final Person person, final String subpopulation) {
-		return delegate.chooseStrategy(subpopulation) ;
+	public GenericPlanStrategy<Plan, Person> chooseStrategy(final Person person, final String subpopulation) {
+		return delegate.chooseStrategy(subpopulation);
 	}
 
 	/**
@@ -234,16 +234,16 @@ public class StrategyManager implements MatsimManager {
 	 *
 	 * @see #setMaxPlansPerAgent(int)
 	 */
-	public final void setPlanSelectorForRemoval(final GenericPlanSelector<Plan> planSelector) {
+	public final void setPlanSelectorForRemoval(final GenericPlanSelector<Plan, Person> planSelector) {
 		delegate.setPlanSelectorForRemoval(planSelector);
 	}
 
 	@Deprecated
-	public final List<GenericPlanStrategy<Plan>> getStrategiesOfDefaultSubpopulation() {
+	public final List<GenericPlanStrategy<Plan, Person>> getStrategiesOfDefaultSubpopulation() {
 		return getStrategies( null );
 	}
 
-	public final List<GenericPlanStrategy<Plan>> getStrategies( final String subpopulation ) {
+	public final List<GenericPlanStrategy<Plan, Person>> getStrategies( final String subpopulation ) {
 		return delegate.getStrategies(subpopulation) ;
 	}
 

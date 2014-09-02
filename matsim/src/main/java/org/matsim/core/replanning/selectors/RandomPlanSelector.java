@@ -30,14 +30,14 @@ import org.matsim.core.gbl.MatsimRandom;
  *
  * @author mrieser
  */
-public class RandomPlanSelector<T extends BasicPlan> implements GenericPlanSelector<T> {
+public class RandomPlanSelector<T extends BasicPlan, I> implements GenericPlanSelector<T, I> {
 
 	/**
 	 * Choose a random plan from the person and return it.
 	 * @return The newly selected plan for this person; <code>null</code> if the person has no plans.
 	 */
 	@Override
-	public T selectPlan(final HasPlansAndId<T> person) {
+	public T selectPlan(final HasPlansAndId<T, I> person) {
 		// this used to use person.getRandomPlan(), but I inlined the function here in order to get rid of the function of the data class.
 		// kai, nov'13
 		if (person.getPlans().size() == 0) {

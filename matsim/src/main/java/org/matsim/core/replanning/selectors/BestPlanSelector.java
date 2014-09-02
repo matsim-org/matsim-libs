@@ -28,13 +28,13 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
  *
  * @author mrieser
  */
-public class BestPlanSelector<T extends BasicPlan> implements GenericPlanSelector<T> {
+public class BestPlanSelector<T extends BasicPlan, I> implements GenericPlanSelector<T, I> {
 
 	/**
 	 * selects the plan with the highest score from the person
 	 */
 	@Override
-	public T selectPlan(final HasPlansAndId<T> person) {
+	public T selectPlan(final HasPlansAndId<T, I> person) {
 
 		double maxScore = Double.NEGATIVE_INFINITY;
 		T bestPlan = null;

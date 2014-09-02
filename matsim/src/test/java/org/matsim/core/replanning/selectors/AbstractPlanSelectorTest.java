@@ -21,6 +21,7 @@
 package org.matsim.core.replanning.selectors;
 
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
@@ -49,7 +50,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 */
 	public void testUndefinedScore() {
 		PersonImpl person;
-		GenericPlanSelector<Plan> selector = getPlanSelector();
+		GenericPlanSelector<Plan, Person> selector = getPlanSelector();
 		PlanImpl plan;
 
 		// test 1: exactly one plan, with undefined score
@@ -100,7 +101,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testNegativeScore() {
-		GenericPlanSelector<Plan> selector = getPlanSelector();
+		GenericPlanSelector<Plan, Person> selector = getPlanSelector();
 		PlanImpl plan;
 		// test with only one plan...
 		PersonImpl person = new PersonImpl(new IdImpl(1));
@@ -138,7 +139,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 * This test only ensures that a plan is returned and no Exception occurred when selecting a plan.
 	 */
 	public void testZeroScore() {
-		GenericPlanSelector<Plan> selector = getPlanSelector();
+		GenericPlanSelector<Plan, Person> selector = getPlanSelector();
 		PlanImpl plan;
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		plan = person.createAndAddPlan(false);
@@ -149,6 +150,6 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	/**
 	 * @return A new instance of a specific implementation of {@link PlanSelector} for testing.
 	 */
-	protected abstract GenericPlanSelector<Plan> getPlanSelector();
+	protected abstract GenericPlanSelector<Plan, Person> getPlanSelector();
 	
 }

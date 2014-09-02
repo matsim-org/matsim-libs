@@ -18,17 +18,28 @@
  * *********************************************************************** */
 package playground.southafrica.kai.freight;
 
+import java.util.Collection;
+
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import jsprit.core.algorithm.box.SchrimpfFactory;
 import jsprit.core.problem.VehicleRoutingProblem;
 import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import jsprit.core.util.Solutions;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
+import org.matsim.contrib.freight.carrier.CarrierService;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
+import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierControlerListener;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
@@ -66,8 +77,6 @@ import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-
-import java.util.Collection;
 
 /**
  * @author nagel
@@ -266,30 +275,30 @@ public class KNFreight4 {
 	private static CarrierPlanStrategyManagerFactory createMyStrategyManager(final Scenario scenario, final Controler controler) {
 			return new CarrierPlanStrategyManagerFactory() {
 				@Override
-				public GenericStrategyManager<CarrierPlan> createStrategyManager() {
+				public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {
 					TravelTime travelTimes = controler.getLinkTravelTimes() ;
 					TravelDisutility travelDisutility = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility( 
 							travelTimes , scenario.getConfig().planCalcScore() );
 					LeastCostPathCalculator router = controler.getLeastCostPathCalculatorFactory().createPathCalculator(scenario.getNetwork(), 
 							travelDisutility, travelTimes) ;
 					
-					GenericStrategyManager<CarrierPlan> mgr = new GenericStrategyManager<CarrierPlan>() ;
+					GenericStrategyManager<CarrierPlan, Carrier> mgr = new GenericStrategyManager<CarrierPlan, Carrier>() ;
 					{	
-						GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>(new RandomPlanSelector<CarrierPlan>()) ;
+						GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<CarrierPlan, Carrier>(new RandomPlanSelector<CarrierPlan, Carrier>()) ;
 						GenericPlanStrategyModule<CarrierPlan> module = new ReRouteVehicles( router, scenario.getNetwork(), travelTimes ) ;
 						strategy.addStrategyModule(module);
 						mgr.addStrategy(strategy, null, 0.1);
 						mgr.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, null, 0.);
 					}
 					{
-						GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
+						GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<CarrierPlan, Carrier>( new BestPlanSelector<CarrierPlan, Carrier>() ) ;
 						GenericPlanStrategyModule<CarrierPlan> module = new TimeAllocationMutator() ;
 						strategy.addStrategyModule(module);
 						mgr.addStrategy(strategy, null, 0.9 );
 						mgr.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, null, 0. );
 					}
 					{
-						GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
+						GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<CarrierPlan, Carrier>( new BestPlanSelector<CarrierPlan, Carrier>() ) ;
 						mgr.addStrategy( strategy, null, 0.01 ) ;
 					}
 					return mgr ;

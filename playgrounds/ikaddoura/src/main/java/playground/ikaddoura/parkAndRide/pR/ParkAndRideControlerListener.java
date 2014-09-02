@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
@@ -129,32 +130,32 @@ public class ParkAndRideControlerListener implements StartupListener {
 	public void notifyStartup(StartupEvent event) {
 		event.getControler().getEvents().addHandler(adaptiveControl);
 		
-		PlanStrategyImpl_workNoPRseq strategyAddPR = new PlanStrategyImpl_workNoPRseq(new RandomPlanSelector<Plan>()); // only for plans with at least one home-work-home sequence without park-and-ride
+		PlanStrategyImpl_workNoPRseq strategyAddPR = new PlanStrategyImpl_workNoPRseq(new RandomPlanSelector<Plan, Person>()); // only for plans with at least one home-work-home sequence without park-and-ride
 		strategyAddPR.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
 		strategyAddPR.addStrategyModule(new ParkAndRideAddStrategy(controler, id2prFacility, personId2prWeights, gravity)); // adds P+R to a randomly chosen home-work-home sequence
 		strategyAddPR.addStrategyModule(new ReRoute(controler.getScenario()));
 		
-		PlanStrategyImpl_parkAndRide strategyChangeLocation = new PlanStrategyImpl_parkAndRide(new RandomPlanSelector<Plan>()); // only for plans with at least one home-work-home sequence with park-and-ride
+		PlanStrategyImpl_parkAndRide strategyChangeLocation = new PlanStrategyImpl_parkAndRide(new RandomPlanSelector<Plan, Person>()); // only for plans with at least one home-work-home sequence with park-and-ride
 		strategyChangeLocation.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
 		strategyChangeLocation.addStrategyModule(new ParkAndRideChangeLocationStrategy(controler, id2prFacility, personId2prWeights, gravity)); // change the P+R location of a randomly chosen home-work-home sequence
 		strategyChangeLocation.addStrategyModule(new ReRoute(controler.getScenario()));
 		
-		PlanStrategyImpl_parkAndRide strategyTimeAllocation = new PlanStrategyImpl_parkAndRide(new RandomPlanSelector<Plan>()); // only for plans with at least one home-work-home sequence with park-and-ride
+		PlanStrategyImpl_parkAndRide strategyTimeAllocation = new PlanStrategyImpl_parkAndRide(new RandomPlanSelector<Plan, Person>()); // only for plans with at least one home-work-home sequence with park-and-ride
 		strategyTimeAllocation.addStrategyModule(new ParkAndRideTimeAllocationMutator(controler.getConfig())); // TimeAllocation, not changing "parkAndRide" and "pt interaction"
 		strategyTimeAllocation.addStrategyModule(new ReRoute(controler.getScenario()));
 		
-		PlanStrategyImpl_workNoPRseq strategyRemovePR = new PlanStrategyImpl_workNoPRseq(new RandomPlanSelector<Plan>()); // only for plans with at least one home-work-home sequence without park-and-ride
+		PlanStrategyImpl_workNoPRseq strategyRemovePR = new PlanStrategyImpl_workNoPRseq(new RandomPlanSelector<Plan, Person>()); // only for plans with at least one home-work-home sequence without park-and-ride
 		strategyRemovePR.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
 		strategyRemovePR.addStrategyModule(new ParkAndRideRemoveStrategy(controler)); // removes P+R from a randomly chosen home-work-home sequence
 		strategyRemovePR.addStrategyModule(new ReRoute(controler.getScenario()));
 		
-		PlanStrategyImpl_workNoPRseq strategyAddPRTimeAllocation = new PlanStrategyImpl_workNoPRseq(new RandomPlanSelector<Plan>()); // only for plans with at least one home-work-home sequence without park-and-ride
+		PlanStrategyImpl_workNoPRseq strategyAddPRTimeAllocation = new PlanStrategyImpl_workNoPRseq(new RandomPlanSelector<Plan, Person>()); // only for plans with at least one home-work-home sequence without park-and-ride
 		strategyAddPRTimeAllocation.addStrategyModule(new TripTimeAllocationMutator(controler.getConfig()));
 		strategyAddPRTimeAllocation.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
 		strategyAddPRTimeAllocation.addStrategyModule(new ParkAndRideAddStrategy(controler, id2prFacility, personId2prWeights, gravity)); // adds a P+R to a randomly chosen home-work-home sequence
 		strategyAddPRTimeAllocation.addStrategyModule(new ReRoute(controler.getScenario()));
 		
-		PlanStrategyImpl_work strategyReRoute = new PlanStrategyImpl_work(new RandomPlanSelector<Plan>()); // only for plans with home and work activities (with and without park-and-ride)
+		PlanStrategyImpl_work strategyReRoute = new PlanStrategyImpl_work(new RandomPlanSelector<Plan, Person>()); // only for plans with home and work activities (with and without park-and-ride)
 		strategyReRoute.addStrategyModule(new ReRoute(controler.getScenario()));
 		
 		StrategyManager manager = this.controler.getStrategyManager() ;

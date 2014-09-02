@@ -36,7 +36,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.RandomUnscoredPlanSelector;
 
@@ -49,7 +48,7 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 	private static final Logger log = Logger
 			.getLogger(PlanStrategyReRoutePtFixedSubMode.class);
 	
-	private RandomPlanSelector<Plan> selector;
+	private RandomPlanSelector<Plan, Person> selector;
 	private List<Plan> plans;
 	private List<PlanStrategyModule> modules;
 	private Scenario sc;
@@ -81,9 +80,9 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 	}
 
 	@Override
-	public void run(HasPlansAndId<Plan> person) {
+	public void run(HasPlansAndId<Plan, Person> person) {
 		// try to score unscored plans anyway
-		Plan p = new RandomUnscoredPlanSelector<Plan>().selectPlan(((PersonImpl) person));
+		Plan p = new RandomUnscoredPlanSelector<Plan, Person>().selectPlan((person));
 		//otherwise get random plan
 		if(p == null){
 			p = this.selector.selectPlan(person);
@@ -135,7 +134,7 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 		this.plans.clear();
 	}
 
-	public GenericPlanSelector<Plan> getPlanSelector() {
+	public GenericPlanSelector<Plan, Person> getPlanSelector() {
 		return this.selector;
 	}
 

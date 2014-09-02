@@ -20,9 +20,11 @@
 package playground.pieter.pseudosimulation.replanning.selectors;
 
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
+
 import playground.pieter.pseudosimulation.controler.listeners.MobSimSwitcher;
 import playground.pieter.pseudosimulation.replanning.PSimPlanStrategyTranslationAndRegistration;
 
@@ -30,7 +32,7 @@ import playground.pieter.pseudosimulation.replanning.PSimPlanStrategyTranslation
  * @author fouriep Plan selector for PSim. See {@link PSimPlanStrategyTranslationAndRegistration}
  *         .
  */
-public class PSimExpBetaPlanSelector extends ExpBetaPlanSelector<Plan> {
+public class PSimExpBetaPlanSelector extends ExpBetaPlanSelector<Plan, Person> {
 
 	public PSimExpBetaPlanSelector(
 			PlanCalcScoreConfigGroup charyparNagelScoringConfigGroup) {
@@ -38,7 +40,7 @@ public class PSimExpBetaPlanSelector extends ExpBetaPlanSelector<Plan> {
 	}
 
 	@Override
-	public Plan selectPlan(HasPlansAndId<Plan> person) {
+	public Plan selectPlan(HasPlansAndId<Plan, Person> person) {
 		if (MobSimSwitcher.isQSimIteration)
 			return super.selectPlan(person);
 		else

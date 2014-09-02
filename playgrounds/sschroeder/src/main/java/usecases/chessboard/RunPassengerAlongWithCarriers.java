@@ -123,15 +123,15 @@ public class RunPassengerAlongWithCarriers {
         return new CarrierPlanStrategyManagerFactory() {
 
             @Override
-            public GenericStrategyManager<CarrierPlan> createStrategyManager() {
+            public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {
 
-                final GenericStrategyManager<CarrierPlan> strategyManager = new GenericStrategyManager<CarrierPlan>();
+                final GenericStrategyManager<CarrierPlan, Carrier> strategyManager = new GenericStrategyManager<CarrierPlan, Carrier>();
                 {
-                    GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>(new BestPlanSelector<CarrierPlan>());
+                    GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<CarrierPlan, Carrier>(new BestPlanSelector<CarrierPlan, Carrier>());
                     strategyManager.addStrategy(strategy, null, 0.95);
                 }
                 {
-                    GenericPlanStrategy<CarrierPlan> strategy =
+                    GenericPlanStrategy<CarrierPlan, Carrier> strategy =
                             new SelectBestPlanAndOptimizeItsVehicleRouteFactory(controler.getNetwork(), types, controler.getLinkTravelTimes()).createStrategy();
                     strategyManager.addStrategy(strategy, null, 0.05);
                 }

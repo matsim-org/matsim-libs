@@ -20,6 +20,7 @@
 package playground.thibautd.parknride.replanning;
 
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
@@ -51,7 +52,7 @@ public class ParkAndRideModeStrategy implements PlanStrategy {
 	}
 
 	@Override
-	public void run(final HasPlansAndId<Plan> person) {
+	public void run(final HasPlansAndId<Plan, Person> person) {
 		delegate.run(person);
 	}
 

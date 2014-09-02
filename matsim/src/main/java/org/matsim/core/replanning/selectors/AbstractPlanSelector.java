@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -34,9 +35,9 @@ import org.matsim.core.gbl.MatsimRandom;
 public abstract class AbstractPlanSelector implements PlanSelector {
 
 	@Override
-	public final Plan selectPlan(HasPlansAndId<Plan> person) {
+	public final Plan selectPlan(HasPlansAndId<Plan, Person> person) {
 		// First check if there are any unscored plans
-		Plan selectedPlan = new RandomUnscoredPlanSelector<Plan>().selectPlan(person);
+		Plan selectedPlan = new RandomUnscoredPlanSelector<Plan, Person>().selectPlan(person);
 		if (selectedPlan != null) return selectedPlan;
 		// Okay, no unscored plans...
 

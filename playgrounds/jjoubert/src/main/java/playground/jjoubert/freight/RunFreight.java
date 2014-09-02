@@ -76,14 +76,14 @@ final class RunFreight {
 		CarrierPlanStrategyManagerFactory strategyManagerFactory = new CarrierPlanStrategyManagerFactory() {
 
 			@Override
-			public GenericStrategyManager<CarrierPlan> createStrategyManager() {
+			public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {
 
-				GenericStrategyManager<CarrierPlan> strategyManager = new GenericStrategyManager<CarrierPlan>() ;
+				GenericStrategyManager<CarrierPlan, Carrier> strategyManager = new GenericStrategyManager<CarrierPlan, Carrier>() ;
 
 				/* Create a basic ReRouting module. */
 				TravelTime travelTime = controler.getLinkTravelTimes();
 				TravelDisutility travelCost = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility(travelTime, config.planCalcScore());
-				GenericPlanStrategyImpl<CarrierPlan> rerouteStrategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>()) ;
+				GenericPlanStrategyImpl<CarrierPlan, Carrier> rerouteStrategy = new GenericPlanStrategyImpl<CarrierPlan, Carrier>( new BestPlanSelector<CarrierPlan, Carrier>()) ;
 
 				LeastCostPathCalculator router = controler.getLeastCostPathCalculatorFactory().createPathCalculator(scenario.getNetwork(), travelCost, travelTime);
 				GenericPlanStrategyModule<CarrierPlan> rerouteModule = new ReRouteVehicles(router , scenario.getNetwork(), travelTime);
@@ -91,7 +91,7 @@ final class RunFreight {
 				strategyManager.addStrategy(rerouteStrategy, null, 0.1);
 
 				/* Alternative: do nothing, but select best plan. */
-				GenericPlanStrategy<CarrierPlan> selectBestStrategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
+				GenericPlanStrategy<CarrierPlan, Carrier> selectBestStrategy = new GenericPlanStrategyImpl<CarrierPlan, Carrier>( new BestPlanSelector<CarrierPlan, Carrier>() ) ;
 				strategyManager.addStrategy(selectBestStrategy, null, 0.9);
 
 				return strategyManager;

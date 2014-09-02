@@ -22,8 +22,12 @@
 
 package playground.mzilske.teach;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
@@ -36,10 +40,6 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import tutorial.programming.example12PluggableTripRouter.MySimulationObserver;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainWithMultithreadedModule {
 
@@ -74,7 +74,7 @@ public class MainWithMultithreadedModule {
                     }
                 });
 
-                PlanStrategyImpl myStrategy = new PlanStrategyImpl(new RandomPlanSelector<Plan>());
+                PlanStrategyImpl myStrategy = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
                 myStrategy.addStrategyModule(new AbstractMultithreadedModule(scenario.getConfig().global()) {
                     @Override
                     public PlanAlgorithm getPlanAlgoInstance() {

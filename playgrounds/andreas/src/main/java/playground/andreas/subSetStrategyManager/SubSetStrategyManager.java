@@ -60,7 +60,7 @@ public class SubSetStrategyManager extends StrategyManager {
 	protected void beforePopulationRunHook(Population population, ReplanningContext replanningContext) {
 		super.beforePopulationRunHook(population, replanningContext);
 		for (StrategyManager mgr : this.managers.values()) {
-			for (GenericPlanStrategy<Plan> strategy : mgr.getStrategiesOfDefaultSubpopulation()) {
+			for (GenericPlanStrategy<Plan, Person> strategy : mgr.getStrategiesOfDefaultSubpopulation()) {
 				strategy.init(replanningContext);
 			}
 		}
@@ -70,14 +70,14 @@ public class SubSetStrategyManager extends StrategyManager {
 	protected void afterRunHook(Population population) {
 		super.afterRunHook(population);
 		for (StrategyManager mgr : this.managers.values()) {
-			for (GenericPlanStrategy<Plan> strategy : mgr.getStrategiesOfDefaultSubpopulation()) {
+			for (GenericPlanStrategy<Plan, Person> strategy : mgr.getStrategiesOfDefaultSubpopulation()) {
 				strategy.finish();
 			}
 		}
 	}
 
 	@Override
-	public GenericPlanStrategy<Plan> chooseStrategy(Person person, String subpopulation) {
+	public GenericPlanStrategy<Plan, Person> chooseStrategy(Person person, String subpopulation) {
 		for (Map.Entry<Set<Id>, StrategyManager> e : this.managers.entrySet()) {
 			Set<Id> ids = e.getKey();
 			if (ids.contains(person.getId())) {

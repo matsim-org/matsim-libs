@@ -3,14 +3,16 @@
  */
 package org.matsim.contrib.cadyts.general;
 
-import cadyts.utilities.math.Vector;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
-import java.util.ArrayList;
-import java.util.List;
+import cadyts.utilities.math.Vector;
 
 /**
  * @author nagel
@@ -29,7 +31,7 @@ public final class PlanSelectionByCadyts<T> implements PlanSelector {
 	
 
 	@Override
-	public Plan selectPlan(HasPlansAndId<Plan> person) {
+	public Plan selectPlan(HasPlansAndId<Plan, Person> person) {
 		List<cadyts.demand.Plan<T>> plans = new ArrayList<cadyts.demand.Plan<T>>() ;
 		Vector choiceProbs = new Vector( person.getPlans().size() ) ;
 		int pos = 0 ;

@@ -33,7 +33,7 @@ public class ArrivalStopTimeMutatorPlanStrategy implements PlanStrategy {
 		delegate.addStrategyModule(new ArrivalTimeToStopMutator(scenario.getConfig(), times));
 	}
 	@Override
-	public void run(HasPlansAndId<Plan> person) {
+	public void run(HasPlansAndId<Plan, Person> person) {
 		delegate.run(person);
 	}
 	@Override

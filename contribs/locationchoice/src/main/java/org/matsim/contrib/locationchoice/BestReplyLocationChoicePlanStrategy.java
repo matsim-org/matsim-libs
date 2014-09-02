@@ -21,6 +21,7 @@ package org.matsim.contrib.locationchoice;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.MaxDCScoreWrapper;
@@ -46,7 +47,7 @@ public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 	}
 		
 	@Override
-	public void run(HasPlansAndId<Plan> person) {
+	public void run(HasPlansAndId<Plan, Person> person) {
 		delegate.run(person);
 	}
 
@@ -64,7 +65,7 @@ public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 		Config config = lcContext.getScenario().getConfig() ;
 		String planSelector = config.locationchoice().getPlanSelector();
 		if (planSelector.equals("BestScore")) {
-			delegate = new PlanStrategyImpl(new BestPlanSelector<Plan>());
+			delegate = new PlanStrategyImpl(new BestPlanSelector<Plan, Person>());
 		} else if (planSelector.equals("ChangeExpBeta")) {
 			delegate = new PlanStrategyImpl(new ExpBetaPlanChanger(config.planCalcScore().getBrainExpBeta()));
 		} else if (planSelector.equals("SelectRandom")) {

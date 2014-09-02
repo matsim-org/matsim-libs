@@ -22,6 +22,7 @@ package playground.wrashid.parkingSearch.planLevel.replanning;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.PlanStrategy;
@@ -45,6 +46,7 @@ public class ParkingPlanStrategy implements PlanStrategy {
 		this.planStrategyDelegate.addStrategyModule(module);
 	}
 
+	@Override
 	public void finish() {
 		this.planStrategyDelegate.finish();
 	}
@@ -53,11 +55,13 @@ public class ParkingPlanStrategy implements PlanStrategy {
 		return this.planStrategyDelegate.getNumberOfStrategyModules();
 	}
 
+	@Override
 	public void init(ReplanningContext replanningContext) {
 		this.planStrategyDelegate.init(replanningContext);
 	}
 
-	public void run(HasPlansAndId<Plan> person) {
+	@Override
+	public void run(HasPlansAndId<Plan, Person> person) {
 		this.planStrategyDelegate.run(person);
 	}
 

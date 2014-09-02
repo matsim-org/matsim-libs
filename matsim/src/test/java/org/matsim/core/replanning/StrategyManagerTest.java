@@ -31,6 +31,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
@@ -66,10 +67,10 @@ public class StrategyManagerTest {
 
 		// setup StrategyManager
 		StrategyManager manager = new StrategyManager();
-		StrategyCounter strategy1 = new StrategyCounter(new RandomPlanSelector<Plan>());
-		StrategyCounter strategy2 = new StrategyCounter(new RandomPlanSelector<Plan>());
-		StrategyCounter strategy3 = new StrategyCounter(new RandomPlanSelector<Plan>());
-		StrategyCounter strategy4 = new StrategyCounter(new RandomPlanSelector<Plan>());
+		StrategyCounter strategy1 = new StrategyCounter(new RandomPlanSelector<Plan, Person>());
+		StrategyCounter strategy2 = new StrategyCounter(new RandomPlanSelector<Plan, Person>());
+		StrategyCounter strategy3 = new StrategyCounter(new RandomPlanSelector<Plan, Person>());
+		StrategyCounter strategy4 = new StrategyCounter(new RandomPlanSelector<Plan, Person>());
 
 		manager.addStrategyForDefaultSubpopulation(strategy1, 0.10);
 		manager.addStrategyForDefaultSubpopulation(strategy2, 0.20);
@@ -272,7 +273,7 @@ public class StrategyManagerTest {
 		assertTrue("plan should not have been removed.", p.getPlans().contains(plans[2]));
 
 		// change plan selector for removal and run again
-		manager.setPlanSelectorForRemoval(new BestPlanSelector<Plan>());
+		manager.setPlanSelectorForRemoval(new BestPlanSelector<Plan, Person>());
 		manager.setMaxPlansPerAgent(plans.length - 4);
 		manager.run(pop, null);
 
@@ -295,7 +296,7 @@ public class StrategyManagerTest {
 		manager.addStrategyForDefaultSubpopulation(str2, 2.0);
 		manager.addStrategyForDefaultSubpopulation(str3, 0.5);
 		
-		List<GenericPlanStrategy<Plan>> strategies = manager.getStrategiesOfDefaultSubpopulation();
+		List<GenericPlanStrategy<Plan, Person>> strategies = manager.getStrategiesOfDefaultSubpopulation();
 		Assert.assertEquals(3, strategies.size());
 
 		Assert.assertEquals(str1, strategies.get(0));
@@ -380,12 +381,12 @@ public class StrategyManagerTest {
 
 		private int counter = 0;
 
-		protected StrategyCounter(final GenericPlanSelector<Plan> selector) {
+		protected StrategyCounter(final GenericPlanSelector<Plan, Person> selector) {
 			planStrategyDelegate = new PlanStrategyImpl( selector ) ;
 		}
 
 		@Override
-		public void run(final HasPlansAndId<Plan> person) {
+		public void run(final HasPlansAndId<Plan, Person> person) {
 			this.counter++;
 			planStrategyDelegate.run(person);
 		}
@@ -434,7 +435,7 @@ public class StrategyManagerTest {
 		public TestPlanSelector() {
 		}
 		@Override
-		public PlanImpl selectPlan(final HasPlansAndId<Plan> person) {
+		public PlanImpl selectPlan(final HasPlansAndId<Plan, Person> person) {
 			throw new UnsupportedOperationException();
 		}
 

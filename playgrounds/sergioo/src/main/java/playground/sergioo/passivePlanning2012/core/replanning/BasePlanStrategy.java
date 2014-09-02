@@ -1,19 +1,21 @@
 package playground.sergioo.passivePlanning2012.core.replanning;
 
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.utils.misc.Counter;
-import playground.sergioo.passivePlanning2012.api.population.BasePerson;
 
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.concurrent.atomic.AtomicBoolean;
+import playground.sergioo.passivePlanning2012.api.population.BasePerson;
 
 public class BasePlanStrategy implements PlanStrategy {
 
@@ -82,7 +84,7 @@ public class BasePlanStrategy implements PlanStrategy {
 		return 0;
 	}
 	@Override
-	public void run(HasPlansAndId<Plan> person) {
+	public void run(HasPlansAndId<Plan, Person> person) {
 		if(person instanceof BasePerson) {
 			basePlanThreads[count % basePlanThreads.length].addPerson((BasePerson)person);
 			count++;

@@ -41,9 +41,9 @@ public class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 		this.travelTimes = travelTimes;
 	}
 
-	public GenericPlanStrategy<CarrierPlan> createStrategy(){
+	public GenericPlanStrategy<CarrierPlan, Carrier> createStrategy(){
 //		CarrierReplanningStrategy replanningStrat = new CarrierReplanningStrategy(new SelectBestPlan());
-		GenericPlanStrategyImpl<CarrierPlan> replanningStrat = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
+		GenericPlanStrategyImpl<CarrierPlan, Carrier> replanningStrat = new GenericPlanStrategyImpl<CarrierPlan, Carrier>( new BestPlanSelector<CarrierPlan, Carrier>() ) ;
 		
 		GenericPlanStrategyModule<CarrierPlan> vraModule = new GenericPlanStrategyModule<CarrierPlan>() {
 			

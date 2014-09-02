@@ -10,10 +10,20 @@
 
 package playground.qvanheerden.freight;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
+import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierControlerListener;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
@@ -45,12 +55,10 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction.LegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+
 import playground.southafrica.utilities.Header;
 import usecases.analysis.CarrierScoreStats;
 import usecases.analysis.LegHistogram;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 
 public class MyCarrierSimulation {
@@ -176,22 +184,22 @@ public class MyCarrierSimulation {
 		// From KnFreight
 		CarrierPlanStrategyManagerFactory stratManFactory = new CarrierPlanStrategyManagerFactory() {
 			@Override
-			public GenericStrategyManager<CarrierPlan> createStrategyManager() {
+			public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {
 				TravelTime travelTimes = controler.getLinkTravelTimes() ;
 				TravelDisutility travelCosts = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility(
 						travelTimes , scenario.getConfig().planCalcScore() );
 				LeastCostPathCalculator router = controler.getLeastCostPathCalculatorFactory().createPathCalculator(scenario.getNetwork(),
 						travelCosts, travelTimes) ;
-				GenericStrategyManager<CarrierPlan> mgr = new GenericStrategyManager<CarrierPlan>() ;
+				GenericStrategyManager<CarrierPlan, Carrier> mgr = new GenericStrategyManager<CarrierPlan, Carrier>() ;
 				{
-					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>(new RandomPlanSelector<CarrierPlan>()) ;
+					GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<CarrierPlan, Carrier>(new RandomPlanSelector<CarrierPlan, Carrier>()) ;
 					GenericPlanStrategyModule<CarrierPlan> module = new ReRouteVehicles( router, scenario.getNetwork(), travelTimes ) ;
 					strategy.addStrategyModule(module);
 					mgr.addStrategy(strategy, null, 0.7);
 					mgr.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, null, 0.);
 				}
 				{
-					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new RandomPlanSelector<CarrierPlan>() ) ;
+					GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<CarrierPlan, Carrier>( new RandomPlanSelector<CarrierPlan, Carrier>() ) ;
 					GenericPlanStrategyModule<CarrierPlan> module = new TimeAllocationMutator() ;
 					strategy.addStrategyModule(module);
 					mgr.addStrategy(strategy, null, 0.3 );
@@ -208,7 +216,7 @@ public class MyCarrierSimulation {
 					// things to figure out, I think.  kai
 				}
 				{
-					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
+					GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<CarrierPlan, Carrier>( new BestPlanSelector<CarrierPlan, Carrier>() ) ;
 					mgr.addStrategy( strategy, null, 0.01 ) ;
 				}
 				return mgr ;

@@ -21,6 +21,7 @@
 package playground.anhorni;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -52,7 +53,7 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 	}
 
 	@Override
-	protected GenericPlanSelector<Plan> getPlanSelector() {
+	protected GenericPlanSelector<Plan, Person> getPlanSelector() {
 		return new ExpBetaPlanForRemovalSelector(this.config.planCalcScore());
 	}
 

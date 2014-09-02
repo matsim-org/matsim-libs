@@ -20,6 +20,7 @@
 
 package org.matsim.core.replanning.selectors;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 
 /**
@@ -27,4 +28,4 @@ import org.matsim.api.core.v01.population.Plan;
  *
  * @author mrieser
  */
-public interface PlanSelector extends GenericPlanSelector<Plan> {}
+public interface PlanSelector extends GenericPlanSelector<Plan, Person> {}

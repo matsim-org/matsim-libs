@@ -30,7 +30,7 @@ import org.matsim.core.gbl.MatsimRandom;
  *
  * @author kn based on mrieser
  */
-public class ExpBetaPlanChanger<T extends BasicPlan> implements GenericPlanSelector<T> {
+public class ExpBetaPlanChanger<T extends BasicPlan, I> implements GenericPlanSelector<T, I> {
 	private static final Logger log = Logger.getLogger(ExpBetaPlanChanger.class);
 
 	private final double beta;
@@ -46,10 +46,10 @@ public class ExpBetaPlanChanger<T extends BasicPlan> implements GenericPlanSelec
 	 * Need to think through if this goes to Nash Equilibrium or to SUE !!!
 	 */
 	@Override
-	public T selectPlan(final HasPlansAndId<T> person) {
+	public T selectPlan(final HasPlansAndId<T, I> person) {
 		// current plan and random plan:
 		T currentPlan = person.getSelectedPlan();
-		T otherPlan = new RandomPlanSelector<T>().selectPlan(person);
+		T otherPlan = new RandomPlanSelector<T, I>().selectPlan(person);
 
 		if (currentPlan == null) {
 			// this case should only happen when the agent has no plans at all

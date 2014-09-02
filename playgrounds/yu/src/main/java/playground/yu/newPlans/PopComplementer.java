@@ -64,7 +64,7 @@ public class PopComplementer extends NewPopulation {
 	public void run(Person person) {
 		int size = person.getPlans().size();
 		while (size < maxPlansPerAgent) {
-			person.addPlan(new RandomPlanSelector<Plan>().selectPlan(person));
+			person.addPlan(new RandomPlanSelector<Plan, Person>().selectPlan(person));
 			log.info("Person (\t" + person.getId()
 					+ "\t) added a Plan in choice set.");
 			size = person.getPlans().size();

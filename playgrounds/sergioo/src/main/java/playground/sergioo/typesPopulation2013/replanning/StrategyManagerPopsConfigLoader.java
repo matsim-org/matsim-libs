@@ -25,6 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -32,7 +33,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.PlanStrategyFactoryRegister;
 import org.matsim.core.controler.PlanStrategyRegistrar;
 import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
@@ -42,7 +42,6 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
@@ -130,7 +129,7 @@ public final class StrategyManagerPopsConfigLoader {
 			if ( name != null ) {
 				// yyyy ``manager'' has a default setting.  I do not want to override this here except when it is configured.
 				// Presumably, this is not the desired approach and the default should be in the config file?  kai, feb'12
-				GenericPlanSelector<Plan> planSelector = null ;
+				GenericPlanSelector<Plan, Person> planSelector = null ;
 				if ( name.equals("WorstPlanSelector") ) { 
 					planSelector = new WorstPlanForRemovalSelector() ; 
 				} else if ( name.equals("SelectRandom") ) {
@@ -143,7 +142,7 @@ public final class StrategyManagerPopsConfigLoader {
 					// yyyy this will select _good_ plans for removal--?
 					// yyyy might just use -beta as parameter??
 				} else if ( name.equals("BestPlanSelector") ) {
-					planSelector = new BestPlanSelector<Plan>() ;
+					planSelector = new BestPlanSelector<Plan, Person>() ;
 					// yyyy this will select _good_ plans for removal--?
 				} else if ( name.equals("PathSizeLogitSelector") ) {
 					planSelector = new PathSizeLogitSelector(config.planCalcScore().getPathSizeLogitBeta(), -config.planCalcScore().getBrainExpBeta(), 

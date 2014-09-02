@@ -22,7 +22,10 @@
 
 package playground.mzilske.clones;
 
-import com.google.inject.Provider;
+import java.util.ArrayList;
+
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -34,8 +37,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
+import com.google.inject.Provider;
 
 class ClonesControlerListener implements Provider<ControlerListener> {
 
@@ -56,7 +58,7 @@ class ClonesControlerListener implements Provider<ControlerListener> {
                         Plan plan2 = scenario.getPopulation().getFactory().createPlan();
                         plan2.setType("emptyClonePlan");
                         person.addPlan(plan2);
-                        person.setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(person));
+                        person.setSelectedPlan(new RandomPlanSelector<Plan, Person>().selectPlan(person));
                     }
                     for (Person person : new ArrayList<Person>(scenario.getPopulation().getPersons().values())) {
                         for (int i = 0; i < clonefactor - 1; i++) {
@@ -67,7 +69,7 @@ class ClonesControlerListener implements Provider<ControlerListener> {
                                 ((PlanImpl) clonePlan).copyFrom(plan);
                                 clone.addPlan(clonePlan);
                             }
-                            clone.setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(clone));
+                            clone.setSelectedPlan(new RandomPlanSelector<Plan, Person>().selectPlan(clone));
                             scenario.getPopulation().addPerson(clone);
                         }
                     }

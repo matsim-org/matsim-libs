@@ -185,7 +185,7 @@ public class CreateBackgroundPopulation {
 		 */
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			PersonImpl p = (PersonImpl) person;
-			p.setSelectedPlan(new RandomPlanSelector<Plan>().selectPlan(p));
+			p.setSelectedPlan(new RandomPlanSelector<Plan, Person>().selectPlan(p));
 		}
 		
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(populationFile);

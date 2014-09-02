@@ -25,7 +25,7 @@ public class DistribSelector implements PlanSelector{
 	}
 	
 	@Override
-	public Plan selectPlan(final HasPlansAndId<Plan> person) {
+	public Plan selectPlan(final HasPlansAndId<Plan, Person> person) {
 		double random= MatsimRandom.getRandom().nextDouble();
 		int selIndex=1;
 		

@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
@@ -88,7 +87,7 @@ public class ExpBetaPlanChangerWithStayHomePlan implements PlanSelector {
 		this.f = f;
 	}
 
-	private Double getDummyStayHomePlanScore4ChoiceProb(HasPlansAndId<Plan> person) {
+	private Double getDummyStayHomePlanScore4ChoiceProb(HasPlansAndId<Plan, Person> person) {
 		/*
 		 * calculate stay Home Plan score, in order to realize the choice
 		 * probability "1-f", U_stayHome = 1/betaBrain * ln[(1-f)/f *
@@ -130,7 +129,7 @@ public class ExpBetaPlanChangerWithStayHomePlan implements PlanSelector {
 	 * A changed dummy score for "stay home" {@code Plan} will be used
 	 */
 	@Override
-	public Plan selectPlan(final HasPlansAndId<Plan> person) {
+	public Plan selectPlan(final HasPlansAndId<Plan, Person> person) {
 		// preferentially choose NULL or NaN -score Plan
 		for (Plan plan : person.getPlans()) {
 			Double score = plan.getScore();
@@ -155,7 +154,7 @@ public class ExpBetaPlanChangerWithStayHomePlan implements PlanSelector {
 
 		// current plan and random plan:
 		Plan currentPlan = person.getSelectedPlan();
-		Plan otherPlan = new RandomPlanSelector<Plan>().selectPlan(((PersonImpl) person));
+		Plan otherPlan = new RandomPlanSelector<Plan, Person>().selectPlan((person));
 
 		if (currentPlan == null) {
 			// this case should only happen when the agent has no plans at all

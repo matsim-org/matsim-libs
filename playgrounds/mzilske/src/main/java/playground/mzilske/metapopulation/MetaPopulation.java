@@ -22,6 +22,11 @@
 
 package playground.mzilske.metapopulation;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
@@ -30,12 +35,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
-
-class MetaPopulation implements HasPlansAndId<MetaPopulationPlan> {
+class MetaPopulation implements HasPlansAndId<MetaPopulationPlan, Person> {
 
     private final IdImpl id;
     private List<MetaPopulationPlan> plans;

@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
  * @author sschroeder
  *
  */
-public interface Carrier extends HasPlansAndId<CarrierPlan> {
+public interface Carrier extends HasPlansAndId<CarrierPlan, Carrier> {
 	
 	public static int PLAN_MEMORY = 5;
 
@@ -61,6 +61,7 @@ public interface Carrier extends HasPlansAndId<CarrierPlan> {
 	 * 
 	 * @param selectedPlan
 	 */
+	@Override
 	public abstract void setSelectedPlan(CarrierPlan selectedPlan);
 
 	/**

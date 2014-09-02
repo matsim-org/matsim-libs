@@ -19,13 +19,14 @@
  * *********************************************************************** */
 package playground.ivt.replanning;
 
-import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.replanning.modules.ReRoute;
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 /**
@@ -35,14 +36,14 @@ public class SwitchNonChainBasedMode implements PlanStrategy {
 	final PlanStrategyImpl delegate;
 
 	public SwitchNonChainBasedMode(final Scenario sc) {
-		delegate = new PlanStrategyImpl( new RandomPlanSelector<Plan>() );
+		delegate = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() );
 
 		delegate.addStrategyModule( new SwitchNonChainBasedModeModule( sc.getConfig() ) );
 		delegate.addStrategyModule( new ReRoute( sc ) );
 	}
 
 	@Override
-	public void run(final HasPlansAndId<Plan> person) {
+	public void run(final HasPlansAndId<Plan, Person> person) {
 		delegate.run( person );
 	}
 

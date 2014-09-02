@@ -2,6 +2,7 @@ package playground.balac.aam.replanning;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.PlanStrategy;
@@ -15,7 +16,7 @@ public class RandomTripToAAMStrategy implements PlanStrategy{
 	private final PlanStrategyImpl strategy;
 	
 	public RandomTripToAAMStrategy(final Scenario controler) {
-		this.strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan>() );
+		this.strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() );
 		 	
 		//addStrategyModule( new TripsToLegsModule(controler.getConfig() ) );   //lets try without this, not sure if it is needed
 		AAMTripModeChoice smc = new AAMTripModeChoice(controler.getConfig());
@@ -26,7 +27,7 @@ public class RandomTripToAAMStrategy implements PlanStrategy{
 		strategy.addStrategyModule(module);
 	}
 	@Override
-	public void run(HasPlansAndId<Plan> person) {
+	public void run(HasPlansAndId<Plan, Person> person) {
 		strategy.run(person);
 		
 	}

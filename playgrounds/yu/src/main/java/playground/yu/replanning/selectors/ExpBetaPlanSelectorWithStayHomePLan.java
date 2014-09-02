@@ -70,7 +70,7 @@ public class ExpBetaPlanSelectorWithStayHomePLan implements PlanSelector {
 		}
 	}
 
-	private Double getDummyStayHomePlanScore4ChoiceProb(HasPlansAndId<Plan>  person) {
+	private Double getDummyStayHomePlanScore4ChoiceProb(HasPlansAndId<Plan, Person>  person) {
 		/*
 		 * calculate stay Home Plan score, in order to realize the choice
 		 * probability "1-f", U_stayHome = 1/betaBrain * ln[(1-f)/f *
@@ -109,7 +109,7 @@ public class ExpBetaPlanSelectorWithStayHomePLan implements PlanSelector {
 	 *         its weight.
 	 */
 	@Override
-	public Plan selectPlan(final HasPlansAndId<Plan> person) {
+	public Plan selectPlan(final HasPlansAndId<Plan, Person> person) {
 		// preferentially choose NULL or NaN -score Plan
 		for (Plan plan : person.getPlans()) {
 			Double score = plan.getScore();
@@ -177,7 +177,7 @@ public class ExpBetaPlanSelectorWithStayHomePLan implements PlanSelector {
 	 * @param person
 	 * @return a map containing the weights of all plans
 	 */
-	Map<Plan, Double> calcWeights(final HasPlansAndId<Plan>  person) {
+	Map<Plan, Double> calcWeights(final HasPlansAndId<Plan, Person>  person) {
 		stayHomeScore = getDummyStayHomePlanScore4ChoiceProb(person);
 		// - first find the max. score of all plans of this person
 		double maxScore = Double.NEGATIVE_INFINITY;

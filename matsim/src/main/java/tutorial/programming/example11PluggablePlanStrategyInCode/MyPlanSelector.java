@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
@@ -41,7 +42,7 @@ ActivityEndEventHandler // as an example
 	}
 
 	@Override
-	public Plan selectPlan(HasPlansAndId<Plan> person) {
+	public Plan selectPlan(HasPlansAndId<Plan, Person> person) {
 		log.error("calling selectPlan") ;
 		return null ;
 	}

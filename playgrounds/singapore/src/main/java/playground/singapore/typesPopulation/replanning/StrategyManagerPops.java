@@ -17,7 +17,6 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
@@ -29,7 +28,7 @@ public class StrategyManagerPops extends StrategyManager implements BeforeMobsim
 	private final Map<Id, ArrayList<Double>> weights = new HashMap<Id, ArrayList<Double>>();
 	private Map<Id, Double> totalWeights = new HashMap<Id, Double>();
 	private Map<Id, Integer> maxPlansPerAgent = new HashMap<Id, Integer>();
-	private Map<Id, GenericPlanSelector<Plan>> removalPlanSelector = new HashMap<Id, GenericPlanSelector<Plan>>();
+	private Map<Id, GenericPlanSelector<Plan, Person>> removalPlanSelector = new HashMap<Id, GenericPlanSelector<Plan, Person>>();
 	private final TreeMap<Integer, Map<String, Map<PlanStrategy, Double>>> changeRequests = new TreeMap<Integer, Map<String, Map<PlanStrategy, Double>>>();
 	/**
 	 * chooses a (weight-influenced) random strategy
@@ -177,7 +176,7 @@ public class StrategyManagerPops extends StrategyManager implements BeforeMobsim
 	 *
 	 * @see #setMaxPlansPerAgent(int)
 	 */
-	public final void setPlanSelectorForRemoval(final GenericPlanSelector<Plan> planSelector, Id populationId) {
+	public final void setPlanSelectorForRemoval(final GenericPlanSelector<Plan, Person> planSelector, Id populationId) {
 		Logger.getLogger(this.getClass()).info("setting PlanSelectorForRemoval to " + planSelector.getClass() ) ;
 		this.removalPlanSelector.put(populationId, planSelector);
 	}
@@ -197,7 +196,7 @@ public class StrategyManagerPops extends StrategyManager implements BeforeMobsim
 
 	private void removePlans(PersonImplPops person, int maxNumberOfPlans) {
 		while (person.getPlans().size() > maxNumberOfPlans) {
-			GenericPlanSelector<Plan> selector = removalPlanSelector.get(person.getPopulationId());
+			GenericPlanSelector<Plan, Person> selector = removalPlanSelector.get(person.getPopulationId());
 			if(selector == null) {
 				selector = new WorstPlanForRemovalSelector();
 				removalPlanSelector.put(person.getPopulationId(), selector);
@@ -205,7 +204,7 @@ public class StrategyManagerPops extends StrategyManager implements BeforeMobsim
 			Plan plan = selector.selectPlan(person);
 			person.getPlans().remove(plan);
 			if (plan == person.getSelectedPlan()) {
-				final Plan newPlanToSelect = new RandomPlanSelector<Plan>().selectPlan(person);
+				final Plan newPlanToSelect = new RandomPlanSelector<Plan, Person>().selectPlan(person);
 				if ( newPlanToSelect == null ) {
 					throw new IllegalStateException("could not find a plan to select for person "+person);
 				}

@@ -25,6 +25,7 @@ import java.util.Random;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
@@ -70,7 +71,7 @@ public class StrategyManagerSubpopulationsTest {
 		manager.setSubpopulationAttributeName(SUBPOP_ATT_NAME);
 		manager.addStrategy(new PlanStrategy() {
 					@Override
-					public void run(HasPlansAndId<Plan> person) {
+					public void run(HasPlansAndId<Plan, Person> person) {
 						counter.incCounter();
 						Assert.assertNull(
 							"unexpected subpopulation",
@@ -90,7 +91,7 @@ public class StrategyManagerSubpopulationsTest {
 				1 );
 		manager.addStrategy(new PlanStrategy() {
 					@Override
-					public void run(HasPlansAndId<Plan> person) {
+					public void run(HasPlansAndId<Plan, Person> person) {
 						counter.incCounter();
 						Assert.assertEquals(
 							"unexpected subpopulation",
@@ -110,7 +111,7 @@ public class StrategyManagerSubpopulationsTest {
 				1 );
 		manager.addStrategy(new PlanStrategy() {
 					@Override
-					public void run(HasPlansAndId<Plan> person) {
+					public void run(HasPlansAndId<Plan, Person> person) {
 						counter.incCounter();
 						Assert.assertEquals(
 							"unexpected subpopulation",

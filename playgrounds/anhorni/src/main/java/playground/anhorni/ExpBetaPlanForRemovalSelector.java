@@ -20,6 +20,7 @@
 
 package playground.anhorni;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
@@ -37,7 +38,7 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
  *
  * @author anhorni
  */
-public class ExpBetaPlanForRemovalSelector extends ExpBetaPlanSelector<Plan> {
+public class ExpBetaPlanForRemovalSelector extends ExpBetaPlanSelector<Plan, Person> {
 
 	public ExpBetaPlanForRemovalSelector(
 			PlanCalcScoreConfigGroup charyparNagelScoringConfigGroup) {

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Identifiable;
 
-public interface HasPlansAndId<T extends BasicPlan> extends Identifiable {
+public interface HasPlansAndId<T extends BasicPlan, I> extends Identifiable<I> {
 
 	/**
 	 * Seems that <? extends T> is actually more restrictive than <T>, i.e. we may later switch from 

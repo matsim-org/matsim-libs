@@ -30,14 +30,14 @@ import org.matsim.core.gbl.MatsimRandom;
  *
  * @author nagel
  */
-public class RandomUnscoredPlanSelector<T extends BasicPlan> implements GenericPlanSelector<T> {
+public class RandomUnscoredPlanSelector<T extends BasicPlan, I> implements GenericPlanSelector<T, I> {
 
 	/**
 	 * Choose a random plan from the person and return it.
 	 * @return The newly selected plan for this person; <code>null</code> if the person has no plans.
 	 */
 	@Override
-	public T selectPlan(final HasPlansAndId<T> person) {
+	public T selectPlan(final HasPlansAndId<T, I> person) {
 		// following code copied from PersonImpl and then made runnable
 		
 		int cntUnscored = 0;

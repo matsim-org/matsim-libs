@@ -28,13 +28,13 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
  * 
  * @author mrieser
  */
-public class KeepSelected<T extends BasicPlan> implements GenericPlanSelector<T> {
+public class KeepSelected<T extends BasicPlan, I> implements GenericPlanSelector<T, I> {
 
 	/**
 	 * returns the already selected plan for this person
 	 */
 	@Override
-	public T selectPlan(HasPlansAndId<T> person) {
+	public T selectPlan(HasPlansAndId<T, I> person) {
 		return person.getSelectedPlan();
 	}
 

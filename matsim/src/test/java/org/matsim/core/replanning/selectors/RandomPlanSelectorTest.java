@@ -21,6 +21,7 @@
 package org.matsim.core.replanning.selectors;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
@@ -36,8 +37,8 @@ public class RandomPlanSelectorTest extends AbstractPlanSelectorTest {
 	private final static Logger log = Logger.getLogger(RandomPlanSelectorTest.class);
 
 	@Override
-	protected GenericPlanSelector<Plan> getPlanSelector() {
-		return new RandomPlanSelector<Plan>();
+	protected GenericPlanSelector<Plan, Person> getPlanSelector() {
+		return new RandomPlanSelector<Plan, Person>();
 	}
 
 	/**
@@ -53,7 +54,7 @@ public class RandomPlanSelectorTest extends AbstractPlanSelectorTest {
 		PlanImpl plan4 = person.createAndAddPlan(false);
 		plan4.setScore(0.0);
 
-		RandomPlanSelector<Plan> selector = new RandomPlanSelector<Plan>();
+		RandomPlanSelector<Plan, Person> selector = new RandomPlanSelector<Plan, Person>();
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;

@@ -20,8 +20,10 @@
 package playground.pieter.pseudosimulation.replanning.selectors;
 
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.KeepSelected;
+
 import playground.pieter.pseudosimulation.controler.listeners.MobSimSwitcher;
 import playground.pieter.pseudosimulation.replanning.PSimPlanStrategyTranslationAndRegistration;
 
@@ -29,9 +31,9 @@ import playground.pieter.pseudosimulation.replanning.PSimPlanStrategyTranslation
  * @author fouriep
  * Plan selector for PSim. See {@link PSimPlanStrategyTranslationAndRegistration}.
  */
-public class PSimKeepSelected extends KeepSelected<Plan> {
+public class PSimKeepSelected extends KeepSelected<Plan, Person> {
 	@Override
-	public Plan selectPlan(HasPlansAndId<Plan> person) {
+	public Plan selectPlan(HasPlansAndId<Plan, Person> person) {
 		if (MobSimSwitcher.isQSimIteration)
 			return super.selectPlan(person);
 		else
