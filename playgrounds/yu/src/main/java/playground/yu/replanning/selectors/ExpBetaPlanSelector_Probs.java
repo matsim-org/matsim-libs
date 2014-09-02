@@ -28,14 +28,13 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-
 import playground.yu.utils.DebugTools;
 
 /**
  * @author yu
  * 
  */
-public class ExpBetaPlanSelector_Probs extends ExpBetaPlanSelector {
+public class ExpBetaPlanSelector_Probs extends ExpBetaPlanSelector<Plan> {
 
 	/**
 	 * @param charyparNagelScoringConfigGroup
