@@ -245,7 +245,7 @@
 									<manifest>
 										<addClasspath>true</addClasspath>
 										<classpathPrefix>libs/</classpathPrefix>
-										<mainClass>org.matsim.run.ReleaseInfo</mainClass>
+										<mainClass>org.matsim.run.gui.Gui</mainClass>
 									</manifest>
 								</archive>
 							</configuration>
@@ -267,7 +267,7 @@
 									<manifest>
 										<addClasspath>true</addClasspath>
 										<classpathPrefix>libs/</classpathPrefix>
-										<mainClass>org.matsim.run.ReleaseInfo</mainClass>
+										<mainClass>org.matsim.run.gui.Gui</mainClass>
 									</manifest>
 								</archive>
 							</configuration>
