@@ -53,7 +53,7 @@ public class CalcMacroZoneTravelTimes implements PersonDepartureEventHandler,
 	private static final Logger log = Logger
 			.getLogger(CalcMacroZoneTravelTimes.class);
 	private HashMap<Id, LegStore> legStore;
-	private Map<Id, ? extends ActivityFacility> allFacilities;
+	private Map<Id<ActivityFacility>, ? extends ActivityFacility> allFacilities;
 	private Map<Id, Id> micro2MacroZone;
 	private Map<String, Matrix> mode2zoneTraveltimes;
 	private Map<String, Matrix> mode2zoneTrips;
@@ -65,7 +65,7 @@ public class CalcMacroZoneTravelTimes implements PersonDepartureEventHandler,
 	 * @param map
 	 * @param micro2MacroZone
 	 */
-	public CalcMacroZoneTravelTimes(Map<Id, ? extends ActivityFacility> map, Map<Id, Id> micro2MacroZone, int startHour, int endHour) {
+	public CalcMacroZoneTravelTimes(Map<Id<ActivityFacility>, ? extends ActivityFacility> map, Map<Id, Id> micro2MacroZone, int startHour, int endHour) {
 		this.legStore = new HashMap<Id, LegStore>();
 		this.allFacilities = map;
 		this.micro2MacroZone = micro2MacroZone;

@@ -754,7 +754,7 @@ public class ReadFromUrbanSimModel {
 		
 		String filename = module.getMATSim4OpusTemp() + InternalConstants.URBANSIM_JOB_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
 		
-		Map<Id, ? extends ActivityFacility> facilityMap = parcelsOrZones.getFacilities();
+		Map<Id<ActivityFacility>, ? extends ActivityFacility> facilityMap = parcelsOrZones.getFacilities();
 		
 		try{
 			BufferedReader reader = IOUtils.getBufferedReader( filename );

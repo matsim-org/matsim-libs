@@ -34,7 +34,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class ComputeMaxDCScoreMultiThreatedModule extends AbstractMultithreadedModule {	
 	private String type;
-	private TreeMap<Id, ActivityFacilityWithIndex> typedFacilities;
+	private TreeMap<Id<ActivityFacility>, ActivityFacilityWithIndex> typedFacilities;
 	private DestinationChoiceBestResponseContext lcContext;
 	private static final Logger log = Logger.getLogger(ComputeMaxDCScoreMultiThreatedModule.class);
 	private DestinationSampler sampler;
@@ -48,8 +48,8 @@ public class ComputeMaxDCScoreMultiThreatedModule extends AbstractMultithreadedM
 		 * Get ActivityFacilies for type and then replace them with ActivityFacilityWithIndex
 		 * objects due to performance reasons.
 		 */
-		Map<Id, ActivityFacility> map = lcContext.getScenario().getActivityFacilities().getFacilitiesForActivityType(lcContext.getConverter().convertType(type));
-		this.typedFacilities = new TreeMap<Id, ActivityFacilityWithIndex>();
+		Map<Id<ActivityFacility>, ActivityFacility> map = lcContext.getScenario().getActivityFacilities().getFacilitiesForActivityType(lcContext.getConverter().convertType(type));
+		this.typedFacilities = new TreeMap<Id<ActivityFacility>, ActivityFacilityWithIndex>();
 		for (ActivityFacility activityFacility : map.values()) {
 			int index = this.lcContext.getFacilityIndex(activityFacility.getId());
 			this.typedFacilities.put(activityFacility.getId(),new ActivityFacilityWithIndex(activityFacility, index));

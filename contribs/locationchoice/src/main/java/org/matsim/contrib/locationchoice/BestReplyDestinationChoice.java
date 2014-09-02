@@ -19,10 +19,19 @@
 
 package org.matsim.contrib.locationchoice;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.locationchoice.bestresponse.BestResponseLocationMutator;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
@@ -47,9 +56,6 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 
@@ -107,7 +113,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		 * Create a copy of the treesBuilder.getQuadTreesOfType() outcome where the
 		 * ActivityFacility objects are replaced by ActivityFacilityWithIndex objects. 
 		 */
-		Map<Id, ActivityFacilityWithIndex> map = new HashMap<Id, ActivityFacilityWithIndex>();
+		Map<Id<ActivityFacility>, ActivityFacilityWithIndex> map = new HashMap<Id<ActivityFacility>, ActivityFacilityWithIndex>();
 		for (ActivityFacility activityFacility : facilities.getFacilities().values()) {
 			int index = this.lcContext.getFacilityIndex(activityFacility.getId());
 			map.put(activityFacility.getId(), new ActivityFacilityWithIndex(activityFacility, index));
@@ -176,7 +182,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		}
 		
 		@Override
-		public Id getLinkId() {
+		public Id<Link> getLinkId() {
 			return this.activityFacility.getLinkId();
 		}
 
@@ -186,7 +192,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		}
 
 		@Override
-		public Id getId() {
+		public Id<ActivityFacility> getId() {
 			return this.activityFacility.getId();
 		}
 

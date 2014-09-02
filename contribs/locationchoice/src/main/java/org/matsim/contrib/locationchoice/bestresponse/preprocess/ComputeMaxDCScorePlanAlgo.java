@@ -30,6 +30,7 @@ import org.matsim.contrib.locationchoice.BestReplyDestinationChoice.ActivityFaci
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -37,12 +38,12 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 	private String type;
-	private TreeMap<Id, ActivityFacilityWithIndex> typedFacilities;
+	private TreeMap<Id<ActivityFacility>, ActivityFacilityWithIndex> typedFacilities;
 	private DestinationScoring scorer;
 	private DestinationSampler sampler;
 	private DestinationChoiceBestResponseContext lcContext;
 	
-	public ComputeMaxDCScorePlanAlgo(String type, TreeMap<Id, ActivityFacilityWithIndex> typedFacilities,
+	public ComputeMaxDCScorePlanAlgo(String type, TreeMap<Id<ActivityFacility>, ActivityFacilityWithIndex> typedFacilities,
 			DestinationScoring scorer, DestinationSampler sampler, DestinationChoiceBestResponseContext lcContext) {		
 		this.type = type;
 		this.typedFacilities = typedFacilities;
