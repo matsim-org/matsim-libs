@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
@@ -36,7 +37,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
@@ -119,12 +119,15 @@ public class TraVolCnter implements LinkEnterEventHandler,
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(plansFilename);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		TraVolCnter traVolCounter = new TraVolCnter();
 		events.addHandler(traVolCounter);
 
-		Mobsim sim = QueueSimulationFactory.createMobsimStatic(scenario, events);
+//		Mobsim sim = QueueSimulationFactory.createMobsimStatic(scenario, events);
+		Mobsim sim = null ;
+		Logger.getLogger(TraVolCnter.class).fatal("no longer supported") ;
+		System.exit(-1) ;
 		sim.run();
 	}
 }
