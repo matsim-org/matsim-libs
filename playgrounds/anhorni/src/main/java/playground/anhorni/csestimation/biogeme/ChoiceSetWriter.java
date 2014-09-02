@@ -30,24 +30,24 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.anhorni.csestimation.EstimationPerson;
+import playground.anhorni.csestimation.Location;
 import playground.anhorni.csestimation.ShopLocation;
 import playground.anhorni.csestimation.ShoppingTrip;
 
 public class ChoiceSetWriter {
 
 	private final static Logger log = Logger.getLogger(ChoiceSetWriter.class);
-	private TreeMap<Id, ShopLocation> universalCS;
+	private TreeMap<Id<Location>, ShopLocation> universalCS;
 	private Population population;
 	private DecimalFormat formatter = new DecimalFormat("0.000");
 	Random random = new Random(37835409);
 	private double sampleRate = 0.5;
 	
-	public ChoiceSetWriter(TreeMap<Id, ShopLocation> universalCS, Population population) {
+	public ChoiceSetWriter(TreeMap<Id<Location>, ShopLocation> universalCS, Population population) {
 		this.universalCS = universalCS;
 		this.population = population;
 	}
@@ -58,9 +58,9 @@ public class ChoiceSetWriter {
 		this.write(outdir);		
 	}
 	
-	private int getIndex(Id id) {
+	private int getIndex(Id<Location> id) {
 		int cnt = 0;
-		for (Id idcs : this.universalCS.keySet()) {
+		for (Id<Location> idcs : this.universalCS.keySet()) {
 			if (idcs.compareTo(id) == 0) {
 				return cnt;
 			}

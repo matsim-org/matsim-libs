@@ -31,10 +31,10 @@ public class MZPerson extends PersonImpl implements Person {
 	private int plz;
 	private double weight;
 	
-	public MZPerson(Id id) {
+	public MZPerson(Id<Person> id) {
 		super(id);
 	}	
-	public Id getId() {
+	public Id<Person> getId() {
 		return id;
 	}
 	public void setId(Id id) {

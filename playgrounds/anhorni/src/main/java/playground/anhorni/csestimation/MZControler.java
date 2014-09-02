@@ -42,7 +42,7 @@ import playground.anhorni.csestimation.biogeme.ChoiceSetWriter;
 import playground.anhorni.csestimation.biogeme.ModFileWriter;
 
 public class MZControler {	
-	private TreeMap<Id, ShopLocation> shops;
+	private TreeMap<Id<Location>, ShopLocation> shops;
 	private final static Logger log = Logger.getLogger(MZControler.class);	
 	private Population estimationPopulation0510 = 
 		((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();

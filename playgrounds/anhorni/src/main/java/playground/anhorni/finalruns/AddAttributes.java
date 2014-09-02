@@ -30,7 +30,7 @@ public class AddAttributes {
 	
 	private String outdir;
 	
-	private TreeMap<Id, ShopLocation> shops = new TreeMap<Id, ShopLocation>();
+	private TreeMap<Id<Location>, ShopLocation> shops = new TreeMap<Id<Location>, ShopLocation>();
 	private QuadTree<ActivityFacility> shopTree;
 	
 	public static void main(final String[] args) {		
@@ -61,7 +61,7 @@ public class AddAttributes {
 	
 	private void assignSizeAndPrice(final String bzFile, final String csFile) {		
 		UniversalChoiceSetReader ucsReader = new UniversalChoiceSetReader();
-		TreeMap<Id, ShopLocation> shopsCS = ucsReader.readUniversalCS(csFile);
+		TreeMap<Id<Location>, ShopLocation> shopsCS = ucsReader.readUniversalCS(csFile);
 		
 		ShopsEnricher enricher = new ShopsEnricher();
 		enricher.enrich(shopsCS, bzFile);
@@ -69,8 +69,8 @@ public class AddAttributes {
 		QuadTree<Location> shopsCSQuadTree = Utils.buildLocationQuadTree(shopsCS); 
 		
 		for (ActivityFacility f:this.scenario.getActivityFacilities().getFacilities().values()) {
-			ShopLocation shop = new ShopLocation(f.getId(), f.getCoord());
-			shops.put(f.getId(), shop);
+			ShopLocation shop = new ShopLocation(Id.create(f.getId().toString(), Location.class), f.getCoord());
+			shops.put(shop.getId(), shop);
 			
 			ShopLocation closestShopCS = (ShopLocation) shopsCSQuadTree.get(shop.getCoord().getX(), shop.getCoord().getY());
 			

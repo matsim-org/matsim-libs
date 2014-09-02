@@ -206,7 +206,7 @@ public class FacilitiesProductionKTI {
 
 	private QuadTree<Location> createZHShops(String zhShopsFile) {
 		UniversalChoiceSetReader ucsReader = new UniversalChoiceSetReader();
-		TreeMap<Id, ShopLocation> shops = new TreeMap<Id, ShopLocation>();
+		TreeMap<Id<Location>, ShopLocation> shops = new TreeMap<Id<Location>, ShopLocation>();
 		shops = ucsReader.readUniversalCS(zhShopsFile);
 
 		this.assignPrice(shops);
@@ -251,7 +251,7 @@ public class FacilitiesProductionKTI {
 		return size;
 	}
 
-	private void assignPrice(TreeMap<Id, ShopLocation> shops) {
+	private void assignPrice(TreeMap<Id<Location>, ShopLocation> shops) {
 		for (ShopLocation shop:shops.values()) {
 			int lidl_aldi = 1;
 			int denner = 2;

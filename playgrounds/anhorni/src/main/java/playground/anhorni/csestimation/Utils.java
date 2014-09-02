@@ -31,7 +31,7 @@ public class Utils {
 	
 	private final static Logger log = Logger.getLogger(Utils.class);
 	
-	public static QuadTree<Location> buildLocationQuadTree(TreeMap<Id, ? extends Location> shops) {
+	public static QuadTree<Location> buildLocationQuadTree(TreeMap<Id<Location>, ? extends Location> shops) {
 		Gbl.startMeasurement();
 		System.out.println("      building loc quad tree...");
 		double minx = Double.POSITIVE_INFINITY;
@@ -58,7 +58,7 @@ public class Utils {
 		return locQuadTree;
 	}
 	
-	public static QuadTree<ActivityFacility> buildLocationQuadTreeFacilities(TreeMap<Id, ? extends ActivityFacility> shops) {
+	public static QuadTree<ActivityFacility> buildLocationQuadTreeFacilities(TreeMap<Id<ActivityFacility>, ? extends ActivityFacility> shops) {
 		Gbl.startMeasurement();
 		System.out.println("      building loc quad tree...");
 		double minx = Double.POSITIVE_INFINITY;

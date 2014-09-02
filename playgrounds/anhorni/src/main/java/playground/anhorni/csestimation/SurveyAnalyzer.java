@@ -15,12 +15,12 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 public class SurveyAnalyzer {
 	private final static Logger log = Logger.getLogger(SurveyAnalyzer.class);	
-	private TreeMap<Id, EstimationPerson> population;
+	private TreeMap<Id<Person>, EstimationPerson> population;
 	private String outdir;
 	private DecimalFormat formatter = new DecimalFormat("0.0");
-	TreeMap<Id, ShopLocation> ucs;
+	TreeMap<Id<Location>, ShopLocation> ucs;
 	
-	public SurveyAnalyzer(TreeMap<Id, EstimationPerson> population, String outdir) {
+	public SurveyAnalyzer(TreeMap<Id<Person>, EstimationPerson> population, String outdir) {
 		this.population = population;
 		this.outdir = outdir;
 		new File(this.outdir).mkdirs();
@@ -31,12 +31,12 @@ public class SurveyAnalyzer {
 		this.outdir = outdir;
 	} 
 	
-	public void setPopulation(TreeMap<Id, EstimationPerson> population) {
+	public void setPopulation(TreeMap<Id<Person>, EstimationPerson> population) {
 		this.population = population;
 	}
 		
 	public void setPopulation(Population population) {
-		this.population = new TreeMap<Id, EstimationPerson>();
+		this.population = new TreeMap<Id<Person>, EstimationPerson>();
 		for (Person p:population.getPersons().values()) {
 			EstimationPerson person = (EstimationPerson)p;
 			this.population.put(p.getId(), person);		
@@ -330,7 +330,7 @@ public class SurveyAnalyzer {
 		incomeBins.plotBinnedDistribution(outdir, "income bins", " income cat");		
 	}
 	
-	public void setUcs(TreeMap<Id, ShopLocation> ucs) {
+	public void setUcs(TreeMap<Id<Location>, ShopLocation> ucs) {
 		this.ucs = ucs;
 	}
 }

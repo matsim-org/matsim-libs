@@ -33,8 +33,8 @@ public class UniversalChoiceSetReader {
 	
 	private WGS84toCH1903LV03 trafo = new WGS84toCH1903LV03();
 	
-	public TreeMap<Id, ShopLocation> readUniversalCS(String file) {
-		TreeMap<Id, ShopLocation> shops = new TreeMap<Id, ShopLocation>();
+	public TreeMap<Id<Location>, ShopLocation> readUniversalCS(String file) {
+		TreeMap<Id<Location>, ShopLocation> shops = new TreeMap<Id<Location>, ShopLocation>();
 		try {
 			FileReader fr = new FileReader(file);
 			BufferedReader br = new BufferedReader(fr);
@@ -43,7 +43,7 @@ public class UniversalChoiceSetReader {
 			while ((curr_line = br.readLine()) != null) {
 				String[] entrs = curr_line.split("\t", -1);
 				
-				Id id = new IdImpl(Integer.parseInt(entrs[0].trim()));
+				Id<Location> id = new IdImpl(Integer.parseInt(entrs[0].trim()));
 				ShopLocation shop = new ShopLocation(id);
 				// lat -> 1 | lon -> 0
 				CoordImpl coord = new CoordImpl(Double.parseDouble(entrs[5]), Double.parseDouble(entrs[4]));

@@ -23,26 +23,26 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
 public class Location {
-	private Id id;
+	private Id<Location> id;
 	private Coord coord;	 
 	private String city;
 	
-	public Location(Id id) {
+	public Location(Id<Location> id) {
 		this.id = id;
 	}
 	
-	public Location(Id id, Coord coord) {
+	public Location(Id<Location> id, Coord coord) {
 		this.id = id;
 		this.coord = coord;
 	}
 	
-	public Id getId() {
+	public Id<Location> getId() {
 		return id;
 	}
 	public Coord getCoord() {
 		return coord;
 	}
-	public void setId(Id id) {
+	public void setId(Id<Location> id) {
 		this.id = id;
 	}
 	public void setCoord(Coord coord) {

@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Id;
 
 public class BZShop extends Location {
 
-	public BZShop(Id id) {
+	public BZShop(Id<Location> id) {
 		super(id);
 	}
 	int [] size;

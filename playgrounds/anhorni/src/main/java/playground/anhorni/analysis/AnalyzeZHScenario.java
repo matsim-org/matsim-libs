@@ -58,8 +58,8 @@ public class AnalyzeZHScenario {
 		this.analyzefacilities(getZHfacilityIds(), "ZH");
 	}
 	
-	private TreeSet<Id> getZHfacilityIds() {
-		TreeSet<Id> zhFacilityIds = new TreeSet<Id>();
+	private TreeSet<Id<ActivityFacility>> getZHfacilityIds() {
+		TreeSet<Id<ActivityFacility>> zhFacilityIds = new TreeSet<Id<ActivityFacility>>();
 		NodeImpl centerNode = (NodeImpl) this.scenario.getNetwork().getNodes().get(new IdImpl("2531"));
 		double radius = 30000;
 		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
@@ -70,12 +70,12 @@ public class AnalyzeZHScenario {
 		return zhFacilityIds;
 	}
 	
-	private void analyzefacilities(Set<Id> set, String region) {
+	private void analyzefacilities(Set<Id<ActivityFacility>> set, String region) {
 		log.info("Number of " + region + " facilities: " + set.size());
 		int numberOfActivityOptions = 0;
 		int numberOfShopFacilities = 0;
 		int numberOfLeisureFacilities = 0;
-		for (Id facilityId: set) {
+		for (Id<ActivityFacility> facilityId: set) {
 			ActivityFacility facility = this.scenario.getActivityFacilities().getFacilities().get(facilityId);
 			numberOfActivityOptions += facility.getActivityOptions().entrySet().size();
 			

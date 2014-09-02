@@ -30,16 +30,15 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
 
 public class ShopsEnricher {
 
-	private TreeMap<Id, BZShop> bzShops;
-	private TreeMap<Id, ShopLocation> shops = new TreeMap<Id, ShopLocation>();
+	private TreeMap<Id<Location>, BZShop> bzShops;
+	private TreeMap<Id<Location>, ShopLocation> shops = new TreeMap<Id<Location>, ShopLocation>();
 	private final static Logger log = Logger.getLogger(ShopsEnricher.class);
 		
-	public void enrich(TreeMap<Id, ShopLocation> ucs, String bzFile) {
+	public void enrich(TreeMap<Id<Location>, ShopLocation> ucs, String bzFile) {
 		this.shops = ucs;
 		try {
 			this.readBZ(bzFile);
@@ -51,7 +50,7 @@ public class ShopsEnricher {
 		log.info("Enriching finished ------------------------------------------");
 	}
 	
-	public void setShops(TreeMap<Id, ShopLocation> shops) {
+	public void setShops(TreeMap<Id<Location>, ShopLocation> shops) {
 		this.shops = shops;
 	}
 
@@ -69,7 +68,7 @@ public class ShopsEnricher {
 		BufferedReader br = new BufferedReader(fr);
 		String curr_line = br.readLine();  // Skip header
 		
-		this.bzShops = new TreeMap<Id, BZShop>();
+		this.bzShops = new TreeMap<Id<Location>, BZShop>();
 		
 		while ((curr_line = br.readLine()) != null) {
 			int [] size = {0, 0, 0, 0, 0, 0};
@@ -84,7 +83,7 @@ public class ShopsEnricher {
 				sum += v;
 			}
 			if (sum > 0) {
-				Id id = new IdImpl(Integer.parseInt(entries[0].trim()));
+				Id<Location> id = new IdImpl(Integer.parseInt(entries[0].trim()));
 				BZShop bzShop = new BZShop(id);
 				Coord coord = new CoordImpl(x, y);
 				bzShop.setCoord(coord);			
@@ -180,7 +179,7 @@ public class ShopsEnricher {
 		
 	}
 
-	public TreeMap<Id, ShopLocation> getShops() {
+	public TreeMap<Id<Location>, ShopLocation> getShops() {
 		return this.shops;
 	}
 }

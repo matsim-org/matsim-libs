@@ -34,11 +34,11 @@ public class ShopLocation extends Location {
 	private int size = -1;
 	private int price = -1;
 	
-	public ShopLocation(Id id) {
+	public ShopLocation(Id<Location> id) {
 		super(id);
 	}
 	
-	public ShopLocation(Id id, Coord coord) {
+	public ShopLocation(Id<Location> id, Coord coord) {
 		super(id, coord);
 	}
 	

@@ -37,7 +37,7 @@ public class FacilityQuadTreeBuilder {
 
 	public QuadTreeRing<ActivityFacility> buildFacilityQuadTree(String type, List<ActivityFacility> facilities) {
 
-		TreeMap<Id, ActivityFacility> treeMap = new TreeMap<Id, ActivityFacility>();
+		TreeMap<Id<ActivityFacility>, ActivityFacility> treeMap = new TreeMap<Id<ActivityFacility>, ActivityFacility>();
 		// get all types of activities
 		for (ActivityFacility f : facilities) {
 			if (!treeMap.containsKey(f.getId())) {
@@ -49,7 +49,7 @@ public class FacilityQuadTreeBuilder {
 
 
 	public QuadTreeRing<ActivityFacility> buildFacilityQuadTree(String type, ActivityFacilitiesImpl facilities) {
-		TreeMap<Id, ActivityFacility> treeMap = new TreeMap<Id, ActivityFacility>();
+		TreeMap<Id<ActivityFacility>, ActivityFacility> treeMap = new TreeMap<Id<ActivityFacility>, ActivityFacility>();
 		// get all types of activities
 		for (ActivityFacility f : facilities.getFacilitiesForActivityType(type).values()) {
 			if (!treeMap.containsKey(f.getId())) {
@@ -60,7 +60,7 @@ public class FacilityQuadTreeBuilder {
 	}
 
 
-	public QuadTreeRing<ActivityFacility> builFacQuadTree(String type, TreeMap<Id, ActivityFacility> treeMap) {
+	public QuadTreeRing<ActivityFacility> builFacQuadTree(String type, TreeMap<Id<ActivityFacility>, ActivityFacility> treeMap) {
 		Gbl.startMeasurement();
 		log.info(" building " + type + " facility quad tree");
 		double minx = Double.POSITIVE_INFINITY;

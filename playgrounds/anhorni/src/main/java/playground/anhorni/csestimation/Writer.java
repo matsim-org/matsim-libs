@@ -12,12 +12,12 @@ import org.matsim.api.core.v01.population.Population;
 
 public class Writer {
 		
-	public void write(Population population, TreeMap<Id, ShopLocation> shops, String personsFile, String shopsFile, String bzFile) {
+	public void write(Population population, TreeMap<Id<Location>, ShopLocation> shops, String personsFile, String shopsFile, String bzFile) {
 		this.writePersons(population, shops, personsFile);
 		this.writeShops(shops, shopsFile, bzFile);
 	}
 	
-	private void writePersons(Population population, TreeMap<Id, ShopLocation> shops, String personsFile) {
+	private void writePersons(Population population, TreeMap<Id<Location>, ShopLocation> shops, String personsFile) {
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(personsFile)); 
 			
@@ -44,7 +44,7 @@ public class Writer {
 		}
 	}
 	
-	public void writeShops(TreeMap<Id, ShopLocation> shops, String shopsFile, String bzFile) {
+	public void writeShops(TreeMap<Id<Location>, ShopLocation> shops, String shopsFile, String bzFile) {
 		
 		ShopsEnricher enricher = new ShopsEnricher();
 		enricher.enrich(shops, bzFile);

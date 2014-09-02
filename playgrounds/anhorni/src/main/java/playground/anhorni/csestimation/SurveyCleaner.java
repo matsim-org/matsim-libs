@@ -15,7 +15,7 @@ public class SurveyCleaner {
 	
 	private final static Logger log = Logger.getLogger(SurveyCleaner.class);
 	
-	public void clean(TreeMap<Id, EstimationPerson> population) {
+	public void clean(TreeMap<Id<Person>, EstimationPerson> population) {
 		this.filter(population);
 		this.cleanIncome(population);
 	}
@@ -33,8 +33,8 @@ public class SurveyCleaner {
 		return pop;
 	}
 	
-	public TreeMap<Id, EstimationPerson> removeNonAgeNonIncomePersons(TreeMap<Id, EstimationPerson> population) {
-		TreeMap<Id, EstimationPerson> pop = new TreeMap<Id, EstimationPerson>();
+	public TreeMap<Id<Person>, EstimationPerson> removeNonAgeNonIncomePersons(TreeMap<Id<Person>, EstimationPerson> population) {
+		TreeMap<Id<Person>, EstimationPerson> pop = new TreeMap<Id<Person>, EstimationPerson>();
 		
 		for (EstimationPerson person : population.values()) {
 			if (person.getAge() > 0.0 && person.getHhIncome() > 0.0) {
@@ -44,7 +44,7 @@ public class SurveyCleaner {
 		return pop;
 	}
 	
-	public void filter(TreeMap<Id, EstimationPerson> population) { // stopped survey
+	public void filter(TreeMap<Id<Person>, EstimationPerson> population) { // stopped survey
 		log.info("clean filter ...");
 		population.remove(new IdImpl(1225));
 		population.remove(new IdImpl(1984));	
@@ -54,7 +54,7 @@ public class SurveyCleaner {
 		population.remove(new IdImpl(1277)); //Küsnacht
 	}
 	
-	public void cleanIncome(TreeMap<Id, EstimationPerson> population) {
+	public void cleanIncome(TreeMap<Id<Person>, EstimationPerson> population) {
 		population.get(new IdImpl(1298)).setHhIncome(
 				(int)(population.get(new IdImpl(1298)).getHhIncome() / 12.0));
 		population.get(new IdImpl(1512)).setHhIncome(

@@ -25,12 +25,13 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.QuadTree;
 
 public class SurveyControler {
 	public static ArrayList<String> modes = new ArrayList<String>(Arrays.asList("car", "pt", "bike", "walk", ""));
 	public static ArrayList<String> frequency = new ArrayList<String>(Arrays.asList("VeryOften", "Often", "OnceAWhile", "Seldom", "Never", "NULL", ""));	
-	private TreeMap<Id, EstimationPerson> population = new TreeMap<Id, EstimationPerson>();
+	private TreeMap<Id<Person>, EstimationPerson> population = new TreeMap<Id<Person>, EstimationPerson>();
 	private final static Logger log = Logger.getLogger(SurveyControler.class);
 	
 	public static void main(String[] args) {
@@ -57,7 +58,7 @@ public class SurveyControler {
 
 		// create and analyze home sets
 		UniversalChoiceSetReader ucsReader = new UniversalChoiceSetReader();
-		TreeMap<Id, ShopLocation> ucs = ucsReader.readUniversalCS(shopsFile);
+		TreeMap<Id<Location>, ShopLocation> ucs = ucsReader.readUniversalCS(shopsFile);
 		QuadTree<Location> shopQuadTree = Utils.buildLocationQuadTree(ucs);
 		
 		for (EstimationPerson person : this.population.values()) {

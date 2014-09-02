@@ -7,20 +7,21 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
 public class SurveyReader {
-	private TreeMap<Id, EstimationPerson> population;
+	private TreeMap<Id<Person>, EstimationPerson> population;
 	private final static Logger log = Logger.getLogger(SurveyReader.class);
 	private WGS84toCH1903LV03 trafo = new WGS84toCH1903LV03();
 
-	public TreeMap<Id, EstimationPerson> getPopulation() {
+	public TreeMap<Id<Person>, EstimationPerson> getPopulation() {
 		return population;
 	}
 	
-	public SurveyReader(TreeMap<Id, EstimationPerson> population) {
+	public SurveyReader(TreeMap<Id<Person>, EstimationPerson> population) {
 		this.population = population;
 	}
 

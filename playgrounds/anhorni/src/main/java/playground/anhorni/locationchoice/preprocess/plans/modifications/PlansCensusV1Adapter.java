@@ -55,7 +55,7 @@ public class PlansCensusV1Adapter {
 				"home", facilities.getFacilitiesForActivityType("home"));
 
 
-		TreeMap<Id, ActivityFacility> educationTreeMap =
+		TreeMap<Id<ActivityFacility>, ActivityFacility> educationTreeMap =
 			facilities.getFacilitiesForActivityType("education_kindergarten");
 		educationTreeMap.putAll(facilities.getFacilitiesForActivityType("education_primary"));
 		educationTreeMap.putAll(facilities.getFacilitiesForActivityType("education_secondary"));
@@ -66,7 +66,7 @@ public class PlansCensusV1Adapter {
 				"education", educationTreeMap);
 
 
-		TreeMap<Id, ActivityFacility> workTreeMap =
+		TreeMap<Id<ActivityFacility>, ActivityFacility> workTreeMap =
 			facilities.getFacilitiesForActivityType("work_sector2");
 		workTreeMap.putAll(facilities.getFacilitiesForActivityType("work_sector3"));
 		workTreeMap.putAll(facilities.getFacilitiesForActivityType("work"));

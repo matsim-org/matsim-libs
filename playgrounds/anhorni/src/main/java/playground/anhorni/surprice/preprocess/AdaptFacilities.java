@@ -78,7 +78,7 @@ public class AdaptFacilities {
 			
 		}
 		
-		TreeMap<Id, ActivityFacility> workFacilities = this.scenario.getActivityFacilities().getFacilitiesForActivityType("work");		
+		TreeMap<Id<ActivityFacility>, ActivityFacility> workFacilities = this.scenario.getActivityFacilities().getFacilitiesForActivityType("work");		
 		for (ActivityFacility facility : workFacilities.values()) {
 			//ActivityOptionImpl aOptWork = (ActivityOptionImpl) facility.getActivityOptions().get("work");
 			//SortedSet<OpeningTime> ots = aOptWork.getOpeningTimes();
