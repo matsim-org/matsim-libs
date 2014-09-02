@@ -45,7 +45,6 @@ import org.matsim.population.algorithms.XY2Links;
 import playground.artemc.utils.CSVReader;
 import playground.artemc.utils.SortEntriesByValueDesc;
 
-
 public class PopulationGenerator {
 
 //	private static Double avgHouseholdSize = 2.0;
@@ -59,7 +58,7 @@ public class PopulationGenerator {
 		String populationPath = args[2];
 		String incomeFilePath = args[3];
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesPath);
 		
 		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
@@ -73,7 +72,7 @@ public class PopulationGenerator {
 		
 		NodeDistances nodeDistances = new NodeDistances(networkPath);
 		
-		Map<Id, ActivityFacility> facilities = (Map<Id, ActivityFacility>) scenario.getActivityFacilities().getFacilities();
+		Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities = scenario.getActivityFacilities().getFacilities();
 		HashMap<Integer,Double> bedsInZone = new HashMap<Integer, Double>();
 		HashMap<Integer,Double> workplacesInZone = new HashMap<Integer, Double>();
 		HashMap<Integer,ArrayList<Double>> workPlaces = new HashMap<Integer, ArrayList<Double>>();

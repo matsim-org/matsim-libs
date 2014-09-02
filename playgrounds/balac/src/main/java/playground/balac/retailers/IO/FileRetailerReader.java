@@ -22,13 +22,13 @@ import playground.balac.retailers.data.Retailers;
 public class FileRetailerReader {
 
 	private final static Logger log = Logger.getLogger(FileRetailerReader.class);
-	private Map<Id, ? extends ActivityFacility> controlerFacilities;
+	private Map<Id<ActivityFacility>, ? extends ActivityFacility> controlerFacilities;
 	private String facilityIdFile;
 	private Retailers retailers = new Retailers();
 	private ArrayList<Id> retailersLinks = new ArrayList<Id>();
 	private ArrayList<Id> retailersFacilities = new ArrayList<Id>();
 	
-	public FileRetailerReader(Map<Id, ? extends ActivityFacility> controlerFacilities, String facilityIdFile) {
+	public FileRetailerReader(Map<Id<ActivityFacility>, ? extends ActivityFacility> controlerFacilities, String facilityIdFile) {
 		this.controlerFacilities = controlerFacilities;
 		this.facilityIdFile = facilityIdFile;
 	}

@@ -35,7 +35,7 @@ public class ActivityDifferentiatorBalac {
 		private int numberOfShopActs;
 		private final ScenarioImpl scenario;
 		private ArrayList<Id> groceryFacilities = new ArrayList<Id>();
-		private TreeMap<Id,ActivityFacility> shopFacilities = new TreeMap<Id,ActivityFacility>();
+		private TreeMap<Id<ActivityFacility>,ActivityFacility> shopFacilities = new TreeMap<Id<ActivityFacility>,ActivityFacility>();
 		//private final String retailersFacilitiesPath = "../../matsim/input/triangle/Retailers.txt";
 		//private final String retailersFacilitiesPath = "/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/balacm/MATSim/input/teleatlas_10pc/retailersWithoutRepeatedLinks_MinDistCosts.txt";
 		
@@ -207,8 +207,8 @@ public class ActivityDifferentiatorBalac {
 			int count = 0;
 			int divisor = 1;
 			
-			Map<Id, ActivityFacility> facilitiesShopgrocery = scenario.getActivityFacilities().getFacilitiesForActivityType("shopgrocery");
-			Map<Id, ActivityFacility> facilitiesNongrocery = scenario.getActivityFacilities().getFacilitiesForActivityType("nongrocery");
+			Map<Id<ActivityFacility>, ActivityFacility> facilitiesShopgrocery = scenario.getActivityFacilities().getFacilitiesForActivityType("shopgrocery");
+			Map<Id<ActivityFacility>, ActivityFacility> facilitiesNongrocery = scenario.getActivityFacilities().getFacilitiesForActivityType("nongrocery");
 			
 			Object[] arrayfacilityshop = facilitiesShopgrocery.values().toArray();
 			Object[] arrayfacilitynongrocery =  facilitiesNongrocery.values().toArray();

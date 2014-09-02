@@ -18,7 +18,6 @@ import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -26,8 +25,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.artemc.utils.DataBaseAdmin;
 import playground.artemc.utils.NoConnectionException;
-
-
 
 public class PlanGenerator {
 
@@ -45,7 +42,7 @@ public class PlanGenerator {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesPath);
 
-		Map<Id, ? extends ActivityFacility> facilities = scenario.getActivityFacilities().getFacilities();
+		Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities = scenario.getActivityFacilities().getFacilities();
 		HashMap<String, Integer> ageMap = new HashMap<String, Integer>();
 		HashMap<String, String> sexMap = new HashMap<String, String>();
 		HashMap<String,Integer> carTracker = new HashMap<String, Integer>();

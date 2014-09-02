@@ -36,8 +36,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.artemc.utils.SortEntriesByValueDesc;
 
-
-
 public class Assignment {
 
 //	private static Double avgHouseholdSize = 2.0;
@@ -66,7 +64,7 @@ public class Assignment {
 		
 		NodeDistances nodeDistances = new NodeDistances(networkPath);
 		
-		Map<Id, ? extends ActivityFacility> facilities = scenario.getActivityFacilities().getFacilities();
+		Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities = scenario.getActivityFacilities().getFacilities();
 		HashMap<Integer,Double> bedsInZone = new HashMap<Integer, Double>();
 		HashMap<Integer,Integer> workplacesInZone = new HashMap<Integer, Integer>();
 		HashMap<Integer,ArrayList<Double>> workPlaces = new HashMap<Integer, ArrayList<Double>>();

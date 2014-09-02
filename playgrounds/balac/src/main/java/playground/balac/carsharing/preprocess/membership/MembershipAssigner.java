@@ -1,30 +1,20 @@
 package playground.balac.carsharing.preprocess.membership;
 
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.Vector;
 
 import org.apache.commons.lang.math.RandomUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.PersonImpl;
@@ -34,7 +24,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.balac.carsharing.data.FlexTransPersonImpl;
-import playground.balac.carsharing.preprocess.membership.IO.MembershipSummaryWriter;
 import playground.balac.carsharing.router.CarSharingStation;
 import playground.balac.carsharing.router.CarSharingStations;
 import playground.balac.carsharing.utils.MembershipUtils;
@@ -44,7 +33,7 @@ public class MembershipAssigner
 {
   private static final Logger log = Logger.getLogger(MembershipAssigner.class);
   private ScenarioImpl scenario;
-  private Map<Id, ? extends ActivityFacility> facilities;
+  private Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities;
   private TreeMap<Integer, Coord> solutionDecoder = new TreeMap<Integer, Coord>();
   private CarSharingStations carStations;
   private QuadTree<Person> personsQuadTree;

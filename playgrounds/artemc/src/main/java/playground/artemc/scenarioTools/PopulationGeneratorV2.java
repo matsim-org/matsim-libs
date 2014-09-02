@@ -74,7 +74,7 @@ public class PopulationGeneratorV2 {
 		
 		NodeDistances nodeDistances = new NodeDistances(networkPath);
 		
-		Map<Id, ? extends ActivityFacility> facilities = scenario.getActivityFacilities().getFacilities();
+		Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities = scenario.getActivityFacilities().getFacilities();
 		HashMap<Integer,Double> bedsInZone = new HashMap<Integer, Double>();
 		HashMap<Integer,Integer> workplacesInZone = new HashMap<Integer, Integer>();
 		HashMap<Integer,ArrayList<Double>> workPlaces = new HashMap<Integer, ArrayList<Double>>();
