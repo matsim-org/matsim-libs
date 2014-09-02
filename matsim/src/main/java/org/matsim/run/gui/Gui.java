@@ -1,5 +1,6 @@
 package org.matsim.run.gui;
 
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -12,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -20,6 +22,7 @@ import javax.swing.SwingUtilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ExeRunner;
 
 /**
@@ -120,7 +123,7 @@ public class Gui extends JFrame {
 		
 		txtOutput = new JTextField();
 		txtOutput.setEditable(false);
-		txtOutput.setText("output");
+		txtOutput.setText("");
 		txtOutput.setColumns(10);
 		
 		progressBar = new JProgressBar();
@@ -134,43 +137,74 @@ public class Gui extends JFrame {
 				startMATSim();
 			}
 		});
+		
+		JButton btnOpen = new JButton("Open");
+		btnOpen.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (!Gui.this.txtOutput.getText().isEmpty()) {
+					try {
+						File f = new File(Gui.this.txtOutput.getText());
+						Desktop.getDesktop().open(f);
+					} catch (IOException ex) {
+						ex.printStackTrace();
+					}
+				}
+			}
+		});
+		
+		JButton btnDelete = new JButton("Delete");
+		btnDelete.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (!Gui.this.txtOutput.getText().isEmpty()) {
+					int i = JOptionPane.showOptionDialog(Gui.this, "Do you really want to delete the output directory? This action cannot be undone.", "Delete Output Directory", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, new String[] {"Cancel", "Delete"}, "Cancel");
+					if (i == 1) {
+						try {
+							IOUtils.deleteDirectory(new File(Gui.this.txtOutput.getText()));
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
+					}
+				}
+			}
+		});
 
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
+					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(lblJavaLocation)
+						.addComponent(lblConfigurationFile)
+						.addComponent(lblOutputDirectory)
 						.addGroup(groupLayout.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(lblJavaLocation))
-						.addGroup(groupLayout.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(lblConfigurationFile))
-						.addGroup(groupLayout.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(lblOutputDirectory))
-						.addGroup(groupLayout.createSequentialGroup()
-							.addContainerGap()
 							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 								.addComponent(lblYouAreRunning)
 								.addComponent(lblYouAreUsing)
 								.addComponent(lblMemory)
 								.addComponent(btnStartMatsim))
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-								.addGroup(groupLayout.createSequentialGroup()
+							.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+								.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
 									.addComponent(txtRam, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(lblMb))
-								.addComponent(txtMatsimversion, GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
-								.addComponent(txtJvmversion, GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
-								.addComponent(txtJvmlocation, GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
-								.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
-									.addComponent(txtConfigfilename, GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE)
+								.addComponent(txtMatsimversion, GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE)
+								.addComponent(txtJvmversion, GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE)
+								.addComponent(txtJvmlocation, GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE)
+								.addGroup(groupLayout.createSequentialGroup()
+									.addComponent(txtConfigfilename, GroupLayout.DEFAULT_SIZE, 399, Short.MAX_VALUE)
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(btnChoose))
-								.addComponent(txtOutput, GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
-								.addComponent(progressBar, GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE))))
+								.addComponent(progressBar, GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE)
+								.addGroup(groupLayout.createSequentialGroup()
+									.addComponent(txtOutput, GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(btnOpen)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(btnDelete)))))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
@@ -196,7 +230,9 @@ public class Gui extends JFrame {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblOutputDirectory)
-						.addComponent(txtOutput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(txtOutput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnDelete)
+						.addComponent(btnOpen))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblMemory)
@@ -206,7 +242,7 @@ public class Gui extends JFrame {
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addComponent(btnStartMatsim)
 						.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(178, Short.MAX_VALUE))
+					.addContainerGap(176, Short.MAX_VALUE))
 		);
 
 		getContentPane().setLayout(groupLayout);
