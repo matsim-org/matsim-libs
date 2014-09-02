@@ -44,7 +44,7 @@ class MATSimTest extends Test {
 	 * list.
 	 */
 	Map<String, ArrayList<Node>> nodeIds;
-	NetworkLayer layer;
+	MATSimLayer layer;
 	Network network;
 
 	/**
@@ -86,9 +86,9 @@ class MATSimTest extends Test {
 		super.startTest(monitor);
 		this.nodeIds = new HashMap<String, ArrayList<Node>>();
 		this.linkIds = new HashMap<String, ArrayList<Way>>();
-		if (Main.main.getActiveLayer() instanceof NetworkLayer) {
-			layer = (NetworkLayer) Main.main.getActiveLayer();
-			this.network = ((NetworkLayer) layer).getMatsimScenario().getNetwork();
+		if (Main.main.getActiveLayer() instanceof MATSimLayer) {
+			layer = (MATSimLayer) Main.main.getActiveLayer();
+			this.network = ((MATSimLayer) layer).getMatsimScenario().getNetwork();
 		}
 	}
 

@@ -71,6 +71,9 @@ public class MapRenderer extends StyledMapRenderer {
 			BasicStroke dashes, Color dashedColor, float offset,
 			boolean showOrientation, boolean showHeadArrowOnly,
 			boolean showOneway, boolean onewayReversed) {
+//		if(!way2Links.containsKey(way)) {
+//			return;
+//		}
 
 		Layer layer = Main.main.getActiveLayer();
 		if (layer instanceof OsmDataLayer) {

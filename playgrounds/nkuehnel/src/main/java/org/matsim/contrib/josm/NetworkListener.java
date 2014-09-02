@@ -4,12 +4,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.osm.Changeset;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
@@ -36,17 +42,20 @@ class NetworkListener implements DataSetListener, Visitor {
 
 	private final Logger log = Logger.getLogger(NetworkListener.class);
 
-	private Network network;
+	private Scenario scenario;
 
 	private Map<Way, List<Link>> way2Links;
 	private Map<Link, List<WaySegment>> link2Segments;
 
-	public NetworkListener(Network network, Map<Way, List<Link>> way2Links,
-			Map<Link, List<WaySegment>> link2Segments)
+	private Map<Relation, TransitRoute> relation2Route;
+
+	public NetworkListener(Scenario scenario, Map<Way, List<Link>> way2Links,
+			Map<Link, List<WaySegment>> link2Segments, Map<Relation, TransitRoute> relation2Route)
 			throws IllegalArgumentException {
-		this.network = network;
+		this.scenario = scenario;
 		this.way2Links = way2Links;
 		this.link2Segments = link2Segments;
+		this.relation2Route = relation2Route;
 		log.debug("Listener initialized");
 	}
 
@@ -76,6 +85,9 @@ class NetworkListener implements DataSetListener, Visitor {
 			log.info("Primitive added. "+ primitive.getType() + " " + primitive.getUniqueId());
 			if (primitive instanceof Way) {
 				visit((Way) primitive);
+				primitive.visitReferrers(this);
+			} else if (primitive instanceof Relation) {
+				visit((Relation) primitive);
 			}
 		}
 	}
@@ -86,10 +98,10 @@ class NetworkListener implements DataSetListener, Visitor {
 			log.info("Primitive removed. "+ primitive.getType() + " " + primitive.getUniqueId());
 			if (primitive instanceof org.openstreetmap.josm.data.osm.Node) {
 				String id = String.valueOf(primitive.getUniqueId());
-				if (network.getNodes().containsKey(new IdImpl(id))) {
-					Node node = network.getNodes().get(new IdImpl(id));
+				if (scenario.getNetwork().getNodes().containsKey(new IdImpl(id))) {
+					Node node = scenario.getNetwork().getNodes().get(new IdImpl(id));
 					log.debug("MATSim Node removed. " + ((NodeImpl) node).getOrigId());
-					network.removeNode(node.getId());
+					scenario.getNetwork().removeNode(node.getId());
 				}
 				primitive.visitReferrers(this);
 			} else if (primitive instanceof Way) {
@@ -100,20 +112,61 @@ class NetworkListener implements DataSetListener, Visitor {
 						link2Segments.remove(link);
 						log.debug("MATSim Link removed. "
 								+ ((LinkImpl) link).getOrigId());
-						network.removeLink(link.getId());
+						scenario.getNetwork().removeLink(link.getId());
 					}
 					way2Links.remove(primitive);
 				}
+				primitive.visitReferrers(this);
+			} else if (primitive instanceof Relation) {
+				log.debug("Relation deleted "+ primitive.getUniqueId());
+				if(relation2Route.containsKey(primitive)) {
+					TransitRoute route = relation2Route.get(primitive);
+					for (Id linkId: route.getRoute().getLinkIds()) {
+						if(!link2Segments.containsKey(scenario.getNetwork().getLinks().get(linkId))) {
+							scenario.getNetwork().removeLink(linkId);
+						}
+					}
+					
+					Id lineId;
+					if (primitive.hasKey("ref")) {
+						lineId = new IdImpl(primitive.get("ref"));
+					} else if (primitive.hasKey("name")) {
+						lineId = new IdImpl(primitive.get("name"));
+					} else {
+						lineId = new IdImpl(primitive.getUniqueId());
+					}
+					
+					for (TransitRouteStop stop: route.getStops()) {
+						Id linkId = stop.getStopFacility().getLinkId();
+						Link link = scenario.getNetwork().getLinks().get(linkId);
+						if (link2Segments.containsKey(link)) {
+							scenario.getNetwork().removeLink(linkId);
+						}
+						scenario.getTransitSchedule().removeStopFacility(stop.getStopFacility());
+					}
+					
+					if (scenario.getTransitSchedule().getTransitLines().containsKey(lineId)) {
+						log.debug("line found");
+						TransitLine line = scenario.getTransitSchedule().getTransitLines().get(lineId);
+						if (line.getRoutes().containsValue(route)) {
+						line.removeRoute(route);
+						}
+						if(line.getRoutes().isEmpty()) {
+							scenario.getTransitSchedule().removeTransitLine(line);
+						}
+					}
+					relation2Route.remove(primitive);
+				}
 			}
 		}
-		log.info("Number of links: " + network.getLinks().size());
-		MATSimPlugin.toggleDialog.notifyDataChanged(network);
+		log.info("Number of links: " + scenario.getNetwork().getLinks().size());
+		MATSimPlugin.toggleDialog.notifyDataChanged(scenario);
 	}
 
 	@Override
 	public void relationMembersChanged(RelationMembersChangedEvent arg0) {
 		log.debug("Relation member changed " + arg0.getType());
-
+		visit(arg0.getRelation()); 
 	}
 
 	@Override
@@ -122,6 +175,7 @@ class NetworkListener implements DataSetListener, Visitor {
 		for (OsmPrimitive primitive : changed.getPrimitives()) {
 			if (primitive instanceof Way) {
 				visit((Way) primitive);
+				primitive.visitReferrers(this);
 				for (org.openstreetmap.josm.data.osm.Node node : ((Way) primitive)
 						.getNodes()) {
 					if (node.isReferredByWays(2)) {
@@ -135,6 +189,9 @@ class NetworkListener implements DataSetListener, Visitor {
 			} else if (primitive instanceof org.openstreetmap.josm.data.osm.Node) {
 				primitive.visitReferrers(this);
 			}
+		}
+		for(TransitStopFacility stop: scenario.getTransitSchedule().getFacilities().values()) {
+			System.out.println(stop.getName());
 		}
 	}
 
@@ -167,23 +224,75 @@ class NetworkListener implements DataSetListener, Visitor {
 			Main.main.getCurrentDataSet().clearHighlightedWaySegments();
 		}
 		List<Link> oldLinks = way2Links.remove(way);
-		MATSimPlugin.toggleDialog.notifyDataChanged(network);
+		MATSimPlugin.toggleDialog.notifyDataChanged(scenario);
 		if (oldLinks != null) {
 			for (Link link : oldLinks) {
-				Link removedLink = network.removeLink(link.getId());
+				Link removedLink = scenario.getNetwork().removeLink(link.getId());
 				log.debug(removedLink + " removed.");
 			}
 		}
 		if (!way.isDeleted()) {
-			NewConverter.convertWay(way, network, way2Links, link2Segments);
-			MATSimPlugin.toggleDialog.notifyDataChanged(network);
+			NewConverter.convertWay(way, scenario.getNetwork(), way2Links, link2Segments);
+			MATSimPlugin.toggleDialog.notifyDataChanged(scenario);
 		}
-		log.info("Number of links: " + network.getLinks().size());
+		log.info("Number of links: " + scenario.getNetwork().getLinks().size());
 	}
 
 	@Override
-	public void visit(Relation arg0) {
-		// TODO Auto-generated method stub
+	public void visit(Relation relation) {
+		if (!relation.isDeleted() && relation.hasTag("type", new String[] {"route", "matsimRoute"})) {
+			if (relation.hasTag("route", new String[] { "train",
+					"track", "bus", "light_rail", "tram", "subway" }) || relation.hasTag("type","matsimRoute")) {
+				
+				if(relation2Route.containsKey(relation)) {
+					TransitRoute route = relation2Route.get(relation);
+					for (Id linkId: route.getRoute().getLinkIds()) {
+						if(!link2Segments.containsKey(scenario.getNetwork().getLinks().get(linkId))) {
+							scenario.getNetwork().removeLink(linkId);
+						}
+					}
+					
+					Id lineId;
+					if (relation.hasKey("ref")) {
+						lineId = new IdImpl(relation.get("ref"));
+					} else if (relation.hasKey("name")) {
+						lineId = new IdImpl(relation.get("name"));
+					} else {
+						lineId = new IdImpl(relation.getUniqueId());
+					}
+					
+					for (TransitRouteStop stop: route.getStops()) {
+						Id linkId = stop.getStopFacility().getLinkId();
+						Link link = scenario.getNetwork().getLinks().get(linkId);
+						if (!link2Segments.containsKey(link)) {
+							scenario.getNetwork().removeLink(linkId);
+						}
+						scenario.getTransitSchedule().removeStopFacility(stop.getStopFacility());
+					}
+					
+					if (scenario.getTransitSchedule().getTransitLines().containsKey(lineId)) {
+						log.debug("line found");
+						TransitLine line = scenario.getTransitSchedule().getTransitLines().get(lineId);
+						if (line.getRoutes().containsValue(route)) {
+						line.removeRoute(route);
+						}
+						if(line.getRoutes().isEmpty()) {
+							scenario.getTransitSchedule().removeTransitLine(line);
+						}
+					}
+					relation2Route.remove(relation);
+				}
+				
+				if (relation.hasTag("route", new String[] { "train",
+						"track", "bus", "light_rail", "tram", "subway" })) {
+				
+					NewConverter.convertTransitRouteOsm(relation, scenario, relation2Route);
+				} else if(relation.hasTag("type", "matsimRoute")) {
+					NewConverter.convertTransitRouteMatsim(relation, scenario, way2Links, relation2Route);
+				}
+				MATSimPlugin.toggleDialog.notifyDataChanged(scenario);
+			}
+		}
 
 	}
 

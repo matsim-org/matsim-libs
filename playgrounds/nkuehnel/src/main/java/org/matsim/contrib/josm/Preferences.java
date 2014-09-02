@@ -24,7 +24,7 @@ final class Preferences extends DefaultTabPreferenceSetting {
 
 	private final static JCheckBox renderMatsim = new JCheckBox(
 			"Activate MATSim Renderer");
-	private final static JCheckBox showIds = new JCheckBox("Show Ids");
+	private final static JCheckBox showIds = new JCheckBox("Show link-Ids");
 	private final static JSlider wayOffset = new JSlider(0, 100);
 	private final static JLabel wayOffsetLabel = new JLabel(
 			"Link offset for overlapping links");
@@ -175,9 +175,16 @@ final class Preferences extends DefaultTabPreferenceSetting {
 		cOptions.gridy = 4;
 		pnl.add(hierarchyLabel, cOptions);
 		cOptions.gridx = 1;
+		pnl.add(hierarchyLayer, cOptions);
+		
 		cOptions.weighty = 1;
 		cOptions.weightx = 1;
-		pnl.add(hierarchyLayer, cOptions);
+		cOptions.fill = GridBagConstraints.HORIZONTAL;
+		cOptions.gridwidth = 2;
+		cOptions.gridx = 0;
+		cOptions.gridy = 5;
+		JSeparator jSep = new JSeparator(SwingConstants.HORIZONTAL);
+		pnl.add(jSep, cOptions);
 
 		return pnl;
 	}

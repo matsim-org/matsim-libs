@@ -9,23 +9,23 @@ import java.util.List;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.DataSet;
+import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.WaySegment;
 import org.openstreetmap.josm.gui.PleaseWaitRunnable;
@@ -48,13 +48,14 @@ class ImportTask extends PleaseWaitRunnable {
 	 * The String representing the id tagging-key for ways.
 	 */
 	public static final String WAY_TAG_ID = "id";
-	private NetworkLayer layer;
+	private MATSimLayer layer;
 	private String path;
 	private DataSet dataSet;
 	private Scenario scenario;
 	private String importSystem;
 	private HashMap<Way, List<Link>> way2Links;
 	private HashMap<Link, List<WaySegment>> link2Segment;
+	private HashMap<Relation, TransitRoute> relation2Route = new HashMap<Relation, TransitRoute>();
 
 	/**
 	 * Creates a new Import task with the given <code>path</code>.
@@ -82,8 +83,8 @@ class ImportTask extends PleaseWaitRunnable {
 	protected void finish() {
 		// layer = null happens if Exception happens during import,
 		// as Exceptions are handled only after this method is called.
-		layer = new NetworkLayer(dataSet, ImportDialog.path.getText(),
-				new File(path), scenario, importSystem, way2Links, link2Segment);
+		layer = new MATSimLayer(dataSet, ImportDialog.path.getText(),
+				new File(path), scenario, importSystem, way2Links, link2Segment, relation2Route);
 		if (layer != null) {
 			Main.main.addLayer(layer);
 			Main.map.mapView.setActiveLayer(layer);
@@ -116,6 +117,7 @@ class ImportTask extends PleaseWaitRunnable {
 
 		way2Links = new HashMap<Way, List<Link>>();
 		link2Segment = new HashMap<Link, List<WaySegment>>();
+		
 		HashMap<Node, org.openstreetmap.josm.data.osm.Node> node2OsmNode = new HashMap<Node, org.openstreetmap.josm.data.osm.Node>();
 		this.progressMonitor.setTicks(3);
 		this.progressMonitor.setCustomText("creating nodes..");

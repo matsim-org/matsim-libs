@@ -43,11 +43,11 @@ final class MATSimNetworkFileExporter extends FileExporter {
 	 * @param layer
 	 *            The layer which holds the data
 	 * @return <code>true</code> if the given {@code layer} is a
-	 *         {@link NetworkLayer}. <code>false</code> otherwise
+	 *         {@link MATSimLayer}. <code>false</code> otherwise
 	 */
 	@Override
 	public boolean acceptFile(File pathname, Layer layer) {
-		return layer instanceof NetworkLayer;
+		return layer instanceof MATSimLayer;
 	}
 
 	/**
@@ -63,7 +63,7 @@ final class MATSimNetworkFileExporter extends FileExporter {
 	 *            stored to
 	 * @param layer
 	 *            The layer which holds the network data (must be a
-	 *            {@link NetworkLayer})
+	 *            {@link MATSimLayer})
 	 */
 	@Override
 	public void exportData(File file, Layer layer) throws IOException {

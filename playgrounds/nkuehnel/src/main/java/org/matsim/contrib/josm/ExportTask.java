@@ -81,18 +81,18 @@ class ExportTask extends PleaseWaitRunnable {
 		Layer layer = Main.main.getActiveLayer();
 
 		if (layer instanceof OsmDataLayer) {
-			if (layer instanceof NetworkLayer) {
+			if (layer instanceof MATSimLayer) {
 				this.progressMonitor.setTicks(1);
 				this.progressMonitor.setCustomText("rearranging data..");
 
-				for (Node node : ((NetworkLayer) layer).getMatsimScenario().getNetwork()
+				for (Node node : ((MATSimLayer) layer).getMatsimScenario().getNetwork()
 						.getNodes().values()) {
 					Node newNode = network.getFactory().createNode(
 							new IdImpl(((NodeImpl) node).getOrigId()),
 							node.getCoord());
 					network.addNode(newNode);
 				}
-				for (Link link : ((NetworkLayer) layer).getMatsimScenario().getNetwork()
+				for (Link link : ((MATSimLayer) layer).getMatsimScenario().getNetwork()
 						.getLinks().values()) {
 					Link newLink = network.getFactory().createLink(
 							new IdImpl(((LinkImpl) link).getOrigId()),

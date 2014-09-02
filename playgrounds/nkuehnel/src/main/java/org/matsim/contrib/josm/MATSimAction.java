@@ -20,9 +20,11 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.data.osm.DataSet;
+import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.WaySegment;
 import org.openstreetmap.josm.gui.layer.Layer;
@@ -101,7 +103,7 @@ class MATSimAction {
 	}
 
 	/**
-	 * New Network Action which causes an empty {@link NetworkLayer} to be
+	 * New Network Action which causes an empty {@link MATSimLayer} to be
 	 * created
 	 * 
 	 * @author Nico
@@ -123,17 +125,18 @@ class MATSimAction {
 			DataSet dataSet = new DataSet();
 			Config config = ConfigUtils.createConfig();
 			Scenario scenario = ScenarioUtils.createScenario(config);
-			NetworkLayer layer = new NetworkLayer(dataSet, "new Layer", null,
+			MATSimLayer layer = new MATSimLayer(dataSet, "new Layer", null,
 					scenario, TransformationFactory.WGS84,
 					new HashMap<Way, List<Link>>(),
-					new HashMap<Link, List<WaySegment>>());
+					new HashMap<Link, List<WaySegment>>(),
+					new HashMap<Relation, TransitRoute>());
 			Main.main.addLayer(layer);
 		}
 	}
 
 	/**
 	 * The Convert Action which causes the {@link ConvertTask} to start. Results
-	 * in a new {@link NetworkLayer} which holds the converted data.
+	 * in a new {@link MATSimLayer} which holds the converted data.
 	 * 
 	 * @author Nico
 	 * 
@@ -157,7 +160,7 @@ class MATSimAction {
 		public void actionPerformed(ActionEvent e) {
 			Layer activeLayer = Main.main.getActiveLayer();
 			if (activeLayer instanceof OsmDataLayer
-					&& !(activeLayer instanceof NetworkLayer)) {
+					&& !(activeLayer instanceof MATSimLayer)) {
 				ConvertTask task = new ConvertTask();
 				task.run();
 			}

@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,13 +35,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.AutoScaleAction;
 import org.openstreetmap.josm.actions.ExtensionFileFilter;
@@ -51,6 +48,7 @@ import org.openstreetmap.josm.data.Preferences.PreferenceChangedListener;
 import org.openstreetmap.josm.data.SelectionChangedListener;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
+import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.WaySegment;
 import org.openstreetmap.josm.gui.MapView.LayerChangeListener;
@@ -58,7 +56,6 @@ import org.openstreetmap.josm.gui.PleaseWaitRunnable;
 import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
-import org.openstreetmap.josm.gui.util.HighlightHelper;
 import org.openstreetmap.josm.io.FileExporter;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.tools.ImageProvider;
@@ -84,6 +81,7 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 	private Scenario currentScenario;
 	private Map<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
 	private Map<Link, List<WaySegment>> link2Segments = new HashMap<Link, List<WaySegment>>();
+	private Map<Relation, TransitRoute> relation2Route = new HashMap<Relation, TransitRoute>();
 	private NetworkListener osmNetworkListener;
 
 	public MATSimToggleDialog() {
@@ -102,6 +100,7 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 		
 		JTabbedPane tabPane = new JTabbedPane();
 		tabPane.addTab("Private Transport", tableContainer);
+		tabPane.addTab("Public Transport", new JPanel());
 		createLayout(tabPane, false, null);
 
 		networkAttributes.setToolTipText(tr("edit network attributes"));
@@ -142,6 +141,7 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 					currentScenario.getConfig().scenario().setUseVehicles(true);
 					way2Links = new HashMap<Way, List<Link>>();
 					link2Segments = new HashMap<Link, List<WaySegment>>();
+					relation2Route = new HashMap<Relation, TransitRoute>();
 					LayerChangeTask task = new LayerChangeTask(
 							(OsmDataLayer) tmpLayer);
 					task.run();
@@ -149,7 +149,7 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 					tableModel = new MATSimTableModel(currentScenario
 							.getNetwork());
 					table.setModel(tableModel);
-					notifyDataChanged(currentScenario.getNetwork());
+					notifyDataChanged(currentScenario);
 					networkAttributes.setEnabled(true);
 					layer = (OsmDataLayer) tmpLayer;
 					checkInternalIdColumn();
@@ -159,11 +159,13 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 		this.titleBar.add(manualConvert, this.titleBar.getComponentCount() - 3);
 	}
 
-	public void notifyDataChanged(Network network) {
-		setTitle(tr("Links: {0} / Nodes: {1} / Stops: {2} / Lines: {3}",
-				network.getLinks().size(), network.getNodes().size(),
-				currentScenario.getTransitSchedule().getFacilities().size(),
-				currentScenario.getTransitSchedule().getTransitLines().size()));
+	public void notifyDataChanged(Scenario scenario) {
+		setTitle(tr(
+				"Links: {0} / Nodes: {1} / Stops: {2} / Lines: {3} / Routes: {4}",
+				scenario.getNetwork().getLinks().size(), scenario.getNetwork().getNodes().size(),
+				scenario.getTransitSchedule().getFacilities().size(),
+				scenario.getTransitSchedule().getTransitLines().size(), relation2Route.size()
+				));
 		tableModel.networkChanged();
 	}
 
@@ -178,12 +180,13 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 		}
 		table.getSelectionModel().removeListSelectionListener(tableModel);
 		if (newLayer instanceof OsmDataLayer) {
-			if (newLayer instanceof NetworkLayer) {
-				currentScenario = ((NetworkLayer) newLayer).getMatsimScenario();
+			if (newLayer instanceof MATSimLayer) {
+				currentScenario = ((MATSimLayer) newLayer).getMatsimScenario();
 				currentScenario.getConfig().scenario().setUseTransit(true);
 				currentScenario.getConfig().scenario().setUseVehicles(true);
-				way2Links = ((NetworkLayer) newLayer).getWay2Links();
-				link2Segments = ((NetworkLayer) newLayer).getLink2Segments();
+				way2Links = ((MATSimLayer) newLayer).getWay2Links();
+				link2Segments = ((MATSimLayer) newLayer).getLink2Segments();
+				relation2Route = ((MATSimLayer) newLayer).getRelation2Route();
 				ExtensionFileFilter.exporters.clear();
 				ExtensionFileFilter.exporters.add(0,
 						new MATSimNetworkFileExporter());
@@ -196,11 +199,12 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 				currentScenario.getConfig().scenario().setUseVehicles(true);
 				way2Links = new HashMap<Way, List<Link>>();
 				link2Segments = new HashMap<Link, List<WaySegment>>();
+				relation2Route = new HashMap<Relation, TransitRoute>();
 				LayerChangeTask task = new LayerChangeTask(
 						(OsmDataLayer) newLayer);
 				task.run();
 
-				if (oldLayer instanceof NetworkLayer || oldLayer == null) {
+				if (oldLayer instanceof MATSimLayer || oldLayer == null) {
 					ExtensionFileFilter.exporters.clear();
 					ExtensionFileFilter.exporters.addAll(this.exporterCopy);
 				}
@@ -208,7 +212,7 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 			if (currentScenario != null) {
 				tableModel = new MATSimTableModel(currentScenario.getNetwork());
 				table.setModel(tableModel);
-				notifyDataChanged(currentScenario.getNetwork());
+				notifyDataChanged(currentScenario);
 				this.networkAttributes.setEnabled(true);
 				this.layer = (OsmDataLayer) newLayer;
 				checkInternalIdColumn();
@@ -225,6 +229,7 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 			networkAttributes.setEnabled(false);
 			way2Links = null;
 			link2Segments = null;
+			relation2Route = null;
 		}
 		MapRenderer.setWay2Links(way2Links);
 	}
@@ -270,7 +275,6 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 		private Network network;
 
 		private Map<Integer, Id> links;
-
 
 		MATSimTableModel(Network network) {
 			this.network = network;
@@ -396,12 +400,12 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 
 		public NetworkAttributes() {
 			Layer layer = Main.main.getActiveLayer();
-			if (layer instanceof NetworkLayer) {
-				laneWidthValue.setText(String.valueOf(((NetworkLayer) layer)
+			if (layer instanceof MATSimLayer) {
+				laneWidthValue.setText(String.valueOf(((MATSimLayer) layer)
 						.getMatsimScenario().getNetwork()
 						.getEffectiveLaneWidth()));
 				capacityPeriodValue.setText(String
-						.valueOf(((NetworkLayer) layer).getMatsimScenario()
+						.valueOf(((MATSimLayer) layer).getMatsimScenario()
 								.getNetwork().getCapacityPeriod()));
 			}
 			add(laneWidth);
@@ -416,16 +420,16 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 
 		protected void apply() {
 			Layer layer = Main.main.getActiveLayer();
-			if (layer instanceof NetworkLayer) {
+			if (layer instanceof MATSimLayer) {
 				String lW = laneWidthValue.getText();
 				String cP = capacityPeriodValue.getText();
 				if (!lW.isEmpty()) {
-					((NetworkImpl) ((NetworkLayer) layer).getMatsimScenario()
+					((NetworkImpl) ((MATSimLayer) layer).getMatsimScenario()
 							.getNetwork()).setEffectiveLaneWidth(Double
 							.parseDouble(lW));
 				}
 				if (!cP.isEmpty()) {
-					((NetworkImpl) ((NetworkLayer) layer).getMatsimScenario()
+					((NetworkImpl) ((MATSimLayer) layer).getMatsimScenario()
 							.getNetwork()).setCapacityPeriod(Double
 							.parseDouble(cP));
 				}
@@ -453,15 +457,14 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 
 		@Override
 		protected void cancel() {
-			// TODO Auto-generated method stub
 
 		}
 
 		@Override
 		protected void finish() {
-			notifyDataChanged(currentScenario.getNetwork());
-			osmNetworkListener = new NetworkListener(
-					currentScenario.getNetwork(), way2Links, link2Segments);
+			notifyDataChanged(currentScenario);
+			osmNetworkListener = new NetworkListener(currentScenario,
+					way2Links, link2Segments, relation2Route);
 			((OsmDataLayer) newLayer).data
 					.addDataSetListener(osmNetworkListener);
 
@@ -471,7 +474,7 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 		protected void realRun() throws SAXException, IOException,
 				OsmTransferException {
 			NewConverter.convertOsmLayer(newLayer, currentScenario, way2Links,
-					link2Segments);
+					link2Segments, relation2Route);
 		}
 	}
 }
