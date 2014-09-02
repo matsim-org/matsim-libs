@@ -36,6 +36,11 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 
 	private final static Map<Class<?>, Map<String, Id<?>>> cache = new ConcurrentHashMap<Class<?>, Map<String, Id<?>>>();
 	
+	
+	public static <T> Id<T> create(final long key, final Class<T> type) {
+		return create(Long.toString(key), type);
+	}
+	
 	/**
 	 * This method supports a cache where ids are stored and re-used per type.   
 	 */
