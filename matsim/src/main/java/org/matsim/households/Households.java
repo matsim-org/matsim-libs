@@ -32,7 +32,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  */
 public interface Households extends MatsimToplevelContainer {
 
-	public Map<Id, Household> getHouseholds();
+	public Map<Id<Household>, Household> getHouseholds();
 	
 	@Override
 	public HouseholdsFactory getFactory();

@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 
 /**
@@ -32,7 +33,7 @@ import org.matsim.api.core.v01.Id;
  */
 public class PersonHouseholdMapping {
 
-	private Map<Id, Household> phMap = new HashMap<Id, Household>();
+	private Map<Id<Person>, Household> phMap = new HashMap<Id<Person>, Household>();
 	
 	public PersonHouseholdMapping(Households hhs) {
 		this.reinitialize(hhs);
@@ -41,14 +42,14 @@ public class PersonHouseholdMapping {
 	public void reinitialize(Households hhs) {
 		this.phMap.clear();
 		for (Household h : hhs.getHouseholds().values()){
-			for (Id member : h.getMemberIds()){
+			for (Id<Person> member : h.getMemberIds()){
 				this.phMap.put(member, h);
 			}
 		}
 		
 	}
 	
-	public Household getHousehold(Id personId) {
+	public Household getHousehold(Id<Person> personId) {
 		return this.phMap.get(personId);
 	}
 	

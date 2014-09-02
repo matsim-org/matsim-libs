@@ -23,12 +23,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.algorithms.HouseholdAlgorithm;
-
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author dgrether
@@ -88,7 +89,7 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlg
 		}
 		if ((h.getVehicleIds() != null) && !h.getVehicleIds().isEmpty()) {
 			this.writeStartTag(HouseholdsSchemaV10Names.VEHICLES, null);
-			for (Id id : h.getVehicleIds()){
+			for (Id<Vehicle> id : h.getVehicleIds()){
 				atts.clear();
 				atts.add(this.createTuple(HouseholdsSchemaV10Names.REFID, id.toString()));
 				this.writeStartTag(HouseholdsSchemaV10Names.VEHICLEDEFINITIONID, atts, true);
@@ -112,9 +113,9 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlg
 		this.writeEndTag(HouseholdsSchemaV10Names.INCOME);
 	}
 
-	private void writeMembers(List<Id> memberIds) throws UncheckedIOException {
+	private void writeMembers(List<Id<Person>> memberIds) throws UncheckedIOException {
 		this.writeStartTag(HouseholdsSchemaV10Names.MEMBERS, null);
-		for (Id id : memberIds){
+		for (Id<Person> id : memberIds){
 			atts.clear();
 			atts.add(this.createTuple(HouseholdsSchemaV10Names.REFID, id.toString()));
 			this.writeStartTag(HouseholdsSchemaV10Names.PERSONID, atts, true);

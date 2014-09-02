@@ -25,24 +25,23 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-
 /**
  * Basic implementation of the Households container, a pure data class
  * 
  * @author dgrether
  */
-public class HouseholdsImpl implements Households{
+public class HouseholdsImpl implements Households {
 	
 //	private final static Logger log = Logger.getLogger(HouseholdImpl.class);
 
 	private HouseholdsFactory factory;
 
-	private Map<Id, Household> households;
+	private Map<Id<Household>, Household> households;
 	
 	private final ObjectAttributes householdAttributes = new ObjectAttributes();
 	
 	public HouseholdsImpl(){
-		this.households = new LinkedHashMap<Id, Household>();
+		this.households = new LinkedHashMap<Id<Household>, Household>();
 		this.factory = new HouseholdsFactoryImpl();
 	}
 	
@@ -74,7 +73,7 @@ public class HouseholdsImpl implements Households{
 	}
 	
 	@Override
-	public Map<Id, Household> getHouseholds() {
+	public Map<Id<Household>, Household> getHouseholds() {
 		return this.households;
 	}
 

@@ -22,22 +22,24 @@ package org.matsim.households;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author dgrether
  */
 public interface Household {
 
-	public Id getId();
+	public Id<Household> getId();
 	
-	public List<Id> getMemberIds();
+	public List<Id<Person>> getMemberIds();
 	
 	/**
 	 * This returns an Income, not a number.  The Income type contains a method `getIncomePeriod()'. 
 	 */
 	public Income getIncome();
 	
-	public List<Id> getVehicleIds();
+	public List<Id<Vehicle>> getVehicleIds();
 
 	public void setIncome(Income income);
 

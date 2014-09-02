@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.households.Income.IncomePeriod;
+import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
-
 
 /**
  * @author dgrether
@@ -36,15 +36,15 @@ import org.xml.sax.Attributes;
  */
 abstract class AbstractHouseholdsReaderV10 extends MatsimXmlParser{
 	
-	private List<Id> currentmembers = null;
+	private List<Id<Person>> currentmembers = null;
 
 	private Income currentincome = null;
 
 	private HouseholdsFactory builder = null;
 
-	private Id currentHhId = null;
+	private Id<Household> currentHhId = null;
 
-	private List<Id> currentVehicleIds = null;
+	private List<Id<Vehicle>> currentVehicleIds = null;
 
 	private IncomePeriod currentIncomePeriod;
 
@@ -92,16 +92,16 @@ abstract class AbstractHouseholdsReaderV10 extends MatsimXmlParser{
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (HouseholdsSchemaV10Names.HOUSEHOLD.equalsIgnoreCase(name)) {
-			this.currentHhId = new IdImpl(atts.getValue(HouseholdsSchemaV10Names.ID));
-			this.currentmembers = new ArrayList<Id>();
-			this.currentVehicleIds = new ArrayList<Id>();
+			this.currentHhId = Id.create(atts.getValue(HouseholdsSchemaV10Names.ID), Household.class);
+			this.currentmembers = new ArrayList<Id<Person>>();
+			this.currentVehicleIds = new ArrayList<Id<Vehicle>>();
 		}
 		else if (HouseholdsSchemaV10Names.MEMBERS.equalsIgnoreCase(name)) {
 //			this.currentmembers = new ArrayList<Id>();
 		}
 		else if (HouseholdsSchemaV10Names.PERSONID.equalsIgnoreCase(name)) {
-			Id id = new IdImpl(atts.getValue(HouseholdsSchemaV10Names.REFID));
-			this.currentmembers.add(id);
+			Id<Person> personId = Id.create(atts.getValue(HouseholdsSchemaV10Names.REFID), Person.class);
+			this.currentmembers.add(personId);
 		}
 		else if (HouseholdsSchemaV10Names.INCOME.equalsIgnoreCase(name)) {
 			this.currentIncomePeriod = getIncomePeriod(atts.getValue(HouseholdsSchemaV10Names.PERIOD));
@@ -111,11 +111,10 @@ abstract class AbstractHouseholdsReaderV10 extends MatsimXmlParser{
 //			this.currentVehicleIds = new ArrayList<Id>();
 		}
 		else if (HouseholdsSchemaV10Names.VEHICLEDEFINITIONID.equalsIgnoreCase(name)) {
-			Id id = new IdImpl(atts.getValue(HouseholdsSchemaV10Names.REFID));
-			this.currentVehicleIds.add(id);
+			Id<Vehicle> vehicleId = Id.create(atts.getValue(HouseholdsSchemaV10Names.REFID), Vehicle.class);
+			this.currentVehicleIds.add(vehicleId);
 		}
 	}
-
 
 	private IncomePeriod getIncomePeriod(String s) {
 		if (IncomePeriod.day.toString().equalsIgnoreCase(s)) {
@@ -141,7 +140,5 @@ abstract class AbstractHouseholdsReaderV10 extends MatsimXmlParser{
 	
 	/*package*/ Households getHouseholds(){
 		return this.households;
-	}
-	
-	
+	}	
 }
