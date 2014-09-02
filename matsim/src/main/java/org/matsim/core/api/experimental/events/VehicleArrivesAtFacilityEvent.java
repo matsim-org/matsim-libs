@@ -24,6 +24,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author mrieser
@@ -33,18 +35,17 @@ import org.matsim.api.core.v01.events.Event;
  */
 public class VehicleArrivesAtFacilityEvent extends Event {
 
-
 	public static final String EVENT_TYPE = "VehicleArrivesAtFacility";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 	public static final String ATTRIBUTE_FACILITY = "facility";
 	public static final String ATTRIBUTE_DELAY = "delay";
 
-	
-	private final Id vehicleId;
-	private final Id facilityId;
+	private final Id<Vehicle> vehicleId;
+	private final Id<ActivityFacility> facilityId;
 	private final double delay;
 
-	public VehicleArrivesAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId, double delay) {
+	public VehicleArrivesAtFacilityEvent(final double time, final Id<Vehicle> vehicleId, 
+			final Id<ActivityFacility> facilityId, double delay) {
 		super(time);
 		this.vehicleId = vehicleId;
 		this.facilityId = facilityId;
@@ -56,11 +57,11 @@ public class VehicleArrivesAtFacilityEvent extends Event {
 		return this.delay;
 	}
 
-	public Id getFacilityId() {
+	public Id<ActivityFacility> getFacilityId() {
 		return this.facilityId;
 	}
 
-	public Id getVehicleId() {
+	public Id<Vehicle> getVehicleId() {
 		return this.vehicleId;
 	}
 
@@ -75,5 +76,4 @@ public class VehicleArrivesAtFacilityEvent extends Event {
 		attributes.put(ATTRIBUTE_DELAY, Double.toString(this.delay));
 		return attributes;
 	}
-
 }

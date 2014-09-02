@@ -23,7 +23,9 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.signalsystems.model.SignalGroup;
 import org.matsim.signalsystems.model.SignalGroupState;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 /**
@@ -39,18 +41,30 @@ public class SignalGroupStateChangedEvent extends Event {
 	public final static String ATTRIBUTE_SIGNALGROUP_STATE = "signalGroupState";
 	
 	private SignalGroupState newState;
-	private Id signalGroupId;
-	private Id signalSystemId;
+	private Id<SignalGroup> signalGroupId;
+	private Id<SignalSystem> signalSystemId;
 
-	public SignalGroupStateChangedEvent(double time, Id systemId, Id groupId, SignalGroupState newState) {
+	public SignalGroupStateChangedEvent(double time, Id<SignalSystem> systemId, Id<SignalGroup> groupId, SignalGroupState newState) {
 		super(time);
 		this.signalSystemId = systemId;
 		this.signalGroupId = groupId;
 		this.newState = newState;
 	}
+	
+	public Id<SignalGroup> getSignalGroupId() {
+		return signalGroupId;
+	}
+	
+	public Id<SignalSystem> getSignalSystemId() {
+		return signalSystemId;
+	}
 
 	public SignalGroupState getNewState() {
 		return this.newState;
+	}
+	
+	public String getEventType() {
+		return SignalGroupStateChangedEvent.EVENT_TYPE;
 	}
 	
 	public Map<String, String> getAttributes() {
@@ -59,17 +73,5 @@ public class SignalGroupStateChangedEvent extends Event {
 		m.put(ATTRIBUTE_SIGNALGROUP_ID, this.signalGroupId.toString());
 		m.put(ATTRIBUTE_SIGNALGROUP_STATE, this.newState.toString());
 		return m;
-	}
-
-	public String getEventType() {
-		return SignalGroupStateChangedEvent.EVENT_TYPE;
-	}
-
-	public Id getSignalGroupId() {
-		return signalGroupId;
-	}
-
-	public Id getSignalSystemId() {
-		return signalSystemId;
 	}
 }

@@ -23,7 +23,9 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * @author mrieser / senozon
@@ -34,32 +36,33 @@ public class AgentWaitingForPtEvent extends Event implements HasPersonId {
 	public static final String ATTRIBUTE_AGENT = "agent";
 	public static final String ATTRIBUTE_WAITSTOP = "atStop";
 	public static final String ATTRIBUTE_DESTINATIONSTOP = "destinationStop";
-	public final Id agentId;
-	public final Id waitingAtStopId;
-	public final Id destinationStopId;
+	public final Id<Person> agentId;
+	public final Id<TransitStopFacility> waitingAtStopId;
+	public final Id<TransitStopFacility> destinationStopId;
 	
-	public AgentWaitingForPtEvent(final double now, final Id agentId, final Id waitingAtStopId, final Id destinationStopId) {
+	public AgentWaitingForPtEvent(final double now, final Id<Person> agentId,
+			final Id<TransitStopFacility> waitingAtStopId, final Id<TransitStopFacility> destinationStopId) {
 		super(now);
 		this.agentId = agentId;
 		this.waitingAtStopId = waitingAtStopId;
 		this.destinationStopId = destinationStopId;
 	}
-
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
 	
-	public Id getPersonId() {
+	public Id<Person> getPersonId() {
 		return this.agentId;
 	}
 	
-	public Id getWaitingAtStopId() {
+	public Id<TransitStopFacility> getWaitingAtStopId() {
 		return this.waitingAtStopId;
 	}
 	
-	public Id getDestinationStopId() {
+	public Id<TransitStopFacility> getDestinationStopId() {
 		return this.destinationStopId;
+	}
+	
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
 	}
 	
 	@Override
@@ -72,5 +75,4 @@ public class AgentWaitingForPtEvent extends Event implements HasPersonId {
 		
 		return attr;
 	}
-
 }

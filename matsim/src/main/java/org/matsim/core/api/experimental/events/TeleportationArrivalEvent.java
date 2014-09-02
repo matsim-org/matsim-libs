@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
 
 /**
@@ -36,15 +37,23 @@ public class TeleportationArrivalEvent extends Event implements HasPersonId {
 
 	public static final String EVENT_TYPE = "travelled";
 
-    private Id agentId;
+    private Id<Person> agentId;
     private double distance;
 
-    public TeleportationArrivalEvent(double time, Id agentId, double distance) {
+    public TeleportationArrivalEvent(double time, Id<Person> agentId, double distance) {
         super(time);
         this.agentId = agentId;
         this.distance = distance;
     }
 
+    public Id<Person> getPersonId() {
+    	return agentId;
+    }
+    
+    public double getDistance() {
+    	return distance;
+    }
+    
     @Override
     public String getEventType() {
         return EVENT_TYPE;
@@ -57,13 +66,4 @@ public class TeleportationArrivalEvent extends Event implements HasPersonId {
         attributes.put(ATTRIBUT_DISTANCE, Double.toString(distance));
         return attributes;
     }
-
-    public Id getPersonId() {
-        return agentId;
-    }
-
-    public double getDistance() {
-        return distance;
-    }
-
 }

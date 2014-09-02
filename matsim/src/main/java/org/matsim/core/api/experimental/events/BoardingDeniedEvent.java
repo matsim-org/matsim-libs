@@ -26,7 +26,9 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -35,40 +37,38 @@ import org.matsim.core.api.internal.HasPersonId;
  */
 public class BoardingDeniedEvent extends Event implements HasPersonId 
 {
-	public static final String EVENT_TYPE="BoardingDeniedEvent" ;
+	public static final String EVENT_TYPE="BoardingDeniedEvent";
 	
-	public static final String ATTRIBUTE_PERSON_ID = "person" ;
-	private Id personId ;
+	public static final String ATTRIBUTE_PERSON_ID = "person";
+	public static final String ATTRIBUTE_VEHICLE_ID = "vehicle";
 
-	public static final String ATTRIBUTE_VEHICLE_ID = "vehicle" ;
-	private Id vehicleId;
+	private Id<Person> personId;
+	private Id<Vehicle> vehicleId;
 	
-	public BoardingDeniedEvent(final double time, Id personId2, Id vehicleId2 ) {
-		super(time) ;
-		this.personId = personId2 ;
-		this.vehicleId = vehicleId2 ;
+	public BoardingDeniedEvent(final double time, Id<Person> personId, Id<Vehicle> vehicleId) {
+		super(time);
+		this.personId = personId;
+		this.vehicleId = vehicleId;
+	}
+
+	public Id<Person> getPersonId() {
+		return personId;
+	}
+	
+	public Id<Vehicle> getVehicleId() {
+		return vehicleId;
 	}
 	
 	@Override
 	public Map<String,String> getAttributes() {
-		Map<String,String> atts = super.getAttributes() ;
-		atts.put(ATTRIBUTE_PERSON_ID, this.personId.toString() ) ;
-		atts.put(ATTRIBUTE_VEHICLE_ID, this.vehicleId.toString() ) ;
-		return atts ;
+		Map<String,String> atts = super.getAttributes();
+		atts.put(ATTRIBUTE_PERSON_ID, this.personId.toString());
+		atts.put(ATTRIBUTE_VEHICLE_ID, this.vehicleId.toString());
+		return atts;
 	}
 	
 	@Override
 	public String getEventType() {
-		return EVENT_TYPE ;
+		return EVENT_TYPE;
 	}
-
-	public Id getPersonId() {
-		return personId;
-	}
-
-	public Id getVehicleId() {
-		return vehicleId;
-	}
-
-
 }
