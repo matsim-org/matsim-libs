@@ -21,9 +21,6 @@
 package org.matsim.contrib.grips.io;
 
 import org.junit.Test;
-import org.matsim.contrib.grips.io.jaxb.gripsconfig.DepartureTimeDistributionType;
-import org.matsim.contrib.grips.io.jaxb.gripsconfig.DistributionType;
-import org.matsim.contrib.grips.io.jaxb.gripsconfig.ObjectFactory;
 import org.matsim.contrib.grips.model.config.GripsConfigModule;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.testcases.MatsimTestCase;
@@ -39,7 +36,7 @@ public class SerializerDeserializerTest extends MatsimTestCase {
 			String outputDir = "dummy-output-dir-name";
 			String populationFile = "population-dummy-file-name";
 			String mainTrafficType = "mixed";
-			DistributionType distrType = DistributionType.LOG_NORMAL;
+			String distrType = DepartureTimeDistribution.LOG_NORMAL;
 			double mu = 0;
 			double sigma = .25;
 			double sampleSize = 0.787;
@@ -56,8 +53,7 @@ public class SerializerDeserializerTest extends MatsimTestCase {
 			gcm.setMainTrafficType(mainTrafficType);
 			
 			
-			ObjectFactory fac = new ObjectFactory();
-			DepartureTimeDistributionType departureTimeDistribution = fac.createDepartureTimeDistributionType();
+			DepartureTimeDistribution departureTimeDistribution = new DepartureTimeDistribution();
 			departureTimeDistribution.setDistribution(distrType );
 			departureTimeDistribution.setMu(mu);
 			departureTimeDistribution.setSigma(sigma);
@@ -66,19 +62,19 @@ public class SerializerDeserializerTest extends MatsimTestCase {
 			
 			gcm.setDepartureTimeDistribution(departureTimeDistribution );
 			
-			GripsConfigSerializer serializer = new GripsConfigSerializer(gcm);
-			serializer.serialize(outputFile);
+			GripsConfigWriter writer = new GripsConfigWriter(gcm);
+			writer.write(outputFile);
 			
 			GripsConfigModule gcm2 = new GripsConfigModule("grips");
-			GripsConfigDeserializer deserializer = new GripsConfigDeserializer(gcm2,false);
-			deserializer.readFile(outputFile);
+			GripsConfigReader reader = new GripsConfigReader(gcm2);
+			reader.parse(outputFile);
 			
 			assertEquals(evacuationAreaFile, gcm2.getEvacuationAreaFileName());
 			assertEquals(networkFile, gcm2.getNetworkFileName());
 			assertEquals(outputDir, gcm2.getOutputDir());
 			assertEquals(populationFile, gcm2.getPopulationFileName());
 			assertEquals(sampleSize, gcm2.getSampleSize());
-			assertEquals(distrType.value(), gcm2.getDepartureTimeDistribution().getDistribution().value());
+			assertEquals(distrType, gcm2.getDepartureTimeDistribution().getDistribution());
 			assertEquals(sigma, gcm2.getDepartureTimeDistribution().getSigma());
 			assertEquals(mu, gcm2.getDepartureTimeDistribution().getMu());
 			assertEquals(earliest, gcm2.getDepartureTimeDistribution().getEarliest());

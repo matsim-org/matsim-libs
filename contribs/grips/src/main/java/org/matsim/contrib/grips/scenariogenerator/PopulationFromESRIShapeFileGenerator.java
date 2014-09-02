@@ -39,8 +39,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.grips.control.algorithms.FeatureTransformer;
-import org.matsim.contrib.grips.io.jaxb.gripsconfig.DepartureTimeDistributionType;
-import org.matsim.contrib.grips.io.jaxb.gripsconfig.DistributionType;
+import org.matsim.contrib.grips.io.DepartureTimeDistribution;
 import org.matsim.contrib.grips.model.config.GripsConfigModule;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
@@ -75,7 +74,7 @@ public class PopulationFromESRIShapeFileGenerator {
 
 	// Konstruktor mit Scenario, PopFile, Senke
 	public PopulationFromESRIShapeFileGenerator(Scenario sc, String populationFile, Id safeLinkId) {
-		log.warn("This implementation is a only a proof of concept!");
+//		log.warn("This implementation is a only a proof of concept!");
 		this.scenario = sc;
 		this.populationShapeFile = populationFile;
 		this.safeLinkId = safeLinkId;
@@ -118,7 +117,7 @@ public class PopulationFromESRIShapeFileGenerator {
 	// Hier werden this.RAND_SAMPLES Zufallszahlen erzeugt, aus denen dann gezogen wird
 
 	private void genDepTimeLookup() {
-		DepartureTimeDistributionType depTimeDistr = this.gcm.getDepartureTimeDistribution();
+		DepartureTimeDistribution depTimeDistr = this.gcm.getDepartureTimeDistribution();
 		if (depTimeDistr == null) {
 			log.warn("No departure time distribution is given! So, we let start all evacuees at once !");
 			this.depTimeLookup = new ArrayList<Double>();
@@ -130,7 +129,7 @@ public class PopulationFromESRIShapeFileGenerator {
 
     double min = depTimeDistr.getEarliest();
     double max = depTimeDistr.getLatest();
-		if (depTimeDistr.getDistribution() == DistributionType.LOG_NORMAL) { // 
+		if (depTimeDistr.getDistribution().equals(DepartureTimeDistribution.LOG_NORMAL)) { // 
 			double mu_h = Math.log(depTimeDistr.getMu()/3600.0);
 			double sigma_h = Math.log(depTimeDistr.getSigma()/3600.0);
 			for (int i = 0; i < RAND_SAMPLES; i ++) {
@@ -144,7 +143,7 @@ public class PopulationFromESRIShapeFileGenerator {
 				} while(sec < min || sec > max);
 				randVariables.add(sec);
 			}
-		} else if(depTimeDistr.getDistribution() == DistributionType.NORMAL) {
+		} else if(depTimeDistr.getDistribution().equals(DepartureTimeDistribution.NORMAL)) {
 			double mu = depTimeDistr.getMu();
 			double sigma = depTimeDistr.getSigma();
 			for (int i = 0; i < RAND_SAMPLES; i ++) {
@@ -155,7 +154,7 @@ public class PopulationFromESRIShapeFileGenerator {
 			    } while(sec < min || sec > max);
 				randVariables.add(sec);
 			}
-		} else if (depTimeDistr.getDistribution() == DistributionType.DIRAC_DELTA) {
+		} else if (depTimeDistr.getDistribution().equals(DepartureTimeDistribution.DIRAC_DELTA)) {
 			this.depTimeLookup = new ArrayList<Double>();
 			this.depTimeLookup.add(0.);
 			return;

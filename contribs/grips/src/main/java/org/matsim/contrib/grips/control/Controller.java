@@ -49,8 +49,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.grips.analysis.data.EventData;
 import org.matsim.contrib.grips.control.eventlistener.AbstractListener;
-import org.matsim.contrib.grips.io.GripsConfigDeserializer;
-import org.matsim.contrib.grips.io.GripsConfigSerializer;
+import org.matsim.contrib.grips.io.GripsConfigReader;
+import org.matsim.contrib.grips.io.GripsConfigWriter;
 import org.matsim.contrib.grips.io.ShapeIO;
 import org.matsim.contrib.grips.model.AbstractModule;
 import org.matsim.contrib.grips.model.AbstractToolBox;
@@ -408,10 +408,10 @@ public class Controller {
 	public boolean openGripsConfig(File selectedFile) {
 		boolean rv = false;
 		try {
-			this.gripsConfigModule = new GripsConfigModule("grips", selectedFile.getAbsolutePath());
+			this.gripsConfigModule = new GripsConfigModule("grips");//, selectedFile.getAbsolutePath());
 //			System.out.println("grips config module:" + this.gripsConfigModule);
-			GripsConfigDeserializer parser = new GripsConfigDeserializer(this.gripsConfigModule);
-			parser.readFile(selectedFile.getAbsolutePath());
+			GripsConfigReader parser = new GripsConfigReader(this.gripsConfigModule);
+			parser.parse(selectedFile.getAbsolutePath());
 
 			this.scenarioPath = selectedFile.getParent();
 			this.gripsFile = selectedFile.getAbsolutePath();
@@ -1271,7 +1271,7 @@ public class Controller {
 
 		if (gripsConfigModule != null) {
 			try {
-				GripsConfigSerializer gcs = new GripsConfigSerializer(gripsConfigModule);
+				GripsConfigWriter gcs = new GripsConfigWriter(gripsConfigModule);
 				gcs.write(fileLocation);
 
 			} catch (Exception e) {

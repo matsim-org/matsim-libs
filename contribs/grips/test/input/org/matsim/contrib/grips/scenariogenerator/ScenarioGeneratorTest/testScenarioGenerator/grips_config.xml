@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<grips_config xsi:schemaLocation="http://matsim.org/xsd http://matsim.org/files/dtd/grips_config_v0.1.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<grips_config xsi:noNamespaceSchemaLocation="http://matsim.org/files/dtd/grips_config_v0.1.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <networkFile>
         <inputFile>./test/input/org/matsim/contrib/grips/scenariogenerator/ScenarioGeneratorTest/testScenarioGenerator/lenzen.osm</inputFile>
     </networkFile>

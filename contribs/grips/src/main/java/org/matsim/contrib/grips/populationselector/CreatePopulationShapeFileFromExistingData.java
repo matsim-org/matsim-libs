@@ -27,7 +27,7 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
-import org.matsim.contrib.grips.io.GripsConfigDeserializer;
+import org.matsim.contrib.grips.io.GripsConfigReader;
 import org.matsim.contrib.grips.model.config.GripsConfigModule;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -53,9 +53,9 @@ public class CreatePopulationShapeFileFromExistingData {
 		String gripsConfig = args[1];
 		ShapeFileReader r1 = new ShapeFileReader();
 		r1.readFileAndInitialize(existingDataFile);
-		GripsConfigModule gcm = new GripsConfigModule("grips", gripsConfig);
-		GripsConfigDeserializer gcd = new GripsConfigDeserializer(gcm,false);
-		gcd.readFile(gripsConfig);
+		GripsConfigModule gcm = new GripsConfigModule("grips");//, gripsConfig);
+		GripsConfigReader gcd = new GripsConfigReader(gcm);//,false);
+		gcd.parse(gripsConfig);
 		
 		ShapeFileReader r2 = new ShapeFileReader();
 		r2.readFileAndInitialize(gcm.getEvacuationAreaFileName());

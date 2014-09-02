@@ -45,9 +45,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.matsim.contrib.grips.control.Controller;
-import org.matsim.contrib.grips.io.jaxb.gripsconfig.DepartureTimeDistributionType;
-import org.matsim.contrib.grips.io.jaxb.gripsconfig.DistributionType;
-import org.matsim.contrib.grips.io.jaxb.gripsconfig.MainTrafficTypeType;
+import org.matsim.contrib.grips.io.DepartureTimeDistribution;
 import org.matsim.contrib.grips.model.AbstractModule;
 import org.matsim.contrib.grips.model.Constants.ModuleType;
 import org.matsim.contrib.grips.model.config.GripsConfigModule;
@@ -110,7 +108,7 @@ class ScenarioXMLMask extends JPanel implements ActionListener {
 	private JLabel labelLatest;
 	private JTextField textFieldLatest;
 
-	private Controller controller;
+	private final Controller controller;
 
 	private JButton btNew;
 	private JButton btOpen;
@@ -132,161 +130,171 @@ class ScenarioXMLMask extends JPanel implements ActionListener {
 		Dimension varInputSize = new Dimension(100, 20);
 
 		JPanel panelCurrentFile = new JPanel();
-		labelCurrentFile = new JLabel(" / ");
-		labelCurrentFile.setForeground(Color.GRAY);
-		final String lcf = controller.getLocale().labelCurrentFile();
+		this.labelCurrentFile = new JLabel(" / ");
+		this.labelCurrentFile.setForeground(Color.GRAY);
+		final String lcf = this.controller.getLocale().labelCurrentFile();
 		panelCurrentFile.setBorder(BorderFactory.createTitledBorder(border, lcf));
-		panelCurrentFile.add(labelCurrentFile);
+		panelCurrentFile.add(this.labelCurrentFile);
 
 		// OSM panel
 		JPanel panelOSM = new JPanel();
-		labelOSMFilePath = new JLabel(" / ");
-		labelOSMFilePath.setForeground(Color.GRAY);
-		labelOSMFilePath.setPreferredSize(inputSize);
-		btOSMBrowse = new JButton(controller.getLocale().btSet());
-		btOSMBrowse.addActionListener(this);
-		btOSMBrowse.setActionCommand(controller.getLocale().labelNetworkFile());
-		panelOSM.setBorder(BorderFactory.createTitledBorder(border, controller.getLocale().labelNetworkFile()));
-		panelOSM.add(labelOSMFilePath);
-		panelOSM.add(btOSMBrowse);
+		this.labelOSMFilePath = new JLabel(" / ");
+		this.labelOSMFilePath.setForeground(Color.GRAY);
+		this.labelOSMFilePath.setPreferredSize(inputSize);
+		this.btOSMBrowse = new JButton(this.controller.getLocale().btSet());
+		this.btOSMBrowse.addActionListener(this);
+		this.btOSMBrowse.setActionCommand(this.controller.getLocale().labelNetworkFile());
+		panelOSM.setBorder(BorderFactory.createTitledBorder(border, this.controller.getLocale().labelNetworkFile()));
+		panelOSM.add(this.labelOSMFilePath);
+		panelOSM.add(this.btOSMBrowse);
 
-		// prepare main traffic type elements
-		MainTrafficTypeType[] trafficTypeElements = MainTrafficTypeType.values();
-		trafficTypeStrings = new String[trafficTypeElements.length];
-		for (int i = 0; i < trafficTypeElements.length; i++)
-			trafficTypeStrings[i] = trafficTypeElements[i].toString();
-		// TODO: englishElements convert english to native language elements
+//		// prepare main traffic type elements
+//		MainTrafficTypeType[] trafficTypeElements = MainTrafficTypeType.values();
+//		this.trafficTypeStrings = new String[trafficTypeElements.length];
+//		for (int i = 0; i < trafficTypeElements.length; i++)
+//			this.trafficTypeStrings[i] = trafficTypeElements[i].toString();
+//		// TODO: englishElements convert english to native language elements
+		
+		//TODO this is already defined below -- needs to be cleand up!! [GL Sep '14]
+		this.trafficTypeStrings = new String[]{"vehicular","pedestrian"};
 
+		
+		
 		// main traffic type
 		JPanel panelTrafficType = new JPanel();
-		boxTrafficType = new JComboBox(trafficTypeStrings);
-		boxTrafficType.setPreferredSize(inputSize);
-		boxTrafficType.setActionCommand(controller.getLocale().labelTrafficType());
-		boxTrafficType.addActionListener(this);
+		this.boxTrafficType = new JComboBox(this.trafficTypeStrings);
+		this.boxTrafficType.setPreferredSize(inputSize);
+		this.boxTrafficType.setActionCommand(this.controller.getLocale().labelTrafficType());
+		this.boxTrafficType.addActionListener(this);
 
-		panelTrafficType.setBorder(BorderFactory.createTitledBorder(border, controller.getLocale().labelTrafficType()));
-		panelTrafficType.add(boxTrafficType);
+		panelTrafficType.setBorder(BorderFactory.createTitledBorder(border, this.controller.getLocale().labelTrafficType()));
+		panelTrafficType.add(this.boxTrafficType);
 
 		JPanel panelEvac = new JPanel();
-		labelEvacFilePath = new JLabel(" / ");
-		labelEvacFilePath.setForeground(Color.GRAY);
-		labelEvacFilePath.setPreferredSize(inputSize);
-		btEvacBrowse = new JButton(controller.getLocale().btSet());
-		btEvacBrowse.addActionListener(this);
-		btEvacBrowse.setActionCommand(controller.getLocale().labelEvacFile());
+		this.labelEvacFilePath = new JLabel(" / ");
+		this.labelEvacFilePath.setForeground(Color.GRAY);
+		this.labelEvacFilePath.setPreferredSize(inputSize);
+		this.btEvacBrowse = new JButton(this.controller.getLocale().btSet());
+		this.btEvacBrowse.addActionListener(this);
+		this.btEvacBrowse.setActionCommand(this.controller.getLocale().labelEvacFile());
 
 		// evacuation area and population
-		panelEvac.setBorder(BorderFactory.createTitledBorder(border, controller.getLocale().labelEvacFile()));
-		panelEvac.add(labelEvacFilePath);
-		panelEvac.add(btEvacBrowse);
+		panelEvac.setBorder(BorderFactory.createTitledBorder(border, this.controller.getLocale().labelEvacFile()));
+		panelEvac.add(this.labelEvacFilePath);
+		panelEvac.add(this.btEvacBrowse);
 
 		JPanel panelPop = new JPanel();
-		labelPopFilePath = new JLabel(" / ");
-		labelPopFilePath.setForeground(Color.GRAY);
-		labelPopFilePath.setPreferredSize(inputSize);
-		btPopBrowse = new JButton(controller.getLocale().btSet());
-		btPopBrowse.addActionListener(this);
-		btPopBrowse.setActionCommand(controller.getLocale().labelPopFile());
-		panelPop.setBorder(BorderFactory.createTitledBorder(border, controller.getLocale().labelPopFile()));
-		panelPop.add(labelPopFilePath);
-		panelPop.add(btPopBrowse);
+		this.labelPopFilePath = new JLabel(" / ");
+		this.labelPopFilePath.setForeground(Color.GRAY);
+		this.labelPopFilePath.setPreferredSize(inputSize);
+		this.btPopBrowse = new JButton(this.controller.getLocale().btSet());
+		this.btPopBrowse.addActionListener(this);
+		this.btPopBrowse.setActionCommand(this.controller.getLocale().labelPopFile());
+		panelPop.setBorder(BorderFactory.createTitledBorder(border, this.controller.getLocale().labelPopFile()));
+		panelPop.add(this.labelPopFilePath);
+		panelPop.add(this.btPopBrowse);
 
 		// output directory
 		JPanel panelOutDir = new JPanel();
-		labelOutDirPath = new JLabel(" / ");
-		labelOutDirPath.setPreferredSize(inputSize);
-		labelOutDirPath.setForeground(Color.GRAY);
-		btOutDirBrowse = new JButton(controller.getLocale().btSet());
-		btOutDirBrowse.addActionListener(this);
-		btOutDirBrowse.setActionCommand(controller.getLocale().labelOutDir());
+		this.labelOutDirPath = new JLabel(" / ");
+		this.labelOutDirPath.setPreferredSize(inputSize);
+		this.labelOutDirPath.setForeground(Color.GRAY);
+		this.btOutDirBrowse = new JButton(this.controller.getLocale().btSet());
+		this.btOutDirBrowse.addActionListener(this);
+		this.btOutDirBrowse.setActionCommand(this.controller.getLocale().labelOutDir());
 
-		panelOutDir.setBorder(BorderFactory.createTitledBorder(border, controller.getLocale().labelOutDir()));
-		panelOutDir.add(labelOutDirPath);
-		panelOutDir.add(btOutDirBrowse);
+		panelOutDir.setBorder(BorderFactory.createTitledBorder(border, this.controller.getLocale().labelOutDir()));
+		panelOutDir.add(this.labelOutDirPath);
+		panelOutDir.add(this.btOutDirBrowse);
 
 		// sample size
 		JPanel panelSampleSize = new JPanel();
-		labelSampleSize = new JLabel("0.787");
-		labelSampleSize.setPreferredSize(varInputSize);
-		sliderSampleSize = new JSlider(1, 1000, 787);
-		sliderSampleSize.setOrientation(JSlider.HORIZONTAL);
-		sliderSampleSize.addChangeListener(new ChangeListener() {
+		this.labelSampleSize = new JLabel("0.787");
+		this.labelSampleSize.setPreferredSize(varInputSize);
+		this.sliderSampleSize = new JSlider(1, 1000, 787);
+		this.sliderSampleSize.setOrientation(JSlider.HORIZONTAL);
+		this.sliderSampleSize.addChangeListener(new ChangeListener() {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				labelSampleSize.setText("" + (sliderSampleSize.getValue() / 1000d));
+				ScenarioXMLMask.this.labelSampleSize.setText("" + (ScenarioXMLMask.this.sliderSampleSize.getValue() / 1000d));
 				checkSaveConditions();
 			}
 		});
-		panelSampleSize.setBorder(BorderFactory.createTitledBorder(border, controller.getLocale().labelSampleSize()));
-		panelSampleSize.add(labelSampleSize);
-		panelSampleSize.add(sliderSampleSize);
+		panelSampleSize.setBorder(BorderFactory.createTitledBorder(border, this.controller.getLocale().labelSampleSize()));
+		panelSampleSize.add(this.labelSampleSize);
+		panelSampleSize.add(this.sliderSampleSize);
 
 		// prepare main traffic type elements
-		DistributionType[] distTypeElements = DistributionType.values();
-		distTypeStrings = new String[distTypeElements.length];
-		for (int i = 0; i < distTypeElements.length; i++)
-			distTypeStrings[i] = distTypeElements[i].toString();
+//		DistributionType[] distTypeElements = DistributionType.values();
+//		this.distTypeStrings = new String[distTypeElements.length];
+//		for (int i = 0; i < distTypeElements.length; i++)
+//			this.distTypeStrings[i] = distTypeElements[i].toString();
+		//TODO: think about this [GL Sep '14]
+		this.distTypeStrings = new String[]{"vehicular","pedestrian"};
+		
+		
+		
 		// TODO: englishElements convert english to native language elements
 
 		// departure time distribution
 		JPanel panelDepTime = new JPanel();
 		panelDepTime.setLayout(new BoxLayout(panelDepTime, BoxLayout.PAGE_AXIS));
-		boxDepTime = new JComboBox(distTypeStrings);
-		boxDepTime.setSelectedIndex(1);
-		boxDepTime.setBorder(emptyBorder);
-		boxDepTime.setActionCommand(controller.getLocale().labelDepTime());
-		boxDepTime.addActionListener(this);
+		this.boxDepTime = new JComboBox(this.distTypeStrings);
+		this.boxDepTime.setSelectedIndex(1);
+		this.boxDepTime.setBorder(emptyBorder);
+		this.boxDepTime.setActionCommand(this.controller.getLocale().labelDepTime());
+		this.boxDepTime.addActionListener(this);
 		// boxDepTime.setPreferredSize(inputSize);
 		// boxDepTime.setMinimumSize(inputSize);
 
 		JPanel panelParams = new JPanel();
 		panelParams.setLayout(new GridLayout(2, 4));
-		labelSigma = new JLabel(" " + controller.getLocale().labelSigma());
-		textFieldSigma = new JTextField("0.25");
-		textFieldSigma.setPreferredSize(varInputSize);
+		this.labelSigma = new JLabel(" " + this.controller.getLocale().labelSigma());
+		this.textFieldSigma = new JTextField("0.25");
+		this.textFieldSigma.setPreferredSize(varInputSize);
 		// textFieldSigma.setBorder(emptyBorder);
 
-		labelMu = new JLabel(" " + controller.getLocale().labelMu());
-		textFieldMu = new JTextField("0.1");
-		textFieldMu.setPreferredSize(varInputSize);
+		this.labelMu = new JLabel(" " + this.controller.getLocale().labelMu());
+		this.textFieldMu = new JTextField("0.1");
+		this.textFieldMu.setPreferredSize(varInputSize);
 		// textFieldMu.setBorder(emptyBorder);
 
-		labelEarliest = new JLabel(" " + controller.getLocale().labelEarliest());
-		textFieldEarliest = new JTextField("0.04315872");
-		textFieldEarliest.setPreferredSize(varInputSize);
+		this.labelEarliest = new JLabel(" " + this.controller.getLocale().labelEarliest());
+		this.textFieldEarliest = new JTextField("0.04315872");
+		this.textFieldEarliest.setPreferredSize(varInputSize);
 		// textFieldEarliest.setBorder(emptyBorder);
 
-		labelLatest = new JLabel(" " + controller.getLocale().labelLatest());
-		textFieldLatest = new JTextField("1.3783154");
-		textFieldLatest.setPreferredSize(varInputSize);
+		this.labelLatest = new JLabel(" " + this.controller.getLocale().labelLatest());
+		this.textFieldLatest = new JTextField("1.3783154");
+		this.textFieldLatest.setPreferredSize(varInputSize);
 		// textFieldLatest.setBorder(emptyBorder);
 
 		JPanel panelIO = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		panelIO.setBackground(new Color(190, 190, 190));
-		btNew = new JButton(controller.getLocale().btNew());
-		btOpen = new JButton(controller.getLocale().btOpen());
-		btSave = new JButton(controller.getLocale().btSave());
-		btNew.addActionListener(this);
-		btOpen.addActionListener(this);
-		btSave.addActionListener(this);
-		btSave.setEnabled(false);
+		this.btNew = new JButton(this.controller.getLocale().btNew());
+		this.btOpen = new JButton(this.controller.getLocale().btOpen());
+		this.btSave = new JButton(this.controller.getLocale().btSave());
+		this.btNew.addActionListener(this);
+		this.btOpen.addActionListener(this);
+		this.btSave.addActionListener(this);
+		this.btSave.setEnabled(false);
 
-		panelIO.add(btNew);
-		panelIO.add(btOpen);
-		panelIO.add(btSave);
+		panelIO.add(this.btNew);
+		panelIO.add(this.btOpen);
+		panelIO.add(this.btSave);
 
-		panelParams.add(labelSigma);
-		panelParams.add(textFieldSigma);
-		panelParams.add(labelMu);
-		panelParams.add(textFieldMu);
-		panelParams.add(labelEarliest);
-		panelParams.add(textFieldEarliest);
-		panelParams.add(labelLatest);
-		panelParams.add(textFieldLatest);
+		panelParams.add(this.labelSigma);
+		panelParams.add(this.textFieldSigma);
+		panelParams.add(this.labelMu);
+		panelParams.add(this.textFieldMu);
+		panelParams.add(this.labelEarliest);
+		panelParams.add(this.textFieldEarliest);
+		panelParams.add(this.labelLatest);
+		panelParams.add(this.textFieldLatest);
 
-		panelDepTime.setBorder(BorderFactory.createTitledBorder(border, controller.getLocale().labelDepTime()));
-		panelDepTime.add(boxDepTime);
+		panelDepTime.setBorder(BorderFactory.createTitledBorder(border, this.controller.getLocale().labelDepTime()));
+		panelDepTime.add(this.boxDepTime);
 		panelDepTime.add(panelParams);
 
 		this.add(panelCurrentFile);
@@ -320,46 +328,46 @@ class ScenarioXMLMask extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
-		if (e.getActionCommand().equals(controller.getLocale().labelNetworkFile())) { // osm
-			DefaultOpenDialog openDialog = new DefaultOpenDialog(controller, "osm", "osm file (*.osm)", false);
-			openDialog.showDialog(controller.getParentComponent(), null);
+		if (e.getActionCommand().equals(this.controller.getLocale().labelNetworkFile())) { // osm
+			DefaultOpenDialog openDialog = new DefaultOpenDialog(this.controller, "osm", "osm file (*.osm)", false);
+			openDialog.showDialog(this.controller.getParentComponent(), null);
 			if (openDialog.getSelectedFile() != null) {
 				this.labelOSMFilePath.setText(openDialog.getSelectedFile().getAbsolutePath());
 			}
 		} else if (e.getActionCommand().equals( // evacuation area
-				controller.getLocale().labelEvacFile())) {
-			DefaultSaveDialog saveDialog = new DefaultSaveDialog(controller, "shp", "area file (*.shp)", false);
-			saveDialog.showDialog(controller.getParentComponent(), null);
+				this.controller.getLocale().labelEvacFile())) {
+			DefaultSaveDialog saveDialog = new DefaultSaveDialog(this.controller, "shp", "area file (*.shp)", false);
+			saveDialog.showDialog(this.controller.getParentComponent(), null);
 			if (saveDialog.getSelectedFile() != null) {
-				if (saveDialog.getSelectedFile().getAbsolutePath().equals(labelPopFilePath.getText()))
-					JOptionPane.showMessageDialog(this, controller.getLocale().msgSameFiles(), "", JOptionPane.ERROR_MESSAGE);
+				if (saveDialog.getSelectedFile().getAbsolutePath().equals(this.labelPopFilePath.getText()))
+					JOptionPane.showMessageDialog(this, this.controller.getLocale().msgSameFiles(), "", JOptionPane.ERROR_MESSAGE);
 				else
 					this.labelEvacFilePath.setText(saveDialog.getSelectedFile().getAbsolutePath());
 			}
 
 		} else if (e.getActionCommand().equals( // population
-				controller.getLocale().labelPopFile())) {
+				this.controller.getLocale().labelPopFile())) {
 
-			DefaultSaveDialog saveDialog = new DefaultSaveDialog(controller, "shp", "population file (*.shp)", false);
-			saveDialog.showDialog(controller.getParentComponent(), null);
+			DefaultSaveDialog saveDialog = new DefaultSaveDialog(this.controller, "shp", "population file (*.shp)", false);
+			saveDialog.showDialog(this.controller.getParentComponent(), null);
 			if (saveDialog.getSelectedFile() != null) {
-				if (saveDialog.getSelectedFile().getAbsolutePath().equals(labelEvacFilePath.getText()))
-					JOptionPane.showMessageDialog(this, controller.getLocale().msgSameFiles(), "", JOptionPane.ERROR_MESSAGE);
+				if (saveDialog.getSelectedFile().getAbsolutePath().equals(this.labelEvacFilePath.getText()))
+					JOptionPane.showMessageDialog(this, this.controller.getLocale().msgSameFiles(), "", JOptionPane.ERROR_MESSAGE);
 				else
 					this.labelPopFilePath.setText(saveDialog.getSelectedFile().getAbsolutePath());
 			}
 		} else if (e.getActionCommand().equals( // output
-				controller.getLocale().labelOutDir())) {
-			DefaultOpenDialog openDialog = new DefaultOpenDialog(controller, "", "directory", true);
-			openDialog.showDialog(controller.getParentComponent(), "select output directory");
+				this.controller.getLocale().labelOutDir())) {
+			DefaultOpenDialog openDialog = new DefaultOpenDialog(this.controller, "", "directory", true);
+			openDialog.showDialog(this.controller.getParentComponent(), "select output directory");
 			if (openDialog.getSelectedFile() != null) {
 				this.labelOutDirPath.setText(openDialog.getSelectedFile().getAbsolutePath());
 				this.gcm = null;
 				this.configOpened = true;
 			}
 
-		} else if (e.getActionCommand().equals(controller.getLocale().btNew())) { // new
-			DefaultSaveDialog save = new DefaultSaveDialog(controller, "xml", "GRIPS config file", true);
+		} else if (e.getActionCommand().equals(this.controller.getLocale().btNew())) { // new
+			DefaultSaveDialog save = new DefaultSaveDialog(this.controller, "xml", "GRIPS config file", true);
 
 			save.showDialog(this.controller.getParentComponent(), "Save GRIPS config file");
 			if (save.getSelectedFile() != null) {
@@ -371,11 +379,11 @@ class ScenarioXMLMask extends JPanel implements ActionListener {
 				this.fileLocation = save.getSelectedFile().getAbsolutePath();
 				this.configOpened = true;
 
-				controller.setGoalAchieved(false);
+				this.controller.setGoalAchieved(false);
 
 			}
 
-		} else if (e.getActionCommand().equals(controller.getLocale().btOpen())) // Open
+		} else if (e.getActionCommand().equals(this.controller.getLocale().btOpen())) // Open
 		{
 			this.setEnabled(false);
 			this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -385,28 +393,28 @@ class ScenarioXMLMask extends JPanel implements ActionListener {
 
 				@Override
 				protected String doInBackground() {
-					final boolean open = controller.openGripsConfig();
+					final boolean open = ScenarioXMLMask.this.controller.openGripsConfig();
 
 					if (open) // open Grips Config
 					{
-						fileLocation = controller.getGripsFile();
-						gcm = controller.getGripsConfigModule();
-						configOpened = true;
-						controller.setGoalAchieved(true);
-						btSave.setEnabled(false);
+						ScenarioXMLMask.this.fileLocation = ScenarioXMLMask.this.controller.getGripsFile();
+						ScenarioXMLMask.this.gcm = ScenarioXMLMask.this.controller.getGripsConfigModule();
+						ScenarioXMLMask.this.configOpened = true;
+						ScenarioXMLMask.this.controller.setGoalAchieved(true);
+						ScenarioXMLMask.this.btSave.setEnabled(false);
 
 						// enable other modules if shape files exist
-						if (!controller.isStandAlone()) {
-							File evacFile = new File(gcm.getEvacuationAreaFileName());
+						if (!ScenarioXMLMask.this.controller.isStandAlone()) {
+							File evacFile = new File(ScenarioXMLMask.this.gcm.getEvacuationAreaFileName());
 							if (evacFile.exists())
-								controller.enableModule(ModuleType.POPULATION);
-							File popFile = new File(gcm.getEvacuationAreaFileName());
+								ScenarioXMLMask.this.controller.enableModule(ModuleType.POPULATION);
+							File popFile = new File(ScenarioXMLMask.this.gcm.getEvacuationAreaFileName());
 							if (popFile.exists()) {
-								controller.enableModule(ModuleType.GRIPSSCENARIO);
-								controller.setPopulationFileOpened(true);
+								ScenarioXMLMask.this.controller.enableModule(ModuleType.GRIPSSCENARIO);
+								ScenarioXMLMask.this.controller.setPopulationFileOpened(true);
 							}
 
-							controller.updateParentUI();
+							ScenarioXMLMask.this.controller.updateParentUI();
 						}
 
 					} else {
@@ -427,11 +435,11 @@ class ScenarioXMLMask extends JPanel implements ActionListener {
 
 			worker.execute();
 
-		} else if (e.getActionCommand().equals(controller.getLocale().btSave())) // Save
+		} else if (e.getActionCommand().equals(this.controller.getLocale().btSave())) // Save
 		{
-			if (configOpened) {
+			if (this.configOpened) {
 				if (this.gcm == null)
-					this.gcm = new GripsConfigModule("grips", fileLocation);
+					this.gcm = new GripsConfigModule("grips");//, fileLocation);
 
 				final String matsimOutputDir = this.labelOutDirPath.getText();
 				this.gcm.setOutputDir(matsimOutputDir);
@@ -440,20 +448,20 @@ class ScenarioXMLMask extends JPanel implements ActionListener {
 				String osmfile = this.controller.getCurrentOSMFile();
 				osmfile = this.labelOSMFilePath.getText();
 				this.gcm.setNetworkFileName(osmfile);
-				this.gcm.setMainTrafficType(boxTrafficType.getSelectedItem().toString().toLowerCase());
-				DepartureTimeDistributionType dtdt = new DepartureTimeDistributionType();
-				dtdt.setDistribution(DistributionType.valueOf(boxDepTime.getSelectedItem().toString().toUpperCase().replaceAll("-", "_")));
-				dtdt.setSigma(Double.valueOf(textFieldSigma.getText()));
-				dtdt.setMu(Double.valueOf(textFieldMu.getText()));
-				dtdt.setEarliest(Double.valueOf(textFieldEarliest.getText()));
-				dtdt.setLatest(Double.valueOf(textFieldLatest.getText()));
+				this.gcm.setMainTrafficType(this.boxTrafficType.getSelectedItem().toString().toLowerCase());
+				DepartureTimeDistribution dtdt = new DepartureTimeDistribution();
+				dtdt.setDistribution(this.boxDepTime.getSelectedItem().toString().toUpperCase().replaceAll("-", "_"));
+				dtdt.setSigma(Double.valueOf(this.textFieldSigma.getText()));
+				dtdt.setMu(Double.valueOf(this.textFieldMu.getText()));
+				dtdt.setEarliest(Double.valueOf(this.textFieldEarliest.getText()));
+				dtdt.setLatest(Double.valueOf(this.textFieldLatest.getText()));
 				this.gcm.setDepartureTimeDistribution(dtdt);
-				this.gcm.setSampleSize(labelSampleSize.getText());
+				this.gcm.setSampleSize(this.labelSampleSize.getText());
 
 				this.controller.setGripsConfigModule(this.gcm);
 				this.controller.setCurrentOSMFile(osmfile);
 
-				boolean writeConfig = controller.writeGripsConfig(this.gcm, this.fileLocation);
+				boolean writeConfig = this.controller.writeGripsConfig(this.gcm, this.fileLocation);
 				this.controller.openGripsConfig(new File(this.fileLocation));
 
 				if (writeConfig) {
@@ -476,26 +484,26 @@ class ScenarioXMLMask extends JPanel implements ActionListener {
 	}
 
 	public void updateMask() {
-		if ((gcm==null) || (gcm.getNetworkFileName()==null))
+		if ((this.gcm==null) || (this.gcm.getNetworkFileName()==null))
 			return;
 		this.labelCurrentFile.setText(this.fileLocation);
-		this.labelOSMFilePath.setText(gcm.getNetworkFileName());
-		this.labelEvacFilePath.setText(gcm.getEvacuationAreaFileName());
-		this.labelPopFilePath.setText(gcm.getPopulationFileName());
-		this.labelOutDirPath.setText(gcm.getOutputDir());
+		this.labelOSMFilePath.setText(this.gcm.getNetworkFileName());
+		this.labelEvacFilePath.setText(this.gcm.getEvacuationAreaFileName());
+		this.labelPopFilePath.setText(this.gcm.getPopulationFileName());
+		this.labelOutDirPath.setText(this.gcm.getOutputDir());
 
-		String gcmMTT = gcm.getMainTrafficType().toLowerCase();
+		String gcmMTT = this.gcm.getMainTrafficType().toLowerCase();
 		// System.out.println(gcmMTT + " | " + trafficTypeStrings[0]);
-		for (int i = 0; i < trafficTypeStrings.length; i++) {
-			if (trafficTypeStrings[i].toLowerCase().equals(gcmMTT))
+		for (int i = 0; i < this.trafficTypeStrings.length; i++) {
+			if (this.trafficTypeStrings[i].toLowerCase().equals(gcmMTT))
 				this.boxTrafficType.setSelectedIndex(i);
 		}
 
-		DepartureTimeDistributionType gcmDep = gcm.getDepartureTimeDistribution();
-		String gcmDepType = gcmDep.getDistribution().toString().toLowerCase();
+		DepartureTimeDistribution gcmDep = this.gcm.getDepartureTimeDistribution();
+		String gcmDepType = gcmDep.getDistribution();//.toString().toLowerCase();
 		// System.out.println(gcmDepType + " | " + distTypeStrings[0]);
-		for (int i = 0; i < distTypeStrings.length; i++) {
-			if (distTypeStrings[i].toLowerCase().equals(gcmDepType))
+		for (int i = 0; i < this.distTypeStrings.length; i++) {
+			if (this.distTypeStrings[i].toLowerCase().equals(gcmDepType))
 				this.boxDepTime.setSelectedIndex(i);
 		}
 
@@ -504,7 +512,7 @@ class ScenarioXMLMask extends JPanel implements ActionListener {
 		this.textFieldEarliest.setText(gcmDep.getEarliest() + "");
 		this.textFieldLatest.setText(gcmDep.getLatest() + "");
 
-		this.sliderSampleSize.setValue((int) (gcm.getSampleSize() * 1000));
+		this.sliderSampleSize.setValue((int) (this.gcm.getSampleSize() * 1000));
 
 	}
 

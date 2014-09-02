@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.grips.control.algorithms.FeatureTransformer;
 import org.matsim.contrib.grips.experimental.CustomizedOsmNetworkReader;
-import org.matsim.contrib.grips.io.GripsConfigDeserializer;
+import org.matsim.contrib.grips.io.GripsConfigReader;
 import org.matsim.contrib.grips.model.Constants;
 import org.matsim.contrib.grips.model.config.GripsConfigModule;
 import org.matsim.contrib.grips.model.events.InfoEvent;
@@ -106,10 +106,10 @@ public class ScenarioGenerator {
 
 		try {
 			this.matsimConfig = ConfigUtils.createConfig();
-			gcm = new GripsConfigModule("grips", this.configFile);
+			gcm = new GripsConfigModule("grips");//, this.configFile);
 			this.matsimConfig.addModule(gcm);
-			GripsConfigDeserializer parser = new GripsConfigDeserializer(gcm);
-			parser.readFile(this.configFile);
+			GripsConfigReader parser = new GripsConfigReader(gcm);
+			parser.parse(this.configFile);
 //			gcm.setFileNamesAbsolute();
 			String crs = gcm.getTargetCRS();
 			if(crs == null)
