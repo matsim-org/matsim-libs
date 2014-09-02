@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.basic.v01.IdImpl;
@@ -60,6 +61,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
+import org.matsim.vehicles.Vehicle;
 import org.xml.sax.SAXException;
 
 /**
@@ -220,7 +222,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		}
 
 		// prepare comparison
-		Link link10 = network.getLinks().get(new IdImpl("10"));
+		Link link10 = network.getLinks().get(Id.create("10", Link.class));
 
 		if (generateNewData) {
 			BufferedWriter outfile = null;
@@ -256,14 +258,14 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
-		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
-		Link link1 = network.createAndAddLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(1000, 0));
+		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
 
 		int timeBinSize = 15*60;
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, scenario.getConfig().travelTimeCalculator());
 
-		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(Id.create("1", Person.class));
 
 		// generate some events that suggest a really long travel time
 		double linkEnterTime1 = 7.0 * 3600 + 10;
@@ -316,7 +318,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		new MatsimEventsReader(events).readFile(eventsFilename);
 
-		Link link10 = network.getLinks().get(new IdImpl("10"));
+		Link link10 = network.getLinks().get(Id.create("10", Link.class));
 
 		assertEquals("wrong link travel time at 06:00.", 110.0, ttCalc.getLinkTravelTimes().getLinkTravelTime(link10, 6.0 * 3600, null, null), EPSILON);
 		assertEquals("wrong link travel time at 06:15.", 359.9712023038157, ttCalc.getLinkTravelTimes().getLinkTravelTime(link10, 6.25 * 3600, null, null), EPSILON);
@@ -545,12 +547,12 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		double linkEnterTime3 = 7.0 * 3600 + 6.0 * 60;
 		double linkTravelTime3 = 14.0 * 60;
 
-		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime1, person1.getId(), link1.getId(), person1.getId()));
-		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime1 + linkTravelTime1, person1.getId(), link1.getId(), person1.getId()));
-		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime2, person2.getId(), link1.getId(), person2.getId()));
-		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime2 + linkTravelTime2, person2.getId(), link1.getId(), person2.getId()));
-		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime3, person3.getId(), link1.getId(), person3.getId()));
-		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime3 + linkTravelTime3, person3.getId(), link1.getId(), person3.getId()));
+		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime1, person1.getId(), link1.getId(), Id.create(person1.getId().toString(), Vehicle.class)));
+		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime1 + linkTravelTime1, person1.getId(), link1.getId(), Id.create(person1.getId().toString(), Vehicle.class)));
+		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime2, person2.getId(), link1.getId(), Id.create(person2.getId().toString(), Vehicle.class)));
+		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime2 + linkTravelTime2, person2.getId(), link1.getId(), Id.create(person2.getId().toString(), Vehicle.class)));
+		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime3, person3.getId(), link1.getId(), Id.create(person3.getId().toString(), Vehicle.class)));
+		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime3 + linkTravelTime3, person3.getId(), link1.getId(), Id.create(person3.getId().toString(), Vehicle.class)));
 
 		
 		assertEquals(6.5 * 60, ttcalc.getLinkTravelTime(link1.getId(), linkEnterTime1));
