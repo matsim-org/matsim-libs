@@ -21,7 +21,6 @@
 package org.matsim.core.mobsim.qsim.pt;
 
 import junit.framework.TestCase;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;

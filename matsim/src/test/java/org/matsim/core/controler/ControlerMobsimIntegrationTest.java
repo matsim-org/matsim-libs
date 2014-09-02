@@ -31,7 +31,6 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -69,20 +68,6 @@ public class ControlerMobsimIntegrationTest {
 		c.getConfig().controler().setWriteEventsInterval(0);
 		c.run();
 		Assert.assertTrue(c.sim instanceof QSim);
-	}
-
-	@Test
-	public void testRunMobsim_queueSimulation() {
-		Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		cfg.controler().setLastIteration(0);
-		cfg.controler().setMobsim("queueSimulation");
-		cfg.controler().setWritePlansInterval(0);
-		FakeControler c = new FakeControler(cfg);
-		c.setCreateGraphs(false);
-		c.setDumpDataAtEnd(false);
-		c.getConfig().controler().setWriteEventsInterval(0);
-		c.run();
-		Assert.assertTrue(c.sim instanceof QueueSimulation);
 	}
 
 	@Test

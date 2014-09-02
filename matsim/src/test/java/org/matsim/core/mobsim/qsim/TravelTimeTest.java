@@ -19,9 +19,6 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -36,6 +33,9 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author dgrether

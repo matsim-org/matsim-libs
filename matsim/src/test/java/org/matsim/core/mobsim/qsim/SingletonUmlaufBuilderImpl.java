@@ -1,8 +1,5 @@
 package org.matsim.core.mobsim.qsim;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufBuilder;
@@ -11,6 +8,9 @@ import org.matsim.pt.UmlaufStueck;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class SingletonUmlaufBuilderImpl implements UmlaufBuilder {
 	
