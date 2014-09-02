@@ -62,7 +62,7 @@ import org.geotools.referencing.CRS;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.grips.io.GripsConfigDeserializer;
+import org.matsim.contrib.grips.io.GripsConfigReader;
 import org.matsim.contrib.grips.jxmapviewerhelper.TileFactoryBuilder;
 import org.matsim.contrib.grips.model.config.GripsConfigModule;
 import org.matsim.core.config.Config;
@@ -131,23 +131,23 @@ public class PopulationAreaSelector implements ActionListener{
 		this.selectedAreaID = selectedAreaID;
 		if (selectedAreaID>-1)
 		{
-			popLabel.setEnabled(true);
-			popInput.setEnabled(true);
-			popDeleteBt.setEnabled(true);
+			this.popLabel.setEnabled(true);
+			this.popInput.setEnabled(true);
+			this.popDeleteBt.setEnabled(true);
 		}
 	}
 	
 	public void setSelectedAreaPop(String selectedAreaPop) {
 		this.selectedAreaPop = selectedAreaPop;
-		popInput.setText(selectedAreaPop);
+		this.popInput.setText(selectedAreaPop);
 	}
 	
 	public int getSelectedAreaID() {
-		return selectedAreaID;
+		return this.selectedAreaID;
 	}
 	
 	public String getSelectedAreaPop() {
-		return selectedAreaPop;
+		return this.selectedAreaPop;
 	}
 	
 
@@ -252,26 +252,26 @@ public class PopulationAreaSelector implements ActionListener{
 			}
 		};
 		
-		areaTableData = new Object[][]{};
+		this.areaTableData = new Object[][]{};
 //		areaTableData = new Object[][]{{0,1},{1,2}};
 		
-		tableModel.setDataVector(areaTableData, columnNames);
-		areaTable = new JTable();
-		areaTable.setModel(tableModel);
+		tableModel.setDataVector(this.areaTableData, columnNames);
+		this.areaTable = new JTable();
+		this.areaTable.setModel(tableModel);
 		
 		
-		areaTable.getSelectionModel().addListSelectionListener(new SelectionListener(this));
-		areaTable.setSelectionBackground(Color.blue);
-		areaTable.setSelectionForeground(Color.white);		
-		areaTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		this.areaTable.getSelectionModel().addListSelectionListener(new SelectionListener(this));
+		this.areaTable.setSelectionBackground(Color.blue);
+		this.areaTable.setSelectionForeground(Color.white);		
+		this.areaTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
 		
 		JPanel editAreaPanel = new JPanel(new GridLayout(0,3));
 		
-		popLabel = new JLabel("population:");
+		this.popLabel = new JLabel("population:");
 		
-		popInput = new JTextField();
-		popInput.addKeyListener(new KeyListener()
+		this.popInput = new JTextField();
+		this.popInput.addKeyListener(new KeyListener()
 		{
 			
 			@Override
@@ -286,14 +286,14 @@ public class PopulationAreaSelector implements ActionListener{
 			{
 				
 				int i = -1;
-				while (i<areaTable.getRowCount())
+				while (i<PopulationAreaSelector.this.areaTable.getRowCount())
 				{
 					i++;
-					int id = (Integer)(areaTable.getModel()).getValueAt(i, 0);
-					if (id==selectedAreaID)
+					int id = (Integer)(PopulationAreaSelector.this.areaTable.getModel()).getValueAt(i, 0);
+					if (id==PopulationAreaSelector.this.selectedAreaID)
 						break;
 				}
-				((DefaultTableModel)areaTable.getModel()).setValueAt(popInput.getText(), i, 1);
+				((DefaultTableModel)PopulationAreaSelector.this.areaTable.getModel()).setValueAt(PopulationAreaSelector.this.popInput.getText(), i, 1);
 				
 			}
 			
@@ -303,55 +303,55 @@ public class PopulationAreaSelector implements ActionListener{
 		
 		
 		
-		popDeleteBt = new JButton("delete area");
-		popDeleteBt.addActionListener(new ActionListener()
+		this.popDeleteBt = new JButton("delete area");
+		this.popDeleteBt.addActionListener(new ActionListener()
 		{
 			
 
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				int sel = areaTable.getSelectedRow();
+				int sel = PopulationAreaSelector.this.areaTable.getSelectedRow();
 				
 				if (sel>-1)
 				{
-					editing =true;
-					DefaultTableModel defModel = (DefaultTableModel)areaTable.getModel();
+					PopulationAreaSelector.this.editing =true;
+					DefaultTableModel defModel = (DefaultTableModel)PopulationAreaSelector.this.areaTable.getModel();
 					
-					if (areaTable.getSelectedRow() <= defModel.getRowCount())
+					if (PopulationAreaSelector.this.areaTable.getSelectedRow() <= defModel.getRowCount())
 					{
-						int id = (Integer)(areaTable.getModel()).getValueAt(sel, 0);
-						jMapViewer.removeArea(id);
+						int id = (Integer)(PopulationAreaSelector.this.areaTable.getModel()).getValueAt(sel, 0);
+						PopulationAreaSelector.this.jMapViewer.removeArea(id);
 
 						//delete action/weight (row) in table
-						((DefaultTableModel)areaTable.getModel()).removeRow(areaTable.getSelectedRow());
+						((DefaultTableModel)PopulationAreaSelector.this.areaTable.getModel()).removeRow(PopulationAreaSelector.this.areaTable.getSelectedRow());
 						
-						jMapViewer.repaint();
+						PopulationAreaSelector.this.jMapViewer.repaint();
 						
 					}
 					
 					if (defModel.getRowCount()==0)
 					{
-						popDeleteBt.setEnabled(false);
-						popInput.setEnabled(false);
-						popLabel.setEnabled(false);
+						PopulationAreaSelector.this.popDeleteBt.setEnabled(false);
+						PopulationAreaSelector.this.popInput.setEnabled(false);
+						PopulationAreaSelector.this.popLabel.setEnabled(false);
 					}
 					
-					editing=false;
+					PopulationAreaSelector.this.editing=false;
 				}	
 			}
 		});
 		
 		
-		popLabel.setEnabled(false);
-		popInput.setEnabled(false);
-		popDeleteBt.setEnabled(false);
+		this.popLabel.setEnabled(false);
+		this.popInput.setEnabled(false);
+		this.popDeleteBt.setEnabled(false);
 		
-		editAreaPanel.add(popLabel);
-		editAreaPanel.add(popInput);
-		editAreaPanel.add(popDeleteBt);
+		editAreaPanel.add(this.popLabel);
+		editAreaPanel.add(this.popInput);
+		editAreaPanel.add(this.popDeleteBt);
 		
-		tools.add(new JScrollPane(areaTable), BorderLayout.CENTER);
+		tools.add(new JScrollPane(this.areaTable), BorderLayout.CENTER);
 		tools.add(editAreaPanel, BorderLayout.SOUTH);
 		
 		tools.setPreferredSize(new Dimension(320, 640));
@@ -375,7 +375,7 @@ public class PopulationAreaSelector implements ActionListener{
 		
 		this.frame.setLocationRelativeTo(null);
 		
-		frame.addComponentListener(new ComponentListener() 
+		this.frame.addComponentListener(new ComponentListener() 
 		{  
 		        @Override
 				public void componentResized(ComponentEvent evt)
@@ -415,7 +415,7 @@ public class PopulationAreaSelector implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand() == "Save")
 		{
-            savePolygon(popshp);
+            savePolygon(this.popshp);
 		}
 		
 		if (e.getActionCommand() == "Open") {
@@ -464,8 +464,9 @@ public class PopulationAreaSelector implements ActionListener{
 					c.addModule(gcm);
 					c.global().setCoordinateSystem("EPSG:3395");
 					
-					GripsConfigDeserializer parser = new GripsConfigDeserializer(gcm);
-					parser.readFile(this.configFile);
+					GripsConfigReader reader = new GripsConfigReader(gcm);
+					reader.parse(file.getAbsolutePath());
+
 				}
 				catch(Exception ee)
 				{
@@ -478,7 +479,7 @@ public class PopulationAreaSelector implements ActionListener{
 					this.sc = ScenarioUtils.loadScenario(c);				
 					String osm = this.sc.getConfig().getModule("grips").getValue("networkFile");
 					String shp = gcm.getEvacuationAreaFileName();
-					popshp = gcm.getPopulationFileName();
+					this.popshp = gcm.getPopulationFileName();
 
 					this.targetSystem = c.global().getCoordinateSystem();
 					
@@ -501,7 +502,7 @@ public class PopulationAreaSelector implements ActionListener{
 	
 	public String getTargetSystem()
 	{
-		return targetSystem;
+		return this.targetSystem;
 	}
 	
 	private void loadMapView() {
@@ -534,7 +535,7 @@ public class PopulationAreaSelector implements ActionListener{
 //		centerC = ct2.transform(centerC);
 		
 		//TODO: transformation Ã¼berflÃ¼ssig? zu klÃ¤ren
-		this.networkCenter = new GeoPosition(areaPolygon.getCentroid().getY(),areaPolygon.getCentroid().getX());
+		this.networkCenter = new GeoPosition(this.areaPolygon.getCentroid().getY(),this.areaPolygon.getCentroid().getX());
 //		this.networkCenter = new GeoPosition(centerC.getY(),centerC.getX());
 
 		return this.networkCenter;
@@ -548,9 +549,9 @@ public class PopulationAreaSelector implements ActionListener{
 	{
 		CoordinateReferenceSystem sourceCRS = MGC.getCRS("EPSG:4326");
 		CoordinateReferenceSystem targetCRS = MGC.getCRS(this.targetSystem);
-		transform = null;
+		this.transform = null;
 		try {
-			transform = CRS.findMathTransform(sourceCRS, targetCRS,true);
+			this.transform = CRS.findMathTransform(sourceCRS, targetCRS,true);
 		} catch (FactoryException e) {
 			throw new RuntimeException(e);
 		}
@@ -577,30 +578,30 @@ public class PopulationAreaSelector implements ActionListener{
 	}
 	
 	public JTable getAreaTable() {
-		return areaTable;
+		return this.areaTable;
 	}
 	
 	public MyMapViewer getjMapViewer() {
-		return jMapViewer;
+		return this.jMapViewer;
 	}
 
 	public void addNewArea(int index)
 	{
-		editing = true;
-		((DefaultTableModel)areaTable.getModel()).addRow(new Object[]{index, "100"});
-		if (!popInput.isEnabled())
+		this.editing = true;
+		((DefaultTableModel)this.areaTable.getModel()).addRow(new Object[]{index, "100"});
+		if (!this.popInput.isEnabled())
 		{
-			popInput.setEnabled(true);
-			popLabel.setEnabled(true);
-			popDeleteBt.setEnabled(true);
+			this.popInput.setEnabled(true);
+			this.popLabel.setEnabled(true);
+			this.popDeleteBt.setEnabled(true);
 		}
-		editing = false;
+		this.editing = false;
 		
 	}
 
 	public Polygon getAreaPolygon()
 	{
-		return areaPolygon;
+		return this.areaPolygon;
 	}
 
 
@@ -625,15 +626,15 @@ public class PopulationAreaSelector implements ActionListener{
 			
 			LinearRing shell = geofac.createLinearRing(coords);
 			
-			areaPolygon = geofac.createPolygon(shell, null);		
+			this.areaPolygon = geofac.createPolygon(shell, null);		
 			
 	}
 	
 	public synchronized void savePolygon(String dest)
 	{
-		HashMap<Integer, Polygon> polygons = jMapViewer.getPolygons();
+		HashMap<Integer, Polygon> polygons = this.jMapViewer.getPolygons();
 		
-		if ((popshp == "") || (polygons.size()==0))
+		if ((this.popshp == "") || (polygons.size()==0))
 			return;
 			
 		CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:4326");
@@ -653,12 +654,12 @@ public class PopulationAreaSelector implements ActionListener{
 			    Polygon currentPolygon = entry.getValue();
 
 				
-				DefaultTableModel defModel = (DefaultTableModel)areaTable.getModel();
+				DefaultTableModel defModel = (DefaultTableModel)this.areaTable.getModel();
 				
 				int pop = 23;
 				for (int j = 0; j < defModel.getRowCount(); j++){
-					if ((Integer) areaTable.getModel().getValueAt(j, 0) == id){
-						pop = Integer.parseInt(""+areaTable.getModel().getValueAt(j, 1));
+					if ((Integer) this.areaTable.getModel().getValueAt(j, 0) == id){
+						pop = Integer.parseInt(""+this.areaTable.getModel().getValueAt(j, 1));
 						break;
 					}
 				}
@@ -668,7 +669,7 @@ public class PopulationAreaSelector implements ActionListener{
 				fts.add(f);
 			}
 
-			ShapeFileWriter.writeGeometries(fts, popshp);
+			ShapeFileWriter.writeGeometries(fts, this.popshp);
 		} catch (FactoryRegistryException e) {
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
@@ -693,16 +694,16 @@ class SelectionListener implements ListSelectionListener
 	public synchronized void valueChanged(ListSelectionEvent e)
 	{
 		
-		if (!populationAreaSelector.editing)
+		if (!this.populationAreaSelector.editing)
 		{
-			int sel = populationAreaSelector.getAreaTable().getSelectedRow();
-			int id = (Integer)(populationAreaSelector.getAreaTable().getModel()).getValueAt(sel, 0);
-			String pop = String.valueOf((populationAreaSelector.getAreaTable().getModel()).getValueAt(sel, 1));
+			int sel = this.populationAreaSelector.getAreaTable().getSelectedRow();
+			int id = (Integer)(this.populationAreaSelector.getAreaTable().getModel()).getValueAt(sel, 0);
+			String pop = String.valueOf((this.populationAreaSelector.getAreaTable().getModel()).getValueAt(sel, 1));
 			
-			populationAreaSelector.setSelectedAreaID(id);
-			populationAreaSelector.setSelectedAreaPop(pop);
+			this.populationAreaSelector.setSelectedAreaID(id);
+			this.populationAreaSelector.setSelectedAreaPop(pop);
 			
-			MyMapViewer mapViewer = populationAreaSelector.getjMapViewer();
+			MyMapViewer mapViewer = this.populationAreaSelector.getjMapViewer();
 			if (mapViewer!=null)
 			{
 				mapViewer.setSelectedArea(id);
