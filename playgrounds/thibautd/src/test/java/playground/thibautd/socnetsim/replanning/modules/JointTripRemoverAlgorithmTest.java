@@ -952,8 +952,8 @@ public class JointTripRemoverAlgorithmTest {
 				act.getMode());
 
 		if ( exp.getMode().equals( JointActingTypes.DRIVER ) ) {
-			Collection<Id> expIds = ((DriverRoute) exp.getRoute()).getPassengersIds();
-			Collection<Id> actIds = ((DriverRoute) act.getRoute()).getPassengersIds();
+			Collection<Id<Person>> expIds = ((DriverRoute) exp.getRoute()).getPassengersIds();
+			Collection<Id<Person>> actIds = ((DriverRoute) act.getRoute()).getPassengersIds();
 			assertEquals(
 					"wrong number of passengers",
 					expIds.size(),

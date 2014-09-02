@@ -20,7 +20,8 @@
 package playground.thibautd.socnetsim.population;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.utils.misc.Time;
 
@@ -31,24 +32,24 @@ import org.matsim.core.utils.misc.Time;
 public class PassengerRoute implements GenericRoute {
 	private double distance = Double.NaN;
 	private double travelTime = Time.UNDEFINED_TIME;
-	private Id startLink = null;
-	private Id endLink = null;
-	private Id driver = null;
+	private Id<Link> startLink = null;
+	private Id<Link> endLink = null;
+	private Id<Person> driver = null;
 
 	private PassengerRoute() {}
 
 	public PassengerRoute(
-			final Id startLink,
-			final Id endLink) {
+			final Id<Link> startLink,
+			final Id<Link> endLink) {
 		this.startLink = startLink;
 		this.endLink = endLink;
 	}
 
-	public Id getDriverId() {
+	public Id<Person> getDriverId() {
 		return driver;
 	}
 
-	public void setDriverId(final Id d) {
+	public void setDriverId(final Id<Person> d) {
 		driver = d;
 	}
 
@@ -73,33 +74,33 @@ public class PassengerRoute implements GenericRoute {
 	}
 
 	@Override
-	public Id getStartLinkId() {
+	public Id<Link> getStartLinkId() {
 		return startLink;
 	}
 
 	@Override
-	public Id getEndLinkId() {
+	public Id<Link> getEndLinkId() {
 		return endLink;
 	}
 
 	@Override
-	public void setStartLinkId(final Id linkId) {
+	public void setStartLinkId(final Id<Link> linkId) {
 		startLink = linkId;
 	}
 
 	@Override
-	public void setEndLinkId(final Id linkId) {
+	public void setEndLinkId(final Id<Link> linkId) {
 		endLink = linkId;
 	}
 
 	@Override
 	public void setRouteDescription(
-			final Id startLinkId,
+			final Id<Link> startLinkId,
 			final String routeDescription,
-			final Id endLinkId) {
+			final Id<Link> endLinkId) {
 		startLink = startLinkId;
 		endLink = endLinkId;
-		driver = new IdImpl( routeDescription.trim() );
+		driver = Id.create(routeDescription.trim(), Person.class);
 	}
 
 	@Override

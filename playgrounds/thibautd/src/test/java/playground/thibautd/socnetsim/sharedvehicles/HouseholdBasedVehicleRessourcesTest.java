@@ -28,11 +28,13 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.households.Household;
 import org.matsim.households.HouseholdImpl;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author thibautd
@@ -63,12 +65,12 @@ public class HouseholdBasedVehicleRessourcesTest {
 		int v = 0;
 		// NO INTERFACE BASED WAY TO ADD MEMBERS ???????
 		HouseholdImpl hh = (HouseholdImpl) hhs.getFactory().createHousehold( new IdImpl( "small" ) );
-		hh.setMemberIds( Arrays.<Id>asList( new IdImpl( c++ ) ) );
-		hh.setVehicleIds( Collections.<Id>emptyList() );
+		hh.setMemberIds( Arrays.<Id<Person>>asList( new IdImpl( c++ ) ) );
+		hh.setVehicleIds( Collections.<Id<Vehicle>>emptyList() );
 		hhs.addHousehold( hh );
 
 		hh = (HouseholdImpl) hhs.getFactory().createHousehold( new IdImpl( "big" ) );
-		hh.setMemberIds( Arrays.<Id>asList(
+		hh.setMemberIds( Arrays.<Id<Person>>asList(
 					new IdImpl( c++ ),
 					new IdImpl( c++ ),
 					new IdImpl( c++ ),
@@ -77,11 +79,11 @@ public class HouseholdBasedVehicleRessourcesTest {
 					new IdImpl( c++ ),
 					new IdImpl( c++ ),
 					new IdImpl( c++ )) );
-		hh.setVehicleIds( Arrays.<Id>asList( new IdImpl( v++ ) ) );
+		hh.setVehicleIds( Arrays.<Id<Vehicle>>asList( new IdImpl( v++ ) ) );
 		hhs.addHousehold( hh );
 
 		hh = (HouseholdImpl) hhs.getFactory().createHousehold( new IdImpl( "lots of vehicles" ) );
-		hh.setMemberIds( Arrays.<Id>asList(
+		hh.setMemberIds( Arrays.<Id<Person>>asList(
 					new IdImpl( c++ ),
 					new IdImpl( c++ ),
 					new IdImpl( c++ ),
@@ -90,7 +92,7 @@ public class HouseholdBasedVehicleRessourcesTest {
 					new IdImpl( c++ ),
 					new IdImpl( c++ ),
 					new IdImpl( c++ )) );
-		hh.setVehicleIds( Arrays.<Id>asList(
+		hh.setVehicleIds( Arrays.<Id<Vehicle>>asList(
 					new IdImpl( v++ ),
 					new IdImpl( v++ ),
 					new IdImpl( v++ ),

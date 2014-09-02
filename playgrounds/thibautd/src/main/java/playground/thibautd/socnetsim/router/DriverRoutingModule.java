@@ -73,7 +73,7 @@ public class DriverRoutingModule implements RoutingModule {
 		NetworkRoute netRoute = (NetworkRoute) carLeg.getRoute();
 
 		Leg leg = popFactory.createLeg( mode );
-		DriverRoute dRoute = new DriverRoute( netRoute , Collections.<Id>emptyList() );
+		DriverRoute dRoute = new DriverRoute( netRoute , Collections.<Id<Person>>emptyList() );
 		leg.setRoute( dRoute );
 		leg.setDepartureTime( departureTime );
 		leg.setTravelTime( dRoute.getTravelTime() );

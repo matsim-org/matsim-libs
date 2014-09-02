@@ -27,6 +27,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -107,8 +108,8 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 			final Id linkId) {
 		assert agent.getCurrentLinkId().equals( linkId ) : agent+" not at link "+linkId;
 
-		final Id driverId = agent.getId();
-		final Collection<Id> passengerIds = getPassengerIds( agent );
+		final Id<Person> driverId = agent.getId();
+		final Collection<Id<Person>> passengerIds = getPassengerIds( agent );
 		final Id vehicleId = getVehicleId( agent );
 		final MobsimVehicle vehicle = vehicleProvider.getVehicle( vehicleId );
 
@@ -192,7 +193,7 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 		return ((VehicleUsingAgent) agent).getPlannedVehicleId();
 	}
 
-	private static Collection<Id> getPassengerIds(final MobsimAgent agent) {
+	private static Collection<Id<Person>> getPassengerIds(final MobsimAgent agent) {
 		if ( !(agent instanceof PlanAgent) ) throw new RuntimeException( agent.getClass().toString() );
 		final Leg currentLeg = (Leg) ((PlanAgent) agent).getCurrentPlanElement();
 		final DriverRoute route = (DriverRoute) currentLeg.getRoute();

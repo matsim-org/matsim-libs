@@ -226,7 +226,7 @@ public class JointTripRouterFactoryTest {
 
 				for (PlanElement pe : plan.getPlanElements()) {
 					if ( pe instanceof Leg && ((Leg) pe).getMode().equals(  JointActingTypes.DRIVER ) ) {
-						final Collection<Id> actualPassengers = ((DriverRoute) ((Leg) pe).getRoute()).getPassengersIds();
+						final Collection<Id<Person>> actualPassengers = ((DriverRoute) ((Leg) pe).getRoute()).getPassengersIds();
 
 						Assert.assertEquals(
 								"wrong number of passengers",

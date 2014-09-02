@@ -97,7 +97,7 @@ public class GenerateRandomHouseholdScenario {
 			// that's stupid. This has to be changed.
 			// household should not change the ref to its internal list,
 			// and should have "add" methods.
-			final List<Id> members = new ArrayList<Id>();
+			final List<Id<Person>> members = new ArrayList<Id<Person>>();
 			((HouseholdImpl) hh).setMemberIds( members );
 
 			final Link homeLink = randomLinks.nextLink();

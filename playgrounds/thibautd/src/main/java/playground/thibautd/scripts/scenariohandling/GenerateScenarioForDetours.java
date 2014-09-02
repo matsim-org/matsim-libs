@@ -213,7 +213,7 @@ public class GenerateScenarioForDetours {
 
 				final Id passengerWorkLinkId = new IdImpl( P_WORK_PREFIX + workPlaceCount );
 
-				final List<Id> members = new ArrayList<Id>();
+				final List<Id<Person>> members = new ArrayList<Id<Person>>();
 				((HouseholdImpl) household).setMemberIds( members );
 				
 				for ( int coupleCount = 0; coupleCount < N_COUPLES_PER_HH; coupleCount++ ) {

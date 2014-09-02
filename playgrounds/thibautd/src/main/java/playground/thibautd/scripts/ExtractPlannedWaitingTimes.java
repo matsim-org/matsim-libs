@@ -31,6 +31,7 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
@@ -182,8 +183,8 @@ public class ExtractPlannedWaitingTimes {
 		private final Map< Tuple<Id, Id> , List<Double> > passengerDepartures = new HashMap< Tuple<Id,Id>, List<Double> >();
 		
 		public void notifyDriverStartTime(
-				final Id driverId,
-				final Collection<Id> passengersIds,
+				final Id<Person> driverId,
+				final Collection<Id<Person>> passengersIds,
 				final double time) {
 			for (Id passenger : passengersIds) {
 				Tuple<Id, Id> tuple = new Tuple<Id, Id>( driverId , passenger );

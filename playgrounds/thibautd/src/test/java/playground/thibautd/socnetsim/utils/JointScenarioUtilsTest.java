@@ -86,8 +86,8 @@ public class JointScenarioUtilsTest {
 						DriverRoute.class,
 						loadedLeg.getRoute().getClass());
 
-				final Collection<Id> dumpedPassengers = ((DriverRoute) dumpedLeg.getRoute()).getPassengersIds();
-				final Collection<Id> loadedPassengers = ((DriverRoute) loadedLeg.getRoute()).getPassengersIds();
+				final Collection<Id<Person>> dumpedPassengers = ((DriverRoute) dumpedLeg.getRoute()).getPassengersIds();
+				final Collection<Id<Person>> loadedPassengers = ((DriverRoute) loadedLeg.getRoute()).getPassengersIds();
 
 				assertEquals(
 						"unexpected passenger ids",

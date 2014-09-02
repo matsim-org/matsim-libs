@@ -27,10 +27,9 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -45,6 +44,7 @@ import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 
 import playground.ivt.utils.ArgParser;
@@ -84,7 +84,7 @@ public class GenerateHouseholdVehiclesBasedOnCarAvailability {
 						final Stack<String> context) {
 					if ( name.equals( "clique" ) ) {
 						currentHousehold = new HouseholdImpl( new IdImpl( atts.getValue( "id" ) ) );
-						currentHousehold.setMemberIds( new ArrayList<Id>() );
+						currentHousehold.setMemberIds( new ArrayList<Id<Person>>() );
 						((HouseholdsImpl) households).addHousehold( currentHousehold );
 					}
 					if ( name.equals( "person" ) ) {
@@ -107,7 +107,7 @@ public class GenerateHouseholdVehiclesBasedOnCarAvailability {
 		log.info( "map persons to households" );
 		final Map<Id, Household> person2hh = new HashMap<Id, Household>();
 		for ( Household hh : households.getHouseholds().values() ) {
-			((HouseholdImpl) hh).setVehicleIds( new ArrayList<Id>( hh.getMemberIds().size() ) );
+			((HouseholdImpl) hh).setVehicleIds( new ArrayList<Id<Vehicle>>( hh.getMemberIds().size() ) );
 			for ( Id pers : hh.getMemberIds() ) {
 				person2hh.put( pers , hh );
 			}
@@ -124,7 +124,7 @@ public class GenerateHouseholdVehiclesBasedOnCarAvailability {
 			public void run(final Person person) {
 				final Household hh = person2hh.get( person.getId() );
 				if ( "always".equals( ((PersonImpl) person).getCarAvail() ) ) {
-					((HouseholdImpl) hh).getVehicleIds().add( person.getId() );
+					((HouseholdImpl) hh).getVehicleIds().add( Id.create(person.getId().toString(), Vehicle.class) );
 				}
 
 				if ( "sometimes".equals( ((PersonImpl) person).getCarAvail() ) ) {

@@ -22,9 +22,11 @@ package playground.thibautd.scripts.scenariohandling;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-
 import java.util.Random;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -34,8 +36,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
@@ -272,7 +272,7 @@ public class GenerateCircularScenarioWithCompleteSocialNetwork {
 			final Link l) {
 		final ActivityFacility facility =
 			facilities.getFactory().createActivityFacility(
-					l.getId(),
+					Id.create(l.getId().toString(), ActivityFacility.class),
 					l.getCoord() );
 		((ActivityFacilityImpl) facility).setLinkId( l.getId() );
 		facilities.addActivityFacility( facility );

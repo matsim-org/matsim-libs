@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Identifiable;
 public class IdentifiableCollectionsUtils {
 
 	public static boolean containsAll(
-			final Collection<Id> list,
+			final Collection<? extends Id> list,
 			final Collection<? extends Identifiable> contained) {
 		for ( Identifiable id : contained ) {
 			if ( !list.contains( id.getId() ) ) return false;

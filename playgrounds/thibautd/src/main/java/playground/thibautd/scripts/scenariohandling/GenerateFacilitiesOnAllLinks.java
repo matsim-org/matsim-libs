@@ -21,10 +21,10 @@ package playground.thibautd.scripts.scenariohandling;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-
 import java.util.Arrays;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
@@ -53,7 +53,7 @@ public class GenerateFacilitiesOnAllLinks {
 		for ( Link l : scenario.getNetwork().getLinks().values() ) {
 			final ActivityFacility fac =
 				scenario.getActivityFacilities().getFactory().createActivityFacility(
-						l.getId(),
+						Id.create(l.getId().toString(), ActivityFacility.class),
 						l.getCoord() );
 			((ActivityFacilityImpl) fac).setLinkId( l.getId() );
 			f2l.newLine();

@@ -309,7 +309,7 @@ public class RecomposeJointPlanAlgorithmTest {
 				fixture.groupPlans.getIndividualPlans().size());
 
 		for (Plan p : fixture.groupPlans.getIndividualPlans()) {
-			final Set<Id> ids = Collections.singleton( p.getPerson().getId() );
+			final Set<Id<Person>> ids = Collections.singleton( p.getPerson().getId() );
 			assertTrue(
 					"unexpected individual plan "+ids+": not in "+fixture.expectedJointPlanStructure,
 					fixture.expectedJointPlanStructure.contains( ids ));

@@ -29,6 +29,7 @@ import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -39,38 +40,38 @@ import org.matsim.core.population.routes.NetworkRoute;
  */
 public class DriverRoute implements GenericRoute , NetworkRoute {
 	private final NetworkRoute netRoute;
-	private final Set<Id> passengers = new TreeSet<Id>();
+	private final Set<Id<Person>> passengers = new TreeSet<Id<Person>>();
 
-	public DriverRoute(final Id startLink , final Id endLink) {
+	public DriverRoute(final Id<Link> startLink , final Id<Link> endLink) {
 		netRoute = new LinkNetworkRouteImpl( startLink , endLink );
 	}
 
-	public DriverRoute(final NetworkRoute r, final Collection<Id> passengers) {
+	public DriverRoute(final NetworkRoute r, final Collection<Id<Person>> passengers) {
 		netRoute = r != null ? (NetworkRoute) r.clone() : new LinkNetworkRouteImpl( null , null );
 		this.passengers.addAll( passengers );
 	}
 
-	public Collection<Id> getPassengersIds() {
+	public Collection<Id<Person>> getPassengersIds() {
 		return Collections.unmodifiableSet(passengers);
 	}
 
-	public void addPassenger(final Id passenger) {
+	public void addPassenger(final Id<Person> passenger) {
 		passengers.add( passenger );
 	}
 
-	public void addPassengers(final Collection<Id> ps) {
+	public void addPassengers(final Collection<Id<Person>> ps) {
 		passengers.addAll( ps );
 	}
 
-	public boolean removePassenger(final Id passenger) {
+	public boolean removePassenger(final Id<Person> passenger) {
 		return passengers.remove( passenger );
 	}
 
-	public boolean removePassengers(final Collection<Id> toRemove) {
+	public boolean removePassengers(final Collection<Id<Person>> toRemove) {
 		return this.passengers.removeAll( toRemove );
 	}
 
-	public void setPassengerIds(final Collection<Id> ps) {
+	public void setPassengerIds(final Collection<Id<Person>> ps) {
 		passengers.clear();
 		passengers.addAll( ps );
 	}
@@ -186,7 +187,7 @@ public class DriverRoute implements GenericRoute , NetworkRoute {
 	@Override
 	public String getRouteDescription() {
 		StringBuffer d = new StringBuffer();
-		Iterator<Id> ps = passengers.iterator();
+		Iterator<Id<Person>> ps = passengers.iterator();
 		if (ps.hasNext()) d.append( ps.next() );
 
 		while (ps.hasNext()) {

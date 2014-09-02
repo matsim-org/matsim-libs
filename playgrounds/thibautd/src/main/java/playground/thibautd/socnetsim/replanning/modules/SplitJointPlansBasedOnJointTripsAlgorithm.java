@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 
@@ -107,7 +108,7 @@ public class SplitJointPlansBasedOnJointTripsAlgorithm implements GenericPlanAlg
 			if ( !(pe instanceof Leg) ) continue;
 			final Leg leg = (Leg) pe;
 
-			final Collection<Id> dependentIds = getDependentIds( leg );
+			final Collection<Id<Person>> dependentIds = getDependentIds( leg );
 			for (Id id : dependentIds) {
 				final Plan depPlan = plansToLook.remove( id );
 				if (depPlan == null) continue;
@@ -121,7 +122,7 @@ public class SplitJointPlansBasedOnJointTripsAlgorithm implements GenericPlanAlg
 		}
 	}
 
-	private static Collection<Id> getDependentIds(final Leg leg) {
+	private static Collection<Id<Person>> getDependentIds(final Leg leg) {
 		if ( JointActingTypes.DRIVER.equals( leg.getMode() ) ) {
 			DriverRoute r = (DriverRoute) leg.getRoute();
 			return r.getPassengersIds();

@@ -30,6 +30,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 
@@ -165,7 +166,7 @@ public class JointPlanUtils {
 					final DriverRoute dRoute = (DriverRoute) ((Leg) pe).getRoute();
 					final Id origin = dRoute.getStartLinkId();
 					final Id destination = dRoute.getEndLinkId();
-					final Collection<Id> passengerIds = dRoute.getPassengersIds();
+					final Collection<Id<Person>> passengerIds = dRoute.getPassengersIds();
 
 					for ( Id passengerId : passengerIds ) {
 						if ( !currentPassengers.contains( passengerId ) ) {

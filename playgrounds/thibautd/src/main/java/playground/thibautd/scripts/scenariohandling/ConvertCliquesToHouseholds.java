@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
@@ -31,6 +32,7 @@ import org.matsim.households.Household;
 import org.matsim.households.HouseholdImpl;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsWriterV10;
+import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 
 import playground.thibautd.socnetsim.cliques.population.CliquesSchemaNames;
@@ -56,7 +58,7 @@ public class ConvertCliquesToHouseholds {
 					nCreatedVehicles < vehiclesPerPerson * household.getMemberIds().size();
 					nCreatedVehicles++ ) {
 				if ( household.getVehicleIds() == null ) {
-					((HouseholdImpl) household).setVehicleIds( new ArrayList<Id>() );
+					((HouseholdImpl) household).setVehicleIds( new ArrayList<Id<Vehicle>>() );
 				}
 				household.getVehicleIds().add( new IdImpl( "vehicle-"+(currentVehicle++) ) );
 			}
@@ -69,7 +71,7 @@ public class ConvertCliquesToHouseholds {
 		private HouseholdsImpl households = null;
 		private Counter counter = null;
 		private Id currentId = null;
-		private List<Id> currentMembers = null;
+		private List<Id<Person>> currentMembers = null;
 
 		public ConvertingParser() {
 			super( false );
@@ -87,7 +89,7 @@ public class ConvertCliquesToHouseholds {
 			if ( name.equals( CliquesSchemaNames.CLIQUE ) ) {
 				counter.incCounter();
 				currentId = new IdImpl( atts.getValue( CliquesSchemaNames.CLIQUE_ID ) );
-				currentMembers = new ArrayList<Id>();
+				currentMembers = new ArrayList<Id<Person>>();
 			}
 			if ( name.equals( CliquesSchemaNames.MEMBER ) ) {
 				currentMembers.add( new IdImpl( atts.getValue( CliquesSchemaNames.MEMBER_ID ) ) );
