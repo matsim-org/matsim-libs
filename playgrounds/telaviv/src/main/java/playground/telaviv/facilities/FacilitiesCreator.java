@@ -189,7 +189,7 @@ public class FacilitiesCreator {
 			log.info("done.\n");
 			
 			log.info("identify nodes outside the model area ...");
-			Set<Id> externalNodes = getExternalNodes(scenario, zonalShapes);
+			Set<Id<Node>> externalNodes = getExternalNodes(scenario, zonalShapes);
 			log.info("\tfound " + externalNodes.size() + " nodes outside the mapped area");
 			log.info("done.\n");
 
@@ -207,13 +207,13 @@ public class FacilitiesCreator {
 			 * Before creating the internal facilities, we can perform the links filtering.
 			 */
 			log.info("removing links from network where no facilities should be attached to ...");
-			List<Id> linksToRemove = new ArrayList<Id>();
+			List<Id<Link>> linksToRemove = new ArrayList<Id<Link>>();
 			for (Link link : scenario.getNetwork().getLinks().values()) {
 				String type = ((LinkImpl) link).getType();
 				if (!validLinkTypes.contains(type)) linksToRemove.add(link.getId());
 			}
 			log.info("\tfound " + linksToRemove.size() + " links which do not match the criteria");
-			for (Id linkId : linksToRemove) ((NetworkImpl) scenario.getNetwork()).removeLink(linkId);
+			for (Id<Link> linkId : linksToRemove) ((NetworkImpl) scenario.getNetwork()).removeLink(linkId);
 			log.info("\tprocessed network contains " + scenario.getNetwork().getLinks().size() + 
 					" valid links");
 			log.info("done.\n");
@@ -263,7 +263,7 @@ public class FacilitiesCreator {
 			
 			int i = 0;
 			for (Coord coord : coordinates) {
-				Id id = scenario.createId(taz + "_" + i);
+				Id<ActivityFacility> id = Id.create(taz + "_" + i, ActivityFacility.class);
 				ActivityFacility facility = factory.createActivityFacility(id, coord);
 				createAndAddActivityOptions(scenario, facility, zonalAttributes.get(taz));
 				activityFacilities.addActivityFacility(facility);
@@ -284,7 +284,7 @@ public class FacilitiesCreator {
 	}
 	
 	// Create external Facilities that are used by transit traffic agents.
-	private static void createExternalFacilities(Scenario scenario, Set<Id> externalNodes) {
+	private static void createExternalFacilities(Scenario scenario, Set<Id<Node>> externalNodes) {
 		
 		ActivityFacilities activityFacilities = scenario.getActivityFacilities();
 		ActivityFacilitiesFactory factory = activityFacilities.getFactory();
@@ -293,7 +293,7 @@ public class FacilitiesCreator {
 		 * We check for all OutLinks of all external nodes if they already host a facility. If not, 
 		 * a new facility with a tta ActivityOption will be created and added. 
 		 */
-		for (Id id : externalNodes) {
+		for (Id<Node> id : externalNodes) {
 			Node externalNode = scenario.getNetwork().getNodes().get(id);
 			
 			for (Link externalLink : externalNode.getOutLinks().values()) {
@@ -326,7 +326,8 @@ public class FacilitiesCreator {
 				
 				Coord coord = scenario.createCoord(centerX + unitVectorX, centerY + unitVectorY);
 				
-				facility = activityFacilities.getFactory().createActivityFacility(externalLink.getId(), coord);
+				facility = activityFacilities.getFactory().createActivityFacility(
+						Id.create(externalLink.getId().toString(), ActivityFacility.class), coord);
 				activityFacilities.addActivityFacility(facility);
 				((ActivityFacilityImpl) facility).setLinkId(externalLink.getId());
 				
@@ -469,9 +470,9 @@ public class FacilitiesCreator {
 	}
 	
 	// iterate over all nodes to find all external nodes
-	private static final Set<Id> getExternalNodes(Scenario scenario, Map<Integer, SimpleFeature> zonalShapes) {
+	private static final Set<Id<Node>> getExternalNodes(Scenario scenario, Map<Integer, SimpleFeature> zonalShapes) {
 		
-		Set<Id> externalNodes = new TreeSet<Id>();
+		Set<Id<Node>> externalNodes = new TreeSet<Id<Node>>();
 		for (Node node : scenario.getNetwork().getNodes().values()) {
 			Coord pointCoord = toWGS84CoordinateTransformation.transform(node.getCoord());
 			Point point = geometryFactory.createPoint(new Coordinate(pointCoord.getX(), pointCoord.getY()));

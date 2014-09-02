@@ -33,7 +33,6 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.telaviv.facilities.FacilitiesCreator;
 import playground.telaviv.population.ParsedPerson;
 import playground.telaviv.population.PersonFileParser;
 import playground.telaviv.zones.ZoneMapping;

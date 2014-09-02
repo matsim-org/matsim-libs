@@ -51,8 +51,8 @@ public class PrepareDifferentInitialLocations {
 	public static String LEISURE = "leisure";
 	public static String SHOPPING = "shopping";
 	
-	private QuadTree<Id> leisureQuadTree;
-	private QuadTree<Id> shoppingQuadTree;
+	private QuadTree<Id<ActivityFacility>> leisureQuadTree;
+	private QuadTree<Id<ActivityFacility>> shoppingQuadTree;
 	
 	public PrepareDifferentInitialLocations(final Scenario scenario, final String prefixToSkip) {
 		
@@ -71,9 +71,9 @@ public class PrepareDifferentInitialLocations {
 		counter.printCounter();
 	}
 	
-	private QuadTree<Id> buildQuadTree(Scenario scenario, String type) {
+	private QuadTree<Id<ActivityFacility>> buildQuadTree(Scenario scenario, String type) {
 		
-		Map<Id, ActivityFacility> facilities = scenario.getActivityFacilities().getFacilitiesForActivityType(type);
+		Map<Id<ActivityFacility>, ActivityFacility> facilities = scenario.getActivityFacilities().getFacilitiesForActivityType(type);
 		
 		double minX = Double.MAX_VALUE;
 		double minY = Double.MAX_VALUE;
@@ -89,7 +89,7 @@ public class PrepareDifferentInitialLocations {
 			if (y < minY) minY = y;
 			if (y > maxY) maxY = y;
 		}
-		QuadTree<Id> quadTree = new QuadTree<Id>(minX, minY, maxX, maxY);
+		QuadTree<Id<ActivityFacility>> quadTree = new QuadTree<Id<ActivityFacility>>(minX, minY, maxX, maxY);
 		for (ActivityFacility facility : facilities.values()) {
 			Coord coord = facility.getCoord();
 			double x = coord.getX();
@@ -103,10 +103,11 @@ public class PrepareDifferentInitialLocations {
 	private static class LocationShifter implements PlanAlgorithm {
 
 		private final Scenario scenario;
-		private final QuadTree<Id> leisureQuadTree;
-		private final QuadTree<Id> shoppingQuadTree;
+		private final QuadTree<Id<ActivityFacility>> leisureQuadTree;
+		private final QuadTree<Id<ActivityFacility>> shoppingQuadTree;
 		
-		public LocationShifter(Scenario scenario, QuadTree<Id> leisureQuadTree, QuadTree<Id> shoppingQuadTree) {
+		public LocationShifter(Scenario scenario, QuadTree<Id<ActivityFacility>> leisureQuadTree, 
+				QuadTree<Id<ActivityFacility>> shoppingQuadTree) {
 			this.scenario = scenario;
 			this.leisureQuadTree = leisureQuadTree;
 			this.shoppingQuadTree = shoppingQuadTree;
@@ -139,7 +140,8 @@ public class PrepareDifferentInitialLocations {
 			
 		}
 		
-		private void relocateActivity(Scenario scenario, Activity activity, Id lastFacilityId, QuadTree<Id> quadTree) {
+		private void relocateActivity(Scenario scenario, Activity activity, Id<ActivityFacility> lastFacilityId, 
+				QuadTree<Id<ActivityFacility>> quadTree) {
 			
 			// get the position of the last performed activity
 			ActivityFacility lastFacility = scenario.getActivityFacilities().getFacilities().get(lastFacilityId);
@@ -147,7 +149,7 @@ public class PrepareDifferentInitialLocations {
 			double x = coord.getX();
 			double y = coord.getY();
 			
-			Id newFacilityId = quadTree.get(x, y);
+			Id<ActivityFacility> newFacilityId = quadTree.get(x, y);
 			ActivityFacility newFacility = scenario.getActivityFacilities().getFacilities().get(newFacilityId);
 			
 			// replace activity location
