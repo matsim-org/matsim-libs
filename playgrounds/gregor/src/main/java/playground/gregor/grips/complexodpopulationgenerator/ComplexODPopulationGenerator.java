@@ -59,7 +59,7 @@ import org.geotools.referencing.CRS;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.grips.io.GripsConfigDeserializer;
+import org.matsim.contrib.grips.io.GripsConfigReader;
 import org.matsim.contrib.grips.jxmapviewerhelper.TileFactoryBuilder;
 import org.matsim.contrib.grips.model.config.GripsConfigModule;
 import org.matsim.core.config.Config;
@@ -459,8 +459,8 @@ public class ComplexODPopulationGenerator implements ActionListener{
 					c.addModule(gcm);
 					c.global().setCoordinateSystem("EPSG:3395");
 					
-					GripsConfigDeserializer parser = new GripsConfigDeserializer(gcm,false);
-					parser.readFile(this.configFile);
+					GripsConfigReader reader = new GripsConfigReader(gcm);
+					reader.parse(this.configFile);
 				}
 				catch(Exception ee)
 				{

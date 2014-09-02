@@ -214,7 +214,7 @@ public class Sim2DRunner implements IterationStartsListener{
 //		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
 //		controller.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
 //		controller.addControlerListener(new MarginalCostPricing( (ScenarioImpl) controller.getScenario(), tollHandler ));
-		controller.run();
+//		controller.run();
 	}
 
 	protected static void printUsage() {
