@@ -242,7 +242,7 @@ public class TimeSeriesInfoExtractor {
 				int total_cars = Integer.parseInt((String)this.microcensus.getHouseholdAttributes().getAttribute(id, MZConstants.TOTAL_CARS));
 				int total_licenses = 0;
 				
-				List<Id> members = household.getMemberIds();
+				List<Id<Person>> members = household.getMemberIds();
 				
 				for(int j=0;j<=members.size()-1;j++){
 					

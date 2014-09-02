@@ -91,10 +91,10 @@ public class BkHouseholdsCreatorTest {
     IncomeCalculatorKantonZurich incomeCalculator = new IncomeCalculatorKantonZurich();
 
     for (Person p : pop.getPersons().values()){
-    	Household hh = b.createHousehold(p.getId());
+    	Household hh = b.createHousehold(Id.create(p.getId().toString(), Household.class));
       hh.setIncome(b.createIncome(incomeCalculator.calculateIncome(46300), Income.IncomePeriod.year));
       hh.getMemberIds().add(p.getId());
-      hhs.getHouseholds().put(p.getId(), hh);
+      hhs.getHouseholds().put(hh.getId(), hh);
     }
 
     HouseholdsWriterV10 hhwriter = new HouseholdsWriterV10(hhs);

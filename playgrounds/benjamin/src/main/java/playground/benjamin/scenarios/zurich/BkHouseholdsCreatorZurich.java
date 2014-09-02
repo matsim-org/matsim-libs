@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -127,9 +128,9 @@ public class BkHouseholdsCreatorZurich {
 		for (Person p : pop.getPersons().values()){
 			//create the households
 			HouseholdsFactory b = households.getFactory();
-			Household hh = b.createHousehold(p.getId());
+			Household hh = b.createHousehold(Id.create(p.getId().toString(), Household.class));
 	    hh.getMemberIds().add(p.getId());
-	    households.getHouseholds().put(p.getId(), hh);
+	    households.getHouseholds().put(hh.getId(), hh);
 
 	    double income;
 	    // transit persons get the median income without any distribution

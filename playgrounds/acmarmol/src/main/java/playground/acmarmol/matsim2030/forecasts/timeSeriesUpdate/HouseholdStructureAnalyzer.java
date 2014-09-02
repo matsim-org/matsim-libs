@@ -5,17 +5,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.geotools.filter.expression.ThisPropertyAccessorFactory;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.households.Household;
-import org.matsim.households.HouseholdImpl;
 
 import playground.acmarmol.matsim2030.microcensus2010.MZConstants;
 
@@ -153,11 +149,11 @@ public class HouseholdStructureAnalyzer {
 //					if(total_cars==0)
 //						continue;
 					
-					List<Id> members = household.getMemberIds();
+					List<Id<Person>> members = household.getMemberIds();
 					
 					for(int i=0;i<=members.size()-1;i++){
 						
-						Id m_id = members.get(i);
+						Id<Person> m_id = members.get(i);
 						int license = (((String) microcensus.getHouseholdPersonsAttributes().getAttribute(m_id.toString(), MZConstants.DRIVING_LICENCE)).equals(MZConstants.YES))?1:0;
 						total_licenses+= license;
 					}					
@@ -225,21 +221,21 @@ public class HouseholdStructureAnalyzer {
 				}		
 	}
 
-	private int getTypeOfHousehold(List<Id> members) {
+	private int getTypeOfHousehold(List<Id<Person>> members) {
 		//[Single],[Single Parent], [Couple], [Couple with ch], [Complex]
 		ArrayList<Integer> ages = new ArrayList<Integer>();
 
 		for(int i=0;i<=members.size()-1;i++){
 			
-			Id m_id = members.get(i);
+			Id<Person> m_id = members.get(i);
 			int m_age = Integer.parseInt((String)microcensus.getHouseholdPersonsAttributes().getAttribute(m_id.toString(), MZConstants.AGE));
 			ages.add(m_age);
 		}
 		
 		int max_age = Collections.max(ages);
 		
-		List<Id> heads = getHeadsOfHouseholdIds(members, max_age);
-		ArrayList<Id> kids = new ArrayList<Id>(members);
+		List<Id<Person>> heads = getHeadsOfHouseholdIds(members, max_age);
+		ArrayList<Id<Person>> kids = new ArrayList<Id<Person>>(members);
 		kids.removeAll(heads);
 		
 	
@@ -282,7 +278,7 @@ public class HouseholdStructureAnalyzer {
 			if(size==1)
 				continue;
 			
-			List<Id> members = household.getMemberIds();
+			List<Id<Person>> members = household.getMemberIds();
 			if(members.size()<2){
 				System.out.println("Error - non single household has only one member!");
 				//Gbl.errorMsg("Error - non single household has only one member!");
@@ -293,13 +289,13 @@ public class HouseholdStructureAnalyzer {
 			
 			for(int i=0;i<=members.size()-1;i++){
 				
-				Id m_id = members.get(i);
+				Id<Person> m_id = members.get(i);
 				int m_age = Integer.parseInt((String)microcensus.getHouseholdPersonsAttributes().getAttribute(m_id.toString(), MZConstants.AGE));
 				ages.add(m_age);
 			}
 			int max_age = Collections.max(ages);
 			
-			List<Id> heads = getHeadsOfHouseholdIds(members, max_age);
+			List<Id<Person>> heads = getHeadsOfHouseholdIds(members, max_age);
 			double age = this.getPrincipalHeadAge(heads);
 			
 		
@@ -328,11 +324,11 @@ public class HouseholdStructureAnalyzer {
 	}
 	
 
-	private double getAverageAgeOfIds(List<Id> ids) {
+	private double getAverageAgeOfIds(List<Id<Person>> ids) {
 		
 		int total = 0;
 		
-		for(Id id:ids){
+		for(Id<Person> id:ids){
 			total += Integer.parseInt((String)microcensus.getHouseholdPersonsAttributes().getAttribute(id.toString(), MZConstants.AGE));
 
 		}
@@ -342,15 +338,15 @@ public class HouseholdStructureAnalyzer {
 	}
 
 
-	private List<Id> getHeadsOfHouseholdIds(List<Id> members, int max_age) {
+	private List<Id<Person>> getHeadsOfHouseholdIds(List<Id<Person>> members, int max_age) {
 		
-		 List<Id> heads = new ArrayList<Id>();
+		 List<Id<Person>> heads = new ArrayList<Id<Person>>();
 		
 		if(members.size()==1)		
 			return members;
 		else{
 					
-			for(Id m_id:members){
+			for(Id<Person> m_id:members){
 				int m_age = Integer.parseInt((String)microcensus.getHouseholdPersonsAttributes().getAttribute(m_id.toString(), MZConstants.AGE));
 				if((m_age>max_age-16 && m_age>=18) || m_age>=30){
 					heads.add(m_id);	
@@ -380,7 +376,7 @@ public class HouseholdStructureAnalyzer {
 			if(size!=1)
 				continue;
 			
-			List<Id> members = household.getMemberIds();
+			List<Id<Person>> members = household.getMemberIds();
 			
 	
 			if(members.size()!=1)
@@ -467,7 +463,7 @@ private void printAgeRangeForMonoparentalHouseholds() throws IOException {
 			if(size==1)
 				continue;
 			
-			List<Id> members = household.getMemberIds();
+			List<Id<Person>> members = household.getMemberIds();
 			if(members.size()<2){
 				System.out.println("Error - non single household has only one member!");
 				//Gbl.errorMsg("Error - non single household has only one member!");
@@ -485,7 +481,7 @@ private void printAgeRangeForMonoparentalHouseholds() throws IOException {
 			}
 			int max_age = Collections.max(ages);
 			
-			List<Id> heads = getHeadsOfHouseholdIds(members, max_age);
+			List<Id<Person>> heads = getHeadsOfHouseholdIds(members, max_age);
 			
 			if(heads.size()!=1)
 				continue;
@@ -551,7 +547,7 @@ private void printAgeRangeForCouplelHouseholds() throws IOException {
 		if(size==1)
 			continue;
 		
-		List<Id> members = household.getMemberIds();
+		List<Id<Person>> members = household.getMemberIds();
 		if(members.size()<2){
 			System.out.println("Error - non single household has only one member!");
 			//Gbl.errorMsg("Error - non single household has only one member!");
@@ -569,7 +565,7 @@ private void printAgeRangeForCouplelHouseholds() throws IOException {
 		}
 		int max_age = Collections.max(ages);
 		
-		List<Id> heads = getHeadsOfHouseholdIds(members, max_age);
+		List<Id<Person>> heads = getHeadsOfHouseholdIds(members, max_age);
 		
 		if(heads.size()!=2)
 			continue;
@@ -618,7 +614,7 @@ private void printAgeRangeForCouplelHouseholds() throws IOException {
 }
 
 
-	private double getPrincipalHeadAge(List<Id> heads) {
+	private double getPrincipalHeadAge(List<Id<Person>> heads) {
 	
 		boolean male_head = false;
 		int head_age = 0;
@@ -661,7 +657,7 @@ private void printAgeRangeForCouplelHouseholds() throws IOException {
 			if(size==1)
 				continue;
 			
-			List<Id> members = household.getMemberIds();
+			List<Id<Person>> members = household.getMemberIds();
 			if(members.size()<2){
 				System.out.println("Error - non single household has only one member!");
 				//Gbl.errorMsg("Error - non single household has only one member!");
@@ -678,7 +674,7 @@ private void printAgeRangeForCouplelHouseholds() throws IOException {
 			}
 			int max_age = Collections.max(ages);
 			
-			List<Id> heads = getHeadsOfHouseholdIds(members, max_age);
+			List<Id<Person>> heads = getHeadsOfHouseholdIds(members, max_age);
 			
 			ArrayList<Id> kids = new ArrayList<Id>(members);
 			kids.removeAll(heads);
@@ -749,19 +745,19 @@ private void printAgeRangeForCouplelHouseholds() throws IOException {
 			double hh_weight = Double.parseDouble((String)this.microcensus.getHouseholdAttributes().getAttribute(id, MZConstants.HOUSEHOLD_WEIGHT));
 		
 			
-			List<Id> members = household.getMemberIds();
+			List<Id<Person>> members = household.getMemberIds();
 			
 			ArrayList<Integer> ages = new ArrayList<Integer>();
 			
 			for(int i=0;i<=members.size()-1;i++){
 				
-				Id m_id = members.get(i);
+				Id<Person> m_id = members.get(i);
 				int m_age = Integer.parseInt((String)microcensus.getHouseholdPersonsAttributes().getAttribute(m_id.toString(), MZConstants.AGE));
 				ages.add(m_age);
 			}
 			int max_age = Collections.max(ages);
 			
-			List<Id> heads = getHeadsOfHouseholdIds(members, max_age);
+			List<Id<Person>> heads = getHeadsOfHouseholdIds(members, max_age);
 			
 			ArrayList<Id> kids = new ArrayList<Id>(members);
 			kids.removeAll(heads);
@@ -807,7 +803,7 @@ private void printAgeRangeForCouplelHouseholds() throws IOException {
 			if(size==1)
 				continue;
 			
-			List<Id> members = household.getMemberIds();
+			List<Id<Person>> members = household.getMemberIds();
 			if(members.size()<2){
 				System.out.println("Error - non single household has only one member!");
 				//Gbl.errorMsg("Error - non single household has only one member!");
@@ -818,13 +814,13 @@ private void printAgeRangeForCouplelHouseholds() throws IOException {
 			
 			for(int i=0;i<=members.size()-1;i++){
 				
-				Id m_id = members.get(i);
+				Id<Person> m_id = members.get(i);
 				int m_age = Integer.parseInt((String)microcensus.getHouseholdPersonsAttributes().getAttribute(m_id.toString(), MZConstants.AGE));
 				ages.add(m_age);
 			}
 			int max_age = Collections.max(ages);
 			
-			List<Id> heads = getHeadsOfHouseholdIds(members, max_age);
+			List<Id<Person>> heads = getHeadsOfHouseholdIds(members, max_age);
 			
 			if(heads.size()!=2)
 				continue;
@@ -859,7 +855,7 @@ private void printAgeRangeForCouplelHouseholds() throws IOException {
 		out.write("Same sex couples: "+ counter + " out of: " + counter2 + " couples");
 	}
 
-	private int getCoupleAgeDifference(List<Id> heads) {
+	private int getCoupleAgeDifference(List<Id<Person>> heads) {
 		
 		if(heads.size()!=2)
 			throw new RuntimeException("Couple household with more/less than 2 heads!");
@@ -869,7 +865,7 @@ private void printAgeRangeForCouplelHouseholds() throws IOException {
 		
 		int age_diff=0;
 		
-		for(Id id:heads){
+		for(Id<Person> id:heads){
 			
 			boolean gender_male  = ((String)microcensus.getHouseholdPersonsAttributes().getAttribute(id.toString(), MZConstants.GENDER)).equals(MZConstants.MALE);
 			int age = Integer.parseInt((String)microcensus.getHouseholdPersonsAttributes().getAttribute(id.toString(), MZConstants.AGE));	
@@ -912,7 +908,7 @@ private void printMotherBirthAges() throws IOException {
 			double hh_weight = Double.parseDouble((String)this.microcensus.getHouseholdAttributes().getAttribute(id, MZConstants.HOUSEHOLD_WEIGHT));
 		
 			
-			List<Id> members = household.getMemberIds();
+			List<Id<Person>> members = household.getMemberIds();
 			
 			ArrayList<Integer> ages = new ArrayList<Integer>();
 			
@@ -924,9 +920,9 @@ private void printMotherBirthAges() throws IOException {
 			}
 			int max_age = Collections.max(ages);
 			
-			List<Id> heads = getHeadsOfHouseholdIds(members, max_age);
+			List<Id<Person>> heads = getHeadsOfHouseholdIds(members, max_age);
 			
-			ArrayList<Id> kids = new ArrayList<Id>(members);
+			ArrayList<Id<Person>> kids = new ArrayList<Id<Person>>(members);
 			kids.removeAll(heads);
 			
 			if(kids.size()==0)
@@ -989,7 +985,7 @@ private void printMotherBirthAges() throws IOException {
 	
 	}
 
-	private ArrayList<Integer> getKidAgesInDescendingOrder(ArrayList<Id> kids) {
+	private ArrayList<Integer> getKidAgesInDescendingOrder(ArrayList<Id<Person>> kids) {
 	
 		ArrayList<Integer> ages = new ArrayList<Integer>();
 		
@@ -1014,12 +1010,12 @@ private void printMotherBirthAges() throws IOException {
 	
 	}
 
-	private int getMomAge(List<Id> heads) {
+	private int getMomAge(List<Id<Person>> heads) {
 		
 		int mom_age=0;
-		boolean female = false;;
+		boolean female = false;
 		
-		for(Id id:heads){
+		for(Id<Person> id:heads){
 			
 			boolean gender_female  = ((String)microcensus.getHouseholdPersonsAttributes().getAttribute(id.toString(), MZConstants.GENDER)).equals(MZConstants.FEMALE);
 			int age = Integer.parseInt((String)microcensus.getHouseholdPersonsAttributes().getAttribute(id.toString(), MZConstants.AGE));	
@@ -1056,19 +1052,19 @@ private void printMotherBirthAges() throws IOException {
 			double hh_weight = Double.parseDouble((String)this.microcensus.getHouseholdAttributes().getAttribute(id, MZConstants.HOUSEHOLD_WEIGHT));
 		
 			
-			List<Id> members = household.getMemberIds();
+			List<Id<Person>> members = household.getMemberIds();
 			
 			ArrayList<Integer> ages = new ArrayList<Integer>();
 			
 			for(int i=0;i<=members.size()-1;i++){
 				
-				Id m_id = members.get(i);
+				Id<Person> m_id = members.get(i);
 				int m_age = Integer.parseInt((String)microcensus.getHouseholdPersonsAttributes().getAttribute(m_id.toString(), MZConstants.AGE));
 				ages.add(m_age);
 			}
 			int max_age = Collections.max(ages);
 			
-			List<Id> heads = getHeadsOfHouseholdIds(members, max_age);
+			List<Id<Person>> heads = getHeadsOfHouseholdIds(members, max_age);
 			
 		
 			double age = getPrincipalHeadAge(heads);
@@ -1112,20 +1108,20 @@ private void printTypeOfHouseholdsDistribution() throws IOException {
 			double hh_weight = Double.parseDouble((String)this.microcensus.getHouseholdAttributes().getAttribute(id, MZConstants.HOUSEHOLD_WEIGHT));
 		
 			
-			List<Id> members = household.getMemberIds();
+			List<Id<Person>> members = household.getMemberIds();
 			
 			ArrayList<Integer> ages = new ArrayList<Integer>();
 			
 			for(int i=0;i<=members.size()-1;i++){
 				
-				Id m_id = members.get(i);
+				Id<Person> m_id = members.get(i);
 				int m_age = Integer.parseInt((String)microcensus.getHouseholdPersonsAttributes().getAttribute(m_id.toString(), MZConstants.AGE));
 				ages.add(m_age);
 			}
 			int max_age = Collections.max(ages);
 			
-			List<Id> heads = getHeadsOfHouseholdIds(members, max_age);
-			ArrayList<Id> kids = new ArrayList<Id>(members);
+			List<Id<Person>> heads = getHeadsOfHouseholdIds(members, max_age);
+			ArrayList<Id<Person>> kids = new ArrayList<Id<Person>>(members);
 			kids.removeAll(heads);
 			
 			if(members.size()==1){
