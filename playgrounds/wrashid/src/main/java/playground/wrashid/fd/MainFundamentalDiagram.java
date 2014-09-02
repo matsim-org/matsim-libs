@@ -56,7 +56,7 @@ public class MainFundamentalDiagram {
 		center = scenario.createCoord(682548.0, 247525.5);
 		//center = scenario.createCoord(0, 0);
 
-		Map<Id, Link> links = LinkSelector.selectLinks(scenario.getNetwork(),
+		Map<Id<Link>, Link> links = LinkSelector.selectLinks(scenario.getNetwork(),
 				center, radiusInMeters, length);
 
 		DensityInfoCollectorDualSim densityHandler = new DensityInfoCollectorDualSim(
@@ -112,7 +112,7 @@ public class MainFundamentalDiagram {
 	}
 
 	public static void printDensityAndOutFlow(HashMap<Id, double[]> density,
-			Map<Id, ? extends Link> links,
+			Map<Id<Link>, ? extends Link> links,
 			OutFlowInfoCollectorDualSim outflowHandler, boolean doConsoleOutput, int runId, String caption, int binSizeInSeconds, double sampleSize) { // print
 
 		for (Id linkId : density.keySet()) {
@@ -214,7 +214,7 @@ public class MainFundamentalDiagram {
 
 	private static void printCordonDensityFlowGraph(
 			HashMap<Id, double[]> density,
-			OutFlowInfoCollectorDualSim outflowHandler, int binSizeInSeconds, Map<Id, ? extends Link> links, double sampleSize) {
+			OutFlowInfoCollectorDualSim outflowHandler, int binSizeInSeconds, Map<Id<Link>, ? extends Link> links, double sampleSize) {
 		double[] cordonDensity = new double[getNumberOfBins(binSizeInSeconds)];
 		double[] cordonOutflow = new double[getNumberOfBins(binSizeInSeconds)];
 		double lengthOfLinksInCordon = 0;

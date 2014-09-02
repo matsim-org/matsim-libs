@@ -36,7 +36,7 @@ public class NetworkReadExample {
 	public static void main(String[] args) {
 		//getFilteredEquilNetLinks();
 	}
-	public static Map<Id,? extends Link> getNetworkLinks(String networkFile, Coord center, double radius){ //read network
+	public static Map<Id<Link>, ? extends Link> getNetworkLinks(String networkFile, Coord center, double radius){ //read network
 		ScenarioImpl scenanrioImpl = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()); // create a new scenario object
 
 		new MatsimNetworkReader(scenanrioImpl).readFile(networkFile);//matsim function, need scenario object for reading
@@ -51,10 +51,10 @@ public class NetworkReadExample {
 		}
 
 	}
-	public static Map<Id, ? extends Link> getLinksWithinRadius(Map<Id, ? extends Link> links, double radius, Coord center){
-		HashMap<Id,Link> filteredLinks=new HashMap<Id, Link>();
+	public static Map<Id<Link>, ? extends Link> getLinksWithinRadius(Map<Id<Link>, ? extends Link> links, double radius, Coord center){
+		HashMap<Id<Link>, Link> filteredLinks=new HashMap<Id<Link>, Link>();
 
-		for (Id linkId:links.keySet()){
+		for (Id<Link> linkId:links.keySet()){
 			Link link=links.get(linkId); //find all the links
 
 			if (getDistance(link.getCoord(),center)<radius){ // filter links

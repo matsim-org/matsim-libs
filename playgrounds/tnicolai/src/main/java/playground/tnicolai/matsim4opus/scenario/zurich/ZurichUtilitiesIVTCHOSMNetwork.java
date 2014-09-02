@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 
@@ -36,7 +37,7 @@ public class ZurichUtilitiesIVTCHOSMNetwork extends ZurichUtilities{
 	private static void removeSchwamendingerTunnel(final Network network) {
 		log.info("Closing/removing Schwamendingertunnel from IVTCH-OSM network ...");
 
-		linksToRemove = new ArrayList<Id>();
+		linksToRemove = new ArrayList<Id<Link>>();
 		
 		linksToRemove.add(new IdImpl(103727));
 		linksToRemove.add(new IdImpl(103728));

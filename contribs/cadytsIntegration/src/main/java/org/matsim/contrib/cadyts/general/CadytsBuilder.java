@@ -19,11 +19,11 @@
 
 package org.matsim.contrib.cadyts.general;
 
-import cadyts.calibrators.analytical.AnalyticalCalibrator;
-import cadyts.measurements.SingleLinkMeasurement;
-import cadyts.measurements.SingleLinkMeasurement.TYPE;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -32,7 +32,9 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 
-import java.util.Map;
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import cadyts.measurements.SingleLinkMeasurement;
+import cadyts.measurements.SingleLinkMeasurement.TYPE;
 
 /**
  * @author nagel
@@ -100,7 +102,7 @@ public final class CadytsBuilder {
 		
 		//add counts data into calibrator
 		int numberOfAddedMeasurements = 0 ;
-		for (Map.Entry<Id, Count> entry : occupCounts.getCounts().entrySet()) {
+		for (Map.Entry<Id<Link>, Count> entry : occupCounts.getCounts().entrySet()) {
 			// (loop over all counting "items" (usually locations/stations)
 			
 			T item = lookUp.lookUp(entry.getKey()) ;

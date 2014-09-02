@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
@@ -19,7 +20,7 @@ public class StationFilter {
 	public void filterStations(Counts counts, int maxVolumeValue){
 		int originalSize = counts.getCounts().size();
 		List<Id> removableStationsList = new ArrayList<Id>(); //
-		for(Map.Entry <Id,Count> entry: counts.getCounts().entrySet()){
+		for(Map.Entry <Id<Link>,Count> entry: counts.getCounts().entrySet()){
 			if (entry.getValue().getMaxVolume().getValue() < maxVolumeValue){
 				removableStationsList.add(entry.getKey());
 			}

@@ -33,7 +33,7 @@ public interface DistributionConfiguration {
 
 	public abstract boolean storeResponsibilityEvents();
 
-	public abstract Map<Id, ? extends Link> getLinks();
+	public abstract Map<Id<Link>, ? extends Link> getLinks();
 
 	public abstract String getMunichShapeFile();
 

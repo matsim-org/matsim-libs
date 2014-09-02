@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
 import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
@@ -31,12 +30,12 @@ public class NetworkToShape {
 		String networkPath = args[0];
 		String outputPath = args[1];
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		new NetworkReaderMatsimV1(scenario).parse(networkPath);
 		Network net = scenario.getNetwork();
 
-		Map<Id, ? extends Node> nodes = net.getNodes();
+		Map<Id<Node>, ? extends Node> nodes = net.getNodes();
 
 		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(net, "WGS84_UTM48N");
 		builder.setWidthCoefficient(1);

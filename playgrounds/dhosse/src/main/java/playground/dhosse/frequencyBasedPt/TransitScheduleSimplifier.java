@@ -654,7 +654,7 @@ public class TransitScheduleSimplifier{
 		}
 		
 		if(newLinkIds.size() < 2){
-			Map<Id, ? extends Link> outLinks = network.getLinks().get(newLinkIds.get(0)).getToNode().getOutLinks();
+			Map<Id<Link>, ? extends Link> outLinks = network.getLinks().get(newLinkIds.get(0)).getToNode().getOutLinks();
 			
 			do{
 				for(Link l : outLinks.values()){

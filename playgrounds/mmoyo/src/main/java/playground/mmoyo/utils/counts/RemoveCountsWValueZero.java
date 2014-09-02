@@ -21,10 +21,11 @@ package playground.mmoyo.utils.counts;
 
 import java.io.File;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
@@ -41,7 +42,7 @@ public class RemoveCountsWValueZero {
 		int countValZeroNum=0;
 		Set<Id> valuesZero = new HashSet<Id>();
 		
-		for(Entry<Id, Count> entry: counts.getCounts().entrySet() ){
+		for(Entry<Id<Link>, Count> entry: counts.getCounts().entrySet() ){
 				Id countId = entry.getKey();
 				Count count = entry.getValue();
 				

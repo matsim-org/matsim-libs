@@ -25,6 +25,8 @@ import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
@@ -119,7 +121,7 @@ public class TransitRouterNetworkReaderMatsimV1 extends MatsimXmlParser {
 		TransitRouteStop stop = route.getStop(stopFacility);
 		
 		TransitRouterNetworkNode node = new TransitRouterNetworkNode(nodeId, stop, route, line);
-		((Map<Id, TransitRouterNetworkNode>) network.getNodes()).put(nodeId, node);
+		((Map<Id<Node>, TransitRouterNetworkNode>) network.getNodes()).put(nodeId, node);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -163,8 +165,8 @@ public class TransitRouterNetworkReaderMatsimV1 extends MatsimXmlParser {
 		double length = Double.parseDouble(atts.getValue("length"));
 		TransitRouterNetworkLink link = new TransitRouterNetworkLink(linkId, fromNode, toNode, route, line, length);
 		
-		((Map<Id, TransitRouterNetworkLink>) network.getLinks()).put(linkId, link);
-		((Map<Id, TransitRouterNetworkLink>) fromNode.getOutLinks()).put(link.getId(), link);
-		((Map<Id, TransitRouterNetworkLink>) toNode.getInLinks()).put(link.getId(), link);
+		((Map<Id<Link>, TransitRouterNetworkLink>) network.getLinks()).put(linkId, link);
+		((Map<Id<Link>, TransitRouterNetworkLink>) fromNode.getOutLinks()).put(link.getId(), link);
+		((Map<Id<Link>, TransitRouterNetworkLink>) toNode.getInLinks()).put(link.getId(), link);
 	}
 }

@@ -55,10 +55,10 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 	public static class SpeedLevel2PolygonGraph extends Network2PolygonGraph {
-		private final Set<Id> linkIds;
+		private final Set<Id<Link>> linkIds;
 		private final PolygonFeatureFactory.Builder factoryBuilder;
 
-		public SpeedLevel2PolygonGraph(Network network, CoordinateReferenceSystem crs, Set<Id> linkIds) {
+		public SpeedLevel2PolygonGraph(Network network, CoordinateReferenceSystem crs, Set<Id<Link>> linkIds) {
 			super(network, crs);
 			this.linkIds = linkIds;
 			geofac = new GeometryFactory();
@@ -97,7 +97,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 	}
 
 	public static List<Map<Id, Double>> createSpeedLevels(
-			Collection<Id> linkIds, CalcLinksAvgSpeed clas, Network network) {
+			Collection<Id<Link>> linkIds, CalcLinksAvgSpeed clas, Network network) {
 		List<Map<Id, Double>> speeds = new ArrayList<Map<Id, Double>>(24);
 		for (int i = 0; i < 24; i++) {
 			speeds.add(i, null);
@@ -181,7 +181,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		 * Collection<Id> links = rps.getLinkIdSet();
 		 */
 
-		Set<Id> links = net.getLinks().keySet();
+		Set<Id<Link>> links = net.getLinks().keySet();
 		List<Map<Id, Double>> sls = createSpeedLevels(links, clas, net);
 
 		// Set<Id> linkIds = rps.getLinkIdSet();
@@ -207,7 +207,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		super(netFilename, coordRefSys);
 	}
 
-	public void setLinkIds(Set<Id> linkIds) {
+	public void setLinkIds(Set<Id<Link>> linkIds) {
 		setN2g(new SpeedLevel2PolygonGraph(getNetwork(), crs, linkIds));
 	}
 

@@ -34,8 +34,8 @@ import org.matsim.api.core.v01.network.Node;
  */
 public class LookupNetwork implements Network {
 
-	private Map<Id, LookupNetworkNode> nodes = new HashMap<Id, LookupNetworkNode>();
-	private Map<Id, LookupNetworkLink> links = new HashMap<Id, LookupNetworkLink>();
+	private Map<Id<Node>, LookupNetworkNode> nodes = new HashMap<Id<Node>, LookupNetworkNode>();
+	private Map<Id<Link>, LookupNetworkLink> links = new HashMap<Id<Link>, LookupNetworkLink>();
 	private final Network network;
 		
 	public LookupNetwork(Network network) {
@@ -48,7 +48,7 @@ public class LookupNetwork implements Network {
 	}
 
 	@Override
-	public Map<Id, LookupNetworkNode> getNodes() {
+	public Map<Id<Node>, LookupNetworkNode> getNodes() {
 		return nodes;
 	}
 
@@ -65,6 +65,7 @@ public class LookupNetwork implements Network {
 		this.links.put(node.getId(), node);
 	}
 
+	@Override
 	public LookupNetworkLink removeLink(Id linkId) {
 		return links.remove(linkId);
 	}
@@ -90,7 +91,7 @@ public class LookupNetwork implements Network {
 	}
 
 	@Override
-	public Map<Id, LookupNetworkLink> getLinks() {
+	public Map<Id<Link>, LookupNetworkLink> getLinks() {
 		return links;
 	}
 }

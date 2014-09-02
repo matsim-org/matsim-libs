@@ -1041,7 +1041,7 @@ public class Osm2TransitSimplified {
 			long closestNeighbour = getClosestNeighbour(nodeId, unprocessedNodesAndConnectedWays);
 
 			// check if there is a link connecting the two nodes, if not create this link and add to network
-			Map<Id, ? extends Link> outLinks = network.getNodes().get(new IdImpl(nodeId)).getOutLinks();
+			Map<Id<Link>, ? extends Link> outLinks = network.getNodes().get(new IdImpl(nodeId)).getOutLinks();
 			Id nextLink = null;
 			for (Link link : outLinks.values()) {
 				if (link.getToNode().getId().equals(new IdImpl(closestNeighbour))) {

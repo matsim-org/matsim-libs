@@ -42,7 +42,7 @@ public class LegBeelineDistanceCalculator {
 		Route route = leg.getRoute();
 		Id startLinkId = route.getStartLinkId();
 		Id endLinkId = route.getEndLinkId();
-		Map<Id, ? extends Link> links = network.getLinks();
+		Map<Id<Link>, ? extends Link> links = network.getLinks();
 		return CoordUtils.calcDistance(links.get(startLinkId).getToNode()
 				.getCoord(), links.get(endLinkId).getToNode().getCoord());
 	}

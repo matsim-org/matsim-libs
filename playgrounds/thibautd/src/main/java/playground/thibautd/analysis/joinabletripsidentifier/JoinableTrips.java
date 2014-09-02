@@ -113,7 +113,7 @@ public class JoinableTrips {
 		List<Trip> trips = tripReconstructor.getTrips();
 		JoinableTripMap joinableTrips = new JoinableTripMap(); 
 		QuadTree<LinkInformation> linkInformation = tripReconstructor.getLinkInformationQuadTree();
-		Map<Id, ? extends Link> links = tripReconstructor.getNetwork().getLinks();
+		Map<Id<Link>, ? extends Link> links = tripReconstructor.getNetwork().getLinks();
 
 		// trip examination to identify joinable trips
 		Coord currentCoord;

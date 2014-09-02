@@ -20,16 +20,18 @@
 
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.utilityCorrection;
 
-import cadyts.calibrators.Calibrator;
-import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
-import cadyts.measurements.SingleLinkMeasurement.TYPE;
-import cadyts.supply.SimResults;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -42,13 +44,15 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
+
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseControlerListener;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.utils.qgis.LinkCostOffsets2QGIS;
 import utilities.misc.DynamicData;
-
-import java.io.IOException;
-import java.util.*;
+import cadyts.calibrators.Calibrator;
+import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
+import cadyts.measurements.SingleLinkMeasurement.TYPE;
+import cadyts.supply.SimResults;
 
 public class BseUCControlerListener implements StartupListener,
 		AfterMobsimListener, BseControlerListener {
@@ -287,7 +291,7 @@ public class BseUCControlerListener implements StartupListener,
 			throw new RuntimeException("BSE requires counts-data.");
 		}
 
-		for (Map.Entry<Id, Count> entry : counts.getCounts().entrySet()) {
+		for (Map.Entry<Id<Link>, Count> entry : counts.getCounts().entrySet()) {
 			Link link = net.getLinks().get(entry.getKey());
 			if (link == null) {
 				System.err.println("could not find link "

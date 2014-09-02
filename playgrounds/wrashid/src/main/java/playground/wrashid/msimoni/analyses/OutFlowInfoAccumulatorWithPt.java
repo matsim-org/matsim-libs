@@ -27,14 +27,14 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 
 public class OutFlowInfoAccumulatorWithPt implements LinkLeaveEventHandler,
@@ -44,11 +44,11 @@ public class OutFlowInfoAccumulatorWithPt implements LinkLeaveEventHandler,
 	private final int numBins;
 	
 	public HashMap<Id, int[]> linkOutFlow;
-	private Map<Id, ? extends Link> filteredEquilNetLinks;
+	private Map<Id<Link>, ? extends Link> filteredEquilNetLinks;
 	private Map<Id, Integer> leavesPerLink;
 	private Set<Id> carAgents;
 	
-	public OutFlowInfoAccumulatorWithPt(Map<Id, ? extends Link> filteredEquilNetLinks,
+	public OutFlowInfoAccumulatorWithPt(Map<Id<Link>, ? extends Link> filteredEquilNetLinks,
 			int binSizeInSeconds) { 
 		// to create the class FlowInfoCollector and give the link set
 		this.filteredEquilNetLinks = filteredEquilNetLinks;

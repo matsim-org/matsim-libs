@@ -39,22 +39,22 @@ public class MyNetwork2 implements Network {
 	}
 
 	@Override
-	public Map<Id, ? extends Link> getLinks() {
+	public Map<Id<Link>, ? extends Link> getLinks() {
 		return delegate.getLinks();
 	}
 
 	@Override
-	public Map<Id, ? extends Node> getNodes() {
+	public Map<Id<Node>, ? extends Node> getNodes() {
 		return delegate.getNodes();
 	}
 
 	@Override
-	public Link removeLink(Id linkId) {
+	public Link removeLink(Id<Link> linkId) {
 		return delegate.removeLink(linkId);
 	}
 
 	@Override
-	public Node removeNode(Id nodeId) {
+	public Node removeNode(Id<Node> nodeId) {
 		return delegate.removeNode(nodeId);
 	}
 

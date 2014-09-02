@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.IdentifiableArrayMap;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
@@ -58,8 +57,8 @@ public final class TransitRouterNetwork implements Network {
 
 	private final static Logger log = Logger.getLogger(TransitRouterNetwork.class);
 
-	private final Map<Id, TransitRouterNetworkLink> links = new LinkedHashMap<Id, TransitRouterNetworkLink>();
-	private final Map<Id, TransitRouterNetworkNode> nodes = new LinkedHashMap<Id, TransitRouterNetworkNode>();
+	private final Map<Id<Link>, TransitRouterNetworkLink> links = new LinkedHashMap<Id<Link>, TransitRouterNetworkLink>();
+	private final Map<Id<Node>, TransitRouterNetworkNode> nodes = new LinkedHashMap<Id<Node>, TransitRouterNetworkNode>();
 	private QuadTree<TransitRouterNetworkNode> qtNodes = null;
 
 	private long nextNodeId = 0;
@@ -70,11 +69,11 @@ public final class TransitRouterNetwork implements Network {
 		public final TransitRouteStop stop;
 		public final TransitRoute route;
 		public final TransitLine line;
-		final Id id;
-		final Map<Id, TransitRouterNetworkLink> ingoingLinks = new IdentifiableArrayMap<TransitRouterNetworkLink>();
-		final Map<Id, TransitRouterNetworkLink> outgoingLinks = new IdentifiableArrayMap<TransitRouterNetworkLink>();
+		final Id<Node> id;
+		final Map<Id<Link>, TransitRouterNetworkLink> ingoingLinks = new IdentifiableArrayMap<Link, TransitRouterNetworkLink>();
+		final Map<Id<Link>, TransitRouterNetworkLink> outgoingLinks = new IdentifiableArrayMap<Link, TransitRouterNetworkLink>();
 
-		public TransitRouterNetworkNode(final Id id, final TransitRouteStop stop, final TransitRoute route, final TransitLine line) {
+		public TransitRouterNetworkNode(final Id<Node> id, final TransitRouteStop stop, final TransitRoute route, final TransitLine line) {
 			this.id = id;
 			this.stop = stop;
 			this.route = route;
@@ -82,12 +81,12 @@ public final class TransitRouterNetwork implements Network {
 		}
 
 		@Override
-		public Map<Id, ? extends Link> getInLinks() {
+		public Map<Id<Link>, ? extends Link> getInLinks() {
 			return this.ingoingLinks;
 		}
 
 		@Override
-		public Map<Id, ? extends Link> getOutLinks() {
+		public Map<Id<Link>, ? extends Link> getOutLinks() {
 			return this.outgoingLinks;
 		}
 
@@ -107,7 +106,7 @@ public final class TransitRouterNetwork implements Network {
 		}
 
 		@Override
-		public Id getId() {
+		public Id<Node> getId() {
 			return this.id;
 		}
 
@@ -140,10 +139,10 @@ public final class TransitRouterNetwork implements Network {
 		public final TransitRouterNetworkNode toNode;
 		final TransitRoute route;
 		final TransitLine line;
-		final Id id;
+		final Id<Link> id;
 		private final double length;
 
-		public TransitRouterNetworkLink(final Id id, final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line, double length) {
+		public TransitRouterNetworkLink(final Id<Link> id, final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line, double length) {
 			this.id = id;
 			this.fromNode = fromNode;
 			this.toNode = toNode;
@@ -152,7 +151,7 @@ public final class TransitRouterNetwork implements Network {
 			this.length = length;
 		}
 		
-		public TransitRouterNetworkLink(final Id id, final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line) {
+		public TransitRouterNetworkLink(final Id<Link> id, final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line) {
 			this(id, fromNode, toNode, route, line, CoordUtils.calcDistance(toNode.stop.getStopFacility().getCoord(), fromNode.stop.getStopFacility().getCoord()));
 		}
 
@@ -187,7 +186,7 @@ public final class TransitRouterNetwork implements Network {
 		}
 
 		@Override
-		public Id getId() {
+		public Id<Link> getId() {
 			return this.id;
 		}
 
@@ -267,13 +266,13 @@ public final class TransitRouterNetwork implements Network {
 	}
 
 	public TransitRouterNetworkNode createNode(final TransitRouteStop stop, final TransitRoute route, final TransitLine line) {
-		final TransitRouterNetworkNode node = new TransitRouterNetworkNode(new IdImpl(this.nextNodeId++), stop, route, line);
+		final TransitRouterNetworkNode node = new TransitRouterNetworkNode(Id.create(this.nextNodeId++, Node.class), stop, route, line);
 		this.nodes.put(node.getId(), node);
 		return node;
 	}
 
 	public TransitRouterNetworkLink createLink(final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line) {
-		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(new IdImpl(this.nextLinkId++), fromNode, toNode, route, line);
+		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(Id.create(this.nextLinkId++, Link.class), fromNode, toNode, route, line);
 		this.links.put(link.getId(), link);
 		fromNode.outgoingLinks.put(link.getId(), link);
 		toNode.ingoingLinks.put(link.getId(), link);
@@ -281,12 +280,12 @@ public final class TransitRouterNetwork implements Network {
 	}
 
 	@Override
-	public Map<Id, ? extends TransitRouterNetworkNode> getNodes() {
+	public Map<Id<Node>, ? extends TransitRouterNetworkNode> getNodes() {
 		return this.nodes;
 	}
 
 	@Override
-	public Map<Id, ? extends TransitRouterNetworkLink> getLinks() {
+	public Map<Id<Link>, ? extends TransitRouterNetworkLink> getLinks() {
 		return this.links;
 	}
 
@@ -354,12 +353,12 @@ public final class TransitRouterNetwork implements Network {
 	}
 
 	@Override
-	public Link removeLink(Id linkId) {
+	public Link removeLink(Id<Link> linkId) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Node removeNode(Id nodeId) {
+	public Node removeNode(Id<Node> nodeId) {
 		throw new UnsupportedOperationException();
 	}
 

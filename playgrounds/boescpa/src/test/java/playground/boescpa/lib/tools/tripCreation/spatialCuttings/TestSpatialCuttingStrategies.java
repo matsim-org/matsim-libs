@@ -36,10 +36,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.boescpa.lib.tools.tripCreation.spatialCuttings.CircleBellevueCutting;
-import playground.boescpa.lib.tools.tripCreation.spatialCuttings.NoCutting;
-import playground.boescpa.lib.tools.tripCreation.spatialCuttings.SpatialCuttingStrategy;
-
 /**
  * Tests for the spatial cutting strategies.
  * 
@@ -120,12 +116,12 @@ public class TestSpatialCuttingStrategies {
 		}
 
 		@Override
-		public Map<Id, ? extends Link> getInLinks() {
+		public Map<Id<Link>, ? extends Link> getInLinks() {
 			return null;
 		}
 
 		@Override
-		public Map<Id, ? extends Link> getOutLinks() {
+		public Map<Id<Link>, ? extends Link> getOutLinks() {
 			return null;
 		}
 		

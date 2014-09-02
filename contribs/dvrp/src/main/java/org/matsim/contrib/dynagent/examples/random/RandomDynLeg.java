@@ -21,8 +21,10 @@ package org.matsim.contrib.dynagent.examples.random;
 
 import java.util.Map;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dynagent.DynLeg;
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -90,7 +92,7 @@ public class RandomDynLeg
         else {
             //Where do I want to move next?
             Link currentLink = network.getLinks().get(currentLinkId);
-            Map<Id, ?> possibleNextLinks = currentLink.getToNode().getOutLinks();
+            Map<Id<Link>, ?> possibleNextLinks = currentLink.getToNode().getOutLinks();
 
             //Let's choose the next link randomly
             nextLinkId = RandomDynAgentLogic.chooseRandomElement(possibleNextLinks.keySet());
@@ -115,7 +117,8 @@ public class RandomDynLeg
     }
 
 
-    public Double getExpectedTravelTime()
+    @Override
+		public Double getExpectedTravelTime()
     {
         return MatsimRandom.getRandom().nextDouble() * 3600;
     }

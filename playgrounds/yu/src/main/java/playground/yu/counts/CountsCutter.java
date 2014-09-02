@@ -97,14 +97,14 @@ public class CountsCutter {
 		}
 
 		// ----------RANDOMLY DISTRIBUTION----------
-		List<Entry<Id, Count>> countEntrys = new ArrayList<Entry<Id, Count>>();
-		for (Entry<Id, Count> entry : originalCounts.getCounts().entrySet())
+		List<Entry<Id<Link>, Count>> countEntrys = new ArrayList<Entry<Id<Link>, Count>>();
+		for (Entry<Id<Link>, Count> entry : originalCounts.getCounts().entrySet())
 			if (isInRange(entry.getKey(), net))
 				countEntrys.add(entry);
 		Collections.shuffle(countEntrys);
 
 		for (int i = 0; i < countEntrys.size(); i++) {
-			Entry<Id, Count> entry = countEntrys.get(i);
+			Entry<Id<Link>, Count> entry = countEntrys.get(i);
 			Id linkId = entry.getKey();
 			Count originalCount = entry.getValue();
 			int idx = i % fragmentsNo;

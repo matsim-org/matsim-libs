@@ -220,7 +220,7 @@ public class ScenarioCut {
 
 	private static void reducePopulation(ScenarioImpl scenario) {
 		System.out.println("removing persons containing links and/or facilities that are removed..." + (new Date()));
-		Set<Id> linkIds = scenario.getNetwork().getLinks().keySet();
+		Set<Id<Link>> linkIds = scenario.getNetwork().getLinks().keySet();
 		Set<Id> facIds = scenario.getActivityFacilities().getFacilities().keySet();
 		Set<Id> toRemove = new HashSet<Id>();
 		for (Person p : scenario.getPopulation().getPersons().values()) {

@@ -43,7 +43,7 @@ public interface Network extends MatsimToplevelContainer {
    *
    * @return a set of this network's nodes
    */
-  public Map<Id, ? extends Node> getNodes();
+  public Map<Id<Node>, ? extends Node> getNodes();
 
   /**
    * Returns a set of this network's links. This set might be empty, but it
@@ -51,7 +51,7 @@ public interface Network extends MatsimToplevelContainer {
    *
    * @return a set of this network's links
    */
-  public Map<Id, ? extends Link> getLinks();
+  public Map<Id<Link>, ? extends Link> getLinks();
 
   /**
    * Returns the time period over which
@@ -89,7 +89,7 @@ public interface Network extends MatsimToplevelContainer {
 	 * @param nodeId node to be removed
 	 * @return the removed node, or <code>null</code> if no such node was found
 	 */
-	public Node removeNode(final Id nodeId);
+	public Node removeNode(final Id<Node> nodeId);
 
 	/** Removes the link with the specified Id from the network and removes it as in- or out-Links of
 	 * its to- and from-Node, but does not remove any node this link is connected to.
@@ -98,6 +98,6 @@ public interface Network extends MatsimToplevelContainer {
 	 * @param linkId node to be removed
 	 * @return the removed link, or <code>null</code> if no such link was found
 	 */
-	public Link removeLink(final Id linkId);
+	public Link removeLink(final Id<Link> linkId);
 
 }

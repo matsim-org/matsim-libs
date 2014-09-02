@@ -360,7 +360,7 @@ public class AccessibilityControlerListenerImpl{
 		// contains all nodes that have a measuring point (origin) assigned
 		Iterator<Id> keyIterator = aggregatedMeasurementPoints.keySet().iterator();
 		// contains all network nodes
-		Map<Id, Node> networkNodesMap = network.getNodes();
+		Map<Id<Node>, Node> networkNodesMap = network.getNodes();
 		
 		// go through all nodes (key's) that have a measuring point (origin) assigned
 		while( keyIterator.hasNext() ){

@@ -50,11 +50,11 @@ public class Counts2QGIS extends MATSimNet2QGIS {
 	}
 
 	public static class Counts2PolygonGraph extends Network2PolygonGraph {
-		private Set<Id> linkIds = null;
+		private Set<Id<Link>> linkIds = null;
 		private final PolygonFeatureFactory.Builder factoryBuilder;
 
 		public Counts2PolygonGraph(final Network network,
-				final CoordinateReferenceSystem crs, final Set<Id> linkIds) {
+				final CoordinateReferenceSystem crs, final Set<Id<Link>> linkIds) {
 			super(network, crs);
 			this.linkIds = linkIds;
 			this.factoryBuilder = new PolygonFeatureFactory.Builder().
@@ -109,7 +109,7 @@ public class Counts2QGIS extends MATSimNet2QGIS {
 
 	protected Counts counts;
 
-	protected Set<Id> readCounts(final String countsFilename) {
+	protected Set<Id<Link>> readCounts(final String countsFilename) {
 		counts = new Counts();
 		new MatsimCountsReader(counts).readFile(countsFilename);
 		System.out.println("size :\t" + counts.getCounts().keySet().size());

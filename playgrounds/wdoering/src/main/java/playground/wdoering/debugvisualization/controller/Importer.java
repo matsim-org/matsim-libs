@@ -96,7 +96,7 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 		//		private HashMap<Integer, int[]> links = null;
 		//sc.getNetwork().get -> nur über Links (hat from / to nodes (getcoord (get x y)))
 
-		Map<Id, ? extends org.matsim.api.core.v01.network.Node> networkNodes = network.getNodes();
+		Map<Id<org.matsim.api.core.v01.network.Node>, ? extends org.matsim.api.core.v01.network.Node> networkNodes = network.getNodes();
 
 		//int k = 0;
 
@@ -107,7 +107,7 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 		this.networkNodes = new HashMap<Integer, DataPoint>();
 		this.networkLinks = new HashMap<Integer, int[]>();
 
-		for (Map.Entry<Id, ? extends org.matsim.api.core.v01.network.Node> node : networkNodes.entrySet())
+		for (Map.Entry<Id<org.matsim.api.core.v01.network.Node>, ? extends org.matsim.api.core.v01.network.Node> node : networkNodes.entrySet())
 		{
 			//k++;
 			//			System.out.println("");
@@ -139,7 +139,7 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 
 			//get in and out links
 			//Map<Id, ? extends Link> inLinks = currentNode.getInLinks();
-			Map<Id, ? extends Link> outLinks = currentNode.getOutLinks();
+			Map<Id<Link>, ? extends Link> outLinks = currentNode.getOutLinks();
 
 			//		    System.out.println("IN LINKS");
 			//		    for (Map.Entry<Id, ? extends Link> inLink : inLinks.entrySet())
@@ -149,7 +149,7 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 			//		    }
 
 			//		    System.out.println("OUT LINKS");
-			for (Map.Entry<Id, ? extends Link> outLink : outLinks.entrySet())
+			for (Map.Entry<Id<Link>, ? extends Link> outLink : outLinks.entrySet())
 			{
 				int from = Integer.valueOf(outLink.getValue().getFromNode().getId().toString());
 				int to = Integer.valueOf(outLink.getValue().getToNode().getId().toString());

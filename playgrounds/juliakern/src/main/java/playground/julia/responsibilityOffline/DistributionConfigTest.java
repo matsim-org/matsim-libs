@@ -96,68 +96,84 @@ public class DistributionConfigTest implements DistributionConfiguration{
 		}
 	}
 
+	@Override
 	public Double getSimulationEndTime() {
 		return this.simulationEndTime;
 	}
 
+	@Override
 	public boolean storeResponsibilityEvents() {
 		return storeResponsibilityEvents;
 	}
 
-	public Map<Id, ? extends Link> getLinks() {
+	@Override
+	public Map<Id<Link>, ? extends Link> getLinks() {
 		return this.scenario.getNetwork().getLinks();
 	}
 
 
 
+	@Override
 	public String getEventsFile() {
 		return eventsFile1;
 	}
 
+	@Override
 	public String getEmissionFile() {
 		return emissionFile1;
 	}
 
+	@Override
 	public String getOutPathStub() {
 		return outPathStub;
 	}
 
+	@Override
 	public double getXmin() {
 		return xMin;
 	}
 	
+	@Override
 	public double getXmax() {
 		return xMax;
 	}
 	
+	@Override
 	public double getYmin() {
 		return yMin;
 	}
 	
+	@Override
 	public double getYmax() {
 		return yMax;
 	}
 
+	@Override
 	public int getNoOfTimeBins() {
 		return noOfTimeBins;
 	}
 	
+	@Override
 	public int getNumberOfXBins(){
 		return noOfXbins;
 	}
 	
+	@Override
 	public int getNumberOfYBins(){
 		return noOfYbins;
 	}
 
+	@Override
 	public WarmPollutant getWarmPollutant2analyze() {
 		return warmPollutant2analyze;
 	}
 
+	@Override
 	public ColdPollutant getColdPollutant2analyze() {
 		return coldPollutant2analyze;
 	}
 
+	@Override
 	public Double getTimeBinSize() {
 		return timeBinSize;
 	}

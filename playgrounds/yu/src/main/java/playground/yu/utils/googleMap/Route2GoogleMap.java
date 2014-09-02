@@ -94,7 +94,7 @@ public class Route2GoogleMap extends X2GoogleMap {
 	}
 
 	public String getPureRoutePath() {
-		Map<Id, ? extends Link> links = this.network.getLinks();
+		Map<Id<Link>, ? extends Link> links = this.network.getLinks();
 
 		Link startLink = links.get(route.getStartLinkId()), endLink = links
 				.get(route.getEndLinkId());

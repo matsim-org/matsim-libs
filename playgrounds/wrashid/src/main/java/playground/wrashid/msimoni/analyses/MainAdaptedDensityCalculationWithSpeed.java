@@ -12,7 +12,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -68,7 +67,7 @@ public class MainAdaptedDensityCalculationWithSpeed {
 		double radiusInMeters = 5000;
 		center = scenario.createCoord(0, 0);
 **/
-		Map<Id, Link> links = LinkSelector.selectLinks(scenario.getNetwork(),
+		Map<Id<Link>, Link> links = LinkSelector.selectLinks(scenario.getNetwork(),
 				center, radiusInMeters, length);
 
 		InFlowInfoCollectorWithPt inflowHandler = new InFlowInfoCollectorWithPt(
@@ -101,13 +100,13 @@ public class MainAdaptedDensityCalculationWithSpeed {
 	}
 
 	private static HashMap<Id, double[]> calculateDensities(
-			Map<Id, Link> links, InFlowInfoCollectorWithPt inflowHandler,
+			Map<Id<Link>, Link> links, InFlowInfoCollectorWithPt inflowHandler,
 			OutFlowInfoCollectorWithPt outflowHandler,
 			HashMap<Id, double[]> averageSpeeds, int binSizeInSeconds) {
 
 		HashMap<Id, double[]> density = new HashMap<Id, double[]>();
 		HashMap<Id, int[]> linkInFlow = inflowHandler.getLinkInFlow();
-		HashMap<Id, int[]> linkOutFlow = outflowHandler.getLinkOutFlow();
+		HashMap<Id<Link>, int[]> linkOutFlow = outflowHandler.getLinkOutFlow();
 
 		for (Link link : links.values()) {
 			double[] bins = new double[getNumberOfBins(binSizeInSeconds)];
@@ -151,7 +150,7 @@ public class MainAdaptedDensityCalculationWithSpeed {
 	}
 
 	public static void printDensityAndOutFlow(HashMap<Id, double[]> density,
-			Map<Id, ? extends Link> links,
+			Map<Id<Link>, ? extends Link> links,
 			OutFlowInfoCollectorWithPt outflowHandler,
 			AverageSpeedCalculator averageSpeedCalculator, int binSizeInSeconds) { // print
 

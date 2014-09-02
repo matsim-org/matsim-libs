@@ -142,10 +142,12 @@ public class EvacuationTransitRouterNetworkTravelTimeAndDisutility implements Tr
 		return time2;
 	}
 	
+	@Override
 	public double getTravelDisutility(Person person, Coord fromCoord, Coord toCoord) {
 		return this.getTravelTime(person, fromCoord, toCoord);
 	}
 
+	@Override
 	public double getTravelTime(Person person, Coord fromCoord, Coord toCoord) {
 		
 		Link dummyLink = new DummyLink(this.beelineDistanceFactor, fromCoord, toCoord);
@@ -245,7 +247,7 @@ public class EvacuationTransitRouterNetworkTravelTimeAndDisutility implements Tr
 		public Coord getCoord() { return coord; }
 
 		@Override
-		public Id getId() { return null; }
+		public Id<Node> getId() { return null; }
 
 		@Override
 		public boolean addInLink(Link link) { return false; }
@@ -254,9 +256,9 @@ public class EvacuationTransitRouterNetworkTravelTimeAndDisutility implements Tr
 		public boolean addOutLink(Link link) { return false; }
 
 		@Override
-		public Map<Id, ? extends Link> getInLinks() { return null; }
+		public Map<Id<Link>, ? extends Link> getInLinks() { return null; }
 
 		@Override
-		public Map<Id, ? extends Link> getOutLinks() { return null; }
+		public Map<Id<Link>, ? extends Link> getOutLinks() { return null; }
 	}
 }

@@ -100,7 +100,7 @@ public class LanesConsistencyChecker {
 			//second check matching of link's outlinks and lane's toLinks
 			Link link = this.network.getLinks().get(l2l.getLinkId());
 			log.info("Link id: " + l2l.getLinkId());
-			Map<Id, ? extends Link> outLinksMap = link.getToNode().getOutLinks();
+			Map<Id<Link>, ? extends Link> outLinksMap = link.getToNode().getOutLinks();
 			Set<Id> linkLanes2LinkIdSet = new HashSet<Id>();
 			for (LaneData20 lane : l2l.getLanes().values()){
 				if (lane.getToLinkIds() != null){

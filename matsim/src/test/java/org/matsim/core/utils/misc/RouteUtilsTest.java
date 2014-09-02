@@ -118,8 +118,8 @@ public class RouteUtilsTest {
 	@Test
 	public void testGetNodes_NoLinksBetween() {
 		Fixture f = new Fixture();
-		Id startLinkId = f.linkIds[3];
-		Id endLinkId = f.linkIds[4];
+		Id<Link> startLinkId = f.linkIds[3];
+		Id<Link> endLinkId = f.linkIds[4];
 		List<Id<Link>> linkIds = new ArrayList<Id<Link>>(0);
 		NetworkRoute route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
 		route.setLinkIds(startLinkId, linkIds, endLinkId);
@@ -133,7 +133,7 @@ public class RouteUtilsTest {
 	public void testGetNodes_CircularRoute() {
 		Fixture f = new Fixture();
 		Id<Link> id99 = Id.create("99", Link.class);
-		f.network.addLink(f.network.getFactory().createLink(id99, f.linkIds[6], f.linkIds[0]));
+		f.network.addLink(f.network.getFactory().createLink(id99, f.network.getNodes().get(f.nodeIds[6]), f.network.getNodes().get(f.nodeIds[0])));
 		Link startLink = f.network.getLinks().get(f.linkIds[3]);
 		Link endLink = f.network.getLinks().get(f.linkIds[3]);
 		List<Id<Link>> linkIds = new ArrayList<Id<Link>>(6);

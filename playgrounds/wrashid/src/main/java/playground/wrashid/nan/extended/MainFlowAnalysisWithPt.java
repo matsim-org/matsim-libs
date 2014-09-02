@@ -18,24 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 package playground.wrashid.nan.extended;
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.xml.sax.SAXException;
 
 //this code calculates circulation flow or outflow, 
 //depending on what event handler you choose in OutFlowInfoCollectorWithPT
@@ -66,7 +56,7 @@ public class MainFlowAnalysisWithPt {
 		double radiusInMeters=2000;
 		
 		
-		Map<Id, Link> links = NetworkReadExample.getNetworkLinks(networkFile,center,radiusInMeters);// input/set center and radius
+		Map<Id<Link>, Link> links = NetworkReadExample.getNetworkLinks(networkFile,center,radiusInMeters);// input/set center and radius
 		
 		
 		OutFlowInfoCollectorWithPt flowAnalyzer=new OutFlowInfoCollectorWithPt(links,isOldEventFile,binSizeInSeconds); 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 
@@ -44,7 +45,7 @@ public class ZurichUtilitiesOSMNetwork extends ZurichUtilities{
 
 		log.info("Closing Uetlibertunnel from (osm) network ...");
 		
-		linksToRemove = new ArrayList<Id>();
+		linksToRemove = new ArrayList<Id<Link>>();
 		
 		linksToRemove.add(new IdImpl(108150));
 		linksToRemove.add(new IdImpl(121962));
@@ -63,7 +64,7 @@ public class ZurichUtilitiesOSMNetwork extends ZurichUtilities{
 
 		log.info("Closing Birmensdorferstrasse from (osm) network ...");
 		
-		linksToRemove = new ArrayList<Id>();
+		linksToRemove = new ArrayList<Id<Link>>();
 		
 		linksToRemove.add(new IdImpl(125464));
 		linksToRemove.add(new IdImpl(125460));
@@ -76,7 +77,7 @@ public class ZurichUtilitiesOSMNetwork extends ZurichUtilities{
 	private static void removeSchwamendingerTunnel(final Network network) {
 		log.info("Closing Schwamendingertunnel from (osm) network ...");
 
-		linksToRemove = new ArrayList<Id>();
+		linksToRemove = new ArrayList<Id<Link>>();
 		
 		linksToRemove.add(new IdImpl(109024));
 		//add(new IdImpl(65583));
@@ -102,7 +103,7 @@ public class ZurichUtilitiesOSMNetwork extends ZurichUtilities{
 	private static void removeMilchbuckTunnel(final Network network) {
 		log.info("Closing Milchbucktunnel from (osm) network ...");
 
-		linksToRemove = new ArrayList<Id>();
+		linksToRemove = new ArrayList<Id<Link>>();
 		
 		linksToRemove.add(new IdImpl(21130));
 		linksToRemove.add(new IdImpl(21129));

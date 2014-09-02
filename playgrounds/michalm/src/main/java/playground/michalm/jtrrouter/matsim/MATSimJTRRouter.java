@@ -19,21 +19,31 @@
 
 package playground.michalm.jtrrouter.matsim;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.velocity.*;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.michalm.jtrrouter.*;
+import playground.michalm.jtrrouter.JTRRouter;
+import playground.michalm.jtrrouter.Route;
 
 
 /**
@@ -45,7 +55,7 @@ public class MATSimJTRRouter
     private static final int TRAVEL_TIME = 1800;
 
     private final List<MATSimPlan> plans = new ArrayList<MATSimPlan>();
-    private Map<Id, ? extends Link> idToLinkMap;
+    private Map<Id<Link>, ? extends Link> idToLinkMap;
 
 
     public void readNetwork(String dir, String networkFile)
@@ -56,7 +66,8 @@ public class MATSimJTRRouter
     }
 
 
-    protected void initFlow(HierarchicalConfiguration flowCfg)
+    @Override
+		protected void initFlow(HierarchicalConfiguration flowCfg)
     {
         // int node = flowCfg.getInt("[@node]");
 
@@ -89,13 +100,15 @@ public class MATSimJTRRouter
     }
 
 
-    protected void addPlan(int id, int startTime, Route route, int subFlow)
+    @Override
+		protected void addPlan(int id, int startTime, Route route, int subFlow)
     {
         plans.add(new MATSimPlan(id, route, startTime, startTime + TRAVEL_TIME));
     }
 
 
-    protected void writePlans(String dir)
+    @Override
+		protected void writePlans(String dir)
         throws Exception
     {
         Properties p = new Properties();

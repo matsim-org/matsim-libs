@@ -28,19 +28,19 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
 
@@ -67,7 +67,7 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 	private List<Id> stuckAgents;
 	private Map<String, AnalysisTripSetStorage> tripSets;
 	
-	private Map<Id, Link> links;
+	private Map<Id<Link>, Link> links;
 	
 	public DistAnalysisHandler(){
 		this.persons = new HashMap<Id, DistAnalysisAgent>();
@@ -79,7 +79,7 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 		this.stuckAgents = new ArrayList<Id>();
 	}
 	
-	public void addLinks(Map<Id, Link> map){
+	public void addLinks(Map<Id<Link>, Link> map){
 		this.links = map;
 	}
 	public void addZones(Map<String, Geometry> zones){

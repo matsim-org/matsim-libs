@@ -102,7 +102,7 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 		Link endLink = network.getLinks().get(WithinDayAgentUtils.getModifiableCurrentLeg(withinDayAgent).getRoute().getEndLinkId());
 		Node endNode = endLink.getFromNode();
 		
-		Map<Id, ? extends Link> outLinksMap = nextNode.getOutLinks();
+		Map<Id<Link>, ? extends Link> outLinksMap = nextNode.getOutLinks();
 		Map<Id, Path> paths = new TreeMap<Id, Path>();	// outLinkId
 		Map<Id, Double> costs = new TreeMap<Id, Double>();	// outLinkId
 		Map<Id, Double> probabilities = new TreeMap<Id, Double>();	// outLinkId

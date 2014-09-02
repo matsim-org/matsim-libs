@@ -191,7 +191,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 		LeastCostPathTreeExtended lcpte = new LeastCostPathTreeExtended(controler.getLinkTravelTimes(), controler.createTravelDisutilityCalculator(), (RoadPricingSchemeImpl) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
 		
 		// contains all network nodes
-		Map<Id, Node> networkNodesMap = network.getNodes();
+		Map<Id<Node>, Node> networkNodesMap = network.getNodes();
 		Id originNodeID = new IdImpl(1);
 		Id destinationNodeId = new IdImpl(4);
 		// run lcpte

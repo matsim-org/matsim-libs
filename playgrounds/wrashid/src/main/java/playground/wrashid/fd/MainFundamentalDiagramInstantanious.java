@@ -42,7 +42,7 @@ public class MainFundamentalDiagramInstantanious {
 		// center = scenario.createCoord(682548.0, 247525.5);
 		center = scenario.createCoord(0, 0);
 
-		Map<Id, Link> links = LinkSelector.selectLinks(scenario.getNetwork(),
+		Map<Id<Link>, Link> links = LinkSelector.selectLinks(scenario.getNetwork(),
 				center, radiusInMeters, length);
 
 		DensityInfoCollectorDualSim densityHandler = new DensityInfoCollectorDualSim(
@@ -61,17 +61,17 @@ public class MainFundamentalDiagramInstantanious {
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 		reader.parse(eventsFile);
 
-		HashMap<Id, double[]> densities = calculateDensities(links,
+		HashMap<Id<Link>, double[]> densities = calculateDensities(links,
 				densityHandler, binSizeInSeconds);
 
 		printDensityAndOutFlow(densities, links, outflowHandler);
 	}
 
-	private static HashMap<Id, double[]> calculateDensities(
-			Map<Id, Link> links, DensityInfoCollectorDualSim densityHandler,
+	private static HashMap<Id<Link>, double[]> calculateDensities(
+			Map<Id<Link>, Link> links, DensityInfoCollectorDualSim densityHandler,
 			int binSizeInSeconds) {
 
-		HashMap<Id, double[]> density = new HashMap<Id, double[]>();
+		HashMap<Id<Link>, double[]> density = new HashMap<Id<Link>, double[]>();
 
 		for (Id linkId : densityHandler.density.keySet()) {
 			Link link = links.get(linkId);
@@ -93,8 +93,8 @@ public class MainFundamentalDiagramInstantanious {
 		return (86400 / binSizeInSeconds) + 1;
 	}
 
-	public static void printDensityAndOutFlow(HashMap<Id, double[]> density,
-			Map<Id, ? extends Link> links,
+	public static void printDensityAndOutFlow(HashMap<Id<Link>, double[]> density,
+			Map<Id<Link>, ? extends Link> links,
 			InstantaniousOutflowCollector outflowHandler) { // print
 
 		for (Id linkId : density.keySet()) {

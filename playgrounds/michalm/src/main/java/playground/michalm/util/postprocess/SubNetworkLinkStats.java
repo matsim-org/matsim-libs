@@ -19,10 +19,14 @@
 
 package playground.michalm.util.postprocess;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Map;
+import java.util.StringTokenizer;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -55,7 +59,7 @@ public class SubNetworkLinkStats
         MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
         nr.readFile(networkFile);
 
-        Map<Id, ? extends Link> linkMap = scenario.getNetwork().getLinks();
+        Map<Id<Link>, ? extends Link> linkMap = scenario.getNetwork().getLinks();
 
         BufferedReader br = IOUtils.getBufferedReader(linkStats);
         PrintWriter pw = new PrintWriter(IOUtils.getBufferedWriter(filteredLinkStats));

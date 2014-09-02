@@ -22,16 +22,22 @@
 
 package playground.mzilske.populationsize;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.name.Names;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
@@ -52,19 +58,27 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
 import org.matsim.counts.CountsWriter;
+
 import playground.mzilske.ant2014.FileIO;
 import playground.mzilske.ant2014.IterationResource;
 import playground.mzilske.ant2014.StreamingOutput;
 import playground.mzilske.cadyts.CadytsModule;
-import playground.mzilske.cdr.*;
+import playground.mzilske.cdr.CallBehavior;
+import playground.mzilske.cdr.CompareMain;
+import playground.mzilske.cdr.PopulationFromSightings;
+import playground.mzilske.cdr.PowerPlans;
+import playground.mzilske.cdr.Sightings;
+import playground.mzilske.cdr.SightingsImpl;
+import playground.mzilske.cdr.ZoneTracker;
 import playground.mzilske.clones.ClonesModule;
 import playground.mzilske.controller.Controller;
 import playground.mzilske.controller.ControllerModule;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.*;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.google.inject.name.Names;
 
 class MultiRateRunResource {
 
@@ -109,7 +123,8 @@ class MultiRateRunResource {
                 return linkId;
             }
 
-            public IdImpl chooseLinkInZone(String zoneId) {
+            @Override
+						public IdImpl chooseLinkInZone(String zoneId) {
                 return new IdImpl(zoneId);
             }
 
@@ -209,7 +224,7 @@ class MultiRateRunResource {
 
     private Counts filterCounts(Counts allCounts) {
         Counts someCounts = new Counts();
-        for (Map.Entry<Id, Count> entry: allCounts.getCounts().entrySet()) {
+        for (Map.Entry<Id<Link>, Count> entry: allCounts.getCounts().entrySet()) {
             if (Math.random() < 0.05) {
                 someCounts.getCounts().put(entry.getKey(), entry.getValue());
             }

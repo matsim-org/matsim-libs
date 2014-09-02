@@ -65,7 +65,7 @@ public class PotsdamAnalysis implements Runnable {
 		String network = "./tnicolai/configs/brandenburg/network_before.xml";
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(network);
-		for (Entry<Id, ? extends Link> entry : scenario.getNetwork().getLinks().entrySet()) {
+		for (Entry<Id<Link>, ? extends Link> entry : scenario.getNetwork().getLinks().entrySet()) {
 			linkDeltas.put(entry.getKey(), new AnalysisLink());
 		}
 		
@@ -78,7 +78,7 @@ public class PotsdamAnalysis implements Runnable {
 		initFeatureType();
 		
 		ArrayList<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		for (Entry<Id, ? extends Link> entry : scenario.getNetwork().getLinks().entrySet()) {
+		for (Entry<Id<Link>, ? extends Link> entry : scenario.getNetwork().getLinks().entrySet()) {
 			features.add(getFeature(entry.getValue()));
 		}
 		

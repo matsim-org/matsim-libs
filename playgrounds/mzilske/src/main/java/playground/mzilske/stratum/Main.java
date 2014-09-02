@@ -22,11 +22,14 @@
 
 package playground.mzilske.stratum;
 
-import com.google.inject.*;
-import com.google.inject.name.Names;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -34,6 +37,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
+
 import playground.mzilske.cadyts.CadytsModule;
 import playground.mzilske.cdr.CDRModule;
 import playground.mzilske.cdr.CallBehavior;
@@ -44,9 +48,12 @@ import playground.mzilske.controller.CharyparNagelModule;
 import playground.mzilske.controller.Controller;
 import playground.mzilske.controller.ControllerModule;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.google.inject.Singleton;
+import com.google.inject.name.Names;
 
 public class Main {
 
@@ -119,7 +126,7 @@ public class Main {
 
     private static Counts filterCounts(Counts allCounts, List<Integer> countHours) {
         Counts someCounts = new Counts();
-        for (Map.Entry<Id, Count> entry : allCounts.getCounts().entrySet()) {
+        for (Map.Entry<Id<Link>, Count> entry : allCounts.getCounts().entrySet()) {
             String linkId = entry.getKey().toString();
             if (linkId.equals("1") || linkId.equals("21")) {
                 Count count = someCounts.createAndAddCount(new IdImpl(linkId), "wurst");

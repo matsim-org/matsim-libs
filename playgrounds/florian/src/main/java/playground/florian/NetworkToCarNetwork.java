@@ -63,9 +63,9 @@ public class NetworkToCarNetwork {
 		net3.setEffectiveCellSize(7.5);
 
 		// uebertragen der Nodes
-		Map<Id,Node> nodes = net.getNodes();
+		Map<Id<Node>,Node> nodes = net.getNodes();
 		int j = 0;
-		for (Iterator<Id> it = nodes.keySet().iterator(); it.hasNext();){
+		for (Iterator<Id<Node>> it = nodes.keySet().iterator(); it.hasNext();){
 			j++;
 			Id id = it.next();
 			Node node = nodes.get(id);
@@ -77,8 +77,8 @@ public class NetworkToCarNetwork {
 		int lanes=0;
 		int i = 0;
 		int g = 0;
-		Map<Id,Link> links = net.getLinks();
-		for (Iterator<Id> it = links.keySet().iterator(); it.hasNext();){
+		Map<Id<Link>, Link> links = net.getLinks();
+		for (Iterator<Id<Link>> it = links.keySet().iterator(); it.hasNext();){
 			Id id1 = it.next();
 			if (excludes.contains(id1.toString())) {
 				continue;

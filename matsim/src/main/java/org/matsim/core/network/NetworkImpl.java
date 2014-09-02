@@ -65,9 +65,9 @@ public final class NetworkImpl implements Network {
 
 	private double capperiod = 3600.0 ;
 
-	private final Map<Id, Node> nodes = new LinkedHashMap<Id, Node>();
+	private final Map<Id<Node>, Node> nodes = new LinkedHashMap<Id<Node>, Node>();
 
-	private Map<Id, Link> links = new LinkedHashMap<Id, Link>();
+	private Map<Id<Link>, Link> links = new LinkedHashMap<Id<Link>, Link>();
 
 	private QuadTree<Node> nodeQuadTree = null;
 	
@@ -143,7 +143,7 @@ public final class NetworkImpl implements Network {
 	
 	@Override
 	public void addNode(final Node nn) {
-		Id id = nn.getId() ;
+		Id<Node> id = nn.getId() ;
 		Node node = this.nodes.get(id);
 		if (node != null) {
 			if (node == nn) {
@@ -173,7 +173,7 @@ public final class NetworkImpl implements Network {
 	// ////////////////////////////////////////////////////////////////////
 
 	@Override
-	public Node removeNode(final Id nodeId) {
+	public Node removeNode(final Id<Node> nodeId) {
 		Node n = this.nodes.remove(nodeId);
 		if (n == null) {
 			return null;
@@ -191,7 +191,7 @@ public final class NetworkImpl implements Network {
 	}
 
 	@Override
-	public Link removeLink(final Id linkId) {
+	public Link removeLink(final Id<Link> linkId) {
 		Link l = this.links.remove(linkId);
 		if (l == null) {
 			return null;
@@ -293,7 +293,7 @@ public final class NetworkImpl implements Network {
 	}
 
 	@Override
-	public Map<Id, Node> getNodes() {
+	public Map<Id<Node>, Node> getNodes() {
 		return this.nodes;
 	}
 
@@ -566,7 +566,7 @@ public final class NetworkImpl implements Network {
 	}
 
 	@Override
-	public Map<Id, Link> getLinks() {
+	public Map<Id<Link>, Link> getLinks() {
 		return Collections.unmodifiableMap(links);
 	}
 

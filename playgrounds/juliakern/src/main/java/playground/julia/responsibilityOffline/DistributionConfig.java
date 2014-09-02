@@ -118,7 +118,7 @@ public class DistributionConfig implements DistributionConfiguration {
 	 * @see playground.julia.distribution.DistributionConfiguration#getLinks()
 	 */
 	@Override
-	public Map<Id, ? extends Link> getLinks() {
+	public Map<Id<Link>, ? extends Link> getLinks() {
 		return this.scenario.getNetwork().getLinks();
 	}
 

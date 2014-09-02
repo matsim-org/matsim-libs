@@ -35,9 +35,9 @@ public class InFlowInfoCollectorWithPt extends AbstractFlowAccumulator implement
 	private int binSizeInSeconds; // set the length of interval
 
 	public HashMap<Id, int[]> linkInFlow;
-	private Map<Id, ? extends Link> filteredEquilNetLinks; //
+	private Map<Id<Link>, ? extends Link> filteredEquilNetLinks; //
 
-	public InFlowInfoCollectorWithPt(Map<Id, ? extends Link> filteredEquilNetLinks,
+	public InFlowInfoCollectorWithPt(Map<Id<Link>, ? extends Link> filteredEquilNetLinks,
 			 int binSizeInSeconds) {
 		this.filteredEquilNetLinks = filteredEquilNetLinks;
 		this.binSizeInSeconds=binSizeInSeconds;

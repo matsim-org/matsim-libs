@@ -1546,7 +1546,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @return true if the link has an inverse direction way, false otherwise.
 	 */
 	protected boolean isDoubleWay(Link link) {
-		for(Entry<Id, ? extends Link> entry : link.getToNode().getOutLinks().entrySet()) {
+		for(Entry<Id<Link>, ? extends Link> entry : link.getToNode().getOutLinks().entrySet()) {
 			if(entry.getValue().getToNode().getId().equals(link.getFromNode().getId()))
 				return true;
 		}
@@ -1566,7 +1566,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 			flag = isDoubleWay(link);
 		if(!flag)
 			return null;
-		for(Entry<Id, ? extends Link> entry : link.getToNode().getOutLinks().entrySet()) {
+		for(Entry<Id<Link>, ? extends Link> entry : link.getToNode().getOutLinks().entrySet()) {
 			if(entry.getValue().getToNode().getId().equals(link.getFromNode().getId()))
 				return entry.getValue();
 		}

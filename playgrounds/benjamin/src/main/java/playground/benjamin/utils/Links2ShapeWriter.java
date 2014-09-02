@@ -51,7 +51,7 @@ public class Links2ShapeWriter {
 
 	private static final Logger log = Logger.getLogger(Links2ShapeWriter.class);
 
-	public static void writeLinks2Shape(String fileName, Map<Id, Link> links, Map<Id, SortedMap<String, String>> attributes){
+	public static void writeLinks2Shape(String fileName, Map<Id<Link>, Link> links, Map<Id, SortedMap<String, String>> attributes){
 		PolylineFeatureFactory factory = null;
 		if(!(attributes == null) && (attributes.size() > 0)){
 			for(SortedMap<String, String> m : attributes.values()){
@@ -225,7 +225,7 @@ public class Links2ShapeWriter {
 		return features;
 	}
 
-	private static Collection<SimpleFeature> createLinkFeatures(Map<Id, Link> links, Map<Id, SortedMap<String, String>> attributes, PolylineFeatureFactory factory) {
+	private static Collection<SimpleFeature> createLinkFeatures(Map<Id<Link>, Link> links, Map<Id, SortedMap<String, String>> attributes, PolylineFeatureFactory factory) {
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		SimpleFeature feature;
 		Coordinate[] coords;

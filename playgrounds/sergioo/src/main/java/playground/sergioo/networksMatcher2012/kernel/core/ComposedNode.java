@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 
@@ -48,11 +47,11 @@ public class ComposedNode implements Node {
 
 	private Coord coord;
 
-	private final Id id;
+	private final Id<Node> id;
 
-	private Map<Id, Link> inLinks;
+	private Map<Id<Link>, Link> inLinks;
 
-	private Map<Id, Link> outLinks;
+	private Map<Id<Link>, Link> outLinks;
 	
 	private final Set<Node> nodes;
 	
@@ -65,10 +64,10 @@ public class ComposedNode implements Node {
 	//Methods
 	
 	public ComposedNode(Node node) {
-		id = new IdImpl(node.getId().toString());
+		id = Id.create(node.getId().toString(), Node.class);
 		coord = new CoordImpl(node.getCoord().getX(), node.getCoord().getY());
-		inLinks = new HashMap<Id, Link>();
-		outLinks = new HashMap<Id, Link>();
+		inLinks = new HashMap<Id<Link>, Link>();
+		outLinks = new HashMap<Id<Link>, Link>();
 		nodes = new HashSet<Node>();
 		nodes.add(node);
 	}
@@ -80,14 +79,14 @@ public class ComposedNode implements Node {
 		for(Node node:nodes)
 			idText+=node.getId()+SEPARATOR;
 		idText=idText.substring(0, idText.length()-1);
-		id = new IdImpl(idText);
+		id = Id.create(idText, Node.class);
 		coord = new CoordImpl(0, 0);
 		for(Node node:nodes)
 			coord.setXY(coord.getX()+node.getCoord().getX(), coord.getY()+node.getCoord().getY());
 		coord.setXY(coord.getX()/nodes.size(), coord.getY()/nodes.size());
 		this.nodes = nodes;
-		inLinks = new HashMap<Id, Link>();
-		outLinks = new HashMap<Id, Link>();
+		inLinks = new HashMap<Id<Link>, Link>();
+		outLinks = new HashMap<Id<Link>, Link>();
 		setIncidentLinks();
 		setType();
 		for(Node node:nodes) {
@@ -222,7 +221,7 @@ public class ComposedNode implements Node {
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Node> getId() {
 		return id;
 	}
 
@@ -237,12 +236,12 @@ public class ComposedNode implements Node {
 	}
 
 	@Override
-	public Map<Id, ? extends Link> getInLinks() {
+	public Map<Id<Link>, ? extends Link> getInLinks() {
 		return inLinks;
 	}
 
 	@Override
-	public Map<Id, ? extends Link> getOutLinks() {
+	public Map<Id<Link>, ? extends Link> getOutLinks() {
 		return outLinks;
 	}
 	

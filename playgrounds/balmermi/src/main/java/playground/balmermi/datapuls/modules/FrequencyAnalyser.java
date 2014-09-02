@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.Gbl;
 
@@ -50,7 +51,7 @@ public class FrequencyAnalyser implements LinkLeaveEventHandler {
 		this(network,network.getLinks().keySet());
 	}
 
-	public FrequencyAnalyser(final Network network, Set<Id> linkIdSet) {
+	public FrequencyAnalyser(final Network network, Set<Id<Link>> linkIdSet) {
 		log.info("init " + this.getClass().getName() + " module...");
 		if (linkIdSet == null) { throw new NullPointerException("linkIdSet cannot be null"); }
 		freqs = new HashMap<Id, Set<Id>>((int)(network.getLinks().size()*1.4));

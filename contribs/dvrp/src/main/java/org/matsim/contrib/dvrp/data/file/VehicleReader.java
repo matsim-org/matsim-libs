@@ -19,11 +19,14 @@
 
 package org.matsim.contrib.dvrp.data.file;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Stack;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.VehicleImpl;
+import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -35,7 +38,7 @@ public class VehicleReader
 
     private Scenario scenario;
     private VrpData data;
-    private Map<Id, ? extends Link> links;
+    private Map<Id<Link>, ? extends Link> links;
 
 
     public VehicleReader(Scenario scenario, VrpData data)

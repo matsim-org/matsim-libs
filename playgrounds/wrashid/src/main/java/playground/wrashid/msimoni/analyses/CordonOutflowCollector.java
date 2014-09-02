@@ -1,14 +1,14 @@
 package playground.wrashid.msimoni.analyses;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.network.Link;
 
 public class CordonOutflowCollector implements PersonArrivalEventHandler,
 		LinkEnterEventHandler {
@@ -18,7 +18,7 @@ public class CordonOutflowCollector implements PersonArrivalEventHandler,
 	private int binSizeInSeconds;
 	private int[] outflowTimeBins;
 
-	public CordonOutflowCollector(Set<Id> linksInsideCordon,
+	public CordonOutflowCollector(Set<Id<Link>> linksInsideCordon,
 			int binSizeInSeconds) {
 		this.linksInsideCordon = new HashSet<Id>();
 		this.linksInsideCordon.addAll(linksInsideCordon);

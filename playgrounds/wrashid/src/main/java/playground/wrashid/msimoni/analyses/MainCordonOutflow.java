@@ -28,7 +28,7 @@ public class MainCordonOutflow {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		center = scenario.createCoord(682548.0, 247525.5);
 
-		Map<Id, Link> links = LinkSelector.selectLinks(scenario.getNetwork(),
+		Map<Id<Link>, Link> links = LinkSelector.selectLinks(scenario.getNetwork(),
 				center, radiusInMeters, length);
 
 		CordonOutflowCollector outflowCollector= new CordonOutflowCollector(links.keySet(), binSizeInSeconds);

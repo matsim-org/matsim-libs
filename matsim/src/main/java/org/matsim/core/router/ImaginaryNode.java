@@ -69,7 +69,7 @@ public class ImaginaryNode implements Node {
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Node> getId() {
 		return null;
 	}
 
@@ -84,12 +84,12 @@ public class ImaginaryNode implements Node {
 	}
 
 	@Override
-	public Map<Id, ? extends Link> getInLinks() {
+	public Map<Id<Link>, ? extends Link> getInLinks() {
 		return null;
 	}
 
 	@Override
-	public Map<Id, ? extends Link> getOutLinks() {
+	public Map<Id<Link>, ? extends Link> getOutLinks() {
 		return null;
 	}
 }

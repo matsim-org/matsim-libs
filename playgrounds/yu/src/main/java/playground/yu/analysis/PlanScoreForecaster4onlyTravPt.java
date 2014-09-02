@@ -149,8 +149,8 @@ public class PlanScoreForecaster4onlyTravPt {
 		Route route = leg.getRoute();
 		if (route instanceof NetworkRoute) {
 			NetworkRoute netRoute = (NetworkRoute) route;
-			Map<Id, Link> links = this.net.getLinks();
-			for (Id linkId : netRoute.getLinkIds()) {
+			Map<Id<Link>, Link> links = this.net.getLinks();
+			for (Id<Link> linkId : netRoute.getLinkIds()) {
 				travelTime_s += ttc.getLinkTravelTime(links.get(linkId),
 						departTime + travelTime_s, null, null);
 			}

@@ -71,7 +71,7 @@ public class HITSToMATSim {
 	private LeastCostPathCalculator leastCostPathCalculator;
 	private HashMap<String, Double> personShortestPathDayTotals;
 	private XY2Links xY2Links;
-	private Map<Id, Link> links;
+	private Map<Id<Link>, Link> links;
 
 	public HITSToMATSim(HITSData h2, Connection conn2) throws ParseException {
 		this();
@@ -96,11 +96,11 @@ public class HITSToMATSim {
 		new MatsimNetworkReader(scenario)
 				.readFile("data/singapore1_no_rail_CLEAN.xml");
 		NetworkImpl subNet = NetworkImpl.createNetwork();
-		TransportModeNetworkFilter t = new TransportModeNetworkFilter((NetworkImpl) scenario.getNetwork());
+		TransportModeNetworkFilter t = new TransportModeNetworkFilter(scenario.getNetwork());
 		HashSet set = new HashSet<String>();
 		set.add("car");
 		t.filter(subNet, set);
-		this.network = (NetworkImpl) subNet;
+		this.network = subNet;
 		this.preProcessNetwork();
 
 		this.setZip2DGP(conn);
@@ -644,7 +644,7 @@ public class HITSToMATSim {
 
 	private int getRandomIndex(int maxIdx) {
 		// returns a random integer smaller than maxIdx
-		double maxIdxD = (double) maxIdx;
+		double maxIdxD = maxIdx;
 		return (int) Math.floor(Math.random() * maxIdxD);
 	}
 
@@ -701,7 +701,7 @@ public class HITSToMATSim {
 
 	private long randomSeconds(int mins) {
 		// returns a random number of seconds spanning -mins/2 : +mins/2
-		return (long) ((Math.random() * 60 * (double) mins) - (double) (mins / 2));
+		return (long) ((Math.random() * 60 * mins) - mins / 2);
 	}
 
 	private void setDGP2Type2Zip(Connection conn2) throws SQLException {

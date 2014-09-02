@@ -35,11 +35,11 @@ public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler,
 	private int binSizeInSeconds; // set the length of interval
 
 	public HashMap<Id, int[]> linkInFlow;
-	private Map<Id, ? extends Link> filteredEquilNetLinks; //
+	private Map<Id<Link>, ? extends Link> filteredEquilNetLinks; //
 
 	private boolean isOldEventFile;
 
-	public InFlowInfoCollectorWithPt(Map<Id, ? extends Link> filteredEquilNetLinks,
+	public InFlowInfoCollectorWithPt(Map<Id<Link>, ? extends Link> filteredEquilNetLinks,
 			boolean isOldEventFile, int binSizeInSeconds) {
 		this.filteredEquilNetLinks = filteredEquilNetLinks;
 		this.isOldEventFile = isOldEventFile;

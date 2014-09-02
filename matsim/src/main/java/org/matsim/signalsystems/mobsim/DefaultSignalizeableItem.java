@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.signalsystems.model.SignalGroupState;
 
 
@@ -36,9 +37,9 @@ public final class DefaultSignalizeableItem implements SignalizeableItem {
 	private Map<Id, SignalGroupState> toLinkIdSignalStates = null;
 	private SignalGroupState allToLinksState = SignalGroupState.GREEN;
 	private boolean linkGreen = true;
-	private Set<Id> outLinks;
+	private Set<Id<Link>> outLinks;
 	
-	public DefaultSignalizeableItem(Set<Id> outLinks){
+	public DefaultSignalizeableItem(Set<Id<Link>> outLinks){
 		this.outLinks = outLinks;
 	}
 

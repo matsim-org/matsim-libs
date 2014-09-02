@@ -3,16 +3,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
 
 //public class InFlowInfoCollectorWithPt implements AgentWait2LinkEventHandler {
 public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler
@@ -20,21 +15,24 @@ public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler
 	{
 	private int binSizeInSeconds; // set the length of interval
 	public HashMap<Id, int[]> linkInFlow;
-	private Map<Id, Link> filteredEquilNetLinks; //
+	private Map<Id<Link>, Link> filteredEquilNetLinks; //
 	private boolean isOldEventFile;
 	int setAggregationLevel=5; // do not forget to set the aggregation level!!!!!!
 	
-	public InFlowInfoCollectorWithPt(Map<Id, Link> filteredEquilNetLinks,
+	public InFlowInfoCollectorWithPt(Map<Id<Link>, Link> filteredEquilNetLinks,
 			boolean isOldEventFile, int binSizeInSeconds) {
 		this.filteredEquilNetLinks = filteredEquilNetLinks;
 		this.isOldEventFile = isOldEventFile;
 		this.binSizeInSeconds=binSizeInSeconds;
 	}
 
+	@Override
 	public void reset(int iteration) {linkInFlow = new HashMap<Id, int[]>();} // reset the variables (private ones)
 	
+	@Override
 	public void handleEvent(LinkEnterEvent event) {enterLink(event.getLinkId(), event.getTime());}
-   public void handleEvent(Wait2LinkEvent event) {enterLink(event.getLinkId(), event.getTime());}
+   @Override
+	public void handleEvent(Wait2LinkEvent event) {enterLink(event.getLinkId(), event.getTime());}
     
 	private void enterLink(Id linkId, double time) {
 		if (!filteredEquilNetLinks.containsKey(linkId)) {return;} // if the link is not in the link set, then exit the method

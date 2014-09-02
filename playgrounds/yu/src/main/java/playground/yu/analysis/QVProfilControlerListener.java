@@ -20,6 +20,11 @@
 
 package playground.yu.analysis;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
@@ -36,14 +41,10 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.counts.Counts;
+
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 import playground.yu.utils.io.SimpleWriter;
 import playground.yu.utils.math.SimpleStatistics;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public class QVProfilControlerListener implements StartupListener,
 		AfterMobsimListener, ShutdownListener {
@@ -92,8 +93,8 @@ public class QVProfilControlerListener implements StartupListener,
 	}
 
 	// ////////////////////////////////////////////////////////
-	private Set<Id/* link ID */> interestedLinkIds = null;
-	private Map<Id/* link ID */, Set<String/* qv-tuple */>> qvTuples = new HashMap<Id, Set<String>>();
+	private Set<Id<Link>> interestedLinkIds = null;
+	private Map<Id<Link>, Set<String/* qv-tuple */>> qvTuples = new HashMap<Id<Link>, Set<String>>();
 	private CalcLinksAvgSpeed clas;
 
 	private int caliStartTime = 1, caliEndTime = 24,

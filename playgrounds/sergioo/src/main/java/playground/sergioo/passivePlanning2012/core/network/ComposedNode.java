@@ -11,7 +11,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -29,16 +28,16 @@ public class ComposedNode implements Node {
 
 	//Attributes
 	private Coord coord;
-	private final Id id;
-	private Map<Id, Link> inLinks;
-	private Map<Id, Link> outLinks;
+	private final Id<Node> id;
+	private Map<Id<Link>, Link> inLinks;
+	private Map<Id<Link>, Link> outLinks;
 	private final Set<Node> nodes;
 
 	public ComposedNode(Node node) {
-		id = new IdImpl(node.getId().toString()+SEPARATOR);
+		id = Id.create(node.getId().toString()+SEPARATOR, Node.class);
 		coord = new CoordImpl(node.getCoord().getX(), node.getCoord().getY());
-		inLinks = new HashMap<Id, Link>();
-		outLinks = new HashMap<Id, Link>();
+		inLinks = new HashMap<Id<Link>, Link>();
+		outLinks = new HashMap<Id<Link>, Link>();
 		nodes = new HashSet<Node>();
 		nodes.add(node);
 	}
@@ -91,6 +90,7 @@ public class ComposedNode implements Node {
 		preProcessData.run(subNetwork);
 		TravelTime timeFunction = new TravelTime() {	
 
+			@Override
 			public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 				return link.getLength()/link.getFreespeed();
 			}
@@ -108,13 +108,13 @@ public class ComposedNode implements Node {
 		for(Node node:nodes)
 			idText+=node.getId()+SEPARATOR;
 		idText=idText.substring(0, idText.length()-1);
-		id = new IdImpl(idText);
+		id = Id.create(idText, Node.class);
 		coord = new CoordImpl(0, 0);
 		for(Node node:nodes)
 			coord.setXY(coord.getX()+node.getCoord().getX(), coord.getY()+node.getCoord().getY());
 		coord.setXY(coord.getX()/nodes.size(), coord.getY()/nodes.size());
-		inLinks = new HashMap<Id, Link>();
-		outLinks = new HashMap<Id, Link>();
+		inLinks = new HashMap<Id<Link>, Link>();
+		outLinks = new HashMap<Id<Link>, Link>();
 		this.nodes = nodes;
 	}
 	
@@ -138,7 +138,7 @@ public class ComposedNode implements Node {
 		return coord;
 	}
 	@Override
-	public Id getId() {
+	public Id<Node> getId() {
 		return id;
 	}
 	@Override
@@ -150,11 +150,11 @@ public class ComposedNode implements Node {
 		return outLinks.put(link.getId(), link)!=null;
 	}
 	@Override
-	public Map<Id, ? extends Link> getInLinks() {
+	public Map<Id<Link>, ? extends Link> getInLinks() {
 		return inLinks;
 	}
 	@Override
-	public Map<Id, ? extends Link> getOutLinks() {
+	public Map<Id<Link>, ? extends Link> getOutLinks() {
 		return outLinks;
 	}
 	public Set<Node> getNodes() {

@@ -106,7 +106,7 @@ public class PrivateVehicleSpeedEvaluator {
 		 *  I'm not sure if this will give the right output now.
 		 */
 		
-		Map<Id, ? extends Link> map = nl.getLinks();
+		Map<Id<Link>, ? extends Link> map = nl.getLinks();
 		for (Id key : map.keySet()) {
 			Link link = map.get(key);
 

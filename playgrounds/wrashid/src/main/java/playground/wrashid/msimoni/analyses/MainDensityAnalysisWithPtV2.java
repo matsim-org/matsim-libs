@@ -66,7 +66,7 @@ public class MainDensityAnalysisWithPtV2 {
 		//center = scenario.getNetwork().getNodes().get(scenario.createId("17560000113841FT")).getCoord();
 		center = scenario.createCoord(682548.0, 247525.5);
 		
-		Map<Id, Link> links = LinkSelector.selectLinks(scenario.getNetwork(), center, radiusInMeters, length);
+		Map<Id<Link>, Link> links = LinkSelector.selectLinks(scenario.getNetwork(), center, radiusInMeters, length);
 		
 		InFlowInfoAcuumulatorWithPt inflowHandler = new InFlowInfoAcuumulatorWithPt(links, binSizeInSeconds);
 		OutFlowInfoAccumulatorWithPt outflowHandler = new OutFlowInfoAccumulatorWithPt(links, binSizeInSeconds);
@@ -97,7 +97,7 @@ public class MainDensityAnalysisWithPtV2 {
 		System.out.println("Entries from the outflow handler: " + linkOutFlow.size());
 		
 		HashMap<Id, int[]> deltaFlow = deltaFlow(linkInFlow, linkOutFlow);
-		HashMap<Id, double[]> density = calculateDensity(deltaFlow, links);
+		HashMap<Id<Link>, double[]> density = calculateDensity(deltaFlow, links);
 
 		System.out.println("inflows-----------------------------------------------");
 		printFlow(linkInFlow, links);
@@ -115,7 +115,7 @@ public class MainDensityAnalysisWithPtV2 {
 		HashMap<Id, int[]> avgDeltaFlow = deltaFlow(avgLinkInFlow, avgLinkOutFlow);
 		int valuesPerBin = binSizeInSeconds / avgBinSize;
 		if (binSizeInSeconds % avgBinSize != 0) throw new RuntimeException("binSize in seconds % binSize for averaging is != 0");
-		HashMap<Id, double[]> avgDensity = calculateAverageDensity(calculateDensity(avgDeltaFlow, links), valuesPerBin);
+		HashMap<Id<Link>, double[]> avgDensity = calculateAverageDensity(calculateDensity(avgDeltaFlow, links), valuesPerBin);
 		
 		System.out.println("avg density-----------------------------------------------");
 		printDensity(avgDensity, links);
@@ -157,9 +157,9 @@ public class MainDensityAnalysisWithPtV2 {
 		return result;
 	}
 
-	public static HashMap<Id, double[]> calculateDensity(HashMap<Id, int[]> deltaFlow, Map<Id, ? extends Link> links) {
+	public static HashMap<Id<Link>, double[]> calculateDensity(HashMap<Id, int[]> deltaFlow, Map<Id<Link>, ? extends Link> links) {
 
-		HashMap<Id, double[]> density = new HashMap<Id, double[]>();
+		HashMap<Id<Link>, double[]> density = new HashMap<Id<Link>, double[]>();
 
 		for (Id linkId : deltaFlow.keySet()) {
 			density.put(linkId, null);
@@ -182,9 +182,9 @@ public class MainDensityAnalysisWithPtV2 {
 		return density;
 	}
 
-	public static HashMap<Id, double[]> calculateAverageDensity(HashMap<Id, double[]> density, int valuesPerBin) {
+	public static HashMap<Id<Link>, double[]> calculateAverageDensity(HashMap<Id<Link>, double[]> density, int valuesPerBin) {
 
-		HashMap<Id, double[]> avgDensity = new HashMap<Id, double[]>();
+		HashMap<Id<Link>, double[]> avgDensity = new HashMap<Id<Link>, double[]>();
 		
 		for (Id linkId : density.keySet()) {
 
@@ -211,8 +211,8 @@ public class MainDensityAnalysisWithPtV2 {
 		return avgDensity;
 	}
 	
-	public static void printDensity(HashMap<Id, double[]> density,
-			Map<Id, ? extends Link> links) { // print
+	public static void printDensity(HashMap<Id<Link>, double[]> density,
+			Map<Id<Link>, ? extends Link> links) { // print
 		for (Id linkId : density.keySet()) {
 			double[] bins = density.get(linkId);
 
@@ -242,7 +242,7 @@ public class MainDensityAnalysisWithPtV2 {
 	}
 	
 	public static void printFlow(HashMap<Id, int[]> flow,
-			Map<Id, ? extends Link> links) { // print
+			Map<Id<Link>, ? extends Link> links) { // print
 		for (Id linkId : flow.keySet()) {
 			int[] bins = flow.get(linkId);
 

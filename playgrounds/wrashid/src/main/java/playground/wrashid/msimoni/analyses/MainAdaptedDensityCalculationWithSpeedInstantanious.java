@@ -53,7 +53,7 @@ public class MainAdaptedDensityCalculationWithSpeedInstantanious {
 			//center = scenario.createCoord(682548.0, 247525.5);
 			center = scenario.createCoord(0, 0);
 			
-			Map<Id, Link> links = LinkSelector.selectLinks(scenario.getNetwork(), center, radiusInMeters, length);
+			Map<Id<Link>, Link> links = LinkSelector.selectLinks(scenario.getNetwork(), center, radiusInMeters, length);
 			
 			InFlowInfoCollectorWithPt inflowHandler = new InFlowInfoCollectorWithPt(links, binSizeInSeconds);
 			InstantaniousOutflowCollector outflowHandler = new InstantaniousOutflowCollector(links, binSizeInSeconds);
@@ -77,7 +77,7 @@ public class MainAdaptedDensityCalculationWithSpeedInstantanious {
 		}
 		
 		private static HashMap<Id, double[]> calculateDensities(
-				Map<Id, Link> links, InFlowInfoCollectorWithPt inflowHandler,
+				Map<Id<Link>, Link> links, InFlowInfoCollectorWithPt inflowHandler,
 				InstantaniousOutflowCollector outflowHandler,
 				HashMap<Id, double[]> averageSpeeds, int binSizeInSeconds) {
 			
@@ -119,7 +119,7 @@ public class MainAdaptedDensityCalculationWithSpeedInstantanious {
 		}
 		
 		public static void printDensityAndOutFlow(HashMap<Id, double[]> density,
-				Map<Id, ? extends Link> links, InstantaniousOutflowCollector outflowHandler, AverageSpeedCalculator averageSpeedCalculator) { // print
+				Map<Id<Link>, ? extends Link> links, InstantaniousOutflowCollector outflowHandler, AverageSpeedCalculator averageSpeedCalculator) { // print
 			
 			for (Id linkId : density.keySet()) {
 				double[] averageSpeed = averageSpeedCalculator.getAverageSpeeds().get(linkId);

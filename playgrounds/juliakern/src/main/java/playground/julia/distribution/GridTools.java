@@ -27,13 +27,13 @@ import org.matsim.api.core.v01.network.Link;
 
 public class GridTools {
 
-	private Map<Id, ? extends Link> links;
+	private Map<Id<Link>, ? extends Link> links;
 	private Double xMin;
 	private Double xMax;
 	private Double yMin;
 	private Double yMax;
 
-	public GridTools(Map<Id, ? extends Link> links, Double xMin, Double xMax,
+	public GridTools(Map<Id<Link>, ? extends Link> links, Double xMin, Double xMax,
 			Double yMin, Double yMax) {
 		this.links=links;
 		this.xMin=xMin;
@@ -45,7 +45,7 @@ public class GridTools {
 	// TODO maybe store x and y values only if in area of interest now x might be null but y not
 	public Map<Id, Integer> mapLinks2Xcells(Integer noOfXCells) {
 		Map<Id, Integer> link2xbin = new HashMap<Id, Integer>();
-		for(Id linkId: this.links.keySet()){
+		for(Id<Link> linkId: this.links.keySet()){
 			link2xbin.put(linkId, mapXCoordToBin(this.links.get(linkId).getCoord().getX(), noOfXCells));
 		}
 		return link2xbin;
@@ -53,7 +53,7 @@ public class GridTools {
 
 	public Map<Id, Integer> mapLinks2Ycells(Integer noOfYCells) {
 		Map<Id, Integer> link2ybin = new HashMap<Id, Integer>();
-		for(Id linkId: this.links.keySet()){
+		for(Id<Link> linkId: this.links.keySet()){
 			link2ybin.put(linkId, mapYCoordToBin(this.links.get(linkId).getCoord().getY(), noOfYCells));
 		}
 		return link2ybin;

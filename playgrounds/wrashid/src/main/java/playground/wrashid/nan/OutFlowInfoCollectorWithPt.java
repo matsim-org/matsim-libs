@@ -24,12 +24,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 
 public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler, LinkEnterEventHandler,
@@ -37,14 +37,14 @@ public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler, LinkEn
 
 	private int binSizeInSeconds; // set the length of interval
 	public HashMap<Id, int[]> linkOutFlow; // define
-	private Map<Id, ? extends Link> filteredEquilNetLinks; // define
+	private Map<Id<Link>, ? extends Link> filteredEquilNetLinks; // define
 	
 	// personId, linkId
 	private HashMap<Id, Id> lastEnteredLink=new HashMap<Id, Id>(); // define
 	
 	private boolean isOldEventFile;
 
-	public OutFlowInfoCollectorWithPt(Map<Id, ? extends Link> filteredEquilNetLinks,
+	public OutFlowInfoCollectorWithPt(Map<Id<Link>, ? extends Link> filteredEquilNetLinks,
 			boolean isOldEventFile,int binSizeInSeconds) { // to create the class FlowInfoCollector
 		// and give the link set
 		this.filteredEquilNetLinks = filteredEquilNetLinks;

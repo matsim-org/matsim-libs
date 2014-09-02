@@ -23,21 +23,16 @@ package playground.pieter.singapore.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -47,22 +42,16 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.ArgumentParser;
-import org.matsim.core.network.*;
-import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.population.algorithms.PlansFilterByLegMode;
-import org.matsim.population.algorithms.PlansFilterByLegMode.FilterType;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
-
-import playground.pieter.singapore.hits.HITSTrip;
 import playground.pieter.singapore.utils.plans.PlansFilterNoRoute;
 
 /**
@@ -194,7 +183,7 @@ public class MATSimUtils {
 	public void changeNetworkSpeeds(double factor, String outfile) {
 //		multiplies network free speed by factor
 		if(network==null) initNetwork();
-		Map<Id, Link> links = network.getLinks();
+		Map<Id<Link>, Link> links = network.getLinks();
 		Iterator<Link> linkIt = links.values().iterator();
 		while(linkIt.hasNext()){
 			Link currLink = linkIt.next();
@@ -223,7 +212,7 @@ public class MATSimUtils {
 			remapString.put((e[0]+"_"+e[1]+"_"+e[2]), new String[]{e[3],e[4],e[5]});
 			line = reader.readLine();
 		}
-		Map<Id, Link> links = network.getLinks();
+		Map<Id<Link>, Link> links = network.getLinks();
 		Iterator<Link> linkIt = links.values().iterator();
 		while(linkIt.hasNext()){
 			Link currLink = linkIt.next();
@@ -254,7 +243,7 @@ public class MATSimUtils {
 	}
 	public void writeLinkInfoToSQL(DataBaseAdmin dba) throws SQLException, NoConnectionException{
 		if(network==null) initNetwork();
-		Map<Id, Link> links = network.getLinks();
+		Map<Id<Link>, Link> links = network.getLinks();
 		Iterator<Link> linkIt = links.values().iterator();
 		dba.executeStatement("drop table if exists linkmap;");
 		dba.executeStatement("create table linkmap(linkid varchar(45), modes varchar(45), freespeed double, capacity double, lanes double, length double);");

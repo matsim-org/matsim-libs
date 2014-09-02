@@ -36,33 +36,39 @@ import org.matsim.api.core.v01.network.Node;
  */
 public class FakeNode implements Node {
 
-	private final Id id;
+	private final Id<Node> id;
 
-	public FakeNode(final Id id) {
+	public FakeNode(final Id<Node> id) {
 		this.id = id;
 	}
 
-	public Map<Id, ? extends Link> getInLinks() {
+	@Override
+	public Map<Id<Link>, ? extends Link> getInLinks() {
 		throw new UnsupportedOperationException();
 	}
 
-	public Map<Id, ? extends Link> getOutLinks() {
+	@Override
+	public Map<Id<Link>, ? extends Link> getOutLinks() {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean addInLink(final Link link) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean addOutLink(final Link link) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public Coord getCoord() {
 		throw new UnsupportedOperationException();
 	}
 
-	public Id getId() {
+	@Override
+	public Id<Node> getId() {
 		return this.id;
 	}
 

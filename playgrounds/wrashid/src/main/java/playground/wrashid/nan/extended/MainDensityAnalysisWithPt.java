@@ -1,24 +1,14 @@
 package playground.wrashid.nan.extended;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.xml.sax.SAXException;
 
 
 public class MainDensityAnalysisWithPt {
@@ -52,7 +42,7 @@ public class MainDensityAnalysisWithPt {
 		
 		
 				
-		Map<Id, Link> links = NetworkReadExample.getNetworkLinks(networkFile,center,radiusInMeters);// input/set center and radius
+		Map<Id<Link>, Link> links = NetworkReadExample.getNetworkLinks(networkFile,center,radiusInMeters);// input/set center and radius
 		//Map<Id, Link> borderLinks = findBorderLinks.getNetworkLinks(networkFile, center, radiusInMeters);
 		
 		InFlowInfoCollectorWithPt inflowHandler=new InFlowInfoCollectorWithPt(links,isOldEventFile,binSizeInSeconds); 
@@ -106,7 +96,7 @@ public class MainDensityAnalysisWithPt {
 		return result;
 	}
 	
-	public static HashMap<Id, double[]> calculateDensity(HashMap<Id, int[]> deltaFlow, Map<Id, Link> links){
+	public static HashMap<Id, double[]> calculateDensity(HashMap<Id, int[]> deltaFlow, Map<Id<Link>, Link> links){
 		//send actual link info.)
 	HashMap<Id, double[]> density=new HashMap<Id, double[]>();
 	
@@ -160,8 +150,8 @@ public class MainDensityAnalysisWithPt {
 	return density;
 }
 
-public static void printDensity(HashMap<Id, double[]> density, Map<Id, Link> links) { // print
-	for (Id linkId : density.keySet()) {
+public static void printDensity(HashMap<Id, double[]> density, Map<Id<Link>, Link> links) { // print
+	for (Id<Link> linkId : density.keySet()) {
 		double[] bins = density.get(linkId);
 		Link link = links.get(linkId);
 		System.out.print(linkId + " - " + link.getCoord() + ": ");

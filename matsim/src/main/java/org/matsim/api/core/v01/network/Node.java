@@ -71,7 +71,7 @@ public interface Node extends BasicLocation<Node>, Identifiable<Node> {
 	 *
 	 * @return this node's ingoing links
 	 */
-	public Map<Id, ? extends Link> getInLinks();
+	public Map<Id<Link>, ? extends Link> getInLinks();
 
 	/**
 	 * Returns this node's set of outgoing links. This set might be empty, but
@@ -79,7 +79,7 @@ public interface Node extends BasicLocation<Node>, Identifiable<Node> {
 	 *
 	 * @return this node's outgoing links
 	 */
-	public Map<Id, ? extends Link> getOutLinks();
+	public Map<Id<Link>, ? extends Link> getOutLinks();
 
 
 }

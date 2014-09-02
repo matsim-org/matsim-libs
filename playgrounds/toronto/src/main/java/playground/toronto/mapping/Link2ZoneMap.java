@@ -65,7 +65,7 @@ public class Link2ZoneMap {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private QuadTree<Node> buildCentroidNodeQuadTree(final Map<Id,? extends Node> nodes, boolean guessZoneNumbers) {
+	private QuadTree<Node> buildCentroidNodeQuadTree(final Map<Id<Node>,? extends Node> nodes, boolean guessZoneNumbers) {
 		this.setOfZones = new HashSet<String>();
 		
 		double minx = Double.POSITIVE_INFINITY;

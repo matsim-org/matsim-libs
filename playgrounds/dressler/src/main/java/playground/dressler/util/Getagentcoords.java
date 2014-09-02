@@ -80,7 +80,7 @@ public class Getagentcoords {
 
 		// get evac links
 		Node evac1node = network.getNodes().get(new IdImpl("en1"));
-		Map<Id,? extends Link> evaclinks = null;
+		Map<Id<Link>,? extends Link> evaclinks = null;
 		if (evac1node != null) {
 			evaclinks = evac1node.getInLinks();
 			/*for (Link link : evaclinks.values()) {

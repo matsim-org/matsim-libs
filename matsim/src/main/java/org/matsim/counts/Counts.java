@@ -20,9 +20,10 @@
 
 package org.matsim.counts;
 
-import org.matsim.api.core.v01.Id;
-
 import java.util.TreeMap;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 public class Counts {
 
@@ -31,14 +32,14 @@ public class Counts {
 	private String name = null;
 	private String desc = null;
 	private int year = 0;
-	private final TreeMap<Id, Count> counts = new TreeMap<Id, Count>();
+	private final TreeMap<Id<Link>, Count> counts = new TreeMap<Id<Link>, Count>();
 
 	/**
 	 * @param linkId the link to which the counting station is assigned, must be unique
 	 * @param stationName some additional identifier for humans, e.g. the original name/id of the counting station
 	 * @return the created Count object, or null if it could not be created (maybe because it already exists)
 	 */
-	public final Count createAndAddCount(final Id linkId, final String stationName) {
+	public final Count createAndAddCount(final Id<Link> linkId, final String stationName) {
 		// check id string for uniqueness
 		if (this.counts.containsKey(linkId)) {
 			return null;
@@ -72,7 +73,7 @@ public class Counts {
 		return this.year;
 	}
 
-	public final TreeMap<Id, Count> getCounts() {
+	public final TreeMap<Id<Link>, Count> getCounts() {
 		return this.counts;
 	}
 

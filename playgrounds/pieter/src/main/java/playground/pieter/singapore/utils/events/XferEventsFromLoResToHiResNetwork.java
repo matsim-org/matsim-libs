@@ -271,7 +271,7 @@ public class XferEventsFromLoResToHiResNetwork{
 			Id vehId = new IdImpl(vehIdString);
 			LinkedList<Event> loResEvents = vehicleLinkEvents.get(vehId.toString());
 			LinkedList<Event> hiResEvents = new LinkedList<Event>();
-			Map<Id, ? extends Link> links = hiRes.getNetwork().getLinks();
+			Map<Id<Link>, ? extends Link> links = hiRes.getNetwork().getLinks();
 			// the first event will always contain the departure info
 			TransitDriverStartsEvent tDSE = (TransitDriverStartsEvent) loResEvents.getFirst();
 			Id driverId = tDSE.getDriverId();

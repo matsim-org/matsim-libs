@@ -5,12 +5,10 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
@@ -21,7 +19,7 @@ public class InstantaniousOutflowCollector implements LinkLeaveEventHandler,
 
 	private int binSizeInSeconds; // set the length of interval
 	private HashMap<Id, int[]> linkOutFlow; // define
-	private Map<Id, ? extends Link> filteredEquilNetLinks; // define
+	private Map<Id<Link>, ? extends Link> filteredEquilNetLinks; // define
 
 	// linkId
 	private DoubleValueHashMap<Id> lastLinkLeaveTime = new DoubleValueHashMap<Id>(); // define
@@ -31,7 +29,7 @@ public class InstantaniousOutflowCollector implements LinkLeaveEventHandler,
 	
 	
 	public InstantaniousOutflowCollector(
-			Map<Id, ? extends Link> filteredEquilNetLinks, int binSizeInSeconds) { // to
+			Map<Id<Link>, ? extends Link> filteredEquilNetLinks, int binSizeInSeconds) { // to
 																					// create
 																					// the
 																					// class

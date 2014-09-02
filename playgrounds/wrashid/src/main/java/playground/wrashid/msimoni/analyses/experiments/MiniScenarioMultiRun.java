@@ -196,7 +196,7 @@ public class MiniScenarioMultiRun {
 				Controler.FILENAME_EVENTS_XML);
 		eventsManager.addHandler(eventsWriter);
 
-		Map<Id, Link> links = new TreeMap<Id, Link>();
+		Map<Id<Link>, Link> links = new TreeMap<Id<Link>, Link>();
 		links.put(scenario.createId("l0"), scenario.getNetwork().getLinks()
 				.get(scenario.createId("l0")));
 		links.put(scenario.createId("l1"), scenario.getNetwork().getLinks()
@@ -258,7 +258,7 @@ public class MiniScenarioMultiRun {
 
 		HashMap<Id, int[]> deltaFlow = MainDensityAnalysisWithPtV2.deltaFlow(
 				linkInFlow, linkOutFlow);
-		HashMap<Id, double[]> density = MainDensityAnalysisWithPtV2
+		HashMap<Id<Link>, double[]> density = MainDensityAnalysisWithPtV2
 				.calculateDensity(deltaFlow, links);
 
 		log.info("inflows-----------------------------------------------");
@@ -279,7 +279,7 @@ public class MiniScenarioMultiRun {
 		if (binSizeInSeconds % avgBinSize != 0)
 			throw new RuntimeException(
 					"binSize in seconds % binSize for averaging is != 0");
-		HashMap<Id, double[]> avgDensity = MainDensityAnalysisWithPtV2
+		HashMap<Id<Link>, double[]> avgDensity = MainDensityAnalysisWithPtV2
 				.calculateAverageDensity(MainDensityAnalysisWithPtV2
 						.calculateDensity(avgDeltaFlow, links), valuesPerBin);
 

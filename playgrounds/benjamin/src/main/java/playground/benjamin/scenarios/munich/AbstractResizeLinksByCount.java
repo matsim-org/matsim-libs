@@ -21,9 +21,9 @@ package playground.benjamin.scenarios.munich;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,11 +32,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
@@ -61,9 +61,9 @@ public abstract class AbstractResizeLinksByCount {
 	private Network oldNet;
 	private Network newNet;
 
-	private Map<Id, Link> modifiedLinks2shp = null;
+	private Map<Id<Link>, Link> modifiedLinks2shp = null;
 	private Map<Id, SortedMap<String, String>> modAttributes = null;
-	private Map<Id, Link> unmodifiedLinks2shp = null;
+	private Map<Id<Link>, Link> unmodifiedLinks2shp = null;
 	private Map<Id, SortedMap<String, String>> unmodAttributes = null;
 	private Double scaleFactor = null;
 	private boolean countsMatched = false;
@@ -225,7 +225,7 @@ public abstract class AbstractResizeLinksByCount {
 	
 	protected void addLink2shp(Id link){
 		if(this.modifiedLinks2shp == null){
-			this.modifiedLinks2shp = new HashMap<Id, Link>();
+			this.modifiedLinks2shp = new HashMap<Id<Link>, Link>();
 			this.modAttributes = new HashMap<Id, SortedMap<String,String>>();
 		}
 		this.modifiedLinks2shp .put(link, this.newNet.getLinks().get(link));
@@ -249,7 +249,7 @@ public abstract class AbstractResizeLinksByCount {
 	private void writeUnmodifiedLinks2Shape(){
 		//preprocess
 		if(!(this.modifiedLinks2shp==null)){
-			this.unmodifiedLinks2shp = new HashMap<Id, Link>();
+			this.unmodifiedLinks2shp = new HashMap<Id<Link>, Link>();
 			this.unmodAttributes = new HashMap<Id, SortedMap<String,String>>();
 			
 			for(Link l : this.newNet.getLinks().values()){
@@ -263,7 +263,7 @@ public abstract class AbstractResizeLinksByCount {
 				}
 			}
 		}else{
-			this.unmodifiedLinks2shp = (Map<Id, Link>) this.oldNet.getLinks();
+			this.unmodifiedLinks2shp = (Map<Id<Link>, Link>) this.oldNet.getLinks();
 		}
 		log.info("Writing unmodified links to *.shp...");
 		Links2ShapeWriter.writeLinks2Shape(this.outFile + "_unmodifiedLinks.shp", this.unmodifiedLinks2shp, this.unmodAttributes);

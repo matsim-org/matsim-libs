@@ -71,7 +71,7 @@ public abstract class AbstractRoutingNetworkNode implements RoutingNetworkNode {
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Node> getId() {
 		return node.getId();
 	}
 
@@ -91,13 +91,13 @@ public abstract class AbstractRoutingNetworkNode implements RoutingNetworkNode {
 	}
 
 	@Override
-	public Map<Id, ? extends Link> getInLinks() {
+	public Map<Id<Link>, ? extends Link> getInLinks() {
 		throw new RuntimeException("Not supported operation!");
 	}
 
 
 	@Override
-	public Map<Id, ? extends Link> getOutLinks() {
+	public Map<Id<Link>, ? extends Link> getOutLinks() {
 		throw new RuntimeException("Not supported operation!");
 	}
 	

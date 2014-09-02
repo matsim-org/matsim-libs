@@ -16,7 +16,7 @@ import org.matsim.contrib.parking.lib.obj.TwoKeyHashMapWithDouble;
 public class AverageSpeedCalculator implements LinkEnterEventHandler,
 		LinkLeaveEventHandler {
 
-	private Map<Id, ? extends Link> filteredLinks;
+	private Map<Id<Link>, ? extends Link> filteredLinks;
 	private int binSizeInSeconds;
 	private TwoKeyHashMapWithDouble<Id, Id> linkEnterTime=new TwoKeyHashMapWithDouble<Id, Id>();
 	// linkId, agentId
@@ -67,7 +67,7 @@ public class AverageSpeedCalculator implements LinkEnterEventHandler,
 	}
 
 	public AverageSpeedCalculator(
-			Map<Id, ? extends Link> filteredEquilNetLinks, int binSizeInSeconds) {
+			Map<Id<Link>, ? extends Link> filteredEquilNetLinks, int binSizeInSeconds) {
 		this.filteredLinks = filteredEquilNetLinks;
 		this.binSizeInSeconds = binSizeInSeconds;
 		

@@ -41,7 +41,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -69,7 +68,7 @@ public class PopLinksMatrixCreator extends AbstractPersonAlgorithm implements
 	 */
 	public PopLinksMatrixCreator(Network network, Population population) {
 		this.network = network;
-		Map<Id, Link> linkMap = (Map<Id, Link>) this.network.getLinks();
+		Map<Id<Link>, Link> linkMap = (Map<Id<Link>, Link>) this.network.getLinks();
 		int i = 0;
 		for (Link link : linkMap.values())
 			this.linkSequence.put(link.getId(), i++);// 1.transfers value, 2.++
@@ -107,6 +106,7 @@ public class PopLinksMatrixCreator extends AbstractPersonAlgorithm implements
 		this.personCnt++;
 	}
 
+	@Override
 	public void run(Plan plan) {// timeBin==a day version
 		List<PlanElement> pes = plan.getPlanElements();
 		for (int i = 1; i < pes.size(); i += 2) {// Leg
@@ -156,7 +156,7 @@ public class PopLinksMatrixCreator extends AbstractPersonAlgorithm implements
 		populationFilename = "../integration-demandCalibration1.0.1/test/output/prepare/ITERS/it.100/100.plans.xml.gz", //
 		matrixOutputFilename = "../integration-demandCalibration1.0.1/test/output/prepare/popLinksMatrix.log";
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);

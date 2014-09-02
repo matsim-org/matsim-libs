@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.Identifiable;
  * 
  * @author mrieser / senozon
  */
-public class IdentifiableArrayMap<T extends Identifiable> implements Map<Id, T> {
+public class IdentifiableArrayMap<S, T extends Identifiable<S>> implements Map<Id<S>, T> {
 
 	@SuppressWarnings("unchecked")
 	private T[] data = (T[]) new Identifiable[0];
@@ -54,7 +54,7 @@ public class IdentifiableArrayMap<T extends Identifiable> implements Map<Id, T> 
 
 	@Override
 	public boolean containsKey(final Object key) {
-		for (Identifiable o : this.data) {
+		for (Identifiable<S> o : this.data) {
 			if (o.getId().equals(key)) {
 				return true;
 			}
@@ -64,7 +64,7 @@ public class IdentifiableArrayMap<T extends Identifiable> implements Map<Id, T> 
 
 	@Override
 	public boolean containsValue(final Object value) {
-		for (Identifiable o : this.data) {
+		for (Identifiable<S> o : this.data) {
 			if (o.equals(value)) {
 				return true;
 			}
@@ -75,7 +75,7 @@ public class IdentifiableArrayMap<T extends Identifiable> implements Map<Id, T> 
 	@SuppressWarnings("unchecked")
 	@Override
 	public T get(final Object key) {
-		for (Identifiable o : this.data) {
+		for (Identifiable<S> o : this.data) {
 			if (o.getId().equals(key)) {
 				return (T) o;
 			}
@@ -89,7 +89,7 @@ public class IdentifiableArrayMap<T extends Identifiable> implements Map<Id, T> 
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public T put(final Id key, final T value) {
+	public T put(final Id<S> key, final T value) {
 		for (int i = 0; i < this.data.length; i++) {
 			T old = this.data[i];
 			if (old.getId().equals(key)) {
@@ -97,7 +97,7 @@ public class IdentifiableArrayMap<T extends Identifiable> implements Map<Id, T> 
 				return old;
 			}
 		}
-		Identifiable[] tmp = new Identifiable[this.data.length + 1];
+		Identifiable<S>[] tmp = new Identifiable[this.data.length + 1];
 		System.arraycopy(this.data, 0, tmp, 0, this.data.length);
 		tmp[this.data.length] = value;
 		this.data = (T[]) tmp;
@@ -111,7 +111,7 @@ public class IdentifiableArrayMap<T extends Identifiable> implements Map<Id, T> 
 			T old = this.data[i];
 			if (old.getId().equals(key)) {
 				
-				Identifiable[] tmp = new Identifiable[this.data.length - 1];
+				Identifiable<S>[] tmp = new Identifiable[this.data.length - 1];
 				if (i > 0) {
 					System.arraycopy(this.data, 0, tmp, 0, i);
 				}
@@ -127,7 +127,7 @@ public class IdentifiableArrayMap<T extends Identifiable> implements Map<Id, T> 
 	}
 
 	@Override
-	public void putAll(final Map<? extends Id, ? extends T> m) {
+	public void putAll(final Map<? extends Id<S>, ? extends T> m) {
 		for (T t : m.values()) {
 			put(t.getId(), t);
 		}
@@ -140,9 +140,9 @@ public class IdentifiableArrayMap<T extends Identifiable> implements Map<Id, T> 
 	}
 
 	@Override
-	public Set<Id> keySet() {
-		Set<Id> ids = new LinkedHashSet<Id>();
-		for (Identifiable o : this.data) {
+	public Set<Id<S>> keySet() {
+		Set<Id<S>> ids = new LinkedHashSet<Id<S>>();
+		for (Identifiable<S> o : this.data) {
 			ids.add(o.getId());
 		}
 		return ids;
@@ -155,34 +155,34 @@ public class IdentifiableArrayMap<T extends Identifiable> implements Map<Id, T> 
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Set<java.util.Map.Entry<Id, T>> entrySet() {
-		Set<Map.Entry<Id, T>> entries = new LinkedHashSet<Map.Entry<Id, T>>();
-		for (Identifiable o : this.data) {
-			entries.add(new Entry<T>((T) o));
+	public Set<java.util.Map.Entry<Id<S>, T>> entrySet() {
+		Set<Map.Entry<Id<S>, T>> entries = new LinkedHashSet<Map.Entry<Id<S>, T>>();
+		for (Identifiable<S> o : this.data) {
+			entries.add(new Entry<S, T>((T) o));
 		}
 		return entries;
 	}
 
-	private static class Entry<S extends Identifiable> implements Map.Entry<Id, S> {
+	private static class Entry<S, T extends Identifiable<S>> implements Map.Entry<Id<S>, T> {
 
-		private final S s;
+		private final T t;
 		
-		public Entry(final S s) {
-			this.s = s;
+		public Entry(final T t) {
+			this.t = t;
 		}
 		
 		@Override
-		public Id getKey() {
-			return s.getId();
+		public Id<S> getKey() {
+			return this.t.getId();
 		}
 
 		@Override
-		public S getValue() {
-			return s;
+		public T getValue() {
+			return this.t;
 		}
 
 		@Override
-		public S setValue(final S value) {
+		public T setValue(final T value) {
 			throw new UnsupportedOperationException();
 		}
 		

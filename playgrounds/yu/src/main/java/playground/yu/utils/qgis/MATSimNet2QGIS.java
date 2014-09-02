@@ -79,7 +79,7 @@ public class MATSimNet2QGIS implements X2QGIS {
 		this(netFilename, coordRefSys);
 		if (linkIds2paint != null) {
 			Set<Link> links2paint = new HashSet<Link>();
-			Map<Id, Link> linkImpls = (Map<Id, Link>) getNetwork().getLinks();
+			Map<Id<Link>, Link> linkImpls = (Map<Id<Link>, Link>) getNetwork().getLinks();
 			for (Id linkId : linkIds2paint) {
 				links2paint.add(linkImpls.get(linkId));
 			}

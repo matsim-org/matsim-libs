@@ -1,6 +1,5 @@
 package playground.sergioo.scheduling2013;
 
-import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -243,12 +242,12 @@ public class SchedulingNetwork implements Network {
 	}
 
 	@Override
-	public Map<Id, ? extends Node> getNodes() {
+	public Map<Id<Node>, ? extends Node> getNodes() {
 		return delegate.getNodes();
 	}
 
 	@Override
-	public Map<Id, ? extends Link> getLinks() {
+	public Map<Id<Link>, ? extends Link> getLinks() {
 		return delegate.getLinks();
 	}
 

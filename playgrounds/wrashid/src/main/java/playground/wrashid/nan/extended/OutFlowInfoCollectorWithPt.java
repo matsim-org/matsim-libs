@@ -3,15 +3,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
 
 //the program is currently calculating the destination flows
 //public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler,LinkLeaveEventHandler
@@ -21,13 +18,13 @@ public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler, Person
 {
 	private int binSizeInSeconds; // set the length of interval
 	public HashMap<Id, int[]> linkOutFlow; // define
-	private Map<Id, Link> filteredEquilNetLinks; // define personId, linkId
+	private Map<Id<Link>, Link> filteredEquilNetLinks; // define personId, linkId
 	private HashMap<Id, Id> lastEnteredLink=new HashMap<Id, Id>(); // define
 	private boolean isOldEventFile;
 	private double networkLength=0;
 	int setAggregationLevel=5; // do not forget to set the aggregation level!!!!!!
 
-	public OutFlowInfoCollectorWithPt(Map<Id, Link> filteredEquilNetLinks,
+	public OutFlowInfoCollectorWithPt(Map<Id<Link>, Link> filteredEquilNetLinks,
 			boolean isOldEventFile,int binSizeInSeconds) { // to create the class FlowInfoCollector
 		// and give the link set
 		this.filteredEquilNetLinks = filteredEquilNetLinks;
@@ -35,6 +32,7 @@ public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler, Person
 		this.binSizeInSeconds = binSizeInSeconds;
 	}
 
+	@Override
 	public void reset(int iteration) {linkOutFlow = new HashMap<Id, int[]>();} // reset the variables (private
 //												// ones)
 //	public void handleEvent(LinkLeaveEvent event) {  
@@ -42,10 +40,12 @@ public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler, Person
 //	}
 	
 
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		lastEnteredLink.put(event.getPersonId(), event.getLinkId());
 	}
 	
+	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		if (lastEnteredLink.containsKey(event.getPersonId()) && lastEnteredLink.get(event.getPersonId())!=null) {
 			if (lastEnteredLink.get(event.getPersonId()).equals(event.getLinkId())){

@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
@@ -106,7 +107,7 @@ public class TollHandler implements LinkEnterEventHandler{
 		this.toll10Links = new ArrayList<Id>();
 		this.toll8Links = new ArrayList<Id>();
 		
-		Set<Id> networklinks = scenario.getNetwork().getLinks().keySet();
+		Set<Id<Link>> networklinks = scenario.getNetwork().getLinks().keySet();
 		
 		for(Id linkId: 	networklinks){
 			for(Id toll8id: toll8){

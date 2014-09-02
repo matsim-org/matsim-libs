@@ -44,7 +44,7 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
  */
 public class SubsequentCapacity extends MatsimXmlWriter {
 
-	private final Map<Id, ? extends Link> links;
+	private final Map<Id<Link>, ? extends Link> links;
 
 	/**
 	 * (arg0) - ssLinkId (arg1) - linkId

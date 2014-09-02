@@ -43,10 +43,8 @@ public class NodeImpl implements Node {
 	private String type = null;
 	private String origid = null;
 
-//	protected transient  Map<Id, Link> inlinks  = new LinkedHashMap<Id, Link>(4, 0.95f);
-//	protected transient  Map<Id, Link> outlinks = new LinkedHashMap<Id, Link>(4, 0.95f);
-	protected transient  Map<Id, Link> inlinks  = new IdentifiableArrayMap<Link>();
-	protected transient  Map<Id, Link> outlinks = new IdentifiableArrayMap<Link>();
+	protected transient  Map<Id<Link>, Link> inlinks  = new IdentifiableArrayMap<Link, Link>();
+	protected transient  Map<Id<Link>, Link> outlinks = new IdentifiableArrayMap<Link, Link>();
 
 	protected Coord coord;
 	protected final Id<Node> id;
@@ -91,7 +89,7 @@ public class NodeImpl implements Node {
 	private static int cnt2 = 0 ;
 	@Override
 	public final boolean addInLink(Link inlink) {
-		Id linkid = inlink.getId();
+		Id<Link> linkid = inlink.getId();
 		if (this.inlinks.containsKey(linkid)) {
 			throw new IllegalArgumentException(this + "[inlink_id=" + inlink.getId() + " already exists]");
 		}
@@ -107,7 +105,7 @@ public class NodeImpl implements Node {
 	private static int cnt = 0 ;
 	@Override
 	public final boolean addOutLink(Link outlink) {
-		Id linkid = outlink.getId();
+		Id<Link> linkid = outlink.getId();
 		if (this.outlinks.containsKey(linkid)) {
 			throw new IllegalArgumentException(this + "[outlink_id=" + outlink.getId() + " already exists]");
 		}
@@ -153,14 +151,14 @@ public class NodeImpl implements Node {
 		return this.type;
 	}
 
-	public final Map<Id, ? extends Link> getIncidentLinks() {
-		Map<Id, Link> links = new TreeMap<Id, Link>(getInLinks());
+	public final Map<Id<Link>, ? extends Link> getIncidentLinks() {
+		Map<Id<Link>, Link> links = new TreeMap<Id<Link>, Link>(getInLinks());
 		links.putAll(getOutLinks());
 		return links;
 	}
 
-	public final Map<Id, ? extends Node> getInNodes() {
-		Map<Id, Node> nodes = new TreeMap<Id, Node>();
+	public final Map<Id<Node>, ? extends Node> getInNodes() {
+		Map<Id<Node>, Node> nodes = new TreeMap<Id<Node>, Node>();
 		for (Link link : getInLinks().values()) {
 			Node node = link.getFromNode();
 			nodes.put(node.getId(), node);
@@ -168,8 +166,8 @@ public class NodeImpl implements Node {
 		return nodes;
 	}
 
-	public final Map<Id, ? extends Node> getOutNodes() {
-		Map<Id, Node> nodes = new TreeMap<Id, Node>();
+	public final Map<Id<Node>, ? extends Node> getOutNodes() {
+		Map<Id<Node>, Node> nodes = new TreeMap<Id<Node>, Node>();
 		for (Link link : getOutLinks().values()) {
 			Node node = link.getToNode();
 			nodes.put(node.getId(), node);
@@ -177,19 +175,19 @@ public class NodeImpl implements Node {
 		return nodes;
 	}
 
-	public final Map<Id, ? extends Node> getIncidentNodes() {
-		Map<Id, Node> nodes = new TreeMap<Id, Node>(getInNodes());
+	public final Map<Id<Node>, ? extends Node> getIncidentNodes() {
+		Map<Id<Node>, Node> nodes = new TreeMap<Id<Node>, Node>(getInNodes());
 		nodes.putAll(getOutNodes());
 		return nodes;
 	}
 
 	@Override
-	public Map<Id, ? extends Link> getInLinks() {
+	public Map<Id<Link>, ? extends Link> getInLinks() {
 		return this.inlinks;
 	}
 
 	@Override
-	public Map<Id, ? extends Link> getOutLinks() {
+	public Map<Id<Link>, ? extends Link> getOutLinks() {
 		return this.outlinks;
 	}
 
@@ -207,8 +205,8 @@ public class NodeImpl implements Node {
 	private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
 		ois.defaultReadObject();
 
-		inlinks = new LinkedHashMap<Id, Link>(4, 0.95f);
-		outlinks = new LinkedHashMap<Id, Link>(4, 0.95f);
+		inlinks = new LinkedHashMap<Id<Link>, Link>(4, 0.95f);
+		outlinks = new LinkedHashMap<Id<Link>, Link>(4, 0.95f);
 
 	}
 

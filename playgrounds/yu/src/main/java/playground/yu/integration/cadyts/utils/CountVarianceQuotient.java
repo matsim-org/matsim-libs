@@ -81,7 +81,7 @@ public class CountVarianceQuotient {
 		List<Double> countList = new LinkedList<Double>()//
 		, countVarList = new LinkedList<Double>();
 
-		TreeMap<Id, Count> countsMap = counts.getCounts();
+		TreeMap<Id<Link>, Count> countsMap = counts.getCounts();
 		for (Id countId : countsMap.keySet()) {
 			Map<Integer, Volume> dayCounts = countsMap.get(countId)
 					.getVolumes();

@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
@@ -54,7 +54,7 @@ public class CountsHr_2_24 {
 		outCounts.setYear(counts.getYear());
 		
 		char point = '.';
-		for(Map.Entry <Id,Count> entry: counts.getCounts().entrySet()){
+		for(Map.Entry <Id<Link>,Count> entry: counts.getCounts().entrySet()){
 			Id countStopId = entry.getKey(); 
 
 			//consider only counts for the given transit route

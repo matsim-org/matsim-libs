@@ -103,31 +103,31 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 	// set the length of interval
 	private int binSizeInSeconds;
 	private int numberOfTimeBins;
-	private HashMap<Id, int[]> linkOutFlowCar;
-	private HashMap<Id, int[]> linkInFlowCar;
+	private HashMap<Id<Link>, int[]> linkOutFlowCar;
+	private HashMap<Id<Link>, int[]> linkInFlowCar;
 	// store the times when the number of vehicles on each link changes,
 	// along with the number of vehicles at that point in time
 	private HashMap<Id, TreeMap<Integer, Integer>> deltaFlowCar;
 	// average the flows from the delta flow map for each time bin
 	private HashMap<Id, double[]> avgDeltaFlowCar;
-	private Map<Id, ? extends Link> filteredEquilNetLinks; // define
+	private Map<Id<Link>, ? extends Link> filteredEquilNetLinks; // define
 	private int lastBinIndex = 0;
 	private HashMap<Id, Id> transitDriverIdToVehicleId = new HashMap<Id, Id>();
 	private Map<Id, PTVehicle> ptVehicles = new HashMap<Id, PTVehicle>();
 	private HashMap<Id, Id> lastEnteredLink = new HashMap<Id, Id>();
-	private HashMap<Id, int[]> linkOutFlowPTVehicle;
-	private HashMap<Id, int[]> linkInFlowPTVehicle;
+	private HashMap<Id<Link>, int[]> linkOutFlowPTVehicle;
+	private HashMap<Id<Link>, int[]> linkInFlowPTVehicle;
 	private HashMap<Id, TreeMap<Integer, Integer>> deltaFlowPTVehicle;
 	private HashMap<Id, double[]> avgDeltaFlowPTVehicle;
-	private HashMap<Id, int[]> linkOutFlowPTPassenger;
-	private HashMap<Id, int[]> linkInFlowPTPassenger;
+	private HashMap<Id<Link>, int[]> linkOutFlowPTPassenger;
+	private HashMap<Id<Link>, int[]> linkInFlowPTPassenger;
 	private HashMap<Id, TreeMap<Integer, Integer>> deltaFlowPTPassenger;
 	private HashMap<Id, double[]> avgDeltaFlowPTPassenger;
 	private double lastTime;
 	private int enterLinkCount;
 	private int leavLinkCount;
 
-	public MultiModalFlowAndDensityCollector(Map<Id, ? extends Link> filteredEquilNetLinks, int binSizeInSeconds) {
+	public MultiModalFlowAndDensityCollector(Map<Id<Link>, ? extends Link> filteredEquilNetLinks, int binSizeInSeconds) {
 		this.filteredEquilNetLinks = filteredEquilNetLinks;
 		this.binSizeInSeconds = binSizeInSeconds;
 		this.numberOfTimeBins = (86400 / binSizeInSeconds) + 1;
@@ -135,22 +135,22 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 
 	@Override
 	public void reset(int iteration) {
-		linkOutFlowCar = new HashMap<Id, int[]>(); // reset the variables
+		linkOutFlowCar = new HashMap<Id<Link>, int[]>(); // reset the variables
 													// (private
-		linkInFlowCar = new HashMap<Id, int[]>();
+		linkInFlowCar = new HashMap<Id<Link>, int[]>();
 		deltaFlowCar = new HashMap<Id, TreeMap<Integer, Integer>>();
 		avgDeltaFlowCar = new HashMap<Id, double[]>();
 
-		linkOutFlowPTVehicle = new HashMap<Id, int[]>(); // reset the variables
+		linkOutFlowPTVehicle = new HashMap<Id<Link>, int[]>(); // reset the variables
 															// (private
-		linkInFlowPTVehicle = new HashMap<Id, int[]>();
+		linkInFlowPTVehicle = new HashMap<Id<Link>, int[]>();
 		deltaFlowPTVehicle = new HashMap<Id, TreeMap<Integer, Integer>>();
 		avgDeltaFlowPTVehicle = new HashMap<Id, double[]>();
 
-		linkOutFlowPTPassenger = new HashMap<Id, int[]>(); // reset the
+		linkOutFlowPTPassenger = new HashMap<Id<Link>, int[]>(); // reset the
 															// variables
 															// (private
-		linkInFlowPTPassenger = new HashMap<Id, int[]>();
+		linkInFlowPTPassenger = new HashMap<Id<Link>, int[]>();
 		deltaFlowPTPassenger = new HashMap<Id, TreeMap<Integer, Integer>>();
 		avgDeltaFlowPTPassenger = new HashMap<Id, double[]>();
 	}
@@ -170,7 +170,7 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 		}
 		boolean processingPassengers = false;
 		boolean done = false;
-		HashMap<Id, int[]> linkOutFlow;
+		HashMap<Id<Link>, int[]> linkOutFlow;
 		HashMap<Id, int[]> linkInFlow;
 		HashMap<Id, TreeMap<Integer, Integer>> deltaFlow;
 		HashMap<Id, double[]> avgDeltaFlow;
@@ -236,6 +236,7 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 
 	}
 
+	@Override
 	public void handleEvent(Wait2LinkEvent event) {
 		Id vehId = transitDriverIdToVehicleId.get(event.getPersonId());
 		if (vehId != null)
@@ -251,8 +252,8 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 		}
 		boolean processingPassengers = false;
 		boolean done = false;
-		HashMap<Id, int[]> linkOutFlow;
-		HashMap<Id, int[]> linkInFlow;
+		HashMap<Id<Link>, int[]> linkOutFlow;
+		HashMap<Id<Link>, int[]> linkInFlow;
 		HashMap<Id, TreeMap<Integer, Integer>> deltaFlow;
 		HashMap<Id, double[]> avgDeltaFlow;
 		while (!done) {
@@ -343,7 +344,7 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 
 		deltaFlow = deltaFlowPTPassenger;
 		avgDeltaFlow = avgDeltaFlowPTPassenger;
-		HashMap<Id, int[]> linkInFlow = linkInFlowPTPassenger;
+		HashMap<Id<Link>, int[]> linkInFlow = linkInFlowPTPassenger;
 
 		int binIndex = (int) Math.round(Math.floor(time / binSizeInSeconds));
 		int[] inBins = linkInFlow.get(linkId);
@@ -380,7 +381,7 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 
 		deltaFlow = deltaFlowPTPassenger;
 		avgDeltaFlow = avgDeltaFlowPTPassenger;
-		HashMap<Id, int[]> linkOutFlow = linkOutFlowPTPassenger;
+		HashMap<Id<Link>, int[]> linkOutFlow = linkOutFlowPTPassenger;
 
 		int binIndex = (int) Math.round(Math.floor(time / binSizeInSeconds));
 		int[] outBins = linkOutFlow.get(linkId);
@@ -436,7 +437,7 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 						weightedLevel += lastDelta * (endTime - times.get(t));
 						endTime = times.get(t);
 					}
-					avgDeltaFlow.get(id)[lastBinIndex] = weightedLevel / (double) binSizeInSeconds;
+					avgDeltaFlow.get(id)[lastBinIndex] = weightedLevel / binSizeInSeconds;
 					// store the last delta and initialize the new structure
 					// with
 					// this
@@ -451,7 +452,7 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 		}
 	}
 
-	public HashMap<Id, int[]> getLinkOutFlow(FlowType flowType) {
+	public HashMap<Id<Link>, int[]> getLinkOutFlow(FlowType flowType) {
 		switch (flowType) {
 		case Car:
 			return this.linkOutFlowCar;
@@ -465,7 +466,7 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 		}
 	}
 
-	public HashMap<Id, int[]> getLinkInFlow(FlowType flowType) {
+	public HashMap<Id<Link>, int[]> getLinkInFlow(FlowType flowType) {
 		switch (flowType) {
 		case Car:
 			return this.linkInFlowCar;
@@ -517,6 +518,7 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 		}
 	}
 
+	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
 		try {
 			ptVehicles.put(event.getVehicleId(), new PTVehicle(event.getTransitLineId(), event.getTransitRouteId()));
@@ -604,7 +606,7 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 		return density;
 	}
 
-	public HashMap<Id, int[]> calculateOccupancy(HashMap<Id, int[]> deltaFlow, Map<Id, ? extends Link> links) {
+	public HashMap<Id, int[]> calculateOccupancy(HashMap<Id<Link>, int[]> deltaFlow, Map<Id<Link>, ? extends Link> links) {
 		// send actual link info.)
 		HashMap<Id, int[]> occupancy = new HashMap<Id, int[]>();
 

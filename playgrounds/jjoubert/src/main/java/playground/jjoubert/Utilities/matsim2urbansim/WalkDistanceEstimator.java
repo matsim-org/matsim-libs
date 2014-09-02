@@ -46,8 +46,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -176,7 +176,7 @@ public class WalkDistanceEstimator {
 									ptLink.setAllowedModes(ptSet);
 								}
 		
-								Map<Id, ? extends Link> outLinks = sAll.getNetwork().getNodes().get(oNode.getId()).getOutLinks();
+								Map<Id<Link>, ? extends Link> outLinks = sAll.getNetwork().getNodes().get(oNode.getId()).getOutLinks();
 								boolean found = false;
 								for(Link l : outLinks.values()){
 									if(l.getToNode().equals(dNode)){

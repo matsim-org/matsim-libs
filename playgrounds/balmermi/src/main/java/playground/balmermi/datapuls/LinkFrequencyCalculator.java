@@ -15,24 +15,24 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 
 import playground.balmermi.datapuls.modules.FrequencyAnalyser;
 
 public class LinkFrequencyCalculator {
 	
-	private static Set<Id> readLinkIds(File linkIdFile) throws IOException {
+	private static Set<Id<Link>> readLinkIds(File linkIdFile) throws IOException {
 		FileReader fr = new FileReader(linkIdFile);
 		BufferedReader br = new BufferedReader(fr);
 		String currLine = null;
-		Set<Id> linkIds = new HashSet<Id>();
+		Set<Id<Link>> linkIds = new HashSet<Id<Link>>();
 		while ((currLine = br.readLine()) != null) {
 			Id id = new IdImpl(currLine.trim());
 			linkIds.add(id);
@@ -53,10 +53,10 @@ public class LinkFrequencyCalculator {
 		if (!outDir.isDirectory()) { throw new RuntimeException("outDir="+outDir+" is not a directory"); }
 		System.out.println("analysis output directory: "+outDir);
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(net.getPath());
 		
-		Set<Id> linkIds = null;
+		Set<Id<Link>> linkIds = null;
 		if (args.length == 4) {
 			File linkIdFile = new File(args[3]);
 			if (!linkIdFile.isFile() || !linkIdFile.canRead()) { throw new RuntimeException("linkIdFile="+linkIdFile+" is not a File or cannot be read"); }
@@ -68,7 +68,7 @@ public class LinkFrequencyCalculator {
 		}
 
 		FrequencyAnalyser fa = new FrequencyAnalyser(scenario.getNetwork(),linkIds);
-		EventsManager eManager = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager eManager = EventsUtils.createEventsManager();
 		eManager.addHandler(fa);
 		EventsReaderTXTv1 reader = new EventsReaderTXTv1(eManager);
 		

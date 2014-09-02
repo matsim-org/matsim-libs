@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -51,7 +50,7 @@ public class MainDensityAnalysisWithPt {
 		
 		
 		
-		Map<Id, ? extends Link> links = NetworkReadExample.getNetworkLinks(networkFile,center,radiusInMeters);// input/set center and radius
+		Map<Id<Link>, ? extends Link> links = NetworkReadExample.getNetworkLinks(networkFile,center,radiusInMeters);// input/set center and radius
 		InFlowInfoCollectorWithPt inflowHandler=new InFlowInfoCollectorWithPt(links,isOldEventFile,binSizeInSeconds); 
 		OutFlowInfoCollectorWithPt outflowHandler=new OutFlowInfoCollectorWithPt(links,isOldEventFile,binSizeInSeconds);// "links" makes run faster
 		
@@ -107,7 +106,7 @@ public class MainDensityAnalysisWithPt {
 		return result;
 	}
 	
-	public static HashMap<Id, double[]> calculateDensity(HashMap<Id, int[]> deltaFlow, Map<Id, ? extends Link> links){
+	public static HashMap<Id, double[]> calculateDensity(HashMap<Id, int[]> deltaFlow, Map<Id<Link>, ? extends Link> links){
 			//send actual link info.)
 		HashMap<Id, double[]> density=new HashMap<Id, double[]>();
 		
@@ -141,8 +140,8 @@ public class MainDensityAnalysisWithPt {
 		return density;
 	}
 	
-	public static void printDensity(HashMap<Id, double[]> density, Map<Id, ? extends Link> links) { // print
-		for (Id linkId : density.keySet()) {
+	public static void printDensity(HashMap<Id, double[]> density, Map<Id<Link>, ? extends Link> links) { // print
+		for (Id<Link> linkId : density.keySet()) {
 			double[] bins = density.get(linkId);
 
 			Link link = links.get(linkId);

@@ -27,12 +27,12 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 
 public class InFlowInfoAcuumulatorWithPt implements LinkEnterEventHandler,
@@ -42,12 +42,12 @@ public class InFlowInfoAcuumulatorWithPt implements LinkEnterEventHandler,
 	private final int numBins;
 
 	public HashMap<Id, int[]> linkInFlow;
-	private Map<Id, ? extends Link> filteredEquilNetLinks;
+	private Map<Id<Link>, ? extends Link> filteredEquilNetLinks;
 	private Map<Id, Integer> entersPerLink;
 	private Set<Id> carAgents;
 
 	
-	public InFlowInfoAcuumulatorWithPt(Map<Id, ? extends Link> filteredEquilNetLinks,
+	public InFlowInfoAcuumulatorWithPt(Map<Id<Link>, ? extends Link> filteredEquilNetLinks,
 			int binSizeInSeconds) {
 		this.filteredEquilNetLinks = filteredEquilNetLinks;
 		this.binSizeInSeconds = binSizeInSeconds;

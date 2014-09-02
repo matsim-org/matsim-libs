@@ -78,10 +78,10 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 	private JTextPane commentComponent;
 	private String comment;
 	private String binSize;
-	private HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id, int[]>> linkOutFlowsByType = new HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id, int[]>>();
+	private HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id<Link>, int[]>> linkOutFlowsByType = new HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id<Link>, int[]>>();
 	private HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id, int[]>> instantaneousLinkOccupancyByType = new HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id, int[]>>();
 	private HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id, double[]>> averageLinkOccupancyByType = new HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id, double[]>>();
-	private Map<Id, ? extends Link> links;
+	private Map<Id<Link>, ? extends Link> links;
 	private int numberOfTimeBins;
 
 	/**
@@ -89,6 +89,7 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 
 				EventsToLinkFlowAndDensityToSQLgui frame = new EventsToLinkFlowAndDensityToSQLgui();
@@ -500,10 +501,10 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 
 		reader.parse(eventsFile); // where we find events data
 		for (MultiModalFlowAndDensityCollector.FlowType flowType : MultiModalFlowAndDensityCollector.FlowType.values()) {
-			HashMap<Id, int[]> linkInFlow = flowAndDensityCollector.getLinkInFlow(flowType);
-			HashMap<Id, int[]> linkOutFlow = flowAndDensityCollector.getLinkOutFlow(flowType);
+			HashMap<Id<Link>, int[]> linkInFlow = flowAndDensityCollector.getLinkInFlow(flowType);
+			HashMap<Id<Link>, int[]> linkOutFlow = flowAndDensityCollector.getLinkOutFlow(flowType);
 
-			HashMap<Id, int[]> deltaFlow = MainDensityAnalysisWithPt.deltaFlow(linkInFlow, linkOutFlow);
+			HashMap<Id<Link>, int[]> deltaFlow = MainDensityAnalysisWithPt.deltaFlow(linkInFlow, linkOutFlow);
 			HashMap<Id, int[]> instantaneousLinkOccupancy = flowAndDensityCollector.calculateOccupancy(deltaFlow,
 					links);
 			HashMap<Id, double[]> averageLinkDensities = flowAndDensityCollector.getAvgDeltaFlow(flowType);
@@ -579,7 +580,7 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 				double flowSum=0.0;
 				for (MultiModalFlowAndDensityCollector.FlowType flowType : MultiModalFlowAndDensityCollector.FlowType
 						.values()) {
-					HashMap<Id, int[]> linkOutFlow = this.linkOutFlowsByType.get(flowType);
+					HashMap<Id<Link>, int[]> linkOutFlow = this.linkOutFlowsByType.get(flowType);
 					HashMap<Id, int[]> instantaneousLinkOccupancy = this.instantaneousLinkOccupancyByType
 							.get(flowType);
 					HashMap<Id, double[]> averageLinkDensities = this.averageLinkOccupancyByType.get(flowType);

@@ -50,7 +50,7 @@ public class CalcNetworkCapacityUtilization {
 	
 	private final Scenario scenario;
 	private final boolean analyzeAllLinks;
-	private final Set<Id> analyzedLinks;
+	private final Set<Id<Link>> analyzedLinks;
 	private VolumesAnalyzer volumesAnalyzer;
 	
 	public static void main(String[] args) throws IOException {
@@ -179,7 +179,7 @@ public class CalcNetworkCapacityUtilization {
 
 		double radius = 15000.0;
 		Coord center = scenario.createCoord(683518.0,246836.0);		
-		Set<Id> linkIds = new TreeSet<Id>();
+		Set<Id<Link>> linkIds = new TreeSet<Id<Link>>();
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			double distance = CoordUtils.calcDistance(center, link.getCoord());
 			if (distance <= radius) linkIds.add(link.getId());
@@ -190,7 +190,7 @@ public class CalcNetworkCapacityUtilization {
 		calcNetworkCapacityUtilization.parseEventsFile(path + "/ITERS/it.0/1.0.events.xml.gz", path + "/NetworkCapacityUtilization.txt");	
 	}
 	
-	public CalcNetworkCapacityUtilization(Scenario scenario, Set<Id> analyzedLinks) {
+	public CalcNetworkCapacityUtilization(Scenario scenario, Set<Id<Link>> analyzedLinks) {
 		
 		this.scenario = scenario;
 		this.analyzedLinks = analyzedLinks;
@@ -229,7 +229,7 @@ public class CalcNetworkCapacityUtilization {
 		
 		new EventsReaderXMLv1(eventsManager).parse(eventsFile);
 		
-		Set<Id> linkIds = null;
+		Set<Id<Link>> linkIds = null;
 		if (analyzeAllLinks) {
 			linkIds = scenario.getNetwork().getLinks().keySet();
 		} else linkIds = this.analyzedLinks;

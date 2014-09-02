@@ -22,16 +22,21 @@ package org.matsim.contrib.dvrp.passenger;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.*;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.*;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 
 
 public class PassengerEngine
@@ -163,7 +168,7 @@ public class PassengerEngine
     private PassengerRequest createRequest(MobsimPassengerAgent passenger, Id fromLinkId,
             Id toLinkId, double departureTime, double now)
     {
-        Map<Id, ? extends Link> links = context.getScenario().getNetwork().getLinks();
+        Map<Id<Link>, ? extends Link> links = context.getScenario().getNetwork().getLinks();
         Link fromLink = links.get(fromLinkId);
         Link toLink = links.get(toLinkId);
         Id id = context.getScenario().createId(mode + "_" + nextId++);

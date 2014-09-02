@@ -49,7 +49,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
@@ -144,8 +143,8 @@ public class PlanScoreForecaster {
 			}
 		}
 
-		Map<Id, Link> links = this.net.getLinks();
-		for (Id linkId : route.getLinkIds()) {
+		Map<Id<Link>, Link> links = this.net.getLinks();
+		for (Id<Link> linkId : route.getLinkIds()) {
 			travelTime_s += ttc.getLinkTravelTime(links.get(linkId), departTime
 					+ travelTime_s, null, null);
 		}
@@ -262,7 +261,7 @@ public class PlanScoreForecaster {
 		eventsFilename = "../integration-parameterCalibration/test/matsim/outputReplanning/ITERS/it.100/100.events.txt.gz", //
 		popFilename = "../integration-parameterCalibration/test/matsim/outputReplanning/output_plans.xml.gz";
 
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Config cf = sc.getConfig();
 		new MatsimConfigReader(cf).readFile(configFilename);
@@ -277,7 +276,7 @@ public class PlanScoreForecaster {
 		TravelTimeCalculator ttc = new TravelTimeCalculatorFactoryImpl()
 				.createTravelTimeCalculator(net, cf.travelTimeCalculator());
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(ttc);
 		new EventsReaderTXTv1(events).readFile(eventsFilename);
 

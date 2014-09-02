@@ -1294,7 +1294,7 @@ public class CepasToEventsMultithreaded {
 		public void fireEvents() {
 			IdImpl driverId = new IdImpl("pt_tr_" + this.vehicleId.toString());
 			Id busRegNum = vehicleId;
-			Map<Id, ? extends Link> links = scenario.getNetwork().getLinks();
+			Map<Id<Link>, ? extends Link> links = scenario.getNetwork().getLinks();
 			for (CepasVehicleDwellEventCluster cluster : this.dwellEventClusters) {
 
 				NetworkRoute route = scenario.getTransitSchedule().getTransitLines().get(transitLineId).getRoutes()

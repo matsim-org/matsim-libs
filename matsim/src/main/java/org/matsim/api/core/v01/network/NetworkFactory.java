@@ -30,7 +30,7 @@ import org.matsim.core.api.internal.MatsimFactory;
  */
 public interface NetworkFactory extends MatsimFactory {
 
-	public Node createNode(final Id id, final Coord coord ) ;
+	public Node createNode(final Id<Node> id, final Coord coord);
 
 	/**
 	 * @param id
@@ -40,7 +40,7 @@ public interface NetworkFactory extends MatsimFactory {
 	 * @deprecated use {@link #createLink(Id, Node, Node)} instead
 	 */
 	@Deprecated
-	public Link createLink(final Id id, final Id fromNodeId, final Id toNodeId);
+	public Link createLink(final Id<Link> id, final Id<Node> fromNodeId, final Id<Node> toNodeId);
 
 	/**
 	 * Creates a link with the given id leading from one node to another.
@@ -50,6 +50,6 @@ public interface NetworkFactory extends MatsimFactory {
 	 * @param toNode
 	 * @return the newly created link
 	 */
-	public Link createLink(final Id id, final Node fromNode, final Node toNode);
+	public Link createLink(final Id<Link> id, final Node fromNode, final Node toNode);
 
 }

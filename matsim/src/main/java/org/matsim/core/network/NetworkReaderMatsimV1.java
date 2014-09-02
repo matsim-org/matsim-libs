@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -130,7 +131,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startNode(final Attributes atts) {
-		Node node = this.network.getFactory().createNode(this.scenario.createId(atts.getValue("id")), new CoordImpl(atts.getValue("x"), atts.getValue("y")));
+		Node node = this.network.getFactory().createNode(Id.create(atts.getValue("id"), Node.class), new CoordImpl(atts.getValue("x"), atts.getValue("y")));
 		this.network.addNode(node);
 		if (node instanceof NodeImpl) {
 			((NodeImpl) node).setType(atts.getValue("type"));
@@ -141,12 +142,9 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startLink(final Attributes atts) {
-		Node fromNode = this.network.getNodes().get(this.scenario.createId(atts.getValue("from")));
-		Node toNode = this.network.getNodes().get(this.scenario.createId(atts.getValue("to")));
-		if (fromNode == null || toNode == null) {
-			System.out.println("breakpoint");
-		}
-		Link l = this.network.getFactory().createLink(this.scenario.createId(atts.getValue("id")), fromNode, toNode);
+		Node fromNode = this.network.getNodes().get(Id.create(atts.getValue("from"), Node.class));
+		Node toNode = this.network.getNodes().get(Id.create(atts.getValue("to"), Node.class));
+		Link l = this.network.getFactory().createLink(Id.create(atts.getValue("id"), Link.class), fromNode, toNode);
 		l.setLength(Double.parseDouble(atts.getValue("length")));
 		l.setFreespeed(Double.parseDouble(atts.getValue("freespeed")));
 		l.setCapacity(Double.parseDouble(atts.getValue("capacity")));

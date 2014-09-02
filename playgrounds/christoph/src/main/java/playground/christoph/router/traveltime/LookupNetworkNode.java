@@ -39,6 +39,7 @@ public class LookupNetworkNode implements Node {
 		return node;
 	}
 	
+	@Override
 	public Id getId() {
 		return node.getId();
 	}
@@ -59,13 +60,13 @@ public class LookupNetworkNode implements Node {
 	}
 
 	@Override
-	public Map<Id, ? extends Link> getInLinks() {
+	public Map<Id<Link>, ? extends Link> getInLinks() {
 		return node.getInLinks();
 	}
 
 
 	@Override
-	public Map<Id, ? extends Link> getOutLinks() {
+	public Map<Id<Link>, ? extends Link> getOutLinks() {
 		return node.getOutLinks();
 	}
 	

@@ -59,7 +59,7 @@ public class LeftTurnIdentifier {
 	 * @return the number of
 	 */
 	public static int getNumberOfLeftTurnsFromALeg(Leg leg,
-			Map<Id, ? extends Link> netLinks) {
+			Map<Id<Link>, ? extends Link> netLinks) {
 		Route route = leg.getRoute();
 		if (route instanceof NetworkRoute) {
 			// **********************************************
@@ -152,7 +152,7 @@ public class LeftTurnIdentifier {
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 		Network network = scenario.getNetwork();
 
-		Map<Id, ? extends Link> links = network.getLinks();
+		Map<Id<Link>, ? extends Link> links = network.getLinks();
 		Link link1 = links.get(new IdImpl(1)), link2 = links.get(new IdImpl(2)), link10 = links
 				.get(new IdImpl(10)), link11 = links.get(new IdImpl(11)), link19 = links
 				.get(new IdImpl(19)), link20 = links.get(new IdImpl(20)), link21 = links

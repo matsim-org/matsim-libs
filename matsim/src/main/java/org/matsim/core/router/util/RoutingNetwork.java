@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 
 /**
  * A network that is used by FastDijkstra, FastAStarEuclidean and FastAStarLandmarks.
@@ -40,5 +41,5 @@ public interface RoutingNetwork extends Network {
 	public void initialize();
 	
 	@Override
-	public Map<Id, RoutingNetworkNode> getNodes();
+	public Map<Id<Node>, RoutingNetworkNode> getNodes();
 }

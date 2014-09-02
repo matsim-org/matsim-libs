@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 import org.geotools.referencing.CRS;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.matsim.api.core.v01.Coord;
@@ -72,7 +73,7 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 	private final String net;
 	private final EvacuationAreaSelector evacuationAreaSelector;
 	private HashMap<Integer, DataPoint> networkNodes;
-	private Map<Id, ? extends org.matsim.api.core.v01.network.Link>  networkLinks;
+	private Map<Id<org.matsim.api.core.v01.network.Link>, ? extends org.matsim.api.core.v01.network.Link>  networkLinks;
 
 	public ShapeToStreetSnapperThreadWrapper(String osm, EvacuationAreaSelector evacuationAreaSelector) {
 		this.net = osm;

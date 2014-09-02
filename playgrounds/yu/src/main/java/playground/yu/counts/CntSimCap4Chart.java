@@ -23,8 +23,15 @@
  */
 package playground.yu.counts;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -37,14 +44,9 @@ import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
+
 import playground.yu.utils.container.Collection2Array;
 import playground.yu.utils.io.SimpleWriter;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * prepares and creates chart with x-achse
@@ -65,8 +67,8 @@ public class CntSimCap4Chart implements StartupListener, AfterMobsimListener,
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		Controler ctl = event.getControler();
-        Map<Id, Count> countsMap = ((Counts) ctl.getScenario().getScenarioElement(Counts.ELEMENT_NAME)).getCounts();
-		for (Entry<Id, Count> countEntry : countsMap.entrySet()) {
+        Map<Id<Link>, Count> countsMap = ((Counts) ctl.getScenario().getScenarioElement(Counts.ELEMENT_NAME)).getCounts();
+		for (Entry<Id<Link>, Count> countEntry : countsMap.entrySet()) {
 			StringBuilder str = new StringBuilder("cntSimCap_");
 			str.append(countEntry.getKey());// count station ID
 			str.append("_");
@@ -90,9 +92,9 @@ public class CntSimCap4Chart implements StartupListener, AfterMobsimListener,
 		VolumesAnalyzer volsAnalyzer = ctl.getVolumes();
 
 		int idx = 0;
-        for (Entry<Id, Count> countEntry : ((Counts) ctl.getScenario().getScenarioElement(Counts.ELEMENT_NAME)).getCounts()
+        for (Entry<Id<Link>, Count> countEntry : ((Counts) ctl.getScenario().getScenarioElement(Counts.ELEMENT_NAME)).getCounts()
 				.entrySet()) {
-			Id linkId = countEntry.getKey();
+			Id<Link> linkId = countEntry.getKey();
 			int[] vols = volsAnalyzer.getVolumesForLink(linkId);
 
 			if (vols == null) {
@@ -120,14 +122,14 @@ public class CntSimCap4Chart implements StartupListener, AfterMobsimListener,
 
 		Controler ctl = event.getControler();
 		int lastIter = ctl.getConfig().controler().getLastIteration(), firstIter = ctl.getConfig().controler().getFirstIteration();
-        Map<Id, Count> countsMap = ((Counts) ctl.getScenario().getScenarioElement(Counts.ELEMENT_NAME)).getCounts();
+        Map<Id<Link>, Count> countsMap = ((Counts) ctl.getScenario().getScenarioElement(Counts.ELEMENT_NAME)).getCounts();
 		double[] xs = Collection2Array.toDoubleArray(iters);
 		iters.clear();
 
 		Network net = ctl.getNetwork();
 
 		int volIdx = 0;
-		for (Entry<Id, Count> countEntry : countsMap.entrySet()) {
+		for (Entry<Id<Link>, Count> countEntry : countsMap.entrySet()) {
 			StringBuilder str = new StringBuilder("cntSimCap_");
 			Id cntId = countEntry.getKey();
 			String cntIdStr = cntId.toString();

@@ -574,7 +574,7 @@ public class GtfsConverter {
 		Network network = scenario.getNetwork();
 		// Add all stops as nodes
 		Map<Id, TransitStopFacility> stops = ts.getFacilities();
-		Map<Id, ? extends Node> nodes = network.getNodes();
+		Map<Id<Node>, ? extends Node> nodes = network.getNodes();
 		for(Id id: stops.keySet()){
 			TransitStopFacility stop = stops.get(id);
 			NodeImpl n = new NodeImpl(id);
@@ -695,7 +695,7 @@ public class GtfsConverter {
 	}
 
 	private void createDummyNodeAndLinks(Id toNodeId, double capacity,
-			int numLanes, Network network, Map<Id, ? extends Node> nodes) {
+			int numLanes, Network network, Map<Id<Node>, ? extends Node> nodes) {
 		Id dummyId = new IdImpl("dN_" + toNodeId);
 		if(!(network.getNodes().containsKey(dummyId))){
 			NodeImpl n = new NodeImpl(dummyId);

@@ -40,7 +40,7 @@ public class SimLauncher
 
         TravelTime travelTime = controler.getLinkTravelTimes();
 
-        Map<Id, ? extends Link> links = controler.getNetwork().getLinks();
+        Map<Id<Link>, ? extends Link> links = controler.getNetwork().getLinks();
         Id idB = controler.getScenario().createId("B");
         Link linkB = links.get(idB);
 

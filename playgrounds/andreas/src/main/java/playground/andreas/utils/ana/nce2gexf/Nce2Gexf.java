@@ -109,7 +109,7 @@ public class Nce2Gexf extends MatsimJaxbXmlWriter{
 		this.gexfContainer = this.gexfFactory.createXMLGexfContent();
 	}
 	
-	private void init(String nceDiffFile, Map<Id, ? extends Node> nodes){
+	private void init(String nceDiffFile, Map<Id<Node>, ? extends Node> nodes){
 		
 		ReadNce readNce = new ReadNce(nceDiffFile);
 		readNce.parse();
@@ -248,6 +248,7 @@ public class Nce2Gexf extends MatsimJaxbXmlWriter{
 		}
 	}
 
+	@Override
 	public void write(String filename) {
 		JAXBContext jc;
 		try {

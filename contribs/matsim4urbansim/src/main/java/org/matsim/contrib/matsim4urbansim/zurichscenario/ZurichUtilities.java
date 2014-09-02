@@ -30,7 +30,7 @@ public class ZurichUtilities {
 	static String CLOSE_GUBRISTTUNNEL = "gubristtunnel";
 	
 	/** links to remove */
-	static ArrayList<Id> linksToRemove = null;
+	static ArrayList<Id<Link>> linksToRemove = null;
 	
 	/**
 	 * Takes a link list and removes them from the network to apply a certain, predefined scenario
@@ -59,11 +59,11 @@ public class ZurichUtilities {
 			return;
 		}
 		
-		Map<Id, ? extends Link> networkLinks = network.getLinks();
-		Iterator<Id> linkIterator = linksToRemove.iterator();
+		Map<Id<Link>, ? extends Link> networkLinks = network.getLinks();
+		Iterator<Id<Link>> linkIterator = linksToRemove.iterator();
 		
 		while(linkIterator.hasNext()){
-			Id id = linkIterator.next();
+			Id<Link> id = linkIterator.next();
 			if(networkLinks.containsKey(id))
 				log.info("Link found in network: " + id.toString());
 			else
@@ -83,10 +83,10 @@ public class ZurichUtilities {
 		if(linksToRemove == null)
 			return;
 		
-		Iterator<Id> linkIterator = linksToRemove.iterator();
+		Iterator<Id<Link>> linkIterator = linksToRemove.iterator();
 		
 		while(linkIterator.hasNext()){
-			Id id = linkIterator.next();
+			Id<Link> id = linkIterator.next();
 			
 			network.removeLink( id );
 			log.info("Removed link " + id.toString() + " from network ...");
@@ -114,11 +114,11 @@ public class ZurichUtilities {
 						if(leg.getRoute() != null){
 							
 							NetworkRoute nr = (NetworkRoute)leg.getRoute();
-							Iterator<Id> linkIterator = linksToRemove.iterator();
+							Iterator<Id<Link>> linkIterator = linksToRemove.iterator();
 							boolean setRouteToNull = false;
 							
 							while(linkIterator.hasNext()){
-								Id linkId = linkIterator.next();
+								Id<Link> linkId = linkIterator.next();
 								
 								for(Id id : nr.getLinkIds()){
 									if(id.compareTo(linkId) == 0){

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 
@@ -52,7 +53,7 @@ public class ZurichUtilitiesZurichBigRoads extends ZurichUtilities{
 
 		log.info("Closing/removing Uetlibertunnel from (zurich_bigRoads) network ...");
 		
-		linksToRemove = new ArrayList<Id>();
+		linksToRemove = new ArrayList<Id<Link>>();
 		
 		linksToRemove.add(new IdImpl(26236));
 		linksToRemove.add(new IdImpl(26267));
@@ -71,7 +72,7 @@ public class ZurichUtilitiesZurichBigRoads extends ZurichUtilities{
 
 		log.info("Closing/removing Birmensdorferstrasse (outer rim) from (zurich_bigRoads) network ...");
 		
-		linksToRemove = new ArrayList<Id>();
+		linksToRemove = new ArrayList<Id<Link>>();
 		
 		linksToRemove.add(new IdImpl(17480));
 		linksToRemove.add(new IdImpl(17481));
@@ -90,7 +91,7 @@ public class ZurichUtilitiesZurichBigRoads extends ZurichUtilities{
 
 		log.info("Closing/removing Birmensdorferstrasse (near city center) from (zurich_bigRoads) network ...");
 		
-		linksToRemove = new ArrayList<Id>();
+		linksToRemove = new ArrayList<Id<Link>>();
 		
 		linksToRemove.add(new IdImpl(7889));
 		linksToRemove.add(new IdImpl(178));
@@ -108,7 +109,7 @@ public class ZurichUtilitiesZurichBigRoads extends ZurichUtilities{
 	private static void removeSchwamendingerTunnel(final Network network) {
 		log.info("Closing/removing Schwamendingertunnel from (zurich_bigRoads) network ...");
 
-		linksToRemove = new ArrayList<Id>();
+		linksToRemove = new ArrayList<Id<Link>>();
 		
 		linksToRemove.add(new IdImpl(41507));
 		linksToRemove.add(new IdImpl(3598));
@@ -126,7 +127,7 @@ public class ZurichUtilitiesZurichBigRoads extends ZurichUtilities{
 	private static void removeMilchbuckTunnel(final Network network) {
 		log.info("Closing/removing Milchbucktunnel from (zurich_bigRoads) network ...");
 
-		linksToRemove = new ArrayList<Id>();
+		linksToRemove = new ArrayList<Id<Link>>();
 		
 		linksToRemove.add(new IdImpl(24698));
 		linksToRemove.add(new IdImpl(24697));
@@ -144,7 +145,7 @@ public class ZurichUtilitiesZurichBigRoads extends ZurichUtilities{
 	private static void removeGubristTunnel(final Network network){
 		log.info("Closing/removing Gubristtunnel from (zurich_bigRoads) network ...");
 
-		linksToRemove = new ArrayList<Id>();
+		linksToRemove = new ArrayList<Id<Link>>();
 		
 		linksToRemove.add(new IdImpl(37190));
 		linksToRemove.add(new IdImpl(20341));

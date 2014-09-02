@@ -27,8 +27,8 @@ public class LinkSelector {
 		selectLinks(scenario.getNetwork(), center, distance, length);
 	}
 	
-	public static Map<Id, Link> selectLinks(Network network, Coord center, double distance, double length) {
-		Map<Id, Link> selectedLinks = new TreeMap<Id, Link>();
+	public static Map<Id<Link>, Link> selectLinks(Network network, Coord center, double distance, double length) {
+		Map<Id<Link>, Link> selectedLinks = new TreeMap<Id<Link>, Link>();
 		
 		for (Link link : network.getLinks().values()) {
 			if (link.getLength() < length) continue;

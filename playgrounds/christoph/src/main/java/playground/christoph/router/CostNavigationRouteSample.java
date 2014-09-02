@@ -164,7 +164,7 @@ public class CostNavigationRouteSample {
 
 		double phi = 1 - gamma;
 			
-		Map<Id, ? extends Link> outLinksMap = fromNode.getOutLinks();
+		Map<Id<Link>, ? extends Link> outLinksMap = fromNode.getOutLinks();
 		Map<Id, Path> paths = new TreeMap<Id, Path>();	// outLinkId
 		Map<Id, Double> costs = new TreeMap<Id, Double>();	// outLinkId
 		Map<Id, Double> probabilities = new TreeMap<Id, Double>();	// outLinkId

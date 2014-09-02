@@ -1,7 +1,5 @@
 package playground.pieter.network.clustering;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
@@ -19,6 +17,7 @@ public class ClusterNode implements Node {
 	}
 	
 
+	@Override
 	public int hashCode() {
 		return node.hashCode();
 	}
@@ -31,14 +30,17 @@ public class ClusterNode implements Node {
 		node.setType(type);
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		return node.equals(obj);
 	}
 
+	@Override
 	public final boolean addInLink(Link inlink) {
 		return node.addInLink(inlink);
 	}
 
+	@Override
 	public final boolean addOutLink(Link outlink) {
 		return node.addOutLink(outlink);
 	}
@@ -63,38 +65,43 @@ public class ClusterNode implements Node {
 		return node.getType();
 	}
 
-	public final Map<Id, ? extends Link> getIncidentLinks() {
+	public final Map<Id<Link>, ? extends Link> getIncidentLinks() {
 		return node.getIncidentLinks();
 	}
 
-	public final Map<Id, ? extends Node> getInNodes() {
+	public final Map<Id<Node>, ? extends Node> getInNodes() {
 		return node.getInNodes();
 	}
 
-	public final Map<Id, ? extends Node> getOutNodes() {
+	public final Map<Id<Node>, ? extends Node> getOutNodes() {
 		return node.getOutNodes();
 	}
 
-	public final Map<Id, ? extends Node> getIncidentNodes() {
+	public final Map<Id<Node>, ? extends Node> getIncidentNodes() {
 		return node.getIncidentNodes();
 	}
 
-	public Map<Id, ? extends Link> getInLinks() {
+	@Override
+	public Map<Id<Link>, ? extends Link> getInLinks() {
 		return node.getInLinks();
 	}
 
-	public Map<Id, ? extends Link> getOutLinks() {
+	@Override
+	public Map<Id<Link>, ? extends Link> getOutLinks() {
 		return node.getOutLinks();
 	}
 
+	@Override
 	public Coord getCoord() {
 		return node.getCoord();
 	}
 
-	public Id getId() {
+	@Override
+	public Id<Node> getId() {
 		return node.getId();
 	}
 
+	@Override
 	public String toString() {
 		return node.toString();
 	}

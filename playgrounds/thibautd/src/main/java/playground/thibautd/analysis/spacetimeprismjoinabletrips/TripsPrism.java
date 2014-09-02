@@ -127,7 +127,7 @@ public class TripsPrism {
 		double maxY = Double.NEGATIVE_INFINITY;
 		List<Tuple<Coord, Record>> records = new ArrayList<Tuple<Coord, Record>>();
 
-		Map<Id, ? extends Link> links = network.getLinks();
+		Map<Id<Link>, ? extends Link> links = network.getLinks();
 		for (Record r : trips) {
 			Coord c = useStartNode ?
 				links.get( getter.getId( r ) ).getFromNode().getCoord() :

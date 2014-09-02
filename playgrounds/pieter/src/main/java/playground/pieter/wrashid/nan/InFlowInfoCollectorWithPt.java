@@ -34,12 +34,12 @@ public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler,
 
 	private int binSizeInSeconds; // set the length of interval
 
-	public HashMap<Id, int[]> linkInFlow;
-	private Map<Id, ? extends Link> filteredEquilNetLinks; //
+	public HashMap<Id<Link>, int[]> linkInFlow;
+	private Map<Id<Link>, ? extends Link> filteredEquilNetLinks; //
 
 	private boolean isOldEventFile;
 
-	public InFlowInfoCollectorWithPt(Map<Id, ? extends Link> filteredEquilNetLinks,
+	public InFlowInfoCollectorWithPt(Map<Id<Link>, ? extends Link> filteredEquilNetLinks,
 			boolean isOldEventFile, int binSizeInSeconds) {
 		this.filteredEquilNetLinks = filteredEquilNetLinks;
 		this.isOldEventFile = isOldEventFile;
@@ -48,7 +48,7 @@ public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler,
 
 	@Override
 	public void reset(int iteration) {
-		linkInFlow = new HashMap<Id, int[]>(); // reset the variables (private
+		linkInFlow = new HashMap<Id<Link>, int[]>(); // reset the variables (private
 												// ones)
 	}
 
@@ -98,7 +98,7 @@ public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler,
 		}
 	}
 
-	public HashMap<Id, int[]> getLinkInFlow() {
+	public HashMap<Id<Link>, int[]> getLinkInFlow() {
 		return linkInFlow;
 	}
 

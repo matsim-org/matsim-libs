@@ -59,8 +59,8 @@ public class RunResizeLinksByCount extends AbstractResizeLinksByCount{
 
 	@Override
 	protected void resize() {
-		TreeMap<Id, Count> counts = this.getOriginalCounts().getCounts();
-		Map<Id, ? extends Link> links = this.getOrigNetwork().getLinks();
+		TreeMap<Id<Link>, Count> counts = this.getOriginalCounts().getCounts();
+		Map<Id<Link>, ? extends Link> links = this.getOrigNetwork().getLinks();
 		for(Count count : counts.values()){
 			Id locId = count.getLocId();
 			Id linkId = links.get(locId).getId();

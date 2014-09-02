@@ -259,9 +259,9 @@ public class TransitRouterNetworkThinner {
 						Id linkId = new IdImpl(nextId);
 						TransitRouterNetworkLink link = new TransitRouterNetworkLink(linkId, otherNode, node, null, null, 0.0);
 						
-						((Map<Id, TransitRouterNetworkLink>) network.getLinks()).put(linkId, link);
-						((Map<Id, TransitRouterNetworkLink>) node.getInLinks()).put(link.getId(), link);
-						((Map<Id, TransitRouterNetworkLink>) otherNode.getOutLinks()).put(link.getId(), link);
+						((Map<Id<Link>, TransitRouterNetworkLink>) network.getLinks()).put(linkId, link);
+						((Map<Id<Link>, TransitRouterNetworkLink>) node.getInLinks()).put(link.getId(), link);
+						((Map<Id<Link>, TransitRouterNetworkLink>) otherNode.getOutLinks()).put(link.getId(), link);
 						connectorLinks.incCounter();
 					}
 					
@@ -281,9 +281,9 @@ public class TransitRouterNetworkThinner {
 						Id linkId = new IdImpl(nextId);
 						TransitRouterNetworkLink link = new TransitRouterNetworkLink(linkId, node, otherNode, null, null, 0.0);
 						
-						((Map<Id, TransitRouterNetworkLink>) network.getLinks()).put(linkId, link);
-						((Map<Id, TransitRouterNetworkLink>) node.getOutLinks()).put(link.getId(), link);
-						((Map<Id, TransitRouterNetworkLink>) otherNode.getInLinks()).put(link.getId(), link);
+						((Map<Id<Link>, TransitRouterNetworkLink>) network.getLinks()).put(linkId, link);
+						((Map<Id<Link>, TransitRouterNetworkLink>) node.getOutLinks()).put(link.getId(), link);
+						((Map<Id<Link>, TransitRouterNetworkLink>) otherNode.getInLinks()).put(link.getId(), link);
 						connectorLinks.incCounter();
 					}
 				}

@@ -55,7 +55,7 @@ public class Expander4NetworkWithNullCapLinks {
 		Network network = scenario.getNetwork();
 		// double capPeriod_h = network.getCapacityPeriod() / 3600d;
 
-		Map<Id, ? extends Link> links = network.getLinks();
+		Map<Id<Link>, ? extends Link> links = network.getLinks();
 
 		for (Iterator<LinkImpl> linkIt = (Iterator<LinkImpl>) network
 				.getLinks().values().iterator(); linkIt.hasNext();) {

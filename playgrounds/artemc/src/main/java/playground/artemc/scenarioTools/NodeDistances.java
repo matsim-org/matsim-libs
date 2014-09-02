@@ -2,15 +2,12 @@ package playground.artemc.scenarioTools;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -27,7 +24,7 @@ public class NodeDistances {
 		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new NetworkReaderMatsimV1(scenario).parse(networkPath); 
 		network = scenario.getNetwork();
-		Map<Id, ? extends Node> nodes = network.getNodes();
+		Map<Id<Node>, ? extends Node> nodes = network.getNodes();
 		
 		distances = new Double[nodes.size()][nodes.size()];
 		

@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.network.Node;
 
 public abstract class AbstractRoutingNetwork implements RoutingNetwork {
 	
-	/*package*/ final Map<Id, RoutingNetworkNode> nodes = new HashMap<Id, RoutingNetworkNode>();
+	/*package*/ final Map<Id<Node>, RoutingNetworkNode> nodes = new HashMap<Id<Node>, RoutingNetworkNode>();
 	/*package*/ final Network network;
 	/*package*/ PreProcessDijkstra preProcessData;
 	
@@ -50,7 +50,7 @@ public abstract class AbstractRoutingNetwork implements RoutingNetwork {
 	}
 
 	@Override
-	public Map<Id, RoutingNetworkNode> getNodes() {
+	public Map<Id<Node>, RoutingNetworkNode> getNodes() {
 		return nodes;
 	}
 
@@ -59,7 +59,7 @@ public abstract class AbstractRoutingNetwork implements RoutingNetwork {
 	}
 	
 	@Override
-	public RoutingNetworkNode removeNode(Id nodeId) {
+	public RoutingNetworkNode removeNode(Id<Node> nodeId) {
 		return nodes.remove(nodeId);
 	}
 
@@ -84,12 +84,12 @@ public abstract class AbstractRoutingNetwork implements RoutingNetwork {
 	}
 
 	@Override
-	public Map<Id, ? extends Link> getLinks() {
+	public Map<Id<Link>, ? extends Link> getLinks() {
 		throw new RuntimeException("Not supported operation!");
 	}
 
 	@Override
-	public Link removeLink(Id linkId) {
+	public Link removeLink(Id<Link> linkId) {
 		throw new RuntimeException("Not supported operation!");
 	}
 
