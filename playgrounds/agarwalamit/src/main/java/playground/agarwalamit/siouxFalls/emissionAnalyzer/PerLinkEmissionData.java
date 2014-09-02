@@ -34,11 +34,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
 import playground.agarwalamit.analysis.emission.EmissionUtilsExtended;
 
@@ -49,13 +47,13 @@ import playground.agarwalamit.analysis.emission.EmissionUtilsExtended;
  */
 public class PerLinkEmissionData {
 	private Logger logger = Logger.getLogger(PerLinkEmissionData.class);
-	private static String outputDir = "/Users/aagarwal/Desktop/ils/agarwal/siouxFalls/output/run1/";
-	private static String networkFile =outputDir+ "/output_network.xml.gz";
-	private static String configFile = outputDir+"/output_config.xml";
-	private static String emissionEventFile = outputDir+"/ITERS/it.100/100.emission.events.xml";
-	EmissionUtils emissionUtils;
+	private String outputDir = "/Users/aagarwal/Desktop/ils/agarwal/siouxFalls/output/run1/";
+	private String networkFile =outputDir+ "/output_network.xml.gz";
+	private String configFile = outputDir+"/output_config.xml";
+	private String emissionEventFile = outputDir+"/ITERS/it.100/100.emission.events.xml";
+	private EmissionUtils emissionUtils;
 
-	 Network network;
+	private Network network;
 
 	public static void main(String[] args) throws IOException {
 		PerLinkEmissionData data = new PerLinkEmissionData();
@@ -63,30 +61,31 @@ public class PerLinkEmissionData {
 	}
 
 	private void run() throws IOException {
-		
+
 		BufferedWriter writer1 = IOUtils.getBufferedWriter(outputDir+"/ITERS/it.100/100.timeLinkIdTotalEmissions.txt");
 		BufferedWriter writer2 = IOUtils.getBufferedWriter(outputDir+"/ITERS/it.100/100.timeLinkIdWarmEmissions.txt");
 		BufferedWriter writer3 = IOUtils.getBufferedWriter(outputDir+"/ITERS/it.100/100.timeLinkIdColdEmissions.txt");
-		
-		Scenario scenario = loadScenario(networkFile);
+
+		Scenario scenario = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
 		this.network = scenario.getNetwork();
 		int noOfTimeBin =1;
-		EmissionLinkAnalyzer linkAnalyzer = new EmissionLinkAnalyzer(configFile, emissionEventFile,noOfTimeBin);
+		double simulationEndTime = LoadMyScenarios.getEndTime(this.configFile);
+		EmissionLinkAnalyzer linkAnalyzer = new EmissionLinkAnalyzer(simulationEndTime, emissionEventFile,noOfTimeBin);
 		linkAnalyzer.init(null);
 		linkAnalyzer.preProcessData();
 		linkAnalyzer.postProcessData();
-		
+
 		emissionUtils = new EmissionUtils();
 		EmissionUtilsExtended emissionUtilsExtended = new EmissionUtilsExtended();
-		
+
 		Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2warmEmissionsTotal = linkAnalyzer.getLink2WarmEmissions();
 		Map<Double, Map<Id, Map<ColdPollutant, Double>>> time2coldEmissionsTotal = linkAnalyzer.getLink2ColdEmissions();
 		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal = linkAnalyzer.getLink2TotalEmissions();
 		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled = setNonCalculatedEmissions(time2EmissionsTotal);
-		
+
 		Map<Double, Map<Id, SortedMap<String, Double>>> time2WarmEmissionsTotalFilled = emissionUtilsExtended.convertPerLinkWarmEmissions2String(network, time2warmEmissionsTotal);
 		Map<Double, Map<Id, SortedMap<String, Double>>> time2ColdEmissionsTotalFilled = emissionUtilsExtended.convertPerLinkColdEmissions2String(network, time2coldEmissionsTotal);
-		
+
 		writer1.write("time"+"\t"+"linkId"+"\t"+"CO"+"\t"+"CO2_Total"+"\t"+"FC"+"\t"+"HC"+"\t"+"NMHC"+"\t"+"NO2"+"\t"+"NOX"+"\t"+"PM"+"\t"+"SO2"+"\n");
 		writer2.write("time"+"\t"+"linkId"+"\t"+"CO"+"\t"+"CO2_Total"+"\t"+"FC"+"\t"+"HC"+"\t"+"NMHC"+"\t"+"NO2"+"\t"+"NOX"+"\t"+"PM"+"\t"+"SO2"+"\n");
 		writer3.write("time"+"\t"+"linkId"+"\t"+"CO"+"\t"+"CO2_Total"+"\t"+"FC"+"\t"+"HC"+"\t"+"NMHC"+"\t"+"NO2"+"\t"+"NOX"+"\t"+"PM"+"\t"+"SO2"+"\n");
@@ -100,7 +99,7 @@ public class PerLinkEmissionData {
 					writer1.write(time2EmissionsTotalFilled.get(time).get(link.getId()).get(str)+"\t");
 					writer2.write(time2WarmEmissionsTotalFilled.get(time).get(link.getId()).get(str)+"\t");
 					writer3.write(time2ColdEmissionsTotalFilled.get(time).get(link.getId()).get(str)+"\t");
-					
+
 					double d = time2EmissionsTotalFilled.get(time).get(link.getId()).get(str) - time2ColdEmissionsTotalFilled.get(time).get(link.getId()).get(str)-time2WarmEmissionsTotalFilled.get(time).get(link.getId()).get(str);
 					if(d<-1||d>1){
 						System.out.println(d);
@@ -119,56 +118,48 @@ public class PerLinkEmissionData {
 		writer3.close();
 		logger.info("Finished Writing files.");
 	}
-	
-	private Scenario loadScenario(String netFile) {
-		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(netFile);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
-	}
-	
-	
-	 private Map<Double, Map<Id, SortedMap<String, Double>>> setNonCalculatedEmissions(Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal) {
-			Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled = new HashMap<Double, Map<Id, SortedMap<String, Double>>>();
-			
-			for(double endOfTimeInterval : time2EmissionsTotal.keySet()){
-				Map<Id, SortedMap<String, Double>> emissionsTotalFilled = emissionUtils.setNonCalculatedEmissionsForNetwork(network, time2EmissionsTotal.get(endOfTimeInterval));
-				time2EmissionsTotalFilled.put(endOfTimeInterval, emissionsTotalFilled);
-			}
-			return time2EmissionsTotalFilled;
+
+	private Map<Double, Map<Id, SortedMap<String, Double>>> setNonCalculatedEmissions(Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal) {
+		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled = new HashMap<Double, Map<Id, SortedMap<String, Double>>>();
+
+		for(double endOfTimeInterval : time2EmissionsTotal.keySet()){
+			Map<Id, SortedMap<String, Double>> emissionsTotalFilled = emissionUtils.setNonCalculatedEmissionsForNetwork(network, time2EmissionsTotal.get(endOfTimeInterval));
+			time2EmissionsTotalFilled.put(endOfTimeInterval, emissionsTotalFilled);
 		}
+		return time2EmissionsTotalFilled;
+	}
 	public void writeLinkLocation2Emissions(
-				Map<Id, SortedMap<String, Double>> map,
-				Network network,
-				String outFile){
-			try{
-				FileWriter fstream = new FileWriter(outFile);			
-				BufferedWriter out = new BufferedWriter(fstream);
-				out.append("linkId\txLink\tyLink\t");
-				for (String pollutant : emissionUtils.getListOfPollutants()){
-					out.append(pollutant + "[g]\t");
+			Map<Id, SortedMap<String, Double>> map,
+			Network network,
+			String outFile){
+		try{
+			FileWriter fstream = new FileWriter(outFile);			
+			BufferedWriter out = new BufferedWriter(fstream);
+			out.append("linkId\txLink\tyLink\t");
+			for (String pollutant : emissionUtils.getListOfPollutants()){
+				out.append(pollutant + "[g]\t");
+			}
+			out.append("\n");
+
+			for(Id linkId : map.keySet()){
+				Link link = network.getLinks().get(linkId);
+				Coord linkCoord = link.getCoord();
+				Double xLink = linkCoord.getX();
+				Double yLink = linkCoord.getY();
+
+				out.append(linkId + "\t" + xLink + "\t" + yLink + "\t");
+
+				Map<String, Double> emissionType2Value = map.get(linkId);
+				for(String pollutant : emissionUtils.getListOfPollutants()){
+					out.append(emissionType2Value.get(pollutant) + "\t");
 				}
 				out.append("\n");
-
-				for(Id linkId : map.keySet()){
-					Link link = network.getLinks().get(linkId);
-					Coord linkCoord = link.getCoord();
-					Double xLink = linkCoord.getX();
-					Double yLink = linkCoord.getY();
-
-					out.append(linkId + "\t" + xLink + "\t" + yLink + "\t");
-
-					Map<String, Double> emissionType2Value = map.get(linkId);
-					for(String pollutant : emissionUtils.getListOfPollutants()){
-						out.append(emissionType2Value.get(pollutant) + "\t");
-					}
-					out.append("\n");
-				}
-				//Close the output stream
-				out.close();
-				logger.info("Finished writing output to " + outFile);
-			} catch (Exception e){
-				throw new RuntimeException(e);
 			}
+			//Close the output stream
+			out.close();
+			logger.info("Finished writing output to " + outFile);
+		} catch (Exception e){
+			throw new RuntimeException(e);
 		}
+	}
 }

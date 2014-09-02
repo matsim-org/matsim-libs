@@ -18,10 +18,10 @@
  * *********************************************************************** */
 package playground.agarwalamit.analysis;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -29,6 +29,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author amit
  */
 public class LoadMyScenarios {
+	private final static Logger logger = Logger.getLogger(LoadMyScenarios.class);
 	
 	/**
 	 * Returns scenario by reading input config file and inserting location of plans and network file.
@@ -71,7 +72,7 @@ public class LoadMyScenarios {
 	
 	
 	/**
-	 * Returns last iterations (int) by reading input config file only.
+	 * Returns last iterations (int) by reading input config file only  and without loading scenario.
 	 */
 	public static int getLastIteration(String configFile) {
 		Config config = new Config();
@@ -92,4 +93,16 @@ public class LoadMyScenarios {
 		return scenario;
 	}
 	
+	/**
+	 * Returns simulation end time by reading config file and without loading scenario.
+	 */
+	public static Double getEndTime(String configfile) {
+		Config config = new Config();
+		config.addCoreModules();
+		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		configReader.readFile(configfile);
+		Double endTime = config.qsim().getEndTime();
+		logger.info("Simulation end time is: " + endTime / 3600 + " hours.");
+		return endTime;
+	}
 }

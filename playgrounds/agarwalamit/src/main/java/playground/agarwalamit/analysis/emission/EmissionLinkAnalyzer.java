@@ -32,8 +32,6 @@ import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -47,7 +45,7 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  *
  */
 public class EmissionLinkAnalyzer extends AbstractAnalyisModule {
-	private final static Logger logger = Logger.getLogger(EmissionLinkAnalyzer.class);
+	private final Logger logger = Logger.getLogger(EmissionLinkAnalyzer.class);
 	private final String emissionEventsFile;
 	private EmissionUtils emissionUtils;
 	private EmissionsPerLinkWarmEventHandler warmHandler;
@@ -55,23 +53,23 @@ public class EmissionLinkAnalyzer extends AbstractAnalyisModule {
 	private Map<Double, Map<Id, Map<WarmPollutant, Double>>> link2WarmEmissions;
 	private Map<Double, Map<Id, Map<ColdPollutant, Double>>> link2ColdEmissions;
 	private SortedMap<Double, Map<Id, SortedMap<String, Double>>> link2TotalEmissions;
-	double simulationEndTime ;
-	 final int noOfTimeBins;
-	 String configFile;
-	
-	public EmissionLinkAnalyzer(String configFile, String emissionEventFile, int noOfTimeBin) {
+	private final int noOfTimeBins;
+	private double simulationEndTime;
+
+	public EmissionLinkAnalyzer(double simulationEndTime, String emissionEventFile, int noOfTimeBin) {
 		super(EmissionLinkAnalyzer.class.getSimpleName());
 		this.emissionEventsFile = emissionEventFile;
-		this.configFile = configFile;
 		this.noOfTimeBins = noOfTimeBin;
-		
+		this.simulationEndTime = simulationEndTime;
+	}
+
+	public void init(ScenarioImpl scenario) {
+		this.logger.info("Aggregating emissions for each "+this.simulationEndTime/noOfTimeBins+" sec time bin.");
+		this.emissionUtils = new EmissionUtils();
+		this.warmHandler = new EmissionsPerLinkWarmEventHandler(simulationEndTime, noOfTimeBins);
+		this.coldHandler = new EmissionsPerLinkColdEventHandler(simulationEndTime, noOfTimeBins);
 	}
 	
-	public void init(ScenarioImpl scenario) {
-		this.emissionUtils = new EmissionUtils();
-		this.warmHandler = new EmissionsPerLinkWarmEventHandler(getEndTime(this.configFile), noOfTimeBins);
-		this.coldHandler = new EmissionsPerLinkColdEventHandler(getEndTime(this.configFile), noOfTimeBins);
-	}
 	@Override
 	public List<EventHandler> getEventHandler() {
 		List<EventHandler> handler = new LinkedList<EventHandler>();
@@ -82,10 +80,10 @@ public class EmissionLinkAnalyzer extends AbstractAnalyisModule {
 	public void preProcessData() {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
-		
+
 		eventsManager.addHandler(this.warmHandler);
 		eventsManager.addHandler(this.coldHandler);
-		
+
 		emissionReader.parse(this.emissionEventsFile);
 	}
 
@@ -98,27 +96,18 @@ public class EmissionLinkAnalyzer extends AbstractAnalyisModule {
 
 	@Override
 	public void writeResults(String outputFolder) {
-		
+
 	}
-	private Double getEndTime(String configfile) {
-		Config config = new Config();
-		config.addCoreModules();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
-		configReader.readFile(configfile);
-		Double endTime = config.qsim().getEndTime();
-		logger.info("Simulation end time is: " + endTime / 3600 + " hours.");
-		logger.info("Aggregating emissions for " + (int) (endTime / 3600 / noOfTimeBins) + " hour time bins.");
-		return endTime;
-	}
+
 	private SortedMap<Double, Map<Id, SortedMap<String, Double>>> sumUpEmissionsPerTimeInterval(
 			Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2warmEmissionsTotal,
 			Map<Double, Map<Id, Map<ColdPollutant, Double>>> time2coldEmissionsTotal) {
-	
+
 		SortedMap<Double, Map<Id, SortedMap<String, Double>>> time2totalEmissions = new TreeMap<Double, Map<Id, SortedMap<String, Double>>>();
-	
+
 		for(double endOfTimeInterval: time2warmEmissionsTotal.keySet()){
 			Map<Id, Map<WarmPollutant, Double>> warmEmissions = time2warmEmissionsTotal.get(endOfTimeInterval);
-			
+
 			Map<Id, SortedMap<String, Double>> totalEmissions = new HashMap<Id, SortedMap<String, Double>>();
 			if(time2coldEmissionsTotal.get(endOfTimeInterval) == null){
 				for(Id id : warmEmissions.keySet()){
@@ -133,7 +122,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalyisModule {
 		}
 		return time2totalEmissions;
 	}
-	
+
 	public SortedMap<Double, Map<Id, SortedMap<String, Double>>> getLink2TotalEmissions() {
 		return this.link2TotalEmissions;
 	}

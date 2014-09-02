@@ -22,12 +22,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
@@ -40,24 +37,23 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  * @author amit
  */
 public class CongestionLinkAnalyzer extends AbstractAnalyisModule {
-	private final static Logger logger = Logger.getLogger(CongestionLinkAnalyzer.class);
 	private final String eventsFile;
 	private CongestionPerLinkHandler congestionPerLinkHandler;
 	private final int noOfTimeBins;
-	private final String configFile;
 	private Map<Double, Map<Id, Double>> congestionPerLinkTimeInterval;
 	private EventsManager eventsManager;
 	private Scenario scenario;
+	private double simulationEndTime;
 
-	public CongestionLinkAnalyzer(String configFile, String eventFile, int noOfTimeBins) {
+	public CongestionLinkAnalyzer(double simulationEndTime, String eventFile, int noOfTimeBins) {
 		super(CongestionLinkAnalyzer.class.getSimpleName());
 		this.eventsFile = eventFile;
-		this.configFile = configFile;
 		this.noOfTimeBins = noOfTimeBins;
+		this.simulationEndTime = simulationEndTime;
 	}
 	public void init(Scenario scenario){
 		this.scenario = scenario;
-		this.congestionPerLinkHandler = new CongestionPerLinkHandler(this.noOfTimeBins, getEndTime(this.configFile), this.scenario);
+		this.congestionPerLinkHandler = new CongestionPerLinkHandler(this.noOfTimeBins, this.simulationEndTime , this.scenario);
 	}
 	@Override
 	public List<EventHandler> getEventHandler() {
@@ -81,16 +77,6 @@ public class CongestionLinkAnalyzer extends AbstractAnalyisModule {
 	@Override
 	public void writeResults(String outputFolder) {
 
-	}
-	private Double getEndTime(String configfile) {
-		Config config = new Config();
-		config.addCoreModules();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
-		configReader.readFile(configfile);
-		Double endTime = config.qsim().getEndTime();
-		logger.info("Simulation end time is: " + endTime / 3600 + " hours.");
-		logger.info("Aggregating delays for " + (int) (endTime / 3600 / this.noOfTimeBins) + " hour time bins.");
-		return endTime;
 	}
 
 	public Map<Double, Map<Id, Double>> getCongestionPerLinkTimeInterval() {

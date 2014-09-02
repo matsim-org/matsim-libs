@@ -20,6 +20,9 @@ package playground.agarwalamit.siouxFalls;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -30,30 +33,30 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.agarwalamit.analysis.congestion.CongestionLinkAnalyzer;
 import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
-import playground.agarwalamit.siouxFalls.emissionAnalyzer.PerLinkEmissionData;
 
 /**
  * @author amit
  */
 public class EmissionsAndCongestionsPerTimeBin {
 
-	private Logger logger = Logger.getLogger(PerLinkEmissionData.class);
-	private String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
-	private String runCase = "ei";
-	private String networkFile ="/Users/aagarwal/Desktop/ils4/agarwal/munich/input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
-	private String configFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/config_munich_1pct_baseCaseCtd.xml";
-	private int lastIteration =1500  ;
-	EmissionUtils emissionUtils;
+	private Logger logger = Logger.getLogger(EmissionsAndCongestionsPerTimeBin.class);
+	private final String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMC/";
+	private final String runCase = "run201";
+	private final String networkFile =outputDir+runCase+"/output_network.xml.gz";
+	private final String configFile = outputDir+runCase+"/output_config.xml";
+	private EmissionUtils emissionUtils;
 
 	private Network network;
-	final int noOfTimeBin = 30;
+	private final int noOfTimeBins = 30;
+	private final double simulationEndTime = LoadMyScenarios.getEndTime(configFile) ;
+	private final Scenario scenario = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
+	private final int lastIteration = LoadMyScenarios.getLastIteration(configFile);
+	private List<Double> allTimeBins = new ArrayList<Double>();
 
 	public static void main(String[] args)  {
 		EmissionsAndCongestionsPerTimeBin emissionsVsCongestionData = new EmissionsAndCongestionsPerTimeBin();
@@ -61,12 +64,10 @@ public class EmissionsAndCongestionsPerTimeBin {
 	}
 
 	private void run()  {
-
-		Scenario scenario = loadScenario(networkFile);
 		String emissionEventFile = outputDir+runCase+"/ITERS/it."+lastIteration+"/"+lastIteration+".emission.events.xml.gz";
 		String eventsFile = outputDir+runCase+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
 		this.network = scenario.getNetwork();
-		EmissionLinkAnalyzer eLinkAnalyzer = new EmissionLinkAnalyzer(configFile, emissionEventFile,noOfTimeBin);
+		EmissionLinkAnalyzer eLinkAnalyzer = new EmissionLinkAnalyzer(simulationEndTime, emissionEventFile, noOfTimeBins);
 		eLinkAnalyzer.init(null);
 		eLinkAnalyzer.preProcessData();
 		eLinkAnalyzer.postProcessData();
@@ -76,25 +77,28 @@ public class EmissionsAndCongestionsPerTimeBin {
 		SortedMap<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal = eLinkAnalyzer.getLink2TotalEmissions();
 		SortedMap<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled = setNonCalculatedEmissions(time2EmissionsTotal);
 
-		CongestionLinkAnalyzer cLinkAnalyzer = new CongestionLinkAnalyzer(configFile, eventsFile, noOfTimeBin);
+		CongestionLinkAnalyzer cLinkAnalyzer = new CongestionLinkAnalyzer(this.simulationEndTime, eventsFile, noOfTimeBins);
 		cLinkAnalyzer.init(scenario);
 		cLinkAnalyzer.preProcessData();
 		cLinkAnalyzer.postProcessData();
 		cLinkAnalyzer.checkTotalDelayUsingAlternativeMethod();
 
 		Map<Double, Map<Id, Double>> time2linkIdDelays = cLinkAnalyzer.getCongestionPerLinkTimeInterval();
-		BufferedWriter writer1 = IOUtils.getBufferedWriter(outputDir+"/analysis/emissionVsCongestion/"+runCase+".hourlyDelaysAndEmissionsPerLink.txt");
+		BufferedWriter writer1 = IOUtils.getBufferedWriter(outputDir+runCase+"/analysis/emissionVsCongestion/"+runCase+".hourlyDelaysAndEmissionsPerLink.txt");
 
 
 		try {
 			writer1.write("time"+"\t"+"linkId"+"\t"+"delays_sec"+"\t"+"CO"+"\t"+"CO2_Total"+"\t"+"FC"+"\t"+"HC"+"\t"+"NMHC"+"\t"+"NO2"+"\t"+"NOX"+"\t"+"PM"+"\t"+"SO2"+"\n");
 
-			for(double time : time2EmissionsTotalFilled.keySet()){
+			for(double time : allTimeBins){
 				for(Link link : network.getLinks().values()){
 
 					double delay;
-					if(time2linkIdDelays.get(time).get(link.getId())==null) delay = 0.0;
-					else delay = time2linkIdDelays.get(time).get(link.getId());
+					if(time2linkIdDelays.get(time)!=null) {
+						if(time2linkIdDelays.get(time).get(link.getId())==null)	delay = 0.0;
+						else delay = time2linkIdDelays.get(time).get(link.getId());
+					}
+					else delay =0.0;
 
 					writer1.write(time+"\t"+link.getId().toString()+"\t"+delay+"\t");
 
@@ -110,8 +114,7 @@ public class EmissionsAndCongestionsPerTimeBin {
 		}
 
 		//writing network delays and emissions per time bin
-		BufferedWriter writer2= IOUtils.getBufferedWriter(outputDir+"/analysis/emissionVsCongestion/"+runCase+".hourlyNetworkDelaysAndEmissions.txt");
-
+		BufferedWriter writer2= IOUtils.getBufferedWriter(outputDir+runCase+"/analysis/emissionVsCongestion/"+runCase+".hourlyNetworkDelaysAndEmissions.txt");
 		try{
 			writer2.write("time"+"\t"+"delays_sec"+"\t"+"CO"+"\t"+"CO2_Total"+"\t"+"FC"+"\t"+"HC"+"\t"+"NMHC"+"\t"+"NO2"+"\t"+"NOX"+"\t"+"PM"+"\t"+"SO2"+"\n");
 			for(double time : time2EmissionsTotalFilled.keySet()){
@@ -119,10 +122,12 @@ public class EmissionsAndCongestionsPerTimeBin {
 				SortedMap<String, Double> networkEmissions = new TreeMap<String, Double>();
 				for(Link link : network.getLinks().values()){
 					double delay;
-					if(time2linkIdDelays.get(time).get(link.getId())==null) delay = 0.0;
-					else delay = time2linkIdDelays.get(time).get(link.getId());
+					if(time2linkIdDelays.get(time)!=null) {
+						if(time2linkIdDelays.get(time).get(link.getId())==null)	delay = 0.0;
+						else delay = time2linkIdDelays.get(time).get(link.getId());
+					}
+					else delay =0.0;
 					networkDelay+=delay;
-
 
 					for(String str : (time2EmissionsTotalFilled.get(time)).get(link.getId()).keySet()){
 						double  emissionSoFar;
@@ -143,7 +148,6 @@ public class EmissionsAndCongestionsPerTimeBin {
 				}
 				writer2.newLine();
 			}
-
 			writer2.close();
 		}catch (IOException e) {
 			throw new RuntimeException("Data is not written in a file. Reason "+e);
@@ -151,17 +155,25 @@ public class EmissionsAndCongestionsPerTimeBin {
 		logger.info("Finished Writing files.");
 	}
 
-	private Scenario loadScenario(String netFile) {
-		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(netFile);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
-	}
-
 	private SortedMap<Double, Map<Id, SortedMap<String, Double>>> setNonCalculatedEmissions(Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal) {
 		SortedMap<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled = new TreeMap<Double, Map<Id, SortedMap<String, Double>>>();
 
-		for(double endOfTimeInterval : time2EmissionsTotal.keySet()){
+		double timeBinSize = simulationEndTime/noOfTimeBins;
+
+		for(double t=0;t<=simulationEndTime;){
+			allTimeBins.add(t);
+			t=t+timeBinSize;
+		}
+
+		for(double d:time2EmissionsTotal.keySet()){
+			if(!allTimeBins.contains(d)) throw new RuntimeException("Time bin "+d+" not found in list of all time bins. Aborting...");
+		}
+
+		for(double endOfTimeInterval : allTimeBins){
+			if(!time2EmissionsTotal.containsKey(endOfTimeInterval)){
+				time2EmissionsTotal.put(endOfTimeInterval, new HashMap<Id, SortedMap<String, Double>>());
+			}
+
 			Map<Id, SortedMap<String, Double>> emissionsTotalFilled = emissionUtils.setNonCalculatedEmissionsForNetwork(network, time2EmissionsTotal.get(endOfTimeInterval));
 			time2EmissionsTotalFilled.put(endOfTimeInterval, emissionsTotalFilled);
 		}

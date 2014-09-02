@@ -27,11 +27,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.agarwalamit.analysis.congestion.CongestionLinkAnalyzer;
 
 /**
@@ -56,9 +54,10 @@ public class PerLinkCongestionData {
 		
 		BufferedWriter writer1 = IOUtils.getBufferedWriter(outputDir+"/ITERS/it.100/100.timeLinkIdTotalCongestion.txt");//
 
-		Scenario scenario = loadScenario(networkFile);
+		Scenario scenario = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
 		this.network = scenario.getNetwork();
-		CongestionLinkAnalyzer linkAnalyzer = new CongestionLinkAnalyzer(configFile, eventFile,1);
+		double simulationEndTime = LoadMyScenarios.getEndTime(configFile);
+		CongestionLinkAnalyzer linkAnalyzer = new CongestionLinkAnalyzer(simulationEndTime, eventFile,1);
 		linkAnalyzer.init(scenario);
 		linkAnalyzer.preProcessData();
 		linkAnalyzer.postProcessData();
@@ -77,12 +76,5 @@ public class PerLinkCongestionData {
 		} 
 		writer1.close();
 		logger.info("Finished Writing files.");
-	}
-	
-	private Scenario loadScenario(String netFile) {
-		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(netFile);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
 	}
 }
