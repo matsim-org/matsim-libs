@@ -41,6 +41,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
 
 public class AgentEventMessage extends Message {
 
@@ -85,20 +86,22 @@ public class AgentEventMessage extends Message {
 				processEndOfLegCarMode(leg, nextAct);
 
 			} else {
-				Id currentLinkId = null;
+				Id<Link> currentLinkId = null;
 				if (getCurrentLinkIndex() == -1) {
 					currentLinkId = prevAct.getLinkId();
 				} else {
 					currentLinkId = linkIds.get(getCurrentLinkIndex());
 				}
 
-				event = new LinkLeaveEvent(getMessageArrivalTime(), getPerson().getId(), currentLinkId, getPerson().getId());
+				event = new LinkLeaveEvent(getMessageArrivalTime(), getPerson().getId(), currentLinkId, 
+						Id.create(getPerson().getId().toString(), Vehicle.class));
 				eventsManager.processEvent(event);
 
 				setCurrentLinkIndex(getCurrentLinkIndex() + 1);
 				currentLinkId = linkIds.get(getCurrentLinkIndex());
 
-				event = new LinkEnterEvent(getMessageArrivalTime(), getPerson().getId(), currentLinkId, getPerson().getId());
+				event = new LinkEnterEvent(getMessageArrivalTime(), getPerson().getId(), currentLinkId, 
+						Id.create(getPerson().getId().toString(), Vehicle.class));
 				eventsManager.processEvent(event);
 
 				setMessageArrivalTime(getMessageArrivalTime() + ttMatrix.getTravelTime(getMessageArrivalTime(), currentLinkId));
@@ -147,11 +150,13 @@ public class AgentEventMessage extends Message {
 			currentLinkId = linkIds.get(getCurrentLinkIndex());
 		}
 
-		event = new LinkLeaveEvent(getMessageArrivalTime(), getPerson().getId(), currentLinkId, getPerson().getId());
+		event = new LinkLeaveEvent(getMessageArrivalTime(), getPerson().getId(), currentLinkId, 
+				Id.create(getPerson().getId().toString(), Vehicle.class));
 		eventsManager.processEvent(event);
 
 		Id<Link> endLinkId = leg.getRoute().getEndLinkId();
-		event = new LinkEnterEvent(getMessageArrivalTime(), getPerson().getId(), endLinkId, getPerson().getId());
+		event = new LinkEnterEvent(getMessageArrivalTime(), getPerson().getId(), endLinkId, 
+				Id.create(getPerson().getId().toString(), Vehicle.class));
 		eventsManager.processEvent(event);
 
 		event = new PersonArrivalEvent(getMessageArrivalTime(), getPerson().getId(), endLinkId, leg.getMode());
