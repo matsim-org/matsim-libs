@@ -246,42 +246,8 @@ This is, naturally, the same as dividing the $200\,m^2$ of the link by the $0.16
 The effective lane width might be used by the visualization (unclear if this is the case).
 
 \umbruch
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{"qsim" (parallel version). Status: looks promising}
 
-\authorsOfCode{C. Dobler, IVT}
-\maintainers{C. Dobler, IVT}
-\authorsOfDoc{C. Dobler, IVT}
-
-
-Analysis of performance and structure of (non parallel) QueueSim shows:
-\begin{itemize}
-	\item Simulation of movement on links and over nodes is most time consuming.
-	\item Within a timestep actions on nodes and links can be simulated on parallel threads with low additional synchronization effort.
-\end{itemize}
-
-The  parallel QueueSim is based on the existing QueueSim and can be used by  just adding a new parameter to a scenario configuration file (see  below).
-
-First performance measurements show promising results.
-
-Working paper will be published in Q2 2010.
-
-\begin{figure}[htp]
-\includegraphics[width=\textwidth]{figures/qsimParallel/parallelqsim.png}
-\caption{Design of the parallel qsim}
-\end{figure}
-
-The config option presumably is:
-\begin{lstlisting}
-<module name="qsim">
-   ...
-   <param name="numberOfThreads" value="5"/>
-</module>
-
-\end{lstlisting}
-
-Any number of threads larger than $1$ triggers the use of the parallel version.
+For configuring the parallel version of the ``qsim'', see Section~\ref{sec:ParallelQsim}. 
 
 \umbruch
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -427,7 +393,7 @@ M. Rieser, K. Nagel; \textbf{Combined agent-based simulation of private car traf
 \umbruch
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{"JDEQSim".  Status: works}
+\section{"JDEQSim".  Status: works}\label{sec:Jdeqsim}
 
 \authorsOfCode{Rashid Waraich}
 \maintainers{Rashid Waraich}
