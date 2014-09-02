@@ -464,7 +464,7 @@ public class AccessibilityCalculator {
 				double householdAverage = tuple.getFirst() / ((double) tuple.getSecond());
 				
 				/* Find an individual in the household to get their home coordinate. */
-				List<Id> members = hhs.getHouseholds().get(householdId).getMemberIds();
+				List<Id<Person>> members = hhs.getHouseholds().get(householdId).getMemberIds();
 				Person person = null;
 				int index = 0;
 				while(person == null && index < members.size()){

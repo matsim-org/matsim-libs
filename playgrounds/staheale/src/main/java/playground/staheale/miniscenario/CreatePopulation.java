@@ -52,8 +52,8 @@ public class CreatePopulation {
 	private DecisionModels decisionModels = new DecisionModels();
 	private AgentMemories memories = new AgentMemories();
 	
-	private TreeMap<Id<ActivityFacility>, ActivityFacility> homeLocations = new TreeMap<Id<ActivityFacility>, ActivityFacility>();
-	private TreeMap<Id<ActivityFacility>, ActivityFacility> workLocations = new TreeMap<Id<ActivityFacility>, ActivityFacility>();
+	private TreeMap<Id<Person>, ActivityFacility> homeLocations = new TreeMap<Id<Person>, ActivityFacility>();
+	private TreeMap<Id<Person>, ActivityFacility> workLocations = new TreeMap<Id<Person>, ActivityFacility>();
 	
 	private DecisionModelCreator decisionModelCreator = new DecisionModelCreator();
 	private Random random = new Random(37835409);

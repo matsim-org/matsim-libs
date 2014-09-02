@@ -158,7 +158,7 @@ public class AffordabilityCalculator {
 				Household hh = hhs.getHouseholds().get(hhId);
 
 				/* Find an individual in the household to get their home coordinate. */
-				List<Id> members = hh.getMemberIds();
+				List<Id<Person>> members = hh.getMemberIds();
 				Person person = null;
 				int index = 0;
 				while(person == null && index < members.size()){

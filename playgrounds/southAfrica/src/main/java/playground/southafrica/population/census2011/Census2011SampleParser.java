@@ -414,7 +414,7 @@ public class Census2011SampleParser {
 	class SAHouseholds implements Households{
 
 		@Override
-		public Map<Id, Household> getHouseholds() {
+		public Map<Id<Household>, Household> getHouseholds() {
 			// TODO Auto-generated method stub
 			return null;
 		}

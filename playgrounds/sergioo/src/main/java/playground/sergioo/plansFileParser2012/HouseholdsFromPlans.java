@@ -52,7 +52,7 @@ public class HouseholdsFromPlans {
 				Household household = facilityIdsHouseholds.get(homeActivity.getFacilityId());
 				if(household == null) {
 					household = new HouseholdImpl(new IdImpl(households.getHouseholds().size()));
-					((HouseholdImpl)household).setMemberIds(new ArrayList<Id>());
+					((HouseholdImpl)household).setMemberIds(new ArrayList<Id<Person>>());
 					households.getHouseholds().put(household.getId(), household);
 					facilityIdsHouseholds.put(homeActivity.getFacilityId(), household);
 				}

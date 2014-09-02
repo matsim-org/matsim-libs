@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
@@ -369,7 +370,7 @@ public class NmbmSurveyParser {
 				
 				/* Clean households. */
 				for(Id hhid : sc.getHouseholds().getHouseholds().keySet()){
-					List<Id> memberIds = sc.getHouseholds().getHouseholds().get(hhid).getMemberIds();
+					List<Id<Person>> memberIds = sc.getHouseholds().getHouseholds().get(hhid).getMemberIds();
 					if(memberIds.contains(id)){
 						memberIds.remove(id);
 					}
