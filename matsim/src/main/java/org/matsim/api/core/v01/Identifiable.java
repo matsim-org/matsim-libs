@@ -20,8 +20,8 @@
 
 package org.matsim.api.core.v01;
 
-public interface Identifiable {
+public interface Identifiable<T> {
 
-	public Id getId();
+	public Id<T> getId();
 
 }
