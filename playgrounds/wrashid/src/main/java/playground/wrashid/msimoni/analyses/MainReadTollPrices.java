@@ -1,8 +1,8 @@
 package playground.wrashid.msimoni.analyses;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.roadpricing.RoadPricingReaderXMLv1;
-import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl;
+import org.matsim.roadpricing.RoadPricingReaderXMLv1;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 public class MainReadTollPrices {
 

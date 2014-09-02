@@ -20,4 +20,4 @@
  * @author nagel
  *
  */
-package org.matsim.contrib.roadpricing.run;
+package org.matsim.roadpricing.run;

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.roadpricing;
+package org.matsim.roadpricing;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 
 /**
  * Calculates the toll agents pay during a simulation by analyzing events. Add an instance of this class as an EventHandler.

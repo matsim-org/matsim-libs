@@ -23,10 +23,10 @@ import java.io.Closeable;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.roadpricing.RoadPricingScheme;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.yu.utils.TollTools;
 import playground.yu.utils.io.SimpleWriter;

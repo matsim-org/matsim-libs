@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.roadpricing.RoadPricingScheme;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.yu.analysis.ModeSplit;
 import playground.yu.utils.TollTools;

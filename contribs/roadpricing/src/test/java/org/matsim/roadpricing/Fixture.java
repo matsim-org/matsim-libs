@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.roadpricing;
+package org.matsim.roadpricing;
 
 import java.util.List;
 

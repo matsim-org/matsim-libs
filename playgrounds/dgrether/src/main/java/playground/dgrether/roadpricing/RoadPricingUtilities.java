@@ -21,7 +21,7 @@ package playground.dgrether.roadpricing;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingScheme;
 
 /**
  * @author dgrether

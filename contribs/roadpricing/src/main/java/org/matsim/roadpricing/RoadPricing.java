@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.roadpricing;
+package org.matsim.roadpricing;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigUtils;

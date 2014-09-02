@@ -16,18 +16,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.roadpricing;
+package org.matsim.roadpricing.run;
 
-import org.matsim.api.core.v01.population.Person;
-
-
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.roadpricing.RoadPricing;
+import org.matsim.roadpricing.RoadPricingConfigGroup;
 
 /**
  * @author nagel
  *
  */
-public interface MarginalUtilityOfMoneyLookup {
-	
-	public double getMarginalUtilityOfMoney(Person person) ;
+public class Main {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+
+		Config config = ConfigUtils.loadConfig( args[0], new RoadPricingConfigGroup() ) ;
+        RoadPricingConfigGroup rpConfigGroup = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class) ;
+        if ( !rpConfigGroup.isUsingRoadpricing() ) {
+        	Logger.getLogger(Main.class).info("roadpricing is not switched on in the config; in consequence it will not be used.  Maybe this is what you want.") ;
+        }
+		
+		Scenario scenario = ScenarioUtils.loadScenario(config) ;
+		
+		Controler controler = new Controler(scenario) ;
+		{		
+			RoadPricing roadPricing = new RoadPricing() ;
+			controler.addControlerListener( roadPricing ) ;
+		}
+		controler.run() ;
+	}
 
 }

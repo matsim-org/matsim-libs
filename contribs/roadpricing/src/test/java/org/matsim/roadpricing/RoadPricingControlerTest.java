@@ -18,17 +18,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.roadpricing;
+package org.matsim.roadpricing;
 
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.roadpricing.RoadPricing;
-import org.matsim.contrib.roadpricing.RoadPricingConfigGroup;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.roadpricing.RoadPricing;
+import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**

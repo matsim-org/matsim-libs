@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.yu.utils.TollTools;
 

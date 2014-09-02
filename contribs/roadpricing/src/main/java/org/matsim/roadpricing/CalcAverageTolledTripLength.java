@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.roadpricing;
+package org.matsim.roadpricing;
 
 import java.util.TreeMap;
 
@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
+import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 
 /**
  * Calculates the distance of a trip which occurred on tolled links.
