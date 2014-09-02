@@ -21,6 +21,9 @@
 package playground.christoph.evacuation.mobsim.decisiondata;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.households.Household;
 
 import playground.christoph.evacuation.mobsim.HouseholdPosition;
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.EvacuationDecision;
@@ -45,10 +48,10 @@ public class HouseholdDecisionData {
 	/*
 	 * Model input data
 	 */
-	private final Id householdId;
-	private Id homeLinkId = null;
-	private Id homeFacilityId = null;
-	private Id meetingFacilityId = null;
+	private final Id<Household> householdId;
+	private Id<Link> homeLinkId = null;
+	private Id<ActivityFacility> homeFacilityId = null;
+	private Id<ActivityFacility> meetingFacilityId = null;
 	private HouseholdPosition householdPosition = null;
 	private boolean hasChildren = false;
 	private Participating participating = Participating.UNDEFINED;
@@ -83,35 +86,35 @@ public class HouseholdDecisionData {
 	 */
 	private double departureTimeDelay = Double.MAX_VALUE;
 	
-	public HouseholdDecisionData(Id householdId) {
+	public HouseholdDecisionData(Id<Household> householdId) {
 		this.householdId = householdId;
 	}
 	
-	public Id getHouseholdId() {
+	public Id<Household> getHouseholdId() {
 		return this.householdId;
 	}
 	
-	public Id getHomeLinkId() {
+	public Id<Link> getHomeLinkId() {
 		return homeLinkId;
 	}
 
-	public void setHomeLinkId(Id homeLinkId) {
+	public void setHomeLinkId(Id<Link> homeLinkId) {
 		this.homeLinkId = homeLinkId;
 	}
 
-	public Id getHomeFacilityId() {
+	public Id<ActivityFacility> getHomeFacilityId() {
 		return homeFacilityId;
 	}
 
-	public void setHomeFacilityId(Id homeFacilityId) {
+	public void setHomeFacilityId(Id<ActivityFacility> homeFacilityId) {
 		this.homeFacilityId = homeFacilityId;
 	}
 	
-	public Id getMeetingPointFacilityId() {
+	public Id<ActivityFacility> getMeetingPointFacilityId() {
 		return this.meetingFacilityId;
 	}
 	
-	public void setMeetingPointFacilityId(Id meetingFacilityId) {
+	public void setMeetingPointFacilityId(Id<ActivityFacility> meetingFacilityId) {
 		this.meetingFacilityId = meetingFacilityId;
 	}
 	

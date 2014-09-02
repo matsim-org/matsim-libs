@@ -41,11 +41,9 @@ import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelPassengerQNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerDepartureHandler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.router.util.TravelTime;
@@ -84,15 +82,6 @@ public class EvacuationQSimFactory implements MobsimFactory, IterationStartsList
     
     @Override
     public Netsim createMobsim(Scenario sc, EventsManager eventsManager) {
-
-    	/*
-    	 * As long as we need ExperimentalBasicWithindayAgents because other agents cannot
-    	 * change their persons' plans. 
-    	 */
-//    	ExperimentalBasicWithindayAgent.copySelectedPlan = false;
-		Logger.getLogger(this.getClass()).fatal("copySelectedPlan no longer possible. kai, feb'14") ;
-		System.exit(-1); 
-
     	
     	// so far "ride_passenger" - might be switched to "ride"
     	PassengerDepartureHandler.passengerMode = PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE;
@@ -119,18 +108,12 @@ public class EvacuationQSimFactory implements MobsimFactory, IterationStartsList
 			if (!(eventsManager instanceof SimStepParallelEventsManagerImpl)) {
 				eventsManager = new SynchronizedEventsManagerImpl(eventsManager);        		
 			}
-			ParallelPassengerQNetsimEngine netsimEngine = new ParallelPassengerQNetsimEngine(qSim, MatsimRandom.getLocalInstance(), jointDepartureOrganizer);
-			qSim.addMobsimEngine(netsimEngine);
-			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-			qSim.addDepartureHandler(netsimEngine.getVehicularDepartureHandler());
-
 			log.info("Using parallel PassengerQSim with " + numOfThreads + " threads.");
-		} else {
-			PassengerQNetsimEngine netsimEngine = new PassengerQNetsimEngine(qSim, MatsimRandom.getLocalInstance(), jointDepartureOrganizer);
-			qSim.addMobsimEngine(netsimEngine);
-			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-			qSim.addDepartureHandler(netsimEngine.getVehicularDepartureHandler());
 		}
+		PassengerQNetsimEngine netsimEngine = new PassengerQNetsimEngine(qSim, MatsimRandom.getLocalInstance(), jointDepartureOrganizer);
+		qSim.addMobsimEngine(netsimEngine);
+		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+		qSim.addDepartureHandler(netsimEngine.getVehicularDepartureHandler());
 			
 		MultiModalSimEngine multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(qSim, this.multiModalTravelTimes);
 		qSim.addMobsimEngine(multiModalEngine);
