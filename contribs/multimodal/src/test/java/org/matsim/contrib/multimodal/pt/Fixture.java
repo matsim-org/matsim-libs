@@ -112,18 +112,18 @@ import org.matsim.vehicles.VehiclesFactory;
 	}
 	
 	protected void buildNetwork() {
-		this.nodes[0] = this.network.getFactory().createNode(this.scenario.createId("0"),  this.scenario.createCoord(    0, 5000));
-		this.nodes[1] = this.network.getFactory().createNode(this.scenario.createId("1"),  this.scenario.createCoord( 4000, 5000));
-		this.nodes[2] = this.network.getFactory().createNode(this.scenario.createId("2"),  this.scenario.createCoord( 8000, 5000));
-		this.nodes[3] = this.network.getFactory().createNode(this.scenario.createId("3"),  this.scenario.createCoord(12000, 5000));
-		this.nodes[4] = this.network.getFactory().createNode(this.scenario.createId("4"),  this.scenario.createCoord(16000, 5000));
+		this.nodes[0] = this.network.getFactory().createNode(Id.create("0", Node.class),  this.scenario.createCoord(    0, 5000));
+		this.nodes[1] = this.network.getFactory().createNode(Id.create("1", Node.class),  this.scenario.createCoord( 4000, 5000));
+		this.nodes[2] = this.network.getFactory().createNode(Id.create("2", Node.class),  this.scenario.createCoord( 8000, 5000));
+		this.nodes[3] = this.network.getFactory().createNode(Id.create("3", Node.class),  this.scenario.createCoord(12000, 5000));
+		this.nodes[4] = this.network.getFactory().createNode(Id.create("4", Node.class),  this.scenario.createCoord(16000, 5000));
 		for (int i = 0; i < 5; i++) {
 			this.network.addNode(this.nodes[i]);
 		}
-		this.links[0] = this.network.getFactory().createLink(this.scenario.createId( "0"), this.nodes[0], this.nodes[1]);
-		this.links[1] = this.network.getFactory().createLink(this.scenario.createId( "1"), this.nodes[1], this.nodes[2]);
-		this.links[2] = this.network.getFactory().createLink(this.scenario.createId( "2"), this.nodes[2], this.nodes[3]);
-		this.links[3] = this.network.getFactory().createLink(this.scenario.createId( "3"), this.nodes[3], this.nodes[4]);
+		this.links[0] = this.network.getFactory().createLink(Id.create("0", Link.class), this.nodes[0], this.nodes[1]);
+		this.links[1] = this.network.getFactory().createLink(Id.create("1", Link.class), this.nodes[1], this.nodes[2]);
+		this.links[2] = this.network.getFactory().createLink(Id.create("2", Link.class), this.nodes[2], this.nodes[3]);
+		this.links[3] = this.network.getFactory().createLink(Id.create("3", Link.class), this.nodes[3], this.nodes[4]);
 		
 		this.links[0].setAllowedModes(CollectionUtils.stringToSet(TransportMode.walk + "," + TransportMode.transit_walk + "," + TransportMode.car));
 		this.links[1].setAllowedModes(CollectionUtils.stringToSet(TransportMode.car));

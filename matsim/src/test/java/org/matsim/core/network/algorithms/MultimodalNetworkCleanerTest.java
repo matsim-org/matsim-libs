@@ -29,11 +29,11 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -50,58 +50,58 @@ public class MultimodalNetworkCleanerTest {
 		cleaner.run(createHashSet(TransportMode.car));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[3]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[4]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[5]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[6]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.nodeIds[1]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.nodeIds[2]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.nodeIds[3]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.nodeIds[4]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.nodeIds[5]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.nodeIds[6]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.nodeIds[7]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.nodeIds[8]).getAllowedModes());
 	}
 
 	@Test
 	public void testRun_singleMode_separateLink() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
-		Node node1 = network.getNodes().get(f.ids[1]);
-		Node node3 = network.getNodes().get(f.ids[3]);
-		Node node4 = network.getNodes().get(f.ids[4]);
-		Node node6 = network.getNodes().get(f.ids[6]);
-		network.addLink(network.getFactory().createLink(f.ids[10], node1, node4));
-		network.addLink(network.getFactory().createLink(f.ids[11], node6, node3));
-		network.getLinks().get(f.ids[10]).setAllowedModes(f.modesW);
-		network.getLinks().get(f.ids[11]).setAllowedModes(f.modesC);
+		Node node1 = network.getNodes().get(f.nodeIds[1]);
+		Node node3 = network.getNodes().get(f.nodeIds[3]);
+		Node node4 = network.getNodes().get(f.nodeIds[4]);
+		Node node6 = network.getNodes().get(f.nodeIds[6]);
+		network.addLink(network.getFactory().createLink(f.linkIds[10], node1, node4));
+		network.addLink(network.getFactory().createLink(f.linkIds[11], node6, node3));
+		network.getLinks().get(f.linkIds[10]).setAllowedModes(f.modesW);
+		network.getLinks().get(f.linkIds[11]).setAllowedModes(f.modesC);
 
 		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 
 		cleaner.run(createHashSet(TransportMode.car));
 		Assert.assertEquals("wrong number of links.", 9, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[3]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[4]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[5]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[6]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[10]).getAllowedModes());
-		Assert.assertNull(network.getLinks().get(f.ids[11]));
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[1]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[2]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[3]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[8]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[10]).getAllowedModes());
+		Assert.assertNull(network.getLinks().get(f.linkIds[11]));
 
 		cleaner.run(createHashSet(TransportMode.walk));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[3]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[4]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[5]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[6]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes());
-		Assert.assertNull(network.getLinks().get(f.ids[10]));
-		Assert.assertNull(network.getLinks().get(f.ids[11]));
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[1]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[2]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[3]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[8]).getAllowedModes());
+		Assert.assertNull(network.getLinks().get(f.linkIds[10]));
+		Assert.assertNull(network.getLinks().get(f.linkIds[11]));
 	}
 
 	@Test
@@ -114,30 +114,30 @@ public class MultimodalNetworkCleanerTest {
 		cleaner.run(createHashSet("other"));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[3]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[4]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[5]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[6]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[1]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[2]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[3]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[8]).getAllowedModes());
 	}
 
 	@Test
 	public void testRun_singleMode_singleSink() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
-		Node node1 = network.getNodes().get(f.ids[1]);
-		Node node3 = network.getNodes().get(f.ids[3]);
-		Node node10 = network.getFactory().createNode(f.ids[10], f.scenario.createCoord(0, 200));
-		Node node11 = network.getFactory().createNode(f.ids[11], f.scenario.createCoord(200, 200));
+		Node node1 = network.getNodes().get(f.nodeIds[1]);
+		Node node3 = network.getNodes().get(f.nodeIds[3]);
+		Node node10 = network.getFactory().createNode(f.nodeIds[10], f.scenario.createCoord(0, 200));
+		Node node11 = network.getFactory().createNode(f.nodeIds[11], f.scenario.createCoord(200, 200));
 		network.addNode(node10);
 		network.addNode(node11);
-		network.addLink(network.getFactory().createLink(f.ids[10], node1, node10));
-		network.addLink(network.getFactory().createLink(f.ids[11], node3, node11));
-		network.getLinks().get(f.ids[10]).setAllowedModes(f.modesC);
-		network.getLinks().get(f.ids[11]).setAllowedModes(f.modesW);
+		network.addLink(network.getFactory().createLink(f.linkIds[10], node1, node10));
+		network.addLink(network.getFactory().createLink(f.linkIds[11], node3, node11));
+		network.getLinks().get(f.linkIds[10]).setAllowedModes(f.modesC);
+		network.getLinks().get(f.linkIds[11]).setAllowedModes(f.modesW);
 
 		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 		Assert.assertEquals("wrong number of links.", 10, network.getLinks().size());
@@ -146,16 +146,16 @@ public class MultimodalNetworkCleanerTest {
 		cleaner.run(createHashSet(TransportMode.car));
 		Assert.assertEquals("wrong number of links.", 9, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 7, network.getNodes().size());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[3]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[4]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[5]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[6]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[11]).getAllowedModes());
-		Assert.assertNull(network.getLinks().get(f.ids[10]));
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[1]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[2]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[3]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[8]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[11]).getAllowedModes());
+		Assert.assertNull(network.getLinks().get(f.linkIds[10]));
 
 		Assert.assertEquals("wrong number of links.", 9, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 7, network.getNodes().size());
@@ -163,15 +163,15 @@ public class MultimodalNetworkCleanerTest {
 		cleaner.run(createHashSet(TransportMode.walk));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[3]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[4]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[5]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[6]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes());
-		Assert.assertNull(network.getLinks().get(f.ids[11]));
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[1]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[2]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[3]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[8]).getAllowedModes());
+		Assert.assertNull(network.getLinks().get(f.linkIds[11]));
 
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
@@ -181,8 +181,8 @@ public class MultimodalNetworkCleanerTest {
 	public void testRun_singleMode_singleSinkIntegrated() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
-		network.getLinks().get(f.ids[1]).setAllowedModes(f.modesCW); // integrate the sinks into the existing network
-		network.getLinks().get(f.ids[8]).setAllowedModes(f.modesCW);
+		network.getLinks().get(f.nodeIds[1]).setAllowedModes(f.modesCW); // integrate the sinks into the existing network
+		network.getLinks().get(f.nodeIds[8]).setAllowedModes(f.modesCW);
 
 		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
@@ -191,14 +191,14 @@ public class MultimodalNetworkCleanerTest {
 		cleaner.run(createHashSet(TransportMode.car));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
-		Assert.assertEquals(f.modesCW, network.getLinks().get(f.ids[1]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[3]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[4]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[5]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[6]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes()); // only remove mode, not link!
+		Assert.assertEquals(f.modesCW, network.getLinks().get(f.linkIds[1]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[2]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[3]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[8]).getAllowedModes()); // only remove mode, not link!
 
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
@@ -206,14 +206,14 @@ public class MultimodalNetworkCleanerTest {
 		cleaner.run(createHashSet(TransportMode.walk));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes()); // only remove mode, not link!
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[3]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[4]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[5]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[6]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[1]).getAllowedModes()); // only remove mode, not link!
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[2]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[3]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[8]).getAllowedModes());
 
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
@@ -223,21 +223,21 @@ public class MultimodalNetworkCleanerTest {
 	public void testRun_singleMode_doubleSink() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
-		Node node1 = network.getNodes().get(f.ids[1]);
-		Node node2 = network.getNodes().get(f.ids[2]);
-		Node node3 = network.getNodes().get(f.ids[3]);
-		Node node10 = network.getFactory().createNode(f.ids[10], f.scenario.createCoord(0, 200));
-		Node node11 = network.getFactory().createNode(f.ids[11], f.scenario.createCoord(200, 200));
+		Node node1 = network.getNodes().get(f.nodeIds[1]);
+		Node node2 = network.getNodes().get(f.nodeIds[2]);
+		Node node3 = network.getNodes().get(f.nodeIds[3]);
+		Node node10 = network.getFactory().createNode(f.nodeIds[10], f.scenario.createCoord(0, 200));
+		Node node11 = network.getFactory().createNode(f.nodeIds[11], f.scenario.createCoord(200, 200));
 		network.addNode(node10);
 		network.addNode(node11);
-		network.addLink(network.getFactory().createLink(f.ids[10], node1, node10));
-		network.addLink(network.getFactory().createLink(f.ids[11], node2, node10));
-		network.addLink(network.getFactory().createLink(f.ids[12], node2, node11));
-		network.addLink(network.getFactory().createLink(f.ids[13], node3, node11));
-		network.getLinks().get(f.ids[10]).setAllowedModes(f.modesC);
-		network.getLinks().get(f.ids[11]).setAllowedModes(f.modesC);
-		network.getLinks().get(f.ids[12]).setAllowedModes(f.modesW);
-		network.getLinks().get(f.ids[13]).setAllowedModes(f.modesW);
+		network.addLink(network.getFactory().createLink(f.linkIds[10], node1, node10));
+		network.addLink(network.getFactory().createLink(f.linkIds[11], node2, node10));
+		network.addLink(network.getFactory().createLink(f.linkIds[12], node2, node11));
+		network.addLink(network.getFactory().createLink(f.linkIds[13], node3, node11));
+		network.getLinks().get(f.linkIds[10]).setAllowedModes(f.modesC);
+		network.getLinks().get(f.linkIds[11]).setAllowedModes(f.modesC);
+		network.getLinks().get(f.linkIds[12]).setAllowedModes(f.modesW);
+		network.getLinks().get(f.linkIds[13]).setAllowedModes(f.modesW);
 
 		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 		Assert.assertEquals("wrong number of links.", 12, network.getLinks().size());
@@ -247,32 +247,32 @@ public class MultimodalNetworkCleanerTest {
 
 		Assert.assertEquals("wrong number of links.", 10, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 7, network.getNodes().size());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[3]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[4]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[5]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[6]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[10]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[11]).getAllowedModes());
-		Assert.assertNull(network.getLinks().get(f.ids[12]));
-		Assert.assertNull(network.getLinks().get(f.ids[13]));
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[1]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[2]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[3]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[8]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[10]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[11]).getAllowedModes());
+		Assert.assertNull(network.getLinks().get(f.linkIds[12]));
+		Assert.assertNull(network.getLinks().get(f.linkIds[13]));
 
 		cleaner.run(createHashSet(TransportMode.car));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[3]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[4]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[5]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[6]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes());
-		Assert.assertNull(network.getLinks().get(f.ids[10]));
-		Assert.assertNull(network.getLinks().get(f.ids[11]));
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[1]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[2]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[3]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[8]).getAllowedModes());
+		Assert.assertNull(network.getLinks().get(f.linkIds[10]));
+		Assert.assertNull(network.getLinks().get(f.linkIds[11]));
 	}
 
 
@@ -280,16 +280,16 @@ public class MultimodalNetworkCleanerTest {
 	public void testRun_singleMode_singleSource() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
-		Node node1 = network.getNodes().get(f.ids[1]);
-		Node node3 = network.getNodes().get(f.ids[3]);
-		Node node10 = network.getFactory().createNode(f.ids[10], f.scenario.createCoord(0, 200));
-		Node node11 = network.getFactory().createNode(f.ids[11], f.scenario.createCoord(200, 200));
+		Node node1 = network.getNodes().get(f.nodeIds[1]);
+		Node node3 = network.getNodes().get(f.nodeIds[3]);
+		Node node10 = network.getFactory().createNode(f.nodeIds[10], f.scenario.createCoord(0, 200));
+		Node node11 = network.getFactory().createNode(f.nodeIds[11], f.scenario.createCoord(200, 200));
 		network.addNode(node10);
 		network.addNode(node11);
-		network.addLink(network.getFactory().createLink(f.ids[10], node10, node1));
-		network.addLink(network.getFactory().createLink(f.ids[11], node11, node3));
-		network.getLinks().get(f.ids[10]).setAllowedModes(f.modesC);
-		network.getLinks().get(f.ids[11]).setAllowedModes(f.modesW);
+		network.addLink(network.getFactory().createLink(f.linkIds[10], node10, node1));
+		network.addLink(network.getFactory().createLink(f.linkIds[11], node11, node3));
+		network.getLinks().get(f.linkIds[10]).setAllowedModes(f.modesC);
+		network.getLinks().get(f.linkIds[11]).setAllowedModes(f.modesW);
 
 		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 		Assert.assertEquals("wrong number of links.", 10, network.getLinks().size());
@@ -298,16 +298,16 @@ public class MultimodalNetworkCleanerTest {
 		cleaner.run(createHashSet(TransportMode.car));
 		Assert.assertEquals("wrong number of links.", 9, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 7, network.getNodes().size());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[3]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[4]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[5]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[6]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[11]).getAllowedModes());
-		Assert.assertNull(network.getLinks().get(f.ids[10]));
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[1]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[2]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[3]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[8]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[11]).getAllowedModes());
+		Assert.assertNull(network.getLinks().get(f.linkIds[10]));
 
 		Assert.assertEquals("wrong number of links.", 9, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 7, network.getNodes().size());
@@ -315,15 +315,15 @@ public class MultimodalNetworkCleanerTest {
 		cleaner.run(createHashSet(TransportMode.walk));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[3]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[4]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[5]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[6]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes());
-		Assert.assertNull(network.getLinks().get(f.ids[11]));
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[1]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[2]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[3]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[8]).getAllowedModes());
+		Assert.assertNull(network.getLinks().get(f.linkIds[11]));
 
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
@@ -333,7 +333,7 @@ public class MultimodalNetworkCleanerTest {
 	public void testRemoveNodesWithoutLinks() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
-		network.addNode(network.getFactory().createNode(f.ids[10], f.scenario.createCoord(300, 300)));
+		network.addNode(network.getFactory().createNode(f.nodeIds[10], f.scenario.createCoord(300, 300)));
 		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 7, network.getNodes().size());
@@ -353,21 +353,21 @@ public class MultimodalNetworkCleanerTest {
 	public void testRun_singleMode_doubleSource() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
-		Node node1 = network.getNodes().get(f.ids[1]);
-		Node node2 = network.getNodes().get(f.ids[2]);
-		Node node3 = network.getNodes().get(f.ids[3]);
-		Node node10 = network.getFactory().createNode(f.ids[10], f.scenario.createCoord(0, 200));
-		Node node11 = network.getFactory().createNode(f.ids[11], f.scenario.createCoord(200, 200));
+		Node node1 = network.getNodes().get(f.nodeIds[1]);
+		Node node2 = network.getNodes().get(f.nodeIds[2]);
+		Node node3 = network.getNodes().get(f.nodeIds[3]);
+		Node node10 = network.getFactory().createNode(f.nodeIds[10], f.scenario.createCoord(0, 200));
+		Node node11 = network.getFactory().createNode(f.nodeIds[11], f.scenario.createCoord(200, 200));
 		network.addNode(node10);
 		network.addNode(node11);
-		network.addLink(network.getFactory().createLink(f.ids[10], node10, node1));
-		network.addLink(network.getFactory().createLink(f.ids[11], node10, node2));
-		network.addLink(network.getFactory().createLink(f.ids[12], node11, node2));
-		network.addLink(network.getFactory().createLink(f.ids[13], node11, node3));
-		network.getLinks().get(f.ids[10]).setAllowedModes(f.modesC);
-		network.getLinks().get(f.ids[11]).setAllowedModes(f.modesC);
-		network.getLinks().get(f.ids[12]).setAllowedModes(f.modesW);
-		network.getLinks().get(f.ids[13]).setAllowedModes(f.modesW);
+		network.addLink(network.getFactory().createLink(f.linkIds[10], node10, node1));
+		network.addLink(network.getFactory().createLink(f.linkIds[11], node10, node2));
+		network.addLink(network.getFactory().createLink(f.linkIds[12], node11, node2));
+		network.addLink(network.getFactory().createLink(f.linkIds[13], node11, node3));
+		network.getLinks().get(f.linkIds[10]).setAllowedModes(f.modesC);
+		network.getLinks().get(f.linkIds[11]).setAllowedModes(f.modesC);
+		network.getLinks().get(f.linkIds[12]).setAllowedModes(f.modesW);
+		network.getLinks().get(f.linkIds[13]).setAllowedModes(f.modesW);
 
 		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 		Assert.assertEquals("wrong number of links.", 12, network.getLinks().size());
@@ -377,32 +377,32 @@ public class MultimodalNetworkCleanerTest {
 
 		Assert.assertEquals("wrong number of links.", 10, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 7, network.getNodes().size());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[3]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[4]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[5]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[6]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[10]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[11]).getAllowedModes());
-		Assert.assertNull(network.getLinks().get(f.ids[12]));
-		Assert.assertNull(network.getLinks().get(f.ids[13]));
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[1]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[2]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[3]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[8]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[10]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[11]).getAllowedModes());
+		Assert.assertNull(network.getLinks().get(f.linkIds[12]));
+		Assert.assertNull(network.getLinks().get(f.linkIds[13]));
 
 		cleaner.run(createHashSet(TransportMode.car));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[3]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[4]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[5]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[6]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes());
-		Assert.assertNull(network.getLinks().get(f.ids[10]));
-		Assert.assertNull(network.getLinks().get(f.ids[11]));
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[1]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[2]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[3]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[8]).getAllowedModes());
+		Assert.assertNull(network.getLinks().get(f.nodeIds[10]));
+		Assert.assertNull(network.getLinks().get(f.nodeIds[11]));
 	}
 
 	@Test
@@ -415,18 +415,18 @@ public class MultimodalNetworkCleanerTest {
 		cleaner.run(createHashSet(TransportMode.car, TransportMode.walk));
 		Assert.assertEquals("wrong number of links.", 12, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 9, network.getNodes().size());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[3]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[4]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[5]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[6]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[9]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[10]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[11]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[12]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[1]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[2]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[3]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[8]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[9]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[10]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[11]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[12]).getAllowedModes());
 	}
 
 	@Test
@@ -434,12 +434,12 @@ public class MultimodalNetworkCleanerTest {
 		Fixture f = new MultimodeFixture();
 		Network network = f.scenario.getNetwork();
 
-		Node node2 = network.getNodes().get(f.ids[2]);
-		Node node3 = network.getNodes().get(f.ids[3]);
-		Node node10 = network.getFactory().createNode(f.ids[10], f.scenario.createCoord(200, 200));
+		Node node2 = network.getNodes().get(f.nodeIds[2]);
+		Node node3 = network.getNodes().get(f.nodeIds[3]);
+		Node node10 = network.getFactory().createNode(f.nodeIds[10], f.scenario.createCoord(200, 200));
 		network.addNode(node10);
-		network.addLink(network.getFactory().createLink(f.ids[18], node2, node10));
-		network.addLink(network.getFactory().createLink(f.ids[19], node3, node10));
+		network.addLink(network.getFactory().createLink(f.linkIds[18], node2, node10));
+		network.addLink(network.getFactory().createLink(f.linkIds[19], node3, node10));
 
 		Assert.assertEquals("wrong number of links.", 14, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 10, network.getNodes().size());
@@ -449,18 +449,18 @@ public class MultimodalNetworkCleanerTest {
 		cleaner.run(createHashSet(TransportMode.car, TransportMode.walk));
 		Assert.assertEquals("wrong number of links.", 12, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 9, network.getNodes().size());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[3]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[4]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[5]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[6]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[9]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[10]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[11]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[12]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[1]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[2]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[3]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[8]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[9]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[10]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[11]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[12]).getAllowedModes());
 	}
 
 	@Test
@@ -468,12 +468,12 @@ public class MultimodalNetworkCleanerTest {
 		Fixture f = new MultimodeFixture();
 		Network network = f.scenario.getNetwork();
 
-		Node node2 = network.getNodes().get(f.ids[2]);
-		Node node3 = network.getNodes().get(f.ids[3]);
-		Node node10 = network.getFactory().createNode(f.ids[10], f.scenario.createCoord(200, 200));
+		Node node2 = network.getNodes().get(f.nodeIds[2]);
+		Node node3 = network.getNodes().get(f.nodeIds[3]);
+		Node node10 = network.getFactory().createNode(f.nodeIds[10], f.scenario.createCoord(200, 200));
 		network.addNode(node10);
-		network.addLink(network.getFactory().createLink(f.ids[18], node10, node2));
-		network.addLink(network.getFactory().createLink(f.ids[19], node10, node3));
+		network.addLink(network.getFactory().createLink(f.linkIds[18], node10, node2));
+		network.addLink(network.getFactory().createLink(f.linkIds[19], node10, node3));
 
 		Assert.assertEquals("wrong number of links.", 14, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 10, network.getNodes().size());
@@ -483,18 +483,18 @@ public class MultimodalNetworkCleanerTest {
 		cleaner.run(createHashSet(TransportMode.car, TransportMode.walk));
 		Assert.assertEquals("wrong number of links.", 12, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 9, network.getNodes().size());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[3]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[4]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[5]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[6]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[9]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[10]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[11]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[12]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[1]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[2]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[3]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[8]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[9]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[10]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[11]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[12]).getAllowedModes());
 	}
 
 	@Test
@@ -508,14 +508,14 @@ public class MultimodalNetworkCleanerTest {
 		// nothing should have changed from the initialization
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[3]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[4]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[5]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[6]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[1]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[2]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[3]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[8]).getAllowedModes());
 	}
 
 	@Test
@@ -529,14 +529,14 @@ public class MultimodalNetworkCleanerTest {
 		// nothing should have changed from the initialization
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[1]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[3]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[4]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[5]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[6]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.ids[7]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.ids[8]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[1]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[2]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[3]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[8]).getAllowedModes());
 	}
 
 	@Test
@@ -545,15 +545,16 @@ public class MultimodalNetworkCleanerTest {
 		Network network = scenario.getNetwork();
 		NetworkFactory factory = network.getFactory();
 
-		Id id1 = scenario.createId("1");
-		Id id2 = scenario.createId("2");
+		Id<Node> id1 = Id.create(1, Node.class);
+		Id<Node> id2 = Id.create(2, Node.class);
+		Id<Link> linkId1 = Id.create(1, Link.class);
 
 		Node node1 = factory.createNode(id1, scenario.createCoord(  0, 100));
 		Node node2 = factory.createNode(id2, scenario.createCoord(100, 100));
 		network.addNode(node1);
 		network.addNode(node2);
-		network.addLink(factory.createLink(id1, node1, node2));
-		network.getLinks().get(id1).setAllowedModes(Collections.singleton(TransportMode.car));
+		network.addLink(factory.createLink(linkId1, node1, node2));
+		network.getLinks().get(linkId1).setAllowedModes(Collections.singleton(TransportMode.car));
 
 		new MultimodalNetworkCleaner(network).run(Collections.singleton(TransportMode.car));
 		/* a single link is no complete network, as the link's
@@ -579,14 +580,14 @@ public class MultimodalNetworkCleanerTest {
 		MultimodalFixture2 f = new MultimodalFixture2();
 		Network network = f.scenario.getNetwork();
 		NetworkFactory nf = network.getFactory();
-		Node node4 = network.getNodes().get(f.ids[4]);
-		Node node5 = network.getNodes().get(f.ids[5]);
-		Node node7 = nf.createNode(f.ids[7], f.scenario.createCoord(600, 100));
+		Node node4 = network.getNodes().get(f.nodeIds[4]);
+		Node node5 = network.getNodes().get(f.nodeIds[5]);
+		Node node7 = nf.createNode(f.nodeIds[7], f.scenario.createCoord(600, 100));
 		network.addNode(node7);
-		network.addLink(nf.createLink(f.ids[10], node4, node7));
-		network.addLink(nf.createLink(f.ids[11], node7, node5));
-		network.getLinks().get(f.ids[10]).setAllowedModes(f.modesT);
-		network.getLinks().get(f.ids[11]).setAllowedModes(f.modesW);
+		network.addLink(nf.createLink(f.linkIds[10], node4, node7));
+		network.addLink(nf.createLink(f.linkIds[11], node7, node5));
+		network.getLinks().get(f.linkIds[10]).setAllowedModes(f.modesT);
+		network.getLinks().get(f.linkIds[11]).setAllowedModes(f.modesW);
 		Assert.assertEquals(7, network.getNodes().size());
 		Assert.assertEquals(10, network.getLinks().size());
 		new MultimodalNetworkCleaner(network).run(Collections.singleton(TransportMode.walk), Collections.singleton(TransportMode.pt));
@@ -599,14 +600,14 @@ public class MultimodalNetworkCleanerTest {
 		MultimodalFixture2 f = new MultimodalFixture2();
 		Network network = f.scenario.getNetwork();
 		NetworkFactory nf = network.getFactory();
-		Node node4 = network.getNodes().get(f.ids[4]);
-		Node node5 = network.getNodes().get(f.ids[5]);
-		Node node7 = nf.createNode(f.ids[7], f.scenario.createCoord(600, 100));
+		Node node4 = network.getNodes().get(f.nodeIds[4]);
+		Node node5 = network.getNodes().get(f.nodeIds[5]);
+		Node node7 = nf.createNode(f.nodeIds[7], f.scenario.createCoord(600, 100));
 		network.addNode(node7);
-		network.addLink(nf.createLink(f.ids[10], node4, node7));
-		network.addLink(nf.createLink(f.ids[11], node7, node5));
-		network.getLinks().get(f.ids[10]).setAllowedModes(f.modesW);
-		network.getLinks().get(f.ids[11]).setAllowedModes(f.modesT);
+		network.addLink(nf.createLink(f.linkIds[10], node4, node7));
+		network.addLink(nf.createLink(f.linkIds[11], node7, node5));
+		network.getLinks().get(f.linkIds[10]).setAllowedModes(f.modesW);
+		network.getLinks().get(f.linkIds[11]).setAllowedModes(f.modesT);
 		Assert.assertEquals(7, network.getNodes().size());
 		Assert.assertEquals(10, network.getLinks().size());
 		new MultimodalNetworkCleaner(network).run(Collections.singleton(TransportMode.walk), Collections.singleton(TransportMode.pt));
@@ -619,20 +620,20 @@ public class MultimodalNetworkCleanerTest {
 		MultimodalFixture2 f = new MultimodalFixture2();
 		Network network = f.scenario.getNetwork();
 		NetworkFactory nf = network.getFactory();
-		Node node4 = network.getNodes().get(f.ids[4]);
-		Node node5 = network.getNodes().get(f.ids[5]);
-		Node node7 = nf.createNode(f.ids[7], f.scenario.createCoord(600, 100));
+		Node node4 = network.getNodes().get(f.nodeIds[4]);
+		Node node5 = network.getNodes().get(f.nodeIds[5]);
+		Node node7 = nf.createNode(f.nodeIds[7], f.scenario.createCoord(600, 100));
 		network.addNode(node7);
-		network.addLink(nf.createLink(f.ids[10], node4, node7));
-		network.addLink(nf.createLink(f.ids[11], node7, node5));
-		network.getLinks().get(f.ids[10]).setAllowedModes(Collections.singleton("bike"));
-		network.getLinks().get(f.ids[11]).setAllowedModes(f.modesW);
+		network.addLink(nf.createLink(f.linkIds[10], node4, node7));
+		network.addLink(nf.createLink(f.linkIds[11], node7, node5));
+		network.getLinks().get(f.linkIds[10]).setAllowedModes(Collections.singleton("bike"));
+		network.getLinks().get(f.linkIds[11]).setAllowedModes(f.modesW);
 		Assert.assertEquals(7, network.getNodes().size());
 		Assert.assertEquals(10, network.getLinks().size());
 		new MultimodalNetworkCleaner(network).run(Collections.singleton(TransportMode.walk), Collections.singleton(TransportMode.pt));
 		Assert.assertEquals(7, network.getNodes().size());
 		Assert.assertEquals(9, network.getLinks().size());
-		Assert.assertNull(network.getLinks().get(f.ids[11]));
+		Assert.assertNull(network.getLinks().get(f.linkIds[11]));
 	}
 
 	@Test
@@ -640,20 +641,20 @@ public class MultimodalNetworkCleanerTest {
 		MultimodalFixture2 f = new MultimodalFixture2();
 		Network network = f.scenario.getNetwork();
 		NetworkFactory nf = network.getFactory();
-		Node node4 = network.getNodes().get(f.ids[4]);
-		Node node5 = network.getNodes().get(f.ids[5]);
-		Node node7 = nf.createNode(f.ids[7], f.scenario.createCoord(600, 100));
+		Node node4 = network.getNodes().get(f.nodeIds[4]);
+		Node node5 = network.getNodes().get(f.nodeIds[5]);
+		Node node7 = nf.createNode(f.nodeIds[7], f.scenario.createCoord(600, 100));
 		network.addNode(node7);
-		network.addLink(nf.createLink(f.ids[10], node4, node7));
-		network.addLink(nf.createLink(f.ids[11], node7, node5));
-		network.getLinks().get(f.ids[10]).setAllowedModes(f.modesW);
-		network.getLinks().get(f.ids[11]).setAllowedModes(Collections.singleton("bike"));
+		network.addLink(nf.createLink(f.linkIds[10], node4, node7));
+		network.addLink(nf.createLink(f.linkIds[11], node7, node5));
+		network.getLinks().get(f.linkIds[10]).setAllowedModes(f.modesW);
+		network.getLinks().get(f.linkIds[11]).setAllowedModes(Collections.singleton("bike"));
 		Assert.assertEquals(7, network.getNodes().size());
 		Assert.assertEquals(10, network.getLinks().size());
 		new MultimodalNetworkCleaner(network).run(Collections.singleton(TransportMode.walk), Collections.singleton(TransportMode.pt));
 		Assert.assertEquals(7, network.getNodes().size());
 		Assert.assertEquals(9, network.getLinks().size());
-		Assert.assertNull(network.getLinks().get(f.ids[10]));
+		Assert.assertNull(network.getLinks().get(f.linkIds[10]));
 	}
 
 	@Test
@@ -661,31 +662,31 @@ public class MultimodalNetworkCleanerTest {
 		MultimodalFixture2 f = new MultimodalFixture2();
 		Network network = f.scenario.getNetwork();
 		NetworkFactory nf = network.getFactory();
-		Node node7 = nf.createNode(f.ids[7], f.scenario.createCoord(600, 100));
-		Node node8 = nf.createNode(f.ids[8], f.scenario.createCoord(600, 000));
+		Node node7 = nf.createNode(f.nodeIds[7], f.scenario.createCoord(600, 100));
+		Node node8 = nf.createNode(f.nodeIds[8], f.scenario.createCoord(600, 000));
 		network.addNode(node7);
 		network.addNode(node8);
-		network.addLink(nf.createLink(f.ids[10], node7, node8));
-		network.addLink(nf.createLink(f.ids[11], node8, node7));
-		network.getLinks().get(f.ids[10]).setAllowedModes(f.modesW);
-		network.getLinks().get(f.ids[11]).setAllowedModes(f.modesW);
-		Node node9 = nf.createNode(f.ids[9], f.scenario.createCoord(700, 100));
-		Node node10 = nf.createNode(f.ids[10], f.scenario.createCoord(700, 000));
+		network.addLink(nf.createLink(f.linkIds[10], node7, node8));
+		network.addLink(nf.createLink(f.linkIds[11], node8, node7));
+		network.getLinks().get(f.linkIds[10]).setAllowedModes(f.modesW);
+		network.getLinks().get(f.linkIds[11]).setAllowedModes(f.modesW);
+		Node node9 = nf.createNode(f.nodeIds[9], f.scenario.createCoord(700, 100));
+		Node node10 = nf.createNode(f.nodeIds[10], f.scenario.createCoord(700, 000));
 		network.addNode(node9);
 		network.addNode(node10);
-		network.addLink(nf.createLink(f.ids[12], node9, node10));
-		network.addLink(nf.createLink(f.ids[13], node10, node9));
-		network.getLinks().get(f.ids[12]).setAllowedModes(f.modesW);
-		network.getLinks().get(f.ids[13]).setAllowedModes(f.modesT);
+		network.addLink(nf.createLink(f.linkIds[12], node9, node10));
+		network.addLink(nf.createLink(f.linkIds[13], node10, node9));
+		network.getLinks().get(f.linkIds[12]).setAllowedModes(f.modesW);
+		network.getLinks().get(f.linkIds[13]).setAllowedModes(f.modesT);
 		Assert.assertEquals(10, network.getNodes().size());
 		Assert.assertEquals(12, network.getLinks().size());
 		new MultimodalNetworkCleaner(network).run(Collections.singleton(TransportMode.walk), Collections.singleton(TransportMode.pt));
 		Assert.assertEquals(8, network.getNodes().size());
 		Assert.assertEquals(9, network.getLinks().size());
-		Assert.assertNull(network.getLinks().get(f.ids[10]));
-		Assert.assertNull(network.getLinks().get(f.ids[11]));
-		Assert.assertNull(network.getLinks().get(f.ids[12]));
-		Assert.assertNotNull(network.getLinks().get(f.ids[13]));
+		Assert.assertNull(network.getLinks().get(f.linkIds[10]));
+		Assert.assertNull(network.getLinks().get(f.linkIds[11]));
+		Assert.assertNull(network.getLinks().get(f.linkIds[12]));
+		Assert.assertNotNull(network.getLinks().get(f.linkIds[13]));
 	}
 
 	/**
@@ -711,47 +712,51 @@ public class MultimodalNetworkCleanerTest {
 	 */
 	private static class Fixture {
 
-		/*package*/ final Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		/*package*/ final Id[] ids = new Id[21];
+		/*package*/ final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		/*package*/ final Id<Node>[] nodeIds = new Id[21];
+		/*package*/ final Id<Link>[] linkIds = new Id[21];
 		/*package*/ final Set<String> modesC = createHashSet(TransportMode.car);
 		/*package*/ final Set<String> modesW = createHashSet(TransportMode.walk);
 		/*package*/ final Set<String> modesCW = createHashSet(TransportMode.car, TransportMode.walk);
 
 		/*package*/ Fixture() {
-			for (int i = 0; i < this.ids.length; i++) {
-				this.ids[i] = this.scenario.createId(Integer.toString(i));
+			for (int i = 0; i < this.nodeIds.length; i++) {
+				this.nodeIds[i] = Id.create(i, Node.class);
+			}
+			for (int i = 0; i < this.linkIds.length; i++) {
+				this.linkIds[i] = Id.create(i, Link.class);
 			}
 
 			Network network = this.scenario.getNetwork();
 			NetworkFactory factory = network.getFactory();
-			Node node1 = factory.createNode(this.ids[1], this.scenario.createCoord(  0, 100));
-			Node node2 = factory.createNode(this.ids[2], this.scenario.createCoord(100, 100));
-			Node node3 = factory.createNode(this.ids[3], this.scenario.createCoord(200, 100));
-			Node node4 = factory.createNode(this.ids[4], this.scenario.createCoord(  0, 100));
-			Node node5 = factory.createNode(this.ids[5], this.scenario.createCoord(100,   0));
-			Node node6 = factory.createNode(this.ids[6], this.scenario.createCoord(200,   0));
+			Node node1 = factory.createNode(this.nodeIds[1], this.scenario.createCoord(  0, 100));
+			Node node2 = factory.createNode(this.nodeIds[2], this.scenario.createCoord(100, 100));
+			Node node3 = factory.createNode(this.nodeIds[3], this.scenario.createCoord(200, 100));
+			Node node4 = factory.createNode(this.nodeIds[4], this.scenario.createCoord(  0, 100));
+			Node node5 = factory.createNode(this.nodeIds[5], this.scenario.createCoord(100,   0));
+			Node node6 = factory.createNode(this.nodeIds[6], this.scenario.createCoord(200,   0));
 			network.addNode(node1);
 			network.addNode(node2);
 			network.addNode(node3);
 			network.addNode(node4);
 			network.addNode(node5);
 			network.addNode(node6);
-			network.addLink(factory.createLink(this.ids[1], node1, node2));
-			network.addLink(factory.createLink(this.ids[2], node2, node3));
-			network.addLink(factory.createLink(this.ids[3], node4, node1));
-			network.addLink(factory.createLink(this.ids[4], node2, node5));
-			network.addLink(factory.createLink(this.ids[5], node5, node2));
-			network.addLink(factory.createLink(this.ids[6], node3, node6));
-			network.addLink(factory.createLink(this.ids[7], node5, node4));
-			network.addLink(factory.createLink(this.ids[8], node6, node5));
-			network.getLinks().get(this.ids[1]).setAllowedModes(this.modesC);
-			network.getLinks().get(this.ids[2]).setAllowedModes(this.modesW);
-			network.getLinks().get(this.ids[3]).setAllowedModes(this.modesC);
-			network.getLinks().get(this.ids[4]).setAllowedModes(this.modesC);
-			network.getLinks().get(this.ids[5]).setAllowedModes(this.modesW);
-			network.getLinks().get(this.ids[6]).setAllowedModes(this.modesW);
-			network.getLinks().get(this.ids[7]).setAllowedModes(this.modesC);
-			network.getLinks().get(this.ids[8]).setAllowedModes(this.modesW);
+			network.addLink(factory.createLink(this.linkIds[1], node1, node2));
+			network.addLink(factory.createLink(this.linkIds[2], node2, node3));
+			network.addLink(factory.createLink(this.linkIds[3], node4, node1));
+			network.addLink(factory.createLink(this.linkIds[4], node2, node5));
+			network.addLink(factory.createLink(this.linkIds[5], node5, node2));
+			network.addLink(factory.createLink(this.linkIds[6], node3, node6));
+			network.addLink(factory.createLink(this.linkIds[7], node5, node4));
+			network.addLink(factory.createLink(this.linkIds[8], node6, node5));
+			network.getLinks().get(this.linkIds[1]).setAllowedModes(this.modesC);
+			network.getLinks().get(this.linkIds[2]).setAllowedModes(this.modesW);
+			network.getLinks().get(this.linkIds[3]).setAllowedModes(this.modesC);
+			network.getLinks().get(this.linkIds[4]).setAllowedModes(this.modesC);
+			network.getLinks().get(this.linkIds[5]).setAllowedModes(this.modesW);
+			network.getLinks().get(this.linkIds[6]).setAllowedModes(this.modesW);
+			network.getLinks().get(this.linkIds[7]).setAllowedModes(this.modesC);
+			network.getLinks().get(this.linkIds[8]).setAllowedModes(this.modesW);
 		}
 	}
 
@@ -789,23 +794,23 @@ public class MultimodalNetworkCleanerTest {
 			super();
 			Network network = this.scenario.getNetwork();
 			NetworkFactory factory = network.getFactory();
-			Node node4 = network.getNodes().get(this.ids[4]);
-			Node node6 = network.getNodes().get(this.ids[6]);
-			Node node7 = factory.createNode(this.ids[7], this.scenario.createCoord(  0, -100));
-			Node node8 = factory.createNode(this.ids[8], this.scenario.createCoord(100, -100));
-			Node node9 = factory.createNode(this.ids[9], this.scenario.createCoord(200, -100));
+			Node node4 = network.getNodes().get(this.nodeIds[4]);
+			Node node6 = network.getNodes().get(this.nodeIds[6]);
+			Node node7 = factory.createNode(this.nodeIds[7], this.scenario.createCoord(  0, -100));
+			Node node8 = factory.createNode(this.nodeIds[8], this.scenario.createCoord(100, -100));
+			Node node9 = factory.createNode(this.nodeIds[9], this.scenario.createCoord(200, -100));
 			network.addNode(node7);
 			network.addNode(node8);
 			network.addNode(node9);
 
-			network.addLink(factory.createLink(this.ids[ 9], node7, node4));
-			network.addLink(factory.createLink(this.ids[10], node6, node9));
-			network.addLink(factory.createLink(this.ids[11], node8, node7));
-			network.addLink(factory.createLink(this.ids[12], node9, node8));
-			network.getLinks().get(this.ids[ 9]).setAllowedModes(this.modesC);
-			network.getLinks().get(this.ids[10]).setAllowedModes(this.modesW);
-			network.getLinks().get(this.ids[11]).setAllowedModes(this.modesC);
-			network.getLinks().get(this.ids[12]).setAllowedModes(this.modesW);
+			network.addLink(factory.createLink(this.linkIds[ 9], node7, node4));
+			network.addLink(factory.createLink(this.linkIds[10], node6, node9));
+			network.addLink(factory.createLink(this.linkIds[11], node8, node7));
+			network.addLink(factory.createLink(this.linkIds[12], node9, node8));
+			network.getLinks().get(this.linkIds[ 9]).setAllowedModes(this.modesC);
+			network.getLinks().get(this.linkIds[10]).setAllowedModes(this.modesW);
+			network.getLinks().get(this.linkIds[11]).setAllowedModes(this.modesC);
+			network.getLinks().get(this.linkIds[12]).setAllowedModes(this.modesW);
 		}
 	}
 
@@ -833,47 +838,51 @@ public class MultimodalNetworkCleanerTest {
 	 * @author mrieser
 	 */
 	private static class MultimodalFixture2 {
-		/*package*/ final Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		/*package*/ final Id[] ids = new Id[21];
+		/*package*/ final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		/*package*/ final Id<Node>[] nodeIds = new Id[21];
+		/*package*/ final Id<Link>[] linkIds = new Id[21];
 		/*package*/ final Set<String> modesT = createHashSet(TransportMode.pt);
 		/*package*/ final Set<String> modesW = createHashSet(TransportMode.walk);
 		/*package*/ final Set<String> modesWT = createHashSet(TransportMode.pt, TransportMode.walk);
 
 		/*package*/ MultimodalFixture2() {
-			for (int i = 0; i < this.ids.length; i++) {
-				this.ids[i] = this.scenario.createId(Integer.toString(i));
+			for (int i = 0; i < this.nodeIds.length; i++) {
+				this.nodeIds[i] = Id.create(i, Node.class);
+			}
+			for (int i = 0; i < this.linkIds.length; i++) {
+				this.linkIds[i] = Id.create(i, Link.class);
 			}
 
 			Network network = this.scenario.getNetwork();
 			NetworkFactory factory = network.getFactory();
-			Node node1 = factory.createNode(this.ids[1], this.scenario.createCoord(  0, 100));
-			Node node2 = factory.createNode(this.ids[2], this.scenario.createCoord(100, 100));
-			Node node3 = factory.createNode(this.ids[3], this.scenario.createCoord(  0,   0));
-			Node node4 = factory.createNode(this.ids[4], this.scenario.createCoord(400, 100));
-			Node node5 = factory.createNode(this.ids[5], this.scenario.createCoord(400,   0));
-			Node node6 = factory.createNode(this.ids[6], this.scenario.createCoord(300,   0));
+			Node node1 = factory.createNode(this.nodeIds[1], this.scenario.createCoord(  0, 100));
+			Node node2 = factory.createNode(this.nodeIds[2], this.scenario.createCoord(100, 100));
+			Node node3 = factory.createNode(this.nodeIds[3], this.scenario.createCoord(  0,   0));
+			Node node4 = factory.createNode(this.nodeIds[4], this.scenario.createCoord(400, 100));
+			Node node5 = factory.createNode(this.nodeIds[5], this.scenario.createCoord(400,   0));
+			Node node6 = factory.createNode(this.nodeIds[6], this.scenario.createCoord(300,   0));
 			network.addNode(node1);
 			network.addNode(node2);
 			network.addNode(node3);
 			network.addNode(node4);
 			network.addNode(node5);
 			network.addNode(node6);
-			network.addLink(factory.createLink(this.ids[1], node1, node2));
-			network.addLink(factory.createLink(this.ids[2], node2, node3));
-			network.addLink(factory.createLink(this.ids[3], node3, node1));
-			network.addLink(factory.createLink(this.ids[4], node4, node5));
-			network.addLink(factory.createLink(this.ids[5], node5, node6));
-			network.addLink(factory.createLink(this.ids[6], node6, node4));
-			network.addLink(factory.createLink(this.ids[7], node2, node4));
-			network.addLink(factory.createLink(this.ids[8], node6, node3));
-			network.getLinks().get(this.ids[1]).setAllowedModes(this.modesWT);
-			network.getLinks().get(this.ids[2]).setAllowedModes(this.modesW);
-			network.getLinks().get(this.ids[3]).setAllowedModes(this.modesWT);
-			network.getLinks().get(this.ids[4]).setAllowedModes(this.modesWT);
-			network.getLinks().get(this.ids[5]).setAllowedModes(this.modesWT);
-			network.getLinks().get(this.ids[6]).setAllowedModes(this.modesW);
-			network.getLinks().get(this.ids[7]).setAllowedModes(this.modesT);
-			network.getLinks().get(this.ids[8]).setAllowedModes(this.modesT);
+			network.addLink(factory.createLink(this.linkIds[1], node1, node2));
+			network.addLink(factory.createLink(this.linkIds[2], node2, node3));
+			network.addLink(factory.createLink(this.linkIds[3], node3, node1));
+			network.addLink(factory.createLink(this.linkIds[4], node4, node5));
+			network.addLink(factory.createLink(this.linkIds[5], node5, node6));
+			network.addLink(factory.createLink(this.linkIds[6], node6, node4));
+			network.addLink(factory.createLink(this.linkIds[7], node2, node4));
+			network.addLink(factory.createLink(this.linkIds[8], node6, node3));
+			network.getLinks().get(this.linkIds[1]).setAllowedModes(this.modesWT);
+			network.getLinks().get(this.linkIds[2]).setAllowedModes(this.modesW);
+			network.getLinks().get(this.linkIds[3]).setAllowedModes(this.modesWT);
+			network.getLinks().get(this.linkIds[4]).setAllowedModes(this.modesWT);
+			network.getLinks().get(this.linkIds[5]).setAllowedModes(this.modesWT);
+			network.getLinks().get(this.linkIds[6]).setAllowedModes(this.modesW);
+			network.getLinks().get(this.linkIds[7]).setAllowedModes(this.modesT);
+			network.getLinks().get(this.linkIds[8]).setAllowedModes(this.modesT);
 		}
 	}
 

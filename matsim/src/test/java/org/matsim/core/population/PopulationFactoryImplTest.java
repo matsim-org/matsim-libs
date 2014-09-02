@@ -20,10 +20,12 @@
 package org.matsim.core.population;
 
 import junit.framework.Assert;
+
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -42,7 +44,7 @@ public class PopulationFactoryImplTest {
 		Scenario scenario = ScenarioUtils.createScenario(config);
         PopulationFactoryImpl pf = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 
-		Id linkId = scenario.createId("1");
+        Id<Link> linkId = Id.create(1, Link.class);
 		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.createRoute(TransportMode.car, linkId, linkId).getClass());
 		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.createRoute(TransportMode.ride, linkId, linkId).getClass());
 	}
@@ -54,7 +56,7 @@ public class PopulationFactoryImplTest {
 		Scenario scenario = ScenarioUtils.createScenario(config);
         PopulationFactoryImpl pf = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 
-		Id linkId = scenario.createId("1");
+        Id<Link> linkId = Id.create(1, Link.class);
 		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.createRoute(TransportMode.car, linkId, linkId).getClass());
 		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.createRoute(TransportMode.ride, linkId, linkId).getClass());
 	}
@@ -66,7 +68,7 @@ public class PopulationFactoryImplTest {
 		Scenario scenario = ScenarioUtils.createScenario(config);
         PopulationFactoryImpl pf = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 
-		Id linkId = scenario.createId("1");
+		Id<Link> linkId = Id.create(1, Link.class);
 		Assert.assertEquals(CompressedNetworkRouteImpl.class, pf.createRoute(TransportMode.car, linkId, linkId).getClass());
 		Assert.assertEquals(CompressedNetworkRouteImpl.class, pf.createRoute(TransportMode.ride, linkId, linkId).getClass());
 	}

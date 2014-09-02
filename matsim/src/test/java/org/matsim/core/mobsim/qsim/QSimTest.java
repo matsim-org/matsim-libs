@@ -1316,17 +1316,17 @@ public class QSimTest {
 
 		// build simple network with 2 links
 		Network network = scenario.getNetwork();
-		Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
-		Node node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
-		Node node3 = network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000.0, 0.0));
+		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(0.0, 0.0));
+		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(1000.0, 0.0));
+		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), scenario.createCoord(2000.0, 0.0));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
-		Link link1 = network.getFactory().createLink(scenario.createId("1"), node1, node2);
+		Link link1 = network.getFactory().createLink(Id.create("1", Link.class), node1, node2);
 		link1.setFreespeed(10.0); // freespeed-traveltime = 100s
 		link1.setCapacity(2000.0);
 		network.addLink(link1);
-		Link link2 = network.getFactory().createLink(scenario.createId("2"), node2, node3);
+		Link link2 = network.getFactory().createLink(Id.create("2", Link.class), node2, node3);
 		link2.setFreespeed(10.0); // freespeed-traveltime = 100s
 		link2.setCapacity(2000.0);
 		network.addLink(link2);
@@ -1335,7 +1335,7 @@ public class QSimTest {
 		Population population = scenario.getPopulation();
 		PopulationFactory pb = population.getFactory();
 		// person 1 : on the road when simulation ends
-		Person person1 = pb.createPerson(scenario.createId("1"));
+		Person person1 = pb.createPerson(Id.create("1", Person.class));
 		Plan plan1 = pb.createPlan();
 		Activity act1_1 = pb.createActivityFromLinkId("h", link1.getId());
 		act1_1.setEndTime(simEndTime - 20);
@@ -1350,7 +1350,7 @@ public class QSimTest {
 		person1.addPlan(plan1);
 		population.addPerson(person1);
 		// person 2 : on teleportation when simulation ends
-		Person person2 = pb.createPerson(scenario.createId("2"));
+		Person person2 = pb.createPerson(Id.create("2", Person.class));
 		Plan plan2 = pb.createPlan();
 		Activity act2_1 = pb.createActivityFromLinkId("h", link1.getId());
 		act2_1.setEndTime(simEndTime - 1000);
@@ -1365,7 +1365,7 @@ public class QSimTest {
 		person2.addPlan(plan2);
 		population.addPerson(person2);
 		// person 3 : still at home when simulation ends
-		Person person3 = pb.createPerson(scenario.createId("3"));
+		Person person3 = pb.createPerson(Id.create("3", Person.class));
 		Plan plan3 = pb.createPlan();
 		Activity act3_1 = pb.createActivityFromLinkId("h", link1.getId());
 		act3_1.setEndTime(simEndTime + 1000);
@@ -1468,13 +1468,13 @@ public class QSimTest {
 			/* build network */
 			this.network = (NetworkImpl) this.scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));
-			this.node1 = this.network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-			this.node2 = this.network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
-			this.node3 = this.network.createAndAddNode(new IdImpl("3"), new CoordImpl(1100, 0));
-			this.node4 = this.network.createAndAddNode(new IdImpl("4"), new CoordImpl(1200, 0));
-			this.link1 = this.network.createAndAddLink(new IdImpl("1"), this.node1, this.node2, 100, 100, 60000, 9);
-			this.link2 = this.network.createAndAddLink(new IdImpl("2"), this.node2, this.node3, 1000, 100, 6000, 2);
-			this.link3 = this.network.createAndAddLink(new IdImpl("3"), this.node3, this.node4, 100, 100, 60000, 9);
+			this.node1 = this.network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
+			this.node2 = this.network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100, 0));
+			this.node3 = this.network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(1100, 0));
+			this.node4 = this.network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(1200, 0));
+			this.link1 = this.network.createAndAddLink(Id.create("1", Link.class), this.node1, this.node2, 100, 100, 60000, 9);
+			this.link2 = this.network.createAndAddLink(Id.create("2", Link.class), this.node2, this.node3, 1000, 100, 6000, 2);
+			this.link3 = this.network.createAndAddLink(Id.create("3", Link.class), this.node3, this.node4, 100, 100, 60000, 9);
 
 			/* build plans */
 			this.plans = scenario.getPopulation();

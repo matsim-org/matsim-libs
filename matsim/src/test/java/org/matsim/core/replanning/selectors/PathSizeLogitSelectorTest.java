@@ -1,5 +1,5 @@
-/* *********************************************************************** *
- * project: org.matsim.*
+/* ***********************************************, ************************ *
+ * project: org.matsim.*1, Person.class
  * BestPlanSelectorTest.java
  *                                                                         *
  * *********************************************************************** *
@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -80,16 +81,16 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		this.network = createNetwork();
 		PlanSelector selector = getPlanSelector();
 
-		Link l1 = network.getLinks().get(new IdImpl("1"));
-		Link l2 = network.getLinks().get(new IdImpl("2"));
-		Link l3 = network.getLinks().get(new IdImpl("3"));
-		Link l4 = network.getLinks().get(new IdImpl("4"));
-		Link l5 = network.getLinks().get(new IdImpl("5"));
-		Link l6 = network.getLinks().get(new IdImpl("6"));
-		Link l7 = network.getLinks().get(new IdImpl("7"));
+		Link l1 = network.getLinks().get(Id.create("1", Link.class));
+		Link l2 = network.getLinks().get(Id.create("2", Link.class));
+		Link l3 = network.getLinks().get(Id.create("3", Link.class));
+		Link l4 = network.getLinks().get(Id.create("4", Link.class));
+		Link l5 = network.getLinks().get(Id.create("5", Link.class));
+		Link l6 = network.getLinks().get(Id.create("6", Link.class));
+		Link l7 = network.getLinks().get(Id.create("7", Link.class));
 
 		// test with only one plan...
-		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
 		PlanImpl p1 = new PlanImpl(person);
 		Activity a = new ActivityImpl("h", l6.getId());
 		Activity b = new ActivityImpl("w", l7.getId());
@@ -187,11 +188,11 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	public void testZeroScore() {
 		this.network = createNetwork();
 		PlanSelector selector = getPlanSelector();
-		Link l1 = network.getLinks().get(new IdImpl("1"));
-		Link l6 = network.getLinks().get(new IdImpl("6"));
-		Link l7 = network.getLinks().get(new IdImpl("7"));
+		Link l1 = network.getLinks().get(Id.create("1", Link.class));
+		Link l6 = network.getLinks().get(Id.create("6", Link.class));
+		Link l7 = network.getLinks().get(Id.create("7", Link.class));
 
-		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
 		PlanImpl p1 = new org.matsim.core.population.PlanImpl(person);
 		ActivityImpl a = new org.matsim.core.population.ActivityImpl("h", l6.getId());
 		ActivityImpl b = new org.matsim.core.population.ActivityImpl("w", l7.getId());
@@ -218,15 +219,15 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	public void testPathSizeLogitSelector() {
 		this.network = createNetwork();
 
-		Link l1 = network.getLinks().get(new IdImpl("1"));
-		Link l2 = network.getLinks().get(new IdImpl("2"));
-		Link l3 = network.getLinks().get(new IdImpl("3"));
-		Link l4 = network.getLinks().get(new IdImpl("4"));
-		Link l5 = network.getLinks().get(new IdImpl("5"));
-		Link l6 = network.getLinks().get(new IdImpl("6"));
-		Link l7 = network.getLinks().get(new IdImpl("7"));
+		Link l1 = network.getLinks().get(Id.create("1", Link.class));
+		Link l2 = network.getLinks().get(Id.create("2", Link.class));
+		Link l3 = network.getLinks().get(Id.create("3", Link.class));
+		Link l4 = network.getLinks().get(Id.create("4", Link.class));
+		Link l5 = network.getLinks().get(Id.create("5", Link.class));
+		Link l6 = network.getLinks().get(Id.create("6", Link.class));
+		Link l7 = network.getLinks().get(Id.create("7", Link.class));
 
-		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
 		PlanImpl p1 = new org.matsim.core.population.PlanImpl(person);
 		ActivityImpl a = new org.matsim.core.population.ActivityImpl("h", l6.getId());
 		ActivityImpl b = new org.matsim.core.population.ActivityImpl("w", l7.getId());

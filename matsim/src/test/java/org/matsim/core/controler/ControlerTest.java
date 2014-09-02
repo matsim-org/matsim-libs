@@ -840,27 +840,27 @@ public class ControlerTest {
 			 * (one having 100secs, the other having 200secs to cross the link).
 			 */
 //			this.network.setCapacityPeriod(Time.parseTime("01:00:00"));
-			this.node1 = this.network.getFactory().createNode(new IdImpl(1), new CoordImpl(-100.0, 0.0));
-			this.node2 = this.network.getFactory().createNode(new IdImpl(2), new CoordImpl(0.0, 0.0));
-			this.node3 = this.network.getFactory().createNode(new IdImpl(3), new CoordImpl(1000.0, 0.0));
-			this.node4 = this.network.getFactory().createNode(new IdImpl(4), new CoordImpl(1100.0, 0.0));
+			this.node1 = this.network.getFactory().createNode(Id.create(1, Node.class), new CoordImpl(-100.0, 0.0));
+			this.node2 = this.network.getFactory().createNode(Id.create(2, Node.class), new CoordImpl(0.0, 0.0));
+			this.node3 = this.network.getFactory().createNode(Id.create(3, Node.class), new CoordImpl(1000.0, 0.0));
+			this.node4 = this.network.getFactory().createNode(Id.create(4, Node.class), new CoordImpl(1100.0, 0.0));
 			this.network.addNode(this.node1);
 			this.network.addNode(this.node2);
 			this.network.addNode(this.node3);
 			this.network.addNode(this.node4);
-			this.link1 = this.network.getFactory().createLink(new IdImpl(1), this.node1, this.node2);
+			this.link1 = this.network.getFactory().createLink(Id.create(1, Link.class), this.node1, this.node2);
 			this.link1.setLength(100);
 			this.link1.setFreespeed(10);
 			this.link1.setCapacity(7200);
 			this.link1.setNumberOfLanes(1);
 			this.network.addLink(this.link1);
-			this.link2 = this.network.getFactory().createLink(new IdImpl(2), this.node2, this.node3);
+			this.link2 = this.network.getFactory().createLink(Id.create(2, Link.class), this.node2, this.node3);
 			this.link2.setLength(1000);
 			this.link2.setFreespeed(10);
 			this.link2.setCapacity(36);
 			this.link2.setNumberOfLanes(1);
 			this.network.addLink(this.link2);
-			this.link3 = this.network.getFactory().createLink(new IdImpl(3), this.node3, this.node4);
+			this.link3 = this.network.getFactory().createLink(Id.create(3, Link.class), this.node3, this.node4);
 			this.link3.setLength(100);
 			this.link3.setFreespeed(10);
 			this.link3.setCapacity(7200);
