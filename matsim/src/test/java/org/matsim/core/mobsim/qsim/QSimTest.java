@@ -20,6 +20,12 @@
 
 package org.matsim.core.mobsim.qsim;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -31,12 +37,27 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.basic.v01.IdImpl;
@@ -50,11 +71,25 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.*;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.*;
-import org.matsim.core.population.routes.*;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.GenericRoute;
+import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteFactory;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -65,8 +100,6 @@ import org.matsim.testcases.utils.LogCounter;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
-
-import java.util.*;
 
 @RunWith(Parameterized.class)
 public class QSimTest {
@@ -1178,12 +1211,12 @@ public class QSimTest {
 		Fixture f = new Fixture();
 
 		/* enhance network */
-		Node node5 = f.network.createAndAddNode(new IdImpl("5"), new CoordImpl(3100, 0));
-		Node node6 = f.network.createAndAddNode(new IdImpl("6"), new CoordImpl(3200, 0));
-		Node node7 = f.network.createAndAddNode(new IdImpl("7"), new CoordImpl(3300, 0));
-		f.network.createAndAddLink(new IdImpl("4"), f.node4, node5, 1000, 10, 6000, 2);
-		Link link5 = f.network.createAndAddLink(new IdImpl("5"), node5, node6, 100, 10, 60000, 9);
-		Link link6 = f.network.createAndAddLink(new IdImpl("6"), node6, node7, 100, 10, 60000, 9);
+		Node node5 = f.network.createAndAddNode(Id.create("5", Node.class), new CoordImpl(3100, 0));
+		Node node6 = f.network.createAndAddNode(Id.create("6", Node.class), new CoordImpl(3200, 0));
+		Node node7 = f.network.createAndAddNode(Id.create("7", Node.class), new CoordImpl(3300, 0));
+		f.network.createAndAddLink(Id.create("4", Node.class), f.node4, node5, 1000, 10, 6000, 2);
+		Link link5 = f.network.createAndAddLink(Id.create("5", Node.class), node5, node6, 100, 10, 60000, 9);
+		Link link6 = f.network.createAndAddLink(Id.create("6", Node.class), node6, node7, 100, 10, 60000, 9);
 
 		((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).setRouteFactory(TransportMode.car, new LinkNetworkRouteFactory());
 
@@ -1194,7 +1227,7 @@ public class QSimTest {
 		a1.setEndTime(8*3600);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 		NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), link5.getId());
-		route.setLinkIds(new IdImpl(startLinkId), NetworkUtils.getLinkIds(linkIds), new IdImpl(endLinkId));
+		route.setLinkIds(Id.create(startLinkId, Link.class), NetworkUtils.getLinkIds(linkIds), Id.create(endLinkId, Link.class));
 		leg.setRoute(route);
 		ActivityImpl a2 = plan.createAndAddActivity("w", link5.getId());
 		a2.setEndTime(9*3600);

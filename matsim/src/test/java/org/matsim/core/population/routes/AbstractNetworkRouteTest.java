@@ -1,5 +1,5 @@
-/* *********************************************************************** *
- * project: org.matsim.*
+/* *****inki****************************************************************** *
+ * projecnkt: org.matsim.*
  * RouteImplTest.java
  *                                                                         *
  * *********************************************************************** *
@@ -29,11 +29,11 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Tests several methods of {@link NetworkRoute}.
@@ -85,8 +85,8 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testSetLinks_AllNull() {
 		NetworkImpl network = createTestNetwork();
-		Id link1 = new IdImpl("1");
-		Id link4 = new IdImpl("4");
+		Id<Link> link1 = Id.create("1", Link.class);
+		Id<Link> link4 = Id.create("4", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(link1, link4, network);
 		route.setLinkIds(link1, NetworkUtils.getLinkIds("22 12 -23 3"), link4);
 		List<Id<Link>> linkIds = route.getLinkIds();
@@ -100,8 +100,8 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testGetDistance() {
 		NetworkImpl network = createTestNetwork();
-		Id link1 = new IdImpl("1");
-		Id link4 = new IdImpl("4");
+		Id<Link> link1 = Id.create("1", Link.class);
+		Id<Link> link4 = Id.create("4", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(link1, link4, network);
 		route.setLinkIds(link1, NetworkUtils.getLinkIds("22 12 -23 3"), link4);
 		route.setDistance(1234.5);
@@ -112,28 +112,28 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testGetLinkIds() {
 		NetworkImpl network = createTestNetwork();
-		Id link1 = new IdImpl("1");
-		Id link4 = new IdImpl("4");
+		Id<Link> link1 = Id.create("1", Link.class);
+		Id<Link> link4 = Id.create("4", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(link1, link4, network);
 		route.setLinkIds(link1, NetworkUtils.getLinkIds("22 12 -23 3"), link4);
 
 		List<Id<Link>> ids = route.getLinkIds();
 		Assert.assertEquals("number of links in route.", 4, ids.size());
-		Assert.assertEquals(new IdImpl("22"), ids.get(0));
-		Assert.assertEquals(new IdImpl("12"), ids.get(1));
-		Assert.assertEquals(new IdImpl("-23"), ids.get(2));
-		Assert.assertEquals(new IdImpl("3"), ids.get(3));
+		Assert.assertEquals(Id.create("22", Link.class), ids.get(0));
+		Assert.assertEquals(Id.create("12", Link.class), ids.get(1));
+		Assert.assertEquals(Id.create("-23", Link.class), ids.get(2));
+		Assert.assertEquals(Id.create("3", Link.class), ids.get(3));
 	}
 
 	@Test
 	public void testGetSubRoute() {
 		NetworkImpl network = createTestNetwork();
-		Id id0 = new IdImpl("0");
-		Id id3 = new IdImpl("3");
-		Id id12 = new IdImpl("12");
-		Id id15 = new IdImpl("15");
-		Id id23m = new IdImpl("-23");
-		Id id24 = new IdImpl("24");
+		Id<Link> id0 = Id.create("0", Link.class);
+		Id<Link> id3 = Id.create("3", Link.class);
+		Id<Link> id12 = Id.create("12", Link.class);
+		Id<Link> id15 = Id.create("15", Link.class);
+		Id<Link> id23m = Id.create("-23", Link.class);
+		Id<Link> id24 = Id.create("24", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(id0, id15, network);
 		route.setLinkIds(id0, NetworkUtils.getLinkIds("1 22 12 -23 3 24 14"), id15);
 
@@ -149,13 +149,13 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testGetSubRoute_fromStart() {
 		NetworkImpl network = createTestNetwork();
-		Id id0 = new IdImpl("0");
-		Id id1 = new IdImpl("1");
-		Id id3 = new IdImpl("3");
-		Id id12 = new IdImpl("12");
-		Id id15 = new IdImpl("15");
-		Id id22 = new IdImpl("22");
-		Id id23m = new IdImpl("-23");
+		Id<Link> id0 = Id.create("0", Link.class);
+		Id<Link> id1 = Id.create("1", Link.class);
+		Id<Link> id3 = Id.create("3", Link.class);
+		Id<Link> id12 = Id.create("12", Link.class);
+		Id<Link> id15 = Id.create("15", Link.class);
+		Id<Link> id22 = Id.create("22", Link.class);
+		Id<Link> id23m = Id.create("-23", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(id0, id15, network);
 		route.setLinkIds(id0, NetworkUtils.getLinkIds("1 22 12 -23 3 24 14"), id15);
 
@@ -173,11 +173,11 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testGetSubRoute_toEnd() {
 		NetworkImpl network = createTestNetwork();
-		Id id0 = new IdImpl("0");
-		Id id3 = new IdImpl("3");
-		Id id15 = new IdImpl("15");
-		Id id23m = new IdImpl("-23");
-		Id id24 = new IdImpl("24");
+		Id<Link> id0 = Id.create("0", Link.class);
+		Id<Link> id3 = Id.create("3", Link.class);
+		Id<Link> id15 = Id.create("15", Link.class);
+		Id<Link> id23m = Id.create("-23", Link.class);
+		Id<Link> id24 = Id.create("24", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(id0, id15, network);
 		route.setLinkIds(id0, NetworkUtils.getLinkIds("1 22 12 -23 3 24 14"), id15);
 
@@ -193,8 +193,8 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testGetSubRoute_startOnly() {
 		NetworkImpl network = createTestNetwork();
-		Id id0 = new IdImpl("0");
-		Id id15 = new IdImpl("15");
+		Id<Link> id0 = Id.create("0", Link.class);
+		Id<Link> id15 = Id.create("15", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(id0, id15, network);
 		route.setLinkIds(id0, NetworkUtils.getLinkIds("1 22 12 -23 3 24 14"), id15);
 
@@ -208,8 +208,8 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testGetSubRoute_endOnly() {
 		NetworkImpl network = createTestNetwork();
-		Id id0 = new IdImpl("0");
-		Id id15 = new IdImpl("15");
+		Id<Link> id0 = Id.create("0", Link.class);
+		Id<Link> id15 = Id.create("15", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(id0, id15, network);
 		route.setLinkIds(id0, NetworkUtils.getLinkIds("1 22 12 -23 3 24 14"), id15);
 
@@ -223,9 +223,9 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testGetSubRoute_wrongStart() {
 		NetworkImpl network = createTestNetwork();
-		Id id0 = new IdImpl("0");
-		Id id1 = new IdImpl("1");
-		Id id15 = new IdImpl("15");
+		Id<Link> id0 = Id.create("0", Link.class);
+		Id<Link> id1 = Id.create("1", Link.class);
+		Id<Link> id15 = Id.create("15", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(id1, id15, network);
 		route.setLinkIds(id1, NetworkUtils.getLinkIds("22 12 -23 3 24 14"), id15);
 
@@ -240,9 +240,9 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testGetSubRoute_wrongEnd() {
 		NetworkImpl network = createTestNetwork();
-		Id id1 = new IdImpl("1");
-		Id id14 = new IdImpl("14");
-		Id id15 = new IdImpl("15");
+		Id<Link> id1 = Id.create("1", Link.class);
+		Id<Link> id14 = Id.create("14", Link.class);
+		Id<Link> id15 = Id.create("15", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(id1, id14, network);
 		route.setLinkIds(id1, NetworkUtils.getLinkIds("22 12 -23 3 24"), id14);
 
@@ -257,9 +257,9 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testGetSubRoute_sameLinks() {
 		NetworkImpl network = createTestNetwork();
-		Id id1 = new IdImpl("1");
-		Id id12 = new IdImpl("12");
-		Id id14 = new IdImpl("14");
+		Id<Link> id1 = Id.create("1", Link.class);
+		Id<Link> id12 = Id.create("12", Link.class);
+		Id<Link> id14 = Id.create("14", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(id1, id14, network);
 		route.setLinkIds(id1, NetworkUtils.getLinkIds("22 12 -23 3 24"), id14);
 
@@ -273,7 +273,7 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testGetSubRoute_sameLinks_emptyRoute1() {
 		NetworkImpl network = createTestNetwork();
-		Id id1 = new IdImpl("1");
+		Id<Link> id1 = Id.create("1", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(id1, id1, network);
 		route.setLinkIds(id1, null, id1);
 
@@ -287,8 +287,8 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testGetSubRoute_sameLinks_emptyRoute2() {
 		NetworkImpl network = createTestNetwork();
-		Id id1 = new IdImpl("1");
-		Id id2 = new IdImpl("2");
+		Id<Link> id1 = Id.create("1", Link.class);
+		Id<Link> id2 = Id.create("2", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(id1, id2, network);
 		route.setLinkIds(id1, null, id2);
 
@@ -308,19 +308,19 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testGetSubRoute_fullRoute() {
 		NetworkImpl network = createTestNetwork();
-		Id id0 = new IdImpl("0");
-		Id id4 = new IdImpl("4");
+		Id<Link> id0 = Id.create("0", Link.class);
+		Id<Link> id4 = Id.create("4", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(id0, id4, network);
 		route.setLinkIds(id0, NetworkUtils.getLinkIds("1 22 12 -23 3"), id4);
 
 		NetworkRoute subRoute = route.getSubRoute(id0, id4);
 		List<Id<Link>> linkIds = subRoute.getLinkIds();
 		Assert.assertEquals("number of links in subRoute.", 5, linkIds.size());
-		Assert.assertEquals("wrong link.", new IdImpl("1"), subRoute.getLinkIds().get(0));
-		Assert.assertEquals("wrong link.", new IdImpl("22"), subRoute.getLinkIds().get(1));
-		Assert.assertEquals("wrong link.", new IdImpl("12"), subRoute.getLinkIds().get(2));
-		Assert.assertEquals("wrong link.", new IdImpl("-23"), subRoute.getLinkIds().get(3));
-		Assert.assertEquals("wrong link.", new IdImpl("3"), subRoute.getLinkIds().get(4));
+		Assert.assertEquals("wrong link.", Id.create("1", Link.class), subRoute.getLinkIds().get(0));
+		Assert.assertEquals("wrong link.", Id.create("22", Link.class), subRoute.getLinkIds().get(1));
+		Assert.assertEquals("wrong link.", Id.create("12", Link.class), subRoute.getLinkIds().get(2));
+		Assert.assertEquals("wrong link.", Id.create("-23", Link.class), subRoute.getLinkIds().get(3));
+		Assert.assertEquals("wrong link.", Id.create("3", Link.class), subRoute.getLinkIds().get(4));
 		Assert.assertEquals("wrong start link.", id0, subRoute.getStartLinkId());
 		Assert.assertEquals("wrong end link.", id4, subRoute.getEndLinkId());
 	}
@@ -328,24 +328,24 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testGetSubRoute_circleInRoute() {
 		NetworkImpl network = createTestNetwork();
-		network.createAndAddLink(new IdImpl(-3),
-				network.getNodes().get(new IdImpl(4)), network.getNodes().get(new IdImpl(3)),
+		network.createAndAddLink(Id.create(-3, Link.class),
+				network.getNodes().get(Id.create(4, Link.class)), network.getNodes().get(Id.create(3, Link.class)),
 				1000.0, 100.0, 3600.0, 1);
-		Id id11 = new IdImpl("11");
-		Id id15 = new IdImpl("15");
+		Id<Link> id11 = Id.create("11", Link.class);
+		Id<Link> id15 = Id.create("15", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(id11, id15, network);
 		route.setLinkIds(id11, NetworkUtils.getLinkIds("12 13 -24 -3 23 13 14"), id15);
 
-		Id id12 = new IdImpl("12");
-		Id id14 = new IdImpl("14");
+		Id<Link> id12 = Id.create("12", Link.class);
+		Id<Link> id14 = Id.create("14", Link.class);
 		NetworkRoute subRoute = route.getSubRoute(id12, id14);
 		List<Id<Link>> linkIds = subRoute.getLinkIds();
 		Assert.assertEquals("number of links in subRoute.", 5, linkIds.size());
-		Assert.assertEquals("wrong link.", new IdImpl("13"), subRoute.getLinkIds().get(0));
-		Assert.assertEquals("wrong link.", new IdImpl("-24"), subRoute.getLinkIds().get(1));
-		Assert.assertEquals("wrong link.", new IdImpl("-3"), subRoute.getLinkIds().get(2));
-		Assert.assertEquals("wrong link.", new IdImpl("23"), subRoute.getLinkIds().get(3));
-		Assert.assertEquals("wrong link.", new IdImpl("13"), subRoute.getLinkIds().get(4));
+		Assert.assertEquals("wrong link.", Id.create("13", Link.class), subRoute.getLinkIds().get(0));
+		Assert.assertEquals("wrong link.", Id.create("-24", Link.class), subRoute.getLinkIds().get(1));
+		Assert.assertEquals("wrong link.", Id.create("-3", Link.class), subRoute.getLinkIds().get(2));
+		Assert.assertEquals("wrong link.", Id.create("23", Link.class), subRoute.getLinkIds().get(3));
+		Assert.assertEquals("wrong link.", Id.create("13", Link.class), subRoute.getLinkIds().get(4));
 		Assert.assertEquals("wrong start link.", id12, subRoute.getStartLinkId());
 		Assert.assertEquals("wrong end link.", id14, subRoute.getEndLinkId());
 	}
@@ -353,21 +353,21 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testGetSubRoute_startInCircle() {
 		NetworkImpl network = createTestNetwork();
-		network.createAndAddLink(new IdImpl(-3),
-				network.getNodes().get(new IdImpl(4)), network.getNodes().get(new IdImpl(3)),
+		network.createAndAddLink(Id.create(-3, Link.class),
+				network.getNodes().get(Id.create(4, Link.class)), network.getNodes().get(Id.create(3, Link.class)),
 				1000.0, 100.0, 3600.0, 1);
-		Id id11 = new IdImpl("11");
-		Id id15 = new IdImpl("15");
+		Id<Link> id11 = Id.create("11", Link.class);
+		Id<Link> id15 = Id.create("15", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(id11, id15, network);
 		route.setLinkIds(id11, NetworkUtils.getLinkIds("12 13 -24 -3 23 13 14"), id15);
 
-		Id id13 = new IdImpl("13");
-		Id id23 = new IdImpl("23");
+		Id<Link> id13 = Id.create("13", Link.class);
+		Id<Link> id23 = Id.create("23", Link.class);
 		NetworkRoute subRoute = route.getSubRoute(id13, id23);
 		List<Id<Link>> linkIds = subRoute.getLinkIds();
 		Assert.assertEquals("number of links in subRoute.", 2, linkIds.size());
-		Assert.assertEquals("wrong link.", new IdImpl("-24"), subRoute.getLinkIds().get(0));
-		Assert.assertEquals("wrong link.", new IdImpl("-3"), subRoute.getLinkIds().get(1));
+		Assert.assertEquals("wrong link.", Id.create("-24", Link.class), subRoute.getLinkIds().get(0));
+		Assert.assertEquals("wrong link.", Id.create("-3", Link.class), subRoute.getLinkIds().get(1));
 		Assert.assertEquals("wrong start link.", id13, subRoute.getStartLinkId());
 		Assert.assertEquals("wrong end link.", id23, subRoute.getEndLinkId());
 	}
@@ -375,20 +375,20 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testGetSubRoute_startInCircle_CircleInEnd() {
 		NetworkImpl network = createTestNetwork();
-		network.createAndAddLink(new IdImpl(-3),
-				network.getNodes().get(new IdImpl(4)), network.getNodes().get(new IdImpl(3)),
+		network.createAndAddLink(Id.create(-3, Link.class),
+				network.getNodes().get(Id.create(4, Link.class)), network.getNodes().get(Id.create(3, Link.class)),
 				1000.0, 100.0, 3600.0, 1);
-		Id id11 = new IdImpl("11");
-		Id id13 = new IdImpl("13");
+		Id<Link> id11 = Id.create("11", Link.class);
+		Id<Link> id13 = Id.create("13", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(id11, id13, network);
 		route.setLinkIds(id11, NetworkUtils.getLinkIds("12 13 -24 -3 23"), id13);
 
-		Id id_24 = new IdImpl("-24");
+		Id<Link> id_24 = Id.create("-24", Link.class);
 		NetworkRoute subRoute = route.getSubRoute(id_24, id13);
 		List<Id<Link>> linkIds = subRoute.getLinkIds();
 		Assert.assertEquals("number of links in subRoute.", 2, linkIds.size());
-		Assert.assertEquals("wrong link.", new IdImpl("-3"), subRoute.getLinkIds().get(0));
-		Assert.assertEquals("wrong link.", new IdImpl("23"), subRoute.getLinkIds().get(1));
+		Assert.assertEquals("wrong link.", Id.create("-3", Link.class), subRoute.getLinkIds().get(0));
+		Assert.assertEquals("wrong link.", Id.create("23", Link.class), subRoute.getLinkIds().get(1));
 		Assert.assertEquals("wrong start link.", id_24, subRoute.getStartLinkId());
 		Assert.assertEquals("wrong end link.", id13, subRoute.getEndLinkId());
 	}
@@ -396,18 +396,18 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testGetSubRoute_CircleAtStart() {
 		NetworkImpl network = createTestNetwork();
-		network.createAndAddLink(new IdImpl(-3),
-				network.getNodes().get(new IdImpl(4)), network.getNodes().get(new IdImpl(3)),
+		network.createAndAddLink(Id.create(-3, Link.class),
+				network.getNodes().get(Id.create(4, Link.class)), network.getNodes().get(Id.create(3, Link.class)),
 				1000.0, 100.0, 3600.0, 1);
-		Id id13 = new IdImpl("13");
-		Id id15 = new IdImpl("15");
+		Id<Link> id13 = Id.create("13", Link.class);
+		Id<Link> id15 = Id.create("15", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(id13, id15, network);
 		route.setLinkIds(id13, NetworkUtils.getLinkIds("-24 -3 23 13 14"), id15);
 
 		NetworkRoute subRoute = route.getSubRoute(id13, id15);
 		List<Id<Link>> linkIds = subRoute.getLinkIds();
 		Assert.assertEquals("number of links in subRoute.", 1, linkIds.size());
-		Assert.assertEquals("wrong link.", new IdImpl("14"), subRoute.getLinkIds().get(0));
+		Assert.assertEquals("wrong link.", Id.create("14", Link.class), subRoute.getLinkIds().get(0));
 		Assert.assertEquals("wrong start link.", id13, subRoute.getStartLinkId());
 		Assert.assertEquals("wrong end link.", id15, subRoute.getEndLinkId());
 	}
@@ -415,7 +415,7 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testStartAndEndOnSameLinks_setLinks() {
 		NetworkImpl network = createTestNetwork();
-		Id link = new IdImpl("3");
+		Id<Link> link = Id.create("3", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(link, link, network);
 		route.setLinkIds(link, new ArrayList<Id<Link>>(0), link);
 		Assert.assertEquals(0, route.getLinkIds().size());
@@ -424,8 +424,8 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testStartAndEndOnSubsequentLinks_setLinks() {
 		NetworkImpl network = createTestNetwork();
-		final Id link13 = new IdImpl("13");
-		final Id link14 = new IdImpl("14");
+		final Id<Link> link13 = Id.create("13", Link.class);
+		final Id<Link> link14 = Id.create("14", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(link13, link14, network);
 		route.setLinkIds(link13, new ArrayList<Id<Link>>(0), link14);
 		Assert.assertEquals(0, route.getLinkIds().size());
@@ -434,11 +434,11 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testVehicleId() {
 		NetworkImpl network = createTestNetwork();
-		Id link0 = new IdImpl("0");
-		Id link15 = new IdImpl("15");
+		Id<Link> link0 = Id.create("0", Link.class);
+		Id<Link> link15 = Id.create("15", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(link0, link15, network);
 		Assert.assertNull(route.getVehicleId());
-		Id id = new IdImpl("8134");
+		Id<Vehicle> id = Id.create("8134", Vehicle.class);
 		route.setVehicleId(id);
 		Assert.assertEquals(id, route.getVehicleId());
 		route.setVehicleId(null);
@@ -456,35 +456,35 @@ public abstract class AbstractNetworkRouteTest {
 		 *  ( 1)-----1---->( 2)-----2---->( 3)-----3---->( 4)-----4---->( 5)
 		 */
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node0 = network.createAndAddNode(new IdImpl("0"), new CoordImpl(   0, 500));
-		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));
-		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(2000, 0));
-		Node node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(3000, 0));
-		Node node5 = network.createAndAddNode(new IdImpl("5"), new CoordImpl(4000, 0));
-		Node node11 = network.createAndAddNode(new IdImpl("11"), new CoordImpl(   0, 1000));
-		Node node12 = network.createAndAddNode(new IdImpl("12"), new CoordImpl(1000, 1000));
-		Node node13 = network.createAndAddNode(new IdImpl("13"), new CoordImpl(2000, 1000));
-		Node node14 = network.createAndAddNode(new IdImpl("14"), new CoordImpl(3000, 1000));
-		Node node15 = network.createAndAddNode(new IdImpl("15"), new CoordImpl(4000, 1000));
-		Node node16 = network.createAndAddNode(new IdImpl("16"), new CoordImpl(5000, 1000));
+		Node node0 = network.createAndAddNode(Id.create("0", Node.class), new CoordImpl(   0, 500));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(   0, 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(1000, 0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(2000, 0));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(3000, 0));
+		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new CoordImpl(4000, 0));
+		Node node11 = network.createAndAddNode(Id.create("11", Link.class), new CoordImpl(   0, 1000));
+		Node node12 = network.createAndAddNode(Id.create("12", Link.class), new CoordImpl(1000, 1000));
+		Node node13 = network.createAndAddNode(Id.create("13", Link.class), new CoordImpl(2000, 1000));
+		Node node14 = network.createAndAddNode(Id.create("14", Link.class), new CoordImpl(3000, 1000));
+		Node node15 = network.createAndAddNode(Id.create("15", Link.class), new CoordImpl(4000, 1000));
+		Node node16 = network.createAndAddNode(Id.create("16", Link.class), new CoordImpl(5000, 1000));
 
-		network.createAndAddLink(new IdImpl("0"), node0, node1,  500.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(new IdImpl("1"), node1, node2, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(new IdImpl("2"), node2, node3, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(new IdImpl("3"), node3, node4, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(new IdImpl("4"), node4, node5, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(new IdImpl("11"), node11, node12, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(new IdImpl("12"), node12, node13, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(new IdImpl("13"), node13, node14, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(new IdImpl("14"), node14, node15, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(new IdImpl("15"), node15, node16, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(new IdImpl("22"), node2, node12, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(new IdImpl("23"), node3, node13, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(new IdImpl("24"), node4, node14, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(new IdImpl("-22"), node12, node2, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(new IdImpl("-23"), node13, node3, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(new IdImpl("-24"), node14, node4, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(Id.create("0", Link.class), node0, node1,  500.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(Id.create("2", Link.class), node2, node3, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(Id.create("3", Link.class), node3, node4, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(Id.create("4", Link.class), node4, node5, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(Id.create("11", Link.class), node11, node12, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(Id.create("12", Link.class), node12, node13, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(Id.create("13", Link.class), node13, node14, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(Id.create("14", Link.class), node14, node15, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(Id.create("15", Link.class), node15, node16, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(Id.create("22", Link.class), node2, node12, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(Id.create("23", Link.class), node3, node13, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(Id.create("24", Link.class), node4, node14, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(Id.create("-22", Link.class), node12, node2, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(Id.create("-23", Link.class), node13, node3, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(Id.create("-24", Link.class), node14, node4, 1000.0, 100.0, 3600.0, 1);
 
 		return network;
 	}

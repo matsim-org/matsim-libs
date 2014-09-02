@@ -24,14 +24,17 @@ import java.io.File;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author mrieser / Senozon AG
@@ -49,8 +52,8 @@ public class EventWriterXMLTest {
 		String filename = this.utils.getOutputDirectory() + "testEvents.xml";
 		EventWriterXML writer = new EventWriterXML(filename);
 		
-		writer.handleEvent(new LinkLeaveEvent(3600.0, new IdImpl("agent 1"), new IdImpl("link<2"), new IdImpl("vehicle>3")));
-		writer.handleEvent(new LinkLeaveEvent(3601.0, new IdImpl("agent 2"), new IdImpl("link'3"), new IdImpl("vehicle\"4")));
+		writer.handleEvent(new LinkLeaveEvent(3600.0, Id.create("agent 1", Person.class), Id.create("link<2", Link.class), Id.create("vehicle>3", Vehicle.class)));
+		writer.handleEvent(new LinkLeaveEvent(3601.0, Id.create("agent 2", Person.class), Id.create("link'3", Link.class), Id.create("vehicle\"4", Vehicle.class)));
 		writer.closeFile();
 		Assert.assertTrue(new File(filename).exists());
 

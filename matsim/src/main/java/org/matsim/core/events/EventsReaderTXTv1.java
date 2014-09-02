@@ -34,9 +34,10 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
@@ -70,7 +71,7 @@ public class EventsReaderTXTv1 implements MatsimSomeReader {
 
 	}
 
-	 public Event createEvent(final double time, final Id agentId, final Id linkId,
+	 public Event createEvent(final double time, final Id<Person> agentId, final Id<Link> linkId,
 			final int flag, final String desc, final String acttype) {
 		 Event data = null;
 
@@ -121,8 +122,8 @@ public class EventsReaderTXTv1 implements MatsimSomeReader {
 	protected void parseLine(final String line) {
 		String[] result = StringUtils.explode(line, '\t', 7);
 		if (result.length == 7) {
-			Event data = createEvent(Double.parseDouble(result[0]), new IdImpl(result[1]),	// time, vehId
-					new IdImpl(result[3]),		// linkId
+			Event data = createEvent(Double.parseDouble(result[0]), Id.create(result[1], Person.class),	// time, vehId
+					Id.create(result[3], Link.class),		// linkId
 					Integer.parseInt(result[5]),		// nodeId
 					result[6],		// description
 					"");		// unused

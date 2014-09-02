@@ -23,9 +23,10 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -37,9 +38,9 @@ public class AgentWaitingForPtEventTest {
 
 	@Test
 	public void testReadWriteXml() {
-		PersonImpl person = new PersonImpl(new IdImpl(1));
-		Id waitStopId = new IdImpl("1980");
-		Id destinationStopId = new IdImpl("0511");
+		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
+		Id<TransitStopFacility> waitStopId = Id.create("1980", TransitStopFacility.class);
+		Id<TransitStopFacility> destinationStopId = Id.create("0511", TransitStopFacility.class);
 		double time = 5.0 * 3600 + 11.0 + 60;
 		AgentWaitingForPtEvent event = new AgentWaitingForPtEvent(time, person.getId(), waitStopId, destinationStopId);
 		AgentWaitingForPtEvent event2 = XmlEventsTester.testWriteReadXml(helper.getOutputDirectory() + "events.xml", event);
