@@ -28,14 +28,12 @@ import org.matsim.core.router.ArrayFastRouterDelegateFactory;
 import org.matsim.core.router.FastAStarLandmarks;
 import org.matsim.core.router.FastRouterDelegateFactory;
 import org.matsim.core.router.FastRouterType;
-import org.matsim.core.router.PointerFastRouterDelegateFactory;
 
 /**
  * @author cdobler
  */
 public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 
-	private final FastRouterType fastRouterType;
 	private final PreProcessLandmarks preProcessData;
 	private final RoutingNetworkFactory routingNetworkFactory;
 	private final Map<Network, RoutingNetwork> routingNetworks;
@@ -44,11 +42,11 @@ public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory
 		this(network, fsttc, FastRouterType.ARRAY);
 	}
 	
+	@Deprecated
 	public FastAStarLandmarksFactory(Network network, final TravelDisutility fsttc,
 			FastRouterType fastRouterType) {
 		this.preProcessData = new PreProcessLandmarks(fsttc);
 		this.preProcessData.run(network);
-		this.fastRouterType = fastRouterType;
 		
 		this.routingNetworks = new HashMap<Network, RoutingNetwork>();
 		
@@ -57,8 +55,8 @@ public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory
 			this.routingNetworkFactory = new ArrayRoutingNetworkFactory(preProcessData);
 			break;
 		case POINTER:
-			this.routingNetworkFactory = new PointerRoutingNetworkFactory(preProcessData);
-			break;
+			throw new RuntimeException("PointerRoutingNetworks are no longer supported. "
+					+ "Use ArrayRoutingNetworks instead. Aborting!");
 		default:
 			throw new RuntimeException("Undefined FastRouterType: " + fastRouterType);
 		}
@@ -68,30 +66,14 @@ public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory
 	public LeastCostPathCalculator createPathCalculator(Network network,
 			TravelDisutility travelCosts, TravelTime travelTimes) {
 		
-		FastRouterDelegateFactory fastRouterFactory = null;
-		RoutingNetwork rn = null;
+		RoutingNetwork routingNetwork = this.routingNetworks.get(network);
+		if (routingNetwork == null) {
+			routingNetwork = this.routingNetworkFactory.createRoutingNetwork(network);
+			this.routingNetworks.put(network, routingNetwork);
+		}
+		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
 
-		switch (fastRouterType) {
-		case ARRAY: {
-			RoutingNetwork routingNetwork = this.routingNetworks.get(network);
-			if (routingNetwork == null) {
-				routingNetwork = this.routingNetworkFactory.createRoutingNetwork(network);
-				this.routingNetworks.put(network, routingNetwork);
-			}
-			rn = routingNetwork;
-			fastRouterFactory = new ArrayFastRouterDelegateFactory();
-			break;
-		}
-		case POINTER: {
-			// Create a new instance since routing data is stored in the network!
-			rn = this.routingNetworkFactory.createRoutingNetwork(network);
-			fastRouterFactory = new PointerFastRouterDelegateFactory();
-			break;
-		}
-		default:
-			throw new RuntimeException("Undefined FastRouterType: " + fastRouterType);
-		}
-		return new FastAStarLandmarks(rn, this.preProcessData, travelCosts, travelTimes, 1,
+		return new FastAStarLandmarks(routingNetwork, this.preProcessData, travelCosts, travelTimes, 1,
 				fastRouterFactory);
 	}
 }

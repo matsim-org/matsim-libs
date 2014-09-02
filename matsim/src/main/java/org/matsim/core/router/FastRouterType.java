@@ -20,6 +20,12 @@
 
 package org.matsim.core.router;
 
+/**
+ * Type Pointer is no longer supported. For now we still keep it here so we
+ * can throw an exception if somebody tries to us it. 
+ * 
+ * @author cdobler
+ */
 public enum FastRouterType {
 	ARRAY, POINTER
 }

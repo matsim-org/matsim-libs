@@ -39,8 +39,7 @@ import org.matsim.vehicles.Vehicle;
 /**
  * <p>
  * Performance optimized version of the AStarEuclidean {@link org.matsim.core.router.AStarEuclidean} 
- * least cost path router which uses its own network to route within. Note that 
- * this network requires additional memory for each FastDijkstra instance.
+ * least cost path router which uses its own network to route within.
  * </p>
  * 
  * @see org.matsim.core.router.AStarEuclidean

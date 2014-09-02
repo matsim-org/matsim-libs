@@ -27,11 +27,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.ArrayFastRouterDelegateFactory;
 import org.matsim.core.router.FastRouterDelegateFactory;
 import org.matsim.core.router.FastRouterType;
-import org.matsim.core.router.PointerFastRouterDelegateFactory;
 import org.matsim.core.router.util.ArrayRoutingNetworkFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PointerRoutingNetworkFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.RoutingNetwork;
 import org.matsim.core.router.util.RoutingNetworkFactory;
@@ -41,7 +39,6 @@ import org.matsim.pt.router.FastTransitMultiNodeDijkstra;
 
 public class FastTransitDijkstraFactory implements LeastCostPathCalculatorFactory {
 	
-	private final FastRouterType fastRouterType;
 	private final PreProcessDijkstra preProcessData;
 	private final RoutingNetworkFactory routingNetworkFactory;
 	private final Map<Network, RoutingNetwork> routingNetworks;
@@ -50,6 +47,7 @@ public class FastTransitDijkstraFactory implements LeastCostPathCalculatorFactor
 		this(null, FastRouterType.ARRAY);
 	}
 	
+	@Deprecated
 	public FastTransitDijkstraFactory(FastRouterType fastRouterType) {
 		this(null, fastRouterType);
 	}
@@ -60,7 +58,6 @@ public class FastTransitDijkstraFactory implements LeastCostPathCalculatorFactor
 	
 	public FastTransitDijkstraFactory(final PreProcessDijkstra preProcessData, FastRouterType fastRouterType) {
 		this.preProcessData = preProcessData;
-		this.fastRouterType = fastRouterType;
 		
 		this.routingNetworks = new HashMap<Network, RoutingNetwork>();
 		
@@ -69,8 +66,8 @@ public class FastTransitDijkstraFactory implements LeastCostPathCalculatorFactor
 			this.routingNetworkFactory = new ArrayRoutingNetworkFactory(preProcessData);
 			break;
 		case POINTER:
-			this.routingNetworkFactory = new PointerRoutingNetworkFactory(preProcessData);
-			break;
+			throw new RuntimeException("PointerRoutingNetworks are no longer supported. "
+					+ "Use ArrayRoutingNetworks instead. Aborting!");
 		default:
 			throw new RuntimeException("Undefined FastRouterType: " + fastRouterType);
 		}
@@ -79,30 +76,13 @@ public class FastTransitDijkstraFactory implements LeastCostPathCalculatorFactor
 	@Override
 	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		
-		FastRouterDelegateFactory fastRouterFactory = null;
-		RoutingNetwork rn = null;
-		
-		switch (fastRouterType) {
-		case ARRAY: {
-			RoutingNetwork routingNetwork = this.routingNetworks.get(network);
-			if (routingNetwork == null) {
-				routingNetwork = this.routingNetworkFactory.createRoutingNetwork(network);
-				this.routingNetworks.put(network, routingNetwork);
-			}
-			rn = routingNetwork;
-			fastRouterFactory = new ArrayFastRouterDelegateFactory();
-			break;
+		RoutingNetwork routingNetwork = this.routingNetworks.get(network);
+		if (routingNetwork == null) {
+			routingNetwork = this.routingNetworkFactory.createRoutingNetwork(network);
+			this.routingNetworks.put(network, routingNetwork);
 		}
-		case POINTER: {
-			// Create a new instance since routing data is stored in the network!
-			rn = this.routingNetworkFactory.createRoutingNetwork(network);
-			fastRouterFactory = new PointerFastRouterDelegateFactory();
-			break;
-		}
-		default:
-			throw new RuntimeException("Undefined FastRouterType: " + fastRouterType);
-		}	
+		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();	
 		
-		return new FastTransitMultiNodeDijkstra(network, travelCosts, travelTimes, preProcessData, rn, fastRouterFactory);
+		return new FastTransitMultiNodeDijkstra(network, travelCosts, travelTimes, preProcessData, routingNetwork, fastRouterFactory);
 	}
 }
