@@ -20,10 +20,6 @@
 
 package org.matsim.core.population;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -33,8 +29,11 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.AbstractMatsimWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PersonAlgorithm;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStream;
 
 public class PopulationWriter extends AbstractMatsimWriter implements MatsimWriter, PersonAlgorithm {
 
@@ -42,7 +41,6 @@ public class PopulationWriter extends AbstractMatsimWriter implements MatsimWrit
 
 	private PopulationWriterHandler handler = null;
 	private final Population population;
-	private Knowledges knowledges = null;
 	private final Network network;
 	private Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
 
@@ -57,7 +55,7 @@ public class PopulationWriter extends AbstractMatsimWriter implements MatsimWrit
 	 * Creates a new PlansWriter to write out the specified plans to the file and with version
 	 * as specified in the {@linkplain org.matsim.core.config.groups.PlansConfigGroup configuration}.
 	 * If plans-streaming is on, the file will already be opened and the file-header be written.
-	 * If plans-streaming is off, the file will not be created until {@link #write()} is called.
+	 * If plans-streaming is off, the file will not be created until {@link #write(java.lang.String)} is called.
 	 *
 	 * @param population the population to write to file
 	 */
@@ -69,7 +67,7 @@ public class PopulationWriter extends AbstractMatsimWriter implements MatsimWrit
 	 * Creates a new PlansWriter to write out the specified plans to the specified file and with
 	 * the specified version.
 	 * If plans-streaming is on, the file will already be opened and the file-header be written.
-	 * If plans-streaming is off, the file will not be created until {@link #write()} is called.
+	 * If plans-streaming is off, the file will not be created until {@link #write(java.lang.String)} is called.
 	 *
 	 * @param population the population to write to file
 	 * @param fraction of persons to write to the plans file
@@ -79,12 +77,6 @@ public class PopulationWriter extends AbstractMatsimWriter implements MatsimWrit
 		this.population = population;
 		this.network = network;
 		this.write_person_fraction = fraction;
-		this.handler = new PopulationWriterHandlerImplV5();
-	}
-
-	public PopulationWriter(final Population pop, final Network network, final Knowledges knowledges) {
-		this(pop, network);
-		this.knowledges = knowledges;
 		this.handler = new PopulationWriterHandlerImplV5();
 	}
 
@@ -204,7 +196,7 @@ public class PopulationWriter extends AbstractMatsimWriter implements MatsimWrit
 	}
 
 	public void writeFileV4(final String filename) {
-		this.handler = new PopulationWriterHandlerImplV4(this.network, this.knowledges);
+		this.handler = new PopulationWriterHandlerImplV4(this.network);
 		write(filename);
 	}
 

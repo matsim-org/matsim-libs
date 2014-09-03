@@ -20,10 +20,6 @@
 
 package org.matsim.core.population;
 
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.Stack;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -43,11 +39,12 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.knowledges.KnowledgeImpl;
-import org.matsim.knowledges.Knowledges;
-import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.population.Desires;
 import org.xml.sax.Attributes;
+
+import java.util.ArrayList;
+import java.util.Locale;
+import java.util.Stack;
 
 /**
  * A reader for plans files of MATSim according to <code>plans_v4.dtd</code>.
@@ -79,11 +76,9 @@ import org.xml.sax.Attributes;
 	/* package*/ final Population plans;
 	private final Network network;
 	private final ActivityFacilities facilities;
-	/* package*/ final Knowledges knowledges;
 
 	/*package*/ PersonImpl currperson = null;
 	private Desires currdesires = null;
-	private KnowledgeImpl currknowledge = null;
 	private String curracttype = null;
 	private ActivityOption curractivity = null;
 	private PlanImpl currplan = null;
@@ -102,19 +97,9 @@ import org.xml.sax.Attributes;
 		this.network = scenario.getNetwork();
 		if (scenario instanceof ScenarioImpl) {
 			this.facilities = scenario.getActivityFacilities();
-			Knowledges k = null;
-			if (scenario.getConfig().scenario().isUseKnowledges()) {
-				k = ((ScenarioImpl) scenario).getKnowledges();
-			}
-			if (k == null) {
-				this.knowledges = new KnowledgesImpl(); // we need knowledges to read in a file
-			} else {
-				this.knowledges = k;
-			}
 		} else {
-			this.facilities = null;
-			this.knowledges = new KnowledgesImpl();
-		}
+            this.facilities = null;
+        }
 	}
 
 	@Override
@@ -131,7 +116,7 @@ import org.xml.sax.Attributes;
 		} else if (ACTDUR.equals(name)) {
 			startActDur(atts);
 		} else if (KNOWLEDGE.equals(name)) {
-			startKnowledge(atts);
+			// Knowledges are no more
 		} else if (ACTIVITYSPACE.equals(name)) {
 			log.warn("<activityspace> will be ignored.");
 		} else if (ACTIVITY.equals(name)) {
@@ -163,9 +148,6 @@ import org.xml.sax.Attributes;
 			this.currperson = null;
 		} else if (DESIRES.equals(name)) {
 			this.currdesires = null;
-		} else if (KNOWLEDGE.equals(name)) {
-
-			this.currknowledge = null;
 		} else if (ACTIVITY.equals(name)) {
 			this.curracttype = null;
 		} else if (LOCATION.equals(name)) {
@@ -231,11 +213,6 @@ import org.xml.sax.Attributes;
 		this.currdesires.putActivityDuration(atts.getValue(ATTR_TYPE), atts.getValue("dur"));
 	}
 
-	private void startKnowledge(final Attributes atts) {
-		this.currknowledge = this.knowledges.getFactory().createKnowledge(this.currperson.getId(), atts.getValue("desc"));
-		this.knowledges.getKnowledgesByPersonId().put(this.currperson.getId(), this.currknowledge);
-	}
-
 	private void startActivityFacility(final Attributes atts) {
 		this.curracttype = atts.getValue(ATTR_TYPE);
 	}
@@ -273,7 +250,6 @@ import org.xml.sax.Attributes;
 		if (this.curractivity == null) {
 			throw new RuntimeException("facility id=" + id + ": Activity of type=" + this.curracttype + " does not exist!");
 		}
-		this.currknowledge.addActivityOption(this.curractivity, isPrimary);
 	}
 
 	private void startPlan(final Attributes atts) {

@@ -1,38 +1,20 @@
 package playground.balac.utils;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.*;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.router.ActivityWrapperFacility;
-import org.matsim.core.router.LegRouterWrapper;
-import org.matsim.core.router.TransitRouterWrapper;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.*;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.router.old.TeleportationLegRouter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -44,8 +26,12 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterNetwork;
-
 import playground.balac.carsharing.preprocess.membership.MyLinkUtils;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.List;
 
 public class PTTravelTimes {
 	
@@ -180,10 +166,10 @@ public class PTTravelTimes {
 		outLink.flush();
 		outLink.close();
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), 
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()
 //				((ScenarioImpl) scenario).getKnowledges()).writeFileV4("/data/matsim/cdobler/2030/60.plans_with_pt_routes.xml.gz");
 		//		((ScenarioImpl) scenario).getKnowledges()).writeFileV4("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/plans_with_pt_routes_single_plan_"+args[0]+".xml.gz");
-			      ((ScenarioImpl)scenario).getKnowledges()).writeFileV4("./plans_with_pt_routes_"+args[0]+".xml.gz");
+        ).writeFileV4("./plans_with_pt_routes_"+args[0]+".xml.gz");
 
 	}
 		

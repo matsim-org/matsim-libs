@@ -20,13 +20,6 @@
 
 package playground.christoph.households;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -47,6 +40,9 @@ import org.matsim.population.filters.PersonIntersectAreaFilter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Creates diluted cut scenario that where only households are removed if no 
@@ -142,7 +138,7 @@ public class CreateDilutedHouseholdCut {
 		log.info("  done.");
 		
 		log.info("  writing filtered population to file...");
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), scenario.getKnowledges()).writeFileV4(populationOutFile);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(populationOutFile);
 		log.info("  done.");
 		
 		log.info("  writing filtered households to file...");

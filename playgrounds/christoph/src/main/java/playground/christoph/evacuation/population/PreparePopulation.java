@@ -20,10 +20,6 @@
 
 package playground.christoph.evacuation.population;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -34,20 +30,18 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.router.old.LegRouter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
-
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.router.KtiPtRouteFactory;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class PreparePopulation {
 
@@ -115,7 +109,7 @@ public class PreparePopulation {
 		
 		population.setIsStreaming(true);
 		
-		PopulationWriter populationWriter = new PopulationWriter(population, scenario.getNetwork(), ((ScenarioImpl)scenario).getKnowledges());
+		PopulationWriter populationWriter = new PopulationWriter(population, scenario.getNetwork());
 		populationWriter.startStreaming(populationOutFile);
 
 		Set<String> modesToReroute = new HashSet<String>();

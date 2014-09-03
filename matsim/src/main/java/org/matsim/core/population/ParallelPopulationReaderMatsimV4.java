@@ -20,14 +20,6 @@
 
 package org.matsim.core.population;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -38,12 +30,16 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.knowledges.KnowledgeImpl;
-import org.matsim.knowledges.Knowledges;
-import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Parallel implementation of the PopulationReaderMatsimV4. The main thread only reads
@@ -64,7 +60,6 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 	private final BlockingQueue<List<Tag>> queue;
 	private final CollectorScenario collectorScenario;
 	private final CollectorPopulation collectorPopulation;
-	private final CollectorKnowledges collectorKnowledges;
 
 	private Thread[] threads;
 	private List<Tag> currentPersonXmlData;
@@ -82,7 +77,6 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 			this.numThreads = 1;
 			this.queue = null;
 			this.collectorPopulation = null;
-			this.collectorKnowledges = null;
 			this.collectorScenario = null;
 		} else {
 			isPopulationStreaming = false;
@@ -93,8 +87,7 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 			
 			this.queue = new LinkedBlockingQueue<List<Tag>>();
 			this.collectorPopulation = new CollectorPopulation(this.plans);
-			this.collectorKnowledges = new CollectorKnowledges();
-			this.collectorScenario = new CollectorScenario(scenario, collectorPopulation, collectorKnowledges);
+			this.collectorScenario = new CollectorScenario(scenario, collectorPopulation);
 		}
 	}
 		
@@ -171,11 +164,6 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 				throw new RuntimeException(e);
 			}
 			
-			// add collector knowledges to knowledges
-			if (knowledges != null) {
-				knowledges.getKnowledgesByPersonId().putAll(this.collectorKnowledges.getKnowledgesByPersonId());
-			}
-			
 			super.endTag(name, content, context);
 			log.info("Finished parallel population reading...");
 		} else {
@@ -195,13 +183,11 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 		
 		private final Scenario scenario;
 		private final CollectorPopulation population;
-		private final CollectorKnowledges knowledges;
 		
-		public CollectorScenario(Scenario scenario, CollectorPopulation population, CollectorKnowledges knowledges) {
+		public CollectorScenario(Scenario scenario, CollectorPopulation population) {
 			super(scenario.getConfig());
 			this.scenario = scenario;
 			this.population = population;
-			this.knowledges = knowledges;
 		}
 		
 		@Override
@@ -220,11 +206,6 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 		@Override
 		public Population getPopulation() {
 			return this.population;	// return collector population
-		}
-		
-		@Override
-		public Knowledges getKnowledges() {
-			return this.knowledges; // return collector knowledges
 		}
 		
 		public ActivityFacilities getActivityFacilities() {
@@ -273,27 +254,6 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 		@Override
 		public void addPerson(Person p) {
 			throw new RuntimeException("Calls to this method are not expected to happen...");
-		}
-	}
-	
-	/*
-	 * We have to extend KnowledgesImpl since there a factory is created
-	 * which directly accesses the Object which creates it. Otherwise
-	 * the factory would call the original knowledges object.
-	 * Alternatively we could ensure that KnowledgesImpl is thread-safe
-	 * and add data directly to it instead of using this collector.
-	 */
-	private static class CollectorKnowledges extends KnowledgesImpl {
-
-		private final Map<Id, KnowledgeImpl> knowledgeByPersonId;
-		
-		public CollectorKnowledges() {
-			this.knowledgeByPersonId = new ConcurrentHashMap<Id, KnowledgeImpl>();
-		}
-
-		@Override
-		public Map<Id, KnowledgeImpl> getKnowledgesByPersonId() {
-			return knowledgeByPersonId;
 		}
 	}
 	

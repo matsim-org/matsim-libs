@@ -20,8 +20,6 @@
 
 package playground.ciarif.modechoice_old;
 
-import java.io.IOException;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -33,11 +31,10 @@ import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkSummary;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.knowledges.Knowledges;
-import org.matsim.knowledges.KnowledgesImpl;
-
 import playground.balmermi.world.MatsimWorldReader;
 import playground.balmermi.world.World;
+
+import java.io.IOException;
 
 public class Mode_choice_main {
 
@@ -89,8 +86,6 @@ public class Mode_choice_main {
 
 		System.out.println("  creating plans object... ");
 		Population plans = scenario.getPopulation();
-		Knowledges knowledges = new KnowledgesImpl();
-		System.out.println("  done.");
 
 		System.out.println("  running plans algorithms... ");
 		new PlansCreateFromNetwork(ns_algo,0).run(plans);
@@ -124,18 +119,15 @@ public class Mode_choice_main {
 		System.out.println("6. DEFINE SOME KNOWLEDGE FOR THE POPULATION");
 		System.out.println();
 
-		System.out.println("  running plans algorithms... ");
-		new PlansDefineKnowledge(facilities, knowledges).run(plans);
-		System.out.println("  done.");
-
 		System.out.println();
 		System.out.println("7. CREATE AN INITIAL DAYPLAN FOR EACH PERSON ACCORDING TO THEIR KNOWLEDGE");
 		System.out.println();
 
 		System.out.println("  running plans algorithms... ");
-		new PersonCreatePlanFromKnowledge(knowledges).run(plans);
+		// new PersonCreatePlanFromKnowledge(knowledges).run(plans);
 		//new FrancescoAlgo().run(plans);
-		new TicketAlgo ().run(plans);
+
+        new TicketAlgo ().run(plans);
 
 		new ModeChoiceAlgorithm().run(plans);
 		//new ModeAlgo().run(plans);
@@ -170,7 +162,9 @@ public class Mode_choice_main {
 		System.out.println("  done.");
 		System.out.println("TEST SUCCEEDED.");
 		System.out.println();
-	}
+        throw new RuntimeException("Knowledges are no more.");
+
+    }
 
 	//////////////////////////////////////////////////////////////////////
 	// main

@@ -22,10 +22,8 @@ package org.matsim.core.scenario;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.households.Households;
-import org.matsim.knowledges.Knowledges;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
@@ -66,27 +64,6 @@ public class ScenarioImplTest {
 		Assert.assertTrue( "households said not created" , created );
 		Assert.assertFalse( "households said recreated" , recreated );
 	}
-
-	@Test
-	public void testCreateOnlyOneKnowledges() {
-		// for some reason, the default is true
-		final Config config = ConfigUtils.createConfig();
-		config.scenario().setUseKnowledge( false );
-		final ScenarioImpl sc = new ScenarioImpl( config );
-
-		final boolean created = sc.createKnowledges();
-		final Knowledges knowledge = sc.getKnowledges();
-		final boolean recreated = sc.createKnowledges();
-
-		Assert.assertSame(
-				"knowledges re-created!",
-				knowledge,
-				sc.getKnowledges() );
-
-		Assert.assertTrue( "knowledge said not created" , created );
-		Assert.assertFalse( "knowledge said recreated" , recreated );
-	}
-
 
 	@Test
 	public void testCreateOnlyOneSchedule() {

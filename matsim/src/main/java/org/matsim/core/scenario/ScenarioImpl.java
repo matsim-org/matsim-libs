@@ -34,8 +34,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
-import org.matsim.knowledges.Knowledges;
-import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.VehicleUtils;
@@ -71,8 +69,6 @@ public class ScenarioImpl implements Scenario {
 	private Households households;
 	private Vehicles vehicles;
 
-	private Knowledges knowledges;
-
 	protected ScenarioImpl(Config config) {
 		this.config = config;
         this.network = NetworkImpl.createNetwork();
@@ -85,7 +81,9 @@ public class ScenarioImpl implements Scenario {
             this.createVehicleContainer();
         }
         if (this.config.scenario().isUseKnowledges()){
-            this.createKnowledges();
+            boolean result;
+            throw new RuntimeException("Knowledges are no more.");
+
         }
         if (this.config.scenario().isUseTransit()) {
             this.createTransitSchedule();
@@ -129,26 +127,7 @@ public class ScenarioImpl implements Scenario {
 		return true;
 	}
 
-	/**
-	 * Creates a knowledge container and stores it, if it does not exist.
-	 * This is necessary only in very special use cases, when one needs
-	 * to create such a container <b>without</b> setting the useKnowledge
-	 * config switch to true.
-	 *
-	 * @return true if a new container was initialized, false otherwise
-	 */
-	public boolean createKnowledges() {
-		if ( this.knowledges != null ) return false;
-
-		if ( !this.config.scenario().isUseKnowledges() ) {
-			log.info( "creating knowledges container while switch in config set to false. File will not be loaded automatically." );
-		}
-
-		this.knowledges = new KnowledgesImpl();
-		return true;
-	}
-
-	/**
+    /**
 	 * Creates a transit schedule and stores it, if it does not exist.
 	 * This is necessary only in very special use cases, when one needs
 	 * to create such a container <b>without</b> setting the useTransit
@@ -251,31 +230,8 @@ public class ScenarioImpl implements Scenario {
 
 		return this.vehicles;
 	}
-	
-	/**
-	 * @deprecated use {@link Population#getPersonAttributes()} instead.
-	 */
-	@Deprecated // use population.getPopulationAttributes instead
-	public Knowledges getKnowledges() {
-		if ( this.knowledges == null ) {
-			if ( this.config.scenario().isUseKnowledges() ) {
-				this.createKnowledges();
-			}
-			else {
-				// throwing an exception should be the right approach,
-				// but it requires some testing (there may be places in the code
-				// which are happy with getting a null pointer, and would then
-				// not work anymore)
-				// throw new IllegalStateException(
-				log.warn(
-						"no knowledge container, and kowledge not activated from config. You must first call the create method of ScenarioImpl." );
-			}
-		}
 
-		return this.knowledges;
-	}
-
-	@Override
+    @Override
 	public TransitSchedule getTransitSchedule() {
 		if ( this.transitSchedule == null ) {
 			if ( this.config.scenario().isUseTransit() ) {

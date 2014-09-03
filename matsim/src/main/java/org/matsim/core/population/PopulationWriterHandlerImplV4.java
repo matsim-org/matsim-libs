@@ -20,37 +20,25 @@
 
 package org.matsim.core.population;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.knowledges.KnowledgeImpl;
-import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Desires;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandler {
 
 	private final Network network;
 
 	public PopulationWriterHandlerImplV4(final Network network) {
-		this.network = network;
-	}
-
-	public PopulationWriterHandlerImplV4(final Network network, final Knowledges knowledges) {
-		super(knowledges);
 		this.network = network;
 	}
 
@@ -176,11 +164,8 @@ public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandl
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void startKnowledge(final KnowledgeImpl knowledge, final BufferedWriter out) throws IOException {
-		out.write("\t\t<knowledge");
-		if (knowledge.getDescription() != null)
-			out.write(" desc=\"" + knowledge.getDescription() + "\"");
-		out.write(">\n");
+	public void startKnowledge(final Object knowledge, final BufferedWriter out) throws IOException {
+
 	}
 
 	@Override

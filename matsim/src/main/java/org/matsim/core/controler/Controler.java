@@ -20,22 +20,12 @@
 
 package org.matsim.core.controler;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-import org.matsim.analysis.CalcLegTimes;
-import org.matsim.analysis.CalcLinkStats;
-import org.matsim.analysis.ScoreStats;
-import org.matsim.analysis.ScoreStatsControlerListener;
-import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.analysis.*;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -49,14 +39,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
-import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
-import org.matsim.core.controler.corelisteners.EventsHandling;
-import org.matsim.core.controler.corelisteners.LegHistogramListener;
-import org.matsim.core.controler.corelisteners.LegTimesListener;
-import org.matsim.core.controler.corelisteners.LinkStatsControlerListener;
-import org.matsim.core.controler.corelisteners.PlansDumping;
-import org.matsim.core.controler.corelisteners.PlansReplanning;
-import org.matsim.core.controler.corelisteners.PlansScoring;
+import org.matsim.core.controler.corelisteners.*;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.external.ExternalMobsim;
@@ -68,14 +51,7 @@ import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.selectors.PlanSelectorFactory;
-import org.matsim.core.router.DefaultTripRouterFactoryImpl;
-import org.matsim.core.router.LinkToLinkTripRouterFactory;
-import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -101,6 +77,11 @@ import org.matsim.signalsystems.controler.SignalsControllerListenerFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
+
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -179,7 +160,7 @@ public class Controler extends AbstractController {
 	private MobsimFactoryRegister mobsimFactoryRegister;
 	private SnapshotWriterFactoryRegister snapshotWriterRegister;
 	private PlanStrategyFactoryRegister planStrategyFactoryRegister;
-	private PlanSelectorFactoryRegister planSelectorFactoryRegister;
+    private PlanSelectorFactoryRegister planSelectorFactoryRegister;
 
 	protected boolean dumpDataAtEnd = true;
 	private boolean overwriteFiles = false;
@@ -864,9 +845,9 @@ public class Controler extends AbstractController {
 		this.planStrategyFactoryRegister.register(planStrategyFactoryName, planStrategyFactory);
 	}
 
-  public final void addPlanSelectorFactory(final String planSelectorFactoryName, final PlanSelectorFactory<Plan, Person> planSelectorFactory) {
-    this.planSelectorFactoryRegister.register(planSelectorFactoryName, planSelectorFactory);
-  }
+    public final void addPlanSelectorFactory(final String planSelectorFactoryName, final PlanSelectorFactory<Plan, Person> planSelectorFactory) {
+        this.planSelectorFactoryRegister.register(planSelectorFactoryName, planSelectorFactory);
+    }
 
 	public final void setSignalsControllerListenerFactory(
 			final SignalsControllerListenerFactory signalsFactory) {

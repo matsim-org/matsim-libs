@@ -21,20 +21,20 @@
 package playground.balmermi.modules;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 public class PersonStupidDeleteKnowledgeForStreamingModule extends AbstractPersonAlgorithm {
 
-	private final Knowledges knowledges;
+	private final Object knowledges;
 
-	public PersonStupidDeleteKnowledgeForStreamingModule(Knowledges knowledges) {
+	public PersonStupidDeleteKnowledgeForStreamingModule(Object knowledges) {
 		super();
 		this.knowledges = knowledges;
 	}
 
 	@Override
 	public void run(final Person person) {
-		knowledges.getKnowledgesByPersonId().clear();
-	}
+        throw new RuntimeException("Knowledges are no more.");
+
+    }
 }
