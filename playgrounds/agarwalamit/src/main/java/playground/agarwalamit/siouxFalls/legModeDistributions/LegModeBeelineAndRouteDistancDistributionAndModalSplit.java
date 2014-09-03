@@ -27,7 +27,7 @@ import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistan
 /**
  * @author amit
  */
-public class ModeDistancDistributionAndModalSplit {
+public class LegModeBeelineAndRouteDistancDistributionAndModalSplit {
 
 	private final static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/";//outputModalSplitSetUp
 //	private final static String run = "/run201/";
@@ -37,7 +37,7 @@ public class ModeDistancDistributionAndModalSplit {
 //	private static String finalPlanFileLocation = runDir+run+"/ITERS/";
 
 	public static void main(String[] args) {
-		ModeDistancDistributionAndModalSplit ms= new ModeDistancDistributionAndModalSplit();
+		LegModeBeelineAndRouteDistancDistributionAndModalSplit ms= new LegModeBeelineAndRouteDistancDistributionAndModalSplit();
 
 		//		for(int i=1;i<2;i++){
 		//			String itNr = String.valueOf(i*100);
