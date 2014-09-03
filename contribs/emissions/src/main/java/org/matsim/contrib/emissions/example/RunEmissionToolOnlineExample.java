@@ -54,7 +54,6 @@ public class RunEmissionToolOnlineExample {
 		
 	// controler settings	
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);		
 		controler.addControlerListener(new EmissionControlerListener());
 		controler.run();
 	}

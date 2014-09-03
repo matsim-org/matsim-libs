@@ -54,7 +54,7 @@ public class CreateEmissionConfig {
 		static String networkFile = inputPath + "sample_network.xml";
 		static String plansFile = inputPath + "sample_population.xml";
 		
-		static String roadTypeMappingFile = inputPath + "roadTypeMapping.txt";
+		static String roadTypeMappingFile = inputPath + "sample_roadTypeMapping.txt";
 		static String emissionVehicleFile = inputPath + "sample_emissionVehicles.xml";
 		
 		static String averageFleetWarmEmissionFactorsFile = inputPath + "sample_EFA_HOT_vehcat_2005average.txt";
@@ -76,58 +76,20 @@ public class CreateEmissionConfig {
 			config.addCoreModules();
 			Controler controler = new Controler(config);
 			
-		// controler settings	
-			controler.setOverwriteFiles(true);
-			controler.setCreateGraphs(false);
-			
 		// controlerConfigGroup
 			ControlerConfigGroup ccg = controler.getConfig().controler();
 			ccg.setOutputDirectory(outputPath);
 			ccg.setFirstIteration(0);
 			ccg.setLastIteration(numberOfIterations-1);
-			ccg.setMobsim("qsim");
-			Set<EventsFileFormat> set = new HashSet<EventsFileFormat>();
-			set.add(EventsFileFormat.xml);
-			ccg.setEventsFileFormats(set);
-//			ccg.setRunId("321");
-			
-		// qsimConfigGroup
-			QSimConfigGroup qcg = controler.getConfig().qsim();
-			qcg.setStartTime(0 * 3600.);
-			qcg.setEndTime(30 * 3600.);
-//			qcg.setFlowCapFactor(0.1);
-//			qcg.setStorageCapFactor(0.3);
-			qcg.setFlowCapFactor(0.01);
-			qcg.setStorageCapFactor(0.03);
-			qcg.setNumberOfThreads(1);
-			qcg.setRemoveStuckVehicles(false);
-			qcg.setStuckTime(10.0);
 			
 		// planCalcScoreConfigGroup
 			PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
-			Set<String> activities = new HashSet<String>();
-			activities.add("unknown");
-			activities.add("work");
-			activities.add("pickup");
-			activities.add("with adult");
-			activities.add("other");
-			activities.add("pvWork");
-			activities.add("pvHome");
-			activities.add("gvHome");
-			activities.add("education");
-			activities.add("business");
-			activities.add("shopping");
-			activities.add("private");
-			activities.add("leisure");
-			activities.add("sports");
-			activities.add("home");
-			activities.add("friends");
-			
-			for(String activity : activities){
-				ActivityParams params = new ActivityParams(activity);
-				params.setTypicalDuration(8 * 3600);
-				pcs.addActivityParams(params);
-			}
+			ActivityParams homeP = new ActivityParams("home");
+			homeP.setTypicalDuration(12 * 3600);
+			pcs.addActivityParams(homeP);
+			ActivityParams workP = new ActivityParams("work");
+			workP.setTypicalDuration(8 * 3600);
+			pcs.addActivityParams(workP);
 
 		// strategy
 			StrategyConfigGroup scg = controler.getConfig().strategy();
