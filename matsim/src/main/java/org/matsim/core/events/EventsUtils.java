@@ -10,27 +10,21 @@ public class EventsUtils {
 	}
 	
 	public static EventsManager createEventsManager(Config config) {
-		EventsManager events;
-
-		Integer numberOfThreads = config.parallelEventHandling().getNumberOfThreads() ;
-		Long estimatedNumberOfEvents = config.parallelEventHandling().getEstimatedNumberOfEvents() ;
-		Boolean synchronizeOnSimSteps = config.parallelEventHandling().getSynchronizeOnSimSteps();		
-		
+        Integer numberOfThreads = config.parallelEventHandling().getNumberOfThreads();
+		Long estimatedNumberOfEvents = config.parallelEventHandling().getEstimatedNumberOfEvents();
+		Boolean synchronizeOnSimSteps = config.parallelEventHandling().getSynchronizeOnSimSteps();
 		if (numberOfThreads != null) {
 			if (synchronizeOnSimSteps != null && synchronizeOnSimSteps) {
-				events = new SimStepParallelEventsManagerImpl(numberOfThreads);
+                return new SimStepParallelEventsManagerImpl(numberOfThreads);
 			} else {
 				if (estimatedNumberOfEvents != null) {
-					events = new ParallelEventsManagerImpl(numberOfThreads, estimatedNumberOfEvents);
+					return new ParallelEventsManagerImpl(numberOfThreads, estimatedNumberOfEvents);
 				} else {
-					events = new ParallelEventsManagerImpl(numberOfThreads);
-				}				
+					return new ParallelEventsManagerImpl(numberOfThreads);
+				}
 			}
-		} else {
-			events = new EventsManagerImpl();
 		}
-
-		return events;
+        return new SimStepParallelEventsManagerImpl(1);
 	}
 
 }

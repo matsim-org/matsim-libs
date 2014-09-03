@@ -20,10 +20,10 @@
 
 package org.matsim.core.config.groups;
 
+import org.matsim.core.config.Module;
+
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.matsim.core.config.Module;
 
 /**
  * @author nagel
@@ -34,13 +34,13 @@ public class ParallelEventHandlingConfigGroup extends Module {
 	public static final String GROUP_NAME = "parallelEventHandling";
 
 	private final static String NUMBER_OF_THREADS = "numberOfThreads";
-	private Integer numberOfThreads = null;
+	private Integer numberOfThreads = 1;
 
 	private final static String ESTIMATED_NUMBER_OF_EVENTS = "estimatedNumberOfEvents";
 	private Long estimatedNumberOfEvents = null;
 
 	private final static String SYNCHRONIZE_ON_SIMSTEPS = "synchronizeOnSimSteps"; 
-	private Boolean synchronizeOnSimSteps = null;
+	private Boolean synchronizeOnSimSteps = true;
 	
 	private boolean locked = false;
 
