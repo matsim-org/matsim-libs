@@ -94,6 +94,17 @@ public class LoadMyScenarios {
 	}
 	
 	/**
+	 * Returns scenario containing only plans file location.
+	 */
+	public static Scenario loadScenarioFromPlans(String plansFile) {
+		Config config = new Config();
+		config.addCoreModules();
+		config.plans().setInputFile(plansFile);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		return scenario;
+	}
+	
+	/**
 	 * Returns simulation end time by reading config file and without loading scenario.
 	 */
 	public static Double getEndTime(String configfile) {
