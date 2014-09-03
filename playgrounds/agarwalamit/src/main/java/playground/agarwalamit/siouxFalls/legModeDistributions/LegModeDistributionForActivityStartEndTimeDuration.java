@@ -47,7 +47,7 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
 public class LegModeDistributionForActivityStartEndTimeDuration extends AbstractAnalyisModule {
 
 	private final Logger logger = Logger.getLogger(LegModeDistributionForActivityStartEndTimeDuration.class);
-	private ActivityStartEndTimeAndDurationHandler actStrEndur;
+	private ActivityEndTimeAndDurationHandler actStrEndur;
 	private Map<String, Map<Id, Double>> actTyp2PersonId2ActStartTime;
 	private Map<String, Map<Id, Double>> actTypPersonId2ActEndTime;
 	private Map<Id, String> personId2LegMode ;
@@ -66,7 +66,7 @@ public class LegModeDistributionForActivityStartEndTimeDuration extends Abstract
 		this.configFile=configFile;
 		this.timeStepClasses=new ArrayList<Integer>();
 		this.travelModes = new ArrayList<String>();
-		this.actStrEndur=new ActivityStartEndTimeAndDurationHandler();
+		this.actStrEndur=new ActivityEndTimeAndDurationHandler();
 	}
 
 	public static void main(String[] args) {
