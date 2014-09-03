@@ -25,11 +25,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 
-import playground.benjamin.scenarios.munich.analysis.nectar.SpatialAveragingUtils;
-
-
 public class LinkLineWeightUtil implements LinkWeightUtil {
-	private final Logger logger = Logger.getLogger(SpatialAveragingUtils.class);
+	private final Logger logger = Logger.getLogger(LinkLineWeightUtil.class);
 	private double smoothingRadiusSquared_m;
 	private double smoothingRadius_m;
 	
