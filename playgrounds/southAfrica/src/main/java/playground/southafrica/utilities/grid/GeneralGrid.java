@@ -23,20 +23,26 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.jzy3d.analysis.AbstractAnalysis;
+import org.jzy3d.analysis.AnalysisLauncher;
+import org.jzy3d.chart.factories.AWTChartComponentFactory;
+import org.jzy3d.colors.Color;
+import org.jzy3d.maths.Coord3d;
+import org.jzy3d.plot3d.rendering.canvas.Quality;
+import org.jzy3d.plot3d.rendering.view.modes.ViewPositionMode;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.matrices.Matrix;
 
 import playground.southafrica.utilities.Header;
 import playground.southafrica.utilities.gis.MyMultiFeatureReader;
@@ -48,48 +54,41 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
- * Class to generate either a square or hexagonal grid from a given shapefile.
+ * Class to generate either a square or hexagonal grid from a given shapefile, 
+ * and apply (optional) smoothing when processing points or lines over the
+ * grid surface. 
  *
  * @author jwjoubert
  */
-public class GeneralGrid {
+public class GeneralGrid{
 	private final static Logger LOG = Logger.getLogger(GeneralGrid.class);
-	
-	private Matrix grid = null;
-	private QuadTree<Tuple<String, Point>> qt;
+
+	private Geometry geometry;
+	private QuadTree<Point> qt;
 	private final GeometryFactory gf = new GeometryFactory();
-	
+
 	private final GridType type;
 	private final double width;
 
-	
+	/* For caching purposes, create the grid cell geometry once, and return the 
+	 * cached geometry subsequently. */
+	private Map<Point, Geometry> geometryCache = new HashMap<Point, Geometry>();
+
+
 	/**
 	 * Instantiates a grid.
 	 * @param width the horizontal distance at the widest portion of the cell.
 	 * 		  For a square that is obviously the width; for a (flat-topped) 
 	 * 		  hexagonal cell it is the distance from the left-most point to the
 	 * 	      right-most point. 
-	 * @param type an indicator specifying the type of grid. Currently supported
-	 * 		  grid-type values are:
-	 * 		  <ol>
-	 * 			<li> square;
-	 * 			<li> hexagonal.
-	 * 		  </ol>
+	 * @param type an indicator specifying the {@link GridType}. 
 	 */
-	public GeneralGrid(double width, int type) {
+	public GeneralGrid(double width, GridType type) {
 		this.width = width;
-		switch (type) {
-		case 1:
-			this.type = GridType.SQUARE;
-			break;
-		case 2:
-			this.type = GridType.HEX;
-			break;
-		default:
-			this.type = GridType.UNKNOWN;
-		};
+		this.type = type;
 	}
-	
+
+
 	/**
 	 * Converts a given (single) shapefile into a grid, each cell having a 
 	 * centroid within the shapefile.
@@ -100,33 +99,40 @@ public class GeneralGrid {
 	public void generateGrid(Geometry g){
 		LOG.warn("Did you check that the width given is in the same unit-of-measure as the shapefile?");
 		LOG.info("Generating " + this.type.toString() + " grid. This may take some time...");
+		this.geometry = g;
 
-		grid = new Matrix("grid", null);
+//		grid = new Matrix("grid", null);
 		Polygon envelope = (Polygon)g.getEnvelope();
-		qt = new QuadTree<Tuple<String,Point>>(
+		qt = new QuadTree<Point>(
 				envelope.getCoordinates()[0].x-width, 
 				envelope.getCoordinates()[0].y-width, 
 				envelope.getCoordinates()[2].x+width, 
 				envelope.getCoordinates()[2].y+width);				
 
 		Counter counter = new Counter("   cells # ");
-		
-		double startX = envelope.getCoordinates()[0].x + 0.5*width;
-		double startY = envelope.getCoordinates()[0].y + 0.5*width;
-		
-		/* Determine the step size, given the GridType. */ 
+
+		double startX = envelope.getCoordinates()[0].x; // + 0.5*width;
+		double startY = envelope.getCoordinates()[0].y; // + 0.5*width;
+
+		/* Determine the step size, given the GridType. 
+		 * TODO: Update this for every new grid type. */ 
 		double yStep;
 		double xStep;
-		if(this.type == GridType.SQUARE){
+		switch (this.type) {
+		case SQUARE:
 			xStep = width;
 			yStep = width;
-		} else if(this.type == GridType.HEX){
+			break;
+		case HEX:
 			xStep = 0.75*width;
 			yStep = ( Math.sqrt(3.0) / 2 ) * width;
-		} else{
+			break;
+		case UNKNOWN:
+			throw new RuntimeException("Don't know how to generate grid for type " + GridType.UNKNOWN);
+		default:
 			throw new RuntimeException("Don't know how to generate grid for type " + GridType.UNKNOWN);
 		}
-		
+
 		double y = startY;
 		int row = 0;
 		while(y <= envelope.getCoordinates()[2].y){
@@ -147,15 +153,14 @@ public class GeneralGrid {
 						thisY = y-0.5*yStep;
 					}
 				} 
-								
+
 				Point p = gf.createPoint(new Coordinate(thisX, thisY));
-				
-				/* Add the point if it is within the original geometry. */
-				if(g.contains(p)){
-					Id toId = new IdImpl(col);
-					qt.put(thisX, thisY, new Tuple<String, Point>(fromId.toString() + "_" + toId.toString(), p));
-					grid.createEntry(fromId, toId, 0.0);
+				Geometry cell = this.getIndividualGeometry(p);
+				if(g.intersects(cell)){
+					qt.put(thisX, thisY, p);
+					geometryCache.put(p, cell);					
 				}
+				
 				x += xStep;
 				col++;
 				counter.incCounter();
@@ -166,67 +171,71 @@ public class GeneralGrid {
 		counter.printCounter();
 	}
 	
-	
+	public Geometry getCellGeometry(Point p){
+		return this.geometryCache.get(p);
+	}
+
+
 	/**
-	 * Writes the grid to a file that can be visualised using R. The format of
-	 * the file, irrespective of the {@link GridType}, contains the following
-	 * columns:<br>
-	 * <blockquote><code> From,To,Long,Lat,Width </code></blockquote>
+	 * Writes the grid to a file that can be visualised using R, for example. 
+	 * The format of the file, irrespective of the {@link GridType}, contains 
+	 * the following columns:<br>
+	 * <blockquote><code> From,To,Long,Lat,X,Y,Width </code></blockquote>
 	 * where
 	 * <ul>
 	 * 	<b>From</b> is the row index of the grid cell;<br>
 	 * 	<b>To</b> is the column index of the grid cell;<br>
-	 * 	<b>Long</b> is the longitude of the centroid of the grid cell;<br>
-	 * 	<b>Lat</b> is the latitude of the grid cell; and<br>
+	 * 	<b>Long</b> is the longitude of the centroid of the grid cell's centroid.
+	 *     If the original geometry's coordinate reference system (CRS) is 
+	 *     provided, then the output longitude will be in decimal degrees 
+	 *     following the WGS84 coordinate reference system). If not, the 
+	 *     x-value of the centroid will be in the same CRS as the original
+	 *     geometry;<br>
+	 * 	<b>Lat</b> is, similar to the longitude, the latitude of the grid cell's 
+	 *     centroid (in decimal degrees following the WGS84 CRS if the original 
+	 *     CRS is provided);<br>
+	 *  <b>X</b> is the x-value of the grid cell's centroid in the original CRS;
+	 *  <b>Y</b> is the y-value of the grid cell's centroid in the original CRS; and
 	 * 	<b>Width</b> is the width of the grid cell.
 	 * </ul>
 	 * 
 	 * @param folder where the output will be written. The final output filename
 	 * 		  will be dependent of the {@link GridType}, followed by the 
 	 * 		  <code>.csv</code> extension. 
+	 * @param originalCRS a string, allowably <code>null</code> describing the 
+	 * 		  coordinate reference system (CRS) of the original geometry 
+	 * 		  provided. If <code>null</code> then no transformation will be done 
+	 * 		  on the coordinate points of the centroids.  
 	 */
-	public void writeGrid(String folder){
+	public void writeGrid(String folder, String originalCRS){
 		String filename = folder + (folder.endsWith("/") ? "" : "/") + this.type + ".csv";
 		LOG.info("Writing grid to file: " + filename);
-		
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "WGS84");
-		
+
+		CoordinateTransformation ct = null;
+		if(originalCRS != null){
+			ct = TransformationFactory.getCoordinateTransformation(originalCRS, "WGS84");
+		}
+
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
-		
+
 		double sum = 0.0;
 		int count = 0;
-		
+
 		try{
 			bw.write("From,To,Long,Lat,X,Y,Width");
 			bw.newLine();
-			Collection<Tuple<String, Point>> list = qt.get(qt.getMinEasting(), qt.getMinNorthing(), qt.getMaxEasting(), qt.getMaxNorthing(), new ArrayList<Tuple<String,Point>>());
-			for(Tuple<String,Point> tuple : list){
-				String[] sa = tuple.getFirst().split("_");
-				bw.write(sa[0]);
-				bw.write(",");
-				bw.write(sa[1]);
-				bw.write(",");
-				Coordinate c = tuple.getSecond().getCoordinate();
-				
-				Coord saAlbers = new CoordImpl(new Double(c.x), new Double(c.y));
-				Coord wgs84 = ct.transform(saAlbers);
-				
-				bw.write(String.format("%.6f,%.6f,%.4f,%.4f,%.4f\n", wgs84.getX(), wgs84.getY(), c.x, c.y, width));
-//				bw.write(String.format("%.4f,%.4f,%.4f\n", c.x, c.y, width));
-				
-				/* Remove after calculation */
-				Coordinate c1 = c;
-				Coordinate c2 = new Coordinate(c1.x, c1.y+1000);
-				c1.distance(c2);
-				
-				Coord saa1 = new CoordImpl(c1.x, c1.y);
-				Coord saa2 = new CoordImpl(c2.x, c2.y);
-				Coord wgs1 = ct.transform(saa1);
-				Coord wgs2 = ct.transform(saa2);
-				double d = CoordUtils.calcDistance(wgs1, wgs2);
-//				LOG.info(String.format("    ==> 1000m = %.6f", d));
-				
-				sum += d;
+			Collection<Point> list = qt.get(qt.getMinEasting(), qt.getMinNorthing(), qt.getMaxEasting(), qt.getMaxNorthing(), new ArrayList<Point>());
+			for(Point p : list){
+				Coord original = new CoordImpl(new Double(p.getX()), new Double(p.getY()));
+				Coord wgs84 = null;
+				if(ct != null){
+					wgs84 = ct.transform(original);
+				} else{
+					wgs84 = original;
+				}
+
+				bw.write(String.format("%.6f,%.6f,%.4f,%.4f,%.4f\n", wgs84.getX(), wgs84.getY(), p.getX(), p.getY(), width));
+
 				count++;
 			}
 		} catch (IOException e) {
@@ -243,28 +252,28 @@ public class GeneralGrid {
 		LOG.info("Done writing file.");
 		LOG.info(String.format("Avg length (in decimal degrees) of 1000m: %.8f (%d observations)", sum / ((int)count), count));
 	}
-	
-	
+
+
 	/**
 	 * @return the {@link GridType} of the grid.
 	 */
 	public GridType getGridType(){
 		return this.type;
 	}
-	
-	public QuadTree<Tuple<String,Point>> getGrid(){
+
+	public QuadTree<Point> getGrid(){
 		return this.qt;
 	}
-	
-	
+
+
 	public static void main(String[] args){
 		Header.printHeader(GeneralGrid.class.toString(), args);
-		
+
 		String shapefile = args[0];
 		String outputFolder = args[1];
-		int type = Integer.parseInt(args[2]);
+		String type = args[2];
 		Double width = Double.parseDouble(args[3]);
-		
+
 		MyMultiFeatureReader mmfr = new MyMultiFeatureReader();
 		try {
 			mmfr.readMultizoneShapefile(shapefile, 1);
@@ -272,20 +281,21 @@ public class GeneralGrid {
 			e.printStackTrace();
 			throw new RuntimeException("Cannot read shapefile from " + shapefile);
 		}
-		
+
 		LOG.info("Read " + mmfr.getAllZones().size() + " zone(s).");
-		GeneralGrid grid = new GeneralGrid(width, type);
+		GeneralGrid grid = new GeneralGrid(width, GridType.valueOf(type));
 
 		Geometry zone = mmfr.getAllZones().get(0);
-//		Geometry dummy = grid.buildDummyPolygon();
-		
+		Geometry dummy = grid.buildDummyPolygon();
+
 		grid.generateGrid(zone);
-		grid.writeGrid(outputFolder);
-		
+		grid.writeGrid(outputFolder, "WGS84_SA_Albers");
+
 		Header.printFooter();
 	}
-	
-	
+
+
+
 	/**
 	 * Currently supported grid types are:
 	 * <ul>
@@ -301,7 +311,73 @@ public class GeneralGrid {
 		HEX,
 		UNKNOWN;		
 	}
+
+
+
+	/**
+	 * Creates a geometry, typical polygon, around the centroid of a grid cell.
+	 * The class uses cache, so it first checks if the geometry has already been
+	 * created.
+	 * 
+	 * @param centroid
+	 * @return
+	 */
+	private Geometry getIndividualGeometry(Point centroid){
+		Geometry g = null;
+
+		switch (this.type) {
+		case SQUARE:
+			double l = centroid.getX() - 0.5*this.width;
+			double r = centroid.getX() + 0.5*this.width;
+			double b = centroid.getY() - 0.5*this.width;
+			double t = centroid.getY() + 0.5*this.width;
+			Coordinate c1 = new Coordinate(l, b);
+			Coordinate c2 = new Coordinate(l, t);
+			Coordinate c3 = new Coordinate(r, t);
+			Coordinate c4 = new Coordinate(r, b);
+			Coordinate[] ca = {c1,c2,c3,c4,c1};
+			g = gf.createPolygon(ca);
+			break;
+			
+		case HEX:
+			double w = 0.5*this.width;
+			double h = Math.sqrt(3.0)/2.0 * w;
+			double x = centroid.getX();
+			double y = centroid.getY();
+			Coordinate cc1 = new Coordinate(x-w, y);
+			Coordinate cc2 = new Coordinate(x-0.5*w, y+h);
+			Coordinate cc3 = new Coordinate(x+0.5*w, y+h);
+			Coordinate cc4 = new Coordinate(x+w, y);
+			Coordinate cc5 = new Coordinate(x+0.5*w, y-h);
+			Coordinate cc6 = new Coordinate(x-0.5*w, y-h);
+			Coordinate[] cca = {cc1, cc2, cc3, cc4, cc5, cc6, cc1};
+			g = gf.createPolygon(cca);
+			break;
+			
+		default:
+			break;
+		}
+		return g;
+	}
 	
+	public double getCellWidth(){
+		return this.width;
+	}
+	
+	public Geometry getGeometry(){
+		return this.geometry;
+	}
+	
+//	public void printGridToScreen(){
+//		try {
+//			AnalysisLauncher.open(this);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			throw new RuntimeException("Cannot visualise.");
+//		}
+//	}
+
+
 	/**
 	 * Builds a geometry that is 20 x 20 grids cells in size.
 	 * @return a geometry of type {@link Polygon} 
@@ -314,8 +390,5 @@ public class GeneralGrid {
 		Coordinate[] ca = {c1,c2,c3,c4,c1};
 		return gf.createPolygon(ca);
 	}
-	
-	
-
 }
 
