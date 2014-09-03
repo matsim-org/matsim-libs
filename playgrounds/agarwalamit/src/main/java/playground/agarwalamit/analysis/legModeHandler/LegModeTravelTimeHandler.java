@@ -25,21 +25,29 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.core.gbl.Gbl;
 
 /**
  * Handles departure and arrival events and store total travel time of a person and 
  * travel time of each trip of a person segregated by leg mode
  * @author amit
  */
-public class LegModeTravelTimeHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
+public class LegModeTravelTimeHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
+
+	private final Logger logger = Logger.getLogger(LegModeTravelTimeHandler.class);
 	private SortedMap<String, Map<Id, List<Double>>> mode2PersonId2TravelTimes;
 	private Map<Id, Double> personId2DepartureTime;
+	private final int maxStuckAndAbortWarnCount=5;
+	private int warnCount = 0;
 
 	public LegModeTravelTimeHandler() {
 		this.mode2PersonId2TravelTimes = new TreeMap<String, Map<Id,List<Double>>>();
@@ -49,6 +57,7 @@ public class LegModeTravelTimeHandler implements PersonDepartureEventHandler, Pe
 	@Override
 	public void reset(int iteration) {
 		this.mode2PersonId2TravelTimes.clear();
+		this.personId2DepartureTime.clear();
 	}
 
 	@Override
@@ -86,6 +95,10 @@ public class LegModeTravelTimeHandler implements PersonDepartureEventHandler, Pe
 		this.personId2DepartureTime.put(personId, deartureTime);
 	}
 
+	
+	/**
+	 * @return  average travel time (averaged over all trips for that person) for each person segregated w.r.t. travel modes.
+	 */
 	public SortedMap<String, Map<Id, Double>> getLegMode2PersonId2TotalTravelTime(){
 		SortedMap<String, Map<Id, Double>> mode2PersonId2TotalTravelTime = new TreeMap<String, Map<Id,Double>>();
 		for(String mode:mode2PersonId2TravelTimes.keySet()){
@@ -102,7 +115,19 @@ public class LegModeTravelTimeHandler implements PersonDepartureEventHandler, Pe
 		return mode2PersonId2TotalTravelTime;
 	}
 
+	/**
+	 * @return  trip time for each trip of each person segregated w.r.t. travel modes.
+	 */
 	public SortedMap<String, Map<Id, List<Double>>> getLegMode2PesonId2TripTimes (){
 		return this.mode2PersonId2TravelTimes;
+	}
+
+	@Override
+	public void handleEvent(PersonStuckEvent event) {
+		if(warnCount<=maxStuckAndAbortWarnCount){
+		logger.warn("'StuckAndAbort' event is thrown for person "+event.getPersonId()+" on link "+event.getLinkId()+" at time "+event.getTime()+
+				". \n Correctness of travel time for such persons can not be guaranteed.");
+		if(warnCount==maxStuckAndAbortWarnCount) logger.warn(Gbl.FUTURE_SUPPRESSED);
+		}
 	}
 }

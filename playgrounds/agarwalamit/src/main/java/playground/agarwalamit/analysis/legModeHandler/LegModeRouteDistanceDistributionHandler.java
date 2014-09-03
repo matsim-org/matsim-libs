@@ -22,7 +22,6 @@ package playground.agarwalamit.analysis.legModeHandler;
 import java.io.BufferedWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -136,7 +135,7 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 
 	@Override
 	public void writeResults(String outputFolder) {
-		
+
 		String outFile = outputFolder + "legModeRouteDistanceDistribution.txt";
 		try{
 			BufferedWriter writer1 = IOUtils.getBufferedWriter(outFile);
@@ -159,9 +158,7 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 				writer1.write("\n");
 			}
 			writer1.close();
-
 			log.info("Finished writing output to " + outFile);
-
 		}catch (Exception e){
 			log.error("Data is not written. Reason " + e.getMessage());
 		}
@@ -264,7 +261,7 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 		return this.mode2DistanceClass2LegCount;
 	}
 
-	public SortedMap<String, Map<Id, List<Double>>> getMode2PersonId2RouteDistance(){
+	public SortedMap<String, Map<Id, List<Double>>> getMode2PersonId2RouteDistances(){
 		return this.mode2PersonId2dist;
 	}
 	public SortedMap<String, Map<Id, Double>> getMode2PersonId2TotalRouteDistance(){

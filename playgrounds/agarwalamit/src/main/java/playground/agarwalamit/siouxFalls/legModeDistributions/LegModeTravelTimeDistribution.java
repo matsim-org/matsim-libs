@@ -120,7 +120,8 @@ public class LegModeTravelTimeDistribution extends AbstractAnalyisModule {
 
 	@Override
 	public void writeResults(String outputFolder) {
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+".rLegModeTravelTimeDistribution.txt");
+		String outputFile = outputFolder+".LegModeTravelTimeDistribution.txt";
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try {
 			writer.write("# \t");
 			for(String mode:this.travelModes){
@@ -139,7 +140,7 @@ public class LegModeTravelTimeDistribution extends AbstractAnalyisModule {
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written in File. Reason : "+e);
 		}
-		logger.info("Files have been written to "+outputFolder+".rLegModeTravelTimeDistribution.txt");
+		logger.info("Files have been written to " + outputFile);
 	}
 	private void initializeTravelTimeClasses() {
 		double highestTravelTime = getHighestTravelTime();
@@ -164,6 +165,7 @@ public class LegModeTravelTimeDistribution extends AbstractAnalyisModule {
 				}
 			}
 		}
+		logger.info("Highest travel time is "+ highestTravelTime+" sec.");
 		return highestTravelTime;
 	}
 	private void getTravelModes(){
