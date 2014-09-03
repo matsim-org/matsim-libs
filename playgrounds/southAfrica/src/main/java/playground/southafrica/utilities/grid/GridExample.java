@@ -42,8 +42,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import javax.sound.sampled.LineListener;
-
 import org.apache.log4j.Logger;
 import org.jzy3d.analysis.AbstractAnalysis;
 import org.jzy3d.analysis.AnalysisLauncher;
@@ -65,7 +63,8 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
- *
+ * A demonstration of how to use the {@link KernelDensityEstimator} class.
+ *  
  * @author jwjoubert
  */
 public class GridExample extends AbstractAnalysis{
@@ -81,7 +80,21 @@ public class GridExample extends AbstractAnalysis{
 	
 
 	/**
-	 * @param args
+	 * Main class to run the grid example. At the end of the run, the code
+	 * produces a visualisation of the points/lines. 
+	 * 
+	 * @param args Require three arguments:
+	 * <ol>
+	 * 		<li><b>example:</b> which example to run: either "1" for the point
+	 * 			example; or "2" for the line example;
+	 * 		<li><b>grid type:</b> the type of grid in which the geometry will be
+	 * 		    demarcated into. Accepted values are <code>SQUARE</code> or 
+	 * 			<code>HEX</code>.
+	 * 		<li><b>smoothing function:</b> the type of kernel density estimation
+	 * 			to use for the smoothing. Accepted values are <code>CELL</code>
+	 * 			for point/line-only aggregation; <code>EPANECHNIKOV</code>; 
+	 * 			<code>GAUSSIAN</code>; <code>TRIANGULAR</code>; <code>TRIWEIGHT</code>;
+	 * 			and <code>UNIFORM</code>. 
 	 */
 	public static void main(String[] args) {
 		int option = Integer.parseInt(args[0]);
