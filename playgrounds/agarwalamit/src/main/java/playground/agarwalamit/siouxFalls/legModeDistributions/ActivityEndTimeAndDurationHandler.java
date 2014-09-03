@@ -35,15 +35,15 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
  * 
  * need to be tested first.
  */
-public class ActivityStartEndTimeAndDurationHandler implements PersonDepartureEventHandler, ActivityEndEventHandler, ActivityStartEventHandler {
+public class ActivityEndTimeAndDurationHandler implements PersonDepartureEventHandler, ActivityEndEventHandler, ActivityStartEventHandler {
 
-	private final Logger logger = Logger.getLogger(ActivityStartEndTimeAndDurationHandler.class);
+	private final Logger logger = Logger.getLogger(ActivityEndTimeAndDurationHandler.class);
 	private Map<String, Map<Id, Double>> activity2personId2StartTime;
 	private Map<String, Map<Id, Double>> activity2personId2EndTime;
 	private Map<String, Map<Id, Double>> activity2personId2Duration;
 	private Map<Id, String> personId2LegMode;
 
-	public ActivityStartEndTimeAndDurationHandler() {
+	public ActivityEndTimeAndDurationHandler() {
 		this.personId2LegMode = new HashMap<Id, String>();
 		this.activity2personId2StartTime = new HashMap<String, Map<Id, Double>>();
 		this.activity2personId2EndTime = new HashMap<String, Map<Id, Double>>();
