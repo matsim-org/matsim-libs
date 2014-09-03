@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -97,11 +98,11 @@ public class ParkAndRideFactory {
 			log.info("Using the transit schedule to create park-and-ride facilities...");
 			
 			if (this.filterType.equals("berlin")) { // filters transit stops by name
-				Map<Id, TransitStopFacility> id2transitStopFacility = this.getFilteredTransitStops_byName();
+				Map<Id<TransitStopFacility>, TransitStopFacility> id2transitStopFacility = this.getFilteredTransitStops_byName();
 				this.setId2prCarLinkToNode_fromScheduleFile(id2transitStopFacility);
 			
 			} else if (this.filterType.equals("allTransitStops")) { // adds park-and-ride facilities to all transit stops
-				Map<Id, TransitStopFacility> id2transitStopFacility = this.scenario.getTransitSchedule().getFacilities();
+				Map<Id<TransitStopFacility>, TransitStopFacility> id2transitStopFacility = this.scenario.getTransitSchedule().getFacilities();
 				this.setId2prCarLinkToNode_fromScheduleFile(id2transitStopFacility);
 			
 			} else {
@@ -163,8 +164,8 @@ public class ParkAndRideFactory {
 		return nextCarLinkToNode;
 	}
 
-	private Map<Id, TransitStopFacility> getFilteredTransitStops_byName() {
-		Map<Id, TransitStopFacility> id2transitStops = new HashMap<Id, TransitStopFacility>();	
+	private Map<Id<TransitStopFacility>, TransitStopFacility> getFilteredTransitStops_byName() {
+		Map<Id<TransitStopFacility>, TransitStopFacility> id2transitStops = new HashMap<Id<TransitStopFacility>, TransitStopFacility>();	
 		List<TransitStopFacility> stopsfilteredOut = new ArrayList<TransitStopFacility>();
 
 		for (TransitStopFacility stop : this.scenario.getTransitSchedule().getFacilities().values()){
@@ -293,7 +294,7 @@ public class ParkAndRideFactory {
 		}
 	}
 
-	private void setId2prCarLinkToNode_fromScheduleFile(Map<Id, TransitStopFacility> id2transitStopFacility) {
+	private void setId2prCarLinkToNode_fromScheduleFile(Map<Id<TransitStopFacility>, TransitStopFacility> id2transitStopFacility) {
 		
 		List<TransitStopFacility> stopsWithoutPRFacility = new ArrayList<TransitStopFacility>();
 

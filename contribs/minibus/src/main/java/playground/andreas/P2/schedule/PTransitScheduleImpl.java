@@ -40,7 +40,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  */
 public class PTransitScheduleImpl implements TransitSchedule {
 	private final Map<Id, TransitLine> transitLines = new TreeMap<Id, TransitLine>();
-	private final Map<Id, TransitStopFacility> stopFacilities = new TreeMap<Id, TransitStopFacility>();
+	private final Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities = new TreeMap<Id<TransitStopFacility>, TransitStopFacility>();
 	private final TransitScheduleFactory factory;
 	private final ObjectAttributes transitLinesAttributes = new ObjectAttributes();
 	private final ObjectAttributes transitStopsAttributes = new ObjectAttributes();
@@ -49,6 +49,7 @@ public class PTransitScheduleImpl implements TransitSchedule {
 		this.factory = builder;
 	}
 
+	@Override
 	public void addTransitLine(final TransitLine line) {
 		final Id id = line.getId();
 		if (this.transitLines.containsKey(id)) {
@@ -62,6 +63,7 @@ public class PTransitScheduleImpl implements TransitSchedule {
 		return this.transitLines.remove(line.getId()) != null;
 	}
 	
+	@Override
 	public void addStopFacility(final TransitStopFacility stop) {
 		final Id id = stop.getId();
 		if (this.stopFacilities.containsKey(id)) {
@@ -71,11 +73,13 @@ public class PTransitScheduleImpl implements TransitSchedule {
 		}
 	}
 
+	@Override
 	public Map<Id, TransitLine> getTransitLines() {
 		return this.transitLines;
 	}
 	
-	public Map<Id, TransitStopFacility> getFacilities() {
+	@Override
+	public Map<Id<TransitStopFacility>, TransitStopFacility> getFacilities() {
 		return this.stopFacilities;
 	}
 
@@ -84,6 +88,7 @@ public class PTransitScheduleImpl implements TransitSchedule {
 		return this.stopFacilities.remove(stop.getId()) != null;
 	}
 
+	@Override
 	public TransitScheduleFactory getFactory() {
 		return this.factory;
 	}

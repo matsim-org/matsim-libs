@@ -42,7 +42,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 public class TransitScheduleImpl implements TransitSchedule {
 
 	private final Map<Id, TransitLine> transitLines = new TreeMap<Id, TransitLine>();
-	private final Map<Id, TransitStopFacility> stopFacilities = new TreeMap<Id, TransitStopFacility>();
+	private final Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities = new TreeMap<Id<TransitStopFacility>, TransitStopFacility>();
 	private final TransitScheduleFactory factory;
 	private final ObjectAttributes transitLinesAttributes = new ObjectAttributes();
 	private final ObjectAttributes transitStopsAttributes = new ObjectAttributes();
@@ -88,7 +88,7 @@ public class TransitScheduleImpl implements TransitSchedule {
 	}
 	
 	@Override
-	public Map<Id, TransitStopFacility> getFacilities() {
+	public Map<Id<TransitStopFacility>, TransitStopFacility> getFacilities() {
 		return Collections.unmodifiableMap(this.stopFacilities);
 	}
 	

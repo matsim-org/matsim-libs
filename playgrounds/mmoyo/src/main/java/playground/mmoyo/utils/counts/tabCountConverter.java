@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.counts.Count;
@@ -62,7 +61,7 @@ public class tabCountConverter {
 		//look for the name of the csId 
 		//convert all facStops from schedule into stopZone
 		Map <Id, TransitStopFacility> trstopToZoneStopMap = new TreeMap <Id, TransitStopFacility>();
-		for(Entry<Id, TransitStopFacility> facEntry: schedule.getFacilities().entrySet() ){
+		for(Entry<Id<TransitStopFacility>, TransitStopFacility> facEntry: schedule.getFacilities().entrySet() ){
 			Id zoneId = convertRealIdtoPseudo(facEntry.getKey());
 			TransitStopFacility stopZone = zoneFactory.createTransitStopFacility(zoneId, facEntry.getValue().getCoord(), false);
 			stopZone.setName(facEntry.getValue().getName());

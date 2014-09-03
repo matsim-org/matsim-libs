@@ -59,7 +59,7 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
 //	private Map<Id, Double> boardSwitchSTotal;
 //	private Map<Id, Double> alightSwitchTotal;
 	
-	private Map<Id, TransitStopFacility> stops;
+	private Map<Id<TransitStopFacility>, TransitStopFacility> stops;
 	private boolean writeHeatMaps = false;
 	private SortedMap<String, HeatMap> heatMaps;
 	private Integer gridSize = Integer.MAX_VALUE;

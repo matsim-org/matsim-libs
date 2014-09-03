@@ -32,6 +32,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.mmoyo.utils.DataLoader;
 
@@ -43,7 +44,7 @@ public class Count_Line_Comparator {
 	
 	void run2(final TransitSchedule schedule, Map<Integer, TabularCountRecord> countRecordMap){
 		
-		Set <Id> stopsIdSet = schedule.getFacilities().keySet();
+		Set<Id<TransitStopFacility>> stopsIdSet = schedule.getFacilities().keySet();
 		for (TabularCountRecord tabularCountRecord : countRecordMap.values()){
 			Id tabStopId = new IdImpl(tabularCountRecord.getStop());
 			if (!stopsIdSet.contains(tabStopId)){

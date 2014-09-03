@@ -47,7 +47,7 @@ protected static TransitScheduleImpl getCadytsSchedule (final TransitSchedule sc
 			cadytsSchedule = (TransitScheduleImpl) cadytsScn.getTransitSchedule();
 			TransitScheduleFactory sBuilder = cadytsSchedule.getFactory();
 			
-			for (Entry<Id, TransitStopFacility> entry:   schedule.getFacilities().entrySet()  ){
+			for (Entry<Id<TransitStopFacility>, TransitStopFacility> entry:   schedule.getFacilities().entrySet()  ){
 				Id cadytsId = FacilityUtils.convertFacilitytoZoneId(entry.getKey());
 				if(!cadytsSchedule.getFacilities().keySet().contains(cadytsId)){
 					TransitStopFacility cadytsStop = sBuilder.createTransitStopFacility(cadytsId, entry.getValue().getCoord() , false);

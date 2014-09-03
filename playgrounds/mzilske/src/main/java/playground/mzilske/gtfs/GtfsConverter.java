@@ -573,7 +573,7 @@ public class GtfsConverter {
 		// Create a new Network
 		Network network = scenario.getNetwork();
 		// Add all stops as nodes
-		Map<Id, TransitStopFacility> stops = ts.getFacilities();
+		Map<Id<TransitStopFacility>, TransitStopFacility> stops = ts.getFacilities();
 		Map<Id<Node>, ? extends Node> nodes = network.getNodes();
 		for(Id id: stops.keySet()){
 			TransitStopFacility stop = stops.get(id);

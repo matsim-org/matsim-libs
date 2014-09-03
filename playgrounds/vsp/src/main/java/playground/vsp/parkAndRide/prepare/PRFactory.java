@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -91,7 +92,7 @@ public class PRFactory {
 		
 		if (this.useScheduleFile == true) {
 			log.info("Using the transit schedule to create park-and-ride facilities...");
-			Map<Id, TransitStopFacility> id2transitStopFacility = this.scenario.getTransitSchedule().getFacilities();
+			Map<Id<TransitStopFacility>, TransitStopFacility> id2transitStopFacility = this.scenario.getTransitSchedule().getFacilities();
 			this.setId2prCarLinkToNode_fromScheduleFile(id2transitStopFacility);
 			
 		}
@@ -213,7 +214,7 @@ public class PRFactory {
 		}
 	}
 
-	private void setId2prCarLinkToNode_fromScheduleFile(Map<Id, TransitStopFacility> id2transitStopFacility) {
+	private void setId2prCarLinkToNode_fromScheduleFile(Map<Id<TransitStopFacility>, TransitStopFacility> id2transitStopFacility) {
 		
 		List<TransitStopFacility> stopsWithoutPRFacility = new ArrayList<TransitStopFacility>();
 
