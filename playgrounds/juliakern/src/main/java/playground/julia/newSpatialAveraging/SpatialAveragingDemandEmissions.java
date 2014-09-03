@@ -39,6 +39,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -67,12 +69,11 @@ public class SpatialAveragingDemandEmissions {
 	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
 	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 
-	private static String configFile1 = runDirectory1 + "output_config.xml.gz";
+	private static String configFile1 = runDirectory1 + "output_config.xml";
 	private final static Integer lastIteration1 = getLastIteration(configFile1);
-	private static String configFile2 = runDirectory1 + "output_config.xml.gz";
+	private static String configFile2 = runDirectory1 + "output_config.xml";
 	private final static Integer lastIteration2 = getLastIteration(configFile2);
-//	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
-	private final String emissionFile1 = "./input/warmEmissionEvent.xml";
+	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
 //	private final String emissionFile1 = "./input/1500.emission.events.xml";
 	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + lastIteration2 + ".emission.events.xml.gz";
 	
@@ -115,16 +116,16 @@ public class SpatialAveragingDemandEmissions {
 	final double xMax = 4479483.33;
 	final double yMin = 5324955.00;
 	final double yMax = 5345696.81;
-	final int noOfXbins = 16; //160
-	final int noOfYbins = 12; //120
+	final int noOfXbins = 160; //160
+	final int noOfYbins = 120; //120
 	
 	final int noOfTimeBins = 1;
 	
 	final double smoothingRadius_m = 500.;
 	
 	final String pollutant2analyze = WarmPollutant.NO2.toString();
-	final boolean compareToBaseCase = false;
-	final boolean useLineMethod = true;
+	final boolean compareToBaseCase = true;
+	final boolean useLineMethod = false;
 	private boolean writeRoutput = true;
 	private boolean writeGisOutput = false;
 	
@@ -133,8 +134,7 @@ public class SpatialAveragingDemandEmissions {
 	Network network;
 	
 	EmissionUtils emissionUtils = new EmissionUtils();
-	EmissionsPerLinkWarmEventHandler warmHandler;
-	EmissionsPerLinkColdEventHandler coldHandler;
+
 	String outPathStub;
 
 	private EmissionsPerLinkAndTimeIntervalEventHandler emissionHandler;
@@ -168,23 +168,14 @@ public class SpatialAveragingDemandEmissions {
 		
 		runBaseCase();
 		if(compareToBaseCase){
-			//runCompareCase(emissionFile2);
+			runCompareCase(emissionFile2);
 		}
 	}
 	
 	private void runBaseCase() throws IOException{
-		
-		/*
-		 * 1. initialize scenario, spatial averaging utils
-		 */
-		
 
 		outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber1 + "." + lastIteration1;
-	
-		/*
-		 * 2. parse emission file and store overall emission amounts by time bins 
-		 */
-		
+
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
 		this.emissionHandler = new EmissionsPerLinkAndTimeIntervalEventHandler(this.simulationEndTime, noOfTimeBins, pollutant2analyze);
@@ -203,109 +194,57 @@ public class SpatialAveragingDemandEmissions {
 			sGrid.multiplyAllCells(linkWeightUtil.getNormalizationFactor());
 			// store results for comparision
 			timeInterval2GridBaseCase[timeInterval] = sGrid;
-			Double endOfTimeInterval = timeInterval/noOfTimeBins*simulationEndTime;
+			Double endOfTimeInterval = (timeInterval+1)/noOfTimeBins*simulationEndTime;
 			// print tables
-			if(writeRoutput){
-				logger.info("start writing r output to " + outPathStub + ".Routput...");
-				
-				this.saWriter.writeRoutput(sGrid.getAverageValuesOfGrid(), outPathStub + ".Routput." + pollutant2analyze.toString() + ".g." + endOfTimeInterval + ".txt");
-				this.saWriter.writeRoutput(sGrid.getWeightsOfGrid(), outPathStub + ".Routput.Demand.vkm." + endOfTimeInterval + ".txt");
-				this.saWriter.writeRoutput(sGrid.getAverageValuesOfGrid(), outPathStub+ ".Routput." + pollutant2analyze + ".gPerVkm." + endOfTimeInterval + ".txt");
-				}
-				if(writeGisOutput){
-					this.saWriter.writeGISoutput(sGrid.getWeightedValuesOfGrid(), outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".g.movie.shp", endOfTimeInterval);
-					this.saWriter.writeGISoutput(sGrid.getWeightsOfGrid(), outPathStub + ".GISoutput.Demand.vkm.movie.shp", endOfTimeInterval);
-					this.saWriter.writeGISoutput(sGrid.getAverageValuesOfGrid(), outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".gPerVkm.movie.shp",endOfTimeInterval);
-				}
+			writeOutput(sGrid, endOfTimeInterval);
 			}
-			logger.info("Done writing output.");
 		}
+	
+	private void runCompareCase(String emissionFile) throws IOException{
+	
+		outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".absoluteDelta";
+
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
+		this.emissionHandler = new EmissionsPerLinkAndTimeIntervalEventHandler(this.simulationEndTime, noOfTimeBins, pollutant2analyze);
+		eventsManager.addHandler(emissionHandler);
+		emissionReader.parse(emissionFile2);
+		
+		Map <Integer, Map<Id, Double>>timeInterval2Link2Pollutant = emissionHandler.getTimeIntervals2EmissionsPerLink();
+		//SpatialGrid[] timeInterval2GridCompareCase = new SpatialGrid[noOfTimeBins];
+		
+		for(int timeInterval:timeInterval2Link2Pollutant.keySet()){
+			SpatialGrid sGrid = new SpatialGrid(noOfXbins, noOfYbins, this.xMin, this.xMax, this.yMin, this.yMax);
 			
-	
-	
-//	private void runCompareCase(String emissionFile) throws IOException{
-//	
-//		/*
-//		 * 1. parse emission file and store overall emission amounts by time bins 
-//		 */
-//		
-//		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFilteredCompareCase = new HashMap<Double, Map<Id,Map<String,Double>>>(); 
-//		Map<Double, Map<Id, Double>> time2CountsPerLinkCompareCase = new HashMap<Double, Map<Id,Double>>();
-//		Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFilteredCompareCase = new HashMap<Double, Map<Id,Double>>();
-//		
-//		//parseAndProcessEmissions(emissionFile, time2EmissionsTotalFilledAndFilteredCompareCase, time2CountsPerLinkCompareCase, time2CountsPerLinkFilledAndFilteredCompareCase);
-//		parseAndProcessEmissions(emissionFile);
-//		time2EmissionsTotalFilledAndFilteredCompareCase = this.time2EmissionsTotalFilledAndFiltered;
-//		time2CountsPerLinkCompareCase = this.time2CountsPerLink;
-//		time2CountsPerLinkFilledAndFilteredCompareCase = this.time2CountsPerLinkFilledAndFiltered;
-//		
-//		/*
-//		 * 2. calculate weighted emissions per cell, weighted demand per cell
-//		 */
-//		Map<Double, double[][]> time2NormalizedWeightedEmissionsCompareCase = new HashMap<Double, double[][]>();
-//		Map<Double, double[][]> time2NormalizedWeightedDemandCompareCase = new HashMap<Double, double[][]>();
-//		Map<Double, double[][]> time2SpecificEmissionsCompareCase = new HashMap<Double, double[][]>();
-//		
-//		//calculateWeightedEmissionsAndDemands(time2NormalizedWeightedEmissionsCompareCase, time2NormalizedWeightedDemandCompareCase, time2SpecificEmissionsCompareCase, time2EmissionsTotalFilledAndFilteredCompareCase, time2CountsPerLinkFilledAndFilteredCompareCase);
-//		calculateWeightedEmissionsAndDemands(time2EmissionsTotalFilledAndFilteredCompareCase, time2CountsPerLinkFilledAndFilteredCompareCase);
-//		time2NormalizedWeightedEmissionsCompareCase = this.time2NormalizedWeightedEmissions;
-//		time2NormalizedWeightedDemandCompareCase = this.time2NormalizedWeightedDemand;
-//		time2SpecificEmissionsCompareCase = this.time2SpecificEmissions;
-//		
-//		/*
-//		 * 3. calculate differences to base case
-//		 */
-//		Map<Double, double[][]> time2AbsoluteEmissionDifferences = calculateAbsoluteDifferencesPerBin(time2NormalizedWeightedEmissionsBaseCase, time2NormalizedWeightedEmissionsCompareCase);
-//		Map<Double, double[][]> time2AbsoluteDemandDifferences = calculateAbsoluteDifferencesPerBin(time2NormalizedWeightedDemandBaseCase, time2NormalizedWeightedDemandCompareCase);
-//		Map<Double, double[][]> time2SpecificEmissionDifferences = calculateAbsoluteDifferencesPerBin(time2SpecificEmissionsBaseCase, time2SpecificEmissionsCompareCase);
-//		
-//		/*
-//		 * 4. write output
-//		 */
-//		outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".absoluteDelta";
-//		writeOutput(time2AbsoluteEmissionDifferences, time2AbsoluteDemandDifferences, time2SpecificEmissionDifferences);
-//	}
-
-	
-
-
-
-	
-	
-	private Map<Double, double[][]> calculateSpecificEmissionsPerBin(
-			Map<Double, double[][]> time2weightedEmissions,
-			Map<Double, double[][]> time2weightedDemand) {
-		
-		Map<Double, double[][]> time2specificEmissions = new HashMap<Double, double[][]>();
-		for( Double endOfTimeInterval : time2weightedEmissions.keySet()){
-			double [][] specificEmissions = new double[noOfXbins][noOfYbins];
-			for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
-				for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
-					specificEmissions[xIndex][yIndex] = time2weightedEmissions.get(endOfTimeInterval)[xIndex][yIndex] / time2weightedDemand.get(endOfTimeInterval)[xIndex][yIndex];
-				}
+			for(Id linkId: timeInterval2Link2Pollutant.get(timeInterval).keySet()){
+				sGrid.addLinkValue(network.getLinks().get(linkId), timeInterval2Link2Pollutant.get(timeInterval).get(linkId), linkWeightUtil);
 			}
-			time2specificEmissions.put(endOfTimeInterval, specificEmissions);
-		}
-		return time2specificEmissions;
-	}
-	
-	private Map<Double, double[][]> calculateAbsoluteDifferencesPerBin(
-			Map<Double, double[][]> time2weightedValues1,
-			Map<Double, double[][]> time2weightedValues2){
-		
-		Map<Double, double[][]> time2absoluteDifferences = new HashMap<Double, double[][]>();
-		for(Double endOfTimeInterval : time2weightedValues1.keySet()){
-			double [][] absoluteDifferences = new double[noOfXbins][noOfYbins];
-			for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
-				for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
-					absoluteDifferences[xIndex][yIndex] = time2weightedValues2.get(endOfTimeInterval)[xIndex][yIndex] - time2weightedValues1.get(endOfTimeInterval)[xIndex][yIndex];
-				}
-			}
-			time2absoluteDifferences.put(endOfTimeInterval, absoluteDifferences);
-		}		
-		return time2absoluteDifferences;
+			sGrid.multiplyAllCells(linkWeightUtil.getNormalizationFactor());
+			// calc differences
+			SpatialGrid differencesGrid = new SpatialGrid(noOfXbins, noOfYbins, this.xMin, this.xMax, this.yMin, this.yMax);
+			differencesGrid = sGrid.getDifferences(timeInterval2GridBaseCase[timeInterval]);
+			Double endOfTimeInterval = (timeInterval+1)/noOfTimeBins*simulationEndTime;
+			// print tables
+			writeOutput(differencesGrid, endOfTimeInterval);
+		}			
 	}
 
+	private void writeOutput(SpatialGrid sGrid, Double endOfTimeInterval)
+			throws IOException {
+		if(writeRoutput){
+			logger.info("start writing r output to " + outPathStub);
+			this.saWriter.writeRoutput(sGrid.getAverageValuesOfGrid(), outPathStub + ".Routput." + pollutant2analyze.toString() + ".g." + endOfTimeInterval + ".txt");
+			this.saWriter.writeRoutput(sGrid.getWeightsOfGrid(), outPathStub + ".Routput.Demand.vkm." + endOfTimeInterval + ".txt");
+			this.saWriter.writeRoutput(sGrid.getAverageValuesOfGrid(), outPathStub+ ".Routput." + pollutant2analyze + ".gPerVkm." + endOfTimeInterval + ".txt");
+			}
+		if(writeGisOutput){
+			this.saWriter.writeGISoutput(sGrid.getWeightedValuesOfGrid(), outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".g.movie.shp", endOfTimeInterval);
+			this.saWriter.writeGISoutput(sGrid.getWeightsOfGrid(), outPathStub + ".GISoutput.Demand.vkm.movie.shp", endOfTimeInterval);
+			this.saWriter.writeGISoutput(sGrid.getAverageValuesOfGrid(), outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".gPerVkm.movie.shp",endOfTimeInterval);
+			}
+		logger.info("Done writing output.");
+	}
+	
 	private Scenario loadScenario(String netFile) {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(netFile);

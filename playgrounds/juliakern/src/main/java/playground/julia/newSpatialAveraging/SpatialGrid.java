@@ -60,7 +60,7 @@ public class SpatialGrid {
 				Double weight = linkWeightUtil.getWeightFromLink(link, currentCell.getCentroid());
 				Double weightedValue = value * weight;
 				currentCell.addWeightedValue(weightedValue);
-				currentCell.addWeight(weight);
+				currentCell.addWeight(weight*link.getLength()/1000.);
 			}
 		}
 	}
@@ -101,5 +101,18 @@ public class SpatialGrid {
 				grid[i][j].multiplyAllValues(normalizationFactor);
 			}
 		}	
+	}
+
+	public SpatialGrid getDifferences(SpatialGrid spatialGrid) {
+		SpatialGrid differences = new SpatialGrid(numberOfCellsX, numberOfCellsY, gridMinX, gridMaxX, gridMinY, gridMaxY);
+		for(int i=0; i<numberOfCellsX; i++){
+			for(int j=0; j<numberOfCellsY; j++){
+				double weightDifference = this.grid[i][j].getWeight()-spatialGrid.grid[i][j].getWeight();
+				double weightedValueDifference = this.grid[i][j].getWeightedValue()-spatialGrid.grid[i][j].getWeightedValue();
+				differences.grid[i][j].addWeightedValue(weightedValueDifference);
+				differences.grid[i][j].addWeight(weightDifference);
+			}
+		}
+		return differences;
 	}
 }

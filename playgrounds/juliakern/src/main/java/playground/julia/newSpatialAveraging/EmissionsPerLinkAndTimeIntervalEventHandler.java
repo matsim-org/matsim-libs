@@ -19,6 +19,7 @@
 
 package playground.julia.newSpatialAveraging;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -26,12 +27,29 @@ import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
+import org.matsim.contrib.emissions.types.ColdPollutant;
+import org.matsim.contrib.emissions.types.WarmPollutant;
 
 public class EmissionsPerLinkAndTimeIntervalEventHandler implements ColdEmissionEventHandler, WarmEmissionEventHandler{
 
+	
+	private Map<Integer, Map<Id, Double>> intervals2links2emissions;
+	private WarmPollutant warmPollutant;
+	private ColdPollutant coldPollutant;
+	private int noOfTimeBins;
+	private double simulationEndTime;
+
 	public EmissionsPerLinkAndTimeIntervalEventHandler(
 			double simulationEndTime, int noOfTimeBins, String pollutant2analyze) {
-		// TODO Auto-generated constructor stub
+		
+		warmPollutant = WarmPollutant.valueOf(pollutant2analyze);
+		coldPollutant = ColdPollutant.valueOf(pollutant2analyze);
+		this.noOfTimeBins=noOfTimeBins;
+		this.simulationEndTime = simulationEndTime;
+		intervals2links2emissions = new HashMap<Integer, Map<Id,Double>>();
+		for(int i=0;i<noOfTimeBins;i++){
+			intervals2links2emissions.put(i, new HashMap<Id, Double>());
+		}
 	}
 
 	@Override
@@ -42,19 +60,33 @@ public class EmissionsPerLinkAndTimeIntervalEventHandler implements ColdEmission
 
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
-		// TODO Auto-generated method stub
-		
+		Id linkId = event.getLinkId();
+		Double emissionValue = event.getWarmEmissions().get(warmPollutant);
+		int timeInterval = (int) Math.floor(event.getTime()/simulationEndTime*noOfTimeBins);
+		Map<Id, Double> currentInterval = intervals2links2emissions.get(timeInterval);
+		if(!currentInterval.containsKey(linkId)){
+			currentInterval.put(linkId, emissionValue);
+		}else{
+			currentInterval.put(linkId, emissionValue+currentInterval.get(linkId));
+		}
 	}
 
 	@Override
 	public void handleEvent(ColdEmissionEvent event) {
-		// TODO Auto-generated method stub
+		Id linkId = event.getLinkId();
+		Double emissionValue = event.getColdEmissions().get(coldPollutant);
+		int timeInterval = (int) Math.floor(event.getTime()/simulationEndTime*noOfTimeBins);
+		Map<Id, Double> currentInterval = intervals2links2emissions.get(timeInterval);
+		if(!currentInterval.containsKey(linkId)){
+			currentInterval.put(linkId, emissionValue);
+		}else{
+			currentInterval.put(linkId, emissionValue+currentInterval.get(linkId));
+		}
 		
 	}
 
 	public Map<Integer, Map<Id, Double>> getTimeIntervals2EmissionsPerLink() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.intervals2links2emissions;
 	}
 
 }

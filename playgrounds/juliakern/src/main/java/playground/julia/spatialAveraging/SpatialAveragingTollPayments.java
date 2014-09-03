@@ -177,7 +177,7 @@
 //		double [][] normalizedWeightsBaseCase = this.sau.normalizeArray(weightsBaseCase);
 //		
 //		double [][] userTollPayments = fillUserBenefits(personId2paidToll, pop);
-//		double [][] normalizedUserTollPayments = this.sau.normalizeArray(userTollPayments);
+//	//	double [][] normalizedUserTollPayments = this.sau.normalizeArray(userTollPayments);
 //		
 //		double [][] averageUserTollPaymentsBaseCase = calculateAverage(normalizedUserTollPayments, normalizedWeightsBaseCase);
 //		

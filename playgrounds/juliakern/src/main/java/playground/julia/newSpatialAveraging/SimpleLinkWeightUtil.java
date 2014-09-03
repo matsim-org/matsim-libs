@@ -19,30 +19,82 @@
 
 package playground.julia.newSpatialAveraging;
 
+import java.util.Collection;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import playground.julia.spatialAveraging.SpatialAveragingUtils;
 
 public class SimpleLinkWeightUtil implements LinkWeightUtil {
 
-	public SimpleLinkWeightUtil(double xMin, double xMax, double yMin,
-			double yMax, int noOfXbins, int noOfYbins,
-			double smoothingRadius_m, String munichShapeFile,
-			CoordinateReferenceSystem targetCRS) {
-		// TODO Auto-generated constructor stub
+
+	private static final Logger logger = Logger.getLogger(SpatialAveragingUtils.class);
+	
+	double xMin;
+	double xMax;
+	double yMin;
+	double yMax;
+	int noOfXbins;
+	int noOfYbins;
+	
+	double smoothinRadiusSquared_m;
+	double area_in_smoothing_circle_sqkm;
+	Collection<SimpleFeature> featuresInVisBoundary;
+	CoordinateReferenceSystem targetCRS;
+	
+	public SimpleLinkWeightUtil(double xMin, double xMax, double yMin,	double yMax, int noOfXbins, int noOfYbins, double smoothingRadius_m, String visBoundaryShapeFile, CoordinateReferenceSystem targetCRS) {
+		this.xMin = xMin;
+		this.xMax = xMax;
+		this.yMin = yMin;
+		this.yMax = yMax;
+		this.noOfXbins = noOfXbins;
+		this.noOfYbins = noOfYbins;
+		
+		this.smoothinRadiusSquared_m = smoothingRadius_m * smoothingRadius_m;
+		this.area_in_smoothing_circle_sqkm = (Math.PI * smoothingRadius_m * smoothingRadius_m) / (1000. * 1000.);
+		this.featuresInVisBoundary = ShapeFileReader.getAllFeatures(visBoundaryShapeFile);
+		this.targetCRS = targetCRS;
 	}
+	
 
 	@Override
 	public Double getWeightFromLink(Link link, Coord cellCentroid) {
-		// TODO Auto-generated method stub
-		return null;
+		double linkcenterx = 0.5 * link.getFromNode().getCoord().getX() + 0.5 * link.getToNode().getCoord().getX();
+		double linkcentery = 0.5 * link.getFromNode().getCoord().getY() + 0.5 * link.getToNode().getCoord().getY();
+		double cellCentroidX = cellCentroid.getX();
+		double cellCentroidY = cellCentroid.getY();
+		return calculateWeightOfPointForCell(linkcenterx, linkcentery, cellCentroidX, cellCentroidY);
 	}
 
 	@Override
 	public Double getNormalizationFactor() {
-		// TODO Auto-generated method stub
-		return null;
+		return (1/this.area_in_smoothing_circle_sqkm);
+	}
+	
+	private double calculateWeightOfPointForCell(double x1, double y1, double x2, double y2) {
+		double distanceSquared = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+//		System.out.println("distance squared" + distanceSquared);
+		return Math.exp((-distanceSquared) / (smoothinRadiusSquared_m));
 	}
 
+	public boolean isInResearchArea(Coord coord) {
+		Double xCoord = coord.getX();
+		Double yCoord = coord.getY();
+		
+		if(xCoord > xMin && xCoord < xMax){
+			if(yCoord > yMin && yCoord < yMax){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	
 }
+
+
