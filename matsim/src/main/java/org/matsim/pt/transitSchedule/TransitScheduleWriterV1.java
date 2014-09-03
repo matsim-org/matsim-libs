@@ -169,7 +169,7 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter implements MatsimSo
 		}
 	}
 
-	private void writeDepartures(final Map<Id, Departure> departures) throws UncheckedIOException {
+	private void writeDepartures(final Map<Id<Departure>, Departure> departures) throws UncheckedIOException {
 		this.writeStartTag(Constants.DEPARTURES, null);
 
 		// optimization: only create one List for multiple departures

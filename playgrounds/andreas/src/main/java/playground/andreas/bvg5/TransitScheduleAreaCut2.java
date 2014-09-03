@@ -307,7 +307,7 @@ public class TransitScheduleAreaCut2 {
 	 * @param departureOffset
 	 * @return
 	 */
-	private List<Departure> copyDepartures(Map<Id, Departure> departures, TransitScheduleFactory factory, double departureOffset) {
+	private List<Departure> copyDepartures(Map<Id<Departure>, Departure> departures, TransitScheduleFactory factory, double departureOffset) {
 		List<Departure> newDepartures = new ArrayList<Departure>();
 		for(Departure dep: departures.values()){
 			// create a new vehicle of the same type

@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -264,7 +265,7 @@ public class TransitRouterNetworkCreator {
 		}
 		
 		@Override
-		public Id getLinkId() {
+		public Id<Link> getLinkId() {
 			return null;
 		}
 
@@ -274,7 +275,7 @@ public class TransitRouterNetworkCreator {
 		}
 
 		@Override
-		public Id getId() {
+		public Id<TransitStopFacility> getId() {
 			return this.id;
 		}
 
@@ -289,7 +290,7 @@ public class TransitRouterNetworkCreator {
 		}
 
 		@Override
-		public void setLinkId(Id linkId) {
+		public void setLinkId(Id<Link> linkId) {
 		}
 
 		@Override
@@ -354,7 +355,7 @@ public class TransitRouterNetworkCreator {
 		}
 
 		@Override
-		public Map<Id, Departure> getDepartures() {
+		public Map<Id<Departure>, Departure> getDepartures() {
 			return null;
 		}
 
@@ -382,14 +383,14 @@ public class TransitRouterNetworkCreator {
 
 		private static int nextInt = 0;
 		
-		private final Id id;
+		private final Id<TransitLine> id;
 		
 		public DummyTransitLine() {
-			this.id = new IdImpl("DummyTransitLine_" + nextInt++);
+			this.id = Id.create("DummyTransitLine_" + nextInt++, TransitLine.class);
 		}
 		
 		@Override
-		public Id getId() {
+		public Id<TransitLine> getId() {
 			return this.id;
 		}
 
@@ -398,7 +399,7 @@ public class TransitRouterNetworkCreator {
 		}
 
 		@Override
-		public Map<Id, TransitRoute> getRoutes() {
+		public Map<Id<TransitRoute>, TransitRoute> getRoutes() {
 			return null;
 		}
 

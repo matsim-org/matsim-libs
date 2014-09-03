@@ -69,8 +69,8 @@ public class TransitScheduleAnalyserToCSVandTEX {
 			
 		String lineId = String.valueOf(lineEntry.getKey());
 		String routeId;
-			Map <Id, TransitRoute> transitRoutesMap = transitLinesMap.get(lineEntry.getKey()).getRoutes();
-			for (Entry <Id, TransitRoute> routeEntry : transitRoutesMap.entrySet()){
+			Map <Id<TransitRoute>, TransitRoute> transitRoutesMap = transitLinesMap.get(lineEntry.getKey()).getRoutes();
+			for (Entry <Id<TransitRoute>, TransitRoute> routeEntry : transitRoutesMap.entrySet()){
 				
 				TransitRoute route = transitRoutesMap.get(routeEntry.getKey());
 				routeId = String.valueOf(route.getId());
@@ -78,11 +78,11 @@ public class TransitScheduleAnalyserToCSVandTEX {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //				Get Departures
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-				Map <Id, Departure> departuresMap = route.getDepartures();
+				Map <Id<Departure>, Departure> departuresMap = route.getDepartures();
 				String firstDeparture;
 				String lastDeparture;
 				List <Double> departureTimes = new ArrayList<Double>();
-				for (Entry <Id, Departure> departuresEntry : departuresMap.entrySet()){
+				for (Entry <Id<Departure>, Departure> departuresEntry : departuresMap.entrySet()){
 					departureTimes.add(departuresEntry.getValue().getDepartureTime());
 				}
 				Collections.sort(departureTimes);
@@ -114,7 +114,7 @@ public class TransitScheduleAnalyserToCSVandTEX {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 				String numberOfVehicles;
 				Map <Id, String> vehiclesIdMap = new HashMap<Id, String>();
-				for (Entry <Id, Departure> departuresEntry : departuresMap.entrySet()){
+				for (Entry <Id<Departure>, Departure> departuresEntry : departuresMap.entrySet()){
 					vehiclesIdMap.put(departuresMap.get(departuresEntry.getKey()).getVehicleId(), "bla" );
 				}
 				int vehicleMapSize = vehiclesIdMap.size();

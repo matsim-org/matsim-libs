@@ -40,11 +40,11 @@ public class TransitSheduleToNetwork {
 		NetworkFactory factory =  new NetworkFactoryImpl(network);
 		Set<String> modes = new HashSet<String>(Arrays.asList("pt"));
 		for(TransitStopFacility stop:scenario.getTransitSchedule().getFacilities().values()) {
-			Node sS = factory.createNode(new IdImpl("s-"+stop.getId()), stop.getCoord());
+			Node sS = factory.createNode(Id.create("s-"+stop.getId(), Node.class), stop.getCoord());
 			network.addNode(sS);
-			Node eS = factory.createNode(new IdImpl("e-"+stop.getId()), stop.getCoord());
+			Node eS = factory.createNode(Id.create("e-"+stop.getId(), Node.class), stop.getCoord());
 			network.addNode(eS);
-			Link link = factory.createLink(stop.getId(), sS, eS);
+			Link link = factory.createLink(Id.create(stop.getId(), Link.class), sS, eS);
 			link.setLength(30);
 			link.setFreespeed(20);
 			link.setCapacity(10000);
@@ -89,10 +89,10 @@ public class TransitSheduleToNetwork {
 						link.setNumberOfLanes(link.getNumberOfLanes()+1);
 					length = 0;
 				}
-				route.setRoute(new LinkNetworkRouteImpl(sId, ids, route.getStops().get(route.getStops().size()-1).getStopFacility().getId()));
+				route.setRoute(new LinkNetworkRouteImpl(sId, ids, Id.create(route.getStops().get(route.getStops().size()-1).getStopFacility().getId(), Link.class)));
 			}
 		for(TransitStopFacility stop:scenario.getTransitSchedule().getFacilities().values())
-			stop.setLinkId(stop.getId());
+			stop.setLinkId(Id.create(stop.getId().toString(), Link.class));
 		TransitScheduleValidator.printResult(TransitScheduleValidator.validateAll(scenario.getTransitSchedule(), network));
 		(new NetworkWriter(network)).write(args[2]);
 		(new TransitScheduleWriter(scenario.getTransitSchedule())).writeFile(args[3]);

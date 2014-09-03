@@ -41,6 +41,10 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 		return create(Long.toString(key), type);
 	}
 	
+	public static <T> Id<T> create(final Id<?> id, final Class<T> type) {
+		return create(id.toString(), type);
+	}
+	
 	/**
 	 * This method supports a cache where ids are stored and re-used per type.   
 	 */

@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Identifiable;
  * 
  * @author mrieser
  */
-public interface TransitLine extends Identifiable {
+public interface TransitLine extends Identifiable<TransitLine> {
 
 	/**
 	 * Adds the specified transit route to this line.
@@ -44,7 +44,7 @@ public interface TransitLine extends Identifiable {
 	/**
 	 * @return immutable Map containing all transit routes assigned to this transit line
 	 */
-	public abstract Map<Id, TransitRoute> getRoutes();
+	public abstract Map<Id<TransitRoute>, TransitRoute> getRoutes();
 
 	/**
 	 * Removes the specified transit route from this transit line.

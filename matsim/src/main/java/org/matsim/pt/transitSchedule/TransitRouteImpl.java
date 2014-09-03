@@ -41,16 +41,16 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public class TransitRouteImpl implements TransitRoute {
 
-	private final Id routeId;
+	private final Id<TransitRoute> routeId;
 	private NetworkRoute route;
 	private final List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 	private String description = null;
-	private final Map<Id, Departure> departures = new TreeMap<Id, Departure>();
+	private final Map<Id<Departure>, Departure> departures = new TreeMap<Id<Departure>, Departure>();
 	private String transportMode;
 	private String lineRouteName;
 	private String direction;
 
-	protected TransitRouteImpl(final Id id, final NetworkRoute route, final List<TransitRouteStop> stops, final String transportMode) {
+	protected TransitRouteImpl(final Id<TransitRoute> id, final NetworkRoute route, final List<TransitRouteStop> stops, final String transportMode) {
 		this.routeId = id;
 		this.route = route;
 		this.stops.addAll(stops);
@@ -103,7 +103,7 @@ public class TransitRouteImpl implements TransitRoute {
 	}
 
 	@Override
-	public Map<Id, Departure> getDepartures() {
+	public Map<Id<Departure>, Departure> getDepartures() {
 		return Collections.unmodifiableMap(this.departures);
 	}
 

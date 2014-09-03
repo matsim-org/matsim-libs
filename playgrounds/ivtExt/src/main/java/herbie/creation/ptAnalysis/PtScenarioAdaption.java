@@ -144,7 +144,7 @@ public class PtScenarioAdaption {
 		for (TransitLine line : schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				
-				Map<Id, Departure> departures = route.getDepartures();
+				Map<Id<Departure>, Departure> departures = route.getDepartures();
 				
 				if(departures == null) continue;
 				

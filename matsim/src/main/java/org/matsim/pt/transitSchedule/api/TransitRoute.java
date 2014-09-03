@@ -32,7 +32,7 @@ import org.matsim.core.population.routes.NetworkRoute;
  *
  * @author mrieser
  */
-public interface TransitRoute extends Identifiable {
+public interface TransitRoute extends Identifiable<TransitRoute> {
 
 	public abstract void setDescription(final String description);
 
@@ -55,7 +55,7 @@ public interface TransitRoute extends Identifiable {
 	/**
 	 * @return an immutable Map of all departures assigned to this route
 	 */
-	public abstract Map<Id, Departure> getDepartures();
+	public abstract Map<Id<Departure>, Departure> getDepartures();
 
 	public abstract NetworkRoute getRoute();
 

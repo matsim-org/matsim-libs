@@ -86,7 +86,7 @@ public class TransitScheduleSimplifier{
 			
 			TransitLine transitLine = transitLineIterator.next();
 		
-			Map<Id,TransitRoute> transitRoutes = transitLine.getRoutes();
+			Map<Id<TransitRoute>,TransitRoute> transitRoutes = transitLine.getRoutes();
 			
 			TransitRoute refTransitRoute = null;
 		
@@ -217,7 +217,7 @@ public class TransitScheduleSimplifier{
 		
 			TransitLine transitLine = transitLineIterator.next();
 			
-			Map<Id,TransitRoute> transitRoutes = transitLine.getRoutes();
+			Map<Id<TransitRoute>,TransitRoute> transitRoutes = transitLine.getRoutes();
 		
 			TransitRoute refTransitRoute = null;
 		
@@ -396,11 +396,11 @@ public class TransitScheduleSimplifier{
 	 * @param listOfRoutes the id list of all touching transit routes
 	 * @return a list of network routes for the merged transit routes
 	 */
-	private static List<NetworkRoute> computeNetworkRoutesByTransitRouteStops(Network network, Map<Id,TransitRoute> transitRoutes, String[] listOfRoutes) {
+	private static List<NetworkRoute> computeNetworkRoutesByTransitRouteStops(Network network, Map<Id<TransitRoute>,TransitRoute> transitRoutes, String[] listOfRoutes) {
 		
 		List<NetworkRoute> newNetworkRoutes = new ArrayList<NetworkRoute>();
 		
-		PriorityQueue<Id> uncheckedTransitRoutes = new PriorityQueue<Id>();
+		PriorityQueue<Id<TransitRoute>> uncheckedTransitRoutes = new PriorityQueue<Id<TransitRoute>>();
 		
 		for(int i=0;i<listOfRoutes.length;i++){
 			uncheckedTransitRoutes.add(new IdImpl(listOfRoutes[i]));
@@ -524,7 +524,7 @@ public class TransitScheduleSimplifier{
 	 * @return merged route profile
 	 */
 	private List<TransitRouteStop> computeNewRouteProfile(TransitScheduleFactoryImpl factory,
-			TransitRoute refTransitRoute, Map<Id,TransitRoute> transitRoutes, String[] listOfRoutes,NetworkRoute newRoute,
+			TransitRoute refTransitRoute, Map<Id<TransitRoute>,TransitRoute> transitRoutes, String[] listOfRoutes,NetworkRoute newRoute,
 			List<TransitRouteStop> stops){
 		
 		List<TransitRouteStop> newStops = new ArrayList<TransitRouteStop>();
@@ -565,7 +565,7 @@ public class TransitScheduleSimplifier{
 	 * @param startTransitRouteStop the first stop of the new transit route
 	 * @param mergedTransitRoute the new transit route
 	 */
-	private void mergeDepartures(TransitScheduleFactoryImpl factory, Map<Id,TransitRoute> transitRoutes, TransitRouteStop startTransitRouteStop,
+	private void mergeDepartures(TransitScheduleFactoryImpl factory, Map<Id<TransitRoute>,TransitRoute> transitRoutes, TransitRouteStop startTransitRouteStop,
 			TransitRoute mergedTransitRoute,String[] listOfTransitRoutes) {
 
 		for(int i = 0; i < listOfTransitRoutes.length; i++){

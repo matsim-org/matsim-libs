@@ -36,16 +36,16 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
  */
 public class TransitLineImpl implements TransitLine {
 
-	private final Id lineId;
+	private final Id<TransitLine> lineId;
 	private String name = null;
-	private final Map<Id, TransitRoute> transitRoutes = new LinkedHashMap<Id, TransitRoute>();
+	private final Map<Id<TransitRoute>, TransitRoute> transitRoutes = new LinkedHashMap<Id<TransitRoute>, TransitRoute>();
 
-	protected TransitLineImpl(final Id id) {
+	protected TransitLineImpl(final Id<TransitLine> id) {
 		this.lineId = id;
 	}
 
 	@Override
-	public Id getId() {
+	public Id<TransitLine> getId() {
 		return this.lineId;
 	}
 	
@@ -69,7 +69,7 @@ public class TransitLineImpl implements TransitLine {
 	}
 
 	@Override
-	public Map<Id, TransitRoute> getRoutes() {
+	public Map<Id<TransitRoute>, TransitRoute> getRoutes() {
 		return Collections.unmodifiableMap(this.transitRoutes);
 	}
 

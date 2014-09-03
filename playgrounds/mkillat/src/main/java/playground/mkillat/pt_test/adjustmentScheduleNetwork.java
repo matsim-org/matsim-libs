@@ -89,12 +89,11 @@ public class adjustmentScheduleNetwork implements Runnable{
 		Map <Id<TransitLine>, TransitLine> transitLinesMap = scenario.getTransitSchedule().getTransitLines();
 		List <NetworkChangeEvent> nces = new ArrayList<NetworkChangeEvent>();
 		for (Iterator<TransitLine> it = transitLinesMap.values().iterator(); it.hasNext();) {
-			Id lineId = it.next().getId();
+			Id<TransitLine> lineId = it.next().getId();
 			TransitLine line = transitLinesMap.get(lineId);
-			Map <Id, TransitRoute> routes = line.getRoutes();
-			for (Iterator <TransitRoute> iterator = routes.values().iterator(); iterator
-					.hasNext();) {
-				Id routeId = iterator.next().getId();
+			Map <Id<TransitRoute>, TransitRoute> routes = line.getRoutes();
+			for (Iterator <TransitRoute> iterator = routes.values().iterator(); iterator.hasNext();) {
+				Id<TransitRoute> routeId = iterator.next().getId();
 				
 				test(lineId, routeId);
 				List <NetworkChangeEvent> networkChangeEvents = modifingTheNetwork2(lineId, routeId);
@@ -149,19 +148,19 @@ public class adjustmentScheduleNetwork implements Runnable{
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Map <Id<TransitLine>, TransitLine> transitLinesMap = scenario.getTransitSchedule().getTransitLines();
 		TransitLine line = transitLinesMap.get(lineId);	
-		Map <Id, TransitRoute> routes = line.getRoutes();
+		Map <Id<TransitRoute>, TransitRoute> routes = line.getRoutes();
 		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //		Erstmal einlesen der Hinrichtung
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		TransitRoute routeHin = routes.get(routeId);
-		Map <Id, Departure> departuresHin = routeHin.getDepartures();
-		List <Id> departuresIdsHin = new ArrayList<Id>();
+		Map <Id<Departure>, Departure> departuresHin = routeHin.getDepartures();
+		List <Id<Departure>> departuresIdsHin = new ArrayList<Id<Departure>>();
 		for (Iterator <Departure> it = departuresHin.values().iterator(); it.hasNext();){
 			departuresIdsHin.add(it.next().getId());
 		}
 		
-//		ersmal nur für ein Departure, muss noch allgemein gemacht werden...
+//		erstmal nur für ein Departure, muss noch allgemein gemacht werden...
 
 		double departureTimeHin01 = departuresHin.get(departuresIdsHin.get(0)).getDepartureTime();
 		

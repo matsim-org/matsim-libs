@@ -21,6 +21,7 @@
 package org.matsim.pt.transitSchedule.api;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.Facility;
 
 /**
@@ -28,11 +29,11 @@ import org.matsim.core.api.experimental.facilities.Facility;
  *
  * @author mrieser
  */
-public interface TransitStopFacility extends Facility {
+public interface TransitStopFacility extends Facility<TransitStopFacility> {
 
 	boolean getIsBlockingLane();
 
-	public void setLinkId(final Id linkId);
+	public void setLinkId(final Id<Link> linkId);
 
 	/**
 	 * Sets a human name for the stop facility, e.g. to be displayed

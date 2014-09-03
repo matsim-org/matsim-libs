@@ -715,8 +715,7 @@ public class BusLineAllocator {
 		/*---------------------TRANSITROUTES--------------------------*/
 		Map<Id, NetworkRoute> idRoutes = convertResult2();
 		for (TransitLine line : this.schedule.getTransitLines().values())
-			for (Entry<Id, TransitRoute> idRoutePair : line.getRoutes()
-					.entrySet()) {
+			for (Entry<Id<TransitRoute>, TransitRoute> idRoutePair : line.getRoutes().entrySet()) {
 				Id id = idRoutePair.getKey();
 				if (idRoutes.containsKey(id))
 					idRoutePair.getValue().setRoute(idRoutes.get(id));

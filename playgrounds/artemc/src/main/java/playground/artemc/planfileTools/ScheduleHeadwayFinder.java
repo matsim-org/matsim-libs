@@ -21,7 +21,7 @@ public class ScheduleHeadwayFinder {
 	private Double departureOffset;
 	private Double timeInSeconds = 0.0;
 	
-	private Map<Id,Departure> departures = new HashMap();
+	private Map<Id<Departure>,Departure> departures = new HashMap();
 	
 	/**
 	 * @param args

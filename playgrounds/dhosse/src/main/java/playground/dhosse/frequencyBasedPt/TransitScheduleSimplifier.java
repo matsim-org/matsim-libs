@@ -112,7 +112,7 @@ public class TransitScheduleSimplifier{
 			
 			TransitLine transitLine = transitLineIterator.next();
 		
-			Map<Id,TransitRoute> transitRoutes = transitLine.getRoutes();
+			Map<Id<TransitRoute>,TransitRoute> transitRoutes = transitLine.getRoutes();
 			
 			if(transitRoutes.size() > 0){
 			
@@ -266,7 +266,7 @@ public class TransitScheduleSimplifier{
 			
 			TransitLine transitLine = transitLineIterator.next();
 		
-			Map<Id,TransitRoute> transitRoutes = transitLine.getRoutes();
+			Map<Id<TransitRoute>,TransitRoute> transitRoutes = transitLine.getRoutes();
 			
 			TransitRoute refTransitRoute = null;
 		
@@ -426,15 +426,15 @@ public class TransitScheduleSimplifier{
 				continue;
 			}
 			
-			TransitLine mergedTransitLine = factory.createTransitLine(new IdImpl(transitLine.getId().toString()));
+			TransitLine mergedTransitLine = factory.createTransitLine(transitLine.getId());
 			
-			Map<Id,TransitRoute> transitRoutes = transitLine.getRoutes();
+			Map<Id<TransitRoute>,TransitRoute> transitRoutes = transitLine.getRoutes();
 			
 			routesCounter += transitRoutes.size();
 		
 			TransitRoute currentTransitRoute = null;
 		
-			PriorityQueue<Id> uncheckedRoutes = new PriorityQueue<Id>();
+			PriorityQueue<Id<TransitRoute>> uncheckedRoutes = new PriorityQueue<Id<TransitRoute>>();
 			uncheckedRoutes.addAll(transitRoutes.keySet());
 		
 			List<TransitStopFacility> checkedFacilities = new ArrayList<TransitStopFacility>();
@@ -447,7 +447,7 @@ public class TransitScheduleSimplifier{
 			while(uncheckedRoutes.size() > 0){
 				
 				currentTransitRoute = transitRoutes.get(uncheckedRoutes.poll());
-				Set<Id> endedTransitRoutes = new HashSet<Id>();
+				Set<Id<TransitRoute>> endedTransitRoutes = new HashSet<Id<TransitRoute>>();
 				
 				if(currentTransitRoute.getDepartures().size() > 0){
 				
@@ -574,7 +574,7 @@ public class TransitScheduleSimplifier{
 	}
 	
 	private TransitRoute createNewMergedRoute(String s, List<TransitStopFacility> routeProfile, Scenario scenario,
-			TransitScheduleFactoryImpl factory, Map<Id,TransitRoute> transitRoutes){
+			TransitScheduleFactoryImpl factory, Map<Id<TransitRoute>,TransitRoute> transitRoutes){
 		
 		final String UNDERLINE = "_____";
 		
@@ -679,7 +679,7 @@ public class TransitScheduleSimplifier{
 	 * @return merged route profile
 	 */
 	private List<TransitRouteStop> computeNewRouteProfile(TransitScheduleFactoryImpl factory,
-			TransitRoute refTransitRoute, Map<Id,TransitRoute> transitRoutes, String[] listOfRoutes,
+			TransitRoute refTransitRoute, Map<Id<TransitRoute>,TransitRoute> transitRoutes, String[] listOfRoutes,
 			List<TransitRouteStop> stops){
 		
 		LinkedList<TransitRouteStop> newStops = new LinkedList<TransitRouteStop>();
@@ -718,7 +718,7 @@ public class TransitScheduleSimplifier{
 	}
 	
 	private List<TransitRouteStop> createNewSplittedRouteProfile(TransitScheduleFactoryImpl factory, String[] listOfRoutes,
-			Map<Id,TransitRoute> transitRoutes, TransitRoute referenceRoute, List<TransitStopFacility> routeProfile){
+			Map<Id<TransitRoute>,TransitRoute> transitRoutes, TransitRoute referenceRoute, List<TransitStopFacility> routeProfile){
 
 		LinkedList<TransitRouteStop> newRouteProfile = new LinkedList<TransitRouteStop>();
 		
@@ -774,7 +774,7 @@ public class TransitScheduleSimplifier{
 	 * @param startTransitRouteStop the first stop of the new transit route
 	 * @param mergedTransitRoute the new transit route
 	 */
-	private void mergeDepartures(TransitScheduleFactoryImpl factory, Map<Id,TransitRoute> transitRoutes,
+	private void mergeDepartures(TransitScheduleFactoryImpl factory, Map<Id<TransitRoute>,TransitRoute> transitRoutes,
 			TransitRoute mergedTransitRoute,String[] listOfTransitRoutes) {
 
 		TransitRouteStop startTransitRouteStop = mergedTransitRoute.getStops().get(0);
@@ -805,7 +805,7 @@ public class TransitScheduleSimplifier{
 	
 	}
 	
-	private void mergeDeparturesTouching(TransitScheduleFactoryImpl factory, Map<Id,TransitRoute> transitRoutes,
+	private void mergeDeparturesTouching(TransitScheduleFactoryImpl factory, Map<Id<TransitRoute>,TransitRoute> transitRoutes,
 			TransitRoute mergedTransitRoute,String[] listOfTransitRoutes,List<TransitStopFacility> routeProfile) {
 
 		for(int i = 0; i < listOfTransitRoutes.length; i++){

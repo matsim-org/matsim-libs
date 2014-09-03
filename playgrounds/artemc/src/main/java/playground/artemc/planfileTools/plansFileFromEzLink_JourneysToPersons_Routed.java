@@ -87,9 +87,9 @@ public class plansFileFromEzLink_JourneysToPersons_Routed extends MatsimXmlWrite
 		String rideDuration = "";
 
 		ResultSet mrtOD = null;
-		Map<Id, Integer>  routesMap = new HashMap<Id,Integer>();
+		Map<Id<TransitRoute>, Integer>  routesMap = new HashMap<Id<TransitRoute>,Integer>();
 		Map<Id<TransitLine>,TransitLine> lines;
-		Set<Id> routes;
+		Set<Id<TransitRoute>> routes;
 
 		ArrayList<String> emptyResultSetIDs = new ArrayList<String>();
 		TransitStopFacility accessFacility; 
@@ -291,15 +291,15 @@ public class plansFileFromEzLink_JourneysToPersons_Routed extends MatsimXmlWrite
 						//Check for stops
 						routes = ((ScenarioImpl) scenario).getTransitSchedule().getTransitLines().get(line.getId()).getRoutes().keySet();
 						routesMap.clear();
-						for(Id routeID:routes){	
+						for(Id<TransitRoute> routeID:routes){	
 							routesMap.put(routeID, ((ScenarioImpl) scenario).getTransitSchedule().getTransitLines().get(line.getId()).getRoutes().get(routeID).getDepartures().size());
 							//System.out.println("RouteID: "+routeID.toString()+"  Dep.:"+((ScenarioImpl) scenario).getTransitSchedule().getTransitLines().get(line.getId()).getRoutes().get(routeID).getDepartures().size());
 						}
 
 						//System.out.println("Looking for a route containing boarding and alighting stops...");
 						//Check if route contains boarding and alighting stops
-						for(Entry<Id, Integer> routeKey:entriesSortedByValues(routesMap)){
-							Id routeID = routeKey.getKey();
+						for(Entry<Id<TransitRoute>, Integer> routeKey:entriesSortedByValues(routesMap)){
+							Id<TransitRoute> routeID = routeKey.getKey();
 							//System.out.println("   RouteID: "+routeID.toString()+"  Dep.:"+((ScenarioImpl) scenario).getTransitSchedule().getTransitLines().get(line.getId()).getRoutes().get(routeID).getDepartures().size());
 							List<TransitRouteStop> currentRouteStops = ((ScenarioImpl) scenario).getTransitSchedule().getTransitLines().get(line.getId()).getRoutes().get(routeID).getStops();						
 							for(TransitRouteStop currentStop:currentRouteStops){	

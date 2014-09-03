@@ -197,7 +197,7 @@ public class UCSBTransitScheduleCreator {
 				for (Integer depTime : ptRoute.depTimes) {
 					depNr++;
 					Departure departure = factory.createDeparture(new IdImpl(transitRoute.getId().toString()+"."+depNr),depTime);
-					departure.setVehicleId(departure.getId());
+					departure.setVehicleId(Id.create(departure.getId(), Vehicle.class));
 					Vehicle vehicle = vehicles.getFactory().createVehicle(departure.getId(),defaultVehicleType);
 					vehicles.addVehicle(vehicle);
 					transitRoute.addDeparture(departure);

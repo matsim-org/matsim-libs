@@ -117,7 +117,7 @@ public class ShuntingTableToMATSimScheduleEnricher {
 						Link dwellLink = scenario.getNetwork().getLinks().get(stop.getStopFacility().getId());
 						if (dwellLink == null) {
 							Node node = scenario.getNetwork().getLinks().get(stop.getStopFacility().getLinkId()).getToNode();
-							dwellLink = factory.createLink(stop.getStopFacility().getId(),node,node);
+							dwellLink = factory.createLink(Id.create(stop.getStopFacility().getId(), Link.class), node, node);
 							dwellLink.setLength(WagonSimConstants.DEFAULT_LENGTH_LOOPLINK);
 							dwellLink.setFreespeed(WagonSimConstants.DEFAULT_FREESPEED);
 							dwellLink.setCapacity(WagonSimConstants.DEFAULT_CAPACITY);

@@ -38,6 +38,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.xml.sax.Attributes;
 
 /**
@@ -112,7 +113,7 @@ class FacilityBuilder {
 	public Coord coord = null;
 	public Id id = null;
 	public Id linkId = null;
-	public final List<Id> stops = new ArrayList<Id>();
+	public final List<Id<TransitStopFacility>> stops = new ArrayList<Id<TransitStopFacility>>();
 
 	public ParkAndRideFacility create() {
 		return new ParkAndRideFacility( id , coord , linkId , stops);

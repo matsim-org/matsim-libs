@@ -74,7 +74,7 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 		TransitRoute route1 = lineT1.getRoutes().get(new IdImpl("1"));
 		assertNotNull("could not find route 1 in line T1.", route1);
 
-		Map<Id, Departure> departures = route1.getDepartures();
+		Map<Id<Departure>, Departure> departures = route1.getDepartures();
 		assertNotNull("could not get departures of route 1 in line T1.", departures);
 		assertEquals("wrong number of departures.", 3, departures.size());
 

@@ -27,6 +27,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * Represents a park and ride facility, linking a network link to transit stops
@@ -37,13 +38,13 @@ public class ParkAndRideFacility implements Facility {
 	private final Coord coord;
 	private final Id linkId;
 	private final Id id;
-	private final List<Id> stopsIds;
+	private final List<Id<TransitStopFacility>> stopsIds;
 
 	public ParkAndRideFacility(
 			final Id id,
 			final Coord coord,
 			final Id linkId,
-			final List<Id> stopsIds) {
+			final List<Id<TransitStopFacility>> stopsIds) {
 		this.coord = coord;
 		this.id = id;
 		this.linkId = linkId;
@@ -83,7 +84,7 @@ public class ParkAndRideFacility implements Facility {
 	 * with a PNR facility! The PT router walk distance is used instead!
 	 */
 	@Deprecated 
-	public List<Id> getStopsFacilitiesIds() {
+	public List<Id<TransitStopFacility>> getStopsFacilitiesIds() {
 		return stopsIds;
 	}
 

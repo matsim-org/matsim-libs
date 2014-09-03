@@ -339,7 +339,7 @@ public class GtfsConverter {
 				departureCounter = ts.getTransitLines().get(routeToTripAssignments.get(tripId)).getRoutes().get(this.matsimRouteIdToGtfsTripIdAssignments.get(tripId)).getDepartures().size();
 			}
 			if(usedTripIds.contains(tripId)){
-				Map<Id,Departure> depatures = ts.getTransitLines().get(routeToTripAssignments.get(tripId)).getRoutes().get(this.matsimRouteIdToGtfsTripIdAssignments.get(tripId)).getDepartures();
+				Map<Id<Departure>, Departure> depatures = ts.getTransitLines().get(routeToTripAssignments.get(tripId)).getRoutes().get(this.matsimRouteIdToGtfsTripIdAssignments.get(tripId)).getDepartures();
 				double latestDeparture = 0;
 				for(Departure d: depatures.values()){
 					if(latestDeparture < d.getDepartureTime()){

@@ -20,8 +20,8 @@ public class CreateVehID2LineMap {
 		Map<Id, Id> veh2LineMap = new HashMap<Id, Id>();
 		
 		for (Entry<Id<TransitLine>, TransitLine> lineEntry : transitSchedule.getTransitLines().entrySet()) {
-			for (Entry<Id, TransitRoute> routeEntry : lineEntry.getValue().getRoutes().entrySet()) {
-				for (Entry<Id, Departure> departureEntry : routeEntry.getValue().getDepartures().entrySet()){
+			for (Entry<Id<TransitRoute>, TransitRoute> routeEntry : lineEntry.getValue().getRoutes().entrySet()) {
+				for (Entry<Id<Departure>, Departure> departureEntry : routeEntry.getValue().getDepartures().entrySet()){
 					
 					// check if vehicle is already in list and if this is the case check its line
 					

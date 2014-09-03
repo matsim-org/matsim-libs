@@ -534,7 +534,7 @@ public class CepasToEventsMultithreaded_1 {
 		/**
 		 * All possible routes in both directions from the transit schedule.
 		 */
-		private Map<Id, TransitRoute> possibleMatsimRoutes;
+		private Map<Id<TransitRoute>, TransitRoute> possibleMatsimRoutes;
 		private TreeSet<Id> possibleMatsimRoutesSortedBynumberOfStops;
 		/**
 		 * Dwell events, ordered by arrival time.
@@ -1591,7 +1591,7 @@ public class CepasToEventsMultithreaded_1 {
 	private void generateRouteIdToStopIdSequence() {
 		routeIdToStopIdSequence = new ConcurrentHashMap<Id, ArrayList<Id>>();
 		for (Id lineId : scenario.getTransitSchedule().getTransitLines().keySet()) {
-			Map<Id, TransitRoute> routes = scenario.getTransitSchedule().getTransitLines().get(lineId).getRoutes();
+			Map<Id<TransitRoute>, TransitRoute> routes = scenario.getTransitSchedule().getTransitLines().get(lineId).getRoutes();
 			for (TransitRoute route : routes.values()) {
 				ArrayList<Id> stopIds = new ArrayList<Id>();
 				ArrayList<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();

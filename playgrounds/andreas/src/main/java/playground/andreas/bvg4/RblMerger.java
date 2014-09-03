@@ -20,6 +20,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.basic.v01.IdImpl;
@@ -734,11 +735,11 @@ public class RblMerger {
 		Collection<Event> events = new ArrayList<Event>();
 
 		for (Entry<Id<TransitLine>, TransitLine> lineEntry : newTransitSchedule.getTransitLines().entrySet()) {
-			for (Entry<Id, TransitRoute> routeEntry : lineEntry.getValue().getRoutes().entrySet()) {
+			for (Entry<Id<TransitRoute>, TransitRoute> routeEntry : lineEntry.getValue().getRoutes().entrySet()) {
 				
 				for (Departure departure : routeEntry.getValue().getDepartures().values()) {
 					
-					events.add(new TransitDriverStartsEvent(departure.getDepartureTime(), departure.getVehicleId(), departure.getVehicleId(), lineEntry.getKey(), routeEntry.getKey(), departure.getId()));
+					events.add(new TransitDriverStartsEvent(departure.getDepartureTime(), Id.create(departure.getVehicleId(), Person.class), departure.getVehicleId(), lineEntry.getKey(), routeEntry.getKey(), departure.getId()));
 					// not visible from playground
 //					events.add(new PersonEntersVehicleEventImpl(departure.getDepartureTime(), driverId, departure.getVehicleId()));
 					

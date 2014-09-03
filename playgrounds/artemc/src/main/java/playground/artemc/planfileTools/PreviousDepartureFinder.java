@@ -1,7 +1,6 @@
 package playground.artemc.planfileTools;
 
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -26,8 +25,8 @@ public class PreviousDepartureFinder {
 		Double previousDepartureTime = 0.0;		
 		Double departureOffset = schedule.getTransitLines().get(line.getId()).getRoutes().get(route.getId()).getStop(stop).getDepartureOffset();
 		
-		Map<Id,Departure> departures = schedule.getTransitLines().get(line.getId()).getRoutes().get(route.getId()).getDepartures();
-		SortedMap<Double,Id> departureTimes = new TreeMap<Double, Id>();
+		Map<Id<Departure>, Departure> departures = schedule.getTransitLines().get(line.getId()).getRoutes().get(route.getId()).getDepartures();
+		SortedMap<Double, Id<Departure>> departureTimes = new TreeMap<Double, Id<Departure>>();
 		for(Id dep:departures.keySet()){
 			departureTimes.put(departures.get(dep).getDepartureTime(), dep);
 		}

@@ -98,12 +98,12 @@ public class HafasOSMMerger {
 
 	}
 
-	private TransitRoute findRouteBestMatching(TransitRoute route, Map<Id, TransitRoute> candidateRoutes) {
+	private TransitRoute findRouteBestMatching(TransitRoute route, Map<Id<TransitRoute>, TransitRoute> candidateRoutes) {
 
 		double bestTotalScore = Double.MAX_VALUE;
 		TransitRoute bestRoute = null;
 
-		for (Entry<Id, TransitRoute> candidateRoute : candidateRoutes.entrySet()) {
+		for (Entry<Id<TransitRoute>, TransitRoute> candidateRoute : candidateRoutes.entrySet()) {
 
 			double stopDistanceSum = 0.0;
 
