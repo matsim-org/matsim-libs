@@ -271,6 +271,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 		 */
 		String transportMode = event.getLegMode();
 		if (!transportModes.contains(transportMode)) return;
+		if(event.getPersonId().toString().startsWith("pt")) return;
 
 		LinkTrip linkTrip = new LinkTrip();
 		linkTrip.person_id = event.getPersonId();
@@ -663,14 +664,15 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 				double estimatedLinkTravelTime = travelTime.getLinkTravelTime(data.link, k * travelTimeBinSize, null, null);
 
 				// Ca(k) = max(0, (ke - k)*T - tfree)
-				double socialCost = ((ke - k) * travelTimeBinSize - estimatedLinkTravelTime);
+				double socialCost = ((ke - k) * travelTimeBinSize - - data.freeSpeedTravelTime);
+				//double socialCost = ((ke - k) * travelTimeBinSize - estimatedLinkTravelTime);
 
 				if (socialCost < 0.0) socialCost = 0.0;
 				if (socialCostPT < 0.0) socialCostPT = 0.0;
 				
-				if(socialCost!=0.0 && socialCostPT!=0.0){
-					log.info(k+","+data.link.getId().toString()+"   SocialCost: "+socialCost+"SocialCost PT: "+socialCostPT);
-				}
+//				if(socialCost!=0.0 && socialCostPT!=0.0){
+//					log.info(k+","+data.link.getId().toString()+"   SocialCost: "+socialCost+"SocialCost PT: "+socialCostPT);
+//				}
 
 				// If it is the first iteration, there is no old value, therefore use this iterations value. 
 				double oldValue;
@@ -684,22 +686,21 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 				
 				//Social cost for PT passenger delay
 				if (socialCostPT < 0.0) socialCostPT = 0.0;
-				// data.socialCosts[k] = socialCost;
-
+	
 				// If it is the first iteration, there is no old value, therefore use this iterations value. 
 				double oldValuePT;
 				if (iteration == 0) oldValuePT = socialCostPT;
 				else oldValuePT = data.socialCostsPT[k];
 
 				double blendedOldValuePT = (1 - blendFactor) * oldValuePT;
-				double blendedNewValuePT = blendFactor * socialCost;
+				double blendedNewValuePT = blendFactor * socialCostPT;
 
 				data.socialCostsPT[k] = blendedOldValuePT + blendedNewValuePT;
 		
 			}
 			
-			SavitzkyGolayFilter sgf = new SavitzkyGolayFilter(5,data.socialCosts, true);
-			data.socialCosts = sgf.appllyFilter();
+			//	SavitzkyGolayFilter sgf = new SavitzkyGolayFilter(5,data.socialCosts, true);
+			//	data.socialCosts = sgf.appllyFilter();
 			
 			//SavitzkyGolayFilter sgf2 = new SavitzkyGolayFilter(5,data.socialCostsPT, true);
 			//data.socialCostsPT = sgf2.appllyFilter();

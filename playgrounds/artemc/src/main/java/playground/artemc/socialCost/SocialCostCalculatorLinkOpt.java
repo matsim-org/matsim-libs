@@ -575,7 +575,9 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 	private void updateSocCosts(int iteration) {
 		int globalInnovationDisableAfter = (int) ((controler.getConfig().controler().getLastIteration() - controler.getConfig().controler().getFirstIteration()) 
 				* controler.getConfig().strategy().getFractionOfIterationsToDisableInnovation() + controler.getConfig().controler().getFirstIteration());
-		if(iteration < (globalInnovationDisableAfter - 100)){
+		
+		//if(iteration < (controler.getConfig().controler().getLastIteration() - 500)){
+
 
 			for (SocialCostsData data : this.socialCostsMap.values()) {
 				int ke = this.numSlots; // ke = K
@@ -594,6 +596,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 
 
 					if(currentDelay > 0 && difference <= data.delays[k]*0.2){
+						//data.socialCosts[k] = data.socialCosts[k] + ((1000.0 - (double) iteration)/1000.0)*currentDelay;
 						data.socialCosts[k] = data.socialCosts[k] + 0.5*currentDelay;
 					}
 
@@ -609,7 +612,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 				//SavitzkyGolayFilter sgf = new SavitzkyGolayFilter(5,data.socialCosts, true);
 				//data.socialCosts = sgf.appllyFilter();
 			}
-		}
+		//}
 	}
 
 	private void printSocialCosts() {

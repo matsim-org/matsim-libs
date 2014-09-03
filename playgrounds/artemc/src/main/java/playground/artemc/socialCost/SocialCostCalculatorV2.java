@@ -260,8 +260,8 @@ AfterMobsimListener, PersonDepartureEventHandler, PersonArrivalEventHandler, Lin
 		 * bike), it is ignored.
 		 */
 		String transportMode = event.getLegMode();
-		if (!transportModes.contains(transportMode))
-			return;
+		if (!transportModes.contains(transportMode)) return;
+		if(event.getPersonId().toString().startsWith("pt")) return;
 
 		LinkTrip linkTrip = new LinkTrip();
 		linkTrip.person_id = event.getPersonId();
