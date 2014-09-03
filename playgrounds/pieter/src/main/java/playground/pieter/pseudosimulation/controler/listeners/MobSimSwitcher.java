@@ -1,22 +1,16 @@
 package playground.pieter.pseudosimulation.controler.listeners;
 
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
 import org.matsim.core.mobsim.qsim.QSimFactory;
-import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-
 import playground.pieter.pseudosimulation.controler.PSimControler;
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
+
+import java.util.ArrayList;
 
 /**
  * @author fouriep
@@ -121,10 +115,10 @@ public class MobSimSwitcher implements ControlerListener,
 				} else if (mobsim.equals("jdeqsim")) {
 					matsimControler.setMobsimFactory(new JDEQSimulationFactory());
 				} else {
-					matsimControler.setMobsimFactory(new QueueSimulationFactory());
+					matsimControler.setMobsimFactory(new QSimFactory());
 				}
 			} else {
-				matsimControler.setMobsimFactory(new QueueSimulationFactory());
+				matsimControler.setMobsimFactory(new QSimFactory());
 			}
 		} else {
 			log.info("Running PSim");
