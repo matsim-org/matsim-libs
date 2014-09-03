@@ -19,10 +19,8 @@
 package playground.agarwalamit.siouxFalls.legModeDistributions;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.agarwalamit.analysis.legModeHandler.LegModeRouteDistanceDistributionHandler;
 import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
 
@@ -31,9 +29,9 @@ import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistan
  */
 public class ModeDistancDistributionAndModalSplit {
 
-	private final static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";//outputModalSplitSetUp
+	private final static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/";//outputModalSplitSetUp
 //	private final static String run = "/run201/";
-	private final static String [] runs = {"baseCaseCtd","ei","ci","eci"};
+	private final static String [] runs = {"run33","run205","run206","run207","run208"};
 	//	private  String initialPlanFile = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/input/SiouxFalls_population_probably_v3.xml";
 	//	private  String initialPlanFile = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/run33/output_plans.xml.gz";
 //	private static String finalPlanFileLocation = runDir+run+"/ITERS/";
@@ -46,11 +44,13 @@ public class ModeDistancDistributionAndModalSplit {
 		//			String finalPlanFile = finalPlanFileLocation+"it."+itNr+"/"+itNr+".plans.xml.gz";
 		//			ms.runBeelineDistance(itNr, finalPlanFile);
 		//		}
-
+		
 		for(String str:runs){
-			String finalPlanFile = runDir+str+"/ITERS/it.1500/1500.plans.xml.gz";
+			String configFile = runDir+str+"/output_config.xml";
+			int lastIteration = LoadMyScenarios.getLastIteration(configFile);
+			String finalPlanFile = runDir+str+"/ITERS/it."+lastIteration+"/"+lastIteration+".plans.xml.gz";
 			ms.runRoutesDistance(str, finalPlanFile);
-			ms.runBeelineDistance(str, finalPlanFile);
+//			ms.runBeelineDistance(str, finalPlanFile);
 		}
 	}
 	
@@ -58,7 +58,7 @@ public class ModeDistancDistributionAndModalSplit {
 	 * It will write legModeShare and beeline distance distribution	
 	 */
 	private void runBeelineDistance(String runNr,String finalPlanFile){
-		Scenario sc = loadScenario(finalPlanFile);
+		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(finalPlanFile);
 		LegModeDistanceDistribution	lmdd = new LegModeDistanceDistribution();
 		lmdd.init(sc);
 		lmdd.preProcessData();
@@ -69,19 +69,11 @@ public class ModeDistancDistributionAndModalSplit {
 	 * It will route distance distribution	
 	 */
 	private void runRoutesDistance(String runNr,String finalPlanFile){
-		Scenario sc = loadScenario(finalPlanFile);
+		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(finalPlanFile);
 		LegModeRouteDistanceDistributionHandler	lmdfed = new LegModeRouteDistanceDistributionHandler();
 		lmdfed.init(sc);
 		lmdfed.preProcessData();
 		lmdfed.postProcessData();
-		lmdfed.writeResults(runDir+"/analysis/legModeDistributions/"+runNr+".");
-//		lmdfed.writeResults(runDir+"/analysisExecutedPlans/legModeDistributions/"+runNr+".");
-	}
-
-	private Scenario loadScenario(String planFile) {
-		Config config = ConfigUtils.createConfig();
-		config.plans().setInputFile(planFile);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
+		lmdfed.writeResults(runDir+"/analysis500Its/legModeDistributions/"+runNr+".");
 	}
 }
