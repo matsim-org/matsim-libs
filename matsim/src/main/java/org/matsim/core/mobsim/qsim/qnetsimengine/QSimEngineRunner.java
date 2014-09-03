@@ -20,15 +20,14 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CyclicBarrier;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Phaser;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 
 /**
@@ -43,29 +42,42 @@ public class QSimEngineRunner extends NetElementActivator implements Runnable {
 
 	private volatile boolean simulationRunning = true;
 
-	private final CyclicBarrier startBarrier;
-	private final CyclicBarrier separationBarrier;
-	private final CyclicBarrier endBarrier;
-
-	private final List<QNode> nodesList = new ArrayList<QNode>();
-	private final List<QLinkInternalI> linksList = new ArrayList<QLinkInternalI>();
-
-	/** 
-	 * This is the collection of nodes that have to be activated in the current time step.
-	 * This needs to be thread-safe since it is not guaranteed that each incoming link is handled
-	 * by the same thread as a node itself.
-	 * A node could be activated multiple times concurrently from different incoming links within 
-	 * a time step. To avoid this,
-	 * a) 	the activateNode() method in the QNode class could be synchronized or 
-	 * b) 	a map could be used instead of a list. By doing so, no multiple entries are possible.
-	 * 		However, still multiple "put" operations will be performed for the same node.
+	private final Phaser startBarrier;
+	private final Phaser separationBarrier;
+	private final Phaser endBarrier;
+	
+	/*
+	 * This needs to be thread-safe since QNodes could be activated concurrently
+	 * from multiple threads. In previous implementations, this data structure was
+	 * a Map since it was possible that the same node was activated concurrently.
+	 * Now, the implementation of the QNode was adapted in a way that this is not
+	 * possible anymore.
+	 * cdobler, sep'14
 	 */
-	private final Map<Id, QNode> nodesToActivate = new ConcurrentHashMap<Id, QNode>();
+	private final Queue<QNode> nodesQueue = new ConcurrentLinkedQueue<QNode>();
+
+	/*
+	 * Needs not to be thread-safe since links are only activated from nodes which
+	 * are handled (by design) from links handled by the same thread. Therefore,
+	 * no concurrent add operation can occur.
+	 * cdobler, sep'14
+	 */
+//	private final List<QLinkInternalI> linksList = new ArrayList<QLinkInternalI>();
+	private final List<QLinkInternalI> linksList = new LinkedList<QLinkInternalI>();
 	
-	/** This is the collection of links that have to be activated in the current time step */
-	private final ArrayList<QLinkInternalI> linksToActivate = new ArrayList<QLinkInternalI>();
-	
-	/*package*/ QSimEngineRunner(CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier) {
+	/*
+	 * Ensure that nodes and links are only activate during times where we expect it.
+	 * Otherwise this could result in unpredictable behavior. Therefore we throw
+	 * an exception then.
+	 * Doing so allows us adding nodes and links directly to the nodesQueue respectively
+	 * the linksList. Previously, we had to cache them in other data structures and copy
+	 * them at a later point in time.
+	 * cdobler, sep'14
+	 */
+	private boolean lockNodes = false;
+	private boolean lockLinks = false;
+		
+	/*package*/ QSimEngineRunner(Phaser startBarrier, Phaser separationBarrier, Phaser endBarrier) {
 		this.startBarrier = startBarrier;
 		this.separationBarrier = separationBarrier;
 		this.endBarrier = endBarrier;
@@ -81,86 +93,68 @@ public class QSimEngineRunner extends NetElementActivator implements Runnable {
 
 	@Override
 	public void run() {
-		/*
-		 * The method is ended when the simulationRunning Flag is
-		 * set to false.
-		 */
+
+		// The method is ended when the simulationRunning flag is set to false.
 		while(true) {
-			try {
-				/*
-				 * The Threads wait at the startBarrier until they are
-				 * triggered in the next TimeStep by the run() method in
-				 * the ParallelQNetsimEngine.
-				 */
-				startBarrier.await();
 
 				/*
-				 * Check if Simulation is still running.
-				 * Otherwise print CPU usage and end Thread.
+				 * The threads wait at the startBarrier until they are triggered in the next 
+				 * time step by the run() method in the QNetsimEngine.
 				 */
+				startBarrier.arriveAndAwaitAdvance();
+				
+				// Check if Simulation is still running. Otherwise print CPU usage and end thread.
 				if (!simulationRunning) {
 					Gbl.printCurrentThreadCpuTime();
 					return;
 				}
 
-				/*
-				 * Move Nodes
-				 */
-				ListIterator<QNode> simNodes = this.nodesList.listIterator();
-				QNode node;
+				boolean remainsActive;
 				
+				// move nodes
+				this.lockNodes = true;
+				QNode node;
+				Iterator<QNode> simNodes = this.nodesQueue.iterator();
 				while (simNodes.hasNext()) {
 					node = simNodes.next();
-					node.doSimStep(time);
-					if (!node.isActive()) simNodes.remove();
+					remainsActive = node.doSimStep(time);
+					if (!remainsActive) simNodes.remove();
 				}
+				this.lockNodes = false;
+				
+				// After moving the QNodes all we use a Phaser to synchronize the threads.
+				this.separationBarrier.arriveAndAwaitAdvance();
 
-				/*
-				 * After moving the Nodes all we use a CyclicBarrier to synchronize
-				 * the Threads. By using a Runnable within the Barrier we activate
-				 * some Links.
-				 */
-				this.separationBarrier.await();
-
-				/*
-				 * Move Links
-				 */
-				ListIterator<QLinkInternalI> simLinks = this.linksList.listIterator();
+				// move links
+				lockLinks = true;
 				QLinkInternalI link;
-				boolean isActive;
-
+				ListIterator<QLinkInternalI> simLinks = this.linksList.listIterator();
 				while (simLinks.hasNext()) {
 					link = simLinks.next();
 
-					isActive = link.doSimStep(time);
+					remainsActive = link.doSimStep(time);
 
-					if (!isActive) {
-						simLinks.remove();
-					}
+					if (!remainsActive) simLinks.remove();
 				}
+				lockLinks = false;
 
 				/*
-				 * The End of the Moving is synchronized with
-				 * the endBarrier. If all Threads reach this Barrier
-				 * the main Thread can go on.
+				 * The end of moving is synchronized with the endBarrier. If all threads 
+				 * reach this barrier the main thread can go on.
 				 */
-				endBarrier.await();
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			} catch (BrokenBarrierException e) {
-            	throw new RuntimeException(e);
-            }
+				this.endBarrier.arriveAndAwaitAdvance();
 		}
-	}	// run()
-
-	@Override
-	protected void activateLink(QLinkInternalI link) {
-		linksToActivate.add(link);
 	}
 
-	/*package*/ void activateLinks() {
-		this.linksList.addAll(this.linksToActivate);
-		this.linksToActivate.clear();
+	/*
+	 * This method is only called while links are NOT "moved", i.e. their
+	 * doStimStep(...) methods are called. To ensure that, we  use a boolean lock.
+	 * cdobler, sep'14
+	 */
+	@Override
+	protected void activateLink(QLinkInternalI link) {
+		if (!lockLinks) linksList.add(link);
+		else throw new RuntimeException("Tried to activate a QLink at a time where this was not allowed. Aborting!");
 	}
 
 	@Override
@@ -168,23 +162,25 @@ public class QSimEngineRunner extends NetElementActivator implements Runnable {
 		return this.linksList.size();
 	}
 
+	/*
+	 * This method is only called while nodes are NOT "moved", i.e. their
+	 * doStimStep(...) methods are called. To ensure that, we  use a boolean lock.
+	 * cdobler, sep'14
+	 */
 	@Override
 	protected void activateNode(QNode node) {
-		this.nodesToActivate.put(node.getNode().getId(), node);
+		if (!this.lockNodes) this.nodesQueue.add(node);
+		else throw new RuntimeException("Tried to activate a QNode at a time where this was not allowed. Aborting!");
 	}
 
-	/*package*/ void activateNodes() {
-		this.nodesList.addAll(this.nodesToActivate.values());
-		this.nodesToActivate.clear();
-	}
-
+	/*
+	 * Note that the size() method is O(n) for a ConcurrentLinkedQueue as used
+	 * for the nodesQueue. However, this method is only called once every simulated
+	 * hour for the log message. Therefore, it should be okay.
+	 * cdobler, sep'14
+	 */
 	@Override
 	public int getNumberOfSimulatedNodes() {
-		return nodesList.size();
+		return this.nodesQueue.size();
 	}
-
-	public NetsimNetworkFactory<QNode,QLinkInternalI> getNetsimNetworkFactory() {
-		return new DefaultQNetworkFactory();
-	}
-
 }

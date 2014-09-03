@@ -32,6 +32,7 @@ import org.matsim.core.mobsim.framework.PassengerAgent;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Represents a node in the QSimulation.
@@ -44,8 +45,14 @@ public class QNode implements NetsimNode {
 
 	private final QLinkInternalI[] inLinksArrayCache;
 	private final QLinkInternalI[] tempLinks;
-
-	private boolean active = false;
+	
+	/*
+	 * This needs to be atomic since this allows us to ensure that an node which is
+	 * already active is not activated again. This could happen if multiple thread call
+	 * activateNode() concurrently.
+	 * cdobler, sep'14
+	 */
+	private AtomicBoolean active = new AtomicBoolean(false);
 
 	private final Node node;
 
@@ -107,15 +114,26 @@ public class QNode implements NetsimNode {
 		this.activator = activator;
 	}
 
-	/*package*/ final void activateNode() {
-		if (!this.active) {
+	/*
+	 * This method is called from QueueWithBuffer.addToBuffer(...) which is triggered at 
+	 * some placed, but always initially by a QLink's doSomStep(...) method. I.e. QNodes
+	 * are only activated while moveNodes(...) is performed. However, multiple threads
+	 * could try to activate the same node at a time, therefore this has to be thread-safe.
+	 * cdobler, sep'14 
+	 */
+	/*package*/ final void activateNode() {	
+		/*
+		 * this.active.compareAndSet(boolean expected, boolean update)
+		 * We expect the value to be false, i.e. the node is de-activated. If this is
+		 * true, the value is changed to true and the activator is informed.
+		 */
+		if (this.active.compareAndSet(false, true)) {
 			this.activator.activateNode(this);
-			this.active = true;
 		}
 	}
 
 	final boolean isActive() {
-		return this.active;
+		return this.active.get();
 	}
 
 	/**
@@ -132,8 +150,10 @@ public class QNode implements NetsimNode {
 	 *
 	 * @param now
 	 *          The current time in seconds from midnight.
+	 * @return 
+	 * 		Whether the QNode stays active or not.
 	 */
-	/*package*/ void doSimStep(final double now) {
+	/*package*/ boolean doSimStep(final double now) {
 		
 		int inLinksCounter = 0;
 		double inLinksCapSum = 0.0;
@@ -147,8 +167,8 @@ public class QNode implements NetsimNode {
 		}
 
 		if (inLinksCounter == 0) {
-			this.active = false;
-			return; // Nothing to do
+			this.active.set(false);
+			return false; // Nothing to do
 		}
 
 		int auxCounter = 0;
@@ -171,6 +191,8 @@ public class QNode implements NetsimNode {
 				}
 			}
 		}
+		
+		return true;
 	}
 
 	private void clearLinkBuffer(final QLinkInternalI link, final double now){

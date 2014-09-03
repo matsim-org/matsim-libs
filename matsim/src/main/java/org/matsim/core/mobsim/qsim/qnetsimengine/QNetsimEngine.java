@@ -20,6 +20,13 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Phaser;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,10 +45,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.VehicularDepartureHandler.Vehic
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 
-import java.util.*;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
  *
@@ -51,66 +54,11 @@ import java.util.concurrent.CyclicBarrier;
  */
 public class QNetsimEngine implements MobsimEngine {
 
-    /*
-     * We do the load balancing between the Threads using some kind
-     * of round robin.
-     *
-     * Additionally we should check from time to time whether the load
-     * is really still balanced. This is not guaranteed due to the fact
-     * that some Links get deactivated while others don't. If the number
-     * of Links is high enough statistically the difference should not
-     * be to significant.
-     */
-	/*package*/ static class LinkReActivator implements Runnable {
-        private final QSimEngineRunner[] runners;
-
-        public LinkReActivator(QSimEngineRunner[] threads) {
-            this.runners = threads;
-        }
-
-        @Override
-        public void run() {
-			/*
-			 * Each Thread contains a List of Links to activate.
-			 */
-            for (QSimEngineRunner runner : this.runners) {
-				/*
-				 * We do not redistribute the Links - they will be processed
-				 * by the same thread during the whole simulation.
-				 */
-                runner.activateLinks();
-            }
-        }
-    }
-
-    /*package*/ static class NodeReActivator implements Runnable {
-        private final QSimEngineRunner[] runners;
-
-        public NodeReActivator(QSimEngineRunner[] runners) {
-            this.runners = runners;
-        }
-
-        @Override
-        public void run() {
-			/*
-			 * Each Thread contains a List of Links to activate.
-			 */
-            for (QSimEngineRunner runner : this.runners) {
-				/*
-				 * We do not redistribute the Nodes - they will be processed
-				 * by the same thread during the whole simulation.
-				 */
-                runner.activateNodes();
-            }
-        }
-    }
-
 	private static final Logger log = Logger.getLogger(QNetsimEngine.class);
 
 	private static final int INFO_PERIOD = 3600;
 
 	/*package*/   QNetwork network;
-
 
 	private final Map<Id, QVehicle> vehicles = new HashMap<Id, QVehicle>();
 
@@ -130,9 +78,9 @@ public class QNetsimEngine implements MobsimEngine {
 
     private QSimEngineRunner[] engines;
 
-    private CyclicBarrier startBarrier;
-    private CyclicBarrier endBarrier;
-
+    private Phaser startBarrier;
+    private Phaser endBarrier;
+    
     private final Set<QLinkInternalI> linksToActivateInitially = new HashSet<QLinkInternalI>();
 
 	/*package*/ InternalInterface internalInterface = null ;
@@ -274,13 +222,14 @@ public class QNetsimEngine implements MobsimEngine {
 		 * They will check whether the Simulation is still running.
 		 * It is not, so the Threads will stop running.
 		 */
-        try {
-            this.startBarrier.await();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (BrokenBarrierException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            this.startBarrier.await();
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        } catch (BrokenBarrierException e) {
+//            throw new RuntimeException(e);
+//        }
+        this.startBarrier.arriveAndAwaitAdvance();
 
 		/* Reset vehicles on ALL links. We cannot iterate only over the active links
 		 * (this.simLinksArray), because there may be links that have vehicles only
@@ -316,20 +265,23 @@ public class QNetsimEngine implements MobsimEngine {
      */
     private void run(double time) {
 
-        try {
+//        try {
             // set current Time
             for (QSimEngineRunner engine : this.engines) {
                 engine.setTime(time);
             }
 
-            this.startBarrier.await();
-
-            this.endBarrier.await();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (BrokenBarrierException e) {
-            throw new RuntimeException(e);
-        }
+//            this.startBarrier.await();
+//
+//            this.endBarrier.await();
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        } catch (BrokenBarrierException e) {
+//            throw new RuntimeException(e);
+//        }
+            this.startBarrier.arriveAndAwaitAdvance();
+            
+            this.endBarrier.arriveAndAwaitAdvance();
     }
 
 
@@ -427,25 +379,18 @@ public class QNetsimEngine implements MobsimEngine {
 
     private void initQSimEngineThreads() {
 
-        Thread[] threads = new Thread[this.numOfThreads];
-        this.engines = new QSimEngineRunner[this.numOfThreads] ;
-        LinkReActivator linkReActivator = new LinkReActivator(this.engines);
-        NodeReActivator nodeReActivator = new NodeReActivator(this.engines);
+        this.engines = new QSimEngineRunner[this.numOfThreads];
 
-        this.startBarrier = new CyclicBarrier(this.numOfThreads + 1);
-        CyclicBarrier separationBarrier = new CyclicBarrier(this.numOfThreads, linkReActivator);
-        //		this.endBarrier = new CyclicBarrier(numOfThreads + 1);
-        this.endBarrier = new CyclicBarrier(this.numOfThreads + 1, nodeReActivator);
-
+        this.startBarrier = new Phaser(this.numOfThreads + 1);
+        Phaser separationBarrier = new Phaser(this.numOfThreads);
+        this.endBarrier = new Phaser(this.numOfThreads + 1);
+       
         // setup threads
         for (int i = 0; i < this.numOfThreads; i++) {
-            QSimEngineRunner engine = new QSimEngineRunner(this.startBarrier, separationBarrier,
-                    this.endBarrier);
+            QSimEngineRunner engine = new QSimEngineRunner(this.startBarrier, separationBarrier, endBarrier);
             Thread thread = new Thread(engine);
-            thread.setName("QSimEngineThread" + i);
-
+            thread.setName("QNetsimEngineRunner_" + i);
             thread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
-            threads[i] = thread;
             this.engines[i] = engine;
 
             thread.start();
