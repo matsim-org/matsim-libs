@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -63,7 +64,7 @@ public class FlightControllerDelay {
 						log.info("Original departure time: " + Time.writeTime(time) + " for departure: " + dep.getId());
 						double r2 = timeRandom.nextGaussian();
 						time = time + ((r2 * 27.6/2 * 60.0) + (27.6 * 60.0));
-						Departure dep2 = factory.createDeparture(dep.getVehicleId(), time);
+						Departure dep2 = factory.createDeparture(Id.create(dep.getVehicleId(), Departure.class), time);
 						dep2.setVehicleId(dep.getVehicleId());
 						route.addDeparture(dep2);
 						log.info("Shifted deprature time: " + Time.writeTime(time) + " using r2: " + r2);

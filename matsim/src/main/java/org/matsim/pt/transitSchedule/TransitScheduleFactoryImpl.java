@@ -38,12 +38,12 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class TransitScheduleFactoryImpl implements TransitScheduleFactory {
 
 	@Override
-	public TransitLine createTransitLine(final Id lineId) {
+	public TransitLine createTransitLine(final Id<TransitLine> lineId) {
 		return new TransitLineImpl(lineId);
 	}
 
 	@Override
-	public TransitRoute createTransitRoute(final Id routeId, final NetworkRoute route, final List<TransitRouteStop> stops, final String mode) {
+	public TransitRoute createTransitRoute(final Id<TransitRoute> routeId, final NetworkRoute route, final List<TransitRouteStop> stops, final String mode) {
 		return new TransitRouteImpl(routeId, route, stops, mode);
 	}
 
@@ -58,12 +58,12 @@ public class TransitScheduleFactoryImpl implements TransitScheduleFactory {
 	}
 
 	@Override
-	public TransitStopFacility createTransitStopFacility(final Id facilityId, final Coord coordinate, final boolean blocksLane) {
+	public TransitStopFacility createTransitStopFacility(final Id<TransitStopFacility> facilityId, final Coord coordinate, final boolean blocksLane) {
 		return new TransitStopFacilityImpl(facilityId, coordinate, blocksLane);
 	}
 
 	@Override
-	public Departure createDeparture(final Id departureId, final double time) {
+	public Departure createDeparture(final Id<Departure> departureId, final double time) {
 		return new DepartureImpl(departureId, time);
 	}
 

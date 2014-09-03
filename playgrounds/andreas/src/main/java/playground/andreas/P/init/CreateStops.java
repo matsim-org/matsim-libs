@@ -20,6 +20,7 @@
 package playground.andreas.P.init;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -81,7 +82,7 @@ public class CreateStops {
 			}
 		}
 		
-		TransitStopFacility stop = this.transitSchedule.getFactory().createTransitStopFacility(link.getId(), link.getCoord(), false);
+		TransitStopFacility stop = this.transitSchedule.getFactory().createTransitStopFacility(Id.create(link.getId(), TransitStopFacility.class), link.getCoord(), false);
 		stop.setLinkId(link.getId());
 		this.transitSchedule.addStopFacility(stop);
 		return 1;		

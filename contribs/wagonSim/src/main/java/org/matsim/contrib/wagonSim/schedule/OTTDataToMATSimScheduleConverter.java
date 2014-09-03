@@ -190,7 +190,7 @@ public class OTTDataToMATSimScheduleConverter {
 				
 				TransitLine line = scheduleFactory.createTransitLine(locomotive.id);
 				scenario.getTransitSchedule().addTransitLine(line);
-				TransitRoute route = scheduleFactory.createTransitRoute(line.getId(),null,transitRouteStops,TransportMode.pt);
+				TransitRoute route = scheduleFactory.createTransitRoute(Id.create(line.getId(), TransitRoute.class), null, transitRouteStops, TransportMode.pt);
 				line.addRoute(route);
 				
 				Vehicle vehicle = vehiclesFactory.createVehicle(route.getId(),vehicleType);
@@ -198,9 +198,9 @@ public class OTTDataToMATSimScheduleConverter {
 				departure.setVehicleId(vehicle.getId());
 				route.addDeparture(departure);
 				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_TYPE, locomotive.type);
-				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_MAX_SPEED, (Double)trainTypes.getAttribute(locomotive.type.toString(),WagonSimConstants.TRAIN_MAX_SPEED));
-				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_MAX_WEIGHT, (Double)trainTypes.getAttribute(locomotive.type.toString(),WagonSimConstants.TRAIN_MAX_WEIGHT));
-				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_MAX_LENGTH, (Double)trainTypes.getAttribute(locomotive.type.toString(),WagonSimConstants.TRAIN_MAX_LENGTH));
+				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_MAX_SPEED, trainTypes.getAttribute(locomotive.type.toString(),WagonSimConstants.TRAIN_MAX_SPEED));
+				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_MAX_WEIGHT, trainTypes.getAttribute(locomotive.type.toString(),WagonSimConstants.TRAIN_MAX_WEIGHT));
+				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_MAX_LENGTH, trainTypes.getAttribute(locomotive.type.toString(),WagonSimConstants.TRAIN_MAX_LENGTH));
 
 				// the next day
 				vehicle = vehiclesFactory.createVehicle(new IdImpl(route.getId()+".1"),vehicleType);
@@ -209,9 +209,9 @@ public class OTTDataToMATSimScheduleConverter {
 				departure.setVehicleId(vehicle.getId());
 				route.addDeparture(departure);
 				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_TYPE, locomotive.type);
-				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_MAX_SPEED, (Double)trainTypes.getAttribute(locomotive.type.toString(),WagonSimConstants.TRAIN_MAX_SPEED));
-				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_MAX_WEIGHT, (Double)trainTypes.getAttribute(locomotive.type.toString(),WagonSimConstants.TRAIN_MAX_WEIGHT));
-				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_MAX_LENGTH, (Double)trainTypes.getAttribute(locomotive.type.toString(),WagonSimConstants.TRAIN_MAX_LENGTH));
+				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_MAX_SPEED, trainTypes.getAttribute(locomotive.type.toString(),WagonSimConstants.TRAIN_MAX_SPEED));
+				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_MAX_WEIGHT, trainTypes.getAttribute(locomotive.type.toString(),WagonSimConstants.TRAIN_MAX_WEIGHT));
+				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_MAX_LENGTH, trainTypes.getAttribute(locomotive.type.toString(),WagonSimConstants.TRAIN_MAX_LENGTH));
 
 				// the day after the next day
 				vehicle = vehiclesFactory.createVehicle(new IdImpl(route.getId()+".2"),vehicleType);
@@ -220,9 +220,9 @@ public class OTTDataToMATSimScheduleConverter {
 				departure.setVehicleId(vehicle.getId());
 				route.addDeparture(departure);
 				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_TYPE, locomotive.type);
-				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_MAX_SPEED, (Double)trainTypes.getAttribute(locomotive.type.toString(),WagonSimConstants.TRAIN_MAX_SPEED));
-				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_MAX_WEIGHT, (Double)trainTypes.getAttribute(locomotive.type.toString(),WagonSimConstants.TRAIN_MAX_WEIGHT));
-				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_MAX_LENGTH, (Double)trainTypes.getAttribute(locomotive.type.toString(),WagonSimConstants.TRAIN_MAX_LENGTH));
+				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_MAX_SPEED, trainTypes.getAttribute(locomotive.type.toString(),WagonSimConstants.TRAIN_MAX_SPEED));
+				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_MAX_WEIGHT, trainTypes.getAttribute(locomotive.type.toString(),WagonSimConstants.TRAIN_MAX_WEIGHT));
+				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_MAX_LENGTH, trainTypes.getAttribute(locomotive.type.toString(),WagonSimConstants.TRAIN_MAX_LENGTH));
 			}
 			else if (transitRouteStops.size() == 1) {
 				System.out.println("locomotive id="+locomotive.id+": only one station given. Therefore, no transitLine created.");

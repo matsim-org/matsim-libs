@@ -239,9 +239,9 @@ class CreateTestScenario {
 	
 	private TransitStopFacility createFacility(Scenario sc, String linkId){
 		TransitScheduleFactory f = sc.getTransitSchedule().getFactory();
-		Link l = sc.getNetwork().getLinks().get(sc.createId(linkId));
+		Link l = sc.getNetwork().getLinks().get(Id.create(linkId, Link.class));
 		
-		TransitStopFacility fac = f.createTransitStopFacility(l.getId(), l.getToNode().getCoord(), false);
+		TransitStopFacility fac = f.createTransitStopFacility(Id.create(l.getId(), TransitStopFacility.class), l.getToNode().getCoord(), false);
 		fac.setLinkId(l.getId());
 	
 		return fac;
@@ -251,7 +251,7 @@ class CreateTestScenario {
 		TransitScheduleFactory f = sc.getTransitSchedule().getFactory();
 		String mode = "bus";
 		//  create vehicleType
-		VehicleType vType = ((ScenarioImpl) sc).getVehicles().getFactory().createVehicleType(sc.createId(mode));
+		VehicleType vType = ((ScenarioImpl) sc).getVehicles().getFactory().createVehicleType(Id.create(mode, Vehicle.class));
 		((ScenarioImpl) sc).getVehicles().addVehicleType(vType);
 		vType.setLength(15);
 		VehicleCapacity cap = new VehicleCapacityImpl();
@@ -259,16 +259,16 @@ class CreateTestScenario {
 		cap.setStandingRoom(0);
 		vType.setCapacity(cap);
 		//create Line and Route
-		TransitLine l = f.createTransitLine(sc.createId(mode));
-		NetworkRoute route = new LinkNetworkRouteImpl(sc.createId("A-A"), sc.createId("A-A"));
+		TransitLine l = f.createTransitLine(Id.create(mode, TransitLine.class));
+		NetworkRoute route = new LinkNetworkRouteImpl(Id.create("A-A", Link.class), Id.create("A-A", Link.class));
 		
 		@SuppressWarnings("serial")
 		List<Id<Link>> linkIds = new ArrayList<Id<Link>>(){{
-			add(new IdImpl("A-B1"));
-			add(new IdImpl("B1-C"));
-			add(new IdImpl("C-C"));
-			add(new IdImpl("C-B1"));
-			add(new IdImpl("B1-A"));
+			add(Id.create("A-B1", Link.class));
+			add(Id.create("B1-C", Link.class));
+			add(Id.create("C-C", Link.class));
+			add(Id.create("C-B1", Link.class));
+			add(Id.create("B1-A", Link.class));
 		}};
 		route.setLinkIds(route.getStartLinkId(), linkIds, route.getEndLinkId());
 		

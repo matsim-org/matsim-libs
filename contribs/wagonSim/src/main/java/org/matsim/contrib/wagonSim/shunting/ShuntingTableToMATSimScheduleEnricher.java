@@ -149,7 +149,7 @@ public class ShuntingTableToMATSimScheduleEnricher {
 				transitRouteStops.add(transitRoute.getStops().get(transitRoute.getStops().size()-1));
 				
 				NetworkRoute networkRoute = RouteUtils.createNetworkRoute(routeLinkIds,scenario.getNetwork());
-				TransitRoute newTransitRoute = scenario.getTransitSchedule().getFactory().createTransitRoute(transitLine.getId(),networkRoute,transitRouteStops,TransportMode.pt);
+				TransitRoute newTransitRoute = scenario.getTransitSchedule().getFactory().createTransitRoute(Id.create(transitLine.getId(), TransitRoute.class), networkRoute,transitRouteStops,TransportMode.pt);
 				for (Departure departure : transitRoute.getDepartures().values()) { newTransitRoute.addDeparture(departure); }
 				newTransitRoutes.add(newTransitRoute);
 			}

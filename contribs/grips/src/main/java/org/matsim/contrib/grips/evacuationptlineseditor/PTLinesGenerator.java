@@ -86,9 +86,9 @@ public class PTLinesGenerator {
 
 		this.schedule = this.fac.createTransitSchedule();
 
-		Link safeLink = this.sc.getNetwork().getLinks().get(new IdImpl("el1"));
+		Link safeLink = this.sc.getNetwork().getLinks().get(Id.create("el1", Link.class));
 
-		TransitStopFacility safeFacility = this.fac.createTransitStopFacility(safeLink.getId(), safeLink.getToNode().getCoord(), false);
+		TransitStopFacility safeFacility = this.fac.createTransitStopFacility(Id.create(safeLink.getId(), TransitStopFacility.class), safeLink.getToNode().getCoord(), false);
 		safeFacility.setLinkId(safeLink.getId());
 		this.schedule.addStopFacility(safeFacility);
 
@@ -125,7 +125,7 @@ public class PTLinesGenerator {
 		TransitStopFacility safeFacility = this.schedule.getFacilities().get(safeLink.getId());
 
 		if (safeFacility == null) {
-			safeFacility = this.fac.createTransitStopFacility(safeLink.getId(), safeLink.getToNode().getCoord(), false);
+			safeFacility = this.fac.createTransitStopFacility(Id.create(safeLink.getId(), TransitStopFacility.class), safeLink.getToNode().getCoord(), false);
 			safeFacility.setLinkId(safeLink.getId());
 			this.schedule.addStopFacility(safeFacility);
 		}

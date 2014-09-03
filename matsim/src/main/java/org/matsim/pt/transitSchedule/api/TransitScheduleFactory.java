@@ -34,14 +34,14 @@ public interface TransitScheduleFactory extends MatsimFactory {
 
 	public abstract TransitSchedule createTransitSchedule();
 
-	public abstract TransitLine createTransitLine(final Id lineId);
+	public abstract TransitLine createTransitLine(final Id<TransitLine> lineId);
 
-	public abstract TransitRoute createTransitRoute(final Id routeId, final NetworkRoute route, final List<TransitRouteStop> stops, final String mode);
+	public abstract TransitRoute createTransitRoute(final Id<TransitRoute> routeId, final NetworkRoute route, final List<TransitRouteStop> stops, final String mode);
 
 	public abstract TransitRouteStop createTransitRouteStop(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay);
 
-	public abstract TransitStopFacility createTransitStopFacility(final Id facilityId, final Coord coordinate, final boolean blocksLane);
+	public abstract TransitStopFacility createTransitStopFacility(final Id<TransitStopFacility> facilityId, final Coord coordinate, final boolean blocksLane);
 
-	public abstract Departure createDeparture(final Id departureId, final double time);
+	public abstract Departure createDeparture(final Id<Departure> departureId, final double time);
 
 }
