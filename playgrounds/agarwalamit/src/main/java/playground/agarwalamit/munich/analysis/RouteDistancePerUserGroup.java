@@ -68,7 +68,7 @@ public class RouteDistancePerUserGroup {
 		lmdfed.preProcessData();
 		lmdfed.postProcessData();
 		lmdfed.writeResults(outputDir+"/analysis/");
-		mode2PersonId2RouteDist = lmdfed.getMode2PersonId2RouteDistance();
+		mode2PersonId2RouteDist = lmdfed.getMode2PersonId2RouteDistances();
 		mode2PersonId2TotalRouteDist = lmdfed.getMode2PersonId2TotalRouteDistance();
 		getUserGroupDistanceMeanAndMeadian();
 		writeResults(outputDir+"/analysis/");
