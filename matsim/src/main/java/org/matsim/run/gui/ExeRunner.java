@@ -37,26 +37,37 @@ import org.matsim.core.utils.io.IOUtils;
  *
  * @author mrieser
  */
-public abstract class ExeRunner {
+public class ExeRunner {
 
 	/*package*/ final static Logger log = Logger.getLogger(ExeRunner.class);
+	
+	private final ExternalExecutor executor;
 
-	public static int run(final String[] cmdArgs, final JTextArea textArea, final String workingDirectory) {
+	public static ExeRunner run(final String[] cmdArgs, final JTextArea textArea, final String workingDirectory) {
 		final ExternalExecutor myExecutor = new ExternalExecutor(cmdArgs, textArea, workingDirectory);
-		return waitForFinish(myExecutor);
+		ExeRunner runner = new ExeRunner(myExecutor);
+		myExecutor.start();
+		return runner;
 	}
 	
-	public static int waitForFinish(final ExternalExecutor myExecutor) {
-		synchronized (myExecutor) {
+	private ExeRunner(ExternalExecutor executor) {
+		this.executor = executor;
+	}
+	
+	public void killProcess() {
+		this.executor.killProcess();
+	}
+	
+	public int waitForFinish() {
+		synchronized (this.executor) {
 			try {
-				myExecutor.start();
-				myExecutor.join();
+				this.executor.join();
 			} catch (InterruptedException e) {
-				log.info("ExeRunner.run() got interrupted while waiting for timeout", e);
+				log.info("Got interrupted while waiting for external exe to finish.", e);
 			}
 		}
 		
-		return myExecutor.erg;
+		return this.executor.erg;
 	}
 
 	private static class ExternalExecutor extends Thread {
@@ -72,7 +83,6 @@ public abstract class ExeRunner {
 			this.textArea = textArea;
 			this.workingDirectory = workingDirectory;
 		}
-		
 		
 		public void killProcess() {
 			if (this.p != null) {

@@ -40,6 +40,8 @@ public class Gui extends JFrame {
 	private JProgressBar progressBar;
 	private JTextArea textArea;
 	private JScrollPane scrollPane;
+	
+	private ExeRunner exeRunner = null;
 
 	public Gui() {
 		setTitle("MATSim");
@@ -136,7 +138,11 @@ public class Gui extends JFrame {
 		btnStartMatsim.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				startMATSim();
+				if (exeRunner == null) {
+					startMATSim();
+				} else {
+					stopMATSim();
+				}
 			}
 		});
 		
@@ -269,7 +275,6 @@ public class Gui extends JFrame {
 			@Override
 			public void run() {
 				String classpath = System.getProperty("java.class.path");
-//		String cmd = "\"" + this.txtJvmlocation.getText() + "\" -cp \"" + classpath + "\" -Xmx" + this.txtRam + "m org.matsim.run.Controler \"" + this.txtConfigfilename.getText() + "\"";
 				String[] cmdArgs = new String[] {
 						txtJvmlocation.getText(),
 						"-cp",
@@ -279,22 +284,49 @@ public class Gui extends JFrame {
 						txtConfigfilename.getText()
 				};
 				Gui.this.textArea.setText("");
-				int exitcode = ExeRunner.run(cmdArgs, Gui.this.textArea, new File(txtConfigfilename.getText()).getParent());
-				
+				Gui.this.exeRunner = ExeRunner.run(cmdArgs, Gui.this.textArea, new File(txtConfigfilename.getText()).getParent());
+				Gui.this.btnStartMatsim.setText("Stop MATSim");
+				Gui.this.btnStartMatsim.setEnabled(true);
+				int exitcode = exeRunner.waitForFinish();
+				Gui.this.exeRunner = null;
+
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
 						progressBar.setVisible(false);
+						btnStartMatsim.setText("Start MATSim");
 						btnStartMatsim.setEnabled(true);
 					}
 				});
 
 				if (exitcode != 0) {
+					Gui.this.textArea.append("\n");
+					Gui.this.textArea.append("The simulation did not run properly. Error/Exit code: " + exitcode);
+					Gui.this.textArea.setCaretPosition(Gui.this.textArea.getDocument().getLength());
 					throw new RuntimeException("There was a problem running MATSim. exit code: " + exitcode);
 				}
 			}
 		}).start();
 		
+	}
+	
+	public void stopMATSim() {
+		ExeRunner runner = this.exeRunner;
+		if (runner != null) {
+			runner.killProcess();
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					progressBar.setVisible(false);
+					btnStartMatsim.setText("Start MATSim");
+					btnStartMatsim.setEnabled(true);
+					
+					Gui.this.textArea.append("\n");
+					Gui.this.textArea.append("The simulation was stopped forcefully.");
+					Gui.this.textArea.setCaretPosition(Gui.this.textArea.getDocument().getLength());
+				}
+			});
+		}
 	}
 	
 	public static void main(String[] args) {
