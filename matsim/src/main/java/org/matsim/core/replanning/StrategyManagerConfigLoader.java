@@ -20,9 +20,6 @@
 
 package org.matsim.core.replanning;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -30,15 +27,13 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.PlanSelectorFactoryRegister;
-import org.matsim.core.controler.PlanSelectorRegistrar;
-import org.matsim.core.controler.PlanStrategyFactoryRegister;
-import org.matsim.core.controler.PlanStrategyRegistrar;
+import org.matsim.core.controler.*;
 import org.matsim.core.replanning.modules.ExternalModule;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Loads the strategy modules specified in the config-file. This class offers
@@ -97,13 +92,12 @@ public final class StrategyManagerConfigLoader {
 
 			// now check if this modules should be disabled after some iterations
 			int maxIter = settings.getDisableAfter();
-			// --- begin new ---
 			if ( maxIter > globalInnovationDisableAfter || maxIter==-1 ) {
 				if (!PlanStrategies.isOnlySelector(strategy)) {
 					maxIter = globalInnovationDisableAfter ;
 				}
 			}
-			// --- end new ---
+
 			if (maxIter >= 0) {
 				if (maxIter >= config.controler().getFirstIteration()) {
 					manager.addChangeRequest(maxIter + 1, strategy, settings.getSubpopulation() , 0.0);
@@ -126,22 +120,19 @@ public final class StrategyManagerConfigLoader {
 	private static PlanStrategy loadStrategy(Scenario scenario, OutputDirectoryHierarchy controlerIO, EventsManager events, final String name, final StrategyConfigGroup.StrategySettings settings, PlanStrategyFactoryRegister planStrategyFactoryRegister) {
 		// Special cases, scheduled to go away.
 		if (name.equals(LOCATION_CHOICE)) {
-			PlanStrategy strategy = tryToLoadPlanStrategyByName(scenario, "org.matsim.contrib.locationchoice.LocationChoicePlanStrategy");
-			return strategy;
+            return tryToLoadPlanStrategyByName(scenario, "org.matsim.contrib.locationchoice.LocationChoicePlanStrategy");
 		} else if (name.equals("ExternalModule")) {
 			externalCounter++;
-			PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
+			PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
 			String exePath = settings.getExePath();
 			ExternalModule em = new ExternalModule(exePath, "ext" + externalCounter, controlerIO, scenario);
 			strategy.addStrategyModule(em);
 			return strategy;
 		} else if (name.contains(".")) {
-			PlanStrategy strategy = tryToLoadPlanStrategyByName(scenario, name);
-			return strategy;
+            return tryToLoadPlanStrategyByName(scenario, name);
 		} else {
 			PlanStrategyFactory planStrategyFactory = planStrategyFactoryRegister.getInstance(name);
-			PlanStrategy strategy = planStrategyFactory.createPlanStrategy(scenario, events);
-			return strategy;
+            return planStrategyFactory.createPlanStrategy(scenario, events);
 		} 
 	} 
 
@@ -153,25 +144,16 @@ public final class StrategyManagerConfigLoader {
 			throw new RuntimeException("Strategies in the org.matsim package must not be loaded by name!");
 		} else {
 			try {
-				Class<? extends PlanStrategy> klas = (Class<? extends PlanStrategy>) Class.forName(name);
-				Class<?>[] args = new Class[1];
-				args[0] = Scenario.class;
-				Constructor<? extends PlanStrategy> c = null;
-				c = klas.getConstructor(args);
-				strategy = c.newInstance(scenario);
-			} catch (ClassNotFoundException e) {
-				throw new RuntimeException(e);
-			} catch (InstantiationException e) {
-				throw new RuntimeException(e);
-			} catch (IllegalAccessException e) {
+				Class<?> klas = Class.forName(name);
+				Constructor<?> c = klas.getConstructor(Scenario.class);
+				strategy = (PlanStrategy) c.newInstance(scenario);
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
 				throw new RuntimeException(e);
 			} catch (NoSuchMethodException e) {
 				log.info("Cannot find Constructor in PlanStrategy " + name + " with single argument of type Scenario. ");
 				throw new RuntimeException(e);
-			} catch (InvocationTargetException e) {
-				throw new RuntimeException(e);
 			}
-		}
+        }
 		return strategy;
 	}
 

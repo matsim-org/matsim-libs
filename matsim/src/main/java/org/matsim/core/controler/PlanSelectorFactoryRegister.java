@@ -22,6 +22,8 @@
 
 package org.matsim.core.controler;
 
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.PlanSelectorFactory;
 
 import java.util.HashMap;
@@ -29,9 +31,9 @@ import java.util.Map;
 
 public class PlanSelectorFactoryRegister {
 
-    private Map<String, PlanSelectorFactory> factoryMap = new HashMap<String, PlanSelectorFactory>();
+    private Map<String, PlanSelectorFactory<Plan, Person>> factoryMap = new HashMap<>();
 
-    public PlanSelectorFactory getInstance(String selectorType) {
+    public PlanSelectorFactory<Plan, Person> getInstance(String selectorType) {
         if (!factoryMap.containsKey(selectorType)) {
             throw new IllegalArgumentException("Plan strategy " + selectorType
                     + " doesn't exist.");
@@ -39,7 +41,7 @@ public class PlanSelectorFactoryRegister {
         return factoryMap.get(selectorType);
     }
 
-    public void register(String string, PlanSelectorFactory selectorFactory) {
+    public void register(String string, PlanSelectorFactory<Plan, Person> selectorFactory) {
         factoryMap.put(string, selectorFactory);
     }
 
