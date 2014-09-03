@@ -47,7 +47,7 @@ public class LegModeTravelTimeDistribution extends AbstractAnalyisModule {
 	private Map<String, Map<Id, Double>> mode2PersonId2TravelTime;
 	private List<Integer> travelTimeClasses;
 	private List<String> travelModes;
-	private SortedMap<String, Map<Integer, Integer>> mode2TravelTimeClasses2LegCount;
+	private SortedMap<String, SortedMap<Integer, Integer>> mode2TravelTimeClasses2LegCount;
 	private String eventsFile;
 
 	public LegModeTravelTimeDistribution(String eventsFile) {
@@ -61,9 +61,9 @@ public class LegModeTravelTimeDistribution extends AbstractAnalyisModule {
 	}
 
 	public static void main(String[] args) {
-		String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/";
+		String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMC/";
 //		String [] runs = {"run33"};
-				String [] runs = {"run33","run205","run206","run207","run208"};
+				String [] runs = {"run33","run201","run202","run203","run204"};
 
 		for(String run:runs){
 		
@@ -101,7 +101,7 @@ public class LegModeTravelTimeDistribution extends AbstractAnalyisModule {
 	}
 
 	private void calculateMode2TravelTimeClases2LegCount() {
-		this.mode2TravelTimeClasses2LegCount= new TreeMap<String, Map<Integer,Integer>>();
+		this.mode2TravelTimeClasses2LegCount= new TreeMap<String, SortedMap<Integer,Integer>>();
 		for(String mode:this.travelModes){
 			SortedMap<Integer, Integer> travelTimeClasses2LegCount = new TreeMap<Integer, Integer>();
 			for(int i=0;i<this.travelTimeClasses.size()-1;i++){
@@ -157,7 +157,7 @@ public class LegModeTravelTimeDistribution extends AbstractAnalyisModule {
 	}
 
 	private double getHighestTravelTime(){
-		double highestTravelTime = 0;
+		double highestTravelTime = Double.NEGATIVE_INFINITY;
 		for(String mode : this.mode2PersonId2TravelTime.keySet()){
 			for(Id id : this.mode2PersonId2TravelTime.get(mode).keySet()){
 				if(highestTravelTime<this.mode2PersonId2TravelTime.get(mode).get(id)){
