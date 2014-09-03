@@ -81,7 +81,7 @@ public class CreateCooperativeFromSchedule implements PStrategy{
 		if (pConfig.getTransitScheduleToStartWith() != null) {
 			TransitSchedule tS = readTransitSchedule(pConfig.getTransitScheduleToStartWith());
 
-			for (Entry<Id, TransitLine> lineEntry : tS.getTransitLines().entrySet()) {
+			for (Entry<Id<TransitLine>, TransitLine> lineEntry : tS.getTransitLines().entrySet()) {
 				Cooperative coop = this.cooperativeFactory.createNewCooperative(new IdImpl(this.pConfig.getPIdentifier() + lineEntry.getKey()));
 
 				PPlan plan = createPlan(lineEntry.getValue());

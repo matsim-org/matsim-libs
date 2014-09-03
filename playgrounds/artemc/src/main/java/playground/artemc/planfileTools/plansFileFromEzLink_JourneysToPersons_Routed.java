@@ -9,10 +9,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -88,7 +88,7 @@ public class plansFileFromEzLink_JourneysToPersons_Routed extends MatsimXmlWrite
 
 		ResultSet mrtOD = null;
 		Map<Id, Integer>  routesMap = new HashMap<Id,Integer>();
-		Map<Id,TransitLine> lines;
+		Map<Id<TransitLine>,TransitLine> lines;
 		Set<Id> routes;
 
 		ArrayList<String> emptyResultSetIDs = new ArrayList<String>();
@@ -632,6 +632,7 @@ public class plansFileFromEzLink_JourneysToPersons_Routed extends MatsimXmlWrite
 		Collections.sort(sortedEntries, 
 				new Comparator<Entry<K,V>>() {
 
+			@Override
 			public int compare(Entry<K,V> e1, Entry<K,V> e2) {
 				return e2.getValue().compareTo(e1.getValue());
 			}

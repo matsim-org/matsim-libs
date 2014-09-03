@@ -21,7 +21,7 @@ public class TransitLinesList {
 		this.schedule = schedule;
 	}
 	
-	private Set<Id> getLines(){
+	private Set<Id<TransitLine>> getLines(){
 		return this.schedule.getTransitLines().keySet();
 	}
 

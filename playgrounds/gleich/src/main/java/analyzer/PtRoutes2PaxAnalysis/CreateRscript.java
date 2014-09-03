@@ -60,7 +60,7 @@ public class CreateRscript {
 	 * @param schedule
 	 * @param outDir
 	 */
-	public static void createScript(Map<Id, TransitLine> lines, String outDir, double interval, int maxSlices){
+	public static void createScript(Map<Id<TransitLine>, TransitLine> lines, String outDir, double interval, int maxSlices){
 		readScript(outDir, interval, maxSlices);
 		heatmapScript(outDir, interval, maxSlices);
 		

@@ -19,7 +19,6 @@
 package analyzer.PtRoutes2PaxAnalysis;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +39,6 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
@@ -61,11 +59,11 @@ public class PtRoutes2PaxAnalysis extends AbstractAnalyisModule {
 	private static final Logger log = Logger
 			.getLogger(PtRoutes2PaxAnalysis.class);
 	private PtRoutes2PaxAnalysisHandler handler;
-	private Map<Id, TransitLine> lines;
+	private Map<Id<TransitLine>, TransitLine> lines;
 	private double interval;
 	private int maxSlices;
 
-	public PtRoutes2PaxAnalysis(Map<Id, TransitLine> lines, Vehicles vehicles, double interval, int maxSlices) {
+	public PtRoutes2PaxAnalysis(Map<Id<TransitLine>, TransitLine> lines, Vehicles vehicles, double interval, int maxSlices) {
 		super(PtRoutes2PaxAnalysis.class.getSimpleName());
 		this.handler = new PtRoutes2PaxAnalysisHandler(interval, maxSlices, lines, vehicles);
 		this.lines = lines;

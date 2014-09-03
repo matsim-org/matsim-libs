@@ -36,6 +36,8 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.BasicPlan;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -177,7 +179,7 @@ public class Controler extends AbstractController {
 	private MobsimFactoryRegister mobsimFactoryRegister;
 	private SnapshotWriterFactoryRegister snapshotWriterRegister;
 	private PlanStrategyFactoryRegister planStrategyFactoryRegister;
-    private PlanSelectorFactoryRegister planSelectorFactoryRegister;
+	private PlanSelectorFactoryRegister planSelectorFactoryRegister;
 
 	protected boolean dumpDataAtEnd = true;
 	private boolean overwriteFiles = false;
@@ -862,9 +864,9 @@ public class Controler extends AbstractController {
 		this.planStrategyFactoryRegister.register(planStrategyFactoryName, planStrategyFactory);
 	}
 
-    public final void addPlanSelectorFactory(final String planSelectorFactoryName, final PlanSelectorFactory<? extends BasicPlan, ?> planSelectorFactory) {
-        this.planSelectorFactoryRegister.register(planSelectorFactoryName, planSelectorFactory);
-    }
+  public final void addPlanSelectorFactory(final String planSelectorFactoryName, final PlanSelectorFactory<Plan, Person> planSelectorFactory) {
+    this.planSelectorFactoryRegister.register(planSelectorFactoryName, planSelectorFactory);
+  }
 
 	public final void setSignalsControllerListenerFactory(
 			final SignalsControllerListenerFactory signalsFactory) {

@@ -69,7 +69,7 @@ public class TransitScheduleSimplifier{
 		
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		
-		Map<Id,TransitLine> transitLines = schedule.getTransitLines();
+		Map<Id<TransitLine>,TransitLine> transitLines = schedule.getTransitLines();
 		
 		TransitSchedule mergedSchedule = factory.createTransitSchedule();
 		
@@ -207,7 +207,7 @@ public class TransitScheduleSimplifier{
 		
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		
-		Map<Id,TransitLine> transitLines = schedule.getTransitLines();
+		Map<Id<TransitLine>, TransitLine> transitLines = schedule.getTransitLines();
 		
 		int mergedRoutesCounter = 0;
 		

@@ -7,10 +7,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -55,7 +55,7 @@ public class HafasOSMMerger {
 		TransitScheduleImpl hafasSchedule = (TransitScheduleImpl) this.hafasScenario.getTransitSchedule();
 		TransitSchedule osmSchedule = this.osmScenario.getTransitSchedule();
 
-		for (Entry<Id, TransitLine> osm : osmSchedule.getTransitLines().entrySet()) {
+		for (Entry<Id<TransitLine>, TransitLine> osm : osmSchedule.getTransitLines().entrySet()) {
 
 			if(osm.getKey().toString().contains(this.lineToConvert)){
 				log.info("Found " + osm.getKey());

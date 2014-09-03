@@ -66,7 +66,7 @@ public class PtLines2PaxAnalysisHandler implements
 	private Vehicles vehicles;
 
 	public PtLines2PaxAnalysisHandler(double interval, int maxSlice,
-			Map<Id, TransitLine> lines, Vehicles vehicles) {
+			Map<Id<TransitLine>, TransitLine> lines, Vehicles vehicles) {
 		this.drivers = new ArrayList<Id>();
 		this.transitVehicles = new HashMap<Id, AnalysisVehicle>();
 		this.linesPaxCounts = new HashMap<Id, TransitLines2PaxCounts>();

@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.southafrica.population.HouseholdSampler;
@@ -61,7 +60,7 @@ public class GenerateTenPercentSamples {
 				hhs.writeSample(areaOutputFolder);
 			} catch (IOException e) {
 				e.printStackTrace();
-				throw new RuntimeCryptoException("May not overwrite any population files!");
+				throw new RuntimeException("May not overwrite any population files!");
 			}
 			hhs = null;
 			LOG.info("==> done with " + area.getName());

@@ -25,7 +25,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
@@ -344,7 +343,7 @@ public class AccessibilityCalculator {
 	 * 200m of one another.  
 	 */
 	private void setupTransitQuadTrees(){
-		Map<Id, TransitLine> lines = sc.getTransitSchedule().getTransitLines();
+		Map<Id<TransitLine>, TransitLine> lines = sc.getTransitSchedule().getTransitLines();
 		LOG.info("Setting up the transit QuadTrees... (" + lines.size() + ")");
 		Counter counter = new Counter("   lines # ");
 		for(TransitLine line : lines.values()){

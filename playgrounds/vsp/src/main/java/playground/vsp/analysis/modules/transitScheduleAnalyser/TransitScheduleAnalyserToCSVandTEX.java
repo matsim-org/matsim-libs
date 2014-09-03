@@ -62,9 +62,9 @@ public class TransitScheduleAnalyserToCSVandTEX {
 		
 		List <TransitScheduleAnalyserElement> allInformations = new ArrayList<TransitScheduleAnalyserElement>();
 		
-		Map <Id, TransitLine> transitLinesMap = ts.getTransitLines();
+		Map <Id<TransitLine>, TransitLine> transitLinesMap = ts.getTransitLines();
 		
-		for (Entry <Id, TransitLine> lineEntry : transitLinesMap.entrySet()) { 
+		for (Entry <Id<TransitLine>, TransitLine> lineEntry : transitLinesMap.entrySet()) { 
 	
 			
 		String lineId = String.valueOf(lineEntry.getKey());

@@ -58,7 +58,7 @@ public class TransitLineRemover {
 		schedReader.readFile("/home/johannes/gsv/matsim/studies/netz2030/data/transitSchedule.routed.gk3.xml");
 		
 		TransitSchedule schedule = scenario.getTransitSchedule();
-		Map<Id, TransitLine> lines = schedule.getTransitLines();
+		Map<Id<TransitLine>, TransitLine> lines = schedule.getTransitLines();
 		Set<TransitLine> toRemove = new HashSet<TransitLine>();
 		for(TransitLine line : lines.values()) {
 //			if(Math.random() > 0.5)

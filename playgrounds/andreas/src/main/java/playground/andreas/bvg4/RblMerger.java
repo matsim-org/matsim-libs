@@ -733,7 +733,7 @@ public class RblMerger {
 		
 		Collection<Event> events = new ArrayList<Event>();
 
-		for (Entry<Id, TransitLine> lineEntry : newTransitSchedule.getTransitLines().entrySet()) {
+		for (Entry<Id<TransitLine>, TransitLine> lineEntry : newTransitSchedule.getTransitLines().entrySet()) {
 			for (Entry<Id, TransitRoute> routeEntry : lineEntry.getValue().getRoutes().entrySet()) {
 				
 				for (Departure departure : routeEntry.getValue().getDepartures().values()) {
@@ -807,7 +807,7 @@ public class RblMerger {
 		log.info("Found " + lineIds.size() + " lines to filter");
 		
 		// copy lines
-		for (Entry<Id, TransitLine> lineEntry : scenario.getTransitSchedule().getTransitLines().entrySet()) {
+		for (Entry<Id<TransitLine>, TransitLine> lineEntry : scenario.getTransitSchedule().getTransitLines().entrySet()) {
 			for (Id lineId : lineIds) {
 				if (lineEntry.getKey().toString().contains(lineId.toString())) {
 					filteredTransitSchedule.addTransitLine(lineEntry.getValue());

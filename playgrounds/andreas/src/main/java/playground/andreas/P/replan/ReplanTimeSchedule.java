@@ -49,7 +49,7 @@ public class ReplanTimeSchedule {
 		new TransitScheduleReaderV1(inSchedule, net).readFile(pConfig.getCurrentOutputBase() + "transitSchedule.xml");			
 		TreeMap<Id, Double> scores = ScorePlans.scorePlans(eventsFile, net);
 		
-		for (Entry<Id, TransitLine> entry : inSchedule.getTransitLines().entrySet()) {
+		for (Entry<Id<TransitLine>, TransitLine> entry : inSchedule.getTransitLines().entrySet()) {
 			if(this.population.get(entry.getKey()) == null){
 				this.population.put(entry.getKey(), new SchedulePlans(entry.getKey(), pConfig.getNumberOfPlans()));
 			}

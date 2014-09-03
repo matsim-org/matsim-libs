@@ -22,7 +22,7 @@ public class TransitSchedule2MainLine {
 		
 		Map<Id, List<List<Id>>> line2MainLinesMap = new HashMap<Id, List<List<Id>>>();
 		
-		for (Entry<Id, TransitLine> transitLineEntry : transitSchedule.getTransitLines().entrySet()) {
+		for (Entry<Id<TransitLine>, TransitLine> transitLineEntry : transitSchedule.getTransitLines().entrySet()) {
 			// Annahme: Es gibt maximal zwei Ketten, z.B. Hin- und Rueckrichtung, andere Routen sind Untermengen
 
 			HashMap<Id, Double> resultingStopDistanceMap = new HashMap<Id, Double>();	

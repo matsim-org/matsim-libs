@@ -54,7 +54,7 @@ public class SimpleHafasOsmMerger {
 	 */
 	private void addRouteProfilToRoutes() {
 		log.info("Adding arrivalOffsets and departureOffsets to transit lines.");
-		for (Entry<Id, TransitLine> transitLineEntry : this.osmScenario.getTransitSchedule().getTransitLines().entrySet()) {
+		for (Entry<Id<TransitLine>, TransitLine> transitLineEntry : this.osmScenario.getTransitSchedule().getTransitLines().entrySet()) {
 			int numberOfRoutesProcessed = 0;
 
 			for (TransitRoute transitRoute : transitLineEntry.getValue().getRoutes().values()) {

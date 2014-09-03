@@ -19,8 +19,8 @@
 
 package playground.andreas.bvgAna.level0;
 
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -69,7 +69,7 @@ public class TransitScheduleDataProvider {
 		
 		TreeMap<Id, Id> map = new TreeMap<Id, Id>();
 		
-		for (Entry<Id, TransitLine> lineEntry : this.transitSchedule.getTransitLines().entrySet()) {
+		for (Entry<Id<TransitLine>, TransitLine> lineEntry : this.transitSchedule.getTransitLines().entrySet()) {
 			Id lineId = lineEntry.getKey();
 			
 			for (Id routeId : lineEntry.getValue().getRoutes().keySet()) {

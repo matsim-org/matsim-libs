@@ -42,7 +42,7 @@ public class TagLinesInTransitSchedule {
 		int routesTagged = 0;
 		int linesTagged = 0;
 
-		for (Entry<Id, TransitLine> transitLineEntry : transitSchedule.getTransitLines().entrySet()) {
+		for (Entry<Id<TransitLine>, TransitLine> transitLineEntry : transitSchedule.getTransitLines().entrySet()) {
 			if (transitLineEntry.getKey().toString().startsWith(identifier)) {
 				linesTagged++;
 				for (TransitRoute transitRoute : transitLineEntry.getValue().getRoutes().values()) {

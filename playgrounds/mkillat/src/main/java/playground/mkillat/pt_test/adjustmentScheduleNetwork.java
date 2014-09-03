@@ -1,6 +1,5 @@
 package playground.mkillat.pt_test;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -16,14 +15,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -71,6 +68,7 @@ public class adjustmentScheduleNetwork implements Runnable{
 		testPt.run();
 	}
 
+	@Override
 	public void run() {
 //		readPublicTransitEvents(lineId, routeId);
 //		readTrasitSchedule(lineId, routeId);
@@ -88,7 +86,7 @@ public class adjustmentScheduleNetwork implements Runnable{
 		config.network().setInputFile(networkFile);
 		config.transit().setTransitScheduleFile(transitScheduleFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Map <Id, TransitLine> transitLinesMap = scenario.getTransitSchedule().getTransitLines();
+		Map <Id<TransitLine>, TransitLine> transitLinesMap = scenario.getTransitSchedule().getTransitLines();
 		List <NetworkChangeEvent> nces = new ArrayList<NetworkChangeEvent>();
 		for (Iterator<TransitLine> it = transitLinesMap.values().iterator(); it.hasNext();) {
 			Id lineId = it.next().getId();
@@ -149,7 +147,7 @@ public class adjustmentScheduleNetwork implements Runnable{
 		config.network().setInputFile(networkFile);
 		config.transit().setTransitScheduleFile(transitScheduleFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Map <Id, TransitLine> transitLinesMap = scenario.getTransitSchedule().getTransitLines();
+		Map <Id<TransitLine>, TransitLine> transitLinesMap = scenario.getTransitSchedule().getTransitLines();
 		TransitLine line = transitLinesMap.get(lineId);	
 		Map <Id, TransitRoute> routes = line.getRoutes();
 		
@@ -375,7 +373,7 @@ private List <NetworkChangeEvent> anpassungNetworkChangeEvent (List <NetworkChan
 	Map <Id, List <Double>> linksPlusFactors = new HashMap <Id, List <Double>>(); 
 	for (int i = 0; i < nces.size(); i++) {
 		for (Iterator <Link> iterator = nces.get(i).getLinks().iterator(); iterator.hasNext();) {
-			Link link = (Link) iterator.next();
+			Link link = iterator.next();
 			if (linksPlusFactors.containsKey(link.getId())){
 				List <Double> bla = linksPlusFactors.get(link.getId());
 				bla.add(nces.get(i).getFreespeedChange().getValue());

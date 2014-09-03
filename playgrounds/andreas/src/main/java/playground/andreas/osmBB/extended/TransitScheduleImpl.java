@@ -39,7 +39,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * @author aneumann
  */
 public class TransitScheduleImpl implements TransitSchedule {
-	private final Map<Id, TransitLine> transitLines = new TreeMap<Id, TransitLine>();
+	private final Map<Id<TransitLine>, TransitLine> transitLines = new TreeMap<Id<TransitLine>, TransitLine>();
 	private final Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities = new TreeMap<Id<TransitStopFacility>, TransitStopFacility>();
 	private final TransitScheduleFactory factory;
 	private final ObjectAttributes transitLinesAttributes = new ObjectAttributes();
@@ -73,7 +73,7 @@ public class TransitScheduleImpl implements TransitSchedule {
 	}
 
 	@Override
-	public Map<Id, TransitLine> getTransitLines() {
+	public Map<Id<TransitLine>, TransitLine> getTransitLines() {
 		return this.transitLines;
 	}
 	

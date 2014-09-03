@@ -19,7 +19,7 @@ public class CreateVehID2LineMap {
 		
 		Map<Id, Id> veh2LineMap = new HashMap<Id, Id>();
 		
-		for (Entry<Id, TransitLine> lineEntry : transitSchedule.getTransitLines().entrySet()) {
+		for (Entry<Id<TransitLine>, TransitLine> lineEntry : transitSchedule.getTransitLines().entrySet()) {
 			for (Entry<Id, TransitRoute> routeEntry : lineEntry.getValue().getRoutes().entrySet()) {
 				for (Entry<Id, Departure> departureEntry : routeEntry.getValue().getDepartures().entrySet()){
 					

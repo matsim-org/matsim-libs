@@ -61,7 +61,7 @@ public class PtLines2PaxAnalysis extends AbstractAnalyisModule {
 	private double interval;
 	private int maxSlices;
 	
-	public PtLines2PaxAnalysis(Map<Id, TransitLine> lines, Vehicles vehicles, double interval, int maxSlices) {
+	public PtLines2PaxAnalysis(Map<Id<TransitLine>, TransitLine> lines, Vehicles vehicles, double interval, int maxSlices) {
 		super(PtLines2PaxAnalysis.class.getSimpleName());
 		this.handler = new PtLines2PaxAnalysisHandler(interval, maxSlices, lines, vehicles);
 		this.interval = interval;

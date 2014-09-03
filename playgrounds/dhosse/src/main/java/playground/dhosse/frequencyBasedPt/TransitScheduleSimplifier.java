@@ -95,7 +95,7 @@ public class TransitScheduleSimplifier{
 
 		TransitScheduleFactoryImpl factory = new TransitScheduleFactoryImpl();
 		
-		Map<Id,TransitLine> transitLines = schedule.getTransitLines();
+		Map<Id<TransitLine>, TransitLine> transitLines = schedule.getTransitLines();
 		
 		TransitSchedule mergedSchedule = factory.createTransitSchedule();
 		
@@ -409,7 +409,7 @@ public class TransitScheduleSimplifier{
 			mergedSchedule.addStopFacility(facility);
 		}
 		
-		Map<Id,TransitLine> transitLines = transitSchedule.getTransitLines();
+		Map<Id<TransitLine>,TransitLine> transitLines = transitSchedule.getTransitLines();
 		
 		int routesCounter = 0;
 		int mergedRoutesCounter = 0;

@@ -3,11 +3,9 @@ package analyzer.analysisRunner;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -16,8 +14,6 @@ import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -25,19 +21,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.mobsim.jdeqsim.Vehicle;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.vehicles.VehicleImpl;
-import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
-
-import analyzer.act2mode.Act2ModeWithPlanCoordAnalysis;
-import playground.vsp.analysis.modules.ptCircuityAnalyzer.*;
 
 import playground.vsp.analysis.modules.act2mode.ActivityToModeAnalysis;
 import playground.vsp.analysis.modules.boardingAlightingCount.BoardingAlightingCountAnalyzer;
@@ -50,6 +38,7 @@ import playground.vsp.analysis.modules.monetaryTransferPayments.MonetaryPayments
 import playground.vsp.analysis.modules.networkAnalysis.NetworkAnalyzer;
 import playground.vsp.analysis.modules.plansSubset.GetPlansSubset;
 import playground.vsp.analysis.modules.ptAccessibility.PtAccessibility;
+import playground.vsp.analysis.modules.ptCircuityAnalyzer.PtCircuityAnalyzer;
 import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 import playground.vsp.analysis.modules.ptLines2PaxAnalysis.PtLines2PaxAnalysis;
 import playground.vsp.analysis.modules.ptOperator.PtOperatorAnalyzer;
@@ -618,7 +607,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 	
 	private void rPtLines2PaxAnalysis(){
 		
-		Map<Id, TransitLine> lines = scenario.getTransitSchedule().getTransitLines();
+		Map<Id<TransitLine>, TransitLine> lines = scenario.getTransitSchedule().getTransitLines();
 		//scenario.getScenarioElement(vehicles)
 		ScenarioImpl sc = (ScenarioImpl) scenario;
 
@@ -692,7 +681,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 	
 	private void rPtRoutes2PaxAnalysis(){
 		
-		Map<Id, TransitLine> lines = scenario.getTransitSchedule().getTransitLines();
+		Map<Id<TransitLine>, TransitLine> lines = scenario.getTransitSchedule().getTransitLines();
 		//scenario.getScenarioElement(vehicles)
 		ScenarioImpl sc = (ScenarioImpl) scenario;
 
@@ -713,7 +702,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 		//Latex code to insert one example plot, implemented here because file names are known here
 		BufferedWriter w = IOUtils.getBufferedWriter(outputDirectory + "/PtRoutes2PaxAnalysis/includeExamplePlot.tex");
 		if(lines.size() > 0){
-			Id exampleLine = lines.values().iterator().next().getId();
+			Id<TransitLine> exampleLine = lines.values().iterator().next().getId();
 			Id exampleRoute = lines.get(exampleLine).getRoutes().values().iterator().next().getId();
 			try {
 				w.write("\\includegraphics[width=0.99\\textwidth, page=1]{" +

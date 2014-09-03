@@ -91,7 +91,7 @@ public class PSim implements Mobsim {
 	private double beelineWalkSpeed;
 	private StopStopTimeCalculator transitStopToStopTimeCalculator;
 	private WaitTimeStuckCalculator transitWaitTimeCalculator;
-	private Map<Id, TransitLine> transitLines;
+	private Map<Id<TransitLine>, TransitLine> transitLines;
 	private Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities;
 
 	public PSim(Scenario sc, EventsManager eventsManager) {

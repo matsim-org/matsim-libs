@@ -161,7 +161,7 @@ public class TransitSchedule2Tikz {
 	/**
 	 * @param transitLines
 	 */
-	private void createAndWriteTikzlines(Map<Id, TransitLine> transitLines, String outdir) {
+	private void createAndWriteTikzlines(Map<Id<TransitLine>, TransitLine> transitLines, String outdir) {
 		for(TransitLine l: transitLines.values()){
 			for(TransitRoute r: l.getRoutes().values()){
 				write(outdir, r);

@@ -56,11 +56,11 @@ public class PtRoutes2PaxAnalysis extends AbstractAnalyisModule {
 	private static final Logger log = Logger
 			.getLogger(PtRoutes2PaxAnalysis.class);
 	private PtRoutes2PaxAnalysisHandler handler;
-	private Map<Id, TransitLine> lines;
+	private Map<Id<TransitLine>, TransitLine> lines;
 	private double interval;
 	private int maxSlices;
 
-	public PtRoutes2PaxAnalysis(Map<Id, TransitLine> lines, Vehicles vehicles, double interval, int maxSlices) {
+	public PtRoutes2PaxAnalysis(Map<Id<TransitLine>, TransitLine> lines, Vehicles vehicles, double interval, int maxSlices) {
 		super(PtRoutes2PaxAnalysis.class.getSimpleName());
 		this.handler = new PtRoutes2PaxAnalysisHandler(interval, maxSlices, lines, vehicles);
 		this.lines = lines;
