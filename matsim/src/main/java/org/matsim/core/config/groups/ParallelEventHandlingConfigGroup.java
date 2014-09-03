@@ -34,7 +34,7 @@ public class ParallelEventHandlingConfigGroup extends Module {
 	public static final String GROUP_NAME = "parallelEventHandling";
 
 	private final static String NUMBER_OF_THREADS = "numberOfThreads";
-	private Integer numberOfThreads = 1;
+	private Integer numberOfThreads = null;
 
 	private final static String ESTIMATED_NUMBER_OF_EVENTS = "estimatedNumberOfEvents";
 	private Long estimatedNumberOfEvents = null;

@@ -24,7 +24,7 @@ public class EventsUtils {
 				}
 			}
 		}
-        return new SimStepParallelEventsManagerImpl(1);
+        return new SimStepParallelEventsManagerImpl();
 	}
 
 }
