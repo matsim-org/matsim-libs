@@ -183,7 +183,6 @@ public class MyCarrierSimulation {
 	public CarrierPlanStrategyManagerFactory createReplanStrategyFactory(final CarrierVehicleTypes types, final Controler controler){
 		// From KnFreight
 		CarrierPlanStrategyManagerFactory stratManFactory = new CarrierPlanStrategyManagerFactory() {
-			@Override
 			public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {
 				TravelTime travelTimes = controler.getLinkTravelTimes() ;
 				TravelDisutility travelCosts = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility(
