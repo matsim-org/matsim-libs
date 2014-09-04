@@ -347,10 +347,13 @@ public class PStatsOverview implements StartupListener, IterationEndsListener, S
 
 	@Override
 	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
-		// check this, otherwise it may be a null-pointer \\ DR aug'13
 		if(this.pConfig.getWriteStatsInterval() > 0){
 			try {
-				this.pStatsWriter.close();
+				if (this.pStatsWriter != null) {
+					this.pStatsWriter.close();
+				} else {
+					log.warn("Tried to close the pStatsWriter. However, it hasn't been initialized yet. Maybe the run suffered from an unexpected shutdown request.");
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
