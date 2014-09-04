@@ -60,6 +60,7 @@ public class InnovationSwitchOffTest {
 	@Test
 	public void testInnovationSwitchOff() {
 		Config config = ConfigUtils.createConfig() ;
+		config.controler().setOutputDirectory(this.utils.getOutputDirectory());
 		
 		config.network().setInputFile("test/scenarios/equil/network.xml" ) ;
 //		config.plans().setInputFile("test/scenarios/equil/plans100.xml") ;
@@ -107,8 +108,8 @@ public class InnovationSwitchOffTest {
 			config.planCalcScore().addActivityParams(params) ;
 		}
 		
-		Controler ctrl = new Controler(config) ;
-		ctrl.setOverwriteFiles(true) ;
+		Controler ctrl = new Controler(config);
+		ctrl.setCreateGraphs(false);
 		ctrl.addControlerListener(new BeforeMobsimListener(){
 			@Override
 			public void notifyBeforeMobsim(BeforeMobsimEvent event) {
