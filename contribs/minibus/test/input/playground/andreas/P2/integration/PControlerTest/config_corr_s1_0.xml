@@ -295,7 +295,7 @@
 		<param name="useHouseholds" value="false" />
 
 		<!-- Set this parameter to true if knowledge should be used, false if not. -->
-		<param name="useKnowledge" value="false" />
+		<!-- <param name="useKnowledge" value="false" />-->
 
 		<!-- Set this parameter to true if lanes should be used, false if not. -->
 		<param name="useLanes" value="false" />
