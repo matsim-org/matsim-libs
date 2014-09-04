@@ -160,20 +160,6 @@ public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandl
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	// <knowledge ... > ... </knowledge>
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
-	public void startKnowledge(final Object knowledge, final BufferedWriter out) throws IOException {
-
-	}
-
-	@Override
-	public void endKnowledge(final BufferedWriter out) throws IOException {
-		out.write("\t\t</knowledge>\n\n");
-	}
-
-	//////////////////////////////////////////////////////////////////////
 	// <activity ... > ... </activity>
 	//////////////////////////////////////////////////////////////////////
 

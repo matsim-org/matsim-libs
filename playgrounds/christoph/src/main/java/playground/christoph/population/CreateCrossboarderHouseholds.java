@@ -61,7 +61,7 @@ public class CreateCrossboarderHouseholds {
 		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkFile);
 		config.facilities().setInputFile(facilitiesFile);
-		config.scenario().setUseKnowledge(true);
+		//config.scenario().setUseKnowledge(true);
 		config.scenario().setUseHouseholds(true);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);

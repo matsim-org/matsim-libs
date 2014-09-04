@@ -1,8 +1,5 @@
 package playground.agarwalamit.patnaIndia;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -10,8 +7,10 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-
 import playground.agarwalamit.patnaIndia.mixedTraffic.VehiclesConfigGroup;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 public class WriteConfig {
 	/**
@@ -52,7 +51,7 @@ public class WriteConfig {
 
 		config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
 
-		config.scenario().setUseKnowledge(false);			
+		//config.scenario().setUseKnowledge(false);
 
 		//QSim is now default mobsim now therefore, it can be added directly as shown below now. 9 oct 2013
 

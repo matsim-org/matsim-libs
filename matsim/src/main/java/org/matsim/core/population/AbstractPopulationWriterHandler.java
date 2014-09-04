@@ -103,10 +103,6 @@ public abstract class AbstractPopulationWriterHandler implements PopulationWrite
 
 	public abstract void endActDur(final BufferedWriter out) throws IOException;
 
-	public abstract void startKnowledge(final Object knowledge, final BufferedWriter out) throws IOException;
-
-	public abstract void endKnowledge(final BufferedWriter out) throws IOException;
-
 	public abstract void startActivity(final String act_type, final BufferedWriter out) throws IOException;
 
 	public abstract void endActivity(final BufferedWriter out) throws IOException;

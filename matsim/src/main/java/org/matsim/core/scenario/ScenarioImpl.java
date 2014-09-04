@@ -80,11 +80,6 @@ public class ScenarioImpl implements Scenario {
         if (this.config.scenario().isUseVehicles()){
             this.createVehicleContainer();
         }
-        if (this.config.scenario().isUseKnowledges()){
-            boolean result;
-            throw new RuntimeException("Knowledges are no more.");
-
-        }
         if (this.config.scenario().isUseTransit()) {
             this.createTransitSchedule();
         }

@@ -20,13 +20,10 @@
 
 package playground.christoph.energyflows.population;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
 import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
@@ -43,10 +40,12 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 public class IdentifyActivitiesToRelocate {
 
@@ -83,7 +82,7 @@ public class IdentifyActivitiesToRelocate {
 		readSHPFile();
 		
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseKnowledge(true);
+		//config.scenario().setUseKnowledge(true);
 		config.scenario().setUseHouseholds(true);
 		
 		config.plans().setInputFile(populationFile);

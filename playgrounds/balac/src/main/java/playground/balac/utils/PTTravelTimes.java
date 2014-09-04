@@ -58,7 +58,7 @@ public class PTTravelTimes {
 		
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.scenario().setUseKnowledge(true);
+		//config.scenario().setUseKnowledge(true);
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		

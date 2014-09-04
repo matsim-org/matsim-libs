@@ -65,7 +65,7 @@ public class CreatePTLegs {
 		config.transit().setVehiclesFile("/data/matsim/cdobler/2030/transitVehicles.ch.xml.gz");
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.scenario().setUseKnowledge(true);
+		//config.scenario().setUseKnowledge(true);
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		

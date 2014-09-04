@@ -88,17 +88,4 @@ public interface Scenario extends IdFactory {
 
 	Households getHouseholds();
 
-	// the following are available via the Impl only
-//	public Knowledges getKnowledges();
-//
-//	public Households getHouseholds();
-//
-//	public BasicVehicles getVehicles();
-//
-//	public BasicLaneDefinitions getLaneDefinitions();
-//
-//	public BasicSignalSystems getSignalSystems();
-//
-//	public BasicSignalSystemConfigurations getSignalSystemConfigurations();
-
 }
