@@ -26,7 +26,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import playground.boescpa.converters.vissim.ConvEvents;
 import playground.boescpa.converters.vissim.ConvEvents2Anm;
-import playground.boescpa.converters.vissim.tools.AmRouteConverter;
 import playground.boescpa.converters.vissim.tools.InpRouteConverter;
 import playground.boescpa.converters.vissim.tools.MsRouteConverter;
 

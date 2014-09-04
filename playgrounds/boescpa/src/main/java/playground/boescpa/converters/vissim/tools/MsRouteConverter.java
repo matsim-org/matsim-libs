@@ -47,7 +47,6 @@ import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.*;
 
 /**
