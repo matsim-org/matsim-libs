@@ -19,6 +19,25 @@
 
 package playground.anhorni.dummy;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.*;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.io.IOUtils;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -27,33 +46,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.Vector;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.io.IOUtils;
 
 public class ScnCreator {
 	
@@ -128,8 +120,8 @@ public class ScnCreator {
 	private void smearPlans() {
 		int cnt = 0;
 		for (Person p : this.origScenario.getPopulation().getPersons().values()) {
-			p.setId(new IdImpl(cnt));
-			Plan plan = p.getSelectedPlan();
+            ((PersonImpl) p).setId(new IdImpl(cnt));
+            Plan plan = p.getSelectedPlan();
 			
 			ActivityImpl homeAct = (ActivityImpl)plan.getPlanElements().get(0);
 			Coord homeLocation = homeAct.getCoord();

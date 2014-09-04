@@ -19,10 +19,6 @@
  * *********************************************************************** */
 package playground.dgrether.koehlerstrehlersignal.conversion;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -36,9 +32,12 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -84,10 +83,6 @@ public class DgKS2010Router {
 		@Override
 		public List<Plan> getPlans() {
 			return null;
-		}
-
-		@Override
-		public void setId(Id id) {
 		}
 
 		@Override

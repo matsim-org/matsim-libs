@@ -58,9 +58,10 @@ public class PlanFragmenter {
 							newPlan.addActivity(act);
 							
 							//add the clonPerson if he/she has a pt-connection
-							if (leg.getMode().equals(TransportMode.transit_walk)){	
-								clonPerson.setId(new IdImpl(clonPerson.getId().toString() + (suffix++)));
-								personList.add(clonPerson);
+							if (leg.getMode().equals(TransportMode.transit_walk)){
+                                final Id id = new IdImpl(clonPerson.getId().toString() + (suffix++));
+                                ((PersonImpl) clonPerson).setId(id);
+                                personList.add(clonPerson);
 							}
 
 						}

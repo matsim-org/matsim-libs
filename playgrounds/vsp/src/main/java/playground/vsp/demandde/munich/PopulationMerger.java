@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -163,15 +164,15 @@ public class PopulationMerger {
 	private static void addFreightPrefix(Person person) {
 		Id id = person.getId();
 		Id newId = new IdImpl("gv_" + id.toString());
-		person.setId(newId);
-		
-	}
+        ((PersonImpl) person).setId(newId);
+
+    }
 
 	private static void addCommuterPrefix(Person person) {
 		Id id = person.getId();
 		Id newId = new IdImpl("pv_" + id.toString());
-		person.setId(newId);
-		
-	}
+        ((PersonImpl) person).setId(newId);
+
+    }
 
 }

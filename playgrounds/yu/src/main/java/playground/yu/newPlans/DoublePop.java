@@ -28,6 +28,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -95,8 +96,8 @@ public class DoublePop extends NewPopulation {
 	}
 
 	private void createAndWriteNewPerson(Id newId) {
-		tmpPerson.setId(newId);
-		pw.writePerson(tmpPerson);
+        ((PersonImpl) tmpPerson).setId(newId);
+        pw.writePerson(tmpPerson);
 	}
 
 	public static void main(final String[] args) {

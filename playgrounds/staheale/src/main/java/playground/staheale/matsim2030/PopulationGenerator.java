@@ -1,9 +1,5 @@
 package playground.staheale.matsim2030;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -11,10 +7,16 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
 
 public class PopulationGenerator {
 
@@ -106,11 +108,11 @@ public class PopulationGenerator {
 					//log.info("person p with old id is: " +p);
 					String nId = String.valueOf(idCounter+i);
 					Id newId = sc.createId(nId);
-					p.setId(newId);
-					//log.info("person p with new id is: " +p);
+                    ((PersonImpl) p).setId(newId);
+                    //log.info("person p with new id is: " +p);
 					pw.writePerson(p);
-					p.setId(id);
-					if ((i+1) == w10) {
+                    ((PersonImpl) p).setId(id);
+                    if ((i+1) == w10) {
 						idCounter = (Integer.parseInt(nId)+1);
 					}
 				}

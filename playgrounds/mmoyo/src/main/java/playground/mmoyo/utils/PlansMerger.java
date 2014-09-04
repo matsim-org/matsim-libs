@@ -75,8 +75,8 @@ public class PlansMerger {
 			
 			if (noNull== popsNum ){
 				for (byte i=0; i<popsNum; i++){
-					personArray[i].setId(new IdImpl(id.toString() + (i+1)));
-					newPopulation.addPerson(personArray[i]);
+                    ((PersonImpl) personArray[i]).setId(new IdImpl(id.toString() + (i+1)));
+                    newPopulation.addPerson(personArray[i]);
 				}
 			}
 		}

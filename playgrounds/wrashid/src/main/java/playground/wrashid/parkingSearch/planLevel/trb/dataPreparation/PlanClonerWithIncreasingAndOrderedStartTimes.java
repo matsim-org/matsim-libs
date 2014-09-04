@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.PersonImpl;
 
 
 /**
@@ -34,8 +35,8 @@ public class PlanClonerWithIncreasingAndOrderedStartTimes {
 		
 		for (int i=1;i<=numberOfClones;i++){
 			Person person=GeneralLib.copyPerson(selectedPersonForCloning);
-			person.setId(new IdImpl(i));
-			Activity firstActivity=((Activity)person.getSelectedPlan().getPlanElements().get(0));
+            ((PersonImpl) person).setId(new IdImpl(i));
+            Activity firstActivity=((Activity)person.getSelectedPlan().getPlanElements().get(0));
 			double endTime=firstActivity.getEndTime();
 			// the departure time of the agents is ordered in increasing order
 			firstActivity.setEndTime(endTime+i*60);

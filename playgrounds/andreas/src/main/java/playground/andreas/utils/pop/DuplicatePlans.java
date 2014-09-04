@@ -28,6 +28,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -55,8 +56,8 @@ public class DuplicatePlans extends NewPopulation {
 
 		for (int i = 1; i < this.numberOfCopies + 1; i++) {
 
-			person.setId(new IdImpl(personId.toString() + "X" + i));
-			this.popWriter.writePerson(person);
+            ((PersonImpl) person).setId(new IdImpl(personId.toString() + "X" + i));
+            this.popWriter.writePerson(person);
 
 		}
 

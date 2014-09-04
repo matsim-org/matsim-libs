@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.PersonImpl;
 
 
 /**
@@ -33,8 +34,8 @@ public class PlanCloner {
 		
 		for (int i=1;i<=numberOfClones;i++){
 			Person person=GeneralLib.copyPerson(selectedPersonForCloning);
-			person.setId(new IdImpl(i));
-			scenario.getPopulation().addPerson(person);
+            ((PersonImpl) person).setId(new IdImpl(i));
+            scenario.getPopulation().addPerson(person);
 		}
 		
 		GeneralLib.writePersons(scenario.getPopulation().getPersons().values(), outputPlansFile, (NetworkImpl) scenario.getNetwork());

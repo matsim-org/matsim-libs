@@ -20,6 +20,18 @@
 
 package playground.mmoyo.ptRouterAdapted.precalculation;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import playground.mmoyo.utils.DataLoader;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -28,18 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
-
-import playground.mmoyo.utils.DataLoader;
 
 public class ptRouteAdder {
 
@@ -85,8 +85,8 @@ public class ptRouteAdder {
 				if (!exists){
 					String strNewId = personX.getId().toString() +  strId;
 					Id newId = new IdImpl(strNewId);
-					personX.setId(newId);
-					newPop.addPerson(personX);
+                    ((PersonImpl) personX).setId(newId);
+                    newPop.addPerson(personX);
 					clonsMap.get(person.getId()).add(newId);
 				}
 				
