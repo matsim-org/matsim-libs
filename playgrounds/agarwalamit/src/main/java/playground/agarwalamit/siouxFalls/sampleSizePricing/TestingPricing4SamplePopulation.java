@@ -20,11 +20,17 @@ package playground.agarwalamit.siouxFalls.sampleSizePricing;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -58,14 +64,14 @@ public class TestingPricing4SamplePopulation {
 
 	public static void main(String[] args) {
 
-		String outputFolder = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/flowCapTest500ItsStrCap1x/";//args[0]; 
+		String outputFolder = "/Users/aagarwal/Desktop/ils4/agarwal/flowCapTest/";//args[0]; 
 
 		double [] samplePopulation = {0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};//, 
 
-		String configFile = outputFolder+"/input/SiouxFalls_config_run10Pct.xml";//args[1];
+		String configFile = outputFolder+"/input/SiouxFalls_config.xml";//args[1];
 		String emissionEfficiencyFactor ="1.0";
 		Config config = ConfigUtils.loadConfig(configFile);
-		config.network().setInputFile(outputFolder+"/input/SiouxFalls_networkWithRoadType0.6Capacity.xml.gz");
+		config.network().setInputFile(outputFolder+"/input/SiouxFalls_networkWithRoadType0.5Capacity.xml.gz");
 
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setAverageColdEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_ColdStart_vehcat_2005average.txt");
@@ -77,10 +83,12 @@ public class TestingPricing4SamplePopulation {
 
 		SortedMap<Double, Double> flowCap2DelaysCosts = new TreeMap<Double, Double>();
 		SortedMap<Double, Double > flowCap2EmissionsCosts = new TreeMap<Double, Double>();
+		SortedMap<Double, Integer > flowCap2NoOfPersons = new TreeMap<Double, Integer>();
+		SortedMap<Double, Integer > flowCap2NoOfCarPersons = new TreeMap<Double, Integer>();
 
 		for(double d:samplePopulation){
 			log.info("Running sample Population "+d+".");
-			String outputDir = outputFolder+"/f"+d+"/";
+			String outputDir = outputFolder+"/3f/f"+d+"/";
 			new File(outputDir).mkdir();
 			String samplePlansFile = outputDir+"/plans"+d+".xml";
 			//			SamplingPlans samplePlans = new SamplingPlans(d,samplePlansFile);
@@ -103,21 +111,38 @@ public class TestingPricing4SamplePopulation {
 			controler.setDumpDataAtEnd(false);
 
 			controler.addControlerListener(new MyEmissionControlerListner());
+			Scenario scenario = ScenarioUtils.loadScenario(config);
 			//			controler.run();
-			double delaysCosts = getDelaysFromEventsDefaultHandler(outputDir,(ScenarioImpl) ScenarioUtils.loadScenario(config));
+			double delaysCosts = getDelaysFromEventsDefaultHandler(outputDir,(ScenarioImpl) scenario );
 			//			double[] delaysCosts = getDelaysFromEvents(outputDir,(ScenarioImpl) controler.getScenario());
-			double emissionsCosts = getTotalEmissionsCostsFromEmissionsEvents(outputDir, (ScenarioImpl) controler.getScenario());
+			double emissionsCosts = getTotalEmissionsCostsFromEmissionsEvents(outputDir, (ScenarioImpl) scenario);
 
+			flowCap2NoOfPersons.put(d, scenario.getPopulation().getPersons().size());
+			int carCounter =0;
+			for(Person p:scenario.getPopulation().getPersons().values()){
+				List<PlanElement> pes = new ArrayList<PlanElement>(p.getSelectedPlan().getPlanElements());
+				for(PlanElement  pe :pes){
+					if(pe instanceof Leg){
+						String mode = ((Leg) pe).getMode();
+						if(mode.equals(TransportMode.car)) {
+							carCounter++;
+							break;
+						}
+					}
+				}
+			}
+			flowCap2NoOfCarPersons.put(d, carCounter);
 			flowCap2DelaysCosts.put(d, delaysCosts);
 			flowCap2EmissionsCosts.put(d,emissionsCosts);
+			log.info(d+"\t"+flowCap2NoOfPersons.get(d)+"\t"+flowCap2NoOfCarPersons.get(d)+"\t"+flowCap2EmissionsCosts.get(d)+"\t"+flowCap2DelaysCosts.get(d)+"\n");
 			log.info("Run for sample population "+d+" is finished. :-) :-) :-)");
 		}
 
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/flowCapFactorVsEmissionsAndTotalDelaysCosts.txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/f/flowCapFactorVsEmissionsAndTotalDelaysCosts.txt");
 		try {
-			writer.write("flowCapacityFactor \t emissionsCosts \t flowCapDelays  \n");
+			writer.write("flowCapacityFactor \t noOfPersons \t noOfCarPersons \t emissionsCosts \t flowCapDelays  \n");
 			for(double d:samplePopulation){
-				writer.write(d+"\t"+flowCap2EmissionsCosts.get(d)+"\t"+flowCap2DelaysCosts.get(d)+"\n");
+				writer.write(d+"\t"+flowCap2NoOfPersons.get(d)+"\t"+flowCap2NoOfCarPersons.get(d)+"\t"+flowCap2EmissionsCosts.get(d)+"\t"+flowCap2DelaysCosts.get(d)+"\n");
 			}
 			writer.close();
 		} catch (Exception e) {
@@ -157,7 +182,7 @@ public class TestingPricing4SamplePopulation {
 	//		double flowAndStorageDelays [] = {congestionHandlerImplV3.getTotalInternalizedDelay()*vtts_car,congestionHandlerImplV3.getDelaysFromStorageCapacity()*vtts_car};
 	//		return flowAndStorageDelays;
 	//	}
-	
+
 	private static double getDelaysFromEventsDefaultHandler(String outputDir, ScenarioImpl sc){
 		EventsManager eventManager = EventsUtils.createEventsManager();
 		MarginalCongestionHandlerImplV3 congestionHandlerImplV3= new MarginalCongestionHandlerImplV3(eventManager, sc);
