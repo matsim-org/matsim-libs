@@ -36,15 +36,20 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.southafrica.population.utilities.PopulationUtils;
 import playground.southafrica.utilities.Header;
 
+/**
+ * Class to
+ *
+ * @author jwjoubert
+ */
 public class AnalyseNmbmSamplePopulation {
 	private final static Logger LOG = Logger.getLogger(AnalyseNmbmSamplePopulation.class);
 
@@ -68,7 +73,13 @@ public class AnalyseNmbmSamplePopulation {
 		Header.printFooter();
 	}
 
-	
+	/**
+	 * This has been replaced by {@link PopulationUtils#extractActivityDurations(String, String)}
+	 * 
+	 * @param outputFolder
+	 * @param sc
+	 */
+	@Deprecated 
 	private static void extractActivityDurations(String outputFolder, Scenario sc) {
 		List<Tuple<String, Double>> durations = new ArrayList<Tuple<String,Double>>();
 		for(Person person : sc.getPopulation().getPersons().values()){
