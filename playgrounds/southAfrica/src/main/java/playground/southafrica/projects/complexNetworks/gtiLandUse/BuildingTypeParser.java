@@ -26,31 +26,39 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.jzy3d.analysis.AbstractAnalysis;
+import org.jzy3d.chart.factories.AWTChartComponentFactory;
+import org.jzy3d.colors.Color;
+import org.jzy3d.maths.Coord3d;
+import org.jzy3d.plot3d.rendering.canvas.Quality;
+import org.jzy3d.plot3d.rendering.view.modes.ViewPositionMode;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Counter;
 import org.opengis.feature.simple.SimpleFeature;
+
+import playground.southafrica.utilities.Header;
+import playground.southafrica.utilities.gis.MyMultiFeatureReader;
+import playground.southafrica.utilities.grid.GeneralGrid;
+import playground.southafrica.utilities.grid.GeneralGrid.GridType;
+import playground.southafrica.utilities.grid.KernelDensityEstimator;
+import playground.southafrica.utilities.grid.KernelDensityEstimator.KdeType;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
-import playground.southafrica.utilities.Header;
-import playground.southafrica.utilities.gis.MyMultiFeatureReader;
-import playground.southafrica.utilities.grid.GeneralGrid;
-
-public class BuildingTypeParser {
+public class BuildingTypeParser extends AbstractAnalysis{
 	private final static Logger LOG = Logger.getLogger(BuildingTypeParser.class);
 	private final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "WGS84_SA_Albers");
 	private final GeneralGrid grid;
-	private Map<String, Map<String, Integer>> activityMap;
+	private final double width;
+	private Map<String, KernelDensityEstimator> activityMap;
 
-	public BuildingTypeParser(String shapefile, double width, int gridType) {
+	public BuildingTypeParser(String shapefile, double width, GridType gridType) {
 		MyMultiFeatureReader mmfr = new MyMultiFeatureReader();
 		try {
 			mmfr.readMultizoneShapefile(shapefile, 1);
@@ -58,10 +66,11 @@ public class BuildingTypeParser {
 			e.printStackTrace();
 			throw new RuntimeException("Cannot read area shapefile from " + shapefile);
 		}
+		this.width = width;
 		this.grid = new GeneralGrid(width, gridType);
 		this.grid.generateGrid(mmfr.getAllZones().get(0));
 		
-		this.activityMap = new HashMap<String, Map<String,Integer>>();
+		this.activityMap = new HashMap<String, KernelDensityEstimator>();
 	}
 	
 	
@@ -70,14 +79,14 @@ public class BuildingTypeParser {
 		
 		String areaShapefile = args[0];
 		Double gridWidth = Double.parseDouble(args[1]);
-		Integer gridType = Integer.parseInt(args[2]);
+		GridType gridType = GridType.valueOf(args[2]);
 		String buildingShapefile = args[3];
 		String outputFolder = args[4];
 		
 		BuildingTypeParser btp = new BuildingTypeParser(areaShapefile, gridWidth, gridType);
 		btp.parseGtiBuildingShapefile(buildingShapefile);
 		btp.writeActivityMapToFile(outputFolder + (outputFolder.endsWith("/") ? "" : "/") + btp.grid.getGridType() + "_activityTypes.csv");
-		btp.grid.writeGrid(outputFolder);
+		btp.grid.writeGrid(outputFolder, "WGS84_SA_Albers");
 		
 		Header.printFooter();
 	}
@@ -88,7 +97,6 @@ public class BuildingTypeParser {
 		LOG.info("Done reading features.");
 		
 		LOG.info("Parsing densities from features... (" + buildingFeatures.size() + " features)");
-		Counter counter = new Counter("   features # ");
 		for(SimpleFeature feature : buildingFeatures){
 			Geometry geo = (Geometry) feature.getDefaultGeometry();
 			if(geo instanceof Point){
@@ -103,28 +111,17 @@ public class BuildingTypeParser {
 				
 				/* Check if the land-use code has already been featured. */
 				if(!activityMap.containsKey(code)){
-					activityMap.put(code, new HashMap<String, Integer>());
+					activityMap.put(code, new KernelDensityEstimator(this.grid, KdeType.TRIWEIGHT, 3.0*this.width));
 				}
-				Map<String, Integer> thisMap = activityMap.get(code);
-				
-				/* Get the closest cell. */
-				Tuple<String, Point> tuple = this.grid.getGrid().get(cNew.getX(), cNew.getY());
-				if(!thisMap.containsKey(tuple.getFirst())){
-					thisMap.put(tuple.getFirst(), 0);
-				}
-				
-				/* Increase the cell's value. */
-				int oldValue = thisMap.get(tuple.getFirst());
-				thisMap.put(tuple.getFirst(), oldValue+1);
-
+				KernelDensityEstimator kde = activityMap.get(code);
+				kde.processPoint(ps.getFactory().createPoint(new Coordinate(cNew.getX(), cNew.getY())), 1.0);
 			} else{
 				throw new RuntimeException("The shapefile does not only contain Point(s)!");
 			}
-			counter.incCounter();
 		}
-		counter.printCounter();
 		LOG.info("Done parsing densities.");
 	}
+	
 	
 	private void writeActivityMapToFile(String filename){
 		LOG.info("Writing output to " + filename);
@@ -135,10 +132,12 @@ public class BuildingTypeParser {
 			
 			for(String activityType : this.activityMap.keySet()){
 				String mainType = activityType.substring(0, activityType.indexOf("."));
-				Map<String, Integer> thisMap = this.activityMap.get(activityType);
-				for(String cell : thisMap.keySet()){
-					String[] sa = cell.split("_");
-					bw.write(String.format("%s,%s,%s,%s,%d\n", mainType, activityType, sa[0], sa[1], thisMap.get(cell)));
+				KernelDensityEstimator kde = this.activityMap.get(activityType);
+				for(Point cell : kde.getGrid().getGrid().values()){
+					double weight = kde.getWeight(cell);
+					if(weight > 0.0){
+						bw.write(String.format("%s,%s,%s,%s,%.4f\n", mainType, activityType, cell.getX(), cell.getY(), weight));
+					}
 				}
 			}
 		} catch (IOException e) {
@@ -154,6 +153,42 @@ public class BuildingTypeParser {
 		}
 		LOG.info("Done writing output.");
 	}
+
+
+	@Override
+	public void init() throws Exception {
+		chart = AWTChartComponentFactory.chart(Quality.Intermediate, "awt");
+		Coord3d newViewPoint = new Coord3d(3*Math.PI/2, Math.PI/2, 10*width);
+		chart.getView().setViewPoint(newViewPoint, true);
+		chart.getView().setViewPositionMode(ViewPositionMode.FREE);
+
+		/* First draw the original geometry. */
+		org.jzy3d.plot3d.primitives.Polygon polygon = new org.jzy3d.plot3d.primitives.Polygon();
+		for(Coordinate c : this.grid.getGeometry().getCoordinates()){
+			polygon.add(new org.jzy3d.plot3d.primitives.Point(new Coord3d(c.x, c.y, 0.0)));
+		}
+		polygon.setWireframeDisplayed(true);
+		polygon.setWireframeColor(Color.BLACK);
+		
+		chart.getScene().add(polygon);
+		
+		for(Point p : this.grid.getGrid().values()){
+			org.jzy3d.plot3d.primitives.Polygon cell = new org.jzy3d.plot3d.primitives.Polygon();
+			Geometry g = this.grid.getCellGeometry(p);
+			Coordinate[] ca = g.getCoordinates();
+			for(int i = 0; i < ca.length-1; i++){
+				cell.add(new org.jzy3d.plot3d.primitives.Point(new Coord3d(ca[i].x, ca[i].y, 0.0)));
+			}
+			cell.setFaceDisplayed(false);
+			cell.setWireframeDisplayed(true);
+			cell.setWireframeColor(Color.BLACK);
+			chart.getScene().add(cell);
+		}
+		
+		chart.getView().shoot();
+		
+	}
+
 	
 	
 	
