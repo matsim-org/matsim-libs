@@ -21,7 +21,6 @@ package org.matsim.api.core.v01;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.IdFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.households.Households;
@@ -40,8 +39,14 @@ import org.matsim.vehicles.Vehicles;
  *
  * @author dgrether
  */
-public interface Scenario extends IdFactory {
+public interface Scenario {
 
+	/**
+	 * @deprecated use {@link Id#create(String, Class)} instead
+	 */
+	@Deprecated
+	public Id createId(final String id);
+	
 	public Network getNetwork();
 
 	public Population getPopulation();

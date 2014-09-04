@@ -51,13 +51,6 @@ public final class NetworkImpl implements Network {
 
 	private final static Logger log = Logger.getLogger(NetworkImpl.class);
 
-	/**
-	 * Design thoughts:<ul>
-	 * <li> This should, in my view, return the interface, not the implementation. (But how to deal with the BasicLocation
-	 * aspect?)  kai, mar'12
-	 * <li> I cannot remember what I meant.  kai, feb'14
-	 * </ul>
-	 */
 	@Deprecated // use NetworkUtils.createNetwork() as much as possible.  kai, feb'14
 	public static NetworkImpl createNetwork() {
 		return new NetworkImpl();

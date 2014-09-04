@@ -27,7 +27,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.IdFactory;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.GenericRoute;
 
 import playground.thibautd.utils.CollectionUtils;
@@ -42,24 +42,19 @@ public class AccessEgressNetworkBasedTeleportationRoute implements GenericRoute 
 
 	private double distance = Double.NaN;
 
-	private Id startLinkId = null;
-	private Id endLinkId = null;
+	private Id<Link> startLinkId = null;
+	private Id<Link> endLinkId = null;
 
-	private List<Id> links = Collections.emptyList();
-	private final IdFactory idFactory;
+	private List<Id<Link>> links = Collections.emptyList();
 
-	public AccessEgressNetworkBasedTeleportationRoute(
-			final IdFactory idFactory) {
-		this.idFactory = idFactory;
+	public AccessEgressNetworkBasedTeleportationRoute() {
 	}
 	
 	public AccessEgressNetworkBasedTeleportationRoute(
-			final IdFactory idFactory,
-			final Id startLinkId,
-			final Id endLinkId ) {
+			final Id<Link> startLinkId,
+			final Id<Link> endLinkId ) {
 		this.startLinkId = startLinkId;
 		this.endLinkId = endLinkId;
-		this.idFactory = idFactory;
 	}
 
 	@Override
@@ -83,30 +78,30 @@ public class AccessEgressNetworkBasedTeleportationRoute implements GenericRoute 
 	}
 
 	@Override
-	public Id getStartLinkId() {
+	public Id<Link> getStartLinkId() {
 		return startLinkId;
 	}
 
 	@Override
-	public Id getEndLinkId() {
+	public Id<Link> getEndLinkId() {
 		return endLinkId;
 	}
 
 	@Override
-	public void setStartLinkId(Id linkId) {
+	public void setStartLinkId(Id<Link> linkId) {
 		this.startLinkId = linkId;
 	}
 
 	@Override
-	public void setEndLinkId(Id linkId) {
+	public void setEndLinkId(Id<Link> linkId) {
 		this.endLinkId = linkId;
 	}
 
 	@Override
 	public void setRouteDescription(
-			final Id startLinkId,
+			final Id<Link> startLinkId,
 			final String routeDescription,
-			final Id endLinkId) {
+			final Id<Link> endLinkId) {
 		setStartLinkId( startLinkId );
 
 		final JSONObject json = new JSONObject( new JSONTokener( routeDescription ) );
@@ -119,9 +114,9 @@ public class AccessEgressNetworkBasedTeleportationRoute implements GenericRoute 
 
 		final JSONArray linksArray = json.getJSONArray( "links" );
 
-		final List<Id> ids = new ArrayList<Id>( linksArray.length() );
+		final List<Id<Link>> ids = new ArrayList<Id<Link>>( linksArray.length() );
 		for ( int i=0; i < linksArray.length(); i++ ) {
-			ids.add( idFactory.createId( linksArray.getString( i ) ) );
+			ids.add( Id.create( linksArray.getString( i ), Link.class ) );
 		}
 
 		this.links = ids;
@@ -129,12 +124,12 @@ public class AccessEgressNetworkBasedTeleportationRoute implements GenericRoute 
 		setEndLinkId( endLinkId );
 	}
 
-	public List<Id> getLinks() {
+	public List<Id<Link>> getLinks() {
 		return Collections.unmodifiableList( links );
 	}
 
-	public void setLinks( final List<Id> newLinks ) {
-		this.links = new ArrayList<Id>( newLinks );
+	public void setLinks( final List<Id<Link>> newLinks ) {
+		this.links = new ArrayList<Id<Link>>( newLinks );
 	}
 
 	@Override
@@ -182,7 +177,7 @@ public class AccessEgressNetworkBasedTeleportationRoute implements GenericRoute 
 	@Override
 	public AccessEgressNetworkBasedTeleportationRoute clone() {
 		final AccessEgressNetworkBasedTeleportationRoute clone =
-				new AccessEgressNetworkBasedTeleportationRoute( idFactory );
+				new AccessEgressNetworkBasedTeleportationRoute();
 
 		// not the most efficient way, but the safest facing refactorings.
 		clone.setRouteDescription(

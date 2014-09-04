@@ -31,9 +31,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.IdFactory;
 import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -47,6 +45,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 
 /**
@@ -57,7 +56,6 @@ import org.xml.sax.Attributes;
 public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSomeReader {
 
 	private final TransitSchedule schedule;
-	private final IdFactory idf;
 	private final ModeRouteFactory routeFactory;
 
 	private TransitLine currentTransitLine = null;
@@ -67,38 +65,21 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 	/**
 	 * @param schedule
 	 * @param network
-	 * @deprecated use {@link #TransitScheduleReaderV1(TransitSchedule, ModeRouteFactory, IdFactory)}
+	 * @deprecated use {@link #TransitScheduleReaderV1(TransitSchedule, ModeRouteFactory)}
 	 */
 	@Deprecated
 	public TransitScheduleReaderV1(final TransitSchedule schedule, final Network network) {
-		this(schedule, new ModeRouteFactory(), new IdFactory() {
-			@Override
-			public Id createId(String id) {
-				return new IdImpl(id);
-			}
-		});
+		this(schedule, new ModeRouteFactory());
 	}
 
-	/**
-	 * @deprecated use {@link #TransitScheduleReaderV1(TransitSchedule, ModeRouteFactory, IdFactory)}
-	 */
-	@Deprecated
-	public TransitScheduleReaderV1(final TransitSchedule schedule, final Network network, final IdFactory idf) {
-		this.schedule = schedule;
-		this.routeFactory = new ModeRouteFactory();
-		this.idf = idf;
-	}
-
-	public TransitScheduleReaderV1(final TransitSchedule schedule, final ModeRouteFactory routeFactory, final IdFactory idf) {
+	public TransitScheduleReaderV1(final TransitSchedule schedule, final ModeRouteFactory routeFactory) {
 		this.schedule = schedule;
 		this.routeFactory = routeFactory;
-		this.idf = idf;
 	}
 
 	public TransitScheduleReaderV1(final Scenario scenario) {
 		this.schedule = scenario.getTransitSchedule();
 		this.routeFactory = ((PopulationFactoryImpl) (scenario.getPopulation().getFactory())).getModeRouteFactory();
-		this.idf = scenario;
 	}
 
 	public void readFile(final String fileName) throws UncheckedIOException {
@@ -110,9 +91,9 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 		if (Constants.STOP_FACILITY.equals(name)) {
 			boolean isBlocking = Boolean.parseBoolean(atts.getValue(Constants.IS_BLOCKING));
 			TransitStopFacility stop = new TransitStopFacilityImpl(
-					this.idf.createId(atts.getValue(Constants.ID)), new CoordImpl(atts.getValue("x"), atts.getValue("y")), isBlocking);
+					Id.create(atts.getValue(Constants.ID), TransitStopFacility.class), new CoordImpl(atts.getValue("x"), atts.getValue("y")), isBlocking);
 			if (atts.getValue(Constants.LINK_REF_ID) != null) {
-				Id linkId = this.idf.createId(atts.getValue(Constants.LINK_REF_ID));
+				Id<Link> linkId = Id.create(atts.getValue(Constants.LINK_REF_ID), Link.class);
 				stop.setLinkId(linkId);
 			}
 			if (atts.getValue(Constants.NAME) != null) {
@@ -120,21 +101,21 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 			}
 			this.schedule.addStopFacility(stop);
 		} else if (Constants.TRANSIT_LINE.equals(name)) {
-			Id id = this.idf.createId(atts.getValue(Constants.ID));
+			Id<TransitLine> id = Id.create(atts.getValue(Constants.ID), TransitLine.class);
 			this.currentTransitLine = new TransitLineImpl(id);
 			if (atts.getValue(Constants.NAME) != null) {
 				this.currentTransitLine.setName(atts.getValue(Constants.NAME));
 			}
 			this.schedule.addTransitLine(this.currentTransitLine);
 		} else if (Constants.TRANSIT_ROUTE.equals(name)) {
-			Id id = this.idf.createId(atts.getValue(Constants.ID));
+			Id<TransitRoute> id = Id.create(atts.getValue(Constants.ID), TransitRoute.class);
 			this.currentTransitRoute = new TempTransitRoute(id);
 		} else if (Constants.DEPARTURE.equals(name)) {
-			Id id = this.idf.createId(atts.getValue(Constants.ID));
+			Id<Departure> id = Id.create(atts.getValue(Constants.ID), Departure.class);
 			Departure departure = new DepartureImpl(id, Time.parseTime(atts.getValue("departureTime")));
 			String vehicleRefId = atts.getValue(Constants.VEHICLE_REF_ID);
 			if (vehicleRefId != null) {
-				departure.setVehicleId(this.idf.createId(vehicleRefId));
+				departure.setVehicleId(Id.create(vehicleRefId, Vehicle.class));
 			}
 			this.currentTransitRoute.departures.put(id, departure);
 		} else if (Constants.ROUTE_PROFILE.equals(name)) {
@@ -142,15 +123,15 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 		} else if (Constants.LINK.equals(name)) {
 			String linkStr = atts.getValue(Constants.REF_ID);
 			if (!linkStr.contains(" ")) {
-				this.currentRouteProfile.addLink(this.idf.createId(linkStr));
+				this.currentRouteProfile.addLink(Id.create(linkStr, Link.class));
 			} else {
 				String[] links = linkStr.split(" ");
 				for (int i = 0; i < links.length; i++) {
-					this.currentRouteProfile.addLink(this.idf.createId(links[i]));
+					this.currentRouteProfile.addLink(Id.create(links[i], Link.class));
 				}
 			}
 		} else if (Constants.STOP.equals(name)) {
-			Id id = this.idf.createId(atts.getValue(Constants.REF_ID));
+			Id<TransitStopFacility> id = Id.create(atts.getValue(Constants.REF_ID), TransitStopFacility.class);
 			TransitStopFacility facility = this.schedule.getFacilities().get(id);
 			if (facility == null) {
 				throw new RuntimeException("no stop/facility with id " + atts.getValue(Constants.REF_ID));
@@ -200,13 +181,13 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 	}
 
 	private static class TempTransitRoute {
-		protected final Id id;
+		protected final Id<TransitRoute> id;
 		protected String description = null;
-		protected Map<Id, Departure> departures = new LinkedHashMap<Id, Departure>();
+		protected Map<Id<Departure>, Departure> departures = new LinkedHashMap<Id<Departure>, Departure>();
 		/*package*/ List<TempStop> stops = new ArrayList<TempStop>();
 		/*package*/ String mode = null;
 
-		protected TempTransitRoute(final Id id) {
+		protected TempTransitRoute(final Id<TransitRoute> id) {
 			this.id = id;
 		}
 	}

@@ -24,14 +24,14 @@ import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.IdFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -43,17 +43,16 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author thibautd
  */
 public class AccessEgressNetworkBasedTeleportationRouteTest {
-	private static final IdFactory idFactory = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private static AccessEgressNetworkBasedTeleportationRoute createRoute() {
 		final AccessEgressNetworkBasedTeleportationRoute route =
-			new AccessEgressNetworkBasedTeleportationRoute( idFactory );
+			new AccessEgressNetworkBasedTeleportationRoute();
 
-		route.setStartLinkId( idFactory.createId( "bouh" ) );
-		route.setEndLinkId( idFactory.createId( "bwa" ) );
+		route.setStartLinkId(Id.create( "bouh", Link.class ) );
+		route.setEndLinkId( Id.create( "bwa", Link.class ) );
 		route.setDistance( 12364 );
 		// test with special values --- JSON is restrictive on numbers
 		route.setAccessTime( Double.NaN );
@@ -61,14 +60,14 @@ public class AccessEgressNetworkBasedTeleportationRouteTest {
 		route.setLinkTime( 4638309 );
 		int i = 0;
 		route.setLinks( Arrays.asList(
-			idFactory.createId( "link-"+(i++) ),
-			idFactory.createId( "link-"+(i++) ),
-			idFactory.createId( "link-"+(i++) ),
-			idFactory.createId( "link-"+(i++) ),
-			idFactory.createId( "link-"+(i++) ),
-			idFactory.createId( "link-"+(i++) ),
-			idFactory.createId( "link-"+(i++) ),
-			idFactory.createId( "link-"+(i++) )
+			Id.create( "link-"+(i++), Link.class ),
+			Id.create( "link-"+(i++), Link.class ),
+			Id.create( "link-"+(i++), Link.class ),
+			Id.create( "link-"+(i++), Link.class ),
+			Id.create( "link-"+(i++), Link.class ),
+			Id.create( "link-"+(i++), Link.class ),
+			Id.create( "link-"+(i++), Link.class ),
+			Id.create( "link-"+(i++), Link.class )
 			) );
 		
 		return route;
@@ -81,7 +80,7 @@ public class AccessEgressNetworkBasedTeleportationRouteTest {
 
 		((PopulationFactoryImpl) pop.getFactory()).setRouteFactory(
 					"shloumpf",
-					new AccessEgressNetworkBasedTeleportationRouteFactory( idFactory ) );
+					new AccessEgressNetworkBasedTeleportationRouteFactory( ) );
 
 		final Person person = pop.getFactory().createPerson( new IdImpl( "jojo" ) );
 		pop.addPerson( person );
@@ -102,7 +101,7 @@ public class AccessEgressNetworkBasedTeleportationRouteTest {
 
 		((PopulationFactoryImpl) insc.getPopulation().getFactory()).setRouteFactory(
 					"shloumpf",
-					new AccessEgressNetworkBasedTeleportationRouteFactory( idFactory ) );
+					new AccessEgressNetworkBasedTeleportationRouteFactory( ) );
 
 		new MatsimPopulationReader( insc ).readFile( file );
 

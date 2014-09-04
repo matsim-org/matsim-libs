@@ -53,7 +53,7 @@ public class Main {
 
 		/* **************reads the transitSchedule file********* */
 		new MatsimNetworkReader(scenario).readFile(netWorkFile);
-		new TransitScheduleReaderV1(transitSchedule, network, scenario).readFile(transitScheduleFile);
+		new TransitScheduleReaderV1(transitSchedule, network).readFile(transitScheduleFile);
 		/*******************************************************/
 
 		LogicFactory logicFactory = new LogicFactory(transitSchedule); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter

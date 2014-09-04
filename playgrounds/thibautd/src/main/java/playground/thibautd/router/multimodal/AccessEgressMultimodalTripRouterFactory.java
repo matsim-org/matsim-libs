@@ -155,7 +155,6 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 					mode,
 					new AccessEgressNetworkBasedTeleportationRoutingModule(
 							mode,
-							scenario,
 							subNetwork,
 							crowFlyDistanceFactor,
 							crowFlySpeed,

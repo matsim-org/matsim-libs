@@ -66,7 +66,7 @@ public class CreateScheduleToMatchPseudoNetwork{
 		//read schedule
 		TransitScheduleFactoryImpl builder = new TransitScheduleFactoryImpl();
 		TransitScheduleImpl Schedule = (TransitScheduleImpl) builder.createTransitSchedule();
-		TransitScheduleReaderV1 tsreader = new TransitScheduleReaderV1(Schedule, new ModeRouteFactory(), scenario);
+		TransitScheduleReaderV1 tsreader = new TransitScheduleReaderV1(Schedule, new ModeRouteFactory());
 		tsreader.readFile(ScheduleFile);
 
 		//pseudonetwork to use the getnetworkstop method

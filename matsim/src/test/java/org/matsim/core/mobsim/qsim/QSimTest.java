@@ -1254,11 +1254,11 @@ public class QSimTest {
 
 		// build simple network with 1 link
 		Network network = scenario.getNetwork();
-		Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
-		Node node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
+		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(0.0, 0.0));
+		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(1000.0, 0.0));
 		network.addNode(node1);
 		network.addNode(node2);
-		Link link = network.getFactory().createLink(scenario.createId("1"), node1, node2);
+		Link link = network.getFactory().createLink(Id.create("1", Link.class), node1, node2);
 		link.setFreespeed(10.0);
 		link.setCapacity(2000.0);
 		network.addLink(link);
@@ -1266,7 +1266,7 @@ public class QSimTest {
 		// build simple population with 1 person with 1 plan with 1 leg
 		Population population = scenario.getPopulation();
 		PopulationFactory pb = population.getFactory();
-		Person person = pb.createPerson(scenario.createId("1"));
+		Person person = pb.createPerson(Id.create("1", Person.class));
 		Plan plan = pb.createPlan();
 		Activity act1 = pb.createActivityFromLinkId("h", link.getId());
 		act1.setEndTime(7.0*3600);

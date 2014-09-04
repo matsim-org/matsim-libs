@@ -20,26 +20,23 @@
 package playground.thibautd.router.multimodal;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.api.experimental.IdFactory;
 import org.matsim.core.population.routes.RouteFactory;
 
 /**
  * @author thibautd
  */
 public class AccessEgressNetworkBasedTeleportationRouteFactory implements RouteFactory {
-	private final IdFactory idFactory;
 
-	public AccessEgressNetworkBasedTeleportationRouteFactory(IdFactory idFactory) {
-		this.idFactory = idFactory;
+	public AccessEgressNetworkBasedTeleportationRouteFactory() {
 	}
 
 	@Override
 	public Route createRoute(
-			final Id startLinkId,
-			final Id endLinkId) {
+			final Id<Link> startLinkId,
+			final Id<Link> endLinkId) {
 		return new AccessEgressNetworkBasedTeleportationRoute(
-				idFactory,
 				startLinkId,
 				endLinkId );
 	}

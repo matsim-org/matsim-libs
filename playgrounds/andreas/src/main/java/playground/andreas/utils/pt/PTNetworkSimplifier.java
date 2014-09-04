@@ -391,7 +391,7 @@ public class PTNetworkSimplifier {
 		osmLoader.loadScenario();
 
 		log.info("Reading " + this.scheduleInFile);
-		new TransitScheduleReaderV1(osmScenario.getTransitSchedule(), osmScenario.getNetwork(), osmScenario).readFile(this.scheduleInFile);
+		new TransitScheduleReaderV1(osmScenario.getTransitSchedule(), osmScenario.getNetwork()).readFile(this.scheduleInFile);
 
 		log.info("Running simplifier...");
 		run(this.network, osmScenario.getTransitSchedule());

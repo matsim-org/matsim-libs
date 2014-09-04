@@ -35,7 +35,7 @@ public class Controller {
 
 		/***************reads the transitSchedule file**********/
 		new MatsimNetworkReader(scenario).readFile(NETWORK);
-		new TransitScheduleReaderV1(transitSchedule, scenario.getNetwork(), scenario).readFile(TRANSITSCHEDULEFILE);
+		new TransitScheduleReaderV1(transitSchedule, scenario.getNetwork()).readFile(TRANSITSCHEDULEFILE);
 		/*******************************************************/
 
 		Map <Id, List<StaticConnection>> connectionMap= new TreeMap <Id, List<StaticConnection>>();

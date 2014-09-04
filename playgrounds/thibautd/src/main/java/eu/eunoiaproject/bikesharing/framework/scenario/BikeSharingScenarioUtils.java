@@ -115,7 +115,7 @@ public class BikeSharingScenarioUtils {
 			scenario.getConfig().getModule(
 					MultiModalConfigGroup.GROUP_NAME );
 
-		final RouteFactory factory = new AccessEgressNetworkBasedTeleportationRouteFactory( scenario );
+		final RouteFactory factory = new AccessEgressNetworkBasedTeleportationRouteFactory( );
 		for (String mode : org.matsim.core.utils.collections.CollectionUtils.stringToArray(multimodalConfigGroup.getSimulatedModes())) {
 			((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory(mode, factory);
 		}
@@ -134,7 +134,7 @@ public class BikeSharingScenarioUtils {
 
 		// PrepareMultiModalScenario.run( scenario );
 
-		final RouteFactory factory = new AccessEgressNetworkBasedTeleportationRouteFactory( scenario );
+		final RouteFactory factory = new AccessEgressNetworkBasedTeleportationRouteFactory( );
         for (String mode : org.matsim.core.utils.collections.CollectionUtils.stringToArray(multimodalConfigGroup.getSimulatedModes())) {
 			((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory(mode, factory);
 		}

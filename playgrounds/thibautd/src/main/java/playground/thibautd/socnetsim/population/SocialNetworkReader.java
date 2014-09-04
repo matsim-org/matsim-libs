@@ -23,7 +23,7 @@ import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.IdFactory;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -35,13 +35,11 @@ public class SocialNetworkReader extends MatsimXmlParser {
 	private SocialNetwork socialNetwork;
 
 	private boolean isReflective = false;
-	private final IdFactory idFactory;
 
 	private final String elementName;
 
 	public SocialNetworkReader(final Scenario scenario) {
 		this.scenario = scenario;
-		this.idFactory = scenario;
 		this.elementName = SocialNetwork.ELEMENT_NAME;
 	}
 
@@ -49,7 +47,6 @@ public class SocialNetworkReader extends MatsimXmlParser {
 			final String elementName,
 			final Scenario scenario) {
 		this.scenario = scenario;
-		this.idFactory = scenario;
 		this.elementName = elementName;
 	}
 
@@ -64,16 +61,16 @@ public class SocialNetworkReader extends MatsimXmlParser {
 			this.scenario.addScenarioElement( elementName , this.socialNetwork );
 		}
 		else if ( name.equals( SocialNetworkWriter.EGO_TAG ) ) {
-			final Id ego = idFactory.createId(
+			final Id ego = new IdImpl(
 						atts.getValue(
 							SocialNetworkWriter.EGO_ATT ) );
 			this.socialNetwork.addEgo( ego );
 		}
 		else if ( name.equals( SocialNetworkWriter.TIE_TAG ) ) {
-			final Id ego = idFactory.createId(
+			final Id ego = new IdImpl(
 						atts.getValue(
 							SocialNetworkWriter.EGO_ATT ) );
-			final Id alter = idFactory.createId(
+			final Id alter = new IdImpl(
 						atts.getValue(
 							SocialNetworkWriter.ALTER_ATT ) );
 			if ( this.isReflective ) this.socialNetwork.addBidirectionalTie( ego , alter );

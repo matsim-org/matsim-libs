@@ -28,9 +28,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
@@ -66,7 +64,7 @@ public class TransitScheduleWriterTest {
 
 		TransitScheduleFactory builder2 = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule2 = builder2.createTransitSchedule();
-		new TransitScheduleReaderV1(schedule2, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig())).readFile(filename);
+		new TransitScheduleReaderV1(schedule2, new ModeRouteFactory()).readFile(filename);
 		Assert.assertEquals(1, schedule2.getTransitLines().size());
 	}
 	
@@ -85,7 +83,7 @@ public class TransitScheduleWriterTest {
 		
 		TransitScheduleFactory builder2 = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule2 = builder2.createTransitSchedule();
-		new TransitScheduleReaderV1(schedule2, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig())).readFile(filename);
+		new TransitScheduleReaderV1(schedule2, new ModeRouteFactory()).readFile(filename);
 		Assert.assertEquals(1, schedule2.getTransitLines().size());
 		Assert.assertEquals("Blue line", schedule2.getTransitLines().get(new IdImpl(1)).getName());
 	}

@@ -39,7 +39,7 @@ public class TransitLineFilter {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(NETWORKFILE);
-		new TransitScheduleReaderV1(transitSchedule, network, scenario).readFile(SCHEDULEFILE);
+		new TransitScheduleReaderV1(transitSchedule, network).readFile(SCHEDULEFILE);
 
 		System.out.println ("List of lines");
 		for (TransitLine line : transitSchedule.getTransitLines().values()){

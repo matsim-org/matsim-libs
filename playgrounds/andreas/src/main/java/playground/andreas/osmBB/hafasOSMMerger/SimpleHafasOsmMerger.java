@@ -95,7 +95,7 @@ public class SimpleHafasOsmMerger {
 		ScenarioLoaderImpl osmLoader = new ScenarioLoaderImpl(this.osmScenario);
 		osmLoader.loadScenario();
 
-		new TransitScheduleReaderV1(this.hafasScenario.getTransitSchedule(), this.hafasScenario.getNetwork(), this.hafasScenario).readFile(hafasTransitSchedule);
-		new TransitScheduleReaderV1(this.osmScenario.getTransitSchedule(), this.osmScenario.getNetwork(), this.osmScenario).readFile(osmTransitSchedule);
+		new TransitScheduleReaderV1(this.hafasScenario.getTransitSchedule(), this.hafasScenario.getNetwork()).readFile(hafasTransitSchedule);
+		new TransitScheduleReaderV1(this.osmScenario.getTransitSchedule(), this.osmScenario.getNetwork()).readFile(osmTransitSchedule);
 	}
 }

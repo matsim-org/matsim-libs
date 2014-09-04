@@ -90,7 +90,7 @@ public class TransitSchedule2Shape {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(NETWORKFILE);
-		new TransitScheduleReaderV1(transitSchedule, network, scenario).readFile(SCHEDULEFILE);
+		new TransitScheduleReaderV1(transitSchedule, network).readFile(SCHEDULEFILE);
 	
 		Map<Id, SortedMap<String, Object>> lineAttributesMap = TransitSchedule2Shape.getAttributesForLines(transitSchedule, pIdentifier);
 		Collection<Id> linesToConvert = TransitSchedule2Shape.getIdsFromAllLinesButParatransitYoungerThanIterationGiven(transitSchedule, pIdentifier, removeAllParatransitLinesYoungerThanIteration);

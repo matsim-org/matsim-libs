@@ -25,7 +25,6 @@ import java.util.Stack;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.IdFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.router.TransitRouterNetwork;
@@ -51,7 +50,6 @@ public class TransitRouterNetworkReader extends MatsimXmlParser {
 	private final static String NODES = "nodes";
 	private final static String LINK = "link";
 
-	private final IdFactory idFactory;
 	private final TransitRouterNetwork network;
 	private final TransitSchedule transitSchedule;
 
@@ -59,10 +57,8 @@ public class TransitRouterNetworkReader extends MatsimXmlParser {
 	private final Counter linksCounter = new Counter("# read links: ");
 	
 	public TransitRouterNetworkReader(
-			final IdFactory idFactory,
 			final TransitSchedule schedule,
 			final TransitRouterNetwork network) {
-		this.idFactory = idFactory;
 		this.network = network;
 		this.transitSchedule = schedule;
 	}
@@ -104,10 +100,10 @@ public class TransitRouterNetworkReader extends MatsimXmlParser {
 	@SuppressWarnings("unchecked")
 	private void startNode(final Attributes atts) {	
 		
-		final Id nodeId = this.idFactory.createId(atts.getValue("id"));
-		final Id stopId = this.idFactory.createId(atts.getValue("stopfacility"));
-		final Id routeId = this.idFactory.createId(atts.getValue("route"));
-		final Id lineId = this.idFactory.createId(atts.getValue("line"));
+		final Id<Node> nodeId = Id.create(atts.getValue("id"), Node.class);
+		final Id<TransitStopFacility> stopId = Id.create(atts.getValue("stopfacility"), TransitStopFacility.class);
+		final Id<TransitRoute> routeId = Id.create(atts.getValue("route"), TransitRoute.class);
+		final Id<TransitLine> lineId = Id.create(atts.getValue("line"), TransitLine.class);
 
 		final TransitLine line = this.transitSchedule.getTransitLines().get(lineId);
 		if ( line == null ) {
@@ -137,20 +133,20 @@ public class TransitRouterNetworkReader extends MatsimXmlParser {
 	@SuppressWarnings("unchecked")
 	private void startLink(final Attributes atts) {
 		
-		final Id linkId = this.idFactory.createId(atts.getValue("id"));
-		final Id fromId = this.idFactory.createId(atts.getValue("from"));
-		final Id toId = this.idFactory.createId(atts.getValue("to"));
-		
+		final Id<Link> linkId = Id.create(atts.getValue("id"), Link.class);
+		final Id<Node> fromId = Id.create(atts.getValue("from"), Node.class);
+		final Id<Node> toId = Id.create(atts.getValue("to"), Node.class);
+
 		final String routeAtt = atts.getValue("route");
-		final Id routeId =
+		final Id<TransitRoute> routeId =
 			routeAtt != null ?
-				this.idFactory.createId( routeAtt ) :
+					Id.create(routeAtt, TransitRoute.class) :
 				null;
 		
 		final String lineAtt = atts.getValue("line");
-		final Id lineId =
+		final Id<TransitLine> lineId =
 			lineAtt != null ?
-				this.idFactory.createId( lineAtt ) :
+				Id.create(lineAtt, TransitLine.class) :
 				null;
 		
 		final TransitLine line =

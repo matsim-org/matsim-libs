@@ -122,7 +122,7 @@ public class PtScenarioAdaption {
 		
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		this.transitFactory = schedule.getFactory();
-		new TransitScheduleReaderV1(schedule, network, scenario).readFile(transitScheduleFile);
+		new TransitScheduleReaderV1(schedule, network).readFile(transitScheduleFile);
 		
 		Vehicles vehicles = scenario.getVehicles();
 		new VehicleReaderV1(vehicles).readFile(transitVehicleFile);

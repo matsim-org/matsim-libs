@@ -78,7 +78,7 @@ public class PseudoNetworkDemo {
 		}
 
 		TransitSchedule schedule = scenario.getTransitSchedule();
-		new TransitScheduleReaderV1(schedule, network, scenario).readFile(transitScheduleFile);
+		new TransitScheduleReaderV1(schedule, network).readFile(transitScheduleFile);
 
 		network.getLinks().clear();
 		network.getNodes().clear();

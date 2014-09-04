@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.IdFactory;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
@@ -60,17 +59,13 @@ public class AccessEgressNetworkBasedTeleportationRoutingModule implements Routi
 	private final double crowFlySpeed;
 	private final LeastCostPathCalculator routeAlgo;
 
-	private final IdFactory idFactory;
-
 	public AccessEgressNetworkBasedTeleportationRoutingModule(
 			final String mode,
-			final IdFactory idFactory,
 			final Network accessibleNetwork,
 			final double crowFlyDistanceFactor,
 			final double crowFlySpeed,
 			final LeastCostPathCalculator routeAlgo) {
 		this.mode = mode;
-		this.idFactory = idFactory;
 		this.accessibleNetwork = (NetworkImpl) accessibleNetwork;
 		this.crowFlySpeed = crowFlySpeed;
 		this.crowFlyDistanceFactor = crowFlyDistanceFactor;
@@ -105,8 +100,7 @@ public class AccessEgressNetworkBasedTeleportationRoutingModule implements Routi
 		final double egressTime = egressDistance / crowFlySpeed;
 
 		final AccessEgressNetworkBasedTeleportationRoute route =
-			new AccessEgressNetworkBasedTeleportationRoute(
-					idFactory );
+			new AccessEgressNetworkBasedTeleportationRoute();
 		route.setStartLinkId( fromFacility.getLinkId() );
 		route.setEndLinkId( toFacility.getLinkId() );
 		route.setAccessTime( accessTime );
@@ -128,8 +122,8 @@ public class AccessEgressNetworkBasedTeleportationRoutingModule implements Routi
 		return d;
 	}
 
-	private static List<Id> toIds(final List<Link> links) {
-		final List<Id> ids = new ArrayList<Id>( links.size() );
+	private static List<Id<Link>> toIds(final List<Link> links) {
+		final List<Id<Link>> ids = new ArrayList<Id<Link>>( links.size() );
 		for ( Link l : links ) ids.add( l.getId() );
 		return ids;
 	}

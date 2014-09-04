@@ -23,11 +23,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.IdFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
@@ -47,13 +45,11 @@ public class DataLoader {
 		TransitScheduleFactoryImpl transitScheduleFactoryImpl = new TransitScheduleFactoryImpl();
 		TransitSchedule transitSchedule = transitScheduleFactoryImpl.createTransitSchedule();
 		ModeRouteFactory routeFactory = new ModeRouteFactory();
-		IdFactory idf =	this.createScenario();
-		TransitScheduleReaderV1 transitScheduleReaderV1 = new TransitScheduleReaderV1(transitSchedule, routeFactory, idf);
+		TransitScheduleReaderV1 transitScheduleReaderV1 = new TransitScheduleReaderV1(transitSchedule, routeFactory);
 		transitScheduleReaderV1.readFile(transitScheduleFile);
 		transitScheduleFactoryImpl = null;
 		transitScheduleReaderV1 = null;
 		routeFactory = null;
-		idf= null;
 		return transitSchedule;
 	}
 

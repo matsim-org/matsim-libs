@@ -19,29 +19,36 @@
  * *********************************************************************** */
 package playground.ivt.matsim2030;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
+import herbie.running.controler.listeners.LegDistanceDistributionWriter;
+
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.MatsimRandom;
@@ -49,29 +56,17 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.population.algorithms.PersonAlgorithm;
-import org.matsim.population.algorithms.XY2Links;
-import org.matsim.population.filters.PersonIntersectAreaFilter;
-
-import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
-import herbie.running.controler.listeners.LegDistanceDistributionWriter;
-
-import java.io.File;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.XY2Links;
+import org.matsim.population.filters.PersonIntersectAreaFilter;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
@@ -429,7 +424,6 @@ public class Matsim2030Utils {
 			log.info( "using thinned transit router network from "+matsim2030conf.getThinnedTransitRouterNetworkFile() );
 			final TransitRouterNetwork transitRouterNetwork = new TransitRouterNetwork();
 			new TransitRouterNetworkReader(
-					scenario,
 					scenario.getTransitSchedule(),
 					transitRouterNetwork ).parse(
 						matsim2030conf.getThinnedTransitRouterNetworkFile() );

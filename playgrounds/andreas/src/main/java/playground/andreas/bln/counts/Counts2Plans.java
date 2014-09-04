@@ -209,7 +209,7 @@ public class Counts2Plans {
 		matsimNetReader.readFile(networkFile);
 
 		TransitSchedule transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		TransitScheduleReaderV1 transitScheduleReaderV1 = new TransitScheduleReaderV1(transitSchedule, scenario.getNetwork(), scenario);
+		TransitScheduleReaderV1 transitScheduleReaderV1 = new TransitScheduleReaderV1(transitSchedule, scenario.getNetwork());
 
 		transitScheduleReaderV1.readFile(transitScheduleFile);
 

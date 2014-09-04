@@ -30,11 +30,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -115,7 +113,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		new TransitScheduleWriterV1(schedule1).write(filename);
 		TransitScheduleFactory builder2 = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule2 = builder2.createTransitSchedule();
-		new TransitScheduleReaderV1(schedule2, network, ScenarioUtils.createScenario(ConfigUtils.createConfig())).readFile(filename);
+		new TransitScheduleReaderV1(schedule2, network).readFile(filename);
 
 		// first test, without network-route
 		assertEquals(schedule1, schedule2);
@@ -135,7 +133,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		new TransitScheduleWriterV1(schedule1).write(filename);
 		TransitScheduleFactory builder3 = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule3 = builder3.createTransitSchedule();
-		new TransitScheduleReaderV1(schedule3, network, ScenarioUtils.createScenario(ConfigUtils.createConfig())).readFile(filename);
+		new TransitScheduleReaderV1(schedule3, network).readFile(filename);
 
 		assertEquals(schedule1, schedule3);
 	}

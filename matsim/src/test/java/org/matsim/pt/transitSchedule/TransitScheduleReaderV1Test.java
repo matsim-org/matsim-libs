@@ -32,12 +32,10 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -48,6 +46,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.AttributesBuilder;
+import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 
 /**
@@ -63,7 +62,7 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testStopFacility_Minimalistic() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		Attributes emptyAtts = AttributesBuilder.getEmpty();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, emptyAtts, context);
@@ -78,7 +77,7 @@ public class TransitScheduleReaderV1Test {
 		reader.endTag(context.pop(), EMPTY_STRING, context);// TRANSIT_SCHEDULE
 
 		assertEquals(1, schedule.getFacilities().size());
-		TransitStopFacility stop = schedule.getFacilities().get(new IdImpl("stop1"));
+		TransitStopFacility stop = schedule.getFacilities().get(Id.create("stop1", TransitStopFacility.class));
 		assertNotNull(stop);
 		assertEquals(79.0, stop.getCoord().getX(), MatsimTestCase.EPSILON);
 		assertEquals(80.0, stop.getCoord().getY(), MatsimTestCase.EPSILON);
@@ -90,12 +89,12 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testStopFacility_withLink() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(10, 5));
-		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(5, 11));
-		Link link3 = network.createAndAddLink(new IdImpl(3), node1, node2, 1000, 10.0, 2000.0, 1.0);
+		NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(10, 5));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(5, 11));
+		Link link3 = network.createAndAddLink(Id.create(3, Link.class), node1, node2, 1000, 10.0, 2000.0, 1.0);
 
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		Attributes emptyAtts = AttributesBuilder.getEmpty();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, emptyAtts, context);
@@ -110,7 +109,7 @@ public class TransitScheduleReaderV1Test {
 		reader.endTag(context.pop(), EMPTY_STRING, context);// TRANSIT_SCHEDULE
 
 		assertEquals(1, schedule.getFacilities().size());
-		TransitStopFacility stop = schedule.getFacilities().get(new IdImpl("stop1"));
+		TransitStopFacility stop = schedule.getFacilities().get(Id.create("stop1", TransitStopFacility.class));
 		assertNotNull(stop);
 		assertEquals(79.0, stop.getCoord().getX(), MatsimTestCase.EPSILON);
 		assertEquals(80.0, stop.getCoord().getY(), MatsimTestCase.EPSILON);
@@ -120,12 +119,12 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testStopFacility_withBadLink() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(10, 5));
-		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(5, 11));
-		network.createAndAddLink(new IdImpl(3), node1, node2, 1000, 10.0, 2000.0, 1.0);
+		NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(10, 5));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(5, 11));
+		network.createAndAddLink(Id.create(3, Link.class), node1, node2, 1000, 10.0, 2000.0, 1.0);
 
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		Attributes emptyAtts = AttributesBuilder.getEmpty();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, emptyAtts, context);
@@ -141,15 +140,15 @@ public class TransitScheduleReaderV1Test {
 		context.pop();
 		reader.endTag(Constants.TRANSIT_SCHEDULE, "", context);
 
-		TransitStopFacility stop = schedule.getFacilities().get(new IdImpl("stop1"));
-		assertEquals(new IdImpl("4"), stop.getLinkId());
+		TransitStopFacility stop = schedule.getFacilities().get(Id.create("stop1", TransitStopFacility.class));
+		assertEquals(Id.create("4", Link.class), stop.getLinkId());
 		assertNull(network.getLinks().get(stop.getLinkId()));
 	}
 
 	@Test
 	public void testStopFacility_withName() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		Attributes emptyAtts = AttributesBuilder.getEmpty();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, emptyAtts, context);
@@ -164,7 +163,7 @@ public class TransitScheduleReaderV1Test {
 		reader.endTag(context.pop(), EMPTY_STRING, context);// TRANSIT_SCHEDULE
 
 		assertEquals(1, schedule.getFacilities().size());
-		TransitStopFacility stop = schedule.getFacilities().get(new IdImpl("stop1"));
+		TransitStopFacility stop = schedule.getFacilities().get(Id.create("stop1", TransitStopFacility.class));
 		assertNotNull(stop);
 		assertEquals(79.0, stop.getCoord().getX(), MatsimTestCase.EPSILON);
 		assertEquals(80.0, stop.getCoord().getY(), MatsimTestCase.EPSILON);
@@ -175,7 +174,7 @@ public class TransitScheduleReaderV1Test {
 	public void testStopFacility_isBlocking() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		Attributes emptyAtts = AttributesBuilder.getEmpty();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, emptyAtts, context);
@@ -190,7 +189,7 @@ public class TransitScheduleReaderV1Test {
 		reader.endTag(context.pop(), EMPTY_STRING, context);// TRANSIT_SCHEDULE
 
 		assertEquals(1, schedule.getFacilities().size());
-		TransitStopFacility stop = schedule.getFacilities().get(new IdImpl("stop1"));
+		TransitStopFacility stop = schedule.getFacilities().get(Id.create("stop1", TransitStopFacility.class));
 		assertNotNull(stop);
 		assertEquals(79.0, stop.getCoord().getX(), MatsimTestCase.EPSILON);
 		assertEquals(80.0, stop.getCoord().getY(), MatsimTestCase.EPSILON);
@@ -200,7 +199,7 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testStopFacility_Multiple() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		Attributes emptyAtts = AttributesBuilder.getEmpty();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, emptyAtts, context);
@@ -222,11 +221,11 @@ public class TransitScheduleReaderV1Test {
 		reader.endTag(context.pop(), EMPTY_STRING, context);// TRANSIT_SCHEDULE
 
 		assertEquals(2, schedule.getFacilities().size());
-		TransitStopFacility stop1 = schedule.getFacilities().get(new IdImpl("stop1"));
+		TransitStopFacility stop1 = schedule.getFacilities().get(Id.create("stop1", TransitStopFacility.class));
 		assertNotNull(stop1);
 		assertEquals(79.0, stop1.getCoord().getX(), MatsimTestCase.EPSILON);
 		assertEquals(80.0, stop1.getCoord().getY(), MatsimTestCase.EPSILON);
-		TransitStopFacility stop2 = schedule.getFacilities().get(new IdImpl("stop2"));
+		TransitStopFacility stop2 = schedule.getFacilities().get(Id.create("stop2", TransitStopFacility.class));
 		assertNotNull(stop2);
 		assertEquals(51.0, stop2.getCoord().getX(), MatsimTestCase.EPSILON);
 		assertEquals(42.0, stop2.getCoord().getY(), MatsimTestCase.EPSILON);
@@ -235,11 +234,11 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testTransitLine_Single() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_SCHEDULE);
-		Id lineId = new IdImpl("23");
+		Id<TransitLine> lineId = Id.create("23", TransitLine.class);
 		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
 		reader.endTag(Constants.TRANSIT_LINE, EMPTY_STRING, context);// TRANSIT_LINE
 		reader.endTag(context.pop(), EMPTY_STRING, context);// TRANSIT_SCHEDULE
@@ -253,14 +252,14 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testTransitLine_Multiple() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_SCHEDULE);
-		Id lineId1 = new IdImpl("23");
+		Id<TransitLine> lineId1 = Id.create("23", TransitLine.class);
 		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId1.toString()).get(), context);
 		reader.endTag(Constants.TRANSIT_LINE, EMPTY_STRING, context);// TRANSIT_LINE
-		Id lineId2 = new IdImpl("42");
+		Id<TransitLine> lineId2 = Id.create("42", TransitLine.class);
 		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId2.toString()).get(), context);
 		reader.endTag(Constants.TRANSIT_LINE, EMPTY_STRING, context);// TRANSIT_LINE
 		reader.endTag(context.pop(), EMPTY_STRING, context);// TRANSIT_SCHEDULE
@@ -277,15 +276,15 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testTransitRoute_Single() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_SCHEDULE);
-		Id lineId = new IdImpl("1");
+		Id<TransitLine> lineId = Id.create("1", TransitLine.class);
 		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
 		context.push(Constants.TRANSIT_LINE);
 
-		Id routeId1 = new IdImpl("foo");
+		Id<TransitRoute> routeId1 = Id.create("foo", TransitRoute.class);
 		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
 		context.push(Constants.TRANSIT_ROUTE);
 
@@ -316,15 +315,15 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testTransitRoute_Multiple() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_SCHEDULE);
-		Id lineId = new IdImpl("1");
+		Id<TransitLine> lineId = Id.create("1", TransitLine.class);
 		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
 		context.push(Constants.TRANSIT_LINE);
 
-		Id routeId1 = new IdImpl("foo");
+		Id<TransitRoute> routeId1 = Id.create("foo", TransitRoute.class);
 		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
 		context.push(Constants.TRANSIT_ROUTE);
 
@@ -337,7 +336,7 @@ public class TransitScheduleReaderV1Test {
 		reader.endTag(Constants.DEPARTURES, EMPTY_STRING, context);
 		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_ROUTE
 
-		Id routeId2 = new IdImpl("bar");
+		Id<TransitRoute> routeId2 = Id.create("bar", TransitRoute.class);
 		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId2.toString()).get(), context);
 		context.push(Constants.TRANSIT_ROUTE);
 
@@ -371,15 +370,15 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testTransitRoute_Description() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_SCHEDULE);
-		Id lineId = new IdImpl("1");
+		Id<TransitLine> lineId = Id.create("1", TransitLine.class);
 		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
 		context.push(Constants.TRANSIT_LINE);
 
-		Id routeId1 = new IdImpl("foo");
+		Id<TransitRoute> routeId1 = Id.create("foo", TransitRoute.class);
 		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
 		context.push(Constants.TRANSIT_ROUTE);
 
@@ -409,7 +408,7 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testRouteProfile_SingleStop() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_SCHEDULE);
@@ -417,18 +416,18 @@ public class TransitScheduleReaderV1Test {
 		// define some transit stops
 		reader.startTag(Constants.TRANSIT_STOPS, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_STOPS);
-		Id stopId = new IdImpl("stop1");
+		Id<TransitStopFacility> stopId = Id.create("stop1", TransitStopFacility.class);
 		Attributes atts = new AttributesBuilder().add(Constants.ID, stopId.toString()).
 				add(Constants.X, "79").add(Constants.Y, "80").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);
 		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
 
 		// now the other stuff
-		Id lineId = new IdImpl("1");
+		Id<TransitLine> lineId = Id.create("1", TransitLine.class);
 		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
 		context.push(Constants.TRANSIT_LINE);
 
-		Id routeId1 = new IdImpl("1");
+		Id<TransitRoute> routeId1 = Id.create("1", TransitRoute.class);
 		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
 		context.push(Constants.TRANSIT_ROUTE);
 
@@ -463,7 +462,7 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testRouteProfile_MultipleStop() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_SCHEDULE);
@@ -471,28 +470,28 @@ public class TransitScheduleReaderV1Test {
 		// define some transit stops
 		reader.startTag(Constants.TRANSIT_STOPS, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_STOPS);
-		Id stopId1 = new IdImpl("stop1");
+		Id<TransitStopFacility> stopId1 = Id.create("stop1", TransitStopFacility.class);
 		Attributes atts = new AttributesBuilder().add(Constants.ID, stopId1.toString()).
 				add(Constants.X, "79").add(Constants.Y, "80").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);
 		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
-		Id stopId2 = new IdImpl("stop2");
+		Id<TransitStopFacility> stopId2 = Id.create("stop2", TransitStopFacility.class);
 		atts = new AttributesBuilder().add(Constants.ID, stopId2.toString()).
 				add(Constants.X, "51").add(Constants.Y, "42").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);
 		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
-		Id stopId3 = new IdImpl("stop3");
+		Id<TransitStopFacility> stopId3 = Id.create("stop3", TransitStopFacility.class);
 		atts = new AttributesBuilder().add(Constants.ID, stopId3.toString()).
 				add(Constants.X, "76").add(Constants.Y, "80").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);
 		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
 
 		// now the other stuff
-		Id lineId = new IdImpl("1");
+		Id<TransitLine> lineId = Id.create("1", TransitLine.class);
 		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
 		context.push(Constants.TRANSIT_LINE);
 
-		Id routeId1 = new IdImpl("1");
+		Id<TransitRoute> routeId1 = Id.create("1", TransitRoute.class);
 		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
 		context.push(Constants.TRANSIT_ROUTE);
 
@@ -534,7 +533,7 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testRouteProfileStop_Offsets() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_SCHEDULE);
@@ -542,33 +541,33 @@ public class TransitScheduleReaderV1Test {
 		// define some transit stops
 		reader.startTag(Constants.TRANSIT_STOPS, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_STOPS);
-		Id stopId1 = new IdImpl("stop1");
+		Id<TransitStopFacility> stopId1 = Id.create("stop1", TransitStopFacility.class);
 		Attributes atts = new AttributesBuilder().add(Constants.ID, stopId1.toString()).
 				add(Constants.X, "79").add(Constants.Y, "80").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);
 		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
-		Id stopId2 = new IdImpl("stop2");
+		Id<TransitStopFacility> stopId2 = Id.create("stop2", TransitStopFacility.class);
 		atts = new AttributesBuilder().add(Constants.ID, stopId2.toString()).
 				add(Constants.X, "51").add(Constants.Y, "42").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);
 		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
-		Id stopId3 = new IdImpl("stop3");
+		Id<TransitStopFacility> stopId3 = Id.create("stop3", TransitStopFacility.class);
 		atts = new AttributesBuilder().add(Constants.ID, stopId3.toString()).
 				add(Constants.X, "76").add(Constants.Y, "80").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);
 		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
-		Id stopId4 = new IdImpl("stop4");
+		Id<TransitStopFacility> stopId4 = Id.create("stop4", TransitStopFacility.class);
 		atts = new AttributesBuilder().add(Constants.ID, stopId4.toString()).
 		add(Constants.X, "5").add(Constants.Y, "11").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);
 		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
 
 		// now the other stuff
-		Id lineId = new IdImpl("1");
+		Id<TransitLine> lineId = Id.create("1", TransitLine.class);
 		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
 		context.push(Constants.TRANSIT_LINE);
 
-		Id routeId1 = new IdImpl("1");
+		Id<TransitRoute> routeId1 = Id.create("1", TransitRoute.class);
 		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
 		context.push(Constants.TRANSIT_ROUTE);
 
@@ -630,7 +629,7 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testRouteProfileStop_AwaitDeparture() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_SCHEDULE);
@@ -638,28 +637,28 @@ public class TransitScheduleReaderV1Test {
 		// define some transit stops
 		reader.startTag(Constants.TRANSIT_STOPS, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_STOPS);
-		Id stopId1 = new IdImpl("stop1");
+		Id<TransitStopFacility> stopId1 = Id.create("stop1", TransitStopFacility.class);
 		Attributes atts = new AttributesBuilder().add(Constants.ID, stopId1.toString()).
 				add(Constants.X, "79").add(Constants.Y, "80").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);
 		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
-		Id stopId2 = new IdImpl("stop2");
+		Id<TransitStopFacility> stopId2 = Id.create("stop2", TransitStopFacility.class);
 		atts = new AttributesBuilder().add(Constants.ID, stopId2.toString()).
 				add(Constants.X, "51").add(Constants.Y, "42").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);
 		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
-		Id stopId3 = new IdImpl("stop3");
+		Id<TransitStopFacility> stopId3 = Id.create("stop3", TransitStopFacility.class);
 		atts = new AttributesBuilder().add(Constants.ID, stopId3.toString()).
 				add(Constants.X, "76").add(Constants.Y, "80").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);
 		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
 
 		// now the other stuff
-		Id lineId = new IdImpl("1");
+		Id<TransitLine> lineId = Id.create("1", TransitLine.class);
 		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
 		context.push(Constants.TRANSIT_LINE);
 
-		Id routeId1 = new IdImpl("1");
+		Id<TransitRoute> routeId1 = Id.create("1", TransitRoute.class);
 		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
 		context.push(Constants.TRANSIT_ROUTE);
 
@@ -700,17 +699,17 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testRouteProfileRoute_NoLink() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_SCHEDULE);
 
 		// now the other stuff
-		Id lineId = new IdImpl("1");
+		Id<TransitLine> lineId = Id.create("1", TransitLine.class);
 		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
 		context.push(Constants.TRANSIT_LINE);
 
-		Id routeId1 = new IdImpl("1");
+		Id<TransitRoute> routeId1 = Id.create("1", TransitRoute.class);
 		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
 		context.push(Constants.TRANSIT_ROUTE);
 
@@ -739,28 +738,28 @@ public class TransitScheduleReaderV1Test {
 	public void testRouteProfileRoute_OneLink() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
-		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(10, 5));
-		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(5, 11));
-		Node node3 = network.createAndAddNode(new IdImpl(3), new CoordImpl(5, 11));
-		Node node4 = network.createAndAddNode(new IdImpl(4), new CoordImpl(5, 11));
-		Node node5 = network.createAndAddNode(new IdImpl(5), new CoordImpl(5, 11));
-		/*Link link1 =*/ network.createAndAddLink(new IdImpl(1), node1, node2, 1000, 10.0, 2000.0, 1.0);
-		Link link2 = network.createAndAddLink(new IdImpl(2), node2, node3, 1000, 10.0, 2000.0, 1.0);
-		/*Link link3 =*/network.createAndAddLink(new IdImpl(3), node3, node4, 1000, 10.0, 2000.0, 1.0);
-		/*Link link4 =*/network.createAndAddLink(new IdImpl(4), node4, node5, 1000, 10.0, 2000.0, 1.0);
+		NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(10, 5));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(5, 11));
+		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new CoordImpl(5, 11));
+		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new CoordImpl(5, 11));
+		Node node5 = network.createAndAddNode(Id.create(5, Node.class), new CoordImpl(5, 11));
+		/*Link link1 =*/ network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000, 10.0, 2000.0, 1.0);
+		Link link2 = network.createAndAddLink(Id.create(2, Link.class), node2, node3, 1000, 10.0, 2000.0, 1.0);
+		/*Link link3 =*/network.createAndAddLink(Id.create(3, Link.class), node3, node4, 1000, 10.0, 2000.0, 1.0);
+		/*Link link4 =*/network.createAndAddLink(Id.create(4, Link.class), node4, node5, 1000, 10.0, 2000.0, 1.0);
 
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_SCHEDULE);
 
 		// now the other stuff
-		Id lineId = new IdImpl("1");
+		Id<TransitLine> lineId = Id.create("1", TransitLine.class);
 		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
 		context.push(Constants.TRANSIT_LINE);
 
-		Id routeId1 = new IdImpl("1");
+		Id<TransitRoute> routeId1 = Id.create("1", TransitRoute.class);
 		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
 		context.push(Constants.TRANSIT_ROUTE);
 
@@ -798,28 +797,28 @@ public class TransitScheduleReaderV1Test {
 	public void testRouteProfileRoute_TwoLinks() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
-		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(10, 5));
-		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(5, 11));
-		Node node3 = network.createAndAddNode(new IdImpl(3), new CoordImpl(5, 11));
-		Node node4 = network.createAndAddNode(new IdImpl(4), new CoordImpl(5, 11));
-		Node node5 = network.createAndAddNode(new IdImpl(5), new CoordImpl(5, 11));
-		/*Link link1 =*/network.createAndAddLink(new IdImpl(1), node1, node2, 1000, 10.0, 2000.0, 1.0);
-		/*Link link2 =*/network.createAndAddLink(new IdImpl(2), node2, node3, 1000, 10.0, 2000.0, 1.0);
-		Link link3 = network.createAndAddLink(new IdImpl(3), node3, node4, 1000, 10.0, 2000.0, 1.0);
-		Link link4 = network.createAndAddLink(new IdImpl(4), node4, node5, 1000, 10.0, 2000.0, 1.0);
+		NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(10, 5));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(5, 11));
+		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new CoordImpl(5, 11));
+		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new CoordImpl(5, 11));
+		Node node5 = network.createAndAddNode(Id.create(5, Node.class), new CoordImpl(5, 11));
+		/*Link link1 =*/network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000, 10.0, 2000.0, 1.0);
+		/*Link link2 =*/network.createAndAddLink(Id.create(2, Link.class), node2, node3, 1000, 10.0, 2000.0, 1.0);
+		Link link3 = network.createAndAddLink(Id.create(3, Link.class), node3, node4, 1000, 10.0, 2000.0, 1.0);
+		Link link4 = network.createAndAddLink(Id.create(4, Link.class), node4, node5, 1000, 10.0, 2000.0, 1.0);
 
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_SCHEDULE);
 
 		// now the other stuff
-		Id lineId = new IdImpl("1");
+		Id<TransitLine> lineId = Id.create("1", TransitLine.class);
 		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
 		context.push(Constants.TRANSIT_LINE);
 
-		Id routeId1 = new IdImpl("1");
+		Id<TransitRoute> routeId1 = Id.create("1", TransitRoute.class);
 		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
 		context.push(Constants.TRANSIT_ROUTE);
 
@@ -859,28 +858,28 @@ public class TransitScheduleReaderV1Test {
 	public void testRouteProfileRoute_MoreLinks() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
-		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(10, 5));
-		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(5, 11));
-		Node node3 = network.createAndAddNode(new IdImpl(3), new CoordImpl(5, 11));
-		Node node4 = network.createAndAddNode(new IdImpl(4), new CoordImpl(5, 11));
-		Node node5 = network.createAndAddNode(new IdImpl(5), new CoordImpl(5, 11));
-		Link link1 = network.createAndAddLink(new IdImpl(1), node1, node2, 1000, 10.0, 2000.0, 1.0);
-		Link link2 = network.createAndAddLink(new IdImpl(2), node2, node3, 1000, 10.0, 2000.0, 1.0);
-		Link link3 = network.createAndAddLink(new IdImpl(3), node3, node4, 1000, 10.0, 2000.0, 1.0);
-		Link link4 = network.createAndAddLink(new IdImpl(4), node4, node5, 1000, 10.0, 2000.0, 1.0);
+		NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(10, 5));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(5, 11));
+		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new CoordImpl(5, 11));
+		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new CoordImpl(5, 11));
+		Node node5 = network.createAndAddNode(Id.create(5, Node.class), new CoordImpl(5, 11));
+		Link link1 = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000, 10.0, 2000.0, 1.0);
+		Link link2 = network.createAndAddLink(Id.create(2, Link.class), node2, node3, 1000, 10.0, 2000.0, 1.0);
+		Link link3 = network.createAndAddLink(Id.create(3, Link.class), node3, node4, 1000, 10.0, 2000.0, 1.0);
+		Link link4 = network.createAndAddLink(Id.create(4, Link.class), node4, node5, 1000, 10.0, 2000.0, 1.0);
 
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_SCHEDULE);
 
 		// now the other stuff
-		Id lineId = new IdImpl("1");
+		Id<TransitLine> lineId = Id.create("1", TransitLine.class);
 		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
 		context.push(Constants.TRANSIT_LINE);
 
-		Id routeId1 = new IdImpl("1");
+		Id<TransitRoute> routeId1 = Id.create("1", TransitRoute.class);
 		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
 		context.push(Constants.TRANSIT_ROUTE);
 
@@ -925,15 +924,15 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testDepartures_Single() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_SCHEDULE);
-		Id lineId = new IdImpl("1");
+		Id<TransitLine> lineId = Id.create("1", TransitLine.class);
 		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
 		context.push(Constants.TRANSIT_LINE);
 
-		Id routeId1 = new IdImpl("foo");
+		Id<TransitRoute> routeId1 = Id.create("foo", TransitRoute.class);
 		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
 		context.push(Constants.TRANSIT_ROUTE);
 
@@ -945,7 +944,7 @@ public class TransitScheduleReaderV1Test {
 		reader.startTag(Constants.DEPARTURES, AttributesBuilder.getEmpty(), context); // departures can be empty
 		context.push(Constants.DEPARTURES);
 
-		Id depId1 = new IdImpl("23");
+		Id<Departure> depId1 = Id.create("23", Departure.class);
 		String depTime1 = "07:35:42";
 		reader.startTag(Constants.DEPARTURE, new AttributesBuilder().add(Constants.ID, depId1.toString()).
 				add(Constants.DEPARTURE_TIME, depTime1).get(), context);
@@ -967,15 +966,15 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testDepartures_Multiple() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_SCHEDULE);
-		Id lineId = new IdImpl("1");
+		Id<TransitLine> lineId = Id.create("1", TransitLine.class);
 		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
 		context.push(Constants.TRANSIT_LINE);
 
-		Id routeId1 = new IdImpl("foo");
+		Id<TransitRoute> routeId1 = Id.create("foo", TransitRoute.class);
 		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
 		context.push(Constants.TRANSIT_ROUTE);
 
@@ -987,13 +986,13 @@ public class TransitScheduleReaderV1Test {
 		reader.startTag(Constants.DEPARTURES, AttributesBuilder.getEmpty(), context); // departures can be empty
 		context.push(Constants.DEPARTURES);
 
-		Id depId1 = new IdImpl("23");
+		Id<Departure> depId1 = Id.create("23", Departure.class);
 		String depTime1 = "07:35:42";
 		reader.startTag(Constants.DEPARTURE, new AttributesBuilder().add(Constants.ID, depId1.toString()).
 				add(Constants.DEPARTURE_TIME, depTime1).get(), context);
 		reader.endTag(Constants.DEPARTURE, EMPTY_STRING, context);
 
-		Id depId2 = new IdImpl("42");
+		Id<Departure> depId2 = Id.create("42", Departure.class);
 		String depTime2 = "07:35:42";
 		reader.startTag(Constants.DEPARTURE, new AttributesBuilder().add(Constants.ID, depId2.toString()).
 				add(Constants.DEPARTURE_TIME, depTime2).get(), context);
@@ -1019,15 +1018,15 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testDepartures_withVehicleRef() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_SCHEDULE);
-		Id lineId = new IdImpl("1");
+		Id<TransitLine> lineId = Id.create("1", TransitLine.class);
 		reader.startTag(Constants.TRANSIT_LINE, new AttributesBuilder().add(Constants.ID, lineId.toString()).get(), context);
 		context.push(Constants.TRANSIT_LINE);
 
-		Id routeId1 = new IdImpl("foo");
+		Id<TransitRoute> routeId1 = Id.create("foo", TransitRoute.class);
 		reader.startTag(Constants.TRANSIT_ROUTE, new AttributesBuilder().add(Constants.ID, routeId1.toString()).get(), context);
 		context.push(Constants.TRANSIT_ROUTE);
 
@@ -1039,13 +1038,13 @@ public class TransitScheduleReaderV1Test {
 		reader.startTag(Constants.DEPARTURES, AttributesBuilder.getEmpty(), context); // departures can be empty
 		context.push(Constants.DEPARTURES);
 
-		Id depId1 = new IdImpl("23");
+		Id<Departure> depId1 = Id.create("23", Departure.class);
 		String depTime1 = "07:35:42";
 		reader.startTag(Constants.DEPARTURE, new AttributesBuilder().add(Constants.ID, depId1.toString()).
 				add(Constants.DEPARTURE_TIME, depTime1).add(Constants.VEHICLE_REF_ID, "v 975").get(), context);
 		reader.endTag(Constants.DEPARTURE, EMPTY_STRING, context);
 
-		Id depId2 = new IdImpl("42");
+		Id<Departure> depId2 = Id.create("42", Departure.class);
 		String depTime2 = "07:35:42";
 		reader.startTag(Constants.DEPARTURE, new AttributesBuilder().add(Constants.ID, depId2.toString()).
 				add(Constants.DEPARTURE_TIME, depTime2).get(), context);
@@ -1062,7 +1061,7 @@ public class TransitScheduleReaderV1Test {
 		assertNotNull(dep1);
 		assertEquals(depId1, dep1.getId());
 		assertEquals(Time.parseTime(depTime1), dep1.getDepartureTime(), MatsimTestCase.EPSILON);
-		assertEquals(new IdImpl("v 975"), dep1.getVehicleId());
+		assertEquals(Id.create("v 975", Vehicle.class), dep1.getVehicleId());
 		Departure dep2 = route.getDepartures().get(depId2);
 		assertNotNull(dep2);
 		assertEquals(depId2, dep2.getId());
