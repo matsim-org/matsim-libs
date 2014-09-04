@@ -20,6 +20,12 @@
 
 package org.matsim.core.events;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.gbl.Gbl;
+
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +35,6 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.gbl.Gbl;
 
 /**
  * An EventsHandler that handles all occurring Events in separate Threads.
@@ -184,7 +184,7 @@ public class SimStepParallelEventsManagerImpl implements EventsManager {
 		 */
 		if (!hadException.get()) {
 			try {
-				this.processEvent(new LastEventOfIteration(Double.MAX_VALUE));
+				this.processEvent(new LastEventOfIteration(Double.POSITIVE_INFINITY));
 				iterationEndBarrier.await();
 			} catch (InterruptedException e) {
 				this.hadException.set(true);
