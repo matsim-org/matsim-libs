@@ -25,11 +25,19 @@ package playground.jjoubert.projects.gfipAnalysis;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.counts.Count;
+import org.matsim.counts.Counts;
+import org.matsim.counts.CountsWriter;
+import org.matsim.counts.Volume;
 
 import playground.southafrica.utilities.Header;
 
@@ -51,7 +59,9 @@ public class ScanGantryData {
 		Header.printHeader(ScanGantryData.class.toString(), args);
 		
 		String input = args[0];
-		parse(input);
+		String output = args[1];
+//		parse(input);
+		buildCounts(input, output);
 		
 		Header.printFooter();
 	}
@@ -108,6 +118,82 @@ public class ScanGantryData {
 		for(String s : gantries){
 			LOG.info("       " + s);
 		}
+	}
+	
+	public static void buildCounts(String inputfile, String outputFile){
+		Map<String, Counts> countMap = new HashMap<String, Counts>();
+		LOG.info("Parsing " + inputfile);
+		Counter counter = new Counter("   lines # ");
+		
+		BufferedReader br = IOUtils.getBufferedReader(inputfile);
+		try{
+			String line = br.readLine(); /* Header */
+			String s_vlnClass = null;
+			String s_gantry = null;
+			while((line = br.readLine()) != null){
+				String[] sa = line.split(",");
+				s_vlnClass = sa[2];
+				if(s_vlnClass == " " | s_vlnClass == "" || s_vlnClass == null){
+					LOG.debug("What's going on here?");
+				}
+
+				/* Initialise the Counts container if it doesn't exist yet. */
+				if(!countMap.containsKey(s_vlnClass)){
+					Counts counts = new Counts();
+					counts.setYear(2014);
+					counts.setName(s_vlnClass);
+					counts.setDescription("GFIP gantry counts.");
+					countMap.put(s_vlnClass, counts);
+				}
+				Counts counts = countMap.get(s_vlnClass);
+				
+				s_gantry = sa[3];
+				/* The name of the gantry starts with '1'. This portion of the 
+				 * code converts it to start with 'TG'. */
+				s_gantry = "TG" + s_gantry.substring(1, 4);
+				
+				Id gantryId = new IdImpl(s_gantry);
+				/* Initialise the gantry if it doesn't exist yet. */
+				Count count = null;
+				if(counts.getCount(gantryId) == null){
+					count = counts.createAndAddCount(gantryId, s_gantry);
+				}
+				count = counts.getCount(gantryId);
+				
+				/* Establish the hour. MATSim assume 1 is the 'first' hour. */
+				int hour = Integer.parseInt(sa[1].substring(11, 13)) + 1;
+
+				/* Initialise the hour count if it doesn't exist yet. */
+				Volume volume = null;
+				if(count.getVolume(hour) == null){
+					volume = count.createVolume(hour, 0.0);
+				}
+				volume = count.getVolume(hour);
+				volume.setValue(volume.getValue() + 1.0);
+				
+				counter.incCounter();
+			}
+			counter.printCounter();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot read from " + inputfile);
+		}finally{
+			try {
+				br.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + inputfile);
+			}
+		}
+		LOG.info("Done parsing " + inputfile);
+		
+		LOG.info("Writing counts to file");
+		for(String vehicleClass : countMap.keySet()){
+			Counts counts = countMap.get(vehicleClass);
+			new CountsWriter(counts).write(outputFile + (outputFile.endsWith("/") ? "" : "/") + "counts_" + vehicleClass + ".xml");
+		}
+		
+		
 	}
 
 }
