@@ -7,6 +7,12 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
 import org.matsim.core.mobsim.qsim.QSimFactory;
+
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+
+
 import playground.pieter.pseudosimulation.controler.PSimControler;
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
 
@@ -114,15 +120,15 @@ public class MobSimSwitcher implements ControlerListener,
 					// controler.setMobsimFactory(new MentalSimFactory(ttcalc));
 				} else if (mobsim.equals("jdeqsim")) {
 					matsimControler.setMobsimFactory(new JDEQSimulationFactory());
-				} else {
-					matsimControler.setMobsimFactory(new QSimFactory());
-				}
+
+				} 
+
 			} else {
 				matsimControler.setMobsimFactory(new QSimFactory());
 			}
 		} else {
 			log.info("Running PSim");
-			matsimControler.setMobsimFactory(new PSimFactory( psimControler));
+			matsimControler.setMobsimFactory(new PSimFactory( ));
 			psimControler.clearPlansForPseudoSimulation();
 
 		}
