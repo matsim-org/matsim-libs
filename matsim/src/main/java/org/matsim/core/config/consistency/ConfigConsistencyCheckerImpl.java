@@ -26,7 +26,6 @@ import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -71,12 +70,6 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 		}
 
 		// older checks, valid for the implicit mobsim selection by putting in the corresponding config group.
-		if ( config.getModule(SimulationConfigGroup.GROUP_NAME) !=null ) {
-			if (!config.controler().getMobsim().equals(MobsimType.queueSimulation.toString())) {
-				throw new RuntimeException("You have a 'simulation' config group, but have not set " +
-						"the mobsim type to 'queueSimulation'. Aborting...");
-			}
-		}
 		if ( config.getModule("JDEQSim")!=null ) {
 			if (!config.controler().getMobsim().equals(MobsimType.JDEQSim.toString())) {
 				throw new RuntimeException("You have a 'JDEQSim' config group, but have not set " +

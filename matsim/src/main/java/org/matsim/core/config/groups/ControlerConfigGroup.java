@@ -20,17 +20,11 @@
 
 package org.matsim.core.config.groups;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
+
+import java.util.*;
 
 public class ControlerConfigGroup extends Module {
 
@@ -52,7 +46,7 @@ public class ControlerConfigGroup extends Module {
 	private static final String WRITE_PLANS_INTERVAL = "writePlansInterval";
 
 	/*package*/ static final String MOBSIM = "mobsim";
-	public enum MobsimType {queueSimulation, qsim, JDEQSim}
+	public enum MobsimType {qsim, JDEQSim}
 
     public static final String WRITE_SNAPSHOTS_INTERVAL = "writeSnapshotsInterval";
 
@@ -81,50 +75,53 @@ public class ControlerConfigGroup extends Module {
 
 	@Override
 	public String getValue(final String key) {
-		if (OUTPUT_DIRECTORY.equals(key)) {
-			return getOutputDirectory();
-		} else if (FIRST_ITERATION.equals(key)) {
-			return Integer.toString(getFirstIteration());
-		} else if (LAST_ITERATION.equals(key)) {
-			return Integer.toString(getLastIteration());
-		} else if (ROUTINGALGORITHM_TYPE.equals(key)){
-			return this.getRoutingAlgorithmType().toString();
-		} else if (RUNID.equals(key)){
-			return this.getRunId();
-		} else if (LINKTOLINK_ROUTING_ENABLED.equals(key)){
-			return Boolean.toString(this.linkToLinkRoutingEnabled);
-		} else if (EVENTS_FILE_FORMAT.equals(key)) {
-			boolean isFirst = true;
-			StringBuilder str = new StringBuilder();
-			for (EventsFileFormat format : this.eventsFileFormats) {
-				if (!isFirst) {
-					str.append(',');
-				}
-				str.append(format.toString());
-				isFirst = false;
-			}
-			return str.toString();
-		} else if (WRITE_EVENTS_INTERVAL.equals(key)) {
-			throw new RuntimeException("use direct getter.  Aborting ..." ) ;
+        switch (key) {
+            case OUTPUT_DIRECTORY:
+                return getOutputDirectory();
+            case FIRST_ITERATION:
+                return Integer.toString(getFirstIteration());
+            case LAST_ITERATION:
+                return Integer.toString(getLastIteration());
+            case ROUTINGALGORITHM_TYPE:
+                return this.getRoutingAlgorithmType().toString();
+            case RUNID:
+                return this.getRunId();
+            case LINKTOLINK_ROUTING_ENABLED:
+                return Boolean.toString(this.linkToLinkRoutingEnabled);
+            case EVENTS_FILE_FORMAT: {
+                boolean isFirst = true;
+                StringBuilder str = new StringBuilder();
+                for (EventsFileFormat format : this.eventsFileFormats) {
+                    if (!isFirst) {
+                        str.append(',');
+                    }
+                    str.append(format.toString());
+                    isFirst = false;
+                }
+                return str.toString();
+            }
+            case WRITE_EVENTS_INTERVAL:
+                throw new RuntimeException("use direct getter.  Aborting ...");
 //			return Integer.toString(getWriteEventsInterval());
-		} else if (MOBSIM.equals(key)) {
-			return getMobsim();
-		} else if (SNAPSHOT_FORMAT.equals(key)) {
-			boolean isFirst = true;
-			StringBuilder str = new StringBuilder();
-			for (String format : this.snapshotFormat) {
-				if (!isFirst) {
-					str.append(',');
-				}
-				str.append(format);
-				isFirst = false;
-			}
-			return str.toString();
-		} else if (WRITE_SNAPSHOTS_INTERVAL.equals(key)){
-			return Integer.toString(this.getWriteSnapshotsInterval());
-		} else {
-			throw new IllegalArgumentException(key);
-		}
+            case MOBSIM:
+                return getMobsim();
+            case SNAPSHOT_FORMAT: {
+                boolean isFirst = true;
+                StringBuilder str = new StringBuilder();
+                for (String format : this.snapshotFormat) {
+                    if (!isFirst) {
+                        str.append(',');
+                    }
+                    str.append(format);
+                    isFirst = false;
+                }
+                return str.toString();
+            }
+            case WRITE_SNAPSHOTS_INTERVAL:
+                return Integer.toString(this.getWriteSnapshotsInterval());
+            default:
+                throw new IllegalArgumentException(key);
+        }
 	}
 
 	@Override
@@ -175,7 +172,7 @@ public class ControlerConfigGroup extends Module {
 			setMobsim(value);
 		} else if (SNAPSHOT_FORMAT.equals(key)) {
 			String[] parts = StringUtils.explode(value, ',');
-			Set<String> formats = new HashSet<String>();
+			Set<String> formats = new HashSet<>();
 			for (String part : parts) {
 				String trimmed = part.trim();
 				if (trimmed.length() > 0) {
@@ -192,7 +189,7 @@ public class ControlerConfigGroup extends Module {
 
 	@Override
 	public final TreeMap<String, String> getParams() {
-		TreeMap<String, String> map = new TreeMap<String, String>();
+		TreeMap<String, String> map = new TreeMap<>();
 		map.put(OUTPUT_DIRECTORY, getValue(OUTPUT_DIRECTORY));
 		map.put(FIRST_ITERATION, getValue(FIRST_ITERATION));
 		map.put(LAST_ITERATION, getValue(LAST_ITERATION));
@@ -231,8 +228,7 @@ public class ControlerConfigGroup extends Module {
 		}
 		map.put(MOBSIM, "Defines which mobility simulation will be used. Currently supported: " + mobsimTypes + IOUtils.NATIVE_NEWLINE + "\t\t" +
 				"Depending on the chosen mobsim, you'll have to add additional config modules to configure the corresponding mobsim." + IOUtils.NATIVE_NEWLINE + "\t\t" +
-				"For 'qsim', add a module 'qsim' to the config." + IOUtils.NATIVE_NEWLINE + "\t\t" +
-				"For 'queueSimulation', add a module 'simulation' to the config.");
+				"For 'qsim', add a module 'qsim' to the config.");
 		
 		map.put(SNAPSHOT_FORMAT, "Comma-separated list of visualizer output file formats. `transims', `googleearth', and `otfvis'.");
 		map.put(WRITE_SNAPSHOTS_INTERVAL, "iterationNumber % " + WRITE_SNAPSHOTS_INTERVAL + " == 0 defines in which iterations snapshots are written " +
@@ -297,13 +293,9 @@ public class ControlerConfigGroup extends Module {
 	public void setEventsFileFormats(final Set<EventsFileFormat> eventsFileFormats) {
 		this.eventsFileFormats = Collections.unmodifiableSet(EnumSet.copyOf(eventsFileFormats));
 	}
-	
-	/** See "getComments()" for options.
-	 *
-	 * @param snapshotFormat
-	 */
+
 	public void setSnapshotFormat(final Collection<String> snapshotFormat) {
-		this.snapshotFormat = Collections.unmodifiableSet(new HashSet<String>(snapshotFormat));
+		this.snapshotFormat = Collections.unmodifiableSet(new HashSet<>(snapshotFormat));
 	}
 
 	public Collection<String> getSnapshotFormat() {
