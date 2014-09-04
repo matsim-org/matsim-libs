@@ -25,12 +25,12 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.southafrica.utilities.grid.GeneralGrid.GridType;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
@@ -42,73 +42,105 @@ public class GeneralGridTest {
 	
 	@Test
 	public void testConstructor(){
-		GeneralGrid g1 = new GeneralGrid(10, 1);
+		GeneralGrid g1 = new GeneralGrid(10, GridType.SQUARE);
 		Assert.assertTrue("Wrong grid type.", g1.getGridType() == GridType.SQUARE);
-		GeneralGrid g2 = new GeneralGrid(10, 2);
+		GeneralGrid g2 = new GeneralGrid(10, GridType.HEX);
 		Assert.assertTrue("Wrong grid type.", g2.getGridType() == GridType.HEX);
-		GeneralGrid g3 = new GeneralGrid(10, 3);
+		GeneralGrid g3 = new GeneralGrid(10, GridType.UNKNOWN);
 		Assert.assertTrue("Wrong grid type.", g3.getGridType() == GridType.UNKNOWN);
 	}
 	
 	@Test
 	public void testGenerateGrid_Square(){
 		Polygon p = buildDummyPolygon();
-		GeneralGrid g1 = new GeneralGrid(10.0, 1);
+		GeneralGrid g1 = new GeneralGrid(10.0, GridType.SQUARE);
 		g1.generateGrid(p);
 		
-		QuadTree<Tuple<String,Point>> qt1 = g1.getGrid();
-		Assert.assertEquals("Wrong number of cells.", 100, qt1.size());
+		QuadTree<Point> qt1 = g1.getGrid();
+		Assert.assertEquals("Wrong number of cells.", 121, qt1.size());
 		
-		/* Cell (0,0) */
-		Tuple<String, Point> t00 = qt1.get(0.5, 0.5);
-		Assert.assertTrue("Wrong cell (0,0).", ((String)t00.getFirst()).equalsIgnoreCase("0_0"));
-		Assert.assertEquals("Wrong x-coordinate for (0,0)", 5, t00.getSecond().getX(), delta);
-		Assert.assertEquals("Wrong y-coordinate for (0,0)", 5, t00.getSecond().getY(), delta);
-		
-		/* Cell (9,9) */
-		Tuple<String, Point> t1010 = qt1.get(95, 95);
-		Assert.assertTrue("Wrong cell (9,9).", ((String)t1010.getFirst()).equalsIgnoreCase("9_9"));
-		Assert.assertEquals("Wrong x-coordinate for (9,9)", 95, t1010.getSecond().getX(), delta);
-		Assert.assertEquals("Wrong y-coordinate for (9,9)", 95, t1010.getSecond().getY(), delta);
+		/* Cell at (0,0) */
+		Point p1 = p.getFactory().createPoint(new Coordinate(0.0, 0.0));
+		Assert.assertEquals("Points should be at the same location.", 0.0, p1.distance(qt1.get(0.0, 0.0)), delta);
+		/* Cell at (10,10) */
+		Point p2 = p.getFactory().createPoint(new Coordinate(10.0, 10.0));
+		Assert.assertEquals("Points should be at the same location.", 0.0, p2.distance(qt1.get(10.0, 10.0)), delta);
 	}
 
 	@Test
 	public void testGenerateGrid_Hex(){
 		Polygon p = buildDummyPolygon();
-		GeneralGrid g1 = new GeneralGrid(10.0, 2);
+		GeneralGrid g1 = new GeneralGrid(10.0, GridType.HEX);
 		g1.generateGrid(p);
 		
-		QuadTree<Tuple<String,Point>> qt1 = g1.getGrid();
-		Assert.assertEquals("Wrong number of cells.", 143, qt1.size());
+		QuadTree<Point> qt1 = g1.getGrid();
+		Assert.assertEquals("Wrong number of cells.", 168, qt1.size());
 		
-		/* Cell (0,0) */
-		Tuple<String, Point> t00 = qt1.get(0.5, 0.5);
-		Assert.assertTrue("Wrong cell (0,0).", ((String)t00.getFirst()).equalsIgnoreCase("0_0"));
-		Assert.assertEquals("Wrong x-coordinate for (0,0)", 5, t00.getSecond().getX(), delta);
-		Assert.assertEquals("Wrong y-coordinate for (0,0)", 5, t00.getSecond().getY(), delta);
+		/* Cell at (0,0) */
+		Point p1 = p.getFactory().createPoint(new Coordinate(0.0, 0.0));
+		Assert.assertEquals("Points should be at the same location.", 0.0, p1.distance(qt1.get(0.0, 0.0)), delta);
 		
-		/* Cell (10,12) */
-		Tuple<String, Point> t1010 = qt1.get(95, 95);
-		Assert.assertTrue("Wrong cell (10,12).", ((String)t1010.getFirst()).equalsIgnoreCase("10_12"));
-		double dx = 0.5*10 + 12*((3.0/4.0)*10);
-		Assert.assertEquals("Wrong x-coordinate for (10,12)", dx, t1010.getSecond().getX(), delta);
-		double dy = 0.5*10 + 10*(Math.sqrt(3.0)/2*10);
-		Assert.assertEquals("Wrong y-coordinate for (10,12)", dy, t1010.getSecond().getY(), delta);
+		/* Cell at (10,0) */
+		Point p2 = p.getFactory().createPoint(new Coordinate(7.5, ( Math.sqrt(3.0) / 2 ) * 5.0));
+		Assert.assertEquals("Points should be at the same location.", 0.0, p2.distance(qt1.get(7.5, ( Math.sqrt(3.0) / 2 ) * 5.0)), delta);
 	}
 	
 	@Test
 	public void testWriteGrid(){
 		Polygon p = buildDummyPolygon();
-		GeneralGrid g1 = new GeneralGrid(10.0, 1);
+		GeneralGrid g1 = new GeneralGrid(10.0, GridType.SQUARE);
 		g1.generateGrid(p);
-		g1.writeGrid(utils.getOutputDirectory());
+		g1.writeGrid(utils.getOutputDirectory(), null);
 		Assert.assertTrue("File does not exist.", new File(utils.getOutputDirectory() + "/SQUARE.csv").exists());
 
-		GeneralGrid g2 = new GeneralGrid(10.0, 2);
+		GeneralGrid g2 = new GeneralGrid(10.0, GridType.HEX);
 		g2.generateGrid(p);
-		g2.writeGrid(utils.getOutputDirectory());
+		g2.writeGrid(utils.getOutputDirectory(), null);
 		Assert.assertTrue("File does not exist.", new File(utils.getOutputDirectory() + "/HEX.csv").exists());
 	}
+	
+	@Test
+	public void testGetGeometrySquare(){
+		Polygon p = buildDummyPolygon();
+		GeneralGrid g1 = new GeneralGrid(10.0, GridType.SQUARE);
+		g1.generateGrid(p);
+		GeometryFactory gf = p.getFactory();
+		
+		/* Try lower left corner. */
+		Coordinate c1 = new Coordinate(-5.0, -5.0);
+		Coordinate c2 = new Coordinate(-5.0, 5.0);
+		Coordinate c3 = new Coordinate(5.0, 5.0);
+		Coordinate c4 = new Coordinate(5.0, -5.0);
+		Coordinate[] ca = {c1, c2, c3, c4, c1};
+		Polygon pTest = gf.createPolygon(ca);
+		Geometry g = g1.getCellGeometry(gf.createPoint(new Coordinate(0.0, 0.0)));
+		Assert.assertEquals("Wrong polygon object.", pTest, g);
+	}
+	
+	@Test
+	public void testGetGeometryHex(){
+		Polygon p = buildDummyPolygon();
+		GeneralGrid g1 = new GeneralGrid(10.0, GridType.HEX);
+		g1.generateGrid(p);
+		GeometryFactory gf = p.getFactory();
+		
+		/* Try lower left corner. */
+		double w = 0.5*10.0;
+		double h = Math.sqrt(3.0)/2.0 * w;
+		
+		Coordinate c1 = new Coordinate(-w, 0.0);
+		Coordinate c2 = new Coordinate(-0.5*w, h);
+		Coordinate c3 = new Coordinate(0.5*w, h);
+		Coordinate c4 = new Coordinate(w, 0.0);
+		Coordinate c5 = new Coordinate(0.5*w, -h);
+		Coordinate c6 = new Coordinate(-0.5*w, -h);
+		
+		Coordinate[] ca = {c1, c2, c3, c4, c5, c6, c1};
+		Polygon pTest = gf.createPolygon(ca);
+		Geometry g = g1.getCellGeometry(gf.createPoint(new Coordinate(0.0, 0.0)));
+		Assert.assertEquals("Wrong polygon object.", pTest, g);
+	}
+	
 	
 	private Polygon buildDummyPolygon(){
 		GeometryFactory gf = new GeometryFactory();
