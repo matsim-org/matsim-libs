@@ -60,7 +60,8 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	private boolean isNamespaceAware = true;
 
 	private String localDtdBase = "dtd";
-	private String localDtdBase2 = "src/main/resources/dtd";
+	
+	private boolean preferLocalDtds = false;
 
 	private String doctype = null;
 	/**
@@ -78,6 +79,10 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 
 	public MatsimXmlParser(final boolean validateXml) {
 		this.isValidating = validateXml;
+		String localDtd = System.getProperty("matsim.preferLocalDtds");
+		if (localDtd != null) {
+			this.preferLocalDtds = Boolean.parseBoolean(localDtd);
+		}
 	}
 
 	/**
@@ -214,16 +219,48 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 			setDoctype(shortSystemId);
 		}
 
-		// try to get the dtd from the web
-		log.info("Trying to load " + systemId + ". In some cases (e.g. network interface up but no connection), this may take a bit.");
-		try {
-			URL url = new URL(systemId);
-      URLConnection urlConn = url.openConnection();
-      urlConn.setConnectTimeout(5000);
-      urlConn.setReadTimeout(5000);
-      urlConn.setAllowUserInteraction(false);         
+		InputSource source;
+		if (this.preferLocalDtds) {
+			source = findDtdInLocalFilesystem(shortSystemId);
+			if (source == null) {
+				source = findDtdInClasspath(shortSystemId);
+			}
+			if (source == null) {
+				source = findDtdInDefaultLocation(shortSystemId);
+			}
+			if (source == null) {
+				source = findDtdInRemoteLocation(systemId);
+			}
+		} else {
+			source = findDtdInRemoteLocation(systemId);
+			if (source == null) {
+				source = findDtdInLocalFilesystem(shortSystemId);
+			}
+			if (source == null) {
+				source = findDtdInClasspath(shortSystemId);
+			}
+			if (source == null) {
+				source = findDtdInDefaultLocation(shortSystemId);
+			}
+		}
 
-      InputStream is = urlConn.getInputStream();
+		if (source == null) {
+			// We could neither get the remote nor the local version of the dtd, show a warning
+			log.warn("Could neither get the DTD from the web nor a local one. " + systemId);
+		}
+		return source;
+	}
+
+	private InputSource findDtdInRemoteLocation(final String fullSystemId) {
+		log.info("Trying to load " + fullSystemId + ". In some cases (e.g. network interface up but no connection), this may take a bit.");
+		try {
+			URL url = new URL(fullSystemId);
+			URLConnection urlConn = url.openConnection();
+			urlConn.setConnectTimeout(5000);
+			urlConn.setReadTimeout(5000);
+			urlConn.setAllowUserInteraction(false);         
+			
+			InputStream is = urlConn.getInputStream();
 			/* If there was no exception until here, than the path is valid.
 			 * Return the opened stream as a source. If we would return null, then the SAX-Parser
 			 * would have to fetch the same file again, requiring two accesses to the webserver */
@@ -232,7 +269,10 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 			// There was a problem getting the (remote) file, just show the error as information for the user
 			log.info(e.toString() + ". May not be fatal, will try to load it locally.");
 		}
-		// systemId could not be resolved, try it locally
+		return null;
+	}
+	
+	private InputSource findDtdInLocalFilesystem(final String shortSystemId) {
 		if (this.localDtdBase != null) {
 			String localFileName = this.localDtdBase + "/" + shortSystemId;
 			File dtdFile = new File(localFileName);
@@ -242,34 +282,26 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 				return new InputSource(dtdFile.getAbsolutePath());
 			}
 		}
-
-		// added by kai; ???  jan'14
-		{
-			String localFileName = this.localDtdBase2 + "/" + shortSystemId;
-			File dtdFile = new File(localFileName);
-			log.debug("dtdfile: " + dtdFile.getAbsolutePath());
-			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
-				log.info("Using the local DTD " + localFileName);
-				return new InputSource(dtdFile.getAbsolutePath());
-			}
-		}
-
+		return null;
+	}
+	
+	private InputSource findDtdInClasspath(final String shortSystemId) {
 		// still no success, try to load it with the ClassLoader, in case we're stuck in a jar...
 		InputStream stream = this.getClass().getResourceAsStream("/dtd/" + shortSystemId);
 		if (stream != null) {
-			log.info("Using local DTD from jar-file " + shortSystemId);
+			log.info("Using local DTD from classpath: /dtd/" + shortSystemId);
 			return new InputSource(stream);
 		}
-
+		return null;
+	}
+	
+	private InputSource findDtdInDefaultLocation(final String shortSystemId) {
 		log.info("Trying to access local dtd folder at standard location ./dtd...");
 		File dtdFile = new File("./dtd/" + shortSystemId);
 		if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
 			log.info("Using the local DTD " + dtdFile.getAbsolutePath());
 			return new InputSource(dtdFile.getAbsolutePath());
 		}
-
-		// We could neither get the remote nor the local version of the dtd, show a warning
-		log.warn("Could neither get the DTD from the web nor a local one. " + systemId);
 		return null;
 	}
 
