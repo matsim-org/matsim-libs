@@ -82,7 +82,7 @@ public class GautengControler_subpopulations {
 
 	static final String RE_ROUTE_AND_SET_VEHICLE = "ReRouteAndSetVehicle";
 	public static final String VEH_ID = "TransportModeToVehicleIdMap" ;
-	final static String planSelectorFactoryName = "DiversityGeneratingPlansRemover";
+	final static String DIVERSITY_GENERATING_PLANS_REMOVER = "DiversityGeneratingPlansRemover";
 
 	public static enum User { johan, kai } ;
 	private static User user = User.johan ;
@@ -149,7 +149,7 @@ public class GautengControler_subpopulations {
 		// yy is the mobsim really assigning the vehicles from the vehicles file?
 
 		GautengUtils.assignSubpopulationStrategies(config);
-		config.strategy().setPlanSelectorForRemoval(planSelectorFactoryName);
+		config.strategy().setPlanSelectorForRemoval(DIVERSITY_GENERATING_PLANS_REMOVER);
 
 //		config.planCalcScore().setBrainExpBeta(1.0); // is now default
 		config.controler().setWritePlansInterval(100);
@@ -178,7 +178,7 @@ public class GautengControler_subpopulations {
 		config.qsim().setStuckTime(10.);
 //		config.qsim().setRemoveStuckVehicles(false); // this is now default
 
-		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true); // test.  I don't think that this is needed. kai, aug'14
+//		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true); // test.  I don't think that this is needed. kai, aug'14
 
 		config.controler().setWriteSnapshotsInterval(0);
 		
@@ -252,7 +252,7 @@ public class GautengControler_subpopulations {
 		builder.setSameModePenalty(5.);
 		builder.setSameRoutePenalty(5.);
 		builder.setActTimeParameter(0.);
-		controler.addPlanSelectorFactory(planSelectorFactoryName, builder );
+		controler.addPlanSelectorFactory(DIVERSITY_GENERATING_PLANS_REMOVER, builder );
 		// yyyy needs to be tested.  But in current runs, all plans of an agent are exactly identical at end of 1000it.  kai, mar'13
 		
 		// ADDITIONAL ANALYSIS:
