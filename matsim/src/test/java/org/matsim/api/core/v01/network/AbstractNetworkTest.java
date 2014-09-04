@@ -131,7 +131,7 @@ public abstract class AbstractNetworkTest {
 			}
 
 			NetworkFactory f = this.network.getFactory();
-			Node[] nodes = new Node[8];
+			Node[] nodes = new Node[9];
 			this.network.addNode(nodes[1] = f.createNode(this.nodeIds[1], new CoordImpl(100, 200)));
 			this.network.addNode(nodes[2] = f.createNode(this.nodeIds[2], new CoordImpl(200, 200)));
 			this.network.addNode(nodes[3] = f.createNode(this.nodeIds[3], new CoordImpl(  0,   0)));
