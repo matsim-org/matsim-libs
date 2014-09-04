@@ -19,17 +19,13 @@
  * *********************************************************************** */
 package org.matsim.core.config.groups;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.collections.CollectionUtils;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Config Module for PlansCalcRoute class.
@@ -61,8 +57,8 @@ public class PlansCalcRouteConfigGroup extends Module {
 	
 	private double beelineDistanceFactor = 1.3;
 	private Collection<String> networkModes = Arrays.asList(TransportMode.car, TransportMode.ride); 
-	private Map<String, Double> teleportedModeSpeeds = new HashMap<String, Double>();
-	private Map<String, Double> teleportedModeFreespeedFactors = new HashMap<String, Double>();
+	private Map<String, Double> teleportedModeSpeeds = new HashMap<>();
+	private Map<String, Double> teleportedModeFreespeedFactors = new HashMap<>();
 
 	private boolean defaultsCleared = false;
 	

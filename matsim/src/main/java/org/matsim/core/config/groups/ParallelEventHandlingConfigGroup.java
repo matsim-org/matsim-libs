@@ -59,29 +59,32 @@ public class ParallelEventHandlingConfigGroup extends Module {
 
 	@Override
 	public void addParam(final String key, final String value) {
-		if ( NUMBER_OF_THREADS.equals(key) ) {
-			this.setNumberOfThreads(Integer.parseInt(value)); 
-		} else if ( ESTIMATED_NUMBER_OF_EVENTS.equals(key) ) {
-			this.setEstimatedNumberOfEvents(Long.parseLong(value)); 
-		} else if ( SYNCHRONIZE_ON_SIMSTEPS.equals(key)) {
-			this.setSynchronizeOnSimSteps(Boolean.parseBoolean(value));
-		}
-		else {
-			throw new IllegalArgumentException(key);
-		}
+        switch (key) {
+            case NUMBER_OF_THREADS:
+                this.setNumberOfThreads(Integer.parseInt(value));
+                break;
+            case ESTIMATED_NUMBER_OF_EVENTS:
+                this.setEstimatedNumberOfEvents(Long.parseLong(value));
+                break;
+            case SYNCHRONIZE_ON_SIMSTEPS:
+                this.setSynchronizeOnSimSteps(Boolean.parseBoolean(value));
+                break;
+            default:
+                throw new IllegalArgumentException(key);
+        }
 	}
 
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
-		comments.put(NUMBER_OF_THREADS, "number of threads for parallel events handler.  0 or null means parallel events handler is disabled");
-		comments.put(ESTIMATED_NUMBER_OF_EVENTS, "estimated number of events during mobsim run, useful for configuration");
+		comments.put(NUMBER_OF_THREADS, "Number of threads for parallel events handler. 0 or null means the framework decides by itself.");
+		comments.put(ESTIMATED_NUMBER_OF_EVENTS, "Estimated number of events during mobsim run. An optional optimization hint for the framework.");
 		return comments;
 	}
 
 	@Override
 	public final TreeMap<String, String> getParams() {
-		TreeMap<String, String> map = new TreeMap<String, String>();
+		TreeMap<String, String> map = new TreeMap<>();
 		map.put(NUMBER_OF_THREADS, this.getNumberOfThreads() == null ? null : this.getNumberOfThreads().toString());
 		map.put(ESTIMATED_NUMBER_OF_EVENTS, this.getEstimatedNumberOfEvents() == null ? null : this.getEstimatedNumberOfEvents().toString());
 		return map;
