@@ -47,6 +47,7 @@ import playground.southafrica.freight.digicore.io.DigicoreVehicleReader_v1;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 import playground.southafrica.utilities.grid.GeneralGrid;
+import playground.southafrica.utilities.grid.GeneralGrid.GridType;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -74,10 +75,10 @@ public class ExtractActivityDensitiesForCapeTown {
 		MultiPolygon area = msr.readMultiPolygon();
 		
 		/* Convert shapefile to hexagonal grid shapes. */
-		GeneralGrid gg = new GeneralGrid(zoneWidth, 2);
+		GeneralGrid gg = new GeneralGrid(zoneWidth, GridType.HEX);
 		gg.generateGrid(area);
-		gg.writeGrid(outputFolder);
-		QuadTree<Tuple<String, Point>> grid = gg.getGrid();
+		gg.writeGrid(outputFolder, "WGS84_SA_Albers");
+		QuadTree<Point> grid = gg.getGrid();
 		
 		/* Perform the analysis */
 		Counter counter = new Counter("   vehicles # ");
@@ -87,45 +88,46 @@ public class ExtractActivityDensitiesForCapeTown {
 		ExecutorService threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
 		List<Future<Map<String, Integer>>> jobs = new ArrayList<Future<Map<String,Integer>>>();
 		
-		LOG.info("Processing vehicle files...");
-		for(File f : vehicleFiles){
-			Callable<Map<String, Integer>> job = new VehicleActivityDensityAnalyser(grid, f, counter, zoneWidth);
-			Future<Map<String, Integer>> result = threadExecutor.submit(job);
-			jobs.add(result);
-		}
-		counter.printCounter();
-		LOG.info("Done processing vehicle files...");
-		
-		threadExecutor.shutdown();
-		while(!threadExecutor.isTerminated()){
-		}
-
-		/* Consolidate the output */
-		LOG.info("Consolidating output...");
-		Map<String, Integer> zoneCounts = new HashMap<String, Integer>();
-		for(Future<Map<String, Integer>> future : jobs){
-			/* Get the job's results. */
-			Map<String, Integer> map = null;
-			try {
-				map = future.get();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
-			}
-			
-			for(String zone : map.keySet()){
-				if(!zoneCounts.containsKey(zone)){
-					zoneCounts.put(zone, map.get(zone));
-				} else{
-					int oldValue = zoneCounts.get(zone);
-					zoneCounts.put(zone, oldValue + map.get(zone));
-				}
-			}
-		}
-		LOG.info("Done consolidating output...");
-
-		writeCountsToFile(outputFolder + "zoneCounts.csv", zoneCounts);
+		/*FIXME Must redo this with the new GeneralGrid code... */
+//		LOG.info("Processing vehicle files...");
+//		for(File f : vehicleFiles){
+//			Callable<Map<String, Integer>> job = new VehicleActivityDensityAnalyser(grid, f, counter, zoneWidth);
+//			Future<Map<String, Integer>> result = threadExecutor.submit(job);
+//			jobs.add(result);
+//		}
+//		counter.printCounter();
+//		LOG.info("Done processing vehicle files...");
+//		
+//		threadExecutor.shutdown();
+//		while(!threadExecutor.isTerminated()){
+//		}
+//
+//		/* Consolidate the output */
+//		LOG.info("Consolidating output...");
+//		Map<String, Integer> zoneCounts = new HashMap<String, Integer>();
+//		for(Future<Map<String, Integer>> future : jobs){
+//			/* Get the job's results. */
+//			Map<String, Integer> map = null;
+//			try {
+//				map = future.get();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			} catch (ExecutionException e) {
+//				e.printStackTrace();
+//			}
+//			
+//			for(String zone : map.keySet()){
+//				if(!zoneCounts.containsKey(zone)){
+//					zoneCounts.put(zone, map.get(zone));
+//				} else{
+//					int oldValue = zoneCounts.get(zone);
+//					zoneCounts.put(zone, oldValue + map.get(zone));
+//				}
+//			}
+//		}
+//		LOG.info("Done consolidating output...");
+//
+//		writeCountsToFile(outputFolder + "zoneCounts.csv", zoneCounts);
 		
 		Header.printFooter();
 	}
