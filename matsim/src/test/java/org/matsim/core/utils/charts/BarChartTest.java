@@ -40,6 +40,8 @@ public class BarChartTest extends MatsimTestCase {
 	 * @throws IOException possible exception when reading the image for validation
 	 */
 	public void testBarChartDemo() throws IOException {
+		System.setProperty("java.awt.headless", "true"); 
+		
 		String imageFilename = getOutputDirectory() + "barchart.png";
 		Demo demo = new Demo();
 		demo.createBarChart(imageFilename);
