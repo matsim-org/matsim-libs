@@ -52,6 +52,8 @@ public class ScenarioImpl implements Scenario {
 	// setting this to final lead to 97 compile errors (many of them IMO multiple error messages of the same problem). kai, feb'14
 
 	private static final Logger log = Logger.getLogger(ScenarioImpl.class);
+	
+	private boolean locked = false ;
 
 	private final Map<String, Object> elements = new HashMap<String, Object>();
 
@@ -176,13 +178,13 @@ public class ScenarioImpl implements Scenario {
 		return this.config;
 	}
 
-	@Deprecated
 	public void setNetwork(Network network) {
+		testForLocked();
 		this.network = network;
 	}
 
-	@Deprecated
 	public void setPopulation(Population population) {
+		testForLocked();
 		this.population = population;
 	}
 
@@ -265,6 +267,25 @@ public class ScenarioImpl implements Scenario {
 	@Override
 	public Object getScenarioElement(final String name) {
 		return elements.get( name );
+	}
+	
+	public void setLocked() {
+		this.locked = true ;
+	}
+	
+	private void testForLocked() {
+		if ( locked ) {
+			throw new RuntimeException( "ScenarioImpl is locked; too late to do this.  See comments in code.") ;
+			/* The decision is roughly as follows:
+			 * - It is ok to set network, population, etc. in the Scenario during initial demand generation.
+			 * - It is NOT ok to do this once the controler is running.
+			 * - But we do not want to make a defensive copy of the whole thing at controler startup.
+			 * - We also want to be able to plug alternative Scenario implementations into the controler.
+			 * - But then the controler only gets the "Scenario" not the "ScenarioImpl", so it does not have to worry about setNetwork and the lik
+			 * since it does not exist in the published interface.
+			 * kai, sep'14
+			 */
+		}
 	}
 
 }

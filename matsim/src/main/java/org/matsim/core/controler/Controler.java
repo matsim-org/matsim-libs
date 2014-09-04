@@ -114,7 +114,7 @@ public class Controler extends AbstractController {
 			"%d{ISO8601} %5p %C{1}:%L %m%n");
 
 	protected final Config config;
-	protected final ScenarioImpl scenarioData ;
+	protected final Scenario scenario;
 
 	protected final EventsManager events;
 
@@ -210,7 +210,7 @@ public class Controler extends AbstractController {
         this.controlerListenerManager.setControler(this);
         if (scenario != null) {
 			this.scenarioLoaded = true;
-			this.scenarioData = (ScenarioImpl) scenario;
+			this.scenario = scenario;
 			this.config = scenario.getConfig();
 			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 		} else {
@@ -223,10 +223,11 @@ public class Controler extends AbstractController {
 				this.config = ConfigUtils.loadConfig(configFileName);
 			}
 			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
-			this.scenarioData = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
+			this.scenario = ScenarioUtils.createScenario(this.config);
 		}
-		this.network = this.scenarioData.getNetwork();
-		this.population = this.scenarioData.getPopulation();
+
+		this.network = this.scenario.getNetwork();
+		this.population = this.scenario.getPopulation();
 		
 		MobsimRegistrar mobsimRegistrar = new MobsimRegistrar();
 		this.mobsimFactoryRegister = mobsimRegistrar.getFactoryRegister();
@@ -242,7 +243,7 @@ public class Controler extends AbstractController {
 		// yy is it really so practical to do this in this way?  People might (re)set this factory between constructor and run()--???  kai, may'13
 		this.travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 		
-		this.travelCostCalculatorFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenarioData);
+		this.travelCostCalculatorFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
 
 		this.config.parallelEventHandling().makeLocked();
 	}
@@ -256,6 +257,14 @@ public class Controler extends AbstractController {
 			setupTransitSimulation();
 		}
 		loadData();
+		// My personal opinion is that the loadData should be done in the constructor since in that way the execution path is the same between
+		// new Controler(config) and new Controler(scenario). kai, sep'14
+
+		if ( scenario instanceof ScenarioImpl ) {
+			((ScenarioImpl)scenario).setLocked();
+			// see comment in ScenarioImpl. kai, sep'14
+		}
+
 		run(config);
 
 		// "run(config)" is:
@@ -302,9 +311,9 @@ public class Controler extends AbstractController {
 		// yyyy cannot make this final since it is overridden about 16 times. kai, jan'13
 
 		if (!this.scenarioLoaded) {
-			ScenarioUtils.loadScenario(this.scenarioData);
-			this.network = this.scenarioData.getNetwork();
-			this.population = this.scenarioData.getPopulation();
+			ScenarioUtils.loadScenario(this.scenario);
+			this.network = this.scenario.getNetwork();
+			this.population = this.scenario.getPopulation();
 			this.scenarioLoaded = true;
 		}
 	}
@@ -327,20 +336,20 @@ public class Controler extends AbstractController {
 		 */
 
 		if (this.dumpDataAtEnd) {
-			this.addCoreControlerListener(new DumpDataAtEnd(scenarioData, getControlerIO()));
+			this.addCoreControlerListener(new DumpDataAtEnd(scenario, getControlerIO()));
 		}
 
 
 		if (this.scoringFunctionFactory == null) {
-			this.scoringFunctionFactory = ControlerDefaults.createDefaultScoringFunctionFactory(this.scenarioData) ;
+			this.scoringFunctionFactory = ControlerDefaults.createDefaultScoringFunctionFactory(this.scenario) ;
 		}
 
-        PlansScoring plansScoring = new PlansScoring(this.scenarioData, this.events, getControlerIO(), this.scoringFunctionFactory);
+        PlansScoring plansScoring = new PlansScoring(this.scenario, this.events, getControlerIO(), this.scoringFunctionFactory);
 		this.addCoreControlerListener(plansScoring);
 
 		this.strategyManager = loadStrategyManager();
 		this.addCoreControlerListener(new PlansReplanning(this.strategyManager, population));
-		this.addCoreControlerListener(new PlansDumping(this.scenarioData, this.getConfig().controler().getFirstIteration(), this.config.controler().getWritePlansInterval(),
+		this.addCoreControlerListener(new PlansDumping(this.scenario, this.getConfig().controler().getFirstIteration(), this.config.controler().getWritePlansInterval(),
 				this.stopwatch, this.getControlerIO() ));
 
 
@@ -389,7 +398,7 @@ public class Controler extends AbstractController {
 		this.addControlerListener(this.scoreStats);
 
 		// optional: use counts
-		if (this.config.counts().getCountsFileName() != null || this.scenarioData.getScenarioElement(Counts.ELEMENT_NAME) != null) {
+		if (this.config.counts().getCountsFileName() != null || this.scenario.getScenarioElement(Counts.ELEMENT_NAME) != null) {
 			CountControlerListener ccl = new CountControlerListener(this.config.counts());
 			this.addControlerListener(ccl);
 		}
@@ -413,7 +422,7 @@ public class Controler extends AbstractController {
 		ActivityDurationInterpretation actDurInterpr = this.config.plans().getActivityDurationInterpretation() ;
 		if ( actDurInterpr != ActivityDurationInterpretation.minOfDurationAndEndTime 
 				|| this.config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
-			addControlerListener(new VspPlansCleaner(this.scenarioData));
+			addControlerListener(new VspPlansCleaner(this.scenario));
 		}
 
 	}
@@ -431,7 +440,7 @@ public class Controler extends AbstractController {
 				return new PersonPrepareForSim(new PlanRouter(
 				getTripRouterFactory().instantiateAndConfigureTripRouter(),
 				getScenario().getActivityFacilities()
-				), Controler.this.scenarioData);
+				), Controler.this.scenario);
 			}
 		});
 	}
@@ -456,7 +465,7 @@ public class Controler extends AbstractController {
 		if ( tripRouterFactory == null ) {
 			// This builder is just for compatibility, in case somebody
 			// uses setTransitRouter or setLeastCostPathCalculatorFactory.
-			tripRouterFactory = tripRouterFactoryBuilder.build(scenarioData);
+			tripRouterFactory = tripRouterFactoryBuilder.build(scenario);
 
 			// Special case
 			/* dg 09-2013: I do not see the "special" case for link to link routing. Compared to the other "special cases" that are considered 
@@ -513,7 +522,7 @@ public class Controler extends AbstractController {
 			return simulation;
 		} else if (this.config.getModule(SimulationConfigGroup.GROUP_NAME) != null && 
 				((SimulationConfigGroup) this.config.getModule(SimulationConfigGroup.GROUP_NAME)).getExternalExe() != null ) {
-			ExternalMobsim simulation = new ExternalMobsim(this.scenarioData, this.events);
+			ExternalMobsim simulation = new ExternalMobsim(this.scenario, this.events);
 			simulation.setControlerIO(this.getControlerIO());
 			simulation.setIterationNumber(this.thisIteration);
 			return simulation;
@@ -538,7 +547,7 @@ public class Controler extends AbstractController {
 					SnapshotWriterFactory snapshotWriterFactory = this.snapshotWriterRegister.getInstance(snapshotFormat);
 					String baseFileName = snapshotWriterFactory.getPreferredBaseFilename();
 					String fileName = this.getControlerIO().getIterationFilename(itNumber, baseFileName);
-					SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, this.scenarioData);
+					SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, this.scenario);
 					manager.addSnapshotWriter(snapshotWriter);
 				}
 				((ObservableMobsim) simulation).addQueueSimulationListeners(manager);
@@ -617,7 +626,7 @@ public class Controler extends AbstractController {
 	}
 
 	public final ActivityFacilities getFacilities() {
-		return this.scenarioData.getActivityFacilities();
+		return this.scenario.getActivityFacilities();
 	}
 
 	public final Network getNetwork() {
@@ -633,7 +642,7 @@ public class Controler extends AbstractController {
 	}
 
 	public final Scenario getScenario() {
-		return this.scenarioData;
+		return this.scenario;
 	}
 
 	/**
@@ -658,6 +667,7 @@ public class Controler extends AbstractController {
 		return this.scoreStats;
 	}
 
+	@SuppressWarnings("static-method")
 	@Deprecated
 	public final PlansScoring getPlansScoring() {
 		throw new RuntimeException("To modify scoring for your Agents, please either:" +
