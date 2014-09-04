@@ -20,6 +20,13 @@
 
 package org.matsim.core.population;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -33,13 +40,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Parallel implementation of the PopulationReaderMatsimV4. The main thread only reads
@@ -122,7 +122,7 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 		else {
 			// If it is an new person, create a new person and a list for its attributes.
 			if (PERSON.equals(name)) {
-				PersonImpl person = new PersonImpl(this.scenario.createId(atts.getValue("id")));			
+				PersonImpl person = (PersonImpl) this.scenario.getPopulation().getFactory().createPerson(Id.create(atts.getValue("id"), Person.class));			
 				currentPersonXmlData = new ArrayList<Tag>();
 				PersonTag personTag = new PersonTag();
 				personTag.person = person;
@@ -191,11 +191,6 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 		}
 		
 		@Override
-		public Id createId(String id) {
-			return scenario.createId(id);
-		}
-
-		@Override
 		public Network getNetwork() {
 			if (this.scenario != null) { // super-Constructor calls some init Methods which might call this method
 				return scenario.getNetwork();
@@ -208,6 +203,7 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 			return this.population;	// return collector population
 		}
 		
+		@Override
 		public ActivityFacilities getActivityFacilities() {
 			return scenario.getActivityFacilities();
 		}
@@ -267,7 +263,7 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 	}
 	
 	public final class PersonTag extends Tag {
-		PersonImpl person;		
+		PersonImpl person;
 	}
 	
 	public final class EndTag extends Tag {

@@ -20,11 +20,17 @@
 
 package org.matsim.core.population;
 
+import java.util.ArrayList;
+import java.util.Locale;
+import java.util.Stack;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -41,10 +47,6 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.Desires;
 import org.xml.sax.Attributes;
-
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.Stack;
 
 /**
  * A reader for plans files of MATSim according to <code>plans_v4.dtd</code>.
@@ -188,7 +190,7 @@ import java.util.Stack;
 		String ageString = atts.getValue("age");
 		int age = Integer.MIN_VALUE;
 		if (ageString != null) age = Integer.parseInt(ageString);
-		this.currperson = new PersonImpl(this.scenario.createId(atts.getValue("id")));
+		this.currperson = new PersonImpl(Id.create(atts.getValue("id"), Person.class));
 		this.currperson.setSex(atts.getValue("sex"));
 		this.currperson.setAge(age);
 		this.currperson.setLicence(atts.getValue("license"));
@@ -242,7 +244,7 @@ import java.util.Stack;
 			log.info("NEW: Attribute freq in <location> is not supported at the moment!");
 		}
 
-		ActivityFacility currfacility = this.facilities.getFacilities().get(this.scenario.createId(id));
+		ActivityFacility currfacility = this.facilities.getFacilities().get(Id.create(id, ActivityFacility.class));
 		if (currfacility == null) {
 			throw new RuntimeException("facility id=" + id + " does not exist!");
 		}
@@ -278,7 +280,7 @@ import java.util.Stack;
 	private void startAct(final Attributes atts) {
 		Coord coord = null;
 		if (atts.getValue("link") != null) {
-			Id linkId = this.scenario.createId(atts.getValue("link"));
+			Id<Link> linkId = Id.create(atts.getValue("link"), Link.class);
 			this.curract = this.currplan.createAndAddActivity(
 					atts.getValue(ATTR_TYPE), linkId);
 			if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
@@ -298,7 +300,7 @@ import java.util.Stack;
 		this.curract.setEndTime(Time.parseTime(atts.getValue("end_time")));
 		String fId = atts.getValue("facility");
 		if (fId != null) {
-			this.curract.setFacilityId(this.scenario.createId(fId));
+			this.curract.setFacilityId(Id.create(fId, ActivityFacility.class));
 		}
 		if (this.routeDescription != null) {
 			Id startLinkId = null;
