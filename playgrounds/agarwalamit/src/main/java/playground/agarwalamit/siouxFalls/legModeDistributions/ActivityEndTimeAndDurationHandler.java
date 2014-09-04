@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.core.config.Config;
 
 /**
  * @author amit
@@ -48,6 +49,7 @@ public class ActivityEndTimeAndDurationHandler implements PersonDepartureEventHa
 		this.activity2personId2StartTime = new HashMap<String, Map<Id, Double>>();
 		this.activity2personId2EndTime = new HashMap<String, Map<Id, Double>>();
 		this.activity2personId2Duration = new HashMap<String, Map<Id,Double>>();
+		Config config = new Config();
 	}
 
 	@Override
@@ -60,6 +62,7 @@ public class ActivityEndTimeAndDurationHandler implements PersonDepartureEventHa
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
+		// TODO [AA] what if different departures have different leg mode.
 		this.personId2LegMode.put(event.getPersonId(), event.getLegMode());
 	}
 
@@ -90,16 +93,16 @@ public class ActivityEndTimeAndDurationHandler implements PersonDepartureEventHa
 		String actType = event.getActType();
 
 		if(this.activity2personId2EndTime.containsKey(actType)){
-			Map<Id, Double> personId2ActStartTime = this.activity2personId2EndTime.get(actType);
-			if(personId2ActStartTime.containsKey(personId)){
+			Map<Id, Double> personId2ActEndTime = this.activity2personId2EndTime.get(actType);
+			if(personId2ActEndTime.containsKey(personId)){
 				throw new RuntimeException("Person "+personId.toString()+" have already ended "+actType+" activity. Can not end again.");
 			} else {
-				personId2ActStartTime.put(personId, activityEndTime);
+				personId2ActEndTime.put(personId, activityEndTime);
 			}
 		} else {
-			Map<Id, Double> personId2ActStartTime = new HashMap<Id, Double>();
-			personId2ActStartTime.put(personId, activityEndTime);
-			this.activity2personId2EndTime.put(actType, personId2ActStartTime);
+			Map<Id, Double> personId2ActEndTime = new HashMap<Id, Double>();
+			personId2ActEndTime.put(personId, activityEndTime);
+			this.activity2personId2EndTime.put(actType, personId2ActEndTime);
 		}
 	}
 
@@ -115,7 +118,6 @@ public class ActivityEndTimeAndDurationHandler implements PersonDepartureEventHa
 	}
 
 	public Map<String, Map<Id, Double>> getActivityType2PersonId2ActDuration(){
-
 		for(String actType : this.activity2personId2StartTime.keySet()){
 			Map<Id, Double> personId2ActDuration = new HashMap<Id, Double>();
 			for (Id personId : this.activity2personId2StartTime.get(actType).keySet()){
