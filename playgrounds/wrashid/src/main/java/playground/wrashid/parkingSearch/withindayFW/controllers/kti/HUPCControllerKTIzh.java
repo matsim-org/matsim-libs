@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.DebugLib;
@@ -45,7 +46,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
-import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
@@ -197,7 +197,7 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		GeneralLib.writeHashMapToFile(houseHoldIncome,"personId\tIncome",fileName);
 	}
 
-	public static HashMap<Id, Double> getHouseHoldIncomeCantonZH(ScenarioImpl scenario) {
+	public static HashMap<Id, Double> getHouseHoldIncomeCantonZH(Scenario scenario) {
 		HashMap<Id, Double> houseHoldIncome=new HashMap<Id, Double>();
 		
 		for (Id personId : scenario.getPopulation().getPersons().keySet()) {

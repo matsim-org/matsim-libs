@@ -92,7 +92,6 @@ IterationEndsListener, ShutdownListener {
         		this.scheme = rpsImpl ;
         	}
 
-        	// yy is this necessary?
             event.getControler().getScenario().addScenarioElement(
                     RoadPricingScheme.ELEMENT_NAME,
                     scheme);

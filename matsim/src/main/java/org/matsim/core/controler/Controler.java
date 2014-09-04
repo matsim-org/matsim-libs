@@ -114,7 +114,7 @@ public class Controler extends AbstractController {
 			"%d{ISO8601} %5p %C{1}:%L %m%n");
 
 	protected final Config config;
-	protected final Scenario scenario;
+	protected final Scenario scenarioData ;
 
 	protected final EventsManager events;
 
@@ -210,7 +210,7 @@ public class Controler extends AbstractController {
         this.controlerListenerManager.setControler(this);
         if (scenario != null) {
 			this.scenarioLoaded = true;
-			this.scenario = scenario;
+			this.scenarioData  = scenario;
 			this.config = scenario.getConfig();
 			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 		} else {
@@ -223,11 +223,11 @@ public class Controler extends AbstractController {
 				this.config = ConfigUtils.loadConfig(configFileName);
 			}
 			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
-			this.scenario = ScenarioUtils.createScenario(this.config);
+			this.scenarioData  = ScenarioUtils.createScenario(this.config);
 		}
 
-		this.network = this.scenario.getNetwork();
-		this.population = this.scenario.getPopulation();
+		this.network = this.scenarioData .getNetwork();
+		this.population = this.scenarioData .getPopulation();
 		
 		MobsimRegistrar mobsimRegistrar = new MobsimRegistrar();
 		this.mobsimFactoryRegister = mobsimRegistrar.getFactoryRegister();
@@ -257,13 +257,8 @@ public class Controler extends AbstractController {
 			setupTransitSimulation();
 		}
 		loadData();
-		// My personal opinion is that the loadData should be done in the constructor since in that way the execution path is the same between
-		// new Controler(config) and new Controler(scenario). kai, sep'14
-
-		if ( scenario instanceof ScenarioImpl ) {
-			((ScenarioImpl)scenario).setLocked();
-			// see comment in ScenarioImpl. kai, sep'14
-		}
+		// I find it difficult (to teach) that the behavior between the constructor and controler.run() depends on which constructor
+		// you call. kai, apr'14
 
 		run(config);
 
@@ -311,9 +306,9 @@ public class Controler extends AbstractController {
 		// yyyy cannot make this final since it is overridden about 16 times. kai, jan'13
 
 		if (!this.scenarioLoaded) {
-			ScenarioUtils.loadScenario(this.scenario);
-			this.network = this.scenario.getNetwork();
-			this.population = this.scenario.getPopulation();
+			ScenarioUtils.loadScenario(this.scenarioData );
+			this.network = this.scenarioData .getNetwork();
+			this.population = this.scenarioData .getPopulation();
 			this.scenarioLoaded = true;
 		}
 	}
@@ -336,20 +331,20 @@ public class Controler extends AbstractController {
 		 */
 
 		if (this.dumpDataAtEnd) {
-			this.addCoreControlerListener(new DumpDataAtEnd(scenario, getControlerIO()));
+			this.addCoreControlerListener(new DumpDataAtEnd(scenarioData , getControlerIO()));
 		}
 
 
 		if (this.scoringFunctionFactory == null) {
-			this.scoringFunctionFactory = ControlerDefaults.createDefaultScoringFunctionFactory(this.scenario) ;
+			this.scoringFunctionFactory = ControlerDefaults.createDefaultScoringFunctionFactory(this.scenarioData ) ;
 		}
 
-        PlansScoring plansScoring = new PlansScoring(this.scenario, this.events, getControlerIO(), this.scoringFunctionFactory);
+        PlansScoring plansScoring = new PlansScoring(this.scenarioData , this.events, getControlerIO(), this.scoringFunctionFactory);
 		this.addCoreControlerListener(plansScoring);
 
 		this.strategyManager = loadStrategyManager();
 		this.addCoreControlerListener(new PlansReplanning(this.strategyManager, population));
-		this.addCoreControlerListener(new PlansDumping(this.scenario, this.getConfig().controler().getFirstIteration(), this.config.controler().getWritePlansInterval(),
+		this.addCoreControlerListener(new PlansDumping(this.scenarioData , this.getConfig().controler().getFirstIteration(), this.config.controler().getWritePlansInterval(),
 				this.stopwatch, this.getControlerIO() ));
 
 
@@ -398,7 +393,7 @@ public class Controler extends AbstractController {
 		this.addControlerListener(this.scoreStats);
 
 		// optional: use counts
-		if (this.config.counts().getCountsFileName() != null || this.scenario.getScenarioElement(Counts.ELEMENT_NAME) != null) {
+		if (this.config.counts().getCountsFileName() != null || this.scenarioData .getScenarioElement(Counts.ELEMENT_NAME) != null) {
 			CountControlerListener ccl = new CountControlerListener(this.config.counts());
 			this.addControlerListener(ccl);
 		}
@@ -422,13 +417,18 @@ public class Controler extends AbstractController {
 		ActivityDurationInterpretation actDurInterpr = this.config.plans().getActivityDurationInterpretation() ;
 		if ( actDurInterpr != ActivityDurationInterpretation.minOfDurationAndEndTime 
 				|| this.config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
-			addControlerListener(new VspPlansCleaner(this.scenario));
+			addControlerListener(new VspPlansCleaner(this.scenarioData ));
 		}
 
 	}
 
 	@Override
 	protected final void prepareForSim() {
+
+		if ( scenarioData  instanceof ScenarioImpl ) {
+			((ScenarioImpl)scenarioData ).setLocked();
+			// see comment in ScenarioImpl. kai, sep'14
+		}
 
 		setUp();
 
@@ -440,7 +440,7 @@ public class Controler extends AbstractController {
 				return new PersonPrepareForSim(new PlanRouter(
 				getTripRouterFactory().instantiateAndConfigureTripRouter(),
 				getScenario().getActivityFacilities()
-				), Controler.this.scenario);
+				), Controler.this.scenarioData );
 			}
 		});
 	}
@@ -465,7 +465,7 @@ public class Controler extends AbstractController {
 		if ( tripRouterFactory == null ) {
 			// This builder is just for compatibility, in case somebody
 			// uses setTransitRouter or setLeastCostPathCalculatorFactory.
-			tripRouterFactory = tripRouterFactoryBuilder.build(scenario);
+			tripRouterFactory = tripRouterFactoryBuilder.build(scenarioData );
 
 			// Special case
 			/* dg 09-2013: I do not see the "special" case for link to link routing. Compared to the other "special cases" that are considered 
@@ -522,7 +522,7 @@ public class Controler extends AbstractController {
 			return simulation;
 		} else if (this.config.getModule(SimulationConfigGroup.GROUP_NAME) != null && 
 				((SimulationConfigGroup) this.config.getModule(SimulationConfigGroup.GROUP_NAME)).getExternalExe() != null ) {
-			ExternalMobsim simulation = new ExternalMobsim(this.scenario, this.events);
+			ExternalMobsim simulation = new ExternalMobsim(this.scenarioData , this.events);
 			simulation.setControlerIO(this.getControlerIO());
 			simulation.setIterationNumber(this.thisIteration);
 			return simulation;
@@ -547,7 +547,7 @@ public class Controler extends AbstractController {
 					SnapshotWriterFactory snapshotWriterFactory = this.snapshotWriterRegister.getInstance(snapshotFormat);
 					String baseFileName = snapshotWriterFactory.getPreferredBaseFilename();
 					String fileName = this.getControlerIO().getIterationFilename(itNumber, baseFileName);
-					SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, this.scenario);
+					SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, this.scenarioData );
 					manager.addSnapshotWriter(snapshotWriter);
 				}
 				((ObservableMobsim) simulation).addQueueSimulationListeners(manager);
@@ -626,7 +626,7 @@ public class Controler extends AbstractController {
 	}
 
 	public final ActivityFacilities getFacilities() {
-		return this.scenario.getActivityFacilities();
+		return this.scenarioData .getActivityFacilities();
 	}
 
 	public final Network getNetwork() {
@@ -642,7 +642,7 @@ public class Controler extends AbstractController {
 	}
 
 	public final Scenario getScenario() {
-		return this.scenario;
+		return this.scenarioData ;
 	}
 
 	/**

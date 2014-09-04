@@ -26,6 +26,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.scenario.ScenarioImpl;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

@@ -22,18 +22,19 @@ package playground.wrashid.parkingSearch.withindayFW.utility;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 
 public class ParkingPersonalBetas {
 
-	private final ScenarioImpl scenario;
+	private final Scenario scenario;
 	private final HashMap<Id, Double> houseHoldIncome;
 	public double externalWalkFactor=1.0;
 	public double externalSearchFactor=1.0;
 
-	public ParkingPersonalBetas(ScenarioImpl scenario, HashMap<Id, Double> houseHoldIncome) {
+	public ParkingPersonalBetas(Scenario scenario, HashMap<Id, Double> houseHoldIncome) {
 		this.scenario = scenario;
 
 		if (this.houseHoldIncome == null) {

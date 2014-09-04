@@ -18,15 +18,14 @@
  * *********************************************************************** */
 
 package playground.wrashid.parkingSearch.withindayFW.zhCity;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
@@ -37,12 +36,12 @@ import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalcul
 	public class ParkingCostCalculatorZH implements ParkingCostCalculator {
 
 		private final CityZones zones;
-		private final ScenarioImpl scenario;
+		private final Scenario scenario;
 		private HighStreetTariffZonesZHCity highTariffParkingZone;
 		private HashSet<Id> paidStreetParking;
 		private final LinkedList<Parking> parkings;
 
-		public ParkingCostCalculatorZH(CityZones zones, ScenarioImpl scenario, LinkedList<Parking> parkings) {
+		public ParkingCostCalculatorZH(CityZones zones, Scenario scenario, LinkedList<Parking> parkings) {
 			this.zones = zones;
 			this.scenario = scenario;
 			this.parkings = parkings;
