@@ -28,6 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -116,31 +117,31 @@ public class PopulationReaderMatsimV4Test {
 		tester.endTag();
 
 		Assert.assertEquals("population size.", 2, population.getPersons().size());
-		Person person1 = population.getPersons().get(scenario.createId("1"));
+		Person person1 = population.getPersons().get(Id.create("1", Person.class));
 		Plan plan1 = person1.getPlans().get(0);
 		Leg leg1a = (Leg) plan1.getPlanElements().get(1);
 		Route route1a = leg1a.getRoute();
-		Assert.assertEquals("different startLink for first leg.", network.getLinks().get(scenario.createId("1")).getId(), route1a.getStartLinkId());
-		Assert.assertEquals("different endLink for first leg.", network.getLinks().get(scenario.createId("20")).getId(), route1a.getEndLinkId());
+		Assert.assertEquals("different startLink for first leg.", network.getLinks().get(Id.create("1", Link.class)).getId(), route1a.getStartLinkId());
+		Assert.assertEquals("different endLink for first leg.", network.getLinks().get(Id.create("20", Link.class)).getId(), route1a.getEndLinkId());
 		Leg leg1b = (Leg) plan1.getPlanElements().get(3);
 		Route route1b = leg1b.getRoute();
-		Assert.assertEquals("different startLink for second leg.", network.getLinks().get(scenario.createId("20")).getId(), route1b.getStartLinkId());
-		Assert.assertEquals("different endLink for second leg.", network.getLinks().get(scenario.createId("20")).getId(), route1b.getEndLinkId());
+		Assert.assertEquals("different startLink for second leg.", network.getLinks().get(Id.create("20", Link.class)).getId(), route1b.getStartLinkId());
+		Assert.assertEquals("different endLink for second leg.", network.getLinks().get(Id.create("20", Link.class)).getId(), route1b.getEndLinkId());
 		Leg leg1c = (Leg) plan1.getPlanElements().get(5);
 		Route route1c = leg1c.getRoute();
-		Assert.assertEquals("different startLink for third leg.", network.getLinks().get(scenario.createId("20")).getId(), route1c.getStartLinkId());
-		Assert.assertEquals("different endLink for third leg.", network.getLinks().get(scenario.createId("1")).getId(), route1c.getEndLinkId());
+		Assert.assertEquals("different startLink for third leg.", network.getLinks().get(Id.create("20", Link.class)).getId(), route1c.getStartLinkId());
+		Assert.assertEquals("different endLink for third leg.", network.getLinks().get(Id.create("1", Link.class)).getId(), route1c.getEndLinkId());
 
-		Person person2 = population.getPersons().get(scenario.createId("2"));
+		Person person2 = population.getPersons().get(Id.create("2", Person.class));
 		Plan plan2 = person2.getPlans().get(0);
 		Leg leg2a = (Leg) plan2.getPlanElements().get(1);
 		Route route2a = leg2a.getRoute();
-		Assert.assertEquals("different startLink for first leg.", network.getLinks().get(scenario.createId("2")).getId(), route2a.getStartLinkId());
-		Assert.assertEquals("different endLink for first leg.", network.getLinks().get(scenario.createId("20")).getId(), route2a.getEndLinkId());
+		Assert.assertEquals("different startLink for first leg.", network.getLinks().get(Id.create("2", Link.class)).getId(), route2a.getStartLinkId());
+		Assert.assertEquals("different endLink for first leg.", network.getLinks().get(Id.create("20", Link.class)).getId(), route2a.getEndLinkId());
 		Leg leg2b = (Leg) plan2.getPlanElements().get(3);
 		Route route2b = leg2b.getRoute();
-		Assert.assertEquals("different startLink for third leg.", network.getLinks().get(scenario.createId("20")).getId(), route2b.getStartLinkId());
-		Assert.assertEquals("different endLink for third leg.", network.getLinks().get(scenario.createId("1")).getId(), route2b.getEndLinkId());
+		Assert.assertEquals("different startLink for third leg.", network.getLinks().get(Id.create("20", Link.class)).getId(), route2b.getStartLinkId());
+		Assert.assertEquals("different endLink for third leg.", network.getLinks().get(Id.create("1", Link.class)).getId(), route2b.getEndLinkId());
 	}
 
 	/**
@@ -174,7 +175,7 @@ public class PopulationReaderMatsimV4Test {
 		parser.endTag("plans", null, context);
 
 		Assert.assertEquals("population size.", 1, population.getPersons().size());
-		Person person1 = population.getPersons().get(scenario.createId("981"));
+		Person person1 = population.getPersons().get(Id.create("981", Person.class));
 		Plan plan1 = person1.getPlans().get(0);
 		Leg leg1 = (Leg) plan1.getPlanElements().get(1);
 		Route route1 = leg1.getRoute();
@@ -188,9 +189,9 @@ public class PopulationReaderMatsimV4Test {
 	public void testReadActivity() {
 		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(0, 0));
-		Node node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(0, 1000));
-		Link link3 = network.createAndAddLink(scenario.createId("3"), node1, node2, 1000.0, 10.0, 2000.0, 1);
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), scenario.createCoord(0, 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), scenario.createCoord(0, 1000));
+		Link link3 = network.createAndAddLink(Id.create("3", Link.class), node1, node2, 1000.0, 10.0, 2000.0, 1);
 		final Population population = scenario.getPopulation();
 
 		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
@@ -209,10 +210,10 @@ public class PopulationReaderMatsimV4Test {
 		reader.endTag("plans", "", context);
 
 		Assert.assertEquals(1, population.getPersons().size());
-		Person person = population.getPersons().get(scenario.createId("2"));
+		Person person = population.getPersons().get(Id.create("2", Person.class));
 		Plan plan = person.getPlans().get(0);
 		Assert.assertEquals(link3.getId(), ((Activity) plan.getPlanElements().get(0)).getLinkId());
-		Assert.assertEquals(scenario.createId("2"), ((Activity) plan.getPlanElements().get(2)).getLinkId());
+		Assert.assertEquals(Id.create("2", Link.class), ((Activity) plan.getPlanElements().get(2)).getLinkId());
 	}
 
 	@Test

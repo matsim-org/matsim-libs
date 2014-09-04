@@ -28,13 +28,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -106,7 +106,7 @@ public class PopulationReaderMatsimV5Test {
 		tester.endTag();
 
 		Assert.assertEquals("population size.", 2, population.getPersons().size());
-		Person person1 = population.getPersons().get(scenario.createId("1"));
+		Person person1 = population.getPersons().get(Id.create("1", Person.class));
 		Plan plan1 = person1.getPlans().get(0);
 		Leg leg1a = (Leg) plan1.getPlanElements().get(1);
 		Route route1a = leg1a.getRoute();
@@ -121,7 +121,7 @@ public class PopulationReaderMatsimV5Test {
 		Assert.assertEquals("different startLink for third leg.", "20", route1c.getStartLinkId().toString());
 		Assert.assertEquals("different endLink for third leg.", "1", route1c.getEndLinkId().toString());
 
-		Person person2 = population.getPersons().get(scenario.createId("2"));
+		Person person2 = population.getPersons().get(Id.create("2", Person.class));
 		Plan plan2 = person2.getPlans().get(0);
 		Leg leg2a = (Leg) plan2.getPlanElements().get(1);
 		Route route2a = leg2a.getRoute();
@@ -158,7 +158,7 @@ public class PopulationReaderMatsimV5Test {
 
 		tester.endTag();
 
-		Person person1 = population.getPersons().get(scenario.createId("1"));
+		Person person1 = population.getPersons().get(Id.create("1", Person.class));
 		Plan plan1 = person1.getPlans().get(0);
 		Leg leg1a = (Leg) plan1.getPlanElements().get(1);
 		Route route1a = leg1a.getRoute();
@@ -194,7 +194,7 @@ public class PopulationReaderMatsimV5Test {
 
 		tester.endTag();
 
-		Person person1 = population.getPersons().get(scenario.createId("1"));
+		Person person1 = population.getPersons().get(Id.create("1", Person.class));
 		Plan plan1 = person1.getPlans().get(0);
 		Leg leg1a = (Leg) plan1.getPlanElements().get(1);
 		Route route1a = leg1a.getRoute();
@@ -236,7 +236,7 @@ public class PopulationReaderMatsimV5Test {
 		parser.endTag("population", null, context);
 
 		Assert.assertEquals("population size.", 1, population.getPersons().size());
-		Person person1 = population.getPersons().get(scenario.createId("981"));
+		Person person1 = population.getPersons().get(Id.create("981", Person.class));
 		Plan plan1 = person1.getPlans().get(0);
 		Leg leg1 = (Leg) plan1.getPlanElements().get(1);
 		Route route1 = leg1.getRoute();
@@ -267,7 +267,7 @@ public class PopulationReaderMatsimV5Test {
 		reader.endTag("population", "", context);
 
 		Assert.assertEquals(1, population.getPersons().size());
-		Person person = population.getPersons().get(scenario.createId("2"));
+		Person person = population.getPersons().get(Id.create("2", Person.class));
 		Plan plan = person.getPlans().get(0);
 		Assert.assertEquals("3", ((Activity) plan.getPlanElements().get(0)).getLinkId().toString());
 		Assert.assertEquals("2", ((Activity) plan.getPlanElements().get(2)).getLinkId().toString());
@@ -294,7 +294,7 @@ public class PopulationReaderMatsimV5Test {
 		"</population>";
 		reader.parse(new ByteArrayInputStream(str.getBytes()));
 
-		Plan plan = population.getPersons().get(new IdImpl(1)).getSelectedPlan();
+		Plan plan = population.getPersons().get(Id.create(1, Person.class)).getSelectedPlan();
 		Assert.assertEquals(5, plan.getPlanElements().size());
 		Assert.assertTrue(plan.getPlanElements().get(0) instanceof Activity);
 		Assert.assertTrue(plan.getPlanElements().get(1) instanceof Leg);
@@ -323,7 +323,7 @@ public class PopulationReaderMatsimV5Test {
 		"</population>";
 		reader.parse(new ByteArrayInputStream(str.getBytes()));
 
-		Plan plan = population.getPersons().get(new IdImpl(1)).getSelectedPlan();
+		Plan plan = population.getPersons().get(Id.create(1, Person.class)).getSelectedPlan();
 		Assert.assertEquals(4, plan.getPlanElements().size());
 		Assert.assertTrue(plan.getPlanElements().get(0) instanceof Activity);
 		Assert.assertTrue(plan.getPlanElements().get(1) instanceof Leg);
@@ -352,13 +352,13 @@ public class PopulationReaderMatsimV5Test {
 		"</population>";
 		reader.parse(new ByteArrayInputStream(str.getBytes()));
 
-		Plan plan = population.getPersons().get(new IdImpl(1)).getSelectedPlan();
+		Plan plan = population.getPersons().get(Id.create(1, Person.class)).getSelectedPlan();
 		Assert.assertEquals(3, plan.getPlanElements().size());
 		Assert.assertTrue(plan.getPlanElements().get(0) instanceof Activity);
 		Assert.assertTrue(plan.getPlanElements().get(1) instanceof Leg);
 		Leg leg = (Leg) plan.getPlanElements().get(1) ;
 		NetworkRoute route = (NetworkRoute) leg.getRoute() ;
-		Assert.assertEquals( new IdImpl("123"), route.getVehicleId() ) ;
+		Assert.assertEquals(Id.create("123", Person.class), route.getVehicleId() ) ;
 		Assert.assertTrue(plan.getPlanElements().get(2) instanceof Activity);
 	}
 

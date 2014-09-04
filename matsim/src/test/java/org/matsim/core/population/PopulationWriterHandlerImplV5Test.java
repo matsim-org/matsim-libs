@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -75,13 +74,13 @@ public class PopulationWriterHandlerImplV5Test {
 
 	private NetworkRoute doTestWriteNetworkRoute(final String startLinkId, final String linkIds, final String endLinkId, final String expectedRouteSerialization) {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.util.loadConfig(null));
-		Id idFrom = scenario.createId(startLinkId);
-		Id idTo = scenario.createId(endLinkId);
+		Id<Link> idFrom = Id.create(startLinkId, Link.class);
+		Id<Link> idTo = Id.create(endLinkId, Link.class);
 
 		ScenarioImpl tmpScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population pop = tmpScenario.getPopulation();
 		PopulationFactory pb = pop.getFactory();
-		PersonImpl person = (PersonImpl) pb.createPerson(new IdImpl(1));
+		PersonImpl person = (PersonImpl) pb.createPerson(Id.create(1, Person.class));
 		PlanImpl plan = (PlanImpl) pb.createPlan();
 		plan.setPerson(person);
 		plan.addActivity(pb.createActivityFromLinkId("h", idFrom));
@@ -101,7 +100,7 @@ public class PopulationWriterHandlerImplV5Test {
 		Population pop2 = scenario.getPopulation();
 		RouteInterceptingPopulationReader popReader = new RouteInterceptingPopulationReader(new PopulationReaderMatsimV5(scenario));
 		popReader.readFile(filename);
-		Person person2 = pop2.getPersons().get(new IdImpl(1));
+		Person person2 = pop2.getPersons().get(Id.create(1, Person.class));
 		Leg leg2 = (Leg) person2.getPlans().get(0).getPlanElements().get(1);
 		Route route2 = leg2.getRoute();
 		Assert.assertEquals(expectedRouteSerialization, popReader.interceptedRouteContent.trim());
@@ -121,12 +120,12 @@ public class PopulationWriterHandlerImplV5Test {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.util.loadConfig(null));
 		String startLinkId = "1";
 		String endLinkId = "4";
-		Id idFrom = scenario.createId(startLinkId);
-		Id idTo = scenario.createId(endLinkId);
+		Id<Link> idFrom = Id.create(startLinkId, Link.class);
+		Id<Link> idTo = Id.create(endLinkId, Link.class);
 		ScenarioImpl tmpScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population pop = tmpScenario.getPopulation();
 		PopulationFactory pb = pop.getFactory();
-		PersonImpl person = (PersonImpl) pb.createPerson(new IdImpl(1));
+		PersonImpl person = (PersonImpl) pb.createPerson(Id.create(1, Person.class));
 		PlanImpl plan = (PlanImpl) pb.createPlan();
 		plan.setPerson(person);
 		plan.addActivity(pb.createActivityFromLinkId("h", idFrom));
@@ -138,7 +137,7 @@ public class PopulationWriterHandlerImplV5Test {
 		route.setDistance(dist); 
 		leg.setRoute(route);
 		plan.addLeg(leg);
-		plan.addActivity(pb.createActivityFromLinkId("h", scenario.createId("2")));
+		plan.addActivity(pb.createActivityFromLinkId("h", Id.create("2", Person.class)));
 		person.addPlan(plan);
 		pop.addPerson(person);
 
@@ -148,7 +147,7 @@ public class PopulationWriterHandlerImplV5Test {
 		Population pop2 = scenario.getPopulation();
 		PopulationReaderMatsimV5 popReader = new PopulationReaderMatsimV5(scenario);
 		popReader.readFile(filename);
-		Person person2 = pop2.getPersons().get(new IdImpl(1));
+		Person person2 = pop2.getPersons().get(Id.create(1, Person.class));
 		Leg leg2 = (Leg) person2.getPlans().get(0).getPlanElements().get(1);
 		Route route2 = leg2.getRoute();
 		Assert.assertTrue("read route is of class " + route2.getClass().getCanonicalName(), route2 instanceof GenericRouteImpl);

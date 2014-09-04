@@ -28,8 +28,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -130,7 +132,7 @@ import org.xml.sax.Attributes;
 	}
 
 	private void startPerson(final Attributes atts) {
-		this.currperson = new PersonImpl(this.scenario.createId(atts.getValue("id")));
+		this.currperson = (PersonImpl) this.plans.getFactory().createPerson(Id.create(atts.getValue("id"), Person.class));
 	}
 
 	private void startPlan(final Attributes atts) {
@@ -164,7 +166,7 @@ import org.xml.sax.Attributes;
 		Coord coord = null;
 		ActivityImpl act;
 		if (atts.getValue("link") != null) {
-			Id linkId = this.scenario.createId(atts.getValue("link"));
+			Id<Link> linkId = Id.create(atts.getValue("link"), Link.class);
 			act = this.currplan.createAndAddActivity(atts.getValue("type"), linkId);
 			if (atts.getValue(ATTR_X100) != null && atts.getValue(ATTR_Y100) != null) {
 				coord = new CoordImpl(atts.getValue(ATTR_X100), atts.getValue(ATTR_Y100));

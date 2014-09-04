@@ -28,7 +28,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -142,7 +144,7 @@ import org.xml.sax.Attributes;
 	}
 
 	private void startPerson(final Attributes atts) {
-		this.currperson = new PersonImpl(this.scenario.createId(atts.getValue("id")));
+		this.currperson = new PersonImpl(Id.create(atts.getValue("id"), Person.class));
 		this.currperson.setSex(atts.getValue("sex"));
 		this.currperson.setAge(Integer.parseInt(atts.getValue("age")));
 		this.currperson.setLicence(atts.getValue("license"));
@@ -180,11 +182,11 @@ import org.xml.sax.Attributes;
 	}
 
 	private void startAct(final Attributes atts) {
-		Id linkId = null;
+		Id<Link> linkId = null;
 		Coord coord = null;
 		ActivityImpl act = null;
 		if (atts.getValue("link") != null) {
-			linkId = this.scenario.createId(atts.getValue("link"));
+			linkId = Id.create(atts.getValue("link"), Link.class);
 			act = this.currplan.createAndAddActivity(atts.getValue("type"), linkId);
 			if (atts.getValue(ATTR_X100) != null && atts.getValue(ATTR_Y100) != null) {
 				coord = new CoordImpl(atts.getValue(ATTR_X100), atts.getValue(ATTR_Y100));
