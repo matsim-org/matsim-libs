@@ -20,8 +20,9 @@
 
 package org.matsim.core.events;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
@@ -35,9 +36,9 @@ import org.matsim.vehicles.VehicleTypeImpl;
 public class PersonLeavesVehicleEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
-		PersonImpl person = new PersonImpl(new IdImpl(1));
-		VehicleType vehicleType = new VehicleTypeImpl(new IdImpl("testVehType"));
-		Vehicle vehicle = new VehicleImpl(new IdImpl(80), vehicleType);
+		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
+		VehicleType vehicleType = new VehicleTypeImpl(Id.create("testVehType", VehicleType.class));
+		Vehicle vehicle = new VehicleImpl(Id.create(80, Vehicle.class), vehicleType);
 		PersonLeavesVehicleEvent event = new PersonLeavesVehicleEvent(5.0 * 3600 + 11.0 * 60, person.getId(), vehicle.getId());
 		PersonLeavesVehicleEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event);
 		assertEquals("wrong time of event.", 5.0 * 3600 + 11.0 * 60, event2.getTime(), EPSILON);

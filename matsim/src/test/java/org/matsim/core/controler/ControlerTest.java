@@ -47,7 +47,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
@@ -199,11 +198,11 @@ public class ControlerTest {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		// create a very simple network with one link only and an empty population
 		Network network = scenario.getNetwork();
-		Node node1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0));
-		Node node2 = network.getFactory().createNode(new IdImpl(2), new CoordImpl(100, 0));
+		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new CoordImpl(0, 0));
+		Node node2 = network.getFactory().createNode(Id.create(2, Node.class), new CoordImpl(100, 0));
 		network.addNode(node1);
 		network.addNode(node2);
-		Link link = network.getFactory().createLink(new IdImpl(1), node1, node2);
+		Link link = network.getFactory().createLink(Id.create(1, Link.class), node1, node2);
 		link.setLength(100);
 		link.setFreespeed(1);
 		link.setCapacity(3600.0);
@@ -322,7 +321,7 @@ public class ControlerTest {
 		Leg leg1 = null;
 		Leg leg2 = null;
 
-		person1 = new PersonImpl(new IdImpl(1));
+		person1 = new PersonImpl(Id.create(1, Person.class));
 		// --- plan 1 ---
 		Plan plan1 = factory.createPlan();
 		person1.addPlan(plan1);

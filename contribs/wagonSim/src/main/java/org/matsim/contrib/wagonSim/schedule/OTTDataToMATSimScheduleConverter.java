@@ -203,9 +203,9 @@ public class OTTDataToMATSimScheduleConverter {
 				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_MAX_LENGTH, trainTypes.getAttribute(locomotive.type.toString(),WagonSimConstants.TRAIN_MAX_LENGTH));
 
 				// the next day
-				vehicle = vehiclesFactory.createVehicle(new IdImpl(route.getId()+".1"),vehicleType);
+				vehicle = vehiclesFactory.createVehicle(Id.create(route.getId()+".1", Vehicle.class),vehicleType);
 				((ScenarioImpl)scenario).getVehicles().addVehicle(vehicle);
-				departure = scheduleFactory.createDeparture(vehicle.getId(),departure.getDepartureTime()+24*3600);
+				departure = scheduleFactory.createDeparture(Id.create(vehicle.getId(), Departure.class), departure.getDepartureTime()+24*3600);
 				departure.setVehicleId(vehicle.getId());
 				route.addDeparture(departure);
 				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_TYPE, locomotive.type);
@@ -214,9 +214,9 @@ public class OTTDataToMATSimScheduleConverter {
 				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_MAX_LENGTH, trainTypes.getAttribute(locomotive.type.toString(),WagonSimConstants.TRAIN_MAX_LENGTH));
 
 				// the day after the next day
-				vehicle = vehiclesFactory.createVehicle(new IdImpl(route.getId()+".2"),vehicleType);
+				vehicle = vehiclesFactory.createVehicle(Id.create(route.getId()+".2", Vehicle.class),vehicleType);
 				((ScenarioImpl)scenario).getVehicles().addVehicle(vehicle);
-				departure = scheduleFactory.createDeparture(vehicle.getId(),departure.getDepartureTime()+24*3600);
+				departure = scheduleFactory.createDeparture(Id.create(vehicle.getId(), Departure.class), departure.getDepartureTime()+24*3600);
 				departure.setVehicleId(vehicle.getId());
 				route.addDeparture(departure);
 				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_TYPE, locomotive.type);
@@ -236,8 +236,8 @@ public class OTTDataToMATSimScheduleConverter {
 	//////////////////////////////////////////////////////////////////////
 
 	private final void convertPseudoNetwork() {
-		List<Id> nodeIds = new ArrayList<Id>(scenario.getNetwork().getNodes().keySet());
-		for (Id id : nodeIds) { scenario.getNetwork().removeNode(id); }
+		List<Id<Node>> nodeIds = new ArrayList<Id<Node>>(scenario.getNetwork().getNodes().keySet());
+		for (Id<Node> id : nodeIds) { scenario.getNetwork().removeNode(id); }
 		new CreatePseudoNetwork(scenario.getTransitSchedule(),scenario.getNetwork(),"").createNetwork();
 
 		for (Link l : scenario.getNetwork().getLinks().values()) {

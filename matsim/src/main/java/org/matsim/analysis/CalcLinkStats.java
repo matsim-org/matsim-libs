@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
@@ -57,7 +56,7 @@ public class CalcLinkStats {
 	private double volScaleFactor = 1.0;
 
 	private int count = 0;
-	private final Map<Id, LinkData> linkData;
+	private final Map<Id<Link>, LinkData> linkData;
 	private final int nofHours;
 	private final Network network;
 
@@ -68,7 +67,7 @@ public class CalcLinkStats {
 
 	public CalcLinkStats(final Network network) {
 		this.network = network;
-		this.linkData = new TreeMap<Id, LinkData>();
+		this.linkData = new TreeMap<Id<Link>, LinkData>();
 		this.nofHours = 24;
 		reset();
 	}
@@ -89,7 +88,7 @@ public class CalcLinkStats {
 		// TODO verify ttimes has hourly timeBin-Settings
 
 		// go through all links
-		for (Id linkId : this.linkData.keySet()) {
+		for (Id<Link> linkId : this.linkData.keySet()) {
 			
 			// retrieve link from link ID
 			Link link = this.network.getLinks().get(linkId);
@@ -180,8 +179,8 @@ public class CalcLinkStats {
 			out.write("\n");
 
 			// write data
-			for (Map.Entry<Id, LinkData> entry : this.linkData.entrySet()) {
-				Id linkId = entry.getKey();
+			for (Map.Entry<Id<Link>, LinkData> entry : this.linkData.entrySet()) {
+				Id<Link> linkId = entry.getKey();
 				LinkData data = entry.getValue();
 				Link link = this.network.getLinks().get(linkId);
 
@@ -271,7 +270,7 @@ public class CalcLinkStats {
 			while (line != null) {
 				String[] parts = StringUtils.explode(line, '\t');
 				if (parts.length == 154) {
-					Id linkId = new IdImpl(parts[0]);
+					Id<Link> linkId = Id.create(parts[0], Link.class);
 					LinkData data = this.linkData.get(linkId);
 					if (data == null) {
 						System.err.println("CalcLinkStats.readFile(); unknown link: " + linkId.toString());
@@ -303,7 +302,7 @@ public class CalcLinkStats {
 				}
 				else if (parts.length == 153) {
 					String linkId = parts[0];
-					LinkData data = this.linkData.get(new IdImpl(linkId));
+					LinkData data = this.linkData.get(Id.create(linkId, Link.class));
 					if (data == null) {
 						System.err.println("CalcLinkStats.readFile(); unknown link: " + linkId);
 					} else {
@@ -355,7 +354,7 @@ public class CalcLinkStats {
 	 * @param linkId
 	 * @return if no data is available, an array with length 0 is returned.
 	 */
-	public double[] getAvgLinkVolumes(final Id linkId) {
+	public double[] getAvgLinkVolumes(final Id<Link> linkId) {
 		LinkData data = this.linkData.get(linkId);
 		if (data == null) {
 			return new double[0];

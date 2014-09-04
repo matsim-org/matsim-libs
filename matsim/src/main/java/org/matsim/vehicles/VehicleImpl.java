@@ -21,19 +21,18 @@ package org.matsim.vehicles;
 
 import org.matsim.api.core.v01.Id;
 
-
 public class VehicleImpl implements Vehicle {
 
 	private VehicleType type;
-	private Id id;
+	private Id<Vehicle> id;
 
-	public VehicleImpl(Id id, VehicleType type) {
+	public VehicleImpl(Id<Vehicle> id, VehicleType type) {
 		this.id = id;
 		this.type = type;
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Vehicle> getId() {
 		return id;
 	}
 

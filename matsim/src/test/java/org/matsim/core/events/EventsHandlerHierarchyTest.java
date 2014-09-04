@@ -24,11 +24,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vehicles.Vehicle;
 
 public class EventsHandlerHierarchyTest extends MatsimTestCase {
 
@@ -37,14 +39,17 @@ public class EventsHandlerHierarchyTest extends MatsimTestCase {
 
 	class A implements BasicEventHandler, LinkLeaveEventHandler {
 
+		@Override
 		public void handleEvent(final Event event) {
 			System.out.println("Event handled");
 			EventsHandlerHierarchyTest.this.eventHandled++;
 		}
 
+		@Override
 		public void handleEvent(LinkLeaveEvent event) {
 		}
 
+		@Override
 		public void reset(final int iteration) {
 			EventsHandlerHierarchyTest.this.resetCalled++;
 		}
@@ -57,24 +62,28 @@ public class EventsHandlerHierarchyTest extends MatsimTestCase {
 
 	public final void testHandlerHierarchy() {
 		EventsManager events = EventsUtils.createEventsManager();
-		Id dummy = new IdImpl("");
+		Id<Person> personId = Id.create("1", Person.class);
+		Id<Link> linkId = Id.create("1", Link.class);
+		Id<Vehicle> vehId = Id.create("1", Vehicle.class);
 		EventHandler cc = new B();
-		events.processEvent(new LinkLeaveEvent(0., dummy, dummy, dummy));
+		events.processEvent(new LinkLeaveEvent(0., personId, linkId, vehId));
 		assertEquals(this.eventHandled, 0);
 		events.addHandler(cc);
-		events.processEvent(new LinkLeaveEvent(0., dummy, dummy, dummy));
+		events.processEvent(new LinkLeaveEvent(0., personId, linkId, vehId));
 		assertEquals(this.eventHandled, 1);
 	}
 
 	public final void testHierarchicalReset() {
 		EventsManagerImpl events = (EventsManagerImpl) EventsUtils.createEventsManager();
-		Id dummy = new IdImpl("");
+		Id<Person> personId = Id.create("1", Person.class);
+		Id<Link> linkId = Id.create("1", Link.class);
+		Id<Vehicle> vehId = Id.create("1", Vehicle.class);
 		//first test if handleEvent is not called twice for A and for C
 		C cc = new C();
-		events.processEvent(new LinkLeaveEvent(0., dummy, dummy, dummy));
+		events.processEvent(new LinkLeaveEvent(0., personId, linkId, vehId));
 		assertEquals(this.eventHandled, 0);
 		events.addHandler(cc);
-		events.processEvent(new LinkLeaveEvent(0., dummy, dummy, dummy));
+		events.processEvent(new LinkLeaveEvent(0., personId, linkId, vehId));
 		assertEquals(this.eventHandled, 1);
 		//then test the reset
 		events.resetHandlers(0);

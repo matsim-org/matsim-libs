@@ -1,4 +1,4 @@
-/* *********************************************************************** *
+/* *****e****************************************************************** *
  * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -50,14 +51,14 @@ public class CalcLinkStatsTest {
 		Network network = s.getNetwork();
 		NetworkFactory nf = network.getFactory();
 		
-		Node node1 = nf.createNode(s.createId("1"), s.createCoord(0, 0));
-		Node node2 = nf.createNode(s.createId("2"), s.createCoord(1000, 0));
-		Node node3 = nf.createNode(s.createId("3"), s.createCoord(2000, 0));
+		Node node1 = nf.createNode(Id.create("1", Node.class), s.createCoord(0, 0));
+		Node node2 = nf.createNode(Id.create("2", Node.class), s.createCoord(1000, 0));
+		Node node3 = nf.createNode(Id.create("3", Node.class), s.createCoord(2000, 0));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
-		Link link1 = nf.createLink(s.createId("101"), node1, node2);
-		Link link2 = nf.createLink(s.createId("102"), node2, node3);
+		Link link1 = nf.createLink(Id.create("101", Link.class), node1, node2);
+		Link link2 = nf.createLink(Id.create("102", Link.class), node2, node3);
 		network.addLink(link1);
 		network.addLink(link2);
 		
@@ -65,7 +66,7 @@ public class CalcLinkStatsTest {
 		TravelTime ttimes = new FreeSpeedTravelTime();
 		CalcLinkStats cls = new CalcLinkStats(network);
 		
-		Id agentId = s.createId("1001");
+		Id<Person> agentId = Id.create("1001", Person.class);
 		// generate some pseudo traffic for hour 0: 3 veh on link 1; 1 veh on link 2
 		analyzer.handleEvent(new LinkLeaveEvent(1000, agentId, link1.getId(), null));
 		analyzer.handleEvent(new LinkLeaveEvent(1010, agentId, link1.getId(), null));
@@ -124,14 +125,14 @@ public class CalcLinkStatsTest {
 		Network network = s.getNetwork();
 		NetworkFactory nf = network.getFactory();
 		
-		Node node1 = nf.createNode(s.createId("1"), s.createCoord(0, 0));
-		Node node2 = nf.createNode(s.createId("2"), s.createCoord(1000, 0));
-		Node node3 = nf.createNode(s.createId("3"), s.createCoord(2000, 0));
+		Node node1 = nf.createNode(Id.create("1", Node.class), s.createCoord(0, 0));
+		Node node2 = nf.createNode(Id.create("2", Node.class), s.createCoord(1000, 0));
+		Node node3 = nf.createNode(Id.create("3", Node.class), s.createCoord(2000, 0));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
-		Link link1 = nf.createLink(s.createId("101"), node1, node2);
-		Link link2 = nf.createLink(s.createId("102"), node2, node3);
+		Link link1 = nf.createLink(Id.create("101", Link.class), node1, node2);
+		Link link2 = nf.createLink(Id.create("102", Link.class), node2, node3);
 		network.addLink(link1);
 		network.addLink(link2);
 		
@@ -139,7 +140,7 @@ public class CalcLinkStatsTest {
 		TravelTime ttimes = new FreeSpeedTravelTime();
 		CalcLinkStats cls = new CalcLinkStats(network);
 		
-		Id agentId = s.createId("1001");
+		Id<Person> agentId = Id.create("1001", Person.class);
 		// generate some pseudo traffic for hour 0: 3 veh on link 1; 1 veh on link 2
 		analyzer.handleEvent(new LinkLeaveEvent(1000, agentId, link1.getId(), null));
 		analyzer.handleEvent(new LinkLeaveEvent(1010, agentId, link1.getId(), null));

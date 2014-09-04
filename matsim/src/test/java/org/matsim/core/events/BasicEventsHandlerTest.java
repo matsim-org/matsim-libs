@@ -20,15 +20,16 @@
 
 package org.matsim.core.events;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vehicles.Vehicle;
 
 public class BasicEventsHandlerTest extends MatsimTestCase {
 
@@ -38,11 +39,11 @@ public class BasicEventsHandlerTest extends MatsimTestCase {
 		events.addHandler(handler);
 
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0));
-		Node node2 = network.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0));
-		Link link1 = network.getFactory().createLink(new IdImpl(1), node1, node2, network, 1000.0, 10.0, 3600.0, 0);
+		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new CoordImpl(0, 0));
+		Node node2 = network.getFactory().createNode(Id.create(2, Node.class), new CoordImpl(1000, 0));
+		Link link1 = network.getFactory().createLink(Id.create(1, Link.class), node1, node2, network, 1000.0, 10.0, 3600.0, 0);
 
-		events.processEvent(new LinkEnterEvent(8.0*3600, new PersonImpl(new IdImpl(1)).getId(), link1.getId(), new IdImpl("veh")));
+		events.processEvent(new LinkEnterEvent(8.0*3600, Id.create(1, Person.class), link1.getId(), Id.create("veh", Vehicle.class)));
 		assertEquals("expected number of handled events wrong.", 1, handler.counter);
 	}
 

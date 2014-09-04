@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -48,15 +48,15 @@ public class LegHistogramTest extends MatsimTestCase {
 	 */
 	public void testDeparturesMiscModes() {
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
-		Link link = network.createAndAddLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 1.0, 1);
-		Id linkId = link.getId();
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(1000, 0));
+		Link link = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000.0, 100.0, 1.0, 1);
+		Id<Link> linkId = link.getId();
 
-		PersonImpl person1 = new PersonImpl(new IdImpl(1));
-		Id person1Id = person1.getId();
-		PersonImpl person2 = new PersonImpl(new IdImpl(2));
-		Id person2Id = person2.getId();
+		PersonImpl person1 = new PersonImpl(Id.create(1, Person.class));
+		Id<Person> person1Id = person1.getId();
+		PersonImpl person2 = new PersonImpl(Id.create(2, Person.class));
+		Id<Person> person2Id = person2.getId();
 		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(7*3600);
 		leg.setTravelTime(Time.UNDEFINED_TIME);
@@ -100,13 +100,13 @@ public class LegHistogramTest extends MatsimTestCase {
 	 */
 	public void testNofBins() {
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
-		Link link = network.createAndAddLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 1.0, 1);
-		Id linkId = link.getId();
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(1000, 0));
+		Link link = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000.0, 100.0, 1.0, 1);
+		Id<Link> linkId = link.getId();
 
-		PersonImpl person1 = new PersonImpl(new IdImpl(1));
-		Id person1Id = person1.getId();
+		PersonImpl person1 = new PersonImpl(Id.create(1, Person.class));
+		Id<Person> person1Id = person1.getId();
 		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(7*3600);
 		leg.setTravelTime(Time.UNDEFINED_TIME);
@@ -139,13 +139,13 @@ public class LegHistogramTest extends MatsimTestCase {
 
 	public void testReset() {
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
-		Link link = network.createAndAddLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 1.0, 1);
-		Id linkId = link.getId();
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(1000, 0));
+		Link link = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000.0, 100.0, 1.0, 1);
+		Id<Link> linkId = link.getId();
 
-		PersonImpl person1 = new PersonImpl(new IdImpl(1));
-		Id person1Id = person1.getId();
+		PersonImpl person1 = new PersonImpl(Id.create(1, Person.class));
+		Id<Person> person1Id = person1.getId();
 		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(7*3600);
 		leg.setTravelTime(Time.UNDEFINED_TIME);

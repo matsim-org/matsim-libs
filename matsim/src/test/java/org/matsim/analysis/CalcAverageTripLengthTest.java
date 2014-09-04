@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -31,15 +32,16 @@ public class CalcAverageTripLengthTest {
 		Population population = scenario.getPopulation();
 
 		NetworkFactory nf = network.getFactory();
-		network.addNode(nf.createNode(scenario.createId("1"), scenario.createCoord(0, 0)));
-		network.addNode(nf.createNode(scenario.createId("2"), scenario.createCoord(50, 0)));
-		network.addNode(nf.createNode(scenario.createId("3"), scenario.createCoord(100, 0)));
-		network.addNode(nf.createNode(scenario.createId("4"), scenario.createCoord(200, 0)));
-		network.addNode(nf.createNode(scenario.createId("5"), scenario.createCoord(400, 0)));
-		Link l1 = nf.createLink(scenario.createId("1"), scenario.createId("1"), scenario.createId("2"));
-		Link l2 = nf.createLink(scenario.createId("2"), scenario.createId("2"), scenario.createId("3"));
-		Link l3 = nf.createLink(scenario.createId("3"), scenario.createId("3"), scenario.createId("4"));
-		Link l4 = nf.createLink(scenario.createId("4"), scenario.createId("4"), scenario.createId("5"));
+		Node n1, n2, n3, n4, n5;
+		network.addNode(n1 = nf.createNode(Id.create("1", Node.class), scenario.createCoord(0, 0)));
+		network.addNode(n2 = nf.createNode(Id.create("2", Node.class), scenario.createCoord(50, 0)));
+		network.addNode(n3 = nf.createNode(Id.create("3", Node.class), scenario.createCoord(100, 0)));
+		network.addNode(n4 = nf.createNode(Id.create("4", Node.class), scenario.createCoord(200, 0)));
+		network.addNode(n5 = nf.createNode(Id.create("5", Node.class), scenario.createCoord(400, 0)));
+		Link l1 = nf.createLink(Id.create("1", Link.class), n1, n2);
+		Link l2 = nf.createLink(Id.create("2", Link.class), n2, n3);
+		Link l3 = nf.createLink(Id.create("3", Link.class), n3, n4);
+		Link l4 = nf.createLink(Id.create("4", Link.class), n4, n5);
 		l1.setLength(50);
 		l2.setLength(100);
 		l3.setLength(200);
@@ -95,11 +97,12 @@ public class CalcAverageTripLengthTest {
 		Population population = scenario.getPopulation();
 
 		NetworkFactory nf = network.getFactory();
-		network.addNode(nf.createNode(scenario.createId("1"), scenario.createCoord(0, 0)));
-		network.addNode(nf.createNode(scenario.createId("2"), scenario.createCoord(50, 0)));
-		network.addNode(nf.createNode(scenario.createId("3"), scenario.createCoord(100, 0)));
-		Link l1 = nf.createLink(scenario.createId("1"), scenario.createId("1"), scenario.createId("2"));
-		Link l2 = nf.createLink(scenario.createId("2"), scenario.createId("2"), scenario.createId("3"));
+		Node n1, n2, n3;
+		network.addNode(n1 = nf.createNode(Id.create("1", Node.class), scenario.createCoord(0, 0)));
+		network.addNode(n2 = nf.createNode(Id.create("2", Node.class), scenario.createCoord(50, 0)));
+		network.addNode(n3 = nf.createNode(Id.create("3", Node.class), scenario.createCoord(100, 0)));
+		Link l1 = nf.createLink(Id.create("1", Link.class), n1, n2);
+		Link l2 = nf.createLink(Id.create("2", Link.class), n2, n3);
 		l1.setLength(50);
 		l2.setLength(100);
 		network.addLink(l1);
@@ -131,9 +134,10 @@ public class CalcAverageTripLengthTest {
 		Population population = scenario.getPopulation();
 
 		NetworkFactory nf = network.getFactory();
-		network.addNode(nf.createNode(scenario.createId("1"), scenario.createCoord(0, 0)));
-		network.addNode(nf.createNode(scenario.createId("2"), scenario.createCoord(50, 0)));
-		Link l1 = nf.createLink(scenario.createId("1"), scenario.createId("1"), scenario.createId("2"));
+		Node n1, n2;
+		network.addNode(n1 = nf.createNode(Id.create("1", Node.class), scenario.createCoord(0, 0)));
+		network.addNode(n2 = nf.createNode(Id.create("2", Node.class), scenario.createCoord(50, 0)));
+		Link l1 = nf.createLink(Id.create("1", Link.class), n1, n2);
 		l1.setLength(50);
 		network.addLink(l1);
 

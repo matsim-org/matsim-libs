@@ -1,5 +1,5 @@
-/* *********************************************************************** *
- * project: org.matsim.*
+/* ******************o***************************************************** *
+ * project: org.matsimde.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,7 +23,6 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
@@ -41,25 +40,25 @@ public abstract class AbstractNetworkTest {
 	public void removeLink() {
 		Fixture f = new Fixture(getEmptyTestNetwork());
 
-		Assert.assertTrue(f.network.getLinks().containsKey(f.ids[1]));
-		Assert.assertEquals(1, f.network.getNodes().get(f.ids[1]).getInLinks().size());
-		f.network.removeLink(f.ids[1]);
-		Assert.assertFalse(f.network.getLinks().containsKey(f.ids[1]));
-		Assert.assertEquals(0, f.network.getNodes().get(f.ids[1]).getInLinks().size());
-		Assert.assertEquals(1, f.network.getNodes().get(f.ids[1]).getOutLinks().size());
+		Assert.assertTrue(f.network.getLinks().containsKey(f.linkIds[1]));
+		Assert.assertEquals(1, f.network.getNodes().get(f.linkIds[1]).getInLinks().size());
+		f.network.removeLink(f.linkIds[1]);
+		Assert.assertFalse(f.network.getLinks().containsKey(f.linkIds[1]));
+		Assert.assertEquals(0, f.network.getNodes().get(f.nodeIds[1]).getInLinks().size());
+		Assert.assertEquals(1, f.network.getNodes().get(f.nodeIds[1]).getOutLinks().size());
 
-		Assert.assertTrue(f.network.getLinks().containsKey(f.ids[2]));
-		f.network.removeLink(f.ids[2]);
-		Assert.assertFalse(f.network.getLinks().containsKey(f.ids[2]));
+		Assert.assertTrue(f.network.getLinks().containsKey(f.linkIds[2]));
+		f.network.removeLink(f.linkIds[2]);
+		Assert.assertFalse(f.network.getLinks().containsKey(f.linkIds[2]));
 
-		Assert.assertTrue(f.network.getNodes().containsKey(f.ids[1]));
-		Assert.assertEquals(0, f.network.getNodes().get(f.ids[1]).getOutLinks().size());
+		Assert.assertTrue(f.network.getNodes().containsKey(f.linkIds[1]));
+		Assert.assertEquals(0, f.network.getNodes().get(f.nodeIds[1]).getOutLinks().size());
 
-		Assert.assertEquals(2, f.network.getNodes().get(f.ids[5]).getOutLinks().size());
-		Assert.assertEquals(2, f.network.getNodes().get(f.ids[8]).getInLinks().size());
-		f.network.removeLink(f.ids[10]);
-		Assert.assertEquals(1, f.network.getNodes().get(f.ids[5]).getOutLinks().size());
-		Assert.assertEquals(1, f.network.getNodes().get(f.ids[8]).getInLinks().size());
+		Assert.assertEquals(2, f.network.getNodes().get(f.nodeIds[5]).getOutLinks().size());
+		Assert.assertEquals(2, f.network.getNodes().get(f.nodeIds[8]).getInLinks().size());
+		f.network.removeLink(f.linkIds[10]);
+		Assert.assertEquals(1, f.network.getNodes().get(f.nodeIds[5]).getOutLinks().size());
+		Assert.assertEquals(1, f.network.getNodes().get(f.nodeIds[8]).getInLinks().size());
 	}
 
 	@Test
@@ -68,30 +67,30 @@ public abstract class AbstractNetworkTest {
 
 		Assert.assertEquals(8, f.network.getNodes().size());
 		Assert.assertEquals(12, f.network.getLinks().size());
-		Assert.assertTrue(f.network.getLinks().containsKey(f.ids[1]));
-		Assert.assertTrue(f.network.getLinks().containsKey(f.ids[2]));
-		Assert.assertTrue(f.network.getNodes().containsKey(f.ids[1]));
-		f.network.removeNode(f.ids[1]);
+		Assert.assertTrue(f.network.getLinks().containsKey(f.linkIds[1]));
+		Assert.assertTrue(f.network.getLinks().containsKey(f.linkIds[2]));
+		Assert.assertTrue(f.network.getNodes().containsKey(f.nodeIds[1]));
+		f.network.removeNode(f.nodeIds[1]);
 		Assert.assertEquals(7, f.network.getNodes().size());
 		Assert.assertEquals(10, f.network.getLinks().size());
-		Assert.assertFalse(f.network.getLinks().containsKey(f.ids[1]));
-		Assert.assertFalse(f.network.getLinks().containsKey(f.ids[2]));
-		Assert.assertFalse(f.network.getNodes().containsKey(f.ids[1]));
-		Assert.assertFalse(f.network.getNodes().get(f.ids[4]).getOutLinks().containsKey(f.ids[1]));
-		Assert.assertTrue(f.network.getNodes().get(f.ids[4]).getOutLinks().containsKey(f.ids[5]));
-		Assert.assertTrue(f.network.getNodes().get(f.ids[4]).getOutLinks().containsKey(f.ids[7]));
+		Assert.assertFalse(f.network.getLinks().containsKey(f.linkIds[1]));
+		Assert.assertFalse(f.network.getLinks().containsKey(f.linkIds[2]));
+		Assert.assertFalse(f.network.getNodes().containsKey(f.nodeIds[1]));
+		Assert.assertFalse(f.network.getNodes().get(f.nodeIds[4]).getOutLinks().containsKey(f.linkIds[1]));
+		Assert.assertTrue(f.network.getNodes().get(f.nodeIds[4]).getOutLinks().containsKey(f.linkIds[5]));
+		Assert.assertTrue(f.network.getNodes().get(f.nodeIds[4]).getOutLinks().containsKey(f.linkIds[7]));
 
-		f.network.removeNode(f.ids[8]);
+		f.network.removeNode(f.nodeIds[8]);
 		Assert.assertEquals(6, f.network.getNodes().size());
 		Assert.assertEquals(6, f.network.getLinks().size());
-		Assert.assertFalse(f.network.getLinks().containsKey(f.ids[8]));
-		Assert.assertFalse(f.network.getLinks().containsKey(f.ids[9]));
-		Assert.assertFalse(f.network.getNodes().containsKey(f.ids[10]));
-		Assert.assertFalse(f.network.getNodes().containsKey(f.ids[11]));
-		Assert.assertFalse(f.network.getNodes().get(f.ids[5]).getOutLinks().containsKey(f.ids[10]));
-		Assert.assertTrue(f.network.getNodes().get(f.ids[5]).getOutLinks().containsKey(f.ids[6]));
-		Assert.assertFalse(f.network.getNodes().get(f.ids[5]).getInLinks().containsKey(f.ids[9]));
-		Assert.assertTrue(f.network.getNodes().get(f.ids[5]).getInLinks().containsKey(f.ids[3]));
+		Assert.assertFalse(f.network.getLinks().containsKey(f.linkIds[8]));
+		Assert.assertFalse(f.network.getLinks().containsKey(f.linkIds[9]));
+		Assert.assertFalse(f.network.getNodes().containsKey(f.nodeIds[10]));
+		Assert.assertFalse(f.network.getNodes().containsKey(f.nodeIds[11]));
+		Assert.assertFalse(f.network.getNodes().get(f.nodeIds[5]).getOutLinks().containsKey(f.linkIds[10]));
+		Assert.assertTrue(f.network.getNodes().get(f.nodeIds[5]).getOutLinks().containsKey(f.linkIds[6]));
+		Assert.assertFalse(f.network.getNodes().get(f.nodeIds[5]).getInLinks().containsKey(f.linkIds[9]));
+		Assert.assertTrue(f.network.getNodes().get(f.nodeIds[5]).getInLinks().containsKey(f.linkIds[3]));
 	}
 
 	/**
@@ -118,36 +117,41 @@ public abstract class AbstractNetworkTest {
 	 */
 	private static class Fixture {
 		public final Network network;
-		public final Id[] ids = new Id[13];
+		public final Id<Link>[] linkIds = new Id[13];
+		public final Id<Node>[] nodeIds = new Id[13];
 
 		public Fixture(final Network network) {
 			this.network = network;
 
-			for (int i = 0; i < ids.length; i++) {
-				this.ids[i] = new IdImpl(Integer.toString(i));
+			for (int i = 0; i < linkIds.length; i++) {
+				this.linkIds[i] = Id.create(i, Link.class);
+			}
+			for (int i = 0; i < nodeIds.length; i++) {
+				this.nodeIds[i] = Id.create(i, Node.class);
 			}
 
 			NetworkFactory f = this.network.getFactory();
-			this.network.addNode(f.createNode(this.ids[1], new CoordImpl(100, 200)));
-			this.network.addNode(f.createNode(this.ids[2], new CoordImpl(200, 200)));
-			this.network.addNode(f.createNode(this.ids[3], new CoordImpl(  0,   0)));
-			this.network.addNode(f.createNode(this.ids[4], new CoordImpl(100, 100)));
-			this.network.addNode(f.createNode(this.ids[5], new CoordImpl(200, 100)));
-			this.network.addNode(f.createNode(this.ids[6], new CoordImpl(300, 100)));
-			this.network.addNode(f.createNode(this.ids[7], new CoordImpl(100,   0)));
-			this.network.addNode(f.createNode(this.ids[8], new CoordImpl(200,   0)));
-			this.network.addLink(f.createLink(this.ids[1], this.ids[4], this.ids[1]));
-			this.network.addLink(f.createLink(this.ids[2], this.ids[1], this.ids[2]));
-			this.network.addLink(f.createLink(this.ids[3], this.ids[2], this.ids[5]));
-			this.network.addLink(f.createLink(this.ids[4], this.ids[3], this.ids[4]));
-			this.network.addLink(f.createLink(this.ids[5], this.ids[4], this.ids[5]));
-			this.network.addLink(f.createLink(this.ids[6], this.ids[5], this.ids[6]));
-			this.network.addLink(f.createLink(this.ids[7], this.ids[4], this.ids[7]));
-			this.network.addLink(f.createLink(this.ids[8], this.ids[7], this.ids[8]));
-			this.network.addLink(f.createLink(this.ids[9], this.ids[8], this.ids[5]));
-			this.network.addLink(f.createLink(this.ids[10], this.ids[5], this.ids[8]));
-			this.network.addLink(f.createLink(this.ids[11], this.ids[8], this.ids[7]));
-			this.network.addLink(f.createLink(this.ids[12], this.ids[7], this.ids[4]));
+			Node[] nodes = new Node[8];
+			this.network.addNode(nodes[1] = f.createNode(this.nodeIds[1], new CoordImpl(100, 200)));
+			this.network.addNode(nodes[2] = f.createNode(this.nodeIds[2], new CoordImpl(200, 200)));
+			this.network.addNode(nodes[3] = f.createNode(this.nodeIds[3], new CoordImpl(  0,   0)));
+			this.network.addNode(nodes[4] = f.createNode(this.nodeIds[4], new CoordImpl(100, 100)));
+			this.network.addNode(nodes[5] = f.createNode(this.nodeIds[5], new CoordImpl(200, 100)));
+			this.network.addNode(nodes[6] = f.createNode(this.nodeIds[6], new CoordImpl(300, 100)));
+			this.network.addNode(nodes[7] = f.createNode(this.nodeIds[7], new CoordImpl(100,   0)));
+			this.network.addNode(nodes[8] = f.createNode(this.nodeIds[8], new CoordImpl(200,   0)));
+			this.network.addLink(f.createLink(this.linkIds[1], nodes[4], nodes[1]));
+			this.network.addLink(f.createLink(this.linkIds[2], nodes[1], nodes[2]));
+			this.network.addLink(f.createLink(this.linkIds[3], nodes[2], nodes[5]));
+			this.network.addLink(f.createLink(this.linkIds[4], nodes[3], nodes[4]));
+			this.network.addLink(f.createLink(this.linkIds[5], nodes[4], nodes[5]));
+			this.network.addLink(f.createLink(this.linkIds[6], nodes[5], nodes[6]));
+			this.network.addLink(f.createLink(this.linkIds[7], nodes[4], nodes[7]));
+			this.network.addLink(f.createLink(this.linkIds[8], nodes[7], nodes[8]));
+			this.network.addLink(f.createLink(this.linkIds[9], nodes[8], nodes[5]));
+			this.network.addLink(f.createLink(this.linkIds[10], nodes[5], nodes[8]));
+			this.network.addLink(f.createLink(this.linkIds[11], nodes[8], nodes[7]));
+			this.network.addLink(f.createLink(this.linkIds[12], nodes[7], nodes[4]));
 		}
 
 	}
