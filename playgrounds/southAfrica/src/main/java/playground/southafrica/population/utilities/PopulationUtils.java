@@ -19,6 +19,10 @@
 
 package playground.southafrica.population.utilities;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -31,19 +35,126 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
 
+import playground.southafrica.population.utilities.activityTypeManipulation.NmbmActivityTypeManipulator;
 import playground.southafrica.utilities.Header;
 
 public class PopulationUtils {
 	private final static Logger LOG = Logger.getLogger(PopulationUtils.class);
 	
+	/**
+	 * Method to read a population file, and extract all the activity durations
+	 * before writing them to file. This is used, for example,as input into the
+	 * plotSurveyActivityDurations.R script and calculate the deciles before
+	 * manipulating the activity types using {@link NmbmActivityTypeManipulator}.
+	 *   
+	 * @param populationFile
+	 * @param outputFile
+	 */
+	public static void extractActivityDurations(String populationFile, String outputFile){
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimPopulationReader(sc).parse(populationFile);
+		
+		/*TODO Remove after debugging. */
+		double maxS = Double.NEGATIVE_INFINITY;
+		
+		List<Tuple<String, Double>> durations = new ArrayList<Tuple<String,Double>>();
+		for(Person person : sc.getPopulation().getPersons().values()){
+			Plan selectedPlan = person.getSelectedPlan();
+			
+			/* Iterate over index, and not the PlanElement, as we need the index */
+			for(int i = 0; i < selectedPlan.getPlanElements().size(); i++){
+				PlanElement pe = selectedPlan.getPlanElements().get(i);
+				if(pe instanceof Activity){
+					double duration = 0.0;
+					ActivityImpl act = (ActivityImpl) pe;
+					if(i == 0){
+						/* It is the first (home) activity. */
+						duration = act.getEndTime();
+						if(!act.getType().equalsIgnoreCase("h")){
+							LOG.warn("Chain starting with activity other than `home': " 
+									+ act.getType() + " (" + person.getId() + ")");
+							durations.add(new Tuple<String, Double>(act.getType(), duration));
+						} else{
+							durations.add(new Tuple<String, Double>("h1", duration));
+						}
+						if(duration < 0){
+							LOG.warn("First!! Negative duration: " + duration);
+						}
+					} else if(i < selectedPlan.getPlanElements().size() - 1){
+						/* It can be any activity. */
+						if(act.getType().equalsIgnoreCase("h")){
+							durations.add(new Tuple<String, Double>("h3", act.getEndTime() - act.getStartTime()));
+						} else {
+							if(act.getStartTime() == Double.NEGATIVE_INFINITY ||
+									act.getEndTime() == Double.NEGATIVE_INFINITY){
+								/* Rather use activity's maximum duration. */
+								duration = act.getMaximumDuration();
+							} else{
+								duration = act.getEndTime() - act.getStartTime();
+							}
+							durations.add(new Tuple<String, Double>(act.getType(), duration));
+						}
+						if(duration < 0){
+							LOG.warn("Mid!! Negative duration: " + duration);
+						}
+					} else {
+						/* It is the final (home) activity. */
+						duration = Math.max(24*60*60, act.getStartTime()) - act.getStartTime();
+						if(duration != Double.POSITIVE_INFINITY){
+							if(!act.getType().equalsIgnoreCase("h")){
+								LOG.warn("Chain ending with activity other than `home': " 
+										+ act.getType() + " (" + person.getId() + ")");
+								durations.add(new Tuple<String, Double>(act.getType(), duration));
+							} else{
+								durations.add(new Tuple<String, Double>("h2", duration));
+							}
+							if(duration < 0){
+								LOG.warn("LAST!! Negative duration: " + duration);
+							}
+						}
+					}
+				}
+			}
+		}
+		LOG.warn("Maximum duration (shopping): " + maxS);
+		
+		/* Write the output. */
+		String filename = outputFile;
+		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+		try {
+			bw.write("Type,Duration");
+			bw.newLine();
+			for(Tuple<String, Double> tuple : durations){
+				bw.write(tuple.getFirst());
+				/* In minutes. */
+				bw.write(String.format(",%.2f\n", tuple.getSecond() / 60)); 
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("Could not read from BufferedWriter "
+					+ filename);
+		} finally {
+			try {
+				bw.close();
+			} catch (IOException e) {
+				throw new RuntimeException("Could not close BufferedWriter "
+						+ filename);
+			}
+		}
+	}
+
+
 	/**
 	 * Reads in a {@link Households} file, and prints the number of 
 	 * {@link Household}s, and the total number of members indicated for the 
@@ -134,6 +245,25 @@ public class PopulationUtils {
 	}
 	
 	
+	public static void printNumberOfEmployedPersons(String population){
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MatsimPopulationReader pr = new MatsimPopulationReader(sc);
+		pr.readFile(population);
+		
+		LOG.info("Population parsed. Analysing employment types...");
+		
+		Counter counter = new Counter(" employed persons # ");
+		for(Id id : sc.getPopulation().getPersons().keySet()){
+			Person person = sc.getPopulation().getPersons().get(id);
+			if(((PersonImpl)person).isEmployed()){
+				counter.incCounter();
+			}
+		}
+		counter.printCounter();
+		
+		LOG.info("--------------------------------------------");
+	}
+	
 	/**
 	 * An implementation to quickly use to print statistics.
 	 */
@@ -151,15 +281,15 @@ public class PopulationUtils {
 		case 3:
 			printActivityStatistics(args[1]);
 			break;
+		case 4:
+			printNumberOfEmployedPersons(args[1]);
+			break;
 		default:
 			LOG.warn("Cannot print any statistics for option `" + option + "'");
-			break;
 		}
 		
 		Header.printFooter();
 	}
-	
-	
 	
 	
 }
