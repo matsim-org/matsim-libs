@@ -60,7 +60,7 @@ public class OcTree<T> implements Serializable {
 	 * TreeMap.java and AbstractMap.java
 	 */
 	transient volatile Collection<T> values = null;
-	
+
 	private void incrementSize() { this.modCount++; this.size++; this.values = null; }
 	private void decrementSize() { this.modCount++; this.size--; this.values = null; }
 

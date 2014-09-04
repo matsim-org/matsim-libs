@@ -1,30 +1,12 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,     *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
+//Nico de Koker, University of Pretoria, August 2014
+
 
 package playground.southafrica.projects.digicore;
-
-// Nico de Koker, University of Pretoria, August 2014
 
 class FCCPolyhedron {
 
 	// Data Members
-	private Polygon[] FcPolyhedron;
+	private NDPolygon[] FcPolyhedron;
 	private final int NFaces;
 
 	//Constructors
@@ -32,7 +14,7 @@ class FCCPolyhedron {
 		
 		NFaces = 12;
 		
-		FcPolyhedron = new Polygon[NFaces];
+		FcPolyhedron = new NDPolygon[NFaces];
 		
 		double[] dBasicPoly = new double[12];
 		double[] dCoordsList = new double[12];
@@ -60,7 +42,7 @@ class FCCPolyhedron {
 			dCoordsList[i+1] = dBasicPoly[i+1]*dScale + dCy;
 			dCoordsList[i+2] = dBasicPoly[i+2]*dScale + dCz;
 		}
-		FcPolyhedron[0] = new Polygon(4, 3, dCoordsList );
+		FcPolyhedron[0] = new NDPolygon(4, 3, dCoordsList );
 
 		// Face +x-y		
 		for (int i=0; i<12; i+=3) {
@@ -68,7 +50,7 @@ class FCCPolyhedron {
 			dCoordsList[i+1] = -1*dBasicPoly[i+1]*dScale + dCy;
 			dCoordsList[i+2] = dBasicPoly[i+2]*dScale + dCz;
 		}
-		FcPolyhedron[1] = new Polygon(4, 3, dCoordsList );
+		FcPolyhedron[1] = new NDPolygon(4, 3, dCoordsList );
 
 		// Face -x+y
 		for (int i=0; i<12; i+=3) {
@@ -76,7 +58,7 @@ class FCCPolyhedron {
 			dCoordsList[i+1] = dBasicPoly[i+1]*dScale + dCy;
 			dCoordsList[i+2] = dBasicPoly[i+2]*dScale + dCz;
 		}
-		FcPolyhedron[2] = new Polygon(4, 3, dCoordsList );
+		FcPolyhedron[2] = new NDPolygon(4, 3, dCoordsList );
 
 		// Face -x-y
 		for (int i=0; i<12; i+=3) {
@@ -84,7 +66,7 @@ class FCCPolyhedron {
 			dCoordsList[i+1] = -1*dBasicPoly[i+1]*dScale + dCy;
 			dCoordsList[i+2] = dBasicPoly[i+2]*dScale + dCz;
 		}
-		FcPolyhedron[3] = new Polygon(4, 3, dCoordsList );
+		FcPolyhedron[3] = new NDPolygon(4, 3, dCoordsList );
 
 		// Face +x+z unit polygon face
 		dBasicPoly[0]  = 1;
@@ -109,7 +91,7 @@ class FCCPolyhedron {
 			dCoordsList[i+1] = dBasicPoly[i+1]*dScale + dCy;
 			dCoordsList[i+2] = dBasicPoly[i+2]*dScale + dCz;
 		}
-		FcPolyhedron[4] = new Polygon(4, 3, dCoordsList );
+		FcPolyhedron[4] = new NDPolygon(4, 3, dCoordsList );
 
 		// Face +x-z
 		for (int i=0; i<12; i+=3) {
@@ -117,7 +99,7 @@ class FCCPolyhedron {
 			dCoordsList[i+1] = dBasicPoly[i+1]*dScale + dCy;
 			dCoordsList[i+2] = -1*dBasicPoly[i+2]*dScale + dCz;
 		}
-		FcPolyhedron[5] = new Polygon(4, 3, dCoordsList );
+		FcPolyhedron[5] = new NDPolygon(4, 3, dCoordsList );
 
 		// Face -x+z
 		for (int i=0; i<12; i+=3) {
@@ -125,7 +107,7 @@ class FCCPolyhedron {
 			dCoordsList[i+1] = dBasicPoly[i+1]*dScale + dCy;
 			dCoordsList[i+2] = dBasicPoly[i+2]*dScale + dCz;
 		}
-		FcPolyhedron[6] = new Polygon(4, 3, dCoordsList );
+		FcPolyhedron[6] = new NDPolygon(4, 3, dCoordsList );
 
 		// Face -x-z
 		for (int i=0; i<12; i+=3) {
@@ -133,7 +115,7 @@ class FCCPolyhedron {
 			dCoordsList[i+1] = dBasicPoly[i+1]*dScale + dCy;
 			dCoordsList[i+2] = -1*dBasicPoly[i+2]*dScale + dCz;
 		}
-		FcPolyhedron[7] = new Polygon(4, 3, dCoordsList );
+		FcPolyhedron[7] = new NDPolygon(4, 3, dCoordsList );
 
 		// Face +y+z unit polygon face
 		dBasicPoly[0]  = 0;
@@ -158,7 +140,7 @@ class FCCPolyhedron {
 			dCoordsList[i+1] = dBasicPoly[i+1]*dScale + dCy;
 			dCoordsList[i+2] = dBasicPoly[i+2]*dScale + dCz;
 		}
-		FcPolyhedron[8] = new Polygon(4, 3, dCoordsList );
+		FcPolyhedron[8] = new NDPolygon(4, 3, dCoordsList );
 
 		// Face +y-z
 		for (int i=0; i<12; i+=3) {
@@ -166,7 +148,7 @@ class FCCPolyhedron {
 			dCoordsList[i+1] = dBasicPoly[i+1]*dScale + dCy;
 			dCoordsList[i+2] = -1*dBasicPoly[i+2]*dScale + dCz;
 		}
-		FcPolyhedron[9] = new Polygon(4, 3, dCoordsList );
+		FcPolyhedron[9] = new NDPolygon(4, 3, dCoordsList );
 
 		// Face -y+z
 		for (int i=0; i<12; i+=3) {
@@ -174,7 +156,7 @@ class FCCPolyhedron {
 			dCoordsList[i+1] = -1*dBasicPoly[i+1]*dScale + dCy;
 			dCoordsList[i+2] = dBasicPoly[i+2]*dScale + dCz;
 		}
-		FcPolyhedron[10] = new Polygon(4, 3, dCoordsList );
+		FcPolyhedron[10] = new NDPolygon(4, 3, dCoordsList );
 
 		// Face -y-z
 		for (int i=0; i<12; i+=3) {
@@ -182,7 +164,7 @@ class FCCPolyhedron {
 			dCoordsList[i+1] = -1*dBasicPoly[i+1]*dScale + dCy;
 			dCoordsList[i+2] = -1*dBasicPoly[i+2]*dScale + dCz;
 		}
-		FcPolyhedron[11] = new Polygon(4, 3, dCoordsList );
+		FcPolyhedron[11] = new NDPolygon(4, 3, dCoordsList );
 
 	}
 	
@@ -194,12 +176,12 @@ class FCCPolyhedron {
 		this(0d, 0d, 0d, 1d);
 	}
 	
-    //Returns FcPolyhedron
-	public Polygon[] getFcPolyhedron( ) {
+ //Returns FcPolyhedron
+	public NDPolygon[] getFcPolyhedron( ) {
 		return FcPolyhedron;
 	}
 	
-    //Returns NFaces
+ //Returns NFaces
 	public int getNFaces( ) {
 		return NFaces;
 	}

@@ -23,27 +23,26 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.jzy3d.analysis.AbstractAnalysis;
 import org.jzy3d.analysis.AnalysisLauncher;
-import org.jzy3d.chart.controllers.camera.AbstractCameraController;
 import org.jzy3d.chart.factories.AWTChartComponentFactory;
 import org.jzy3d.colors.Color;
-import org.jzy3d.maths.BoundingBox3d;
 import org.jzy3d.maths.Coord3d;
-import org.jzy3d.maths.Scale;
 import org.jzy3d.plot3d.primitives.Point;
+import org.jzy3d.plot3d.primitives.Polygon;
 import org.jzy3d.plot3d.primitives.Quad;
 import org.jzy3d.plot3d.primitives.Scatter;
 import org.jzy3d.plot3d.primitives.Shape;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 import org.jzy3d.plot3d.rendering.lights.Light;
-import org.jzy3d.plot3d.rendering.view.Camera;
-import org.jzy3d.plot3d.rendering.view.modes.CameraMode;
 import org.jzy3d.plot3d.rendering.view.modes.ViewPositionMode;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -55,8 +54,15 @@ public class AggregateData extends AbstractAnalysis{
 	private double scale;
 	private OcTree<Coord3d> ot;
 	private Map<Coord3d, Integer> map;
+	private Map<Coord3d, Integer> mapRating;
 	private double countMax;
 	private double maxLines;
+	
+	/* Specify colours */
+	private final static Color MY_GREEN = new Color(147, 214, 83, 255);
+	private final static Color MY_YELLOW = new Color(248, 215,85, 255);
+	private final static Color MY_ORANGE = new Color(250, 164, 54, 255);
+	private final static Color MY_RED = new Color(246, 43, 32, 255);
 
 	public static void main(String[] args) {
 		Header.printHeader(AggregateData.class.toString(), args);
@@ -80,6 +86,12 @@ public class AggregateData extends AbstractAnalysis{
 		String rFile = args[1];
 		this.scale = Double.parseDouble(args[2]);
 		this.maxLines = Double.parseDouble(args[3]);
+		
+		List<Double> zoneThresholds = new ArrayList<Double>();
+		int argsIndex = 4;
+		while(args.length > argsIndex){
+			zoneThresholds.add(Double.parseDouble(args[argsIndex++]));
+		}
 		
 		/* Read the raw data. */
 		LOG.info("Parsing the data extent...");
@@ -172,7 +184,45 @@ public class AggregateData extends AbstractAnalysis{
 		}
 		counter.printCounter();
 		
-		/* Write values out to file, for visualization in R. */
+		
+		Comparator<Coord3d> coordComparator = new Comparator<Coord3d>() {
+
+			@Override
+			public int compare(Coord3d o1, Coord3d o2) {
+				return map.get(o2).compareTo(map.get(o1));
+			}
+		};
+		/* Sort the polyhedra based on their counts.*/
+		LOG.info("Ranking polyhedra based on point-counts only.");
+		List<Coord3d> sortedCoords = new ArrayList<Coord3d>(map.keySet());
+		Collections.sort(sortedCoords, coordComparator);
+		LOG.info("   10 polyhedra with largest number of observations:");
+		for(int i = 0; i < 10; i++){
+			LOG.info(String.format("      %d: %d observations", i+1, map.get(sortedCoords.get(i))));
+		}
+		double totalAdded = 0.0;
+		double cumulative = 0.0;
+		mapRating = new TreeMap<Coord3d, Integer>(coordComparator);
+		for(int i = 0; i < sortedCoords.size(); i++){
+			Coord3d c = sortedCoords.get(i);
+			int obs = map.get(c);
+			totalAdded += (double)obs;
+			cumulative = totalAdded / (double)counter.getCounter();
+			
+			/* Get the rating class for this value. */
+			Integer ratingZone = null;
+			int zoneIndex = 0;
+			while(ratingZone == null && zoneIndex < zoneThresholds.size()){
+				if(cumulative <= zoneThresholds.get(zoneIndex)){
+					ratingZone = new Integer(zoneIndex);
+				} else{
+					zoneIndex++;
+				}
+			}
+			mapRating.put(c, ratingZone);
+		}
+		
+		/* Write values out to file, for visualisation in R. */
 		LOG.info("Writing centroid counts to file...");
 		BufferedWriter bw = IOUtils.getBufferedWriter(rFile);
 		try{
@@ -180,6 +230,8 @@ public class AggregateData extends AbstractAnalysis{
 				bw.write(c.toString());
 				bw.write(",");
 				bw.write(String.valueOf(map.get(c)));
+				bw.write(",");
+				bw.write(String.valueOf(mapRating.get(c)));
 				bw.newLine();
 			}
 		} catch (IOException e) {
@@ -213,7 +265,9 @@ public class AggregateData extends AbstractAnalysis{
 	
 	@Override
 	public void init() throws Exception {
+//		printCentroids();
 		printPolyhedra();
+//		printPolyhedraSlice();
 	}
 	
 	public AggregateData() {
@@ -241,12 +295,14 @@ public class AggregateData extends AbstractAnalysis{
 		Light light = chart.addLight(new Coord3d(-1000f, -300f, 12000f));
 		light.setRepresentationRadius(100);
 		light.setEnabled(true);
+		light.setEnabled(false);
 
 		chart.addKeyController();
 		Coord3d oldViewPoint = chart.getCanvas().getView().getViewPoint();
 		Coord3d newViewPoint = new Coord3d(oldViewPoint.x, oldViewPoint.y/3, 100);
 
 		chart.getView().setSquared(false);
+		chart.getView().setSquared(true);
 		chart.getView().setMaximized(true);
 		chart.getView().setViewPoint(newViewPoint, true);
 		chart.getView().setViewPositionMode(ViewPositionMode.FREE);
@@ -264,9 +320,31 @@ public class AggregateData extends AbstractAnalysis{
 			Color white = new Color(255, 255, 255, 255); 
 			Color yellow = new Color(255, 255, 180, 255);
 			
+			/* Change colour based on rating zone. */
+			Color fillColor = null;
+			int zone = mapRating.get(c);
+			switch (zone) {
+			case 0:
+				fillColor = MY_GREEN;
+				break;
+			case 1:
+				fillColor = MY_YELLOW;
+				break;
+			case 2:
+				fillColor = MY_ORANGE;
+				break;
+			case 3:
+				fillColor = MY_RED;
+				break;
+			default:
+			}
+			if(fillColor == null){
+				LOG.error("Something wrong!!");
+			}
+			
 			/* Create faces. */
 			FCCPolyhedron poly = new FCCPolyhedron(c.x, c.y, c.z, scale);
-			for(Polygon face : poly.getFcPolyhedron()){
+			for(NDPolygon face : poly.getFcPolyhedron()){
 				Quad q = new Quad();
 				for(GridPoint point : face.getPolyFace()){
 					q.add(new Point(new Coord3d(point.getX(), point.getY(), point.getZ())));
@@ -276,16 +354,84 @@ public class AggregateData extends AbstractAnalysis{
 			
 			Shape shape = new Shape(body);
 			shape.setFaceDisplayed(true);
-			shape.setColor(lightGray);
+			shape.setColor(fillColor);
 			shape.setFaceDisplayed(true);
 			shape.setWireframeColor(darkerGray);
 			chart.getScene().add(shape);
 			chart.getView().shoot();
 		}
+	}
+	
+	
+	private void printPolyhedraSlice(){
+		/* Set up the chart. */
+		chart = AWTChartComponentFactory.chart(Quality.Advanced, "awt");
+		Light light = chart.addLight(new Coord3d(-1000f, -300f, 12000f));
+		light.setRepresentationRadius(100);
+		light.setEnabled(true);
+		light.setEnabled(false);
 		
-		/* Print the stuff. */
+		chart.addKeyController();
+		Coord3d oldViewPoint = chart.getCanvas().getView().getViewPoint();
+//		Coord3d newViewPoint = new Coord3d(oldViewPoint.x, oldViewPoint.y/3, 100);
+		Coord3d newViewPoint = new Coord3d(3*Math.PI/2, Math.PI/2, 5000);
 		
+		chart.getView().setSquared(false);
+		chart.getView().setMaximized(true);
+		chart.getView().setViewPoint(newViewPoint, true);
+		chart.getView().setViewPositionMode(ViewPositionMode.FREE);
+		chart.getView().updateBounds();
 		
+		for(Coord3d c : map.keySet()){
+			/* Determine colour. */
+			Color darkerGray = new Color(100, 100, 100, 255);
+			
+			/* Change colour based on rating zone. */
+			Color fillColor = null;
+			int zone = mapRating.get(c);
+			switch (zone) {
+			case 0:
+				fillColor = MY_GREEN;
+				break;
+			case 1:
+				fillColor = MY_YELLOW;
+				break;
+			case 2:
+				fillColor = MY_ORANGE;
+				break;
+			case 3:
+				fillColor = MY_RED;
+				break;
+			default:
+			}
+			if(fillColor == null){
+				LOG.error("Something wrong!!");
+			}
+			
+			
+			/* Create slice face. */
+//			for(double depth = 800; depth <= 1200; depth+=10){
+			{double depth = 1003.0;
+				FCCPlanePolygon fccPoly = new FCCPlanePolygon(c.x, c.y, c.z, 3, depth, scale);
+				Polygon poly = new Polygon();
+				
+				for(GridPoint point : fccPoly.getFcPlanePolygon().getPolyFace()){
+					poly.add(new Point(new Coord3d(point.getX(), point.getY(), 0)));
+				}
+				
+				poly.setFaceDisplayed(true);
+				poly.setColor(fillColor);
+				poly.setWireframeColor(darkerGray);
+				chart.getScene().add(poly);
+				chart.getView().shoot();
+//				try {
+//					chart.screenshot(new File("/Users/jwjoubert/Pictures/Digicore/Slice_" + depth + ".png"));
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//					LOG.error("Could not write image for depth " + depth);
+//				}
+			}
+		}
 	}
 	
 	
