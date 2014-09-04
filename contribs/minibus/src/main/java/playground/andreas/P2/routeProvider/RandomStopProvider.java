@@ -37,9 +37,9 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import playground.andreas.P2.genericUtils.GridNode;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants;
-import playground.vsp.analysis.utils.GridNode;
 
 /**
  * 

@@ -45,8 +45,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 
+import playground.andreas.P2.genericUtils.GridNode;
 import playground.andreas.P2.helper.PConfigGroup;
-import playground.vsp.analysis.utils.GridNode;
 
 /**
  * Accumulates the number of activities right before and after a paratransit trip. Ignores pt interactions.

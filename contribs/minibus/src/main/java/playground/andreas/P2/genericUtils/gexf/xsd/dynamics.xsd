@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.gexf.net/1.2draft" xmlns:ns1="http://www.gexf.net/1.2draft" xmlns:viz="http://www.gexf.net/1.2draft/viz">
+  <xs:import namespace="http://www.gexf.net/1.2draft/viz" schemaLocation="viz.xsd"/>
+  <!-- extension point -->
+  <!-- extension point -->
+  <!-- extension point -->
+  <!-- extension point -->
+  <!-- extension point -->
+  <!-- new point -->
+  <xs:complexType name="spells-content">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" ref="ns1:spell"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="spell">
+    <xs:complexType>
+      <xs:attributeGroup ref="ns1:spell-content"/>
+    </xs:complexType>
+  </xs:element>
+  <!-- new point -->
+  <xs:attributeGroup name="spell-content">
+    <xs:attribute name="start" type="ns1:time-type"/>
+    <xs:attribute name="startopen" type="ns1:time-type"/>
+    <xs:attribute name="end" type="ns1:time-type"/>
+    <xs:attribute name="endopen" type="ns1:time-type"/>
+  </xs:attributeGroup>
+  <!-- new datatype -->
+  <xs:simpleType name="time-type">
+    <xs:union memberTypes="xs:integer xs:double xs:date xs:dateTime"/>
+  </xs:simpleType>
+  <!-- new datatype -->
+  <xs:simpleType name="timeformat-type">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="integer"/>
+      <xs:enumeration value="double"/>
+      <xs:enumeration value="date"/>
+      <xs:enumeration value="dateTime"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

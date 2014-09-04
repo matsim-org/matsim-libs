@@ -35,24 +35,24 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import org.matsim.core.utils.misc.Time;
 
-import playground.vsp.gexf.ObjectFactory;
-import playground.vsp.gexf.XMLAttributeContent;
-import playground.vsp.gexf.XMLAttributesContent;
-import playground.vsp.gexf.XMLAttrtypeType;
-import playground.vsp.gexf.XMLAttvalue;
-import playground.vsp.gexf.XMLAttvaluesContent;
-import playground.vsp.gexf.XMLClassType;
-import playground.vsp.gexf.XMLDefaultedgetypeType;
-import playground.vsp.gexf.XMLEdgeContent;
-import playground.vsp.gexf.XMLEdgesContent;
-import playground.vsp.gexf.XMLGexfContent;
-import playground.vsp.gexf.XMLGraphContent;
-import playground.vsp.gexf.XMLIdtypeType;
-import playground.vsp.gexf.XMLModeType;
-import playground.vsp.gexf.XMLNodeContent;
-import playground.vsp.gexf.XMLNodesContent;
-import playground.vsp.gexf.XMLTimeformatType;
-import playground.vsp.gexf.viz.PositionContent;
+import playground.andreas.P2.genericUtils.gexf.ObjectFactory;
+import playground.andreas.P2.genericUtils.gexf.XMLAttributeContent;
+import playground.andreas.P2.genericUtils.gexf.XMLAttributesContent;
+import playground.andreas.P2.genericUtils.gexf.XMLAttrtypeType;
+import playground.andreas.P2.genericUtils.gexf.XMLAttvalue;
+import playground.andreas.P2.genericUtils.gexf.XMLAttvaluesContent;
+import playground.andreas.P2.genericUtils.gexf.XMLClassType;
+import playground.andreas.P2.genericUtils.gexf.XMLDefaultedgetypeType;
+import playground.andreas.P2.genericUtils.gexf.XMLEdgeContent;
+import playground.andreas.P2.genericUtils.gexf.XMLEdgesContent;
+import playground.andreas.P2.genericUtils.gexf.XMLGexfContent;
+import playground.andreas.P2.genericUtils.gexf.XMLGraphContent;
+import playground.andreas.P2.genericUtils.gexf.XMLIdtypeType;
+import playground.andreas.P2.genericUtils.gexf.XMLModeType;
+import playground.andreas.P2.genericUtils.gexf.XMLNodeContent;
+import playground.andreas.P2.genericUtils.gexf.XMLNodesContent;
+import playground.andreas.P2.genericUtils.gexf.XMLTimeformatType;
+import playground.andreas.P2.genericUtils.gexf.viz.PositionContent;
 
 /**
  * Transforms {@link PlanElement} into a Gexf file.
@@ -177,7 +177,7 @@ public class PlanElement2Gexf extends MatsimJaxbXmlWriter{
 	public void write(String filename) {
 		JAXBContext jc;
 		try {
-			jc = JAXBContext.newInstance(playground.vsp.gexf.ObjectFactory.class);
+			jc = JAXBContext.newInstance(playground.andreas.P2.genericUtils.gexf.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller();
 			super.setMarshallerProperties(PlanElement2Gexf.XSD_PATH, m);
 			BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
@@ -205,7 +205,7 @@ public class PlanElement2Gexf extends MatsimJaxbXmlWriter{
 			XMLNodeContent n = this.gexfFactory.createXMLNodeContent();
 			n.setId(node.getUniquePlanIdentifier());
 			
-			playground.vsp.gexf.viz.ObjectFactory vizFac = new playground.vsp.gexf.viz.ObjectFactory();
+			playground.andreas.P2.genericUtils.gexf.viz.ObjectFactory vizFac = new playground.andreas.P2.genericUtils.gexf.viz.ObjectFactory();
 			PositionContent pos = vizFac.createPositionContent();
 			pos.setX((float) node.getIterationFounded());
 			pos.setY((float) Integer.parseInt(node.getCoopId().split("_")[1]));
