@@ -20,17 +20,13 @@
 
 package org.matsim.core.config.groups;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
+
+import java.util.*;
 
 public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	
@@ -46,7 +42,6 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private static final String END_TIME = "endTime";
 	private static final String TIME_STEP_SIZE = "timeStepSize";
 	private static final String SNAPSHOT_PERIOD = "snapshotperiod";
-//	private static final String SNAPSHOT_FORMAT = "snapshotFormat";
 	private static final String FLOW_CAPACITY_FACTOR = "flowCapacityFactor";
 	private static final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
 	private static final String STUCK_TIME = "stuckTime";
@@ -165,7 +160,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 
 	@Override
 	public final TreeMap<String, String> getParams() {
-		TreeMap<String, String> map = new TreeMap<String, String>();
+		TreeMap<String, String> map = new TreeMap<>();
 		map.put(START_TIME, Time.writeTime(getStartTime()));
 		map.put(END_TIME, Time.writeTime(getEndTime()));
 		map.put(TIME_STEP_SIZE, Time.writeTime(getTimeStepSize()));
@@ -179,7 +174,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		map.put(TRAFFIC_DYNAMICS, getTrafficDynamics());
 		map.put(SIM_STARTTIME_INTERPRETATION, getSimStarttimeInterpretation());
 		map.put(VEHICLE_BEHAVIOR, getVehicleBehavior());
-		map.put(MAIN_MODE, CollectionUtils.setToString(new HashSet<String>(getMainModes())));
+		map.put(MAIN_MODE, CollectionUtils.setToString(new HashSet<>(getMainModes())));
 		map.put(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES, String.valueOf( isInsertingWaitingVehiclesBeforeDrivingVehicles() ) );
 		map.put(NODE_OFFSET, Double.toString(this.getNodeOffset()));
 		map.put(LINK_DYNAMICS, this.getLinkDynamics() ) ;
@@ -208,9 +203,9 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 				+ ONLY_USE_STARTTIME + "'" );
 		map.put(VEHICLE_BEHAVIOR, "Defines what happens if an agent wants to depart, but the specified vehicle is not available. " +
 				"One of: " + VEHICLE_BEHAVIOR_TELEPORT + ", " + VEHICLE_BEHAVIOR_WAIT + ", " + VEHICLE_BEHAVIOR_EXCEPTION);
-		map.put(MAIN_MODE, "Defines which mode should be the qsim `main' (=congested) mode. Technically, this is the mode that " +
+		map.put(MAIN_MODE, "Defines which modes are congested modes. Technically, these are the modes that " +
 				"the departure handler of the netsimengine handles.  Effective cell size, effective lane width, flow capacity " +
-				"factor, and storage capacity factor need to be set with diligence.  Needs to be a vehicular mode to make sense.");
+				"factor, and storage capacity factor need to be set with diligence.  Need to be vehicular modes to make sense.");
 		map.put(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES, 
 				"decides if waiting vehicles enter the network after or before the already driving vehicles were moved. Default: false"); 
 		map.put(NODE_OFFSET, "Shortens a link in the visualization, i.e. its start and end point are moved into towards the center. Does not affect traffic flow. ");
@@ -218,7 +213,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		{
 			StringBuilder stb = new StringBuilder() ;
 			for ( LinkDynamics ld : LinkDynamics.values() ) {
-				stb.append( " " + ld.toString() ) ;
+				stb.append(" ").append(ld.toString());
 			}
 			map.put(LINK_DYNAMICS, "default: FIFO; options:" + stb ) ;
 		}
