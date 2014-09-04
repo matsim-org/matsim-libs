@@ -77,26 +77,48 @@ public class NmbmActivityTypeManipulator extends ActivityTypeManipulator {
 						act.setType("h1"); /* First activity of the chain. */
 					}
 				} else if(i == plan.getPlanElements().size() - 1){
-					/* Since the method getStartTime is deprecated,
-					 * estimate the start time as the end time of the
-					 * previous activity plus the duration of the trip. */
-					double previousEndTime = ((ActivityImpl)plan.getPlanElements().get(i-2)).getEndTime();
-					double tripDuration = ((Leg)plan.getPlanElements().get(i-1)).getTravelTime();
-					estimatedDuration = Math.max(24*60*60, (previousEndTime + tripDuration) ) - (previousEndTime + tripDuration);
-
-					if(act.getType().equalsIgnoreCase("h")){
-						act.setType("h2"); /* Final activity of the chain. */
+					/* We need to distinguish between persons and freight, since
+					 * freight does not have a start time, duration, or end
+					 * time set for the last 'major' activity - June 2014 
+					 * 
+					 * FIXME Question is, so what do we change the activity type 
+					 * TO for the last activity?!?!*/
+					
+					if(plan.getPerson().getId().toString().startsWith("com")){
+						estimatedDuration = 4*60*60; /* Thumb suck!! */
+					} else{
+						/* Since the method getStartTime is deprecated,
+						 * estimate the start time as the end time of the
+						 * previous activity plus the duration of the trip. */
+						double previousEndTime = ((ActivityImpl)plan.getPlanElements().get(i-2)).getEndTime();
+						double tripDuration = ((Leg)plan.getPlanElements().get(i-1)).getTravelTime();
+						estimatedDuration = Math.max(24*60*60, (previousEndTime + tripDuration) ) - (previousEndTime + tripDuration);
+						
+						if(act.getType().equalsIgnoreCase("h")){
+							act.setType("h2"); /* Final activity of the chain. */
+						}
 					}
 				} else{
-					/* Since the method getStartTime is deprecated,
-					 * estimate the start time as the end time of the
-					 * previous activity plus the duration of the trip. */
-					double previousEndTime = ((ActivityImpl)plan.getPlanElements().get(i-2)).getEndTime();
-					double tripDuration = ((Leg)plan.getPlanElements().get(i-1)).getTravelTime();
-					estimatedDuration = act.getEndTime() - (previousEndTime + tripDuration);
-
-					if(act.getType().equalsIgnoreCase("h")){
-						act.setType("h3"); /* Intermediate activity. */
+					/* We need to distinguish between persons and freight, since
+					 * freight works with maximum duration, and not start- and
+					 * end times. JWJ, June 2014*/
+					if(plan.getPerson().getId().toString().startsWith("com")){
+						estimatedDuration = act.getMaximumDuration();
+					} else{
+						/* We assume it is a person... */
+						
+						/* Since the method getStartTime is deprecated,
+						 * estimate the start time as the end time of the
+						 * previous activity plus the duration of the trip. 
+						 * 
+						 * This will only work with Persons (JWJ, June 2014)*/
+						double previousEndTime = ((ActivityImpl)plan.getPlanElements().get(i-2)).getEndTime();
+						double tripDuration = ((Leg)plan.getPlanElements().get(i-1)).getTravelTime();
+						estimatedDuration = act.getEndTime() - (previousEndTime + tripDuration);
+						
+						if(act.getType().equalsIgnoreCase("h")){
+							act.setType("h3"); /* Intermediate activity. */
+						}
 					}
 				}
 				

@@ -36,12 +36,20 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
 
+import playground.southafrica.population.utilities.PopulationUtils;
+
 /**
  * Once a population has been generated, the {@link Activity} types often 
  * requires adaption to account for different durations. For example, when
  * <i>shopping</i> (s) duration has a large time distribution, it may be  
  * useful to change them to s1, s2, etc., each with a different <i>typical
  * duration</i>. This may result in more accurate simulation results.
+ * 
+ * This class expected that activity durations have already been analysed. This
+ * can be done using {@link PopulationUtils#extractActivityDurations(String, String)}
+ * and analysing the durations in R using the script plotSurveyActivityDurations.
+ * (TODO That R class should be updated as it is used for more than just survey
+ * activities, JWJ - June 2014)
  *
  * @author jwjoubert
  */
