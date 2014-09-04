@@ -88,7 +88,7 @@ public class SanralPopulationConverter {
 		String outputCRS = args[7];
 		Boolean convertDurationToEndTime= Boolean.parseBoolean(args[8]);
 		
-		SanralPopulationConverter.Run(inputFile, inputCRS, idPrefix, subPopulation, fraction, outputFile, attributesFile, outputCRS, convertDurationToEndTime);
+		SanralPopulationConverter.Run(inputFile, idPrefix, inputCRS, subPopulation, fraction, outputFile, attributesFile, outputCRS, convertDurationToEndTime);
 		
 		Header.printFooter();
 	}

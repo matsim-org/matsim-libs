@@ -57,7 +57,7 @@ public class PuttingGautengPopulationTogether {
 	 * 		vehicles; and <br>
 	 * <code>comAttr.xml.gz</code> containing the attributes of the commercial
 	 * 		vehicle population.<br><br>
-	 * 
+	 * 	
 	 * This means you have to first run the {@link AddGautengIntraAttribute} 
 	 * class and move the output to the relevant folder.
 	 * 
@@ -67,6 +67,7 @@ public class PuttingGautengPopulationTogether {
 		Header.printHeader(PuttingGautengPopulationTogether.class.toString(), args);
 		
 		String outputFolder = args[0];
+		Double fraction = Double.parseDouble(args[1]); 
 		
 		/* Remove all the non-Gauteng commercial vehicles. */
 		RemoveNonGautengCommercial.run(
@@ -84,7 +85,7 @@ public class PuttingGautengPopulationTogether {
 				outputFolder + "comAttrGautengIntra.xml.gz");
 
 		/* Convert all the old Sanral population components. */
-		convertOldSanralSubpopulations(outputFolder);
+		convertOldSanralSubpopulations(outputFolder, fraction);
 		
 		/* Now combine the subpopulations. */
 		combineSubpopulations(outputFolder);
@@ -160,33 +161,43 @@ public class PuttingGautengPopulationTogether {
 	}
 
 	/**
+	 * Takes the original subpopulation, and does a few conversions:
+	 * <ul>
+	 * 		<li> coordinate reference system from WGS84_UTM35S to WGS84_SA_Albers;
+	 * 		<li> add a subpopulation prefix to the Id;
+	 * 		<li> add a subpopulation attribute;
+	 * 		<li> samples a given fraction. This is tricky, because the fraction 
+	 * 			 is relative to the original population sample. So, if the 
+	 * 			 original given population was a 10% sample (which was the case
+	 * 			 in Gauteng) then 0.10 would mean 10% of the input 10% sample, 
+	 * 			 resulting in a final 1% sample.
+	 * </ul>
 	 * @param outputFolder
 	 */
-	private static void convertOldSanralSubpopulations(String outputFolder) {
+	private static void convertOldSanralSubpopulations(String outputFolder, double fraction) {
 		SanralPopulationConverter.Run("/Users/jwjoubert/Documents/workspace/data-sanral2010/plans/car_plans_2009_10pctV0.xml.gz",
-				"car", "WGS84_UTM35S", "car", 0.1, 
+				"car", "WGS84_UTM35S", "car", fraction, 
 				outputFolder + "car.xml.gz",
 				outputFolder + "carAttr.xml.gz",
 				"WGS84_SA_Albers",
 				true);
 		SanralPopulationConverter.Run("/Users/jwjoubert/Documents/workspace/data-sanral2010/plans/bus_plans_2009_10pctV0.xml.gz",
-				"bus", "WGS84_UTM35S", "bus", 0.1, 
+				"bus", "WGS84_UTM35S", "bus", fraction, 
 				outputFolder + "bus.xml.gz",
 				outputFolder + "busAttr.xml.gz",
 				"WGS84_SA_Albers",
 				true);
 		SanralPopulationConverter.Run("/Users/jwjoubert/Documents/workspace/data-sanral2010/plans/taxi_plans_2009_10pctV0.xml.gz",
-				"taxi", "WGS84_UTM35S", "taxi", 0.1, 
+				"taxi", "WGS84_UTM35S", "taxi", fraction, 
 				outputFolder + "taxi.xml.gz",
 				outputFolder + "taxiAttr.xml.gz",
 				"WGS84_SA_Albers",
 				true);
 		SanralPopulationConverter.Run("/Users/jwjoubert/Documents/workspace/data-sanral2010/plans/ext_plans_2011_10pctV0.xml.gz",
-				"ext", "WGS84_UTM35S", "ext", 0.1, 
+				"ext", "WGS84_UTM35S", "ext", fraction, 
 				outputFolder + "ext.xml.gz",
 				outputFolder + "extAttr.xml.gz",
 				"WGS84_SA_Albers",
 				false);
 	}
-
 }
