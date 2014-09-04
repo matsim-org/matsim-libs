@@ -105,9 +105,22 @@ public class LoadMyScenarios {
 	}
 	
 	/**
+	 * Returns scenario from config and contains only plans file location.
+	 */
+	public static Scenario loadScenarioFromPlansAndConfig(String plansFile, String configFile) {
+		Config config = new Config();
+		config.addCoreModules();
+		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		configReader.readFile(configFile);
+		config.plans().setInputFile(plansFile);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		return scenario;
+	}
+	
+	/**
 	 * Returns simulation end time by reading config file and without loading scenario.
 	 */
-	public static Double getEndTime(String configfile) {
+	public static Double getSimulationEndTime(String configfile) {
 		Config config = new Config();
 		config.addCoreModules();
 		MatsimConfigReader configReader = new MatsimConfigReader(config);

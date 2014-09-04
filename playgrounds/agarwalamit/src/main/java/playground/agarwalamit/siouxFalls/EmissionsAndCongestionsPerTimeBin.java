@@ -45,15 +45,15 @@ import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
 public class EmissionsAndCongestionsPerTimeBin {
 
 	private Logger logger = Logger.getLogger(EmissionsAndCongestionsPerTimeBin.class);
-	private final String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMC/";
-	private final String runCase = "run201";
+	private final String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/";
+	private final String runCase = "run208";
 	private final String networkFile =outputDir+runCase+"/output_network.xml.gz";
 	private final String configFile = outputDir+runCase+"/output_config.xml";
 	private EmissionUtils emissionUtils;
 
 	private Network network;
 	private final int noOfTimeBins = 30;
-	private final double simulationEndTime = LoadMyScenarios.getEndTime(configFile) ;
+	private final double simulationEndTime = LoadMyScenarios.getSimulationEndTime(configFile) ;
 	private final Scenario scenario = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
 	private final int lastIteration = LoadMyScenarios.getLastIteration(configFile);
 	private List<Double> allTimeBins = new ArrayList<Double>();

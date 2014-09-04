@@ -124,6 +124,7 @@ public class LegModeTravelTimeHandler implements PersonDepartureEventHandler, Pe
 
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
+		warnCount++;
 		if(warnCount<=maxStuckAndAbortWarnCount){
 		logger.warn("'StuckAndAbort' event is thrown for person "+event.getPersonId()+" on link "+event.getLinkId()+" at time "+event.getTime()+
 				". \n Correctness of travel time for such persons can not be guaranteed.");
