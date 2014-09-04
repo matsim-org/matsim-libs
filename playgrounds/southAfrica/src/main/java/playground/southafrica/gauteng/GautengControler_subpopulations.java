@@ -55,6 +55,7 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.roadpricing.RoadPricing;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeUsingTollFactor;
@@ -268,7 +269,13 @@ public class GautengControler_subpopulations {
 
 	private static void setUpRoadPricingAndScoring(double baseValueOfTime, double valueOfTimeMultiplier, final Scenario sc,
 			final Controler controler) {
+		// SCORING:
+		controler.setScoringFunctionFactory(new GautengScoringFunctionFactory( 
+				sc, baseValueOfTime, valueOfTimeMultiplier 
+				) );
+
 		// ROAD PRICING:
+		// scheme:
         final RoadPricingConfigGroup roadPricingConfig = ConfigUtils.addOrGetModule(
         		sc.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class
         		);
@@ -278,30 +285,28 @@ public class GautengControler_subpopulations {
 							+ "road pricing features.  aborting ...");
 		}
 
-		// CONSTRUCT VEH-DEP ROAD PRICING SCHEME:
         RoadPricingScheme sanralTollScheme = new RoadPricingSchemeUsingTollFactor(
         		roadPricingConfig.getTollLinksFile(), new SanralTollFactor_Subpopulation(sc)
         		);
+        
+        RoadPricing roadPricing = new RoadPricing( sanralTollScheme );
+        controler.addControlerListener( roadPricing ) ;
 
-		// INSTALL ROAD PRICING (in the longer run, re-merge with RoadPricing
-		// class):
-		// insert into scoring:
-		controler.addControlerListener(new GenerationOfMoneyEvents(
-				sc.getNetwork(), sc.getPopulation(), sanralTollScheme
-				));
-
-		controler.setScoringFunctionFactory(new GautengScoringFunctionFactory( 
-				sc, baseValueOfTime, valueOfTimeMultiplier 
-				) );
-
-		
-		final RandomizingTravelDisutilityWithTollFactory travelDisutilityFactory = 
-				new RandomizingTravelDisutilityWithTollFactory( sc );
-		// ---
-		travelDisutilityFactory.setRoadPricingScheme( sanralTollScheme ); 
-		travelDisutilityFactory.setRandomness(3);
-		// ---
-		controler.setTravelDisutilityFactory( travelDisutilityFactory );
+//		// INSTALL ROAD PRICING (in the longer run, re-merge with RoadPricing
+//		// class):
+//		// insert into scoring:
+//		controler.addControlerListener(new GenerationOfMoneyEvents(
+//				sc.getNetwork(), sc.getPopulation(), sanralTollScheme
+//				));
+//
+//		
+//		final RandomizingTravelDisutilityWithTollFactory travelDisutilityFactory = 
+//				new RandomizingTravelDisutilityWithTollFactory( sc );
+//		// ---
+//		travelDisutilityFactory.setRoadPricingScheme( sanralTollScheme ); 
+//		travelDisutilityFactory.setRandomness(3);
+//		// ---
+//		controler.setTravelDisutilityFactory( travelDisutilityFactory );
 
 	}
 

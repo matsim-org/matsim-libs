@@ -173,7 +173,9 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 		/* if filtering transport modes is enabled and the agents
 		 * starts a leg on a non analyzed transport mode, add the agent
 		 * to the filtered agents set. */
-		if (filterAnalyzedModes && !analyzedModes.contains(event.getLegMode())) this.agentsToFilter.add(event.getPersonId());
+		if (filterAnalyzedModes && !analyzedModes.contains(event.getLegMode())) { 
+			this.agentsToFilter.add(event.getPersonId());
+		}
 	}
 
 	@Override

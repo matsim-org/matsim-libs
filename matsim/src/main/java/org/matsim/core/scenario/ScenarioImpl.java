@@ -252,6 +252,7 @@ public class ScenarioImpl implements Scenario {
 	public void addScenarioElement(
 			final String name,
 			final Object o) {
+		// Once the "removal" operation is locked, you cannot add under the same name. kai, sep'14
 		if ( o == null ) throw new NullPointerException( name );
 		final Object former = elements.put( name , o );
 		if ( former != null ) {
@@ -261,6 +262,7 @@ public class ScenarioImpl implements Scenario {
 
 	@Override
 	public Object removeScenarioElement(final String name) {
+		testForLocked();
 		return elements.remove( name );
 	}
 

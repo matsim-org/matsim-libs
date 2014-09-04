@@ -109,8 +109,10 @@ public class Main2 {
 					final TravelDisutilityFactory factory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
 //					factory.setMarginalUtilityOfMoneyLookup(... ) ;
 					final TravelDisutility previousTravelDisutility = factory.createTravelDisutility(timeCalculator, cnScoringGroup);
-					return new TravelDisutilityIncludingToll( previousTravelDisutility, scheme, 1. );
+//					return new TravelDisutilityIncludingToll( previousTravelDisutility, scheme, 1. );
 //					return new TravelDisutilityIncludingToll( previousTravelDisutility, scheme, muml );
+					throw new RuntimeException("deprecated") ;
+					
 				}
 			}) ;
 		}
