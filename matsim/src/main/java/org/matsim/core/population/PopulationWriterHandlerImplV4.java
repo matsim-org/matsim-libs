@@ -20,9 +20,17 @@
 
 package org.matsim.core.population;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -30,9 +38,6 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.Desires;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
 
 public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandler {
 
@@ -124,39 +129,6 @@ public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandl
 
 	@Override
 	public void endTravelCard(final BufferedWriter out) throws IOException {
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// <desires ... > ... </desires>
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
-	public void startDesires(final Desires desires, final BufferedWriter out) throws IOException {
-		out.write("\t\t<desires");
-		if (desires.getDesc() != null)
-			out.write(" desc=\"" + desires.getDesc() + "\"");
-		out.write(">\n");
-	}
-
-	@Override
-	public void endDesires(final BufferedWriter out) throws IOException {
-		out.write("\t\t</desires>\n\n");
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// <actDur ... />
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
-	public void startActDur(final String act_type, final double dur, final BufferedWriter out) throws IOException {
-		out.write("\t\t\t<actDur");
-		out.write(" type=\"" + act_type + "\"");
-		out.write(" dur=\"" + Time.writeTime(dur) + "\"");
-		out.write(" />\n");
-	}
-
-	@Override
-	public void endActDur(final BufferedWriter out) throws IOException {
 	}
 
 	//////////////////////////////////////////////////////////////////////

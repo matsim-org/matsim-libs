@@ -45,7 +45,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.Desires;
 import org.xml.sax.Attributes;
 
 /**
@@ -80,7 +79,6 @@ import org.xml.sax.Attributes;
 	private final ActivityFacilities facilities;
 
 	/*package*/ PersonImpl currperson = null;
-	private Desires currdesires = null;
 	private String curracttype = null;
 	private ActivityOption curractivity = null;
 	private PlanImpl currplan = null;
@@ -114,9 +112,9 @@ import org.xml.sax.Attributes;
 		} else if (TRAVELCARD.equals(name)) {
 			startTravelcard(atts);
 		} else if (DESIRES.equals(name)) {
-			startDesires(atts);
+			log.error("Desires are no longer supported and will be ignored.");
 		} else if (ACTDUR.equals(name)) {
-			startActDur(atts);
+			log.error("Desires are no longer supported and will be ignored.");
 		} else if (KNOWLEDGE.equals(name)) {
 			// Knowledges are no more
 		} else if (ACTIVITYSPACE.equals(name)) {
@@ -148,8 +146,6 @@ import org.xml.sax.Attributes;
 		if (PERSON.equals(name)) {
 			this.plans.addPerson(this.currperson);
 			this.currperson = null;
-		} else if (DESIRES.equals(name)) {
-			this.currdesires = null;
 		} else if (ACTIVITY.equals(name)) {
 			this.curracttype = null;
 		} else if (LOCATION.equals(name)) {
@@ -205,14 +201,6 @@ import org.xml.sax.Attributes;
 
 	private void startTravelcard(final Attributes atts) {
 		this.currperson.addTravelcard(atts.getValue(ATTR_TYPE));
-	}
-
-	private void startDesires(final Attributes atts) {
-		this.currdesires = this.currperson.createDesires(atts.getValue("desc"));
-	}
-
-	private void startActDur(final Attributes atts) {
-		this.currdesires.putActivityDuration(atts.getValue(ATTR_TYPE), atts.getValue("dur"));
 	}
 
 	private void startActivityFacility(final Attributes atts) {
