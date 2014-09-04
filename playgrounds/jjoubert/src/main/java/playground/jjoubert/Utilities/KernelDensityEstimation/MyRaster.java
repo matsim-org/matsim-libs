@@ -75,7 +75,7 @@ public class MyRaster{
 	
 	/**
 	 * Constructs an instance of the raster-generating class.
-	 * @param polygon the <i>com.vividsolutions.jts.geom</i> polygon representing 
+	 * @param polygon the <code>com.vividsolutions.jts.geom</code> polygon representing 
 	 * 		  the study area for which the raster should be created. It is assumed
 	 * 		  that the polygon's coordinate system is in WGS84-UTM so that the unit 
 	 * 		  of measure is meters. 
