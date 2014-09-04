@@ -105,25 +105,12 @@ public class RandomizingTravelDisutilityWithTollFactory implements TravelDisutil
 				// apply toll if applicable:
 				if ( localScheme != null ) {
 					double toll_usually_positive = 0. ;
-//					Id vehicleId = null ;
-//					if ( vehicle != null ) {
-//						vehicleId  = vehicle.getId() ;
-//					} else{
-//						vehicleId = person.getId() ;
-//						if ( wrnCnt<1 ) {
-//							wrnCnt++ ;
-//							Logger.getLogger(this.getClass()).warn( "still taking vehicle id from driver id (presumably during routing)") ;
-//							Logger.getLogger(this.getClass()).warn( Gbl.ONLYONCE ) ;
-//						}
-//					}
-//					Cost cost = localScheme.getLinkCostInfo(link.getId(), time, person.getId(), vehicleId ) ;
-					// yyyy I (kn) think we should re-run the abmtrans paper with getLinkCostInfo( link.getId(), time, null, null ) .  kai, jul'14
+
 					Cost cost = localScheme.getTypicalLinkCostInfo(link.getId(), time) ;
 					
 					if ( cost != null ) {
 						/* This needed to be introduced after the GautengRoadPricingScheme started to return null instead of
-						 * Cost objects with amount=0.  kai, apr'12
-						 */
+						 * Cost objects with amount=0.  kai, apr'12  */
 						if ( localScheme.getType().equalsIgnoreCase(RoadPricingScheme.TOLL_TYPE_DISTANCE) ) {
 							toll_usually_positive = link.getLength() * cost.amount ;
 						} else if ( localScheme.getType().equalsIgnoreCase(RoadPricingScheme.TOLL_TYPE_LINK ) ) {

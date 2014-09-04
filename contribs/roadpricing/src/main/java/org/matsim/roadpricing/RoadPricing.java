@@ -103,14 +103,17 @@ IterationEndsListener, ShutdownListener {
             // replace the travelCostCalculator with a toll-dependent one if required
             if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()) 
             		|| RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType())) {
-                final TravelDisutilityFactory previousTravelCostCalculatorFactory = controler.getTravelDisutilityFactory();
-                // area-toll requires a regular TravelCost, no toll-specific one.
+                // (area-toll requires a regular TravelCost, no toll-specific one.)
+
+            	final TravelDisutilityFactory previousTravelCostCalculatorFactory = controler.getTravelDisutilityFactory();
 
                 TravelDisutilityFactory travelCostCalculatorFactory = new TravelDisutilityFactory() {
                     @Override
                     public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-                        return new TravelDisutilityIncludingToll(previousTravelCostCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup),
-                                RoadPricing.this.scheme, controler.getConfig() );
+                        return new TravelDisutilityIncludingToll(
+                        		previousTravelCostCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup),
+                                RoadPricing.this.scheme, controler.getConfig() 
+                        		);
                     }
                 };
                 controler.setTravelDisutilityFactory(travelCostCalculatorFactory);
