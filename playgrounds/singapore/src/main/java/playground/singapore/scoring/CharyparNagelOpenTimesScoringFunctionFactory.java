@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
@@ -57,13 +57,15 @@ public class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunc
 			 */
 			this.params = new CharyparNagelScoringParameters(this.config);
 		}
-		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(person.getSelectedPlan(), params, scenario.getActivityFacilities()));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(params));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-		scoringFunctionAccumulator.addScoringFunction(new SingaporeFareScoring(person.getSelectedPlan(), scenario.getTransitSchedule(), scenario.getNetwork()));
-		return scoringFunctionAccumulator;
+		SumScoringFunction sumScoringFunction = new SumScoringFunction();
+		sumScoringFunction.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(params, scenario.getActivityFacilities()));
+		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
+		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
+		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+		sumScoringFunction.addScoringFunction(new SingaporeFareScoring(person.getSelectedPlan(), scenario.getTransitSchedule(), scenario.getNetwork()));
+		return sumScoringFunction;
 	}
 
+	
+	
 }

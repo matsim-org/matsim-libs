@@ -22,7 +22,9 @@ package playground.singapore.ptsim;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashSet;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -31,6 +33,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.artemc.calibration.CalibrationStatsListener;
 import playground.singapore.ptsim.qnetsimengine.PTQSimFactory;
 import playground.singapore.transitRouterEventsBased.TransitRouterWSImplFactory;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
@@ -49,17 +52,18 @@ public class ControlerWS {
 		Config config = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(config, args[0]);
 		Controler controler = new Controler(ScenarioUtils.loadScenario(config));
-		if(args.length>1) {
+		if(args.length>3) {
 			StopStopTimeCalculator stopStopTimeCalculatorEvents = new StopStopTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
+			stopStopTimeCalculatorEvents.setUseVehicleIds(false);
 			EventsManager eventsManager = EventsUtils.createEventsManager(controler.getConfig());
 			eventsManager.addHandler(stopStopTimeCalculatorEvents);
-			(new MatsimEventsReader(eventsManager)).readFile(args[1]);
+			(new MatsimEventsReader(eventsManager)).readFile(args[3]);
 			controler.setMobsimFactory(new PTQSimFactory(stopStopTimeCalculatorEvents.getStopStopTimes()));
 		}
 		else
 			controler.setMobsimFactory(new PTQSimFactory());
 		controler.setOverwriteFiles(true);
-		//controler.addControlerListener(new CalibrationStatsListener(controler.getEvents(), new String[]{args[1], args[2]}, 1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id>()));
+		controler.addControlerListener(new CalibrationStatsListener(controler.getEvents(), new String[]{args[1], args[2]}, 1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id>()));
 		WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(waitTimeCalculator);
 		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));

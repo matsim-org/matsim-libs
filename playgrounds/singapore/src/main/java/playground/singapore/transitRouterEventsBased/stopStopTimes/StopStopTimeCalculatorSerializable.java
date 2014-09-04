@@ -1,6 +1,5 @@
 package playground.singapore.transitRouterEventsBased.stopStopTimes;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -19,40 +18,40 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-public class StopStopTimeCalculator implements VehicleArrivesAtFacilityEventHandler, PersonLeavesVehicleEventHandler, Serializable {
+public class StopStopTimeCalculatorSerializable implements VehicleArrivesAtFacilityEventHandler, PersonLeavesVehicleEventHandler {
 	
-	private final Map<Id, Map<Id, StopStopTimeData>> stopStopTimes = new HashMap<Id, Map<Id, StopStopTimeData>>(5000);
-	private final Map<Id, Map<Id, Double>> scheduledStopStopTimes = new HashMap<Id, Map<Id, Double>>(5000);
-	private final Map<Id, Tuple<Id, Double>> inTransitVehicles = new HashMap<Id, Tuple<Id,Double>>(1000);
-	private final Set<Id> vehicleIds = new HashSet<Id>();
+	private final Map<String, Map<String, StopStopTimeData>> stopStopTimes = new HashMap<String, Map<String, StopStopTimeData>>(5000);
+	private final Map<String, Map<String, Double>> scheduledStopStopTimes = new HashMap<String, Map<String, Double>>(5000);
+	private final Map<String, Tuple<String, Double>> inTransitVehicles = new HashMap<String, Tuple<String,Double>>(1000);
+	private final Set<String> vehicleIds = new HashSet<String>();
 	private double timeSlot;
 	private boolean useVehicleIds = true;
 	
 	//Constructors
-	public StopStopTimeCalculator(final TransitSchedule transitSchedule, final Config config) {
+	public StopStopTimeCalculatorSerializable(final TransitSchedule transitSchedule, final Config config) {
 		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime()-config.qsim().getStartTime()));
 	}
-	public StopStopTimeCalculator(final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
+	public StopStopTimeCalculatorSerializable(final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
 		this.timeSlot = timeSlot;
-		Map<Id, Map<Id, Integer>> numObservations = new HashMap<Id, Map<Id, Integer>>();
+		Map<String, Map<String, Integer>> numObservations = new HashMap<String, Map<String, Integer>>();
 		for(TransitLine line:transitSchedule.getTransitLines().values())
 			for(TransitRoute route:line.getRoutes().values()) {
 				for(int s=0; s<route.getStops().size()-1; s++) {
-					Map<Id, StopStopTimeData> map = stopStopTimes.get(route.getStops().get(s).getStopFacility().getId());
+					Map<String, StopStopTimeData> map = stopStopTimes.get(route.getStops().get(s).getStopFacility().getId());
 					if(map==null) {
-						map = new HashMap<Id, StopStopTimeData>(2);
-						stopStopTimes.put(route.getStops().get(s).getStopFacility().getId(), map);
+						map = new HashMap<String, StopStopTimeData>(2);
+						stopStopTimes.put(route.getStops().get(s).getStopFacility().getId().toString(), map);
 					}
-					map.put(route.getStops().get(s+1).getStopFacility().getId(), new StopStopTimeDataArray((int) (totalTime/timeSlot)+1));
-					Map<Id, Double> map2 = scheduledStopStopTimes.get(route.getStops().get(s).getStopFacility().getId());
-					Map<Id, Integer> map3 = numObservations.get(route.getStops().get(s).getStopFacility().getId());
+					map.put(route.getStops().get(s+1).getStopFacility().getId().toString(), new StopStopTimeDataArray((int) (totalTime/timeSlot)+1));
+					Map<String, Double> map2 = scheduledStopStopTimes.get(route.getStops().get(s).getStopFacility().getId());
+					Map<String, Integer> map3 = numObservations.get(route.getStops().get(s).getStopFacility().getId());
 					Double stopStopTime;
 					Integer num;
 					if(map2==null) {
-						map2 = new HashMap<Id, Double>(2);
-						scheduledStopStopTimes.put(route.getStops().get(s).getStopFacility().getId(), map2);
-						map3 = new HashMap<Id, Integer>(2);
-						numObservations.put(route.getStops().get(s).getStopFacility().getId(), map3);
+						map2 = new HashMap<String, Double>(2);
+						scheduledStopStopTimes.put(route.getStops().get(s).getStopFacility().getId().toString(), map2);
+						map3 = new HashMap<String, Integer>(2);
+						numObservations.put(route.getStops().get(s).getStopFacility().getId().toString(), map3);
 						stopStopTime = 0.0;
 						num = 0;
 					}
@@ -64,14 +63,14 @@ public class StopStopTimeCalculator implements VehicleArrivesAtFacilityEventHand
 							num = 0;
 						}
 					}
-					map2.put(route.getStops().get(s+1).getStopFacility().getId(), stopStopTime+route.getStops().get(s+1).getArrivalOffset()-route.getStops().get(s).getDepartureOffset());
-					map3.put(route.getStops().get(s+1).getStopFacility().getId(), ++num);
+					map2.put(route.getStops().get(s+1).getStopFacility().getId().toString(), stopStopTime+route.getStops().get(s+1).getArrivalOffset()-route.getStops().get(s).getDepartureOffset());
+					map3.put(route.getStops().get(s+1).getStopFacility().getId().toString(), ++num);
 				}
 				for(Departure departure:route.getDepartures().values())
-					vehicleIds.add(departure.getVehicleId());
+					vehicleIds.add(departure.getVehicleId().toString());
 			}
-		for(Entry<Id, Map<Id, Double>> entry:scheduledStopStopTimes.entrySet())
-			for(Entry<Id, Double> entry2:entry.getValue().entrySet())
+		for(Entry<String, Map<String, Double>> entry:scheduledStopStopTimes.entrySet())
+			for(Entry<String, Double> entry2:entry.getValue().entrySet())
 				entry.getValue().put(entry2.getKey(), entry2.getValue()/numObservations.get(entry.getKey()).get(entry2.getKey()));
 	}
 		
@@ -80,11 +79,11 @@ public class StopStopTimeCalculator implements VehicleArrivesAtFacilityEventHand
 		return new StopStopTime() {
 			@Override
 			public double getStopStopTime(Id stopOId, Id stopDId, double time) {
-				return StopStopTimeCalculator.this.getStopStopTime(stopOId, stopDId, time);
+				return StopStopTimeCalculatorSerializable.this.getStopStopTime(stopOId, stopDId, time);
 			}
 			@Override
 			public double getStopStopTimeVariance(Id stopOId, Id stopDId, double time) {
-				return StopStopTimeCalculator.this.getStopStopTimeVariance(stopOId, stopDId, time);
+				return StopStopTimeCalculatorSerializable.this.getStopStopTimeVariance(stopOId, stopDId, time);
 			}
 		};
 	}
@@ -104,7 +103,7 @@ public class StopStopTimeCalculator implements VehicleArrivesAtFacilityEventHand
 	}
 	@Override
 	public void reset(int iteration) {
-		for(Map<Id, StopStopTimeData> map:stopStopTimes.values())
+		for(Map<String, StopStopTimeData> map:stopStopTimes.values())
 			for(StopStopTimeData stopStopTimeData:map.values())
 				stopStopTimeData.resetStopStopTimes();
 		inTransitVehicles.clear();
@@ -112,14 +111,14 @@ public class StopStopTimeCalculator implements VehicleArrivesAtFacilityEventHand
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 		if(!useVehicleIds || vehicleIds.contains(event.getVehicleId())) {
-			Tuple<Id, Double> route = inTransitVehicles.remove(event.getVehicleId());
+			Tuple<String, Double> route = inTransitVehicles.remove(event.getVehicleId());
 			if(route!=null)
 				try {
 					stopStopTimes.get(route.getFirst()).get(event.getFacilityId()).addStopStopTime((int) (route.getSecond()/timeSlot), event.getTime()-route.getSecond());
 				} catch(Exception e) {
 					//System.out.println("No: "+route.getFirst()+"-->"+event.getFacilityId());
 				}
-			inTransitVehicles.put(event.getVehicleId(), new Tuple<Id, Double>(event.getFacilityId(), event.getTime()));
+			inTransitVehicles.put(event.getVehicleId().toString(), new Tuple<String, Double>(event.getFacilityId().toString(), event.getTime()));
 		}
 	}
 	@Override

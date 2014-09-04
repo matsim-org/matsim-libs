@@ -1,8 +1,10 @@
 package playground.singapore.transitRouterEventsBased.stopStopTimes;
 
+import java.io.Serializable;
+
 import org.matsim.api.core.v01.Id;
 
-public interface StopStopTime {
+public interface StopStopTime extends Serializable {
 
 	//Methods
 	public double getStopStopTime(Id stopOId, Id stopDId, double time);

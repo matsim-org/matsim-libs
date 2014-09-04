@@ -20,6 +20,8 @@
 
 package playground.singapore.transitRouterEventsBased.waitTimes;
 
+import java.io.Serializable;
+
 import org.matsim.api.core.v01.Id;
 
 /**
@@ -28,7 +30,7 @@ import org.matsim.api.core.v01.Id;
  * @author sergioo
  */
 
-public interface WaitTime {
+public interface WaitTime extends Serializable {
 
 	//Methods
 	public double getRouteStopWaitTime(Id line, Id route, Id stopId, double time);

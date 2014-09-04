@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
+import org.matsim.core.scoring.SumScoringFunction.LegScoring;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 public class SingaporeFareScoring implements LegScoring {
@@ -25,12 +25,12 @@ public class SingaporeFareScoring implements LegScoring {
 		this.plan = plan;
 		this.transitSchedule = transitSchedule;
 		this.network = network;
+		this.score = 0;
 	}
 
 	@Override
 	public void finish() {
-		// TODO Auto-generated method stub
-		
+		score = 0;
 	}
 
 	@Override
@@ -39,17 +39,11 @@ public class SingaporeFareScoring implements LegScoring {
 	}
 
 	@Override
-	public void reset() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void startLeg(double time, Leg leg) {
+	public void handleLeg(Leg leg) {
 		if(leg.getMode().equals(TransportMode.pt))
 			score += getDistance()*DISTANCE_FARE_RATE;
 	}
-	
+
 	protected double getDistance() {
 		int num = numPtLegsScored++;
 		for(PlanElement planElement:plan.getPlanElements())
@@ -63,11 +57,6 @@ public class SingaporeFareScoring implements LegScoring {
 				else
 					num--;
 		return 0;
-	}
-
-	@Override
-	public void endLeg(double time) {
-		
 	}
 
 }

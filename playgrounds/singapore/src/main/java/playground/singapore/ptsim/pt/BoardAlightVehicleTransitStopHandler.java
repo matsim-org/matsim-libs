@@ -11,6 +11,7 @@ import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.PassengerAccessEgress;
 import org.matsim.core.mobsim.qsim.pt.TransitStopHandler;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
+import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.VehicleType;
 
@@ -21,9 +22,12 @@ public class BoardAlightVehicleTransitStopHandler implements TransitStopHandler 
 	private final static Logger log = Logger.getLogger(BoardAlightVehicleTransitStopHandler.class);
 	private static final double openDoorsDuration = 1.0;
 	private static final double closeDoorsDuration = 1.0;
-	private static final double NON_UNIFORM_DOOR_OPERATION = 1.0;
-	private static final double ACC_DEC_DELAY = 8.0;
+	private static final double NON_UNIFORM_DOOR_OPERATION = 0.0;
+	private static final double ACC_DEC_DELAY = 0.0;
 	
+	//Attributes
+	private TransitStopFacility lastHandledStop = new TransitScheduleFactoryImpl().createTransitStopFacility(null, null, true);
+
 	//Methods
 	@Override
 	public double handleTransitStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers, List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler, MobsimVehicle vehicle) {
@@ -42,14 +46,25 @@ public class BoardAlightVehicleTransitStopHandler implements TransitStopHandler 
 		int cntEgress = leavingPassengers.size();
 		int cntAccess = enteringPassengers.size();
 		double stopTime = 0;
-		if ((cntAccess > 0) || (cntEgress > 0)) {
+		if (((cntAccess > 0) || (cntEgress > 0)) && this.lastHandledStop != null) {
 			stopTime = getStopTimeParallel(leavingPassengers.size(), enteringPassengers.size(), vehicle);
+			stopTime = Math.max(0, stopTime-20);
+			if (this.lastHandledStop != stop)
+				stopTime += openDoorsDuration+ACC_DEC_DELAY/2;
 			for (PTPassengerAgent passenger : leavingPassengers)
 				handler.handlePassengerLeaving(passenger, vehicle, stop.getLinkId(), now);
 			for (PTPassengerAgent passenger : enteringPassengers)
 				handler.handlePassengerEntering(passenger, vehicle, stop.getId(), now);
+			this.lastHandledStop = stop;
 		}
-		return stopTime+(stopTime==0?0:(openDoorsDuration+closeDoorsDuration+ACC_DEC_DELAY));
+        else if(this.lastHandledStop == stop){
+            this.lastHandledStop = null;
+            stopTime += closeDoorsDuration+ACC_DEC_DELAY/2;
+		}
+		else {
+			this.lastHandledStop = stop;
+		}
+		return stopTime;
 	}
 	private double getStopTimeParallel(double leaving, double entering, MobsimVehicle vehicle) {
 		double beta1 = ((TransitVehicle)vehicle).getVehicle().getType().getAccessTime();

@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.OpeningTime;
@@ -42,11 +41,9 @@ import org.matsim.core.utils.misc.Time;
 public class CharyparNagelOpenTimesActivityScoring extends CharyparNagelActivityScoring {
 
 	private final ActivityFacilities facilities;
-	protected /* :-( yyyy */ Plan plan;
-
-	public CharyparNagelOpenTimesActivityScoring(Plan plan, final CharyparNagelScoringParameters params, final ActivityFacilities facilities) {
+	
+	public CharyparNagelOpenTimesActivityScoring(final CharyparNagelScoringParameters params, final ActivityFacilities facilities) {
 		super(params);
-		this.plan = plan;
 		this.facilities = facilities;
 	}
 
@@ -75,7 +72,7 @@ public class CharyparNagelOpenTimesActivityScoring extends CharyparNagelActivity
 				// either wed or wkday
 				// if none is given, use undefined opentimes
 				opentimes = facility.getActivityOptions().get(facilityActType).getOpeningTimes();
-				if (opentimes != null) {
+				if (opentimes != null && opentimes.size()>0) {
 					// ignoring lunch breaks with the following procedure:
 					// if there is only one wed/wkday open time interval, use it
 					// if there are two or more, use the earliest start time and the latest end time

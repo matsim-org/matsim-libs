@@ -27,17 +27,21 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 
-import playground.singapore.ptsim.QSim;
-import playground.singapore.ptsim.agents.PopulationAgentSource;
 import playground.singapore.ptsim.pt.BoardAlightVehicleTransitStopHandlerFactory;
-import playground.singapore.ptsim.pt.TransitQSimEngine;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTime;
 
 /**
@@ -71,31 +75,31 @@ public class PTQSimFactory implements MobsimFactory {
 
 		// Get number of parallel Threads
 		int numOfThreads = conf.getNumberOfThreads();
-		PTQNetsimEngineFactory netsimEngFactory;
+		QNetsimEngineFactory netsimEngFactory;
 		if (numOfThreads > 1) {
 			eventsManager = new SynchronizedEventsManagerImpl(eventsManager);
-			netsimEngFactory = new PTParallelQNetsimEngineFactory();
+			netsimEngFactory = new ParallelQNetsimEngineFactory();
 			log.info("Using parallel QSim with " + numOfThreads + " threads.");
 		} else {
-			netsimEngFactory = new PTQSimEngineFactory();
+			netsimEngFactory = new DefaultQNetsimEngineFactory();
 		}
 		QSim qSim = new QSim(sc, eventsManager);
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
-		PTQNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
+		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
 		if(stopStopTime!=null)
-			netsimEngine.setStopStopTime(stopStopTime);
+			netsimEngine.setLinkSpeedCalculator(new PTLinkSpeedCalculator(stopStopTime));
+		else
+			netsimEngine.setLinkSpeedCalculator(new PTLinkSpeedCalculator());
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
-
 		AgentFactory agentFactory;
 		if (sc.getConfig().scenario().isUseTransit()) {
 			agentFactory = new TransitAgentFactory(qSim);
 			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-			transitEngine.setUseUmlaeufe(true);
 			transitEngine.setTransitStopHandlerFactory(new BoardAlightVehicleTransitStopHandlerFactory());
 			qSim.addDepartureHandler(transitEngine);
 			qSim.addAgentSource(transitEngine);
