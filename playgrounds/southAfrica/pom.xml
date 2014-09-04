@@ -96,7 +96,7 @@
     		<groupId>org.jzy3d</groupId>
     		<artifactId>jzy3d-api</artifactId>
     		<version>0.9.1</version>
-		</dependency>		
+		</dependency>
   </dependencies>
   <build>
 	<pluginManagement>
