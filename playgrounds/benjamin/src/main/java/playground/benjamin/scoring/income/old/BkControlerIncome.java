@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.benjamin.scoring.income.old;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.StartupEvent;
@@ -76,8 +77,13 @@ public class BkControlerIncome extends BkControler {
 
 	private void installTravelCostCalculatorFactory() {
 		//returns null, if there is no road pricing
-        if (ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUsingRoadpricing()){
-			RoadPricingScheme roadPricingScheme = (RoadPricingScheme) this.scenarioData.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
+//        if (ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUsingRoadpricing()){
+		Logger.getLogger(this.getClass()).fatal("the above functionality does no longer exist.  please talk to me if needed. kai, sep'14") ;
+		System.exit(-1) ;
+		if ( true ) {
+
+        	
+        	RoadPricingScheme roadPricingScheme = (RoadPricingScheme) this.scenarioData.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
 			
 			/*		Setting travel cost calculator for the router.
 			Remark: parameters must be set in several classes and independently for scoring and router!*/

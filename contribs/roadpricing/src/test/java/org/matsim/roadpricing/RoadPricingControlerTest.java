@@ -57,7 +57,7 @@ public class RoadPricingControlerTest {
 		double scoreBasecase = controler1.getPopulation().getPersons().get(new IdImpl("1")).getPlans().get(0).getScore();
 
 		// now run toll case
-        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
+//        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
         ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(utils.getInputDirectory() + "distanceToll.xml");
 		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/tollcase/");
 		Controler controler2 = new Controler(config);

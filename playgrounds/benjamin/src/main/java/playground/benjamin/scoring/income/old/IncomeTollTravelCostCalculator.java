@@ -67,7 +67,9 @@ public class IncomeTollTravelCostCalculator implements TravelDisutility {
 	public IncomeTollTravelCostCalculator(PersonHouseholdMapping hhdb, RoadPricingScheme scheme, Config config) {
 		this.hhdb = hhdb;
 		TravelDisutility nullTravelCostCalculator = new NullTravelCostCalculator();
-		this.tollTravelCostCalculator = new TravelDisutilityIncludingToll(nullTravelCostCalculator, scheme, config);
+//		this.tollTravelCostCalculator = new TravelDisutilityIncludingToll(nullTravelCostCalculator, scheme, config);
+		throw new RuntimeException("above constructor is gone.  please talk to me if you still need this (not a big probley, just a "
+				+ "different syntax. kai, sep'14") ;
 	}
 
 	//calculating additional generalized toll costs

@@ -19,10 +19,10 @@
 
 package playground.benjamin.scoring.income;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -33,7 +33,6 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.households.Income;
 import org.matsim.households.Income.IncomePeriod;
 import org.matsim.households.PersonHouseholdMapping;
-import org.matsim.roadpricing.RoadPricingConfigGroup;
 
 /**
  * @author dgrether
@@ -73,7 +72,10 @@ public class IncomeScoringFunctionFactory implements ScoringFunctionFactory {
 		scoringFunctionAccumulator.addScoringFunction(new ScoringFromLeg(person.getSelectedPlan(), params, this.network, householdIncomePerDay ));
 
 		//utility spend for traveling (toll costs) if there is a toll
-        if(ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUsingRoadpricing()){
+//        if(ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUsingRoadpricing()){
+		Logger.getLogger(this.getClass()).fatal("the above functionality does no longer exist; pls tlk to me if you need it. kai, sep'14") ;
+		System.exit(-1) ;
+		if ( true ) {
 			scoringFunctionAccumulator.addScoringFunction(new ScoringFromToll(params, householdIncomePerDay));
 		}
 		

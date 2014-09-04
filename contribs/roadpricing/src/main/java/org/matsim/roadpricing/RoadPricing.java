@@ -63,6 +63,7 @@ IterationEndsListener, ShutdownListener {
 
 	final static private Logger log = Logger.getLogger(RoadPricing.class);
     private RoadPricingConfigGroup rpConfig;
+	private double sigma = 0. ;
 
     public RoadPricing() {
     	// public is needed (for obvious reasons: this is the entry point). kai, sep'14
@@ -78,7 +79,7 @@ IterationEndsListener, ShutdownListener {
 	public void notifyStartup(final StartupEvent event) {
 		final Controler controler = event.getControler();
         rpConfig = ConfigUtils.addOrGetModule(controler.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
-        if (rpConfig.isUsingRoadpricing()) {
+//        if (rpConfig.isUsingRoadpricing()) {
         	if ( this.scheme == null ) {
         		RoadPricingSchemeImpl rpsImpl = new RoadPricingSchemeImpl() ;
         		String tollLinksFile = rpConfig.getTollLinksFile();
@@ -90,7 +91,7 @@ IterationEndsListener, ShutdownListener {
         			throw new RuntimeException("road pricing switched on but toll links file not given") ;
         		}
         		this.scheme = rpsImpl ;
-        	}
+//        	}
 
             event.getControler().getScenario().addScenarioElement(
                     RoadPricingScheme.ELEMENT_NAME,
@@ -105,18 +106,14 @@ IterationEndsListener, ShutdownListener {
             		|| RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType())) {
                 // (area-toll requires a regular TravelCost, no toll-specific one.)
 
-            	final TravelDisutilityFactory previousTravelCostCalculatorFactory = controler.getTravelDisutilityFactory();
+            	final TravelDisutilityFactory previousTravelDisutilityFactory = controler.getTravelDisutilityFactory();
+            	
+            	TravelDisutilityIncludingToll.Builder travelDisutilityFactory = new TravelDisutilityIncludingToll.Builder(
+            			previousTravelDisutilityFactory, scheme, controler.getConfig().planCalcScore().getMarginalUtilityOfMoney()
+            					) ;
+            	travelDisutilityFactory.setSigma( this.sigma );
 
-                TravelDisutilityFactory travelCostCalculatorFactory = new TravelDisutilityFactory() {
-                    @Override
-                    public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-                        return new TravelDisutilityIncludingToll(
-                        		previousTravelCostCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup),
-                                RoadPricing.this.scheme, controler.getConfig() 
-                        		);
-                    }
-                };
-                controler.setTravelDisutilityFactory(travelCostCalculatorFactory);
+                controler.setTravelDisutilityFactory(travelDisutilityFactory);
             }
 
             this.cattl = new CalcAverageTolledTripLength(controler.getNetwork(), this.scheme);
@@ -126,19 +123,19 @@ IterationEndsListener, ShutdownListener {
 
 	@Override
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
-        if (rpConfig.isUsingRoadpricing()) {
+//        if (rpConfig.isUsingRoadpricing()) {
             // evaluate the final tolls paid by the agents and add them to their scores
             this.calcPaidToll.sendMoneyEvents(Time.MIDNIGHT, event.getControler().getEvents());
-        }
+//        }
 	}
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-        if (rpConfig.isUsingRoadpricing()) {
+//        if (rpConfig.isUsingRoadpricing()) {
             log.info("The sum of all paid tolls : " + this.calcPaidToll.getAllAgentsToll() + " Euro.");
             log.info("The number of people who paid toll : " + this.calcPaidToll.getDraweesNr());
             log.info("The average paid trip length : " + this.cattl.getAverageTripLength() + " m.");
-        }
+//        }
 	}
 
 	public RoadPricingScheme getRoadPricingScheme() {
@@ -169,6 +166,10 @@ IterationEndsListener, ShutdownListener {
 	public void notifyShutdown(ShutdownEvent event) {
 		String filename = event.getControler().getControlerIO().getOutputFilename("output_toll.xml.gz") ;
 		new RoadPricingWriterXMLv1(this.scheme).writeFile(filename);
+	}
+
+	public void setSigma(double d) {
+		this.sigma = d ;
 	}
 
 }

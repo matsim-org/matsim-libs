@@ -88,7 +88,9 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 	// === end Builder ===
 
 	@Deprecated // use the builder.  Let me know if/why this is not possible in your case.  kai, sep'14
-	public TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, final RoadPricingScheme scheme, Config config) {
+	 /* package */ TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, final RoadPricingScheme scheme, Config config)
+	// could be made private but some calls within package need to be removed
+	{
 		this( normalTravelDisutility, scheme, config.planCalcScore().getMarginalUtilityOfMoney(), 0. ) ;
 		// this is using sigma=0 for backwards compatibility (not sure how often this is needed)
 	}
@@ -156,7 +158,15 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 		// end randomize
 
 		double normalTravelDisutilityForLink = this.normalTravelDisutility.getLinkTravelDisutility(link, time, person, vehicle);
-		double tollCost = this.tollCostHandler.getTollCost(link, time, person, vehicle);
+		Id <Person>personId = null ;
+		if ( person != null ) {
+			personId = person.getId();
+		}
+		Id<Vehicle> vehicleId = null ;
+		if ( vehicle != null ) {
+			vehicleId = vehicle.getId();
+		}
+		double tollCost = this.tollCostHandler.getTollCost(link, time, personId, vehicleId );
 		return normalTravelDisutilityForLink + tollCost*this.marginalUtilityOfMoney*logNormalRnd ;
 		// sign convention: these are all costs (= disutilities), so they are all normally positive.  tollCost is positive, marginalUtilityOfMoney as well.
 	}
@@ -167,22 +177,12 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 	}
 
 	private interface TollRouterBehaviour {
-		public double getTollCost(Link link, double time, Person person, Vehicle vehicle);
+		public double getTollCost(Link link, double time, Id<Person> personId, Id<Vehicle> vehicleId);
 	}
 
 	/*package*/ class DistanceTollCostBehaviour implements TollRouterBehaviour {
 		@Override
-		public double getTollCost(final Link link, final double time, Person person, Vehicle vehicle) {
-			// not sure why it is the object at one level, and the id on the next level.
-			// In any case, retrofitting this so it accepts null arguments.  kai, apr'14
-			Id personId = null ;
-			if ( person != null ) {
-				personId = person.getId();
-			}
-			Id vehicleId = null ;
-			if ( vehicle != null ) {
-				vehicleId = vehicle.getId();
-			}
+		public double getTollCost(final Link link, final double time, Id<Person> personId, Id<Vehicle> vehicleId) {
 			Cost cost_per_m = scheme.getLinkCostInfo(link.getId(), time, personId, vehicleId );
 			if (cost_per_m == null) {
 				return 0.0;
@@ -195,24 +195,13 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 
 	/*package*/ class AreaTollCostBehaviour implements TollRouterBehaviour {
 		@Override
-		public double getTollCost(final Link link, final double time, Person person, Vehicle vehicle) {
-			// not sure why it is the object at one level, and the id on the next level.
-			// In any case, retrofitting this so it accepts null arguments.  kai, apr'14
-			Id personId = null ;
-			if ( person != null ) {
-				personId = person.getId();
-			}
-			Id vehicleId = null ;
-			if ( vehicle != null ) {
-				vehicleId = vehicle.getId();
-			}
+		public double getTollCost(final Link link, final double time, Id<Person> personId, Id<Vehicle> vehicleId) {
 			Cost cost = scheme.getLinkCostInfo(link.getId(), time, personId, vehicleId );
 			if (cost == null) {
 				return 0.0;
 			}
 			/* just return some really high costs for tolled links, so that still a
-			 * route could be found if there is no other possibility.
-			 */
+			 * route could be found if there is no other possibility. */
 			if ( wrnCnt2 < 1 ) {
 				wrnCnt2 ++ ;
 				Logger.getLogger(this.getClass()).warn("at least here, the area toll does not use the true toll value. " +
@@ -224,17 +213,7 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 
 	/*package*/ class CordonTollCostBehaviour implements TollRouterBehaviour {
 		@Override
-		public double getTollCost(final Link link, final double time, Person person, Vehicle vehicle) {
-			// not sure why it is the object at one level, and the id on the next level.
-			// In any case, retrofitting this so it accepts null arguments.  kai, apr'14
-			Id personId = null ;
-			if ( person != null ) {
-				personId = person.getId();
-			}
-			Id vehicleId = null ;
-			if ( vehicle != null ) {
-				vehicleId = vehicle.getId();
-			}
+		public double getTollCost(final Link link, final double time, Id<Person> personId, Id<Vehicle> vehicleId) {
 			Cost cost = scheme.getLinkCostInfo(link.getId(), time, personId, vehicleId );
 			if (cost == null) {
 				return 0.0;
@@ -243,19 +222,9 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 		}
 	}
 
-	class LinkTollCostBehaviour implements TollRouterBehaviour {
+	/* package */ class LinkTollCostBehaviour implements TollRouterBehaviour {
 		@Override
-		public double getTollCost(final Link link, final double time, Person person, Vehicle vehicle) {
-			// not sure why it is the object at one level, and the id on the next level.
-			// In any case, retrofitting this so it accepts null arguments.  kai, apr'14
-			Id personId = null ;
-			if ( person != null ) {
-				personId = person.getId();
-			}
-			Id vehicleId = null ;
-			if ( vehicle != null ) {
-				vehicleId = vehicle.getId();
-			}
+		public double getTollCost(final Link link, final double time, Id<Person> personId, Id<Vehicle> vehicleId) {
 			Cost cost = scheme.getLinkCostInfo(link.getId(), time, personId, vehicleId );
 			if (cost == null) {
 				return 0.0;

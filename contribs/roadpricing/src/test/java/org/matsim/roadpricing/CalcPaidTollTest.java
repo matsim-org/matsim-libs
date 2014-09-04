@@ -192,7 +192,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 	private Population runTollSimulation(final String tollFile, final String tollType, final PlanCalcScoreConfigGroup config) {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Fixture.createNetwork1(scenario);
-        ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
+//        ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
         RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 		scenario.addScenarioElement( RoadPricingScheme.ELEMENT_NAME , scheme);
 		RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(scheme);

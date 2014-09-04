@@ -52,13 +52,16 @@ public class KTIScenarioWithRoadPricing {
 					config.planCalcScore(),
 					scenario) );
 
-        if (ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUsingRoadpricing()) {
+//        if (ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUsingRoadpricing()) {
+			Logger.getLogger("KTIScenarioWithRoadPricing.class").fatal("this above syntax is no longer there.  "
+					+ "If you really need to configure this via a config group, please construct your own config group for that purpose.  kai, sep'14");
+		
 			log.info( "adding the roadpricing listenner." );
 			controler.addControlerListener( new RoadPricing() );
-		}
-		else {
-			log.info( "NOT adding the roadpricing listenner." );
-		}
+//		}
+//		else {
+//			log.info( "NOT adding the roadpricing listenner." );
+//		}
 
 		// we're done!
 		controler.run();

@@ -74,9 +74,11 @@ public class Controller {
 				final RouteTTObserver observer = new RouteTTObserver(con.getControlerIO().getOutputFilename("routeTravelTimes.txt"));
 				con.addControlerListener(observer);
 				con.getEvents().addHandler(observer);
-                if (ConfigUtils.addOrGetModule(event.getControler().getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUsingRoadpricing()) {
+//                if (ConfigUtils.addOrGetModule(event.getControler().getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUsingRoadpricing()) {
 					con.addControlerListener(new TollBehaviour());
-				}
+					Logger.getLogger(this.getClass()).fatal("the toll on/off switch is no longer there.  use an empty toll file for the base case. kai, sep'14") ;
+					System.exit(-1) ;
+//				}
 				if (con.getScenario().getConfig().network().isTimeVariantNetwork()){
 					IncidentGenerator generator = new IncidentGenerator(con.getScenario().getConfig().getParam("telematics", "incidentsFile"), con.getScenario().getNetwork());
 					con.addControlerListener(generator);

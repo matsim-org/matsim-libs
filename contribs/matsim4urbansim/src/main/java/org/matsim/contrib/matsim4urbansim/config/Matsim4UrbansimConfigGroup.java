@@ -16,18 +16,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.kai.usecases.ownroadpricing;
+package org.matsim.contrib.matsim4urbansim.config;
 
-import org.matsim.api.core.v01.population.Person;
-
-
+import org.apache.log4j.Logger;
+import org.matsim.core.config.experimental.ReflectiveModule;
 
 /**
  * @author nagel
  *
  */
-public interface MarginalUtilityOfMoneyLookup {
+public class Matsim4UrbansimConfigGroup extends ReflectiveModule {
+	@SuppressWarnings("unused")
+	private final static Logger log = Logger.getLogger(Matsim4UrbansimConfigGroup.class);
+
+	public static final String GROUP_NAME = "matsim4Urbansim";
+
+	public Matsim4UrbansimConfigGroup() {
+		super(GROUP_NAME);
+	}
 	
-	public double getMarginalUtilityOfMoney(Person person) ;
+	private boolean usingRoadPricing = false ;
+	private static final String USING_ROAD_PRICING = "usingRoadPricing" ;
+	@StringGetter(USING_ROAD_PRICING)
+	public boolean isUsingRoadPricing() {
+		return usingRoadPricing;
+	}
+	@StringSetter(USING_ROAD_PRICING)
+	public void setUsingRoadPricing(boolean usingRoadPricing) {
+		this.usingRoadPricing = usingRoadPricing;
+	}
 
 }

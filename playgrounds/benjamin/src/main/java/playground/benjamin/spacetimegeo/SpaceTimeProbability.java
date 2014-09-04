@@ -224,8 +224,11 @@ public class SpaceTimeProbability {
 		
 		// scenarioConfigGroup
 		ScenarioConfigGroup sccg = config.scenario();
-        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
 
+		//        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
+		Logger.getLogger(this.getClass()).fatal("the above functionality does no longer exist.  please talk to me if needed. kai, sep'14") ;
+		System.exit(-1) ;
+		
         // roadPricingConfigGroup
         RoadPricingConfigGroup rpc = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
 		rpc.setTollLinksFile(this.tollLinksFile);

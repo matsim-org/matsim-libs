@@ -40,6 +40,7 @@ import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
+import org.matsim.contrib.matsim4urbansim.config.Matsim4UrbansimConfigGroup;
 import org.matsim.contrib.matsim4urbansim.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.AgentPerformanceControlerListener;
@@ -275,11 +276,14 @@ public class MATSim4UrbanSimParcel{
 	void runControler( ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels,ActivityFacilitiesImpl opportunities){
 		
 		Controler controler = new Controler(scenario);
-        if (ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUsingRoadpricing()) {
+        if (ConfigUtils.addOrGetModule(scenario.getConfig(), Matsim4UrbansimConfigGroup.GROUP_NAME, Matsim4UrbansimConfigGroup.class).isUsingRoadPricing()) {
 			controler.addControlerListener(new RoadPricing());
-			// yyyy this is a quick fix in order to make the SustainCity case studies work.  The more longterm goal is to
+			//  this is a quick fix in order to make the SustainCity case studies work.  The more longterm goal is to
 			// remove those "configuration" flags completely from the config.  However, then some other mechanism needs to be found 
 			// to be able to configure externally written "scripts" (such as this one) in a simple way.  kai & michael z, feb'13
+			
+			// this is now no longer a hack but something that should be reasonably stable.  NOTE: You have to switch on/off roadpricing now in a 
+			// (newly constructed) matsim4Urbansim config section.  kai & michael z, sep'14
 		}
 		controler.setOverwriteFiles(true);	
 		controler.setCreateGraphs(true);	

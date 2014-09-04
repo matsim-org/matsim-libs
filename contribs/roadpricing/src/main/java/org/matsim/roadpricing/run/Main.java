@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package org.matsim.roadpricing.run;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -39,10 +38,10 @@ public class Main {
 	public static void main(String[] args) {
 
 		Config config = ConfigUtils.loadConfig( args[0], new RoadPricingConfigGroup() ) ;
-        RoadPricingConfigGroup rpConfigGroup = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class) ;
-        if ( !rpConfigGroup.isUsingRoadpricing() ) {
-        	Logger.getLogger(Main.class).info("roadpricing is not switched on in the config; in consequence it will not be used.  Maybe this is what you want.") ;
-        }
+//        RoadPricingConfigGroup rpConfigGroup = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class) ;
+//        if ( !rpConfigGroup.isUsingRoadpricing() ) {
+//        	Logger.getLogger(Main.class).info("roadpricing is not switched on in the config; in consequence it will not be used.  Maybe this is what you want.") ;
+//        }
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		

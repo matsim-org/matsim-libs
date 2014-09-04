@@ -134,7 +134,10 @@ public class AnalysisTransportEconomics10 {
 		
 //***************************************************************************************************************************************************
 //only if there is a toll scheme, money events file needed
-        if(ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUsingRoadpricing()){
+//        if(ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUsingRoadpricing()){
+		Logger.getLogger(AnalysisTransportEconomics10.class).fatal("the above functionality does no longer exist; pls tlk to me if you need it. kai, sep'14") ;
+		System.exit(-1) ;
+if ( true ) {
 	eventsfile = io2.getIterationFilename(config.controler().getLastIteration(), "events") + ".txt.gz";
 	
 	EventsManager events = EventsUtils.createEventsManager();

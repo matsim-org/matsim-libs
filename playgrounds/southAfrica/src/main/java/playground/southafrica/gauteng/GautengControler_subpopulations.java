@@ -243,8 +243,20 @@ public class GautengControler_subpopulations {
 			}
 		});
 
-		// ROAD PRICING AND SCORING:
-		setUpRoadPricingAndScoring(baseValueOfTime, valueOfTimeMultiplier, sc, controler);
+		// SCORING:
+		controler.setScoringFunctionFactory(new GautengScoringFunctionFactory( 
+				sc, baseValueOfTime, valueOfTimeMultiplier 
+				) );
+		
+		// ROAD PRICING:
+		final RoadPricingConfigGroup roadPricingConfig = ConfigUtils.addOrGetModule(
+				sc.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class
+				);
+		RoadPricing roadPricing = new RoadPricing( new RoadPricingSchemeUsingTollFactor(
+				roadPricingConfig.getTollLinksFile(), new SanralTollFactor_Subpopulation(sc)
+				) );
+		roadPricing.setSigma(3.) ;
+		controler.addControlerListener( roadPricing ) ;
 		
 		// PLANS REMOVAL
 		Builder builder = new DiversityGeneratingPlansRemover.Builder() ;
@@ -266,49 +278,6 @@ public class GautengControler_subpopulations {
 		Header.printFooter();
 	}
 
-
-	private static void setUpRoadPricingAndScoring(double baseValueOfTime, double valueOfTimeMultiplier, final Scenario sc,
-			final Controler controler) {
-		// SCORING:
-		controler.setScoringFunctionFactory(new GautengScoringFunctionFactory( 
-				sc, baseValueOfTime, valueOfTimeMultiplier 
-				) );
-
-		// ROAD PRICING:
-		// scheme:
-        final RoadPricingConfigGroup roadPricingConfig = ConfigUtils.addOrGetModule(
-        		sc.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class
-        		);
-		if (roadPricingConfig.isUsingRoadpricing()) {
-			throw new RuntimeException(
-					"roadpricing must NOT be enabled in config.scenario in order to use special "
-							+ "road pricing features.  aborting ...");
-		}
-
-        RoadPricingScheme sanralTollScheme = new RoadPricingSchemeUsingTollFactor(
-        		roadPricingConfig.getTollLinksFile(), new SanralTollFactor_Subpopulation(sc)
-        		);
-        
-        RoadPricing roadPricing = new RoadPricing( sanralTollScheme );
-        controler.addControlerListener( roadPricing ) ;
-
-//		// INSTALL ROAD PRICING (in the longer run, re-merge with RoadPricing
-//		// class):
-//		// insert into scoring:
-//		controler.addControlerListener(new GenerationOfMoneyEvents(
-//				sc.getNetwork(), sc.getPopulation(), sanralTollScheme
-//				));
-//
-//		
-//		final RandomizingTravelDisutilityWithTollFactory travelDisutilityFactory = 
-//				new RandomizingTravelDisutilityWithTollFactory( sc );
-//		// ---
-//		travelDisutilityFactory.setRoadPricingScheme( sanralTollScheme ); 
-//		travelDisutilityFactory.setRandomness(3);
-//		// ---
-//		controler.setTravelDisutilityFactory( travelDisutilityFactory );
-
-	}
 
 	/**
 	 * @param sc
