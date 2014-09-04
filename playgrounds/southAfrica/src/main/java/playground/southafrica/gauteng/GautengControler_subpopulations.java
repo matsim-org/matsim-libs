@@ -57,7 +57,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricing;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
-import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeUsingTollFactor;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -66,9 +65,7 @@ import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor_Subpopulation;
-import playground.southafrica.gauteng.routing.RandomizingTravelDisutilityWithTollFactory;
 import playground.southafrica.gauteng.scoring.GautengScoringFunctionFactory;
-import playground.southafrica.gauteng.scoring.GenerationOfMoneyEvents;
 import playground.southafrica.utilities.Header;
 import playground.vsp.planselectors.DiversityGeneratingPlansRemover;
 import playground.vsp.planselectors.DiversityGeneratingPlansRemover.Builder;

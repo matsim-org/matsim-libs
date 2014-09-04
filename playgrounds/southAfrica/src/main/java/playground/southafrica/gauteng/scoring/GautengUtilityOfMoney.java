@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.southafrica.gauteng.utilityofmoney;
+package playground.southafrica.gauteng.scoring;
 
 import java.util.Map;
 import java.util.TreeMap;

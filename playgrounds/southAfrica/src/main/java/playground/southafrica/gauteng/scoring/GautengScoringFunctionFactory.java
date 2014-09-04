@@ -33,9 +33,6 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-import playground.southafrica.gauteng.utilityofmoney.GautengUtilityOfMoney;
-import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
-
 /**
  * @author nagel after
  * @author kickhoefer after

@@ -1,4 +1,4 @@
-package playground.southafrica.gauteng.utilityofmoney;
+package playground.southafrica.gauteng.scoring;
 
 import org.matsim.api.core.v01.Id;
 

@@ -6,7 +6,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
-import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
+import playground.southafrica.gauteng.scoring.UtilityOfMoneyI;
 
 public class EffectiveMarginalUtilitiesContainer implements UtilityOfMoneyI, UtilityOfDistanceI, UtilityOfTtimeI {
 	private final Map<Id,Double> effectiveMarginalUtilityOfTravelTime = new HashMap<Id,Double>() ;
