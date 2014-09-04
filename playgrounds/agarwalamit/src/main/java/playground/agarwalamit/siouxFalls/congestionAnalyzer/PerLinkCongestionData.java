@@ -56,7 +56,7 @@ public class PerLinkCongestionData {
 
 		Scenario scenario = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
 		this.network = scenario.getNetwork();
-		double simulationEndTime = LoadMyScenarios.getEndTime(configFile);
+		double simulationEndTime = LoadMyScenarios.getSimulationEndTime(configFile);
 		CongestionLinkAnalyzer linkAnalyzer = new CongestionLinkAnalyzer(simulationEndTime, eventFile,1);
 		linkAnalyzer.init(scenario);
 		linkAnalyzer.preProcessData();
