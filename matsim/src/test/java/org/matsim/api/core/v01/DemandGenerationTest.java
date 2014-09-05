@@ -76,15 +76,15 @@ public class DemandGenerationTest extends MatsimTestCase {
 		Activity activity;
 		Leg leg;
 
-		for (int i = 0; i < personCount; i++){
+		for (int i = 1; i <= personCount; i++){
 			//create the person and add it to the population
-			person = builder.createPerson(Id.create(i + 1, Person.class));
+			person = builder.createPerson(Id.create(i, Person.class));
 			//person should be created
 			assertNotNull(person);
 			//but not added to population
-			assertEquals(i, pop.getPersons().size());
+			assertEquals(i - 1, pop.getPersons().size());
 			pop.addPerson(person);
-			assertEquals(i+1, pop.getPersons().size());
+			assertEquals(i, pop.getPersons().size());
 			//create the plan and add it to the person
 			plan = builder.createPlan();
 			assertNotNull(plan);
@@ -94,7 +94,7 @@ public class DemandGenerationTest extends MatsimTestCase {
 			assertEquals(person, plan.getPerson());
 			assertEquals(1, person.getPlans().size());
 			//create the plan elements
-			activity = builder.createActivityFromLinkId("h", Id.create(0, Link.class));
+			activity = builder.createActivityFromLinkId("h", Id.create(1, Link.class));
 			assertNotNull(activity);
 			assertEquals(0, plan.getPlanElements().size());
 			//this should be called addActivity
@@ -108,7 +108,7 @@ public class DemandGenerationTest extends MatsimTestCase {
 			plan.addLeg(leg);
 			assertEquals(2, plan.getPlanElements().size());
 
-			activity = builder.createActivityFromLinkId("w", Id.create(2, Link.class));
+			activity = builder.createActivityFromLinkId("w", Id.create(3, Link.class));
 			assertNotNull(activity);
 			activity.setEndTime(workEndTime);
 			assertEquals(2, plan.getPlanElements().size());
@@ -126,7 +126,7 @@ public class DemandGenerationTest extends MatsimTestCase {
 			//we cannot add routes to legs as they cann't be written by the writers
 //			leg.setRoute(route);
 
-			activity = builder.createActivityFromLinkId("h", Id.create(0, Link.class));
+			activity = builder.createActivityFromLinkId("h", Id.create(1, Link.class));
 			assertNotNull(activity);
 			assertEquals(4, plan.getPlanElements().size());
 			plan.addActivity(activity);
@@ -174,7 +174,7 @@ public class DemandGenerationTest extends MatsimTestCase {
 		Person pers;
 		Plan p;
 		for (int id = 1; id <= linkCount; id++) {
-			pers = population.getPersons().get(id);
+			pers = population.getPersons().get(Id.create(id, Person.class));
 			assertNotNull(pers);
 			assertNotNull(pers.getPlans());
 			assertEquals(1, pers.getPlans().size());
@@ -185,11 +185,11 @@ public class DemandGenerationTest extends MatsimTestCase {
 				assertNotNull(element);
 			}
 			assertEquals(homeEndTime, ((Activity)p.getPlanElements().get(0)).getEndTime(), EPSILON);
-			assertEquals(Id.create(id, Link.class), ((Activity)p.getPlanElements().get(0)).getLinkId());
+			assertEquals(Id.create(1, Link.class), ((Activity)p.getPlanElements().get(0)).getLinkId());
 			assertEquals(workEndTime, ((Activity)p.getPlanElements().get(2)).getEndTime(), EPSILON);
-			assertEquals(Id.create(id, Link.class), ((Activity)p.getPlanElements().get(2)).getLinkId());
+			assertEquals(Id.create(3, Link.class), ((Activity)p.getPlanElements().get(2)).getLinkId());
 			assertEquals(Time.UNDEFINED_TIME, ((Activity)p.getPlanElements().get(4)).getEndTime(), EPSILON);
-			assertEquals(Id.create(id, Link.class), ((Activity)p.getPlanElements().get(4)).getLinkId());
+			assertEquals(Id.create(1, Link.class), ((Activity)p.getPlanElements().get(4)).getLinkId());
 
 			assertEquals(TransportMode.car, ((Leg)p.getPlanElements().get(1)).getMode());
 			assertNull(((Leg)p.getPlanElements().get(1)).getRoute());
