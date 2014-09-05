@@ -44,6 +44,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -61,21 +62,23 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 		config.scenario().setUseVehicles(true);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
-		Id id1 = scenario.createId("1");
-		Id id2 = scenario.createId("2");
-		Id id3 = scenario.createId("3");
+		Id<Node> nodeId1 = Id.create("1", Node.class);
+		Id<Node> nodeId2 = Id.create("2", Node.class);
+		Id<Node> nodeId3 = Id.create("3", Node.class);
+		Id<Link> linkId1 = Id.create("1", Link.class);
+		Id<Link> linkId2 = Id.create("2", Link.class);
 
 		// build network
 		Network network = scenario.getNetwork();
 		NetworkFactory nBuilder = network.getFactory();
-		Node node1 = nBuilder.createNode(id1, scenario.createCoord(0, 0));
-		Node node2 = nBuilder.createNode(id2, scenario.createCoord(1000, 0));
-		Node node3 = nBuilder.createNode(id3, scenario.createCoord(2000, 0));
+		Node node1 = nBuilder.createNode(nodeId1, scenario.createCoord(0, 0));
+		Node node2 = nBuilder.createNode(nodeId2, scenario.createCoord(1000, 0));
+		Node node3 = nBuilder.createNode(nodeId3, scenario.createCoord(2000, 0));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
-		Link link1 = nBuilder.createLink(id1, node1, node2);
-		Link link2 = nBuilder.createLink(id2, node2, node3);
+		Link link1 = nBuilder.createLink(linkId1, node1, node2);
+		Link link2 = nBuilder.createLink(linkId2, node2, node3);
 		network.addLink(link1);
 		network.addLink(link2);
 
@@ -83,14 +86,14 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory sBuilder = schedule.getFactory();
 
-		TransitStopFacility stopF1 = sBuilder.createTransitStopFacility(id1, scenario.createCoord(1000.0, 0), false);
-		TransitStopFacility stopF2 = sBuilder.createTransitStopFacility(id2, scenario.createCoord(2000.0, 0), false);
+		TransitStopFacility stopF1 = sBuilder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), scenario.createCoord(1000.0, 0), false);
+		TransitStopFacility stopF2 = sBuilder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), scenario.createCoord(2000.0, 0), false);
 		stopF1.setLinkId(link1.getId());
 		stopF2.setLinkId(link2.getId());
 		schedule.addStopFacility(stopF1);
 		schedule.addStopFacility(stopF2);
 
-		TransitLine tLine1 = sBuilder.createTransitLine(id1);
+		TransitLine tLine1 = sBuilder.createTransitLine(Id.create("1", TransitLine.class));
 
 		TransitRouteStop stop1 = sBuilder.createTransitRouteStop(stopF1, 0, 0);
 		TransitRouteStop stop2 = sBuilder.createTransitRouteStop(stopF2, 100, 100);
@@ -100,9 +103,9 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 
 		NetworkRoute netRoute = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
 		netRoute.setLinkIds(link1.getId(), Collections.<Id<Link>>emptyList(), link2.getId());
-		TransitRoute tRoute1 = sBuilder.createTransitRoute(id1, netRoute, stops, "bus");
+		TransitRoute tRoute1 = sBuilder.createTransitRoute(Id.create("1", TransitRoute.class), netRoute, stops, "bus");
 
-		tRoute1.addDeparture(sBuilder.createDeparture(id1, 7.0*3600));
+		tRoute1.addDeparture(sBuilder.createDeparture(Id.create("1", Departure.class), 7.0*3600));
 		tLine1.addRoute(tRoute1);
 		schedule.addTransitLine(tLine1);
 
@@ -112,16 +115,16 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 		// build population
 		Population population = scenario.getPopulation();
 		PopulationFactory pBuilder = population.getFactory();
-		Person person1 = pBuilder.createPerson(id1);
+		Person person1 = pBuilder.createPerson(Id.create("1", Person.class));
 		Plan plan = pBuilder.createPlan();
-		Activity homeAct = pBuilder.createActivityFromLinkId("h", id1);
+		Activity homeAct = pBuilder.createActivityFromLinkId("h", linkId1);
 		homeAct.setEndTime(7.0*3600);
 		plan.addActivity(homeAct);
 		Leg leg = pBuilder.createLeg(TransportMode.pt);
 		ExperimentalTransitRoute tRoute = new ExperimentalTransitRoute(stopF1, tLine1, tRoute1, stopF2);
 		leg.setRoute(tRoute);
 		plan.addLeg(leg);
-		plan.addActivity(pBuilder.createActivityFromLinkId("w", id2));
+		plan.addActivity(pBuilder.createActivityFromLinkId("w", linkId2));
 		person1.addPlan(plan);
 		population.addPerson(person1);
 

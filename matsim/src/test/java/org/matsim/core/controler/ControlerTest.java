@@ -113,7 +113,7 @@ public class ControlerTest {
 		PopulationFactory factory = population.getFactory();
 		Person person1 = null;
 
-		person1 = factory.createPerson(f.scenario.createId("1"));
+		person1 = factory.createPerson(Id.create("1", Person.class));
 		Plan plan1 = factory.createPlan();
 		person1.addPlan(plan1);
 		Activity a1 = factory.createActivityFromLinkId("h", f.link1.getId());
@@ -129,7 +129,7 @@ public class ControlerTest {
 		plan1.addActivity(factory.createActivityFromLinkId("h", f.link3.getId()));
 		population.addPerson(person1);
 
-		Person person2 = factory.createPerson(f.scenario.createId("2"));
+		Person person2 = factory.createPerson(Id.create("2", Person.class));
 		Plan plan2 = factory.createPlan();
 		person2.addPlan(plan2);
 		Activity a2 = factory.createActivityFromLinkId("h", f.link1.getId());
@@ -240,7 +240,7 @@ public class ControlerTest {
 		Leg leg1 = null;
 		Leg leg2 = null;
 
-		person1 = factory.createPerson(f.scenario.createId("1"));
+		person1 = factory.createPerson(Id.create("1", Person.class));
 		// --- plan 1 ---
 		Plan plan1 = factory.createPlan();
 		person1.addPlan(plan1);

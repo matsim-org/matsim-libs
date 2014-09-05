@@ -3,9 +3,11 @@ package org.matsim.core.network;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -126,9 +128,9 @@ public class LinkQuadTreeTest {
 		Coord fc = s.createCoord(fromX, fromY);
 		Coord tc = s.createCoord(toX, toY);
 		return nf.createLink(
-				s.createId(fc.toString() + "-" + tc.toString()), 
-				nf.createNode(s.createId(fc.toString()), fc), 
-				nf.createNode(s.createId(tc.toString()), tc) 
+				Id.create(fc.toString() + "-" + tc.toString(), Link.class), 
+				nf.createNode(Id.create(fc.toString(), Node.class), fc), 
+				nf.createNode(Id.create(tc.toString(), Node.class), tc) 
 				);
 	}
 

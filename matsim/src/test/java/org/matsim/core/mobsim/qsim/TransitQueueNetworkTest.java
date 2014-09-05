@@ -20,13 +20,24 @@
 
 package org.matsim.core.mobsim.qsim;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import junit.framework.TestCase;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
@@ -35,22 +46,36 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.pt.*;
-import org.matsim.core.mobsim.qsim.qnetsimengine.*;
+import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
+import org.matsim.core.mobsim.qsim.pt.SimpleTransitStopHandler;
+import org.matsim.core.mobsim.qsim.pt.TransitDriverAgentImpl;
+import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
+import org.matsim.core.mobsim.qsim.pt.TransitQVehicle;
+import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.fakes.FakeAgent;
-import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.vehicles.*;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleCapacityImpl;
+import org.matsim.vehicles.VehicleImpl;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleTypeImpl;
 
 
 public class TransitQueueNetworkTest extends TestCase {
@@ -961,29 +986,32 @@ public class TransitQueueNetworkTest extends TestCase {
             // setup: config
             ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
             scenario.getConfig().scenario().setUseTransit(true);
-            Id id1 = scenario.createId("1");
-            Id id2 = scenario.createId("2");
-            Id id3 = scenario.createId("3");
-            Id id4 = scenario.createId("4");
+            Id<Node> nodeId1 = Id.create("1", Node.class);
+            Id<Node> nodeId2 = Id.create("2", Node.class);
+            Id<Node> nodeId3 = Id.create("3", Node.class);
+            Id<Node> nodeId4 = Id.create("4", Node.class);
+            Id<Link> linkId1 = Id.create("1", Link.class);
+            Id<Link> linkId2 = Id.create("2", Link.class);
+            Id<Link> linkId3 = Id.create("3", Link.class);
 
             // setup: network
             NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-            Node node1 = network.createAndAddNode(id1, scenario.createCoord(   0, 0));
-            Node node2 = network.createAndAddNode(id2, scenario.createCoord(1000, 0));
-            Node node3 = network.createAndAddNode(id3, scenario.createCoord(2000, 0));
-            Node node4 = network.createAndAddNode(id4, scenario.createCoord(3000, 0));
+            Node node1 = network.createAndAddNode(nodeId1, scenario.createCoord(   0, 0));
+            Node node2 = network.createAndAddNode(nodeId2, scenario.createCoord(1000, 0));
+            Node node3 = network.createAndAddNode(nodeId3, scenario.createCoord(2000, 0));
+            Node node4 = network.createAndAddNode(nodeId4, scenario.createCoord(3000, 0));
             Link[] links = new Link[4];
-            links[1] = network.createAndAddLink(id1, node1, node2, 1000.0, 10.0, 3600.0, 1);
-            links[2] = network.createAndAddLink(id2, node2, node3, 1000.0, 10.0, 3600.0, 1);
-            links[3] = network.createAndAddLink(id3, node3, node4, 1000.0, 10.0, 3600.0, 1);
+            links[1] = network.createAndAddLink(linkId1, node1, node2, 1000.0, 10.0, 3600.0, 1);
+            links[2] = network.createAndAddLink(linkId2, node2, node3, 1000.0, 10.0, 3600.0, 1);
+            links[3] = network.createAndAddLink(linkId3, node3, node4, 1000.0, 10.0, 3600.0, 1);
 
             // setup: population
             Population population = scenario.getPopulation();
             PopulationFactory pb = population.getFactory();
-            Person person = pb.createPerson(id2);
+            Person person = pb.createPerson(Id.create(2, Person.class));
             Plan plan = pb.createPlan();
             person.addPlan(plan);
-            Activity act = pb.createActivityFromLinkId("home", id1);
+            Activity act = pb.createActivityFromLinkId("home", linkId1);
             plan.addActivity(act);
             Leg leg = pb.createLeg(TransportMode.car);
             LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(links[1].getId(), links[3].getId());
@@ -992,22 +1020,22 @@ public class TransitQueueNetworkTest extends TestCase {
             route.setLinkIds(links[1].getId(), linkIds_2, links[3].getId());
             leg.setRoute(route);
             plan.addLeg(leg);
-            plan.addActivity(pb.createActivityFromLinkId("work", id2));
+            plan.addActivity(pb.createActivityFromLinkId("work", linkId2));
             population.addPerson(person);
 
             // setup: transit schedule
             TransitSchedule schedule = scenario.getTransitSchedule();
             TransitScheduleFactory builder = schedule.getFactory();
-            TransitStopFacility stop1 = builder.createTransitStopFacility(id1, scenario.createCoord(0, 0), firstStopisBlocking);
+            TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), scenario.createCoord(0, 0), firstStopisBlocking);
             schedule.addStopFacility(stop1);
             stop1.setLinkId(links[firstStopLocation].getId());
             TransitStopFacility stop2 = null;
             if (secondStopLocation > 0) {
-                stop2 = builder.createTransitStopFacility(id2, scenario.createCoord(100, 0), secondStopIsBlocking);
+                stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), scenario.createCoord(100, 0), secondStopIsBlocking);
                 schedule.addStopFacility(stop2);
                 stop2.setLinkId(links[secondStopLocation].getId());
             }
-            TransitLine tLine = builder.createTransitLine(id1);
+            TransitLine tLine = builder.createTransitLine(Id.create("1", TransitLine.class));
             NetworkRoute netRoute = new LinkNetworkRouteImpl(links[1].getId(), links[3].getId());
             netRoute.setLinkIds(links[1].getId(), linkIds_2, links[3].getId());
             ArrayList<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
@@ -1015,8 +1043,8 @@ public class TransitQueueNetworkTest extends TestCase {
             if (stop2 != null) {
                 stops.add(builder.createTransitRouteStop(stop2, 70, 80));
             }
-            TransitRoute tRoute = builder.createTransitRoute(id1, netRoute, stops, TransportMode.pt);
-            Departure dep = builder.createDeparture(id1, 100);
+            TransitRoute tRoute = builder.createTransitRoute(Id.create("1", TransitRoute.class), netRoute, stops, TransportMode.pt);
+            Departure dep = builder.createDeparture(Id.create("1", Departure.class), 100);
             tRoute.addDeparture(dep);
             tLine.addRoute(tRoute);
 			QSim qSim1 = new QSim(scenario, EventsUtils.createEventsManager());
@@ -1042,9 +1070,9 @@ public class TransitQueueNetworkTest extends TestCase {
             qSim.addAgentSource(agentSource);
             qsim = qSim;
             NetsimNetwork qnet = qsim.getNetsimNetwork();
-            this.qlink1 = (QLinkImpl) qnet.getNetsimLink(id1);
-            this.qlink2 = (QLinkImpl) qnet.getNetsimLink(id2);
-            this.qlink3 = (QLinkImpl) qnet.getNetsimLink(id3);
+            this.qlink1 = (QLinkImpl) qnet.getNetsimLink(linkId1);
+            this.qlink2 = (QLinkImpl) qnet.getNetsimLink(linkId2);
+            this.qlink3 = (QLinkImpl) qnet.getNetsimLink(linkId3);
             this.simEngine = qsim.getNetsimEngine();
             this.simEngine.onPrepareSim();
             TransitStopAgentTracker tracker = transitEngine.getAgentTracker();
@@ -1055,14 +1083,14 @@ public class TransitQueueNetworkTest extends TestCase {
             qsim.getSimTimer().setTime(100);
 
             // setup: vehicles
-            VehicleType vehicleType = new VehicleTypeImpl(new IdImpl("testVehicleType"));
+            VehicleType vehicleType = new VehicleTypeImpl(Id.create("testVehicleType", Vehicle.class));
             VehicleCapacity capacity = new VehicleCapacityImpl();
             capacity.setSeats(Integer.valueOf(101));
             capacity.setStandingRoom(Integer.valueOf(0));
             vehicleType.setCapacity(capacity);
 
             FakeTransitDriver tDriver = new FakeTransitDriver(tLine, tRoute, dep, tracker, transitEngine );
-            this.transitVehicle = new TransitQVehicle(new VehicleImpl(tDriver.getId(), vehicleType));
+            this.transitVehicle = new TransitQVehicle(new VehicleImpl(Id.create(tDriver.getId(), Vehicle.class), vehicleType));
 
 //            this.qlink1.addParkedVehicle(this.transitVehicle);
             ((QNetsimEngine)this.simEngine).addParkedVehicle(this.transitVehicle, this.qlink1.getLink().getId()) ;
@@ -1076,7 +1104,7 @@ public class TransitQueueNetworkTest extends TestCase {
             this.qsim.internalInterface.arrangeNextAgentState(tDriver) ;
             // (not great, but is a test. kai, dec'11)
 
-            this.normalVehicle = new QVehicle(new VehicleImpl(id2, vehicleType));
+            this.normalVehicle = new QVehicle(new VehicleImpl(Id.create("2", Vehicle.class), vehicleType));
 //            this.qlink1.addParkedVehicle(this.normalVehicle);
             ((QNetsimEngine)this.simEngine).addParkedVehicle(this.normalVehicle, this.qlink1.getLink().getId()) ;
 
@@ -1090,14 +1118,14 @@ public class TransitQueueNetworkTest extends TestCase {
             if (stop2 != null) {
                 /* we're testing two stops. Add another normal vehicle with 20 seconds delay,
                      * that *could* overtake a transit vehicle at its second stop. */
-                this.normalVehicle2 = new QVehicle(new VehicleImpl(id3, vehicleType));
+                this.normalVehicle2 = new QVehicle(new VehicleImpl(Id.create("3", Vehicle.class), vehicleType));
 //                this.qlink1.addParkedVehicle(this.normalVehicle2);
                 ((QNetsimEngine)this.simEngine).addParkedVehicle(this.normalVehicle2, this.qlink1.getLink().getId()) ;
 
-                Person person2 = pb.createPerson(id3);
+                Person person2 = pb.createPerson(Id.create("3", Person.class));
                 Plan plan2 = pb.createPlan();
                 person2.addPlan(plan2);
-                Activity act2 = pb.createActivityFromLinkId("home", id1);
+                Activity act2 = pb.createActivityFromLinkId("home", linkId1);
                 act2.setEndTime(120);
                 plan2.addActivity(act2);
                 Leg leg2 = pb.createLeg(TransportMode.car);
@@ -1105,7 +1133,7 @@ public class TransitQueueNetworkTest extends TestCase {
                 route2.setLinkIds(links[1].getId(), linkIds_2, links[3].getId());
                 leg2.setRoute(route2);
                 plan2.addLeg(leg2);
-                plan2.addActivity(pb.createActivityFromLinkId("work", id2));
+                plan2.addActivity(pb.createActivityFromLinkId("work", linkId2));
                 population.addPerson(person2);
 
                 PersonDriverAgentImpl nDriver2 = createAndInsertPersonDriverAgentImpl(person2);

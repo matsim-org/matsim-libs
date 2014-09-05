@@ -20,17 +20,44 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.api.experimental.events.*;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.SimulationConfigGroup;
@@ -38,7 +65,11 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.*;
+import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.SingletonUmlaufBuilderImpl;
+import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
@@ -55,19 +86,24 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
-import org.matsim.vehicles.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleCapacityImpl;
+import org.matsim.vehicles.VehicleImpl;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleTypeImpl;
+import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesFactory;
 
 
 /**
@@ -88,15 +124,15 @@ public class TransitQueueSimulationTest {
 
         // setup: network
         Network network = scenario.getNetwork();
-        Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(   0, 0));
-        Node node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000, 0));
-        Node node3 = network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000, 0));
+        Node node1 = network.getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(   0, 0));
+        Node node2 = network.getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(1000, 0));
+        Node node3 = network.getFactory().createNode(Id.create("3", Node.class), scenario.createCoord(2000, 0));
         network.addNode(node1);
         network.addNode(node2);
         network.addNode(node3);
-        Link link1 = network.getFactory().createLink(scenario.createId("1"), node1, node2);
+        Link link1 = network.getFactory().createLink(Id.create("1", Link.class), node1, node2);
         setDefaultLinkAttributes(link1);
-        Link link2 = network.getFactory().createLink(scenario.createId("2"), node2, node3);
+        Link link2 = network.getFactory().createLink(Id.create("2", Link.class), node2, node3);
         setDefaultLinkAttributes(link2);
         network.addLink(link1);
         network.addLink(link2);
@@ -104,7 +140,7 @@ public class TransitQueueSimulationTest {
         // setup: vehicles
         Vehicles vehicles = scenario.getVehicles();
         VehiclesFactory vb = vehicles.getFactory();
-        VehicleType vehicleType = vb.createVehicleType(new IdImpl("transitVehicleType"));
+        VehicleType vehicleType = vb.createVehicleType(Id.create("transitVehicleType", VehicleType.class));
         VehicleCapacity capacity = vb.createVehicleCapacity();
         capacity.setSeats(Integer.valueOf(101));
         capacity.setStandingRoom(Integer.valueOf(0));
@@ -112,20 +148,20 @@ public class TransitQueueSimulationTest {
         
         vehicles.addVehicleType(vehicleType);
         
-        vehicles.addVehicle(vb.createVehicle(new IdImpl("veh1"), vehicleType));
-        vehicles.addVehicle(vb.createVehicle(new IdImpl("veh2"), vehicleType));
-        vehicles.addVehicle(vb.createVehicle(new IdImpl("veh3"), vehicleType));
-        vehicles.addVehicle(vb.createVehicle(new IdImpl("veh4"), vehicleType));
-        vehicles.addVehicle(vb.createVehicle(new IdImpl("veh5"), vehicleType));
+        vehicles.addVehicle(vb.createVehicle(Id.create("veh1", Vehicle.class), vehicleType));
+        vehicles.addVehicle(vb.createVehicle(Id.create("veh2", Vehicle.class), vehicleType));
+        vehicles.addVehicle(vb.createVehicle(Id.create("veh3", Vehicle.class), vehicleType));
+        vehicles.addVehicle(vb.createVehicle(Id.create("veh4", Vehicle.class), vehicleType));
+        vehicles.addVehicle(vb.createVehicle(Id.create("veh5", Vehicle.class), vehicleType));
 
         // setup: transit schedule
         TransitSchedule schedule = scenario.getTransitSchedule();
         TransitScheduleFactory builder = schedule.getFactory();
 
-        TransitStopFacility stop1 = builder.createTransitStopFacility(scenario.createId("stop1"), scenario.createCoord(0, 0), false);
-        TransitStopFacility stop2 = builder.createTransitStopFacility(scenario.createId("stop2"), scenario.createCoord(0, 0), false);
-        TransitStopFacility stop3 = builder.createTransitStopFacility(scenario.createId("stop3"), scenario.createCoord(0, 0), false);
-        TransitStopFacility stop4 = builder.createTransitStopFacility(scenario.createId("stop4"), scenario.createCoord(0, 0), false);
+        TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", TransitStopFacility.class), scenario.createCoord(0, 0), false);
+        TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", TransitStopFacility.class), scenario.createCoord(0, 0), false);
+        TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("stop3", TransitStopFacility.class), scenario.createCoord(0, 0), false);
+        TransitStopFacility stop4 = builder.createTransitStopFacility(Id.create("stop4", TransitStopFacility.class), scenario.createCoord(0, 0), false);
         ArrayList<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
         stops.add(builder.createTransitRouteStop(stop1, 50, 60));
         stops.add(builder.createTransitRouteStop(stop2, 150, 160));
@@ -145,38 +181,38 @@ public class TransitQueueSimulationTest {
         route.setLinkIds(link1.getId(), links, link2.getId());
 
         { // line 1, 1 route, 2 departures
-            TransitLine line = builder.createTransitLine(scenario.createId("1"));
-            TransitRoute tRoute = builder.createTransitRoute(scenario.createId(">"), route, stops, TransportMode.pt);
-            Departure dep = builder.createDeparture(scenario.createId("dep1"), 6.0*3600);
-            dep.setVehicleId(new IdImpl("veh1"));
+            TransitLine line = builder.createTransitLine(Id.create("1", TransitLine.class));
+            TransitRoute tRoute = builder.createTransitRoute(Id.create(">", TransitRoute.class), route, stops, TransportMode.pt);
+            Departure dep = builder.createDeparture(Id.create("dep1", Departure.class), 6.0*3600);
+            dep.setVehicleId(Id.create("veh1", Vehicle.class));
             tRoute.addDeparture(dep);
-            dep = builder.createDeparture(scenario.createId("dep2"), 7.0*3600);
-            dep.setVehicleId(new IdImpl("veh2"));
+            dep = builder.createDeparture(Id.create("dep2", Departure.class), 7.0*3600);
+            dep.setVehicleId(Id.create("veh2", Vehicle.class));
             tRoute.addDeparture(dep);
             line.addRoute(tRoute);
             schedule.addTransitLine(line);
         }
 
         { // line 2, 3 routes, each 1 departure
-            TransitLine line = builder.createTransitLine(scenario.createId("2"));
+            TransitLine line = builder.createTransitLine(Id.create("2", TransitLine.class));
             { // route 1
-                TransitRoute tRoute = builder.createTransitRoute(scenario.createId("A"), route, stops, TransportMode.pt);
-                Departure dep = builder.createDeparture(scenario.createId("dep3"), 8.0*3600);
-                dep.setVehicleId(new IdImpl("veh3"));
+                TransitRoute tRoute = builder.createTransitRoute(Id.create("A", TransitRoute.class), route, stops, TransportMode.pt);
+                Departure dep = builder.createDeparture(Id.create("dep3", Departure.class), 8.0*3600);
+                dep.setVehicleId(Id.create("veh3", Vehicle.class));
                 tRoute.addDeparture(dep);
                 line.addRoute(tRoute);
             }
             { // route 2
-                TransitRoute tRoute = builder.createTransitRoute(scenario.createId("B"), route, stops, TransportMode.pt);
-                Departure dep = builder.createDeparture(scenario.createId("dep4"), 8.5*3600);
-                dep.setVehicleId(new IdImpl("veh4"));
+                TransitRoute tRoute = builder.createTransitRoute(Id.create("B", TransitRoute.class), route, stops, TransportMode.pt);
+                Departure dep = builder.createDeparture(Id.create("dep4", Departure.class), 8.5*3600);
+                dep.setVehicleId(Id.create("veh4", Vehicle.class));
                 tRoute.addDeparture(dep);
                 line.addRoute(tRoute);
             }
             { // route 3
-                TransitRoute tRoute = builder.createTransitRoute(scenario.createId("C"), route, stops, TransportMode.pt);
-                Departure dep = builder.createDeparture(scenario.createId("dep5"), 9.0*3600);
-                dep.setVehicleId(new IdImpl("veh5"));
+                TransitRoute tRoute = builder.createTransitRoute(Id.create("C", TransitRoute.class), route, stops, TransportMode.pt);
+                Departure dep = builder.createDeparture(Id.create("dep5", Departure.class), 9.0*3600);
+                dep.setVehicleId(Id.create("veh5", Vehicle.class));
                 tRoute.addDeparture(dep);
                 line.addRoute(tRoute);
             }
@@ -218,32 +254,32 @@ public class TransitQueueSimulationTest {
         
         // setup: network
         Network network = scenario.getNetwork();
-        Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(   0, 0));
-        Node node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000, 0));
+        Node node1 = network.getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(   0, 0));
+        Node node2 = network.getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(1000, 0));
         network.addNode(node1);
         network.addNode(node2);
-        Link link = network.getFactory().createLink(scenario.createId("1"), node1, node2);
+        Link link = network.getFactory().createLink(Id.create("1", Link.class), node1, node2);
         setDefaultLinkAttributes(link);
         network.addLink(link);
 
         // setup: transit schedule
         TransitSchedule schedule = scenario.getTransitSchedule();
         TransitScheduleFactory builder = schedule.getFactory();
-        TransitLine line = builder.createTransitLine(scenario.createId("1"));
+        TransitLine line = builder.createTransitLine(Id.create("1", TransitLine.class));
 
-        TransitStopFacility stop1 = builder.createTransitStopFacility(scenario.createId("stop1"), scenario.createCoord(0, 0), false);
+        TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", TransitStopFacility.class), scenario.createCoord(0, 0), false);
         stop1.setLinkId(link.getId());
-        TransitStopFacility stop2 = builder.createTransitStopFacility(scenario.createId("stop2"), scenario.createCoord(0, 0), false);
+        TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", TransitStopFacility.class), scenario.createCoord(0, 0), false);
         schedule.addStopFacility(stop1);
         schedule.addStopFacility(stop2);
 
         // setup: population
         Population population = scenario.getPopulation();
         PopulationFactory pb = population.getFactory();
-        Person person = pb.createPerson(scenario.createId("1"));
+        Person person = pb.createPerson(Id.create("1", Person.class));
         Plan plan = pb.createPlan();
         person.addPlan(plan);
-        Activity homeAct = pb.createActivityFromLinkId("home", scenario.createId("1"));
+        Activity homeAct = pb.createActivityFromLinkId("home", Id.create("1", Link.class));
 
         homeAct.setEndTime(7.0*3600 - 10.0);
         // as no transit line runs, make sure to stop the simulation manually.
@@ -251,7 +287,7 @@ public class TransitQueueSimulationTest {
 
         Leg leg = pb.createLeg(TransportMode.pt);
         leg.setRoute(new ExperimentalTransitRoute(stop1, line, null, stop2));
-        Activity workAct = pb.createActivityFromLinkId("work", scenario.createId("2"));
+        Activity workAct = pb.createActivityFromLinkId("work", Id.create("2", Link.class));
         plan.addActivity(homeAct);
         plan.addLeg(leg);
         plan.addActivity(workAct);
@@ -297,14 +333,14 @@ public class TransitQueueSimulationTest {
    
         // setup: network
         Network network = scenario.getNetwork();
-        Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(   0, 0));
-        Node node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000, 0));
-        Node node3 = network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000, 0));
+        Node node1 = network.getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(   0, 0));
+        Node node2 = network.getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(1000, 0));
+        Node node3 = network.getFactory().createNode(Id.create("3", Node.class), scenario.createCoord(2000, 0));
         network.addNode(node1);
         network.addNode(node2);
         network.addNode(node3);
-        Link link1 = network.getFactory().createLink(scenario.createId("1"), node1, node2);
-        Link link2 = network.getFactory().createLink(scenario.createId("2"), node2, node3);
+        Link link1 = network.getFactory().createLink(Id.create("1", Link.class), node1, node2);
+        Link link2 = network.getFactory().createLink(Id.create("2", Link.class), node2, node3);
         setDefaultLinkAttributes(link1);
         network.addLink(link1);
         setDefaultLinkAttributes(link2);
@@ -313,11 +349,11 @@ public class TransitQueueSimulationTest {
         // setup: transit schedule
         TransitSchedule schedule = scenario.getTransitSchedule();
         TransitScheduleFactory builder = schedule.getFactory();
-        TransitLine line = builder.createTransitLine(scenario.createId("1"));
+        TransitLine line = builder.createTransitLine(Id.create("1", TransitLine.class));
 
-        TransitStopFacility stop1 = builder.createTransitStopFacility(scenario.createId("stop1"), scenario.createCoord(0, 0), false);
+        TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", TransitStopFacility.class), scenario.createCoord(0, 0), false);
         stop1.setLinkId(link1.getId());
-        TransitStopFacility stop2 = builder.createTransitStopFacility(scenario.createId("stop2"), scenario.createCoord(0, 0), false);
+        TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", TransitStopFacility.class), scenario.createCoord(0, 0), false);
         stop2.setLinkId(link2.getId());
         schedule.addStopFacility(stop1);
         schedule.addStopFacility(stop2);
@@ -325,10 +361,10 @@ public class TransitQueueSimulationTest {
         // setup: population
         Population population = scenario.getPopulation();
         PopulationFactory pb = population.getFactory();
-        Person person = pb.createPerson(scenario.createId("1"));
+        Person person = pb.createPerson(Id.create("1", Person.class));
         Plan plan = pb.createPlan();
         person.addPlan(plan);
-        Activity homeAct = pb.createActivityFromLinkId("home", scenario.createId("2"));
+        Activity homeAct = pb.createActivityFromLinkId("home", Id.create("2", Link.class));
 
         homeAct.setEndTime(7.0*3600 - 10.0);
         // as no transit line runs, make sure to stop the simulation manually.
@@ -336,7 +372,7 @@ public class TransitQueueSimulationTest {
 
         Leg leg = pb.createLeg(TransportMode.pt);
         leg.setRoute(new ExperimentalTransitRoute(stop1, line, null, stop2));
-        Activity workAct = pb.createActivityFromLinkId("work", scenario.createId("1"));
+        Activity workAct = pb.createActivityFromLinkId("work", Id.create("1", Link.class));
         plan.addActivity(homeAct);
         plan.addLeg(leg);
         plan.addActivity(workAct);
@@ -364,23 +400,23 @@ public class TransitQueueSimulationTest {
 
         // setup: network
         Network network = scenario.getNetwork();
-        Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(   0, 0));
-        Node node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000, 0));
-        Node node3 = network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000, 0));
-        Node node4 = network.getFactory().createNode(scenario.createId("4"), scenario.createCoord(3000, 0));
-        Node node5 = network.getFactory().createNode(scenario.createId("5"), scenario.createCoord(4000, 0));
-        Node node6 = network.getFactory().createNode(scenario.createId("6"), scenario.createCoord(5000, 0));
+        Node node1 = network.getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(   0, 0));
+        Node node2 = network.getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(1000, 0));
+        Node node3 = network.getFactory().createNode(Id.create("3", Node.class), scenario.createCoord(2000, 0));
+        Node node4 = network.getFactory().createNode(Id.create("4", Node.class), scenario.createCoord(3000, 0));
+        Node node5 = network.getFactory().createNode(Id.create("5", Node.class), scenario.createCoord(4000, 0));
+        Node node6 = network.getFactory().createNode(Id.create("6", Node.class), scenario.createCoord(5000, 0));
         network.addNode(node1);
         network.addNode(node2);
         network.addNode(node3);
         network.addNode(node4);
         network.addNode(node5);
         network.addNode(node6);
-        Link link1 = network.getFactory().createLink(scenario.createId("1"), node1, node2);
-        Link link2 = network.getFactory().createLink(scenario.createId("2"), node2, node3);
-        Link link3 = network.getFactory().createLink(scenario.createId("3"), node3, node4);
-        Link link4 = network.getFactory().createLink(scenario.createId("4"), node4, node5);
-        Link link5 = network.getFactory().createLink(scenario.createId("5"), node5, node6);
+        Link link1 = network.getFactory().createLink(Id.create("1", Link.class), node1, node2);
+        Link link2 = network.getFactory().createLink(Id.create("2", Link.class), node2, node3);
+        Link link3 = network.getFactory().createLink(Id.create("3", Link.class), node3, node4);
+        Link link4 = network.getFactory().createLink(Id.create("4", Link.class), node4, node5);
+        Link link5 = network.getFactory().createLink(Id.create("5", Link.class), node5, node6);
         setDefaultLinkAttributes(link1);
         setDefaultLinkAttributes(link2);
         setDefaultLinkAttributes(link3);
@@ -395,13 +431,13 @@ public class TransitQueueSimulationTest {
         // setup: transit schedule
         TransitSchedule schedule = scenario.getTransitSchedule();
         TransitScheduleFactory builder = schedule.getFactory();
-        TransitLine line = builder.createTransitLine(scenario.createId("1"));
+        TransitLine line = builder.createTransitLine(Id.create("1", TransitLine.class));
         // important: do NOT add the line to the schedule, or agents will be created twice!
 
-        TransitStopFacility stop1 = builder.createTransitStopFacility(scenario.createId("stop1"), scenario.createCoord(0, 0), false);
-        TransitStopFacility stop2 = builder.createTransitStopFacility(scenario.createId("stop2"), scenario.createCoord(0, 0), false);
-        TransitStopFacility stop3 = builder.createTransitStopFacility(scenario.createId("stop3"), scenario.createCoord(0, 0), false);
-        TransitStopFacility stop4 = builder.createTransitStopFacility(scenario.createId("stop4"), scenario.createCoord(0, 0), false);
+        TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", TransitStopFacility.class), scenario.createCoord(0, 0), false);
+        TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", TransitStopFacility.class), scenario.createCoord(0, 0), false);
+        TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("stop3", TransitStopFacility.class), scenario.createCoord(0, 0), false);
+        TransitStopFacility stop4 = builder.createTransitStopFacility(Id.create("stop4", TransitStopFacility.class), scenario.createCoord(0, 0), false);
         ArrayList<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
         stops.add(builder.createTransitRouteStop(stop1, 50, 60));
         stops.add(builder.createTransitRouteStop(stop2, 150, 160));
@@ -422,37 +458,37 @@ public class TransitQueueSimulationTest {
         Collections.addAll(links, link2.getId(), link3.getId(), link4.getId());
         route.setLinkIds(link1.getId(), links, link5.getId());
 
-        TransitRoute tRoute = builder.createTransitRoute(scenario.createId(">"), route, stops, TransportMode.pt);
-        Departure departure = builder.createDeparture(scenario.createId("dep1"), 6.0*3600);
+        TransitRoute tRoute = builder.createTransitRoute(Id.create(">", TransitRoute.class), route, stops, TransportMode.pt);
+        Departure departure = builder.createDeparture(Id.create("dep1", Departure.class), 6.0*3600);
         tRoute.addDeparture(departure);
         line.addRoute(tRoute);
 
         // setup: population
         Population population = scenario.getPopulation();
         PopulationFactory pb = population.getFactory();
-        Person person1 = pb.createPerson(scenario.createId("1"));
+        Person person1 = pb.createPerson(Id.create("1", Person.class));
         Plan plan1 = pb.createPlan();
         person1.addPlan(plan1);
-        Activity homeAct = pb.createActivityFromLinkId("home", scenario.createId("1"));
+        Activity homeAct = pb.createActivityFromLinkId("home", Id.create("1", Link.class));
         homeAct.setEndTime(departure.getDepartureTime() - 60.0);
         Leg leg1 = pb.createLeg(TransportMode.pt);
         leg1.setRoute(new ExperimentalTransitRoute(stop1, line, tRoute, stop3));
-        Activity workAct = pb.createActivityFromLinkId("work", scenario.createId("2"));
+        Activity workAct = pb.createActivityFromLinkId("work", Id.create("2", Link.class));
         plan1.addActivity(homeAct);
         plan1.addLeg(leg1);
         plan1.addActivity(workAct);
         population.addPerson(person1);
 
-        Person person2 = pb.createPerson(scenario.createId("2"));
+        Person person2 = pb.createPerson(Id.create("2", Person.class));
         Plan plan2 = pb.createPlan();
         person2.addPlan(plan2);
         Leg leg2 = pb.createLeg(TransportMode.pt);
         leg2.setRoute(new ExperimentalTransitRoute(stop3, line, tRoute, stop4));
-        Activity homeActOnLink4 = pb.createActivityFromLinkId("home", scenario.createId("4"));
+        Activity homeActOnLink4 = pb.createActivityFromLinkId("home", Id.create("4", Link.class));
         homeActOnLink4.setEndTime(departure.getDepartureTime() - 60.0);
         plan2.addActivity(homeActOnLink4);
         plan2.addLeg(leg2);
-        Activity workActOnLink5 = pb.createActivityFromLinkId("work", scenario.createId("5"));
+        Activity workActOnLink5 = pb.createActivityFromLinkId("work", Id.create("5", Link.class));
         plan2.addActivity(workActOnLink5);
         population.addPerson(person2);
 
@@ -549,13 +585,13 @@ public class TransitQueueSimulationTest {
                     		TestHandleStopSimulation.this.route, TestHandleStopSimulation.this.departure, 
                     		transitEngine.getAgentTracker(), transitEngine );
 
-                    VehicleType vehicleType = new VehicleTypeImpl(new IdImpl("transitVehicleType"));
+                    VehicleType vehicleType = new VehicleTypeImpl(Id.create("transitVehicleType", VehicleType.class));
                     VehicleCapacity capacity = new VehicleCapacityImpl();
                     capacity.setSeats(Integer.valueOf(101));
                     capacity.setStandingRoom(Integer.valueOf(0));
                     vehicleType.setCapacity(capacity);
 
-                    TransitQVehicle veh = new TransitQVehicle(new VehicleImpl(TestHandleStopSimulation.this.driver.getId(), vehicleType));
+                    TransitQVehicle veh = new TransitQVehicle(new VehicleImpl(Id.create(TestHandleStopSimulation.this.driver.getId(), Vehicle.class), vehicleType));
                     veh.setDriver(TestHandleStopSimulation.this.driver);
                     veh.setStopHandler(new SimpleTransitStopHandler());
                     TestHandleStopSimulation.this.driver.setVehicle(veh);
@@ -623,17 +659,17 @@ public class TransitQueueSimulationTest {
       
         // build simple network with 2 links
         NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-        NodeImpl node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
-        NodeImpl node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
-        NodeImpl node3 = network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000.0, 0.0));
+        NodeImpl node1 = network.getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(0.0, 0.0));
+        NodeImpl node2 = network.getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(1000.0, 0.0));
+        NodeImpl node3 = network.getFactory().createNode(Id.create("3", Node.class), scenario.createCoord(2000.0, 0.0));
         network.getNodes().put(node1.getId(), node1);
         network.getNodes().put(node2.getId(), node2);
         network.getNodes().put(node3.getId(), node3);
-        Link link1 = network.getFactory().createLink(scenario.createId("1"), node1, node2);
+        Link link1 = network.getFactory().createLink(Id.create("1", Link.class), node1, node2);
         link1.setFreespeed(10.0);
         link1.setCapacity(2000.0);
         link1.setLength(1000.0);
-        Link link2 = network.getFactory().createLink(scenario.createId("2"), node2, node3);
+        Link link2 = network.getFactory().createLink(Id.create("2", Link.class), node2, node3);
         link2.setFreespeed(10.0);
         link2.setCapacity(2000.0);
         link2.setLength(1000.0);
@@ -646,21 +682,21 @@ public class TransitQueueSimulationTest {
         double depTime = 7.0*3600;
         TransitSchedule schedule = scenario.getTransitSchedule();
         TransitScheduleFactory sb = schedule.getFactory();
-        TransitStopFacility stopFacility1 = sb.createTransitStopFacility(scenario.createId("1"), scenario.createCoord(1000, 0), false);
-        TransitStopFacility stopFacility2 = sb.createTransitStopFacility(scenario.createId("2"), scenario.createCoord(2000, 0), false);
+        TransitStopFacility stopFacility1 = sb.createTransitStopFacility(Id.create("1", TransitStopFacility.class), scenario.createCoord(1000, 0), false);
+        TransitStopFacility stopFacility2 = sb.createTransitStopFacility(Id.create("2", TransitStopFacility.class), scenario.createCoord(2000, 0), false);
         schedule.addStopFacility(stopFacility1);
         schedule.addStopFacility(stopFacility2);
         stopFacility1.setLinkId(link1.getId());
         stopFacility2.setLinkId(link2.getId());
-        TransitLine tLine = sb.createTransitLine(scenario.createId("1"));
+        TransitLine tLine = sb.createTransitLine(Id.create("1", TransitLine.class));
         NetworkRoute route = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
         TransitRouteStop stop1 = sb.createTransitRouteStop(stopFacility1, Time.UNDEFINED_TIME, 0.0);
         TransitRouteStop stop2 = sb.createTransitRouteStop(stopFacility2, 100.0, 100.0);
         List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
         stops.add(stop1);
         stops.add(stop2);
-        TransitRoute tRoute = sb.createTransitRoute(scenario.createId("1"), route, stops, "bus");
-        Departure dep = sb.createDeparture(scenario.createId("1"), depTime);
+        TransitRoute tRoute = sb.createTransitRoute(Id.create("1", TransitRoute.class), route, stops, "bus");
+        Departure dep = sb.createDeparture(Id.create("1", Departure.class), depTime);
         tRoute.addDeparture(dep);
         tLine.addRoute(tRoute);
         schedule.addTransitLine(tLine);
@@ -713,17 +749,17 @@ public class TransitQueueSimulationTest {
      
         // build simple network with 2 links
         NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-        NodeImpl node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
-        NodeImpl node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
-        NodeImpl node3 = network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000.0, 0.0));
+        NodeImpl node1 = network.getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(0.0, 0.0));
+        NodeImpl node2 = network.getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(1000.0, 0.0));
+        NodeImpl node3 = network.getFactory().createNode(Id.create("3", Node.class), scenario.createCoord(2000.0, 0.0));
         network.getNodes().put(node1.getId(), node1);
         network.getNodes().put(node2.getId(), node2);
         network.getNodes().put(node3.getId(), node3);
-        Link link1 = network.getFactory().createLink(scenario.createId("1"), node1, node2);
+        Link link1 = network.getFactory().createLink(Id.create("1", Link.class), node1, node2);
         link1.setFreespeed(10.0);
         link1.setCapacity(2000.0);
         link1.setLength(1000.0);
-        Link link2 = network.getFactory().createLink(scenario.createId("2"), node2, node3);
+        Link link2 = network.getFactory().createLink(Id.create("2", Link.class), node2, node3);
         link2.setFreespeed(10.0);
         link2.setCapacity(2000.0);
         link2.setLength(1000.0);
@@ -736,21 +772,21 @@ public class TransitQueueSimulationTest {
         double depTime = 7.0*3600;
         TransitSchedule schedule = scenario.getTransitSchedule();
         TransitScheduleFactory sb = schedule.getFactory();
-        TransitStopFacility stopFacility1 = sb.createTransitStopFacility(scenario.createId("1"), scenario.createCoord(1000, 0), false);
-        TransitStopFacility stopFacility2 = sb.createTransitStopFacility(scenario.createId("2"), scenario.createCoord(2000, 0), false);
+        TransitStopFacility stopFacility1 = sb.createTransitStopFacility(Id.create("1", TransitStopFacility.class), scenario.createCoord(1000, 0), false);
+        TransitStopFacility stopFacility2 = sb.createTransitStopFacility(Id.create("2", TransitStopFacility.class), scenario.createCoord(2000, 0), false);
         schedule.addStopFacility(stopFacility1);
         schedule.addStopFacility(stopFacility2);
         stopFacility1.setLinkId(link1.getId());
         stopFacility2.setLinkId(link2.getId());
-        TransitLine tLine = sb.createTransitLine(scenario.createId("1"));
+        TransitLine tLine = sb.createTransitLine(Id.create("1", TransitLine.class));
         NetworkRoute route = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
         TransitRouteStop stop1 = sb.createTransitRouteStop(stopFacility1, Time.UNDEFINED_TIME, 0.0);
         TransitRouteStop stop2 = sb.createTransitRouteStop(stopFacility2, 100.0, 100.0);
         List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
         stops.add(stop1);
         stops.add(stop2);
-        TransitRoute tRoute = sb.createTransitRoute(scenario.createId("1"), route, stops, "bus");
-        Departure dep = sb.createDeparture(scenario.createId("1"), depTime);
+        TransitRoute tRoute = sb.createTransitRoute(Id.create("1", TransitRoute.class), route, stops, "bus");
+        Departure dep = sb.createDeparture(Id.create("1", Departure.class), depTime);
         tRoute.addDeparture(dep);
         tLine.addRoute(tRoute);
         schedule.addTransitLine(tLine);
@@ -759,7 +795,7 @@ public class TransitQueueSimulationTest {
         // build population with 1 person
         Population population = scenario.getPopulation();
         PopulationFactory pb = population.getFactory();
-        Person person = pb.createPerson(scenario.createId("1"));
+        Person person = pb.createPerson(Id.create("1", Person.class));
         Plan plan = pb.createPlan();
         Activity act1 = pb.createActivityFromLinkId("h", link1.getId());
         act1.setEndTime(depTime - 60.0);

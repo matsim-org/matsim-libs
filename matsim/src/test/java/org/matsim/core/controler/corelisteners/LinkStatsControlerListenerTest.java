@@ -301,11 +301,11 @@ public class LinkStatsControlerListenerTest {
 		lsConfig.setAverageLinkStatsOverIterations(2);
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		Node node1 = scenario.getNetwork().getFactory().createNode(scenario.createId("1"), scenario.createCoord(0, 0));
-		Node node2 = scenario.getNetwork().getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000, 0));
+		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(0, 0));
+		Node node2 = scenario.getNetwork().getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(1000, 0));
 		scenario.getNetwork().addNode(node1);
 		scenario.getNetwork().addNode(node2);
-		Link link = scenario.getNetwork().getFactory().createLink(scenario.createId("100"), node1, node2);
+		Link link = scenario.getNetwork().getFactory().createLink(Id.create("100", Link.class), node1, node2);
 		scenario.getNetwork().addLink(link);
 		
 		Controler controler = new Controler(scenario);

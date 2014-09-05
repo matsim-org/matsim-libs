@@ -21,6 +21,7 @@ package org.matsim.core.router;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -44,7 +45,6 @@ import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
@@ -59,12 +59,12 @@ public class NetworkLegRouterTest {
 		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0/3600, +6.0/3600, 0.0);
 		LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);
 
-		Person person = new PersonImpl(new IdImpl(1));
+		Person person = new PersonImpl(Id.create(1, Person.class));
 		Leg leg = new LegImpl(TransportMode.car);
 		Activity fromAct = new ActivityImpl("h", new CoordImpl(0, 0));
-		((ActivityImpl) fromAct).setLinkId(f.s.createId("1"));
+		((ActivityImpl) fromAct).setLinkId(Id.create("1", Link.class));
 		Activity toAct = new ActivityImpl("h", new CoordImpl(0, 3000));
-		((ActivityImpl) toAct).setLinkId(f.s.createId("3"));
+		((ActivityImpl) toAct).setLinkId(Id.create("3", Link.class));
 
 		double tt = new NetworkLegRouter(f.s.getNetwork(), routeAlgo, routeFactory).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 		Assert.assertEquals(100.0, tt, 1e-8);
@@ -79,9 +79,9 @@ public class NetworkLegRouterTest {
 		Person person = new PersonImpl(new IdImpl(1));
 		Leg leg = new LegImpl(TransportMode.car);
 		Activity fromAct = new ActivityImpl("h", new CoordImpl(0, 0));
-		((ActivityImpl) fromAct).setLinkId(f.s.createId("1"));
+		((ActivityImpl) fromAct).setLinkId(Id.create("1", Link.class));
 		Activity toAct = new ActivityImpl("h", new CoordImpl(0, 3000));
-		((ActivityImpl) toAct).setLinkId(f.s.createId("3"));
+		((ActivityImpl) toAct).setLinkId(Id.create("3", Link.class));
 		
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) f.s.getPopulation().getFactory()).getModeRouteFactory();
 
@@ -126,22 +126,22 @@ public class NetworkLegRouterTest {
 	}
 
 	private static class Fixture {
-		public final Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		public final Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		public Fixture() {
 			Network net = this.s.getNetwork();
 			NetworkFactory nf = net.getFactory();
-			Node n1 = nf.createNode(this.s.createId("1"), this.s.createCoord(0, 0));
-			Node n2 = nf.createNode(this.s.createId("2"), this.s.createCoord(0, 1000));
-			Node n3 = nf.createNode(this.s.createId("3"), this.s.createCoord(0, 2000));
-			Node n4 = nf.createNode(this.s.createId("4"), this.s.createCoord(0, 3000));
+			Node n1 = nf.createNode(Id.create("1", Node.class), this.s.createCoord(0, 0));
+			Node n2 = nf.createNode(Id.create("2", Node.class), this.s.createCoord(0, 1000));
+			Node n3 = nf.createNode(Id.create("3", Node.class), this.s.createCoord(0, 2000));
+			Node n4 = nf.createNode(Id.create("4", Node.class), this.s.createCoord(0, 3000));
 			net.addNode(n1);
 			net.addNode(n2);
 			net.addNode(n3);
 			net.addNode(n4);
-			Link l1 = nf.createLink(this.s.createId("1"), n1, n2);
-			Link l2 = nf.createLink(this.s.createId("2"), n2, n3);
-			Link l3 = nf.createLink(this.s.createId("3"), n3, n4);
+			Link l1 = nf.createLink(Id.create("1", Link.class), n1, n2);
+			Link l2 = nf.createLink(Id.create("2", Link.class), n2, n3);
+			Link l3 = nf.createLink(Id.create("3", Link.class), n3, n4);
 			l1.setFreespeed(10.0);
 			l2.setFreespeed(10.0);
 			l3.setFreespeed(10.0);

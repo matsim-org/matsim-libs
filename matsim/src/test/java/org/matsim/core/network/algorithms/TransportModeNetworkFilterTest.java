@@ -281,10 +281,9 @@ public class TransportModeNetworkFilterTest {
 		final Network network = scenario.getNetwork();
 		final NetworkFactory factory = network.getFactory();
 
-		Id id1 = scenario.createId("1");
-		Node node1 = factory.createNode(id1, scenario.createCoord(0, 0));
+		Node node1 = factory.createNode(Id.create(1, Node.class), scenario.createCoord(0, 0));
 		network.addNode(node1);
-		Link link1 = factory.createLink(id1, node1, node1);
+		Link link1 = factory.createLink(Id.create(1, Link.class), node1, node1);
 		link1.setAllowedModes(createHashSet(TransportMode.car));
 		network.addLink(link1);
 		
@@ -294,7 +293,7 @@ public class TransportModeNetworkFilterTest {
 		filter.filter(subNetwork, createHashSet(TransportMode.car));
 		Assert.assertEquals("wrong number of nodes.", 1, subNetwork.getNodes().size());
 		Assert.assertEquals("wrong number of links", 1, subNetwork.getLinks().size());
-		Assert.assertTrue(subNetwork.getLinks().containsKey(id1));
+		Assert.assertTrue(subNetwork.getLinks().containsKey(Id.create(1, Link.class)));
 	}
 
 	/**
@@ -325,7 +324,8 @@ public class TransportModeNetworkFilterTest {
 	 */
 	private static class Fixture {
 		/*package*/ final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		/*package*/ final Id[] ids = new Id[17];
+		/*package*/ final Id<Node>[] nodeIds = new Id[17];
+		/*package*/ final Id<Link>[] linkIds = new Id[17];
 		/*package*/ final Set<String> modesC = createHashSet(TransportMode.car);
 		/*package*/ final Set<String> modesCB = createHashSet(TransportMode.car, TransportMode.bike);
 		/*package*/ final Set<String> modesCBW = createHashSet(TransportMode.car, TransportMode.bike, TransportMode.walk);
@@ -335,43 +335,46 @@ public class TransportModeNetworkFilterTest {
 		/*package*/ final Set<String> modesB = createHashSet(TransportMode.bike);
 
 		/*package*/ Fixture() {
-			for (int i = 0; i < ids.length; i++) {
-				this.ids[i] = this.scenario.createId(Integer.toString(i));
+			for (int i = 0; i < nodeIds.length; i++) {
+				this.nodeIds[i] = Id.create(1, Node.class);
+			}
+			for (int i = 0; i < linkIds.length; i++) {
+				this.linkIds[i] = Id.create(1, Link.class);
 			}
 
 			final Network network = this.scenario.getNetwork();
 			final NetworkFactory factory = network.getFactory();
 
-			network.addNode(factory.createNode(this.ids[ 1], this.scenario.createCoord(  0, 100)));
-			network.addNode(factory.createNode(this.ids[ 2], this.scenario.createCoord(  0,   0)));
-			network.addNode(factory.createNode(this.ids[ 3], this.scenario.createCoord(100,   0)));
-			network.addNode(factory.createNode(this.ids[ 4], this.scenario.createCoord(100, 100)));
-			network.addNode(factory.createNode(this.ids[ 5], this.scenario.createCoord(100, 200)));
-			network.addNode(factory.createNode(this.ids[ 6], this.scenario.createCoord(200, 200)));
-			network.addNode(factory.createNode(this.ids[ 7], this.scenario.createCoord(200, 100)));
-			network.addNode(factory.createNode(this.ids[ 8], this.scenario.createCoord(200,   0)));
-			network.addNode(factory.createNode(this.ids[ 9], this.scenario.createCoord(300,   0)));
-			network.addNode(factory.createNode(this.ids[10], this.scenario.createCoord(300, 100)));
-			network.addNode(factory.createNode(this.ids[11], this.scenario.createCoord(300, 200)));
-			network.addNode(factory.createNode(this.ids[12], this.scenario.createCoord(400, 200)));
-			network.addNode(factory.createNode(this.ids[13], this.scenario.createCoord(400, 100)));
+			network.addNode(factory.createNode(this.nodeIds[ 1], this.scenario.createCoord(  0, 100)));
+			network.addNode(factory.createNode(this.nodeIds[ 2], this.scenario.createCoord(  0,   0)));
+			network.addNode(factory.createNode(this.nodeIds[ 3], this.scenario.createCoord(100,   0)));
+			network.addNode(factory.createNode(this.nodeIds[ 4], this.scenario.createCoord(100, 100)));
+			network.addNode(factory.createNode(this.nodeIds[ 5], this.scenario.createCoord(100, 200)));
+			network.addNode(factory.createNode(this.nodeIds[ 6], this.scenario.createCoord(200, 200)));
+			network.addNode(factory.createNode(this.nodeIds[ 7], this.scenario.createCoord(200, 100)));
+			network.addNode(factory.createNode(this.nodeIds[ 8], this.scenario.createCoord(200,   0)));
+			network.addNode(factory.createNode(this.nodeIds[ 9], this.scenario.createCoord(300,   0)));
+			network.addNode(factory.createNode(this.nodeIds[10], this.scenario.createCoord(300, 100)));
+			network.addNode(factory.createNode(this.nodeIds[11], this.scenario.createCoord(300, 200)));
+			network.addNode(factory.createNode(this.nodeIds[12], this.scenario.createCoord(400, 200)));
+			network.addNode(factory.createNode(this.nodeIds[13], this.scenario.createCoord(400, 100)));
 
-			network.addLink(createLink(network, this.ids[ 1], this.ids[ 1], this.ids[ 2], this.modesC));
-			network.addLink(createLink(network, this.ids[ 2], this.ids[ 2], this.ids[ 3], this.modesC));
-			network.addLink(createLink(network, this.ids[ 3], this.ids[ 3], this.ids[ 4], this.modesC));
-			network.addLink(createLink(network, this.ids[ 4], this.ids[ 4], this.ids[ 5], this.modesCB));
-			network.addLink(createLink(network, this.ids[ 5], this.ids[ 5], this.ids[ 6], this.modesCB));
-			network.addLink(createLink(network, this.ids[ 6], this.ids[ 6], this.ids[ 7], this.modesCB));
-			network.addLink(createLink(network, this.ids[ 7], this.ids[ 7], this.ids[ 8], this.modesCB));
-			network.addLink(createLink(network, this.ids[ 8], this.ids[ 8], this.ids[ 9], this.modesCB));
-			network.addLink(createLink(network, this.ids[ 9], this.ids[ 9], this.ids[10], this.modesCB));
-			network.addLink(createLink(network, this.ids[10], this.ids[10], this.ids[11], this.modesC));
-			network.addLink(createLink(network, this.ids[11], this.ids[11], this.ids[12], this.modesC));
-			network.addLink(createLink(network, this.ids[12], this.ids[12], this.ids[13], this.modesC));
-			network.addLink(createLink(network, this.ids[13], this.ids[ 1], this.ids[ 4], this.modesWB));
-			network.addLink(createLink(network, this.ids[14], this.ids[ 4], this.ids[ 7], this.modesCW));
-			network.addLink(createLink(network, this.ids[15], this.ids[ 7], this.ids[10], this.modesW));
-			network.addLink(createLink(network, this.ids[16], this.ids[10], this.ids[13], this.modesCBW));
+			network.addLink(createLink(network, this.linkIds[ 1], this.nodeIds[ 1], this.nodeIds[ 2], this.modesC));
+			network.addLink(createLink(network, this.linkIds[ 2], this.nodeIds[ 2], this.nodeIds[ 3], this.modesC));
+			network.addLink(createLink(network, this.linkIds[ 3], this.nodeIds[ 3], this.nodeIds[ 4], this.modesC));
+			network.addLink(createLink(network, this.linkIds[ 4], this.nodeIds[ 4], this.nodeIds[ 5], this.modesCB));
+			network.addLink(createLink(network, this.linkIds[ 5], this.nodeIds[ 5], this.nodeIds[ 6], this.modesCB));
+			network.addLink(createLink(network, this.linkIds[ 6], this.nodeIds[ 6], this.nodeIds[ 7], this.modesCB));
+			network.addLink(createLink(network, this.linkIds[ 7], this.nodeIds[ 7], this.nodeIds[ 8], this.modesCB));
+			network.addLink(createLink(network, this.linkIds[ 8], this.nodeIds[ 8], this.nodeIds[ 9], this.modesCB));
+			network.addLink(createLink(network, this.linkIds[ 9], this.nodeIds[ 9], this.nodeIds[10], this.modesCB));
+			network.addLink(createLink(network, this.linkIds[10], this.nodeIds[10], this.nodeIds[11], this.modesC));
+			network.addLink(createLink(network, this.linkIds[11], this.nodeIds[11], this.nodeIds[12], this.modesC));
+			network.addLink(createLink(network, this.linkIds[12], this.nodeIds[12], this.nodeIds[13], this.modesC));
+			network.addLink(createLink(network, this.linkIds[13], this.nodeIds[ 1], this.nodeIds[ 4], this.modesWB));
+			network.addLink(createLink(network, this.linkIds[14], this.nodeIds[ 4], this.nodeIds[ 7], this.modesCW));
+			network.addLink(createLink(network, this.linkIds[15], this.nodeIds[ 7], this.nodeIds[10], this.modesW));
+			network.addLink(createLink(network, this.linkIds[16], this.nodeIds[10], this.nodeIds[13], this.modesCBW));
 		}
 
 	}

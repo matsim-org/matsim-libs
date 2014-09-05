@@ -19,6 +19,10 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,7 +35,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
@@ -44,10 +54,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.testcases.utils.EventsLogger;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author mrieser / Senozon AG
@@ -181,28 +187,32 @@ public class LinkSpeedCalculatorIntegrationTest {
 		public Fixture() {
 			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-			Id[] ids = new Id[5];
-			for (int i = 0; i < ids.length; i++) {
-				ids[i] = this.scenario.createId(Integer.toString(i));
+			Id<Node>[] nodeIds = new Id[5];
+			for (int i = 0; i < nodeIds.length; i++) {
+				nodeIds[i] = Id.create(i, Node.class);
+			}
+			Id<Link>[] linkIds = new Id[4];
+			for (int i = 0; i < linkIds.length; i++) {
+				linkIds[i] = Id.create(i, Link.class);
 			}
 	
 			/* create Network */
 			Network network = this.scenario.getNetwork();
 			NetworkFactory nf = network.getFactory();
 
-			Node n1 = nf.createNode(ids[1], this.scenario.createCoord(0, 0));
-			Node n2 = nf.createNode(ids[2], this.scenario.createCoord(100, 0));
-			Node n3 = nf.createNode(ids[3], this.scenario.createCoord(200, 0));
-			Node n4 = nf.createNode(ids[4], this.scenario.createCoord(300, 0));
+			Node n1 = nf.createNode(nodeIds[1], this.scenario.createCoord(0, 0));
+			Node n2 = nf.createNode(nodeIds[2], this.scenario.createCoord(100, 0));
+			Node n3 = nf.createNode(nodeIds[3], this.scenario.createCoord(200, 0));
+			Node n4 = nf.createNode(nodeIds[4], this.scenario.createCoord(300, 0));
 
 			network.addNode(n1);
 			network.addNode(n2);
 			network.addNode(n3);
 			network.addNode(n4);
 
-			Link l1 = nf.createLink(ids[1], n1, n2);
-			Link l2 = nf.createLink(ids[2], n2, n3);
-			Link l3 = nf.createLink(ids[3], n3, n4);
+			Link l1 = nf.createLink(linkIds[1], n1, n2);
+			Link l2 = nf.createLink(linkIds[2], n2, n3);
+			Link l3 = nf.createLink(linkIds[3], n3, n4);
 			
 			Set<String> modes = new HashSet<String>();
 			modes.add("car");
@@ -218,14 +228,14 @@ public class LinkSpeedCalculatorIntegrationTest {
 			Population population = this.scenario.getPopulation();
 			PopulationFactory pf = population.getFactory();
 
-			Person person = pf.createPerson(ids[1]);
+			Person person = pf.createPerson(Id.create(1, Person.class));
 			Plan plan = pf.createPlan();
-			Activity homeAct = pf.createActivityFromLinkId("home", ids[1]);
+			Activity homeAct = pf.createActivityFromLinkId("home", linkIds[1]);
 			homeAct.setEndTime(7*3600);
 			Leg leg = pf.createLeg("car");
-			Route route = new LinkNetworkRouteImpl(ids[1], new Id[] { ids[2] }, ids[3]);
+			Route route = new LinkNetworkRouteImpl(linkIds[1], new Id[] { linkIds[2] }, linkIds[3]);
 			leg.setRoute(route);
-			Activity workAct = pf.createActivityFromLinkId("work", ids[1]);
+			Activity workAct = pf.createActivityFromLinkId("work", linkIds[1]);
 
 			plan.addActivity(homeAct);
 			plan.addLeg(leg);
