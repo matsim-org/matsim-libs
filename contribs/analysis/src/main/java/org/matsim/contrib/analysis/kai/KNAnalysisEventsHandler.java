@@ -82,7 +82,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 	private double controlStatisticsSum;
 	private double controlStatisticsCnt;
 
-	private  Set<Id> tolledLinkIds = new HashSet<Id>() ;
+	private  Set<Id<Link>> tolledLinkIds = new HashSet<Id<Link>>() ;
 	// (initializing with empty set, meaning output will say no vehicles at gantries).
 
 	// general trip counter.  Would, in theory, not necessary to do this per StatType, but I find it too brittle 

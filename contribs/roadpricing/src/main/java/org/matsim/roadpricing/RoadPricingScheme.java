@@ -25,7 +25,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author nagel, mrieser, michaz
@@ -60,7 +63,7 @@ public interface RoadPricingScheme {
 
 	public String getDescription();
 
-	public Set<Id> getTolledLinkIds();
+	public Set<Id<Link>> getTolledLinkIds();
 
 	/**
 	 * Returns the Cost object that contains the active costs for the given link
@@ -93,18 +96,18 @@ public interface RoadPricingScheme {
 	 * <code>null</code> if the link is either not part of the tolling scheme
 	 * or there is no toll at the specified time for the link.
 	 */
-	public Cost getLinkCostInfo(final Id linkId, final double time, Id personId, Id vehicleId);
+	public Cost getLinkCostInfo(final Id<Link> linkId, final double time, Id<Person> personId, Id<Vehicle> vehicleId);
 	
 	/**
 	 * This is essentially to enforce that getLinkCostInfo( linkId, time, null, null ) is there ... to allow mental modules to work on
 	 * "approximate" numbers.
 	 */
-	public Cost getTypicalLinkCostInfo( final Id linkId, final double time ) ;
+	public Cost getTypicalLinkCostInfo( final Id<Link> linkId, final double time ) ;
 
 	Iterable<Cost> getTypicalCosts();
 	// yy seems to me that this is not needed; getting Map<Id, List<Cost>> should be enough.  Has something to do with cache and
 	// access speeds.
 
-	Map<Id, List<Cost>> getTypicalCostsForLink();
+	Map<Id<Link>, List<Cost>> getTypicalCostsForLink();
 
 }

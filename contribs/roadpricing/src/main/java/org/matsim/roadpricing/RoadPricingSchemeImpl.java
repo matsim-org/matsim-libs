@@ -28,7 +28,10 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * A road pricing scheme (sometimes also called toll scheme) contains the type of the toll, a list of the
@@ -41,7 +44,7 @@ public class RoadPricingSchemeImpl implements RoadPricingScheme {
 	
 	private static Logger log = Logger.getLogger( RoadPricingSchemeImpl.class ) ;
 
-	private Map<Id, List<Cost>> linkIds = null;
+	private Map<Id<Link>, List<Cost>> linkIds = null;
 
 	private String name = null;
 	private String type = null;
@@ -52,11 +55,11 @@ public class RoadPricingSchemeImpl implements RoadPricingScheme {
 	private Cost[] costCache = null;
 
 	public RoadPricingSchemeImpl() {
-		this.linkIds = new HashMap<Id, List<Cost>>();
+		this.linkIds = new HashMap<Id<Link>, List<Cost>>();
 		this.costs = new ArrayList<Cost>();
 	}
 
-	public void addLink(final Id linkId) {
+	public void addLink(final Id<Link> linkId) {
 		this.linkIds.put(linkId, null);
 	}
 
@@ -105,7 +108,7 @@ public class RoadPricingSchemeImpl implements RoadPricingScheme {
 		return cost;
 	}
 
-	public void addLinkCost(Id linkId, double startTime, double endTime, double amount) {
+	public void addLinkCost(Id<Link> linkId, double startTime, double endTime, double amount) {
 		if ( startTime==0. && endTime == 24.*3600. ) {
 			if (wrnCnt < 1) {
 				wrnCnt++ ;
@@ -129,17 +132,17 @@ public class RoadPricingSchemeImpl implements RoadPricingScheme {
 		return this.costs.remove(cost);
 	}
 
-	public boolean removeLinkCost(final Id linkId, final Cost cost){
+	public boolean removeLinkCost(final Id<Link> linkId, final Cost cost){
 		List<Cost> c = this.linkIds.get(linkId);
 		return (c != null) ? c.remove(cost) : false;
 	}
 
 	@Override
-	public Set<Id> getTolledLinkIds() {
+	public Set<Id<Link>> getTolledLinkIds() {
 		return this.linkIds.keySet();
 	}
 	@Override
-	public Map<Id, List<Cost>> getTypicalCostsForLink(){
+	public Map<Id<Link>, List<Cost>> getTypicalCostsForLink(){
 		return this.linkIds;
 	}
 	@Override
@@ -154,7 +157,7 @@ public class RoadPricingSchemeImpl implements RoadPricingScheme {
 	}
 
 	@Override
-	public Cost getLinkCostInfo(final Id linkId, final double time, Id personId, Id vehicleId) {
+	public Cost getLinkCostInfo(final Id<Link> linkId, final double time, Id<Person> personId, Id<Vehicle> vehicleId) {
 		// this is the default road pricing scheme, which ignores the person.  kai, mar'12
 		// Now also added vehicleId as an argument, which is also ignored at the default level. kai, apr'14
 
@@ -181,7 +184,7 @@ public class RoadPricingSchemeImpl implements RoadPricingScheme {
 	}
 	
 	@Override
-	public Cost getTypicalLinkCostInfo( Id linkId, double time ) {
+	public Cost getTypicalLinkCostInfo( Id<Link> linkId, double time ) {
 		return this.getLinkCostInfo( linkId, time, null, null ) ;
 	}
 

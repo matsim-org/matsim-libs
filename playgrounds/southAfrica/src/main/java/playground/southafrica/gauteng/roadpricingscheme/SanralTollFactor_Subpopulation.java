@@ -20,9 +20,13 @@
 package playground.southafrica.gauteng.roadpricingscheme;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.roadpricing.TollFactorI;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 public class SanralTollFactor_Subpopulation implements TollFactorI {
@@ -38,14 +42,19 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 	}
 	
 	@Override
-	public double getTollFactor(Id personId, final Id vehicleId, final Id linkId, final double time){		
+	public double getTollFactor(Id<Person> personId, final Id<Vehicle> vehicleId, final Id<Link> linkId, final double time){		
 		double timeDiscount = getTimeDiscount(time, vehicleId);
 		double tagDiscount = 0.00;
 		double ptDiscount = 0.00;
 		double sizeFactor = 1.00;
 		
 		/* Determine the presence of an eTag from vehicle attributes. */  
-		if ( hasETag(vehicleId) ) {
+//		if ( hasETag(vehicleId) ) {
+		// yyyy Johan, this came up as a problem due to typed ids: The original method passes a vehicleId, but in the end interprets it
+		// as a personId.  Such "silent conversion" are now no longer possible; they need to be explicit.  I am assuming that we can
+		// as well pass the vehicleId here since, I think they are the same anyways.  kai, sep'14
+		
+		if ( hasETag(personId) ) {
 			tagDiscount = 0.483 ;
 		} 
 		
@@ -73,7 +82,7 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 
 
 	@SuppressWarnings("static-method") // may become truly non-static later. kai, mar'14
-	private boolean isPt(final Id vehicleId) {
+	private boolean isPt(final Id<Vehicle> vehicleId) {
 		return vehicleId.toString().startsWith("bus") || 
 		   vehicleId.toString().startsWith("taxi");
 	}
@@ -87,13 +96,19 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 	 * @return
 	 * @see <a href="http://sanral.ensight-cdn.com/content/37038_19-11_TransE-TollCV01~1.pdf">Government Gazette,  Vol 581, No. 37038, page 13.</a>
 	 */
-	private  double getTimeDiscount(double time, Id vehicleId){
+	private  double getTimeDiscount(double time, Id<Vehicle> vehicleId){
 		/* First get the real time of day. */
 		double timeOfDay = time;
 		while(timeOfDay > 86400){
 			timeOfDay -= 86400;
 		}
 		
+		Assert.assertNotNull( this.sc );
+		Assert.assertNotNull( this.sc.getVehicles() );
+		Assert.assertNotNull( this.sc.getVehicles().getVehicles() );
+		if( this.sc.getVehicles().getVehicles().get(vehicleId)==null ) {
+			Logger.getLogger(this.getClass()).warn("vehicleId: " + vehicleId ) ;
+		}
 		VehicleType type = this.sc.getVehicles().getVehicles().get(vehicleId).getType();
 		
 		if(type.getId().toString().equalsIgnoreCase("A1") || 
@@ -143,7 +158,7 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 	 * @param linkId
 	 * @return
 	 */
-	private static boolean getDiscountEligibility(Id linkId){
+	private static boolean getDiscountEligibility(Id<Link> linkId){
 		if(NoDiscountLinks.getList().contains(linkId)){
 			return false;
 		} else{
@@ -151,7 +166,7 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 		}
 	}
 	
-	private Boolean hasETag(Id personId) {
+	private Boolean hasETag(Id<Person> personId) {
 		Object o3 = this.sc.getPopulation().getPersonAttributes().getAttribute(personId.toString(), E_TAG_ATTRIBUTE_NAME);
 		Boolean tag = false;
 		if(o3 instanceof Boolean){

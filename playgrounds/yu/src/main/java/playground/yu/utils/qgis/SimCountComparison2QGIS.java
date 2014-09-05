@@ -52,7 +52,7 @@ public class SimCountComparison2QGIS extends MATSimNet2QGIS {
 		private static double linkWidthScaleFactor = 1d;
 
 		public SimCountComparison2Polygon(Network network,
-				CoordinateReferenceSystem crs, Set<Id> linkIds) {
+				CoordinateReferenceSystem crs, Set<Id<Link>> linkIds) {
 			super(network, crs, linkIds);
 		}
 
@@ -93,7 +93,7 @@ public class SimCountComparison2QGIS extends MATSimNet2QGIS {
 		return net.getLinks().containsKey(linkid);
 	}
 
-	public static List<Map<Id, Integer>> createVolumes(Collection<Id> linkIds,
+	public static List<Map<Id, Integer>> createVolumes(Collection<Id<Link>> linkIds,
 			final VolumesAnalyzer va) {
 		List<Map<Id, Integer>> volumes = new ArrayList<Map<Id, Integer>>(24);
 		for (int i = 0; i < 24; i++) {
@@ -116,7 +116,7 @@ public class SimCountComparison2QGIS extends MATSimNet2QGIS {
 		return volumes;
 	}
 
-	public void setLinkIds(Set<Id> linkIds) {
+	public void setLinkIds(Set<Id<Link>> linkIds) {
 		setN2g(new SimCountComparison2Polygon(getNetwork(), crs, linkIds));
 	}
 
@@ -155,7 +155,7 @@ public class SimCountComparison2QGIS extends MATSimNet2QGIS {
 		System.out.println("  reading the events...");
 		mn2q.readEvents(eventsFilename, new EventHandler[] { volumeAnalyzer });
 
-		Set<Id> linkIds = new HashSet<Id>();
+		Set<Id<Link>> linkIds = new HashSet<Id<Link>>();
 		for (Id linkId : counts.getCounts().keySet()) {
 			if (isInRange(linkId, (NetworkImpl) network)) {
 				linkIds.add(linkId);

@@ -147,6 +147,7 @@ public class GautengControler_subpopulations {
 		// yy is the mobsim really assigning the vehicles from the vehicles file?  (In fact I think it is. kai, sep'14)
 
 		GautengUtils.assignSubpopulationStrategies(config);
+
 		config.strategy().setPlanSelectorForRemoval(DIVERSITY_GENERATING_PLANS_REMOVER);
 
 		config.controler().setWritePlansInterval(100);
@@ -175,6 +176,11 @@ public class GautengControler_subpopulations {
 		} else if(user == User.johan){
 			config.parallelEventHandling().setNumberOfThreads(1); 
 		}
+		
+		final RoadPricingConfigGroup roadPricingConfig = ConfigUtils.addOrGetModule( 
+				config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class
+				);
+		roadPricingConfig.setRoutingRandomness(3.); // <-- This is the diversity generating toll router!
 
 		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspExperimentalConfigGroup.ABORT ) ;
@@ -231,14 +237,9 @@ public class GautengControler_subpopulations {
 		controler.setScoringFunctionFactory(new GautengScoringFunctionFactory( sc, baseValueOfTime, valueOfTimeMultiplier ) );
 		
 		// ROAD PRICING:
-		final RoadPricingConfigGroup roadPricingConfig = ConfigUtils.addOrGetModule(
-				sc.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class
-				);
-		roadPricingConfig.setRoutingRandomness(3.);
-		RoadPricing roadPricing = new RoadPricing( new RoadPricingSchemeUsingTollFactor(
+		controler.addControlerListener( new RoadPricing( new RoadPricingSchemeUsingTollFactor(
 				roadPricingConfig.getTollLinksFile(), new SanralTollFactor_Subpopulation(sc)
-				) );
-		controler.addControlerListener( roadPricing ) ;
+				) ) ) ;
 		
 		// PLANS REMOVAL
 		Builder builder = new DiversityGeneratingPlansRemover.Builder() ;
@@ -314,9 +315,8 @@ public class GautengControler_subpopulations {
 			sc.getPopulation().getPersonAttributes().putAttribute( p.getId().toString(), VEH_ID, v.getId() );
 		}
 	}
-	@SuppressWarnings({ "cast", "unchecked", "rawtypes" })
 	private static Id<Vehicle> createVehicleIdFrom( Id<Person> id ) {
-		return (Id<Vehicle>) (Id) id ; // weird.
+		return Id.create(id.toString(), Vehicle.class) ;
 	}
 
 	/**

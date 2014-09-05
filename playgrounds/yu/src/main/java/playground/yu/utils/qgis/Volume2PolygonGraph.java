@@ -45,11 +45,11 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  */
 public class Volume2PolygonGraph extends Network2PolygonGraph {
-	private Set<Id> linkIds;
+	private Set<Id<Link>> linkIds;
 	private PolygonFeatureFactory.Builder factoryBuilder;
 
 	public Volume2PolygonGraph(Network network, CoordinateReferenceSystem crs,
-			Set<Id> linkIds) {
+			Set<Id<Link>> linkIds) {
 		super(network, crs);
 		this.linkIds = linkIds;
 		geofac = new GeometryFactory();

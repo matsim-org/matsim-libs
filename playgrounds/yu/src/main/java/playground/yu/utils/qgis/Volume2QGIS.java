@@ -32,6 +32,7 @@ import java.util.Set;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
@@ -47,7 +48,7 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 		super(netFilename, coordRefSys);
 	}
 
-	public static List<Map<Id, Integer>> createVolumes(Collection<Id> linkIds,
+	public static List<Map<Id, Integer>> createVolumes(Collection<Id<Link>> linkIds,
 			final VolumesAnalyzer va) {
 		List<Map<Id, Integer>> volumes = new ArrayList<Map<Id, Integer>>(24);
 		for (int i = 0; i < 24; i++)
@@ -66,7 +67,7 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 		return volumes;
 	}
 
-	public void setLinkIds(Set<Id> linkIds) {
+	public void setLinkIds(Set<Id<Link>> linkIds) {
 		setN2g(new Volume2PolygonGraph(getNetwork(), crs, linkIds));
 	}
 
@@ -101,7 +102,7 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(rps);
 		tollReader.parse(tollFilename);
 
-		Collection<Id> linkIds = rps.getTolledLinkIds();
+		Collection<Id<Link>> linkIds = rps.getTolledLinkIds();
 		List<Map<Id, Integer>> vols = createVolumes(linkIds, va);
 		List<Map<Id, Double>> sls = SaturationLevel2QGIS
 				.createSaturationLevels(net, rps, va);

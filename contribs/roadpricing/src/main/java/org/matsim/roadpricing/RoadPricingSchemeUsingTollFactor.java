@@ -26,7 +26,10 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author nagel
@@ -62,7 +65,7 @@ public class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme {
 	}
 
 	@Override
-	public Cost getLinkCostInfo(Id linkId, double time, Id personId, Id vehicleId) {
+	public Cost getLinkCostInfo(Id<Link> linkId, double time, Id<Person> personId, Id<Vehicle> vehicleId) {
 		Cost baseToll = delegate.getLinkCostInfo(linkId, time, personId, vehicleId );
 		if (baseToll == null) {
 			return null ;
@@ -72,12 +75,12 @@ public class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme {
 	}
 	
 	@Override
-	public Cost getTypicalLinkCostInfo( Id linkId, double time ) {
+	public Cost getTypicalLinkCostInfo( Id<Link> linkId, double time ) {
 		return delegate.getTypicalLinkCostInfo(linkId, time) ;
 	}
 
 	@Override
-	public Set<Id> getTolledLinkIds() {
+	public Set<Id<Link>> getTolledLinkIds() {
 		return delegate.getTolledLinkIds();
 	}
 
@@ -97,7 +100,7 @@ public class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme {
 	}
 
 	@Override
-	public Map<Id, List<Cost>> getTypicalCostsForLink() {
+	public Map<Id<Link>, List<Cost>> getTypicalCostsForLink() {
 		return delegate.getTypicalCostsForLink() ;
 	}
 

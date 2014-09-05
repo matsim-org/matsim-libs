@@ -57,6 +57,7 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 
 	private double logNormalRnd;
 	private static int utlOfMoneyWrnCnt = 0 ;
+	private static int normalisationWrnCnt = 0 ;
 
 	// === start Builder ===
 	public static class Builder implements TravelDisutilityFactory{
@@ -124,7 +125,10 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 		if ( sigma != 0. ) {
 			this.random = MatsimRandom.getLocalInstance() ;
 			this.normalization = 1./Math.exp( this.sigma*this.sigma/2 );
-			log.warn(" sigma: " + this.sigma + "; resulting normalization: " + normalization ) ;
+			if ( normalisationWrnCnt < 10 ) {
+				normalisationWrnCnt++ ;
+				log.warn(" sigma: " + this.sigma + "; resulting normalization: " + normalization ) ;
+			}
 		} else {
 			this.normalization = 1. ;
 		}
@@ -166,7 +170,7 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 		if ( vehicle != null ) {
 			vehicleId = vehicle.getId();
 		}
-		double tollCost = this.tollCostHandler.getTollCost(link, time, personId, vehicleId );
+		double tollCost = this.tollCostHandler.getTypicalTollCost(link, time );
 		return normalTravelDisutilityForLink + tollCost*this.marginalUtilityOfMoney*logNormalRnd ;
 		// sign convention: these are all costs (= disutilities), so they are all normally positive.  tollCost is positive, marginalUtilityOfMoney as well.
 	}
@@ -177,13 +181,13 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 	}
 
 	private interface TollRouterBehaviour {
-		public double getTollCost(Link link, double time, Id<Person> personId, Id<Vehicle> vehicleId);
+		public double getTypicalTollCost(Link link, double time);
 	}
 
 	/*package*/ class DistanceTollCostBehaviour implements TollRouterBehaviour {
 		@Override
-		public double getTollCost(final Link link, final double time, Id<Person> personId, Id<Vehicle> vehicleId) {
-			Cost cost_per_m = scheme.getLinkCostInfo(link.getId(), time, personId, vehicleId );
+		public double getTypicalTollCost(final Link link, final double time) {
+			Cost cost_per_m = scheme.getTypicalLinkCostInfo(link.getId(), time );
 			if (cost_per_m == null) {
 				return 0.0;
 			}
@@ -195,8 +199,8 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 
 	/*package*/ class AreaTollCostBehaviour implements TollRouterBehaviour {
 		@Override
-		public double getTollCost(final Link link, final double time, Id<Person> personId, Id<Vehicle> vehicleId) {
-			Cost cost = scheme.getLinkCostInfo(link.getId(), time, personId, vehicleId );
+		public double getTypicalTollCost(final Link link, final double time) {
+			Cost cost = scheme.getTypicalLinkCostInfo(link.getId(), time );
 			if (cost == null) {
 				return 0.0;
 			}
@@ -213,8 +217,8 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 
 	/*package*/ class CordonTollCostBehaviour implements TollRouterBehaviour {
 		@Override
-		public double getTollCost(final Link link, final double time, Id<Person> personId, Id<Vehicle> vehicleId) {
-			Cost cost = scheme.getLinkCostInfo(link.getId(), time, personId, vehicleId );
+		public double getTypicalTollCost(final Link link, final double time) {
+			Cost cost = scheme.getTypicalLinkCostInfo(link.getId(), time );
 			if (cost == null) {
 				return 0.0;
 			}
@@ -224,8 +228,8 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 
 	/* package */ class LinkTollCostBehaviour implements TollRouterBehaviour {
 		@Override
-		public double getTollCost(final Link link, final double time, Id<Person> personId, Id<Vehicle> vehicleId) {
-			Cost cost = scheme.getLinkCostInfo(link.getId(), time, personId, vehicleId );
+		public double getTypicalTollCost(final Link link, final double time) {
+			Cost cost = scheme.getTypicalLinkCostInfo(link.getId(), time );
 			if (cost == null) {
 				return 0.0;
 			}
